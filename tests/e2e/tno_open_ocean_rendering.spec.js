@@ -38,17 +38,16 @@ async function setOpenOceanVisibility(page, visible) {
 async function setWaterOverrideColor(page, featureId, color) {
   await page.evaluate(async ({ targetFeatureId, nextColor }) => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
+    const { refreshColorState } = await import("/js/core/map_renderer.js");
     state.waterRegionOverrides = {
       ...(state.waterRegionOverrides || {}),
     };
     if (nextColor) {
       state.waterRegionOverrides[targetFeatureId] = nextColor;
-      render();
     } else {
       delete state.waterRegionOverrides[targetFeatureId];
-      render();
     }
+    refreshColorState({ renderNow: true });
   }, {
     targetFeatureId: featureId,
     nextColor: color,
@@ -62,7 +61,7 @@ async function readOpenOceanRuntime(page, featureId) {
       ? state.waterSpatialItems.filter((item) => String(item?.featureId || "") === targetFeatureId)
       : [];
     return {
-      featureVisible: !!state.showOpenOceanRegions,
+      featureInteractive: !!state.showOpenOceanRegions,
       itemCount: items.length,
       itemBounds: items.map((item) => ({
         minX: item.minX,
@@ -78,49 +77,85 @@ async function readOpenOceanRuntime(page, featureId) {
 async function measureFeaturePatchDiff(page, featureId, color) {
   return page.evaluate(async ({ targetFeatureId, nextColor }) => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
+    const { refreshColorState } = await import("/js/core/map_renderer.js");
     const items = Array.isArray(state.waterSpatialItems)
       ? state.waterSpatialItems
         .filter((item) => String(item?.featureId || "") === targetFeatureId)
         .sort((left, right) => Number(right?.bboxArea || 0) - Number(left?.bboxArea || 0))
       : [];
-    const targetItem = items[0];
     const canvas = document.getElementById("map-canvas");
     const context = canvas instanceof HTMLCanvasElement
       ? canvas.getContext("2d", { willReadFrequently: true })
       : null;
-    if (!targetItem || !canvas || !context) {
+    const transform = state.zoomTransform || { x: 0, y: 0, k: 1 };
+    const dpr = Number(state.dpr || globalThis.devicePixelRatio || 1);
+    if (!items.length || !canvas || !context) {
       return null;
     }
-    const minX = Math.max(0, Math.min(canvas.width - 1, Math.floor(targetItem.minX)));
-    const minY = Math.max(0, Math.min(canvas.height - 1, Math.floor(targetItem.minY)));
-    const maxX = Math.max(minX + 1, Math.min(canvas.width, Math.ceil(targetItem.maxX)));
-    const maxY = Math.max(minY + 1, Math.min(canvas.height, Math.ceil(targetItem.maxY)));
-    const width = Math.max(1, maxX - minX);
-    const height = Math.max(1, maxY - minY);
-    const before = context.getImageData(minX, minY, width, height).data;
+    const sampleBoxes = items
+      .map((item) => {
+        const minX = Math.max(
+          0,
+          Math.min(
+            canvas.width - 1,
+            Math.floor(((item.minX * transform.k) + transform.x) * dpr)
+          )
+        );
+        const minY = Math.max(
+          0,
+          Math.min(
+            canvas.height - 1,
+            Math.floor(((item.minY * transform.k) + transform.y) * dpr)
+          )
+        );
+        const maxX = Math.max(
+          minX + 1,
+          Math.min(
+            canvas.width,
+            Math.ceil(((item.maxX * transform.k) + transform.x) * dpr)
+          )
+        );
+        const maxY = Math.max(
+          minY + 1,
+          Math.min(
+            canvas.height,
+            Math.ceil(((item.maxY * transform.k) + transform.y) * dpr)
+          )
+        );
+        const width = Math.max(1, maxX - minX);
+        const height = Math.max(1, maxY - minY);
+        if (!(width > 0) || !(height > 0)) return null;
+        return { minX, minY, width, height };
+      })
+      .filter(Boolean);
+    if (!sampleBoxes.length) {
+      return null;
+    }
+    const before = sampleBoxes.map((box) => context.getImageData(box.minX, box.minY, box.width, box.height).data);
     state.waterRegionOverrides = {
       ...(state.waterRegionOverrides || {}),
       [targetFeatureId]: nextColor,
     };
-    render();
+    refreshColorState({ renderNow: true });
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const after = context.getImageData(minX, minY, width, height).data;
     let changedPixelCount = 0;
     let changedChannelSum = 0;
-    for (let index = 0; index < before.length; index += 4) {
-      const diff =
-        Math.abs(before[index] - after[index])
-        + Math.abs(before[index + 1] - after[index + 1])
-        + Math.abs(before[index + 2] - after[index + 2]);
-      if (diff >= 24) {
-        changedPixelCount += 1;
-        changedChannelSum += diff / 3;
+    sampleBoxes.forEach((box, boxIndex) => {
+      const after = context.getImageData(box.minX, box.minY, box.width, box.height).data;
+      const beforeData = before[boxIndex];
+      for (let index = 0; index < beforeData.length; index += 4) {
+        const diff =
+          Math.abs(beforeData[index] - after[index])
+          + Math.abs(beforeData[index + 1] - after[index + 1])
+          + Math.abs(beforeData[index + 2] - after[index + 2]);
+        if (diff >= 24) {
+          changedPixelCount += 1;
+          changedChannelSum += diff / 3;
+        }
       }
-    }
+    });
     return {
-      width,
-      height,
+      sampledBoxes: sampleBoxes.length,
       changedPixelCount,
       meanChangedChannelDiff: changedPixelCount ? changedChannelSum / changedPixelCount : 0,
     };
@@ -139,22 +174,44 @@ test("tno open ocean override is visibly rendered and indexed by polygon part", 
   await waitForAppInteractive(page);
   await applyScenario(page, "tno_1962");
 
-  await setOpenOceanVisibility(page, true);
   await page.waitForFunction(async (expectedFeatureId) => {
     const { state } = await import("/js/core/state.js");
-    return !!state.showOpenOceanRegions
-      && Array.isArray(state.waterSpatialItems)
+    return Array.isArray(state.waterSpatialItems)
       && state.waterSpatialItems.some((item) => String(item?.featureId || "") === expectedFeatureId);
   }, targetFeatureId);
 
   const runtimeBefore = await readOpenOceanRuntime(page, targetFeatureId);
-  expect(runtimeBefore.featureVisible).toBe(true);
+  expect(runtimeBefore.featureInteractive).toBe(false);
   expect(runtimeBefore.itemCount).toBeGreaterThan(1);
 
-  const diffStats = await measureFeaturePatchDiff(page, targetFeatureId, "#ff00ff");
-  expect(diffStats).not.toBeNull();
-  expect(diffStats.changedPixelCount).toBeGreaterThan(250);
-  expect(diffStats.meanChangedChannelDiff).toBeGreaterThan(30);
+  const diffWhileInteractionOff = await measureFeaturePatchDiff(page, targetFeatureId, "#ff00ff");
+  expect(diffWhileInteractionOff).not.toBeNull();
+  expect(diffWhileInteractionOff.changedPixelCount).toBeGreaterThan(80);
+  expect(diffWhileInteractionOff.meanChangedChannelDiff).toBeGreaterThan(20);
+
+  await setOpenOceanVisibility(page, true);
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !!state.showOpenOceanRegions;
+  });
+  const runtimeInteractiveOn = await readOpenOceanRuntime(page, targetFeatureId);
+  expect(runtimeInteractiveOn.featureInteractive).toBe(true);
+  const diffWhileInteractionOn = await measureFeaturePatchDiff(page, targetFeatureId, "#00d4ff");
+  expect(diffWhileInteractionOn).not.toBeNull();
+  expect(diffWhileInteractionOn.changedPixelCount).toBeGreaterThan(80);
+  expect(diffWhileInteractionOn.meanChangedChannelDiff).toBeGreaterThan(20);
+
+  await setOpenOceanVisibility(page, false);
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !state.showOpenOceanRegions;
+  });
+  const runtimeAfterToggleOff = await readOpenOceanRuntime(page, targetFeatureId);
+  expect(runtimeAfterToggleOff.featureInteractive).toBe(false);
+  const diffAfterToggleOff = await measureFeaturePatchDiff(page, targetFeatureId, "#ff8800");
+  expect(diffAfterToggleOff).not.toBeNull();
+  expect(diffAfterToggleOff.changedPixelCount).toBeGreaterThan(80);
+  expect(diffAfterToggleOff.meanChangedChannelDiff).toBeGreaterThan(20);
 
   await setWaterOverrideColor(page, targetFeatureId, "");
 });

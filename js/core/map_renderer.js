@@ -1804,15 +1804,23 @@ function isMacroOceanWaterRegion(feature) {
   );
 }
 
-function isWaterRegionEnabled(feature) {
+function isWaterRegionRenderable(feature) {
   if (!feature) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
   }
   if (isOpenOceanWaterRegion(feature)) {
-    return !!state.showOpenOceanRegions;
+    return true;
   }
   return feature?.properties?.interactive !== false;
+}
+
+function isWaterRegionEnabled(feature) {
+  if (!isWaterRegionRenderable(feature)) return false;
+  if (isOpenOceanWaterRegion(feature)) {
+    return !!state.showOpenOceanRegions;
+  }
+  return true;
 }
 
 function getWaterRegionDefaultStyle(feature) {
@@ -3988,6 +3996,7 @@ function refreshColorState({ renderNow = true } = {}) {
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   rebuildResolvedColors();
+  invalidateRenderPasses("contextScenario", "refresh-colors");
   if (renderNow && context) {
     render();
   }
@@ -13792,7 +13801,7 @@ function drawScenarioRegionOverlaysPass(k) {
   if (showWater) {
     waterFeatures.forEach((feature, index) => {
       const id = getFeatureId(feature) || `water-${index}`;
-      if (!isWaterRegionEnabled(feature)) return;
+      if (!isWaterRegionRenderable(feature)) return;
       if (!pathBoundsInScreen(feature)) return;
       const isMacroOcean = isMacroOceanWaterRegion(feature);
       const defaultStyle = getWaterRegionDefaultStyle(feature);

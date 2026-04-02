@@ -3,6 +3,7 @@ import {
   getTransportWorkbenchCarrierViewState,
   projectTransportWorkbenchCarrierGeometry,
   projectTransportWorkbenchCarrierPoint,
+  projectTransportWorkbenchCarrierScenePoint,
 } from "./transport_workbench_carrier.js";
 import {
   createTransportWorkbenchLinePackRuntime,
@@ -37,6 +38,13 @@ const STATION_IMPORTANCE_STYLE = {
   broad_major: { sizeMultiplier: 0.92, labelScale: 0.95, minLabelScale: 1.22 },
   regional_core: { sizeMultiplier: 1.0, labelScale: 1.0, minLabelScale: 1.14 },
   capital_core: { sizeMultiplier: 1.22, labelScale: 1.12, minLabelScale: 1.06 },
+};
+const STATION_LABEL_GRID_BY_DENSITY = {
+  very_sparse: 208,
+  sparse: 176,
+  balanced: 144,
+  dense: 118,
+  very_dense: 94,
 };
 const INACTIVE_STATUS = new Set(["disused", "abandoned", "construction"]);
 const SELECTED_LINE_STROKE = "#0f172a";
@@ -278,6 +286,33 @@ function shouldShowStation(feature, config, scale) {
 function shouldShowStationLabel(feature, config, scale) {
   if (!config.showStationLabels) return false;
   return shouldShowStation(feature, config, scale) && scale >= getStationImportanceStyle(feature).minLabelScale;
+}
+
+function getStationLabelDensityGridSize(config) {
+  return STATION_LABEL_GRID_BY_DENSITY[String(config?.labelDensityPreset || "").trim()] || STATION_LABEL_GRID_BY_DENSITY.balanced;
+}
+
+function buildVisibleStationLabelEntries(visibleStations, config, scale) {
+  const gridSize = getStationLabelDensityGridSize(config);
+  const usedBuckets = new Set();
+  return visibleStations
+    .filter((feature) => shouldShowStationLabel(feature, config, scale))
+    .map((feature) => ({
+      feature,
+      screenPoint: projectTransportWorkbenchCarrierScenePoint(feature.x, feature.y),
+    }))
+    .filter((entry) => entry.screenPoint)
+    .sort((left, right) => {
+      const importanceDelta = getImportanceRank(right.feature) - getImportanceRank(left.feature);
+      if (importanceDelta !== 0) return importanceDelta;
+      return String(left.feature.name || left.feature.id).localeCompare(String(right.feature.name || right.feature.id), "ja");
+    })
+    .filter((entry) => {
+      const bucketKey = `${Math.round(entry.screenPoint.x / gridSize)}:${Math.round(entry.screenPoint.y / gridSize)}`;
+      if (usedBuckets.has(bucketKey)) return false;
+      usedBuckets.add(bucketKey);
+      return true;
+    });
 }
 
 function findDatasetNode(startNode, datasetKey, boundaryNode) {
@@ -536,9 +571,10 @@ function updateStationNode(node, feature, config, isSelected) {
   node.setAttribute("class", `transport-workbench-rail-station importance-${feature.importance}`);
 }
 
-function syncStationNodes(visibleStations, config, selectedStationId, scale) {
+function syncStationNodes(visibleStations, visibleStationLabelEntries, config, selectedStationId) {
   const visibleIds = new Set();
-  const visibleLabelIds = new Set();
+  const visibleLabelIds = new Set(visibleStationLabelEntries.map((entry) => entry.feature.id));
+  const stationLabelEntryById = new Map(visibleStationLabelEntries.map((entry) => [entry.feature.id, entry]));
   const orderedNodes = [];
   const orderedLabels = [];
   visibleStations.forEach((feature) => {
@@ -558,7 +594,8 @@ function syncStationNodes(visibleStations, config, selectedStationId, scale) {
     orderedNodes.push(node);
     visibleIds.add(feature.id);
 
-    if (shouldShowStationLabel(feature, config, scale)) {
+    const labelEntry = stationLabelEntryById.get(feature.id);
+    if (labelEntry) {
       const importanceStyle = getStationImportanceStyle(feature);
       const fontSize = 10 * importanceStyle.labelScale;
       const textOffsetX = 7 + Math.max(0, fontSize - 10);
@@ -569,8 +606,8 @@ function syncStationNodes(visibleStations, config, selectedStationId, scale) {
         stationLabelNodeById.set(feature.id, text);
       }
       text.textContent = feature.name || "";
-      text.setAttribute("x", String(feature.x + textOffsetX));
-      text.setAttribute("y", String(feature.y - textOffsetY));
+      text.setAttribute("x", String(labelEntry.screenPoint.x + textOffsetX));
+      text.setAttribute("y", String(labelEntry.screenPoint.y - textOffsetY));
       text.setAttribute("font-size", String(fontSize));
       text.setAttribute("font-weight", feature.importance === "capital_core" ? "700" : "600");
       text.setAttribute("fill", feature.importance === "capital_core" ? "#111827" : "#1f2937");
@@ -581,7 +618,6 @@ function syncStationNodes(visibleStations, config, selectedStationId, scale) {
       text.dataset.railStationId = feature.id;
       text.setAttribute("class", "transport-workbench-rail-station-label");
       orderedLabels.push(text);
-      visibleLabelIds.add(feature.id);
     }
   });
   syncGroupOrder(stationsGroup, orderedNodes);
@@ -622,15 +658,16 @@ function renderRail(config) {
       return left.projectedLength - right.projectedLength;
     });
   const visibleStations = pack.stationFeatures.filter((feature) => shouldShowStation(feature, config, scale));
+  const visibleStationLabelEntries = buildVisibleStationLabelEntries(visibleStations, config, scale);
   const selectedLineId = runtime.selectedFeature?.type === "line" ? runtime.selectedFeature.id : null;
   const selectedStationId = runtime.selectedFeature?.type === "station" ? runtime.selectedFeature.id : null;
   syncLineNodes(visibleLines, config, selectedLineId);
-  syncStationNodes(visibleStations, config, selectedStationId, scale);
+  syncStationNodes(visibleStations, visibleStationLabelEntries, config, selectedStationId);
   runtime.renderStats = {
     visibleLines: visibleLines.length,
     visibleStations: visibleStations.length,
     visibleLineLabels: 0,
-    visibleStationLabels: stationLabelNodeById.size,
+    visibleStationLabels: visibleStationLabelEntries.length,
     totalLines: pack.lineFeatures.length,
     totalStations: pack.stationFeatures.length,
     filteredLines: pack.lineFeatures.length - visibleLines.length,

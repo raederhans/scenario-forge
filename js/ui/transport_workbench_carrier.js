@@ -18,6 +18,7 @@ let svgNode = null;
 let cameraNode = null;
 let sceneNode = null;
 let orientationNode = null;
+let screenLabelLayerNode = null;
 let resizeObserver = null;
 let asset = null;
 let activeFamily = "road";
@@ -440,9 +441,11 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
 
   const labelOverlay = createSvgNode("g");
   labelOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-labels");
+  labelOverlay.dataset.frameId = frameId;
 
-  frameLayer.append(seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay, labelOverlay);
+  frameLayer.append(seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay);
   scene.appendChild(frameLayer);
+  screenLabelLayerNode?.appendChild(labelOverlay);
 
   overlayRoots.land[frameId] = landOverlay;
   overlayRoots.sea[frameId] = seaOverlay;
@@ -484,17 +487,20 @@ function buildCarrierSvg(carrierAsset) {
   orientationLayer.classList.add("transport-workbench-carrier-orientation");
   const scene = createSvgNode("g");
   scene.classList.add("transport-workbench-carrier-scene");
+  const screenLabelLayer = createSvgNode("g");
+  screenLabelLayer.classList.add("transport-workbench-carrier-screen-labels");
 
   frameContexts = {};
   sceneBaseBounds = null;
+  screenLabelLayerNode = screenLabelLayer;
   Object.entries(carrierAsset.frames || {}).forEach(([frameId, frameDefinition]) => {
     frameContexts[frameId] = buildFrame(frameId, frameDefinition, defs, scene);
   });
 
   orientationLayer.appendChild(scene);
   cameraLayer.appendChild(orientationLayer);
-  svg.append(defs, seaBackground, cameraLayer);
-  return { svg, cameraLayer, scene, orientationLayer };
+  svg.append(defs, seaBackground, cameraLayer, screenLabelLayer);
+  return { svg, cameraLayer, scene, orientationLayer, screenLabelLayer };
 }
 
 function ensureResizeObserver() {
@@ -549,6 +555,21 @@ export function projectTransportWorkbenchCarrierGeometry(geometry, frameId) {
   };
 }
 
+export function projectTransportWorkbenchCarrierScenePoint(x, y) {
+  if (!sceneNode || !svgNode) return null;
+  const resolvedX = Number(x);
+  const resolvedY = Number(y);
+  if (!Number.isFinite(resolvedX) || !Number.isFinite(resolvedY)) return null;
+  const matrix = sceneNode.getCTM?.();
+  if (!matrix) return null;
+  const point = svgNode.createSVGPoint();
+  point.x = resolvedX;
+  point.y = resolvedY;
+  const transformed = point.matrixTransform(matrix);
+  if (!Number.isFinite(transformed.x) || !Number.isFinite(transformed.y)) return null;
+  return { x: transformed.x, y: transformed.y };
+}
+
 export async function ensureTransportWorkbenchCarrier(nextMountNode) {
   if (!nextMountNode) return null;
   mountNode = nextMountNode;
@@ -560,6 +581,7 @@ export async function ensureTransportWorkbenchCarrier(nextMountNode) {
     cameraNode = built.cameraLayer;
     sceneNode = built.scene;
     orientationNode = built.orientationLayer;
+    screenLabelLayerNode = built.screenLabelLayer;
     currentLodKey = "overview";
     camera = clampCamera(asset.defaultCamera || camera);
     renderLodIfNeeded(true);
@@ -648,6 +670,7 @@ export function destroyTransportWorkbenchCarrier() {
   cameraNode = null;
   sceneNode = null;
   orientationNode = null;
+  screenLabelLayerNode = null;
   frameContexts = {};
   sceneBaseBounds = null;
   overlayRoots.land.main = null;

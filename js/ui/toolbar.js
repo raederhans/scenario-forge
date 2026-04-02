@@ -347,6 +347,15 @@ function buildEnergyFacilitySubtypeControlOptions(previewSnapshot) {
     .filter((entry) => entry.value);
 }
 
+const TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS = [
+  { value: "very_sparse", label: "Very sparse" },
+  { value: "sparse", label: "Sparse" },
+  { value: "balanced", label: "Balanced" },
+  { value: "dense", label: "Dense" },
+  { value: "very_dense", label: "Very dense" },
+];
+const TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES = TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS.map((option) => option.value);
+
 const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
   road: {
     roadClass: ["motorway", "trunk", "primary"],
@@ -386,6 +395,7 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     importanceThreshold: "regional_core",
     singlePrimaryStationPerCity: true,
     showStationLabels: true,
+    labelDensityPreset: "balanced",
     statusEncoding: "line_style",
     showBranchAtCurrentZoom: true,
     showServiceLines: false,
@@ -399,6 +409,7 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     statuses: ["active", "paused"],
     importanceThreshold: "regional_core",
     showLabels: true,
+    labelDensityPreset: "balanced",
     baseOpacity: 90,
   },
   port: {
@@ -406,10 +417,12 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     managerTypes: PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value),
     importanceThreshold: "regional_core",
     showLabels: true,
+    labelDensityPreset: "balanced",
     baseOpacity: 90,
   },
   mineral_resources: {
     showLabels: false,
+    labelDensityPreset: "sparse",
     pointOpacity: 72,
     pointSize: 92,
   },
@@ -417,6 +430,7 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     facilitySubtypes: [],
     statuses: ENERGY_STATUS_OPTIONS.map((option) => option.value),
     showLabels: true,
+    labelDensityPreset: "very_sparse",
     pointOpacity: 86,
     pointSize: 100,
   },
@@ -425,6 +439,7 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     siteClasses: INDUSTRIAL_SITE_CLASS_OPTIONS.map((option) => option.value),
     coastalModes: INDUSTRIAL_COASTAL_OPTIONS.map((option) => option.value),
     showLabels: false,
+    labelDensityPreset: "sparse",
     fillOpacity: 74,
     outlineOpacity: 88,
   },
@@ -432,6 +447,7 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     hubTypes: LOGISTICS_HUB_TYPE_OPTIONS.map((option) => option.value),
     operatorClassifications: LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS.map((option) => option.value),
     showLabels: false,
+    labelDensityPreset: "sparse",
     pointOpacity: 78,
     pointSize: 100,
   },
@@ -663,7 +679,7 @@ function normalizeRoadTransportWorkbenchConfig(value) {
     denseMetroGuard: normalizeTransportWorkbenchEnum(source.denseMetroGuard, ["light", "balanced", "strict"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.denseMetroGuard),
     showRefs: source.showRefs !== false,
     refClasses: normalizeTransportWorkbenchMulti(source.refClasses, ROAD_CLASS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.refClasses),
-    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, ["sparse", "balanced", "dense"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.labelDensityPreset),
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.labelDensityPreset),
     allowPrimaryRefsAtHighZoom: source.allowPrimaryRefsAtHighZoom !== false,
     strokePreset: normalizeTransportWorkbenchEnum(source.strokePreset, ["corridor", "review", "quiet"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.strokePreset),
     selectedEmphasis: normalizeTransportWorkbenchEnum(source.selectedEmphasis, ["outline", "glow", "mute_others"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.selectedEmphasis),
@@ -690,6 +706,7 @@ function normalizeRailTransportWorkbenchConfig(value) {
     importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["capital_core", "regional_core", "broad_major"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.importanceThreshold),
     singlePrimaryStationPerCity: source.singlePrimaryStationPerCity !== false,
     showStationLabels: source.showStationLabels !== false,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.labelDensityPreset),
     statusEncoding: normalizeTransportWorkbenchEnum(source.statusEncoding, ["line_style", "line_style_plus_hue"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.statusEncoding),
     showBranchAtCurrentZoom: source.showBranchAtCurrentZoom !== false,
     showServiceLines: !!source.showServiceLines,
@@ -707,6 +724,7 @@ function normalizeAirportTransportWorkbenchConfig(value) {
     statuses: normalizeTransportWorkbenchMulti(source.statuses, AIRPORT_STATUS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.statuses),
     importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core", "local_connector"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.importanceThreshold),
     showLabels: source.showLabels !== false,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.labelDensityPreset),
     baseOpacity: Math.max(35, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.baseOpacity)),
   };
 }
@@ -718,6 +736,7 @@ function normalizePortTransportWorkbenchConfig(value) {
     managerTypes: normalizeTransportWorkbenchMulti(source.managerTypes, PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.managerTypes),
     importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.importanceThreshold),
     showLabels: source.showLabels !== false,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.labelDensityPreset),
     baseOpacity: Math.max(35, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.baseOpacity)),
   };
 }
@@ -726,6 +745,7 @@ function normalizeMineralResourceTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
     showLabels: !!source.showLabels,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources.labelDensityPreset),
     pointOpacity: Math.max(28, Math.min(100, Number(source.pointOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources.pointOpacity)),
     pointSize: Math.max(72, Math.min(148, Number(source.pointSize) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources.pointSize)),
   };
@@ -743,6 +763,7 @@ function normalizeEnergyFacilityTransportWorkbenchConfig(value) {
       TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities.statuses
     ),
     showLabels: source.showLabels !== false,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities.labelDensityPreset),
     pointOpacity: Math.max(30, Math.min(100, Number(source.pointOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities.pointOpacity)),
     pointSize: Math.max(72, Math.min(148, Number(source.pointSize) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities.pointSize)),
   };
@@ -767,6 +788,7 @@ function normalizeIndustrialTransportWorkbenchConfig(value) {
       TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.industrial_zones.coastalModes
     ),
     showLabels: !!source.showLabels,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.industrial_zones.labelDensityPreset),
     fillOpacity: Math.max(18, Math.min(100, Number(source.fillOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.industrial_zones.fillOpacity)),
     outlineOpacity: Math.max(28, Math.min(100, Number(source.outlineOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.industrial_zones.outlineOpacity)),
   };
@@ -786,6 +808,7 @@ function normalizeLogisticsHubTransportWorkbenchConfig(value) {
       TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.logistics_hubs.operatorClassifications
     ),
     showLabels: !!source.showLabels,
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.logistics_hubs.labelDensityPreset),
     pointOpacity: Math.max(30, Math.min(100, Number(source.pointOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.logistics_hubs.pointOpacity)),
     pointSize: Math.max(72, Math.min(148, Number(source.pointSize) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.logistics_hubs.pointSize)),
   };
@@ -910,11 +933,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       controls: [
         { type: "toggle", key: "showRefs", label: "Show refs", description: "Turns road_labels on or off." },
         { type: "multi", key: "refClasses", label: "Ref classes", options: ROAD_REF_CLASS_OPTIONS, description: "Primary is now available. Lower classes stay visible in UI but disabled until data lands." },
-        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively refs fill the corridor.", options: [
-          { value: "sparse", label: "Sparse" },
-          { value: "balanced", label: "Balanced" },
-          { value: "dense", label: "Dense" },
-        ] },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively refs fill the corridor.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
         { type: "toggle", key: "allowPrimaryRefsAtHighZoom", label: "Allow primary refs at high zoom", description: "Primary refs stay gated until closer inspection." },
       ],
     },
@@ -981,6 +1000,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
         ] },
         { type: "toggle", key: "singlePrimaryStationPerCity", label: "Single primary station per city", description: "Keep one main station per city by default." },
         { type: "toggle", key: "showStationLabels", label: "Show station labels", description: "Expose names only for retained major stations." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively station names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1034,6 +1054,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep label reveal simple and intentional.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose airport names only when the current zoom can carry them cleanly." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively airport names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1066,6 +1087,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep port names gated by the current zoom and importance.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose port names only when the current zoom can carry them cleanly." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively port names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1085,6 +1107,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep mineral labels opt-in so dense point fields stay readable.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose mineral labels only during closer review." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively mineral labels are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1121,6 +1144,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep facility names visible only when the current zoom can carry them cleanly.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose energy facility labels during closer review." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively facility names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1165,6 +1189,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep names opt-in so polygon review stays readable.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose polygon names only when you want name-led review." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively polygon names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -1194,6 +1219,7 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
       description: "Keep names gated so hub points stay readable over industrial land.",
       controls: [
         { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose logistics hub labels only during closer review." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively hub names are kept on screen.", options: TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS },
       ],
     },
     {
@@ -3115,6 +3141,8 @@ function initToolbar({ render } = {}) {
             const viewState = getTransportWorkbenchCarrierViewState() || {};
             transportWorkbenchPreviewLastViewKey = [
               Number(viewState.scale || 1).toFixed(4),
+              Number(viewState.translateX || 0).toFixed(2),
+              Number(viewState.translateY || 0).toFixed(2),
               String(viewState.quarterTurns || 0),
             ].join(":");
             renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
@@ -3202,6 +3230,8 @@ function initToolbar({ render } = {}) {
     const viewState = getTransportWorkbenchCarrierViewState() || {};
     const nextViewKey = [
       Number(viewState.scale || 1).toFixed(4),
+      Number(viewState.translateX || 0).toFixed(2),
+      Number(viewState.translateY || 0).toFixed(2),
       String(viewState.quarterTurns || 0),
     ].join(":");
     if (transportWorkbenchPreviewLastViewKey === nextViewKey) {

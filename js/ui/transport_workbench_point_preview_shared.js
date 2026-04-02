@@ -2,10 +2,18 @@ import {
   getTransportWorkbenchCarrierOverlayRoots,
   getTransportWorkbenchCarrierViewState,
   projectTransportWorkbenchCarrierPoint,
+  projectTransportWorkbenchCarrierScenePoint,
 } from "./transport_workbench_carrier.js";
 
 const PACK_MODE_PREVIEW = "preview";
 const PACK_MODE_FULL = "full";
+const POINT_LABEL_GRID_BY_DENSITY = {
+  very_sparse: 192,
+  sparse: 164,
+  balanced: 136,
+  dense: 112,
+  very_dense: 90,
+};
 
 function createSvgNode(tagName) {
   return document.createElementNS("http://www.w3.org/2000/svg", tagName);
@@ -148,9 +156,11 @@ function createMarkerNode(feature, markerStyle, onSelect) {
 }
 
 function createLabelNode(feature, markerStyle, onSelect) {
+  const screenPoint = projectTransportWorkbenchCarrierScenePoint(feature.x, feature.y);
+  if (!screenPoint) return null;
   const label = createSvgNode("text");
-  label.setAttribute("x", String(feature.x + normalizeNumber(markerStyle.labelOffsetX, 8)));
-  label.setAttribute("y", String(feature.y + normalizeNumber(markerStyle.labelOffsetY, 1.5)));
+  label.setAttribute("x", String(screenPoint.x + normalizeNumber(markerStyle.labelOffsetX, 8)));
+  label.setAttribute("y", String(screenPoint.y + normalizeNumber(markerStyle.labelOffsetY, 1.5)));
   label.setAttribute("fill", markerStyle.labelColor || markerStyle.stroke);
   label.setAttribute("font-size", String(normalizeNumber(markerStyle.labelSize, 10.5)));
   label.setAttribute("font-weight", String(normalizeNumber(markerStyle.labelWeight, 600)));
@@ -165,6 +175,33 @@ function createLabelNode(feature, markerStyle, onSelect) {
     onSelect(feature);
   });
   return label;
+}
+
+function getLabelDensityGridSize(config) {
+  return POINT_LABEL_GRID_BY_DENSITY[String(config?.labelDensityPreset || "").trim()] || POINT_LABEL_GRID_BY_DENSITY.balanced;
+}
+
+function selectVisibleLabelEntries(visibleEntries, config) {
+  const gridSize = getLabelDensityGridSize(config);
+  const usedBuckets = new Set();
+  return visibleEntries
+    .filter((entry) => entry.visibility.showLabel)
+    .map((entry) => ({
+      ...entry,
+      screenPoint: projectTransportWorkbenchCarrierScenePoint(entry.feature.x, entry.feature.y),
+    }))
+    .filter((entry) => entry.screenPoint)
+    .sort((left, right) => {
+      const rankDelta = normalizeNumber(right.feature.importanceRank, 1) - normalizeNumber(left.feature.importanceRank, 1);
+      if (rankDelta !== 0) return rankDelta;
+      return String(left.feature.label || left.feature.id).localeCompare(String(right.feature.label || right.feature.id), "ja");
+    })
+    .filter((entry) => {
+      const bucketKey = `${Math.round(entry.screenPoint.x / gridSize)}:${Math.round(entry.screenPoint.y / gridSize)}`;
+      if (usedBuckets.has(bucketKey)) return false;
+      usedBuckets.add(bucketKey);
+      return true;
+    });
 }
 
 function applySelectionHighlight(runtime) {
@@ -451,24 +488,29 @@ export function createTransportWorkbenchPointPreviewController(definition) {
       }
       visibleEntries.push({ feature, visibility });
     });
+    const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
+    const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
     visibleEntries.forEach(({ feature, visibility }) => {
       runtime.rootGroup.appendChild(createMarkerNode(feature, markerStyle, (selectedFeature) => {
         runtime.selectedFeature = { ...selectedFeature, visible: true };
         applySelectionHighlight(runtime);
         emitSelectionChange();
       }));
-      if (visibility.showLabel) {
-        runtime.labelsGroup.appendChild(createLabelNode(feature, markerStyle, (selectedFeature) => {
+      if (visibility.showLabel && visibleLabelIds.has(feature.id)) {
+        const labelNode = createLabelNode(feature, markerStyle, (selectedFeature) => {
           runtime.selectedFeature = { ...selectedFeature, visible: true };
           applySelectionHighlight(runtime);
           emitSelectionChange();
-        }));
+        });
+        if (labelNode) {
+          runtime.labelsGroup.appendChild(labelNode);
+        }
       }
     });
     runtime.renderStats.totalFeatures = features.length;
     runtime.renderStats.visibleFeatures = visibleEntries.length;
     runtime.renderStats.filteredFeatures = Math.max(0, features.length - visibleEntries.length);
-    runtime.renderStats.visibleLabels = visibleEntries.filter((entry) => entry.visibility.showLabel).length;
+    runtime.renderStats.visibleLabels = visibleLabelEntries.length;
     runtime.renderedConfigSignature = JSON.stringify(config || {});
     applySelectionHighlight(runtime);
     emitSelectionChange();

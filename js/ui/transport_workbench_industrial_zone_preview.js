@@ -2,6 +2,7 @@ import {
   getTransportWorkbenchCarrierOverlayRoots,
   getTransportWorkbenchCarrierViewState,
   projectTransportWorkbenchCarrierGeometry,
+  projectTransportWorkbenchCarrierScenePoint,
 } from "./transport_workbench_carrier.js";
 
 const PACK_MODE_PREVIEW = "preview";
@@ -10,6 +11,13 @@ const MANIFEST_URL = "data/transport_layers/japan_industrial_zones/manifest.json
 const PACK_KEY = "industrial_zones";
 const INTERNAL_LABEL_THRESHOLD = 1.2;
 const OPEN_LABEL_THRESHOLD = 1.32;
+const INDUSTRIAL_LABEL_GRID_BY_DENSITY = {
+  very_sparse: 230,
+  sparse: 192,
+  balanced: 160,
+  dense: 132,
+  very_dense: 108,
+};
 
 function createSvgNode(tagName) {
   return document.createElementNS("http://www.w3.org/2000/svg", tagName);
@@ -253,9 +261,11 @@ function createPolygonNode(feature, style, onSelect) {
 }
 
 function createLabelNode(feature, style, onSelect) {
+  const screenPoint = projectTransportWorkbenchCarrierScenePoint(feature.bounds.centerX, feature.bounds.centerY);
+  if (!screenPoint) return null;
   const label = createSvgNode("text");
-  label.setAttribute("x", String(feature.bounds.centerX));
-  label.setAttribute("y", String(feature.bounds.centerY));
+  label.setAttribute("x", String(screenPoint.x));
+  label.setAttribute("y", String(screenPoint.y));
   label.setAttribute("fill", style.labelColor);
   label.setAttribute("font-size", "10.1");
   label.setAttribute("font-weight", "620");
@@ -274,6 +284,34 @@ function createLabelNode(feature, style, onSelect) {
     onSelect(feature);
   });
   return label;
+}
+
+function getLabelDensityGridSize(config) {
+  return INDUSTRIAL_LABEL_GRID_BY_DENSITY[String(config?.labelDensityPreset || "").trim()] || INDUSTRIAL_LABEL_GRID_BY_DENSITY.balanced;
+}
+
+function selectVisibleLabelEntries(visibleEntries, config) {
+  const gridSize = getLabelDensityGridSize(config);
+  const usedBuckets = new Set();
+  return visibleEntries
+    .filter((entry) => entry.showLabel)
+    .map((entry) => ({
+      ...entry,
+      screenPoint: projectTransportWorkbenchCarrierScenePoint(entry.feature.bounds.centerX, entry.feature.bounds.centerY),
+    }))
+    .filter((entry) => entry.screenPoint)
+    .sort((left, right) => {
+      const areaDelta = normalizeNumber(right.feature.bounds.width * right.feature.bounds.height, 0)
+        - normalizeNumber(left.feature.bounds.width * left.feature.bounds.height, 0);
+      if (areaDelta !== 0) return areaDelta;
+      return String(left.feature.name || left.feature.id).localeCompare(String(right.feature.name || right.feature.id), "ja");
+    })
+    .filter((entry) => {
+      const bucketKey = `${Math.round(entry.screenPoint.x / gridSize)}:${Math.round(entry.screenPoint.y / gridSize)}`;
+      if (usedBuckets.has(bucketKey)) return false;
+      usedBuckets.add(bucketKey);
+      return true;
+    });
 }
 
 function applySelectionHighlight(runtime) {
@@ -522,6 +560,8 @@ export async function renderJapanIndustrialZonePreview(config = {}) {
       showLabel: shouldShowLabel(feature, config, variantId, scale),
     });
   });
+  const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
+  const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
 
   visibleEntries.forEach(({ feature, showLabel }) => {
     runtime.rootGroup.appendChild(createPolygonNode(feature, style, (selectedFeature) => {
@@ -532,22 +572,25 @@ export async function renderJapanIndustrialZonePreview(config = {}) {
       applySelectionHighlight(runtime);
       emitSelectionChange();
     }));
-    if (showLabel) {
-      runtime.labelsGroup.appendChild(createLabelNode(feature, style, (selectedFeature) => {
+    if (showLabel && visibleLabelIds.has(feature.id)) {
+      const labelNode = createLabelNode(feature, style, (selectedFeature) => {
         runtime.selectedFeature = {
           ...selectedFeature,
           visible: true,
         };
         applySelectionHighlight(runtime);
         emitSelectionChange();
-      }));
+      });
+      if (labelNode) {
+        runtime.labelsGroup.appendChild(labelNode);
+      }
     }
   });
 
   runtime.renderStats.totalFeatures = pack.features.length;
   runtime.renderStats.visibleFeatures = visibleEntries.length;
   runtime.renderStats.filteredFeatures = Math.max(0, pack.features.length - visibleEntries.length);
-  runtime.renderStats.visibleLabels = visibleEntries.filter((entry) => entry.showLabel).length;
+  runtime.renderStats.visibleLabels = visibleLabelEntries.length;
   runtime.renderStats.variant = variantId;
   runtime.renderedConfigSignature = JSON.stringify(config || {});
   applySelectionHighlight(runtime);
