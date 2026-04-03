@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
 from map_builder.geo.topology import compute_neighbor_graph
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder.scenario_locks import scenario_build_lock
 from map_builder import scenario_bundle_platform
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
@@ -87,7 +88,9 @@ STAGE_ALL = "all"
 STAGE_COUNTRIES = "countries"
 STAGE_RUNTIME_TOPOLOGY = "runtime_topology"
 STAGE_GEO_LOCALE = "geo_locale"
+STAGE_STARTUP_ASSETS = "startup_assets"
 STAGE_WRITE_BUNDLE = "write_bundle"
+STAGE_CHUNK_ASSETS = "chunk_assets"
 PUBLISH_SCOPE_POLAR_RUNTIME = CONTRACT_PUBLISH_SCOPE_POLAR_RUNTIME
 PUBLISH_SCOPE_SCENARIO_DATA = CONTRACT_PUBLISH_SCOPE_SCENARIO_DATA
 PUBLISH_SCOPE_ALL = CONTRACT_PUBLISH_SCOPE_ALL
@@ -96,7 +99,9 @@ STAGE_CHOICES = [
     STAGE_COUNTRIES,
     STAGE_RUNTIME_TOPOLOGY,
     STAGE_GEO_LOCALE,
+    STAGE_STARTUP_ASSETS,
     STAGE_WRITE_BUNDLE,
+    STAGE_CHUNK_ASSETS,
 ]
 PUBLISH_SCOPE_CHOICES = [
     PUBLISH_SCOPE_POLAR_RUNTIME,
@@ -198,6 +203,17 @@ def _checkpoint_build_lock(checkpoint_dir: Path, *, stage: str = STAGE_ALL) -> o
                     lock_path.unlink(missing_ok=True)
             else:
                 _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth - 1
+
+
+@contextmanager
+def _scenario_build_session_lock(scenario_dir: Path) -> object:
+    with scenario_build_lock(
+        root=ROOT,
+        scenario_id=SCENARIO_ID,
+        scenario_dir=scenario_dir,
+        holder="patch_tno_1962_bundle",
+    ):
+        yield
 RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
@@ -4623,6 +4639,7 @@ CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = CONTRACT_CHECKPOINT_WATER_SEED_FILENAM
 CHECKPOINT_WATER_FILENAME = CONTRACT_CHECKPOINT_WATER_FILENAME
 CHECKPOINT_RELIEF_FILENAME = CONTRACT_CHECKPOINT_RELIEF_FILENAME
 CHECKPOINT_BATHYMETRY_FILENAME = CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME
+CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME
 CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME
 CHECKPOINT_GEO_LOCALE_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME
 CHECKPOINT_GEO_LOCALE_EN_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME
@@ -9276,14 +9293,19 @@ def build_bundle_state(
     )
 
 
-def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
-    with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_COUNTRIES):
-        scenario_bundle_platform.write_countries_stage_checkpoints(
-            state,
-            checkpoint_dir,
-            write_json=write_json,
-            gdf_to_feature_collection=gdf_to_feature_collection,
-        )
+def write_countries_stage_checkpoints(
+    state: dict[str, object],
+    checkpoint_dir: Path,
+    scenario_dir: Path = SCENARIO_DIR,
+) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_COUNTRIES):
+            scenario_bundle_platform.write_countries_stage_checkpoints(
+                state,
+                checkpoint_dir,
+                write_json=write_json,
+                gdf_to_feature_collection=gdf_to_feature_collection,
+            )
 
 
 def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
@@ -9294,14 +9316,19 @@ def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
     )
 
 
-def write_runtime_topology_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
-    with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_RUNTIME_TOPOLOGY):
-        scenario_bundle_platform.write_runtime_topology_stage_checkpoints(
-            state,
-            checkpoint_dir,
-            write_json=write_json,
-            gdf_to_feature_collection=gdf_to_feature_collection,
-        )
+def write_runtime_topology_stage_checkpoints(
+    state: dict[str, object],
+    checkpoint_dir: Path,
+    scenario_dir: Path = SCENARIO_DIR,
+) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_RUNTIME_TOPOLOGY):
+            scenario_bundle_platform.write_runtime_topology_stage_checkpoints(
+                state,
+                checkpoint_dir,
+                write_json=write_json,
+                gdf_to_feature_collection=gdf_to_feature_collection,
+            )
 
 
 def ensure_runtime_topology_checkpoints(
@@ -9309,16 +9336,21 @@ def ensure_runtime_topology_checkpoints(
     checkpoint_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> None:
-    with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_RUNTIME_TOPOLOGY):
-        scenario_bundle_platform.ensure_runtime_topology_checkpoints(
-            scenario_dir,
-            checkpoint_dir,
-            refresh_named_water_snapshot=refresh_named_water_snapshot,
-            build_countries_stage_state=build_countries_stage_state,
-            build_runtime_topology_state_from_countries_state=build_runtime_topology_state_from_countries_state,
-            load_countries_stage_checkpoints=load_countries_stage_checkpoints,
-            write_runtime_topology_stage_checkpoints=write_runtime_topology_stage_checkpoints,
-        )
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_RUNTIME_TOPOLOGY):
+            scenario_bundle_platform.ensure_runtime_topology_checkpoints(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=refresh_named_water_snapshot,
+                build_countries_stage_state=build_countries_stage_state,
+                build_runtime_topology_state_from_countries_state=build_runtime_topology_state_from_countries_state,
+                load_countries_stage_checkpoints=load_countries_stage_checkpoints,
+                write_runtime_topology_stage_checkpoints=lambda state, path: write_runtime_topology_stage_checkpoints(
+                    state,
+                    path,
+                    scenario_dir=scenario_dir,
+                ),
+            )
 
 
 def build_runtime_topology_stage(checkpoint_dir: Path) -> dict[str, object]:
@@ -9331,49 +9363,65 @@ def build_geo_locale_stage(
     checkpoint_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> None:
-    with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_GEO_LOCALE):
-        ensure_runtime_topology_checkpoints(
-            scenario_dir,
-            checkpoint_dir,
-            refresh_named_water_snapshot=refresh_named_water_snapshot,
-        )
-        build_tno_geo_locale_patch(
-            scenario_id=SCENARIO_ID,
-            scenario_dir=checkpoint_dir,
-            locales_path=ROOT / "data/locales.json",
-            manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
-            reviewed_exceptions_path=scenario_dir / "geo_locale_reviewed_exceptions.json",
-            output_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
-        )
-        ensure_geo_locale_variant_checkpoints(checkpoint_dir)
-        validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
-        build_startup_bootstrap_assets(
-            base_topology_path=ROOT / "data/europe_topology.na_v2.json",
-            full_locales_path=ROOT / "data/locales.json",
-            full_geo_aliases_path=ROOT / "data/geo_aliases.json",
-            full_runtime_topology_path=checkpoint_dir / "runtime_topology.topo.json",
-            scenario_geo_patch_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
-            runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-            startup_locales_output_path=ROOT / "data/locales.startup.json",
-            startup_geo_aliases_output_path=ROOT / "data/geo_aliases.startup.json",
-        )
-        build_startup_bundles(
-            scenario_manifest_path=checkpoint_dir / "manifest.json",
-            data_manifest_path=ROOT / "data/manifest.json",
-            topology_primary_path=ROOT / "data/europe_topology.json",
-            startup_locales_path=ROOT / "data/locales.startup.json",
-            geo_aliases_path=ROOT / "data/geo_aliases.startup.json",
-            runtime_bootstrap_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-            countries_path=checkpoint_dir / "countries.json",
-            owners_path=checkpoint_dir / "owners.by_feature.json",
-            controllers_path=checkpoint_dir / "controllers.by_feature.json",
-            cores_path=checkpoint_dir / "cores.by_feature.json",
-            geo_locale_patch_en_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_EN_FILENAME,
-            geo_locale_patch_zh_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
-            output_en_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
-            output_zh_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
-            report_path=STARTUP_BUNDLE_REPORT_PATH,
-        )
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_GEO_LOCALE):
+            ensure_runtime_topology_checkpoints(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=refresh_named_water_snapshot,
+            )
+            build_tno_geo_locale_patch(
+                scenario_id=SCENARIO_ID,
+                scenario_dir=checkpoint_dir,
+                locales_path=ROOT / "data/locales.json",
+                manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
+                reviewed_exceptions_path=scenario_dir / "geo_locale_reviewed_exceptions.json",
+                output_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
+            )
+            ensure_geo_locale_variant_checkpoints(checkpoint_dir)
+            validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+
+
+def build_startup_assets_stage(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_STARTUP_ASSETS):
+            ensure_runtime_topology_checkpoints(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=refresh_named_water_snapshot,
+            )
+            validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+            build_startup_bootstrap_assets(
+                base_topology_path=ROOT / "data/europe_topology.na_v2.json",
+                full_locales_path=ROOT / "data/locales.json",
+                full_geo_aliases_path=ROOT / "data/geo_aliases.json",
+                full_runtime_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
+                scenario_geo_patch_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
+                runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+                startup_locales_output_path=ROOT / "data/locales.startup.json",
+                startup_geo_aliases_output_path=ROOT / "data/geo_aliases.startup.json",
+            )
+            build_startup_bundles(
+                scenario_manifest_path=checkpoint_dir / "manifest.json",
+                data_manifest_path=ROOT / "data/manifest.json",
+                topology_primary_path=ROOT / "data/europe_topology.json",
+                startup_locales_path=ROOT / "data/locales.startup.json",
+                geo_aliases_path=ROOT / "data/geo_aliases.startup.json",
+                runtime_bootstrap_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+                countries_path=checkpoint_dir / "countries.json",
+                owners_path=checkpoint_dir / "owners.by_feature.json",
+                controllers_path=checkpoint_dir / "controllers.by_feature.json",
+                cores_path=checkpoint_dir / "cores.by_feature.json",
+                geo_locale_patch_en_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+                geo_locale_patch_zh_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+                output_en_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+                output_zh_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+                report_path=STARTUP_BUNDLE_REPORT_PATH,
+            )
 
 
 def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkpoint_payload: dict) -> dict[str, object]:
@@ -9418,35 +9466,42 @@ def write_bundle_stage(
     publish_scope: str = PUBLISH_SCOPE_POLAR_RUNTIME,
     manual_sync_policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
 ) -> None:
-    with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_WRITE_BUNDLE):
-        if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
-            _ensure_scenario_publish_target_offline(scenario_dir)
-            scenario_bundle_platform.validate_strict_publish_bundle(
-                checkpoint_dir,
-                publish_scope,
-                scenario_data_scope=PUBLISH_SCOPE_SCENARIO_DATA,
-                all_scope=PUBLISH_SCOPE_ALL,
-                validate_publish_bundle_dir=validate_publish_bundle_dir,
-            )
-            validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
-            detect_unsynced_manual_edits(
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_WRITE_BUNDLE):
+            if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+                _ensure_scenario_publish_target_offline(scenario_dir)
+                scenario_bundle_platform.validate_strict_publish_bundle(
+                    checkpoint_dir,
+                    publish_scope,
+                    scenario_data_scope=PUBLISH_SCOPE_SCENARIO_DATA,
+                    all_scope=PUBLISH_SCOPE_ALL,
+                    validate_publish_bundle_dir=validate_publish_bundle_dir,
+                )
+                validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+                scenario_bundle_platform.require_startup_stage_checkpoints(checkpoint_dir)
+                detect_unsynced_manual_edits(
+                    scenario_dir,
+                    checkpoint_dir,
+                    {
+                        "scenario_manual_overrides": scenario_dir / MANUAL_OVERRIDE_FILENAME,
+                        "geo_name_overrides": scenario_dir / "geo_name_overrides.manual.json",
+                        "district_groups": scenario_dir / "district_groups.manual.json",
+                    },
+                    policy=manual_sync_policy,
+                )
+            scenario_bundle_platform.publish_checkpoint_bundle(
                 scenario_dir,
                 checkpoint_dir,
-                {
-                    "scenario_manual_overrides": scenario_dir / MANUAL_OVERRIDE_FILENAME,
-                    "geo_name_overrides": scenario_dir / "geo_name_overrides.manual.json",
-                    "district_groups": scenario_dir / "district_groups.manual.json",
-                },
-                policy=manual_sync_policy,
+                publish_scope,
+                load_checkpoint_json=load_checkpoint_json,
+                write_json=write_json,
             )
-        scenario_bundle_platform.publish_checkpoint_bundle(
-            scenario_dir,
-            checkpoint_dir,
-            publish_scope,
-            load_checkpoint_json=load_checkpoint_json,
-            write_json=write_json,
-        )
-        if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+
+
+def build_chunk_assets_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_CHUNK_ASSETS):
+            scenario_bundle_platform.require_chunk_stage_publish_inputs(scenario_dir)
             rebuild_published_scenario_chunk_assets(scenario_dir, checkpoint_dir)
 
 
@@ -9491,60 +9546,87 @@ def main() -> None:
     _CLI_TNO_ROOT_OVERRIDE = Path(args.tno_root).expanduser().resolve() if args.tno_root else None
     _CLI_HGO_ROOT_OVERRIDE = Path(args.hgo_root).expanduser().resolve() if args.hgo_root else None
 
-    with _checkpoint_build_lock(checkpoint_dir, stage=args.stage):
-        if args.stage == STAGE_COUNTRIES:
-            state = build_countries_stage_state(
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=args.stage):
+            if args.stage == STAGE_COUNTRIES:
+                state = build_countries_stage_state(
+                    scenario_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                write_countries_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
+                print(f"Wrote countries-stage checkpoints to {checkpoint_dir}")
+                return
+
+            if args.stage == STAGE_RUNTIME_TOPOLOGY:
+                state = build_runtime_topology_stage(checkpoint_dir)
+                write_runtime_topology_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
+                print_bundle_summary(state)
+                return
+
+            if args.stage == STAGE_GEO_LOCALE:
+                build_geo_locale_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                print(f"Updated geo locale checkpoint: {checkpoint_path(checkpoint_dir, 'geo_locale_patch.json')}")
+                return
+
+            if args.stage == STAGE_STARTUP_ASSETS:
+                build_startup_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                print(f"Updated startup-assets checkpoints in {checkpoint_dir}")
+                return
+
+            if args.stage == STAGE_WRITE_BUNDLE:
+                write_bundle_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    args.publish_scope,
+                    manual_sync_policy=args.manual_sync_policy,
+                )
+                print(f"Published {args.publish_scope} checkpoint bundle to {scenario_dir}")
+                return
+
+            if args.stage == STAGE_CHUNK_ASSETS:
+                build_chunk_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                )
+                print(f"Rebuilt published chunk assets in {scenario_dir}")
+                return
+
+            countries_state = build_countries_stage_state(
                 scenario_dir,
                 refresh_named_water_snapshot=args.refresh_named_water_snapshot,
             )
-            write_countries_stage_checkpoints(state, checkpoint_dir)
-            print(f"Wrote countries-stage checkpoints to {checkpoint_dir}")
-            return
-
-        if args.stage == STAGE_RUNTIME_TOPOLOGY:
+            write_countries_stage_checkpoints(countries_state, checkpoint_dir, scenario_dir=scenario_dir)
             state = build_runtime_topology_stage(checkpoint_dir)
-            write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
-            print_bundle_summary(state)
-            return
-
-        if args.stage == STAGE_GEO_LOCALE:
+            write_runtime_topology_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
             build_geo_locale_stage(
                 scenario_dir,
                 checkpoint_dir,
                 refresh_named_water_snapshot=args.refresh_named_water_snapshot,
             )
-            print(f"Updated geo locale checkpoint: {checkpoint_path(checkpoint_dir, 'geo_locale_patch.json')}")
-            return
-
-        if args.stage == STAGE_WRITE_BUNDLE:
+            build_startup_assets_stage(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+            )
             write_bundle_stage(
                 scenario_dir,
                 checkpoint_dir,
-                args.publish_scope,
+                PUBLISH_SCOPE_ALL,
                 manual_sync_policy=args.manual_sync_policy,
             )
-            print(f"Published {args.publish_scope} checkpoint bundle to {scenario_dir}")
-            return
-
-        countries_state = build_countries_stage_state(
-            scenario_dir,
-            refresh_named_water_snapshot=args.refresh_named_water_snapshot,
-        )
-        write_countries_stage_checkpoints(countries_state, checkpoint_dir)
-        state = build_runtime_topology_stage(checkpoint_dir)
-        write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
-        build_geo_locale_stage(
-            scenario_dir,
-            checkpoint_dir,
-            refresh_named_water_snapshot=args.refresh_named_water_snapshot,
-        )
-        write_bundle_stage(
-            scenario_dir,
-            checkpoint_dir,
-            PUBLISH_SCOPE_ALL,
-            manual_sync_policy=args.manual_sync_policy,
-        )
-        print_bundle_summary(state)
+            build_chunk_assets_stage(
+                scenario_dir,
+                checkpoint_dir,
+            )
+            print_bundle_summary(state)
 
 
 def pd_concat_geodataframes(gdfs: list[gpd.GeoDataFrame]) -> gpd.GeoDataFrame:

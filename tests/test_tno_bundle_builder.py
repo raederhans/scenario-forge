@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from contextlib import nullcontext
 import json
 import os
 from pathlib import Path
@@ -11,6 +12,7 @@ from unittest.mock import patch
 import geopandas as gpd
 from shapely.geometry import Polygon, mapping
 
+from map_builder.contracts import SCENARIO_BUNDLE_STAGE_DESCRIPTORS
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools import patch_tno_1962_bundle as tno_bundle
 from tools.patch_tno_1962_bundle import (
@@ -28,7 +30,10 @@ from tools.patch_tno_1962_bundle import (
     build_runtime_topology_state_from_countries_state,
     build_polar_feature_diagnostics,
     build_runtime_topology_payload,
+    build_chunk_assets_stage,
+    build_geo_locale_stage,
     build_single_antarctic_feature,
+    build_startup_assets_stage,
     detect_unsynced_manual_edits,
     rebuild_feature_maps_from_political_gdf,
     normalize_feature_core_map,
@@ -112,6 +117,21 @@ def _write_publish_bundle_dir(
     )
     (target_dir / "countries.json").write_text(json.dumps({"countries": {"AAA": {"tag": "AAA"}}}), encoding="utf-8")
     (target_dir / "geo_locale_patch.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
+    (target_dir / "runtime_topology.bootstrap.topo.json").write_text(
+        json.dumps(
+            {
+                "type": "Topology",
+                "objects": {
+                    "bootstrap": {"type": "GeometryCollection", "geometries": []},
+                },
+                "arcs": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (target_dir / "startup.bundle.en.json").write_text(json.dumps({"ok": True}, ensure_ascii=False), encoding="utf-8")
+    (target_dir / "startup.bundle.zh.json").write_text(json.dumps({"ok": True}, ensure_ascii=False), encoding="utf-8")
     (target_dir / "bathymetry.topo.json").write_text(
         json.dumps(
             {
@@ -126,6 +146,24 @@ def _write_publish_bundle_dir(
         ),
         encoding="utf-8",
     )
+    for filename in resolve_publish_filenames(tno_bundle.PUBLISH_SCOPE_SCENARIO_DATA):
+        path = target_dir / filename
+        if path.exists():
+            continue
+        if filename.endswith(".topo.json"):
+            payload: object = {
+                "type": "Topology",
+                "objects": {},
+                "arcs": [],
+            }
+        elif filename.endswith(".geojson"):
+            payload = {
+                "type": "FeatureCollection",
+                "features": [],
+            }
+        else:
+            payload = {}
+        path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
 
 class TnoBundleBuilderTest(unittest.TestCase):
@@ -932,13 +970,14 @@ class TnoBundleBuilderTest(unittest.TestCase):
             checkpoint_dir.mkdir(parents=True, exist_ok=True)
             lock_path = checkpoint_dir / tno_bundle.CHECKPOINT_BUILD_LOCK_FILENAME
             lock_path.write_text(
-                json.dumps({"pid": os.getpid(), "checkpoint_dir": str(checkpoint_dir)}, ensure_ascii=False),
+                json.dumps({"pid": 424242, "checkpoint_dir": str(checkpoint_dir)}, ensure_ascii=False),
                 encoding="utf-8",
             )
 
-            with self.assertRaisesRegex(RuntimeError, "another build is in progress"):
-                with tno_bundle._checkpoint_build_lock(checkpoint_dir):
-                    self.fail("lock acquisition should have been blocked")
+            with patch.object(tno_bundle, "_pid_is_alive", return_value=True):
+                with self.assertRaisesRegex(RuntimeError, "another build is in progress"):
+                    with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                        self.fail("lock acquisition should have been blocked")
 
     def test_checkpoint_build_lock_removes_stale_lock_before_acquiring(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -1028,6 +1067,132 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             self.assertFalse((scenario_dir / "owners.by_feature.json").exists())
 
+    def test_scenario_bundle_contracts_define_startup_and_chunk_stages(self) -> None:
+        descriptors = {descriptor.name: descriptor for descriptor in SCENARIO_BUNDLE_STAGE_DESCRIPTORS}
+
+        self.assertIn("startup_assets", descriptors)
+        self.assertIn("chunk_assets", descriptors)
+        self.assertEqual(descriptors["geo_locale"].outputs, ("geo locale checkpoint variants",))
+        self.assertEqual(descriptors["startup_assets"].outputs, ("startup bootstrap topology", "startup bundles"))
+        self.assertEqual(descriptors["chunk_assets"].outputs, ("published scenario chunk assets",))
+
+    def test_build_geo_locale_stage_stops_before_startup_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle, "ensure_runtime_topology_checkpoints") as ensure_runtime_mock,
+                patch.object(tno_bundle, "build_tno_geo_locale_patch") as build_geo_mock,
+                patch.object(tno_bundle, "ensure_geo_locale_variant_checkpoints") as ensure_variant_mock,
+                patch.object(tno_bundle, "validate_geo_locale_checkpoint") as validate_geo_mock,
+                patch.object(tno_bundle, "build_startup_bootstrap_assets") as build_bootstrap_mock,
+                patch.object(tno_bundle, "build_startup_bundles") as build_bundles_mock,
+            ):
+                build_geo_locale_stage(scenario_dir, checkpoint_dir)
+
+            ensure_runtime_mock.assert_called_once()
+            build_geo_mock.assert_called_once()
+            ensure_variant_mock.assert_called_once_with(checkpoint_dir)
+            validate_geo_mock.assert_called_once()
+            build_bootstrap_mock.assert_not_called()
+            build_bundles_mock.assert_not_called()
+
+    def test_build_startup_assets_stage_builds_startup_outputs_independently(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle, "ensure_runtime_topology_checkpoints") as ensure_runtime_mock,
+                patch.object(tno_bundle, "validate_geo_locale_checkpoint") as validate_geo_mock,
+                patch.object(tno_bundle, "build_startup_bootstrap_assets") as build_bootstrap_mock,
+                patch.object(tno_bundle, "build_startup_bundles") as build_bundles_mock,
+            ):
+                build_startup_assets_stage(scenario_dir, checkpoint_dir)
+
+            ensure_runtime_mock.assert_called_once()
+            validate_geo_mock.assert_called_once()
+            build_bootstrap_mock.assert_called_once()
+            build_bundles_mock.assert_called_once()
+
+    def test_write_bundle_stage_no_longer_rebuilds_chunk_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle, "_ensure_scenario_publish_target_offline") as offline_mock,
+                patch.object(tno_bundle.scenario_bundle_platform, "validate_strict_publish_bundle") as strict_mock,
+                patch.object(tno_bundle, "validate_geo_locale_checkpoint") as validate_geo_mock,
+                patch.object(tno_bundle.scenario_bundle_platform, "require_startup_stage_checkpoints") as require_startup_mock,
+                patch.object(tno_bundle, "detect_unsynced_manual_edits") as manual_sync_mock,
+                patch.object(tno_bundle.scenario_bundle_platform, "publish_checkpoint_bundle") as publish_mock,
+                patch.object(tno_bundle, "rebuild_published_scenario_chunk_assets") as rebuild_chunk_mock,
+            ):
+                write_bundle_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    publish_scope="scenario_data",
+                    manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                )
+
+            offline_mock.assert_called_once_with(scenario_dir)
+            strict_mock.assert_called_once()
+            validate_geo_mock.assert_called_once()
+            require_startup_mock.assert_called_once_with(checkpoint_dir)
+            manual_sync_mock.assert_called_once()
+            publish_mock.assert_called_once()
+            rebuild_chunk_mock.assert_not_called()
+
+    def test_build_chunk_assets_stage_requires_published_inputs_and_runs_chunk_builder(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle.scenario_bundle_platform, "require_chunk_stage_publish_inputs") as require_chunk_mock,
+                patch.object(tno_bundle, "rebuild_published_scenario_chunk_assets") as rebuild_chunk_mock,
+            ):
+                build_chunk_assets_stage(scenario_dir, checkpoint_dir)
+
+            require_chunk_mock.assert_called_once_with(scenario_dir)
+            rebuild_chunk_mock.assert_called_once_with(scenario_dir, checkpoint_dir)
+
+    def test_write_bundle_stage_uses_shared_scenario_build_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle, "_scenario_build_session_lock", return_value=nullcontext()) as session_lock_mock,
+                patch.object(tno_bundle.scenario_bundle_platform, "publish_checkpoint_bundle") as publish_mock,
+            ):
+                write_bundle_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    publish_scope=tno_bundle.PUBLISH_SCOPE_POLAR_RUNTIME,
+                    manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                )
+
+            session_lock_mock.assert_called_once_with(scenario_dir)
+            publish_mock.assert_called_once()
+
     def test_write_bundle_stage_blocks_publish_when_live_dev_server_targets_workspace(self) -> None:
         runtime_tmp_root = tno_bundle.ROOT / ".runtime" / "tmp"
         runtime_tmp_root.mkdir(parents=True, exist_ok=True)
@@ -1035,21 +1200,20 @@ class TnoBundleBuilderTest(unittest.TestCase):
             root = Path(tmp_dir)
             scenario_dir = root / "scenario"
             checkpoint_dir = root / "checkpoint"
-            metadata_path = root / "active_server.json"
             _write_publish_bundle_dir(checkpoint_dir)
-            metadata_path.write_text(
-                json.dumps(
-                    {
-                        "pid": os.getpid(),
+
+            with (
+                patch.object(
+                    tno_bundle,
+                    "_load_active_server_metadata",
+                    return_value={
+                        "pid": 12345,
                         "cwd": str(tno_bundle.ROOT),
                         "url": "http://127.0.0.1:8810",
                     },
-                    ensure_ascii=False,
                 ),
-                encoding="utf-8",
-            )
-
-            with patch.object(tno_bundle, "RUNTIME_ACTIVE_SERVER_METADATA_PATH", metadata_path):
+                patch.object(tno_bundle, "_pid_is_alive", return_value=True),
+            ):
                 with self.assertRaisesRegex(RuntimeError, "live dev server"):
                     write_bundle_stage(
                         scenario_dir,

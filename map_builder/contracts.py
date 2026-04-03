@@ -329,8 +329,15 @@ SCENARIO_BUNDLE_STAGE_DESCRIPTORS: tuple[StageDescriptor, ...] = (
         name="geo_locale",
         owner="tools/patch_tno_1962_bundle.py",
         inputs=("runtime topology checkpoints", "manual geo overrides"),
-        outputs=("geo locale checkpoint variants", "startup bootstrap topology"),
-        failure_surface=("manual override mismatch", "startup bootstrap drift"),
+        outputs=("geo locale checkpoint variants",),
+        failure_surface=("manual override mismatch", "geo locale variant drift"),
+    ),
+    StageDescriptor(
+        name="startup_assets",
+        owner="tools/patch_tno_1962_bundle.py",
+        inputs=("geo locale checkpoints", "runtime topology checkpoints", "startup bundle sources"),
+        outputs=("startup bootstrap topology", "startup bundles"),
+        failure_surface=("startup bootstrap drift", "startup bundle build failure"),
     ),
     StageDescriptor(
         name="write_bundle",
@@ -338,6 +345,13 @@ SCENARIO_BUNDLE_STAGE_DESCRIPTORS: tuple[StageDescriptor, ...] = (
         inputs=("checkpoint bundle", "publish scope", "manual sync policy"),
         outputs=("published scenario bundle",),
         failure_surface=("strict publish validation failure", "unsynced manual edits"),
+    ),
+    StageDescriptor(
+        name="chunk_assets",
+        owner="tools/patch_tno_1962_bundle.py",
+        inputs=("published scenario bundle", "chunk manifest sources"),
+        outputs=("published scenario chunk assets",),
+        failure_surface=("missing published bundle dependency", "chunk asset regeneration failure"),
     ),
 )
 
@@ -392,11 +406,27 @@ SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] =
     ScenarioCheckpointArtifact("runtime_topology_payload", SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME),
 )
 
-SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
+SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = ()
+
+SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
+    ScenarioCheckpointArtifact("geo_locale_payload", SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME),
+    ScenarioCheckpointArtifact("geo_locale_payload_en", SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME),
+    ScenarioCheckpointArtifact("geo_locale_payload_zh", SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME),
+)
+
+SCENARIO_STARTUP_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact(
         "runtime_bootstrap_topology_payload",
         SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
     ),
+    ScenarioCheckpointArtifact("startup_bundle_payload_en", SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME),
+    ScenarioCheckpointArtifact("startup_bundle_payload_zh", SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME),
+)
+
+SCENARIO_CHUNK_STAGE_REQUIRED_FILENAMES = (
+    "manifest.json",
+    SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
+    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
 )
 
 SCENARIO_PUBLISH_FILENAMES_BY_SCOPE = {

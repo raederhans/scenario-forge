@@ -154,3 +154,22 @@
 - 输出采用“双轨并重”：先给短期 hardening，再给中期新架构。
 - 迁移策略采用“可破坏式重构”，默认允许旧 dev 工具和旧直写流程失效，不为兼容性保留复杂分支。
 - 不引入 Bazel/DVC/Dagster 作为运行时依赖；只吸收它们的工程原则。
+
+## 当前执行进展
+
+### 2026-04-03
+
+- 第一轮止血已经完成：
+  - `scenario_mutations.json` 已接入 `tag / country / ownership / capital / geo_locale`
+  - builder 和 `dev_server` 已共用 scenario 级跨进程锁
+  - `startup_assets` / `chunk_assets` 已从主 builder 链路拆出
+- 第二轮已开始，当前先做了最短路径抽离：
+  - 新增 `map_builder/scenario_political_materializer.py`
+  - `tools/dev_server.py` 里的 political transaction 已改成薄包装，核心物化逻辑迁入新模块
+  - 顺手清掉了重复定义的 `_load_scenario_mutations_payload`
+  - 顺手删除了未再使用的 `_load_releasable_catalog_payload`
+  - 顺手删除了旧的 `_build_scenario_tag_create_payload` 死代码壳
+- 这一轮还没有完成的部分：
+  - `save_scenario_capital_payload()` 仍然保留自己的事务拼装逻辑，没有完全并入新 materializer
+  - `save_scenario_geo_locale_entry()` 仍然依赖 builder 子进程，还没有切成 in-process materialize
+  - 还没有正式的 `materialize_scenario_mutations(...)` 命令入口

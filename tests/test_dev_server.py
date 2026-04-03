@@ -12,6 +12,7 @@ import urllib.request
 from pathlib import Path
 from unittest import mock
 
+from map_builder.scenario_political_materializer import build_political_materialization_transaction
 from tools import dev_server
 
 
@@ -279,6 +280,7 @@ class DevServerTest(unittest.TestCase):
             controllers_payload = json.loads((scenario_dir / "controllers.by_feature.json").read_text(encoding="utf-8"))
             cores_payload = json.loads((scenario_dir / "cores.by_feature.json").read_text(encoding="utf-8"))
             manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
             self.assertEqual(saved_payload["owners"]["DE-1"], "BBB")
             self.assertEqual(saved_payload["owners"]["DE-2"], "AAA")
@@ -289,8 +291,50 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(manual_payload["assignments"]["DE-1"]["owner"], "BBB")
             self.assertEqual(manual_payload["assignments"]["DE-1"]["controller"], "AAA")
             self.assertEqual(manual_payload["assignments"]["DE-1"]["cores"], ["AAA"])
+            self.assertEqual(mutations_payload["assignments_by_feature_id"]["DE-1"]["owner"], "BBB")
+            self.assertEqual(result["mutationsPath"], "data/scenarios/test_scenario/scenario_mutations.json")
             self.assertEqual(result["stats"]["featureCount"], 5)
             self.assertEqual(result["stats"]["touchedFeatureCount"], 2)
+
+    def test_political_materializer_builds_transaction_from_mutations_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root)
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+            mutations_payload = dev_server._load_scenario_mutations_payload(context)
+            mutations_payload["countries"]["AAA"] = {
+                "mode": "override",
+                "display_name_en": "Alpha Prime",
+                "display_name_zh": "阿尔法首府",
+                "color_hex": "#654321",
+                "parent_owner_tag": "BBB",
+            }
+            mutations_payload["assignments_by_feature_id"]["DE-1"] = {"owner": "BBB"}
+
+            transaction_payloads, materialized = build_political_materialization_transaction(
+                context,
+                mutations_payload,
+                root=root,
+                deps=dev_server._political_materializer_deps(),
+            )
+
+            transaction_names = {path.name for path, _payload in transaction_payloads}
+            self.assertIn("scenario_mutations.json", transaction_names)
+            self.assertIn("countries.json", transaction_names)
+            self.assertIn("owners.by_feature.json", transaction_names)
+            self.assertIn("scenario_manual_overrides.json", transaction_names)
+            self.assertEqual(
+                materialized["countriesPayload"]["countries"]["AAA"]["display_name_en"],
+                "Alpha Prime",
+            )
+            self.assertEqual(
+                materialized["ownersPayload"]["owners"]["DE-1"],
+                "BBB",
+            )
+            self.assertEqual(
+                materialized["manualPayload"]["assignments"]["DE-1"]["owner"],
+                "BBB",
+            )
 
     def test_validate_country_code_accepts_two_or_three_uppercase_letters_and_rejects_invalid_values(self) -> None:
         self.assertEqual(dev_server._validate_country_code("de"), "DE")
@@ -412,6 +456,7 @@ class DevServerTest(unittest.TestCase):
             manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
             manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
             catalog_payload = json.loads((scenario_dir / "releasable_catalog.manual.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
             created_country = countries_payload["countries"]["CCC"]
 
             self.assertTrue(result["ok"])
@@ -428,6 +473,8 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(manual_payload["assignments"]["DE-1"]["owner"], "CCC")
             self.assertEqual(manual_payload["assignments"]["DE-1"]["controller"], "CCC")
             self.assertEqual(manual_payload["assignments"]["DE-1"]["cores"], ["CCC"])
+            self.assertEqual(mutations_payload["tags"]["CCC"]["feature_ids"], ["DE-1", "DE-2"])
+            self.assertEqual(mutations_payload["countries"]["CCC"]["mode"], "create")
             self.assertEqual(manifest_payload["releasable_catalog_url"], "data/scenarios/test_scenario/releasable_catalog.manual.json")
             self.assertEqual(catalog_payload["entries"][0]["tag"], "OLD")
             self.assertEqual(catalog_payload["entries"][1]["tag"], "CCC")
@@ -659,6 +706,7 @@ class DevServerTest(unittest.TestCase):
 
             countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
             manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
             self.assertEqual(countries_payload["countries"]["AAA"]["display_name_en"], "Alpha Prime")
             self.assertEqual(countries_payload["countries"]["AAA"]["display_name_zh"], "阿尔法首府")
@@ -668,6 +716,7 @@ class DevServerTest(unittest.TestCase):
             self.assertTrue(countries_payload["countries"]["AAA"]["featured"])
             self.assertEqual(manual_payload["countries"]["AAA"]["mode"], "override")
             self.assertEqual(manual_payload["countries"]["AAA"]["display_name_en"], "Alpha Prime")
+            self.assertEqual(mutations_payload["countries"]["AAA"]["display_name_en"], "Alpha Prime")
 
     def test_save_scenario_ownership_payload_rejects_unknown_owner_tag(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -974,9 +1023,11 @@ class DevServerTest(unittest.TestCase):
 
             manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
             self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha")
             self.assertEqual(patch_payload["geo"]["AAA-1"]["zh"], "\u963f\u5c14\u6cd5")
+            self.assertEqual(mutations_payload["geo_locale"]["AAA-1"]["en"], "Alpha")
 
     def test_save_scenario_geo_locale_entry_prefers_manifest_builder_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -1044,8 +1095,10 @@ class DevServerTest(unittest.TestCase):
                 dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             manual_payload = json.loads(manual_path.read_text(encoding="utf-8"))
+            mutations_path = scenario_dir / "scenario_mutations.json"
             self.assertEqual(exc_info.exception.code, "geo_locale_build_failed")
             self.assertEqual(manual_payload, original_manual_payload)
+            self.assertFalse(mutations_path.exists())
             self.assertEqual(exc_info.exception.details["stderr"], "intentional failure")
 
     def test_save_scenario_geo_locale_entry_rejects_when_no_builder_is_registered(self) -> None:

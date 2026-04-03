@@ -6,9 +6,12 @@ from typing import Callable, Iterable
 
 from map_builder.contracts import (
     SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
+    SCENARIO_CHUNK_STAGE_REQUIRED_FILENAMES,
+    SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS,
     SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS,
     SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA,
     SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
+    SCENARIO_STARTUP_STAGE_ARTIFACTS,
     ScenarioCheckpointArtifact,
     resolve_scenario_publish_filenames,
 )
@@ -166,6 +169,15 @@ def all_checkpoint_files_exist(checkpoint_dir: Path, filenames: Iterable[str]) -
     return all(checkpoint_path(checkpoint_dir, filename).exists() for filename in filenames)
 
 
+def require_directory_files(base_dir: Path, filenames: Iterable[str], *, label: str) -> None:
+    missing = [filename for filename in filenames if not (base_dir / filename).exists()]
+    if missing:
+        sample = ", ".join(missing[:8])
+        if len(missing) > 8:
+            sample += ", ..."
+        raise FileNotFoundError(f"Missing {label} artifacts in {base_dir}: {sample}")
+
+
 def write_countries_stage_checkpoints(
     state: dict[str, object],
     checkpoint_dir: Path,
@@ -229,6 +241,30 @@ def write_runtime_topology_stage_checkpoints(
         SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
         write_json=write_json,
         gdf_to_feature_collection=gdf_to_feature_collection,
+    )
+
+
+def require_geo_locale_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        (artifact.filename for artifact in SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS),
+        label="geo-locale checkpoint",
+    )
+
+
+def require_startup_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        (artifact.filename for artifact in SCENARIO_STARTUP_STAGE_ARTIFACTS),
+        label="startup-assets checkpoint",
+    )
+
+
+def require_chunk_stage_publish_inputs(scenario_dir: Path) -> None:
+    require_directory_files(
+        scenario_dir,
+        SCENARIO_CHUNK_STAGE_REQUIRED_FILENAMES,
+        label="chunk-assets publish",
     )
 
 
