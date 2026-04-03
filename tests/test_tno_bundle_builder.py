@@ -949,6 +949,34 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             self.assertFalse(lock_path.exists())
 
+    def test_resolve_tno_root_prefers_cli_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir) / "tno_root"
+            (root / "map").mkdir(parents=True, exist_ok=True)
+            (root / "history/states").mkdir(parents=True, exist_ok=True)
+            (root / "map/provinces.bmp").write_bytes(b"bmp")
+            (root / "map/definition.csv").write_text("0;0;0;0;land;false;unknown;0\n", encoding="utf-8")
+            (root / "history/states/163-Dalmatia.txt").write_text("state={}", encoding="utf-8")
+
+            with patch.object(tno_bundle, "_CLI_TNO_ROOT_OVERRIDE", root):
+                resolved = tno_bundle.resolve_tno_root()
+
+            self.assertEqual(resolved, root)
+
+    def test_resolve_hgo_root_supports_env_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir) / "hgo_root"
+            (root / "map").mkdir(parents=True, exist_ok=True)
+            (root / "history/states").mkdir(parents=True, exist_ok=True)
+            (root / "map/provinces.bmp").write_bytes(b"bmp")
+            (root / "map/definition.csv").write_text("0;0;0;0;land;false;unknown;0\n", encoding="utf-8")
+
+            with patch.dict(os.environ, {tno_bundle.HGO_ROOT_ENV_VAR: str(root)}, clear=False):
+                with patch.object(tno_bundle, "_CLI_HGO_ROOT_OVERRIDE", None):
+                    resolved = tno_bundle.resolve_hgo_root()
+
+            self.assertEqual(resolved, root)
+
     def test_validate_publish_bundle_dir_rejects_strict_contract_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             bundle_dir = Path(tmp_dir) / "bundle"

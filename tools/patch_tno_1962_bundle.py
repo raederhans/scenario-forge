@@ -206,6 +206,10 @@ TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
 ]
+TNO_ROOT_ENV_VAR = "SCENARIO_FORGE_TNO_ROOT"
+HGO_ROOT_ENV_VAR = "SCENARIO_FORGE_HGO_ROOT"
+_CLI_TNO_ROOT_OVERRIDE: Path | None = None
+_CLI_HGO_ROOT_OVERRIDE: Path | None = None
 TNO_ATLANTIC_OPEN_OCEAN_IDS = (
     "tno_northwest_atlantic_ocean",
     "tno_northeast_atlantic_ocean",
@@ -4541,6 +4545,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stage", choices=STAGE_CHOICES, default=STAGE_ALL)
     parser.add_argument("--checkpoint-dir", default=str(DEFAULT_CHECKPOINT_DIR))
     parser.add_argument("--scenario-dir", default=str(SCENARIO_DIR))
+    parser.add_argument(
+        "--tno-root",
+        default=None,
+        help=(
+            "Explicit TNO workshop root. "
+            f"Can also be provided via ${TNO_ROOT_ENV_VAR}."
+        ),
+    )
+    parser.add_argument(
+        "--hgo-root",
+        default=None,
+        help=(
+            "Explicit HGO donor root. "
+            f"Can also be provided via ${HGO_ROOT_ENV_VAR}."
+        ),
+    )
     parser.add_argument("--publish-scope", choices=PUBLISH_SCOPE_CHOICES, default=PUBLISH_SCOPE_POLAR_RUNTIME)
     parser.add_argument(
         "--manual-sync-policy",
@@ -5076,6 +5096,28 @@ def fallback_color(tag: str) -> str:
 
 
 def resolve_tno_root() -> Path:
+    if _CLI_TNO_ROOT_OVERRIDE is not None:
+        candidate = _CLI_TNO_ROOT_OVERRIDE
+        if (
+            candidate.exists()
+            and (candidate / "map/provinces.bmp").exists()
+            and (candidate / "map/definition.csv").exists()
+            and (candidate / "history/states/163-Dalmatia.txt").exists()
+        ):
+            return candidate
+        raise FileNotFoundError(f"Invalid --tno-root path: {candidate}")
+    env_override = Path(os.environ[TNO_ROOT_ENV_VAR]).expanduser() if os.environ.get(TNO_ROOT_ENV_VAR) else None
+    if env_override is not None:
+        if (
+            env_override.exists()
+            and (env_override / "map/provinces.bmp").exists()
+            and (env_override / "map/definition.csv").exists()
+            and (env_override / "history/states/163-Dalmatia.txt").exists()
+        ):
+            return env_override
+        raise FileNotFoundError(
+            f"Invalid ${TNO_ROOT_ENV_VAR} path: {env_override}"
+        )
     for candidate in TNO_ROOT_CANDIDATES:
         if (
             candidate.exists()
@@ -5091,6 +5133,28 @@ def resolve_tno_root() -> Path:
 
 
 def resolve_hgo_root() -> Path:
+    if _CLI_HGO_ROOT_OVERRIDE is not None:
+        candidate = _CLI_HGO_ROOT_OVERRIDE
+        if (
+            candidate.exists()
+            and (candidate / "map/provinces.bmp").exists()
+            and (candidate / "map/definition.csv").exists()
+            and (candidate / "history/states").exists()
+        ):
+            return candidate
+        raise FileNotFoundError(f"Invalid --hgo-root path: {candidate}")
+    env_override = Path(os.environ[HGO_ROOT_ENV_VAR]).expanduser() if os.environ.get(HGO_ROOT_ENV_VAR) else None
+    if env_override is not None:
+        if (
+            env_override.exists()
+            and (env_override / "map/provinces.bmp").exists()
+            and (env_override / "map/definition.csv").exists()
+            and (env_override / "history/states").exists()
+        ):
+            return env_override
+        raise FileNotFoundError(
+            f"Invalid ${HGO_ROOT_ENV_VAR} path: {env_override}"
+        )
     if (
         HGO_ROOT.exists()
         and (HGO_ROOT / "map/provinces.bmp").exists()
@@ -9422,9 +9486,13 @@ def print_bundle_summary(state: dict[str, object]) -> None:
 
 
 def main() -> None:
+    global _CLI_TNO_ROOT_OVERRIDE
+    global _CLI_HGO_ROOT_OVERRIDE
     args = parse_args()
     scenario_dir = Path(args.scenario_dir).resolve()
     checkpoint_dir = Path(args.checkpoint_dir).resolve()
+    _CLI_TNO_ROOT_OVERRIDE = Path(args.tno_root).expanduser().resolve() if args.tno_root else None
+    _CLI_HGO_ROOT_OVERRIDE = Path(args.hgo_root).expanduser().resolve() if args.hgo_root else None
 
     with _checkpoint_build_lock(checkpoint_dir, stage=args.stage):
         if args.stage == STAGE_COUNTRIES:
