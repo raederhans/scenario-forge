@@ -1,6 +1,7 @@
 """City asset generation helpers for the map build pipeline."""
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
@@ -19,6 +20,9 @@ from map_builder import config as cfg
 from map_builder.io.fetch import fetch_or_cache_binary
 from map_builder.io.readers import load_populated_places, read_json_optional
 from map_builder.io.writers import write_json_atomic
+from map_builder.scenario_city_overrides_composer import (
+    compose_city_overrides_payload,
+)
 
 
 GEONAMES_COLUMNS = [
@@ -150,6 +154,62 @@ SCENARIO_CITY_RENAMES = {
     "hoi4_1936": SOVIET_ERA_CITY_RENAMES,
     "hoi4_1939": SOVIET_ERA_CITY_RENAMES,
 }
+
+
+def _build_default_capital_outputs(
+    *,
+    scenario_id: str,
+    generated_at: str,
+    accepted_capital_entries: dict[str, dict[str, object]],
+    rejected_capital_entries: list[dict[str, object]],
+    unresolved_capitals: list[dict[str, object]],
+    featured_runtime_missing: list[str],
+) -> tuple[dict[str, object], dict[str, object]]:
+    accepted_tags = sorted(accepted_capital_entries)
+    accepted_entries = [copy.deepcopy(accepted_capital_entries[tag]) for tag in accepted_tags]
+    capitals_by_tag = {
+        tag: _clean_text(accepted_capital_entries[tag].get("city_id"))
+        for tag in accepted_tags
+        if _clean_text(accepted_capital_entries[tag].get("city_id"))
+    }
+    capital_city_hints = {
+        tag: copy.deepcopy(accepted_capital_entries[tag])
+        for tag in accepted_tags
+        if _clean_text(accepted_capital_entries[tag].get("city_id"))
+    }
+
+    capital_defaults_partial_payload = {
+        "version": 1,
+        "scenario_id": scenario_id,
+        "generated_at": generated_at,
+        "capitals_by_tag": capitals_by_tag,
+        "capital_city_hints": capital_city_hints,
+        "audit": {
+            "default_capital_entry_count": len(capitals_by_tag),
+            "default_capital_missing_tag_count": len(unresolved_capitals),
+            "default_capital_missing_tags": [_clean_text(entry.get("tag")) for entry in unresolved_capitals],
+            "default_rejected_candidate_count": len(rejected_capital_entries),
+            "default_rejected_candidates": copy.deepcopy(rejected_capital_entries),
+            "default_featured_runtime_missing_count": len(featured_runtime_missing),
+            "default_featured_runtime_missing_tags": copy.deepcopy(featured_runtime_missing),
+        },
+    }
+    capital_hints_payload = {
+        "version": 1,
+        "scenario_id": scenario_id,
+        "generated_at": generated_at,
+        "entry_count": len(accepted_entries),
+        "missing_tag_count": len(unresolved_capitals),
+        "missing_tags": [_clean_text(entry.get("tag")) for entry in unresolved_capitals],
+        "entries": accepted_entries,
+        "audit": {
+            "rejected_candidate_count": len(rejected_capital_entries),
+            "rejected_candidates": copy.deepcopy(rejected_capital_entries),
+            "featured_runtime_missing_count": len(featured_runtime_missing),
+            "featured_runtime_missing_tags": copy.deepcopy(featured_runtime_missing),
+        },
+    }
+    return capital_defaults_partial_payload, capital_hints_payload
 
 
 def _ensure_epsg4326(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -1577,52 +1637,69 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             for tag in sorted(featured_tags)
             if tag not in capitals_by_tag and tag not in capital_city_hints
         ]
-        overrides_payload = {
+        city_assets_payload = {
+            "version": 1,
+            "scenario_id": scenario_id,
+            "generated_at": generated_at,
+            "cities": city_overrides,
+            "audit": {
+                "renamed_city_count": len(city_overrides),
+                "name_conflict_count": len(name_conflicts),
+                "unresolved_city_rename_count": len(unresolved_city_renames),
+                "name_conflicts": name_conflicts,
+                "unresolved_city_renames": unresolved_city_renames,
+            },
+        }
+        capital_overrides_payload = {
             "version": 1,
             "scenario_id": scenario_id,
             "generated_at": generated_at,
             "capitals_by_tag": capitals_by_tag,
             "capital_city_hints": capital_city_hints,
-            "cities": city_overrides,
             "audit": {
                 "manual_capital_count": len(capitals_by_tag),
                 "capital_hint_count": len(capital_city_hints),
-                "renamed_city_count": len(city_overrides),
-                "name_conflict_count": len(name_conflicts),
                 "unresolved_capital_count": len(unresolved_capitals),
                 "unresolved_manual_capital_count": len(unresolved_manual_capitals),
-                "unresolved_city_rename_count": len(unresolved_city_renames),
                 "featured_runtime_missing_count": len(featured_runtime_missing),
                 "featured_runtime_missing_tags": featured_runtime_missing,
-                "name_conflicts": name_conflicts,
                 "unresolved_capitals": unresolved_capitals,
                 "unresolved_manual_capitals": unresolved_manual_capitals,
-                "unresolved_city_renames": unresolved_city_renames,
             },
         }
+        overrides_payload = compose_city_overrides_payload(
+            city_assets_payload,
+            capital_overrides_payload,
+            scenario_id=scenario_id,
+            generated_at=generated_at,
+        )
+        city_assets_partial_path = scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME
+        write_json_atomic(city_assets_partial_path, city_assets_payload, ensure_ascii=False, indent=2)
+
+        capital_defaults_partial_payload, capital_hints_payload = _build_default_capital_outputs(
+            scenario_id=scenario_id,
+            generated_at=generated_at,
+            accepted_capital_entries=accepted_capital_entries,
+            rejected_capital_entries=rejected_capital_entries,
+            unresolved_capitals=unresolved_capitals,
+            featured_runtime_missing=featured_runtime_missing,
+        )
+        capital_defaults_partial_path = scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME
+        write_json_atomic(capital_defaults_partial_path, capital_defaults_partial_payload, ensure_ascii=False, indent=2)
+        capital_hints_path = scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME
+        if scenario_id not in cfg.SCENARIO_IDS_WITHOUT_PUBLIC_CAPITAL_HINTS:
+            write_json_atomic(capital_hints_path, capital_hints_payload, ensure_ascii=False, indent=2)
+        elif capital_hints_path.exists():
+            capital_hints_path.unlink()
+
         overrides_path = scenario_dir / cfg.SCENARIO_CITY_OVERRIDES_FILENAME
         write_json_atomic(overrides_path, overrides_payload, ensure_ascii=False, indent=2)
-
-        capital_hints_payload = {
-            "version": 1,
-            "scenario_id": scenario_id,
-            "generated_at": generated_at,
-            "entry_count": len(accepted_capital_entries),
-            "missing_tag_count": len(unresolved_capitals),
-            "missing_tags": [entry["tag"] for entry in unresolved_capitals],
-            "entries": [accepted_capital_entries[tag] for tag in sorted(accepted_capital_entries)],
-            "audit": {
-                "rejected_candidate_count": len(rejected_capital_entries),
-                "rejected_candidates": rejected_capital_entries,
-                "featured_runtime_missing_count": len(featured_runtime_missing),
-                "featured_runtime_missing_tags": featured_runtime_missing,
-            },
-        }
-        capital_hints_path = scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME
-        write_json_atomic(capital_hints_path, capital_hints_payload, ensure_ascii=False, indent=2)
 
         manifest_path = scenario_dir / "manifest.json"
         if manifest_path.exists() and isinstance(manifest, dict):
             manifest["city_overrides_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CITY_OVERRIDES_FILENAME}"
-            manifest["capital_hints_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CAPITAL_HINTS_FILENAME}"
+            if scenario_id in cfg.SCENARIO_IDS_WITHOUT_PUBLIC_CAPITAL_HINTS:
+                manifest.pop("capital_hints_url", None)
+            else:
+                manifest["capital_hints_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CAPITAL_HINTS_FILENAME}"
             write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2)

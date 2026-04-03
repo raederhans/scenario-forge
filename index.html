@@ -294,7 +294,7 @@
                     <div class="space-y-3 mt-3">
                       <label class="toggle-label">
                         <input id="internalBorderAutoColor" type="checkbox" class="checkbox-input" checked />
-                        <span>Auto Contrast</span>
+                        <span data-i18n="Auto Contrast">Auto Contrast</span>
                       </label>
                       <div class="flex items-center justify-between gap-3">
                         <label class="range-label" for="internalBorderColor">Color</label>
@@ -356,7 +356,7 @@
                     <div class="space-y-3 mt-3">
                       <label class="toggle-label">
                         <input id="parentBordersVisible" type="checkbox" class="checkbox-input" checked />
-                        <span>Show Parent Unit Borders</span>
+                        <span data-i18n="Show Parent Unit Borders">Show Parent Unit Borders</span>
                       </label>
                       <div class="flex items-center justify-between gap-3">
                         <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
@@ -576,7 +576,7 @@
                             <label class="range-label" for="urbanMode">Mode</label>
                           </div>
                           <select id="urbanMode" class="select-input mt-2">
-                            <option value="adaptive" selected>Adaptive</option>
+                            <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
                             <option value="manual">Manual</option>
                           </select>
                           <p id="urbanAdaptiveStatus" class="sidebar-tool-hint mt-2 hidden"></p>
@@ -584,21 +584,21 @@
                         <div id="urbanAdaptiveControls" class="space-y-2">
                           <div>
                             <div class="range-row">
-                              <label class="range-label" for="urbanAdaptiveStrength">Adaptive Strength</label>
+                              <label class="range-label" for="urbanAdaptiveStrength" data-i18n="Adaptive Strength">Adaptive Strength</label>
                               <span id="urbanAdaptiveStrengthValue" class="range-value">72%</span>
                             </div>
                             <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="72" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
-                              <label class="range-label" for="urbanStrokeOpacity">Stroke Opacity</label>
+                              <label class="range-label" for="urbanStrokeOpacity" data-i18n="Stroke Opacity">Stroke Opacity</label>
                               <span id="urbanStrokeOpacityValue" class="range-value">62%</span>
                             </div>
                             <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="62" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
-                              <label class="range-label" for="urbanToneBias">Tone Bias</label>
+                              <label class="range-label" for="urbanToneBias" data-i18n="Tone Bias">Tone Bias</label>
                               <span id="urbanToneBiasValue" class="range-value">+12%</span>
                             </div>
                             <input id="urbanToneBias" type="range" min="-30" max="30" value="12" class="range-input" />
@@ -622,7 +622,7 @@
                         </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Fill Opacity</label>
+                          <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity" data-i18n="Fill Opacity">Fill Opacity</label>
                             <span id="urbanOpacityValue" class="range-value">34%</span>
                           </div>
                           <input id="urbanOpacity" type="range" min="0" max="100" value="34" class="range-input" />
@@ -913,7 +913,7 @@
                       <div>
                         <label class="toggle-label mt-2">
                           <input id="dayNightCityLightsPopulationBoostEnabled" type="checkbox" class="checkbox-input" checked />
-                          <span id="lblDayNightPopulationBoostEnabled">Population / City Boost (Modern only)</span>
+                          <span id="lblDayNightPopulationBoostEnabled" data-i18n="Population / City Boost (Modern only)">Population / City Boost (Modern only)</span>
                         </label>
                       </div>
                       <div>
@@ -923,7 +923,7 @@
                             class="range-label"
                             for="dayNightCityLightsPopulationBoostStrength"
                           >
-                            Population Boost Strength (Modern only)
+                            <span data-i18n="Population Boost Strength (Modern only)">Population Boost Strength (Modern only)</span>
                           </label>
                           <span id="dayNightCityLightsPopulationBoostStrengthValue" class="range-value">56%</span>
                         </div>
@@ -1944,7 +1944,7 @@
               <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false" data-i18n="Energy Facilities">Energy Facilities</button>
               <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false" data-i18n="Industrial Land">Industrial Land</button>
               <button type="button" class="transport-workbench-family-tab" data-transport-family="logistics_hubs" role="tab" aria-selected="false" data-i18n="Logistics Hubs">Logistics Hubs</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="layers" role="tab" aria-selected="false">Layers</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="layers" role="tab" aria-selected="false" data-i18n="Layers">Layers</button>
             </div>
             <div class="transport-workbench-topbar-actions">
               <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Info">Info</button>
@@ -2006,9 +2006,9 @@
                     <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
                     <div id="transportWorkbenchLayerOrderPanel" class="transport-workbench-layer-order hidden" aria-live="polite">
                       <div class="transport-workbench-layer-order-header">
-                        <div class="transport-workbench-layer-order-kicker">Layer Order</div>
-                        <h4 class="transport-workbench-layer-order-title">Reorder transport layers</h4>
-                        <p class="transport-workbench-layer-order-text">Drag rows to define the future draw order. Only the road family is live right now, so the rest stay as structural placeholders.</p>
+                        <div class="transport-workbench-layer-order-kicker" data-i18n="Layer Order">Layer Order</div>
+                        <h4 class="transport-workbench-layer-order-title" data-i18n="Reorder transport layers">Reorder transport layers</h4>
+                        <p class="transport-workbench-layer-order-text" data-i18n="Drag rows to define the future draw order. Only the road family is live right now, so the rest stay as structural placeholders.">Drag rows to define the future draw order. Only the road family is live right now, so the rest stay as structural placeholders.</p>
                       </div>
                       <div id="transportWorkbenchLayerOrderList" class="transport-workbench-layer-order-list" role="list"></div>
                     </div>
@@ -2024,12 +2024,12 @@
                 </div>
                 <div class="transport-workbench-inspector-stack">
                   <div id="transportWorkbenchInspectorTabs" class="transport-workbench-inspector-tabs" role="tablist" aria-label="Workbench inspector tabs" data-i18n-aria-label="Workbench inspector tabs">
-                    <button type="button" class="transport-workbench-inspector-tab is-active" data-transport-inspector-tab="inspect" role="tab" aria-selected="true" aria-controls="transportWorkbenchInspectorPanelInspect">Inspect</button>
-                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="display" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelDisplay">Display</button>
-                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="aggregation" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelAggregation">Aggregation</button>
+                    <button type="button" class="transport-workbench-inspector-tab is-active" data-transport-inspector-tab="inspect" role="tab" aria-selected="true" aria-controls="transportWorkbenchInspectorPanelInspect" data-i18n="Inspect">Inspect</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="display" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelDisplay" data-i18n="Display">Display</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="aggregation" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelAggregation" data-i18n="Aggregation">Aggregation</button>
                     <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="labels" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelLabels">Labels</button>
-                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="coverage" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelCoverage">Coverage</button>
-                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="data" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelData">Data</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="coverage" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelCoverage" data-i18n="Coverage">Coverage</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="data" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelData" data-i18n="Data">Data</button>
                   </div>
                   <div class="transport-workbench-inspector-panels">
                     <section id="transportWorkbenchInspectorPanelInspect" class="transport-workbench-inspector-panel is-active" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">

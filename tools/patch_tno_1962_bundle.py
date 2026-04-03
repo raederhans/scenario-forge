@@ -39,6 +39,7 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_locks import scenario_build_lock
 from map_builder import scenario_bundle_platform
+from map_builder import scenario_bundle_publish_service
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
@@ -9460,6 +9461,34 @@ def detect_unsynced_manual_edits(
     )
 
 
+def _build_bundle_publish_service_kwargs(
+    *,
+    publish_scope: str,
+    manual_sync_policy: str,
+) -> dict[str, object]:
+    return {
+        "publish_scope": publish_scope,
+        "manual_sync_policy": manual_sync_policy,
+        "scenario_id": SCENARIO_ID,
+        "scenario_data_scope": PUBLISH_SCOPE_SCENARIO_DATA,
+        "all_scope": PUBLISH_SCOPE_ALL,
+        "manual_source_filenames": {
+            "scenario_manual_overrides": MANUAL_OVERRIDE_FILENAME,
+            "geo_name_overrides": "geo_name_overrides.manual.json",
+            "district_groups": "district_groups.manual.json",
+        },
+        "validate_publish_bundle_dir": validate_publish_bundle_dir,
+        "ensure_publish_target_offline": _ensure_scenario_publish_target_offline,
+        "validate_geo_locale_checkpoint": validate_geo_locale_checkpoint,
+        "require_startup_stage_checkpoints": scenario_bundle_platform.require_startup_stage_checkpoints,
+        "detect_unsynced_manual_edits": detect_unsynced_manual_edits,
+        "publish_checkpoint_bundle": scenario_bundle_platform.publish_checkpoint_bundle,
+        "load_checkpoint_json": load_checkpoint_json,
+        "write_json": write_json,
+        "resolve_publish_filenames": resolve_scenario_publish_filenames,
+    }
+
+
 def write_bundle_stage(
     scenario_dir: Path,
     checkpoint_dir: Path,
@@ -9468,33 +9497,13 @@ def write_bundle_stage(
 ) -> None:
     with _scenario_build_session_lock(scenario_dir):
         with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_WRITE_BUNDLE):
-            if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
-                _ensure_scenario_publish_target_offline(scenario_dir)
-                scenario_bundle_platform.validate_strict_publish_bundle(
-                    checkpoint_dir,
-                    publish_scope,
-                    scenario_data_scope=PUBLISH_SCOPE_SCENARIO_DATA,
-                    all_scope=PUBLISH_SCOPE_ALL,
-                    validate_publish_bundle_dir=validate_publish_bundle_dir,
-                )
-                validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
-                scenario_bundle_platform.require_startup_stage_checkpoints(checkpoint_dir)
-                detect_unsynced_manual_edits(
-                    scenario_dir,
-                    checkpoint_dir,
-                    {
-                        "scenario_manual_overrides": scenario_dir / MANUAL_OVERRIDE_FILENAME,
-                        "geo_name_overrides": scenario_dir / "geo_name_overrides.manual.json",
-                        "district_groups": scenario_dir / "district_groups.manual.json",
-                    },
-                    policy=manual_sync_policy,
-                )
-            scenario_bundle_platform.publish_checkpoint_bundle(
+            scenario_bundle_publish_service.publish_scenario_build_in_locked_session(
                 scenario_dir,
                 checkpoint_dir,
-                publish_scope,
-                load_checkpoint_json=load_checkpoint_json,
-                write_json=write_json,
+                **_build_bundle_publish_service_kwargs(
+                    publish_scope=publish_scope,
+                    manual_sync_policy=manual_sync_policy,
+                ),
             )
 
 

@@ -8,6 +8,7 @@ from pathlib import Path
 import geopandas as gpd
 from shapely.geometry import Point
 
+from map_builder import config as cfg
 from map_builder.cities import emit_default_scenario_city_assets
 
 
@@ -83,10 +84,24 @@ class CityAssetsTest(unittest.TestCase):
             emit_default_scenario_city_assets(tmp_path, world_cities)
 
             payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
+            partial_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
+            capital_defaults_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
 
             self.assertEqual(payload["cities"], {})
             self.assertEqual(payload["audit"]["renamed_city_count"], 0)
             self.assertEqual(payload["audit"]["name_conflict_count"], 0)
+            self.assertEqual(partial_payload["cities"], {})
+            self.assertNotIn("capitals_by_tag", partial_payload)
+            self.assertNotIn("capital_city_hints", partial_payload)
+            self.assertEqual(capital_defaults_payload["capitals_by_tag"], {})
+            self.assertEqual(capital_defaults_payload["capital_city_hints"], {})
+            self.assertNotIn("capital_hints_url", manifest_payload)
+            self.assertFalse((scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME).exists())
 
     def test_emit_default_scenario_city_assets_keeps_soviet_era_renames_for_hoi4_1936(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -154,12 +169,25 @@ class CityAssetsTest(unittest.TestCase):
             emit_default_scenario_city_assets(tmp_path, world_cities)
 
             payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            partial_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
+            capital_defaults_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
 
             self.assertEqual(
                 payload["cities"]["CITY::saint-petersburg"]["display_name"],
                 {"en": "Leningrad", "zh": "列宁格勒"},
             )
             self.assertEqual(payload["audit"]["renamed_city_count"], 1)
+            self.assertEqual(
+                partial_payload["cities"]["CITY::saint-petersburg"]["display_name"],
+                payload["cities"]["CITY::saint-petersburg"]["display_name"],
+            )
+            self.assertNotIn("capitals_by_tag", partial_payload)
+            self.assertEqual(capital_defaults_payload["capitals_by_tag"], {})
+            self.assertEqual(capital_defaults_payload["capital_city_hints"], {})
 
     def test_emit_default_scenario_city_assets_accepts_high_confidence_controlled_capital_without_state_hint(
         self,
@@ -241,11 +269,30 @@ class CityAssetsTest(unittest.TestCase):
             emit_default_scenario_city_assets(tmp_path, world_cities)
 
             payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            partial_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
+            capital_defaults_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME).read_text(encoding="utf-8")
+            )
+            capital_hints_payload = json.loads(
+                (scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME).read_text(encoding="utf-8")
+            )
+            manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
             hint = payload["capital_city_hints"]["US"]
 
             self.assertEqual(hint["city_id"], "CITY::washington")
             self.assertEqual(hint["resolution_method"], "controlled_city_fallback")
             self.assertEqual(payload["audit"]["featured_runtime_missing_tags"], [])
+            self.assertEqual(partial_payload["cities"], {})
+            self.assertNotIn("capitals_by_tag", partial_payload)
+            self.assertEqual(capital_defaults_payload["capitals_by_tag"]["US"], "CITY::washington")
+            self.assertEqual(capital_defaults_payload["capital_city_hints"]["US"]["city_id"], "CITY::washington")
+            self.assertEqual(capital_hints_payload["entries"][0]["city_id"], "CITY::washington")
+            self.assertEqual(
+                manifest_payload["capital_hints_url"],
+                f"data/scenarios/modern_world/{cfg.SCENARIO_CAPITAL_HINTS_FILENAME}",
+            )
 
 
 if __name__ == "__main__":

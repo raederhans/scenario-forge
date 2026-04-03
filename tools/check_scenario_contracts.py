@@ -12,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from map_builder import config as cfg
 from map_builder.contracts import SCENARIO_STRICT_REQUIRED_FILENAMES
 
 DEFAULT_SCENARIOS_ROOT = PROJECT_ROOT / "data/scenarios"
@@ -39,7 +40,6 @@ V2_REQUIRED_MANIFEST_FIELDS = (
     "performance_hints",
     "style_defaults",
     "city_overrides_url",
-    "capital_hints_url",
 )
 SUSPICIOUS_LOCALE_TRANSLATIONS = {
     "\u8df3\u6c60",
@@ -148,7 +148,11 @@ def normalize_featured_tags(manifest: dict) -> list[str]:
     return tags
 
 
-def validate_manifest_version_matrix(manifest: dict, errors: list[str]) -> None:
+def scenario_requires_public_capital_hints(expected_scenario_id: str) -> bool:
+    return expected_scenario_id not in cfg.SCENARIO_IDS_WITHOUT_PUBLIC_CAPITAL_HINTS
+
+
+def validate_manifest_version_matrix(expected_scenario_id: str, manifest: dict, errors: list[str]) -> None:
     version = manifest.get("version")
     if version not in (1, 2):
         errors.append(f"manifest.version must be 1 or 2. Found {version!r}.")
@@ -168,6 +172,8 @@ def validate_manifest_version_matrix(manifest: dict, errors: list[str]) -> None:
         return
 
     missing_v2 = [field for field in V2_REQUIRED_MANIFEST_FIELDS if not has_value(manifest.get(field))]
+    if scenario_requires_public_capital_hints(expected_scenario_id) and not has_value(manifest.get("capital_hints_url")):
+        missing_v2.append("capital_hints_url")
     if missing_v2:
         errors.append(
             "manifest.version 2 must include all required v2 fields. "
@@ -243,6 +249,8 @@ def validate_runtime_capitals(expected_scenario_id: str, manifest: dict, errors:
         )
 
     capital_hints_url = str(manifest.get("capital_hints_url") or "").strip()
+    if not capital_hints_url and not scenario_requires_public_capital_hints(expected_scenario_id):
+        return
     if not capital_hints_url:
         return
     capital_hints_path = scenario_relative_url_to_path(capital_hints_url)
@@ -641,7 +649,7 @@ def inspect_scenario_contract(
             f"Duplicate directories for `{actual_scenario_id or expected_scenario_id}`: {duplicate_dirs}."
         )
 
-    validate_manifest_version_matrix(manifest, errors)
+    validate_manifest_version_matrix(expected_scenario_id, manifest, errors)
     validate_manifest_urls(expected_scenario_id, manifest, errors)
     validate_runtime_capitals(expected_scenario_id, manifest, errors)
     validate_locale_patch(expected_scenario_id, manifest, errors, warnings, strict=strict, repair_tracks=repair_tracks)

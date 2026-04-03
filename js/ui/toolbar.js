@@ -3038,16 +3038,19 @@ function initToolbar({ render } = {}) {
     heading.className = "transport-workbench-shell-heading";
     const title = document.createElement("div");
     title.className = "transport-workbench-note-title";
-    title.textContent = tabId === "display"
-      ? "Workbench mode shell"
-      : tabId === "aggregation"
-        ? "Aggregation shell"
-        : tabId === "labels"
-          ? "Label shell"
-          : "Coverage shell";
+    title.textContent = t(
+      tabId === "display"
+        ? "Workbench mode shell"
+        : tabId === "aggregation"
+          ? "Aggregation shell"
+          : tabId === "labels"
+            ? "Label shell"
+            : "Coverage shell",
+      "ui"
+    );
     const kicker = document.createElement("span");
     kicker.className = "transport-workbench-shell-kicker";
-    kicker.textContent = "Live config";
+    kicker.textContent = t("Live config", "ui");
     heading.append(title, kicker);
     card.appendChild(heading);
     const grid = document.createElement("div");
@@ -3057,7 +3060,7 @@ function initToolbar({ render } = {}) {
       control.className = "transport-workbench-shell-control";
       const label = document.createElement("div");
       label.className = "transport-workbench-shell-label";
-      label.textContent = labelText;
+      label.textContent = t(labelText, "ui");
       const select = document.createElement("select");
       select.className = "select-input transport-workbench-select";
       options.forEach((option) => {
@@ -3076,7 +3079,7 @@ function initToolbar({ render } = {}) {
       control.className = "transport-workbench-shell-control";
       const label = document.createElement("div");
       label.className = "transport-workbench-shell-label";
-      label.textContent = labelText;
+      label.textContent = t(labelText, "ui");
       const row = document.createElement("div");
       row.className = "transport-workbench-range-row";
       const input = document.createElement("input");
@@ -3102,16 +3105,16 @@ function initToolbar({ render } = {}) {
       control.className = "transport-workbench-shell-control";
       const label = document.createElement("div");
       label.className = "transport-workbench-shell-label";
-      label.textContent = labelText;
+      label.textContent = t(labelText, "ui");
       const toggle = document.createElement("label");
       toggle.className = "transport-workbench-toggle";
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = !!checked;
       const text = document.createElement("span");
-      text.textContent = input.checked ? "Enabled" : "Disabled";
+      text.textContent = input.checked ? t("Enabled", "ui") : t("Disabled", "ui");
       input.addEventListener("change", () => {
-        text.textContent = input.checked ? "Enabled" : "Disabled";
+        text.textContent = input.checked ? t("Enabled", "ui") : t("Disabled", "ui");
         onChange(input.checked);
       });
       toggle.append(input, text);
@@ -3205,8 +3208,8 @@ function initToolbar({ render } = {}) {
     const note = document.createElement("p");
     note.className = "transport-workbench-shell-note";
     note.textContent = tabId === "data"
-      ? "Audit and manifest stay read-only here so tuning and source truth do not get mixed."
-      : "The control deck now binds the new display schema on the right side while the left column stays contextual.";
+      ? t("Audit and manifest stay read-only here so tuning and source truth do not get mixed.", "ui")
+      : t("The control deck now binds the new display schema on the right side while the left column stays contextual.", "ui");
     card.append(grid, note);
     return card;
   };
@@ -3225,7 +3228,7 @@ function initToolbar({ render } = {}) {
       control.className = "transport-workbench-shell-control";
       const label = document.createElement("div");
       label.className = "transport-workbench-shell-label";
-      label.textContent = labelText;
+      label.textContent = t(labelText, "ui");
       const row = document.createElement("div");
       row.className = "transport-workbench-range-row";
       const input = document.createElement("input");
@@ -3267,7 +3270,7 @@ function initToolbar({ render } = {}) {
       const advanced = document.createElement("details");
       advanced.className = "transport-workbench-advanced";
       const summary = document.createElement("summary");
-      summary.textContent = "Advanced";
+      summary.textContent = t("Advanced", "ui");
       advanced.appendChild(summary);
       const body = document.createElement("div");
       body.className = "transport-workbench-section-body transport-workbench-section-body-advanced";
@@ -3315,12 +3318,12 @@ function initToolbar({ render } = {}) {
       empty.className = "transport-workbench-empty-card";
       const title = document.createElement("div");
       title.className = "transport-workbench-empty-title";
-      title.textContent = tabId === "data" ? "No audit payload yet" : "No controls in this tab";
+      title.textContent = tabId === "data" ? t("No audit payload yet", "ui") : t("No controls in this tab", "ui");
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
       body.textContent = tabId === "data"
-        ? "This family has not exposed extra manifest or audit cards in the current shell."
-        : "This tab is reserved so the right-side deck keeps one stable structure across families.";
+        ? t("This family has not exposed extra manifest or audit cards in the current shell.", "ui")
+        : t("This tab is reserved so the right-side deck keeps one stable structure across families.", "ui");
       empty.append(title, body);
       mountNode.appendChild(empty);
     }
@@ -3356,10 +3359,10 @@ function initToolbar({ render } = {}) {
       card.className = "transport-workbench-empty-card";
       const title = document.createElement("div");
       title.className = "transport-workbench-empty-title";
-      title.textContent = "Future draw stack";
+      title.textContent = t("Future draw stack", "ui");
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
-      body.textContent = "Use the center board to sort the seven transport families. Left stays as context only, while the right deck owns all tuning.";
+      body.textContent = t("Use the center board to sort the seven transport families. Left stays as context only, while the right deck owns all tuning.", "ui");
       card.append(title, body);
       transportWorkbenchLensSections.appendChild(card);
       return;
@@ -3370,7 +3373,7 @@ function initToolbar({ render } = {}) {
     overview.className = "transport-workbench-note-card transport-workbench-note-card-emphasis";
     const overviewTitle = document.createElement("div");
     overviewTitle.className = "transport-workbench-note-title";
-    overviewTitle.textContent = "Review focus";
+    overviewTitle.textContent = t("Review focus", "ui");
     const overviewBody = document.createElement("p");
     overviewBody.className = "transport-workbench-note-text";
     overviewBody.textContent = `${family.lensBody} ${family.lensNext}`;
@@ -3380,13 +3383,13 @@ function initToolbar({ render } = {}) {
     summaryCard.className = "transport-workbench-note-card transport-workbench-note-card-soft transport-workbench-lens-summary";
     const summaryTitle = document.createElement("div");
     summaryTitle.className = "transport-workbench-note-title";
-    summaryTitle.textContent = "Current context";
+    summaryTitle.textContent = t("Current context", "ui");
     summaryCard.appendChild(summaryTitle);
     summaryCard.appendChild(createTransportWorkbenchInspectorRow("Preview", family.previewTitle || family.label));
     summaryCard.appendChild(createTransportWorkbenchInspectorRow("Data packs", Array.isArray(dataContract?.packs) && dataContract.packs.length ? dataContract.packs.join(", ") : "Deferred"));
     summaryCard.appendChild(createTransportWorkbenchInspectorRow("Geometry", dataContract?.geometryKind || "reserved"));
     summaryCard.appendChild(createTransportWorkbenchInspectorRow("Pack status", previewSnapshot?.status || "pending"));
-    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Right deck", "Display / Aggregation / Labels / Coverage / Data"));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Right deck", t("Display / Aggregation / Labels / Coverage / Data", "ui")));
     summaryCard.appendChild(createTransportWorkbenchInspectorRow("Compare", compareHeld ? "Holding baseline" : "Working state"));
     transportWorkbenchLensSections.appendChild(summaryCard);
   };
@@ -5079,7 +5082,7 @@ function initToolbar({ render } = {}) {
       urbanAdaptiveStatus.textContent = statusText;
       urbanAdaptiveStatus.classList.toggle("hidden", !statusText);
     }
-    if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? "Opacity" : "Fill Opacity";
+    if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
     if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
     if (urbanColor) urbanColor.value = urbanConfig.color;

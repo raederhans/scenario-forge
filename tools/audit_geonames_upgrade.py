@@ -255,17 +255,19 @@ def _load_json(path: Path) -> dict[str, object]:
 def _scenario_asset_summary(root: Path) -> dict[str, dict[str, object]]:
     summary: dict[str, dict[str, object]] = {}
     for scenario_dir in sorted(path for path in (root / "scenarios").iterdir() if path.is_dir()):
-        capital_hints_path = scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME
+        capital_defaults_path = scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME
         city_overrides_path = scenario_dir / cfg.SCENARIO_CITY_OVERRIDES_FILENAME
-        if not capital_hints_path.exists() or not city_overrides_path.exists():
+        if not capital_defaults_path.exists() or not city_overrides_path.exists():
             continue
-        capital_hints_payload = _load_json(capital_hints_path)
+        capital_defaults_payload = _load_json(capital_defaults_path)
         city_overrides_payload = _load_json(city_overrides_path)
+        capital_defaults_audit = capital_defaults_payload.get("audit") or {}
+        capital_defaults_by_tag = capital_defaults_payload.get("capitals_by_tag") or {}
         summary[scenario_dir.name] = {
-            "capital_hints_signature": _json_signature(capital_hints_payload),
-            "capital_hints_entry_count": int(capital_hints_payload.get("entry_count") or 0),
-            "capital_hints_missing_tag_count": int(capital_hints_payload.get("missing_tag_count") or 0),
-            "capital_hints_rejected_candidate_count": int((capital_hints_payload.get("audit") or {}).get("rejected_candidate_count") or 0),
+            "capital_defaults_signature": _json_signature(capital_defaults_payload),
+            "capital_defaults_entry_count": int(len(capital_defaults_by_tag)),
+            "capital_defaults_missing_tag_count": int(capital_defaults_audit.get("default_capital_missing_tag_count") or 0),
+            "capital_defaults_rejected_candidate_count": int(capital_defaults_audit.get("default_rejected_candidate_count") or 0),
             "city_override_signature": _json_signature(city_overrides_payload),
             "city_override_count": int(((city_overrides_payload.get("cities") or {})).__len__()),
             "city_override_unresolved_capital_count": int((city_overrides_payload.get("audit") or {}).get("unresolved_capital_count") or 0),
@@ -281,15 +283,15 @@ def _scenario_asset_diff(left: dict[str, dict[str, object]], right: dict[str, di
         left_entry = left.get(scenario_id, {})
         right_entry = right.get(scenario_id, {})
         deltas = {
-            "capital_hints_entry_count_delta": int(right_entry.get("capital_hints_entry_count", 0)) - int(left_entry.get("capital_hints_entry_count", 0)),
-            "capital_hints_missing_tag_count_delta": int(right_entry.get("capital_hints_missing_tag_count", 0)) - int(left_entry.get("capital_hints_missing_tag_count", 0)),
-            "capital_hints_rejected_candidate_count_delta": int(right_entry.get("capital_hints_rejected_candidate_count", 0)) - int(left_entry.get("capital_hints_rejected_candidate_count", 0)),
+            "capital_defaults_entry_count_delta": int(right_entry.get("capital_defaults_entry_count", 0)) - int(left_entry.get("capital_defaults_entry_count", 0)),
+            "capital_defaults_missing_tag_count_delta": int(right_entry.get("capital_defaults_missing_tag_count", 0)) - int(left_entry.get("capital_defaults_missing_tag_count", 0)),
+            "capital_defaults_rejected_candidate_count_delta": int(right_entry.get("capital_defaults_rejected_candidate_count", 0)) - int(left_entry.get("capital_defaults_rejected_candidate_count", 0)),
             "city_override_count_delta": int(right_entry.get("city_override_count", 0)) - int(left_entry.get("city_override_count", 0)),
             "city_override_unresolved_capital_count_delta": int(right_entry.get("city_override_unresolved_capital_count", 0)) - int(left_entry.get("city_override_unresolved_capital_count", 0)),
             "city_override_unresolved_rename_count_delta": int(right_entry.get("city_override_unresolved_rename_count", 0)) - int(left_entry.get("city_override_unresolved_rename_count", 0)),
         }
         signature_changed = (
-            left_entry.get("capital_hints_signature") != right_entry.get("capital_hints_signature")
+            left_entry.get("capital_defaults_signature") != right_entry.get("capital_defaults_signature")
             or left_entry.get("city_override_signature") != right_entry.get("city_override_signature")
         )
         if signature_changed or any(value != 0 for value in deltas.values()):
@@ -322,7 +324,7 @@ def _tracked_scenario_summary() -> dict[str, dict[str, object]]:
     root = RUNTIME_TMP_DIR / "tracked_snapshot"
     _prepare_candidate_root(root)
     for scenario_dir in sorted(path for path in SCENARIOS_DIR.iterdir() if path.is_dir()):
-        for file_name in (cfg.SCENARIO_CAPITAL_HINTS_FILENAME, cfg.SCENARIO_CITY_OVERRIDES_FILENAME):
+        for file_name in (cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME, cfg.SCENARIO_CITY_OVERRIDES_FILENAME):
             source_path = scenario_dir / file_name
             if source_path.exists():
                 shutil.copy2(source_path, root / "scenarios" / scenario_dir.name / file_name)

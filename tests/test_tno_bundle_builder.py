@@ -1131,12 +1131,10 @@ class TnoBundleBuilderTest(unittest.TestCase):
             checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
             with (
-                patch.object(tno_bundle, "_ensure_scenario_publish_target_offline") as offline_mock,
-                patch.object(tno_bundle.scenario_bundle_platform, "validate_strict_publish_bundle") as strict_mock,
-                patch.object(tno_bundle, "validate_geo_locale_checkpoint") as validate_geo_mock,
-                patch.object(tno_bundle.scenario_bundle_platform, "require_startup_stage_checkpoints") as require_startup_mock,
-                patch.object(tno_bundle, "detect_unsynced_manual_edits") as manual_sync_mock,
-                patch.object(tno_bundle.scenario_bundle_platform, "publish_checkpoint_bundle") as publish_mock,
+                patch.object(
+                    tno_bundle.scenario_bundle_publish_service,
+                    "publish_scenario_build_in_locked_session",
+                ) as publish_service_mock,
                 patch.object(tno_bundle, "rebuild_published_scenario_chunk_assets") as rebuild_chunk_mock,
             ):
                 write_bundle_stage(
@@ -1146,12 +1144,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                     manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
                 )
 
-            offline_mock.assert_called_once_with(scenario_dir)
-            strict_mock.assert_called_once()
-            validate_geo_mock.assert_called_once()
-            require_startup_mock.assert_called_once_with(checkpoint_dir)
-            manual_sync_mock.assert_called_once()
-            publish_mock.assert_called_once()
+            publish_service_mock.assert_called_once()
             rebuild_chunk_mock.assert_not_called()
 
     def test_build_chunk_assets_stage_requires_published_inputs_and_runs_chunk_builder(self) -> None:
@@ -1181,7 +1174,10 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             with (
                 patch.object(tno_bundle, "_scenario_build_session_lock", return_value=nullcontext()) as session_lock_mock,
-                patch.object(tno_bundle.scenario_bundle_platform, "publish_checkpoint_bundle") as publish_mock,
+                patch.object(
+                    tno_bundle.scenario_bundle_publish_service,
+                    "publish_scenario_build_in_locked_session",
+                ) as publish_service_mock,
             ):
                 write_bundle_stage(
                     scenario_dir,
@@ -1191,7 +1187,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 )
 
             session_lock_mock.assert_called_once_with(scenario_dir)
-            publish_mock.assert_called_once()
+            publish_service_mock.assert_called_once()
 
     def test_write_bundle_stage_blocks_publish_when_live_dev_server_targets_workspace(self) -> None:
         runtime_tmp_root = tno_bundle.ROOT / ".runtime" / "tmp"

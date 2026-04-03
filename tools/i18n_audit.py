@@ -76,6 +76,7 @@ DECLARATIVE_ATTR_NAMES = {
 }
 VISIBLE_ATTR_NAMES = {"placeholder", "title", "aria-label"}
 A11Y_ATTR_NAMES = {"aria-label", "title"}
+NON_VISIBLE_HTML_TAGS = {"script", "style"}
 NON_TRANSLATABLE_PATTERNS = (
     re.compile(r"^\d+(?:\.\d+)?(?:px|x|ms|s|%)$", re.IGNORECASE),
     re.compile(r"^\d{1,2}:\d{2}(?:\s*(?:UTC|AM|PM))?$", re.IGNORECASE),
@@ -179,6 +180,7 @@ class MarkupAuditParser(HTMLParser):
         self.text_nodes: list[str] = []
         self.visible_attrs: list[dict[str, str]] = []
         self.declarative_ui_keys: list[str] = []
+        self._ignored_tag_depth = 0
 
     def _collect_attrs(self, attrs) -> None:
         for name, value in attrs:
@@ -191,13 +193,26 @@ class MarkupAuditParser(HTMLParser):
             elif attr_name in VISIBLE_ATTR_NAMES:
                 self.visible_attrs.append({"name": attr_name, "value": attr_value})
 
-    def handle_starttag(self, _tag, attrs):
+    def handle_starttag(self, tag, attrs):
+        if str(tag or "").strip().lower() in NON_VISIBLE_HTML_TAGS:
+            self._ignored_tag_depth += 1
+            return
         self._collect_attrs(attrs)
 
-    def handle_startendtag(self, _tag, attrs):
+    def handle_startendtag(self, tag, attrs):
+        if str(tag or "").strip().lower() in NON_VISIBLE_HTML_TAGS:
+            return
         self._collect_attrs(attrs)
+
+    def handle_endtag(self, tag):
+        if self._ignored_tag_depth <= 0:
+            return
+        if str(tag or "").strip().lower() in NON_VISIBLE_HTML_TAGS:
+            self._ignored_tag_depth -= 1
 
     def handle_data(self, data):
+        if self._ignored_tag_depth > 0:
+            return
         value = decode_js_string(data)
         if value:
             self.text_nodes.append(value)

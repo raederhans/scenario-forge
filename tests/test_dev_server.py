@@ -12,6 +12,9 @@ import urllib.request
 from pathlib import Path
 from unittest import mock
 
+from map_builder import config as cfg
+from map_builder import scenario_geo_locale_materializer
+from map_builder import scenario_materialization_service
 from map_builder.scenario_political_materializer import build_political_materialization_transaction
 from tools import dev_server
 
@@ -185,6 +188,33 @@ class DevServerTest(unittest.TestCase):
                 "geo": {},
             },
         )
+        _write_json(
+            scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME,
+            {
+                "version": 1,
+                "scenario_id": scenario_id,
+                "generated_at": "",
+                "cities": {},
+                "audit": {
+                    "renamed_city_count": 0,
+                    "name_conflict_count": 0,
+                    "unresolved_city_rename_count": 0,
+                    "name_conflicts": [],
+                    "unresolved_city_renames": [],
+                },
+            },
+        )
+        _write_json(
+            scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+            {
+                "version": 1,
+                "scenario_id": scenario_id,
+                "generated_at": "",
+                "capitals_by_tag": {},
+                "capital_city_hints": {},
+                "audit": {},
+            },
+        )
         return scenario_dir
 
     def test_dev_server_tcp_server_handles_parallel_requests(self) -> None:
@@ -336,6 +366,491 @@ class DevServerTest(unittest.TestCase):
                 "BBB",
             )
 
+    def test_political_materializer_derives_manual_payload_without_reading_existing_manual_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / "scenario_manual_overrides.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "stale",
+                    "countries": {
+                        "ZZZ": {"mode": "override", "display_name_en": "Stale"},
+                    },
+                    "assignments": {
+                        "BBB-1": {"owner": "AAA"},
+                    },
+                },
+            )
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+            mutations_payload = dev_server._load_scenario_mutations_payload(context)
+            mutations_payload["countries"]["AAA"] = {
+                "mode": "override",
+                "display_name_en": "Alpha Prime",
+                "display_name_zh": "阿尔法首都",
+                "color_hex": "#654321",
+            }
+            mutations_payload["assignments_by_feature_id"]["AAA-1"] = {"owner": "BBB"}
+
+            _transaction_payloads, materialized = build_political_materialization_transaction(
+                context,
+                mutations_payload,
+                root=root,
+                deps=dev_server._political_materializer_deps(),
+            )
+
+            self.assertEqual(
+                sorted(materialized["manualPayload"]["countries"].keys()),
+                ["AAA"],
+            )
+            self.assertEqual(
+                sorted(materialized["manualPayload"]["assignments"].keys()),
+                ["AAA-1"],
+            )
+            self.assertNotIn("ZZZ", materialized["manualPayload"]["countries"])
+            self.assertNotIn("BBB-1", materialized["manualPayload"]["assignments"])
+
+    def test_save_scenario_capital_payload_materializes_capital_from_mutations(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+
+            result = dev_server.save_scenario_capital_payload(
+                "test_scenario",
+                tag="AAA",
+                feature_id="AAA-1",
+                city_id="alpha-city",
+                capital_state_id=101,
+                city_name="Alpha City",
+                stable_key="id::alpha-city",
+                country_code="AA",
+                lookup_iso2="AA",
+                base_iso2="AA",
+                capital_kind="primary_capital",
+                population=12345,
+                lon=12.34,
+                lat=56.78,
+                urban_match_id="urban-alpha",
+                base_tier="city",
+                name_ascii="Alpha City",
+                root=root,
+            )
+
+            countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
+            manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            city_overrides_payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
+
+            self.assertTrue(result["ok"])
+            self.assertEqual(countries_payload["countries"]["AAA"]["capital_state_id"], 101)
+            self.assertEqual(manual_payload["countries"]["AAA"]["capital_state_id"], 101)
+            self.assertEqual(mutations_payload["capitals"]["AAA"]["feature_id"], "AAA-1")
+            self.assertEqual(city_overrides_payload["capitals_by_tag"]["AAA"], "alpha-city")
+            self.assertEqual(city_overrides_payload["capital_city_hints"]["AAA"]["city_name"], "Alpha City")
+            self.assertEqual(result["cityOverrideEntry"]["city_id"], "alpha-city")
+            self.assertEqual(result["mutationsPath"], "data/scenarios/test_scenario/scenario_mutations.json")
+
+    def test_save_scenario_capital_payload_seeds_previous_hint_from_defaults_partial(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "defaults-pass",
+                    "capitals_by_tag": {"AAA": "alpha-default"},
+                    "capital_city_hints": {
+                        "AAA": {
+                            "tag": "AAA",
+                            "city_id": "alpha-default",
+                            "city_name": "Alpha Default",
+                            "name_ascii": "Alpha Default",
+                            "stable_key": "id::alpha-default",
+                            "country_code": "AA",
+                            "lookup_iso2": "AA",
+                            "base_iso2": "AA",
+                            "capital_kind": "primary_capital",
+                            "population": 12345,
+                            "lon": 12.34,
+                            "lat": 56.78,
+                            "urban_match_id": "urban-alpha",
+                            "base_tier": "city",
+                            "host_feature_id": "AAA-1",
+                        }
+                    },
+                    "audit": {},
+                },
+            )
+
+            result = dev_server.save_scenario_capital_payload(
+                "test_scenario",
+                tag="AAA",
+                feature_id="AAA-1",
+                city_id="alpha-default",
+                capital_state_id=101,
+                root=root,
+            )
+
+            city_overrides_payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            hint = city_overrides_payload["capital_city_hints"]["AAA"]
+            self.assertTrue(result["ok"])
+            self.assertEqual(hint["city_name"], "Alpha Default")
+            self.assertEqual(hint["name_ascii"], "Alpha Default")
+            self.assertEqual(hint["population"], 12345)
+            self.assertEqual(hint["base_tier"], "city")
+            self.assertEqual(hint["urban_match_id"], "urban-alpha")
+            self.assertEqual(hint["lookup_iso2"], "AA")
+            self.assertEqual(hint["country_code"], "AA")
+
+    def test_save_scenario_capital_payload_ignores_stale_city_override_capital_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / "city_overrides.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "stale-pass",
+                    "capitals_by_tag": {"AAA": "stale-city"},
+                    "capital_city_hints": {
+                        "AAA": {
+                            "tag": "AAA",
+                            "city_id": "stale-city",
+                            "city_name": "Stale City",
+                            "host_feature_id": "AAA-1",
+                        }
+                    },
+                    "cities": {
+                        "CITY::legacy": {
+                            "display_name": {"en": "Legacy City", "zh": "鏃у煄"},
+                            "aliases": ["Legacy City"],
+                        }
+                    },
+                    "audit": {
+                        "renamed_city_count": 1,
+                        "name_conflict_count": 0,
+                    },
+                },
+            )
+            _write_json(
+                scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "defaults-pass",
+                    "capitals_by_tag": {"BBB": "beta-default"},
+                    "capital_city_hints": {
+                        "BBB": {
+                            "tag": "BBB",
+                            "city_id": "beta-default",
+                            "city_name": "Beta City",
+                            "host_feature_id": "BBB-2",
+                        }
+                    },
+                    "audit": {},
+                },
+            )
+            _write_json(
+                scenario_dir / "capital_hints.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "defaults-pass",
+                    "entry_count": 1,
+                    "missing_tag_count": 0,
+                    "missing_tags": [],
+                    "entries": [
+                        {
+                            "tag": "BBB",
+                            "city_id": "beta-default",
+                            "city_name": "Beta City",
+                            "host_feature_id": "BBB-2",
+                        }
+                    ],
+                    "audit": {},
+                },
+            )
+
+            result = dev_server.save_scenario_capital_payload(
+                "test_scenario",
+                tag="AAA",
+                feature_id="AAA-1",
+                city_id="alpha-city",
+                capital_state_id=101,
+                city_name="Alpha City",
+                stable_key="id::alpha-city",
+                country_code="AA",
+                lookup_iso2="AA",
+                base_iso2="AA",
+                capital_kind="primary_capital",
+                population=12345,
+                lon=12.34,
+                lat=56.78,
+                urban_match_id="urban-alpha",
+                base_tier="city",
+                name_ascii="Alpha City",
+                root=root,
+            )
+
+            city_overrides_payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(city_overrides_payload["capitals_by_tag"]["AAA"], "alpha-city")
+            self.assertEqual(city_overrides_payload["capital_city_hints"]["AAA"]["city_name"], "Alpha City")
+            self.assertEqual(city_overrides_payload["capitals_by_tag"]["BBB"], "beta-default")
+            self.assertEqual(city_overrides_payload["cities"], {})
+            self.assertNotEqual(city_overrides_payload["capital_city_hints"]["AAA"]["city_id"], "stale-city")
+
+    def test_save_scenario_capital_payload_prefers_city_assets_partial_over_stale_city_overrides(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / "city_overrides.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "stale-cities",
+                    "cities": {
+                        "CITY::legacy": {
+                            "display_name": {"en": "Legacy City", "zh": "鏃у煄"},
+                            "aliases": ["Legacy City"],
+                        }
+                    },
+                    "audit": {"renamed_city_count": 1, "name_conflict_count": 0},
+                },
+            )
+            _write_json(
+                scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME,
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "partial-cities",
+                    "cities": {
+                        "CITY::partial": {
+                            "display_name": {"en": "Partial City", "zh": "閮ㄥ垎鍩庡競"},
+                            "aliases": ["Partial City"],
+                        }
+                    },
+                    "audit": {"renamed_city_count": 1, "name_conflict_count": 0},
+                },
+            )
+
+            result = dev_server.save_scenario_capital_payload(
+                "test_scenario",
+                tag="AAA",
+                feature_id="AAA-1",
+                city_id="alpha-city",
+                capital_state_id=101,
+                city_name="Alpha City",
+                stable_key="id::alpha-city",
+                country_code="AA",
+                lookup_iso2="AA",
+                base_iso2="AA",
+                capital_kind="primary_capital",
+                population=12345,
+                lon=12.34,
+                lat=56.78,
+                urban_match_id="urban-alpha",
+                base_tier="city",
+                name_ascii="Alpha City",
+                root=root,
+            )
+
+            city_overrides_payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertIn("CITY::partial", city_overrides_payload["cities"])
+            self.assertNotIn("CITY::legacy", city_overrides_payload["cities"])
+
+    def test_save_scenario_capital_payload_requires_city_assets_partial(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            city_assets_partial_path = scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME
+            city_assets_partial_path.unlink()
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.save_scenario_capital_payload(
+                    "test_scenario",
+                    tag="AAA",
+                    feature_id="AAA-1",
+                    city_id="alpha-city",
+                    capital_state_id=101,
+                    city_name="Alpha City",
+                    stable_key="id::alpha-city",
+                    country_code="AA",
+                    lookup_iso2="AA",
+                    base_iso2="AA",
+                    capital_kind="primary_capital",
+                    population=12345,
+                    lon=12.34,
+                    lat=56.78,
+                    urban_match_id="urban-alpha",
+                    base_tier="city",
+                    name_ascii="Alpha City",
+                    root=root,
+                )
+
+            error = exc_info.exception
+            self.assertEqual(error.code, "missing_city_assets_partial")
+            self.assertEqual(error.details["scenarioId"], "test_scenario")
+            self.assertEqual(error.details["path"], str(city_assets_partial_path))
+
+    def test_save_scenario_capital_payload_requires_capital_defaults_partial(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            capital_defaults_partial_path = scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME
+            capital_defaults_partial_path.unlink()
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.save_scenario_capital_payload(
+                    "test_scenario",
+                    tag="AAA",
+                    feature_id="AAA-1",
+                    city_id="alpha-city",
+                    capital_state_id=101,
+                    city_name="Alpha City",
+                    stable_key="id::alpha-city",
+                    country_code="AA",
+                    lookup_iso2="AA",
+                    base_iso2="AA",
+                    capital_kind="primary_capital",
+                    population=12345,
+                    lon=12.34,
+                    lat=56.78,
+                    urban_match_id="urban-alpha",
+                    base_tier="city",
+                    name_ascii="Alpha City",
+                    root=root,
+                )
+
+            error = exc_info.exception
+            self.assertEqual(error.code, "missing_capital_defaults_partial")
+            self.assertEqual(error.details["scenarioId"], "test_scenario")
+            self.assertEqual(error.details["path"], str(capital_defaults_partial_path))
+
+    def test_save_scenario_capital_payload_ignores_stale_capital_hints_when_defaults_partial_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "defaults-partial-pass",
+                    "capitals_by_tag": {"BBB": "beta-from-partial"},
+                    "capital_city_hints": {
+                        "BBB": {
+                            "tag": "BBB",
+                            "city_id": "beta-from-partial",
+                            "city_name": "Beta Partial",
+                            "host_feature_id": "BBB-2",
+                        }
+                    },
+                    "audit": {},
+                },
+            )
+            _write_json(
+                scenario_dir / "capital_hints.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "stale-hints-pass",
+                    "entry_count": 1,
+                    "missing_tag_count": 0,
+                    "missing_tags": [],
+                    "entries": [
+                        {
+                            "tag": "BBB",
+                            "city_id": "beta-from-hints",
+                            "city_name": "Beta Hints",
+                            "host_feature_id": "BBB-2",
+                        }
+                    ],
+                    "audit": {},
+                },
+            )
+
+            result = dev_server.save_scenario_capital_payload(
+                "test_scenario",
+                tag="AAA",
+                feature_id="AAA-1",
+                city_id="alpha-city",
+                capital_state_id=101,
+                city_name="Alpha City",
+                stable_key="id::alpha-city",
+                country_code="AA",
+                lookup_iso2="AA",
+                base_iso2="AA",
+                capital_kind="primary_capital",
+                population=12345,
+                lon=12.34,
+                lat=56.78,
+                urban_match_id="urban-alpha",
+                base_tier="city",
+                name_ascii="Alpha City",
+                root=root,
+            )
+
+            city_overrides_payload = json.loads((scenario_dir / "city_overrides.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(city_overrides_payload["capitals_by_tag"]["BBB"], "beta-from-partial")
+            self.assertEqual(city_overrides_payload["capital_city_hints"]["BBB"]["city_name"], "Beta Partial")
+
+    def test_save_scenario_geo_locale_entry_uses_in_process_materializer_for_tno(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root, scenario_id="tno_1962")
+            published_patch_payload = {
+                "version": 1,
+                "scenario_id": "tno_1962",
+                "generated_at": "in-process-pass",
+                "geo": {"AAA-1": {"en": "Alpha One", "zh": "阿尔法一"}},
+            }
+
+            def fake_materialize(context: dict[str, object], *, root: Path, error_cls: type[Exception], fallback_builder_path=None, checkpoint_dir=None) -> dict[str, object]:
+                return {"checkpointPaths": ["checkpoint/geo_locale_patch.json"], "buildMode": "in_process"}
+
+            def fake_publish(context: dict[str, object], *, target: str, root: Path, checkpoint_dir=None) -> dict[str, object]:
+                if target == "geo-locale":
+                    _write_json(Path(context["geoLocalePatchPath"]), published_patch_payload)
+                return {"target": target}
+
+            with (
+                mock.patch.object(
+                    scenario_materialization_service,
+                    "materialize_scenario_geo_locale",
+                    side_effect=fake_materialize,
+                ) as materialize_mock,
+                mock.patch.object(
+                    dev_server,
+                    "publish_scenario_outputs_in_locked_context",
+                    side_effect=fake_publish,
+                ) as publish_mock,
+            ):
+                result = dev_server.save_scenario_geo_locale_entry(
+                    "tno_1962",
+                    feature_id="AAA-1",
+                    en="Alpha One",
+                    zh="阿尔法一",
+                    root=root,
+                )
+
+            manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha One")
+            self.assertEqual(mutations_payload["geo_locale"]["AAA-1"]["zh"], "阿尔法一")
+            self.assertEqual(result["entry"]["en"], "Alpha One")
+            materialize_mock.assert_called_once()
+            self.assertEqual(publish_mock.call_count, 2)
+
     def test_validate_country_code_accepts_two_or_three_uppercase_letters_and_rejects_invalid_values(self) -> None:
         self.assertEqual(dev_server._validate_country_code("de"), "DE")
         self.assertEqual(dev_server._validate_country_code("USA"), "USA")
@@ -480,6 +995,232 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(catalog_payload["entries"][1]["tag"], "CCC")
             self.assertEqual(catalog_payload["entries"][1]["parent_owner_tag"], "AAA")
             self.assertEqual(catalog_payload["entries"][1]["preset_source"]["feature_ids"], ["DE-1", "DE-2"])
+
+    @unittest.skip("Replaced by preservation of untouched local-only manual catalog entries.")
+    def test_save_scenario_tag_create_payload_ignores_stale_local_catalog_when_deriving_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            source_catalog_url = "data/releasables/test_scenario.source.catalog.json"
+            scenario_dir = self._create_scenario_fixture(
+                root,
+                releasable_catalog_url=source_catalog_url,
+            )
+            _write_json(
+                root / source_catalog_url,
+                {
+                    "version": 1,
+                    "catalog_id": "test_scenario.source",
+                    "generated_at": "2026-03-19T00:00:00Z",
+                    "scenario_ids": ["test_scenario"],
+                    "entries": [
+                        {
+                            "tag": "OLD",
+                            "display_name": "Old Release",
+                            "display_name_en": "Old Release",
+                            "display_name_zh": "旧释放",
+                            "color_hex": "#111111",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["AAA-1"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "AAA",
+                            "parent_owner_tags": ["AAA"],
+                        }
+                    ],
+                },
+            )
+            _write_json(
+                scenario_dir / "releasable_catalog.manual.json",
+                {
+                    "version": 1,
+                    "catalog_id": "test_scenario.manual",
+                    "generated_at": "stale",
+                    "scenario_ids": ["test_scenario"],
+                    "entries": [
+                        {
+                            "tag": "STALE",
+                            "display_name": "Stale",
+                            "display_name_en": "Stale",
+                            "display_name_zh": "陈旧",
+                            "color_hex": "#999999",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["BBB-1"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "BBB",
+                            "parent_owner_tags": ["BBB"],
+                        }
+                    ],
+                },
+            )
+
+            result = dev_server.save_scenario_tag_create_payload(
+                "test_scenario",
+                feature_ids=["DE-1", "DE-2"],
+                tag="CCC",
+                name_en="Caledonia",
+                name_zh="卡莱多尼亚",
+                color_hex="#123456",
+                parent_owner_tag="AAA",
+                root=root,
+            )
+
+            catalog_payload = json.loads((scenario_dir / "releasable_catalog.manual.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(
+                [entry["tag"] for entry in catalog_payload["entries"]],
+                ["OLD", "CCC"],
+            )
+            self.assertNotIn(
+                "STALE",
+                {entry["tag"] for entry in catalog_payload["entries"]},
+            )
+
+    def test_save_scenario_country_payload_preserves_untouched_local_manual_catalog_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            source_catalog_url = "data/releasables/test_scenario.source.catalog.json"
+            scenario_dir = self._create_scenario_fixture(
+                root,
+                releasable_catalog_url=source_catalog_url,
+            )
+            _write_json(
+                root / source_catalog_url,
+                {
+                    "version": 1,
+                    "catalog_id": "test_scenario.source",
+                    "generated_at": "2026-03-19T00:00:00Z",
+                    "scenario_ids": ["test_scenario"],
+                    "entries": [
+                        {
+                            "tag": "OLD",
+                            "display_name": "Old Release",
+                            "display_name_en": "Old Release",
+                            "display_name_zh": "Old Release Zh",
+                            "color_hex": "#111111",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["AAA-1"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "AAA",
+                            "parent_owner_tags": ["AAA"],
+                        }
+                    ],
+                },
+            )
+            _write_json(
+                scenario_dir / "releasable_catalog.manual.json",
+                {
+                    "version": 1,
+                    "catalog_id": "test_scenario.manual",
+                    "generated_at": "stale",
+                    "scenario_ids": ["test_scenario"],
+                    "entries": [
+                        {
+                            "tag": "OLD",
+                            "display_name": "Old Release Local",
+                            "display_name_en": "Old Release Local",
+                            "display_name_zh": "Old Release Local Zh",
+                            "color_hex": "#999999",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["BBB-1"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "BBB",
+                            "parent_owner_tags": ["BBB"],
+                        },
+                        {
+                            "tag": "STALE",
+                            "display_name": "Stale",
+                            "display_name_en": "Stale",
+                            "display_name_zh": "Stale Zh",
+                            "color_hex": "#999999",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["BBB-1"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "BBB",
+                            "parent_owner_tags": ["BBB"],
+                        },
+                        {
+                            "tag": "MAN2",
+                            "display_name": "Manual Two",
+                            "display_name_en": "Manual Two",
+                            "display_name_zh": "Manual Two Zh",
+                            "color_hex": "#777777",
+                            "entry_kind": "releasable",
+                            "scenario_ids": ["test_scenario"],
+                            "scenario_only": True,
+                            "allow_manual_overlay": True,
+                            "preset_source": {
+                                "type": "feature_ids",
+                                "name": "",
+                                "group_ids": [],
+                                "feature_ids": ["DE-3"],
+                            },
+                            "boundary_variants": [],
+                            "parent_owner_tag": "AAA",
+                            "parent_owner_tags": ["AAA"],
+                        },
+                    ],
+                },
+            )
+
+            result = dev_server.save_scenario_country_payload(
+                "test_scenario",
+                tag="AAA",
+                name_en="Alpha Prime",
+                name_zh="Alpha Prime Zh",
+                color_hex="#123456",
+                parent_owner_tag="BBB",
+                root=root,
+            )
+
+            catalog_payload = json.loads((scenario_dir / "releasable_catalog.manual.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(
+                [entry["tag"] for entry in catalog_payload["entries"]],
+                ["OLD", "STALE", "MAN2", "AAA"],
+            )
+            self.assertEqual(catalog_payload["entries"][0]["display_name_en"], "Old Release")
+            self.assertEqual(catalog_payload["entries"][1]["preset_source"]["feature_ids"], ["BBB-1"])
+            self.assertEqual(catalog_payload["entries"][2]["preset_source"]["feature_ids"], ["DE-3"])
+            self.assertEqual(catalog_payload["entries"][3]["tag"], "AAA")
 
     def test_load_scenario_context_allows_shared_releasable_catalog_under_data_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -1248,7 +1989,11 @@ class DevServerTest(unittest.TestCase):
 
             dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {"test_scenario": builder_script}
             try:
-                with mock.patch.object(dev_server.subprocess, "run", side_effect=fake_builder_run):
+                with mock.patch.object(
+                    scenario_geo_locale_materializer.subprocess,
+                    "run",
+                    side_effect=fake_builder_run,
+                ):
                     first_thread = threading.Thread(target=run_first, name="first-geo-save", daemon=True)
                     second_thread = threading.Thread(target=run_second, name="second-geo-save", daemon=True)
                     first_thread.start()

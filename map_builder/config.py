@@ -158,6 +158,9 @@ WORLD_CITIES_FILENAME = "world_cities.geojson"
 CITY_ALIASES_FILENAME = "city_aliases.json"
 SCENARIO_CITY_OVERRIDES_FILENAME = "city_overrides.json"
 SCENARIO_CAPITAL_HINTS_FILENAME = "capital_hints.json"
+SCENARIO_CITY_ASSETS_PARTIAL_FILENAME = "city_assets.partial.json"
+SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME = "capital_defaults.partial.json"
+SCENARIO_IDS_WITHOUT_PUBLIC_CAPITAL_HINTS = frozenset({"tno_1962"})
 
 # Geography configuration
 MAP_NAME = "Global Admin-0 Skeleton"

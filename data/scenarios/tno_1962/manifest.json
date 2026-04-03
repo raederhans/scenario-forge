@@ -138,7 +138,6 @@
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
   "geo_locale_patch_url": "data/scenarios/tno_1962/geo_locale_patch.json",
   "city_overrides_url": "data/scenarios/tno_1962/city_overrides.json",
-  "capital_hints_url": "data/scenarios/tno_1962/capital_hints.json",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "excluded_water_region_ids": [
     "marine_andaman_sea",

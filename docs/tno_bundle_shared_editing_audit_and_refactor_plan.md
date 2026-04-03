@@ -155,21 +155,58 @@
 - 迁移策略采用“可破坏式重构”，默认允许旧 dev 工具和旧直写流程失效，不为兼容性保留复杂分支。
 - 不引入 Bazel/DVC/Dagster 作为运行时依赖；只吸收它们的工程原则。
 
-## 当前执行进展
+## 当前执行进展（压缩版）
 
-### 2026-04-03
+### 已完成
 
-- 第一轮止血已经完成：
-  - `scenario_mutations.json` 已接入 `tag / country / ownership / capital / geo_locale`
-  - builder 和 `dev_server` 已共用 scenario 级跨进程锁
-  - `startup_assets` / `chunk_assets` 已从主 builder 链路拆出
-- 第二轮已开始，当前先做了最短路径抽离：
-  - 新增 `map_builder/scenario_political_materializer.py`
-  - `tools/dev_server.py` 里的 political transaction 已改成薄包装，核心物化逻辑迁入新模块
-  - 顺手清掉了重复定义的 `_load_scenario_mutations_payload`
-  - 顺手删除了未再使用的 `_load_releasable_catalog_payload`
-  - 顺手删除了旧的 `_build_scenario_tag_create_payload` 死代码壳
-- 这一轮还没有完成的部分：
-  - `save_scenario_capital_payload()` 仍然保留自己的事务拼装逻辑，没有完全并入新 materializer
-  - `save_scenario_geo_locale_entry()` 仍然依赖 builder 子进程，还没有切成 in-process materialize
-  - 还没有正式的 `materialize_scenario_mutations(...)` 命令入口
+- 编辑链已经从“直写发布文件”切到“canonical 输入 -> materialize -> publish”主线：
+  - `scenario_mutations.json` 已承接 `tag / country / ownership / capital / geo_locale`
+  - `dev_server`、CLI、materializer、service 不再各自维护一套 orchestration
+- builder 与编辑链已共用 scenario 级跨进程锁。
+- `materialize` 和 `publish` 已拆开：
+  - `scenario_materialization_service`
+  - `scenario_publish_service`
+  - `scenario_bundle_publish_service`
+  - `tools/materialize_scenario_mutations.py`
+  - `tools/publish_scenario_outputs.py`
+  - `tools/publish_scenario_build.py`
+- TNO builder 的边界已经收紧：
+  - `startup_assets`、`chunk_assets` 已从主链拆出
+  - `write_bundle_stage()` 已收成“锁 + bundle publish service 委托”
+  - `write_bundle_stage()` 不再顺手重建 chunk
+- political / capital / geo_locale 主链已经模块化：
+  - `scenario_political_materializer.py`
+  - `scenario_geo_locale_materializer.py`
+  - `scenario_city_overrides_composer.py`
+- 城市/首都输入边界已经基本收干净：
+  - `city_assets.partial.json` 成为 `cities` 唯一输入
+  - `capital_defaults.partial.json` 成为默认 capital 唯一内部输入
+  - `city_overrides.json` 现在是组合后的发布产物
+  - `capital_hints.json` 已退出主输入链；对 `tno_1962` 而言也已退出 public contract
+- local manual mirror 已经不再反向污染 canonical state：
+  - `scenario_manual_overrides.json` 不再作为 materializer 输入
+  - `releasable_catalog.manual.json` 现在按 `source + untouched local-only + touched rebuilt` 合并
+- 关键回归已经补齐并通过：
+  - `tests.test_dev_server`
+  - `tests.test_city_assets`
+  - `tests.test_scenario_materialization_service`
+  - `tests.test_materialize_scenario_mutations`
+  - `tests.test_publish_scenario_outputs`
+  - `tests.test_publish_scenario_build`
+  - `tests.test_scenario_bundle_publish_service`
+  - `tests.test_tno_bundle_builder`
+  - `tests.test_scenario_contracts`
+
+### 当前仍未完成
+
+- `dev_server` 仍保留“保存后同步 materialize / 部分同步 publish”的同步语义，还没切到更薄的任务层。
+- 非 `tno_1962` 场景的 `geo_locale` 仍保留 subprocess fallback。
+- 统一 build root、`build_id`、异步任务系统都还没开始。
+- checked-in 场景产物还没有全仓迁到新契约；当前只明确把 `tno_1962` 收得最干净。
+- 旧镜像层虽然大多已经退成派生产物，但还没到“全仓统一清退”的最后一步。
+
+### 后续长期路线
+
+1. 继续按 scenario 分批迁移旧 contract，逐步退掉剩余 public hints / mirror 文件。
+2. 评估是否把同步保存语义再压薄，避免 `dev_server` 长期承担“请求 + 物化 + 发布”串联职责。
+3. 等场景迁移稳定后，再考虑统一 build root、`build_id` 和更明确的异步/任务化执行模型。

@@ -121,6 +121,45 @@ const label = t("Create Tag", "ui");
             self.assertIn("Scenario Tag Creator", result["declarative_ui_keys"])
             self.assertNotIn("Broken      data-extra=", result["declarative_ui_keys"])
 
+    def test_ignores_script_and_importmap_contents_in_markup_audit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "index.html",
+                """
+<!doctype html>
+<html>
+  <head>
+    <script type="importmap">
+      {
+        "imports": {
+          "/js/": "./js/"
+        }
+      }
+    </script>
+    <script>
+      (() => {
+        const preload = document.createElement("link");
+        preload.setAttribute("data-startup-bundle-preload", "true");
+      })();
+    </script>
+  </head>
+  <body>
+    <button data-i18n="Scenario Tag Creator">Scenario Tag Creator</button>
+  </body>
+</html>
+                """.strip(),
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertNotIn('{ "imports": { "/js/": "./js/" } }', result["uncovered_user_visible_literals"])
+            self.assertFalse(
+                any("data-startup-bundle-preload" in item for item in result["uncovered_user_visible_literals"])
+            )
+            self.assertIn("Scenario Tag Creator", result["covered_default_literals"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,8 +14,13 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _build_minimal_manifest(scenario_name: str, scenario_id: str | None = None) -> dict[str, object]:
-    return {
+def _build_minimal_manifest(
+    scenario_name: str,
+    scenario_id: str | None = None,
+    *,
+    include_capital_hints_url: bool = True,
+) -> dict[str, object]:
+    manifest = {
         "version": 2,
         "scenario_id": scenario_id or scenario_name,
         "display_name": scenario_name,
@@ -36,13 +41,25 @@ def _build_minimal_manifest(scenario_name: str, scenario_id: str | None = None) 
         "performance_hints": {"render_profile_default": "balanced"},
         "style_defaults": {"ocean": {"fillColor": "#123456"}},
         "city_overrides_url": f"data/scenarios/{scenario_name}/city_overrides.json",
-        "capital_hints_url": f"data/scenarios/{scenario_name}/capital_hints.json",
     }
+    if include_capital_hints_url:
+        manifest["capital_hints_url"] = f"data/scenarios/{scenario_name}/capital_hints.json"
+    return manifest
 
 
-def _create_scenario_dir(tmp_path: Path, scenario_name: str, scenario_id: str | None = None) -> Path:
+def _create_scenario_dir(
+    tmp_path: Path,
+    scenario_name: str,
+    scenario_id: str | None = None,
+    *,
+    include_capital_hints_url: bool = True,
+) -> Path:
     scenario_dir = tmp_path / "data" / "scenarios" / scenario_name
-    manifest = _build_minimal_manifest(scenario_name, scenario_id=scenario_id)
+    manifest = _build_minimal_manifest(
+        scenario_name,
+        scenario_id=scenario_id,
+        include_capital_hints_url=include_capital_hints_url,
+    )
     _write_json(scenario_dir / "manifest.json", manifest)
     _write_json(
         scenario_dir / "city_overrides.json",
@@ -53,14 +70,15 @@ def _create_scenario_dir(tmp_path: Path, scenario_name: str, scenario_id: str | 
             "capital_city_hints": {},
         },
     )
-    _write_json(
-        scenario_dir / "capital_hints.json",
-        {
-            "version": 1,
-            "scenario_id": scenario_id or scenario_name,
-            "entries": [],
-        },
-    )
+    if include_capital_hints_url:
+        _write_json(
+            scenario_dir / "capital_hints.json",
+            {
+                "version": 1,
+                "scenario_id": scenario_id or scenario_name,
+                "entries": [],
+            },
+        )
     return scenario_dir
 
 
@@ -136,6 +154,44 @@ class ScenarioContractTest(unittest.TestCase):
                     for error in errors
                 )
             )
+
+    def test_validate_scenario_contract_allows_tno_without_capital_hints_url(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(
+                tmp_root,
+                "tno_1962",
+                include_capital_hints_url=False,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+    def test_validate_scenario_contract_requires_capital_hints_url_for_non_tno(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(
+                tmp_root,
+                "example_scenario",
+                include_capital_hints_url=False,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("Missing: capital_hints_url" in error for error in errors))
 
     def test_validate_scenario_contract_keeps_locale_collisions_as_warnings(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

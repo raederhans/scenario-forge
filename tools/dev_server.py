@@ -11,7 +11,6 @@ import os
 import re
 from pathlib import Path
 import socketserver
-import subprocess
 import sys
 import threading
 from datetime import datetime
@@ -22,15 +21,30 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder import config as cfg
 from map_builder.io.writers import write_json_atomic, write_text_atomic
+from map_builder.scenario_city_overrides_composer import (
+    extract_city_assets_payload,
+    normalize_capital_overrides_payload,
+)
 from map_builder.scenario_locks import scenario_build_lock
 from map_builder.scenario_mutations import (
     DEFAULT_SCENARIO_MUTATIONS_FILENAME,
     default_scenario_mutations_payload,
     normalize_scenario_mutations_payload,
 )
+from map_builder.scenario_materialization_service import (
+    apply_mutation_and_materialize_in_locked_context,
+)
+from map_builder.scenario_publish_service import (
+    publish_scenario_outputs_in_locked_context,
+)
+from map_builder.scenario_geo_locale_materializer import (
+    normalize_geo_locale_entry as _normalize_locale_entry,
+)
 from map_builder.scenario_political_materializer import (
     PoliticalMaterializerDeps,
+    build_capital_city_override_entry_payload,
     build_political_materialization_transaction as build_political_materialization_transaction_impl,
 )
 
@@ -47,6 +61,7 @@ DEFAULT_SCENARIO_RELEASABLE_CATALOG_FILENAME = "releasable_catalog.manual.json"
 DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME = "district_groups.manual.json"
 DEFAULT_SCENARIO_MANUAL_OVERRIDES_FILENAME = "scenario_manual_overrides.json"
 DEFAULT_SCENARIO_CITY_OVERRIDES_FILENAME = "city_overrides.json"
+DEFAULT_SCENARIO_CITY_ASSETS_PARTIAL_FILENAME = cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 MAX_JSON_BODY_BYTES = 1024 * 1024
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
@@ -381,6 +396,7 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     releasable_catalog_url = str(manifest.get("releasable_catalog_url") or "").strip()
     district_groups_url = str(manifest.get("district_groups_url") or "").strip()
     city_overrides_url = str(manifest.get("city_overrides_url") or "").strip()
+    capital_hints_url = str(manifest.get("capital_hints_url") or "").strip()
     geo_locale_patch_url = str(
         manifest.get("geo_locale_patch_url")
         or manifest.get("geo_locale_patch_url_en")
@@ -397,6 +413,17 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     city_overrides_path = _resolve_repo_path(city_overrides_url, root=root) if city_overrides_url else (
         scenario_dir / DEFAULT_SCENARIO_CITY_OVERRIDES_FILENAME
     )
+    city_assets_partial_path = _ensure_path_within_root(
+        scenario_dir / DEFAULT_SCENARIO_CITY_ASSETS_PARTIAL_FILENAME,
+        root=root,
+    )
+    capital_hints_path = _resolve_repo_path(capital_hints_url, root=root) if capital_hints_url else (
+        scenario_dir / "capital_hints.json"
+    )
+    capital_defaults_partial_path = _ensure_path_within_root(
+        scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+        root=root,
+    )
     geo_locale_patch_path = _resolve_repo_path(geo_locale_patch_url, root=root) if geo_locale_patch_url else None
     geo_locale_builder_path = _resolve_repo_path(geo_locale_builder_url, root=root) if geo_locale_builder_url else None
 
@@ -407,6 +434,9 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
         controllers_path,
         cores_path,
         city_overrides_path,
+        city_assets_partial_path,
+        capital_hints_path,
+        capital_defaults_partial_path,
         geo_locale_patch_path,
         district_groups_path,
     ):
@@ -451,6 +481,10 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
         "districtGroupsPath": district_groups_path,
         "cityOverridesUrl": city_overrides_url,
         "cityOverridesPath": city_overrides_path,
+        "cityAssetsPartialPath": city_assets_partial_path,
+        "capitalHintsUrl": capital_hints_url,
+        "capitalHintsPath": capital_hints_path,
+        "capitalDefaultsPartialPath": capital_defaults_partial_path,
         "geoLocalePatchPath": geo_locale_patch_path,
         "geoLocaleBuilderPath": geo_locale_builder_path,
         "manualGeoOverridesPath": _ensure_path_within_root(
@@ -479,6 +513,9 @@ def _scenario_transaction_paths(context: dict[str, object]) -> list[Path]:
         Path(context["releasableCatalogLocalPath"]),
         Path(context["districtGroupsPath"]),
         Path(context["cityOverridesPath"]),
+        Path(context["cityAssetsPartialPath"]),
+        Path(context["capitalHintsPath"]),
+        Path(context["capitalDefaultsPartialPath"]),
         Path(context["manualOverridesPath"]),
         Path(context["mutationsPath"]),
         context.get("geoLocalePatchPath"),
@@ -729,13 +766,15 @@ def save_scenario_ownership_payload(
                 status=400,
             )
 
-        mutations_payload["generated_at"] = _now_iso()
-        transaction_payloads, materialized = _build_political_materialization_transaction(
+        service_result = apply_mutation_and_materialize_in_locked_context(
             context,
-            mutations_payload,
+            mutation_patch={
+                "assignments_by_feature_id": mutations_payload["assignments_by_feature_id"],
+            },
+            target="political",
             root=root,
         )
-        _write_json_transaction(transaction_payloads)
+        materialized = service_result["political"]["materialized"]
         owners_payload = materialized["ownersPayload"]
         owner_codes = sorted(set(owners_payload["owners"].values()))
         return {
@@ -774,29 +813,6 @@ def _default_scenario_manual_overrides_payload(scenario_id: str) -> dict[str, ob
         "countries": {},
         "assignments": {},
     }
-
-
-def _normalize_scenario_manual_overrides_payload(payload: object, *, scenario_id: str) -> dict[str, object]:
-    if not isinstance(payload, dict):
-        payload = {}
-    countries = payload.get("countries", {})
-    assignments = payload.get("assignments", {})
-    normalized = dict(payload)
-    normalized["version"] = int(normalized.get("version") or 1)
-    normalized["scenario_id"] = scenario_id
-    normalized["generated_at"] = _normalize_text(normalized.get("generated_at"))
-    normalized["countries"] = dict(countries) if isinstance(countries, dict) else {}
-    normalized["assignments"] = dict(assignments) if isinstance(assignments, dict) else {}
-    return normalized
-
-
-def _load_scenario_manual_overrides_payload(context: dict[str, object]) -> dict[str, object]:
-    manual_path = Path(context["manualOverridesPath"])
-    scenario_id = str(context["scenarioId"])
-    payload = _read_json_or_none(manual_path)
-    if payload is None:
-        payload = _default_scenario_manual_overrides_payload(scenario_id)
-    return _normalize_scenario_manual_overrides_payload(payload, scenario_id=scenario_id)
 
 
 def _load_scenario_mutations_payload(context: dict[str, object]) -> dict[str, object]:
@@ -895,24 +911,39 @@ def _write_json_transaction(file_payloads: list[tuple[Path, object]]) -> None:
             raise
 
 
-def _load_city_overrides_payload(context: dict[str, object]) -> dict[str, object]:
-    city_overrides_path = Path(context["cityOverridesPath"])
-    payload = _read_json_or_none(city_overrides_path)
-    if not isinstance(payload, dict):
-        payload = {}
-    cities = payload.get("cities", {})
-    capitals_by_tag = payload.get("capitals_by_tag", {})
-    capital_city_hints = payload.get("capital_city_hints", {})
-    normalized = dict(payload)
-    normalized["version"] = int(normalized.get("version") or 1)
-    normalized["scenario_id"] = str(context["scenarioId"])
-    normalized["generated_at"] = _normalize_text(normalized.get("generated_at"))
-    normalized["cities"] = dict(cities) if isinstance(cities, dict) else {}
-    normalized["capitals_by_tag"] = dict(capitals_by_tag) if isinstance(capitals_by_tag, dict) else {}
-    normalized["capital_city_hints"] = (
-        dict(capital_city_hints) if isinstance(capital_city_hints, dict) else {}
+def _load_city_assets_payload(context: dict[str, object]) -> dict[str, object]:
+    city_assets_partial_path = Path(context["cityAssetsPartialPath"])
+    payload = _read_json_or_none(city_assets_partial_path)
+    if payload is None:
+        raise DevServerError(
+            "missing_city_assets_partial",
+            f'City assets partial is required for scenario "{context["scenarioId"]}".',
+            status=500,
+            details={
+                "scenarioId": str(context["scenarioId"]),
+                "path": str(city_assets_partial_path),
+            },
+        )
+    return extract_city_assets_payload(payload, scenario_id=str(context["scenarioId"]))
+
+
+def _load_default_capital_overrides_payload(context: dict[str, object]) -> dict[str, object]:
+    capital_defaults_partial_path = Path(context["capitalDefaultsPartialPath"])
+    payload = _read_json_or_none(capital_defaults_partial_path)
+    if payload is None:
+        raise DevServerError(
+            "missing_capital_defaults_partial",
+            f'Capital defaults partial is required for scenario "{context["scenarioId"]}".',
+            status=500,
+            details={
+                "scenarioId": str(context["scenarioId"]),
+                "path": str(capital_defaults_partial_path),
+            },
+        )
+    return normalize_capital_overrides_payload(
+        payload,
+        scenario_id=str(context["scenarioId"]),
     )
-    return normalized
 
 
 def _load_releasable_catalog_for_edits(context: dict[str, object]) -> dict[str, object] | None:
@@ -923,6 +954,23 @@ def _load_releasable_catalog_for_edits(context: dict[str, object]) -> dict[str, 
     if source_catalog_path is not None and source_catalog_path.exists():
         return _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
     return None
+
+
+def _load_source_releasable_catalog_for_materialization(context: dict[str, object]) -> dict[str, object] | None:
+    source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
+    if source_catalog_path is None or not source_catalog_path.exists():
+        return None
+    local_catalog_path = Path(context["releasableCatalogLocalPath"]).resolve()
+    if source_catalog_path.resolve() == local_catalog_path:
+        return None
+    return _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
+
+
+def _load_local_releasable_catalog_for_materialization(context: dict[str, object]) -> dict[str, object] | None:
+    local_catalog_path = Path(context["releasableCatalogLocalPath"])
+    if not local_catalog_path.exists():
+        return None
+    return _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
 
 
 def _build_country_entry_from_mutation(
@@ -1000,10 +1048,24 @@ def _build_capital_city_override_entry(
     normalized_name_ascii = _normalize_text(capital_mutation.get("name_ascii")) or normalized_city_name
     normalized_capital_kind = _normalize_text(capital_mutation.get("capital_kind"))
     normalized_base_tier = _normalize_text(capital_mutation.get("base_tier")).lower()
-    normalized_lookup_iso2 = _normalize_code(capital_mutation.get("lookup_iso2") or country_entry.get("lookup_iso2"))
-    normalized_base_iso2 = _normalize_code(capital_mutation.get("base_iso2") or country_entry.get("base_iso2") or normalized_lookup_iso2)
-    normalized_country_code = _normalize_code(capital_mutation.get("country_code") or normalized_lookup_iso2 or normalized_base_iso2)
-    normalized_feature_id = _normalize_text(capital_mutation.get("feature_id"))
+    normalized_lookup_iso2 = _normalize_code(
+        capital_mutation.get("lookup_iso2")
+        or previous_hint.get("lookup_iso2")
+        or country_entry.get("lookup_iso2")
+    )
+    normalized_base_iso2 = _normalize_code(
+        capital_mutation.get("base_iso2")
+        or previous_hint.get("base_iso2")
+        or country_entry.get("base_iso2")
+        or normalized_lookup_iso2
+    )
+    normalized_country_code = _normalize_code(
+        capital_mutation.get("country_code")
+        or previous_hint.get("country_code")
+        or normalized_lookup_iso2
+        or normalized_base_iso2
+    )
+    normalized_feature_id = _normalize_text(capital_mutation.get("feature_id") or previous_hint.get("host_feature_id"))
     return {
         **previous_hint,
         "tag": tag,
@@ -1012,17 +1074,17 @@ def _build_capital_city_override_entry(
         "base_iso2": normalized_base_iso2,
         "capital_state_id": capital_mutation.get("capital_state_id"),
         "city_id": normalized_city_id,
-        "stable_key": _normalize_text(capital_mutation.get("stable_key")) or f"id::{normalized_city_id}",
+        "stable_key": _normalize_text(capital_mutation.get("stable_key") or previous_hint.get("stable_key")) or f"id::{normalized_city_id}",
         "city_name": normalized_city_name or _normalize_text(previous_hint.get("city_name")) or normalized_city_id,
         "name_ascii": normalized_name_ascii or _normalize_text(previous_hint.get("name_ascii")) or normalized_city_id,
         "capital_kind": normalized_capital_kind or _normalize_text(previous_hint.get("capital_kind")) or "manual_capital",
         "base_tier": normalized_base_tier or _normalize_text(previous_hint.get("base_tier")),
-        "population": capital_mutation.get("population"),
+        "population": capital_mutation.get("population") if capital_mutation.get("population") is not None else previous_hint.get("population"),
         "country_code": normalized_country_code,
         "host_feature_id": normalized_feature_id,
-        "urban_match_id": _normalize_text(capital_mutation.get("urban_match_id")),
-        "lon": capital_mutation.get("lon"),
-        "lat": capital_mutation.get("lat"),
+        "urban_match_id": _normalize_text(capital_mutation.get("urban_match_id") or previous_hint.get("urban_match_id")),
+        "lon": capital_mutation.get("lon") if capital_mutation.get("lon") is not None else previous_hint.get("lon"),
+        "lat": capital_mutation.get("lat") if capital_mutation.get("lat") is not None else previous_hint.get("lat"),
         "source": "manual_override",
         "resolution_method": "dev_workspace_manual",
         "confidence": "manual",
@@ -1033,14 +1095,16 @@ def _political_materializer_deps() -> PoliticalMaterializerDeps:
     return PoliticalMaterializerDeps(
         load_country_catalog=_load_country_catalog,
         load_political_payload_bundle=_load_political_payload_bundle,
-        load_city_overrides_payload=_load_city_overrides_payload,
-        load_scenario_manual_overrides_payload=_load_scenario_manual_overrides_payload,
-        load_releasable_catalog_for_edits=_load_releasable_catalog_for_edits,
+        load_city_assets_payload=_load_city_assets_payload,
+        load_default_capital_overrides_payload=_load_default_capital_overrides_payload,
+        load_source_releasable_catalog=_load_source_releasable_catalog_for_materialization,
+        load_local_releasable_catalog=_load_local_releasable_catalog_for_materialization,
         build_country_entry_from_mutation=_build_country_entry_from_mutation,
         build_capital_city_override_entry=_build_capital_city_override_entry,
         recompute_country_feature_counts=_recompute_country_feature_counts,
         build_manual_override_country_record=_build_manual_override_country_record,
         build_manual_assignment_record=_build_manual_assignment_record,
+        default_scenario_manual_overrides_payload=_default_scenario_manual_overrides_payload,
         default_releasable_catalog=_default_releasable_catalog,
         find_releasable_catalog_entry=_find_releasable_catalog_entry,
         scenario_manual_catalog_entry=_scenario_manual_catalog_entry,
@@ -1616,29 +1680,32 @@ def save_scenario_tag_create_payload(
             inspector_group_label=normalized_group_label,
             inspector_group_anchor_id=normalized_group_anchor_id,
         )
-        mutations_payload = _load_scenario_mutations_payload(context)
-        mutations_payload["tags"][normalized_tag] = {
+        tag_mutation = {
             "tag": normalized_tag,
             "parent_owner_tag": normalized_parent_owner_tag,
             "feature_ids": normalized_feature_ids,
         }
-        mutations_payload["countries"][normalized_tag] = _build_manual_override_country_record(country_entry, mode="create")
+        country_mutation = _build_manual_override_country_record(country_entry, mode="create")
+        assignment_patch: dict[str, dict[str, object]] = {}
         for feature_id in normalized_feature_ids:
             assignment_record: dict[str, object] = {"owner": normalized_tag}
             if political_bundle["hasControllers"]:
                 assignment_record["controller"] = normalized_tag
             if political_bundle["hasCores"]:
                 assignment_record["cores"] = [normalized_tag]
-            mutations_payload["assignments_by_feature_id"][feature_id] = assignment_record
-        mutations_payload["generated_at"] = _now_iso()
+            assignment_patch[feature_id] = assignment_record
 
-        transaction_payloads, materialized = _build_political_materialization_transaction(
+        service_result = apply_mutation_and_materialize_in_locked_context(
             context,
-            mutations_payload,
+            mutation_patch={
+                "tags": {normalized_tag: tag_mutation},
+                "countries": {normalized_tag: country_mutation},
+                "assignments_by_feature_id": assignment_patch,
+            },
+            target="political",
             root=root,
         )
-        _write_json_transaction(transaction_payloads)
-
+        materialized = service_result["political"]["materialized"]
         materialized_countries = materialized["countriesPayload"]["countries"]
         materialized_catalog = materialized.get("catalogPayload")
         catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(materialized_catalog, normalized_tag) if isinstance(materialized_catalog, dict) else (None, None)
@@ -1746,15 +1813,17 @@ def save_scenario_country_payload(
             manual_mode = "create"
         elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
             manual_mode = "create"
-        mutations_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
-        mutations_payload["generated_at"] = _now_iso()
-
-        transaction_payloads, materialized = _build_political_materialization_transaction(
+        service_result = apply_mutation_and_materialize_in_locked_context(
             context,
-            mutations_payload,
+            mutation_patch={
+                "countries": {
+                    normalized_tag: _build_manual_override_country_record(updated_entry, mode=manual_mode),
+                }
+            },
+            target="political",
             root=root,
         )
-        _write_json_transaction(transaction_payloads)
+        materialized = service_result["political"]["materialized"]
         materialized_countries = materialized["countriesPayload"]["countries"]
         materialized_catalog = materialized.get("catalogPayload")
         _catalog_entry_index, updated_catalog_entry = _find_releasable_catalog_entry(materialized_catalog, normalized_tag) if isinstance(materialized_catalog, dict) else (None, None)
@@ -1808,17 +1877,10 @@ def save_scenario_capital_payload(
         countries_payload = _load_country_catalog(context)
         countries = countries_payload["countries"]
         existing_entry = countries.get(normalized_tag) if isinstance(countries.get(normalized_tag), dict) else None
-        local_catalog_path = Path(context["releasableCatalogLocalPath"])
-        source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
-        catalog_payload: dict[str, object] | None = None
-        catalog_entry_index: int | None = None
+        catalog_payload = _load_releasable_catalog_for_edits(context)
         catalog_entry: dict[str, object] | None = None
-        if local_catalog_path.exists():
-            catalog_payload = _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
-        elif source_catalog_path is not None and source_catalog_path.exists():
-            catalog_payload = _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
         if catalog_payload is not None:
-            catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
+            _catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
         if existing_entry is None and catalog_entry is None:
             raise DevServerError(
                 "unknown_scenario_tag",
@@ -1865,117 +1927,88 @@ def save_scenario_capital_payload(
         normalized_urban_match_id = _normalize_text(urban_match_id)
         normalized_base_tier = _normalize_text(base_tier).lower()
 
-        updated_entry["capital_state_id"] = normalized_capital_state_id
-        if existing_entry is not None:
-            countries[normalized_tag] = updated_entry
-            countries_payload["generated_at"] = _now_iso()
-
-        manual_payload = _load_scenario_manual_overrides_payload(context)
         mutations_payload = _load_scenario_mutations_payload(context)
-        existing_manual_entry = manual_payload["countries"].get(normalized_tag)
-        manual_mode = "override"
-        if isinstance(existing_manual_entry, dict) and str(existing_manual_entry.get("mode") or "").strip().lower() == "create":
-            manual_mode = "create"
-        elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
-            manual_mode = "create"
-        manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
-        manual_payload["generated_at"] = _now_iso()
-        mutations_payload["countries"][normalized_tag] = _build_mutation_country_record(updated_entry, mode=manual_mode)
-
-        city_overrides_payload = _load_city_overrides_payload(context)
-        city_overrides_payload["generated_at"] = _now_iso()
-        city_overrides_payload["capitals_by_tag"][normalized_tag] = normalized_city_id
-        previous_hint = city_overrides_payload["capital_city_hints"].get(normalized_tag)
-        previous_hint = previous_hint if isinstance(previous_hint, dict) else {}
-        city_override_entry = {
-            **previous_hint,
-            "tag": normalized_tag,
-            "display_name": _normalize_text(
-                updated_entry.get("display_name")
-                or updated_entry.get("display_name_en")
-                or normalized_tag
-            ),
-            "lookup_iso2": normalized_lookup_iso2,
-            "base_iso2": normalized_base_iso2,
-            "capital_state_id": normalized_capital_state_id,
-            "city_id": normalized_city_id,
-            "stable_key": normalized_stable_key,
-            "city_name": normalized_city_name or _normalize_text(previous_hint.get("city_name")) or normalized_city_id,
-            "name_ascii": normalized_name_ascii or _normalize_text(previous_hint.get("name_ascii")) or normalized_city_id,
-            "capital_kind": normalized_capital_kind or _normalize_text(previous_hint.get("capital_kind")) or "manual_capital",
-            "base_tier": normalized_base_tier or _normalize_text(previous_hint.get("base_tier")),
-            "population": normalized_population,
-            "country_code": normalized_country_code,
-            "host_feature_id": normalized_feature_id,
-            "urban_match_id": normalized_urban_match_id,
-            "lon": normalized_lon,
-            "lat": normalized_lat,
-            "source": "manual_override",
-            "resolution_method": "dev_workspace_manual",
-            "confidence": "manual",
-        }
-        city_overrides_payload["capital_city_hints"][normalized_tag] = city_override_entry
-        mutations_payload["capitals"][normalized_tag] = _build_mutation_capital_record(
-            feature_id=normalized_feature_id,
-            city_id=normalized_city_id,
-            capital_state_id=normalized_capital_state_id,
-            city_override_entry=city_override_entry,
+        previous_capital_mutation = (
+            mutations_payload.get("capitals", {}).get(normalized_tag)
+            if isinstance(mutations_payload.get("capitals"), dict)
+            else None
         )
-        mutations_payload["generated_at"] = _now_iso()
-
-        transaction_payloads: list[tuple[Path, object]] = [
-            (Path(context["mutationsPath"]), mutations_payload),
-            (Path(context["manualOverridesPath"]), manual_payload),
-            (Path(context["cityOverridesPath"]), city_overrides_payload),
-        ]
-        if existing_entry is not None:
-            transaction_payloads.insert(0, (Path(context["countriesPath"]), countries_payload))
-
-        updated_catalog_entry = None
-        catalog_path_relative = ""
-        manifest_payload: dict[str, object] | None = None
-        if catalog_entry is not None:
-            if catalog_payload is None:
-                catalog_payload = _default_releasable_catalog(str(context["scenarioId"]))
-            entries = catalog_payload.get("entries", [])
-            if not isinstance(entries, list):
-                entries = []
-                catalog_payload["entries"] = entries
-            updated_catalog_entry = _sync_releasable_catalog_entry_from_country(catalog_entry, updated_entry)
-            if catalog_entry_index is None:
-                entries.append(updated_catalog_entry)
-            else:
-                entries[catalog_entry_index] = updated_catalog_entry
-            catalog_payload["generated_at"] = _now_iso()
-            catalog_payload["scenario_ids"] = [str(context["scenarioId"])]
-            transaction_payloads.append((local_catalog_path, catalog_payload))
-            catalog_path_relative = _repo_relative(local_catalog_path, root=root)
-            if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != catalog_path_relative:
-                manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-                manifest_payload["releasable_catalog_url"] = catalog_path_relative
-
+        default_capital_overrides_payload = _load_default_capital_overrides_payload(context)
+        previous_hint: dict[str, object] = {}
+        default_hint = (
+            default_capital_overrides_payload.get("capital_city_hints", {}).get(normalized_tag)
+            if isinstance(default_capital_overrides_payload.get("capital_city_hints"), dict)
+            else None
+        )
+        if isinstance(default_hint, dict):
+            previous_hint.update(copy.deepcopy(default_hint))
+        mutation_hint = (
+            previous_capital_mutation.get("city_override_entry")
+            if isinstance(previous_capital_mutation, dict)
+            else None
+        )
+        if isinstance(mutation_hint, dict):
+            previous_hint.update(copy.deepcopy(mutation_hint))
+        service_result = apply_mutation_and_materialize_in_locked_context(
+            context,
+            mutation_patch={
+                "capitals": {
+                    normalized_tag: _build_mutation_capital_record(
+                        feature_id=normalized_feature_id,
+                        city_id=normalized_city_id,
+                        capital_state_id=normalized_capital_state_id,
+                        city_override_entry=build_capital_city_override_entry_payload(
+                            tag=normalized_tag,
+                            country_entry=updated_entry,
+                            capital_state_id=normalized_capital_state_id,
+                            city_id=normalized_city_id,
+                            city_name=normalized_city_name,
+                            stable_key=normalized_stable_key,
+                            country_code=normalized_country_code,
+                            lookup_iso2=normalized_lookup_iso2,
+                            base_iso2=normalized_base_iso2,
+                            capital_kind=normalized_capital_kind,
+                            population=normalized_population,
+                            lon=normalized_lon,
+                            lat=normalized_lat,
+                            urban_match_id=normalized_urban_match_id,
+                            base_tier=normalized_base_tier,
+                            name_ascii=normalized_name_ascii,
+                            host_feature_id=normalized_feature_id,
+                            previous_hint=previous_hint,
+                        ),
+                    )
+                }
+            },
+            target="political",
+            root=root,
+        )
+        materialized = service_result["political"]["materialized"]
+        materialized_countries = materialized["countriesPayload"]["countries"]
+        materialized_catalog = materialized.get("catalogPayload")
+        _catalog_entry_index, updated_catalog_entry = _find_releasable_catalog_entry(
+            materialized_catalog,
+            normalized_tag,
+        ) if isinstance(materialized_catalog, dict) else (None, None)
+        city_overrides_payload = materialized["cityOverridesPayload"]
+        city_override_entry = (
+            city_overrides_payload.get("capital_city_hints", {}).get(normalized_tag)
+            if isinstance(city_overrides_payload, dict)
+            else None
+        )
         city_overrides_relative = _repo_relative(Path(context["cityOverridesPath"]), root=root)
-        if str(context.get("manifest", {}).get("city_overrides_url") or "").strip() != city_overrides_relative:
-            if manifest_payload is None:
-                manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-            manifest_payload["city_overrides_url"] = city_overrides_relative
-
-        manifest_path_relative = ""
-        if manifest_payload is not None:
-            transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
-            manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root)
-
-        _write_json_transaction(transaction_payloads)
+        catalog_path_relative = _repo_relative(Path(context["releasableCatalogLocalPath"]), root=root) if updated_catalog_entry is not None else ""
+        manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root) if materialized.get("manifestPayload") is not None else ""
         return {
             "ok": True,
             "scenarioId": context["scenarioId"],
             "tag": normalized_tag,
             "featureId": normalized_feature_id,
             "cityId": normalized_city_id,
-            "countryEntry": updated_entry,
+            "countryEntry": materialized_countries.get(normalized_tag),
             "catalogEntry": updated_catalog_entry,
             "cityOverrideEntry": city_override_entry,
-            "filePath": _repo_relative(Path(context["countriesPath"]), root=root) if existing_entry is not None else "",
+            "filePath": _repo_relative(Path(context["countriesPath"]), root=root),
             "catalogPath": catalog_path_relative,
             "cityOverridesPath": city_overrides_relative,
             "mutationsPath": _repo_relative(Path(context["mutationsPath"]), root=root),
@@ -2286,49 +2319,6 @@ def apply_shared_district_template_payload(
         return save_result
 
 
-def _default_manual_geo_payload(scenario_id: str) -> dict[str, object]:
-    return {
-        "version": 1,
-        "scenario_id": scenario_id,
-        "generated_at": "",
-        "geo": {},
-    }
-
-
-def _normalize_locale_entry(en: object, zh: object) -> dict[str, str]:
-    entry = {}
-    en_text = str(en or "").strip()
-    zh_text = str(zh or "").strip()
-    if en_text:
-        entry["en"] = en_text
-    if zh_text:
-        entry["zh"] = zh_text
-    return entry
-
-
-def _build_geo_locale_command(context: dict[str, object], *, root: Path = ROOT) -> list[str]:
-    scenario_id = str(context["scenarioId"])
-    builder_path = context.get("geoLocaleBuilderPath") or GEO_LOCALE_BUILDER_BY_SCENARIO.get(scenario_id)
-    if not builder_path:
-        raise DevServerError(
-            "geo_locale_not_supported",
-            f"Scenario \"{scenario_id}\" does not have a registered geo locale patch builder yet.",
-            status=501,
-        )
-    return [
-        sys.executable,
-        str(builder_path),
-        "--scenario-id",
-        scenario_id,
-        "--scenario-dir",
-        str(context["scenarioDir"]),
-        "--manual-overrides",
-        str(context["manualGeoOverridesPath"]),
-        "--output",
-        str(context["geoLocalePatchPath"]),
-    ]
-
-
 def save_scenario_geo_locale_entry(
     scenario_id: object,
     *,
@@ -2356,100 +2346,28 @@ def save_scenario_geo_locale_entry(
         normalized_feature_id = str(feature_id or "").strip()
         if not normalized_feature_id:
             raise DevServerError("missing_feature_id", "Feature id is required for geo locale saves.", status=400)
-
-        manual_path = Path(context["manualGeoOverridesPath"])
-        manual_snapshot = _capture_text_snapshot(manual_path)
-        mutations_path = Path(context["mutationsPath"])
-        mutations_snapshot = _capture_text_snapshot(mutations_path)
-        if manual_path.exists():
-            manual_payload = _read_json(manual_path)
-            if not isinstance(manual_payload, dict):
-                manual_payload = _default_manual_geo_payload(str(context["scenarioId"]))
-        else:
-            manual_payload = _default_manual_geo_payload(str(context["scenarioId"]))
-        mutations_payload = _load_scenario_mutations_payload(context)
-
-        manual_payload["version"] = int(manual_payload.get("version") or 1)
-        manual_payload["scenario_id"] = str(context["scenarioId"])
-        manual_payload["generated_at"] = _now_iso()
-        manual_payload["geo"] = manual_payload.get("geo", {}) if isinstance(manual_payload.get("geo"), dict) else {}
-
         locale_entry = _normalize_locale_entry(en, zh)
-        if locale_entry:
-            manual_payload["geo"][normalized_feature_id] = locale_entry
-            mutations_payload["geo_locale"][normalized_feature_id] = locale_entry
-        else:
-            manual_payload["geo"].pop(normalized_feature_id, None)
-            mutations_payload["geo_locale"].pop(normalized_feature_id, None)
-        mutations_payload["generated_at"] = _now_iso()
-
-        write_json_atomic(manual_path, manual_payload, ensure_ascii=False, indent=2, trailing_newline=True)
-        write_json_atomic(mutations_path, mutations_payload, ensure_ascii=False, indent=2, trailing_newline=True)
-
-        command = _build_geo_locale_command(context, root=root)
-        build_error_details: dict[str, object] = {
-            "command": command,
-        }
-        try:
-            result = subprocess.run(
-                command,
-                cwd=root,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        except Exception as exc:
-            try:
-                _restore_text_snapshot(
-                    manual_snapshot[0],
-                    existed=manual_snapshot[1],
-                    original_text=manual_snapshot[2],
-                )
-            except Exception as rollback_exc:
-                build_error_details["rollbackError"] = str(rollback_exc)
-            try:
-                _restore_text_snapshot(
-                    mutations_snapshot[0],
-                    existed=mutations_snapshot[1],
-                    original_text=mutations_snapshot[2],
-                )
-            except Exception as rollback_exc:
-                build_error_details["mutationsRollbackError"] = str(rollback_exc)
-            build_error_details["error"] = repr(exc)
-            raise DevServerError(
-                "geo_locale_build_failed",
-                "The geo locale patch builder failed after updating manual overrides.",
-                status=500,
-                details=build_error_details,
-            ) from exc
-        if result.returncode != 0:
-            try:
-                _restore_text_snapshot(
-                    manual_snapshot[0],
-                    existed=manual_snapshot[1],
-                    original_text=manual_snapshot[2],
-                )
-            except Exception as rollback_exc:
-                build_error_details["rollbackError"] = str(rollback_exc)
-            try:
-                _restore_text_snapshot(
-                    mutations_snapshot[0],
-                    existed=mutations_snapshot[1],
-                    original_text=mutations_snapshot[2],
-                )
-            except Exception as rollback_exc:
-                build_error_details["mutationsRollbackError"] = str(rollback_exc)
-            build_error_details.update(
-                {
-                    "stdout": result.stdout[-2000:],
-                    "stderr": result.stderr[-2000:],
+        mutation_entry: dict[str, object] | None = locale_entry or None
+        service_result = apply_mutation_and_materialize_in_locked_context(
+            context,
+            mutation_patch={
+                "geo_locale": {
+                    normalized_feature_id: mutation_entry,
                 }
+            },
+            target="geo-locale",
+            root=root,
+        )
+        if str(context["scenarioId"]) == "tno_1962":
+            publish_scenario_outputs_in_locked_context(
+                context,
+                target="geo-locale",
+                root=root,
             )
-            raise DevServerError(
-                "geo_locale_build_failed",
-                "The geo locale patch builder failed after updating manual overrides.",
-                status=500,
-                details=build_error_details,
+            publish_scenario_outputs_in_locked_context(
+                context,
+                target="startup-assets",
+                root=root,
             )
 
         geo_locale_patch_payload = _read_json(Path(context["geoLocalePatchPath"]))
