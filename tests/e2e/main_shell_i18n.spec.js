@@ -3,6 +3,31 @@ const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
+async function openColorOnlySection(page) {
+  await page.waitForFunction(() => {
+    const status = document.querySelector("#scenarioStatus");
+    return !!status && String(status.textContent || "").trim().length > 0;
+  });
+  await page.evaluate(() => {
+    const details = document.querySelector("details[aria-labelledby='lblScenario']");
+    if (details && !details.open) {
+      details.open = true;
+    }
+  });
+  const colorOnlySection = page.locator(".scenario-visual-adjustments").first();
+  await expect(colorOnlySection).toBeVisible({ timeout: 15000 });
+  await page.evaluate(() => {
+    const details = document.querySelector(".scenario-visual-adjustments");
+    if (details && !details.open) {
+      details.open = true;
+    }
+  });
+  return {
+    summary: colorOnlySection.locator("summary").first(),
+    note: colorOnlySection.locator(".scenario-action-hint").first(),
+  };
+}
+
 test("main shell static i18n updates visible labels and aria text", async ({ page }) => {
   test.setTimeout(90_000);
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
@@ -20,6 +45,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   const developerModeBtn = page.locator("#developerModeBtn");
   const recentColors = page.locator("#recentColors");
   const frontlineIntro = page.locator(".inspector-frontline-intro");
+  const colorOnlySection = await openColorOnlySection(page);
 
   await expect(currentTool).toHaveText("Tools");
   await expect(leftPanelToggle).toHaveText("Panels");
@@ -37,6 +63,10 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(recentColors).toHaveAttribute("aria-label", "Recent colors");
   await expect(frontlineIntro).toHaveText(
     "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+  );
+  await expect(colorOnlySection.summary).toHaveText("Color Only");
+  await expect(colorOnlySection.note).toHaveText(
+    "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged."
   );
 
   await page.locator("#btnToggleLang").click();
@@ -56,5 +86,9 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(recentColors).not.toHaveAttribute("aria-label", "Recent colors");
   await expect(frontlineIntro).not.toHaveText(
     "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+  );
+  await expect(colorOnlySection.summary).toHaveText("仅颜色");
+  await expect(colorOnlySection.note).toHaveText(
+    "这些操作只会改变视觉颜色。归属、控制方和动态边界保持不变。"
   );
 });

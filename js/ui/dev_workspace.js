@@ -2306,13 +2306,7 @@ function createDevWorkspacePanel(bottomDock) {
   section.id = "devWorkspacePanel";
   section.className = "dev-workspace-dock is-hidden";
   section.innerHTML = `
-    <div class="dev-workspace-header">
-      <div class="dev-workspace-title-row">
-        <div>
-          <div class="section-header sidebar-tool-title" data-i18n="Dev Workspace"></div>
-          <p id="devWorkspaceIntro" class="dev-workspace-note" data-i18n="Development tools take over the center dock while enabled."></p>
-        </div>
-      </div>
+    <div class="dev-workspace-category-strip">
       <div class="dev-workspace-category-tabs" role="tablist" aria-label="Development workspace sections" data-i18n-aria-label="Development workspace sections">
         <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true" data-i18n="Selection & Ownership">
           Selection &amp; Ownership

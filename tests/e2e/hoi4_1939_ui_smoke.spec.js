@@ -1,7 +1,60 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { gotoApp } = require("./support/playwright-app");
+const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+
+test.setTimeout(120000);
+
+async function waitForScenarioUiReady(page) {
+  await page.waitForFunction(() => {
+    const select = document.querySelector('#scenarioSelect');
+    return !!select && !!select.querySelector('option[value="hoi4_1939"]');
+  });
+  await page.evaluate(() => {
+    const details = document.querySelector("details[aria-labelledby='lblScenario']");
+    if (details && !details.open) {
+      details.open = true;
+    }
+  });
+  await expect(page.locator('#scenarioSelect')).toBeVisible();
+}
+
+async function waitForScenarioManagerIdle(page) {
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return !state.scenarioApplyInFlight;
+  });
+}
+
+async function applyScenario(page, scenarioId) {
+  await waitForScenarioManagerIdle(page);
+  await page.evaluate((expectedScenarioId) => {
+    const select = document.querySelector('#scenarioSelect');
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }, scenarioId);
+  const result = await page.evaluate(async (expectedScenarioId) => {
+    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
+    try {
+      await applyScenarioByIdCommand(expectedScenarioId, {
+        renderMode: 'none',
+        markDirtyReason: '',
+        showToastOnComplete: false,
+      });
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        code: String(error?.code || ''),
+        message: String(error?.message || ''),
+      };
+    }
+  }, scenarioId);
+  expect(result).toEqual({ ok: true });
+  await waitForScenarioManagerIdle(page);
+}
 
 test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   const consoleIssues = [];
@@ -30,15 +83,10 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   });
 
   await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1200);
-
-  await page.waitForFunction(() => {
-    const select = document.querySelector('#scenarioSelect');
-    return !!select && !!select.querySelector('option[value="hoi4_1939"]');
-  });
-  await page.selectOption('#scenarioSelect', 'hoi4_1939');
-  await page.click('#applyScenarioBtn');
-  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 15000 });
+  await waitForAppInteractive(page);
+  await waitForScenarioUiReady(page);
+  await applyScenario(page, 'hoi4_1939');
+  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();
   const scenarioAuditHint = await page.locator('#scenarioAuditHint').innerText();

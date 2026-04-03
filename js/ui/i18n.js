@@ -657,13 +657,23 @@ function updateUIText() {
   }
 }
 
-function toggleLanguage() {
+async function toggleLanguage() {
   const nextLang = state.currentLanguage === "zh" ? "en" : "zh";
   state.currentLanguage = nextLang;
   try {
     localStorage.setItem("map_lang", nextLang);
   } catch (error) {
     console.warn("Unable to persist language preference:", error);
+  }
+  if (typeof state.ensureFullLocalizationDataReadyFn === "function") {
+    try {
+      await state.ensureFullLocalizationDataReadyFn({
+        reason: "language-toggle",
+        renderNow: false,
+      });
+    } catch (error) {
+      console.warn("Unable to hydrate full localization data before language toggle:", error);
+    }
   }
   updateUIText();
   if (typeof state.renderCountryListFn === "function") {

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from contextlib import contextmanager
 import gzip
 import http.server
 import json
@@ -12,6 +13,7 @@ from pathlib import Path
 import socketserver
 import subprocess
 import sys
+import threading
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 import webbrowser
@@ -43,6 +45,8 @@ DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
 GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
+_REPO_PATH_LOCKS_GUARD = threading.Lock()
+_REPO_PATH_LOCKS: dict[str, threading.RLock] = {}
 
 
 class DevServerError(Exception):
@@ -54,8 +58,9 @@ class DevServerError(Exception):
         self.details = details
 
 
-class DevServerTCPServer(socketserver.TCPServer):
+class DevServerTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = False
+    daemon_threads = True
 
     def handle_error(self, request, client_address):
         _, error, _ = sys.exc_info()
@@ -66,6 +71,45 @@ class DevServerTCPServer(socketserver.TCPServer):
 
 def _read_json(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def _get_repo_path_lock(path: Path) -> threading.RLock:
+    lock_key = str(Path(path).resolve()).casefold()
+    with _REPO_PATH_LOCKS_GUARD:
+        lock = _REPO_PATH_LOCKS.get(lock_key)
+        if lock is None:
+            lock = threading.RLock()
+            _REPO_PATH_LOCKS[lock_key] = lock
+        return lock
+
+
+def _normalize_locked_paths(paths: list[Path | None]) -> list[Path]:
+    normalized: list[Path] = []
+    seen: set[str] = set()
+    for raw_path in paths:
+        if raw_path is None:
+            continue
+        resolved = Path(raw_path).resolve()
+        key = str(resolved).casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized.append(resolved)
+    normalized.sort(key=lambda value: str(value).casefold())
+    return normalized
+
+
+@contextmanager
+def _locked_repo_paths(paths: list[Path | None]):
+    normalized_paths = _normalize_locked_paths(paths)
+    locks = [_get_repo_path_lock(path) for path in normalized_paths]
+    for lock in locks:
+        lock.acquire()
+    try:
+        yield
+    finally:
+        for lock in reversed(locks):
+            lock.release()
 
 
 def _now_iso() -> str:
@@ -272,13 +316,14 @@ def _manifest_relative_path(path: Path, *, root: Path = ROOT) -> str:
 
 def _write_manifest(context: dict[str, object], *, updates: dict[str, object], root: Path = ROOT) -> dict[str, object]:
     manifest_path = Path(context["manifestPath"])
-    manifest = _read_json(manifest_path)
-    if not isinstance(manifest, dict):
-        raise DevServerError("invalid_manifest", "Scenario manifest must be a JSON object.", status=500)
-    manifest.update(updates)
-    write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2, trailing_newline=True)
-    context["manifest"] = manifest
-    return manifest
+    with _locked_repo_paths([manifest_path]):
+        manifest = _read_json(manifest_path)
+        if not isinstance(manifest, dict):
+            raise DevServerError("invalid_manifest", "Scenario manifest must be a JSON object.", status=500)
+        manifest.update(updates)
+        write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2, trailing_newline=True)
+        context["manifest"] = manifest
+        return manifest
 
 
 def _load_scenario_index(*, root: Path = ROOT) -> dict[str, object]:
@@ -410,6 +455,33 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     return context
 
 
+def _scenario_transaction_paths(context: dict[str, object]) -> list[Path]:
+    paths: list[Path | None] = [
+        Path(context["manifestPath"]),
+        Path(context["countriesPath"]),
+        Path(context["ownersPath"]),
+        context.get("controllersPath"),
+        context.get("coresPath"),
+        Path(context["releasableCatalogLocalPath"]),
+        Path(context["districtGroupsPath"]),
+        Path(context["cityOverridesPath"]),
+        Path(context["manualOverridesPath"]),
+        context.get("geoLocalePatchPath"),
+        Path(context["manualGeoOverridesPath"]),
+    ]
+    return [Path(path) for path in _normalize_locked_paths(paths)]
+
+
+@contextmanager
+def _locked_scenario_context(scenario_id: object, *, root: Path = ROOT, extra_paths: list[Path | None] | None = None):
+    initial_context = load_scenario_context(scenario_id, root=root)
+    lock_paths: list[Path | None] = _scenario_transaction_paths(initial_context)
+    if extra_paths:
+        lock_paths.extend(extra_paths)
+    with _locked_repo_paths(lock_paths):
+        yield load_scenario_context(scenario_id, root=root)
+
+
 def _extract_allowed_country_tags(payload: object) -> set[str]:
     countries = payload.get("countries", {}) if isinstance(payload, dict) else {}
     allowed_tags = {
@@ -499,182 +571,182 @@ def save_scenario_ownership_payload(
     baseline_hash: object = "",
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    countries_payload = _load_country_catalog(context)
-    countries = countries_payload["countries"]
-    expected_baseline_hash = str(context["manifest"].get("baseline_hash") or "").strip()
-    normalized_baseline_hash = str(baseline_hash or "").strip()
-    if normalized_baseline_hash and expected_baseline_hash and normalized_baseline_hash != expected_baseline_hash:
-        raise DevServerError(
-            "baseline_hash_mismatch",
-            "The provided baseline hash does not match the current scenario manifest.",
-            status=409,
-            details={
-                "expected": expected_baseline_hash,
-                "received": normalized_baseline_hash,
-            },
-        )
-    political_bundle = _load_political_payload_bundle(context)
-    owners_payload = political_bundle["ownersPayload"]
-    owners_map = political_bundle["owners"]
-    controllers_payload = political_bundle["controllersPayload"]
-    controllers_map = political_bundle["controllers"]
-    has_controllers = bool(political_bundle["hasControllers"])
-    cores_payload = political_bundle["coresPayload"]
-    cores_map = political_bundle["cores"]
-    has_cores = bool(political_bundle["hasCores"])
-    allowed_tags = {
-        str(tag or "").strip().upper()
-        for tag in countries.keys()
-        if str(tag or "").strip()
-    }
-    known_feature_ids = set(owners_map.keys())
-    manual_payload = _load_scenario_manual_overrides_payload(context)
-    manual_assignments = manual_payload["assignments"]
-    touched_feature_ids: list[str] = []
-
-    if owners is not None:
-        if not isinstance(owners, dict):
-            raise DevServerError("invalid_owners", "Owners payload must be an object.", status=400)
-        if not owners and assignments_by_feature_id is None:
-            raise DevServerError("empty_owners", "No ownership entries were provided.", status=400)
-        for raw_feature_id, raw_owner_code in owners.items():
-            feature_id = str(raw_feature_id or "").strip()
-            owner_code = _normalize_code(raw_owner_code)
-            if not feature_id:
-                raise DevServerError("invalid_feature_ids", "Feature ids cannot be empty.", status=400)
-            if feature_id not in known_feature_ids:
-                raise DevServerError(
-                    "unknown_feature_ids",
-                    "One or more ownership entries referenced a feature outside the active scenario.",
-                    status=400,
-                    details={"missingFeatureIds": [feature_id]},
-                )
-            if owner_code not in allowed_tags:
-                raise DevServerError(
-                    "invalid_owner_codes",
-                    "One or more ownership entries used a tag not declared by the scenario.",
-                    status=400,
-                    details={"invalidOwnerCodes": [f"{feature_id}:{owner_code}"]},
-                )
-            owners_map[feature_id] = owner_code
-            touched_feature_ids.append(feature_id)
-
-    if assignments_by_feature_id is not None:
-        if not isinstance(assignments_by_feature_id, dict):
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        countries_payload = _load_country_catalog(context)
+        countries = countries_payload["countries"]
+        expected_baseline_hash = str(context["manifest"].get("baseline_hash") or "").strip()
+        normalized_baseline_hash = str(baseline_hash or "").strip()
+        if normalized_baseline_hash and expected_baseline_hash and normalized_baseline_hash != expected_baseline_hash:
             raise DevServerError(
-                "invalid_assignments_by_feature_id",
-                "assignmentsByFeatureId must be an object keyed by feature id.",
-                status=400,
+                "baseline_hash_mismatch",
+                "The provided baseline hash does not match the current scenario manifest.",
+                status=409,
+                details={
+                    "expected": expected_baseline_hash,
+                    "received": normalized_baseline_hash,
+                },
             )
-        for raw_feature_id, raw_assignment in assignments_by_feature_id.items():
-            feature_id = str(raw_feature_id or "").strip()
-            if not feature_id:
-                raise DevServerError("invalid_feature_ids", "Feature ids cannot be empty.", status=400)
-            if feature_id not in known_feature_ids:
-                raise DevServerError(
-                    "unknown_feature_ids",
-                    "One or more feature assignments referenced a feature outside the active scenario.",
-                    status=400,
-                    details={"missingFeatureIds": [feature_id]},
-                )
-            if not isinstance(raw_assignment, dict):
-                raise DevServerError(
-                    "invalid_assignment_payload",
-                    f'Feature "{feature_id}" must map to an object with owner/controller/cores fields.',
-                    status=400,
-                )
-            if "owner" in raw_assignment:
-                owner_tag = _normalize_code(raw_assignment.get("owner"))
-                if owner_tag not in allowed_tags:
+        political_bundle = _load_political_payload_bundle(context)
+        owners_payload = political_bundle["ownersPayload"]
+        owners_map = political_bundle["owners"]
+        controllers_payload = political_bundle["controllersPayload"]
+        controllers_map = political_bundle["controllers"]
+        has_controllers = bool(political_bundle["hasControllers"])
+        cores_payload = political_bundle["coresPayload"]
+        cores_map = political_bundle["cores"]
+        has_cores = bool(political_bundle["hasCores"])
+        allowed_tags = {
+            str(tag or "").strip().upper()
+            for tag in countries.keys()
+            if str(tag or "").strip()
+        }
+        known_feature_ids = set(owners_map.keys())
+        manual_payload = _load_scenario_manual_overrides_payload(context)
+        manual_assignments = manual_payload["assignments"]
+        touched_feature_ids: list[str] = []
+
+        if owners is not None:
+            if not isinstance(owners, dict):
+                raise DevServerError("invalid_owners", "Owners payload must be an object.", status=400)
+            if not owners and assignments_by_feature_id is None:
+                raise DevServerError("empty_owners", "No ownership entries were provided.", status=400)
+            for raw_feature_id, raw_owner_code in owners.items():
+                feature_id = str(raw_feature_id or "").strip()
+                owner_code = _normalize_code(raw_owner_code)
+                if not feature_id:
+                    raise DevServerError("invalid_feature_ids", "Feature ids cannot be empty.", status=400)
+                if feature_id not in known_feature_ids:
+                    raise DevServerError(
+                        "unknown_feature_ids",
+                        "One or more ownership entries referenced a feature outside the active scenario.",
+                        status=400,
+                        details={"missingFeatureIds": [feature_id]},
+                    )
+                if owner_code not in allowed_tags:
                     raise DevServerError(
                         "invalid_owner_codes",
-                        f'Feature "{feature_id}" used an owner tag not declared by the scenario.',
+                        "One or more ownership entries used a tag not declared by the scenario.",
                         status=400,
-                        details={"featureId": feature_id, "invalidOwnerTag": owner_tag},
+                        details={"invalidOwnerCodes": [f"{feature_id}:{owner_code}"]},
+                    )
+                owners_map[feature_id] = owner_code
+                touched_feature_ids.append(feature_id)
+
+        if assignments_by_feature_id is not None:
+            if not isinstance(assignments_by_feature_id, dict):
+                raise DevServerError(
+                    "invalid_assignments_by_feature_id",
+                    "assignmentsByFeatureId must be an object keyed by feature id.",
+                    status=400,
                 )
-                owners_map[feature_id] = owner_tag
-            if "controller" in raw_assignment:
-                if not has_controllers:
+            for raw_feature_id, raw_assignment in assignments_by_feature_id.items():
+                feature_id = str(raw_feature_id or "").strip()
+                if not feature_id:
+                    raise DevServerError("invalid_feature_ids", "Feature ids cannot be empty.", status=400)
+                if feature_id not in known_feature_ids:
                     raise DevServerError(
-                        "missing_controllers_file",
-                        "Scenario controllers file is required when saving controller assignments.",
+                        "unknown_feature_ids",
+                        "One or more feature assignments referenced a feature outside the active scenario.",
+                        status=400,
+                        details={"missingFeatureIds": [feature_id]},
+                    )
+                if not isinstance(raw_assignment, dict):
+                    raise DevServerError(
+                        "invalid_assignment_payload",
+                        f'Feature "{feature_id}" must map to an object with owner/controller/cores fields.',
                         status=400,
                     )
-                controller_tag = _normalize_code(raw_assignment.get("controller"))
-                if controller_tag not in allowed_tags:
-                    raise DevServerError(
-                        "invalid_controller_codes",
-                        f'Feature "{feature_id}" used a controller tag not declared by the scenario.',
-                        status=400,
-                        details={"featureId": feature_id, "invalidControllerTag": controller_tag},
+                if "owner" in raw_assignment:
+                    owner_tag = _normalize_code(raw_assignment.get("owner"))
+                    if owner_tag not in allowed_tags:
+                        raise DevServerError(
+                            "invalid_owner_codes",
+                            f'Feature "{feature_id}" used an owner tag not declared by the scenario.',
+                            status=400,
+                            details={"featureId": feature_id, "invalidOwnerTag": owner_tag},
+                        )
+                    owners_map[feature_id] = owner_tag
+                if "controller" in raw_assignment:
+                    if not has_controllers:
+                        raise DevServerError(
+                            "missing_controllers_file",
+                            "Scenario controllers file is required when saving controller assignments.",
+                            status=400,
+                        )
+                    controller_tag = _normalize_code(raw_assignment.get("controller"))
+                    if controller_tag not in allowed_tags:
+                        raise DevServerError(
+                            "invalid_controller_codes",
+                            f'Feature "{feature_id}" used a controller tag not declared by the scenario.',
+                            status=400,
+                            details={"featureId": feature_id, "invalidControllerTag": controller_tag},
+                        )
+                    controllers_map[feature_id] = controller_tag
+                if "cores" in raw_assignment:
+                    if not has_cores:
+                        raise DevServerError(
+                            "missing_cores_file",
+                            "Scenario cores file is required when saving core assignments.",
+                            status=400,
+                        )
+                    cores_map[feature_id] = _validate_core_tags(
+                        raw_assignment.get("cores"),
+                        feature_id=feature_id,
+                        allowed_tags=allowed_tags,
                     )
-                controllers_map[feature_id] = controller_tag
-            if "cores" in raw_assignment:
-                if not has_cores:
-                    raise DevServerError(
-                        "missing_cores_file",
-                        "Scenario cores file is required when saving core assignments.",
-                        status=400,
-                    )
-                cores_map[feature_id] = _validate_core_tags(
-                    raw_assignment.get("cores"),
-                    feature_id=feature_id,
-                    allowed_tags=allowed_tags,
-                )
-            touched_feature_ids.append(feature_id)
+                touched_feature_ids.append(feature_id)
 
-    touched_feature_ids = list(dict.fromkeys(touched_feature_ids))
-    if not touched_feature_ids:
-        raise DevServerError(
-            "empty_assignments",
-            "No scenario ownership or assignment changes were provided.",
-            status=400,
-        )
+        touched_feature_ids = list(dict.fromkeys(touched_feature_ids))
+        if not touched_feature_ids:
+            raise DevServerError(
+                "empty_assignments",
+                "No scenario ownership or assignment changes were provided.",
+                status=400,
+            )
 
-    _recompute_country_feature_counts(countries, owners_map, controllers_map)
-    countries_payload["generated_at"] = _now_iso()
-    owners_payload["owners"] = owners_map
-    owners_payload["baseline_hash"] = expected_baseline_hash or normalized_baseline_hash
-    if has_controllers and controllers_payload is not None:
-        controllers_payload["controllers"] = controllers_map
-    if has_cores and cores_payload is not None:
-        cores_payload["cores"] = cores_map
-    for feature_id in touched_feature_ids:
-        manual_assignments[feature_id] = _build_manual_assignment_record(
-            feature_id,
-            owners_map,
-            controllers_map,
-            cores_map,
-            has_controllers=has_controllers,
-            has_cores=has_cores,
-        )
-    manual_payload["generated_at"] = _now_iso()
+        _recompute_country_feature_counts(countries, owners_map, controllers_map)
+        countries_payload["generated_at"] = _now_iso()
+        owners_payload["owners"] = owners_map
+        owners_payload["baseline_hash"] = expected_baseline_hash or normalized_baseline_hash
+        if has_controllers and controllers_payload is not None:
+            controllers_payload["controllers"] = controllers_map
+        if has_cores and cores_payload is not None:
+            cores_payload["cores"] = cores_map
+        for feature_id in touched_feature_ids:
+            manual_assignments[feature_id] = _build_manual_assignment_record(
+                feature_id,
+                owners_map,
+                controllers_map,
+                cores_map,
+                has_controllers=has_controllers,
+                has_cores=has_cores,
+            )
+        manual_payload["generated_at"] = _now_iso()
 
-    transaction_payloads: list[tuple[Path, object]] = [
-        (Path(context["countriesPath"]), countries_payload),
-        (Path(context["ownersPath"]), owners_payload),
-        (Path(context["manualOverridesPath"]), manual_payload),
-    ]
-    if has_controllers and political_bundle["controllersPath"] is not None and controllers_payload is not None:
-        transaction_payloads.append((political_bundle["controllersPath"], controllers_payload))
-    if has_cores and political_bundle["coresPath"] is not None and cores_payload is not None:
-        transaction_payloads.append((political_bundle["coresPath"], cores_payload))
-    _write_json_transaction(transaction_payloads)
-    owner_codes = sorted(set(owners_map.values()))
-    return {
-        "ok": True,
-        "scenarioId": context["scenarioId"],
-        "filePath": _repo_relative(Path(context["ownersPath"]), root=root),
-        "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
-        "savedAt": _now_iso(),
-        "stats": {
-            "featureCount": len(owners_map),
-            "ownerCount": len(owner_codes),
-            "ownerCodesSample": owner_codes[:12],
-            "touchedFeatureCount": len(touched_feature_ids),
-        },
-    }
+        transaction_payloads: list[tuple[Path, object]] = [
+            (Path(context["countriesPath"]), countries_payload),
+            (Path(context["ownersPath"]), owners_payload),
+            (Path(context["manualOverridesPath"]), manual_payload),
+        ]
+        if has_controllers and political_bundle["controllersPath"] is not None and controllers_payload is not None:
+            transaction_payloads.append((political_bundle["controllersPath"], controllers_payload))
+        if has_cores and political_bundle["coresPath"] is not None and cores_payload is not None:
+            transaction_payloads.append((political_bundle["coresPath"], cores_payload))
+        _write_json_transaction(transaction_payloads)
+        owner_codes = sorted(set(owners_map.values()))
+        return {
+            "ok": True,
+            "scenarioId": context["scenarioId"],
+            "filePath": _repo_relative(Path(context["ownersPath"]), root=root),
+            "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
+            "savedAt": _now_iso(),
+            "stats": {
+                "featureCount": len(owners_map),
+                "ownerCount": len(owner_codes),
+                "ownerCodesSample": owner_codes[:12],
+                "touchedFeatureCount": len(touched_feature_ids),
+            },
+        }
 
 
 def _load_country_catalog(context: dict[str, object]) -> dict[str, object]:
@@ -723,23 +795,24 @@ def _load_scenario_manual_overrides_payload(context: dict[str, object]) -> dict[
 
 
 def _write_json_transaction(file_payloads: list[tuple[Path, object]]) -> None:
-    snapshots: list[tuple[Path, bool, str]] = []
-    for path, _payload in file_payloads:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        snapshots.append(_capture_text_snapshot(path))
-    try:
-        for path, payload in file_payloads:
-            write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
-    except Exception as exc:
-        rollback_errors: list[str] = []
-        for path, existed, original_text in reversed(snapshots):
-            try:
-                _restore_text_snapshot(path, existed=existed, original_text=original_text)
-            except Exception as rollback_exc:
-                rollback_errors.append(f"{path}: {rollback_exc}")
-        for error in rollback_errors:
-            exc.add_note(f"Rollback failed: {error}")
-        raise
+    with _locked_repo_paths([path for path, _payload in file_payloads]):
+        snapshots: list[tuple[Path, bool, str]] = []
+        for path, _payload in file_payloads:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            snapshots.append(_capture_text_snapshot(path))
+        try:
+            for path, payload in file_payloads:
+                write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+        except Exception as exc:
+            rollback_errors: list[str] = []
+            for path, existed, original_text in reversed(snapshots):
+                try:
+                    _restore_text_snapshot(path, existed=existed, original_text=original_text)
+                except Exception as rollback_exc:
+                    rollback_errors.append(f"{path}: {rollback_exc}")
+            for error in rollback_errors:
+                exc.add_note(f"Rollback failed: {error}")
+            raise
 
 
 def _load_city_overrides_payload(context: dict[str, object]) -> dict[str, object]:
@@ -1436,20 +1509,20 @@ def save_scenario_tag_create_payload(
     inspector_group_anchor_id: object = "",
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    return _build_scenario_tag_create_payload(
-        context,
-        feature_ids=feature_ids,
-        tag=tag,
-        name_en=name_en,
-        name_zh=name_zh,
-        color_hex=color_hex,
-        parent_owner_tag=parent_owner_tag,
-        inspector_group_id=inspector_group_id,
-        inspector_group_label=inspector_group_label,
-        inspector_group_anchor_id=inspector_group_anchor_id,
-        root=root,
-    )
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        return _build_scenario_tag_create_payload(
+            context,
+            feature_ids=feature_ids,
+            tag=tag,
+            name_en=name_en,
+            name_zh=name_zh,
+            color_hex=color_hex,
+            parent_owner_tag=parent_owner_tag,
+            inspector_group_id=inspector_group_id,
+            inspector_group_label=inspector_group_label,
+            inspector_group_anchor_id=inspector_group_anchor_id,
+            root=root,
+        )
 
 
 def save_scenario_country_payload(
@@ -1464,130 +1537,130 @@ def save_scenario_country_payload(
     featured: object | None = None,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    countries_payload = _load_country_catalog(context)
-    countries = countries_payload["countries"]
-    normalized_tag = _validate_tag_code(tag)
-    existing_entry = countries.get(normalized_tag) if isinstance(countries.get(normalized_tag), dict) else None
-    local_catalog_path = Path(context["releasableCatalogLocalPath"])
-    source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
-    catalog_payload: dict[str, object] | None = None
-    catalog_entry_index: int | None = None
-    catalog_entry: dict[str, object] | None = None
-    if local_catalog_path.exists():
-        catalog_payload = _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
-    elif source_catalog_path is not None and source_catalog_path.exists():
-        catalog_payload = _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
-    if catalog_payload is not None:
-        catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
-    if existing_entry is None and catalog_entry is None:
-        raise DevServerError(
-            "unknown_scenario_tag",
-            f'Tag "{normalized_tag}" does not exist in the active scenario countries catalog or releasable catalog.',
-            status=404,
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        countries_payload = _load_country_catalog(context)
+        countries = countries_payload["countries"]
+        normalized_tag = _validate_tag_code(tag)
+        existing_entry = countries.get(normalized_tag) if isinstance(countries.get(normalized_tag), dict) else None
+        local_catalog_path = Path(context["releasableCatalogLocalPath"])
+        source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
+        catalog_payload: dict[str, object] | None = None
+        catalog_entry_index: int | None = None
+        catalog_entry: dict[str, object] | None = None
+        if local_catalog_path.exists():
+            catalog_payload = _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
+        elif source_catalog_path is not None and source_catalog_path.exists():
+            catalog_payload = _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
+        if catalog_payload is not None:
+            catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
+        if existing_entry is None and catalog_entry is None:
+            raise DevServerError(
+                "unknown_scenario_tag",
+                f'Tag "{normalized_tag}" does not exist in the active scenario countries catalog or releasable catalog.',
+                status=404,
+            )
+
+        updated_entry = _build_editable_country_entry(
+            normalized_tag,
+            existing_entry=existing_entry,
+            catalog_entry=catalog_entry,
         )
 
-    updated_entry = _build_editable_country_entry(
-        normalized_tag,
-        existing_entry=existing_entry,
-        catalog_entry=catalog_entry,
-    )
-
-    resolved_name_en = _normalize_text(name_en) if name_en is not None else _normalize_text(updated_entry.get("display_name_en"))
-    resolved_name_zh = _normalize_text(name_zh) if name_zh is not None else _normalize_text(updated_entry.get("display_name_zh"))
-    if not resolved_name_en or not resolved_name_zh:
-        raise DevServerError(
-            "missing_bilingual_name",
-            "Both English and Chinese names are required.",
-            status=400,
+        resolved_name_en = _normalize_text(name_en) if name_en is not None else _normalize_text(updated_entry.get("display_name_en"))
+        resolved_name_zh = _normalize_text(name_zh) if name_zh is not None else _normalize_text(updated_entry.get("display_name_zh"))
+        if not resolved_name_en or not resolved_name_zh:
+            raise DevServerError(
+                "missing_bilingual_name",
+                "Both English and Chinese names are required.",
+                status=400,
+            )
+        resolved_color_hex = _validate_color_hex(color_hex) if color_hex is not None else _validate_color_hex(updated_entry.get("color_hex") or "#000000")
+        resolved_parent_owner_tag = (
+            _normalize_code(parent_owner_tag)
+            if parent_owner_tag is not None
+            else _normalize_code(updated_entry.get("parent_owner_tag"))
         )
-    resolved_color_hex = _validate_color_hex(color_hex) if color_hex is not None else _validate_color_hex(updated_entry.get("color_hex") or "#000000")
-    resolved_parent_owner_tag = (
-        _normalize_code(parent_owner_tag)
-        if parent_owner_tag is not None
-        else _normalize_code(updated_entry.get("parent_owner_tag"))
-    )
-    known_tags = {normalized_tag, *[str(key or "").strip().upper() for key in countries.keys()]}
-    if catalog_payload is not None:
-        known_tags.update(
-            _normalize_code(entry.get("tag"))
-            for entry in (catalog_payload.get("entries", []) if isinstance(catalog_payload.get("entries"), list) else [])
-            if isinstance(entry, dict)
-        )
-    if resolved_parent_owner_tag and resolved_parent_owner_tag not in known_tags:
-        raise DevServerError(
-            "unknown_parent_owner_tag",
-            f'Parent owner tag "{resolved_parent_owner_tag}" does not exist in the scenario country or releasable catalog.',
-            status=400,
-        )
-    updated_entry["display_name"] = resolved_name_en
-    updated_entry["display_name_en"] = resolved_name_en
-    updated_entry["display_name_zh"] = resolved_name_zh
-    updated_entry["color_hex"] = resolved_color_hex
-    updated_entry["parent_owner_tag"] = resolved_parent_owner_tag
-    updated_entry["parent_owner_tags"] = [resolved_parent_owner_tag] if resolved_parent_owner_tag else []
-    if notes is not None:
-        updated_entry["notes"] = _normalize_text(notes)
-    if featured is not None:
-        updated_entry["featured"] = bool(featured)
-    if existing_entry is not None:
-        countries[normalized_tag] = updated_entry
-        countries_payload["generated_at"] = _now_iso()
+        known_tags = {normalized_tag, *[str(key or "").strip().upper() for key in countries.keys()]}
+        if catalog_payload is not None:
+            known_tags.update(
+                _normalize_code(entry.get("tag"))
+                for entry in (catalog_payload.get("entries", []) if isinstance(catalog_payload.get("entries"), list) else [])
+                if isinstance(entry, dict)
+            )
+        if resolved_parent_owner_tag and resolved_parent_owner_tag not in known_tags:
+            raise DevServerError(
+                "unknown_parent_owner_tag",
+                f'Parent owner tag "{resolved_parent_owner_tag}" does not exist in the scenario country or releasable catalog.',
+                status=400,
+            )
+        updated_entry["display_name"] = resolved_name_en
+        updated_entry["display_name_en"] = resolved_name_en
+        updated_entry["display_name_zh"] = resolved_name_zh
+        updated_entry["color_hex"] = resolved_color_hex
+        updated_entry["parent_owner_tag"] = resolved_parent_owner_tag
+        updated_entry["parent_owner_tags"] = [resolved_parent_owner_tag] if resolved_parent_owner_tag else []
+        if notes is not None:
+            updated_entry["notes"] = _normalize_text(notes)
+        if featured is not None:
+            updated_entry["featured"] = bool(featured)
+        if existing_entry is not None:
+            countries[normalized_tag] = updated_entry
+            countries_payload["generated_at"] = _now_iso()
 
-    manual_payload = _load_scenario_manual_overrides_payload(context)
-    existing_manual_entry = manual_payload["countries"].get(normalized_tag)
-    manual_mode = "override"
-    if isinstance(existing_manual_entry, dict) and str(existing_manual_entry.get("mode") or "").strip().lower() == "create":
-        manual_mode = "create"
-    elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
-        manual_mode = "create"
-    manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
-    manual_payload["generated_at"] = _now_iso()
+        manual_payload = _load_scenario_manual_overrides_payload(context)
+        existing_manual_entry = manual_payload["countries"].get(normalized_tag)
+        manual_mode = "override"
+        if isinstance(existing_manual_entry, dict) and str(existing_manual_entry.get("mode") or "").strip().lower() == "create":
+            manual_mode = "create"
+        elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
+            manual_mode = "create"
+        manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
+        manual_payload["generated_at"] = _now_iso()
 
-    transaction_payloads: list[tuple[Path, object]] = [
-        (Path(context["manualOverridesPath"]), manual_payload),
-    ]
-    if existing_entry is not None:
-        transaction_payloads.insert(0, (Path(context["countriesPath"]), countries_payload))
+        transaction_payloads: list[tuple[Path, object]] = [
+            (Path(context["manualOverridesPath"]), manual_payload),
+        ]
+        if existing_entry is not None:
+            transaction_payloads.insert(0, (Path(context["countriesPath"]), countries_payload))
 
-    updated_catalog_entry = None
-    catalog_path_relative = ""
-    manifest_path_relative = ""
-    if catalog_entry is not None:
-        if catalog_payload is None:
-            catalog_payload = _default_releasable_catalog(str(context["scenarioId"]))
-        entries = catalog_payload.get("entries", [])
-        if not isinstance(entries, list):
-            entries = []
-            catalog_payload["entries"] = entries
-        updated_catalog_entry = _sync_releasable_catalog_entry_from_country(catalog_entry, updated_entry)
-        if catalog_entry_index is None:
-            entries.append(updated_catalog_entry)
-        else:
-            entries[catalog_entry_index] = updated_catalog_entry
-        catalog_payload["generated_at"] = _now_iso()
-        catalog_payload["scenario_ids"] = [str(context["scenarioId"])]
-        transaction_payloads.append((local_catalog_path, catalog_payload))
-        catalog_path_relative = _repo_relative(local_catalog_path, root=root)
-        if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != catalog_path_relative:
-            manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-            manifest_payload["releasable_catalog_url"] = catalog_path_relative
-            transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
-            manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root)
+        updated_catalog_entry = None
+        catalog_path_relative = ""
+        manifest_path_relative = ""
+        if catalog_entry is not None:
+            if catalog_payload is None:
+                catalog_payload = _default_releasable_catalog(str(context["scenarioId"]))
+            entries = catalog_payload.get("entries", [])
+            if not isinstance(entries, list):
+                entries = []
+                catalog_payload["entries"] = entries
+            updated_catalog_entry = _sync_releasable_catalog_entry_from_country(catalog_entry, updated_entry)
+            if catalog_entry_index is None:
+                entries.append(updated_catalog_entry)
+            else:
+                entries[catalog_entry_index] = updated_catalog_entry
+            catalog_payload["generated_at"] = _now_iso()
+            catalog_payload["scenario_ids"] = [str(context["scenarioId"])]
+            transaction_payloads.append((local_catalog_path, catalog_payload))
+            catalog_path_relative = _repo_relative(local_catalog_path, root=root)
+            if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != catalog_path_relative:
+                manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
+                manifest_payload["releasable_catalog_url"] = catalog_path_relative
+                transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
+                manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root)
 
-    _write_json_transaction(transaction_payloads)
-    return {
-        "ok": True,
-        "scenarioId": context["scenarioId"],
-        "tag": normalized_tag,
-        "countryEntry": updated_entry,
-        "catalogEntry": updated_catalog_entry,
-        "filePath": _repo_relative(Path(context["countriesPath"]), root=root) if existing_entry is not None else "",
-        "catalogPath": catalog_path_relative,
-        "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
-        "manifestPath": manifest_path_relative,
-        "savedAt": _now_iso(),
-    }
+        _write_json_transaction(transaction_payloads)
+        return {
+            "ok": True,
+            "scenarioId": context["scenarioId"],
+            "tag": normalized_tag,
+            "countryEntry": updated_entry,
+            "catalogEntry": updated_catalog_entry,
+            "filePath": _repo_relative(Path(context["countriesPath"]), root=root) if existing_entry is not None else "",
+            "catalogPath": catalog_path_relative,
+            "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
+            "manifestPath": manifest_path_relative,
+            "savedAt": _now_iso(),
+        }
 
 
 def save_scenario_capital_payload(
@@ -1611,182 +1684,182 @@ def save_scenario_capital_payload(
     name_ascii: object = "",
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    normalized_tag = _validate_tag_code(tag)
-    normalized_feature_id = str(feature_id or "").strip()
-    normalized_city_id = _normalize_text(city_id)
-    if not normalized_feature_id:
-        raise DevServerError("missing_feature_id", "A capital feature id is required.", status=400)
-    if not normalized_city_id:
-        raise DevServerError("missing_city_id", "A city id is required.", status=400)
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        normalized_tag = _validate_tag_code(tag)
+        normalized_feature_id = str(feature_id or "").strip()
+        normalized_city_id = _normalize_text(city_id)
+        if not normalized_feature_id:
+            raise DevServerError("missing_feature_id", "A capital feature id is required.", status=400)
+        if not normalized_city_id:
+            raise DevServerError("missing_city_id", "A city id is required.", status=400)
 
-    countries_payload = _load_country_catalog(context)
-    countries = countries_payload["countries"]
-    existing_entry = countries.get(normalized_tag) if isinstance(countries.get(normalized_tag), dict) else None
-    local_catalog_path = Path(context["releasableCatalogLocalPath"])
-    source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
-    catalog_payload: dict[str, object] | None = None
-    catalog_entry_index: int | None = None
-    catalog_entry: dict[str, object] | None = None
-    if local_catalog_path.exists():
-        catalog_payload = _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
-    elif source_catalog_path is not None and source_catalog_path.exists():
-        catalog_payload = _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
-    if catalog_payload is not None:
-        catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
-    if existing_entry is None and catalog_entry is None:
-        raise DevServerError(
-            "unknown_scenario_tag",
-            f'Tag "{normalized_tag}" does not exist in the active scenario countries catalog or releasable catalog.',
-            status=404,
+        countries_payload = _load_country_catalog(context)
+        countries = countries_payload["countries"]
+        existing_entry = countries.get(normalized_tag) if isinstance(countries.get(normalized_tag), dict) else None
+        local_catalog_path = Path(context["releasableCatalogLocalPath"])
+        source_catalog_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
+        catalog_payload: dict[str, object] | None = None
+        catalog_entry_index: int | None = None
+        catalog_entry: dict[str, object] | None = None
+        if local_catalog_path.exists():
+            catalog_payload = _normalize_releasable_catalog(_read_json(local_catalog_path), scenario_id=str(context["scenarioId"]))
+        elif source_catalog_path is not None and source_catalog_path.exists():
+            catalog_payload = _normalize_releasable_catalog(_read_json(source_catalog_path), scenario_id=str(context["scenarioId"]))
+        if catalog_payload is not None:
+            catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(catalog_payload, normalized_tag)
+        if existing_entry is None and catalog_entry is None:
+            raise DevServerError(
+                "unknown_scenario_tag",
+                f'Tag "{normalized_tag}" does not exist in the active scenario countries catalog or releasable catalog.',
+                status=404,
+            )
+
+        updated_entry = _build_editable_country_entry(
+            normalized_tag,
+            existing_entry=existing_entry,
+            catalog_entry=catalog_entry,
         )
 
-    updated_entry = _build_editable_country_entry(
-        normalized_tag,
-        existing_entry=existing_entry,
-        catalog_entry=catalog_entry,
-    )
+        owners = _load_owner_assignments(context)
+        if normalized_feature_id not in owners:
+            raise DevServerError(
+                "unknown_feature_id",
+                f'Feature "{normalized_feature_id}" was not found in the scenario owners file.',
+                status=400,
+            )
+        if owners.get(normalized_feature_id) != normalized_tag:
+            raise DevServerError(
+                "capital_feature_owner_mismatch",
+                "The selected feature is not owned by the requested country in the saved scenario owners file.",
+                status=400,
+                details={
+                    "featureId": normalized_feature_id,
+                    "featureOwnerTag": owners.get(normalized_feature_id),
+                    "requestedTag": normalized_tag,
+                },
+            )
 
-    owners = _load_owner_assignments(context)
-    if normalized_feature_id not in owners:
-        raise DevServerError(
-            "unknown_feature_id",
-            f'Feature "{normalized_feature_id}" was not found in the scenario owners file.',
-            status=400,
-        )
-    if owners.get(normalized_feature_id) != normalized_tag:
-        raise DevServerError(
-            "capital_feature_owner_mismatch",
-            "The selected feature is not owned by the requested country in the saved scenario owners file.",
-            status=400,
-            details={
-                "featureId": normalized_feature_id,
-                "featureOwnerTag": owners.get(normalized_feature_id),
-                "requestedTag": normalized_tag,
-            },
-        )
+        normalized_capital_state_id = _normalize_optional_int(capital_state_id)
+        normalized_population = _normalize_optional_int(population)
+        normalized_lon = _normalize_optional_float(lon)
+        normalized_lat = _normalize_optional_float(lat)
+        normalized_lookup_iso2 = _normalize_code(lookup_iso2) or _normalize_code(updated_entry.get("lookup_iso2"))
+        normalized_base_iso2 = _normalize_code(base_iso2) or _normalize_code(updated_entry.get("base_iso2")) or normalized_lookup_iso2
+        normalized_country_code = _normalize_code(country_code) or normalized_lookup_iso2 or normalized_base_iso2
+        normalized_city_name = _normalize_text(city_name)
+        normalized_name_ascii = _normalize_text(name_ascii) or normalized_city_name
+        normalized_stable_key = _normalize_text(stable_key) or f"id::{normalized_city_id}"
+        normalized_capital_kind = _normalize_text(capital_kind)
+        normalized_urban_match_id = _normalize_text(urban_match_id)
+        normalized_base_tier = _normalize_text(base_tier).lower()
 
-    normalized_capital_state_id = _normalize_optional_int(capital_state_id)
-    normalized_population = _normalize_optional_int(population)
-    normalized_lon = _normalize_optional_float(lon)
-    normalized_lat = _normalize_optional_float(lat)
-    normalized_lookup_iso2 = _normalize_code(lookup_iso2) or _normalize_code(updated_entry.get("lookup_iso2"))
-    normalized_base_iso2 = _normalize_code(base_iso2) or _normalize_code(updated_entry.get("base_iso2")) or normalized_lookup_iso2
-    normalized_country_code = _normalize_code(country_code) or normalized_lookup_iso2 or normalized_base_iso2
-    normalized_city_name = _normalize_text(city_name)
-    normalized_name_ascii = _normalize_text(name_ascii) or normalized_city_name
-    normalized_stable_key = _normalize_text(stable_key) or f"id::{normalized_city_id}"
-    normalized_capital_kind = _normalize_text(capital_kind)
-    normalized_urban_match_id = _normalize_text(urban_match_id)
-    normalized_base_tier = _normalize_text(base_tier).lower()
+        updated_entry["capital_state_id"] = normalized_capital_state_id
+        if existing_entry is not None:
+            countries[normalized_tag] = updated_entry
+            countries_payload["generated_at"] = _now_iso()
 
-    updated_entry["capital_state_id"] = normalized_capital_state_id
-    if existing_entry is not None:
-        countries[normalized_tag] = updated_entry
-        countries_payload["generated_at"] = _now_iso()
+        manual_payload = _load_scenario_manual_overrides_payload(context)
+        existing_manual_entry = manual_payload["countries"].get(normalized_tag)
+        manual_mode = "override"
+        if isinstance(existing_manual_entry, dict) and str(existing_manual_entry.get("mode") or "").strip().lower() == "create":
+            manual_mode = "create"
+        elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
+            manual_mode = "create"
+        manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
+        manual_payload["generated_at"] = _now_iso()
 
-    manual_payload = _load_scenario_manual_overrides_payload(context)
-    existing_manual_entry = manual_payload["countries"].get(normalized_tag)
-    manual_mode = "override"
-    if isinstance(existing_manual_entry, dict) and str(existing_manual_entry.get("mode") or "").strip().lower() == "create":
-        manual_mode = "create"
-    elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
-        manual_mode = "create"
-    manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(updated_entry, mode=manual_mode)
-    manual_payload["generated_at"] = _now_iso()
+        city_overrides_payload = _load_city_overrides_payload(context)
+        city_overrides_payload["generated_at"] = _now_iso()
+        city_overrides_payload["capitals_by_tag"][normalized_tag] = normalized_city_id
+        previous_hint = city_overrides_payload["capital_city_hints"].get(normalized_tag)
+        previous_hint = previous_hint if isinstance(previous_hint, dict) else {}
+        city_override_entry = {
+            **previous_hint,
+            "tag": normalized_tag,
+            "display_name": _normalize_text(
+                updated_entry.get("display_name")
+                or updated_entry.get("display_name_en")
+                or normalized_tag
+            ),
+            "lookup_iso2": normalized_lookup_iso2,
+            "base_iso2": normalized_base_iso2,
+            "capital_state_id": normalized_capital_state_id,
+            "city_id": normalized_city_id,
+            "stable_key": normalized_stable_key,
+            "city_name": normalized_city_name or _normalize_text(previous_hint.get("city_name")) or normalized_city_id,
+            "name_ascii": normalized_name_ascii or _normalize_text(previous_hint.get("name_ascii")) or normalized_city_id,
+            "capital_kind": normalized_capital_kind or _normalize_text(previous_hint.get("capital_kind")) or "manual_capital",
+            "base_tier": normalized_base_tier or _normalize_text(previous_hint.get("base_tier")),
+            "population": normalized_population,
+            "country_code": normalized_country_code,
+            "host_feature_id": normalized_feature_id,
+            "urban_match_id": normalized_urban_match_id,
+            "lon": normalized_lon,
+            "lat": normalized_lat,
+            "source": "manual_override",
+            "resolution_method": "dev_workspace_manual",
+            "confidence": "manual",
+        }
+        city_overrides_payload["capital_city_hints"][normalized_tag] = city_override_entry
 
-    city_overrides_payload = _load_city_overrides_payload(context)
-    city_overrides_payload["generated_at"] = _now_iso()
-    city_overrides_payload["capitals_by_tag"][normalized_tag] = normalized_city_id
-    previous_hint = city_overrides_payload["capital_city_hints"].get(normalized_tag)
-    previous_hint = previous_hint if isinstance(previous_hint, dict) else {}
-    city_override_entry = {
-        **previous_hint,
-        "tag": normalized_tag,
-        "display_name": _normalize_text(
-            updated_entry.get("display_name")
-            or updated_entry.get("display_name_en")
-            or normalized_tag
-        ),
-        "lookup_iso2": normalized_lookup_iso2,
-        "base_iso2": normalized_base_iso2,
-        "capital_state_id": normalized_capital_state_id,
-        "city_id": normalized_city_id,
-        "stable_key": normalized_stable_key,
-        "city_name": normalized_city_name or _normalize_text(previous_hint.get("city_name")) or normalized_city_id,
-        "name_ascii": normalized_name_ascii or _normalize_text(previous_hint.get("name_ascii")) or normalized_city_id,
-        "capital_kind": normalized_capital_kind or _normalize_text(previous_hint.get("capital_kind")) or "manual_capital",
-        "base_tier": normalized_base_tier or _normalize_text(previous_hint.get("base_tier")),
-        "population": normalized_population,
-        "country_code": normalized_country_code,
-        "host_feature_id": normalized_feature_id,
-        "urban_match_id": normalized_urban_match_id,
-        "lon": normalized_lon,
-        "lat": normalized_lat,
-        "source": "manual_override",
-        "resolution_method": "dev_workspace_manual",
-        "confidence": "manual",
-    }
-    city_overrides_payload["capital_city_hints"][normalized_tag] = city_override_entry
+        transaction_payloads: list[tuple[Path, object]] = [
+            (Path(context["manualOverridesPath"]), manual_payload),
+            (Path(context["cityOverridesPath"]), city_overrides_payload),
+        ]
+        if existing_entry is not None:
+            transaction_payloads.insert(0, (Path(context["countriesPath"]), countries_payload))
 
-    transaction_payloads: list[tuple[Path, object]] = [
-        (Path(context["manualOverridesPath"]), manual_payload),
-        (Path(context["cityOverridesPath"]), city_overrides_payload),
-    ]
-    if existing_entry is not None:
-        transaction_payloads.insert(0, (Path(context["countriesPath"]), countries_payload))
+        updated_catalog_entry = None
+        catalog_path_relative = ""
+        manifest_payload: dict[str, object] | None = None
+        if catalog_entry is not None:
+            if catalog_payload is None:
+                catalog_payload = _default_releasable_catalog(str(context["scenarioId"]))
+            entries = catalog_payload.get("entries", [])
+            if not isinstance(entries, list):
+                entries = []
+                catalog_payload["entries"] = entries
+            updated_catalog_entry = _sync_releasable_catalog_entry_from_country(catalog_entry, updated_entry)
+            if catalog_entry_index is None:
+                entries.append(updated_catalog_entry)
+            else:
+                entries[catalog_entry_index] = updated_catalog_entry
+            catalog_payload["generated_at"] = _now_iso()
+            catalog_payload["scenario_ids"] = [str(context["scenarioId"])]
+            transaction_payloads.append((local_catalog_path, catalog_payload))
+            catalog_path_relative = _repo_relative(local_catalog_path, root=root)
+            if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != catalog_path_relative:
+                manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
+                manifest_payload["releasable_catalog_url"] = catalog_path_relative
 
-    updated_catalog_entry = None
-    catalog_path_relative = ""
-    manifest_payload: dict[str, object] | None = None
-    if catalog_entry is not None:
-        if catalog_payload is None:
-            catalog_payload = _default_releasable_catalog(str(context["scenarioId"]))
-        entries = catalog_payload.get("entries", [])
-        if not isinstance(entries, list):
-            entries = []
-            catalog_payload["entries"] = entries
-        updated_catalog_entry = _sync_releasable_catalog_entry_from_country(catalog_entry, updated_entry)
-        if catalog_entry_index is None:
-            entries.append(updated_catalog_entry)
-        else:
-            entries[catalog_entry_index] = updated_catalog_entry
-        catalog_payload["generated_at"] = _now_iso()
-        catalog_payload["scenario_ids"] = [str(context["scenarioId"])]
-        transaction_payloads.append((local_catalog_path, catalog_payload))
-        catalog_path_relative = _repo_relative(local_catalog_path, root=root)
-        if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != catalog_path_relative:
-            manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-            manifest_payload["releasable_catalog_url"] = catalog_path_relative
+        city_overrides_relative = _repo_relative(Path(context["cityOverridesPath"]), root=root)
+        if str(context.get("manifest", {}).get("city_overrides_url") or "").strip() != city_overrides_relative:
+            if manifest_payload is None:
+                manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
+            manifest_payload["city_overrides_url"] = city_overrides_relative
 
-    city_overrides_relative = _repo_relative(Path(context["cityOverridesPath"]), root=root)
-    if str(context.get("manifest", {}).get("city_overrides_url") or "").strip() != city_overrides_relative:
-        if manifest_payload is None:
-            manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-        manifest_payload["city_overrides_url"] = city_overrides_relative
+        manifest_path_relative = ""
+        if manifest_payload is not None:
+            transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
+            manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root)
 
-    manifest_path_relative = ""
-    if manifest_payload is not None:
-        transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
-        manifest_path_relative = _repo_relative(Path(context["manifestPath"]), root=root)
-
-    _write_json_transaction(transaction_payloads)
-    return {
-        "ok": True,
-        "scenarioId": context["scenarioId"],
-        "tag": normalized_tag,
-        "featureId": normalized_feature_id,
-        "cityId": normalized_city_id,
-        "countryEntry": updated_entry,
-        "catalogEntry": updated_catalog_entry,
-        "cityOverrideEntry": city_override_entry,
-        "filePath": _repo_relative(Path(context["countriesPath"]), root=root) if existing_entry is not None else "",
-        "catalogPath": catalog_path_relative,
-        "cityOverridesPath": city_overrides_relative,
-        "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
-        "manifestPath": manifest_path_relative,
-        "savedAt": _now_iso(),
-    }
+        _write_json_transaction(transaction_payloads)
+        return {
+            "ok": True,
+            "scenarioId": context["scenarioId"],
+            "tag": normalized_tag,
+            "featureId": normalized_feature_id,
+            "cityId": normalized_city_id,
+            "countryEntry": updated_entry,
+            "catalogEntry": updated_catalog_entry,
+            "cityOverrideEntry": city_override_entry,
+            "filePath": _repo_relative(Path(context["countriesPath"]), root=root) if existing_entry is not None else "",
+            "catalogPath": catalog_path_relative,
+            "cityOverridesPath": city_overrides_relative,
+            "manualOverridesPath": _repo_relative(Path(context["manualOverridesPath"]), root=root),
+            "manifestPath": manifest_path_relative,
+            "savedAt": _now_iso(),
+        }
 
 
 def _load_district_groups_payload(context: dict[str, object]) -> dict[str, object]:
@@ -1966,13 +2039,13 @@ def save_scenario_district_groups_payload(
     districts: object,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    return _save_scenario_district_groups_payload_from_context(
-        context,
-        tag=tag,
-        districts=districts,
-        root=root,
-    )
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        return _save_scenario_district_groups_payload_from_context(
+            context,
+            tag=tag,
+            districts=districts,
+            root=root,
+        )
 
 
 def _load_shared_district_templates_payload(*, root: Path = ROOT) -> dict[str, object]:
@@ -2005,46 +2078,46 @@ def save_shared_district_template_payload(
     districts: object,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    normalized_tag = _validate_tag_code(tag)
-    normalized_template_tag = _validate_tag_code(template_tag)
-    valid_feature_ids = _load_scenario_tag_feature_ids(context, normalized_tag)
-    normalized_districts = _build_tag_districts(
-        tag=normalized_tag,
-        districts=districts,
-        valid_feature_ids=valid_feature_ids,
-    )
-    payload = _load_shared_district_templates_payload(root=root)
-    payload["version"] = int(payload.get("version") or 1)
-    payload["generated_at"] = _now_iso()
-    payload["templates"][normalized_template_tag] = {
-        "tag": normalized_template_tag,
-        "source_scenario_id": str(context["scenarioId"]),
-        "source_tag": normalized_tag,
-        "saved_at": payload["generated_at"],
-        "districts": normalized_districts,
-    }
     shared_templates_path = _ensure_path_within_root(
         DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH if root == ROOT else root / "data" / "scenarios" / "district_templates.shared.json",
         root=root,
     )
-    write_json_atomic(shared_templates_path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+    with _locked_scenario_context(scenario_id, root=root, extra_paths=[shared_templates_path]) as context:
+        normalized_tag = _validate_tag_code(tag)
+        normalized_template_tag = _validate_tag_code(template_tag)
+        valid_feature_ids = _load_scenario_tag_feature_ids(context, normalized_tag)
+        normalized_districts = _build_tag_districts(
+            tag=normalized_tag,
+            districts=districts,
+            valid_feature_ids=valid_feature_ids,
+        )
+        payload = _load_shared_district_templates_payload(root=root)
+        payload["version"] = int(payload.get("version") or 1)
+        payload["generated_at"] = _now_iso()
+        payload["templates"][normalized_template_tag] = {
+            "tag": normalized_template_tag,
+            "source_scenario_id": str(context["scenarioId"]),
+            "source_tag": normalized_tag,
+            "saved_at": payload["generated_at"],
+            "districts": normalized_districts,
+        }
+        write_json_atomic(shared_templates_path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
-    return {
-        "ok": True,
-        "scenarioId": context["scenarioId"],
-        "tag": normalized_tag,
-        "templateTag": normalized_template_tag,
-        "template": payload["templates"][normalized_template_tag],
-        "filePath": _repo_relative(shared_templates_path, root=root),
-        "savedAt": _now_iso(),
-        "stats": {
+        return {
+            "ok": True,
+            "scenarioId": context["scenarioId"],
             "tag": normalized_tag,
             "templateTag": normalized_template_tag,
-            "districtCount": len(normalized_districts),
-            "featureCount": sum(len(entry["feature_ids"]) for entry in normalized_districts.values()),
-        },
-    }
+            "template": payload["templates"][normalized_template_tag],
+            "filePath": _repo_relative(shared_templates_path, root=root),
+            "savedAt": _now_iso(),
+            "stats": {
+                "tag": normalized_tag,
+                "templateTag": normalized_template_tag,
+                "districtCount": len(normalized_districts),
+                "featureCount": sum(len(entry["feature_ids"]) for entry in normalized_districts.values()),
+            },
+        }
 
 
 def apply_shared_district_template_payload(
@@ -2054,36 +2127,40 @@ def apply_shared_district_template_payload(
     template_tag: object,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
-    normalized_tag = _validate_tag_code(tag)
-    normalized_template_tag = _validate_tag_code(template_tag)
-    shared_payload = _load_shared_district_templates_payload(root=root)
-    template = shared_payload.get("templates", {}).get(normalized_template_tag)
-    if not isinstance(template, dict):
-        raise DevServerError(
-            "missing_shared_template",
-            f'Shared district template "{normalized_template_tag}" does not exist.',
-            status=404,
-        )
-    template_districts = list((template.get("districts") or {}).values()) if isinstance(template.get("districts"), dict) else []
-    applied_districts = [
-        {
-            "districtId": district.get("district_id") or district.get("id"),
-            "nameEn": district.get("name_en") or district.get("nameEn"),
-            "nameZh": district.get("name_zh") or district.get("nameZh"),
-            "featureIds": district.get("feature_ids") or district.get("featureIds") or [],
-        }
-        for district in template_districts
-    ]
-    save_result = _save_scenario_district_groups_payload_from_context(
-        context,
-        tag=normalized_tag,
-        districts=applied_districts,
+    shared_templates_path = _ensure_path_within_root(
+        DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH if root == ROOT else root / "data" / "scenarios" / "district_templates.shared.json",
         root=root,
     )
-    save_result["templateTag"] = normalized_template_tag
-    save_result["appliedTemplate"] = template
-    return save_result
+    with _locked_scenario_context(scenario_id, root=root, extra_paths=[shared_templates_path]) as context:
+        normalized_tag = _validate_tag_code(tag)
+        normalized_template_tag = _validate_tag_code(template_tag)
+        shared_payload = _load_shared_district_templates_payload(root=root)
+        template = shared_payload.get("templates", {}).get(normalized_template_tag)
+        if not isinstance(template, dict):
+            raise DevServerError(
+                "missing_shared_template",
+                f'Shared district template "{normalized_template_tag}" does not exist.',
+                status=404,
+            )
+        template_districts = list((template.get("districts") or {}).values()) if isinstance(template.get("districts"), dict) else []
+        applied_districts = [
+            {
+                "districtId": district.get("district_id") or district.get("id"),
+                "nameEn": district.get("name_en") or district.get("nameEn"),
+                "nameZh": district.get("name_zh") or district.get("nameZh"),
+                "featureIds": district.get("feature_ids") or district.get("featureIds") or [],
+            }
+            for district in template_districts
+        ]
+        save_result = _save_scenario_district_groups_payload_from_context(
+            context,
+            tag=normalized_tag,
+            districts=applied_districts,
+            root=root,
+        )
+        save_result["templateTag"] = normalized_template_tag
+        save_result["appliedTemplate"] = template
+        return save_result
 
 
 def _default_manual_geo_payload(scenario_id: str) -> dict[str, object]:
@@ -2145,106 +2222,105 @@ def save_scenario_geo_locale_entry(
             f"Unsupported geo locale save mode: {normalized_mode}",
             status=400,
         )
+    with _locked_scenario_context(scenario_id, root=root) as context:
+        if not context["geoLocalePatchPath"]:
+            raise DevServerError(
+                "missing_geo_locale_patch",
+                "The active scenario does not declare a geo locale patch target.",
+                status=400,
+            )
 
-    context = load_scenario_context(scenario_id, root=root)
-    if not context["geoLocalePatchPath"]:
-        raise DevServerError(
-            "missing_geo_locale_patch",
-            "The active scenario does not declare a geo locale patch target.",
-            status=400,
-        )
+        normalized_feature_id = str(feature_id or "").strip()
+        if not normalized_feature_id:
+            raise DevServerError("missing_feature_id", "Feature id is required for geo locale saves.", status=400)
 
-    normalized_feature_id = str(feature_id or "").strip()
-    if not normalized_feature_id:
-        raise DevServerError("missing_feature_id", "Feature id is required for geo locale saves.", status=400)
-
-    manual_path = Path(context["manualGeoOverridesPath"])
-    manual_snapshot = _capture_text_snapshot(manual_path)
-    if manual_path.exists():
-        manual_payload = _read_json(manual_path)
-        if not isinstance(manual_payload, dict):
+        manual_path = Path(context["manualGeoOverridesPath"])
+        manual_snapshot = _capture_text_snapshot(manual_path)
+        if manual_path.exists():
+            manual_payload = _read_json(manual_path)
+            if not isinstance(manual_payload, dict):
+                manual_payload = _default_manual_geo_payload(str(context["scenarioId"]))
+        else:
             manual_payload = _default_manual_geo_payload(str(context["scenarioId"]))
-    else:
-        manual_payload = _default_manual_geo_payload(str(context["scenarioId"]))
 
-    manual_payload["version"] = int(manual_payload.get("version") or 1)
-    manual_payload["scenario_id"] = str(context["scenarioId"])
-    manual_payload["generated_at"] = _now_iso()
-    manual_payload["geo"] = manual_payload.get("geo", {}) if isinstance(manual_payload.get("geo"), dict) else {}
+        manual_payload["version"] = int(manual_payload.get("version") or 1)
+        manual_payload["scenario_id"] = str(context["scenarioId"])
+        manual_payload["generated_at"] = _now_iso()
+        manual_payload["geo"] = manual_payload.get("geo", {}) if isinstance(manual_payload.get("geo"), dict) else {}
 
-    locale_entry = _normalize_locale_entry(en, zh)
-    if locale_entry:
-        manual_payload["geo"][normalized_feature_id] = locale_entry
-    else:
-        manual_payload["geo"].pop(normalized_feature_id, None)
+        locale_entry = _normalize_locale_entry(en, zh)
+        if locale_entry:
+            manual_payload["geo"][normalized_feature_id] = locale_entry
+        else:
+            manual_payload["geo"].pop(normalized_feature_id, None)
 
-    write_json_atomic(manual_path, manual_payload, ensure_ascii=False, indent=2, trailing_newline=True)
+        write_json_atomic(manual_path, manual_payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
-    command = _build_geo_locale_command(context, root=root)
-    build_error_details: dict[str, object] = {
-        "command": command,
-    }
-    try:
-        result = subprocess.run(
-            command,
-            cwd=root,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except Exception as exc:
+        command = _build_geo_locale_command(context, root=root)
+        build_error_details: dict[str, object] = {
+            "command": command,
+        }
         try:
-            _restore_text_snapshot(
-                manual_snapshot[0],
-                existed=manual_snapshot[1],
-                original_text=manual_snapshot[2],
+            result = subprocess.run(
+                command,
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
             )
-        except Exception as rollback_exc:
-            build_error_details["rollbackError"] = str(rollback_exc)
-        build_error_details["error"] = repr(exc)
-        raise DevServerError(
-            "geo_locale_build_failed",
-            "The geo locale patch builder failed after updating manual overrides.",
-            status=500,
-            details=build_error_details,
-        ) from exc
-    if result.returncode != 0:
-        try:
-            _restore_text_snapshot(
-                manual_snapshot[0],
-                existed=manual_snapshot[1],
-                original_text=manual_snapshot[2],
+        except Exception as exc:
+            try:
+                _restore_text_snapshot(
+                    manual_snapshot[0],
+                    existed=manual_snapshot[1],
+                    original_text=manual_snapshot[2],
+                )
+            except Exception as rollback_exc:
+                build_error_details["rollbackError"] = str(rollback_exc)
+            build_error_details["error"] = repr(exc)
+            raise DevServerError(
+                "geo_locale_build_failed",
+                "The geo locale patch builder failed after updating manual overrides.",
+                status=500,
+                details=build_error_details,
+            ) from exc
+        if result.returncode != 0:
+            try:
+                _restore_text_snapshot(
+                    manual_snapshot[0],
+                    existed=manual_snapshot[1],
+                    original_text=manual_snapshot[2],
+                )
+            except Exception as rollback_exc:
+                build_error_details["rollbackError"] = str(rollback_exc)
+            build_error_details.update(
+                {
+                    "stdout": result.stdout[-2000:],
+                    "stderr": result.stderr[-2000:],
+                }
             )
-        except Exception as rollback_exc:
-            build_error_details["rollbackError"] = str(rollback_exc)
-        build_error_details.update(
-            {
-                "stdout": result.stdout[-2000:],
-                "stderr": result.stderr[-2000:],
-            }
-        )
-        raise DevServerError(
-            "geo_locale_build_failed",
-            "The geo locale patch builder failed after updating manual overrides.",
-            status=500,
-            details=build_error_details,
-        )
+            raise DevServerError(
+                "geo_locale_build_failed",
+                "The geo locale patch builder failed after updating manual overrides.",
+                status=500,
+                details=build_error_details,
+            )
 
-    geo_locale_patch_payload = _read_json(Path(context["geoLocalePatchPath"]))
-    current_entry = (
-        geo_locale_patch_payload.get("geo", {}).get(normalized_feature_id)
-        if isinstance(geo_locale_patch_payload, dict)
-        else None
-    )
-    return {
-        "ok": True,
-        "scenarioId": context["scenarioId"],
-        "featureId": normalized_feature_id,
-        "filePath": _repo_relative(Path(context["manualGeoOverridesPath"]), root=root),
-        "generatedPath": _repo_relative(Path(context["geoLocalePatchPath"]), root=root),
-        "savedAt": _now_iso(),
-        "entry": current_entry or None,
-    }
+        geo_locale_patch_payload = _read_json(Path(context["geoLocalePatchPath"]))
+        current_entry = (
+            geo_locale_patch_payload.get("geo", {}).get(normalized_feature_id)
+            if isinstance(geo_locale_patch_payload, dict)
+            else None
+        )
+        return {
+            "ok": True,
+            "scenarioId": context["scenarioId"],
+            "featureId": normalized_feature_id,
+            "filePath": _repo_relative(Path(context["manualGeoOverridesPath"]), root=root),
+            "generatedPath": _repo_relative(Path(context["geoLocalePatchPath"]), root=root),
+            "savedAt": _now_iso(),
+            "entry": current_entry or None,
+        }
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

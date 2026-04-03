@@ -1840,6 +1840,7 @@ function initToolbar({ render } = {}) {
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
   const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
+  const dockConfigGroup = document.getElementById("dockConfigGroup");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const dockExportBtn = document.getElementById("dockExportBtn");
   const dockEditPopoverBtn = document.getElementById("dockEditPopoverBtn");
@@ -1902,7 +1903,6 @@ function initToolbar({ render } = {}) {
   const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
   const paintModePoliticalBtn = document.getElementById("paintModePoliticalBtn");
   const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
-  const scenarioVisualAdjustmentsBtn = document.getElementById("scenarioVisualAdjustmentsBtn");
   const dockPoliticalEditingPanel = document.getElementById("dockPoliticalEditingPanel");
   const dockColorModeField = document.getElementById("dockColorModeField");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
@@ -2051,6 +2051,7 @@ function initToolbar({ render } = {}) {
   const SCENARIO_BAR_SAFE_GAP = 16;
   const SCENARIO_BAR_MIN_WIDTH = 172;
   const SCENARIO_GUIDE_MAX_WIDTH = 360;
+  const SCENARIO_GUIDE_VERTICAL_GAP = 10;
   if (!state.ui || typeof state.ui !== "object") {
     state.ui = {};
   }
@@ -4316,6 +4317,10 @@ function initToolbar({ render } = {}) {
     const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
     const showPoliticalPanel = !isScenarioMode && (state.ui.politicalEditingExpanded || isOwnershipMode);
     const showBorderMaintenance = isScenarioMode || state.ui.politicalEditingExpanded || isOwnershipMode;
+    const showGranularityField = !isScenarioMode;
+    const showColorModeField = !isOwnershipMode;
+    const showPoliticalEditingToggle = !isScenarioMode;
+    const showEditConfigButton = showGranularityField || showColorModeField || showPoliticalEditingToggle || showPoliticalPanel;
     const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
@@ -4327,26 +4332,34 @@ function initToolbar({ render } = {}) {
     }
 
     if (dockGranularityField) {
-      dockGranularityField.classList.toggle("hidden", isScenarioMode);
+      dockGranularityField.classList.toggle("hidden", !showGranularityField);
     }
 
     if (dockColorModeField) {
-      dockColorModeField.classList.toggle("hidden", isOwnershipMode);
+      dockColorModeField.classList.toggle("hidden", !showColorModeField);
     }
 
     if (politicalEditingToggleBtn) {
-      politicalEditingToggleBtn.classList.toggle("hidden", isScenarioMode);
+      politicalEditingToggleBtn.classList.toggle("hidden", !showPoliticalEditingToggle);
       politicalEditingToggleBtn.classList.toggle("is-active", showPoliticalPanel);
       politicalEditingToggleBtn.setAttribute("aria-expanded", String(showPoliticalPanel));
-    }
-
-    if (scenarioVisualAdjustmentsBtn) {
-      scenarioVisualAdjustmentsBtn.classList.toggle("hidden", !isScenarioMode);
     }
 
     if (dockPoliticalEditingPanel) {
       dockPoliticalEditingPanel.classList.toggle("hidden", !showPoliticalPanel);
       dockPoliticalEditingPanel.setAttribute("aria-hidden", showPoliticalPanel ? "false" : "true");
+    }
+
+    if (!showEditConfigButton && state.activeDockPopover === "edit") {
+      closeDockPopover();
+    }
+    if (dockEditPopoverBtn) {
+      dockEditPopoverBtn.classList.toggle("hidden", !showEditConfigButton);
+      dockEditPopoverBtn.setAttribute("aria-hidden", showEditConfigButton ? "false" : "true");
+    }
+    if (dockConfigGroup) {
+      dockConfigGroup.classList.toggle("hidden", !showEditConfigButton);
+      dockConfigGroup.setAttribute("aria-hidden", showEditConfigButton ? "false" : "true");
     }
 
     if (recalculateBordersBtn) {
@@ -4521,7 +4534,13 @@ function initToolbar({ render } = {}) {
         SCENARIO_BAR_MIN_WIDTH,
         Math.min(SCENARIO_GUIDE_MAX_WIDTH, availableWidth)
       );
+      const contextRect = scenarioContextBar.getBoundingClientRect();
+      const guideTop = Math.max(
+        0,
+        Math.round(contextRect.bottom - overlayRect.top + SCENARIO_GUIDE_VERTICAL_GAP)
+      );
       scenarioGuidePopover.style.maxWidth = `${guideWidth}px`;
+      scenarioGuidePopover.style.top = `${guideTop}px`;
     }
   };
 
@@ -6460,7 +6479,6 @@ function initToolbar({ render } = {}) {
     zoomPercentInput.setCustomValidity("");
     setZoomPercent(clamp(parsed, 35, 5000));
     updateZoomUi();
-    emitTransientFeedback(getZoomPercent(), { duration: 1000 });
   }
 
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
@@ -6505,13 +6523,11 @@ function initToolbar({ render } = {}) {
   const runZoomStep = (delta) => {
     dismissOnboardingHint();
     zoomByStep(delta);
-    emitTransientFeedback(getZoomPercent(), { duration: 900 });
   };
 
   const runZoomReset = () => {
     dismissOnboardingHint();
     resetZoomToFit();
-    emitTransientFeedback(getZoomPercent(), { duration: 1000 });
   };
 
   state.runToolSelectionFn = runToolSelection;
@@ -6922,15 +6938,6 @@ function initToolbar({ render } = {}) {
       }
     });
     politicalEditingToggleBtn.dataset.bound = "true";
-  }
-
-  if (scenarioVisualAdjustmentsBtn && !scenarioVisualAdjustmentsBtn.dataset.bound) {
-    scenarioVisualAdjustmentsBtn.addEventListener("click", () => {
-      if (typeof state.openScenarioVisualAdjustmentsFn === "function") {
-        state.openScenarioVisualAdjustmentsFn({ scrollIntoView: true });
-      }
-    });
-    scenarioVisualAdjustmentsBtn.dataset.bound = "true";
   }
 
   if (scenarioContextCollapseBtn && !scenarioContextCollapseBtn.dataset.bound) {

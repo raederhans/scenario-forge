@@ -958,6 +958,10 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
         result.locales?.geo && typeof result.locales.geo === "object"
           ? { ...result.locales.geo }
           : {};
+      const fullUiLocales =
+        result.locales?.ui && typeof result.locales.ui === "object"
+          ? { ...result.locales.ui }
+          : (state.locales?.ui || {});
       const fullBaseAliasMap =
         result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
           ? { ...result.geoAliases.alias_to_stable_key }
@@ -973,6 +977,10 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
       state.baseGeoLocales = fullBaseGeoLocales;
       state.baseGeoAliasToStableKey = fullBaseAliasMap;
       state.baseLocalizationLevel = "full";
+      state.locales = {
+        ...(state.locales || {}),
+        ui: fullUiLocales,
+      };
       if (state.activeScenarioId) {
         syncScenarioLocalizationState({
           cityOverridesPayload: state.scenarioCityOverridesData,
@@ -981,7 +989,7 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
       } else {
         state.locales = {
           ...(state.locales || {}),
-          ui: result.locales?.ui || state.locales?.ui || {},
+          ui: fullUiLocales,
           geo: { ...state.baseGeoLocales },
         };
         state.geoAliasToStableKey = { ...state.baseGeoAliasToStableKey };
@@ -1016,6 +1024,8 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
   state.baseLocalizationDataPromise = promise;
   return promise;
 }
+
+state.ensureFullLocalizationDataReadyFn = ensureFullLocalizationDataReady;
 
 async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", renderNow = true } = {}) {
   const scenarioId = String(state.activeScenarioId || "").trim();

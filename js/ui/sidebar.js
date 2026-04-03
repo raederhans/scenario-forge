@@ -6172,7 +6172,7 @@ function initSidebar({ render } = {}) {
     const intro = document.createElement("div");
     intro.className = "scenario-action-intro";
     intro.textContent = t(
-      "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
+      "Scenario Actions change political ownership and dynamic borders. Use Color Only for color-only edits.",
       "ui"
     );
     container.appendChild(intro);
@@ -6476,7 +6476,7 @@ function initSidebar({ render } = {}) {
 
     const summary = document.createElement("summary");
     summary.className = "section-header";
-    summary.textContent = t("Visual Adjustments", "ui");
+    summary.textContent = t("Color Only", "ui");
     details.appendChild(summary);
 
     const body = document.createElement("div");

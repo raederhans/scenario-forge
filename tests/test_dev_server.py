@@ -4,8 +4,11 @@ import gzip
 import io
 import json
 import os
+import threading
 import tempfile
+import time
 import unittest
+import urllib.request
 from pathlib import Path
 from unittest import mock
 
@@ -182,6 +185,80 @@ class DevServerTest(unittest.TestCase):
             },
         )
         return scenario_dir
+
+    def test_dev_server_tcp_server_handles_parallel_requests(self) -> None:
+        slow_started = threading.Event()
+        release_slow = threading.Event()
+
+        class ParallelProbeHandler(dev_server.http.server.BaseHTTPRequestHandler):
+            def log_message(self, format: str, *args) -> None:  # noqa: A003
+                return
+
+            def do_GET(self) -> None:  # noqa: N802
+                if self.path == "/slow":
+                    slow_started.set()
+                    release_slow.wait(timeout=2.0)
+                    body = b"slow"
+                elif self.path == "/fast":
+                    body = b"fast"
+                else:
+                    body = b"missing"
+                    self.send_response(404)
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+        httpd = dev_server.DevServerTCPServer((dev_server.BIND_ADDRESS, 0), ParallelProbeHandler)
+        server_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        server_thread.start()
+
+        try:
+            port = httpd.server_address[1]
+            slow_result: dict[str, object] = {}
+
+            def run_slow_request() -> None:
+                with urllib.request.urlopen(
+                    f"http://{dev_server.BIND_ADDRESS}:{port}/slow",
+                    timeout=2.0,
+                ) as response:
+                    slow_result["status"] = response.status
+                    slow_result["body"] = response.read().decode("utf-8")
+
+            slow_thread = threading.Thread(target=run_slow_request, daemon=True)
+            slow_thread.start()
+            self.assertTrue(slow_started.wait(timeout=1.0))
+
+            fast_started_at = time.perf_counter()
+            with urllib.request.urlopen(
+                f"http://{dev_server.BIND_ADDRESS}:{port}/fast",
+                timeout=1.0,
+            ) as response:
+                fast_body = response.read().decode("utf-8")
+                fast_status = response.status
+            fast_elapsed = time.perf_counter() - fast_started_at
+
+            release_slow.set()
+            slow_thread.join(timeout=1.0)
+
+            self.assertEqual(fast_status, 200)
+            self.assertEqual(fast_body, "fast")
+            self.assertLess(
+                fast_elapsed,
+                0.25,
+                "Fast request should not wait for a slow in-flight request.",
+            )
+            self.assertEqual(slow_result, {"status": 200, "body": "slow"})
+        finally:
+            release_slow.set()
+            httpd.shutdown()
+            httpd.server_close()
+            server_thread.join(timeout=1.0)
 
     def test_save_scenario_ownership_payload_legacy_owner_updates_preserve_controller_and_core_and_write_manual_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -991,7 +1068,161 @@ class DevServerTest(unittest.TestCase):
 
             self.assertEqual(exc_info.exception.code, "geo_locale_not_supported")
 
-    def test_apply_shared_district_template_payload_loads_context_once(self) -> None:
+    def test_save_scenario_ownership_payload_blocks_overlapping_save_until_first_commit_finishes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            owners_path = scenario_dir / "owners.by_feature.json"
+            first_write_started = threading.Event()
+            release_first_write = threading.Event()
+            second_reached_write = threading.Event()
+            original_write_json_atomic = dev_server.write_json_atomic
+            results: dict[str, object] = {}
+
+            def gated_write_json_atomic(path: Path, payload: object, **kwargs: object) -> None:
+                current_name = threading.current_thread().name
+                if Path(path) == owners_path and current_name == "first-save":
+                    first_write_started.set()
+                    self.assertTrue(release_first_write.wait(timeout=2.0))
+                elif Path(path) == owners_path and current_name == "second-save":
+                    second_reached_write.set()
+                    raise RuntimeError("intentional ownership write failure")
+                original_write_json_atomic(path, payload, **kwargs)
+
+            def run_first() -> None:
+                try:
+                    results["first"] = dev_server.save_scenario_ownership_payload(
+                        "test_scenario",
+                        {"DE-1": "BBB"},
+                        baseline_hash="baseline-123",
+                        root=root,
+                    )
+                except Exception as exc:  # pragma: no cover - failure path asserted below
+                    results["first_error"] = exc
+
+            def run_second() -> None:
+                try:
+                    dev_server.save_scenario_ownership_payload(
+                        "test_scenario",
+                        {"DE-2": "AAA"},
+                        baseline_hash="baseline-123",
+                        root=root,
+                    )
+                except Exception as exc:
+                    results["second_error"] = exc
+
+            with mock.patch.object(dev_server, "write_json_atomic", side_effect=gated_write_json_atomic):
+                first_thread = threading.Thread(target=run_first, name="first-save", daemon=True)
+                second_thread = threading.Thread(target=run_second, name="second-save", daemon=True)
+                first_thread.start()
+                self.assertTrue(first_write_started.wait(timeout=1.0))
+                second_thread.start()
+                time.sleep(0.15)
+                self.assertFalse(
+                    second_reached_write.is_set(),
+                    "Second overlapping ownership save should stay blocked until the first transaction commits.",
+                )
+                release_first_write.set()
+                first_thread.join(timeout=2.0)
+                second_thread.join(timeout=2.0)
+
+            self.assertNotIn("first_error", results)
+            self.assertIsInstance(results.get("second_error"), RuntimeError)
+            owners_payload = json.loads(owners_path.read_text(encoding="utf-8"))
+            manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            self.assertEqual(owners_payload["owners"]["DE-1"], "BBB")
+            self.assertEqual(owners_payload["owners"]["DE-2"], "BBB")
+            self.assertEqual(manual_payload["assignments"]["DE-1"]["owner"], "BBB")
+            self.assertNotIn("DE-2", manual_payload["assignments"])
+
+    def test_save_scenario_geo_locale_entry_blocks_overlapping_builder_and_preserves_committed_manual_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            builder_script = root / "tools" / "fake_builder.py"
+            builder_script.parent.mkdir(parents=True, exist_ok=True)
+            builder_script.write_text("# placeholder\n", encoding="utf-8")
+            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            first_builder_started = threading.Event()
+            release_first_builder = threading.Event()
+            second_builder_started = threading.Event()
+            results: dict[str, object] = {}
+
+            def fake_builder_run(command: list[str], **kwargs: object) -> mock.Mock:
+                current_name = threading.current_thread().name
+                manual_path = Path(command[command.index("--manual-overrides") + 1])
+                output_path = Path(command[command.index("--output") + 1])
+                manual_payload = json.loads(manual_path.read_text(encoding="utf-8"))
+                if current_name == "first-geo-save":
+                    first_builder_started.set()
+                    self.assertTrue(release_first_builder.wait(timeout=2.0))
+                    _write_json(
+                        output_path,
+                        {
+                            "version": 1,
+                            "scenario_id": "test_scenario",
+                            "generated_at": "first-pass",
+                            "geo": manual_payload.get("geo", {}),
+                        },
+                    )
+                    return mock.Mock(returncode=0, stdout="", stderr="")
+                second_builder_started.set()
+                return mock.Mock(returncode=1, stdout="", stderr="intentional builder failure")
+
+            def run_first() -> None:
+                try:
+                    results["first"] = dev_server.save_scenario_geo_locale_entry(
+                        "test_scenario",
+                        feature_id="AAA-1",
+                        en="Alpha One",
+                        zh="阿尔法一",
+                        root=root,
+                    )
+                except Exception as exc:  # pragma: no cover - failure path asserted below
+                    results["first_error"] = exc
+
+            def run_second() -> None:
+                try:
+                    dev_server.save_scenario_geo_locale_entry(
+                        "test_scenario",
+                        feature_id="AAA-1",
+                        en="Broken Update",
+                        zh="错误更新",
+                        root=root,
+                    )
+                except Exception as exc:
+                    results["second_error"] = exc
+
+            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {"test_scenario": builder_script}
+            try:
+                with mock.patch.object(dev_server.subprocess, "run", side_effect=fake_builder_run):
+                    first_thread = threading.Thread(target=run_first, name="first-geo-save", daemon=True)
+                    second_thread = threading.Thread(target=run_second, name="second-geo-save", daemon=True)
+                    first_thread.start()
+                    self.assertTrue(first_builder_started.wait(timeout=1.0))
+                    second_thread.start()
+                    time.sleep(0.15)
+                    self.assertFalse(
+                        second_builder_started.is_set(),
+                        "Second geo locale save should not enter the builder while the first transaction is still active.",
+                    )
+                    release_first_builder.set()
+                    first_thread.join(timeout=2.0)
+                    second_thread.join(timeout=2.0)
+            finally:
+                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+
+            self.assertNotIn("first_error", results)
+            self.assertIsInstance(results.get("second_error"), dev_server.DevServerError)
+            self.assertEqual(results["second_error"].code, "geo_locale_build_failed")
+            manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
+            patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha One")
+            self.assertEqual(manual_payload["geo"]["AAA-1"]["zh"], "阿尔法一")
+            self.assertEqual(patch_payload["geo"]["AAA-1"]["en"], "Alpha One")
+            self.assertEqual(patch_payload["generated_at"], "first-pass")
+
+    def test_apply_shared_district_template_payload_reloads_context_after_acquiring_transaction_lock(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             scenario_dir = self._create_scenario_fixture(root)
@@ -1029,7 +1260,7 @@ class DevServerTest(unittest.TestCase):
 
             district_payload = json.loads((scenario_dir / "district_groups.manual.json").read_text(encoding="utf-8"))
             self.assertTrue(apply_result["ok"])
-            self.assertEqual(call_count["value"], 1)
+            self.assertEqual(call_count["value"], 2)
             self.assertEqual(district_payload["tags"]["AAA"]["districts"]["alpha"]["feature_ids"], ["DE-1", "DE-3", "AAA-1"])
 
     def test_parse_args_accepts_fixed_port(self) -> None:

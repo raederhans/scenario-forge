@@ -2562,6 +2562,35 @@ TNO_1962_GREECE_COARSE_OWNER_BACKFILL = {
     "GR_ADM1_GRC-3001": "BUL",
 }
 
+TNO_1962_OWNER_ONLY_BACKFILL = {
+    "CI_ADM1_83157122B12160353323799": "AFA",
+    "CI_ADM1_83157122B20352934117266": "AFA",
+    "CI_ADM1_83157122B28791092437733": "AFA",
+    "CI_ADM1_83157122B58892240487392": "AFA",
+    "CI_ADM1_83157122B62906982633778": "AFA",
+    "CI_ADM1_83157122B69310198422077": "AFA",
+    "CI_ADM1_83157122B74959515955757": "AFA",
+    "CI_ADM1_83157122B79983119233374": "AFA",
+    "UKK11": "ENG",
+    "UKK12": "ENG",
+    "UKK23": "ENG",
+    "UKK25": "ENG",
+    "UKK43": "ENG",
+    "PL_POW_2001": "RKO",
+    "PL_POW_2009": "RKO",
+    "RU_RAY_50074027B11673707761487": "RKM",
+    "RU_RAY_50074027B49278461872326": "RKM",
+    "RU_RAY_50074027B5223158268211": "RKM",
+    "RU_RAY_50074027B5631740772865": "RKM",
+    "RU_RAY_50074027B58076034090645": "RKM",
+    "RU_RAY_50074027B64055482679717": "RKM",
+    "RU_RAY_50074027B71157437388348": "RKM",
+    "RU_RAY_50074027B87627181065564": "RKM",
+    "RU_RAY_50074027B99227036451137": "RKM",
+    "RU_RAY_50074027B99894122533642": "RKM",
+    "RU_RAY_50074027B93805213208185": "VOL",
+}
+
 TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
     "WRS": {
         "display_name": "West Russian Revolutionary Front",
@@ -7284,6 +7313,63 @@ def apply_tno_greece_coarse_owner_backfill(
     }
 
 
+def apply_tno_owner_only_backfill(
+    owners_payload: dict,
+    scenario_political_gdf: gpd.GeoDataFrame | None = None,
+) -> dict[str, object]:
+    runtime_feature_ids: set[str] = set()
+    shell_fragment_ids: set[str] = set()
+    if scenario_political_gdf is not None and not scenario_political_gdf.empty:
+        scenario_rows = scenario_political_gdf.to_dict("records")
+        runtime_feature_ids = {
+            str(row.get("id") or "").strip()
+            for row in scenario_rows
+            if str(row.get("id") or "").strip()
+        }
+        shell_fragment_ids = {
+            str(row.get("id") or "").strip()
+            for row in scenario_rows
+            if is_runtime_shell_fragment_row(row) and str(row.get("id") or "").strip()
+        }
+        missing_feature_ids = sorted(
+            feature_id for feature_id in TNO_1962_OWNER_ONLY_BACKFILL if feature_id not in runtime_feature_ids
+        )
+        if missing_feature_ids:
+            preview = ", ".join(missing_feature_ids[:10])
+            raise ValueError(f"TNO owner-only backfill references missing runtime feature id: {preview}")
+        shell_fragment_override_ids = sorted(
+            feature_id for feature_id in TNO_1962_OWNER_ONLY_BACKFILL if feature_id in shell_fragment_ids
+        )
+        if shell_fragment_override_ids:
+            preview = ", ".join(shell_fragment_override_ids[:10])
+            raise ValueError(
+                "TNO owner-only backfill cannot target runtime shell fragments: "
+                f"{preview}"
+            )
+
+    owners = owners_payload.setdefault("owners", {})
+    for feature_id, owner_tag in TNO_1962_OWNER_ONLY_BACKFILL.items():
+        owners[feature_id] = owner_tag
+
+    if scenario_political_gdf is not None and not scenario_political_gdf.empty:
+        id_series = scenario_political_gdf["id"].fillna("").astype(str).str.strip()
+        mask = id_series.isin(TNO_1962_OWNER_ONLY_BACKFILL)
+        if mask.any():
+            scenario_political_gdf.loc[mask, "cntr_code"] = id_series.loc[mask].map(TNO_1962_OWNER_ONLY_BACKFILL)
+
+    return {
+        "feature_count": len(TNO_1962_OWNER_ONLY_BACKFILL),
+        "by_tag": {
+            tag: sorted(
+                feature_id
+                for feature_id, applied_tag in TNO_1962_OWNER_ONLY_BACKFILL.items()
+                if applied_tag == tag
+            )
+            for tag in sorted(set(TNO_1962_OWNER_ONLY_BACKFILL.values()))
+        },
+    }
+
+
 def load_runtime_political_gdf() -> gpd.GeoDataFrame:
     topology_payload = load_json(RUNTIME_POLITICAL_PATH)
     runtime_gdf = topology_object_to_gdf(topology_payload, "political")
@@ -8591,6 +8677,10 @@ def build_countries_stage_state(
         cores_payload,
         scenario_political_gdf,
     )
+    owner_only_backfill_diagnostics = apply_tno_owner_only_backfill(
+        owners_payload,
+        scenario_political_gdf,
+    )
     greece_coarse_owner_backfill_diagnostics = apply_tno_greece_coarse_owner_backfill(
         owners_payload,
         controllers_payload,
@@ -8764,6 +8854,7 @@ def build_countries_stage_state(
         "restore_diagnostics": restore_diagnostics,
         "polar_feature_diagnostics": polar_feature_diagnostics,
         "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "owner_only_backfill_diagnostics": owner_only_backfill_diagnostics,
         "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
         "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
@@ -9003,6 +9094,10 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "atl_sea_feature_count": len(stage_metadata["atl_sea_feature_ids"]),
         "coastal_restore_stats": stage_metadata["restore_diagnostics"],
         "feature_assignment_override_diagnostics": stage_metadata["feature_assignment_override_diagnostics"],
+        "owner_only_backfill_diagnostics": stage_metadata.get(
+            "owner_only_backfill_diagnostics",
+            {"feature_count": 0, "by_tag": {}},
+        ),
         "greece_coarse_owner_backfill_diagnostics": stage_metadata.get(
             "greece_coarse_owner_backfill_diagnostics",
             {"feature_count": 0, "by_tag": {}},

@@ -18,7 +18,9 @@ from tools.patch_tno_1962_bundle import (
     MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
     TNO_1962_GREECE_COARSE_OWNER_BACKFILL,
+    TNO_1962_OWNER_ONLY_BACKFILL,
     apply_tno_greece_coarse_owner_backfill,
+    apply_tno_owner_only_backfill,
     apply_tno_feature_assignment_overrides,
     apply_dev_manual_overrides,
     build_relief_overlays,
@@ -859,6 +861,54 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 )
         finally:
             tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = original_overrides
+
+    def test_apply_tno_owner_only_backfill_updates_only_owners_and_runtime_cntr_code(self) -> None:
+        feature_ids = list(TNO_1962_OWNER_ONLY_BACKFILL.keys())
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {"id": feature_id, "name": feature_id, "cntr_code": "OLD", "geometry": _square(float(index), 0.0)}
+                for index, feature_id in enumerate(feature_ids)
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        owners_payload = {"owners": {feature_id: "OLD" for feature_id in feature_ids}}
+        controllers_payload = {"controllers": {feature_id: "KEEP" for feature_id in feature_ids}}
+        cores_payload = {"cores": {feature_id: ["KEEP"] for feature_id in feature_ids}}
+
+        diagnostics = apply_tno_owner_only_backfill(owners_payload, political_gdf)
+
+        self.assertEqual(diagnostics["feature_count"], len(TNO_1962_OWNER_ONLY_BACKFILL))
+        for feature_id, expected_owner in TNO_1962_OWNER_ONLY_BACKFILL.items():
+            self.assertEqual(owners_payload["owners"][feature_id], expected_owner)
+            self.assertEqual(controllers_payload["controllers"][feature_id], "KEEP")
+            self.assertEqual(cores_payload["cores"][feature_id], ["KEEP"])
+        runtime_owner_map = dict(zip(political_gdf["id"], political_gdf["cntr_code"]))
+        for feature_id, expected_owner in TNO_1962_OWNER_ONLY_BACKFILL.items():
+            self.assertEqual(runtime_owner_map[feature_id], expected_owner)
+
+    def test_checked_in_tno_1962_owner_only_backfill_matches_expected_visual_state(self) -> None:
+        scenario_dir = Path(tno_bundle.SCENARIO_DATA_DIR)
+        owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
+        countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
+
+        owners = owners_payload["owners"]
+        countries = countries_payload["countries"]
+        for feature_id, expected_owner in TNO_1962_OWNER_ONLY_BACKFILL.items():
+            self.assertEqual(owners.get(feature_id), expected_owner, feature_id)
+
+        expected_counts = {
+            "AFA": 117,
+            "FFR": 5,
+            "GCE": 1,
+            "ENG": 135,
+            "GER": 840,
+            "RKO": 68,
+            "RKM": 770,
+            "VOL": 30,
+        }
+        for tag, expected_count in expected_counts.items():
+            self.assertEqual(countries.get(tag, {}).get("feature_count"), expected_count, tag)
 
     def test_validate_publish_bundle_dir_rejects_strict_contract_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
