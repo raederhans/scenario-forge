@@ -591,10 +591,6 @@
               24.485890271616203
             ],
             [
-              10.3389977295999,
-              24.521062009091814
-            ],
-            [
               10.243902439024396,
               24.572416623166234
             ],
@@ -700,8 +696,16 @@
         "coordinates": [
           [
             [
-              10.274136465145672,
-              22.51961493710444
+              4.632335735123149,
+              19.221995081376903
+            ],
+            [
+              5.815858158581591,
+              19.448221789217897
+            ],
+            [
+              7.471874718747188,
+              20.873345081450807
             ],
             [
               11.971919719197189,
@@ -902,22 +906,6 @@
             [
               4.632335735123149,
               19.221995081376903
-            ],
-            [
-              5.815858158581591,
-              19.448221789217897
-            ],
-            [
-              6.952853093315574,
-              20.426689036235164
-            ],
-            [
-              7.471874718747188,
-              20.873345081450807
-            ],
-            [
-              10.274136465145672,
-              22.51961493710444
             ]
           ]
         ]
@@ -4573,7 +4561,7 @@
       }
     },
     {
-      "id": 12527,
+      "id": 12513,
       "type": "Feature",
       "properties": {
         "id": "ATLPRV_18179",
@@ -4585,6 +4573,8 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
+        "atl_geometry_role": "donor_land",
+        "atl_join_mode": "none",
         "interactive": true,
         "render_as_base_geography": false
       },
@@ -4717,7 +4707,7 @@
       }
     },
     {
-      "id": 12535,
+      "id": 12521,
       "type": "Feature",
       "properties": {
         "id": "ATLSHL_west_med_5",
@@ -4729,7 +4719,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "gap_fill",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {

@@ -907,6 +907,13 @@ class TnoBundleBuilderTest(unittest.TestCase):
         for tag in affected_tags:
             self.assertEqual(countries.get(tag, {}).get("feature_count"), owner_counts[tag], tag)
 
+    def test_atlantropa_west_med_owner_overrides_use_existing_algeria_subject_tags(self) -> None:
+        overrides = ATLANTROPA_REGION_CONFIGS["west_med"]["state_owner_overrides"]
+
+        self.assertEqual(overrides[8454], "ALC")
+        self.assertEqual(overrides[8465], "IAL")
+        self.assertNotIn("ALG", set(overrides.values()))
+
     def test_checkpoint_build_lock_is_reentrant_and_cleans_up(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             checkpoint_dir = Path(tmp_dir) / "checkpoint"

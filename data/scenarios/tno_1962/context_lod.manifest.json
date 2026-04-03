@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-28T21:25:26Z",
+  "generated_at": "2026-04-03T03:15:35Z",
   "layers": {
     "political": [
       {
@@ -458,6 +458,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.eg"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.eng"
         ]
       },
       {

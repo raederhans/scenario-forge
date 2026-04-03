@@ -366,7 +366,7 @@
       }
     },
     {
-      "id": 12520,
+      "id": 12506,
       "type": "Feature",
       "properties": {
         "id": "ATLPRV_18153",
@@ -378,12 +378,118 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
+        "atl_geometry_role": "donor_land",
+        "atl_join_mode": "none",
         "interactive": true,
         "render_as_base_geography": false
       },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
+          [
+            [
+              [
+                4.0232467251848085,
+                36.95945354865196
+              ],
+              [
+                4.023990512616993,
+                37.013986671145105
+              ],
+              [
+                3.9590724688041257,
+                37.01441998684131
+              ],
+              [
+                3.9613038311006785,
+                37.17801935432075
+              ],
+              [
+                3.896385787287811,
+                37.17845267001695
+              ],
+              [
+                3.8948982124234424,
+                37.06938642503066
+              ],
+              [
+                3.8299801686105748,
+                37.06981974072686
+              ],
+              [
+                3.8292363811783905,
+                37.015286618233716
+              ],
+              [
+                3.764318337365523,
+                37.015719933929915
+              ],
+              [
+                3.7804959325878715,
+                36.99315528410207
+              ],
+              [
+                3.818114018351542,
+                36.94068525250688
+              ],
+              [
+                4.070411328881454,
+                36.93034064440644
+              ],
+              [
+                4.088164768997676,
+                36.95902023295576
+              ],
+              [
+                4.023416724227211,
+                36.95945241394042
+              ],
+              [
+                4.0232467251848085,
+                36.95945354865196
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                4.217062674436008,
+                36.95815986375247
+              ],
+              [
+                4.153082812810544,
+                36.95858691725955
+              ],
+              [
+                4.152697556625061,
+                36.93034064440644
+              ],
+              [
+                4.347469418284542,
+                36.93034064440644
+              ],
+              [
+                4.34834127271861,
+                36.994263403237646
+              ],
+              [
+                4.348580731681331,
+                37.011820092664095
+              ],
+              [
+                4.218744644055596,
+                37.0126867240565
+              ],
+              [
+                4.218000856623411,
+                36.95815360156335
+              ],
+              [
+                4.217062674436008,
+                36.95815986375247
+              ]
+            ]
+          ],
           [
             [
               [
@@ -635,116 +741,12 @@
                 36.85688646790466
               ]
             ]
-          ],
-          [
-            [
-              [
-                3.764318337365523,
-                37.015719933929915
-              ],
-              [
-                3.7804959325878715,
-                36.99315528410207
-              ],
-              [
-                3.818114018351542,
-                36.94068525250688
-              ],
-              [
-                4.070411328881454,
-                36.93034064440644
-              ],
-              [
-                4.088164768997676,
-                36.95902023295576
-              ],
-              [
-                4.023416724227211,
-                36.95945241394042
-              ],
-              [
-                4.0232467251848085,
-                36.95945354865196
-              ],
-              [
-                4.023990512616993,
-                37.013986671145105
-              ],
-              [
-                3.9590724688041257,
-                37.01441998684131
-              ],
-              [
-                3.9613038311006785,
-                37.17801935432075
-              ],
-              [
-                3.896385787287811,
-                37.17845267001695
-              ],
-              [
-                3.8948982124234424,
-                37.06938642503066
-              ],
-              [
-                3.8299801686105748,
-                37.06981974072686
-              ],
-              [
-                3.8292363811783905,
-                37.015286618233716
-              ],
-              [
-                3.764318337365523,
-                37.015719933929915
-              ]
-            ]
-          ],
-          [
-            [
-              [
-                4.217062674436008,
-                36.95815986375247
-              ],
-              [
-                4.153082812810544,
-                36.95858691725955
-              ],
-              [
-                4.152697556625061,
-                36.93034064440644
-              ],
-              [
-                4.347469418284542,
-                36.93034064440644
-              ],
-              [
-                4.34834127271861,
-                36.994263403237646
-              ],
-              [
-                4.348580731681331,
-                37.011820092664095
-              ],
-              [
-                4.218744644055596,
-                37.0126867240565
-              ],
-              [
-                4.218000856623411,
-                36.95815360156335
-              ],
-              [
-                4.217062674436008,
-                36.95815986375247
-              ]
-            ]
           ]
         ]
       }
     },
     {
-      "id": 12536,
+      "id": 12522,
       "type": "Feature",
       "properties": {
         "id": "ATLSHL_west_med_6",
@@ -756,17 +758,15 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "gap_fill",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
-            [
-              4.610827252884747,
-              36.83993561308262
-            ],
             [
               4.614153411700305,
               36.83901972900349
@@ -782,13 +782,17 @@
             [
               4.610827252884747,
               36.83993561308262
+            ],
+            [
+              4.614153411700305,
+              36.83901972900349
             ]
           ]
         ]
       }
     },
     {
-      "id": 12537,
+      "id": 12523,
       "type": "Feature",
       "properties": {
         "id": "ATLSHL_west_med_7",
@@ -800,7 +804,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "gap_fill",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1064,7 +1070,7 @@
       }
     },
     {
-      "id": 12538,
+      "id": 12524,
       "type": "Feature",
       "properties": {
         "id": "ATLSHL_west_med_9",
@@ -1076,7 +1082,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "gap_fill",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1180,7 +1188,7 @@
       }
     },
     {
-      "id": 12551,
+      "id": 12537,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_22",
@@ -1192,7 +1200,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1240,7 +1250,7 @@
       }
     },
     {
-      "id": 12552,
+      "id": 12538,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_24",
@@ -1252,7 +1262,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1318,10 +1330,6 @@
           ],
           [
             [
-              1.9975612695370462,
-              36.66992466648692
-            ],
-            [
               1.8224355195599824,
               36.661388095013656
             ],
@@ -1336,13 +1344,17 @@
             [
               1.9975612695370462,
               36.66992466648692
+            ],
+            [
+              1.8224355195599824,
+              36.661388095013656
             ]
           ]
         ]
       }
     },
     {
-      "id": 12553,
+      "id": 12539,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_25",
@@ -1354,7 +1366,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1390,7 +1404,7 @@
       }
     },
     {
-      "id": 12554,
+      "id": 12540,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_26",
@@ -1402,7 +1416,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1488,7 +1504,7 @@
       }
     },
     {
-      "id": 12555,
+      "id": 12541,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_27",
@@ -1500,7 +1516,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1536,7 +1554,7 @@
       }
     },
     {
-      "id": 12556,
+      "id": 12542,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_29",
@@ -1548,7 +1566,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1608,7 +1628,7 @@
       }
     },
     {
-      "id": 12557,
+      "id": 12543,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_31",
@@ -1620,7 +1640,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -1672,7 +1694,7 @@
       }
     },
     {
-      "id": 12558,
+      "id": 12544,
       "type": "Feature",
       "properties": {
         "id": "ATLWLD_west_med_70",
@@ -1684,7 +1706,9 @@
         "scenario_id": "tno_1962",
         "region_group": "atlantropa_west_mediterranean_margin",
         "atl_surface_kind": "salt_flat_land",
-        "interactive": true,
+        "atl_geometry_role": "shore_seal",
+        "atl_join_mode": "boolean_weld",
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
