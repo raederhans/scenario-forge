@@ -13,6 +13,7 @@ from pathlib import Path
 from unittest import mock
 
 from map_builder import config as cfg
+from map_builder import scenario_context
 from map_builder import scenario_geo_locale_materializer
 from map_builder import scenario_materialization_service
 from map_builder.scenario_political_materializer import build_political_materialization_transaction
@@ -2044,14 +2045,18 @@ class DevServerTest(unittest.TestCase):
             )
             self.assertTrue(template_result["ok"])
 
-            original_load_scenario_context = dev_server.load_scenario_context
+            original_load_scenario_context = scenario_context.load_scenario_context
             call_count = {"value": 0}
 
             def counting_load_scenario_context(*args: object, **kwargs: object) -> dict[str, object]:
                 call_count["value"] += 1
                 return original_load_scenario_context(*args, **kwargs)
 
-            with mock.patch.object(dev_server, "load_scenario_context", side_effect=counting_load_scenario_context):
+            with mock.patch.object(
+                scenario_context,
+                "load_scenario_context",
+                side_effect=counting_load_scenario_context,
+            ):
                 apply_result = dev_server.apply_shared_district_template_payload(
                     "test_scenario",
                     tag="AAA",

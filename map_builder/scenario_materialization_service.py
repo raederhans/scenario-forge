@@ -7,6 +7,15 @@ from typing import Iterator
 
 from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_build_session import resolve_scenario_build_session
+from map_builder.scenario_context import (
+    capture_text_snapshot,
+    load_locked_scenario_context,
+    load_scenario_mutations_payload,
+    now_iso,
+    repo_relative,
+    restore_text_snapshot,
+    write_json_transaction,
+)
 from map_builder.scenario_geo_locale_materializer import (
     build_manual_geo_payload_from_mutations,
     materialize_scenario_geo_locale,
@@ -29,9 +38,11 @@ def load_locked_materialization_context(
     *,
     root: Path = ROOT,
 ) -> Iterator[dict[str, object]]:
-    from tools import dev_server
-
-    with dev_server._locked_scenario_context(scenario_id, root=root) as context:
+    with load_locked_scenario_context(
+        scenario_id,
+        root=root,
+        holder="scenario_materialization_service",
+    ) as context:
         yield context
 
 
@@ -65,14 +76,13 @@ def merge_mutation_patch(
 
 def _rollback_text_snapshots(
     *,
-    dev_server,
     error,
     manual_snapshot: tuple[Path, bool, str],
     mutations_snapshot: tuple[Path, bool, str],
 ) -> None:
     rollback_details = dict(error.details) if isinstance(error.details, dict) else {}
     try:
-        dev_server._restore_text_snapshot(
+        restore_text_snapshot(
             manual_snapshot[0],
             existed=manual_snapshot[1],
             original_text=manual_snapshot[2],
@@ -80,7 +90,7 @@ def _rollback_text_snapshots(
     except Exception as rollback_exc:
         rollback_details["rollbackError"] = str(rollback_exc)
     try:
-        dev_server._restore_text_snapshot(
+        restore_text_snapshot(
             mutations_snapshot[0],
             existed=mutations_snapshot[1],
             original_text=mutations_snapshot[2],
@@ -101,10 +111,10 @@ def _materialize_geo_locale_in_context(
 
     manual_path = Path(context["manualGeoOverridesPath"])
     mutations_path = Path(context["mutationsPath"])
-    manual_snapshot = dev_server._capture_text_snapshot(manual_path)
-    mutations_snapshot = dev_server._capture_text_snapshot(mutations_path)
+    manual_snapshot = capture_text_snapshot(manual_path)
+    mutations_snapshot = capture_text_snapshot(mutations_path)
 
-    generated_at = dev_server._now_iso()
+    generated_at = now_iso()
     mutations_payload["generated_at"] = generated_at
     manual_payload = build_manual_geo_payload_from_mutations(
         str(context["scenarioId"]),
@@ -126,7 +136,6 @@ def _materialize_geo_locale_in_context(
         )
     except dev_server.DevServerError as exc:
         _rollback_text_snapshots(
-            dev_server=dev_server,
             error=exc,
             manual_snapshot=manual_snapshot,
             mutations_snapshot=mutations_snapshot,
@@ -140,7 +149,6 @@ def _materialize_geo_locale_in_context(
             details={"error": repr(exc)},
         )
         _rollback_text_snapshots(
-            dev_server=dev_server,
             error=build_error,
             manual_snapshot=manual_snapshot,
             mutations_snapshot=mutations_snapshot,
@@ -167,7 +175,7 @@ def _materialize_district_groups_in_context(
     from tools import dev_server
 
     scenario_id = str(context["scenarioId"])
-    generated_at = dev_server._now_iso()
+    generated_at = now_iso()
     raw_tags = mutations_payload.get("district_groups", {})
     if not isinstance(raw_tags, dict):
         raw_tags = {}
@@ -207,13 +215,13 @@ def _materialize_district_groups_in_context(
     transaction_payloads: list[tuple[Path, object]] = [
         (Path(context["districtGroupsPath"]), district_groups_payload),
     ]
-    manifest_relative_path = dev_server._repo_relative(Path(context["districtGroupsPath"]), root=root)
+    manifest_relative_path = repo_relative(Path(context["districtGroupsPath"]), root=root)
     manifest_payload: dict[str, object] | None = None
     if str(context.get("manifest", {}).get("district_groups_url") or "").strip() != manifest_relative_path:
         manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
         manifest_payload["district_groups_url"] = manifest_relative_path
         transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
-    dev_server._write_json_transaction(transaction_payloads)
+    write_json_transaction(transaction_payloads)
     return {
         "districtGroupsPayload": district_groups_payload,
         "manifestPayload": manifest_payload,
@@ -226,11 +234,9 @@ def write_mutation_patch_in_locked_context(
     mutation_patch: dict[str, object] | None,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    from tools import dev_server
-
-    mutations_payload = dev_server._load_scenario_mutations_payload(context)
+    mutations_payload = load_scenario_mutations_payload(context)
     merged_payload = merge_mutation_patch(mutations_payload, mutation_patch)
-    merged_payload["generated_at"] = dev_server._now_iso()
+    merged_payload["generated_at"] = now_iso()
     write_json_atomic(
         Path(context["mutationsPath"]),
         merged_payload,
@@ -255,7 +261,7 @@ def materialize_in_locked_context(
     from tools import dev_server
 
     normalized_target = _validate_target(target)
-    mutations_payload = dev_server._load_scenario_mutations_payload(context)
+    mutations_payload = load_scenario_mutations_payload(context)
     results: dict[str, object] = {
         "scenarioId": str(context["scenarioId"]),
         "target": normalized_target,
@@ -264,13 +270,13 @@ def materialize_in_locked_context(
     }
 
     if normalized_target in {"political", "all"}:
-        mutations_payload["generated_at"] = dev_server._now_iso()
+        mutations_payload["generated_at"] = now_iso()
         transaction_payloads, materialized = dev_server._build_political_materialization_transaction(
             context,
             mutations_payload,
             root=root,
         )
-        dev_server._write_json_transaction(transaction_payloads)
+        write_json_transaction(transaction_payloads)
         results["political"] = {
             "transactionPayloads": transaction_payloads,
             "materialized": materialized,

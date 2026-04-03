@@ -13,13 +13,10 @@ if /I "%START_MODE%"=="fresh" (
 )
 if /I "%START_MODE%"=="full" (
   shift
+  goto :full
 )
 
-set "MAPCREATOR_SKIP_PAUSE=1"
-call build_data.bat %*
-if errorlevel 1 exit /b %ERRORLEVEL%
-
-call run_server.bat
+call run_server.bat %*
 exit /b %ERRORLEVEL%
 
 :fast
@@ -32,4 +29,12 @@ exit /b %ERRORLEVEL%
 set "MAPCREATOR_OPEN_PATH=/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=0"
 set "MAPCREATOR_DEV_CACHE_MODE=nostore"
 call run_server.bat %*
+exit /b %ERRORLEVEL%
+
+:full
+set "MAPCREATOR_SKIP_PAUSE=1"
+call build_data.bat %*
+if errorlevel 1 exit /b %ERRORLEVEL%
+
+call run_server.bat
 exit /b %ERRORLEVEL%

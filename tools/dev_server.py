@@ -12,7 +12,6 @@ import re
 from pathlib import Path
 import socketserver
 import sys
-import threading
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 import webbrowser
@@ -27,7 +26,18 @@ from map_builder.scenario_city_overrides_composer import (
     extract_city_assets_payload,
     normalize_capital_overrides_payload,
 )
-from map_builder.scenario_locks import scenario_build_lock
+from map_builder.scenario_context import (
+    _read_json as scenario_context_read_json,
+    ensure_path_within_allowed_bases as scenario_context_ensure_path_within_allowed_bases,
+    ensure_path_within_root as scenario_context_ensure_path_within_root,
+    load_locked_scenario_context as scenario_context_load_locked_scenario_context,
+    load_scenario_context as scenario_context_load_scenario_context,
+    locked_repo_paths as scenario_context_locked_repo_paths,
+    normalize_locked_paths as scenario_context_normalize_locked_paths,
+    repo_relative as scenario_context_repo_relative,
+    resolve_repo_path as scenario_context_resolve_repo_path,
+    scenario_transaction_paths as scenario_context_transaction_paths,
+)
 from map_builder.scenario_mutations import (
     DEFAULT_SCENARIO_MUTATIONS_FILENAME,
     default_scenario_mutations_payload,
@@ -54,15 +64,9 @@ PORT_START = 8000
 PORT_END = 8010
 BIND_ADDRESS = "127.0.0.1"
 RUNTIME_ACTIVE_SERVER_PATH = Path(".runtime") / "dev" / "active_server.json"
-SCENARIO_INDEX_PATH = ROOT / "data" / "scenarios" / "index.json"
 GEO_LOCALE_BUILDER_BY_SCENARIO = {
     "tno_1962": ROOT / "tools" / "build_tno_1962_geo_locale_patch.py",
 }
-DEFAULT_SCENARIO_RELEASABLE_CATALOG_FILENAME = "releasable_catalog.manual.json"
-DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME = "district_groups.manual.json"
-DEFAULT_SCENARIO_MANUAL_OVERRIDES_FILENAME = "scenario_manual_overrides.json"
-DEFAULT_SCENARIO_CITY_OVERRIDES_FILENAME = "city_overrides.json"
-DEFAULT_SCENARIO_CITY_ASSETS_PARTIAL_FILENAME = cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 MAX_JSON_BODY_BYTES = 1024 * 1024
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
@@ -71,8 +75,6 @@ DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
 GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
-_REPO_PATH_LOCKS_GUARD = threading.Lock()
-_REPO_PATH_LOCKS: dict[str, threading.RLock] = {}
 
 
 class DevServerError(Exception):
@@ -96,46 +98,17 @@ class DevServerTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 
 def _read_json(path: Path) -> object:
-    return json.loads(path.read_text(encoding="utf-8-sig"))
-
-
-def _get_repo_path_lock(path: Path) -> threading.RLock:
-    lock_key = str(Path(path).resolve()).casefold()
-    with _REPO_PATH_LOCKS_GUARD:
-        lock = _REPO_PATH_LOCKS.get(lock_key)
-        if lock is None:
-            lock = threading.RLock()
-            _REPO_PATH_LOCKS[lock_key] = lock
-        return lock
+    return scenario_context_read_json(path)
 
 
 def _normalize_locked_paths(paths: list[Path | None]) -> list[Path]:
-    normalized: list[Path] = []
-    seen: set[str] = set()
-    for raw_path in paths:
-        if raw_path is None:
-            continue
-        resolved = Path(raw_path).resolve()
-        key = str(resolved).casefold()
-        if key in seen:
-            continue
-        seen.add(key)
-        normalized.append(resolved)
-    normalized.sort(key=lambda value: str(value).casefold())
-    return normalized
+    return scenario_context_normalize_locked_paths(paths)
 
 
 @contextmanager
 def _locked_repo_paths(paths: list[Path | None]):
-    normalized_paths = _normalize_locked_paths(paths)
-    locks = [_get_repo_path_lock(path) for path in normalized_paths]
-    for lock in locks:
-        lock.acquire()
-    try:
+    with scenario_context_locked_repo_paths(paths):
         yield
-    finally:
-        for lock in reversed(locks):
-            lock.release()
 
 
 def _now_iso() -> str:
@@ -162,27 +135,15 @@ def _restore_text_snapshot(path: Path, *, existed: bool, original_text: str) -> 
 
 
 def _repo_relative(path: Path, *, root: Path = ROOT) -> str:
-    return path.resolve().relative_to(root.resolve()).as_posix()
+    return scenario_context_repo_relative(path, root=root)
 
 
 def _ensure_path_within_root(path: Path, *, root: Path = ROOT) -> Path:
-    resolved = path.resolve()
-    try:
-        resolved.relative_to(root.resolve())
-    except ValueError as exc:
-        raise DevServerError(
-            "path_outside_root",
-            f"Refused to access a path outside the repository root: {path}",
-            status=400,
-        ) from exc
-    return resolved
+    return scenario_context_ensure_path_within_root(path, root=root, error_cls=DevServerError)
 
 
 def _resolve_repo_path(raw_path: object, *, root: Path = ROOT) -> Path:
-    text = str(raw_path or "").strip()
-    if not text:
-        raise DevServerError("missing_path", "Required scenario path is missing.", status=400)
-    return _ensure_path_within_root(root / text, root=root)
+    return scenario_context_resolve_repo_path(raw_path, root=root, error_cls=DevServerError)
 
 
 def _ensure_path_within_allowed_bases(
@@ -192,19 +153,12 @@ def _ensure_path_within_allowed_bases(
     label: str,
     root: Path = ROOT,
 ) -> Path:
-    resolved = _ensure_path_within_root(path, root=root)
-    normalized_bases = tuple(_ensure_path_within_root(base, root=root) for base in allowed_bases if base)
-    for base in normalized_bases:
-        try:
-            resolved.relative_to(base)
-            return resolved
-        except ValueError:
-            continue
-    allowed_display = ", ".join(_repo_relative(base, root=root) for base in normalized_bases)
-    raise DevServerError(
-        "path_not_allowed",
-        f"{label} must stay within one of: {allowed_display}",
-        status=400,
+    return scenario_context_ensure_path_within_allowed_bases(
+        path,
+        allowed_bases=allowed_bases,
+        label=label,
+        root=root,
+        error_cls=DevServerError,
     )
 
 
@@ -361,184 +315,27 @@ def _load_scenario_index(*, root: Path = ROOT) -> dict[str, object]:
 
 
 def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str, object]:
-    normalized_id = str(scenario_id or "").strip()
-    if not normalized_id:
-        raise DevServerError("missing_scenario_id", "Scenario id is required.", status=400)
-
-    registry = _load_scenario_index(root=root)
-    scenarios = registry.get("scenarios", []) if isinstance(registry, dict) else []
-    scenario_entry = next(
-        (entry for entry in scenarios if str(entry.get("scenario_id") or "").strip() == normalized_id),
-        None,
-    )
-    if not scenario_entry:
-        raise DevServerError(
-            "unknown_scenario",
-            f"Scenario \"{normalized_id}\" was not found in the scenario registry.",
-            status=404,
-        )
-
-    manifest_path = _resolve_repo_path(scenario_entry.get("manifest_url"), root=root)
-    if not manifest_path.exists():
-        raise DevServerError(
-            "missing_manifest",
-            f"Manifest for scenario \"{normalized_id}\" does not exist: {manifest_path}",
-            status=404,
-        )
-    manifest = _read_json(manifest_path)
-    scenario_dir = _ensure_path_within_root(manifest_path.parent, root=root)
-    shared_data_dir = _ensure_path_within_root(root / "data", root=root)
-    tools_dir = _ensure_path_within_root(root / "tools", root=root)
-
-    owners_path = _resolve_repo_path(manifest.get("owners_url"), root=root)
-    countries_path = _resolve_repo_path(manifest.get("countries_url"), root=root)
-    controllers_url = str(manifest.get("controllers_url") or "").strip()
-    cores_url = str(manifest.get("cores_url") or "").strip()
-    releasable_catalog_url = str(manifest.get("releasable_catalog_url") or "").strip()
-    district_groups_url = str(manifest.get("district_groups_url") or "").strip()
-    city_overrides_url = str(manifest.get("city_overrides_url") or "").strip()
-    capital_hints_url = str(manifest.get("capital_hints_url") or "").strip()
-    geo_locale_patch_url = str(
-        manifest.get("geo_locale_patch_url")
-        or manifest.get("geo_locale_patch_url_en")
-        or manifest.get("geo_locale_patch_url_zh")
-        or ""
-    ).strip()
-    geo_locale_builder_url = str(manifest.get("geo_locale_builder_url") or "").strip()
-    controllers_path = _resolve_repo_path(controllers_url, root=root) if controllers_url else None
-    cores_path = _resolve_repo_path(cores_url, root=root) if cores_url else None
-    releasable_catalog_path = _resolve_repo_path(releasable_catalog_url, root=root) if releasable_catalog_url else None
-    district_groups_path = _resolve_repo_path(district_groups_url, root=root) if district_groups_url else (
-        scenario_dir / DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME
-    )
-    city_overrides_path = _resolve_repo_path(city_overrides_url, root=root) if city_overrides_url else (
-        scenario_dir / DEFAULT_SCENARIO_CITY_OVERRIDES_FILENAME
-    )
-    city_assets_partial_path = _ensure_path_within_root(
-        scenario_dir / DEFAULT_SCENARIO_CITY_ASSETS_PARTIAL_FILENAME,
+    return scenario_context_load_scenario_context(
+        scenario_id,
         root=root,
+        error_cls=DevServerError,
     )
-    capital_hints_path = _resolve_repo_path(capital_hints_url, root=root) if capital_hints_url else (
-        scenario_dir / "capital_hints.json"
-    )
-    capital_defaults_partial_path = _ensure_path_within_root(
-        scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
-        root=root,
-    )
-    geo_locale_patch_path = _resolve_repo_path(geo_locale_patch_url, root=root) if geo_locale_patch_url else None
-    geo_locale_builder_path = _resolve_repo_path(geo_locale_builder_url, root=root) if geo_locale_builder_url else None
-
-    for candidate in (
-        manifest_path,
-        owners_path,
-        countries_path,
-        controllers_path,
-        cores_path,
-        city_overrides_path,
-        city_assets_partial_path,
-        capital_hints_path,
-        capital_defaults_partial_path,
-        geo_locale_patch_path,
-        district_groups_path,
-    ):
-        if candidate:
-            _ensure_path_within_allowed_bases(
-                candidate,
-                allowed_bases=(scenario_dir,),
-                label="Scenario file",
-                root=root,
-            )
-    if releasable_catalog_path:
-        releasable_catalog_path = _ensure_path_within_allowed_bases(
-            releasable_catalog_path,
-            allowed_bases=(scenario_dir, shared_data_dir),
-            label="Releasable catalog path",
-            root=root,
-        )
-    if geo_locale_builder_path:
-        geo_locale_builder_path = _ensure_path_within_allowed_bases(
-            geo_locale_builder_path,
-            allowed_bases=(scenario_dir, tools_dir),
-            label="Geo locale builder path",
-            root=root,
-        )
-
-    context = {
-        "scenarioId": normalized_id,
-        "manifest": manifest,
-        "manifestPath": manifest_path,
-        "scenarioDir": scenario_dir,
-        "ownersPath": owners_path,
-        "countriesPath": countries_path,
-        "controllersPath": controllers_path,
-        "coresPath": cores_path,
-        "releasableCatalogUrl": releasable_catalog_url,
-        "releasableCatalogPath": releasable_catalog_path,
-        "releasableCatalogLocalPath": _ensure_path_within_root(
-            scenario_dir / DEFAULT_SCENARIO_RELEASABLE_CATALOG_FILENAME,
-            root=root,
-        ),
-        "districtGroupsUrl": district_groups_url,
-        "districtGroupsPath": district_groups_path,
-        "cityOverridesUrl": city_overrides_url,
-        "cityOverridesPath": city_overrides_path,
-        "cityAssetsPartialPath": city_assets_partial_path,
-        "capitalHintsUrl": capital_hints_url,
-        "capitalHintsPath": capital_hints_path,
-        "capitalDefaultsPartialPath": capital_defaults_partial_path,
-        "geoLocalePatchPath": geo_locale_patch_path,
-        "geoLocaleBuilderPath": geo_locale_builder_path,
-        "manualGeoOverridesPath": _ensure_path_within_root(
-            scenario_dir / "geo_name_overrides.manual.json",
-            root=root,
-        ),
-        "manualOverridesPath": _ensure_path_within_root(
-            scenario_dir / DEFAULT_SCENARIO_MANUAL_OVERRIDES_FILENAME,
-            root=root,
-        ),
-        "mutationsPath": _ensure_path_within_root(
-            scenario_dir / DEFAULT_SCENARIO_MUTATIONS_FILENAME,
-            root=root,
-        ),
-    }
-    return context
 
 
 def _scenario_transaction_paths(context: dict[str, object]) -> list[Path]:
-    paths: list[Path | None] = [
-        Path(context["manifestPath"]),
-        Path(context["countriesPath"]),
-        Path(context["ownersPath"]),
-        context.get("controllersPath"),
-        context.get("coresPath"),
-        Path(context["releasableCatalogLocalPath"]),
-        Path(context["districtGroupsPath"]),
-        Path(context["cityOverridesPath"]),
-        Path(context["cityAssetsPartialPath"]),
-        Path(context["capitalHintsPath"]),
-        Path(context["capitalDefaultsPartialPath"]),
-        Path(context["manualOverridesPath"]),
-        Path(context["mutationsPath"]),
-        context.get("geoLocalePatchPath"),
-        Path(context["manualGeoOverridesPath"]),
-    ]
-    return [Path(path) for path in _normalize_locked_paths(paths)]
+    return [Path(path) for path in scenario_context_transaction_paths(context)]
 
 
 @contextmanager
 def _locked_scenario_context(scenario_id: object, *, root: Path = ROOT, extra_paths: list[Path | None] | None = None):
-    initial_context = load_scenario_context(scenario_id, root=root)
-    lock_paths: list[Path | None] = _scenario_transaction_paths(initial_context)
-    if extra_paths:
-        lock_paths.extend(extra_paths)
-    with scenario_build_lock(
+    with scenario_context_load_locked_scenario_context(
+        scenario_id,
         root=root,
-        scenario_id=str(initial_context["scenarioId"]),
-        scenario_dir=Path(initial_context["scenarioDir"]),
+        extra_paths=extra_paths,
         holder="dev_server",
-    ):
-        with _locked_repo_paths(lock_paths):
-            yield load_scenario_context(scenario_id, root=root)
+        error_cls=DevServerError,
+    ) as context:
+        yield context
 
 
 def _extract_allowed_country_tags(payload: object) -> set[str]:

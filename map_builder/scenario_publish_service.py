@@ -9,6 +9,10 @@ from map_builder.scenario_build_session import (
     ensure_scenario_build_session,
     record_published_target,
 )
+from map_builder.scenario_context import (
+    ScenarioContextError,
+    load_locked_scenario_context,
+)
 from map_builder.scenario_geo_locale_materializer import (
     NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME,
 )
@@ -30,9 +34,11 @@ def load_locked_publish_context(
     *,
     root: Path = ROOT,
 ) -> Iterator[dict[str, object]]:
-    from tools import dev_server
-
-    with dev_server._locked_scenario_context(scenario_id, root=root) as context:
+    with load_locked_scenario_context(
+        scenario_id,
+        root=root,
+        holder="scenario_publish_service",
+    ) as context:
         yield context
 
 
@@ -65,8 +71,6 @@ def publish_scenario_outputs_in_locked_context(
     root: Path = ROOT,
     checkpoint_dir: Path | None = None,
 ) -> dict[str, object]:
-    from tools import dev_server
-
     normalized_target = _validate_target(target)
     scenario_id = str(context["scenarioId"])
     scenario_dir = Path(context["scenarioDir"])
@@ -87,7 +91,7 @@ def publish_scenario_outputs_in_locked_context(
             source_geo_locale_path = resolved_checkpoint_dir / NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME
             geo_locale_path = Path(context["geoLocalePatchPath"])
             if not source_geo_locale_path.exists():
-                raise dev_server.DevServerError(
+                raise ScenarioContextError(
                     "missing_geo_locale_patch",
                     "The active scenario does not have a generated geo locale patch to publish.",
                     status=400,
@@ -105,7 +109,7 @@ def publish_scenario_outputs_in_locked_context(
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
             return results
-        raise dev_server.DevServerError(
+        raise ScenarioContextError(
             "publish_target_not_supported",
             f'Scenario "{scenario_id}" does not support publish target "{normalized_target}" yet.',
             status=501,
