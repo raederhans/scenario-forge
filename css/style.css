@@ -6253,6 +6253,7 @@ body.counter-editor-modal-open {
 
 .country-select-row {
   justify-content: space-between;
+  align-items: flex-start;
   background: linear-gradient(180deg, rgba(239, 243, 247, 0.84) 0%, rgba(232, 238, 243, 0.78) 100%);
   text-align: left;
   cursor: pointer;
@@ -6334,7 +6335,7 @@ body.counter-editor-modal-open {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: 1 1 auto;
 }
 
@@ -6356,26 +6357,33 @@ body.counter-editor-modal-open {
 .country-select-title {
   min-width: 0;
   font-size: 0.86rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-weight: 700;
+  line-height: 1.28;
   color: var(--text-primary);
+  word-break: break-word;
 }
 
 .country-select-meta {
   min-width: 0;
-  font-size: 0.71rem;
-  line-height: 1.4;
+  font-size: 0.72rem;
+  line-height: 1.35;
   color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .country-select-side {
   flex: 0 0 auto;
   display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.country-select-corner {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .country-select-swatch {
@@ -6391,14 +6399,26 @@ body.counter-editor-modal-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.45rem;
-  height: 1.45rem;
-  padding: 0 6px;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 5px;
   border-radius: 999px;
-  background: rgba(37, 54, 73, 0.08);
-  color: var(--text-secondary);
-  font-size: 0.7rem;
+  background: rgba(32, 76, 119, 0.1);
+  color: var(--color-accent);
+  font-size: 0.68rem;
   font-weight: 700;
+  line-height: 1;
+}
+
+.country-children-toggle {
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
   line-height: 1;
 }
 
@@ -6620,6 +6640,46 @@ button.scenario-action-card:hover {
   justify-content: space-between;
 }
 
+.inspector-action-disclosure {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+}
+
+.inspector-action-disclosure > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 10px 12px;
+  background: rgba(245, 248, 251, 0.92);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.inspector-action-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.inspector-action-disclosure > summary::after {
+  content: ">";
+  float: right;
+  color: var(--text-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.inspector-action-disclosure[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.inspector-action-disclosure-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+
 .inspector-detail-card {
   display: flex;
   flex-direction: column;
@@ -6661,6 +6721,10 @@ button.scenario-action-card:hover {
   min-width: 0;
 }
 
+#countryInspectorColorRow .inspector-color-row-main {
+  gap: 0;
+}
+
 .inspector-color-swatch-btn {
   width: 34px;
   height: 34px;
@@ -6670,6 +6734,13 @@ button.scenario-action-card:hover {
   background: #cccccc;
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+#countryInspectorColorRow .inspector-color-swatch-btn {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 8px;
 }
 
 .inspector-color-value {
@@ -6710,6 +6781,12 @@ button.scenario-action-card:hover {
   padding-right: 4px;
 }
 
+.inspector-action-list-natural {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
 .inspector-action-section {
   margin-top: 0;
 }
@@ -6737,11 +6814,22 @@ button.scenario-action-card:hover {
   background: rgba(255, 255, 255, 0.84);
 }
 
+.inspector-color-sync-row-compact {
+  padding: 10px 12px;
+  flex-wrap: nowrap;
+}
+
 .inspector-color-sync-copy {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.inspector-color-sync-title {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.2;
 }
 
 .inspector-color-sync-text {
@@ -6759,6 +6847,14 @@ button.scenario-action-card:hover {
 
 .inspector-color-sync-swatch {
   flex: 0 0 auto;
+}
+
+.inspector-color-sync-trigger {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .inspector-empty-state {

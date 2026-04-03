@@ -3103,16 +3103,13 @@ function initSidebar({ render } = {}) {
   const unitCounterCatalogCategoriesEl = document.getElementById("unitCounterCatalogCategories");
   const unitCounterCatalogGrid = document.getElementById("unitCounterCatalogGrid");
   const debugModeSelect = document.getElementById("debug-mode-select");
-  const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
+  const countryInspectorDetail = document.getElementById("countryInspectorDetail");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
   const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
   const countryInspectorDetailHint = document.getElementById("countryInspectorDetailHint");
   const countryInspectorColorRow = document.getElementById("countryInspectorColorRow");
-  const countryInspectorColorLabel = document.getElementById("countryInspectorColorLabel");
   const countryInspectorColorSwatch = document.getElementById("countryInspectorColorSwatch");
-  const countryInspectorColorValue = document.getElementById("countryInspectorColorValue");
   const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
-  const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const waterInspectorSection = document.getElementById("waterInspectorSection");
   const waterInspectorOpenOceanToggle = document.getElementById("waterInspectorOpenOceanToggle");
@@ -3150,8 +3147,6 @@ function initSidebar({ render } = {}) {
   const frontlineProjectSection = document.getElementById("frontlineProjectSection");
   const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
-  const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
-  const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
   let counterEditorModalPreviouslyFocused = null;
   const STRATEGIC_OVERLAY_REFRESH_SCOPES = Object.freeze([
     "frontlineControls",
@@ -3291,9 +3286,6 @@ function initSidebar({ render } = {}) {
     }
     projectLegendSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     diagnosticsSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
-    if (countryInspectorOrderingHint) {
-      countryInspectorOrderingHint.classList.add("hidden");
-    }
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.classList.remove("hidden");
       selectedCountryActionsSection.setAttribute("aria-hidden", "false");
@@ -3301,14 +3293,6 @@ function initSidebar({ render } = {}) {
     if (projectLegendSection && diagnosticsSection && isScenarioMode) {
       projectLegendSection.open = false;
       diagnosticsSection.open = false;
-    }
-    if (selectedCountryActionsTitle) {
-      selectedCountryActionsTitle.textContent = isScenarioMode
-        ? t("Scenario Actions", "ui")
-        : t("Selected Country Actions", "ui");
-    }
-    if (selectedCountryActionHint) {
-      selectedCountryActionHint.classList.add("hidden");
     }
   };
 
@@ -3329,6 +3313,7 @@ function initSidebar({ render } = {}) {
   let waterInspectorColorPickerOpen = false;
   let specialRegionColorPickerOpen = false;
   let lastScenarioInspectorDefaultsKey = null;
+  const inspectorDisclosureOpenByKey = new Map();
 
   const collapseScenarioManagedSections = () => {
     countryInspectorSection?.removeAttribute("open");
@@ -3340,6 +3325,19 @@ function initSidebar({ render } = {}) {
 
   const clampInspectorHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
   const toViewportPixels = (vh) => (window.innerHeight * vh) / 100;
+
+  const getInspectorDisclosureOpenState = (key, fallbackOpen) => {
+    if (!key) return !!fallbackOpen;
+    if (!inspectorDisclosureOpenByKey.has(key)) {
+      inspectorDisclosureOpenByKey.set(key, !!fallbackOpen);
+    }
+    return !!inspectorDisclosureOpenByKey.get(key);
+  };
+
+  const setInspectorDisclosureOpenState = (key, isOpen) => {
+    if (!key) return;
+    inspectorDisclosureOpenByKey.set(key, !!isOpen);
+  };
 
   const applyAdaptiveInspectorHeight = (element, minimum, maximum) => {
     if (!element) return;
@@ -3378,16 +3376,9 @@ function initSidebar({ render } = {}) {
     );
     applyAdaptiveInspectorHeight(
       presetTree,
-      toViewportPixels(INSPECTOR_VH_BASELINE.presetTree),
+      0,
       toViewportPixels(INSPECTOR_VH_BASELINE.presetTreeCap)
     );
-    sidebar?.querySelectorAll(".inspector-action-list").forEach((element) => {
-      applyAdaptiveInspectorHeight(
-        element,
-        INSPECTOR_PX_BASELINE.actionList,
-        INSPECTOR_PX_BASELINE.actionListCap
-      );
-    });
     sidebar?.querySelectorAll(".preset-country-body").forEach((element) => {
       applyAdaptiveInspectorHeight(
         element,
@@ -4742,6 +4733,7 @@ function initSidebar({ render } = {}) {
     const isSelected = state.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
     row.classList.toggle("is-active-owner", isActiveOwner);
+    row.classList.toggle("has-children", hasChildren);
 
     const main = document.createElement("button");
     main.type = "button";
@@ -4762,11 +4754,33 @@ function initSidebar({ render } = {}) {
     const side = document.createElement("div");
     side.className = "country-select-side";
 
-    if (hasChildren && !hideExpandToggle) {
+    if (hasChildren) {
+      const corner = document.createElement("div");
+      corner.className = "country-select-corner";
       const countBadge = document.createElement("span");
       countBadge.className = "country-children-count";
       countBadge.textContent = String(childCount);
-      side.appendChild(countBadge);
+      corner.appendChild(countBadge);
+
+      if (!hideExpandToggle) {
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "country-action-btn country-children-toggle";
+        toggleBtn.textContent = isExpanded ? "v" : ">";
+        toggleBtn.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
+        toggleBtn.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (state.expandedInspectorReleaseParents.has(countryState.code)) {
+            state.expandedInspectorReleaseParents.delete(countryState.code);
+          } else {
+            state.expandedInspectorReleaseParents.add(countryState.code);
+          }
+          renderList();
+        });
+        corner.appendChild(toggleBtn);
+      }
+      side.appendChild(corner);
     }
 
     const swatch = document.createElement("span");
@@ -4776,25 +4790,6 @@ function initSidebar({ render } = {}) {
     main.appendChild(title);
     main.appendChild(meta);
     row.appendChild(main);
-
-    if (hasChildren && !hideExpandToggle) {
-      const toggleBtn = document.createElement("button");
-      toggleBtn.type = "button";
-      toggleBtn.className = "country-action-btn";
-      toggleBtn.textContent = isExpanded ? "v" : ">";
-      toggleBtn.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
-      toggleBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (state.expandedInspectorReleaseParents.has(countryState.code)) {
-          state.expandedInspectorReleaseParents.delete(countryState.code);
-        } else {
-          state.expandedInspectorReleaseParents.add(countryState.code);
-        }
-        renderList();
-      });
-      side.appendChild(toggleBtn);
-    }
 
     side.appendChild(swatch);
     row.appendChild(side);
@@ -4939,7 +4934,7 @@ function initSidebar({ render } = {}) {
   };
 
   const renderCountryInspectorDetail = () => {
-    if (!countryInspectorEmpty || !countryInspectorSelected) return;
+    if (!countryInspectorSelected) return;
     incrementSidebarCounter("inspectorRenders");
 
     updateScenarioInspectorLayout();
@@ -4948,7 +4943,9 @@ function initSidebar({ render } = {}) {
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
     const isEmpty = !countryState;
 
-    countryInspectorEmpty.classList.toggle("hidden", !isEmpty);
+    if (countryInspectorDetail) {
+      countryInspectorDetail.classList.toggle("hidden", isEmpty);
+    }
     countryInspectorSelected.classList.toggle("hidden", isEmpty);
 
     if (!countryState) {
@@ -5003,19 +5000,13 @@ function initSidebar({ render } = {}) {
     if (countryInspectorColorRow) {
       const resolvedColor = getDisplayCountryColor(countryState);
       countryInspectorColorRow.classList.remove("hidden");
-      if (countryInspectorColorLabel) {
-        countryInspectorColorLabel.textContent = t("Country Color", "ui");
-      }
       if (countryInspectorColorSwatch) {
         countryInspectorColorSwatch.style.backgroundColor = resolvedColor;
-        countryInspectorColorSwatch.title = `${t("Edit country color", "ui")}: ${countryState.displayName} (${resolvedColor.toUpperCase()})`;
+        countryInspectorColorSwatch.title = `${t("Edit country color", "ui")}: ${countryState.displayName}`;
         countryInspectorColorSwatch.setAttribute(
           "aria-label",
-          `${t("Edit country color", "ui")}: ${countryState.displayName} (${resolvedColor.toUpperCase()})`
+          `${t("Edit country color", "ui")}: ${countryState.displayName}`
         );
-      }
-      if (countryInspectorColorValue) {
-        countryInspectorColorValue.textContent = resolvedColor.toUpperCase();
       }
       if (countryInspectorColorInput) {
         countryInspectorColorInput.disabled = false;
@@ -5967,17 +5958,50 @@ function initSidebar({ render } = {}) {
     clearSpecialRegionColorBtn.dataset.bound = "true";
   }
 
-  const appendActionSection = (container, titleText) => {
-    const section = document.createElement("div");
-    section.className = "inspector-detail-section inspector-action-section";
-    const title = document.createElement("div");
-    title.className = "section-header-block";
-    title.textContent = titleText;
+  const appendActionSection = (
+    container,
+    titleText,
+    {
+      collapsible = false,
+      defaultOpen = true,
+      rememberKey = "",
+      bodyClassName = "",
+    } = {}
+  ) => {
     const body = document.createElement("div");
-    body.className = "inspector-action-list inspector-action-section-body";
-    section.appendChild(title);
-    section.appendChild(body);
-    container.appendChild(section);
+    body.className = [
+      "inspector-action-section-body",
+      bodyClassName,
+      collapsible ? "inspector-action-disclosure-body" : "inspector-action-list",
+    ].filter(Boolean).join(" ");
+
+    if (!collapsible) {
+      const section = document.createElement("div");
+      section.className = "inspector-detail-section inspector-action-section";
+      const title = document.createElement("div");
+      title.className = "section-header-block";
+      title.textContent = titleText;
+      section.appendChild(title);
+      section.appendChild(body);
+      container.appendChild(section);
+      return body;
+    }
+
+    const details = document.createElement("details");
+    details.className = "inspector-action-disclosure";
+    details.open = getInspectorDisclosureOpenState(rememberKey, defaultOpen);
+    details.addEventListener("toggle", () => {
+      setInspectorDisclosureOpenState(rememberKey, details.open);
+      scheduleAdaptiveInspectorHeights();
+    });
+
+    const summary = document.createElement("summary");
+    summary.className = "inspector-action-disclosure-summary";
+    summary.textContent = titleText;
+
+    details.appendChild(summary);
+    details.appendChild(body);
+    container.appendChild(details);
     return body;
   };
 
@@ -6093,48 +6117,43 @@ function initSidebar({ render } = {}) {
 
     const resolvedColor = getDisplayCountryColor(countryState);
     const row = document.createElement("div");
-    row.className = "inspector-color-sync-row";
+    row.className = "inspector-color-sync-row inspector-color-sync-row-compact";
 
     const copy = document.createElement("div");
     copy.className = "inspector-color-sync-copy";
 
-    const swatch = document.createElement("span");
-    swatch.className = "country-select-swatch inspector-color-sync-swatch";
-    swatch.style.backgroundColor = resolvedColor;
+    const compactTitle = document.createElement("div");
+    compactTitle.className = "section-header-block inspector-color-sync-title";
+    compactTitle.textContent = t("Country Color", "ui");
+    copy.appendChild(compactTitle);
 
-    const textWrap = document.createElement("div");
-    textWrap.className = "inspector-color-sync-text";
-
-    const title = document.createElement("div");
-    title.className = "section-header-block";
-    title.textContent = t("Country Color", "ui");
-
-    const note = document.createElement("div");
-    note.className = "inspector-color-sync-note";
-    note.textContent = `${countryState.displayName} · ${resolvedColor.toUpperCase()}`;
-
-    textWrap.appendChild(title);
-    textWrap.appendChild(note);
-    copy.appendChild(swatch);
-    copy.appendChild(textWrap);
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn-secondary";
-    button.textContent = t("Use Country Color for Visual Actions", "ui");
-    button.addEventListener("click", () => {
+    const compactButton = document.createElement("button");
+    compactButton.type = "button";
+    compactButton.className = "country-select-swatch inspector-color-sync-swatch inspector-color-sync-trigger";
+    compactButton.style.backgroundColor = resolvedColor;
+    compactButton.title = `${t("Use Country Color for Visual Actions", "ui")}: ${countryState.displayName}`;
+    compactButton.setAttribute(
+      "aria-label",
+      `${t("Use Country Color for Visual Actions", "ui")}: ${countryState.displayName}`
+    );
+    compactButton.addEventListener("click", () => {
       syncSelectedColorFromCountry(countryState);
     });
 
     row.appendChild(copy);
-    row.appendChild(button);
+    row.appendChild(compactButton);
     container.appendChild(row);
+    return;
   };
 
   const renderParentCountryActions = (container, countryState) => {
     renderCountryColorSyncAffordance(container, countryState);
     const actionGuarded = renderNoActiveGuard(container);
-    const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+    const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
+      collapsible: true,
+      defaultOpen: false,
+      rememberKey: "territories-presets:hierarchy-groups",
+    });
     if (countryState.hierarchyGroups.length > 0) {
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
@@ -6151,7 +6170,11 @@ function initSidebar({ render } = {}) {
       groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
     }
 
-    const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
+    const presetSection = appendActionSection(container, t("Regional Presets", "ui"), {
+      collapsible: true,
+      defaultOpen: false,
+      rememberKey: "territories-presets:regional-presets",
+    });
     const filteredPresetEntries = getFilteredRegionalPresets(countryState);
     if (filteredPresetEntries.length > 0) {
       renderPresetEntryRows(
@@ -6182,7 +6205,9 @@ function initSidebar({ render } = {}) {
     const children = Array.isArray(childStates) ? childStates : [];
     if (!children.length) return;
 
-    const section = appendActionSection(container, title || t("Related Countries", "ui"));
+    const section = appendActionSection(container, title || t("Related Countries", "ui"), {
+      bodyClassName: "inspector-action-list-natural",
+    });
     children.forEach((childState) => {
       const card = document.createElement("button");
       card.type = "button";
@@ -6235,7 +6260,11 @@ function initSidebar({ render } = {}) {
     });
 
     if (countryState.hierarchyGroups.length > 0) {
-      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
+        collapsible: true,
+        defaultOpen: false,
+        rememberKey: "territories-presets:hierarchy-groups",
+      });
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
           t(group.label, "geo") || group.label,
@@ -6250,12 +6279,20 @@ function initSidebar({ render } = {}) {
         groupSection.appendChild(button);
       });
     } else {
-      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
+        collapsible: true,
+        defaultOpen: false,
+        rememberKey: "territories-presets:hierarchy-groups",
+      });
       groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
     }
 
     const filteredPresetEntries = getFilteredRegionalPresets(countryState);
-    const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
+    const presetSection = appendActionSection(container, t("Regional Presets", "ui"), {
+      collapsible: true,
+      defaultOpen: false,
+      rememberKey: "territories-presets:regional-presets",
+    });
     renderPresetEntryRows(
       presetSection,
       countryState.presetLookupCode || countryState.code,
@@ -6670,16 +6707,11 @@ function initSidebar({ render } = {}) {
 
   const renderScenarioActionsPanel = (container, countryState) => {
     container.replaceChildren();
-    renderScenarioActionStatus(container);
     if (countryState) {
       renderCountryColorSyncAffordance(container, countryState);
     }
 
     if (!countryState) {
-      container.appendChild(
-        createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
-      );
-      renderScenarioVisualAdjustments(container, null);
       return;
     }
 
@@ -6707,9 +6739,6 @@ function initSidebar({ render } = {}) {
     }
 
     if (!countryState) {
-      presetTree.appendChild(
-        createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
-      );
       scheduleAdaptiveInspectorHeights();
       return;
     }

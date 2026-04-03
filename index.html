@@ -1554,25 +1554,14 @@
               </span>
             </summary>
             <div class="inspector-panel-body">
-              <h3 id="lblCountryColors" class="section-header-block">Country Colors</h3>
-              <p id="countryInspectorOrderingHint" class="sidebar-tool-hint inspector-ordering-hint mt-2 hidden">
-                Key scenario countries first. Releasables appear under parent countries.
-              </p>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="countryInspectorEmpty" class="inspector-empty-state">
-                  <h3 id="countryInspectorEmptyTitle" class="section-header-block">Select a country to inspect</h3>
-                  <p id="countryInspectorEmptyHint" class="sidebar-tool-hint">
-                    Choose a country above, then use Active Owner and the Territories &amp; Presets panel.
-                  </p>
-                </div>
                 <div id="countryInspectorSelected" class="hidden">
                   <div class="inspector-detail-actions mt-3">
                     <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Use as Active Owner</button>
                   </div>
                   <p id="countryInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                   <div id="countryInspectorColorRow" class="inspector-color-row mt-3 hidden">
-                    <h3 id="countryInspectorColorLabel" class="section-header-block">Country Color</h3>
                     <div class="inspector-color-row-main mt-2">
                       <button
                         id="countryInspectorColorSwatch"
@@ -1580,7 +1569,6 @@
                         class="inspector-color-swatch-btn"
                         aria-label="Edit country color"
                       ></button>
-                      <div id="countryInspectorColorValue" class="inspector-color-value">#cccccc</div>
                       <input
                         id="countryInspectorColorInput"
                         type="color"
@@ -1610,8 +1598,6 @@
               </span>
             </summary>
             <div class="inspector-panel-body">
-              <h3 class="section-header-block" id="lblHistoricalPresets">Selected Country Actions</h3>
-              <p id="selectedCountryActionHint" class="tip-text mt-2 hidden">Choose a country above to inspect territories, presets, and releasables.</p>
               <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>
