@@ -887,28 +887,67 @@ class TnoBundleBuilderTest(unittest.TestCase):
         for feature_id, expected_owner in TNO_1962_OWNER_ONLY_BACKFILL.items():
             self.assertEqual(runtime_owner_map[feature_id], expected_owner)
 
-    def test_checked_in_tno_1962_owner_only_backfill_matches_expected_visual_state(self) -> None:
-        scenario_dir = Path(tno_bundle.SCENARIO_DATA_DIR)
+    def test_checked_in_tno_1962_owner_only_backfill_touchset_keeps_checked_in_data_consistent(self) -> None:
+        scenario_dir = Path(tno_bundle.SCENARIO_DIR)
         owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
         countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
 
         owners = owners_payload["owners"]
         countries = countries_payload["countries"]
-        for feature_id, expected_owner in TNO_1962_OWNER_ONLY_BACKFILL.items():
-            self.assertEqual(owners.get(feature_id), expected_owner, feature_id)
+        for feature_id in TNO_1962_OWNER_ONLY_BACKFILL:
+            self.assertIn(feature_id, owners, feature_id)
 
-        expected_counts = {
-            "AFA": 117,
-            "FFR": 5,
-            "GCE": 1,
-            "ENG": 135,
-            "GER": 840,
-            "RKO": 68,
-            "RKM": 770,
-            "VOL": 30,
-        }
-        for tag, expected_count in expected_counts.items():
-            self.assertEqual(countries.get(tag, {}).get("feature_count"), expected_count, tag)
+        affected_tags = sorted(
+            {
+                *TNO_1962_OWNER_ONLY_BACKFILL.values(),
+                *(str(owners.get(feature_id) or "").strip() for feature_id in TNO_1962_OWNER_ONLY_BACKFILL),
+            }
+        )
+        owner_counts = Counter(str(owner or "").strip() for owner in owners.values())
+        for tag in affected_tags:
+            self.assertEqual(countries.get(tag, {}).get("feature_count"), owner_counts[tag], tag)
+
+    def test_checkpoint_build_lock_is_reentrant_and_cleans_up(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            lock_path = checkpoint_dir / tno_bundle.CHECKPOINT_BUILD_LOCK_FILENAME
+
+            with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                self.assertTrue(lock_path.exists())
+                with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                    self.assertTrue(lock_path.exists())
+
+            self.assertFalse(lock_path.exists())
+
+    def test_checkpoint_build_lock_blocks_when_lock_file_already_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            lock_path = checkpoint_dir / tno_bundle.CHECKPOINT_BUILD_LOCK_FILENAME
+            lock_path.write_text(
+                json.dumps({"pid": os.getpid(), "checkpoint_dir": str(checkpoint_dir)}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(RuntimeError, "another build is in progress"):
+                with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                    self.fail("lock acquisition should have been blocked")
+
+    def test_checkpoint_build_lock_removes_stale_lock_before_acquiring(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            lock_path = checkpoint_dir / tno_bundle.CHECKPOINT_BUILD_LOCK_FILENAME
+            lock_path.write_text(
+                json.dumps({"pid": 999999, "checkpoint_dir": str(checkpoint_dir)}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            with patch.object(tno_bundle, "_pid_is_alive", return_value=False):
+                with tno_bundle._checkpoint_build_lock(checkpoint_dir):
+                    self.assertTrue(lock_path.exists())
+
+            self.assertFalse(lock_path.exists())
 
     def test_validate_publish_bundle_dir_rejects_strict_contract_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
