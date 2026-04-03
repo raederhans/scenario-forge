@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "generated_at": "2026-03-17T04:10:44.164493+00:00",
+  "cities": {},
+  "audit": {
+    "renamed_city_count": 0,
+    "name_conflict_count": 0,
+    "unresolved_city_rename_count": 0,
+    "name_conflicts": [],
+    "unresolved_city_renames": []
+  }
+}

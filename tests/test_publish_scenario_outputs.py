@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from map_builder import scenario_publish_service
+from map_builder.scenario_build_session import SCENARIO_BUILD_STATE_FILENAME
 from tools import publish_scenario_outputs
 
 
@@ -52,6 +53,29 @@ def _create_scenario_fixture(root: Path, scenario_id: str = "tno_1962") -> Path:
 
 
 class PublishScenarioOutputsTest(unittest.TestCase):
+    def test_publish_geo_locale_target_for_non_tno_copies_build_session_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = _create_scenario_fixture(root, scenario_id="test_scenario")
+            checkpoint_dir = root / ".runtime" / "build" / "scenario" / "test_scenario" / "snapshot"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            _write_json(
+                checkpoint_dir / "geo_locale_patch.json",
+                {"version": 1, "scenario_id": "test_scenario", "generated_at": "build-pass", "geo": {"AAA-1": {"en": "Alpha One"}}},
+            )
+
+            result = publish_scenario_outputs.run_publish_scenario_outputs(
+                "test_scenario",
+                target="geo-locale",
+                root=root,
+                checkpoint_dir=checkpoint_dir,
+            )
+
+            published_patch = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            self.assertEqual(published_patch["generated_at"], "build-pass")
+            self.assertEqual(result["geoLocale"]["publishMode"], "copied_from_checkpoint")
+            self.assertEqual(result["geoLocale"]["checkpointDir"], str(checkpoint_dir))
+
     def test_publish_geo_locale_target_for_tno_copies_checkpoint_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -76,8 +100,10 @@ class PublishScenarioOutputsTest(unittest.TestCase):
             )
 
             published_patch = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            build_state_payload = json.loads((checkpoint_dir / SCENARIO_BUILD_STATE_FILENAME).read_text(encoding="utf-8"))
             self.assertEqual(published_patch["generated_at"], "publish-pass")
             self.assertEqual(result["geoLocale"]["publishMode"], "copied_from_checkpoint")
+            self.assertEqual(build_state_payload["published_targets"][0]["target"], "geo-locale")
 
     def test_publish_startup_assets_target_for_tno_copies_checkpoint_bundles(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

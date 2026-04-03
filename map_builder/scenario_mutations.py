@@ -15,6 +15,7 @@ def default_scenario_mutations_payload(scenario_id: str) -> dict[str, object]:
         "assignments_by_feature_id": {},
         "capitals": {},
         "geo_locale": {},
+        "district_groups": {},
     }
 
 
@@ -25,7 +26,7 @@ def normalize_scenario_mutations_payload(payload: object, *, scenario_id: str) -
     normalized["version"] = int(normalized.get("version") or 1)
     normalized["scenario_id"] = scenario_id
     normalized["generated_at"] = str(normalized.get("generated_at") or "").strip()
-    for field in ("tags", "countries", "assignments_by_feature_id", "capitals", "geo_locale"):
+    for field in ("tags", "countries", "assignments_by_feature_id", "capitals", "geo_locale", "district_groups"):
         value = normalized.get(field)
         normalized[field] = dict(value) if isinstance(value, dict) else {}
     return normalized

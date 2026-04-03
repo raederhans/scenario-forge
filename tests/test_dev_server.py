@@ -1550,6 +1550,7 @@ class DevServerTest(unittest.TestCase):
 
             district_payload = json.loads((scenario_dir / "district_groups.manual.json").read_text(encoding="utf-8"))
             manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
+            mutations_payload = json.loads((scenario_dir / "scenario_mutations.json").read_text(encoding="utf-8"))
             aaa_payload = district_payload["tags"]["AAA"]
 
             self.assertTrue(result["ok"])
@@ -1557,6 +1558,7 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(aaa_payload["districts"]["berlin"]["name_en"], "Berlin")
             self.assertEqual(aaa_payload["districts"]["alpha_core"]["feature_ids"], ["AAA-1"])
             self.assertEqual(manifest_payload["district_groups_url"], "data/scenarios/test_scenario/district_groups.manual.json")
+            self.assertEqual(mutations_payload["district_groups"]["AAA"]["districts"]["berlin"]["name_en"], "Berlin")
             self.assertEqual(result["districtGroupsUrl"], "data/scenarios/test_scenario/district_groups.manual.json")
             self.assertEqual(result["stats"]["districtCount"], 2)
 
@@ -1589,6 +1591,7 @@ class DevServerTest(unittest.TestCase):
 
             manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
             self.assertFalse((scenario_dir / "district_groups.manual.json").exists())
+            self.assertFalse((scenario_dir / "scenario_mutations.json").exists())
             self.assertNotIn("district_groups_url", manifest_payload)
 
     def test_write_json_transaction_preserves_original_exception_when_rollback_fails(self) -> None:

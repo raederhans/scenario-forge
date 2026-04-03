@@ -40,6 +40,11 @@ def materialize_scenario_mutations(
         }
     if "geoLocale" in service_result:
         results["geoLocale"] = service_result["geoLocale"]["materialized"]
+    if "districtGroups" in service_result:
+        results["districtGroups"] = {
+            "filePath": str(Path(context["districtGroupsPath"]).relative_to(root)).replace("\\", "/"),
+            "tagCount": len(service_result["districtGroups"]["districtGroupsPayload"].get("tags", {})),
+        }
     return results
 
 
@@ -49,7 +54,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--scenario-id", required=True)
-    parser.add_argument("--target", choices=("political", "geo-locale", "all"), required=True)
+    parser.add_argument("--target", choices=("political", "geo-locale", "district-groups", "all"), required=True)
     parser.add_argument("--root", default=str(ROOT))
     return parser.parse_args(argv)
 

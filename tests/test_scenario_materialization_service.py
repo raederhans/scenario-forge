@@ -7,7 +7,10 @@ from pathlib import Path
 from unittest import mock
 
 from map_builder import config as cfg
+from map_builder import scenario_build_session
+from map_builder import scenario_geo_locale_materializer
 from map_builder import scenario_materialization_service as service
+from map_builder.scenario_build_session import SCENARIO_BUILD_STATE_FILENAME
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -272,7 +275,16 @@ class ScenarioMaterializationServiceTest(unittest.TestCase):
                 _write_json(checkpoint_dir_arg / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME, {"language": "zh"})
 
             with (
-                mock.patch.object(tno_bundle, "DEFAULT_CHECKPOINT_DIR", checkpoint_dir),
+                mock.patch.object(
+                    scenario_geo_locale_materializer,
+                    "ensure_scenario_build_session",
+                    side_effect=lambda **kwargs: scenario_build_session.ensure_scenario_build_session(
+                        scenario_id="tno_1962",
+                        scenario_dir=scenario_dir,
+                        root=root,
+                        build_dir=checkpoint_dir,
+                    ),
+                ),
                 mock.patch.object(tno_bundle, "build_geo_locale_stage", side_effect=fake_build_geo_locale_stage),
                 mock.patch.object(tno_bundle, "build_startup_assets_stage", side_effect=fake_build_startup_assets_stage),
             ):
@@ -285,10 +297,13 @@ class ScenarioMaterializationServiceTest(unittest.TestCase):
 
             manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            build_state_payload = json.loads((checkpoint_dir / SCENARIO_BUILD_STATE_FILENAME).read_text(encoding="utf-8"))
             self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha One")
             self.assertEqual(patch_payload["generated_at"], "")
             self.assertEqual(result["geoLocale"]["materialized"]["buildMode"], "in_process")
             self.assertEqual(result["geoLocale"]["materialized"]["checkpointDir"], str(checkpoint_dir))
+            self.assertEqual(build_state_payload["snapshot_hash"], result["geoLocale"]["materialized"]["snapshotHash"])
+            self.assertIn("geo-locale", build_state_payload["stage_outputs"])
 
 
 if __name__ == "__main__":

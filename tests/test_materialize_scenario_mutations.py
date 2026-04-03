@@ -7,6 +7,8 @@ from pathlib import Path
 from unittest import mock
 
 from map_builder import config as cfg
+from map_builder import scenario_build_session
+from map_builder import scenario_geo_locale_materializer
 from tools import dev_server
 from tools import materialize_scenario_mutations
 from tools import publish_scenario_outputs
@@ -211,7 +213,16 @@ class MaterializeScenarioMutationsTest(unittest.TestCase):
                 _write_json(checkpoint_dir_arg / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME, {"language": "zh"})
 
             with (
-                mock.patch.object(tno_bundle, "DEFAULT_CHECKPOINT_DIR", checkpoint_dir),
+                mock.patch.object(
+                    scenario_geo_locale_materializer,
+                    "ensure_scenario_build_session",
+                    side_effect=lambda **kwargs: scenario_build_session.ensure_scenario_build_session(
+                        scenario_id="tno_1962",
+                        scenario_dir=scenario_dir,
+                        root=root,
+                        build_dir=checkpoint_dir,
+                    ),
+                ),
                 mock.patch.object(tno_bundle, "build_geo_locale_stage", side_effect=fake_build_geo_locale_stage),
                 mock.patch.object(tno_bundle, "build_startup_assets_stage", side_effect=fake_build_startup_assets_stage),
             ):
@@ -229,6 +240,55 @@ class MaterializeScenarioMutationsTest(unittest.TestCase):
             self.assertEqual(result["geoLocale"]["checkpointDir"], str(checkpoint_dir))
             self.assertTrue((checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME).exists())
             self.assertFalse((scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME).exists())
+
+    def test_materialize_district_groups_target_writes_derived_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = _create_scenario_fixture(root)
+            _write_json(
+                scenario_dir / "scenario_mutations.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "generated_at": "",
+                    "countries": {},
+                    "assignments_by_feature_id": {},
+                    "capitals": {},
+                    "geo_locale": {},
+                    "tags": {},
+                    "district_groups": {
+                        "AAA": {
+                            "tag": "AAA",
+                            "districts": {
+                                "alpha": {
+                                    "district_id": "alpha",
+                                    "name_en": "Alpha District",
+                                    "name_zh": "阿尔法区",
+                                    "feature_ids": ["AAA-1"],
+                                }
+                            },
+                        }
+                    },
+                },
+            )
+
+            result = materialize_scenario_mutations.materialize_scenario_mutations(
+                "test_scenario",
+                target="district-groups",
+                root=root,
+            )
+
+            district_groups_payload = json.loads((scenario_dir / "district_groups.manual.json").read_text(encoding="utf-8"))
+            manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                district_groups_payload["tags"]["AAA"]["districts"]["alpha"]["feature_ids"],
+                ["AAA-1"],
+            )
+            self.assertEqual(
+                manifest_payload["district_groups_url"],
+                "data/scenarios/test_scenario/district_groups.manual.json",
+            )
+            self.assertEqual(result["districtGroups"]["filePath"], "data/scenarios/test_scenario/district_groups.manual.json")
 
     def test_publish_geo_locale_target_for_tno_copies_checkpoint_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

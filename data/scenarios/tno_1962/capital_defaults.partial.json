@@ -2,40 +2,163 @@
   "version": 1,
   "scenario_id": "tno_1962",
   "generated_at": "2026-03-17T04:10:44.164493+00:00",
-  "entry_count": 153,
-  "missing_tag_count": 28,
-  "missing_tags": [
-    "ALT",
-    "ANG",
-    "ATL",
-    "BDI",
-    "BOT",
-    "BRY",
-    "CAM",
-    "CHT",
-    "GNG",
-    "GUI",
-    "IRK",
-    "KRS",
-    "LAO",
-    "MOR",
-    "MWI",
-    "MZB",
-    "POR",
-    "RFA",
-    "RWA",
-    "SPR",
-    "SUD",
-    "TZA",
-    "UGA",
-    "URA",
-    "XIN",
-    "YAK",
-    "ZAM",
-    "ZIM"
-  ],
-  "entries": [
-    {
+  "capitals_by_tag": {
+    "AEF": "CITY::ne::1159149851",
+    "AFA": "CITY::ne::1159150605",
+    "AFG": "CITY::ne::1159151561",
+    "ALC": "CITY::ne::1159151137",
+    "ALG": "CITY::ne::1159151471",
+    "AOF": "CITY::ne::1159151513",
+    "AOI": "CITY::ne::1159151549",
+    "ARE": "CITY::ne::1159150565",
+    "ARG": "CITY::ne::1159151559",
+    "ARM": "CITY::ne::1159151119",
+    "AST": "CITY::ne::1159151161",
+    "BHR": "CITY::ne::1159150451",
+    "BHU": "CITY::ne::1159151151",
+    "BKR": "CITY::ne::1159150775",
+    "BOL": "CITY::ne::1159151133",
+    "BRA": "CITY::ne::1159151443",
+    "BRG": "CITY::ne::1159151465",
+    "BRI": "CITY::ne::1159147219",
+    "BRM": "CITY::ne::1159151477",
+    "BUL": "CITY::ne::1159151147",
+    "BWA": "CITY::ne::1159151591",
+    "CAN": "CITY::ne::1159151059",
+    "CEY": "CITY::ne::1159150719",
+    "CHI": "CITY::ne::1159151533",
+    "CHL": "CITY::ne::1159150931",
+    "COL": "CITY::ne::1159151601",
+    "COS": "CITY::ne::1159150849",
+    "CRO": "CITY::ne::1159150875",
+    "CUB": "CITY::ne::1159151347",
+    "DEN": "CITY::ne::1159151437",
+    "DOM": "CITY::ne::1159151401",
+    "ECU": "CITY::ne::1159150847",
+    "EGY": "CITY::ne::1159151603",
+    "ELS": "CITY::ne::1159150853",
+    "ENG": "CITY::ne::1159151577",
+    "FIC": "CITY::ne::1159146681",
+    "FIN": "CITY::ne::1159151419",
+    "FRA": "CITY::ne::1159151613",
+    "FRI": "CITY::ne::1159151617",
+    "GCE": "CITY::ne::1159127297",
+    "GCO": "CITY::ne::1159151539",
+    "GEA": "CITY::ne::1159151305",
+    "GER": "CITY::ne::1159151529",
+    "GMA": "CITY::ne::1159151321",
+    "GOR": "CITY::ne::1159146557",
+    "GRE": "CITY::ne::1159151545",
+    "GRN": "CITY::ne::1159150939",
+    "GSW": "CITY::ne::1159150785",
+    "GUA": "CITY::ne::1159150909",
+    "GXC": "CITY::ne::1159151323",
+    "HAI": "CITY::ne::1159150589",
+    "HOL": "CITY::ne::1159150597",
+    "HON": "CITY::ne::1159150583",
+    "HUN": "CITY::ne::1159151257",
+    "IAL": "CITY::ne::1159150349",
+    "IBR": "CITY::ne::1159151503",
+    "ICE": "CITY::ne::1159150587",
+    "INS": "CITY::ne::1159151599",
+    "IRE": "CITY::ne::1159151309",
+    "IRQ": "CITY::ne::1159151547",
+    "ITA": "CITY::ne::1159151593",
+    "JAP": "CITY::ne::1159149967",
+    "JOR": "CITY::ne::1159150807",
+    "KAZ": "CITY::ne::1159150965",
+    "KGZ": "CITY::ne::1159150813",
+    "KOM": "CITY::ne::1159146551",
+    "KOR": "CITY::ne::1159151523",
+    "KUR": "CITY::ne::1159150087",
+    "KUW": "CITY::ne::1159151361",
+    "LBA": "CITY::ne::1159151415",
+    "LEB": "CITY::ne::1159150957",
+    "LIB": "CITY::ne::1159151311",
+    "MAD": "CITY::ne::1159150835",
+    "MAL": "CITY::ne::1159151317",
+    "MAN": "CITY::ne::1159151377",
+    "MEN": "CITY::ne::1159147139",
+    "MEX": "CITY::ne::1159151587",
+    "MLD": "CITY::ne::1159151201",
+    "MNT": "CITY::ne::1159149511",
+    "MON": "CITY::ne::1159150781",
+    "NCP": "CITY::ne::1159151595",
+    "NEP": "CITY::ne::1159150655",
+    "NIC": "CITY::ne::1159150623",
+    "NOV": "CITY::ne::1159150713",
+    "NZL": "CITY::ne::1159151699",
+    "OMA": "CITY::ne::1159150717",
+    "OMS": "CITY::ne::1159149579",
+    "VYT": "CITY::ne::1159149571",
+    "OUR": "CITY::ne::1159149571",
+    "PAK": "CITY::ne::1159150645",
+    "PAL": "CITY::ne::1159151417",
+    "PAN": "CITY::ne::1159150667",
+    "PAR": "CITY::ne::1159150621",
+    "PER": "CITY::ne::1159151551",
+    "PFC": "CITY::ne::1159150795",
+    "PHI": "CITY::ne::1159149605",
+    "PRC": "CITY::gn::1787765",
+    "PRM": "CITY::ne::1159150775",
+    "PRU": "CITY::ne::1159151511",
+    "PUE": "CITY::ne::1159151181",
+    "QAT": "CITY::ne::1159149469",
+    "QMA": "CITY::ne::1159150819",
+    "RAJ": "CITY::ne::1159151541",
+    "RGC": "CITY::ne::1159151605",
+    "RKK": "CITY::ne::1159150961",
+    "RKM": "CITY::ne::1159151585",
+    "RKN": "CITY::ne::1159149457",
+    "RKNO": "CITY::ne::1159151281",
+    "RKO": "CITY::ne::1159150809",
+    "RKP": "CITY::ne::1159151299",
+    "RKU": "CITY::ne::1159151495",
+    "ROM": "CITY::ne::1159151263",
+    "RSF": "CITY::ne::1159150749",
+    "RUR": "CITY::ne::1159149585",
+    "SAF": "CITY::ne::1159150661",
+    "SAM": "CITY::ne::1159150703",
+    "SAU": "CITY::ne::1159151581",
+    "SBA": "CITY::ne::1159150713",
+    "SCO": "CITY::ne::1159150591",
+    "SER": "CITY::ne::1159151079",
+    "SGN": "CITY::ne::1159150867",
+    "SHX": "CITY::ne::1159151365",
+    "SIA": "CITY::ne::1159151509",
+    "SIC": "CITY::gn::1787816",
+    "SIK": "CITY::ne::1159151531",
+    "SLO": "CITY::ne::1159149463",
+    "SOV": "CITY::ne::1159146525",
+    "SVR": "CITY::ne::1159146559",
+    "SWE": "CITY::ne::1159151507",
+    "SWI": "CITY::ne::1159149737",
+    "SYR": "CITY::ne::1159151269",
+    "TAT": "CITY::ne::1159150705",
+    "TIB": "CITY::gn::13527052",
+    "TJK": "CITY::ne::1159150609",
+    "TKM": "CITY::ne::1159150567",
+    "TOM": "CITY::ne::1159150685",
+    "TUN": "CITY::ne::1159150537",
+    "TUR": "CITY::ne::1159151255",
+    "TYM": "CITY::ne::1159149581",
+    "URG": "CITY::ne::1159150469",
+    "ZLT": "CITY::ne::1159139121",
+    "USA": "CITY::ne::1159151573",
+    "UZB": "CITY::ne::1159151501",
+    "VEN": "CITY::ne::1159151493",
+    "VIN": "CITY::ne::1159151251",
+    "VMT": "CITY::ne::1159146331",
+    "VOL": "CITY::ne::1159148095",
+    "WLS": "CITY::ne::1159146373",
+    "WRS": "CITY::ne::1159146517",
+    "XSM": "CITY::ne::1159150889",
+    "YEM": "CITY::ne::1159151259",
+    "YUN": "CITY::ne::1159151371",
+    "VOR": "CITY::ne::1159149563"
+  },
+  "capital_city_hints": {
+    "AEF": {
       "tag": "AEF",
       "display_name": "German Equatorial Africa",
       "lookup_iso2": "TD",
@@ -58,7 +181,7 @@
       "confidence": "medium",
       "candidate_count": 104
     },
-    {
+    "AFA": {
       "tag": "AFA",
       "display_name": "African Anarchy",
       "lookup_iso2": "NE",
@@ -81,7 +204,7 @@
       "confidence": "high",
       "candidate_count": 76
     },
-    {
+    "AFG": {
       "tag": "AFG",
       "display_name": "Afghanistan",
       "lookup_iso2": "AF",
@@ -104,7 +227,7 @@
       "confidence": "high",
       "candidate_count": 89
     },
-    {
+    "ALC": {
       "tag": "ALC",
       "display_name": "Algerian Command",
       "lookup_iso2": "DZ",
@@ -127,7 +250,7 @@
       "confidence": "medium",
       "candidate_count": 77
     },
-    {
+    "ALG": {
       "tag": "ALG",
       "display_name": "French Algeria",
       "lookup_iso2": "DZ",
@@ -150,7 +273,7 @@
       "confidence": "high",
       "candidate_count": 51
     },
-    {
+    "AOF": {
       "tag": "AOF",
       "display_name": "French West Africa",
       "lookup_iso2": "SN",
@@ -173,7 +296,7 @@
       "confidence": "high",
       "candidate_count": 178
     },
-    {
+    "AOI": {
       "tag": "AOI",
       "display_name": "Italian East Africa",
       "lookup_iso2": "ET",
@@ -196,7 +319,7 @@
       "confidence": "high",
       "candidate_count": 168
     },
-    {
+    "ARE": {
       "tag": "ARE",
       "display_name": "United Arab Emirates",
       "lookup_iso2": "AE",
@@ -219,7 +342,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "ARG": {
       "tag": "ARG",
       "display_name": "Argentina",
       "lookup_iso2": "AR",
@@ -242,7 +365,7 @@
       "confidence": "high",
       "candidate_count": 232
     },
-    {
+    "ARM": {
       "tag": "ARM",
       "display_name": "Armenia",
       "lookup_iso2": "AM",
@@ -265,7 +388,7 @@
       "confidence": "high",
       "candidate_count": 30
     },
-    {
+    "AST": {
       "tag": "AST",
       "display_name": "Australia",
       "lookup_iso2": "PG",
@@ -288,7 +411,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "BHR": {
       "tag": "BHR",
       "display_name": "Bahrain",
       "lookup_iso2": "BH",
@@ -311,7 +434,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "BHU": {
       "tag": "BHU",
       "display_name": "Bhutan",
       "lookup_iso2": "BT",
@@ -334,7 +457,7 @@
       "confidence": "high",
       "candidate_count": 6
     },
-    {
+    "BKR": {
       "tag": "BKR",
       "display_name": "Bashkir",
       "lookup_iso2": "RU",
@@ -357,7 +480,7 @@
       "confidence": "medium",
       "candidate_count": 5
     },
-    {
+    "BOL": {
       "tag": "BOL",
       "display_name": "Bolivia",
       "lookup_iso2": "BO",
@@ -380,7 +503,7 @@
       "confidence": "high",
       "candidate_count": 73
     },
-    {
+    "BRA": {
       "tag": "BRA",
       "display_name": "Brazil",
       "lookup_iso2": "BR",
@@ -403,7 +526,7 @@
       "confidence": "high",
       "candidate_count": 610
     },
-    {
+    "BRG": {
       "tag": "BRG",
       "display_name": "Ordensstaat Burgund",
       "lookup_iso2": "BE",
@@ -426,7 +549,7 @@
       "confidence": "high",
       "candidate_count": 298
     },
-    {
+    "BRI": {
       "tag": "BRI",
       "display_name": "Brittany",
       "lookup_iso2": "FR",
@@ -449,7 +572,7 @@
       "confidence": "medium",
       "candidate_count": 19
     },
-    {
+    "BRM": {
       "tag": "BRM",
       "display_name": "Burma",
       "lookup_iso2": "MM",
@@ -472,7 +595,7 @@
       "confidence": "high",
       "candidate_count": 70
     },
-    {
+    "BUL": {
       "tag": "BUL",
       "display_name": "Bulgaria",
       "lookup_iso2": "BG",
@@ -495,7 +618,7 @@
       "confidence": "high",
       "candidate_count": 99
     },
-    {
+    "BWA": {
       "tag": "BWA",
       "display_name": "British West Africa",
       "lookup_iso2": "NG",
@@ -518,7 +641,7 @@
       "confidence": "high",
       "candidate_count": 248
     },
-    {
+    "CAN": {
       "tag": "CAN",
       "display_name": "Canada",
       "lookup_iso2": "CA",
@@ -541,7 +664,7 @@
       "confidence": "high",
       "candidate_count": 302
     },
-    {
+    "CEY": {
       "tag": "CEY",
       "display_name": "Ceylon",
       "lookup_iso2": "LK",
@@ -564,7 +687,7 @@
       "confidence": "high",
       "candidate_count": 19
     },
-    {
+    "CHI": {
       "tag": "CHI",
       "display_name": "Republic of China",
       "lookup_iso2": "CN",
@@ -587,7 +710,7 @@
       "confidence": "medium",
       "candidate_count": 760
     },
-    {
+    "CHL": {
       "tag": "CHL",
       "display_name": "Chile",
       "lookup_iso2": "CL",
@@ -610,7 +733,7 @@
       "confidence": "high",
       "candidate_count": 99
     },
-    {
+    "COL": {
       "tag": "COL",
       "display_name": "Colombia",
       "lookup_iso2": "CO",
@@ -633,7 +756,7 @@
       "confidence": "high",
       "candidate_count": 292
     },
-    {
+    "COS": {
       "tag": "COS",
       "display_name": "Costa Rica",
       "lookup_iso2": "CR",
@@ -656,7 +779,7 @@
       "confidence": "high",
       "candidate_count": 17
     },
-    {
+    "CRO": {
       "tag": "CRO",
       "display_name": "Independent State of Croatia",
       "lookup_iso2": "HR",
@@ -679,7 +802,7 @@
       "confidence": "high",
       "candidate_count": 45
     },
-    {
+    "CUB": {
       "tag": "CUB",
       "display_name": "Cuba",
       "lookup_iso2": "CU",
@@ -702,7 +825,7 @@
       "confidence": "high",
       "candidate_count": 114
     },
-    {
+    "DEN": {
       "tag": "DEN",
       "display_name": "Denmark",
       "lookup_iso2": "DK",
@@ -725,7 +848,7 @@
       "confidence": "high",
       "candidate_count": 61
     },
-    {
+    "DOM": {
       "tag": "DOM",
       "display_name": "Dominican Republic",
       "lookup_iso2": "DO",
@@ -748,7 +871,7 @@
       "confidence": "high",
       "candidate_count": 36
     },
-    {
+    "ECU": {
       "tag": "ECU",
       "display_name": "Ecuador",
       "lookup_iso2": "EC",
@@ -771,7 +894,7 @@
       "confidence": "high",
       "candidate_count": 64
     },
-    {
+    "EGY": {
       "tag": "EGY",
       "display_name": "Italian Egypt",
       "lookup_iso2": "EG",
@@ -794,7 +917,7 @@
       "confidence": "high",
       "candidate_count": 128
     },
-    {
+    "ELS": {
       "tag": "ELS",
       "display_name": "El Salvador",
       "lookup_iso2": "SV",
@@ -817,7 +940,7 @@
       "confidence": "high",
       "candidate_count": 16
     },
-    {
+    "ENG": {
       "tag": "ENG",
       "display_name": "Britain",
       "lookup_iso2": "GB",
@@ -840,7 +963,7 @@
       "confidence": "high",
       "candidate_count": 763
     },
-    {
+    "FIC": {
       "tag": "FIC",
       "display_name": "Far Eastern Intervention Committee",
       "lookup_iso2": "RU",
@@ -863,7 +986,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "FIN": {
       "tag": "FIN",
       "display_name": "Finland",
       "lookup_iso2": "FI",
@@ -886,7 +1009,7 @@
       "confidence": "high",
       "candidate_count": 129
     },
-    {
+    "FRA": {
       "tag": "FRA",
       "display_name": "France",
       "lookup_iso2": "FR",
@@ -909,7 +1032,7 @@
       "confidence": "high",
       "candidate_count": 548
     },
-    {
+    "FRI": {
       "tag": "FRI",
       "display_name": "Azad Hind",
       "lookup_iso2": "IN",
@@ -932,7 +1055,7 @@
       "confidence": "medium",
       "candidate_count": 47
     },
-    {
+    "GCE": {
       "tag": "GCE",
       "display_name": "German Cornwall Expeditionary Force",
       "lookup_iso2": "GB",
@@ -955,7 +1078,7 @@
       "confidence": "medium",
       "candidate_count": 30
     },
-    {
+    "GCO": {
       "tag": "GCO",
       "display_name": "German Congo",
       "lookup_iso2": "CD",
@@ -978,7 +1101,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "GEA": {
       "tag": "GEA",
       "display_name": "German East Africa",
       "lookup_iso2": "TZ",
@@ -1001,7 +1124,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "GER": {
       "tag": "GER",
       "display_name": "Germany",
       "lookup_iso2": "DE",
@@ -1024,7 +1147,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "GMA": {
       "tag": "GMA",
       "display_name": "Northwest Pacification Government",
       "lookup_iso2": "CN",
@@ -1047,7 +1170,7 @@
       "confidence": "medium",
       "candidate_count": 112
     },
-    {
+    "GOR": {
       "tag": "GOR",
       "display_name": "13th Panzer Army - Gorky",
       "lookup_iso2": "RU",
@@ -1070,7 +1193,7 @@
       "confidence": "medium",
       "candidate_count": 4
     },
-    {
+    "GRE": {
       "tag": "GRE",
       "display_name": "Greek Protectorate",
       "lookup_iso2": "GR",
@@ -1093,7 +1216,7 @@
       "confidence": "high",
       "candidate_count": 101
     },
-    {
+    "GRN": {
       "tag": "GRN",
       "display_name": "Greenland",
       "lookup_iso2": "GL",
@@ -1116,7 +1239,7 @@
       "confidence": "medium",
       "candidate_count": 21
     },
-    {
+    "GSW": {
       "tag": "GSW",
       "display_name": "German Southwest Africa",
       "lookup_iso2": "NA",
@@ -1139,7 +1262,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "GUA": {
       "tag": "GUA",
       "display_name": "Guatemala",
       "lookup_iso2": "GT",
@@ -1162,7 +1285,7 @@
       "confidence": "high",
       "candidate_count": 100
     },
-    {
+    "GXC": {
       "tag": "GXC",
       "display_name": "Guangxi Clique",
       "lookup_iso2": "CN",
@@ -1185,7 +1308,7 @@
       "confidence": "medium",
       "candidate_count": 24
     },
-    {
+    "HAI": {
       "tag": "HAI",
       "display_name": "Haiti",
       "lookup_iso2": "HT",
@@ -1208,7 +1331,7 @@
       "confidence": "high",
       "candidate_count": 16
     },
-    {
+    "HOL": {
       "tag": "HOL",
       "display_name": "Netherlands",
       "lookup_iso2": "NL",
@@ -1231,7 +1354,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "HON": {
       "tag": "HON",
       "display_name": "Honduras",
       "lookup_iso2": "HN",
@@ -1254,7 +1377,7 @@
       "confidence": "high",
       "candidate_count": 21
     },
-    {
+    "HUN": {
       "tag": "HUN",
       "display_name": "Hungary",
       "lookup_iso2": "HU",
@@ -1277,7 +1400,7 @@
       "confidence": "high",
       "candidate_count": 162
     },
-    {
+    "IAL": {
       "tag": "IAL",
       "display_name": "Italian Algeria",
       "lookup_iso2": "DZ",
@@ -1300,7 +1423,7 @@
       "confidence": "medium",
       "candidate_count": 145
     },
-    {
+    "IBR": {
       "tag": "IBR",
       "display_name": "Iberian Union",
       "lookup_iso2": "ES",
@@ -1323,7 +1446,7 @@
       "confidence": "high",
       "candidate_count": 985
     },
-    {
+    "ICE": {
       "tag": "ICE",
       "display_name": "Iceland",
       "lookup_iso2": "IS",
@@ -1346,7 +1469,7 @@
       "confidence": "high",
       "candidate_count": 12
     },
-    {
+    "INS": {
       "tag": "INS",
       "display_name": "Indonesia",
       "lookup_iso2": "ID",
@@ -1369,7 +1492,7 @@
       "confidence": "high",
       "candidate_count": 314
     },
-    {
+    "IRE": {
       "tag": "IRE",
       "display_name": "Ireland",
       "lookup_iso2": "IE",
@@ -1392,7 +1515,7 @@
       "confidence": "high",
       "candidate_count": 60
     },
-    {
+    "IRQ": {
       "tag": "IRQ",
       "display_name": "Iraq",
       "lookup_iso2": "IQ",
@@ -1415,7 +1538,7 @@
       "confidence": "high",
       "candidate_count": 37
     },
-    {
+    "ITA": {
       "tag": "ITA",
       "display_name": "Italy",
       "lookup_iso2": "IT",
@@ -1438,7 +1561,7 @@
       "confidence": "high",
       "candidate_count": 620
     },
-    {
+    "JAP": {
       "tag": "JAP",
       "display_name": "Japan",
       "lookup_iso2": "JP",
@@ -1461,7 +1584,7 @@
       "confidence": "high",
       "candidate_count": 829
     },
-    {
+    "JOR": {
       "tag": "JOR",
       "display_name": "Italian Transjordan",
       "lookup_iso2": "JO",
@@ -1484,7 +1607,7 @@
       "confidence": "high",
       "candidate_count": 23
     },
-    {
+    "KAZ": {
       "tag": "KAZ",
       "display_name": "Kazakhstan",
       "lookup_iso2": "KZ",
@@ -1507,7 +1630,7 @@
       "confidence": "high",
       "candidate_count": 120
     },
-    {
+    "KGZ": {
       "tag": "KGZ",
       "display_name": "Kyrgyzstan",
       "lookup_iso2": "KG",
@@ -1530,7 +1653,7 @@
       "confidence": "high",
       "candidate_count": 26
     },
-    {
+    "KOM": {
       "tag": "KOM",
       "display_name": "Komi Republic",
       "lookup_iso2": "RU",
@@ -1553,7 +1676,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "KOR": {
       "tag": "KOR",
       "display_name": "Korean Residency-General",
       "lookup_iso2": "KR",
@@ -1576,7 +1699,7 @@
       "confidence": "high",
       "candidate_count": 122
     },
-    {
+    "KUR": {
       "tag": "KUR",
       "display_name": "Kurdistan",
       "lookup_iso2": "IQ",
@@ -1599,7 +1722,7 @@
       "confidence": "medium",
       "candidate_count": 33
     },
-    {
+    "KUW": {
       "tag": "KUW",
       "display_name": "Kuwait",
       "lookup_iso2": "KW",
@@ -1622,7 +1745,7 @@
       "confidence": "high",
       "candidate_count": 7
     },
-    {
+    "LBA": {
       "tag": "LBA",
       "display_name": "Libya",
       "lookup_iso2": "LY",
@@ -1645,7 +1768,7 @@
       "confidence": "high",
       "candidate_count": 43
     },
-    {
+    "LEB": {
       "tag": "LEB",
       "display_name": "Lebanese Protectorate",
       "lookup_iso2": "LB",
@@ -1668,7 +1791,7 @@
       "confidence": "high",
       "candidate_count": 14
     },
-    {
+    "LIB": {
       "tag": "LIB",
       "display_name": "Liberia",
       "lookup_iso2": "LR",
@@ -1691,7 +1814,7 @@
       "confidence": "high",
       "candidate_count": 14
     },
-    {
+    "MAD": {
       "tag": "MAD",
       "display_name": "Madagascar",
       "lookup_iso2": "MG",
@@ -1714,7 +1837,7 @@
       "confidence": "high",
       "candidate_count": 39
     },
-    {
+    "MAL": {
       "tag": "MAL",
       "display_name": "Malaya",
       "lookup_iso2": "MY",
@@ -1737,7 +1860,7 @@
       "confidence": "high",
       "candidate_count": 90
     },
-    {
+    "MAN": {
       "tag": "MAN",
       "display_name": "Manchukuo",
       "lookup_iso2": "CN",
@@ -1760,7 +1883,7 @@
       "confidence": "medium",
       "candidate_count": 176
     },
-    {
+    "MEN": {
       "tag": "MEN",
       "display_name": "Mengjiang",
       "lookup_iso2": "CN",
@@ -1783,7 +1906,7 @@
       "confidence": "medium",
       "candidate_count": 6
     },
-    {
+    "MEX": {
       "tag": "MEX",
       "display_name": "Mexico",
       "lookup_iso2": "MX",
@@ -1806,7 +1929,7 @@
       "confidence": "high",
       "candidate_count": 500
     },
-    {
+    "MLD": {
       "tag": "MLD",
       "display_name": "Maldives",
       "lookup_iso2": "MV",
@@ -1829,7 +1952,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "MNT": {
       "tag": "MNT",
       "display_name": "Montenegro",
       "lookup_iso2": "ME",
@@ -1852,7 +1975,7 @@
       "confidence": "high",
       "candidate_count": 7
     },
-    {
+    "MON": {
       "tag": "MON",
       "display_name": "Mongolia",
       "lookup_iso2": "MN",
@@ -1875,7 +1998,7 @@
       "confidence": "high",
       "candidate_count": 17
     },
-    {
+    "NCP": {
       "tag": "NCP",
       "display_name": "North China Political Council",
       "lookup_iso2": "CN",
@@ -1898,7 +2021,7 @@
       "confidence": "high",
       "candidate_count": 131
     },
-    {
+    "NEP": {
       "tag": "NEP",
       "display_name": "Nepal",
       "lookup_iso2": "NP",
@@ -1921,7 +2044,7 @@
       "confidence": "high",
       "candidate_count": 26
     },
-    {
+    "NIC": {
       "tag": "NIC",
       "display_name": "Nicaragua",
       "lookup_iso2": "NI",
@@ -1944,7 +2067,7 @@
       "confidence": "high",
       "candidate_count": 40
     },
-    {
+    "NOV": {
       "tag": "NOV",
       "display_name": "Novosibirsk",
       "lookup_iso2": "RU",
@@ -1967,7 +2090,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "NZL": {
       "tag": "NZL",
       "display_name": "New Zealand",
       "lookup_iso2": "NZ",
@@ -1990,7 +2113,7 @@
       "confidence": "high",
       "candidate_count": 53
     },
-    {
+    "OMA": {
       "tag": "OMA",
       "display_name": "Oman",
       "lookup_iso2": "OM",
@@ -2013,7 +2136,7 @@
       "confidence": "high",
       "candidate_count": 16
     },
-    {
+    "OMS": {
       "tag": "OMS",
       "display_name": "Omsk",
       "lookup_iso2": "RU",
@@ -2036,7 +2159,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "VYT": {
       "tag": "VYT",
       "display_name": "Vyatka",
       "lookup_iso2": "RU",
@@ -2059,7 +2182,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "OUR": {
       "tag": "OUR",
       "display_name": "Orenburg-Ural Union",
       "lookup_iso2": "RU",
@@ -2082,7 +2205,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "PAK": {
       "tag": "PAK",
       "display_name": "Pakistan",
       "lookup_iso2": "PK",
@@ -2105,7 +2228,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "PAL": {
       "tag": "PAL",
       "display_name": "Italian Palestine",
       "lookup_iso2": "IL",
@@ -2128,7 +2251,7 @@
       "confidence": "high",
       "candidate_count": 32
     },
-    {
+    "PAN": {
       "tag": "PAN",
       "display_name": "Panama",
       "lookup_iso2": "PA",
@@ -2151,7 +2274,7 @@
       "confidence": "high",
       "candidate_count": 25
     },
-    {
+    "PAR": {
       "tag": "PAR",
       "display_name": "Paraguay",
       "lookup_iso2": "PY",
@@ -2174,7 +2297,7 @@
       "confidence": "high",
       "candidate_count": 42
     },
-    {
+    "PER": {
       "tag": "PER",
       "display_name": "Iran",
       "lookup_iso2": "IR",
@@ -2197,7 +2320,7 @@
       "confidence": "high",
       "candidate_count": 263
     },
-    {
+    "PFC": {
       "tag": "PFC",
       "display_name": "Far Eastern Pacific Fleet Command",
       "lookup_iso2": "RU",
@@ -2220,7 +2343,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "PHI": {
       "tag": "PHI",
       "display_name": "Philippines",
       "lookup_iso2": "PH",
@@ -2243,7 +2366,7 @@
       "confidence": "high",
       "candidate_count": 378
     },
-    {
+    "PRC": {
       "tag": "PRC",
       "display_name": "Communist China",
       "lookup_iso2": "CN",
@@ -2266,7 +2389,7 @@
       "confidence": "medium",
       "candidate_count": 3
     },
-    {
+    "PRM": {
       "tag": "PRM",
       "display_name": "Perm",
       "lookup_iso2": "RU",
@@ -2289,7 +2412,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "PRU": {
       "tag": "PRU",
       "display_name": "Peru",
       "lookup_iso2": "PE",
@@ -2312,7 +2435,7 @@
       "confidence": "high",
       "candidate_count": 128
     },
-    {
+    "PUE": {
       "tag": "PUE",
       "display_name": "Puerto Rico",
       "lookup_iso2": "PR",
@@ -2335,7 +2458,7 @@
       "confidence": "high",
       "candidate_count": 21
     },
-    {
+    "QAT": {
       "tag": "QAT",
       "display_name": "Qatar",
       "lookup_iso2": "QA",
@@ -2358,7 +2481,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "QMA": {
       "tag": "QMA",
       "display_name": "13th National Revolutionary Army",
       "lookup_iso2": "CN",
@@ -2381,7 +2504,7 @@
       "confidence": "medium",
       "candidate_count": 18
     },
-    {
+    "RAJ": {
       "tag": "RAJ",
       "display_name": "British Raj",
       "lookup_iso2": "IN",
@@ -2404,7 +2527,7 @@
       "confidence": "high",
       "candidate_count": 537
     },
-    {
+    "RGC": {
       "tag": "RGC",
       "display_name": "Sichuan Clique",
       "lookup_iso2": "CN",
@@ -2427,7 +2550,7 @@
       "confidence": "medium",
       "candidate_count": 232
     },
-    {
+    "RKK": {
       "tag": "RKK",
       "display_name": "Reichskommissariat Kaukasien",
       "lookup_iso2": "GE",
@@ -2450,7 +2573,7 @@
       "confidence": "high",
       "candidate_count": 201
     },
-    {
+    "RKM": {
       "tag": "RKM",
       "display_name": "Reichskommissariat Moskowien",
       "lookup_iso2": "RU",
@@ -2473,7 +2596,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "RKN": {
       "tag": "RKN",
       "display_name": "Reichskommissariat Niederlande",
       "lookup_iso2": "NL",
@@ -2496,7 +2619,7 @@
       "confidence": "high",
       "candidate_count": 240
     },
-    {
+    "RKNO": {
       "tag": "RKNO",
       "display_name": "Reichskommissariat Norwegen",
       "lookup_iso2": "NO",
@@ -2519,7 +2642,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "RKO": {
       "tag": "RKO",
       "display_name": "Reichskommissariat Ostland",
       "lookup_iso2": "LT",
@@ -2542,7 +2665,7 @@
       "confidence": "high",
       "candidate_count": 125
     },
-    {
+    "RKP": {
       "tag": "RKP",
       "display_name": "Reichskommissariat Polen",
       "lookup_iso2": "PL",
@@ -2565,7 +2688,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "RKU": {
       "tag": "RKU",
       "display_name": "Reichskommissariat Ukraine",
       "lookup_iso2": "UA",
@@ -2588,7 +2711,7 @@
       "confidence": "high",
       "candidate_count": 298
     },
-    {
+    "ROM": {
       "tag": "ROM",
       "display_name": "Romania",
       "lookup_iso2": "RO",
@@ -2611,7 +2734,7 @@
       "confidence": "high",
       "candidate_count": 172
     },
-    {
+    "RSF": {
       "tag": "RSF",
       "display_name": "Russian Salvation Front",
       "lookup_iso2": "RU",
@@ -2634,7 +2757,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "RUR": {
       "tag": "RUR",
       "display_name": "Rurik Kingdom",
       "lookup_iso2": "RU",
@@ -2657,7 +2780,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "SAF": {
       "tag": "SAF",
       "display_name": "South Africa",
       "lookup_iso2": "NA",
@@ -2680,7 +2803,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "SAM": {
       "tag": "SAM",
       "display_name": "Russian Liberation Army",
       "lookup_iso2": "RU",
@@ -2703,7 +2826,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "SAU": {
       "tag": "SAU",
       "display_name": "Saudi Arabia",
       "lookup_iso2": "SA",
@@ -2726,7 +2849,7 @@
       "confidence": "high",
       "candidate_count": 39
     },
-    {
+    "SBA": {
       "tag": "SBA",
       "display_name": "Siberian Black Army",
       "lookup_iso2": "RU",
@@ -2749,7 +2872,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "SCO": {
       "tag": "SCO",
       "display_name": "Scotland",
       "lookup_iso2": "GB",
@@ -2772,7 +2895,7 @@
       "confidence": "medium",
       "candidate_count": 62
     },
-    {
+    "SER": {
       "tag": "SER",
       "display_name": "Serbian Administration",
       "lookup_iso2": "RS",
@@ -2795,7 +2918,7 @@
       "confidence": "high",
       "candidate_count": 54
     },
-    {
+    "SGN": {
       "tag": "SGN",
       "display_name": "Spanish Guinea",
       "lookup_iso2": "GQ",
@@ -2818,7 +2941,7 @@
       "confidence": "high",
       "candidate_count": 6
     },
-    {
+    "SHX": {
       "tag": "SHX",
       "display_name": "Shanxi",
       "lookup_iso2": "CN",
@@ -2841,7 +2964,7 @@
       "confidence": "medium",
       "candidate_count": 33
     },
-    {
+    "SIA": {
       "tag": "SIA",
       "display_name": "Siam",
       "lookup_iso2": "TH",
@@ -2864,7 +2987,7 @@
       "confidence": "high",
       "candidate_count": 289
     },
-    {
+    "SIC": {
       "tag": "SIC",
       "display_name": "Xikang Clique",
       "lookup_iso2": "CN",
@@ -2887,7 +3010,7 @@
       "confidence": "medium",
       "candidate_count": 4
     },
-    {
+    "SIK": {
       "tag": "SIK",
       "display_name": "Sinkiang",
       "lookup_iso2": "CN",
@@ -2910,7 +3033,7 @@
       "confidence": "medium",
       "candidate_count": 101
     },
-    {
+    "SLO": {
       "tag": "SLO",
       "display_name": "Slovakia",
       "lookup_iso2": "SK",
@@ -2933,7 +3056,7 @@
       "confidence": "high",
       "candidate_count": 51
     },
-    {
+    "SOV": {
       "tag": "SOV",
       "display_name": "Soviet Union",
       "lookup_iso2": "RU",
@@ -2956,7 +3079,7 @@
       "confidence": "medium",
       "candidate_count": 46
     },
-    {
+    "SVR": {
       "tag": "SVR",
       "display_name": "Ural Military District",
       "lookup_iso2": "RU",
@@ -2979,7 +3102,7 @@
       "confidence": "medium",
       "candidate_count": 5
     },
-    {
+    "SWE": {
       "tag": "SWE",
       "display_name": "Sweden",
       "lookup_iso2": "SE",
@@ -3002,7 +3125,7 @@
       "confidence": "high",
       "candidate_count": 111
     },
-    {
+    "SWI": {
       "tag": "SWI",
       "display_name": "Switzerland",
       "lookup_iso2": "CH",
@@ -3025,7 +3148,7 @@
       "confidence": "high",
       "candidate_count": 103
     },
-    {
+    "SYR": {
       "tag": "SYR",
       "display_name": "Syrian Protectorate",
       "lookup_iso2": "SY",
@@ -3048,7 +3171,7 @@
       "confidence": "high",
       "candidate_count": 34
     },
-    {
+    "TAT": {
       "tag": "TAT",
       "display_name": "Tatar Republic",
       "lookup_iso2": "RU",
@@ -3071,7 +3194,7 @@
       "confidence": "medium",
       "candidate_count": 18
     },
-    {
+    "TIB": {
       "tag": "TIB",
       "display_name": "Tibet",
       "lookup_iso2": "CN",
@@ -3094,7 +3217,7 @@
       "confidence": "medium",
       "candidate_count": 17
     },
-    {
+    "TJK": {
       "tag": "TJK",
       "display_name": "Tajikistan",
       "lookup_iso2": "TJ",
@@ -3117,7 +3240,7 @@
       "confidence": "high",
       "candidate_count": 21
     },
-    {
+    "TKM": {
       "tag": "TKM",
       "display_name": "Turkmenistan",
       "lookup_iso2": "TM",
@@ -3140,7 +3263,7 @@
       "confidence": "high",
       "candidate_count": 15
     },
-    {
+    "TOM": {
       "tag": "TOM",
       "display_name": "Tomsk",
       "lookup_iso2": "RU",
@@ -3163,7 +3286,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "TUN": {
       "tag": "TUN",
       "display_name": "Tunisian Protectorate",
       "lookup_iso2": "TN",
@@ -3186,7 +3309,7 @@
       "confidence": "high",
       "candidate_count": 116
     },
-    {
+    "TUR": {
       "tag": "TUR",
       "display_name": "Turkey",
       "lookup_iso2": "TR",
@@ -3209,7 +3332,7 @@
       "confidence": "high",
       "candidate_count": 472
     },
-    {
+    "TYM": {
       "tag": "TYM",
       "display_name": "Tyumen",
       "lookup_iso2": "RU",
@@ -3232,7 +3355,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "URG": {
       "tag": "URG",
       "display_name": "Uruguay",
       "lookup_iso2": "UY",
@@ -3255,7 +3378,7 @@
       "confidence": "high",
       "candidate_count": 32
     },
-    {
+    "ZLT": {
       "tag": "ZLT",
       "display_name": "Zlatoust",
       "lookup_iso2": "RU",
@@ -3278,7 +3401,7 @@
       "confidence": "medium",
       "candidate_count": 7
     },
-    {
+    "USA": {
       "tag": "USA",
       "display_name": "America",
       "lookup_iso2": "US",
@@ -3301,7 +3424,7 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    {
+    "UZB": {
       "tag": "UZB",
       "display_name": "Uzbekistan",
       "lookup_iso2": "UZ",
@@ -3324,7 +3447,7 @@
       "confidence": "high",
       "candidate_count": 65
     },
-    {
+    "VEN": {
       "tag": "VEN",
       "display_name": "Venezuela",
       "lookup_iso2": "VE",
@@ -3347,7 +3470,7 @@
       "confidence": "high",
       "candidate_count": 205
     },
-    {
+    "VIN": {
       "tag": "VIN",
       "display_name": "Vietnam",
       "lookup_iso2": "VN",
@@ -3370,7 +3493,7 @@
       "confidence": "high",
       "candidate_count": 208
     },
-    {
+    "VMT": {
       "tag": "VMT",
       "display_name": "Viet Minh",
       "lookup_iso2": "VN",
@@ -3393,7 +3516,7 @@
       "confidence": "medium",
       "candidate_count": 26
     },
-    {
+    "VOL": {
       "tag": "VOL",
       "display_name": "Vologda Neutral Zone",
       "lookup_iso2": "RU",
@@ -3416,7 +3539,7 @@
       "confidence": "medium",
       "candidate_count": 2
     },
-    {
+    "WLS": {
       "tag": "WLS",
       "display_name": "Wales",
       "lookup_iso2": "GB",
@@ -3439,7 +3562,7 @@
       "confidence": "medium",
       "candidate_count": 41
     },
-    {
+    "WRS": {
       "tag": "WRS",
       "display_name": "West Russian Revolutionary Front",
       "lookup_iso2": "RU",
@@ -3462,7 +3585,7 @@
       "confidence": "medium",
       "candidate_count": 17
     },
-    {
+    "XSM": {
       "tag": "XSM",
       "display_name": "Xibei San Ma",
       "lookup_iso2": "CN",
@@ -3485,7 +3608,7 @@
       "confidence": "medium",
       "candidate_count": 15
     },
-    {
+    "YEM": {
       "tag": "YEM",
       "display_name": "Yemen",
       "lookup_iso2": "YE",
@@ -3508,7 +3631,7 @@
       "confidence": "high",
       "candidate_count": 29
     },
-    {
+    "YUN": {
       "tag": "YUN",
       "display_name": "Yunnan",
       "lookup_iso2": "CN",
@@ -3531,7 +3654,7 @@
       "confidence": "medium",
       "candidate_count": 74
     },
-    {
+    "VOR": {
       "tag": "VOR",
       "display_name": "Vorkuta",
       "lookup_iso2": "RU",
@@ -3554,8 +3677,40 @@
       "confidence": "high",
       "candidate_count": 1
     }
-  ],
+  },
   "audit": {
+    "entry_count": 153,
+    "missing_tag_count": 28,
+    "missing_tags": [
+      "ALT",
+      "ANG",
+      "ATL",
+      "BDI",
+      "BOT",
+      "BRY",
+      "CAM",
+      "CHT",
+      "GNG",
+      "GUI",
+      "IRK",
+      "KRS",
+      "LAO",
+      "MOR",
+      "MWI",
+      "MZB",
+      "POR",
+      "RFA",
+      "RWA",
+      "SPR",
+      "SUD",
+      "TZA",
+      "UGA",
+      "URA",
+      "XIN",
+      "YAK",
+      "ZAM",
+      "ZIM"
+    ],
     "rejected_candidate_count": 2,
     "rejected_candidates": [
       {

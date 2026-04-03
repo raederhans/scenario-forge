@@ -5,6 +5,13 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
+from map_builder.scenario_build_session import (
+    ensure_scenario_build_session,
+    record_published_target,
+)
+from map_builder.scenario_geo_locale_materializer import (
+    NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLISH_TARGETS = {"geo-locale", "startup-assets", "chunk-assets", "all"}
@@ -70,16 +77,32 @@ def publish_scenario_outputs_in_locked_context(
 
     if scenario_id != "tno_1962":
         if normalized_target == "geo-locale":
+            build_session = ensure_scenario_build_session(
+                scenario_id=scenario_id,
+                scenario_dir=scenario_dir,
+                root=root,
+                build_dir=checkpoint_dir,
+            )
+            resolved_checkpoint_dir = Path(build_session["buildDir"])
+            source_geo_locale_path = resolved_checkpoint_dir / NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME
             geo_locale_path = Path(context["geoLocalePatchPath"])
-            if not geo_locale_path.exists():
+            if not source_geo_locale_path.exists():
                 raise dev_server.DevServerError(
                     "missing_geo_locale_patch",
                     "The active scenario does not have a generated geo locale patch to publish.",
                     status=400,
                 )
+            _copy_artifact(source_geo_locale_path, geo_locale_path)
+            record_published_target(
+                build_dir=resolved_checkpoint_dir,
+                target="geo-locale",
+                published_paths=[geo_locale_path],
+                root=root,
+            )
             results["geoLocale"] = {
-                "publishMode": "already_published",
+                "publishMode": "copied_from_checkpoint",
                 "publishedPaths": [str(geo_locale_path)],
+                "checkpointDir": str(resolved_checkpoint_dir),
             }
             return results
         raise dev_server.DevServerError(
@@ -90,7 +113,7 @@ def publish_scenario_outputs_in_locked_context(
 
     from tools import patch_tno_1962_bundle as tno_bundle
 
-    resolved_checkpoint_dir = checkpoint_dir or tno_bundle.DEFAULT_CHECKPOINT_DIR
+    resolved_checkpoint_dir = checkpoint_dir or tno_bundle.resolve_default_checkpoint_dir(scenario_dir)
     with tno_bundle._checkpoint_build_lock(
         resolved_checkpoint_dir,
         stage=f"publish_{normalized_target.replace('-', '_')}",
@@ -111,6 +134,12 @@ def publish_scenario_outputs_in_locked_context(
                 "publishedPaths": [str(path) for path in published_geo_paths],
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
+            record_published_target(
+                build_dir=resolved_checkpoint_dir,
+                target="geo-locale",
+                published_paths=published_geo_paths,
+                root=root,
+            )
 
         if normalized_target in {"startup-assets", "all"}:
             tno_bundle.scenario_bundle_platform.require_startup_stage_checkpoints(resolved_checkpoint_dir)
@@ -135,17 +164,32 @@ def publish_scenario_outputs_in_locked_context(
                 "supportingPaths": supporting_paths,
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
+            record_published_target(
+                build_dir=resolved_checkpoint_dir,
+                target="startup-assets",
+                published_paths=published_startup_paths,
+                root=root,
+            )
 
         if normalized_target in {"chunk-assets", "all"}:
             tno_bundle.build_chunk_assets_stage(scenario_dir, resolved_checkpoint_dir)
+            published_chunk_paths = [
+                scenario_dir / "detail_chunks.manifest.json",
+                scenario_dir / "chunks",
+            ]
             results["chunkAssets"] = {
                 "publishMode": "rebuilt_from_published_inputs",
                 "publishedPaths": [
-                    str(scenario_dir / "detail_chunks.manifest.json"),
-                    str(scenario_dir / "chunks"),
+                    str(path) for path in published_chunk_paths
                 ],
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
+            record_published_target(
+                build_dir=resolved_checkpoint_dir,
+                target="chunk-assets",
+                published_paths=published_chunk_paths,
+                root=root,
+            )
 
     return results
 

@@ -179,6 +179,10 @@ def validate_manifest_version_matrix(expected_scenario_id: str, manifest: dict, 
             "manifest.version 2 must include all required v2 fields. "
             f"Missing: {', '.join(missing_v2)}."
         )
+    if not scenario_requires_public_capital_hints(expected_scenario_id) and has_value(manifest.get("capital_hints_url")):
+        errors.append(
+            "Scenarios without public capital hints must not declare manifest.capital_hints_url."
+        )
     if has_value(manifest.get("performance_hints")) and not isinstance(manifest.get("performance_hints"), dict):
         errors.append("manifest.performance_hints must be an object for version 2.")
     if has_value(manifest.get("style_defaults")) and not isinstance(manifest.get("style_defaults"), dict):
@@ -266,6 +270,28 @@ def validate_runtime_capitals(expected_scenario_id: str, manifest: dict, errors:
     if capital_hints_scenario_id and capital_hints_scenario_id != expected_scenario_id:
         errors.append(
             f"capital_hints.json scenario_id must be `{expected_scenario_id}`. Found `{capital_hints_scenario_id}`."
+        )
+
+
+def validate_internal_authoring_inputs(expected_scenario_id: str, errors: list[str]) -> None:
+    if scenario_requires_public_capital_hints(expected_scenario_id):
+        return
+    scenario_dir = PROJECT_ROOT / "data" / "scenarios" / expected_scenario_id
+    required_paths = (
+        scenario_dir / "scenario_mutations.json",
+        scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME,
+        scenario_dir / cfg.SCENARIO_CAPITAL_DEFAULTS_PARTIAL_FILENAME,
+    )
+    missing_paths = [path.name for path in required_paths if not path.exists()]
+    if missing_paths:
+        errors.append(
+            "Scenarios without public capital hints must check in canonical authoring inputs. "
+            f"Missing: {', '.join(missing_paths)}."
+        )
+    legacy_capital_hints_path = scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME
+    if legacy_capital_hints_path.exists():
+        errors.append(
+            "Scenarios without public capital hints must not check in legacy capital_hints.json."
         )
 
 
@@ -652,6 +678,7 @@ def inspect_scenario_contract(
     validate_manifest_version_matrix(expected_scenario_id, manifest, errors)
     validate_manifest_urls(expected_scenario_id, manifest, errors)
     validate_runtime_capitals(expected_scenario_id, manifest, errors)
+    validate_internal_authoring_inputs(expected_scenario_id, errors)
     validate_locale_patch(expected_scenario_id, manifest, errors, warnings, strict=strict, repair_tracks=repair_tracks)
     if strict:
         validate_strict_bundle_contract(scenario_dir, errors, repair_tracks=repair_tracks)

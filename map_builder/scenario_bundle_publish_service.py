@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Mapping
 
 from map_builder import scenario_bundle_platform
+from map_builder.scenario_build_session import record_published_target
 
 
 def publish_scenario_build_in_locked_session(
@@ -25,6 +26,7 @@ def publish_scenario_build_in_locked_session(
     load_checkpoint_json: Callable[[Path, str], dict],
     write_json: Callable[[Path, dict], None],
     resolve_publish_filenames: Callable[[str], Iterable[str]],
+    root: Path | None = None,
     geo_name_overrides_filename: str = "geo_name_overrides.manual.json",
 ) -> dict[str, object]:
     manual_sync_report: dict[str, object] | None = None
@@ -65,6 +67,12 @@ def publish_scenario_build_in_locked_session(
         "manualSyncPolicy": manual_sync_policy,
         "publishedFiles": list(resolve_publish_filenames(publish_scope)),
     }
+    record_published_target(
+        build_dir=checkpoint_dir,
+        target=publish_scope,
+        published_paths=[scenario_dir / filename for filename in resolve_publish_filenames(publish_scope)],
+        root=root or scenario_dir.parent.parent.parent,
+    )
     if manual_sync_report is not None:
         result["manualSyncReport"] = manual_sync_report
     return result

@@ -49,7 +49,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--scenario-dir", required=True)
-    parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--checkpoint-dir", default="")
     parser.add_argument("--publish-scope", choices=tno_bundle.PUBLISH_SCOPE_CHOICES, required=True)
     parser.add_argument("--manual-sync-policy", choices=tno_bundle.MANUAL_SYNC_POLICY_CHOICES, required=True)
     parser.add_argument("--root", default=str(ROOT))
@@ -59,9 +59,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     root = Path(args.root).resolve()
+    scenario_dir = _resolve_input_path(args.scenario_dir, root=root)
+    checkpoint_dir = (
+        _resolve_input_path(args.checkpoint_dir, root=root)
+        if str(args.checkpoint_dir or "").strip()
+        else tno_bundle.resolve_default_checkpoint_dir(scenario_dir)
+    )
     result = run_publish_scenario_build(
-        _resolve_input_path(args.scenario_dir, root=root),
-        _resolve_input_path(args.checkpoint_dir, root=root),
+        scenario_dir,
+        checkpoint_dir,
         publish_scope=args.publish_scope,
         manual_sync_policy=args.manual_sync_policy,
     )

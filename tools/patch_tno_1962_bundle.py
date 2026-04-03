@@ -37,6 +37,11 @@ if str(ROOT) not in sys.path:
 from map_builder.geo.topology import compute_neighbor_graph
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder.scenario_build_session import (
+    SCENARIO_BUILD_STATE_FILENAME,
+    ensure_scenario_build_session,
+    record_stage_outputs,
+)
 from map_builder.scenario_locks import scenario_build_lock
 from map_builder import scenario_bundle_platform
 from map_builder import scenario_bundle_publish_service
@@ -83,7 +88,6 @@ HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
-DEFAULT_CHECKPOINT_DIR = ROOT / ".runtime" / "tmp" / "tno_1962_bundle"
 CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
 STAGE_ALL = "all"
 STAGE_COUNTRIES = "countries"
@@ -215,6 +219,43 @@ def _scenario_build_session_lock(scenario_dir: Path) -> object:
         holder="patch_tno_1962_bundle",
     ):
         yield
+
+
+def resolve_default_checkpoint_dir(scenario_dir: Path = SCENARIO_DIR) -> Path:
+    session = ensure_scenario_build_session(
+        scenario_id=SCENARIO_ID,
+        scenario_dir=scenario_dir,
+        root=ROOT,
+    )
+    return Path(session["buildDir"])
+
+
+def _record_checkpoint_stage_outputs(
+    checkpoint_dir: Path,
+    *,
+    scenario_dir: Path,
+    stage: str,
+    filenames: list[str],
+) -> None:
+    ensure_scenario_build_session(
+        scenario_id=SCENARIO_ID,
+        scenario_dir=scenario_dir,
+        root=ROOT,
+        build_dir=checkpoint_dir,
+    )
+    existing_paths = [
+        checkpoint_dir / filename
+        for filename in filenames
+        if (checkpoint_dir / filename).exists()
+    ]
+    if not existing_paths:
+        return
+    record_stage_outputs(
+        build_dir=checkpoint_dir,
+        stage=stage,
+        output_paths=existing_paths,
+        root=ROOT,
+    )
 RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
@@ -4557,7 +4598,7 @@ def load_or_refresh_marine_regions_named_water_snapshot(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Patch the checked-in tno_1962 scenario bundle.")
     parser.add_argument("--stage", choices=STAGE_CHOICES, default=STAGE_ALL)
-    parser.add_argument("--checkpoint-dir", default=str(DEFAULT_CHECKPOINT_DIR))
+    parser.add_argument("--checkpoint-dir", default="")
     parser.add_argument("--scenario-dir", default=str(SCENARIO_DIR))
     parser.add_argument(
         "--tno-root",
@@ -4635,6 +4676,7 @@ def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame
 
 
 CHECKPOINT_STAGE_METADATA_FILENAME = CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME
+CHECKPOINT_BUILD_METADATA_FILENAME = SCENARIO_BUILD_STATE_FILENAME
 CHECKPOINT_SCENARIO_POLITICAL_FILENAME = CONTRACT_CHECKPOINT_POLITICAL_FILENAME
 CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = CONTRACT_CHECKPOINT_WATER_SEED_FILENAME
 CHECKPOINT_WATER_FILENAME = CONTRACT_CHECKPOINT_WATER_FILENAME
@@ -9307,6 +9349,15 @@ def write_countries_stage_checkpoints(
                 write_json=write_json,
                 gdf_to_feature_collection=gdf_to_feature_collection,
             )
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_COUNTRIES,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS),
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
+                ],
+            )
 
 
 def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
@@ -9329,6 +9380,16 @@ def write_runtime_topology_stage_checkpoints(
                 checkpoint_dir,
                 write_json=write_json,
                 gdf_to_feature_collection=gdf_to_feature_collection,
+            )
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_RUNTIME_TOPOLOGY,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS),
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS),
+                ],
             )
 
 
@@ -9381,6 +9442,14 @@ def build_geo_locale_stage(
             )
             ensure_geo_locale_variant_checkpoints(checkpoint_dir)
             validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_GEO_LOCALE,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS),
+                ],
+            )
 
 
 def build_startup_assets_stage(
@@ -9422,6 +9491,14 @@ def build_startup_assets_stage(
                 output_en_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
                 output_zh_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
                 report_path=STARTUP_BUNDLE_REPORT_PATH,
+            )
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_STARTUP_ASSETS,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_STARTUP_STAGE_ARTIFACTS),
+                ],
             )
 
 
@@ -9486,6 +9563,7 @@ def _build_bundle_publish_service_kwargs(
         "load_checkpoint_json": load_checkpoint_json,
         "write_json": write_json,
         "resolve_publish_filenames": resolve_scenario_publish_filenames,
+        "root": ROOT,
     }
 
 
@@ -9512,6 +9590,21 @@ def build_chunk_assets_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
         with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_CHUNK_ASSETS):
             scenario_bundle_platform.require_chunk_stage_publish_inputs(scenario_dir)
             rebuild_published_scenario_chunk_assets(scenario_dir, checkpoint_dir)
+            ensure_scenario_build_session(
+                scenario_id=SCENARIO_ID,
+                scenario_dir=scenario_dir,
+                root=ROOT,
+                build_dir=checkpoint_dir,
+            )
+            record_stage_outputs(
+                build_dir=checkpoint_dir,
+                stage=STAGE_CHUNK_ASSETS,
+                output_paths=[
+                    scenario_dir / "detail_chunks.manifest.json",
+                    scenario_dir / "chunks",
+                ],
+                root=ROOT,
+            )
 
 
 def print_bundle_summary(state: dict[str, object]) -> None:
@@ -9551,7 +9644,11 @@ def main() -> None:
     global _CLI_HGO_ROOT_OVERRIDE
     args = parse_args()
     scenario_dir = Path(args.scenario_dir).resolve()
-    checkpoint_dir = Path(args.checkpoint_dir).resolve()
+    checkpoint_dir = (
+        Path(args.checkpoint_dir).resolve()
+        if str(args.checkpoint_dir or "").strip()
+        else resolve_default_checkpoint_dir(scenario_dir)
+    )
     _CLI_TNO_ROOT_OVERRIDE = Path(args.tno_root).expanduser().resolve() if args.tno_root else None
     _CLI_HGO_ROOT_OVERRIDE = Path(args.hgo_root).expanduser().resolve() if args.hgo_root else None
 

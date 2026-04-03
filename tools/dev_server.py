@@ -34,7 +34,8 @@ from map_builder.scenario_mutations import (
     normalize_scenario_mutations_payload,
 )
 from map_builder.scenario_materialization_service import (
-    apply_mutation_and_materialize_in_locked_context,
+    materialize_in_locked_context,
+    write_mutation_patch_in_locked_context,
 )
 from map_builder.scenario_publish_service import (
     publish_scenario_outputs_in_locked_context,
@@ -766,7 +767,7 @@ def save_scenario_ownership_payload(
                 status=400,
             )
 
-        service_result = apply_mutation_and_materialize_in_locked_context(
+        pipeline_result = _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
                 "assignments_by_feature_id": mutations_payload["assignments_by_feature_id"],
@@ -774,7 +775,7 @@ def save_scenario_ownership_payload(
             target="political",
             root=root,
         )
-        materialized = service_result["political"]["materialized"]
+        materialized = pipeline_result["materialize"]["political"]["materialized"]
         owners_payload = materialized["ownersPayload"]
         owner_codes = sorted(set(owners_payload["owners"].values()))
         return {
@@ -822,6 +823,56 @@ def _load_scenario_mutations_payload(context: dict[str, object]) -> dict[str, ob
     if payload is None:
         payload = default_scenario_mutations_payload(scenario_id)
     return normalize_scenario_mutations_payload(payload, scenario_id=scenario_id)
+
+
+def _write_and_materialize_mutation_pipeline(
+    context: dict[str, object],
+    *,
+    mutation_patch: dict[str, object] | None,
+    target: str,
+    publish_targets: tuple[str, ...] = (),
+    root: Path = ROOT,
+) -> dict[str, object]:
+    mutations_snapshot = _capture_text_snapshot(Path(context["mutationsPath"]))
+    try:
+        write_result = write_mutation_patch_in_locked_context(
+            context,
+            mutation_patch=mutation_patch,
+            root=root,
+        )
+        materialize_result = materialize_in_locked_context(
+            context,
+            target=target,
+            root=root,
+        )
+        geo_locale_checkpoint_dir = None
+        geo_locale_result = materialize_result.get("geoLocale") if isinstance(materialize_result, dict) else None
+        if isinstance(geo_locale_result, dict):
+            materialized_geo_locale = geo_locale_result.get("materialized")
+            if isinstance(materialized_geo_locale, dict):
+                checkpoint_dir_text = str(materialized_geo_locale.get("checkpointDir") or "").strip()
+                if checkpoint_dir_text:
+                    geo_locale_checkpoint_dir = Path(checkpoint_dir_text)
+        publish_results: dict[str, object] = {}
+        for publish_target in publish_targets:
+            publish_results[publish_target] = publish_scenario_outputs_in_locked_context(
+                context,
+                target=publish_target,
+                root=root,
+                checkpoint_dir=geo_locale_checkpoint_dir if publish_target in {"geo-locale", "startup-assets"} else None,
+            )
+        return {
+            "write": write_result,
+            "materialize": materialize_result,
+            "publish": publish_results,
+        }
+    except Exception:
+        _restore_text_snapshot(
+            mutations_snapshot[0],
+            existed=mutations_snapshot[1],
+            original_text=mutations_snapshot[2],
+        )
+        raise
 
 
 def _build_mutation_country_record(country_entry: dict[str, object], *, mode: str) -> dict[str, object]:
@@ -1695,7 +1746,7 @@ def save_scenario_tag_create_payload(
                 assignment_record["cores"] = [normalized_tag]
             assignment_patch[feature_id] = assignment_record
 
-        service_result = apply_mutation_and_materialize_in_locked_context(
+        pipeline_result = _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
                 "tags": {normalized_tag: tag_mutation},
@@ -1705,7 +1756,7 @@ def save_scenario_tag_create_payload(
             target="political",
             root=root,
         )
-        materialized = service_result["political"]["materialized"]
+        materialized = pipeline_result["materialize"]["political"]["materialized"]
         materialized_countries = materialized["countriesPayload"]["countries"]
         materialized_catalog = materialized.get("catalogPayload")
         catalog_entry_index, catalog_entry = _find_releasable_catalog_entry(materialized_catalog, normalized_tag) if isinstance(materialized_catalog, dict) else (None, None)
@@ -1813,7 +1864,7 @@ def save_scenario_country_payload(
             manual_mode = "create"
         elif isinstance(existing_entry, dict) and str(existing_entry.get("primary_rule_source") or "").strip() == "dev_manual_tag_create":
             manual_mode = "create"
-        service_result = apply_mutation_and_materialize_in_locked_context(
+        pipeline_result = _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
                 "countries": {
@@ -1823,7 +1874,7 @@ def save_scenario_country_payload(
             target="political",
             root=root,
         )
-        materialized = service_result["political"]["materialized"]
+        materialized = pipeline_result["materialize"]["political"]["materialized"]
         materialized_countries = materialized["countriesPayload"]["countries"]
         materialized_catalog = materialized.get("catalogPayload")
         _catalog_entry_index, updated_catalog_entry = _find_releasable_catalog_entry(materialized_catalog, normalized_tag) if isinstance(materialized_catalog, dict) else (None, None)
@@ -1949,7 +2000,7 @@ def save_scenario_capital_payload(
         )
         if isinstance(mutation_hint, dict):
             previous_hint.update(copy.deepcopy(mutation_hint))
-        service_result = apply_mutation_and_materialize_in_locked_context(
+        pipeline_result = _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
                 "capitals": {
@@ -1983,7 +2034,7 @@ def save_scenario_capital_payload(
             target="political",
             root=root,
         )
-        materialized = service_result["political"]["materialized"]
+        materialized = pipeline_result["materialize"]["political"]["materialized"]
         materialized_countries = materialized["countriesPayload"]["countries"]
         materialized_catalog = materialized.get("catalogPayload")
         _catalog_entry_index, updated_catalog_entry = _find_releasable_catalog_entry(
@@ -2144,32 +2195,22 @@ def _save_scenario_district_groups_payload_from_context(
         districts=districts,
         valid_feature_ids=valid_feature_ids,
     )
-
-    district_groups_payload["version"] = int(district_groups_payload.get("version") or 1)
-    district_groups_payload["scenario_id"] = str(context["scenarioId"])
-    district_groups_payload["generated_at"] = _now_iso()
-    district_groups_payload = {
-        "version": district_groups_payload["version"],
-        "scenario_id": district_groups_payload["scenario_id"],
-        "generated_at": district_groups_payload["generated_at"],
-        "tags": {
-            **(district_groups_payload.get("tags", {}) if isinstance(district_groups_payload.get("tags"), dict) else {}),
-            normalized_tag: {
-                "tag": normalized_tag,
-                "districts": normalized_districts,
-            },
+    pipeline_result = _write_and_materialize_mutation_pipeline(
+        context,
+        mutation_patch={
+            "district_groups": {
+                normalized_tag: {
+                    "tag": normalized_tag,
+                    "districts": normalized_districts,
+                }
+            }
         },
-    }
-
+        target="district-groups",
+        root=root,
+    )
+    district_groups_payload = pipeline_result["materialize"]["districtGroups"]["districtGroupsPayload"]
     district_groups_path = Path(context["districtGroupsPath"])
     current_url = _repo_relative(district_groups_path, root=root)
-    transaction_payloads: list[tuple[Path, object]] = [(district_groups_path, district_groups_payload)]
-    if str(context.get("manifest", {}).get("district_groups_url") or "").strip() != current_url:
-        manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
-        manifest_payload["district_groups_url"] = current_url
-        context["manifest"] = manifest_payload
-        transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
-    _write_json_transaction(transaction_payloads)
 
     return {
         "ok": True,
@@ -2348,7 +2389,10 @@ def save_scenario_geo_locale_entry(
             raise DevServerError("missing_feature_id", "Feature id is required for geo locale saves.", status=400)
         locale_entry = _normalize_locale_entry(en, zh)
         mutation_entry: dict[str, object] | None = locale_entry or None
-        service_result = apply_mutation_and_materialize_in_locked_context(
+        publish_targets: tuple[str, ...] = ("geo-locale",)
+        if str(context["scenarioId"]) == "tno_1962":
+            publish_targets = ("geo-locale", "startup-assets")
+        _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
                 "geo_locale": {
@@ -2356,19 +2400,9 @@ def save_scenario_geo_locale_entry(
                 }
             },
             target="geo-locale",
+            publish_targets=publish_targets,
             root=root,
         )
-        if str(context["scenarioId"]) == "tno_1962":
-            publish_scenario_outputs_in_locked_context(
-                context,
-                target="geo-locale",
-                root=root,
-            )
-            publish_scenario_outputs_in_locked_context(
-                context,
-                target="startup-assets",
-                root=root,
-            )
 
         geo_locale_patch_payload = _read_json(Path(context["geoLocalePatchPath"]))
         current_entry = (

@@ -70,6 +70,41 @@ def _create_scenario_dir(
             "capital_city_hints": {},
         },
     )
+    _write_json(
+        scenario_dir / "scenario_mutations.json",
+        {
+            "version": 1,
+            "scenario_id": scenario_id or scenario_name,
+            "generated_at": "",
+            "tags": {},
+            "countries": {},
+            "assignments_by_feature_id": {},
+            "capitals": {},
+            "geo_locale": {},
+            "district_groups": {},
+        },
+    )
+    _write_json(
+        scenario_dir / "city_assets.partial.json",
+        {
+            "version": 1,
+            "scenario_id": scenario_id or scenario_name,
+            "generated_at": "",
+            "cities": {},
+            "audit": {},
+        },
+    )
+    _write_json(
+        scenario_dir / "capital_defaults.partial.json",
+        {
+            "version": 1,
+            "scenario_id": scenario_id or scenario_name,
+            "generated_at": "",
+            "capitals_by_tag": {},
+            "capital_city_hints": {},
+            "audit": {},
+        },
+    )
     if include_capital_hints_url:
         _write_json(
             scenario_dir / "capital_hints.json",
@@ -192,6 +227,77 @@ class ScenarioContractTest(unittest.TestCase):
 
             self.assertEqual(warnings, [])
             self.assertTrue(any("Missing: capital_hints_url" in error for error in errors))
+
+    def test_validate_scenario_contract_requires_internal_authoring_inputs_for_tno_without_capital_hints(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(
+                tmp_root,
+                "tno_1962",
+                include_capital_hints_url=False,
+            )
+            for filename in (
+                "scenario_mutations.json",
+                "city_assets.partial.json",
+                "capital_defaults.partial.json",
+            ):
+                (scenario_dir / filename).unlink(missing_ok=True)
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("canonical authoring inputs" in error for error in errors))
+
+    def test_validate_scenario_contract_rejects_tno_manifest_capital_hints_url(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(
+                tmp_root,
+                "tno_1962",
+                include_capital_hints_url=True,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("must not declare manifest.capital_hints_url" in error for error in errors))
+
+    def test_validate_scenario_contract_rejects_tno_checked_in_legacy_capital_hints(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(
+                tmp_root,
+                "tno_1962",
+                include_capital_hints_url=False,
+            )
+            _write_json(
+                scenario_dir / "capital_hints.json",
+                {
+                    "version": 1,
+                    "scenario_id": "tno_1962",
+                    "entries": [],
+                },
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("must not check in legacy capital_hints.json" in error for error in errors))
 
     def test_validate_scenario_contract_keeps_locale_collisions_as_warnings(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
