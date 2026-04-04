@@ -35,8 +35,6 @@ const CITY_ALIASES_URLS = ["data/city_aliases.json"];
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
-const STARTUP_LOCALES_URL = "data/locales.startup.json";
-const STARTUP_GEO_ALIASES_URL = "data/geo_aliases.startup.json";
 const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
 const CONTEXT_LAYER_PACKS = {
   airports: { url: "data/transport_layers/japan_airport/airports.geojson", format: "geojson" },
@@ -694,6 +692,10 @@ function normalizeLocaleLevel(value, fallback = "full") {
   return String(value || fallback).trim().toLowerCase() === "startup" ? "startup" : "full";
 }
 
+function isScenarioScopedLocalizationUrl(url) {
+  return /(^|\/)data\/scenarios\/[^/]+\/(?:locales|geo_aliases)\.startup\.json$/i.test(String(url || "").trim());
+}
+
 function resolveLocalizationUrls({
   localeLevel = "full",
   localesUrl = null,
@@ -703,10 +705,10 @@ function resolveLocalizationUrls({
   return {
     localeLevel: normalizedLevel,
     localesUrl: String(
-      localesUrl || (normalizedLevel === "startup" ? STARTUP_LOCALES_URL : "data/locales.json")
+      localesUrl || "data/locales.json"
     ).trim(),
     geoAliasesUrl: String(
-      geoAliasesUrl || (normalizedLevel === "startup" ? STARTUP_GEO_ALIASES_URL : "data/geo_aliases.json")
+      geoAliasesUrl || "data/geo_aliases.json"
     ).trim(),
   };
 }
@@ -1015,6 +1017,9 @@ export async function loadStartupBootArtifacts({
     useStartupCache && isStartupCacheEnabled()
   );
   const workerEnabled = useWorker && shouldUseStartupWorker();
+  const localizationUsesScenarioScopedStartupFiles =
+    isScenarioScopedLocalizationUrl(resolvedLocalization.localesUrl)
+    || isScenarioScopedLocalizationUrl(resolvedLocalization.geoAliasesUrl);
   let buildManifest = null;
 
   if (startupBootCacheState.enabled) {
@@ -1025,6 +1030,9 @@ export async function loadStartupBootArtifacts({
       startupBootCacheState.enabled = false;
     }
   }
+  if (startupBootCacheState.enabled && localizationUsesScenarioScopedStartupFiles) {
+    startupBootCacheState.localization = "scenario-scoped";
+  }
 
   const topologyCacheKey = startupBootCacheState.enabled
     ? createStartupBaseTopologyCacheKey({
@@ -1032,7 +1040,7 @@ export async function loadStartupBootArtifacts({
       buildManifest,
     })
     : "";
-  const localizationCacheKey = startupBootCacheState.enabled
+  const localizationCacheKey = startupBootCacheState.enabled && !localizationUsesScenarioScopedStartupFiles
     ? createStartupLocalizationCacheKey({
       localeLevel: resolvedLocalization.localeLevel,
       currentLanguage: state.currentLanguage || "en",

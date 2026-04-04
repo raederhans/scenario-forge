@@ -63,6 +63,56 @@ class ScenarioBundlePublishServiceTest(unittest.TestCase):
             self.assertEqual(result["publishedFiles"], ["countries.json", "owners.by_feature.json"])
             self.assertIn("manualSyncReport", result)
 
+    def test_publish_scenario_build_does_not_record_target_when_commit_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            ensure_offline = Mock()
+            validate_geo_locale = Mock()
+            require_startup = Mock()
+            detect_manual_sync = Mock(return_value={"has_drift": False})
+            publish_bundle = Mock(side_effect=OSError("commit failed"))
+
+            with (
+                patch.object(
+                    scenario_bundle_publish_service.scenario_bundle_platform,
+                    "validate_strict_publish_bundle",
+                ),
+                patch.object(
+                    scenario_bundle_publish_service,
+                    "record_published_target",
+                ) as record_published_target_mock,
+            ):
+                with self.assertRaisesRegex(OSError, "commit failed"):
+                    scenario_bundle_publish_service.publish_scenario_build_in_locked_session(
+                        scenario_dir,
+                        checkpoint_dir,
+                        publish_scope="scenario_data",
+                        manual_sync_policy="backup-continue",
+                        scenario_id="tno_1962",
+                        scenario_data_scope="scenario_data",
+                        all_scope="all",
+                        manual_source_filenames={
+                            "scenario_manual_overrides": "scenario_manual_overrides.json",
+                            "geo_name_overrides": "geo_name_overrides.manual.json",
+                        },
+                        validate_publish_bundle_dir=lambda path: [],
+                        ensure_publish_target_offline=ensure_offline,
+                        validate_geo_locale_checkpoint=validate_geo_locale,
+                        require_startup_stage_checkpoints=require_startup,
+                        detect_unsynced_manual_edits=detect_manual_sync,
+                        publish_checkpoint_bundle=publish_bundle,
+                        load_checkpoint_json=Mock(),
+                        write_json=Mock(),
+                        resolve_publish_filenames=lambda scope: ["countries.json", "owners.by_feature.json"],
+                    )
+
+            record_published_target_mock.assert_not_called()
+
     def test_publish_polar_runtime_scope_skips_scenario_data_guards(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

@@ -14,9 +14,13 @@ from unittest import mock
 
 from map_builder import config as cfg
 from map_builder import scenario_context
+from map_builder import scenario_geo_locale_registry
+from map_builder import scenario_political_support
 from map_builder import scenario_geo_locale_materializer
 from map_builder import scenario_materialization_service
+from map_builder import scenario_political_materialization_service
 from map_builder.scenario_political_materializer import build_political_materialization_transaction
+from map_builder.scenario_service_errors import ScenarioServiceError
 from tools import dev_server
 
 
@@ -364,6 +368,58 @@ class DevServerTest(unittest.TestCase):
             )
             self.assertEqual(
                 materialized["manualPayload"]["assignments"]["DE-1"]["owner"],
+                "BBB",
+            )
+
+    def test_dev_server_error_aliases_shared_service_error(self) -> None:
+        self.assertIs(dev_server.DevServerError, ScenarioServiceError)
+
+    def test_political_materialization_service_deps_are_map_builder_owned(self) -> None:
+        deps = scenario_political_materialization_service.build_political_materializer_deps()
+        self.assertEqual(
+            deps.load_country_catalog.__module__,
+            scenario_political_support.load_country_catalog.__module__,
+        )
+        self.assertEqual(
+            deps.load_political_payload_bundle.__module__,
+            scenario_political_support.load_political_payload_bundle.__module__,
+        )
+        self.assertIs(deps.error_cls, ScenarioServiceError)
+
+    def test_political_materialization_service_builds_transaction_from_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root)
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+            mutations_payload = dev_server._load_scenario_mutations_payload(context)
+            mutations_payload["countries"]["AAA"] = {
+                "mode": "override",
+                "display_name_en": "Alpha Prime",
+                "display_name_zh": "阿尔法首都",
+                "color_hex": "#654321",
+                "parent_owner_tag": "BBB",
+            }
+            mutations_payload["assignments_by_feature_id"]["DE-1"] = {"owner": "BBB"}
+
+            transaction_payloads, materialized = (
+                scenario_political_materialization_service.build_political_materialization_transaction_in_context(
+                    context,
+                    mutations_payload,
+                    root=root,
+                )
+            )
+
+            transaction_names = {path.name for path, _payload in transaction_payloads}
+            self.assertIn("scenario_mutations.json", transaction_names)
+            self.assertIn("countries.json", transaction_names)
+            self.assertIn("owners.by_feature.json", transaction_names)
+            self.assertIn("scenario_manual_overrides.json", transaction_names)
+            self.assertEqual(
+                materialized["countriesPayload"]["countries"]["AAA"]["display_name_en"],
+                "Alpha Prime",
+            )
+            self.assertEqual(
+                materialized["ownersPayload"]["owners"]["DE-1"],
                 "BBB",
             )
 
@@ -1567,14 +1623,14 @@ class DevServerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             scenario_dir = self._create_scenario_fixture(root)
-            original_write_json_atomic = dev_server.write_json_atomic
+            original_write_json_atomic = scenario_context.write_json_atomic
 
             def failing_write_json_atomic(path: Path, payload: object, **kwargs: object) -> None:
                 if Path(path) == scenario_dir / "manifest.json":
                     raise RuntimeError("manifest write failed")
                 original_write_json_atomic(path, payload, **kwargs)
 
-            with mock.patch.object(dev_server, "write_json_atomic", side_effect=failing_write_json_atomic):
+            with mock.patch.object(scenario_context, "write_json_atomic", side_effect=failing_write_json_atomic):
                 with self.assertRaises(RuntimeError):
                     dev_server.save_scenario_district_groups_payload(
                         "test_scenario",
@@ -1751,8 +1807,8 @@ class DevServerTest(unittest.TestCase):
             scenario_dir = self._create_scenario_fixture(root)
             builder_script = root / "builder.py"
             _write_geo_builder_script(builder_script, generated_at="now")
-            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
-            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
+            original_registry = dict(scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = {
                 "test_scenario": builder_script,
             }
             try:
@@ -1764,7 +1820,7 @@ class DevServerTest(unittest.TestCase):
                     root=root,
                 )
             finally:
-                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+                scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
@@ -1785,8 +1841,8 @@ class DevServerTest(unittest.TestCase):
                 root,
                 geo_locale_builder_url="tools/override_builder.py",
             )
-            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
-            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
+            original_registry = dict(scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = {
                 "test_scenario": registry_builder,
             }
             try:
@@ -1798,7 +1854,7 @@ class DevServerTest(unittest.TestCase):
                     root=root,
                 )
             finally:
-                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+                scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
@@ -1823,8 +1879,8 @@ class DevServerTest(unittest.TestCase):
                 },
             }
             _write_json(manual_path, original_manual_payload)
-            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
-            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
+            original_registry = dict(scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = {
                 "test_scenario": builder_script,
             }
             try:
@@ -1837,7 +1893,7 @@ class DevServerTest(unittest.TestCase):
                         root=root,
                     )
             finally:
-                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+                scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             manual_payload = json.loads(manual_path.read_text(encoding="utf-8"))
             mutations_path = scenario_dir / "scenario_mutations.json"
@@ -1850,8 +1906,8 @@ class DevServerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             self._create_scenario_fixture(root)
-            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
-            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {}
+            original_registry = dict(scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = {}
             try:
                 with self.assertRaises(dev_server.DevServerError) as exc_info:
                     dev_server.save_scenario_geo_locale_entry(
@@ -1862,7 +1918,7 @@ class DevServerTest(unittest.TestCase):
                         root=root,
                     )
             finally:
-                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+                scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             self.assertEqual(exc_info.exception.code, "geo_locale_not_supported")
 
@@ -1940,7 +1996,7 @@ class DevServerTest(unittest.TestCase):
             builder_script = root / "tools" / "fake_builder.py"
             builder_script.parent.mkdir(parents=True, exist_ok=True)
             builder_script.write_text("# placeholder\n", encoding="utf-8")
-            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            original_registry = dict(scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO)
             first_builder_started = threading.Event()
             release_first_builder = threading.Event()
             second_builder_started = threading.Event()
@@ -1991,7 +2047,7 @@ class DevServerTest(unittest.TestCase):
                 except Exception as exc:
                     results["second_error"] = exc
 
-            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {"test_scenario": builder_script}
+            scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = {"test_scenario": builder_script}
             try:
                 with mock.patch.object(
                     scenario_geo_locale_materializer.subprocess,
@@ -2012,11 +2068,11 @@ class DevServerTest(unittest.TestCase):
                     first_thread.join(timeout=2.0)
                     second_thread.join(timeout=2.0)
             finally:
-                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+                scenario_geo_locale_registry.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
 
             self.assertNotIn("first_error", results)
-            self.assertIsInstance(results.get("second_error"), dev_server.DevServerError)
-            self.assertEqual(results["second_error"].code, "geo_locale_build_failed")
+            self.assertIsInstance(results.get("second_error"), RuntimeError)
+            self.assertIn("another scenario writer is active", str(results["second_error"]))
             manual_payload = json.loads((scenario_dir / "geo_name_overrides.manual.json").read_text(encoding="utf-8"))
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
             self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha One")

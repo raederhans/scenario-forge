@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -964,6 +965,35 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             self.assertFalse(lock_path.exists())
 
+    def test_checkpoint_build_lock_rejects_same_thread_different_transaction(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+
+            with tno_bundle._checkpoint_build_lock(checkpoint_dir, transaction_id="tx-1"):
+                with self.assertRaisesRegex(RuntimeError, "another build is in progress"):
+                    with tno_bundle._checkpoint_build_lock(checkpoint_dir, transaction_id="tx-2"):
+                        self.fail("lock acquisition should have been blocked")
+
+    def test_checkpoint_build_lock_rejects_different_thread_same_transaction(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            errors: list[str] = []
+
+            def worker() -> None:
+                try:
+                    with tno_bundle._checkpoint_build_lock(checkpoint_dir, transaction_id="tx-1"):
+                        pass
+                except RuntimeError as exc:
+                    errors.append(str(exc))
+
+            with tno_bundle._checkpoint_build_lock(checkpoint_dir, transaction_id="tx-1"):
+                thread = threading.Thread(target=worker)
+                thread.start()
+                thread.join(timeout=5)
+
+            self.assertTrue(errors)
+            self.assertIn("another build is in progress", errors[0])
+
     def test_checkpoint_build_lock_blocks_when_lock_file_already_exists(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             checkpoint_dir = Path(tmp_dir) / "checkpoint"
@@ -1121,6 +1151,24 @@ class TnoBundleBuilderTest(unittest.TestCase):
             validate_geo_mock.assert_called_once()
             build_bootstrap_mock.assert_called_once()
             build_bundles_mock.assert_called_once()
+            bootstrap_kwargs = build_bootstrap_mock.call_args.kwargs
+            self.assertEqual(
+                bootstrap_kwargs["startup_locales_output_path"],
+                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
+            )
+            self.assertEqual(
+                bootstrap_kwargs["startup_geo_aliases_output_path"],
+                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+            )
+            bundle_kwargs = build_bundles_mock.call_args.kwargs
+            self.assertEqual(
+                bundle_kwargs["startup_locales_path"],
+                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
+            )
+            self.assertEqual(
+                bundle_kwargs["geo_aliases_path"],
+                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+            )
 
     def test_write_bundle_stage_no_longer_rebuilds_chunk_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -7,7 +7,7 @@ from map_builder import scenario_bundle_platform
 from map_builder.scenario_build_session import record_published_target
 
 
-def publish_scenario_build_in_locked_session(
+def plan_publish_scenario_build_in_locked_session(
     scenario_dir: Path,
     checkpoint_dir: Path,
     *,
@@ -22,13 +22,11 @@ def publish_scenario_build_in_locked_session(
     validate_geo_locale_checkpoint: Callable[[Path, Path], None],
     require_startup_stage_checkpoints: Callable[[Path], None],
     detect_unsynced_manual_edits: Callable[..., dict[str, object]],
-    publish_checkpoint_bundle: Callable[..., None],
-    load_checkpoint_json: Callable[[Path, str], dict],
-    write_json: Callable[[Path, dict], None],
     resolve_publish_filenames: Callable[[str], Iterable[str]],
-    root: Path | None = None,
     geo_name_overrides_filename: str = "geo_name_overrides.manual.json",
 ) -> dict[str, object]:
+    published_files = list(resolve_publish_filenames(publish_scope))
+    published_paths = [scenario_dir / filename for filename in published_files]
     manual_sync_report: dict[str, object] | None = None
     if publish_scope in {scenario_data_scope, all_scope}:
         ensure_publish_target_offline(scenario_dir)
@@ -51,28 +49,95 @@ def publish_scenario_build_in_locked_session(
             manual_sources,
             policy=manual_sync_policy,
         )
-
-    publish_checkpoint_bundle(
-        scenario_dir,
-        checkpoint_dir,
-        publish_scope,
-        load_checkpoint_json=load_checkpoint_json,
-        write_json=write_json,
-    )
-    result: dict[str, object] = {
-        "scenarioDir": str(scenario_dir),
-        "checkpointDir": str(checkpoint_dir),
+    return {
+        "scenarioDir": scenario_dir,
+        "checkpointDir": checkpoint_dir,
         "scenarioId": scenario_id,
         "publishScope": publish_scope,
         "manualSyncPolicy": manual_sync_policy,
-        "publishedFiles": list(resolve_publish_filenames(publish_scope)),
+        "publishMode": "copied_from_checkpoint",
+        "publishedFiles": published_files,
+        "publishedPaths": published_paths,
+        "manualSyncReport": manual_sync_report,
     }
+
+
+def commit_publish_scenario_build_plan(
+    publish_plan: Mapping[str, object],
+    *,
+    publish_checkpoint_bundle: Callable[..., None],
+    load_checkpoint_json: Callable[[Path, str], dict],
+    write_json: Callable[[Path, dict], None],
+) -> None:
+    publish_checkpoint_bundle(
+        Path(publish_plan["scenarioDir"]),
+        Path(publish_plan["checkpointDir"]),
+        str(publish_plan["publishScope"]),
+        load_checkpoint_json=load_checkpoint_json,
+        write_json=write_json,
+    )
+
+
+def publish_scenario_build_in_locked_session(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    *,
+    publish_scope: str,
+    manual_sync_policy: str,
+    scenario_id: str,
+    scenario_data_scope: str,
+    all_scope: str,
+    manual_source_filenames: Mapping[str, str],
+    validate_publish_bundle_dir: Callable[[Path], list[str]],
+    ensure_publish_target_offline: Callable[[Path], None],
+    validate_geo_locale_checkpoint: Callable[[Path, Path], None],
+    require_startup_stage_checkpoints: Callable[[Path], None],
+    detect_unsynced_manual_edits: Callable[..., dict[str, object]],
+    publish_checkpoint_bundle: Callable[..., None],
+    load_checkpoint_json: Callable[[Path, str], dict],
+    write_json: Callable[[Path, dict], None],
+    resolve_publish_filenames: Callable[[str], Iterable[str]],
+    root: Path | None = None,
+    geo_name_overrides_filename: str = "geo_name_overrides.manual.json",
+) -> dict[str, object]:
+    publish_plan = plan_publish_scenario_build_in_locked_session(
+        scenario_dir,
+        checkpoint_dir,
+        publish_scope=publish_scope,
+        manual_sync_policy=manual_sync_policy,
+        scenario_id=scenario_id,
+        scenario_data_scope=scenario_data_scope,
+        all_scope=all_scope,
+        manual_source_filenames=manual_source_filenames,
+        validate_publish_bundle_dir=validate_publish_bundle_dir,
+        ensure_publish_target_offline=ensure_publish_target_offline,
+        validate_geo_locale_checkpoint=validate_geo_locale_checkpoint,
+        require_startup_stage_checkpoints=require_startup_stage_checkpoints,
+        detect_unsynced_manual_edits=detect_unsynced_manual_edits,
+        resolve_publish_filenames=resolve_publish_filenames,
+        geo_name_overrides_filename=geo_name_overrides_filename,
+    )
+    commit_publish_scenario_build_plan(
+        publish_plan,
+        publish_checkpoint_bundle=publish_checkpoint_bundle,
+        load_checkpoint_json=load_checkpoint_json,
+        write_json=write_json,
+    )
     record_published_target(
         build_dir=checkpoint_dir,
         target=publish_scope,
-        published_paths=[scenario_dir / filename for filename in resolve_publish_filenames(publish_scope)],
+        published_paths=list(publish_plan["publishedPaths"]),
         root=root or scenario_dir.parent.parent.parent,
     )
+    result: dict[str, object] = {
+        "scenarioDir": str(publish_plan["scenarioDir"]),
+        "checkpointDir": str(publish_plan["checkpointDir"]),
+        "scenarioId": str(publish_plan["scenarioId"]),
+        "publishScope": str(publish_plan["publishScope"]),
+        "manualSyncPolicy": str(publish_plan["manualSyncPolicy"]),
+        "publishedFiles": list(publish_plan["publishedFiles"]),
+    }
+    manual_sync_report = publish_plan.get("manualSyncReport")
     if manual_sync_report is not None:
         result["manualSyncReport"] = manual_sync_report
     return result

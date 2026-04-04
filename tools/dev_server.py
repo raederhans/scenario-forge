@@ -53,20 +53,25 @@ from map_builder.scenario_publish_service import (
 from map_builder.scenario_geo_locale_materializer import (
     normalize_geo_locale_entry as _normalize_locale_entry,
 )
-from map_builder.scenario_political_materializer import (
-    PoliticalMaterializerDeps,
-    build_capital_city_override_entry_payload,
-    build_political_materialization_transaction as build_political_materialization_transaction_impl,
+from map_builder.scenario_district_groups_service import (
+    build_tag_districts as build_tag_districts_service,
+    load_scenario_tag_feature_ids as load_scenario_tag_feature_ids_service,
 )
+from map_builder.scenario_political_materialization_service import (
+    build_political_materialization_transaction_in_context,
+    build_political_materializer_deps,
+)
+from map_builder.scenario_political_materializer import (
+    build_capital_city_override_entry_payload,
+)
+from map_builder import scenario_political_support
+from map_builder.scenario_service_errors import ScenarioServiceError as DevServerError
 
 # Define the range of ports to try
 PORT_START = 8000
 PORT_END = 8010
 BIND_ADDRESS = "127.0.0.1"
 RUNTIME_ACTIVE_SERVER_PATH = Path(".runtime") / "dev" / "active_server.json"
-GEO_LOCALE_BUILDER_BY_SCENARIO = {
-    "tno_1962": ROOT / "tools" / "build_tno_1962_geo_locale_patch.py",
-}
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 MAX_JSON_BODY_BYTES = 1024 * 1024
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
@@ -75,15 +80,6 @@ DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
 GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
-
-
-class DevServerError(Exception):
-    def __init__(self, code: str, message: str, *, status: int = 400, details: object | None = None) -> None:
-        super().__init__(message)
-        self.code = code
-        self.message = message
-        self.status = status
-        self.details = details
 
 
 class DevServerTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -939,32 +935,8 @@ def _build_capital_city_override_entry(
     }
 
 
-def _political_materializer_deps() -> PoliticalMaterializerDeps:
-    return PoliticalMaterializerDeps(
-        load_country_catalog=_load_country_catalog,
-        load_political_payload_bundle=_load_political_payload_bundle,
-        load_city_assets_payload=_load_city_assets_payload,
-        load_default_capital_overrides_payload=_load_default_capital_overrides_payload,
-        load_source_releasable_catalog=_load_source_releasable_catalog_for_materialization,
-        load_local_releasable_catalog=_load_local_releasable_catalog_for_materialization,
-        build_country_entry_from_mutation=_build_country_entry_from_mutation,
-        build_capital_city_override_entry=_build_capital_city_override_entry,
-        recompute_country_feature_counts=_recompute_country_feature_counts,
-        build_manual_override_country_record=_build_manual_override_country_record,
-        build_manual_assignment_record=_build_manual_assignment_record,
-        default_scenario_manual_overrides_payload=_default_scenario_manual_overrides_payload,
-        default_releasable_catalog=_default_releasable_catalog,
-        find_releasable_catalog_entry=_find_releasable_catalog_entry,
-        scenario_manual_catalog_entry=_scenario_manual_catalog_entry,
-        sync_releasable_catalog_entry_from_country=_sync_releasable_catalog_entry_from_country,
-        validate_tag_code=_validate_tag_code,
-        validate_core_tags=_validate_core_tags,
-        normalize_code=_normalize_code,
-        normalize_text=_normalize_text,
-        repo_relative=_repo_relative,
-        now_iso=_now_iso,
-        error_cls=DevServerError,
-    )
+def _political_materializer_deps():
+    return build_political_materializer_deps()
 
 
 def _build_political_materialization_transaction(
@@ -973,11 +945,10 @@ def _build_political_materialization_transaction(
     *,
     root: Path = ROOT,
 ) -> tuple[list[tuple[Path, object]], dict[str, object]]:
-    return build_political_materialization_transaction_impl(
+    return build_political_materialization_transaction_in_context(
         context,
         mutations_payload,
         root=root,
-        deps=_political_materializer_deps(),
     )
 
 
@@ -1287,20 +1258,11 @@ def _validate_core_tags(raw_core_tags: object, *, feature_id: str, allowed_tags:
 
 
 def _load_scenario_tag_feature_ids(context: dict[str, object], tag: str) -> set[str]:
-    normalized_tag = _validate_tag_code(tag)
-    allowed_tags = _load_allowed_country_tags(context)
-    if normalized_tag not in allowed_tags:
-        raise DevServerError(
-            "unknown_scenario_tag",
-            f'Scenario tag "{normalized_tag}" does not exist in the active scenario countries catalog.',
-            status=400,
-        )
-    owners = _load_owner_assignments(context)
-    return {
-        feature_id
-        for feature_id, owner_code in owners.items()
-        if owner_code == normalized_tag
-    }
+    return load_scenario_tag_feature_ids_service(
+        context,
+        tag,
+        error_cls=DevServerError,
+    )
 
 
 def _default_releasable_catalog(scenario_id: str) -> dict[str, object]:
@@ -1449,6 +1411,59 @@ def _recompute_country_feature_counts(
             continue
         raw_country["feature_count"] = int(owner_counts.get(tag, 0))
         raw_country["controller_feature_count"] = int(controller_counts.get(tag, 0))
+
+
+# Keep dev_server's legacy helper names stable while making map_builder the
+# single implementation source for political materialization support.
+_load_country_catalog = scenario_political_support.load_country_catalog
+_default_scenario_manual_overrides_payload = (
+    scenario_political_support.default_scenario_manual_overrides_payload
+)
+_load_city_assets_payload = scenario_political_support.load_city_assets_payload
+_load_default_capital_overrides_payload = (
+    scenario_political_support.load_default_capital_overrides_payload
+)
+_load_source_releasable_catalog_for_materialization = (
+    scenario_political_support.load_source_releasable_catalog_for_materialization
+)
+_load_local_releasable_catalog_for_materialization = (
+    scenario_political_support.load_local_releasable_catalog_for_materialization
+)
+_load_releasable_catalog_for_edits = (
+    scenario_political_support.load_releasable_catalog_for_edits
+)
+_build_country_entry_from_mutation = (
+    scenario_political_support.build_country_entry_from_mutation
+)
+_build_capital_city_override_entry = (
+    scenario_political_support.build_capital_city_override_entry
+)
+_find_releasable_catalog_entry = (
+    scenario_political_support.find_releasable_catalog_entry
+)
+_apply_inspector_group_fields = scenario_political_support.apply_inspector_group_fields
+_sync_releasable_catalog_entry_from_country = (
+    scenario_political_support.sync_releasable_catalog_entry_from_country
+)
+_build_editable_country_entry = scenario_political_support.build_editable_country_entry
+_normalize_core_assignments = scenario_political_support.normalize_core_assignments
+_load_political_payload_bundle = scenario_political_support.load_political_payload_bundle
+_build_manual_assignment_record = (
+    scenario_political_support.build_manual_assignment_record
+)
+_build_manual_override_country_record = (
+    scenario_political_support.build_manual_override_country_record
+)
+_validate_core_tags = scenario_political_support.validate_core_tags
+_default_releasable_catalog = scenario_political_support.default_releasable_catalog
+_normalize_releasable_catalog = scenario_political_support.normalize_releasable_catalog
+_scenario_manual_catalog_entry = (
+    scenario_political_support.scenario_manual_catalog_entry
+)
+_scenario_country_entry = scenario_political_support.scenario_country_entry
+_recompute_country_feature_counts = (
+    scenario_political_support.recompute_country_feature_counts
+)
 
 
 def save_scenario_tag_create_payload(
@@ -1896,76 +1911,12 @@ def _build_tag_districts(
     districts: object,
     valid_feature_ids: set[str] | None = None,
 ) -> dict[str, dict[str, object]]:
-    if not isinstance(districts, list):
-        raise DevServerError("invalid_districts", "District payload must be an array.", status=400)
-    normalized_districts: dict[str, dict[str, object]] = {}
-    seen_name_en: set[str] = set()
-    seen_name_zh: set[str] = set()
-    seen_feature_ids: set[str] = set()
-
-    for raw_district in districts:
-        if not isinstance(raw_district, dict):
-            raise DevServerError("invalid_district", "Each district entry must be an object.", status=400)
-        district_id = _normalize_text(raw_district.get("districtId") or raw_district.get("district_id"))
-        if not DISTRICT_ID_PATTERN.fullmatch(district_id):
-            raise DevServerError(
-                "invalid_district_id",
-                "District ids must use letters, numbers, underscore, or hyphen.",
-                status=400,
-            )
-        if district_id in normalized_districts:
-            raise DevServerError(
-                "duplicate_district_ids",
-                f'District id "{district_id}" is duplicated within the scenario tag payload.',
-                status=400,
-            )
-        name_en, name_zh = _validate_bilingual_name(raw_district.get("nameEn"), raw_district.get("nameZh"))
-        name_key_en = name_en.lower()
-        name_key_zh = name_zh.lower()
-        if name_key_en in seen_name_en or name_key_zh in seen_name_zh:
-            raise DevServerError(
-                "duplicate_district_names",
-                "District names must be unique within the scenario tag payload.",
-                status=400,
-            )
-        raw_feature_ids = raw_district.get("featureIds") or raw_district.get("feature_ids")
-        if not isinstance(raw_feature_ids, list):
-            raise DevServerError("invalid_feature_ids", "Feature ids must be provided as an array.", status=400)
-        normalized_raw_feature_ids = [_normalize_text(value) for value in raw_feature_ids]
-        if len(set(normalized_raw_feature_ids)) != len(normalized_raw_feature_ids):
-            raise DevServerError(
-                "duplicate_feature_ids",
-                "Each feature id may only belong to one district.",
-                status=400,
-            )
-        feature_ids = _normalize_feature_ids(raw_feature_ids)
-        if valid_feature_ids is not None:
-            unknown_feature_ids = [feature_id for feature_id in feature_ids if feature_id not in valid_feature_ids]
-            if unknown_feature_ids:
-                raise DevServerError(
-                    "unknown_feature_ids",
-                    "One or more district features were not found in the scenario owners file.",
-                    status=400,
-                    details={"missingFeatureIds": unknown_feature_ids[:20]},
-                )
-        overlap = seen_feature_ids.intersection(feature_ids)
-        if overlap:
-            raise DevServerError(
-                "duplicate_feature_ids",
-                "Each feature id may only belong to one district.",
-                status=400,
-                details={"duplicateFeatureIds": sorted(overlap)[:20]},
-            )
-        seen_name_en.add(name_key_en)
-        seen_name_zh.add(name_key_zh)
-        seen_feature_ids.update(feature_ids)
-        normalized_districts[district_id] = {
-            "district_id": district_id,
-            "name_en": name_en,
-            "name_zh": name_zh,
-            "feature_ids": feature_ids,
-        }
-    return normalized_districts
+    return build_tag_districts_service(
+        tag=tag,
+        districts=districts,
+        valid_feature_ids=valid_feature_ids,
+        error_cls=DevServerError,
+    )
 
 
 def _save_scenario_district_groups_payload_from_context(

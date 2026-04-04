@@ -64,6 +64,15 @@ def _tno_copy_checkpoint_artifacts(
     return published_paths
 
 
+def _require_existing_publish_paths(paths: list[Path], *, label: str) -> None:
+    missing = [str(path) for path in paths if not path.exists()]
+    if missing:
+        sample = ", ".join(missing[:8])
+        if len(missing) > 8:
+            sample += ", ..."
+        raise FileNotFoundError(f"Missing {label} artifacts: {sample}")
+
+
 def publish_scenario_outputs_in_locked_context(
     context: dict[str, object],
     *,
@@ -151,21 +160,16 @@ def publish_scenario_outputs_in_locked_context(
                 scenario_dir=scenario_dir,
                 checkpoint_dir=resolved_checkpoint_dir,
                 filenames=[
+                    tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
+                    tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
                     tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
                     tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
                 ],
             )
-            supporting_paths: list[str] = []
-            startup_locales_path = root / "data" / "locales.startup.json"
-            startup_geo_aliases_path = root / "data" / "geo_aliases.startup.json"
-            if startup_locales_path.exists():
-                supporting_paths.append(str(startup_locales_path))
-            if startup_geo_aliases_path.exists():
-                supporting_paths.append(str(startup_geo_aliases_path))
             results["startupAssets"] = {
                 "publishMode": "copied_from_checkpoint",
                 "publishedPaths": [str(path) for path in published_startup_paths],
-                "supportingPaths": supporting_paths,
+                "supportingPaths": [],
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
             record_published_target(
@@ -176,13 +180,15 @@ def publish_scenario_outputs_in_locked_context(
             )
 
         if normalized_target in {"chunk-assets", "all"}:
-            tno_bundle.build_chunk_assets_stage(scenario_dir, resolved_checkpoint_dir)
+            tno_bundle.scenario_bundle_platform.require_chunk_stage_checkpoints(resolved_checkpoint_dir)
+            tno_bundle.scenario_bundle_platform.require_chunk_stage_publish_inputs(scenario_dir)
             published_chunk_paths = [
                 scenario_dir / "detail_chunks.manifest.json",
                 scenario_dir / "chunks",
             ]
+            _require_existing_publish_paths(published_chunk_paths, label="chunk-assets publish")
             results["chunkAssets"] = {
-                "publishMode": "rebuilt_from_published_inputs",
+                "publishMode": "checkpoint_stage_outputs",
                 "publishedPaths": [
                     str(path) for path in published_chunk_paths
                 ],

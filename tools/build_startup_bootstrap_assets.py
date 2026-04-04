@@ -243,8 +243,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--runtime-topology", default=str(ROOT / "data/scenarios/tno_1962/runtime_topology.topo.json"))
     parser.add_argument("--scenario-geo-patch", default=str(ROOT / "data/scenarios/tno_1962/geo_locale_patch.json"))
     parser.add_argument("--runtime-bootstrap-output", default=str(ROOT / "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json"))
-    parser.add_argument("--startup-locales-output", default=str(ROOT / "data/locales.startup.json"))
-    parser.add_argument("--startup-geo-aliases-output", default=str(ROOT / "data/geo_aliases.startup.json"))
+    parser.add_argument("--startup-locales-output", default=str(ROOT / "data/scenarios/tno_1962/locales.startup.json"))
+    parser.add_argument("--startup-geo-aliases-output", default=str(ROOT / "data/scenarios/tno_1962/geo_aliases.startup.json"))
     return parser.parse_args()
 
 

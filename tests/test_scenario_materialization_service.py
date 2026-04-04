@@ -8,6 +8,7 @@ from unittest import mock
 
 from map_builder import config as cfg
 from map_builder import scenario_build_session
+from map_builder import scenario_district_groups_service
 from map_builder import scenario_geo_locale_materializer
 from map_builder import scenario_materialization_service as service
 from map_builder.scenario_build_session import SCENARIO_BUILD_STATE_FILENAME
@@ -126,6 +127,10 @@ def _create_scenario_fixture(root: Path, scenario_id: str = "test_scenario") -> 
 
 
 class ScenarioMaterializationServiceTest(unittest.TestCase):
+    def test_geo_locale_materializer_no_longer_imports_dev_server_registry(self) -> None:
+        source = Path(scenario_geo_locale_materializer.__file__).read_text(encoding="utf-8")
+        self.assertNotIn("from tools import dev_server", source)
+
     def test_apply_mutation_and_materialize_in_locked_context_materializes_political_patch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -304,6 +309,37 @@ class ScenarioMaterializationServiceTest(unittest.TestCase):
             self.assertEqual(result["geoLocale"]["materialized"]["checkpointDir"], str(checkpoint_dir))
             self.assertEqual(build_state_payload["snapshot_hash"], result["geoLocale"]["materialized"]["snapshotHash"])
             self.assertIn("geo-locale", build_state_payload["stage_outputs"])
+
+    def test_build_district_groups_payload_in_context_normalizes_mutation_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            _create_scenario_fixture(root)
+
+            with service.load_locked_materialization_context("test_scenario", root=root) as context:
+                payload = scenario_district_groups_service.build_district_groups_payload_in_context(
+                    context,
+                    {
+                        "district_groups": {
+                            "aaa": {
+                                "districts": {
+                                    "berlin": {
+                                    "district_id": "berlin",
+                                        "name_en": "Berlin",
+                                        "name_zh": "柏林",
+                                        "feature_ids": ["AAA-1"],
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    root=root,
+                )
+
+            self.assertEqual(payload["tags"]["AAA"]["tag"], "AAA")
+            self.assertEqual(
+                payload["tags"]["AAA"]["districts"]["berlin"]["feature_ids"],
+                ["AAA-1"],
+            )
 
 
 if __name__ == "__main__":

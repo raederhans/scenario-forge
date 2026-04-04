@@ -372,6 +372,15 @@ function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage()) 
   return `data/scenarios/${normalizedScenarioId}/startup.bundle.${bundleLanguage}.json`;
 }
 
+function getStartupScenarioSupportUrl(scenarioId, filename) {
+  const normalizedScenarioId = String(scenarioId || "").trim();
+  const normalizedFilename = String(filename || "").trim();
+  if (!normalizedScenarioId || !normalizedFilename) {
+    return "";
+  }
+  return `data/scenarios/${normalizedScenarioId}/${normalizedFilename}`;
+}
+
 function createStartupBundleLoadDiagnostics({
   startupBundleUrl = "",
   language = "en",
@@ -1697,6 +1706,7 @@ async function bootstrap() {
         };
       })
       .catch((error) => ({ ok: false, error }));
+    const startupFallbackScenarioId = await requestedDefaultScenarioIdPromise;
     const {
       topology,
       topologyPrimary,
@@ -1726,6 +1736,8 @@ async function bootstrap() {
       includeCityData: false,
       includeContextLayers: false,
       localeLevel: "startup",
+      localesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "locales.startup.json"),
+      geoAliasesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "geo_aliases.startup.json"),
       useStartupWorker: true,
       useStartupCache: true,
       startupBootArtifactsOverride: startupBundleResultPromise.then((result) => (

@@ -16,10 +16,17 @@ from map_builder.scenario_context import (
     restore_text_snapshot,
     write_json_transaction,
 )
+from map_builder.scenario_district_groups_service import (
+    build_district_groups_payload_in_context,
+)
 from map_builder.scenario_geo_locale_materializer import (
     build_manual_geo_payload_from_mutations,
     materialize_scenario_geo_locale,
 )
+from map_builder.scenario_political_materialization_service import (
+    build_political_materialization_transaction_in_context,
+)
+from map_builder.scenario_service_errors import ScenarioServiceError
 
 ROOT = Path(__file__).resolve().parents[1]
 MATERIALIZE_TARGETS = {"political", "geo-locale", "district-groups", "all"}
@@ -107,8 +114,6 @@ def _materialize_geo_locale_in_context(
     root: Path,
     checkpoint_dir: Path | None = None,
 ) -> dict[str, object]:
-    from tools import dev_server
-
     manual_path = Path(context["manualGeoOverridesPath"])
     mutations_path = Path(context["mutationsPath"])
     manual_snapshot = capture_text_snapshot(manual_path)
@@ -129,12 +134,10 @@ def _materialize_geo_locale_in_context(
         materialized = materialize_scenario_geo_locale(
             context,
             root=root,
-            error_cls=dev_server.DevServerError,
-            fallback_builder_path=context.get("geoLocaleBuilderPath")
-            or dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO.get(str(context["scenarioId"])),
+            error_cls=ScenarioServiceError,
             checkpoint_dir=checkpoint_dir,
         )
-    except dev_server.DevServerError as exc:
+    except ScenarioServiceError as exc:
         _rollback_text_snapshots(
             error=exc,
             manual_snapshot=manual_snapshot,
@@ -142,7 +145,7 @@ def _materialize_geo_locale_in_context(
         )
         raise
     except Exception as exc:
-        build_error = dev_server.DevServerError(
+        build_error = ScenarioServiceError(
             "geo_locale_build_failed",
             "The geo locale patch builder failed after updating manual overrides.",
             status=500,
@@ -153,7 +156,7 @@ def _materialize_geo_locale_in_context(
             manual_snapshot=manual_snapshot,
             mutations_snapshot=mutations_snapshot,
         )
-        raise dev_server.DevServerError(
+        raise ScenarioServiceError(
             "geo_locale_build_failed",
             "The geo locale patch builder failed after updating manual overrides.",
             status=500,
@@ -172,45 +175,12 @@ def _materialize_district_groups_in_context(
     mutations_payload: dict[str, object],
     root: Path,
 ) -> dict[str, object]:
-    from tools import dev_server
-
-    scenario_id = str(context["scenarioId"])
-    generated_at = now_iso()
-    raw_tags = mutations_payload.get("district_groups", {})
-    if not isinstance(raw_tags, dict):
-        raw_tags = {}
-    district_groups_payload: dict[str, object] = {
-        "version": 1,
-        "scenario_id": scenario_id,
-        "generated_at": generated_at,
-        "tags": {},
-    }
-    for raw_tag, raw_tag_payload in raw_tags.items():
-        normalized_tag = dev_server._validate_tag_code(raw_tag)
-        if not isinstance(raw_tag_payload, dict):
-            continue
-        raw_districts = raw_tag_payload.get("districts", {})
-        if not isinstance(raw_districts, dict):
-            raw_districts = {}
-        valid_feature_ids = dev_server._load_scenario_tag_feature_ids(context, normalized_tag)
-        normalized_districts = dev_server._build_tag_districts(
-            tag=normalized_tag,
-            districts=[
-                {
-                    "districtId": raw_district.get("district_id") or raw_district.get("districtId") or raw_district_id,
-                    "nameEn": raw_district.get("name_en") or raw_district.get("nameEn"),
-                    "nameZh": raw_district.get("name_zh") or raw_district.get("nameZh"),
-                    "featureIds": raw_district.get("feature_ids") or raw_district.get("featureIds") or [],
-                }
-                for raw_district_id, raw_district in raw_districts.items()
-                if isinstance(raw_district, dict)
-            ],
-            valid_feature_ids=valid_feature_ids,
-        )
-        district_groups_payload["tags"][normalized_tag] = {
-            "tag": normalized_tag,
-            "districts": normalized_districts,
-        }
+    district_groups_payload = build_district_groups_payload_in_context(
+        context,
+        mutations_payload,
+        root=root,
+        error_cls=ScenarioServiceError,
+    )
 
     transaction_payloads: list[tuple[Path, object]] = [
         (Path(context["districtGroupsPath"]), district_groups_payload),
@@ -258,8 +228,6 @@ def materialize_in_locked_context(
     target: str,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    from tools import dev_server
-
     normalized_target = _validate_target(target)
     mutations_payload = load_scenario_mutations_payload(context)
     results: dict[str, object] = {
@@ -271,7 +239,7 @@ def materialize_in_locked_context(
 
     if normalized_target in {"political", "all"}:
         mutations_payload["generated_at"] = now_iso()
-        transaction_payloads, materialized = dev_server._build_political_materialization_transaction(
+        transaction_payloads, materialized = build_political_materialization_transaction_in_context(
             context,
             mutations_payload,
             root=root,

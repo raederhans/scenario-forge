@@ -10,11 +10,13 @@ import math
 import os
 import re
 import sys
+import threading
+import uuid
 from collections import Counter, deque
 from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from pathlib import Path
-import threading
 
 import geopandas as gpd
 import numpy as np
@@ -50,8 +52,10 @@ from map_builder.contracts import (
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME as CONTRACT_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
     SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME as CONTRACT_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
     SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME as CONTRACT_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME as CONTRACT_CHECKPOINT_STARTUP_LOCALES_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
     SCENARIO_CHECKPOINT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME as CONTRACT_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
@@ -135,27 +139,61 @@ MANUAL_SYNC_BACKUP_ROOT = ROOT / ".runtime" / "backups" / "scenario-rebuild"
 STARTUP_BUNDLE_REPORT_PATH = ROOT / ".runtime" / "reports" / "generated" / "startup_bundle_report.json"
 _CHECKPOINT_BUILD_LOCK_GUARD = threading.RLock()
 _CHECKPOINT_BUILD_LOCK_DEPTHS: dict[str, int] = {}
+_CHECKPOINT_BUILD_LOCK_OWNERS: dict[str, tuple[int, int, str]] = {}
+_CHECKPOINT_BUILD_LOCK_TRANSACTIONS: ContextVar[dict[str, str]] = ContextVar(
+    "checkpoint_build_lock_transactions",
+    default={},
+)
 
 
 @contextmanager
-def _checkpoint_build_lock(checkpoint_dir: Path, *, stage: str = STAGE_ALL) -> object:
+def _checkpoint_build_lock(
+    checkpoint_dir: Path,
+    *,
+    stage: str = STAGE_ALL,
+    holder: str = "patch_tno_1962_bundle",
+    transaction_id: str | None = None,
+) -> object:
     checkpoint_dir = checkpoint_dir.resolve()
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     lock_path = checkpoint_dir / CHECKPOINT_BUILD_LOCK_FILENAME
     lock_key = str(checkpoint_dir)
+    thread_id = threading.get_ident()
+    normalized_holder = str(holder)
+    inherited_transactions = _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get()
+    inherited_transaction_id = inherited_transactions.get(lock_key)
+    normalized_transaction_id = str(
+        transaction_id or inherited_transaction_id or f"{normalized_holder}:{thread_id}:{uuid.uuid4().hex}"
+    ).strip()
+    owner_identity = (os.getpid(), thread_id, normalized_transaction_id)
     with _CHECKPOINT_BUILD_LOCK_GUARD:
         depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
-        if depth > 0:
+        current_owner = _CHECKPOINT_BUILD_LOCK_OWNERS.get(lock_key)
+        if depth > 0 and current_owner == owner_identity:
             _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = depth + 1
             acquired_here = False
         else:
             lock_payload = {
                 "pid": os.getpid(),
+                "thread_id": thread_id,
+                "holder": normalized_holder,
+                "transaction_id": normalized_transaction_id,
                 "stage": stage,
                 "cwd": str(ROOT),
                 "checkpoint_dir": str(checkpoint_dir),
                 "acquired_at": datetime.now(timezone.utc).isoformat(),
             }
+            if depth > 0:
+                existing_lock = None
+                if lock_path.exists():
+                    try:
+                        existing_lock = load_json(lock_path)
+                    except Exception:
+                        existing_lock = lock_path.read_text(encoding="utf-8", errors="ignore").strip() or None
+                raise RuntimeError(
+                    "another build is in progress for checkpoint "
+                    f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
+                )
             try:
                 with lock_path.open("x", encoding="utf-8", newline="\n") as handle:
                     json.dump(lock_payload, handle, ensure_ascii=False, indent=2)
@@ -196,7 +234,11 @@ def _checkpoint_build_lock(checkpoint_dir: Path, *, stage: str = STAGE_ALL) -> o
                         f"{checkpoint_dir} (lock: {lock_path}, holder: {existing_lock!r})"
                     ) from exc
             _CHECKPOINT_BUILD_LOCK_DEPTHS[lock_key] = 1
+            _CHECKPOINT_BUILD_LOCK_OWNERS[lock_key] = owner_identity
             acquired_here = True
+        current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
+        current_transactions[lock_key] = normalized_transaction_id
+        _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
     try:
         yield
     finally:
@@ -204,6 +246,10 @@ def _checkpoint_build_lock(checkpoint_dir: Path, *, stage: str = STAGE_ALL) -> o
             depth = _CHECKPOINT_BUILD_LOCK_DEPTHS.get(lock_key, 0)
             if depth <= 1:
                 _CHECKPOINT_BUILD_LOCK_DEPTHS.pop(lock_key, None)
+                _CHECKPOINT_BUILD_LOCK_OWNERS.pop(lock_key, None)
+                current_transactions = dict(_CHECKPOINT_BUILD_LOCK_TRANSACTIONS.get())
+                current_transactions.pop(lock_key, None)
+                _CHECKPOINT_BUILD_LOCK_TRANSACTIONS.set(current_transactions)
                 if acquired_here:
                     lock_path.unlink(missing_ok=True)
             else:
@@ -4687,6 +4733,8 @@ CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_BOO
 CHECKPOINT_GEO_LOCALE_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME
 CHECKPOINT_GEO_LOCALE_EN_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME
 CHECKPOINT_GEO_LOCALE_ZH_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME
+CHECKPOINT_STARTUP_LOCALES_FILENAME = CONTRACT_CHECKPOINT_STARTUP_LOCALES_FILENAME
+CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME = CONTRACT_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME
 CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME = CONTRACT_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME
 CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME = CONTRACT_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME
 CHECKPOINT_LAND_MASK_FILENAME = CONTRACT_CHECKPOINT_LAND_MASK_FILENAME
@@ -9472,15 +9520,15 @@ def build_startup_assets_stage(
                 full_runtime_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
                 scenario_geo_patch_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
                 runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-                startup_locales_output_path=ROOT / "data/locales.startup.json",
-                startup_geo_aliases_output_path=ROOT / "data/geo_aliases.startup.json",
+                startup_locales_output_path=checkpoint_dir / CHECKPOINT_STARTUP_LOCALES_FILENAME,
+                startup_geo_aliases_output_path=checkpoint_dir / CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
             )
             build_startup_bundles(
                 scenario_manifest_path=checkpoint_dir / "manifest.json",
                 data_manifest_path=ROOT / "data/manifest.json",
                 topology_primary_path=ROOT / "data/europe_topology.json",
-                startup_locales_path=ROOT / "data/locales.startup.json",
-                geo_aliases_path=ROOT / "data/geo_aliases.startup.json",
+                startup_locales_path=checkpoint_dir / CHECKPOINT_STARTUP_LOCALES_FILENAME,
+                geo_aliases_path=checkpoint_dir / CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
                 runtime_bootstrap_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
                 countries_path=checkpoint_dir / "countries.json",
                 owners_path=checkpoint_dir / "owners.by_feature.json",

@@ -4,10 +4,7 @@ const STARTUP_CACHE_STORE_NAME = "entries";
 const STARTUP_CACHE_KIND_INDEX = "by_kind";
 const STARTUP_CACHE_UPDATED_AT_INDEX = "by_updated_at";
 const DEFAULT_BUILD_MANIFEST_URL = "data/manifest.json";
-const BUILD_MANIFEST_PROXY_OUTPUT_BY_URL = {
-  "data/locales.startup.json": "locales.json",
-  "data/geo_aliases.startup.json": "geo_aliases.json",
-};
+const BUILD_MANIFEST_PROXY_OUTPUT_BY_URL = {};
 
 export const BOOT_CACHE_SCHEMA_VERSION = 2;
 export const BASE_DATA_CACHE_REVISION = 1;

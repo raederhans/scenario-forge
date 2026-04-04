@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from map_builder import scenario_publish_service
 from map_builder.scenario_build_session import SCENARIO_BUILD_STATE_FILENAME
@@ -117,10 +118,10 @@ class PublishScenarioOutputsTest(unittest.TestCase):
             _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_FILENAME, {"version": 1, "scenario_id": "tno_1962", "generated_at": "", "geo": {}})
             _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_EN_FILENAME, {"language": "en"})
             _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_GEO_LOCALE_ZH_FILENAME, {"language": "zh"})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME, {"geo": {}})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME, {"alias_to_stable_key": {}})
             _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, {"language": "en"})
             _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME, {"language": "zh"})
-            _write_json(root / "data" / "locales.startup.json", {"locales": {}})
-            _write_json(root / "data" / "geo_aliases.startup.json", {"aliases": {}})
 
             with scenario_publish_service.load_locked_publish_context("tno_1962", root=root) as context:
                 result = scenario_publish_service.publish_scenario_outputs_in_locked_context(
@@ -132,7 +133,51 @@ class PublishScenarioOutputsTest(unittest.TestCase):
 
             self.assertTrue((scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME).exists())
             self.assertEqual(result["startupAssets"]["publishMode"], "copied_from_checkpoint")
-            self.assertEqual(len(result["startupAssets"]["supportingPaths"]), 2)
+            self.assertEqual(result["startupAssets"]["supportingPaths"], [])
+            self.assertEqual(
+                result["startupAssets"]["publishedPaths"],
+                [
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME),
+                ],
+            )
+
+    def test_publish_chunk_assets_target_for_tno_reuses_existing_outputs_without_rebuild(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = _create_scenario_fixture(root)
+            checkpoint_dir = root / ".runtime" / "tmp" / "chunk_publish_checkpoint"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            from tools import patch_tno_1962_bundle as tno_bundle
+
+            _write_json(checkpoint_dir / "manifest.json", {"scenario_id": "tno_1962"})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME, {"objects": {}})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME, {"objects": {}})
+            _write_json(scenario_dir / tno_bundle.CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME, {"objects": {}})
+            _write_json(scenario_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME, {"objects": {}})
+            _write_json(scenario_dir / "detail_chunks.manifest.json", {"chunks": []})
+            (scenario_dir / "chunks").mkdir(parents=True, exist_ok=True)
+
+            with patch.object(tno_bundle, "build_chunk_assets_stage") as build_chunk_assets_stage_mock:
+                with scenario_publish_service.load_locked_publish_context("tno_1962", root=root) as context:
+                    result = scenario_publish_service.publish_scenario_outputs_in_locked_context(
+                        context,
+                        target="chunk-assets",
+                        root=root,
+                        checkpoint_dir=checkpoint_dir,
+                    )
+
+            build_chunk_assets_stage_mock.assert_not_called()
+            self.assertEqual(result["chunkAssets"]["publishMode"], "checkpoint_stage_outputs")
+            self.assertEqual(
+                result["chunkAssets"]["publishedPaths"],
+                [
+                    str(scenario_dir / "detail_chunks.manifest.json"),
+                    str(scenario_dir / "chunks"),
+                ],
+            )
 
 
 if __name__ == "__main__":

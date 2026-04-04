@@ -9,6 +9,10 @@ from map_builder.scenario_build_session import (
     ensure_scenario_build_session,
     record_stage_outputs,
 )
+from map_builder.scenario_geo_locale_registry import (
+    get_registered_geo_locale_builder_path,
+)
+from map_builder.scenario_service_errors import ScenarioServiceError
 
 NON_TNO_GEO_LOCALE_CHECKPOINT_FILENAME = "geo_locale_patch.json"
 
@@ -65,7 +69,7 @@ def _run_legacy_geo_locale_builder(
     root: Path,
     builder_path: Path,
     output_path: Path,
-    error_cls: type[Exception],
+    error_cls: type[ScenarioServiceError] = ScenarioServiceError,
 ) -> dict[str, object]:
     scenario_id = str(context["scenarioId"])
     command = [
@@ -118,11 +122,29 @@ def _run_legacy_geo_locale_builder(
     }
 
 
+def resolve_geo_locale_builder_path(
+    context: dict[str, object],
+    *,
+    fallback_builder_path: Path | None = None,
+) -> Path | None:
+    if fallback_builder_path is not None:
+        return Path(fallback_builder_path)
+    configured_builder_path = context.get("geoLocaleBuilderPath")
+    if configured_builder_path:
+        return Path(configured_builder_path)
+    registered_builder_path = get_registered_geo_locale_builder_path(
+        str(context["scenarioId"])
+    )
+    if registered_builder_path:
+        return Path(registered_builder_path)
+    return None
+
+
 def materialize_scenario_geo_locale(
     context: dict[str, object],
     *,
     root: Path,
-    error_cls: type[Exception],
+    error_cls: type[ScenarioServiceError] = ScenarioServiceError,
     fallback_builder_path: Path | None = None,
     checkpoint_dir: Path | None = None,
 ) -> dict[str, object]:
@@ -170,7 +192,10 @@ def materialize_scenario_geo_locale(
             "buildMode": "in_process",
         }
 
-    builder_path = fallback_builder_path or context.get("geoLocaleBuilderPath")
+    builder_path = resolve_geo_locale_builder_path(
+        context,
+        fallback_builder_path=fallback_builder_path,
+    )
     if not builder_path:
         raise error_cls(
             "geo_locale_not_supported",

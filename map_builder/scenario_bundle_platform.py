@@ -260,6 +260,14 @@ def require_startup_stage_checkpoints(checkpoint_dir: Path) -> None:
     )
 
 
+def require_chunk_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        SCENARIO_CHUNK_STAGE_REQUIRED_FILENAMES,
+        label="chunk-assets checkpoint",
+    )
+
+
 def require_chunk_stage_publish_inputs(scenario_dir: Path) -> None:
     require_directory_files(
         scenario_dir,

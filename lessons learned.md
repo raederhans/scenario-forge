@@ -81,3 +81,21 @@
 - 同线程嵌套写链如果没有 transaction 继承，收紧锁语义后会先把自己锁死。
 - 最小可行方案是：锁文件写 `thread_id` / `transaction_id`，进程内用 `ContextVar` 继承当前 transaction，跨线程即使 transaction 相同也不允许重入。
 - 改完后必须补三类定向测试：同线程默认继承、同线程不同 transaction 拒绝、不同线程同 transaction 拒绝。
+
+### 15. startup supporting file 一旦进入场景链路，就要直接正式化，不要保留半套 root 兼容层
+- 如果 `locales.startup.json` / `geo_aliases.startup.json` 已经参与 startup bundle 构筑，就应当进入 checkpoint artifact 和 scenario publish contract。
+- 继续把它们留在 root 当 supporting file，只会让 build、publish、fallback 各走各的路径。
+- 更稳的最短路径是：checkpoint 内生成，scenario 目录正式发布，fallback 也直接读 scenario-scoped 版本。
+
+### 16. live test 归属要先锁死，不能在收尾阶段并行起两条 unittest
+- 就算都是短测，也要默认串行；一旦 parent 和子代理同时持有 live test，日志归属会立刻混乱。
+- 正确顺序是：先关掉还在运行的写线子代理，再由主线程独占执行所有验证。
+
+### 17. 抽 service 时，测试要跟着切到真实写口，不能继续 patch 旧 adapter helper
+- 业务 helper 下沉后，dev_server.write_json_atomic 这类旧入口不一定还是实际写口；继续 patch 旧入口，测出来的只会是过时实现。
+- 更稳的做法是先确认当前真实写链，再 patch 命中的共享 transaction writer 或底层 IO 函数。
+- 这样才能同时守住“逻辑没回退”和“回滚边界还在”。
+### 18. 先切断 service 的反向 import，再决定 adapter 要不要同波次薄化
+- 真正影响架构边界的是 map_builder -> tools 这类反向依赖，不是 adapter 文件里还保留了多少旧 helper 名字。
+- 如果 donor 面很大，先把 service deps 内收，保留 adapter wrapper，通常比一波里同时清空旧 helper 更稳。
+- 等主链稳定后，再单独决定要不要把 adapter 旧实现全部收成转发，避免为了“顺手清理”扩大回归面。
