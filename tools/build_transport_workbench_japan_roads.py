@@ -16,6 +16,8 @@ from shapely.geometry import GeometryCollection, LineString, MultiLineString, Po
 from shapely.ops import linemerge, unary_union
 from topojson import Topology
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CACHE_DIR = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "road"
@@ -557,10 +559,12 @@ def main() -> None:
     manifest = {
         "adapter_id": "japan_road_v1",
         "family": "road",
+        "geometry_kind": "line",
         "country": "Japan",
         "schema_version": 1,
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "distribution_tier": "single_pack",
         "paths": {
             "preview": {
                 "roads": str(PREVIEW_ROADS_TOPO_PATH.relative_to(ROOT)).replace("\\", "/"),
@@ -596,6 +600,18 @@ def main() -> None:
             "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     write_json(MANIFEST_PATH, manifest)
     print(
         f"Wrote {PREVIEW_ROADS_TOPO_PATH.relative_to(ROOT)} ({len(preview_roads)} roads), "

@@ -913,6 +913,44 @@ function ensureActiveScenarioChunkState() {
   return state.activeScenarioChunks;
 }
 
+function ensureScenarioChunkPayloadCache(bundle) {
+  if (!bundle || typeof bundle !== "object") {
+    return {};
+  }
+  bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
+    ? bundle.chunkPayloadCacheById
+    : {};
+  return bundle.chunkPayloadCacheById;
+}
+
+function ensureScenarioChunkPromiseCache(bundle) {
+  if (!bundle || typeof bundle !== "object") {
+    return {};
+  }
+  bundle.chunkPayloadPromisesById = bundle.chunkPayloadPromisesById && typeof bundle.chunkPayloadPromisesById === "object"
+    ? bundle.chunkPayloadPromisesById
+    : {};
+  return bundle.chunkPayloadPromisesById;
+}
+
+function hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey) {
+  return !!(
+    mergedLayerPayloads
+    && typeof mergedLayerPayloads === "object"
+    && Object.prototype.hasOwnProperty.call(mergedLayerPayloads, layerKey)
+  );
+}
+
+function getScenarioRuntimeMergedLayerPayloads(bundle = null) {
+  const bundleScenarioId = getScenarioBundleId(bundle);
+  const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
+  const chunkScenarioId = normalizeScenarioId(state.activeScenarioChunks?.scenarioId);
+  if (!bundleScenarioId || bundleScenarioId !== activeScenarioId || chunkScenarioId !== bundleScenarioId) {
+    return {};
+  }
+  return ensureActiveScenarioChunkState().mergedLayerPayloads;
+}
+
 function touchScenarioChunkLru(chunkId) {
   const chunkState = ensureActiveScenarioChunkState();
   const normalizedChunkId = String(chunkId || "").trim();
@@ -1049,7 +1087,10 @@ function getChunkLayerStatePayload(layerKey) {
 function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow = false } = {}) {
   let changed = false;
   Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach(([layerKey, config]) => {
-    const nextPayload = mergedLayerPayloads?.[layerKey] || null;
+    if (!hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)) {
+      return;
+    }
+    const nextPayload = mergedLayerPayloads[layerKey] || null;
     const currentPayload = state[config.stateField] || null;
     if (nextPayload === currentPayload) return;
     if (config.stateField === "scenarioCityOverridesData") {
@@ -1084,12 +1125,6 @@ function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNo
     return false;
   }
   state.scenarioPoliticalChunkData = normalizedPayload || null;
-  if (bundle) {
-    bundle.chunkMergedLayerPayloads = bundle.chunkMergedLayerPayloads && typeof bundle.chunkMergedLayerPayloads === "object"
-      ? bundle.chunkMergedLayerPayloads
-      : {};
-    bundle.chunkMergedLayerPayloads.political = normalizedPayload || null;
-  }
   refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
   recordScenarioRenderMetric("politicalChunkPromotionMs", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
     scenarioId: getScenarioBundleId(bundle),
@@ -1102,10 +1137,7 @@ function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNo
 function buildMergedScenarioChunkLayerPayloads(bundle) {
   const chunkState = ensureActiveScenarioChunkState();
   const mergedLayerPayloads = {};
-  const layerKeys = new Set([
-    ...Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS),
-    ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
-  ]);
+  const layerKeys = new Set(Object.keys(bundle?.chunkRegistry?.byLayer || {}));
   layerKeys.forEach((layerKey) => {
     const layerChunkPayloads = chunkState.loadedChunkIds
       .map((chunkId) => chunkState.payloadByChunkId?.[chunkId] || null)
@@ -1119,7 +1151,6 @@ function buildMergedScenarioChunkLayerPayloads(bundle) {
     mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
   });
   chunkState.mergedLayerPayloads = mergedLayerPayloads;
-  bundle.chunkMergedLayerPayloads = mergedLayerPayloads;
   return mergedLayerPayloads;
 }
 
@@ -1131,12 +1162,6 @@ async function preloadScenarioCoarseChunks(
 ) {
   if (!scenarioSupportsChunkedRuntime(bundle?.manifest)) return null;
   await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
-  if (bundle.chunkPreloaded === true) {
-    return bundle.chunkMergedLayerPayloads || null;
-  }
-  bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
-    ? bundle.chunkPayloadCacheById
-    : {};
   const visibleLayers = getVisibleScenarioChunkLayers({
     includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
     showWaterRegions: normalizeScenarioPerformanceHints(bundle.manifest).waterRegionsDefault !== false,
@@ -1156,63 +1181,70 @@ async function preloadScenarioCoarseChunks(
     loadedChunkIds: [],
   });
   await Promise.all(
-    coarseSelection.requiredChunks.map(async (chunk) => {
-      if (bundle.chunkPayloadCacheById?.[chunk.id]) return;
-      const result = await loadScenarioChunkFile(chunk.url, {
-        d3Client,
-        scenarioId: getScenarioBundleId(bundle),
-        resourceLabel: `chunk:${chunk.layer}:${chunk.id}`,
-      });
-      bundle.chunkPayloadCacheById[chunk.id] = {
-        layerKey: chunk.layer,
-        payload: result?.payload || null,
-      };
-    })
+    coarseSelection.requiredChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client }))
   );
-  bundle.chunkMergedLayerPayloads = {};
-  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach((layerKey) => {
-    const layerPayloads = coarseSelection.requiredChunks
-      .filter((chunk) => chunk.layer === layerKey)
-      .map((chunk) => bundle.chunkPayloadCacheById?.[chunk.id]?.payload || null)
-      .filter(Boolean);
-    bundle.chunkMergedLayerPayloads[layerKey] = layerPayloads.length
-      ? mergeScenarioChunkPayloads(layerKey, layerPayloads)
-      : null;
-  });
   bundle.chunkPreloaded = true;
-  return bundle.chunkMergedLayerPayloads;
+  const bundleScenarioId = getScenarioBundleId(bundle);
+  if (bundleScenarioId && bundleScenarioId === normalizeScenarioId(state.activeScenarioId)) {
+    const chunkState = ensureActiveScenarioChunkState();
+    chunkState.scenarioId = bundleScenarioId;
+    coarseSelection.requiredChunks.forEach((chunk) => {
+      const payload = bundle.chunkPayloadCacheById?.[chunk.id];
+      if (!payload) return;
+      chunkState.payloadByChunkId[chunk.id] = payload;
+      if (!chunkState.loadedChunkIds.includes(chunk.id)) {
+        chunkState.loadedChunkIds.push(chunk.id);
+      }
+      touchScenarioChunkLru(chunk.id);
+    });
+    const mergedLayerPayloads = buildMergedScenarioChunkLayerPayloads(bundle);
+    applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow: false });
+    applyScenarioPoliticalChunkPayload(bundle, mergedLayerPayloads.political || null, {
+      renderNow: false,
+      reason: "coarse-prewarm",
+    });
+    return mergedLayerPayloads;
+  }
+  return null;
 }
 
 async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3 } = {}) {
   const normalizedChunkId = String(chunkMeta?.id || "").trim();
   if (!bundle || !normalizedChunkId) return null;
-  bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
-    ? bundle.chunkPayloadCacheById
-    : {};
-  if (bundle.chunkPayloadCacheById[normalizedChunkId]) {
-    return bundle.chunkPayloadCacheById[normalizedChunkId];
+  const payloadCache = ensureScenarioChunkPayloadCache(bundle);
+  if (payloadCache[normalizedChunkId]) {
+    return payloadCache[normalizedChunkId];
+  }
+  const promiseCache = ensureScenarioChunkPromiseCache(bundle);
+  if (promiseCache[normalizedChunkId]) {
+    return promiseCache[normalizedChunkId];
   }
   const loadState = ensureRuntimeChunkLoadState();
   loadState.inFlightByChunkId[normalizedChunkId] = true;
-  try {
-    const result = await loadScenarioChunkFile(chunkMeta.url, {
-      d3Client,
-      scenarioId: getScenarioBundleId(bundle),
-      resourceLabel: `chunk:${chunkMeta.layer}:${normalizedChunkId}`,
-    });
-    const payload = {
-      layerKey: chunkMeta.layer,
-      payload: result?.payload || null,
-    };
-    bundle.chunkPayloadCacheById[normalizedChunkId] = payload;
-    delete loadState.errorByChunkId[normalizedChunkId];
-    return payload;
-  } catch (error) {
-    loadState.errorByChunkId[normalizedChunkId] = String(error?.message || error || "Unknown chunk load error.");
-    throw error;
-  } finally {
-    delete loadState.inFlightByChunkId[normalizedChunkId];
-  }
+  const loadPromise = (async () => {
+    try {
+      const result = await loadScenarioChunkFile(chunkMeta.url, {
+        d3Client,
+        scenarioId: getScenarioBundleId(bundle),
+        resourceLabel: `chunk:${chunkMeta.layer}:${normalizedChunkId}`,
+      });
+      const payload = {
+        layerKey: chunkMeta.layer,
+        payload: result?.payload || null,
+      };
+      payloadCache[normalizedChunkId] = payload;
+      delete loadState.errorByChunkId[normalizedChunkId];
+      return payload;
+    } catch (error) {
+      loadState.errorByChunkId[normalizedChunkId] = String(error?.message || error || "Unknown chunk load error.");
+      throw error;
+    } finally {
+      delete promiseCache[normalizedChunkId];
+      delete loadState.inFlightByChunkId[normalizedChunkId];
+    }
+  })();
+  promiseCache[normalizedChunkId] = loadPromise;
+  return loadPromise;
 }
 
 async function refreshActiveScenarioChunks({
@@ -1706,7 +1738,7 @@ function createScenarioBootstrapBundleFromCache({
     chunkPayloadCacheById: {
       ...(priorBundle?.chunkPayloadCacheById || {}),
     },
-    chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
+    chunkPayloadPromisesById: {},
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: cachedCorePayload?.countriesPayload || null,
     ownersPayload: cachedCorePayload?.ownersPayload || null,
@@ -1825,7 +1857,7 @@ function createStartupScenarioBundleFromPayload({
     runtimeMetaPayload: null,
     meshPackPayload: null,
     chunkPayloadCacheById: {},
-    chunkMergedLayerPayloads: null,
+    chunkPayloadPromisesById: {},
     chunkPreloaded: false,
     countriesPayload: payload?.scenario?.countries || null,
     ownersPayload: payload?.scenario?.owners || null,
@@ -1932,6 +1964,22 @@ function hydrateActiveScenarioBundle(
   }
   const runtimeTopologyPayload =
     normalizeScenarioRuntimeTopologyPayload(bundle.runtimeTopologyPayload) || state.scenarioRuntimeTopologyData || null;
+  const runtimeMergedLayerPayloads = getScenarioRuntimeMergedLayerPayloads(bundle);
+  const mergedWaterPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "water")
+    ? runtimeMergedLayerPayloads.water || null
+    : undefined;
+  const mergedSpecialPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "special")
+    ? runtimeMergedLayerPayloads.special || null
+    : undefined;
+  const mergedPoliticalPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "political")
+    ? runtimeMergedLayerPayloads.political || null
+    : undefined;
+  const mergedReliefPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "relief")
+    ? runtimeMergedLayerPayloads.relief || null
+    : undefined;
+  const mergedCitiesPayload = hasScenarioMergedLayerPayload(runtimeMergedLayerPayloads, "cities")
+    ? runtimeMergedLayerPayloads.cities || null
+    : undefined;
   let scenarioOverlayChanged = false;
   let contextBaseChanged = false;
   if (runtimeTopologyPayload) {
@@ -1949,19 +1997,23 @@ function hydrateActiveScenarioBundle(
       || state.scenarioContextLandMaskData
       || null;
     const nextScenarioWaterRegionsData =
-      bundle.chunkMergedLayerPayloads?.water
-      || bundle.waterRegionsPayload
+      mergedWaterPayload !== undefined
+        ? mergedWaterPayload
+        : bundle.waterRegionsPayload
       || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
       || state.scenarioWaterRegionsData
       || null;
     const nextScenarioSpecialRegionsData =
-      bundle.chunkMergedLayerPayloads?.special
-      || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
-      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
-        || bundle.specialRegionsPayload
-        || state.scenarioSpecialRegionsData
-        || null;
+      mergedSpecialPayload !== undefined
+        ? mergedSpecialPayload
+        : (
+          getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+          || bundle.specialRegionsPayload
+          || state.scenarioSpecialRegionsData
+          || null
+        );
     scenarioOverlayChanged =
       state.scenarioRuntimeTopologyData !== runtimeTopologyPayload
       || state.scenarioWaterRegionsData !== nextScenarioWaterRegionsData
@@ -1981,7 +2033,9 @@ function hydrateActiveScenarioBundle(
     state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
   state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
-  state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
+  state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(
+    mergedPoliticalPayload !== undefined ? mergedPoliticalPayload : state.scenarioPoliticalChunkData
+  ) || null;
   if (bundle.districtGroupsPayload) {
     state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
     state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
@@ -1998,10 +2052,14 @@ function hydrateActiveScenarioBundle(
       errorMessage: "",
     });
   }
-  state.scenarioReliefOverlaysData = bundle.chunkMergedLayerPayloads?.relief || bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null;
-  if (bundle.chunkMergedLayerPayloads?.cities || bundle.cityOverridesPayload) {
+  state.scenarioReliefOverlaysData = mergedReliefPayload !== undefined
+    ? mergedReliefPayload
+    : (bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null);
+  if (mergedCitiesPayload !== undefined || bundle.cityOverridesPayload) {
     syncScenarioLocalizationState({
-      cityOverridesPayload: bundle.chunkMergedLayerPayloads?.cities || bundle.cityOverridesPayload || null,
+      cityOverridesPayload: mergedCitiesPayload !== undefined
+        ? mergedCitiesPayload
+        : (bundle.cityOverridesPayload || null),
       geoLocalePatchPayload: bundle.geoLocalePatchPayload || state.scenarioGeoLocalePatchData || null,
     });
   }
@@ -2310,7 +2368,7 @@ async function loadScenarioBundle(
     chunkPayloadCacheById: {
       ...(priorBundle?.chunkPayloadCacheById || {}),
     },
-    chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
+    chunkPayloadPromisesById: {},
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: countriesResult.payload,
     ownersPayload: ownersResult.payload,
@@ -2638,6 +2696,7 @@ export {
   createStartupScenarioBundleFromPayload,
   ensureRuntimeChunkLoadState,
   resetScenarioChunkRuntimeState,
+  preloadScenarioCoarseChunks,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
   scenarioBundleUsesChunkedLayer,

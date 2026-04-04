@@ -6,7 +6,13 @@ import {
 } from "./map_renderer.js";
 import { rebuildPresetState } from "./releasable_manager.js";
 import { refreshScenarioDataHealth } from "./scenario_data_health.js";
-import { ensureActiveScenarioOptionalLayersForVisibility, scheduleScenarioChunkRefresh, scenarioBundleHasChunkedData, scenarioBundleUsesChunkedLayer } from "./scenario_resources.js";
+import {
+  ensureActiveScenarioOptionalLayersForVisibility,
+  preloadScenarioCoarseChunks,
+  scheduleScenarioChunkRefresh,
+  scenarioBundleHasChunkedData,
+  scenarioBundleUsesChunkedLayer,
+} from "./scenario_resources.js";
 import { refreshScenarioShellOverlays } from "./scenario_shell_overlay.js";
 import { syncCountryUi } from "./scenario_ui_sync.js";
 
@@ -61,6 +67,10 @@ async function runPostScenarioApplyEffects({
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioBundleUsesChunkedLayer(bundle)) {
+    await preloadScenarioCoarseChunks(bundle)
+      .catch((error) => {
+        console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
+      });
     scheduleScenarioChunkRefresh({
       reason: "scenario-apply",
       delayMs: 0,

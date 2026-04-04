@@ -7,7 +7,6 @@
   "generated_at": "2026-04-01T23:21:05.687886Z",
   "recipe_path": "data/transport_layers/japan_industrial_zones/source_recipe.manual.json",
   "recipe_version": "japan_industrial_zones_sources_v2",
-  "default_distribution_variant": "internal",
   "distribution_tier": "dual_track",
   "license_tier": "mixed_by_variant",
   "coverage_scope": "japan_main_islands_v1",
@@ -20,58 +19,6 @@
       "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
     },
     "build_audit": "data/transport_layers/japan_industrial_zones/build_audit.json"
-  },
-  "distribution_variants": {
-    "internal": {
-      "label": "official_core",
-      "distribution_tier": "internal_only",
-      "license_tier": "review_required",
-      "source_set": [
-        "l05_official"
-      ],
-      "source_policy": "local_source_cache_with_download",
-      "paths": {
-        "preview": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson"
-        },
-        "full": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
-        }
-      },
-      "feature_counts": {
-        "preview": {
-          "industrial_zones": 3458
-        },
-        "full": {
-          "industrial_zones": 3458
-        }
-      }
-    },
-    "open": {
-      "label": "open_variant",
-      "distribution_tier": "public_publishable_candidate",
-      "license_tier": "odbl_attribution_required",
-      "source_set": [
-        "osm_industrial"
-      ],
-      "source_policy": "local_source_cache_only",
-      "paths": {
-        "preview": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson"
-        },
-        "full": {
-          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson"
-        }
-      },
-      "feature_counts": {
-        "preview": {
-          "industrial_zones": 31976
-        },
-        "full": {
-          "industrial_zones": 31976
-        }
-      }
-    }
   },
   "feature_counts": {
     "preview": {
@@ -258,5 +205,63 @@
   },
   "excluded_regions": [
     "outside_japan_main_islands_route_mask"
-  ]
+  ],
+  "default_variant": "internal",
+  "variants": {
+    "internal": {
+      "label": "official_core",
+      "distribution_tier": "internal_only",
+      "license_tier": "review_required",
+      "source_set": [
+        "l05_official"
+      ],
+      "source_policy": "local_source_cache_with_download",
+      "paths": {
+        "preview": {
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.preview.geojson"
+        },
+        "full": {
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.internal.geojson"
+        }
+      },
+      "feature_counts": {
+        "preview": {
+          "industrial_zones": 3458
+        },
+        "full": {
+          "industrial_zones": 3458
+        }
+      }
+    },
+    "open": {
+      "label": "open_variant",
+      "distribution_tier": "public_publishable_candidate",
+      "license_tier": "odbl_attribution_required",
+      "source_set": [
+        "osm_industrial"
+      ],
+      "source_policy": "local_source_cache_only",
+      "paths": {
+        "preview": {
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson"
+        },
+        "full": {
+          "industrial_zones": "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson"
+        }
+      },
+      "feature_counts": {
+        "preview": {
+          "industrial_zones": 31976
+        },
+        "full": {
+          "industrial_zones": 31976
+        }
+      }
+    }
+  },
+  "extensions": {
+    "industrial_zones": {
+      "variant_axis": "distribution"
+    }
+  }
 }

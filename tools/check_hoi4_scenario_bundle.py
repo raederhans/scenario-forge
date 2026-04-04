@@ -6,9 +6,13 @@ from collections import Counter
 import json
 import re
 from pathlib import Path
-
+import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from tools.check_scenario_contracts import collect_duplicate_scenario_dirs, inspect_scenario_contract
 DEFAULT_SCENARIO_DIR = PROJECT_ROOT / "data/scenarios/hoi4_1936"
 DEFAULT_REPORT_DIR = PROJECT_ROOT / ".runtime/reports/generated/scenarios/hoi4_1936"
 DEFAULT_EXPECTATION_DIR = PROJECT_ROOT / "data/scenarios/expectations"
@@ -225,11 +229,27 @@ def evaluate_controller_set_assertions(
             )
 
 
-def main() -> int:
-    args = parse_args()
-    scenario_dir = Path(args.scenario_dir)
+def inspect_hoi4_scenario_bundle(
+    scenario_dir: Path,
+    report_dir: Path,
+    *,
+    expectation_path: Path | None = None,
+) -> dict[str, object]:
     scenario_dir_name = scenario_dir.name
-    report_dir = Path(args.report_dir)
+    expectation_file = expectation_path or (DEFAULT_EXPECTATION_DIR / f"{scenario_dir_name}.expectation.json")
+    duplicate_scenario_dirs: dict[str, list[str]] = {}
+    if scenario_dir.parent.exists():
+        duplicate_scenario_dirs = collect_duplicate_scenario_dirs(
+            [path for path in scenario_dir.parent.iterdir() if path.is_dir()]
+        )
+    shared_report = inspect_scenario_contract(
+        scenario_dir,
+        duplicate_scenario_dirs,
+        strict=False,
+    )
+    errors: list[str] = []
+    shared_errors = list(shared_report.get("errors", []))
+    errors.extend(shared_errors)
 
     manifest = load_json(scenario_dir / "manifest.json")
     countries = load_json(scenario_dir / "countries.json")
@@ -238,18 +258,10 @@ def main() -> int:
     cores = load_json(scenario_dir / "cores.by_feature.json")
     controllers_path = scenario_dir / "controllers.by_feature.json"
     controllers = load_json(controllers_path) if controllers_path.exists() else {}
-
     scenario_id = str(manifest.get("scenario_id") or "").strip()
-    expectation_path = (
-        Path(args.expectation)
-        if args.expectation
-        else DEFAULT_EXPECTATION_DIR / f"{scenario_dir_name}.expectation.json"
-    )
-    expectation = load_json(expectation_path) if expectation_path.exists() else {}
-
+    expectation = load_json(expectation_file) if expectation_file.exists() else {}
     coverage_report_path = report_dir / "coverage_report.md"
     coverage_report = coverage_report_path.read_text(encoding="utf-8") if coverage_report_path.exists() else ""
-
     summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
     audit_summary = audit.get("summary", {}) if isinstance(audit.get("summary"), dict) else {}
     country_map = countries.get("countries", {}) if isinstance(countries.get("countries"), dict) else {}
@@ -261,16 +273,12 @@ def main() -> int:
         else {}
     )
 
-    errors: list[str] = []
-
     def expect(condition: bool, message: str) -> None:
         if not condition:
             errors.append(message)
 
     expected_scenario_id = str(expectation.get("scenario_id") or scenario_dir_name).strip()
     require_controllers = bool(expectation.get("require_controllers", bool(manifest.get("controllers_url"))))
-    expect(bool(scenario_id), "manifest.scenario_id must be present.")
-    expect(scenario_id == expected_scenario_id, f"scenario_id must be {expected_scenario_id}. Found {scenario_id}.")
     expectation_scenario_id = str(expectation.get("scenario_id") or "").strip()
     if expectation_scenario_id:
         expect(
@@ -278,12 +286,7 @@ def main() -> int:
             "expectation.scenario_id must match the scenario directory name. "
             f"Expected {scenario_dir_name}, found {expectation_scenario_id}.",
         )
-    expect(bool(manifest.get("owners_url")), "manifest.owners_url must be present.")
-    expect(bool(manifest.get("cores_url")), "manifest.cores_url must be present.")
-    expect(bool(manifest.get("countries_url")), "manifest.countries_url must be present.")
-    expect(bool(manifest.get("audit_url")), "manifest.audit_url must be present.")
     if require_controllers:
-        expect(bool(manifest.get("controllers_url")), "manifest.controllers_url must be present.")
         expect(controllers_path.exists(), "controllers.by_feature.json must exist.")
 
     manifest_required_fields = expectation.get("manifest_required_fields", [])
@@ -387,40 +390,6 @@ def main() -> int:
         prefix="manifest.summary",
     )
 
-    # Core consistency checks between manifest, audit, and payload assets.
-    for key in [
-        "feature_count",
-        "owner_count",
-        "approximate_count",
-        "geometry_blocker_count",
-        "failed_region_check_count",
-        "synthetic_owner_feature_count",
-        "critical_region_check_count",
-        "owner_controller_split_feature_count",
-        "controller_count",
-    ]:
-        manifest_value = summary.get(key)
-        audit_value = audit_summary.get(key)
-        if key == "approximate_count" and audit_value is None:
-            audit_value = (audit_summary.get("quality_counts") or {}).get("approx_existing_geometry")
-        if manifest_value is None and audit_value is None:
-            continue
-        expect(manifest_value == audit_value, f"manifest.summary.{key} must equal audit.summary.{key}.")
-
-    expect(
-        summary.get("feature_count") == len(owners_by_feature_id),
-        "manifest.summary.feature_count must equal owners.by_feature entry count.",
-    )
-    expect(
-        summary.get("feature_count") == len(cores.get("cores", {})),
-        "manifest.summary.feature_count must equal cores.by_feature entry count.",
-    )
-    if require_controllers and controllers:
-        expect(
-            summary.get("feature_count") == len(controllers_by_feature_id),
-            "manifest.summary.feature_count must equal controllers.by_feature entry count.",
-        )
-
     owner_tag_counts = Counter(
         str(tag or "").strip().upper()
         for tag in owners_by_feature_id.values()
@@ -479,14 +448,32 @@ def main() -> int:
                 continue
             expect(report_value == audit_value, f"coverage_report.md {md_key} must equal audit.summary.{audit_key}.")
 
-    if errors:
+    return {
+        "scenario_id": scenario_id,
+        "status": "failed" if errors else "ok",
+        "shared_errors": shared_errors,
+        "domain_errors": [error for error in errors if error not in shared_errors],
+        "errors": errors,
+        "summary": summary,
+    }
+
+
+def main() -> int:
+    args = parse_args()
+    report = inspect_hoi4_scenario_bundle(
+        Path(args.scenario_dir),
+        Path(args.report_dir),
+        expectation_path=Path(args.expectation) if args.expectation else None,
+    )
+    if report["errors"]:
         print("[scenario-check] FAILED")
-        for error in errors:
+        for error in report["errors"]:
             print(f"- {error}")
         return 1
 
     print("[scenario-check] OK")
-    print(f"- Scenario: {scenario_id}")
+    summary = report["summary"]
+    print(f"- Scenario: {report['scenario_id']}")
     print(f"- Owners: {summary.get('owner_count')}")
     print(f"- Controllers: {summary.get('controller_count')}")
     print(f"- Features: {summary.get('feature_count')}")

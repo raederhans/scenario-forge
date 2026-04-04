@@ -59,5 +59,30 @@
     "display_fields_preserve_original": true,
     "match_key_normalization": "NFKC + whitespace collapse + casefold"
   },
-  "scope_policy": "japan_corridor_main_islands"
+  "scope_policy": "japan_corridor_main_islands",
+  "distribution_tier": "single_pack",
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "airports": "data/transport_layers/japan_airport/airports.preview.geojson"
+        },
+        "full": {
+          "airports": "data/transport_layers/japan_airport/airports.geojson"
+        },
+        "build_audit": "data/transport_layers/japan_airport/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "airports": 68
+        },
+        "full": {
+          "airports": 75
+        }
+      }
+    }
+  }
 }

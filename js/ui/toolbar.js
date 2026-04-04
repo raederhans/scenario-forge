@@ -75,6 +75,11 @@ import {
   isTransportWorkbenchManifestOnlyRuntimeFamily,
   listTransportWorkbenchWarmupPlans,
 } from "./transport_workbench_family_registry.js";
+import {
+  getTransportWorkbenchManifestDefaultVariantId,
+  getTransportWorkbenchManifestVariantMeta,
+  listTransportWorkbenchManifestVariantEntries,
+} from "./transport_workbench_manifest_variants.js";
 import { formatJapanRailVisibilityReason } from "./transport_workbench_rail_preview.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
@@ -2495,9 +2500,7 @@ function initToolbar({ render } = {}) {
     const audit = previewSnapshot.audit || {};
     const previewCounts = manifest?.feature_counts?.preview || {};
     const fullCounts = manifest?.feature_counts?.full || {};
-    const distributionVariants = manifest?.distribution_variants && typeof manifest.distribution_variants === "object"
-      ? manifest.distribution_variants
-      : null;
+    const variantEntries = listTransportWorkbenchManifestVariantEntries(manifest);
     const rows = [
       ["Pack version", manifest.adapter_id || dataContract?.adapterId || `japan_${family.id}_v1`],
       ["Recipe version", manifest.recipe_version || audit.recipe_version || "unknown"],
@@ -2510,8 +2513,8 @@ function initToolbar({ render } = {}) {
       ["Full features", JSON.stringify(fullCounts || {})],
     ];
 
-    if (distributionVariants) {
-      const variantSummaries = Object.entries(distributionVariants).map(([variantId, variantMeta]) => {
+    if (variantEntries.length > 0) {
+      const variantSummaries = variantEntries.map(([variantId, variantMeta]) => {
         const count = variantMeta?.feature_counts?.full?.industrial_zones
           ?? variantMeta?.feature_counts?.full?.logistics_hubs
           ?? variantMeta?.feature_counts?.full
@@ -2519,7 +2522,7 @@ function initToolbar({ render } = {}) {
         return `${variantId} (${typeof count === "number" ? count : JSON.stringify(count)})`;
       });
       rows.push(
-        ["Default variant", manifest.default_distribution_variant || manifest.default_variant || "unknown"],
+        ["Default variant", getTransportWorkbenchManifestDefaultVariantId(manifest, family.id)],
         ["Variants", variantSummaries.join(", ") || "none"],
       );
     }
@@ -3562,7 +3565,7 @@ function initToolbar({ render } = {}) {
           ["Loaded ports", String(previewSnapshot.stats?.totalFeatures || 0)],
           ["Visible ports", String(previewSnapshot.stats?.visibleFeatures || 0)],
           ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
-          ["Coverage tier", previewSnapshot.activeVariant || config.coverageTier || previewSnapshot.manifest?.default_coverage_tier || "core"],
+          ["Coverage tier", previewSnapshot.activeVariant || config.coverageTier || getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "port")],
           ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
           ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
           ["Pack mode", previewSnapshot.packMode || "preview"],
@@ -3689,8 +3692,10 @@ function initToolbar({ render } = {}) {
       ) {
         const selected = previewSnapshot.selected;
         const selectedProps = selected?.properties || {};
-        const activeVariant = previewSnapshot.activeVariant || config.variant || previewSnapshot.manifest?.default_distribution_variant || "internal";
-        const variantMeta = previewSnapshot.manifest?.distribution_variants?.[activeVariant] || null;
+        const activeVariant = previewSnapshot.activeVariant
+          || config.variant
+          || getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "industrial_zones");
+        const variantMeta = getTransportWorkbenchManifestVariantMeta(previewSnapshot.manifest, activeVariant, "industrial_zones");
         const totalFeatures = Number(previewSnapshot.stats?.totalFeatures || 0);
         const visibleFeatures = Number(previewSnapshot.stats?.visibleFeatures || 0);
         const filteredFeatures = Number(previewSnapshot.stats?.filteredFeatures || 0);
@@ -3764,7 +3769,7 @@ function initToolbar({ render } = {}) {
           ),
         );
         rows = [
-          ["Source track", config.variant || previewSnapshot?.manifest?.default_distribution_variant || "internal"],
+          ["Source track", config.variant || (previewSnapshot?.manifest ? getTransportWorkbenchManifestDefaultVariantId(previewSnapshot.manifest, "industrial_zones") : "internal")],
           ["Land type", formatTransportWorkbenchOptionLabels(config.siteClasses, INDUSTRIAL_SITE_CLASS_OPTIONS)],
           ["Labels", config.showLabels ? "Enabled" : "Hidden"],
           ["Data check", dataContract?.governance || "Deferred pack governance pending"],

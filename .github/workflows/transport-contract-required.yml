@@ -1,0 +1,30 @@
+name: Transport Contract Required
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  transport-contract-required:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Python test dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run transport manifest validator
+        run: python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json
+
+      - name: Run transport manifest unit tests
+        run: python -m unittest tests.test_transport_manifest_contracts tests.test_transport_workbench_manifest_runtime_contract -q

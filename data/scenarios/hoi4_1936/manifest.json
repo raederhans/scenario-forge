@@ -97,7 +97,7 @@
     "manual_reviewed_region_count": 13,
     "belarus_hybrid_feature_count": 35
   },
-  "generated_at": "2026-03-17T04:09:09.223243+00:00",
+  "generated_at": "2026-04-04T02:45:46.798067+00:00",
   "performance_hints": {
     "render_profile_default": "balanced",
     "dynamic_borders_default": false,
@@ -110,6 +110,9 @@
       "fillColor": "#2d4769"
     }
   },
+  "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
+  "runtime_bootstrap_topology_url": "data/scenarios/hoi4_1936/runtime_topology.bootstrap.topo.json",
+  "startup_topology_url": "data/scenarios/hoi4_1936/runtime_topology.bootstrap.topo.json",
   "city_overrides_url": "data/scenarios/hoi4_1936/city_overrides.json",
   "capital_hints_url": "data/scenarios/hoi4_1936/capital_hints.json"
 }

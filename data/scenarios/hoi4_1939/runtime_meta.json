@@ -1,11 +1,13 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-17T00:59:45.665709+00:00",
-  "startup_topology_url": "data/europe_topology.runtime_political_v1.json",
-  "runtime_topology_url": "",
-  "political_chunk_count": 1,
-  "total_chunk_count": 1,
-  "runtime_topology_object_names": [],
-  "runtime_topology_object_count": 0
+  "generated_at": "2026-04-04T02:50:53.167413+00:00",
+  "startup_topology_url": "data/scenarios/hoi4_1939/runtime_topology.bootstrap.topo.json",
+  "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
+  "political_chunk_count": 197,
+  "total_chunk_count": 197,
+  "runtime_topology_object_names": [
+    "political"
+  ],
+  "runtime_topology_object_count": 1
 }

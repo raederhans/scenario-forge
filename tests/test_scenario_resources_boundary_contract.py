@@ -4,6 +4,8 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_RESOURCES = REPO_ROOT / "js" / "core" / "scenario_resources.js"
+SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
+SCENARIO_POST_APPLY_EFFECTS = REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
 MAIN_JS = REPO_ROOT / "js" / "main.js"
 I18N_JS = REPO_ROOT / "js" / "ui" / "i18n.js"
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
@@ -42,6 +44,24 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
 
         self.assertNotIn("let activeScenarioApplyPromise = null;", content)
+
+    def test_chunk_runtime_state_stays_out_of_bundle_cache(self):
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        manager_content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertIn("chunkPayloadPromisesById", resources_content)
+        self.assertIn("hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)", resources_content)
+        self.assertNotIn("bundle.chunkMergedLayerPayloads", resources_content)
+        self.assertNotIn("chunkMergedLayerPayloads:", resources_content)
+        self.assertNotIn("bundle.chunkMergedLayerPayloads", manager_content)
+        self.assertIn("state.activeScenarioChunks?.mergedLayerPayloads", manager_content)
+
+    def test_post_apply_effects_prewarm_coarse_chunks_before_refresh(self):
+        content = SCENARIO_POST_APPLY_EFFECTS.read_text(encoding="utf-8")
+
+        self.assertIn("preloadScenarioCoarseChunks", content)
+        self.assertIn("await preloadScenarioCoarseChunks(bundle)", content)
+        self.assertIn('reason: "scenario-apply"', content)
 
 
 if __name__ == "__main__":

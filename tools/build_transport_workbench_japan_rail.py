@@ -13,6 +13,8 @@ import pandas as pd
 from shapely.geometry import GeometryCollection, MultiPoint, Point, shape
 from topojson import Topology
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CACHE_DIR = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "rail"
@@ -470,6 +472,7 @@ def main() -> None:
         "schema_version": 1,
         "generated_at": utc_now(),
         "recipe_path": "data/transport_layers/japan_rail/source_recipe.manual.json",
+        "distribution_tier": "single_pack",
         "paths": {
             "preview": {
                 "railways": "data/transport_layers/japan_rail/railways.preview.topo.json",
@@ -512,6 +515,18 @@ def main() -> None:
             "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_rail_v1",

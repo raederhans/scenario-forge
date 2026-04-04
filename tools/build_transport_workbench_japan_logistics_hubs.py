@@ -15,6 +15,8 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE_PATH = ROOT / "data" / "transport_layers" / "japan_logistics_hubs" / "source_recipe.manual.json"
@@ -322,6 +324,18 @@ def main() -> None:
         },
         "supplement_to": "industrial_zones",
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_logistics_hubs_v1",

@@ -1,47 +1,43 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-17T00:59:45.625555+00:00",
+  "generated_at": "2026-04-04T02:50:53.129613+00:00",
   "default_country": "GER",
   "countries": {
-    "AEF": {
-      "tag": "AEF",
-      "display_name": "French Equatorial Africa",
-      "color_hex": "#4066d3",
-      "feature_count": 70,
-      "controller_feature_count": 70,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "TD",
-      "lookup_iso2": "TD",
-      "provenance_iso2": "TD",
+    "AD": {
+      "tag": "AD",
+      "display_name": "Andorra la Vella",
+      "color_hex": "#a96457",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "AD",
+      "lookup_iso2": "AD",
+      "provenance_iso2": "AD",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_middle_africa",
-      "subregion_label": "Middle Africa",
-      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_equatorial_africa",
-      "rule_sources": [
-        "french_equatorial_africa"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "colonial_federation",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "AFG": {
       "tag": "AFG",
@@ -80,12 +76,12 @@
     },
     "ALG": {
       "tag": "ALG",
-      "display_name": "French Algeria",
-      "color_hex": "#1746e6",
+      "display_name": "Algeria",
+      "color_hex": "#996633",
       "feature_count": 48,
       "controller_feature_count": 48,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "DZ",
       "lookup_iso2": "DZ",
       "provenance_iso2": "DZ",
@@ -96,35 +92,31 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_algeria",
-      "rule_sources": [
-        "french_algeria"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ANG": {
       "tag": "ANG",
       "display_name": "Angola",
-      "color_hex": "#1e6737",
+      "color_hex": "#258c3d",
       "feature_count": 18,
       "controller_feature_count": 18,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "AO",
       "lookup_iso2": "AO",
       "provenance_iso2": "AO",
@@ -135,65 +127,22 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_middle_africa",
       "subregion_label": "Middle Africa",
-      "notes": "Portuguese Angola represented as a separate colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "portuguese_angola",
-      "rule_sources": [
-        "portuguese_angola"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "POR",
-      "parent_owner_tags": [
-        "POR"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
-    },
-    "AOF": {
-      "tag": "AOF",
-      "display_name": "French West Africa",
-      "color_hex": "#5384dc",
-      "feature_count": 96,
-      "controller_feature_count": 96,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "SN",
-      "lookup_iso2": "SN",
-      "provenance_iso2": "SN",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_western_africa",
-      "subregion_label": "Western Africa",
-      "notes": "French West Africa represented as a macro-level colonial federation.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_west_africa",
-      "rule_sources": [
-        "french_west_africa"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "colonial_federation",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "AOI": {
       "tag": "AOI",
@@ -234,6 +183,41 @@
       "subject_kind": "colonial_government",
       "entry_kind": "scenario_subject"
     },
+    "AQ": {
+      "tag": "AQ",
+      "display_name": "Antarctica / 142E-160E Sector",
+      "color_hex": "#5b6859",
+      "feature_count": 11,
+      "controller_feature_count": 11,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "AQ",
+      "lookup_iso2": "AQ",
+      "provenance_iso2": "AQ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "ARG": {
       "tag": "ARG",
       "display_name": "Argentina",
@@ -269,83 +253,215 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "ARM": {
+      "tag": "ARM",
+      "display_name": "Armenia",
+      "color_hex": "#b066b4",
+      "feature_count": 11,
+      "controller_feature_count": 11,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "AM",
+      "lookup_iso2": "AM",
+      "provenance_iso2": "AM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 230,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "AST": {
       "tag": "AST",
       "display_name": "Australia",
-      "color_hex": "#d97993",
-      "feature_count": 33,
-      "controller_feature_count": 33,
-      "quality": "approx_existing_geometry",
-      "source": "manual_rule",
-      "base_iso2": "PG",
-      "lookup_iso2": "PG",
-      "provenance_iso2": "PG",
-      "scenario_only": true,
+      "color_hex": "#398f61",
+      "feature_count": 12,
+      "controller_feature_count": 12,
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
+      "base_iso2": "AU",
+      "lookup_iso2": "AU",
+      "provenance_iso2": "AU",
+      "scenario_only": false,
       "featured": true,
       "capital_state_id": 285,
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
-      "subregion_id": "subregion_melanesia",
-      "subregion_label": "Melanesia",
-      "notes": "Australian dependencies approximation.",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "australia_dependencies",
-      "rule_sources": [
-        "australia_dependencies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "dominion",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
-    "BEA": {
-      "tag": "BEA",
-      "display_name": "British East Africa",
-      "color_hex": "#d24f79",
-      "feature_count": 42,
-      "controller_feature_count": 42,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "KE",
-      "lookup_iso2": "KE",
-      "provenance_iso2": "KE",
+    "AX": {
+      "tag": "AX",
+      "display_name": "Aland",
+      "color_hex": "#696a5a",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "AX",
+      "lookup_iso2": "AX",
+      "provenance_iso2": "AX",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_eastern_africa",
-      "subregion_label": "Eastern Africa",
-      "notes": "British East Africa macro government covering Kenya, Uganda, and Tanganyika.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "british_east_africa",
-      "rule_sources": [
-        "british_east_africa"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "AZR": {
+      "tag": "AZR",
+      "display_name": "Azerbaijan",
+      "color_hex": "#459731",
+      "feature_count": 76,
+      "controller_feature_count": 76,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "AZ",
+      "lookup_iso2": "AZ",
+      "provenance_iso2": "AZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 229,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colonial_government",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BA": {
+      "tag": "BA",
+      "display_name": "Federation of Bosnia and Herzegovina",
+      "color_hex": "#a46457",
+      "feature_count": 3,
+      "controller_feature_count": 3,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "BA",
+      "lookup_iso2": "BA",
+      "provenance_iso2": "BA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BAN": {
+      "tag": "BAN",
+      "display_name": "Bangladesh",
+      "color_hex": "#cccc00",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BD",
+      "lookup_iso2": "BD",
+      "provenance_iso2": "BD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 430,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BEL": {
       "tag": "BEL",
@@ -382,6 +498,76 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "BF": {
+      "tag": "BF",
+      "display_name": "Centre",
+      "color_hex": "#ae6557",
+      "feature_count": 13,
+      "controller_feature_count": 13,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "BF",
+      "lookup_iso2": "BF",
+      "provenance_iso2": "BF",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BHR": {
+      "tag": "BHR",
+      "display_name": "Bahrain",
+      "color_hex": "#e60000",
+      "feature_count": 5,
+      "controller_feature_count": 5,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BH",
+      "lookup_iso2": "BH",
+      "provenance_iso2": "BH",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 1014,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "BHU": {
       "tag": "BHU",
       "display_name": "Bhutan",
@@ -408,6 +594,76 @@
       "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BLR": {
+      "tag": "BLR",
+      "display_name": "Belarus",
+      "color_hex": "#b4dcbe",
+      "feature_count": 35,
+      "controller_feature_count": 35,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BY",
+      "lookup_iso2": "BY",
+      "provenance_iso2": "BY",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 206,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BLZ": {
+      "tag": "BLZ",
+      "display_name": "Belize",
+      "color_hex": "#00cccc",
+      "feature_count": 6,
+      "controller_feature_count": 6,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BZ",
+      "lookup_iso2": "BZ",
+      "provenance_iso2": "BZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 311,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -522,14 +778,49 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "BRD": {
+      "tag": "BRD",
+      "display_name": "Burundi",
+      "color_hex": "#cc9900",
+      "feature_count": 17,
+      "controller_feature_count": 17,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BI",
+      "lookup_iso2": "BI",
+      "provenance_iso2": "BI",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 769,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "BRM": {
       "tag": "BRM",
       "display_name": "Burma",
-      "color_hex": "#a12e4f",
+      "color_hex": "#4c9900",
       "feature_count": 14,
       "controller_feature_count": 14,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "MM",
       "lookup_iso2": "MM",
       "provenance_iso2": "MM",
@@ -540,26 +831,92 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "Burma separation from British Raj at runtime-country level.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "burma",
-      "rule_sources": [
-        "burma"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BRN": {
+      "tag": "BRN",
+      "display_name": "Brunei",
+      "color_hex": "#e6e600",
+      "feature_count": 4,
+      "controller_feature_count": 4,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BN",
+      "lookup_iso2": "BN",
+      "provenance_iso2": "BN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 1023,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BS": {
+      "tag": "BS",
+      "display_name": "The Bahamas",
+      "color_hex": "#606959",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "BS",
+      "lookup_iso2": "BS",
+      "provenance_iso2": "BS",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BUL": {
       "tag": "BUL",
@@ -596,44 +953,40 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "BWA": {
-      "tag": "BWA",
-      "display_name": "British West Africa",
-      "color_hex": "#c5495c",
-      "feature_count": 57,
-      "controller_feature_count": 57,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "NG",
-      "lookup_iso2": "NG",
-      "provenance_iso2": "NG",
+    "CAM": {
+      "tag": "CAM",
+      "display_name": "Cambodia",
+      "color_hex": "#644796",
+      "feature_count": 24,
+      "controller_feature_count": 24,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "KH",
+      "lookup_iso2": "KH",
+      "provenance_iso2": "KH",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_western_africa",
-      "subregion_label": "Western Africa",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "capital_state_id": 741,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "british_west_africa",
-      "rule_sources": [
-        "british_west_africa"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "colonial_government",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CAN": {
       "tag": "CAN",
@@ -670,51 +1023,152 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "CEY": {
-      "tag": "CEY",
-      "display_name": "Ceylon",
-      "color_hex": "#aa2e56",
-      "feature_count": 25,
-      "controller_feature_count": 25,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "LK",
-      "lookup_iso2": "LK",
-      "provenance_iso2": "LK",
+    "CAR": {
+      "tag": "CAR",
+      "display_name": "Central African Republic",
+      "color_hex": "#990000",
+      "feature_count": 17,
+      "controller_feature_count": 17,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CF",
+      "lookup_iso2": "CF",
+      "provenance_iso2": "CF",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_southern_asia",
-      "subregion_label": "Southern Asia",
-      "notes": "Ceylon represented as a distinct British colony.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "capital_state_id": 660,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "ceylon",
-      "rule_sources": [
-        "ceylon"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "CBV": {
+      "tag": "CBV",
+      "display_name": "Cabo Verde",
+      "color_hex": "#0066cc",
+      "feature_count": 22,
+      "controller_feature_count": 22,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CV",
+      "lookup_iso2": "CV",
+      "provenance_iso2": "CV",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 702,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "CD": {
+      "tag": "CD",
+      "display_name": "Équateur",
+      "color_hex": "#ab6557",
+      "feature_count": 11,
+      "controller_feature_count": 11,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "CD",
+      "lookup_iso2": "CD",
+      "provenance_iso2": "CD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "CHA": {
+      "tag": "CHA",
+      "display_name": "Chad",
+      "color_hex": "#ccffcc",
+      "feature_count": 22,
+      "controller_feature_count": 22,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "TD",
+      "lookup_iso2": "TD",
+      "provenance_iso2": "TD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 774,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CHI": {
       "tag": "CHI",
       "display_name": "China",
       "color_hex": "#28288c",
-      "feature_count": 1445,
-      "controller_feature_count": 839,
+      "feature_count": 1783,
+      "controller_feature_count": 1177,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "CN",
@@ -776,6 +1230,41 @@
       "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "CMR": {
+      "tag": "CMR",
+      "display_name": "Cameroon",
+      "color_hex": "#ff3300",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CM",
+      "lookup_iso2": "CM",
+      "provenance_iso2": "CM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 773,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -855,6 +1344,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "CRO": {
+      "tag": "CRO",
+      "display_name": "Croatia",
+      "color_hex": "#e646b4",
+      "feature_count": 21,
+      "controller_feature_count": 21,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "HR",
+      "lookup_iso2": "HR",
+      "provenance_iso2": "HR",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 109,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "CUB": {
       "tag": "CUB",
       "display_name": "Cuba",
@@ -890,6 +1414,76 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "CYP": {
+      "tag": "CYP",
+      "display_name": "Cyprus",
+      "color_hex": "#ffcc00",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CY",
+      "lookup_iso2": "CY",
+      "provenance_iso2": "CY",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 183,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "DAH": {
+      "tag": "DAH",
+      "display_name": "Benin",
+      "color_hex": "#0033cc",
+      "feature_count": 12,
+      "controller_feature_count": 12,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "BJ",
+      "lookup_iso2": "BJ",
+      "provenance_iso2": "BJ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 776,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "DEN": {
       "tag": "DEN",
       "display_name": "Denmark",
@@ -916,6 +1510,41 @@
       "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "DJI": {
+      "tag": "DJI",
+      "display_name": "Djibouti",
+      "color_hex": "#006699",
+      "feature_count": 6,
+      "controller_feature_count": 6,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "DJ",
+      "lookup_iso2": "DJ",
+      "provenance_iso2": "DJ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 268,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -997,12 +1626,12 @@
     },
     "EGY": {
       "tag": "EGY",
-      "display_name": "Kingdom of Egypt",
-      "color_hex": "#ac4457",
+      "display_name": "Egypt",
+      "color_hex": "#e6e646",
       "feature_count": 26,
       "controller_feature_count": 26,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "EG",
       "lookup_iso2": "EG",
       "provenance_iso2": "EG",
@@ -1013,26 +1642,22 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "egypt_kingdom",
-      "rule_sources": [
-        "egypt_kingdom"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "protectorate",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ELS": {
       "tag": "ELS",
@@ -1071,10 +1696,10 @@
     },
     "ENG": {
       "tag": "ENG",
-      "display_name": "Britain",
+      "display_name": "United Kingdom",
       "color_hex": "#c9385d",
-      "feature_count": 498,
-      "controller_feature_count": 498,
+      "feature_count": 379,
+      "controller_feature_count": 379,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "GB",
@@ -1087,18 +1712,51 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
+      "notes": "Aden represented as British-controlled enclave in the 1939 setup.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "british_colonies",
+      "primary_rule_source": "1939_britain_aden",
       "rule_sources": [
-        "british_colonies",
-        "british_caribbean_guiana",
         "1939_britain_aden"
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "EQG": {
+      "tag": "EQG",
+      "display_name": "Equatorial Guinea",
+      "color_hex": "#ffcc00",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GQ",
+      "lookup_iso2": "GQ",
+      "provenance_iso2": "GQ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 297,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1147,9 +1805,9 @@
       "tag": "FIN",
       "display_name": "Finland",
       "color_hex": "#cdd4e4",
-      "feature_count": 20,
-      "controller_feature_count": 20,
-      "quality": "manual_reviewed",
+      "feature_count": 19,
+      "controller_feature_count": 19,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "FI",
       "lookup_iso2": "FI",
@@ -1161,16 +1819,84 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "Aland Islands should follow Finland in 1936.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "finnish_aland",
-      "rule_sources": [
-        "finnish_aland"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "FK": {
+      "tag": "FK",
+      "display_name": "Falkland Islands",
+      "color_hex": "#546758",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "FK",
+      "lookup_iso2": "FK",
+      "provenance_iso2": "FK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "FO": {
+      "tag": "FO",
+      "display_name": "Faroe Islands",
+      "color_hex": "#5c6859",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "FO",
+      "lookup_iso2": "FO",
+      "provenance_iso2": "FO",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1184,9 +1910,9 @@
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#3971e4",
-      "feature_count": 332,
-      "controller_feature_count": 332,
-      "quality": "approx_existing_geometry",
+      "feature_count": 320,
+      "controller_feature_count": 320,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "FR",
       "lookup_iso2": "FR",
@@ -1198,16 +1924,119 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "French colonial approximation for remaining African and overseas possessions outside the dedicated subject governments.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_colonies",
-      "rule_sources": [
-        "french_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GAB": {
+      "tag": "GAB",
+      "display_name": "Gabon",
+      "color_hex": "#33cccc",
+      "feature_count": 9,
+      "controller_feature_count": 9,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GA",
+      "lookup_iso2": "GA",
+      "provenance_iso2": "GA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 539,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GAM": {
+      "tag": "GAM",
+      "display_name": "The Gambia",
+      "color_hex": "#990000",
+      "feature_count": 6,
+      "controller_feature_count": 6,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GM",
+      "lookup_iso2": "GM",
+      "provenance_iso2": "GM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 701,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GEO": {
+      "tag": "GEO",
+      "display_name": "Georgia",
+      "color_hex": "#ff9696",
+      "feature_count": 12,
+      "controller_feature_count": 12,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GE",
+      "lookup_iso2": "GE",
+      "provenance_iso2": "GE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 231,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1221,8 +2050,8 @@
       "tag": "GER",
       "display_name": "Germany",
       "color_hex": "#3c3c3c",
-      "feature_count": 912,
-      "controller_feature_count": 912,
+      "feature_count": 792,
+      "controller_feature_count": 792,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "DE",
@@ -1235,13 +2064,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
+      "notes": "Anschluss: Austria and attached states are merged into Germany by 1939.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "germany_frontier_1936",
+      "primary_rule_source": "1939_germany_annexes_austria",
       "rule_sources": [
-        "germany_frontier_1936",
         "1939_germany_annexes_austria",
         "germany_sudetenland_1939",
         "bohemia_moravia_protectorate_1939",
@@ -1249,6 +2077,76 @@
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GG": {
+      "tag": "GG",
+      "display_name": "Guernsey",
+      "color_hex": "#4d6658",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "GG",
+      "lookup_iso2": "GG",
+      "provenance_iso2": "GG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GHA": {
+      "tag": "GHA",
+      "display_name": "Ghana",
+      "color_hex": "#666633",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GH",
+      "lookup_iso2": "GH",
+      "provenance_iso2": "GH",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 274,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1276,19 +2174,89 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Scenario extension: Gansu Ma clique split from the coarse XSM block.",
+      "notes": "Project extension: Gansu Ma clique split from the coarse XSM block in 1939.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
       "historical_fidelity": "extended",
-      "primary_rule_source": "gansu_ma_clique",
+      "primary_rule_source": "1939_gansu_ma_clique",
       "rule_sources": [
-        "gansu_ma_clique"
+        "1939_gansu_ma_clique"
       ],
       "source_types": [
         "scenario_extension"
       ],
       "historical_fidelity_summary": [
         "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GNA": {
+      "tag": "GNA",
+      "display_name": "Guinea",
+      "color_hex": "#6699ff",
+      "feature_count": 8,
+      "controller_feature_count": 8,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GN",
+      "lookup_iso2": "GN",
+      "provenance_iso2": "GN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 780,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GNB": {
+      "tag": "GNB",
+      "display_name": "Guinea-Bissau",
+      "color_hex": "#996600",
+      "feature_count": 9,
+      "controller_feature_count": 9,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GW",
+      "lookup_iso2": "GW",
+      "provenance_iso2": "GW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 296,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
       ],
       "parent_owner_tag": "",
       "parent_owner_tags": [],
@@ -1365,6 +2333,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "GS": {
+      "tag": "GS",
+      "display_name": "South Georgia and the Islands",
+      "color_hex": "#65695a",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "GS",
+      "lookup_iso2": "GS",
+      "provenance_iso2": "GS",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_other",
+      "continent_label": "Other",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "GUA": {
       "tag": "GUA",
       "display_name": "Guatemala",
@@ -1418,16 +2421,51 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Guangxi clique override.",
+      "notes": "Guangxi clique owner-layer override for the 1939 scenario.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "guangxi_clique",
+      "primary_rule_source": "1939_guangxi_clique",
       "rule_sources": [
-        "guangxi_clique"
+        "1939_guangxi_clique"
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GYA": {
+      "tag": "GYA",
+      "display_name": "Guyana",
+      "color_hex": "#ffcc99",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "GY",
+      "lookup_iso2": "GY",
+      "provenance_iso2": "GY",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 687,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1472,13 +2510,83 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "HK": {
+      "tag": "HK",
+      "display_name": "Central and Western District",
+      "color_hex": "#566759",
+      "feature_count": 18,
+      "controller_feature_count": 18,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "HK",
+      "lookup_iso2": "HK",
+      "provenance_iso2": "HK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "HM": {
+      "tag": "HM",
+      "display_name": "Heard Island and McDonald Islands",
+      "color_hex": "#5a6859",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "HM",
+      "lookup_iso2": "HM",
+      "provenance_iso2": "HM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "HOL": {
       "tag": "HOL",
       "display_name": "Netherlands",
       "color_hex": "#cb8a4a",
-      "feature_count": 50,
-      "controller_feature_count": 50,
-      "quality": "approx_existing_geometry",
+      "feature_count": 40,
+      "controller_feature_count": 40,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "NL",
       "lookup_iso2": "NL",
@@ -1490,14 +2598,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "Dutch Suriname approximation outside the East Indies.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "dutch_colonies",
-      "rule_sources": [
-        "dutch_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
@@ -1617,14 +2723,84 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "IM": {
+      "tag": "IM",
+      "display_name": "Isle of Man",
+      "color_hex": "#5b6859",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "IM",
+      "lookup_iso2": "IM",
+      "provenance_iso2": "IM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "IN": {
+      "tag": "IN",
+      "display_name": "South District",
+      "color_hex": "#5d6859",
+      "feature_count": 718,
+      "controller_feature_count": 718,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "IN",
+      "lookup_iso2": "IN",
+      "provenance_iso2": "IN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "INS": {
       "tag": "INS",
-      "display_name": "Dutch East Indies",
-      "color_hex": "#bf7f36",
+      "display_name": "Indonesia",
+      "color_hex": "#283278",
       "feature_count": 34,
       "controller_feature_count": 34,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "ID",
       "lookup_iso2": "ID",
       "provenance_iso2": "ID",
@@ -1635,26 +2811,57 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "Dutch East Indies represented separately from the Netherlands proper.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "dutch_east_indies",
-      "rule_sources": [
-        "dutch_east_indies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "HOL",
-      "parent_owner_tags": [
-        "HOL"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "IO": {
+      "tag": "IO",
+      "display_name": "British Indian Ocean Territory",
+      "color_hex": "#5f6959",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "IO",
+      "lookup_iso2": "IO",
+      "provenance_iso2": "IO",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "IRE": {
       "tag": "IRE",
@@ -1726,6 +2933,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "ISR": {
+      "tag": "ISR",
+      "display_name": "Israel",
+      "color_hex": "#9882bf",
+      "feature_count": 6,
+      "controller_feature_count": 6,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "IL",
+      "lookup_iso2": "IL",
+      "provenance_iso2": "IL",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 454,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "ITA": {
       "tag": "ITA",
       "display_name": "Italy",
@@ -1744,18 +2986,87 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "San Marino is folded into Italy for this scenario baseline.",
+      "notes": "Italian occupation and annexation of Albania by 1939.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "italy_absorbs_san_marino_1936",
+      "primary_rule_source": "1939_italy_albania",
       "rule_sources": [
-        "italy_absorbs_san_marino_1936",
         "1939_italy_albania",
         "1939_italy_absorbs_san_marino"
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "IVO": {
+      "tag": "IVO",
+      "display_name": "Côte d'Ivoire",
+      "color_hex": "#ffffcc",
+      "feature_count": 14,
+      "controller_feature_count": 14,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CI",
+      "lookup_iso2": "CI",
+      "provenance_iso2": "CI",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 779,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "JAM": {
+      "tag": "JAM",
+      "display_name": "Jamaica",
+      "color_hex": "#666600",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "JM",
+      "lookup_iso2": "JM",
+      "provenance_iso2": "JM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 689,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1783,16 +3094,49 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "jidong_japanese_occupation",
-      "rule_sources": [
-        "jidong_japanese_occupation"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "JE": {
+      "tag": "JE",
+      "display_name": "Jersey",
+      "color_hex": "#4c6658",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "JE",
+      "lookup_iso2": "JE",
+      "provenance_iso2": "JE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1837,44 +3181,215 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "KOR": {
-      "tag": "KOR",
-      "display_name": "Korea",
-      "color_hex": "#faba98",
-      "feature_count": 28,
-      "controller_feature_count": 28,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+    "KAZ": {
+      "tag": "KAZ",
+      "display_name": "Kazakhstan",
+      "color_hex": "#4bb8cb",
+      "feature_count": 16,
+      "controller_feature_count": 16,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "KZ",
+      "lookup_iso2": "KZ",
+      "provenance_iso2": "KZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 586,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KEN": {
+      "tag": "KEN",
+      "display_name": "Kenya",
+      "color_hex": "#91670e",
+      "feature_count": 8,
+      "controller_feature_count": 8,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "KE",
+      "lookup_iso2": "KE",
+      "provenance_iso2": "KE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 547,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KM": {
+      "tag": "KM",
+      "display_name": "Mohéli",
+      "color_hex": "#5d6859",
+      "feature_count": 3,
+      "controller_feature_count": 3,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "KM",
+      "lookup_iso2": "KM",
+      "provenance_iso2": "KM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KOS": {
+      "tag": "KOS",
+      "display_name": "Kosovo",
+      "color_hex": "#d0a650",
+      "feature_count": 30,
+      "controller_feature_count": 30,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "XK",
+      "lookup_iso2": "XK",
+      "provenance_iso2": "XK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 802,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KP": {
+      "tag": "KP",
+      "display_name": "Hwanghae-bukto",
+      "color_hex": "#63695a",
+      "feature_count": 11,
+      "controller_feature_count": 11,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "KP",
+      "lookup_iso2": "KP",
+      "provenance_iso2": "KP",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KR": {
+      "tag": "KR",
+      "display_name": "North Chungcheong",
+      "color_hex": "#676a5a",
+      "feature_count": 17,
+      "controller_feature_count": 17,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
       "base_iso2": "KR",
       "lookup_iso2": "KR",
       "provenance_iso2": "KR",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": 525,
+      "capital_state_id": null,
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Japanese colonial rule across Korea.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "japanese_korea",
-      "rule_sources": [
-        "japanese_korea"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "JAP"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "KUW": {
       "tag": "KUW",
@@ -1902,6 +3417,76 @@
       "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KYR": {
+      "tag": "KYR",
+      "display_name": "Kyrgyzstan",
+      "color_hex": "#994c00",
+      "feature_count": 8,
+      "controller_feature_count": 8,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "KG",
+      "lookup_iso2": "KG",
+      "provenance_iso2": "KG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 732,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "LAO": {
+      "tag": "LAO",
+      "display_name": "Laos",
+      "color_hex": "#b06688",
+      "feature_count": 17,
+      "controller_feature_count": 17,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "LA",
+      "lookup_iso2": "LA",
+      "provenance_iso2": "LA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 670,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -1949,11 +3534,11 @@
     "LBA": {
       "tag": "LBA",
       "display_name": "Libya",
-      "color_hex": "#285229",
+      "color_hex": "#c8b45a",
       "feature_count": 22,
       "controller_feature_count": 22,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "source": "fallback_mapped_tag",
       "base_iso2": "LY",
       "lookup_iso2": "LY",
       "provenance_iso2": "LY",
@@ -1964,35 +3549,31 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "Italian Libya represented as a distinct colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "italian_colonies",
-      "rule_sources": [
-        "italian_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ITA"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LEB": {
       "tag": "LEB",
-      "display_name": "French Mandate for Lebanon",
-      "color_hex": "#5473d5",
+      "display_name": "Lebanon",
+      "color_hex": "#82963c",
       "feature_count": 6,
       "controller_feature_count": 6,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "LB",
       "lookup_iso2": "LB",
       "provenance_iso2": "LB",
@@ -2003,26 +3584,57 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_western_asia",
       "subregion_label": "Western Asia",
-      "notes": "French Mandate for Lebanon represented as a separate mandate government.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_mandate_lebanon",
-      "rule_sources": [
-        "french_mandate_lebanon"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "LI": {
+      "tag": "LI",
+      "display_name": "Triesenberg",
+      "color_hex": "#566759",
+      "feature_count": 11,
+      "controller_feature_count": 11,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "LI",
+      "lookup_iso2": "LI",
+      "provenance_iso2": "LI",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_western_europe",
+      "subregion_label": "Western Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "mandate",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LIB": {
       "tag": "LIB",
@@ -2065,7 +3677,7 @@
       "color_hex": "#dbdb77",
       "feature_count": 9,
       "controller_feature_count": 9,
-      "quality": "manual_reviewed",
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "LT",
       "lookup_iso2": "LT",
@@ -2077,16 +3689,49 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "Project-specific override: Vilnius remains with Lithuania in this scenario instead of strict vanilla HOI4 ownership.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "lithuania_vilnius_override",
-      "rule_sources": [
-        "lithuania_vilnius_override"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "LS": {
+      "tag": "LS",
+      "display_name": "Berea",
+      "color_hex": "#6a6a5a",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "LS",
+      "lookup_iso2": "LS",
+      "provenance_iso2": "LS",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -2134,11 +3779,11 @@
     "MAD": {
       "tag": "MAD",
       "display_name": "Madagascar",
-      "color_hex": "#1952c9",
+      "color_hex": "#ffff99",
       "feature_count": 22,
       "controller_feature_count": 22,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "MG",
       "lookup_iso2": "MG",
       "provenance_iso2": "MG",
@@ -2149,34 +3794,30 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_eastern_africa",
       "subregion_label": "Eastern Africa",
-      "notes": "Madagascar represented as a separate French colony.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "madagascar_colony",
-      "rule_sources": [
-        "madagascar_colony"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MAL": {
       "tag": "MAL",
       "display_name": "Malaysia",
-      "color_hex": "#bf2b56",
-      "feature_count": 25,
-      "controller_feature_count": 25,
-      "quality": "approx_existing_geometry",
+      "color_hex": "#c56064",
+      "feature_count": 16,
+      "controller_feature_count": 16,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "MY",
       "lookup_iso2": "MY",
@@ -2188,55 +3829,49 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "Approximate Malaya and Borneo dependencies.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "malaya_singapore_brunei",
-      "rule_sources": [
-        "malaya_singapore_brunei"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
-    "MAN": {
-      "tag": "MAN",
-      "display_name": "Manchukuo",
-      "color_hex": "#ff7847",
-      "feature_count": 234,
-      "controller_feature_count": 234,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "CN",
-      "lookup_iso2": "CN",
-      "provenance_iso2": "CN",
+    "MC": {
+      "tag": "MC",
+      "display_name": "Monaco",
+      "color_hex": "#4b6658",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "MC",
+      "lookup_iso2": "MC",
+      "provenance_iso2": "MC",
       "scenario_only": true,
-      "featured": true,
-      "capital_state_id": 328,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia",
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_western_europe",
+      "subregion_label": "Western Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "manchukuo",
-      "rule_sources": [
-        "manchukuo"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "hoi4_owner"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -2248,12 +3883,12 @@
     },
     "MEN": {
       "tag": "MEN",
-      "display_name": "Mengjiang",
+      "display_name": "Mengkukuo",
       "color_hex": "#b9ff98",
-      "feature_count": 17,
-      "controller_feature_count": 23,
+      "feature_count": 0,
+      "controller_feature_count": 6,
       "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "source": "controller_rule",
       "base_iso2": "CN",
       "lookup_iso2": "CN",
       "provenance_iso2": "CN",
@@ -2264,13 +3899,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Mengjiang limited to the Chahar and Xilingol core plus the South Chahar corridor in northern Hebei.",
+      "notes": "Hebei-Chahar frontline represented as Mengjiang field control over the contested corridor features.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "mengjiang",
+      "primary_rule_source": "1939_frontline_hebei_chahar_mengjiang_control",
       "rule_sources": [
-        "mengjiang"
+        "1939_frontline_hebei_chahar_mengjiang_control"
       ],
       "source_types": [
         "hoi4_owner"
@@ -2281,7 +3916,7 @@
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "subject_kind": "",
-      "entry_kind": ""
+      "entry_kind": "controller_only"
     },
     "MEX": {
       "tag": "MEX",
@@ -2318,6 +3953,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "MK": {
+      "tag": "MK",
+      "display_name": "Вардарски",
+      "color_hex": "#5b6859",
+      "feature_count": 8,
+      "controller_feature_count": 8,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "MK",
+      "lookup_iso2": "MK",
+      "provenance_iso2": "MK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "MLD": {
       "tag": "MLD",
       "display_name": "Maldives",
@@ -2336,6 +4006,216 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MLI": {
+      "tag": "MLI",
+      "display_name": "Mali",
+      "color_hex": "#ccccff",
+      "feature_count": 9,
+      "controller_feature_count": 9,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "ML",
+      "lookup_iso2": "ML",
+      "provenance_iso2": "ML",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 556,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MLT": {
+      "tag": "MLT",
+      "display_name": "Malta",
+      "color_hex": "#ffff99",
+      "feature_count": 2,
+      "controller_feature_count": 2,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "MT",
+      "lookup_iso2": "MT",
+      "provenance_iso2": "MT",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 116,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MLW": {
+      "tag": "MLW",
+      "display_name": "Malawi",
+      "color_hex": "#99cc00",
+      "feature_count": 3,
+      "controller_feature_count": 3,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "MW",
+      "lookup_iso2": "MW",
+      "provenance_iso2": "MW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 770,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MNT": {
+      "tag": "MNT",
+      "display_name": "Montenegro",
+      "color_hex": "#4d5a69",
+      "feature_count": 21,
+      "controller_feature_count": 21,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "ME",
+      "lookup_iso2": "ME",
+      "provenance_iso2": "ME",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 105,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MO": {
+      "tag": "MO",
+      "display_name": "Macao S.A.R",
+      "color_hex": "#63695a",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "MO",
+      "lookup_iso2": "MO",
+      "provenance_iso2": "MO",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MOL": {
+      "tag": "MOL",
+      "display_name": "Moldova",
+      "color_hex": "#ffcccc",
+      "feature_count": 40,
+      "controller_feature_count": 40,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "MD",
+      "lookup_iso2": "MD",
+      "provenance_iso2": "MD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 78,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
       "notes": "",
       "synthetic_owner": true,
       "source_type": "synthetic_fallback",
@@ -2390,12 +4270,12 @@
     },
     "MOR": {
       "tag": "MOR",
-      "display_name": "French Morocco",
-      "color_hex": "#4280d3",
-      "feature_count": 11,
-      "controller_feature_count": 11,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "display_name": "Morocco",
+      "color_hex": "#663300",
+      "feature_count": 16,
+      "controller_feature_count": 16,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "MA",
       "lookup_iso2": "MA",
       "provenance_iso2": "MA",
@@ -2406,35 +4286,101 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_morocco",
-      "rule_sources": [
-        "french_morocco"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MRT": {
+      "tag": "MRT",
+      "display_name": "Mauritania",
+      "color_hex": "#ff9999",
+      "feature_count": 13,
+      "controller_feature_count": 13,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "MR",
+      "lookup_iso2": "MR",
+      "provenance_iso2": "MR",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 557,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "protectorate",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MU": {
+      "tag": "MU",
+      "display_name": "Mauritius",
+      "color_hex": "#6f6b5b",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "MU",
+      "lookup_iso2": "MU",
+      "provenance_iso2": "MU",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MZB": {
       "tag": "MZB",
       "display_name": "Mozambique",
-      "color_hex": "#175937",
+      "color_hex": "#703e5a",
       "feature_count": 11,
       "controller_feature_count": 11,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "MZ",
       "lookup_iso2": "MZ",
       "provenance_iso2": "MZ",
@@ -2445,26 +4391,22 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_eastern_africa",
       "subregion_label": "Eastern Africa",
-      "notes": "Portuguese Mozambique represented as a separate colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "portuguese_mozambique",
-      "rule_sources": [
-        "portuguese_mozambique"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "POR",
-      "parent_owner_tags": [
-        "POR"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "NCP": {
       "tag": "NCP",
@@ -2541,6 +4483,76 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "NGA": {
+      "tag": "NGA",
+      "display_name": "Nigeria",
+      "color_hex": "#ffcc66",
+      "feature_count": 37,
+      "controller_feature_count": 37,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "NG",
+      "lookup_iso2": "NG",
+      "provenance_iso2": "NG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 558,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "NGR": {
+      "tag": "NGR",
+      "display_name": "Niger",
+      "color_hex": "#ff9966",
+      "feature_count": 8,
+      "controller_feature_count": 8,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "NE",
+      "lookup_iso2": "NE",
+      "provenance_iso2": "NE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 781,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "NIC": {
       "tag": "NIC",
       "display_name": "Nicaragua",
@@ -2567,6 +4579,41 @@
       "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "NMB": {
+      "tag": "NMB",
+      "display_name": "Namibia",
+      "color_hex": "#e5ccff",
+      "feature_count": 13,
+      "controller_feature_count": 13,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "NA",
+      "lookup_iso2": "NA",
+      "provenance_iso2": "NA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 541,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -2681,44 +4728,75 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "PAL": {
-      "tag": "PAL",
-      "display_name": "Palestine",
-      "color_hex": "#c76a7a",
+    "PAK": {
+      "tag": "PAK",
+      "display_name": "Pakistan",
+      "color_hex": "#006600",
       "feature_count": 8,
       "controller_feature_count": 8,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
-      "base_iso2": "IL",
-      "lookup_iso2": "IL",
-      "provenance_iso2": "IL",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "PK",
+      "lookup_iso2": "PK",
+      "provenance_iso2": "PK",
       "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 443,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "PAL": {
+      "tag": "PAL",
+      "display_name": "Palestine",
+      "color_hex": "#aa7d50",
+      "feature_count": 2,
+      "controller_feature_count": 2,
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
+      "base_iso2": "PS",
+      "lookup_iso2": "PS",
+      "provenance_iso2": "PS",
+      "scenario_only": false,
       "featured": false,
       "capital_state_id": 454,
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "subregion_id": "subregion_western_asia",
       "subregion_label": "Western Asia",
-      "notes": "Approximate Mandatory Palestine using current Israel runtime geography.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "palestine_mandate",
-      "rule_sources": [
-        "palestine_mandate"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "mandate",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PAN": {
       "tag": "PAN",
@@ -2828,11 +4906,11 @@
     "PHI": {
       "tag": "PHI",
       "display_name": "Philippines",
-      "color_hex": "#4297ea",
+      "color_hex": "#0028c3",
       "feature_count": 117,
       "controller_feature_count": 117,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "PH",
       "lookup_iso2": "PH",
       "provenance_iso2": "PH",
@@ -2843,33 +4921,99 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "Philippines retained as a United States-associated commonwealth government.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "philippines_commonwealth",
-      "rule_sources": [
-        "philippines_commonwealth"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "USA",
-      "parent_owner_tags": [
-        "USA"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "PM": {
+      "tag": "PM",
+      "display_name": "Saint Pierre and Miquelon",
+      "color_hex": "#62695a",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "PM",
+      "lookup_iso2": "PM",
+      "provenance_iso2": "PM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "commonwealth",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "PNG": {
+      "tag": "PNG",
+      "display_name": "Papua",
+      "color_hex": "#99004c",
+      "feature_count": 20,
+      "controller_feature_count": 20,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "PG",
+      "lookup_iso2": "PG",
+      "provenance_iso2": "PG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 523,
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "subregion_id": "subregion_melanesia",
+      "subregion_label": "Melanesia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "POL": {
       "tag": "POL",
       "display_name": "Poland",
       "color_hex": "#d6668b",
-      "feature_count": 379,
-      "controller_feature_count": 379,
+      "feature_count": 381,
+      "controller_feature_count": 381,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "PL",
@@ -2882,13 +5026,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
+      "notes": "Zaolzie transfer to Poland before September 1939, approximated with the Karvina district after full CZ ADM2 replacement.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "poland_kresy_1936",
+      "primary_rule_source": "1939_poland_zaolzie",
       "rule_sources": [
-        "poland_kresy_1936",
         "1939_poland_zaolzie"
       ],
       "source_types": [
@@ -2906,10 +5049,10 @@
       "tag": "POR",
       "display_name": "Portugal",
       "color_hex": "#277446",
-      "feature_count": 70,
-      "controller_feature_count": 70,
-      "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "feature_count": 23,
+      "controller_feature_count": 23,
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "PT",
       "lookup_iso2": "PT",
       "provenance_iso2": "PT",
@@ -2920,14 +5063,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "Portuguese colonial approximation.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "portuguese_colonies",
-      "rule_sources": [
-        "portuguese_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
@@ -2957,13 +5098,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Communist China limited to the northern Shaanbei base area and excludes Xi'an and central Shaanxi.",
+      "notes": "Communist China remains limited to the northern Shaanbei base area and excludes Xi'an and central Shaanxi in 1939.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "communist_china_shaanbei",
+      "primary_rule_source": "1939_communist_china_shaanbei",
       "rule_sources": [
-        "communist_china_shaanbei"
+        "1939_communist_china_shaanbei"
       ],
       "source_types": [
         "hoi4_owner"
@@ -3046,6 +5187,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "QAT": {
+      "tag": "QAT",
+      "display_name": "Qatar",
+      "color_hex": "#800000",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "QA",
+      "lookup_iso2": "QA",
+      "provenance_iso2": "QA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 765,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "QMA": {
       "tag": "QMA",
       "display_name": "Qinghai Ma Clique",
@@ -3064,13 +5240,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Scenario extension: Qinghai Ma clique split from the coarse XSM block.",
+      "notes": "Project extension: Qinghai Ma clique split from the coarse XSM block in 1939.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
       "historical_fidelity": "extended",
-      "primary_rule_source": "qinghai_ma_clique",
+      "primary_rule_source": "1939_qinghai_ma_clique",
       "rule_sources": [
-        "qinghai_ma_clique"
+        "1939_qinghai_ma_clique"
       ],
       "source_types": [
         "scenario_extension"
@@ -3083,56 +5259,17 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "RAJ": {
-      "tag": "RAJ",
-      "display_name": "British Raj",
-      "color_hex": "#cc5668",
-      "feature_count": 733,
-      "controller_feature_count": 733,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "IN",
-      "lookup_iso2": "IN",
-      "provenance_iso2": "IN",
-      "scenario_only": true,
-      "featured": true,
-      "capital_state_id": 439,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_southern_asia",
-      "subregion_label": "Southern Asia",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "british_raj",
-      "rule_sources": [
-        "british_raj"
-      ],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "raj",
-      "entry_kind": "scenario_subject"
-    },
     "RCG": {
       "tag": "RCG",
-      "display_name": "Belgian Congo",
-      "color_hex": "#edd421",
-      "feature_count": 33,
-      "controller_feature_count": 33,
+      "display_name": "Congo",
+      "color_hex": "#66ccff",
+      "feature_count": 12,
+      "controller_feature_count": 12,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
-      "base_iso2": "CD",
-      "lookup_iso2": "CD",
-      "provenance_iso2": "CD",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "CG",
+      "lookup_iso2": "CG",
+      "provenance_iso2": "CG",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 772,
@@ -3140,26 +5277,22 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_middle_africa",
       "subregion_label": "Middle Africa",
-      "notes": "Belgian Congo and Ruanda-Urundi represented as a single Belgian colonial government.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "belgian_colonies",
-      "rule_sources": [
-        "belgian_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "BEL",
-      "parent_owner_tags": [
-        "BEL"
-      ],
-      "subject_kind": "colonial_government",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "RGC": {
       "tag": "RGC",
@@ -3206,10 +5339,10 @@
       "tag": "ROM",
       "display_name": "Romania",
       "color_hex": "#d7c448",
-      "feature_count": 102,
-      "controller_feature_count": 102,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "feature_count": 42,
+      "controller_feature_count": 42,
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "RO",
       "lookup_iso2": "RO",
       "provenance_iso2": "RO",
@@ -3220,16 +5353,119 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
-      "notes": "Greater Romania including Bessarabia and northern Bukovina.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "romania_bessarabia_1936",
-      "rule_sources": [
-        "romania_bessarabia_1936"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "RS": {
+      "tag": "RS",
+      "display_name": "Београдска област",
+      "color_hex": "#706b5b",
+      "feature_count": 25,
+      "controller_feature_count": 25,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "RS",
+      "lookup_iso2": "RS",
+      "provenance_iso2": "RS",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "RU": {
+      "tag": "RU",
+      "display_name": "Irafsky District",
+      "color_hex": "#746c5b",
+      "feature_count": 11878,
+      "controller_feature_count": 11878,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "RU",
+      "lookup_iso2": "RU",
+      "provenance_iso2": "RU",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "RWA": {
+      "tag": "RWA",
+      "display_name": "Rwanda",
+      "color_hex": "#ffff66",
+      "feature_count": 5,
+      "controller_feature_count": 5,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "RW",
+      "lookup_iso2": "RW",
+      "provenance_iso2": "RW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 768,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -3242,41 +5478,37 @@
     "SAF": {
       "tag": "SAF",
       "display_name": "South Africa",
-      "color_hex": "#d7697d",
-      "feature_count": 22,
-      "controller_feature_count": 22,
-      "quality": "approx_existing_geometry",
-      "source": "manual_rule",
-      "base_iso2": "NA",
-      "lookup_iso2": "NA",
-      "provenance_iso2": "NA",
-      "scenario_only": true,
+      "color_hex": "#c36ba0",
+      "feature_count": 9,
+      "controller_feature_count": 9,
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
+      "base_iso2": "ZA",
+      "lookup_iso2": "ZA",
+      "provenance_iso2": "ZA",
+      "scenario_only": false,
       "featured": true,
       "capital_state_id": 275,
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "subregion_id": "subregion_southern_africa",
       "subregion_label": "Southern Africa",
-      "notes": "South West Africa approximation under South African control.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "south_africa_mandate",
-      "rule_sources": [
-        "south_africa_mandate"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "subject_kind": "dominion",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SAU": {
       "tag": "SAU",
@@ -3313,44 +5545,110 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "SGN": {
-      "tag": "SGN",
-      "display_name": "Spanish Guinea",
-      "color_hex": "#f3b121",
-      "feature_count": 7,
-      "controller_feature_count": 7,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "GQ",
-      "lookup_iso2": "GQ",
-      "provenance_iso2": "GQ",
+    "SC": {
+      "tag": "SC",
+      "display_name": "Seychelles",
+      "color_hex": "#516758",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "SC",
+      "lookup_iso2": "SC",
+      "provenance_iso2": "SC",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "subregion_id": "subregion_middle_africa",
-      "subregion_label": "Middle Africa",
-      "notes": "Spanish Guinea represented as a separate colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "spanish_guinea",
-      "rule_sources": [
-        "spanish_guinea"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "SPR",
-      "parent_owner_tags": [
-        "SPR"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "SEN": {
+      "tag": "SEN",
+      "display_name": "Senegal",
+      "color_hex": "#cc3300",
+      "feature_count": 14,
+      "controller_feature_count": 14,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "SN",
+      "lookup_iso2": "SN",
+      "provenance_iso2": "SN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 272,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "SH": {
+      "tag": "SH",
+      "display_name": "Saint Helena",
+      "color_hex": "#5b6859",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "SH",
+      "lookup_iso2": "SH",
+      "provenance_iso2": "SH",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SHX": {
       "tag": "SHX",
@@ -3370,13 +5668,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Shanxi warlord baseline override including the 1936 Suiyuan and Ordos extension.",
+      "notes": "Shanxi warlord baseline override including the 1939 Suiyuan and Ordos extension.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "shanxi_warlord",
+      "primary_rule_source": "1939_shanxi_warlord",
       "rule_sources": [
-        "shanxi_warlord"
+        "1939_shanxi_warlord"
       ],
       "source_types": [
         "scenario_extension"
@@ -3461,34 +5759,32 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "SIK": {
-      "tag": "SIK",
-      "display_name": "Sinkiang",
-      "color_hex": "#47be98",
-      "feature_count": 87,
-      "controller_feature_count": 87,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "CN",
-      "lookup_iso2": "CN",
-      "provenance_iso2": "CN",
+    "SIE": {
+      "tag": "SIE",
+      "display_name": "Sierra Leone",
+      "color_hex": "#cc66ff",
+      "feature_count": 4,
+      "controller_feature_count": 4,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "SL",
+      "lookup_iso2": "SL",
+      "provenance_iso2": "SL",
       "scenario_only": true,
-      "featured": true,
-      "capital_state_id": 617,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia",
-      "notes": "Sinkiang override.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
+      "featured": false,
+      "capital_state_id": 700,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "sinkiang",
-      "rule_sources": [
-        "sinkiang"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "hoi4_owner"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -3535,73 +5831,67 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "SMR": {
-      "tag": "SMR",
-      "display_name": "Spanish Morocco",
-      "color_hex": "#e6bc62",
-      "feature_count": 3,
-      "controller_feature_count": 3,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "MA",
-      "lookup_iso2": "MA",
-      "provenance_iso2": "MA",
+    "SLV": {
+      "tag": "SLV",
+      "display_name": "Slovenia",
+      "color_hex": "#66b2ff",
+      "feature_count": 12,
+      "controller_feature_count": 12,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "SI",
+      "lookup_iso2": "SI",
+      "provenance_iso2": "SI",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_northern_africa",
-      "subregion_label": "Northern Africa",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "capital_state_id": 853,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "spanish_morocco",
-      "rule_sources": [
-        "spanish_morocco"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "SPR",
-      "parent_owner_tags": [
-        "SPR"
-      ],
-      "subject_kind": "protectorate",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
-    "SOV": {
-      "tag": "SOV",
-      "display_name": "Soviet Union",
-      "color_hex": "#7d0d18",
-      "feature_count": 12959,
-      "controller_feature_count": 12959,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "RU",
-      "lookup_iso2": "RU",
-      "provenance_iso2": "RU",
+    "SNG": {
+      "tag": "SNG",
+      "display_name": "Singapore",
+      "color_hex": "#cc0000",
+      "feature_count": 5,
+      "controller_feature_count": 5,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "SG",
+      "lookup_iso2": "SG",
+      "provenance_iso2": "SG",
       "scenario_only": true,
-      "featured": true,
-      "capital_state_id": 219,
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
+      "featured": false,
+      "capital_state_id": 1021,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "soviet_union",
-      "rule_sources": [
-        "soviet_union"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "hoi4_owner"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -3615,9 +5905,9 @@
       "tag": "SPR",
       "display_name": "Spain",
       "color_hex": "#f2cd5e",
-      "feature_count": 59,
-      "controller_feature_count": 59,
-      "quality": "approx_existing_geometry",
+      "feature_count": 52,
+      "controller_feature_count": 52,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "ES",
       "lookup_iso2": "ES",
@@ -3629,14 +5919,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "Approximate Spanish fallback for Andorra only; colonial holdings are handled by dedicated subject rules.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "spanish_andorra_only",
-      "rule_sources": [
-        "spanish_andorra_only"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
@@ -3648,53 +5936,119 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "SSH": {
-      "tag": "SSH",
-      "display_name": "Spanish Sahara",
-      "color_hex": "#edc431",
-      "feature_count": 3,
-      "controller_feature_count": 3,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "EH",
-      "lookup_iso2": "EH",
-      "provenance_iso2": "EH",
+    "SRL": {
+      "tag": "SRL",
+      "display_name": "Sri Lanka",
+      "color_hex": "#cc0066",
+      "feature_count": 25,
+      "controller_feature_count": 25,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "LK",
+      "lookup_iso2": "LK",
+      "provenance_iso2": "LK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 422,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "SS": {
+      "tag": "SS",
+      "display_name": "Northern Bahr el Ghazal",
+      "color_hex": "#716b5b",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "SS",
+      "lookup_iso2": "SS",
+      "provenance_iso2": "SS",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "subregion_id": "subregion_northern_africa",
-      "subregion_label": "Northern Africa",
-      "notes": "Spanish Sahara represented using the current Western Sahara approximation blocks.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "spanish_sahara",
-      "rule_sources": [
-        "spanish_sahara"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "SPR",
-      "parent_owner_tags": [
-        "SPR"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "ST": {
+      "tag": "ST",
+      "display_name": "São Tomé",
+      "color_hex": "#736b5b",
+      "feature_count": 2,
+      "controller_feature_count": 2,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "ST",
+      "lookup_iso2": "ST",
+      "provenance_iso2": "ST",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SUD": {
       "tag": "SUD",
-      "display_name": "Anglo-Egyptian Sudan",
-      "color_hex": "#cf5a6c",
-      "feature_count": 27,
-      "controller_feature_count": 27,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "display_name": "Sudan",
+      "color_hex": "#cc6600",
+      "feature_count": 17,
+      "controller_feature_count": 17,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "SD",
       "lookup_iso2": "SD",
       "provenance_iso2": "SD",
@@ -3705,27 +6059,57 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "Anglo-Egyptian Sudan represented as a condominium under British primacy with Egyptian linkage retained in metadata.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "anglo_egyptian_sudan",
-      "rule_sources": [
-        "anglo_egyptian_sudan"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG",
-        "EGY"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "SUR": {
+      "tag": "SUR",
+      "display_name": "Suriname",
+      "color_hex": "#ffb266",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "SR",
+      "lookup_iso2": "SR",
+      "provenance_iso2": "SR",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 309,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "condominium",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SWE": {
       "tag": "SWE",
@@ -3766,9 +6150,9 @@
       "tag": "SWI",
       "display_name": "Switzerland",
       "color_hex": "#e00505",
-      "feature_count": 37,
-      "controller_feature_count": 37,
-      "quality": "approx_existing_geometry",
+      "feature_count": 26,
+      "controller_feature_count": 26,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CH",
       "lookup_iso2": "CH",
@@ -3780,14 +6164,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "Liechtenstein approximation via Switzerland.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "swiss_liechtenstein",
-      "rule_sources": [
-        "swiss_liechtenstein"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
@@ -3801,12 +6183,12 @@
     },
     "SYR": {
       "tag": "SYR",
-      "display_name": "French Mandate for Syria",
-      "color_hex": "#5086d9",
+      "display_name": "Syria",
+      "color_hex": "#646496",
       "feature_count": 14,
       "controller_feature_count": 14,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "direct_country_copy",
+      "source": "direct_active_owner",
       "base_iso2": "SY",
       "lookup_iso2": "SY",
       "provenance_iso2": "SY",
@@ -3817,94 +6199,119 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_western_asia",
       "subregion_label": "Western Asia",
-      "notes": "French Mandate for Syria represented as a separate mandate government.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_mandate_syria",
-      "rule_sources": [
-        "french_mandate_syria"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "mandate",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
-    "TAI": {
-      "tag": "TAI",
-      "display_name": "Taiwan",
-      "color_hex": "#fab5a1",
-      "feature_count": 21,
-      "controller_feature_count": 21,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "TW",
-      "lookup_iso2": "TW",
-      "provenance_iso2": "TW",
+    "SZ": {
+      "tag": "SZ",
+      "display_name": "Hhohho",
+      "color_hex": "#7f6d5c",
+      "feature_count": 4,
+      "controller_feature_count": 4,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "SZ",
+      "lookup_iso2": "SZ",
+      "provenance_iso2": "SZ",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia",
-      "notes": "Japanese colonial rule in Taiwan represented as a distinct subject government.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "japanese_taiwan",
-      "rule_sources": [
-        "japanese_taiwan"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "JAP"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
-    "TAN": {
-      "tag": "TAN",
-      "display_name": "Tannu Tuva",
-      "color_hex": "#9882bf",
-      "feature_count": 19,
-      "controller_feature_count": 19,
+    "TAJ": {
+      "tag": "TAJ",
+      "display_name": "Tajikistan",
+      "color_hex": "#336600",
+      "feature_count": 5,
+      "controller_feature_count": 5,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
-      "base_iso2": "RU",
-      "lookup_iso2": "RU",
-      "provenance_iso2": "RU",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "TJ",
+      "lookup_iso2": "TJ",
+      "provenance_iso2": "TJ",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": 329,
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "notes": "Approximate Tannu Tuva using the current Tuva Republic group.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
+      "capital_state_id": 742,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "tannu_tuva",
-      "rule_sources": [
-        "tannu_tuva"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "hoi4_owner"
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TF": {
+      "tag": "TF",
+      "display_name": "French Southern and Antarctic Lands",
+      "color_hex": "#586859",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "TF",
+      "lookup_iso2": "TF",
+      "provenance_iso2": "TF",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -3932,13 +6339,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Tibet override.",
+      "notes": "Tibet owner-layer override for the 1939 scenario.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "tibet",
+      "primary_rule_source": "1939_tibet",
       "rule_sources": [
-        "tibet"
+        "1939_tibet"
       ],
       "source_types": [
         "hoi4_owner"
@@ -3951,14 +6358,154 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "TL": {
+      "tag": "TL",
+      "display_name": "Dili",
+      "color_hex": "#64695a",
+      "feature_count": 13,
+      "controller_feature_count": 13,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "TL",
+      "lookup_iso2": "TL",
+      "provenance_iso2": "TL",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TMS": {
+      "tag": "TMS",
+      "display_name": "Turkmenistan",
+      "color_hex": "#004c99",
+      "feature_count": 5,
+      "controller_feature_count": 5,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "TM",
+      "lookup_iso2": "TM",
+      "provenance_iso2": "TM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 584,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TOG": {
+      "tag": "TOG",
+      "display_name": "Togo",
+      "color_hex": "#006600",
+      "feature_count": 5,
+      "controller_feature_count": 5,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "TG",
+      "lookup_iso2": "TG",
+      "provenance_iso2": "TG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 777,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TRI": {
+      "tag": "TRI",
+      "display_name": "Trinidad and Tobago",
+      "color_hex": "#606060",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "TT",
+      "lookup_iso2": "TT",
+      "provenance_iso2": "TT",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 691,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "TUN": {
       "tag": "TUN",
-      "display_name": "French Tunisia",
-      "color_hex": "#4874d6",
+      "display_name": "Tunisia",
+      "color_hex": "#999966",
       "feature_count": 23,
       "controller_feature_count": 23,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
       "base_iso2": "TN",
       "lookup_iso2": "TN",
       "provenance_iso2": "TN",
@@ -3969,26 +6516,22 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_tunisia",
-      "rule_sources": [
-        "french_tunisia"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "protectorate",
-      "entry_kind": "scenario_subject"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "TUR": {
       "tag": "TUR",
@@ -4018,6 +6561,181 @@
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TW": {
+      "tag": "TW",
+      "display_name": "Kaohsiung City",
+      "color_hex": "#7a6c5b",
+      "feature_count": 21,
+      "controller_feature_count": 21,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "TW",
+      "lookup_iso2": "TW",
+      "provenance_iso2": "TW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TZ": {
+      "tag": "TZ",
+      "display_name": "Mbeya",
+      "color_hex": "#806d5c",
+      "feature_count": 30,
+      "controller_feature_count": 30,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_current_code",
+      "base_iso2": "TZ",
+      "lookup_iso2": "TZ",
+      "provenance_iso2": "TZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "UAE": {
+      "tag": "UAE",
+      "display_name": "Arab Emirates",
+      "color_hex": "#666600",
+      "feature_count": 9,
+      "controller_feature_count": 9,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "AE",
+      "lookup_iso2": "AE",
+      "provenance_iso2": "AE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 658,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "UGA": {
+      "tag": "UGA",
+      "display_name": "Uganda",
+      "color_hex": "#ff5050",
+      "feature_count": 4,
+      "controller_feature_count": 4,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "UG",
+      "lookup_iso2": "UG",
+      "provenance_iso2": "UG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 548,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "UKR": {
+      "tag": "UKR",
+      "display_name": "Ukraine",
+      "color_hex": "#0050e6",
+      "feature_count": 1046,
+      "controller_feature_count": 1046,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "UA",
+      "lookup_iso2": "UA",
+      "provenance_iso2": "UA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 202,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
@@ -4097,6 +6815,41 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "UZB": {
+      "tag": "UZB",
+      "display_name": "Uzbekistan",
+      "color_hex": "#006666",
+      "feature_count": 14,
+      "controller_feature_count": 14,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "UZ",
+      "lookup_iso2": "UZ",
+      "provenance_iso2": "UZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 405,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_central_asia",
+      "subregion_label": "Central Asia",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "VEN": {
       "tag": "VEN",
       "display_name": "Venezuela",
@@ -4132,44 +6885,75 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "VIN": {
-      "tag": "VIN",
-      "display_name": "French Indochina",
-      "color_hex": "#6595ea",
-      "feature_count": 104,
-      "controller_feature_count": 104,
+    "VN": {
+      "tag": "VN",
+      "display_name": "Quảng Ninh",
+      "color_hex": "#6a6a5a",
+      "feature_count": 63,
+      "controller_feature_count": 63,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "source": "fallback_current_code",
       "base_iso2": "VN",
       "lookup_iso2": "VN",
       "provenance_iso2": "VN",
       "scenario_only": true,
       "featured": false,
-      "capital_state_id": 671,
+      "capital_state_id": null,
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "French Indochina represented as a unified colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_indochina",
-      "rule_sources": [
-        "french_indochina"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
-        "scenario_extension"
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"
       ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "WES": {
+      "tag": "WES",
+      "display_name": "Western Sahara",
+      "color_hex": "#ffb266",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "EH",
+      "lookup_iso2": "EH",
+      "provenance_iso2": "EH",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 699,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
-      "subject_kind": "colonial_government",
-      "entry_kind": "scenario_subject"
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "XSM": {
       "tag": "XSM",
@@ -4189,13 +6973,13 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Ningxia remains under Xibei San Ma and absorbs the far-western Alashan frontier that does not belong to Mengjiang.",
+      "notes": "Ningxia remains under Xibei San Ma and absorbs the far-western Alashan frontier that does not belong to Mengjiang in 1939.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "ningxia_ma_clique",
+      "primary_rule_source": "1939_ningxia_ma_clique",
       "rule_sources": [
-        "ningxia_ma_clique"
+        "1939_ningxia_ma_clique"
       ],
       "source_types": [
         "hoi4_owner"
@@ -4243,43 +7027,6 @@
       "subject_kind": "",
       "entry_kind": ""
     },
-    "YUG": {
-      "tag": "YUG",
-      "display_name": "Yugoslavia",
-      "color_hex": "#48497e",
-      "feature_count": 120,
-      "controller_feature_count": 120,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "RS",
-      "lookup_iso2": "RS",
-      "provenance_iso2": "RS",
-      "scenario_only": true,
-      "featured": true,
-      "capital_state_id": 107,
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "subregion_id": "subregion_southern_europe",
-      "subregion_label": "Southern Europe",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "yugoslavia_union",
-      "rule_sources": [
-        "yugoslavia_union"
-      ],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": ""
-    },
     "YUN": {
       "tag": "YUN",
       "display_name": "Yunnan",
@@ -4298,16 +7045,86 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Yunnan clique override.",
+      "notes": "Yunnan clique owner-layer override for the 1939 scenario.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "yunnan_warlord",
+      "primary_rule_source": "1939_yunnan_warlord",
       "rule_sources": [
-        "yunnan_warlord"
+        "1939_yunnan_warlord"
       ],
       "source_types": [
         "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "ZAM": {
+      "tag": "ZAM",
+      "display_name": "Zambia",
+      "color_hex": "#6666ff",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "ZM",
+      "lookup_iso2": "ZM",
+      "provenance_iso2": "ZM",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 771,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "ZIM": {
+      "tag": "ZIM",
+      "display_name": "Zimbabwe",
+      "color_hex": "#0707ef",
+      "feature_count": 10,
+      "controller_feature_count": 10,
+      "quality": "approx_existing_geometry",
+      "source": "fallback_mapped_tag",
+      "base_iso2": "ZW",
+      "lookup_iso2": "ZW",
+      "provenance_iso2": "ZW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 545,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": true,
+      "source_type": "synthetic_fallback",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
       ],
       "historical_fidelity_summary": [
         "vanilla"

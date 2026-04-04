@@ -1,0 +1,328 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "AD_ADM1_AND-4876",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4876",
+        "name": "Andorra la Vella",
+        "cntr_code": "AD",
+        "admin1_group": "Andorra la Vella",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.5498154981549987,
+              42.529664440644396
+            ],
+            [
+              1.4886148861488664,
+              42.51751357213571
+            ],
+            [
+              1.4922149221492305,
+              42.493211835118345
+            ],
+            [
+              1.5174151741517505,
+              42.49841935019349
+            ],
+            [
+              1.5498154981549987,
+              42.529664440644396
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4877",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4877",
+        "name": "La Massana",
+        "cntr_code": "AD",
+        "admin1_group": "La Massana",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.452614526145254,
+              42.60083381333813
+            ],
+            [
+              1.405814058140578,
+              42.529664440644396
+            ],
+            [
+              1.4490144901449185,
+              42.50362686526866
+            ],
+            [
+              1.5570155701556985,
+              42.53834363243631
+            ],
+            [
+              1.5570155701556985,
+              42.562645369453705
+            ],
+            [
+              1.452614526145254,
+              42.60083381333813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4878",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4878",
+        "name": "Ordino",
+        "cntr_code": "AD",
+        "admin1_group": "Ordino",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.5966159661596748,
+              42.621663873638724
+            ],
+            [
+              1.4670146701467104,
+              42.64249393393935
+            ],
+            [
+              1.452614526145254,
+              42.60083381333813
+            ],
+            [
+              1.5570155701556985,
+              42.562645369453705
+            ],
+            [
+              1.5966159661596748,
+              42.621663873638724
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4879",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4879",
+        "name": "Canillo",
+        "cntr_code": "AD",
+        "admin1_group": "Canillo",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.6074160741607386,
+              42.61819219692198
+            ],
+            [
+              1.5570155701556985,
+              42.562645369453705
+            ],
+            [
+              1.6830168301682988,
+              42.57479623796239
+            ],
+            [
+              1.715417154171547,
+              42.54007947079471
+            ],
+            [
+              1.7658176581765872,
+              42.562645369453705
+            ],
+            [
+              1.711817118171183,
+              42.59041878318784
+            ],
+            [
+              1.7226172261722752,
+              42.60951300513004
+            ],
+            [
+              1.6074160741607386,
+              42.61819219692198
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4880",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4880",
+        "name": "Encamp",
+        "cntr_code": "AD",
+        "admin1_group": "Encamp",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.711817118171183,
+              42.527928602286025
+            ],
+            [
+              1.6830168301682988,
+              42.57479623796239
+            ],
+            [
+              1.5570155701556985,
+              42.562645369453705
+            ],
+            [
+              1.5570155701556985,
+              42.53834363243631
+            ],
+            [
+              1.6758167581675991,
+              42.489740158401574
+            ],
+            [
+              1.711817118171183,
+              42.527928602286025
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4881",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4881",
+        "name": "Escaldes-Engordany",
+        "cntr_code": "AD",
+        "admin1_group": "Escaldes-Engordany",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.6542165421654147,
+              42.496683511835116
+            ],
+            [
+              1.5678156781567907,
+              42.54007947079471
+            ],
+            [
+              1.4994149941499586,
+              42.4880043200432
+            ],
+            [
+              1.5750157501575188,
+              42.48453264332643
+            ],
+            [
+              1.5714157141571548,
+              42.45328755287552
+            ],
+            [
+              1.6542165421654147,
+              42.496683511835116
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "AD_ADM1_AND-4882",
+      "type": "Feature",
+      "properties": {
+        "id": "AD_ADM1_AND-4882",
+        "name": "Sant Julià de Lòria",
+        "cntr_code": "AD",
+        "admin1_group": "Sant Julià de Lòria",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.4490144901449185,
+              42.4341933309333
+            ],
+            [
+              1.5174151741517505,
+              42.428985815858155
+            ],
+            [
+              1.5714157141571548,
+              42.45328755287552
+            ],
+            [
+              1.5750157501575188,
+              42.48453264332643
+            ],
+            [
+              1.4994149941499586,
+              42.4880043200432
+            ],
+            [
+              1.4886148861488664,
+              42.51751357213571
+            ],
+            [
+              1.405814058140578,
+              42.4862684816848
+            ],
+            [
+              1.4490144901449185,
+              42.4341933309333
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

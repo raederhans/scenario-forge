@@ -1,0 +1,354 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "SM_ADM1_SMR-4883",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4883",
+        "name": "Borgo Maggiore",
+        "cntr_code": "SM",
+        "admin1_group": "Borgo Maggiore",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.41832418324185,
+              43.94090102601025
+            ],
+            [
+              12.457924579245798,
+              43.918335127351284
+            ],
+            [
+              12.44352443524437,
+              43.96693860138602
+            ],
+            [
+              12.41832418324185,
+              43.94090102601025
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4884",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4884",
+        "name": "San Marino",
+        "cntr_code": "SM",
+        "admin1_group": "San Marino",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.385923859238602,
+              43.9252784807848
+            ],
+            [
+              12.42552425524255,
+              43.9044484204842
+            ],
+            [
+              12.439924399244006,
+              43.91486345063451
+            ],
+            [
+              12.41832418324185,
+              43.94090102601025
+            ],
+            [
+              12.385923859238602,
+              43.9252784807848
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4885",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4885",
+        "name": "Acquaviva",
+        "cntr_code": "SM",
+        "admin1_group": "Acquaviva",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.385923859238602,
+              43.9252784807848
+            ],
+            [
+              12.42552425524255,
+              43.95652357123571
+            ],
+            [
+              12.41832418324185,
+              43.96346692466925
+            ],
+            [
+              12.385923859238602,
+              43.9252784807848
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4886",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4886",
+        "name": "Serravalle",
+        "cntr_code": "SM",
+        "admin1_group": "Serravalle",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.483124831248318,
+              43.982561146611474
+            ],
+            [
+              12.42552425524255,
+              43.96867443974439
+            ],
+            [
+              12.465124651246526,
+              43.951316056160564
+            ],
+            [
+              12.483124831248318,
+              43.982561146611474
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4887",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4887",
+        "name": "Domagnano",
+        "cntr_code": "SM",
+        "admin1_group": "Domagnano",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.49392493924941,
+              43.95652357123571
+            ],
+            [
+              12.457924579245798,
+              43.95999524795248
+            ],
+            [
+              12.44352443524437,
+              43.94090102601025
+            ],
+            [
+              12.457924579245798,
+              43.93395767257674
+            ],
+            [
+              12.49392493924941,
+              43.95652357123571
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4888",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4888",
+        "name": "Faetano",
+        "cntr_code": "SM",
+        "admin1_group": "Faetano",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.490324903249046,
+              43.947844379443794
+            ],
+            [
+              12.457924579245798,
+              43.93395767257674
+            ],
+            [
+              12.479524795247954,
+              43.923542642426426
+            ],
+            [
+              12.490324903249046,
+              43.947844379443794
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4889",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4889",
+        "name": "Montegiardino",
+        "cntr_code": "SM",
+        "admin1_group": "Montegiardino",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.46872468724689,
+              43.923542642426426
+            ],
+            [
+              12.465124651246526,
+              43.89924090540906
+            ],
+            [
+              12.479524795247954,
+              43.916599288992884
+            ],
+            [
+              12.46872468724689,
+              43.923542642426426
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4890",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4890",
+        "name": "Fiorentino",
+        "cntr_code": "SM",
+        "admin1_group": "Fiorentino",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.461524615246162,
+              43.89403339033389
+            ],
+            [
+              12.46872468724689,
+              43.923542642426426
+            ],
+            [
+              12.465124651246526,
+              43.9252784807848
+            ],
+            [
+              12.436324363243642,
+              43.9044484204842
+            ],
+            [
+              12.461524615246162,
+              43.89403339033389
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SM_ADM1_SMR-4891",
+      "type": "Feature",
+      "properties": {
+        "id": "SM_ADM1_SMR-4891",
+        "name": "Chiesanuova",
+        "cntr_code": "SM",
+        "admin1_group": "Chiesanuova",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.429124291242914,
+              43.890561713617146
+            ],
+            [
+              12.421924219242186,
+              43.913127612276114
+            ],
+            [
+              12.389523895238966,
+              43.918335127351284
+            ],
+            [
+              12.40032400324003,
+              43.90271258212583
+            ],
+            [
+              12.429124291242914,
+              43.890561713617146
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

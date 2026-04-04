@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-17T00:59:45.665709+00:00",
+  "generated_at": "2026-04-04T02:50:53.167413+00:00",
   "chunks": [
     {
       "id": "political.coarse.r0c0",
@@ -216,6 +216,4122 @@
         "YE",
         "ZA",
         "ZM",
+        "ZW"
+      ]
+    },
+    {
+      "id": "political.detail.country.ad",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ad.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        1.405814058140578,
+        42.428985815858155,
+        1.7658176581765872,
+        42.64249393393935
+      ],
+      "priority": 95,
+      "feature_count": 7,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AD"
+      ]
+    },
+    {
+      "id": "political.detail.country.ae",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ae.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        51.575915759157596,
+        22.616126793267938,
+        56.36396363963641,
+        26.07044512645126
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AE"
+      ]
+    },
+    {
+      "id": "political.detail.country.af",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.af.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        60.46800468004682,
+        29.385896390963907,
+        74.90414904149043,
+        38.4712743587436
+      ],
+      "priority": 95,
+      "feature_count": 34,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AF"
+      ]
+    },
+    {
+      "id": "political.detail.country.al",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.al.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        19.315993159931594,
+        39.649908604086036,
+        21.080010800108,
+        42.64596561065609
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AL"
+      ]
+    },
+    {
+      "id": "political.detail.country.am",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.am.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        43.439834398344004,
+        38.86530966609665,
+        46.607866078660805,
+        41.29548336783368
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AM"
+      ]
+    },
+    {
+      "id": "political.detail.country.ao",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ao.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        11.669516695166948,
+        -18.03200004500046,
+        24.060840608406096,
+        -4.40566893168932
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AO"
+      ]
+    },
+    {
+      "id": "political.detail.country.aq",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.aq.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -180.0,
+        -89.9825,
+        180.0,
+        -60.520115543155434
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AQ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ar",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ar.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -73.56853568535685,
+        -55.05048887588876,
+        -53.66753667536675,
+        -21.786618414184147
+      ],
+      "priority": 95,
+      "feature_count": 24,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AR"
+      ]
+    },
+    {
+      "id": "political.detail.country.at",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.at.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        9.523895238952406,
+        46.371074727747285,
+        17.155971559715596,
+        49.00607735577357
+      ],
+      "priority": 95,
+      "feature_count": 35,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AT"
+      ]
+    },
+    {
+      "id": "political.detail.country.au",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.au.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        105.580055800558,
+        -54.7501888398884,
+        158.96138961389613,
+        -10.052351111511115
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AU"
+      ]
+    },
+    {
+      "id": "political.detail.country.ax",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ax.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        19.53199531995321,
+        60.00434919449195,
+        20.61200612006121,
+        60.40359201692017
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AX"
+      ]
+    },
+    {
+      "id": "political.detail.country.az",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.az.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        44.771847718477204,
+        38.3966333093331,
+        50.38790387903879,
+        41.8839325713257
+      ],
+      "priority": 95,
+      "feature_count": 76,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "AZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ba",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ba.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        15.72675726757268,
+        42.58000375303753,
+        19.567995679956795,
+        45.27055320853209
+      ],
+      "priority": 95,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BA"
+      ]
+    },
+    {
+      "id": "political.detail.country.bd",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bd.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        88.01188011880117,
+        20.741421366213658,
+        92.6559265592656,
+        26.618970047700472
+      ],
+      "priority": 95,
+      "feature_count": 7,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BD"
+      ]
+    },
+    {
+      "id": "political.detail.country.be",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.be.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        2.5398253982539813,
+        49.49731961119612,
+        6.427864278642801,
+        51.502212915129164
+      ],
+      "priority": 95,
+      "feature_count": 44,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BE"
+      ]
+    },
+    {
+      "id": "political.detail.country.bf",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bf.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -5.517055170551686,
+        9.399453532535318,
+        2.4066240662406813,
+        15.082588317883179
+      ],
+      "priority": 95,
+      "feature_count": 13,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BF"
+      ]
+    },
+    {
+      "id": "political.detail.country.bg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        22.340023400234003,
+        41.238200702007006,
+        28.60408604086041,
+        44.20995597155972
+      ],
+      "priority": 95,
+      "feature_count": 28,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BG"
+      ]
+    },
+    {
+      "id": "political.detail.country.bh",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bh.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        50.45990459904601,
+        25.784031797317965,
+        50.6759067590676,
+        26.290896597965983
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BH"
+      ]
+    },
+    {
+      "id": "political.detail.country.bi",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bi.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        28.985689856898574,
+        -4.462951597515982,
+        30.832508325083268,
+        -2.305304518045176
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BI"
+      ]
+    },
+    {
+      "id": "political.detail.country.bj",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bj.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.7686076860768765,
+        6.214190144901451,
+        3.8358383583835973,
+        12.398982215822159
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BJ"
+      ]
+    },
+    {
+      "id": "political.detail.country.bn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        114.00054000540007,
+        4.0166187831878375,
+        115.35775357753579,
+        5.051178444784441
+      ],
+      "priority": 95,
+      "feature_count": 4,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BN"
+      ]
+    },
+    {
+      "id": "political.detail.country.bo",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bo.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -69.6660966609666,
+        -22.89234744847448,
+        -57.46557465574655,
+        -9.679145864458647
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BO"
+      ]
+    },
+    {
+      "id": "political.detail.country.br",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.br.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -74.01854018540185,
+        -33.74133718837189,
+        -34.792547925479255,
+        5.262950724507249
+      ],
+      "priority": 95,
+      "feature_count": 27,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BR"
+      ]
+    },
+    {
+      "id": "political.detail.country.bs",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bs.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -78.97218972189721,
+        20.941042777427768,
+        -72.74412744127441,
+        26.94877933579336
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BS"
+      ]
+    },
+    {
+      "id": "political.detail.country.bt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        88.73188731887319,
+        26.702290288902887,
+        92.07992079920803,
+        28.35480840608406
+      ],
+      "priority": 95,
+      "feature_count": 20,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BT"
+      ]
+    },
+    {
+      "id": "political.detail.country.bw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        19.978399783997844,
+        -26.891719026190266,
+        29.349293492934947,
+        -17.782039321393214
+      ],
+      "priority": 95,
+      "feature_count": 15,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BW"
+      ]
+    },
+    {
+      "id": "political.detail.country.by",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.by.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        23.1680316803168,
+        51.23142213122132,
+        32.70812708127082,
+        56.16120306903069
+      ],
+      "priority": 95,
+      "feature_count": 35,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BY"
+      ]
+    },
+    {
+      "id": "political.detail.country.bz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.bz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -89.23589235892359,
+        15.893224831248318,
+        -87.78867788677887,
+        18.490039015390153
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "BZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ca",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ca.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -141.00081000810007,
+        41.67736780667808,
+        -52.65232652326523,
+        83.11703693636936
+      ],
+      "priority": 95,
+      "feature_count": 343,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CA"
+      ]
+    },
+    {
+      "id": "political.detail.country.cd",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cd.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        12.209522095220962,
+        -13.456330132301318,
+        31.2789127891279,
+        5.374044379443788
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CD"
+      ]
+    },
+    {
+      "id": "political.detail.country.cf",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cf.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        14.387543875438752,
+        2.237384465844656,
+        27.44127441274412,
+        10.998160660606601
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CF"
+      ]
+    },
+    {
+      "id": "political.detail.country.cg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        11.115111151111506,
+        -5.0201557105571055,
+        18.635586355863552,
+        3.7093753937539304
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CG"
+      ]
+    },
+    {
+      "id": "political.detail.country.ch",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ch.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        5.959859598595983,
+        45.83122899828997,
+        10.495904959049597,
+        47.796198019980196
+      ],
+      "priority": 95,
+      "feature_count": 26,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CH"
+      ]
+    },
+    {
+      "id": "political.detail.country.ci",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ci.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -8.580685806858071,
+        4.37072980829808,
+        -2.4930249302493053,
+        10.746464098640985
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CI"
+      ]
+    },
+    {
+      "id": "political.detail.country.cl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -109.45369453694536,
+        -55.918408055080555,
+        -66.4260642606426,
+        -17.50604102241023
+      ],
+      "priority": 95,
+      "feature_count": 16,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CL"
+      ]
+    },
+    {
+      "id": "political.detail.country.cm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        8.508685086850875,
+        1.6541427774277793,
+        16.201962019620197,
+        13.081166690666905
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CM"
+      ]
+    },
+    {
+      "id": "political.detail.country.cn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        73.46413464134642,
+        18.163701404014034,
+        134.99594995949963,
+        53.53314379443795
+      ],
+      "priority": 95,
+      "feature_count": 2391,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CN"
+      ]
+    },
+    {
+      "id": "political.detail.country.co",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.co.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -81.72261722617226,
+        -4.235556772567733,
+        -66.8760687606876,
+        12.589924435244356
+      ],
+      "priority": 95,
+      "feature_count": 34,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CO"
+      ]
+    },
+    {
+      "id": "political.detail.country.cr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -85.94545945459454,
+        8.035084582845826,
+        -82.56142561425614,
+        11.19604623346234
+      ],
+      "priority": 95,
+      "feature_count": 7,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CR"
+      ]
+    },
+    {
+      "id": "political.detail.country.cu",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cu.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -84.87984879848798,
+        19.847464611646117,
+        -74.14814148141481,
+        23.19763264332643
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CU"
+      ]
+    },
+    {
+      "id": "political.detail.country.cv",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cv.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -25.360453604536048,
+        14.803118342183424,
+        -22.678426784267828,
+        17.196839438394377
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CV"
+      ]
+    },
+    {
+      "id": "political.detail.country.cy",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cy.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        32.27612276122761,
+        34.56737389073891,
+        34.400144001440026,
+        35.59846187561875
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CY"
+      ]
+    },
+    {
+      "id": "political.detail.country.cz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        12.079920799207997,
+        48.58079695796958,
+        18.840788407884077,
+        51.04568742687427
+      ],
+      "priority": 95,
+      "feature_count": 160,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "CZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.de",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.de.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        5.851858518585203,
+        47.27891818918188,
+        15.028350283502846,
+        55.05720987309873
+      ],
+      "priority": 95,
+      "feature_count": 597,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "DE"
+      ]
+    },
+    {
+      "id": "political.detail.country.dj",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.dj.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        41.747817478174795,
+        10.93046296462964,
+        43.41103411034112,
+        12.697546413464138
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "DJ"
+      ]
+    },
+    {
+      "id": "political.detail.country.dk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.dk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        8.119881198811981,
+        54.56423177931778,
+        15.175951759517602,
+        57.699155854558555
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "DK"
+      ]
+    },
+    {
+      "id": "political.detail.country.do",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.do.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -72.00972009720097,
+        17.604761452614525,
+        -68.32688326883269,
+        19.93772820628206
+      ],
+      "priority": 95,
+      "feature_count": 32,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "DO"
+      ]
+    },
+    {
+      "id": "political.detail.country.dz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.dz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -8.695886958869579,
+        18.974337917379174,
+        11.971919719197189,
+        37.096490378903795
+      ],
+      "priority": 95,
+      "feature_count": 48,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "DZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ec",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ec.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -91.66951669516695,
+        -5.011476518765193,
+        -75.22815228152281,
+        1.4354271442714435
+      ],
+      "priority": 95,
+      "feature_count": 24,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "EC"
+      ]
+    },
+    {
+      "id": "political.detail.country.ee",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ee.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        21.872018720187214,
+        57.52036450364504,
+        28.208082080820816,
+        59.64850233102332
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "EE"
+      ]
+    },
+    {
+      "id": "political.detail.country.eg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.eg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        24.680046800468006,
+        21.99469666096661,
+        36.88416884168842,
+        31.654637125371252
+      ],
+      "priority": 95,
+      "feature_count": 26,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "EG"
+      ]
+    },
+    {
+      "id": "political.detail.country.eh",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.eh.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -17.0839708397084,
+        20.80217570875709,
+        -8.695886958869579,
+        27.66047306273063
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "EH"
+      ]
+    },
+    {
+      "id": "political.detail.country.er",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.er.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        36.42336423364233,
+        12.359057933579336,
+        43.12303123031231,
+        18.00574011340113
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ER"
+      ]
+    },
+    {
+      "id": "political.detail.country.es",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.es.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -9.271892718927177,
+        35.27038842588426,
+        4.3038430384303865,
+        43.751694644946454
+      ],
+      "priority": 95,
+      "feature_count": 52,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ES"
+      ]
+    },
+    {
+      "id": "political.detail.country.et",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.et.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        32.9889298892989,
+        3.4056036810368084,
+        47.97947979479795,
+        14.879495229952298
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ET"
+      ]
+    },
+    {
+      "id": "political.detail.country.fi",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.fi.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        19.53199531995321,
+        59.83597287372875,
+        31.55611556115562,
+        70.08436254162542
+      ],
+      "priority": 95,
+      "feature_count": 19,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "FI"
+      ]
+    },
+    {
+      "id": "political.detail.country.fk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.fk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -61.152011520115195,
+        -52.3078642696427,
+        -57.80397803978039,
+        -51.26636125461255
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "FK"
+      ]
+    },
+    {
+      "id": "political.detail.country.fo",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.fo.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -7.435874358743575,
+        61.412114103141036,
+        -6.391863918639189,
+        62.34946681666817
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "FO"
+      ]
+    },
+    {
+      "id": "political.detail.country.fr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.fr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -4.807848078480788,
+        41.370124417244185,
+        9.55989559895599,
+        51.094290900909
+      ],
+      "priority": 95,
+      "feature_count": 320,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "FR"
+      ]
+    },
+    {
+      "id": "political.detail.country.ga",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ga.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        8.695886958869607,
+        -3.9369925749257533,
+        14.499144991449924,
+        2.3207047070470708
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GA"
+      ]
+    },
+    {
+      "id": "political.detail.country.gb",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gb.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -8.155881558815594,
+        49.97293932139321,
+        1.7478174781747953,
+        60.842759121591214
+      ],
+      "priority": 95,
+      "feature_count": 378,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GB"
+      ]
+    },
+    {
+      "id": "political.detail.country.ge",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ge.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        39.980199801998026,
+        41.04205096750967,
+        46.679866798668,
+        43.57984664746648
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GE"
+      ]
+    },
+    {
+      "id": "political.detail.country.gg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -2.64782647826479,
+        49.43135775357753,
+        -2.503825038250369,
+        49.50079128791289
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GG"
+      ]
+    },
+    {
+      "id": "political.detail.country.gh",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gh.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -3.2598325983259713,
+        4.73699170191702,
+        1.1862118621186255,
+        11.163065304653045
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GH"
+      ]
+    },
+    {
+      "id": "political.detail.country.gl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -72.81612816128161,
+        59.81340697506975,
+        -11.431914319143175,
+        83.5996
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GL"
+      ]
+    },
+    {
+      "id": "political.detail.country.gm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -16.828368283682835,
+        13.06554414544145,
+        -13.822338223382218,
+        13.818897992979927
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GM"
+      ]
+    },
+    {
+      "id": "political.detail.country.gn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -15.085950859508586,
+        7.194938817388177,
+        -7.6410764107641,
+        12.676716353163528
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GN"
+      ]
+    },
+    {
+      "id": "political.detail.country.gq",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gq.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        5.610656106561066,
+        -1.4755737827378255,
+        11.334713347133487,
+        3.773601413014134
+      ],
+      "priority": 95,
+      "feature_count": 7,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GQ"
+      ]
+    },
+    {
+      "id": "political.detail.country.gr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        19.625596255962563,
+        34.926692430924305,
+        28.244082440824428,
+        41.75027301773018
+      ],
+      "priority": 95,
+      "feature_count": 66,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GR"
+      ]
+    },
+    {
+      "id": "political.detail.country.gs",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gs.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -38.000180001800004,
+        -58.48918466384664,
+        -26.264062640626406,
+        -53.991627477274776
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GS"
+      ]
+    },
+    {
+      "id": "political.detail.country.gt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -92.24552245522455,
+        13.732106075060756,
+        -88.23148231482314,
+        17.81653373233732
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GT"
+      ]
+    },
+    {
+      "id": "political.detail.country.gw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -16.727567275672754,
+        10.928727126271255,
+        -13.660336603366034,
+        12.678452191521913
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GW"
+      ]
+    },
+    {
+      "id": "political.detail.country.gy",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gy.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -61.39681396813968,
+        1.1976172891728964,
+        -56.48276482764827,
+        8.557571928719284
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "GY"
+      ]
+    },
+    {
+      "id": "political.detail.country.hk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.hk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        113.83853838538386,
+        22.189110557105565,
+        114.40014400144003,
+        22.555372450724505
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HK"
+      ]
+    },
+    {
+      "id": "political.detail.country.hm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.hm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        73.24813248132483,
+        -53.19314183241833,
+        73.82413824138243,
+        -52.96748284582846
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HM"
+      ]
+    },
+    {
+      "id": "political.detail.country.hn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.hn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -89.3618936189362,
+        12.980488065880664,
+        -83.13023130231302,
+        16.50944744847449
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HN"
+      ]
+    },
+    {
+      "id": "political.detail.country.hr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.hr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        13.519935199352005,
+        42.41683494734947,
+        19.423994239942402,
+        46.54292272522726
+      ],
+      "priority": 95,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HR"
+      ]
+    },
+    {
+      "id": "political.detail.country.ht",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ht.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -74.49014490144901,
+        18.024834335343357,
+        -71.63891638916388,
+        20.080066951669522
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HT"
+      ]
+    },
+    {
+      "id": "political.detail.country.hu",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.hu.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        16.11196111961121,
+        45.739229565295645,
+        22.9160291602916,
+        48.58079695796958
+      ],
+      "priority": 95,
+      "feature_count": 20,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "HU"
+      ]
+    },
+    {
+      "id": "political.detail.country.id",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.id.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        95.01035010350103,
+        -10.944572027720284,
+        141.0188101881019,
+        5.906946755467558
+      ],
+      "priority": 95,
+      "feature_count": 34,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ID"
+      ]
+    },
+    {
+      "id": "political.detail.country.ie",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ie.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -10.387903879038788,
+        51.502212915129164,
+        -5.995859958599567,
+        55.35750990909908
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IE"
+      ]
+    },
+    {
+      "id": "political.detail.country.il",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.il.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        34.256142561425634,
+        29.48310333903339,
+        35.87615876158762,
+        33.40436219062191
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IL"
+      ]
+    },
+    {
+      "id": "political.detail.country.im",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.im.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -4.771847718477176,
+        54.06778200882009,
+        -4.33984339843397,
+        54.414949680496804
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IM"
+      ]
+    },
+    {
+      "id": "political.detail.country.in",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.in.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        68.1720817208172,
+        8.069801350013492,
+        97.15597155971562,
+        37.08086783367834
+      ],
+      "priority": 95,
+      "feature_count": 718,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IN"
+      ]
+    },
+    {
+      "id": "political.detail.country.io",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.io.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        72.34812348123481,
+        -7.427763513635142,
+        72.49212492124923,
+        -7.219462910629105
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IO"
+      ]
+    },
+    {
+      "id": "political.detail.country.iq",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.iq.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        38.79218792187922,
+        29.06650213302133,
+        48.55188551885519,
+        37.374224516245164
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IQ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ir",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ir.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        44.0158401584016,
+        25.05497968679687,
+        63.31203312033122,
+        39.75579474394745
+      ],
+      "priority": 95,
+      "feature_count": 31,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IR"
+      ]
+    },
+    {
+      "id": "political.detail.country.is",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.is.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -24.320043200431996,
+        63.396177346773456,
+        -13.55593555935559,
+        66.51374303843038
+      ],
+      "priority": 95,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IS"
+      ]
+    },
+    {
+      "id": "political.detail.country.it",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.it.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        6.643866438664389,
+        36.65558743587435,
+        18.523985239852408,
+        47.08276845468454
+      ],
+      "priority": 95,
+      "feature_count": 107,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "IT"
+      ]
+    },
+    {
+      "id": "political.detail.country.je",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.je.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -2.2518225182251683,
+        49.17098199982,
+        -1.9998199981999676,
+        49.257773917739186
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "JE"
+      ]
+    },
+    {
+      "id": "political.detail.country.jm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.jm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -78.32418324183242,
+        17.712383430834308,
+        -76.20016200162001,
+        18.52822745927459
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "JM"
+      ]
+    },
+    {
+      "id": "political.detail.country.jo",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.jo.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        34.94014940149401,
+        29.207105040050394,
+        39.29619296192962,
+        33.371381261812616
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "JO"
+      ]
+    },
+    {
+      "id": "political.detail.country.jp",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.jp.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        123.65583655836559,
+        24.259965718657185,
+        145.8320583205832,
+        45.511834740347396
+      ],
+      "priority": 95,
+      "feature_count": 47,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "JP"
+      ]
+    },
+    {
+      "id": "political.detail.country.ke",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ke.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        33.89253892538926,
+        -4.6764597155971614,
+        41.88461884618846,
+        5.030348384483844
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KE"
+      ]
+    },
+    {
+      "id": "political.detail.country.kg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        69.21609216092162,
+        39.19164727747277,
+        80.27180271802717,
+        43.26913158131582
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KG"
+      ]
+    },
+    {
+      "id": "political.detail.country.kh",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kh.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        102.30402304023039,
+        10.420126487264866,
+        107.5960759607596,
+        14.700703879038784
+      ],
+      "priority": 95,
+      "feature_count": 24,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KH"
+      ]
+    },
+    {
+      "id": "political.detail.country.km",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.km.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        43.21663216632166,
+        -12.376638673386736,
+        44.5270452704527,
+        -11.361173233732345
+      ],
+      "priority": 95,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KM"
+      ]
+    },
+    {
+      "id": "political.detail.country.kp",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kp.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        124.30384303843039,
+        37.677996228962286,
+        130.7119071190712,
+        43.00701998919989
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KP"
+      ]
+    },
+    {
+      "id": "political.detail.country.kr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        126.10386103861038,
+        33.19953326433264,
+        130.92790927909283,
+        38.618820619206204
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KR"
+      ]
+    },
+    {
+      "id": "political.detail.country.kw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        46.53586535865358,
+        28.535335595355946,
+        48.44388443884441,
+        30.088910926109264
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KW"
+      ]
+    },
+    {
+      "id": "political.detail.country.kz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.kz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        46.49986499865,
+        40.5837896408964,
+        87.3278732787328,
+        55.42347176671767
+      ],
+      "priority": 95,
+      "feature_count": 16,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "KZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.la",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.la.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        100.10800108001081,
+        13.916104941049412,
+        107.66807668076683,
+        22.4928822698227
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LA"
+      ]
+    },
+    {
+      "id": "political.detail.country.lb",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lb.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        35.120151201512016,
+        33.06240203402034,
+        36.596165961659636,
+        34.68193922239222
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LB"
+      ]
+    },
+    {
+      "id": "political.detail.country.li",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.li.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        9.491494914949158,
+        47.0567308793088,
+        9.581495814958146,
+        47.261559805598054
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LI"
+      ]
+    },
+    {
+      "id": "political.detail.country.lk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        79.69219692196924,
+        5.917361785617857,
+        81.89181891818919,
+        9.82299809198092
+      ],
+      "priority": 95,
+      "feature_count": 25,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LK"
+      ]
+    },
+    {
+      "id": "political.detail.country.lr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -11.475114751147515,
+        4.346428071280712,
+        -7.385473854738535,
+        8.56277944379444
+      ],
+      "priority": 95,
+      "feature_count": 15,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LR"
+      ]
+    },
+    {
+      "id": "political.detail.country.ls",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ls.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        27.002070020700216,
+        -30.65848826388264,
+        29.43569435694357,
+        -28.582425587255877
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LS"
+      ]
+    },
+    {
+      "id": "political.detail.country.lt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        20.97200972009722,
+        53.90114152641526,
+        26.80406804068042,
+        56.438937206372074
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LT"
+      ]
+    },
+    {
+      "id": "political.detail.country.lu",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lu.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        5.743857438574395,
+        49.4556594905949,
+        6.503465034650361,
+        50.17082489424895
+      ],
+      "priority": 95,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LU"
+      ]
+    },
+    {
+      "id": "political.detail.country.lv",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.lv.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        20.97200972009722,
+        55.6855833588336,
+        28.244082440824428,
+        58.07409693996941
+      ],
+      "priority": 95,
+      "feature_count": 6,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LV"
+      ]
+    },
+    {
+      "id": "political.detail.country.ly",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ly.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        9.307893078930789,
+        19.48814607146072,
+        25.148051480514823,
+        33.18391071910719
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "LY"
+      ]
+    },
+    {
+      "id": "political.detail.country.ma",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ma.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -17.011970119701203,
+        21.421870002700032,
+        -1.027810278102777,
+        35.91785613356133
+      ],
+      "priority": 95,
+      "feature_count": 16,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MA"
+      ]
+    },
+    {
+      "id": "political.detail.country.mc",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mc.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        7.363873638736408,
+        43.73780793807937,
+        7.435874358743604,
+        43.77078886688868
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MC"
+      ]
+    },
+    {
+      "id": "political.detail.country.md",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.md.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        26.624066240662415,
+        45.46149542795429,
+        30.152101521015226,
+        48.48185417154171
+      ],
+      "priority": 95,
+      "feature_count": 40,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MD"
+      ]
+    },
+    {
+      "id": "political.detail.country.me",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.me.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        18.44118441184412,
+        41.85789499594996,
+        20.34560345603458,
+        43.527771496714976
+      ],
+      "priority": 95,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ME"
+      ]
+    },
+    {
+      "id": "political.detail.country.mg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        43.22383223832239,
+        -25.598519449194498,
+        50.49950499504996,
+        -11.947886598865992
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MG"
+      ]
+    },
+    {
+      "id": "political.detail.country.mk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        20.468004680046818,
+        40.85284458644587,
+        23.02403024030241,
+        42.36649563495634
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MK"
+      ]
+    },
+    {
+      "id": "political.detail.country.ml",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ml.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -12.263522635226337,
+        10.140656511565112,
+        4.235442354423554,
+        24.994225344253437
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ML"
+      ]
+    },
+    {
+      "id": "political.detail.country.mm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        92.18792187921878,
+        9.847299828998288,
+        101.1520115201152,
+        28.535335595355946
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MM"
+      ]
+    },
+    {
+      "id": "political.detail.country.mn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        87.75987759877597,
+        41.58189669696698,
+        119.90819908199086,
+        52.12537888578886
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MN"
+      ]
+    },
+    {
+      "id": "political.detail.country.mo",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mo.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        113.46413464134645,
+        22.19084639546395,
+        113.53613536135362,
+        22.242921546215456
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MO"
+      ]
+    },
+    {
+      "id": "political.detail.country.mr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -17.07677076770767,
+        14.733684807848078,
+        -4.822248222482216,
+        27.285531977319778
+      ],
+      "priority": 95,
+      "feature_count": 13,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MR"
+      ]
+    },
+    {
+      "id": "political.detail.country.mt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        14.1679416794168,
+        35.81196999369993,
+        14.563945639456392,
+        36.08102493924939
+      ],
+      "priority": 95,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MT"
+      ]
+    },
+    {
+      "id": "political.detail.country.mu",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mu.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        57.29997299973002,
+        -20.51772057420574,
+        57.80397803978042,
+        -19.996969066690667
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MU"
+      ]
+    },
+    {
+      "id": "political.detail.country.mv",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mv.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        73.46413464134642,
+        4.152014175141744,
+        73.53613536135362,
+        4.23880609306093
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MV"
+      ]
+    },
+    {
+      "id": "political.detail.country.mw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        32.67572675726757,
+        -17.12589242192422,
+        35.91935919359193,
+        -9.368430798307983
+      ],
+      "priority": 95,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MW"
+      ]
+    },
+    {
+      "id": "political.detail.country.mx",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mx.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -118.39978399783998,
+        14.544478426784266,
+        -86.70866708667086,
+        32.71523436234362
+      ],
+      "priority": 95,
+      "feature_count": 300,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MX"
+      ]
+    },
+    {
+      "id": "political.detail.country.my",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.my.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        99.63999639996399,
+        0.8504496174961673,
+        119.26019260192601,
+        7.358107623076236
+      ],
+      "priority": 95,
+      "feature_count": 16,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MY"
+      ]
+    },
+    {
+      "id": "political.detail.country.mz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        30.21330213302133,
+        -26.846587228872288,
+        40.84420844208444,
+        -10.474159832598332
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "MZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.na",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.na.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        11.716317163171652,
+        -28.95736667266673,
+        25.259652596525967,
+        -16.964459454594547
+      ],
+      "priority": 95,
+      "feature_count": 13,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NA"
+      ]
+    },
+    {
+      "id": "political.detail.country.ne",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ne.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.16020160201603062,
+        11.695967680676802,
+        15.971559715597152,
+        23.51876273962739
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NE"
+      ]
+    },
+    {
+      "id": "political.detail.country.ng",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ng.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        2.669426694266946,
+        4.276994536945367,
+        14.668346683466837,
+        13.872708982089819
+      ],
+      "priority": 95,
+      "feature_count": 37,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NG"
+      ]
+    },
+    {
+      "id": "political.detail.country.ni",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ni.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -87.68427684276843,
+        10.71348316983169,
+        -83.13023130231302,
+        15.030513167131673
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NI"
+      ]
+    },
+    {
+      "id": "political.detail.country.nl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.nl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        3.3678336783367797,
+        50.7575382593826,
+        7.219872198721987,
+        53.524464602646034
+      ],
+      "priority": 95,
+      "feature_count": 40,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NL"
+      ]
+    },
+    {
+      "id": "political.detail.country.no",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.no.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -9.091890918909172,
+        57.98556918369182,
+        30.980109801098024,
+        71.16405400053999
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NO"
+      ]
+    },
+    {
+      "id": "political.detail.country.np",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.np.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        80.05580055800561,
+        26.34817926379263,
+        88.15588155881562,
+        30.40830518405184
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NP"
+      ]
+    },
+    {
+      "id": "political.detail.country.nz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.nz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -176.85356853568535,
+        -47.27740470704707,
+        178.56358563585638,
+        -34.41137079470795
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "NZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.om",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.om.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        51.97191971919719,
+        16.650050355503552,
+        59.85599855998561,
+        26.381160192601925
+      ],
+      "priority": 95,
+      "feature_count": 11,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "OM"
+      ]
+    },
+    {
+      "id": "political.detail.country.pa",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pa.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -83.0510305103051,
+        7.2053538475384755,
+        -77.16497164971649,
+        9.630320034200338
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PA"
+      ]
+    },
+    {
+      "id": "political.detail.country.pe",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pe.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -81.33741337413373,
+        -18.337507596075966,
+        -68.68328683286832,
+        -0.03135626856268914
+      ],
+      "priority": 95,
+      "feature_count": 26,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PE"
+      ]
+    },
+    {
+      "id": "political.detail.country.pg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        140.84960849608495,
+        -11.635435694356943,
+        155.96255962559627,
+        -1.3471217442174463
+      ],
+      "priority": 95,
+      "feature_count": 20,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PG"
+      ]
+    },
+    {
+      "id": "political.detail.country.ph",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ph.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        116.95616956169562,
+        4.657143137431376,
+        126.64386643866442,
+        20.83862831428314
+      ],
+      "priority": 95,
+      "feature_count": 117,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PH"
+      ]
+    },
+    {
+      "id": "political.detail.country.pk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        60.86400864008641,
+        23.688874898748992,
+        77.06417064170643,
+        37.04615106651066
+      ],
+      "priority": 95,
+      "feature_count": 8,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PK"
+      ]
+    },
+    {
+      "id": "political.detail.country.pl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        14.131941319413187,
+        49.00607735577357,
+        24.14004140041402,
+        54.83328672486725
+      ],
+      "priority": 95,
+      "feature_count": 380,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PL"
+      ]
+    },
+    {
+      "id": "political.detail.country.pm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -56.39996399963999,
+        46.79288344883447,
+        -56.25596255962559,
+        47.10533435334354
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PM"
+      ]
+    },
+    {
+      "id": "political.detail.country.pr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -67.27207272072721,
+        17.95540080100801,
+        -65.2920529205292,
+        18.52822745927459
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PR"
+      ]
+    },
+    {
+      "id": "political.detail.country.ps",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ps.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        34.22014220142202,
+        31.21199834398344,
+        35.58815588155883,
+        32.53644301143011
+      ],
+      "priority": 95,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PS"
+      ]
+    },
+    {
+      "id": "political.detail.country.pt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -9.487894878948794,
+        36.980189208892085,
+        -6.211862118621184,
+        42.15472335523354
+      ],
+      "priority": 95,
+      "feature_count": 23,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PT"
+      ]
+    },
+    {
+      "id": "political.detail.country.py",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.py.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -62.64962649626496,
+        -27.580846854468547,
+        -54.243542435424345,
+        -19.287011178111783
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "PY"
+      ]
+    },
+    {
+      "id": "political.detail.country.qa",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.qa.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        50.7479074790748,
+        24.55679407794078,
+        51.61191611916121,
+        26.160708721087204
+      ],
+      "priority": 95,
+      "feature_count": 7,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "QA"
+      ]
+    },
+    {
+      "id": "political.detail.country.ro",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ro.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        20.2520025200252,
+        43.619770929709304,
+        29.684096840968408,
+        48.261402700027006
+      ],
+      "priority": 95,
+      "feature_count": 42,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "RO"
+      ]
+    },
+    {
+      "id": "political.detail.country.rs",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.rs.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        18.847988479884805,
+        42.2449869498695,
+        23.02403024030241,
+        46.18186834668346
+      ],
+      "priority": 95,
+      "feature_count": 25,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "RS"
+      ]
+    },
+    {
+      "id": "political.detail.country.ru",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ru.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -180.0,
+        41.1878613896139,
+        180.0,
+        81.84640325803257
+      ],
+      "priority": 95,
+      "feature_count": 11878,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "RU"
+      ]
+    },
+    {
+      "id": "political.detail.country.rw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.rw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        28.859688596885974,
+        -2.827791863918634,
+        30.886508865088672,
+        -1.0572367383673793
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "RW"
+      ]
+    },
+    {
+      "id": "political.detail.country.sa",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sa.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        34.58014580145803,
+        16.370580379803798,
+        55.64395643956439,
+        32.11984180541805
+      ],
+      "priority": 95,
+      "feature_count": 13,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SA"
+      ]
+    },
+    {
+      "id": "political.detail.country.sc",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sc.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        55.39195391953919,
+        -4.789289208892086,
+        55.53595535955361,
+        -4.563630222302223
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SC"
+      ]
+    },
+    {
+      "id": "political.detail.country.sd",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sd.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        21.81081810818108,
+        8.689495643956434,
+        38.60138601386015,
+        22.227299000990016
+      ],
+      "priority": 95,
+      "feature_count": 17,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SD"
+      ]
+    },
+    {
+      "id": "political.detail.country.se",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.se.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        11.107911079110806,
+        55.341887363873624,
+        24.14004140041402,
+        69.0602179101791
+      ],
+      "priority": 95,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SE"
+      ]
+    },
+    {
+      "id": "political.detail.country.sg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        103.63603636036362,
+        1.267050823508228,
+        103.99603996039963,
+        1.4493138511385126
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SG"
+      ]
+    },
+    {
+      "id": "political.detail.country.sh",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sh.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -14.419944199442,
+        -16.00454084240843,
+        -5.67185671856717,
+        -7.879081486814869
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SH"
+      ]
+    },
+    {
+      "id": "political.detail.country.si",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.si.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        13.411934119341197,
+        45.42851449914498,
+        16.579965799657998,
+        46.870996174961746
+      ],
+      "priority": 95,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SI"
+      ]
+    },
+    {
+      "id": "political.detail.country.sk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        16.86796867968681,
+        47.73891535415355,
+        22.55602556025562,
+        49.611884942849414
+      ],
+      "priority": 95,
+      "feature_count": 79,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SK"
+      ]
+    },
+    {
+      "id": "political.detail.country.sl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -13.300333003330024,
+        6.918940518405179,
+        -10.283502835028344,
+        9.993110251102507
+      ],
+      "priority": 95,
+      "feature_count": 4,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SL"
+      ]
+    },
+    {
+      "id": "political.detail.country.sm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        12.385923859238602,
+        43.890561713617146,
+        12.49392493924941,
+        43.982561146611474
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SM"
+      ]
+    },
+    {
+      "id": "political.detail.country.sn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -17.53757537575376,
+        12.305246944469445,
+        -11.377913779137799,
+        16.69171047610476
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SN"
+      ]
+    },
+    {
+      "id": "political.detail.country.so",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.so.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        40.98820988209883,
+        -1.663044325443252,
+        51.41391413914141,
+        11.987588524885254
+      ],
+      "priority": 95,
+      "feature_count": 18,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SO"
+      ]
+    },
+    {
+      "id": "political.detail.country.sr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -58.06678066780667,
+        1.8329341283412788,
+        -53.987939879398795,
+        6.01109705697057
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SR"
+      ]
+    },
+    {
+      "id": "political.detail.country.ss",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ss.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        24.1220412204122,
+        3.490659760597609,
+        35.746557465574654,
+        12.214983349833503
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SS"
+      ]
+    },
+    {
+      "id": "political.detail.country.st",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.st.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        6.471064710647113,
+        0.024190558905587523,
+        7.45747457474576,
+        1.692331221312216
+      ],
+      "priority": 95,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ST"
+      ]
+    },
+    {
+      "id": "political.detail.country.sv",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sv.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -90.09990099900999,
+        13.166222770227705,
+        -87.70227702277022,
+        14.445535640356397
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SV"
+      ]
+    },
+    {
+      "id": "political.detail.country.sy",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sy.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        35.732157321573226,
+        32.324670731707315,
+        42.39582395823959,
+        37.3169418504185
+      ],
+      "priority": 95,
+      "feature_count": 15,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SY"
+      ]
+    },
+    {
+      "id": "political.detail.country.sz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.sz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        30.782107821078228,
+        -27.31699942399424,
+        32.11412114121143,
+        -25.744329871298717
+      ],
+      "priority": 95,
+      "feature_count": 4,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "SZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.td",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.td.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        13.44793447934481,
+        7.455314571145706,
+        23.98163981639817,
+        23.442385851858518
+      ],
+      "priority": 95,
+      "feature_count": 22,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TD"
+      ]
+    },
+    {
+      "id": "political.detail.country.tf",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tf.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        51.64791647916479,
+        -49.70410673206732,
+        70.54810548105482,
+        -46.334844478444786
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TF"
+      ]
+    },
+    {
+      "id": "political.detail.country.tg",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tg.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -0.16740167401673034,
+        6.099624813248127,
+        1.7838178381783791,
+        11.135291890918907
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TG"
+      ]
+    },
+    {
+      "id": "political.detail.country.th",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.th.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        97.3359733597336,
+        5.6396276482764875,
+        105.65205652056522,
+        20.43938549185492
+      ],
+      "priority": 95,
+      "feature_count": 77,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TH"
+      ]
+    },
+    {
+      "id": "political.detail.country.tj",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tj.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        67.3440734407344,
+        36.67815333453335,
+        75.15615156151563,
+        41.033371775717754
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TJ"
+      ]
+    },
+    {
+      "id": "political.detail.country.tl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        124.03024030240306,
+        -9.500354513545133,
+        127.31347313473134,
+        -8.135985563855641
+      ],
+      "priority": 95,
+      "feature_count": 13,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TL"
+      ]
+    },
+    {
+      "id": "political.detail.country.tm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        52.439924399244006,
+        35.140200549005485,
+        66.66006660066603,
+        42.78483267932678
+      ],
+      "priority": 95,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TM"
+      ]
+    },
+    {
+      "id": "political.detail.country.tn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        7.471874718747188,
+        30.229513833138327,
+        11.575915759157596,
+        37.342979425794255
+      ],
+      "priority": 95,
+      "feature_count": 23,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TN"
+      ]
+    },
+    {
+      "id": "political.detail.country.tr",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tr.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        25.652056520565225,
+        35.8362717307173,
+        44.80784807848079,
+        42.097440689406895
+      ],
+      "priority": 95,
+      "feature_count": 81,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TR"
+      ]
+    },
+    {
+      "id": "political.detail.country.tt",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tt.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -61.9080190801908,
+        10.072958815588152,
+        -60.540005400054,
+        11.322762433624334
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TT"
+      ]
+    },
+    {
+      "id": "political.detail.country.tw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        118.28818288182885,
+        21.904433066330668,
+        121.9998199982,
+        25.294525380253802
+      ],
+      "priority": 95,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TW"
+      ]
+    },
+    {
+      "id": "political.detail.country.tz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.tz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        29.320493204932063,
+        -11.729170965709656,
+        40.448204482044815,
+        -0.9860673656736623
+      ],
+      "priority": 95,
+      "feature_count": 30,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "TZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ua",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ua.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        22.124021240212414,
+        44.242936900369,
+        40.189001890018915,
+        52.37881128611285
+      ],
+      "priority": 95,
+      "feature_count": 1059,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "UA"
+      ]
+    },
+    {
+      "id": "political.detail.country.ug",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ug.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        29.572495724957264,
+        -1.4825171361713672,
+        35.001350013500144,
+        4.233598577985774
+      ],
+      "priority": 95,
+      "feature_count": 4,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "UG"
+      ]
+    },
+    {
+      "id": "political.detail.country.us",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.us.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -179.14679146791468,
+        18.910111898118984,
+        179.7767977679777,
+        71.3879771487715
+      ],
+      "priority": 95,
+      "feature_count": 914,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "US"
+      ]
+    },
+    {
+      "id": "political.detail.country.uy",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.uy.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -58.437584375843755,
+        -34.97378242282423,
+        -53.113131131311306,
+        -30.101284150841508
+      ],
+      "priority": 95,
+      "feature_count": 19,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "UY"
+      ]
+    },
+    {
+      "id": "political.detail.country.uz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.uz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        55.96795967959682,
+        37.18675397353974,
+        73.14013140131402,
+        45.56043821438213
+      ],
+      "priority": 95,
+      "feature_count": 14,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "UZ"
+      ]
+    },
+    {
+      "id": "political.detail.country.ve",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ve.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -73.39213392133921,
+        0.650828206282057,
+        -59.81639816398163,
+        15.70228261182612
+      ],
+      "priority": 95,
+      "feature_count": 26,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "VE"
+      ]
+    },
+    {
+      "id": "political.detail.country.vn",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.vn.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        102.12402124021241,
+        8.561043605436055,
+        109.46809468094682,
+        23.360801449014488
+      ],
+      "priority": 95,
+      "feature_count": 63,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "VN"
+      ]
+    },
+    {
+      "id": "political.detail.country.xk",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.xk.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        20.036000360003612,
+        41.870045864458646,
+        21.764017640176405,
+        43.26392406624065
+      ],
+      "priority": 95,
+      "feature_count": 30,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "XK"
+      ]
+    },
+    {
+      "id": "political.detail.country.ye",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ye.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        42.53982539825398,
+        12.147285653856542,
+        54.52794527945281,
+        18.983017109171087
+      ],
+      "priority": 95,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "YE"
+      ]
+    },
+    {
+      "id": "political.detail.country.za",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.za.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        16.468364683646854,
+        -46.96668964089641,
+        37.89577895778959,
+        -22.132050247502477
+      ],
+      "priority": 95,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ZA"
+      ]
+    },
+    {
+      "id": "political.detail.country.zm",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.zm.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        21.980019800198022,
+        -18.06845265052651,
+        33.67293672936731,
+        -8.195004068040689
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
+        "ZM"
+      ]
+    },
+    {
+      "id": "political.detail.country.zw",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.zw.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        25.22005220052202,
+        -22.395897677976777,
+        33.042930429304306,
+        -15.61744888848888
+      ],
+      "priority": 95,
+      "feature_count": 10,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "country_codes": [
         "ZW"
       ]
     }

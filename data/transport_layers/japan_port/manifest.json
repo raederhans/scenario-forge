@@ -6,7 +6,6 @@
   "schema_version": 2,
   "generated_at": "2026-04-02T14:08:09.194657Z",
   "recipe_path": "data/transport_layers/japan_port/source_recipe.manual.json",
-  "default_coverage_tier": "core",
   "distribution_tier": "coverage_tiered",
   "license_tier": "review_required",
   "coverage_scope": "japan_main_islands_route_mask",
@@ -19,7 +18,44 @@
     },
     "build_audit": "data/transport_layers/japan_port/build_audit.json"
   },
-  "coverage_variants": {
+  "source_signature": {
+    "mlit_c02_2014_ports": {
+      "filename": "C02-14-g_PortAndHarbor.shp",
+      "size_bytes": 27932,
+      "sha256": "0186c00463256339ecd9502e93abef459ad2c8b0f73ad367b0090d206c26baea"
+    }
+  },
+  "recipe_version": "japan_port_sources_v1",
+  "feature_counts": {
+    "preview": {
+      "ports": 12
+    },
+    "full": {
+      "ports": 317
+    }
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_ports.py",
+  "runtime_consumer": "transport_workbench_port_preview",
+  "source_policy": "local_source_cache_only_internal_trial",
+  "official_port_member": "C02-14_GML/C02-14-g_PortAndHarbor.shp",
+  "official_encoding": "cp932",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "release_policy": "internal_trial_only",
+  "publish_guard": "replace_c02_source_before_public_release",
+  "scope_policy": "japan_corridor_main_islands",
+  "default_variant": "core",
+  "variants": {
     "core": {
       "label": "core",
       "description": "International strategic, international hub, and important ports only.",
@@ -102,40 +138,9 @@
       }
     }
   },
-  "source_signature": {
-    "mlit_c02_2014_ports": {
-      "filename": "C02-14-g_PortAndHarbor.shp",
-      "size_bytes": 27932,
-      "sha256": "0186c00463256339ecd9502e93abef459ad2c8b0f73ad367b0090d206c26baea"
+  "extensions": {
+    "port": {
+      "variant_axis": "coverage"
     }
-  },
-  "recipe_version": "japan_port_sources_v1",
-  "feature_counts": {
-    "preview": {
-      "ports": 12
-    },
-    "full": {
-      "ports": 317
-    }
-  },
-  "clip_bbox": [
-    129.0,
-    30.75,
-    145.824962,
-    45.520413
-  ],
-  "build_command": "python tools/build_transport_workbench_japan_ports.py",
-  "runtime_consumer": "transport_workbench_port_preview",
-  "source_policy": "local_source_cache_only_internal_trial",
-  "official_port_member": "C02-14_GML/C02-14-g_PortAndHarbor.shp",
-  "official_encoding": "cp932",
-  "text_policy": {
-    "storage_encoding": "utf-8",
-    "display_fields_preserve_original": true,
-    "source_fallback_encoding": "cp932",
-    "match_key_normalization": "NFKC + whitespace collapse + casefold"
-  },
-  "release_policy": "internal_trial_only",
-  "publish_guard": "replace_c02_source_before_public_release",
-  "scope_policy": "japan_corridor_main_islands"
+  }
 }

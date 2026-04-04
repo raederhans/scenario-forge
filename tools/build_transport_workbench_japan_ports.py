@@ -11,6 +11,8 @@ from typing import Any
 import geopandas as gpd
 from shapely.geometry import shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CACHE_DIR = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "port"
@@ -265,6 +267,31 @@ def main() -> None:
             "sha256": file_sha256(PORTS_SHP_PATH),
         },
     }
+    variants = {
+        tier_id: {
+            "label": tier_meta["label"],
+            "description": tier_meta["description"],
+            "distribution_tier": tier_meta["distribution_tier"],
+            "legal_designation_codes": list(tier_meta["legal_designation_codes"]),
+            "paths": {
+                "preview": {
+                    "ports": str(tier_meta["preview_path"].relative_to(ROOT)).replace("\\", "/"),
+                },
+                "full": {
+                    "ports": str(tier_meta["full_path"].relative_to(ROOT)).replace("\\", "/"),
+                },
+            },
+            "feature_counts": {
+                "preview": {
+                    "ports": int(len(tier_packs[tier_id])),
+                },
+                "full": {
+                    "ports": int(len(tier_packs[tier_id])),
+                },
+            },
+        }
+        for tier_id, tier_meta in COVERAGE_TIERS.items()
+    }
     manifest = {
         "adapter_id": "japan_port_v1",
         "family": "port",
@@ -273,7 +300,6 @@ def main() -> None:
         "schema_version": 2,
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
-        "default_coverage_tier": "core",
         "distribution_tier": "coverage_tiered",
         "license_tier": "review_required",
         "coverage_scope": "japan_main_islands_route_mask",
@@ -285,31 +311,6 @@ def main() -> None:
                 "ports": str(FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
             },
             "build_audit": str(AUDIT_PATH.relative_to(ROOT)).replace("\\", "/"),
-        },
-        "coverage_variants": {
-            tier_id: {
-                "label": tier_meta["label"],
-                "description": tier_meta["description"],
-                "distribution_tier": tier_meta["distribution_tier"],
-                "legal_designation_codes": list(tier_meta["legal_designation_codes"]),
-                "paths": {
-                    "preview": {
-                        "ports": str(tier_meta["preview_path"].relative_to(ROOT)).replace("\\", "/"),
-                    },
-                    "full": {
-                        "ports": str(tier_meta["full_path"].relative_to(ROOT)).replace("\\", "/"),
-                    },
-                },
-                "feature_counts": {
-                    "preview": {
-                        "ports": int(len(tier_packs[tier_id])),
-                    },
-                    "full": {
-                        "ports": int(len(tier_packs[tier_id])),
-                    },
-                },
-            }
-            for tier_id, tier_meta in COVERAGE_TIERS.items()
         },
         "source_signature": source_signature,
         "recipe_version": recipe.get("version", "japan_port_sources_v1"),
@@ -337,12 +338,18 @@ def main() -> None:
         "publish_guard": "replace_c02_source_before_public_release",
         "scope_policy": "japan_corridor_main_islands",
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="core",
+        variants=variants,
+        extension={"variant_axis": "coverage"},
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_port_v1",
         "raw_port_feature_count": int(len(ports)),
         "normalized_port_count": int(len(normalized)),
-        "default_coverage_tier": "core",
+        "default_variant": "core",
         "coverage_tier_counts": {
             tier_id: int(len(tier_gdf))
             for tier_id, tier_gdf in tier_packs.items()

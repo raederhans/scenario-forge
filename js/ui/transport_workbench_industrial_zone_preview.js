@@ -13,6 +13,11 @@ import {
   resolveTransportWorkbenchLabelSeparation,
   selectTransportWorkbenchLabels,
 } from "./transport_workbench_density_helpers.js";
+import {
+  getTransportWorkbenchManifestDefaultVariantId,
+  getTransportWorkbenchManifestVariantMeta,
+  resolveTransportWorkbenchManifestVariantId,
+} from "./transport_workbench_manifest_variants.js";
 
 const PACK_MODE_PREVIEW = "preview";
 const PACK_MODE_FULL = "full";
@@ -42,35 +47,15 @@ function getCurrentScale() {
 }
 
 function getDefaultVariantId(manifest) {
-  const variants = manifest?.distribution_variants;
-  if (variants && typeof variants === "object") {
-    const candidate = String(
-      manifest?.default_distribution_variant
-      || manifest?.default_variant
-      || ""
-    ).trim();
-    if (candidate && variants[candidate]) return candidate;
-    const [firstVariantId] = Object.keys(variants);
-    if (firstVariantId) return firstVariantId;
-  }
-  return "internal";
+  return getTransportWorkbenchManifestDefaultVariantId(manifest, "industrial_zones");
 }
 
 function resolveVariantId(manifest, config) {
-  const requestedVariant = String(config?.variant || "").trim();
-  const variants = manifest?.distribution_variants;
-  if (requestedVariant && variants?.[requestedVariant]) {
-    return requestedVariant;
-  }
-  return getDefaultVariantId(manifest);
+  return resolveTransportWorkbenchManifestVariantId(manifest, config?.variant, "industrial_zones");
 }
 
 function getVariantMeta(manifest, variantId) {
-  const variants = manifest?.distribution_variants;
-  if (variants && typeof variants === "object" && variants[variantId]) {
-    return variants[variantId];
-  }
-  return manifest || null;
+  return getTransportWorkbenchManifestVariantMeta(manifest, variantId, "industrial_zones");
 }
 
 function getPackPath(manifest, variantId, mode) {

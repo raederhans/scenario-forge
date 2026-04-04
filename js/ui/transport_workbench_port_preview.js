@@ -1,27 +1,16 @@
 import { createTransportWorkbenchPointPreviewController } from "./transport_workbench_point_preview_shared.js";
-
-function getDefaultCoverageVariantId(manifest) {
-  const variants = manifest?.coverage_variants;
-  const defaultVariantId = String(manifest?.default_coverage_tier || "").trim();
-  if (defaultVariantId && variants?.[defaultVariantId]) {
-    return defaultVariantId;
-  }
-  const [firstVariantId] = Object.keys(variants || {});
-  return String(firstVariantId || "").trim();
-}
+import {
+  getTransportWorkbenchManifestVariantMeta,
+  resolveTransportWorkbenchManifestVariantId,
+} from "./transport_workbench_manifest_variants.js";
 
 function resolveCoverageVariantId(config, manifest) {
-  const variants = manifest?.coverage_variants;
-  const requestedVariantId = String(config?.coverageTier || "").trim();
-  if (requestedVariantId && variants?.[requestedVariantId]) {
-    return requestedVariantId;
-  }
-  return getDefaultCoverageVariantId(manifest);
+  return resolveTransportWorkbenchManifestVariantId(manifest, config?.coverageTier, "port");
 }
 
 function getCoverageVariantMeta(manifest, variantId) {
   if (!variantId) return null;
-  return manifest?.coverage_variants?.[variantId] || null;
+  return getTransportWorkbenchManifestVariantMeta(manifest, variantId, "port");
 }
 
 const controller = createTransportWorkbenchPointPreviewController({

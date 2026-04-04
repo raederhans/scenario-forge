@@ -15,11 +15,12 @@ class StartupShellTest(unittest.TestCase):
         for href in [
             "data/europe_topology.json",
             "data/scenarios/index.json",
-            "data/scenarios/tno_1962/manifest.json",
         ]:
             self.assertIn(f'<link rel="preload" href="{href}" as="fetch" crossorigin />', html)
+        self.assertNotIn('href="data/scenarios/tno_1962/manifest.json"', html)
         self.assertNotIn('href="data/locales.startup.json"', html)
         self.assertNotIn('href="data/geo_aliases.startup.json"', html)
+        self.assertIn('<link rel="modulepreload" href="js/main.js" />', html)
 
         self.assertNotIn('<script src="vendor/milsymbol.js"></script>', html)
 

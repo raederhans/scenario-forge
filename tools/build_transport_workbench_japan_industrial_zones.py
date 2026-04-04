@@ -16,6 +16,8 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE_PATH = ROOT / "data" / "transport_layers" / "japan_industrial_zones" / "source_recipe.manual.json"
@@ -438,6 +440,46 @@ def main() -> None:
             "members": osm_signature,
         },
     }
+    variants = {
+        "internal": {
+            "label": "official_core",
+            "distribution_tier": "internal_only",
+            "license_tier": "review_required",
+            "source_set": ["l05_official"],
+            "source_policy": "local_source_cache_with_download",
+            "paths": {
+                "preview": {
+                    "industrial_zones": str(INTERNAL_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                },
+                "full": {
+                    "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                },
+            },
+            "feature_counts": {
+                "preview": {"industrial_zones": int(len(internal_features))},
+                "full": {"industrial_zones": int(len(internal_features))},
+            },
+        },
+        "open": {
+            "label": "open_variant",
+            "distribution_tier": "public_publishable_candidate",
+            "license_tier": "odbl_attribution_required",
+            "source_set": ["osm_industrial"],
+            "source_policy": "local_source_cache_only",
+            "paths": {
+                "preview": {
+                    "industrial_zones": str(OPEN_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                },
+                "full": {
+                    "industrial_zones": str(OPEN_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                },
+            },
+            "feature_counts": {
+                "preview": {"industrial_zones": int(len(open_features))},
+                "full": {"industrial_zones": int(len(open_features))},
+            },
+        },
+    }
     manifest = {
         "adapter_id": "japan_industrial_zones_v2",
         "family": "industrial_zones",
@@ -447,7 +489,6 @@ def main() -> None:
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
         "recipe_version": recipe.get("version", "japan_industrial_zones_sources_v2"),
-        "default_distribution_variant": "internal",
         "distribution_tier": "dual_track",
         "license_tier": "mixed_by_variant",
         "coverage_scope": "japan_main_islands_v1",
@@ -460,46 +501,6 @@ def main() -> None:
                 "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
             },
             "build_audit": str(AUDIT_PATH.relative_to(ROOT)).replace("\\", "/"),
-        },
-        "distribution_variants": {
-            "internal": {
-                "label": "official_core",
-                "distribution_tier": "internal_only",
-                "license_tier": "review_required",
-                "source_set": ["l05_official"],
-                "source_policy": "local_source_cache_with_download",
-                "paths": {
-                    "preview": {
-                        "industrial_zones": str(INTERNAL_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
-                    },
-                    "full": {
-                        "industrial_zones": str(INTERNAL_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
-                    },
-                },
-                "feature_counts": {
-                    "preview": {"industrial_zones": int(len(internal_features))},
-                    "full": {"industrial_zones": int(len(internal_features))},
-                },
-            },
-            "open": {
-                "label": "open_variant",
-                "distribution_tier": "public_publishable_candidate",
-                "license_tier": "odbl_attribution_required",
-                "source_set": ["osm_industrial"],
-                "source_policy": "local_source_cache_only",
-                "paths": {
-                    "preview": {
-                        "industrial_zones": str(OPEN_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
-                    },
-                    "full": {
-                        "industrial_zones": str(OPEN_FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
-                    },
-                },
-                "feature_counts": {
-                    "preview": {"industrial_zones": int(len(open_features))},
-                    "full": {"industrial_zones": int(len(open_features))},
-                },
-            },
         },
         "feature_counts": {
             "preview": {"industrial_zones": int(len(internal_features))},
@@ -530,6 +531,12 @@ def main() -> None:
             "outside_japan_main_islands_route_mask"
         ],
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="internal",
+        variants=variants,
+        extension={"variant_axis": "distribution"},
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_industrial_zones_v2",

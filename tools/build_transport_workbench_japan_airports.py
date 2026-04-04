@@ -11,6 +11,8 @@ from typing import Any
 import geopandas as gpd
 from shapely.geometry import Point, shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CACHE_DIR = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "airport"
@@ -303,6 +305,7 @@ def main() -> None:
         "schema_version": 1,
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "distribution_tier": "single_pack",
         "paths": {
             "preview": {
                 "airports": str(PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
@@ -337,6 +340,18 @@ def main() -> None:
         },
         "scope_policy": "japan_corridor_main_islands",
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_airport_v1",

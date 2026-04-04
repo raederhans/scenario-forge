@@ -18,12 +18,15 @@ except ImportError as exc:
 from shapely.geometry import GeometryCollection, LineString, MultiLineString, MultiPolygon, Polygon, box, mapping
 from shapely.ops import linemerge, transform, unary_union
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PATH = ROOT / "data" / "ne_10m_admin_1_states_provinces.shp"
 OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_corridor"
 CARRIER_PATH = OUTPUT_DIR / "carrier.json"
 PROVENANCE_PATH = OUTPUT_DIR / "provenance.json"
+MANIFEST_PATH = OUTPUT_DIR / "manifest.json"
 
 VIEWBOX_WIDTH = 1600
 VIEWBOX_HEIGHT = 900
@@ -299,11 +302,47 @@ def main() -> None:
         },
         "namedWaterAnchors": NAMED_WATER_ANCHORS,
     }
+    manifest_payload = finalize_transport_manifest(
+        {
+            "adapter_id": "japan_carrier_v3",
+            "family": "carrier",
+            "geometry_kind": "carrier",
+            "country": "Japan",
+            "schema_version": 1,
+            "generated_at": provenance_payload["generatedAt"],
+            "recipe_path": "tools/build_transport_workbench_japan_carrier.py",
+            "recipe_version": "japan_carrier_v3",
+            "distribution_tier": "internal_layout",
+            "feature_counts": {},
+            "source_policy": "local_source_cache_only",
+            "paths": {
+                "carrier": str(CARRIER_PATH.relative_to(ROOT)).replace("\\", "/"),
+                "provenance": str(PROVENANCE_PATH.relative_to(ROOT)).replace("\\", "/"),
+            },
+            "build_command": "python tools/build_transport_workbench_japan_carrier.py",
+            "runtime_consumer": "transport_workbench_carrier",
+        },
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": "internal_layout",
+                "paths": {
+                    "carrier": str(CARRIER_PATH.relative_to(ROOT)).replace("\\", "/"),
+                    "provenance": str(PROVENANCE_PATH.relative_to(ROOT)).replace("\\", "/"),
+                },
+                "feature_counts": {},
+            }
+        },
+        extension={"carrier_source_kind": "natural_earth_admin1"},
+    )
 
     CARRIER_PATH.write_text(json.dumps(carrier_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     PROVENANCE_PATH.write_text(json.dumps(provenance_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    MANIFEST_PATH.write_text(json.dumps(manifest_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {CARRIER_PATH.relative_to(ROOT)}")
     print(f"Wrote {PROVENANCE_PATH.relative_to(ROOT)}")
+    print(f"Wrote {MANIFEST_PATH.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

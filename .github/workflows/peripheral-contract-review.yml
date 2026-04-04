@@ -1,0 +1,93 @@
+name: Peripheral Contract Review
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hoi4-shared-contract-review:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario_id:
+          - hoi4_1936
+          - hoi4_1939
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare report directory
+        run: mkdir -p .runtime/reports/generated
+
+      - name: Run strict HOI4 shared contract review (${{ matrix.scenario_id }})
+        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/${{ matrix.scenario_id }} --report-path .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
+
+      - name: Upload HOI4 shared contract report (${{ matrix.scenario_id }})
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.scenario_id }}-strict-contract-report
+          path: .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
+
+  hoi4-domain-contract-review:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario_id:
+          - hoi4_1936
+          - hoi4_1939
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare report directory
+        run: mkdir -p .runtime/reports/generated/scenarios/${{ matrix.scenario_id }}
+
+      - name: Run HOI4 domain contract review (${{ matrix.scenario_id }})
+        run: python tools/check_hoi4_scenario_bundle.py --scenario-dir data/scenarios/${{ matrix.scenario_id }} --report-dir .runtime/reports/generated/scenarios/${{ matrix.scenario_id }}
+
+      - name: Upload HOI4 domain review inputs (${{ matrix.scenario_id }})
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.scenario_id }}-domain-review-inputs
+          path: .runtime/reports/generated/scenarios/${{ matrix.scenario_id }}
+          if-no-files-found: ignore
+
+  transport-manifest-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare report directory
+        run: mkdir -p .runtime/reports/generated
+
+      - name: Run transport manifest contract review
+        run: python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json
+
+      - name: Upload transport manifest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transport-workbench-manifest-report
+          path: .runtime/reports/generated/transport_workbench_manifest_report.json

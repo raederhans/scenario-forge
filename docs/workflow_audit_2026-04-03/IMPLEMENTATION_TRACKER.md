@@ -69,3 +69,58 @@
 - 已完成：`tools/dev_server.py` 删除自持的 `GEO_LOCALE_BUILDER_BY_SCENARIO`；geo-locale donor tests 改为 patch 共享 registry，并新增静态守卫，确保 materializer 不再回头抓 adapter 层。
 - 已验证：`python -m py_compile map_builder/scenario_geo_locale_registry.py map_builder/scenario_geo_locale_materializer.py tools/dev_server.py tests/test_dev_server.py tests/test_scenario_materialization_service.py`；`python -m unittest tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_uses_in_process_materializer_for_tno tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_updates_manual_overrides_and_rebuilds_patch tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_prefers_manifest_builder_override tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_rolls_back_manual_overrides_on_builder_failure tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_rejects_when_no_builder_is_registered tests.test_dev_server.DevServerTest.test_save_scenario_geo_locale_entry_blocks_overlapping_builder_and_preserves_committed_manual_override tests.test_scenario_materialization_service.ScenarioMaterializationServiceTest.test_geo_locale_materializer_no_longer_imports_dev_server_registry -q`。
 - 剩余风险不变：TNO geo-locale 保存仍会连带 `startup-assets` publish；这一波没有进入 startup 或 chunk。
+## 第七波补记（2026-04-03）
+- 已完成：`index.html` 去掉默认场景 `data/scenarios/tno_1962/manifest.json` 硬编码 preload，startup shell 只保留 `modulepreload js/main.js`、`data/europe_topology.json`、`data/scenarios/index.json` 和现有 startup bundle 动态 preload。
+- 已完成：`js/core/scenario_resources.js` 新增 `chunkPayloadPromisesById`，`loadScenarioChunkPayload(...)` 改为 `cache -> promise -> fetch` 去重；`preloadScenarioCoarseChunks(...)` 现在复用同一套 chunk loader，并把 coarse prewarm 接进 runtime state，不再把 merged payload 回写 bundle cache。
+- 已完成：`js/core/scenario_manager.js` / `js/core/scenario_post_apply_effects.js` 改为从 `state.activeScenarioChunks.mergedLayerPayloads` 读取 chunk merged state，并在 scenario apply 后先做 coarse prewarm 再排队 viewport refresh；同时修正了 chunk refresh 不应清空 fallback water/special/relief/cities 的边界。
+- 已验证：`node --check js/core/scenario_resources.js`、`node --check js/core/scenario_manager.js`、`node --check js/core/scenario_post_apply_effects.js`、`python -m unittest tests.test_startup_shell tests.test_scenario_resources_boundary_contract -q`。
+- 剩余风险：`applyScenarioPoliticalChunkPayload(...)` 仍然沿用 feature id 列表级相等判定，若后续发现 political chunk 在 id 不变时也会改 geometry/properties，需要单独收这条判定，不和本波混做。
+## 第八波补记（2026-04-03）
+- 已完成：`tools/check_hoi4_scenario_bundle.py` 改成 shared/domain 分层；generic manifest/url 校验回到 `tools/check_scenario_contracts.py`，HOI4 脚本只保留 expectation、owner/controller set、controller_only country 和 `coverage_report.md` 对账。
+- 已完成：新增 `map_builder/transport_workbench_contracts.py` 和 `tools/check_transport_workbench_manifests.py`，Japan transport families 与 `japan_corridor` carrier 现在都有 shared manifest contract；checked-in transport manifest 已补齐 `default_variant` / `variants`，carrier 新增正式 `manifest.json`。
+- 已完成：新增 `.github/workflows/peripheral-contract-review.yml`，把 HOI4 shared strict、HOI4 domain、transport manifest review 拆成独立 non-blocking review workflow，不接现有 deploy blocking gate。
+- 已验证：`python -m py_compile map_builder/transport_workbench_contracts.py tools/check_transport_workbench_manifests.py tools/check_hoi4_scenario_bundle.py tools/build_hoi4_scenario.py tools/build_transport_workbench_japan_airports.py tools/build_transport_workbench_japan_carrier.py tools/build_transport_workbench_japan_energy_facilities.py tools/build_transport_workbench_japan_industrial_zones.py tools/build_transport_workbench_japan_logistics_hubs.py tools/build_transport_workbench_japan_mineral_resources.py tools/build_transport_workbench_japan_ports.py tools/build_transport_workbench_japan_rail.py tools/build_transport_workbench_japan_roads.py tests/test_check_hoi4_scenario_bundle.py tests/test_transport_manifest_contracts.py`。
+- 已验证：`python -m unittest tests.test_check_hoi4_scenario_bundle tests.test_transport_manifest_contracts -q`、`python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json`、`python tools/check_hoi4_scenario_bundle.py --scenario-dir data/scenarios/hoi4_1936 --report-dir .runtime/reports/generated/scenarios/hoi4_1936`、`python -m unittest tests.test_scenario_contracts -q`。
+- 明确暴露：`python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/hoi4_1936 --report-path .runtime/reports/generated/hoi4_1936.strict_contract_report.json` 目前仍失败，原因是 checked-in `hoi4_1936` 缺 `runtime_topology.topo.json`。这波没有用降级或豁免掩盖它，而是把它留给下一波 HOI4 pack 边界收口。
+
+## 第九波补记（2026-04-03）
+- 已完成：`tools/build_hoi4_scenario.py` 现在会为 HOI4 场景正式写出 `runtime_topology.topo.json`、`runtime_topology.bootstrap.topo.json`，并把 `runtime_topology_url`、`runtime_bootstrap_topology_url`、`startup_topology_url`、`city_overrides_url`、`capital_hints_url` 一次性补进 manifest；builder 默认值也按 `scenario_id` 解析，不再把 `hoi4_1939` 写成 `HOI4 1936`。
+- 已完成：重新生成并 check-in `data/scenarios/hoi4_1936` 与 `data/scenarios/hoi4_1939`；其中 `hoi4_1939` 额外重跑了 `tools/build_scenario_chunk_assets.py --scenario-dir data/scenarios/hoi4_1939`，`runtime_meta.json`、`mesh_pack.json` 和 chunk sidecar 已切到 scenario-local runtime topology。
+- 已完成：补齐 `data/scenario-rules/hoi4_1939.manual.json` 里缺失的中国 warlord owner-layer 规则，并把 `data/scenarios/expectations/hoi4_1939.expectation.json` 的 `CHI.feature_count` 更新到当前真实值 `1783`；现在 `hoi4_1936` / `hoi4_1939` 的 shared strict 和 HOI4 domain checker 都能通过。
+- 已完成：`.github/workflows/peripheral-contract-review.yml` 已按双场景 matrix 覆盖 `hoi4_1936` / `hoi4_1939` 的 shared/domain review，仍保持 non-blocking。
+- 已验证：
+  - `python -m py_compile tools/build_hoi4_scenario.py tests/test_scenario_contracts.py tests/test_check_hoi4_scenario_bundle.py`
+  - `python tools/build_hoi4_scenario.py --scenario-id hoi4_1936 --skip-atlas`
+  - `python tools/build_hoi4_scenario.py --scenario-id hoi4_1939 --skip-atlas`
+  - `python tools/build_scenario_chunk_assets.py --scenario-dir data/scenarios/hoi4_1939`
+  - `python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/hoi4_1936 --report-path .runtime/reports/generated/hoi4_1936.strict_contract_report.json`
+  - `python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/hoi4_1939 --report-path .runtime/reports/generated/hoi4_1939.strict_contract_report.json`
+  - `python tools/check_hoi4_scenario_bundle.py --scenario-dir data/scenarios/hoi4_1936 --report-dir .runtime/reports/generated/scenarios/hoi4_1936`
+  - `python tools/check_hoi4_scenario_bundle.py --scenario-dir data/scenarios/hoi4_1939 --report-dir .runtime/reports/generated/scenarios/hoi4_1939`
+  - `python -m unittest tests.test_check_hoi4_scenario_bundle tests.test_scenario_contracts -q`
+- 剩余风险：这一波只把 HOI4 pack completeness 收平，没有顺手推进 transport 前端迁移，也没有把 `peripheral-contract-review.yml` 接进 blocking deploy gate；这两件事仍应留在后续外围 contract 波次。
+## 第十波补记（2026-04-03）
+- 已完成：新增 `js/ui/transport_workbench_manifest_variants.js`，把 transport workbench 的 shared variant 解析统一成 `default_variant` / `variants` 唯一运行时契约；`port`、`industrial_zones` 和 `toolbar` 已全部改为复用这一个 helper，不再读取 `coverage_variants`、`distribution_variants`、`default_coverage_tier`、`default_distribution_variant`。
+- 已完成：`js/ui/transport_workbench_port_preview.js`、`js/ui/transport_workbench_industrial_zone_preview.js`、`js/ui/toolbar.js` 已收口到 shared manifest v1；`config.coverageTier` 和 `config.variant` 两个现有 UI 配置名保持不变，变的只是 manifest 读取源。
+- 已完成：补了 `tests/test_transport_workbench_manifest_runtime_contract.py` 静态 contract 测试和 `tests/e2e/transport_workbench_industrial_variants.spec.js` focused industrial e2e；现有 `tests/e2e/transport_workbench_port_coverage_tiers.spec.js` 回归继续通过。
+- 已验证：
+  - `node --check js/ui/transport_workbench_manifest_variants.js`
+  - `node --check js/ui/transport_workbench_port_preview.js`
+  - `node --check js/ui/transport_workbench_industrial_zone_preview.js`
+  - `node --check js/ui/toolbar.js`
+  - `node --check tests/e2e/transport_workbench_industrial_variants.spec.js`
+  - `node --check tests/e2e/transport_workbench_port_coverage_tiers.spec.js`
+  - `python -m unittest tests.test_transport_workbench_manifest_runtime_contract -q`
+  - `python -m unittest tests.test_startup_shell -q`
+  - `python -m unittest tests.test_transport_manifest_contracts -q`
+  - `node node_modules/@playwright/test/cli.js test tests/e2e/transport_workbench_port_coverage_tiers.spec.js tests/e2e/transport_workbench_industrial_variants.spec.js --reporter=list --workers=1`
+- 剩余风险：transport 前端这波已经切到 shared-only 读取，但 manifest 里的 legacy variant 字段还保留着；下一波如果继续收外围 contract，可以单独决定是否删除 legacy 字段，并把 `transport-manifest-review` 往 blocking gate 推进一步。
+
+## 第十一波补记（2026-04-03）
+- 已完成：`tools/build_transport_workbench_japan_ports.py` 和 `tools/build_transport_workbench_japan_industrial_zones.py` 已停止产出 `default_coverage_tier` / `coverage_variants` / `default_distribution_variant` / `distribution_variants`，shared `default_variant` / `variants` 现在是 transport builder 的唯一 variant 输出契约。
+- 已完成：`data/transport_layers/japan_port/manifest.json` 与 `data/transport_layers/japan_industrial_zones/manifest.json` 已去掉 legacy variant 字段；`map_builder/transport_workbench_contracts.py` 也从 shared/legacy 对照校验改成了 shared-only 校验，manifest 里只要再出现 legacy variant 字段就会直接报错。
+- 已完成：新增 `.github/workflows/transport-contract-required.yml`，以轻量 required gate 形式运行 transport manifest validator 与 `tests.test_transport_manifest_contracts`、`tests.test_transport_workbench_manifest_runtime_contract`；没有把 Playwright 或 deploy workflow 一起绑进来。
+- 已验证：`python -m py_compile map_builder/transport_workbench_contracts.py tools/check_transport_workbench_manifests.py tools/build_transport_workbench_japan_ports.py tools/build_transport_workbench_japan_industrial_zones.py tests/test_transport_manifest_contracts.py`
+- 已验证：`python -m unittest tests.test_transport_manifest_contracts tests.test_transport_workbench_manifest_runtime_contract -q`
+- 已验证：`python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json`
+- 剩余风险：`peripheral-contract-review.yml` 里仍保留 transport review job，所以短期内会和新的 required gate 有一层重复；这一波刻意没有顺手做 workflow 去重。下一波更自然的是单独收 HOI4 gate，或者再回头把外围 review workflow 做语义瘦身。

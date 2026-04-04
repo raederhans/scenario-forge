@@ -14,6 +14,8 @@ from typing import Any
 import geopandas as gpd
 from shapely.geometry import Point, shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ARCHIVE_PATH = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "mineral_resources" / "GSJ_DOC_INR_073_2017_DATA.zip"
@@ -287,6 +289,18 @@ def main() -> None:
             "source_type_code_field": "resource_type_code",
         },
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_mineral_resources_v1",

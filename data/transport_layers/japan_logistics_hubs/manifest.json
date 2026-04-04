@@ -279,5 +279,29 @@
     "source_fallback_encoding": "cp932",
     "match_key_normalization": "NFKC + whitespace collapse + casefold"
   },
-  "supplement_to": "industrial_zones"
+  "supplement_to": "industrial_zones",
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "internal_only",
+      "paths": {
+        "preview": {
+          "logistics_hubs": "data/transport_layers/japan_logistics_hubs/logistics_hubs.preview.geojson"
+        },
+        "full": {
+          "logistics_hubs": "data/transport_layers/japan_logistics_hubs/logistics_hubs.geojson"
+        },
+        "build_audit": "data/transport_layers/japan_logistics_hubs/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "logistics_hubs": 6948
+        },
+        "full": {
+          "logistics_hubs": 6948
+        }
+      }
+    }
+  }
 }

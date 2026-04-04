@@ -13,6 +13,8 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape
 
+from map_builder.transport_workbench_contracts import finalize_transport_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ARCHIVE_PATH = ROOT / ".runtime" / "source-cache" / "transport" / "japan" / "energy_facilities" / "P03-07_GML.zip"
@@ -290,6 +292,18 @@ def main() -> None:
             "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
     }
+    manifest = finalize_transport_manifest(
+        manifest,
+        default_variant="default",
+        variants={
+            "default": {
+                "label": "default",
+                "distribution_tier": manifest["distribution_tier"],
+                "paths": manifest["paths"],
+                "feature_counts": manifest["feature_counts"],
+            }
+        },
+    )
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_energy_facilities_v1",

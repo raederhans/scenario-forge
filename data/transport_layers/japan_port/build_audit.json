@@ -3,7 +3,7 @@
   "adapter_id": "japan_port_v1",
   "raw_port_feature_count": 317,
   "normalized_port_count": 317,
-  "default_coverage_tier": "core",
+  "default_variant": "core",
   "coverage_tier_counts": {
     "core": 12,
     "expanded": 295,

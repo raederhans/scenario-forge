@@ -6,7 +6,12 @@ import unittest
 from pathlib import Path
 
 from tools import check_scenario_contracts
-from tools.check_scenario_contracts import inspect_scenario_contract, validate_scenario_contract
+from tools.check_scenario_contracts import (
+    collect_duplicate_scenario_dirs,
+    discover_scenario_dirs,
+    inspect_scenario_contract,
+    validate_scenario_contract,
+)
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -169,6 +174,26 @@ class ScenarioContractTest(unittest.TestCase):
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
 
         self.assertEqual(registry.get("default_scenario_id"), "tno_1962")
+
+    def test_checked_in_hoi4_scenarios_pass_shared_strict_review(self) -> None:
+        scenarios_root = Path(__file__).resolve().parents[1] / "data" / "scenarios"
+        duplicate_scenario_dirs = collect_duplicate_scenario_dirs(
+            discover_scenario_dirs(scenarios_root, [])
+        )
+
+        for scenario_name in ("hoi4_1936", "hoi4_1939"):
+            with self.subTest(scenario_name=scenario_name):
+                report = inspect_scenario_contract(
+                    scenarios_root / scenario_name,
+                    duplicate_scenario_dirs,
+                    strict=True,
+                )
+
+                self.assertEqual(report["status"], "ok")
+                self.assertEqual(report["errors"], [])
+                self.assertIsNone(report["repair_tracks"]["owners_controllers_keyset"])
+                self.assertIsNone(report["repair_tracks"]["owners_cores_keyset"])
+                self.assertIsNone(report["repair_tracks"]["runtime_topology_extra_ids"])
 
     def test_validate_scenario_contract_rejects_manifest_scenario_id_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

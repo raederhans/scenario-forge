@@ -731,6 +731,22 @@ function getScenarioBaselineHashFromBundle(bundle) {
   return String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
 }
 
+function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = state.activeScenarioId) {
+  const mergedLayerPayloads = state.activeScenarioChunks?.mergedLayerPayloads;
+  const normalizedScenarioId = normalizeScenarioId(scenarioId);
+  const normalizedChunkScenarioId = normalizeScenarioId(state.activeScenarioChunks?.scenarioId);
+  if (
+    !normalizedScenarioId
+    || normalizedChunkScenarioId !== normalizedScenarioId
+    || !mergedLayerPayloads
+    || typeof mergedLayerPayloads !== "object"
+    || !Object.prototype.hasOwnProperty.call(mergedLayerPayloads, layerKey)
+  ) {
+    return undefined;
+  }
+  return mergedLayerPayloads[layerKey] || null;
+}
+
 
 function getScenarioBlockerCount(summary = {}) {
   const flattened = Number(summary.blocker_count);
@@ -796,7 +812,7 @@ function createScenarioBootstrapBundleFromCache({
     chunkPayloadCacheById: {
       ...(priorBundle?.chunkPayloadCacheById || {}),
     },
-    chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
+    chunkPayloadPromisesById: {},
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: cachedPayload?.countriesPayload || null,
     ownersPayload: cachedPayload?.ownersPayload || null,
@@ -1207,16 +1223,25 @@ async function prepareScenarioApplyState(
   };
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
   const districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(bundle.districtGroupsPayload, scenarioId);
-  const chunkMergedLayerPayloads = bundle.chunkMergedLayerPayloads || {};
+  const mergedWaterPayload = getActiveScenarioMergedChunkLayerPayload("water", scenarioId);
+  const mergedSpecialPayload = getActiveScenarioMergedChunkLayerPayload("special", scenarioId);
+  const mergedReliefPayload = getActiveScenarioMergedChunkLayerPayload("relief", scenarioId);
+  const mergedCitiesPayload = getActiveScenarioMergedChunkLayerPayload("cities", scenarioId);
   const scenarioWaterRegionsFromTopology =
-    chunkMergedLayerPayloads.water
-    || bundle.waterRegionsPayload
-    || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
-    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
+    mergedWaterPayload !== undefined
+      ? mergedWaterPayload
+      : (
+        bundle.waterRegionsPayload
+        || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
+        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
+      );
   const scenarioSpecialRegionsFromTopology =
-    chunkMergedLayerPayloads.special
-    || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
-    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
+    mergedSpecialPayload !== undefined
+      ? mergedSpecialPayload
+      : (
+        getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+      );
   const scenarioContextLandMaskFromTopology =
     getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask");
@@ -1279,8 +1304,12 @@ async function prepareScenarioApplyState(
     scenarioSpecialRegionsFromTopology,
     scenarioContextLandMaskFromTopology,
     scenarioLandMaskFromTopology,
-    scenarioReliefOverlaysPayload: chunkMergedLayerPayloads.relief || bundle.reliefOverlaysPayload || null,
-    scenarioCityOverridesPayload: chunkMergedLayerPayloads.cities || bundle.cityOverridesPayload || null,
+    scenarioReliefOverlaysPayload: mergedReliefPayload !== undefined
+      ? mergedReliefPayload
+      : (bundle.reliefOverlaysPayload || null),
+    scenarioCityOverridesPayload: mergedCitiesPayload !== undefined
+      ? mergedCitiesPayload
+      : (bundle.cityOverridesPayload || null),
     scenarioNameMap,
     scenarioColorMap,
     scenarioOwnerBackfill,
@@ -1334,12 +1363,14 @@ async function applyScenarioBundle(
     state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
       ? staged.runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
-    state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
+    state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(
+      getActiveScenarioMergedChunkLayerPayload("political", staged.scenarioId)
+    ) || null;
     state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
     state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
-    state.scenarioWaterRegionsData = bundle.waterRegionsPayload || staged.scenarioWaterRegionsFromTopology || null;
+    state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
     state.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
@@ -1400,7 +1431,6 @@ async function applyScenarioBundle(
       if (chunkIds.length) {
         state.activeScenarioChunks.loadedChunkIds = [...chunkIds];
         state.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
-        state.activeScenarioChunks.mergedLayerPayloads = cloneScenarioStateValue(bundle.chunkMergedLayerPayloads) || {};
         state.activeScenarioChunks.lruChunkIds = [...chunkIds];
       }
       ensureRuntimeChunkLoadState().shellStatus = "ready";

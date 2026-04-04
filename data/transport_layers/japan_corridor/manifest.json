@@ -1,0 +1,36 @@
+{
+  "adapter_id": "japan_carrier_v3",
+  "family": "carrier",
+  "geometry_kind": "carrier",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-03-31T18:27:21.433973+00:00",
+  "recipe_path": "tools/build_transport_workbench_japan_carrier.py",
+  "recipe_version": "japan_carrier_v3",
+  "distribution_tier": "internal_layout",
+  "feature_counts": {},
+  "source_policy": "local_source_cache_only",
+  "paths": {
+    "carrier": "data/transport_layers/japan_corridor/carrier.json",
+    "provenance": "data/transport_layers/japan_corridor/provenance.json"
+  },
+  "build_command": "python tools/build_transport_workbench_japan_carrier.py",
+  "runtime_consumer": "transport_workbench_carrier",
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "internal_layout",
+      "paths": {
+        "carrier": "data/transport_layers/japan_corridor/carrier.json",
+        "provenance": "data/transport_layers/japan_corridor/provenance.json"
+      },
+      "feature_counts": {}
+    }
+  },
+  "extensions": {
+    "carrier": {
+      "carrier_source_kind": "Natural Earth 10m admin1"
+    }
+  }
+}

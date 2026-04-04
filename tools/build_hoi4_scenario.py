@@ -14,6 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from scenario_builder.hoi4.audit import build_source_atlas, write_report_files
 from scenario_builder.hoi4.compiler import compile_scenario_bundle
 from map_builder.io.writers import write_json_atomic
+from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology
 from scenario_builder.hoi4.parser import (
     discover_hoi4_source_root,
     load_hierarchy_groups,
@@ -32,16 +33,26 @@ from scenario_builder.hoi4.parser import (
 
 DEFAULT_SCENARIO_ID = "hoi4_1936"
 DEFAULT_BOOKMARK_FILE = "common/bookmarks/the_gathering_storm.txt"
+DEFAULT_DISPLAY_NAME_BY_SCENARIO = {
+    "hoi4_1936": "HOI4 1936",
+    "hoi4_1939": "HOI4 1939",
+}
+DEFAULT_BOOKMARK_FILE_BY_SCENARIO = {
+    "hoi4_1936": "common/bookmarks/the_gathering_storm.txt",
+    "hoi4_1939": "common/bookmarks/blitzkrieg.txt",
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build bundled HOI4 scenario assets.")
+    parser = argparse.ArgumentParser(
+        description="Build the checked-in HOI4 core political bundle plus audit/report artifacts."
+    )
     parser.add_argument("--scenario-id", default=DEFAULT_SCENARIO_ID)
-    parser.add_argument("--display-name", default="HOI4 1936")
+    parser.add_argument("--display-name", default="")
     parser.add_argument("--source-root", default="")
     parser.add_argument(
         "--bookmark-file",
-        default=DEFAULT_BOOKMARK_FILE,
+        default="",
         help="Path relative to the HOI4 source root.",
     )
     parser.add_argument(
@@ -72,7 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--manual-rules",
-        default=str(PROJECT_ROOT / "data/scenario-rules/hoi4_1936.manual.json"),
+        default="",
         help="Comma-separated rule file paths.",
     )
     parser.add_argument(
@@ -82,11 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--scenario-output-dir",
-        default=str(PROJECT_ROOT / "data/scenarios/hoi4_1936"),
+        default="",
     )
     parser.add_argument(
         "--report-dir",
-        default=str(PROJECT_ROOT / ".runtime/reports/generated/scenarios/hoi4_1936"),
+        default="",
     )
     parser.add_argument(
         "--default-scenario-id",
@@ -105,8 +116,16 @@ def write_json(path: Path, payload: object) -> None:
     write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
 
+def read_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def resolve_scenario_output_dir(raw_value: str, scenario_id: str) -> Path:
-    scenario_output_dir = Path(raw_value)
+    scenario_output_dir = (
+        Path(raw_value)
+        if str(raw_value or "").strip()
+        else PROJECT_ROOT / "data" / "scenarios" / scenario_id
+    )
     folder_name = scenario_output_dir.name.strip()
     expected_name = str(scenario_id or "").strip()
     if not expected_name:
@@ -122,6 +141,67 @@ def resolve_scenario_output_dir(raw_value: str, scenario_id: str) -> Path:
             f"at `{scenario_output_dir}`."
         )
     return scenario_output_dir
+
+
+def resolve_report_dir(raw_value: str, scenario_id: str) -> Path:
+    if str(raw_value or "").strip():
+        return Path(raw_value)
+    return PROJECT_ROOT / ".runtime" / "reports" / "generated" / "scenarios" / scenario_id
+
+
+def resolve_bookmark_file(raw_value: str, scenario_id: str) -> str:
+    value = str(raw_value or "").strip()
+    if value:
+        return value
+    return DEFAULT_BOOKMARK_FILE_BY_SCENARIO.get(scenario_id, DEFAULT_BOOKMARK_FILE)
+
+
+def resolve_display_name(raw_value: str, scenario_id: str) -> str:
+    value = str(raw_value or "").strip()
+    if value:
+        return value
+    return DEFAULT_DISPLAY_NAME_BY_SCENARIO.get(scenario_id, scenario_id)
+
+
+def resolve_manual_rules(raw_value: str, scenario_id: str) -> str:
+    value = str(raw_value or "").strip()
+    if value:
+        return value
+    default_path = PROJECT_ROOT / "data" / "scenario-rules" / f"{scenario_id}.manual.json"
+    return str(default_path) if default_path.exists() else ""
+
+
+def resolve_controller_rules(raw_value: str, scenario_id: str) -> str:
+    value = str(raw_value or "").strip()
+    if value:
+        return value
+    default_path = PROJECT_ROOT / "data" / "scenario-rules" / f"{scenario_id}.controller.manual.json"
+    return str(default_path) if default_path.exists() else ""
+
+
+def ensure_city_authoring_inputs(scenario_output_dir: Path, scenario_id: str) -> None:
+    city_overrides_path = scenario_output_dir / "city_overrides.json"
+    if not city_overrides_path.exists():
+        write_json(
+            city_overrides_path,
+            {
+                "version": 1,
+                "scenario_id": scenario_id,
+                "capitals_by_tag": {},
+                "capital_city_hints": {},
+            },
+        )
+
+    capital_hints_path = scenario_output_dir / "capital_hints.json"
+    if not capital_hints_path.exists():
+        write_json(
+            capital_hints_path,
+            {
+                "version": 1,
+                "scenario_id": scenario_id,
+                "entries": [],
+            },
+        )
 
 
 def split_paths(raw_value: str) -> list[Path]:
@@ -240,9 +320,11 @@ def gate_state_delta_coverage(
 def main() -> int:
     args = build_parser().parse_args()
     scenario_output_dir = resolve_scenario_output_dir(args.scenario_output_dir, args.scenario_id)
+    display_name = resolve_display_name(args.display_name, args.scenario_id)
 
+    report_dir = resolve_report_dir(args.report_dir, args.scenario_id)
     source_root = discover_hoi4_source_root(args.source_root or None)
-    bookmark = parse_bookmark(source_root / args.bookmark_file)
+    bookmark = parse_bookmark(source_root / resolve_bookmark_file(args.bookmark_file, args.scenario_id))
     as_of_date = str(args.as_of_date or bookmark.date).strip()
     if not as_of_date:
         raise ValueError("Unable to resolve scenario as_of_date from --as-of-date or bookmark date.")
@@ -251,18 +333,21 @@ def main() -> int:
     country_histories = parse_country_histories(source_root / "history/countries")
     states_by_id = parse_states(source_root / "history/states", as_of_date=as_of_date)
     definition_entries = parse_definition_csv(source_root / "map/definition.csv")
-    runtime_features = load_runtime_features(Path(args.runtime_topology))
-    runtime_country_names = load_runtime_country_names(Path(args.runtime_topology))
+    runtime_topology_path = Path(args.runtime_topology)
+    runtime_topology_payload = read_json(runtime_topology_path)
+    runtime_bootstrap_topology_payload = build_bootstrap_runtime_topology(runtime_topology_payload)
+    runtime_features = load_runtime_features(runtime_topology_path)
+    runtime_country_names = load_runtime_country_names(runtime_topology_path)
     hierarchy_groups, country_meta_by_iso2 = load_hierarchy_groups(Path(args.hierarchy))
     palette_pack = load_palette_pack(Path(args.palette_pack))
     palette_map = load_palette_map(Path(args.palette_map))
 
-    owner_rule_paths = split_paths(args.manual_rules)
+    owner_rule_paths = split_paths(resolve_manual_rules(args.manual_rules, args.scenario_id))
     if not owner_rule_paths:
         raise ValueError("At least one owner manual rules path must be provided.")
     manual_rules, owner_rule_metadata = load_rules_with_metadata(owner_rule_paths)
 
-    controller_rule_paths = split_paths(args.controller_rules)
+    controller_rule_paths = split_paths(resolve_controller_rules(args.controller_rules, args.scenario_id))
     controller_rules: list[object] = []
     controller_rule_metadata: list[dict[str, object]] = []
     if controller_rule_paths:
@@ -292,7 +377,7 @@ def main() -> int:
 
     diagnostics = {
         "source_root": str(source_root),
-        "bookmark_file": args.bookmark_file,
+        "bookmark_file": resolve_bookmark_file(args.bookmark_file, args.scenario_id),
         "bookmark_featured_count": len(bookmark.featured_tags),
         "as_of_date": as_of_date,
         "country_tag_file_entries": len(country_tags),
@@ -322,7 +407,7 @@ def main() -> int:
 
     bundle = compile_scenario_bundle(
         scenario_id=args.scenario_id,
-        display_name=args.display_name,
+        display_name=display_name,
         bookmark=bookmark,
         runtime_features=runtime_features,
         runtime_country_names=runtime_country_names,
@@ -337,7 +422,6 @@ def main() -> int:
         diagnostics=diagnostics,
     )
 
-    report_dir = Path(args.report_dir)
     atlas_dir = report_dir / "source_atlas"
     atlas_paths: list[str] = []
     if not args.skip_atlas:
@@ -349,12 +433,29 @@ def main() -> int:
             output_dir=atlas_dir,
         )
 
-    write_json(scenario_output_dir / "manifest.json", bundle["manifest"])
+    ensure_city_authoring_inputs(scenario_output_dir, args.scenario_id)
     write_json(scenario_output_dir / "countries.json", bundle["countries"])
     write_json(scenario_output_dir / "owners.by_feature.json", bundle["owners"])
     write_json(scenario_output_dir / "controllers.by_feature.json", bundle["controllers"])
     write_json(scenario_output_dir / "cores.by_feature.json", bundle["cores"])
     write_json(scenario_output_dir / "audit.json", bundle["audit"])
+    write_json(scenario_output_dir / "runtime_topology.topo.json", runtime_topology_payload)
+    write_json(
+        scenario_output_dir / "runtime_topology.bootstrap.topo.json",
+        runtime_bootstrap_topology_payload,
+    )
+
+    manifest_payload = bundle["manifest"]
+    manifest_payload["runtime_topology_url"] = f"data/scenarios/{args.scenario_id}/runtime_topology.topo.json"
+    manifest_payload["runtime_bootstrap_topology_url"] = (
+        f"data/scenarios/{args.scenario_id}/runtime_topology.bootstrap.topo.json"
+    )
+    manifest_payload["startup_topology_url"] = (
+        f"data/scenarios/{args.scenario_id}/runtime_topology.bootstrap.topo.json"
+    )
+    manifest_payload["city_overrides_url"] = f"data/scenarios/{args.scenario_id}/city_overrides.json"
+    manifest_payload["capital_hints_url"] = f"data/scenarios/{args.scenario_id}/capital_hints.json"
+    write_json(scenario_output_dir / "manifest.json", manifest_payload)
 
     if delta_rows:
         write_json(
@@ -384,7 +485,7 @@ def main() -> int:
     scenarios.append(
         {
             "scenario_id": args.scenario_id,
-            "display_name": args.display_name,
+            "display_name": display_name,
             "manifest_url": f"data/scenarios/{args.scenario_id}/manifest.json",
             "audit_url": f"data/scenarios/{args.scenario_id}/audit.json",
         }

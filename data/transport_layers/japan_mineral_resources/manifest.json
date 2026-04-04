@@ -66,5 +66,29 @@
     "primary_group_label_field": "normalized_resource_group_label",
     "source_type_field": "resource_type",
     "source_type_code_field": "resource_type_code"
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "public_candidate",
+      "paths": {
+        "preview": {
+          "mineral_resources": "data/transport_layers/japan_mineral_resources/mineral_resources.preview.geojson"
+        },
+        "full": {
+          "mineral_resources": "data/transport_layers/japan_mineral_resources/mineral_resources.geojson"
+        },
+        "build_audit": "data/transport_layers/japan_mineral_resources/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "mineral_resources": 12668
+        },
+        "full": {
+          "mineral_resources": 12668
+        }
+      }
+    }
   }
 }

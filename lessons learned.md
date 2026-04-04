@@ -98,4 +98,26 @@
 ### 18. 先切断 service 的反向 import，再决定 adapter 要不要同波次薄化
 - 真正影响架构边界的是 map_builder -> tools 这类反向依赖，不是 adapter 文件里还保留了多少旧 helper 名字。
 - 如果 donor 面很大，先把 service deps 内收，保留 adapter wrapper，通常比一波里同时清空旧 helper 更稳。
-- 等主链稳定后，再单独决定要不要把 adapter 旧实现全部收成转发，避免为了“顺手清理”扩大回归面。
+- 等主链稳定后，再单独决定要不要把 adapter 旧实现全部收成转发，避免为了“顺手清理”扩大回归面。### 19. runtime merged state 必须区分“没有这个 layer”和“这个 layer 明确为空”
+- chunk runtime 一旦把 merged payload 从 bundle cache 收回 runtime state，就不能再用 `merged?.layer || null` 这种写法偷懒；否则没有加载该 layer 和该 layer 真的应该清空会被混成一件事。
+- 更稳的做法是先判 `hasOwnProperty(layerKey)`，只有 chunk 真正接管的 layer 才允许写回 `null`；fallback layer 必须保持现有 bundle/topology 路径，不应被 chunk refresh 顺手清空。
+- 这条边界尤其会放大到 `cities -> syncScenarioLocalizationState()`，所以 runtime/chunk 调整时必须把 localization collateral 一起复核。
+
+### 20. 新 validator 的路径归一化要在 CLI 入口就做，不要等到 report 阶段才混用相对/绝对路径
+- 只要 validator 会把输入路径再做 `relative_to(PROJECT_ROOT)` 或写进报告，`--root` / `--manifest` 入口就必须先统一 `resolve()`；否则本地相对路径能跑到扫描阶段，却会在生成报告或错误文案时直接炸掉。
+- 这类问题最容易在“本地手跑命令”和“CI 从 repo root 跑命令”之间来回漂移，所以应把归一化做成入口不变量，不要散落在后续 helper 里补。
+
+### 21. 新增 review lane 的第一职责是暴露真实缺口，不是把红灯伪装成绿灯
+- 如果新 workflow 接上 shared strict checker 后立刻暴露 checked-in 产物缺文件，优先把它记录为显式剩余风险；不要通过降级 strict、跳过 scenario、改成 warning-only 来掩盖真实 contract 漏口。
+- non-blocking 的意义是“不阻断主 deploy”，不是“把 checker 变松”。
+### 22. 多 scenario builder 不能只把输出目录参数化，默认输入和域规则也要一起 scenario-aware
+- 这次 `build_hoi4_scenario.py` 真正的红点不是 runtime topology，而是它虽然支持 `--scenario-id hoi4_1939`，默认 `display_name`、rules 和 manifest authoring inputs 还停在 1936 世界，导致 checked-in 产物会出现“strict 部分变绿，但 domain 仍然漂移”的假完成状态。
+- 最稳的做法是：只要 builder 宣称支持多个 scenario，`display_name`、bookmark、manual rules、controller rules、authoring input contract 就都必须按 `scenario_id` 一起解析，并且要用真实 checked-in 场景重建一次来验收，不要只靠 fixture。
+
+### 23. transport frontend manifest migrations must switch preview + inspector together
+- If preview loaders move to shared variants but toolbar summary/inspector still read legacy fields, the UI enters a split state: data loads from shared, while panels still describe legacy defaults.
+- The shortest stable fix is to add one tiny shared variant helper, migrate all runtime readers in the same wave, and add a static test that forbids legacy manifest variant field names in runtime UI code.
+
+### 24. once transport runtime is shared-only, validator must ban legacy fields instead of comparing against them
+- If the UI has already switched to shared `default_variant/variants`, keeping validator logic in shared-vs-legacy comparison mode only preserves the old contract and delays real cleanup.
+- The stable cutover is: stop builders from writing legacy fields, remove checked-in legacy fields, then make validator reject any legacy variant keys on sight.

@@ -1,0 +1,432 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "LI_ADM1_LIE-4892",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4892",
+        "name": "Triesenberg",
+        "cntr_code": "LI",
+        "admin1_group": "Triesenberg",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.549095490954926,
+              47.096655161551624
+            ],
+            [
+              9.574295742957446,
+              47.10880603006031
+            ],
+            [
+              9.549095490954926,
+              47.16088118081181
+            ],
+            [
+              9.52749527495277,
+              47.129636090360904
+            ],
+            [
+              9.549095490954926,
+              47.096655161551624
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4893",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4893",
+        "name": "Triesen",
+        "cntr_code": "LI",
+        "admin1_group": "Triesen",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.581495814958146,
+              47.05846671766717
+            ],
+            [
+              9.581495814958146,
+              47.08624013140131
+            ],
+            [
+              9.55989559895599,
+              47.075825101251
+            ],
+            [
+              9.513095130951314,
+              47.12790025200253
+            ],
+            [
+              9.53469534695347,
+              47.0567308793088
+            ],
+            [
+              9.581495814958146,
+              47.05846671766717
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4894",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4894",
+        "name": "Balzers",
+        "cntr_code": "LI",
+        "admin1_group": "Balzers",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.498694986949886,
+              47.06020255602557
+            ],
+            [
+              9.53469534695347,
+              47.0567308793088
+            ],
+            [
+              9.513095130951314,
+              47.08797596975968
+            ],
+            [
+              9.498694986949886,
+              47.06020255602557
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4895",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4895",
+        "name": "Vaduz",
+        "cntr_code": "LI",
+        "admin1_group": "Vaduz",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.52749527495277,
+              47.129636090360904
+            ],
+            [
+              9.549095490954926,
+              47.16088118081181
+            ],
+            [
+              9.505895058950586,
+              47.169560372603726
+            ],
+            [
+              9.52749527495277,
+              47.129636090360904
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4896",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4896",
+        "name": "Schaan",
+        "cntr_code": "LI",
+        "admin1_group": "Schaan",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.538295382953834,
+              47.162617019170185
+            ],
+            [
+              9.531095310953106,
+              47.193862109621094
+            ],
+            [
+              9.491494914949158,
+              47.193862109621094
+            ],
+            [
+              9.498694986949886,
+              47.15567366573664
+            ],
+            [
+              9.538295382953834,
+              47.162617019170185
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4897",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4897",
+        "name": "Gamprin",
+        "cntr_code": "LI",
+        "admin1_group": "Gamprin",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.505895058950586,
+              47.226843038430374
+            ],
+            [
+              9.491494914949158,
+              47.193862109621094
+            ],
+            [
+              9.531095310953106,
+              47.193862109621094
+            ],
+            [
+              9.505895058950586,
+              47.226843038430374
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4898",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4898",
+        "name": "Ruggell",
+        "cntr_code": "LI",
+        "admin1_group": "Ruggell",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.520295202952042,
+              47.261559805598054
+            ],
+            [
+              9.505895058950586,
+              47.226843038430374
+            ],
+            [
+              9.520295202952042,
+              47.225107200072
+            ],
+            [
+              9.520295202952042,
+              47.261559805598054
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4899",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4899",
+        "name": "Schellenberg",
+        "cntr_code": "LI",
+        "admin1_group": "Schellenberg",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.53469534695347,
+              47.25114477544774
+            ],
+            [
+              9.520295202952042,
+              47.225107200072
+            ],
+            [
+              9.541895418954198,
+              47.23552223022229
+            ],
+            [
+              9.53469534695347,
+              47.25114477544774
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4900",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4900",
+        "name": "Mauren",
+        "cntr_code": "LI",
+        "admin1_group": "Mauren",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.520295202952042,
+              47.225107200072
+            ],
+            [
+              9.55269552695529,
+              47.21122049320492
+            ],
+            [
+              9.545495454954562,
+              47.21989968499686
+            ],
+            [
+              9.520295202952042,
+              47.225107200072
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4901",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4901",
+        "name": "Planken",
+        "cntr_code": "LI",
+        "admin1_group": "Planken",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.55269552695529,
+              47.17650372603727
+            ],
+            [
+              9.563495634956354,
+              47.19039043290432
+            ],
+            [
+              9.531095310953106,
+              47.193862109621094
+            ],
+            [
+              9.55269552695529,
+              47.17650372603727
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "LI_ADM1_LIE-4902",
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4902",
+        "name": "Eschen",
+        "cntr_code": "LI",
+        "admin1_group": "Eschen",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.563495634956354,
+              47.197333786337865
+            ],
+            [
+              9.520295202952042,
+              47.225107200072
+            ],
+            [
+              9.50949509495095,
+              47.21469216992169
+            ],
+            [
+              9.531095310953106,
+              47.193862109621094
+            ],
+            [
+              9.563495634956354,
+              47.197333786337865
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
