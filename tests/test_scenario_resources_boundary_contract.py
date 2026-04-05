@@ -56,12 +56,20 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("bundle.chunkMergedLayerPayloads", manager_content)
         self.assertIn("state.activeScenarioChunks?.mergedLayerPayloads", manager_content)
 
-    def test_post_apply_effects_prewarm_coarse_chunks_before_refresh(self):
+    def test_post_apply_effects_waits_for_chunked_first_frame_before_returning(self):
         content = SCENARIO_POST_APPLY_EFFECTS.read_text(encoding="utf-8")
 
         self.assertIn("preloadScenarioCoarseChunks", content)
-        self.assertIn("await preloadScenarioCoarseChunks(bundle)", content)
+        self.assertIn("ensureChunkedScenarioFirstFrameReady", content)
+        self.assertIn("await preloadScenarioCoarseChunks(bundle);", content)
+        self.assertIn("await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });", content)
         self.assertIn('reason: "scenario-apply"', content)
+
+    def test_full_bundle_prefers_runtime_topology_even_with_chunk_manifest(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertNotIn("preferStartupTopologyForFullBundle", content)
+        self.assertIn('manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""', content)
 
 
 if __name__ == "__main__":

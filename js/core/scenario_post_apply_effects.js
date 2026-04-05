@@ -49,6 +49,23 @@ function runPaletteAndToolbarRefreshCallbacks() {
   }
 }
 
+async function ensureChunkedScenarioFirstFrameReady({
+  bundle,
+  scenarioId = "",
+} = {}) {
+  if (!scenarioBundleUsesChunkedLayer(bundle)) return;
+  try {
+    await preloadScenarioCoarseChunks(bundle);
+  } catch (error) {
+    console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
+  } finally {
+    scheduleScenarioChunkRefresh({
+      reason: "scenario-apply",
+      delayMs: 0,
+    });
+  }
+}
+
 async function runPostScenarioApplyEffects({
   bundle,
   scenarioId = "",
@@ -67,14 +84,7 @@ async function runPostScenarioApplyEffects({
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioBundleUsesChunkedLayer(bundle)) {
-    await preloadScenarioCoarseChunks(bundle)
-      .catch((error) => {
-        console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
-      });
-    scheduleScenarioChunkRefresh({
-      reason: "scenario-apply",
-      delayMs: 0,
-    });
+    await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
   } else {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {

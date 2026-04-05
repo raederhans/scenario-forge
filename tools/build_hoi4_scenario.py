@@ -41,6 +41,16 @@ DEFAULT_BOOKMARK_FILE_BY_SCENARIO = {
     "hoi4_1936": "common/bookmarks/the_gathering_storm.txt",
     "hoi4_1939": "common/bookmarks/blitzkrieg.txt",
 }
+DEFAULT_OWNER_RULE_FILES_BY_SCENARIO = {
+    "hoi4_1936": [
+        "hoi4_1936.manual.json",
+    ],
+    # 1939 rules are a delta overlay on top of the 1936 base ownership pack.
+    "hoi4_1939": [
+        "hoi4_1936.manual.json",
+        "hoi4_1939.manual.json",
+    ],
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -120,6 +130,13 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def to_project_relative_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return Path(str(path)).as_posix()
+
+
 def resolve_scenario_output_dir(raw_value: str, scenario_id: str) -> Path:
     scenario_output_dir = (
         Path(raw_value)
@@ -167,6 +184,19 @@ def resolve_manual_rules(raw_value: str, scenario_id: str) -> str:
     value = str(raw_value or "").strip()
     if value:
         return value
+    scenario_rule_filenames = DEFAULT_OWNER_RULE_FILES_BY_SCENARIO.get(scenario_id)
+    if scenario_rule_filenames:
+        resolved_paths = [
+            PROJECT_ROOT / "data" / "scenario-rules" / filename
+            for filename in scenario_rule_filenames
+        ]
+        missing_paths = [str(path) for path in resolved_paths if not path.exists()]
+        if missing_paths:
+            missing_list = ", ".join(missing_paths)
+            raise FileNotFoundError(
+                f"Missing default owner manual rule file(s) for scenario `{scenario_id}`: {missing_list}"
+            )
+        return ",".join(str(path) for path in resolved_paths)
     default_path = PROJECT_ROOT / "data" / "scenario-rules" / f"{scenario_id}.manual.json"
     return str(default_path) if default_path.exists() else ""
 
@@ -390,8 +420,8 @@ def main() -> int:
         "enable_region_checks": enable_region_checks,
         "enforce_region_checks": enforce_region_checks,
         "enforce_scenario_extensions": enforce_scenario_extensions,
-        "owner_rule_paths": [str(path) for path in owner_rule_paths],
-        "controller_rule_paths": [str(path) for path in controller_rule_paths],
+        "owner_rule_paths": [to_project_relative_path(path) for path in owner_rule_paths],
+        "controller_rule_paths": [to_project_relative_path(path) for path in controller_rule_paths],
         "state_owner_counts": dict(
             sorted(
                 Counter(record.owner_tag for record in states_by_id.values()).items(),

@@ -28,6 +28,11 @@ class StartupShellTest(unittest.TestCase):
         main_js = (REPO_ROOT / "js" / "main.js").read_text(encoding="utf-8")
         data_loader_js = (REPO_ROOT / "js" / "core" / "data_loader.js").read_text(encoding="utf-8")
         startup_cache_js = (REPO_ROOT / "js" / "core" / "startup_cache.js").read_text(encoding="utf-8")
+        scenario_resources_js = (REPO_ROOT / "js" / "core" / "scenario_resources.js").read_text(encoding="utf-8")
+        scenario_post_apply_effects_js = (
+            REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
+        ).read_text(encoding="utf-8")
+        scenario_manager_js = (REPO_ROOT / "js" / "core" / "scenario_manager.js").read_text(encoding="utf-8")
 
         self.assertIn('import { initPresetState } from "./core/preset_state.js";', main_js)
         self.assertNotRegex(main_js, r'import\s+\{\s*initSidebar')
@@ -45,6 +50,26 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn('scenario-scoped', data_loader_js)
         self.assertNotIn('data/locales.startup.json', startup_cache_js)
         self.assertNotIn('data/geo_aliases.startup.json', startup_cache_js)
+        self.assertIn('if ((!topologyPrimary || !locales || !geoAliases) && workerEnabled)', data_loader_js)
+        self.assertIn('needTopologyPrimary: !topologyPrimary,', data_loader_js)
+        self.assertIn('needLocales: !locales,', data_loader_js)
+        self.assertIn('needGeoAliases: !geoAliases,', data_loader_js)
+        self.assertIn('topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;', data_loader_js)
+        self.assertIn('startupWorkerUsed,', data_loader_js)
+        self.assertIn('requestedBundleLevel === "bootstrap"', scenario_resources_js)
+        self.assertIn(
+            ': manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""',
+            scenario_resources_js,
+        )
+        self.assertIn('async function ensureChunkedScenarioFirstFrameReady({', scenario_post_apply_effects_js)
+        self.assertIn('await preloadScenarioCoarseChunks(bundle);', scenario_post_apply_effects_js)
+        self.assertIn('await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });', scenario_post_apply_effects_js)
+        self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', scenario_manager_js)
+        self.assertIn(': { ...staged.scenarioNameMap };', scenario_manager_js)
+        self.assertNotIn(
+            "state.countryNames = {\n      ...countryNames,\n      ...staged.scenarioNameMap,\n    };",
+            scenario_manager_js,
+        )
 
 
 if __name__ == "__main__":

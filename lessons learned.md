@@ -121,3 +121,21 @@
 ### 24. once transport runtime is shared-only, validator must ban legacy fields instead of comparing against them
 - If the UI has already switched to shared `default_variant/variants`, keeping validator logic in shared-vs-legacy comparison mode only preserves the old contract and delays real cleanup.
 - The stable cutover is: stop builders from writing legacy fields, remove checked-in legacy fields, then make validator reject any legacy variant keys on sight.
+
+### 25. Scenario delta rule files must never become full-pack defaults
+- If a scenario-specific manual rules file is only meant to override a shared base pack, the builder default must continue to load the base pack and the delta pack together.
+- The fastest way to catch this class of regression is to gate on semantic signals like owner_count, synthetic_owner_feature_count, featured_tags, and a few representative country counts, not only on file presence.
+
+### 26. Fix the checked-in scenario pack first, then tune runtime symptoms
+- When a historical scenario suddenly shows modern countries or wrong palettes, check the checked-in bundle and audit outputs before touching render or UI code.
+- Runtime strictness is still useful: removing silent fallback to global names makes bad scenario packs fail loudly instead of looking half-correct.
+
+### 25. Scenario checker path assertions must normalize before compare
+- If a builder writes absolute diagnostic paths while expectations store repo-relative paths, the same gold baseline will fail across machines for non-semantic reasons.
+- The stable fix is to normalize diagnostic path assertions to repo-root-relative form inside the checker instead of hardcoding absolute paths into expectations.
+
+### 26. Scenario name fallback tests must distinguish blank mode from active scenario mode
+- The real regression is merging global modern country names into an active historical scenario, not every read of countryNames.
+- lank semantic mode may still use baseline countryNames; tests should encode that exception explicitly so correct fixes are not flagged as regressions.### 25. 做浏览器类审查前，不能只信 .runtime/dev/active_server.json，必须先验证端口真活着
+- ctive_server.json 可能残留旧 pid 和旧端口，看起来像“已有 dev server”，但实际请求已经连不上。
+- 最短稳路线是：先做一次真实 HTTP 探测；失败再重启 server，并把 stdout/stderr 落到 .runtime/tmp，不要直接把陈旧元数据当事实。

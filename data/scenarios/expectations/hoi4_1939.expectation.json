@@ -13,11 +13,25 @@
     "primary_rule_source",
     "rule_sources"
   ],
+  "featured_tags_contains": [
+    "SOV",
+    "RAJ",
+    "YUG",
+    "MAN",
+    "SIK"
+  ],
+  "diagnostics_equals": {
+    "manual_rule_count": 94,
+    "owner_rule_paths": [
+      "data/scenario-rules/hoi4_1936.manual.json",
+      "data/scenario-rules/hoi4_1939.manual.json"
+    ]
+  },
   "country_assertions": [
     {
       "tag": "CHI",
       "field": "feature_count",
-      "equals": 1783
+      "equals": 1445
     },
     {
       "tag": "GXC",
@@ -61,7 +75,11 @@
     }
   ],
   "summary_equals": {
-    "blocker_count": 0
+    "blocker_count": 0,
+    "feature_count": 22502,
+    "owner_count": 115,
+    "controller_count": 117,
+    "synthetic_owner_feature_count": 18
   },
   "summary_min": {
     "feature_count": 10000,

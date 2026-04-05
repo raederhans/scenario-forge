@@ -60,6 +60,26 @@ def to_number(value: object) -> float | None:
         return None
 
 
+def normalize_diagnostic_assertion_value(value: object) -> object:
+    if isinstance(value, list):
+        return [normalize_diagnostic_assertion_value(item) for item in value]
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return text
+        try:
+            path = Path(text)
+            if path.is_absolute():
+                try:
+                    text = str(path.resolve().relative_to(PROJECT_ROOT.resolve()))
+                except ValueError:
+                    text = str(path)
+        except OSError:
+            text = value
+        return text.replace("\\", "/")
+    return value
+
+
 def expect_number(
     *,
     errors: list[str],
@@ -264,6 +284,7 @@ def inspect_hoi4_scenario_bundle(
     coverage_report = coverage_report_path.read_text(encoding="utf-8") if coverage_report_path.exists() else ""
     summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
     audit_summary = audit.get("summary", {}) if isinstance(audit.get("summary"), dict) else {}
+    diagnostics = audit.get("diagnostics", {}) if isinstance(audit.get("diagnostics"), dict) else {}
     country_map = countries.get("countries", {}) if isinstance(countries.get("countries"), dict) else {}
     markdown_summary = parse_markdown_summary(coverage_report)
     owners_by_feature_id = owners.get("owners", {}) if isinstance(owners.get("owners", {}), dict) else {}
@@ -305,6 +326,16 @@ def inspect_hoi4_scenario_bundle(
     expect(
         not missing_featured_tags,
         f"manifest.featured_tags must all exist in countries.json. Missing: {missing_featured_tags[:10]}",
+    )
+    required_featured_tags = [
+        str(tag or "").strip().upper()
+        for tag in (expectation.get("featured_tags_contains") or [])
+        if str(tag or "").strip()
+    ]
+    missing_required_featured_tags = [tag for tag in required_featured_tags if tag not in featured_tags]
+    expect(
+        not missing_required_featured_tags,
+        f"manifest.featured_tags must include: {missing_required_featured_tags[:10]}",
     )
 
     required_country_fields = expectation.get("required_country_fields", [])
@@ -389,6 +420,15 @@ def inspect_hoi4_scenario_bundle(
         maximums=expectation.get("summary_max", {}) if isinstance(expectation.get("summary_max"), dict) else {},
         prefix="manifest.summary",
     )
+    diagnostics_equals = expectation.get("diagnostics_equals", {})
+    if isinstance(diagnostics_equals, dict):
+        for key, expected_value in diagnostics_equals.items():
+            actual_value = normalize_diagnostic_assertion_value(diagnostics.get(key))
+            expected_normalized = normalize_diagnostic_assertion_value(expected_value)
+            expect(
+                actual_value == expected_normalized,
+                f"audit.diagnostics.{key} must equal {expected_normalized}. Found {actual_value}.",
+            )
 
     owner_tag_counts = Counter(
         str(tag or "").strip().upper()

@@ -2155,13 +2155,10 @@ async function loadScenarioBundle(
   const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const hints = normalizeScenarioPerformanceHints(manifest);
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
-  const preferStartupTopologyForFullBundle = !!runtimeShell?.detailChunkManifestUrl;
   const runtimeTopologyUrl = String(
     requestedBundleLevel === "bootstrap"
       ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
-      : preferStartupTopologyForFullBundle
-        ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
-        : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
+      : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
   ).trim();
   const scenarioBootstrapCoreCacheKey =
     requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()

@@ -129,6 +129,12 @@ def _create_valid_hoi4_bundle(tmp_root: Path, scenario_name: str = "hoi4_1936") 
     _write_json(
         scenario_dir / "audit.json",
         {
+            "diagnostics": {
+                "owner_rule_paths": [
+                    "data/scenario-rules/hoi4_1936.manual.json",
+                    f"data/scenario-rules/{scenario_name}.manual.json",
+                ]
+            },
             "summary": {
                 "feature_count": 1,
                 "owner_count": 1,
@@ -146,6 +152,13 @@ def _create_valid_hoi4_bundle(tmp_root: Path, scenario_name: str = "hoi4_1936") 
             "scenario_id": scenario_name,
             "require_controllers": True,
             "summary_equals": {"feature_count": 1},
+            "featured_tags_contains": ["AAA"],
+            "diagnostics_equals": {
+                "owner_rule_paths": [
+                    "data/scenario-rules/hoi4_1936.manual.json",
+                    f"data/scenario-rules/{scenario_name}.manual.json",
+                ]
+            },
             "owner_set_assertions": [
                 {
                     "name": "aaa owners",
@@ -190,6 +203,33 @@ class CheckHoi4ScenarioBundleTest(unittest.TestCase):
             self.assertEqual(report["status"], "ok")
             self.assertEqual(report["shared_errors"], [])
             self.assertEqual(report["domain_errors"], [])
+
+    def test_inspect_hoi4_scenario_bundle_enforces_featured_tags_and_diagnostics_expectations(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            scenario_dir, report_dir, expectation_path = _create_valid_hoi4_bundle(tmp_root, scenario_name="hoi4_1939")
+            expectation = json.loads(expectation_path.read_text(encoding="utf-8"))
+            expectation["featured_tags_contains"] = ["AAA", "SOV"]
+            expectation["diagnostics_equals"] = {
+                "owner_rule_paths": [
+                    "data/scenario-rules/hoi4_1936.manual.json",
+                    "data/scenario-rules/hoi4_1939.manual.json",
+                ]
+            }
+            _write_json(expectation_path, expectation)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            try:
+                report = inspect_hoi4_scenario_bundle(
+                    scenario_dir,
+                    report_dir,
+                    expectation_path=expectation_path,
+                )
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(report["status"], "failed")
+            self.assertTrue(any("manifest.featured_tags must include" in error for error in report["domain_errors"]))
 
     def test_inspect_hoi4_scenario_bundle_keeps_domain_report_checks(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

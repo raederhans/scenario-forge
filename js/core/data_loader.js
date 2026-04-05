@@ -1054,6 +1054,7 @@ export async function loadStartupBootArtifacts({
   let locales = null;
   let geoAliases = null;
   let decodedCollections = null;
+  let startupWorkerUsed = false;
   const resourceMetrics = {
     topologyPrimary: null,
     locales: null,
@@ -1091,8 +1092,9 @@ export async function loadStartupBootArtifacts({
     }
   }
 
-  if (!topologyPrimary && workerEnabled) {
+  if ((!topologyPrimary || !locales || !geoAliases) && workerEnabled) {
     try {
+      startupWorkerUsed = true;
       const workerResult = await loadBaseStartupViaWorker({
         topologyUrl,
         localesUrl: resolvedLocalization.localesUrl,
@@ -1101,7 +1103,7 @@ export async function loadStartupBootArtifacts({
         needLocales: !locales,
         needGeoAliases: !geoAliases,
       });
-      topologyPrimary = workerResult.topologyPrimary || null;
+      topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;
       locales = locales || workerResult.locales || null;
       geoAliases = geoAliases || workerResult.geoAliases || null;
       decodedCollections = workerResult.decodedCollections || null;
@@ -1179,7 +1181,7 @@ export async function loadStartupBootArtifacts({
     localeLevel: resolvedLocalization.localeLevel,
     resourceMetrics,
     startupBootCacheState,
-    startupWorkerUsed: workerEnabled,
+    startupWorkerUsed,
   };
 }
 

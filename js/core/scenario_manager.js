@@ -665,6 +665,21 @@ function getScenarioNameMap(countryMap = {}) {
   return next;
 }
 
+function getMissingScenarioNameTags(countryMap = {}, scenarioNameMap = {}) {
+  const missing = [];
+  Object.keys(countryMap || {}).forEach((rawTag) => {
+    const normalizedTag = String(rawTag || "").trim().toUpperCase();
+    if (!normalizedTag) {
+      return;
+    }
+    const displayName = String(scenarioNameMap?.[normalizedTag] || "").trim();
+    if (!displayName) {
+      missing.push(normalizedTag);
+    }
+  });
+  return missing;
+}
+
 function getScenarioFixedOwnerColors(countryMap = {}) {
   const next = {};
   Object.entries(countryMap || {}).forEach(([tag, entry]) => {
@@ -1252,6 +1267,12 @@ async function prepareScenarioApplyState(
   const scenarioNameMap = startupApplySeed?.scenario_name_map && typeof startupApplySeed.scenario_name_map === "object"
     ? { ...startupApplySeed.scenario_name_map }
     : getScenarioNameMap(countryMap);
+  const missingScenarioNameTags = getMissingScenarioNameTags(countryMap, scenarioNameMap);
+  if (missingScenarioNameTags.length) {
+    throw new Error(
+      `Scenario "${scenarioId}" is missing display names for active tags: ${missingScenarioNameTags.slice(0, 12).join(", ")}`
+    );
+  }
   const scenarioColorMap = startupApplySeed?.scenario_color_map && typeof startupApplySeed.scenario_color_map === "object"
     ? { ...startupApplySeed.scenario_color_map }
     : getScenarioFixedOwnerColors(countryMap);
@@ -1402,10 +1423,11 @@ async function applyScenarioBundle(
     state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
     state.scenarioViewMode = "ownership";
-    state.countryNames = {
-      ...countryNames,
-      ...staged.scenarioNameMap,
-    };
+    // Scenario country labels must come from the active scenario pack so
+    // broken packs fail loudly instead of silently falling back to modern names.
+    state.countryNames = staged.mapSemanticMode === "blank"
+      ? { ...countryNames }
+      : { ...staged.scenarioNameMap };
     state.sovereigntyByFeatureId = { ...staged.resolvedOwners };
     state.sovereigntyInitialized = false;
     state.visualOverrides = {};

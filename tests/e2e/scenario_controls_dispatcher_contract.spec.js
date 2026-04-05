@@ -86,6 +86,19 @@ test("scenario controls apply reset and exit stay on dispatcher-backed path", as
     activeScenarioId: "hoi4_1939",
     scenarioApplyInFlight: false,
   });
+  const firstFrameChunkState = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      chunkFeatureCount: Array.isArray(state.scenarioPoliticalChunkData?.features)
+        ? state.scenarioPoliticalChunkData.features.length
+        : 0,
+      loadedChunkCount: Array.isArray(state.activeScenarioChunks?.loadedChunkIds)
+        ? state.activeScenarioChunks.loadedChunkIds.length
+        : 0,
+    };
+  });
+  expect(firstFrameChunkState.chunkFeatureCount).toBeGreaterThan(0);
+  expect(firstFrameChunkState.loadedChunkCount).toBeGreaterThan(0);
   await expect(page.locator("#scenarioStatus")).toContainText("HOI4 1939");
 
   await page.locator("#resetScenarioBtn").click();

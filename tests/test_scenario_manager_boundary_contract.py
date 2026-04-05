@@ -44,6 +44,17 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bgetScenarioFatalRecoveryState\b", content))
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\brefreshScenarioShellOverlays\b", content))
 
+    def test_active_scenario_country_names_do_not_fall_back_to_global_map(self):
+        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', content)
+        self.assertIn('? { ...countryNames }', content)
+        self.assertIn(': { ...staged.scenarioNameMap };', content)
+        self.assertNotIn(
+            "state.countryNames = {\n      ...countryNames,\n      ...staged.scenarioNameMap,\n    };",
+            content,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
