@@ -1248,65 +1248,60 @@
               <span class="scenario-context-icon" aria-hidden="true">#</span>
               <span id="scenarioContextSelectionText" data-i18n="No selection">No selection</span>
             </div>
-            <button
-              id="scenarioTransportWorkbenchBtn"
-              type="button"
-              class="scenario-context-action-btn"
-              aria-haspopup="dialog"
-              aria-controls="transportWorkbenchOverlay"
-              aria-expanded="false"
-            >
-              Transport
-            </button>
-            <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide">?</button>
-          </div>
-          <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-labelledby="scenarioGuideTitle">
-            <h2 id="scenarioGuideTitle" class="section-header">Scenario Quick Start</h2>
-            <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
-              <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
-            </div>
-            <ol class="scenario-guide-list mt-2">
-              <li id="scenarioGuideStepApply">Apply Scenario</li>
-              <li id="scenarioGuideStepSelect">Select a country in Inspector</li>
-                <li id="scenarioGuideStepActive">Use an active owner for political actions</li>
-                <li id="scenarioGuideStepApplyActions">Use Activate or Scenario Actions for ownership changes</li>
-            </ol>
+            <button id="scenarioGuideBtn" type="button" class="scenario-context-action-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide" data-i18n="Guide">Guide</button>
           </div>
 
           <div id="toastViewport" class="toast-viewport" aria-live="polite" aria-atomic="false"></div>
 
           <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls" data-i18n-aria-label="Map zoom controls">
-            <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
-            <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
-            <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
-            <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" data-i18n-aria-label="Reset zoom" title="Fit">Fit</button>
-            <button id="btnToggleLang" class="zoom-btn zoom-pill-btn zoom-language-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
-              Language
-            </button>
-            <button
-              id="developerModeBtn"
-              class="zoom-btn zoom-pill-btn developer-mode-btn"
-              type="button"
-              aria-pressed="false"
-              aria-label="Developer mode"
-              data-i18n-aria-label="Developer mode"
-              title="Developer mode"
-              data-i18n-title="Developer mode"
-            >
-              Dev
-            </button>
-            <button
-              id="devWorkspaceToggleBtn"
-              class="zoom-btn dev-workspace-toggle dev-only hidden"
-              type="button"
-              aria-controls="devWorkspacePanel"
-              aria-expanded="false"
-              aria-pressed="false"
-              title="Toggle development workspace"
-              data-i18n-title="Toggle development workspace"
-            >
-              <span data-i18n="Dev">Dev</span>
-            </button>
+            <div id="zoomUtilityViewportGroup" class="shell-utility-group shell-utility-group-viewport" role="group" aria-label="Viewport controls" data-i18n-aria-label="Viewport controls">
+              <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
+              <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
+              <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
+              <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" data-i18n-aria-label="Reset zoom" title="Fit">Fit</button>
+            </div>
+            <div id="zoomUtilitySystemGroup" class="shell-utility-group shell-utility-group-system" role="group" aria-label="System status" data-i18n-aria-label="System status">
+              <button id="btnToggleLang" class="zoom-btn zoom-pill-btn zoom-language-btn shell-utility-status-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
+                Language
+              </button>
+              <button
+                id="developerModeBtn"
+                class="zoom-btn zoom-pill-btn developer-mode-btn shell-utility-status-btn"
+                type="button"
+                aria-pressed="false"
+                aria-label="Developer mode"
+                data-i18n-aria-label="Developer mode"
+                title="Developer mode"
+                data-i18n-title="Developer mode"
+              >
+                Dev
+              </button>
+            </div>
+            <div id="zoomUtilityWorkspaceGroup" class="shell-utility-group shell-utility-group-workspace" role="group" aria-label="Workspace entry" data-i18n-aria-label="Workspace entry">
+              <button
+                id="scenarioTransportWorkbenchBtn"
+                type="button"
+                class="zoom-btn zoom-pill-btn shell-workspace-entry-btn"
+                aria-haspopup="dialog"
+                aria-controls="transportWorkbenchOverlay"
+                aria-expanded="false"
+                data-i18n="Transport"
+              >
+                Transport
+              </button>
+              <button
+                id="devWorkspaceToggleBtn"
+                class="zoom-btn dev-workspace-toggle dev-only hidden shell-workspace-entry-btn"
+                type="button"
+                aria-controls="devWorkspacePanel"
+                aria-expanded="false"
+                aria-pressed="false"
+                title="Toggle development workspace"
+                data-i18n-title="Toggle development workspace"
+              >
+                <span data-i18n="Dev">Dev</span>
+              </button>
+            </div>
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
@@ -1362,49 +1357,6 @@
                 </div>
               </div>
 
-              <div id="dockConfigGroup" class="dock-group dock-group-config" role="group" aria-label="Edit Config" data-i18n-aria-label="Edit Config" title="Edit Config" data-i18n-title="Edit Config">
-                <span id="lblEditingRules" class="visually-hidden" data-i18n="Edit Config">Edit Config</span>
-                <div class="dock-icon-row dock-cluster-row">
-                    <button id="dockEditPopoverBtn" type="button" class="dock-icon-btn dock-mode-icon-btn" aria-label="Edit Config" data-i18n-aria-label="Edit Config" title="Edit Config" data-i18n-title="Edit Config">
-                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M6 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M6 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M6 17h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <circle cx="9" cy="7" r="1.7" fill="currentColor"></circle>
-                        <circle cx="15" cy="12" r="1.7" fill="currentColor"></circle>
-                        <circle cx="11" cy="17" r="1.7" fill="currentColor"></circle>
-                      </svg>
-                    </button>
-                </div>
-                <div id="dockEditPopover" class="dock-utility-popover dock-editor-popover hidden" role="dialog" aria-label="Edit Config">
-                  <div id="dockGranularityField" class="dock-popover-field">
-                    <label for="paintGranularitySelect" class="dock-popover-label" data-i18n="Editing Scope">Editing Scope</label>
-                    <select id="paintGranularitySelect" name="paint-granularity" autocomplete="off" class="select-input dock-select">
-                      <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
-                      <option id="optPaintCountry" value="country">By Country</option>
-                    </select>
-                  </div>
-                  <div id="dockColorModeField" class="dock-popover-field">
-                    <label for="colorModeSelect" class="dock-popover-label" data-i18n="Color Rule">Color Rule</label>
-                    <select id="colorModeSelect" name="color-mode" autocomplete="off" class="select-input dock-select">
-                      <option id="optColorModeRegion" value="region">By Region</option>
-                      <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
-                    </select>
-                  </div>
-                  <div class="dock-popover-field">
-                    <button id="politicalEditingToggleBtn" type="button" class="dock-inline-btn" data-i18n="Political Editing">Political Editing</button>
-                  </div>
-                  <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
-                    <label class="visually-hidden" for="paintModeSelect" data-i18n="Paint mode">Paint mode</label>
-                    <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select dock-select-hidden">
-                      <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
-                      <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
-                    </select>
-                    <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
-                  </div>
-                </div>
-              </div>
-
               <div class="dock-group dock-group-map-actions" role="group" aria-label="Map Actions" data-i18n-aria-label="Map Actions" title="Map Actions" data-i18n-title="Map Actions">
                 <span class="visually-hidden" data-i18n="Map Actions">Map Actions</span>
                 <div class="dock-icon-row dock-cluster-row">
@@ -1414,17 +1366,6 @@
                         <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
                       </svg>
                       <span id="labelPresetPolitical" class="visually-hidden">Auto-Fill Countries</span>
-                    </button>
-                    <button id="presetClear" class="dock-icon-btn dock-action-icon-btn" type="button" aria-label="Clear Map" data-i18n-aria-label="Clear Map" title="Clear Map" data-i18n-title="Clear Map">
-                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M6 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M9 7V5.5h6V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M8.5 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M12 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M15.5 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M7.5 7h9l-.8 11a1 1 0 0 1-1 .9H9.3a1 1 0 0 1-1-.9L7.5 7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
-                      </svg>
-                      <span class="visually-hidden" data-i18n="Clear Map">Clear Map</span>
                     </button>
                     <button id="dockQuickFillBtn" class="dock-icon-btn dock-action-icon-btn hidden" type="button" aria-label="Quick Fill" data-i18n-aria-label="Quick Fill" title="Quick Fill" data-i18n-title="Quick Fill">
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1524,7 +1465,7 @@
             role="tabpanel"
             aria-labelledby="inspectorSidebarTabInspector"
           >
-          <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Inspector">Inspector</div>
+          <div class="sidebar-shell-heading sidebar-shell-heading-right sidebar-shell-anchor" data-i18n="Inspector">Inspector</div>
           <div class="inspector-search-shell">
             <div class="card-flat inspector-search-block">
               <label id="lblCountrySearch" class="visually-hidden" for="countrySearch">Search Countries</label>
@@ -1539,9 +1480,9 @@
           </div>
 
           <h2 id="countryInspectorHeading" class="visually-hidden">Country Inspector</h2>
-          <details id="countryInspectorSection" class="card inspector-section" aria-labelledby="countryInspectorHeading lblCountryInspector">
-            <summary id="lblCountryInspector" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Country Inspector</span>
+          <details id="countryInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="countryInspectorHeading lblCountryInspector">
+            <summary id="lblCountryInspector" class="sidebar-section-head">
+              <span class="sidebar-section-title">Country Inspector</span>
               <span class="summary-info-trigger info-trigger" aria-hidden="true">
                 <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
@@ -1555,7 +1496,7 @@
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="countryInspectorSelected" class="hidden">
                   <div class="inspector-detail-actions mt-3">
-                    <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Use as Active Owner</button>
+                    <button id="countryInspectorSetActive" type="button" class="sidebar-action-primary inspector-detail-primary-btn">Use as Active Owner</button>
                   </div>
                   <p id="countryInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                   <div id="countryInspectorColorRow" class="inspector-color-row mt-3 hidden">
@@ -1578,14 +1519,14 @@
                   </div>
                 </div>
               </div>
-              <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
+              <button id="resetCountryColors" class="sidebar-action-secondary is-section-tail mt-3">Reset Country Colors</button>
             </div>
           </details>
 
           <h2 id="selectedCountryActionsHeading" class="visually-hidden" data-i18n="Territories & Presets">Territories & Presets</h2>
-          <details id="selectedCountryActionsSection" class="card inspector-section" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
-            <summary id="lblPresetsHierarchy" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Territories &amp; Presets</span>
+          <details id="selectedCountryActionsSection" class="card inspector-section sidebar-section-shell" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
+            <summary id="lblPresetsHierarchy" class="sidebar-section-head">
+              <span class="sidebar-section-title">Territories &amp; Presets</span>
               <span class="summary-info-trigger info-trigger" aria-hidden="true">
                 <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
@@ -1600,9 +1541,9 @@
           </details>
 
           <h2 id="specialRegionInspectorHeading" class="visually-hidden">Special Regions</h2>
-          <details id="specialRegionInspectorSection" class="card inspector-section hidden" aria-labelledby="specialRegionInspectorHeading lblSpecialRegionInspector">
-            <summary id="lblSpecialRegionInspector" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Special Regions</span>
+          <details id="specialRegionInspectorSection" class="card inspector-section hidden sidebar-section-shell is-conditional" aria-labelledby="specialRegionInspectorHeading lblSpecialRegionInspector">
+            <summary id="lblSpecialRegionInspector" class="sidebar-section-head">
+              <span class="sidebar-section-title is-conditional">Special Regions</span>
               <span class="summary-info-trigger info-trigger" aria-hidden="true">
                 <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
@@ -1613,7 +1554,7 @@
             </summary>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
-                <h3 id="lblScenarioSpecialRegionVisibility" class="section-header-block">Visibility</h3>
+                <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label">Visibility</h3>
                 <label class="toggle-label mt-2" title="Toggle scenario-only special regions." data-i18n-title="Toggle scenario-only special regions.">
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle">Show Scenario Special Regions</span>
@@ -1649,8 +1590,8 @@
               </div>
               <div id="specialRegionList" class="country-list inspector-scroll mt-3"></div>
               <div id="specialRegionInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="specialRegionInspectorEmpty" class="inspector-empty-state">
-                  <h3 id="specialRegionInspectorEmptyTitle" class="section-header-block">Select a special region to inspect</h3>
+                <div id="specialRegionInspectorEmpty" class="inspector-empty-state sidebar-empty-state">
+                  <h3 id="specialRegionInspectorEmptyTitle" class="sidebar-empty-copy is-title">Select a special region to inspect</h3>
                   <p id="specialRegionInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a drained basin or exposure zone on the map, or choose one from the list.
                   </p>
@@ -1658,7 +1599,7 @@
                 <div id="specialRegionInspectorSelected" class="hidden">
                   <p id="specialRegionInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                   <div id="specialRegionColorRow" class="inspector-color-row mt-3 hidden">
-                    <h3 id="specialRegionColorLabel" class="section-header-block">Special Region Color</h3>
+                    <h3 id="specialRegionColorLabel" class="sidebar-field-label">Special Region Color</h3>
                     <div class="inspector-color-row-main mt-2">
                       <button
                         id="specialRegionColorSwatch"
@@ -1676,21 +1617,21 @@
                         aria-hidden="true"
                       />
                     </div>
-                    <button id="clearSpecialRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Special Region Override</button>
+                    <button id="clearSpecialRegionColorBtn" type="button" class="sidebar-action-secondary is-danger mt-3">Clear Special Region Override</button>
                   </div>
                 </div>
               </div>
-              <div class="inspector-detail-section mt-3">
-                <h3 id="lblSpecialRegionLegend" class="section-header-block">Special Region Overrides</h3>
+              <div class="inspector-detail-section mt-3 sidebar-detail-group">
+                <h3 id="lblSpecialRegionLegend" class="sidebar-group-label">Special Region Overrides</h3>
                 <div id="specialRegionLegendList" class="inspector-scroll mt-3"></div>
               </div>
             </div>
           </details>
 
           <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
-          <details id="waterInspectorSection" class="card inspector-section" aria-labelledby="waterInspectorHeading lblWaterInspector">
-            <summary id="lblWaterInspector" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Water Regions</span>
+          <details id="waterInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="waterInspectorHeading lblWaterInspector">
+            <summary id="lblWaterInspector" class="sidebar-section-head">
+              <span class="sidebar-section-title">Water Regions</span>
               <span class="summary-info-trigger info-trigger" aria-hidden="true">
                 <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
@@ -1701,7 +1642,7 @@
             </summary>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
-                <h3 id="lblWaterInteraction" class="section-header-block">Interaction</h3>
+                <h3 id="lblWaterInteraction" class="sidebar-group-label">Interaction</h3>
                 <label class="toggle-label mt-2" title="Allow or ignore macro open-ocean regions during hover, click, and paint." data-i18n-title="Allow or ignore macro open-ocean regions during hover, click, and paint.">
                   <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
                   <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
@@ -1730,8 +1671,8 @@
               </div>
               <div id="waterRegionList" class="country-list inspector-scroll mt-3"></div>
               <div id="waterInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="waterInspectorEmpty" class="inspector-empty-state">
-                  <h3 id="waterInspectorEmptyTitle" class="section-header-block">Select a water region to inspect</h3>
+                <div id="waterInspectorEmpty" class="inspector-empty-state sidebar-empty-state">
+                  <h3 id="waterInspectorEmptyTitle" class="sidebar-empty-copy is-title">Select a water region to inspect</h3>
                   <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a sea, lake, or strait on the map, or choose one from the list.
                   </p>
@@ -1739,7 +1680,7 @@
                 <div id="waterInspectorSelected" class="hidden">
                   <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                   <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
-                    <h3 id="waterInspectorColorLabel" class="section-header-block">Water Color</h3>
+                    <h3 id="waterInspectorColorLabel" class="sidebar-field-label">Water Color</h3>
                     <div class="inspector-color-row-main mt-2">
                       <button
                         id="waterInspectorColorSwatch"
@@ -1757,12 +1698,12 @@
                         aria-hidden="true"
                       />
                     </div>
-                    <button id="clearWaterRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Water Override</button>
+                    <button id="clearWaterRegionColorBtn" type="button" class="sidebar-action-secondary is-danger mt-3">Clear Water Override</button>
                   </div>
                 </div>
               </div>
-              <div class="inspector-detail-section mt-3">
-                <h3 id="lblWaterLegend" class="section-header-block">Water Overrides</h3>
+              <div class="inspector-detail-section mt-3 sidebar-detail-group">
+                <h3 id="lblWaterLegend" class="sidebar-group-label">Water Overrides</h3>
                 <div id="waterLegendList" class="inspector-scroll mt-3"></div>
               </div>
             </div>
@@ -1776,13 +1717,28 @@
             aria-labelledby="inspectorSidebarTabProject"
             hidden
           >
-            <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Project">Project</div>
+            <div class="sidebar-shell-heading sidebar-shell-heading-right sidebar-shell-anchor" data-i18n="Project">Project</div>
+
+            <h2 id="projectLegendHeading" class="visually-hidden" data-i18n="Project & Legend">Project & Legend</h2>
+            <details id="projectLegendSection" class="card inspector-section sidebar-section-shell" aria-labelledby="projectLegendHeading lblProjectLegend">
+              <summary id="lblProjectLegend" class="sidebar-section-head">
+                <span class="sidebar-anchor-title">Project &amp; Legend</span>
+                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
+                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="info-tooltip" data-i18n="Manage project-level legend entries and working map references.">Manage project-level legend entries and working map references.</span>
+                </span>
+              </summary>
+              <div id="projectLegendStack" class="inspector-panel-body inspector-stack"></div>
+            </details>
 
             <h2 id="frontlineProjectHeading" class="visually-hidden">Frontline</h2>
-            <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
-              <summary id="lblFrontlineProject" class="section-header inspector-section-summary">
-                <span class="inspector-section-summary-copy">Frontline</span>
-                <span class="summary-info-trigger info-trigger" aria-hidden="true">
+            <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
+              <summary id="lblFrontlineProject" class="sidebar-section-head">
+                <span class="sidebar-section-title is-secondary" data-i18n="Frontline">Frontline</span>
+                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
                   <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                     <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
@@ -1791,131 +1747,101 @@
                 </span>
               </summary>
               <div class="inspector-panel-body">
-                <p class="sidebar-tool-hint inspector-frontline-intro hidden" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
+                <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
                   Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
                 </p>
                 <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
               </div>
             </details>
 
-          <h2 id="projectLegendHeading" class="visually-hidden" data-i18n="Project & Legend">Project & Legend</h2>
-          <details id="projectLegendSection" class="card inspector-section" aria-labelledby="projectLegendHeading lblProjectLegend">
-            <summary id="lblProjectLegend" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Project &amp; Legend</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Manage project-level legend entries and working map references.">Manage project-level legend entries and working map references.</span>
-              </span>
-            </summary>
-            <div id="projectLegendStack" class="inspector-panel-body inspector-stack"></div>
-          </details>
+            <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
+            <details id="inspectorUtilitiesSection" class="card inspector-section sidebar-support-block" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
+              <summary id="lblInspectorUtilities" class="sidebar-support-head" data-i18n="Utilities">
+                <span class="sidebar-support-title">Utilities</span>
+              </summary>
+              <div class="inspector-panel-body">
+                <div class="inspector-utilities-shell sidebar-tool-panel">
+                  <p class="sidebar-help-copy" data-i18n="Open the guide, reference tools, and export tools from one stable support area.">
+                    Open the guide, reference tools, and export tools from one stable support area.
+                  </p>
+                  <div class="inspector-utility-stack">
+                    <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities">
+                      <button id="utilitiesGuideBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Guide">Guide</button>
+                      <button id="dockReferenceBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Reference">Reference</button>
+                      <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Export">Export</button>
+                    </div>
 
-          <h2 id="diagnosticsHeading" class="visually-hidden">Diagnostics</h2>
-          <details id="diagnosticsSection" class="card inspector-section dev-only" aria-labelledby="diagnosticsHeading lblDiagnostics">
-            <summary id="lblDiagnostics" class="section-header inspector-section-summary">
-              <span class="inspector-section-summary-copy">Diagnostics</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Check rendering state, debug views, and project diagnostics when something looks off.">Check rendering state, debug views, and project diagnostics when something looks off.</span>
-              </span>
-            </summary>
-            <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
-          </details>
+                    <div id="scenarioGuidePopover" class="scenario-guide-popover sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="scenarioGuideTitle">
+                      <h3 id="scenarioGuideTitle" class="sidebar-tool-title" data-i18n="Scenario Quick Start">Scenario Quick Start</h3>
+                      <p id="scenarioGuideSupportHint" class="sidebar-help-copy" data-i18n="Use this guide inside the support area so the shell stays quiet while the next step stays readable.">Use this guide inside the support area so the shell stays quiet while the next step stays readable.</p>
+                      <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
+                        <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
+                      </div>
+                      <ol class="scenario-guide-list mt-2">
+                        <li id="scenarioGuideStepApply" data-i18n="Apply Scenario">Apply Scenario</li>
+                        <li id="scenarioGuideStepSelect" data-i18n="Select a country in Inspector">Select a country in Inspector</li>
+                        <li id="scenarioGuideStepActive" data-i18n="Use an active owner for political actions">Use an active owner for political actions</li>
+                        <li id="scenarioGuideStepApplyActions" data-i18n="Use Activate or Scenario Actions for ownership changes">Use Activate or Scenario Actions for ownership changes</li>
+                      </ol>
+                    </div>
 
-          <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
-          <details id="inspectorUtilitiesSection" class="card inspector-section" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
-            <summary id="lblInspectorUtilities" class="section-header inspector-section-summary" data-i18n="Utilities">
-              <span class="inspector-section-summary-copy">Utilities</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Open reference tools, export utilities, language toggle, and development workspace access.">Open reference tools, export utilities, language toggle, and development workspace access.</span>
-              </span>
-            </summary>
-            <div class="inspector-panel-body">
-              <div class="inspector-utilities-shell">
-                <div class="inspector-utility-stack">
-              <div class="inspector-utility-actions" role="toolbar" aria-label="Utilities">
-                    <button id="dockReferenceBtn" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Reference" title="Reference">
-                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
-                        <path d="M7 15.5 10.5 12l2.5 2.5 2.5-3 1.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <circle cx="9" cy="9.5" r="1.2" fill="currentColor"></circle>
-                      </svg>
-                    </button>
-                    <button id="dockExportBtn" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Export" title="Export">
-                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M12 4v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div id="dockReferencePopover" class="dock-utility-popover hidden" role="dialog" aria-label="Reference tools">
-                    <h3 id="lblReferenceImage" class="section-header">Reference Image</h3>
-                    <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
-                    <div class="space-y-3 mt-4">
-                      <div>
-                        <div class="range-row">
-                          <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
-                          <span id="referenceOpacityValue" class="range-value">60%</span>
+                    <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
+                      <h3 id="lblReferenceImage" class="sidebar-tool-title" data-i18n="Reference Image">Reference Image</h3>
+                      <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Keep a working reference visible while you line up opacity, scale, and offsets.">Keep a working reference visible while you line up opacity, scale, and offsets.</p>
+                      <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
+                      <div class="space-y-3 mt-4">
+                        <div>
+                          <div class="range-row">
+                            <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
+                            <span id="referenceOpacityValue" class="range-value">60%</span>
+                          </div>
+                          <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
                         </div>
-                        <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
-                          <span id="referenceScaleValue" class="range-value">1.00×</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
+                            <span id="referenceScaleValue" class="range-value">1.00×</span>
+                          </div>
+                          <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
                         </div>
-                        <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
-                          <span id="referenceOffsetXValue" class="range-value">0px</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
+                            <span id="referenceOffsetXValue" class="range-value">0px</span>
+                          </div>
+                          <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                         </div>
-                        <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
-                          <span id="referenceOffsetYValue" class="range-value">0px</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
+                            <span id="referenceOffsetYValue" class="range-value">0px</span>
+                          </div>
+                          <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                         </div>
-                        <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                       </div>
                     </div>
-                  </div>
-                  <div id="dockExportPopover" class="dock-utility-popover hidden" role="dialog" aria-labelledby="lblExport">
-                    <div class="flex items-center justify-between">
-                      <h3 id="lblExport" class="section-header">Export Map</h3>
-                      <div class="relative info-trigger">
-                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                          <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                        </svg>
-                        <div id="lblExportInfoTooltip" class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
-                      </div>
+                    <div id="dockExportPopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="lblExport">
+                      <h3 id="lblExport" class="sidebar-tool-title" data-i18n="Export Map">Export Map</h3>
+                      <p id="exportToolHint" class="sidebar-help-copy mt-2" data-i18n="Export the visible map as a PNG or JPG snapshot.">Export the visible map as a PNG or JPG snapshot.</p>
+                      <label id="lblExportFormat" class="sidebar-field-label mt-3" for="exportFormat">Format</label>
+                      <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                      </select>
+                      <button id="exportBtn" class="btn-primary sidebar-tool-action-primary mt-4">Download Snapshot</button>
                     </div>
-                    <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
-                    <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
-                      <option value="png">PNG</option>
-                      <option value="jpg">JPG</option>
-                    </select>
-                    <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
                   </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+
+            <h2 id="diagnosticsHeading" class="visually-hidden">Diagnostics</h2>
+            <details id="diagnosticsSection" class="card inspector-section dev-only sidebar-appendix-shell" aria-labelledby="diagnosticsHeading lblDiagnostics">
+              <summary id="lblDiagnostics" class="sidebar-appendix-head">
+                <span class="sidebar-appendix-title">Diagnostics</span>
+              </summary>
+              <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
+            </details>
           </section>
         </div>
       </aside>
@@ -1948,11 +1874,11 @@
               <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench" data-i18n="Close" data-i18n-aria-label="Close transport workbench">Close</button>
             </div>
             <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
-              <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title" data-i18n="Workbench notes">Workbench notes</div>
+              <h3 id="transportWorkbenchInfoTitle" class="transport-workbench-info-title" data-i18n="Transport guide">Transport guide</h3>
               <div id="transportWorkbenchInfoBody" class="transport-workbench-info-body"></div>
             </div>
             <div id="transportWorkbenchSectionHelpPopover" class="transport-workbench-section-help-popover hidden" role="dialog" aria-labelledby="transportWorkbenchSectionHelpTitle" aria-hidden="true">
-              <div id="transportWorkbenchSectionHelpTitle" class="transport-workbench-info-title"></div>
+              <h3 id="transportWorkbenchSectionHelpTitle" class="transport-workbench-info-title"></h3>
               <div id="transportWorkbenchSectionHelpBody" class="transport-workbench-section-help-body"></div>
             </div>
           </div>
@@ -1961,8 +1887,8 @@
             <div class="transport-workbench-grid">
               <section class="transport-workbench-column transport-workbench-column-lens" aria-labelledby="transportWorkbenchLensTitle">
                 <div class="transport-workbench-column-header transport-workbench-column-header-compact">
-                  <div class="transport-workbench-column-kicker" data-i18n="Context Lens">Context Lens</div>
-                  <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title" data-i18n="Road corridor lens">Road corridor lens</h3>
+                  <div class="transport-workbench-column-kicker" data-i18n="Lens">Lens</div>
+                  <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title" data-i18n="Road lens">Road lens</h3>
                 </div>
                 <div class="transport-workbench-meta-strip">
                   <div class="transport-workbench-meta-pill">
@@ -1975,7 +1901,7 @@
                   </div>
                   <div class="transport-workbench-meta-pill">
                     <span class="transport-workbench-meta-label" data-i18n="Mode">Mode</span>
-                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value" data-i18n="Bounded zoom/pan">Bounded zoom/pan</strong>
+                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value" data-i18n="Bounded zoom / pan">Bounded zoom / pan</strong>
                   </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
@@ -1987,11 +1913,11 @@
                 <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden" data-i18n="Japan preview">Japan preview</h3>
                 <div class="transport-workbench-preview-shell">
                   <div id="transportWorkbenchPreviewActions" class="transport-workbench-preview-actions">
-                    <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn" data-i18n="Hold to Compare Baseline">
-                      Hold to Compare Baseline
+                    <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn" data-i18n="Compare baseline">
+                      Compare baseline
                     </button>
-                    <span id="transportWorkbenchCompareStatus" class="transport-workbench-preview-compare-status" data-i18n="Current working state">
-                      Current working state
+                    <span id="transportWorkbenchCompareStatus" class="transport-workbench-preview-compare-status" data-i18n="Live working state" aria-live="polite">
+                      Live working state
                     </span>
                   </div>
                   <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
@@ -2016,15 +1942,15 @@
 
               <section class="transport-workbench-column transport-workbench-column-inspector" aria-labelledby="transportWorkbenchInspectorTitle">
                 <div class="transport-workbench-column-header transport-workbench-column-header-compact">
-                  <div class="transport-workbench-column-kicker" data-i18n="Control Deck">Control Deck</div>
-                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title" data-i18n="Road control deck">Road control deck</h3>
+                  <div class="transport-workbench-column-kicker" data-i18n="Inspector">Inspector</div>
+                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title" data-i18n="Road inspector">Road inspector</h3>
                 </div>
                 <div class="transport-workbench-inspector-stack">
                   <div id="transportWorkbenchInspectorTabs" class="transport-workbench-inspector-tabs" role="tablist" aria-label="Workbench inspector tabs" data-i18n-aria-label="Workbench inspector tabs">
                     <button type="button" class="transport-workbench-inspector-tab is-active" data-transport-inspector-tab="inspect" role="tab" aria-selected="true" aria-controls="transportWorkbenchInspectorPanelInspect" data-i18n="Inspect">Inspect</button>
                     <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="display" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelDisplay" data-i18n="Display">Display</button>
                     <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="aggregation" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelAggregation" data-i18n="Aggregation">Aggregation</button>
-                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="labels" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelLabels">Labels</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="labels" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelLabels" data-i18n="Labels">Labels</button>
                     <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="coverage" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelCoverage" data-i18n="Coverage">Coverage</button>
                     <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="data" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelData" data-i18n="Data">Data</button>
                   </div>
@@ -2032,9 +1958,9 @@
                     <section id="transportWorkbenchInspectorPanelInspect" class="transport-workbench-inspector-panel is-active" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
                       <div id="transportWorkbenchInspectorDetails" class="transport-workbench-inspector-detail-list" aria-live="polite"></div>
                       <div class="transport-workbench-empty-card">
-                        <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title" data-i18n="Awaiting real family schema">Awaiting real family schema</div>
-                        <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text" data-i18n="Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.">
-                          Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
+                        <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title" data-i18n="No transport schema loaded yet">No transport schema loaded yet</div>
+                        <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text" data-i18n="Load a supported family to inspect live parameters, preview controls, and map application rules.">
+                          Load a supported family to inspect live parameters, preview controls, and map application rules.
                         </p>
                       </div>
                     </section>

@@ -1,19 +1,14 @@
 import { t } from "./i18n.js";
+import {
+  applyDialogContract,
+  captureFocusOrigin,
+  focusSurface,
+  getFocusableElements,
+  restoreFocusOrigin,
+} from "./ui_contract.js";
 
 let activeDialogController = null;
 let dialogCounter = 0;
-
-function getFocusableElements(container) {
-  if (!(container instanceof HTMLElement)) return [];
-  return Array.from(container.querySelectorAll(
-    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )).filter((element) => (
-    element instanceof HTMLElement
-    && !element.hidden
-    && element.getAttribute("aria-hidden") !== "true"
-    && element.tabIndex >= 0
-  ));
-}
 
 function showAppDialog({
   title = "",
@@ -41,7 +36,7 @@ function showAppDialog({
   const titleId = `${dialogId}-title`;
   const messageId = normalizedMessage ? `${dialogId}-message` : "";
   const detailsId = normalizedDetails ? `${dialogId}-details` : "";
-  const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const previouslyFocused = captureFocusOrigin(document);
 
   const overlay = document.createElement("div");
   overlay.className = "app-dialog-overlay";
@@ -49,12 +44,11 @@ function showAppDialog({
 
   const dialog = document.createElement("div");
   dialog.className = `app-dialog${normalizedTone === "warning" || normalizedTone === "error" ? ` app-dialog--${normalizedTone}` : ""}`;
-  dialog.setAttribute("role", normalizedTone === "warning" || normalizedTone === "error" ? "alertdialog" : "dialog");
-  dialog.setAttribute("aria-modal", "true");
-  dialog.setAttribute("aria-labelledby", titleId);
-  if (messageId || detailsId) {
-    dialog.setAttribute("aria-describedby", [messageId, detailsId].filter(Boolean).join(" "));
-  }
+  applyDialogContract(dialog, {
+    tone: normalizedTone,
+    labelledBy: titleId,
+    describedBy: [messageId, detailsId],
+  });
 
   const header = document.createElement("div");
   header.className = "app-dialog-header";
@@ -117,9 +111,7 @@ function showAppDialog({
       overlay.removeEventListener("click", handleOverlayClick);
       overlay.remove();
       activeDialogController = null;
-      if (previouslyFocused && document.contains(previouslyFocused)) {
-        previouslyFocused.focus({ preventScroll: true });
-      }
+      restoreFocusOrigin(previouslyFocused);
       resolve(!!result);
     };
 
@@ -133,7 +125,7 @@ function showAppDialog({
       const focusables = getFocusableElements(dialog);
       if (!focusables.length) {
         event.preventDefault();
-        dialog.focus({ preventScroll: true });
+        focusSurface(dialog);
         return;
       }
       const currentIndex = focusables.indexOf(document.activeElement);
@@ -160,7 +152,7 @@ function showAppDialog({
     cancelButton.addEventListener("click", () => cleanup(false));
     confirmButton.addEventListener("click", () => cleanup(true));
     globalThis.requestAnimationFrame(() => {
-      cancelButton.focus({ preventScroll: true });
+      focusSurface(dialog);
     });
   });
 }

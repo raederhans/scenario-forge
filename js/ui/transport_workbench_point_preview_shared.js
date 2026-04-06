@@ -212,7 +212,7 @@ function createLabelNode(feature, markerStyle, onSelect) {
   label.setAttribute("fill", markerStyle.labelColor || markerStyle.stroke);
   label.setAttribute("font-size", String(normalizeNumber(markerStyle.labelSize, 10.5)));
   label.setAttribute("font-weight", String(normalizeNumber(markerStyle.labelWeight, 600)));
-  label.setAttribute("font-family", "IBM Plex Sans, Inter, system-ui, sans-serif");
+  label.setAttribute("font-family", "\"Segoe UI Variable\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei UI\", \"Noto Sans SC\", sans-serif");
   label.textContent = feature.label;
   label.dataset.featureId = feature.id;
   label.dataset.featureKind = feature.kind;

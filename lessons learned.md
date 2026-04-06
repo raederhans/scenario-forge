@@ -140,3 +140,55 @@
 ### 27. 做浏览器类审查前，不能只信 `.runtime/dev/active_server.json`，必须先验证端口真活着
 - `active_server.json` 可能残留旧 pid 和旧端口，看起来像“已有 dev server”，但实际请求已经连不上。
 - 最短稳路线是：先做一次真实 HTTP 探测；失败再重启 server，并把 stdout/stderr 落到 `.runtime/tmp`，不要直接把陈旧元数据当事实。
+
+### 28. 分阶段 UI 重构要先把 contract 落成可机读资产，再让表面迁移接入
+- 如果 01 只是文档，没有 `source of truth + checker + 最小真实接入点`，02/03 执行时很快又会把“标题/标签/按钮/弹层边界”重新争论一遍。
+- 最稳的最短路径是：先落共享 contract 模块、语义 class 骨架、targeted 验证，再开始主界面结构迁移。
+
+### 29. 顶部 overlay 重排不能只改 DOM，要一起复核点击层级和安全间距
+- 这次 02 把 `Transport` 移到右上 utility 后，`scenario context bar` 和 `zoomControls` 立刻发生点击遮挡；如果只看静态结构，很容易漏掉。
+- 最稳做法是：改完后立刻做一次真实点击验证；必要时同时调 `z-index`、安全间距和纵向分层，不要只靠肉眼看“不太重叠”。
+
+### 30. `$team` 不是随时可用，先做 tmux leader 预检
+- 当前环境如果不在 tmux leader pane 内，`omx team` / `omx_run_team_start` 会直接失败；不要等到分工都写完才发现。
+- 最短路径是先预检 `$env:TMUX` 和 team runtime 条件；不满足时尽早暴露，再决定是否切原生子代理并行。
+
+### 31. 相邻 e2e 不要把非主路径存在性写成硬前置
+- 这次 `main_shell_i18n.spec.js` 被 `.scenario-visual-adjustments` 是否出现卡死，但它本来测的是主壳 i18n，不是这个区块的存在性。
+- 更稳的写法是：主壳类用例只对“存在时必须正确”的相邻区块做可选断言；真正要求必出现的内容，单独交给自己的 contract/e2e。
+
+### 32. i18n 不能直接对带子节点的 summary / heading 容器整块写 `textContent`
+- 如果一个 summary 里包了标题节点、info trigger、状态节点，翻译时直接 `element.textContent = ...` 会把整个结构抹平。
+- 更稳的做法是先找语义文本子节点，只替换真正承载标题文案的那一层；结构容器本身不要直接覆写。
+
+### 31. 主壳 e2e 不要被相邻非主路径区块绑死
+- `main_shell_i18n.spec.js` 这类主壳回归，应该优先锁定真正的主壳文案和交互；像 `.scenario-visual-adjustments` 这种可选相邻区块，存在才校验，不该变成整轮主壳验收的硬门槛。
+- 更稳的做法是把“主壳稳定性”和“相邻功能块存在性”拆成不同测试面，避免一处可选 UI 把整轮 01/02/03 验收拖死。
+
+### 29. 顶部双壳层同时改版时，必须用真实浏览器检查点击命中，不要只看 DOM 顺序
+- 这次 `scenario context bar` 和右上 utility 分组同时收口后，`Guide` 按钮一度被 `zoomControls` 遮住，DOM 没报错，但真实点击被上层按钮拦截。
+- 最稳的最短路径是：每次改完顶部壳层布局，都跑一次真实浏览器点击验证，再决定是收宽、下移，还是改 z-index。
+
+### 30. `$team` 不是普通并行 fanout，缺少 tmux leader pane 时会直接硬失败
+- 这次 `omx team` / `omx_run_team_start` 因为当前 leader 不在 tmux pane 内直接失败，不能把它当成和原生 subagent 一样随时可用。
+- 进入 team 流程前要先确认 `$TMUX`、再确认是否接受 team runtime 的工作模式；不满足前置条件时，要尽早暴露，不要把失败拖到执行中途。
+
+### 29. `$team / omx team` 不是随时可用；不在 tmux leader pane 时要尽早暴露并切回原生子代理
+- 这次 `omx_run_team_start` 直接因为“当前会话不在 tmux leader pane”失败，说明 team mode 有硬前置，不满足就不要继续假设它能跑。
+- 遇到这种情况要第一时间暴露，再用原生子代理 + 主线程单拥有者集成顶上，别一边卡着 team 一边让实现停摆。
+
+### 30. 顶部轻状态条和右上 utility 重排后，要立刻复核可点击层级，不然会出现“看得见但点不到”
+- 这次 `scenario context bar` 和 `zoomControls` 重排后，Guide 按钮被右上 utility 遮住，Playwright 点不到。
+- 最稳的收口顺序是：改完位置/宽度后立刻用一次真实点击验证，不要只看静态截图。
+
+### 29. `$team` / omx team` 依赖 tmux leader pane，当前会话不在 tmux 时要先暴露这个硬前提
+- `omx team` 和 `omx_run_team_start` 都不是普通并行工具；如果当前 leader 不在 tmux pane 里，运行时会直接失败。
+- 真正开工前先检查 `$env:TMUX` 和 tmux 前提，缺前提就尽早暴露，不要把调度失败拖到实现中段。
+
+### 28. 文档先行的 UI 重构阶段，先落 machine-readable contract，再动表面迁移
+- 如果阶段目标是“共享契约 / foundation”，最稳的最短路径是先交付统一 contract 模块、语义 class 骨架、验证脚本，再把真正的 HTML/布局迁移留给后续 phase。
+- 这样可以先把边界锁死，又不会误闯进下一阶段的表面重排。
+
+### 29. 契约文件名、文档进度和验证脚本必须同名同口径
+- 像 `ui_contract.js` / `ui_contracts.js` 这种单复数不一致，会先把验证和留档搞乱，再拖累后续阶段接入。
+- 文档里的执行进度、package 脚本名、测试断言要共用同一个 canonical 名称。

@@ -5,6 +5,16 @@
 - 它不是视觉批注，也不是实现记录。
 - 后续任何代码改动，只要和这里冲突，一律以这里为准；如果这里也不够清楚，先补这里，再写代码。
 
+## 2026-04-06 执行进度（01）
+- [x] 新增共享契约模块 `js/ui/ui_contract.js`，把 01 中最需要反复引用的文字角色、交互边界、URL 白名单、密度分档收成 machine-readable source of truth。
+- [x] 把共享焦点回退与 dialog 合同接入 `js/ui/app_dialog.js`，先落地 01 里的 dialog / focus 基础设施，不提前改 02/03 表面结构。
+- [x] 把共享焦点回退 helper 接入 `js/ui/toolbar.js` 的 overlay / popover 触发器记忆链，只收口共享行为，不改壳层入口位置。
+- [x] 在 `css/style.css` 预先落成后续 02/03 要用的语义 class 家族骨架，但没有开始主界面表面迁移。
+- [x] 新增 `tests/test_ui_rework_plan01_foundation_contract.py`，把 01 的共享合同变成可机器校验的边界。
+- [x] 新增 `tests/e2e/ui_contract_foundation.spec.js`，用浏览器 smoke 验证 contract snapshot 与 focus return helper 的真实运行闭环。
+- [x] 新增验证入口：`npm run verify:ui-contract-foundation` 与 `npm run test:e2e:ui-contract-foundation`。
+- [x] 保持未启动：`02_MAINLINE` 表面改造、`03_SUPPORT` 支持面重构、`Transport workbench` 内部改造、搜索壳、列表/树内部件、颜色拾取器内部 widget。
+
 ## 适用范围
 - 主地图工作区
 - 左 rail

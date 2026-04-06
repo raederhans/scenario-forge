@@ -5,6 +5,16 @@
 - 它只处理：主壳、顶条、右上 utility、左 rail、右栏主线、`bottom dock`。
 - 所有规则默认继承 [UI_REWORK_EXECUTION_PLAN_01_FOUNDATION_AND_CONTRACTS_2026-04-05.md](/C:/Users/raede/Desktop/dev/mapcreator/docs/UI_REWORK_EXECUTION_PLAN_01_FOUNDATION_AND_CONTRACTS_2026-04-05.md)。
 
+## 2026-04-06 执行进度（02）
+- [x] 主壳第一波收口：`scenario context bar` 只保留轻状态与 `Guide` 轻入口；`Transport` 移到右上 workspace 入口组。
+- [x] 右上 utility 第一波分组：视口控制 / 轻系统状态 / workspace 入口。
+- [x] 右栏主线第一波结构迁移：`Project & Legend → Frontline → Utilities → Diagnostics`，`Inspector scope` 正式章节壳接入 01 语义类。
+- [x] `Utilities` 第一正式落点锁定在右栏支持区，`Guide / Reference / Export` 已变成文字入口。
+- [x] `bottom dock` 第一波收紧：移除 `Edit Config` 长停留配置入口和 `Clear Map` 危险动作。
+- [x] URL / 焦点 / 弹层第一波对齐：右栏 `scope + section` 写回 URL，`Guide / Reference / Export` 支持面视图写回 URL，弹层关闭回到触发器。
+- [x] 新增 02 定向验证：`tests/test_ui_rework_plan02_mainline_contract.py`、`tests/e2e/ui_rework_mainline_shell_sidebar.spec.js`。
+- [ ] 保持未启动：03 的支持面深改、Transport 内部改造、第二波视觉收口、搜索壳/列表树/legend/颜色拾取器内部件。
+
 ## 主要代码边界
 - [index.html](/C:/Users/raede/Desktop/dev/mapcreator/index.html)
 - [css/style.css](/C:/Users/raede/Desktop/dev/mapcreator/css/style.css)

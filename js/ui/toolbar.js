@@ -49,6 +49,13 @@ import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
+import {
+  createFocusReturnRegistry,
+  focusSurface,
+  rememberSurfaceTrigger,
+  restoreSurfaceTriggerFocus,
+  UI_URL_STATE_KEYS,
+} from "./ui_contract.js";
 import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
 import {
   destroyTransportWorkbenchCarrier,
@@ -1842,6 +1849,7 @@ function initToolbar({ render } = {}) {
   const scenarioContextSelectionText = document.getElementById("scenarioContextSelectionText");
   const scenarioTransportWorkbenchBtn = document.getElementById("scenarioTransportWorkbenchBtn");
   const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
+  const utilitiesGuideBtn = document.getElementById("utilitiesGuideBtn");
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
   const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
@@ -1855,6 +1863,8 @@ function initToolbar({ render } = {}) {
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
+  const inspectorSidebarTabProject = document.getElementById("inspectorSidebarTabProject");
+  const inspectorUtilitiesSection = document.getElementById("inspectorUtilitiesSection");
   const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
@@ -2042,7 +2052,7 @@ function initToolbar({ render } = {}) {
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
   let dockPopoverCloseBound = false;
-  const overlayFocusReturnTargets = new WeakMap();
+  const overlayFocusReturnTargets = createFocusReturnRegistry();
   const PALETTE_LIBRARY_GROUPS = [
     { key: "essentials", label: () => t("Essentials", "ui"), defaultOpen: true },
     { key: "dynamic", label: () => t("Dynamic / Runtime", "ui"), defaultOpen: false },
@@ -2157,43 +2167,27 @@ function initToolbar({ render } = {}) {
     });
   };
 
-  const getFocusableElements = (container) => {
-    if (!(container instanceof HTMLElement)) return [];
-    const candidates = Array.from(container.querySelectorAll(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    ));
-    return candidates.filter((element) => (
-      element instanceof HTMLElement
-      && !element.hidden
-      && element.getAttribute("aria-hidden") !== "true"
-      && element.tabIndex >= 0
-    ));
+  const focusOverlaySurface = (container) => focusSurface(container);
+  const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
+  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => (
+    restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger)
+  );
+  const replaceUiUrlParams = (mutator) => {
+    if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
+    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
+    mutator?.(params);
+    const nextQuery = params.toString();
+    const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
+    globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
   };
-
-  const focusOverlaySurface = (container) => {
-    if (!(container instanceof HTMLElement)) return;
-    const [firstFocusable] = getFocusableElements(container);
-    const target = firstFocusable || container;
-    if (!target.hasAttribute("tabindex")) {
-      container.setAttribute("tabindex", "-1");
-    }
-    if (typeof target.focus === "function") {
-      target.focus({ preventScroll: true });
-    }
-  };
-
-  const rememberOverlayTrigger = (overlay, trigger) => {
-    if (!(overlay instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
-    overlayFocusReturnTargets.set(overlay, trigger);
-  };
-
-  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => {
-    const target = explicitTrigger instanceof HTMLElement
-      ? explicitTrigger
-      : overlayFocusReturnTargets.get(overlay);
-    if (target && typeof target.focus === "function") {
-      target.focus({ preventScroll: true });
-    }
+  const syncSupportSurfaceUrlState = (view = "") => {
+    replaceUiUrlParams((params) => {
+      if (view) {
+        params.set(UI_URL_STATE_KEYS.view, view);
+      } else if (["guide", "reference", "export"].includes(String(params.get(UI_URL_STATE_KEYS.view) || ""))) {
+        params.delete(UI_URL_STATE_KEYS.view);
+      }
+    });
   };
 
   const closeTransportWorkbenchInfoPopover = ({ restoreFocus = false } = {}) => {
@@ -2282,72 +2276,13 @@ function initToolbar({ render } = {}) {
 
   const getTransportWorkbenchDataContract = (familyId) => TRANSPORT_WORKBENCH_DATA_CONTRACTS[familyId] || null;
 
-  const renderTransportWorkbenchInfoPopoverLegacy = (family) => {
-    if (!transportWorkbenchInfoBody) return;
-    transportWorkbenchInfoBody.replaceChildren();
-    const dataContract = getTransportWorkbenchDataContract(family.id);
-
-    const blocks = [
-      {
-        title: "Overview",
-        body: family.lensBody,
-      },
-      {
-        title: "Baseline",
-        body: family.lensNext,
-      },
-      family.supportsDetailedControls
-        ? {
-          title: "Compare",
-          body: `Hold to Compare Baseline only shows the locked ${family.label.toLowerCase()} baseline for reference. It never overwrites the working values in the left column.`,
-        }
-        : {
-          title: "Status",
-          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the real Japan schema is wired.`,
-        },
-    ];
-    blocks[2] = family.supportsDetailedControls
-      ? {
-        title: "Compare",
-        body: `Hold to Compare Baseline only shows the current baseline snapshot for ${family.label.toLowerCase()}. It does not rewrite your working controls.`,
-      }
-      : {
-        title: "Status",
-        body: `${family.label} is still a reserved shell. Detailed controls open only after its schema is wired.`,
-      };
-    if (dataContract) {
-      blocks.push({
-        title: "Data path",
-        body: `${dataContract.country} ${family.label.toLowerCase()} stays on ${dataContract.packs.join(" + ")} deferred packs, using ${dataContract.geometrySource} for geometry and ${dataContract.hardeningSource} for hardening. ${dataContract.governance}`,
-      });
-    }
-    blocks.push({
-      title: "Preview controls",
-      body: "Use the bottom-right controls for zoom and a 90-degree turn. Reset View always restores the framed standard view.",
-    });
-
-    blocks.forEach((block) => {
-      const node = document.createElement("section");
-      node.className = "transport-workbench-info-block";
-      const title = document.createElement("div");
-      title.className = "transport-workbench-info-subtitle";
-      title.textContent = t(block.title, "ui");
-      const body = document.createElement("p");
-      body.className = "transport-workbench-info-text";
-      body.textContent = t(block.body, "ui");
-      node.append(title, body);
-      transportWorkbenchInfoBody.appendChild(node);
-    });
-
-  };
-
   const renderTransportWorkbenchInfoContent = (family) => {
     if (!transportWorkbenchInfoBody) return;
     transportWorkbenchInfoBody.replaceChildren();
     const dataContract = getTransportWorkbenchDataContract(family.id);
     const blocks = [
       {
-        title: "Overview",
+        title: "Current lens",
         body: family.lensBody,
       },
       {
@@ -2356,16 +2291,16 @@ function initToolbar({ render } = {}) {
       },
       family.supportsDetailedControls
         ? {
-          title: "Compare",
-          body: `Hold to Compare Baseline only swaps the preview to the locked ${family.label.toLowerCase()} baseline while the control is held. It never overwrites the working values in the left column.`,
+          title: "Compare action",
+          body: `Compare baseline temporarily swaps the preview to the locked ${family.label.toLowerCase()} baseline while the control is held. It never overwrites the working values in the left column.`,
         }
         : {
-          title: "Status",
-          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the real Japan schema and packs are wired.`,
+          title: "Availability",
+          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the live Japan schema and packs are wired.`,
         },
       {
         title: "Preview controls",
-        body: "Use mouse wheel or the + / - controls to zoom. The 90° button toggles between the default north-up workbench view and the alternate quarter-turn inspection view. Reset View restores pan, zoom, and rotation to the default frame.",
+        body: "Use mouse wheel or the + / - controls to zoom. The 90° button swaps between the default north-up view and the quarter-turn inspection view. Reset View restores the framed default preview.",
       },
       dataContract
         ? {
@@ -3043,17 +2978,17 @@ function initToolbar({ render } = {}) {
     title.className = "transport-workbench-note-title";
     title.textContent = t(
       tabId === "display"
-        ? "Workbench mode shell"
+        ? "Display settings"
         : tabId === "aggregation"
-          ? "Aggregation shell"
+          ? "Aggregation settings"
           : tabId === "labels"
-            ? "Label shell"
-            : "Coverage shell",
+            ? "Label settings"
+            : "Coverage settings",
       "ui"
     );
     const kicker = document.createElement("span");
     kicker.className = "transport-workbench-shell-kicker";
-    kicker.textContent = t("Live config", "ui");
+    kicker.textContent = t("Current settings", "ui");
     heading.append(title, kicker);
     card.appendChild(heading);
     const grid = document.createElement("div");
@@ -3211,8 +3146,8 @@ function initToolbar({ render } = {}) {
     const note = document.createElement("p");
     note.className = "transport-workbench-shell-note";
     note.textContent = tabId === "data"
-      ? t("Audit and manifest stay read-only here so tuning and source truth do not get mixed.", "ui")
-      : t("The control deck now binds the new display schema on the right side while the left column stays contextual.", "ui");
+      ? t("Manifest and audit stay read-only here so control tuning and source truth do not get mixed.", "ui")
+      : t("Use this panel to adjust the current family without changing the lens column context.", "ui");
     card.append(grid, note);
     return card;
   };
@@ -4002,9 +3937,9 @@ function initToolbar({ render } = {}) {
     transportWorkbenchFamilyStatus.textContent = t(family.label, "ui");
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
     transportWorkbenchPreviewMode.textContent = family.id === "layers"
-      ? "Drag to reorder"
+      ? "Layer order"
       : TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)
-        ? `${String(context.config?.displayMode || "inspect").replace(/_/g, " ")} / ${String(context.config?.displayPreset || "balanced").replace(/_/g, " ")}`
+        ? `${String(context.config?.displayMode || "inspect").replace(/_/g, " ")} · ${String(context.config?.displayPreset || "balanced").replace(/_/g, " ")}`
         : uiState.previewMode === "bounded_zoom_pan"
           ? t("Zoom / pan / quarter-turn", "ui")
           : uiState.previewMode;
@@ -4016,20 +3951,20 @@ function initToolbar({ render } = {}) {
       transportWorkbenchCompareBtn.setAttribute("aria-disabled", family.supportsDetailedControls ? "false" : "true");
       transportWorkbenchCompareBtn.classList.toggle("is-held", compareHeld);
       transportWorkbenchCompareBtn.textContent = family.supportsDetailedControls
-        ? t("Hold to Compare Baseline", "ui")
-        : t("Baseline compare unavailable", "ui");
+        ? t("Compare baseline", "ui")
+        : t("Baseline unavailable", "ui");
     }
     if (transportWorkbenchCompareStatus) {
       transportWorkbenchCompareStatus.textContent = !family.supportsDetailedControls
-        ? t("Detailed baseline not defined for this family", "ui")
+        ? t("Baseline unavailable for this family", "ui")
         : compareHeld
-          ? t("Showing baseline snapshot", "ui")
-          : t("Current working state", "ui");
+          ? t("Baseline preview", "ui")
+          : t("Live working state", "ui");
     }
     if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
       renderTransportWorkbenchInfoContent(family);
     }
-    transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} control deck`;
+    transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} inspector`;
     transportWorkbenchInspectorEmptyTitle.textContent = t(family.inspectorEmptyTitle, "ui");
     transportWorkbenchInspectorEmptyBody.textContent = t(family.inspectorEmptyBody, "ui");
     transportWorkbenchPreviewCanvas?.classList.toggle("is-layer-order-mode", family.id === "layers");
@@ -4441,40 +4376,96 @@ function initToolbar({ render } = {}) {
     focusOverlaySurface(specialZonePopover);
   };
 
-  const closeScenarioGuidePopover = ({ restoreFocus = false } = {}) => {
+  const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     if (!scenarioGuidePopover) return;
     scenarioGuidePopover.classList.add("hidden");
     scenarioGuidePopover.setAttribute("aria-hidden", "true");
     scenarioGuideBtn?.classList.remove("is-active");
+    utilitiesGuideBtn?.classList.remove("is-active");
     scenarioGuideBtn?.setAttribute("aria-expanded", "false");
-    if (scenarioGuideBtn) {
-      scenarioGuideBtn.textContent = "?";
-      scenarioGuideBtn.setAttribute("title", t("Show guide", "ui"));
+    utilitiesGuideBtn?.setAttribute("aria-expanded", "false");
+    scenarioGuideBtn?.setAttribute("title", t("Show guide", "ui"));
+    utilitiesGuideBtn?.setAttribute("title", t("Show guide", "ui"));
+    if (syncUrl) {
+      syncSupportSurfaceUrlState("");
     }
     if (restoreFocus) {
-      restoreOverlayTriggerFocus(scenarioGuidePopover, scenarioGuideBtn);
+      restoreOverlayTriggerFocus(scenarioGuidePopover);
     }
   };
 
-  const toggleScenarioGuidePopover = () => {
+  const ensureProjectSupportSurface = () => {
+    if (!document.body.classList.contains("right-drawer-open")) {
+      toggleRightPanel(true);
+    }
+    inspectorSidebarTabProject?.click();
+    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute("aria-selected") !== "true") {
+      const inspectorSidebarPanel = document.getElementById("inspectorSidebarPanel");
+      const projectSidebarPanel = document.getElementById("projectSidebarPanel");
+      const inspectorSidebarTabInspector = document.getElementById("inspectorSidebarTabInspector");
+      inspectorSidebarTabProject.classList.add("is-active");
+      inspectorSidebarTabProject.setAttribute("aria-selected", "true");
+      inspectorSidebarTabInspector?.classList.remove("is-active");
+      inspectorSidebarTabInspector?.setAttribute("aria-selected", "false");
+      projectSidebarPanel?.classList.add("is-active");
+      if (projectSidebarPanel instanceof HTMLElement) projectSidebarPanel.hidden = false;
+      inspectorSidebarPanel?.classList.remove("is-active");
+      if (inspectorSidebarPanel instanceof HTMLElement) inspectorSidebarPanel.hidden = true;
+    }
+    if (inspectorUtilitiesSection instanceof HTMLDetailsElement) {
+      inspectorUtilitiesSection.open = true;
+    }
+  };
+
+  const restoreSupportSurfaceFromUrl = () => {
+    if (!globalThis.URLSearchParams || !globalThis.location) return;
+    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
+    const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
+    if (!["guide", "reference", "export"].includes(view)) return;
+    ensureTransportWorkbenchUiState();
+    if (state.ui?.restoredSupportSurfaceViewFromUrl === view) {
+      return;
+    }
+    ensureProjectSupportSurface();
+    if (view === "guide") {
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+        state.ui.restoredSupportSurfaceViewFromUrl = view;
+        return;
+      }
+      toggleScenarioGuidePopover(utilitiesGuideBtn || scenarioGuideBtn);
+      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      return;
+    }
+    const targetPopover = getDockPopoverByKind(view);
+    if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
+      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      return;
+    }
+    openDockPopover(view);
+    state.ui.restoredSupportSurfaceViewFromUrl = view;
+  };
+  state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;
+
+  const toggleScenarioGuidePopover = (trigger = scenarioGuideBtn) => {
     if (!scenarioGuidePopover) return;
     const willOpen = scenarioGuidePopover.classList.contains("hidden");
     if (!willOpen) {
       closeScenarioGuidePopover({ restoreFocus: true });
-      applyScenarioOverlaySafeLayout();
       return;
     }
-    rememberOverlayTrigger(scenarioGuidePopover, scenarioGuideBtn);
+    closeDockPopover({ restoreFocus: false, syncUrl: false });
+    ensureProjectSupportSurface();
+    rememberOverlayTrigger(scenarioGuidePopover, trigger);
     scenarioGuidePopover.classList.remove("hidden");
     scenarioGuidePopover.setAttribute("aria-hidden", "false");
     scenarioGuideBtn?.classList.add("is-active");
+    utilitiesGuideBtn?.classList.add("is-active");
     scenarioGuideBtn?.setAttribute("aria-expanded", "true");
-    if (scenarioGuideBtn) {
-      scenarioGuideBtn.textContent = "?";
-      scenarioGuideBtn.setAttribute("title", t("Hide guide", "ui"));
-    }
+    utilitiesGuideBtn?.setAttribute("aria-expanded", "true");
+    scenarioGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
+    utilitiesGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
+    syncSupportSurfaceUrlState("guide");
     focusOverlaySurface(scenarioGuidePopover);
-    applyScenarioOverlaySafeLayout();
   };
 
   const getScenarioOverlayLeftInset = () => (
@@ -4537,19 +4528,6 @@ function initToolbar({ render } = {}) {
     );
     scenarioContextBar.classList.remove("is-overlap-avoid");
     scenarioContextBar.style.maxWidth = `${availableWidth}px`;
-    if (scenarioGuidePopover) {
-      const guideWidth = Math.max(
-        SCENARIO_BAR_MIN_WIDTH,
-        Math.min(SCENARIO_GUIDE_MAX_WIDTH, availableWidth)
-      );
-      const contextRect = scenarioContextBar.getBoundingClientRect();
-      const guideTop = Math.max(
-        0,
-        Math.round(contextRect.bottom - overlayRect.top + SCENARIO_GUIDE_VERTICAL_GAP)
-      );
-      scenarioGuidePopover.style.maxWidth = `${guideWidth}px`;
-      scenarioGuidePopover.style.top = `${guideTop}px`;
-    }
   };
 
   const refreshScenarioContextBar = () => {
@@ -4594,12 +4572,16 @@ function initToolbar({ render } = {}) {
     }
     if (scenarioGuideBtn) {
       scenarioGuideBtn.classList.toggle("hidden", !state.ui.tutorialEntryVisible);
-      scenarioGuideBtn.textContent = "?";
+      scenarioGuideBtn.textContent = t("Guide", "ui");
       const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
       scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
     }
+    if (utilitiesGuideBtn) {
+      const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
+      utilitiesGuideBtn.textContent = t("Guide", "ui");
+      utilitiesGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
+    }
     if (scenarioTransportWorkbenchBtn) {
-      scenarioTransportWorkbenchBtn.classList.toggle("hidden", !!state.ui.scenarioBarCollapsed);
       scenarioTransportWorkbenchBtn.textContent = t("Transport", "ui");
       scenarioTransportWorkbenchBtn.setAttribute("title", state.transportWorkbenchUi?.open
         ? t("Close transport workbench", "ui")
@@ -4703,7 +4685,10 @@ function initToolbar({ render } = {}) {
     return null;
   };
 
-  const closeDockPopover = ({ restoreFocus = false } = {}) => {
+  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference", "export"]);
+  const isSupportDockPopoverKind = (kind) => SUPPORT_DOCK_POPOVER_KINDS.has(String(kind || ""));
+
+  const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     const activeKind = String(state.activeDockPopover || "");
     const activePopover = getDockPopoverByKind(activeKind);
     const activeTrigger = getDockPopoverTrigger(activeKind);
@@ -4726,6 +4711,9 @@ function initToolbar({ render } = {}) {
     dockQuickFillBtn?.setAttribute("aria-expanded", "false");
     if (restoreFocus && activePopover) {
       restoreOverlayTriggerFocus(activePopover, activeTrigger);
+    }
+    if (syncUrl && isSupportDockPopoverKind(activeKind)) {
+      syncSupportSurfaceUrlState("");
     }
   };
   state.closeDockPopoverFn = closeDockPopover;
@@ -4802,12 +4790,18 @@ function initToolbar({ render } = {}) {
     const nextKind = state.activeDockPopover === kind ? "" : kind;
     closeDockPopover();
     if (!nextKind) return;
+    if (isSupportDockPopoverKind(nextKind) && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+      closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
+    }
     state.activeDockPopover = nextKind;
     rememberOverlayTrigger(target, trigger);
     target.classList.remove("hidden");
     target.setAttribute("aria-hidden", "false");
     trigger?.classList.add("is-active");
     trigger?.setAttribute("aria-expanded", "true");
+    if (isSupportDockPopoverKind(nextKind)) {
+      syncSupportSurfaceUrlState(nextKind);
+    }
     focusOverlaySurface(target);
   };
 
@@ -4826,7 +4820,7 @@ function initToolbar({ render } = {}) {
       if (!specialZoneEditorInline && specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
         closeSpecialZonePopover();
       }
-      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn");
+      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn, #utilitiesGuideBtn");
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && !insideScenarioGuide) {
         closeScenarioGuidePopover();
       }
@@ -6960,9 +6954,18 @@ function initToolbar({ render } = {}) {
     scenarioGuideBtn.setAttribute("aria-haspopup", "dialog");
     scenarioGuideBtn.setAttribute("aria-controls", "scenarioGuidePopover");
     scenarioGuideBtn.addEventListener("click", () => {
-      toggleScenarioGuidePopover();
+      toggleScenarioGuidePopover(scenarioGuideBtn);
     });
     scenarioGuideBtn.dataset.bound = "true";
+  }
+
+  if (utilitiesGuideBtn && !utilitiesGuideBtn.dataset.bound) {
+    utilitiesGuideBtn.setAttribute("aria-haspopup", "dialog");
+    utilitiesGuideBtn.setAttribute("aria-controls", "scenarioGuidePopover");
+    utilitiesGuideBtn.addEventListener("click", () => {
+      toggleScenarioGuidePopover(utilitiesGuideBtn);
+    });
+    utilitiesGuideBtn.dataset.bound = "true";
   }
 
   if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
@@ -6990,6 +6993,11 @@ function initToolbar({ render } = {}) {
   }
 
   bindDockPopoverDismiss();
+  globalThis.requestAnimationFrame(() => {
+    globalThis.requestAnimationFrame(() => {
+      restoreSupportSurfaceFromUrl();
+    });
+  });
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
@@ -8626,9 +8634,9 @@ function initToolbar({ render } = {}) {
   updateZoomUi();
   updateSwatchUI();
   updateToolUI();
-  closeDockPopover();
+  closeDockPopover({ syncUrl: false });
   closeSpecialZonePopover();
-  closeScenarioGuidePopover();
+  closeScenarioGuidePopover({ syncUrl: false });
   if (dockReferencePopover) {
     dockReferencePopover.setAttribute("aria-hidden", "true");
   }

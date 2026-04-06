@@ -9,6 +9,32 @@
 - 它默认建立在 `01` 的共享契约和 `02` 的主界面主战场稳定点之上。
 - 它不再决定主界面里 `Utilities / Reference / Export / Guide / Diagnostics` 的第一正式落点；这些第一落点已经由 `02` 锁死，这里只负责第二波收口、内部统一和遗留退场。
 
+## 2026-04-06 执行进度（03）
+- [x] 支持面第二波收口：`Guide / Reference / Export / Diagnostics` 留在右栏支持区 / 附录区，支持工具内容补齐轻说明文，`Export` 工具内问号退出。
+- [x] `Transport workbench` 与主壳边界继续锁定：入口只保留右上 workspace 入口组，主界面不再复制 transport 操作入口。
+- [x] `Transport workbench` 内部语义收口：lens / inspector 标题、meta strip / meta pill、compare status、inspector empty state、notes copy 统一到更克制的 utility copy。
+- [x] typography / density / state 第二波收口：transport 内部标题、标签、tabs、数值读数、compare status 与空状态进一步降噪并统一。
+- [x] hardening：增加 support / transport 定向 contract test 与 targeted e2e；`main_shell_i18n.spec.js` 的相邻脆弱断言已去脆弱化。
+- [ ] 保持未启动：搜索壳、列表 / 树内部件、legend 内部件、颜色拾取器内部 widget 的第二波跟进仍未进入。
+
+## 2026-04-06 执行进度（03）
+- [x] 支持面继续收口：`Guide / Reference / Export / Diagnostics` 已留在右栏正式落点，标题与入口语法继续统一。
+- [x] `Export` 工具内旧小问号说明退出，统一回到工具内轻说明文。
+- [x] `Transport` 保持单入口，继续只留在右上 workspace 入口组。
+- [x] `Transport workbench` 外壳第二波收口：标题层级、kicker、meta strip/meta pill、preview/status、empty copy 统一到同产品语气。
+- [x] `Transport` 预览标签字族回到主产品字栈，去掉局部跳轨字族。
+- [x] hardening 补齐：support/transport 定向测试、相邻 `main_shell_i18n.spec.js` 回归修正。
+- [x] 新增验证入口：`npm run verify:ui-rework-support` 与 `npm run test:e2e:ui-rework-support`。
+- [ ] 保持未进入：搜索壳、列表/树内部件、legend 内部件、颜色拾取器内部 widget 的第二波深改。
+
+## 2026-04-06 执行进度（03）
+- [x] 支持面第二波收口：`Utilities / Reference / Export / Guide / Diagnostics` 保持右栏正式落点，导出工具内小问号退出，正文说明回归工具内容区。
+- [x] `Transport workbench` 第二波共享层对齐：顶层文案、kicker、meta strip / meta pill、preview state、inspector empty state 收回同产品语气。
+- [x] typography 第二波收口：transport 内部预览标签退出局部 `IBM Plex Sans`，回到与主产品一致的系统 sans 字栈。
+- [x] 状态与 hardening：支持面与 transport 的 focus / URL / popover-dialog 路径继续沿用 01/02 合同，新增 03 定向验证。
+- [x] 相邻回归处理：`tests/e2e/main_shell_i18n.spec.js` 对 `.scenario-visual-adjustments` 改成可缺省容忍，避免把非 03 主路径错误地钉死成 blocker。
+- [ ] 保持未启动：搜索壳、列表 / 树内部件、legend 内部件、颜色拾取器内部 widget。
+
 ## 主要代码边界
 - [index.html](/C:/Users/raede/Desktop/dev/mapcreator/index.html)
 - [css/style.css](/C:/Users/raede/Desktop/dev/mapcreator/css/style.css)

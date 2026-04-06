@@ -23,6 +23,7 @@ import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
+import { UI_URL_STATE_KEYS } from "./ui_contract.js";
 import { importProjectThroughFunnel } from "../core/interaction_funnel.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
 import {
@@ -3013,6 +3014,66 @@ function initSidebar({ render } = {}) {
   const legendList = document.getElementById("legendEditorList");
   const inspectorSidebarTabButtons = Array.from(document.querySelectorAll("[data-inspector-tab]"));
   const inspectorSidebarTabPanels = Array.from(document.querySelectorAll("[data-inspector-panel]"));
+  const rightSidebarDetails = () => Array.from(document.querySelectorAll("#rightSidebar details[id]"));
+  const replaceUiUrlParams = (mutator) => {
+    if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
+    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
+    mutator?.(params);
+    const nextQuery = params.toString();
+    const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
+    globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
+  };
+  const getScopeParamForTab = (tabId) => (String(tabId || "").trim().toLowerCase() === "project" ? "current-project" : "current-object");
+  const isProjectSupportView = (value) => ["guide", "reference", "export"].includes(String(value || "").trim().toLowerCase());
+  const clearRightSidebarSupportViewParam = () => {
+    replaceUiUrlParams((params) => {
+      params.delete(UI_URL_STATE_KEYS.view);
+    });
+  };
+  const collectOpenRightSidebarSections = () => rightSidebarDetails()
+    .filter((details) => details.open && !details.hidden)
+    .map((details) => details.id)
+    .join(",");
+  const syncRightSidebarUrlState = () => {
+    replaceUiUrlParams((params) => {
+      const scopeValue = getScopeParamForTab(state.ui?.rightSidebarTab || "inspector");
+      params.set(UI_URL_STATE_KEYS.scope, scopeValue);
+      const openSections = collectOpenRightSidebarSections();
+      if (openSections) {
+        params.set(UI_URL_STATE_KEYS.section, openSections);
+      } else {
+        params.delete(UI_URL_STATE_KEYS.section);
+      }
+      if (scopeValue !== "current-project") {
+        params.delete(UI_URL_STATE_KEYS.view);
+      }
+    });
+  };
+  const restoreRightSidebarUrlState = () => {
+    if (!globalThis.URLSearchParams || !globalThis.location) return "";
+    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
+    const scopeValue = String(params.get(UI_URL_STATE_KEYS.scope) || "").trim().toLowerCase();
+    const viewValue = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
+    const requestedSections = new Set(
+      String(params.get(UI_URL_STATE_KEYS.section) || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+    );
+    if (requestedSections.size) {
+      rightSidebarDetails().forEach((details) => {
+        details.open = requestedSections.has(details.id);
+      });
+    }
+    if (isProjectSupportView(viewValue) && scopeValue !== "current-object") {
+      const utilitiesDetails = document.getElementById("inspectorUtilitiesSection");
+      if (utilitiesDetails instanceof HTMLDetailsElement) {
+        utilitiesDetails.open = true;
+      }
+      return "project";
+    }
+    return scopeValue === "current-project" ? "project" : "";
+  };
   const frontlineEnabledStatus = document.getElementById("frontlineEnabledStatus");
   const frontlineStatusHint = document.getElementById("frontlineStatusHint");
   const frontlineEnabledToggle = document.getElementById("frontlineEnabledToggle");
@@ -6807,6 +6868,7 @@ function initSidebar({ render } = {}) {
       setCounterEditorModalState(false, { restoreFocus: false });
       cancelStrategicEditingModes();
       setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+      clearRightSidebarSupportViewParam();
     }
     inspectorSidebarTabButtons.forEach((button) => {
       const id = String(button.dataset.inspectorTab || "").trim().toLowerCase();
@@ -6820,6 +6882,7 @@ function initSidebar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+    syncRightSidebarUrlState();
     scheduleAdaptiveInspectorHeights();
   };
 
@@ -7583,7 +7646,9 @@ function initSidebar({ render } = {}) {
   state.getStrategicOverlayPerfCountersFn = () => ({ ...strategicOverlayPerfCounters });
   state.refreshCountryListRowsFn = refreshCountryRows;
   state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;
-  setRightSidebarTab(state.ui?.rightSidebarTab || "inspector");
+  const requestedSidebarTab = restoreRightSidebarUrlState();
+  setRightSidebarTab(requestedSidebarTab || state.ui?.rightSidebarTab || "inspector");
+  state.restoreSupportSurfaceFromUrlFn?.();
   refreshStrategicOverlayUI();
 
   inspectorSidebarTabButtons.forEach((button) => {
@@ -7592,6 +7657,14 @@ function initSidebar({ render } = {}) {
       setRightSidebarTab(button.dataset.inspectorTab || "inspector");
     });
     button.dataset.bound = "true";
+  });
+
+  rightSidebarDetails().forEach((details) => {
+    if (details.dataset.urlBound === "true") return;
+    details.addEventListener("toggle", () => {
+      syncRightSidebarUrlState();
+    });
+    details.dataset.urlBound = "true";
   });
 
   if (frontlineEnabledToggle && !frontlineEnabledToggle.dataset.bound) {

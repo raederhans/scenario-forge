@@ -1,5 +1,39 @@
 // Translation helpers (Phase 13)
 import { state } from "../core/state.js";
+
+const INLINE_UI_TRANSLATIONS = Object.freeze({
+  Guide: { zh: "\u6307\u5357", en: "Guide" },
+  Reference: { zh: "\u53c2\u8003", en: "Reference" },
+  Export: { zh: "\u5bfc\u51fa", en: "Export" },
+  "Viewport controls": { zh: "\u89c6\u53e3\u63a7\u5236", en: "Viewport controls" },
+  "System status": { zh: "\u7cfb\u7edf\u72b6\u6001", en: "System status" },
+  "Workspace entry": { zh: "\u5de5\u4f5c\u533a\u5165\u53e3", en: "Workspace entry" },
+  "Transport guide": { zh: "Transport \u6307\u5357", en: "Transport guide" },
+  "Scenario Quick Start": { zh: "\u573a\u666f\u5feb\u901f\u5f00\u59cb", en: "Scenario Quick Start" },
+  "Apply Scenario": { zh: "\u5e94\u7528\u573a\u666f", en: "Apply Scenario" },
+  "Select a country in Inspector": { zh: "\u5728 Inspector \u4e2d\u9009\u62e9\u56fd\u5bb6", en: "Select a country in Inspector" },
+  "Use an active owner for political actions": { zh: "\u4f7f\u7528\u5f53\u524d\u6fc0\u6d3b\u5f52\u5c5e\u6267\u884c\u653f\u6cbb\u64cd\u4f5c", en: "Use an active owner for political actions" },
+  "Use Activate or Scenario Actions for ownership changes": { zh: "\u901a\u8fc7 Activate \u6216 Scenario Actions \u4fee\u6539\u5f52\u5c5e", en: "Use Activate or Scenario Actions for ownership changes" },
+  "Reference Image": { zh: "\u53c2\u8003\u56fe\u50cf", en: "Reference Image" },
+  "Use this guide inside the support area so the shell stays quiet while the next step stays readable.": {
+    zh: "\u628a\u8fd9\u4efd\u6307\u5357\u7559\u5728\u652f\u6301\u533a\u91cc\uff0c\u8fd9\u6837\u58f3\u5c42\u80fd\u4fdd\u6301\u5b89\u9759\uff0c\u540c\u65f6\u4e0b\u4e00\u6b65\u4ecd\u7136\u6e05\u695a\u53ef\u8bfb\u3002",
+    en: "Use this guide inside the support area so the shell stays quiet while the next step stays readable.",
+  },
+  "Keep a working reference visible while you line up opacity, scale, and offsets.": {
+    zh: "\u5728\u8c03\u6574\u900f\u660e\u5ea6\u3001\u7f29\u653e\u548c\u504f\u79fb\u65f6\uff0c\u8ba9\u53c2\u8003\u5185\u5bb9\u59cb\u7ec8\u53ef\u89c1\u3002",
+    en: "Keep a working reference visible while you line up opacity, scale, and offsets.",
+  },
+  "Export the visible map as a PNG or JPG snapshot.": {
+    zh: "\u628a\u5f53\u524d\u53ef\u89c1\u5730\u56fe\u5bfc\u51fa\u4e3a PNG \u6216 JPG \u5feb\u7167\u3002",
+    en: "Export the visible map as a PNG or JPG snapshot.",
+  },
+  "Compare baseline": { zh: "\u5bf9\u6bd4\u57fa\u7ebf", en: "Compare baseline" },
+  "Baseline unavailable": { zh: "\u57fa\u7ebf\u4e0d\u53ef\u7528", en: "Baseline unavailable" },
+  "Baseline unavailable for this family": { zh: "\u8fd9\u4e2a family \u6ca1\u6709\u53ef\u7528\u57fa\u7ebf", en: "Baseline unavailable for this family" },
+  "Baseline preview": { zh: "\u57fa\u7ebf\u9884\u89c8\u4e2d", en: "Baseline preview" },
+  "Live working state": { zh: "\u5f53\u524d\u5de5\u4f5c\u72b6\u6001", en: "Live working state" },
+  Labels: { zh: "\u6807\u7b7e", en: "Labels" },
+});
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 
@@ -160,15 +194,35 @@ function t(key, type = "geo") {
   if (!key) return "";
   const entry = type === "geo" ? resolveGeoLocaleEntry(key) : state.locales?.[type]?.[key];
   const lang = state.currentLanguage === "zh" ? "zh" : "en";
-  return entry?.[lang] || entry?.en || key;
+  if (entry?.[lang] || entry?.en) {
+    return entry?.[lang] || entry?.en || key;
+  }
+  if (type !== "geo") {
+    const inlineEntry = INLINE_UI_TRANSLATIONS[key];
+    if (inlineEntry?.[lang] || inlineEntry?.en) {
+      return inlineEntry?.[lang] || inlineEntry?.en || key;
+    }
+  }
+  return key;
 }
 
 function applyDeclarativeTranslationToElement(element) {
   if (!element?.getAttribute) return;
 
+  const applyTextValue = (localizedText) => {
+    const semanticChild = typeof element.querySelector === "function"
+      ? element.querySelector(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title")
+      : null;
+    if (semanticChild instanceof HTMLElement) {
+      semanticChild.textContent = localizedText;
+      return;
+    }
+    element.textContent = localizedText;
+  };
+
   const textKey = String(element.getAttribute("data-i18n") || "").trim();
   if (textKey) {
-    element.textContent = t(textKey, "ui");
+    applyTextValue(t(textKey, "ui"));
   }
 
   const placeholderKey = String(element.getAttribute("data-i18n-placeholder") || "").trim();
@@ -474,11 +528,18 @@ function updateUIText() {
     ["uploadProjectBtn", "Load Project"],
     ["lblProjectFile", "Selected File"],
     ["lblUtilities", "Utilities"],
+    ["utilitiesGuideBtn", "Guide"],
+    ["dockReferenceBtn", "Reference"],
+    ["dockExportBtn", "Export"],
+    ["scenarioGuideSupportHint", "Use this guide inside the support area so the shell stays quiet while the next step stays readable."],
+    ["referenceToolHint", "Keep a working reference visible while you line up opacity, scale, and offsets."],
+    ["exportToolHint", "Export the visible map as a PNG or JPG snapshot."],
+    ["inspectorSidebarTabInspector", "Inspector"],
+    ["inspectorSidebarTabProject", "Project"],
     ["lblReferenceOpacity", "Opacity"],
     ["lblReferenceScale", "Scale"],
     ["lblReferenceOffsetX", "Offset X"],
     ["lblReferenceOffsetY", "Offset Y"],
-    ["lblExportInfoTooltip", "Export the visible map as a PNG or JPG snapshot."],
     ["lblLegendEditor", "Legend Editor"],
     ["lblLegendHint", "Paint regions to generate a legend."],
     ["debugOptionPROD", "Normal View"],
@@ -495,12 +556,34 @@ function updateUIText() {
     ["scenarioGuideStepSelect", "Select a country in Inspector"],
     ["scenarioGuideStepActive", "Use an active owner for political actions"],
     ["scenarioGuideStepApplyActions", "Use Activate or Scenario Actions for ownership changes"],
+    ["transportWorkbenchInfoTitle", "Transport guide"],
   ];
 
   uiMap.forEach(([id, label]) => {
     const el = document.getElementById(id);
     if (el) {
-      el.textContent = t(label, "ui");
+      const localizedText = t(label, "ui");
+      const semanticChild = typeof el.querySelector === "function"
+        ? el.querySelector(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title")
+        : null;
+      if (semanticChild instanceof HTMLElement) {
+        semanticChild.textContent = localizedText;
+      } else {
+        el.textContent = localizedText;
+      }
+    }
+  });
+
+  const uiAttributeMap = [
+    ["zoomUtilityViewportGroup", "aria-label", "Viewport controls"],
+    ["zoomUtilitySystemGroup", "aria-label", "System status"],
+    ["zoomUtilityWorkspaceGroup", "aria-label", "Workspace entry"],
+  ];
+
+  uiAttributeMap.forEach(([id, attributeName, label]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.setAttribute(attributeName, t(label, "ui"));
     }
   });
 
@@ -645,6 +728,9 @@ function updateUIText() {
   }
   if (typeof state.updateWorkspaceStatusFn === "function") {
     state.updateWorkspaceStatusFn();
+  }
+  if (typeof state.refreshTransportWorkbenchUiFn === "function") {
+    state.refreshTransportWorkbenchUiFn();
   }
   if (typeof state.updatePaletteLibraryUIFn === "function") {
     state.updatePaletteLibraryUIFn();

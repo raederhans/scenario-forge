@@ -306,7 +306,7 @@ function createLabelNode(feature, style, onSelect) {
   label.setAttribute("fill", style.labelColor);
   label.setAttribute("font-size", "10.1");
   label.setAttribute("font-weight", "620");
-  label.setAttribute("font-family", "IBM Plex Sans, Inter, system-ui, sans-serif");
+  label.setAttribute("font-family", "\"Segoe UI Variable\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei UI\", \"Noto Sans SC\", sans-serif");
   label.setAttribute("text-anchor", "middle");
   label.setAttribute("paint-order", "stroke");
   label.setAttribute("stroke", style.labelHalo);
@@ -332,7 +332,7 @@ function createAggregateLabelNode(aggregateEntry, style, onSelect) {
   label.setAttribute("fill", style.labelColor);
   label.setAttribute("font-size", String(style.labelSize || 10.2));
   label.setAttribute("font-weight", String(style.labelWeight || 700));
-  label.setAttribute("font-family", "IBM Plex Sans, Inter, system-ui, sans-serif");
+  label.setAttribute("font-family", "\"Segoe UI Variable\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei UI\", \"Noto Sans SC\", sans-serif");
   label.setAttribute("text-anchor", "middle");
   label.setAttribute("paint-order", "stroke");
   label.setAttribute("stroke", style.labelHalo);
