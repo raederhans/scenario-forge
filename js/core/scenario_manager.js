@@ -1265,7 +1265,7 @@ async function prepareScenarioApplyState(
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
   const scenarioNameMap = startupApplySeed?.scenario_name_map && typeof startupApplySeed.scenario_name_map === "object"
-    ? { ...startupApplySeed.scenario_name_map }
+    ? { ...getScenarioNameMap(countryMap), ...startupApplySeed.scenario_name_map }
     : getScenarioNameMap(countryMap);
   const missingScenarioNameTags = getMissingScenarioNameTags(countryMap, scenarioNameMap);
   if (missingScenarioNameTags.length) {
