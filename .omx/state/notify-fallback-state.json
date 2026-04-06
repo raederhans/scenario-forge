@@ -1,0 +1,65 @@
+{
+  "pid": 38200,
+  "parent_pid": 69288,
+  "started_at": "2026-04-05T23:48:51.008Z",
+  "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
+  "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
+  "authority_only": false,
+  "poll_ms": 250,
+  "pid_file": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\.omx\\state\\notify-fallback.pid",
+  "max_lifetime_ms": 21600000,
+  "tracked_files": 1,
+  "seen_turns": 0,
+  "dispatch_drain": {
+    "enabled": true,
+    "max_per_tick": 5,
+    "run_count": 4429,
+    "leader_only": true,
+    "last_tick_at": "2026-04-06T00:08:25.691Z",
+    "last_result": {
+      "processed": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    "last_error": null
+  },
+  "leader_nudge": {
+    "enabled": true,
+    "leader_only": true,
+    "stale_threshold_ms": 180000,
+    "precomputed_leader_stale": true,
+    "last_tick_at": "2026-04-06T00:08:25.692Z",
+    "last_error": null,
+    "run_count": 4429
+  },
+  "ralph_continue_steer": {
+    "enabled": true,
+    "cadence_ms": 60000,
+    "message": "Ralph loop active continue",
+    "active": false,
+    "last_state_check_at": "2026-04-06T00:08:25.696Z",
+    "last_sent_at": "",
+    "cooldown_anchor_at": "",
+    "last_reason": "blocked_by_current_session",
+    "last_error": null,
+    "state_path": "",
+    "pane_id": "",
+    "pane_current_command": "",
+    "current_phase": "",
+    "shared_timestamp_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\.omx\\state\\ralph-last-steer-at",
+    "shared_last_sent_at": "",
+    "singleton_lock_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\.omx\\state\\ralph-continue-steer.lock"
+  },
+  "fallback_auto_nudge": {
+    "enabled": true,
+    "stall_ms": 5000,
+    "last_tick_at": "2026-04-06T00:08:25.696Z",
+    "last_turn_at": "2026-04-05T23:48:50.923Z",
+    "last_turn_count": 0,
+    "last_message": "",
+    "last_reason": "hud_state_incomplete",
+    "last_error": null,
+    "last_nudged_signature": "",
+    "last_nudged_at": ""
+  }
+}
