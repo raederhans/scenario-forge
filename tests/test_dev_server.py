@@ -1965,13 +1965,13 @@ class DevServerTest(unittest.TestCase):
                 except Exception as exc:
                     results["second_error"] = exc
 
-            with mock.patch.object(dev_server, "write_json_atomic", side_effect=gated_write_json_atomic):
+            with mock.patch.object(scenario_context, "write_json_atomic", side_effect=gated_write_json_atomic):
                 first_thread = threading.Thread(target=run_first, name="first-save", daemon=True)
                 second_thread = threading.Thread(target=run_second, name="second-save", daemon=True)
                 first_thread.start()
                 self.assertTrue(first_write_started.wait(timeout=1.0))
                 second_thread.start()
-                time.sleep(0.15)
+                time.sleep(0.35)
                 self.assertFalse(
                     second_reached_write.is_set(),
                     "Second overlapping ownership save should stay blocked until the first transaction commits.",

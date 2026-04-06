@@ -69,7 +69,7 @@ from map_builder.scenario_service_errors import ScenarioServiceError as DevServe
 
 # Define the range of ports to try
 PORT_START = 8000
-PORT_END = 8010
+PORT_END = 8030
 BIND_ADDRESS = "127.0.0.1"
 RUNTIME_ACTIVE_SERVER_PATH = Path(".runtime") / "dev" / "active_server.json"
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
