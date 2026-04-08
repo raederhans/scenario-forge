@@ -2240,6 +2240,9 @@ async function enforceScenarioHydrationHealthGate({
     }
   }
   if (report.healthy && waterConsistency.healthy) {
+    if (attemptedRetry && renderNow) {
+      flushRenderBoundary("scenario-health-gate-retry-recovered");
+    }
     state.scenarioHydrationHealthGate = {
       status: "ok",
       reason: attemptedRetry ? "retry-recovered" : "ok",
