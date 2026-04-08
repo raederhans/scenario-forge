@@ -2027,9 +2027,26 @@ function hydrateActiveScenarioBundle(
     state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
   state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
-  state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(
-    mergedPoliticalPayload !== undefined ? mergedPoliticalPayload : state.scenarioPoliticalChunkData
+  const nextScenarioPoliticalPayload = normalizeScenarioFeatureCollection(
+    mergedPoliticalPayload !== undefined
+      ? mergedPoliticalPayload
+      : (
+        getScenarioDecodedCollection(bundle, "politicalData")
+        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political")
+        || state.scenarioPoliticalChunkData
+      )
   ) || null;
+  const promotedScenarioPolitical = applyScenarioPoliticalChunkPayload(
+    bundle,
+    nextScenarioPoliticalPayload,
+    {
+      renderNow: false,
+      reason: "scenario-hydrate-political",
+    }
+  );
+  if (!promotedScenarioPolitical) {
+    state.scenarioPoliticalChunkData = nextScenarioPoliticalPayload;
+  }
   if (bundle.districtGroupsPayload) {
     state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
     state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
@@ -2063,6 +2080,9 @@ function hydrateActiveScenarioBundle(
   if (scenarioOverlayChanged) {
     invalidateOceanWaterInteractionVisualState("scenario-hydrate-water");
     refreshColorState({ renderNow: false });
+  }
+  if (promotedScenarioPolitical && renderNow) {
+    flushRenderBoundary("scenario-hydrate-political");
   }
   syncScenarioUi();
   syncCountryUi({ renderNow });
