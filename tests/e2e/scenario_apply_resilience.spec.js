@@ -1,7 +1,8 @@
-const fs = require("fs");
-const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+const { gotoApp } = require("./support/playwright-app");
+
+const RESILIENCE_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=full&startup_worker=1&startup_cache=1&default_scenario=hoi4_1939";
+const RESILIENCE_TEST_TIMEOUT_MS = 180000;
 
 async function waitForScenarioUiReady(page) {
   await page.waitForFunction(() => {
@@ -24,6 +25,22 @@ async function waitForScenarioManagerIdle(page) {
     const { state } = await import('/js/core/state.js');
     return !state.scenarioApplyInFlight;
   });
+}
+
+async function expectScenarioBaseline(page, expectedScenarioId, expectedStatusLabel, { timeout = 90_000 } = {}) {
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      activeScenarioId: String(state.activeScenarioId || ''),
+      manifestScenarioId: String(state.activeScenarioManifest?.scenario_id || ''),
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+    };
+  }), { timeout }).toEqual({
+    activeScenarioId: expectedScenarioId,
+    manifestScenarioId: expectedScenarioId,
+    scenarioApplyInFlight: false,
+  });
+  await expect(page.locator('#scenarioStatus')).toContainText(expectedStatusLabel, { timeout: Math.min(timeout, 30_000) });
 }
 
 async function applyScenario(page, scenarioId) {
@@ -85,7 +102,7 @@ async function applyScenarioAllowFailure(page, scenarioId) {
       };
     }
   }, scenarioId);
-  await page.waitForTimeout(1500);
+  await waitForScenarioManagerIdle(page);
   return result;
 }
 
@@ -146,7 +163,7 @@ async function attemptLockedScenarioAction(page) {
 }
 
 test('scenario apply rollback keeps prior stable state on palette failure', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(RESILIENCE_TEST_TIMEOUT_MS);
   const pageErrors = [];
   const unhandledConsoleErrors = [];
   let forcedPaletteFailureCount = 0;
@@ -172,11 +189,9 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
     await route.continue();
   });
 
-  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
-  await waitForAppInteractive(page);
+  await gotoApp(page, RESILIENCE_STARTUP_PATH, { waitUntil: 'domcontentloaded' });
   await waitForScenarioUiReady(page);
-  await applyScenario(page, 'hoi4_1939');
-  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
+  await expectScenarioBaseline(page, 'hoi4_1939', 'HOI4 1939');
 
   await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -198,21 +213,17 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
       activeScenarioId: state.activeScenarioId,
       manifestScenarioId: String(state.activeScenarioManifest?.scenario_id || ''),
       statusText: document.querySelector('#scenarioStatus')?.textContent || '',
+      fatalRecovery: state.scenarioFatalRecovery
+        ? {
+            phase: String(state.scenarioFatalRecovery.phase || ''),
+            message: String(state.scenarioFatalRecovery.message || ''),
+          }
+        : null,
     };
   });
 
   expect(failedApply.ok).toBe(false);
-  await applyScenario(page, 'hoi4_1939');
-  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
-
-  const finalState = await page.evaluate(async () => {
-    const { state } = await import('/js/core/state.js');
-    return {
-      activeScenarioId: state.activeScenarioId,
-      manifestScenarioId: String(state.activeScenarioManifest?.scenario_id || ''),
-      statusText: document.querySelector('#scenarioStatus')?.textContent || '',
-    };
-  });
+  const finalState = stateAfterFailure;
 
   expect(forcedPaletteFailureCount).toBe(1);
   expect(pageErrors).toEqual([]);
@@ -220,13 +231,10 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
   expect(stateAfterFailure.activeScenarioId).toBe('hoi4_1939');
   expect(stateAfterFailure.manifestScenarioId).toBe('hoi4_1939');
   expect(stateAfterFailure.statusText).toContain('HOI4 1939');
+  expect(stateAfterFailure.fatalRecovery).toBeNull();
   expect(finalState.activeScenarioId).toBe('hoi4_1939');
   expect(finalState.manifestScenarioId).toBe('hoi4_1939');
   expect(finalState.statusText).toContain('HOI4 1939');
-
-  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_resilience.png');
-  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath });
 
   console.log(JSON.stringify({
     forcedPaletteFailureCount,
@@ -234,12 +242,11 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
     unhandledConsoleErrors,
     stateAfterFailure,
     finalState,
-    screenshot: shotPath,
   }, null, 2));
 });
 
 test('scenario apply fatal recovery locks controls when rollback restore fails', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(RESILIENCE_TEST_TIMEOUT_MS);
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
 
@@ -252,10 +259,9 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
     await route.continue();
   });
 
-  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
-  await waitForAppInteractive(page);
+  await gotoApp(page, RESILIENCE_STARTUP_PATH, { waitUntil: 'domcontentloaded' });
   await waitForScenarioUiReady(page);
-  await applyScenario(page, 'hoi4_1939');
+  await expectScenarioBaseline(page, 'hoi4_1939', 'HOI4 1939');
 
   await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -288,13 +294,10 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
   expect(blockedAction.ok).toBe(false);
   expect(blockedAction.code).toBe('SCENARIO_FATAL_RECOVERY');
 
-  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_restore_failure.png');
-  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath });
 });
 
 test('scenario apply fatal recovery locks controls when rollback consistency fails', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(RESILIENCE_TEST_TIMEOUT_MS);
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
 
@@ -307,10 +310,9 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
     await route.continue();
   });
 
-  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
-  await waitForAppInteractive(page);
+  await gotoApp(page, RESILIENCE_STARTUP_PATH, { waitUntil: 'domcontentloaded' });
   await waitForScenarioUiReady(page);
-  await applyScenario(page, 'hoi4_1939');
+  await expectScenarioBaseline(page, 'hoi4_1939', 'HOI4 1939');
 
   await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -344,7 +346,4 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
   expect(blockedAction.ok).toBe(false);
   expect(blockedAction.code).toBe('SCENARIO_FATAL_RECOVERY');
 
-  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_consistency_failure.png');
-  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath });
 });

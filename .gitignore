@@ -39,7 +39,8 @@ data/geoBoundaries-*.geojson
 skills-lock.json
 .tmp_*.js
 .tmp/
-.omx
+.omx/
+.claude/
 
 # Local scratch workspaces and evidence dumps
 /historic geographic overhaul/

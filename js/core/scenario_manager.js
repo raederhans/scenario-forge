@@ -82,6 +82,7 @@ import {
   releaseScenarioAuditPayload,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
+  scenarioSupportsChunkedRuntime,
   scenarioBundleUsesChunkedLayer,
   validateImportedScenarioBaseline,
 } from "./scenario_resources.js";
@@ -1446,8 +1447,8 @@ async function applyScenarioBundle(
     applyScenarioPaintMode();
     syncScenarioOceanFillForActivation(bundle.manifest);
     applyScenarioPerformanceHints(bundle.manifest);
-    state.scheduleScenarioChunkRefreshFn = scenarioBundleUsesChunkedLayer(bundle) ? scheduleScenarioChunkRefresh : null;
-    if (scenarioBundleUsesChunkedLayer(bundle)) {
+    state.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;
+    if (scenarioSupportsChunkedRuntime(bundle)) {
       resetScenarioChunkRuntimeState({ scenarioId: staged.scenarioId });
       const chunkIds = Object.keys(bundle.chunkPayloadCacheById || {});
       if (chunkIds.length) {
@@ -1455,7 +1456,7 @@ async function applyScenarioBundle(
         state.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
         state.activeScenarioChunks.lruChunkIds = [...chunkIds];
       }
-      ensureRuntimeChunkLoadState().shellStatus = "ready";
+      ensureRuntimeChunkLoadState().shellStatus = chunkIds.length ? "ready" : "idle";
       ensureRuntimeChunkLoadState().registryStatus = scenarioBundleHasChunkedData(bundle) ? "ready" : "idle";
     } else {
       resetScenarioChunkRuntimeState();

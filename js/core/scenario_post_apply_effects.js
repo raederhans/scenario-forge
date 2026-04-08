@@ -11,6 +11,7 @@ import {
   preloadScenarioCoarseChunks,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
+  scenarioSupportsChunkedRuntime,
   scenarioBundleUsesChunkedLayer,
 } from "./scenario_resources.js";
 import { refreshScenarioShellOverlays } from "./scenario_shell_overlay.js";
@@ -53,7 +54,7 @@ async function ensureChunkedScenarioFirstFrameReady({
   bundle,
   scenarioId = "",
 } = {}) {
-  if (!scenarioBundleUsesChunkedLayer(bundle)) return;
+  if (!scenarioSupportsChunkedRuntime(bundle)) return;
   try {
     await preloadScenarioCoarseChunks(bundle);
   } catch (error) {
@@ -83,9 +84,9 @@ async function runPostScenarioApplyEffects({
   }
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
-  if (scenarioBundleUsesChunkedLayer(bundle)) {
+  if (scenarioSupportsChunkedRuntime(bundle)) {
     await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
-  } else {
+  } else if (!state.bootBlocking) {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {
         console.warn(`[scenario] Optional layer visibility sync failed for "${scenarioId}".`, error);

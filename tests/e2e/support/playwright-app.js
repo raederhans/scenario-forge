@@ -47,14 +47,53 @@ async function gotoApp(page, targetPath = "/", options = {}) {
   return page.goto(getAppUrl(targetPath), options);
 }
 
+async function readBootStateSnapshot(page) {
+  try {
+    return await page.evaluate(async () => {
+      const overlay = document.querySelector("#bootOverlay");
+      const scenarioStatus = document.querySelector("#scenarioStatus");
+      const stateModule = await import("/js/core/state.js");
+      const state = stateModule?.state || {};
+      return {
+        bootPhase: String(state.bootPhase || ""),
+        bootBlocking: !!state.bootBlocking,
+        startupReadonly: !!state.startupReadonly,
+        startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+        detailDeferred: !!state.detailDeferred,
+        detailPromotionInFlight: !!state.detailPromotionInFlight,
+        scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+        activeScenarioId: String(state.activeScenarioId || ""),
+        overlayHidden: !!overlay?.classList?.contains("hidden"),
+        overlayAriaBusy: String(overlay?.getAttribute("aria-busy") || ""),
+        bootError: String(state.bootError || ""),
+        scenarioStatus: String(scenarioStatus?.textContent || ""),
+      };
+    });
+  } catch (error) {
+    return {
+      snapshotError: String(error?.message || error),
+    };
+  }
+}
+
 async function waitForAppInteractive(page, { timeout = 90_000 } = {}) {
-  await page.waitForFunction(() => {
-    const overlay = document.querySelector("#bootOverlay");
-    if (!overlay) {
-      return true;
-    }
-    return overlay.classList.contains("hidden") && overlay.getAttribute("aria-busy") === "false";
-  }, { timeout });
+  try {
+    await page.waitForFunction(() => {
+      const overlay = document.querySelector("#bootOverlay");
+      if (!overlay) {
+        return true;
+      }
+      return overlay.classList.contains("hidden") && overlay.getAttribute("aria-busy") === "false";
+    }, { timeout });
+  } catch (error) {
+    const snapshot = await readBootStateSnapshot(page);
+    const detail = JSON.stringify(snapshot);
+    const wrapped = new Error(
+      `[playwright-app] waitForAppInteractive timed out after ${timeout}ms. Boot snapshot: ${detail}`
+    );
+    wrapped.cause = error;
+    throw wrapped;
+  }
 }
 
 function getWebServerConfig() {

@@ -2237,8 +2237,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".mjs",
         ".css",
         ".json",
+        ".json.gz",
         ".geojson",
+        ".geojson.gz",
         ".topo.json",
+        ".topo.json.gz",
         ".svg",
         ".png",
         ".jpg",
@@ -2255,9 +2258,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _cache_mode(self) -> str:
         raw = os.environ.get("MAPCREATOR_DEV_CACHE_MODE", "").strip().lower()
-        if raw == "revalidate-static":
-            return "revalidate-static"
-        return "nostore"
+        return "nostore" if raw == "nostore" else "revalidate-static"
+
+    def _resolve_static_path(self) -> Path:
+        return Path(self.translate_path(self.path))
 
     def _resolve_cache_headers(self) -> dict[str, str]:
         route = urlparse(self.path or "").path
@@ -2267,12 +2271,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 "Pragma": "no-cache",
                 "Expires": "0",
             }
+        filesystem_path = self._resolve_static_path()
+        if route == "/" or filesystem_path.suffix.lower() == ".html" or not filesystem_path.is_file():
+            return {
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            }
         if self._cache_mode() == "revalidate-static":
-            filesystem_path = Path(self.translate_path(self.path))
-            suffix = "".join(filesystem_path.suffixes[-2:]).lower() or filesystem_path.suffix.lower()
-            if filesystem_path.is_file() and (
-                filesystem_path.suffix.lower() in self.STATIC_REVALIDATE_SUFFIXES
-                or suffix in self.STATIC_REVALIDATE_SUFFIXES
+            name = filesystem_path.name.lower()
+            if filesystem_path.is_file() and any(
+                name.endswith(suffix) for suffix in self.STATIC_REVALIDATE_SUFFIXES
             ):
                 return {
                     "Cache-Control": "no-cache, must-revalidate",
@@ -2306,7 +2315,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         route = urlparse(self.path or "").path
         if route.startswith("/__dev/"):
             return None
-        filesystem_path = Path(self.translate_path(self.path))
+        filesystem_path = self._resolve_static_path()
         if not filesystem_path.is_file():
             return None
         name = filesystem_path.name.lower()
@@ -2320,7 +2329,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         target_path = self._resolve_static_gzip_target()
         if not target_path:
             return False
-        compressed_body = gzip.compress(target_path.read_bytes())
+        gzip_path = target_path.with_name(f"{target_path.name}.gz")
+        if not gzip_path.is_file():
+            return False
+        compressed_body = gzip_path.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", self.guess_type(str(target_path)))
         self.send_header("Content-Encoding", "gzip")

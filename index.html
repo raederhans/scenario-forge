@@ -19,7 +19,16 @@
     <link rel="modulepreload" href="js/main.js" />
     <script>
       (() => {
-        const defaultScenario = document
+        let queryOverride = "";
+        try {
+          const params = typeof URLSearchParams === "function"
+            ? new URLSearchParams(globalThis.location?.search || "")
+            : null;
+          queryOverride = String(params?.get("default_scenario") || "").trim();
+        } catch (_error) {
+          queryOverride = "";
+        }
+        const defaultScenario = queryOverride || document
           .querySelector('meta[name="default-scenario"]')
           ?.getAttribute("content");
         const scenarioId = String(defaultScenario || "").trim();

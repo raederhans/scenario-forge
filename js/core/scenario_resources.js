@@ -1613,27 +1613,13 @@ function prewarmScenarioOptionalLayersOnCacheHit(
     hints = normalizeScenarioPerformanceHints(manifest),
   } = {}
 ) {
-  if (!bundle || !manifest) return;
-  bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
-    ? bundle.optionalLayerPromises
-    : {};
-  bundle.optionalLayerSettledByKey = bundle.optionalLayerSettledByKey
-    && typeof bundle.optionalLayerSettledByKey === "object"
-    ? bundle.optionalLayerSettledByKey
-    : {};
-  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-    .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints))
-    .forEach((layerKey) => {
-      if (bundle.optionalLayerSettledByKey[layerKey] === true || bundle.optionalLayerPromises[layerKey]) {
-        return;
-      }
-      loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }).catch((error) => {
-        console.warn(
-          `[scenario] Failed to prewarm optional layer "${layerKey}" for "${getScenarioBundleId(bundle)}".`,
-          error
-        );
-      });
-    });
+  // Keep cache-hit hydration lean. Optional layers now load on demand through
+  // visibility and panel-driven paths instead of auto-prewarming here.
+  void d3Client;
+  void manifest;
+  void runtimeTopologyPayload;
+  void hints;
+  void bundle;
 }
 
 async function ensureActiveScenarioOptionalLayerLoaded(
@@ -1841,8 +1827,15 @@ function createStartupScenarioBundleFromPayload({
       || manifestSubset.baseline_hash
       || ""
     ).trim(),
+    startup_bootstrap_strategy: String(
+      manifestSubset.startup_bootstrap_strategy
+      || payload?.scenario?.bootstrap_strategy
+      || ""
+    ).trim(),
   };
   const geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(payload?.scenario?.geo_locale_patch);
+  const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(payload?.scenario?.runtime_topology_bootstrap);
+  const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   const bundle = {
     meta: {
       scenario_id: normalizedScenarioId,
@@ -1850,6 +1843,7 @@ function createStartupScenarioBundleFromPayload({
       manifest_url: "",
     },
     manifest,
+    bootstrapStrategy,
     bundleLevel: "bootstrap",
     runtimeShell: normalizeScenarioRuntimeShell(manifest),
     chunkRegistry: null,
@@ -1869,9 +1863,9 @@ function createStartupScenarioBundleFromPayload({
     cityOverridesPayload: null,
     geoLocalePatchPayload,
     geoLocalePatchPayloadsByLanguage: geoLocalePatchPayload ? { [language === "zh" ? "zh" : "en"]: geoLocalePatchPayload } : {},
-    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(payload?.scenario?.runtime_topology_bootstrap),
-    runtimePoliticalMeta: runtimePoliticalMeta || null,
-    runtimeDecodedCollections: runtimeDecodedCollections || null,
+    runtimeTopologyPayload,
+    runtimePoliticalMeta: runtimeTopologyPayload ? (runtimePoliticalMeta || null) : null,
+    runtimeDecodedCollections: runtimeTopologyPayload ? (runtimeDecodedCollections || null) : null,
     releasableCatalog: null,
     districtGroupsPayload: null,
     auditPayload: null,
@@ -1883,8 +1877,8 @@ function createStartupScenarioBundleFromPayload({
     loadDiagnostics: loadDiagnostics || {
       optionalResources: {
         runtime_topology: {
-          ok: true,
-          reason: "startup-bundle",
+          ok: !!runtimeTopologyPayload,
+          reason: runtimeTopologyPayload ? "startup-bundle" : (bootstrapStrategy || "deferred"),
           errorMessage: "",
           metrics: payload?.metrics?.runtimeTopology || null,
           url: "",
@@ -2448,32 +2442,6 @@ async function loadScenarioBundle(
   if (requestedBundleLevel === "full") {
     if (scenarioSupportsChunkedRuntime(bundle)) {
       await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
-      if (scenarioBundleHasChunkedData(bundle)) {
-        const eagerFallbackLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-          .filter((layerKey) => !scenarioBundleUsesChunkedLayer(bundle, layerKey))
-          .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-        if (eagerFallbackLayers.length) {
-          await Promise.all(
-            eagerFallbackLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-          );
-        }
-      } else {
-        const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-          .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-        if (eagerOptionalLayers.length) {
-          await Promise.all(
-            eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-          );
-        }
-      }
-    } else {
-      const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-        .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-      if (eagerOptionalLayers.length) {
-        await Promise.all(
-          eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-        );
-      }
     }
   }
   const ownerCount = Object.keys(bundle.ownersPayload?.owners || {}).length;
@@ -2696,6 +2664,7 @@ export {
   preloadScenarioCoarseChunks,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
+  scenarioSupportsChunkedRuntime,
   scenarioBundleUsesChunkedLayer,
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,

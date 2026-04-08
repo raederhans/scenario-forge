@@ -353,6 +353,17 @@ function getConfiguredDefaultScenarioId() {
   if (typeof document === "undefined") {
     return "";
   }
+  try {
+    const params = typeof globalThis.URLSearchParams === "function"
+      ? new globalThis.URLSearchParams(globalThis.location?.search || "")
+      : null;
+    const queryOverride = String(params?.get("default_scenario") || "").trim();
+    if (queryOverride) {
+      return queryOverride;
+    }
+  } catch (_error) {
+    // Ignore malformed location/search state and fall back to the static default.
+  }
   const configured = document
     .querySelector('meta[name="default-scenario"]')
     ?.getAttribute("content");
@@ -386,11 +397,13 @@ function createStartupBundleLoadDiagnostics({
   language = "en",
   metrics = null,
 } = {}) {
+  const runtimeTopologyAvailable = Number(metrics?.runtimeTopology?.featureCount || 0) > 0;
+  const bootstrapStrategy = String(metrics?.startupBundle?.bootstrapStrategy || "").trim();
   return {
     optionalResources: {
       runtime_topology: {
-        ok: true,
-        reason: "startup-bundle",
+        ok: runtimeTopologyAvailable,
+        reason: runtimeTopologyAvailable ? "startup-bundle" : (bootstrapStrategy || "deferred"),
         errorMessage: "",
         metrics: metrics?.runtimeTopology || null,
         url: startupBundleUrl,
@@ -1067,12 +1080,24 @@ function schedulePostReadyHydration() {
     return;
   }
   postReadyHydrationScheduled = true;
-  globalThis.setTimeout(() => {
-    void Promise.allSettled([
-      ensureFullLocalizationDataReady({ reason: "post-ready", renderNow: true }),
-      ensureActiveScenarioBundleHydrated({ reason: "post-ready", renderNow: true }),
-    ]);
-  }, 180);
+  scheduleIdleTask(() => (
+    ensureFullLocalizationDataReady({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
+      console.warn("[boot] Deferred full localization hydration failed during idle scheduling.", error);
+      return null;
+    })
+  ), {
+    timeout: 2200,
+    delayMs: 1200,
+  });
+  scheduleIdleTask(() => (
+    ensureActiveScenarioBundleHydrated({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
+      console.warn("[boot] Deferred full scenario hydration failed during idle scheduling.", error);
+      return null;
+    })
+  ), {
+    timeout: 4800,
+    delayMs: 4200,
+  });
 }
 
 function expandDeferredContextLayerNames(requestedLayerNames) {
@@ -1460,7 +1485,10 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
       canContinueWithoutScenario: false,
     });
     startBootMetric("interaction-infra");
-    await buildInteractionInfrastructureAfterStartup({ chunked: true });
+    await buildInteractionInfrastructureAfterStartup({
+      chunked: true,
+      buildHitCanvas: false,
+    });
     finishBootMetric("interaction-infra", {
       activeScenarioId,
     });
@@ -1553,13 +1581,48 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
   }
 }
 
-function finalizeReadyState(renderDispatcher) {
+async function finalizeReadyState(renderDispatcher) {
   const shouldEnterStartupReadonly = (
     !!String(state.activeScenarioId || "").trim()
     && state.startupInteractionMode === "readonly"
     && state.detailDeferred
     && !hasDetailTopologyLoaded()
   );
+  const startupBootstrapStrategy = String(
+    state.activeScenarioManifest?.startup_bootstrap_strategy || ""
+  ).trim();
+  const shouldUseChunkedCoarseStartup =
+    shouldEnterStartupReadonly
+    && startupBootstrapStrategy === "chunked-coarse-first";
+  if (shouldUseChunkedCoarseStartup) {
+    setBootState("interaction-infra", {
+      blocking: true,
+      progress: Math.max(Number(state.bootProgress) || 0, BOOT_PHASE_WINDOWS["detail-promotion"].min),
+      canContinueWithoutScenario: false,
+    });
+    startBootMetric("interaction-infra");
+    await buildInteractionInfrastructureAfterStartup({
+      chunked: true,
+      buildHitCanvas: false,
+    });
+    finishBootMetric("interaction-infra", {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      startupBootstrapStrategy,
+    });
+    setBootState("ready", {
+      blocking: false,
+      progress: 100,
+      canContinueWithoutScenario: false,
+    });
+    checkpointBootMetric("time-to-interactive");
+    checkpointBootMetric("first-interactive");
+    completeBootSequenceLogging();
+    scheduleDeferredDetailPromotion(renderDispatcher);
+    schedulePostReadyHydration();
+    schedulePostReadyDeferredContextWarmup();
+    schedulePostReadyVisualWarmup();
+    return;
+  }
   if (shouldEnterStartupReadonly) {
     setStartupReadonlyState(true, {
       reason: "detail-promotion",
@@ -1995,7 +2058,7 @@ async function bootstrap() {
     setBootState("warmup");
     renderDispatcher.flush();
     checkpointBootMetricOnce("first-visible-scenario");
-    finalizeReadyState(renderDispatcher);
+    await finalizeReadyState(renderDispatcher);
   } catch (error) {
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);
@@ -2018,7 +2081,7 @@ async function bootstrap() {
         renderDispatcher.flush();
         checkpointBootMetricOnce("first-visible");
         checkpointBootMetricOnce("first-visible-base");
-        finalizeReadyState(renderDispatcher);
+        await finalizeReadyState(renderDispatcher);
       }
       : null;
     setBootState("error", {

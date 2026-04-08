@@ -341,11 +341,9 @@ async function handleLoadStartupBundle(message) {
   }
   const topologyPrimary = payload.base?.topology_primary || null;
   const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   if (!topologyPrimary?.objects?.political) {
     throw new Error("[startup_worker] Startup bundle is missing base topology.");
-  }
-  if (!runtimeTopology?.objects?.political) {
-    throw new Error("[startup_worker] Startup bundle is missing runtime bootstrap topology.");
   }
   const baseDecodeStartedAt = nowMs();
   const baseDecodedCollections = {
@@ -359,19 +357,25 @@ async function handleLoadStartupBundle(message) {
     physicalData: decodeTopologyObject(topologyPrimary, "physical"),
   };
   const baseDecodeCompletedAt = nowMs();
-  const runtimeDecodeStartedAt = nowMs();
-  const runtimeDecodedCollections = {
-    politicalData: decodeTopologyObject(runtimeTopology, "political"),
-    scenarioLandMaskData:
-      decodeTopologyObject(runtimeTopology, "land_mask")
-      || decodeTopologyObject(runtimeTopology, "land"),
-    scenarioContextLandMaskData: decodeTopologyObject(runtimeTopology, "context_land_mask"),
-    scenarioWaterRegionsData: decodeTopologyObject(runtimeTopology, "scenario_water"),
-    scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopology, "scenario_special_land"),
-  };
-  const runtimeDecodeCompletedAt = nowMs();
-  const runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopology);
-  const metaCompletedAt = nowMs();
+  let runtimeDecodedCollections = null;
+  let runtimePoliticalMeta = null;
+  let runtimeDecodeCompletedAt = baseDecodeCompletedAt;
+  let metaCompletedAt = runtimeDecodeCompletedAt;
+  if (runtimeTopology?.objects?.political) {
+    const runtimeDecodeStartedAt = nowMs();
+    runtimeDecodedCollections = {
+      politicalData: decodeTopologyObject(runtimeTopology, "political"),
+      scenarioLandMaskData:
+        decodeTopologyObject(runtimeTopology, "land_mask")
+        || decodeTopologyObject(runtimeTopology, "land"),
+      scenarioContextLandMaskData: decodeTopologyObject(runtimeTopology, "context_land_mask"),
+      scenarioWaterRegionsData: decodeTopologyObject(runtimeTopology, "scenario_water"),
+      scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopology, "scenario_special_land"),
+    };
+    runtimeDecodeCompletedAt = nowMs();
+    runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopology);
+    metaCompletedAt = nowMs();
+  }
   postWorkerMessage(MESSAGE_TYPES.STARTUP_BUNDLE_READY, {
     taskId,
     payload,
@@ -384,21 +388,34 @@ async function handleLoadStartupBundle(message) {
         ...(startupBundleResult.metrics || {}),
         scenarioId,
         language,
+        bootstrapStrategy,
       },
       topologyPrimary: {
         featureCount: getPoliticalGeometryCount(topologyPrimary),
         decodeMs: baseDecodeCompletedAt - baseDecodeStartedAt,
       },
-      runtimeTopology: {
-        featureCount: getPoliticalGeometryCount(runtimeTopology),
-        decodeMs: runtimeDecodeCompletedAt - runtimeDecodeStartedAt,
-      },
-      runtimePoliticalMeta: {
-        featureCount: Array.isArray(runtimePoliticalMeta.featureIds)
-          ? runtimePoliticalMeta.featureIds.length
-          : 0,
-        buildMs: metaCompletedAt - runtimeDecodeCompletedAt,
-      },
+      runtimeTopology: runtimeTopology?.objects?.political
+        ? {
+          featureCount: getPoliticalGeometryCount(runtimeTopology),
+          decodeMs: runtimeDecodeCompletedAt - baseDecodeCompletedAt,
+        }
+        : {
+          featureCount: 0,
+          decodeMs: 0,
+          deferred: true,
+        },
+      runtimePoliticalMeta: runtimePoliticalMeta
+        ? {
+          featureCount: Array.isArray(runtimePoliticalMeta.featureIds)
+            ? runtimePoliticalMeta.featureIds.length
+            : 0,
+          buildMs: metaCompletedAt - runtimeDecodeCompletedAt,
+        }
+        : {
+          featureCount: 0,
+          buildMs: 0,
+          deferred: true,
+        },
       geoLocalePatch: {
         present: !!payload?.scenario?.geo_locale_patch,
         language,

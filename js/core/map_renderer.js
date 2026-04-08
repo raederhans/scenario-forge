@@ -7749,7 +7749,10 @@ async function buildHitCanvasAfterStartup() {
   await yieldToMain();
 }
 
-async function buildInteractionInfrastructureAfterStartup({ chunked = true } = {}) {
+async function buildInteractionInfrastructureAfterStartup({
+  chunked = true,
+  buildHitCanvas = true,
+} = {}) {
   if (state.interactionInfrastructureReady && !state.interactionInfrastructureBuildInFlight) {
     return true;
   }
@@ -7782,10 +7785,16 @@ async function buildInteractionInfrastructureAfterStartup({ chunked = true } = {
       scheduleSecondarySpatialIndexBuild({
         reason: chunked ? "startup-deferred-secondary-spatial" : "startup-secondary-spatial",
       });
-      if (chunked) {
-        await buildHitCanvasAfterStartup();
-      } else {
-        ensureHitCanvasUpToDate({ force: true });
+      if (buildHitCanvas) {
+        if (chunked) {
+          await buildHitCanvasAfterStartup();
+        } else {
+          ensureHitCanvasUpToDate({ force: true });
+        }
+      } else if (state.hitCanvasDirty) {
+        scheduleHitCanvasBuildIfNeeded({
+          reason: chunked ? "startup-deferred-hit-canvas" : "startup-hit-canvas",
+        });
       }
       setInteractionInfrastructureState("ready", {
         ready: true,

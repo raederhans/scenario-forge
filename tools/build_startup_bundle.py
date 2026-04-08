@@ -16,7 +16,8 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 
 SUPPORTED_LANGUAGES = ("en", "zh")
-STARTUP_BUNDLE_VERSION = 1
+STARTUP_BUNDLE_VERSION = 2
+STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 
 
 def _normalize_text(value: object) -> str:
@@ -272,6 +273,7 @@ def build_startup_bundle_payload(
     manifest_subset["baseline_hash"] = _normalize_text(scenario_manifest.get("baseline_hash"))
     manifest_subset["generated_at"] = _normalize_text(scenario_manifest.get("generated_at"))
     manifest_subset["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
+    manifest_subset["startup_bootstrap_strategy"] = STARTUP_BOOTSTRAP_STRATEGY
 
     return {
         "version": STARTUP_BUNDLE_VERSION,
@@ -299,7 +301,7 @@ def build_startup_bundle_payload(
             "geo_aliases": pruned_geo_aliases,
         },
         "scenario": {
-            "runtime_topology_bootstrap": runtime_bootstrap_topology,
+            "bootstrap_strategy": STARTUP_BOOTSTRAP_STRATEGY,
             "countries": countries_payload,
             "owners": owners_payload,
             "controllers": controllers_payload,
@@ -354,11 +356,16 @@ def build_startup_bundle_report(
                     json.dumps(payload["base"]["geo_aliases"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
                 ),
                 "runtime_bootstrap_raw_bytes": len(
-                    json.dumps(payload["scenario"]["runtime_topology_bootstrap"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                    json.dumps(
+                        payload["scenario"].get("runtime_topology_bootstrap"),
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
                 ),
                 "apply_seed_raw_bytes": len(
                     json.dumps(payload["scenario"]["apply_seed"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
                 ),
+                "bootstrap_strategy": payload["scenario"].get("bootstrap_strategy", ""),
             },
         }
     if report_path is not None:
