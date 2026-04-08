@@ -20,6 +20,7 @@ import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
   hydrateActiveScenarioBundle,
   createStartupScenarioBundleFromPayload,
+  enforceScenarioHydrationHealthGate,
   loadScenarioBundle,
   loadScenarioRegistry,
 } from "./core/scenario_resources.js";
@@ -1059,9 +1060,20 @@ async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", rende
       bundleLevel: "full",
     });
     hydrateActiveScenarioBundle(bundle, { renderNow });
+    const healthGateResult = await enforceScenarioHydrationHealthGate({
+      renderNow,
+      reason,
+      autoRetry: true,
+    });
     finishBootMetric("scenario:full:hydrate", {
       reason,
       bundleLevel: bundle?.bundleLevel || "full",
+      healthGateOk: healthGateResult?.ok !== false,
+      healthGateRetried: !!healthGateResult?.attemptedRetry,
+      ownerFeatureOverlapRatio: Number(healthGateResult?.report?.overlapRatio || 0),
+      ownerFeatureOverlapCount: Number(healthGateResult?.report?.overlapCount || 0),
+      ownerFeatureRenderedCount: Number(healthGateResult?.report?.renderedFeatureCount || 0),
+      waterConsistency: String(healthGateResult?.waterConsistency?.reason || "unknown"),
     });
     return bundle;
   } catch (error) {
