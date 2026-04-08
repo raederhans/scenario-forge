@@ -768,6 +768,41 @@ function normalizeScenarioFeatureCollection(payload) {
   };
 }
 
+function getScenarioFeatureCollectionIdentityList(payload) {
+  const normalizedPayload = normalizeScenarioFeatureCollection(payload);
+  const features = Array.isArray(normalizedPayload?.features) ? normalizedPayload.features : [];
+  return features
+    .map((feature) => String(feature?.id || feature?.properties?.id || "").trim())
+    .filter(Boolean);
+}
+
+function areScenarioFeatureCollectionIdentitiesEqual(leftPayload, rightPayload) {
+  const leftIds = getScenarioFeatureCollectionIdentityList(leftPayload);
+  const rightIds = getScenarioFeatureCollectionIdentityList(rightPayload);
+  return (
+    leftIds.length === rightIds.length
+    && leftIds.every((featureId, index) => featureId === rightIds[index])
+  );
+}
+
+function areScenarioFeatureCollectionFeatureReferencesEqual(leftPayload, rightPayload) {
+  const leftNormalized = normalizeScenarioFeatureCollection(leftPayload);
+  const rightNormalized = normalizeScenarioFeatureCollection(rightPayload);
+  const leftFeatures = Array.isArray(leftNormalized?.features) ? leftNormalized.features : [];
+  const rightFeatures = Array.isArray(rightNormalized?.features) ? rightNormalized.features : [];
+  return (
+    leftFeatures.length === rightFeatures.length
+    && leftFeatures.every((feature, index) => feature === rightFeatures[index])
+  );
+}
+
+function areScenarioFeatureCollectionsEquivalent(leftPayload, rightPayload) {
+  return (
+    areScenarioFeatureCollectionIdentitiesEqual(leftPayload, rightPayload)
+    && areScenarioFeatureCollectionFeatureReferencesEqual(leftPayload, rightPayload)
+  );
+}
+
 function normalizeScenarioOptionalLayerKey(value) {
   const key = String(value || "").trim().toLowerCase();
   return Object.prototype.hasOwnProperty.call(SCENARIO_OPTIONAL_LAYER_CONFIGS, key) ? key : "";
@@ -1115,14 +1150,10 @@ function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow 
 function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNow = false, reason = "refresh" } = {}) {
   const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const normalizedPayload = normalizeScenarioFeatureCollection(politicalPayload);
-  const currentPayload = normalizeScenarioFeatureCollection(state.scenarioPoliticalChunkData);
-  const currentFeatures = Array.isArray(currentPayload?.features) ? currentPayload.features : [];
-  const nextFeatures = Array.isArray(normalizedPayload?.features) ? normalizedPayload.features : [];
-  const currentIds = currentFeatures.map((feature) => String(feature?.id || feature?.properties?.id || "").trim()).filter(Boolean);
-  const nextIds = nextFeatures.map((feature) => String(feature?.id || feature?.properties?.id || "").trim()).filter(Boolean);
-  const samePayload =
-    currentIds.length === nextIds.length
-    && currentIds.every((featureId, index) => featureId === nextIds[index]);
+  const samePayload = areScenarioFeatureCollectionsEquivalent(
+    state.scenarioPoliticalChunkData,
+    normalizedPayload
+  );
   if (samePayload) {
     return false;
   }
@@ -1131,7 +1162,7 @@ function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNo
   recordScenarioRenderMetric("politicalChunkPromotionMs", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
     scenarioId: getScenarioBundleId(bundle),
     reason: String(reason || "refresh"),
-    promotedPoliticalFeatureCount: nextIds.length,
+    promotedPoliticalFeatureCount: getScenarioFeatureCollectionIdentityList(normalizedPayload).length,
   });
   return true;
 }
@@ -2067,7 +2098,10 @@ function hydrateActiveScenarioBundle(
   );
   if (!promotedScenarioPolitical) {
     state.scenarioPoliticalChunkData = nextScenarioPoliticalPayload;
-    if (nextScenarioPoliticalPayload && nextScenarioPoliticalPayload !== previousScenarioPoliticalPayload) {
+    if (
+      nextScenarioPoliticalPayload
+      && !areScenarioFeatureCollectionsEquivalent(nextScenarioPoliticalPayload, previousScenarioPoliticalPayload)
+    ) {
       refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
     }
   }
