@@ -768,6 +768,32 @@ function normalizeScenarioFeatureCollection(payload) {
   };
 }
 
+function buildScenarioPoliticalPayloadFingerprint(payload) {
+  const normalizedPayload = normalizeScenarioFeatureCollection(payload);
+  const features = Array.isArray(normalizedPayload?.features) ? normalizedPayload.features : [];
+  if (!features.length) {
+    return "";
+  }
+  return features.map((feature) => {
+    const featureId = String(feature?.id || feature?.properties?.id || "").trim();
+    return [
+      featureId,
+      JSON.stringify(feature?.geometry || null),
+      JSON.stringify(feature?.properties || null),
+    ].join("::");
+  }).join("|");
+}
+
+function scenarioPoliticalPayloadContentChanged(previousPayload, nextPayload) {
+  const normalizedPrevious = normalizeScenarioFeatureCollection(previousPayload);
+  const normalizedNext = normalizeScenarioFeatureCollection(nextPayload);
+  if (normalizedPrevious === normalizedNext) {
+    return false;
+  }
+  return buildScenarioPoliticalPayloadFingerprint(normalizedPrevious)
+    !== buildScenarioPoliticalPayloadFingerprint(normalizedNext);
+}
+
 function normalizeScenarioOptionalLayerKey(value) {
   const key = String(value || "").trim().toLowerCase();
   return Object.prototype.hasOwnProperty.call(SCENARIO_OPTIONAL_LAYER_CONFIGS, key) ? key : "";
@@ -2067,7 +2093,10 @@ function hydrateActiveScenarioBundle(
   );
   if (!promotedScenarioPolitical) {
     state.scenarioPoliticalChunkData = nextScenarioPoliticalPayload;
-    if (nextScenarioPoliticalPayload && nextScenarioPoliticalPayload !== previousScenarioPoliticalPayload) {
+    if (
+      nextScenarioPoliticalPayload
+      && scenarioPoliticalPayloadContentChanged(previousScenarioPoliticalPayload, nextScenarioPoliticalPayload)
+    ) {
       refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
     }
   }
