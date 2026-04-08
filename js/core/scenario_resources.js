@@ -2032,7 +2032,6 @@ function hydrateActiveScenarioBundle(
       ? mergedPoliticalPayload
       : (
         getScenarioDecodedCollection(bundle, "politicalData")
-        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political")
         || state.scenarioPoliticalChunkData
       )
   ) || null;
