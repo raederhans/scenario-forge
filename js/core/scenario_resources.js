@@ -1996,12 +1996,11 @@ function hydrateActiveScenarioBundle(
     const hasBundleWaterPayload = Object.prototype.hasOwnProperty.call(bundle || {}, "waterRegionsPayload");
     const decodedWaterPayload = getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData");
     const topologyWaterPayload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
+    const bundleWaterPayload = hasBundleWaterPayload ? bundle.waterRegionsPayload : undefined;
     const nextScenarioWaterRegionsData =
       mergedWaterPayload !== undefined
         ? mergedWaterPayload
-        : hasBundleWaterPayload
-        ? bundle.waterRegionsPayload
-        : decodedWaterPayload
+        : (bundleWaterPayload != null ? bundleWaterPayload : decodedWaterPayload)
       || topologyWaterPayload
       || state.scenarioWaterRegionsData
       || null;
