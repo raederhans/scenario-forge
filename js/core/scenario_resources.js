@@ -1997,17 +1997,19 @@ function hydrateActiveScenarioBundle(
     const decodedWaterPayload = getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData");
     const topologyWaterPayload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
     const bundleWaterPayload = hasBundleWaterPayload ? bundle.waterRegionsPayload : undefined;
-    const nextScenarioWaterRegionsData =
-      mergedWaterPayload !== undefined
+    const preferredWaterPayload =
+      mergedWaterPayload != null
         ? mergedWaterPayload
-        : (bundleWaterPayload != null ? bundleWaterPayload : decodedWaterPayload)
+        : (bundleWaterPayload != null ? bundleWaterPayload : decodedWaterPayload);
+    const nextScenarioWaterRegionsData =
+      preferredWaterPayload
       || topologyWaterPayload
       || state.scenarioWaterRegionsData
       || null;
     const reusingCachedWaterPayload =
       nextScenarioWaterRegionsData
       && mergedWaterPayload === undefined
-      && !hasBundleWaterPayload
+      && bundleWaterPayload == null
       && !decodedWaterPayload
       && !topologyWaterPayload
       && nextScenarioWaterRegionsData === state.scenarioWaterRegionsData;
