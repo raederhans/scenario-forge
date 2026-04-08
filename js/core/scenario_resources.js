@@ -1993,14 +1993,30 @@ function hydrateActiveScenarioBundle(
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
       || state.scenarioContextLandMaskData
       || null;
+    const hasBundleWaterPayload = Object.prototype.hasOwnProperty.call(bundle || {}, "waterRegionsPayload");
+    const decodedWaterPayload = getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData");
+    const topologyWaterPayload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
     const nextScenarioWaterRegionsData =
       mergedWaterPayload !== undefined
         ? mergedWaterPayload
-        : bundle.waterRegionsPayload
-      || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
-      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
+        : hasBundleWaterPayload
+        ? bundle.waterRegionsPayload
+        : decodedWaterPayload
+      || topologyWaterPayload
       || state.scenarioWaterRegionsData
       || null;
+    const reusingCachedWaterPayload =
+      nextScenarioWaterRegionsData
+      && mergedWaterPayload === undefined
+      && !hasBundleWaterPayload
+      && !decodedWaterPayload
+      && !topologyWaterPayload
+      && nextScenarioWaterRegionsData === state.scenarioWaterRegionsData;
+    const nextScenarioWaterOverlayVersionTag = nextScenarioWaterRegionsData
+      ? (reusingCachedWaterPayload
+        ? String(state.scenarioWaterOverlayVersionTag || "").trim()
+        : runtimeVersionTag)
+      : "";
     const nextScenarioSpecialRegionsData =
       mergedSpecialPayload !== undefined
         ? mergedSpecialPayload
@@ -2028,7 +2044,7 @@ function hydrateActiveScenarioBundle(
     state.scenarioContextLandMaskData = nextScenarioContextLandMaskData;
     state.scenarioWaterRegionsData = nextScenarioWaterRegionsData;
     state.scenarioRuntimeTopologyVersionTag = runtimeVersionTag;
-    state.scenarioWaterOverlayVersionTag = nextScenarioWaterRegionsData ? runtimeVersionTag : "";
+    state.scenarioWaterOverlayVersionTag = nextScenarioWaterOverlayVersionTag;
     state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
   state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
