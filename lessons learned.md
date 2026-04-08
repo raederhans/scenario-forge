@@ -209,3 +209,10 @@
 ### 36. If startup is bundle-first, shrinking the bundle boundary usually beats local cache tricks
 - When the default startup path already prioritizes a scenario-specific startup bundle, cutting the largest embedded payload can produce much larger real gains than adding another cache layer around the old shape.
 - For coarse-first startup, carry enough scenario state to apply ownership/controller/core immediately, then let chunk registry + coarse chunks provide the first scenario geometry.
+
+### 37. Startup health gate should live inside the scenario apply transaction
+- If the gate runs only after boot leaves apply flow, rollback cannot restore a clean scenario baseline.
+- The safer path is apply -> refresh map data -> run startup-only health gate inside applyScenarioBundle() -> throw into existing rollback.
+### 38. Ultra-light runtime shell should keep contract markers and ids, not real mask geometry
+- Re-embedding real land/water mask geometry into startup bundle quickly eats back the startup gain.
+- Keep empty named topology objects plus runtime_political_meta in startup bundle, and leave real overlay geometry to deferred hydration.

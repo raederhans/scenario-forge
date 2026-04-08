@@ -72,6 +72,9 @@ import {
   ensureRuntimeChunkLoadState,
   ensureActiveScenarioOptionalLayerLoaded,
   ensureScenarioGeoLocalePatchForLanguage,
+  evaluateScenarioHydrationHealthGateState,
+  buildScenarioRuntimeVersionTag,
+  hasRenderableScenarioPoliticalTopology,
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,
   hydrateActiveScenarioBundle,
@@ -1238,6 +1241,9 @@ async function prepareScenarioApplyState(
     ...releasableCountries,
   };
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
+  const runtimeVersionTag = runtimeTopologyPayload
+    ? buildScenarioRuntimeVersionTag(bundle, runtimeTopologyPayload)
+    : "";
   const districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(bundle.districtGroupsPayload, scenarioId);
   const mergedWaterPayload = getActiveScenarioMergedChunkLayerPayload("water", scenarioId);
   const mergedSpecialPayload = getActiveScenarioMergedChunkLayerPayload("special", scenarioId);
@@ -1321,6 +1327,7 @@ async function prepareScenarioApplyState(
     mapSemanticMode,
     countryMap,
     runtimeTopologyPayload,
+    runtimeVersionTag,
     districtGroupsPayload,
     scenarioWaterRegionsFromTopology,
     scenarioSpecialRegionsFromTopology,
@@ -1382,7 +1389,7 @@ async function applyScenarioBundle(
     state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
     state.activeScenarioMeshPack = bundle.meshPackPayload || null;
     state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
-    state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
+    state.runtimePoliticalTopology = hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload)
       ? staged.runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
     state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(
@@ -1393,6 +1400,10 @@ async function applyScenarioBundle(
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
     state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+    state.scenarioRuntimeTopologyVersionTag = String(staged.runtimeVersionTag || "");
+    state.scenarioLandMaskVersionTag = state.scenarioLandMaskData ? String(staged.runtimeVersionTag || "") : "";
+    state.scenarioContextLandMaskVersionTag = state.scenarioContextLandMaskData ? String(staged.runtimeVersionTag || "") : "";
+    state.scenarioWaterOverlayVersionTag = state.scenarioWaterRegionsData ? String(staged.runtimeVersionTag || "") : "";
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
     state.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
@@ -1477,6 +1488,20 @@ async function applyScenarioBundle(
       renderNow,
       suppressRender,
     });
+    if (bundle.loadDiagnostics?.startupBundle) {
+      const startupHydrationHealth = evaluateScenarioHydrationHealthGateState({
+        phase: "startup",
+      });
+      if (!startupHydrationHealth.ok) {
+        throw new Error(
+          `[scenario] Startup hydration health gate failed for "${staged.scenarioId}". reason=${
+            !startupHydrationHealth.report.healthy
+              ? startupHydrationHealth.report.reason
+              : startupHydrationHealth.overlayConsistency.reason
+          }, overlap=${startupHydrationHealth.report.overlapCount}/${startupHydrationHealth.report.renderedFeatureCount}, ratio=${startupHydrationHealth.report.overlapRatio.toFixed(3)}`
+        );
+      }
+    }
     recordScenarioPerfMetric(
       "timeToInteractiveCoarseFrame",
       (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
@@ -1756,9 +1781,12 @@ function clearActiveScenario(
   state.scenarioCountriesByTag = {};
   state.scenarioFixedOwnerColors = {};
   state.scenarioRuntimeTopologyData = null;
+  state.scenarioRuntimeTopologyVersionTag = "";
   state.scenarioPoliticalChunkData = null;
   state.scenarioLandMaskData = null;
   state.scenarioContextLandMaskData = null;
+  state.scenarioLandMaskVersionTag = "";
+  state.scenarioContextLandMaskVersionTag = "";
   state.mapSemanticMode = "blank";
   state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
   state.activeScenarioChunks = {
@@ -1779,6 +1807,7 @@ function clearActiveScenario(
   };
   state.scheduleScenarioChunkRefreshFn = null;
   state.scenarioWaterRegionsData = null;
+  state.scenarioWaterOverlayVersionTag = "";
   state.scenarioSpecialRegionsData = null;
   state.scenarioReliefOverlaysData = null;
   state.scenarioDistrictGroupsData = null;
@@ -1802,6 +1831,16 @@ function clearActiveScenario(
   state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.scenarioOwnerControllerDiffCount = 0;
+  state.scenarioHydrationHealthGate = {
+    status: "idle",
+    reason: "",
+    checkedAt: 0,
+    attemptedRetry: false,
+    ownerFeatureOverlapRatio: 1,
+    ownerFeatureOverlapCount: 0,
+    ownerFeatureRenderedCount: 0,
+    degradedWaterOverlay: false,
+  };
   state.scenarioDataHealth = {
     expectedFeatureCount: 0,
     runtimeFeatureCount: 0,

@@ -16,8 +16,9 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 
 SUPPORTED_LANGUAGES = ("en", "zh")
-STARTUP_BUNDLE_VERSION = 2
+STARTUP_BUNDLE_VERSION = 3
 STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
+STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
 
 
 def _normalize_text(value: object) -> str:
@@ -71,6 +72,108 @@ def _extract_geometry_key(geometry: object) -> str:
         if key:
             return key
     return ""
+
+
+def _extract_country_code_from_id(value: object) -> str:
+    text = _normalize_text(value).upper()
+    if not text:
+        return ""
+    prefix = text.split("-", 1)[0].split("_", 1)[0]
+    alpha_prefix = "".join(ch for ch in prefix if "A" <= ch <= "Z")
+    return alpha_prefix[:3] if 2 <= len(alpha_prefix[:3]) <= 3 else ""
+
+
+def _normalize_country_code_alias(raw_code: object) -> str:
+    code = "".join(ch for ch in _normalize_text(raw_code).upper() if "A" <= ch <= "Z")
+    if code == "UK":
+        return "GB"
+    if code == "EL":
+        return "GR"
+    return code
+
+
+def _extract_geometry_country_code(geometry: object) -> str:
+    if not isinstance(geometry, dict):
+        return ""
+    properties = geometry.get("properties")
+    if not isinstance(properties, dict):
+        properties = {}
+    for candidate in (
+        properties.get("cntr_code"),
+        properties.get("CNTR_CODE"),
+        properties.get("iso_a2"),
+        properties.get("ISO_A2"),
+        properties.get("iso_a2_eh"),
+        properties.get("ISO_A2_EH"),
+        properties.get("adm0_a2"),
+        properties.get("ADM0_A2"),
+    ):
+        normalized = _normalize_country_code_alias(candidate)
+        if normalized and normalized not in {"ZZ", "XX"}:
+            return normalized
+    return _normalize_country_code_alias(
+        _extract_country_code_from_id(properties.get("id"))
+        or _extract_country_code_from_id(properties.get("NUTS_ID"))
+        or _extract_country_code_from_id(geometry.get("id"))
+    )
+
+
+def build_runtime_political_meta(runtime_bootstrap_topology: dict) -> dict:
+    geometries = (
+        runtime_bootstrap_topology.get("objects", {}).get("political", {}).get("geometries", [])
+        if isinstance(runtime_bootstrap_topology, dict)
+        else []
+    )
+    neighbors = (
+        runtime_bootstrap_topology.get("objects", {}).get("political", {}).get("computed_neighbors", [])
+        if isinstance(runtime_bootstrap_topology, dict)
+        else []
+    )
+    if not isinstance(geometries, list):
+        geometries = []
+    if not isinstance(neighbors, list):
+        neighbors = []
+
+    feature_ids: list[str] = []
+    feature_index_by_id: dict[str, int] = {}
+    canonical_country_by_feature_id: dict[str, str] = {}
+
+    for index, geometry in enumerate(geometries):
+        feature_id = _extract_geometry_key(geometry)
+        if not feature_id:
+            continue
+        feature_ids.append(feature_id)
+        feature_index_by_id[feature_id] = index
+        canonical_country_by_feature_id[feature_id] = _extract_geometry_country_code(geometry)
+
+    return {
+        "featureIds": feature_ids,
+        "featureIndexById": feature_index_by_id,
+        "canonicalCountryByFeatureId": canonical_country_by_feature_id,
+        "neighborGraph": (
+            neighbors
+            if len(neighbors) == len(geometries)
+            else [[] for _ in geometries]
+        ),
+    }
+
+
+def build_startup_runtime_shell(runtime_bootstrap_topology: dict) -> dict:
+    source_objects = runtime_bootstrap_topology.get("objects", {}) if isinstance(runtime_bootstrap_topology, dict) else {}
+    next_objects = {}
+    for object_name in ("land_mask", "context_land_mask", "scenario_water", "scenario_special_land"):
+        if object_name not in source_objects:
+            continue
+        next_objects[object_name] = {
+            "type": "GeometryCollection",
+            "geometries": [],
+        }
+    return {
+        "type": "Topology",
+        "objects": next_objects,
+        "arcs": [],
+        "bbox": copy.deepcopy(runtime_bootstrap_topology.get("bbox")),
+    }
 
 
 def _collect_topology_object_keys(topology: dict, object_names: tuple[str, ...]) -> set[str]:
@@ -249,6 +352,8 @@ def build_startup_bundle_payload(
 
     topology_primary = _read_json(topology_primary_path)
     runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
+    runtime_political_meta = build_runtime_political_meta(runtime_bootstrap_topology)
+    runtime_shell_topology = build_startup_runtime_shell(runtime_bootstrap_topology)
     countries_payload = _read_json(countries_path)
     owners_payload = _read_json(owners_path)
     controllers_payload = _read_json(controllers_path)
@@ -307,6 +412,8 @@ def build_startup_bundle_payload(
             "controllers": controllers_payload,
             "cores": cores_payload,
             "geo_locale_patch": geo_locale_patch,
+            "runtime_topology_bootstrap": runtime_shell_topology,
+            "runtime_political_meta": runtime_political_meta,
             "apply_seed": apply_seed,
         },
     }
@@ -325,6 +432,7 @@ def build_startup_bundle_report(
         "version": STARTUP_BUNDLE_VERSION,
         "generated_at": next(iter(payload_by_language.values())).get("generated_at", ""),
         "scenario_id": next(iter(payload_by_language.values())).get("scenario_id", ""),
+        "gzip_budget_bytes": STARTUP_BUNDLE_GZIP_BUDGET_BYTES,
         "languages": {},
     }
     for language, payload in payload_by_language.items():
@@ -335,16 +443,52 @@ def build_startup_bundle_report(
         original_geo_alias_map = original_geo_aliases.get("alias_to_stable_key", {}) if isinstance(original_geo_aliases, dict) else {}
         pruned_locales_payload = payload["base"]["locales"]
         pruned_geo_aliases = payload["base"]["geo_aliases"]
+        runtime_shell = payload.get("scenario", {}).get("runtime_topology_bootstrap", {})
+        runtime_political_meta = payload.get("scenario", {}).get("runtime_political_meta", {})
+        runtime_shell_objects = runtime_shell.get("objects", {}) if isinstance(runtime_shell, dict) else {}
+        runtime_feature_ids = runtime_political_meta.get("featureIds", []) if isinstance(runtime_political_meta, dict) else []
+        owner_keys = set(
+            _normalize_stable_key(key)
+            for key in (payload.get("scenario", {}).get("owners", {}).get("owners", {}) or {}).keys()
+            if _normalize_stable_key(key)
+        )
+        controller_keys = set(
+            _normalize_stable_key(key)
+            for key in (payload.get("scenario", {}).get("controllers", {}).get("controllers", {}) or {}).keys()
+            if _normalize_stable_key(key)
+        )
+        runtime_feature_id_set = {
+            _normalize_stable_key(feature_id)
+            for feature_id in runtime_feature_ids
+            if _normalize_stable_key(feature_id)
+        }
+        owner_overlap_count = len(runtime_feature_id_set & owner_keys)
+        controller_overlap_count = len(runtime_feature_id_set & controller_keys)
+        feature_count = len(runtime_feature_id_set)
+        owner_overlap_ratio = owner_overlap_count / feature_count if feature_count else 1.0
+        controller_overlap_ratio = controller_overlap_count / feature_count if feature_count else 1.0
         report["languages"][language] = {
             "output_path": str(output_path),
             "gzip_output_path": str(gzip_path),
             "raw_bytes": len(raw_bytes),
             "gzip_bytes": len(gzip.compress(raw_bytes, compresslevel=9)),
             "gzip_file_bytes": gzip_path.stat().st_size if gzip_path.exists() else 0,
+            "gzip_budget_exceeded": (gzip_path.stat().st_size if gzip_path.exists() else 0) > STARTUP_BUNDLE_GZIP_BUDGET_BYTES,
             "locale_geo_keys_before": len(original_locales_payload.get("geo", {})),
             "locale_geo_keys_after": len(pruned_locales_payload.get("geo", {})),
             "geo_alias_keys_before": len(original_geo_alias_map),
             "geo_alias_keys_after": len(pruned_geo_aliases.get("alias_to_stable_key", {})),
+            "contract": {
+                "required_runtime_objects_present": {
+                    object_name: object_name in runtime_shell_objects
+                    for object_name in ("land_mask", "context_land_mask", "scenario_water")
+                },
+                "runtime_political_feature_count": feature_count,
+                "owner_feature_overlap_count": owner_overlap_count,
+                "owner_feature_overlap_ratio": owner_overlap_ratio,
+                "controller_feature_overlap_count": controller_overlap_count,
+                "controller_feature_overlap_ratio": controller_overlap_ratio,
+            },
             "sections": {
                 "base_topology_raw_bytes": len(
                     json.dumps(payload["base"]["topology_primary"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -358,6 +502,13 @@ def build_startup_bundle_report(
                 "runtime_bootstrap_raw_bytes": len(
                     json.dumps(
                         payload["scenario"].get("runtime_topology_bootstrap"),
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ),
+                "runtime_political_meta_raw_bytes": len(
+                    json.dumps(
+                        payload["scenario"].get("runtime_political_meta"),
                         ensure_ascii=False,
                         separators=(",", ":"),
                     ).encode("utf-8")

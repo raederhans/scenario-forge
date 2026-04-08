@@ -21,6 +21,8 @@ import {
   hydrateActiveScenarioBundle,
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
+  hasScenarioRuntimeShellContract,
+  validateScenarioRuntimeShellContract,
   loadScenarioBundle,
   loadScenarioRegistry,
 } from "./core/scenario_resources.js";
@@ -334,11 +336,13 @@ const STARTUP_READONLY_COPY = {
     pending: "Detailed interactions are still loading. Pan and zoom remain available.",
     loading: "Preparing detailed interactions. The map is view-only for a moment.",
     failed: "Detailed interactions are unavailable right now. The map stays view-only until the detail layer recovers.",
+    healthGate: "Scenario data is being held in safe mode. The map stays view-only until startup recovery finishes.",
   },
   zh: {
     pending: "细分交互仍在加载中。当前可平移缩放，但保持只读。",
     loading: "正在准备细分交互。当前地图暂时只读。",
     failed: "细分交互暂时不可用。在细分图层恢复前，地图将保持只读。",
+    healthGate: "场景数据已切换到安全模式。在启动恢复完成前，地图将保持只读。",
   },
 };
 
@@ -435,7 +439,10 @@ function createStartupBootArtifactsOverride({
   baseDecodedCollections = null,
   metrics = null,
 } = {}) {
-  const hasScenarioRuntimeBootstrap = !!payload?.scenario?.runtime_topology_bootstrap?.objects?.political;
+  const hasScenarioRuntimeBootstrap = hasScenarioRuntimeShellContract({
+    runtimeTopologyPayload: payload?.scenario?.runtime_topology_bootstrap || null,
+    runtimePoliticalMeta: payload?.scenario?.runtime_political_meta || null,
+  });
   return {
     topologyPrimary: payload?.base?.topology_primary || null,
     locales: payload?.base?.locales || { ui: {}, geo: {} },
@@ -456,6 +463,14 @@ function createStartupBootArtifactsOverride({
       geoAliases: null,
     },
   };
+}
+
+function formatStartupRuntimeShellContractFailure(contract) {
+  const missingParts = [
+    ...(Array.isArray(contract?.missingObjects) ? contract.missingObjects.map((objectName) => `missing-${objectName}`) : []),
+    ...(contract?.missingPoliticalMeta ? ["missing-runtime-political-meta"] : []),
+  ];
+  return missingParts.join(", ") || "incomplete-runtime-shell";
 }
 
 function warnOnStartupBundleIntegrity(bundle, { source = "" } = {}) {
@@ -527,6 +542,9 @@ function getStartupReadonlyMessage() {
   if (state.startupReadonlyReason === "detail-promotion-failed") {
     return copy.failed;
   }
+  if (state.startupReadonlyReason === "scenario-health-gate") {
+    return copy.healthGate;
+  }
   if (state.startupReadonlyUnlockInFlight) {
     return copy.loading;
   }
@@ -563,6 +581,7 @@ function setStartupReadonlyState(active, { reason = "", unlockInFlight = false }
   }
   syncBootOverlay();
 }
+state.setStartupReadonlyStateFn = setStartupReadonlyState;
 
 function setBootPreviewVisible(active) {
   state.bootPreviewVisible = !!active;
@@ -1732,6 +1751,26 @@ async function bootstrap() {
           language: startupBundleLanguage,
           metrics: startupBundleResult.metrics,
         });
+        const startupScenarioBundle = createStartupScenarioBundleFromPayload({
+          scenarioId: defaultScenarioId,
+          language: startupBundleLanguage,
+          payload: startupBundleResult.payload,
+          runtimeDecodedCollections: startupBundleResult.runtimeDecodedCollections,
+          runtimePoliticalMeta: startupBundleResult.runtimePoliticalMeta,
+          loadDiagnostics,
+        });
+        const runtimeShellContract = validateScenarioRuntimeShellContract({
+          runtimeTopologyPayload: startupScenarioBundle.runtimeTopologyPayload,
+          runtimePoliticalMeta: startupScenarioBundle.runtimePoliticalMeta,
+        });
+        if (
+          String(startupScenarioBundle.bootstrapStrategy || "").trim() === "chunked-coarse-first"
+          && !runtimeShellContract.ok
+        ) {
+          throw new Error(
+            `[boot] Startup bundle for "${defaultScenarioId}" is missing the minimum runtime shell (${formatStartupRuntimeShellContractFailure(runtimeShellContract)}).`
+          );
+        }
         return {
           ok: true,
           scenarioId: defaultScenarioId,
@@ -1742,14 +1781,7 @@ async function bootstrap() {
             baseDecodedCollections: startupBundleResult.baseDecodedCollections,
             metrics: startupBundleResult.metrics,
           }),
-          bundle: createStartupScenarioBundleFromPayload({
-            scenarioId: defaultScenarioId,
-            language: startupBundleLanguage,
-            payload: startupBundleResult.payload,
-            runtimeDecodedCollections: startupBundleResult.runtimeDecodedCollections,
-            runtimePoliticalMeta: startupBundleResult.runtimePoliticalMeta,
-            loadDiagnostics,
-          }),
+          bundle: startupScenarioBundle,
         };
       })
       .catch((error) => ({
@@ -2029,7 +2061,9 @@ async function bootstrap() {
     if (!scenarioBundleResult.ok) {
       throw scenarioBundleResult.error;
     }
-    const defaultScenarioBundle = scenarioBundleResult.bundle;
+    let defaultScenarioBundle = scenarioBundleResult.bundle;
+    let scenarioBundleSource = String(scenarioBundleResult.source || "legacy").trim() || "legacy";
+    let startupRecoveryReason = "";
     if (!defaultScenarioBundle?.manifest) {
       throw new Error("Default scenario bundle did not include a manifest.");
     }
@@ -2053,18 +2087,44 @@ async function bootstrap() {
     await deferredUiBootstrapPromise;
     setBootState("scenario-apply");
     startBootMetric("scenario-apply");
-    await applyScenarioBundleCommand(defaultScenarioBundle, {
-      renderMode: "none",
-      suppressRender: true,
-      markDirtyReason: "",
-      showToastOnComplete: false,
-      interactionLevel: state.startupInteractionMode === "readonly" ? "readonly-startup" : "full",
-    });
+    try {
+      await applyScenarioBundleCommand(defaultScenarioBundle, {
+        renderMode: "none",
+        suppressRender: true,
+        markDirtyReason: "",
+        showToastOnComplete: false,
+        interactionLevel: state.startupInteractionMode === "readonly" ? "readonly-startup" : "full",
+      });
+    } catch (startupApplyError) {
+      if (scenarioBundleSource !== "startup-bundle") {
+        throw startupApplyError;
+      }
+      startupRecoveryReason = String(startupApplyError?.message || "startup-bundle-apply-failed");
+      console.warn(
+        `[boot] Startup bundle apply failed for "${defaultScenarioBundle.manifest?.scenario_id || ""}", falling back to legacy bootstrap bundle.`,
+        startupApplyError
+      );
+      defaultScenarioBundle = await loadScenarioBundle(String(defaultScenarioBundle.manifest?.scenario_id || ""), {
+        d3Client,
+        bundleLevel: "bootstrap",
+        forceReload: true,
+      });
+      scenarioBundleSource = "legacy-bootstrap-recovery";
+      await applyScenarioBundleCommand(defaultScenarioBundle, {
+        renderMode: "none",
+        suppressRender: true,
+        markDirtyReason: "",
+        showToastOnComplete: false,
+        interactionLevel: state.startupInteractionMode === "readonly" ? "readonly-startup" : "full",
+      });
+    }
     warnOnStartupBundleIntegrity(defaultScenarioBundle, {
-      source: scenarioBundleResult.source,
+      source: scenarioBundleSource,
     });
     finishBootMetric("scenario-apply", {
       activeScenarioId: String(state.activeScenarioId || ""),
+      source: scenarioBundleSource,
+      startupRecoveryReason,
     });
 
     setBootState("warmup");

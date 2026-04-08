@@ -251,6 +251,25 @@ function buildRuntimePoliticalMeta(runtimePoliticalTopology) {
   };
 }
 
+function normalizeRuntimePoliticalMetaPayload(meta) {
+  if (!meta || typeof meta !== "object") {
+    return null;
+  }
+  const featureIds = Array.isArray(meta.featureIds)
+    ? meta.featureIds.map((featureId) => String(featureId || "").trim()).filter(Boolean)
+    : [];
+  return {
+    featureIds,
+    featureIndexById: meta.featureIndexById && typeof meta.featureIndexById === "object"
+      ? { ...meta.featureIndexById }
+      : {},
+    canonicalCountryByFeatureId: meta.canonicalCountryByFeatureId && typeof meta.canonicalCountryByFeatureId === "object"
+      ? { ...meta.canonicalCountryByFeatureId }
+      : {},
+    neighborGraph: Array.isArray(meta.neighborGraph) ? [...meta.neighborGraph] : [],
+  };
+}
+
 function postWorkerMessage(type, payload) {
   self.postMessage({
     type,
@@ -341,6 +360,7 @@ async function handleLoadStartupBundle(message) {
   }
   const topologyPrimary = payload.base?.topology_primary || null;
   const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   if (!topologyPrimary?.objects?.political) {
     throw new Error("[startup_worker] Startup bundle is missing base topology.");
@@ -361,10 +381,12 @@ async function handleLoadStartupBundle(message) {
   let runtimePoliticalMeta = null;
   let runtimeDecodeCompletedAt = baseDecodeCompletedAt;
   let metaCompletedAt = runtimeDecodeCompletedAt;
-  if (runtimeTopology?.objects?.political) {
+  if (runtimeTopology?.objects) {
     const runtimeDecodeStartedAt = nowMs();
     runtimeDecodedCollections = {
-      politicalData: decodeTopologyObject(runtimeTopology, "political"),
+      politicalData: runtimeTopology?.objects?.political
+        ? decodeTopologyObject(runtimeTopology, "political")
+        : null,
       scenarioLandMaskData:
         decodeTopologyObject(runtimeTopology, "land_mask")
         || decodeTopologyObject(runtimeTopology, "land"),
@@ -373,7 +395,8 @@ async function handleLoadStartupBundle(message) {
       scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopology, "scenario_special_land"),
     };
     runtimeDecodeCompletedAt = nowMs();
-    runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopology);
+    runtimePoliticalMeta = runtimePoliticalMetaPayload
+      || (runtimeTopology?.objects?.political ? buildRuntimePoliticalMeta(runtimeTopology) : null);
     metaCompletedAt = nowMs();
   }
   postWorkerMessage(MESSAGE_TYPES.STARTUP_BUNDLE_READY, {
@@ -394,10 +417,13 @@ async function handleLoadStartupBundle(message) {
         featureCount: getPoliticalGeometryCount(topologyPrimary),
         decodeMs: baseDecodeCompletedAt - baseDecodeStartedAt,
       },
-      runtimeTopology: runtimeTopology?.objects?.political
+      runtimeTopology: runtimeTopology?.objects
         ? {
-          featureCount: getPoliticalGeometryCount(runtimeTopology),
+          featureCount: runtimeTopology?.objects?.political
+            ? getPoliticalGeometryCount(runtimeTopology)
+            : (Array.isArray(runtimePoliticalMeta?.featureIds) ? runtimePoliticalMeta.featureIds.length : 0),
           decodeMs: runtimeDecodeCompletedAt - baseDecodeCompletedAt,
+          deferred: !runtimeTopology?.objects?.political,
         }
         : {
           featureCount: 0,

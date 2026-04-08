@@ -60,7 +60,9 @@ import {
   hasExplicitScenarioAssignment,
   shouldApplyHoi4FarEastSovietBackfill,
 } from "./scenario_runtime_queries.js";
+import { consumeScenarioTestHook } from "./scenario_recovery.js";
 import { t } from "../ui/i18n.js";
+import { showToast } from "../ui/toast.js";
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
@@ -72,6 +74,11 @@ const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 const SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO = 0.85;
 const SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES = 1000;
+const SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS = Object.freeze([
+  "land_mask",
+  "context_land_mask",
+  "scenario_water",
+]);
 let scenarioRegistryPromise = null;
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
@@ -834,6 +841,69 @@ function normalizeScenarioRuntimeTopologyPayload(payload) {
 
 function hasScenarioRuntimePoliticalPayload(payload) {
   return !!normalizeScenarioRuntimeTopologyPayload(payload)?.objects?.political;
+}
+
+function normalizeScenarioRuntimePoliticalMeta(meta) {
+  if (!meta || typeof meta !== "object") {
+    return null;
+  }
+  const featureIds = Array.isArray(meta.featureIds)
+    ? meta.featureIds.map((featureId) => String(featureId || "").trim()).filter(Boolean)
+    : [];
+  return {
+    featureIds,
+    featureIndexById: meta.featureIndexById && typeof meta.featureIndexById === "object"
+      ? { ...meta.featureIndexById }
+      : {},
+    canonicalCountryByFeatureId: meta.canonicalCountryByFeatureId && typeof meta.canonicalCountryByFeatureId === "object"
+      ? { ...meta.canonicalCountryByFeatureId }
+      : {},
+    neighborGraph: Array.isArray(meta.neighborGraph) ? [...meta.neighborGraph] : [],
+  };
+}
+
+function getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta = null) {
+  const geometryCount = Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)
+    ? runtimeTopologyPayload.objects.political.geometries.length
+    : 0;
+  if (geometryCount > 0) {
+    return geometryCount;
+  }
+  return Array.isArray(runtimePoliticalMeta?.featureIds) ? runtimePoliticalMeta.featureIds.length : 0;
+}
+
+function hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload) {
+  return !!getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political");
+}
+
+function validateScenarioRuntimeShellContract({
+  runtimeTopologyPayload = null,
+  runtimePoliticalMeta = null,
+} = {}) {
+  const normalizedTopologyPayload = normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload);
+  const normalizedMeta = normalizeScenarioRuntimePoliticalMeta(runtimePoliticalMeta);
+  const missingObjects = normalizedTopologyPayload
+    ? SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS.filter((objectName) => !normalizedTopologyPayload?.objects?.[objectName])
+    : [...SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS];
+  const politicalFeatureCount = getScenarioRuntimePoliticalFeatureCount(normalizedTopologyPayload, normalizedMeta);
+  return {
+    ok: !!normalizedTopologyPayload && missingObjects.length === 0 && politicalFeatureCount > 0,
+    missingObjects,
+    missingPoliticalMeta: politicalFeatureCount <= 0,
+    politicalFeatureCount,
+    runtimeTopologyPayload: normalizedTopologyPayload,
+    runtimePoliticalMeta: normalizedMeta,
+  };
+}
+
+function hasScenarioRuntimeShellContract({
+  runtimeTopologyPayload = null,
+  runtimePoliticalMeta = null,
+} = {}) {
+  return validateScenarioRuntimeShellContract({
+    runtimeTopologyPayload,
+    runtimePoliticalMeta,
+  }).ok;
 }
 
 function normalizeScenarioRuntimeShell(manifest) {
@@ -1786,7 +1856,10 @@ function createScenarioBootstrapBundleFromCache({
     loadDiagnostics: {
       optionalResources: {
         runtime_topology: {
-          ok: hasScenarioRuntimePoliticalPayload(runtimeTopologyPayload),
+          ok: hasScenarioRuntimeShellContract({
+            runtimeTopologyPayload,
+            runtimePoliticalMeta: cachedCorePayload?.runtimePoliticalMeta || null,
+          }),
           reason: "persistent-cache-hit",
           errorMessage: "",
           metrics: null,
@@ -1819,6 +1892,18 @@ function createScenarioBootstrapBundleFromCache({
       bundle.geoLocalePatchPayloadsByLanguage.en = bundle.geoLocalePatchPayload;
       bundle.geoLocalePatchPayloadsByLanguage.zh = bundle.geoLocalePatchPayload;
     }
+  }
+  if (!bundle.loadDiagnostics.optionalResources.runtime_topology.ok) {
+    const runtimeShellContract = validateScenarioRuntimeShellContract({
+      runtimeTopologyPayload: bundle.runtimeTopologyPayload,
+      runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+    });
+    const missingParts = [
+      ...runtimeShellContract.missingObjects.map((objectName) => `missing-${objectName}`),
+      ...(runtimeShellContract.missingPoliticalMeta ? ["missing-runtime-political-meta"] : []),
+    ];
+    bundle.loadDiagnostics.optionalResources.runtime_topology.reason =
+      missingParts.join(",") || "incomplete-runtime-shell";
   }
   return bundle;
 }
@@ -1868,6 +1953,9 @@ function createStartupScenarioBundleFromPayload({
   };
   const geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(payload?.scenario?.geo_locale_patch);
   const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(payload?.scenario?.runtime_topology_bootstrap);
+  const normalizedRuntimePoliticalMeta = normalizeScenarioRuntimePoliticalMeta(
+    runtimePoliticalMeta || payload?.scenario?.runtime_political_meta || null
+  );
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   const bundle = {
     meta: {
@@ -1897,7 +1985,7 @@ function createStartupScenarioBundleFromPayload({
     geoLocalePatchPayload,
     geoLocalePatchPayloadsByLanguage: geoLocalePatchPayload ? { [language === "zh" ? "zh" : "en"]: geoLocalePatchPayload } : {},
     runtimeTopologyPayload,
-    runtimePoliticalMeta: runtimeTopologyPayload ? (runtimePoliticalMeta || null) : null,
+    runtimePoliticalMeta: normalizedRuntimePoliticalMeta,
     runtimeDecodedCollections: runtimeTopologyPayload ? (runtimeDecodedCollections || null) : null,
     releasableCatalog: null,
     districtGroupsPayload: null,
@@ -1910,7 +1998,10 @@ function createStartupScenarioBundleFromPayload({
     loadDiagnostics: loadDiagnostics || {
       optionalResources: {
         runtime_topology: {
-          ok: !!runtimeTopologyPayload,
+          ok: hasScenarioRuntimeShellContract({
+            runtimeTopologyPayload,
+            runtimePoliticalMeta: normalizedRuntimePoliticalMeta,
+          }),
           reason: runtimeTopologyPayload ? "startup-bundle" : (bootstrapStrategy || "deferred"),
           errorMessage: "",
           metrics: payload?.metrics?.runtimeTopology || null,
@@ -1936,6 +2027,18 @@ function createStartupScenarioBundleFromPayload({
       startupBundle: true,
     },
   };
+  if (!bundle.loadDiagnostics.optionalResources.runtime_topology.ok) {
+    const runtimeShellContract = validateScenarioRuntimeShellContract({
+      runtimeTopologyPayload,
+      runtimePoliticalMeta: normalizedRuntimePoliticalMeta,
+    });
+    const missingParts = [
+      ...runtimeShellContract.missingObjects.map((objectName) => `missing-${objectName}`),
+      ...(runtimeShellContract.missingPoliticalMeta ? ["missing-runtime-political-meta"] : []),
+    ];
+    bundle.loadDiagnostics.optionalResources.runtime_topology.reason =
+      missingParts.join(",") || "incomplete-runtime-shell";
+  }
   return bundle;
 }
 
@@ -2011,7 +2114,7 @@ function hydrateActiveScenarioBundle(
   let contextBaseChanged = false;
   if (runtimeTopologyPayload) {
     const runtimeVersionTag = buildScenarioRuntimeVersionTag(bundle, runtimeTopologyPayload);
-    const nextRuntimePoliticalTopology = runtimeTopologyPayload?.objects?.political
+    const nextRuntimePoliticalTopology = hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload)
       ? runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
     const nextScenarioLandMaskData =
@@ -2047,6 +2150,16 @@ function hydrateActiveScenarioBundle(
         ? String(state.scenarioWaterOverlayVersionTag || "").trim()
         : runtimeVersionTag)
       : "";
+    const nextScenarioLandMaskVersionTag = nextScenarioLandMaskData
+      ? (nextScenarioLandMaskData === state.scenarioLandMaskData
+        ? String(state.scenarioLandMaskVersionTag || "").trim()
+        : runtimeVersionTag)
+      : "";
+    const nextScenarioContextLandMaskVersionTag = nextScenarioContextLandMaskData
+      ? (nextScenarioContextLandMaskData === state.scenarioContextLandMaskData
+        ? String(state.scenarioContextLandMaskVersionTag || "").trim()
+        : runtimeVersionTag)
+      : "";
     const nextScenarioSpecialRegionsData =
       mergedSpecialPayload !== undefined
         ? mergedSpecialPayload
@@ -2075,6 +2188,8 @@ function hydrateActiveScenarioBundle(
     state.scenarioWaterRegionsData = nextScenarioWaterRegionsData;
     state.scenarioRuntimeTopologyVersionTag = runtimeVersionTag;
     state.scenarioWaterOverlayVersionTag = nextScenarioWaterOverlayVersionTag;
+    state.scenarioLandMaskVersionTag = nextScenarioLandMaskVersionTag;
+    state.scenarioContextLandMaskVersionTag = nextScenarioContextLandMaskVersionTag;
     state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
   state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
@@ -2151,9 +2266,7 @@ function buildScenarioRuntimeVersionTag(bundle, runtimeTopologyPayload) {
     || state.activeScenarioId
   ) || "scenario";
   const baselineHash = String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
-  const runtimeFeatureCount = Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)
-    ? runtimeTopologyPayload.objects.political.geometries.length
-    : 0;
+  const runtimeFeatureCount = getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, bundle?.runtimePoliticalMeta || null);
   return `${scenarioId}:${baselineHash || "no-baseline"}:${runtimeFeatureCount}`;
 }
 
@@ -2167,7 +2280,7 @@ function collectFeatureIdsFromCollection(collection) {
   return ids;
 }
 
-function evaluateScenarioOwnerFeatureCoverage() {
+function evaluateScenarioOwnerFeatureCoverage({ phase = "deferred" } = {}) {
   const renderedFeatureIds = collectFeatureIdsFromCollection(state.landData);
   const ownerFeatureIds = new Set(
     Object.keys(state.sovereigntyByFeatureId && typeof state.sovereigntyByFeatureId === "object"
@@ -2183,49 +2296,99 @@ function evaluateScenarioOwnerFeatureCoverage() {
   const renderedFeatureCount = renderedFeatureIds.size;
   const ownerFeatureCount = ownerFeatureIds.size;
   const overlapRatio = renderedFeatureCount > 0 ? overlapCount / renderedFeatureCount : 1;
+  const forcedMismatch =
+    (phase === "startup" && consumeScenarioTestHook("forceStartupHealthGateOwnerMismatchOnce"))
+    || (phase !== "startup" && consumeScenarioTestHook("forceHydrationHealthGateOwnerMismatchOnce"));
+  const effectiveOverlapCount = forcedMismatch ? 0 : overlapCount;
+  const effectiveOverlapRatio = forcedMismatch && renderedFeatureCount > 0 ? 0 : overlapRatio;
   return {
     renderedFeatureCount,
     ownerFeatureCount,
-    overlapCount,
-    overlapRatio,
+    overlapCount: effectiveOverlapCount,
+    overlapRatio: effectiveOverlapRatio,
     healthy:
-      renderedFeatureCount < SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES
-      || overlapRatio >= SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO,
+      phase === "startup"
+        ? (renderedFeatureCount === 0 || effectiveOverlapRatio >= SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO)
+        : (
+          renderedFeatureCount < SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES
+          || effectiveOverlapRatio >= SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO
+        ),
+    reason: forcedMismatch ? "owner-feature-mismatch" : "ok",
   };
 }
 
-function evaluateScenarioWaterOverlayConsistency() {
+function evaluateScenarioOverlayConsistency({ phase = "deferred" } = {}) {
   const runtimeTag = String(state.scenarioRuntimeTopologyVersionTag || "").trim();
-  const overlayTag = String(state.scenarioWaterOverlayVersionTag || "").trim();
-  if (!state.scenarioWaterRegionsData) {
-    return {
-      healthy: true,
-      reason: "missing-overlay",
-      runtimeTag,
-      overlayTag,
-    };
-  }
-  if (!runtimeTag || !overlayTag) {
+  const forcedMaskMismatch =
+    (phase === "startup" && consumeScenarioTestHook("forceStartupHealthGateMaskMismatchOnce"))
+    || (phase !== "startup" && consumeScenarioTestHook("forceHydrationHealthGateMaskMismatchOnce"));
+  if (forcedMaskMismatch) {
     return {
       healthy: false,
-      reason: "missing-version-tag",
+      reason: "context-land-mask-version-mismatch",
       runtimeTag,
-      overlayTag,
+      overlayTags: {
+        water: String(state.scenarioWaterOverlayVersionTag || "").trim(),
+        landMask: String(state.scenarioLandMaskVersionTag || "").trim(),
+        contextLandMask: String(state.scenarioContextLandMaskVersionTag || "").trim(),
+      },
     };
   }
-  if (runtimeTag !== overlayTag) {
+  const overlayChecks = [
+    {
+      key: "water",
+      present: !!state.scenarioWaterRegionsData,
+      overlayTag: String(state.scenarioWaterOverlayVersionTag || "").trim(),
+    },
+    {
+      key: "land-mask",
+      present: !!state.scenarioLandMaskData,
+      overlayTag: String(state.scenarioLandMaskVersionTag || "").trim(),
+    },
+    {
+      key: "context-land-mask",
+      present: !!state.scenarioContextLandMaskData,
+      overlayTag: String(state.scenarioContextLandMaskVersionTag || "").trim(),
+    },
+  ];
+  const failingOverlay = overlayChecks.find((entry) => {
+    if (!entry.present) return false;
+    if (!runtimeTag || !entry.overlayTag) return true;
+    return runtimeTag !== entry.overlayTag;
+  });
+  if (failingOverlay) {
     return {
       healthy: false,
-      reason: "version-mismatch",
+      reason: !runtimeTag || !failingOverlay.overlayTag
+        ? `${failingOverlay.key}-missing-version-tag`
+        : `${failingOverlay.key}-version-mismatch`,
       runtimeTag,
-      overlayTag,
+      overlayTags: {
+        water: overlayChecks[0].overlayTag,
+        landMask: overlayChecks[1].overlayTag,
+        contextLandMask: overlayChecks[2].overlayTag,
+      },
     };
   }
   return {
     healthy: true,
     reason: "ok",
     runtimeTag,
-    overlayTag,
+    overlayTags: {
+      water: overlayChecks[0].overlayTag,
+      landMask: overlayChecks[1].overlayTag,
+      contextLandMask: overlayChecks[2].overlayTag,
+    },
+  };
+}
+
+function evaluateScenarioHydrationHealthGateState({ phase = "deferred" } = {}) {
+  const report = evaluateScenarioOwnerFeatureCoverage({ phase });
+  const overlayConsistency = evaluateScenarioOverlayConsistency({ phase });
+  return {
+    ok: report.healthy && overlayConsistency.healthy,
+    report,
+    overlayConsistency,
   };
 }
 
@@ -2238,8 +2401,9 @@ async function enforceScenarioHydrationHealthGate({
   if (!scenarioId) {
     return { ok: true, attemptedRetry: false, degradedWaterOverlay: false, report: null };
   }
-  let report = evaluateScenarioOwnerFeatureCoverage();
-  let waterConsistency = evaluateScenarioWaterOverlayConsistency();
+  let { report, overlayConsistency: waterConsistency } = evaluateScenarioHydrationHealthGateState({
+    phase: "deferred",
+  });
   if (report.healthy) {
     const ok = waterConsistency.healthy;
     if (ok) {
@@ -2268,8 +2432,9 @@ async function enforceScenarioHydrationHealthGate({
         forceReload: true,
       });
       hydrateActiveScenarioBundle(refreshedBundle, { renderNow: false });
-      report = evaluateScenarioOwnerFeatureCoverage();
-      waterConsistency = evaluateScenarioWaterOverlayConsistency();
+      ({ report, overlayConsistency: waterConsistency } = evaluateScenarioHydrationHealthGateState({
+        phase: "deferred",
+      }));
     } catch (retryError) {
       console.warn(`[scenario] Hydration health gate retry failed for "${scenarioId}".`, retryError);
     }
@@ -2290,16 +2455,31 @@ async function enforceScenarioHydrationHealthGate({
     };
     return { ok: true, attemptedRetry, degradedWaterOverlay: false, report, waterConsistency };
   }
-  const hadScenarioWaterOverlay = !!state.scenarioWaterRegionsData;
+  const hadScenarioOverlay =
+    !!state.scenarioWaterRegionsData
+    || !!state.scenarioLandMaskData
+    || !!state.scenarioContextLandMaskData;
   state.scenarioWaterRegionsData = null;
   state.scenarioWaterOverlayVersionTag = "";
+  state.scenarioLandMaskData = null;
+  state.scenarioContextLandMaskData = null;
+  state.scenarioLandMaskVersionTag = "";
+  state.scenarioContextLandMaskVersionTag = "";
+  invalidateContextLayerVisualStateBatch([], "scenario-health-gate-mask-fallback", { renderNow: false });
   invalidateOceanWaterInteractionVisualState("scenario-health-gate-water-fallback");
   refreshColorState({ renderNow: false });
-  state.startupReadonly = true;
-  state.startupReadonlyReason = "scenario-health-gate";
-  state.startupReadonlyUnlockInFlight = false;
+  if (typeof state.setStartupReadonlyStateFn === "function") {
+    state.setStartupReadonlyStateFn(true, {
+      reason: "scenario-health-gate",
+      unlockInFlight: false,
+    });
+  } else {
+    state.startupReadonly = true;
+    state.startupReadonlyReason = "scenario-health-gate";
+    state.startupReadonlyUnlockInFlight = false;
+  }
   showToast(
-    t("Scenario hydration mismatch detected. Applied safe water fallback; full retry is required.", "ui"),
+    t("Scenario hydration mismatch detected. Applied safe runtime overlay fallback; full retry is required.", "ui"),
     {
       title: t("Scenario hydration warning", "ui"),
       tone: "warning",
@@ -2311,13 +2491,13 @@ async function enforceScenarioHydrationHealthGate({
   );
   state.scenarioHydrationHealthGate = {
     status: "degraded",
-    reason: !report.healthy ? "owner-feature-mismatch" : `water-overlay-${waterConsistency.reason}`,
+    reason: !report.healthy ? "owner-feature-mismatch" : `runtime-overlay-${waterConsistency.reason}`,
     checkedAt: Date.now(),
     attemptedRetry,
     ownerFeatureOverlapRatio: report.overlapRatio,
     ownerFeatureOverlapCount: report.overlapCount,
     ownerFeatureRenderedCount: report.renderedFeatureCount,
-    degradedWaterOverlay: hadScenarioWaterOverlay,
+    degradedWaterOverlay: hadScenarioOverlay,
   };
   if (renderNow) {
     flushRenderBoundary("scenario-health-gate-fallback");
@@ -2325,7 +2505,7 @@ async function enforceScenarioHydrationHealthGate({
   return {
     ok: false,
     attemptedRetry,
-    degradedWaterOverlay: hadScenarioWaterOverlay,
+    degradedWaterOverlay: hadScenarioOverlay,
     report,
     waterConsistency,
   };
@@ -2455,7 +2635,10 @@ async function loadScenarioBundle(
         coreEntry?.payload?.countriesPayload
         && coreEntry?.payload?.ownersPayload
         && coreEntry?.payload?.coresPayload
-        && hasScenarioRuntimePoliticalPayload(coreEntry?.payload?.runtimeTopologyPayload)
+        && hasScenarioRuntimeShellContract({
+          runtimeTopologyPayload: coreEntry?.payload?.runtimeTopologyPayload,
+          runtimePoliticalMeta: coreEntry?.payload?.runtimePoliticalMeta || null,
+        })
       ) {
         if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
           state.startupBootCacheState.scenarioBootstrap = "hit";
@@ -2719,7 +2902,10 @@ async function loadScenarioBundle(
   );
   state.scenarioBundleCacheById[targetId] = bundle;
   if (scenarioBootstrapCoreCacheKey && requestedBundleLevel === "bootstrap") {
-    if (hasScenarioRuntimePoliticalPayload(bundle.runtimeTopologyPayload)) {
+    if (hasScenarioRuntimeShellContract({
+      runtimeTopologyPayload: bundle.runtimeTopologyPayload,
+      runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+    })) {
       if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
         state.startupBootCacheState.scenarioBootstrap = "write-pending";
       }
@@ -2933,6 +3119,11 @@ export {
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
   ensureScenarioGeoLocalePatchForLanguage,
+  evaluateScenarioHydrationHealthGateState,
+  buildScenarioRuntimeVersionTag,
+  hasRenderableScenarioPoliticalTopology,
+  hasScenarioRuntimeShellContract,
+  validateScenarioRuntimeShellContract,
   hydrateActiveScenarioBundle,
   loadScenarioAuditPayload,
   loadScenarioBundle,

@@ -15,9 +15,14 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "scenarioRuntimeTopologyData",
   "scenarioLandMaskData",
   "scenarioContextLandMaskData",
+  "scenarioLandMaskVersionTag",
+  "scenarioContextLandMaskVersionTag",
   "runtimePoliticalTopology",
   "scenarioWaterRegionsData",
+  "scenarioWaterOverlayVersionTag",
   "scenarioSpecialRegionsData",
+  "scenarioRuntimeTopologyVersionTag",
+  "scenarioHydrationHealthGate",
   "scenarioReliefOverlaysData",
   "scenarioDistrictGroupsData",
   "scenarioDistrictGroupByFeatureId",
@@ -142,9 +147,14 @@ export function captureScenarioApplyRollbackSnapshot() {
     scenarioRuntimeTopologyData: cloneScenarioStateValue(state.scenarioRuntimeTopologyData),
     scenarioLandMaskData: cloneScenarioStateValue(state.scenarioLandMaskData),
     scenarioContextLandMaskData: cloneScenarioStateValue(state.scenarioContextLandMaskData),
+    scenarioLandMaskVersionTag: String(state.scenarioLandMaskVersionTag || ""),
+    scenarioContextLandMaskVersionTag: String(state.scenarioContextLandMaskVersionTag || ""),
     runtimePoliticalTopology: cloneScenarioStateValue(state.runtimePoliticalTopology),
     scenarioWaterRegionsData: cloneScenarioStateValue(state.scenarioWaterRegionsData),
+    scenarioWaterOverlayVersionTag: String(state.scenarioWaterOverlayVersionTag || ""),
     scenarioSpecialRegionsData: cloneScenarioStateValue(state.scenarioSpecialRegionsData),
+    scenarioRuntimeTopologyVersionTag: String(state.scenarioRuntimeTopologyVersionTag || ""),
+    scenarioHydrationHealthGate: cloneScenarioStateValue(state.scenarioHydrationHealthGate),
     scenarioReliefOverlaysData: cloneScenarioStateValue(state.scenarioReliefOverlaysData),
     scenarioDistrictGroupsData: cloneScenarioStateValue(state.scenarioDistrictGroupsData),
     scenarioDistrictGroupByFeatureId: cloneScenarioStateValue(state.scenarioDistrictGroupByFeatureId),
@@ -253,9 +263,23 @@ export function restoreScenarioApplyRollbackSnapshot(
   state.scenarioRuntimeTopologyData = cloneScenarioStateValue(snapshot.scenarioRuntimeTopologyData);
   state.scenarioLandMaskData = cloneScenarioStateValue(snapshot.scenarioLandMaskData);
   state.scenarioContextLandMaskData = cloneScenarioStateValue(snapshot.scenarioContextLandMaskData);
+  state.scenarioLandMaskVersionTag = String(snapshot.scenarioLandMaskVersionTag || "");
+  state.scenarioContextLandMaskVersionTag = String(snapshot.scenarioContextLandMaskVersionTag || "");
   state.runtimePoliticalTopology = cloneScenarioStateValue(snapshot.runtimePoliticalTopology);
   state.scenarioWaterRegionsData = cloneScenarioStateValue(snapshot.scenarioWaterRegionsData);
+  state.scenarioWaterOverlayVersionTag = String(snapshot.scenarioWaterOverlayVersionTag || "");
   state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
+  state.scenarioRuntimeTopologyVersionTag = String(snapshot.scenarioRuntimeTopologyVersionTag || "");
+  state.scenarioHydrationHealthGate = cloneScenarioStateValue(snapshot.scenarioHydrationHealthGate) || {
+    status: "idle",
+    reason: "",
+    checkedAt: 0,
+    attemptedRetry: false,
+    ownerFeatureOverlapRatio: 1,
+    ownerFeatureOverlapCount: 0,
+    ownerFeatureRenderedCount: 0,
+    degradedWaterOverlay: false,
+  };
   state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
   state.scenarioDistrictGroupsData = cloneScenarioStateValue(snapshot.scenarioDistrictGroupsData);
   state.scenarioDistrictGroupByFeatureId = cloneScenarioStateValue(snapshot.scenarioDistrictGroupByFeatureId) || new Map();
