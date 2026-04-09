@@ -308,6 +308,7 @@ def build_startup_apply_seed(
         owners = {}
     scenario_name_map = {}
     scenario_color_map = {}
+    coarse_color_candidates: dict[str, tuple[int, str]] = {}
     for raw_tag, raw_entry in countries.items():
         tag = _normalize_text(raw_tag).upper()
         entry = raw_entry if isinstance(raw_entry, dict) else {}
@@ -317,6 +318,16 @@ def build_startup_apply_seed(
         color_hex = _normalize_text(entry.get("color_hex") or entry.get("colorHex")).lower()
         if color_hex.startswith("#") and len(color_hex) == 7:
             scenario_color_map[tag] = color_hex
+            iso2 = _normalize_text(entry.get("base_iso2") or entry.get("lookup_iso2")).upper()
+            if len(iso2) == 2 and iso2.isalpha():
+                feature_count = int(entry.get("feature_count") or 0)
+                current = coarse_color_candidates.get(iso2)
+                if current is None or feature_count > current[0]:
+                    coarse_color_candidates[iso2] = (feature_count, color_hex)
+    coarse_color_map = {
+        iso2: color_hex
+        for iso2, (_, color_hex) in coarse_color_candidates.items()
+    }
     return {
         "scenario_id": scenario_id,
         "default_country_code": _normalize_text(
@@ -326,6 +337,7 @@ def build_startup_apply_seed(
         "map_semantic_mode": _normalize_text(scenario_manifest.get("map_mode") or "political") or "political",
         "scenario_name_map": scenario_name_map,
         "scenario_color_map": scenario_color_map,
+        "coarse_color_map": coarse_color_map,
         "resolved_owners": copy.deepcopy(owners),
     }
 
