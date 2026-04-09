@@ -12258,12 +12258,16 @@ function getModernCityLightsGeometry() {
       const clampedRy = Math.min(ry, maxRadius);
 
       let neighborCount = 0;
+      const visitedNeighborIndices = new Set();
       for (let dy = -1; dy <= 1; dy += 1) {
         for (let dx = -1; dx <= 1; dx += 1) {
           if (dx === 0 && dy === 0) continue;
           const nx = ((x + dx) % MODERN_CITY_LIGHTS_GRID_WIDTH + MODERN_CITY_LIGHTS_GRID_WIDTH) % MODERN_CITY_LIGHTS_GRID_WIDTH;
           const ny = clamp(y + dy, 0, MODERN_CITY_LIGHTS_GRID_HEIGHT - 1);
-          if (MODERN_CITY_LIGHTS_GRID[(ny * MODERN_CITY_LIGHTS_GRID_WIDTH) + nx] >= MODERN_CITY_LIGHTS_BASE_THRESHOLD) {
+          const neighborIndex = (ny * MODERN_CITY_LIGHTS_GRID_WIDTH) + nx;
+          if (visitedNeighborIndices.has(neighborIndex)) continue;
+          visitedNeighborIndices.add(neighborIndex);
+          if (MODERN_CITY_LIGHTS_GRID[neighborIndex] >= MODERN_CITY_LIGHTS_BASE_THRESHOLD) {
             neighborCount += 1;
           }
         }
