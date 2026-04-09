@@ -12251,16 +12251,40 @@ function getModernCityLightsGeometry() {
       if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx <= 0.02 || ry <= 0.02 || rx > 12 || ry > 12) {
         continue;
       }
+      const aspectRatio = Math.max(rx, ry) / Math.max(Math.min(rx, ry), 0.01);
+      if (aspectRatio > 3.5) continue;
+      const maxRadius = Math.min(rx, ry) * 2.2;
+      const clampedRx = Math.min(rx, maxRadius);
+      const clampedRy = Math.min(ry, maxRadius);
+
+      let neighborCount = 0;
+      const visitedNeighborIndices = new Set();
+      const currentIndex = (y * MODERN_CITY_LIGHTS_GRID_WIDTH) + x;
+      for (let dy = -1; dy <= 1; dy += 1) {
+        for (let dx = -1; dx <= 1; dx += 1) {
+          if (dx === 0 && dy === 0) continue;
+          const nx = ((x + dx) % MODERN_CITY_LIGHTS_GRID_WIDTH + MODERN_CITY_LIGHTS_GRID_WIDTH) % MODERN_CITY_LIGHTS_GRID_WIDTH;
+          const ny = clamp(y + dy, 0, MODERN_CITY_LIGHTS_GRID_HEIGHT - 1);
+          const neighborIndex = (ny * MODERN_CITY_LIGHTS_GRID_WIDTH) + nx;
+          if (neighborIndex === currentIndex) continue;
+          if (visitedNeighborIndices.has(neighborIndex)) continue;
+          visitedNeighborIndices.add(neighborIndex);
+          if (MODERN_CITY_LIGHTS_GRID[neighborIndex] >= MODERN_CITY_LIGHTS_BASE_THRESHOLD) {
+            neighborCount += 1;
+          }
+        }
+      }
 
       const entry = {
         x: center[0],
         y: center[1],
-        rx,
-        ry,
+        rx: clampedRx,
+        ry: clampedRy,
         rotation: Math.atan2(ewDy, ewDx),
         gridX: x,
         gridY: y,
         value,
+        neighborCount,
       };
       baseEntries.push(entry);
       if (value >= MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD) {
@@ -12477,6 +12501,13 @@ function getModernGridEntryJitter(entry, strength = 0.18) {
   return { dx, dy };
 }
 
+function getModernCityLightLatitudeFade(gridY) {
+  const cellLat = 90 - ((gridY + 0.5) * MODERN_CITY_LIGHTS_STEP_LAT_DEG);
+  const absLat = Math.abs(cellLat);
+  if (absLat <= 72) return 1;
+  return clamp(1 - ((absLat - 72) / 16), 0.15, 1);
+}
+
 function drawModernCityLightsTexture(config, intensity) {
   const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
   if (textureOpacity <= 0) return;
@@ -12489,31 +12520,42 @@ function drawModernCityLightsTexture(config, intensity) {
   geometry.baseEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
     const normalized = normalizeModernCityLightsValue(entry.value);
-    const lumaWeight = Math.pow(normalized, 0.52);
+    const lumaWeight = Math.pow(normalized, 0.78);
+    const densityDampen = entry.neighborCount >= 7 ? 0.72
+      : entry.neighborCount >= 5 ? 0.84
+      : 1.0;
+    const isolationAlphaBoost = entry.neighborCount <= 1 ? 0.06 : 0;
+    const latFade = getModernCityLightLatitudeFade(entry.gridY);
     const alpha = clamp(
       intensity
       * (0.38 + (textureOpacity * 1.04))
-      * (0.08 + (lumaWeight * 0.48))
-      * zoomProfile.textureAlphaScale,
+      * (0.08 + (lumaWeight * 0.36))
+      * zoomProfile.textureAlphaScale
+      * densityDampen
+      * latFade,
       0,
-      0.52
+      0.4
     );
     if (alpha <= 0.002) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.textureJitterStrength);
-    const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
-    const radius = baseRadius * (zoomProfile.textureRadiusScale + 0.18 + (lumaWeight * 0.72));
+    const isolationSpread = entry.neighborCount <= 1 ? 1.38
+      : entry.neighborCount <= 3 ? 1.18
+      : 1.0;
+    const radiusScale = (zoomProfile.textureRadiusScale + 0.12 + (lumaWeight * 0.48)) * isolationSpread;
+    const blobRx = entry.rx * radiusScale;
+    const blobRy = entry.ry * radiusScale;
     drawSoftLightBlob(
       entry.x + jitter.dx,
       entry.y + jitter.dy,
-      radius,
-      radius * 1.04,
+      blobRx,
+      blobRy,
       {
-        rotation: 0,
+        rotation: entry.rotation,
         rgb: textureRgb,
         alpha,
         innerStop: 0.06,
         midStop: 0.7,
-        innerAlphaScale: 0.96,
+        innerAlphaScale: clamp(0.96 + isolationAlphaBoost, 0, 1.08),
         midAlphaScale: 0.28,
       }
     );
@@ -12532,14 +12574,16 @@ function drawModernCityLightsCorridors(config, intensity) {
   geometry.corridorEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
     const normalized = normalizeModernCityLightsValue(entry.value);
-    const corridorWeight = Math.pow(normalized, 0.56);
+    const corridorWeight = Math.pow(normalized, 0.82);
+    const latFade = getModernCityLightLatitudeFade(entry.gridY);
     const alpha = clamp(
       intensity
       * (0.42 + (corridorStrength * 0.88))
       * (0.06 + (corridorWeight * 0.38))
-      * zoomProfile.corridorAlphaScale,
+      * zoomProfile.corridorAlphaScale
+      * latFade,
       0,
-      0.42
+      0.34
     );
     if (alpha <= 0.003) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
@@ -12699,7 +12743,7 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
   const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
   const overscan = Math.max(28, Math.min(state.width, state.height) * 0.05);
   const urbanIndex = getUrbanFeatureIndex();
-  const minPopulation = zoomScale <= 1.1 ? 100000 : zoomScale <= 1.8 ? 50000 : 20000;
+  const minPopulation = zoomScale <= 1.1 ? 60000 : zoomScale <= 1.8 ? 30000 : 15000;
 
   cityCollection.features.forEach((feature) => {
     const props = feature?.properties || {};
