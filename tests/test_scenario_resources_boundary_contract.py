@@ -63,6 +63,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("ensureChunkedScenarioFirstFrameReady", content)
         self.assertIn("await preloadScenarioCoarseChunks(bundle);", content)
         self.assertIn("await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });", content)
+        self.assertNotIn("void ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });", content)
         self.assertIn('reason: "scenario-apply"', content)
 
     def test_full_bundle_prefers_runtime_topology_even_with_chunk_manifest(self):

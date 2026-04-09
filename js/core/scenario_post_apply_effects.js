@@ -85,7 +85,7 @@ async function runPostScenarioApplyEffects({
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioSupportsChunkedRuntime(bundle)) {
-    void ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
+    await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
   } else if (!state.bootBlocking) {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {
