@@ -2087,6 +2087,10 @@ async function bootstrap() {
     await deferredUiBootstrapPromise;
     setBootState("scenario-apply");
     startBootMetric("scenario-apply");
+    state.scenarioApplyInFlight = true;
+    if (typeof state.updateScenarioUIFn === "function") {
+      state.updateScenarioUIFn();
+    }
     try {
       await applyScenarioBundleCommand(defaultScenarioBundle, {
         renderMode: "none",
@@ -2126,12 +2130,20 @@ async function bootstrap() {
       source: scenarioBundleSource,
       startupRecoveryReason,
     });
+    state.scenarioApplyInFlight = false;
+    if (typeof state.updateScenarioUIFn === "function") {
+      state.updateScenarioUIFn();
+    }
 
     setBootState("warmup");
     renderDispatcher.flush();
     checkpointBootMetricOnce("first-visible-scenario");
     await finalizeReadyState(renderDispatcher);
   } catch (error) {
+    state.scenarioApplyInFlight = false;
+    if (typeof state.updateScenarioUIFn === "function") {
+      state.updateScenarioUIFn();
+    }
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);
     console.error("Stack trace:", error?.stack);

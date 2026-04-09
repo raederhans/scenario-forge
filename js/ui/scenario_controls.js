@@ -114,7 +114,7 @@ export function initScenarioControls() {
   if (scenarioViewModeSelect && !scenarioViewModeSelect.dataset.bound) {
     scenarioViewModeSelect.addEventListener("change", (event) => {
       const changed = setScenarioViewModeCommand(event?.target?.value, {
-        renderMode: "flush",
+        renderMode: "request",
         markDirtyReason: "",
       });
       if (changed) {
@@ -130,7 +130,7 @@ export function initScenarioControls() {
       if (!scenarioId) return;
       try {
         await applyScenarioByIdCommand(scenarioId, {
-          renderMode: "flush",
+          renderMode: "request",
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
@@ -152,7 +152,7 @@ export function initScenarioControls() {
     resetScenarioBtn.addEventListener("click", () => {
       if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
       const changed = resetScenarioToBaselineCommand({
-        renderMode: "flush",
+        renderMode: "request",
         markDirtyReason: "scenario-reset",
         showToastOnComplete: true,
       });
@@ -167,7 +167,7 @@ export function initScenarioControls() {
     clearScenarioBtn.addEventListener("click", () => {
       if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
       clearActiveScenarioCommand({
-        renderMode: "flush",
+        renderMode: "request",
         markDirtyReason: "scenario-clear",
         showToastOnComplete: true,
       });

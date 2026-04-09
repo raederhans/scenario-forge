@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-09T00:12:51.612Z",
-  "last_progress_at": "2026-04-09T00:12:51.612Z",
-  "turn_count": 24,
-  "last_agent_output": "结论：我已经把这轮 follow-up 做完了。**i18n 回归已经补上，`project_save_load_roundtrip.spec.js` 也已经确认不是 harness 启动卡死，而是之"
+  "last_turn_at": "2026-04-09T03:24:34.647Z",
+  "last_progress_at": "2026-04-09T03:24:34.647Z",
+  "turn_count": 7,
+  "last_agent_output": "结论：**1939 启动链的问题我已经修了，而且没有回退你现在的性能方案。**  \n修复方案是两块：\n\n1. **把 startup/default scenario 也纳入 `scenarioApp"
 }

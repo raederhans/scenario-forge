@@ -247,3 +247,17 @@
 ### 39. Playwright list reporter 只显示 Running 并不等于 harness 启动卡死
 - 像 project_save_load_roundtrip 这种长链路用例，如果中间没有阶段日志，stdout 可能长时间只剩 'Running N tests using 1 worker'，很容易误判成 harness 没启动。
 - 更稳的做法是在关键 helper（页面进入、UI ready、download、import、scenario apply）里打印带时间戳的阶段日志，并在超时时附运行态快照。
+
+### 40. Chunked detail political features must be normalized before merging into runtime land collections
+- If chunk payload features bypass normalizeFeatureGeometry(), many detail polygons can be interpreted as world-size complements, causing world_bounds skips, blank political fills, and oversized Antarctic/ocean artifacts.
+- When runtime/topology collections are merged, normalize the chunk features at the merge boundary instead of assuming chunk JSON already has safe winding.
+### 41. New render passes that depend on scenario masks must be invalidated on runtime mask updates
+- Once a pass like physicalBase starts clipping against scenarioLandMask/contextLandMask, scenario hydrate and water fallback paths must invalidate that pass too, not just background/contextScenario.
+- Otherwise old mask geometry can keep rendering against new scenario state, which looks like broken open-ocean or Antarctic overlays.
+
+### 42. Startup default scenario apply must participate in the same in-flight gate as manual scenario apply
+- If startup bundle apply does not set scenarioApplyInFlight, tests and UI can observe activeScenarioId early while the apply transaction is still unfinished.
+- The stable rule is: startup apply, manual apply, and recovery apply should all share the same busy gate before scenario UI is treated as settled.
+### 43. Chunked coarse preload and noncritical scenario metadata should not block scenario apply completion
+- If coarse chunk preload or metadata like releasable catalog/district groups/audit stay on the main apply path, startup can remain stuck in scenario-apply even after the scene is already usable.
+- Let apply finish on required political/runtime assets first, then load coarse chunks and metadata in the background.

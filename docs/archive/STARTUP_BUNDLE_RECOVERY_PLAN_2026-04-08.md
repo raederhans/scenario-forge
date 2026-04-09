@@ -21,6 +21,22 @@
 - `python -m py_compile tools/build_startup_bundle.py`
 - `node node_modules/@playwright/test/cli.js test tests/e2e/startup_bundle_recovery_contract.spec.js --reporter=list --workers=1`
 
+## 后续补充修复（2026-04-08 晚间）
+- 修复 chunked detail political features 在并入 runtime land collection 前未做 `normalizeFeatureGeometry()`，解决 `world_bounds` 误判导致的 TNO 无国家填色、南极/外海异常放大。
+- 补齐 `scenarioLandMask / scenarioContextLandMask / scenarioWater` 改动后的 renderer invalidation，把 `physicalBase` 一起纳入刷新链；并限制 terrain 开启时的 exact refresh 不再在 startup/apply 阶段强制触发。
+- 将 scenario controls 的 apply/reset/exit 改成非阻塞 `renderMode: "request"`，并把 startup 默认场景 apply 也纳入 `scenarioApplyInFlight`。
+- 将 `runPostScenarioApplyEffects()` 里的 chunked coarse preload 改为后台任务，同时把 full bundle 的 `releasable_catalog / district_groups / audit` 改成 deferred metadata load，避免阻塞 1939 startup apply。
+
+## 后续补充验证（2026-04-08 晚间）
+- `node --check js/core/map_renderer.js`
+- `node --check js/core/scenario_post_apply_effects.js`
+- `node --check js/core/scenario_recovery.js`
+- `node --check js/ui/scenario_controls.js`
+- `node --check tests/e2e/tno_open_ocean_rendering.spec.js`
+- `node node_modules/@playwright/test/cli.js test tests/e2e/tno_open_ocean_rendering.spec.js --reporter=list --workers=1`
+- `node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1`
+- `node node_modules/@playwright/test/cli.js test tests/e2e/startup_bundle_recovery_contract.spec.js --reporter=list --workers=1`
+
 ## 备注
 - `tests/e2e/tno_open_ocean_rendering.spec.js` 单独跑时仍会在 `applyScenarioByIdCommand("tno_1962")` 阶段撞到既有 120s 超时，未纳入本轮修复范围。
 

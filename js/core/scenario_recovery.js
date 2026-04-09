@@ -130,6 +130,7 @@ export function enterScenarioFatalRecovery({
     rootErrorMessage: String(rootError?.message || "").trim(),
     rollbackErrorMessage: String(rollbackError?.message || "").trim(),
   };
+  state.scenarioApplyInFlight = false;
   showToast(formatScenarioFatalRecoveryMessage(state.scenarioFatalRecovery), {
     title: t("Scenario recovery failed", "ui"),
     tone: "error",

@@ -15,7 +15,7 @@ async function applyScenario(page, scenarioId) {
   await page.evaluate(async (expectedScenarioId) => {
     const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
     await applyScenarioByIdCommand(expectedScenarioId, {
-      renderMode: "flush",
+      renderMode: "request",
       markDirtyReason: "",
       showToastOnComplete: false,
     });

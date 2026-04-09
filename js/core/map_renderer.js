@@ -983,8 +983,8 @@ function invalidateOceanTextureVisualState(reason = "ocean-texture") {
 
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
   cancelExactAfterSettleRefresh({ clearDefer: true });
-  invalidateRenderPasses(["background", "contextScenario"], reason);
-  clearRenderPassReferenceTransforms(["background", "contextScenario"]);
+  invalidateRenderPasses(["background", "physicalBase", "contextScenario"], reason);
+  clearRenderPassReferenceTransforms(["background", "physicalBase", "contextScenario"]);
 }
 
 function invalidateOceanCoastalAccentVisualState(reason = "ocean-coastal-accent") {
@@ -3519,13 +3519,16 @@ function composePoliticalFeatureCollections(primaryCollection, detailCollection 
   const normalizedDetailCollection = Array.isArray(detailCollection?.features)
     ? {
       type: "FeatureCollection",
-      features: detailCollection.features.map((feature) => ({
-        ...feature,
-        properties: {
-          ...(feature?.properties || {}),
-          __source: "detail",
-        },
-      })),
+      features: detailCollection.features.map((feature) => {
+        const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
+        return {
+          ...normalizedFeature,
+          properties: {
+            ...(normalizedFeature?.properties || {}),
+            __source: "detail",
+          },
+        };
+      }),
     }
     : null;
   if (!normalizedDetailCollection) {
@@ -9885,6 +9888,9 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
 
 function shouldForceExactContextBaseRefresh() {
   if (!state.showPhysical) return false;
+  if (state.bootBlocking || state.scenarioApplyInFlight || state.startupReadonly || state.startupReadonlyUnlockInFlight) {
+    return false;
+  }
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
   return cfg.mode === "atlas_only" || cfg.mode === "contours_only" || cfg.mode === "atlas_and_contours";
 }

@@ -862,6 +862,71 @@ function normalizeScenarioRuntimePoliticalMeta(meta) {
   };
 }
 
+function scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client = globalThis.d3 } = {}) {
+  if (!bundle?.manifest || bundle?.bundleLevel !== "full") {
+    return;
+  }
+  if (bundle.deferredMetadataLoadPromise) {
+    return;
+  }
+  const scenarioId = normalizeScenarioId(bundle.manifest?.scenario_id || bundle.meta?.scenario_id);
+  if (!scenarioId || !d3Client || typeof d3Client.json !== "function") {
+    return;
+  }
+  bundle.deferredMetadataLoadPromise = new Promise((resolve) => {
+    globalThis.setTimeout(async () => {
+      const [releasableCatalogResult, districtGroupsResult] = await Promise.all([
+        bundle.manifest?.releasable_catalog_url
+          ? loadOptionalScenarioResource(d3Client, bundle.manifest.releasable_catalog_url, {
+            scenarioId,
+            resourceLabel: "releasable_catalog",
+          })
+          : Promise.resolve({ ok: false, value: null, metrics: null, reason: "missing-url", errorMessage: "" }),
+        bundle.manifest?.district_groups_url
+          ? loadOptionalScenarioResource(d3Client, bundle.manifest.district_groups_url, {
+            scenarioId,
+            resourceLabel: "district_groups",
+          })
+          : Promise.resolve({ ok: false, value: null, metrics: null, reason: "missing-url", errorMessage: "" }),
+      ]);
+      if (releasableCatalogResult.ok) {
+        bundle.releasableCatalog = releasableCatalogResult.value || null;
+        if (bundle.loadDiagnostics?.optionalResources?.releasable_catalog) {
+          bundle.loadDiagnostics.optionalResources.releasable_catalog = {
+            ok: true,
+            reason: releasableCatalogResult.reason,
+            errorMessage: releasableCatalogResult.errorMessage,
+            metrics: releasableCatalogResult.metrics || null,
+          };
+        }
+      }
+      if (districtGroupsResult.ok) {
+        bundle.districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, scenarioId);
+        if (bundle.loadDiagnostics?.optionalResources?.district_groups) {
+          bundle.loadDiagnostics.optionalResources.district_groups = {
+            ok: true,
+            reason: districtGroupsResult.reason,
+            errorMessage: districtGroupsResult.errorMessage,
+            metrics: districtGroupsResult.metrics || null,
+          };
+        }
+      }
+      if (normalizeScenarioId(state.activeScenarioId) === scenarioId) {
+        if (bundle.releasableCatalog) {
+          state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
+          state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId, { excludeTags: [] });
+        }
+        if (bundle.districtGroupsPayload) {
+          state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
+          state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
+        }
+        syncScenarioUi();
+      }
+      resolve();
+    }, 1200);
+  });
+}
+
 function getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta = null) {
   const geometryCount = Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)
     ? runtimeTopologyPayload.objects.political.geometries.length
@@ -2248,7 +2313,7 @@ function hydrateActiveScenarioBundle(
     });
   }
   if (contextBaseChanged) {
-    invalidateContextLayerVisualStateBatch([], "scenario-hydrate-context-base", { renderNow: false });
+    invalidateContextLayerVisualStateBatch(["physical"], "scenario-hydrate-context-base", { renderNow: false });
   }
   if (scenarioOverlayChanged) {
     invalidateOceanWaterInteractionVisualState("scenario-hydrate-water");
@@ -2771,24 +2836,27 @@ async function loadScenarioBundle(
         ? `geo_locale_patch_${geoLocalePatchDescriptor.language}`
         : "geo_locale_patch",
     }),
-    requestedBundleLevel === "full"
-      ? loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
-        scenarioId: targetId,
-        resourceLabel: "releasable_catalog",
-      })
-      : Promise.resolve({ ok: false, value: priorBundle?.releasableCatalog || null, metrics: null, reason: "deferred", errorMessage: "" }),
-    requestedBundleLevel === "full"
-      ? loadOptionalScenarioResource(d3Client, manifest.district_groups_url, {
-        scenarioId: targetId,
-        resourceLabel: "district_groups",
-      })
-      : Promise.resolve({ ok: false, value: priorBundle?.districtGroupsPayload || null, metrics: null, reason: "deferred", errorMessage: "" }),
-    requestedBundleLevel === "full"
-      ? loadOptionalScenarioResource(d3Client, manifest.audit_url, {
-        scenarioId: targetId,
-        resourceLabel: "audit",
-      })
-      : Promise.resolve({ ok: false, value: priorBundle?.auditPayload || null, metrics: null, reason: "deferred", errorMessage: "" }),
+    Promise.resolve({
+      ok: false,
+      value: priorBundle?.releasableCatalog || null,
+      metrics: null,
+      reason: requestedBundleLevel === "full" ? "deferred-idle" : "deferred",
+      errorMessage: "",
+    }),
+    Promise.resolve({
+      ok: false,
+      value: priorBundle?.districtGroupsPayload || null,
+      metrics: null,
+      reason: requestedBundleLevel === "full" ? "deferred-idle" : "deferred",
+      errorMessage: "",
+    }),
+    Promise.resolve({
+      ok: false,
+      value: priorBundle?.auditPayload || null,
+      metrics: null,
+      reason: requestedBundleLevel === "full" ? "deferred-on-demand" : "deferred",
+      errorMessage: "",
+    }),
   ]);
 
   const bundle = {
@@ -2888,6 +2956,7 @@ async function loadScenarioBundle(
     if (scenarioSupportsChunkedRuntime(bundle)) {
       await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
     }
+    scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client });
   }
   const ownerCount = Object.keys(bundle.ownersPayload?.owners || {}).length;
   const controllerCount = Object.keys(bundle.controllersPayload?.controllers || {}).length;

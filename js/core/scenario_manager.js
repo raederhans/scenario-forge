@@ -1628,6 +1628,14 @@ async function applyScenarioById(
   if (!normalizedScenarioId) {
     throw new Error("[scenario] Scenario id is required.");
   }
+  if (
+    normalizeScenarioId(state.activeScenarioId) === normalizedScenarioId
+    && !state.startupReadonly
+    && !state.startupReadonlyUnlockInFlight
+    && String(state.topologyBundleMode || "") === "composite"
+  ) {
+    return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+  }
   if (state.scenarioApplyInFlight && activeScenarioApplyPromise) {
     return activeScenarioApplyPromise;
   }
