@@ -221,6 +221,8 @@ let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let startupReadonlyUnlockHandle = null;
 let bootMetricsLogged = false;
+let forcedStartupReadonlyInfraRetryCount = 0;
+const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
@@ -1562,15 +1564,91 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
   }
 }
 
-function scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs = 120 } = {}) {
+function scheduleStartupReadonlyUnlock(
+  renderDispatcher,
+  { delayMs = 120, attempt = 0, maxAttempts = 5 } = {},
+) {
   if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || startupReadonlyUnlockHandle !== null) {
     return;
   }
   startupReadonlyUnlockHandle = globalThis.setTimeout(() => {
     startupReadonlyUnlockHandle = null;
+    if (attempt >= maxAttempts) {
+      console.warn(`[boot] Startup readonly unlock failed after ${maxAttempts} attempts, force-unlocking.`);
+      setStartupReadonlyState(true, {
+        reason: "detail-promotion-failed",
+        unlockInFlight: true,
+      });
+      setBootState("interaction-infra", {
+        blocking: true,
+        canContinueWithoutScenario: false,
+      });
+      startBootMetric("interaction-infra");
+      void buildInteractionInfrastructureAfterStartup({
+        chunked: true,
+        buildHitCanvas: false,
+      }).then(() => {
+        forcedStartupReadonlyInfraRetryCount = 0;
+        finishBootMetric("interaction-infra", {
+          activeScenarioId: String(state.activeScenarioId || ""),
+          forced: true,
+        });
+        setStartupReadonlyState(false);
+        setBootState("ready", {
+          blocking: false,
+          progress: 100,
+          canContinueWithoutScenario: false,
+        });
+        checkpointBootMetric("time-to-interactive");
+        checkpointBootMetric("first-interactive");
+        completeBootSequenceLogging();
+        scheduleDeferredDetailPromotion(renderDispatcher);
+        schedulePostReadyHydration();
+        schedulePostReadyDeferredContextWarmup();
+        schedulePostReadyVisualWarmup();
+      }).catch((error) => {
+        finishBootMetric("interaction-infra", {
+          failed: true,
+          forced: true,
+          errorMessage: error?.message || String(error || "Unknown interaction infrastructure error."),
+        });
+        console.warn("[boot] Forced startup readonly unlock interaction infra build failed:", error);
+        setStartupReadonlyState(true, {
+          reason: "interaction-infra-failed",
+          unlockInFlight: false,
+        });
+        setBootState("interaction-infra", {
+          blocking: true,
+          canContinueWithoutScenario: false,
+        });
+        forcedStartupReadonlyInfraRetryCount += 1;
+        if (forcedStartupReadonlyInfraRetryCount <= MAX_FORCED_STARTUP_INFRA_RETRIES) {
+          console.warn(
+            `[boot] Retrying forced startup readonly unlock infra build (${forcedStartupReadonlyInfraRetryCount}/${MAX_FORCED_STARTUP_INFRA_RETRIES}).`,
+          );
+          scheduleStartupReadonlyUnlock(renderDispatcher, {
+            delayMs: 1600,
+            attempt: maxAttempts,
+            maxAttempts,
+          });
+          return;
+        }
+        setStartupReadonlyState(false);
+        setBootState("error", {
+          error: error?.message || "Failed to initialize interaction infrastructure during startup recovery.",
+          canContinueWithoutScenario: false,
+          progress: state.bootProgress || BOOT_PHASE_WINDOWS["interaction-infra"].min,
+        });
+      });
+      return;
+    }
     void unlockStartupReadonlyWithDetail(renderDispatcher).then((unlocked) => {
       if (!unlocked && state.startupReadonly) {
-        scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs: 1600 });
+        scheduleStartupReadonlyUnlock(renderDispatcher, {
+          delayMs: 1600,
+          attempt: attempt + 1,
+          maxAttempts,
+        });
       }
     });
   }, Math.max(0, delayMs));
@@ -1640,6 +1718,7 @@ async function finalizeReadyState(renderDispatcher) {
       activeScenarioId: String(state.activeScenarioId || ""),
       startupBootstrapStrategy,
     });
+    setStartupReadonlyState(false);
     setBootState("ready", {
       blocking: false,
       progress: 100,

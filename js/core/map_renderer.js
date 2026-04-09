@@ -467,7 +467,7 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = ["background", "political", "physicalBase", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+const RENDER_PASS_NAMES = ["background", "physicalBase", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
 const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "background",
   "physicalBase",
@@ -479,8 +479,8 @@ const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
 ]);
 const TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
-  "political",
   "physicalBase",
+  "political",
   "effects",
   "contextBase",
   "contextScenario",
@@ -14966,10 +14966,13 @@ function renderPassToCache(passName, drawFn, transform, timings) {
 function ensureIdleRenderPasses(timings) {
   const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
   const cache = getRenderPassCacheState();
+  if (state.legacyColorStateDirty) {
+    rebuildResolvedColors();
+  }
   const passDefinitions = [
     ["background", (k) => drawBackgroundPass(k)],
-    ["political", (k) => drawPoliticalPass(k)],
     ["physicalBase", (k) => drawPhysicalBasePass(k)],
+    ["political", (k) => drawPoliticalPass(k)],
     ["effects", (k) => drawEffectsPass(k)],
     ["contextBase", (k) => drawContextBasePass(k)],
     ["contextScenario", (k) => drawContextScenarioPass(k)],
