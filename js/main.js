@@ -1571,19 +1571,45 @@ function scheduleStartupReadonlyUnlock(
   }
   if (attempt >= maxAttempts) {
     console.warn(`[boot] Startup readonly unlock failed after ${maxAttempts} attempts, force-unlocking.`);
-    setStartupReadonlyState(false);
-    setBootState("ready", {
-      blocking: false,
-      progress: 100,
+    setStartupReadonlyState(true, {
+      reason: "detail-promotion-failed",
+      unlockInFlight: true,
+    });
+    setBootState("interaction-infra", {
+      blocking: true,
       canContinueWithoutScenario: false,
     });
-    checkpointBootMetric("time-to-interactive");
-    checkpointBootMetric("first-interactive");
-    completeBootSequenceLogging();
-    scheduleDeferredDetailPromotion(renderDispatcher);
-    schedulePostReadyHydration();
-    schedulePostReadyDeferredContextWarmup();
-    schedulePostReadyVisualWarmup();
+    startBootMetric("interaction-infra");
+    void buildInteractionInfrastructureAfterStartup({
+      chunked: true,
+      buildHitCanvas: false,
+    }).then(() => {
+      finishBootMetric("interaction-infra", {
+        activeScenarioId: String(state.activeScenarioId || ""),
+        forced: true,
+      });
+    }).catch((error) => {
+      finishBootMetric("interaction-infra", {
+        failed: true,
+        forced: true,
+        errorMessage: error?.message || String(error || "Unknown interaction infrastructure error."),
+      });
+      console.warn("[boot] Forced startup readonly unlock interaction infra build failed:", error);
+    }).finally(() => {
+      setStartupReadonlyState(false);
+      setBootState("ready", {
+        blocking: false,
+        progress: 100,
+        canContinueWithoutScenario: false,
+      });
+      checkpointBootMetric("time-to-interactive");
+      checkpointBootMetric("first-interactive");
+      completeBootSequenceLogging();
+      scheduleDeferredDetailPromotion(renderDispatcher);
+      schedulePostReadyHydration();
+      schedulePostReadyDeferredContextWarmup();
+      schedulePostReadyVisualWarmup();
+    });
     return;
   }
   startupReadonlyUnlockHandle = globalThis.setTimeout(() => {
