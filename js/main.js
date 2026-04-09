@@ -221,6 +221,8 @@ let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let startupReadonlyUnlockHandle = null;
 let bootMetricsLogged = false;
+let forcedStartupReadonlyInfraRetryCount = 0;
+const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
@@ -1584,6 +1586,7 @@ function scheduleStartupReadonlyUnlock(
       chunked: true,
       buildHitCanvas: false,
     }).then(() => {
+      forcedStartupReadonlyInfraRetryCount = 0;
       finishBootMetric("interaction-infra", {
         activeScenarioId: String(state.activeScenarioId || ""),
         forced: true,
@@ -1615,6 +1618,24 @@ function scheduleStartupReadonlyUnlock(
       setBootState("interaction-infra", {
         blocking: true,
         canContinueWithoutScenario: false,
+      });
+      forcedStartupReadonlyInfraRetryCount += 1;
+      if (forcedStartupReadonlyInfraRetryCount <= MAX_FORCED_STARTUP_INFRA_RETRIES) {
+        console.warn(
+          `[boot] Retrying forced startup readonly unlock infra build (${forcedStartupReadonlyInfraRetryCount}/${MAX_FORCED_STARTUP_INFRA_RETRIES}).`,
+        );
+        scheduleStartupReadonlyUnlock(renderDispatcher, {
+          delayMs: 1600,
+          attempt: maxAttempts,
+          maxAttempts,
+        });
+        return;
+      }
+      setStartupReadonlyState(false);
+      setBootState("error", {
+        error: error?.message || "Failed to initialize interaction infrastructure during startup recovery.",
+        canContinueWithoutScenario: false,
+        progress: state.bootProgress || BOOT_PHASE_WINDOWS["interaction-infra"].min,
       });
     });
     return;
