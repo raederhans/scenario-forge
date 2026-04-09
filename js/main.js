@@ -1588,14 +1588,6 @@ function scheduleStartupReadonlyUnlock(
         activeScenarioId: String(state.activeScenarioId || ""),
         forced: true,
       });
-    }).catch((error) => {
-      finishBootMetric("interaction-infra", {
-        failed: true,
-        forced: true,
-        errorMessage: error?.message || String(error || "Unknown interaction infrastructure error."),
-      });
-      console.warn("[boot] Forced startup readonly unlock interaction infra build failed:", error);
-    }).finally(() => {
       setStartupReadonlyState(false);
       setBootState("ready", {
         blocking: false,
@@ -1609,6 +1601,21 @@ function scheduleStartupReadonlyUnlock(
       schedulePostReadyHydration();
       schedulePostReadyDeferredContextWarmup();
       schedulePostReadyVisualWarmup();
+    }).catch((error) => {
+      finishBootMetric("interaction-infra", {
+        failed: true,
+        forced: true,
+        errorMessage: error?.message || String(error || "Unknown interaction infrastructure error."),
+      });
+      console.warn("[boot] Forced startup readonly unlock interaction infra build failed:", error);
+      setStartupReadonlyState(true, {
+        reason: "interaction-infra-failed",
+        unlockInFlight: false,
+      });
+      setBootState("interaction-infra", {
+        blocking: true,
+        canContinueWithoutScenario: false,
+      });
     });
     return;
   }
