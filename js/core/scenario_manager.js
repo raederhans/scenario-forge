@@ -1149,6 +1149,57 @@ function cloneScenarioStateValue(value) {
   return cloned;
 }
 
+function normalizeScenarioIso2Code(value) {
+  const normalized = String(value || "").trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(normalized) ? normalized : "";
+}
+
+function buildScenarioCoarseColorMap({
+  startupApplySeed,
+  countryMap,
+  scenarioColorMap,
+}) {
+  if (startupApplySeed?.coarse_color_map && typeof startupApplySeed.coarse_color_map === "object") {
+    const sanitized = {};
+    Object.entries(startupApplySeed.coarse_color_map).forEach(([rawIso2, rawColor]) => {
+      const iso2 = normalizeScenarioIso2Code(rawIso2);
+      const color = String(rawColor || "").trim().toLowerCase();
+      if (iso2 && /^#[0-9a-f]{6}$/.test(color)) {
+        sanitized[iso2] = color;
+      }
+    });
+    return sanitized;
+  }
+  const coarseCandidates = {};
+  Object.entries(countryMap || {}).forEach(([rawTag, rawEntry]) => {
+    const tag = String(rawTag || "").trim().toUpperCase();
+    const entry = rawEntry && typeof rawEntry === "object" ? rawEntry : {};
+    const iso2 = normalizeScenarioIso2Code(entry.base_iso2 || entry.lookup_iso2);
+    const color = String(
+      scenarioColorMap?.[tag]
+      || entry.color_hex
+      || entry.colorHex
+      || ""
+    ).trim().toLowerCase();
+    if (!iso2 || !/^#[0-9a-f]{6}$/.test(color)) {
+      return;
+    }
+    const featureCount = Number(entry.feature_count);
+    const score = Number.isFinite(featureCount) ? featureCount : 0;
+    const existing = coarseCandidates[iso2];
+    if (!existing || score > existing.score) {
+      coarseCandidates[iso2] = { score, color };
+    }
+  });
+  const coarseColorMap = {};
+  Object.entries(coarseCandidates).forEach(([iso2, entry]) => {
+    if (entry?.color) {
+      coarseColorMap[iso2] = entry.color;
+    }
+  });
+  return coarseColorMap;
+}
+
 async function prepareScenarioApplyState(
   bundle,
   {
@@ -1283,6 +1334,11 @@ async function prepareScenarioApplyState(
   const scenarioColorMap = startupApplySeed?.scenario_color_map && typeof startupApplySeed.scenario_color_map === "object"
     ? { ...startupApplySeed.scenario_color_map }
     : getScenarioFixedOwnerColors(countryMap);
+  const coarseColorMap = buildScenarioCoarseColorMap({
+    startupApplySeed,
+    countryMap,
+    scenarioColorMap,
+  });
   const scenarioOwnerBackfill = startupApplySeed?.resolved_owners && typeof startupApplySeed.resolved_owners === "object"
     ? {}
     : buildHoi4FarEastSovietOwnerBackfill(scenarioId, {
@@ -1341,6 +1397,7 @@ async function prepareScenarioApplyState(
       : (bundle.cityOverridesPayload || null),
     scenarioNameMap,
     scenarioColorMap,
+    coarseColorMap,
     scenarioOwnerBackfill,
     resolvedOwners,
     controllers,
@@ -1446,6 +1503,14 @@ async function applyScenarioBundle(
     state.featureOverrides = {};
     state.sovereignBaseColors = { ...staged.scenarioColorMap };
     state.countryBaseColors = { ...staged.scenarioColorMap };
+    if (staged.coarseColorMap && typeof staged.coarseColorMap === "object") {
+      Object.entries(staged.coarseColorMap).forEach(([iso2, color]) => {
+        if (iso2 && color && !state.sovereignBaseColors[iso2]) {
+          state.sovereignBaseColors[iso2] = color;
+          state.countryBaseColors[iso2] = color;
+        }
+      });
+    }
     markLegacyColorStateDirty();
     state.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
     state.selectedWaterRegionId = "";
