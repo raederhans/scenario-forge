@@ -1442,7 +1442,6 @@ async function applyScenarioBundle(
     state.activeScenarioManifest = bundle.manifest || null;
     state.mapSemanticMode = staged.mapSemanticMode;
     state.scenarioCountriesByTag = staged.countryMap;
-    state.scenarioFixedOwnerColors = staged.scenarioColorMap;
     state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
     state.activeScenarioMeshPack = bundle.meshPackPayload || null;
     state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
@@ -1501,16 +1500,17 @@ async function applyScenarioBundle(
     state.sovereigntyInitialized = false;
     state.visualOverrides = {};
     state.featureOverrides = {};
-    state.sovereignBaseColors = { ...staged.scenarioColorMap };
-    state.countryBaseColors = { ...staged.scenarioColorMap };
+    const fixedOwnerColors = { ...staged.scenarioColorMap };
     if (staged.coarseColorMap && typeof staged.coarseColorMap === "object") {
       Object.entries(staged.coarseColorMap).forEach(([iso2, color]) => {
-        if (iso2 && color && !state.sovereignBaseColors[iso2]) {
-          state.sovereignBaseColors[iso2] = color;
-          state.countryBaseColors[iso2] = color;
+        if (iso2 && color && !fixedOwnerColors[iso2]) {
+          fixedOwnerColors[iso2] = color;
         }
       });
     }
+    state.scenarioFixedOwnerColors = { ...fixedOwnerColors };
+    state.sovereignBaseColors = { ...fixedOwnerColors };
+    state.countryBaseColors = { ...fixedOwnerColors };
     markLegacyColorStateDirty();
     state.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
     state.selectedWaterRegionId = "";
