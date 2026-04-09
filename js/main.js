@@ -1562,15 +1562,39 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
   }
 }
 
-function scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs = 120 } = {}) {
+function scheduleStartupReadonlyUnlock(
+  renderDispatcher,
+  { delayMs = 120, attempt = 0, maxAttempts = 5 } = {},
+) {
   if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || startupReadonlyUnlockHandle !== null) {
+    return;
+  }
+  if (attempt >= maxAttempts) {
+    console.warn(`[boot] Startup readonly unlock failed after ${maxAttempts} attempts, force-unlocking.`);
+    setStartupReadonlyState(false);
+    setBootState("ready", {
+      blocking: false,
+      progress: 100,
+      canContinueWithoutScenario: false,
+    });
+    checkpointBootMetric("time-to-interactive");
+    checkpointBootMetric("first-interactive");
+    completeBootSequenceLogging();
+    scheduleDeferredDetailPromotion(renderDispatcher);
+    schedulePostReadyHydration();
+    schedulePostReadyDeferredContextWarmup();
+    schedulePostReadyVisualWarmup();
     return;
   }
   startupReadonlyUnlockHandle = globalThis.setTimeout(() => {
     startupReadonlyUnlockHandle = null;
     void unlockStartupReadonlyWithDetail(renderDispatcher).then((unlocked) => {
       if (!unlocked && state.startupReadonly) {
-        scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs: 1600 });
+        scheduleStartupReadonlyUnlock(renderDispatcher, {
+          delayMs: 1600,
+          attempt: attempt + 1,
+          maxAttempts,
+        });
       }
     });
   }, Math.max(0, delayMs));
@@ -1640,6 +1664,7 @@ async function finalizeReadyState(renderDispatcher) {
       activeScenarioId: String(state.activeScenarioId || ""),
       startupBootstrapStrategy,
     });
+    setStartupReadonlyState(false);
     setBootState("ready", {
       blocking: false,
       progress: 100,
