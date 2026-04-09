@@ -68,10 +68,13 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
         blendMode: "overlay",
         atlasOpacity: 0.27,
       }),
+      normalizedInvalidBlend: normalizePhysicalStyleConfig({
+        blendMode: "totally-invalid-mode",
+      }),
       normalizedNewSchemaOpacityOnly: normalizePhysicalStyleConfig({
         mode: "atlas_and_contours",
         opacity: 0.44,
-        blendMode: "soft-light",
+        blendMode: "source-over",
       }),
       normalizedLegacyOpacityOnly: normalizePhysicalStyleConfig({
         opacity: 0.31,
@@ -83,9 +86,9 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
     state.styleConfig.physical = normalizePhysicalStyleConfig({
       ...state.styleConfig.physical,
       mode: "atlas_and_contours",
-      opacity: 0.5,
-      atlasOpacity: 0.52,
-      atlasIntensity: 0.9,
+      opacity: 0.58,
+      atlasOpacity: 0.48,
+      atlasIntensity: 0.88,
       blendMode: "totally-invalid-mode",
       contourMinorVisible: false,
     });
@@ -123,54 +126,75 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           && /"soft-light"/.test(rendererSource),
         hasSafeBlendFallback:
           /return VALID_BLEND_MODES\.has\(mode\) \? mode : safeFallback;/.test(rendererSource),
+        hasPhysicalBasePass:
+          /\["physicalBase", \(k\) => drawPhysicalBasePass\(k\)\]/.test(rendererSource),
+        hasPhysicalExactRefresh:
+          /invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(rendererSource),
         contourUsesSourceOver:
           /drawPhysicalContourLayer[\s\S]*?context\.globalCompositeOperation = "source-over";/.test(rendererSource),
         hasMountainMultiplier:
-          /if \(atlasClass === "mountain_high_relief"\) return 1\.15;/.test(rendererSource),
+          /if \(normalized === "mountain_high_relief"\) return 1\.18;/.test(rendererSource),
+        hasMountainHillsMultiplier:
+          /if \(normalized === "mountain_hills"\) return 1\.02;/.test(rendererSource),
         hasDesertMultiplier:
-          /if \(atlasClass === "desert_bare"\) return 1\.1;/.test(rendererSource),
+          /if \(normalized === "desert_bare"\) return 1\.1;/.test(rendererSource),
         hasForestMultiplier:
-          /if \(atlasClass === "forest"\) return 0\.95;/.test(rendererSource),
+          /if \(normalized === "forest" \|\| normalized === "forest_temperate"\) return 0\.95;/.test(rendererSource),
         hasPlateauMultiplier:
-          /if \(atlasClass === "upland_plateau"\) return 0\.9;/.test(rendererSource),
+          /if \(normalized === "upland_plateau"\) return 0\.9;/.test(rendererSource),
+        hasBadlandsMultiplier:
+          /if \(normalized === "badlands_canyon"\) return 0\.98;/.test(rendererSource),
         hasPlainsMultiplier:
-          /if \(atlasClass === "plains_lowlands"\) return 0\.68;/.test(rendererSource),
+          /if \(normalized === "plains_lowlands"\) return 0\.68;/.test(rendererSource),
+        hasGrasslandMultiplier:
+          /if \(normalized === "grassland_steppe"\) return 0\.8;/.test(rendererSource),
         hasTundraMultiplier:
-          /if \(atlasClass === "tundra_ice"\) return 0\.85;/.test(rendererSource),
+          /if \(normalized === "tundra_ice"\) return 0\.85;/.test(rendererSource),
       },
     };
   });
 
-  expect(inspection.defaults.normalizedDefault.blendMode).toBe("soft-light");
-  expect(inspection.defaults.normalizedDefault.atlasOpacity).toBeCloseTo(0.52, 5);
+  expect(inspection.defaults.normalizedDefault.blendMode).toBe("source-over");
+  expect(inspection.defaults.normalizedDefault.preset).toBe("balanced");
+  expect(inspection.defaults.normalizedDefault.atlasOpacity).toBeCloseTo(0.44, 5);
   expect(inspection.defaults.normalizedExplicit.blendMode).toBe("overlay");
   expect(inspection.defaults.normalizedExplicit.atlasOpacity).toBeCloseTo(0.27, 5);
+  expect(inspection.defaults.normalizedInvalidBlend.blendMode).toBe("source-over");
   expect(inspection.defaults.normalizedNewSchemaOpacityOnly.opacity).toBeCloseTo(0.44, 5);
-  expect(inspection.defaults.normalizedNewSchemaOpacityOnly.atlasOpacity).toBeCloseTo(0.52, 5);
+  expect(inspection.defaults.normalizedNewSchemaOpacityOnly.atlasOpacity).toBeCloseTo(0.44, 5);
   expect(inspection.defaults.normalizedLegacyOpacityOnly.atlasOpacity).toBeCloseTo(0.31, 5);
 
   expect(inspection.palette).toEqual({
-    mountain_high_relief: "#7a4a2a",
-    upland_plateau: "#c4956a",
-    plains_lowlands: "#8aad62",
-    wetlands_delta: "#3d9e96",
-    forest: "#3e6e28",
-    rainforest: "#1a5c3e",
-    desert_bare: "#dbb56a",
-    tundra_ice: "#b8c8dc",
+    mountain_high_relief: "#6f4430",
+    mountain_hills: "#9e6b4e",
+    upland_plateau: "#bf8d63",
+    badlands_canyon: "#b35b3c",
+    plains_lowlands: "#91ab68",
+    basin_lowlands: "#b8b07c",
+    wetlands_delta: "#4d9a8d",
+    forest_temperate: "#4e7240",
+    rainforest_tropical: "#236148",
+    grassland_steppe: "#c2b66d",
+    desert_bare: "#d8b169",
+    tundra_ice: "#b8c7d8",
   });
 
   expect(inspection.rendererSourceChecks.hasValidBlendModes).toBe(true);
   expect(inspection.rendererSourceChecks.hasSafeBlendFallback).toBe(true);
+  expect(inspection.rendererSourceChecks.hasPhysicalBasePass).toBe(true);
+  expect(inspection.rendererSourceChecks.hasPhysicalExactRefresh).toBe(true);
   expect(inspection.rendererSourceChecks.contourUsesSourceOver).toBe(true);
   expect(inspection.rendererSourceChecks.hasMountainMultiplier).toBe(true);
+  expect(inspection.rendererSourceChecks.hasMountainHillsMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasDesertMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasForestMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasPlateauMultiplier).toBe(true);
+  expect(inspection.rendererSourceChecks.hasBadlandsMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasPlainsMultiplier).toBe(true);
+  expect(inspection.rendererSourceChecks.hasGrasslandMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasTundraMultiplier).toBe(true);
 
-  expect(inspection.physicalBlendModeAfterNormalize).toBe("totally-invalid-mode");
+  expect(inspection.physicalBlendModeAfterNormalize).toBe("source-over");
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
   expect(pageErrors, `Page errors: ${JSON.stringify(pageErrors, null, 2)}`).toEqual([]);
   expect(networkFailures, `Network failures: ${JSON.stringify(networkFailures, null, 2)}`).toEqual([]);

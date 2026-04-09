@@ -464,26 +464,51 @@ const PHYSICAL_MODE_ALIASES = {
   tint_only: "atlas_only",
   atlas_only: "atlas_only",
 };
+const PHYSICAL_PRESET_ALIASES = {
+  political: "political_clean",
+  political_clean: "political_clean",
+  clean: "political_clean",
+  balanced: "balanced",
+  default: "balanced",
+  terrain: "terrain_rich",
+  terrain_rich: "terrain_rich",
+  rich: "terrain_rich",
+};
+const PHYSICAL_PRESET_KEYS = ["political_clean", "balanced", "terrain_rich"];
 const PHYSICAL_ATLAS_CLASS_KEYS = [
   "mountain_high_relief",
+  "mountain_hills",
   "upland_plateau",
+  "badlands_canyon",
   "plains_lowlands",
+  "basin_lowlands",
   "wetlands_delta",
-  "forest",
-  "rainforest",
+  "forest_temperate",
+  "rainforest_tropical",
+  "grassland_steppe",
   "desert_bare",
   "tundra_ice",
 ];
 const PHYSICAL_ATLAS_PALETTE = {
-  mountain_high_relief: "#7a4a2a",
-  upland_plateau: "#c4956a",
-  plains_lowlands: "#8aad62",
-  wetlands_delta: "#3d9e96",
-  forest: "#3e6e28",
-  rainforest: "#1a5c3e",
-  desert_bare: "#dbb56a",
-  tundra_ice: "#b8c8dc",
+  mountain_high_relief: "#6f4430",
+  mountain_hills: "#9e6b4e",
+  upland_plateau: "#bf8d63",
+  badlands_canyon: "#b35b3c",
+  plains_lowlands: "#91ab68",
+  basin_lowlands: "#b8b07c",
+  wetlands_delta: "#4d9a8d",
+  forest_temperate: "#4e7240",
+  rainforest_tropical: "#236148",
+  grassland_steppe: "#c2b66d",
+  desert_bare: "#d8b169",
+  tundra_ice: "#b8c7d8",
 };
+const VALID_PHYSICAL_BLEND_MODES = new Set([
+  "source-over",
+  "multiply",
+  "soft-light",
+  "overlay",
+]);
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -504,35 +529,107 @@ function normalizePhysicalMode(value) {
   return PHYSICAL_MODE_ALIASES[raw] || "atlas_and_contours";
 }
 
+function normalizePhysicalPreset(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  return PHYSICAL_PRESET_ALIASES[raw] || "balanced";
+}
+
 function createDefaultPhysicalAtlasVisibility() {
   return Object.fromEntries(PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [key, true]));
 }
 
-function createDefaultPhysicalStyleConfig() {
+function createPhysicalPresetConfig(preset = "balanced") {
+  const normalizedPreset = normalizePhysicalPreset(preset);
+  const atlasClassVisibility = createDefaultPhysicalAtlasVisibility();
+  if (normalizedPreset === "political_clean") {
+    atlasClassVisibility.forest_temperate = false;
+    atlasClassVisibility.rainforest_tropical = false;
+    atlasClassVisibility.grassland_steppe = false;
+    atlasClassVisibility.desert_bare = false;
+    atlasClassVisibility.tundra_ice = false;
+  }
+  if (normalizedPreset === "terrain_rich") {
+    return {
+      preset: normalizedPreset,
+      mode: "atlas_and_contours",
+      opacity: 0.72,
+      atlasOpacity: 0.68,
+      atlasIntensity: 1.12,
+      atlasClassVisibility,
+      rainforestEmphasis: 0.88,
+      contourColor: "#5e4b3b",
+      contourOpacity: 0.62,
+      contourMajorWidth: 1.3,
+      contourMinorWidth: 0.8,
+      contourMajorIntervalM: 500,
+      contourMinorIntervalM: 100,
+      contourMinorVisible: true,
+      contourLowReliefCutoffM: 180,
+      blendMode: "overlay",
+    };
+  }
+  if (normalizedPreset === "political_clean") {
+    return {
+      preset: normalizedPreset,
+      mode: "atlas_and_contours",
+      opacity: 0.36,
+      atlasOpacity: 0.24,
+      atlasIntensity: 0.78,
+      atlasClassVisibility,
+      rainforestEmphasis: 0.52,
+      contourColor: "#675645",
+      contourOpacity: 0.48,
+      contourMajorWidth: 1.05,
+      contourMinorWidth: 0.45,
+      contourMajorIntervalM: 1000,
+      contourMinorIntervalM: 200,
+      contourMinorVisible: false,
+      contourLowReliefCutoffM: 420,
+      blendMode: "source-over",
+    };
+  }
   return {
+    preset: normalizedPreset,
     mode: "atlas_and_contours",
-    opacity: 0.5,
-    atlasOpacity: 0.52,
-    atlasIntensity: 0.9,
-    atlasClassVisibility: createDefaultPhysicalAtlasVisibility(),
-    rainforestEmphasis: 0.72,
-    contourColor: "#6b5947",
-    contourOpacity: 0.28,
-    contourMajorWidth: 0.8,
-    contourMinorWidth: 0.45,
+    opacity: 0.56,
+    atlasOpacity: 0.44,
+    atlasIntensity: 0.96,
+    atlasClassVisibility,
+    rainforestEmphasis: 0.74,
+    contourColor: "#665241",
+    contourOpacity: 0.58,
+    contourMajorWidth: 1.18,
+    contourMinorWidth: 0.62,
     contourMajorIntervalM: 500,
     contourMinorIntervalM: 100,
     contourMinorVisible: true,
-    contourLowReliefCutoffM: 300,
-    blendMode: "soft-light",
+    contourLowReliefCutoffM: 240,
+    blendMode: "source-over",
   };
 }
 
+function createDefaultPhysicalStyleConfig() {
+  return createPhysicalPresetConfig("balanced");
+}
+
+function createPhysicalStyleConfigForPreset(preset = "balanced") {
+  return createPhysicalPresetConfig(preset);
+}
+
+function normalizePhysicalBlendMode(value, fallback = "source-over") {
+  const normalizedFallback = String(fallback || "source-over").trim().toLowerCase();
+  const safeFallback = VALID_PHYSICAL_BLEND_MODES.has(normalizedFallback) ? normalizedFallback : "source-over";
+  const mode = String(value || "").trim().toLowerCase();
+  return VALID_PHYSICAL_BLEND_MODES.has(mode) ? mode : safeFallback;
+}
+
 function normalizePhysicalStyleConfig(rawConfig) {
-  const defaults = createDefaultPhysicalStyleConfig();
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const normalizedPreset = normalizePhysicalPreset(raw.preset || "balanced");
+  const defaults = createPhysicalPresetConfig(normalizedPreset);
   const legacyPreset = raw.preset;
   const hasNewPhysicalSchema = [
+    "preset",
     "mode",
     "atlasOpacity",
     "atlasIntensity",
@@ -555,7 +652,8 @@ function normalizePhysicalStyleConfig(rawConfig) {
       : {};
 
   return {
-    mode: normalizePhysicalMode(raw.mode || legacyPreset),
+    preset: normalizedPreset,
+    mode: normalizePhysicalMode(raw.mode || defaults.mode),
     opacity: clamp(
       toFiniteNumber(hasNewPhysicalSchema ? (raw.opacity ?? raw.layerOpacity) : raw.layerOpacity, defaults.opacity),
       0,
@@ -564,7 +662,10 @@ function normalizePhysicalStyleConfig(rawConfig) {
     atlasOpacity: clamp(toFiniteNumber(raw.atlasOpacity, atlasOpacityFallback), 0, 1),
     atlasIntensity: clamp(toFiniteNumber(raw.atlasIntensity, defaults.atlasIntensity), 0.2, 1.4),
     atlasClassVisibility: Object.fromEntries(
-      PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [key, rawVisibility[key] === undefined ? true : !!rawVisibility[key]])
+      PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [
+        key,
+        rawVisibility[key] === undefined ? defaults.atlasClassVisibility?.[key] !== false : !!rawVisibility[key],
+      ])
     ),
     rainforestEmphasis: clamp(toFiniteNumber(raw.rainforestEmphasis, defaults.rainforestEmphasis), 0, 1),
     contourColor: String(raw.contourColor || defaults.contourColor).trim() || defaults.contourColor,
@@ -591,7 +692,7 @@ function normalizePhysicalStyleConfig(rawConfig) {
       0,
       2000
     ),
-    blendMode: String(raw.blendMode || defaults.blendMode).trim() || defaults.blendMode,
+    blendMode: normalizePhysicalBlendMode(raw.blendMode, defaults.blendMode),
   };
 }
 
@@ -1228,11 +1329,16 @@ export {
   MAP_SEMANTIC_MODES,
   countryNames,
   countryPresets,
+  PHYSICAL_PRESET_KEYS,
   PHYSICAL_ATLAS_CLASS_KEYS,
   PHYSICAL_ATLAS_PALETTE,
+  createPhysicalPresetConfig,
+  createPhysicalStyleConfigForPreset,
   createDefaultPhysicalStyleConfig,
   createDefaultPhysicalAtlasVisibility,
+  normalizePhysicalPreset,
   normalizePhysicalMode,
+  normalizePhysicalBlendMode,
   normalizePhysicalStyleConfig,
   createDefaultLakeStyleConfig,
   normalizeLakeStyleConfig,

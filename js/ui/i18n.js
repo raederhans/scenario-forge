@@ -33,6 +33,33 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
   "Baseline preview": { zh: "\u57fa\u7ebf\u9884\u89c8\u4e2d", en: "Baseline preview" },
   "Live working state": { zh: "\u5f53\u524d\u5de5\u4f5c\u72b6\u6001", en: "Live working state" },
   Labels: { zh: "\u6807\u7b7e", en: "Labels" },
+  "Visual Preset": { zh: "\u89c6\u89c9\u9884\u8bbe", en: "Visual Preset" },
+  "Political Clean": { zh: "\u653f\u6cbb\u4f18\u5148", en: "Political Clean" },
+  Balanced: { zh: "\u5747\u8861", en: "Balanced" },
+  "Terrain Rich": { zh: "\u5730\u8c8c\u4f18\u5148", en: "Terrain Rich" },
+  "Balanced keeps terrain visible while staying cleaner over political fills.": {
+    zh: "\u5747\u8861\u6a21\u5f0f\u4f1a\u4fdd\u7559\u5730\u8c8c\u5b58\u5728\u611f\uff0c\u540c\u65f6\u5c3d\u91cf\u907f\u514d\u628a\u653f\u6cbb\u5e95\u8272\u5f04\u810f\u3002",
+    en: "Balanced keeps terrain visible while staying cleaner over political fills.",
+  },
+  "Political Clean keeps only the clearest landform cues over political fills.": {
+    zh: "\u653f\u6cbb\u4f18\u5148\u6a21\u5f0f\u53ea\u4fdd\u7559\u6700\u6e05\u6670\u7684\u5730\u8c8c\u7ed3\u6784\u63d0\u793a\uff0c\u5c3d\u91cf\u4e0d\u5e72\u6270\u56fd\u5bb6\u5e95\u8272\u3002",
+    en: "Political Clean keeps only the clearest landform cues over political fills.",
+  },
+  "Terrain Rich pushes the atlas and contour layer for the strongest relief read.": {
+    zh: "\u5730\u8c8c\u4f18\u5148\u6a21\u5f0f\u4f1a\u5f3a\u5316\u56fe\u96c6\u548c\u7b49\u9ad8\u7ebf\uff0c\u8ba9\u5730\u5f62\u8d77\u4f0f\u6700\u660e\u663e\u3002",
+    en: "Terrain Rich pushes the atlas and contour layer for the strongest relief read.",
+  },
+  "High Relief Mountains": { zh: "\u9ad8\u8d77\u4f0f\u5c71\u5730", en: "High Relief Mountains" },
+  "Mountain Hills": { zh: "\u5c71\u9e93\u4e18\u9675", en: "Mountain Hills" },
+  "Upland Plateaus": { zh: "\u9ad8\u5730\u9ad8\u539f", en: "Upland Plateaus" },
+  "Badlands & Canyon": { zh: "\u6076\u5730\u4e0e\u5ce1\u8c37", en: "Badlands & Canyon" },
+  "Plains Lowlands": { zh: "\u5e73\u539f\u4f4e\u5730", en: "Plains Lowlands" },
+  "Basins & Valleys": { zh: "\u76c6\u5730\u4e0e\u6cb3\u8c37", en: "Basins & Valleys" },
+  "Temperate Forest": { zh: "\u6e29\u5e26\u68ee\u6797", en: "Temperate Forest" },
+  "Tropical Rainforest": { zh: "\u70ed\u5e26\u96e8\u6797", en: "Tropical Rainforest" },
+  "Grassland & Steppe": { zh: "\u8349\u539f\u4e0e\u8349\u539f\u5e26", en: "Grassland & Steppe" },
+  "Desert & Bare": { zh: "\u8352\u6f20\u4e0e\u88f8\u5730", en: "Desert & Bare" },
+  "Tundra & Ice": { zh: "\u82d4\u539f\u4e0e\u51b0\u96ea", en: "Tundra & Ice" },
 });
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
@@ -367,6 +394,11 @@ function updateUIText() {
     ["lblContextLayers", "Context Layers"],
     ["lblPhysicalPanel", "Physical Regions"],
     ["lblPhysicalLayer", "Physical Regions"],
+    ["lblPhysicalPreset", "Visual Preset"],
+    ["optPhysicalPresetPoliticalClean", "Political Clean"],
+    ["optPhysicalPresetBalanced", "Balanced"],
+    ["optPhysicalPresetTerrainRich", "Terrain Rich"],
+    ["physicalPresetHint", "Balanced keeps terrain visible while staying cleaner over political fills."],
     ["lblPhysicalMode", "Mode"],
     ["optPhysicalModeAtlasContours", "Atlas + Contours"],
     ["optPhysicalModeAtlasOnly", "Atlas Only"],
@@ -375,12 +407,16 @@ function updateUIText() {
     ["lblTerrainAtlasPanel", "Terrain Atlas"],
     ["lblPhysicalAtlasIntensity", "Atlas Intensity"],
     ["lblPhysicalRainforestEmphasis", "Rainforest Emphasis"],
-    ["lblPhysicalClassMountain", "Mountains"],
-    ["lblPhysicalClassPlateau", "Plateaus"],
-    ["lblPhysicalClassPlains", "Plains"],
+    ["lblPhysicalClassMountain", "High Relief Mountains"],
+    ["lblPhysicalClassMountainHills", "Mountain Hills"],
+    ["lblPhysicalClassPlateau", "Upland Plateaus"],
+    ["lblPhysicalClassBadlands", "Badlands & Canyon"],
+    ["lblPhysicalClassPlains", "Plains Lowlands"],
+    ["lblPhysicalClassBasin", "Basins & Valleys"],
     ["lblPhysicalClassWetlands", "Wetlands & Delta"],
-    ["lblPhysicalClassForest", "Forest"],
-    ["lblPhysicalClassRainforest", "Rainforest"],
+    ["lblPhysicalClassForestTemperate", "Temperate Forest"],
+    ["lblPhysicalClassRainforestTropical", "Tropical Rainforest"],
+    ["lblPhysicalClassGrassland", "Grassland & Steppe"],
     ["lblPhysicalClassDesert", "Desert & Bare"],
     ["lblPhysicalClassTundra", "Tundra & Ice"],
     ["lblTerrainContoursPanel", "Terrain Contours"],
@@ -601,6 +637,9 @@ function updateUIText() {
   }
   if (typeof state.updateDevWorkspaceUIFn === "function") {
     state.updateDevWorkspaceUIFn();
+  }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
   }
   if (typeof state.syncDeveloperModeUiFn === "function") {
     state.syncDeveloperModeUiFn();

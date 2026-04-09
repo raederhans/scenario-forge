@@ -1,10 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { gotoApp } = require("./support/playwright-app");
+const { gotoApp, readBootStateSnapshot, waitForAppInteractive } = require("./support/playwright-app");
 
 function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function logProjectSaveLoadStep(step, extra = null) {
+  const payload = extra ? ` ${JSON.stringify(extra)}` : "";
+  // eslint-disable-next-line no-console
+  console.log(`[project-save-load] ${new Date().toISOString()} ${String(step || "").trim()}${payload}`);
 }
 
 async function installStateHandle(page) {
@@ -27,6 +33,7 @@ async function installInteractionFunnelDebugHandle(page) {
 
 async function waitForStartupReadonlyUnlocked(page, { timeout = 120000, stableMs = 300 } = {}) {
   await installStateHandle(page);
+  logProjectSaveLoadStep("waitForStartupReadonlyUnlocked:start", { timeout, stableMs });
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     const unlocked = await page.evaluate(() => {
@@ -40,13 +47,17 @@ async function waitForStartupReadonlyUnlocked(page, { timeout = 120000, stableMs
         return !!state && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
       });
       if (stillUnlocked) {
+        logProjectSaveLoadStep("waitForStartupReadonlyUnlocked:done");
         return;
       }
     } else {
       await page.waitForTimeout(150);
     }
   }
-  throw new Error("Startup readonly did not unlock before the test timed out.");
+  const snapshot = await readProjectUiSnapshot(page);
+  throw new Error(
+    `[project-save-load] waitForStartupReadonlyUnlocked timed out after ${timeout}ms: ${JSON.stringify(snapshot)}`
+  );
 }
 
 async function setInputValue(page, selector, value) {
@@ -66,44 +77,94 @@ async function setSelectValue(page, selector, value) {
 }
 
 async function gotoProjectPage(page, targetPath = "/") {
+  logProjectSaveLoadStep("gotoProjectPage:start", { targetPath });
   await gotoApp(page, targetPath, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  logProjectSaveLoadStep("gotoProjectPage:interactive");
+}
+
+async function readProjectUiSnapshot(page) {
+  await installStateHandle(page);
+  const boot = await readBootStateSnapshot(page);
+  const ui = await page.evaluate(() => {
+    const state = globalThis.__pwProjectSaveLoad?.state || null;
+    const themeSelect = document.querySelector("#themeSelect");
+    const scenarioSelect = document.querySelector("#scenarioSelect");
+    return {
+      activeScenarioId: String(state?.activeScenarioId || ""),
+      startupReadonly: !!state?.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state?.startupReadonlyUnlockInFlight,
+      renderCountryListReady: typeof state?.renderCountryListFn === "function",
+      updateToolbarInputsReady: typeof state?.updateToolbarInputsFn === "function",
+      d3JsonReady: !!globalThis.d3?.json,
+      downloadButtonPresent: !!document.querySelector("#downloadProjectBtn"),
+      uploadInputPresent: !!document.querySelector("#projectFileInput"),
+      themeOptions: themeSelect?.options?.length || 0,
+      scenarioOptions: scenarioSelect?.options?.length || 0,
+    };
+  });
+  return { boot, ui };
 }
 
 async function waitForProjectUiReady(page) {
   await installStateHandle(page);
-  await page.waitForFunction(() => {
-    const state = globalThis.__pwProjectSaveLoad?.state;
-    const downloadBtn = document.querySelector("#downloadProjectBtn");
-    const uploadInput = document.querySelector("#projectFileInput");
-    const themeSelect = document.querySelector("#themeSelect");
-    const scenarioSelect = document.querySelector("#scenarioSelect");
-    return typeof state.renderCountryListFn === "function"
-      && typeof state.updateToolbarInputsFn === "function"
-      && !state.startupReadonly
-      && !!globalThis.d3?.json
-      && !!downloadBtn
-      && !!uploadInput
-      && !!themeSelect
-      && themeSelect.options.length > 1
-      && !!scenarioSelect;
-  }, { timeout: 120000 });
+  logProjectSaveLoadStep("waitForProjectUiReady:start");
+  try {
+    await page.waitForFunction(() => {
+      const downloadBtn = document.querySelector("#downloadProjectBtn");
+      const uploadInput = document.querySelector("#projectFileInput");
+      const themeSelect = document.querySelector("#themeSelect");
+      const scenarioSelect = document.querySelector("#scenarioSelect");
+      return !!globalThis.d3?.json
+        && !!downloadBtn
+        && !!uploadInput
+        && !!themeSelect
+        && themeSelect.options.length > 1
+        && !!scenarioSelect;
+    }, { timeout: 120000 });
+  } catch (_error) {
+    const snapshot = await readProjectUiSnapshot(page);
+    throw new Error(
+      `[project-save-load] waitForProjectUiReady timed out after 120000ms: ${JSON.stringify(snapshot)}`
+    );
+  }
   await waitForStartupReadonlyUnlocked(page);
+  logProjectSaveLoadStep("waitForProjectUiReady:done", await readProjectUiSnapshot(page));
 }
 
 async function exportProjectJson(page, outputPath) {
-  const downloadPromise = page.waitForEvent("download");
+  logProjectSaveLoadStep("exportProjectJson:start", { outputPath });
+  const downloadPromise = page.waitForEvent("download", { timeout: 120000 });
   await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
-  const download = await downloadPromise;
+  let download;
+  try {
+    download = await downloadPromise;
+  } catch (_error) {
+    const snapshot = await readProjectUiSnapshot(page);
+    throw new Error(
+      `[project-save-load] download did not start before timeout: ${JSON.stringify(snapshot)}`
+    );
+  }
   await download.saveAs(outputPath);
+  logProjectSaveLoadStep("exportProjectJson:done", { outputPath });
   return JSON.parse(fs.readFileSync(outputPath, "utf8"));
 }
 
 async function waitForScenarioApplyIdle(page, { timeout = 120000 } = {}) {
   await installStateHandle(page);
-  await page.waitForFunction(() => {
-    const state = globalThis.__pwProjectSaveLoad?.state;
-    return !!state && !state.scenarioApplyInFlight;
-  }, { timeout });
+  logProjectSaveLoadStep("waitForScenarioApplyIdle:start", { timeout });
+  try {
+    await page.waitForFunction(() => {
+      const state = globalThis.__pwProjectSaveLoad?.state;
+      return !!state && !state.scenarioApplyInFlight;
+    }, { timeout });
+  } catch (_error) {
+    const snapshot = await readProjectUiSnapshot(page);
+    throw new Error(
+      `[project-save-load] waitForScenarioApplyIdle timed out after ${timeout}ms: ${JSON.stringify(snapshot)}`
+    );
+  }
+  logProjectSaveLoadStep("waitForScenarioApplyIdle:done");
 }
 
 async function ensureScenarioActive(page, scenarioId, { timeout = 120000 } = {}) {
@@ -120,6 +181,7 @@ async function ensureScenarioActive(page, scenarioId, { timeout = 120000 } = {})
 }
 
 async function applyScenario(page, scenarioId) {
+  logProjectSaveLoadStep("applyScenario:start", { scenarioId });
   await waitForStartupReadonlyUnlocked(page);
   await waitForScenarioApplyIdle(page);
   await page.evaluate(async (expectedScenarioId) => {
@@ -136,17 +198,31 @@ async function applyScenario(page, scenarioId) {
     });
   }, scenarioId);
   await installStateHandle(page);
-  await page.waitForFunction((expectedScenarioId) => {
-    const state = globalThis.__pwProjectSaveLoad?.state;
-    return state?.activeScenarioId === expectedScenarioId;
-  }, scenarioId, { timeout: 120000 });
+  try {
+    await page.waitForFunction((expectedScenarioId) => {
+      const state = globalThis.__pwProjectSaveLoad?.state;
+      return state?.activeScenarioId === expectedScenarioId;
+    }, scenarioId, { timeout: 120000 });
+  } catch (_error) {
+    const snapshot = await readProjectUiSnapshot(page);
+    throw new Error(
+      `[project-save-load] applyScenario did not reach activeScenarioId=${scenarioId}: ${JSON.stringify(snapshot)}`
+    );
+  }
+  logProjectSaveLoadStep("applyScenario:done", { scenarioId, snapshot: await readProjectUiSnapshot(page) });
 }
 
 async function beginProjectImportWait(page, { expectedFileName = "" } = {}) {
   await installInteractionFunnelDebugHandle(page);
+  logProjectSaveLoadStep("beginProjectImportWait:start", { expectedFileName });
   const initialDebug = await page.evaluate(() => (
     globalThis.__pwProjectSaveLoad?.getInteractionFunnelDebugState?.() || null
   ));
+  logProjectSaveLoadStep("beginProjectImportWait:baseline", {
+    expectedFileName,
+    importStartCount: Number(initialDebug?.importStartCount || 0),
+    importApplyCount: Number(initialDebug?.importApplyCount || 0),
+  });
   return {
     expectedFileName: String(expectedFileName || "").trim(),
     initialImportStartCount: Number(initialDebug?.importStartCount || 0),
@@ -157,6 +233,10 @@ async function beginProjectImportWait(page, { expectedFileName = "" } = {}) {
 async function waitForProjectImportCompletionFrom(page, importWaitState, { timeout = 120000 } = {}) {
   const waitState = importWaitState && typeof importWaitState === "object" ? importWaitState : {};
   await installInteractionFunnelDebugHandle(page);
+  logProjectSaveLoadStep("waitForProjectImportCompletionFrom:start", {
+    expectedFileName: String(waitState.expectedFileName || "").trim(),
+    timeout,
+  });
   const deadline = Date.now() + timeout;
   const expectedFileName = String(waitState.expectedFileName || "").trim();
   while (Date.now() < deadline) {
@@ -172,11 +252,19 @@ async function waitForProjectImportCompletionFrom(page, importWaitState, { timeo
       && debug?.importPhase === "complete"
       && (!expectedFileName || debug?.lastImportFileName === expectedFileName);
     if (importCompleted) {
+      logProjectSaveLoadStep("waitForProjectImportCompletionFrom:done", {
+        expectedFileName,
+        importStartCount: Number(debug?.importStartCount || 0),
+        importApplyCount: Number(debug?.importApplyCount || 0),
+      });
       return;
     }
     await page.waitForTimeout(150);
   }
-  throw new Error(`Project import did not complete before timeout for ${expectedFileName || "selected file"}.`);
+  const snapshot = await readProjectUiSnapshot(page);
+  throw new Error(
+    `[project-save-load] Project import did not complete before timeout for ${expectedFileName || "selected file"}: ${JSON.stringify({ snapshot, waitState })}`
+  );
 }
 
 async function getScenarioSplitFeature(page) {
@@ -265,12 +353,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await installStateHandle(page);
   await page.waitForFunction(() => !!globalThis.__pwProjectSaveLoad?.state?.specialZoneEditor?.active);
 
-  const initialDownloadPromise = page.waitForEvent("download");
-  await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
-  const initialDownload = await initialDownloadPromise;
   const initialExportPath = path.join(artifactDir, "initial-export.json");
-  await initialDownload.saveAs(initialExportPath);
-  const initialExport = JSON.parse(fs.readFileSync(initialExportPath, "utf8"));
+  const initialExport = await exportProjectJson(page, initialExportPath);
 
   expect(initialExport.schemaVersion).toBe(19);
   expect(initialExport.styleConfig.internalBorders).toEqual({
@@ -289,7 +373,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(initialExport.styleConfig.physical).toMatchObject({
     opacity: 0.61,
     blendMode: "overlay",
-    atlasOpacity: 0.52,
+    atlasOpacity: 0.44,
+    preset: "balanced",
   });
   expect(initialExport.activePaletteId).toBe(selectedPaletteId);
   expect(initialExport.interactionGranularity).toBe("subdivision");
@@ -468,12 +553,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     recentColors: ["#112233", "#445566"],
   });
 
-  const roundtripDownloadPromise = page.waitForEvent("download");
-  await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
-  const roundtripDownload = await roundtripDownloadPromise;
   const roundtripExportPath = path.join(artifactDir, "roundtrip-export.json");
-  await roundtripDownload.saveAs(roundtripExportPath);
-  const roundtripExport = JSON.parse(fs.readFileSync(roundtripExportPath, "utf8"));
+  const roundtripExport = await exportProjectJson(page, roundtripExportPath);
 
   expect(roundtripExport.activePaletteId).toBe(selectedPaletteId);
   expect(roundtripExport.interactionGranularity).toBe("country");
@@ -488,7 +569,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(roundtripExport.styleConfig.physical).toMatchObject({
     opacity: 0.44,
     blendMode: "multiply",
-    atlasOpacity: 0.52,
+    atlasOpacity: 0.44,
+    preset: "balanced",
   });
   expect(roundtripExport.customPresets).toEqual({
     ZZZ: [
@@ -568,8 +650,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     const state = globalThis.__pwProjectSaveLoad?.state;
     return byId("#themeSelect")?.value === "hoi4_vanilla"
       && byId("#toggleSpecialZones")?.checked === false
-      && byId("#physicalBlendMode")?.value === "soft-light"
-      && byId("#physicalOpacity")?.value === "50"
+      && byId("#physicalBlendMode")?.value === "source-over"
+      && byId("#physicalOpacity")?.value === "56"
       && !state.specialZoneEditor?.active
       && byId("#frontlineEnabledToggle")?.checked === false
       && byId("#strategicFrontlineStyleSelect")?.value === "clean"
@@ -579,12 +661,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       && recentCount === 0;
   });
 
-  const legacyDownloadPromise = page.waitForEvent("download");
-  await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
-  const legacyDownload = await legacyDownloadPromise;
   const legacyExportPath = path.join(artifactDir, "legacy-export.json");
-  await legacyDownload.saveAs(legacyExportPath);
-  const legacyExport = JSON.parse(fs.readFileSync(legacyExportPath, "utf8"));
+  const legacyExport = await exportProjectJson(page, legacyExportPath);
 
   expect(legacyExport.activePaletteId).toBe("hoi4_vanilla");
   expect(legacyExport.interactionGranularity).toBe("subdivision");
@@ -622,9 +700,10 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     width: 1.2,
   });
   expect(legacyExport.styleConfig.physical).toMatchObject({
-    opacity: 0.5,
-    atlasOpacity: 0.52,
-    blendMode: "soft-light",
+    opacity: 0.56,
+    atlasOpacity: 0.44,
+    blendMode: "source-over",
+    preset: "balanced",
   });
 
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);

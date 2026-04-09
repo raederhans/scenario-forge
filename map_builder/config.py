@@ -234,15 +234,29 @@ MAP_BOUNDS = GLOBAL_BOUNDS
 PHYSICAL_RELIEF_BASE_TYPES = {
     "Range/Mountain": "mountain_high_relief",
     "Range/mtn": "mountain_high_relief",
-    "Foothills": "upland_plateau",
+    "Highland": "mountain_hills",
+    "Foothills": "mountain_hills",
+    "Hills": "mountain_hills",
+    "Hill": "mountain_hills",
     "Plateau": "upland_plateau",
+    "Tableland": "upland_plateau",
+    "Mesa": "badlands_canyon",
+    "Escarpment": "badlands_canyon",
+    "Badlands": "badlands_canyon",
+    "Canyon": "badlands_canyon",
     "Plain": "plains_lowlands",
-    "Lowland": "plains_lowlands",
+    "Lowland": "basin_lowlands",
+    "Basin": "basin_lowlands",
+    "Depression": "basin_lowlands",
+    "Valley": "basin_lowlands",
     "Delta": "wetlands_delta",
     "Wetlands": "wetlands_delta",
 }
 
 PHYSICAL_NATURAL_EARTH_OVERLAY_TYPES = {
+    "Grassland": "grassland_steppe",
+    "Steppe": "grassland_steppe",
+    "Savanna": "grassland_steppe",
     "Desert": "desert_bare",
     "Tundra": "tundra_ice",
 }
@@ -254,6 +268,7 @@ CGLS_FOREST_CLASS_CODES = {
     121, 122, 123, 124, 125, 126,
 }
 CGLS_RAINFOREST_CLASS_CODES = {112, 122}
+CGLS_GRASSLAND_STEPPE_CLASS_CODES = {20, 30}
 CGLS_DESERT_CLASS_CODES = {60}
 CGLS_TUNDRA_ICE_CLASS_CODES = {70, 100}
 CGLS_FOREST_TYPE_CODES = {0, 1, 2, 3, 4, 5}
@@ -261,15 +276,17 @@ CGLS_RAINFOREST_FOREST_TYPE_CODES = {1}
 
 PHYSICAL_SEMANTIC_CELL_SIZE_DEGREES = 0.5
 PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES = 0.10
+PHYSICAL_SEMANTIC_COMPONENT_MIN_AREA_KM2 = 900.0
 PHYSICAL_RAINFOREST_MAX_ABS_LAT = 25.0
 PHYSICAL_RAINFOREST_MIN_AREA_KM2 = 2500.0
+PHYSICAL_GRASSLAND_STEPPE_MIN_AREA_KM2 = 3200.0
 
 CONTOUR_MAJOR_INTERVAL_M = 500
 CONTOUR_MINOR_INTERVAL_M = 100
-CONTOUR_LOW_RELIEF_CUTOFF_M = 300
+CONTOUR_LOW_RELIEF_CUTOFF_M = 200
 CONTOUR_PROCESSING_STEP_DEGREES = 0.125
-CONTOUR_MAJOR_SIMPLIFY_DEGREES = 0.06
-CONTOUR_MINOR_SIMPLIFY_DEGREES = 0.04
+CONTOUR_MAJOR_SIMPLIFY_DEGREES = 0.05
+CONTOUR_MINOR_SIMPLIFY_DEGREES = 0.03
 CONTOUR_MIN_LENGTH_DEGREES = 0.15
 
 MICRO_ISLAND_BLACKLIST = {

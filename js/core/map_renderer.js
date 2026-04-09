@@ -467,9 +467,10 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+const RENDER_PASS_NAMES = ["background", "political", "physicalBase", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
 const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "background",
+  "physicalBase",
   "political",
   "effects",
   "contextBase",
@@ -479,6 +480,7 @@ const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
 const TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
   "political",
+  "physicalBase",
   "effects",
   "contextBase",
   "contextScenario",
@@ -602,10 +604,6 @@ const suspiciousScenarioBackgroundMergeWarnings = new Set();
 const scenarioCoastlineDecisionWarnings = new Set();
 const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
-const physicalAtlasFallbackCache = {
-  sourceRef: null,
-  collection: null,
-};
 const renderDiag = {
   enabled: false,
   seenKeys: new Set(),
@@ -731,6 +729,7 @@ function getRenderPassCacheState() {
     transformedFrames: 0,
     drawCanvas: 0,
     backgroundPassRenders: 0,
+    physicalBasePassRenders: 0,
     politicalPassRenders: 0,
     effectsPassRenders: 0,
     contextPassRenders: 0,
@@ -966,8 +965,8 @@ function clearRenderPassReferenceTransforms(passNames = null) {
 
 function invalidateOceanVisualState(reason = "ocean-visual") {
   cancelExactAfterSettleRefresh({ clearDefer: true });
-  invalidateRenderPasses(["background", "political", "contextBase", "contextScenario"], reason);
-  clearRenderPassReferenceTransforms(["background", "political", "contextBase", "contextScenario", "effects", "dayNight"]);
+  invalidateRenderPasses(["background", "physicalBase", "political", "contextBase", "contextScenario"], reason);
+  clearRenderPassReferenceTransforms(["background", "physicalBase", "political", "contextBase", "contextScenario", "effects", "dayNight"]);
 }
 
 function invalidateOceanBackgroundVisualState(reason = "ocean-background") {
@@ -978,8 +977,8 @@ function invalidateOceanBackgroundVisualState(reason = "ocean-background") {
 
 function invalidateOceanTextureVisualState(reason = "ocean-texture") {
   cancelExactAfterSettleRefresh({ clearDefer: true });
-  invalidateRenderPasses(["background", "effects"], reason);
-  clearRenderPassReferenceTransforms(["background", "effects"]);
+  invalidateRenderPasses(["background", "physicalBase", "effects"], reason);
+  clearRenderPassReferenceTransforms(["background", "physicalBase", "effects"]);
 }
 
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
@@ -1556,6 +1555,18 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.oceanMaskMode || "topology_ocean",
       Number(state.oceanMaskQuality || 1).toFixed(3),
       stableJson(state.styleConfig?.ocean || {}),
+    ].join("::");
+  }
+  if (passName === "physicalBase") {
+    const maskInfo = getPhysicalLandMaskInfo();
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      state.activeScenarioId || "",
+      state.showPhysical ? "physical:on" : "physical:off",
+      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
+      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+      stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
     ].join("::");
   }
   if (passName === "political") {
@@ -2607,6 +2618,7 @@ function withRenderTarget(targetContext, callback) {
 
 function getPassCounterNames(passName) {
   if (passName === "background") return ["backgroundPassRenders"];
+  if (passName === "physicalBase") return ["contextPassRenders", "physicalBasePassRenders"];
   if (passName === "political") return ["politicalPassRenders"];
   if (passName === "effects") return ["effectsPassRenders"];
   if (passName === "contextBase") return ["contextPassRenders", "contextBasePassRenders"];
@@ -2834,7 +2846,7 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
 function shouldStartExactAfterSettleFastPath() {
   if (!shouldEnableContextBaseTransformReuse()) return false;
   if (state.deferContextBasePass) return false;
-  const requiredPasses = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight"];
+  const requiredPasses = ["background", "physicalBase", "political", "effects", "contextBase", "contextScenario", "dayNight"];
   return requiredPasses.every((passName) => {
     const cache = getRenderPassCacheState();
     return !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName);
@@ -4100,7 +4112,7 @@ function rebuildResolvedColors() {
 
   state.colors = nextColors;
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses(["political", "contextBase"], "rebuild-colors");
+  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   return nextColors;
 }
 
@@ -4128,7 +4140,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   });
 
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses(["political", "contextBase"], "refresh-colors");
+  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "refresh-colors");
 
   if (renderNow && context) {
     render();
@@ -4597,7 +4609,11 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
   normalizedLayerNames.forEach((layerName) => {
     const normalized = String(layerName || "").trim().toLowerCase();
-    if (normalized === "urban" || normalized === "physical" || normalized === "physical_semantics") {
+    if (normalized === "physical" || normalized === "physical_semantics") {
+      targetPasses.add("physicalBase");
+      targetPasses.add("dayNight");
+    }
+    if (normalized === "urban") {
       targetPasses.add("dayNight");
     }
   });
@@ -7634,7 +7650,7 @@ function rebuildRuntimeDerivedState({
 
   state.colors = nextColors;
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses(["political", "contextBase"], "rebuild-colors");
+  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   queueIndexUiRefresh({
     renderCountryList: true,
     renderWaterRegionList: true,
@@ -9340,90 +9356,79 @@ function getPhysicalAtlasLayer(feature) {
   return String(props.atlas_layer || props.atlasLayer || "relief_base").trim().toLowerCase();
 }
 
-function buildPhysicalAtlasFallbackCollection() {
-  const sourceCollection = state.physicalData;
-  if (!Array.isArray(sourceCollection?.features)) return null;
-  if (physicalAtlasFallbackCache.sourceRef === sourceCollection) {
-    return physicalAtlasFallbackCache.collection;
-  }
-
-  const classifyFeature = (featureClassRaw) => {
-    const featureClass = String(featureClassRaw || "").trim().toLowerCase();
-    switch (featureClass) {
-      case "range/mountain":
-      case "range/mtn":
-        return { atlasClass: "mountain_high_relief", atlasLayer: "relief_base" };
-      case "foothills":
-      case "plateau":
-        return { atlasClass: "upland_plateau", atlasLayer: "relief_base" };
-      case "plain":
-      case "lowland":
-        return { atlasClass: "plains_lowlands", atlasLayer: "relief_base" };
-      case "delta":
-      case "wetlands":
-        return { atlasClass: "wetlands_delta", atlasLayer: "relief_base" };
-      case "desert":
-        return { atlasClass: "desert_bare", atlasLayer: "semantic_overlay" };
-      case "tundra":
-        return { atlasClass: "tundra_ice", atlasLayer: "semantic_overlay" };
-      default:
-        return null;
-    }
-  };
-  const features = sourceCollection.features
-    .map((feature, index) => {
-      const props = feature?.properties || {};
-      const featureClass = String(props.featurecla || props.FEATURECLA || "").trim();
-      const semantic = classifyFeature(featureClass);
-      if (!semantic?.atlasClass) return null;
-      return {
-        type: "Feature",
-        id: props.id || `physical_fallback_${index}`,
-        properties: {
-          ...props,
-          atlas_class: semantic.atlasClass,
-          atlas_layer: semantic.atlasLayer,
-          source: "topology_physical_fallback",
-        },
-        geometry: feature.geometry,
-      };
-    })
-    .filter(Boolean);
-
-  physicalAtlasFallbackCache.sourceRef = sourceCollection;
-  physicalAtlasFallbackCache.collection = {
-    type: "FeatureCollection",
-    features,
-  };
-  return physicalAtlasFallbackCache.collection;
-}
-
 function getResolvedPhysicalAtlasCollection() {
   if (Array.isArray(state.physicalSemanticsData?.features) && state.physicalSemanticsData.features.length > 0) {
     return state.physicalSemanticsData;
   }
-  const fallback = buildPhysicalAtlasFallbackCollection();
-  if (Array.isArray(fallback?.features) && fallback.features.length > 0) {
-    warnMissingPhysicalContextOnce(
-      "physical-semantics-fallback",
-      "[physical] global_physical_semantics.topo.json unavailable or deferred; using relief-only atlas fallback."
-    );
-    return fallback;
-  }
+  warnMissingPhysicalContextOnce(
+    "physical-semantics-missing",
+    "[physical] global_physical_semantics.topo.json unavailable or deferred; disabling physical atlas instead of using the old fallback."
+  );
   return null;
 }
 
+function getPhysicalPresetId(cfg) {
+  const preset = String(cfg?.preset || "balanced").trim().toLowerCase();
+  if (preset === "political_clean" || preset === "terrain_rich") {
+    return preset;
+  }
+  return "balanced";
+}
+
+function getPhysicalPresetRenderProfile(cfg) {
+  const preset = getPhysicalPresetId(cfg);
+  if (preset === "political_clean") {
+    return {
+      preset,
+      reliefOpacityMultiplier: 0.38,
+      semanticOpacityMultiplier: 0.2,
+      reliefBlendFallback: "source-over",
+      semanticBlendMode: "source-over",
+      majorContourOpacityMultiplier: 0.92,
+      minorContourOpacityRatio: 0.52,
+      minorContourMinZoom: 2.6,
+    };
+  }
+  if (preset === "terrain_rich") {
+    return {
+      preset,
+      reliefOpacityMultiplier: 1,
+      semanticOpacityMultiplier: 0.72,
+      reliefBlendFallback: "soft-light",
+      semanticBlendMode: "source-over",
+      majorContourOpacityMultiplier: 1.55,
+      minorContourOpacityRatio: 0.8,
+      minorContourMinZoom: 1.2,
+    };
+  }
+  return {
+    preset: "balanced",
+    reliefOpacityMultiplier: 0.72,
+    semanticOpacityMultiplier: 0.42,
+    reliefBlendFallback: "source-over",
+    semanticBlendMode: "source-over",
+    majorContourOpacityMultiplier: 1.22,
+    minorContourOpacityRatio: 0.68,
+    minorContourMinZoom: 1.6,
+  };
+}
+
 function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
-  if (atlasClass === "mountain_high_relief") return 1.15;
-  if (atlasClass === "desert_bare") return 1.1;
-  if (atlasClass === "rainforest") {
+  const normalized = String(atlasClass || "").trim().toLowerCase();
+  if (normalized === "mountain_high_relief") return 1.18;
+  if (normalized === "mountain_hills") return 1.02;
+  if (normalized === "desert_bare") return 1.1;
+  if (normalized === "rainforest" || normalized === "rainforest_tropical") {
     return clamp(0.72 + cfg.rainforestEmphasis * 0.38, 0.2, 1.2);
   }
-  if (atlasClass === "forest") return 0.95;
-  if (atlasClass === "upland_plateau") return 0.9;
-  if (atlasClass === "plains_lowlands") return 0.68;
-  if (atlasClass === "wetlands_delta") return 0.92;
-  if (atlasClass === "tundra_ice") return 0.85;
+  if (normalized === "forest" || normalized === "forest_temperate") return 0.95;
+  if (normalized === "upland_plateau") return 0.9;
+  if (normalized === "badlands_canyon") return 0.98;
+  if (normalized === "basin_lowlands") return 0.76;
+  if (normalized === "plains_lowlands") return 0.68;
+  if (normalized === "grassland_steppe") return 0.8;
+  if (normalized === "wetlands_delta") return 0.92;
+  if (normalized === "tundra_ice") return 0.85;
   return 1;
 }
 
@@ -9591,9 +9596,106 @@ function applyPhysicalLandClipMask() {
   return true;
 }
 
+function drawPhysicalAtlasCollectionLayer(
+  atlasCollection,
+  layerName,
+  cfg,
+  {
+    baseOpacity = 1,
+    blendMode = "source-over",
+    clipAlreadyApplied = false,
+  } = {}
+) {
+  if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
+    return 0;
+  }
+  let renderedCount = 0;
+  context.save();
+  if (!clipAlreadyApplied) {
+    applyPhysicalLandClipMask();
+  }
+  context.globalCompositeOperation = blendMode;
+  atlasCollection.features.forEach((feature) => {
+    const atlasClass = getPhysicalAtlasClass(feature);
+    if (!atlasClass || cfg.atlasClassVisibility?.[atlasClass] === false) return;
+    if (getPhysicalAtlasLayer(feature) !== layerName) return;
+    if (!pathBoundsInScreen(feature)) return;
+    const fillColor = getSafeCanvasColor(PHYSICAL_ATLAS_PALETTE[atlasClass], null);
+    if (!fillColor) return;
+    context.globalAlpha = clamp(
+      baseOpacity * getAtlasFeatureAlphaMultiplier(atlasClass, cfg),
+      0,
+      1
+    );
+    context.fillStyle = fillColor;
+    context.beginPath();
+    pathCanvas(feature);
+    context.fill();
+    renderedCount += 1;
+  });
+  context.restore();
+  return renderedCount;
+}
+
+function drawPhysicalBasePass(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const presetProfile = getPhysicalPresetRenderProfile(cfg);
+  const maskInfo = getPhysicalLandMaskInfo();
+  if (!state.showPhysical || cfg.mode === "contours_only") {
+    collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showPhysical ? "hidden" : "contours-only",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return;
+  }
+
+  const atlasCollection = getResolvedPhysicalAtlasCollection();
+  if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
+    collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "no-data",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return;
+  }
+
+  const baseOpacity = clamp(
+    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.reliefOpacityMultiplier,
+    0,
+    1
+  );
+  const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "relief_base", cfg, {
+    baseOpacity,
+    blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.reliefBlendFallback),
+  });
+  collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
+    featureCount: atlasCollection.features.length,
+    renderedCount,
+    interactive: !!interactive,
+    skipped: renderedCount === 0,
+    reason: renderedCount === 0 ? "no-relief-base" : "",
+    maskSource: maskInfo.maskSource,
+    maskFeatureCount: maskInfo.maskFeatureCount,
+    maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+  });
+}
+
 function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const presetProfile = getPhysicalPresetRenderProfile(cfg);
   const maskInfo = getPhysicalLandMaskInfo();
   if (!state.showPhysical || cfg.mode === "contours_only") {
     collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
@@ -9626,40 +9728,22 @@ function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = f
     return;
   }
 
-  const blendMode = getSafeBlendMode(cfg.blendMode, "source-over");
-  const baseOpacity = clamp(
-    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity,
+  const semanticOpacity = clamp(
+    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.semanticOpacityMultiplier,
     0,
     1
   );
-
-  context.save();
-  if (!clipAlreadyApplied) {
-    applyPhysicalLandClipMask();
-  }
-  context.globalCompositeOperation = blendMode;
-
-  ["relief_base", "semantic_overlay"].forEach((layerName) => {
-    atlasCollection.features.forEach((feature) => {
-      const atlasClass = getPhysicalAtlasClass(feature);
-      if (!atlasClass || cfg.atlasClassVisibility?.[atlasClass] === false) return;
-      if (getPhysicalAtlasLayer(feature) !== layerName) return;
-      if (!pathBoundsInScreen(feature)) return;
-      const fillColor = getSafeCanvasColor(PHYSICAL_ATLAS_PALETTE[atlasClass], null);
-      if (!fillColor) return;
-      context.globalAlpha = clamp(baseOpacity * getAtlasFeatureAlphaMultiplier(atlasClass, cfg), 0, 1);
-      context.fillStyle = fillColor;
-      context.beginPath();
-      pathCanvas(feature);
-      context.fill();
-    });
+  const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "semantic_overlay", cfg, {
+    baseOpacity: semanticOpacity,
+    blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.semanticBlendMode),
+    clipAlreadyApplied,
   });
-
-  context.restore();
   collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
     featureCount: atlasCollection.features.length,
+    renderedCount,
     interactive: !!interactive,
-    skipped: false,
+    skipped: renderedCount === 0,
+    reason: renderedCount === 0 ? "no-semantic-overlay" : "",
     maskSource: maskInfo.maskSource,
     maskFeatureCount: maskInfo.maskFeatureCount,
     maskArcRefEstimate: maskInfo.maskArcRefEstimate,
@@ -9705,6 +9789,7 @@ function drawContourCollection(
 function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const presetProfile = getPhysicalPresetRenderProfile(cfg);
   const maskInfo = getPhysicalLandMaskInfo();
   if (!state.showPhysical || cfg.mode === "atlas_only") {
     collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
@@ -9740,8 +9825,12 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
 
   const contourColor = getSafeCanvasColor(cfg.contourColor, "#6b5947");
   const lowReliefCutoff = clamp(Number(cfg.contourLowReliefCutoffM) || 0, 0, 2000);
-  const majorOpacity = clamp(cfg.opacity * cfg.contourOpacity, 0, 1);
-  const minorOpacity = clamp(majorOpacity * 0.68, 0, 1);
+  const majorOpacity = clamp(
+    cfg.opacity * cfg.contourOpacity * presetProfile.majorContourOpacityMultiplier,
+    0,
+    1
+  );
+  const minorOpacity = clamp(majorOpacity * presetProfile.minorContourOpacityRatio, 0, 1);
 
   context.save();
   if (!clipAlreadyApplied) {
@@ -9759,7 +9848,7 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
     intervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
   });
 
-  if (cfg.contourMinorVisible && k >= 2) {
+  if (cfg.contourMinorVisible && k >= presetProfile.minorContourMinZoom) {
     if (Array.isArray(state.physicalContourMinorData?.features) && state.physicalContourMinorData.features.length > 0) {
       drawContourCollection(state.physicalContourMinorData, {
         color: contourColor,
@@ -9794,19 +9883,14 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   });
 }
 
-function drawPhysicalLayer(k, { interactive = false } = {}) {
+function shouldForceExactContextBaseRefresh() {
+  if (!state.showPhysical) return false;
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
-  const shouldShareClip = !!state.showPhysical && cfg.mode !== "disabled";
-  if (!shouldShareClip) {
-    drawPhysicalAtlasLayer(k, { interactive });
-    drawPhysicalContourLayer(k, { interactive });
-    return;
-  }
-  context.save();
-  applyPhysicalLandClipMask();
-  drawPhysicalAtlasLayer(k, { interactive, clipAlreadyApplied: true });
-  drawPhysicalContourLayer(k, { interactive, clipAlreadyApplied: true });
-  context.restore();
+  return cfg.mode === "atlas_only" || cfg.mode === "contours_only" || cfg.mode === "atlas_and_contours";
+}
+
+function getPhysicalExactRefreshPasses() {
+  return state.showPhysical ? ["physicalBase", "contextBase"] : ["contextBase"];
 }
 
 function getUrbanFeatureOwnerId(feature) {
@@ -14756,7 +14840,8 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         reason: "staged-apply",
       });
     } else {
-      drawPhysicalLayer(k, { interactive });
+      drawPhysicalAtlasLayer(k, { interactive });
+      drawPhysicalContourLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });
       drawAirportsLayer(k, { interactive });
@@ -14878,6 +14963,7 @@ function ensureIdleRenderPasses(timings) {
   const passDefinitions = [
     ["background", (k) => drawBackgroundPass(k)],
     ["political", (k) => drawPoliticalPass(k)],
+    ["physicalBase", (k) => drawPhysicalBasePass(k)],
     ["effects", (k) => drawEffectsPass(k)],
     ["contextBase", (k) => drawContextBasePass(k)],
     ["contextScenario", (k) => drawContextScenarioPass(k)],
@@ -15120,9 +15206,12 @@ function scheduleExactAfterSettleRefresh() {
     state.exactAfterSettleHandle = null;
     if (state.renderPhase !== RENDER_PHASE_IDLE || !state.deferExactAfterSettle) return;
     const reuseDecision = getContextBaseReuseDecision();
+    const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh();
     const startedAt = nowMs();
     state.deferExactAfterSettle = false;
-    if (reuseDecision.enabled) {
+    if (forceExactContextBaseRefresh) {
+      invalidateRenderPasses(["physicalBase", "contextBase"], "physical-visible-exact");
+    } else if (reuseDecision.enabled) {
       recordRenderPerfMetric("contextBaseReuseScaleRatio", 0, {
         activeScenarioId: String(state.activeScenarioId || ""),
         scaleRatio: reuseDecision.scaleRatio,
@@ -15135,7 +15224,7 @@ function scheduleExactAfterSettleRefresh() {
         maxDistancePx: reuseDecision.maxDistancePx,
       });
       if (reuseDecision.shouldExactRefresh) {
-        invalidateRenderPasses("contextBase", reuseDecision.reason || "context-base-exact");
+        invalidateRenderPasses(getPhysicalExactRefreshPasses(), reuseDecision.reason || "context-base-exact");
       } else {
         recordRenderPerfMetric("contextBaseReuseSkipped", 0, {
           activeScenarioId: String(state.activeScenarioId || ""),
@@ -15152,10 +15241,11 @@ function scheduleExactAfterSettleRefresh() {
     }
     render();
     const durationMs = Math.max(0, nowMs() - startedAt);
+    const exactRefreshApplied = forceExactContextBaseRefresh || !!reuseDecision.shouldExactRefresh;
     recordRenderPerfMetric("settleExactRefresh", durationMs, {
       activeScenarioId: String(state.activeScenarioId || ""),
-      contextBaseRefreshed: !!reuseDecision.shouldExactRefresh,
-      reason: reuseDecision.reason,
+      contextBaseRefreshed: exactRefreshApplied,
+      reason: forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
       scaleRatio: reuseDecision.scaleRatio,
       distancePx: reuseDecision.distancePx,
       maxDistancePx: reuseDecision.maxDistancePx,
@@ -15164,10 +15254,10 @@ function scheduleExactAfterSettleRefresh() {
       crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
       crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
     });
-    if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
+    if (exactRefreshApplied) {
       recordRenderPerfMetric("contextBaseExactRefresh", Number(state.renderPerfMetrics?.drawContextBasePass?.durationMs || durationMs), {
         activeScenarioId: String(state.activeScenarioId || ""),
-        reason: reuseDecision.reason,
+        reason: forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
         scaleRatio: reuseDecision.scaleRatio,
         distancePx: reuseDecision.distancePx,
         maxDistancePx: reuseDecision.maxDistancePx,
@@ -20968,7 +21058,7 @@ function refreshMapDataForScenarioApply({
   });
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   state.hitCanvasDirty = true;
-  const targetPasses = ["background", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+  const targetPasses = ["background", "physicalBase", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
   invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
   clearRenderPassReferenceTransforms(targetPasses);
   markAllOverlaysDirty();

@@ -1,8 +1,10 @@
 """Build derived physical atlas semantics and terrain contours."""
 from __future__ import annotations
 
+import hashlib
 import math
 import os
+import re
 from pathlib import Path
 
 import contourpy
@@ -22,6 +24,87 @@ from map_builder.io.fetch import fetch_or_cache_binary
 
 
 EQUAL_AREA_CRS = "EPSG:6933"
+
+
+def _slugify_fragment(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_") or "unknown"
+
+
+def _stable_geometry_fragment(geometry) -> str:
+    if geometry is None or geometry.is_empty:
+        return "empty"
+    digest = hashlib.sha1(geometry.wkb).hexdigest()
+    return digest[:12]
+
+
+def _finalize_semantic_components(
+    gdf: gpd.GeoDataFrame,
+    *,
+    id_prefix: str,
+) -> gpd.GeoDataFrame:
+    if gdf is None or gdf.empty:
+        return gpd.GeoDataFrame(
+            columns=["id", "atlas_class", "atlas_layer", "source", "geometry"],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+    prepared = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
+    if prepared.empty:
+        return gpd.GeoDataFrame(
+            columns=["id", "atlas_class", "atlas_layer", "source", "geometry"],
+            geometry="geometry",
+            crs=gdf.crs or "EPSG:4326",
+        )
+
+    if hasattr(prepared.geometry, "make_valid"):
+        prepared["geometry"] = prepared.geometry.make_valid()
+    else:
+        prepared["geometry"] = prepared.geometry.buffer(0)
+    prepared = prepared[prepared.geometry.notna() & ~prepared.geometry.is_empty].copy()
+    prepared = prepared.explode(index_parts=False, ignore_index=True)
+    prepared = prepared[prepared.geometry.notna() & ~prepared.geometry.is_empty].copy()
+    prepared = prepared[prepared.geometry.geom_type.isin({"Polygon", "MultiPolygon"})].copy()
+    prepared["geometry"] = prepared.geometry.simplify(
+        tolerance=float(cfg.PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES),
+        preserve_topology=True,
+    )
+    prepared = prepared[prepared.geometry.notna() & ~prepared.geometry.is_empty].copy()
+    prepared = prepared[prepared.geometry.geom_type.isin({"Polygon", "MultiPolygon"})].copy()
+    if prepared.empty:
+        return gpd.GeoDataFrame(
+            columns=["id", "atlas_class", "atlas_layer", "source", "geometry"],
+            geometry="geometry",
+            crs=gdf.crs or "EPSG:4326",
+        )
+
+    metric = prepared.to_crs(EQUAL_AREA_CRS)
+    areas_sqkm = metric.geometry.area / 1_000_000.0
+    min_area = float(cfg.PHYSICAL_SEMANTIC_COMPONENT_MIN_AREA_KM2)
+    thresholds = prepared["atlas_class"].map(
+        lambda atlas_class: max(
+            min_area,
+            float(cfg.PHYSICAL_RAINFOREST_MIN_AREA_KM2)
+            if str(atlas_class or "").strip().lower() == "rainforest_tropical"
+            else float(cfg.PHYSICAL_GRASSLAND_STEPPE_MIN_AREA_KM2)
+            if str(atlas_class or "").strip().lower() == "grassland_steppe"
+            else min_area,
+        )
+    )
+    prepared = prepared.loc[(areas_sqkm >= thresholds).values].copy()
+    if prepared.empty:
+        return gpd.GeoDataFrame(
+            columns=["id", "atlas_class", "atlas_layer", "source", "geometry"],
+            geometry="geometry",
+            crs=gdf.crs or "EPSG:4326",
+        )
+
+    prepared = prepared.sort_values(["atlas_layer", "atlas_class"], kind="stable").reset_index(drop=True)
+    prepared["id"] = [
+        f"{id_prefix}_{_slugify_fragment(atlas_class)}_{_stable_geometry_fragment(geometry)}"
+        for atlas_class, geometry in zip(prepared["atlas_class"], prepared.geometry, strict=False)
+    ]
+    return prepared[["id", "atlas_class", "atlas_layer", "source", "geometry"]].copy()
 
 
 def _resolve_raster_source(
@@ -70,9 +153,7 @@ def _classify_relief_base(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     base["atlas_layer"] = "relief_base"
     base["source"] = "natural_earth_physical"
-    dissolved = base.dissolve(by="atlas_class", as_index=False)
-    dissolved["id"] = dissolved["atlas_class"].map(lambda value: f"atlas_relief_{value}")
-    return dissolved[["id", "atlas_class", "atlas_layer", "source", "geometry"]].copy()
+    return _finalize_semantic_components(base, id_prefix="atlas_relief")
 
 
 def _classify_natural_earth_overlay(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -103,9 +184,7 @@ def _classify_natural_earth_overlay(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDa
 
     overlay["atlas_layer"] = "semantic_overlay"
     overlay["source"] = "natural_earth_physical"
-    dissolved = overlay.dissolve(by="atlas_class", as_index=False)
-    dissolved["id"] = dissolved["atlas_class"].map(lambda value: f"atlas_semantic_fallback_{value}")
-    return dissolved[["id", "atlas_class", "atlas_layer", "source", "geometry"]].copy()
+    return _finalize_semantic_components(overlay, id_prefix="atlas_semantic_ne")
 
 
 def _load_discrete_landcover_array() -> tuple[np.ndarray, rasterio.Affine]:
@@ -156,6 +235,7 @@ def _build_semantic_code_grid(discrete_landcover: np.ndarray, transform) -> np.n
 
     forest_mask = np.isin(discrete_landcover, list(cfg.CGLS_FOREST_CLASS_CODES))
     rainforest_mask = np.isin(discrete_landcover, list(cfg.CGLS_RAINFOREST_CLASS_CODES))
+    grassland_mask = np.isin(discrete_landcover, list(cfg.CGLS_GRASSLAND_STEPPE_CLASS_CODES))
     desert_mask = np.isin(discrete_landcover, list(cfg.CGLS_DESERT_CLASS_CODES))
     tundra_mask = np.isin(discrete_landcover, list(cfg.CGLS_TUNDRA_ICE_CLASS_CODES))
 
@@ -165,9 +245,10 @@ def _build_semantic_code_grid(discrete_landcover: np.ndarray, transform) -> np.n
     rainforest_mask &= rainforest_band[:, None]
 
     semantic_codes[forest_mask] = 1
-    semantic_codes[desert_mask] = 2
-    semantic_codes[tundra_mask] = 3
-    semantic_codes[rainforest_mask] = 4
+    semantic_codes[grassland_mask] = 2
+    semantic_codes[desert_mask] = 3
+    semantic_codes[tundra_mask] = 4
+    semantic_codes[rainforest_mask] = 5
     return semantic_codes
 
 
@@ -184,16 +265,17 @@ def _build_forest_semantic_code_grid(forest_type: np.ndarray, transform) -> np.n
     rainforest_mask &= rainforest_band[:, None]
 
     semantic_codes[forest_mask] = 1
-    semantic_codes[rainforest_mask] = 4
+    semantic_codes[rainforest_mask] = 5
     return semantic_codes
 
 
 def _polygonize_semantic_grid(code_grid: np.ndarray, transform) -> gpd.GeoDataFrame:
     class_map = {
-        1: "forest",
-        2: "desert_bare",
-        3: "tundra_ice",
-        4: "rainforest",
+        1: "forest_temperate",
+        2: "grassland_steppe",
+        3: "desert_bare",
+        4: "tundra_ice",
+        5: "rainforest_tropical",
     }
     records: list[dict] = []
     for geometry, value in shapes(code_grid, mask=code_grid > 0, transform=transform):
@@ -219,35 +301,7 @@ def _polygonize_semantic_grid(code_grid: np.ndarray, transform) -> gpd.GeoDataFr
 
     gdf = gpd.GeoDataFrame(records, geometry="geometry", crs="EPSG:4326")
     gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
-    if hasattr(gdf.geometry, "make_valid"):
-        gdf["geometry"] = gdf.geometry.make_valid()
-    else:
-        gdf["geometry"] = gdf.geometry.buffer(0)
-    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
-    gdf["geometry"] = gdf.geometry.simplify(
-        tolerance=float(cfg.PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES),
-        preserve_topology=True,
-    )
-    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
-
-    rainforest = gdf[gdf["atlas_class"] == "rainforest"].copy()
-    if not rainforest.empty:
-        rainforest_metric = rainforest.to_crs(EQUAL_AREA_CRS)
-        rainforest_area_sqkm = rainforest_metric.geometry.area / 1_000_000.0
-        keep = rainforest_area_sqkm >= float(cfg.PHYSICAL_RAINFOREST_MIN_AREA_KM2)
-        rainforest = rainforest.loc[keep.values].copy()
-        non_rainforest = gdf[gdf["atlas_class"] != "rainforest"].copy()
-        gdf = gpd.GeoDataFrame(
-            pd.concat([non_rainforest, rainforest], ignore_index=True),
-            geometry="geometry",
-            crs="EPSG:4326",
-        )
-
-    dissolved = gdf.dissolve(by="atlas_class", as_index=False)
-    dissolved["atlas_layer"] = "semantic_overlay"
-    dissolved["source"] = "cgls_lc100_2019"
-    dissolved["id"] = dissolved["atlas_class"].map(lambda value: f"atlas_semantic_{value}")
-    return dissolved[["id", "atlas_class", "atlas_layer", "source", "geometry"]].copy()
+    return _finalize_semantic_components(gdf, id_prefix="atlas_semantic_lc100")
 
 
 def build_physical_semantics(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -262,8 +316,8 @@ def build_physical_semantics(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame
     try:
         if skip_landcover:
             raise RuntimeError("MAPCREATOR_CONTEXT_SKIP_LANDCOVER enabled")
-        forest_type, transform = _load_forest_type_array()
-        semantic_codes = _build_forest_semantic_code_grid(forest_type, transform)
+        discrete_landcover, transform = _load_discrete_landcover_array()
+        semantic_codes = _build_semantic_code_grid(discrete_landcover, transform)
         forest_overlays = _polygonize_semantic_grid(semantic_codes, transform)
         if fallback_overlays.empty:
             overlays = forest_overlays

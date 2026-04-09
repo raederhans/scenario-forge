@@ -430,6 +430,17 @@
                       </label>
                       <div class="ml-5 space-y-2">
                         <div class="flex items-center justify-between gap-3">
+                          <label id="lblPhysicalPreset" class="range-label" for="physicalPreset" data-i18n="Visual Preset">Visual Preset</label>
+                          <select id="physicalPreset" class="select-input">
+                            <option id="optPhysicalPresetPoliticalClean" value="political_clean" data-i18n="Political Clean">Political Clean</option>
+                            <option id="optPhysicalPresetBalanced" value="balanced" selected data-i18n="Balanced">Balanced</option>
+                            <option id="optPhysicalPresetTerrainRich" value="terrain_rich" data-i18n="Terrain Rich">Terrain Rich</option>
+                          </select>
+                        </div>
+                        <p id="physicalPresetHint" class="sidebar-tool-hint" data-i18n="Balanced keeps terrain visible while staying cleaner over political fills.">
+                          Balanced keeps terrain visible while staying cleaner over political fills.
+                        </p>
+                        <div class="flex items-center justify-between gap-3">
                           <label id="lblPhysicalMode" class="range-label" for="physicalMode">Mode</label>
                           <select id="physicalMode" class="select-input">
                             <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected>Atlas + Contours</option>
@@ -476,35 +487,51 @@
                               <div class="space-y-2 pt-1">
                                 <label class="toggle-label">
                                   <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassMountain">Mountains</span>
+                                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="physicalClassMountainHills" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassPlateau">Plateaus</span>
+                                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="physicalClassBadlands" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassPlains">Plains</span>
+                                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="physicalClassBasin" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassWetlands">Wetlands & Delta</span>
+                                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span>
                                 </label>
                                 <label class="toggle-label">
-                                  <input id="physicalClassForest" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassForest">Forest</span>
+                                  <input id="physicalClassForestTemperate" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassForestTemperate" data-i18n="Temperate Forest">Temperate Forest</span>
                                 </label>
                                 <label class="toggle-label">
-                                  <input id="physicalClassRainforest" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassRainforest">Rainforest</span>
+                                  <input id="physicalClassRainforestTropical" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="physicalClassGrassland" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassDesert">Desert & Bare</span>
+                                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassTundra">Tundra & Ice</span>
+                                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span>
                                 </label>
                               </div>
                             </div>

@@ -2,10 +2,12 @@
 import {
   state,
   PALETTE_THEMES,
+  createPhysicalStyleConfigForPreset,
   createDefaultTransportWorkbenchDisplayConfig,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
+  normalizePhysicalPreset,
   normalizePhysicalStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchDisplayConfig,
@@ -1762,6 +1764,8 @@ function initToolbar({ render } = {}) {
   const urbanToneBias = document.getElementById("urbanToneBias");
   const urbanMinArea = document.getElementById("urbanMinArea");
   const urbanAdaptiveStatus = document.getElementById("urbanAdaptiveStatus");
+  const physicalPreset = document.getElementById("physicalPreset");
+  const physicalPresetHint = document.getElementById("physicalPresetHint");
   const physicalMode = document.getElementById("physicalMode");
   const physicalOpacity = document.getElementById("physicalOpacity");
   const physicalAtlasIntensity = document.getElementById("physicalAtlasIntensity");
@@ -1776,11 +1780,15 @@ function initToolbar({ render } = {}) {
   const physicalContourLowReliefCutoff = document.getElementById("physicalContourLowReliefCutoff");
   const physicalBlendMode = document.getElementById("physicalBlendMode");
   const physicalClassMountain = document.getElementById("physicalClassMountain");
+  const physicalClassMountainHills = document.getElementById("physicalClassMountainHills");
   const physicalClassPlateau = document.getElementById("physicalClassPlateau");
+  const physicalClassBadlands = document.getElementById("physicalClassBadlands");
   const physicalClassPlains = document.getElementById("physicalClassPlains");
+  const physicalClassBasin = document.getElementById("physicalClassBasin");
   const physicalClassWetlands = document.getElementById("physicalClassWetlands");
-  const physicalClassForest = document.getElementById("physicalClassForest");
-  const physicalClassRainforest = document.getElementById("physicalClassRainforest");
+  const physicalClassForestTemperate = document.getElementById("physicalClassForestTemperate");
+  const physicalClassRainforestTropical = document.getElementById("physicalClassRainforestTropical");
+  const physicalClassGrassland = document.getElementById("physicalClassGrassland");
   const physicalClassDesert = document.getElementById("physicalClassDesert");
   const physicalClassTundra = document.getElementById("physicalClassTundra");
   const riversColor = document.getElementById("riversColor");
@@ -2041,11 +2049,15 @@ function initToolbar({ render } = {}) {
   const DEVELOPER_MODE_STORAGE_KEY = "map_creator_developer_mode";
   const physicalClassToggleMap = {
     mountain_high_relief: physicalClassMountain,
+    mountain_hills: physicalClassMountainHills,
     upland_plateau: physicalClassPlateau,
+    badlands_canyon: physicalClassBadlands,
     plains_lowlands: physicalClassPlains,
+    basin_lowlands: physicalClassBasin,
     wetlands_delta: physicalClassWetlands,
-    forest: physicalClassForest,
-    rainforest: physicalClassRainforest,
+    forest_temperate: physicalClassForestTemperate,
+    rainforest_tropical: physicalClassRainforestTropical,
+    grassland_steppe: physicalClassGrassland,
     desert_bare: physicalClassDesert,
     tundra_ice: physicalClassTundra,
   };
@@ -5060,6 +5072,29 @@ function initToolbar({ render } = {}) {
     return state.styleConfig.physical;
   };
 
+  const applyPhysicalPresetConfig = (preset, { preserveMode = true } = {}) => {
+    const current = syncPhysicalConfig();
+    const resolvedPreset = normalizePhysicalPreset(preset);
+    const next = createPhysicalStyleConfigForPreset(resolvedPreset);
+    state.styleConfig.physical = normalizePhysicalStyleConfig({
+      ...next,
+      mode: preserveMode ? current.mode : next.mode,
+      contourColor: current.contourColor || next.contourColor,
+    });
+    return state.styleConfig.physical;
+  };
+
+  const getPhysicalPresetHint = (preset) => {
+    const normalizedPreset = normalizePhysicalPreset(preset);
+    if (normalizedPreset === "political_clean") {
+      return t("Political Clean keeps only the clearest landform cues over political fills.", "ui");
+    }
+    if (normalizedPreset === "terrain_rich") {
+      return t("Terrain Rich pushes the atlas and contour layer for the strongest relief read.", "ui");
+    }
+    return t("Balanced keeps terrain visible while staying cleaner over political fills.", "ui");
+  };
+
   const syncDayNightConfig = () => {
     state.styleConfig.dayNight = normalizeDayNightStyleConfig(state.styleConfig.dayNight);
     return state.styleConfig.dayNight;
@@ -6240,6 +6275,11 @@ function initToolbar({ render } = {}) {
     syncUrbanControls();
 
     state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
+    const activePhysicalPreset = normalizePhysicalPreset(state.styleConfig.physical.preset || "balanced");
+    if (physicalPreset) physicalPreset.value = activePhysicalPreset;
+    if (physicalPresetHint) {
+      physicalPresetHint.textContent = getPhysicalPresetHint(activePhysicalPreset);
+    }
     if (physicalMode) physicalMode.value = state.styleConfig.physical.mode;
     if (physicalOpacity) physicalOpacity.value = String(Math.round(state.styleConfig.physical.opacity * 100));
     if (physicalOpacityValue) {
@@ -7583,6 +7623,13 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (physicalPreset) {
+    physicalPreset.addEventListener("change", (event) => {
+      applyPhysicalPresetConfig(event.target.value || "balanced");
+      syncToolbarFromState();
+      renderDirty("physical-preset-select");
+    });
+  }
   if (physicalMode) {
     physicalMode.addEventListener("change", (event) => {
       const cfg = syncPhysicalConfig();
@@ -7714,7 +7761,7 @@ function initToolbar({ render } = {}) {
   if (physicalBlendMode) {
     physicalBlendMode.addEventListener("change", (event) => {
       const cfg = syncPhysicalConfig();
-      cfg.blendMode = String(event.target.value || "multiply");
+      cfg.blendMode = String(event.target.value || "source-over");
       renderDirty("physical-blend");
     });
   }

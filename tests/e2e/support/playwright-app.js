@@ -130,5 +130,6 @@ module.exports = {
   getConfiguredAppOrigin,
   getWebServerConfig,
   gotoApp,
+  readBootStateSnapshot,
   waitForAppInteractive,
 };
