@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-09T03:24:34.647Z",
-  "last_progress_at": "2026-04-09T03:24:34.647Z",
-  "turn_count": 7,
-  "last_agent_output": "结论：**1939 启动链的问题我已经修了，而且没有回退你现在的性能方案。**  \n修复方案是两块：\n\n1. **把 startup/default scenario 也纳入 `scenarioApp"
+  "last_turn_at": "2026-04-09T19:40:11.901Z",
+  "last_progress_at": "2026-04-09T19:40:11.901Z",
+  "turn_count": 17,
+  "last_agent_output": "结论：**两个主问题都已经按最短路径修了。**  \n修复方案是：\n\n- **TNO 1962 ready / 可编辑状态**：不再把 post-ready 的 overlay 降级误判成启动期只读；d"
 }

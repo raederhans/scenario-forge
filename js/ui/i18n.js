@@ -49,6 +49,18 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
     zh: "\u5730\u8c8c\u4f18\u5148\u6a21\u5f0f\u4f1a\u5f3a\u5316\u56fe\u96c6\u548c\u7b49\u9ad8\u7ebf\uff0c\u8ba9\u5730\u5f62\u8d77\u4f0f\u6700\u660e\u663e\u3002",
     en: "Terrain Rich pushes the atlas and contour layer for the strongest relief read.",
   },
+  "Scenario runtime overlays were degraded. Editing remains available.": {
+    zh: "\u573a\u666f\u8fd0\u884c\u65f6 overlay \u5df2\u964d\u7ea7\uff0c\u4f46\u4ecd\u53ef\u4ee5\u7ee7\u7eed\u67e5\u770b\u548c\u7f16\u8f91\u3002",
+    en: "Scenario runtime overlays were degraded. Editing remains available.",
+  },
+  "Scenario overlays degraded": {
+    zh: "\u573a\u666f overlay \u5df2\u964d\u7ea7",
+    en: "Scenario overlays degraded",
+  },
+  "Overlay fallback active; editing remains available.": {
+    zh: "Overlay \u964d\u7ea7\u56de\u9000\u5df2\u542f\u7528\uff0c\u4f46\u4ecd\u53ef\u4ee5\u7ee7\u7eed\u7f16\u8f91\u3002",
+    en: "Overlay fallback active; editing remains available.",
+  },
   "High Relief Mountains": { zh: "\u9ad8\u8d77\u4f0f\u5c71\u5730", en: "High Relief Mountains" },
   "Mountain Hills": { zh: "\u5c71\u9e93\u4e18\u9675", en: "Mountain Hills" },
   "Upland Plateaus": { zh: "\u9ad8\u5730\u9ad8\u539f", en: "Upland Plateaus" },

@@ -228,6 +228,41 @@ const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
 const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
 const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
 const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
+const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
+  low: Object.freeze({
+    majorIntervalMultiplier: 3,
+    majorOpacityMultiplier: 0.42,
+    majorWidthMultiplier: 0.78,
+    majorMinScreenSpanPx: 22,
+    minorVisible: false,
+    minorOpacityMultiplier: 0,
+    minorWidthMultiplier: 0,
+    minorIntervalMultiplier: 3,
+    minorMinScreenSpanPx: 22,
+  }),
+  mid: Object.freeze({
+    majorIntervalMultiplier: 2,
+    majorOpacityMultiplier: 0.72,
+    majorWidthMultiplier: 0.88,
+    majorMinScreenSpanPx: 12,
+    minorVisible: true,
+    minorOpacityMultiplier: 0.55,
+    minorWidthMultiplier: 0.82,
+    minorIntervalMultiplier: 2,
+    minorMinScreenSpanPx: 18,
+  }),
+  high: Object.freeze({
+    majorIntervalMultiplier: 1,
+    majorOpacityMultiplier: 1,
+    majorWidthMultiplier: 1,
+    majorMinScreenSpanPx: 0,
+    minorVisible: true,
+    minorOpacityMultiplier: 1,
+    minorWidthMultiplier: 1,
+    minorIntervalMultiplier: 1,
+    minorMinScreenSpanPx: 8,
+  }),
+});
 const RIVER_LOW_MAX_SCALERANK = 5;
 const RIVER_MID_MAX_SCALERANK = 7;
 const RIVER_ZOOM_STYLE_FACTORS = {
@@ -2470,6 +2505,72 @@ function getInternalBorderStrokeColor(countryCode, fallbackColor) {
   return mixCanvasColors(dominantFillColor, targetColor, luminance >= 0.42 ? 0.78 : 0.72)
     || targetColor
     || manualColor;
+}
+
+function getContourZoomStyleProfile(k) {
+  const zoomBucket = getContextBaseZoomBucketId(k);
+  return CONTOUR_ZOOM_STYLE_PROFILES[zoomBucket] || CONTOUR_ZOOM_STYLE_PROFILES.high;
+}
+
+function getContourFeatureHostFillColor(feature) {
+  if (!feature || !state.spatialItems?.length || !projection) return null;
+  const cacheKey = [
+    Number(state.colorRevision || 0),
+    String(state.activeScenarioId || ""),
+    String(state.scenarioViewMode || "ownership"),
+  ].join("::");
+  const cached = contourHostFillColorCache.get(feature);
+  if (cached?.key === cacheKey) {
+    return cached.color;
+  }
+
+  const geographicCentroid = getFeatureGeoCentroid(feature);
+  const projectedCentroid = pathCanvas?.centroid
+    ? pathCanvas.centroid(feature)
+    : (Array.isArray(geographicCentroid) ? projection(geographicCentroid) : null);
+  const resolveFromRadius = (radiusProj = 0) => {
+    if (
+      !Array.isArray(projectedCentroid)
+      || projectedCentroid.length < 2
+      || !projectedCentroid.every((value) => Number.isFinite(Number(value)))
+      || !Array.isArray(geographicCentroid)
+    ) {
+      return null;
+    }
+    const ranked = rankCandidates(
+      collectGridCandidates(projectedCentroid[0], projectedCentroid[1], radiusProj),
+      geographicCentroid,
+    );
+    const match = ranked.find((candidate) => candidate.containsGeo) || ranked[0];
+    const hostFeature = match?.item?.feature || null;
+    const hostFeatureId = String(match?.item?.featureId || getFeatureId(hostFeature) || "").trim();
+    if (!hostFeature || !hostFeatureId) return null;
+    return (
+      getSafeCanvasColor(state.colors?.[hostFeatureId], null)
+      || getSafeCanvasColor(getResolvedFeatureColor(hostFeature, hostFeatureId), null)
+    );
+  };
+
+  const color = resolveFromRadius(0) || resolveFromRadius(CONTOUR_HOST_FILL_FALLBACK_RADIUS);
+  contourHostFillColorCache.set(feature, {
+    key: cacheKey,
+    color,
+  });
+  return color;
+}
+
+function getAdaptiveContourStrokeColor(feature, baseColor) {
+  const safeBaseColor = getSafeCanvasColor(baseColor, "#665241") || "#665241";
+  const hostFillColor = getContourFeatureHostFillColor(feature);
+  const luminance = getCanvasColorRelativeLuminance(hostFillColor);
+  if (!Number.isFinite(luminance)) {
+    return safeBaseColor;
+  }
+  const targetColor = luminance >= 0.42
+    ? CONTOUR_AUTO_COLOR_DARK_TARGET
+    : CONTOUR_AUTO_COLOR_LIGHT_TARGET;
+  const mixAmount = luminance >= 0.42 ? 0.58 : 0.74;
+  return mixCanvasColors(safeBaseColor, targetColor, mixAmount) || targetColor || safeBaseColor;
 }
 
 function sanitizeColorMap(input) {
@@ -9643,7 +9744,6 @@ function drawPhysicalAtlasCollectionLayer(
 function drawPhysicalBasePass(k, { interactive = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
-  const presetProfile = getPhysicalPresetRenderProfile(cfg);
   const maskInfo = getPhysicalLandMaskInfo();
   if (!state.showPhysical || cfg.mode === "contours_only") {
     collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
@@ -9674,6 +9774,7 @@ function drawPhysicalBasePass(k, { interactive = false } = {}) {
     return;
   }
 
+  const presetProfile = getPhysicalPresetRenderProfile(cfg);
   const baseOpacity = clamp(
     cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.reliefOpacityMultiplier,
     0,
@@ -9683,6 +9784,10 @@ function drawPhysicalBasePass(k, { interactive = false } = {}) {
     baseOpacity,
     blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.reliefBlendFallback),
   });
+  // Keep the fill-based semantic atlas in the same pass as relief so it stays
+  // beneath political fills. Contours remain in contextBase as the lightest
+  // readable physical cue above political.
+  drawPhysicalAtlasLayer(k, { interactive });
   collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
     featureCount: atlasCollection.features.length,
     renderedCount,
@@ -9757,6 +9862,7 @@ function drawContourCollection(
   collection,
   {
     color,
+    colorResolver = null,
     opacity,
     width,
     k,
@@ -9764,6 +9870,7 @@ function drawContourCollection(
     lowReliefCutoff = 0,
     intervalM = 0,
     excludeIntervalM = 0,
+    minScreenSpanPx = 0,
   } = {}
 ) {
   if (!Array.isArray(collection?.features) || collection.features.length === 0) return false;
@@ -9781,6 +9888,16 @@ function drawContourCollection(
     if (intervalM > 0 && Number.isFinite(elevation) && elevation % intervalM !== 0) return;
     if (excludeIntervalM > 0 && Number.isFinite(elevation) && elevation % excludeIntervalM === 0) return;
     if (!pathBoundsInScreen(feature)) return;
+    if (minScreenSpanPx > 0) {
+      const screenBounds = getFeatureScreenBounds(feature, { allowCompute: false }) || getFeatureScreenBounds(feature);
+      const span = Math.max(Number(screenBounds?.width || 0), Number(screenBounds?.height || 0));
+      if (!(span >= minScreenSpanPx)) return;
+    }
+    const strokeColor = typeof colorResolver === "function"
+      ? getSafeCanvasColor(colorResolver(feature), color)
+      : color;
+    if (!strokeColor) return;
+    context.strokeStyle = strokeColor;
     context.beginPath();
     pathCanvas(feature);
     context.stroke();
@@ -9793,6 +9910,7 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
   const presetProfile = getPhysicalPresetRenderProfile(cfg);
+  const zoomProfile = getContourZoomStyleProfile(k);
   const maskInfo = getPhysicalLandMaskInfo();
   if (!state.showPhysical || cfg.mode === "atlas_only") {
     collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
@@ -9829,11 +9947,26 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   const contourColor = getSafeCanvasColor(cfg.contourColor, "#6b5947");
   const lowReliefCutoff = clamp(Number(cfg.contourLowReliefCutoffM) || 0, 0, 2000);
   const majorOpacity = clamp(
-    cfg.opacity * cfg.contourOpacity * presetProfile.majorContourOpacityMultiplier,
+    cfg.opacity * cfg.contourOpacity * presetProfile.majorContourOpacityMultiplier * zoomProfile.majorOpacityMultiplier,
     0,
     1
   );
-  const minorOpacity = clamp(majorOpacity * presetProfile.minorContourOpacityRatio, 0, 1);
+  const minorOpacity = clamp(
+    majorOpacity * presetProfile.minorContourOpacityRatio * zoomProfile.minorOpacityMultiplier,
+    0,
+    1
+  );
+  const resolveContourColor = (feature) => getAdaptiveContourStrokeColor(feature, contourColor);
+  const majorInterval = clamp(
+    (clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000) * zoomProfile.majorIntervalMultiplier),
+    500,
+    6000,
+  );
+  const minorInterval = clamp(
+    (clamp(Number(cfg.contourMinorIntervalM) || 100, 100, 1000) * zoomProfile.minorIntervalMultiplier),
+    100,
+    3000,
+  );
 
   context.save();
   if (!clipAlreadyApplied) {
@@ -9843,25 +9976,29 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
 
   drawContourCollection(state.physicalContourMajorData, {
     color: contourColor,
+    colorResolver: resolveContourColor,
     opacity: majorOpacity,
-    width: clamp(Number(cfg.contourMajorWidth) || 0.8, 0.2, 3),
+    width: clamp((Number(cfg.contourMajorWidth) || 0.8) * zoomProfile.majorWidthMultiplier, 0.2, 3),
     k,
     interactive,
     lowReliefCutoff,
-    intervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
+    intervalM: majorInterval,
+    minScreenSpanPx: zoomProfile.majorMinScreenSpanPx,
   });
 
-  if (cfg.contourMinorVisible && k >= presetProfile.minorContourMinZoom) {
+  if (cfg.contourMinorVisible && zoomProfile.minorVisible && k >= presetProfile.minorContourMinZoom) {
     if (Array.isArray(state.physicalContourMinorData?.features) && state.physicalContourMinorData.features.length > 0) {
       drawContourCollection(state.physicalContourMinorData, {
         color: contourColor,
+        colorResolver: resolveContourColor,
         opacity: minorOpacity,
-        width: clamp(Number(cfg.contourMinorWidth) || 0.45, 0.1, 2),
+        width: clamp((Number(cfg.contourMinorWidth) || 0.45) * zoomProfile.minorWidthMultiplier, 0.1, 2),
         k,
         interactive,
         lowReliefCutoff,
-        intervalM: clamp(Number(cfg.contourMinorIntervalM) || 100, 100, 1000),
-        excludeIntervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
+        intervalM: minorInterval,
+        excludeIntervalM: majorInterval,
+        minScreenSpanPx: zoomProfile.minorMinScreenSpanPx,
       });
     } else {
         warnMissingPhysicalContextOnce(
@@ -14839,15 +14976,6 @@ function drawContextBasePass(k, { interactive = false } = {}) {
     if (state.deferContextBasePass && !interactive) {
       deferred = true;
       const maskInfo = getPhysicalLandMaskInfo();
-      collectContextMetric("drawPhysicalAtlasLayer", 0, {
-        featureCount: 0,
-        interactive: false,
-        skipped: true,
-        reason: "staged-apply",
-        maskSource: maskInfo.maskSource,
-        maskFeatureCount: maskInfo.maskFeatureCount,
-        maskArcRefEstimate: maskInfo.maskArcRefEstimate,
-      });
       collectContextMetric("drawPhysicalContourLayer", 0, {
         featureCount: 0,
         majorFeatureCount: 0,
@@ -14890,7 +15018,6 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         reason: "staged-apply",
       });
     } else {
-      drawPhysicalAtlasLayer(k, { interactive });
       drawPhysicalContourLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });

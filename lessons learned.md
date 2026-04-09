@@ -261,3 +261,23 @@
 ### 43. Chunked coarse preload and noncritical scenario metadata should not block scenario apply completion
 - If coarse chunk preload or metadata like releasable catalog/district groups/audit stay on the main apply path, startup can remain stuck in scenario-apply even after the scene is already usable.
 - Let apply finish on required political/runtime assets first, then load coarse chunks and metadata in the background.
+
+### 44. 不能把 fill-based physical 机械地下沉到完全不透明的 political 下方
+- 这次检查发现 drawPoliticalBackgroundFills() 和 drawPoliticalFeature() 默认都是不透明填色；如果把 atlas + contours 全部沉到底下，physical 会直接基本不可见。
+- 更稳的最小修复是先确认上层 fill 是否透明，再决定 physical ownership；在不改 political opacity 的前提下，优先把最抢眼的 atlas fill 下沉，把最轻的 contour cue 留在上层。
+
+### 45. Ready text and editability must use the same runtime contract
+- TNO 1962 showed detail promotion completed and startupReadonly=false while the status bar still claimed coarse mode, so status copy and edit locks cannot be derived from separate stale flags.
+- Keep startup readonly for startup unlock only; treat post-ready overlay degradation as a separate health-gate state, and drive status text/buttons from the real ready state.
+
+### 45. scenario health gate 不能优先信任 TopoJSON 自动数字 id，必须优先用业务 feature id
+- 这次 TNO deferred hydration gate 看起来像“overlay 降级逻辑有问题”，根因其实是 `state.landData` 里的很多 detail feature 带的是 TopoJSON 数字 `feature.id`，真正的业务 id 在 `feature.properties.id`。
+- 如果 gate / overlap 校验先读数字 id，就会把本来健康的 detail 场景误判成 owner-feature mismatch，后续所有 readonly / fatal recovery 判断都会跑偏。
+
+### 46. detail promotion 完成后，状态文案不能继续吃旧的 scenarioDataHealth 快照
+- 这次浏览器里 `detailPromotionCompleted=true`、`topologyBundleMode="composite"` 已经成立，但状态栏还残留 coarse mode，说明 detail promotion 链只更新了渲染，没有同步刷新 status 依赖的数据。
+- 更稳的做法是：detail promotion 一旦落地，就在同一轮里刷新 scenarioDataHealth 和 scenario UI，避免“画面是 detail，文案还是 coarse”的假只读感。
+
+### 45. hydration / health gate 做要素重叠校验时，不能优先读 topology 自动编号 `feature.id`
+- 这次 TNO 1962 detail runtime 里很多 feature 的真正稳定 id 在 `properties.id`，而 `feature.id` 只是 0,1,2 这种自动编号；如果校验逻辑优先读 `feature.id`，owner overlap 会被误判成几乎全丢。
+- 更稳的做法是：凡是做跨阶段一致性、ownership、controller、diff、health gate 这类校验，一律先取 `properties.id`，只有没有时才退回 `feature.id`。

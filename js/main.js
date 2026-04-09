@@ -9,6 +9,7 @@ import {
   loadMapData,
   normalizeRequestedContextLayerNames,
 } from "./core/data_loader.js";
+import { refreshScenarioDataHealth } from "./core/scenario_data_health.js";
 import {
   buildInteractionInfrastructureAfterStartup,
   initMap,
@@ -1378,6 +1379,16 @@ function hasDetailTopologyLoaded() {
   return !!state.topologyDetail?.objects?.political;
 }
 
+function syncScenarioReadyUiAfterDetailPromotion() {
+  refreshScenarioDataHealth({
+    showWarningToast: false,
+    showErrorToast: false,
+  });
+  if (typeof state.updateScenarioUIFn === "function") {
+    state.updateScenarioUIFn();
+  }
+}
+
 async function ensureDetailTopologyReady({
   renderDispatcher = null,
   requireIdle = false,
@@ -1397,6 +1408,7 @@ async function ensureDetailTopologyReady({
     }
     state.detailDeferred = false;
     state.detailPromotionCompleted = true;
+    syncScenarioReadyUiAfterDetailPromotion();
     return true;
   }
 
@@ -1443,6 +1455,7 @@ async function ensureDetailTopologyReady({
         requestMainRender("detail-topology-promoted");
       }
     }
+    syncScenarioReadyUiAfterDetailPromotion();
     return true;
   } catch (error) {
     console.warn("[main] Detail promotion failed:", error);

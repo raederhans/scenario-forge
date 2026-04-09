@@ -51,6 +51,7 @@ import {
 import {
   DETAIL_POLITICAL_MIN_FEATURES,
   SCENARIO_DETAIL_MIN_RATIO_STRICT,
+  evaluateScenarioDataHealth,
   hasUsablePoliticalTopology,
   refreshScenarioDataHealth,
   scenarioNeedsDetailTopology,
@@ -978,6 +979,14 @@ function setScenarioViewMode(
 }
 
 async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) {
+  const syncScenarioReadyUiAfterPromotion = () => {
+    refreshScenarioDataHealth({
+      showWarningToast: false,
+      showErrorToast: false,
+    });
+    syncScenarioUi();
+    syncCountryUi({ renderNow: false });
+  };
   {
     const promoted = await ensureDetailTopologyBoundary({ applyMapData });
     if (promoted) return true;
@@ -988,6 +997,9 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
     if (applyMapData) {
       setMapData({ refitProjection: false, resetZoom: false });
     }
+    state.detailDeferred = false;
+    state.detailPromotionCompleted = true;
+    syncScenarioReadyUiAfterPromotion();
     return true;
   }
   if (hasDetailNow && state.topologyBundleMode === "composite") {
@@ -1037,6 +1049,7 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
       if (applyMapData) {
         setMapData({ refitProjection: false, resetZoom: false });
       }
+      syncScenarioReadyUiAfterPromotion();
       return true;
     } catch (error) {
       state.detailDeferred = false;
@@ -1970,7 +1983,16 @@ function formatScenarioStatusText() {
     return t("No scenario active", "ui");
   }
   const displayName = getScenarioDisplayName(state.activeScenarioManifest, state.activeScenarioId);
-  const warning = String(state.scenarioDataHealth?.warning || "").trim();
+  const liveHealth = evaluateScenarioDataHealth(state.activeScenarioManifest, {
+    minRatio: Number(state.scenarioDataHealth?.minRatio || SCENARIO_DETAIL_MIN_RATIO_STRICT),
+  });
+  const warning = String(liveHealth?.warning || state.scenarioDataHealth?.warning || "").trim();
+  if (
+    state.scenarioHydrationHealthGate?.status === "degraded"
+    && String(state.scenarioHydrationHealthGate?.reason || "").startsWith("runtime-overlay-")
+  ) {
+    return `${displayName} · ${t("Overlay fallback active; editing remains available.", "ui")}`;
+  }
   return warning ? `${displayName} · ${warning}` : displayName;
 }
 

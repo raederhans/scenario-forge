@@ -55,6 +55,9 @@ import {
   syncScenarioUi,
 } from "./scenario_ui_sync.js";
 import {
+  enterScenarioFatalRecovery,
+} from "./scenario_recovery.js";
+import {
   getRuntimeGeometryFeatureId,
   getScenarioRuntimeGeometryCountryCode,
   hasExplicitScenarioAssignment,
@@ -2339,7 +2342,10 @@ function collectFeatureIdsFromCollection(collection) {
   const features = Array.isArray(collection?.features) ? collection.features : [];
   const ids = new Set();
   features.forEach((feature) => {
-    const featureId = normalizeCityText(feature?.id || feature?.properties?.id);
+    const featureId = normalizeCityText(
+      feature?.properties?.id
+      || feature?.id
+    );
     if (featureId) ids.add(featureId);
   });
   return ids;
@@ -2508,6 +2514,17 @@ async function enforceScenarioHydrationHealthGate({
     if (attemptedRetry && renderNow) {
       flushRenderBoundary("scenario-health-gate-retry-recovered");
     }
+    if (
+      typeof state.setStartupReadonlyStateFn === "function"
+      && state.startupReadonly
+      && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
+    ) {
+      state.setStartupReadonlyStateFn(false);
+    } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
+      state.startupReadonly = false;
+      state.startupReadonlyReason = "";
+      state.startupReadonlyUnlockInFlight = false;
+    }
     state.scenarioHydrationHealthGate = {
       status: "ok",
       reason: attemptedRetry ? "retry-recovered" : "ok",
@@ -2518,7 +2535,59 @@ async function enforceScenarioHydrationHealthGate({
       ownerFeatureRenderedCount: report.renderedFeatureCount,
       degradedWaterOverlay: false,
     };
+    syncScenarioUi();
+    syncCountryUi({ renderNow: false });
     return { ok: true, attemptedRetry, degradedWaterOverlay: false, report, waterConsistency };
+  }
+  if (!report.healthy) {
+    const problemParts = [
+      `Hydration owner overlap dropped to ${report.overlapCount}/${report.renderedFeatureCount} (${report.overlapRatio.toFixed(3)}).`,
+    ];
+    if (waterConsistency?.reason && waterConsistency.reason !== "ok") {
+      problemParts.push(`Overlay consistency also failed: ${waterConsistency.reason}.`);
+    }
+    state.scenarioHydrationHealthGate = {
+      status: "degraded",
+      reason: "owner-feature-mismatch",
+      checkedAt: Date.now(),
+      attemptedRetry,
+      ownerFeatureOverlapRatio: report.overlapRatio,
+      ownerFeatureOverlapCount: report.overlapCount,
+      ownerFeatureRenderedCount: report.renderedFeatureCount,
+      degradedWaterOverlay: false,
+    };
+    if (
+      typeof state.setStartupReadonlyStateFn === "function"
+      && state.startupReadonly
+      && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
+    ) {
+      state.setStartupReadonlyStateFn(false);
+    } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
+      state.startupReadonly = false;
+      state.startupReadonlyReason = "";
+      state.startupReadonlyUnlockInFlight = false;
+    }
+    enterScenarioFatalRecovery({
+      phase: "hydration-health-gate",
+      consistencyReport: {
+        phase: "hydration-health-gate",
+        problems: problemParts,
+      },
+      syncUi: () => {
+        syncScenarioUi();
+        syncCountryUi({ renderNow: false });
+      },
+    });
+    if (renderNow) {
+      flushRenderBoundary("scenario-health-gate-owner-mismatch");
+    }
+    return {
+      ok: false,
+      attemptedRetry,
+      degradedWaterOverlay: false,
+      report,
+      waterConsistency,
+    };
   }
   const hadScenarioOverlay =
     !!state.scenarioWaterRegionsData
@@ -2533,20 +2602,21 @@ async function enforceScenarioHydrationHealthGate({
   invalidateContextLayerVisualStateBatch([], "scenario-health-gate-mask-fallback", { renderNow: false });
   invalidateOceanWaterInteractionVisualState("scenario-health-gate-water-fallback");
   refreshColorState({ renderNow: false });
-  if (typeof state.setStartupReadonlyStateFn === "function") {
-    state.setStartupReadonlyStateFn(true, {
-      reason: "scenario-health-gate",
-      unlockInFlight: false,
-    });
-  } else {
-    state.startupReadonly = true;
-    state.startupReadonlyReason = "scenario-health-gate";
+  if (
+    typeof state.setStartupReadonlyStateFn === "function"
+    && state.startupReadonly
+    && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
+  ) {
+    state.setStartupReadonlyStateFn(false);
+  } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
+    state.startupReadonly = false;
+    state.startupReadonlyReason = "";
     state.startupReadonlyUnlockInFlight = false;
   }
   showToast(
-    t("Scenario hydration mismatch detected. Applied safe runtime overlay fallback; full retry is required.", "ui"),
+    t("Scenario runtime overlays were degraded. Editing remains available.", "ui"),
     {
-      title: t("Scenario hydration warning", "ui"),
+      title: t("Scenario overlays degraded", "ui"),
       tone: "warning",
       duration: 6200,
     }
@@ -2564,6 +2634,8 @@ async function enforceScenarioHydrationHealthGate({
     ownerFeatureRenderedCount: report.renderedFeatureCount,
     degradedWaterOverlay: hadScenarioOverlay,
   };
+  syncScenarioUi();
+  syncCountryUi({ renderNow: false });
   if (renderNow) {
     flushRenderBoundary("scenario-health-gate-fallback");
   }

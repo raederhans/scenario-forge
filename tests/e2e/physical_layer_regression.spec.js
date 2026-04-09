@@ -128,10 +128,26 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           /return VALID_BLEND_MODES\.has\(mode\) \? mode : safeFallback;/.test(rendererSource),
         hasPhysicalBasePass:
           /\["physicalBase", \(k\) => drawPhysicalBasePass\(k\)\]/.test(rendererSource),
+        physicalBaseOwnsAtlas:
+          /function drawPhysicalBasePass[\s\S]*?drawPhysicalAtlasLayer\(k, \{ interactive \}\);/.test(rendererSource),
         hasPhysicalExactRefresh:
           /invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(rendererSource),
+        contextBaseNoLongerDrawsAtlas:
+          /function drawContextBasePass[\s\S]*?drawPhysicalAtlasLayer\(k, \{ interactive \}\);/.test(rendererSource) === false,
+        contextBaseStillDrawsContours:
+          /function drawContextBasePass[\s\S]*?drawPhysicalContourLayer\(k, \{ interactive \}\);/.test(rendererSource),
         contourUsesSourceOver:
           /drawPhysicalContourLayer[\s\S]*?context\.globalCompositeOperation = "source-over";/.test(rendererSource),
+        hasContourZoomProfiles:
+          /const CONTOUR_ZOOM_STYLE_PROFILES = Object\.freeze\(\{/.test(rendererSource),
+        hasAdaptiveContourColor:
+          /function getAdaptiveContourStrokeColor\(feature, baseColor\)/.test(rendererSource),
+        contourUsesAdaptiveColor:
+          /drawContourCollection[\s\S]*?colorResolver = null/.test(rendererSource)
+          && /drawPhysicalContourLayer[\s\S]*?colorResolver: resolveContourColor/.test(rendererSource),
+        contourUsesScreenSpanGate:
+          /minScreenSpanPx = 0/.test(rendererSource)
+          && /getFeatureScreenBounds\(feature, \{ allowCompute: false \}\) \|\| getFeatureScreenBounds\(feature\)/.test(rendererSource),
         hasMountainMultiplier:
           /if \(normalized === "mountain_high_relief"\) return 1\.18;/.test(rendererSource),
         hasMountainHillsMultiplier:
@@ -182,8 +198,15 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   expect(inspection.rendererSourceChecks.hasValidBlendModes).toBe(true);
   expect(inspection.rendererSourceChecks.hasSafeBlendFallback).toBe(true);
   expect(inspection.rendererSourceChecks.hasPhysicalBasePass).toBe(true);
+  expect(inspection.rendererSourceChecks.physicalBaseOwnsAtlas).toBe(true);
   expect(inspection.rendererSourceChecks.hasPhysicalExactRefresh).toBe(true);
+  expect(inspection.rendererSourceChecks.contextBaseNoLongerDrawsAtlas).toBe(true);
+  expect(inspection.rendererSourceChecks.contextBaseStillDrawsContours).toBe(true);
   expect(inspection.rendererSourceChecks.contourUsesSourceOver).toBe(true);
+  expect(inspection.rendererSourceChecks.hasContourZoomProfiles).toBe(true);
+  expect(inspection.rendererSourceChecks.hasAdaptiveContourColor).toBe(true);
+  expect(inspection.rendererSourceChecks.contourUsesAdaptiveColor).toBe(true);
+  expect(inspection.rendererSourceChecks.contourUsesScreenSpanGate).toBe(true);
   expect(inspection.rendererSourceChecks.hasMountainMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasMountainHillsMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasDesertMultiplier).toBe(true);
