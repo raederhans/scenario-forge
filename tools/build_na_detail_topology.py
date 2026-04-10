@@ -726,8 +726,7 @@ def _promote_geometry_ids(topology_dict: dict) -> None:
                 candidate = f"{candidate}__dup{index}"
             seen.add(candidate)
             geom["id"] = candidate
-            if preferred and "id" not in props:
-                props["id"] = preferred
+            props["id"] = preferred or candidate
 
 
 def _clean_text(value: object) -> str:
@@ -971,6 +970,8 @@ def main() -> None:
     print(f"[Detail patch] Source political features: {len(layers['political'])}")
     primary_topology_path = source_path.with_name("europe_topology.json")
     primary_layers = None
+    source_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
+    primary_urban_issue = ""
     if primary_topology_path.exists():
         print(f"[Detail patch] Loading primary topology shell: {primary_topology_path}")
         primary_layers = _load_layers_from_topology(_load_topology(primary_topology_path))
@@ -981,7 +982,6 @@ def main() -> None:
                 primary_layer = primary_layers.get(layer_name)
                 if primary_layer is not None and not primary_layer.empty:
                     layers[layer_name] = primary_layer.copy()
-        source_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
         primary_urban_issue = _describe_urban_layer_contract(primary_layers.get("urban"))
         if source_urban_issue and not primary_urban_issue:
             print(
@@ -989,6 +989,14 @@ def main() -> None:
                 f"source={source_urban_issue}"
             )
             layers["urban"] = primary_layers["urban"].copy()
+            source_urban_issue = ""
+    effective_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
+    if effective_urban_issue:
+        raise ValueError(
+            "Detail patch urban layer contract invalid before build: "
+            f"{effective_urban_issue} (source={source_urban_issue or 'ok'}, "
+            f"primary={primary_urban_issue or 'n/a'})"
+        )
     _record_timing(
         stage_timings,
         "load_inputs",
