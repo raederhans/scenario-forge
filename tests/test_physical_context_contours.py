@@ -72,6 +72,15 @@ class PhysicalContextContourTest(unittest.TestCase):
         self.assertTrue(all(level % cfg.CONTOUR_MAJOR_INTERVAL_M == 0 for level in major_levels))
         self.assertTrue(all(level % cfg.CONTOUR_MAJOR_INTERVAL_M != 0 for level in minor_levels))
 
+    def test_build_contour_layers_raises_when_dem_has_no_finite_positive_elevations(self) -> None:
+        dem = np.full((4, 4), np.nan, dtype=np.float32)
+        x = np.arange(4, dtype=np.float32)
+        y = np.arange(4, dtype=np.float32)
+
+        with patch.object(physical_context, "_load_contour_dem_array", return_value=(dem, x, y)):
+            with self.assertRaisesRegex(RuntimeError, "no finite positive land elevations"):
+                physical_context.build_contour_layers()
+
     def test_build_and_save_physical_context_layers_refuses_empty_contours(self) -> None:
         contour_minor = gpd.GeoDataFrame(
             [
