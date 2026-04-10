@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-09T19:40:11.901Z",
-  "last_progress_at": "2026-04-09T19:40:11.901Z",
-  "turn_count": 17,
-  "last_agent_output": "结论：**两个主问题都已经按最短路径修了。**  \n修复方案是：\n\n- **TNO 1962 ready / 可编辑状态**：不再把 post-ready 的 overlay 降级误判成启动期只读；d"
+  "last_turn_at": "2026-04-10T01:02:09.088Z",
+  "last_progress_at": "2026-04-10T01:02:09.088Z",
+  "turn_count": 48,
+  "last_agent_output": "结论：这个 P1 我已经修了，修法是**不去放宽全局 defer 规则**，而是在 exact-after-settle 真正结束后，**补一轮 guarded flush**，把之前挂起的 chun"
 }

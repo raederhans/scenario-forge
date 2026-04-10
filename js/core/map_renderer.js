@@ -317,6 +317,7 @@ const INTERNAL_BORDER_LOCAL_ALPHA_SCALE = 0.60;
 const INTERNAL_BORDER_LOCAL_WIDTH_SCALE = 0.75;
 const INTERNAL_BORDER_AUTO_DARK = "#ffffff";
 const INTERNAL_BORDER_AUTO_LIGHT = "#111827";
+const CONTOUR_HOST_FILL_FALLBACK_RADIUS = 24;
 const DETAIL_ADM_BORDER_COLOR = "#888888";
 const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
 const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
@@ -603,6 +604,11 @@ let countryDominantFillColorCache = {
   activeScenarioId: "",
   result: new Map(),
 };
+let contourHostFillColorCache = new WeakMap();
+let staticMeshSourceCountries = {
+  primary: new Set(),
+  detail: new Set(),
+};
 let scenarioPoliticalBackgroundCache = {
   runtimeRef: null,
   scenarioId: "",
@@ -665,6 +671,7 @@ const cityLayerCache = {
 };
 const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
+let cityMarkerSpriteCacheColorRevision = -1;
 let visibleCityHoverEntries = [];
 let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
@@ -675,6 +682,23 @@ let deferredIndexUiRefreshState = null;
 let pendingSidebarRefreshHandle = null;
 let pendingSidebarRefreshState = null;
 let secondarySpatialBuildHandle = null;
+let pendingScenarioChunkFlushAfterExactHandle = null;
+let deferredHeavyBorderMeshHandle = null;
+let deferredContextBaseEnhancementHandle = null;
+let deferContextBaseEnhancements = false;
+let detailAdmMeshBuildState = {
+  signature: "",
+  status: "idle",
+};
+let visibleInternalBorderMeshSignature = "";
+let visibleBorderCountryCodesCache = {
+  signature: "",
+  codes: new Set(),
+};
+let contourVisibleSetCache = {
+  major: { collectionRef: null, key: "", features: [] },
+  minor: { collectionRef: null, key: "", features: [] },
+};
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -2566,9 +2590,7 @@ function getAdaptiveContourStrokeColor(feature, baseColor) {
   if (!Number.isFinite(luminance)) {
     return safeBaseColor;
   }
-  const targetColor = luminance >= 0.42
-    ? CONTOUR_AUTO_COLOR_DARK_TARGET
-    : CONTOUR_AUTO_COLOR_LIGHT_TARGET;
+  const targetColor = luminance >= 0.42 ? "#111827" : "#ffffff";
   const mixAmount = luminance >= 0.42 ? 0.58 : 0.74;
   return mixCanvasColors(safeBaseColor, targetColor, mixAmount) || targetColor || safeBaseColor;
 }
@@ -4130,10 +4152,60 @@ function scheduleRenderPhaseIdle() {
       state.deferExactAfterSettle = true;
       render();
       scheduleExactAfterSettleRefresh();
+      if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+        state.scheduleScenarioChunkRefreshFn({
+          reason: "render-phase-idle",
+          delayMs: 0,
+          flushPending: true,
+        });
+      }
       return;
     }
     render();
+    if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+      state.scheduleScenarioChunkRefreshFn({
+        reason: "render-phase-idle",
+        delayMs: 0,
+        flushPending: true,
+      });
+    }
   }, RENDER_SETTLE_DURATION_MS);
+}
+
+function flushPendingScenarioChunkRefreshAfterExact(reason = "exact-after-settle") {
+  if (pendingScenarioChunkFlushAfterExactHandle) {
+    globalThis.clearTimeout(pendingScenarioChunkFlushAfterExactHandle);
+    pendingScenarioChunkFlushAfterExactHandle = null;
+  }
+  if (typeof state.scheduleScenarioChunkRefreshFn !== "function") {
+    return;
+  }
+  const loadState = state.runtimeChunkLoadState;
+  const hasPendingPromotion = !!loadState?.pendingPromotion;
+  const hasPendingReason = !!String(loadState?.pendingReason || "").trim();
+  if (!hasPendingPromotion && !hasPendingReason) {
+    return;
+  }
+  pendingScenarioChunkFlushAfterExactHandle = globalThis.setTimeout(() => {
+    pendingScenarioChunkFlushAfterExactHandle = null;
+    if (typeof state.scheduleScenarioChunkRefreshFn !== "function") {
+      return;
+    }
+    const nextLoadState = state.runtimeChunkLoadState;
+    const stillHasPendingPromotion = !!nextLoadState?.pendingPromotion;
+    const stillHasPendingReason = !!String(nextLoadState?.pendingReason || "").trim();
+    if (!stillHasPendingPromotion && !stillHasPendingReason) {
+      return;
+    }
+    if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+      return;
+    }
+    state.scheduleScenarioChunkRefreshFn({
+      reason,
+      delayMs: 0,
+      flushPending: true,
+    });
+  }, 0);
 }
 
 function getDisplayOwnerCode(feature, id) {
@@ -5684,6 +5756,281 @@ function getSourceCountrySets() {
   return sets;
 }
 
+function resetContourHostFillColorCache() {
+  contourHostFillColorCache = new WeakMap();
+}
+function resetExactRefreshOptimizationState() {
+  resetContourHostFillColorCache();
+  resetContourVisibleSetCache();
+  cancelDeferredContextBaseEnhancement({ resetFlag: true });
+  detailAdmMeshBuildState = {
+    signature: "",
+    status: "idle",
+  };
+}
+
+function resetContourVisibleSetCache() {
+  contourVisibleSetCache = {
+    major: { collectionRef: null, key: "", features: [] },
+    minor: { collectionRef: null, key: "", features: [] },
+  };
+}
+
+function cancelDeferredContextBaseEnhancement({ resetFlag = false } = {}) {
+  cancelDeferredWork(deferredContextBaseEnhancementHandle);
+  deferredContextBaseEnhancementHandle = null;
+  if (resetFlag) {
+    deferContextBaseEnhancements = false;
+  }
+}
+
+function shouldDeferContextBaseEnhancementsForExactRefresh(
+  reuseDecision = null,
+  forceExactContextBaseRefresh = false,
+) {
+  const resolvedReuseDecision =
+    reuseDecision && typeof reuseDecision === "object"
+      ? reuseDecision
+      : null;
+  if (!resolvedReuseDecision && !forceExactContextBaseRefresh) {
+    return false;
+  }
+  return !!(
+    resolvedReuseDecision?.crossesZoomBucket
+    || (
+      Number.isFinite(Number(resolvedReuseDecision?.distancePx))
+      && Number.isFinite(Number(resolvedReuseDecision?.maxDistancePx))
+      && Number(resolvedReuseDecision.distancePx) > Number(resolvedReuseDecision.maxDistancePx)
+    )
+    || String(resolvedReuseDecision?.zoomBucket || "") === "high"
+  );
+}
+
+function scheduleDeferredContextBaseEnhancements() {
+  cancelDeferredContextBaseEnhancement();
+  deferredContextBaseEnhancementHandle = scheduleDeferredWork(() => {
+    deferredContextBaseEnhancementHandle = null;
+    if (!deferContextBaseEnhancements) {
+      return;
+    }
+    if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+      scheduleDeferredContextBaseEnhancements();
+      return;
+    }
+    deferContextBaseEnhancements = false;
+    invalidateRenderPasses(["contextBase", "labels"], "context-base-enhancement");
+    render();
+  }, {
+    timeout: 180,
+  });
+}
+
+function setStaticMeshSourceCountries(sourceCountries = {}) {
+  staticMeshSourceCountries = {
+    primary: sourceCountries.primary instanceof Set ? new Set(sourceCountries.primary) : new Set(),
+    detail: sourceCountries.detail instanceof Set ? new Set(sourceCountries.detail) : new Set(),
+  };
+}
+
+function resetVisibleInternalBorderMeshSignature() {
+  visibleInternalBorderMeshSignature = "";
+  visibleBorderCountryCodesCache = {
+    signature: "",
+    codes: new Set(),
+  };
+}
+
+function resetDetailAdmMeshBuildState() {
+  detailAdmMeshBuildState = {
+    signature: "",
+    status: "idle",
+  };
+}
+
+function syncStaticMeshSnapshot() {
+  staticMeshCache.snapshot = captureStaticMeshSnapshot();
+}
+
+function buildDetailAdmMeshSignature(visibleCountryCodes = new Set(), k = state.zoomTransform?.k || 1) {
+  const detailCountries = Array.from(staticMeshSourceCountries.detail || new Set())
+    .filter((countryCode) => visibleCountryCodes.has(countryCode))
+    .sort((left, right) => left.localeCompare(right));
+  return {
+    detailCountries,
+    signature: [
+      Number(state.topologyRevision || 0),
+      String(getContextBaseZoomBucketId(k)),
+      ...detailCountries,
+    ].join("|"),
+  };
+}
+
+function getVisibleCountryCodesForBorderMeshes() {
+  const viewportBounds = getProjectedViewportBounds({ overscanPx: VIEWPORT_CULL_OVERSCAN_PX * 0.5 });
+  if (!viewportBounds) {
+    return new Set();
+  }
+  const signature = [
+    Number(state.topologyRevision || 0),
+    Number(state.zoomTransform?.k || 1).toFixed(3),
+    Number(viewportBounds.minX || 0).toFixed(1),
+    Number(viewportBounds.minY || 0).toFixed(1),
+    Number(viewportBounds.maxX || 0).toFixed(1),
+    Number(viewportBounds.maxY || 0).toFixed(1),
+    Array.isArray(state.spatialItems) ? state.spatialItems.length : 0,
+  ].join("|");
+  if (visibleBorderCountryCodesCache.signature === signature) {
+    return new Set(visibleBorderCountryCodesCache.codes);
+  }
+  const visible = new Set();
+  const minX = Number(viewportBounds.minX);
+  const minY = Number(viewportBounds.minY);
+  const maxX = Number(viewportBounds.maxX);
+  const maxY = Number(viewportBounds.maxY);
+  (state.spatialItems || []).forEach((item) => {
+    const countryCode = canonicalCountryCode(item?.countryCode || "");
+    if (!countryCode || visible.has(countryCode)) return;
+    if (item.maxX < minX || item.maxY < minY || item.minX > maxX || item.minY > maxY) {
+      return;
+    }
+    visible.add(countryCode);
+  });
+  visibleBorderCountryCodesCache = {
+    signature,
+    codes: new Set(visible),
+  };
+  return visible;
+}
+
+function ensureCountrySourceBorderMeshes(countryCode, {
+  includeProvince = true,
+  includeLocal = true,
+} = {}) {
+  const normalizedCode = canonicalCountryCode(countryCode);
+  if (!normalizedCode || !globalThis.topojson) return;
+  const needsProvince = includeProvince && !state.cachedProvinceBordersByCountry?.has(normalizedCode);
+  const needsLocal = includeLocal && !state.cachedLocalBordersByCountry?.has(normalizedCode);
+  if (!needsProvince && !needsLocal) {
+    return;
+  }
+
+  const nextProvinceMeshes = [];
+  const nextLocalMeshes = [];
+  const sources = [
+    { key: "detail", topology: state.topologyDetail },
+    { key: "primary", topology: state.topologyPrimary || state.topology },
+  ];
+  sources.forEach(({ key, topology }) => {
+    if (!topology?.objects?.political) return;
+    if (!staticMeshSourceCountries[key]?.has(normalizedCode)) return;
+    const meshes = buildSourceBorderMeshes(topology, new Set([normalizedCode]));
+    if (!meshes) return;
+    if (needsProvince) {
+      const provinceMeshes = meshes.provinceMeshesByCountry?.get(normalizedCode) || [];
+      provinceMeshes.forEach((mesh) => {
+        if (isUsableMesh(mesh)) {
+          nextProvinceMeshes.push(mesh);
+          state.cachedProvinceBorders.push(mesh);
+        }
+      });
+    }
+    if (needsLocal) {
+      const localMeshes = meshes.localMeshesByCountry?.get(normalizedCode) || [];
+      localMeshes.forEach((mesh) => {
+        if (isUsableMesh(mesh)) {
+          nextLocalMeshes.push(mesh);
+          state.cachedLocalBorders.push(mesh);
+        }
+      });
+    }
+  });
+  if (needsProvince) {
+    state.cachedProvinceBordersByCountry.set(normalizedCode, nextProvinceMeshes);
+  }
+  if (needsLocal) {
+    state.cachedLocalBordersByCountry.set(normalizedCode, nextLocalMeshes);
+    state.cachedGridLines = [...(state.cachedLocalBorders || [])];
+  }
+}
+
+function cancelDeferredHeavyBorderMeshes() {
+  cancelDeferredWork(deferredHeavyBorderMeshHandle);
+  deferredHeavyBorderMeshHandle = null;
+}
+
+function scheduleDeferredHeavyBorderMeshes() {
+  cancelDeferredHeavyBorderMeshes();
+  deferredHeavyBorderMeshHandle = scheduleDeferredWork(() => {
+    deferredHeavyBorderMeshHandle = null;
+    if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+      scheduleDeferredHeavyBorderMeshes();
+      return;
+    }
+    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
+    if (!visibleCountryCodes.size) return;
+    const currentZoom = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+    const includeProvince = currentZoom >= PROVINCE_BORDERS_TRANSITION_END_ZOOM;
+    const includeLocal = currentZoom >= LOCAL_BORDERS_MIN_ZOOM;
+    const detailAdmMeta = currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
+      ? buildDetailAdmMeshSignature(visibleCountryCodes, currentZoom)
+      : { detailCountries: [], signature: "" };
+    const includeDetailAdm =
+      currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
+      && detailAdmMeta.detailCountries.length > 0
+      && (
+        detailAdmMeshBuildState.signature !== detailAdmMeta.signature
+        || detailAdmMeshBuildState.status === "idle"
+      );
+    if (!includeProvince && !includeLocal && !includeDetailAdm) return;
+    let changed = false;
+    let snapshotChanged = false;
+    visibleCountryCodes.forEach((countryCode) => {
+      const hadProvince = state.cachedProvinceBordersByCountry?.has(countryCode);
+      const hadLocal = state.cachedLocalBordersByCountry?.has(countryCode);
+      ensureCountrySourceBorderMeshes(countryCode, {
+        includeProvince,
+        includeLocal,
+      });
+      if ((includeProvince && !hadProvince && state.cachedProvinceBordersByCountry?.has(countryCode))
+        || (includeLocal && !hadLocal && state.cachedLocalBordersByCountry?.has(countryCode))) {
+        changed = true;
+        snapshotChanged = true;
+      }
+    });
+    if (includeDetailAdm) {
+      const previousDetailAdmStatus = String(detailAdmMeshBuildState.status || "idle");
+      const detailAdmMesh = buildDetailAdmBorderMesh(state.topologyDetail, new Set(detailAdmMeta.detailCountries));
+      if (isUsableMesh(detailAdmMesh)) {
+        state.cachedDetailAdmBorders = [detailAdmMesh];
+        detailAdmMeshBuildState = {
+          signature: detailAdmMeta.signature,
+          status: "ready",
+        };
+        changed = true;
+        snapshotChanged = true;
+      } else {
+        detailAdmMeshBuildState = {
+          signature: detailAdmMeta.signature,
+          status: "empty",
+        };
+        snapshotChanged =
+          snapshotChanged
+          || previousDetailAdmStatus !== "empty"
+          || state.cachedDetailAdmBorders.length > 0;
+      }
+    }
+    if (snapshotChanged) {
+      syncStaticMeshSnapshot();
+    }
+    if (changed) {
+      invalidateRenderPasses("borders", "deferred-country-border-meshes");
+      render();
+    }
+  }, {
+    timeout: 220,
+  });
+}
+
 function serializeCountrySetSignature(countrySet) {
   return Array.from(countrySet || []).sort((left, right) => left.localeCompare(right)).join(",");
 }
@@ -5734,6 +6081,7 @@ function captureStaticMeshSnapshot() {
     parentGroupByFeatureId: new Map(state.parentGroupByFeatureId || []),
     parentBorderMetaByCountry: { ...(state.parentBorderMetaByCountry || {}) },
     parentBorderSupportedCountries: [...(state.parentBorderSupportedCountries || [])],
+    detailAdmMeshBuildState: { ...(detailAdmMeshBuildState || { signature: "", status: "idle" }) },
   };
 }
 
@@ -5754,6 +6102,12 @@ function restoreStaticMeshSnapshot(snapshot) {
   state.parentGroupByFeatureId = new Map(snapshot.parentGroupByFeatureId || []);
   state.parentBorderMetaByCountry = { ...(snapshot.parentBorderMetaByCountry || {}) };
   state.parentBorderSupportedCountries = [...(snapshot.parentBorderSupportedCountries || [])];
+  detailAdmMeshBuildState = snapshot.detailAdmMeshBuildState && typeof snapshot.detailAdmMeshBuildState === "object"
+    ? {
+      signature: String(snapshot.detailAdmMeshBuildState.signature || ""),
+      status: String(snapshot.detailAdmMeshBuildState.status || "idle"),
+    }
+    : { signature: "", status: "idle" };
   syncParentBorderEnabledByCountry(state.parentBorderSupportedCountries);
 }
 
@@ -6305,8 +6659,11 @@ function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
 
 function rebuildStaticMeshes() {
   const startedAt = nowMs();
+  cancelDeferredHeavyBorderMeshes();
+  resetVisibleInternalBorderMeshSignature();
   if (!globalThis.topojson) {
     staticMeshCache.snapshot = null;
+    setStaticMeshSourceCountries();
     state.cachedCountryBorders = [];
     state.cachedProvinceBorders = [];
     state.cachedProvinceBordersByCountry = new Map();
@@ -6335,6 +6692,7 @@ function rebuildStaticMeshes() {
   }
 
   const sourceCountries = getSourceCountrySets();
+  setStaticMeshSourceCountries(sourceCountries);
   const coastlineSourceDecision = resolveCoastlineTopologySource();
   const sourceCountriesSignature = getSourceCountriesSignature(sourceCountries);
   const coastlineDecisionSignature = getCoastlineDecisionSignature(coastlineSourceDecision);
@@ -6354,6 +6712,21 @@ function rebuildStaticMeshes() {
     staticMeshCache.snapshot;
   if (cacheMatches) {
     restoreStaticMeshSnapshot(staticMeshCache.snapshot);
+    const currentZoom = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+    if (currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
+      const detailAdmMeta = buildDetailAdmMeshSignature(getVisibleCountryCodesForBorderMeshes(), currentZoom);
+      detailAdmMeshBuildState = {
+        signature: detailAdmMeta.signature,
+        status: state.cachedDetailAdmBorders.length
+          ? "ready"
+          : (detailAdmMeta.detailCountries.length ? "idle" : "empty"),
+      };
+    } else {
+      detailAdmMeshBuildState = {
+        signature: "",
+        status: "idle",
+      };
+    }
     if (typeof state.updateParentBorderCountryListFn === "function") {
       state.updateParentBorderCountryListFn();
     }
@@ -6387,41 +6760,29 @@ function rebuildStaticMeshes() {
   state.parentBorderSupportedCountries = [];
   refreshParentBorderSupport();
 
-  const sources = [
-    { key: "detail", topology: detailTopology },
-    { key: "primary", topology: primaryTopology },
-  ];
-
-  sources.forEach(({ key, topology }) => {
-    if (!topology?.objects?.political) return;
-    const includedCountries = sourceCountries[key] || new Set();
-    if (!includedCountries.size) return;
-    const meshes = buildSourceBorderMeshes(topology, includedCountries);
-    if (!meshes) return;
-    (meshes.provinceMeshes || []).forEach((mesh) => {
-      if (isUsableMesh(mesh)) state.cachedProvinceBorders.push(mesh);
-    });
-    (meshes.localMeshes || []).forEach((mesh) => {
-      if (isUsableMesh(mesh)) state.cachedLocalBorders.push(mesh);
-    });
-    if (meshes.provinceMeshesByCountry instanceof Map) {
-      meshes.provinceMeshesByCountry.forEach((countryMeshes, countryCode) => {
-        const existing = state.cachedProvinceBordersByCountry.get(countryCode) || [];
-        state.cachedProvinceBordersByCountry.set(countryCode, [...existing, ...countryMeshes]);
-      });
+  if (Math.max(0.0001, Number(state.zoomTransform?.k || 1)) >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
+    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
+    const detailCountries = new Set(
+      [...(sourceCountries.detail || new Set())].filter((countryCode) => visibleCountryCodes.has(countryCode))
+    );
+    const detailAdmMesh = buildDetailAdmBorderMesh(state.topologyDetail, detailCountries);
+    if (isUsableMesh(detailAdmMesh)) {
+      state.cachedDetailAdmBorders.push(detailAdmMesh);
+      detailAdmMeshBuildState = {
+        signature: buildDetailAdmMeshSignature(visibleCountryCodes, state.zoomTransform?.k || 1).signature,
+        status: "ready",
+      };
+    } else {
+      detailAdmMeshBuildState = {
+        signature: buildDetailAdmMeshSignature(visibleCountryCodes, state.zoomTransform?.k || 1).signature,
+        status: detailCountries.size ? "empty" : "empty",
+      };
     }
-    if (meshes.localMeshesByCountry instanceof Map) {
-      meshes.localMeshesByCountry.forEach((countryMeshes, countryCode) => {
-        const existing = state.cachedLocalBordersByCountry.get(countryCode) || [];
-        state.cachedLocalBordersByCountry.set(countryCode, [...existing, ...countryMeshes]);
-      });
-    }
-  });
-
-  const detailCountries = sourceCountries.detail || new Set();
-  const detailAdmMesh = buildDetailAdmBorderMesh(state.topologyDetail, detailCountries);
-  if (isUsableMesh(detailAdmMesh)) {
-    state.cachedDetailAdmBorders.push(detailAdmMesh);
+  } else {
+    detailAdmMeshBuildState = {
+      signature: "",
+      status: "idle",
+    };
   }
 
   const unifiedBorderTopology =
@@ -6485,6 +6846,7 @@ function rebuildStaticMeshes() {
     coastlineSource: String(coastlineSourceDecision?.source || "primary"),
     coastlineReason: String(coastlineSourceDecision?.reason || ""),
   });
+  scheduleDeferredHeavyBorderMeshes();
 }
 
 function invalidateBorderCache() {
@@ -6523,6 +6885,7 @@ function hitColorToKey(pixel) {
 function drawHitCanvas() {
   if (!hitContext || !pathHitCanvas || !state.landData?.features?.length) {
     state.hitCanvasDirty = false;
+    state.hitCanvasTopologyRevision = 0;
     return false;
   }
 
@@ -6530,6 +6893,7 @@ function drawHitCanvas() {
   const height = hitCanvas?.height || 0;
   if (width <= 0 || height <= 0) {
     state.hitCanvasDirty = false;
+    state.hitCanvasTopologyRevision = 0;
     return false;
   }
 
@@ -6575,6 +6939,7 @@ function drawHitCanvas() {
 
   hitContext.restore();
   state.hitCanvasDirty = false;
+  state.hitCanvasTopologyRevision = Number(state.topologyRevision || 0);
   incrementPerfCounter("hitCanvasRenders");
   return true;
 }
@@ -6629,6 +6994,13 @@ function ensureHitCanvasUpToDate({ force = false } = {}) {
   });
 }
 
+function isHitCanvasCurrent() {
+  return (
+    !state.hitCanvasDirty
+    && Number(state.hitCanvasTopologyRevision || 0) === Number(state.topologyRevision || 0)
+  );
+}
+
 function getHitResultFromCanvas(event) {
   if (!mapSvg || !hitContext || !state.keyToId?.size || !globalThis.d3?.pointer) {
     return createHitResult();
@@ -6672,7 +7044,11 @@ function getHitResultFromCanvas(event) {
 }
 
 function getValidatedCanvasHit(event, strictIds = null, { forceBuild = false } = {}) {
-  if (state.renderPhase !== RENDER_PHASE_IDLE || !ensureHitCanvasUpToDate({ force: !!forceBuild })) {
+  if (
+    state.renderPhase !== RENDER_PHASE_IDLE
+    || (!isHitCanvasCurrent() && !ensureHitCanvasUpToDate({ force: !!forceBuild }))
+    || !isHitCanvasCurrent()
+  ) {
     return createHitResult();
   }
   const hit = getHitResultFromCanvas(event);
@@ -7040,8 +7416,11 @@ function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, ta
   });
 }
 
-function shouldPreferWaterHit(landHit, waterHit) {
+function shouldPreferWaterHit(landHit, waterHit, { eventType = "unknown" } = {}) {
   if (!waterHit?.id) return false;
+  if (eventType === "hover" && isMacroOceanWaterRegion(waterHit.feature)) {
+    return false;
+  }
   if (!landHit?.id) return true;
   const waterType = getWaterRegionType(waterHit.feature);
   if (["lake", "inland_sea", "strait", "chokepoint"].includes(waterType)) {
@@ -7121,7 +7500,7 @@ function getLandHitFromPointer(
 
 function getWaterHitFromPointer(
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
   if (!state.showWaterRegions) return createHitResult();
   if (!state.waterSpatialItems?.length) {
@@ -7137,6 +7516,9 @@ function getWaterHitFromPointer(
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
+    if (eventType === "hover" && isMacroOceanWaterRegion(strictHit.item?.feature)) {
+      return createHitResult();
+    }
     if (shouldSuppressOpenOceanHit(strictHit, pointer)) {
       return createHitResult();
     }
@@ -7160,6 +7542,9 @@ function getWaterHitFromPointer(
   const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
+  if (eventType === "hover" && isMacroOceanWaterRegion(chosen.item?.feature)) {
+    return createHitResult();
+  }
   if (shouldSuppressOpenOceanHit(chosen, pointer)) {
     return createHitResult();
   }
@@ -7958,11 +8343,12 @@ function getHitFromEvent(
   const waterHit = getWaterHitFromPointer(pointer, {
     enableSnap,
     snapPx,
+    eventType,
   });
-  if (waterHit.id && isScenarioWaterRegion(waterHit.feature)) {
+  if (waterHit.id && isScenarioWaterRegion(waterHit.feature) && eventType !== "hover") {
     return waterHit;
   }
-  if (shouldPreferWaterHit(landHit, waterHit)) {
+  if (shouldPreferWaterHit(landHit, waterHit, { eventType })) {
     return waterHit;
   }
   if (landHit.id) return landHit;
@@ -8388,10 +8774,28 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
   ) * DETAIL_ADM_BORDER_WIDTH_SCALE / kDenom;
   const coastlineCollection = getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k);
+  const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
+  if (visibleCountryCodes.size > 0) {
+    const includeProvinceMeshes = k >= PROVINCE_BORDERS_TRANSITION_END_ZOOM;
+    const includeLocalMeshes = k >= LOCAL_BORDERS_MIN_ZOOM;
+    const nextVisibleMeshSignature = [
+      includeProvinceMeshes ? "province" : "country",
+      includeLocalMeshes ? "local" : "nolocal",
+      ...Array.from(visibleCountryCodes).sort((left, right) => left.localeCompare(right)),
+    ].join("|");
+    if (
+      nextVisibleMeshSignature !== visibleInternalBorderMeshSignature
+      && (includeProvinceMeshes || includeLocalMeshes)
+    ) {
+      visibleInternalBorderMeshSignature = nextVisibleMeshSignature;
+      scheduleDeferredHeavyBorderMeshes();
+    }
+  }
 
   if (k >= LOCAL_BORDERS_MIN_ZOOM) {
     context.globalAlpha = localAlpha;
-    state.cachedLocalBordersByCountry?.forEach((meshes, countryCode) => {
+    visibleCountryCodes.forEach((countryCode) => {
+      const meshes = state.cachedLocalBordersByCountry?.get(countryCode) || [];
       drawMeshCollection(
         meshes,
         getInternalBorderStrokeColor(countryCode, internalColor),
@@ -8402,7 +8806,8 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   }
 
   context.globalAlpha = provinceAlpha;
-  state.cachedProvinceBordersByCountry?.forEach((meshes, countryCode) => {
+  visibleCountryCodes.forEach((countryCode) => {
+    const meshes = state.cachedProvinceBordersByCountry?.get(countryCode) || [];
     drawMeshCollection(
       meshes,
       getInternalBorderStrokeColor(countryCode, internalColor),
@@ -8410,6 +8815,43 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
       { transformMesh: provinceMeshTransform }
     );
   });
+
+  if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
+    const detailAdmMeta = buildDetailAdmMeshSignature(visibleCountryCodes, k);
+    const signatureChanged = detailAdmMeta.signature !== detailAdmMeshBuildState.signature;
+    if (signatureChanged) {
+      const hadDetailAdmBorders = state.cachedDetailAdmBorders.length > 0;
+      state.cachedDetailAdmBorders = [];
+      if (detailAdmMeta.detailCountries.length > 0) {
+        detailAdmMeshBuildState = {
+          signature: detailAdmMeta.signature,
+          status: "building",
+        };
+        if (hadDetailAdmBorders) {
+          syncStaticMeshSnapshot();
+        }
+        scheduleDeferredHeavyBorderMeshes();
+      } else {
+        detailAdmMeshBuildState = {
+          signature: detailAdmMeta.signature,
+          status: "empty",
+        };
+        if (hadDetailAdmBorders) {
+          syncStaticMeshSnapshot();
+        }
+      }
+    } else if (
+      !state.cachedDetailAdmBorders.length
+      && detailAdmMeshBuildState.status === "idle"
+      && detailAdmMeta.detailCountries.length > 0
+    ) {
+      detailAdmMeshBuildState = {
+        signature: detailAdmMeta.signature,
+        status: "building",
+      };
+      scheduleDeferredHeavyBorderMeshes();
+    }
+  }
 
   if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
     context.globalAlpha = detailAdmAlpha;
@@ -10023,13 +10465,24 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   });
 }
 
-function shouldForceExactContextBaseRefresh() {
+function shouldForceExactContextBaseRefresh(reuseDecision = null) {
   if (!state.showPhysical) return false;
   if (state.bootBlocking || state.scenarioApplyInFlight || state.startupReadonly || state.startupReadonlyUnlockInFlight) {
     return false;
   }
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
-  return cfg.mode === "atlas_only" || cfg.mode === "contours_only" || cfg.mode === "atlas_and_contours";
+  if (!(cfg.mode === "atlas_only" || cfg.mode === "contours_only" || cfg.mode === "atlas_and_contours")) {
+    return false;
+  }
+  const cache = getRenderPassCacheState();
+  if (cache.dirty?.physicalBase || cache.dirty?.contextBase) {
+    return true;
+  }
+  const resolvedReuseDecision =
+    reuseDecision && typeof reuseDecision === "object"
+      ? reuseDecision
+      : getContextBaseReuseDecision();
+  return !!resolvedReuseDecision?.crossesMinorContourThreshold;
 }
 
 function getPhysicalExactRefreshPasses() {
@@ -11041,11 +11494,18 @@ function renderCityMarkerSprite(spriteContext, spec, tokens, entry) {
 }
 
 function getCityMarkerSprite(entry, config = {}) {
+  const colorRevision = Number(state.colorRevision || 0);
+  if (cityMarkerSpriteCacheColorRevision !== colorRevision) {
+    cityMarkerSpriteCache.clear();
+    cityMarkerSpriteCacheColorRevision = colorRevision;
+  }
   const spec = getCityMarkerVisualSpec(entry, config);
   const sizePx = spec.sizePx;
   const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
   const baseColorKey = String(config.color || "");
   const capitalColorKey = String(config.capitalColor || "");
+  const markerStyle = getCityMarkerRenderStyle(entry, config);
+  const backgroundKey = markerStyle.backgroundColor || "none";
   const spriteKey = [
     themeKey,
     String(entry?.cityTier || "minor"),
@@ -11053,12 +11513,13 @@ function getCityMarkerSprite(entry, config = {}) {
     sizePx.toFixed(2),
     baseColorKey,
     capitalColorKey,
+    backgroundKey,
   ].join("|");
   if (cityMarkerSpriteCache.has(spriteKey)) {
     return cityMarkerSpriteCache.get(spriteKey);
   }
 
-  const tokens = getCityMarkerThemeTokens(config);
+  const tokens = markerStyle.tokens;
   const canvas = createCityMarkerSpriteCanvas(spec.widthPx, spec.heightPx + spec.capitalTopExtra);
   const sprite = {
     canvas,
@@ -11141,8 +11602,31 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     .filter(Boolean)
     .sort(compareCityRevealEntries);
 
+  const capitalEntriesByCountry = new Map();
+  candidateEntries.forEach((entry) => {
+    if (!entry.isCapital || capitalEntriesByCountry.has(entry.countryKey)) {
+      return;
+    }
+    capitalEntriesByCountry.set(entry.countryKey, entry);
+  });
+  const acceptedCityIds = new Set();
+  capitalEntriesByCountry.forEach((entry) => {
+    const currentCount = countsByCountry.get(entry.countryKey) || 0;
+    const quota = Math.max(
+      getCityMarkerQuotaForTier(phase.id, entry.countryTier),
+      1
+    );
+    if (currentCount >= quota) return;
+    entry.markerSizePx = getCityMarkerSizePx(entry, config);
+    markerEntries.push(entry);
+    countsByCountry.set(entry.countryKey, currentCount + 1);
+    acceptedCityIds.add(entry.cityId);
+  });
+  const effectiveMarkerBudget = Math.max(markerBudget, markerEntries.length);
+
   for (const entry of candidateEntries) {
-    if (markerEntries.length >= markerBudget) break;
+    if (markerEntries.length >= effectiveMarkerBudget) break;
+    if (acceptedCityIds.has(entry.cityId)) continue;
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
     const quota = Math.max(
       getCityMarkerQuotaForTier(phase.id, entry.countryTier),
@@ -11152,6 +11636,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     entry.markerSizePx = getCityMarkerSizePx(entry, config);
     markerEntries.push(entry);
     countsByCountry.set(entry.countryKey, currentCount + 1);
+    acceptedCityIds.add(entry.cityId);
   }
 
   if (config.showLabels && !state.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
@@ -11171,6 +11656,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     phase,
     markerEntries,
     labelEntries,
+    candidateEntries,
   };
 }
 
@@ -11649,11 +12135,22 @@ function getCityLabelBackgroundColor(entry) {
   );
 }
 
+function getCityBackgroundPaintInfo(entry) {
+  const backgroundColor = getCityLabelBackgroundColor(entry) || "";
+  const luminance = getCanvasColorRelativeLuminance(backgroundColor);
+  const usesLightContrast = Number.isFinite(luminance) && luminance < CITY_LABEL_DARK_BACKGROUND_LUMINANCE;
+  return {
+    backgroundColor,
+    luminance,
+    usesLightContrast,
+  };
+}
+
 function getCityLabelRenderStyle(entry, config = {}) {
   const tokens = getCityMarkerThemeTokens(config);
-  const backgroundColor = getCityLabelBackgroundColor(entry);
-  const luminance = getCanvasColorRelativeLuminance(backgroundColor);
-  const usesLightLabel = Number.isFinite(luminance) && luminance < CITY_LABEL_DARK_BACKGROUND_LUMINANCE;
+  const backgroundInfo = getCityBackgroundPaintInfo(entry);
+  const { backgroundColor, luminance } = backgroundInfo;
+  const usesLightLabel = backgroundInfo.usesLightContrast;
 
   if (!usesLightLabel) {
     return {
@@ -11679,6 +12176,49 @@ function getCityLabelRenderStyle(entry, config = {}) {
     usesLightLabel: true,
     backgroundColor: backgroundColor || "",
     luminance,
+  };
+}
+
+function getCityMarkerRenderStyle(entry, config = {}) {
+  const baseTokens = getCityMarkerThemeTokens(config);
+  const backgroundInfo = getCityBackgroundPaintInfo(entry);
+  const { backgroundColor, luminance, usesLightContrast } = backgroundInfo;
+  if (!usesLightContrast || !backgroundColor) {
+    return {
+      tokens: baseTokens,
+      backgroundColor,
+      luminance,
+      usesLightContrast: false,
+      adapted: false,
+    };
+  }
+
+  const adaptiveBase = computeUrbanAdaptivePaintFromHostColor(backgroundColor, {
+    adaptiveStrength: 1,
+    toneBias: 0.08,
+  });
+  const fillMid = adaptiveBase?.fillColor || mixCanvasColors(backgroundColor, "#ede7da", 0.62) || baseTokens.fillMid;
+  const stroke = adaptiveBase?.strokeColor || mixCanvasColors(backgroundColor, "#fff8ef", 0.78) || baseTokens.stroke;
+  const fillTop = mixCanvasColors(fillMid, "#fffaf2", 0.28) || fillMid;
+  const fillBottom = mixCanvasColors(fillMid, stroke, 0.46) || stroke;
+  return {
+    tokens: {
+      ...baseTokens,
+      fillTop,
+      fillMid,
+      fillBottom,
+      rimDark: mixCanvasColors(backgroundColor, stroke, 0.82) || stroke,
+      stroke,
+      highlight: mixCanvasColors(stroke, "#ffffff", 0.24) || baseTokens.highlight,
+      specular: mixCanvasColors(stroke, "#ffffff", 0.14) || baseTokens.specular,
+      capitalAccent: mixCanvasColors(backgroundColor, "#f2e4b2", 0.84) || baseTokens.capitalAccent,
+      capitalHighlight: mixCanvasColors(backgroundColor, "#fff7da", 0.88) || baseTokens.capitalHighlight,
+      halo: mixCanvasColors(backgroundColor, "#fff9ef", 0.18) || baseTokens.halo,
+    },
+    backgroundColor,
+    luminance,
+    usesLightContrast: true,
+    adapted: true,
   };
 }
 
@@ -15386,9 +15926,10 @@ function scheduleExactAfterSettleRefresh() {
     state.exactAfterSettleHandle = null;
     if (state.renderPhase !== RENDER_PHASE_IDLE || !state.deferExactAfterSettle) return;
     const reuseDecision = getContextBaseReuseDecision();
-    const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh();
+    const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
     const startedAt = nowMs();
     state.deferExactAfterSettle = false;
+    cancelDeferredContextBaseEnhancement();
     if (forceExactContextBaseRefresh) {
       invalidateRenderPasses(["physicalBase", "contextBase"], "physical-visible-exact");
     } else if (reuseDecision.enabled) {
@@ -15419,9 +15960,14 @@ function scheduleExactAfterSettleRefresh() {
         });
       }
     }
-    render();
-    const durationMs = Math.max(0, nowMs() - startedAt);
     const exactRefreshApplied = forceExactContextBaseRefresh || !!reuseDecision.shouldExactRefresh;
+    deferContextBaseEnhancements = shouldDeferContextBaseEnhancementsForExactRefresh(
+      reuseDecision,
+      forceExactContextBaseRefresh,
+    );
+    render();
+    flushPendingScenarioChunkRefreshAfterExact();
+    const durationMs = Math.max(0, nowMs() - startedAt);
     recordRenderPerfMetric("settleExactRefresh", durationMs, {
       activeScenarioId: String(state.activeScenarioId || ""),
       contextBaseRefreshed: exactRefreshApplied,
@@ -15446,6 +15992,9 @@ function scheduleExactAfterSettleRefresh() {
         crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
         crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
       });
+    }
+    if (deferContextBaseEnhancements) {
+      scheduleDeferredContextBaseEnhancements();
     }
     }, EXACT_AFTER_SETTLE_QUIET_WINDOW_MS),
   };
@@ -19123,7 +19672,24 @@ function handleMouseMove(event) {
     return;
   }
 
-  const reducedHoverPhase = state.renderPhase !== RENDER_PHASE_IDLE;
+  const reducedHoverPhase =
+    state.renderPhase !== RENDER_PHASE_IDLE
+    || state.isInteracting
+    || state.scenarioApplyInFlight
+    || state.startupReadonly
+    || state.startupReadonlyUnlockInFlight;
+  if (reducedHoverPhase) {
+    if (state.hoveredId || state.hoveredWaterRegionId || state.hoveredSpecialRegionId) {
+      state.hoveredId = null;
+      state.hoveredWaterRegionId = null;
+      state.hoveredSpecialRegionId = null;
+      state.hoverOverlayDirty = true;
+      renderHoverOverlayIfNeeded();
+    }
+    updateDevHoverHit(null);
+    queueTooltipUpdate({ visible: false });
+    return;
+  }
   const hit = getHitFromEvent(event, {
     enableSnap: false,
     snapPx: HIT_SNAP_RADIUS_HOVER_PX,
@@ -20760,11 +21326,6 @@ function updateMap(transform) {
   }
   syncUnitCounterScalesDuringZoom();
   drawCanvas();
-  if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
-    state.scheduleScenarioChunkRefreshFn({
-      reason: state.renderPhase || "zoom",
-    });
-  }
 }
 
 function resetZoomToFit() {
@@ -20853,17 +21414,33 @@ function initZoom() {
       }
     })
     .on("zoom", (event) => {
-      if (!state.zoomRenderScheduled) {
-        state.zoomRenderScheduled = true;
-        requestAnimationFrame(() => {
-          updateMap(event.transform);
-          state.zoomRenderScheduled = false;
-        });
-      }
+      state.pendingZoomTransform = event.transform;
+      if (state.zoomRenderScheduled) return;
+      state.zoomRenderScheduled = true;
+      const flushLatestZoomTransform = () => {
+        const nextTransform = state.pendingZoomTransform;
+        state.pendingZoomTransform = null;
+        if (nextTransform) {
+          updateMap(nextTransform);
+        }
+        if (state.pendingZoomTransform) {
+          requestAnimationFrame(flushLatestZoomTransform);
+          return;
+        }
+        state.zoomRenderScheduled = false;
+      };
+      requestAnimationFrame(flushLatestZoomTransform);
     })
     .on("end", (event) => {
       setRenderPhase(RENDER_PHASE_SETTLING);
+      state.pendingZoomTransform = null;
       updateMap(event.transform);
+      if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+        state.scheduleScenarioChunkRefreshFn({
+          reason: "zoom-end",
+          delayMs: 0,
+        });
+      }
       scheduleRenderPhaseIdle();
     });
 
@@ -20947,7 +21524,9 @@ function initMap({
   layerResolverCache.bundleMode = null;
   layerResolverCache.contextRevision = 0;
   resetPhysicalLandClipPathCache();
+  resetExactRefreshOptimizationState();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
+  state.hitCanvasTopologyRevision = 0;
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
@@ -21061,7 +21640,10 @@ function setMapData({
   state.devClipboardFallbackText = "";
   state.devClipboardPreviewFormat = "names_with_ids";
   resetPhysicalLandClipPathCache();
+  resetExactRefreshOptimizationState();
+  resetVisibleInternalBorderMeshSignature();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
+  state.hitCanvasTopologyRevision = 0;
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
@@ -21168,8 +21750,11 @@ function refreshMapDataForScenarioChunkPromotion({
   rebuildPoliticalLandCollections();
   buildIndex();
   ensureSovereigntyState();
+  resetExactRefreshOptimizationState();
+  resetVisibleInternalBorderMeshSignature();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   state.hitCanvasDirty = true;
+  state.hitCanvasTopologyRevision = 0;
   invalidateAllRenderPasses("scenario-chunk-promotion");
   markAllOverlaysDirty();
   rebuildStaticMeshes();
@@ -21236,8 +21821,11 @@ function refreshMapDataForScenarioApply({
     buildSpatial: true,
     includeSecondarySpatial: false,
   });
+  resetExactRefreshOptimizationState();
+  resetVisibleInternalBorderMeshSignature();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   state.hitCanvasDirty = true;
+  state.hitCanvasTopologyRevision = 0;
   const targetPasses = ["background", "physicalBase", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
   invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
   clearRenderPassReferenceTransforms(targetPasses);
@@ -21328,8 +21916,10 @@ export {
   getUrbanLayerCapability,
   computeUrbanAdaptivePaintFromHostColor,
   getEffectiveUrbanMode,
+  buildCityRevealPlan,
   getCityScenarioTag,
   getCityLabelRenderStyle,
+  getCityMarkerRenderStyle,
   getEffectiveCityCollection,
   doesScenarioCountryHideCityPoints,
   getZoomPercent,

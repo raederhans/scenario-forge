@@ -220,6 +220,8 @@ let milsymbolLoadPromise = null;
 let deferredUiBootstrapPromise = null;
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
+let postReadyTaskHandles = new Map();
+let postReadyTaskEpoch = 0;
 let startupReadonlyUnlockHandle = null;
 let bootMetricsLogged = false;
 let forcedStartupReadonlyInfraRetryCount = 0;
@@ -1114,7 +1116,7 @@ function schedulePostReadyHydration() {
     return;
   }
   postReadyHydrationScheduled = true;
-  scheduleIdleTask(() => (
+  schedulePostReadyTask("post-ready-localization-hydration", () => (
     ensureFullLocalizationDataReady({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
       console.warn("[boot] Deferred full localization hydration failed during idle scheduling.", error);
       return null;
@@ -1122,8 +1124,9 @@ function schedulePostReadyHydration() {
   ), {
     timeout: 2200,
     delayMs: 1200,
+    retryDelayMs: 600,
   });
-  scheduleIdleTask(() => (
+  schedulePostReadyTask("post-ready-scenario-hydration", () => (
     ensureActiveScenarioBundleHydrated({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
       console.warn("[boot] Deferred full scenario hydration failed during idle scheduling.", error);
       return null;
@@ -1131,6 +1134,7 @@ function schedulePostReadyHydration() {
   ), {
     timeout: 4800,
     delayMs: 4200,
+    retryDelayMs: 900,
   });
 }
 
@@ -1289,16 +1293,134 @@ function scheduleIdleTask(callback, { timeout = 1200, delayMs = 0 } = {}) {
   globalThis.setTimeout(run, Math.max(0, delayMs));
 }
 
+function flushPendingScenarioChunkRefreshAfterReady(reason = "post-ready") {
+  if (typeof state.scheduleScenarioChunkRefreshFn !== "function") {
+    return;
+  }
+  state.scheduleScenarioChunkRefreshFn({
+    reason,
+    delayMs: 0,
+    flushPending: true,
+  });
+}
+
+function clearPostReadyTaskHandle(handle) {
+  if (!handle) return;
+  if (handle.type === "idle" && typeof globalThis.cancelIdleCallback === "function") {
+    globalThis.cancelIdleCallback(handle.id);
+    return;
+  }
+  if (handle.type === "raf" && typeof globalThis.cancelAnimationFrame === "function") {
+    globalThis.cancelAnimationFrame(handle.id);
+    return;
+  }
+  globalThis.clearTimeout?.(handle.id);
+}
+
+function clearScheduledPostReadyTask(taskKey) {
+  const handle = postReadyTaskHandles.get(taskKey);
+  if (!handle) return;
+  clearPostReadyTaskHandle(handle);
+  postReadyTaskHandles.delete(taskKey);
+}
+
+function clearAllScheduledPostReadyTasks() {
+  postReadyTaskHandles.forEach((handle) => {
+    clearPostReadyTaskHandle(handle);
+  });
+  postReadyTaskHandles.clear();
+}
+
+function canRunPostReadyIdleWork() {
+  return (
+    !state.bootBlocking
+    && !state.scenarioApplyInFlight
+    && !state.startupReadonly
+    && !state.startupReadonlyUnlockInFlight
+    && !state.isInteracting
+    && String(state.renderPhase || "idle") === "idle"
+  );
+}
+
+function schedulePostReadyTask(
+  taskKey,
+  callback,
+  {
+    timeout = 1200,
+    delayMs = 0,
+    retryDelayMs = 320,
+  } = {}
+) {
+  const normalizedTaskKey = String(taskKey || "").trim();
+  if (!normalizedTaskKey) return;
+  clearScheduledPostReadyTask(normalizedTaskKey);
+  const scheduledEpoch = postReadyTaskEpoch;
+
+  const runWhenIdle = () => {
+    if (scheduledEpoch !== postReadyTaskEpoch) {
+      clearScheduledPostReadyTask(normalizedTaskKey);
+      return;
+    }
+    if (!canRunPostReadyIdleWork()) {
+      const retryId = globalThis.setTimeout(runWhenIdle, Math.max(120, retryDelayMs));
+      postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: retryId });
+      return;
+    }
+    if (typeof globalThis.requestIdleCallback === "function") {
+      const idleId = globalThis.requestIdleCallback(() => {
+        postReadyTaskHandles.delete(normalizedTaskKey);
+        if (scheduledEpoch !== postReadyTaskEpoch) {
+          return;
+        }
+        if (!canRunPostReadyIdleWork()) {
+          schedulePostReadyTask(normalizedTaskKey, callback, {
+            timeout,
+            delayMs: retryDelayMs,
+            retryDelayMs,
+          });
+          return;
+        }
+        void callback();
+      }, { timeout });
+      postReadyTaskHandles.set(normalizedTaskKey, { type: "idle", id: idleId });
+      return;
+    }
+    const timeoutId = globalThis.setTimeout(() => {
+      postReadyTaskHandles.delete(normalizedTaskKey);
+      if (scheduledEpoch !== postReadyTaskEpoch) {
+        return;
+      }
+      if (!canRunPostReadyIdleWork()) {
+        schedulePostReadyTask(normalizedTaskKey, callback, {
+          timeout,
+          delayMs: retryDelayMs,
+          retryDelayMs,
+        });
+        return;
+      }
+      void callback();
+    }, 0);
+    postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: timeoutId });
+  };
+
+  const startId = globalThis.setTimeout(runWhenIdle, Math.max(0, delayMs));
+  postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: startId });
+}
+
 function schedulePostReadyVisualWarmup() {
   const textureMode = String(state.styleConfig?.texture?.mode || "none").trim().toLowerCase();
   const dayNightEnabled = !!state.styleConfig?.dayNight?.enabled;
   if (textureMode === "none" && !dayNightEnabled) {
     return;
   }
-  globalThis.requestAnimationFrame?.(() => {
+  schedulePostReadyTask("post-ready-visual-warmup", async () => {
     if (!state.bootBlocking) {
       requestMainRender("post-ready-visual-warmup");
     }
+  }, {
+    timeout: 900,
+    delayMs: 120,
+    retryDelayMs: 240,
   });
 }
 
@@ -1330,7 +1452,7 @@ function schedulePostReadyDeferredContextWarmup() {
     return;
   }
   postReadyContextWarmupScheduled = true;
-  scheduleIdleTask(async () => {
+  schedulePostReadyTask("post-ready-context-warmup", async () => {
     if (state.bootBlocking) {
       return;
     }
@@ -1348,6 +1470,7 @@ function schedulePostReadyDeferredContextWarmup() {
   }, {
     timeout: 1000,
     delayMs: 120,
+    retryDelayMs: 320,
   });
 }
 
@@ -1502,28 +1625,29 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     finishBootMetric("detail-promotion", {
       activeScenarioId: String(state.activeScenarioId || ""),
     });
-    setMapData({
-      refitProjection: false,
-      resetZoom: false,
-      suppressRender: true,
-      interactionLevel: "full",
-      deferInteractionInfrastructure: true,
-    });
     const activeScenarioId = String(state.activeScenarioId || "").trim();
-    if (activeScenarioId) {
-      const cachedBundle = state.scenarioBundleCacheById?.[activeScenarioId] || null;
-      if (cachedBundle?.manifest) {
-        await applyScenarioBundleCommand(cachedBundle, {
-          renderMode: "none",
-          suppressRender: true,
-          markDirtyReason: "",
-          showToastOnComplete: false,
-          interactionLevel: "full",
-        });
-        warnOnStartupBundleIntegrity(cachedBundle, {
-          source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
-        });
-      }
+    const cachedBundle = activeScenarioId
+      ? state.scenarioBundleCacheById?.[activeScenarioId] || null
+      : null;
+    if (cachedBundle?.manifest) {
+      await applyScenarioBundleCommand(cachedBundle, {
+        renderMode: "none",
+        suppressRender: true,
+        markDirtyReason: "",
+        showToastOnComplete: false,
+        interactionLevel: "full",
+      });
+      warnOnStartupBundleIntegrity(cachedBundle, {
+        source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
+      });
+    } else {
+      setMapData({
+        refitProjection: false,
+        resetZoom: false,
+        suppressRender: true,
+        interactionLevel: "full",
+        deferInteractionInfrastructure: true,
+      });
     }
     renderDispatcher?.flush?.();
     setBootState("interaction-infra", {
@@ -1551,6 +1675,7 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
       canContinueWithoutScenario: false,
     });
     completeBootSequenceLogging();
+    flushPendingScenarioChunkRefreshAfterReady("startup-readonly-unlocked");
     schedulePostReadyHydration();
     schedulePostReadyDeferredContextWarmup();
     schedulePostReadyVisualWarmup();
@@ -1615,6 +1740,7 @@ function scheduleStartupReadonlyUnlock(
         checkpointBootMetric("time-to-interactive");
         checkpointBootMetric("first-interactive");
         completeBootSequenceLogging();
+        flushPendingScenarioChunkRefreshAfterReady("startup-readonly-force-unlocked");
         scheduleDeferredDetailPromotion(renderDispatcher);
         schedulePostReadyHydration();
         schedulePostReadyDeferredContextWarmup();
@@ -1682,6 +1808,10 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
     if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
       return;
     }
+    if (!canRunPostReadyIdleWork()) {
+      scheduleDeferredDetailPromotion(renderDispatcher);
+      return;
+    }
     const promoted = await ensureDetailTopologyReady({
       renderDispatcher,
       requireIdle: true,
@@ -1740,6 +1870,7 @@ async function finalizeReadyState(renderDispatcher) {
     checkpointBootMetric("time-to-interactive");
     checkpointBootMetric("first-interactive");
     completeBootSequenceLogging();
+    flushPendingScenarioChunkRefreshAfterReady("ready-state");
     scheduleDeferredDetailPromotion(renderDispatcher);
     schedulePostReadyHydration();
     schedulePostReadyDeferredContextWarmup();
@@ -1797,6 +1928,8 @@ async function bootstrap() {
   deferredUiBootstrapPromise = null;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
+  postReadyTaskEpoch += 1;
+  clearAllScheduledPostReadyTasks();
   state.startupInteractionMode = resolveStartupInteractionMode();
   setStartupReadonlyState(false);
 
@@ -2140,10 +2273,7 @@ async function bootstrap() {
       });
 
     initToast();
-    renderDispatcher.flush();
-    checkpointBootMetricOnce("first-visible");
-    checkpointBootMetricOnce("first-visible-base");
-    setBootPreviewVisible(true);
+    setBootPreviewVisible(false);
     initPresetState();
     void loadDeferredMilsymbol();
     deferredUiBootstrapPromise = bootstrapDeferredUi(renderApp);
@@ -2229,6 +2359,7 @@ async function bootstrap() {
 
     setBootState("warmup");
     renderDispatcher.flush();
+    checkpointBootMetricOnce("first-visible");
     checkpointBootMetricOnce("first-visible-scenario");
     await finalizeReadyState(renderDispatcher);
   } catch (error) {
