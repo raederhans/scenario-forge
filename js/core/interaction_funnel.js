@@ -739,7 +739,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     });
   }
   if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn("physical-set", {
+    await state.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], {
       reason: "project-import",
       renderNow: false,
     });

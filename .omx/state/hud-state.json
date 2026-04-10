@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-10T01:02:09.088Z",
-  "last_progress_at": "2026-04-10T01:02:09.088Z",
-  "turn_count": 48,
-  "last_agent_output": "结论：这个 P1 我已经修了，修法是**不去放宽全局 defer 规则**，而是在 exact-after-settle 真正结束后，**补一轮 guarded flush**，把之前挂起的 chun"
+  "last_turn_at": "2026-04-10T02:08:13.707Z",
+  "last_progress_at": "2026-04-10T02:08:13.707Z",
+  "turn_count": 49,
+  "last_agent_output": "结论：这两个 review 问题已经修掉了。现在 **first idle 会先走原本的 transformed-frame fast path**，不会再被我之前那段逻辑抢跑成 exact；同时 *"
 }

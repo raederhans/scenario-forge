@@ -457,25 +457,30 @@ def build_contour_layers() -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     return major, minor
 
 
+def _require_non_empty_contour_layers(
+    contour_major: gpd.GeoDataFrame,
+    contour_minor: gpd.GeoDataFrame,
+) -> None:
+    missing_layers: list[str] = []
+    if contour_major is None or contour_major.empty:
+        missing_layers.append("major")
+    if contour_minor is None or contour_minor.empty:
+        missing_layers.append("minor")
+    if missing_layers:
+        missing = ", ".join(missing_layers)
+        raise RuntimeError(
+            "[Physical Context] Contour generation produced empty contour layer(s): "
+            f"{missing}. Refusing to write empty contour topology."
+        )
+
+
 def build_and_save_physical_context_layers(
     physical_gdf: gpd.GeoDataFrame,
     output_dir: Path,
 ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame, gpd.GeoDataFrame]:
     semantics = build_physical_semantics(physical_gdf)
-    try:
-        contour_major, contour_minor = build_contour_layers()
-    except Exception as exc:
-        print(f"[Physical Context] Contour generation unavailable; writing empty contour layers: {exc}")
-        contour_major = gpd.GeoDataFrame(
-            columns=["id", "elevation_m", "geometry"],
-            geometry="geometry",
-            crs="EPSG:4326",
-        )
-        contour_minor = gpd.GeoDataFrame(
-            columns=["id", "elevation_m", "geometry"],
-            geometry="geometry",
-            crs="EPSG:4326",
-        )
+    contour_major, contour_minor = build_contour_layers()
+    _require_non_empty_contour_layers(contour_major, contour_minor)
 
     build_named_layer_topology(
         semantics,

@@ -249,6 +249,8 @@ const CONTEXT_LAYER_LOAD_ORDER = [
 const PHYSICAL_CONTEXT_LAYER_SET = [
   "physical",
   "physical_semantics",
+];
+const PHYSICAL_CONTOUR_LAYER_SET = [
   "physical_contours_major",
   "physical_contours_minor",
 ];
@@ -1146,6 +1148,9 @@ function expandDeferredContextLayerNames(requestedLayerNames) {
     if (normalized === "physical-set") {
       return PHYSICAL_CONTEXT_LAYER_SET;
     }
+    if (normalized === "physical-contours-set") {
+      return PHYSICAL_CONTOUR_LAYER_SET;
+    }
     return [normalized];
   });
   const normalized = normalizeRequestedContextLayerNames(expanded);
@@ -1429,6 +1434,7 @@ function schedulePostReadyDeferredContextWarmup() {
     return;
   }
   const requestedLayerNames = [];
+  const requestedContourLayerNames = [];
   if (state.showRivers) {
     requestedLayerNames.push("rivers");
   }
@@ -1443,6 +1449,7 @@ function schedulePostReadyDeferredContextWarmup() {
   }
   if (state.showPhysical) {
     requestedLayerNames.push("physical-set");
+    requestedContourLayerNames.push("physical-contours-set");
   }
   const shouldWarmCities =
     state.showCityPoints !== false
@@ -1472,6 +1479,21 @@ function schedulePostReadyDeferredContextWarmup() {
     delayMs: 120,
     retryDelayMs: 320,
   });
+  if (requestedContourLayerNames.length) {
+    schedulePostReadyTask("post-ready-contour-warmup", async () => {
+      if (state.bootBlocking) {
+        return;
+      }
+      await ensureContextLayerDataReady(requestedContourLayerNames, {
+        reason: "post-ready-contours",
+        renderNow: true,
+      });
+    }, {
+      timeout: 1200,
+      delayMs: 900,
+      retryDelayMs: 320,
+    });
+  }
 }
 
 function schedulePostReadyCityWarmup() {

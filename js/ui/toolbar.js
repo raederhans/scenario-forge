@@ -7360,7 +7360,7 @@ function initToolbar({ render } = {}) {
     togglePhysical.addEventListener("change", (event) => {
       state.showPhysical = event.target.checked;
       if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
-        void state.ensureContextLayerDataFn("physical-set", { reason: "toolbar-toggle", renderNow: true });
+        void state.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], { reason: "toolbar-toggle", renderNow: true });
       }
       renderDirty("toggle-physical");
     });

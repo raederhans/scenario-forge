@@ -54,8 +54,14 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   const inspection = await page.evaluate(async () => {
     const stateModuleUrl = new URL("js/core/state.js", document.baseURI).href;
     const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
+    const mainSourceUrl = new URL("js/main.js", document.baseURI).href;
+    const toolbarSourceUrl = new URL("js/ui/toolbar.js", document.baseURI).href;
+    const interactionFunnelSourceUrl = new URL("js/core/interaction_funnel.js", document.baseURI).href;
     const stateModule = await import(stateModuleUrl);
     const rendererSource = await fetch(rendererSourceUrl).then((response) => response.text());
+    const mainSource = await fetch(mainSourceUrl).then((response) => response.text());
+    const toolbarSource = await fetch(toolbarSourceUrl).then((response) => response.text());
+    const interactionFunnelSource = await fetch(interactionFunnelSourceUrl).then((response) => response.text());
     const {
       normalizePhysicalStyleConfig,
       PHYSICAL_ATLAS_PALETTE,
@@ -142,12 +148,27 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           /const CONTOUR_ZOOM_STYLE_PROFILES = Object\.freeze\(\{/.test(rendererSource),
         hasAdaptiveContourColor:
           /function getAdaptiveContourStrokeColor\(feature, baseColor\)/.test(rendererSource),
+        contourKeepsInverseScaleWidth:
+          /function drawContourCollection[\s\S]*?const scale = Math\.max\(0\.0001, k\);[\s\S]*?context\.lineWidth = width \/ scale;/.test(rendererSource),
         contourUsesAdaptiveColor:
           /drawContourCollection[\s\S]*?colorResolver = null/.test(rendererSource)
           && /drawPhysicalContourLayer[\s\S]*?colorResolver: resolveContourColor/.test(rendererSource),
-        contourUsesScreenSpanGate:
-          /minScreenSpanPx = 0/.test(rendererSource)
-          && /getFeatureScreenBounds\(feature, \{ allowCompute: false \}\) \|\| getFeatureScreenBounds\(feature\)/.test(rendererSource),
+        contourUsesVisibleSetCache:
+          /function getContourVisibleFeatures\(/.test(rendererSource)
+          && /contourVisibleSetCache\[cacheSlot\] = \{[\s\S]*?collectionRef: collection,[\s\S]*?features: visibleFeatures,/.test(rendererSource),
+        contourMergesBoundsAndFilter:
+          /function getContourVisibleFeatures[\s\S]*?const screenBounds = getFeatureScreenBounds\(feature, \{ allowCompute: false \}\) \|\| getFeatureScreenBounds\(feature\);/.test(rendererSource)
+          && /function getContourVisibleFeatures[\s\S]*?rectsIntersect\(screenBounds, viewportBounds\)/.test(rendererSource)
+          && /function drawContourCollection[\s\S]*?const visibleFeatures = getContourVisibleFeatures\(collection, \{/.test(rendererSource),
+        contourUsesStrokeBatching:
+          /function drawContourCollection[\s\S]*?const strokeBatches = new Map\(\);/.test(rendererSource)
+          && /strokeBatches\.forEach\(\(features, strokeColor\) => \{[\s\S]*?features\.forEach\(\(feature\) => \{[\s\S]*?pathCanvas\(feature\);/.test(rendererSource),
+        contourFirstIdleKeepsFastPath:
+          /function shouldPreferImmediateExactContextBaseRefresh\(reuseDecision = null\)/.test(rendererSource) === false
+          && /const deferredReuseDecision = state\.deferExactAfterSettle \? getContextBaseReuseDecision\(\) : null;/.test(rendererSource) === false,
+        contourZoomBucketRefreshesAfterQuietWindow:
+          /function scheduleExactAfterSettleRefresh\(\) \{[\s\S]*?const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh\(reuseDecision\);/.test(rendererSource)
+          && /if \(forceExactContextBaseRefresh\) \{[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(rendererSource),
         hasMountainMultiplier:
           /if \(normalized === "mountain_high_relief"\) return 1\.18;/.test(rendererSource),
         hasMountainHillsMultiplier:
@@ -166,6 +187,22 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           /if \(normalized === "grassland_steppe"\) return 0\.8;/.test(rendererSource),
         hasTundraMultiplier:
           /if \(normalized === "tundra_ice"\) return 0\.85;/.test(rendererSource),
+      },
+      mainSourceChecks: {
+        physicalSetDefersContours:
+          /const PHYSICAL_CONTEXT_LAYER_SET = \[\s*"physical",\s*"physical_semantics",\s*\];/.test(mainSource),
+        hasSeparateContourWarmupSet:
+          /const PHYSICAL_CONTOUR_LAYER_SET = \[[\s\S]*?"physical_contours_major",[\s\S]*?"physical_contours_minor",[\s\S]*?\];/.test(mainSource)
+          && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return PHYSICAL_CONTOUR_LAYER_SET;/.test(mainSource),
+        schedulesDeferredContourWarmup:
+          /if \(state\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(mainSource)
+          && /schedulePostReadyTask\("post-ready-contour-warmup", async \(\) => \{[\s\S]*?ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",/.test(mainSource),
+      },
+      integrationSourceChecks: {
+        toolbarToggleLoadsFullPhysicalSet:
+          /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(toolbarSource),
+        projectImportLoadsFullPhysicalSet:
+          /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{[\s\S]*?reason: "project-import",[\s\S]*?renderNow: false,/.test(interactionFunnelSource),
       },
     };
   });
@@ -205,8 +242,13 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   expect(inspection.rendererSourceChecks.contourUsesSourceOver).toBe(true);
   expect(inspection.rendererSourceChecks.hasContourZoomProfiles).toBe(true);
   expect(inspection.rendererSourceChecks.hasAdaptiveContourColor).toBe(true);
+  expect(inspection.rendererSourceChecks.contourKeepsInverseScaleWidth).toBe(true);
   expect(inspection.rendererSourceChecks.contourUsesAdaptiveColor).toBe(true);
-  expect(inspection.rendererSourceChecks.contourUsesScreenSpanGate).toBe(true);
+  expect(inspection.rendererSourceChecks.contourUsesVisibleSetCache).toBe(true);
+  expect(inspection.rendererSourceChecks.contourMergesBoundsAndFilter).toBe(true);
+  expect(inspection.rendererSourceChecks.contourUsesStrokeBatching).toBe(true);
+  expect(inspection.rendererSourceChecks.contourFirstIdleKeepsFastPath).toBe(true);
+  expect(inspection.rendererSourceChecks.contourZoomBucketRefreshesAfterQuietWindow).toBe(true);
   expect(inspection.rendererSourceChecks.hasMountainMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasMountainHillsMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasDesertMultiplier).toBe(true);
@@ -216,6 +258,11 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   expect(inspection.rendererSourceChecks.hasPlainsMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasGrasslandMultiplier).toBe(true);
   expect(inspection.rendererSourceChecks.hasTundraMultiplier).toBe(true);
+  expect(inspection.mainSourceChecks.physicalSetDefersContours).toBe(true);
+  expect(inspection.mainSourceChecks.hasSeparateContourWarmupSet).toBe(true);
+  expect(inspection.mainSourceChecks.schedulesDeferredContourWarmup).toBe(true);
+  expect(inspection.integrationSourceChecks.toolbarToggleLoadsFullPhysicalSet).toBe(true);
+  expect(inspection.integrationSourceChecks.projectImportLoadsFullPhysicalSet).toBe(true);
 
   expect(inspection.physicalBlendModeAfterNormalize).toBe("source-over");
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
