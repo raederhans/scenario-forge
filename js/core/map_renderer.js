@@ -221,7 +221,7 @@ const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
 const RENDER_SETTLE_DURATION_MS = 200;
-const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 450;
+const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 700;
 const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 640;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
@@ -4025,6 +4025,9 @@ function renderSpecialZonesIfNeeded({ force = false } = {}) {
 }
 
 function renderFrontlineOverlayIfNeeded({ force = false } = {}) {
+  if (!force && !state.frontlineOverlayDirty && state.renderPhase !== RENDER_PHASE_IDLE) {
+    return;
+  }
   const nextSignature = getFrontlineOverlaySignature();
   if (!force && !state.frontlineOverlayDirty && nextSignature === lastFrontlineOverlaySignature) {
     return;
@@ -4035,6 +4038,9 @@ function renderFrontlineOverlayIfNeeded({ force = false } = {}) {
 }
 
 function renderOperationGraphicsIfNeeded({ force = false } = {}) {
+  if (!force && !state.operationGraphicsDirty && state.renderPhase !== RENDER_PHASE_IDLE) {
+    return;
+  }
   const nextSignature = getOperationGraphicsOverlaySignature();
   if (!force && !state.operationGraphicsDirty && nextSignature === lastOperationGraphicsOverlaySignature) {
     return;
@@ -4045,6 +4051,9 @@ function renderOperationGraphicsIfNeeded({ force = false } = {}) {
 }
 
 function renderOperationalLinesIfNeeded({ force = false } = {}) {
+  if (!force && !state.operationalLinesDirty && state.renderPhase !== RENDER_PHASE_IDLE) {
+    return;
+  }
   const nextSignature = getOperationalLinesOverlaySignature();
   if (!force && !state.operationalLinesDirty && nextSignature === lastOperationalLinesOverlaySignature) {
     return;
@@ -4055,6 +4064,9 @@ function renderOperationalLinesIfNeeded({ force = false } = {}) {
 }
 
 function renderUnitCountersIfNeeded({ force = false } = {}) {
+  if (!force && !state.unitCountersDirty && state.renderPhase !== RENDER_PHASE_IDLE) {
+    return;
+  }
   const nextSignature = getUnitCountersOverlaySignature();
   if (!force && !state.unitCountersDirty && nextSignature === lastUnitCountersOverlaySignature) {
     return;
@@ -4455,7 +4467,7 @@ function getContourVisibleFeatures(
   }
 
   const viewportBounds = getContourViewportScreenBounds();
-  const visibleFeatures = [];
+  const visibleRecords = [];
   collection.features.forEach((feature) => {
     const elevation = Number(feature?.properties?.elevation_m);
     if (Number.isFinite(elevation) && elevation < lowReliefCutoff) return;
@@ -4465,38 +4477,35 @@ function getContourVisibleFeatures(
     const screenBounds = getFeatureScreenBounds(feature, { allowCompute: false }) || getFeatureScreenBounds(feature);
     if (!screenBounds) {
       if (minScreenSpanPx <= 0 && isLineGeometryType(String(feature?.geometry?.type || "").trim())) {
-        visibleFeatures.push(feature);
+        visibleRecords.push({ feature, elevation, span: 0 });
       }
       return;
     }
     if (!rectsIntersect(screenBounds, viewportBounds)) return;
-    if (minScreenSpanPx > 0) {
-      const span = Math.max(Number(screenBounds.width || 0), Number(screenBounds.height || 0));
-      if (!(span >= minScreenSpanPx)) return;
-    }
-    visibleFeatures.push(feature);
+    const span = Math.max(Number(screenBounds.width || 0), Number(screenBounds.height || 0));
+    if (minScreenSpanPx > 0 && !(span >= minScreenSpanPx)) return;
+    visibleRecords.push({ feature, elevation, span });
   });
 
-  if (maxFeatures > 0 && visibleFeatures.length > maxFeatures) {
-    const scored = visibleFeatures.map((feature) => {
-      const elevation = Number(feature?.properties?.elevation_m);
+  if (maxFeatures > 0 && visibleRecords.length > maxFeatures) {
+    const scored = visibleRecords.map(({ feature, elevation, span }) => {
       const elevationScore = Number.isFinite(elevation) ? elevation : 0;
-      const screenBounds = getFeatureScreenBounds(feature, { allowCompute: false }) || getFeatureScreenBounds(feature);
-      const span = screenBounds
-        ? Math.max(Number(screenBounds.width || 0), Number(screenBounds.height || 0))
-        : 0;
       return {
         feature,
         score: elevationScore * 1.15 + span * 34,
       };
     });
     scored.sort((a, b) => b.score - a.score);
-    visibleFeatures.length = 0;
-    scored.slice(0, maxFeatures).forEach((entry) => {
-      visibleFeatures.push(entry.feature);
-    });
+    const visibleFeatures = scored.slice(0, maxFeatures).map((entry) => entry.feature);
+    contourVisibleSetCache[cacheSlot] = {
+      collectionRef: collection,
+      key: cacheKey,
+      features: visibleFeatures,
+    };
+    return visibleFeatures;
   }
 
+  const visibleFeatures = visibleRecords.map((entry) => entry.feature);
   contourVisibleSetCache[cacheSlot] = {
     collectionRef: collection,
     key: cacheKey,
