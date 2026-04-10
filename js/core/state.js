@@ -564,7 +564,8 @@ function createPhysicalPresetConfig(preset = "balanced") {
       contourMajorIntervalM: 500,
       contourMinorIntervalM: 100,
       contourMinorVisible: true,
-      contourLowReliefCutoffM: 180,
+      contourMajorLowReliefCutoffM: 160,
+      contourMinorLowReliefCutoffM: 220,
       blendMode: "overlay",
     };
   }
@@ -584,7 +585,8 @@ function createPhysicalPresetConfig(preset = "balanced") {
       contourMajorIntervalM: 1000,
       contourMinorIntervalM: 200,
       contourMinorVisible: false,
-      contourLowReliefCutoffM: 420,
+      contourMajorLowReliefCutoffM: 380,
+      contourMinorLowReliefCutoffM: 520,
       blendMode: "source-over",
     };
   }
@@ -603,7 +605,8 @@ function createPhysicalPresetConfig(preset = "balanced") {
     contourMajorIntervalM: 500,
     contourMinorIntervalM: 100,
     contourMinorVisible: true,
-    contourLowReliefCutoffM: 240,
+    contourMajorLowReliefCutoffM: 200,
+    contourMinorLowReliefCutoffM: 280,
     blendMode: "source-over",
   };
 }
@@ -640,6 +643,8 @@ function normalizePhysicalStyleConfig(rawConfig) {
     "contourMajorIntervalM",
     "contourMinorIntervalM",
     "contourMinorVisible",
+    "contourMajorLowReliefCutoffM",
+    "contourMinorLowReliefCutoffM",
     "contourLowReliefCutoffM",
     "layerOpacity",
   ].some((key) => Object.prototype.hasOwnProperty.call(raw, key));
@@ -687,8 +692,23 @@ function normalizePhysicalStyleConfig(rawConfig) {
       1000
     ),
     contourMinorVisible: raw.contourMinorVisible === undefined ? defaults.contourMinorVisible : !!raw.contourMinorVisible,
-    contourLowReliefCutoffM: clamp(
-      Math.round(toFiniteNumber(raw.contourLowReliefCutoffM, defaults.contourLowReliefCutoffM)),
+    contourMajorLowReliefCutoffM: clamp(
+      Math.round(
+        toFiniteNumber(
+          raw.contourMajorLowReliefCutoffM,
+          toFiniteNumber(raw.contourLowReliefCutoffM, defaults.contourMajorLowReliefCutoffM)
+        )
+      ),
+      0,
+      2000
+    ),
+    contourMinorLowReliefCutoffM: clamp(
+      Math.round(
+        toFiniteNumber(
+          raw.contourMinorLowReliefCutoffM,
+          toFiniteNumber(raw.contourLowReliefCutoffM, defaults.contourMinorLowReliefCutoffM)
+        )
+      ),
       0,
       2000
     ),

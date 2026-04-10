@@ -1777,7 +1777,8 @@ function initToolbar({ render } = {}) {
   const physicalContourMinorWidth = document.getElementById("physicalContourMinorWidth");
   const physicalContourMajorInterval = document.getElementById("physicalContourMajorInterval");
   const physicalContourMinorInterval = document.getElementById("physicalContourMinorInterval");
-  const physicalContourLowReliefCutoff = document.getElementById("physicalContourLowReliefCutoff");
+  const physicalContourMajorLowReliefCutoff = document.getElementById("physicalContourMajorLowReliefCutoff");
+  const physicalContourMinorLowReliefCutoff = document.getElementById("physicalContourMinorLowReliefCutoff");
   const physicalBlendMode = document.getElementById("physicalBlendMode");
   const physicalClassMountain = document.getElementById("physicalClassMountain");
   const physicalClassMountainHills = document.getElementById("physicalClassMountainHills");
@@ -1999,7 +2000,8 @@ function initToolbar({ render } = {}) {
   const physicalContourMinorWidthValue = document.getElementById("physicalContourMinorWidthValue");
   const physicalContourMajorIntervalValue = document.getElementById("physicalContourMajorIntervalValue");
   const physicalContourMinorIntervalValue = document.getElementById("physicalContourMinorIntervalValue");
-  const physicalContourLowReliefCutoffValue = document.getElementById("physicalContourLowReliefCutoffValue");
+  const physicalContourMajorLowReliefCutoffValue = document.getElementById("physicalContourMajorLowReliefCutoffValue");
+  const physicalContourMinorLowReliefCutoffValue = document.getElementById("physicalContourMinorLowReliefCutoffValue");
   const riversOpacityValue = document.getElementById("riversOpacityValue");
   const riversWidthValue = document.getElementById("riversWidthValue");
   const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
@@ -6329,11 +6331,17 @@ function initToolbar({ render } = {}) {
     if (physicalContourMinorIntervalValue) {
       physicalContourMinorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorIntervalM)}`;
     }
-    if (physicalContourLowReliefCutoff) {
-      physicalContourLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourLowReliefCutoffM));
+    if (physicalContourMajorLowReliefCutoff) {
+      physicalContourMajorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM));
     }
-    if (physicalContourLowReliefCutoffValue) {
-      physicalContourLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourLowReliefCutoffM)}`;
+    if (physicalContourMajorLowReliefCutoffValue) {
+      physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM)}`;
+    }
+    if (physicalContourMinorLowReliefCutoff) {
+      physicalContourMinorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM));
+    }
+    if (physicalContourMinorLowReliefCutoffValue) {
+      physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM)}`;
     }
     if (physicalBlendMode) physicalBlendMode.value = state.styleConfig.physical.blendMode;
     Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
@@ -7747,15 +7755,26 @@ function initToolbar({ render } = {}) {
       renderDirty("physical-contour-minor-interval");
     });
   }
-  if (physicalContourLowReliefCutoff) {
-    physicalContourLowReliefCutoff.addEventListener("input", (event) => {
+  if (physicalContourMajorLowReliefCutoff) {
+    physicalContourMajorLowReliefCutoff.addEventListener("input", (event) => {
       const cfg = syncPhysicalConfig();
       const value = Number(event.target.value);
-      cfg.contourLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 300, 0, 2000);
-      if (physicalContourLowReliefCutoffValue) {
-        physicalContourLowReliefCutoffValue.textContent = `${Math.round(cfg.contourLowReliefCutoffM)}`;
+      cfg.contourMajorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 200, 0, 2000);
+      if (physicalContourMajorLowReliefCutoffValue) {
+        physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(cfg.contourMajorLowReliefCutoffM)}`;
       }
-      renderDirty("physical-contour-low-relief-cutoff");
+      renderDirty("physical-contour-major-low-relief-cutoff");
+    });
+  }
+  if (physicalContourMinorLowReliefCutoff) {
+    physicalContourMinorLowReliefCutoff.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.contourMinorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 280, 0, 2000);
+      if (physicalContourMinorLowReliefCutoffValue) {
+        physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(cfg.contourMinorLowReliefCutoffM)}`;
+      }
+      renderDirty("physical-contour-minor-low-relief-cutoff");
     });
   }
   if (physicalBlendMode) {
@@ -8711,5 +8730,4 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar };
-
 

@@ -384,6 +384,10 @@ def _build_contour_gdf(
     simplify_tolerance: float,
     id_prefix: str,
 ) -> gpd.GeoDataFrame:
+    if not np.isfinite(dem).any():
+        raise RuntimeError(
+            "[Physical Context] Contour DEM contains no finite positive land elevations after preprocessing."
+        )
     max_elevation = int(math.floor(float(np.nanmax(dem)) / interval_m) * interval_m)
     levels = np.arange(interval_m, max_elevation + interval_m, interval_m, dtype=np.int32)
     if exclude_major_interval_m:

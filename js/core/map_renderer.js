@@ -239,6 +239,9 @@ const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
     minorWidthMultiplier: 0,
     minorIntervalMultiplier: 3,
     minorMinScreenSpanPx: 22,
+    minorMaxFeaturesBase: 0,
+    minorMaxFeaturesPerMajor: 0,
+    minorMaxFeaturesHardCap: 0,
   }),
   mid: Object.freeze({
     majorIntervalMultiplier: 2,
@@ -250,6 +253,9 @@ const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
     minorWidthMultiplier: 0.82,
     minorIntervalMultiplier: 2,
     minorMinScreenSpanPx: 18,
+    minorMaxFeaturesBase: 900,
+    minorMaxFeaturesPerMajor: 1.8,
+    minorMaxFeaturesHardCap: 3000,
   }),
   high: Object.freeze({
     majorIntervalMultiplier: 1,
@@ -261,6 +267,9 @@ const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
     minorWidthMultiplier: 1,
     minorIntervalMultiplier: 1,
     minorMinScreenSpanPx: 8,
+    minorMaxFeaturesBase: 1800,
+    minorMaxFeaturesPerMajor: 2.8,
+    minorMaxFeaturesHardCap: 6400,
   }),
 });
 const RIVER_LOW_MAX_SCALERANK = 5;
@@ -4399,6 +4408,7 @@ function getContourVisibleSetCacheKey(collection, {
   intervalM = 0,
   excludeIntervalM = 0,
   minScreenSpanPx = 0,
+  maxFeatures = 0,
 } = {}) {
   return [
     Number(state.topologyRevision || 0),
@@ -4410,6 +4420,7 @@ function getContourVisibleSetCacheKey(collection, {
     Number(intervalM || 0).toFixed(2),
     Number(excludeIntervalM || 0).toFixed(2),
     Number(minScreenSpanPx || 0).toFixed(2),
+    Number(maxFeatures || 0),
   ].join("|");
 }
 
@@ -4422,6 +4433,7 @@ function getContourVisibleFeatures(
     intervalM = 0,
     excludeIntervalM = 0,
     minScreenSpanPx = 0,
+    maxFeatures = 0,
   } = {},
 ) {
   if (!Array.isArray(collection?.features) || collection.features.length === 0) return [];
@@ -4431,6 +4443,7 @@ function getContourVisibleFeatures(
     intervalM,
     excludeIntervalM,
     minScreenSpanPx,
+    maxFeatures,
   });
   const cacheEntry = contourVisibleSetCache[cacheSlot];
   if (
@@ -4463,6 +4476,26 @@ function getContourVisibleFeatures(
     }
     visibleFeatures.push(feature);
   });
+
+  if (maxFeatures > 0 && visibleFeatures.length > maxFeatures) {
+    const scored = visibleFeatures.map((feature) => {
+      const elevation = Number(feature?.properties?.elevation_m);
+      const elevationScore = Number.isFinite(elevation) ? elevation : 0;
+      const screenBounds = getFeatureScreenBounds(feature, { allowCompute: false }) || getFeatureScreenBounds(feature);
+      const span = screenBounds
+        ? Math.max(Number(screenBounds.width || 0), Number(screenBounds.height || 0))
+        : 0;
+      return {
+        feature,
+        score: elevationScore * 1.15 + span * 34,
+      };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    visibleFeatures.length = 0;
+    scored.slice(0, maxFeatures).forEach((entry) => {
+      visibleFeatures.push(entry.feature);
+    });
+  }
 
   contourVisibleSetCache[cacheSlot] = {
     collectionRef: collection,
@@ -10414,9 +10447,12 @@ function drawContourCollection(
     intervalM = 0,
     excludeIntervalM = 0,
     minScreenSpanPx = 0,
+    maxFeatures = 0,
   } = {}
 ) {
-  if (!Array.isArray(collection?.features) || collection.features.length === 0) return false;
+  if (!Array.isArray(collection?.features) || collection.features.length === 0) {
+    return { drewAny: false, renderedCount: 0, selectedCount: 0 };
+  }
   const visibleFeatures = getContourVisibleFeatures(collection, {
     cacheSlot,
     k,
@@ -10424,8 +10460,9 @@ function drawContourCollection(
     intervalM,
     excludeIntervalM,
     minScreenSpanPx,
+    maxFeatures,
   });
-  if (!visibleFeatures.length) return false;
+  if (!visibleFeatures.length) return { drewAny: false, renderedCount: 0, selectedCount: 0 };
   const scale = Math.max(0.0001, k);
   context.globalAlpha = interactive ? Math.min(opacity, 0.22) : opacity;
   context.strokeStyle = color;
@@ -10446,6 +10483,7 @@ function drawContourCollection(
   });
 
   let drewAny = false;
+  let renderedCount = 0;
   strokeBatches.forEach((features, strokeColor) => {
     if (!Array.isArray(features) || !features.length) return;
     context.strokeStyle = strokeColor;
@@ -10455,8 +10493,13 @@ function drawContourCollection(
     });
     context.stroke();
     drewAny = true;
+    renderedCount += features.length;
   });
-  return drewAny;
+  return {
+    drewAny,
+    renderedCount,
+    selectedCount: visibleFeatures.length,
+  };
 }
 
 function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
@@ -10498,7 +10541,8 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   }
 
   const contourColor = getSafeCanvasColor(cfg.contourColor, "#6b5947");
-  const lowReliefCutoff = clamp(Number(cfg.contourLowReliefCutoffM) || 0, 0, 2000);
+  const majorLowReliefCutoff = clamp(Number(cfg.contourMajorLowReliefCutoffM) || 0, 0, 2000);
+  const minorLowReliefCutoff = clamp(Number(cfg.contourMinorLowReliefCutoffM) || 0, 0, 2000);
   const majorOpacity = clamp(
     cfg.opacity * cfg.contourOpacity * presetProfile.majorContourOpacityMultiplier * zoomProfile.majorOpacityMultiplier,
     0,
@@ -10527,7 +10571,7 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   }
   context.globalCompositeOperation = "source-over";
 
-  drawContourCollection(state.physicalContourMajorData, {
+  const majorDrawResult = drawContourCollection(state.physicalContourMajorData, {
     cacheSlot: "major",
     color: contourColor,
     colorResolver: resolveContourColor,
@@ -10535,13 +10579,21 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
     width: clamp((Number(cfg.contourMajorWidth) || 0.8) * zoomProfile.majorWidthMultiplier, 0.2, 3),
     k,
     interactive,
-    lowReliefCutoff,
+    lowReliefCutoff: majorLowReliefCutoff,
     intervalM: majorInterval,
     minScreenSpanPx: zoomProfile.majorMinScreenSpanPx,
   });
 
   if (cfg.contourMinorVisible && zoomProfile.minorVisible && k >= presetProfile.minorContourMinZoom) {
     if (Array.isArray(state.physicalContourMinorData?.features) && state.physicalContourMinorData.features.length > 0) {
+      const dynamicMinorMaxFeatures = clamp(
+        Math.round(
+          Number(zoomProfile.minorMaxFeaturesBase || 0)
+          + Number(majorDrawResult?.selectedCount || 0) * Number(zoomProfile.minorMaxFeaturesPerMajor || 0)
+        ),
+        0,
+        Number(zoomProfile.minorMaxFeaturesHardCap || 0) || 100000
+      );
       drawContourCollection(state.physicalContourMinorData, {
         cacheSlot: "minor",
         color: contourColor,
@@ -10550,10 +10602,11 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
         width: clamp((Number(cfg.contourMinorWidth) || 0.45) * zoomProfile.minorWidthMultiplier, 0.1, 2),
         k,
         interactive,
-        lowReliefCutoff,
+        lowReliefCutoff: minorLowReliefCutoff,
         intervalM: minorInterval,
         excludeIntervalM: majorInterval,
         minScreenSpanPx: zoomProfile.minorMinScreenSpanPx,
+        maxFeatures: dynamicMinorMaxFeatures,
       });
     } else {
         warnMissingPhysicalContextOnce(
