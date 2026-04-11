@@ -11226,10 +11226,12 @@ function getCityEffectiveMinZoom(feature) {
 }
 
 function getUrbanFeatureStableId(feature) {
-  const directId = String(feature?.id || "").trim();
+  const directId = String(feature?.id ?? "").trim();
   if (directId) return directId;
   const props = feature?.properties || {};
-  return String(props.id || props.ID || "").trim();
+  const lowercasePropId = String(props.id ?? "").trim();
+  if (lowercasePropId) return lowercasePropId;
+  return String(props.ID ?? "").trim();
 }
 
 function getUrbanFeatureIndex() {
