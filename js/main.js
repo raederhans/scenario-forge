@@ -2088,7 +2088,7 @@ async function bootstrap() {
     } = await loadMapData({
       d3Client,
       includeCityData: false,
-      includeContextLayers: false,
+      includeContextLayers: ["urban"],
       localeLevel: "startup",
       localesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "locales.startup.json"),
       geoAliasesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "geo_aliases.startup.json"),

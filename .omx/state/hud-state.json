@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-10T02:08:13.707Z",
-  "last_progress_at": "2026-04-10T02:08:13.707Z",
-  "turn_count": 49,
-  "last_agent_output": "结论：这两个 review 问题已经修掉了。现在 **first idle 会先走原本的 transformed-frame fast path**，不会再被我之前那段逻辑抢跑成 exact；同时 *"
+  "last_turn_at": "2026-04-11T03:27:50.617Z",
+  "last_progress_at": "2026-04-11T03:27:50.617Z",
+  "turn_count": 14,
+  "last_agent_output": "结论：这个 P1 我已经修掉了，修法是**把 urban 的 `country_owner_id` 改成 runtime political feature id 空间**，不再用国家级 `FR/CY"
 }

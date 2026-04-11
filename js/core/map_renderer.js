@@ -4767,6 +4767,42 @@ function resolveContextLayerData(layerName) {
   const primaryUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(primaryCollection) : null;
   const detailUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(detailCollection) : null;
   const externalUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(externalContextCollection) : null;
+  const preferExternalUrban =
+    isUrbanLayer
+    && canPreferUrbanDetailCollection(externalUrbanCapability)
+    && !canPreferUrbanDetailCollection(primaryUrbanCapability)
+    && !canPreferUrbanDetailCollection(detailUrbanCapability);
+
+  if (preferExternalUrban) {
+    if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
+      state.layerDataDiagnostics = {};
+    }
+    if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
+      state.contextLayerSourceByName = {};
+    }
+    state.contextLayerSourceByName[layerName] = "external";
+    state.layerDataDiagnostics[layerName] = {
+      source: "external",
+      primaryCount: Array.isArray(primaryCollection?.features) ? primaryCollection.features.length : 0,
+      detailCount: Array.isArray(detailCollection?.features) ? detailCollection.features.length : 0,
+      primaryScore: Number(computeLayerCoverageScore(primaryCollection).toFixed(3)),
+      detailScore: Number(computeLayerCoverageScore(detailCollection).toFixed(3)),
+      externalCount: Array.isArray(externalContextCollection?.features) ? externalContextCollection.features.length : 0,
+      externalScore: Number(computeLayerCoverageScore(externalContextCollection).toFixed(3)),
+      primaryAdaptiveAvailable: !!primaryUrbanCapability?.adaptiveAvailable,
+      detailAdaptiveAvailable: !!detailUrbanCapability?.adaptiveAvailable,
+      externalAdaptiveAvailable: !!externalUrbanCapability?.adaptiveAvailable,
+      primaryMissingStableIds: Number(primaryUrbanCapability?.missingStableIdCount || 0),
+      primaryMissingOwnerMeta: Number(primaryUrbanCapability?.missingOwnerCount || 0),
+      detailMissingStableIds: Number(detailUrbanCapability?.missingStableIdCount || 0),
+      detailMissingOwnerMeta: Number(detailUrbanCapability?.missingOwnerCount || 0),
+      externalMissingStableIds: Number(externalUrbanCapability?.missingStableIdCount || 0),
+      externalMissingOwnerMeta: Number(externalUrbanCapability?.missingOwnerCount || 0),
+    };
+    state.urbanLayerCapability = externalUrbanCapability;
+    return externalContextCollection;
+  }
+
   const pick = pickBestLayerSource(
     isUrbanLayer && !canRenderUrbanCollection(primaryUrbanCapability) ? null : primaryCollection,
     isUrbanLayer && !canPreferUrbanDetailCollection(detailUrbanCapability) ? null : detailCollection,
