@@ -1030,8 +1030,11 @@ function ensureRuntimeChunkLoadState() {
       registryStatus: "idle",
       refreshScheduled: false,
       refreshTimerId: null,
+      selectionVersion: 0,
       pendingReason: "",
       pendingDelayMs: null,
+      pendingVisualPromotion: null,
+      pendingInfraPromotion: null,
       inFlightByChunkId: {},
       errorByChunkId: {},
       lastSelection: null,
@@ -1055,6 +1058,18 @@ function ensureRuntimeChunkLoadState() {
   state.runtimeChunkLoadState.pendingDelayMs =
     Number.isFinite(Number(state.runtimeChunkLoadState.pendingDelayMs))
       ? Number(state.runtimeChunkLoadState.pendingDelayMs)
+      : null;
+  state.runtimeChunkLoadState.selectionVersion = Math.max(
+    0,
+    Number(state.runtimeChunkLoadState.selectionVersion || 0),
+  );
+  state.runtimeChunkLoadState.pendingVisualPromotion =
+    state.runtimeChunkLoadState.pendingVisualPromotion && typeof state.runtimeChunkLoadState.pendingVisualPromotion === "object"
+      ? state.runtimeChunkLoadState.pendingVisualPromotion
+      : null;
+  state.runtimeChunkLoadState.pendingInfraPromotion =
+    state.runtimeChunkLoadState.pendingInfraPromotion && typeof state.runtimeChunkLoadState.pendingInfraPromotion === "object"
+      ? state.runtimeChunkLoadState.pendingInfraPromotion
       : null;
   state.runtimeChunkLoadState.pendingPromotion =
     state.runtimeChunkLoadState.pendingPromotion && typeof state.runtimeChunkLoadState.pendingPromotion === "object"
@@ -1090,7 +1105,6 @@ function shouldDeferScenarioChunkRefresh() {
     || state.startupReadonlyUnlockInFlight
     || state.isInteracting
     || String(state.renderPhase || "idle") !== "idle"
-    || state.deferExactAfterSettle
   );
 }
 
@@ -1178,6 +1192,36 @@ function flushPendingScenarioChunkPromotion({ renderNow = true } = {}) {
     }
   );
   return true;
+}
+
+function executeScenarioChunkRefreshNow({
+  bundle,
+  reason = "refresh",
+  flushPending = false,
+  allowRefreshStart = false,
+  d3Client = globalThis.d3,
+} = {}) {
+  const loadState = ensureRuntimeChunkLoadState();
+  const hasPendingReason = !!allowRefreshStart || !!String(loadState.pendingReason || "").trim();
+  if (!bundle) {
+    clearPendingScenarioChunkRefresh(loadState);
+    return "noop";
+  }
+  if (loadState.pendingPromotion && commitPendingScenarioChunkPromotion(bundle, loadState.pendingPromotion)) {
+    return "promotion-committed";
+  }
+  if (!flushPending || !hasPendingReason) {
+    return "noop";
+  }
+  void refreshActiveScenarioChunks({
+    reason,
+    renderNow: true,
+    d3Client,
+  }).catch((error) => {
+    const scenarioId = normalizeScenarioId(state.activeScenarioId);
+    console.warn(`[scenario] Failed to refresh active scenario chunks for "${scenarioId}".`, error);
+  });
+  return "refresh-started";
 }
 
 function recordScenarioRenderMetric(name, durationMs, details = {}) {
@@ -1395,6 +1439,7 @@ function getChunkLayerStatePayload(layerKey) {
 
 function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow = false } = {}) {
   let changed = false;
+  const changedLayerKeys = [];
   Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach(([layerKey, config]) => {
     if (!hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)) {
       return;
@@ -1405,6 +1450,7 @@ function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow 
     if (config.stateField === "scenarioCityOverridesData") {
       syncScenarioLocalizationState({ cityOverridesPayload: nextPayload });
       changed = true;
+      changedLayerKeys.push(layerKey);
       return;
     }
     state[config.stateField] = nextPayload;
@@ -1412,16 +1458,26 @@ function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow 
       state[config.revisionField] = (Number(state[config.revisionField]) || 0) + 1;
     }
     changed = true;
+    changedLayerKeys.push(layerKey);
   });
   if (changed && renderNow) {
     flushRenderBoundary("scenario-optional-layer-apply");
   }
-  return changed;
+  return {
+    changed,
+    changedLayerKeys,
+  };
 }
 
-function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNow = false, reason = "refresh" } = {}) {
+function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, {
+  renderNow = false,
+  reason = "refresh",
+  changedLayerKeys = [],
+} = {}) {
   const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const normalizedPayload = normalizeScenarioFeatureCollection(politicalPayload);
+  const previousFeatureIds = getScenarioFeatureCollectionIdentityList(state.scenarioPoliticalChunkData);
+  const nextFeatureIds = getScenarioFeatureCollectionIdentityList(normalizedPayload);
   const samePayload = areScenarioFeatureCollectionsEquivalent(
     state.scenarioPoliticalChunkData,
     normalizedPayload
@@ -1430,11 +1486,19 @@ function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNo
     return false;
   }
   state.scenarioPoliticalChunkData = normalizedPayload || null;
-  refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
+  refreshMapDataForScenarioChunkPromotion({
+    suppressRender: !renderNow,
+    reason,
+    changedLayerKeys,
+    politicalFeatureIds: Array.from(new Set([
+      ...previousFeatureIds,
+      ...nextFeatureIds,
+    ])),
+  });
   recordScenarioRenderMetric("politicalChunkPromotionMs", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
     scenarioId: getScenarioBundleId(bundle),
     reason: String(reason || "refresh"),
-    promotedPoliticalFeatureCount: getScenarioFeatureCollectionIdentityList(normalizedPayload).length,
+    promotedPoliticalFeatureCount: nextFeatureIds.length,
   });
   return true;
 }
@@ -1452,12 +1516,13 @@ function commitPendingScenarioChunkPromotion(bundle, pendingPromotion = null) {
       ? pendingPromotion.mergedLayerPayloads
       : {};
   const promotionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-  applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, {
+  const mergedLayerResult = applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, {
     renderNow: pendingPromotion.renderNow !== false,
   });
   applyScenarioPoliticalChunkPayload(bundle, mergedLayerPayloads.political || null, {
     renderNow: pendingPromotion.renderNow !== false,
     reason: pendingPromotion.reason,
+    changedLayerKeys: mergedLayerResult?.changedLayerKeys || [],
   });
   recordScenarioRenderMetric(
     "chunkPromotionMs",
@@ -1669,6 +1734,8 @@ async function refreshActiveScenarioChunks({
     clearPendingScenarioChunkRefresh();
     return selection;
   }
+  const nextSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0)) + 1;
+  loadState.selectionVersion = nextSelectionVersion;
   await Promise.all(selection.requiredChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client })));
   selection.requiredChunks.forEach((chunk) => {
     const payload = bundle.chunkPayloadCacheById?.[chunk.id];
@@ -1692,6 +1759,13 @@ async function refreshActiveScenarioChunks({
   }
   const mergedLayerPayloads = buildMergedScenarioChunkLayerPayloads(bundle);
   const politicalRequired = selection.requiredChunks.some((chunk) => chunk.layer === "political");
+  loadState.pendingVisualPromotion = {
+    scenarioId,
+    reason,
+    selectionVersion: nextSelectionVersion,
+    requiredChunkIds: nextRequiredChunkIds,
+  };
+  loadState.pendingInfraPromotion = null;
   loadState.pendingPromotion = {
     scenarioId,
     reason,
@@ -1699,6 +1773,7 @@ async function refreshActiveScenarioChunks({
     mergedLayerPayloads,
     politicalRequired,
     requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+    selectionVersion: nextSelectionVersion,
   };
   if (shouldDeferScenarioChunkRefresh()) {
     markPendingScenarioChunkRefresh(reason);
@@ -1714,11 +1789,12 @@ function scheduleScenarioChunkRefresh({
   flushPending = false,
 } = {}) {
   const scenarioId = normalizeScenarioId(state.activeScenarioId);
-  if (!scenarioId) return;
+  if (!scenarioId) return "noop";
   const bundle = getCachedScenarioBundle(scenarioId);
-  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return;
+  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return "noop";
   const loadState = ensureRuntimeChunkLoadState();
-  const nextReason = flushPending && loadState.pendingReason
+  const hadPendingReason = !!String(loadState.pendingReason || "").trim();
+  const nextReason = flushPending && hadPendingReason
     ? String(loadState.pendingReason || "refresh").trim() || "refresh"
     : String(reason || "refresh").trim() || "refresh";
   const explicitDelayMs = Number.isFinite(Number(delayMs)) ? Number(delayMs) : null;
@@ -1734,7 +1810,7 @@ function scheduleScenarioChunkRefresh({
   }
   if (shouldDeferScenarioChunkRefresh()) {
     markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
-    return;
+    return "deferred";
   }
   clearPendingScenarioChunkRefresh(loadState);
   const resolvedDelayMs = nextDelayMs != null
@@ -1742,26 +1818,30 @@ function scheduleScenarioChunkRefresh({
     : (String(nextReason || "").includes("interacting")
       ? SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING
       : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE);
+  if (flushPending && resolvedDelayMs <= 0) {
+    return executeScenarioChunkRefreshNow({
+      bundle,
+      reason: nextReason,
+      flushPending,
+      allowRefreshStart: hadPendingReason,
+    });
+  }
   loadState.refreshScheduled = true;
   loadState.refreshTimerId = globalThis.setTimeout(() => {
     loadState.refreshTimerId = null;
     loadState.refreshScheduled = false;
-    if (loadState.pendingPromotion) {
-      if (shouldDeferScenarioChunkRefresh()) {
-        markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
-        return;
-      }
-      if (commitPendingScenarioChunkPromotion(bundle, loadState.pendingPromotion)) {
-        return;
-      }
+    if (shouldDeferScenarioChunkRefresh()) {
+      markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
+      return;
     }
-    void refreshActiveScenarioChunks({
+    executeScenarioChunkRefreshNow({
+      bundle,
       reason: nextReason,
-      renderNow: true,
-    }).catch((error) => {
-      console.warn(`[scenario] Failed to refresh active scenario chunks for "${scenarioId}".`, error);
+      flushPending,
+      allowRefreshStart: flushPending && hadPendingReason,
     });
   }, resolvedDelayMs);
+  return "scheduled";
 }
 
 function getScenarioTopologyFeatureCollection(topologyPayload, objectName) {

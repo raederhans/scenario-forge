@@ -86,7 +86,8 @@ let pathSVG = null;
 let pathCanvas = null;
 let pathHitCanvas = null;
 let zoomBehavior = null;
-let interactionInfrastructurePromise = null;
+let interactionInfrastructureBasicPromise = null;
+let interactionInfrastructureFullPromise = null;
 let activeContextMetricSession = null;
 
 let viewportGroup = null;
@@ -547,6 +548,8 @@ const POLITICAL_PATH_WARMUP_TIMEOUT_MS = 24;
 const HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD = 12000;
 const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
 const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
+const CHUNKED_INDEX_BUILD_SLICE_SIZE = 1200;
+const CHUNKED_SPATIAL_BUILD_SLICE_SIZE = 900;
 let debugMode = "PROD";
 let islandNeighborsCache = {
   topologyRef: null,
@@ -694,6 +697,8 @@ let secondarySpatialBuildHandle = null;
 let pendingScenarioChunkFlushAfterExactHandle = null;
 let deferredHeavyBorderMeshHandle = null;
 let deferredContextBaseEnhancementHandle = null;
+let deferredScenarioChunkPromotionInfraHandle = null;
+let scenarioChunkPromotionVersion = 0;
 let deferContextBaseEnhancements = false;
 let detailAdmMeshBuildState = {
   signature: "",
@@ -2813,9 +2818,12 @@ function clearStagedMapDataTasks() {
   cancelDeferredWork(state.stagedContextBaseHandle);
   cancelDeferredWork(state.stagedHitCanvasHandle);
   cancelDeferredWork(secondarySpatialBuildHandle);
+  cancelDeferredWork(deferredScenarioChunkPromotionInfraHandle);
   state.stagedContextBaseHandle = null;
   state.stagedHitCanvasHandle = null;
   secondarySpatialBuildHandle = null;
+  deferredScenarioChunkPromotionInfraHandle = null;
+  scenarioChunkPromotionVersion = 0;
 }
 
 function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
@@ -4169,27 +4177,24 @@ function scheduleRenderPhaseIdle() {
   state.renderPhaseTimerId = globalThis.setTimeout(() => {
     state.renderPhaseTimerId = null;
     setRenderPhase(RENDER_PHASE_IDLE);
-    if (shouldStartExactAfterSettleFastPath()) {
-      state.deferExactAfterSettle = true;
-      render();
-      scheduleExactAfterSettleRefresh();
-      if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
-        state.scheduleScenarioChunkRefreshFn({
-          reason: "render-phase-idle",
-          delayMs: 0,
-          flushPending: true,
-        });
-      }
-      return;
-    }
-    render();
-    if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
-      state.scheduleScenarioChunkRefreshFn({
+    const pendingChunkRefreshStatus = typeof state.scheduleScenarioChunkRefreshFn === "function"
+      ? state.scheduleScenarioChunkRefreshFn({
         reason: "render-phase-idle",
         delayMs: 0,
         flushPending: true,
-      });
+      })
+      : "noop";
+    const committedPendingChunkRefresh = pendingChunkRefreshStatus === "promotion-committed";
+    if (shouldStartExactAfterSettleFastPath()) {
+      if (committedPendingChunkRefresh) {
+        return;
+      }
+      state.deferExactAfterSettle = true;
+      render();
+      scheduleExactAfterSettleRefresh();
+      return;
     }
+    render();
   }, RENDER_SETTLE_DURATION_MS);
 }
 
@@ -7995,6 +8000,13 @@ function setInteractionInfrastructureState(
   }
 }
 
+function getInteractionInfrastructureStageRank(stage = state.interactionInfrastructureStage) {
+  const normalized = String(stage || "idle").trim().toLowerCase();
+  if (normalized === "ready") return 2;
+  if (normalized === "basic-ready") return 1;
+  return 0;
+}
+
 async function yieldToMain() {
   if (typeof globalThis.scheduler?.yield === "function") {
     await globalThis.scheduler.yield();
@@ -8396,35 +8408,159 @@ function buildSpatialIndex({
   });
 }
 
-async function buildIndexChunked({ scheduleUiMode = "immediate" } = {}) {
+async function buildIndexChunked({
+  scheduleUiMode = "immediate",
+  keepReady = false,
+} = {}) {
   setInteractionInfrastructureState("building-index", {
-    ready: false,
+    ready: keepReady ? true : false,
     inFlight: true,
   });
   await yieldToMain();
-  buildIndex({ scheduleUiMode });
+  state.landIndex.clear();
+  state.countryToFeatureIds.clear();
+  state.idToKey.clear();
+  state.keyToId.clear();
+  rebuildAuxiliaryRegionIndexes();
+
+  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+  if (!features.length) {
+    queueIndexUiRefresh({
+      renderCountryList: true,
+      renderWaterRegionList: true,
+      renderSpecialRegionList: true,
+    }, scheduleUiMode);
+    finalizeIndexBuildEffects();
+    await yieldToMain();
+    return;
+  }
+
+  for (let start = 0; start < features.length; start += CHUNKED_INDEX_BUILD_SLICE_SIZE) {
+    const end = Math.min(features.length, start + CHUNKED_INDEX_BUILD_SLICE_SIZE);
+    for (let index = start; index < end; index += 1) {
+      const feature = features[index];
+      const id = getFeatureId(feature) || `feature-${index}`;
+      state.landIndex.set(id, feature);
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
+      const countryCode = getFeatureCountryCodeNormalized(feature);
+      if (countryCode) {
+        const ids = state.countryToFeatureIds.get(countryCode) || [];
+        ids.push(id);
+        state.countryToFeatureIds.set(countryCode, ids);
+      }
+      const key = index + 1;
+      state.idToKey.set(id, key);
+      state.keyToId.set(key, id);
+    }
+    if (end < features.length) {
+      await yieldToMain();
+    }
+  }
+
+  queueIndexUiRefresh({
+    renderCountryList: true,
+    renderWaterRegionList: true,
+    renderSpecialRegionList: true,
+  }, scheduleUiMode);
+  finalizeIndexBuildEffects();
   await yieldToMain();
 }
 
 async function buildSpatialIndexChunked({
   includeSecondary = true,
   allowComputeMissingBounds = true,
+  keepReady = false,
 } = {}) {
   setInteractionInfrastructureState("building-spatial", {
-    ready: false,
+    ready: keepReady ? true : false,
     inFlight: true,
   });
   await yieldToMain();
-  buildSpatialIndex({
-    includeSecondary,
-    allowComputeMissingBounds,
+  const startedAt = nowMs();
+  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+  if (!features.length || !pathSVG) {
+    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
+      landCount: features.length,
+      spatialItems: 0,
+      waterItems: 0,
+      specialItems: 0,
+      skipped: true,
+      chunked: true,
+    });
+    await yieldToMain();
+    return;
+  }
+
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  const nextSpatialItems = [];
+  for (let start = 0; start < features.length; start += CHUNKED_SPATIAL_BUILD_SLICE_SIZE) {
+    const end = Math.min(features.length, start + CHUNKED_SPATIAL_BUILD_SLICE_SIZE);
+    for (let index = start; index < end; index += 1) {
+      const feature = features[index];
+      const id = getFeatureId(feature);
+      if (!id) continue;
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
+      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
+      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
+      if (!bounds) continue;
+      nextSpatialItems.push({
+        id,
+        drawOrder: index,
+        feature,
+        countryCode: getFeatureCountryCodeNormalized(feature),
+        source: String(feature?.properties?.__source || "primary"),
+        minX: bounds.minX,
+        minY: bounds.minY,
+        maxX: bounds.maxX,
+        maxY: bounds.maxY,
+        bboxArea: bounds.area,
+      });
+    }
+    if (end < features.length) {
+      await yieldToMain();
+    }
+  }
+
+  const previousItems = state.spatialItems;
+  const previousGrid = state.spatialGrid;
+  const previousGridMeta = state.spatialGridMeta;
+  const previousItemsById = state.spatialItemsById;
+  state.spatialItems = nextSpatialItems;
+  buildSpatialGrid(nextSpatialItems, canvasWidth, canvasHeight);
+  const nextGrid = state.spatialGrid;
+  const nextGridMeta = state.spatialGridMeta;
+  const nextItemsById = state.spatialItemsById;
+  state.spatialItems = previousItems;
+  state.spatialGrid = previousGrid;
+  state.spatialGridMeta = previousGridMeta;
+  state.spatialItemsById = previousItemsById;
+
+  state.spatialItems = nextSpatialItems;
+  state.spatialIndex = null;
+  state.spatialGrid = nextGrid;
+  state.spatialGridMeta = nextGridMeta;
+  state.spatialItemsById = nextItemsById;
+  resetSecondarySpatialIndexState();
+  if (includeSecondary) {
+    buildSecondarySpatialIndexes({
+      allowComputeMissingBounds,
+    });
+  }
+  state.hitCanvasDirty = true;
+  recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
+    landCount: features.length,
+    spatialItems: state.spatialItems.length,
+    waterItems: state.waterSpatialItems.length,
+    specialItems: state.specialSpatialItems.length,
+    skipped: false,
+    chunked: true,
   });
   await yieldToMain();
 }
 
-async function buildHitCanvasAfterStartup() {
+async function buildHitCanvasAfterStartup({ keepReady = false } = {}) {
   setInteractionInfrastructureState("building-hit-canvas", {
-    ready: false,
+    ready: keepReady ? true : false,
     inFlight: true,
   });
   await yieldToMain();
@@ -8432,17 +8568,16 @@ async function buildHitCanvasAfterStartup() {
   await yieldToMain();
 }
 
-async function buildInteractionInfrastructureAfterStartup({
+async function buildBasicInteractionInfrastructureAfterStartup({
   chunked = true,
-  buildHitCanvas = true,
 } = {}) {
-  if (state.interactionInfrastructureReady && !state.interactionInfrastructureBuildInFlight) {
+  if (getInteractionInfrastructureStageRank() >= 1 && !state.interactionInfrastructureBuildInFlight) {
     return true;
   }
-  if (interactionInfrastructurePromise) {
-    return interactionInfrastructurePromise;
+  if (interactionInfrastructureBasicPromise) {
+    return interactionInfrastructureBasicPromise;
   }
-  interactionInfrastructurePromise = (async () => {
+  interactionInfrastructureBasicPromise = (async () => {
     setInteractionInfrastructureState("deferred-startup", {
       ready: false,
       inFlight: true,
@@ -8451,14 +8586,61 @@ async function buildInteractionInfrastructureAfterStartup({
       state.deferHitCanvasBuild = false;
       if (chunked) {
         await buildIndexChunked({ scheduleUiMode: "deferred" });
+        await buildSpatialIndexChunked({
+          includeSecondary: false,
+        });
       } else {
         buildIndex({ scheduleUiMode: "deferred" });
+        buildSpatialIndex({
+          includeSecondary: false,
+        });
+      }
+      setInteractionInfrastructureState("basic-ready", {
+        ready: true,
+        inFlight: false,
+      });
+      return true;
+    } catch (error) {
+      setInteractionInfrastructureState("error", {
+        ready: false,
+        inFlight: false,
+      });
+      throw error;
+    } finally {
+      interactionInfrastructureBasicPromise = null;
+    }
+  })();
+  return interactionInfrastructureBasicPromise;
+}
+
+async function buildFullInteractionInfrastructureAfterStartup({
+  chunked = true,
+  buildHitCanvas = true,
+} = {}) {
+  if (getInteractionInfrastructureStageRank() >= 2 && !state.interactionInfrastructureBuildInFlight) {
+    return true;
+  }
+  if (interactionInfrastructureFullPromise) {
+    return interactionInfrastructureFullPromise;
+  }
+  interactionInfrastructureFullPromise = (async () => {
+    await buildBasicInteractionInfrastructureAfterStartup({ chunked });
+    setInteractionInfrastructureState("building-spatial", {
+      ready: true,
+      inFlight: true,
+    });
+    try {
+      while (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle || state.isInteracting) {
+        await yieldToMain();
       }
       ensureSovereigntyState({ force: true });
+      await yieldToMain();
       rebuildResolvedColors();
+      await yieldToMain();
       if (chunked) {
         await buildSpatialIndexChunked({
           includeSecondary: false,
+          keepReady: true,
         });
       } else {
         buildSpatialIndex({
@@ -8470,7 +8652,7 @@ async function buildInteractionInfrastructureAfterStartup({
       });
       if (buildHitCanvas) {
         if (chunked) {
-          await buildHitCanvasAfterStartup();
+          await buildHitCanvasAfterStartup({ keepReady: true });
         } else {
           ensureHitCanvasUpToDate({ force: true });
         }
@@ -8485,16 +8667,30 @@ async function buildInteractionInfrastructureAfterStartup({
       });
       return true;
     } catch (error) {
-      setInteractionInfrastructureState("error", {
-        ready: false,
+      setInteractionInfrastructureState("basic-ready", {
+        ready: true,
         inFlight: false,
       });
       throw error;
     } finally {
-      interactionInfrastructurePromise = null;
+      interactionInfrastructureFullPromise = null;
     }
   })();
-  return interactionInfrastructurePromise;
+  return interactionInfrastructureFullPromise;
+}
+
+async function buildInteractionInfrastructureAfterStartup({
+  chunked = true,
+  buildHitCanvas = true,
+  mode = "full",
+} = {}) {
+  if (String(mode || "full").trim().toLowerCase() === "basic") {
+    return buildBasicInteractionInfrastructureAfterStartup({ chunked });
+  }
+  return buildFullInteractionInfrastructureAfterStartup({
+    chunked,
+    buildHitCanvas,
+  });
 }
 
 function getHitFromEvent(
@@ -21955,8 +22151,114 @@ function setMapData({
   }
 }
 
+function getScenarioChunkPromotionTargetPasses({
+  changedLayerKeys = [],
+  hasPoliticalChange = false,
+} = {}) {
+  const targetPasses = new Set();
+  if (hasPoliticalChange) {
+    ["political", "contextBase", "borders", "labels"].forEach((passName) => targetPasses.add(passName));
+  }
+  (Array.isArray(changedLayerKeys) ? changedLayerKeys : []).forEach((layerKey) => {
+    const normalized = String(layerKey || "").trim().toLowerCase();
+    if (normalized === "cities") {
+      ["contextBase", "labels", "dayNight"].forEach((passName) => targetPasses.add(passName));
+      return;
+    }
+    if (normalized === "water" || normalized === "special" || normalized === "relief") {
+      targetPasses.add("contextScenario");
+    }
+  });
+  return Array.from(targetPasses);
+}
+
+function cancelDeferredScenarioChunkPromotionInfraRefresh() {
+  cancelDeferredWork(deferredScenarioChunkPromotionInfraHandle);
+  deferredScenarioChunkPromotionInfraHandle = null;
+}
+
+function scheduleDeferredScenarioChunkPromotionInfraRefresh({
+  reason = "scenario-chunk-promotion",
+  suppressRender = false,
+  promotionVersion = scenarioChunkPromotionVersion,
+} = {}) {
+  cancelDeferredScenarioChunkPromotionInfraRefresh();
+  deferredScenarioChunkPromotionInfraHandle = scheduleDeferredWork(() => {
+    deferredScenarioChunkPromotionInfraHandle = null;
+    void runDeferredScenarioChunkPromotionInfraRefresh({
+      reason,
+      suppressRender,
+      promotionVersion,
+    });
+  }, {
+    timeout: 120,
+  });
+}
+
+async function runDeferredScenarioChunkPromotionInfraRefresh({
+  reason = "scenario-chunk-promotion",
+  suppressRender = false,
+  promotionVersion = scenarioChunkPromotionVersion,
+} = {}) {
+  if (promotionVersion !== scenarioChunkPromotionVersion) {
+    return false;
+  }
+  if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle || state.isInteracting) {
+    scheduleDeferredScenarioChunkPromotionInfraRefresh({
+      reason,
+      suppressRender,
+      promotionVersion,
+    });
+    return false;
+  }
+  const startedAt = nowMs();
+  rebuildStaticMeshes();
+  refreshScenarioOpeningOwnerBorders({
+    renderNow: false,
+    reason: `${reason}-opening`,
+  });
+  invalidateBorderCache();
+  updateDynamicBorderStatusUI();
+  await yieldToMain();
+  if (promotionVersion !== scenarioChunkPromotionVersion) {
+    return false;
+  }
+  await buildSpatialIndexChunked({
+    includeSecondary: false,
+    keepReady: true,
+  });
+  if (promotionVersion !== scenarioChunkPromotionVersion) {
+    return false;
+  }
+  updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
+  scheduleSecondarySpatialIndexBuild({
+    reason: `${reason}-secondary-spatial`,
+  });
+  if (state.hitCanvasDirty) {
+    scheduleHitCanvasBuildIfNeeded({
+      reason: `${reason}-hit-canvas`,
+    });
+  }
+  if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
+    state.runtimeChunkLoadState.pendingInfraPromotion = null;
+  }
+  if (!suppressRender) {
+    render();
+  }
+  recordRenderPerfMetric("scenarioChunkPromotionInfraStage", nowMs() - startedAt, {
+    activeScenarioId: String(state.activeScenarioId || ""),
+    suppressRender: !!suppressRender,
+    promotionVersion,
+  });
+  return true;
+}
+
 function refreshMapDataForScenarioChunkPromotion({
   suppressRender = false,
+  reason = "scenario-chunk-promotion",
+  changedLayerKeys = [],
+  politicalFeatureIds = [],
 } = {}) {
   const startedAt = nowMs();
   ensureLayerDataFromTopology();
@@ -21965,36 +22267,58 @@ function refreshMapDataForScenarioChunkPromotion({
   ensureSovereigntyState();
   resetExactRefreshOptimizationState();
   resetVisibleInternalBorderMeshSignature();
+  scenarioChunkPromotionVersion = Number(scenarioChunkPromotionVersion || 0) + 1;
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   state.hitCanvasDirty = true;
   state.hitCanvasTopologyRevision = 0;
-  invalidateAllRenderPasses("scenario-chunk-promotion");
+  if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
+    state.runtimeChunkLoadState.pendingVisualPromotion = null;
+    state.runtimeChunkLoadState.pendingInfraPromotion = {
+      reason: String(reason || "scenario-chunk-promotion"),
+      selectionVersion: Math.max(0, Number(state.runtimeChunkLoadState.selectionVersion || 0)),
+      promotionVersion: scenarioChunkPromotionVersion,
+    };
+  }
+  const hasPoliticalChange = Array.isArray(politicalFeatureIds) && politicalFeatureIds.length > 0;
+  if (hasPoliticalChange) {
+    refreshResolvedColorsForFeatures(politicalFeatureIds, { renderNow: false });
+  }
+  const targetPasses = getScenarioChunkPromotionTargetPasses({
+    changedLayerKeys,
+    hasPoliticalChange,
+  });
+  invalidateRenderPasses(
+    targetPasses.length ? targetPasses : ["political", "borders", "labels"],
+    reason,
+  );
   markAllOverlaysDirty();
-  rebuildStaticMeshes();
-  refreshScenarioOpeningOwnerBorders({
-    renderNow: false,
-    reason: "scenario-chunk-promotion-opening",
-  });
-  invalidateBorderCache();
-  updateDynamicBorderStatusUI();
-  rebuildResolvedColors();
-  buildSpatialIndex();
-  updateSpecialZonesPaths();
-  renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
-  setInteractionInfrastructureState("ready", {
-    ready: true,
-    inFlight: false,
-  });
   if (!suppressRender) {
     render();
   }
+  scheduleDeferredScenarioChunkPromotionInfraRefresh({
+    reason,
+    suppressRender,
+    promotionVersion: scenarioChunkPromotionVersion,
+  });
+  recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
+    activeScenarioId: String(state.activeScenarioId || ""),
+    suppressRender: !!suppressRender,
+    promotedFeatureCount: Array.isArray(state.scenarioPoliticalChunkData?.features)
+      ? state.scenarioPoliticalChunkData.features.length
+      : 0,
+    changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
+    promotionVersion: scenarioChunkPromotionVersion,
+  });
   recordRenderPerfMetric("scenarioChunkPoliticalPromotion", nowMs() - startedAt, {
     activeScenarioId: String(state.activeScenarioId || ""),
     suppressRender: !!suppressRender,
     promotedFeatureCount: Array.isArray(state.scenarioPoliticalChunkData?.features)
       ? state.scenarioPoliticalChunkData.features.length
       : 0,
+    changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
+    promotionVersion: scenarioChunkPromotionVersion,
+    stage: "visual",
   });
 }
 

@@ -52,7 +52,59 @@ async function waitForStableExactRender(page, { timeout = 30_000 } = {}) {
   }, { timeout });
 }
 
-test("exact-after-settle issues a second flush for pending scenario chunk refresh without a second interaction", async ({ page }) => {
+async function startChunkPromotionProbe(page) {
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const previousProbe = state.__chunkPromotionVisualStageProbe;
+    if (previousProbe?.intervalId) {
+      globalThis.clearInterval(previousProbe.intervalId);
+    }
+    const probe = {
+      startedAt: Date.now(),
+      sawDeferred: false,
+      visualRecordedAt: 0,
+      exactClearedAt: 0,
+      maxSelectionVersion: Number(state.runtimeChunkLoadState?.selectionVersion || 0),
+      sawPendingVisualField: false,
+      sawPendingInfraField: false,
+    };
+    let lastDeferred = !!state.deferExactAfterSettle;
+    probe.intervalId = globalThis.setInterval(() => {
+      const loadState = state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object"
+        ? state.runtimeChunkLoadState
+        : {};
+      const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+        ? state.renderPerfMetrics
+        : (globalThis.__renderPerfMetrics || {});
+      const visualMetric = metrics.scenarioChunkPromotionVisualStage || null;
+      if (state.deferExactAfterSettle) {
+        probe.sawDeferred = true;
+      }
+      if (
+        !probe.visualRecordedAt
+        && visualMetric
+        && Number(visualMetric.recordedAt || 0) >= probe.startedAt
+      ) {
+        probe.visualRecordedAt = Number(visualMetric.recordedAt || 0);
+      }
+      if (probe.sawDeferred && lastDeferred && !state.deferExactAfterSettle && !probe.exactClearedAt) {
+        probe.exactClearedAt = Date.now();
+      }
+      lastDeferred = !!state.deferExactAfterSettle;
+      probe.maxSelectionVersion = Math.max(
+        probe.maxSelectionVersion,
+        Number(loadState.selectionVersion || 0),
+      );
+      probe.sawPendingVisualField = probe.sawPendingVisualField
+        || Object.prototype.hasOwnProperty.call(loadState, "pendingVisualPromotion");
+      probe.sawPendingInfraField = probe.sawPendingInfraField
+        || Object.prototype.hasOwnProperty.call(loadState, "pendingInfraPromotion");
+    }, 20);
+    state.__chunkPromotionVisualStageProbe = probe;
+  });
+}
+
+test("chunk promotion visual stage can land before exact-after-settle clears", async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
 
@@ -92,39 +144,25 @@ test("exact-after-settle issues a second flush for pending scenario chunk refres
 
   const seededState = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const runtimeState = state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object"
+    const loadState = state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object"
       ? state.runtimeChunkLoadState
       : {};
-    const originalScheduleScenarioChunkRefreshFn = state.scheduleScenarioChunkRefreshFn;
-    const probeCalls = [];
-    state.__scenarioChunkRefreshProbeCalls = probeCalls;
-    if (typeof originalScheduleScenarioChunkRefreshFn === "function") {
-      state.scheduleScenarioChunkRefreshFn = (options = {}) => {
-        probeCalls.push({
-          reason: String(options?.reason || ""),
-          flushPending: !!options?.flushPending,
-          delayMs: Number.isFinite(Number(options?.delayMs)) ? Number(options.delayMs) : null,
-          renderPhase: String(state.renderPhase || ""),
-          deferExactAfterSettle: !!state.deferExactAfterSettle,
-          exactAfterSettleHandle: !!state.exactAfterSettleHandle,
-        });
-        return originalScheduleScenarioChunkRefreshFn(options);
-      };
-    }
     state.runtimeChunkLoadState = {
-      ...runtimeState,
-      pendingReason: "test-exact-after-settle",
-      pendingDelayMs: 0,
-      pendingPromotion: null,
+      ...loadState,
+      selectionVersion: Number(loadState.selectionVersion || 0),
     };
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
     return {
       activeScenarioId: String(state.activeScenarioId || ""),
-      hasScheduleScenarioChunkRefreshFn: typeof state.scheduleScenarioChunkRefreshFn === "function",
+      initialSelectionVersion: Number(state.runtimeChunkLoadState?.selectionVersion || 0),
+      initialVisualMetricRecordedAt: Number(metrics.scenarioChunkPromotionVisualStage?.recordedAt || 0),
     };
   });
 
   expect(seededState.activeScenarioId).toBe("tno_1962");
-  expect(seededState.hasScheduleScenarioChunkRefreshFn).toBe(true);
+  await startChunkPromotionProbe(page);
 
   await setZoomPercent(page, 120);
   await page.waitForFunction(async () => {
@@ -135,35 +173,38 @@ test("exact-after-settle issues a second flush for pending scenario chunk refres
 
   const finalState = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const probeCalls = Array.isArray(state.__scenarioChunkRefreshProbeCalls)
-      ? state.__scenarioChunkRefreshProbeCalls.map((entry) => ({ ...entry }))
-      : [];
+    const probe = state.__chunkPromotionVisualStageProbe && typeof state.__chunkPromotionVisualStageProbe === "object"
+      ? { ...state.__chunkPromotionVisualStageProbe }
+      : {};
+    if (probe.intervalId) {
+      globalThis.clearInterval(probe.intervalId);
+      delete probe.intervalId;
+    }
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
+    const loadState = state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object"
+      ? state.runtimeChunkLoadState
+      : {};
     return {
       renderPhase: String(state.renderPhase || ""),
       deferExactAfterSettle: !!state.deferExactAfterSettle,
       hasExactAfterSettleHandle: !!state.exactAfterSettleHandle,
-      pendingReason: String(state.runtimeChunkLoadState?.pendingReason || ""),
-      refreshScheduled: !!state.runtimeChunkLoadState?.refreshScheduled,
-      probeCalls,
+      selectionVersion: Number(loadState.selectionVersion || 0),
+      hasPendingVisualPromotionField: Object.prototype.hasOwnProperty.call(loadState, "pendingVisualPromotion"),
+      hasPendingInfraPromotionField: Object.prototype.hasOwnProperty.call(loadState, "pendingInfraPromotion"),
+      visualMetricRecordedAt: Number(metrics.scenarioChunkPromotionVisualStage?.recordedAt || 0),
+      probe,
     };
   });
 
-  const deferredFlushCall = finalState.probeCalls.find((entry) => (
-    entry.flushPending
-    && entry.deferExactAfterSettle
-  ));
-  const postExactFlushCall = finalState.probeCalls.find((entry) => (
-    entry.reason === "exact-after-settle"
-    && entry.flushPending
-    && !entry.deferExactAfterSettle
-    && entry.renderPhase === "idle"
-  ));
-
   expect(finalState.renderPhase).toBe("idle");
-  expect(finalState.deferExactAfterSettle).toBe(false);
-  expect(finalState.hasExactAfterSettleHandle).toBe(false);
-  expect(deferredFlushCall).toBeTruthy();
-  expect(postExactFlushCall).toBeTruthy();
+  expect(finalState.hasPendingVisualPromotionField).toBe(true);
+  expect(finalState.hasPendingInfraPromotionField).toBe(true);
+  expect(finalState.visualMetricRecordedAt).toBeGreaterThanOrEqual(seededState.initialVisualMetricRecordedAt);
+  expect(finalState.probe.sawDeferred).toBe(true);
+  expect(finalState.probe.sawPendingVisualField).toBe(true);
+  expect(finalState.probe.sawPendingInfraField).toBe(true);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
 });

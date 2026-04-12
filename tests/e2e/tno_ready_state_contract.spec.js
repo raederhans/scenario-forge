@@ -57,6 +57,45 @@ test("TNO startup reaches editable composite-ready state without stale coarse wa
   expect(runtime.scenarioStatus).not.toContain("coarse mode");
 });
 
+test("basic startup interaction rebuild restores land spatial picking before leaving basic-ready", async ({ page }) => {
+  test.setTimeout(240000);
+  await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });
+  await waitForTnoReady(page);
+
+  const result = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const { buildInteractionInfrastructureAfterStartup } = await import("/js/core/map_renderer.js");
+
+    state.spatialItems = [];
+    state.spatialIndex = null;
+    state.spatialGrid = new Map();
+    state.spatialGridMeta = null;
+    state.spatialItemsById = new Map();
+    state.interactionInfrastructureStage = "deferred-startup";
+    state.interactionInfrastructureReady = false;
+    state.interactionInfrastructureBuildInFlight = false;
+
+    await buildInteractionInfrastructureAfterStartup({
+      chunked: true,
+      mode: "basic",
+    });
+
+    return {
+      interactionInfrastructureStage: String(state.interactionInfrastructureStage || ""),
+      interactionInfrastructureReady: !!state.interactionInfrastructureReady,
+      spatialItemCount: Array.isArray(state.spatialItems) ? state.spatialItems.length : 0,
+      hasAQSpatial: !!(typeof state.spatialItemsById?.has === "function" && state.spatialItemsById.has("AQ")),
+    };
+  });
+
+  expect(result).toMatchObject({
+    interactionInfrastructureStage: "basic-ready",
+    interactionInfrastructureReady: true,
+    hasAQSpatial: true,
+  });
+  expect(result.spatialItemCount).toBeGreaterThan(0);
+});
+
 test("overlay-only hydration mismatch degrades overlays without restoring startup readonly", async ({ page }) => {
   test.setTimeout(240000);
   await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });

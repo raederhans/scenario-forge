@@ -1309,6 +1309,25 @@ function flushPendingScenarioChunkRefreshAfterReady(reason = "post-ready") {
   });
 }
 
+function startDeferredFullInteractionInfrastructureBuild(reason = "post-ready-full-interaction") {
+  const run = () => {
+    void buildInteractionInfrastructureAfterStartup({
+      chunked: true,
+      buildHitCanvas: false,
+      mode: "full",
+    }).catch((error) => {
+      console.warn(`[boot] Deferred full interaction infrastructure build failed. reason=${reason}`, error);
+    });
+  };
+  if (typeof globalThis.requestIdleCallback === "function") {
+    globalThis.requestIdleCallback(() => {
+      run();
+    }, { timeout: 1200 });
+    return;
+  }
+  globalThis.setTimeout(run, 180);
+}
+
 function clearPostReadyTaskHandle(handle) {
   if (!handle) return;
   if (handle.type === "idle" && typeof globalThis.cancelIdleCallback === "function") {
@@ -1680,6 +1699,7 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     await buildInteractionInfrastructureAfterStartup({
       chunked: true,
       buildHitCanvas: false,
+      mode: "basic",
     });
     finishBootMetric("interaction-infra", {
       activeScenarioId,
@@ -1698,6 +1718,7 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     });
     completeBootSequenceLogging();
     flushPendingScenarioChunkRefreshAfterReady("startup-readonly-unlocked");
+    startDeferredFullInteractionInfrastructureBuild("startup-readonly-unlocked");
     schedulePostReadyHydration();
     schedulePostReadyDeferredContextWarmup();
     schedulePostReadyVisualWarmup();
@@ -1747,6 +1768,7 @@ function scheduleStartupReadonlyUnlock(
       void buildInteractionInfrastructureAfterStartup({
         chunked: true,
         buildHitCanvas: false,
+        mode: "basic",
       }).then(() => {
         forcedStartupReadonlyInfraRetryCount = 0;
         finishBootMetric("interaction-infra", {
@@ -1763,6 +1785,7 @@ function scheduleStartupReadonlyUnlock(
         checkpointBootMetric("first-interactive");
         completeBootSequenceLogging();
         flushPendingScenarioChunkRefreshAfterReady("startup-readonly-force-unlocked");
+        startDeferredFullInteractionInfrastructureBuild("startup-readonly-force-unlocked");
         scheduleDeferredDetailPromotion(renderDispatcher);
         schedulePostReadyHydration();
         schedulePostReadyDeferredContextWarmup();
@@ -1878,6 +1901,7 @@ async function finalizeReadyState(renderDispatcher) {
     await buildInteractionInfrastructureAfterStartup({
       chunked: true,
       buildHitCanvas: false,
+      mode: "basic",
     });
     finishBootMetric("interaction-infra", {
       activeScenarioId: String(state.activeScenarioId || ""),
@@ -1893,6 +1917,7 @@ async function finalizeReadyState(renderDispatcher) {
     checkpointBootMetric("first-interactive");
     completeBootSequenceLogging();
     flushPendingScenarioChunkRefreshAfterReady("ready-state");
+    startDeferredFullInteractionInfrastructureBuild("ready-state");
     scheduleDeferredDetailPromotion(renderDispatcher);
     schedulePostReadyHydration();
     schedulePostReadyDeferredContextWarmup();
