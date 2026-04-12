@@ -3,6 +3,7 @@ const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 async function expectSupportPopoverVisibility(page, { guide, reference, export: exportVisible }) {
   await expect(page.locator("#scenarioGuidePopover"))[guide ? "toBeVisible" : "toBeHidden"]();
+  await expect(page.locator("#scenarioGuideBackdrop"))[guide ? "toBeVisible" : "toBeHidden"]();
   await expect(page.locator("#dockReferencePopover"))[reference ? "toBeVisible" : "toBeHidden"]();
   await expect(page.locator("#dockExportPopover"))[exportVisible ? "toBeVisible" : "toBeHidden"]();
 }
@@ -34,6 +35,7 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await activateSupportTrigger(page, "#utilitiesGuideBtn");
   await expectSupportPopoverVisibility(page, { guide: true, reference: false, export: false });
   await expect(page.locator("#scenarioGuideTitle")).not.toHaveText("");
+  await expect(page.locator("body")).toHaveClass(/scenario-guide-open/);
 
   await page.keyboard.press("Escape");
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
@@ -94,10 +96,25 @@ test("phase 03 support surfaces restore the guide view from URL", async ({ page 
   test.setTimeout(240_000);
   await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
-  await expect(page.locator("#inspectorSidebarTabProject")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeVisible();
   await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
+  await expect(page.locator("body")).toHaveClass(/scenario-guide-open/);
   await expect(page.locator("#scenarioGuideBtn")).toHaveAttribute("aria-expanded", "true");
+});
+
+test("phase 03 guide URL restore returns focus to visible topbar trigger on compact viewport", async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeVisible();
+  await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
+  await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeHidden();
+  await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
+  await expect(page.locator("#scenarioGuideBtn")).toBeFocused();
 });
 
 test("phase 03 support surfaces restore the export view and stay idempotent", async ({ page }) => {
@@ -134,8 +151,28 @@ test("phase 03 ignores unknown support-surface view values", async ({ page }) =>
     state.restoreSupportSurfaceFromUrlFn?.();
   });
   await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeHidden();
   await expect(page.locator("#dockReferencePopover")).toBeHidden();
   await expect(page.locator("#dockExportPopover")).toBeHidden();
+});
+
+test("phase 03 guide modal closes cleanly from backdrop without leaving drawer scrim behind", async ({ page }) => {
+  test.setTimeout(240_000);
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+
+  await page.locator("#scenarioGuideBtn").click();
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeVisible();
+  await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
+  await expect(page.locator("body")).toHaveClass(/scenario-guide-open/);
+  await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+
+  await page.mouse.click(16, 16);
+  await expect(page.locator("#scenarioGuideBackdrop")).toBeHidden();
+  await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
+  await expect(page.locator("body")).not.toHaveClass(/scenario-guide-open/);
+  await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+  await expect(page.locator("#scenarioGuideBtn")).toBeFocused();
 });
 
 test("phase 03 transport compare runtime strings localize across live states", async ({ page }) => {

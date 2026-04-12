@@ -989,6 +989,8 @@ function createDefaultDayNightStyleConfig() {
     cityLightsCoreSharpness: 0.54,
     cityLightsPopulationBoostEnabled: true,
     cityLightsPopulationBoostStrength: 0.56,
+    historicalCityLightsDensity: 1.25,
+    historicalCityLightsSecondaryRetention: 0.55,
   };
 }
 
@@ -1033,6 +1035,19 @@ function normalizeDayNightStyleConfig(rawConfig) {
       toFiniteNumber(raw.cityLightsPopulationBoostStrength, defaults.cityLightsPopulationBoostStrength),
       0,
       1.5
+    ),
+    historicalCityLightsDensity: clamp(
+      toFiniteNumber(raw.historicalCityLightsDensity, defaults.historicalCityLightsDensity),
+      0.75,
+      2
+    ),
+    historicalCityLightsSecondaryRetention: clamp(
+      toFiniteNumber(
+        raw.historicalCityLightsSecondaryRetention,
+        defaults.historicalCityLightsSecondaryRetention
+      ),
+      0,
+      1
     ),
   };
 }

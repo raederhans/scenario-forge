@@ -52,8 +52,10 @@ import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import {
+  applyDialogContract,
   createFocusReturnRegistry,
   focusSurface,
+  getFocusableElements,
   rememberSurfaceTrigger,
   restoreSurfaceTriggerFocus,
   UI_URL_STATE_KEYS,
@@ -1743,6 +1745,10 @@ function initToolbar({ render } = {}) {
   const dayNightCityLightsCoreSharpness = document.getElementById("dayNightCityLightsCoreSharpness");
   const dayNightCityLightsPopulationBoostEnabled = document.getElementById("dayNightCityLightsPopulationBoostEnabled");
   const dayNightCityLightsPopulationBoostStrength = document.getElementById("dayNightCityLightsPopulationBoostStrength");
+  const dayNightHistoricalCityLightsDensity = document.getElementById("dayNightHistoricalCityLightsDensity");
+  const dayNightHistoricalCityLightsSecondaryRetention = document.getElementById(
+    "dayNightHistoricalCityLightsSecondaryRetention"
+  );
   const dayNightShadowOpacity = document.getElementById("dayNightShadowOpacity");
   const dayNightTwilightWidth = document.getElementById("dayNightTwilightWidth");
   const toggleUrban = document.getElementById("toggleUrban");
@@ -1871,7 +1877,9 @@ function initToolbar({ render } = {}) {
   const scenarioTransportWorkbenchBtn = document.getElementById("scenarioTransportWorkbenchBtn");
   const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
   const utilitiesGuideBtn = document.getElementById("utilitiesGuideBtn");
+  const scenarioGuideBackdrop = document.getElementById("scenarioGuideBackdrop");
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
+  const scenarioGuideCloseBtn = document.getElementById("scenarioGuideCloseBtn");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
   const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
   const dockConfigGroup = document.getElementById("dockConfigGroup");
@@ -2046,6 +2054,10 @@ function initToolbar({ render } = {}) {
   const dayNightCityLightsCorridorStrengthValue = document.getElementById("dayNightCityLightsCorridorStrengthValue");
   const dayNightCityLightsCoreSharpnessValue = document.getElementById("dayNightCityLightsCoreSharpnessValue");
   const dayNightCityLightsPopulationBoostStrengthValue = document.getElementById("dayNightCityLightsPopulationBoostStrengthValue");
+  const dayNightHistoricalCityLightsDensityValue = document.getElementById("dayNightHistoricalCityLightsDensityValue");
+  const dayNightHistoricalCityLightsSecondaryRetentionValue = document.getElementById(
+    "dayNightHistoricalCityLightsSecondaryRetentionValue"
+  );
   const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
   const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
@@ -2206,6 +2218,24 @@ function initToolbar({ render } = {}) {
   const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => (
     restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger)
   );
+  const isFocusableGuideTriggerVisible = (element) => {
+    if (!(element instanceof HTMLElement)) return false;
+    if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+    const style = globalThis.getComputedStyle ? globalThis.getComputedStyle(element) : null;
+    if (style && (style.display === "none" || style.visibility === "hidden")) return false;
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    return rect.right > 0
+      && rect.bottom > 0
+      && rect.left < (globalThis.innerWidth || 0)
+      && rect.top < (globalThis.innerHeight || 0);
+  };
+  const getGuideFocusReturnTrigger = (preferredTrigger = null) => {
+    if (isFocusableGuideTriggerVisible(preferredTrigger)) return preferredTrigger;
+    if (isFocusableGuideTriggerVisible(utilitiesGuideBtn)) return utilitiesGuideBtn;
+    if (isFocusableGuideTriggerVisible(scenarioGuideBtn)) return scenarioGuideBtn;
+    return preferredTrigger || utilitiesGuideBtn || scenarioGuideBtn || null;
+  };
   const replaceUiUrlParams = (mutator) => {
     if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
     const params = new globalThis.URLSearchParams(globalThis.location.search || "");
@@ -4412,6 +4442,9 @@ function initToolbar({ render } = {}) {
 
   const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     if (!scenarioGuidePopover) return;
+    document.body.classList.remove("scenario-guide-open");
+    scenarioGuideBackdrop?.classList.add("hidden");
+    scenarioGuideBackdrop?.setAttribute("aria-hidden", "true");
     scenarioGuidePopover.classList.add("hidden");
     scenarioGuidePopover.setAttribute("aria-hidden", "true");
     scenarioGuideBtn?.classList.remove("is-active");
@@ -4460,16 +4493,16 @@ function initToolbar({ render } = {}) {
     if (state.ui?.restoredSupportSurfaceViewFromUrl === view) {
       return;
     }
-    ensureProjectSupportSurface();
     if (view === "guide") {
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
         state.ui.restoredSupportSurfaceViewFromUrl = view;
         return;
       }
-      toggleScenarioGuidePopover(utilitiesGuideBtn || scenarioGuideBtn);
+      toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
       state.ui.restoredSupportSurfaceViewFromUrl = view;
       return;
     }
+    ensureProjectSupportSurface();
     const targetPopover = getDockPopoverByKind(view);
     if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
       state.ui.restoredSupportSurfaceViewFromUrl = view;
@@ -4488,8 +4521,11 @@ function initToolbar({ render } = {}) {
       return;
     }
     closeDockPopover({ restoreFocus: false, syncUrl: false });
-    ensureProjectSupportSurface();
+    closeSpecialZonePopover();
     rememberOverlayTrigger(scenarioGuidePopover, trigger);
+    document.body.classList.add("scenario-guide-open");
+    scenarioGuideBackdrop?.classList.remove("hidden");
+    scenarioGuideBackdrop?.setAttribute("aria-hidden", "false");
     scenarioGuidePopover.classList.remove("hidden");
     scenarioGuidePopover.setAttribute("aria-hidden", "false");
     scenarioGuideBtn?.classList.add("is-active");
@@ -4854,7 +4890,7 @@ function initToolbar({ render } = {}) {
       if (!specialZoneEditorInline && specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
         closeSpecialZonePopover();
       }
-      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn, #utilitiesGuideBtn");
+      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn, #utilitiesGuideBtn, #scenarioGuideBackdrop");
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && !insideScenarioGuide) {
         closeScenarioGuidePopover();
       }
@@ -4868,6 +4904,27 @@ function initToolbar({ render } = {}) {
       }
     });
     document.addEventListener("keydown", (event) => {
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && event.key === "Tab") {
+        const focusables = getFocusableElements(scenarioGuidePopover);
+        if (!focusables.length) {
+          event.preventDefault();
+          focusOverlaySurface(scenarioGuidePopover);
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+          return;
+        }
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+          return;
+        }
+      }
       if (event.key === "Escape") {
         let closedOverlay = false;
         if (state.activeDockPopover) {
@@ -5298,6 +5355,8 @@ function initToolbar({ render } = {}) {
       dayNightCityLightsStyle.disabled = !dayNight.cityLightsEnabled;
     }
     const modernLightsControlsEnabled = dayNight.cityLightsEnabled && dayNight.cityLightsStyle === "modern";
+    const historicalLightsControlsEnabled =
+      dayNight.cityLightsEnabled && dayNight.cityLightsStyle === "historical_1930s";
     if (dayNightCityLightsIntensity) {
       dayNightCityLightsIntensity.value = String(Math.round(dayNight.cityLightsIntensity * 100));
       dayNightCityLightsIntensity.disabled = !dayNight.cityLightsEnabled;
@@ -5344,6 +5403,24 @@ function initToolbar({ render } = {}) {
     updateTextureValueLabel(
       dayNightCityLightsPopulationBoostStrengthValue,
       `${Math.round(dayNight.cityLightsPopulationBoostStrength * 100)}%`
+    );
+    if (dayNightHistoricalCityLightsDensity) {
+      dayNightHistoricalCityLightsDensity.value = String(Math.round(dayNight.historicalCityLightsDensity * 100));
+      dayNightHistoricalCityLightsDensity.disabled = !historicalLightsControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightHistoricalCityLightsDensityValue,
+      `${Math.round(dayNight.historicalCityLightsDensity * 100)}%`
+    );
+    if (dayNightHistoricalCityLightsSecondaryRetention) {
+      dayNightHistoricalCityLightsSecondaryRetention.value = String(
+        Math.round(dayNight.historicalCityLightsSecondaryRetention * 100)
+      );
+      dayNightHistoricalCityLightsSecondaryRetention.disabled = !historicalLightsControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightHistoricalCityLightsSecondaryRetentionValue,
+      `${Math.round(dayNight.historicalCityLightsSecondaryRetention * 100)}%`
     );
 
     if (dayNightShadowOpacity) {
@@ -7090,6 +7167,20 @@ function initToolbar({ render } = {}) {
     utilitiesGuideBtn.dataset.bound = "true";
   }
 
+  if (scenarioGuideCloseBtn && !scenarioGuideCloseBtn.dataset.bound) {
+    scenarioGuideCloseBtn.addEventListener("click", () => {
+      closeScenarioGuidePopover({ restoreFocus: true });
+    });
+    scenarioGuideCloseBtn.dataset.bound = "true";
+  }
+
+  if (scenarioGuideBackdrop && !scenarioGuideBackdrop.dataset.bound) {
+    scenarioGuideBackdrop.addEventListener("click", () => {
+      closeScenarioGuidePopover({ restoreFocus: true });
+    });
+    scenarioGuideBackdrop.dataset.bound = "true";
+  }
+
   if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
     appearanceSpecialZoneBtn.setAttribute("aria-haspopup", "dialog");
     appearanceSpecialZoneBtn.setAttribute("aria-controls", "specialZonePopover");
@@ -7488,6 +7579,31 @@ function initToolbar({ render } = {}) {
       renderDirty("day-night-city-lights-population-boost-strength");
     });
     dayNightCityLightsPopulationBoostStrength.dataset.bound = "true";
+  }
+
+  if (dayNightHistoricalCityLightsDensity && !dayNightHistoricalCityLightsDensity.dataset.bound) {
+    dayNightHistoricalCityLightsDensity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.historicalCityLightsDensity = clamp(Number.isFinite(value) ? value / 100 : 1.25, 0.75, 2);
+      renderDayNightUI();
+      renderDirty("day-night-historical-city-lights-density");
+    });
+    dayNightHistoricalCityLightsDensity.dataset.bound = "true";
+  }
+
+  if (
+    dayNightHistoricalCityLightsSecondaryRetention &&
+    !dayNightHistoricalCityLightsSecondaryRetention.dataset.bound
+  ) {
+    dayNightHistoricalCityLightsSecondaryRetention.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.historicalCityLightsSecondaryRetention = clamp(Number.isFinite(value) ? value / 100 : 0.55, 0, 1);
+      renderDayNightUI();
+      renderDirty("day-night-historical-city-lights-secondary-retention");
+    });
+    dayNightHistoricalCityLightsSecondaryRetention.dataset.bound = "true";
   }
 
   if (dayNightShadowOpacity && !dayNightShadowOpacity.dataset.bound) {
@@ -8870,7 +8986,15 @@ function initToolbar({ render } = {}) {
     dockExportPopover.setAttribute("aria-hidden", "true");
   }
   if (scenarioGuidePopover) {
+    applyDialogContract(scenarioGuidePopover, {
+      tone: "info",
+      labelledBy: "scenarioGuideTitle",
+      describedBy: ["scenarioGuideSupportHint"],
+    });
     scenarioGuidePopover.setAttribute("aria-hidden", "true");
+  }
+  if (scenarioGuideBackdrop) {
+    scenarioGuideBackdrop.setAttribute("aria-hidden", "true");
   }
   if (specialZonePopover) {
     specialZonePopover.setAttribute("aria-hidden", specialZonePopover.classList.contains("hidden") ? "true" : "false");

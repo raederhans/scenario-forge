@@ -25,8 +25,10 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
 
     def test_support_surface_tool_panels_keep_help_copy_and_drop_export_tooltip(self):
         content = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="scenarioGuideBackdrop"', content)
         self.assertIn('id="scenarioGuidePopover"', content)
-        self.assertIn("sidebar-tool-popover", content)
+        self.assertIn('id="scenarioGuideCloseBtn"', content)
+        self.assertIn("scenario-guide-modal", content)
         self.assertIn("Use this guide inside the support area so the shell stays quiet while the next step stays readable.", content)
         self.assertIn("Keep a working reference visible while you line up opacity, scale, and offsets.", content)
         self.assertIn("Export the visible map as a PNG or JPG snapshot.", content)

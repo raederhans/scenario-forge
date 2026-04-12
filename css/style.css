@@ -5391,25 +5391,58 @@ body.counter-editor-modal-open {
   box-shadow: 0 8px 16px rgba(123, 91, 78, 0.1);
 }
 
-.scenario-guide-popover {
-  position: absolute;
-  top: 58px;
-  left: 16px;
-  z-index: 26;
-  width: min(360px, calc(100% - 36px));
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(37, 54, 73, 0.14);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+.scenario-guide-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 148;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.inspector-utilities-shell .scenario-guide-popover {
-  top: calc(100% + 12px);
-  left: 0;
-  right: auto;
-  bottom: auto;
-  width: min(360px, calc(100vw - 72px));
+.scenario-guide-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 149;
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(80vh, 720px);
+  overflow: auto;
+  padding: 20px 22px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(37, 54, 73, 0.14);
+  background: rgba(250, 252, 253, 0.98);
+  box-shadow: 0 28px 58px rgba(15, 23, 42, 0.18);
+  transform: translate(-50%, -50%);
+}
+
+.scenario-guide-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.scenario-guide-close-btn {
+  border: 1px solid rgba(22, 35, 51, 0.14);
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-primary);
+  font: 600 0.92rem var(--font-body);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.scenario-guide-close-btn:hover {
+  background: #ffffff;
+  border-color: rgba(22, 35, 51, 0.22);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.scenario-guide-close-btn:focus-visible {
+  outline: 2px solid rgba(31, 79, 126, 0.34);
+  outline-offset: 2px;
 }
 
 .scenario-guide-status {
@@ -5452,6 +5485,21 @@ body.counter-editor-modal-open {
   font-size: 0.78rem;
   color: var(--text-secondary);
   line-height: 1.45;
+}
+
+body.scenario-guide-open #leftSidebar,
+body.scenario-guide-open #rightSidebar,
+body.scenario-guide-open #scenarioContextBar,
+body.scenario-guide-open #zoomControls,
+body.scenario-guide-open #bottomDock,
+body.scenario-guide-open #toolHudChip,
+body.scenario-guide-open #mapOnboardingHint,
+body.scenario-guide-open #devWorkspacePanel,
+body.scenario-guide-open #devWorkspaceQuickbar,
+body.scenario-guide-open #devWorkspaceToggleBtn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .zoom-controls {

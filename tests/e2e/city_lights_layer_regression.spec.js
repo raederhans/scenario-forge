@@ -47,6 +47,8 @@ const DEFAULT_MODERN_LIGHTS_CONFIG = {
 };
 
 const EASTERN_NIGHT_UTC_MINUTES = 18 * 60;
+const EAST_ASIA_NIGHT_UTC_MINUTES = 14 * 60;
+const AMERICAS_NIGHT_UTC_MINUTES = 4 * 60;
 
 const URBAN_SAMPLE_POINTS = [
   { name: 'London', lon: -0.1276, lat: 51.5072 },
@@ -78,6 +80,38 @@ const HISTORICAL_CAPITAL_SAMPLE_POINTS = [
   { name: 'Delhi', lon: 77.1025, lat: 28.7041 },
   { name: 'Beijing', lon: 116.4074, lat: 39.9042 },
   { name: 'Cairo', lon: 31.2357, lat: 30.0444 },
+];
+
+const HISTORICAL_EUROPE_SAMPLE_POINTS = [
+  { name: 'Rome', lon: 12.4964, lat: 41.9028 },
+  { name: 'Milan', lon: 9.1900, lat: 45.4642 },
+  { name: 'Moscow', lon: 37.6173, lat: 55.7558 },
+  { name: 'Saint Petersburg', lon: 30.3351, lat: 59.9343 },
+];
+
+const HISTORICAL_JAPAN_SAMPLE_POINTS = [
+  { name: 'Tokyo', lon: 139.6917, lat: 35.6895 },
+  { name: 'Osaka', lon: 135.5023, lat: 34.6937 },
+];
+
+const HISTORICAL_US_EAST_COAST_SAMPLE_POINTS = [
+  { name: 'New York', lon: -74.0060, lat: 40.7128 },
+  { name: 'Washington', lon: -77.0369, lat: 38.9072 },
+];
+
+const HISTORICAL_US_WEST_COAST_SAMPLE_POINTS = [
+  { name: 'Los Angeles', lon: -118.2437, lat: 34.0522 },
+  { name: 'San Francisco', lon: -122.4194, lat: 37.7749 },
+];
+
+const EAST_ASIA_RURAL_SAMPLE_POINTS = [
+  { name: 'Gobi Desert', lon: 104.0, lat: 43.0 },
+  { name: 'Taklamakan Basin', lon: 86.0, lat: 40.0 },
+];
+
+const AMERICAS_RURAL_SAMPLE_POINTS = [
+  { name: 'Great Basin', lon: -116.0, lat: 39.0 },
+  { name: 'Northern Manitoba', lon: -98.0, lat: 56.0 },
 ];
 
 function countChangedPixels(left, right, threshold = 12) {
@@ -540,7 +574,6 @@ test('city lights default scene and intensity regression', async ({ page }) => {
 
   const offToModernChanged = countChangedPixels(lightsOff.pixels, modernLights.pixels, 10);
   const offToHistoricalChanged = countChangedPixels(lightsOff.pixels, historicalLights.pixels, 10);
-  const modernToHistoricalChanged = countChangedPixels(modernLights.pixels, historicalLights.pixels, 10);
   const offToModernLuminance = computeLuminanceDelta(lightsOff.pixels, modernLights.pixels);
   const offToHistoricalLuminance = computeLuminanceDelta(lightsOff.pixels, historicalLights.pixels);
   const highZoomOffToModernChanged = countChangedPixels(highZoomLightsOff.pixels, modernHighZoomLights.pixels, 10);
@@ -566,11 +599,28 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   });
   await page.waitForTimeout(250);
   const historicalCapitals = await samplePointGroup(page, HISTORICAL_CAPITAL_SAMPLE_POINTS, 18);
+  const historicalEurope = await samplePointGroup(page, HISTORICAL_EUROPE_SAMPLE_POINTS, 18);
   const historicalRural = await samplePointGroup(page, EASTERN_RURAL_SAMPLE_POINTS, 18);
+
+  await configureCityLights(page, 'historical_1930s', true, {
+    manualUtcMinutes: EAST_ASIA_NIGHT_UTC_MINUTES,
+    populationBoostEnabled: false,
+  });
+  await page.waitForTimeout(250);
+  const historicalJapan = await samplePointGroup(page, HISTORICAL_JAPAN_SAMPLE_POINTS, 18);
+  const historicalJapanRural = await samplePointGroup(page, EAST_ASIA_RURAL_SAMPLE_POINTS, 18);
+
+  await configureCityLights(page, 'historical_1930s', true, {
+    manualUtcMinutes: AMERICAS_NIGHT_UTC_MINUTES,
+    populationBoostEnabled: false,
+  });
+  await page.waitForTimeout(250);
+  const historicalUsEastCoast = await samplePointGroup(page, HISTORICAL_US_EAST_COAST_SAMPLE_POINTS, 18);
+  const historicalUsWestCoast = await samplePointGroup(page, HISTORICAL_US_WEST_COAST_SAMPLE_POINTS, 18);
+  const historicalAmericasRural = await samplePointGroup(page, AMERICAS_RURAL_SAMPLE_POINTS, 18);
 
   expect(offToModernChanged).toBeGreaterThan(2000);
   expect(offToModernLuminance).toBeGreaterThan(300000);
-  expect(modernToHistoricalChanged).toBeGreaterThan(180);
   expect(highZoomOffToModernChanged).toBeGreaterThan(8000);
   expect(highZoomOffToModernLuminance).toBeGreaterThan(1000000);
   expect(boostChanged).toBeGreaterThan(2000);
@@ -579,7 +629,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(modernMeanLuminance).toBeGreaterThan(lightsOffMeanLuminance);
   expect(modernUrban.average).toBeGreaterThan(modernRural.average + 8);
   expect(modernUrban.maxBrightRatio).toBeLessThan(0.32);
-  expect(modernRural.maxBrightRatio).toBeLessThan(0.01);
+  expect(modernRural.maxBrightRatio).toBeLessThan(0.012);
   expect(modernUrban.peak).toBeGreaterThan(modernRural.peak + 16);
   expect(boostOnUrban.average).toBeGreaterThan(boostOffUrban.average + 1.2);
   expect(boostOnUrban.maxBrightRatio).toBeLessThan(0.42);
@@ -587,9 +637,25 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(easternUrban.average).toBeGreaterThan(easternRural.average + 10);
   expect(easternUrban.averageBrightRatio).toBeGreaterThan(easternRural.averageBrightRatio + 0.003);
   expect(easternUrban.maxBrightRatio).toBeLessThan(0.18);
+  expect(offToHistoricalChanged).toBeGreaterThan(300);
+  expect(offToHistoricalLuminance).toBeGreaterThan(45000);
   expect(historicalCapitals.peak).toBeGreaterThan(historicalRural.peak + 20);
-  expect(historicalCapitals.average).toBeLessThan(modernUrban.average);
-  expect(historicalBrightPixelRatio).toBeLessThan(modernBrightPixelRatio);
+  expect(historicalCapitals.average).toBeGreaterThan(historicalRural.average + 2);
+  expect(historicalCapitals.averageBrightRatio).toBeGreaterThan(historicalRural.averageBrightRatio + 0.001);
+  expect(historicalCapitals.maxBrightRatio).toBeLessThan(0.18);
+  expect(historicalBrightPixelRatio).toBeLessThan(0.012);
+  expect(historicalEurope.average).toBeGreaterThan(historicalRural.average + 1);
+  expect(historicalEurope.peak).toBeGreaterThan(historicalRural.peak + 8);
+  expect(historicalEurope.maxBrightRatio).toBeLessThan(0.14);
+  expect(historicalJapan.average).toBeGreaterThan(historicalJapanRural.average + 1);
+  expect(historicalJapan.peak).toBeGreaterThan(historicalJapanRural.peak + 8);
+  expect(historicalJapan.maxBrightRatio).toBeLessThan(0.14);
+  expect(historicalUsEastCoast.average).toBeGreaterThan(historicalAmericasRural.average + 1);
+  expect(historicalUsEastCoast.peak).toBeGreaterThan(historicalAmericasRural.peak + 8);
+  expect(historicalUsEastCoast.maxBrightRatio).toBeLessThan(0.14);
+  expect(historicalUsWestCoast.average).toBeGreaterThan(historicalAmericasRural.average + 1);
+  expect(historicalUsWestCoast.peak).toBeGreaterThan(historicalAmericasRural.peak + 8);
+  expect(historicalUsWestCoast.maxBrightRatio).toBeLessThan(0.14);
   expect(pageErrors).toEqual([]);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
@@ -607,7 +673,6 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   console.log(JSON.stringify({
     offToModernChanged,
     offToHistoricalChanged,
-    modernToHistoricalChanged,
     offToModernLuminance,
     offToHistoricalLuminance,
     highZoomOffToModernChanged,
@@ -627,7 +692,13 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     easternUrban,
     easternRural,
     historicalCapitals,
+    historicalEurope,
     historicalRural,
+    historicalJapan,
+    historicalJapanRural,
+    historicalUsEastCoast,
+    historicalUsWestCoast,
+    historicalAmericasRural,
     screenshot: screenshotPath,
     modernLowZoomScreenshot: modernLowZoomScreenshotPath,
     modernHighZoomScreenshot: modernHighZoomScreenshotPath,

@@ -14149,8 +14149,23 @@ const historicalCityLightsFallbackCache = {
   cityCollection: null,
   cityLayerRevision: -1,
   scenarioId: "",
+  secondaryRetention: -1,
   entries: [],
 };
+
+function getHistoricalCityLightsDensity(config) {
+  const density = Number(config?.historicalCityLightsDensity);
+  return clamp(Number.isFinite(density) ? density : 1.25, 0.75, 2);
+}
+
+function getHistoricalCityLightsSecondaryRetention(config) {
+  const secondaryRetention = Number(config?.historicalCityLightsSecondaryRetention);
+  return clamp(Number.isFinite(secondaryRetention) ? secondaryRetention : 0.55, 0, 1);
+}
+
+function interpolateHistoricalThreshold(strictValue, relaxedValue, secondaryRetention) {
+  return strictValue + ((relaxedValue - strictValue) * secondaryRetention);
+}
 
 function getHistoricalCityLightCapitalBoost(capitalKind = "") {
   const normalizedKind = String(capitalKind || "").trim().toLowerCase();
@@ -14176,26 +14191,31 @@ function sanitizeHistoricalCityLightEntry(rawEntry) {
   };
 }
 
-function shouldRenderHistoricalCityLightEntry(entry) {
+function shouldRenderHistoricalCityLightEntry(entry, secondaryRetention = 0) {
   const capitalKind = String(entry?.capitalKind || "").trim().toLowerCase();
   const population = Math.max(0, Number(entry?.population || 0));
   const weight = clamp(Number(entry?.weight || 0), 0, 1.08);
   if (capitalKind === "country_capital") {
     return true;
   }
+  const normalizedRetention = clamp(Number(secondaryRetention) || 0, 0, 1);
   if (capitalKind === "admin_capital") {
-    return population >= 1000000 || weight >= 0.7;
+    const adminPopulationThreshold = interpolateHistoricalThreshold(1000000, 700000, normalizedRetention);
+    const adminWeightThreshold = interpolateHistoricalThreshold(0.7, 0.55, normalizedRetention);
+    return population >= adminPopulationThreshold || weight >= adminWeightThreshold;
   }
-  return population >= 2200000 || weight >= 0.8;
+  const cityPopulationThreshold = interpolateHistoricalThreshold(2200000, 1500000, normalizedRetention);
+  const cityWeightThreshold = interpolateHistoricalThreshold(0.8, 0.65, normalizedRetention);
+  return population >= cityPopulationThreshold || weight >= cityWeightThreshold;
 }
 
-function getHistoricalProxyAssetEntries() {
+function getHistoricalProxyAssetEntries(secondaryRetention = 0) {
   if (!Array.isArray(HISTORICAL_1930_CITY_LIGHTS_ENTRIES) || !HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length) {
     return [];
   }
   return HISTORICAL_1930_CITY_LIGHTS_ENTRIES
     .map(sanitizeHistoricalCityLightEntry)
-    .filter((entry) => shouldRenderHistoricalCityLightEntry(entry))
+    .filter((entry) => shouldRenderHistoricalCityLightEntry(entry, secondaryRetention))
     .filter(Boolean);
 }
 
@@ -14226,21 +14246,23 @@ function computeHistoricalFallbackCityLightWeight(feature) {
   return clamp((populationScore * 0.74) + capitalBoost + tierBoost + rankBoost, 0.18, 1.02);
 }
 
-function shouldIncludeHistoricalFallbackCity(feature) {
+function shouldIncludeHistoricalFallbackCity(feature, secondaryRetention = 0) {
   const props = feature?.properties || {};
+  const normalizedRetention = clamp(Number(secondaryRetention) || 0, 0, 1);
   if (!!(props.__city_is_country_capital ?? props.is_country_capital)) return true;
+  const adminPopulation = Math.max(
+    0,
+    Number(
+      props.__city_population
+      ?? props.population
+      ?? props.pop_max
+      ?? props.POP_MAX
+      ?? 0
+    )
+  );
   if (
     !!(props.__city_is_admin_capital ?? props.is_admin_capital)
-    && Math.max(
-      0,
-      Number(
-        props.__city_population
-        ?? props.population
-        ?? props.pop_max
-        ?? props.POP_MAX
-        ?? 0
-      )
-    ) >= 2000000
+    && adminPopulation >= interpolateHistoricalThreshold(2000000, 1200000, normalizedRetention)
   ) {
     return true;
   }
@@ -14260,24 +14282,27 @@ function shouldIncludeHistoricalFallbackCity(feature) {
       ?? 0
     )
   );
-  return population >= 4200000;
+  const cityPopulationThreshold = interpolateHistoricalThreshold(4200000, 2400000, normalizedRetention);
+  return population >= cityPopulationThreshold;
 }
 
-function getHistoricalProxyFallbackEntries() {
+function getHistoricalProxyFallbackEntries(secondaryRetention = 0) {
   const cityCollection = getEffectiveCityCollection();
   const cityLayerRevision = Number(state.cityLayerRevision || 0);
   const scenarioId = String(state.activeScenarioId || "");
+  const normalizedRetention = clamp(Number(secondaryRetention) || 0, 0, 1);
   if (
     historicalCityLightsFallbackCache.cityCollection === cityCollection
     && historicalCityLightsFallbackCache.cityLayerRevision === cityLayerRevision
     && historicalCityLightsFallbackCache.scenarioId === scenarioId
+    && historicalCityLightsFallbackCache.secondaryRetention === normalizedRetention
   ) {
     return historicalCityLightsFallbackCache.entries;
   }
 
   const entries = Array.isArray(cityCollection?.features)
     ? cityCollection.features
-      .filter((feature) => shouldIncludeHistoricalFallbackCity(feature))
+      .filter((feature) => shouldIncludeHistoricalFallbackCity(feature, normalizedRetention))
       .map((feature) => {
         const coordinates = getCityGeoCoordinates(feature);
         if (!coordinates) return null;
@@ -14291,7 +14316,7 @@ function getHistoricalProxyFallbackEntries() {
           nameAscii: props.name_ascii || props.__city_name_ascii || props.name_en || props.name || "",
         });
       })
-      .filter((entry) => shouldRenderHistoricalCityLightEntry(entry))
+      .filter((entry) => shouldRenderHistoricalCityLightEntry(entry, normalizedRetention))
       .filter(Boolean)
       .sort((left, right) => right.weight - left.weight)
     : [];
@@ -14299,20 +14324,22 @@ function getHistoricalProxyFallbackEntries() {
   historicalCityLightsFallbackCache.cityCollection = cityCollection;
   historicalCityLightsFallbackCache.cityLayerRevision = cityLayerRevision;
   historicalCityLightsFallbackCache.scenarioId = scenarioId;
+  historicalCityLightsFallbackCache.secondaryRetention = normalizedRetention;
   historicalCityLightsFallbackCache.entries = entries;
   return entries;
 }
 
-function getHistoricalNightLightEntries() {
-  const assetEntries = getHistoricalProxyAssetEntries();
+function getHistoricalNightLightEntries(config) {
+  const secondaryRetention = getHistoricalCityLightsSecondaryRetention(config);
+  const assetEntries = getHistoricalProxyAssetEntries(secondaryRetention);
   if (assetEntries.length) {
     return assetEntries;
   }
-  return getHistoricalProxyFallbackEntries();
+  return getHistoricalProxyFallbackEntries(secondaryRetention);
 }
 
 function drawHistoricalNightLightsLayer(k, config, solarState) {
-  const historicalEntries = getHistoricalNightLightEntries();
+  const historicalEntries = getHistoricalNightLightEntries(config);
   if (!historicalEntries.length) {
     return;
   }
@@ -14320,8 +14347,9 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   if (!nightHemisphere) return;
 
   const variant = "historical_1930s";
-  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.8);
   if (intensity <= 0) return;
+  const density = getHistoricalCityLightsDensity(config);
   const palette = getNightLightPalette(variant);
   const overscan = Math.max(24, Math.min(state.width, state.height) * 0.05);
 
@@ -14352,10 +14380,12 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
     }
 
     const capitalBoost = getHistoricalCityLightCapitalBoost(entry.capitalKind);
-    const baseRadiusPx = 0.52 + (weight * (0.68 + (capitalBoost * 0.28)));
+    const baseRadiusPx = (0.52 + (weight * (0.68 + (capitalBoost * 0.28)))) * density;
     const haloRadiusPx = baseRadiusPx * (1.24 + (capitalBoost * 0.3));
-    const haloAlpha = clamp(intensity * weight * 0.12, 0, 0.28);
-    const coreAlpha = clamp(intensity * weight * 0.22, 0, 0.52);
+    const haloAlphaMax = clamp(0.28 * density, 0, 0.48);
+    const coreAlphaMax = clamp(0.52 * density, 0, 0.82);
+    const haloAlpha = clamp(intensity * weight * 0.12 * density, 0, haloAlphaMax);
+    const coreAlpha = clamp(intensity * weight * 0.22 * density, 0, coreAlphaMax);
     const orientation = (stringHash(
       entry.nameAscii ||
       `${entry.lon}:${entry.lat}`

@@ -976,6 +976,47 @@
                           class="range-input"
                         />
                       </div>
+                      <div id="lblDayNightHistoricalOnly" class="section-header-block mt-3">Historical only</div>
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightHistoricalCityLightsDensity"
+                            class="range-label"
+                            for="dayNightHistoricalCityLightsDensity"
+                          >
+                            Historical Light Density
+                          </label>
+                          <span id="dayNightHistoricalCityLightsDensityValue" class="range-value">125%</span>
+                        </div>
+                        <input
+                          id="dayNightHistoricalCityLightsDensity"
+                          type="range"
+                          min="75"
+                          max="200"
+                          value="125"
+                          class="range-input"
+                        />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightHistoricalCityLightsSecondaryRetention"
+                            class="range-label"
+                            for="dayNightHistoricalCityLightsSecondaryRetention"
+                          >
+                            Secondary City Retention
+                          </label>
+                          <span id="dayNightHistoricalCityLightsSecondaryRetentionValue" class="range-value">55%</span>
+                        </div>
+                        <input
+                          id="dayNightHistoricalCityLightsSecondaryRetention"
+                          type="range"
+                          min="0"
+                          max="100"
+                          value="55"
+                          class="range-input"
+                        />
+                      </div>
                       <div>
                         <div class="range-row">
                           <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity">Shadow Opacity</label>
@@ -1890,20 +1931,6 @@
                       <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Export">Export</button>
                     </div>
 
-                    <div id="scenarioGuidePopover" class="scenario-guide-popover sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="scenarioGuideTitle">
-                      <h3 id="scenarioGuideTitle" class="sidebar-tool-title" data-i18n="Scenario Quick Start">Scenario Quick Start</h3>
-                      <p id="scenarioGuideSupportHint" class="sidebar-help-copy" data-i18n="Use this guide inside the support area so the shell stays quiet while the next step stays readable.">Use this guide inside the support area so the shell stays quiet while the next step stays readable.</p>
-                      <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
-                        <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
-                      </div>
-                      <ol class="scenario-guide-list mt-2">
-                        <li id="scenarioGuideStepApply" data-i18n="Apply Scenario">Apply Scenario</li>
-                        <li id="scenarioGuideStepSelect" data-i18n="Select a country in Inspector">Select a country in Inspector</li>
-                        <li id="scenarioGuideStepActive" data-i18n="Use an active owner for political actions">Use an active owner for political actions</li>
-                        <li id="scenarioGuideStepApplyActions" data-i18n="Use Activate or Scenario Actions for ownership changes">Use Activate or Scenario Actions for ownership changes</li>
-                      </ol>
-                    </div>
-
                     <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
                       <h3 id="lblReferenceImage" class="sidebar-tool-title" data-i18n="Reference Image">Reference Image</h3>
                       <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Keep a working reference visible while you line up opacity, scale, and offsets.">Keep a working reference visible while you line up opacity, scale, and offsets.</p>
@@ -2118,6 +2145,32 @@
     <div id="startupReadonlyBanner" class="startup-readonly-banner hidden" role="status" aria-live="polite" aria-busy="false">
       <div class="startup-readonly-banner__eyebrow" data-i18n="Read-only startup">Read-only startup</div>
       <div id="startupReadonlyMessage" class="startup-readonly-banner__message" data-i18n="Detailed interactions are still loading. Pan and zoom remain available.">Detailed interactions are still loading. Pan and zoom remain available.</div>
+    </div>
+    <div id="scenarioGuideBackdrop" class="scenario-guide-backdrop hidden" aria-hidden="true"></div>
+    <div id="scenarioGuidePopover" class="scenario-guide-popover scenario-guide-modal sidebar-tool-panel hidden" role="dialog" aria-labelledby="scenarioGuideTitle" aria-hidden="true">
+      <div class="scenario-guide-modal-header">
+        <h3 id="scenarioGuideTitle" class="sidebar-tool-title" data-i18n="Scenario Quick Start">Scenario Quick Start</h3>
+        <button
+          id="scenarioGuideCloseBtn"
+          type="button"
+          class="scenario-guide-close-btn"
+          aria-label="Close scenario guide"
+          data-i18n="Close"
+          data-i18n-aria-label="Close scenario guide"
+        >
+          Close
+        </button>
+      </div>
+      <p id="scenarioGuideSupportHint" class="sidebar-help-copy" data-i18n="Use this guide inside the support area so the shell stays quiet while the next step stays readable.">Use this guide inside the support area so the shell stays quiet while the next step stays readable.</p>
+      <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
+        <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
+      </div>
+      <ol class="scenario-guide-list mt-2">
+        <li id="scenarioGuideStepApply" data-i18n="Apply Scenario">Apply Scenario</li>
+        <li id="scenarioGuideStepSelect" data-i18n="Select a country in Inspector">Select a country in Inspector</li>
+        <li id="scenarioGuideStepActive" data-i18n="Use an active owner for political actions">Use an active owner for political actions</li>
+        <li id="scenarioGuideStepApplyActions" data-i18n="Use Activate or Scenario Actions for ownership changes">Use Activate or Scenario Actions for ownership changes</li>
+      </ol>
     </div>
     <div id="bootOverlay" class="boot-overlay" role="status" aria-live="polite" aria-busy="true">
       <div class="boot-overlay__panel">
