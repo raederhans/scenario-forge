@@ -378,3 +378,11 @@
 ### 1. `flushPending` 立即执行路径不能先清空 pending 标记再判断要不要启动 refresh
 - 这次 `scheduleScenarioChunkRefresh()` 在 `resolvedDelayMs <= 0` 前先 `clearPendingScenarioChunkRefresh()`，会把 `executeScenarioChunkRefreshNow()` 需要的 pending reason 提前抹掉，结果异步 refresh 启动路径被误判成 `noop`。
 - 更稳的做法是：把“是否允许启动 refresh”的语义在进入 immediate execute 前就显式带进去，不要依赖已经被清掉的 runtime 字段再二次判断。
+
+### 40. Texture overlay 不能把纸张、线网、标签塞进同一个 render pass
+- Old Paper、Draft/Grid 线条、Graticule 标签的层级目标不同；如果共用一个 pass，修海洋覆盖时很容易顺手把城市点、机场、港口或边界一起压脏。
+- 更稳的最短路径是至少拆成 paper / line / label 三层，再按读图优先级排顺序。
+
+### 41. 只把无效控件设成 disabled 不够，写状态的 handler 也要同步加 guard
+- Clean 模式这种“控件存在但语义无效”的场景，若只禁 DOM，不禁 handler，脚本事件或测试 helper 仍会偷偷改 state。
+- UI 禁用和状态写保护必须同一轮收口，否则很容易出现“界面看起来没变，状态其实漂了”的假通过。

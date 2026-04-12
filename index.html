@@ -1072,14 +1072,57 @@
                         <label id="lblTextureGraticuleMinorStep" class="range-label" for="textureGraticuleMinorStep">Minor Step</label>
                         <span id="textureGraticuleMinorStepValue" class="range-value">15°</span>
                       </div>
-                      <input id="textureGraticuleMinorStep" type="range" min="5" max="45" step="5" value="15" class="range-input" />
+                      <input id="textureGraticuleMinorStep" type="range" min="1" max="45" step="1" value="15" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
                         <label id="lblTextureGraticuleLabelStep" class="range-label" for="textureGraticuleLabelStep">Label Step</label>
                         <span id="textureGraticuleLabelStepValue" class="range-value">60°</span>
                       </div>
-                      <input id="textureGraticuleLabelStep" type="range" min="30" max="180" step="15" value="60" class="range-input" />
+                      <input id="textureGraticuleLabelStep" type="range" min="10" max="180" step="5" value="60" class="range-input" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <label id="lblTextureGraticuleColor" class="range-label" for="textureGraticuleColor">Line Color</label>
+                      <input id="textureGraticuleColor" type="color" value="#475569" class="color-input" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <label id="lblTextureGraticuleLabelColor" class="range-label" for="textureGraticuleLabelColor">Label Color</label>
+                      <input id="textureGraticuleLabelColor" type="color" value="#334155" class="color-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleLabelSize" class="range-label" for="textureGraticuleLabelSize">Label Size</label>
+                        <span id="textureGraticuleLabelSizeValue" class="range-value">12px</span>
+                      </div>
+                      <input id="textureGraticuleLabelSize" type="range" min="9" max="24" step="1" value="12" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMajorWidth" class="range-label" for="textureGraticuleMajorWidth">Major Width</label>
+                        <span id="textureGraticuleMajorWidthValue" class="range-value">1.20</span>
+                      </div>
+                      <input id="textureGraticuleMajorWidth" type="range" min="0.2" max="4" step="0.05" value="1.2" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMinorWidth" class="range-label" for="textureGraticuleMinorWidth">Minor Width</label>
+                        <span id="textureGraticuleMinorWidthValue" class="range-value">0.70</span>
+                      </div>
+                      <input id="textureGraticuleMinorWidth" type="range" min="0.1" max="3" step="0.05" value="0.7" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMajorOpacity" class="range-label" for="textureGraticuleMajorOpacity">Major Opacity</label>
+                        <span id="textureGraticuleMajorOpacityValue" class="range-value">34%</span>
+                      </div>
+                      <input id="textureGraticuleMajorOpacity" type="range" min="0" max="100" step="1" value="34" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMinorOpacity" class="range-label" for="textureGraticuleMinorOpacity">Minor Opacity</label>
+                        <span id="textureGraticuleMinorOpacityValue" class="range-value">14%</span>
+                      </div>
+                      <input id="textureGraticuleMinorOpacity" type="range" min="0" max="100" step="1" value="14" class="range-input" />
                     </div>
                   </div>
                   <div id="textureDraftGridControls" class="space-y-2 hidden">
@@ -1117,6 +1160,39 @@
                         <span id="textureDraftRollValue" class="range-value">-18°</span>
                       </div>
                       <input id="textureDraftRoll" type="range" min="-180" max="180" step="1" value="-18" class="range-input" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <label id="lblTextureDraftColor" class="range-label" for="textureDraftColor">Line Color</label>
+                      <input id="textureDraftColor" type="color" value="#475569" class="color-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftWidth" class="range-label" for="textureDraftWidth">Line Width</label>
+                        <span id="textureDraftWidthValue" class="range-value">1.10</span>
+                      </div>
+                      <input id="textureDraftWidth" type="range" min="0.2" max="4" step="0.05" value="1.1" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftMajorOpacity" class="range-label" for="textureDraftMajorOpacity">Major Opacity</label>
+                        <span id="textureDraftMajorOpacityValue" class="range-value">28%</span>
+                      </div>
+                      <input id="textureDraftMajorOpacity" type="range" min="0" max="100" step="1" value="28" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftMinorOpacity" class="range-label" for="textureDraftMinorOpacity">Minor Opacity</label>
+                        <span id="textureDraftMinorOpacityValue" class="range-value">14%</span>
+                      </div>
+                      <input id="textureDraftMinorOpacity" type="range" min="0" max="100" step="1" value="14" class="range-input" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <label id="lblTextureDraftDash" class="range-label" for="textureDraftDash">Dash Style</label>
+                      <select id="textureDraftDash" class="select-input">
+                        <option id="optTextureDraftDashDashed" value="dashed" selected>Dashed</option>
+                        <option id="optTextureDraftDashDotted" value="dotted">Dotted</option>
+                        <option id="optTextureDraftDashSolid" value="solid">Solid</option>
+                      </select>
                     </div>
                   </div>
                 </div>

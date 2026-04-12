@@ -876,14 +876,14 @@ function createDefaultTextureStyleConfig() {
     graticule: {
       majorStep: 30,
       minorStep: 15,
-      labelStep: 60,
-      majorWidth: 1.0,
-      minorWidth: 0.55,
-      majorOpacity: 0.24,
-      minorOpacity: 0.10,
-      color: "#64748b",
-      labelColor: "#475569",
-      labelSize: 11,
+      labelStep: 90,
+      majorWidth: 1.2,
+      minorWidth: 0.7,
+      majorOpacity: 0.34,
+      minorOpacity: 0.14,
+      color: "#475569",
+      labelColor: "#334155",
+      labelSize: 12,
     },
     draftGrid: {
       majorStep: 24,
@@ -891,13 +891,22 @@ function createDefaultTextureStyleConfig() {
       lonOffset: 0,
       latOffset: 12,
       roll: -18,
-      width: 0.85,
-      majorOpacity: 0.18,
-      minorOpacity: 0.08,
-      color: "#5c677d",
+      width: 1.1,
+      majorOpacity: 0.28,
+      minorOpacity: 0.14,
+      color: "#475569",
       dash: "dashed",
     },
   };
+}
+
+function normalizeTextureHexColor(value, fallback) {
+  const candidate = String(value || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
+  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
+  }
+  return String(fallback || "#475569").trim().toLowerCase();
 }
 
 function normalizeTextureStyleConfig(rawConfig) {
@@ -908,7 +917,7 @@ function normalizeTextureStyleConfig(rawConfig) {
   const rawDraftGrid = raw.draftGrid && typeof raw.draftGrid === "object" ? raw.draftGrid : {};
 
   const majorStep = clamp(Math.round(toFiniteNumber(rawGraticule.majorStep, defaults.graticule.majorStep)), 10, 90);
-  const minorStep = clamp(Math.round(toFiniteNumber(rawGraticule.minorStep, defaults.graticule.minorStep)), 5, majorStep);
+  const minorStep = clamp(Math.round(toFiniteNumber(rawGraticule.minorStep, defaults.graticule.minorStep)), 1, majorStep);
   const draftMajorStep = clamp(
     Math.round(toFiniteNumber(rawDraftGrid.majorStep, defaults.draftGrid.majorStep)),
     12,
@@ -946,8 +955,8 @@ function normalizeTextureStyleConfig(rawConfig) {
       minorWidth: clamp(toFiniteNumber(rawGraticule.minorWidth, defaults.graticule.minorWidth), 0.1, 3),
       majorOpacity: clamp(toFiniteNumber(rawGraticule.majorOpacity, defaults.graticule.majorOpacity), 0, 1),
       minorOpacity: clamp(toFiniteNumber(rawGraticule.minorOpacity, defaults.graticule.minorOpacity), 0, 1),
-      color: String(rawGraticule.color || defaults.graticule.color).trim() || defaults.graticule.color,
-      labelColor: String(rawGraticule.labelColor || defaults.graticule.labelColor).trim() || defaults.graticule.labelColor,
+      color: normalizeTextureHexColor(rawGraticule.color, defaults.graticule.color),
+      labelColor: normalizeTextureHexColor(rawGraticule.labelColor, defaults.graticule.labelColor),
       labelSize: clamp(Math.round(toFiniteNumber(rawGraticule.labelSize, defaults.graticule.labelSize)), 9, 24),
     },
     draftGrid: {
@@ -959,7 +968,7 @@ function normalizeTextureStyleConfig(rawConfig) {
       width: clamp(toFiniteNumber(rawDraftGrid.width, defaults.draftGrid.width), 0.2, 4),
       majorOpacity: clamp(toFiniteNumber(rawDraftGrid.majorOpacity, defaults.draftGrid.majorOpacity), 0, 1),
       minorOpacity: clamp(toFiniteNumber(rawDraftGrid.minorOpacity, defaults.draftGrid.minorOpacity), 0, 1),
-      color: String(rawDraftGrid.color || defaults.draftGrid.color).trim() || defaults.draftGrid.color,
+      color: normalizeTextureHexColor(rawDraftGrid.color, defaults.draftGrid.color),
       dash: dash === "solid" || dash === "dotted" ? dash : defaults.draftGrid.dash,
     },
   };

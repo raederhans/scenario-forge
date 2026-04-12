@@ -5,6 +5,7 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeTextureMode,
   normalizeTextureStyleConfig,
   normalizeUrbanStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
@@ -513,24 +514,42 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = ["background", "physicalBase", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+const RENDER_PASS_NAMES = [
+  "background",
+  "physicalBase",
+  "political",
+  "contextBase",
+  "contextScenario",
+  "effects",
+  "lineEffects",
+  "contextMarkers",
+  "dayNight",
+  "borders",
+  "textureLabels",
+  "labels",
+];
 const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "background",
   "physicalBase",
   "political",
-  "effects",
   "contextBase",
   "contextScenario",
+  "effects",
+  "lineEffects",
+  "contextMarkers",
   "dayNight",
 ]);
 const TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
-  "effects",
   "contextBase",
   "contextScenario",
+  "effects",
+  "lineEffects",
+  "contextMarkers",
   "dayNight",
+  "textureLabels",
   "labels",
 ];
 const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
@@ -1039,7 +1058,7 @@ function clearRenderPassReferenceTransforms(passNames = null) {
 function invalidateOceanVisualState(reason = "ocean-visual") {
   cancelExactAfterSettleRefresh({ clearDefer: true });
   invalidateRenderPasses(["background", "physicalBase", "political", "contextBase", "contextScenario"], reason);
-  clearRenderPassReferenceTransforms(["background", "physicalBase", "political", "contextBase", "contextScenario", "effects", "dayNight"]);
+  clearRenderPassReferenceTransforms(["background", "physicalBase", "political", "contextBase", "contextScenario", "effects", "lineEffects", "contextMarkers", "dayNight", "textureLabels"]);
 }
 
 function invalidateOceanBackgroundVisualState(reason = "ocean-background") {
@@ -1655,6 +1674,13 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       stableJson(normalizeTextureStyleConfig(state.styleConfig?.texture || {})),
     ].join("::");
   }
+  if (passName === "lineEffects") {
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      stableJson(normalizeTextureStyleConfig(state.styleConfig?.texture || {})),
+    ].join("::");
+  }
   if (passName === "contextBase") {
     const maskInfo = getPhysicalLandMaskInfo();
     const zoomBucket = getContextBaseZoomBucketId(transform?.k || state.zoomTransform?.k || 1);
@@ -1664,19 +1690,13 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
       `bucket:${zoomBucket}`,
       state.showPhysical ? "physical:on" : "physical:off",
-      state.showCityPoints ? "cities:on" : "cities:off",
-      state.showAirports ? "airports:on" : "airports:off",
-      state.showPorts ? "ports:on" : "ports:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
-      `cities:${Number(state.cityLayerRevision || 0)}`,
-      `colors:${Number(state.colorRevision || 0)}`,
       `context:${Number(state.contextLayerRevision || 0)}`,
       `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(state.renderProfile || "auto"),
       stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
-      stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
       stableJson(normalizeUrbanStyleConfig(state.styleConfig?.urban || {})),
       stableJson(state.styleConfig?.rivers || {}),
     ];
@@ -1690,6 +1710,21 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
     return [
       transformSignature,
       ...baseSignatureParts,
+    ].join("::");
+  }
+  if (passName === "contextMarkers") {
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      state.activeScenarioId || "",
+      state.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
+      state.showCityPoints ? "cities:on" : "cities:off",
+      state.showAirports ? "airports:on" : "airports:off",
+      state.showPorts ? "ports:on" : "ports:off",
+      `cities:${Number(state.cityLayerRevision || 0)}`,
+      `colors:${Number(state.colorRevision || 0)}`,
+      `context:${Number(state.contextLayerRevision || 0)}`,
+      stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
     ].join("::");
   }
   if (passName === "contextScenario") {
@@ -1707,6 +1742,13 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       `ocean-fill:${getOceanBaseFillColor()}`,
       `lake-fill:${getLakeBaseFillColor()}`,
       `lake-style:${stableJson(getLakeStyleConfig())}`,
+    ].join("::");
+  }
+  if (passName === "textureLabels") {
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      stableJson(normalizeTextureStyleConfig(state.styleConfig?.texture || {})),
     ].join("::");
   }
   if (passName === "dayNight") {
@@ -2760,8 +2802,11 @@ function getPassCounterNames(passName) {
   if (passName === "effects") return ["effectsPassRenders"];
   if (passName === "contextBase") return ["contextPassRenders", "contextBasePassRenders"];
   if (passName === "contextScenario") return ["contextPassRenders", "contextScenarioPassRenders"];
+  if (passName === "lineEffects") return ["effectsPassRenders"];
+  if (passName === "contextMarkers") return ["contextPassRenders", "contextBasePassRenders"];
   if (passName === "dayNight") return ["dayNightPassRenders"];
   if (passName === "borders") return ["borderPassRenders"];
+  if (passName === "textureLabels") return ["labelPassRenders"];
   if (passName === "labels") return ["labelPassRenders"];
   return [];
 }
@@ -2986,7 +3031,18 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
 function shouldStartExactAfterSettleFastPath() {
   if (!shouldEnableContextBaseTransformReuse()) return false;
   if (state.deferContextBasePass) return false;
-  const requiredPasses = ["background", "physicalBase", "political", "effects", "contextBase", "contextScenario", "dayNight"];
+  const requiredPasses = [
+    "background",
+    "physicalBase",
+    "political",
+    "contextBase",
+    "contextScenario",
+    "effects",
+    "lineEffects",
+    "contextMarkers",
+    "dayNight",
+    "textureLabels",
+  ];
   return requiredPasses.every((passName) => {
     const cache = getRenderPassCacheState();
     return !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName);
@@ -14648,34 +14704,53 @@ function buildTextureGraticuleGeometry(cacheKey, {
 
 function getTextureLineAnchor(line) {
   if (!projection || !Array.isArray(line?.geometry?.coordinates)) return null;
-  let best = null;
+  let topMost = null;
+  let bottomMost = null;
+  let leftMost = null;
+  let rightMost = null;
   line.geometry.coordinates.forEach((coordinate) => {
     const projected = projection(coordinate);
     if (!projected || projected.length < 2 || !projected.every(Number.isFinite)) return;
     const [x, y] = projected;
     if (line.kind === "meridian") {
-      if (!best || y < best.y) {
-        best = { x, y, align: "center", baseline: "top", offsetX: 0, offsetY: 8 };
-      }
-    } else if (!best || x < best.x) {
-      best = { x, y, align: "left", baseline: "middle", offsetX: 8, offsetY: 0 };
+      if (!topMost || y < topMost.y) topMost = { x, y };
+      if (!bottomMost || y > bottomMost.y) bottomMost = { x, y };
+    } else {
+      if (!leftMost || x < leftMost.x) leftMost = { x, y };
+      if (!rightMost || x > rightMost.x) rightMost = { x, y };
     }
   });
-  return best;
+  if (line.kind === "meridian") {
+    const shouldUseBottomAnchor = Number(line.value) < 0;
+    const anchor = shouldUseBottomAnchor ? (bottomMost || topMost) : (topMost || bottomMost);
+    if (!anchor) return null;
+    return shouldUseBottomAnchor
+      ? { ...anchor, align: "center", baseline: "bottom", offsetX: 0, offsetY: -8 }
+      : { ...anchor, align: "center", baseline: "top", offsetX: 0, offsetY: 8 };
+  }
+  const shouldUseRightAnchor = Number(line.value) >= 0;
+  const anchor = shouldUseRightAnchor ? (rightMost || leftMost) : (leftMost || rightMost);
+  if (!anchor) return null;
+  return shouldUseRightAnchor
+    ? { ...anchor, align: "right", baseline: "middle", offsetX: -8, offsetY: 0 }
+    : { ...anchor, align: "left", baseline: "middle", offsetX: 8, offsetY: 0 };
 }
 
 function drawTextureLabels(lines, config, k, opacity) {
   if (!context || !Array.isArray(lines) || !lines.length) return;
   const occupied = [];
-  const minDistance = 34 / Math.max(0.8, k);
-  const fontSize = clamp((Number(config.labelSize) || 11) / Math.max(0.75, k), 8, 18);
+  const minDistance = 56 / Math.max(0.8, k);
+  const fontSize = clamp((Number(config.labelSize) || 12) / Math.max(0.75, k), 9, 20);
+  const labelOpacity = clamp(opacity, 0, 0.92);
 
   context.save();
+  context.lineJoin = "round";
+  context.miterLimit = 2;
+  context.strokeStyle = "rgba(248, 250, 252, 0.92)";
+  context.lineWidth = 3.2 / Math.max(0.85, k);
   context.fillStyle = getSafeCanvasColor(config.labelColor, "#475569");
-  context.globalAlpha = clamp(opacity, 0, 1);
+  context.globalAlpha = labelOpacity;
   context.font = `${fontSize}px ${TEXTURE_LABEL_SERIF_STACK}`;
-  context.shadowColor = "rgba(255,255,255,0.8)";
-  context.shadowBlur = 5 / Math.max(0.85, k);
 
   lines.forEach((line) => {
     if (!line?.label) return;
@@ -14688,6 +14763,7 @@ function drawTextureLabels(lines, config, k, opacity) {
     occupied.push({ x, y });
     context.textAlign = anchor.align;
     context.textBaseline = anchor.baseline;
+    context.strokeText(line.label, x, y);
     context.fillText(line.label, x, y);
   });
 
@@ -14786,9 +14862,7 @@ function drawProjectedTextureLines(lines, {
   context.restore();
 }
 
-function drawGraticuleTexture(k, { interactive = false } = {}) {
-  const texture = getTextureStyleConfig();
-  const config = texture.graticule || {};
+function getGraticuleTextureGeometry(config) {
   const cacheKey = [
     "graticule",
     config.majorStep,
@@ -14797,12 +14871,18 @@ function drawGraticuleTexture(k, { interactive = false } = {}) {
     config.majorWidth,
     config.minorWidth,
   ].join("|");
-  const geometry = buildTextureGraticuleGeometry(cacheKey, {
+  return buildTextureGraticuleGeometry(cacheKey, {
     majorStep: config.majorStep,
     minorStep: config.minorStep,
     labelStep: config.labelStep,
     includeLabels: true,
   });
+}
+
+function drawGraticuleTextureLines(k, { interactive = false } = {}) {
+  const texture = getTextureStyleConfig();
+  const config = texture.graticule || {};
+  const geometry = getGraticuleTextureGeometry(config);
 
   withTextureSphereClip(texture.sphereClip, () => {
     drawProjectedTextureLines(geometry.minorLines, {
@@ -14817,11 +14897,19 @@ function drawGraticuleTexture(k, { interactive = false } = {}) {
       opacity: texture.opacity * config.majorOpacity,
       k,
     });
+  });
+}
+
+function drawGraticuleTextureLabels(k) {
+  const texture = getTextureStyleConfig();
+  const config = texture.graticule || {};
+  const geometry = getGraticuleTextureGeometry(config);
+  withTextureSphereClip(texture.sphereClip, () => {
     drawTextureLabels(
       geometry.majorLines,
       config,
       k,
-      texture.opacity * clamp(config.majorOpacity * 1.18, 0, 0.6)
+      texture.opacity * clamp((config.majorOpacity * 1.25) + 0.08, 0, 0.78)
     );
   });
 }
@@ -14880,7 +14968,10 @@ function drawTextureLayer(k, { interactive = false } = {}) {
     return;
   }
   if (mode === "graticule") {
-    drawGraticuleTexture(k, { interactive });
+    drawGraticuleTextureLines(k, { interactive });
+    if (!interactive) {
+      drawGraticuleTextureLabels(k);
+    }
     return;
   }
   if (mode === "draft_grid") {
@@ -15914,7 +16005,32 @@ function drawScenarioRegionOverlaysPass(k) {
 }
 
 function drawEffectsPass(k, { interactive = false } = {}) {
-  drawTextureLayer(k, { interactive });
+  const texture = getTextureStyleConfig();
+  if (normalizeTextureMode(texture.mode) !== "paper") return;
+  if (!isBootInteractionReady()) return;
+  drawOldPaperTexture(k, { interactive });
+}
+
+function drawLineEffectsPass(k, { interactive = false } = {}) {
+  const texture = getTextureStyleConfig();
+  const mode = String(texture.mode || "none").trim().toLowerCase();
+  if (!isBootInteractionReady()) return;
+  if (mode === "graticule") {
+    drawGraticuleTextureLines(k, { interactive });
+    return;
+  }
+  if (mode === "draft_grid") {
+    drawDraftGridTexture(k, { interactive });
+  }
+}
+
+function drawTextureLabelEffectsPass(k) {
+  const texture = getTextureStyleConfig();
+  const mode = String(texture.mode || "none").trim().toLowerCase();
+  if (!isBootInteractionReady()) return;
+  if (mode === "graticule") {
+    drawGraticuleTextureLabels(k);
+  }
 }
 
 function drawContextBasePass(k, { interactive = false } = {}) {
@@ -15942,12 +16058,6 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         skipped: true,
         reason: "staged-apply",
       });
-      collectContextMetric("drawCityPointsLayer", 0, {
-        featureCount: getFeatureCollectionFeatureCount(getEffectiveCityCollection()),
-        interactive: false,
-        skipped: true,
-        reason: "staged-apply",
-      });
       collectContextMetric("drawAirportsLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(state.airportsData),
         interactive: false,
@@ -15970,6 +16080,42 @@ function drawContextBasePass(k, { interactive = false } = {}) {
       drawPhysicalContourLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });
+    }
+  } finally {
+    endContextMetricSession();
+  }
+  recordRenderPerfMetric("drawContextBasePass", nowMs() - startedAt, {
+    interactive: !!interactive,
+    deferred,
+  });
+}
+
+function drawContextMarkersPass(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  let deferred = false;
+  beginContextMetricSession();
+  try {
+    if (state.deferContextBasePass && !interactive) {
+      deferred = true;
+      collectContextMetric("drawCityPointsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(getEffectiveCityCollection()),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawAirportsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.airportsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawPortsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.portsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+    } else {
       drawAirportsLayer(k, { interactive });
       drawPortsLayer(k, { interactive });
       drawCityPointsLayer(k, { interactive });
@@ -15977,7 +16123,7 @@ function drawContextBasePass(k, { interactive = false } = {}) {
   } finally {
     endContextMetricSession();
   }
-  recordRenderPerfMetric("drawContextBasePass", nowMs() - startedAt, {
+  recordRenderPerfMetric("drawContextMarkersPass", nowMs() - startedAt, {
     interactive: !!interactive,
     deferred,
   });
@@ -16093,11 +16239,14 @@ function ensureIdleRenderPasses(timings) {
     ["background", (k) => drawBackgroundPass(k)],
     ["physicalBase", (k) => drawPhysicalBasePass(k)],
     ["political", (k) => drawPoliticalPass(k)],
-    ["effects", (k) => drawEffectsPass(k)],
     ["contextBase", (k) => drawContextBasePass(k)],
     ["contextScenario", (k) => drawContextScenarioPass(k)],
+    ["effects", (k) => drawEffectsPass(k)],
+    ["lineEffects", (k) => drawLineEffectsPass(k)],
+    ["contextMarkers", (k) => drawContextMarkersPass(k)],
     ["dayNight", (k) => drawDayNightPass(k)],
     ["borders", (k) => drawBordersPass(k)],
+    ["textureLabels", (k) => drawTextureLabelEffectsPass(k)],
     ["labels", (k) => drawLabelsPass(k)],
   ];
   passDefinitions.forEach(([passName, drawFn]) => {
@@ -16441,7 +16590,8 @@ function scheduleStagedContextBaseWarmup(startedAt, token) {
       return;
     }
     state.deferContextBasePass = false;
-    invalidateRenderPasses("contextBase", "staged-context-base");
+    invalidateRenderPasses(["contextBase", "contextMarkers"], "staged-context-base");
+    clearRenderPassReferenceTransforms(["contextBase", "contextMarkers"]);
     render();
     recordRenderPerfMetric("setMapDataContextBaseReady", nowMs() - startedAt, {
       staged: true,

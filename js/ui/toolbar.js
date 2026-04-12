@@ -1710,12 +1710,24 @@ function initToolbar({ render } = {}) {
   const textureGraticuleMajorStep = document.getElementById("textureGraticuleMajorStep");
   const textureGraticuleMinorStep = document.getElementById("textureGraticuleMinorStep");
   const textureGraticuleLabelStep = document.getElementById("textureGraticuleLabelStep");
+  const textureGraticuleColor = document.getElementById("textureGraticuleColor");
+  const textureGraticuleLabelColor = document.getElementById("textureGraticuleLabelColor");
+  const textureGraticuleLabelSize = document.getElementById("textureGraticuleLabelSize");
+  const textureGraticuleMajorWidth = document.getElementById("textureGraticuleMajorWidth");
+  const textureGraticuleMinorWidth = document.getElementById("textureGraticuleMinorWidth");
+  const textureGraticuleMajorOpacity = document.getElementById("textureGraticuleMajorOpacity");
+  const textureGraticuleMinorOpacity = document.getElementById("textureGraticuleMinorOpacity");
   const textureDraftGridControls = document.getElementById("textureDraftGridControls");
   const textureDraftMajorStep = document.getElementById("textureDraftMajorStep");
   const textureDraftMinorStep = document.getElementById("textureDraftMinorStep");
   const textureDraftLonOffset = document.getElementById("textureDraftLonOffset");
   const textureDraftLatOffset = document.getElementById("textureDraftLatOffset");
   const textureDraftRoll = document.getElementById("textureDraftRoll");
+  const textureDraftColor = document.getElementById("textureDraftColor");
+  const textureDraftWidth = document.getElementById("textureDraftWidth");
+  const textureDraftMajorOpacity = document.getElementById("textureDraftMajorOpacity");
+  const textureDraftMinorOpacity = document.getElementById("textureDraftMinorOpacity");
+  const textureDraftDash = document.getElementById("textureDraftDash");
   const dayNightEnabled = document.getElementById("dayNightEnabled");
   const dayNightModeManualBtn = document.getElementById("dayNightModeManualBtn");
   const dayNightModeUtcBtn = document.getElementById("dayNightModeUtcBtn");
@@ -2015,11 +2027,19 @@ function initToolbar({ render } = {}) {
   const textureGraticuleMajorStepValue = document.getElementById("textureGraticuleMajorStepValue");
   const textureGraticuleMinorStepValue = document.getElementById("textureGraticuleMinorStepValue");
   const textureGraticuleLabelStepValue = document.getElementById("textureGraticuleLabelStepValue");
+  const textureGraticuleLabelSizeValue = document.getElementById("textureGraticuleLabelSizeValue");
+  const textureGraticuleMajorWidthValue = document.getElementById("textureGraticuleMajorWidthValue");
+  const textureGraticuleMinorWidthValue = document.getElementById("textureGraticuleMinorWidthValue");
+  const textureGraticuleMajorOpacityValue = document.getElementById("textureGraticuleMajorOpacityValue");
+  const textureGraticuleMinorOpacityValue = document.getElementById("textureGraticuleMinorOpacityValue");
   const textureDraftMajorStepValue = document.getElementById("textureDraftMajorStepValue");
   const textureDraftMinorStepValue = document.getElementById("textureDraftMinorStepValue");
   const textureDraftLonOffsetValue = document.getElementById("textureDraftLonOffsetValue");
   const textureDraftLatOffsetValue = document.getElementById("textureDraftLatOffsetValue");
   const textureDraftRollValue = document.getElementById("textureDraftRollValue");
+  const textureDraftWidthValue = document.getElementById("textureDraftWidthValue");
+  const textureDraftMajorOpacityValue = document.getElementById("textureDraftMajorOpacityValue");
+  const textureDraftMinorOpacityValue = document.getElementById("textureDraftMinorOpacityValue");
   const dayNightManualTimeValue = document.getElementById("dayNightManualTimeValue");
   const dayNightCityLightsIntensityValue = document.getElementById("dayNightCityLightsIntensityValue");
   const dayNightCityLightsTextureOpacityValue = document.getElementById("dayNightCityLightsTextureOpacityValue");
@@ -4961,6 +4981,9 @@ function initToolbar({ render } = {}) {
     "styleConfig.texture.graticule.majorStep",
     "styleConfig.texture.graticule.minorStep",
     "styleConfig.texture.graticule.labelStep",
+    "styleConfig.texture.graticule.color",
+    "styleConfig.texture.graticule.labelColor",
+    "styleConfig.texture.graticule.labelSize",
     "styleConfig.texture.graticule.majorWidth",
     "styleConfig.texture.graticule.minorWidth",
     "styleConfig.texture.graticule.majorOpacity",
@@ -4970,6 +4993,7 @@ function initToolbar({ render } = {}) {
     "styleConfig.texture.draftGrid.lonOffset",
     "styleConfig.texture.draftGrid.latOffset",
     "styleConfig.texture.draftGrid.roll",
+    "styleConfig.texture.draftGrid.color",
     "styleConfig.texture.draftGrid.width",
     "styleConfig.texture.draftGrid.majorOpacity",
     "styleConfig.texture.draftGrid.minorOpacity",
@@ -5163,8 +5187,14 @@ function initToolbar({ render } = {}) {
   const renderTextureUI = () => {
     const texture = syncTextureConfig();
     const mode = normalizeTextureMode(texture.mode);
+    const degreesLabel = "\u00B0";
     if (textureSelect) textureSelect.value = mode;
-    if (textureOpacity) textureOpacity.value = String(Math.round(texture.opacity * 100));
+    const textureOpacityDisabled = mode === "none";
+    if (textureOpacity) {
+      textureOpacity.value = String(Math.round(texture.opacity * 100));
+      textureOpacity.disabled = textureOpacityDisabled;
+      textureOpacity.setAttribute("aria-disabled", textureOpacityDisabled ? "true" : "false");
+    }
     updateTextureValueLabel(textureOpacityValue, `${Math.round(texture.opacity * 100)}%`);
 
     if (texturePaperScale) texturePaperScale.value = String(Math.round(texture.paper.scale * 100));
@@ -5177,22 +5207,55 @@ function initToolbar({ render } = {}) {
     updateTextureValueLabel(texturePaperWearValue, `${Math.round(texture.paper.wear * 100)}%`);
 
     if (textureGraticuleMajorStep) textureGraticuleMajorStep.value = String(texture.graticule.majorStep);
-    updateTextureValueLabel(textureGraticuleMajorStepValue, `${Math.round(texture.graticule.majorStep)}°`);
-    if (textureGraticuleMinorStep) textureGraticuleMinorStep.value = String(texture.graticule.minorStep);
-    updateTextureValueLabel(textureGraticuleMinorStepValue, `${Math.round(texture.graticule.minorStep)}°`);
-    if (textureGraticuleLabelStep) textureGraticuleLabelStep.value = String(texture.graticule.labelStep);
-    updateTextureValueLabel(textureGraticuleLabelStepValue, `${Math.round(texture.graticule.labelStep)}°`);
+    updateTextureValueLabel(textureGraticuleMajorStepValue, `${Math.round(texture.graticule.majorStep)}${degreesLabel}`);
+    if (textureGraticuleMinorStep) {
+      textureGraticuleMinorStep.min = "1";
+      textureGraticuleMinorStep.max = String(texture.graticule.majorStep);
+      textureGraticuleMinorStep.step = "1";
+      textureGraticuleMinorStep.value = String(texture.graticule.minorStep);
+    }
+    updateTextureValueLabel(textureGraticuleMinorStepValue, `${Math.round(texture.graticule.minorStep)}${degreesLabel}`);
+    if (textureGraticuleLabelStep) {
+      textureGraticuleLabelStep.min = String(texture.graticule.majorStep);
+      textureGraticuleLabelStep.max = "180";
+      textureGraticuleLabelStep.step = "5";
+      textureGraticuleLabelStep.value = String(texture.graticule.labelStep);
+    }
+    updateTextureValueLabel(textureGraticuleLabelStepValue, `${Math.round(texture.graticule.labelStep)}${degreesLabel}`);
+    if (textureGraticuleColor) textureGraticuleColor.value = texture.graticule.color;
+    if (textureGraticuleLabelColor) textureGraticuleLabelColor.value = texture.graticule.labelColor;
+    if (textureGraticuleLabelSize) textureGraticuleLabelSize.value = String(texture.graticule.labelSize);
+    updateTextureValueLabel(textureGraticuleLabelSizeValue, `${Math.round(texture.graticule.labelSize)}px`);
+    if (textureGraticuleMajorWidth) textureGraticuleMajorWidth.value = String(texture.graticule.majorWidth);
+    updateTextureValueLabel(textureGraticuleMajorWidthValue, Number(texture.graticule.majorWidth).toFixed(2));
+    if (textureGraticuleMinorWidth) textureGraticuleMinorWidth.value = String(texture.graticule.minorWidth);
+    updateTextureValueLabel(textureGraticuleMinorWidthValue, Number(texture.graticule.minorWidth).toFixed(2));
+    if (textureGraticuleMajorOpacity) textureGraticuleMajorOpacity.value = String(Math.round(texture.graticule.majorOpacity * 100));
+    updateTextureValueLabel(textureGraticuleMajorOpacityValue, `${Math.round(texture.graticule.majorOpacity * 100)}%`);
+    if (textureGraticuleMinorOpacity) textureGraticuleMinorOpacity.value = String(Math.round(texture.graticule.minorOpacity * 100));
+    updateTextureValueLabel(textureGraticuleMinorOpacityValue, `${Math.round(texture.graticule.minorOpacity * 100)}%`);
 
     if (textureDraftMajorStep) textureDraftMajorStep.value = String(texture.draftGrid.majorStep);
-    updateTextureValueLabel(textureDraftMajorStepValue, `${Math.round(texture.draftGrid.majorStep)}°`);
-    if (textureDraftMinorStep) textureDraftMinorStep.value = String(texture.draftGrid.minorStep);
-    updateTextureValueLabel(textureDraftMinorStepValue, `${Math.round(texture.draftGrid.minorStep)}°`);
+    updateTextureValueLabel(textureDraftMajorStepValue, `${Math.round(texture.draftGrid.majorStep)}${degreesLabel}`);
+    if (textureDraftMinorStep) {
+      textureDraftMinorStep.max = String(texture.draftGrid.majorStep);
+      textureDraftMinorStep.value = String(texture.draftGrid.minorStep);
+    }
+    updateTextureValueLabel(textureDraftMinorStepValue, `${Math.round(texture.draftGrid.minorStep)}${degreesLabel}`);
     if (textureDraftLonOffset) textureDraftLonOffset.value = String(Math.round(texture.draftGrid.lonOffset));
-    updateTextureValueLabel(textureDraftLonOffsetValue, `${Math.round(texture.draftGrid.lonOffset)}°`);
+    updateTextureValueLabel(textureDraftLonOffsetValue, `${Math.round(texture.draftGrid.lonOffset)}${degreesLabel}`);
     if (textureDraftLatOffset) textureDraftLatOffset.value = String(Math.round(texture.draftGrid.latOffset));
-    updateTextureValueLabel(textureDraftLatOffsetValue, `${Math.round(texture.draftGrid.latOffset)}°`);
+    updateTextureValueLabel(textureDraftLatOffsetValue, `${Math.round(texture.draftGrid.latOffset)}${degreesLabel}`);
     if (textureDraftRoll) textureDraftRoll.value = String(Math.round(texture.draftGrid.roll));
-    updateTextureValueLabel(textureDraftRollValue, `${Math.round(texture.draftGrid.roll)}°`);
+    updateTextureValueLabel(textureDraftRollValue, `${Math.round(texture.draftGrid.roll)}${degreesLabel}`);
+    if (textureDraftColor) textureDraftColor.value = texture.draftGrid.color;
+    if (textureDraftWidth) textureDraftWidth.value = String(texture.draftGrid.width);
+    updateTextureValueLabel(textureDraftWidthValue, Number(texture.draftGrid.width).toFixed(2));
+    if (textureDraftMajorOpacity) textureDraftMajorOpacity.value = String(Math.round(texture.draftGrid.majorOpacity * 100));
+    updateTextureValueLabel(textureDraftMajorOpacityValue, `${Math.round(texture.draftGrid.majorOpacity * 100)}%`);
+    if (textureDraftMinorOpacity) textureDraftMinorOpacity.value = String(Math.round(texture.draftGrid.minorOpacity * 100));
+    updateTextureValueLabel(textureDraftMinorOpacityValue, `${Math.round(texture.draftGrid.minorOpacity * 100)}%`);
+    if (textureDraftDash) textureDraftDash.value = texture.draftGrid.dash;
 
     renderTextureModePanels(mode);
   };
@@ -5307,6 +5370,17 @@ function initToolbar({ render } = {}) {
   };
 
   const bindTextureRange = (element, handler) => {
+    if (!element || element.dataset.bound === "true") return;
+    element.addEventListener("input", (event) => {
+      handler(event, false);
+    });
+    element.addEventListener("change", (event) => {
+      handler(event, true);
+    });
+    element.dataset.bound = "true";
+  };
+
+  const bindTextureColorInput = (element, handler) => {
     if (!element || element.dataset.bound === "true") return;
     element.addEventListener("input", (event) => {
       handler(event, false);
@@ -7118,6 +7192,9 @@ function initToolbar({ render } = {}) {
   bindTextureRange(textureOpacity, (event, commit) => {
     const value = Number(event.target.value);
     updateTextureStyle((texture) => {
+      if (normalizeTextureMode(texture.mode) === "none") {
+        return;
+      }
       texture.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
     }, { historyKind: "texture-opacity", commitHistory: commit });
   });
@@ -7154,7 +7231,7 @@ function initToolbar({ render } = {}) {
     const value = Number(event.target.value);
     updateTextureStyle((texture) => {
       texture.graticule.majorStep = clamp(Number.isFinite(value) ? value : 30, 10, 90);
-      texture.graticule.minorStep = Math.min(texture.graticule.minorStep, texture.graticule.majorStep);
+      texture.graticule.minorStep = clamp(texture.graticule.minorStep, 1, texture.graticule.majorStep);
       texture.graticule.labelStep = Math.max(texture.graticule.labelStep, texture.graticule.majorStep);
     }, { historyKind: "texture-graticule-major", commitHistory: commit });
   });
@@ -7162,7 +7239,7 @@ function initToolbar({ render } = {}) {
   bindTextureRange(textureGraticuleMinorStep, (event, commit) => {
     const value = Number(event.target.value);
     updateTextureStyle((texture) => {
-      texture.graticule.minorStep = clamp(Number.isFinite(value) ? value : 15, 5, texture.graticule.majorStep);
+      texture.graticule.minorStep = clamp(Number.isFinite(value) ? value : 15, 1, texture.graticule.majorStep);
     }, { historyKind: "texture-graticule-minor", commitHistory: commit });
   });
 
@@ -7171,6 +7248,53 @@ function initToolbar({ render } = {}) {
     updateTextureStyle((texture) => {
       texture.graticule.labelStep = clamp(Number.isFinite(value) ? value : 60, texture.graticule.majorStep, 180);
     }, { historyKind: "texture-graticule-label", commitHistory: commit });
+  });
+
+  bindTextureColorInput(textureGraticuleColor, (event, commit) => {
+    updateTextureStyle((texture) => {
+      texture.graticule.color = normalizeOceanFillColor(event.target.value);
+    }, { historyKind: "texture-graticule-color", commitHistory: commit });
+  });
+
+  bindTextureColorInput(textureGraticuleLabelColor, (event, commit) => {
+    updateTextureStyle((texture) => {
+      texture.graticule.labelColor = normalizeOceanFillColor(event.target.value);
+    }, { historyKind: "texture-graticule-label-color", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleLabelSize, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.labelSize = clamp(Math.round(Number.isFinite(value) ? value : 12), 9, 24);
+    }, { historyKind: "texture-graticule-label-size", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMajorWidth, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.majorWidth = clamp(Number.isFinite(value) ? value : 1.2, 0.2, 4);
+    }, { historyKind: "texture-graticule-major-width", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMinorWidth, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.minorWidth = clamp(Number.isFinite(value) ? value : 0.7, 0.1, 3);
+    }, { historyKind: "texture-graticule-minor-width", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMajorOpacity, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.majorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
+    }, { historyKind: "texture-graticule-major-opacity", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMinorOpacity, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.minorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.14, 0, 1);
+    }, { historyKind: "texture-graticule-minor-opacity", commitHistory: commit });
   });
 
   bindTextureRange(textureDraftMajorStep, (event, commit) => {
@@ -7208,6 +7332,42 @@ function initToolbar({ render } = {}) {
       texture.draftGrid.roll = clamp(Number.isFinite(value) ? value : -18, -180, 180);
     }, { historyKind: "texture-draft-roll", commitHistory: commit });
   });
+
+  bindTextureColorInput(textureDraftColor, (event, commit) => {
+    updateTextureStyle((texture) => {
+      texture.draftGrid.color = normalizeOceanFillColor(event.target.value);
+    }, { historyKind: "texture-draft-color", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftWidth, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
+    }, { historyKind: "texture-draft-width", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftMajorOpacity, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.majorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.28, 0, 1);
+    }, { historyKind: "texture-draft-major-opacity", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftMinorOpacity, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.minorOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.14, 0, 1);
+    }, { historyKind: "texture-draft-minor-opacity", commitHistory: commit });
+  });
+
+  if (textureDraftDash && !textureDraftDash.dataset.bound) {
+    textureDraftDash.addEventListener("change", (event) => {
+      updateTextureStyle((texture) => {
+        texture.draftGrid.dash = String(event.target.value || "dashed");
+      }, { historyKind: "texture-draft-dash", commitHistory: true });
+    });
+    textureDraftDash.dataset.bound = "true";
+  }
 
   if (dayNightEnabled && !dayNightEnabled.dataset.bound) {
     dayNightEnabled.addEventListener("change", (event) => {
