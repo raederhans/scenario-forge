@@ -680,69 +680,109 @@
 
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="city points capitals labels">
                     <summary id="lblCityPointsPanel" class="section-header">City Points</summary>
-                    <div class="mt-3">
+                    <div class="mt-3 city-points-panel">
                       <label class="toggle-label mt-2">
                         <input id="toggleCityPoints" type="checkbox" class="checkbox-input" checked />
                         <span id="lblCityPointsLayer">City Points</span>
                       </label>
-                      <div class="ml-5 space-y-2">
-                        <div>
-                          <div class="range-row">
-                            <span id="lblCityPointsStylePreset" class="range-label">Style Preset</span>
-                          </div>
-                          <p id="cityPointsThemeStatic" class="panel-hint mt-2">Classic Graphite</p>
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale">Marker Scale</label>
-                            <span id="cityPointsMarkerScaleValue" class="range-value">1.00x</span>
-                          </div>
-                          <input id="cityPointsMarkerScale" type="range" min="0.75" max="1.40" step="0.01" value="1.00" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity">Label Density</label>
-                          </div>
-                          <select id="cityPointsLabelDensity" class="select-input mt-2">
-                            <option id="optCityLabelDensitySparse" value="sparse">Sparse</option>
-                            <option id="optCityLabelDensityBalanced" value="balanced" selected>Balanced</option>
-                            <option id="optCityLabelDensityDense" value="dense">Dense</option>
-                          </select>
-                          <p id="cityPointsLabelDensityHint" class="panel-hint mt-2">Controls how many labels can appear per viewport at mid/high zoom.</p>
-                        </div>
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblCityPointsOpacity" class="range-label" for="cityPointsOpacity">Point Opacity</label>
-                          <span id="cityPointsOpacityValue" class="range-value">94%</span>
-                        </div>
-                        <input id="cityPointsOpacity" type="range" min="0" max="100" value="94" class="range-input" />
-                        <label class="toggle-label">
-                          <input id="cityPointLabelsEnabled" type="checkbox" class="checkbox-input" checked />
-                          <span id="lblCityPointLabelsEnabled">Show City Labels</span>
-                        </label>
-                        <label class="toggle-label">
-                          <input id="cityCapitalOverlayEnabled" type="checkbox" class="checkbox-input" checked />
-                          <span id="lblCityCapitalOverlayEnabled">Highlight Capitals</span>
-                        </label>
-                        <details class="appearance-mini-section">
-                          <summary id="lblCityPointsAdvanced" class="section-header">Advanced</summary>
-                          <div class="space-y-3 mt-3">
-                            <div class="flex items-center justify-between gap-3">
-                              <label id="lblCityPointsColor" class="range-label" for="cityPointsColor">Point Color</label>
-                              <input id="cityPointsColor" type="color" value="#2f343a" class="color-input" />
+                      <div class="city-points-panel-body ml-5">
+                        <div class="city-points-panel-stack">
+                          <section class="appearance-prop-group city-points-control-group">
+                            <div class="city-points-control-group-head">
+                              <h4 id="lblCityPointsPresetDensityGroup" class="city-points-control-group-title">Preset &amp; Density</h4>
+                              <p id="cityPointsPresetDensityGroupHint" class="city-points-control-group-hint">Choose a restrained map treatment first, then tune how many point markers and labels are allowed to surface.</p>
                             </div>
-                            <div class="flex items-center justify-between gap-3">
-                              <label id="lblCityPointsCapitalColor" class="range-label" for="cityPointsCapitalColor">Capital Highlight Color</label>
-                              <input id="cityPointsCapitalColor" type="color" value="#9f9072" class="color-input" />
-                            </div>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblCityPointsLabelSize" class="range-label" for="cityPointsLabelSize">Label Size</label>
-                                <span id="cityPointsLabelSizeValue" class="range-value">11px</span>
+                            <div class="space-y-3">
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsStylePreset" class="range-label" for="cityPointsTheme">Style Preset</label>
+                                </div>
+                                <select id="cityPointsTheme" class="select-input mt-2">
+                                  <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Classic Graphite</option>
+                                  <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Atlas Ink</option>
+                                  <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Parchment Sepia</option>
+                                  <option id="optCityPointsThemeSlateBlue" value="slate_blue">Slate Blue</option>
+                                  <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Outline</option>
+                                </select>
+                                <p id="cityPointsThemeHint" class="panel-hint mt-2">Five muted presets tuned for political maps, atlas views, and historical overlays.</p>
                               </div>
-                              <input id="cityPointsLabelSize" type="range" min="8" max="24" step="1" value="11" class="range-input" />
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale">Marker Scale</label>
+                                  <span id="cityPointsMarkerScaleValue" class="range-value">1.00x</span>
+                                </div>
+                                <input id="cityPointsMarkerScale" type="range" min="0.75" max="2.50" step="0.05" value="1.00" class="range-input" />
+                              </div>
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsMarkerDensity" class="range-label" for="cityPointsMarkerDensity">Point Density</label>
+                                  <span id="cityPointsMarkerDensityValue" class="range-value">1.00x</span>
+                                </div>
+                                <input id="cityPointsMarkerDensity" type="range" min="0.50" max="2.00" step="0.05" value="1.00" class="range-input" />
+                                <p id="cityPointsMarkerDensityHint" class="panel-hint mt-2">Controls how many point markers can appear across the current viewport before labels are considered.</p>
+                              </div>
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity">Label Density</label>
+                                </div>
+                                <select id="cityPointsLabelDensity" class="select-input mt-2">
+                                  <option id="optCityLabelDensitySparse" value="sparse">Sparse</option>
+                                  <option id="optCityLabelDensityBalanced" value="balanced" selected>Balanced</option>
+                                  <option id="optCityLabelDensityDense" value="dense">Dense</option>
+                                </select>
+                                <p id="cityPointsLabelDensityHint" class="panel-hint mt-2">Controls how many labels can appear per viewport once cities are already eligible to render.</p>
+                              </div>
                             </div>
-                          </div>
-                        </details>
+                          </section>
+
+                          <section class="appearance-prop-group city-points-control-group">
+                            <div class="city-points-control-group-head">
+                              <h4 id="lblCityPointsVisibilityGroup" class="city-points-control-group-title">Visibility</h4>
+                              <p id="cityPointsVisibilityGroupHint" class="city-points-control-group-hint">Keep the main visibility controls together so opacity, labels, and capital emphasis read as one layer.</p>
+                            </div>
+                            <div class="space-y-3">
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsOpacity" class="range-label" for="cityPointsOpacity">Point Opacity</label>
+                                  <span id="cityPointsOpacityValue" class="range-value">94%</span>
+                                </div>
+                                <input id="cityPointsOpacity" type="range" min="0" max="100" value="94" class="range-input" />
+                              </div>
+                              <div class="city-points-toggle-stack">
+                                <label class="toggle-label">
+                                  <input id="cityPointLabelsEnabled" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblCityPointLabelsEnabled">Show City Labels</span>
+                                </label>
+                                <label class="toggle-label">
+                                  <input id="cityCapitalOverlayEnabled" type="checkbox" class="checkbox-input" checked />
+                                  <span id="lblCityCapitalOverlayEnabled">Highlight Capitals</span>
+                                </label>
+                              </div>
+                            </div>
+                          </section>
+
+                          <details class="appearance-mini-section appearance-mini-section-subtle city-points-advanced">
+                            <summary id="lblCityPointsAdvanced" class="section-header">Advanced</summary>
+                            <div class="space-y-3 mt-3">
+                              <p id="cityPointsAdvancedHint" class="panel-hint city-points-advanced-hint">Fine-tune colors and label size once the preset and density feel close.</p>
+                              <div class="flex items-center justify-between gap-3">
+                                <label id="lblCityPointsColor" class="range-label" for="cityPointsColor">Point Color</label>
+                                <input id="cityPointsColor" type="color" value="#2f343a" class="color-input" />
+                              </div>
+                              <div class="flex items-center justify-between gap-3">
+                                <label id="lblCityPointsCapitalColor" class="range-label" for="cityPointsCapitalColor">Capital Highlight Color</label>
+                                <input id="cityPointsCapitalColor" type="color" value="#9f9072" class="color-input" />
+                              </div>
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsLabelSize" class="range-label" for="cityPointsLabelSize">Label Size</label>
+                                  <span id="cityPointsLabelSizeValue" class="range-value">11px</span>
+                                </div>
+                                <input id="cityPointsLabelSize" type="range" min="8" max="24" step="1" value="11" class="range-input" />
+                              </div>
+                            </div>
+                          </details>
+                        </div>
                       </div>
                     </div>
                   </details>

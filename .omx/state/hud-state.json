@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-12T02:56:14.869Z",
-  "last_progress_at": "2026-04-12T02:56:14.869Z",
-  "turn_count": 21,
-  "last_agent_output": "结论：我已经把这个回归修掉了。现在即使在 heavy scenario 的 staged apply 首屏阶段，`relief overlay` 也不会再因为 `contextBase` 被 defe"
+  "last_turn_at": "2026-04-12T03:57:42.300Z",
+  "last_progress_at": "2026-04-12T03:57:42.300Z",
+  "turn_count": 31,
+  "last_agent_output": "结论：这 3 个 review 问题我已经按最小路径修掉了，没有再扩大范围。\n\n这次修了：\n\n1. **单语场景改名不再被原始 `name_zh` 抢回**\n   - 文件：`js/core/map_"
 }

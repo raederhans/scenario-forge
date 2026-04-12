@@ -399,3 +399,11 @@
 - 这次 atlas “逻辑上被调用但视觉上几乎消失”的问题，单看源码归属断言抓不住；必须补一个最小像素差异检查，直接验证 atlas 打开后画面真的变了，而且没有强到盖死政治填色。
 ### 42. 把首屏关键视觉提示从 deferred pass 挪走时，要同时检查 staged apply 分支
 - 某层即使层级放对了，只要它被塞进 `deferContextBasePass` 这类 staged warmup 分支里，重场景首屏仍会稳定缺失。改 render pass 归属时，必须同步检查 defer 分支是否还保留该层的最小首帧绘制。
+
+### 64. 旧配置兼容迁移不要放在通用 normalize 里反复重放
+- 像 cityPoints.radius 这种只该在历史存档进入系统时迁移一次的字段，如果直接写进通用 normalize，就会在每次局部 patch / UI 更新时被反复折算，变成新的隐藏状态污染。
+- 更稳的做法是：显式参数优先；旧字段只在缺少新字段时参与一次性迁移，之后就从运行时结构里移除。
+
+### 65. canvas 标签重绘回归优先断言“重绘发生 + 目标标签状态”，不要把 fillText hook 当唯一证据
+- fillText/strokeText hook 适合抓“有没有画”，但对长链路 i18n redraw 很容易受视口、候选标签、重排影响而变脆。
+- 更稳的最短路径是：同时断言 drawLabelsPass.recordedAt 前进、当前语言切换成功、目标 feature 的最终显示标签已更新；文本 hook 只作为加分证据。

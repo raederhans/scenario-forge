@@ -1260,28 +1260,28 @@ input[type="checkbox"].checkbox-input {
   border-style: solid;
 }
 
-.appearance-subsection,
+details.appearance-subsection,
 .appearance-mini-section {
   overflow: hidden;
 }
 
-.appearance-subsection {
+section.appearance-subsection {
   padding: 0;
 }
 
-.appearance-subsection > summary,
+details.appearance-subsection > summary,
 .appearance-mini-section > summary {
   cursor: pointer;
   list-style: none;
   padding: 14px 12px;
 }
 
-.appearance-subsection > summary::-webkit-details-marker,
+details.appearance-subsection > summary::-webkit-details-marker,
 .appearance-mini-section > summary::-webkit-details-marker {
   display: none;
 }
 
-.appearance-subsection > summary::after,
+details.appearance-subsection > summary::after,
 .appearance-mini-section > summary::after {
   content: "▸";
   float: right;
@@ -1289,12 +1289,12 @@ input[type="checkbox"].checkbox-input {
   transition: transform var(--transition-fast);
 }
 
-.appearance-subsection[open] > summary::after,
+details.appearance-subsection[open] > summary::after,
 .appearance-mini-section[open] > summary::after {
   transform: rotate(90deg);
 }
 
-.appearance-subsection > *:not(summary),
+details.appearance-subsection > *:not(summary),
 .appearance-mini-section > *:not(summary) {
   padding: 0 12px 16px;
 }
@@ -1303,6 +1303,27 @@ input[type="checkbox"].checkbox-input {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.appearance-mini-section-subtle {
+  margin-top: 2px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.appearance-mini-section-subtle > summary {
+  padding: 10px 12px;
+}
+
+.appearance-mini-section-subtle > summary.section-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.appearance-mini-section-subtle > *:not(summary) {
+  padding: 0 12px 14px;
 }
 
 .appearance-filter-row {
@@ -1326,6 +1347,73 @@ input[type="checkbox"].checkbox-input {
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.3;
+}
+
+.panel-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.city-points-panel-body {
+  margin-top: 12px;
+}
+
+.city-points-panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.city-points-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.city-points-control-group-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.city-points-control-group-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.city-points-control-group-hint,
+.city-points-advanced-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.city-points-toggle-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.city-points-panel .range-label {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.city-points-panel .range-value {
+  font-size: 0.75rem;
+}
+
+.city-points-panel .select-input {
+  padding: 10px 12px;
+  font-size: 0.82rem;
 }
 
 .special-zone-style-section {

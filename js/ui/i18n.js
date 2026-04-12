@@ -11,6 +11,25 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
   "Transport guide": { zh: "Transport \u6307\u5357", en: "Transport guide" },
   "Scenario Quick Start": { zh: "\u573a\u666f\u5feb\u901f\u5f00\u59cb", en: "Scenario Quick Start" },
   "Close scenario guide": { zh: "\u5173\u95ed\u573a\u666f\u6307\u5357", en: "Close scenario guide" },
+  "Classic Graphite": { zh: "\u7ecf\u5178\u77f3\u58a8\u7070", en: "Classic Graphite" },
+  "Atlas Ink": { zh: "\u56fe\u96c6\u58a8\u84dd", en: "Atlas Ink" },
+  "Parchment Sepia": { zh: "\u7eb8\u9762\u68d5\u8910", en: "Parchment Sepia" },
+  "Slate Blue": { zh: "\u77f3\u677f\u84dd", en: "Slate Blue" },
+  "Ivory Outline": { zh: "\u8c61\u7259\u63cf\u8fb9", en: "Ivory Outline" },
+  "Preset & Density": { zh: "\u9884\u8bbe\u4e0e\u5bc6\u5ea6", en: "Preset & Density" },
+  "Choose a restrained map treatment first, then tune how many point markers and labels are allowed to surface.": {
+    zh: "\u5148\u9009\u62e9\u4e00\u5957\u66f4\u514b\u5236\u7684\u5730\u56fe\u98ce\u683c\uff0c\u518d\u8c03\u6574\u5141\u8bb8\u51fa\u73b0\u7684\u57ce\u5e02\u70b9\u548c\u6807\u7b7e\u6570\u91cf\u3002",
+    en: "Choose a restrained map treatment first, then tune how many point markers and labels are allowed to surface.",
+  },
+  "Visibility": { zh: "\u53ef\u89c1\u6027", en: "Visibility" },
+  "Keep the main visibility controls together so opacity, labels, and capital emphasis read as one layer.": {
+    zh: "\u628a\u4e3b\u8981\u7684\u53ef\u89c1\u6027\u63a7\u4ef6\u653e\u5728\u4e00\u8d77\uff0c\u8ba9\u900f\u660e\u5ea6\u3001\u6807\u7b7e\u548c\u9996\u90fd\u5f3a\u8c03\u8bfb\u8d77\u6765\u5c5e\u4e8e\u540c\u4e00\u5c42\u3002",
+    en: "Keep the main visibility controls together so opacity, labels, and capital emphasis read as one layer.",
+  },
+  "Fine-tune colors and label size once the preset and density feel close.": {
+    zh: "\u5f53\u9884\u8bbe\u548c\u5bc6\u5ea6\u5df2\u7ecf\u63a5\u8fd1\u7406\u60f3\u72b6\u6001\u65f6\uff0c\u518d\u8fdb\u4e00\u6b65\u5fae\u8c03\u989c\u8272\u548c\u6807\u7b7e\u5927\u5c0f\u3002",
+    en: "Fine-tune colors and label size once the preset and density feel close.",
+  },
   "Apply Scenario": { zh: "\u5e94\u7528\u573a\u666f", en: "Apply Scenario" },
   "Select a country in Inspector": { zh: "\u5728 Inspector \u4e2d\u9009\u62e9\u56fd\u5bb6", en: "Select a country in Inspector" },
   "Use an active owner for political actions": { zh: "\u4f7f\u7528\u5f53\u524d\u6fc0\u6d3b\u5f52\u5c5e\u6267\u884c\u653f\u6cbb\u64cd\u4f5c", en: "Use an active owner for political actions" },
@@ -475,19 +494,29 @@ function updateUIText() {
     ["lblUrbanMinArea", "Min Area (px)"],
     ["lblCityPointsPanel", "City Points"],
     ["lblCityPointsLayer", "City Points"],
+    ["lblCityPointsPresetDensityGroup", "Preset & Density"],
+    ["cityPointsPresetDensityGroupHint", "Choose a restrained map treatment first, then tune how many point markers and labels are allowed to surface."],
     ["lblCityPointsStylePreset", "Style Preset"],
-    ["optCityThemeClassicGraphite", "Classic Graphite"],
+    ["optCityPointsThemeClassicGraphite", "Classic Graphite"],
+    ["optCityPointsThemeAtlasInk", "Atlas Ink"],
+    ["optCityPointsThemeParchmentSepia", "Parchment Sepia"],
+    ["optCityPointsThemeSlateBlue", "Slate Blue"],
+    ["optCityPointsThemeIvoryOutline", "Ivory Outline"],
     ["lblCityPointsMarkerScale", "Marker Scale"],
+    ["lblCityPointsMarkerDensity", "Point Density"],
     ["lblCityPointsLabelDensity", "Label Density"],
-    ["cityPointsLabelDensityHint", "Controls how many labels can appear per viewport at mid/high zoom."],
+    ["cityPointsMarkerDensityHint", "Controls how many city markers can appear per viewport at mid/high zoom."],
+    ["cityPointsLabelDensityHint", "Controls label count only. It does not change point density."],
     ["optCityLabelDensitySparse", "Sparse"],
     ["optCityLabelDensityBalanced", "Balanced"],
     ["optCityLabelDensityDense", "Dense"],
+    ["lblCityPointsVisibilityGroup", "Visibility"],
+    ["cityPointsVisibilityGroupHint", "Keep the main visibility controls together so opacity, labels, and capital emphasis read as one layer."],
     ["lblCityPointsAdvanced", "Advanced"],
+    ["cityPointsAdvancedHint", "Fine-tune colors and label size once the preset and density feel close."],
     ["lblCityPointsColor", "Point Color"],
     ["lblCityPointsCapitalColor", "Capital Highlight Color"],
     ["lblCityPointsOpacity", "Point Opacity"],
-    ["lblCityPointsRadius", "Point Size"],
     ["lblCityPointLabelsEnabled", "Show City Labels"],
     ["lblCityPointsLabelSize", "Label Size"],
     ["lblCityCapitalOverlayEnabled", "Highlight Capitals"],
@@ -836,6 +865,9 @@ async function toggleLanguage() {
     }
   }
   updateUIText();
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
   if (typeof state.renderCountryListFn === "function") {
     state.renderCountryListFn();
   }
@@ -854,16 +886,17 @@ async function toggleLanguage() {
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();
   }
-  import("../core/scenario_resources.js")
-    .then(({ ensureScenarioGeoLocalePatchForLanguage }) => {
-      if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
-        return ensureScenarioGeoLocalePatchForLanguage(nextLang, { renderNow: false });
-      }
-      return null;
-    })
-    .catch((error) => {
-      console.warn("Unable to refresh scenario geo locale patch for active language:", error);
-    });
+  try {
+    const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario_resources.js");
+    if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
+      await ensureScenarioGeoLocalePatchForLanguage(nextLang, { renderNow: false });
+    }
+  } catch (error) {
+    console.warn("Unable to refresh scenario geo locale patch for active language:", error);
+  }
+  if (typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
 }
 
 function initTranslations() {

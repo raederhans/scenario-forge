@@ -438,6 +438,70 @@ const CITY_MARKER_THEME_TOKENS = {
     halo: "rgba(255, 252, 245, 0.08)",
     shadow: "rgba(20, 24, 31, 0.18)",
   },
+  atlas_ink: {
+    fillTop: "rgba(150, 173, 194, 0.99)",
+    fillMid: "rgba(95, 122, 150, 0.99)",
+    fillBottom: "rgba(45, 67, 95, 0.99)",
+    rimDark: "rgba(16, 26, 37, 0.44)",
+    stroke: "rgba(218, 224, 228, 0.58)",
+    highlight: "rgba(242, 248, 255, 0.26)",
+    specular: "rgba(233, 241, 252, 0.18)",
+    baseShadow: "rgba(10, 19, 28, 0.24)",
+    capitalAccent: "rgba(214, 183, 126, 0.96)",
+    capitalHighlight: "rgba(252, 236, 199, 0.46)",
+    label: "rgba(42, 57, 76, 0.94)",
+    capitalLabel: "rgba(72, 64, 44, 0.96)",
+    halo: "rgba(247, 251, 255, 0.11)",
+    shadow: "rgba(17, 24, 35, 0.2)",
+  },
+  parchment_sepia: {
+    fillTop: "rgba(203, 180, 149, 0.99)",
+    fillMid: "rgba(158, 126, 92, 0.99)",
+    fillBottom: "rgba(103, 78, 54, 0.99)",
+    rimDark: "rgba(42, 31, 22, 0.42)",
+    stroke: "rgba(240, 226, 200, 0.56)",
+    highlight: "rgba(255, 247, 231, 0.24)",
+    specular: "rgba(247, 237, 216, 0.16)",
+    baseShadow: "rgba(26, 19, 14, 0.23)",
+    capitalAccent: "rgba(171, 105, 63, 0.96)",
+    capitalHighlight: "rgba(248, 210, 163, 0.46)",
+    label: "rgba(88, 61, 37, 0.94)",
+    capitalLabel: "rgba(110, 70, 42, 0.96)",
+    halo: "rgba(255, 247, 234, 0.08)",
+    shadow: "rgba(34, 25, 18, 0.18)",
+  },
+  slate_blue: {
+    fillTop: "rgba(162, 177, 196, 0.99)",
+    fillMid: "rgba(106, 123, 149, 0.99)",
+    fillBottom: "rgba(59, 74, 99, 0.99)",
+    rimDark: "rgba(20, 28, 41, 0.42)",
+    stroke: "rgba(226, 232, 240, 0.56)",
+    highlight: "rgba(246, 249, 255, 0.24)",
+    specular: "rgba(236, 242, 252, 0.16)",
+    baseShadow: "rgba(14, 19, 28, 0.24)",
+    capitalAccent: "rgba(214, 184, 118, 0.96)",
+    capitalHighlight: "rgba(252, 238, 201, 0.44)",
+    label: "rgba(48, 58, 77, 0.94)",
+    capitalLabel: "rgba(71, 64, 49, 0.96)",
+    halo: "rgba(248, 251, 255, 0.1)",
+    shadow: "rgba(19, 24, 33, 0.18)",
+  },
+  ivory_outline: {
+    fillTop: "rgba(252, 249, 242, 0.99)",
+    fillMid: "rgba(235, 227, 211, 0.99)",
+    fillBottom: "rgba(199, 189, 171, 0.99)",
+    rimDark: "rgba(39, 45, 54, 0.42)",
+    stroke: "rgba(58, 67, 79, 0.62)",
+    highlight: "rgba(255, 255, 255, 0.34)",
+    specular: "rgba(255, 255, 255, 0.2)",
+    baseShadow: "rgba(12, 17, 24, 0.2)",
+    capitalAccent: "rgba(142, 101, 60, 0.96)",
+    capitalHighlight: "rgba(244, 214, 164, 0.48)",
+    label: "rgba(70, 63, 53, 0.96)",
+    capitalLabel: "rgba(88, 64, 42, 0.98)",
+    halo: "rgba(255, 255, 255, 0.12)",
+    shadow: "rgba(20, 24, 31, 0.16)",
+  },
 };
 
 const bathymetryTopologyCacheByUrl = new Map();
@@ -11430,24 +11494,41 @@ function getCityRawFallbackLabel(feature) {
 }
 
 function getCityDisplayLabel(feature) {
+  const props = feature?.properties || {};
   const overrideLabel = getCityOverrideDisplayLabel(feature);
   if (overrideLabel) {
     return overrideLabel;
   }
   const baseStrict = getCityBaseLocalizedLabel(feature, { strict: true });
   const baseFallback = getCityBaseLocalizedLabel(feature);
+  const rawCurrentLanguageLabel = getCityRawLanguageLabel(feature, state.currentLanguage);
   const rawFallback = getCityRawFallbackLabel(feature);
   const hostFeatureLabel = getCityHostFeatureDisplayLabel(feature);
+  const prefersLocalizedFallback = !!props.__city_has_display_name_override;
   const hostComparison = normalizeCityLabelComparisonValue(hostFeatureLabel);
-  const baseComparison = normalizeCityLabelComparisonValue(baseStrict || baseFallback || rawFallback);
+  const baseComparison = normalizeCityLabelComparisonValue(
+    baseStrict || (prefersLocalizedFallback ? baseFallback : rawCurrentLanguageLabel) || (prefersLocalizedFallback ? rawCurrentLanguageLabel : baseFallback) || rawFallback
+  );
   if (hostComparison && hostComparison !== baseComparison) {
     return hostFeatureLabel;
   }
   if (baseStrict) {
     return baseStrict;
   }
-  if (baseFallback) {
-    return baseFallback;
+  if (prefersLocalizedFallback) {
+    if (baseFallback) {
+      return baseFallback;
+    }
+    if (rawCurrentLanguageLabel) {
+      return rawCurrentLanguageLabel;
+    }
+  } else {
+    if (rawCurrentLanguageLabel) {
+      return rawCurrentLanguageLabel;
+    }
+    if (baseFallback) {
+      return baseFallback;
+    }
   }
   return rawFallback;
 }
@@ -11664,10 +11745,17 @@ function getCitySortWeight(feature) {
 function getCityMarkerThemeTokens(config = {}) {
   const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
   const baseTokens = CITY_MARKER_THEME_TOKENS[themeKey] || CITY_MARKER_THEME_TOKENS.classic_graphite;
+  const pointColor = getSafeCanvasColor(config.color, baseTokens.fillMid);
+  const capitalColor = getSafeCanvasColor(config.capitalColor, baseTokens.capitalAccent);
   return {
     ...baseTokens,
-    fillBottom: getSafeCanvasColor(config.color, baseTokens.fillBottom),
-    capitalAccent: getSafeCanvasColor(config.capitalColor, baseTokens.capitalAccent),
+    fillTop: mixCanvasColors(baseTokens.fillTop, pointColor, 0.34) || pointColor,
+    fillMid: mixCanvasColors(baseTokens.fillMid, pointColor, 0.84) || pointColor,
+    fillBottom: mixCanvasColors(baseTokens.fillBottom, pointColor, 0.9) || pointColor,
+    stroke: mixCanvasColors(baseTokens.stroke, pointColor, 0.2) || baseTokens.stroke,
+    capitalAccent: mixCanvasColors(baseTokens.capitalAccent, capitalColor, 0.92) || capitalColor,
+    capitalHighlight: mixCanvasColors(baseTokens.capitalHighlight, capitalColor, 0.32) || baseTokens.capitalHighlight,
+    capitalLabel: mixCanvasColors(baseTokens.capitalLabel, capitalColor, 0.18) || baseTokens.capitalLabel,
   };
 }
 
@@ -11853,6 +11941,18 @@ function getCityMarkerQuotaForTier(phaseId, countryTier) {
   return quotaTable[String(countryTier || "D").trim().toUpperCase()] ?? 0;
 }
 
+function getCityMarkerDensityMultiplier(config = {}) {
+  return clamp(Number(config.markerDensity) || 1, 0.5, 2);
+}
+
+function scaleCityMarkerQuota(baseQuota, markerDensity) {
+  const normalizedQuota = Math.max(0, Number(baseQuota) || 0);
+  const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
+  if (normalizedQuota <= 0) return 0;
+  const scaledQuota = normalizedQuota * normalizedDensity;
+  return normalizedDensity < 1 ? Math.floor(scaledQuota) : Math.ceil(scaledQuota);
+}
+
 function compareCityRevealEntries(left, right) {
   const leftBucket = Number(left?.revealBucket ?? Number.POSITIVE_INFINITY);
   const rightBucket = Number(right?.revealBucket ?? Number.POSITIVE_INFINITY);
@@ -11893,13 +11993,12 @@ function isCityLabelEligibleForPhase(entry, phaseId) {
 
 function getCityMarkerSizePx(entry, config = {}) {
   const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
-  const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 1.4);
-  const legacyScale = clamp((Number(config.radius) || 3.2) / 3.2, 0.75, 1.3);
+  const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 2.5);
   const baseSize = CITY_MARKER_BASE_SIZES_PX[cityTier] || CITY_MARKER_BASE_SIZES_PX.minor;
   const hardLimit = CITY_MARKER_SIZE_LIMITS_PX[cityTier] || CITY_MARKER_SIZE_LIMITS_PX.minor;
   const capitalLimit = entry?.isCapital ? CITY_MARKER_SIZE_LIMITS_PX.capital : hardLimit;
   const boostedSize = entry?.isCapital ? baseSize * 1.08 : baseSize;
-  return Math.min(capitalLimit, boostedSize * markerScale * legacyScale);
+  return Math.min(capitalLimit, boostedSize * markerScale);
 }
 
 function createCityMarkerSpriteCanvas(width, height) {
@@ -12084,7 +12183,8 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   const urbanIndex = getUrbanFeatureIndex();
   const markerEntries = [];
   const countsByCountry = new Map();
-  const markerBudget = Math.max(0, Number(phase.markerBudget || 0));
+  const markerDensity = getCityMarkerDensityMultiplier(config);
+  const markerBudget = Math.max(0, Math.round(Number(phase.markerBudget || 0) * markerDensity));
   const labelBudget = getCityLabelBudget(phase, config);
   const labelEntries = [];
 
@@ -12145,7 +12245,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   capitalEntriesByCountry.forEach((entry) => {
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
     const quota = Math.max(
-      getCityMarkerQuotaForTier(phase.id, entry.countryTier),
+      scaleCityMarkerQuota(getCityMarkerQuotaForTier(phase.id, entry.countryTier), markerDensity),
       1
     );
     if (currentCount >= quota) return;
@@ -12161,7 +12261,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     if (acceptedCityIds.has(entry.cityId)) continue;
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
     const quota = Math.max(
-      getCityMarkerQuotaForTier(phase.id, entry.countryTier),
+      scaleCityMarkerQuota(getCityMarkerQuotaForTier(phase.id, entry.countryTier), markerDensity),
       entry.isCapital ? 1 : 0
     );
     if (currentCount >= quota) continue;
@@ -12729,29 +12829,25 @@ function getCityMarkerRenderStyle(entry, config = {}) {
     adaptiveStrength: 1,
     toneBias: 0.08,
   });
-  const fillMid = adaptiveBase?.fillColor || mixCanvasColors(backgroundColor, "#ede7da", 0.62) || baseTokens.fillMid;
-  const stroke = adaptiveBase?.strokeColor || mixCanvasColors(backgroundColor, "#fff8ef", 0.78) || baseTokens.stroke;
-  const fillTop = mixCanvasColors(fillMid, "#fffaf2", 0.28) || fillMid;
-  const fillBottom = mixCanvasColors(fillMid, stroke, 0.46) || stroke;
+  const adaptiveStroke = adaptiveBase?.strokeColor || mixCanvasColors(backgroundColor, "#fff8ef", 0.78) || baseTokens.stroke;
   return {
     tokens: {
       ...baseTokens,
-      fillTop,
-      fillMid,
-      fillBottom,
-      rimDark: mixCanvasColors(backgroundColor, stroke, 0.82) || stroke,
-      stroke,
-      highlight: mixCanvasColors(stroke, "#ffffff", 0.24) || baseTokens.highlight,
-      specular: mixCanvasColors(stroke, "#ffffff", 0.14) || baseTokens.specular,
-      capitalAccent: mixCanvasColors(backgroundColor, "#f2e4b2", 0.84) || baseTokens.capitalAccent,
-      capitalHighlight: mixCanvasColors(backgroundColor, "#fff7da", 0.88) || baseTokens.capitalHighlight,
-      halo: mixCanvasColors(backgroundColor, "#fff9ef", 0.18) || baseTokens.halo,
+      rimDark: mixCanvasColors(baseTokens.rimDark, adaptiveStroke, 0.44) || baseTokens.rimDark,
+      stroke: mixCanvasColors(baseTokens.stroke, adaptiveStroke, 0.54) || baseTokens.stroke,
+      highlight: mixCanvasColors(baseTokens.highlight, "#ffffff", 0.14) || baseTokens.highlight,
+      specular: mixCanvasColors(baseTokens.specular, "#ffffff", 0.1) || baseTokens.specular,
+      halo: mixCanvasColors(baseTokens.halo, adaptiveStroke, 0.16) || baseTokens.halo,
     },
     backgroundColor,
     luminance,
     usesLightContrast: true,
     adapted: true,
   };
+}
+
+function getCityVisualCapitalState(entry, config = {}) {
+  return !!entry?.isCapital && config.showCapitalOverlay !== false;
 }
 
 function getCityHoverRadiusPx(entry) {
@@ -12888,9 +12984,13 @@ function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, int
   context.globalAlpha = interactive ? Math.min(opacity, 0.8) : opacity;
 
   markerEntries.forEach((entry) => {
-    const spriteEntry = entry.isCapital && !config.showCapitalOverlay
-      ? { ...entry, isCapital: false }
-      : entry;
+    const spriteEntry = getCityVisualCapitalState(entry, config)
+      ? entry
+      : {
+        ...entry,
+        isCapital: false,
+        markerSizePx: null,
+      };
     const sprite = getCityMarkerSprite(spriteEntry, config);
     if (!sprite?.canvas) return;
     const drawWidth = sprite.width / scale;
@@ -12912,21 +13012,24 @@ function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
   context.lineJoin = "round";
   const occupiedBoxes = [];
   labelEntries.forEach((entry) => {
-    context.font = `${entry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
-    const fullText = getCityDisplayLabel(entry.feature);
+    const visualEntry = getCityVisualCapitalState(entry, config)
+      ? entry
+      : { ...entry, isCapital: false, markerSizePx: null };
+    context.font = `${visualEntry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
+    const fullText = getCityDisplayLabel(visualEntry.feature);
     const text = formatCityMapLabel(fullText, {
-      entry,
+      entry: visualEntry,
       context,
       config,
       scale,
     });
-    const labelMinZoom = Math.max(Number(config?.labelMinZoom || 2.45), Number(entry.minZoom || 0));
+    const labelMinZoom = Math.max(Number(config?.labelMinZoom || 2.45), Number(visualEntry.minZoom || 0));
     if (!text || !entry.screenPoint || scale < labelMinZoom) return;
-    const markerSizePx = Number(entry.markerSizePx || getCityMarkerSizePx(entry, config));
+    const markerSizePx = Number(visualEntry.markerSizePx || getCityMarkerSizePx(visualEntry, config));
     const offsetPx = Math.max(7, markerSizePx + 4);
     const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
     const metrics = context.measureText(text);
-    const candidates = buildCityLabelPlacementCandidates(entry, {
+    const candidates = buildCityLabelPlacementCandidates(visualEntry, {
       textWidthPx: metrics.width * scale,
       fontPx,
       scale,
@@ -12946,7 +13049,7 @@ function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
     occupiedBoxes.push(acceptedPlacement.box);
     entry.acceptedLabelPlacement = acceptedPlacement.id;
     labelCount += 1;
-    const labelStyle = getCityLabelRenderStyle(entry, config);
+    const labelStyle = getCityLabelRenderStyle(visualEntry, config);
     context.textAlign = acceptedPlacement.textAlign;
     context.shadowColor = labelStyle.shadowColor;
     context.shadowBlur = Math.max(1.1, fontPx * labelStyle.shadowBlurFactor) / scale;
@@ -16217,7 +16320,9 @@ function drawContextMarkersPass(k, { interactive = false } = {}) {
     } else {
       drawAirportsLayer(k, { interactive });
       drawPortsLayer(k, { interactive });
-      drawCityPointsLayer(k, { interactive });
+      if (interactive) {
+        drawCityPointsLayer(k, { interactive: true });
+      }
     }
   } finally {
     endContextMetricSession();
@@ -16280,19 +16385,25 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
   const renderState = getCityLayerRenderState(k, {
     interactive: false,
-    cacheHoverEntries: false,
+    cacheHoverEntries: true,
   });
-  if (renderState.skipped || !renderState.labelEntries.length) {
+  if (renderState.skipped || !renderState.markerEntries.length) {
     recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
       interactive: false,
       skipped: true,
-      reason: renderState.skipped ? renderState.reason : "labels-hidden",
+      reason: renderState.reason || "markers-hidden",
       featureCount: renderState.featureCount,
       visibleFeatureCount: renderState.markerEntries.length,
       labelCount: 0,
     });
     return;
   }
+  drawCityMarkersFromEntries(renderState.markerEntries, {
+    config: renderState.config,
+    scale: renderState.scale,
+    opacity: renderState.opacity,
+    interactive: false,
+  });
   const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {
     config: renderState.config,
     scale: renderState.scale,
@@ -16342,9 +16453,9 @@ function ensureIdleRenderPasses(timings) {
     ["contextScenario", (k) => drawContextScenarioPass(k)],
     ["effects", (k) => drawEffectsPass(k)],
     ["lineEffects", (k) => drawLineEffectsPass(k)],
-    ["contextMarkers", (k) => drawContextMarkersPass(k)],
     ["dayNight", (k) => drawDayNightPass(k)],
     ["borders", (k) => drawBordersPass(k)],
+    ["contextMarkers", (k) => drawContextMarkersPass(k)],
     ["textureLabels", (k) => drawTextureLabelEffectsPass(k)],
     ["labels", (k) => drawLabelsPass(k)],
   ];

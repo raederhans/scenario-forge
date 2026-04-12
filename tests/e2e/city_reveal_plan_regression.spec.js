@@ -11,6 +11,7 @@ const IGNORED_CONSOLE_PATTERNS = [
   /\[scenario\] Detail visibility gate triggered for tno_1962/i,
   /\[map_renderer\] scenario_owner_only borders unavailable for scenario=tno_1962/i,
   /startup\.bundle\.en\.json\.gz was preloaded using link preload but not used/i,
+  /europe_topology\.json was preloaded using link preload but not used/i,
 ];
 
 async function ensureScenario(page, scenarioId) {
@@ -177,7 +178,7 @@ test("city reveal plan keeps capital coverage stable across low-zoom pan", async
   expect(networkFailures).toEqual([]);
 });
 
-test("city markers adapt against dark host fills", async ({ page }) => {
+test("point density changes marker budgets while label density only changes labels", async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
 
@@ -208,37 +209,52 @@ test("city markers adapt against dark host fills", async ({ page }) => {
   await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await ensureScenario(page, "tno_1962");
-  await ensureBaseCityDataLoaded(page, "e2e-city-marker-adaptation");
+  await ensureBaseCityDataLoaded(page, "e2e-city-marker-density-regression");
+  await setZoomPercent(page, 320);
 
   const runtime = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const { getCityMarkerRenderStyle } = await import("/js/core/map_renderer.js");
-    const cityStyle = state.styleConfig?.cityPoints || {};
-    const worldCities = Array.isArray(state.worldCitiesData?.features) ? state.worldCitiesData.features : [];
-    const samples = worldCities
-      .map((feature) => {
-        const style = getCityMarkerRenderStyle({ feature }, cityStyle);
-        return {
-          cityId: String(feature?.properties?.id || feature?.properties?.__city_id || feature?.id || ""),
-          adapted: !!style.adapted,
-          usesLightContrast: !!style.usesLightContrast,
-          backgroundColor: String(style.backgroundColor || ""),
-          fillBottom: String(style.tokens?.fillBottom || ""),
-          stroke: String(style.tokens?.stroke || ""),
-        };
-      })
-      .filter((entry) => entry.adapted)
-      .slice(0, 12);
+    const { buildCityRevealPlan, getEffectiveCityCollection } = await import("/js/core/map_renderer.js");
+
+    const cityCollection = getEffectiveCityCollection();
+    const baseConfig = { ...(state.styleConfig?.cityPoints || {}) };
+    const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+    const scale = Math.max(0.0001, Number(transform?.k || 1));
+
+    const summarizePlan = (config) => {
+      const plan = buildCityRevealPlan(cityCollection, scale, transform, config);
+      const candidateCapitalCountries = new Set(
+        (Array.isArray(plan?.candidateEntries) ? plan.candidateEntries : [])
+          .filter((entry) => entry.isCapital)
+          .map((entry) => entry.countryKey)
+      );
+      const acceptedCapitalCountries = new Set(
+        (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
+          .filter((entry) => entry.isCapital)
+          .map((entry) => entry.countryKey)
+      );
+      return {
+        markerBudget: Number(plan?.phase?.markerBudget || 0),
+        markerCount: Array.isArray(plan?.markerEntries) ? plan.markerEntries.length : 0,
+        labelCount: Array.isArray(plan?.labelEntries) ? plan.labelEntries.length : 0,
+        candidateCapitalCount: candidateCapitalCountries.size,
+        acceptedCapitalCount: acceptedCapitalCountries.size,
+      };
+    };
+
     return {
-      samples,
-      defaultFillBottom: "rgba(42, 48, 55, 0.99)",
+      lowPointDensity: summarizePlan({ ...baseConfig, markerDensity: 0.5, labelDensity: "balanced" }),
+      highPointDensity: summarizePlan({ ...baseConfig, markerDensity: 1.35, labelDensity: "balanced" }),
+      sparseLabels: summarizePlan({ ...baseConfig, markerDensity: 1, labelDensity: "sparse" }),
+      denseLabels: summarizePlan({ ...baseConfig, markerDensity: 1, labelDensity: "dense" }),
     };
   });
 
-  expect(runtime.samples.length).toBeGreaterThan(0);
-  expect(runtime.samples.every((entry) => entry.usesLightContrast)).toBe(true);
-  expect(runtime.samples.every((entry) => entry.backgroundColor)).toBe(true);
-  expect(runtime.samples.every((entry) => entry.fillBottom !== runtime.defaultFillBottom)).toBe(true);
+  expect(runtime.lowPointDensity.markerCount).toBeLessThanOrEqual(runtime.highPointDensity.markerCount);
+  expect(runtime.lowPointDensity.acceptedCapitalCount).toBe(runtime.lowPointDensity.candidateCapitalCount);
+  expect(runtime.highPointDensity.acceptedCapitalCount).toBe(runtime.highPointDensity.candidateCapitalCount);
+  expect(runtime.sparseLabels.markerCount).toBe(runtime.denseLabels.markerCount);
+  expect(runtime.sparseLabels.labelCount).toBeLessThan(runtime.denseLabels.labelCount);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
 });

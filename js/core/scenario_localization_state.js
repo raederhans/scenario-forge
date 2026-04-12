@@ -11,10 +11,14 @@ function getScenarioOverrideLocaleEntry(overrideEntry) {
   const en = normalizeCityText(displayName.en || overrideEntry?.name_en || overrideEntry?.name || "");
   const zh = normalizeCityText(displayName.zh || overrideEntry?.name_zh || "");
   if (!en && !zh) return null;
-  return {
-    en: en || zh,
-    zh: zh || en,
-  };
+  const localeEntry = {};
+  if (en) {
+    localeEntry.en = en;
+  }
+  if (zh) {
+    localeEntry.zh = zh;
+  }
+  return Object.keys(localeEntry).length ? localeEntry : null;
 }
 
 function getScenarioOverrideSourceCityFeature(overrideEntry) {
@@ -122,14 +126,21 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
       const existingEntry = baseGeoLocales[targetId] || null;
       const existingEn = normalizeCityText(existingEntry?.en || "");
       const existingZh = normalizeCityText(existingEntry?.zh || "");
-      if (existingEn === localeEntry.en && existingZh === localeEntry.zh) {
+      const nextEntry = {
+        ...(existingEntry && typeof existingEntry === "object" ? existingEntry : {}),
+        ...(localeEntry.en ? { en: localeEntry.en } : {}),
+        ...(localeEntry.zh ? { zh: localeEntry.zh } : {}),
+      };
+      const nextEn = normalizeCityText(nextEntry.en || "");
+      const nextZh = normalizeCityText(nextEntry.zh || "");
+      if (existingEn === nextEn && existingZh === nextZh) {
         return;
       }
-      geo[targetId] = { ...localeEntry };
+      geo[targetId] = nextEntry;
       conflicts.push({
         targetId,
         previous: existingEntry,
-        next: localeEntry,
+        next: nextEntry,
       });
     });
   });

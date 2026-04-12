@@ -813,11 +813,11 @@ function createDefaultCityLayerStyleConfig() {
   return {
     theme: "classic_graphite",
     revealProfile: "hybrid_country_budget",
+    markerDensity: 1,
     labelDensity: "balanced",
     color: "#2f343a",
     capitalColor: "#9f9072",
     opacity: 0.94,
-    radius: 3.2,
     markerScale: 1,
     showLabels: true,
     labelSize: 11,
@@ -827,7 +827,13 @@ function createDefaultCityLayerStyleConfig() {
   };
 }
 
-const VALID_CITY_LAYER_THEMES = ["classic_graphite"];
+const VALID_CITY_LAYER_THEMES = [
+  "classic_graphite",
+  "atlas_ink",
+  "parchment_sepia",
+  "slate_blue",
+  "ivory_outline",
+];
 const VALID_CITY_LAYER_REVEAL_PROFILES = ["hybrid_country_budget"];
 const VALID_CITY_LAYER_LABEL_DENSITIES = ["sparse", "balanced", "dense"];
 
@@ -839,16 +845,28 @@ function normalizeCityLayerStyleConfig(rawConfig) {
   const theme = String(raw.theme || defaults.theme).trim().toLowerCase();
   const revealProfile = String(raw.revealProfile || defaults.revealProfile).trim().toLowerCase();
   const labelDensity = String(raw.labelDensity || defaults.labelDensity).trim().toLowerCase();
+  const explicitMarkerScale = toFiniteNumber(raw.markerScale, Number.NaN);
+  const legacyRadius = toFiniteNumber(raw.radius, Number.NaN);
+  const legacyRadiusScale = Number.isFinite(legacyRadius)
+    ? clamp(legacyRadius / 3.2, 0.75, 1.3)
+    : 1;
+  const migratedMarkerScale = clamp(
+    Number.isFinite(explicitMarkerScale)
+      ? explicitMarkerScale
+      : (defaults.markerScale * legacyRadiusScale),
+    0.75,
+    2.5,
+  );
 
   return {
     theme: VALID_CITY_LAYER_THEMES.includes(theme) ? theme : defaults.theme,
     revealProfile: VALID_CITY_LAYER_REVEAL_PROFILES.includes(revealProfile) ? revealProfile : defaults.revealProfile,
+    markerDensity: clamp(toFiniteNumber(raw.markerDensity, defaults.markerDensity), 0.5, 2),
     labelDensity: VALID_CITY_LAYER_LABEL_DENSITIES.includes(labelDensity) ? labelDensity : defaults.labelDensity,
     color: color || defaults.color,
     capitalColor: capitalColor || defaults.capitalColor,
     opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),
-    radius: clamp(toFiniteNumber(raw.radius, defaults.radius), 1, 8),
-    markerScale: clamp(toFiniteNumber(raw.markerScale, defaults.markerScale), 0.75, 1.4),
+    markerScale: migratedMarkerScale,
     showLabels: raw.showLabels === undefined ? defaults.showLabels : !!raw.showLabels,
     labelSize: clamp(Math.round(toFiniteNumber(raw.labelSize, defaults.labelSize)), 8, 24),
     labelMinZoom: clamp(toFiniteNumber(raw.labelMinZoom, defaults.labelMinZoom), 0.5, 8),

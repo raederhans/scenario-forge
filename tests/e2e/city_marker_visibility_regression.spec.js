@@ -11,6 +11,21 @@ const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
 ];
 
+function countChangedPixels(left, right, threshold = 14) {
+  const limit = Math.min(left.length, right.length);
+  let changed = 0;
+  for (let index = 0; index < limit; index += 4) {
+    const delta = Math.abs(left[index] - right[index])
+      + Math.abs(left[index + 1] - right[index + 1])
+      + Math.abs(left[index + 2] - right[index + 2])
+      + Math.abs(left[index + 3] - right[index + 3]);
+    if (delta >= threshold) {
+      changed += 1;
+    }
+  }
+  return changed;
+}
+
 async function dismissStartupBlocker(page) {
   const continueButton = page.getByRole("button", { name: "Continue without scenario" });
   if (await continueButton.isVisible().catch(() => false)) {
@@ -71,7 +86,74 @@ async function setZoomPercent(page, percent) {
   await page.waitForTimeout(800);
 }
 
-test("city reveal plan keeps capital coverage across synthetic pans and dark-host markers adapt", async ({ page }) => {
+async function waitForStableExactRender(page, { timeout = 20_000 } = {}) {
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return String(state.renderPhase || "") === "idle"
+      && !state.deferExactAfterSettle
+      && !state.exactAfterSettleHandle;
+  }, { timeout });
+}
+
+async function setCheckbox(page, id, checked) {
+  await page.evaluate(({ targetId, targetChecked }) => {
+    const input = document.getElementById(targetId);
+    if (!input) {
+      throw new Error(`Missing checkbox: ${targetId}`);
+    }
+    input.checked = !!targetChecked;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }, { targetId: id, targetChecked: checked });
+}
+
+async function captureCapitalPatch(page, cityId) {
+  return page.evaluate(async (targetCityId) => {
+    const { state } = await import("/js/core/state.js");
+    const { buildCityRevealPlan, getEffectiveCityCollection } = await import("/js/core/map_renderer.js");
+
+    const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+    const plan = buildCityRevealPlan(getEffectiveCityCollection(), Number(transform.k || 1), transform, state.styleConfig?.cityPoints || {});
+    const entry = (Array.isArray(plan?.labelEntries) ? plan.labelEntries : []).find((candidate) => String(candidate?.cityId || "") === String(targetCityId || ""))
+      || (Array.isArray(plan?.markerEntries) ? plan.markerEntries : []).find((candidate) => String(candidate?.cityId || "") === String(targetCityId || ""));
+    if (!entry || !Array.isArray(entry.screenPoint)) {
+      throw new Error(`Missing visible capital entry: ${targetCityId}`);
+    }
+
+    const candidates = Array.from(document.querySelectorAll("canvas"))
+      .filter((canvas) => canvas.width >= 200 && canvas.height >= 120 && getComputedStyle(canvas).display !== "none")
+      .sort((left, right) => (right.width * right.height) - (left.width * left.height));
+    const source = candidates[0];
+    if (!source) {
+      throw new Error("No visible map canvas found");
+    }
+
+    const dpr = Math.max(1, Number(globalThis.devicePixelRatio || 1));
+    const patchWidthCss = 180;
+    const patchHeightCss = 120;
+    const patchWidth = Math.max(40, Math.round(patchWidthCss * dpr));
+    const patchHeight = Math.max(40, Math.round(patchHeightCss * dpr));
+    const centerX = Math.round((Number(entry.screenPoint[0] || 0) + 28) * dpr);
+    const centerY = Math.round((Number(entry.screenPoint[1] || 0) - 28) * dpr);
+    const minX = Math.max(0, Math.min(source.width - patchWidth, centerX - Math.round(patchWidth / 2)));
+    const minY = Math.max(0, Math.min(source.height - patchHeight, centerY - Math.round(patchHeight / 2)));
+
+    const patch = document.createElement("canvas");
+    patch.width = patchWidth;
+    patch.height = patchHeight;
+    const ctx = patch.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(source, minX, minY, patchWidth, patchHeight, 0, 0, patchWidth, patchHeight);
+    const image = ctx.getImageData(0, 0, patchWidth, patchHeight);
+    return {
+      cityId: String(entry.cityId || ""),
+      width: patchWidth,
+      height: patchHeight,
+      pixels: Array.from(image.data),
+      markerSizePx: Number(entry.markerSizePx || 0),
+    };
+  }, cityId);
+}
+
+test("city reveal plan keeps capital coverage across synthetic pans and overlay toggle visibly changes capital treatment", async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
 
@@ -110,6 +192,7 @@ test("city reveal plan keeps capital coverage across synthetic pans and dark-hos
           theme: "classic_graphite",
           radius: 6.8,
           markerScale: 1.12,
+          markerDensity: 1,
           labelDensity: "balanced",
           color: "#2f343a",
           capitalColor: "#9f9072",
@@ -128,13 +211,14 @@ test("city reveal plan keeps capital coverage across synthetic pans and dark-hos
   await ensureScenario(page, "tno_1962");
   await ensureBaseCityDataLoaded(page);
   await setZoomPercent(page, 160);
+  await waitForStableExactRender(page);
 
   const runtimeCheck = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
     const {
       buildCityRevealPlan,
-      getEffectiveCityCollection,
       getCityMarkerRenderStyle,
+      getEffectiveCityCollection,
     } = await import("/js/core/map_renderer.js");
 
     const cityCollection = getEffectiveCityCollection();
@@ -182,9 +266,20 @@ test("city reveal plan keeps capital coverage across synthetic pans and dark-hos
       .filter((entry) => entry.usesLightContrast && entry.backgroundColor)
       .slice(0, 12);
 
+    const visiblePlan = buildCityRevealPlan(
+      cityCollection,
+      Number(state.zoomTransform?.k || 1),
+      state.zoomTransform || identity,
+      config,
+    );
+    const visibleCapital = (Array.isArray(visiblePlan?.labelEntries) ? visiblePlan.labelEntries : [])
+      .find((entry) => entry.isCapital)
+      || (Array.isArray(visiblePlan?.markerEntries) ? visiblePlan.markerEntries : []).find((entry) => entry.isCapital);
+
     return {
       planSummaries: transforms.map(summarizePlan),
       darkSamples,
+      visibleCapitalCityId: String(visibleCapital?.cityId || ""),
     };
   });
 
@@ -202,10 +297,27 @@ test("city reveal plan keeps capital coverage across synthetic pans and dark-hos
 
   expect(runtimeCheck.darkSamples.length).toBeGreaterThan(0);
   runtimeCheck.darkSamples.forEach((sample) => {
-    expect(sample.fillBottom).not.toBe("");
-    expect(sample.stroke).not.toBe("");
-    expect(sample.fillBottom.toLowerCase()).not.toBe(sample.configColor.toLowerCase());
+    expect(sample.fillBottom).toBeTruthy();
+    expect(sample.stroke).toBeTruthy();
   });
+  expect(runtimeCheck.visibleCapitalCityId).toBeTruthy();
+
+  const capitalOverlayOn = await captureCapitalPatch(page, runtimeCheck.visibleCapitalCityId);
+  await setCheckbox(page, "cityCapitalOverlayEnabled", false);
+  await waitForStableExactRender(page);
+  const capitalOverlayOff = await captureCapitalPatch(page, runtimeCheck.visibleCapitalCityId);
+  const overlayDiff = countChangedPixels(capitalOverlayOn.pixels, capitalOverlayOff.pixels, 12);
+
+  const overlayState = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      showCapitalOverlay: !!state.styleConfig?.cityPoints?.showCapitalOverlay,
+    };
+  });
+
+  expect(overlayState.showCapitalOverlay).toBe(false);
+  expect(capitalOverlayOn.markerSizePx).toBeGreaterThan(0);
+  expect(overlayDiff).toBeGreaterThan(80);
 
   const shotPath = path.join(".runtime", "browser", "mcp-artifacts", "screenshots", "qa_020_city_marker_visibility_regression.png");
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });

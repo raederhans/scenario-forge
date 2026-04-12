@@ -1761,12 +1761,14 @@ function initToolbar({ render } = {}) {
   const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
   const toggleSpecialZones = document.getElementById("toggleSpecialZones");
   const cityPointsTheme = document.getElementById("cityPointsTheme");
+  const cityPointsThemeHint = document.getElementById("cityPointsThemeHint");
   const cityPointsMarkerScale = document.getElementById("cityPointsMarkerScale");
+  const cityPointsMarkerDensity = document.getElementById("cityPointsMarkerDensity");
+  const cityPointsMarkerDensityHint = document.getElementById("cityPointsMarkerDensityHint");
   const cityPointsLabelDensity = document.getElementById("cityPointsLabelDensity");
   const cityPointsColor = document.getElementById("cityPointsColor");
   const cityPointsCapitalColor = document.getElementById("cityPointsCapitalColor");
   const cityPointsOpacity = document.getElementById("cityPointsOpacity");
-  const cityPointsRadius = document.getElementById("cityPointsRadius");
   const cityPointLabelsEnabled = document.getElementById("cityPointLabelsEnabled");
   const cityPointsLabelSize = document.getElementById("cityPointsLabelSize");
   const cityCapitalOverlayEnabled = document.getElementById("cityCapitalOverlayEnabled");
@@ -2010,7 +2012,7 @@ function initToolbar({ render } = {}) {
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
   const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
-  const cityPointsRadiusValue = document.getElementById("cityPointsRadiusValue");
+  const cityPointsMarkerDensityValue = document.getElementById("cityPointsMarkerDensityValue");
   const cityPointsLabelSizeValue = document.getElementById("cityPointsLabelSizeValue");
   const physicalOpacityValue = document.getElementById("physicalOpacityValue");
   const physicalAtlasIntensityValue = document.getElementById("physicalAtlasIntensityValue");
@@ -5116,6 +5118,106 @@ function initToolbar({ render } = {}) {
     return state.styleConfig.cityPoints;
   };
 
+  const CITY_POINTS_THEME_OPTIONS = [
+    { value: "classic_graphite", labelKey: "optCityPointsThemeClassicGraphite", fallback: "Classic Graphite" },
+    { value: "atlas_ink", labelKey: "optCityPointsThemeAtlasInk", fallback: "Atlas Ink" },
+    { value: "parchment_sepia", labelKey: "optCityPointsThemeParchmentSepia", fallback: "Parchment Sepia" },
+    { value: "slate_blue", labelKey: "optCityPointsThemeSlateBlue", fallback: "Slate Blue" },
+    { value: "ivory_outline", labelKey: "optCityPointsThemeIvoryOutline", fallback: "Ivory Outline" },
+  ];
+
+  const getCityPointsThemeMeta = (themeValue) =>
+    CITY_POINTS_THEME_OPTIONS.find((option) => option.value === String(themeValue || "").trim().toLowerCase())
+    || CITY_POINTS_THEME_OPTIONS[0];
+
+  const getCityPointsThemeLabel = (themeValue) => {
+    const meta = getCityPointsThemeMeta(themeValue);
+    return t(meta.fallback, "ui");
+  };
+
+  const CITY_POINTS_THEME_DEFAULT_STYLES = {
+    classic_graphite: {
+      color: "#2f343a",
+      capitalColor: "#9f9072",
+      hintEn: "Neutral graphite markers that stay readable on mixed political fills.",
+      hintZh: "中性的石墨灰点位，适合混合政治底图，整体最稳。 ",
+    },
+    atlas_ink: {
+      color: "#35506e",
+      capitalColor: "#d2aa72",
+      hintEn: "Cool blue-ink markers with a cleaner atlas feel and clearer outlines.",
+      hintZh: "偏蓝墨水感的点位，轮廓更清楚，更像地图集标注。",
+    },
+    parchment_sepia: {
+      color: "#866245",
+      capitalColor: "#c78d55",
+      hintEn: "Warmer sepia markers tuned for historical overlays and paper-like palettes.",
+      hintZh: "更暖的棕褐色点位，适合历史纸面和偏暖色地图。",
+    },
+    slate_blue: {
+      color: "#566c86",
+      capitalColor: "#d4b178",
+      hintEn: "Cool slate-blue markers that sit quietly on modern, cleaner political maps.",
+      hintZh: "偏冷的石板蓝点位，适合更现代、更干净的政治底图。",
+    },
+    ivory_outline: {
+      color: "#ddd2bf",
+      capitalColor: "#b27a4a",
+      hintEn: "Light ivory fills with darker rims for stronger contrast on darker land colors.",
+      hintZh: "浅象牙底配深描边，在深色国土上会更显眼。",
+    },
+  };
+
+  const getCityPointsThemeStyle = (themeValue) =>
+    CITY_POINTS_THEME_DEFAULT_STYLES[getCityPointsThemeMeta(themeValue).value]
+    || CITY_POINTS_THEME_DEFAULT_STYLES.classic_graphite;
+
+  const getCityPointsThemeHint = (themeValue) => {
+    const themeStyle = getCityPointsThemeStyle(themeValue);
+    return state.currentLanguage === "zh" ? themeStyle.hintZh.trim() : themeStyle.hintEn;
+  };
+
+  const getCityPointsLabelDensityHint = (densityValue) => {
+    const normalized = String(densityValue || "balanced").trim().toLowerCase();
+    if (state.currentLanguage === "zh") {
+      if (normalized === "sparse") return "Sparse · 标签预算 P4 16 / P5 32，只保留更关键的名称。";
+      if (normalized === "dense") return "Dense · 标签预算 P4 32 / P5 64，会显示更多次级城市名称。";
+      return "Balanced · 标签预算 P4 24 / P5 48，是默认的均衡读图方案。";
+    }
+    if (normalized === "sparse") return "Sparse · label budget P4 16 / P5 32, favoring only the most important names.";
+    if (normalized === "dense") return "Dense · label budget P4 32 / P5 64, allowing more secondary city labels.";
+    return "Balanced · label budget P4 24 / P5 48, the default readability mix.";
+  };
+
+  const ensureCityPointsThemeOptions = () => {
+    if (!cityPointsTheme) return;
+    const normalizedExisting = Array.from(cityPointsTheme.options || []).map((option) => String(option.value || ""));
+    const expected = CITY_POINTS_THEME_OPTIONS.map((option) => option.value);
+    const matchesExisting =
+      normalizedExisting.length === expected.length
+      && normalizedExisting.every((value, index) => value === expected[index]);
+    if (matchesExisting) {
+      Array.from(cityPointsTheme.options || []).forEach((optionNode, index) => {
+        const meta = CITY_POINTS_THEME_OPTIONS[index];
+        if (!meta) return;
+        optionNode.id = meta.labelKey;
+        optionNode.textContent = getCityPointsThemeLabel(meta.value);
+      });
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    CITY_POINTS_THEME_OPTIONS.forEach((optionMeta) => {
+      const option = document.createElement("option");
+      option.value = optionMeta.value;
+      option.id = optionMeta.labelKey;
+      option.textContent = getCityPointsThemeLabel(optionMeta.value);
+      fragment.appendChild(option);
+    });
+    cityPointsTheme.replaceChildren(fragment);
+  };
+
+  const formatCityPointsDensityValue = (value) => `${Number(value || 1).toFixed(2)}x`;
+
   const syncUrbanConfig = () => {
     state.styleConfig.urban = normalizeUrbanStyleConfig(state.styleConfig.urban);
     if (state.styleConfig.urban.mode === "manual") {
@@ -6384,8 +6486,12 @@ function initToolbar({ render } = {}) {
     if (toggleSpecialZones) toggleSpecialZones.checked = !!state.showSpecialZones;
 
     const cityPointsConfig = syncCityPointsConfig();
+    ensureCityPointsThemeOptions();
     if (cityPointsTheme) {
       cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
+    }
+    if (cityPointsThemeHint) {
+      cityPointsThemeHint.textContent = getCityPointsThemeHint(cityPointsConfig.theme || "classic_graphite");
     }
     if (cityPointsMarkerScale) {
       cityPointsMarkerScale.value = Number(cityPointsConfig.markerScale || 1).toFixed(2);
@@ -6393,8 +6499,22 @@ function initToolbar({ render } = {}) {
     if (cityPointsMarkerScaleValue) {
       cityPointsMarkerScaleValue.textContent = `${Number(cityPointsConfig.markerScale || 1).toFixed(2)}x`;
     }
+    if (cityPointsMarkerDensity) {
+      cityPointsMarkerDensity.value = Number(cityPointsConfig.markerDensity || 1).toFixed(2);
+    }
+    if (cityPointsMarkerDensityValue) {
+      cityPointsMarkerDensityValue.textContent = formatCityPointsDensityValue(cityPointsConfig.markerDensity || 1);
+    }
+    if (cityPointsMarkerDensityHint) {
+      cityPointsMarkerDensityHint.textContent = state.currentLanguage === "zh"
+        ? "控制每个缩放阶段最多允许出现多少个城市点。"
+        : "Controls how many city markers can surface at each zoom stage.";
+    }
     if (cityPointsLabelDensity) {
       cityPointsLabelDensity.value = String(cityPointsConfig.labelDensity || "balanced");
+    }
+    if (cityPointsLabelDensityHint) {
+      cityPointsLabelDensityHint.textContent = getCityPointsLabelDensityHint(cityPointsConfig.labelDensity || "balanced");
     }
     if (cityPointsColor) cityPointsColor.value = normalizeOceanFillColor(cityPointsConfig.color || "#2f343a");
     if (cityPointsCapitalColor) {
@@ -6405,12 +6525,6 @@ function initToolbar({ render } = {}) {
     }
     if (cityPointsOpacityValue) {
       cityPointsOpacityValue.textContent = `${Math.round(cityPointsConfig.opacity * 100)}%`;
-    }
-    if (cityPointsRadius) {
-      cityPointsRadius.value = Number(cityPointsConfig.radius).toFixed(1);
-    }
-    if (cityPointsRadiusValue) {
-      cityPointsRadiusValue.textContent = Number(cityPointsConfig.radius).toFixed(1);
     }
     if (cityPointLabelsEnabled) {
       cityPointLabelsEnabled.checked = !!cityPointsConfig.showLabels;
@@ -7763,7 +7877,19 @@ function initToolbar({ render } = {}) {
   if (cityPointsTheme) {
     cityPointsTheme.addEventListener("change", (event) => {
       const cfg = syncCityPointsConfig();
-      cfg.theme = String(event.target.value || "classic_graphite");
+      cfg.theme = getCityPointsThemeMeta(event.target.value || "classic_graphite").value;
+      const themeStyle = getCityPointsThemeStyle(cfg.theme);
+      cfg.color = themeStyle.color;
+      cfg.capitalColor = themeStyle.capitalColor;
+      if (cityPointsThemeHint) {
+        cityPointsThemeHint.textContent = getCityPointsThemeHint(cfg.theme);
+      }
+      if (cityPointsColor) {
+        cityPointsColor.value = normalizeOceanFillColor(cfg.color);
+      }
+      if (cityPointsCapitalColor) {
+        cityPointsCapitalColor.value = normalizeOceanFillColor(cfg.capitalColor);
+      }
       persistCityViewSettings();
       renderDirty("city-points-theme");
     });
@@ -7772,7 +7898,7 @@ function initToolbar({ render } = {}) {
     cityPointsMarkerScale.addEventListener("input", (event) => {
       const cfg = syncCityPointsConfig();
       const value = Number(event.target.value);
-      cfg.markerScale = clamp(Number.isFinite(value) ? value : 1, 0.75, 1.4);
+      cfg.markerScale = clamp(Number.isFinite(value) ? value : 1, 0.75, 2.5);
       if (cityPointsMarkerScaleValue) {
         cityPointsMarkerScaleValue.textContent = `${Number(cfg.markerScale).toFixed(2)}x`;
       }
@@ -7780,10 +7906,27 @@ function initToolbar({ render } = {}) {
       renderDirty("city-points-marker-scale");
     });
   }
+  if (cityPointsMarkerDensity) {
+    const syncMarkerDensity = (event) => {
+      const cfg = syncCityPointsConfig();
+      const value = Number(event.target.value);
+      cfg.markerDensity = clamp(Number.isFinite(value) ? value : 1, 0.5, 2);
+      if (cityPointsMarkerDensityValue) {
+        cityPointsMarkerDensityValue.textContent = formatCityPointsDensityValue(cfg.markerDensity);
+      }
+      persistCityViewSettings();
+      renderDirty("city-points-marker-density");
+    };
+    cityPointsMarkerDensity.addEventListener("input", syncMarkerDensity);
+    cityPointsMarkerDensity.addEventListener("change", syncMarkerDensity);
+  }
   if (cityPointsLabelDensity) {
     cityPointsLabelDensity.addEventListener("change", (event) => {
       const cfg = syncCityPointsConfig();
       cfg.labelDensity = String(event.target.value || "balanced");
+      if (cityPointsLabelDensityHint) {
+        cityPointsLabelDensityHint.textContent = getCityPointsLabelDensityHint(cfg.labelDensity);
+      }
       persistCityViewSettings();
       renderDirty("city-points-label-density");
     });
@@ -7806,18 +7949,6 @@ function initToolbar({ render } = {}) {
       }
       persistCityViewSettings();
       renderDirty("city-points-opacity");
-    });
-  }
-  if (cityPointsRadius) {
-    cityPointsRadius.addEventListener("input", (event) => {
-      const cfg = syncCityPointsConfig();
-      const value = Number(event.target.value);
-      cfg.radius = clamp(Number.isFinite(value) ? value : 2.6, 1, 8);
-      if (cityPointsRadiusValue) {
-        cityPointsRadiusValue.textContent = Number(cfg.radius).toFixed(1);
-      }
-      persistCityViewSettings();
-      renderDirty("city-points-radius");
     });
   }
   if (cityPointLabelsEnabled) {
