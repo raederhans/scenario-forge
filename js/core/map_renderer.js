@@ -371,6 +371,7 @@ const BATHYMETRY_CONTOURS_OBJECT_NAME = "bathymetry_contours";
 const BATHYMETRY_MAX_REFERENCE_DEPTH_M = 6000;
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
+  "drawPhysicalReliefOverlayLayer",
   "drawPhysicalAtlasLayer",
   "drawPhysicalContourLayer",
   "drawCityPointsLayer",
@@ -10357,6 +10358,8 @@ function getPhysicalPresetRenderProfile(cfg) {
     return {
       preset,
       reliefOpacityMultiplier: 0.38,
+      reliefOverlayOpacityRatio: 0.7,
+      reliefOverlayOpacityCap: 0.05,
       semanticOpacityMultiplier: 0.2,
       reliefBlendFallback: "source-over",
       semanticBlendMode: "source-over",
@@ -10369,6 +10372,8 @@ function getPhysicalPresetRenderProfile(cfg) {
     return {
       preset,
       reliefOpacityMultiplier: 1,
+      reliefOverlayOpacityRatio: 0.25,
+      reliefOverlayOpacityCap: 0.18,
       semanticOpacityMultiplier: 0.72,
       reliefBlendFallback: "soft-light",
       semanticBlendMode: "source-over",
@@ -10380,6 +10385,8 @@ function getPhysicalPresetRenderProfile(cfg) {
   return {
     preset: "balanced",
     reliefOpacityMultiplier: 0.72,
+    reliefOverlayOpacityRatio: 0.55,
+    reliefOverlayOpacityCap: 0.12,
     semanticOpacityMultiplier: 0.42,
     reliefBlendFallback: "source-over",
     semanticBlendMode: "source-over",
@@ -10613,6 +10620,80 @@ function drawPhysicalAtlasCollectionLayer(
   return renderedCount;
 }
 
+function getPhysicalReliefOverlayBlendMode(cfg, presetProfile) {
+  const requestedMode = getSafeBlendMode(cfg?.blendMode, presetProfile?.reliefBlendFallback || "source-over");
+  if (requestedMode === "overlay" || requestedMode === "multiply") {
+    return "soft-light";
+  }
+  return requestedMode;
+}
+
+function drawPhysicalReliefOverlayLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+  const startedAt = nowMs();
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const presetProfile = getPhysicalPresetRenderProfile(cfg);
+  const maskInfo = getPhysicalLandMaskInfo();
+  if (!state.showPhysical || cfg.mode === "contours_only") {
+    collectContextMetric("drawPhysicalReliefOverlayLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showPhysical ? "hidden" : "contours-only",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return 0;
+  }
+
+  const atlasCollection = getResolvedPhysicalAtlasCollection();
+  if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
+    collectContextMetric("drawPhysicalReliefOverlayLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "no-data",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return 0;
+  }
+
+  const baseReliefOpacity = clamp(
+    cfg.opacity
+      * cfg.atlasOpacity
+      * (interactive ? 0.7 : 1)
+      * cfg.atlasIntensity
+      * presetProfile.reliefOpacityMultiplier,
+    0,
+    1
+  );
+  const overlayOpacity = clamp(
+    baseReliefOpacity * Number(presetProfile.reliefOverlayOpacityRatio || 0),
+    0,
+    Number(presetProfile.reliefOverlayOpacityCap ?? 1)
+  );
+  const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "relief_base", cfg, {
+    baseOpacity: overlayOpacity,
+    blendMode: getPhysicalReliefOverlayBlendMode(cfg, presetProfile),
+    clipAlreadyApplied,
+  });
+  collectContextMetric("drawPhysicalReliefOverlayLayer", nowMs() - startedAt, {
+    featureCount: atlasCollection.features.length,
+    renderedCount,
+    interactive: !!interactive,
+    skipped: renderedCount === 0,
+    reason: renderedCount === 0 ? "no-relief-overlay" : "",
+    maskSource: maskInfo.maskSource,
+    maskFeatureCount: maskInfo.maskFeatureCount,
+    maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+  });
+  return renderedCount;
+}
+
 function drawPhysicalBasePass(k, { interactive = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
@@ -10646,26 +10727,13 @@ function drawPhysicalBasePass(k, { interactive = false } = {}) {
     return;
   }
 
-  const presetProfile = getPhysicalPresetRenderProfile(cfg);
-  const baseOpacity = clamp(
-    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.reliefOpacityMultiplier,
-    0,
-    1
-  );
-  const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "relief_base", cfg, {
-    baseOpacity,
-    blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.reliefBlendFallback),
-  });
-  // Keep the fill-based semantic atlas in the same pass as relief so it stays
-  // beneath political fills. Contours remain in contextBase as the lightest
-  // readable physical cue above political.
-  drawPhysicalAtlasLayer(k, { interactive });
+  const renderedCount = drawPhysicalAtlasLayer(k, { interactive });
   collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
     featureCount: atlasCollection.features.length,
     renderedCount,
     interactive: !!interactive,
     skipped: renderedCount === 0,
-    reason: renderedCount === 0 ? "no-relief-base" : "",
+    reason: renderedCount === 0 ? "no-semantic-overlay" : "",
     maskSource: maskInfo.maskSource,
     maskFeatureCount: maskInfo.maskFeatureCount,
     maskArcRefEstimate: maskInfo.maskArcRefEstimate,
@@ -10687,7 +10755,7 @@ function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = f
       maskFeatureCount: maskInfo.maskFeatureCount,
       maskArcRefEstimate: maskInfo.maskArcRefEstimate,
     });
-    return;
+    return 0;
   }
 
   const atlasCollection = getResolvedPhysicalAtlasCollection();
@@ -10705,16 +10773,14 @@ function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = f
       maskFeatureCount: maskInfo.maskFeatureCount,
       maskArcRefEstimate: maskInfo.maskArcRefEstimate,
     });
-    return;
+    return 0;
   }
-
-  const semanticOpacity = clamp(
-    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.semanticOpacityMultiplier,
-    0,
-    1
-  );
   const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "semantic_overlay", cfg, {
-    baseOpacity: semanticOpacity,
+    baseOpacity: clamp(
+      cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.semanticOpacityMultiplier,
+      0,
+      1
+    ),
     blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.semanticBlendMode),
     clipAlreadyApplied,
   });
@@ -10728,6 +10794,7 @@ function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = f
     maskFeatureCount: maskInfo.maskFeatureCount,
     maskArcRefEstimate: maskInfo.maskArcRefEstimate,
   });
+  return renderedCount;
 }
 
 function drawContourCollection(
@@ -16070,6 +16137,7 @@ function drawContextBasePass(k, { interactive = false } = {}) {
   try {
     if (state.deferContextBasePass && !interactive) {
       deferred = true;
+      drawPhysicalReliefOverlayLayer(k, { interactive: false });
       const maskInfo = getPhysicalLandMaskInfo();
       collectContextMetric("drawPhysicalContourLayer", 0, {
         featureCount: 0,
@@ -16107,6 +16175,7 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         reason: "staged-apply",
       });
     } else {
+      drawPhysicalReliefOverlayLayer(k, { interactive });
       drawPhysicalContourLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });

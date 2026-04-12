@@ -17,6 +17,44 @@ async function waitForMapReady(page) {
   await page.waitForTimeout(1500);
 }
 
+async function captureCanvasSnapshot(page) {
+  return page.evaluate(() => {
+    const canvas = document.getElementById("map-canvas");
+    const context = canvas instanceof HTMLCanvasElement
+      ? canvas.getContext("2d", { willReadFrequently: true })
+      : null;
+    if (!canvas || !context) {
+      return null;
+    }
+    const { width, height } = canvas;
+    const step = Math.max(6, Math.round(Math.min(width, height) / 180));
+    const imageData = context.getImageData(0, 0, width, height).data;
+    const pixels = [];
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const offset = (y * width + x) * 4;
+        pixels.push(imageData[offset], imageData[offset + 1], imageData[offset + 2]);
+      }
+    }
+    return { width, height, step, pixels };
+  });
+}
+
+function getMeanRgbDiff(snapshotA, snapshotB) {
+  if (!snapshotA || !snapshotB) {
+    throw new Error("Missing canvas snapshot for RGB diff comparison.");
+  }
+  expect(snapshotA.width).toBe(snapshotB.width);
+  expect(snapshotA.height).toBe(snapshotB.height);
+  expect(snapshotA.step).toBe(snapshotB.step);
+  expect(snapshotA.pixels.length).toBe(snapshotB.pixels.length);
+  let diffTotal = 0;
+  for (let index = 0; index < snapshotA.pixels.length; index += 1) {
+    diffTotal += Math.abs(snapshotA.pixels[index] - snapshotB.pixels[index]);
+  }
+  return diffTotal / snapshotA.pixels.length;
+}
+
 test("physical layer defaults and atlas rendering regression", async ({ page }) => {
   test.setTimeout(60000);
   const baseUrl = resolveBaseUrl();
@@ -67,6 +105,18 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
       PHYSICAL_ATLAS_PALETTE,
       state,
     } = stateModule;
+    const physicalBaseStart = rendererSource.indexOf("function drawPhysicalBasePass");
+    const physicalBaseEnd = rendererSource.indexOf("function drawPhysicalAtlasLayer");
+    const contextBaseStart = rendererSource.indexOf("function drawContextBasePass");
+    const contextBaseEnd = rendererSource.indexOf("function drawContextMarkersPass");
+    const physicalBaseSource =
+      physicalBaseStart >= 0 && physicalBaseEnd > physicalBaseStart
+        ? rendererSource.slice(physicalBaseStart, physicalBaseEnd)
+        : "";
+    const contextBaseSource =
+      contextBaseStart >= 0 && contextBaseEnd > contextBaseStart
+        ? rendererSource.slice(contextBaseStart, contextBaseEnd)
+        : "";
 
     const defaults = {
       normalizedDefault: normalizePhysicalStyleConfig(null),
@@ -114,7 +164,9 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
         },
       ],
     };
+    state.renderPassCache.dirty.physicalBase = true;
     state.renderPassCache.dirty.contextBase = true;
+    state.renderPassCache.reasons.physicalBase = "physical-invalid-blend-regression";
     state.renderPassCache.reasons.contextBase = "physical-invalid-blend-regression";
     state.renderNowFn?.();
 
@@ -134,14 +186,23 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           /return VALID_BLEND_MODES\.has\(mode\) \? mode : safeFallback;/.test(rendererSource),
         hasPhysicalBasePass:
           /\["physicalBase", \(k\) => drawPhysicalBasePass\(k\)\]/.test(rendererSource),
-        physicalBaseOwnsAtlas:
-          /function drawPhysicalBasePass[\s\S]*?drawPhysicalAtlasLayer\(k, \{ interactive \}\);/.test(rendererSource),
+        hasPhysicalReliefOverlayHelper:
+          /function drawPhysicalReliefOverlayLayer\(k, \{ interactive = false, clipAlreadyApplied = false \} = \{\}\)/.test(rendererSource),
+        reliefOverlayBlendClamp:
+          /function getPhysicalReliefOverlayBlendMode\(cfg, presetProfile\)/.test(rendererSource)
+          && /if \(requestedMode === "overlay" \|\| requestedMode === "multiply"\) \{[\s\S]*?return "soft-light";/.test(rendererSource),
+        physicalBaseKeepsSemanticAtlas:
+          physicalBaseSource.includes("drawPhysicalAtlasLayer(k, { interactive });")
+          && !physicalBaseSource.includes("drawPhysicalReliefOverlayLayer(k, { interactive });"),
         hasPhysicalExactRefresh:
           /invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(rendererSource),
-        contextBaseNoLongerDrawsAtlas:
-          /function drawContextBasePass[\s\S]*?drawPhysicalAtlasLayer\(k, \{ interactive \}\);/.test(rendererSource) === false,
-        contextBaseStillDrawsContours:
-          /function drawContextBasePass[\s\S]*?drawPhysicalContourLayer\(k, \{ interactive \}\);/.test(rendererSource),
+        contextBaseDrawsReliefOverlayBeforeContours:
+          contextBaseSource.includes("drawPhysicalReliefOverlayLayer(k, { interactive });")
+          && contextBaseSource.indexOf("drawPhysicalReliefOverlayLayer(k, { interactive });")
+            < contextBaseSource.indexOf("drawPhysicalContourLayer(k, { interactive });"),
+        deferredContextBaseStillDrawsReliefOverlay:
+          contextBaseSource.includes("if (state.deferContextBasePass && !interactive) {")
+          && contextBaseSource.includes("drawPhysicalReliefOverlayLayer(k, { interactive: false });"),
         contourUsesSourceOver:
           /drawPhysicalContourLayer[\s\S]*?context\.globalCompositeOperation = "source-over";/.test(rendererSource),
         hasContourZoomProfiles:
@@ -235,10 +296,12 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   expect(inspection.rendererSourceChecks.hasValidBlendModes).toBe(true);
   expect(inspection.rendererSourceChecks.hasSafeBlendFallback).toBe(true);
   expect(inspection.rendererSourceChecks.hasPhysicalBasePass).toBe(true);
-  expect(inspection.rendererSourceChecks.physicalBaseOwnsAtlas).toBe(true);
+  expect(inspection.rendererSourceChecks.hasPhysicalReliefOverlayHelper).toBe(true);
+  expect(inspection.rendererSourceChecks.reliefOverlayBlendClamp).toBe(true);
+  expect(inspection.rendererSourceChecks.physicalBaseKeepsSemanticAtlas).toBe(true);
   expect(inspection.rendererSourceChecks.hasPhysicalExactRefresh).toBe(true);
-  expect(inspection.rendererSourceChecks.contextBaseNoLongerDrawsAtlas).toBe(true);
-  expect(inspection.rendererSourceChecks.contextBaseStillDrawsContours).toBe(true);
+  expect(inspection.rendererSourceChecks.contextBaseDrawsReliefOverlayBeforeContours).toBe(true);
+  expect(inspection.rendererSourceChecks.deferredContextBaseStillDrawsReliefOverlay).toBe(true);
   expect(inspection.rendererSourceChecks.contourUsesSourceOver).toBe(true);
   expect(inspection.rendererSourceChecks.hasContourZoomProfiles).toBe(true);
   expect(inspection.rendererSourceChecks.hasAdaptiveContourColor).toBe(true);
@@ -265,6 +328,60 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   expect(inspection.integrationSourceChecks.projectImportLoadsFullPhysicalSet).toBe(true);
 
   expect(inspection.physicalBlendModeAfterNormalize).toBe("source-over");
+
+  await page.evaluate(async () => {
+    const { state, normalizePhysicalStyleConfig } = await import("/js/core/state.js");
+    const reliefFeature = {
+      type: "Feature",
+      properties: {
+        atlas_class: "mountain_high_relief",
+        atlas_layer: "relief_base",
+      },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[[-12, 36], [32, 36], [32, 60], [-12, 60], [-12, 36]]],
+      },
+    };
+    state.physicalSemanticsData = {
+      type: "FeatureCollection",
+      features: [reliefFeature],
+    };
+    state.deferContextBasePass = false;
+    state.styleConfig.physical = normalizePhysicalStyleConfig({
+      ...state.styleConfig.physical,
+      preset: "balanced",
+      mode: "atlas_only",
+      opacity: 0.56,
+      atlasOpacity: 0.44,
+      atlasIntensity: 0.96,
+      blendMode: "source-over",
+      contourMinorVisible: false,
+    });
+    Object.keys(state.renderPassCache.dirty || {}).forEach((key) => {
+      state.renderPassCache.dirty[key] = true;
+      state.renderPassCache.reasons[key] = "physical-visual-regression";
+    });
+    state.showPhysical = false;
+    state.renderNowFn?.();
+  });
+  await page.waitForTimeout(400);
+  const physicalOffSnapshot = await captureCanvasSnapshot(page);
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    state.showPhysical = true;
+    Object.keys(state.renderPassCache.dirty || {}).forEach((key) => {
+      state.renderPassCache.dirty[key] = true;
+      state.renderPassCache.reasons[key] = "physical-visual-regression";
+    });
+    state.renderNowFn?.();
+  });
+  await page.waitForTimeout(400);
+  const physicalOnSnapshot = await captureCanvasSnapshot(page);
+  const reliefOverlayDiff = getMeanRgbDiff(physicalOffSnapshot, physicalOnSnapshot);
+  expect(reliefOverlayDiff).toBeGreaterThan(0.9);
+  expect(reliefOverlayDiff).toBeLessThan(10);
+
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
   expect(pageErrors, `Page errors: ${JSON.stringify(pageErrors, null, 2)}`).toEqual([]);
   expect(networkFailures, `Network failures: ${JSON.stringify(networkFailures, null, 2)}`).toEqual([]);
