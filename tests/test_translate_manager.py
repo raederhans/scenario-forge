@@ -12,6 +12,7 @@ from tools.translate_manager import (
     build_translation_source_audit,
     collect_ui_keys,
     contains_cjk,
+    load_inline_ui_translations,
 )
 
 
@@ -102,6 +103,25 @@ const label = t("Say \"hi\"", "ui");
 
             self.assertIn("Next Label", keys)
             self.assertNotIn("Broken      data-extra=", keys)
+
+    def test_load_inline_ui_translations_reuses_existing_runtime_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "js/ui/i18n.js",
+                """
+const INLINE_UI_TRANSLATIONS = Object.freeze({
+  "Atlas Ink": { zh: "\\u56fe\\u96c6\\u58a8\\u84dd", en: "Atlas Ink" },
+  Guide: { zh: "\\u6307\\u5357", en: "Guide" },
+});
+                """.strip(),
+            )
+
+            translations = load_inline_ui_translations(repo_root)
+
+            self.assertEqual(translations["Atlas Ink"], "图集墨蓝")
+            self.assertEqual(translations["Guide"], "指南")
 
     def test_contains_cjk_uses_shared_cjk_detection(self) -> None:
         self.assertTrue(contains_cjk("阿尔法"))

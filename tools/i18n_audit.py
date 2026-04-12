@@ -83,11 +83,15 @@ NON_TRANSLATABLE_PATTERNS = (
     re.compile(r"^[+\-]?\d+(?:\.\d+)?$"),
 )
 PLACEHOLDER_SAMPLE_RE = re.compile(r"^[a-z][a-z0-9_-]{2,}$")
+UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
+HEX_ESCAPE_RE = re.compile(r"\\x([0-9a-fA-F]{2})")
 
 
 def decode_js_string(text: str) -> str:
     value = text.strip()
     value = value.replace(r"\'", "'").replace(r'\"', '"')
+    value = UNICODE_ESCAPE_RE.sub(lambda match: chr(int(match.group(1), 16)), value)
+    value = HEX_ESCAPE_RE.sub(lambda match: chr(int(match.group(1), 16)), value)
     value = value.replace(r"\n", " ").replace(r"\r", " ").replace(r"\t", " ")
     return " ".join(value.split())
 
@@ -426,6 +430,7 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- Declarative UI keys via data-i18n*: {report['declarative_ui_key_count']}")
     lines.append(f"- Legacy uiMap keys: {report['legacy_ui_map_key_count']}")
     lines.append(f"- Missing UI locale keys: {report['ui_missing_count']}")
+    lines.append(f"- UI english fallback entries: {report['ui_english_fallback_count']}")
     lines.append(f"- Covered default literals: {report['covered_default_literal_count']}")
     lines.append(f"- Uncovered user-visible literals: {report['uncovered_user_visible_count']}")
     lines.append(f"- A11y literals requiring translation wiring: {report['a11y_literal_count']}")
@@ -462,6 +467,14 @@ def render_markdown(report: dict) -> str:
     lines.append("## Missing UI Locale Keys")
     if report["ui_missing_keys"]:
         for key in report["ui_missing_keys"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## UI English Fallback Entries")
+    if report["ui_english_fallback_keys"]:
+        for key in report["ui_english_fallback_keys"]:
             lines.append(f"- {key}")
     else:
         lines.append("- None")
@@ -648,6 +661,7 @@ def main() -> None:
 
     ui_locale_key_set = set((locales.get("ui") or {}).keys())
     ui_locale_keys = sorted(ui_locale_key_set)
+    ui_locale = locales.get("ui") or {}
     geo_locale = locales.get("geo") or {}
 
     ui_used = (
@@ -656,6 +670,17 @@ def main() -> None:
         | set(code_strings["legacy_ui_map_keys"])
     )
     ui_missing = sorted(key for key in ui_used if key not in ui_locale_key_set)
+    ui_english_fallback_keys = []
+    for key, entry in ui_locale.items():
+        if not isinstance(entry, dict):
+            continue
+        en_value = str(entry.get("en", key) or key)
+        zh_value = str(entry.get("zh", key) or key)
+        if not is_user_visible_candidate(en_value):
+            continue
+        if is_missing_like(zh_value, en_value):
+            ui_english_fallback_keys.append(key)
+    ui_english_fallback_keys = sorted(set(ui_english_fallback_keys))
 
     shell_fallback_geo = sorted(key for key in geo_locale if is_shell_fallback_name(key))
     shell_fallback_missing_like = sorted(
@@ -750,6 +775,8 @@ def main() -> None:
         "legacy_ui_map_keys": code_strings["legacy_ui_map_keys"],
         "ui_missing_count": len(ui_missing),
         "ui_missing_keys": ui_missing,
+        "ui_english_fallback_count": len(ui_english_fallback_keys),
+        "ui_english_fallback_keys": ui_english_fallback_keys,
         "covered_default_literal_count": len(code_strings["covered_default_literals"]),
         "covered_default_literals": code_strings["covered_default_literals"],
         "uncovered_user_visible_count": len(code_strings["uncovered_user_visible_literals"]),
@@ -800,6 +827,7 @@ def main() -> None:
     print(
         "OK: i18n audit complete. "
         f"ui_missing={report['ui_missing_count']}, "
+        f"ui_english_fallback={report['ui_english_fallback_count']}, "
         f"covered_defaults={report['covered_default_literal_count']}, "
         f"uncovered_visible_ui={report['uncovered_user_visible_count']}, "
         f"a11y_literals={report['a11y_literal_count']}, "

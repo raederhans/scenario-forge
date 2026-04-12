@@ -659,6 +659,24 @@ US_ZONE_TRANSLATION_RE = re.compile(r"(?:\bZone\s*\d+\b|\u7b2c?\s*\d+\s*[\u533a\
 SCENARIO_DISPLAY_FIELDS = ("display_name", "displayName")
 SCENARIO_METADATA_FIELDS = ("bookmark_name", "bookmarkName", "bookmark_description", "bookmarkDescription")
 TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
+UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
+HEX_ESCAPE_RE = re.compile(r"\\x([0-9a-fA-F]{2})")
+INLINE_UI_TRANSLATIONS_RE = re.compile(
+    r"const\s+INLINE_UI_TRANSLATIONS\s*=\s*Object\.freeze\(\{(?P<body>.*?)\}\);",
+    re.DOTALL,
+)
+INLINE_UI_TRANSLATION_ENTRY_RE = re.compile(
+    r"""
+    (?P<key>"(?:\\.|[^"])+"|[A-Za-z_][A-Za-z0-9_ ]*)
+    \s*:\s*
+    \{
+      \s*zh:\s*"(?P<zh>(?:\\.|[^"])*)"
+      \s*,\s*en:\s*"(?P<en>(?:\\.|[^"])*)"
+      \s*
+    \}
+    """,
+    re.DOTALL | re.VERBOSE,
+)
 
 
 
@@ -666,6 +684,8 @@ TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
 def decode_js_string(text: str) -> str:
     value = text.strip()
     value = value.replace(r"\'", "'").replace(r'\"', '"')
+    value = UNICODE_ESCAPE_RE.sub(lambda match: chr(int(match.group(1), 16)), value)
+    value = HEX_ESCAPE_RE.sub(lambda match: chr(int(match.group(1), 16)), value)
     value = value.replace(r"\n", " ").replace(r"\r", " ").replace(r"\t", " ")
     return " ".join(value.split())
 
@@ -897,6 +917,33 @@ def collect_ui_keys(repo_root: Path) -> list[str]:
                 if value:
                     keys.add(value)
     return sorted(keys)
+
+
+def load_inline_ui_translations(repo_root: Path) -> dict[str, str]:
+    i18n_path = repo_root / "js" / "ui" / "i18n.js"
+    if not i18n_path.exists():
+        return {}
+    try:
+        content = i18n_path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return {}
+
+    object_match = INLINE_UI_TRANSLATIONS_RE.search(content)
+    scan_source = object_match.group("body") if object_match else content
+    payload: dict[str, str] = {}
+    for match in INLINE_UI_TRANSLATION_ENTRY_RE.finditer(scan_source):
+        raw_key = str(match.group("key") or "").strip()
+        if raw_key.startswith('"') and raw_key.endswith('"'):
+            raw_key = raw_key[1:-1]
+        key = decode_js_string(raw_key)
+        zh_value = decode_js_string(match.group("zh") or "")
+        en_value = decode_js_string(match.group("en") or "")
+        if not key or not zh_value:
+            continue
+        payload[key] = zh_value
+        if en_value:
+            payload.setdefault(en_value, zh_value)
+    return payload
 
 
 def parse_country_codes(raw_value: str | None) -> set[str]:
@@ -1308,6 +1355,7 @@ def resolve_zh(
     en_value: str,
     current_existing: dict,
     baseline_existing: dict,
+    inline_ui_translations: dict[str, str],
     translator: MachineTranslator,
     alias_to_stable: dict,
     stable_to_primary: dict,
@@ -1315,6 +1363,12 @@ def resolve_zh(
 ) -> tuple[str, str]:
     if section == "ui" and key in MANUAL_UI_DICT:
         return MANUAL_UI_DICT[key], "manual_ui"
+    if section == "ui" and en_value in MANUAL_UI_DICT:
+        return MANUAL_UI_DICT[en_value], "manual_ui"
+    if section == "ui":
+        inline_zh = inline_ui_translations.get(key) or inline_ui_translations.get(en_value)
+        if inline_zh and not is_missing_like(inline_zh, en_value):
+            return inline_zh, "inline_ui_reuse"
 
     if section == "geo" and key in EUROPE_GEO_SEEDS:
         return EUROPE_GEO_SEEDS[key], "geo_seed"
@@ -1388,6 +1442,7 @@ def merge_ui(
     current_ui: dict,
     baseline_ui: dict,
     discovered_ui_keys: list[str],
+    inline_ui_translations: dict[str, str],
     translator: MachineTranslator,
 ) -> tuple[dict, dict]:
     current_normalized = {key: normalize_entry(key, value) for key, value in (current_ui or {}).items()}
@@ -1404,6 +1459,7 @@ def merge_ui(
             en_value=existing["en"],
             current_existing=current_normalized,
             baseline_existing=baseline_normalized,
+            inline_ui_translations=inline_ui_translations,
             translator=translator,
             alias_to_stable={},
             stable_to_primary={},
@@ -1462,6 +1518,7 @@ def merge_geo(
             en_value=existing_primary.get("en", primary_name),
             current_existing=current_normalized,
             baseline_existing=baseline_normalized,
+            inline_ui_translations={},
             translator=translator,
             alias_to_stable=alias_to_stable,
             stable_to_primary=stable_to_primary,
@@ -1487,6 +1544,7 @@ def merge_geo(
             en_value=en_value,
             current_existing=current_normalized,
             baseline_existing=baseline_normalized,
+            inline_ui_translations={},
             translator=translator,
             alias_to_stable=alias_to_stable,
             stable_to_primary=stable_to_primary,
@@ -1541,6 +1599,7 @@ def build_translation_source_audit(
             "entry_count": len(ui_payload),
             "source_counts": ui_counts,
             "sample_keys_by_source": ui_samples,
+            "english_fallback_count": ui_counts.get("english_fallback", 0),
         },
         "geo": {
             "entry_count": len(geo_payload),
@@ -1772,6 +1831,7 @@ def sync_translations(
     geo_names = sorted(geo_names)
     alias_to_stable, stable_to_primary, search_only_aliases = load_geo_aliases(geo_aliases_path)
     discovered_ui_keys = collect_ui_keys(base_dir)
+    inline_ui_translations = load_inline_ui_translations(base_dir)
     translator = MachineTranslator(
         enabled=machine_translate_enabled,
         delay_seconds=translator_delay_seconds,
@@ -1783,6 +1843,7 @@ def sync_translations(
         current_locales.get("ui", {}),
         baseline_locales.get("ui", {}),
         discovered_ui_keys,
+        inline_ui_translations,
         translator,
     )
     geo_payload, geo_sources = merge_geo(
@@ -1870,6 +1931,7 @@ def sync_translations(
         "scenario_geo_names": scenario_geo_name_count,
         "alias_map": len(alias_to_stable),
         "mt_requests": translator.requests_made,
+        "ui_english_fallback_count": int(audit_payload.get("ui", {}).get("english_fallback_count", 0)),
         "corrupted_translation_count": corrupted_translation_count,
         "machine_translate_enabled": machine_translate_enabled,
         "machine_translate_available": machine_translate_available,
@@ -1927,7 +1989,9 @@ def main() -> None:
         f"source_name_corrupted={result['source_name_corrupted_count']}, "
         f"corrupted_translations={result['corrupted_translation_count']}, "
         f"scenario_geo_names={result['scenario_geo_names']}, "
-        f"alias_map={result['alias_map']}, mt_requests={result['mt_requests']}"
+        f"alias_map={result['alias_map']}, mt_requests={result['mt_requests']}, "
+        f"ui_english_fallback={result['ui_english_fallback_count']}, "
+        f"review_queue={result['review_queue_entries']}"
     )
     if result["resolved_country_codes"]:
         print(

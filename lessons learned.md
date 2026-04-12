@@ -407,3 +407,11 @@
 ### 65. canvas 标签重绘回归优先断言“重绘发生 + 目标标签状态”，不要把 fillText hook 当唯一证据
 - fillText/strokeText hook 适合抓“有没有画”，但对长链路 i18n redraw 很容易受视口、候选标签、重排影响而变脆。
 - 更稳的最短路径是：同时断言 drawLabelsPass.recordedAt 前进、当前语言切换成功、目标 feature 的最终显示标签已更新；文本 hook 只作为加分证据。
+
+### 66. 生成用 locales 和运行时 inline i18n 不能双轨各自漂移
+- 这次 57 个 UI key 已经在 js/ui/i18n.js 里有中文，但 	ranslate_manager 没有复用它们，导致生成 data/locales.json 时仍回退成英文或机翻。
+- 更稳的做法是：保留运行时 fallback，但 sync/build 也必须把 inline translation 当成输入来源之一，避免同一份中文写了却喂不到正式产物。
+
+### 67. i18n audit 处理 JS 字符串时，要先解码 \uXXXX 再判断是不是可翻译文案
+- 像 \u00D7、\u25B6、\u2699 这种图标，如果不先解码，就会被误判成带字母的未汉化字符串。
+- 更稳的做法是：先把 Unicode escape 还原成真实字符，再走可见文案/非翻译 token 判断。

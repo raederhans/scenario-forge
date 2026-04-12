@@ -96,6 +96,23 @@ const label = t("Create Tag", "ui");
 
             self.assertEqual(result["ui_t_keys"], result["literal_translated_ui_keys"])
 
+    def test_unicode_icon_escape_does_not_count_as_uncovered_literal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "js/sample.js",
+                r"""
+const gear = document.createElement("button");
+gear.textContent = "\u2699";
+                """.strip(),
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertNotIn("\\u2699", result["uncovered_user_visible_literals"])
+            self.assertNotIn("⚙", result["uncovered_user_visible_literals"])
+
     def test_collect_code_strings_ignores_broken_multiline_declarative_markup_without_hiding_valid_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
