@@ -589,3 +589,7 @@
 ### 49. 首屏间歇性视觉脏块，如果只在 startup/coarse 阶段出现，除了改颜色，还要考虑推迟那类 overlay 到 detail 稳定后再显示
 - 这次亚特兰托帕黄块在单独去掉 `salt_texture` 之后仍有间歇反馈，说明问题不只是某一个 fill 颜色，而是“Atlantropa relief overlay 在 startup 早期就参与绘制”这件事本身也会放大首屏不稳定。
 - 更稳的做法是：对这类只在 detail 稳态下才有意义的场景 overlay，除了调色，还在 `detailPromotionCompleted` 之前直接不显示，等拓扑和遮罩稳定后再画。
+
+### 34. Pages/部署构建如果会在 CI 里重建 `dist`，就不要把 `dist/app/data/**` 这类生成产物塞进 Git 历史
+- 这次 push 失败不是代码坏了，而是本地未推送提交里混进了 `dist/app/data/**` 下的超大生成文件，远端收 pack 时直接报 HTTP 500。
+- 更稳的最短路径是：把真正的 source of truth 留在 `data/**`、`js/**`、`tools/**`，把 CI 会重建出来的 `dist/app/data/**` 直接 `.gitignore`，不要等大文件进了历史再补救。
