@@ -1391,6 +1391,16 @@ function collectScenarioPoliticalFeatureIdsForChunkIds(bundle, chunkIds = []) {
   return Array.from(new Set(featureIds));
 }
 
+function getScenarioChunkIdSetByLayer(bundle, layerKey = "") {
+  const normalizedLayerKey = String(layerKey || "").trim().toLowerCase();
+  if (!normalizedLayerKey) return new Set();
+  return new Set(
+    (Array.isArray(bundle?.chunkRegistry?.byLayer?.[normalizedLayerKey]) ? bundle.chunkRegistry.byLayer[normalizedLayerKey] : [])
+      .map((chunk) => String(chunk?.id || "").trim())
+      .filter(Boolean)
+  );
+}
+
 async function loadScenarioChunkFile(
   url,
   {
@@ -1557,6 +1567,7 @@ function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, {
     reason,
     changedLayerKeys,
     politicalFeatureIds: resolvedPoliticalFeatureIds,
+    hasPoliticalPayloadChange: true,
   });
   recordScenarioRenderMetric("politicalChunkPromotionMs", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
     scenarioId: getScenarioBundleId(bundle),
@@ -1891,10 +1902,11 @@ async function refreshActiveScenarioChunks({
   loadState.layerSelectionSignatures = nextLayerSignatures;
   loadState.mergedLayerPayloadCache = mergedLayerPayloads;
   const politicalRequired = selection.requiredChunks.some((chunk) => chunk.layer === "political");
+  const politicalChunkIdSet = getScenarioChunkIdSetByLayer(bundle, "political");
   const previousRequiredPoliticalChunkIds = (Array.isArray(previousSelection?.requiredChunkIds) ? previousSelection.requiredChunkIds : [])
-    .filter((chunkId) => String(bundle?.chunkRegistry?.byId?.[chunkId]?.layer || "").trim().toLowerCase() === "political");
+    .filter((chunkId) => politicalChunkIdSet.has(String(chunkId || "").trim()));
   const nextRequiredPoliticalChunkIds = nextRequiredChunkIds
-    .filter((chunkId) => String(bundle?.chunkRegistry?.byId?.[chunkId]?.layer || "").trim().toLowerCase() === "political");
+    .filter((chunkId) => politicalChunkIdSet.has(String(chunkId || "").trim()));
   const changedPoliticalChunkIds = Array.from(new Set([
     ...previousRequiredPoliticalChunkIds.filter((chunkId) => !nextRequiredPoliticalChunkIds.includes(chunkId)),
     ...nextRequiredPoliticalChunkIds.filter((chunkId) => !previousRequiredPoliticalChunkIds.includes(chunkId)),

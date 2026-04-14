@@ -22832,9 +22832,11 @@ function refreshMapDataForScenarioChunkPromotion({
   reason = "scenario-chunk-promotion",
   changedLayerKeys = [],
   politicalFeatureIds = [],
+  hasPoliticalPayloadChange = false,
 } = {}) {
   const startedAt = nowMs();
-  const hasPoliticalChange = Array.isArray(politicalFeatureIds) && politicalFeatureIds.length > 0;
+  const hasPoliticalChange = !!hasPoliticalPayloadChange
+    || (Array.isArray(politicalFeatureIds) && politicalFeatureIds.length > 0);
   if (hasPoliticalChange) {
     ensureLayerDataFromTopology();
     rebuildPoliticalLandCollections();
