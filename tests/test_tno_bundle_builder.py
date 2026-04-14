@@ -28,8 +28,8 @@ from tools.patch_tno_1962_bundle import (
     apply_dev_manual_overrides,
     build_relief_overlays,
     build_tno_bathymetry_payload,
+    build_polar_feature_diagnostics_from_topology,
     build_runtime_topology_state_from_countries_state,
-    build_polar_feature_diagnostics,
     build_runtime_topology_payload,
     build_chunk_assets_stage,
     build_geo_locale_stage,
@@ -795,9 +795,12 @@ class TnoBundleBuilderTest(unittest.TestCase):
             / "runtime_topology.topo.json"
         )
         topology_payload = json.loads(runtime_topology_path.read_text(encoding="utf-8"))
-        political_gdf = topology_object_to_gdf(topology_payload, "political")
-        feature_ids = political_gdf["id"].fillna("").astype(str).tolist()
-        polar_diagnostics = build_polar_feature_diagnostics(political_gdf)
+        geometries = topology_payload.get("objects", {}).get("political", {}).get("geometries", [])
+        feature_ids = [
+            str((geometry.get("properties", {}) or {}).get("id") or "").strip()
+            for geometry in geometries
+        ]
+        polar_diagnostics = build_polar_feature_diagnostics_from_topology(topology_payload, "political")
         shell_fragment_count = sum(feature_id.startswith("RU_ARCTIC_FB_") for feature_id in feature_ids)
 
         self.assertIn("AQ", feature_ids)

@@ -7353,6 +7353,161 @@ def topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFram
     return gdf
 
 
+def _decode_topology_arc_points(
+    topo_dict: dict,
+    arc_index: int,
+    arc_cache: dict[int, list[tuple[float, float]]],
+) -> list[tuple[float, float]]:
+    transform = topo_dict.get("transform") or {}
+    has_transform = isinstance(transform, dict) and bool(transform)
+    scales = transform.get("scale") or [1.0, 1.0]
+    translates = transform.get("translate") or [0.0, 0.0]
+    scale_x = float(scales[0] if len(scales) > 0 else 1.0)
+    scale_y = float(scales[1] if len(scales) > 1 else 1.0)
+    translate_x = float(translates[0] if len(translates) > 0 else 0.0)
+    translate_y = float(translates[1] if len(translates) > 1 else 0.0)
+
+    forward_index = int(arc_index)
+    if forward_index < 0:
+        forward_index = -forward_index - 1
+    if forward_index in arc_cache:
+        points = arc_cache[forward_index]
+    else:
+        arcs = topo_dict.get("arcs") or []
+        if forward_index < 0 or forward_index >= len(arcs):
+            return []
+        points: list[tuple[float, float]] = []
+        x = 0.0
+        y = 0.0
+        for raw_point in arcs[forward_index]:
+            if not isinstance(raw_point, list) or len(raw_point) < 2:
+                continue
+            if has_transform:
+                # TopoJSON with `transform` stores delta-encoded integer arcs.
+                x += float(raw_point[0] or 0.0)
+                y += float(raw_point[1] or 0.0)
+                points.append((x * scale_x + translate_x, y * scale_y + translate_y))
+            else:
+                # TopoJSON without `transform` stores absolute coordinates.
+                points.append((float(raw_point[0] or 0.0), float(raw_point[1] or 0.0)))
+        arc_cache[forward_index] = points
+
+    if int(arc_index) < 0:
+        return list(reversed(points))
+    return list(points)
+
+
+def _decode_topology_ring(
+    topo_dict: dict,
+    ring_arc_indexes: list[object],
+    arc_cache: dict[int, list[tuple[float, float]]],
+) -> list[tuple[float, float]]:
+    ring_points: list[tuple[float, float]] = []
+    for arc_ref in ring_arc_indexes:
+        if not isinstance(arc_ref, int):
+            continue
+        arc_points = _decode_topology_arc_points(topo_dict, arc_ref, arc_cache)
+        if not arc_points:
+            continue
+        if ring_points:
+            ring_points.extend(arc_points[1:])
+        else:
+            ring_points.extend(arc_points)
+    if ring_points and ring_points[0] != ring_points[-1]:
+        ring_points.append(ring_points[0])
+    return ring_points
+
+
+def build_polar_feature_diagnostics_from_topology(
+    topo_dict: dict,
+    object_name: str = "political",
+) -> dict[str, dict[str, object]]:
+    objects = topo_dict.get("objects") if isinstance(topo_dict, dict) else None
+    object_payload = objects.get(object_name) if isinstance(objects, dict) else None
+    geometries = object_payload.get("geometries") if isinstance(object_payload, dict) else None
+    if not isinstance(geometries, list) or not geometries:
+        return {}
+
+    polar_features: list[dict[str, object]] = []
+    arc_cache: dict[int, list[tuple[float, float]]] = {}
+    for geometry in geometries:
+        if not isinstance(geometry, dict):
+            continue
+        properties = geometry.get("properties")
+        if not isinstance(properties, dict):
+            continue
+        feature_id = str(properties.get("id") or "").strip()
+        if not (feature_id == "AQ" or feature_id.startswith("RU_ARCTIC_FB_")):
+            continue
+
+        geometry_type = str(geometry.get("type") or "").strip()
+        arcs = geometry.get("arcs")
+        if geometry_type == "Polygon" and isinstance(arcs, list):
+            rings: list[list[tuple[float, float]]] = []
+            for ring_arc_indexes in arcs:
+                if not isinstance(ring_arc_indexes, list):
+                    continue
+                ring_points = _decode_topology_ring(topo_dict, ring_arc_indexes, arc_cache)
+                if len(ring_points) >= 4:
+                    rings.append(ring_points)
+            if rings:
+                shell = rings[0]
+                holes = [ring for ring in rings[1:] if len(ring) >= 4]
+                polygon = normalize_polygonal(Polygon(shell, holes))
+                if polygon is None:
+                    continue
+                polar_features.append(
+                    make_feature(
+                        polygon,
+                        {
+                            "id": feature_id,
+                            "name": properties.get("name"),
+                            "cntr_code": properties.get("cntr_code"),
+                        },
+                    )
+                )
+        elif geometry_type == "MultiPolygon" and isinstance(arcs, list):
+            polygon_parts: list[Polygon] = []
+            for polygon_arc_indexes in arcs:
+                if not isinstance(polygon_arc_indexes, list) or not polygon_arc_indexes:
+                    continue
+                rings: list[list[tuple[float, float]]] = []
+                for ring_arc_indexes in polygon_arc_indexes:
+                    if not isinstance(ring_arc_indexes, list):
+                        continue
+                    ring_points = _decode_topology_ring(topo_dict, ring_arc_indexes, arc_cache)
+                    if len(ring_points) >= 4:
+                        rings.append(ring_points)
+                if not rings:
+                    continue
+                shell = rings[0]
+                holes = [ring for ring in rings[1:] if len(ring) >= 4]
+                polygon = normalize_polygonal(Polygon(shell, holes))
+                if polygon is None:
+                    continue
+                if isinstance(polygon, MultiPolygon):
+                    polygon_parts.extend(list(polygon.geoms))
+                elif isinstance(polygon, Polygon):
+                    polygon_parts.append(polygon)
+            if polygon_parts:
+                multipolygon = normalize_polygonal(MultiPolygon(polygon_parts))
+                if multipolygon is None:
+                    continue
+                polar_features.append(
+                    make_feature(
+                        multipolygon,
+                        {
+                            "id": feature_id,
+                            "name": properties.get("name"),
+                            "cntr_code": properties.get("cntr_code"),
+                        },
+                    )
+                )
+
+    polar_gdf = geopandas_from_features(polar_features)
+    return build_polar_feature_diagnostics(polar_gdf)
+
+
 def remap_topology_arc_indexes(value: object, offset: int) -> object:
     if not offset:
         return copy.deepcopy(value)
