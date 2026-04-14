@@ -746,10 +746,13 @@ function createDefaultUrbanStyleConfig() {
     color: LEGACY_URBAN_STYLE_DEFAULTS.color,
     blendMode: LEGACY_URBAN_STYLE_DEFAULTS.blendMode,
     fillOpacity: 0.34,
-    strokeOpacity: 0.62,
-    adaptiveStrength: 0.72,
+    strokeOpacity: 0.25,
+    adaptiveStrength: 0.3,
     toneBias: 0.12,
-    minAreaPx: LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx,
+    adaptiveTintEnabled: false,
+    adaptiveTintColor: "#f2dea1",
+    adaptiveTintStrength: 0,
+    minAreaPx: 1,
   };
 }
 
@@ -772,7 +775,7 @@ function hasLegacyUrbanManualSignal(rawConfig) {
   const color = typeof raw.color === "string" ? raw.color.trim().toLowerCase() : LEGACY_URBAN_STYLE_DEFAULTS.color;
   const blendMode = String(raw.blendMode || LEGACY_URBAN_STYLE_DEFAULTS.blendMode).trim().toLowerCase();
   const opacity = clamp(toFiniteNumber(raw.opacity, LEGACY_URBAN_STYLE_DEFAULTS.opacity), 0, 1);
-  const minAreaPx = clamp(toFiniteNumber(raw.minAreaPx, LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx), 0, 80);
+  const minAreaPx = clamp(toFiniteNumber(raw.minAreaPx, LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx), 1, 80);
 
   return (
     color !== LEGACY_URBAN_STYLE_DEFAULTS.color ||
@@ -805,7 +808,10 @@ function normalizeUrbanStyleConfig(rawConfig) {
     strokeOpacity: clamp(toFiniteNumber(raw.strokeOpacity, defaults.strokeOpacity), 0, 1),
     adaptiveStrength: clamp(toFiniteNumber(raw.adaptiveStrength, defaults.adaptiveStrength), 0, 1),
     toneBias: clamp(toFiniteNumber(raw.toneBias, legacyToneBias), -0.3, 0.3),
-    minAreaPx: clamp(toFiniteNumber(raw.minAreaPx, defaults.minAreaPx), 0, 80),
+    adaptiveTintEnabled: raw.adaptiveTintEnabled === undefined ? defaults.adaptiveTintEnabled : !!raw.adaptiveTintEnabled,
+    adaptiveTintColor: normalizeTextureHexColor(raw.adaptiveTintColor, defaults.adaptiveTintColor),
+    adaptiveTintStrength: clamp(toFiniteNumber(raw.adaptiveTintStrength, defaults.adaptiveTintStrength), 0, 0.5),
+    minAreaPx: clamp(toFiniteNumber(raw.minAreaPx, defaults.minAreaPx), 1, 80),
   };
 }
 

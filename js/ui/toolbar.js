@@ -1820,6 +1820,9 @@ function initToolbar({ render } = {}) {
   const urbanAdaptiveStrength = document.getElementById("urbanAdaptiveStrength");
   const urbanStrokeOpacity = document.getElementById("urbanStrokeOpacity");
   const urbanToneBias = document.getElementById("urbanToneBias");
+  const urbanAdaptiveTintEnabled = document.getElementById("urbanAdaptiveTintEnabled");
+  const urbanAdaptiveTintColor = document.getElementById("urbanAdaptiveTintColor");
+  const urbanAdaptiveTintStrength = document.getElementById("urbanAdaptiveTintStrength");
   const urbanMinArea = document.getElementById("urbanMinArea");
   const urbanAdaptiveStatus = document.getElementById("urbanAdaptiveStatus");
   const physicalPreset = document.getElementById("physicalPreset");
@@ -2047,6 +2050,7 @@ function initToolbar({ render } = {}) {
   const urbanAdaptiveStrengthValue = document.getElementById("urbanAdaptiveStrengthValue");
   const urbanStrokeOpacityValue = document.getElementById("urbanStrokeOpacityValue");
   const urbanToneBiasValue = document.getElementById("urbanToneBiasValue");
+  const urbanAdaptiveTintStrengthValue = document.getElementById("urbanAdaptiveTintStrengthValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
   const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
@@ -5445,6 +5449,7 @@ function initToolbar({ render } = {}) {
     if (state.styleConfig.urban.mode === "manual") {
       state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
     }
+    state.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(state.styleConfig.urban.adaptiveTintColor || "#f2dea1");
     return state.styleConfig.urban;
   };
 
@@ -5540,9 +5545,21 @@ function initToolbar({ render } = {}) {
     }
     if (urbanToneBias) urbanToneBias.value = String(Math.round(urbanConfig.toneBias * 100));
     if (urbanToneBiasValue) urbanToneBiasValue.textContent = formatUrbanToneBias(urbanConfig.toneBias);
-    [urbanAdaptiveStrength, urbanStrokeOpacity, urbanToneBias].forEach((element) => {
+    if (urbanAdaptiveTintEnabled) urbanAdaptiveTintEnabled.checked = !!urbanConfig.adaptiveTintEnabled;
+    if (urbanAdaptiveTintColor) urbanAdaptiveTintColor.value = urbanConfig.adaptiveTintColor || "#f2dea1";
+    if (urbanAdaptiveTintStrength) urbanAdaptiveTintStrength.value = String(Math.round((urbanConfig.adaptiveTintStrength || 0) * 100));
+    if (urbanAdaptiveTintStrengthValue) {
+      urbanAdaptiveTintStrengthValue.textContent = `${Math.round((urbanConfig.adaptiveTintStrength || 0) * 100)}%`;
+    }
+    [urbanAdaptiveStrength, urbanStrokeOpacity, urbanToneBias, urbanAdaptiveTintEnabled, urbanAdaptiveTintColor, urbanAdaptiveTintStrength].forEach((element) => {
       if (element) element.disabled = !adaptiveAvailable;
     });
+    if (urbanAdaptiveTintColor) {
+      urbanAdaptiveTintColor.disabled = !adaptiveAvailable || !urbanConfig.adaptiveTintEnabled;
+    }
+    if (urbanAdaptiveTintStrength) {
+      urbanAdaptiveTintStrength.disabled = !adaptiveAvailable || !urbanConfig.adaptiveTintEnabled;
+    }
     if (urbanMinArea) urbanMinArea.value = String(Math.round(urbanConfig.minAreaPx));
     if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(urbanConfig.minAreaPx)}`;
     return urbanConfig;
@@ -8469,11 +8486,37 @@ function initToolbar({ render } = {}) {
       renderDirty("urban-tone-bias");
     });
   }
+  if (urbanAdaptiveTintEnabled) {
+    urbanAdaptiveTintEnabled.addEventListener("change", (event) => {
+      const cfg = syncUrbanConfig();
+      cfg.adaptiveTintEnabled = !!event.target.checked;
+      syncUrbanControls();
+      renderDirty("urban-adaptive-tint-enabled");
+    });
+  }
+  if (urbanAdaptiveTintColor) {
+    urbanAdaptiveTintColor.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
+      cfg.adaptiveTintColor = normalizeOceanFillColor(event.target.value || cfg.adaptiveTintColor || "#f2dea1");
+      renderDirty("urban-adaptive-tint-color");
+    });
+  }
+  if (urbanAdaptiveTintStrength) {
+    urbanAdaptiveTintStrength.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
+      const value = Number(event.target.value);
+      cfg.adaptiveTintStrength = clamp(Number.isFinite(value) ? value / 100 : cfg.adaptiveTintStrength, 0, 0.5);
+      if (urbanAdaptiveTintStrengthValue) {
+        urbanAdaptiveTintStrengthValue.textContent = `${Math.round(cfg.adaptiveTintStrength * 100)}%`;
+      }
+      renderDirty("urban-adaptive-tint-strength");
+    });
+  }
   if (urbanMinArea) {
     urbanMinArea.addEventListener("input", (event) => {
       const cfg = syncUrbanConfig();
       const value = Number(event.target.value);
-      cfg.minAreaPx = clamp(Number.isFinite(value) ? value : 8, 0, 80);
+      cfg.minAreaPx = clamp(Number.isFinite(value) ? value : 1, 1, 80);
       if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(cfg.minAreaPx)}`;
       renderDirty("urban-area");
     });
@@ -9587,4 +9630,3 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar };
-

@@ -95,6 +95,9 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
   "Grassland & Steppe": { zh: "\u8349\u539f\u4e0e\u8349\u539f\u5e26", en: "Grassland & Steppe" },
   "Desert & Bare": { zh: "\u8352\u6f20\u4e0e\u88f8\u5730", en: "Desert & Bare" },
   "Tundra & Ice": { zh: "\u82d4\u539f\u4e0e\u51b0\u96ea", en: "Tundra & Ice" },
+  "Adaptive Tint": { zh: "\u81ea\u9002\u5e94\u8272\u5f69\u503e\u5411", en: "Adaptive Tint" },
+  "Tint Color": { zh: "\u503e\u5411\u989c\u8272", en: "Tint Color" },
+  "Tint Strength": { zh: "\u503e\u5411\u5f3a\u5ea6", en: "Tint Strength" },
 });
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";

@@ -636,16 +636,16 @@
                           <div>
                             <div class="range-row">
                               <label class="range-label" for="urbanAdaptiveStrength" data-i18n="Adaptive Strength">Adaptive Strength</label>
-                              <span id="urbanAdaptiveStrengthValue" class="range-value">72%</span>
+                              <span id="urbanAdaptiveStrengthValue" class="range-value">30%</span>
                             </div>
-                            <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="72" class="range-input" />
+                            <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="30" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
                               <label class="range-label" for="urbanStrokeOpacity" data-i18n="Stroke Opacity">Stroke Opacity</label>
-                              <span id="urbanStrokeOpacityValue" class="range-value">62%</span>
+                              <span id="urbanStrokeOpacityValue" class="range-value">25%</span>
                             </div>
-                            <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="62" class="range-input" />
+                            <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="25" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
@@ -653,6 +653,24 @@
                               <span id="urbanToneBiasValue" class="range-value">+12%</span>
                             </div>
                             <input id="urbanToneBias" type="range" min="-30" max="30" value="12" class="range-input" />
+                          </div>
+                          <div>
+                            <label class="range-label" for="urbanAdaptiveTintEnabled" data-i18n="Adaptive Tint">Adaptive Tint</label>
+                            <label class="toggle-switch mt-2">
+                              <input id="urbanAdaptiveTintEnabled" type="checkbox" />
+                              <span class="toggle-slider"></span>
+                            </label>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label class="range-label" for="urbanAdaptiveTintColor" data-i18n="Tint Color">Tint Color</label>
+                            <input id="urbanAdaptiveTintColor" type="color" value="#f2dea1" class="color-input" />
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label class="range-label" for="urbanAdaptiveTintStrength" data-i18n="Tint Strength">Tint Strength</label>
+                              <span id="urbanAdaptiveTintStrengthValue" class="range-value">0%</span>
+                            </div>
+                            <input id="urbanAdaptiveTintStrength" type="range" min="0" max="50" value="0" class="range-input" />
                           </div>
                         </div>
                         <div id="urbanManualControls" class="space-y-2 hidden">
@@ -681,9 +699,9 @@
                         <div>
                           <div class="range-row">
                             <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea">Min Area (px)</label>
-                            <span id="urbanMinAreaValue" class="range-value">8</span>
+                            <span id="urbanMinAreaValue" class="range-value">1</span>
                           </div>
-                          <input id="urbanMinArea" type="range" min="0" max="80" value="8" class="range-input" />
+                          <input id="urbanMinArea" type="range" min="1" max="80" value="1" class="range-input" />
                         </div>
                       </div>
                     </div>
