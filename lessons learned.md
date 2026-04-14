@@ -604,3 +604,11 @@
 ### 26. 未来 family 的占位状态如果还没接通 runtime，就不要先写进项目保存链
 - 这次 `showRail/showRoad` 先写进 save/load，实际却还没有对应的加载、渲染、缓存失效入口，马上就暴露出“状态能恢复，但行为没接上”的半接通风险。
 - 更稳的做法是：要么一次把 family 的 state/load/render/invalidation 一起接通；要么在真正落地前只保留 style/schema 占位，不把开关真值写进项目文件。
+
+### 50. 场景 overlay cache signature 不能只看数据数量，还要带上 detail/composite 阶段 token
+- 这次 Atlantropa 黄块残留不是 relief 数据又坏了，而是 `contextScenario` pass 的缓存签名没把 `topologyBundleMode`、`detailPromotionCompleted`、`detailPromotionInFlight` 算进去，导致 coarse/detail 切换后旧画面还能留在稳定帧。
+- 更稳的做法是：凡是“同一批数据在不同阶段显示规则不同”的 overlay pass，签名里必须显式带上阶段 token；不要只靠 feature count 或 revision 侥幸命中重绘。
+
+### 51. startup bundle 先进入 ready 不代表场景视觉壳已经完整，缺 mask 的场景要提前 full hydration
+- 这次首屏亚特兰托帕海域残留问题，本质上是 startup bundle 已让 TNO 进入 `ready/composite`，但 `scenarioLandMaskData` / `scenarioContextLandMaskData` 还要等默认的 post-ready full hydration，视觉上就会先看到错误海域壳。
+- 更稳的做法是：如果活动场景已经声明了 runtime topology，但 ready 后关键 mask 仍为空，就不要继续按通用延后时间等 full hydration，而应立即快速调度完整场景水合。

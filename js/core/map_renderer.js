@@ -1705,6 +1705,9 @@ function getScenarioOverlaySignatureToken() {
     getFeatureCollectionFeatureCount(state.scenarioWaterRegionsData),
     getFeatureCollectionFeatureCount(state.scenarioSpecialRegionsData),
     getFeatureCollectionFeatureCount(state.scenarioReliefOverlaysData),
+    String(state.topologyBundleMode || "single"),
+    state.detailPromotionCompleted ? "detail-ready" : "detail-pending",
+    state.detailPromotionInFlight ? "detail-in-flight" : "detail-idle",
   ].join("|");
 }
 
@@ -2198,8 +2201,9 @@ function isReliefOverlayEnabled(feature) {
   if (!feature) return false;
   if (!state.activeScenarioId) return false;
   if (!state.showScenarioReliefOverlays) return false;
-  if (isAtlantropaReliefOverlayFeature(feature) && !state.detailPromotionCompleted) {
-    return false;
+  if (isAtlantropaReliefOverlayFeature(feature)) {
+    if (!state.detailPromotionCompleted) return false;
+    if (String(state.topologyBundleMode || "").trim().toLowerCase() !== "composite") return false;
   }
   if (isBaseGeographyScenarioFeature(feature)) return true;
   return feature?.properties?.interactive !== false;

@@ -57,6 +57,25 @@ test("TNO startup reaches editable composite-ready state without stale coarse wa
   expect(runtime.scenarioStatus).not.toContain("coarse mode");
 });
 
+test("TNO startup fast-tracks full hydration when startup shell lacks scenario masks", async ({ page }) => {
+  test.setTimeout(240000);
+  await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });
+  await waitForTnoReady(page);
+
+  await expect.poll(async () => {
+    const runtime = await readTnoRuntime(page);
+    return {
+      hasScenarioLandMask: runtime.overlayState.hasScenarioLandMask,
+      hasScenarioContextLandMask: runtime.overlayState.hasScenarioContextLandMask,
+      hydrationStatus: String(runtime.scenarioHydrationHealthGate?.status || ""),
+    };
+  }, { timeout: 15000 }).toEqual({
+    hasScenarioLandMask: true,
+    hasScenarioContextLandMask: true,
+    hydrationStatus: "ok",
+  });
+});
+
 test("basic startup interaction rebuild restores land spatial picking before leaving basic-ready", async ({ page }) => {
   test.setTimeout(240000);
   await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });

@@ -1168,6 +1168,30 @@ async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", rende
   }
 }
 
+function hasHydrationFeatureCollectionData(collection) {
+  return Array.isArray(collection?.features) && collection.features.length > 0;
+}
+
+function shouldFastTrackScenarioHydration() {
+  const manifest = state.activeScenarioManifest;
+  if (!manifest || !String(state.activeScenarioId || "").trim()) {
+    return false;
+  }
+  const runtimeTopologyUrl = String(
+    manifest.runtime_topology_url
+    || manifest.runtime_bootstrap_topology_url
+    || manifest.startup_topology_url
+    || ""
+  ).trim();
+  if (!runtimeTopologyUrl) {
+    return false;
+  }
+  return (
+    !hasHydrationFeatureCollectionData(state.scenarioLandMaskData)
+    || !hasHydrationFeatureCollectionData(state.scenarioContextLandMaskData)
+  );
+}
+
 function schedulePostReadyHydration() {
   if (postReadyHydrationScheduled) {
     return;
@@ -1190,8 +1214,8 @@ function schedulePostReadyHydration() {
     })
   ), {
     timeout: 4800,
-    delayMs: 4200,
-    retryDelayMs: 900,
+    delayMs: shouldFastTrackScenarioHydration() ? 300 : 4200,
+    retryDelayMs: shouldFastTrackScenarioHydration() ? 450 : 900,
   });
 }
 
