@@ -22774,8 +22774,27 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
     return false;
   }
   const startedAt = nowMs();
+  buildIndex();
+  await yieldToMain();
+  if (promotionVersion !== scenarioChunkPromotionVersion) {
+    return false;
+  }
+  await buildSpatialIndexChunked({
+    includeSecondary: false,
+    keepReady: true,
+  });
+  if (promotionVersion !== scenarioChunkPromotionVersion) {
+    return false;
+  }
+  scheduleSecondarySpatialIndexBuild({
+    reason: `${reason}-secondary-spatial`,
+  });
+  if (state.hitCanvasDirty) {
+    scheduleHitCanvasBuildIfNeeded({
+      reason: `${reason}-hit-canvas`,
+    });
+  }
   if (hasPoliticalGeometryChange) {
-    buildIndex();
     ensureSovereigntyState();
     rebuildStaticMeshes();
     refreshScenarioOpeningOwnerBorders({
@@ -22784,27 +22803,8 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
     });
     invalidateBorderCache();
     updateDynamicBorderStatusUI();
-    await yieldToMain();
-    if (promotionVersion !== scenarioChunkPromotionVersion) {
-      return false;
-    }
-    await buildSpatialIndexChunked({
-      includeSecondary: false,
-      keepReady: true,
-    });
-    if (promotionVersion !== scenarioChunkPromotionVersion) {
-      return false;
-    }
     updateSpecialZonesPaths();
     renderSpecialZoneEditorOverlay();
-    scheduleSecondarySpatialIndexBuild({
-      reason: `${reason}-secondary-spatial`,
-    });
-    if (state.hitCanvasDirty) {
-      scheduleHitCanvasBuildIfNeeded({
-        reason: `${reason}-hit-canvas`,
-      });
-    }
   }
   if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
     state.runtimeChunkLoadState.pendingInfraPromotion = null;
