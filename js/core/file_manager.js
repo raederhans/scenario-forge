@@ -6,6 +6,7 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchUiState,
   normalizeTextureStyleConfig,
@@ -319,6 +320,7 @@ class FileManager {
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
+        showTransport: appState.showTransport === undefined ? true : !!appState.showTransport,
         showAirports: !!appState.showAirports,
         showPorts: !!appState.showPorts,
         showSpecialZones: !!appState.showSpecialZones,
@@ -333,6 +335,7 @@ class FileManager {
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
         urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
+        transportOverview: normalizeTransportOverviewStyleConfig(appState.styleConfig?.transportOverview),
         rivers: appState.styleConfig?.rivers || null,
         specialZones: appState.styleConfig?.specialZones || null,
         texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
@@ -457,6 +460,7 @@ class FileManager {
         data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
         data.styleConfig.urban = normalizeUrbanStyleConfig(data.styleConfig.urban);
         data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);
+        data.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(data.styleConfig.transportOverview);
         if (!data.styleConfig.rivers || typeof data.styleConfig.rivers !== "object") {
           data.styleConfig.rivers = null;
         }
@@ -534,6 +538,8 @@ class FileManager {
           data.layerVisibility.showPhysical === undefined ? true : !!data.layerVisibility.showPhysical;
         data.layerVisibility.showRivers =
           data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers;
+        data.layerVisibility.showTransport =
+          data.layerVisibility.showTransport === undefined ? true : !!data.layerVisibility.showTransport;
         data.layerVisibility.showAirports =
           data.layerVisibility.showAirports === undefined ? false : !!data.layerVisibility.showAirports;
         data.layerVisibility.showPorts =

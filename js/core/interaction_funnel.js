@@ -32,6 +32,7 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchUiState,
   state,
@@ -583,6 +584,12 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       ...data.styleConfig.physical,
     });
   }
+  if (data.styleConfig?.transportOverview && typeof data.styleConfig.transportOverview === "object") {
+    state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig({
+      ...(state.styleConfig.transportOverview || {}),
+      ...data.styleConfig.transportOverview,
+    });
+  }
   if (data.styleConfig?.rivers && typeof data.styleConfig.rivers === "object") {
     state.styleConfig.rivers = {
       ...(state.styleConfig.rivers || {}),
@@ -648,6 +655,10 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     state.showUrban = !!data.layerVisibility.showUrban;
     state.showPhysical = !!data.layerVisibility.showPhysical;
     state.showRivers = !!data.layerVisibility.showRivers;
+    state.showTransport =
+      data.layerVisibility.showTransport === undefined
+        ? true
+        : !!data.layerVisibility.showTransport;
     state.showAirports = !!data.layerVisibility.showAirports;
     state.showPorts = !!data.layerVisibility.showPorts;
     state.showSpecialZones =
@@ -725,13 +736,13 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       renderNow: false,
     });
   }
-  if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
+  if (state.showTransport && state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
     await state.ensureContextLayerDataFn("airports", {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
+  if (state.showTransport && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
     await state.ensureContextLayerDataFn("ports", {
       reason: "project-import",
       renderNow: false,

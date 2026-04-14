@@ -593,3 +593,11 @@
 ### 34. Pages/部署构建如果会在 CI 里重建 `dist`，就不要把 `dist/app/data/**` 这类生成产物塞进 Git 历史
 - 这次 push 失败不是代码坏了，而是本地未推送提交里混进了 `dist/app/data/**` 下的超大生成文件，远端收 pack 时直接报 HTTP 500。
 - 更稳的最短路径是：把真正的 source of truth 留在 `data/**`、`js/**`、`tools/**`，把 CI 会重建出来的 `dist/app/data/**` 直接 `.gitignore`，不要等大文件进了历史再补救。
+### 24. startup support slimming之后，新增顶层功能入口先默认只进 deferred runtime，不要顺手塞回 startup 主链
+- 这次 `Appearance > Transport` 说明了一条边界：新增顶层 tab 的 UI 壳可以先上线，但 family 真数据应继续走启动后按需加载。
+- `startup_support_whitelist` 当前主要约束 geo key / alias，不是普通 UI 文案；不要因为加一个新 tab 就误以为必须扩 startup support 资产范围。
+- 更稳的最短路径是：先补 tab、state、save/load、renderer 和 lazy load，再单独评估要不要进 scenario publish / chunk contract。
+
+### 25. 总显隐开关不能顺手覆写子图层可见性，尤其当保存链会把子图层状态当成真值写盘时
+- 这次 Transport Overview 暴露出一个典型坑：如果总开关关闭时直接把 showAirports/showPorts 改成 alse，项目保存后就会把“临时总隐藏”误写成“family 真的关闭了”。
+- 更稳的做法是：总开关只负责渲染门控；family 自己的可见性继续单独保存，必要时再单独持久化“上次展开状态”，不要混用同一组字段。

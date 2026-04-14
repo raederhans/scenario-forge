@@ -877,6 +877,119 @@ function normalizeCityLayerStyleConfig(rawConfig) {
   };
 }
 
+const TRANSPORT_OVERVIEW_FAMILY_IDS = Object.freeze(["airport", "port", "rail", "road"]);
+const TRANSPORT_OVERVIEW_LABEL_DENSITIES = Object.freeze(["sparse", "balanced", "dense"]);
+
+function createDefaultTransportOverviewFamilyConfig(familyId) {
+  switch (String(familyId || "").trim().toLowerCase()) {
+    case "airport":
+      return {
+        preset: "balanced",
+        opacity: 0.82,
+        labelsEnabled: true,
+        labelDensity: "balanced",
+        labelMode: "both",
+        scope: "major_civil",
+        importanceThreshold: "secondary",
+      };
+    case "port":
+      return {
+        preset: "balanced",
+        opacity: 0.78,
+        labelsEnabled: true,
+        labelDensity: "balanced",
+        labelMode: "mixed",
+        scope: "regional",
+        importanceThreshold: "secondary",
+      };
+    case "rail":
+      return {
+        preset: "balanced",
+        opacity: 0.72,
+        labelsEnabled: false,
+        labelDensity: "sparse",
+        labelMode: "name",
+        scope: "mainline_only",
+        importanceThreshold: "primary",
+      };
+    case "road":
+      return {
+        preset: "balanced",
+        opacity: 0.72,
+        labelsEnabled: false,
+        labelDensity: "sparse",
+        labelMode: "ref",
+        scope: "motorway_trunk",
+        importanceThreshold: "primary",
+      };
+    default:
+      return {
+        preset: "default",
+        opacity: 0.65,
+        labelsEnabled: false,
+        labelDensity: "balanced",
+        labelMode: "name",
+        scope: "default",
+        importanceThreshold: "primary",
+      };
+  }
+}
+
+function normalizeTransportOverviewLabelDensity(value, fallback = "balanced") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (TRANSPORT_OVERVIEW_LABEL_DENSITIES.includes(normalized)) return normalized;
+  return TRANSPORT_OVERVIEW_LABEL_DENSITIES.includes(fallback) ? fallback : "balanced";
+}
+
+function normalizeTransportOverviewImportanceThreshold(value, fallback = "primary") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "national_core") return "primary";
+  if (normalized === "regional_core") return "secondary";
+  if (normalized === "local_connector") return "all";
+  if (["primary", "secondary", "all"].includes(normalized)) return normalized;
+  if (["primary", "secondary", "all"].includes(fallback)) return fallback;
+  if (fallback === "national_core") return "primary";
+  if (fallback === "regional_core") return "secondary";
+  if (fallback === "local_connector") return "all";
+  return "primary";
+}
+
+function normalizeTransportOverviewFamilyConfig(rawConfig, familyId) {
+  const defaults = createDefaultTransportOverviewFamilyConfig(familyId);
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  return {
+    preset: String(raw.preset || defaults.preset).trim().toLowerCase() || defaults.preset,
+    opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),
+    labelsEnabled: raw.labelsEnabled === undefined ? defaults.labelsEnabled : !!raw.labelsEnabled,
+    labelDensity: normalizeTransportOverviewLabelDensity(raw.labelDensity, defaults.labelDensity),
+    labelMode: String(raw.labelMode || defaults.labelMode).trim().toLowerCase() || defaults.labelMode,
+    scope: String(raw.scope || defaults.scope).trim().toLowerCase() || defaults.scope,
+    importanceThreshold: normalizeTransportOverviewImportanceThreshold(
+      raw.importanceThreshold,
+      defaults.importanceThreshold,
+    ),
+  };
+}
+
+function createDefaultTransportOverviewStyleConfig() {
+  return Object.fromEntries(
+    TRANSPORT_OVERVIEW_FAMILY_IDS.map((familyId) => [
+      familyId,
+      createDefaultTransportOverviewFamilyConfig(familyId),
+    ]),
+  );
+}
+
+function normalizeTransportOverviewStyleConfig(rawConfig) {
+  const source = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  return Object.fromEntries(
+    TRANSPORT_OVERVIEW_FAMILY_IDS.map((familyId) => [
+      familyId,
+      normalizeTransportOverviewFamilyConfig(source[familyId], familyId),
+    ]),
+  );
+}
+
 function createDefaultTextureStyleConfig() {
   return {
     mode: "none",
@@ -1408,6 +1521,11 @@ export {
   normalizeUrbanStyleConfig,
   createDefaultCityLayerStyleConfig,
   normalizeCityLayerStyleConfig,
+  TRANSPORT_OVERVIEW_FAMILY_IDS,
+  createDefaultTransportOverviewFamilyConfig,
+  createDefaultTransportOverviewStyleConfig,
+  normalizeTransportOverviewFamilyConfig,
+  normalizeTransportOverviewStyleConfig,
   PRESET_STORAGE_KEY,
   createDefaultTextureStyleConfig,
   normalizeTextureMode,
@@ -1814,6 +1932,7 @@ export const state = {
   showUrban: true,
   showPhysical: true,
   showRivers: true,
+  showTransport: true,
   showAirports: false,
   showPorts: false,
   showSpecialZones: false,
@@ -2021,6 +2140,7 @@ export const state = {
     physical: {
       ...createDefaultPhysicalStyleConfig(),
     },
+    transportOverview: createDefaultTransportOverviewStyleConfig(),
     rivers: {
       color: "#3b82f6",
       opacity: 0.88,

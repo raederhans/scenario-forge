@@ -1757,6 +1757,30 @@ function initToolbar({ render } = {}) {
   const toggleRivers = document.getElementById("toggleRivers");
   const toggleAirports = document.getElementById("toggleAirports");
   const togglePorts = document.getElementById("togglePorts");
+  const transportAppearanceMasterToggle = document.getElementById("transportAppearanceMasterToggle");
+  const transportAppearanceWorkbenchBtn = document.getElementById("transportAppearanceWorkbenchBtn");
+  const transportAirportCard = document.getElementById("transportAirportCard");
+  const transportPortCard = document.getElementById("transportPortCard");
+  const transportRailCard = document.getElementById("transportRailCard");
+  const transportRoadCard = document.getElementById("transportRoadCard");
+  const transportAirportControls = document.getElementById("transportAirportControls");
+  const transportPortControls = document.getElementById("transportPortControls");
+  const transportRailPlaceholder = document.getElementById("transportRailPlaceholder");
+  const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
+  const airportVisibilityPreset = document.getElementById("airportVisibilityPreset");
+  const airportOpacity = document.getElementById("airportOpacity");
+  const airportLabelsEnabled = document.getElementById("airportLabelsEnabled");
+  const airportLabelDensity = document.getElementById("airportLabelDensity");
+  const airportLabelMode = document.getElementById("airportLabelMode");
+  const airportScope = document.getElementById("airportScope");
+  const airportImportanceThreshold = document.getElementById("airportImportanceThreshold");
+  const portVisibilityPreset = document.getElementById("portVisibilityPreset");
+  const portOpacity = document.getElementById("portOpacity");
+  const portLabelsEnabled = document.getElementById("portLabelsEnabled");
+  const portLabelDensity = document.getElementById("portLabelDensity");
+  const portLabelMode = document.getElementById("portLabelMode");
+  const portTier = document.getElementById("portTier");
+  const portImportanceThreshold = document.getElementById("portImportanceThreshold");
   const toggleCityPoints = document.getElementById("toggleCityPoints");
   const toggleWaterRegions = document.getElementById("toggleWaterRegions");
   const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
@@ -2063,6 +2087,8 @@ function initToolbar({ render } = {}) {
   );
   const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
   const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
+  const airportOpacityValue = document.getElementById("airportOpacityValue");
+  const portOpacityValue = document.getElementById("portOpacityValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -2214,6 +2240,158 @@ function initToolbar({ render } = {}) {
       const matches = !query || label.includes(query);
       item.classList.toggle("hidden", !matches);
     });
+  };
+
+  const createDefaultTransportAppearanceFamilyState = (familyId) => (
+    familyId === "port"
+      ? {
+        preset: "balanced",
+        opacity: 0.78,
+        labelsEnabled: true,
+        labelDensity: "balanced",
+        labelMode: "mixed",
+        scope: "regional",
+        importanceThreshold: "secondary",
+      }
+      : {
+        preset: "balanced",
+        opacity: 0.82,
+        labelsEnabled: true,
+        labelDensity: "balanced",
+        labelMode: "both",
+        scope: "major_civil",
+        importanceThreshold: "secondary",
+      }
+  );
+
+  const ensureTransportAppearanceUiState = () => {
+    if (!state.ui || typeof state.ui !== "object") {
+      state.ui = {};
+    }
+    if (!state.ui.transportAppearance || typeof state.ui.transportAppearance !== "object") {
+      state.ui.transportAppearance = {};
+    }
+    const uiState = state.ui.transportAppearance;
+    if (!uiState.lastLiveFamilyState || typeof uiState.lastLiveFamilyState !== "object") {
+      uiState.lastLiveFamilyState = {
+        airports: !!state.showAirports,
+        ports: !!state.showPorts,
+      };
+    } else {
+      if (typeof uiState.lastLiveFamilyState.airports !== "boolean") {
+        uiState.lastLiveFamilyState.airports = !!state.showAirports;
+      }
+      if (typeof uiState.lastLiveFamilyState.ports !== "boolean") {
+        uiState.lastLiveFamilyState.ports = !!state.showPorts;
+      }
+    }
+    return uiState;
+  };
+
+  const getTransportAppearanceConfig = () => {
+    state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(
+      state.styleConfig?.transportOverview || {},
+    );
+    return state.styleConfig.transportOverview;
+  };
+
+  const setTransportAppearanceGroupEnabled = (container, enabled) => {
+    if (!(container instanceof HTMLElement)) return;
+    container.classList.toggle("opacity-60", !enabled);
+    container.classList.toggle("pointer-events-none", !enabled);
+    container.setAttribute("aria-disabled", enabled ? "false" : "true");
+  };
+
+  const renderTransportAppearanceUi = () => {
+    ensureTransportAppearanceUiState();
+    const transportConfig = getTransportAppearanceConfig();
+    const airportConfig = transportConfig.airport || createDefaultTransportAppearanceFamilyState("airport");
+    const portConfig = transportConfig.port || createDefaultTransportAppearanceFamilyState("port");
+    const transportEnabled = state.showTransport !== false;
+    const airportEnabled = transportEnabled && !!state.showAirports;
+    const portEnabled = transportEnabled && !!state.showPorts;
+
+    if (transportAppearanceMasterToggle) {
+      transportAppearanceMasterToggle.checked = transportEnabled;
+    }
+
+    if (airportVisibilityPreset) airportVisibilityPreset.value = String(airportConfig.preset || "balanced");
+    if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity || 0.82) * 100));
+    if (airportOpacityValue) airportOpacityValue.textContent = `${Math.round(Number(airportConfig.opacity || 0.82) * 100)}%`;
+    if (airportLabelsEnabled) airportLabelsEnabled.checked = !!airportConfig.labelsEnabled;
+    if (airportLabelDensity) airportLabelDensity.value = String(airportConfig.labelDensity || "balanced");
+    if (airportLabelMode) airportLabelMode.value = String(airportConfig.labelMode || "both");
+    if (airportScope) airportScope.value = String(airportConfig.scope || "major_civil");
+    if (airportImportanceThreshold) {
+      airportImportanceThreshold.value = String(airportConfig.importanceThreshold || "secondary");
+    }
+
+    if (portVisibilityPreset) portVisibilityPreset.value = String(portConfig.preset || "balanced");
+    if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity || 0.78) * 100));
+    if (portOpacityValue) portOpacityValue.textContent = `${Math.round(Number(portConfig.opacity || 0.78) * 100)}%`;
+    if (portLabelsEnabled) portLabelsEnabled.checked = !!portConfig.labelsEnabled;
+    if (portLabelDensity) portLabelDensity.value = String(portConfig.labelDensity || "balanced");
+    if (portLabelMode) portLabelMode.value = String(portConfig.labelMode || "mixed");
+    if (portTier) portTier.value = String(portConfig.scope || "regional");
+    if (portImportanceThreshold) {
+      portImportanceThreshold.value = String(portConfig.importanceThreshold || "secondary");
+    }
+
+    [
+      airportVisibilityPreset,
+      airportOpacity,
+      airportLabelsEnabled,
+      airportLabelDensity,
+      airportLabelMode,
+      airportScope,
+      airportImportanceThreshold,
+    ].forEach((control) => {
+      if (control) control.disabled = !airportEnabled;
+    });
+    [
+      portVisibilityPreset,
+      portOpacity,
+      portLabelsEnabled,
+      portLabelDensity,
+      portLabelMode,
+      portTier,
+      portImportanceThreshold,
+    ].forEach((control) => {
+      if (control) control.disabled = !portEnabled;
+    });
+
+    setTransportAppearanceGroupEnabled(transportAirportControls, transportEnabled);
+    setTransportAppearanceGroupEnabled(transportPortControls, transportEnabled);
+    setTransportAppearanceGroupEnabled(transportRailPlaceholder, transportEnabled);
+    setTransportAppearanceGroupEnabled(transportRoadPlaceholder, transportEnabled);
+
+    transportAirportCard?.classList.toggle("opacity-60", !transportEnabled || !state.showAirports);
+    transportPortCard?.classList.toggle("opacity-60", !transportEnabled || !state.showPorts);
+    transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
+    transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
+  };
+
+  const applyTransportAppearanceMasterToggle = (nextEnabled) => {
+    const normalized = !!nextEnabled;
+    if ((state.showTransport !== false) === normalized) {
+      renderTransportAppearanceUi();
+      return;
+    }
+    state.showTransport = normalized;
+    if (!normalized) {
+      renderTransportAppearanceUi();
+      renderDirty("toggle-transport-overview");
+      return;
+    }
+
+    if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
+      void state.ensureContextLayerDataFn("airports", { reason: "transport-master-toggle", renderNow: true });
+    }
+    if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
+      void state.ensureContextLayerDataFn("ports", { reason: "transport-master-toggle", renderNow: true });
+    }
+    renderTransportAppearanceUi();
+    renderDirty("toggle-transport-overview");
   };
 
   const focusOverlaySurface = (container) => focusSurface(container);
@@ -6476,6 +6654,7 @@ function initToolbar({ render } = {}) {
   state.updateParentBorderCountryListFn = renderParentBorderCountryList;
 
   function renderSpecialZoneEditorUI() {
+    ensureTransportAppearanceUiState();
     if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
     if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
     if (toggleCityPoints) toggleCityPoints.checked = !!state.showCityPoints;
@@ -6692,6 +6871,7 @@ function initToolbar({ render } = {}) {
         ? t("Drawing in progress: click map to add vertices, double-click to finish.", "ui")
         : t("Click map to add vertices, double-click to finish.", "ui");
     }
+    renderTransportAppearanceUi();
     updateToolUI();
   }
   state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
@@ -7060,6 +7240,13 @@ function initToolbar({ render } = {}) {
     scenarioTransportWorkbenchBtn.dataset.bound = "true";
   }
 
+  if (transportAppearanceWorkbenchBtn && !transportAppearanceWorkbenchBtn.dataset.bound) {
+    transportAppearanceWorkbenchBtn.addEventListener("click", () => {
+      setTransportWorkbenchState(true, { trigger: transportAppearanceWorkbenchBtn });
+    });
+    transportAppearanceWorkbenchBtn.dataset.bound = "true";
+  }
+
   if (transportWorkbenchInfoBtn && !transportWorkbenchInfoBtn.dataset.bound) {
     transportWorkbenchInfoBtn.addEventListener("click", () => {
       toggleTransportWorkbenchInfoPopover();
@@ -7318,6 +7505,13 @@ function initToolbar({ render } = {}) {
       applyAppearanceFilter();
     });
     appearanceLayerFilter.dataset.bound = "true";
+  }
+
+  if (transportAppearanceMasterToggle && !transportAppearanceMasterToggle.dataset.bound) {
+    transportAppearanceMasterToggle.addEventListener("change", (event) => {
+      applyTransportAppearanceMasterToggle(!!event.target.checked);
+    });
+    transportAppearanceMasterToggle.dataset.bound = "true";
   }
 
   bindDockPopoverDismiss();
@@ -7780,9 +7974,12 @@ function initToolbar({ render } = {}) {
     toggleAirports.checked = !!state.showAirports;
     toggleAirports.addEventListener("change", (event) => {
       state.showAirports = !!event.target.checked;
+      const transportUi = ensureTransportAppearanceUiState();
+      transportUi.lastLiveFamilyState.airports = !!state.showAirports;
       if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
       }
+      renderTransportAppearanceUi();
       renderDirty("toggle-airports");
     });
   }
@@ -7791,11 +7988,142 @@ function initToolbar({ render } = {}) {
     togglePorts.checked = !!state.showPorts;
     togglePorts.addEventListener("change", (event) => {
       state.showPorts = !!event.target.checked;
+      const transportUi = ensureTransportAppearanceUiState();
+      transportUi.lastLiveFamilyState.ports = !!state.showPorts;
       if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
       }
+      renderTransportAppearanceUi();
       renderDirty("toggle-ports");
     });
+  }
+
+  if (airportVisibilityPreset && !airportVisibilityPreset.dataset.bound) {
+    airportVisibilityPreset.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.preset = String(event.target.value || "balanced");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-visibility-preset");
+    });
+    airportVisibilityPreset.dataset.bound = "true";
+  }
+
+  if (airportOpacity && !airportOpacity.dataset.bound) {
+    airportOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().airport.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.82, 0.2, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-opacity");
+    });
+    airportOpacity.dataset.bound = "true";
+  }
+
+  if (airportLabelsEnabled && !airportLabelsEnabled.dataset.bound) {
+    airportLabelsEnabled.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.labelsEnabled = !!event.target.checked;
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-labels-enabled");
+    });
+    airportLabelsEnabled.dataset.bound = "true";
+  }
+
+  if (airportLabelDensity && !airportLabelDensity.dataset.bound) {
+    airportLabelDensity.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.labelDensity = String(event.target.value || "balanced");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-label-density");
+    });
+    airportLabelDensity.dataset.bound = "true";
+  }
+
+  if (airportLabelMode && !airportLabelMode.dataset.bound) {
+    airportLabelMode.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.labelMode = String(event.target.value || "both");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-label-mode");
+    });
+    airportLabelMode.dataset.bound = "true";
+  }
+
+  if (airportScope && !airportScope.dataset.bound) {
+    airportScope.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.scope = String(event.target.value || "major_civil");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-scope");
+    });
+    airportScope.dataset.bound = "true";
+  }
+
+  if (airportImportanceThreshold && !airportImportanceThreshold.dataset.bound) {
+    airportImportanceThreshold.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().airport.importanceThreshold = String(event.target.value || "secondary");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-importance-threshold");
+    });
+    airportImportanceThreshold.dataset.bound = "true";
+  }
+
+  if (portVisibilityPreset && !portVisibilityPreset.dataset.bound) {
+    portVisibilityPreset.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.preset = String(event.target.value || "balanced");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-visibility-preset");
+    });
+    portVisibilityPreset.dataset.bound = "true";
+  }
+
+  if (portOpacity && !portOpacity.dataset.bound) {
+    portOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().port.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.78, 0.2, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-opacity");
+    });
+    portOpacity.dataset.bound = "true";
+  }
+
+  if (portLabelsEnabled && !portLabelsEnabled.dataset.bound) {
+    portLabelsEnabled.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.labelsEnabled = !!event.target.checked;
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-labels-enabled");
+    });
+    portLabelsEnabled.dataset.bound = "true";
+  }
+
+  if (portLabelDensity && !portLabelDensity.dataset.bound) {
+    portLabelDensity.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.labelDensity = String(event.target.value || "balanced");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-label-density");
+    });
+    portLabelDensity.dataset.bound = "true";
+  }
+
+  if (portLabelMode && !portLabelMode.dataset.bound) {
+    portLabelMode.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.labelMode = String(event.target.value || "mixed");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-label-mode");
+    });
+    portLabelMode.dataset.bound = "true";
+  }
+
+  if (portTier && !portTier.dataset.bound) {
+    portTier.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.scope = String(event.target.value || "regional");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-scope");
+    });
+    portTier.dataset.bound = "true";
+  }
+
+  if (portImportanceThreshold && !portImportanceThreshold.dataset.bound) {
+    portImportanceThreshold.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().port.importanceThreshold = String(event.target.value || "secondary");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-importance-threshold");
+    });
+    portImportanceThreshold.dataset.bound = "true";
   }
 
   if (toggleCityPoints) {
@@ -9106,6 +9434,7 @@ function initToolbar({ render } = {}) {
   renderRecentColors();
   renderParentBorderCountryList();
   renderSpecialZoneEditorUI();
+  renderTransportAppearanceUi();
   updateHistoryUi();
   updateZoomUi();
   updateSwatchUI();

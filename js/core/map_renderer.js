@@ -5,6 +5,7 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeTransportOverviewStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
   normalizeUrbanStyleConfig,
@@ -1788,12 +1789,14 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.activeScenarioId || "",
       state.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
       state.showCityPoints ? "cities:on" : "cities:off",
+      state.showTransport ? "transport:on" : "transport:off",
       state.showAirports ? "airports:on" : "airports:off",
       state.showPorts ? "ports:on" : "ports:off",
       `cities:${Number(state.cityLayerRevision || 0)}`,
       `colors:${Number(state.colorRevision || 0)}`,
       `context:${Number(state.contextLayerRevision || 0)}`,
       stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
+      stableJson(normalizeTransportOverviewStyleConfig(state.styleConfig?.transportOverview || {})),
     ].join("::");
   }
   if (passName === "contextScenario") {
@@ -13139,7 +13142,110 @@ function getContextFacilityThresholdRank(threshold, allowed = []) {
   return 1;
 }
 
-function buildContextFacilityEntries(collection, thresholdRank = 1) {
+function getTransportOverviewStyleConfig() {
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
+  state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(
+    state.styleConfig.transportOverview || {},
+  );
+  return state.styleConfig.transportOverview;
+}
+
+function getTransportOverviewFamilyConfig(familyId) {
+  const config = getTransportOverviewStyleConfig();
+  return config?.[familyId] || {};
+}
+
+function getTransportOverviewLabelZoomConfig(familyId, labelDensity) {
+  const base = familyId === "airport"
+    ? { nationalLabelScale: 2.0, regionalLabelScale: 5.0 }
+    : { nationalLabelScale: 2.2, regionalLabelScale: 5.4 };
+  switch (String(labelDensity || "").trim().toLowerCase()) {
+    case "sparse":
+      return {
+        nationalLabelScale: base.nationalLabelScale + 0.7,
+        regionalLabelScale: base.regionalLabelScale + 1.1,
+      };
+    case "dense":
+      return {
+        nationalLabelScale: Math.max(0.75, base.nationalLabelScale - 0.35),
+        regionalLabelScale: Math.max(1.4, base.regionalLabelScale - 0.9),
+      };
+    default:
+      return base;
+  }
+}
+
+function getTransportOverviewImportanceThresholdRank(value, allowed = ["primary", "secondary", "all"]) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!allowed.includes(normalized)) return 2;
+  if (normalized === "primary") return 3;
+  if (normalized === "secondary") return 2;
+  return 1;
+}
+
+function getTransportAirportScopeThreshold(scope) {
+  const normalized = String(scope || "").trim().toLowerCase();
+  if (normalized === "international") return 3;
+  if (normalized === "all_civil") return 1;
+  return 2;
+}
+
+function getTransportPortScopeThreshold(scope) {
+  const normalized = String(scope || "").trim().toLowerCase();
+  if (normalized === "core") return 3;
+  if (normalized === "expanded") return 1;
+  return 2;
+}
+
+function getTransportOverviewAirportPresetStyle(preset) {
+  switch (String(preset || "").trim().toLowerCase()) {
+    case "quiet":
+      return { fillStyle: "#355c9a", strokeStyle: "#eff6ff", labelColor: "#20385d" };
+    case "bold":
+      return { fillStyle: "#0f5fff", strokeStyle: "#f8fbff", labelColor: "#0f2b57" };
+    default:
+      return { fillStyle: "#1d4ed8", strokeStyle: "#dbeafe", labelColor: "#15315f" };
+  }
+}
+
+function getTransportOverviewPortPresetStyle(preset) {
+  switch (String(preset || "").trim().toLowerCase()) {
+    case "quiet":
+      return { fillStyle: "#8f5f1a", strokeStyle: "#ffedd5", labelColor: "#70420d" };
+    case "bold":
+      return { fillStyle: "#d97706", strokeStyle: "#fff2df", labelColor: "#7c2d12" };
+    default:
+      return { fillStyle: "#b45309", strokeStyle: "#ffedd5", labelColor: "#7c2d12" };
+  }
+}
+
+function getTransportOverviewAirportLabelText(properties = {}, mode = "both") {
+  const name = String(properties.name || "").trim();
+  const code = String(properties.iata || properties.icao || "").trim();
+  const normalized = String(mode || "").trim().toLowerCase();
+  if (normalized === "code") return code || name;
+  if (normalized === "name") return name || code;
+  return code && name ? `${code} · ${name}` : (code || name);
+}
+
+function getTransportOverviewPortLabelText(properties = {}, mode = "mixed") {
+  const name = String(properties.name || "").trim();
+  const designation = String(properties.legal_designation_label || properties.legal_designation || "").trim();
+  const normalized = String(mode || "").trim().toLowerCase();
+  if (normalized === "cargo_focus") return designation || name;
+  if (normalized === "name") return name || designation;
+  return designation && name ? `${name} · ${designation}` : (name || designation);
+}
+
+function buildContextFacilityEntries(
+  collection,
+  thresholdRank = 1,
+  {
+    getLabelText = null,
+  } = {},
+) {
   const featureCount = getFeatureCollectionFeatureCount(collection);
   if (!collection?.features?.length || !projection) {
     return {
@@ -13174,7 +13280,9 @@ function buildContextFacilityEntries(collection, thresholdRank = 1) {
     entries.push({
       x,
       y,
-      label: String(properties.name || "").trim(),
+      label: typeof getLabelText === "function"
+        ? String(getLabelText(properties, feature) || "").trim()
+        : String(properties.name || "").trim(),
       importanceRank,
       properties,
     });
@@ -13201,8 +13309,10 @@ function drawContextFacilityPointLayer(
     strokeStyle = "#eff6ff",
     labelColor = "#1e3a8a",
     opacity = 0.9,
+    labelsEnabled = true,
     nationalLabelScale = 2.2,
     regionalLabelScale = 5.2,
+    getLabelText = null,
   } = {},
 ) {
   const startedAt = nowMs();
@@ -13228,7 +13338,9 @@ function drawContextFacilityPointLayer(
     });
     return;
   }
-  const renderState = buildContextFacilityEntries(collection, thresholdRank);
+  const renderState = buildContextFacilityEntries(collection, thresholdRank, {
+    getLabelText,
+  });
   if (renderState.skipped) {
     collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount: renderState.featureCount,
@@ -13265,6 +13377,17 @@ function drawContextFacilityPointLayer(
   });
   context.restore();
 
+  if (!labelsEnabled) {
+    collectContextMetric(metricName, nowMs() - startedAt, {
+      featureCount: renderState.featureCount,
+      visibleFeatureCount: renderState.entries.length,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: false,
+    });
+    return;
+  }
+
   context.save();
   context.textAlign = "left";
   context.textBaseline = "middle";
@@ -13292,32 +13415,48 @@ function drawContextFacilityPointLayer(
 }
 
 function drawAirportsLayer(k, { interactive = false } = {}) {
+  const airportConfig = getTransportOverviewFamilyConfig("airport");
+  const labelZoomConfig = getTransportOverviewLabelZoomConfig("airport", airportConfig.labelDensity);
+  const presetStyle = getTransportOverviewAirportPresetStyle(airportConfig.preset);
   drawContextFacilityPointLayer("drawAirportsLayer", state.airportsData, k, {
     interactive,
-    visible: !!state.showAirports,
-    thresholdRank: getContextFacilityThresholdRank("regional_core", ["national_core", "regional_core", "local_connector"]),
+    visible: !!state.showTransport && !!state.showAirports,
+    thresholdRank: Math.max(
+      getTransportOverviewImportanceThresholdRank(airportConfig.importanceThreshold),
+      getTransportAirportScopeThreshold(airportConfig.scope),
+    ),
     shape: "diamond",
-    fillStyle: "#1d4ed8",
-    strokeStyle: "#dbeafe",
-    labelColor: "#15315f",
-    opacity: 0.9,
-    nationalLabelScale: 2.0,
-    regionalLabelScale: 5.0,
+    fillStyle: presetStyle.fillStyle,
+    strokeStyle: presetStyle.strokeStyle,
+    labelColor: presetStyle.labelColor,
+    opacity: airportConfig.opacity,
+    labelsEnabled: airportConfig.labelsEnabled,
+    nationalLabelScale: labelZoomConfig.nationalLabelScale,
+    regionalLabelScale: labelZoomConfig.regionalLabelScale,
+    getLabelText: (properties) => getTransportOverviewAirportLabelText(properties, airportConfig.labelMode),
   });
 }
 
 function drawPortsLayer(k, { interactive = false } = {}) {
+  const portConfig = getTransportOverviewFamilyConfig("port");
+  const labelZoomConfig = getTransportOverviewLabelZoomConfig("port", portConfig.labelDensity);
+  const presetStyle = getTransportOverviewPortPresetStyle(portConfig.preset);
   drawContextFacilityPointLayer("drawPortsLayer", state.portsData, k, {
     interactive,
-    visible: !!state.showPorts,
-    thresholdRank: getContextFacilityThresholdRank("regional_core", ["national_core", "regional_core"]),
+    visible: !!state.showTransport && !!state.showPorts,
+    thresholdRank: Math.max(
+      getTransportOverviewImportanceThresholdRank(portConfig.importanceThreshold),
+      getTransportPortScopeThreshold(portConfig.scope),
+    ),
     shape: "square",
-    fillStyle: "#b45309",
-    strokeStyle: "#ffedd5",
-    labelColor: "#7c2d12",
-    opacity: 0.9,
-    nationalLabelScale: 2.2,
-    regionalLabelScale: 5.4,
+    fillStyle: presetStyle.fillStyle,
+    strokeStyle: presetStyle.strokeStyle,
+    labelColor: presetStyle.labelColor,
+    opacity: portConfig.opacity,
+    labelsEnabled: portConfig.labelsEnabled,
+    nationalLabelScale: labelZoomConfig.nationalLabelScale,
+    regionalLabelScale: labelZoomConfig.regionalLabelScale,
+    getLabelText: (properties) => getTransportOverviewPortLabelText(properties, portConfig.labelMode),
   });
 }
 
