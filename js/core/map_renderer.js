@@ -22848,12 +22848,14 @@ function refreshMapDataForScenarioChunkPromotion({
   state.hitCanvasDirty = true;
   state.hitCanvasTopologyRevision = 0;
   if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
+    const pendingPoliticalInfraRebuild = !!state.runtimeChunkLoadState.pendingInfraPromotion?.hasPoliticalGeometryChange;
+    const nextHasPoliticalGeometryChange = hasPoliticalChange || pendingPoliticalInfraRebuild;
     state.runtimeChunkLoadState.pendingVisualPromotion = null;
     state.runtimeChunkLoadState.pendingInfraPromotion = {
       reason: String(reason || "scenario-chunk-promotion"),
       selectionVersion: Math.max(0, Number(state.runtimeChunkLoadState.selectionVersion || 0)),
       promotionVersion: scenarioChunkPromotionVersion,
-      hasPoliticalGeometryChange: hasPoliticalChange,
+      hasPoliticalGeometryChange: nextHasPoliticalGeometryChange,
     };
   }
   if (hasPoliticalChange) {
@@ -22876,7 +22878,7 @@ function refreshMapDataForScenarioChunkPromotion({
     reason,
     suppressRender,
     promotionVersion: scenarioChunkPromotionVersion,
-    hasPoliticalGeometryChange: hasPoliticalChange,
+    hasPoliticalGeometryChange: state.runtimeChunkLoadState?.pendingInfraPromotion?.hasPoliticalGeometryChange ?? hasPoliticalChange,
   });
   recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
     activeScenarioId: String(state.activeScenarioId || ""),
