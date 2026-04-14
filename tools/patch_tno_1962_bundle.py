@@ -7359,6 +7359,7 @@ def _decode_topology_arc_points(
     arc_cache: dict[int, list[tuple[float, float]]],
 ) -> list[tuple[float, float]]:
     transform = topo_dict.get("transform") or {}
+    has_transform = isinstance(transform, dict) and bool(transform)
     scales = transform.get("scale") or [1.0, 1.0]
     translates = transform.get("translate") or [0.0, 0.0]
     scale_x = float(scales[0] if len(scales) > 0 else 1.0)
@@ -7375,15 +7376,20 @@ def _decode_topology_arc_points(
         arcs = topo_dict.get("arcs") or []
         if forward_index < 0 or forward_index >= len(arcs):
             return []
+        points: list[tuple[float, float]] = []
         x = 0.0
         y = 0.0
-        points: list[tuple[float, float]] = []
         for raw_point in arcs[forward_index]:
             if not isinstance(raw_point, list) or len(raw_point) < 2:
                 continue
-            x += float(raw_point[0] or 0.0)
-            y += float(raw_point[1] or 0.0)
-            points.append((x * scale_x + translate_x, y * scale_y + translate_y))
+            if has_transform:
+                # TopoJSON with `transform` stores delta-encoded integer arcs.
+                x += float(raw_point[0] or 0.0)
+                y += float(raw_point[1] or 0.0)
+                points.append((x * scale_x + translate_x, y * scale_y + translate_y))
+            else:
+                # TopoJSON without `transform` stores absolute coordinates.
+                points.append((float(raw_point[0] or 0.0), float(raw_point[1] or 0.0)))
         arc_cache[forward_index] = points
 
     if int(arc_index) < 0:
