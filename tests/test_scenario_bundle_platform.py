@@ -145,6 +145,44 @@ class ScenarioBundlePlatformTest(unittest.TestCase):
             self.assertTrue((scenario_dir / "runtime_topology.topo.json").exists())
             self.assertFalse((scenario_dir / "manifest.json").exists())
 
+    def test_publish_checkpoint_bundle_scenario_data_copies_derived_support_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir = root / "scenario"
+            checkpoint_dir.mkdir()
+            _write_json(checkpoint_dir / "countries.json", {"countries": {"AAA": {}}})
+            _write_json(checkpoint_dir / "owners.by_feature.json", {"owners": {"F-1": "AAA"}})
+            _write_json(checkpoint_dir / "controllers.by_feature.json", {"controllers": {"F-1": "AAA"}})
+            _write_json(checkpoint_dir / "cores.by_feature.json", {"cores": {"F-1": ["AAA"]}})
+            _write_json(checkpoint_dir / "manifest.json", {"summary": {"feature_count": 1}})
+            _write_json(checkpoint_dir / "audit.json", {"ok": True})
+            _write_json(checkpoint_dir / "special_regions.geojson", {"type": "FeatureCollection", "features": []})
+            _write_json(checkpoint_dir / "water_regions.geojson", {"type": "FeatureCollection", "features": []})
+            _write_json(checkpoint_dir / "relief_overlays.geojson", {"type": "FeatureCollection", "features": []})
+            _write_json(checkpoint_dir / "bathymetry.topo.json", {"type": "Topology"})
+            _write_json(checkpoint_dir / "runtime_topology.bootstrap.topo.json", {"type": "Topology"})
+            _write_json(checkpoint_dir / "geo_locale_patch.json", {"geo": {}})
+            _write_json(checkpoint_dir / "geo_locale_patch.en.json", {"language": "en"})
+            _write_json(checkpoint_dir / "geo_locale_patch.zh.json", {"language": "zh"})
+            _write_json(checkpoint_dir / "locales.startup.json", {"locales": {}})
+            _write_json(checkpoint_dir / "geo_aliases.startup.json", {"aliases": {}})
+            _write_json(checkpoint_dir / "startup.bundle.en.json", {"ok": True})
+            _write_json(checkpoint_dir / "startup.bundle.zh.json", {"ok": True})
+            _write_json(checkpoint_dir / "derived" / "marine_regions_named_waters.snapshot.geojson", {"features": []})
+            _write_json(checkpoint_dir / "derived" / "water_regions.provenance.json", {"generated_at": "now"})
+
+            scenario_bundle_platform.publish_checkpoint_bundle(
+                scenario_dir,
+                checkpoint_dir,
+                "scenario_data",
+                load_checkpoint_json=lambda directory, filename: _load_json(directory / filename),
+                write_json=_write_json,
+            )
+
+            self.assertTrue((scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson").exists())
+            self.assertTrue((scenario_dir / "derived" / "water_regions.provenance.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

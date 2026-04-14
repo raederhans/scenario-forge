@@ -100,15 +100,94 @@ import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 
 const US_LEGACY_ZONE_LABEL_RE = /(?:\bZone\s+\d+\b|第?\s*\d+\s*[区號号])/i;
+const STARTUP_SUPPORT_AUDIT_PARAM = "startup_support_audit";
+let startupSupportKeyUsageAuditEnabled = null;
+let startupSupportKeyUsageAuditState = null;
+
+function shouldCaptureStartupSupportKeyUsage() {
+  if (startupSupportKeyUsageAuditEnabled !== null) {
+    return startupSupportKeyUsageAuditEnabled;
+  }
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    const raw = String(params.get(STARTUP_SUPPORT_AUDIT_PARAM) || "").trim().toLowerCase();
+    startupSupportKeyUsageAuditEnabled = ["1", "true", "yes", "on"].includes(raw);
+  } catch (_error) {
+    startupSupportKeyUsageAuditEnabled = false;
+  }
+  return startupSupportKeyUsageAuditEnabled;
+}
+
+function getStartupSupportKeyUsageAuditState() {
+  if (!shouldCaptureStartupSupportKeyUsage()) {
+    return null;
+  }
+  if (!startupSupportKeyUsageAuditState) {
+    startupSupportKeyUsageAuditState = {
+      queryKeys: new Set(),
+      directLocaleKeys: new Set(),
+      aliasKeys: new Set(),
+      aliasTargetKeys: new Set(),
+      missKeys: new Set(),
+    };
+  }
+  return startupSupportKeyUsageAuditState;
+}
+
+function recordStartupSupportKeyUsage({
+  queryKey = "",
+  directLocaleKey = "",
+  aliasKey = "",
+  aliasTargetKey = "",
+  miss = false,
+} = {}) {
+  const auditState = getStartupSupportKeyUsageAuditState();
+  if (!auditState) return;
+  const normalizedQueryKey = String(queryKey || "").trim();
+  if (normalizedQueryKey) {
+    auditState.queryKeys.add(normalizedQueryKey);
+  }
+  const normalizedDirectLocaleKey = String(directLocaleKey || "").trim();
+  if (normalizedDirectLocaleKey) {
+    auditState.directLocaleKeys.add(normalizedDirectLocaleKey);
+  }
+  const normalizedAliasKey = String(aliasKey || "").trim();
+  if (normalizedAliasKey) {
+    auditState.aliasKeys.add(normalizedAliasKey);
+  }
+  const normalizedAliasTargetKey = String(aliasTargetKey || "").trim();
+  if (normalizedAliasTargetKey) {
+    auditState.aliasTargetKeys.add(normalizedAliasTargetKey);
+  }
+  if (miss && normalizedQueryKey) {
+    auditState.missKeys.add(normalizedQueryKey);
+  }
+}
 
 function resolveGeoLocaleEntry(key) {
+  const candidate = String(key || "").trim();
   const geoLocales = state.locales?.geo || {};
-  if (geoLocales[key]) return geoLocales[key];
+  if (geoLocales[candidate]) {
+    recordStartupSupportKeyUsage({
+      queryKey: candidate,
+      directLocaleKey: candidate,
+    });
+    return geoLocales[candidate];
+  }
 
-  const stableKey = state.geoAliasToStableKey?.[key];
+  const stableKey = state.geoAliasToStableKey?.[candidate];
   if (stableKey && geoLocales[stableKey]) {
+    recordStartupSupportKeyUsage({
+      queryKey: candidate,
+      aliasKey: candidate,
+      aliasTargetKey: stableKey,
+    });
     return geoLocales[stableKey];
   }
+  recordStartupSupportKeyUsage({
+    queryKey: candidate,
+    miss: true,
+  });
   return null;
 }
 
@@ -565,8 +644,22 @@ function updateUIText() {
     ["lblWaterInspector", "Water Regions"],
     ["lblWaterInteraction", "Interaction"],
     ["lblWaterInspectorOpenOceanToggle", "Allow Open-Ocean Interaction"],
-    ["waterInspectorOpenOceanHint", "When off, macro ocean regions are ignored for hover, click, and paint."],
-    ["waterInspectorOpenOceanHintEnabled", "Macro ocean regions are currently included in hover, click, and paint."],
+    ["lblWaterInspectorOpenOceanSelectToggle", "Allow Open-Ocean Selection"],
+    ["waterInspectorOpenOceanSelectHint", "When off, macro ocean regions stay hidden from inspector selection and map picking."],
+    ["waterInspectorOpenOceanSelectHintEnabled", "Macro ocean regions are currently available in the inspector and map picking."],
+    ["lblWaterInspectorOpenOceanPaintToggle", "Allow Open-Ocean Paint"],
+    ["waterInspectorOpenOceanPaintHint", "When off, macro ocean regions can be inspected but ignore paint, eraser, and eyedropper actions."],
+    ["waterInspectorOpenOceanPaintHintEnabled", "Macro ocean regions currently accept paint, eraser, and eyedropper actions."],
+    ["lblWaterFilters", "Filters"],
+    ["lblWaterInspectorOverridesOnlyToggle", "Overrides Only"],
+    ["lblWaterFilterType", "Type"],
+    ["lblWaterFilterGroup", "Group"],
+    ["lblWaterFilterSource", "Source"],
+    ["lblWaterSort", "Sort"],
+    ["lblWaterInspectorMeta", "Region Details"],
+    ["lblWaterInspectorHierarchy", "Family"],
+    ["lblWaterInspectorBatch", "Batch Actions"],
+    ["lblWaterInspectorScope", "Apply Scope"],
     ["lblSpecialRegionInspector", "Special Regions"],
     ["lblScenarioSpecialRegionVisibility", "Visibility"],
     ["lblScenarioSpecialRegionVisibilityToggle", "Show Scenario Special Regions"],
@@ -585,10 +678,14 @@ function updateUIText() {
     ["countryInspectorEmptyHint", "Choose a country above, then use Active Owner and the Territories & Presets panel."],
     ["waterInspectorEmptyTitle", "Select a water region to inspect"],
     ["waterInspectorEmptyHint", "Click a sea, lake, or strait on the map, or choose one from the list."],
+    ["waterInspectorResultCount", "regions"],
     ["specialRegionInspectorEmptyTitle", "Select a special region to inspect"],
     ["specialRegionInspectorEmptyHint", "Click a drained basin or exposure zone on the map, or choose one from the list."],
     ["resetCountryColors", "Reset Country Colors"],
     ["clearWaterRegionColorBtn", "Clear Water Override"],
+    ["applyWaterFamilyOverrideBtn", "Apply Current Color To Scope"],
+    ["clearWaterFamilyOverrideBtn", "Clear Scope Overrides"],
+    ["waterInspectorJumpToParentBtn", "Jump To Parent"],
     ["clearSpecialRegionColorBtn", "Clear Special Region Override"],
     ["lblHistoricalPresets", "Selected Country Actions"],
     ["selectedCountryActionHint", "Choose a country above to inspect territories, presets, and releasables."],
@@ -1085,7 +1182,49 @@ function getTooltipText(feature) {
   return renderTooltipText(buildTooltipModel(feature));
 }
 
+function consumeStartupSupportKeyUsageAuditReport() {
+  const auditState = startupSupportKeyUsageAuditState;
+  startupSupportKeyUsageAuditState = null;
+  if (!auditState) {
+    return null;
+  }
+  return {
+    enabled: true,
+    language: String(state.currentLanguage || "en").trim() || "en",
+    baseLocalizationLevel: String(state.baseLocalizationLevel || "").trim(),
+    queryKeys: Array.from(auditState.queryKeys).sort(),
+    directLocaleKeys: Array.from(auditState.directLocaleKeys).sort(),
+    aliasKeys: Array.from(auditState.aliasKeys).sort(),
+    aliasTargetKeys: Array.from(auditState.aliasTargetKeys).sort(),
+    missKeys: Array.from(auditState.missKeys).sort(),
+  };
+}
+
+function getStartupSupportKeyUsageAuditReport() {
+  const auditState = startupSupportKeyUsageAuditState;
+  if (!auditState) {
+    return null;
+  }
+  return {
+    enabled: true,
+    language: String(state.currentLanguage || "en").trim() || "en",
+    baseLocalizationLevel: String(state.baseLocalizationLevel || "").trim(),
+    queryKeys: Array.from(auditState.queryKeys).sort(),
+    directLocaleKeys: Array.from(auditState.directLocaleKeys).sort(),
+    aliasKeys: Array.from(auditState.aliasKeys).sort(),
+    aliasTargetKeys: Array.from(auditState.aliasTargetKeys).sort(),
+    missKeys: Array.from(auditState.missKeys).sort(),
+  };
+}
+
+function clearStartupSupportKeyUsageAuditReport() {
+  startupSupportKeyUsageAuditState = null;
+}
+
 export {
+  clearStartupSupportKeyUsageAuditReport,
+  consumeStartupSupportKeyUsageAuditReport,
+  getStartupSupportKeyUsageAuditReport,
   t,
   initTranslations,
   toggleLanguage,

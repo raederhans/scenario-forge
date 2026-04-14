@@ -624,10 +624,15 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       data.layerVisibility.showWaterRegions === undefined
         ? true
         : !!data.layerVisibility.showWaterRegions;
-    state.showOpenOceanRegions =
-      data.layerVisibility.showOpenOceanRegions === undefined
-        ? false
-        : !!data.layerVisibility.showOpenOceanRegions;
+    state.allowOpenOceanSelect =
+      data.layerVisibility.allowOpenOceanSelect === undefined
+        ? (data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions)
+        : !!data.layerVisibility.allowOpenOceanSelect;
+    state.allowOpenOceanPaint =
+      data.layerVisibility.allowOpenOceanPaint === undefined
+        ? (data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions)
+        : !!data.layerVisibility.allowOpenOceanPaint;
+    state.showOpenOceanRegions = !!(state.allowOpenOceanSelect || state.allowOpenOceanPaint);
     state.showScenarioSpecialRegions =
       data.layerVisibility.showScenarioSpecialRegions === undefined
         ? true

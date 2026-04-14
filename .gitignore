@@ -35,6 +35,10 @@ data/geoBoundaries-*.geojson
 .playwright-cli/
 .agents/
 
+# Generated deploy artifact data. GitHub Pages rebuilds this via
+# init_map_data.py + tools/build_pages_dist.py, so it should not be tracked.
+dist/app/data/
+
 # Local Codex/runtime lock files
 skills-lock.json
 .tmp_*.js

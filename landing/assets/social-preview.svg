@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title>Scenario Forge social preview</title>
+  <desc>Scenario Forge preview image</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7f3ed" />
+      <stop offset="1" stop-color="#e8dfd1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect x="26" y="26" width="1148" height="578" rx="42" fill="#f8f3eb" />
+  <circle cx="101" cy="99" r="15" fill="#234d83" />
+  <text x="140" y="112" fill="#18222f" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Scenario Forge</text>
+  <text x="86" y="240" fill="#18222f" font-size="76" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Forge political maps</text>
+  <text x="86" y="320" fill="#18222f" font-size="76" font-family="Segoe UI, Arial, sans-serif" font-weight="700">that feel alive.</text>
+  <text x="86" y="374" fill="#465466" font-size="28" font-family="Segoe UI, Arial, sans-serif">Scenario-first workbench for alternate history, strategy modding,</text>
+  <text x="86" y="414" fill="#465466" font-size="28" font-family="Segoe UI, Arial, sans-serif">and geopolitical storytelling.</text>
+  <text x="86" y="515" fill="#9a5d31" font-size="22" font-family="Segoe UI, Arial, sans-serif" letter-spacing="1">WORLD STATES / OWNERSHIP / CONTEXT LAYERS / EXPORT</text>
+</svg>

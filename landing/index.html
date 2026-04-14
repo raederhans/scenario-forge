@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Forge — Scenario-first political map workbench</title>
+    <meta
+      name="description"
+      content="Scenario Forge is a scenario-first political map workbench for alternate history, strategy modding, and geopolitical storytelling."
+    />
+    <meta
+      name="keywords"
+      content="Scenario Forge, alternate history maps, political map workbench, strategy modding, HOI4, TNO, Kaiserreich, geopolitical storytelling"
+    />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#f5f1ea" />
+    <link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Scenario Forge" />
+    <meta
+      property="og:description"
+      content="Build political maps that start from a world state, reshape control, layer context, and export a story-ready result."
+    />
+    <meta property="og:url" content="https://raederhans.github.io/scenario-forge/" />
+    <meta property="og:image" content="https://raederhans.github.io/scenario-forge/assets/social-preview.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Scenario Forge" />
+    <meta
+      name="twitter:description"
+      content="A scenario-first political map workbench for alternate history, strategy modding, and geopolitical storytelling."
+    />
+    <meta name="twitter:image" content="https://raederhans.github.io/scenario-forge/assets/social-preview.png" />
+
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="./assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skipLink">Skip to content</a>
+
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brandmark" href="#hero" aria-label="Scenario Forge home">
+          <span class="brandmark__dot" aria-hidden="true"></span>
+          <span class="brandmark__text">Scenario Forge</span>
+        </a>
+
+        <nav class="topnav" aria-label="Primary">
+          <a href="#works" data-i18n="navWorks">Works</a>
+          <a href="#workflow" data-i18n="navWorkflow">Workflow</a>
+          <a href="#features" data-i18n="navFeatures">Features</a>
+          <a href="#roadmap" data-i18n="navRoadmap">In progress</a>
+        </nav>
+
+        <div class="topbar__actions">
+          <div class="lang-switch" role="group" aria-label="Language switcher">
+            <button type="button" class="lang-switch__btn is-active" data-lang="en">EN</button>
+            <button type="button" class="lang-switch__btn" data-lang="zh">中文</button>
+          </div>
+          <a class="button button--ghost" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="headerGithub">GitHub</a>
+          <a class="button button--primary" href="./app/?view=guide" data-i18n="headerOpenApp">Open demo</a>
+        </div>
+      </header>
+
+      <main id="main">
+        <section id="hero" class="hero section">
+          <div class="hero__copy">
+            <p class="eyebrow" data-i18n="heroEyebrow">Scenario-first political map workbench</p>
+            <h1 data-i18n="heroTitle">Forge political maps that feel alive.</h1>
+            <p class="lede" data-i18n="heroBody">
+              Build from a world state, reshape ownership and control, layer context, and export a map that can actually carry a story.
+            </p>
+            <div class="hero__actions">
+              <a class="button button--primary" href="./app/?view=guide" data-i18n="heroPrimaryCta">Open live demo</a>
+              <a class="button button--secondary" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="heroSecondaryCta">View on GitHub</a>
+            </div>
+            <ul class="hero__facts" aria-label="Core product facts">
+              <li data-i18n="heroFactOne">Built-in world states: Blank, Modern World, HOI4 1936, HOI4 1939, and TNO 1962.</li>
+              <li data-i18n="heroFactTwo">Political editing, context layers, bilingual UI, project save/load, PNG and JPG export.</li>
+              <li data-i18n="heroFactThree">Made for alternate history, strategy modding, and geopolitical storytelling.</li>
+            </ul>
+          </div>
+
+          <div class="hero__visual">
+            <div class="product-frame">
+              <img
+                src="./assets/workspace-overview.webp"
+                alt="Scenario Forge editor showing a world political map with side panels and toolbars."
+                loading="eager"
+                width="1280"
+                height="874"
+              />
+            </div>
+            <div class="hero__chips" aria-hidden="true">
+              <span data-i18n="heroChipOne">World states</span>
+              <span data-i18n="heroChipTwo">Political ownership</span>
+              <span data-i18n="heroChipThree">Context layers</span>
+              <span data-i18n="heroChipFour">Export-ready</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="works" class="section">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="worksEyebrow">Selected works</p>
+            <h2 data-i18n="worksTitle">Show the result first.</h2>
+            <p data-i18n="worksBody">
+              Scenario Forge is easiest to understand when you see the maps it can produce, not when you read a wall of feature names.
+            </p>
+          </div>
+
+          <div class="works-grid">
+            <article class="work-card work-card--wide">
+              <div class="work-card__media">
+                <img src="./assets/workspace-overview.webp" alt="A wide overview of Scenario Forge editing a global political scenario." loading="lazy" width="1280" height="874" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workOneLabel">Alternate history baseline</p>
+                <h3 data-i18n="workOneTitle">Start from a scenario, not a blank canvas.</h3>
+                <p data-i18n="workOneBody">Switch between named world states, keep political context intact, and begin from something that already carries narrative meaning.</p>
+              </div>
+            </article>
+
+            <article class="work-card">
+              <div class="work-card__media">
+                <img src="./assets/night-lights-political.webp" alt="Scenario Forge combining political ownership with night lights and labels." loading="lazy" width="1280" height="874" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workTwoLabel">Conflict and context</p>
+                <h3 data-i18n="workTwoTitle">Overlay political change with real-world texture.</h3>
+                <p data-i18n="workTwoBody">Blend ownership, labels, urban lights, and context layers to move from editor output toward presentation-ready storytelling.</p>
+              </div>
+            </article>
+
+            <article class="work-card">
+              <div class="work-card__media">
+                <img src="./assets/atlas-physical.webp" alt="Scenario Forge showing a lighter atlas-like map with physical context." loading="lazy" width="1280" height="874" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workThreeLabel">Atlas-style output</p>
+                <h3 data-i18n="workThreeTitle">Push toward a cleaner, calmer final map.</h3>
+                <p data-i18n="workThreeBody">Dial back the noise, tune the layer stack, and export a map that reads like a finished visual, not just an internal workspace snapshot.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="why" class="section section--muted">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="whyEyebrow">Why Scenario Forge</p>
+            <h2 data-i18n="whyTitle">Stop stitching five tools together to tell one geopolitical story.</h2>
+          </div>
+
+          <div class="comparison-grid">
+            <article class="comparison-card comparison-card--problem">
+              <h3 data-i18n="problemTitle">Typical workflow</h3>
+              <ul>
+                <li data-i18n="problemOne">One tool for painting political states.</li>
+                <li data-i18n="problemTwo">Another for labels or overlays.</li>
+                <li data-i18n="problemThree">Another for exports or presentation cleanup.</li>
+                <li data-i18n="problemFour">No real scenario baseline to start from.</li>
+              </ul>
+            </article>
+            <article class="comparison-card comparison-card--solution">
+              <h3 data-i18n="solutionTitle">Scenario Forge</h3>
+              <ul>
+                <li data-i18n="solutionOne">Begin from a named world state.</li>
+                <li data-i18n="solutionTwo">Repaint ownership, controller, and frontline logic inside one workspace.</li>
+                <li data-i18n="solutionThree">Layer context and presentation surfaces without leaving the tool.</li>
+                <li data-i18n="solutionFour">Save the project or export the result when the story is ready.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="workflowEyebrow">Workflow</p>
+            <h2 data-i18n="workflowTitle">A short path from baseline to story-ready map.</h2>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card">
+              <span class="step-card__index">01</span>
+              <h3 data-i18n="stepOneTitle">Start from a world state</h3>
+              <p data-i18n="stepOneBody">Use built-in baselines like Blank Map, Modern World, HOI4 1936, HOI4 1939, or TNO 1962 to begin from an explicit scenario frame.</p>
+            </article>
+            <article class="step-card">
+              <span class="step-card__index">02</span>
+              <h3 data-i18n="stepTwoTitle">Repaint control and ownership</h3>
+              <p data-i18n="stepTwoBody">Shift who owns what, who controls what, and how the map should read politically without rebuilding the whole surface from scratch.</p>
+            </article>
+            <article class="step-card">
+              <span class="step-card__index">03</span>
+              <h3 data-i18n="stepThreeTitle">Layer context and export</h3>
+              <p data-i18n="stepThreeBody">Add rivers, urban areas, city points, water regions, special zones, legends, and visual refinements, then export a clean PNG or JPG snapshot.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="features" class="section section--muted">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="featuresEyebrow">Feature groups</p>
+            <h2 data-i18n="featuresTitle">Organized around tasks, not just panels.</h2>
+          </div>
+
+          <div class="feature-groups">
+            <article class="feature-group">
+              <h3 data-i18n="featureGroupOneTitle">Scenario baselines</h3>
+              <p data-i18n="featureGroupOneBody">Named starting points, default scenarios, palette packs, and scenario-aware startup flow.</p>
+            </article>
+            <article class="feature-group">
+              <h3 data-i18n="featureGroupTwoTitle">Political editing</h3>
+              <p data-i18n="featureGroupTwoBody">Ownership, controller, frontline-style views, brushes, selected objects, and scenario-level map changes.</p>
+            </article>
+            <article class="feature-group">
+              <h3 data-i18n="featureGroupThreeTitle">Presentation layers</h3>
+              <p data-i18n="featureGroupThreeBody">Physical regions, rivers, urban areas, city points, water regions, special zones, legends, and display tuning.</p>
+            </article>
+            <article class="feature-group">
+              <h3 data-i18n="featureGroupFourTitle">Project and export</h3>
+              <p data-i18n="featureGroupFourBody">Project save/load, bilingual UI, snapshot export, and a workspace that keeps editorial polish close to the map itself.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="audience" class="section">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="audienceEyebrow">Built for</p>
+            <h2 data-i18n="audienceTitle">People who need the map to carry the scenario.</h2>
+          </div>
+
+          <div class="audience-grid">
+            <article class="audience-card" data-i18n="audienceOne">Alternate-history creators</article>
+            <article class="audience-card" data-i18n="audienceTwo">HOI4, TNO, and Kaiserreich modders</article>
+            <article class="audience-card" data-i18n="audienceThree">Scenario and campaign designers</article>
+            <article class="audience-card" data-i18n="audienceFour">Geopolitical storytellers</article>
+            <article class="audience-card" data-i18n="audienceFive">Researchers and presenters</article>
+          </div>
+        </section>
+
+        <section id="roadmap" class="section section--muted">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="roadmapEyebrow">In progress</p>
+            <h2 data-i18n="roadmapTitle">Transparent about what is ready and what is not.</h2>
+            <p data-i18n="roadmapBody">Scenario Forge already has a strong core. Some transport-related surfaces are still intentionally presented as work in progress.</p>
+          </div>
+
+          <div class="roadmap-list">
+            <article class="roadmap-item">
+              <h3 data-i18n="roadmapOneTitle">Transport workbench</h3>
+              <p data-i18n="roadmapOneBody">Partially complete. It exists, but it is not yet the center of the product story.</p>
+            </article>
+            <article class="roadmap-item">
+              <h3 data-i18n="roadmapTwoTitle">Japan road preview</h3>
+              <p data-i18n="roadmapTwoBody">Currently the most mature transport sample inside the project.</p>
+            </article>
+            <article class="roadmap-item">
+              <h3 data-i18n="roadmapThreeTitle">Rail and other infrastructure families</h3>
+              <p data-i18n="roadmapThreeBody">Still closer to baseline or shell stage and should be treated as in-progress, not product-defining yet.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="cta-panel">
+            <div>
+              <p class="eyebrow" data-i18n="ctaEyebrow">Ready to open the workbench?</p>
+              <h2 data-i18n="ctaTitle">Step into the editor when you want to move from idea to map.</h2>
+              <p data-i18n="ctaBody">The showcase explains the product. The editor is where you actually shape the scenario.</p>
+            </div>
+            <div class="cta-panel__actions">
+              <a class="button button--primary" href="./app/?view=guide" data-i18n="ctaPrimary">Open the live demo</a>
+              <a class="button button--secondary" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="ctaSecondary">Browse the repository</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div>
+          <strong>Scenario Forge</strong>
+          <p data-i18n="footerNote">
+            Built from scenario-aware map data, political state editing, and presentation-focused context layers.
+          </p>
+        </div>
+        <div class="footer__meta">
+          <p data-i18n="footerSources">Major data families include Natural Earth, geoBoundaries, GeoNames, NOAA ETOPO, NASA Black Marble, OpenStreetMap, and Geofabrik.</p>
+          <div class="footer__links">
+            <a href="./app/?view=guide" data-i18n="footerDemo">Open demo</a>
+            <a href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="footerGithub">GitHub</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+

@@ -1368,7 +1368,7 @@ export async function loadMapData({
     : [Promise.resolve(null), Promise.resolve(null)];
 
   const localizationPromise = startupBootArtifactsPromise.then((startupBootArtifacts) => (
-    startupBootArtifacts
+    startupBootArtifacts && startupBootArtifacts.locales && startupBootArtifacts.geoAliases
       ? {
         localeLevel: startupBootArtifacts.localeLevel || localizationUrls.localeLevel,
         locales: startupBootArtifacts.locales,

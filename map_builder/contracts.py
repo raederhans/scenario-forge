@@ -319,9 +319,16 @@ SCENARIO_BUNDLE_STAGE_DESCRIPTORS: tuple[StageDescriptor, ...] = (
         failure_surface=("ownership/controller/core drift", "manual override mismatch"),
     ),
     StageDescriptor(
+        name="water_state",
+        owner="tools/patch_tno_1962_bundle.py",
+        inputs=("countries stage checkpoints", "named water snapshot sources", "runtime topology donor roots"),
+        outputs=("water state checkpoint artifacts",),
+        failure_surface=("water geometry validation failure", "named-water snapshot drift"),
+    ),
+    StageDescriptor(
         name="runtime_topology",
         owner="tools/patch_tno_1962_bundle.py",
-        inputs=("countries stage checkpoints",),
+        inputs=("countries stage checkpoints", "water state checkpoints"),
         outputs=("runtime topology checkpoint bundle",),
         failure_surface=("runtime topology validation failure", "water/special region divergence"),
     ),
@@ -365,6 +372,7 @@ SCENARIO_PUBLISH_SCOPES = (
 )
 
 SCENARIO_CHECKPOINT_STAGE_METADATA_FILENAME = "stage_metadata.json"
+SCENARIO_CHECKPOINT_WATER_STAGE_METADATA_FILENAME = "water_stage_metadata.json"
 SCENARIO_CHECKPOINT_POLITICAL_FILENAME = "scenario_political.geojson"
 SCENARIO_CHECKPOINT_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
 SCENARIO_CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
@@ -380,8 +388,8 @@ SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME = "startup.bundle.en.json"
 SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME = "startup.bundle.zh.json"
 SCENARIO_CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
 SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
-SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = "marine_regions_named_waters.snapshot.geojson"
-SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME = "water_regions.provenance.json"
+SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = "derived/marine_regions_named_waters.snapshot.geojson"
+SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME = "derived/water_regions.provenance.json"
 SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME = "runtime_topology.topo.json"
 
 SCENARIO_COUNTRIES_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
@@ -393,6 +401,10 @@ SCENARIO_COUNTRIES_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact("audit_payload", "audit.json"),
     ScenarioCheckpointArtifact("stage_metadata", SCENARIO_CHECKPOINT_STAGE_METADATA_FILENAME),
     ScenarioCheckpointArtifact("scenario_political_gdf", SCENARIO_CHECKPOINT_POLITICAL_FILENAME, payload_kind="gdf"),
+)
+
+SCENARIO_WATER_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
+    ScenarioCheckpointArtifact("water_stage_metadata", SCENARIO_CHECKPOINT_WATER_STAGE_METADATA_FILENAME),
     ScenarioCheckpointArtifact("water_gdf", SCENARIO_CHECKPOINT_WATER_SEED_FILENAME, payload_kind="gdf"),
     ScenarioCheckpointArtifact("relief_overlays_payload", SCENARIO_CHECKPOINT_RELIEF_FILENAME),
     ScenarioCheckpointArtifact("bathymetry_payload", SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME),
@@ -416,15 +428,23 @@ SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact("geo_locale_payload_zh", SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME),
 )
 
-SCENARIO_STARTUP_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
+SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact(
         "runtime_bootstrap_topology_payload",
         SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
     ),
     ScenarioCheckpointArtifact("startup_locales_payload", SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME),
     ScenarioCheckpointArtifact("startup_geo_aliases_payload", SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME),
+)
+
+SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact("startup_bundle_payload_en", SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME),
     ScenarioCheckpointArtifact("startup_bundle_payload_zh", SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME),
+)
+
+SCENARIO_STARTUP_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
+    *SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS,
+    *SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS,
 )
 
 SCENARIO_CHUNK_STAGE_REQUIRED_FILENAMES = (
@@ -448,6 +468,8 @@ SCENARIO_PUBLISH_FILENAMES_BY_SCOPE = {
         SCENARIO_CHECKPOINT_WATER_FILENAME,
         SCENARIO_CHECKPOINT_RELIEF_FILENAME,
         SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME,
+        SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
+        SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
         SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
         SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
         SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
@@ -456,8 +478,6 @@ SCENARIO_PUBLISH_FILENAMES_BY_SCOPE = {
         SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
         SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
         SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
-        SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
-        SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
     ),
 }
 SCENARIO_PUBLISH_FILENAMES_BY_SCOPE[SCENARIO_PUBLISH_SCOPE_ALL] = (

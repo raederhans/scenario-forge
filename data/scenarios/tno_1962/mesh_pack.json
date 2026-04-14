@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-04-03T03:15:35Z",
+  "generated_at": "2026-04-13T01:45:34Z",
   "coastline_source": "runtime_topology",
   "mesh_summary": {
     "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",

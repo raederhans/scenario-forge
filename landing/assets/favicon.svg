@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title>Scenario Forge</title>
+  <desc>Scenario Forge favicon</desc>
+  <defs>
+    <linearGradient id="g" x1="12" y1="16" x2="108" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#234d83" />
+      <stop offset="1" stop-color="#9a5d31" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="30" fill="#f5f1ea" />
+  <rect x="22" y="22" width="84" height="84" rx="24" fill="#101928" />
+  <circle cx="46" cy="46" r="11" fill="url(#g)" />
+  <path d="M37 81c11-11 28-18 54-20" fill="none" stroke="#f4ede4" stroke-width="8" stroke-linecap="round" />
+  <path d="M37 81c11-11 28-18 54-20" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
+</svg>

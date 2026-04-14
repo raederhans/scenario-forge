@@ -3173,20 +3173,38 @@ function initSidebar({ render } = {}) {
   const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const waterInspectorSection = document.getElementById("waterInspectorSection");
-  const waterInspectorOpenOceanToggle = document.getElementById("waterInspectorOpenOceanToggle");
-  const waterInspectorOpenOceanHint = document.getElementById("waterInspectorOpenOceanHint");
+  const waterInspectorOpenOceanSelectToggle = document.getElementById("waterInspectorOpenOceanSelectToggle");
+  const waterInspectorOpenOceanSelectHint = document.getElementById("waterInspectorOpenOceanSelectHint");
+  const waterInspectorOpenOceanPaintToggle = document.getElementById("waterInspectorOpenOceanPaintToggle");
+  const waterInspectorOpenOceanPaintHint = document.getElementById("waterInspectorOpenOceanPaintHint");
+  const waterInspectorOverridesOnlyToggle = document.getElementById("waterInspectorOverridesOnlyToggle");
+  const waterInspectorTypeFilter = document.getElementById("waterInspectorTypeFilter");
+  const waterInspectorGroupFilter = document.getElementById("waterInspectorGroupFilter");
+  const waterInspectorSourceFilter = document.getElementById("waterInspectorSourceFilter");
+  const waterInspectorSortSelect = document.getElementById("waterInspectorSortSelect");
+  const waterInspectorResultCount = document.getElementById("waterInspectorResultCount");
   const waterSearchInput = document.getElementById("waterRegionSearch");
   const waterRegionList = document.getElementById("waterRegionList");
   const waterLegendList = document.getElementById("waterLegendList");
   const waterInspectorEmpty = document.getElementById("waterInspectorEmpty");
   const waterInspectorSelected = document.getElementById("waterInspectorSelected");
   const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
+  const waterInspectorMetaSection = document.getElementById("waterInspectorMetaSection");
+  const waterInspectorMetaList = document.getElementById("waterInspectorMetaList");
+  const waterInspectorHierarchySection = document.getElementById("waterInspectorHierarchySection");
+  const waterInspectorJumpToParentBtn = document.getElementById("waterInspectorJumpToParentBtn");
+  const waterInspectorChildrenList = document.getElementById("waterInspectorChildrenList");
   const waterInspectorColorRow = document.getElementById("waterInspectorColorRow");
   const waterInspectorColorLabel = document.getElementById("waterInspectorColorLabel");
   const waterInspectorColorSwatch = document.getElementById("waterInspectorColorSwatch");
   const waterInspectorColorValue = document.getElementById("waterInspectorColorValue");
   const waterInspectorColorInput = document.getElementById("waterInspectorColorInput");
   const clearWaterRegionColorBtn = document.getElementById("clearWaterRegionColorBtn");
+  const waterInspectorBatchSection = document.getElementById("waterInspectorBatchSection");
+  const waterInspectorScopeSelect = document.getElementById("waterInspectorScopeSelect");
+  const waterInspectorScopePreview = document.getElementById("waterInspectorScopePreview");
+  const applyWaterFamilyOverrideBtn = document.getElementById("applyWaterFamilyOverrideBtn");
+  const clearWaterFamilyOverrideBtn = document.getElementById("clearWaterFamilyOverrideBtn");
   const specialRegionInspectorSection = document.getElementById("specialRegionInspectorSection");
   const scenarioSpecialRegionVisibilityToggle = document.getElementById("scenarioSpecialRegionVisibilityToggle");
   const scenarioSpecialRegionVisibilityHint = document.getElementById("scenarioSpecialRegionVisibilityHint");
@@ -5080,27 +5098,65 @@ function initSidebar({ render } = {}) {
 
   const getWaterSearchTerm = () => (waterSearchInput?.value || "").trim().toLowerCase();
 
+  const getLegacyOpenOceanFallbackEnabled = () =>
+    !!state.showOpenOceanRegions && !state.allowOpenOceanSelect && !state.allowOpenOceanPaint;
+
+  const isOpenOceanSelectionEnabled = () =>
+    !!state.allowOpenOceanSelect || getLegacyOpenOceanFallbackEnabled();
+
+  const isOpenOceanPaintEnabled = () =>
+    !!state.allowOpenOceanPaint || getLegacyOpenOceanFallbackEnabled();
+
+  const syncOpenOceanInspectorState = () => {
+    state.showOpenOceanRegions = !!(isOpenOceanSelectionEnabled() || isOpenOceanPaintEnabled());
+  };
+
+  const formatWaterTokenLabel = (value, fallback = "Unknown") => {
+    const normalized = String(value || "").trim();
+    if (!normalized) return fallback;
+    return normalized
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (match) => match.toUpperCase());
+  };
+
   const getWaterFeatureDisplayName = (feature) => {
     return getGeoFeatureDisplayLabel(feature, "Water Region")
       || t("Water Region", "ui")
       || "Water Region";
   };
 
+  const getWaterFeatureId = (feature) =>
+    String(feature?.properties?.id || feature?.id || "").trim();
+
+  const getWaterFeatureType = (feature) =>
+    String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
+
+  const getWaterFeatureGroup = (feature) =>
+    String(feature?.properties?.region_group || "").trim().toLowerCase();
+
+  const getWaterFeatureParentId = (feature) =>
+    String(feature?.properties?.parent_id || "").trim();
+
+  const getWaterFeatureSource = (feature) =>
+    String(feature?.properties?.source_standard || "").trim().toLowerCase();
+
+  const getWaterFeatureHasOverride = (featureId) =>
+    Object.prototype.hasOwnProperty.call(state.waterRegionOverrides || {}, String(featureId || "").trim());
+
   const getWaterFeatureMeta = (feature) => {
-    const waterType = String(feature?.properties?.water_type || "water_region")
-      .replace(/_/g, " ")
-      .trim();
-    const regionGroup = String(feature?.properties?.region_group || "").replace(/_/g, " ").trim();
-    return [waterType, regionGroup].filter(Boolean).join(" · ");
+    const waterType = formatWaterTokenLabel(getWaterFeatureType(feature), "Water");
+    const regionGroup = formatWaterTokenLabel(getWaterFeatureGroup(feature));
+    const sourceLabel = formatWaterTokenLabel(getWaterFeatureSource(feature));
+    return [waterType, regionGroup, sourceLabel].filter(Boolean).join(" · ");
   };
 
   const isOpenOceanWaterFeature = (feature) =>
-    String(feature?.properties?.water_type || "").trim().toLowerCase() === "ocean";
+    getWaterFeatureType(feature) === "ocean";
 
   const isWaterFeatureVisibleInInspector = (feature) => {
     if (!feature) return false;
     if (isOpenOceanWaterFeature(feature)) {
-      return !!state.showOpenOceanRegions;
+      return isOpenOceanSelectionEnabled();
     }
     return feature?.properties?.interactive !== false;
   };
@@ -5127,14 +5183,195 @@ function initSidebar({ render } = {}) {
       .filter((feature) => isWaterFeatureVisibleInInspector(feature))
       .sort((a, b) => getWaterFeatureDisplayName(a).localeCompare(getWaterFeatureDisplayName(b)));
 
-  const renderWaterInteractionUi = () => {
-    if (waterInspectorOpenOceanToggle) {
-      waterInspectorOpenOceanToggle.checked = !!state.showOpenOceanRegions;
+  const getWaterFilterValue = (input) => String(input?.value || "").trim().toLowerCase();
+
+  const getFilteredWaterFeatures = () => {
+    const term = getWaterSearchTerm();
+    const typeFilter = getWaterFilterValue(waterInspectorTypeFilter);
+    const groupFilter = getWaterFilterValue(waterInspectorGroupFilter);
+    const sourceFilter = getWaterFilterValue(waterInspectorSourceFilter);
+    const sortMode = getWaterFilterValue(waterInspectorSortSelect) || "name";
+    const overridesOnly = !!waterInspectorOverridesOnlyToggle?.checked;
+
+    const filtered = getVisibleWaterFeatures().filter((feature) => {
+      const featureId = getWaterFeatureId(feature).toLowerCase();
+      const name = getWaterFeatureDisplayName(feature).toLowerCase();
+      const meta = getWaterFeatureMeta(feature).toLowerCase();
+      if (term && !name.includes(term) && !featureId.includes(term) && !meta.includes(term)) {
+        return false;
+      }
+      if (typeFilter && getWaterFeatureType(feature) !== typeFilter) return false;
+      if (groupFilter && getWaterFeatureGroup(feature) !== groupFilter) return false;
+      if (sourceFilter && getWaterFeatureSource(feature) !== sourceFilter) return false;
+      if (overridesOnly && !getWaterFeatureHasOverride(getWaterFeatureId(feature))) return false;
+      return true;
+    });
+
+    filtered.sort((left, right) => {
+      if (sortMode === "type") {
+        const compare = formatWaterTokenLabel(getWaterFeatureType(left)).localeCompare(
+          formatWaterTokenLabel(getWaterFeatureType(right))
+        );
+        if (compare !== 0) return compare;
+      } else if (sortMode === "group") {
+        const compare = formatWaterTokenLabel(getWaterFeatureGroup(left)).localeCompare(
+          formatWaterTokenLabel(getWaterFeatureGroup(right))
+        );
+        if (compare !== 0) return compare;
+      } else if (sortMode === "override") {
+        const compare = Number(getWaterFeatureHasOverride(getWaterFeatureId(right)))
+          - Number(getWaterFeatureHasOverride(getWaterFeatureId(left)));
+        if (compare !== 0) return compare;
+      }
+      return getWaterFeatureDisplayName(left).localeCompare(getWaterFeatureDisplayName(right));
+    });
+
+    return filtered;
+  };
+
+  const populateWaterFilterSelect = (input, values, emptyLabel) => {
+    if (!input) return;
+    const currentValue = String(input.value || "");
+    const nextValues = ["", ...values];
+    const signature = JSON.stringify(nextValues);
+    if (input.dataset.optionsSignature !== signature) {
+      input.replaceChildren();
+      nextValues.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value ? formatWaterTokenLabel(value) : t(emptyLabel, "ui") || emptyLabel;
+        input.appendChild(option);
+      });
+      input.dataset.optionsSignature = signature;
     }
-    if (waterInspectorOpenOceanHint) {
-      waterInspectorOpenOceanHint.textContent = state.showOpenOceanRegions
-        ? t("Macro ocean regions are currently included in hover, click, and paint.", "ui")
-        : t("When off, macro ocean regions are ignored for hover, click, and paint.", "ui");
+    input.value = nextValues.includes(currentValue) ? currentValue : "";
+  };
+
+  const getWaterScopeFeatureIds = (selectedId, scope) => {
+    const normalizedSelectedId = String(selectedId || "").trim();
+    if (!normalizedSelectedId) return [];
+    const selectedFeature = state.waterRegionsById?.get(normalizedSelectedId);
+    if (!selectedFeature) return [];
+    const filteredFeatures = getFilteredWaterFeatures();
+    const selectedGroup = getWaterFeatureGroup(selectedFeature);
+    const selectedType = getWaterFeatureType(selectedFeature);
+    const selectedParentId = getWaterFeatureParentId(selectedFeature);
+    let candidateIds = [];
+    switch (scope) {
+      case "same-parent":
+        if (selectedParentId) {
+          candidateIds = filteredFeatures
+            .filter((feature) => getWaterFeatureParentId(feature) === selectedParentId)
+            .map((feature) => getWaterFeatureId(feature));
+        } else {
+          candidateIds = filteredFeatures
+            .filter((feature) => {
+              const featureId = getWaterFeatureId(feature);
+              return featureId === normalizedSelectedId || getWaterFeatureParentId(feature) === normalizedSelectedId;
+            })
+            .map((feature) => getWaterFeatureId(feature));
+        }
+        break;
+      case "same-group":
+        candidateIds = filteredFeatures
+          .filter((feature) => getWaterFeatureGroup(feature) === selectedGroup)
+          .map((feature) => getWaterFeatureId(feature));
+        break;
+      case "same-type":
+        candidateIds = filteredFeatures
+          .filter((feature) => getWaterFeatureType(feature) === selectedType)
+          .map((feature) => getWaterFeatureId(feature));
+        break;
+      case "selected":
+      default:
+        candidateIds = [normalizedSelectedId];
+        break;
+    }
+    if (!candidateIds.includes(normalizedSelectedId)) {
+      candidateIds.unshift(normalizedSelectedId);
+    }
+    return Array.from(new Set(candidateIds.filter(Boolean)));
+  };
+
+  const applyWaterOverrideScope = (targetIds, color, kind, dirtyReason) => {
+    const nextIds = Array.from(new Set((targetIds || []).map((featureId) => String(featureId || "").trim()).filter(Boolean)));
+    if (!nextIds.length) return false;
+    const historyBefore = captureHistoryState({ waterRegionIds: nextIds });
+    let changed = false;
+    nextIds.forEach((featureId) => {
+      const currentColor = getWaterFeatureColor(featureId);
+      if (currentColor === color) return;
+      state.waterRegionOverrides[featureId] = color;
+      changed = true;
+    });
+    if (!changed) return false;
+    pushHistoryEntry({
+      kind,
+      before: historyBefore,
+      after: captureHistoryState({ waterRegionIds: nextIds }),
+    });
+    markDirty(dirtyReason);
+    return true;
+  };
+
+  const clearWaterOverrideScope = (targetIds, kind, dirtyReason) => {
+    const nextIds = Array.from(new Set((targetIds || []).map((featureId) => String(featureId || "").trim()).filter(Boolean)));
+    const activeIds = nextIds.filter((featureId) => getWaterFeatureHasOverride(featureId));
+    if (!activeIds.length) return false;
+    const historyBefore = captureHistoryState({ waterRegionIds: activeIds });
+    activeIds.forEach((featureId) => {
+      delete state.waterRegionOverrides[featureId];
+    });
+    pushHistoryEntry({
+      kind,
+      before: historyBefore,
+      after: captureHistoryState({ waterRegionIds: activeIds }),
+    });
+    markDirty(dirtyReason);
+    return true;
+  };
+
+  const renderWaterInteractionUi = () => {
+    syncOpenOceanInspectorState();
+    if (waterInspectorOpenOceanSelectToggle) {
+      waterInspectorOpenOceanSelectToggle.checked = isOpenOceanSelectionEnabled();
+    }
+    if (waterInspectorOpenOceanSelectHint) {
+      waterInspectorOpenOceanSelectHint.textContent = isOpenOceanSelectionEnabled()
+        ? t("Macro ocean regions are currently available in the inspector and map picking.", "ui")
+        : t("When off, macro ocean regions stay hidden from inspector selection and map picking.", "ui");
+    }
+    if (waterInspectorOpenOceanPaintToggle) {
+      waterInspectorOpenOceanPaintToggle.checked = isOpenOceanPaintEnabled();
+    }
+    if (waterInspectorOpenOceanPaintHint) {
+      waterInspectorOpenOceanPaintHint.textContent = isOpenOceanPaintEnabled()
+        ? t("Macro ocean regions currently accept paint, eraser, and eyedropper actions.", "ui")
+        : t("When off, macro ocean regions can be inspected but ignore paint, eraser, and eyedropper actions.", "ui");
+    }
+  };
+
+  const renderWaterFilterUi = () => {
+    const visibleFeatures = getVisibleWaterFeatures();
+    populateWaterFilterSelect(
+      waterInspectorTypeFilter,
+      Array.from(new Set(visibleFeatures.map((feature) => getWaterFeatureType(feature)).filter(Boolean))).sort(),
+      "All Types"
+    );
+    populateWaterFilterSelect(
+      waterInspectorGroupFilter,
+      Array.from(new Set(visibleFeatures.map((feature) => getWaterFeatureGroup(feature)).filter(Boolean))).sort(),
+      "All Groups"
+    );
+    populateWaterFilterSelect(
+      waterInspectorSourceFilter,
+      Array.from(new Set(visibleFeatures.map((feature) => getWaterFeatureSource(feature)).filter(Boolean))).sort(),
+      "All Sources"
+    );
+    if (waterInspectorResultCount) {
+      const filteredFeatures = getFilteredWaterFeatures();
+      const overrideCount = filteredFeatures.filter((feature) => getWaterFeatureHasOverride(getWaterFeatureId(feature))).length;
+      waterInspectorResultCount.textContent = `${filteredFeatures.length} ${t("regions", "ui") || "regions"} · ${overrideCount} ${t("overrides", "ui") || "overrides"}`;
     }
   };
 
@@ -5209,6 +5446,23 @@ function initSidebar({ render } = {}) {
     waterInspectorSelected.classList.toggle("hidden", isEmpty);
 
     if (!feature) {
+      waterInspectorMetaSection?.classList.add("hidden");
+      waterInspectorHierarchySection?.classList.add("hidden");
+      waterInspectorBatchSection?.classList.add("hidden");
+      if (waterInspectorMetaList) {
+        waterInspectorMetaList.replaceChildren();
+      }
+      if (waterInspectorChildrenList) {
+        waterInspectorChildrenList.replaceChildren();
+        waterInspectorChildrenList.classList.add("hidden");
+      }
+      if (waterInspectorScopePreview) {
+        waterInspectorScopePreview.classList.add("hidden");
+        waterInspectorScopePreview.textContent = "";
+      }
+      if (waterInspectorJumpToParentBtn) {
+        waterInspectorJumpToParentBtn.classList.add("hidden");
+      }
       if (waterInspectorColorRow) {
         waterInspectorColorRow.classList.add("hidden");
       }
@@ -5225,10 +5479,89 @@ function initSidebar({ render } = {}) {
     }
 
     const featureColor = getWaterFeatureColor(selectedId);
+    const defaultColor = ColorManager.normalizeHexColor(
+      mapRenderer.getWaterRegionDefaultFillColorById?.(selectedId)
+    ) || featureColor;
+    const featureParentId = getWaterFeatureParentId(feature);
+    const childFeatures = Array.from(state.waterRegionsById?.values() || [])
+      .filter((candidate) => getWaterFeatureParentId(candidate) === selectedId)
+      .sort((left, right) => getWaterFeatureDisplayName(left).localeCompare(getWaterFeatureDisplayName(right)));
+    const selectedScope = getWaterFilterValue(waterInspectorScopeSelect) || "selected";
+    const scopeIds = getWaterScopeFeatureIds(selectedId, selectedScope);
     if (waterInspectorDetailHint) {
-      const meta = getWaterFeatureMeta(feature);
+      const meta = [
+        getWaterFeatureMeta(feature),
+        getWaterFeatureHasOverride(selectedId)
+          ? `Override active · ${featureColor.toUpperCase()}`
+          : `Default color · ${defaultColor.toUpperCase()}`,
+      ].filter(Boolean).join(" · ");
       waterInspectorDetailHint.classList.toggle("hidden", !meta);
       waterInspectorDetailHint.textContent = meta;
+    }
+    if (waterInspectorMetaSection && waterInspectorMetaList) {
+      waterInspectorMetaSection.classList.remove("hidden");
+      waterInspectorMetaList.replaceChildren();
+      const rows = [
+        ["ID", selectedId],
+        ["Type", formatWaterTokenLabel(getWaterFeatureType(feature), "Water")],
+        ["Group", formatWaterTokenLabel(getWaterFeatureGroup(feature))],
+        ["Parent", featureParentId || "None"],
+        ["Source", formatWaterTokenLabel(getWaterFeatureSource(feature))],
+        ["Interactive", feature?.properties?.interactive === false ? "No" : "Yes"],
+        ["Chokepoint", feature?.properties?.is_chokepoint ? "Yes" : "No"],
+        ["Base Geography", feature?.properties?.render_as_base_geography ? "Yes" : "No"],
+        ["Default Color", defaultColor.toUpperCase()],
+        ["Current Color", featureColor.toUpperCase()],
+      ];
+      rows.forEach(([label, value]) => {
+        const key = document.createElement("div");
+        key.className = "inspector-meta-label";
+        key.textContent = label;
+        const val = document.createElement("div");
+        val.className = "inspector-meta-value";
+        val.textContent = String(value || "");
+        waterInspectorMetaList.appendChild(key);
+        waterInspectorMetaList.appendChild(val);
+      });
+    }
+    if (waterInspectorHierarchySection) {
+      const shouldShowHierarchy = !!featureParentId || childFeatures.length > 0;
+      waterInspectorHierarchySection.classList.toggle("hidden", !shouldShowHierarchy);
+    }
+    if (waterInspectorJumpToParentBtn) {
+      if (featureParentId && state.waterRegionsById?.has(featureParentId)) {
+        const parentFeature = state.waterRegionsById.get(featureParentId);
+        waterInspectorJumpToParentBtn.classList.remove("hidden");
+        waterInspectorJumpToParentBtn.textContent = `${t("Jump To Parent", "ui")} · ${getWaterFeatureDisplayName(parentFeature)}`;
+      } else {
+        waterInspectorJumpToParentBtn.classList.add("hidden");
+      }
+    }
+    if (waterInspectorChildrenList) {
+      waterInspectorChildrenList.replaceChildren();
+      waterInspectorChildrenList.classList.toggle("hidden", childFeatures.length === 0);
+      childFeatures.forEach((childFeature) => {
+        const childId = getWaterFeatureId(childFeature);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "inspector-item-btn";
+        button.addEventListener("click", () => {
+          state.selectedWaterRegionId = childId;
+          renderWaterRegionList();
+        });
+        const copy = document.createElement("div");
+        copy.className = "scenario-action-card-copy";
+        const title = document.createElement("div");
+        title.className = "country-row-title";
+        title.textContent = getWaterFeatureDisplayName(childFeature);
+        const meta = document.createElement("div");
+        meta.className = "country-select-meta";
+        meta.textContent = getWaterFeatureMeta(childFeature);
+        copy.appendChild(title);
+        copy.appendChild(meta);
+        button.appendChild(copy);
+        waterInspectorChildrenList.appendChild(button);
+      });
     }
     if (waterInspectorColorRow) {
       waterInspectorColorRow.classList.remove("hidden");
@@ -5247,25 +5580,29 @@ function initSidebar({ render } = {}) {
       waterInspectorColorInput.disabled = false;
       waterInspectorColorInput.value = featureColor;
     }
+    if (waterInspectorBatchSection) {
+      waterInspectorBatchSection.classList.remove("hidden");
+    }
+    if (waterInspectorScopePreview) {
+      const sampleNames = scopeIds
+        .slice(0, 4)
+        .map((featureId) => getWaterFeatureDisplayName(state.waterRegionsById?.get(featureId)))
+        .filter(Boolean);
+      waterInspectorScopePreview.classList.toggle("hidden", scopeIds.length === 0);
+      waterInspectorScopePreview.textContent = scopeIds.length
+        ? `${scopeIds.length} regions affected · ${sampleNames.join(", ")}${scopeIds.length > sampleNames.length ? "..." : ""}`
+        : "";
+    }
     scheduleAdaptiveInspectorHeights();
   };
 
   const renderWaterRegionList = () => {
     if (!waterRegionList) return;
-    const term = getWaterSearchTerm();
-    const features = getVisibleWaterFeatures();
+    renderWaterFilterUi();
+    const filteredFeatures = getFilteredWaterFeatures();
 
     waterRowRefsById.clear();
     waterRegionList.replaceChildren();
-
-    const filteredFeatures = term
-      ? features.filter((feature) => {
-        const name = getWaterFeatureDisplayName(feature).toLowerCase();
-        const rawId = String(feature?.properties?.id || feature?.id || "").toLowerCase();
-        const meta = getWaterFeatureMeta(feature).toLowerCase();
-        return name.includes(term) || rawId.includes(term) || meta.includes(term);
-      })
-      : features;
 
     if (!filteredFeatures.length) {
       waterRegionList.appendChild(createEmptyNote(t("No matching water regions", "ui")));
@@ -5276,7 +5613,7 @@ function initSidebar({ render } = {}) {
     }
 
     filteredFeatures.forEach((feature) => {
-      const featureId = String(feature?.properties?.id || feature?.id || "").trim();
+      const featureId = getWaterFeatureId(feature);
       if (!featureId) return;
       const button = document.createElement("button");
       button.type = "button";
@@ -5303,6 +5640,12 @@ function initSidebar({ render } = {}) {
       const actions = document.createElement("div");
       actions.className = "country-row-actions";
       actions.appendChild(swatch);
+      if (getWaterFeatureHasOverride(featureId)) {
+        const badge = document.createElement("span");
+        badge.className = "country-select-meta";
+        badge.textContent = "Override";
+        actions.appendChild(badge);
+      }
 
       const copy = document.createElement("div");
       copy.className = "scenario-action-card-copy";
@@ -5839,13 +6182,14 @@ function initSidebar({ render } = {}) {
   state.updateScenarioSpecialRegionUIFn = renderSpecialRegionInspectorUi;
   state.updateScenarioReliefOverlayUIFn = renderSpecialRegionInspectorUi;
 
-  if (waterInspectorOpenOceanToggle && !waterInspectorOpenOceanToggle.dataset.bound) {
-    waterInspectorOpenOceanToggle.addEventListener("change", (event) => {
-      state.showOpenOceanRegions = !!event.target.checked;
+  if (waterInspectorOpenOceanSelectToggle && !waterInspectorOpenOceanSelectToggle.dataset.bound) {
+    waterInspectorOpenOceanSelectToggle.addEventListener("change", (event) => {
+      state.allowOpenOceanSelect = !!event.target.checked;
+      syncOpenOceanInspectorState();
       if (!state.showOpenOceanRegions) {
         state.hoveredWaterRegionId = null;
       }
-      markDirty("toggle-open-ocean-regions");
+      markDirty("toggle-open-ocean-select");
       renderWaterInteractionUi();
       renderWaterRegionList();
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
@@ -5853,8 +6197,40 @@ function initSidebar({ render } = {}) {
       }
       if (render) render();
     });
-    waterInspectorOpenOceanToggle.dataset.bound = "true";
+    waterInspectorOpenOceanSelectToggle.dataset.bound = "true";
   }
+
+  if (waterInspectorOpenOceanPaintToggle && !waterInspectorOpenOceanPaintToggle.dataset.bound) {
+    waterInspectorOpenOceanPaintToggle.addEventListener("change", (event) => {
+      state.allowOpenOceanPaint = !!event.target.checked;
+      syncOpenOceanInspectorState();
+      if (!state.showOpenOceanRegions) {
+        state.hoveredWaterRegionId = null;
+      }
+      markDirty("toggle-open-ocean-paint");
+      renderWaterInteractionUi();
+      renderWaterRegionList();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+    waterInspectorOpenOceanPaintToggle.dataset.bound = "true";
+  }
+
+  [
+    waterInspectorOverridesOnlyToggle,
+    waterInspectorTypeFilter,
+    waterInspectorGroupFilter,
+    waterInspectorSourceFilter,
+    waterInspectorSortSelect,
+  ].filter(Boolean).forEach((input) => {
+    if (input.dataset.bound) return;
+    input.addEventListener("change", () => {
+      renderWaterRegionList();
+    });
+    input.dataset.bound = "true";
+  });
 
   if (scenarioSpecialRegionVisibilityToggle && !scenarioSpecialRegionVisibilityToggle.dataset.bound) {
     scenarioSpecialRegionVisibilityToggle.addEventListener("change", (event) => {
@@ -5947,6 +6323,58 @@ function initSidebar({ render } = {}) {
       renderWaterRegionList();
     });
     clearWaterRegionColorBtn.dataset.bound = "true";
+  }
+
+  if (waterInspectorJumpToParentBtn && !waterInspectorJumpToParentBtn.dataset.bound) {
+    waterInspectorJumpToParentBtn.addEventListener("click", () => {
+      const selectedId = ensureSelectedWaterRegion();
+      const feature = selectedId ? state.waterRegionsById?.get(selectedId) : null;
+      const parentId = getWaterFeatureParentId(feature);
+      if (!parentId || !state.waterRegionsById?.has(parentId)) return;
+      state.selectedWaterRegionId = parentId;
+      renderWaterRegionList();
+    });
+    waterInspectorJumpToParentBtn.dataset.bound = "true";
+  }
+
+  if (waterInspectorScopeSelect && !waterInspectorScopeSelect.dataset.bound) {
+    waterInspectorScopeSelect.addEventListener("change", () => {
+      renderWaterInspectorDetail();
+    });
+    waterInspectorScopeSelect.dataset.bound = "true";
+  }
+
+  if (applyWaterFamilyOverrideBtn && !applyWaterFamilyOverrideBtn.dataset.bound) {
+    applyWaterFamilyOverrideBtn.addEventListener("click", () => {
+      const selectedId = ensureSelectedWaterRegion();
+      if (!selectedId) return;
+      const scope = getWaterFilterValue(waterInspectorScopeSelect) || "selected";
+      const targetIds = getWaterScopeFeatureIds(selectedId, scope);
+      if (!targetIds.length) return;
+      const color = getWaterFeatureColor(selectedId);
+      if (!applyWaterOverrideScope(targetIds, color, "batch-water-region-color", "batch-water-region-color")) {
+        return;
+      }
+      if (render) render();
+      renderWaterRegionList();
+    });
+    applyWaterFamilyOverrideBtn.dataset.bound = "true";
+  }
+
+  if (clearWaterFamilyOverrideBtn && !clearWaterFamilyOverrideBtn.dataset.bound) {
+    clearWaterFamilyOverrideBtn.addEventListener("click", () => {
+      const selectedId = ensureSelectedWaterRegion();
+      if (!selectedId) return;
+      const scope = getWaterFilterValue(waterInspectorScopeSelect) || "selected";
+      const targetIds = getWaterScopeFeatureIds(selectedId, scope);
+      if (!targetIds.length) return;
+      if (!clearWaterOverrideScope(targetIds, "clear-batch-water-region-color", "clear-batch-water-region-color")) {
+        return;
+      }
+      if (render) render();
+      renderWaterRegionList();
+    });
+    clearWaterFamilyOverrideBtn.dataset.bound = "true";
   }
 
   if (specialRegionSearchInput && !specialRegionSearchInput.dataset.bound) {

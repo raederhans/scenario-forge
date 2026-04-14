@@ -33,7 +33,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--scenario-id", required=True)
-    parser.add_argument("--target", choices=("geo-locale", "startup-assets", "chunk-assets", "all"), required=True)
+    parser.add_argument(
+        "--target",
+        choices=("geo-locale", "startup-support-assets", "startup-bundle-assets", "startup-assets", "chunk-assets", "all"),
+        required=True,
+    )
     parser.add_argument("--root", default=str(ROOT))
     parser.add_argument("--checkpoint-dir", default="")
     return parser.parse_args(argv)

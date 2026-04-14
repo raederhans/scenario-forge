@@ -24,6 +24,11 @@ import {
   writeStartupCacheEntry,
 } from "./startup_cache.js";
 import {
+  normalizeIndexedCoreAssignmentPayload,
+  normalizeIndexedTagAssignmentPayload,
+  normalizeRuntimePoliticalMeta as normalizeStartupBundleRuntimePoliticalMeta,
+} from "./startup_bundle_compaction.js";
+import {
   decodeRuntimeChunkViaWorker,
   loadScenarioRuntimeBootstrapViaWorker,
   shouldUseStartupWorker,
@@ -819,6 +824,10 @@ function createScenarioBootstrapBundleFromCache({
   runtimeTopologyUrl,
 } = {}) {
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
+  const runtimePoliticalMeta = normalizeStartupBundleRuntimePoliticalMeta(cachedPayload?.runtimePoliticalMeta || null);
+  const runtimeFeatureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
+    ? runtimePoliticalMeta.featureIds
+    : [];
   const bundle = {
     ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
@@ -835,9 +844,9 @@ function createScenarioBootstrapBundleFromCache({
     chunkPayloadPromisesById: {},
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: cachedPayload?.countriesPayload || null,
-    ownersPayload: cachedPayload?.ownersPayload || null,
-    controllersPayload: cachedPayload?.controllersPayload || null,
-    coresPayload: cachedPayload?.coresPayload || null,
+    ownersPayload: normalizeIndexedTagAssignmentPayload(cachedPayload?.ownersPayload, runtimeFeatureIds, "owners"),
+    controllersPayload: normalizeIndexedTagAssignmentPayload(cachedPayload?.controllersPayload, runtimeFeatureIds, "controllers"),
+    coresPayload: normalizeIndexedCoreAssignmentPayload(cachedPayload?.coresPayload, runtimeFeatureIds),
     waterRegionsPayload: priorBundle?.waterRegionsPayload || null,
     specialRegionsPayload: priorBundle?.specialRegionsPayload || null,
     reliefOverlaysPayload: priorBundle?.reliefOverlaysPayload || null,
@@ -847,7 +856,7 @@ function createScenarioBootstrapBundleFromCache({
       ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
     },
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload),
-    runtimePoliticalMeta: cachedPayload?.runtimePoliticalMeta || null,
+    runtimePoliticalMeta,
     runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
     districtGroupsPayload: priorBundle?.districtGroupsPayload || null,

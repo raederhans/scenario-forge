@@ -42,11 +42,19 @@ from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_build_session import (
     SCENARIO_BUILD_STATE_FILENAME,
     ensure_scenario_build_session,
+    load_stage_signature,
     record_stage_outputs,
+    stable_stage_signature,
 )
 from map_builder.scenario_locks import scenario_build_lock
 from map_builder import scenario_bundle_platform
 from map_builder import scenario_bundle_publish_service
+from map_builder import scenario_publish_service
+from map_builder.scenario_rebuild_planner import (
+    CHANGED_DOMAIN_CHOICES,
+    compute_tno_stage_signature_payload,
+    resolve_tno_rebuild_plan,
+)
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
@@ -64,6 +72,7 @@ from map_builder.contracts import (
     SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME as CONTRACT_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
     SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME as CONTRACT_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
     SCENARIO_CHECKPOINT_STAGE_METADATA_FILENAME as CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME,
+    SCENARIO_CHECKPOINT_WATER_STAGE_METADATA_FILENAME as CONTRACT_CHECKPOINT_WATER_STAGE_METADATA_FILENAME,
     SCENARIO_CHECKPOINT_WATER_FILENAME as CONTRACT_CHECKPOINT_WATER_FILENAME,
     SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME as CONTRACT_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
     SCENARIO_CHECKPOINT_WATER_SEED_FILENAME as CONTRACT_CHECKPOINT_WATER_SEED_FILENAME,
@@ -95,8 +104,11 @@ DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
 CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
 STAGE_ALL = "all"
 STAGE_COUNTRIES = "countries"
+STAGE_WATER_STATE = "water_state"
 STAGE_RUNTIME_TOPOLOGY = "runtime_topology"
 STAGE_GEO_LOCALE = "geo_locale"
+STAGE_STARTUP_SUPPORT_ASSETS = "startup_support_assets"
+STAGE_STARTUP_BUNDLE_ASSETS = "startup_bundle_assets"
 STAGE_STARTUP_ASSETS = "startup_assets"
 STAGE_WRITE_BUNDLE = "write_bundle"
 STAGE_CHUNK_ASSETS = "chunk_assets"
@@ -106,8 +118,11 @@ PUBLISH_SCOPE_ALL = CONTRACT_PUBLISH_SCOPE_ALL
 STAGE_CHOICES = [
     STAGE_ALL,
     STAGE_COUNTRIES,
+    STAGE_WATER_STATE,
     STAGE_RUNTIME_TOPOLOGY,
     STAGE_GEO_LOCALE,
+    STAGE_STARTUP_SUPPORT_ASSETS,
+    STAGE_STARTUP_BUNDLE_ASSETS,
     STAGE_STARTUP_ASSETS,
     STAGE_WRITE_BUNDLE,
     STAGE_CHUNK_ASSETS,
@@ -282,6 +297,7 @@ def _record_checkpoint_stage_outputs(
     scenario_dir: Path,
     stage: str,
     filenames: list[str],
+    stage_signature: dict[str, object] | None = None,
 ) -> None:
     ensure_scenario_build_session(
         scenario_id=SCENARIO_ID,
@@ -301,7 +317,61 @@ def _record_checkpoint_stage_outputs(
         stage=stage,
         output_paths=existing_paths,
         root=ROOT,
+        stage_signature=stage_signature,
     )
+
+
+def _build_stage_signature_entry(
+    stage: str,
+    *,
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+    tno_root: Path | None = None,
+    hgo_root: Path | None = None,
+) -> dict[str, object]:
+    if stage in {STAGE_WATER_STATE, STAGE_RUNTIME_TOPOLOGY}:
+        tno_root = Path(tno_root).resolve() if tno_root is not None else resolve_tno_root()
+        hgo_root = Path(hgo_root).resolve() if hgo_root is not None else resolve_hgo_root()
+    payload = compute_tno_stage_signature_payload(
+        stage,
+        scenario_dir=scenario_dir,
+        checkpoint_dir=checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+        tno_root=tno_root,
+        hgo_root=hgo_root,
+    )
+    return {
+        "signature": stable_stage_signature(payload),
+        "payload": payload,
+        "recorded_at": utc_timestamp(),
+    }
+
+
+def _stage_signature_is_current(
+    stage: str,
+    *,
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> bool:
+    if stage == STAGE_WATER_STATE and refresh_named_water_snapshot:
+        return False
+    resolved_tno_root = resolve_tno_root() if stage in {STAGE_WATER_STATE, STAGE_RUNTIME_TOPOLOGY} else None
+    resolved_hgo_root = resolve_hgo_root() if stage in {STAGE_WATER_STATE, STAGE_RUNTIME_TOPOLOGY} else None
+    entry = _build_stage_signature_entry(
+        stage,
+        scenario_dir=scenario_dir,
+        checkpoint_dir=checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+        tno_root=resolved_tno_root,
+        hgo_root=resolved_hgo_root,
+    )
+    existing_entry = load_stage_signature(checkpoint_dir, stage)
+    if not isinstance(existing_entry, dict):
+        return False
+    existing_signature = str(existing_entry.get("signature") or "").strip()
+    return existing_signature == entry["signature"]
 RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
@@ -526,8 +596,10 @@ MARINE_REGIONS_SOURCES_URL = "https://marineregions.org/sources.php"
 MARINE_REGIONS_LICENSE_URL = "https://www.marineregions.org/disclaimer.php"
 MARINE_REGIONS_SEAVOX_DETAILS_URL = "https://www.marineregions.org/gazetteer.php?id=23622&p=details"
 MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME = "derived/marine_regions_named_waters.snapshot.geojson"
-TNO_WATER_REGIONS_PROVENANCE_FILENAME = "water_regions.provenance.json"
-TNO_WATER_SUBTRACT_BUFFER_DEGREES = 0.0005
+TNO_WATER_REGIONS_PROVENANCE_FILENAME = "derived/water_regions.provenance.json"
+LEGACY_MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME = "marine_regions_named_waters.snapshot.geojson"
+LEGACY_TNO_WATER_REGIONS_PROVENANCE_FILENAME = "water_regions.provenance.json"
+TNO_WATER_SUBTRACT_BUFFER_DEGREES = 0.0
 MARINE_REGIONS_DATASET_META = {
     "seavox_v19": {
         "dataset_name": "Marine Regions SeaVoX SeaArea v19",
@@ -557,9 +629,37 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23649'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": ("marine_north_sea",),
-        "subtract_named_ids": ("tno_strait_of_dover",),
+        "subtract_named_ids": ("tno_strait_of_dover", "tno_poole_bay", "tno_solent"),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_poole_bay",
+        "name": "Poole Bay",
+        "label": "Poole Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_english_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_l4='23736'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_solent",
+        "name": "Solent",
+        "label": "Solent",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_english_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_l4='23737'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_gulf_of_st_lawrence",
@@ -570,7 +670,6 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_layer": "seavox_v19",
         "source_query": "mrgid_sr='24048'",
         "source_standard": "marine_regions_seavox_v19",
-        "subtract_base_ids": ("marine_labrador_sea",),
         "clip_open_ocean_ids": ("tno_northwest_atlantic_ocean",),
         "simplify_tolerance": 0.01,
     },
@@ -601,8 +700,39 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid=4307",
         "source_standard": "marine_regions_iho_v3",
         "subtract_base_ids": ("marine_yellow_sea", "marine_east_china_sea", "marine_sea_of_okhotsk"),
+        "subtract_named_ids": ("tno_seto_naikai", "tno_tatarskiy_proliv"),
         "clip_open_ocean_ids": ("tno_northwest_pacific_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_seto_naikai",
+        "name": "Seto Naikai",
+        "label": "Seto Naikai",
+        "water_type": "sea",
+        "region_group": "marine_detail",
+        "parent_id": "tno_sea_of_japan",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24108'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_tatarskiy_proliv",
+        "name": "Tatarskiy Proliv",
+        "label": "Tatarskiy Proliv",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_sea_of_japan",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24114'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_coral_sea",
@@ -614,8 +744,96 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23650'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": ("marine_tasman_sea",),
-        "clip_open_ocean_ids": ("tno_southwest_pacific_ocean",),
+        "subtract_named_ids": (
+            "tno_gulf_of_papua",
+            "tno_torres_strait",
+            "tno_great_barrier_reef_coastal_waters",
+        ),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_gulf_of_carpentaria",
+        "name": "Gulf of Carpentaria",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24063'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_gulf_of_carpentaria",),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_arafura_sea",
+        "name": "Arafura Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24065'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_named_ids": ("tno_gulf_of_carpentaria", "tno_timor_sea"),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_timor_sea",
+        "name": "Timor Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24066'",
+        "source_standard": "marine_regions_seavox_v19",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_gulf_of_papua",
+        "name": "Gulf of Papua",
+        "label": "Gulf of Papua",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_coral_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24099'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_torres_strait",
+        "name": "Torres Strait",
+        "label": "Torres Strait",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_coral_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24098'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_great_barrier_reef_coastal_waters",
+        "name": "Great Barrier Reef Coastal Waters",
+        "label": "Great Barrier Reef Coastal Waters",
+        "water_type": "sea",
+        "region_group": "marine_detail",
+        "parent_id": "tno_coral_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24164'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_celtic_sea",
@@ -627,9 +845,45 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23729'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
-        "subtract_named_ids": ("tno_english_channel",),
+        "subtract_named_ids": (
+            "tno_english_channel",
+            "tno_bristol_channel",
+            "tno_st_georges_channel",
+            "tno_st_brides_bay",
+            "tno_bay_of_brest",
+        ),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_st_brides_bay",
+        "name": "St. Brides Bay",
+        "label": "St. Brides Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_celtic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24214'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_bay_of_brest",
+        "name": "Bay of Brest",
+        "label": "Bay of Brest",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_celtic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='62608'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_bristol_channel",
@@ -641,8 +895,90 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23728'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "subtract_named_ids": (
+            "tno_severn_estuary",
+            "tno_swansea_bay",
+            "tno_carmarthen_bay",
+            "tno_bridgwater_bay",
+            "tno_barnstaple_bideford_bay",
+        ),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_swansea_bay",
+        "name": "Swansea Bay",
+        "label": "Swansea Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bristol_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24217'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_carmarthen_bay",
+        "name": "Carmarthen Bay",
+        "label": "Carmarthen Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bristol_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24216'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_bridgwater_bay",
+        "name": "Bridgwater Bay",
+        "label": "Bridgwater Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bristol_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24219'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_barnstaple_bideford_bay",
+        "name": "Barnstaple or Bideford Bay",
+        "label": "Barnstaple / Bideford Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bristol_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24215'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_severn_estuary",
+        "name": "Severn Estuary",
+        "label": "Severn Estuary",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bristol_channel",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24218'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_north_channel",
@@ -656,6 +992,21 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "subtract_base_ids": ("marine_irish_sea",),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_st_georges_channel",
+        "name": "St. George's Channel",
+        "label": "St. George's Channel",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_celtic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24210'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_strait_of_dover",
@@ -694,6 +1045,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid=2374",
         "source_standard": "marine_regions_iho_v3",
         "subtract_base_ids": ("marine_north_sea", "marine_baltic_sea"),
+        "subtract_named_ids": ("tno_central_baltic_sea", "tno_the_sound", "tno_storebaelt", "tno_lillebaelt"),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
     },
@@ -705,8 +1057,131 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "is_chokepoint": False,
         "global_source_id": "marine_baltic_sea",
         "source_standard": "tno_cloned_from_global_water_regions",
-        "subtract_named_ids": ("tno_kattegat",),
+        "subtract_named_ids": (
+            "tno_kattegat",
+            "tno_gulf_of_riga",
+            "tno_bothnian_sea",
+            "tno_bay_of_bothnia",
+            "tno_gulf_of_finland",
+            "tno_central_baltic_sea",
+            "tno_the_sound",
+            "tno_storebaelt",
+            "tno_lillebaelt",
+        ),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+    },
+    {
+        "id": "tno_central_baltic_sea",
+        "name": "Central Baltic Sea",
+        "label": "Central Baltic",
+        "water_type": "sea",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24053'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_gulf_of_riga",
+        "name": "Gulf of Riga",
+        "label": "Gulf of Riga",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24054'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_bothnian_sea",
+        "name": "Bothnian Sea",
+        "label": "Bothnian Sea",
+        "water_type": "sea",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24051'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "subtract_named_ids": ("tno_bay_of_bothnia",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_bay_of_bothnia",
+        "name": "Bay of Bothnia",
+        "label": "Bothnian Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24060'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_gulf_of_finland",
+        "name": "Gulf of Finland",
+        "label": "Gulf of Finland",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24052'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_the_sound",
+        "name": "The Sound",
+        "label": "The Sound",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24056'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_storebaelt",
+        "name": "Storebaelt",
+        "label": "Storebaelt",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24057'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_lillebaelt",
+        "name": "Lillebaelt",
+        "label": "Lillebaelt",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_baltic_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24058'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_sea_of_marmara",
@@ -737,8 +1212,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_black_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24093'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_black_sea",),
+        "subtract_named_ids": ("tno_sea_of_azov", "tno_bosporus_dardanelles"),
+        "simplify_tolerance": 0.005,
     },
     {
         "id": "tno_sea_of_azov",
@@ -746,8 +1225,11 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_sea_of_azov",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24094'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_sea_of_azov",),
+        "simplify_tolerance": 0.005,
     },
     {
         "id": "tno_greenland_sea",
@@ -755,9 +1237,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_greenland_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='36279'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_greenland_sea",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_norwegian_sea",
@@ -765,9 +1250,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_norwegian_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24024'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_norwegian_sea",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_barents_sea",
@@ -775,9 +1263,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_barents_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24029'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_barents_sea",),
         "clip_open_ocean_ids": TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_beaufort_sea",
@@ -785,9 +1276,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_beaufort_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4256",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_beaufort_sea",),
         "clip_open_ocean_ids": TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_labrador_sea",
@@ -795,9 +1289,16 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_labrador_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4291",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_labrador_sea",),
+        "supplement_bboxes": (
+            (-64.7520475204752, 47.53888893, -43.99299356875491, 60.31812110621105),
+        ),
+        "subtract_named_ids": ("tno_gulf_of_st_lawrence",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_baffin_bay",
@@ -805,9 +1306,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_baffin_bay",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24030'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_baffin_bay",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_hudson_bay",
@@ -815,9 +1319,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "bay",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_hudson_bay",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4252",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_hudson_bay",),
         "clip_open_ocean_ids": ("tno_northwest_atlantic_ocean", "tno_western_arctic_ocean"),
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_bay_of_biscay",
@@ -827,6 +1334,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "is_chokepoint": False,
         "global_source_id": "marine_bay_of_biscay",
         "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": ("tno_bay_of_brest",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
     },
     {
@@ -837,8 +1345,133 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "is_chokepoint": False,
         "global_source_id": "marine_north_sea",
         "source_standard": "tno_cloned_from_global_water_regions",
-        "subtract_named_ids": ("tno_english_channel", "tno_strait_of_dover", "tno_skagerrak", "tno_kattegat"),
+        "subtract_named_ids": (
+            "tno_english_channel",
+            "tno_strait_of_dover",
+            "tno_skagerrak",
+            "tno_kattegat",
+            "tno_wadden_sea",
+            "tno_thames_estuary",
+            "tno_blackwater_estuary",
+            "tno_the_wash",
+            "tno_humber_estuary",
+            "tno_firth_of_forth",
+            "tno_moray_firth",
+            "tno_pentland_firth",
+        ),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_wadden_sea",
+        "name": "Wadden Sea",
+        "label": "Wadden Sea",
+        "water_type": "sea",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24170'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_thames_estuary",
+        "name": "Thames Estuary",
+        "label": "Thames Estuary",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24195'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_blackwater_estuary",
+        "name": "Blackwater Estuary",
+        "label": "Blackwater Estuary",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24194'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_the_wash",
+        "name": "The Wash",
+        "label": "The Wash",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24193'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_humber_estuary",
+        "name": "Humber Estuary",
+        "label": "Humber Estuary",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24192'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_firth_of_forth",
+        "name": "Firth of Forth",
+        "label": "Firth of Forth",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24188'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_moray_firth",
+        "name": "Moray Firth",
+        "label": "Moray Firth",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24187'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_pentland_firth",
+        "name": "Pentland Firth",
+        "label": "Pentland Firth",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_north_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24179'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_irish_sea",
@@ -848,8 +1481,57 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "is_chokepoint": False,
         "global_source_id": "marine_irish_sea",
         "source_standard": "tno_cloned_from_global_water_regions",
-        "subtract_named_ids": ("tno_north_channel",),
+        "subtract_named_ids": (
+            "tno_north_channel",
+            "tno_st_georges_channel",
+            "tno_st_brides_bay",
+            "tno_cardigan_bay",
+            "tno_liverpool_bay",
+            "tno_solway_firth",
+        ),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_cardigan_bay",
+        "name": "Cardigan Bay",
+        "label": "Cardigan Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_irish_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_l4='23740'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_liverpool_bay",
+        "name": "Liverpool Bay",
+        "label": "Liverpool Bay",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_irish_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_l4='23741'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_solway_firth",
+        "name": "Solway Firth",
+        "label": "Solway Firth",
+        "water_type": "channel",
+        "region_group": "marine_detail",
+        "parent_id": "tno_irish_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_l4='23742'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_caribbean_sea",
@@ -857,9 +1539,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_caribbean_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4287",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_caribbean_sea",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_gulf_of_mexico",
@@ -867,9 +1552,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_gulf_of_mexico",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4288",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_gulf_of_mexico",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_gulf_of_guinea",
@@ -877,9 +1565,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_gulf_of_guinea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24041'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_gulf_of_guinea",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_sea_of_okhotsk",
@@ -887,9 +1578,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_sea_of_okhotsk",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24120'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_sea_of_okhotsk",),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_east_china_sea",
@@ -897,9 +1591,28 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_east_china_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24107'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_east_china_sea",),
+        "subtract_named_ids": ("tno_taiwan_strait",),
+        "simplify_tolerance": 0.006,
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_taiwan_strait",
+        "name": "Taiwan Strait",
+        "label": "Taiwan Strait",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_east_china_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24105'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_yellow_sea",
@@ -907,9 +1620,42 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_yellow_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24110'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_yellow_sea",),
+        "subtract_named_ids": ("tno_bo_hai",),
+        "simplify_tolerance": 0.006,
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_bo_hai",
+        "name": "Bo Hai",
+        "label": "Bo Hai",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_yellow_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24111'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "subtract_named_ids": ("tno_liaodong_wan",),
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_liaodong_wan",
+        "name": "Liaodong Wan",
+        "label": "Liaodong Wan",
+        "water_type": "bay",
+        "region_group": "marine_detail",
+        "parent_id": "tno_bo_hai",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24112'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_south_china_sea",
@@ -919,6 +1665,15 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "is_chokepoint": False,
         "global_source_id": "marine_south_china_sea",
         "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": (
+            "tno_taiwan_strait",
+            "tno_gulf_of_tonkin",
+            "tno_gulf_of_thailand",
+            "tno_natuna_sea",
+            "tno_singapore_strait",
+            "tno_java_sea",
+            "tno_sulu_sea",
+        ),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
     },
     {
@@ -927,9 +1682,16 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_philippine_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24109'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_philippine_sea",),
+        "supplement_bboxes": (
+            (128.56, 2.4999, 128.684, 2.6481),
+        ),
+        "subtract_named_ids": ("tno_sulu_sea", "tno_celebes_sea", "tno_molucca_sea", "tno_halmahera_sea"),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_sulu_sea",
@@ -937,9 +1699,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_sulu_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24141'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_sulu_sea",),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_celebes_sea",
@@ -947,9 +1712,57 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_celebes_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24139'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_celebes_sea",),
+        "subtract_named_ids": ("tno_makassar_strait",),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_natuna_sea",
+        "name": "Natuna Sea",
+        "label": "Natuna Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24138'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_gulf_of_tonkin",
+        "name": "Gulf of Tonkin",
+        "label": "Gulf of Tonkin",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_south_china_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24143'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_gulf_of_thailand",
+        "name": "Gulf of Thailand",
+        "label": "Gulf of Thailand",
+        "water_type": "gulf",
+        "region_group": "marine_detail",
+        "parent_id": "tno_south_china_sea",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24142'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_gulf_of_alaska",
@@ -957,9 +1770,15 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_gulf_of_alaska",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "iho",
+        "source_query": "mrgid=4312",
+        "source_standard": "marine_regions_iho_v3",
+        "exclude_base_ids": ("marine_gulf_of_alaska",),
+        "supplement_bboxes": (
+            (-163.36783367833678, 54.04918667486676, -136.579965799658, 60.664144681446814),
+        ),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_tasman_sea",
@@ -967,9 +1786,31 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_tasman_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24096'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_tasman_sea",),
+        "supplement_bboxes": (
+            (146.37206372063724, -50.79764454144542, 175.24795247952483, -29.875877638776394),
+        ),
+        "subtract_named_ids": ("tno_bass_strait",),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_bass_strait",
+        "name": "Bass Strait",
+        "label": "Bass Strait",
+        "water_type": "strait",
+        "region_group": "marine_detail",
+        "parent_id": "tno_tasman_sea",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24095'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
     },
     {
         "id": "tno_great_australian_bight",
@@ -977,9 +1818,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_great_australian_bight",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24061'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_great_australian_bight",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_scotia_sea",
@@ -1007,9 +1851,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_ross_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24147'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_ross_sea",),
         "clip_open_ocean_ids": ("tno_south_pacific_antarctic_ocean",),
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_arabian_sea",
@@ -1017,9 +1864,13 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_arabian_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24074'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_arabian_sea",),
+        "subtract_named_ids": ("tno_gulf_of_aden", "tno_gulf_of_oman"),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_bay_of_bengal",
@@ -1027,8 +1878,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_bay_of_bengal",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24073'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_bay_of_bengal",),
+        "subtract_named_ids": ("tno_andaman_sea", "tno_malacca_strait"),
+        "simplify_tolerance": 0.006,
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
     },
     {
@@ -1037,9 +1892,13 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_red_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24077'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_red_sea",),
+        "subtract_named_ids": ("tno_gulf_of_aden",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_gulf_of_aden",
@@ -1047,9 +1906,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_gulf_of_aden",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24071'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_gulf_of_aden",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_gulf_of_oman",
@@ -1057,9 +1919,16 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_gulf_of_oman",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24075'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_gulf_of_oman",),
+        "supplement_bboxes": (
+            (55.8215, 25.6649, 56.2690, 25.7106),
+        ),
+        "subtract_named_ids": ("tno_persian_gulf",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_persian_gulf",
@@ -1067,9 +1936,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "gulf",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_persian_gulf",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24080'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_persian_gulf",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
     {
         "id": "tno_mozambique_channel",
@@ -1077,9 +1949,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "channel",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_mozambique_channel",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24064'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_mozambique_channel",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.01,
     },
     {
         "id": "tno_andaman_sea",
@@ -1087,9 +1962,114 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "water_type": "sea",
         "region_group": "marine_macro",
         "is_chokepoint": False,
-        "global_source_id": "marine_andaman_sea",
-        "source_standard": "tno_cloned_from_global_water_regions",
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24072'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_andaman_sea",),
+        "subtract_named_ids": ("tno_malacca_strait", "tno_singapore_strait"),
+        "simplify_tolerance": 0.006,
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_malacca_strait",
+        "name": "Malacca Strait",
+        "label": "Malacca Strait",
+        "water_type": "strait",
+        "region_group": "marine_macro",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24140'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_singapore_strait",
+        "name": "Singapore Strait",
+        "label": "Singapore Strait",
+        "water_type": "strait",
+        "region_group": "marine_macro",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24165'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_java_sea",
+        "name": "Java Sea",
+        "label": "Java Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24130'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_java_sea",),
+        "subtract_named_ids": ("tno_makassar_strait",),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_makassar_strait",
+        "name": "Makassar Strait",
+        "label": "Makassar Strait",
+        "water_type": "strait",
+        "region_group": "marine_macro",
+        "is_chokepoint": True,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24135'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.004,
+    },
+    {
+        "id": "tno_banda_sea",
+        "name": "Banda Sea",
+        "label": "Banda Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24133'",
+        "source_standard": "marine_regions_seavox_v19",
+        "exclude_base_ids": ("marine_banda_sea",),
+        "subtract_named_ids": ("tno_molucca_sea", "tno_halmahera_sea"),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_molucca_sea",
+        "name": "Molucca Sea",
+        "label": "Molucca Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24137'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "subtract_named_ids": ("tno_celebes_sea", "tno_halmahera_sea"),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
+    },
+    {
+        "id": "tno_halmahera_sea",
+        "name": "Halmahera Sea",
+        "label": "Halmahera Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "seavox_v19",
+        "source_query": "mrgid_sr='24136'",
+        "source_standard": "marine_regions_seavox_v19",
+        "subtract_base_ids": (),
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+        "simplify_tolerance": 0.006,
     },
 )
 TNO_EXCLUDED_BASE_WATER_REGION_IDS = sorted({
@@ -1099,6 +2079,11 @@ TNO_EXCLUDED_BASE_WATER_REGION_IDS = sorted({
     str(spec.get("global_source_id") or "").strip()
     for spec in TNO_NAMED_MARGINAL_WATER_SPECS
     if str(spec.get("global_source_id") or "").strip()
+} | {
+    str(base_id).strip()
+    for spec in TNO_NAMED_MARGINAL_WATER_SPECS
+    for base_id in tuple(spec.get("exclude_base_ids") or ())
+    if str(base_id).strip()
 })
 
 ATL_TAG = "ATL"
@@ -4343,6 +5328,7 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
             "source_standard": spec["source_standard"],
             "global_source_id": global_source_id,
             "subtract_base_ids": subtract_base_ids,
+            "supplement_bboxes": list(spec.get("supplement_bboxes", ()) or ()),
             "subtract_named_ids": [
                 str(region_id).strip()
                 for region_id in spec.get("subtract_named_ids", ())
@@ -4363,7 +5349,10 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
             subtract_geom = prepared_geometries_by_id.get(region_id)
             if subtract_geom is None:
                 raise ValueError(f"Named water '{named_feature_id}' references missing named subtraction '{region_id}'.")
-            buffered_subtract_geom = buffer_polygonal(subtract_geom, TNO_WATER_SUBTRACT_BUFFER_DEGREES)
+            overlap_geom = normalize_polygonal(final_geom.intersection(subtract_geom))
+            if overlap_geom is None:
+                continue
+            buffered_subtract_geom = buffer_polygonal(overlap_geom, TNO_WATER_SUBTRACT_BUFFER_DEGREES)
             if buffered_subtract_geom is not None:
                 subtract_named_geometries.append(buffered_subtract_geom)
         final_geom = subtract_geometry_list(final_geom, subtract_named_geometries)
@@ -4389,6 +5378,57 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
         named_features.append(make_feature(final_geom, properties))
         diagnostics[named_feature_id]["geometry_area"] = round(float(final_geom.area), 6)
     return named_features, diagnostics
+
+
+def apply_tno_named_water_supplements(named_features: list[dict], land_mask_geom) -> list[dict]:
+    feature_map = {
+        str(feature.get("properties", {}).get("id") or "").strip(): feature
+        for feature in named_features
+        if str(feature.get("properties", {}).get("id") or "").strip()
+    }
+    base_geometries = {
+        feature_id: normalize_polygonal(shape(feature.get("geometry")))
+        for feature_id, feature in feature_map.items()
+    }
+    supplemented_features: list[dict] = []
+    for spec in TNO_NAMED_MARGINAL_WATER_SPECS:
+        feature_id = str(spec.get("id") or "").strip()
+        feature = feature_map.get(feature_id)
+        current_geom = base_geometries.get(feature_id)
+        if feature is None or current_geom is None:
+            continue
+        supplement_parts = []
+        for supplement_bbox in spec.get("supplement_bboxes", ()) or ():
+            if not supplement_bbox:
+                continue
+            supplement_geom = normalize_polygonal(box(*supplement_bbox))
+            if supplement_geom is None:
+                continue
+            if land_mask_geom is not None:
+                supplement_geom = normalize_polygonal(supplement_geom.difference(land_mask_geom))
+            if supplement_geom is None:
+                continue
+            subtract_geometries = [
+                geom
+                for other_id in (
+                    str(region_id).strip()
+                    for region_id in spec.get("subtract_named_ids", ())
+                    if str(region_id).strip()
+                )
+                for geom in [base_geometries.get(other_id)]
+                if geom is not None
+            ]
+            supplement_geom = subtract_geometry_list(supplement_geom, subtract_geometries)
+            if supplement_geom is not None:
+                supplement_parts.append(supplement_geom)
+        if supplement_parts:
+            current_geom = normalize_polygonal(safe_unary_union([current_geom, *supplement_parts]))
+            if current_geom is None:
+                raise ValueError(f"Named water feature '{feature_id}' collapsed after late supplement union.")
+        supplemented_features.append(
+            make_feature(current_geom, dict(feature.get("properties", {})))
+        )
+    return supplemented_features
 
 
 def sanitize_jsonable(value):
@@ -4462,6 +5502,14 @@ def marine_regions_named_water_snapshot_path(scenario_dir: Path) -> Path:
 
 def tno_water_regions_provenance_path(scenario_dir: Path) -> Path:
     return scenario_dir / TNO_WATER_REGIONS_PROVENANCE_FILENAME
+
+
+def legacy_marine_regions_named_water_snapshot_path(scenario_dir: Path) -> Path:
+    return scenario_dir / LEGACY_MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME
+
+
+def legacy_tno_water_regions_provenance_path(scenario_dir: Path) -> Path:
+    return scenario_dir / LEGACY_TNO_WATER_REGIONS_PROVENANCE_FILENAME
 
 
 def rebuild_published_scenario_chunk_assets(scenario_dir: Path, checkpoint_dir: Path) -> None:
@@ -4623,6 +5671,8 @@ def load_or_refresh_marine_regions_named_water_snapshot(
 ) -> tuple[dict, dict]:
     snapshot_path = marine_regions_named_water_snapshot_path(scenario_dir)
     provenance_path = tno_water_regions_provenance_path(scenario_dir)
+    legacy_snapshot_path = legacy_marine_regions_named_water_snapshot_path(scenario_dir)
+    legacy_provenance_path = legacy_tno_water_regions_provenance_path(scenario_dir)
     if refresh_named_water_snapshot:
         snapshot_payload, provenance_payload = build_marine_regions_named_water_snapshot_payload()
         snapshot_path.parent.mkdir(parents=True, exist_ok=True)
@@ -4631,10 +5681,20 @@ def load_or_refresh_marine_regions_named_water_snapshot(
         write_json(provenance_path, provenance_payload)
         return snapshot_payload, provenance_payload
     if not snapshot_path.exists():
-        raise FileNotFoundError(
-            f"Missing named water snapshot: {snapshot_path}. Run with --refresh-named-water-snapshot to create it."
-        )
+        if legacy_snapshot_path.exists():
+            snapshot_payload = load_json(legacy_snapshot_path)
+            snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+            write_json(snapshot_path, snapshot_payload)
+        else:
+            raise FileNotFoundError(
+                f"Missing named water snapshot: {snapshot_path}. Run with --refresh-named-water-snapshot to create it."
+            )
     if not provenance_path.exists():
+        if legacy_provenance_path.exists():
+            provenance_payload = load_json(legacy_provenance_path)
+            provenance_path.parent.mkdir(parents=True, exist_ok=True)
+            write_json(provenance_path, provenance_payload)
+            return load_json(snapshot_path), provenance_payload
         raise FileNotFoundError(
             f"Missing water-region provenance file: {provenance_path}. Run with --refresh-named-water-snapshot to create it."
         )
@@ -4644,6 +5704,12 @@ def load_or_refresh_marine_regions_named_water_snapshot(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Patch the checked-in tno_1962 scenario bundle.")
     parser.add_argument("--stage", choices=STAGE_CHOICES, default=STAGE_ALL)
+    parser.add_argument(
+        "--changed-domain",
+        choices=CHANGED_DOMAIN_CHOICES,
+        default="",
+        help="Run the shared incremental rebuild plan for a specific change domain instead of stage all.",
+    )
     parser.add_argument("--checkpoint-dir", default="")
     parser.add_argument("--scenario-dir", default=str(SCENARIO_DIR))
     parser.add_argument(
@@ -4722,6 +5788,7 @@ def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame
 
 
 CHECKPOINT_STAGE_METADATA_FILENAME = CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME
+CHECKPOINT_WATER_STAGE_METADATA_FILENAME = CONTRACT_CHECKPOINT_WATER_STAGE_METADATA_FILENAME
 CHECKPOINT_BUILD_METADATA_FILENAME = SCENARIO_BUILD_STATE_FILENAME
 CHECKPOINT_SCENARIO_POLITICAL_FILENAME = CONTRACT_CHECKPOINT_POLITICAL_FILENAME
 CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = CONTRACT_CHECKPOINT_WATER_SEED_FILENAME
@@ -8981,6 +10048,74 @@ def build_countries_stage_state(
         audit_payload,
     )
 
+    stage_metadata = {
+        "generated_at": generated_at,
+        "source_root": str(tno_root),
+        "hgo_donor_root": str(hgo_root),
+        "touched_east_asia_tags": touched_east_asia_tags,
+        "touched_south_asia_tags": touched_south_asia_tags,
+        "touched_regional_rule_tags": touched_regional_rule_tags,
+        "applied_annex_maps": {key: list(value) for key, value in applied_annex_maps.items()},
+        "antarctic_diagnostics": antarctic_diagnostics,
+        "restore_diagnostics": restore_diagnostics,
+        "polar_feature_diagnostics": polar_feature_diagnostics,
+        "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "owner_only_backfill_diagnostics": owner_only_backfill_diagnostics,
+        "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
+        "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
+    }
+
+    return {
+        "countries_payload": countries_payload,
+        "owners_payload": owners_payload,
+        "controllers_payload": controllers_payload,
+        "cores_payload": cores_payload,
+        "manifest_payload": manifest_payload,
+        "audit_payload": audit_payload,
+        "scenario_political_gdf": scenario_political_gdf,
+        "stage_metadata": stage_metadata,
+    }
+
+
+def build_water_stage_state_from_countries_state(
+    countries_state: dict[str, object],
+    scenario_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> dict[str, object]:
+    countries_metadata = dict(countries_state.get("stage_metadata") or {})
+    generated_at = str(countries_metadata.get("generated_at") or utc_timestamp())
+    tno_root = resolve_tno_root()
+    hgo_root = resolve_hgo_root()
+    donor_context = load_hgo_context(hgo_root)
+    runtime_political_full_gdf = load_runtime_political_gdf()
+    scenario_political_gdf = countries_state["scenario_political_gdf"]
+    named_water_snapshot_payload, water_regions_provenance_payload = load_or_refresh_marine_regions_named_water_snapshot(
+        scenario_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+    tno_key_image = load_province_key_image(tno_root)
+    _, province_type_by_id, rgb_key_to_id = load_definition_entries(tno_root)
+    lake_geom, lake_component_ids = build_congo_lake_geometry(tno_key_image, province_type_by_id, rgb_key_to_id)
+    atl_feature_collection, atlantropa_region_unions, atlantropa_diagnostics, atl_replacement_specs = build_atlantropa_from_hgo(
+        donor_context,
+        runtime_political_full_gdf,
+    )
+    atl_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_feature_collection]
+    atl_political_gdf = geopandas_from_features(atl_feature_collection)
+    island_drop_ids, island_replacement_diagnostics = collect_baseline_island_drop_ids(
+        scenario_political_gdf,
+        atl_replacement_specs,
+    )
+    atl_sea_collection, atl_sea_union, med_water_diagnostics = build_atl_sea_from_hgo(
+        donor_context,
+        runtime_political_full_gdf,
+        atlantropa_region_unions,
+    )
+    atl_sea_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_sea_collection]
+    base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
+    atl_land_union = safe_unary_union(atl_political_gdf.geometry.tolist())
+    if base_land_union is None or atl_land_union is None:
+        raise ValueError("Unable to assemble land unions for runtime topology.")
     congo_props = {
         "id": "congo_lake",
         "name": "Congo Lake",
@@ -9001,13 +10136,13 @@ def build_countries_stage_state(
     named_marginal_water_features, named_water_diagnostics = build_tno_named_marginal_water_features(
         named_water_snapshot_payload
     )
-    base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
-    atl_land_union = safe_unary_union(atl_political_gdf.geometry.tolist())
-    if base_land_union is None or atl_land_union is None:
-        raise ValueError("Unable to assemble land unions for runtime topology.")
     ocean_land_mask_geom = safe_unary_union([base_land_union, atl_land_union])
     if ocean_land_mask_geom is None:
         raise ValueError("Open-ocean land mask collapsed to empty geometry.")
+    named_marginal_water_features = apply_tno_named_water_supplements(
+        named_marginal_water_features,
+        ocean_land_mask_geom,
+    )
     mediterranean_template_gdf = load_mediterranean_template_water_gdf()
     mediterranean_template_union = (
         safe_unary_union(mediterranean_template_gdf.geometry.tolist())
@@ -9050,7 +10185,6 @@ def build_countries_stage_state(
     )
     water_feature_collection = feature_collection_from_features(scenario_water_features)
     water_gdf = geopandas_from_features(water_feature_collection["features"])
-
     land_without_lake = normalize_polygonal(base_land_union.difference(lake_geom))
     if land_without_lake is None:
         raise ValueError("Scenario land mask lost all land after Congo cut.")
@@ -9072,9 +10206,7 @@ def build_countries_stage_state(
         context_land_mask_area_delta_ratio,
         context_land_mask_fallback_used,
         context_land_mask_arc_refs,
-    ) = (
-        build_context_land_mask_geometry(land_mask_geom)
-    )
+    ) = build_context_land_mask_geometry(land_mask_geom)
     context_land_mask_gdf = gpd.GeoDataFrame([{
         "id": "tno_1962_context_land_mask",
         "name": "TNO 1962 Context Land Mask",
@@ -9085,25 +10217,13 @@ def build_countries_stage_state(
         atl_sea_collection,
         atlantropa_region_unions,
     )
-
-    stage_metadata = {
+    water_stage_metadata = {
         "generated_at": generated_at,
         "source_root": str(tno_root),
         "hgo_donor_root": str(hgo_root),
-        "touched_east_asia_tags": touched_east_asia_tags,
-        "touched_south_asia_tags": touched_south_asia_tags,
-        "touched_regional_rule_tags": touched_regional_rule_tags,
-        "applied_annex_maps": {key: list(value) for key, value in applied_annex_maps.items()},
         "atlantropa_diagnostics": atlantropa_diagnostics,
         "island_replacement_diagnostics": island_replacement_diagnostics,
         "med_water_diagnostics": med_water_diagnostics,
-        "antarctic_diagnostics": antarctic_diagnostics,
-        "restore_diagnostics": restore_diagnostics,
-        "polar_feature_diagnostics": polar_feature_diagnostics,
-        "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
-        "owner_only_backfill_diagnostics": owner_only_backfill_diagnostics,
-        "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
-        "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
         "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
         "bathymetry_diagnostics": bathymetry_diagnostics,
@@ -9114,50 +10234,53 @@ def build_countries_stage_state(
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
         "context_land_mask_arc_refs": context_land_mask_arc_refs,
+        "island_drop_ids": sorted(island_drop_ids),
     }
-
     return {
-        "countries_payload": countries_payload,
-        "owners_payload": owners_payload,
-        "controllers_payload": controllers_payload,
-        "cores_payload": cores_payload,
-        "manifest_payload": manifest_payload,
-        "audit_payload": audit_payload,
-        "manual_overrides_payload": manual_overrides_payload,
+        "water_stage_metadata": water_stage_metadata,
+        "water_gdf": water_gdf,
+        "land_mask_gdf": land_mask_gdf,
+        "context_land_mask_gdf": context_land_mask_gdf,
         "relief_overlays_payload": relief_overlays_payload,
         "bathymetry_payload": bathymetry_payload,
         "named_water_snapshot_payload": named_water_snapshot_payload,
         "water_regions_provenance_payload": water_regions_provenance_payload,
-        "scenario_political_gdf": scenario_political_gdf,
-        "water_gdf": water_gdf,
-        "land_mask_gdf": land_mask_gdf,
-        "context_land_mask_gdf": context_land_mask_gdf,
-        "atl_feature_ids": sorted(atl_feature_ids),
-        "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
-        "context_land_mask_tolerance": context_land_mask_tolerance,
-        "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
-        "context_land_mask_fallback_used": context_land_mask_fallback_used,
-        "context_land_mask_arc_refs": context_land_mask_arc_refs,
-        "stage_metadata": stage_metadata,
     }
 
 
-def build_runtime_topology_state_from_countries_state(state: dict[str, object]) -> dict[str, object]:
-    countries_payload = state["countries_payload"]
-    owners_payload = state["owners_payload"]
-    controllers_payload = state["controllers_payload"]
-    cores_payload = state["cores_payload"]
-    manifest_payload = state["manifest_payload"]
-    audit_payload = state["audit_payload"]
-    scenario_political_gdf = state["scenario_political_gdf"]
-    water_gdf = state["water_gdf"]
-    land_mask_gdf = state["land_mask_gdf"]
-    context_land_mask_gdf = state["context_land_mask_gdf"]
-    relief_overlays_payload = state["relief_overlays_payload"]
-    bathymetry_payload = state.get("bathymetry_payload") or build_empty_bathymetry_payload()
-    named_water_snapshot_payload = state.get("named_water_snapshot_payload") or feature_collection_from_features([])
-    water_regions_provenance_payload = state.get("water_regions_provenance_payload") or {}
-    stage_metadata = state["stage_metadata"]
+def build_water_stage_state(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> dict[str, object]:
+    return build_water_stage_state_from_countries_state(
+        load_countries_stage_checkpoints(checkpoint_dir),
+        scenario_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+
+
+def build_runtime_topology_state(
+    countries_state: dict[str, object],
+    water_state: dict[str, object],
+) -> dict[str, object]:
+    countries_payload = countries_state["countries_payload"]
+    owners_payload = countries_state["owners_payload"]
+    controllers_payload = countries_state["controllers_payload"]
+    cores_payload = countries_state["cores_payload"]
+    manifest_payload = countries_state["manifest_payload"]
+    audit_payload = countries_state["audit_payload"]
+    scenario_political_gdf = countries_state["scenario_political_gdf"]
+    water_gdf = water_state["water_gdf"]
+    land_mask_gdf = water_state["land_mask_gdf"]
+    context_land_mask_gdf = water_state["context_land_mask_gdf"]
+    relief_overlays_payload = water_state["relief_overlays_payload"]
+    bathymetry_payload = water_state.get("bathymetry_payload") or build_empty_bathymetry_payload()
+    named_water_snapshot_payload = water_state.get("named_water_snapshot_payload") or feature_collection_from_features([])
+    water_regions_provenance_payload = water_state.get("water_regions_provenance_payload") or {}
+    stage_metadata = dict(countries_state["stage_metadata"])
+    water_stage_metadata = dict(water_state.get("water_stage_metadata") or {})
+    stage_metadata.update(water_stage_metadata)
 
     runtime_topology_payload = build_runtime_topology_payload(
         scenario_political_gdf,
@@ -9356,7 +10479,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     stage_metadata["core_baseline_hash"] = core_baseline_hash
     stage_metadata["context_land_mask_arc_refs"] = context_land_mask_arc_refs
 
-    full_state = dict(state)
+    full_state = dict(countries_state)
     full_state.update({
         "runtime_topology_payload": runtime_topology_payload,
         "runtime_bootstrap_topology_payload": build_bootstrap_runtime_topology(runtime_topology_payload),
@@ -9372,15 +10495,36 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     return full_state
 
 
+def build_runtime_topology_state_from_countries_state(state: dict[str, object]) -> dict[str, object]:
+    water_state = {
+        "water_gdf": state["water_gdf"],
+        "land_mask_gdf": state["land_mask_gdf"],
+        "context_land_mask_gdf": state["context_land_mask_gdf"],
+        "relief_overlays_payload": state.get("relief_overlays_payload"),
+        "bathymetry_payload": state.get("bathymetry_payload"),
+        "named_water_snapshot_payload": state.get("named_water_snapshot_payload"),
+        "water_regions_provenance_payload": state.get("water_regions_provenance_payload"),
+        "water_stage_metadata": dict(state.get("stage_metadata") or {}),
+    }
+    return build_runtime_topology_state(state, water_state)
+
+
 def build_bundle_state(
     scenario_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> dict[str, object]:
-    return build_runtime_topology_state_from_countries_state(
-        build_countries_stage_state(
-            scenario_dir,
-            refresh_named_water_snapshot=refresh_named_water_snapshot,
-        )
+    countries_state = build_countries_stage_state(
+        scenario_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+    water_state = build_water_stage_state_from_countries_state(
+        countries_state,
+        scenario_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+    return build_runtime_topology_state(
+        countries_state,
+        water_state,
     )
 
 
@@ -9405,11 +10549,52 @@ def write_countries_stage_checkpoints(
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS),
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
                 ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_COUNTRIES,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
             )
 
 
 def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
     return scenario_bundle_platform.load_countries_stage_checkpoints(
+        checkpoint_dir,
+        load_json=load_json,
+        geopandas_from_features=geopandas_from_features,
+    )
+
+
+def write_water_stage_checkpoints(
+    state: dict[str, object],
+    checkpoint_dir: Path,
+    scenario_dir: Path = SCENARIO_DIR,
+) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_WATER_STATE):
+            scenario_bundle_platform.write_water_stage_checkpoints(
+                state,
+                checkpoint_dir,
+                write_json=write_json,
+                gdf_to_feature_collection=gdf_to_feature_collection,
+            )
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_WATER_STATE,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_WATER_STAGE_ARTIFACTS),
+                ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_WATER_STATE,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
+            )
+
+
+def load_water_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
+    return scenario_bundle_platform.load_water_stage_checkpoints(
         checkpoint_dir,
         load_json=load_json,
         geopandas_from_features=geopandas_from_features,
@@ -9435,10 +10620,39 @@ def write_runtime_topology_stage_checkpoints(
                 stage=STAGE_RUNTIME_TOPOLOGY,
                 filenames=[
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS),
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_WATER_STAGE_ARTIFACTS),
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS),
                 ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_RUNTIME_TOPOLOGY,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
             )
+
+
+def ensure_water_stage_checkpoints(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> None:
+    required = [artifact.filename for artifact in scenario_bundle_platform.SCENARIO_WATER_STAGE_ARTIFACTS]
+    if scenario_bundle_platform.all_checkpoint_files_exist(checkpoint_dir, required):
+        return
+    countries_required = [artifact.filename for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS]
+    if not scenario_bundle_platform.all_checkpoint_files_exist(checkpoint_dir, countries_required):
+        countries_state = build_countries_stage_state(
+            scenario_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        write_countries_stage_checkpoints(countries_state, checkpoint_dir, scenario_dir=scenario_dir)
+    water_state = build_water_stage_state(
+        scenario_dir,
+        checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+    write_water_stage_checkpoints(water_state, checkpoint_dir, scenario_dir=scenario_dir)
 
 
 def ensure_runtime_topology_checkpoints(
@@ -9453,8 +10667,20 @@ def ensure_runtime_topology_checkpoints(
                 checkpoint_dir,
                 refresh_named_water_snapshot=refresh_named_water_snapshot,
                 build_countries_stage_state=build_countries_stage_state,
-                build_runtime_topology_state_from_countries_state=build_runtime_topology_state_from_countries_state,
+                build_water_stage_state=build_water_stage_state,
+                build_runtime_topology_state=build_runtime_topology_state,
                 load_countries_stage_checkpoints=load_countries_stage_checkpoints,
+                load_water_stage_checkpoints=load_water_stage_checkpoints,
+                write_countries_stage_checkpoints=lambda state, path: write_countries_stage_checkpoints(
+                    state,
+                    path,
+                    scenario_dir=scenario_dir,
+                ),
+                write_water_stage_checkpoints=lambda state, path: write_water_stage_checkpoints(
+                    state,
+                    path,
+                    scenario_dir=scenario_dir,
+                ),
                 write_runtime_topology_stage_checkpoints=lambda state, path: write_runtime_topology_stage_checkpoints(
                     state,
                     path,
@@ -9465,7 +10691,10 @@ def ensure_runtime_topology_checkpoints(
 
 def build_runtime_topology_stage(checkpoint_dir: Path) -> dict[str, object]:
     with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_RUNTIME_TOPOLOGY):
-        return build_runtime_topology_state_from_countries_state(load_countries_stage_checkpoints(checkpoint_dir))
+        return build_runtime_topology_state(
+            load_countries_stage_checkpoints(checkpoint_dir),
+            load_water_stage_checkpoints(checkpoint_dir),
+        )
 
 
 def build_geo_locale_stage(
@@ -9497,16 +10726,21 @@ def build_geo_locale_stage(
                 filenames=[
                     *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS),
                 ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_GEO_LOCALE,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
             )
 
 
-def build_startup_assets_stage(
+def build_startup_support_assets_stage(
     scenario_dir: Path,
     checkpoint_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> None:
     with _scenario_build_session_lock(scenario_dir):
-        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_STARTUP_ASSETS):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_STARTUP_SUPPORT_ASSETS):
             ensure_runtime_topology_checkpoints(
                 scenario_dir,
                 checkpoint_dir,
@@ -9522,13 +10756,53 @@ def build_startup_assets_stage(
                 runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
                 startup_locales_output_path=checkpoint_dir / CHECKPOINT_STARTUP_LOCALES_FILENAME,
                 startup_geo_aliases_output_path=checkpoint_dir / CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+                startup_support_whitelist_path=scenario_dir / "derived" / "startup_support_whitelist.json",
             )
+            _record_checkpoint_stage_outputs(
+                checkpoint_dir,
+                scenario_dir=scenario_dir,
+                stage=STAGE_STARTUP_SUPPORT_ASSETS,
+                filenames=[
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS),
+                ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_STARTUP_SUPPORT_ASSETS,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
+            )
+
+
+def build_startup_bundle_assets_stage(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> None:
+    with _scenario_build_session_lock(scenario_dir):
+        with _checkpoint_build_lock(checkpoint_dir, stage=STAGE_STARTUP_BUNDLE_ASSETS):
+            ensure_runtime_topology_checkpoints(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=refresh_named_water_snapshot,
+            )
+            required_support_files = (
+                checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+                checkpoint_dir / CHECKPOINT_STARTUP_LOCALES_FILENAME,
+                checkpoint_dir / CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+            )
+            if not all(path.exists() for path in required_support_files):
+                build_startup_support_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=refresh_named_water_snapshot,
+                )
             build_startup_bundles(
                 scenario_manifest_path=checkpoint_dir / "manifest.json",
                 data_manifest_path=ROOT / "data/manifest.json",
                 topology_primary_path=ROOT / "data/europe_topology.json",
                 startup_locales_path=checkpoint_dir / CHECKPOINT_STARTUP_LOCALES_FILENAME,
                 geo_aliases_path=checkpoint_dir / CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+                full_runtime_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
                 runtime_bootstrap_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
                 countries_path=checkpoint_dir / "countries.json",
                 owners_path=checkpoint_dir / "owners.by_feature.json",
@@ -9543,11 +10817,33 @@ def build_startup_assets_stage(
             _record_checkpoint_stage_outputs(
                 checkpoint_dir,
                 scenario_dir=scenario_dir,
-                stage=STAGE_STARTUP_ASSETS,
+                stage=STAGE_STARTUP_BUNDLE_ASSETS,
                 filenames=[
-                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_STARTUP_STAGE_ARTIFACTS),
+                    *(artifact.filename for artifact in scenario_bundle_platform.SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS),
                 ],
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_STARTUP_BUNDLE_ASSETS,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
             )
+
+
+def build_startup_assets_stage(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    refresh_named_water_snapshot: bool = False,
+) -> None:
+    build_startup_support_assets_stage(
+        scenario_dir,
+        checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
+    build_startup_bundle_assets_stage(
+        scenario_dir,
+        checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+    )
 
 
 def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkpoint_payload: dict) -> dict[str, object]:
@@ -9652,6 +10948,11 @@ def build_chunk_assets_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
                     scenario_dir / "chunks",
                 ],
                 root=ROOT,
+                stage_signature=_build_stage_signature_entry(
+                    STAGE_CHUNK_ASSETS,
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                ),
             )
 
 
@@ -9687,6 +10988,187 @@ def print_bundle_summary(state: dict[str, object]) -> None:
     )
 
 
+def _stage_required_paths(stage: str, *, scenario_dir: Path, checkpoint_dir: Path) -> list[Path]:
+    mapping = {
+        STAGE_COUNTRIES: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS
+        ],
+        STAGE_WATER_STATE: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_WATER_STAGE_ARTIFACTS
+        ],
+        STAGE_RUNTIME_TOPOLOGY: [
+            checkpoint_dir / artifact.filename
+            for artifact in (
+                *scenario_bundle_platform.SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
+                *scenario_bundle_platform.SCENARIO_WATER_STAGE_ARTIFACTS,
+                *scenario_bundle_platform.SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
+            )
+        ],
+        STAGE_GEO_LOCALE: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_GEO_LOCALE_STAGE_ARTIFACTS
+        ],
+        STAGE_STARTUP_SUPPORT_ASSETS: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS
+        ],
+        STAGE_STARTUP_BUNDLE_ASSETS: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS
+        ],
+        STAGE_STARTUP_ASSETS: [
+            checkpoint_dir / artifact.filename
+            for artifact in scenario_bundle_platform.SCENARIO_STARTUP_STAGE_ARTIFACTS
+        ],
+        STAGE_CHUNK_ASSETS: [
+            scenario_dir / "detail_chunks.manifest.json",
+            scenario_dir / "chunks",
+        ],
+    }
+    return mapping.get(stage, [])
+
+
+def _stage_outputs_are_ready(stage: str, *, scenario_dir: Path, checkpoint_dir: Path) -> bool:
+    required_paths = _stage_required_paths(stage, scenario_dir=scenario_dir, checkpoint_dir=checkpoint_dir)
+    return bool(required_paths) and all(path.exists() for path in required_paths)
+
+
+def _run_single_stage(
+    stage: str,
+    *,
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    publish_scope: str,
+    manual_sync_policy: str,
+    refresh_named_water_snapshot: bool,
+) -> dict[str, object] | None:
+    if stage == STAGE_COUNTRIES:
+        state = build_countries_stage_state(
+            scenario_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        write_countries_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
+        return state
+    if stage == STAGE_WATER_STATE:
+        ensure_water_stage_checkpoints(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return None
+    if stage == STAGE_RUNTIME_TOPOLOGY:
+        ensure_runtime_topology_checkpoints(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return build_runtime_topology_stage(checkpoint_dir)
+    if stage == STAGE_GEO_LOCALE:
+        build_geo_locale_stage(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return None
+    if stage == STAGE_STARTUP_SUPPORT_ASSETS:
+        build_startup_support_assets_stage(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return None
+    if stage == STAGE_STARTUP_BUNDLE_ASSETS:
+        build_startup_bundle_assets_stage(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return None
+    if stage == STAGE_STARTUP_ASSETS:
+        build_startup_assets_stage(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        return None
+    if stage == STAGE_WRITE_BUNDLE:
+        write_bundle_stage(
+            scenario_dir,
+            checkpoint_dir,
+            publish_scope,
+            manual_sync_policy=manual_sync_policy,
+        )
+        return None
+    if stage == STAGE_CHUNK_ASSETS:
+        build_chunk_assets_stage(
+            scenario_dir,
+            checkpoint_dir,
+        )
+        return None
+    raise ValueError(f"Unsupported stage: {stage}")
+
+
+def _run_changed_domain_plan(
+    *,
+    changed_domain: str,
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    publish_scope: str,
+    manual_sync_policy: str,
+    refresh_named_water_snapshot: bool,
+) -> dict[str, object]:
+    plan = resolve_tno_rebuild_plan(changed_domain)
+    executed: list[str] = []
+    skipped: list[str] = []
+    latest_runtime_state: dict[str, object] | None = None
+    for stage in plan.stage_sequence:
+        if stage != STAGE_WRITE_BUNDLE:
+            current_signature = _stage_signature_is_current(
+                stage,
+                scenario_dir=scenario_dir,
+                checkpoint_dir=checkpoint_dir,
+                refresh_named_water_snapshot=refresh_named_water_snapshot,
+            )
+            if current_signature and _stage_outputs_are_ready(
+                stage,
+                scenario_dir=scenario_dir,
+                checkpoint_dir=checkpoint_dir,
+            ):
+                skipped.append(stage)
+                continue
+        result = _run_single_stage(
+            stage,
+            scenario_dir=scenario_dir,
+            checkpoint_dir=checkpoint_dir,
+            publish_scope=plan.publish_scope or publish_scope,
+            manual_sync_policy=manual_sync_policy,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        if isinstance(result, dict) and stage == STAGE_RUNTIME_TOPOLOGY:
+            latest_runtime_state = result
+        executed.append(stage)
+
+    published_targets: list[str] = []
+    for target in plan.publish_targets:
+        scenario_publish_service.publish_scenario_outputs(
+            SCENARIO_ID,
+            target=target,
+            root=ROOT,
+            checkpoint_dir=checkpoint_dir,
+        )
+        published_targets.append(target)
+
+    return {
+        "changed_domain": changed_domain,
+        "executed_stages": executed,
+        "skipped_stages": skipped,
+        "published_targets": published_targets,
+        "runtime_state": latest_runtime_state,
+    }
+
+
 def main() -> None:
     global _CLI_TNO_ROOT_OVERRIDE
     global _CLI_HGO_ROOT_OVERRIDE
@@ -9701,6 +11183,31 @@ def main() -> None:
     _CLI_HGO_ROOT_OVERRIDE = Path(args.hgo_root).expanduser().resolve() if args.hgo_root else None
 
     with _scenario_build_session_lock(scenario_dir):
+        if str(args.changed_domain or "").strip():
+            plan_result = _run_changed_domain_plan(
+                changed_domain=str(args.changed_domain).strip().lower(),
+                scenario_dir=scenario_dir,
+                checkpoint_dir=checkpoint_dir,
+                publish_scope=args.publish_scope,
+                manual_sync_policy=args.manual_sync_policy,
+                refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+            )
+            runtime_state = plan_result.get("runtime_state")
+            if isinstance(runtime_state, dict):
+                print_bundle_summary(runtime_state)
+            print(
+                json.dumps(
+                    {
+                        "changed_domain": plan_result["changed_domain"],
+                        "executed_stages": plan_result["executed_stages"],
+                        "skipped_stages": plan_result["skipped_stages"],
+                        "published_targets": plan_result["published_targets"],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+            return
         with _checkpoint_build_lock(checkpoint_dir, stage=args.stage):
             if args.stage == STAGE_COUNTRIES:
                 state = build_countries_stage_state(
@@ -9711,7 +11218,21 @@ def main() -> None:
                 print(f"Wrote countries-stage checkpoints to {checkpoint_dir}")
                 return
 
+            if args.stage == STAGE_WATER_STATE:
+                ensure_water_stage_checkpoints(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                print(f"Updated water-state checkpoints in {checkpoint_dir}")
+                return
+
             if args.stage == STAGE_RUNTIME_TOPOLOGY:
+                ensure_water_stage_checkpoints(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
                 state = build_runtime_topology_stage(checkpoint_dir)
                 write_runtime_topology_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
                 print_bundle_summary(state)
@@ -9724,6 +11245,24 @@ def main() -> None:
                     refresh_named_water_snapshot=args.refresh_named_water_snapshot,
                 )
                 print(f"Updated geo locale checkpoint: {checkpoint_path(checkpoint_dir, 'geo_locale_patch.json')}")
+                return
+
+            if args.stage == STAGE_STARTUP_SUPPORT_ASSETS:
+                build_startup_support_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                print(f"Updated startup-support-assets checkpoints in {checkpoint_dir}")
+                return
+
+            if args.stage == STAGE_STARTUP_BUNDLE_ASSETS:
+                build_startup_bundle_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+                )
+                print(f"Updated startup-bundle-assets checkpoints in {checkpoint_dir}")
                 return
 
             if args.stage == STAGE_STARTUP_ASSETS:
@@ -9758,6 +11297,11 @@ def main() -> None:
                 refresh_named_water_snapshot=args.refresh_named_water_snapshot,
             )
             write_countries_stage_checkpoints(countries_state, checkpoint_dir, scenario_dir=scenario_dir)
+            ensure_water_stage_checkpoints(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=args.refresh_named_water_snapshot,
+            )
             state = build_runtime_topology_stage(checkpoint_dir)
             write_runtime_topology_stage_checkpoints(state, checkpoint_dir, scenario_dir=scenario_dir)
             build_geo_locale_stage(

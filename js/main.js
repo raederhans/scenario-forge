@@ -31,13 +31,17 @@ import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/r
 import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";
 import { syncScenarioLocalizationState } from "./core/scenario_localization_state.js";
-import { initTranslations } from "./ui/i18n.js";
+import { consumeStartupSupportKeyUsageAuditReport, initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
 import { normalizeCountryCodeAlias } from "./core/country_code_aliases.js";
 import { loadStartupBundleViaWorker } from "./core/startup_worker_client.js";
 
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
+const STARTUP_SUPPORT_AUDIT_PARAM = "startup_support_audit";
+const STARTUP_SUPPORT_AUDIT_LABEL_PARAM = "startup_support_audit_label";
+const STARTUP_SUPPORT_AUDIT_DEFER_PARAM = "startup_support_audit_defer";
+const STARTUP_SUPPORT_AUDIT_REPORT_URL = "/__dev/startup-support/key-usage-report";
 const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
 
 function requestMainRender(reason = "", { flush = false } = {}) {
@@ -54,6 +58,57 @@ function normalizeBatchFillScopes(rawScopes) {
     .map((scope) => String(scope || "").trim().toLowerCase())
     .filter((scope) => VALID_BATCH_FILL_SCOPES.has(scope));
   return normalized.length ? Array.from(new Set(normalized)) : ["parent", "country"];
+}
+
+function isStartupSupportAuditEnabled() {
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    const raw = String(params.get(STARTUP_SUPPORT_AUDIT_PARAM) || "").trim().toLowerCase();
+    return ["1", "true", "yes", "on"].includes(raw);
+  } catch (_error) {
+    return false;
+  }
+}
+
+function shouldDeferStartupSupportAuditPost() {
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    const raw = String(params.get(STARTUP_SUPPORT_AUDIT_DEFER_PARAM) || "").trim().toLowerCase();
+    return ["1", "true", "yes", "on"].includes(raw);
+  } catch (_error) {
+    return false;
+  }
+}
+
+async function postStartupSupportKeyUsageReport({ scenarioId = "", source = "" } = {}) {
+  if (!isStartupSupportAuditEnabled()) {
+    return;
+  }
+  if (shouldDeferStartupSupportAuditPost()) {
+    return;
+  }
+  const usage = consumeStartupSupportKeyUsageAuditReport();
+  if (!usage) {
+    return;
+  }
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    const sampleLabel = String(params.get(STARTUP_SUPPORT_AUDIT_LABEL_PARAM) || "").trim();
+    await fetch(STARTUP_SUPPORT_AUDIT_REPORT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scenarioId: String(scenarioId || "").trim(),
+        source: String(source || "").trim(),
+        sampleLabel,
+        usage,
+      }),
+    });
+  } catch (error) {
+    console.warn("[startup-support-audit] Unable to persist startup support key-usage report.", error);
+  }
 }
 
 function processHierarchyData(data) {
@@ -452,8 +507,8 @@ function createStartupBootArtifactsOverride({
   });
   return {
     topologyPrimary: payload?.base?.topology_primary || null,
-    locales: payload?.base?.locales || { ui: {}, geo: {} },
-    geoAliases: payload?.base?.geo_aliases || { alias_to_stable_key: {} },
+    locales: payload?.base?.locales || null,
+    geoAliases: payload?.base?.geo_aliases || null,
     hasScenarioRuntimeBootstrap,
     localeLevel: "startup",
     startupBootCacheState: {
@@ -1457,10 +1512,10 @@ function schedulePostReadyDeferredContextWarmup() {
   if (state.showRivers) {
     requestedLayerNames.push("rivers");
   }
-  if (state.showAirports) {
+  if (state.showTransport && state.showAirports) {
     requestedLayerNames.push("airports");
   }
-  if (state.showPorts) {
+  if (state.showTransport && state.showPorts) {
     requestedLayerNames.push("ports");
   }
   if (state.showUrban) {
@@ -2023,13 +2078,14 @@ async function bootstrap() {
           language: startupBundleLanguage,
           metrics: startupBundleResult.metrics,
         });
-        const startupScenarioBundle = createStartupScenarioBundleFromPayload({
+        const startupScenarioBundle = await createStartupScenarioBundleFromPayload({
           scenarioId: defaultScenarioId,
           language: startupBundleLanguage,
           payload: startupBundleResult.payload,
           runtimeDecodedCollections: startupBundleResult.runtimeDecodedCollections,
           runtimePoliticalMeta: startupBundleResult.runtimePoliticalMeta,
           loadDiagnostics,
+          d3Client,
         });
         const runtimeShellContract = validateScenarioRuntimeShellContract({
           runtimeTopologyPayload: startupScenarioBundle.runtimeTopologyPayload,
@@ -2409,6 +2465,10 @@ async function bootstrap() {
     checkpointBootMetricOnce("first-visible");
     checkpointBootMetricOnce("first-visible-scenario");
     await finalizeReadyState(renderDispatcher);
+    void postStartupSupportKeyUsageReport({
+      scenarioId: String(state.activeScenarioId || defaultScenarioBundle?.manifest?.scenario_id || "").trim(),
+      source: scenarioBundleSource,
+    });
   } catch (error) {
     state.scenarioApplyInFlight = false;
     if (typeof state.updateScenarioUIFn === "function") {

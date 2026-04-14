@@ -258,14 +258,32 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
   const featureIds = Array.isArray(meta.featureIds)
     ? meta.featureIds.map((featureId) => String(featureId || "").trim()).filter(Boolean)
     : [];
+  const featureIndexById = {};
+  featureIds.forEach((featureId, index) => {
+    featureIndexById[featureId] = index;
+  });
+  const canonicalCountryByFeatureId = {};
+  if (Array.isArray(meta.canonicalCountryByIndex)) {
+    featureIds.forEach((featureId, index) => {
+      canonicalCountryByFeatureId[featureId] = normalizeCountryCodeAlias(meta.canonicalCountryByIndex[index]);
+    });
+  } else if (meta.canonicalCountryByFeatureId && typeof meta.canonicalCountryByFeatureId === "object") {
+    Object.entries(meta.canonicalCountryByFeatureId).forEach(([featureId, countryCode]) => {
+      const normalizedFeatureId = String(featureId || "").trim();
+      if (!normalizedFeatureId) return;
+      canonicalCountryByFeatureId[normalizedFeatureId] = normalizeCountryCodeAlias(countryCode);
+      if (!(normalizedFeatureId in featureIndexById)) {
+        featureIndexById[normalizedFeatureId] = featureIds.length;
+        featureIds.push(normalizedFeatureId);
+      }
+    });
+  }
   return {
     featureIds,
     featureIndexById: meta.featureIndexById && typeof meta.featureIndexById === "object"
-      ? { ...meta.featureIndexById }
-      : {},
-    canonicalCountryByFeatureId: meta.canonicalCountryByFeatureId && typeof meta.canonicalCountryByFeatureId === "object"
-      ? { ...meta.canonicalCountryByFeatureId }
-      : {},
+      ? { ...featureIndexById, ...meta.featureIndexById }
+      : featureIndexById,
+    canonicalCountryByFeatureId,
     neighborGraph: Array.isArray(meta.neighborGraph) ? [...meta.neighborGraph] : [],
   };
 }

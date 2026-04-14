@@ -20,8 +20,9 @@ test("startup partial cache hit keeps cached topology and skips topology refetch
     const { loadStartupBootArtifacts } = await import("/js/core/data_loader.js");
 
     const topologyUrl = "data/europe_topology.json";
-    const localesUrl = "data/locales.startup.json";
-    const geoAliasesUrl = "data/geo_aliases.startup.json";
+    const scenarioId = "tno_1962";
+    const localesUrl = `data/scenarios/${scenarioId}/locales.startup.json`;
+    const geoAliasesUrl = `data/scenarios/${scenarioId}/geo_aliases.startup.json`;
 
     await clearStartupCache({ force: true });
     await loadStartupBootArtifacts({

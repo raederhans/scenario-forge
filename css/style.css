@@ -7070,6 +7070,36 @@ button.scenario-action-card:hover {
   gap: 12px;
 }
 
+.inspector-meta-list {
+  display: grid;
+  grid-template-columns: minmax(0, 112px) minmax(0, 1fr);
+  gap: 8px 12px;
+}
+
+.inspector-meta-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.inspector-meta-value {
+  min-width: 0;
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.inspector-family-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .inspector-action-list {
   display: flex;
   flex-direction: column;

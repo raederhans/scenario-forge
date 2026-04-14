@@ -62,6 +62,11 @@ def compute_scenario_snapshot_hash(input_hashes: dict[str, str]) -> str:
     return hashlib.sha256(encoded).hexdigest()[:16]
 
 
+def stable_stage_signature(payload: dict[str, object]) -> str:
+    encoded = json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def scenario_build_root(root: Path, scenario_id: str) -> Path:
     return Path(root).resolve() / SCENARIO_BUILD_ROOT_RELATIVE / str(scenario_id or "").strip()
 
@@ -97,6 +102,7 @@ def resolve_scenario_build_session(
             "input_hashes": input_hashes,
             "generated_at": str(state_payload.get("generated_at") or _now_iso()),
             "stage_outputs": dict(state_payload.get("stage_outputs") or {}),
+            "stage_signatures": dict(state_payload.get("stage_signatures") or {}),
             "published_targets": list(state_payload.get("published_targets") or []),
         }
     )
@@ -142,6 +148,7 @@ def update_scenario_build_state(
     *,
     stage_name: str | None = None,
     stage_outputs: list[str] | tuple[str, ...] | None = None,
+    stage_signature: dict[str, object] | None = None,
     published_target: str | None = None,
     published_files: list[str] | tuple[str, ...] | None = None,
 ) -> dict[str, object]:
@@ -154,6 +161,10 @@ def update_scenario_build_state(
     if stage_name:
         current_stage_outputs[str(stage_name)] = list(stage_outputs or [])
     state_payload["stage_outputs"] = current_stage_outputs
+    current_stage_signatures = dict(state_payload.get("stage_signatures") or {})
+    if stage_name and isinstance(stage_signature, dict):
+        current_stage_signatures[str(stage_name)] = dict(stage_signature)
+    state_payload["stage_signatures"] = current_stage_signatures
     current_published_targets = list(state_payload.get("published_targets") or [])
     if published_target:
         entry = {
@@ -178,6 +189,7 @@ def record_stage_outputs(
     stage: str,
     output_paths: list[Path] | tuple[Path, ...],
     root: Path,
+    stage_signature: dict[str, object] | None = None,
 ) -> dict[str, object]:
     resolved_root = Path(root).resolve()
     relative_paths: list[str] = []
@@ -191,7 +203,22 @@ def record_stage_outputs(
         build_dir,
         stage_name=stage,
         stage_outputs=relative_paths,
+        stage_signature=stage_signature,
     )
+
+
+def load_stage_signature(build_dir: Path, stage: str) -> dict[str, object] | None:
+    state_payload = load_scenario_build_state(build_dir)
+    signatures = state_payload.get("stage_signatures")
+    if not isinstance(signatures, dict):
+        return None
+    entry = signatures.get(str(stage))
+    return dict(entry) if isinstance(entry, dict) else None
+
+
+def stage_signature_matches(build_dir: Path, stage: str, signature: str) -> bool:
+    entry = load_stage_signature(build_dir, stage)
+    return isinstance(entry, dict) and str(entry.get("signature") or "") == str(signature or "").strip()
 
 
 def record_published_target(

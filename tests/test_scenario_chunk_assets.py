@@ -138,6 +138,186 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 owner_mesh,
             )
 
+    def test_political_coarse_falls_back_to_runtime_topology_when_startup_shell_has_no_political(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "tno_1962"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+
+            runtime_political_gdf = gpd.GeoDataFrame(
+                [
+                    {
+                        "id": "AAA-1",
+                        "name": "Alpha",
+                        "cntr_code": "AAA",
+                        "admin1_group": "Alpha Group",
+                        "detail_tier": "scenario_atlantropa",
+                        "__source": "detail",
+                        "interactive": True,
+                        "render_as_base_geography": False,
+                        "scenario_helper_kind": "shell_fallback",
+                        "atl_geometry_role": "shore_seal",
+                        "atl_join_mode": "gap_fill",
+                        "geometry": _square(0, 0),
+                    }
+                ],
+                geometry="geometry",
+                crs="EPSG:4326",
+            )
+            runtime_topology_payload = Topology(
+                [runtime_political_gdf],
+                object_name=["political"],
+                topology=True,
+                prequantize=False,
+                topoquantize=False,
+                presimplify=False,
+                toposimplify=False,
+                shared_coords=False,
+            ).to_dict()
+            startup_shell_payload = {
+                "type": "Topology",
+                "objects": {
+                    "land_mask": {"type": "GeometryCollection", "geometries": []},
+                    "context_land_mask": {"type": "GeometryCollection", "geometries": []},
+                    "scenario_water": {"type": "GeometryCollection", "geometries": []},
+                },
+                "arcs": [],
+            }
+
+            result = scenario_chunk_assets.build_and_write_scenario_chunk_assets(
+                scenario_dir=scenario_dir,
+                manifest_payload={"scenario_id": "tno_1962", "generated_at": "2026-04-13T00:00:00Z"},
+                layer_payloads={},
+                startup_topology_payload=startup_shell_payload,
+                runtime_topology_payload=runtime_topology_payload,
+                startup_topology_url="data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
+                runtime_topology_url="data/scenarios/tno_1962/runtime_topology.topo.json",
+                generated_at="2026-04-13T00:00:00Z",
+            )
+
+            coarse_chunk = next(chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["id"] == "political.coarse.r0c0")
+            self.assertEqual(coarse_chunk["feature_count"], 1)
+            coarse_payload = json.loads((scenario_dir / "chunks" / "political.coarse.r0c0.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(coarse_payload["features"]), 1)
+            self.assertNotIn("id", coarse_payload["features"][0])
+            self.assertEqual(
+                sorted(coarse_payload["features"][0]["properties"].keys()),
+                [
+                    "__source",
+                    "admin1_group",
+                    "atl_geometry_role",
+                    "atl_join_mode",
+                    "cntr_code",
+                    "detail_tier",
+                    "id",
+                    "interactive",
+                    "name",
+                    "render_as_base_geography",
+                    "scenario_helper_kind",
+                ],
+            )
+
+    def test_water_coarse_is_minified_without_trimming_runtime_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "tno_1962"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+
+            water_gdf = gpd.GeoDataFrame(
+                [
+                    {
+                        "id": "tno_parent_sea",
+                        "label": "Parent Sea",
+                        "name": "Parent Sea",
+                        "interactive": True,
+                        "water_type": "sea",
+                        "region_group": "marine_macro",
+                        "parent_id": "",
+                        "neighbors": "tno_child_gulf",
+                        "is_chokepoint": False,
+                        "scenario_id": "tno_1962",
+                        "source_standard": "marine_regions_seavox_v19",
+                        "source_province_ids": "100,101",
+                        "topology_mode": "true_water",
+                        "render_as_base_geography": False,
+                        "geometry": _square(0, 0, 3),
+                    },
+                    {
+                        "id": "tno_child_gulf",
+                        "label": "Child Gulf",
+                        "name": "Child Gulf",
+                        "interactive": True,
+                        "water_type": "gulf",
+                        "region_group": "marine_detail",
+                        "parent_id": "tno_parent_sea",
+                        "neighbors": "tno_parent_sea",
+                        "is_chokepoint": True,
+                        "scenario_id": "tno_1962",
+                        "source_standard": "marine_regions_seavox_v19",
+                        "source_province_ids": "102",
+                        "topology_mode": "true_water",
+                        "render_as_base_geography": False,
+                        "geometry": _square(0.5, 0.5, 1),
+                    },
+                ],
+                geometry="geometry",
+                crs="EPSG:4326",
+            )
+
+            runtime_topology_payload = Topology(
+                [water_gdf],
+                object_name=["scenario_water"],
+                topology=True,
+                prequantize=False,
+                topoquantize=False,
+                presimplify=False,
+                toposimplify=False,
+                shared_coords=False,
+            ).to_dict()
+
+            water_payload = {
+                "type": "FeatureCollection",
+                "features": json.loads(water_gdf.to_json())["features"],
+            }
+
+            result = scenario_chunk_assets.build_and_write_scenario_chunk_assets(
+                scenario_dir=scenario_dir,
+                manifest_payload={"scenario_id": "tno_1962", "generated_at": "2026-04-13T00:00:00Z"},
+                layer_payloads={"water": water_payload},
+                startup_topology_payload=None,
+                runtime_topology_payload=runtime_topology_payload,
+                startup_topology_url="data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
+                runtime_topology_url="data/scenarios/tno_1962/runtime_topology.topo.json",
+                generated_at="2026-04-13T00:00:00Z",
+            )
+
+            coarse_chunk = next(chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["id"] == "water.coarse.r0c0")
+            self.assertEqual(coarse_chunk["feature_count"], 2)
+
+            coarse_path = scenario_dir / "chunks" / "water.coarse.r0c0.json"
+            coarse_text = coarse_path.read_text(encoding="utf-8")
+            coarse_payload = json.loads(coarse_text)
+            self.assertEqual(len(coarse_payload["features"]), 2)
+            self.assertEqual(
+                sorted(coarse_payload["features"][0]["properties"].keys()),
+                [
+                    "id",
+                    "interactive",
+                    "is_chokepoint",
+                    "label",
+                    "name",
+                    "neighbors",
+                    "parent_id",
+                    "region_group",
+                    "render_as_base_geography",
+                    "scenario_id",
+                    "source_province_ids",
+                    "source_standard",
+                    "topology_mode",
+                    "water_type",
+                ],
+            )
+            expected_text = json.dumps(coarse_payload, ensure_ascii=False, separators=(",", ":")) + "\n"
+            self.assertEqual(coarse_text, expected_text)
+
 
 if __name__ == "__main__":
     unittest.main()

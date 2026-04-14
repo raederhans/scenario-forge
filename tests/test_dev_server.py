@@ -222,6 +222,76 @@ class DevServerTest(unittest.TestCase):
         )
         return scenario_dir
 
+    def test_save_startup_support_key_usage_report_writes_runtime_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            response = dev_server.save_startup_support_key_usage_report(
+                scenario_id="tno_1962",
+                usage={
+                    "queryKeys": ["A Coruña", "id::ES111"],
+                    "directLocaleKeys": ["id::ES111"],
+                    "aliasKeys": ["A Coruña"],
+                    "aliasTargetKeys": ["id::ES111"],
+                    "missKeys": [],
+                },
+                source="startup-bundle",
+                sample_label="en-default",
+                root=root,
+            )
+
+            report_path = root / ".runtime" / "reports" / "generated" / "scenarios" / "tno_1962_startup_support_key_usage_startup-bundle_en-default.json"
+            self.assertTrue(report_path.exists())
+            payload = json.loads(report_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["scenario_id"], "tno_1962")
+            self.assertEqual(payload["source"], "startup-bundle")
+            self.assertEqual(payload["sample_label"], "en-default")
+            self.assertEqual(payload["usage"]["aliasTargetKeys"], ["id::ES111"])
+            self.assertEqual(response["reportPath"], ".runtime/reports/generated/scenarios/tno_1962_startup_support_key_usage_startup-bundle_en-default.json")
+            self.assertEqual(response["stats"]["queryKeyCount"], 2)
+
+    def test_save_startup_support_key_usage_report_keeps_language_variants_separate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            common_kwargs = {
+                "scenario_id": "tno_1962",
+                "source": "sampling-harness",
+                "sample_label": "default",
+                "root": root,
+            }
+
+            first = dev_server.save_startup_support_key_usage_report(
+                usage={
+                    "language": "en",
+                    "queryKeys": ["Alpha"],
+                    "directLocaleKeys": [],
+                    "aliasKeys": [],
+                    "aliasTargetKeys": [],
+                    "missKeys": [],
+                },
+                **common_kwargs,
+            )
+            second = dev_server.save_startup_support_key_usage_report(
+                usage={
+                    "language": "zh",
+                    "queryKeys": ["阿尔法"],
+                    "directLocaleKeys": [],
+                    "aliasKeys": [],
+                    "aliasTargetKeys": [],
+                    "missKeys": [],
+                },
+                **common_kwargs,
+            )
+
+            self.assertNotEqual(first["reportPath"], second["reportPath"])
+            first_path = root / first["reportPath"]
+            second_path = root / second["reportPath"]
+            self.assertTrue(first_path.exists())
+            self.assertTrue(second_path.exists())
+            self.assertNotEqual(
+                json.loads(first_path.read_text(encoding="utf-8"))["usage"]["language"],
+                json.loads(second_path.read_text(encoding="utf-8"))["usage"]["language"],
+            )
+
     def test_dev_server_tcp_server_handles_parallel_requests(self) -> None:
         slow_started = threading.Event()
         release_slow = threading.Event()
@@ -907,6 +977,10 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(result["entry"]["en"], "Alpha One")
             materialize_mock.assert_called_once()
             self.assertEqual(publish_mock.call_count, 2)
+            self.assertEqual(
+                [call.kwargs["target"] for call in publish_mock.call_args_list],
+                ["geo-locale", "startup-support-assets"],
+            )
 
     def test_validate_country_code_accepts_two_or_three_uppercase_letters_and_rejects_invalid_values(self) -> None:
         self.assertEqual(dev_server._validate_country_code("de"), "DE")

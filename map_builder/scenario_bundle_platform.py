@@ -11,7 +11,10 @@ from map_builder.contracts import (
     SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS,
     SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA,
     SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
+    SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS,
+    SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS,
     SCENARIO_STARTUP_STAGE_ARTIFACTS,
+    SCENARIO_WATER_STAGE_ARTIFACTS,
     ScenarioCheckpointArtifact,
     resolve_scenario_publish_filenames,
 )
@@ -222,6 +225,36 @@ def load_countries_stage_checkpoints(
     return state
 
 
+def write_water_stage_checkpoints(
+    state: dict[str, object],
+    checkpoint_dir: Path,
+    *,
+    write_json: Callable[[Path, dict], None],
+    gdf_to_feature_collection: Callable[[object], dict],
+) -> None:
+    write_checkpoint_artifacts(
+        state,
+        checkpoint_dir,
+        SCENARIO_WATER_STAGE_ARTIFACTS,
+        write_json=write_json,
+        gdf_to_feature_collection=gdf_to_feature_collection,
+    )
+
+
+def load_water_stage_checkpoints(
+    checkpoint_dir: Path,
+    *,
+    load_json: Callable[[Path], object],
+    geopandas_from_features: Callable[[list[object]], object],
+) -> dict[str, object]:
+    return load_checkpoint_artifacts(
+        checkpoint_dir,
+        SCENARIO_WATER_STAGE_ARTIFACTS,
+        load_json=load_json,
+        geopandas_from_features=geopandas_from_features,
+    )
+
+
 def write_runtime_topology_stage_checkpoints(
     state: dict[str, object],
     checkpoint_dir: Path,
@@ -230,6 +263,12 @@ def write_runtime_topology_stage_checkpoints(
     gdf_to_feature_collection: Callable[[object], dict],
 ) -> None:
     write_countries_stage_checkpoints(
+        state,
+        checkpoint_dir,
+        write_json=write_json,
+        gdf_to_feature_collection=gdf_to_feature_collection,
+    )
+    write_water_stage_checkpoints(
         state,
         checkpoint_dir,
         write_json=write_json,
@@ -252,11 +291,35 @@ def require_geo_locale_stage_checkpoints(checkpoint_dir: Path) -> None:
     )
 
 
+def require_water_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        (artifact.filename for artifact in SCENARIO_WATER_STAGE_ARTIFACTS),
+        label="water-state checkpoint",
+    )
+
+
 def require_startup_stage_checkpoints(checkpoint_dir: Path) -> None:
     require_directory_files(
         checkpoint_dir,
         (artifact.filename for artifact in SCENARIO_STARTUP_STAGE_ARTIFACTS),
         label="startup-assets checkpoint",
+    )
+
+
+def require_startup_support_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        (artifact.filename for artifact in SCENARIO_STARTUP_SUPPORT_STAGE_ARTIFACTS),
+        label="startup-support-assets checkpoint",
+    )
+
+
+def require_startup_bundle_stage_checkpoints(checkpoint_dir: Path) -> None:
+    require_directory_files(
+        checkpoint_dir,
+        (artifact.filename for artifact in SCENARIO_STARTUP_BUNDLE_STAGE_ARTIFACTS),
+        label="startup-bundle-assets checkpoint",
     )
 
 
@@ -282,27 +345,45 @@ def ensure_runtime_topology_checkpoints(
     *,
     refresh_named_water_snapshot: bool,
     build_countries_stage_state: Callable[..., dict[str, object]],
-    build_runtime_topology_state_from_countries_state: Callable[[dict[str, object]], dict[str, object]],
+    build_water_stage_state: Callable[..., dict[str, object]],
+    build_runtime_topology_state: Callable[[dict[str, object], dict[str, object]], dict[str, object]],
     load_countries_stage_checkpoints: Callable[[Path], dict[str, object]],
+    load_water_stage_checkpoints: Callable[[Path], dict[str, object]],
+    write_countries_stage_checkpoints: Callable[[dict[str, object], Path], None],
+    write_water_stage_checkpoints: Callable[[dict[str, object], Path], None],
     write_runtime_topology_stage_checkpoints: Callable[[dict[str, object], Path], None],
 ) -> None:
     countries_stage_required = [artifact.filename for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS]
+    water_stage_required = [artifact.filename for artifact in SCENARIO_WATER_STAGE_ARTIFACTS]
     required = [
         *countries_stage_required,
+        *water_stage_required,
         *(artifact.filename for artifact in SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS),
         *(artifact.filename for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
     ]
     if all_checkpoint_files_exist(checkpoint_dir, required):
         return
+
     if all_checkpoint_files_exist(checkpoint_dir, countries_stage_required):
-        state = build_runtime_topology_state_from_countries_state(load_countries_stage_checkpoints(checkpoint_dir))
+        countries_state = load_countries_stage_checkpoints(checkpoint_dir)
     else:
-        state = build_runtime_topology_state_from_countries_state(
-            build_countries_stage_state(
-                scenario_dir,
-                refresh_named_water_snapshot=refresh_named_water_snapshot,
-            )
+        countries_state = build_countries_stage_state(
+            scenario_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
         )
+        write_countries_stage_checkpoints(countries_state, checkpoint_dir)
+
+    if all_checkpoint_files_exist(checkpoint_dir, water_stage_required):
+        water_state = load_water_stage_checkpoints(checkpoint_dir)
+    else:
+        water_state = build_water_stage_state(
+            scenario_dir,
+            checkpoint_dir,
+            refresh_named_water_snapshot=refresh_named_water_snapshot,
+        )
+        write_water_stage_checkpoints(water_state, checkpoint_dir)
+
+    state = build_runtime_topology_state(countries_state, water_state)
     write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
 
 

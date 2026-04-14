@@ -28,6 +28,11 @@ import {
   writeStartupCacheEntry,
 } from "./startup_cache.js";
 import {
+  normalizeIndexedCoreAssignmentPayload,
+  normalizeIndexedTagAssignmentPayload,
+  normalizeRuntimePoliticalMeta as normalizeStartupBundleRuntimePoliticalMeta,
+} from "./startup_bundle_compaction.js";
+import {
   decodeRuntimeChunkViaWorker,
   loadScenarioRuntimeBootstrapViaWorker,
   shouldUseStartupWorker,
@@ -847,22 +852,7 @@ function hasScenarioRuntimePoliticalPayload(payload) {
 }
 
 function normalizeScenarioRuntimePoliticalMeta(meta) {
-  if (!meta || typeof meta !== "object") {
-    return null;
-  }
-  const featureIds = Array.isArray(meta.featureIds)
-    ? meta.featureIds.map((featureId) => String(featureId || "").trim()).filter(Boolean)
-    : [];
-  return {
-    featureIds,
-    featureIndexById: meta.featureIndexById && typeof meta.featureIndexById === "object"
-      ? { ...meta.featureIndexById }
-      : {},
-    canonicalCountryByFeatureId: meta.canonicalCountryByFeatureId && typeof meta.canonicalCountryByFeatureId === "object"
-      ? { ...meta.canonicalCountryByFeatureId }
-      : {},
-    neighborGraph: Array.isArray(meta.neighborGraph) ? [...meta.neighborGraph] : [],
-  };
+  return normalizeStartupBundleRuntimePoliticalMeta(meta);
 }
 
 function scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client = globalThis.d3 } = {}) {
@@ -2176,6 +2166,10 @@ function createScenarioBootstrapBundleFromCache({
 } = {}) {
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
   const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(cachedCorePayload?.runtimeTopologyPayload);
+  const runtimePoliticalMeta = normalizeScenarioRuntimePoliticalMeta(cachedCorePayload?.runtimePoliticalMeta || null);
+  const runtimeFeatureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
+    ? runtimePoliticalMeta.featureIds
+    : [];
   const bundle = {
     ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
@@ -2192,9 +2186,9 @@ function createScenarioBootstrapBundleFromCache({
     chunkPayloadPromisesById: {},
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: cachedCorePayload?.countriesPayload || null,
-    ownersPayload: cachedCorePayload?.ownersPayload || null,
-    controllersPayload: cachedCorePayload?.controllersPayload || null,
-    coresPayload: cachedCorePayload?.coresPayload || null,
+    ownersPayload: normalizeIndexedTagAssignmentPayload(cachedCorePayload?.ownersPayload, runtimeFeatureIds, "owners"),
+    controllersPayload: normalizeIndexedTagAssignmentPayload(cachedCorePayload?.controllersPayload, runtimeFeatureIds, "controllers"),
+    coresPayload: normalizeIndexedCoreAssignmentPayload(cachedCorePayload?.coresPayload, runtimeFeatureIds),
     waterRegionsPayload: priorBundle?.waterRegionsPayload || null,
     specialRegionsPayload: priorBundle?.specialRegionsPayload || null,
     reliefOverlaysPayload: priorBundle?.reliefOverlaysPayload || null,
@@ -2204,11 +2198,12 @@ function createScenarioBootstrapBundleFromCache({
       ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
     },
     runtimeTopologyPayload,
-    runtimePoliticalMeta: cachedCorePayload?.runtimePoliticalMeta || null,
+    runtimePoliticalMeta,
     runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
     districtGroupsPayload: priorBundle?.districtGroupsPayload || null,
     auditPayload: priorBundle?.auditPayload || null,
+    startupApplySeed: null,
     optionalLayerPromises: {
       ...(priorBundle?.optionalLayerPromises || {}),
     },
@@ -2220,7 +2215,7 @@ function createScenarioBootstrapBundleFromCache({
         runtime_topology: {
           ok: hasScenarioRuntimeShellContract({
             runtimeTopologyPayload,
-            runtimePoliticalMeta: cachedCorePayload?.runtimePoliticalMeta || null,
+            runtimePoliticalMeta,
           }),
           reason: "persistent-cache-hit",
           errorMessage: "",
@@ -2270,13 +2265,14 @@ function createScenarioBootstrapBundleFromCache({
   return bundle;
 }
 
-function createStartupScenarioBundleFromPayload({
+async function createStartupScenarioBundleFromPayload({
   scenarioId = "",
   language = "en",
   payload = null,
   runtimeDecodedCollections = null,
   runtimePoliticalMeta = null,
   loadDiagnostics = null,
+  d3Client = globalThis.d3,
 } = {}) {
   const normalizedScenarioId = normalizeScenarioId(
     scenarioId
@@ -2313,12 +2309,24 @@ function createStartupScenarioBundleFromPayload({
       || ""
     ).trim(),
   };
-  const geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(payload?.scenario?.geo_locale_patch);
   const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(payload?.scenario?.runtime_topology_bootstrap);
   const normalizedRuntimePoliticalMeta = normalizeScenarioRuntimePoliticalMeta(
     runtimePoliticalMeta || payload?.scenario?.runtime_political_meta || null
   );
+  const runtimeFeatureIds = Array.isArray(normalizedRuntimePoliticalMeta?.featureIds)
+    ? normalizedRuntimePoliticalMeta.featureIds
+    : [];
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
+  const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest, language);
+  const geoLocalePatchResult = geoLocalePatchDescriptor.url
+    ? await loadOptionalScenarioResource(d3Client, geoLocalePatchDescriptor.url, {
+      scenarioId: normalizedScenarioId,
+      resourceLabel: geoLocalePatchDescriptor.localeSpecific
+        ? `geo_locale_patch_${geoLocalePatchDescriptor.language}`
+        : "geo_locale_patch",
+    })
+    : { ok: false, value: null, metrics: null, reason: "not-configured", errorMessage: "" };
+  const geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value);
   const bundle = {
     meta: {
       scenario_id: normalizedScenarioId,
@@ -2337,9 +2345,9 @@ function createStartupScenarioBundleFromPayload({
     chunkPayloadPromisesById: {},
     chunkPreloaded: false,
     countriesPayload: payload?.scenario?.countries || null,
-    ownersPayload: payload?.scenario?.owners || null,
-    controllersPayload: payload?.scenario?.controllers || null,
-    coresPayload: payload?.scenario?.cores || null,
+    ownersPayload: normalizeIndexedTagAssignmentPayload(payload?.scenario?.owners, runtimeFeatureIds, "owners"),
+    controllersPayload: normalizeIndexedTagAssignmentPayload(payload?.scenario?.controllers, runtimeFeatureIds, "controllers"),
+    coresPayload: normalizeIndexedCoreAssignmentPayload(payload?.scenario?.cores, runtimeFeatureIds),
     waterRegionsPayload: null,
     specialRegionsPayload: null,
     reliefOverlaysPayload: null,
@@ -2352,9 +2360,7 @@ function createStartupScenarioBundleFromPayload({
     releasableCatalog: null,
     districtGroupsPayload: null,
     auditPayload: null,
-    startupApplySeed: payload?.scenario?.apply_seed && typeof payload.scenario.apply_seed === "object"
-      ? payload.scenario.apply_seed
-      : null,
+    startupApplySeed: null,
     optionalLayerPromises: {},
     optionalLayerSettledByKey: {},
     loadDiagnostics: loadDiagnostics || {
@@ -2370,12 +2376,12 @@ function createStartupScenarioBundleFromPayload({
           url: "",
         },
         geo_locale_patch: {
-          ok: !!geoLocalePatchPayload,
-          reason: "startup-bundle",
-          errorMessage: "",
+          ok: !!geoLocalePatchResult.ok,
+          reason: geoLocalePatchResult.reason,
+          errorMessage: geoLocalePatchResult.errorMessage,
           language,
-          localeSpecific: true,
-          metrics: payload?.metrics?.geoLocalePatch || null,
+          localeSpecific: geoLocalePatchDescriptor.localeSpecific,
+          metrics: geoLocalePatchResult.metrics || null,
         },
       },
       requiredResources: {

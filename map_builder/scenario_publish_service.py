@@ -18,7 +18,7 @@ from map_builder.scenario_geo_locale_materializer import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLISH_TARGETS = {"geo-locale", "startup-assets", "chunk-assets", "all"}
+PUBLISH_TARGETS = {"geo-locale", "startup-support-assets", "startup-bundle-assets", "startup-assets", "chunk-assets", "all"}
 
 
 def _validate_target(target: str) -> str:
@@ -154,30 +154,61 @@ def publish_scenario_outputs_in_locked_context(
                 root=root,
             )
 
-        if normalized_target in {"startup-assets", "all"}:
-            tno_bundle.scenario_bundle_platform.require_startup_stage_checkpoints(resolved_checkpoint_dir)
-            published_startup_paths = _tno_copy_checkpoint_artifacts(
+        if normalized_target in {"startup-support-assets", "startup-assets", "all"}:
+            tno_bundle.scenario_bundle_platform.require_startup_support_stage_checkpoints(resolved_checkpoint_dir)
+            published_support_paths = _tno_copy_checkpoint_artifacts(
                 scenario_dir=scenario_dir,
                 checkpoint_dir=resolved_checkpoint_dir,
                 filenames=[
+                    tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
                     tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
                     tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
-                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
-                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
                 ],
             )
-            results["startupAssets"] = {
+            results["startupSupportAssets"] = {
                 "publishMode": "copied_from_checkpoint",
-                "publishedPaths": [str(path) for path in published_startup_paths],
-                "supportingPaths": [],
+                "publishedPaths": [str(path) for path in published_support_paths],
                 "checkpointDir": str(resolved_checkpoint_dir),
             }
             record_published_target(
                 build_dir=resolved_checkpoint_dir,
-                target="startup-assets",
+                target="startup-support-assets",
+                published_paths=published_support_paths,
+                root=root,
+            )
+
+        if normalized_target in {"startup-bundle-assets", "startup-assets", "all"}:
+            tno_bundle.scenario_bundle_platform.require_startup_bundle_stage_checkpoints(resolved_checkpoint_dir)
+            published_startup_paths = _tno_copy_checkpoint_artifacts(
+                scenario_dir=scenario_dir,
+                checkpoint_dir=resolved_checkpoint_dir,
+                filenames=[
+                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+                    tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+                ],
+            )
+            results["startupBundleAssets"] = {
+                "publishMode": "copied_from_checkpoint",
+                "publishedPaths": [str(path) for path in published_startup_paths],
+                "checkpointDir": str(resolved_checkpoint_dir),
+            }
+            record_published_target(
+                build_dir=resolved_checkpoint_dir,
+                target="startup-bundle-assets",
                 published_paths=published_startup_paths,
                 root=root,
             )
+
+        if normalized_target in {"startup-assets", "all"}:
+            results["startupAssets"] = {
+                "publishMode": "copied_from_checkpoint",
+                "publishedPaths": [
+                    *results.get("startupSupportAssets", {}).get("publishedPaths", []),
+                    *results.get("startupBundleAssets", {}).get("publishedPaths", []),
+                ],
+                "supportingPaths": [],
+                "checkpointDir": str(resolved_checkpoint_dir),
+            }
 
         if normalized_target in {"chunk-assets", "all"}:
             tno_bundle.scenario_bundle_platform.require_chunk_stage_checkpoints(resolved_checkpoint_dir)

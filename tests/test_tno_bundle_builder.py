@@ -35,6 +35,7 @@ from tools.patch_tno_1962_bundle import (
     build_geo_locale_stage,
     build_single_antarctic_feature,
     build_startup_assets_stage,
+    ensure_water_stage_checkpoints,
     detect_unsynced_manual_edits,
     rebuild_feature_maps_from_political_gdf,
     normalize_feature_core_map,
@@ -151,6 +152,7 @@ def _write_publish_bundle_dir(
         path = target_dir / filename
         if path.exists():
             continue
+        path.parent.mkdir(parents=True, exist_ok=True)
         if filename.endswith(".topo.json"):
             payload: object = {
                 "type": "Topology",
@@ -668,6 +670,82 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(result["manifest_payload"]["summary"]["tno_bathymetry_band_count"], 1)
         self.assertEqual(result["manifest_payload"]["summary"]["tno_bathymetry_contour_count"], 1)
 
+    def test_load_or_refresh_named_water_snapshot_backfills_derived_provenance_from_legacy_root_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "scenario"
+            (scenario_dir / "derived").mkdir(parents=True, exist_ok=True)
+            snapshot_payload = {"type": "FeatureCollection", "features": []}
+            provenance_payload = {"generated_at": "legacy-pass"}
+            (scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson").write_text(
+                json.dumps(snapshot_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            (scenario_dir / "water_regions.provenance.json").write_text(
+                json.dumps(provenance_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
+
+            self.assertEqual(loaded_snapshot, snapshot_payload)
+            self.assertEqual(loaded_provenance, provenance_payload)
+            self.assertTrue((scenario_dir / "derived" / "water_regions.provenance.json").exists())
+
+    def test_load_or_refresh_named_water_snapshot_backfills_derived_snapshot_from_legacy_root_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "scenario"
+            (scenario_dir / "derived").mkdir(parents=True, exist_ok=True)
+            snapshot_payload = {"type": "FeatureCollection", "features": [{"id": "legacy-water"}]}
+            provenance_payload = {"generated_at": "derived-pass"}
+            (scenario_dir / "marine_regions_named_waters.snapshot.geojson").write_text(
+                json.dumps(snapshot_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            (scenario_dir / "derived" / "water_regions.provenance.json").write_text(
+                json.dumps(provenance_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
+
+            self.assertEqual(loaded_snapshot, snapshot_payload)
+            self.assertEqual(loaded_provenance, provenance_payload)
+            self.assertTrue((scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson").exists())
+
+    def test_startup_bundle_assets_stage_rebuilds_support_assets_when_locales_or_aliases_are_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            (checkpoint_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME).write_text(
+                json.dumps({"type": "Topology", "objects": {}}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            with (
+                patch.object(tno_bundle, "ensure_runtime_topology_checkpoints") as ensure_runtime_mock,
+                patch.object(tno_bundle, "build_startup_support_assets_stage") as support_stage_mock,
+                patch.object(tno_bundle, "build_startup_bundles") as build_startup_bundles_mock,
+                patch.object(tno_bundle, "_record_checkpoint_stage_outputs") as record_outputs_mock,
+            ):
+                tno_bundle.build_startup_bundle_assets_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    refresh_named_water_snapshot=False,
+                )
+
+            ensure_runtime_mock.assert_called_once()
+            support_stage_mock.assert_called_once_with(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=False,
+            )
+            build_startup_bundles_mock.assert_called_once()
+            record_outputs_mock.assert_called_once()
+
     def test_build_single_antarctic_feature_collapses_runtime_sectors(self) -> None:
         runtime_gdf = gpd.GeoDataFrame(
             [
@@ -742,6 +820,8 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(runtime_only, ("runtime_topology.topo.json",))
         self.assertIn("geo_locale_patch.json", scenario_data)
         self.assertIn("bathymetry.topo.json", scenario_data)
+        self.assertIn("derived/marine_regions_named_waters.snapshot.geojson", scenario_data)
+        self.assertIn("derived/water_regions.provenance.json", scenario_data)
         self.assertNotIn("runtime_topology.topo.json", scenario_data)
         self.assertEqual(all_files[-1], "runtime_topology.topo.json")
 
@@ -1102,9 +1182,37 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
         self.assertIn("startup_assets", descriptors)
         self.assertIn("chunk_assets", descriptors)
+        self.assertIn("water_state", descriptors)
         self.assertEqual(descriptors["geo_locale"].outputs, ("geo locale checkpoint variants",))
+        self.assertEqual(descriptors["water_state"].outputs, ("water state checkpoint artifacts",))
         self.assertEqual(descriptors["startup_assets"].outputs, ("startup bootstrap topology", "startup bundles"))
         self.assertEqual(descriptors["chunk_assets"].outputs, ("published scenario chunk assets",))
+
+    def test_ensure_water_stage_checkpoints_builds_water_outputs_from_existing_countries_state(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle.scenario_bundle_platform, "all_checkpoint_files_exist", side_effect=[False, True]),
+                patch.object(tno_bundle, "build_countries_stage_state") as build_countries_mock,
+                patch.object(tno_bundle, "write_countries_stage_checkpoints") as write_countries_mock,
+                patch.object(tno_bundle, "build_water_stage_state") as build_water_mock,
+                patch.object(tno_bundle, "write_water_stage_checkpoints") as write_water_mock,
+            ):
+                ensure_water_stage_checkpoints(scenario_dir, checkpoint_dir)
+
+            build_countries_mock.assert_not_called()
+            write_countries_mock.assert_not_called()
+            build_water_mock.assert_called_once_with(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=False,
+            )
+            write_water_mock.assert_called_once()
 
     def test_build_geo_locale_stage_stops_before_startup_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -1140,34 +1248,20 @@ class TnoBundleBuilderTest(unittest.TestCase):
             checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
             with (
-                patch.object(tno_bundle, "ensure_runtime_topology_checkpoints") as ensure_runtime_mock,
-                patch.object(tno_bundle, "validate_geo_locale_checkpoint") as validate_geo_mock,
-                patch.object(tno_bundle, "build_startup_bootstrap_assets") as build_bootstrap_mock,
-                patch.object(tno_bundle, "build_startup_bundles") as build_bundles_mock,
+                patch.object(tno_bundle, "build_startup_support_assets_stage") as build_support_mock,
+                patch.object(tno_bundle, "build_startup_bundle_assets_stage") as build_bundle_mock,
             ):
                 build_startup_assets_stage(scenario_dir, checkpoint_dir)
 
-            ensure_runtime_mock.assert_called_once()
-            validate_geo_mock.assert_called_once()
-            build_bootstrap_mock.assert_called_once()
-            build_bundles_mock.assert_called_once()
-            bootstrap_kwargs = build_bootstrap_mock.call_args.kwargs
-            self.assertEqual(
-                bootstrap_kwargs["startup_locales_output_path"],
-                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
+            build_support_mock.assert_called_once_with(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=False,
             )
-            self.assertEqual(
-                bootstrap_kwargs["startup_geo_aliases_output_path"],
-                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
-            )
-            bundle_kwargs = build_bundles_mock.call_args.kwargs
-            self.assertEqual(
-                bundle_kwargs["startup_locales_path"],
-                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME,
-            )
-            self.assertEqual(
-                bundle_kwargs["geo_aliases_path"],
-                checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+            build_bundle_mock.assert_called_once_with(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=False,
             )
 
     def test_write_bundle_stage_no_longer_rebuilds_chunk_assets(self) -> None:
@@ -1211,6 +1305,102 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             require_chunk_mock.assert_called_once_with(scenario_dir)
             rebuild_chunk_mock.assert_called_once_with(scenario_dir, checkpoint_dir)
+
+    def test_run_changed_domain_plan_for_geo_locale_uses_planner_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "scenario"
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            executed_stages: list[str] = []
+
+            def fake_run_single_stage(stage: str, **kwargs):
+                executed_stages.append(stage)
+                return None
+
+            with (
+                patch.object(tno_bundle, "_stage_signature_is_current", return_value=False),
+                patch.object(tno_bundle, "_run_single_stage", side_effect=fake_run_single_stage),
+                patch.object(tno_bundle.scenario_publish_service, "publish_scenario_outputs") as publish_mock,
+            ):
+                result = tno_bundle._run_changed_domain_plan(
+                    changed_domain="geo-locale",
+                    scenario_dir=scenario_dir,
+                    checkpoint_dir=checkpoint_dir,
+                    publish_scope="all",
+                    manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                    refresh_named_water_snapshot=False,
+                )
+
+            self.assertEqual(executed_stages, ["geo_locale", "startup_support_assets"])
+            self.assertEqual(
+                [call.kwargs["target"] for call in publish_mock.call_args_list],
+                ["geo-locale", "startup-support-assets"],
+            )
+            self.assertEqual(result["published_targets"], ["geo-locale", "startup-support-assets"])
+
+    def test_stage_signature_is_never_reused_for_forced_water_snapshot_refresh(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "scenario"
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+            with (
+                patch.object(tno_bundle, "load_stage_signature", return_value={"signature": "same"}),
+                patch.object(tno_bundle, "_build_stage_signature_entry", return_value={"signature": "same"}),
+            ):
+                self.assertFalse(
+                    tno_bundle._stage_signature_is_current(
+                        tno_bundle.STAGE_WATER_STATE,
+                        scenario_dir=scenario_dir,
+                        checkpoint_dir=checkpoint_dir,
+                        refresh_named_water_snapshot=True,
+                    )
+                )
+
+    def test_main_runtime_topology_stage_builds_missing_water_stage_first(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "scenario"
+            checkpoint_dir = Path(tmp_dir) / "checkpoint"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            args = type(
+                "Args",
+                (),
+                {
+                    "stage": tno_bundle.STAGE_RUNTIME_TOPOLOGY,
+                    "changed_domain": "",
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "scenario_dir": str(scenario_dir),
+                    "tno_root": None,
+                    "hgo_root": None,
+                    "publish_scope": "all",
+                    "manual_sync_policy": MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                    "refresh_named_water_snapshot": False,
+                },
+            )()
+
+            with (
+                patch.object(tno_bundle, "parse_args", return_value=args),
+                patch.object(tno_bundle, "_scenario_build_session_lock", return_value=nullcontext()),
+                patch.object(tno_bundle, "_checkpoint_build_lock", return_value=nullcontext()),
+                patch.object(tno_bundle, "ensure_water_stage_checkpoints") as ensure_water_mock,
+                patch.object(tno_bundle, "build_runtime_topology_stage", return_value={"owner_baseline_hash": "x", "owners_payload": {"owners": {}}, "runtime_water_regions": {"features": []}, "context_land_mask_arc_refs": 0}) as build_runtime_mock,
+                patch.object(tno_bundle, "write_runtime_topology_stage_checkpoints") as write_runtime_mock,
+                patch.object(tno_bundle, "print_bundle_summary") as print_summary_mock,
+            ):
+                tno_bundle.main()
+
+            ensure_water_mock.assert_called_once_with(
+                scenario_dir,
+                checkpoint_dir,
+                refresh_named_water_snapshot=False,
+            )
+            build_runtime_mock.assert_called_once_with(checkpoint_dir)
+            write_runtime_mock.assert_called_once()
+            print_summary_mock.assert_called_once()
 
     def test_write_bundle_stage_uses_shared_scenario_build_lock(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

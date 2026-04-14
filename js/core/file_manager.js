@@ -303,6 +303,14 @@ class FileManager {
       layerVisibility: {
         showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
         showOpenOceanRegions: !!appState.showOpenOceanRegions,
+        allowOpenOceanSelect:
+          appState.allowOpenOceanSelect === undefined
+            ? !!appState.showOpenOceanRegions
+            : !!appState.allowOpenOceanSelect,
+        allowOpenOceanPaint:
+          appState.allowOpenOceanPaint === undefined
+            ? !!appState.showOpenOceanRegions
+            : !!appState.allowOpenOceanPaint,
         showScenarioSpecialRegions:
           appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
         showScenarioReliefOverlays:
@@ -502,6 +510,14 @@ class FileManager {
           data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
         data.layerVisibility.showOpenOceanRegions =
           data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions;
+        data.layerVisibility.allowOpenOceanSelect =
+          data.layerVisibility.allowOpenOceanSelect === undefined
+            ? !!data.layerVisibility.showOpenOceanRegions
+            : !!data.layerVisibility.allowOpenOceanSelect;
+        data.layerVisibility.allowOpenOceanPaint =
+          data.layerVisibility.allowOpenOceanPaint === undefined
+            ? !!data.layerVisibility.showOpenOceanRegions
+            : !!data.layerVisibility.allowOpenOceanPaint;
         data.layerVisibility.showScenarioSpecialRegions =
           data.layerVisibility.showScenarioSpecialRegions === undefined
             ? true

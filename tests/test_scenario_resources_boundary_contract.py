@@ -72,6 +72,15 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("preferStartupTopologyForFullBundle", content)
         self.assertIn('manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""', content)
 
+    def test_startup_core_bundle_path_uses_compaction_helpers_and_no_longer_reads_apply_seed_from_payload(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertIn("normalizeIndexedTagAssignmentPayload", content)
+        self.assertIn("normalizeIndexedCoreAssignmentPayload", content)
+        self.assertIn("normalizeStartupBundleRuntimePoliticalMeta", content)
+        self.assertIn("startupApplySeed: null,", content)
+        self.assertNotIn('payload?.scenario?.apply_seed', content)
+
 
 if __name__ == "__main__":
     unittest.main()

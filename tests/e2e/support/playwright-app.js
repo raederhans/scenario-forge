@@ -7,7 +7,8 @@ const DEFAULT_TEST_SERVER_PORT = String(
   || "8810"
 ).trim();
 const DEFAULT_APP_ORIGIN = `http://127.0.0.1:${DEFAULT_TEST_SERVER_PORT}`;
-const DEFAULT_OPEN_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
+const DEFAULT_APP_PATH = "/app/";
+const DEFAULT_OPEN_PATH = "/app/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
 
 function normalizeAppOrigin(value) {
   const normalized = String(value || "").trim();
@@ -34,16 +35,35 @@ function shouldReuseExistingServer() {
   if (["0", "false", "no"].includes(normalized)) {
     return false;
   }
+  if (process.env.CODEX_CI) {
+    return false;
+  }
   return !process.env.CI;
 }
 
-function getAppUrl(targetPath = "/") {
-  const normalizedTarget = String(targetPath || "/").trim() || "/";
-  const pathname = normalizedTarget.startsWith("/") ? normalizedTarget : `/${normalizedTarget}`;
+function normalizeAppPath(targetPath = DEFAULT_APP_PATH) {
+  const normalizedTarget = String(targetPath || DEFAULT_APP_PATH).trim() || DEFAULT_APP_PATH;
+  if (normalizedTarget === "/") {
+    return DEFAULT_APP_PATH;
+  }
+  if (normalizedTarget.startsWith("/app/")) {
+    return normalizedTarget;
+  }
+  if (normalizedTarget === "/app") {
+    return DEFAULT_APP_PATH;
+  }
+  if (normalizedTarget.startsWith("/?") || normalizedTarget.startsWith("/#")) {
+    return `/app${normalizedTarget}`;
+  }
+  return normalizedTarget.startsWith("/") ? normalizedTarget : `/${normalizedTarget}`;
+}
+
+function getAppUrl(targetPath = DEFAULT_APP_PATH) {
+  const pathname = normalizeAppPath(targetPath);
   return new URL(pathname, `${getConfiguredAppOrigin()}/`).toString();
 }
 
-async function gotoApp(page, targetPath = "/", options = {}) {
+async function gotoApp(page, targetPath = DEFAULT_APP_PATH, options = {}) {
   return page.goto(getAppUrl(targetPath), options);
 }
 
@@ -52,7 +72,8 @@ async function readBootStateSnapshot(page) {
     return await page.evaluate(async () => {
       const overlay = document.querySelector("#bootOverlay");
       const scenarioStatus = document.querySelector("#scenarioStatus");
-      const stateModule = await import("/js/core/state.js");
+      const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
+      const stateModule = await import(stateModuleUrl);
       const state = stateModule?.state || {};
       return {
         bootPhase: String(state.bootPhase || ""),
@@ -105,12 +126,14 @@ function getWebServerConfig() {
     return undefined;
   }
 
-  const command = "python tools/dev_server.py";
+  const command = process.platform === "win32"
+    ? "py tools/dev_server.py"
+    : "python tools/dev_server.py";
 
   return {
     command,
     cwd: REPO_ROOT,
-    url: getAppUrl("/"),
+    url: getAppUrl(DEFAULT_APP_PATH),
     timeout: 120_000,
     reuseExistingServer: shouldReuseExistingServer(),
     env: {

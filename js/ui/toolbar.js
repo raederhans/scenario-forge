@@ -9,6 +9,7 @@ import {
   normalizeLakeStyleConfig,
   normalizePhysicalPreset,
   normalizePhysicalStyleConfig,
+  normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchDisplayConfig,
   normalizeTextureMode,
@@ -7826,6 +7827,8 @@ function initToolbar({ render } = {}) {
   if (toggleOpenOceanRegions) {
     toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
     toggleOpenOceanRegions.addEventListener("change", (event) => {
+      state.allowOpenOceanSelect = !!event.target.checked;
+      state.allowOpenOceanPaint = !!event.target.checked;
       state.showOpenOceanRegions = !!event.target.checked;
       if (!state.showOpenOceanRegions) {
         state.hoveredWaterRegionId = null;

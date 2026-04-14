@@ -1,3 +1,9 @@
+import {
+  compactIndexedCoreAssignmentPayload,
+  compactIndexedTagAssignmentPayload,
+  compactRuntimePoliticalMeta,
+} from "./startup_bundle_compaction.js";
+
 const STARTUP_CACHE_DB_NAME = "mapcreator-startup-cache";
 const STARTUP_CACHE_DB_VERSION = 1;
 const STARTUP_CACHE_STORE_NAME = "entries";
@@ -6,7 +12,7 @@ const STARTUP_CACHE_UPDATED_AT_INDEX = "by_updated_at";
 const DEFAULT_BUILD_MANIFEST_URL = "data/manifest.json";
 const BUILD_MANIFEST_PROXY_OUTPUT_BY_URL = {};
 
-export const BOOT_CACHE_SCHEMA_VERSION = 2;
+export const BOOT_CACHE_SCHEMA_VERSION = 3;
 export const BASE_DATA_CACHE_REVISION = 1;
 export const STARTUP_CACHE_KINDS = Object.freeze({
   BASE_TOPOLOGY: "startup-base-topology",
@@ -339,16 +345,19 @@ export function createSerializableStartupScenarioBootstrapPayload({
   runtimeTopologyPayload = null,
   runtimePoliticalMeta = null,
 } = {}) {
+  const featureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
+    ? runtimePoliticalMeta.featureIds
+    : [];
   return {
     manifest: clonePlainObject(manifest),
     bundleLevel: normalizeCacheKeyPart(bundleLevel, "bootstrap"),
     countriesPayload: clonePlainObject(countriesPayload),
-    ownersPayload: clonePlainObject(ownersPayload),
-    controllersPayload: clonePlainObject(controllersPayload),
-    coresPayload: clonePlainObject(coresPayload),
+    ownersPayload: compactIndexedTagAssignmentPayload(ownersPayload, featureIds, "owners"),
+    controllersPayload: compactIndexedTagAssignmentPayload(controllersPayload, featureIds, "controllers"),
+    coresPayload: compactIndexedCoreAssignmentPayload(coresPayload, featureIds),
     geoLocalePatchPayload: clonePlainObject(geoLocalePatchPayload),
     runtimeTopologyPayload: clonePlainObject(runtimeTopologyPayload),
-    runtimePoliticalMeta: clonePlainObject(runtimePoliticalMeta),
+    runtimePoliticalMeta: compactRuntimePoliticalMeta(runtimePoliticalMeta),
   };
 }
 
@@ -362,15 +371,18 @@ export function createSerializableStartupScenarioBootstrapCorePayload({
   runtimeTopologyPayload = null,
   runtimePoliticalMeta = null,
 } = {}) {
+  const featureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
+    ? runtimePoliticalMeta.featureIds
+    : [];
   return {
     manifest: clonePlainObject(manifest),
     bundleLevel: normalizeCacheKeyPart(bundleLevel, "bootstrap"),
     countriesPayload: clonePlainObject(countriesPayload),
-    ownersPayload: clonePlainObject(ownersPayload),
-    controllersPayload: clonePlainObject(controllersPayload),
-    coresPayload: clonePlainObject(coresPayload),
+    ownersPayload: compactIndexedTagAssignmentPayload(ownersPayload, featureIds, "owners"),
+    controllersPayload: compactIndexedTagAssignmentPayload(controllersPayload, featureIds, "controllers"),
+    coresPayload: compactIndexedCoreAssignmentPayload(coresPayload, featureIds),
     runtimeTopologyPayload: clonePlainObject(runtimeTopologyPayload),
-    runtimePoliticalMeta: clonePlainObject(runtimePoliticalMeta),
+    runtimePoliticalMeta: compactRuntimePoliticalMeta(runtimePoliticalMeta),
   };
 }
 

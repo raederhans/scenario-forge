@@ -151,6 +151,17 @@
                 >
                   Texture
                 </button>
+                <button
+                  id="appearanceTabTransport"
+                  type="button"
+                  class="appearance-tab-btn"
+                  data-appearance-tab="transport"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="appearancePanelTransport"
+                >
+                  Transport
+                </button>
               </div>
             </div>
             <div class="appearance-stack mt-4">
@@ -1278,6 +1289,229 @@
                   </div>
                 </div>
               </section>
+
+              <section
+                id="appearancePanelTransport"
+                class="card-flat appearance-subsection appearance-tab-panel"
+                data-appearance-panel="transport"
+                role="tabpanel"
+                aria-labelledby="appearanceTabTransport"
+                hidden
+              >
+                <h2 id="lblTransportPanel" class="section-header">Transport</h2>
+                <div class="space-y-4 mt-3">
+                  <label class="toggle-label">
+                    <input id="transportAppearanceMasterToggle" type="checkbox" class="checkbox-input" />
+                    <span id="lblTransportAppearanceMasterToggle" data-i18n="Show Transport Overview">Show Transport Overview</span>
+                  </label>
+
+                  <div id="transportAppearanceFamilies" class="space-y-3">
+                    <section id="transportAirportCard" class="appearance-prop-group">
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 id="lblTransportAirportFamily" class="appearance-prop-heading">Airport</h3>
+                          <p id="transportAirportFamilyHint" class="panel-hint mt-1" data-i18n="Coarse airport context on the main map.">Coarse airport context on the main map.</p>
+                        </div>
+                      </div>
+                      <div id="transportAirportControls" class="space-y-4 mt-3">
+                        <section class="space-y-3">
+                          <h4 id="lblTransportAirportVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <label class="toggle-label">
+                            <input id="toggleAirports" type="checkbox" class="checkbox-input" />
+                            <span id="lblTransportAirportToggle" data-i18n="Show Airports">Show Airports</span>
+                          </label>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportVisibilityPreset" class="range-label" for="airportVisibilityPreset" data-i18n="Visual Preset">Visual Preset</label>
+                            <select id="airportVisibilityPreset" class="select-input">
+                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                              <option value="quiet" data-i18n="Quiet">Quiet</option>
+                              <option value="bold" data-i18n="Bold">Bold</option>
+                            </select>
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblAirportOpacity" class="range-label" for="airportOpacity" data-i18n="Opacity">Opacity</label>
+                              <span id="airportOpacityValue" class="range-value">82%</span>
+                            </div>
+                            <input id="airportOpacity" type="range" min="20" max="100" value="82" class="range-input" />
+                          </div>
+                        </section>
+
+                        <section class="space-y-3">
+                          <h4 id="lblTransportAirportLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <label class="toggle-label">
+                            <input id="airportLabelsEnabled" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblAirportLabelsEnabled" data-i18n="Show Airport Labels">Show Airport Labels</span>
+                          </label>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportLabelDensity" class="range-label" for="airportLabelDensity" data-i18n="Label Density">Label Density</label>
+                            <select id="airportLabelDensity" class="select-input">
+                              <option value="sparse" data-i18n="Sparse">Sparse</option>
+                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                              <option value="dense" data-i18n="Dense">Dense</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportLabelMode" class="range-label" for="airportLabelMode" data-i18n="Label Mode">Label Mode</label>
+                            <select id="airportLabelMode" class="select-input">
+                              <option value="both" selected data-i18n="Name + Code">Name + Code</option>
+                              <option value="name" data-i18n="Name Only">Name Only</option>
+                              <option value="code" data-i18n="Code Only">Code Only</option>
+                            </select>
+                          </div>
+                        </section>
+
+                        <section class="space-y-3">
+                          <h4 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Airport Scope">Airport Scope</label>
+                            <select id="airportScope" class="select-input">
+                              <option value="international" data-i18n="International">International</option>
+                              <option value="major_civil" selected data-i18n="Major Civil">Major Civil</option>
+                              <option value="all_civil" data-i18n="All Civil">All Civil</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportImportanceThreshold" class="range-label" for="airportImportanceThreshold" data-i18n="Importance Threshold">Importance Threshold</label>
+                            <select id="airportImportanceThreshold" class="select-input">
+                              <option value="primary" selected data-i18n="Primary">Primary</option>
+                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="all" data-i18n="All">All</option>
+                            </select>
+                          </div>
+                        </section>
+                      </div>
+                    </section>
+
+                    <section id="transportPortCard" class="appearance-prop-group">
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 id="lblTransportPortFamily" class="appearance-prop-heading">Port</h3>
+                          <p id="transportPortFamilyHint" class="panel-hint mt-1" data-i18n="Coarse port context on the main map.">Coarse port context on the main map.</p>
+                        </div>
+                      </div>
+                      <div id="transportPortControls" class="space-y-4 mt-3">
+                        <section class="space-y-3">
+                          <h4 id="lblTransportPortVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <label class="toggle-label">
+                            <input id="togglePorts" type="checkbox" class="checkbox-input" />
+                            <span id="lblTransportPortToggle" data-i18n="Show Ports">Show Ports</span>
+                          </label>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortVisibilityPreset" class="range-label" for="portVisibilityPreset" data-i18n="Visual Preset">Visual Preset</label>
+                            <select id="portVisibilityPreset" class="select-input">
+                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                              <option value="quiet" data-i18n="Quiet">Quiet</option>
+                              <option value="bold" data-i18n="Bold">Bold</option>
+                            </select>
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblPortOpacity" class="range-label" for="portOpacity" data-i18n="Opacity">Opacity</label>
+                              <span id="portOpacityValue" class="range-value">78%</span>
+                            </div>
+                            <input id="portOpacity" type="range" min="20" max="100" value="78" class="range-input" />
+                          </div>
+                        </section>
+
+                        <section class="space-y-3">
+                          <h4 id="lblTransportPortLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <label class="toggle-label">
+                            <input id="portLabelsEnabled" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblPortLabelsEnabled" data-i18n="Show Port Labels">Show Port Labels</span>
+                          </label>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortLabelDensity" class="range-label" for="portLabelDensity" data-i18n="Label Density">Label Density</label>
+                            <select id="portLabelDensity" class="select-input">
+                              <option value="sparse" data-i18n="Sparse">Sparse</option>
+                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                              <option value="dense" data-i18n="Dense">Dense</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortLabelMode" class="range-label" for="portLabelMode" data-i18n="Label Mode">Label Mode</label>
+                            <select id="portLabelMode" class="select-input">
+                              <option value="mixed" selected data-i18n="Mixed">Mixed</option>
+                              <option value="name" data-i18n="Name Only">Name Only</option>
+                              <option value="cargo_focus" data-i18n="Cargo Focus">Cargo Focus</option>
+                            </select>
+                          </div>
+                        </section>
+
+                        <section class="space-y-3">
+                          <h4 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Port Tier">Port Tier</label>
+                            <select id="portTier" class="select-input">
+                              <option value="core" data-i18n="Core">Core</option>
+                              <option value="regional" selected data-i18n="Regional">Regional</option>
+                              <option value="expanded" data-i18n="Expanded">Expanded</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortImportanceThreshold" class="range-label" for="portImportanceThreshold" data-i18n="Importance Threshold">Importance Threshold</label>
+                            <select id="portImportanceThreshold" class="select-input">
+                              <option value="primary" selected data-i18n="Primary">Primary</option>
+                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="all" data-i18n="All">All</option>
+                            </select>
+                          </div>
+                        </section>
+                      </div>
+                    </section>
+
+                    <section id="transportRailCard" class="appearance-prop-group opacity-60" aria-disabled="true">
+                      <div>
+                        <h3 id="lblTransportRailFamily" class="appearance-prop-heading">Rail</h3>
+                        <p id="transportRailFamilyHint" class="panel-hint mt-1" data-i18n="Reserved for the future global backbone rail pack.">Reserved for the future global backbone rail pack.</p>
+                      </div>
+                      <div id="transportRailPlaceholder" class="space-y-4 mt-3">
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <p class="panel-hint" data-i18n="Mainline-only visibility controls will land here when the coarse rail family is wired.">Mainline-only visibility controls will land here when the coarse rail family is wired.</p>
+                        </section>
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRailLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <p class="panel-hint" data-i18n="Rail labels stay off by default until the coarse backbone data is ready.">Rail labels stay off by default until the coarse backbone data is ready.</p>
+                        </section>
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <p class="panel-hint" data-i18n="Scope will start at global mainline backbone only.">Scope will start at global mainline backbone only.</p>
+                        </section>
+                      </div>
+                    </section>
+
+                    <section id="transportRoadCard" class="appearance-prop-group opacity-60" aria-disabled="true">
+                      <div>
+                        <h3 id="lblTransportRoadFamily" class="appearance-prop-heading">Road</h3>
+                        <p id="transportRoadFamilyHint" class="panel-hint mt-1" data-i18n="Reserved for the future global motorway and trunk skeleton pack.">Reserved for the future global motorway and trunk skeleton pack.</p>
+                      </div>
+                      <div id="transportRoadPlaceholder" class="space-y-4 mt-3">
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <p class="panel-hint" data-i18n="Motorway and trunk visibility controls will land here when the coarse road family is wired.">Motorway and trunk visibility controls will land here when the coarse road family is wired.</p>
+                        </section>
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <p class="panel-hint" data-i18n="Road labels stay off by default until the coarse skeleton data is ready.">Road labels stay off by default until the coarse skeleton data is ready.</p>
+                        </section>
+                        <section class="space-y-2">
+                          <h4 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <p class="panel-hint" data-i18n="Scope will start at motorway and trunk skeleton only.">Scope will start at motorway and trunk skeleton only.</p>
+                        </section>
+                      </div>
+                    </section>
+                  </div>
+
+                  <section class="appearance-prop-group">
+                    <div class="space-y-2">
+                      <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
+                      <p id="transportWorkbenchReminderHint" class="panel-hint" data-i18n="Open the dedicated workbench for country or region-level transport review and editing.">Open the dedicated workbench for country or region-level transport review and editing.</p>
+                      <button id="transportAppearanceWorkbenchBtn" type="button" class="btn-secondary" data-i18n="Open Transport Workbench">Open Transport Workbench</button>
+                    </div>
+                  </section>
+                </div>
+              </section>
             </div>
           </details>
 
@@ -1844,12 +2078,46 @@
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblWaterInteraction" class="sidebar-group-label">Interaction</h3>
                 <label class="toggle-label mt-2" title="Allow or ignore macro open-ocean regions during hover, click, and paint." data-i18n-title="Allow or ignore macro open-ocean regions during hover, click, and paint.">
-                  <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
-                  <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
+                  <input id="waterInspectorOpenOceanSelectToggle" type="checkbox" class="checkbox-input" />
+                  <span id="lblWaterInspectorOpenOceanSelectToggle" data-i18n="Allow Open-Ocean Selection">Allow Open-Ocean Selection</span>
                 </label>
-                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2 hidden">
-                  When off, macro ocean regions are ignored for hover, click, and paint.
+                <p id="waterInspectorOpenOceanSelectHint" class="sidebar-tool-hint mt-2 hidden">
+                  <span data-i18n="When off, macro ocean regions stay hidden from inspector selection and map picking.">When off, macro ocean regions stay hidden from inspector selection and map picking.</span>
                 </p>
+                <label class="toggle-label mt-2" title="Allow macro open-ocean regions to receive paint, eraser, and eyedropper actions." data-i18n-title="Allow macro open-ocean regions to receive paint, eraser, and eyedropper actions.">
+                  <input id="waterInspectorOpenOceanPaintToggle" type="checkbox" class="checkbox-input" />
+                  <span id="lblWaterInspectorOpenOceanPaintToggle" data-i18n="Allow Open-Ocean Paint">Allow Open-Ocean Paint</span>
+                </label>
+                <p id="waterInspectorOpenOceanPaintHint" class="sidebar-tool-hint mt-2 hidden">
+                  <span data-i18n="When off, macro ocean regions can be inspected but ignore paint, eraser, and eyedropper actions.">When off, macro ocean regions can be inspected but ignore paint, eraser, and eyedropper actions.</span>
+                </p>
+              </div>
+              <div class="card-flat inspector-detail-section mt-3">
+                <h3 id="lblWaterFilters" class="sidebar-group-label" data-i18n="Filters">Filters</h3>
+                <div id="waterInspectorResultCount" class="sidebar-tool-hint mt-2">0</div>
+                <label class="toggle-label mt-2" title="Only show water regions that currently have an explicit override." data-i18n-title="Only show water regions that currently have an explicit override.">
+                  <input id="waterInspectorOverridesOnlyToggle" type="checkbox" class="checkbox-input" />
+                  <span id="lblWaterInspectorOverridesOnlyToggle" data-i18n="Overrides Only">Overrides Only</span>
+                </label>
+                <label id="lblWaterFilterType" class="sidebar-field-label mt-3" for="waterInspectorTypeFilter">Type</label>
+                <select id="waterInspectorTypeFilter" class="select-input mt-2">
+                  <option value="" data-i18n="All Types">All Types</option>
+                </select>
+                <label id="lblWaterFilterGroup" class="sidebar-field-label mt-3" for="waterInspectorGroupFilter" data-i18n="Group">Group</label>
+                <select id="waterInspectorGroupFilter" class="select-input mt-2">
+                  <option value="" data-i18n="All Groups">All Groups</option>
+                </select>
+                <label id="lblWaterFilterSource" class="sidebar-field-label mt-3" for="waterInspectorSourceFilter" data-i18n="Source">Source</label>
+                <select id="waterInspectorSourceFilter" class="select-input mt-2">
+                  <option value="" data-i18n="All Sources">All Sources</option>
+                </select>
+                <label id="lblWaterSort" class="sidebar-field-label mt-3" for="waterInspectorSortSelect">Sort</label>
+                <select id="waterInspectorSortSelect" class="select-input mt-2">
+                  <option value="name">Name</option>
+                  <option value="type">Type</option>
+                  <option value="group" data-i18n="Group">Group</option>
+                  <option value="override" data-i18n="Has Override">Has Override</option>
+                </select>
               </div>
               <div class="card-flat inspector-search-block">
                 <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
@@ -1879,6 +2147,15 @@
                 </div>
                 <div id="waterInspectorSelected" class="hidden">
                   <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <div id="waterInspectorMetaSection" class="inspector-detail-section mt-3 hidden">
+                    <h3 id="lblWaterInspectorMeta" class="sidebar-group-label" data-i18n="Region Details">Region Details</h3>
+                    <div id="waterInspectorMetaList" class="inspector-meta-list mt-2"></div>
+                  </div>
+                  <div id="waterInspectorHierarchySection" class="inspector-detail-section mt-3 hidden">
+                    <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label">Family</h3>
+                    <button id="waterInspectorJumpToParentBtn" type="button" class="sidebar-action-secondary mt-2 hidden" data-i18n="Jump To Parent">Jump To Parent</button>
+                    <div id="waterInspectorChildrenList" class="inspector-scroll mt-3 hidden"></div>
+                  </div>
                   <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
                     <h3 id="waterInspectorColorLabel" class="sidebar-field-label">Water Color</h3>
                     <div class="inspector-color-row-main mt-2">
@@ -1899,6 +2176,21 @@
                       />
                     </div>
                     <button id="clearWaterRegionColorBtn" type="button" class="sidebar-action-secondary is-danger mt-3">Clear Water Override</button>
+                  </div>
+                  <div id="waterInspectorBatchSection" class="inspector-detail-section mt-3 hidden">
+                    <h3 id="lblWaterInspectorBatch" class="sidebar-group-label" data-i18n="Batch Actions">Batch Actions</h3>
+                    <label id="lblWaterInspectorScope" class="sidebar-field-label mt-2" for="waterInspectorScopeSelect" data-i18n="Apply Scope">Apply Scope</label>
+                    <select id="waterInspectorScopeSelect" class="select-input mt-2">
+                      <option value="selected" data-i18n="Selected Region Only">Selected Region Only</option>
+                      <option value="same-parent" data-i18n="Same Parent">Same Parent</option>
+                      <option value="same-group" data-i18n="Same Group">Same Group</option>
+                      <option value="same-type" data-i18n="Same Type">Same Type</option>
+                    </select>
+                    <p id="waterInspectorScopePreview" class="sidebar-tool-hint mt-2 hidden"></p>
+                    <div class="inspector-detail-actions mt-3">
+                      <button id="applyWaterFamilyOverrideBtn" type="button" class="sidebar-action-primary inspector-detail-primary-btn" data-i18n="Apply Current Color To Scope">Apply Current Color To Scope</button>
+                    </div>
+                    <button id="clearWaterFamilyOverrideBtn" type="button" class="sidebar-action-secondary is-danger mt-3" data-i18n="Clear Scope Overrides">Clear Scope Overrides</button>
                   </div>
                 </div>
               </div>

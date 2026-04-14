@@ -8,7 +8,11 @@ from pathlib import Path
 from map_builder.scenario_build_session import (
     SCENARIO_BUILD_ROOT_RELATIVE,
     SCENARIO_BUILD_STATE_FILENAME,
+    load_stage_signature,
+    record_stage_outputs,
     resolve_scenario_build_session,
+    stable_stage_signature,
+    stage_signature_matches,
 )
 
 
@@ -55,6 +59,53 @@ class ScenarioBuildSessionTest(unittest.TestCase):
             self.assertEqual(state_payload["snapshot_hash"], session["snapshotHash"])
             self.assertIn("manifest.json", state_payload["input_hashes"])
             self.assertIn("scenario_mutations.json", state_payload["input_hashes"])
+            self.assertEqual(state_payload["stage_signatures"], {})
+
+    def test_record_stage_outputs_persists_stage_signature(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "data" / "scenarios" / "example_scenario"
+            _write_json(scenario_dir / "manifest.json", {"scenario_id": "example_scenario"})
+            _write_json(
+                scenario_dir / "scenario_mutations.json",
+                {
+                    "version": 1,
+                    "scenario_id": "example_scenario",
+                    "generated_at": "",
+                    "tags": {},
+                    "countries": {},
+                    "assignments_by_feature_id": {},
+                    "capitals": {},
+                    "geo_locale": {},
+                    "district_groups": {},
+                },
+            )
+            session = resolve_scenario_build_session(
+                root=root,
+                scenario_id="example_scenario",
+                scenario_dir=scenario_dir,
+            )
+            build_dir = Path(session["buildDir"])
+            output_path = build_dir / "countries.json"
+            _write_json(output_path, {"countries": {}})
+            signature_payload = {"stage": "countries", "inputs": {"manifest.json": {"exists": True}}}
+            signature = stable_stage_signature(signature_payload)
+
+            record_stage_outputs(
+                build_dir=build_dir,
+                stage="countries",
+                output_paths=[output_path],
+                root=root,
+                stage_signature={
+                    "signature": signature,
+                    "payload": signature_payload,
+                },
+            )
+
+            saved_signature = load_stage_signature(build_dir, "countries")
+            self.assertIsNotNone(saved_signature)
+            self.assertEqual(saved_signature["signature"], signature)
+            self.assertTrue(stage_signature_matches(build_dir, "countries", signature))
 
 
 if __name__ == "__main__":

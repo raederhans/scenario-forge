@@ -50,6 +50,7 @@ from map_builder.scenario_materialization_service import (
 from map_builder.scenario_publish_service import (
     publish_scenario_outputs_in_locked_context,
 )
+from map_builder.scenario_rebuild_planner import resolve_tno_rebuild_plan
 from map_builder.scenario_geo_locale_materializer import (
     normalize_geo_locale_entry as _normalize_locale_entry,
 )
@@ -72,6 +73,7 @@ PORT_START = 8000
 PORT_END = 8030
 BIND_ADDRESS = "127.0.0.1"
 RUNTIME_ACTIVE_SERVER_PATH = Path(".runtime") / "dev" / "active_server.json"
+STARTUP_SUPPORT_KEY_USAGE_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "scenarios"
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 MAX_JSON_BODY_BYTES = 1024 * 1024
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
@@ -80,6 +82,19 @@ DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
 GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
+DEFAULT_OPEN_PATH = "/app/"
+LANDING_SOURCE_CANDIDATES = (
+    "landing/index.html",
+    "site/index.html",
+    "marketing/index.html",
+    "index.html",
+)
+EDITOR_SOURCE_CANDIDATES = (
+    "app/index.html",
+    "editor/index.html",
+    "workspace/index.html",
+    "index.html",
+)
 
 
 class DevServerTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -243,6 +258,65 @@ def _normalize_optional_float(value: object) -> float | None:
     if not math.isfinite(parsed):
         raise DevServerError("invalid_number", "Expected a finite numeric value.", status=400)
     return parsed
+
+
+def save_startup_support_key_usage_report(
+    *,
+    scenario_id: object,
+    usage: object,
+    source: object = "",
+    sample_label: object = "",
+    root: Path = ROOT,
+) -> dict[str, object]:
+    normalized_scenario_id = _normalize_text(scenario_id)
+    if not normalized_scenario_id:
+        raise DevServerError("missing_scenario_id", "scenarioId is required.", status=400)
+    if not isinstance(usage, dict):
+        raise DevServerError("invalid_usage_payload", "usage must be a JSON object.", status=400)
+
+    report_payload = {
+        "version": 1,
+        "scenario_id": normalized_scenario_id,
+        "captured_at": _now_iso(),
+        "source": _normalize_text(source),
+        "sample_label": _normalize_text(sample_label),
+        "usage": usage,
+    }
+    report_dir = _ensure_path_within_root((root / ".runtime" / "reports" / "generated" / "scenarios").resolve(), root=root)
+    normalized_source = re.sub(r"[^A-Za-z0-9._-]+", "_", report_payload["source"]).strip("._-")
+    normalized_sample_label = re.sub(r"[^A-Za-z0-9._-]+", "_", report_payload["sample_label"]).strip("._-")
+    normalized_language = re.sub(
+        r"[^A-Za-z0-9._-]+",
+        "_",
+        _normalize_text((usage or {}).get("language", "")),
+    ).strip("._-")
+    filename_parts = [
+        normalized_scenario_id,
+        "startup_support_key_usage",
+    ]
+    if normalized_source:
+        filename_parts.append(normalized_source)
+    if normalized_language:
+        filename_parts.append(normalized_language)
+    if normalized_sample_label:
+        filename_parts.append(normalized_sample_label)
+    filename = "_".join(filename_parts) + ".json"
+    report_path = report_dir / filename
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json_atomic(report_path, report_payload, ensure_ascii=False, indent=2, trailing_newline=True)
+    return {
+        "ok": True,
+        "scenarioId": normalized_scenario_id,
+        "reportPath": _repo_relative(report_path, root=root),
+        "savedAt": report_payload["captured_at"],
+        "stats": {
+            "queryKeyCount": len(usage.get("queryKeys", [])) if isinstance(usage.get("queryKeys"), list) else 0,
+            "directLocaleKeyCount": len(usage.get("directLocaleKeys", [])) if isinstance(usage.get("directLocaleKeys"), list) else 0,
+            "aliasKeyCount": len(usage.get("aliasKeys", [])) if isinstance(usage.get("aliasKeys"), list) else 0,
+            "aliasTargetKeyCount": len(usage.get("aliasTargetKeys", [])) if isinstance(usage.get("aliasTargetKeys"), list) else 0,
+            "missKeyCount": len(usage.get("missKeys", [])) if isinstance(usage.get("missKeys"), list) else 0,
+        },
+    }
 
 
 def _normalize_inspector_group_fields(
@@ -2139,7 +2213,7 @@ def save_scenario_geo_locale_entry(
         mutation_entry: dict[str, object] | None = locale_entry or None
         publish_targets: tuple[str, ...] = ("geo-locale",)
         if str(context["scenarioId"]) == "tno_1962":
-            publish_targets = ("geo-locale", "startup-assets")
+            publish_targets = resolve_tno_rebuild_plan("geo-locale").publish_targets
         _write_and_materialize_mutation_pipeline(
             context,
             mutation_patch={
@@ -2190,12 +2264,101 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _resolve_index_source_path(
+    env_var_name: str,
+    candidates: tuple[str, ...],
+    *,
+    root: Path = ROOT,
+) -> Path:
+    raw_override = str(os.environ.get(env_var_name, "") or "").strip()
+    candidate_paths: list[Path] = []
+    if raw_override:
+        override_path = Path(raw_override)
+        if not override_path.is_absolute():
+            override_path = root / override_path
+        candidate_paths.append(override_path)
+    candidate_paths.extend(root / candidate for candidate in candidates)
+    for candidate_path in candidate_paths:
+        try:
+            resolved_candidate = candidate_path.resolve()
+        except OSError:
+            continue
+        if resolved_candidate.is_file():
+            return _ensure_path_within_root(resolved_candidate, root=root)
+    fallback = root / candidates[-1]
+    return _ensure_path_within_root(fallback.resolve(), root=root)
+
+
+def resolve_landing_source_path(*, root: Path = ROOT) -> Path:
+    return _resolve_index_source_path("MAPCREATOR_LANDING_SOURCE", LANDING_SOURCE_CANDIDATES, root=root)
+
+
+def resolve_editor_source_path(*, root: Path = ROOT) -> Path:
+    return _resolve_index_source_path("MAPCREATOR_EDITOR_SOURCE", EDITOR_SOURCE_CANDIDATES, root=root)
+
+
+def _resolve_prefixed_asset_path(
+    relative_path: str,
+    *,
+    preferred_root: Path,
+    fallback_root: Path = ROOT,
+) -> Path:
+    normalized_relative = str(relative_path or "").lstrip("/").strip()
+    if not normalized_relative:
+        return preferred_root
+    candidate_roots = [preferred_root]
+    if fallback_root not in candidate_roots:
+        candidate_roots.append(fallback_root)
+    for candidate_root in candidate_roots:
+        candidate_path = (candidate_root / normalized_relative).resolve()
+        try:
+            safe_path = _ensure_path_within_root(candidate_path, root=fallback_root)
+        except DevServerError:
+            continue
+        if safe_path.exists():
+            return safe_path
+    return _ensure_path_within_root((fallback_root / normalized_relative).resolve(), root=fallback_root)
+
+
+def resolve_static_request_path(route: str, *, root: Path = ROOT) -> Path | None:
+    normalized_route = str(route or "/").strip() or "/"
+    if normalized_route == "/":
+        landing_source_path = resolve_landing_source_path(root=root)
+        if landing_source_path != root / "index.html":
+            return landing_source_path
+        return None
+    if normalized_route in {"/app", "/app/"}:
+        return resolve_editor_source_path(root=root)
+    if normalized_route.startswith("/app/"):
+        relative_path = normalized_route[len("/app/"):]
+        return _resolve_prefixed_asset_path(
+            relative_path,
+            preferred_root=resolve_editor_source_path(root=root).parent,
+            fallback_root=root,
+        )
+    landing_source_path = resolve_landing_source_path(root=root)
+    landing_root = landing_source_path.parent
+    if landing_root != root:
+        candidate_path = _resolve_prefixed_asset_path(
+            normalized_route.lstrip("/"),
+            preferred_root=landing_root,
+            fallback_root=root,
+        )
+        if candidate_path.exists():
+            return candidate_path
+    return None
+
+
 def resolve_open_path(cli_path: str = ""):
     cli_path = str(cli_path or "").strip()
     env_path = os.environ.get("MAPCREATOR_OPEN_PATH", "").strip()
-    raw_path = cli_path or env_path or "/"
+    raw_path = cli_path or env_path or DEFAULT_OPEN_PATH
     if not raw_path.startswith("/"):
         raw_path = f"/{raw_path}"
+    if raw_path == "/app":
+        raw_path = "/app/"
+    elif raw_path.startswith("/app?"):
+        raw_path = raw_path.replace("/app?", "/app/?", 1)
     return raw_path
 
 
@@ -2255,6 +2418,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         # Optional: Silence default logging to keep console clean, or keep it.
         pass
+
+    def translate_path(self, path):
+        route = urlparse(path or "").path
+        resolved_path = resolve_static_request_path(route)
+        if resolved_path is not None:
+            return str(resolved_path)
+        return super().translate_path(path)
 
     def _cache_mode(self) -> str:
         raw = os.environ.get("MAPCREATOR_DEV_CACHE_MODE", "").strip().lower()
@@ -2378,14 +2548,30 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        if self._maybe_redirect_app_root():
+            return
         if self._maybe_send_gzip_static(head_only=False):
             return
         super().do_GET()
 
     def do_HEAD(self):
+        if self._maybe_redirect_app_root():
+            return
         if self._maybe_send_gzip_static(head_only=True):
             return
         super().do_HEAD()
+
+    def _maybe_redirect_app_root(self) -> bool:
+        parsed = urlparse(self.path or "")
+        if parsed.path != "/app":
+            return False
+        location = "/app/"
+        if parsed.query:
+            location = f"{location}?{parsed.query}"
+        self.send_response(308)
+        self.send_header("Location", location)
+        self.end_headers()
+        return True
 
     def do_POST(self):
         route = urlparse(self.path or "").path
@@ -2485,6 +2671,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 )
                 self._send_json(200, response)
                 return
+            if route == "/__dev/startup-support/key-usage-report":
+                response = save_startup_support_key_usage_report(
+                    scenario_id=payload.get("scenarioId"),
+                    usage=payload.get("usage"),
+                    source=payload.get("source"),
+                    sample_label=payload.get("sampleLabel"),
+                )
+                self._send_json(200, response)
+                return
             raise DevServerError("not_found", f"Unknown dev server route: {route}", status=404)
         except DevServerError as error:
             self._send_json(
@@ -2507,7 +2702,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             )
 
 
-def start_server(open_path="/", preferred_port: int | None = None):
+def start_server(open_path=DEFAULT_OPEN_PATH, preferred_port: int | None = None):
     candidate_ports = [preferred_port] if preferred_port else list(range(PORT_START, PORT_END + 1))
     for port in candidate_ports:
         try:

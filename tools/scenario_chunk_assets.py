@@ -43,6 +43,23 @@ def _write_json(path: Path, payload: Any) -> None:
         ) from exc
 
 
+def _write_minified_json(path: Path, payload: Any) -> None:
+    try:
+        write_json_atomic(
+            path,
+            payload,
+            ensure_ascii=False,
+            indent=None,
+            separators=(",", ":"),
+            trailing_newline=True,
+        )
+    except PermissionError as exc:
+        raise PermissionError(
+            f"Scenario chunk write is blocked for {path}. "
+            "Stop any local dev server or browser tab serving this scenario, then retry the publish."
+        ) from exc
+
+
 def _normalize_relative_url(raw_url: Any) -> str:
     return str(raw_url or "").strip().replace("\\", "/")
 
@@ -374,6 +391,63 @@ def _slice_feature_collection(feature_collection: dict[str, Any], selected_featu
     }
 
 
+def _round_geometry_coordinates(node: Any, *, decimals: int) -> Any:
+    if isinstance(node, (int, float)):
+        return round(float(node), decimals)
+    if isinstance(node, list):
+        return [_round_geometry_coordinates(item, decimals=decimals) for item in node]
+    return node
+
+
+def _round_feature_geometry(feature: dict[str, Any], *, decimals: int) -> dict[str, Any]:
+    geometry = feature.get("geometry")
+    if not isinstance(geometry, dict):
+        return geometry
+    rounded = dict(geometry)
+    if "coordinates" in rounded:
+        rounded["coordinates"] = _round_geometry_coordinates(rounded["coordinates"], decimals=decimals)
+    return rounded
+
+
+def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(payload, dict) or not isinstance(payload.get("features"), list):
+        return payload
+    property_whitelist = (
+        "id",
+        "name",
+        "cntr_code",
+        "__source",
+        "interactive",
+        "detail_tier",
+        "admin1_group",
+        "render_as_base_geography",
+        "scenario_helper_kind",
+        "atl_geometry_role",
+        "atl_join_mode",
+    )
+    optimized_features: list[dict[str, Any]] = []
+    for feature in payload.get("features") or []:
+        if not isinstance(feature, dict):
+            continue
+        properties = feature.get("properties") if isinstance(feature.get("properties"), dict) else {}
+        optimized_properties = {
+            key: properties[key]
+            for key in property_whitelist
+            if key in properties and properties[key] not in (None, "")
+        }
+        optimized_features.append(
+            {
+                "type": "Feature",
+                "properties": optimized_properties,
+                "geometry": _round_feature_geometry(feature, decimals=4),
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "features": optimized_features,
+    }
+
+
 def _collect_feature_ids(feature_collection: dict[str, Any] | None) -> set[str]:
     if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
         return set()
@@ -564,7 +638,13 @@ def _build_chunk_payloads_for_feature_collection(
                 chunk_id = f"{layer_key}.{spec['lod']}.r{row}c{col}"
                 chunk_filename = f"{chunk_id}.json"
                 chunk_path = scenario_dir / "chunks" / chunk_filename
-                _write_json(chunk_path, chunk_payload)
+                if layer_key == "political" and spec["lod"] == "coarse":
+                    chunk_payload = _optimize_political_coarse_payload(chunk_payload)
+                    _write_minified_json(chunk_path, chunk_payload)
+                elif layer_key == "water" and spec["lod"] == "coarse":
+                    _write_minified_json(chunk_path, chunk_payload)
+                else:
+                    _write_json(chunk_path, chunk_payload)
                 manifest_chunks.append({
                     "id": chunk_id,
                     "layer": layer_key,
@@ -617,20 +697,21 @@ def _build_political_chunk_payloads(
     lod_layers: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     startup_feature_collection = _topology_object_to_feature_collection(startup_topology_payload, "political")
-    if startup_feature_collection:
+    runtime_feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "political")
+    coarse_feature_collection = startup_feature_collection or runtime_feature_collection
+    if coarse_feature_collection:
         chunks, lod_entries = _build_chunk_payloads_for_feature_collection(
             scenario_id=scenario_id,
             scenario_dir=scenario_dir,
             layer_key="political",
-            feature_collection=startup_feature_collection,
-            payload_factory=lambda selected_feature_ids: _slice_feature_collection(startup_feature_collection, selected_feature_ids),
+            feature_collection=coarse_feature_collection,
+            payload_factory=lambda selected_feature_ids: _slice_feature_collection(coarse_feature_collection, selected_feature_ids),
             chunk_specs=POLITICAL_COARSE_LOD_SPECS,
         )
         all_chunks.extend(chunks)
         for lod_layer_key, entries in lod_entries.items():
             lod_layers[lod_layer_key].extend(entries)
 
-    runtime_feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "political")
     if runtime_feature_collection:
         chunks_dir = scenario_dir / "chunks"
         chunks_dir.mkdir(parents=True, exist_ok=True)

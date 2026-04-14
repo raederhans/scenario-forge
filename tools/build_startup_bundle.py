@@ -7,6 +7,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -16,9 +17,152 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 
 SUPPORTED_LANGUAGES = ("en", "zh")
-STARTUP_BUNDLE_VERSION = 3
+STARTUP_BUNDLE_VERSION = 5
 STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
+STARTUP_RUNTIME_POLITICAL_META_ENCODING = "feature-index-v1"
+STARTUP_FEATURE_ORDER_ASSIGNMENT_ENCODING = "runtime-feature-index-v1"
+STARTUP_FAMILY_SECTION_ROLES = {
+    "base.topology_primary": "startup-first-paint geometry seed; high-cost and likely first slimming candidate",
+    "base.locales": "external startup-scoped locale payload used before full locale hydration",
+    "base.geo_aliases": "external startup-scoped alias lookup used before full alias hydration",
+    "scenario.countries": "scenario identity and display seed for startup/apply",
+    "scenario.owners": "startup apply ownership seed",
+    "scenario.controllers": "startup apply controller seed",
+    "scenario.cores": "startup apply core seed",
+    "scenario.geo_locale_patch": "external scenario-specific locale patch used by scenario apply paths",
+    "scenario.runtime_topology_bootstrap": "ultra-light runtime shell contract for startup",
+    "scenario.runtime_political_meta": "startup political id/meta contract stored in compact feature-order form",
+    "scenario.apply_seed": "runtime-derived startup apply convenience seed; no longer serialized into startup bundle",
+}
+STARTUP_PRIMARY_KEEP_OBJECTS = (
+    "political",
+    "water_regions",
+    "special_zones",
+    "ocean",
+    "land",
+    "urban",
+    "physical",
+    "rivers",
+)
+STARTUP_PRIMARY_PROPERTY_WHITELISTS = {
+    "political": (
+        "id",
+        "name",
+        "cntr_code",
+        "detail_tier",
+        "claim_status",
+        "claimants",
+        "partition_scheme",
+        "sector_start_lon",
+        "sector_end_lon",
+    ),
+    "water_regions": (
+        "id",
+        "interactive",
+        "is_chokepoint",
+        "label",
+        "name",
+        "neighbors",
+        "parent_id",
+        "region_group",
+        "source_standard",
+        "water_type",
+    ),
+    "special_zones": (
+        "id",
+        "label",
+        "name",
+        "type",
+        "cntr_code",
+        "claimants",
+    ),
+    "urban": (
+        "area_sqkm",
+        "featurecla",
+        "min_zoom",
+        "scalerank",
+    ),
+    "physical": (
+        "NAME",
+        "NAME_EN",
+        "featurecla",
+    ),
+    "rivers": (
+        "featurecla",
+        "min_zoom",
+        "name",
+        "name_en",
+        "scalerank",
+    ),
+    "land": (),
+    "ocean": (),
+}
+STARTUP_FAMILY_CONSUMER_MATRIX = {
+    "startup_bundle": {
+        "default_startup": [
+            "js/workers/startup_boot.worker.js",
+            "js/core/startup_worker_client.js",
+        ],
+        "scenario_apply": [
+            "js/core/scenario_resources.js",
+            "js/core/scenario_manager.js",
+        ],
+    },
+    "startup_locales": {
+        "default_startup": [
+            "js/main.js",
+        ],
+        "scenario_apply": [],
+    },
+    "startup_geo_aliases": {
+        "default_startup": [
+            "js/main.js",
+        ],
+        "scenario_apply": [],
+    },
+    "geo_locale_patch": {
+        "default_startup": [],
+        "scenario_apply": [
+            "js/core/scenario_resources.js",
+            "js/core/scenario_manager.js",
+        ],
+    },
+    "gzip_sidecar": {
+        "default_startup": [
+            "js/workers/startup_boot.worker.js",
+            "js/core/startup_worker_client.js",
+            "tools/dev_server.py",
+        ],
+        "scenario_apply": [],
+    },
+}
+STARTUP_FAMILY_DUPLICATION_SUSPECTS = (
+    {
+        "id": "base_topology_primary",
+        "severity": "high",
+        "summary": "base.topology_primary is the single largest startup bundle section and the clearest first-cut target.",
+        "sections": ["base.topology_primary"],
+    },
+    {
+        "id": "startup_locale_alias_patch_overlap",
+        "severity": "high",
+        "summary": "base.locales, base.geo_aliases, and scenario.geo_locale_patch all carry startup label/alias responsibilities and need a clearer boundary.",
+        "sections": ["base.locales", "base.geo_aliases", "scenario.geo_locale_patch"],
+    },
+    {
+        "id": "apply_seed_owner_meta_overlap",
+        "severity": "medium",
+        "summary": "owners/controllers/cores, apply_seed, and runtime_political_meta all contribute startup scenario state and may contain overlapping role data.",
+        "sections": [
+            "scenario.owners",
+            "scenario.controllers",
+            "scenario.cores",
+            "scenario.apply_seed",
+            "scenario.runtime_political_meta",
+        ],
+    },
+)
 
 
 def _normalize_text(value: object) -> str:
@@ -39,6 +183,10 @@ def _sha256_path(path: Path) -> str:
 def _gzip_size(payload: object) -> int:
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     return len(gzip.compress(raw, compresslevel=9))
+
+
+def _json_size_bytes(payload: object) -> int:
+    return len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
 def _extract_language_entry(value: object, language: str) -> object:
@@ -135,27 +283,132 @@ def build_runtime_political_meta(runtime_bootstrap_topology: dict) -> dict:
         neighbors = []
 
     feature_ids: list[str] = []
-    feature_index_by_id: dict[str, int] = {}
-    canonical_country_by_feature_id: dict[str, str] = {}
+    canonical_country_by_index: list[str] = []
 
     for index, geometry in enumerate(geometries):
         feature_id = _extract_geometry_key(geometry)
         if not feature_id:
             continue
         feature_ids.append(feature_id)
-        feature_index_by_id[feature_id] = index
-        canonical_country_by_feature_id[feature_id] = _extract_geometry_country_code(geometry)
+        canonical_country_by_index.append(_extract_geometry_country_code(geometry))
 
     return {
+        "encoding": STARTUP_RUNTIME_POLITICAL_META_ENCODING,
         "featureIds": feature_ids,
-        "featureIndexById": feature_index_by_id,
-        "canonicalCountryByFeatureId": canonical_country_by_feature_id,
+        "canonicalCountryByIndex": canonical_country_by_index,
         "neighborGraph": (
             neighbors
             if len(neighbors) == len(geometries)
             else [[] for _ in geometries]
         ),
     }
+
+
+def _build_feature_index_by_id(feature_ids: list[str]) -> dict[str, int]:
+    return {
+        feature_id: index
+        for index, feature_id in enumerate(feature_ids)
+        if feature_id
+    }
+
+
+def compact_tag_assignment_payload(payload: dict, feature_ids: list[str], map_key: str) -> dict:
+    source_map = payload.get(map_key, {}) if isinstance(payload, dict) else {}
+    if not isinstance(source_map, dict):
+        source_map = {}
+    index_by_id = _build_feature_index_by_id(feature_ids)
+    values = [""] * len(feature_ids)
+    for feature_id, raw_value in source_map.items():
+        index = index_by_id.get(_normalize_text(feature_id))
+        if index is None:
+            raise ValueError(f"Cannot compact {map_key}: feature id {feature_id!r} is missing from runtime political meta.")
+        values[index] = _normalize_text(raw_value).upper()
+    compact_payload = {
+        "encoding": STARTUP_FEATURE_ORDER_ASSIGNMENT_ENCODING,
+        "values": values,
+    }
+    if "baseline_hash" in payload:
+        compact_payload["baseline_hash"] = payload["baseline_hash"]
+    if "owner_baseline_hash" in payload:
+        compact_payload["owner_baseline_hash"] = payload["owner_baseline_hash"]
+    return compact_payload
+
+
+def compact_core_assignment_payload(payload: dict, feature_ids: list[str]) -> dict:
+    source_map = payload.get("cores", {}) if isinstance(payload, dict) else {}
+    if not isinstance(source_map, dict):
+        source_map = {}
+    index_by_id = _build_feature_index_by_id(feature_ids)
+    values: list[list[str]] = [[] for _ in feature_ids]
+    for feature_id, raw_values in source_map.items():
+        index = index_by_id.get(_normalize_text(feature_id))
+        if index is None:
+            raise ValueError(f"Cannot compact cores: feature id {feature_id!r} is missing from runtime political meta.")
+        normalized_values = [
+            _normalize_text(tag).upper()
+            for tag in (raw_values if isinstance(raw_values, list) else [])
+            if _normalize_text(tag)
+        ]
+        values[index] = normalized_values
+    compact_payload = {
+        "encoding": STARTUP_FEATURE_ORDER_ASSIGNMENT_ENCODING,
+        "values": values,
+    }
+    if "baseline_hash" in payload:
+        compact_payload["baseline_hash"] = payload["baseline_hash"]
+    return compact_payload
+
+
+def expand_compact_runtime_political_meta(payload: dict) -> dict:
+    feature_ids = [
+        _normalize_text(feature_id)
+        for feature_id in (payload.get("featureIds", []) if isinstance(payload, dict) else [])
+        if _normalize_text(feature_id)
+    ]
+    canonical_country_by_index = payload.get("canonicalCountryByIndex", []) if isinstance(payload, dict) else []
+    return {
+        "featureIds": feature_ids,
+        "featureIndexById": _build_feature_index_by_id(feature_ids),
+        "canonicalCountryByFeatureId": {
+            feature_id: _normalize_text(canonical_country_by_index[index]).upper()
+            for index, feature_id in enumerate(feature_ids)
+        },
+        "neighborGraph": payload.get("neighborGraph", []) if isinstance(payload, dict) else [],
+    }
+
+
+def expand_compact_tag_assignment_payload(payload: dict, feature_ids: list[str], map_key: str) -> dict:
+    values = payload.get("values", []) if isinstance(payload, dict) else []
+    expanded_map = {}
+    for index, feature_id in enumerate(feature_ids):
+        raw_value = values[index] if isinstance(values, list) and index < len(values) else ""
+        normalized = _normalize_text(raw_value).upper()
+        if normalized:
+            expanded_map[feature_id] = normalized
+    expanded_payload = {map_key: expanded_map}
+    if isinstance(payload, dict) and "baseline_hash" in payload:
+        expanded_payload["baseline_hash"] = payload["baseline_hash"]
+    if isinstance(payload, dict) and "owner_baseline_hash" in payload:
+        expanded_payload["owner_baseline_hash"] = payload["owner_baseline_hash"]
+    return expanded_payload
+
+
+def expand_compact_core_assignment_payload(payload: dict, feature_ids: list[str]) -> dict:
+    values = payload.get("values", []) if isinstance(payload, dict) else []
+    expanded_map = {}
+    for index, feature_id in enumerate(feature_ids):
+        raw_values = values[index] if isinstance(values, list) and index < len(values) else []
+        normalized_values = [
+            _normalize_text(tag).upper()
+            for tag in (raw_values if isinstance(raw_values, list) else [])
+            if _normalize_text(tag)
+        ]
+        if normalized_values:
+            expanded_map[feature_id] = normalized_values
+    expanded_payload = {"cores": expanded_map}
+    if isinstance(payload, dict) and "baseline_hash" in payload:
+        expanded_payload["baseline_hash"] = payload["baseline_hash"]
+    return expanded_payload
 
 
 def build_startup_runtime_shell(runtime_bootstrap_topology: dict) -> dict:
@@ -348,43 +601,31 @@ def build_startup_bundle_payload(
     scenario_manifest: dict,
     data_manifest: dict,
     topology_primary_path: Path,
-    startup_locales_path: Path,
-    startup_locales_payload: dict,
-    geo_aliases_path: Path,
+    full_runtime_topology_path: Path,
     runtime_bootstrap_topology_path: Path,
     countries_path: Path,
     owners_path: Path,
     controllers_path: Path,
     cores_path: Path,
-    geo_locale_patch_path: Path,
 ) -> dict:
     scenario_id = _normalize_text(scenario_manifest.get("scenario_id"))
     if not scenario_id:
         raise ValueError("Scenario manifest is missing scenario_id.")
 
     topology_primary = _read_json(topology_primary_path)
+    slim_topology_primary = build_slim_startup_primary_topology(topology_primary)
+    full_runtime_topology = _read_json(full_runtime_topology_path)
     runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
-    runtime_political_meta = build_runtime_political_meta(runtime_bootstrap_topology)
+    runtime_political_meta = build_runtime_political_meta(full_runtime_topology)
+    runtime_feature_ids = list(runtime_political_meta.get("featureIds", []))
     runtime_shell_topology = build_startup_runtime_shell(runtime_bootstrap_topology)
     countries_payload = _read_json(countries_path)
     owners_payload = _read_json(owners_path)
     controllers_payload = _read_json(controllers_path)
     cores_payload = _read_json(cores_path)
-    geo_locale_patch = _read_json(geo_locale_patch_path)
-    geo_aliases = _read_json(geo_aliases_path)
-    required_geo_keys = collect_required_geo_keys(
-        topology_primary,
-        runtime_bootstrap_topology,
-        geo_locale_patch,
-    )
-    pruned_locales_payload = prune_startup_geo_locales(startup_locales_payload, required_geo_keys)
-    pruned_geo_aliases = prune_startup_geo_aliases(geo_aliases, required_geo_keys)
-    apply_seed = build_startup_apply_seed(
-        scenario_id,
-        scenario_manifest,
-        countries_payload,
-        owners_payload,
-    )
+    compact_owners_payload = compact_tag_assignment_payload(owners_payload, runtime_feature_ids, "owners")
+    compact_controllers_payload = compact_tag_assignment_payload(controllers_payload, runtime_feature_ids, "controllers")
+    compact_cores_payload = compact_core_assignment_payload(cores_payload, runtime_feature_ids)
 
     manifest_subset = copy.deepcopy(scenario_manifest)
     manifest_subset["baseline_hash"] = _normalize_text(scenario_manifest.get("baseline_hash"))
@@ -401,32 +642,192 @@ def build_startup_bundle_payload(
         "source": {
             "data_manifest_version": data_manifest.get("version"),
             "data_manifest_generated_at": _normalize_text(data_manifest.get("generated_at")),
-            "startup_locales_sha256": _sha256_path(startup_locales_path),
             "base_topology_sha256": _sha256_path(topology_primary_path),
+            "runtime_topology_sha256": _sha256_path(full_runtime_topology_path),
             "runtime_bootstrap_topology_sha256": _sha256_path(runtime_bootstrap_topology_path),
-            "geo_aliases_sha256": _sha256_path(geo_aliases_path),
             "countries_sha256": _sha256_path(countries_path),
             "owners_sha256": _sha256_path(owners_path),
             "controllers_sha256": _sha256_path(controllers_path),
             "cores_sha256": _sha256_path(cores_path),
-            "geo_locale_patch_sha256": _sha256_path(geo_locale_patch_path),
         },
         "manifest_subset": manifest_subset,
         "base": {
-            "topology_primary": topology_primary,
-            "locales": pruned_locales_payload,
-            "geo_aliases": pruned_geo_aliases,
+            "topology_primary": slim_topology_primary,
         },
         "scenario": {
             "bootstrap_strategy": STARTUP_BOOTSTRAP_STRATEGY,
             "countries": countries_payload,
-            "owners": owners_payload,
-            "controllers": controllers_payload,
-            "cores": cores_payload,
-            "geo_locale_patch": geo_locale_patch,
+            "owners": compact_owners_payload,
+            "controllers": compact_controllers_payload,
+            "cores": compact_cores_payload,
             "runtime_topology_bootstrap": runtime_shell_topology,
             "runtime_political_meta": runtime_political_meta,
-            "apply_seed": apply_seed,
+        },
+    }
+
+def _iter_topology_arc_indexes(node: Any):
+    if isinstance(node, bool):
+        return
+    if isinstance(node, int):
+        yield node if node >= 0 else ~node
+        return
+    if isinstance(node, list):
+        for child in node:
+            yield from _iter_topology_arc_indexes(child)
+
+
+def _remap_topology_arc_indexes(node: Any, index_map: dict[int, int]) -> Any:
+    if isinstance(node, bool):
+        return node
+    if isinstance(node, int):
+        source_index = node if node >= 0 else ~node
+        remapped_index = index_map[source_index]
+        return remapped_index if node >= 0 else ~remapped_index
+    if isinstance(node, list):
+        return [_remap_topology_arc_indexes(child, index_map) for child in node]
+    return copy.deepcopy(node)
+
+
+def _prune_geometry_properties(properties: Any, allowed_keys: tuple[str, ...]) -> dict[str, Any]:
+    if not isinstance(properties, dict):
+        return {}
+    next_properties: dict[str, Any] = {}
+    for key in allowed_keys:
+        if key not in properties:
+            continue
+        value = properties[key]
+        if value is None or value == "":
+            continue
+        next_properties[key] = copy.deepcopy(value)
+    return next_properties
+
+
+def _copy_pruned_topology_geometry(geometry: Any, allowed_keys: tuple[str, ...]) -> Any:
+    if not isinstance(geometry, dict):
+        return copy.deepcopy(geometry)
+    next_geometry: dict[str, Any] = {}
+    for key, value in geometry.items():
+        if key == "properties":
+            pruned_properties = _prune_geometry_properties(value, allowed_keys)
+            if pruned_properties:
+                next_geometry[key] = pruned_properties
+            continue
+        if key == "geometries" and isinstance(value, list):
+            next_geometry[key] = [_copy_pruned_topology_geometry(child, allowed_keys) for child in value]
+            continue
+        next_geometry[key] = copy.deepcopy(value)
+    return next_geometry
+
+
+def _collect_topology_object_arc_indexes(object_payload: dict[str, Any]) -> list[int]:
+    indexes: list[int] = []
+    seen: set[int] = set()
+    geometries = object_payload.get("geometries") if isinstance(object_payload, dict) else None
+    if not isinstance(geometries, list):
+        return indexes
+    for geometry in geometries:
+        for arc_index in _iter_topology_arc_indexes((geometry or {}).get("arcs")):
+            if arc_index in seen:
+                continue
+            seen.add(arc_index)
+            indexes.append(arc_index)
+    return indexes
+
+
+def _remap_topology_geometry_arcs(geometry: Any, index_map: dict[int, int]) -> Any:
+    if not isinstance(geometry, dict):
+        return copy.deepcopy(geometry)
+    next_geometry: dict[str, Any] = {}
+    for key, value in geometry.items():
+        if key == "arcs":
+            next_geometry[key] = _remap_topology_arc_indexes(value, index_map)
+            continue
+        if key == "geometries" and isinstance(value, list):
+            next_geometry[key] = [_remap_topology_geometry_arcs(child, index_map) for child in value]
+            continue
+        next_geometry[key] = copy.deepcopy(value)
+    return next_geometry
+
+
+def _copy_slim_startup_primary_object(object_name: str, object_payload: dict[str, Any], index_map: dict[int, int]) -> dict[str, Any]:
+    allowed_keys = STARTUP_PRIMARY_PROPERTY_WHITELISTS.get(object_name, ())
+    next_object: dict[str, Any] = {}
+    for key, value in object_payload.items():
+        if key == "geometries" and isinstance(value, list):
+            next_object[key] = [
+                _remap_topology_geometry_arcs(
+                    _copy_pruned_topology_geometry(geometry, allowed_keys),
+                    index_map,
+                )
+                for geometry in value
+            ]
+            continue
+        next_object[key] = copy.deepcopy(value)
+    return next_object
+
+
+def build_slim_startup_primary_topology(topology_primary: dict) -> dict:
+    if not isinstance(topology_primary, dict):
+        raise TypeError("startup topology_primary must be a JSON object")
+    source_objects = topology_primary.get("objects")
+    source_arcs = topology_primary.get("arcs")
+    if not isinstance(source_objects, dict) or not isinstance(source_arcs, list):
+        return copy.deepcopy(topology_primary)
+
+    kept_objects: dict[str, dict[str, Any]] = {}
+    used_arc_indexes: list[int] = []
+    seen_arc_indexes: set[int] = set()
+
+    for object_name in STARTUP_PRIMARY_KEEP_OBJECTS:
+        object_payload = source_objects.get(object_name)
+        if not isinstance(object_payload, dict):
+            continue
+        kept_objects[object_name] = copy.deepcopy(object_payload)
+        for arc_index in _collect_topology_object_arc_indexes(object_payload):
+            if arc_index in seen_arc_indexes:
+                continue
+            seen_arc_indexes.add(arc_index)
+            used_arc_indexes.append(arc_index)
+
+    index_map = {source_index: new_index for new_index, source_index in enumerate(used_arc_indexes)}
+    next_topology = {
+        key: copy.deepcopy(value)
+        for key, value in topology_primary.items()
+        if key not in {"objects", "arcs"}
+    }
+    next_topology["objects"] = {
+        object_name: _copy_slim_startup_primary_object(object_name, object_payload, index_map)
+        for object_name, object_payload in kept_objects.items()
+    }
+    next_topology["arcs"] = [copy.deepcopy(source_arcs[index]) for index in used_arc_indexes]
+    return next_topology
+
+
+def build_startup_primary_slimming_report(source_topology_primary: dict, slim_topology_primary: dict) -> dict:
+    source_objects = source_topology_primary.get("objects", {}) if isinstance(source_topology_primary, dict) else {}
+    slim_objects = slim_topology_primary.get("objects", {}) if isinstance(slim_topology_primary, dict) else {}
+    before_bytes = _json_size_bytes(source_topology_primary)
+    after_bytes = _json_size_bytes(slim_topology_primary)
+    return {
+        "before_bytes": before_bytes,
+        "after_bytes": after_bytes,
+        "bytes_saved": max(0, before_bytes - after_bytes),
+        "before_arc_count": len(source_topology_primary.get("arcs", []) if isinstance(source_topology_primary, dict) else []),
+        "after_arc_count": len(slim_topology_primary.get("arcs", []) if isinstance(slim_topology_primary, dict) else []),
+        "before_object_names": sorted(source_objects.keys()) if isinstance(source_objects, dict) else [],
+        "after_object_names": sorted(slim_objects.keys()) if isinstance(slim_objects, dict) else [],
+        "removed_objects": sorted(
+            set(source_objects.keys()) - set(slim_objects.keys())
+        ) if isinstance(source_objects, dict) and isinstance(slim_objects, dict) else [],
+        "before_object_geometry_counts": {
+            object_name: len((object_payload or {}).get("geometries", []))
+            for object_name, object_payload in source_objects.items()
+            if isinstance(object_payload, dict)
+        },
+        "after_object_geometry_counts": {
+            object_name: len((object_payload or {}).get("geometries", []))
+            for object_name, object_payload in slim_objects.items()
+            if isinstance(object_payload, dict)
         },
     }
 
@@ -438,37 +839,126 @@ def build_startup_bundle_report(
     gzip_paths_by_language: dict[str, Path],
     startup_locales_payload_by_language: dict[str, dict],
     original_geo_aliases: dict,
+    topology_primary_source_path: Path | None = None,
+    startup_locales_path: Path | None = None,
+    geo_aliases_path: Path | None = None,
+    geo_locale_patch_paths_by_language: dict[str, Path] | None = None,
     report_path: Path | None,
 ) -> dict:
+    source_topology_primary = (
+        _read_json(topology_primary_source_path)
+        if topology_primary_source_path and topology_primary_source_path.exists()
+        else None
+    )
+    startup_geo_aliases_payload = (
+        _read_json(geo_aliases_path)
+        if geo_aliases_path and geo_aliases_path.exists()
+        else {"alias_to_stable_key": {}}
+    )
+    file_audit = {
+        "startup_bundle": {},
+        "startup_primary_source": {
+            "path": str(topology_primary_source_path) if topology_primary_source_path else "",
+            "raw_bytes": topology_primary_source_path.stat().st_size if topology_primary_source_path and topology_primary_source_path.exists() else 0,
+            "role": "startup base topology source",
+            "consumers": {
+                "default_startup": [
+                    "js/workers/startup_boot.worker.js",
+                    "js/main.js",
+                ],
+                "scenario_apply": [],
+            },
+        },
+        "startup_locales": {
+            "path": str(startup_locales_path) if startup_locales_path else "",
+            "raw_bytes": startup_locales_path.stat().st_size if startup_locales_path and startup_locales_path.exists() else 0,
+            "role": "scenario-scoped startup support file",
+            "consumers": STARTUP_FAMILY_CONSUMER_MATRIX["startup_locales"],
+        },
+        "startup_geo_aliases": {
+            "path": str(geo_aliases_path) if geo_aliases_path else "",
+            "raw_bytes": geo_aliases_path.stat().st_size if geo_aliases_path and geo_aliases_path.exists() else 0,
+            "role": "scenario-scoped startup alias support file",
+            "consumers": STARTUP_FAMILY_CONSUMER_MATRIX["startup_geo_aliases"],
+        },
+        "geo_locale_patch": {},
+    }
     report = {
         "version": STARTUP_BUNDLE_VERSION,
         "generated_at": next(iter(payload_by_language.values())).get("generated_at", ""),
         "scenario_id": next(iter(payload_by_language.values())).get("scenario_id", ""),
         "gzip_budget_bytes": STARTUP_BUNDLE_GZIP_BUDGET_BYTES,
+        "consumer_matrix": STARTUP_FAMILY_CONSUMER_MATRIX,
+        "section_roles": STARTUP_FAMILY_SECTION_ROLES,
+        "duplication_suspects": list(STARTUP_FAMILY_DUPLICATION_SUSPECTS),
+        "file_audit": file_audit,
         "languages": {},
     }
+    first_payload = next(iter(payload_by_language.values()), {})
+    slim_topology_primary = first_payload.get("base", {}).get("topology_primary") if isinstance(first_payload, dict) else None
+    report["startup_primary_slimming"] = (
+        build_startup_primary_slimming_report(source_topology_primary, slim_topology_primary)
+        if isinstance(source_topology_primary, dict) and isinstance(slim_topology_primary, dict)
+        else {
+            "before_bytes": 0,
+            "after_bytes": _json_size_bytes(slim_topology_primary) if isinstance(slim_topology_primary, dict) else 0,
+            "bytes_saved": 0,
+            "before_arc_count": 0,
+            "after_arc_count": len(slim_topology_primary.get("arcs", [])) if isinstance(slim_topology_primary, dict) else 0,
+            "before_object_names": [],
+            "after_object_names": sorted((slim_topology_primary.get("objects") or {}).keys()) if isinstance(slim_topology_primary, dict) else [],
+            "removed_objects": [],
+            "before_object_geometry_counts": {},
+            "after_object_geometry_counts": {
+                object_name: len((object_payload or {}).get("geometries", []))
+                for object_name, object_payload in (slim_topology_primary.get("objects") or {}).items()
+                if isinstance(object_payload, dict)
+            } if isinstance(slim_topology_primary, dict) else {},
+        }
+    )
     for language, payload in payload_by_language.items():
         output_path = output_paths_by_language[language]
         gzip_path = gzip_paths_by_language[language]
         raw_bytes = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         original_locales_payload = startup_locales_payload_by_language[language]
         original_geo_alias_map = original_geo_aliases.get("alias_to_stable_key", {}) if isinstance(original_geo_aliases, dict) else {}
-        pruned_locales_payload = payload["base"]["locales"]
-        pruned_geo_aliases = payload["base"]["geo_aliases"]
+        pruned_locales_payload = original_locales_payload
+        pruned_geo_aliases = startup_geo_aliases_payload
         runtime_shell = payload.get("scenario", {}).get("runtime_topology_bootstrap", {})
         runtime_political_meta = payload.get("scenario", {}).get("runtime_political_meta", {})
         runtime_shell_objects = runtime_shell.get("objects", {}) if isinstance(runtime_shell, dict) else {}
         runtime_feature_ids = runtime_political_meta.get("featureIds", []) if isinstance(runtime_political_meta, dict) else []
-        owner_keys = set(
-            _normalize_stable_key(key)
-            for key in (payload.get("scenario", {}).get("owners", {}).get("owners", {}) or {}).keys()
-            if _normalize_stable_key(key)
+        expanded_runtime_political_meta = expand_compact_runtime_political_meta(runtime_political_meta)
+        expanded_owners_payload = expand_compact_tag_assignment_payload(
+            payload.get("scenario", {}).get("owners", {}),
+            runtime_feature_ids,
+            "owners",
         )
-        controller_keys = set(
-            _normalize_stable_key(key)
-            for key in (payload.get("scenario", {}).get("controllers", {}).get("controllers", {}) or {}).keys()
-            if _normalize_stable_key(key)
+        expanded_controllers_payload = expand_compact_tag_assignment_payload(
+            payload.get("scenario", {}).get("controllers", {}),
+            runtime_feature_ids,
+            "controllers",
         )
+        expanded_cores_payload = expand_compact_core_assignment_payload(
+            payload.get("scenario", {}).get("cores", {}),
+            runtime_feature_ids,
+        )
+        legacy_apply_seed = build_startup_apply_seed(
+            _normalize_text(payload.get("scenario_id")),
+            payload.get("manifest_subset", {}) if isinstance(payload.get("manifest_subset"), dict) else {},
+            payload.get("scenario", {}).get("countries", {}) if isinstance(payload.get("scenario"), dict) else {},
+            expanded_owners_payload,
+        )
+        owner_keys = {
+            _normalize_stable_key(key)
+            for key in (expanded_owners_payload.get("owners", {}) or {}).keys()
+            if _normalize_stable_key(key)
+        }
+        controller_keys = {
+            _normalize_stable_key(key)
+            for key in (expanded_controllers_payload.get("controllers", {}) or {}).keys()
+            if _normalize_stable_key(key)
+        }
         runtime_feature_id_set = {
             _normalize_stable_key(feature_id)
             for feature_id in runtime_feature_ids
@@ -479,6 +969,30 @@ def build_startup_bundle_report(
         feature_count = len(runtime_feature_id_set)
         owner_overlap_ratio = owner_overlap_count / feature_count if feature_count else 1.0
         controller_overlap_ratio = controller_overlap_count / feature_count if feature_count else 1.0
+        section_bytes = {
+            "base.topology_primary": _json_size_bytes(payload["base"]["topology_primary"]),
+            "scenario.countries": _json_size_bytes(payload["scenario"]["countries"]),
+            "scenario.owners": _json_size_bytes(payload["scenario"]["owners"]),
+            "scenario.controllers": _json_size_bytes(payload["scenario"]["controllers"]),
+            "scenario.cores": _json_size_bytes(payload["scenario"]["cores"]),
+            "scenario.runtime_topology_bootstrap": _json_size_bytes(payload["scenario"].get("runtime_topology_bootstrap")),
+            "scenario.runtime_political_meta": _json_size_bytes(payload["scenario"].get("runtime_political_meta")),
+        }
+        report["file_audit"]["startup_bundle"][language] = {
+            "path": str(output_path),
+            "raw_bytes": output_path.stat().st_size if output_path.exists() else 0,
+            "gzip_path": str(gzip_path),
+            "gzip_file_bytes": gzip_path.stat().st_size if gzip_path.exists() else 0,
+            "consumers": STARTUP_FAMILY_CONSUMER_MATRIX["startup_bundle"],
+            "gzip_consumers": STARTUP_FAMILY_CONSUMER_MATRIX["gzip_sidecar"],
+        }
+        if geo_locale_patch_paths_by_language and language in geo_locale_patch_paths_by_language:
+            patch_path = geo_locale_patch_paths_by_language[language]
+            report["file_audit"]["geo_locale_patch"][language] = {
+                "path": str(patch_path),
+                "raw_bytes": patch_path.stat().st_size if patch_path.exists() else 0,
+                "consumers": STARTUP_FAMILY_CONSUMER_MATRIX["geo_locale_patch"],
+            }
         report["languages"][language] = {
             "output_path": str(output_path),
             "gzip_output_path": str(gzip_path),
@@ -501,33 +1015,47 @@ def build_startup_bundle_report(
                 "controller_feature_overlap_count": controller_overlap_count,
                 "controller_feature_overlap_ratio": controller_overlap_ratio,
             },
+            "section_bytes": section_bytes,
+            "startup_core_compaction": {
+                "runtime_political_meta": {
+                    "before_bytes": _json_size_bytes(expanded_runtime_political_meta),
+                    "after_bytes": _json_size_bytes(runtime_political_meta),
+                },
+                "owners": {
+                    "before_bytes": _json_size_bytes(expanded_owners_payload),
+                    "after_bytes": _json_size_bytes(payload["scenario"]["owners"]),
+                },
+                "controllers": {
+                    "before_bytes": _json_size_bytes(expanded_controllers_payload),
+                    "after_bytes": _json_size_bytes(payload["scenario"]["controllers"]),
+                },
+                "cores": {
+                    "before_bytes": _json_size_bytes(expanded_cores_payload),
+                    "after_bytes": _json_size_bytes(payload["scenario"]["cores"]),
+                },
+                "apply_seed": {
+                    "before_bytes": _json_size_bytes(legacy_apply_seed),
+                    "after_bytes": 0,
+                },
+            },
+            "external_support_bytes": {
+                "startup_locales": startup_locales_path.stat().st_size if startup_locales_path and startup_locales_path.exists() else 0,
+                "startup_geo_aliases": geo_aliases_path.stat().st_size if geo_aliases_path and geo_aliases_path.exists() else 0,
+            },
+            "external_patch_bytes": {
+                "geo_locale_patch": (
+                    geo_locale_patch_paths_by_language[language].stat().st_size
+                    if geo_locale_patch_paths_by_language and language in geo_locale_patch_paths_by_language and geo_locale_patch_paths_by_language[language].exists()
+                    else 0
+                ),
+            },
+            "section_roles": STARTUP_FAMILY_SECTION_ROLES,
+            "duplication_suspects": list(STARTUP_FAMILY_DUPLICATION_SUSPECTS),
             "sections": {
-                "base_topology_raw_bytes": len(
-                    json.dumps(payload["base"]["topology_primary"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                ),
-                "locales_raw_bytes": len(
-                    json.dumps(payload["base"]["locales"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                ),
-                "geo_aliases_raw_bytes": len(
-                    json.dumps(payload["base"]["geo_aliases"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                ),
-                "runtime_bootstrap_raw_bytes": len(
-                    json.dumps(
-                        payload["scenario"].get("runtime_topology_bootstrap"),
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ),
-                "runtime_political_meta_raw_bytes": len(
-                    json.dumps(
-                        payload["scenario"].get("runtime_political_meta"),
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ),
-                "apply_seed_raw_bytes": len(
-                    json.dumps(payload["scenario"]["apply_seed"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                ),
+                "base_topology_raw_bytes": section_bytes["base.topology_primary"],
+                "runtime_bootstrap_raw_bytes": section_bytes["scenario.runtime_topology_bootstrap"],
+                "runtime_political_meta_raw_bytes": section_bytes["scenario.runtime_political_meta"],
+                "apply_seed_raw_bytes": 0,
                 "bootstrap_strategy": payload["scenario"].get("bootstrap_strategy", ""),
             },
         }
@@ -543,6 +1071,7 @@ def build_startup_bundles(
     topology_primary_path: Path,
     startup_locales_path: Path,
     geo_aliases_path: Path,
+    full_runtime_topology_path: Path,
     runtime_bootstrap_topology_path: Path,
     countries_path: Path,
     owners_path: Path,
@@ -578,15 +1107,12 @@ def build_startup_bundles(
             scenario_manifest=scenario_manifest,
             data_manifest=data_manifest,
             topology_primary_path=topology_primary_path,
-            startup_locales_path=startup_locales_path,
-            startup_locales_payload=single_language_locales_payload,
-            geo_aliases_path=geo_aliases_path,
+            full_runtime_topology_path=full_runtime_topology_path,
             runtime_bootstrap_topology_path=runtime_bootstrap_topology_path,
             countries_path=countries_path,
             owners_path=owners_path,
             controllers_path=controllers_path,
             cores_path=cores_path,
-            geo_locale_patch_path=patch_paths_by_language[language],
         )
         payload_by_language[language] = payload
         write_json_atomic(
@@ -605,6 +1131,10 @@ def build_startup_bundles(
         gzip_paths_by_language=gzip_paths_by_language,
         startup_locales_payload_by_language=startup_locales_payload_by_language,
         original_geo_aliases=original_geo_aliases,
+        topology_primary_source_path=topology_primary_path,
+        startup_locales_path=startup_locales_path,
+        geo_aliases_path=geo_aliases_path,
+        geo_locale_patch_paths_by_language=patch_paths_by_language,
         report_path=report_path,
     )
     return {
@@ -623,6 +1153,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--topology-primary", default=str(ROOT / "data/europe_topology.json"))
     parser.add_argument("--startup-locales", default=str(ROOT / "data/scenarios/tno_1962/locales.startup.json"))
     parser.add_argument("--geo-aliases", default=str(ROOT / "data/scenarios/tno_1962/geo_aliases.startup.json"))
+    parser.add_argument("--full-runtime-topology", required=True)
     parser.add_argument("--runtime-bootstrap-topology", required=True)
     parser.add_argument("--countries", required=True)
     parser.add_argument("--owners", required=True)
@@ -644,6 +1175,7 @@ def main() -> None:
         topology_primary_path=Path(args.topology_primary).resolve(),
         startup_locales_path=Path(args.startup_locales).resolve(),
         geo_aliases_path=Path(args.geo_aliases).resolve(),
+        full_runtime_topology_path=Path(args.full_runtime_topology).resolve(),
         runtime_bootstrap_topology_path=Path(args.runtime_bootstrap_topology).resolve(),
         countries_path=Path(args.countries).resolve(),
         owners_path=Path(args.owners).resolve(),

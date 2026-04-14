@@ -137,8 +137,69 @@ class PublishScenarioOutputsTest(unittest.TestCase):
             self.assertEqual(
                 result["startupAssets"]["publishedPaths"],
                 [
+                    str(scenario_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME),
                     str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME),
                     str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME),
+                ],
+            )
+
+    def test_publish_startup_support_assets_target_for_tno_copies_only_supporting_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = _create_scenario_fixture(root)
+            checkpoint_dir = root / ".runtime" / "tmp" / "startup_support_publish_checkpoint"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            from tools import patch_tno_1962_bundle as tno_bundle
+
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME, {"objects": {}})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME, {"geo": {}})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME, {"alias_to_stable_key": {}})
+
+            with scenario_publish_service.load_locked_publish_context("tno_1962", root=root) as context:
+                result = scenario_publish_service.publish_scenario_outputs_in_locked_context(
+                    context,
+                    target="startup-support-assets",
+                    root=root,
+                    checkpoint_dir=checkpoint_dir,
+                )
+
+            self.assertTrue((scenario_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME).exists())
+            self.assertFalse((scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME).exists())
+            self.assertEqual(
+                result["startupSupportAssets"]["publishedPaths"],
+                [
+                    str(scenario_dir / tno_bundle.CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME),
+                    str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME),
+                ],
+            )
+
+    def test_publish_startup_bundle_assets_target_for_tno_copies_only_bundle_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = _create_scenario_fixture(root)
+            checkpoint_dir = root / ".runtime" / "tmp" / "startup_bundle_publish_checkpoint"
+            checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            from tools import patch_tno_1962_bundle as tno_bundle
+
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, {"language": "en"})
+            _write_json(checkpoint_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME, {"language": "zh"})
+
+            with scenario_publish_service.load_locked_publish_context("tno_1962", root=root) as context:
+                result = scenario_publish_service.publish_scenario_outputs_in_locked_context(
+                    context,
+                    target="startup-bundle-assets",
+                    root=root,
+                    checkpoint_dir=checkpoint_dir,
+                )
+
+            self.assertTrue((scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME).exists())
+            self.assertFalse((scenario_dir / tno_bundle.CHECKPOINT_STARTUP_LOCALES_FILENAME).exists())
+            self.assertEqual(
+                result["startupBundleAssets"]["publishedPaths"],
+                [
                     str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME),
                     str(scenario_dir / tno_bundle.CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME),
                 ],

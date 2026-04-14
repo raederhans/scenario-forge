@@ -136,8 +136,12 @@ const UNIFIED_WATER_STROKE_COLOR = "rgba(62, 96, 138, 0)";
 const UNIFIED_WATER_FILL_OPACITY = 1;
 const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
 const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
+const RELIEF_ATLANTROPA_SALT_FILL_COLOR = "rgba(0, 0, 0, 0)";
+const RELIEF_ATLANTROPA_SALT_STROKE_COLOR = "rgba(148, 163, 184, 0.22)";
 const RELIEF_SHORELINE_COLOR = "rgba(109, 84, 50, 0.78)";
 const RELIEF_CONTOUR_COLOR = "rgba(176, 148, 103, 0.6)";
+const RELIEF_ATLANTROPA_SHORELINE_COLOR = "rgba(148, 163, 184, 0.36)";
+const RELIEF_ATLANTROPA_CONTOUR_COLOR = "rgba(148, 163, 184, 0.18)";
 const RELIEF_SWAMP_FILL_COLOR = "rgba(128, 150, 114, 0.28)";
 const RELIEF_SWAMP_STROKE_COLOR = "rgba(88, 108, 76, 0.68)";
 const RELIEF_LAKE_SHORELINE_COLOR = "rgba(214, 232, 244, 0.92)";
@@ -2018,6 +2022,14 @@ function isMacroOceanWaterRegion(feature) {
   );
 }
 
+function isOpenOceanSelectionEnabled() {
+  return !!state.allowOpenOceanSelect || (!!state.showOpenOceanRegions && !state.allowOpenOceanPaint);
+}
+
+function isOpenOceanPaintEnabled() {
+  return !!state.allowOpenOceanPaint || (!!state.showOpenOceanRegions && !state.allowOpenOceanSelect);
+}
+
 function isWaterRegionRenderable(feature) {
   if (!feature) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
@@ -2032,7 +2044,7 @@ function isWaterRegionEnabled(feature) {
     return true;
   }
   if (isOpenOceanWaterRegion(feature)) {
-    return !!state.showOpenOceanRegions;
+    return isOpenOceanSelectionEnabled() || isOpenOceanPaintEnabled();
   }
   return feature?.properties?.interactive !== false;
 }
@@ -2172,10 +2184,20 @@ function getReliefOverlayKind(feature) {
   return String(feature?.properties?.overlay_kind || "").trim().toLowerCase();
 }
 
+function isAtlantropaReliefOverlayFeature(feature) {
+  if (String(state.activeScenarioId || "").trim().toLowerCase() !== "tno_1962") {
+    return false;
+  }
+  return String(feature?.properties?.id || "").trim().toLowerCase().startsWith("atlantropa_");
+}
+
 function isReliefOverlayEnabled(feature) {
   if (!feature) return false;
   if (!state.activeScenarioId) return false;
   if (!state.showScenarioReliefOverlays) return false;
+  if (isAtlantropaReliefOverlayFeature(feature) && !state.detailPromotionCompleted) {
+    return false;
+  }
   if (isBaseGeographyScenarioFeature(feature)) return true;
   return feature?.properties?.interactive !== false;
 }
@@ -2208,8 +2230,17 @@ function getAtlantropaAccentSuppressionFeatures() {
 
 function getReliefOverlayStyle(feature) {
   const kind = getReliefOverlayKind(feature);
+  const isAtlantropaRelief = isAtlantropaReliefOverlayFeature(feature);
   switch (kind) {
     case "salt_flat_texture":
+      if (isAtlantropaRelief) {
+        return {
+          fill: RELIEF_ATLANTROPA_SALT_FILL_COLOR,
+          stroke: RELIEF_ATLANTROPA_SALT_STROKE_COLOR,
+          lineWidth: 0.55,
+          fillAlpha: 1,
+        };
+      }
       return {
         fill: RELIEF_SALT_FILL_COLOR,
         stroke: RELIEF_SALT_STROKE_COLOR,
@@ -2219,14 +2250,14 @@ function getReliefOverlayStyle(feature) {
     case "new_shoreline":
       return {
         fill: null,
-        stroke: RELIEF_SHORELINE_COLOR,
-        lineWidth: 1.35,
+        stroke: isAtlantropaRelief ? RELIEF_ATLANTROPA_SHORELINE_COLOR : RELIEF_SHORELINE_COLOR,
+        lineWidth: isAtlantropaRelief ? 1.1 : 1.35,
       };
     case "drained_basin_contour":
       return {
         fill: null,
-        stroke: RELIEF_CONTOUR_COLOR,
-        lineWidth: 1,
+        stroke: isAtlantropaRelief ? RELIEF_ATLANTROPA_CONTOUR_COLOR : RELIEF_CONTOUR_COLOR,
+        lineWidth: isAtlantropaRelief ? 0.8 : 1,
       };
     case "swamp_margin":
       return {
@@ -21690,6 +21721,12 @@ async function handleClick(event, _interactionContext = null) {
     state.selectedWaterRegionId = id;
     if (typeof state.renderWaterRegionListFn === "function") {
       state.renderWaterRegionListFn();
+    }
+    const macroOceanSelectionOnly =
+      isMacroOceanWaterRegion(waterFeature) && !isOpenOceanPaintEnabled();
+    if (macroOceanSelectionOnly) {
+      noteRenderAction("click-select-open-ocean", actionStart);
+      return;
     }
     if (state.currentTool === "eraser") {
       const historyBefore = captureHistoryState({ waterRegionIds: [id] });

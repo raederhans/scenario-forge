@@ -85,6 +85,18 @@ function resolveTaskTimeoutMs(type, timeoutMs = null) {
   return STARTUP_WORKER_TIMEOUTS_MS[type] || STARTUP_WORKER_TIMEOUT_MS;
 }
 
+function resolveWorkerResourceUrl(url) {
+  const normalizedUrl = String(url || "").trim();
+  if (!normalizedUrl) {
+    return "";
+  }
+  try {
+    return new URL(normalizedUrl, globalThis.location?.href || import.meta.url).toString();
+  } catch (_error) {
+    return normalizedUrl;
+  }
+}
+
 function ensureStartupWorker() {
   if (startupWorker) {
     return Promise.resolve(startupWorker);
@@ -152,9 +164,9 @@ export async function loadBaseStartupViaWorker({
   timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_BASE_STARTUP, {
-    topologyUrl,
-    localesUrl,
-    geoAliasesUrl,
+    topologyUrl: resolveWorkerResourceUrl(topologyUrl),
+    localesUrl: resolveWorkerResourceUrl(localesUrl),
+    geoAliasesUrl: resolveWorkerResourceUrl(geoAliasesUrl),
     needTopologyPrimary,
     needLocales,
     needGeoAliases,
@@ -175,7 +187,7 @@ export async function loadStartupBundleViaWorker({
   timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_STARTUP_BUNDLE, {
-    startupBundleUrl,
+    startupBundleUrl: resolveWorkerResourceUrl(startupBundleUrl),
     scenarioId,
     language,
   }, { timeoutMs });
@@ -193,7 +205,7 @@ export async function loadScenarioRuntimeBootstrapViaWorker({
   timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_SCENARIO_RUNTIME_BOOTSTRAP, {
-    runtimeTopologyUrl,
+    runtimeTopologyUrl: resolveWorkerResourceUrl(runtimeTopologyUrl),
   }, { timeoutMs });
   return {
     runtimePoliticalTopology: message.runtimePoliticalTopology || null,
@@ -210,8 +222,8 @@ export async function decodeRuntimeChunkViaWorker({
   timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.DECODE_RUNTIME_CHUNK, {
-    runtimeTopologyUrl,
-    chunkUrl,
+    runtimeTopologyUrl: resolveWorkerResourceUrl(runtimeTopologyUrl),
+    chunkUrl: resolveWorkerResourceUrl(chunkUrl),
     chunkType,
   }, { timeoutMs });
   return {

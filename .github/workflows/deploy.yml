@@ -70,13 +70,16 @@ jobs:
       - name: Generate Map Data
         run: python init_map_data.py
 
+      - name: Assemble Pages dist
+        run: python tools/build_pages_dist.py
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'dist'
 
   deploy:
     environment:

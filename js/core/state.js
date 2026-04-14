@@ -1806,6 +1806,8 @@ export const state = {
   zoomTransform: defaultZoom,
   showWaterRegions: true,
   showOpenOceanRegions: false,
+  allowOpenOceanSelect: false,
+  allowOpenOceanPaint: false,
   showScenarioSpecialRegions: true,
   showScenarioReliefOverlays: true,
   showCityPoints: true,

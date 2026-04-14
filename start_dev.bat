@@ -20,13 +20,13 @@ call run_server.bat %*
 exit /b %ERRORLEVEL%
 
 :fast
-set "MAPCREATOR_OPEN_PATH=/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1"
+set "MAPCREATOR_OPEN_PATH=/app/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1"
 set "MAPCREATOR_DEV_CACHE_MODE=revalidate-static"
 call run_server.bat %*
 exit /b %ERRORLEVEL%
 
 :fresh
-set "MAPCREATOR_OPEN_PATH=/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=0"
+set "MAPCREATOR_OPEN_PATH=/app/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=0"
 set "MAPCREATOR_DEV_CACHE_MODE=nostore"
 call run_server.bat %*
 exit /b %ERRORLEVEL%
