@@ -1512,12 +1512,6 @@ function schedulePostReadyDeferredContextWarmup() {
   if (state.showRivers) {
     requestedLayerNames.push("rivers");
   }
-  if (state.showTransport && state.showAirports) {
-    requestedLayerNames.push("airports");
-  }
-  if (state.showTransport && state.showPorts) {
-    requestedLayerNames.push("ports");
-  }
   if (state.showUrban) {
     requestedLayerNames.push("urban");
   }

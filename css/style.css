@@ -1341,6 +1341,75 @@ details.appearance-subsection > *:not(summary),
   background: rgba(255, 255, 255, 0.72);
 }
 
+.appearance-panel-body {
+  padding: 0 12px 16px;
+}
+
+.appearance-panel-body-transport {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transport-family-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.transport-family-summary-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.transport-family-summary-title {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.transport-family-summary-meta {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.transport-family-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transport-family-section-disabled {
+  opacity: 0.72;
+}
+
+.transport-readout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.74rem;
+}
+
+.transport-readout-label {
+  color: var(--text-secondary);
+}
+
+.transport-readout-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.transport-workbench-reminder-card {
+  margin-top: 2px;
+}
+
 .appearance-prop-heading {
   margin: 0;
   color: var(--text-primary);

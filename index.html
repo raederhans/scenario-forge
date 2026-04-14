@@ -1299,34 +1299,33 @@
                 hidden
               >
                 <h2 id="lblTransportPanel" class="section-header">Transport</h2>
-                <div class="space-y-4 mt-3">
+                <div class="appearance-panel-body appearance-panel-body-transport mt-3">
                   <label class="toggle-label">
                     <input id="transportAppearanceMasterToggle" type="checkbox" class="checkbox-input" />
                     <span id="lblTransportAppearanceMasterToggle" data-i18n="Show Transport Overview">Show Transport Overview</span>
                   </label>
 
-                  <div id="transportAppearanceFamilies" class="space-y-3">
-                    <section id="transportAirportCard" class="appearance-prop-group">
-                      <div class="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 id="lblTransportAirportFamily" class="appearance-prop-heading">Airport</h3>
-                          <p id="transportAirportFamilyHint" class="panel-hint mt-1" data-i18n="Coarse airport context on the main map.">Coarse airport context on the main map.</p>
-                        </div>
-                      </div>
-                      <div id="transportAirportControls" class="space-y-4 mt-3">
+                  <div id="transportAppearanceFamilies" class="appearance-subsection-stack transport-family-stack mt-3">
+                    <details id="transportAirportCard" class="appearance-mini-section transport-family-section">
+                      <summary class="section-header transport-family-summary">
+                        <span class="transport-family-summary-main">
+                          <span id="lblTransportAirportFamily" class="transport-family-summary-title">Airport</span>
+                          <span id="transportAirportSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
+                        </span>
+                      </summary>
+                      <div id="transportAirportControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
                           <h4 id="lblTransportAirportVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
                           <label class="toggle-label">
                             <input id="toggleAirports" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportAirportToggle" data-i18n="Show Airports">Show Airports</span>
                           </label>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportVisibilityPreset" class="range-label" for="airportVisibilityPreset" data-i18n="Visual Preset">Visual Preset</label>
-                            <select id="airportVisibilityPreset" class="select-input">
-                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                              <option value="quiet" data-i18n="Quiet">Quiet</option>
-                              <option value="bold" data-i18n="Bold">Bold</option>
-                            </select>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblAirportVisualStrength" class="range-label" for="airportVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                              <span id="airportVisualStrengthValue" class="range-value">56%</span>
+                            </div>
+                            <input id="airportVisualStrength" type="range" min="0" max="100" value="56" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
@@ -1363,8 +1362,27 @@
 
                         <section class="space-y-3">
                           <h4 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                              <span id="airportCoverageReachValue" class="range-value">50%</span>
+                            </div>
+                            <input id="airportCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                          </div>
+                          <label class="toggle-label">
+                            <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                          </label>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                            <span id="airportScopeResolved" class="transport-readout-value">Major Civil</span>
+                          </div>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                            <span id="airportThresholdResolved" class="transport-readout-value">Secondary</span>
+                          </div>
                           <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Airport Scope">Airport Scope</label>
+                            <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Manual Scope">Manual Scope</label>
                             <select id="airportScope" class="select-input">
                               <option value="international" data-i18n="International">International</option>
                               <option value="major_civil" selected data-i18n="Major Civil">Major Civil</option>
@@ -1372,38 +1390,37 @@
                             </select>
                           </div>
                           <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportImportanceThreshold" class="range-label" for="airportImportanceThreshold" data-i18n="Importance Threshold">Importance Threshold</label>
+                            <label id="lblAirportImportanceThreshold" class="range-label" for="airportImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
                             <select id="airportImportanceThreshold" class="select-input">
-                              <option value="primary" selected data-i18n="Primary">Primary</option>
-                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="primary" data-i18n="Primary">Primary</option>
+                              <option value="secondary" selected data-i18n="Secondary">Secondary</option>
                               <option value="all" data-i18n="All">All</option>
                             </select>
                           </div>
                         </section>
                       </div>
-                    </section>
+                    </details>
 
-                    <section id="transportPortCard" class="appearance-prop-group">
-                      <div class="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 id="lblTransportPortFamily" class="appearance-prop-heading">Port</h3>
-                          <p id="transportPortFamilyHint" class="panel-hint mt-1" data-i18n="Coarse port context on the main map.">Coarse port context on the main map.</p>
-                        </div>
-                      </div>
-                      <div id="transportPortControls" class="space-y-4 mt-3">
+                    <details id="transportPortCard" class="appearance-mini-section transport-family-section">
+                      <summary class="section-header transport-family-summary">
+                        <span class="transport-family-summary-main">
+                          <span id="lblTransportPortFamily" class="transport-family-summary-title">Port</span>
+                          <span id="transportPortSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
+                        </span>
+                      </summary>
+                      <div id="transportPortControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
                           <h4 id="lblTransportPortVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
                           <label class="toggle-label">
                             <input id="togglePorts" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportPortToggle" data-i18n="Show Ports">Show Ports</span>
                           </label>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortVisibilityPreset" class="range-label" for="portVisibilityPreset" data-i18n="Visual Preset">Visual Preset</label>
-                            <select id="portVisibilityPreset" class="select-input">
-                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                              <option value="quiet" data-i18n="Quiet">Quiet</option>
-                              <option value="bold" data-i18n="Bold">Bold</option>
-                            </select>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblPortVisualStrength" class="range-label" for="portVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                              <span id="portVisualStrengthValue" class="range-value">54%</span>
+                            </div>
+                            <input id="portVisualStrength" type="range" min="0" max="100" value="54" class="range-input" />
                           </div>
                           <div>
                             <div class="range-row">
@@ -1440,8 +1457,27 @@
 
                         <section class="space-y-3">
                           <h4 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                              <span id="portCoverageReachValue" class="range-value">50%</span>
+                            </div>
+                            <input id="portCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                          </div>
+                          <label class="toggle-label">
+                            <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                          </label>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                            <span id="portScopeResolved" class="transport-readout-value">Regional</span>
+                          </div>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                            <span id="portThresholdResolved" class="transport-readout-value">Secondary</span>
+                          </div>
                           <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Port Tier">Port Tier</label>
+                            <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Manual Scope">Manual Scope</label>
                             <select id="portTier" class="select-input">
                               <option value="core" data-i18n="Core">Core</option>
                               <option value="regional" selected data-i18n="Regional">Regional</option>
@@ -1449,23 +1485,25 @@
                             </select>
                           </div>
                           <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortImportanceThreshold" class="range-label" for="portImportanceThreshold" data-i18n="Importance Threshold">Importance Threshold</label>
+                            <label id="lblPortImportanceThreshold" class="range-label" for="portImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
                             <select id="portImportanceThreshold" class="select-input">
-                              <option value="primary" selected data-i18n="Primary">Primary</option>
-                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="primary" data-i18n="Primary">Primary</option>
+                              <option value="secondary" selected data-i18n="Secondary">Secondary</option>
                               <option value="all" data-i18n="All">All</option>
                             </select>
                           </div>
                         </section>
                       </div>
-                    </section>
+                    </details>
 
-                    <section id="transportRailCard" class="appearance-prop-group opacity-60" aria-disabled="true">
-                      <div>
-                        <h3 id="lblTransportRailFamily" class="appearance-prop-heading">Rail</h3>
-                        <p id="transportRailFamilyHint" class="panel-hint mt-1" data-i18n="Reserved for the future global backbone rail pack.">Reserved for the future global backbone rail pack.</p>
-                      </div>
-                      <div id="transportRailPlaceholder" class="space-y-4 mt-3">
+                    <details id="transportRailCard" class="appearance-mini-section transport-family-section transport-family-section-disabled">
+                      <summary class="section-header transport-family-summary">
+                        <span class="transport-family-summary-main">
+                          <span id="lblTransportRailFamily" class="transport-family-summary-title">Rail</span>
+                          <span id="transportRailSummaryMeta" class="transport-family-summary-meta" data-i18n="Planned">Planned</span>
+                        </span>
+                      </summary>
+                      <div id="transportRailPlaceholder" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-2">
                           <h4 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
                           <p class="panel-hint" data-i18n="Mainline-only visibility controls will land here when the coarse rail family is wired.">Mainline-only visibility controls will land here when the coarse rail family is wired.</p>
@@ -1479,14 +1517,16 @@
                           <p class="panel-hint" data-i18n="Scope will start at global mainline backbone only.">Scope will start at global mainline backbone only.</p>
                         </section>
                       </div>
-                    </section>
+                    </details>
 
-                    <section id="transportRoadCard" class="appearance-prop-group opacity-60" aria-disabled="true">
-                      <div>
-                        <h3 id="lblTransportRoadFamily" class="appearance-prop-heading">Road</h3>
-                        <p id="transportRoadFamilyHint" class="panel-hint mt-1" data-i18n="Reserved for the future global motorway and trunk skeleton pack.">Reserved for the future global motorway and trunk skeleton pack.</p>
-                      </div>
-                      <div id="transportRoadPlaceholder" class="space-y-4 mt-3">
+                    <details id="transportRoadCard" class="appearance-mini-section transport-family-section transport-family-section-disabled">
+                      <summary class="section-header transport-family-summary">
+                        <span class="transport-family-summary-main">
+                          <span id="lblTransportRoadFamily" class="transport-family-summary-title">Road</span>
+                          <span id="transportRoadSummaryMeta" class="transport-family-summary-meta" data-i18n="Planned">Planned</span>
+                        </span>
+                      </summary>
+                      <div id="transportRoadPlaceholder" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-2">
                           <h4 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
                           <p class="panel-hint" data-i18n="Motorway and trunk visibility controls will land here when the coarse road family is wired.">Motorway and trunk visibility controls will land here when the coarse road family is wired.</p>
@@ -1500,10 +1540,10 @@
                           <p class="panel-hint" data-i18n="Scope will start at motorway and trunk skeleton only.">Scope will start at motorway and trunk skeleton only.</p>
                         </section>
                       </div>
-                    </section>
+                    </details>
                   </div>
 
-                  <section class="appearance-prop-group">
+                  <section class="appearance-prop-group transport-workbench-reminder-card">
                     <div class="space-y-2">
                       <h3 id="lblTransportWorkbenchReminder" class="appearance-prop-heading" data-i18n="Transport Workbench">Transport Workbench</h3>
                       <p id="transportWorkbenchReminderHint" class="panel-hint" data-i18n="Open the dedicated workbench for country or region-level transport review and editing.">Open the dedicated workbench for country or region-level transport review and editing.</p>

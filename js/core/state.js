@@ -879,58 +879,134 @@ function normalizeCityLayerStyleConfig(rawConfig) {
 
 const TRANSPORT_OVERVIEW_FAMILY_IDS = Object.freeze(["airport", "port", "rail", "road"]);
 const TRANSPORT_OVERVIEW_LABEL_DENSITIES = Object.freeze(["sparse", "balanced", "dense"]);
+const TRANSPORT_OVERVIEW_SCOPE_LINK_MODES = Object.freeze(["linked", "manual"]);
+
+function clampUnitInterval(value, fallback = 0.5) {
+  return clamp(toFiniteNumber(value, fallback), 0, 1);
+}
+
+function mapLegacyTransportPresetToVisualStrength(value, fallback = 0.56) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "quiet") return 0.32;
+  if (normalized === "bold") return 0.82;
+  if (normalized === "balanced") return 0.56;
+  return fallback;
+}
+
+function mapLegacyTransportScopeToCoverageReach(familyId, value, fallback = 0.5) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return fallback;
+  if (familyId === "airport") {
+    if (normalized === "international") return 0.12;
+    if (normalized === "major_civil") return 0.5;
+    if (normalized === "all_civil") return 0.88;
+  }
+  if (familyId === "port") {
+    if (normalized === "core") return 0.12;
+    if (normalized === "regional") return 0.5;
+    if (normalized === "expanded") return 0.88;
+  }
+  if (familyId === "rail") {
+    if (normalized === "mainline_only") return 0.2;
+    if (normalized === "mainline_plus_regional") return 0.78;
+  }
+  if (familyId === "road") {
+    if (normalized === "motorway_only") return 0.2;
+    if (normalized === "motorway_trunk") return 0.78;
+  }
+  return fallback;
+}
+
+function resolveLinkedTransportOverviewScopeAndThreshold(familyId, coverageReach = 0.5) {
+  const reach = clampUnitInterval(coverageReach, 0.5);
+  switch (String(familyId || "").trim().toLowerCase()) {
+    case "airport":
+      if (reach >= 0.74) return { scope: "all_civil", importanceThreshold: "all" };
+      if (reach >= 0.36) return { scope: "major_civil", importanceThreshold: "secondary" };
+      return { scope: "international", importanceThreshold: "primary" };
+    case "port":
+      if (reach >= 0.74) return { scope: "expanded", importanceThreshold: "all" };
+      if (reach >= 0.36) return { scope: "regional", importanceThreshold: "secondary" };
+      return { scope: "core", importanceThreshold: "primary" };
+    case "rail":
+      if (reach >= 0.58) return { scope: "mainline_plus_regional", importanceThreshold: "secondary" };
+      return { scope: "mainline_only", importanceThreshold: "primary" };
+    case "road":
+      if (reach >= 0.58) return { scope: "motorway_trunk", importanceThreshold: "secondary" };
+      return { scope: "motorway_only", importanceThreshold: "primary" };
+    default:
+      return { scope: "default", importanceThreshold: "secondary" };
+  }
+}
+
+function normalizeTransportOverviewScopeLinkMode(value, fallback = "linked") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (TRANSPORT_OVERVIEW_SCOPE_LINK_MODES.includes(normalized)) return normalized;
+  return TRANSPORT_OVERVIEW_SCOPE_LINK_MODES.includes(fallback) ? fallback : "linked";
+}
 
 function createDefaultTransportOverviewFamilyConfig(familyId) {
+  const linked = resolveLinkedTransportOverviewScopeAndThreshold(familyId, familyId === "airport" || familyId === "port" ? 0.5 : 0.2);
   switch (String(familyId || "").trim().toLowerCase()) {
     case "airport":
       return {
-        preset: "balanced",
         opacity: 0.82,
+        visualStrength: 0.56,
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "both",
-        scope: "major_civil",
-        importanceThreshold: "secondary",
+        coverageReach: 0.5,
+        scopeLinkMode: "linked",
+        scope: linked.scope,
+        importanceThreshold: linked.importanceThreshold,
       };
     case "port":
       return {
-        preset: "balanced",
         opacity: 0.78,
+        visualStrength: 0.54,
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "mixed",
-        scope: "regional",
-        importanceThreshold: "secondary",
+        coverageReach: 0.5,
+        scopeLinkMode: "linked",
+        scope: linked.scope,
+        importanceThreshold: linked.importanceThreshold,
       };
     case "rail":
       return {
-        preset: "balanced",
         opacity: 0.72,
+        visualStrength: 0.5,
         labelsEnabled: false,
         labelDensity: "sparse",
         labelMode: "name",
-        scope: "mainline_only",
-        importanceThreshold: "primary",
+        coverageReach: 0.2,
+        scopeLinkMode: "linked",
+        scope: linked.scope,
+        importanceThreshold: linked.importanceThreshold,
       };
     case "road":
       return {
-        preset: "balanced",
         opacity: 0.72,
+        visualStrength: 0.5,
         labelsEnabled: false,
         labelDensity: "sparse",
         labelMode: "ref",
-        scope: "motorway_trunk",
-        importanceThreshold: "primary",
+        coverageReach: 0.2,
+        scopeLinkMode: "linked",
+        scope: linked.scope,
+        importanceThreshold: linked.importanceThreshold,
       };
     default:
       return {
-        preset: "default",
         opacity: 0.65,
+        visualStrength: 0.5,
         labelsEnabled: false,
         labelDensity: "balanced",
         labelMode: "name",
+        coverageReach: 0.5,
+        scopeLinkMode: "linked",
         scope: "default",
-        importanceThreshold: "primary",
+        importanceThreshold: "secondary",
       };
   }
 }
@@ -957,17 +1033,31 @@ function normalizeTransportOverviewImportanceThreshold(value, fallback = "primar
 function normalizeTransportOverviewFamilyConfig(rawConfig, familyId) {
   const defaults = createDefaultTransportOverviewFamilyConfig(familyId);
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const scopeLinkMode = normalizeTransportOverviewScopeLinkMode(raw.scopeLinkMode, defaults.scopeLinkMode);
+  const coverageReach = Object.prototype.hasOwnProperty.call(raw, "coverageReach")
+    ? clampUnitInterval(raw.coverageReach, defaults.coverageReach)
+    : mapLegacyTransportScopeToCoverageReach(
+      familyId,
+      raw.scope,
+      defaults.coverageReach,
+    );
+  const linked = resolveLinkedTransportOverviewScopeAndThreshold(familyId, coverageReach);
   return {
-    preset: String(raw.preset || defaults.preset).trim().toLowerCase() || defaults.preset,
     opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),
+    visualStrength: Object.prototype.hasOwnProperty.call(raw, "visualStrength")
+      ? clampUnitInterval(raw.visualStrength, defaults.visualStrength)
+      : mapLegacyTransportPresetToVisualStrength(raw.preset, defaults.visualStrength),
     labelsEnabled: raw.labelsEnabled === undefined ? defaults.labelsEnabled : !!raw.labelsEnabled,
     labelDensity: normalizeTransportOverviewLabelDensity(raw.labelDensity, defaults.labelDensity),
     labelMode: String(raw.labelMode || defaults.labelMode).trim().toLowerCase() || defaults.labelMode,
-    scope: String(raw.scope || defaults.scope).trim().toLowerCase() || defaults.scope,
-    importanceThreshold: normalizeTransportOverviewImportanceThreshold(
-      raw.importanceThreshold,
-      defaults.importanceThreshold,
-    ),
+    coverageReach,
+    scopeLinkMode,
+    scope: scopeLinkMode === "linked"
+      ? linked.scope
+      : (String(raw.scope || defaults.scope).trim().toLowerCase() || defaults.scope),
+    importanceThreshold: scopeLinkMode === "linked"
+      ? linked.importanceThreshold
+      : normalizeTransportOverviewImportanceThreshold(raw.importanceThreshold, defaults.importanceThreshold),
   };
 }
 
@@ -1524,6 +1614,8 @@ export {
   TRANSPORT_OVERVIEW_FAMILY_IDS,
   createDefaultTransportOverviewFamilyConfig,
   createDefaultTransportOverviewStyleConfig,
+  normalizeTransportOverviewScopeLinkMode,
+  resolveLinkedTransportOverviewScopeAndThreshold,
   normalizeTransportOverviewFamilyConfig,
   normalizeTransportOverviewStyleConfig,
   PRESET_STORAGE_KEY,

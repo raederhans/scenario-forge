@@ -10,6 +10,7 @@ import {
   normalizePhysicalPreset,
   normalizePhysicalStyleConfig,
   normalizeTransportOverviewStyleConfig,
+  resolveLinkedTransportOverviewScopeAndThreshold,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchDisplayConfig,
   normalizeTextureMode,
@@ -1767,20 +1768,32 @@ function initToolbar({ render } = {}) {
   const transportPortControls = document.getElementById("transportPortControls");
   const transportRailPlaceholder = document.getElementById("transportRailPlaceholder");
   const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
-  const airportVisibilityPreset = document.getElementById("airportVisibilityPreset");
+  const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
   const airportLabelsEnabled = document.getElementById("airportLabelsEnabled");
   const airportLabelDensity = document.getElementById("airportLabelDensity");
   const airportLabelMode = document.getElementById("airportLabelMode");
+  const airportCoverageReach = document.getElementById("airportCoverageReach");
+  const airportScopeLinked = document.getElementById("airportScopeLinked");
+  const airportScopeResolved = document.getElementById("airportScopeResolved");
+  const airportThresholdResolved = document.getElementById("airportThresholdResolved");
   const airportScope = document.getElementById("airportScope");
   const airportImportanceThreshold = document.getElementById("airportImportanceThreshold");
-  const portVisibilityPreset = document.getElementById("portVisibilityPreset");
+  const transportAirportSummaryMeta = document.getElementById("transportAirportSummaryMeta");
+  const portVisualStrength = document.getElementById("portVisualStrength");
   const portOpacity = document.getElementById("portOpacity");
   const portLabelsEnabled = document.getElementById("portLabelsEnabled");
   const portLabelDensity = document.getElementById("portLabelDensity");
   const portLabelMode = document.getElementById("portLabelMode");
+  const portCoverageReach = document.getElementById("portCoverageReach");
+  const portScopeLinked = document.getElementById("portScopeLinked");
+  const portScopeResolved = document.getElementById("portScopeResolved");
+  const portThresholdResolved = document.getElementById("portThresholdResolved");
   const portTier = document.getElementById("portTier");
   const portImportanceThreshold = document.getElementById("portImportanceThreshold");
+  const transportPortSummaryMeta = document.getElementById("transportPortSummaryMeta");
+  const transportRailSummaryMeta = document.getElementById("transportRailSummaryMeta");
+  const transportRoadSummaryMeta = document.getElementById("transportRoadSummaryMeta");
   const toggleCityPoints = document.getElementById("toggleCityPoints");
   const toggleWaterRegions = document.getElementById("toggleWaterRegions");
   const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
@@ -2087,8 +2100,12 @@ function initToolbar({ render } = {}) {
   );
   const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
   const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
+  const airportVisualStrengthValue = document.getElementById("airportVisualStrengthValue");
   const airportOpacityValue = document.getElementById("airportOpacityValue");
+  const airportCoverageReachValue = document.getElementById("airportCoverageReachValue");
+  const portVisualStrengthValue = document.getElementById("portVisualStrengthValue");
   const portOpacityValue = document.getElementById("portOpacityValue");
+  const portCoverageReachValue = document.getElementById("portCoverageReachValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -2242,57 +2259,41 @@ function initToolbar({ render } = {}) {
     });
   };
 
-  const createDefaultTransportAppearanceFamilyState = (familyId) => (
-    familyId === "port"
-      ? {
-        preset: "balanced",
-        opacity: 0.78,
-        labelsEnabled: true,
-        labelDensity: "balanced",
-        labelMode: "mixed",
-        scope: "regional",
-        importanceThreshold: "secondary",
-      }
-      : {
-        preset: "balanced",
-        opacity: 0.82,
-        labelsEnabled: true,
-        labelDensity: "balanced",
-        labelMode: "both",
-        scope: "major_civil",
-        importanceThreshold: "secondary",
-      }
-  );
-
-  const ensureTransportAppearanceUiState = () => {
-    if (!state.ui || typeof state.ui !== "object") {
-      state.ui = {};
-    }
-    if (!state.ui.transportAppearance || typeof state.ui.transportAppearance !== "object") {
-      state.ui.transportAppearance = {};
-    }
-    const uiState = state.ui.transportAppearance;
-    if (!uiState.lastLiveFamilyState || typeof uiState.lastLiveFamilyState !== "object") {
-      uiState.lastLiveFamilyState = {
-        airports: !!state.showAirports,
-        ports: !!state.showPorts,
-      };
-    } else {
-      if (typeof uiState.lastLiveFamilyState.airports !== "boolean") {
-        uiState.lastLiveFamilyState.airports = !!state.showAirports;
-      }
-      if (typeof uiState.lastLiveFamilyState.ports !== "boolean") {
-        uiState.lastLiveFamilyState.ports = !!state.showPorts;
-      }
-    }
-    return uiState;
-  };
-
   const getTransportAppearanceConfig = () => {
     state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(
       state.styleConfig?.transportOverview || {},
     );
     return state.styleConfig.transportOverview;
+  };
+
+  const formatTransportPercent = (value) => `${Math.round(Number(value || 0) * 100)}%`;
+  const formatTransportScopeLabel = (value) => String(value || "")
+    .trim()
+    .split("_")
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+  const formatTransportThresholdLabel = (value) => String(value || "")
+    .trim()
+    .split("_")
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+
+  const getEffectiveTransportScopeState = (familyId, familyConfig) => (
+    familyConfig.scopeLinkMode === "manual"
+      ? {
+        scope: String(familyConfig.scope || "").trim().toLowerCase(),
+        importanceThreshold: String(familyConfig.importanceThreshold || "").trim().toLowerCase(),
+      }
+      : resolveLinkedTransportOverviewScopeAndThreshold(familyId, familyConfig.coverageReach)
+  );
+
+  const buildTransportFamilySummaryText = (familyId, masterEnabled, familyEnabled, familyConfig, effectiveScope) => {
+    if (!familyEnabled) return t("Off", "ui");
+    if (!masterEnabled) return `${t("On", "ui")} · ${t("hidden by master", "ui")}`;
+    const labelsPart = familyConfig.labelsEnabled ? t("labels on", "ui") : t("labels off", "ui");
+    return `${t("On", "ui")} · ${labelsPart} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
   };
 
   const setTransportAppearanceGroupEnabled = (container, enabled) => {
@@ -2303,70 +2304,118 @@ function initToolbar({ render } = {}) {
   };
 
   const renderTransportAppearanceUi = () => {
-    ensureTransportAppearanceUiState();
     const transportConfig = getTransportAppearanceConfig();
-    const airportConfig = transportConfig.airport || createDefaultTransportAppearanceFamilyState("airport");
-    const portConfig = transportConfig.port || createDefaultTransportAppearanceFamilyState("port");
+    const airportConfig = transportConfig.airport || {};
+    const portConfig = transportConfig.port || {};
     const transportEnabled = state.showTransport !== false;
     const airportEnabled = transportEnabled && !!state.showAirports;
     const portEnabled = transportEnabled && !!state.showPorts;
+    const airportScopeState = getEffectiveTransportScopeState("airport", airportConfig);
+    const portScopeState = getEffectiveTransportScopeState("port", portConfig);
 
     if (transportAppearanceMasterToggle) {
       transportAppearanceMasterToggle.checked = transportEnabled;
     }
 
-    if (airportVisibilityPreset) airportVisibilityPreset.value = String(airportConfig.preset || "balanced");
-    if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity || 0.82) * 100));
-    if (airportOpacityValue) airportOpacityValue.textContent = `${Math.round(Number(airportConfig.opacity || 0.82) * 100)}%`;
+    if (airportVisualStrength) airportVisualStrength.value = String(Math.round(Number(airportConfig.visualStrength ?? 0.56) * 100));
+    if (airportVisualStrengthValue) airportVisualStrengthValue.textContent = formatTransportPercent(airportConfig.visualStrength ?? 0.56);
+    if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity ?? 0.82) * 100));
+    if (airportOpacityValue) airportOpacityValue.textContent = formatTransportPercent(airportConfig.opacity ?? 0.82);
     if (airportLabelsEnabled) airportLabelsEnabled.checked = !!airportConfig.labelsEnabled;
     if (airportLabelDensity) airportLabelDensity.value = String(airportConfig.labelDensity || "balanced");
     if (airportLabelMode) airportLabelMode.value = String(airportConfig.labelMode || "both");
+    if (airportCoverageReach) airportCoverageReach.value = String(Math.round(Number(airportConfig.coverageReach ?? 0.5) * 100));
+    if (airportCoverageReachValue) airportCoverageReachValue.textContent = formatTransportPercent(airportConfig.coverageReach ?? 0.5);
+    if (airportScopeLinked) airportScopeLinked.checked = String(airportConfig.scopeLinkMode || "linked") !== "manual";
+    if (airportScopeResolved) airportScopeResolved.textContent = t(formatTransportScopeLabel(airportScopeState.scope), "ui");
+    if (airportThresholdResolved) {
+      airportThresholdResolved.textContent = t(formatTransportThresholdLabel(airportScopeState.importanceThreshold), "ui");
+    }
     if (airportScope) airportScope.value = String(airportConfig.scope || "major_civil");
     if (airportImportanceThreshold) {
       airportImportanceThreshold.value = String(airportConfig.importanceThreshold || "secondary");
     }
+    if (transportAirportSummaryMeta) {
+      transportAirportSummaryMeta.textContent = buildTransportFamilySummaryText(
+        "airport",
+        transportEnabled,
+        !!state.showAirports,
+        airportConfig,
+        airportScopeState,
+      );
+    }
 
-    if (portVisibilityPreset) portVisibilityPreset.value = String(portConfig.preset || "balanced");
-    if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity || 0.78) * 100));
-    if (portOpacityValue) portOpacityValue.textContent = `${Math.round(Number(portConfig.opacity || 0.78) * 100)}%`;
+    if (portVisualStrength) portVisualStrength.value = String(Math.round(Number(portConfig.visualStrength ?? 0.54) * 100));
+    if (portVisualStrengthValue) portVisualStrengthValue.textContent = formatTransportPercent(portConfig.visualStrength ?? 0.54);
+    if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity ?? 0.78) * 100));
+    if (portOpacityValue) portOpacityValue.textContent = formatTransportPercent(portConfig.opacity ?? 0.78);
     if (portLabelsEnabled) portLabelsEnabled.checked = !!portConfig.labelsEnabled;
     if (portLabelDensity) portLabelDensity.value = String(portConfig.labelDensity || "balanced");
     if (portLabelMode) portLabelMode.value = String(portConfig.labelMode || "mixed");
+    if (portCoverageReach) portCoverageReach.value = String(Math.round(Number(portConfig.coverageReach ?? 0.5) * 100));
+    if (portCoverageReachValue) portCoverageReachValue.textContent = formatTransportPercent(portConfig.coverageReach ?? 0.5);
+    if (portScopeLinked) portScopeLinked.checked = String(portConfig.scopeLinkMode || "linked") !== "manual";
+    if (portScopeResolved) portScopeResolved.textContent = t(formatTransportScopeLabel(portScopeState.scope), "ui");
+    if (portThresholdResolved) {
+      portThresholdResolved.textContent = t(formatTransportThresholdLabel(portScopeState.importanceThreshold), "ui");
+    }
     if (portTier) portTier.value = String(portConfig.scope || "regional");
     if (portImportanceThreshold) {
       portImportanceThreshold.value = String(portConfig.importanceThreshold || "secondary");
     }
+    if (transportPortSummaryMeta) {
+      transportPortSummaryMeta.textContent = buildTransportFamilySummaryText(
+        "port",
+        transportEnabled,
+        !!state.showPorts,
+        portConfig,
+        portScopeState,
+      );
+    }
+    if (transportRailSummaryMeta) transportRailSummaryMeta.textContent = t("Planned", "ui");
+    if (transportRoadSummaryMeta) transportRoadSummaryMeta.textContent = t("Planned", "ui");
 
     [
-      airportVisibilityPreset,
+      airportVisualStrength,
       airportOpacity,
       airportLabelsEnabled,
       airportLabelDensity,
       airportLabelMode,
+      airportScopeLinked,
       airportScope,
       airportImportanceThreshold,
     ].forEach((control) => {
-      if (control) control.disabled = !airportEnabled;
+      if (control) control.disabled = !transportEnabled;
     });
     [
-      portVisibilityPreset,
+      portVisualStrength,
       portOpacity,
       portLabelsEnabled,
       portLabelDensity,
       portLabelMode,
+      portScopeLinked,
       portTier,
       portImportanceThreshold,
     ].forEach((control) => {
-      if (control) control.disabled = !portEnabled;
+      if (control) control.disabled = !transportEnabled;
     });
+
+    const airportManual = String(airportConfig.scopeLinkMode || "linked") === "manual";
+    const portManual = String(portConfig.scopeLinkMode || "linked") === "manual";
+    if (airportCoverageReach) airportCoverageReach.disabled = !transportEnabled || airportManual;
+    if (airportScope) airportScope.disabled = !transportEnabled || !airportManual;
+    if (airportImportanceThreshold) airportImportanceThreshold.disabled = !transportEnabled || !airportManual;
+    if (portCoverageReach) portCoverageReach.disabled = !transportEnabled || portManual;
+    if (portTier) portTier.disabled = !transportEnabled || !portManual;
+    if (portImportanceThreshold) portImportanceThreshold.disabled = !transportEnabled || !portManual;
 
     setTransportAppearanceGroupEnabled(transportAirportControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportPortControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportRailPlaceholder, transportEnabled);
     setTransportAppearanceGroupEnabled(transportRoadPlaceholder, transportEnabled);
 
-    transportAirportCard?.classList.toggle("opacity-60", !transportEnabled || !state.showAirports);
-    transportPortCard?.classList.toggle("opacity-60", !transportEnabled || !state.showPorts);
+    transportAirportCard?.classList.toggle("opacity-60", !transportEnabled);
+    transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
   };
@@ -2378,16 +2427,10 @@ function initToolbar({ render } = {}) {
       return;
     }
     state.showTransport = normalized;
-    if (!normalized) {
-      renderTransportAppearanceUi();
-      renderDirty("toggle-transport-overview");
-      return;
-    }
-
-    if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
+    if (normalized && state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
       void state.ensureContextLayerDataFn("airports", { reason: "transport-master-toggle", renderNow: true });
     }
-    if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
+    if (normalized && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
       void state.ensureContextLayerDataFn("ports", { reason: "transport-master-toggle", renderNow: true });
     }
     renderTransportAppearanceUi();
@@ -6654,7 +6697,6 @@ function initToolbar({ render } = {}) {
   state.updateParentBorderCountryListFn = renderParentBorderCountryList;
 
   function renderSpecialZoneEditorUI() {
-    ensureTransportAppearanceUiState();
     if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
     if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
     if (toggleCityPoints) toggleCityPoints.checked = !!state.showCityPoints;
@@ -7974,8 +8016,6 @@ function initToolbar({ render } = {}) {
     toggleAirports.checked = !!state.showAirports;
     toggleAirports.addEventListener("change", (event) => {
       state.showAirports = !!event.target.checked;
-      const transportUi = ensureTransportAppearanceUiState();
-      transportUi.lastLiveFamilyState.airports = !!state.showAirports;
       if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
       }
@@ -7988,8 +8028,6 @@ function initToolbar({ render } = {}) {
     togglePorts.checked = !!state.showPorts;
     togglePorts.addEventListener("change", (event) => {
       state.showPorts = !!event.target.checked;
-      const transportUi = ensureTransportAppearanceUiState();
-      transportUi.lastLiveFamilyState.ports = !!state.showPorts;
       if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
       }
@@ -7998,13 +8036,14 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (airportVisibilityPreset && !airportVisibilityPreset.dataset.bound) {
-    airportVisibilityPreset.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().airport.preset = String(event.target.value || "balanced");
+  if (airportVisualStrength && !airportVisualStrength.dataset.bound) {
+    airportVisualStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().airport.visualStrength = clamp(Number.isFinite(value) ? value / 100 : 0.56, 0, 1);
       renderTransportAppearanceUi();
-      renderDirty("transport-airport-visibility-preset");
+      renderDirty("transport-airport-visual-strength");
     });
-    airportVisibilityPreset.dataset.bound = "true";
+    airportVisualStrength.dataset.bound = "true";
   }
 
   if (airportOpacity && !airportOpacity.dataset.bound) {
@@ -8044,9 +8083,42 @@ function initToolbar({ render } = {}) {
     airportLabelMode.dataset.bound = "true";
   }
 
+  if (airportCoverageReach && !airportCoverageReach.dataset.bound) {
+    airportCoverageReach.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const config = getTransportAppearanceConfig().airport;
+      config.coverageReach = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
+      if (String(config.scopeLinkMode || "linked") !== "manual") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("airport", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-coverage-reach");
+    });
+    airportCoverageReach.dataset.bound = "true";
+  }
+
+  if (airportScopeLinked && !airportScopeLinked.dataset.bound) {
+    airportScopeLinked.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().airport;
+      config.scopeLinkMode = event.target.checked ? "linked" : "manual";
+      if (config.scopeLinkMode === "linked") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("airport", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-scope-link");
+    });
+    airportScopeLinked.dataset.bound = "true";
+  }
+
   if (airportScope && !airportScope.dataset.bound) {
     airportScope.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().airport.scope = String(event.target.value || "major_civil");
+      const config = getTransportAppearanceConfig().airport;
+      config.scopeLinkMode = "manual";
+      config.scope = String(event.target.value || "major_civil");
       renderTransportAppearanceUi();
       renderDirty("transport-airport-scope");
     });
@@ -8055,20 +8127,23 @@ function initToolbar({ render } = {}) {
 
   if (airportImportanceThreshold && !airportImportanceThreshold.dataset.bound) {
     airportImportanceThreshold.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().airport.importanceThreshold = String(event.target.value || "secondary");
+      const config = getTransportAppearanceConfig().airport;
+      config.scopeLinkMode = "manual";
+      config.importanceThreshold = String(event.target.value || "secondary");
       renderTransportAppearanceUi();
       renderDirty("transport-airport-importance-threshold");
     });
     airportImportanceThreshold.dataset.bound = "true";
   }
 
-  if (portVisibilityPreset && !portVisibilityPreset.dataset.bound) {
-    portVisibilityPreset.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().port.preset = String(event.target.value || "balanced");
+  if (portVisualStrength && !portVisualStrength.dataset.bound) {
+    portVisualStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().port.visualStrength = clamp(Number.isFinite(value) ? value / 100 : 0.54, 0, 1);
       renderTransportAppearanceUi();
-      renderDirty("transport-port-visibility-preset");
+      renderDirty("transport-port-visual-strength");
     });
-    portVisibilityPreset.dataset.bound = "true";
+    portVisualStrength.dataset.bound = "true";
   }
 
   if (portOpacity && !portOpacity.dataset.bound) {
@@ -8108,9 +8183,42 @@ function initToolbar({ render } = {}) {
     portLabelMode.dataset.bound = "true";
   }
 
+  if (portCoverageReach && !portCoverageReach.dataset.bound) {
+    portCoverageReach.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const config = getTransportAppearanceConfig().port;
+      config.coverageReach = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
+      if (String(config.scopeLinkMode || "linked") !== "manual") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("port", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-coverage-reach");
+    });
+    portCoverageReach.dataset.bound = "true";
+  }
+
+  if (portScopeLinked && !portScopeLinked.dataset.bound) {
+    portScopeLinked.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().port;
+      config.scopeLinkMode = event.target.checked ? "linked" : "manual";
+      if (config.scopeLinkMode === "linked") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("port", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-scope-link");
+    });
+    portScopeLinked.dataset.bound = "true";
+  }
+
   if (portTier && !portTier.dataset.bound) {
     portTier.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().port.scope = String(event.target.value || "regional");
+      const config = getTransportAppearanceConfig().port;
+      config.scopeLinkMode = "manual";
+      config.scope = String(event.target.value || "regional");
       renderTransportAppearanceUi();
       renderDirty("transport-port-scope");
     });
@@ -8119,7 +8227,9 @@ function initToolbar({ render } = {}) {
 
   if (portImportanceThreshold && !portImportanceThreshold.dataset.bound) {
     portImportanceThreshold.addEventListener("change", (event) => {
-      getTransportAppearanceConfig().port.importanceThreshold = String(event.target.value || "secondary");
+      const config = getTransportAppearanceConfig().port;
+      config.scopeLinkMode = "manual";
+      config.importanceThreshold = String(event.target.value || "secondary");
       renderTransportAppearanceUi();
       renderDirty("transport-port-importance-threshold");
     });
