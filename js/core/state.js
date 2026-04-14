@@ -809,7 +809,7 @@ function normalizeUrbanStyleConfig(rawConfig) {
     adaptiveStrength: clamp(toFiniteNumber(raw.adaptiveStrength, defaults.adaptiveStrength), 0, 1),
     toneBias: clamp(toFiniteNumber(raw.toneBias, legacyToneBias), -0.3, 0.3),
     adaptiveTintEnabled: raw.adaptiveTintEnabled === undefined ? defaults.adaptiveTintEnabled : !!raw.adaptiveTintEnabled,
-    adaptiveTintColor: normalizeOceanFillColor(raw.adaptiveTintColor || defaults.adaptiveTintColor),
+    adaptiveTintColor: normalizeTextureHexColor(raw.adaptiveTintColor, defaults.adaptiveTintColor),
     adaptiveTintStrength: clamp(toFiniteNumber(raw.adaptiveTintStrength, defaults.adaptiveTintStrength), 0, 0.5),
     minAreaPx: clamp(toFiniteNumber(raw.minAreaPx, defaults.minAreaPx), 1, 80),
   };
