@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import unittest
 from pathlib import Path
-
-from tools.build_global_transport_roads import build_label_candidates, empty_roads_frame
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_ROAD_RECIPE = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'source_recipe.manual.json'
@@ -15,6 +14,10 @@ COMMON_HELPER = REPO_ROOT / 'map_builder' / 'overture_transport_common.py'
 
 
 class GlobalTransportBuilderContractsTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.pyarrow_available = importlib.util.find_spec("pyarrow") is not None
+
     def test_new_global_transport_files_exist(self) -> None:
         for path in (GLOBAL_ROAD_RECIPE, GLOBAL_RAIL_RECIPE, ROAD_BUILDER, RAIL_BUILDER, COMMON_HELPER):
             self.assertTrue(path.exists(), path.as_posix())
@@ -42,6 +45,10 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
             self.assertIn('build_audit', content)
 
     def test_road_label_builder_handles_empty_input(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_roads import build_label_candidates, empty_roads_frame
+
         labels = build_label_candidates(empty_roads_frame())
         self.assertEqual(len(labels), 0)
         self.assertIn('geometry', labels.columns)
