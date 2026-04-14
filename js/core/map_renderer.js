@@ -426,6 +426,24 @@ const CITY_COUNTRY_TIER_RANK = {
   D: 2,
   E: 1,
 };
+const CITY_COUNTRY_CLASS_WEIGHT = Object.freeze({
+  global_core: 1.36,
+  regional_core: 1.2,
+  local_actor: 1.02,
+  fragmented_actor: 1.12,
+  micro: 0.86,
+  micro_subject: 0.74,
+});
+const CITY_SCENARIO_EXCLUDED_TAGS = new Set(["AFA", "RFA"]);
+const CITY_WARLORD_SCENARIO_TAGS = new Set([
+  // Russia warlord/fragmentation bloc
+  "ALT", "BKR", "BRY", "CHT", "GOR", "IRK", "KOM", "KRS", "NOV", "OMS", "OUR", "PRM", "RSF",
+  "RUR", "SAM", "SBA", "SVR", "TAT", "TOM", "TYM", "URA", "VOL", "VYT", "WRS", "YAK", "ZLT",
+  // China warlord/clique bloc
+  "GXC", "GUI", "PRC", "QMA", "RGC", "SIC", "SIK", "XIK", "XSM",
+]);
+const CITY_PRIMARY_POWER_TAGS = new Set(["USA", "GER", "JAP"]);
+const CITY_SECONDARY_POWER_TAGS = new Set(["ITA", "ENG", "FRA", "CAN", "BRA", "BRG", "RKM", "RKO", "RKU"]);
 const CITY_MARKER_THEME_TOKENS = {
   classic_graphite: {
     fillTop: "rgba(126, 134, 143, 0.99)",
@@ -571,6 +589,14 @@ const CITY_REVEAL_PHASES = [
   { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
   { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
 ];
+const CITY_MARKER_QUOTAS_BY_PHASE = Object.freeze({
+  P0: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 0 }),
+  P1: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 1 }),
+  P2: Object.freeze({ A: 3, B: 1, C: 0, D: 0, E: 0 }),
+  P3: Object.freeze({ A: 4, B: 2, C: 1, D: 1, E: 1 }),
+  P4: Object.freeze({ A: 6, B: 4, C: 2, D: 1, E: 1 }),
+  P5: Object.freeze({ A: 8, B: 6, C: 4, D: 2, E: 1 }),
+});
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
@@ -11845,6 +11871,95 @@ function getCityCountryTierFromScenarioRecord(profile, record, { defaultCountry 
   return "E";
 }
 
+function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
+  const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
+  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
+    return "fragmented_actor";
+  }
+  const controllerFeatureCount = Math.max(
+    0,
+    Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? 0) || 0
+  );
+  const profileFeatureCount = Math.max(0, Number(profile?.featureCount || 0));
+  const isFeatured = !!record?.featured || featuredTags.has(tag) || tag === defaultCountry;
+  const isScenarioOnly = !!record?.scenario_only;
+  const parentOwnerTag = String(record?.parent_owner_tag || record?.parentOwnerTag || "").trim().toUpperCase();
+  const entryKind = String(record?.entry_kind || record?.entryKind || "").trim().toLowerCase();
+  const isSubject = !!parentOwnerTag || entryKind === "scenario_subject";
+  if (isSubject) return "micro_subject";
+  if (isFeatured || controllerFeatureCount >= 120 || profileFeatureCount >= 200) return "global_core";
+  if (controllerFeatureCount >= 40 || profileFeatureCount >= 80) return "regional_core";
+  if (controllerFeatureCount >= 8 || profileFeatureCount >= 16) return "local_actor";
+  if (isScenarioOnly && controllerFeatureCount >= 1 && !parentOwnerTag && profileFeatureCount <= 18) {
+    return "fragmented_actor";
+  }
+  return "micro";
+}
+
+function isCityScenarioTagExcludedFromReveal(tag = "") {
+  const normalized = String(tag || "").trim().toUpperCase();
+  return normalized ? CITY_SCENARIO_EXCLUDED_TAGS.has(normalized) : false;
+}
+
+function getCityFixedPowerCalibration(tag = "") {
+  const normalized = String(tag || "").trim().toUpperCase();
+  if (CITY_PRIMARY_POWER_TAGS.has(normalized)) {
+    return {
+      className: "global_core",
+      classWeightBias: 0.42,
+      minQuotaFloorBoost: 2,
+    };
+  }
+  if (CITY_SECONDARY_POWER_TAGS.has(normalized)) {
+    return {
+      className: "regional_core",
+      classWeightBias: 0.22,
+      minQuotaFloorBoost: 1,
+    };
+  }
+  return null;
+}
+
+function normalizeCityCountryVisibilityClass(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(CITY_COUNTRY_CLASS_WEIGHT, normalized)
+    ? normalized
+    : "";
+}
+
+function getCityCountryRevealOverride(record = null) {
+  const tag = String(record?.tag || "").trim().toUpperCase();
+  const fixedPower = getCityFixedPowerCalibration(tag);
+  if (!record || typeof record !== "object") {
+    return fixedPower || {
+      className: "",
+      classWeightBias: 0,
+      minQuotaFloorBoost: 0,
+    };
+  }
+  const className = normalizeCityCountryVisibilityClass(
+    record.city_reveal_class
+    || record.cityRevealClass
+    || record.city_visibility_class
+    || record.cityVisibilityClass
+  ) || String(fixedPower?.className || "");
+  const classWeightBias = clamp(
+    Number(record.city_reveal_weight_bias ?? record.cityRevealWeightBias ?? fixedPower?.classWeightBias ?? 0) || 0,
+    -0.35,
+    0.75
+  );
+  const minQuotaFloorBoost = clamp(
+    Math.round(Number(record.city_reveal_min_floor_boost ?? record.cityRevealMinFloorBoost ?? fixedPower?.minQuotaFloorBoost ?? 0) || 0),
+    0,
+    3
+  );
+  return {
+    className,
+    classWeightBias,
+    minQuotaFloorBoost,
+  };
+}
+
 function getFallbackCityCountryTier(profile) {
   const maxPopulation = Math.max(0, Number(profile?.maxPopulation || 0));
   if ((profile?.hasCountryCapital && maxPopulation >= 2_500_000) || maxPopulation >= 5_000_000) {
@@ -11886,6 +12001,10 @@ function getCityCountryProfileIndex(cityCollection) {
         hasCountryCapital: false,
         maxPopulation: 0,
         maxTierWeight: 0,
+        controllerFeatureCount: 0,
+        countryClass: "micro",
+        classWeightBias: 0,
+        minQuotaFloorBoost: 0,
       };
       profiles.set(groupKey, profile);
     }
@@ -11902,10 +12021,21 @@ function getCityCountryProfileIndex(cityCollection) {
     .toUpperCase();
   profiles.forEach((profile) => {
     const record = profile.scenarioTag ? state.scenarioCountriesByTag?.[profile.scenarioTag] : null;
+    const revealOverride = getCityCountryRevealOverride(record);
+    profile.controllerFeatureCount = Math.max(
+      0,
+      Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? profile.featureCount ?? 0) || 0
+    );
     profile.countryTier = getCityCountryTierFromScenarioRecord(profile, record, {
       defaultCountry,
       featuredTags,
     }) || getFallbackCityCountryTier(profile);
+    profile.countryClass = revealOverride.className || getCityCountryVisibilityClass(profile, record, {
+      defaultCountry,
+      featuredTags,
+    });
+    profile.classWeightBias = Number(revealOverride.classWeightBias || 0);
+    profile.minQuotaFloorBoost = Number(revealOverride.minQuotaFloorBoost || 0);
     profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
   });
 
@@ -11917,6 +12047,26 @@ function getCityRevealPhase(scale) {
   const normalizedScale = Math.max(0.0001, Number(scale || 1));
   return CITY_REVEAL_PHASES.find((phase) => normalizedScale >= phase.minScale && normalizedScale < phase.maxScale)
     || CITY_REVEAL_PHASES[CITY_REVEAL_PHASES.length - 1];
+}
+
+function getCityRevealPhaseIndex(scale) {
+  const phase = getCityRevealPhase(scale);
+  const index = CITY_REVEAL_PHASES.findIndex((entry) => entry.id === phase.id);
+  return Math.max(0, index);
+}
+
+function getCityRevealPhaseInterpolation(scale) {
+  const phaseIndex = getCityRevealPhaseIndex(scale);
+  const currentPhase = CITY_REVEAL_PHASES[phaseIndex] || CITY_REVEAL_PHASES[0];
+  const nextPhase = CITY_REVEAL_PHASES[Math.min(CITY_REVEAL_PHASES.length - 1, phaseIndex + 1)] || currentPhase;
+  if (!nextPhase || nextPhase.id === currentPhase.id || !Number.isFinite(nextPhase.minScale)) {
+    return { phaseIndex, currentPhase, nextPhase: currentPhase, t: 0 };
+  }
+  const minScale = Number(currentPhase.minScale || 0);
+  const maxScale = Number(nextPhase.minScale || currentPhase.maxScale || minScale);
+  const span = Math.max(0.0001, maxScale - minScale);
+  const t = clamp((Number(scale || 1) - minScale) / span, 0, 1);
+  return { phaseIndex, currentPhase, nextPhase, t };
 }
 
 function getCityRevealBucket(entry, phaseId) {
@@ -11966,16 +12116,24 @@ function getCityRevealBucket(entry, phaseId) {
   }
 }
 
+function getCityInterpolatedRevealBucket(entry, scale) {
+  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
+  const currentBucket = getCityRevealBucket(entry, currentPhase.id);
+  if (!nextPhase || nextPhase.id === currentPhase.id) {
+    return currentBucket;
+  }
+  const nextBucket = getCityRevealBucket(entry, nextPhase.id);
+  if (Number.isFinite(currentBucket) && Number.isFinite(nextBucket)) {
+    return currentBucket + ((nextBucket - currentBucket) * t);
+  }
+  if (!Number.isFinite(currentBucket) && Number.isFinite(nextBucket)) {
+    return t >= 0.68 ? nextBucket + ((1 - t) * 0.5) : Number.POSITIVE_INFINITY;
+  }
+  return currentBucket;
+}
+
 function getCityMarkerQuotaForTier(phaseId, countryTier) {
-  const phaseQuotas = {
-    P0: { A: 1, B: 1, C: 1, D: 1, E: 0 },
-    P1: { A: 1, B: 1, C: 1, D: 1, E: 1 },
-    P2: { A: 3, B: 1, C: 0, D: 0, E: 0 },
-    P3: { A: 4, B: 2, C: 1, D: 1, E: 1 },
-    P4: { A: 6, B: 4, C: 2, D: 1, E: 1 },
-    P5: { A: 8, B: 6, C: 4, D: 2, E: 1 },
-  };
-  const quotaTable = phaseQuotas[String(phaseId || "P0")] || phaseQuotas.P0;
+  const quotaTable = CITY_MARKER_QUOTAS_BY_PHASE[String(phaseId || "P0")] || CITY_MARKER_QUOTAS_BY_PHASE.P0;
   return quotaTable[String(countryTier || "D").trim().toUpperCase()] ?? 0;
 }
 
@@ -11989,6 +12147,85 @@ function scaleCityMarkerQuota(baseQuota, markerDensity) {
   if (normalizedQuota <= 0) return 0;
   const scaledQuota = normalizedQuota * normalizedDensity;
   return normalizedDensity < 1 ? Math.floor(scaledQuota) : Math.ceil(scaledQuota);
+}
+
+function getCitySizeQuotaFloor(entry, scale, markerDensity = 1) {
+  const featureCount = Math.max(0, Number(entry?.countryFeatureCount || 0));
+  const controllerFeatureCount = Math.max(0, Number(entry?.countryControllerFeatureCount || featureCount));
+  const maxPopulation = Math.max(0, Number(entry?.countryMaxPopulation || 0));
+  const countryClass = String(entry?.countryClass || "micro").trim().toLowerCase();
+  const classWeight = clamp(
+    Number(CITY_COUNTRY_CLASS_WEIGHT[countryClass] || CITY_COUNTRY_CLASS_WEIGHT.micro)
+      + Number(entry?.countryClassWeightBias || 0),
+    0.55,
+    2.1
+  );
+  const minQuotaFloorBoost = clamp(Number(entry?.countryMinQuotaFloorBoost || 0) || 0, 0, 3);
+  const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
+  const scaleFactor = clamp((Math.max(0.0001, Number(scale || 1)) - 1.05) / 2.3, 0, 1);
+  const featureBoost = featureCount >= 220 ? 3
+    : featureCount >= 120 ? 2
+      : featureCount >= 60 ? 1
+        : 0;
+  const controllerBoost = controllerFeatureCount >= 160 ? 2
+    : controllerFeatureCount >= 50 ? 1
+      : 0;
+  const populationBoost = maxPopulation >= 8_000_000 ? 1
+    : maxPopulation >= 3_000_000 ? 0.5
+      : 0;
+  const coarseFloor = Math.floor((featureBoost + controllerBoost + populationBoost) * classWeight * scaleFactor * normalizedDensity);
+  return clamp(coarseFloor + minQuotaFloorBoost, 0, 6);
+}
+
+function buildCityViewportCountryStats(candidateEntries = []) {
+  const statsByCountry = new Map();
+  let totalCandidates = 0;
+  candidateEntries.forEach((entry) => {
+    totalCandidates += 1;
+    const countryKey = String(entry?.countryKey || "").trim();
+    if (!countryKey) return;
+    let stat = statsByCountry.get(countryKey);
+    if (!stat) {
+      stat = { visibleCount: 0, capitalCount: 0 };
+      statsByCountry.set(countryKey, stat);
+    }
+    stat.visibleCount += 1;
+    if (entry?.isCapital) stat.capitalCount += 1;
+  });
+  return { statsByCountry, totalCandidates };
+}
+
+function getCityViewportQuotaMultiplier(entry, viewportStats = null) {
+  if (!viewportStats || !(viewportStats.statsByCountry instanceof Map)) return 1;
+  const countryKey = String(entry?.countryKey || "").trim();
+  if (!countryKey) return 1;
+  const stat = viewportStats.statsByCountry.get(countryKey);
+  if (!stat) return 1;
+  const total = Math.max(1, Number(viewportStats.totalCandidates || 0));
+  const share = clamp((Number(stat.visibleCount || 0) / total) * 12, 0, 1);
+  const spreadBoost = 0.9 + (Math.sqrt(share) * 0.28);
+  const capitalBoost = Number(stat.capitalCount || 0) > 0 ? 0.06 : 0;
+  return clamp(spreadBoost + capitalBoost, 0.85, 1.32);
+}
+
+function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1, viewportStats = null) {
+  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
+  const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
+  const fromQuota = Number(getCityMarkerQuotaForTier(currentPhase.id, countryTier) || 0);
+  const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) || fromQuota);
+  const viewportMultiplier = getCityViewportQuotaMultiplier(entry, viewportStats);
+  const interpolated = (fromQuota + ((toQuota - fromQuota) * t)) * viewportMultiplier;
+  const scaledInterpolated = scaleCityMarkerQuota(interpolated, markerDensity);
+  const sizeFloor = getCitySizeQuotaFloor(entry, scale, markerDensity);
+  return Math.max(scaledInterpolated, sizeFloor);
+}
+
+function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
+  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
+  const fromBudget = Math.max(0, Number(currentPhase?.markerBudget || 0));
+  const toBudget = Math.max(0, Number(nextPhase?.markerBudget || fromBudget));
+  const interpolated = fromBudget + ((toBudget - fromBudget) * t);
+  return Math.max(0, Math.round(interpolated * clamp(Number(markerDensity) || 1, 0.5, 2)));
 }
 
 function compareCityRevealEntries(left, right) {
@@ -12222,7 +12459,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   const markerEntries = [];
   const countsByCountry = new Map();
   const markerDensity = getCityMarkerDensityMultiplier(config);
-  const markerBudget = Math.max(0, Math.round(Number(phase.markerBudget || 0) * markerDensity));
+  const markerBudget = getCityInterpolatedMarkerBudget(scale, markerDensity);
   const labelBudget = getCityLabelBudget(phase, config);
   const labelEntries = [];
 
@@ -12233,9 +12470,20 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         return null;
       }
       const profile = countryProfiles.get(getCityCountryGroupKey(feature)) || {
+        scenarioTag: getCityScenarioTag(feature),
         countryTier: "D",
         countryTierRank: CITY_COUNTRY_TIER_RANK.D,
+        featureCount: 0,
+        maxPopulation: 0,
+        controllerFeatureCount: 0,
+        countryClass: "micro",
+        classWeightBias: 0,
+        minQuotaFloorBoost: 0,
       };
+      const scenarioTag = String(profile.scenarioTag || getCityScenarioTag(feature) || "").trim().toUpperCase();
+      if (isCityScenarioTagExcludedFromReveal(scenarioTag)) {
+        return null;
+      }
       const isCapital = !!feature?.properties?.__city_is_capital;
       const minZoom = getCityEffectiveMinZoom(feature);
       if (!isCapital && scale < minZoom) {
@@ -12253,8 +12501,15 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         cityTier,
         cityTierWeight: getCityTierWeight(feature),
         countryKey: profile.groupKey || getCityCountryGroupKey(feature),
+        scenarioTag,
         countryTier: profile.countryTier || "D",
         countryTierRank: profile.countryTierRank || CITY_COUNTRY_TIER_RANK.D,
+        countryFeatureCount: Math.max(0, Number(profile.featureCount || 0)),
+        countryControllerFeatureCount: Math.max(0, Number(profile.controllerFeatureCount || profile.featureCount || 0)),
+        countryMaxPopulation: Math.max(0, Number(profile.maxPopulation || 0)),
+        countryClass: String(profile.countryClass || "micro").trim().toLowerCase(),
+        countryClassWeightBias: Number(profile.classWeightBias || 0),
+        countryMinQuotaFloorBoost: Number(profile.minQuotaFloorBoost || 0),
         population: Math.max(0, Number(feature?.properties?.__city_population || 0)),
         sortWeight: getCitySortWeight(feature),
         urbanMatchId: urbanInfo.urbanMatchId,
@@ -12263,7 +12518,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         urbanMatchMethod: urbanInfo.urbanMatchMethod,
         acceptedLabelPlacement: "",
       };
-      entry.revealBucket = getCityRevealBucket(entry, phase.id);
+      entry.revealBucket = getCityInterpolatedRevealBucket(entry, scale);
       if (!Number.isFinite(entry.revealBucket)) {
         return null;
       }
@@ -12271,6 +12526,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     })
     .filter(Boolean)
     .sort(compareCityRevealEntries);
+  const viewportStats = buildCityViewportCountryStats(candidateEntries);
 
   const capitalEntriesByCountry = new Map();
   candidateEntries.forEach((entry) => {
@@ -12283,7 +12539,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   capitalEntriesByCountry.forEach((entry) => {
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
     const quota = Math.max(
-      scaleCityMarkerQuota(getCityMarkerQuotaForTier(phase.id, entry.countryTier), markerDensity),
+      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
       1
     );
     if (currentCount >= quota) return;
@@ -12299,7 +12555,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
     if (acceptedCityIds.has(entry.cityId)) continue;
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
     const quota = Math.max(
-      scaleCityMarkerQuota(getCityMarkerQuotaForTier(phase.id, entry.countryTier), markerDensity),
+      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
       entry.isCapital ? 1 : 0
     );
     if (currentCount >= quota) continue;
