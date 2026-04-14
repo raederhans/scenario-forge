@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-12T03:57:42.300Z",
-  "last_progress_at": "2026-04-12T03:57:42.300Z",
-  "turn_count": 31,
-  "last_agent_output": "结论：这 3 个 review 问题我已经按最小路径修掉了，没有再扩大范围。\n\n这次修了：\n\n1. **单语场景改名不再被原始 `name_zh` 抢回**\n   - 文件：`js/core/map_"
+  "last_turn_at": "2026-04-14T03:17:06.117Z",
+  "last_progress_at": "2026-04-14T03:17:06.117Z",
+  "turn_count": 32,
+  "last_agent_output": "结论：**这两个问题我已经修了。**\n\n### 修复内容\n1. **内存问题**\n   - `tools/build_global_transport_roads.py`\n   - 不再先把全球道路全"
 }

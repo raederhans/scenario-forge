@@ -612,3 +612,6 @@
 ### 51. startup bundle 先进入 ready 不代表场景视觉壳已经完整，缺 mask 的场景要提前 full hydration
 - 这次首屏亚特兰托帕海域残留问题，本质上是 startup bundle 已让 TNO 进入 `ready/composite`，但 `scenarioLandMaskData` / `scenarioContextLandMaskData` 还要等默认的 post-ready full hydration，视觉上就会先看到错误海域壳。
 - 更稳的做法是：如果活动场景已经声明了 runtime topology，但 ready 后关键 mask 仍为空，就不要继续按通用延后时间等 full hydration，而应立即快速调度完整场景水合。
+### 27. 全球静态交通 builder 不能先把全量世界主干网物化到 Python list，再做过滤和简化
+- 这次 `build_global_transport_roads.py` 审查直接暴露了一个典型问题：Overture 全球主干道路大约千万级，先 `to_pylist()` 全收进大 list 再转 `GeoDataFrame`，正常开发机和 CI 都会先被内存打爆。
+- 更稳的做法是：按 Arrow batch 流式读取，批内完成字段裁剪、长度过滤、几何简化，再把中间结果落到临时 parquet chunk，最后只对过滤后的结果做汇总和正式输出。

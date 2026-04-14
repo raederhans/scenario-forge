@@ -39,6 +39,18 @@ const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
 const CONTEXT_LAYER_PACKS = {
   airports: { url: "data/transport_layers/japan_airport/airports.geojson", format: "geojson" },
   ports: { url: "data/transport_layers/japan_port/ports.geojson", format: "geojson" },
+  roads: {
+    url: "data/transport_layers/global_road/roads.topo.json",
+    format: "topology",
+    objectName: "roads",
+  },
+  road_labels: { url: "data/transport_layers/global_road/road_labels.geojson", format: "geojson" },
+  railways: {
+    url: "data/transport_layers/global_rail/railways.topo.json",
+    format: "topology",
+    objectName: "railways",
+  },
+  rail_stations_major: { url: "data/transport_layers/global_rail/rail_stations_major.geojson", format: "geojson" },
   physical: { url: "data/europe_physical.geojson", format: "geojson" },
   urban: { url: "data/europe_urban.geojson", format: "geojson" },
   physical_semantics: {

@@ -1251,6 +1251,14 @@ function updateContextLayerDerivedState(layerName, collection) {
     state.airportsData = collection;
   } else if (layerName === "ports") {
     state.portsData = collection;
+  } else if (layerName === "roads") {
+    state.roadsData = collection;
+  } else if (layerName === "road_labels") {
+    state.roadLabelsData = collection;
+  } else if (layerName === "railways") {
+    state.railwaysData = collection;
+  } else if (layerName === "rail_stations_major") {
+    state.railStationsMajorData = collection;
   } else if (layerName === "urban") {
     state.urbanData = collection;
   } else if (layerName === "physical") {

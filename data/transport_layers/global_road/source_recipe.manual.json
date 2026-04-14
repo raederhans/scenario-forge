@@ -1,0 +1,38 @@
+{
+  "version": "global_road_sources_v1",
+  "family": "road",
+  "source_policy": "overture_only_checked_in_v1",
+  "primary_source": {
+    "provider": "Overture Maps Foundation",
+    "release": "2026-02-18.0",
+    "theme": "transportation",
+    "type": "segment",
+    "subtype": "road",
+    "classes": ["motorway", "trunk", "primary"],
+    "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/",
+    "license": "ODbL-1.0"
+  },
+  "product_rules": {
+    "full_min_length_m": {
+      "motorway": 0,
+      "trunk": 3000,
+      "primary": 12000
+    },
+    "preview_min_length_m": {
+      "motorway": 8000,
+      "trunk": 22000,
+      "primary": 60000
+    },
+    "label_min_length_m": {
+      "motorway": 30000,
+      "trunk": 45000,
+      "primary": 80000
+    },
+    "simplify_meters": {
+      "motorway": 120,
+      "trunk": 150,
+      "primary": 180
+    },
+    "reveal_rank_policy": "motorway=1, long trunk=1, other trunk=2, long primary=2, other primary=3"
+  }
+}

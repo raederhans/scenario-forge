@@ -1,0 +1,31 @@
+{
+  "version": "global_rail_sources_v1",
+  "family": "rail",
+  "source_policy": "overture_only_checked_in_v1",
+  "primary_source": {
+    "provider": "Overture Maps Foundation",
+    "release": "2026-02-18.0",
+    "theme": "transportation",
+    "type": "segment",
+    "subtype": "rail",
+    "classes": ["standard_gauge", "unknown"],
+    "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/",
+    "license": "ODbL-1.0"
+  },
+  "product_rules": {
+    "full_min_length_m": {
+      "standard_gauge": 8000,
+      "unknown": 20000
+    },
+    "preview_min_length_m": {
+      "standard_gauge": 35000,
+      "unknown": 90000
+    },
+    "simplify_meters": {
+      "standard_gauge": 120,
+      "unknown": 160
+    },
+    "line_class_policy": "standard_gauge long segments => mainline, other standard_gauge => regional, remaining => secondary",
+    "stations_phase": "phase_b_pending_major_station_source"
+  }
+}
