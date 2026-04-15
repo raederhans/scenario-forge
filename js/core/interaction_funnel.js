@@ -36,6 +36,7 @@ import {
   normalizeUrbanStyleConfig,
   normalizeExportWorkbenchUiState,
   normalizeTransportWorkbenchUiState,
+  normalizeExportWorkbenchUiState,
   state,
 } from "./state.js";
 
@@ -715,6 +716,14 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       ...normalizedExportWorkbenchUi,
       bakeArtifacts: normalizedExportWorkbenchUi.bakeArtifacts,
     };
+    state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
+      ...(state.exportWorkbenchUi || {}),
+      ...data.exportWorkbenchUi,
+      layerVisibility: {
+        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.layerVisibility) || {}),
+        ...(data.exportWorkbenchUi.layerVisibility || {}),
+      },
+    });
   }
   state.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};

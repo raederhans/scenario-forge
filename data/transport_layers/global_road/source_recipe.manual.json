@@ -8,31 +8,33 @@
     "theme": "transportation",
     "type": "segment",
     "subtype": "road",
-    "classes": ["motorway", "trunk", "primary"],
+    "classes": [
+      "motorway",
+      "trunk"
+    ],
     "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/",
     "license": "ODbL-1.0"
   },
   "product_rules": {
     "full_min_length_m": {
-      "motorway": 0,
-      "trunk": 3000,
-      "primary": 12000
+      "motorway": 0.0,
+      "trunk": 3000.0
     },
     "preview_min_length_m": {
-      "motorway": 8000,
-      "trunk": 22000,
-      "primary": 60000
+      "motorway": 8000.0,
+      "trunk": 22000.0
     },
     "label_min_length_m": {
-      "motorway": 30000,
-      "trunk": 45000,
-      "primary": 80000
+      "motorway": 30000.0,
+      "trunk": 45000.0
     },
     "simplify_meters": {
-      "motorway": 120,
-      "trunk": 150,
-      "primary": 180
+      "motorway": 120.0,
+      "trunk": 150.0
     },
-    "reveal_rank_policy": "motorway=1, long trunk=1, other trunk=2, long primary=2, other primary=3"
+    "reveal_rank_policy": "motorway=1, long trunk=1, other trunk=2",
+    "preview_scope": "motorway + trunk only",
+    "phase_a_scope": "motorway + trunk backbone only",
+    "labels_phase": "phase_b_pending_ref_sidecar"
   }
 }

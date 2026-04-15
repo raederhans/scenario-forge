@@ -1,0 +1,90 @@
+{
+  "adapter_id": "global_road_v1",
+  "family": "road",
+  "geometry_kind": "line",
+  "schema_version": 1,
+  "generated_at": "2026-04-14T22:44:37.417795Z",
+  "recipe_path": "data/transport_layers/global_road/shards/w120_w090/source_recipe.manual.json",
+  "recipe_version": "global_road_sources_v1",
+  "distribution_tier": "single_pack",
+  "source_policy": "overture_only_checked_in_v1",
+  "paths": {
+    "preview": {
+      "roads": "data/transport_layers/global_road/shards/w120_w090/roads.preview.topo.json"
+    },
+    "full": {
+      "roads": "data/transport_layers/global_road/shards/w120_w090/roads.topo.json"
+    },
+    "build_audit": "data/transport_layers/global_road/shards/w120_w090/build_audit.json"
+  },
+  "feature_counts": {
+    "preview": {
+      "roads": 4214
+    },
+    "full": {
+      "roads": 170283
+    }
+  },
+  "build_command": "python tools/build_global_transport_roads.py --shard w120_w090",
+  "runtime_consumer": "transport_overview_road",
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_road/shards/w120_w090/source_recipe.manual.json",
+      "size_bytes": 1230,
+      "sha256": "125939c24a362a0d41be3c4f8e3aabc5ef5b59ab613197bdc4e1aac2d11134b8"
+    },
+    "shard": {
+      "id": "w120_w090",
+      "lon_min": -120.0,
+      "lon_max": -90.0
+    }
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "roads": "data/transport_layers/global_road/shards/w120_w090/roads.preview.topo.json"
+        },
+        "full": {
+          "roads": "data/transport_layers/global_road/shards/w120_w090/roads.topo.json"
+        },
+        "build_audit": "data/transport_layers/global_road/shards/w120_w090/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "roads": 4214
+        },
+        "full": {
+          "roads": 170283
+        }
+      }
+    }
+  },
+  "extensions": {
+    "road": {
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      },
+      "runtime_readiness": {
+        "transport_overview_road": "backbone_only_not_ui_ready",
+        "road_labels": "placeholder_only"
+      },
+      "phase_b_reserved_outputs": [
+        "road_labels"
+      ],
+      "shard": {
+        "id": "w120_w090",
+        "lon_min": -120.0,
+        "lon_max": -90.0
+      }
+    }
+  }
+}
