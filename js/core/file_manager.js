@@ -9,6 +9,7 @@ import {
   normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchUiState,
+  normalizeExportWorkbenchUiState,
   normalizeTextureStyleConfig,
 } from "./state.js";
 import { t } from "../ui/i18n.js";
@@ -273,7 +274,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 19,
+      schemaVersion: 20,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -342,6 +343,7 @@ class FileManager {
         dayNight: normalizeDayNightStyleConfig(appState.styleConfig?.dayNight),
       },
       transportWorkbenchUi: normalizeTransportWorkbenchUiState(appState.transportWorkbenchUi),
+      exportWorkbenchUi: normalizeExportWorkbenchUiState(appState.exportWorkbenchUi),
       scenario: appState.activeScenarioId
         ? {
           id: appState.activeScenarioId,
@@ -470,6 +472,7 @@ class FileManager {
         data.styleConfig.texture = normalizeTextureStyleConfig(data.styleConfig.texture);
         data.styleConfig.dayNight = normalizeDayNightStyleConfig(data.styleConfig.dayNight);
         data.transportWorkbenchUi = normalizeTransportWorkbenchUiState(data.transportWorkbenchUi);
+        data.exportWorkbenchUi = normalizeExportWorkbenchUiState(data.exportWorkbenchUi);
         if (
           !data.manualSpecialZones ||
           typeof data.manualSpecialZones !== "object" ||
@@ -509,6 +512,9 @@ class FileManager {
         data.releasableBoundaryVariantByTag = normalizeBoundaryVariantSelectionMap(data.releasableBoundaryVariantByTag);
         if (!data.transportWorkbenchUi || typeof data.transportWorkbenchUi !== "object") {
           data.transportWorkbenchUi = null;
+        }
+        if (!data.exportWorkbenchUi || typeof data.exportWorkbenchUi !== "object") {
+          data.exportWorkbenchUi = null;
         }
         data.layerVisibility.showWaterRegions =
           data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;

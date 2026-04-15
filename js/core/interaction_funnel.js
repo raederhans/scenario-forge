@@ -34,7 +34,9 @@ import {
   normalizePhysicalStyleConfig,
   normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
+  normalizeExportWorkbenchUiState,
   normalizeTransportWorkbenchUiState,
+  normalizeExportWorkbenchUiState,
   state,
 } from "./state.js";
 
@@ -503,6 +505,9 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.transportWorkbenchUi = data.transportWorkbenchUi
     ? cloneImportedProjectValue(data.transportWorkbenchUi)
     : cloneImportedProjectValue(state.transportWorkbenchUi);
+  state.exportWorkbenchUi = data.exportWorkbenchUi
+    ? cloneImportedProjectValue(data.exportWorkbenchUi)
+    : cloneImportedProjectValue(state.exportWorkbenchUi);
   state.specialZones = data.specialZones || {};
   state.parentBordersVisible = data.parentBordersVisible !== false;
   state.manualSpecialZones =
@@ -697,6 +702,28 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       displayConfigs: normalizedTransportWorkbenchUi.displayConfigs,
       sectionOpen: normalizedTransportWorkbenchUi.sectionOpen,
     };
+  }
+  if (data.exportWorkbenchUi && typeof data.exportWorkbenchUi === "object") {
+    const normalizedExportWorkbenchUi = normalizeExportWorkbenchUiState({
+      ...(state.exportWorkbenchUi || {}),
+      ...data.exportWorkbenchUi,
+      bakeArtifacts: Array.isArray(data.exportWorkbenchUi.bakeArtifacts)
+        ? data.exportWorkbenchUi.bakeArtifacts
+        : (state.exportWorkbenchUi?.bakeArtifacts || []),
+    });
+    state.exportWorkbenchUi = {
+      ...(state.exportWorkbenchUi || {}),
+      ...normalizedExportWorkbenchUi,
+      bakeArtifacts: normalizedExportWorkbenchUi.bakeArtifacts,
+    };
+    state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
+      ...(state.exportWorkbenchUi || {}),
+      ...data.exportWorkbenchUi,
+      layerVisibility: {
+        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.layerVisibility) || {}),
+        ...(data.exportWorkbenchUi.layerVisibility || {}),
+      },
+    });
   }
   state.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};

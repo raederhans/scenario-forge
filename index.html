@@ -2358,10 +2358,12 @@
                     <div id="dockExportPopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="lblExport">
                       <h3 id="lblExport" class="sidebar-tool-title" data-i18n="Export Map">Export Map</h3>
                       <p id="exportToolHint" class="sidebar-help-copy mt-2" data-i18n="Export the visible map as a PNG or JPG snapshot.">Export the visible map as a PNG or JPG snapshot.</p>
-                      <label id="lblExportTarget" class="sidebar-field-label mt-3" for="exportTarget" data-i18n="Target:">Target:</label>
-                      <select id="exportTarget" name="export-target" autocomplete="off" class="select-input mt-2">
-                        <option id="optExportTargetComposite" value="composite" data-i18n="Composite image">Composite image</option>
-                        <option id="optExportTargetPerLayerPng" value="per-layer-png" data-i18n="Per-layer PNG">Per-layer PNG</option>
+<label id="lblExportTarget" class="sidebar-field-label mt-3" for="exportTarget" data-i18n="Target:">Target:</label>
+<select id="exportTarget" name="export-target" autocomplete="off" class="select-input mt-2">
+  <option id="optExportTargetComposite" value="composite" data-i18n="Composite image">Composite image</option>
+  <option id="optExportTargetPerLayerPng" value="per-layer-png" data-i18n="Per-layer PNG">Per-layer PNG</option>
+  <option id="optExportTargetBakePack" value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
+</select>
                         <option id="optExportTargetBakePack" value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
                       </select>
                       <label id="lblExportFormat" class="sidebar-field-label mt-3" for="exportFormat">Format</label>
@@ -2369,17 +2371,20 @@
                         <option value="png">PNG</option>
                         <option value="jpg">JPG</option>
                       </select>
-                      <label id="lblExportScale" class="sidebar-field-label mt-3" for="exportScale" data-i18n="Export Resolution">Export Resolution</label>
-                      <select id="exportScale" name="export-scale" autocomplete="off" class="select-input mt-2">
-                        <option id="optExportScale1x" value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
-                        <option id="optExportScale1_5x" value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
-                        <option id="optExportScale2x" value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
-                        <option id="optExportScale4x" value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
-                      </select>
-                      <p id="exportResolutionHint" class="sidebar-help-copy mt-2" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
-                      <div class="export-workbench mt-3">
-                        <div id="lblExportWorkbenchMainLayers" class="sidebar-field-label" data-i18n="Main Layers">Main Layers</div>
-                        <p id="exportWorkbenchHint" class="sidebar-help-copy mt-2" data-i18n="Drag to reorder exported layer groups. Visibility only applies to this export session.">Drag to reorder exported layer groups. Visibility only applies to this export session.</p>
+<label id="lblExportScale" class="sidebar-field-label mt-3" for="exportScale" data-i18n="Export Resolution">Export Resolution</label>
+<select id="exportScale" name="export-scale" autocomplete="off" class="select-input mt-2">
+  <option id="optExportScale1x" value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
+  <option id="optExportScale1_5x" value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
+  <option id="optExportScale2x" value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
+  <option id="optExportScale4x" value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
+</select>
+<p id="exportResolutionHint" class="sidebar-help-copy mt-2" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
+
+<div class="export-workbench mt-3">
+  <div id="lblExportWorkbenchMainLayers" class="sidebar-field-label" data-i18n="Main Layers">Main Layers</div>
+  <p id="exportWorkbenchHint" class="sidebar-help-copy mt-2" data-i18n="Drag to reorder exported layer groups. Visibility only applies to this export session.">Drag to reorder exported layer groups. Visibility only applies to this export session.</p>
+  <div id="exportWorkbenchLayerList" class="export-workbench-layer-list" role="list"></div>
+</div>
                         <div id="exportWorkbenchLayerList" class="export-workbench-layer-list" role="list"></div>
                       </div>
                       <button id="exportBtn" class="btn-primary sidebar-tool-action-primary mt-4">Download Snapshot</button>
@@ -2544,6 +2549,127 @@
               <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary" data-i18n="Reset View">Reset View</button>
               <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true" data-i18n="Apply to Main Map">Apply to Main Map</button>
             </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="exportWorkbenchOverlay" class="export-workbench-overlay hidden" aria-hidden="true">
+      <section
+        id="exportWorkbenchPanel"
+        class="export-workbench-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exportWorkbenchTitle"
+      >
+        <h2 id="exportWorkbenchTitle" class="visually-hidden" data-i18n="Export workbench">Export workbench</h2>
+        <div class="export-workbench-shell">
+          <div class="export-workbench-topbar">
+            <div class="export-workbench-topbar-copy">
+              <div class="export-workbench-topbar-kicker" data-i18n="Export">Export</div>
+              <h3 class="export-workbench-topbar-title" data-i18n="Export workbench">Export workbench</h3>
+            </div>
+            <button
+              id="exportWorkbenchCloseBtn"
+              type="button"
+              class="export-workbench-close-btn"
+              aria-label="Close export workbench"
+              data-i18n="Close"
+              data-i18n-aria-label="Close export workbench"
+            >
+              Close
+            </button>
+          </div>
+          <div class="export-workbench-grid">
+            <section class="export-workbench-column export-workbench-column-params" aria-labelledby="exportWorkbenchParamsTitle">
+              <div class="export-workbench-column-kicker" data-i18n="Base image">Base image</div>
+              <h4 id="exportWorkbenchParamsTitle" class="export-workbench-column-title" data-i18n="Base frame tuning">Base frame tuning</h4>
+              <div class="export-workbench-control-list">
+                <label class="export-workbench-control" for="exportWorkbenchBrightness">
+                  <span class="export-workbench-control-label" data-i18n="Brightness">Brightness</span>
+                  <input id="exportWorkbenchBrightness" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
+                </label>
+                <label class="export-workbench-control" for="exportWorkbenchContrast">
+                  <span class="export-workbench-control-label" data-i18n="Contrast">Contrast</span>
+                  <input id="exportWorkbenchContrast" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
+                </label>
+                <label class="export-workbench-control" for="exportWorkbenchSaturation">
+                  <span class="export-workbench-control-label" data-i18n="Saturation">Saturation</span>
+                  <input id="exportWorkbenchSaturation" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
+                </label>
+                <label class="export-workbench-control" for="exportWorkbenchClarity">
+                  <span class="export-workbench-control-label" data-i18n="Clarity">Clarity</span>
+                  <input id="exportWorkbenchClarity" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
+                </label>
+              </div>
+            </section>
+
+            <section class="export-workbench-column export-workbench-column-preview" aria-labelledby="exportWorkbenchPreviewTitle">
+              <div class="export-workbench-preview-header">
+                <h4 id="exportWorkbenchPreviewTitle" class="export-workbench-column-title" data-i18n="Export preview canvas">Export preview canvas</h4>
+                <div class="export-workbench-preview-toggle" role="group" aria-label="Preview mode" data-i18n-aria-label="Preview mode">
+                  <button type="button" class="export-workbench-preview-toggle-btn is-active" data-export-preview-mode="main" aria-pressed="true" data-i18n="Main image">Main image</button>
+                  <button type="button" class="export-workbench-preview-toggle-btn" data-export-preview-mode="layer" aria-pressed="false" data-i18n="Single layer">Single layer</button>
+                </div>
+              </div>
+              <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
+                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state">
+                  Main image preview (placeholder)
+                </div>
+              </div>
+            </section>
+
+            <section class="export-workbench-column export-workbench-column-layers" aria-labelledby="exportWorkbenchLayersTitle">
+              <h4 id="exportWorkbenchLayersTitle" class="export-workbench-column-title" data-i18n="Layer and text stacks">Layer and text stacks</h4>
+              <div class="export-workbench-layer-groups">
+                <div class="export-workbench-layer-group">
+                  <div class="export-workbench-group-header">
+                    <span class="export-workbench-column-kicker" data-i18n="Main layers">Main layers</span>
+                    <span class="export-workbench-group-hint" data-i18n="Sort · Visibility · Bake">Sort · Visibility · Bake</span>
+                  </div>
+                  <div id="exportWorkbenchMainLayerList" class="export-workbench-layer-list" role="list">
+                    <div class="export-workbench-layer-item" role="listitem">
+                      <span class="export-workbench-layer-order">01</span>
+                      <span class="export-workbench-layer-name" data-i18n="Base map">Base map</span>
+                      <span class="export-workbench-layer-meta" data-i18n="Visible · Baked">Visible · Baked</span>
+                    </div>
+                    <div class="export-workbench-layer-item" role="listitem">
+                      <span class="export-workbench-layer-order">02</span>
+                      <span class="export-workbench-layer-name" data-i18n="Transport overlay">Transport overlay</span>
+                      <span class="export-workbench-layer-meta" data-i18n="Visible · Live">Visible · Live</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="export-workbench-layer-group">
+                  <div class="export-workbench-group-header">
+                    <span class="export-workbench-column-kicker" data-i18n="Text elements">Text elements</span>
+                    <span class="export-workbench-group-hint" data-i18n="Nameplates and labels">Nameplates and labels</span>
+                  </div>
+                  <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list">
+                    <div class="export-workbench-layer-item" role="listitem">
+                      <span class="export-workbench-layer-order">T1</span>
+                      <span class="export-workbench-layer-name" data-i18n="Country labels">Country labels</span>
+                      <span class="export-workbench-layer-meta" data-i18n="Visible">Visible</span>
+                    </div>
+                    <div class="export-workbench-layer-item" role="listitem">
+                      <span class="export-workbench-layer-order">T2</span>
+                      <span class="export-workbench-layer-name" data-i18n="City labels">City labels</span>
+                      <span class="export-workbench-layer-meta" data-i18n="Hidden">Hidden</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="export-workbench-footer">
+            <label id="lblExportWorkbenchFormat" class="sidebar-field-label" for="exportWorkbenchFormat" data-i18n="Format">Format</label>
+            <select id="exportWorkbenchFormat" name="export-workbench-format" autocomplete="off" class="select-input export-workbench-format-select">
+              <option value="png">PNG</option>
+              <option value="jpg">JPG</option>
+            </select>
+            <button id="exportWorkbenchSnapshotBtn" class="btn-primary export-workbench-snapshot-btn" type="button" data-i18n="Download Snapshot">
+              Download Snapshot
+            </button>
           </div>
         </div>
       </section>
