@@ -1567,108 +1567,6 @@ function normalizeTransportWorkbenchDisplayConfigs(rawConfigs) {
     ])
   );
 }
-
-
-const EXPORT_WORKBENCH_LAYER_IDS = Object.freeze([
-  "base",
-  "paint",
-  "borders",
-  "labels",
-  "overlay",
-]);
-
-function normalizeExportWorkbenchLayerOrder(rawOrder) {
-  const savedOrder = Array.isArray(rawOrder) ? rawOrder.map((value) => String(value || "").trim()).filter(Boolean) : [];
-  return EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => savedOrder.includes(layerId)).concat(
-    EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => !savedOrder.includes(layerId))
-  );
-}
-
-function normalizeExportWorkbenchLayerVisibility(rawVisibility) {
-  const source = rawVisibility && typeof rawVisibility === "object" ? rawVisibility : {};
-  return Object.fromEntries(
-    EXPORT_WORKBENCH_LAYER_IDS.map((layerId) => [
-      layerId,
-      source[layerId] === undefined ? true : !!source[layerId],
-    ])
-  );
-}
-
-function normalizeExportWorkbenchUiState(rawUi) {
-  const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
-  const textItems = Array.isArray(raw.textItems)
-    ? raw.textItems
-      .map((entry, index) => {
-        const source = entry && typeof entry === "object" ? entry : {};
-        const text = String(source.text || "");
-        if (!text.trim()) return null;
-        return {
-          id: String(source.id || "").trim() || `text_${index + 1}`,
-          text,
-          x: toFiniteNumber(source.x, 0),
-          y: toFiniteNumber(source.y, 0),
-          font: String(source.font || "600 20px Inter").trim() || "600 20px Inter",
-          fill: String(source.fill || "#ffffff").trim() || "#ffffff",
-          align: ["left", "center", "right"].includes(String(source.align || "").trim().toLowerCase())
-            ? String(source.align || "").trim().toLowerCase()
-            : "left",
-          baseline: ["top", "middle", "bottom", "alphabetic"].includes(String(source.baseline || "").trim().toLowerCase())
-            ? String(source.baseline || "").trim().toLowerCase()
-            : "alphabetic",
-        };
-      })
-      .filter(Boolean)
-    : [];
-  const exportTargets = Array.isArray(raw.exportTargets)
-    ? raw.exportTargets
-      .map((entry) => {
-        const source = entry && typeof entry === "object" ? entry : {};
-        const type = String(source.type || "").trim().toLowerCase();
-        if (!["composite", "layer"].includes(type)) return null;
-        const id = String(source.id || "").trim();
-        const layerId = String(source.layerId || "").trim();
-        if (type === "layer" && !EXPORT_WORKBENCH_LAYER_IDS.includes(layerId)) return null;
-        return {
-          id: id || (type === "layer" ? `${layerId}_layer` : "composite"),
-          type,
-          layerId: type === "layer" ? layerId : "",
-        };
-      })
-      .filter(Boolean)
-    : [];
-  const bakeQueue = Array.isArray(raw.bakeQueue)
-    ? raw.bakeQueue
-      .map((entry) => {
-        const source = entry && typeof entry === "object" ? entry : {};
-        const layerId = String(source.layerId || "").trim();
-        if (!EXPORT_WORKBENCH_LAYER_IDS.includes(layerId)) return null;
-        return {
-          layerId,
-          enabled: source.enabled === undefined ? true : !!source.enabled,
-          mode: ["none", "flatten", "multiply", "screen", "overlay"].includes(String(source.mode || "").trim().toLowerCase())
-            ? String(source.mode || "").trim().toLowerCase()
-            : "none",
-        };
-      })
-      .filter(Boolean)
-    : [];
-  return {
-    open: !!raw.open,
-    activePreset: String(raw.activePreset || "default").trim() || "default",
-    layerOrder: normalizeExportWorkbenchLayerOrder(raw.layerOrder),
-    layerVisibility: normalizeExportWorkbenchLayerVisibility(raw.layerVisibility),
-    bakeQueue,
-    textItems,
-    exportTargets: exportTargets.length ? exportTargets : [{ id: "composite", type: "composite", layerId: "" }],
-    imageAdjustments: {
-      brightness: clamp(toFiniteNumber(raw.imageAdjustments?.brightness, 1), 0.2, 2.5),
-      contrast: clamp(toFiniteNumber(raw.imageAdjustments?.contrast, 1), 0.2, 2.5),
-      saturation: clamp(toFiniteNumber(raw.imageAdjustments?.saturation, 1), 0, 3),
-      gamma: clamp(toFiniteNumber(raw.imageAdjustments?.gamma, 1), 0.3, 3),
-    },
-  };
-}
-
 function normalizeTransportWorkbenchUiState(rawUi) {
   const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
   const rawPreviewCamera = raw.previewCamera && typeof raw.previewCamera === "object" ? raw.previewCamera : {};
@@ -1708,7 +1606,33 @@ function normalizeTransportWorkbenchUiState(rawUi) {
 }
 
 const EXPORT_WORKBENCH_TARGETS = new Set(["composite", "per-layer", "bake-pack"]);
-const EXPORT_WORKBENCH_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
+const EXPORT_WORKBENCH_LAYER_IDS = Object.freeze([
+  "background",
+  "political",
+  "context",
+  "effects",
+  "labels",
+]);
+const EXPORT_WORKBENCH_BAKE_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
+
+function normalizeExportWorkbenchLayerOrder(rawOrder) {
+  const savedOrder = Array.isArray(rawOrder)
+    ? rawOrder.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean)
+    : [];
+  return EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => savedOrder.includes(layerId)).concat(
+    EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => !savedOrder.includes(layerId))
+  );
+}
+
+function normalizeExportWorkbenchVisibility(rawVisibility) {
+  const source = rawVisibility && typeof rawVisibility === "object" ? rawVisibility : {};
+  return Object.fromEntries(
+    EXPORT_WORKBENCH_LAYER_IDS.map((layerId) => [
+      layerId,
+      source[layerId] === undefined ? true : !!source[layerId],
+    ])
+  );
+}
 
 function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
   if (!Array.isArray(rawArtifacts)) return [];
@@ -1716,7 +1640,7 @@ function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
     .map((entry) => {
       const artifact = entry && typeof entry === "object" ? entry : {};
       const layerId = String(artifact.layerId || "").trim().toLowerCase();
-      if (!EXPORT_WORKBENCH_LAYER_IDS.has(layerId)) return null;
+      if (!EXPORT_WORKBENCH_BAKE_LAYER_IDS.has(layerId)) return null;
       const dependencies = Array.isArray(artifact.dependencies)
         ? artifact.dependencies.map((value) => String(value || "").trim()).filter(Boolean)
         : [];
@@ -1739,21 +1663,17 @@ function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
 
 function normalizeExportWorkbenchUiState(rawUi) {
   const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
-  const target = String(raw.target || "").trim().toLowerCase();
-  const layerOrderSource = Array.isArray(raw.layerOrder) ? raw.layerOrder : [];
-  const normalizedLayerOrder = Array.from(new Set(layerOrderSource
-    .map((value) => String(value || "").trim().toLowerCase())
-    .filter((value) => EXPORT_WORKBENCH_LAYER_IDS.has(value))));
-  EXPORT_WORKBENCH_LAYER_IDS.forEach((layerId) => {
-    if (!normalizedLayerOrder.includes(layerId)) {
-      normalizedLayerOrder.push(layerId);
-    }
-  });
+  const rawTarget = String(raw.target || "").trim().toLowerCase();
+  const normalizedTarget = rawTarget === "per-layer-png" ? "per-layer" : rawTarget;
+  const visibilitySource = raw.visibility && typeof raw.visibility === "object"
+    ? raw.visibility
+    : raw.layerVisibility;
   return {
-    target: EXPORT_WORKBENCH_TARGETS.has(target) ? target : "composite",
+    target: EXPORT_WORKBENCH_TARGETS.has(normalizedTarget) ? normalizedTarget : "composite",
     format: String(raw.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png",
     includeTextLayer: raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer,
-    layerOrder: normalizedLayerOrder,
+    layerOrder: normalizeExportWorkbenchLayerOrder(raw.layerOrder),
+    visibility: normalizeExportWorkbenchVisibility(visibilitySource),
     bakeArtifacts: normalizeExportWorkbenchBakeArtifacts(raw.bakeArtifacts),
   };
 }

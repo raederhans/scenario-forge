@@ -2357,41 +2357,7 @@
                     </div>
                     <div id="dockExportPopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="lblExport">
                       <h3 id="lblExport" class="sidebar-tool-title" data-i18n="Export Map">Export Map</h3>
-                      <p id="exportToolHint" class="sidebar-help-copy mt-2" data-i18n="Export the visible map as a PNG or JPG snapshot.">Export the visible map as a PNG or JPG snapshot.</p>
-                      <label id="lblExportTarget" class="sidebar-field-label mt-3" for="exportTarget" data-i18n="Target">Target</label>
-                      <select id="exportTarget" name="export-target" autocomplete="off" class="select-input mt-2">
-                        <option id="optExportTargetComposite" value="composite" data-i18n="Composite image">Composite image</option>
-                        <option id="optExportTargetPerLayer" value="per-layer" data-i18n="Per-layer PNG">Per-layer PNG</option>
-<label id="lblExportTarget" class="sidebar-field-label mt-3" for="exportTarget" data-i18n="Target:">Target:</label>
-<select id="exportTarget" name="export-target" autocomplete="off" class="select-input mt-2">
-  <option id="optExportTargetComposite" value="composite" data-i18n="Composite image">Composite image</option>
-  <option id="optExportTargetPerLayerPng" value="per-layer-png" data-i18n="Per-layer PNG">Per-layer PNG</option>
-  <option id="optExportTargetBakePack" value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
-</select>
-                        <option id="optExportTargetBakePack" value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
-                      </select>
-                      <label id="lblExportFormat" class="sidebar-field-label mt-3" for="exportFormat">Format</label>
-                      <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
-                        <option value="png">PNG</option>
-                        <option value="jpg">JPG</option>
-                      </select>
-<label id="lblExportScale" class="sidebar-field-label mt-3" for="exportScale" data-i18n="Export Resolution">Export Resolution</label>
-<select id="exportScale" name="export-scale" autocomplete="off" class="select-input mt-2">
-  <option id="optExportScale1x" value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
-  <option id="optExportScale1_5x" value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
-  <option id="optExportScale2x" value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
-  <option id="optExportScale4x" value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
-</select>
-<p id="exportResolutionHint" class="sidebar-help-copy mt-2" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
-
-<div class="export-workbench mt-3">
-  <div id="lblExportWorkbenchMainLayers" class="sidebar-field-label" data-i18n="Main Layers">Main Layers</div>
-  <p id="exportWorkbenchHint" class="sidebar-help-copy mt-2" data-i18n="Drag to reorder exported layer groups. Visibility only applies to this export session.">Drag to reorder exported layer groups. Visibility only applies to this export session.</p>
-  <div id="exportWorkbenchLayerList" class="export-workbench-layer-list" role="list"></div>
-</div>
-                        <div id="exportWorkbenchLayerList" class="export-workbench-layer-list" role="list"></div>
-                      </div>
-                      <button id="exportBtn" class="btn-primary sidebar-tool-action-primary mt-4">Download Snapshot</button>
+                      <p id="exportToolHint" class="sidebar-help-copy mt-2" data-i18n="Export now opens the workbench overlay for target, layer, and resolution controls.">Export now opens the workbench overlay for target, layer, and resolution controls.</p>
                     </div>
                   </div>
                 </div>
@@ -2666,11 +2632,25 @@
             </section>
           </div>
           <div class="export-workbench-footer">
+            <label id="lblExportWorkbenchTarget" class="sidebar-field-label" for="exportWorkbenchTarget" data-i18n="Target">Target</label>
+            <select id="exportWorkbenchTarget" name="export-workbench-target" autocomplete="off" class="select-input export-workbench-format-select">
+              <option value="composite" data-i18n="Composite image">Composite image</option>
+              <option value="per-layer" data-i18n="Per-layer PNG">Per-layer PNG</option>
+              <option value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
+            </select>
             <label id="lblExportWorkbenchFormat" class="sidebar-field-label" for="exportWorkbenchFormat" data-i18n="Format">Format</label>
             <select id="exportWorkbenchFormat" name="export-workbench-format" autocomplete="off" class="select-input export-workbench-format-select">
               <option value="png">PNG</option>
               <option value="jpg">JPG</option>
             </select>
+            <label id="lblExportWorkbenchScale" class="sidebar-field-label" for="exportWorkbenchScale" data-i18n="Export Resolution">Export Resolution</label>
+            <select id="exportWorkbenchScale" name="export-workbench-scale" autocomplete="off" class="select-input export-workbench-format-select">
+              <option value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
+              <option value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
+              <option value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
+              <option value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
+            </select>
+            <p id="exportWorkbenchResolutionHint" class="sidebar-help-copy" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
             <button id="exportWorkbenchSnapshotBtn" class="btn-primary export-workbench-snapshot-btn" type="button" data-i18n="Download Snapshot">
               Download Snapshot
             </button>

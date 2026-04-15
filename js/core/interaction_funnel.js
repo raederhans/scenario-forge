@@ -36,7 +36,6 @@ import {
   normalizeUrbanStyleConfig,
   normalizeExportWorkbenchUiState,
   normalizeTransportWorkbenchUiState,
-  normalizeExportWorkbenchUiState,
   state,
 } from "./state.js";
 
@@ -704,25 +703,16 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     };
   }
   if (data.exportWorkbenchUi && typeof data.exportWorkbenchUi === "object") {
-    const normalizedExportWorkbenchUi = normalizeExportWorkbenchUiState({
-      ...(state.exportWorkbenchUi || {}),
-      ...data.exportWorkbenchUi,
-      bakeArtifacts: Array.isArray(data.exportWorkbenchUi.bakeArtifacts)
-        ? data.exportWorkbenchUi.bakeArtifacts
-        : (state.exportWorkbenchUi?.bakeArtifacts || []),
-    });
-    state.exportWorkbenchUi = {
-      ...(state.exportWorkbenchUi || {}),
-      ...normalizedExportWorkbenchUi,
-      bakeArtifacts: normalizedExportWorkbenchUi.bakeArtifacts,
-    };
     state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
       ...(state.exportWorkbenchUi || {}),
       ...data.exportWorkbenchUi,
-      layerVisibility: {
-        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.layerVisibility) || {}),
-        ...(data.exportWorkbenchUi.layerVisibility || {}),
+      visibility: {
+        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.visibility) || {}),
+        ...(data.exportWorkbenchUi.visibility || data.exportWorkbenchUi.layerVisibility || {}),
       },
+      bakeArtifacts: Array.isArray(data.exportWorkbenchUi.bakeArtifacts)
+        ? data.exportWorkbenchUi.bakeArtifacts
+        : (state.exportWorkbenchUi?.bakeArtifacts || []),
     });
   }
   state.customPresets =
