@@ -14,7 +14,7 @@ test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page
   await expect(page.locator("#presetClear")).toHaveCount(0);
 
   await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
-  await expect(page.locator("#dockExportBtn")).toHaveText("Export");
+  await expect(page.locator("#dockExportBtn")).toHaveText("Open workbench");
 
   await page.locator("#scenarioGuideBtn").click();
 

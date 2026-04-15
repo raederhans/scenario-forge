@@ -3066,8 +3066,13 @@ function initSidebar({ render } = {}) {
       });
     }
     if (isProjectSupportView(viewValue) && scopeValue !== "current-object") {
+      const exportDetails = document.getElementById("exportProjectSection");
       const utilitiesDetails = document.getElementById("inspectorUtilitiesSection");
-      if (utilitiesDetails instanceof HTMLDetailsElement) {
+      if (viewValue === "export") {
+        if (exportDetails instanceof HTMLDetailsElement) {
+          exportDetails.open = true;
+        }
+      } else if (utilitiesDetails instanceof HTMLDetailsElement) {
         utilitiesDetails.open = true;
       }
       return "project";

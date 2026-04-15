@@ -6,9 +6,26 @@
 
 1. 启动应用（本地开发模式）。
 2. 打开任意包含多图层与文本标注的场景。
-3. 打开 **Support → Export Map** 面板。
+3. 打开 **Project → Export** 区块，再进入 `Open workbench`。
 
 ## 1. 导出硬性约束
+
+### Case P：真实预览可用
+
+1. 打开 Export workbench。
+2. 确认预览区显示真实画面，而不是占位文案。
+3. 切换 `Main image / Single layer`。
+4. 预期：
+   - 两种模式都显示真实预览。
+   - `Single layer` 会随预览来源切换而变化。
+
+### Case T：Text stack 可见性真实生效
+
+1. 在 `Text elements` 里分别关闭 `Render-pass labels` 与 `SVG annotations`。
+2. 观察预览，再执行一次导出。
+3. 预期：
+   - 预览会立刻反映文字层变化。
+   - 导出结果与当前文字层可见性一致。
 
 ### Case A：8K 上限约束
 
@@ -33,8 +50,23 @@
 2. 选择导出倍率 `2×` 并导出。
 3. 检查导出文件像素尺寸。
 4. 预期：
-   - 预览尺寸不变。
-   - 导出文件尺寸为预览的 2×（例如 3840×2160）。
+  - 预览尺寸不变。
+  - 导出文件尺寸为预览的 2×（例如 3840×2160）。
+
+### Case B1：Bake current pack
+
+1. 点击 `Bake current pack`。
+2. 预期：
+   - Bake 列表出现更新时间/缓存状态变化。
+   - 不报错时，后续 `Bake pack` 导出可直接生成多文件结果。
+
+### Case B2：Bake pack 多文件导出
+
+1. 将 `Target` 切换到 `Bake pack (v1.1)`。
+2. 点击下载。
+3. 预期：
+   - 浏览器会下载多张 baked PNG 与一个 metadata JSON。
+   - 成功提示是 bake-pack 语义，而不是普通 snapshot 语义。
 
 ## 2. 导出失败分级提示
 

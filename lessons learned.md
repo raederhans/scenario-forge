@@ -699,3 +699,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 41. 连续叠加同一 feature 的 PR 时，先收口唯一 state schema，再继续加 UI 和导出分支
 - 如果 state normalizer、DOM 控件、import 恢复链各自按不同字段名演化，最后合并时最容易留下“语法能过一半、运行链却分叉”的双轨残留。
 - 更稳的最短路径是：先固定唯一 canonical schema，再让 toolbar / file_manager / interaction_funnel 全部只认这一套；旧字段只做单向迁移，不要长期并存。
+
+### 39. 支持区工具一旦升级成一级功能区块，必须同波次迁移 URL restore、旧壳清理和契约测试
+- 这次 Export 从 Utilities 升成 Project 一级区块后，如果只挪 DOM、不同时改 sidebar.js / toolbar.js 的 restore 链、旧 popover 清理和 contract/e2e，界面会立刻出现‘入口新了，但状态恢复和测试还活在旧层级’的分裂。
+- 最稳的最短路径是：保留按钮 id 和 overlay id，只搬入口层级；同时把旧 support-surface 残链一次删干净。

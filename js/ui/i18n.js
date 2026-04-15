@@ -46,10 +46,6 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
     zh: "\u5728\u8c03\u6574\u900f\u660e\u5ea6\u3001\u7f29\u653e\u548c\u504f\u79fb\u65f6\uff0c\u8ba9\u53c2\u8003\u5185\u5bb9\u59cb\u7ec8\u53ef\u89c1\u3002",
     en: "Keep a working reference visible while you line up opacity, scale, and offsets.",
   },
-  "Export the visible map as a PNG or JPG snapshot.": {
-    zh: "\u628a\u5f53\u524d\u53ef\u89c1\u5730\u56fe\u5bfc\u51fa\u4e3a PNG \u6216 JPG \u5feb\u7167\u3002",
-    en: "Export the visible map as a PNG or JPG snapshot.",
-  },
   Target: { zh: "\u76ee\u6807", en: "Target" },
   "Composite image": { zh: "\u4e3b\u56fe\u5408\u6210", en: "Composite image" },
   "Per-layer PNG": { zh: "\u5355\u5c42 PNG", en: "Per-layer PNG" },
@@ -127,6 +123,49 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
     zh: "\u5bfc\u51fa\u5931\u8d25 \u00b7 \u53c2\u6570\u9519\u8bef",
     en: "Export failed \u00b7 Invalid parameters",
   },
+  "Open the export workbench for target, layer, and resolution controls.": {
+    zh: "\u6253\u5f00\u5bfc\u51fa\u5de5\u4f5c\u53f0\uff0c\u8c03\u6574\u76ee\u6807\u3001\u56fe\u5c42\u548c\u5206\u8fa8\u7387\u63a7\u5236\u3002",
+    en: "Open the export workbench for target, layer, and resolution controls.",
+  },
+  "Open the export workbench to choose target, layer order, format, and resolution.": {
+    zh: "\u6253\u5f00\u5bfc\u51fa\u5de5\u4f5c\u53f0\uff0c\u9009\u62e9\u76ee\u6807\u3001\u56fe\u5c42\u987a\u5e8f\u3001\u683c\u5f0f\u548c\u5206\u8fa8\u7387\u3002",
+    en: "Open the export workbench to choose target, layer order, format, and resolution.",
+  },
+  "Keep the guide and reference tools nearby without mixing them into the main project workflow.": {
+    zh: "\u628a Guide \u548c Reference \u7559\u5728\u9644\u8fd1\uff0c\u4f46\u4e0d\u8981\u518d\u548c\u4e3b\u9879\u76ee\u6d41\u7a0b\u6df7\u5728\u4e00\u8d77\u3002",
+    en: "Keep the guide and reference tools nearby without mixing them into the main project workflow.",
+  },
+  "Export summary": { zh: "\u5bfc\u51fa\u6458\u8981", en: "Export summary" },
+  "Export actions": { zh: "\u5bfc\u51fa\u64cd\u4f5c", en: "Export actions" },
+  "Open workbench": { zh: "\u6253\u5f00\u5de5\u4f5c\u53f0", en: "Open workbench" },
+  "Bake outputs": { zh: "\u70d8\u7119\u8f93\u51fa", en: "Bake outputs" },
+  "Prepare reusable export layers": { zh: "\u9884\u5148\u751f\u6210\u53ef\u590d\u7528\u7684\u5bfc\u51fa\u56fe\u5c42", en: "Prepare reusable export layers" },
+  "Bake current pack": { zh: "\u70d8\u7119\u5f53\u524d\u5bfc\u51fa\u5305", en: "Bake current pack" },
+  "Clear baked cache": { zh: "\u6e05\u7a7a\u70d8\u7119\u7f13\u5b58", en: "Clear baked cache" },
+  "Preview source": { zh: "\u9884\u89c8\u6765\u6e90", en: "Preview source" },
+  "Export preview ready": { zh: "\u5bfc\u51fa\u9884\u89c8\u5df2\u5c31\u7eea", en: "Export preview ready" },
+  "Rendering export preview\u2026": { zh: "\u6b63\u5728\u6e32\u67d3\u5bfc\u51fa\u9884\u89c8\u2026", en: "Rendering export preview\u2026" },
+  "Single layer preview ready": { zh: "\u5355\u5c42\u9884\u89c8\u5df2\u5c31\u7eea", en: "Single layer preview ready" },
+  "Main image preview ready": { zh: "\u4e3b\u56fe\u9884\u89c8\u5df2\u5c31\u7eea", en: "Main image preview ready" },
+  "Preview unavailable. Export settings remain editable.": { zh: "\u9884\u89c8\u6682\u4e0d\u53ef\u7528\uff0c\u4f46\u4ecd\u53ef\u7ee7\u7eed\u8c03\u6574\u5bfc\u51fa\u8bbe\u7f6e\u3002", en: "Preview unavailable. Export settings remain editable." },
+  "Render-pass labels and SVG annotations": { zh: "\u6e32\u67d3 pass \u6807\u7b7e\u4e0e SVG \u6807\u6ce8", en: "Render-pass labels and SVG annotations" },
+  "Sort \u00b7 Visibility": { zh: "\u6392\u5e8f \u00b7 \u53ef\u89c1\u6027", en: "Sort \u00b7 Visibility" },
+  "Render-pass labels": { zh: "\u6e32\u67d3 pass \u6807\u7b7e", en: "Render-pass labels" },
+  "SVG annotations": { zh: "SVG \u6807\u6ce8", en: "SVG annotations" },
+  nodes: { zh: "\u8282\u70b9", en: "nodes" },
+  "Not baked yet": { zh: "\u5c1a\u672a\u70d8\u7119", en: "Not baked yet" },
+  "Ready to export": { zh: "\u53ef\u76f4\u63a5\u5bfc\u51fa", en: "Ready to export" },
+  Cached: { zh: "\u5df2\u7f13\u5b58", en: "Cached" },
+  "Download Bake Pack": { zh: "\u4e0b\u8f7d\u70d8\u7119\u5305", en: "Download Bake Pack" },
+  "Download Layers": { zh: "\u4e0b\u8f7d\u56fe\u5c42", en: "Download Layers" },
+  "Layer export finished.": { zh: "\u56fe\u5c42\u5bfc\u51fa\u5b8c\u6210\u3002", en: "Layer export finished." },
+  "Layers exported": { zh: "\u56fe\u5c42\u5df2\u5bfc\u51fa", en: "Layers exported" },
+  "Bake outputs updated.": { zh: "\u70d8\u7119\u8f93\u51fa\u5df2\u66f4\u65b0\u3002", en: "Bake outputs updated." },
+  "Bake ready": { zh: "\u70d8\u7119\u5df2\u5c31\u7eea", en: "Bake ready" },
+  "Cleared baked cache.": { zh: "\u5df2\u6e05\u7a7a\u70d8\u7119\u7f13\u5b58\u3002", en: "Cleared baked cache." },
+  "Bake cache cleared": { zh: "\u70d8\u7119\u7f13\u5b58\u5df2\u6e05\u7a7a", en: "Bake cache cleared" },
+  "Bake pack downloaded as multiple files.": { zh: "\u70d8\u7119\u5305\u5df2\u4ee5\u591a\u4e2a\u6587\u4ef6\u5f62\u5f0f\u4e0b\u8f7d\u3002", en: "Bake pack downloaded as multiple files." },
+  "Bake pack exported": { zh: "\u70d8\u7119\u5305\u5df2\u5bfc\u51fa", en: "Bake pack exported" },
   "Composite image": { zh: "\u4e3b\u56fe\u5408\u6210", en: "Composite image" },
   "Per-layer PNG": { zh: "\u5355\u5c42 PNG", en: "Per-layer PNG" },
   "Bake pack (v1.1)": { zh: "\u70d8\u7119\u5305\uff08v1.1\uff09", en: "Bake pack (v1.1)" },
@@ -852,10 +891,9 @@ function updateUIText() {
     ["lblUtilities", "Utilities"],
     ["utilitiesGuideBtn", "Guide"],
     ["dockReferenceBtn", "Reference"],
-    ["dockExportBtn", "Export"],
+    ["dockExportBtn", "Open workbench"],
     ["scenarioGuideSupportHint", "Use this guide inside the support area so the shell stays quiet while the next step stays readable."],
     ["referenceToolHint", "Keep a working reference visible while you line up opacity, scale, and offsets."],
-    ["exportToolHint", "Export the visible map as a PNG or JPG snapshot."],
     ["lblExportTarget", "Target"],
     ["optExportTargetComposite", "Composite image"],
     ["optExportTargetPerLayer", "Per-layer PNG"],
@@ -989,7 +1027,7 @@ function updateUIText() {
     ["zoomOutBtn", "Zoom out"],
     ["zoomResetBtn", "Fit"],
     ["dockReferenceBtn", "Reference"],
-    ["dockExportBtn", "Export"],
+    ["dockExportBtn", "Open workbench"],
   ];
   iconButtonLabels.forEach(([id, label]) => {
     const el = document.getElementById(id);
@@ -1029,11 +1067,6 @@ function updateUIText() {
   const referencePopover = document.getElementById("dockReferencePopover");
   if (referencePopover) {
     referencePopover.setAttribute("aria-label", t("Reference tools", "ui"));
-  }
-
-  const exportPopover = document.getElementById("dockExportPopover");
-  if (exportPopover) {
-    exportPopover.setAttribute("aria-label", t("Export tools", "ui"));
   }
 
   const confirmableButtons = [

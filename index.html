@@ -2303,6 +2303,42 @@
               </div>
             </details>
 
+            <h2 id="exportProjectHeading" class="visually-hidden">Export</h2>
+            <details id="exportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="exportProjectHeading lblExportProject">
+              <summary id="lblExportProject" class="sidebar-section-head">
+                <span class="sidebar-section-title is-secondary" data-i18n="Export">Export</span>
+                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
+                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="info-tooltip" data-i18n="Open the export workbench for target, layer, and resolution controls.">Open the export workbench for target, layer, and resolution controls.</span>
+                </span>
+              </summary>
+              <div class="inspector-panel-body">
+                <p class="sidebar-help-copy" data-i18n="Open the export workbench to choose target, layer order, format, and resolution.">
+                  Open the export workbench to choose target, layer order, format, and resolution.
+                </p>
+                <div class="sidebar-support-summary-row" aria-label="Export summary" data-i18n-aria-label="Export summary">
+                  <div class="sidebar-support-summary-pill">
+                    <span class="sidebar-support-summary-label" data-i18n="Target">Target</span>
+                    <strong id="exportSectionSummaryTarget" class="sidebar-support-summary-value" data-i18n="Composite image">Composite image</strong>
+                  </div>
+                  <div class="sidebar-support-summary-pill">
+                    <span class="sidebar-support-summary-label" data-i18n="Format">Format</span>
+                    <strong id="exportSectionSummaryFormat" class="sidebar-support-summary-value">PNG</strong>
+                  </div>
+                  <div class="sidebar-support-summary-pill">
+                    <span class="sidebar-support-summary-label" data-i18n="Export Resolution">Export Resolution</span>
+                    <strong id="exportSectionSummaryScale" class="sidebar-support-summary-value" data-i18n="Ultra (2×)">Ultra (2×)</strong>
+                  </div>
+                </div>
+                <div class="sidebar-support-actions" role="group" aria-label="Export actions" data-i18n-aria-label="Export actions">
+                  <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Open workbench">Open workbench</button>
+                </div>
+              </div>
+            </details>
+
             <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
             <details id="inspectorUtilitiesSection" class="card inspector-section sidebar-support-block" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
               <summary id="lblInspectorUtilities" class="sidebar-support-head" data-i18n="Utilities">
@@ -2310,14 +2346,13 @@
               </summary>
               <div class="inspector-panel-body">
                 <div class="inspector-utilities-shell sidebar-tool-panel">
-                  <p class="sidebar-help-copy" data-i18n="Open the guide, reference tools, and export tools from one stable support area.">
-                    Open the guide, reference tools, and export tools from one stable support area.
+                  <p class="sidebar-help-copy" data-i18n="Keep the guide and reference tools nearby without mixing them into the main project workflow.">
+                    Keep the guide and reference tools nearby without mixing them into the main project workflow.
                   </p>
                   <div class="inspector-utility-stack">
                     <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities">
                       <button id="utilitiesGuideBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Guide">Guide</button>
                       <button id="dockReferenceBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Reference">Reference</button>
-                      <button id="dockExportBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Export">Export</button>
                     </div>
 
                     <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
@@ -2354,10 +2389,6 @@
                           <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                         </div>
                       </div>
-                    </div>
-                    <div id="dockExportPopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-labelledby="lblExport">
-                      <h3 id="lblExport" class="sidebar-tool-title" data-i18n="Export Map">Export Map</h3>
-                      <p id="exportToolHint" class="sidebar-help-copy mt-2" data-i18n="Export now opens the workbench overlay for target, layer, and resolution controls.">Export now opens the workbench overlay for target, layer, and resolution controls.</p>
                     </div>
                   </div>
                 </div>
@@ -2556,35 +2587,63 @@
               <h4 id="exportWorkbenchParamsTitle" class="export-workbench-column-title" data-i18n="Base frame tuning">Base frame tuning</h4>
               <div class="export-workbench-control-list">
                 <label class="export-workbench-control" for="exportWorkbenchBrightness">
-                  <span class="export-workbench-control-label" data-i18n="Brightness">Brightness</span>
+                  <span class="export-workbench-control-row">
+                    <span class="export-workbench-control-label" data-i18n="Brightness">Brightness</span>
+                    <span id="exportWorkbenchBrightnessValue" class="export-workbench-control-value">100%</span>
+                  </span>
                   <input id="exportWorkbenchBrightness" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
                 <label class="export-workbench-control" for="exportWorkbenchContrast">
-                  <span class="export-workbench-control-label" data-i18n="Contrast">Contrast</span>
+                  <span class="export-workbench-control-row">
+                    <span class="export-workbench-control-label" data-i18n="Contrast">Contrast</span>
+                    <span id="exportWorkbenchContrastValue" class="export-workbench-control-value">100%</span>
+                  </span>
                   <input id="exportWorkbenchContrast" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
                 <label class="export-workbench-control" for="exportWorkbenchSaturation">
-                  <span class="export-workbench-control-label" data-i18n="Saturation">Saturation</span>
+                  <span class="export-workbench-control-row">
+                    <span class="export-workbench-control-label" data-i18n="Saturation">Saturation</span>
+                    <span id="exportWorkbenchSaturationValue" class="export-workbench-control-value">100%</span>
+                  </span>
                   <input id="exportWorkbenchSaturation" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
                 <label class="export-workbench-control" for="exportWorkbenchClarity">
-                  <span class="export-workbench-control-label" data-i18n="Clarity">Clarity</span>
+                  <span class="export-workbench-control-row">
+                    <span class="export-workbench-control-label" data-i18n="Clarity">Clarity</span>
+                    <span id="exportWorkbenchClarityValue" class="export-workbench-control-value">100%</span>
+                  </span>
                   <input id="exportWorkbenchClarity" type="range" min="0" max="200" value="100" class="range-input export-workbench-range-input" />
                 </label>
+              </div>
+              <div class="export-workbench-bake-shell">
+                <div class="export-workbench-group-header">
+                  <span class="export-workbench-column-kicker" data-i18n="Bake outputs">Bake outputs</span>
+                  <span class="export-workbench-group-hint" data-i18n="Prepare reusable export layers">Prepare reusable export layers</span>
+                </div>
+                <div class="export-workbench-bake-actions">
+                  <button id="exportWorkbenchBakeVisibleBtn" type="button" class="btn-secondary" data-i18n="Bake current pack">Bake current pack</button>
+                  <button id="exportWorkbenchClearBakeBtn" type="button" class="btn-secondary" data-i18n="Clear baked cache">Clear baked cache</button>
+                </div>
+                <div id="exportWorkbenchBakeArtifactList" class="export-workbench-bake-list" role="list"></div>
               </div>
             </section>
 
             <section class="export-workbench-column export-workbench-column-preview" aria-labelledby="exportWorkbenchPreviewTitle">
               <div class="export-workbench-preview-header">
                 <h4 id="exportWorkbenchPreviewTitle" class="export-workbench-column-title" data-i18n="Export preview canvas">Export preview canvas</h4>
-                <div class="export-workbench-preview-toggle" role="group" aria-label="Preview mode" data-i18n-aria-label="Preview mode">
-                  <button type="button" class="export-workbench-preview-toggle-btn is-active" data-export-preview-mode="main" aria-pressed="true" data-i18n="Main image">Main image</button>
-                  <button type="button" class="export-workbench-preview-toggle-btn" data-export-preview-mode="layer" aria-pressed="false" data-i18n="Single layer">Single layer</button>
+                <div class="export-workbench-preview-controls">
+                  <div class="export-workbench-preview-toggle" role="group" aria-label="Preview mode" data-i18n-aria-label="Preview mode">
+                    <button type="button" class="export-workbench-preview-toggle-btn is-active" data-export-preview-mode="main" aria-pressed="true" data-i18n="Main image">Main image</button>
+                    <button type="button" class="export-workbench-preview-toggle-btn" data-export-preview-mode="layer" aria-pressed="false" data-i18n="Single layer">Single layer</button>
+                  </div>
+                  <label class="visually-hidden" for="exportWorkbenchPreviewLayerSelect" data-i18n="Preview source">Preview source</label>
+                  <select id="exportWorkbenchPreviewLayerSelect" class="select-input export-workbench-preview-select" autocomplete="off" aria-label="Preview source" data-i18n-aria-label="Preview source"></select>
                 </div>
               </div>
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
+                <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
                 <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state">
-                  Main image preview (placeholder)
+                  Export preview ready
                 </div>
               </div>
             </section>
@@ -2595,38 +2654,16 @@
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Main layers">Main layers</span>
-                    <span class="export-workbench-group-hint" data-i18n="Sort · Visibility · Bake">Sort · Visibility · Bake</span>
+                    <span class="export-workbench-group-hint" data-i18n="Sort · Visibility">Sort · Visibility</span>
                   </div>
-                  <div id="exportWorkbenchMainLayerList" class="export-workbench-layer-list" role="list">
-                    <div class="export-workbench-layer-item" role="listitem">
-                      <span class="export-workbench-layer-order">01</span>
-                      <span class="export-workbench-layer-name" data-i18n="Base map">Base map</span>
-                      <span class="export-workbench-layer-meta" data-i18n="Visible · Baked">Visible · Baked</span>
-                    </div>
-                    <div class="export-workbench-layer-item" role="listitem">
-                      <span class="export-workbench-layer-order">02</span>
-                      <span class="export-workbench-layer-name" data-i18n="Transport overlay">Transport overlay</span>
-                      <span class="export-workbench-layer-meta" data-i18n="Visible · Live">Visible · Live</span>
-                    </div>
-                  </div>
+                  <div id="exportWorkbenchMainLayerList" class="export-workbench-layer-list" role="list"></div>
                 </div>
                 <div class="export-workbench-layer-group">
                   <div class="export-workbench-group-header">
                     <span class="export-workbench-column-kicker" data-i18n="Text elements">Text elements</span>
-                    <span class="export-workbench-group-hint" data-i18n="Nameplates and labels">Nameplates and labels</span>
+                    <span class="export-workbench-group-hint" data-i18n="Render-pass labels and SVG annotations">Render-pass labels and SVG annotations</span>
                   </div>
-                  <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list">
-                    <div class="export-workbench-layer-item" role="listitem">
-                      <span class="export-workbench-layer-order">T1</span>
-                      <span class="export-workbench-layer-name" data-i18n="Country labels">Country labels</span>
-                      <span class="export-workbench-layer-meta" data-i18n="Visible">Visible</span>
-                    </div>
-                    <div class="export-workbench-layer-item" role="listitem">
-                      <span class="export-workbench-layer-order">T2</span>
-                      <span class="export-workbench-layer-name" data-i18n="City labels">City labels</span>
-                      <span class="export-workbench-layer-meta" data-i18n="Hidden">Hidden</span>
-                    </div>
-                  </div>
+                  <div id="exportWorkbenchTextElementList" class="export-workbench-layer-list" role="list"></div>
                 </div>
               </div>
             </section>
@@ -2636,7 +2673,7 @@
             <select id="exportWorkbenchTarget" name="export-workbench-target" autocomplete="off" class="select-input export-workbench-format-select">
               <option value="composite" data-i18n="Composite image">Composite image</option>
               <option value="per-layer" data-i18n="Per-layer PNG">Per-layer PNG</option>
-              <option value="bake-pack" data-i18n="Bake pack (v1.1)" disabled>Bake pack (v1.1)</option>
+              <option value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
             </select>
             <label id="lblExportWorkbenchFormat" class="sidebar-field-label" for="exportWorkbenchFormat" data-i18n="Format">Format</label>
             <select id="exportWorkbenchFormat" name="export-workbench-format" autocomplete="off" class="select-input export-workbench-format-select">

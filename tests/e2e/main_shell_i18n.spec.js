@@ -119,7 +119,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(workspaceGroup).toHaveAttribute("aria-label", "Workspace entry");
   await expect(supportGuideBtn).toHaveText("Guide");
   await expect(supportReferenceBtn).toHaveText("Reference");
-  await expect(supportExportBtn).toHaveText("Export");
+  await expect(supportExportBtn).toHaveText("Open workbench");
   await expect(supportGuideTitle).toHaveText("Scenario Quick Start");
   await expect(supportReferenceTitle).toHaveText("Reference Image");
   await expect(frontlineProjectTitle).toHaveText("Frontline");
