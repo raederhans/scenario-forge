@@ -1944,6 +1944,8 @@ function initToolbar({ render } = {}) {
   const exportWorkbenchCloseBtn = document.getElementById("exportWorkbenchCloseBtn");
   const exportWorkbenchPreviewState = document.getElementById("exportWorkbenchPreviewState");
   const exportWorkbenchPreviewModeButtons = Array.from(document.querySelectorAll(".export-workbench-preview-toggle-btn"));
+  const exportWorkbenchFormat = document.getElementById("exportWorkbenchFormat");
+  const exportWorkbenchSnapshotBtn = document.getElementById("exportWorkbenchSnapshotBtn");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
@@ -4394,6 +4396,9 @@ function initToolbar({ render } = {}) {
     exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
     dockExportBtn?.classList.toggle("is-active", isOpen);
     dockExportBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    if (exportWorkbenchFormat && exportFormat) {
+      exportWorkbenchFormat.value = exportFormat.value === "jpg" ? "jpg" : "png";
+    }
     if (exportWorkbenchPreviewState) {
       exportWorkbenchPreviewState.textContent = exportWorkbenchPreviewMode === "layer"
         ? t("Single layer preview (placeholder)", "ui")
@@ -7586,6 +7591,25 @@ function initToolbar({ render } = {}) {
     });
     button.dataset.bound = "true";
   });
+
+  if (exportWorkbenchFormat && !exportWorkbenchFormat.dataset.bound) {
+    exportWorkbenchFormat.addEventListener("change", () => {
+      if (exportFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+    });
+    exportWorkbenchFormat.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchSnapshotBtn && !exportWorkbenchSnapshotBtn.dataset.bound) {
+    exportWorkbenchSnapshotBtn.addEventListener("click", () => {
+      if (exportFormat && exportWorkbenchFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+      exportBtn?.click();
+    });
+    exportWorkbenchSnapshotBtn.dataset.bound = "true";
+  }
 
   if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
     dockCollapseBtn.addEventListener("click", () => {

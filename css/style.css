@@ -4853,6 +4853,24 @@ body.counter-editor-modal-open {
   white-space: nowrap;
 }
 
+.export-workbench-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 2px 2px;
+  border-top: 1px solid rgba(37, 54, 73, 0.08);
+}
+
+.export-workbench-format-select {
+  width: 96px;
+  min-height: 36px;
+}
+
+.export-workbench-snapshot-btn {
+  min-height: 36px;
+}
+
 @media (max-width: 1180px) {
   .transport-workbench-panel {
     --transport-workbench-preview-height: 600px;
@@ -4943,6 +4961,11 @@ body.counter-editor-modal-open {
   .export-workbench-preview-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .export-workbench-footer {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
 
