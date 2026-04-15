@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import importlib.util
 import unittest
+from collections import Counter
 from pathlib import Path
 from unittest.mock import patch
 
@@ -10,11 +11,15 @@ import geopandas as gpd
 from shapely import wkb
 from shapely.geometry import LineString
 
+from tools.check_transport_workbench_manifests import discover_manifest_paths
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_ROAD_RECIPE = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'source_recipe.manual.json'
 GLOBAL_RAIL_RECIPE = REPO_ROOT / 'data' / 'transport_layers' / 'global_rail' / 'source_recipe.manual.json'
 GLOBAL_ROAD_CATALOG = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'catalog.json'
+GLOBAL_RAIL_CATALOG = REPO_ROOT / 'data' / 'transport_layers' / 'global_rail' / 'catalog.json'
 GLOBAL_ROAD_SHARD_ROOT = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'shards'
+GLOBAL_RAIL_REGION_ROOT = REPO_ROOT / 'data' / 'transport_layers' / 'global_rail' / 'regions'
 GLOBAL_TRANSPORT_CATALOG_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_catalogs.py'
 ROAD_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_roads.py'
 RAIL_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_rail.py'
@@ -331,6 +336,12 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 'sources': [],
                 'geometry': b'noop',
             },
+        ], region_id='japan')
+
+        self.assertEqual([row['id'] for row in rows], ['focus_jp'])
+        self.assertEqual(rows[0]['focus_region'], 'japan')
+
+        low_priority_rows = map_batch_rows([
             {
                 'id': 'low_priority_unnamed',
                 'class': 'standard_gauge',
@@ -347,17 +358,147 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 'sources': [],
                 'geometry': b'noop',
             },
-        ])
+        ], region_id='low_priority')
+        self.assertEqual(low_priority_rows, [])
 
-        self.assertEqual([row['id'] for row in rows], ['focus_jp'])
-        self.assertEqual(rows[0]['focus_region'], 'japan')
+    def test_rail_focus_region_priority_prefers_japan_over_east_asia(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import assign_focus_region_id
+
+        row_bbox = {'xmin': 138.0, 'xmax': 139.0, 'ymin': 35.0, 'ymax': 36.0}
+        self.assertEqual(assign_focus_region_id(row_bbox), 'japan')
+
+    def test_rail_focus_region_priority_prefers_europe_over_russia(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import assign_focus_region_id
+
+        row_bbox = {'xmin': 34.0, 'xmax': 35.0, 'ymin': 55.0, 'ymax': 56.0}
+        self.assertEqual(assign_focus_region_id(row_bbox), 'europe')
+
+    def test_rail_adjacent_shard_assignment_uses_center_point(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import get_shard_spec, shard_bbox_center_matches
+
+        west_shard = get_shard_spec('eu_e010_e025')
+        east_shard = get_shard_spec('eu_e025_e045')
+        boundary_bbox = {'xmin': 24.0, 'xmax': 26.0, 'ymin': 50.0, 'ymax': 51.0}
+        self.assertTrue(shard_bbox_center_matches(boundary_bbox, east_shard))
+        self.assertFalse(shard_bbox_center_matches(boundary_bbox, west_shard))
+
+    def test_rail_region_and_shard_specs_exist(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import FOCUS_REGION_SPECS, RAIL_SHARDS
+
+        region_ids = {spec['id'] for spec in FOCUS_REGION_SPECS}
+        shard_region_ids = {spec['region_id'] for spec in RAIL_SHARDS}
+        self.assertEqual(
+            region_ids,
+            {'europe', 'japan', 'russia', 'east_asia', 'north_america'},
+        )
+        self.assertEqual(shard_region_ids, region_ids)
+        self.assertIn('jp_e128_e147', {spec['id'] for spec in RAIL_SHARDS})
+
+    def test_rail_shard_can_infer_region_when_region_flag_is_default(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import resolve_requested_region_specs
+
+        region_specs = resolve_requested_region_specs('all_focus', 'jp_e128_e147')
+        self.assertEqual([spec['id'] for spec in region_specs], ['japan'])
+
+    def test_rail_shard_and_region_conflict_is_rejected(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import resolve_requested_region_specs
+
+        with self.assertRaises(SystemExit):
+            resolve_requested_region_specs('europe', 'jp_e128_e147')
+
+    def test_checked_in_rail_shard_dirs_match_builder_truth(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import RAIL_SHARDS
+
+        expected_pairs = {(spec['region_id'], spec['id']) for spec in RAIL_SHARDS}
+        actual_pairs = set()
+        for region_dir in GLOBAL_RAIL_REGION_ROOT.iterdir():
+            if not region_dir.is_dir():
+                continue
+            shard_root = region_dir / 'shards'
+            if not shard_root.exists():
+                continue
+            for shard_dir in shard_root.iterdir():
+                if shard_dir.is_dir():
+                    actual_pairs.add((region_dir.name, shard_dir.name))
+        self.assertEqual(actual_pairs, expected_pairs)
+
+    def test_checked_in_rail_full_feature_ids_are_globally_unique(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import RAIL_SHARDS
+
+        seen_counts: Counter[str] = Counter()
+        for shard_spec in RAIL_SHARDS:
+            topo_path = (
+                GLOBAL_RAIL_REGION_ROOT
+                / shard_spec['region_id']
+                / 'shards'
+                / shard_spec['id']
+                / 'railways.topo.json'
+            )
+            payload = json.loads(topo_path.read_text(encoding='utf-8'))
+            for geometry in payload.get('objects', {}).get('railways', {}).get('geometries', []):
+                feature_id = str((geometry.get('properties') or {}).get('id') or '').strip()
+                if feature_id:
+                    seen_counts[feature_id] += 1
+
+        duplicates = sorted(feature_id for feature_id, count in seen_counts.items() if count > 1)
+        self.assertFalse(duplicates, duplicates[:10])
+
+    def test_shared_manifest_discovery_covers_global_shard_manifests(self) -> None:
+        discovered = {
+            path.resolve()
+            for path in discover_manifest_paths(REPO_ROOT / 'data' / 'transport_layers')
+        }
+        expected = {
+            *(
+                path.resolve()
+                for path in GLOBAL_ROAD_SHARD_ROOT.rglob('manifest.json')
+                if path.is_file()
+            ),
+            *(
+                path.resolve()
+                for path in GLOBAL_RAIL_REGION_ROOT.rglob('manifest.json')
+                if path.is_file()
+            ),
+        }
+        self.assertFalse(expected - discovered, sorted(str(path) for path in expected - discovered))
 
     def test_rail_builder_keeps_stations_out_of_phase_a_manifest(self) -> None:
         if not self.pyarrow_available:
             self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
-        from tools.build_global_transport_rail import build_audit_payload, build_manifest_payload, empty_railways_frame, empty_station_collection
+        from tools.build_global_transport_rail import (
+            build_audit_payload,
+            build_manifest_payload,
+            empty_railways_frame,
+            empty_station_collection,
+            get_output_paths,
+        )
 
+        output_dir = REPO_ROOT / '.runtime' / 'tmp' / 'rail_test_manifest_contract'
+        output_dir.mkdir(parents=True, exist_ok=True)
+        paths = get_output_paths(output_dir)
+        for path in paths.values():
+            if path.suffix:
+                path.write_text('{}' if path.suffix == '.json' else '', encoding='utf-8')
         audit = build_audit_payload(
+            paths=paths,
+            region_spec={'id': 'japan', 'lon_min': 128.0, 'lon_max': 147.0, 'lat_min': 30.0, 'lat_max': 46.0},
+            shard_spec={'id': 'jp_e128_e147', 'lon_min': 128.0, 'lon_max': 147.0},
             source_signature={'dummy': True},
             result={
                 'raw_line_count': 0,
@@ -371,17 +512,75 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
             output_size_bytes={'railways_preview': 0, 'railways_full': 0, 'stations_preview': 0, 'stations_full': 0},
         )
         manifest = build_manifest_payload(
+            paths=paths,
+            region_spec={'id': 'japan', 'lon_min': 128.0, 'lon_max': 147.0, 'lat_min': 30.0, 'lat_max': 46.0},
+            shard_spec={'id': 'jp_e128_e147', 'lon_min': 128.0, 'lon_max': 147.0},
             source_signature={'dummy': True},
             preview_railways=empty_railways_frame(),
             railways=empty_railways_frame(),
             audit=audit,
+            build_command='python tools/build_global_transport_rail.py --region japan --shard jp_e128_e147',
         )
 
         self.assertEqual(audit['phase_status']['major_stations'], 'phase_b_pending_source')
         self.assertEqual(audit['runtime_readiness']['transport_overview_rail'], 'backbone_only_not_ui_ready')
+        self.assertEqual(audit['shard_id'], 'jp_e128_e147')
         self.assertNotIn('rail_stations_major', manifest['paths']['preview'])
         self.assertNotIn('rail_stations_major', manifest['paths']['full'])
         self.assertEqual(manifest['extensions']['rail']['phase_b_reserved_outputs'], ['rail_stations_major'])
+        self.assertEqual(manifest['extensions']['rail']['region']['id'], 'japan')
+        self.assertEqual(manifest['extensions']['rail']['shard']['id'], 'jp_e128_e147')
+
+    def test_rail_recipe_selection_rules_describe_center_assignment(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import get_output_paths, write_source_recipe
+
+        output_dir = REPO_ROOT / '.runtime' / 'tmp' / 'rail_test_recipe_selection_rule'
+        output_dir.mkdir(parents=True, exist_ok=True)
+        paths = get_output_paths(output_dir)
+        write_source_recipe(
+            paths['recipe'],
+            {'id': 'japan', 'lon_min': 128.0, 'lon_max': 147.0, 'lat_min': 30.0, 'lat_max': 46.0},
+            {'id': 'jp_e128_e147', 'lon_min': 128.0, 'lon_max': 147.0},
+        )
+        recipe = json.loads(paths['recipe'].read_text(encoding='utf-8'))
+        self.assertEqual(recipe['region']['selection_rule'], 'bbox_center_priority_region_assignment')
+        self.assertEqual(recipe['shard']['selection_rule'], 'bbox_longitude_center_assignment_within_region')
+
+    def test_rail_catalog_matches_region_shard_manifests(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import FOCUS_REGION_SPECS, RAIL_SHARDS
+
+        catalog = json.loads(GLOBAL_RAIL_CATALOG.read_text(encoding='utf-8'))
+        self.assertEqual(catalog.get('family'), 'rail')
+        self.assertEqual(catalog.get('distribution_tier'), 'regional_sharded_manifest_catalog')
+        self.assertEqual(catalog.get('coverage_scope'), 'focus_regions_only')
+
+        regions = catalog.get('regions', [])
+        entries = catalog.get('entries', [])
+        self.assertEqual(len(regions), len(FOCUS_REGION_SPECS))
+        self.assertEqual(len(entries), len(RAIL_SHARDS))
+        self.assertEqual([region.get('id') for region in regions], [spec['id'] for spec in FOCUS_REGION_SPECS])
+        self.assertEqual([entry.get('id') for entry in entries], [spec['id'] for spec in RAIL_SHARDS])
+
+        for shard_spec, entry in zip(RAIL_SHARDS, entries):
+            manifest_path = REPO_ROOT / entry['manifest_path']
+            self.assertTrue(manifest_path.exists(), manifest_path.as_posix())
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            self.assertEqual(entry.get('region_id'), shard_spec['region_id'])
+            self.assertEqual(entry.get('lon_min'), float(shard_spec['lon_min']))
+            self.assertEqual(entry.get('lon_max'), float(shard_spec['lon_max']))
+            self.assertEqual(
+                manifest.get('build_command'),
+                f"python tools/build_global_transport_rail.py --region {shard_spec['region_id']} --shard {shard_spec['id']}",
+            )
+            self.assertEqual(manifest.get('feature_counts'), entry.get('feature_counts'))
+            self.assertEqual(
+                ((manifest.get('extensions') or {}).get('rail') or {}).get('phase_status'),
+                entry.get('phase_status'),
+            )
 
     def test_runtime_gate_still_closed_for_road_and_rail(self) -> None:
         for path in (

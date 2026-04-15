@@ -45,7 +45,7 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def discover_manifest_paths(root: Path) -> list[Path]:
     resolved_root = root.resolve()
-    return sorted(path.resolve() for path in resolved_root.glob("*/manifest.json") if path.is_file())
+    return sorted(path.resolve() for path in resolved_root.rglob("manifest.json") if path.is_file())
 
 
 def inspect_transport_manifests(manifest_paths: list[Path]) -> list[dict[str, Any]]:

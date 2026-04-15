@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from map_builder.transport_workbench_contracts import validate_transport_manifest
-from tools.check_transport_workbench_manifests import inspect_transport_manifests
+from tools.check_transport_workbench_manifests import discover_manifest_paths, inspect_transport_manifests
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -16,10 +16,18 @@ INDUSTRIAL_BUILDER = PROJECT_ROOT / "tools" / "build_transport_workbench_japan_i
 
 class TransportManifestContractsTest(unittest.TestCase):
     def test_checked_in_transport_manifests_pass_shared_contract(self) -> None:
-        manifest_paths = sorted((PROJECT_ROOT / "data" / "transport_layers").glob("*/manifest.json"))
+        manifest_paths = discover_manifest_paths(PROJECT_ROOT / "data" / "transport_layers")
         reports = inspect_transport_manifests(manifest_paths)
         failed = [report for report in reports if report.get("status") != "ok"]
         self.assertFalse(failed, failed)
+
+    def test_recursive_manifest_discovery_includes_rail_region_shards(self) -> None:
+        manifest_paths = discover_manifest_paths(PROJECT_ROOT / "data" / "transport_layers")
+        normalized_paths = [str(path.relative_to(PROJECT_ROOT)).replace("\\", "/") for path in manifest_paths]
+        self.assertTrue(
+            any(path.startswith("data/transport_layers/global_rail/regions/") for path in normalized_paths),
+            normalized_paths,
+        )
 
     def test_validator_rejects_legacy_variant_fields(self) -> None:
         manifest = {
@@ -58,7 +66,7 @@ class TransportManifestContractsTest(unittest.TestCase):
         )
 
     def test_checked_in_transport_manifests_do_not_keep_legacy_variant_fields(self) -> None:
-        manifest_paths = sorted((PROJECT_ROOT / "data" / "transport_layers").glob("*/manifest.json"))
+        manifest_paths = discover_manifest_paths(PROJECT_ROOT / "data" / "transport_layers")
         legacy_fields = {
             "default_coverage_tier",
             "coverage_variants",

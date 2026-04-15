@@ -1,0 +1,94 @@
+{
+  "adapter_id": "global_rail_v1",
+  "family": "rail",
+  "geometry_kind": "line",
+  "schema_version": 1,
+  "generated_at": "2026-04-15T22:09:37.461291Z",
+  "recipe_path": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/source_recipe.manual.json",
+  "recipe_version": "global_rail_sources_v1",
+  "distribution_tier": "single_pack",
+  "source_policy": "overture_only_checked_in_v1",
+  "paths": {
+    "preview": {
+      "railways": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/railways.preview.topo.json"
+    },
+    "full": {
+      "railways": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/railways.topo.json"
+    },
+    "build_audit": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/build_audit.json"
+  },
+  "feature_counts": {
+    "preview": {
+      "railways": 980
+    },
+    "full": {
+      "railways": 3589
+    }
+  },
+  "build_command": "python tools/build_global_transport_rail.py --region east_asia --shard ea_e095_e115",
+  "runtime_consumer": "transport_overview_rail",
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/source_recipe.manual.json",
+      "size_bytes": 4529,
+      "sha256": "8d310c39342c14e8e835b01d9596f91b09f5fb527be820ed7c37e54fe7845c4e"
+    }
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "railways": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/railways.preview.topo.json"
+        },
+        "full": {
+          "railways": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/railways.topo.json"
+        },
+        "build_audit": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "railways": 980
+        },
+        "full": {
+          "railways": 3589
+        }
+      }
+    }
+  },
+  "extensions": {
+    "rail": {
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      },
+      "runtime_readiness": {
+        "transport_overview_rail": "backbone_only_not_ui_ready",
+        "rail_stations_major": "placeholder_only"
+      },
+      "phase_b_reserved_outputs": [
+        "rail_stations_major"
+      ],
+      "region": {
+        "id": "east_asia",
+        "lon_min": 95.0,
+        "lon_max": 150.0,
+        "lat_min": 20.0,
+        "lat_max": 55.0
+      },
+      "shard": {
+        "id": "ea_e095_e115",
+        "lon_min": 95.0,
+        "lon_max": 115.0,
+        "lat_min": 20.0,
+        "lat_max": 55.0
+      }
+    }
+  }
+}

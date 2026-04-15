@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-04-15T22:21:26.082639Z",
+  "adapter_id": "global_rail_v1",
+  "region_id": "north_america",
+  "shard_id": "na_w080_w050",
+  "recipe_version": "global_rail_sources_v1",
+  "source_policy": "overture_only_checked_in_v1",
+  "raw_line_count": 89918,
+  "filtered_line_count": 2356,
+  "preview_line_count": 213,
+  "major_station_count": 0,
+  "line_class_counts": {
+    "mainline": 10,
+    "regional": 2065,
+    "secondary": 281
+  },
+  "region_counts": {
+    "north_america": 2356
+  },
+  "preview_thresholds_m": {
+    "japan": {
+      "mainline": 25000.0,
+      "regional": 28000.0,
+      "secondary": 70000.0
+    },
+    "europe": {
+      "mainline": 35000.0,
+      "regional": 35000.0,
+      "secondary": 90000.0
+    },
+    "russia": {
+      "mainline": 42000.0,
+      "regional": 52000.0,
+      "secondary": 120000.0
+    },
+    "east_asia": {
+      "mainline": 35000.0,
+      "regional": 40000.0,
+      "secondary": 100000.0
+    },
+    "north_america": {
+      "mainline": 45000.0,
+      "regional": 55000.0,
+      "secondary": 130000.0
+    },
+    "low_priority": {
+      "mainline": 150000.0,
+      "regional": 220000.0,
+      "secondary": 320000.0
+    }
+  },
+  "output_size_bytes": {
+    "railways_preview": 135893,
+    "railways_full": 884280,
+    "stations_preview": 54,
+    "stations_full": 54
+  },
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/source_recipe.manual.json",
+      "size_bytes": 4540,
+      "sha256": "f03857c4c312d7ae561a4a32e3ea6618daf85e108fcc3338368a0f2e65e4aeda"
+    }
+  },
+  "phase_status": {
+    "backbone": "ready_for_phase_a_checked_in_outputs",
+    "major_stations": "phase_b_pending_source"
+  },
+  "runtime_readiness": {
+    "transport_overview_rail": "backbone_only_not_ui_ready",
+    "rail_stations_major": "placeholder_only"
+  },
+  "notes": [
+    "Global rail coarse v1 uses Overture transportation segments as the only canonical source.",
+    "Phase A delivers backbone railways now and leaves major station enrichment to phase B.",
+    "Manifest phase A only declares railways as checked-in live outputs.",
+    "rail_stations_major is emitted as an empty placeholder sidecar until the dedicated major-station source is finalized.",
+    "Focus regions are Europe, Russia, East Asia, Japan, and North America; other regions keep a coarser line-only baseline with stricter early filtering and longer reveal thresholds.",
+    "Region scope: north_america (-170.0..-50.0 lon, 15.0..75.0 lat).",
+    "Shard scope: na_w080_w050 (-80.0..-50.0 lon within region window)."
+  ]
+}

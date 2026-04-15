@@ -60,8 +60,20 @@ def transport_class_filter(
         raise ValueError("allowed_classes must not be empty")
     expr = (ds.field("subtype") == str(subtype).strip()) & ds.field("class").isin(classes)
     if bbox_bounds:
-        lon_min, lon_max = bbox_bounds
-        expr = expr & (ds.field("bbox", "xmax") >= float(lon_min)) & (ds.field("bbox", "xmin") < float(lon_max))
+        if len(bbox_bounds) == 2:
+            lon_min, lon_max = bbox_bounds
+            expr = expr & (ds.field("bbox", "xmax") >= float(lon_min)) & (ds.field("bbox", "xmin") < float(lon_max))
+        elif len(bbox_bounds) == 4:
+            lon_min, lon_max, lat_min, lat_max = bbox_bounds
+            expr = (
+                expr
+                & (ds.field("bbox", "xmax") >= float(lon_min))
+                & (ds.field("bbox", "xmin") < float(lon_max))
+                & (ds.field("bbox", "ymax") >= float(lat_min))
+                & (ds.field("bbox", "ymin") <= float(lat_max))
+            )
+        else:
+            raise ValueError("bbox_bounds must be (lon_min, lon_max) or (lon_min, lon_max, lat_min, lat_max)")
     return expr
 
 

@@ -715,3 +715,16 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 61. 支持区工具一旦升级成一级功能区块，必须同波次迁移 URL restore、旧壳清理和契约测试
 - 这次 Export 从 Utilities 升成 Project 一级区块后，如果只挪 DOM、不同时改 sidebar.js / toolbar.js 的 restore 链、旧 popover 清理和 contract/e2e，界面会立刻出现‘入口新了，但状态恢复和测试还活在旧层级’的分裂。
 - 最稳的最短路径是：保留按钮 id 和 overlay id，只搬入口层级；同时把旧 support-surface 残链一次删干净。
+
+## 2026-04-15 - 外部 skill 安装
+
+### 1. 第三方仓库把 skill 打包在通用目录名 `skill/` 时，安装器必须显式给 `--name`
+- `install-skill-from-github.py` 默认用路径 basename 当目标目录；像 `--path skill` 这种仓库结构会直接撞上已有的 `~/.codex/skills/skill`。
+- 更稳的做法是安装这类第三方 skill 时一开始就显式传 `--name talk-normal` 这类真实 skill 名，避免误判成“已安装”或覆盖错误目录。
+### 62. 多区域/多分片的几何 builder 不能直接用 bbox intersects 当最终归属规则
+- 这次 rail 在 focus region 和相邻 shard 都有重叠窗口时，只要按 intersects 收件，同一条线就会稳定落入多个 pack。
+- 更稳的最短路径是：query 层仍可用 intersects 做粗筛，但真正写入 checked-in 产物前，必须再走一次唯一 owner 规则；这里用 bbox center + 固定优先顺序收口最稳。
+
+### 63. manifest 输出层级一旦改成嵌套目录，共享 contract discovery 必须同波次递归化
+- 这次 rail manifest 从顶层 family 目录移到 `regions/.../shards/...` 后，旧的单层 `glob("*/manifest.json")` 会直接把全部新产物漏掉。
+- 更稳的做法是：manifest discovery 只保留一个递归 helper，CLI 和测试都复用它，避免工具修好了但测试还在偷跑旧发现逻辑。

@@ -1,0 +1,94 @@
+{
+  "adapter_id": "global_rail_v1",
+  "family": "rail",
+  "geometry_kind": "line",
+  "schema_version": 1,
+  "generated_at": "2026-04-15T22:05:21.805529Z",
+  "recipe_path": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/source_recipe.manual.json",
+  "recipe_version": "global_rail_sources_v1",
+  "distribution_tier": "single_pack",
+  "source_policy": "overture_only_checked_in_v1",
+  "paths": {
+    "preview": {
+      "railways": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/railways.preview.topo.json"
+    },
+    "full": {
+      "railways": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/railways.topo.json"
+    },
+    "build_audit": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/build_audit.json"
+  },
+  "feature_counts": {
+    "preview": {
+      "railways": 492
+    },
+    "full": {
+      "railways": 2695
+    }
+  },
+  "build_command": "python tools/build_global_transport_rail.py --region japan --shard jp_e128_e147",
+  "runtime_consumer": "transport_overview_rail",
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/source_recipe.manual.json",
+      "size_bytes": 4523,
+      "sha256": "488493167c978b8461f5b4afd1f50f9510d268e14a0fa149453b7433319f0c29"
+    }
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "railways": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/railways.preview.topo.json"
+        },
+        "full": {
+          "railways": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/railways.topo.json"
+        },
+        "build_audit": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "railways": 492
+        },
+        "full": {
+          "railways": 2695
+        }
+      }
+    }
+  },
+  "extensions": {
+    "rail": {
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      },
+      "runtime_readiness": {
+        "transport_overview_rail": "backbone_only_not_ui_ready",
+        "rail_stations_major": "placeholder_only"
+      },
+      "phase_b_reserved_outputs": [
+        "rail_stations_major"
+      ],
+      "region": {
+        "id": "japan",
+        "lon_min": 128.0,
+        "lon_max": 147.0,
+        "lat_min": 30.0,
+        "lat_max": 46.0
+      },
+      "shard": {
+        "id": "jp_e128_e147",
+        "lon_min": 128.0,
+        "lon_max": 147.0,
+        "lat_min": 30.0,
+        "lat_max": 46.0
+      }
+    }
+  }
+}

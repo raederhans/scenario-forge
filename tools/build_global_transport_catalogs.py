@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 
 from map_builder.overture_transport_common import utc_now, write_json
 from tools.build_global_transport_roads import ROAD_SHARDS
+from tools.build_global_transport_rail import FOCUS_REGION_SPECS, RAIL_SHARDS
 
 
 ROAD_ROOT = ROOT / "data" / "transport_layers" / "global_road"
@@ -53,25 +54,48 @@ def build_road_catalog() -> dict[str, Any]:
 
 
 def build_rail_catalog() -> dict[str, Any]:
-    manifest_path = RAIL_ROOT / "manifest.json"
-    if not manifest_path.exists():
-        raise FileNotFoundError(f"Missing rail manifest: {manifest_path.relative_to(ROOT)}")
-    manifest = load_json(manifest_path)
+    entries: list[dict[str, Any]] = []
+    for shard_spec in RAIL_SHARDS:
+        manifest_path = RAIL_ROOT / "regions" / shard_spec["region_id"] / "shards" / shard_spec["id"] / "manifest.json"
+        if not manifest_path.exists():
+            raise FileNotFoundError(f"Missing rail shard manifest: {manifest_path.relative_to(ROOT)}")
+        manifest = load_json(manifest_path)
+        entries.append(
+            {
+                "id": shard_spec["id"],
+                "region_id": shard_spec["region_id"],
+                "manifest_path": str(manifest_path.relative_to(ROOT)).replace("\\", "/"),
+                "lon_min": float(shard_spec["lon_min"]),
+                "lon_max": float(shard_spec["lon_max"]),
+                "lat_min": float(((manifest.get("extensions") or {}).get("rail") or {}).get("region", {}).get("lat_min", 0.0)),
+                "lat_max": float(((manifest.get("extensions") or {}).get("rail") or {}).get("region", {}).get("lat_max", 0.0)),
+                "feature_counts": manifest.get("feature_counts") or {},
+                "phase_status": ((manifest.get("extensions") or {}).get("rail") or {}).get("phase_status") or {},
+            }
+        )
     return {
         "version": "global_transport_catalog_v1",
         "family": "rail",
         "generated_at": utc_now(),
-        "distribution_tier": "single_manifest_catalog",
+        "distribution_tier": "regional_sharded_manifest_catalog",
         "source_policy": "overture_only_checked_in_v1",
         "default_variant": "default",
-        "entries": [
+        "coverage_scope": "focus_regions_only",
+        "regions": [
             {
-                "id": "default",
-                "manifest_path": str(manifest_path.relative_to(ROOT)).replace("\\", "/"),
-                "feature_counts": manifest.get("feature_counts") or {},
-                "phase_status": ((manifest.get("extensions") or {}).get("rail") or {}).get("phase_status") or {},
+                "id": region_spec["id"],
+                "lon_min": float(region_spec["lon_min"]),
+                "lon_max": float(region_spec["lon_max"]),
+                "lat_min": float(region_spec["lat_min"]),
+                "lat_max": float(region_spec["lat_max"]),
+                "default_shard": next(
+                    (shard["id"] for shard in RAIL_SHARDS if shard["region_id"] == region_spec["id"]),
+                    "",
+                ),
             }
+            for region_spec in FOCUS_REGION_SPECS
         ],
+        "entries": entries,
     }
 
 

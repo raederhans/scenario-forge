@@ -1,0 +1,94 @@
+{
+  "adapter_id": "global_rail_v1",
+  "family": "rail",
+  "geometry_kind": "line",
+  "schema_version": 1,
+  "generated_at": "2026-04-15T22:21:26.083640Z",
+  "recipe_path": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/source_recipe.manual.json",
+  "recipe_version": "global_rail_sources_v1",
+  "distribution_tier": "single_pack",
+  "source_policy": "overture_only_checked_in_v1",
+  "paths": {
+    "preview": {
+      "railways": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/railways.preview.topo.json"
+    },
+    "full": {
+      "railways": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/railways.topo.json"
+    },
+    "build_audit": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/build_audit.json"
+  },
+  "feature_counts": {
+    "preview": {
+      "railways": 213
+    },
+    "full": {
+      "railways": 2356
+    }
+  },
+  "build_command": "python tools/build_global_transport_rail.py --region north_america --shard na_w080_w050",
+  "runtime_consumer": "transport_overview_rail",
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/source_recipe.manual.json",
+      "size_bytes": 4540,
+      "sha256": "f03857c4c312d7ae561a4a32e3ea6618daf85e108fcc3338368a0f2e65e4aeda"
+    }
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "railways": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/railways.preview.topo.json"
+        },
+        "full": {
+          "railways": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/railways.topo.json"
+        },
+        "build_audit": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "railways": 213
+        },
+        "full": {
+          "railways": 2356
+        }
+      }
+    }
+  },
+  "extensions": {
+    "rail": {
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      },
+      "runtime_readiness": {
+        "transport_overview_rail": "backbone_only_not_ui_ready",
+        "rail_stations_major": "placeholder_only"
+      },
+      "phase_b_reserved_outputs": [
+        "rail_stations_major"
+      ],
+      "region": {
+        "id": "north_america",
+        "lon_min": -170.0,
+        "lon_max": -50.0,
+        "lat_min": 15.0,
+        "lat_max": 75.0
+      },
+      "shard": {
+        "id": "na_w080_w050",
+        "lon_min": -80.0,
+        "lon_max": -50.0,
+        "lat_min": 15.0,
+        "lat_max": 75.0
+      }
+    }
+  }
+}

@@ -1,0 +1,389 @@
+{
+  "version": "global_transport_catalog_v1",
+  "family": "rail",
+  "generated_at": "2026-04-15T22:21:26.805019Z",
+  "distribution_tier": "regional_sharded_manifest_catalog",
+  "source_policy": "overture_only_checked_in_v1",
+  "default_variant": "default",
+  "coverage_scope": "focus_regions_only",
+  "regions": [
+    {
+      "id": "europe",
+      "lon_min": -12.0,
+      "lon_max": 45.0,
+      "lat_min": 34.0,
+      "lat_max": 72.0,
+      "default_shard": "eu_w012_e010"
+    },
+    {
+      "id": "japan",
+      "lon_min": 128.0,
+      "lon_max": 147.0,
+      "lat_min": 30.0,
+      "lat_max": 46.0,
+      "default_shard": "jp_e128_e147"
+    },
+    {
+      "id": "russia",
+      "lon_min": 30.0,
+      "lon_max": 180.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "default_shard": "ru_e030_e060"
+    },
+    {
+      "id": "east_asia",
+      "lon_min": 95.0,
+      "lon_max": 150.0,
+      "lat_min": 20.0,
+      "lat_max": 55.0,
+      "default_shard": "ea_e095_e115"
+    },
+    {
+      "id": "north_america",
+      "lon_min": -170.0,
+      "lon_max": -50.0,
+      "lat_min": 15.0,
+      "lat_max": 75.0,
+      "default_shard": "na_w170_w140"
+    }
+  ],
+  "entries": [
+    {
+      "id": "eu_w012_e010",
+      "region_id": "europe",
+      "manifest_path": "data/transport_layers/global_rail/regions/europe/shards/eu_w012_e010/manifest.json",
+      "lon_min": -12.0,
+      "lon_max": 10.0,
+      "lat_min": 34.0,
+      "lat_max": 72.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 1536
+        },
+        "full": {
+          "railways": 8901
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "eu_e010_e025",
+      "region_id": "europe",
+      "manifest_path": "data/transport_layers/global_rail/regions/europe/shards/eu_e010_e025/manifest.json",
+      "lon_min": 10.0,
+      "lon_max": 25.0,
+      "lat_min": 34.0,
+      "lat_max": 72.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 1468
+        },
+        "full": {
+          "railways": 9451
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "eu_e025_e045",
+      "region_id": "europe",
+      "manifest_path": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/manifest.json",
+      "lon_min": 25.0,
+      "lon_max": 45.0,
+      "lat_min": 34.0,
+      "lat_max": 72.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 1592
+        },
+        "full": {
+          "railways": 5915
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "jp_e128_e147",
+      "region_id": "japan",
+      "manifest_path": "data/transport_layers/global_rail/regions/japan/shards/jp_e128_e147/manifest.json",
+      "lon_min": 128.0,
+      "lon_max": 147.0,
+      "lat_min": 30.0,
+      "lat_max": 46.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 492
+        },
+        "full": {
+          "railways": 2695
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ru_e030_e060",
+      "region_id": "russia",
+      "manifest_path": "data/transport_layers/global_rail/regions/russia/shards/ru_e030_e060/manifest.json",
+      "lon_min": 30.0,
+      "lon_max": 60.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 242
+        },
+        "full": {
+          "railways": 1313
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ru_e060_e090",
+      "region_id": "russia",
+      "manifest_path": "data/transport_layers/global_rail/regions/russia/shards/ru_e060_e090/manifest.json",
+      "lon_min": 60.0,
+      "lon_max": 90.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 349
+        },
+        "full": {
+          "railways": 1253
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ru_e090_e120",
+      "region_id": "russia",
+      "manifest_path": "data/transport_layers/global_rail/regions/russia/shards/ru_e090_e120/manifest.json",
+      "lon_min": 90.0,
+      "lon_max": 120.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 131
+        },
+        "full": {
+          "railways": 721
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ru_e120_e150",
+      "region_id": "russia",
+      "manifest_path": "data/transport_layers/global_rail/regions/russia/shards/ru_e120_e150/manifest.json",
+      "lon_min": 120.0,
+      "lon_max": 150.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 131
+        },
+        "full": {
+          "railways": 865
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ru_e150_e180",
+      "region_id": "russia",
+      "manifest_path": "data/transport_layers/global_rail/regions/russia/shards/ru_e150_e180/manifest.json",
+      "lon_min": 150.0,
+      "lon_max": 180.0,
+      "lat_min": 45.0,
+      "lat_max": 78.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 0
+        },
+        "full": {
+          "railways": 4
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ea_e095_e115",
+      "region_id": "east_asia",
+      "manifest_path": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e095_e115/manifest.json",
+      "lon_min": 95.0,
+      "lon_max": 115.0,
+      "lat_min": 20.0,
+      "lat_max": 55.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 980
+        },
+        "full": {
+          "railways": 3589
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ea_e115_e130",
+      "region_id": "east_asia",
+      "manifest_path": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e115_e130/manifest.json",
+      "lon_min": 115.0,
+      "lon_max": 130.0,
+      "lat_min": 20.0,
+      "lat_max": 55.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 726
+        },
+        "full": {
+          "railways": 3591
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "ea_e130_e150",
+      "region_id": "east_asia",
+      "manifest_path": "data/transport_layers/global_rail/regions/east_asia/shards/ea_e130_e150/manifest.json",
+      "lon_min": 130.0,
+      "lon_max": 150.0,
+      "lat_min": 20.0,
+      "lat_max": 55.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 0
+        },
+        "full": {
+          "railways": 0
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "na_w170_w140",
+      "region_id": "north_america",
+      "manifest_path": "data/transport_layers/global_rail/regions/north_america/shards/na_w170_w140/manifest.json",
+      "lon_min": -170.0,
+      "lon_max": -140.0,
+      "lat_min": 15.0,
+      "lat_max": 75.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 9
+        },
+        "full": {
+          "railways": 63
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "na_w140_w110",
+      "region_id": "north_america",
+      "manifest_path": "data/transport_layers/global_rail/regions/north_america/shards/na_w140_w110/manifest.json",
+      "lon_min": -140.0,
+      "lon_max": -110.0,
+      "lat_min": 15.0,
+      "lat_max": 75.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 285
+        },
+        "full": {
+          "railways": 1989
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "na_w110_w080",
+      "region_id": "north_america",
+      "manifest_path": "data/transport_layers/global_rail/regions/north_america/shards/na_w110_w080/manifest.json",
+      "lon_min": -110.0,
+      "lon_max": -80.0,
+      "lat_min": 15.0,
+      "lat_max": 75.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 1348
+        },
+        "full": {
+          "railways": 8112
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    },
+    {
+      "id": "na_w080_w050",
+      "region_id": "north_america",
+      "manifest_path": "data/transport_layers/global_rail/regions/north_america/shards/na_w080_w050/manifest.json",
+      "lon_min": -80.0,
+      "lon_max": -50.0,
+      "lat_min": 15.0,
+      "lat_max": 75.0,
+      "feature_counts": {
+        "preview": {
+          "railways": 213
+        },
+        "full": {
+          "railways": 2356
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "adapter_id": "global_rail_v1",
+  "family": "rail",
+  "geometry_kind": "line",
+  "schema_version": 1,
+  "generated_at": "2026-04-15T22:03:58.325514Z",
+  "recipe_path": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/source_recipe.manual.json",
+  "recipe_version": "global_rail_sources_v1",
+  "distribution_tier": "single_pack",
+  "source_policy": "overture_only_checked_in_v1",
+  "paths": {
+    "preview": {
+      "railways": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/railways.preview.topo.json"
+    },
+    "full": {
+      "railways": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/railways.topo.json"
+    },
+    "build_audit": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/build_audit.json"
+  },
+  "feature_counts": {
+    "preview": {
+      "railways": 1592
+    },
+    "full": {
+      "railways": 5915
+    }
+  },
+  "build_command": "python tools/build_global_transport_rail.py --region europe --shard eu_e025_e045",
+  "runtime_consumer": "transport_overview_rail",
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/source_recipe.manual.json",
+      "size_bytes": 4522,
+      "sha256": "0cd9162cd0ec0986588b9af2e95a7d4ae6449b12c0fda6374cf8243b38da9485"
+    }
+  },
+  "default_variant": "default",
+  "variants": {
+    "default": {
+      "label": "default",
+      "distribution_tier": "single_pack",
+      "paths": {
+        "preview": {
+          "railways": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/railways.preview.topo.json"
+        },
+        "full": {
+          "railways": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/railways.topo.json"
+        },
+        "build_audit": "data/transport_layers/global_rail/regions/europe/shards/eu_e025_e045/build_audit.json"
+      },
+      "feature_counts": {
+        "preview": {
+          "railways": 1592
+        },
+        "full": {
+          "railways": 5915
+        }
+      }
+    }
+  },
+  "extensions": {
+    "rail": {
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "major_stations": "phase_b_pending_source"
+      },
+      "runtime_readiness": {
+        "transport_overview_rail": "backbone_only_not_ui_ready",
+        "rail_stations_major": "placeholder_only"
+      },
+      "phase_b_reserved_outputs": [
+        "rail_stations_major"
+      ],
+      "region": {
+        "id": "europe",
+        "lon_min": -12.0,
+        "lon_max": 45.0,
+        "lat_min": 34.0,
+        "lat_max": 72.0
+      },
+      "shard": {
+        "id": "eu_e025_e045",
+        "lon_min": 25.0,
+        "lon_max": 45.0,
+        "lat_min": 34.0,
+        "lat_max": 72.0
+      }
+    }
+  }
+}

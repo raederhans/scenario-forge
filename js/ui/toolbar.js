@@ -2757,6 +2757,16 @@ function initToolbar({ render } = {}) {
     ].filter((entry) => !!entry?.id);
   };
 
+  const getExportBakeVisibilitySignature = (exportUi) => {
+    const main = EXPORT_MAIN_LAYER_IDS
+      .map((layerId) => `${layerId}:${exportUi?.visibility?.[layerId] === false ? "0" : "1"}`)
+      .join("|");
+    const text = EXPORT_TEXT_LAYER_IDS
+      .map((layerId) => `${layerId}:${exportUi?.textVisibility?.[layerId] === false ? "0" : "1"}`)
+      .join("|");
+    return `main=${main};text=${text}`;
+  };
+
   const getVisibleExportPreviewSources = (exportUi) => {
     const mainEntries = exportUi.layerOrder
       .map((layerId) => EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId))
@@ -2838,7 +2848,7 @@ function initToolbar({ render } = {}) {
 
       const name = document.createElement("span");
       name.className = "export-workbench-layer-name";
-      name.textContent = layer.name;
+      name.textContent = t(layer.name, "ui");
       item.appendChild(name);
 
       const controls = document.createElement("div");
@@ -2846,7 +2856,7 @@ function initToolbar({ render } = {}) {
 
       const badge = document.createElement("span");
       badge.className = "export-workbench-layer-badge";
-      badge.textContent = layer.summary || t("Visible", "ui");
+      badge.textContent = t(layer.summary || "Visible", "ui");
       controls.appendChild(badge);
 
       const toggle = document.createElement("label");
@@ -2892,7 +2902,7 @@ function initToolbar({ render } = {}) {
 
       const name = document.createElement("span");
       name.className = "export-workbench-layer-name";
-      name.textContent = entry.name;
+      name.textContent = t(entry.name, "ui");
       item.appendChild(name);
 
       const controls = document.createElement("div");
@@ -4841,7 +4851,7 @@ function initToolbar({ render } = {}) {
     entries.forEach((entry) => {
       const option = document.createElement("option");
       option.value = entry.id;
-      option.textContent = entry.label;
+      option.textContent = t(entry.label, "ui");
       exportWorkbenchPreviewLayerSelect.appendChild(option);
     });
     if (!entries.some((entry) => entry.id === exportUi.previewLayerId)) {
@@ -4866,7 +4876,7 @@ function initToolbar({ render } = {}) {
       copy.className = "export-workbench-bake-copy";
       const title = document.createElement("strong");
       title.className = "export-workbench-bake-title";
-      title.textContent = model.name;
+      title.textContent = t(model.name, "ui");
       const meta = document.createElement("span");
       meta.className = "export-workbench-bake-meta";
       if (!artifact) {
@@ -8357,7 +8367,7 @@ function initToolbar({ render } = {}) {
     return `fnv1a_${(hash >>> 0).toString(16).padStart(8, "0")}`;
   };
 
-  const getLayerDependencyRevision = (layerId) => {
+  const getLayerDependencyRevision = (layerId, exportUi = ensureExportWorkbenchUiState()) => {
     const mapSvg = document.getElementById("map-svg");
     const mapSvgChildCount = mapSvg ? mapSvg.childElementCount : 0;
     const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
@@ -8377,6 +8387,7 @@ function initToolbar({ render } = {}) {
     ];
     if (layerId === "color") {
       return [
+        getExportBakeVisibilitySignature(exportUi),
         `colorRevision:${Number(state.colorRevision) || 0}`,
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `dirtyRevision:${dirtyRevision}`,
@@ -8391,6 +8402,7 @@ function initToolbar({ render } = {}) {
     }
     if (layerId === "line") {
       return [
+        getExportBakeVisibilitySignature(exportUi),
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `dynamicDirty:${state.dynamicBordersDirty ? 1 : 0}`,
         `dirtyRevision:${dirtyRevision}`,
@@ -8400,6 +8412,7 @@ function initToolbar({ render } = {}) {
     }
     if (layerId === "text") {
       return [
+        getExportBakeVisibilitySignature(exportUi),
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `svgChildren:${mapSvgChildCount}`,
         `dirtyRevision:${dirtyRevision}`,
@@ -8407,6 +8420,7 @@ function initToolbar({ render } = {}) {
       ];
     }
     return [
+      getExportBakeVisibilitySignature(exportUi),
       `colorRevision:${Number(state.colorRevision) || 0}`,
       `topologyRevision:${Number(state.topologyRevision) || 0}`,
       `svgChildren:${mapSvgChildCount}`,
@@ -8581,15 +8595,17 @@ function initToolbar({ render } = {}) {
     return "none";
   };
 
-  const bakeLayer = async (layerId) => {
-    const exportUi = ensureExportWorkbenchUiState();
+  const bakeLayer = async (layerId, exportUiOverride = null) => {
+    const exportUi = exportUiOverride && typeof exportUiOverride === "object"
+      ? exportUiOverride
+      : ensureExportWorkbenchUiState();
     const normalizedLayerId = String(layerId || "").trim().toLowerCase();
     if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
       throw new Error(`Unsupported bake layer: ${layerId}`);
     }
     const width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
     const height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
-    const dependencies = getLayerDependencyRevision(normalizedLayerId);
+    const dependencies = getLayerDependencyRevision(normalizedLayerId, exportUi);
     const hash = computeBakeHash([normalizedLayerId, `${width}x${height}`, ...dependencies]);
     const cacheEntry = exportUi.bakeCache.get(normalizedLayerId);
     if (
@@ -8609,19 +8625,18 @@ function initToolbar({ render } = {}) {
     if (!bakeCtx) {
       throw new Error("Canvas bake context unavailable.");
     }
-    if (normalizedLayerId === "color") {
-      drawColorLayerToCanvas(bakeCtx);
-    } else if (normalizedLayerId === "line") {
-      drawLineLayerToCanvas(bakeCtx);
-    } else if (normalizedLayerId === "text") {
-      const labelsCanvas = renderExportPassesToCanvas(["labels"]);
-      if (labelsCanvas) {
-        bakeCtx.drawImage(labelsCanvas, 0, 0);
-      }
-      await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
+    const bakePassNames = getBakePassNamesForLayer(normalizedLayerId, exportUi);
+    if (normalizedLayerId === "composite") {
+      const compositeCanvas = await buildCompositeSourceCanvas(exportUi);
+      bakeCtx.drawImage(compositeCanvas, 0, 0);
     } else {
-      drawCompositeLayerToCanvas(bakeCtx);
-      if (exportUi.includeTextLayer) {
+      if (bakePassNames.length) {
+        const passCanvas = renderExportPassesToCanvas(bakePassNames);
+        if (passCanvas) {
+          bakeCtx.drawImage(passCanvas, 0, 0);
+        }
+      }
+      if (normalizedLayerId === "text" && exportUi.textVisibility?.["svg-annotations"]) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
       }
     }
@@ -8695,6 +8710,32 @@ function initToolbar({ render } = {}) {
     }
     await drawSvgLayerToCanvas(canvas, ctx);
     return canvas;
+  };
+
+  const getBakePassNamesForLayer = (layerId, exportUi) => {
+    const visibility = exportUi?.visibility || {};
+    const textVisibility = exportUi?.textVisibility || {};
+    if (layerId === "color") {
+      return [
+        ...(visibility.background === false ? [] : ["background"]),
+        ...(visibility.political === false ? [] : ["physicalBase", "political"]),
+        ...(visibility.context === false ? [] : ["contextBase", "contextScenario"]),
+        ...(visibility.effects === false ? [] : ["effects", "dayNight"]),
+      ];
+    }
+    if (layerId === "line") {
+      return visibility.effects === false ? [] : ["lineEffects", "borders"];
+    }
+    if (layerId === "text") {
+      return textVisibility["render-labels"] === false ? [] : ["labels"];
+    }
+    if (layerId === "composite") {
+      return resolveExportPassSequence({
+        ...exportUi,
+        visibility,
+      }).filter((passName) => textVisibility["render-labels"] !== false || passName !== "labels");
+    }
+    return [];
   };
 
   const buildCompositeSourceCanvas = async (exportUi) => {
@@ -8809,7 +8850,7 @@ function initToolbar({ render } = {}) {
     const outputs = [];
     const bakeLayerIds = getBakePackLayerIds(exportUi);
     for (const layerId of bakeLayerIds) {
-      const bakedCanvas = await bakeLayer(layerId);
+      const bakedCanvas = await bakeLayer(layerId, exportUi);
       outputs.push({
         id: layerId,
         canvas: scaleCanvasForExport(bakedCanvas, scaleMultiplier, exportUi),
