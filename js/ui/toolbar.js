@@ -1735,6 +1735,15 @@ function showExportFailureToast(error) {
   );
 }
 
+function resolveExportBaseDimensions() {
+  const dpr = Math.max(1, Number(state.dpr || globalThis.devicePixelRatio || 1));
+  const fallbackLogicalWidth = Number(state.colorCanvas?.width || 0) / dpr;
+  const fallbackLogicalHeight = Number(state.colorCanvas?.height || 0) / dpr;
+  const width = Math.round(Number(state.width || fallbackLogicalWidth || 0));
+  const height = Math.round(Number(state.height || fallbackLogicalHeight || 0));
+  return { width, height };
+}
+
 
 function initToolbar({ render } = {}) {
   const OCEAN_ADVANCED_PRESETS = new Set([
@@ -7707,11 +7716,7 @@ function initToolbar({ render } = {}) {
       try {
         const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
         const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const dpr = Math.max(1, Number(state.dpr || globalThis.devicePixelRatio || 1));
-        const fallbackLogicalWidth = Number(state.colorCanvas?.width || 0) / dpr;
-        const fallbackLogicalHeight = Number(state.colorCanvas?.height || 0) / dpr;
-        const baseWidth = Math.round(Number(state.width || fallbackLogicalWidth || 0));
-        const baseHeight = Math.round(Number(state.height || fallbackLogicalHeight || 0));
+        const { width: baseWidth, height: baseHeight } = resolveExportBaseDimensions();
         if (!(baseWidth > 0) || !(baseHeight > 0)) {
           throw createExportError("invalid-params", "Missing preview canvas dimensions.");
         }

@@ -2365,10 +2365,10 @@
                       </select>
                       <label id="lblExportScale" class="sidebar-field-label mt-3" for="exportScale" data-i18n="Export Resolution">Export Resolution</label>
                       <select id="exportScale" name="export-scale" autocomplete="off" class="select-input mt-2">
-                        <option value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
-                        <option value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
-                        <option value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
-                        <option value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
+                        <option id="optExportScale1x" value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
+                        <option id="optExportScale1_5x" value="1.5" data-i18n="High (1.5×)">High (1.5×)</option>
+                        <option id="optExportScale2x" value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
+                        <option id="optExportScale4x" value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
                       </select>
                       <p id="exportResolutionHint" class="sidebar-help-copy mt-2" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
                       <button id="exportBtn" class="btn-primary sidebar-tool-action-primary mt-4">Download Snapshot</button>
