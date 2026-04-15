@@ -1827,6 +1827,7 @@ function initToolbar({ render } = {}) {
   const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
   const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
+  const airportPrimaryColor = document.getElementById("airportPrimaryColor");
   const airportLabelsEnabled = document.getElementById("airportLabelsEnabled");
   const airportLabelDensity = document.getElementById("airportLabelDensity");
   const airportLabelMode = document.getElementById("airportLabelMode");
@@ -1839,6 +1840,7 @@ function initToolbar({ render } = {}) {
   const transportAirportSummaryMeta = document.getElementById("transportAirportSummaryMeta");
   const portVisualStrength = document.getElementById("portVisualStrength");
   const portOpacity = document.getElementById("portOpacity");
+  const portPrimaryColor = document.getElementById("portPrimaryColor");
   const portLabelsEnabled = document.getElementById("portLabelsEnabled");
   const portLabelDensity = document.getElementById("portLabelDensity");
   const portLabelMode = document.getElementById("portLabelMode");
@@ -1996,6 +1998,13 @@ function initToolbar({ render } = {}) {
   const inspectorUtilitiesSection = document.getElementById("inspectorUtilitiesSection");
   const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
+  const exportWorkbenchOverlay = document.getElementById("exportWorkbenchOverlay");
+  const exportWorkbenchPanel = document.getElementById("exportWorkbenchPanel");
+  const exportWorkbenchCloseBtn = document.getElementById("exportWorkbenchCloseBtn");
+  const exportWorkbenchPreviewState = document.getElementById("exportWorkbenchPreviewState");
+  const exportWorkbenchPreviewModeButtons = Array.from(document.querySelectorAll(".export-workbench-preview-toggle-btn"));
+  const exportWorkbenchFormat = document.getElementById("exportWorkbenchFormat");
+  const exportWorkbenchSnapshotBtn = document.getElementById("exportWorkbenchSnapshotBtn");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
@@ -2350,11 +2359,62 @@ function initToolbar({ render } = {}) {
       : resolveLinkedTransportOverviewScopeAndThreshold(familyId, familyConfig.coverageReach)
   );
 
+  const getTransportScopeThresholdRank = (familyId, scope) => {
+    const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+    const normalizedScope = String(scope || "").trim().toLowerCase();
+    if (normalizedFamilyId === "airport") {
+      if (normalizedScope === "international") return 3;
+      if (normalizedScope === "all_civil") return 1;
+      return 2;
+    }
+    if (normalizedFamilyId === "port") {
+      if (normalizedScope === "core") return 3;
+      if (normalizedScope === "expanded") return 1;
+      return 2;
+    }
+    return 1;
+  };
+
+  const getTransportImportanceThresholdRank = (threshold) => {
+    const normalized = String(threshold || "").trim().toLowerCase();
+    if (normalized === "primary") return 3;
+    if (normalized === "secondary") return 2;
+    return 1;
+  };
+
+  const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {
+    const collection = familyId === "port" ? state.portsData : state.airportsData;
+    const features = Array.isArray(collection?.features) ? collection.features : null;
+    if (!features) return null;
+    const minimumImportanceRank = Math.max(
+      getTransportScopeThresholdRank(familyId, effectiveScope.scope),
+      getTransportImportanceThresholdRank(effectiveScope.importanceThreshold),
+    );
+    return features.filter((feature) => {
+      const importanceRank = Math.max(1, Math.round(Number(feature?.properties?.importance_rank || 1)));
+      return importanceRank >= minimumImportanceRank;
+    }).length;
+  };
+
+  const formatTransportFamilyCountText = (familyId, count) => {
+    if (!Number.isFinite(count)) return "";
+    const roundedCount = Math.max(0, Math.round(count));
+    const noun = familyId === "port"
+      ? (roundedCount === 1 ? "port" : "ports")
+      : (roundedCount === 1 ? "airport" : "airports");
+    return `${roundedCount.toLocaleString()} ${t(noun, "ui")}`;
+  };
+
   const buildTransportFamilySummaryText = (familyId, masterEnabled, familyEnabled, familyConfig, effectiveScope) => {
     if (!familyEnabled) return t("Off", "ui");
     if (!masterEnabled) return `${t("On", "ui")} · ${t("hidden by master", "ui")}`;
-    const labelsPart = familyConfig.labelsEnabled ? t("labels on", "ui") : t("labels off", "ui");
-    return `${t("On", "ui")} · ${labelsPart} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
+    const countText = formatTransportFamilyCountText(
+      familyId,
+      getTransportFamilyFilteredCount(familyId, familyConfig, effectiveScope),
+    );
+    return countText
+      ? `${t("On", "ui")} · ${countText}`
+      : `${t("On", "ui")} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
   };
 
   const setTransportAppearanceGroupEnabled = (container, enabled) => {
@@ -2382,6 +2442,7 @@ function initToolbar({ render } = {}) {
     if (airportVisualStrengthValue) airportVisualStrengthValue.textContent = formatTransportPercent(airportConfig.visualStrength ?? 0.56);
     if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity ?? 0.82) * 100));
     if (airportOpacityValue) airportOpacityValue.textContent = formatTransportPercent(airportConfig.opacity ?? 0.82);
+    if (airportPrimaryColor) airportPrimaryColor.value = normalizeOceanFillColor(airportConfig.primaryColor || "#1d4ed8");
     if (airportLabelsEnabled) airportLabelsEnabled.checked = !!airportConfig.labelsEnabled;
     if (airportLabelDensity) airportLabelDensity.value = String(airportConfig.labelDensity || "balanced");
     if (airportLabelMode) airportLabelMode.value = String(airportConfig.labelMode || "both");
@@ -2410,6 +2471,7 @@ function initToolbar({ render } = {}) {
     if (portVisualStrengthValue) portVisualStrengthValue.textContent = formatTransportPercent(portConfig.visualStrength ?? 0.54);
     if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity ?? 0.78) * 100));
     if (portOpacityValue) portOpacityValue.textContent = formatTransportPercent(portConfig.opacity ?? 0.78);
+    if (portPrimaryColor) portPrimaryColor.value = normalizeOceanFillColor(portConfig.primaryColor || "#b45309");
     if (portLabelsEnabled) portLabelsEnabled.checked = !!portConfig.labelsEnabled;
     if (portLabelDensity) portLabelDensity.value = String(portConfig.labelDensity || "balanced");
     if (portLabelMode) portLabelMode.value = String(portConfig.labelMode || "mixed");
@@ -2439,6 +2501,7 @@ function initToolbar({ render } = {}) {
     [
       airportVisualStrength,
       airportOpacity,
+      airportPrimaryColor,
       airportLabelsEnabled,
       airportLabelDensity,
       airportLabelMode,
@@ -2451,6 +2514,7 @@ function initToolbar({ render } = {}) {
     [
       portVisualStrength,
       portOpacity,
+      portPrimaryColor,
       portLabelsEnabled,
       portLabelDensity,
       portLabelMode,
@@ -2479,6 +2543,9 @@ function initToolbar({ render } = {}) {
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const applyTransportAppearanceMasterToggle = (nextEnabled) => {
@@ -2497,6 +2564,8 @@ function initToolbar({ render } = {}) {
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
   };
+
+  state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;
 
   const focusOverlaySurface = (container) => focusSurface(container);
   const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
@@ -2629,6 +2698,7 @@ function initToolbar({ render } = {}) {
   let transportWorkbenchPreviewWarmupScheduled = false;
   let transportWorkbenchDraggedLayerId = "";
   let exportWorkbenchDraggedLayerId = "";
+  let exportWorkbenchPreviewMode = "main";
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -4466,6 +4536,9 @@ function initToolbar({ render } = {}) {
     const willOpen = !!nextOpen;
     if (willOpen === wasOpen && !willOpen) {
       renderTransportWorkbenchUi();
+      if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+        state.syncFacilityInfoCardVisibilityFn();
+      }
       return;
     }
     if (willOpen) {
@@ -4476,6 +4549,7 @@ function initToolbar({ render } = {}) {
       state.toggleLeftPanelFn?.(false);
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
+      state.closeExportWorkbenchFn?.({ restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
@@ -4484,6 +4558,9 @@ function initToolbar({ render } = {}) {
     }
     uiState.open = willOpen;
     renderTransportWorkbenchUi();
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
     if (willOpen) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
@@ -4511,6 +4588,64 @@ function initToolbar({ render } = {}) {
     ensureTransportWorkbenchUiState();
     resetTransportWorkbenchCarrierView();
     syncTransportWorkbenchPreviewControls();
+  };
+
+  const renderExportWorkbenchUi = (isOpen) => {
+    if (!exportWorkbenchOverlay) return;
+    exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
+    exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    dockExportBtn?.classList.toggle("is-active", isOpen);
+    dockExportBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    if (exportWorkbenchFormat && exportFormat) {
+      exportWorkbenchFormat.value = exportFormat.value === "jpg" ? "jpg" : "png";
+    }
+    if (exportWorkbenchPreviewState) {
+      exportWorkbenchPreviewState.textContent = exportWorkbenchPreviewMode === "layer"
+        ? t("Single layer preview (placeholder)", "ui")
+        : t("Main image preview (placeholder)", "ui");
+    }
+    exportWorkbenchPreviewModeButtons.forEach((button) => {
+      const isActive = String(button.dataset.exportPreviewMode || "main") === exportWorkbenchPreviewMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  };
+
+  const setExportWorkbenchState = (nextOpen, { trigger = null, restoreFocus = true } = {}) => {
+    if (!exportWorkbenchOverlay || !exportWorkbenchPanel) return;
+    const willOpen = !!nextOpen;
+    const wasOpen = !exportWorkbenchOverlay.classList.contains("hidden");
+    if (willOpen === wasOpen) {
+      renderExportWorkbenchUi(willOpen);
+      return;
+    }
+    if (willOpen) {
+      closeDockPopover({ restoreFocus: false, syncUrl: false });
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+        closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
+      }
+      if (trigger instanceof HTMLElement) {
+        rememberOverlayTrigger(exportWorkbenchOverlay, trigger);
+      }
+      renderExportWorkbenchUi(true);
+      syncSupportSurfaceUrlState("export");
+      focusOverlaySurface(exportWorkbenchPanel);
+      return;
+    }
+    renderExportWorkbenchUi(false);
+    syncSupportSurfaceUrlState("");
+    if (restoreFocus) {
+      restoreOverlayTriggerFocus(exportWorkbenchOverlay);
+    }
+  };
+
+  state.openExportWorkbenchFn = (trigger = dockExportBtn) => {
+    setExportWorkbenchState(true, { trigger });
+    return true;
+  };
+  state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {
+    setExportWorkbenchState(false, { restoreFocus });
+    return false;
   };
 
   state.openTransportWorkbenchFn = (trigger = null) => {
@@ -4775,6 +4910,9 @@ function initToolbar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const closeSpecialZonePopover = () => {
@@ -4859,6 +4997,13 @@ function initToolbar({ render } = {}) {
         return;
       }
       toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
+      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      return;
+    }
+    if (view === "export") {
+      ensureProjectSupportSurface();
+      const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
+      state.openExportWorkbenchFn?.(exportTrigger);
       state.ui.restoredSupportSurfaceViewFromUrl = view;
       return;
     }
@@ -5115,7 +5260,7 @@ function initToolbar({ render } = {}) {
     return null;
   };
 
-  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference", "export"]);
+  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference"]);
   const isSupportDockPopoverKind = (kind) => SUPPORT_DOCK_POPOVER_KINDS.has(String(kind || ""));
 
   const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
@@ -5262,8 +5407,37 @@ function initToolbar({ render } = {}) {
       if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden") && !insideTransportWorkbenchSectionHelp) {
         closeTransportWorkbenchSectionHelpPopover();
       }
+      if (
+        exportWorkbenchOverlay
+        && exportWorkbenchPanel
+        && !exportWorkbenchOverlay.classList.contains("hidden")
+        && target === exportWorkbenchOverlay
+      ) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      }
     });
     document.addEventListener("keydown", (event) => {
+      if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
+        const focusables = getFocusableElements(exportWorkbenchPanel);
+        if (!focusables.length) {
+          event.preventDefault();
+          focusOverlaySurface(exportWorkbenchPanel);
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+          return;
+        }
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+          return;
+        }
+      }
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && event.key === "Tab") {
         const focusables = getFocusableElements(scenarioGuidePopover);
         if (!focusables.length) {
@@ -5300,6 +5474,10 @@ function initToolbar({ render } = {}) {
         }
         if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
           closeScenarioGuidePopover({ restoreFocus: true });
+          closedOverlay = true;
+        }
+        if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) {
+          state.closeExportWorkbenchFn?.({ restoreFocus: true });
           closedOverlay = true;
         }
         if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
@@ -7591,11 +7769,51 @@ function initToolbar({ render } = {}) {
 
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
     dockExportBtn.setAttribute("aria-haspopup", "dialog");
-    dockExportBtn.setAttribute("aria-controls", "dockExportPopover");
+    dockExportBtn.setAttribute("aria-controls", "exportWorkbenchOverlay");
     dockExportBtn.addEventListener("click", () => {
-      openDockPopover("export");
+      const isOpen = !!(exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden"));
+      if (isOpen) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      } else {
+        state.openExportWorkbenchFn?.(dockExportBtn);
+      }
     });
     dockExportBtn.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchCloseBtn && !exportWorkbenchCloseBtn.dataset.bound) {
+    exportWorkbenchCloseBtn.addEventListener("click", () => {
+      state.closeExportWorkbenchFn?.({ restoreFocus: true });
+    });
+    exportWorkbenchCloseBtn.dataset.bound = "true";
+  }
+
+  exportWorkbenchPreviewModeButtons.forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      exportWorkbenchPreviewMode = String(button.dataset.exportPreviewMode || "main") === "layer" ? "layer" : "main";
+      renderExportWorkbenchUi(true);
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (exportWorkbenchFormat && !exportWorkbenchFormat.dataset.bound) {
+    exportWorkbenchFormat.addEventListener("change", () => {
+      if (exportFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+    });
+    exportWorkbenchFormat.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchSnapshotBtn && !exportWorkbenchSnapshotBtn.dataset.bound) {
+    exportWorkbenchSnapshotBtn.addEventListener("click", () => {
+      if (exportFormat && exportWorkbenchFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+      exportBtn?.click();
+    });
+    exportWorkbenchSnapshotBtn.dataset.bound = "true";
   }
 
   if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
@@ -7712,59 +7930,276 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  async function renderSvgOverlayCanvas(mapSvg, width, height) {
+    if (!mapSvg || !width || !height) return null;
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      const image = await new Promise((resolve, reject) => {
+        const nextImage = new Image();
+        nextImage.onload = () => resolve(nextImage);
+        nextImage.onerror = () => reject(new Error("SVG overlay export failed."));
+        nextImage.src = svgUrl;
+      });
+      const overlayCanvas = document.createElement("canvas");
+      overlayCanvas.width = width;
+      overlayCanvas.height = height;
+      const overlayCtx = overlayCanvas.getContext("2d");
+      if (!overlayCtx) {
+        throw new Error("Overlay export context unavailable.");
+      }
+      overlayCtx.drawImage(image, 0, 0);
+      return overlayCanvas;
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+
+  async function renderQuickSnapshotToCanvas(runtimeState) {
+    const safeState = runtimeState && typeof runtimeState === "object" ? runtimeState : {};
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = safeState.colorCanvas?.width || 0;
+    exportCanvas.height = safeState.colorCanvas?.height || 0;
+    const exportCtx = exportCanvas.getContext("2d");
+    if (!exportCtx) {
+      throw new Error("Canvas export context unavailable.");
+    }
+    if (safeState.colorCanvas) exportCtx.drawImage(safeState.colorCanvas, 0, 0);
+    if (safeState.lineCanvas) exportCtx.drawImage(safeState.lineCanvas, 0, 0);
+    const overlayCanvas = await renderSvgOverlayCanvas(safeState.mapSvg, exportCanvas.width, exportCanvas.height);
+    if (overlayCanvas) {
+      exportCtx.drawImage(overlayCanvas, 0, 0);
+    }
+    return exportCanvas;
+  }
+
+  function buildExportRenderPlan(exportWorkbenchUi, runtimeState) {
+    const ui = exportWorkbenchUi && typeof exportWorkbenchUi === "object" ? exportWorkbenchUi : {};
+    const layerOrder = Array.isArray(ui.layerOrder) ? ui.layerOrder : ["base", "paint", "borders", "labels", "overlay"];
+    const layerVisibility = ui.layerVisibility && typeof ui.layerVisibility === "object" ? ui.layerVisibility : {};
+    const visibleLayers = layerOrder.filter((layerId) => layerVisibility[layerId] !== false);
+    const layerCanvases = runtimeState.layerCanvases || {};
+    const renderableLayers = visibleLayers.filter((layerId) => layerId === "base" || layerCanvases[layerId]);
+    const bakeQueue = Array.isArray(ui.bakeQueue) ? ui.bakeQueue : [];
+    const exportTargets = Array.isArray(ui.exportTargets) && ui.exportTargets.length
+      ? ui.exportTargets
+      : [{ id: "composite", type: "composite", layerId: "" }];
+    return {
+      activePreset: String(ui.activePreset || "default").trim() || "default",
+      layers: renderableLayers,
+      bakeQueue,
+      textItems: Array.isArray(ui.textItems) ? ui.textItems : [],
+      exportTargets,
+      imageAdjustments: ui.imageAdjustments && typeof ui.imageAdjustments === "object" ? ui.imageAdjustments : {},
+    };
+  }
+
+  async function renderExportPlanToCanvas(plan, runtimeState) {
+    const outputs = [];
+    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
+    if (!width || !height) {
+      throw new Error("Export canvas is empty.");
+    }
+
+    const resolveLayerCanvas = (layerId) => {
+      const layerCanvas = runtimeState.layerCanvases?.[layerId];
+      if (!layerCanvas) return null;
+      if (!layerCanvas.width || !layerCanvas.height) return null;
+      return layerCanvas;
+    };
+
+    const drawTextItems = (ctx) => {
+      plan.textItems.forEach((item) => {
+        if (!item || !String(item.text || "").trim()) return;
+        ctx.save();
+        ctx.font = String(item.font || "600 20px Inter");
+        ctx.fillStyle = String(item.fill || "#ffffff");
+        ctx.textAlign = ["left", "center", "right"].includes(item.align) ? item.align : "left";
+        ctx.textBaseline = ["top", "middle", "bottom", "alphabetic"].includes(item.baseline) ? item.baseline : "alphabetic";
+        ctx.fillText(String(item.text), Number(item.x) || 0, Number(item.y) || 0);
+        ctx.restore();
+      });
+    };
+
+    const drawLayerStack = (ctx, layerIds) => {
+      let drawnCount = 0;
+      const drawnCanvases = new Set();
+      layerIds.forEach((layerId) => {
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas || drawnCanvases.has(layerCanvas)) return;
+        ctx.drawImage(layerCanvas, 0, 0);
+        drawnCanvases.add(layerCanvas);
+        drawnCount += 1;
+      });
+      return drawnCount;
+    };
+
+    for (const target of plan.exportTargets) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) continue;
+      const targetType = String(target?.type || "composite").toLowerCase();
+      if (targetType === "layer") {
+        const layerId = String(target?.layerId || "").trim();
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas) {
+          throw new Error(`Export layer target has no render data: ${layerId || "<unknown>"}`);
+        }
+        ctx.drawImage(layerCanvas, 0, 0);
+      } else {
+        const drawn = drawLayerStack(ctx, Array.isArray(plan.layers) ? plan.layers : []);
+        if (!drawn) {
+          throw new Error("Export render plan has no drawable layers.");
+        }
+      }
+      drawTextItems(ctx);
+      outputs.push({
+        id: String(target?.id || target?.layerId || "composite"),
+        canvas,
+      });
+    }
+
+    return outputs;
+  }
+
+  function downloadExportOutputs(outputs, format, namingRule) {
+    const normalizedFormat = format === "jpg" ? "jpg" : "png";
+    const mimeType = normalizedFormat === "jpg" ? "image/jpeg" : "image/png";
+    outputs.forEach((output, index) => {
+      const dataUrl = output.canvas.toDataURL(mimeType, 0.92);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = namingRule(output, index, normalizedFormat);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+  }
+
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
+      const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
+      const mapSvg = document.getElementById("map-svg");
+      const layerCanvases = {
+        ...(state.exportLayerCanvases || {}),
+      };
+      if (!layerCanvases.base && state.colorCanvas) {
+        layerCanvases.base = state.colorCanvas;
+      }
+      if (!layerCanvases.paint && state.colorCanvas) {
+        layerCanvases.paint = state.colorCanvas;
+      }
+      if (!layerCanvases.borders && state.lineCanvas) {
+        layerCanvases.borders = state.lineCanvas;
+      }
+      let runtimeState = {
+        colorCanvas: state.colorCanvas,
+        lineCanvas: state.lineCanvas,
+        mapSvg,
+        layerCanvases,
+      };
       try {
-        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
-        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const passSequence = resolveExportPassSequence(state.exportWorkbenchUi);
-        const exportCanvas = renderExportPassesToCanvas(passSequence) || document.createElement("canvas");
-        if (!exportCanvas.width || !exportCanvas.height) {
-          exportCanvas.width = state.colorCanvas?.width || 0;
-          exportCanvas.height = state.colorCanvas?.height || 0;
+const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
+const extension = exportFormat.value === "jpg" ? "jpg" : "png";
+
+const passSequence = resolveExportPassSequence(state.exportWorkbenchUi);
+const exportCanvas = renderExportPassesToCanvas(passSequence) || document.createElement("canvas");
+if (!exportCanvas.width || !exportCanvas.height) {
+  exportCanvas.width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
+  exportCanvas.height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
+}
+
+const exportCtx = exportCanvas.getContext("2d");
+if (!exportCtx) {
+  throw new Error("Canvas export context unavailable.");
+}
+
+const mapSvg = document.getElementById("map-svg");
+if (mapSvg) {
+  // incoming 分支的 overlay 管线
+  if (typeof renderSvgOverlayCanvas === "function") {
+    const overlayCanvas = await renderSvgOverlayCanvas(
+      mapSvg,
+      exportCanvas.width,
+      exportCanvas.height,
+    );
+    if (overlayCanvas) {
+      exportCtx.drawImage(overlayCanvas, 0, 0);
+
+      // 若当前函数上下文有 layerCanvases，则同步写回
+      if (typeof layerCanvases !== "undefined" && layerCanvases && typeof layerCanvases === "object") {
+        if (!layerCanvases.overlay) layerCanvases.overlay = overlayCanvas;
+        if (!layerCanvases.labels) layerCanvases.labels = overlayCanvas;
+      }
+    }
+  } else {
+    // fallback：旧逻辑（直接序列化 SVG 叠加）
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      await new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+          exportCtx.drawImage(image, 0, 0);
+          resolve();
+        };
+        image.onerror = () => reject(new Error("SVG overlay export failed."));
+        image.src = svgUrl;
+      });
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+}
+
+const dataUrl = exportCanvas.toDataURL(format, 0.92);
+const link = document.createElement("a");
+link.href = dataUrl;
+link.download = `map_snapshot.${extension}`;
+document.body.appendChild(link);
+link.click();
+link.remove();
         }
-        const exportCtx = exportCanvas.getContext("2d");
-        if (!exportCtx) {
-          throw new Error("Canvas export context unavailable.");
-        }
-        const mapSvg = document.getElementById("map-svg");
-        if (mapSvg) {
-          const serializer = new XMLSerializer();
-          const svgMarkup = serializer.serializeToString(mapSvg);
-          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-          const svgUrl = URL.createObjectURL(svgBlob);
-          try {
-            await new Promise((resolve, reject) => {
-              const image = new Image();
-              image.onload = () => {
-                exportCtx.drawImage(image, 0, 0);
-                resolve();
-              };
-              image.onerror = () => reject(new Error("SVG overlay export failed."));
-              image.src = svgUrl;
-            });
-          } finally {
-            URL.revokeObjectURL(svgUrl);
-          }
-        }
-        const dataUrl = exportCanvas.toDataURL(format, 0.92);
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = `map_snapshot.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        runtimeState = {
+          colorCanvas: state.colorCanvas,
+          lineCanvas: state.lineCanvas,
+          mapSvg,
+          layerCanvases,
+        };
+        const plan = buildExportRenderPlan(state.exportWorkbenchUi, runtimeState);
+        const outputs = await renderExportPlanToCanvas(plan, runtimeState);
+        downloadExportOutputs(outputs, formatKey, (output, index, extension) => {
+          const suffix = outputs.length > 1 ? `_${index + 1}_${output.id}` : "";
+          return `map_snapshot${suffix}.${extension}`;
+        });
         showToast(t("Map snapshot downloaded.", "ui"), {
           title: t("Snapshot exported", "ui"),
           tone: "success",
         });
       } catch (error) {
-        console.error("Snapshot export failed:", error);
-        showToast(t("Unable to export the map snapshot.", "ui"), {
-          title: t("Snapshot failed", "ui"),
-          tone: "error",
-          duration: 4200,
-        });
+        console.warn("Workbench export failed, fallback to quick export:", error);
+        try {
+          const fallbackCanvas = await renderQuickSnapshotToCanvas(runtimeState);
+          downloadExportOutputs([{ id: "quick", canvas: fallbackCanvas }], formatKey, (_output, _index, extension) => `map_snapshot.${extension}`);
+          showToast(t("Map snapshot downloaded.", "ui"), {
+            title: t("Snapshot exported", "ui"),
+            tone: "success",
+          });
+        } catch (fallbackError) {
+          console.error("Snapshot export failed:", fallbackError);
+          showToast(t("Unable to export the map snapshot.", "ui"), {
+            title: t("Snapshot failed", "ui"),
+            tone: "error",
+            duration: 4200,
+          });
+        }
       }
     });
   }
@@ -8206,6 +8641,15 @@ function initToolbar({ render } = {}) {
     airportOpacity.dataset.bound = "true";
   }
 
+  if (airportPrimaryColor && !airportPrimaryColor.dataset.bound) {
+    airportPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().airport.primaryColor = normalizeOceanFillColor(event.target.value || "#1d4ed8");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-primary-color");
+    });
+    airportPrimaryColor.dataset.bound = "true";
+  }
+
   if (airportLabelsEnabled && !airportLabelsEnabled.dataset.bound) {
     airportLabelsEnabled.addEventListener("change", (event) => {
       getTransportAppearanceConfig().airport.labelsEnabled = !!event.target.checked;
@@ -8304,6 +8748,15 @@ function initToolbar({ render } = {}) {
       renderDirty("transport-port-opacity");
     });
     portOpacity.dataset.bound = "true";
+  }
+
+  if (portPrimaryColor && !portPrimaryColor.dataset.bound) {
+    portPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().port.primaryColor = normalizeOceanFillColor(event.target.value || "#b45309");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-primary-color");
+    });
+    portPrimaryColor.dataset.bound = "true";
   }
 
   if (portLabelsEnabled && !portLabelsEnabled.dataset.bound) {
@@ -9734,6 +10187,9 @@ function initToolbar({ render } = {}) {
   }
   if (dockExportPopover) {
     dockExportPopover.setAttribute("aria-hidden", "true");
+  }
+  if (exportWorkbenchOverlay) {
+    exportWorkbenchOverlay.setAttribute("aria-hidden", "true");
   }
   if (scenarioGuidePopover) {
     applyDialogContract(scenarioGuidePopover, {

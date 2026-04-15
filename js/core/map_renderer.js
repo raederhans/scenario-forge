@@ -426,6 +426,14 @@ const CITY_COUNTRY_TIER_RANK = {
   D: 2,
   E: 1,
 };
+const CITY_COUNTRY_CLASS_RANK = Object.freeze({
+  global_core: 6,
+  regional_core: 5,
+  local_actor: 4,
+  fragmented_actor: 3,
+  micro: 2,
+  micro_subject: 1,
+});
 const CITY_COUNTRY_CLASS_WEIGHT = Object.freeze({
   global_core: 1.36,
   regional_core: 1.2,
@@ -585,17 +593,25 @@ const CITY_REVEAL_PHASES = [
   { id: "P0", minScale: 0, maxScale: 1.15, markerBudget: 18, labelBudget: 0 },
   { id: "P1", minScale: 1.15, maxScale: 1.45, markerBudget: 28, labelBudget: 0 },
   { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 0 },
-  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 0 },
+  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 8 },
   { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
   { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
 ];
 const CITY_MARKER_QUOTAS_BY_PHASE = Object.freeze({
-  P0: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 0 }),
+  P0: Object.freeze({ A: 1, B: 0, C: 0, D: 0, E: 0 }),
   P1: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 1 }),
-  P2: Object.freeze({ A: 3, B: 1, C: 0, D: 0, E: 0 }),
+  P2: Object.freeze({ A: 3, B: 1, C: 1, D: 1, E: 1 }),
   P3: Object.freeze({ A: 4, B: 2, C: 1, D: 1, E: 1 }),
   P4: Object.freeze({ A: 6, B: 4, C: 2, D: 1, E: 1 }),
   P5: Object.freeze({ A: 8, B: 6, C: 4, D: 2, E: 1 }),
+});
+const CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE = Object.freeze({
+  P0: 0.5,
+  P1: 0.5,
+  P2: 0.3,
+  P3: 0.3,
+  P4: 0,
+  P5: 0,
 });
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
@@ -800,6 +816,20 @@ const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
 let cityMarkerSpriteCacheColorRevision = -1;
 let visibleCityHoverEntries = [];
+const visibleFacilityHoverEntriesByFamily = {
+  airport: [],
+  port: [],
+};
+let hoveredFacilityEntry = null;
+let selectedFacilityEntry = null;
+let facilityInfoCard = null;
+let facilityInfoCardTitle = null;
+let facilityInfoCardBody = null;
+let facilityInfoCardZoomBtn = null;
+let facilityInfoCardCloseBtn = null;
+let facilityInfoCardMoreBtn = null;
+let facilityInfoCardExpanded = false;
+let facilityInfoCardAnchor = null;
 let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
 let pendingIndexUiRefreshHandle = null;
@@ -4187,12 +4217,16 @@ function getInspectorOverlaySignature() {
 }
 
 function getHoverOverlaySignature() {
+  const activeFacilityEntry = getActiveFacilityHighlightEntry();
   return [
     getOverlayProjectionSignature(),
     String(state.renderPhase || RENDER_PHASE_IDLE),
     String(state.hoveredId || ""),
     String(state.hoveredWaterRegionId || ""),
     String(state.hoveredSpecialRegionId || ""),
+    buildFacilityEntryKey(activeFacilityEntry),
+    Number(activeFacilityEntry?.screenPoint?.[0] || 0).toFixed(1),
+    Number(activeFacilityEntry?.screenPoint?.[1] || 0).toFixed(1),
   ].join("::");
 }
 
@@ -11887,9 +11921,6 @@ function getCityCountryTierFromScenarioRecord(profile, record, { defaultCountry 
 
 function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
   const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
-  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
-    return "fragmented_actor";
-  }
   const controllerFeatureCount = Math.max(
     0,
     Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? 0) || 0
@@ -11901,6 +11932,9 @@ function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", f
   const entryKind = String(record?.entry_kind || record?.entryKind || "").trim().toLowerCase();
   const isSubject = !!parentOwnerTag || entryKind === "scenario_subject";
   if (isSubject) return "micro_subject";
+  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
+    return "fragmented_actor";
+  }
   if (isFeatured || controllerFeatureCount >= 120 || profileFeatureCount >= 200) return "global_core";
   if (controllerFeatureCount >= 40 || profileFeatureCount >= 80) return "regional_core";
   if (controllerFeatureCount >= 8 || profileFeatureCount >= 16) return "local_actor";
@@ -12036,6 +12070,10 @@ function getCityCountryProfileIndex(cityCollection) {
   profiles.forEach((profile) => {
     const record = profile.scenarioTag ? state.scenarioCountriesByTag?.[profile.scenarioTag] : null;
     const revealOverride = getCityCountryRevealOverride(record);
+    const isDefaultCountry = !!profile.scenarioTag && profile.scenarioTag === defaultCountry;
+    const isFeaturedCountry = !!record?.featured || featuredTags.has(profile.scenarioTag);
+    const isPrimaryPower = CITY_PRIMARY_POWER_TAGS.has(profile.scenarioTag);
+    const isSecondaryPower = CITY_SECONDARY_POWER_TAGS.has(profile.scenarioTag);
     profile.controllerFeatureCount = Math.max(
       0,
       Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? profile.featureCount ?? 0) || 0
@@ -12048,9 +12086,19 @@ function getCityCountryProfileIndex(cityCollection) {
       defaultCountry,
       featuredTags,
     });
+    profile.countryClassRank = CITY_COUNTRY_CLASS_RANK[profile.countryClass] || 0;
     profile.classWeightBias = Number(revealOverride.classWeightBias || 0);
     profile.minQuotaFloorBoost = Number(revealOverride.minQuotaFloorBoost || 0);
     profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
+    profile.isDefaultCountry = isDefaultCountry;
+    profile.isFeaturedCountry = isFeaturedCountry;
+    profile.isPrimaryPower = isPrimaryPower;
+    profile.isSecondaryPower = isSecondaryPower;
+    profile.isPriorityCountry = (
+      isDefaultCountry
+      || isPrimaryPower
+      || isSecondaryPower
+    );
   });
 
   cityCountryProfileCache.set(cityCollection, profiles);
@@ -12141,7 +12189,9 @@ function getCityInterpolatedRevealBucket(entry, scale) {
     return currentBucket + ((nextBucket - currentBucket) * t);
   }
   if (!Number.isFinite(currentBucket) && Number.isFinite(nextBucket)) {
-    return t >= 0.68 ? nextBucket + ((1 - t) * 0.5) : Number.POSITIVE_INFINITY;
+    const seed = `${String(entry?.cityId || "")}:${currentPhase.id}:${nextPhase.id}`;
+    const threshold = clamp(0.7 + (getSignedHashUnit(seed) * 0.12), 0.58, 0.82);
+    return t >= threshold ? nextBucket + ((1 - t) * 0.5) : Number.POSITIVE_INFINITY;
   }
   return currentBucket;
 }
@@ -12160,7 +12210,14 @@ function scaleCityMarkerQuota(baseQuota, markerDensity) {
   const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
   if (normalizedQuota <= 0) return 0;
   const scaledQuota = normalizedQuota * normalizedDensity;
-  return normalizedDensity < 1 ? Math.floor(scaledQuota) : Math.ceil(scaledQuota);
+  if (normalizedDensity < 1) {
+    const flooredQuota = Math.floor(scaledQuota);
+    if (normalizedQuota >= 1 && scaledQuota > 0) {
+      return Math.max(1, flooredQuota);
+    }
+    return flooredQuota;
+  }
+  return Math.ceil(scaledQuota);
 }
 
 function getCitySizeQuotaFloor(entry, scale, markerDensity = 1) {
@@ -12227,11 +12284,8 @@ function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1, viewpor
   const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
   const fromQuota = Number(getCityMarkerQuotaForTier(currentPhase.id, countryTier) || 0);
   const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) || fromQuota);
-  const viewportMultiplier = getCityViewportQuotaMultiplier(entry, viewportStats);
-  const interpolated = (fromQuota + ((toQuota - fromQuota) * t)) * viewportMultiplier;
-  const scaledInterpolated = scaleCityMarkerQuota(interpolated, markerDensity);
-  const sizeFloor = getCitySizeQuotaFloor(entry, scale, markerDensity);
-  return Math.max(scaledInterpolated, sizeFloor);
+  const interpolated = fromQuota + ((toQuota - fromQuota) * t);
+  return scaleCityMarkerQuota(interpolated, markerDensity);
 }
 
 function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
@@ -12242,20 +12296,89 @@ function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
   return Math.max(0, Math.round(interpolated * clamp(Number(markerDensity) || 1, 0.5, 2)));
 }
 
-function compareCityRevealEntries(left, right) {
+function getCityRevealCompetitionBand(phaseId = "") {
+  if (phaseId === "P0" || phaseId === "P1") return "low";
+  if (phaseId === "P2" || phaseId === "P3") return "mid";
+  return "high";
+}
+
+function getCityCountryClassScore(entry) {
+  const className = String(entry?.countryClass || "micro").trim().toLowerCase();
+  const rank = Number(entry?.countryClassRank || CITY_COUNTRY_CLASS_RANK[className] || 0);
+  const bias = clamp(Number(entry?.countryClassWeightBias || 0) || 0, -0.35, 0.75);
+  return rank + bias;
+}
+
+function getCityPriorityCountryReserveBudget(scale, markerBudget) {
+  const normalizedBudget = Math.max(0, Number(markerBudget) || 0);
+  if (normalizedBudget <= 0) return 0;
+  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
+  const fromShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[currentPhase.id] || 0);
+  const toShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[nextPhase.id] || fromShare);
+  const share = clamp(fromShare + ((toShare - fromShare) * t), 0, 0.5);
+  return Math.min(normalizedBudget, Math.max(0, Math.round(normalizedBudget * share)));
+}
+
+function getCityPriorityCountryReserveRank(entry) {
+  let score = 0;
+  if (entry?.isDefaultCountry) score += 600;
+  if (entry?.isPrimaryPower) score += 520;
+  if (entry?.isFeaturedCountry) score += 360;
+  if (entry?.isSecondaryPower) score += 260;
+  score += Number(entry?.countryTierRank || 0) * 24;
+  score += getCityCountryClassScore(entry) * 8;
+  if (entry?.feature?.properties?.__city_is_country_capital) score += 18;
+  return score;
+}
+
+function getCityViewportCenterDistanceNorm(entry) {
+  const point = Array.isArray(entry?.screenPoint) ? entry.screenPoint : null;
+  if (!point || point.length < 2) return 1;
+  const centerX = Number(state.width || 0) * 0.5;
+  const centerY = Number(state.height || 0) * 0.5;
+  const maxDistance = Math.max(1, Math.hypot(centerX + 48, centerY + 48));
+  return clamp(Math.hypot(Number(point[0] || 0) - centerX, Number(point[1] || 0) - centerY) / maxDistance, 0, 1);
+}
+
+function compareCityRevealEntries(left, right, phaseId = "P0") {
   const leftBucket = Number(left?.revealBucket ?? Number.POSITIVE_INFINITY);
   const rightBucket = Number(right?.revealBucket ?? Number.POSITIVE_INFINITY);
   if (leftBucket !== rightBucket) return leftBucket - rightBucket;
+  const competitionBand = getCityRevealCompetitionBand(phaseId);
   const leftCountryRank = Number(left?.countryTierRank || 0);
   const rightCountryRank = Number(right?.countryTierRank || 0);
-  if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
-  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
   const leftTierWeight = Number(left?.cityTierWeight || 0);
   const rightTierWeight = Number(right?.cityTierWeight || 0);
-  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
   const leftPopulation = Math.max(0, Number(left?.population || 0));
   const rightPopulation = Math.max(0, Number(right?.population || 0));
+  const leftCenterDistance = Number(left?.centerDistanceNorm ?? 1);
+  const rightCenterDistance = Number(right?.centerDistanceNorm ?? 1);
+  const leftCountryClassScore = getCityCountryClassScore(left);
+  const rightCountryClassScore = getCityCountryClassScore(right);
+
+  if (competitionBand === "low") {
+    if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+    if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+  } else {
+    if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+    if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
+    if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
+    if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
+    if (competitionBand === "mid") {
+      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    } else {
+      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    }
+  }
+  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
   if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
+  if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
   return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
 }
 
@@ -12271,6 +12394,9 @@ function getCityLabelBudget(phase, config = {}) {
 
 function isCityLabelEligibleForPhase(entry, phaseId) {
   const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  if (String(phaseId || "P0") === "P3") {
+    return !!entry?.isCapital;
+  }
   if (String(phaseId || "P0") === "P4") {
     return !!entry?.isCapital || cityTier === "major";
   }
@@ -12278,6 +12404,14 @@ function isCityLabelEligibleForPhase(entry, phaseId) {
     return true;
   }
   return false;
+}
+
+function getCityLabelMinZoom(entry, config = {}) {
+  const configuredMinZoom = Number(config?.labelMinZoom || 1.9);
+  if (entry?.isCapital) {
+    return configuredMinZoom;
+  }
+  return Math.max(configuredMinZoom, Number(entry?.minZoom || 0));
 }
 
 function getCityMarkerSizePx(entry, config = {}) {
@@ -12474,6 +12608,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   const countsByCountry = new Map();
   const markerDensity = getCityMarkerDensityMultiplier(config);
   const markerBudget = getCityInterpolatedMarkerBudget(scale, markerDensity);
+  const priorityReserveBudget = getCityPriorityCountryReserveBudget(scale, markerBudget);
   const labelBudget = getCityLabelBudget(phase, config);
   const labelEntries = [];
 
@@ -12491,8 +12626,14 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         maxPopulation: 0,
         controllerFeatureCount: 0,
         countryClass: "micro",
+        countryClassRank: CITY_COUNTRY_CLASS_RANK.micro,
         classWeightBias: 0,
         minQuotaFloorBoost: 0,
+        isDefaultCountry: false,
+        isFeaturedCountry: false,
+        isPrimaryPower: false,
+        isSecondaryPower: false,
+        isPriorityCountry: false,
       };
       const scenarioTag = String(profile.scenarioTag || getCityScenarioTag(feature) || "").trim().toUpperCase();
       if (isCityScenarioTagExcludedFromReveal(scenarioTag)) {
@@ -12522,16 +12663,24 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         countryControllerFeatureCount: Math.max(0, Number(profile.controllerFeatureCount || profile.featureCount || 0)),
         countryMaxPopulation: Math.max(0, Number(profile.maxPopulation || 0)),
         countryClass: String(profile.countryClass || "micro").trim().toLowerCase(),
+        countryClassRank: Number(profile.countryClassRank || CITY_COUNTRY_CLASS_RANK.micro),
         countryClassWeightBias: Number(profile.classWeightBias || 0),
         countryMinQuotaFloorBoost: Number(profile.minQuotaFloorBoost || 0),
+        isDefaultCountry: !!profile.isDefaultCountry,
+        isFeaturedCountry: !!profile.isFeaturedCountry,
+        isPrimaryPower: !!profile.isPrimaryPower,
+        isSecondaryPower: !!profile.isSecondaryPower,
+        isPriorityCountry: !!profile.isPriorityCountry,
         population: Math.max(0, Number(feature?.properties?.__city_population || 0)),
         sortWeight: getCitySortWeight(feature),
         urbanMatchId: urbanInfo.urbanMatchId,
         urbanFeature: urbanInfo.urbanFeature,
         hasUrbanMatch: urbanInfo.hasUrbanMatch,
         urbanMatchMethod: urbanInfo.urbanMatchMethod,
+        centerDistanceNorm: 1,
         acceptedLabelPlacement: "",
       };
+      entry.centerDistanceNorm = getCityViewportCenterDistanceNorm(entry);
       entry.revealBucket = getCityInterpolatedRevealBucket(entry, scale);
       if (!Number.isFinite(entry.revealBucket)) {
         return null;
@@ -12539,39 +12688,45 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
       return entry;
     })
     .filter(Boolean)
-    .sort(compareCityRevealEntries);
-  const viewportStats = buildCityViewportCountryStats(candidateEntries);
+    .sort((left, right) => compareCityRevealEntries(left, right, phase.id));
 
-  const capitalEntriesByCountry = new Map();
+  const priorityCapitalEntriesByCountry = new Map();
   candidateEntries.forEach((entry) => {
-    if (!entry.isCapital || capitalEntriesByCountry.has(entry.countryKey)) {
+    if (!entry.isCapital || !entry.isPriorityCountry) {
       return;
     }
-    capitalEntriesByCountry.set(entry.countryKey, entry);
+    const existing = priorityCapitalEntriesByCountry.get(entry.countryKey);
+    if (!existing || compareCityRevealEntries(entry, existing, phase.id) < 0) {
+      priorityCapitalEntriesByCountry.set(entry.countryKey, entry);
+    }
   });
   const acceptedCityIds = new Set();
-  capitalEntriesByCountry.forEach((entry) => {
-    const currentCount = countsByCountry.get(entry.countryKey) || 0;
-    const quota = Math.max(
-      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
-      1
-    );
-    if (currentCount >= quota) return;
-    entry.markerSizePx = getCityMarkerSizePx(entry, config);
-    markerEntries.push(entry);
-    countsByCountry.set(entry.countryKey, currentCount + 1);
-    acceptedCityIds.add(entry.cityId);
-  });
-  const effectiveMarkerBudget = Math.max(markerBudget, markerEntries.length);
+  Array.from(priorityCapitalEntriesByCountry.values())
+    .sort((left, right) => {
+      const leftRank = getCityPriorityCountryReserveRank(left);
+      const rightRank = getCityPriorityCountryReserveRank(right);
+      if (leftRank !== rightRank) return rightRank - leftRank;
+      if (left.population !== right.population) return right.population - left.population;
+      return String(left.cityId || "").localeCompare(String(right.cityId || ""));
+    })
+    .some((entry) => {
+      if (markerEntries.length >= markerBudget || markerEntries.length >= priorityReserveBudget) {
+        return true;
+      }
+      const currentCount = countsByCountry.get(entry.countryKey) || 0;
+      if (currentCount >= 1) return false;
+      entry.markerSizePx = getCityMarkerSizePx(entry, config);
+      markerEntries.push(entry);
+      countsByCountry.set(entry.countryKey, currentCount + 1);
+      acceptedCityIds.add(entry.cityId);
+      return false;
+    });
 
   for (const entry of candidateEntries) {
-    if (markerEntries.length >= effectiveMarkerBudget) break;
+    if (markerEntries.length >= markerBudget) break;
     if (acceptedCityIds.has(entry.cityId)) continue;
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
-    const quota = Math.max(
-      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
-      entry.isCapital ? 1 : 0
-    );
+    const quota = getCityInterpolatedMarkerQuota(entry, scale, markerDensity);
     if (currentCount >= quota) continue;
     entry.markerSizePx = getCityMarkerSizePx(entry, config);
     markerEntries.push(entry);
@@ -12582,9 +12737,9 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   if (config.showLabels && !state.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
     markerEntries
       .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
-      .sort(compareCityRevealEntries)
+      .sort((left, right) => compareCityRevealEntries(left, right, phase.id))
       .some((entry) => {
-        if (scale < Math.max(Number(config.labelMinZoom || 0), Number(entry.minZoom || 0))) {
+        if (scale < getCityLabelMinZoom(entry, config)) {
           return false;
         }
         labelEntries.push(entry);
@@ -12594,6 +12749,8 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
 
   return {
     phase,
+    markerBudget,
+    priorityReserveBudget,
     markerEntries,
     labelEntries,
     candidateEntries,
@@ -13216,6 +13373,402 @@ function getHoveredCityTooltipEntry(event, hit) {
   return isCityEntryEligibleForLandHit(entry, hit) ? entry : null;
 }
 
+function listVisibleFacilityHoverEntries() {
+  return [
+    ...(Array.isArray(visibleFacilityHoverEntriesByFamily.airport) ? visibleFacilityHoverEntriesByFamily.airport : []),
+    ...(Array.isArray(visibleFacilityHoverEntriesByFamily.port) ? visibleFacilityHoverEntriesByFamily.port : []),
+  ];
+}
+
+function buildFacilityEntryKey(entry) {
+  const familyId = String(entry?.familyId || "").trim().toLowerCase();
+  const stableId = String(entry?.stableId || "").trim();
+  if (!familyId || !stableId) return "";
+  return `${familyId}:${stableId}`;
+}
+
+function clearFacilityHoverEntries(familyId = "") {
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+  if (normalizedFamilyId && Object.prototype.hasOwnProperty.call(visibleFacilityHoverEntriesByFamily, normalizedFamilyId)) {
+    visibleFacilityHoverEntriesByFamily[normalizedFamilyId] = [];
+  }
+  if (normalizedFamilyId && hoveredFacilityEntry?.familyId === normalizedFamilyId) {
+    hoveredFacilityEntry = null;
+    state.hoverOverlayDirty = true;
+  }
+  if (normalizedFamilyId && selectedFacilityEntry?.familyId === normalizedFamilyId) {
+    selectedFacilityEntry = null;
+    applyFacilityInfoCardState(null);
+    state.hoverOverlayDirty = true;
+  }
+}
+
+function setVisibleFacilityHoverEntries(familyId = "", entries = []) {
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+  if (!normalizedFamilyId || !Object.prototype.hasOwnProperty.call(visibleFacilityHoverEntriesByFamily, normalizedFamilyId)) {
+    return;
+  }
+  visibleFacilityHoverEntriesByFamily[normalizedFamilyId] = Array.isArray(entries) ? entries : [];
+  const nextEntriesByKey = new Map(
+    listVisibleFacilityHoverEntries()
+      .map((entry) => [buildFacilityEntryKey(entry), entry])
+      .filter(([key]) => !!key)
+  );
+  const hoveredKey = buildFacilityEntryKey(hoveredFacilityEntry);
+  const selectedKey = buildFacilityEntryKey(selectedFacilityEntry);
+  if (hoveredKey) {
+    const nextHoveredEntry = nextEntriesByKey.get(hoveredKey) || null;
+    if (nextHoveredEntry) {
+      hoveredFacilityEntry = nextHoveredEntry;
+      state.hoverOverlayDirty = true;
+    } else {
+      hoveredFacilityEntry = null;
+      state.hoverOverlayDirty = true;
+    }
+  }
+  if (selectedKey) {
+    const nextSelectedEntry = nextEntriesByKey.get(selectedKey) || null;
+    if (nextSelectedEntry) {
+      selectedFacilityEntry = nextSelectedEntry;
+      applyFacilityInfoCardState(nextSelectedEntry);
+      state.hoverOverlayDirty = true;
+    } else {
+      selectedFacilityEntry = null;
+      applyFacilityInfoCardState(null);
+      state.hoverOverlayDirty = true;
+    }
+  }
+}
+
+function getFacilityHoverRadiusPx(entry) {
+  return Math.max(8, Number(entry?.markerRadiusPx || 0) + 5);
+}
+
+function getHoveredFacilityEntryFromEvent(event) {
+  if (!mapSvg || !globalThis.d3?.pointer) {
+    return null;
+  }
+  const entries = listVisibleFacilityHoverEntries();
+  if (!entries.length) {
+    return null;
+  }
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  if (![sx, sy].every(Number.isFinite)) {
+    return null;
+  }
+  let bestEntry = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  entries.forEach((entry) => {
+    const [entryX, entryY] = entry?.screenPoint || [];
+    if (![entryX, entryY].every(Number.isFinite)) {
+      return;
+    }
+    const threshold = Math.max(6, Number(entry?.hoverRadiusPx || 0));
+    const distance = Math.hypot(sx - entryX, sy - entryY);
+    if (distance <= threshold && distance < bestDistance) {
+      bestDistance = distance;
+      bestEntry = entry;
+    }
+  });
+  return bestEntry;
+}
+
+function buildFacilityTooltipText(entry) {
+  if (!entry) return "";
+  const properties = entry.properties || {};
+  const lines = [String(properties.name || "").trim()];
+  if (entry.familyId === "airport") {
+    const typeLabel = String(properties.airport_type_label || properties.airport_type || properties.category || "").trim();
+    const code = String(properties.iata || properties.icao || "").trim();
+    if (typeLabel || code) {
+      lines.push([typeLabel, code].filter(Boolean).join(" · "));
+    }
+    const runwayLength = Number(properties.runway_length_m_max);
+    const passengerCount = Number(properties.passengers_per_day_latest);
+    const summaryBits = [];
+    if (Number.isFinite(runwayLength) && runwayLength > 0) {
+      summaryBits.push(`${t("Runway", "ui")}: ${Math.round(runwayLength).toLocaleString()}m`);
+    }
+    if (Number.isFinite(passengerCount) && passengerCount > 0) {
+      summaryBits.push(`${t("Passengers/day", "ui")}: ${Math.round(passengerCount).toLocaleString()}`);
+    }
+    if (summaryBits.length) {
+      lines.push(summaryBits.join(" · "));
+    }
+  } else if (entry.familyId === "port") {
+    const designation = String(properties.legal_designation_label || properties.legal_designation || properties.category || "").trim();
+    const portClass = String(properties.port_class || "").trim();
+    if (designation || portClass) {
+      lines.push([designation, portClass].filter(Boolean).join(" · "));
+    }
+    const mooringLength = Number(properties.mooring_facility_length_m);
+    const ferryService = properties.ferry_service === true || String(properties.ferry_service || "").trim().toLowerCase() === "true";
+    const summaryBits = [];
+    if (ferryService) {
+      summaryBits.push(t("Ferry service", "ui"));
+    }
+    if (Number.isFinite(mooringLength) && mooringLength > 0) {
+      summaryBits.push(`${t("Mooring", "ui")}: ${Math.round(mooringLength).toLocaleString()}m`);
+    }
+    if (summaryBits.length) {
+      lines.push(summaryBits.join(" · "));
+    }
+  }
+  return renderTooltipText({ lines: lines.filter(Boolean) });
+}
+
+function escapeFacilityHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function normalizeFacilityDisplayValue(value) {
+  if (value == null) return "";
+  const normalized = String(value).trim();
+  if (!normalized) return "";
+  const lower = normalized.toLowerCase();
+  if (["nan", "null", "none", "undefined"].includes(lower)) {
+    return "";
+  }
+  return normalized;
+}
+
+function buildFacilityInfoCardTitle(entry) {
+  const familyLabel = entry?.familyId === "port" ? t("Port", "ui") : t("Airport", "ui");
+  const name = String(entry?.properties?.name || "").trim() || t("Unnamed facility", "ui");
+  return `${familyLabel} · ${name}`;
+}
+
+function buildFacilityInfoCardFieldSections(entry) {
+  if (!entry) {
+    return { defaultRows: [], extraRows: [] };
+  }
+  const properties = entry.properties || {};
+  const defaultRows = [];
+  const extraRows = [];
+  const pushRow = (target, label, value) => {
+    const normalizedValue = normalizeFacilityDisplayValue(value);
+    if (!normalizedValue) return false;
+    target.push(
+      `<div class="facility-info-card-row"><span class="facility-info-card-label">${escapeFacilityHtml(label)}</span><span class="facility-info-card-value">${escapeFacilityHtml(normalizedValue)}</span></div>`
+    );
+    return true;
+  };
+  const appendFallbackRow = (target, rows) => {
+    for (const [label, value] of rows) {
+      if (pushRow(target, label, value)) return true;
+    }
+    return false;
+  };
+  pushRow(defaultRows, t("Tier", "ui"), String(properties.importance || "").replaceAll("_", " "));
+  if (entry.familyId === "airport") {
+    pushRow(defaultRows, t("Airport type", "ui"), properties.airport_type_label || properties.airport_type || properties.category);
+    pushRow(defaultRows, "IATA / ICAO", [properties.iata, properties.icao].filter(Boolean).join(" / "));
+    pushRow(defaultRows, t("Runway", "ui"), Number.isFinite(Number(properties.runway_length_m_max)) && Number(properties.runway_length_m_max) > 0
+      ? `${Math.round(Number(properties.runway_length_m_max)).toLocaleString()}m`
+      : "");
+    const passengersPerDay = Number.isFinite(Number(properties.passengers_per_day_latest)) && Number(properties.passengers_per_day_latest) > 0
+      ? Math.round(Number(properties.passengers_per_day_latest)).toLocaleString()
+      : "";
+    const landingsPerDay = Number.isFinite(Number(properties.landings_per_day_latest)) && Number(properties.landings_per_day_latest) > 0
+      ? Math.round(Number(properties.landings_per_day_latest)).toLocaleString()
+      : "";
+    const statusText = String(properties.status || properties.status_category || "").trim();
+    let usedAirportMetric = "";
+    if (pushRow(defaultRows, t("Passengers/day", "ui"), passengersPerDay)) {
+      usedAirportMetric = "passengers";
+    } else if (pushRow(defaultRows, t("Landings/day", "ui"), landingsPerDay)) {
+      usedAirportMetric = "landings";
+    } else if (pushRow(defaultRows, t("Status", "ui"), statusText)) {
+      usedAirportMetric = "status";
+    }
+    if (usedAirportMetric !== "landings") {
+      pushRow(extraRows, t("Landings/day", "ui"), landingsPerDay);
+    }
+    if (usedAirportMetric !== "passengers") {
+      pushRow(extraRows, t("Passengers/day", "ui"), passengersPerDay);
+    }
+    pushRow(extraRows, t("Hours", "ui"), [properties.operation_start, properties.operation_end].filter(Boolean).join(" - "));
+    appendFallbackRow(extraRows, [
+      [t("Owner / Manager", "ui"), [properties.owner, properties.manager].filter(Boolean).join(" / ")],
+      [t("Owner", "ui"), properties.owner],
+      [t("Manager", "ui"), properties.manager],
+    ]);
+  } else if (entry.familyId === "port") {
+    pushRow(defaultRows, t("Designation", "ui"), properties.legal_designation_label || properties.legal_designation);
+    pushRow(defaultRows, t("Class", "ui"), properties.port_class);
+    const mooringText = Number.isFinite(Number(properties.mooring_facility_length_m)) && Number(properties.mooring_facility_length_m) > 0
+      ? `${Math.round(Number(properties.mooring_facility_length_m)).toLocaleString()}m`
+      : "";
+    const outerFacilityText = Number.isFinite(Number(properties.outer_facility_length_m)) && Number(properties.outer_facility_length_m) > 0
+      ? `${Math.round(Number(properties.outer_facility_length_m)).toLocaleString()}m`
+      : "";
+    const ferryText = properties.ferry_service === true ? t("Yes", "ui") : properties.ferry_service === false ? t("No", "ui") : "";
+    const managerText = String(properties.manager || "").trim();
+    let usedPortMetric = "";
+    if (pushRow(defaultRows, t("Mooring", "ui"), mooringText)) {
+      usedPortMetric = "mooring";
+    } else if (pushRow(defaultRows, t("Outer facility", "ui"), outerFacilityText)) {
+      usedPortMetric = "outer";
+    }
+    let usedPortIdentity = "";
+    if (pushRow(defaultRows, t("Ferry", "ui"), ferryText)) {
+      usedPortIdentity = "ferry";
+    } else if (pushRow(defaultRows, t("Manager", "ui"), managerText)) {
+      usedPortIdentity = "manager";
+    }
+    if (usedPortMetric !== "outer") {
+      pushRow(extraRows, t("Outer facility", "ui"), outerFacilityText);
+    }
+    if (usedPortMetric !== "mooring") {
+      pushRow(extraRows, t("Mooring", "ui"), mooringText);
+    }
+    if (usedPortIdentity !== "manager") {
+      pushRow(extraRows, t("Manager", "ui"), managerText);
+    }
+    if (usedPortIdentity !== "ferry") {
+      pushRow(extraRows, t("Ferry", "ui"), ferryText);
+    }
+    pushRow(extraRows, t("Established", "ui"), properties.date_established);
+    appendFallbackRow(extraRows, [
+      [t("Manager / Agencies", "ui"), [properties.manager, properties.agency_labels].filter(Boolean).join(" / ")],
+      [t("Agencies", "ui"), properties.agency_labels],
+    ]);
+  }
+  return { defaultRows, extraRows };
+}
+
+function buildFacilityInfoCardBody(entry, expanded = false) {
+  const { defaultRows, extraRows } = buildFacilityInfoCardFieldSections(entry);
+  const rows = [...defaultRows, ...(expanded ? extraRows : [])];
+  if (!rows.length) {
+    return {
+      html: `<div class="facility-info-card-empty">${escapeFacilityHtml(t("No facility details available yet.", "ui"))}</div>`,
+      hasExtraRows: false,
+    };
+  }
+  return {
+    html: rows.join(""),
+    hasExtraRows: extraRows.length > 0,
+  };
+}
+
+function applyFacilityInfoCardState(entry, anchor = null) {
+  if (!facilityInfoCard || !facilityInfoCardTitle || !facilityInfoCardBody || !facilityInfoCardZoomBtn || !facilityInfoCardMoreBtn) {
+    return;
+  }
+  if (!entry) {
+    selectedFacilityEntry = null;
+    facilityInfoCardExpanded = false;
+    facilityInfoCardAnchor = null;
+    facilityInfoCard.classList.add("hidden");
+    facilityInfoCard.setAttribute("aria-hidden", "true");
+    facilityInfoCardTitle.textContent = "";
+    facilityInfoCardBody.innerHTML = "";
+    facilityInfoCardZoomBtn.disabled = true;
+    facilityInfoCardZoomBtn.dataset.familyKey = "";
+    facilityInfoCardMoreBtn.classList.add("hidden");
+    facilityInfoCardMoreBtn.textContent = t("More fields", "ui");
+    return;
+  }
+  selectedFacilityEntry = entry;
+  facilityInfoCardAnchor = anchor && Number.isFinite(Number(anchor?.x)) && Number.isFinite(Number(anchor?.y))
+    ? { x: Number(anchor.x), y: Number(anchor.y) }
+    : (facilityInfoCardAnchor || { x: 24, y: 24 });
+  facilityInfoCardTitle.textContent = buildFacilityInfoCardTitle(entry);
+  const bodyState = buildFacilityInfoCardBody(entry, facilityInfoCardExpanded);
+  facilityInfoCardBody.innerHTML = bodyState.html;
+  facilityInfoCardZoomBtn.disabled = false;
+  facilityInfoCardZoomBtn.dataset.familyKey = buildFacilityEntryKey(entry);
+  facilityInfoCardMoreBtn.classList.toggle("hidden", !bodyState.hasExtraRows);
+  facilityInfoCardMoreBtn.textContent = t(facilityInfoCardExpanded ? "Less fields" : "More fields", "ui");
+  facilityInfoCard.classList.remove("hidden");
+  facilityInfoCard.setAttribute("aria-hidden", "false");
+  const viewportWidth = Math.max(320, Number(globalThis.innerWidth || 0));
+  const viewportHeight = Math.max(280, Number(globalThis.innerHeight || 0));
+  const cardWidth = 340;
+  const cardHeight = 260;
+  const anchorX = Number(facilityInfoCardAnchor?.x || 0);
+  const anchorY = Number(facilityInfoCardAnchor?.y || 0);
+  const left = Math.max(16, Math.min(viewportWidth - cardWidth - 16, anchorX + 18));
+  const top = Math.max(16, Math.min(viewportHeight - cardHeight - 16, anchorY + 18));
+  facilityInfoCard.style.left = `${Math.round(left)}px`;
+  facilityInfoCard.style.top = `${Math.round(top)}px`;
+}
+
+function setMapInteractionCursor(nextCursor = "") {
+  if (!interactionRect) return;
+  interactionRect.style("cursor", nextCursor || null);
+}
+
+function getActiveFacilityHighlightEntry() {
+  return hoveredFacilityEntry || selectedFacilityEntry || null;
+}
+
+function zoomToFacilityEntry(entry, { targetScale = 4.8, durationMs = 420 } = {}) {
+  if (!entry?.coordinates || !projection || !interactionRect || !zoomBehavior || !globalThis.d3) {
+    return;
+  }
+  const projected = projection(entry.coordinates);
+  if (!Array.isArray(projected) || !projected.every(Number.isFinite)) {
+    return;
+  }
+  const nextScale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, Number(targetScale) || 4.8));
+  const nextTransform = globalThis.d3.zoomIdentity
+    .translate(state.width / 2, state.height / 2)
+    .scale(nextScale)
+    .translate(-projected[0], -projected[1]);
+  globalThis.d3
+    .select(interactionRect.node())
+    .transition()
+    .duration(durationMs)
+    .call(zoomBehavior.transform, nextTransform);
+}
+
+function syncFacilityInfoCardVisibility() {
+  if (!selectedFacilityEntry) {
+    return;
+  }
+  if (isFacilityDetailsSurfaceActive(selectedFacilityEntry.familyId)) {
+    return;
+  }
+  hoveredFacilityEntry = null;
+  applyFacilityInfoCardState(null);
+  state.hoverOverlayDirty = true;
+  renderHoverOverlayIfNeeded();
+  queueTooltipUpdate({ visible: false });
+  setMapInteractionCursor("");
+}
+
+function isFacilityDetailsSurfaceActive(familyId = "") {
+  const transportPanel = document.getElementById("appearancePanelTransport");
+  if (
+    transportPanel instanceof HTMLElement
+    && transportPanel.hidden !== true
+    && !transportPanel.classList.contains("hidden")
+  ) {
+    const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+    if (normalizedFamilyId === "airport") {
+      const airportCard = document.getElementById("transportAirportCard");
+      if (airportCard instanceof HTMLDetailsElement && airportCard.open) {
+        return true;
+      }
+    }
+    if (normalizedFamilyId === "port") {
+      const portCard = document.getElementById("transportPortCard");
+      if (portCard instanceof HTMLDetailsElement && portCard.open) {
+        return true;
+      }
+    }
+  }
+  const workbenchOverlay = document.getElementById("transportWorkbenchOverlay");
+  return workbenchOverlay instanceof HTMLElement && !workbenchOverlay.classList.contains("hidden");
+}
+
 function doScreenBoxesOverlap(a, b) {
   return (
     a.x < (b.x + b.w)
@@ -13331,7 +13884,7 @@ function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
       config,
       scale,
     });
-    const labelMinZoom = Math.max(Number(config?.labelMinZoom || 2.45), Number(visualEntry.minZoom || 0));
+    const labelMinZoom = getCityLabelMinZoom(visualEntry, config);
     if (!text || !entry.screenPoint || scale < labelMinZoom) return;
     const markerSizePx = Number(visualEntry.markerSizePx || getCityMarkerSizePx(visualEntry, config));
     const offsetPx = Math.max(7, markerSizePx + 4);
@@ -13480,26 +14033,33 @@ function getTransportPortScopeThreshold(scope) {
   return 2;
 }
 
-function getTransportOverviewAirportVisualStyle(visualStrength) {
+function getTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
+  return ColorManager.normalizeHexColor(String(value || "").trim()) || fallback;
+}
+
+function buildTransportFacilityVisualStyle(primaryColor, visualStrength, fallback = "#1d4ed8") {
+  const resolvedPrimaryColor = getTransportOverviewPrimaryColor(primaryColor, fallback);
   const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.56, 0, 1);
+  const luminance = getCanvasColorRelativeLuminance(resolvedPrimaryColor);
+  const strokeTarget = Number.isFinite(luminance) && luminance < 0.4 ? "#f8fbff" : "#ffffff";
+  const labelTarget = Number.isFinite(luminance) && luminance < 0.56 ? "#f8fafc" : "#0f172a";
   return {
-    fillStyle: strength >= 0.7 ? "#0f5fff" : strength <= 0.35 ? "#355c9a" : "#1d4ed8",
-    strokeStyle: strength >= 0.7 ? "#f8fbff" : "#dbeafe",
-    labelColor: strength >= 0.7 ? "#0f2b57" : strength <= 0.35 ? "#20385d" : "#15315f",
+    fillStyle: resolvedPrimaryColor,
+    strokeStyle: mixCanvasColors(resolvedPrimaryColor, strokeTarget, 0.72) || strokeTarget,
+    labelColor: mixCanvasColors(resolvedPrimaryColor, labelTarget, Number.isFinite(luminance) && luminance < 0.56 ? 0.48 : 0.78) || labelTarget,
+    highlightStroke: mixCanvasColors(resolvedPrimaryColor, "#ffffff", 0.82) || "#ffffff",
     radiusScale: 0.85 + (strength * 0.55),
     strokeScale: 0.9 + (strength * 0.35),
+    hoverScale: 1.12 + (strength * 0.12),
   };
 }
 
-function getTransportOverviewPortVisualStyle(visualStrength) {
-  const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.54, 0, 1);
-  return {
-    fillStyle: strength >= 0.7 ? "#d97706" : strength <= 0.35 ? "#8f5f1a" : "#b45309",
-    strokeStyle: strength >= 0.7 ? "#fff2df" : "#ffedd5",
-    labelColor: strength >= 0.7 ? "#7c2d12" : strength <= 0.35 ? "#70420d" : "#7c2d12",
-    radiusScale: 0.85 + (strength * 0.55),
-    strokeScale: 0.9 + (strength * 0.35),
-  };
+function getTransportOverviewAirportVisualStyle(primaryColor, visualStrength) {
+  return buildTransportFacilityVisualStyle(primaryColor, visualStrength, "#1d4ed8");
+}
+
+function getTransportOverviewPortVisualStyle(primaryColor, visualStrength) {
+  return buildTransportFacilityVisualStyle(primaryColor, visualStrength, "#b45309");
 }
 
 function getTransportOverviewAirportLabelText(properties = {}, mode = "both") {
@@ -13565,7 +14125,10 @@ function buildContextFacilityEntries(
         ? String(getLabelText(properties, feature) || "").trim()
         : String(properties.name || "").trim(),
       importanceRank,
-      properties,
+      properties: {
+        ...properties,
+        __coordinates: [coordinates[0], coordinates[1]],
+      },
     });
   });
   entries.sort((left, right) => left.importanceRank - right.importanceRank);
@@ -13582,6 +14145,7 @@ function drawContextFacilityPointLayer(
   collection,
   k,
   {
+    familyId = "",
     interactive = false,
     visible = true,
     thresholdRank = 1,
@@ -13596,10 +14160,14 @@ function drawContextFacilityPointLayer(
     getLabelText = null,
     radiusScale = 1,
     strokeScale = 1,
+    hoverScale = 1.18,
+    highlightStroke = "#ffffff",
   } = {},
 ) {
   const startedAt = nowMs();
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
   if (!visible) {
+    clearFacilityHoverEntries(normalizedFamilyId);
     collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount: getFeatureCollectionFeatureCount(collection),
       visibleFeatureCount: 0,
@@ -13625,6 +14193,7 @@ function drawContextFacilityPointLayer(
     getLabelText,
   });
   if (renderState.skipped) {
+    clearFacilityHoverEntries(normalizedFamilyId);
     collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount: renderState.featureCount,
       visibleFeatureCount: 0,
@@ -13635,6 +14204,8 @@ function drawContextFacilityPointLayer(
     });
     return;
   }
+  const activeHighlightKey = buildFacilityEntryKey(getActiveFacilityHighlightEntry());
+  const hoverEntries = [];
   let labelCount = 0;
   context.save();
   context.lineJoin = "round";
@@ -13642,7 +14213,22 @@ function drawContextFacilityPointLayer(
   context.globalAlpha = opacity;
   renderState.entries.forEach((entry) => {
     const radiusBase = entry.importanceRank >= 3 ? 5.2 : entry.importanceRank === 2 ? 4.3 : 3.5;
-    const radius = radiusBase * radiusScale;
+    const markerEntry = {
+      familyId: normalizedFamilyId,
+      stableId: String(entry.properties?.stable_key || entry.properties?.id || entry.label || `${entry.x}:${entry.y}`).trim(),
+      shape,
+      markerRadiusPx: radiusBase * radiusScale,
+      hoverScale: Number(hoverScale || 1.18),
+      highlightStroke: String(highlightStroke || strokeStyle || "#ffffff"),
+      screenPoint: [entry.x, entry.y],
+      coordinates: Array.isArray(entry.properties?.__coordinates) ? entry.properties.__coordinates : null,
+      properties: entry.properties,
+    };
+    markerEntry.hoverRadiusPx = getFacilityHoverRadiusPx(markerEntry);
+    markerEntry.tooltipText = buildFacilityTooltipText(markerEntry);
+    hoverEntries.push(markerEntry);
+    const highlightFactor = buildFacilityEntryKey(markerEntry) && buildFacilityEntryKey(markerEntry) === activeHighlightKey ? markerEntry.hoverScale : 1;
+    const radius = markerEntry.markerRadiusPx * highlightFactor;
     context.beginPath();
     if (shape === "square") {
       context.rect(entry.x - radius, entry.y - radius, radius * 2, radius * 2);
@@ -13660,6 +14246,7 @@ function drawContextFacilityPointLayer(
     context.stroke();
   });
   context.restore();
+  setVisibleFacilityHoverEntries(normalizedFamilyId, hoverEntries);
 
   if (!labelsEnabled) {
     collectContextMetric(metricName, nowMs() - startedAt, {
@@ -13701,10 +14288,11 @@ function drawContextFacilityPointLayer(
 function drawAirportsLayer(k, { interactive = false } = {}) {
   const airportConfig = getTransportOverviewFamilyConfig("airport");
   const labelZoomConfig = getTransportOverviewLabelZoomConfig("airport", airportConfig.labelDensity);
-  const visualStyle = getTransportOverviewAirportVisualStyle(airportConfig.visualStrength);
+  const visualStyle = getTransportOverviewAirportVisualStyle(airportConfig.primaryColor, airportConfig.visualStrength);
   const zoomAllowance = getTransportOverviewZoomRevealAllowance(k);
   const revealFloor = Math.max(getTransportAirportScopeThreshold(airportConfig.scope), 3 - zoomAllowance);
   drawContextFacilityPointLayer("drawAirportsLayer", state.airportsData, k, {
+    familyId: "airport",
     interactive,
     visible: !!state.showTransport && !!state.showAirports,
     thresholdRank: Math.max(
@@ -13721,6 +14309,8 @@ function drawAirportsLayer(k, { interactive = false } = {}) {
     regionalLabelScale: labelZoomConfig.regionalLabelScale,
     radiusScale: visualStyle.radiusScale,
     strokeScale: visualStyle.strokeScale,
+    hoverScale: visualStyle.hoverScale,
+    highlightStroke: visualStyle.highlightStroke,
     getLabelText: (properties) => getTransportOverviewAirportLabelText(properties, airportConfig.labelMode),
   });
 }
@@ -13728,10 +14318,11 @@ function drawAirportsLayer(k, { interactive = false } = {}) {
 function drawPortsLayer(k, { interactive = false } = {}) {
   const portConfig = getTransportOverviewFamilyConfig("port");
   const labelZoomConfig = getTransportOverviewLabelZoomConfig("port", portConfig.labelDensity);
-  const visualStyle = getTransportOverviewPortVisualStyle(portConfig.visualStrength);
+  const visualStyle = getTransportOverviewPortVisualStyle(portConfig.primaryColor, portConfig.visualStrength);
   const zoomAllowance = getTransportOverviewZoomRevealAllowance(k);
   const revealFloor = Math.max(getTransportPortScopeThreshold(portConfig.scope), 3 - zoomAllowance);
   drawContextFacilityPointLayer("drawPortsLayer", state.portsData, k, {
+    familyId: "port",
     interactive,
     visible: !!state.showTransport && !!state.showPorts,
     thresholdRank: Math.max(
@@ -13748,6 +14339,8 @@ function drawPortsLayer(k, { interactive = false } = {}) {
     regionalLabelScale: labelZoomConfig.regionalLabelScale,
     radiusScale: visualStyle.radiusScale,
     strokeScale: visualStyle.strokeScale,
+    hoverScale: visualStyle.hoverScale,
+    highlightStroke: visualStyle.highlightStroke,
     getLabelText: (properties) => getTransportOverviewPortLabelText(properties, portConfig.labelMode),
   });
 }
@@ -19619,6 +20212,7 @@ function renderHoverOverlay() {
 
   if (state.renderPhase !== RENDER_PHASE_IDLE) {
     hoverGroup.selectAll("path.hovered-feature").remove();
+    hoverGroup.selectAll("path.hovered-facility-marker").remove();
     hoverGroup.attr("aria-hidden", "true");
     return;
   }
@@ -19651,7 +20245,34 @@ function renderHoverOverlay() {
     .attr("stroke-width", 2.0);
 
   selection.exit().remove();
-  hoverGroup.attr("aria-hidden", data.length ? "false" : "true");
+
+  const activeFacilityEntry = getActiveFacilityHighlightEntry();
+  const facilityMarkerData = activeFacilityEntry?.screenPoint?.length >= 2 ? [activeFacilityEntry] : [];
+  const facilitySelection = hoverGroup
+    .selectAll("path.hovered-facility-marker")
+    .data(facilityMarkerData, (datum) => buildFacilityEntryKey(datum) || "hovered-facility");
+
+  facilitySelection
+    .enter()
+    .append("path")
+    .attr("class", "hovered-facility-marker")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .merge(facilitySelection)
+    .attr("d", (datum) => {
+      const [x, y] = datum.screenPoint || [];
+      const radius = Math.max(6.8, Number(datum.markerRadiusPx || 0) + 2.8);
+      if (datum.shape === "square") {
+        return `M ${x - radius} ${y - radius} L ${x + radius} ${y - radius} L ${x + radius} ${y + radius} L ${x - radius} ${y + radius} Z`;
+      }
+      return `M ${x} ${y - radius} L ${x + radius} ${y} L ${x} ${y + radius} L ${x - radius} ${y} Z`;
+    })
+    .attr("fill", "rgba(255,255,255,0.12)")
+    .attr("stroke", (datum) => String(datum.highlightStroke || "#ffffff"))
+    .attr("stroke-width", 2.1);
+
+  facilitySelection.exit().remove();
+  hoverGroup.attr("aria-hidden", data.length || facilityMarkerData.length ? "false" : "true");
 }
 
 function renderInspectorHighlightOverlay() {
@@ -20947,10 +21568,14 @@ function handleMouseMove(event) {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    if (hoveredFacilityEntry) {
+      hoveredFacilityEntry = null;
+    }
     updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
     return;
   }
 
@@ -20968,8 +21593,14 @@ function handleMouseMove(event) {
       state.hoverOverlayDirty = true;
       renderHoverOverlayIfNeeded();
     }
+    if (hoveredFacilityEntry) {
+      hoveredFacilityEntry = null;
+      state.hoverOverlayDirty = true;
+      renderHoverOverlayIfNeeded();
+    }
     updateDevHoverHit(null);
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
     return;
   }
   const hit = getHitFromEvent(event, {
@@ -20997,6 +21628,25 @@ function handleMouseMove(event) {
   updateDevHoverHit(id ? hit : null);
 
   if (!tooltip) return;
+  const hoveredFacility = getHoveredFacilityEntryFromEvent(event);
+  const facilityDetailsActive = hoveredFacility ? isFacilityDetailsSurfaceActive(hoveredFacility.familyId) : false;
+  const nextFacilityKey = buildFacilityEntryKey(hoveredFacility);
+  const previousFacilityKey = buildFacilityEntryKey(hoveredFacilityEntry);
+  if (nextFacilityKey !== previousFacilityKey) {
+    hoveredFacilityEntry = hoveredFacility || null;
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+  }
+  setMapInteractionCursor(facilityDetailsActive ? "pointer" : "");
+  if (hoveredFacility?.tooltipText) {
+    queueTooltipUpdate({
+      visible: true,
+      text: hoveredFacility.tooltipText,
+      x: event.clientX + 12,
+      y: event.clientY + 12,
+    });
+    return;
+  }
   const hoveredCityEntry = getHoveredCityTooltipEntry(event, hit);
   if (hoveredCityEntry?.tooltipText) {
     queueTooltipUpdate({
@@ -22129,6 +22779,28 @@ async function handleClick(event, _interactionContext = null) {
     return;
   }
 
+  const clickedFacilityEntry = getHoveredFacilityEntryFromEvent(event);
+  if (clickedFacilityEntry && isFacilityDetailsSurfaceActive(clickedFacilityEntry.familyId)) {
+    hoveredFacilityEntry = clickedFacilityEntry;
+    selectedFacilityEntry = clickedFacilityEntry;
+    facilityInfoCardExpanded = false;
+    queueTooltipUpdate({ visible: false });
+    applyFacilityInfoCardState(clickedFacilityEntry, {
+      x: event?.clientX,
+      y: event?.clientY,
+    });
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+    noteRenderAction("click-facility-info", actionStart);
+    return;
+  }
+  if (selectedFacilityEntry) {
+    selectedFacilityEntry = null;
+    applyFacilityInfoCardState(null);
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+  }
+
   const hit = getHitFromEvent(event, {
     enableSnap: true,
     snapPx: HIT_SNAP_RADIUS_CLICK_PX,
@@ -22753,10 +23425,12 @@ function bindEvents() {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    hoveredFacilityEntry = null;
     updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
   });
   interactionRect.on("click", dispatchMapClick);
   interactionRect.on("dblclick", dispatchMapDoubleClick);
@@ -22777,6 +23451,12 @@ function initMap({
 
   mapContainer = document.getElementById(containerId);
   tooltip = document.getElementById("tooltip");
+  facilityInfoCard = document.getElementById("facilityInfoCard");
+  facilityInfoCardTitle = document.getElementById("facilityInfoCardTitle");
+  facilityInfoCardBody = document.getElementById("facilityInfoCardBody");
+  facilityInfoCardZoomBtn = document.getElementById("facilityInfoCardZoomBtn");
+  facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
+  facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   state.refreshColorStateFn = refreshColorState;
   state.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
 
@@ -22784,6 +23464,38 @@ function initMap({
     console.error("Map container not found.");
     return;
   }
+
+  if (facilityInfoCardCloseBtn && !facilityInfoCardCloseBtn.dataset.bound) {
+    facilityInfoCardCloseBtn.addEventListener("click", () => {
+      applyFacilityInfoCardState(null);
+      state.hoverOverlayDirty = true;
+      renderHoverOverlayIfNeeded();
+    });
+    facilityInfoCardCloseBtn.dataset.bound = "true";
+  }
+  if (facilityInfoCardZoomBtn && !facilityInfoCardZoomBtn.dataset.bound) {
+    facilityInfoCardZoomBtn.addEventListener("click", () => {
+      const activeEntry = selectedFacilityEntry;
+      if (!activeEntry) return;
+      zoomToFacilityEntry(activeEntry);
+    });
+    facilityInfoCardZoomBtn.dataset.bound = "true";
+  }
+  if (facilityInfoCardMoreBtn && !facilityInfoCardMoreBtn.dataset.bound) {
+    facilityInfoCardMoreBtn.addEventListener("click", () => {
+      if (!selectedFacilityEntry) return;
+      facilityInfoCardExpanded = !facilityInfoCardExpanded;
+      applyFacilityInfoCardState(selectedFacilityEntry);
+    });
+    facilityInfoCardMoreBtn.dataset.bound = "true";
+  }
+  state.syncFacilityInfoCardVisibilityFn = syncFacilityInfoCardVisibility;
+  state.updateFacilityInfoCardUiFn = () => {
+    if (selectedFacilityEntry) {
+      applyFacilityInfoCardState(selectedFacilityEntry);
+    }
+  };
+  applyFacilityInfoCardState(null);
 
   ensureHybridLayers();
 

@@ -1322,6 +1322,9 @@ async function ensureContextLayerDataReady(
         updateContextLayerDerivedState(layerName, collection);
         state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
         state.contextLayerLoadStateByName[layerName] = "loaded";
+        if (typeof state.updateTransportAppearanceUIFn === "function" && (layerName === "airports" || layerName === "ports")) {
+          state.updateTransportAppearanceUIFn();
+        }
         finishBootMetric(`layer:${layerName}:load`, {
           featureCount: collection.features.length,
           reason,

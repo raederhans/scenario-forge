@@ -235,19 +235,37 @@ test("city reveal plan keeps capital coverage across synthetic pans and overlay 
       const candidateCapitalCountries = new Set(
         (plan.candidateEntries || []).filter((entry) => entry.isCapital).map((entry) => entry.countryKey)
       );
+      const candidateProtectedCapitalCountries = new Set(
+        (plan.candidateEntries || [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
       const acceptedCapitalCountries = new Set(
         (plan.markerEntries || []).filter((entry) => entry.isCapital).map((entry) => entry.countryKey)
       );
-      const missingCapitalCountries = Array.from(candidateCapitalCountries)
-        .filter((countryKey) => !acceptedCapitalCountries.has(countryKey))
+      const acceptedProtectedCapitalCountries = new Set(
+        (plan.markerEntries || [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
+      const missingProtectedCapitalCountries = Array.from(candidateProtectedCapitalCountries)
+        .filter((countryKey) => !acceptedProtectedCapitalCountries.has(countryKey))
         .slice(0, 20);
       return {
         name: transform.name,
-        markerBudget: Number(plan.phase?.markerBudget || 0),
+        markerBudget: Number(plan.markerBudget || 0),
+        priorityReserveBudget: Number(plan.priorityReserveBudget || 0),
         markerCount: Array.isArray(plan.markerEntries) ? plan.markerEntries.length : 0,
         candidateCapitalCountryCount: candidateCapitalCountries.size,
         acceptedCapitalCountryCount: acceptedCapitalCountries.size,
-        missingCapitalCountries,
+        candidateProtectedCapitalCountryCount: candidateProtectedCapitalCountries.size,
+        acceptedProtectedCapitalCountryCount: acceptedProtectedCapitalCountries.size,
+        missingProtectedCapitalCountries,
+        excludedScenarioTags: Array.from(new Set(
+          (plan.candidateEntries || [])
+            .map((entry) => String(entry?.scenarioTag || ""))
+            .filter((tag) => tag === "AFA" || tag === "RFA")
+        )),
       };
     };
 
@@ -285,13 +303,16 @@ test("city reveal plan keeps capital coverage across synthetic pans and overlay 
 
   runtimeCheck.planSummaries.forEach((summary) => {
     expect(summary.candidateCapitalCountryCount).toBeGreaterThan(0);
-    expect(summary.missingCapitalCountries).toEqual([]);
-    expect(summary.acceptedCapitalCountryCount).toBe(summary.candidateCapitalCountryCount);
-    expect(summary.markerCount).toBeGreaterThanOrEqual(summary.acceptedCapitalCountryCount);
+    expect(summary.candidateProtectedCapitalCountryCount).toBeGreaterThan(0);
+    expect(summary.markerCount).toBeLessThanOrEqual(summary.markerBudget);
+    expect(summary.priorityReserveBudget).toBeLessThanOrEqual(summary.markerBudget);
+    expect(summary.missingProtectedCapitalCountries).toEqual([]);
+    expect(summary.markerCount).toBeGreaterThanOrEqual(summary.acceptedProtectedCapitalCountryCount);
+    expect(summary.excludedScenarioTags).toEqual([]);
   });
   expect(
     runtimeCheck.planSummaries.some(
-      (summary) => summary.candidateCapitalCountryCount > summary.markerBudget
+      (summary) => summary.candidateCapitalCountryCount > summary.acceptedCapitalCountryCount
     )
   ).toBe(true);
 

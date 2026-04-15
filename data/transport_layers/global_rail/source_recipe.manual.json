@@ -21,11 +21,17 @@
       "standard_gauge": 35000,
       "unknown": 90000
     },
+    "preview_min_length_by_line_class": {
+      "mainline": 35000.0,
+      "regional": 35000.0,
+      "secondary": 90000.0
+    },
     "simplify_meters": {
       "standard_gauge": 120,
       "unknown": 160
     },
     "line_class_policy": "standard_gauge long segments => mainline, other standard_gauge => regional, remaining => secondary",
-    "stations_phase": "phase_b_pending_major_station_source"
+    "stations_phase": "phase_b_pending_major_station_source",
+    "phase_a_scope": "line_only_backbone"
   }
 }
