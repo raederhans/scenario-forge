@@ -35,6 +35,7 @@ import {
   normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchUiState,
+  normalizeExportWorkbenchUiState,
   state,
 } from "./state.js";
 
@@ -697,6 +698,16 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       displayConfigs: normalizedTransportWorkbenchUi.displayConfigs,
       sectionOpen: normalizedTransportWorkbenchUi.sectionOpen,
     };
+  }
+  if (data.exportWorkbenchUi && typeof data.exportWorkbenchUi === "object") {
+    state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
+      ...(state.exportWorkbenchUi || {}),
+      ...data.exportWorkbenchUi,
+      layerVisibility: {
+        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.layerVisibility) || {}),
+        ...(data.exportWorkbenchUi.layerVisibility || {}),
+      },
+    });
   }
   state.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
