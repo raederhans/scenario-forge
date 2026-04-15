@@ -4726,6 +4726,72 @@ body.counter-editor-modal-open {
   color: #6b4134;
 }
 
+.export-workbench-layer-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.export-workbench-layer-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.2);
+  padding: 8px 10px;
+}
+
+.export-workbench-layer-item.is-dragging {
+  opacity: 0.65;
+}
+
+.export-workbench-layer-handle {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: #94a3b8;
+  cursor: grab;
+}
+
+.export-workbench-layer-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.export-workbench-layer-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-workbench-layer-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 8px;
+}
+
+.export-workbench-layer-badge.is-baked {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #c7d2fe;
+}
+
+.export-workbench-layer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
 .transport-workbench-footer-actions {
   display: flex;
   align-items: center;
