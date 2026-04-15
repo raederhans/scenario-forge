@@ -6280,6 +6280,95 @@ body.counter-editor-modal-open {
   line-height: 1.45;
 }
 
+.scenario-guide-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scenario-guide-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scenario-guide-nav-btn {
+  border: 1px solid rgba(22, 35, 51, 0.12);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-secondary);
+  font: 600 0.78rem/1.2 var(--font-body);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.scenario-guide-nav-btn:hover {
+  border-color: rgba(31, 79, 126, 0.28);
+  color: var(--text-primary);
+}
+
+.scenario-guide-nav-btn.is-active,
+.scenario-guide-nav-btn[aria-selected="true"] {
+  border-color: rgba(31, 79, 126, 0.28);
+  background: rgba(31, 79, 126, 0.1);
+  color: var(--text-primary);
+  box-shadow: 0 8px 18px rgba(31, 79, 126, 0.08);
+}
+
+.scenario-guide-nav-btn:focus-visible {
+  outline: 2px solid rgba(31, 79, 126, 0.34);
+  outline-offset: 2px;
+}
+
+.scenario-guide-manual-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 15px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.scenario-guide-manual-title {
+  margin: 0;
+  color: var(--text-primary);
+  font: 700 0.88rem/1.35 var(--font-body);
+}
+
+.scenario-guide-manual-lead,
+.scenario-guide-bilingual-copy p,
+.scenario-guide-step-line {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.scenario-guide-bilingual-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scenario-guide-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.scenario-guide-step:last-child {
+  margin-bottom: 0;
+}
+
+.scenario-guide-step strong {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 body.scenario-guide-open #leftSidebar,
 body.scenario-guide-open #rightSidebar,
 body.scenario-guide-open #scenarioContextBar,

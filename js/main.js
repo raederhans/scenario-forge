@@ -295,6 +295,8 @@ const BOOT_PHASE_WINDOWS = {
 };
 const CONTEXT_LAYER_LOAD_ORDER = [
   "rivers",
+  "railways",
+  "rail_stations_major",
   "urban",
   "physical",
   "physical_semantics",
@@ -1322,7 +1324,10 @@ async function ensureContextLayerDataReady(
         updateContextLayerDerivedState(layerName, collection);
         state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
         state.contextLayerLoadStateByName[layerName] = "loaded";
-        if (typeof state.updateTransportAppearanceUIFn === "function" && (layerName === "airports" || layerName === "ports")) {
+        if (
+          typeof state.updateTransportAppearanceUIFn === "function"
+          && (layerName === "airports" || layerName === "ports" || layerName === "railways" || layerName === "rail_stations_major")
+        ) {
           state.updateTransportAppearanceUIFn();
         }
         finishBootMetric(`layer:${layerName}:load`, {
@@ -2243,6 +2248,10 @@ async function bootstrap() {
       urban: "idle",
       airports: "idle",
       ports: "idle",
+      roads: "idle",
+      road_labels: "idle",
+      railways: "idle",
+      rail_stations_major: "idle",
       physical: "idle",
       physical_semantics: "idle",
       physical_contours_major: "idle",

@@ -253,7 +253,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     inspectorTitle: "Layer order status",
     inspectorBody: "The inspector mirrors the current local layer order so later family renderers can consume it directly.",
     inspectorEmptyTitle: "Layer order ready",
-    inspectorEmptyBody: "Reorder the seven transport families in the center board. This state is local to the transport workbench for now.",
+    inspectorEmptyBody: "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.",
   },
 ];
 
@@ -1923,6 +1923,7 @@ function initToolbar({ render } = {}) {
   const toggleRivers = document.getElementById("toggleRivers");
   const toggleAirports = document.getElementById("toggleAirports");
   const togglePorts = document.getElementById("togglePorts");
+  const toggleRail = document.getElementById("toggleRail");
   const transportAppearanceMasterToggle = document.getElementById("transportAppearanceMasterToggle");
   const transportAppearanceWorkbenchBtn = document.getElementById("transportAppearanceWorkbenchBtn");
   const transportAirportCard = document.getElementById("transportAirportCard");
@@ -1931,7 +1932,7 @@ function initToolbar({ render } = {}) {
   const transportRoadCard = document.getElementById("transportRoadCard");
   const transportAirportControls = document.getElementById("transportAirportControls");
   const transportPortControls = document.getElementById("transportPortControls");
-  const transportRailPlaceholder = document.getElementById("transportRailPlaceholder");
+  const transportRailControls = document.getElementById("transportRailControls");
   const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
   const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
@@ -1959,6 +1960,20 @@ function initToolbar({ render } = {}) {
   const portTier = document.getElementById("portTier");
   const portImportanceThreshold = document.getElementById("portImportanceThreshold");
   const transportPortSummaryMeta = document.getElementById("transportPortSummaryMeta");
+  const railVisualStrength = document.getElementById("railVisualStrength");
+  const railVisualStrengthValue = document.getElementById("railVisualStrengthValue");
+  const railOpacity = document.getElementById("railOpacity");
+  const railOpacityValue = document.getElementById("railOpacityValue");
+  const railPrimaryColor = document.getElementById("railPrimaryColor");
+  const railLabelsEnabled = document.getElementById("railLabelsEnabled");
+  const railLabelDensity = document.getElementById("railLabelDensity");
+  const railCoverageReach = document.getElementById("railCoverageReach");
+  const railCoverageReachValue = document.getElementById("railCoverageReachValue");
+  const railScopeLinked = document.getElementById("railScopeLinked");
+  const railScopeResolved = document.getElementById("railScopeResolved");
+  const railThresholdResolved = document.getElementById("railThresholdResolved");
+  const railScope = document.getElementById("railScope");
+  const railImportanceThreshold = document.getElementById("railImportanceThreshold");
   const transportRailSummaryMeta = document.getElementById("transportRailSummaryMeta");
   const transportRoadSummaryMeta = document.getElementById("transportRoadSummaryMeta");
   const toggleCityPoints = document.getElementById("toggleCityPoints");
@@ -2092,6 +2107,8 @@ function initToolbar({ render } = {}) {
   const scenarioGuideCloseBtn = document.getElementById("scenarioGuideCloseBtn");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
   const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
+  const scenarioGuideNavButtons = Array.from(document.querySelectorAll(".scenario-guide-nav-btn"));
+  const scenarioGuidePanels = Array.from(document.querySelectorAll("[data-guide-panel]"));
   const dockConfigGroup = document.getElementById("dockConfigGroup");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const dockExportBtn = document.getElementById("dockExportBtn");
@@ -2339,6 +2356,7 @@ function initToolbar({ render } = {}) {
   };
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
+  let scenarioGuideActiveSection = "quick";
   let dockPopoverCloseBound = false;
   const overlayFocusReturnTargets = createFocusReturnRegistry();
   const PALETTE_LIBRARY_GROUPS = [
@@ -2370,6 +2388,36 @@ function initToolbar({ render } = {}) {
   if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
     state.ui.paletteLibrarySections = {};
   }
+
+  const normalizeScenarioGuideSection = (value = "") => {
+    const normalizedValue = String(value || "").trim().toLowerCase();
+    return ["quick", "prepare", "tools", "checks"].includes(normalizedValue) ? normalizedValue : "quick";
+  };
+
+  const renderScenarioGuideSection = (section = "quick") => {
+    scenarioGuideActiveSection = normalizeScenarioGuideSection(section);
+    scenarioGuideNavButtons.forEach((button) => {
+      const isActive = String(button.dataset.guideSection || "").trim().toLowerCase() === scenarioGuideActiveSection;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+      button.tabIndex = isActive ? 0 : -1;
+    });
+    scenarioGuidePanels.forEach((panel) => {
+      const isActive = String(panel.dataset.guidePanel || "").trim().toLowerCase() === scenarioGuideActiveSection;
+      panel.classList.toggle("hidden", !isActive);
+      panel.hidden = !isActive;
+    });
+  };
+
+  const focusScenarioGuideSectionButton = (section = "quick") => {
+    const normalizedSection = normalizeScenarioGuideSection(section);
+    const button = scenarioGuideNavButtons.find(
+      (candidate) => String(candidate.dataset.guideSection || "").trim().toLowerCase() === normalizedSection
+    );
+    if (button && typeof button.focus === "function") {
+      button.focus({ preventScroll: true });
+    }
+  };
 
   const getResponsiveChromeTier = () => {
     const viewportWidth = Number(globalThis.innerWidth) || 0;
@@ -2498,6 +2546,9 @@ function initToolbar({ render } = {}) {
       if (normalizedScope === "expanded") return 1;
       return 2;
     }
+    if (normalizedFamilyId === "rail") {
+      return normalizedScope === "mainline_only" ? 1 : 2;
+    }
     return 1;
   };
 
@@ -2509,6 +2560,24 @@ function initToolbar({ render } = {}) {
   };
 
   const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {
+    if (familyId === "rail") {
+      const features = Array.isArray(state.railwaysData?.features) ? state.railwaysData.features : null;
+      if (!features) return null;
+      const scopeThreshold = getTransportScopeThresholdRank(familyId, effectiveScope.scope);
+      const revealThreshold = String(effectiveScope.importanceThreshold || "").trim().toLowerCase() === "primary"
+        ? 1
+        : String(effectiveScope.importanceThreshold || "").trim().toLowerCase() === "secondary"
+          ? 2
+          : 3;
+      return features.filter((feature) => {
+        const properties = feature?.properties || {};
+        const lineClass = String(properties.class || "").trim().toLowerCase();
+        const revealRank = Math.max(1, Math.round(Number(properties.reveal_rank || (lineClass === "mainline" ? 1 : 2))));
+        if (revealRank > revealThreshold) return false;
+        if (scopeThreshold <= 1 && lineClass !== "mainline") return false;
+        return lineClass === "mainline" || lineClass === "regional";
+      }).length;
+    }
     const collection = familyId === "port" ? state.portsData : state.airportsData;
     const features = Array.isArray(collection?.features) ? collection.features : null;
     if (!features) return null;
@@ -2525,6 +2594,9 @@ function initToolbar({ render } = {}) {
   const formatTransportFamilyCountText = (familyId, count) => {
     if (!Number.isFinite(count)) return "";
     const roundedCount = Math.max(0, Math.round(count));
+    if (familyId === "rail") {
+      return `${roundedCount.toLocaleString()} ${t(roundedCount === 1 ? "railway" : "railways", "ui")}`;
+    }
     const noun = familyId === "port"
       ? (roundedCount === 1 ? "port" : "ports")
       : (roundedCount === 1 ? "airport" : "airports");
@@ -2554,11 +2626,14 @@ function initToolbar({ render } = {}) {
     const transportConfig = getTransportAppearanceConfig();
     const airportConfig = transportConfig.airport || {};
     const portConfig = transportConfig.port || {};
+    const railConfig = transportConfig.rail || {};
     const transportEnabled = state.showTransport !== false;
     const airportEnabled = transportEnabled && !!state.showAirports;
     const portEnabled = transportEnabled && !!state.showPorts;
+    const railEnabled = transportEnabled && !!state.showRail;
     const airportScopeState = getEffectiveTransportScopeState("airport", airportConfig);
     const portScopeState = getEffectiveTransportScopeState("port", portConfig);
+    const railScopeState = getEffectiveTransportScopeState("rail", railConfig);
 
     if (transportAppearanceMasterToggle) {
       transportAppearanceMasterToggle.checked = transportEnabled;
@@ -2621,8 +2696,31 @@ function initToolbar({ render } = {}) {
         portScopeState,
       );
     }
-    if (transportRailSummaryMeta) transportRailSummaryMeta.textContent = t("Planned", "ui");
-    if (transportRoadSummaryMeta) transportRoadSummaryMeta.textContent = t("Planned", "ui");
+    if (railVisualStrength) railVisualStrength.value = String(Math.round(Number(railConfig.visualStrength ?? 0.5) * 100));
+    if (railVisualStrengthValue) railVisualStrengthValue.textContent = formatTransportPercent(railConfig.visualStrength ?? 0.5);
+    if (railOpacity) railOpacity.value = String(Math.round(Number(railConfig.opacity ?? 0.72) * 100));
+    if (railOpacityValue) railOpacityValue.textContent = formatTransportPercent(railConfig.opacity ?? 0.72);
+    if (railPrimaryColor) railPrimaryColor.value = normalizeOceanFillColor(railConfig.primaryColor || "#0f172a");
+    if (railLabelsEnabled) railLabelsEnabled.checked = !!railConfig.labelsEnabled;
+    if (railLabelDensity) railLabelDensity.value = String(railConfig.labelDensity || "sparse");
+    if (railCoverageReach) railCoverageReach.value = String(Math.round(Number(railConfig.coverageReach ?? 0.2) * 100));
+    if (railCoverageReachValue) railCoverageReachValue.textContent = formatTransportPercent(railConfig.coverageReach ?? 0.2);
+    if (railScopeLinked) railScopeLinked.checked = String(railConfig.scopeLinkMode || "linked") !== "manual";
+    if (railScopeResolved) railScopeResolved.textContent = t(formatTransportScopeLabel(railScopeState.scope), "ui");
+    if (railThresholdResolved) railThresholdResolved.textContent = t(formatTransportThresholdLabel(railScopeState.importanceThreshold), "ui");
+    if (railScope) railScope.value = String(railConfig.scope || "mainline_only");
+    if (railImportanceThreshold) railImportanceThreshold.value = String(railConfig.importanceThreshold || "primary");
+    if (toggleRail) toggleRail.checked = !!state.showRail;
+    if (transportRailSummaryMeta) {
+      transportRailSummaryMeta.textContent = buildTransportFamilySummaryText(
+        "rail",
+        transportEnabled,
+        !!state.showRail,
+        railConfig,
+        railScopeState,
+      );
+    }
+    if (transportRoadSummaryMeta) transportRoadSummaryMeta.textContent = t("Live in Transport Workbench", "ui");
 
     [
       airportVisualStrength,
@@ -2650,19 +2748,36 @@ function initToolbar({ render } = {}) {
     ].forEach((control) => {
       if (control) control.disabled = !transportEnabled;
     });
+    [
+      railVisualStrength,
+      railOpacity,
+      railPrimaryColor,
+      railLabelsEnabled,
+      railLabelDensity,
+      railScopeLinked,
+      railScope,
+      railImportanceThreshold,
+      toggleRail,
+    ].forEach((control) => {
+      if (control) control.disabled = !transportEnabled;
+    });
 
     const airportManual = String(airportConfig.scopeLinkMode || "linked") === "manual";
     const portManual = String(portConfig.scopeLinkMode || "linked") === "manual";
+    const railManual = String(railConfig.scopeLinkMode || "linked") === "manual";
     if (airportCoverageReach) airportCoverageReach.disabled = !transportEnabled || airportManual;
     if (airportScope) airportScope.disabled = !transportEnabled || !airportManual;
     if (airportImportanceThreshold) airportImportanceThreshold.disabled = !transportEnabled || !airportManual;
     if (portCoverageReach) portCoverageReach.disabled = !transportEnabled || portManual;
     if (portTier) portTier.disabled = !transportEnabled || !portManual;
     if (portImportanceThreshold) portImportanceThreshold.disabled = !transportEnabled || !portManual;
+    if (railCoverageReach) railCoverageReach.disabled = !transportEnabled || railManual;
+    if (railScope) railScope.disabled = !transportEnabled || !railManual;
+    if (railImportanceThreshold) railImportanceThreshold.disabled = !transportEnabled || !railManual;
 
     setTransportAppearanceGroupEnabled(transportAirportControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportPortControls, transportEnabled);
-    setTransportAppearanceGroupEnabled(transportRailPlaceholder, transportEnabled);
+    setTransportAppearanceGroupEnabled(transportRailControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportRoadPlaceholder, transportEnabled);
 
     transportAirportCard?.classList.toggle("opacity-60", !transportEnabled);
@@ -2686,6 +2801,9 @@ function initToolbar({ render } = {}) {
     }
     if (normalized && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
       void state.ensureContextLayerDataFn("ports", { reason: "transport-master-toggle", renderNow: true });
+    }
+    if (normalized && state.showRail && typeof state.ensureContextLayerDataFn === "function") {
+      void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "transport-master-toggle", renderNow: true });
     }
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
@@ -3022,12 +3140,13 @@ function initToolbar({ render } = {}) {
   };
 
   const getTransportWorkbenchDataContract = (familyId) => TRANSPORT_WORKBENCH_DATA_CONTRACTS[familyId] || null;
+  const pickUiCopy = (zh, en) => (state.currentLanguage === "zh" ? zh : en);
 
   const renderTransportWorkbenchInfoContent = (family) => {
     if (!transportWorkbenchInfoBody) return;
     transportWorkbenchInfoBody.replaceChildren();
     const dataContract = getTransportWorkbenchDataContract(family.id);
-    const blocks = [
+    const defaultBlocks = [
       {
         title: "Current lens",
         body: family.lensBody,
@@ -3056,6 +3175,31 @@ function initToolbar({ render } = {}) {
         }
         : null,
     ];
+    const blocks = family.id === "layers"
+      ? [
+        {
+          title: pickUiCopy("当前用途", "Current use"),
+          body: pickUiCopy(
+            "Layers 用来调整 transport families 的当前本地绘制顺序。中间排序板负责拖拽重排，Inspect 会同步回显当前顺序。",
+            "Layers controls the current local draw order for transport families. Use the center board to drag and reorder families, and use Inspect to review the active order."
+          ),
+        },
+        {
+          title: pickUiCopy("排序板行为", "Board behavior"),
+          body: pickUiCopy(
+            "Layers 使用排序板模式。这里没有缩放、旋转或基线对比，重点是确认绘制顺序和 family 状态。",
+            "Layers uses board mode. Zoom, rotate, and baseline compare are hidden here, and the main task is confirming draw order and family status."
+          ),
+        },
+        {
+          title: pickUiCopy("Inspector 分工", "Inspector role"),
+          body: pickUiCopy(
+            "左侧只保留上下文说明，真正的顺序确认在中间排序板和右侧 Inspect。其余页签继续保留统一结构，方便以后接入更多帮助内容。",
+            "The left column keeps context only, while the center board and right-side Inspect confirm the active order. The remaining tabs stay in place so later help and controls can land without changing the shell."
+          ),
+        },
+      ]
+      : defaultBlocks;
 
     blocks.filter(Boolean).forEach((block) => {
       const node = document.createElement("section");
@@ -3962,11 +4106,14 @@ function initToolbar({ render } = {}) {
       const copy = document.createElement("p");
       copy.className = "transport-workbench-section-description";
       copy.textContent = tabId === "aggregation"
-        ? "这里预留给动态阈值、单元尺寸、极密触发等精调项，默认先收起。"
-        : "这里预留给标签预算、分离强度、降级规则和标签聚合阈值，默认先收起。";
-      copy.textContent = tabId === "aggregation"
-        ? "这里预留给动态阈值、单元尺寸、极密触发等精调项，默认先收起。"
-        : "这里预留给标签预算、分离强度、降级规则和标签聚合阈值，默认先收起。";
+        ? pickUiCopy(
+          "这里放当前聚合精调项，例如 cluster radius、cell size 和密度触发阈值。默认折叠，便于先完成主设置，再做细调。",
+          "This section contains active aggregation fine-tuning controls such as cluster radius, cell size, and density thresholds. It stays collapsed by default so the main setup remains easy to scan."
+        )
+        : pickUiCopy(
+          "这里放当前标签精调项，例如 label separation 和聚合阈值。默认折叠，便于先完成主设置，再做细调。",
+          "This section contains active label fine-tuning controls such as label separation and aggregation thresholds. It stays collapsed by default so the main setup remains easy to scan."
+        );
       if (tabId === "aggregation") {
         appendShellRange(
           "Cluster radius",
@@ -4008,7 +4155,15 @@ function initToolbar({ render } = {}) {
       body.className = "transport-workbench-empty-text";
       body.textContent = tabId === "data"
         ? t("This family has not exposed extra manifest or audit cards in the current shell.", "ui")
-        : t("This tab is reserved so the right-side deck keeps one stable structure across families.", "ui");
+        : family.id === "layers"
+          ? pickUiCopy(
+            "Layers 的主要操作在中间排序板完成。Inspect 用来确认当前顺序，其余页签保留统一结构。",
+            "Layers is operated from the center reorder board. Inspect confirms the active order, and the remaining tabs keep the shared workbench structure."
+          )
+          : pickUiCopy(
+            "这个 family 当前没有单独的页签控件。请在有内容的页签中调整真实规则，Inspect 会继续显示当前状态。",
+            "This family does not expose separate controls in this tab yet. Use the populated tabs for active tuning, and use Inspect to confirm the current state."
+          );
       empty.append(title, body);
       mountNode.appendChild(empty);
     }
@@ -4047,7 +4202,10 @@ function initToolbar({ render } = {}) {
       title.textContent = t("Future draw stack", "ui");
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
-      body.textContent = t("Use the center board to sort the seven transport families. Left stays as context only, while the right deck owns all tuning.", "ui");
+      body.textContent = pickUiCopy(
+        "使用中间排序板调整 8 个 transport families 的绘制顺序。左侧负责上下文，右侧负责状态查看。",
+        "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state."
+      );
       card.append(title, body);
       transportWorkbenchLensSections.appendChild(card);
       return;
@@ -5396,6 +5554,7 @@ function initToolbar({ render } = {}) {
     utilitiesGuideBtn?.setAttribute("aria-expanded", "true");
     scenarioGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
     utilitiesGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
+    renderScenarioGuideSection("quick");
     syncSupportSurfaceUrlState("guide");
     focusOverlaySurface(scenarioGuidePopover);
   };
@@ -8305,6 +8464,29 @@ function initToolbar({ render } = {}) {
     utilitiesGuideBtn.dataset.bound = "true";
   }
 
+  scenarioGuideNavButtons.forEach((button) => {
+    if (button.dataset.bound) return;
+    button.addEventListener("click", () => {
+      renderScenarioGuideSection(button.dataset.guideSection || "quick");
+    });
+    button.addEventListener("keydown", (event) => {
+      const currentIndex = scenarioGuideNavButtons.indexOf(button);
+      if (currentIndex < 0) return;
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % scenarioGuideNavButtons.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + scenarioGuideNavButtons.length) % scenarioGuideNavButtons.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = scenarioGuideNavButtons.length - 1;
+      if (nextIndex === currentIndex) return;
+      event.preventDefault();
+      const nextButton = scenarioGuideNavButtons[nextIndex];
+      const nextSection = nextButton?.dataset.guideSection || "quick";
+      renderScenarioGuideSection(nextSection);
+      focusScenarioGuideSectionButton(nextSection);
+    });
+    button.dataset.bound = "true";
+  });
+
   if (scenarioGuideCloseBtn && !scenarioGuideCloseBtn.dataset.bound) {
     scenarioGuideCloseBtn.addEventListener("click", () => {
       closeScenarioGuidePopover({ restoreFocus: true });
@@ -9427,6 +9609,18 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (toggleRail) {
+    toggleRail.checked = !!state.showRail;
+    toggleRail.addEventListener("change", (event) => {
+      state.showRail = !!event.target.checked;
+      if (state.showRail && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "toolbar-toggle", renderNow: true });
+      }
+      renderTransportAppearanceUi();
+      renderDirty("toggle-rail");
+    });
+  }
+
   if (airportVisualStrength && !airportVisualStrength.dataset.bound) {
     airportVisualStrength.addEventListener("input", (event) => {
       const value = Number(event.target.value);
@@ -9643,6 +9837,106 @@ function initToolbar({ render } = {}) {
       renderDirty("transport-port-importance-threshold");
     });
     portImportanceThreshold.dataset.bound = "true";
+  }
+
+  if (railVisualStrength && !railVisualStrength.dataset.bound) {
+    railVisualStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().rail.visualStrength = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-visual-strength");
+    });
+    railVisualStrength.dataset.bound = "true";
+  }
+
+  if (railOpacity && !railOpacity.dataset.bound) {
+    railOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().rail.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0.2, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-opacity");
+    });
+    railOpacity.dataset.bound = "true";
+  }
+
+  if (railPrimaryColor && !railPrimaryColor.dataset.bound) {
+    railPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().rail.primaryColor = normalizeOceanFillColor(event.target.value || "#0f172a");
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-primary-color");
+    });
+    railPrimaryColor.dataset.bound = "true";
+  }
+
+  if (railLabelsEnabled && !railLabelsEnabled.dataset.bound) {
+    railLabelsEnabled.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().rail.labelsEnabled = !!event.target.checked;
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-labels-enabled");
+    });
+    railLabelsEnabled.dataset.bound = "true";
+  }
+
+  if (railLabelDensity && !railLabelDensity.dataset.bound) {
+    railLabelDensity.addEventListener("change", (event) => {
+      getTransportAppearanceConfig().rail.labelDensity = String(event.target.value || "sparse");
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-label-density");
+    });
+    railLabelDensity.dataset.bound = "true";
+  }
+
+  if (railCoverageReach && !railCoverageReach.dataset.bound) {
+    railCoverageReach.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const config = getTransportAppearanceConfig().rail;
+      config.coverageReach = clamp(Number.isFinite(value) ? value / 100 : 0.2, 0, 1);
+      if (String(config.scopeLinkMode || "linked") !== "manual") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("rail", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-coverage-reach");
+    });
+    railCoverageReach.dataset.bound = "true";
+  }
+
+  if (railScopeLinked && !railScopeLinked.dataset.bound) {
+    railScopeLinked.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().rail;
+      config.scopeLinkMode = event.target.checked ? "linked" : "manual";
+      if (config.scopeLinkMode === "linked") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("rail", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-scope-link");
+    });
+    railScopeLinked.dataset.bound = "true";
+  }
+
+  if (railScope && !railScope.dataset.bound) {
+    railScope.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().rail;
+      config.scopeLinkMode = "manual";
+      config.scope = String(event.target.value || "mainline_only");
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-scope");
+    });
+    railScope.dataset.bound = "true";
+  }
+
+  if (railImportanceThreshold && !railImportanceThreshold.dataset.bound) {
+    railImportanceThreshold.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().rail;
+      config.scopeLinkMode = "manual";
+      config.importanceThreshold = String(event.target.value || "primary");
+      renderTransportAppearanceUi();
+      renderDirty("transport-rail-importance-threshold");
+    });
+    railImportanceThreshold.dataset.bound = "true";
   }
 
   if (toggleCityPoints) {
@@ -11005,6 +11299,7 @@ function initToolbar({ render } = {}) {
   if (scenarioGuideBackdrop) {
     scenarioGuideBackdrop.setAttribute("aria-hidden", "true");
   }
+  renderScenarioGuideSection("quick");
   if (specialZonePopover) {
     specialZonePopover.setAttribute("aria-hidden", specialZonePopover.classList.contains("hidden") ? "true" : "false");
   }

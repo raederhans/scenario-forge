@@ -405,7 +405,22 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     opacity: 0.44,
     blendMode: "multiply",
   };
+  importedProject.styleConfig.transportOverview = {
+    ...(importedProject.styleConfig.transportOverview || {}),
+    rail: {
+      opacity: 0.61,
+      visualStrength: 0.68,
+      labelsEnabled: true,
+      labelDensity: "dense",
+      labelMode: "name",
+      coverageReach: 0.78,
+      scopeLinkMode: "linked",
+      scope: "mainline_plus_regional",
+      importanceThreshold: "secondary",
+    },
+  };
   importedProject.layerVisibility.showSpecialZones = true;
+  importedProject.layerVisibility.showRail = true;
   importedProject.recentColors = ["#112233", "#445566"];
   importedProject.interactionGranularity = "country";
   importedProject.batchFillScope = "country";
@@ -510,6 +525,10 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       && byId("#coastlineWidth")?.value === expected.coastWidth
       && byId("#physicalOpacity")?.value === expected.physicalOpacity
       && byId("#physicalBlendMode")?.value === expected.physicalBlendMode
+      && byId("#toggleRail")?.checked === true
+      && byId("#railLabelsEnabled")?.checked === true
+      && byId("#railLabelDensity")?.value === expected.railLabelDensity
+      && byId("#railOpacity")?.value === expected.railOpacity
       && byId("#paintGranularitySelect")?.value === expected.granularity
       && byId("#toggleSpecialZones")?.checked === true
       && byId("#referenceOpacity")?.value === expected.referenceOpacity
@@ -537,6 +556,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     coastWidth: "2.7",
     physicalOpacity: "44",
     physicalBlendMode: "multiply",
+    railLabelDensity: "dense",
+    railOpacity: "61",
     granularity: "country",
     referenceOpacity: "33",
     referenceScale: "1.23",
@@ -572,6 +593,16 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     atlasOpacity: 0.44,
     preset: "balanced",
   });
+  expect(roundtripExport.styleConfig.transportOverview.rail).toMatchObject({
+    opacity: 0.61,
+    visualStrength: 0.68,
+    labelsEnabled: true,
+    labelDensity: "dense",
+    coverageReach: 0.78,
+    scope: "mainline_plus_regional",
+    importanceThreshold: "secondary",
+  });
+  expect(roundtripExport.layerVisibility.showRail).toBe(true);
   expect(roundtripExport.customPresets).toEqual({
     ZZZ: [
       {
@@ -625,6 +656,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   delete legacyProject.styleConfig.empireBorders;
   delete legacyProject.styleConfig.coastlines;
   delete legacyProject.styleConfig.physical;
+  delete legacyProject.layerVisibility.showRail;
   delete legacyProject.layerVisibility.showSpecialZones;
   const legacyProjectPath = path.join(artifactDir, "legacy-import.json");
   fs.writeFileSync(legacyProjectPath, JSON.stringify(legacyProject, null, 2));
@@ -650,6 +682,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     const state = globalThis.__pwProjectSaveLoad?.state;
     return byId("#themeSelect")?.value === "hoi4_vanilla"
       && byId("#toggleSpecialZones")?.checked === false
+      && byId("#toggleRail")?.checked === false
       && byId("#physicalBlendMode")?.value === "source-over"
       && byId("#physicalOpacity")?.value === "56"
       && !state.specialZoneEditor?.active
@@ -686,6 +719,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(legacyExport.operationGraphics).toEqual([]);
   expect(legacyExport.unitCounters).toEqual([]);
   expect(legacyExport.layerVisibility.showSpecialZones).toBe(false);
+  expect(legacyExport.layerVisibility.showRail).toBe(false);
   expect(legacyExport.styleConfig.internalBorders).toEqual({
     color: "#cccccc",
     opacity: 1,

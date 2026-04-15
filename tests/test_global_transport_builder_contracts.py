@@ -582,16 +582,90 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 entry.get('phase_status'),
             )
 
-    def test_runtime_gate_still_closed_for_road_and_rail(self) -> None:
-        for path in (
+    def test_road_runtime_gate_stays_closed_while_rail_runtime_opens_and_saves(self) -> None:
+        road_guard_paths = (
             REPO_ROOT / 'js' / 'core' / 'file_manager.js',
             REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js',
             REPO_ROOT / 'js' / 'ui' / 'toolbar.js',
             REPO_ROOT / 'js' / 'core' / 'map_renderer.js',
-        ):
+        )
+        for path in road_guard_paths:
             content = path.read_text(encoding='utf-8')
             self.assertNotIn('showRoad', content)
-            self.assertNotIn('showRail', content)
+
+        state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
+        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
+        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
+
+        self.assertIn('showRail', state_content)
+        self.assertIn('showRail', toolbar_content)
+        self.assertIn('showRail', renderer_content)
+        self.assertIn('showRail', file_manager_content)
+        self.assertIn('showRail', interaction_content)
+        self.assertIn('data.layerVisibility.showRail', file_manager_content)
+        self.assertIn('state.showRail = !!data.layerVisibility.showRail', interaction_content)
+
+    def test_rail_runtime_loader_uses_catalog_not_eager_pack(self) -> None:
+        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
+        self.assertIn('data/transport_layers/global_rail/catalog.json', data_loader_content)
+        self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', data_loader_content)
+        self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', data_loader_content)
+        self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8'))
+        self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
+
+    def test_transport_appearance_ui_exposes_live_rail_controls(self) -> None:
+        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        html_content = (REPO_ROOT / 'index.html').read_text(encoding='utf-8')
+        self.assertIn('toggleRail', toolbar_content)
+        self.assertIn('transportRailControls', toolbar_content)
+        self.assertIn('drawRailwaysLayer', (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8'))
+        self.assertIn('railLabelsEnabled', toolbar_content)
+        self.assertIn('railLabelDensity', toolbar_content)
+        self.assertIn('id="toggleRail"', html_content)
+        self.assertIn('id="transportRailControls"', html_content)
+        self.assertIn('id="railLabelsEnabled"', html_content)
+        self.assertIn('id="railLabelDensity"', html_content)
+        self.assertNotIn('data-i18n="Planned">Planned</span>', html_content.split('transportRailSummaryMeta', 1)[1].split('</details>', 1)[0])
+
+    def test_rail_renderer_consumes_label_config_and_station_layer(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        self.assertIn('railConfig.labelsEnabled', renderer_content)
+        self.assertIn('railConfig.labelDensity', renderer_content)
+        self.assertIn('railConfig.labelMode', renderer_content)
+        self.assertIn('drawRailStationsMajorLayer', renderer_content)
+        self.assertIn('state.railStationsMajorData', renderer_content)
+
+    def test_rail_renderer_threshold_order_keeps_all_as_broadest_setting(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        self.assertIn('function getTransportRailRevealRankThreshold(value)', renderer_content)
+        self.assertIn('if (normalized === "primary") return 1;', renderer_content)
+        self.assertIn('if (normalized === "secondary") return 2;', renderer_content)
+        self.assertIn('return 3;', renderer_content)
+        self.assertIn('if (revealRank > maximumRevealRank) return;', renderer_content)
+
+    def test_rail_transport_overview_default_primary_color_is_dark(self) -> None:
+        state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
+        self.assertIn('case "rail":', state_content)
+        self.assertIn('primaryColor: "#0f172a"', state_content)
+
+    def test_rail_stations_placeholder_sidecars_remain_real_empty_collections(self) -> None:
+        sample_station_path = (
+            GLOBAL_RAIL_REGION_ROOT
+            / 'japan'
+            / 'shards'
+            / 'jp_e128_e147'
+            / 'rail_stations_major.geojson'
+        )
+        payload = json.loads(sample_station_path.read_text(encoding='utf-8'))
+        self.assertEqual(payload.get('type'), 'FeatureCollection')
+        self.assertEqual(payload.get('features'), [])
+
+    def test_rail_runtime_loader_keeps_station_collection_shape_even_when_empty(self) -> None:
+        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
+        self.assertIn('rail_stations_major', data_loader_content)
+        self.assertIn('features: stationFeatures', data_loader_content)
 
     def test_data_loader_no_longer_hardcodes_missing_global_transport_pack_paths(self) -> None:
         content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')

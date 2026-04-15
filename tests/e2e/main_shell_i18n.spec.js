@@ -146,7 +146,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
     document.getElementById("transportWorkbenchCloseBtn")?.click();
   });
   await expect(frontlineIntro).toHaveText(
-    "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+    "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters."
   );
   if (colorOnlySection) {
     await expect(colorOnlySection.summary).toHaveText("Color Only");
@@ -206,7 +206,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
     document.getElementById("transportWorkbenchCloseBtn")?.click();
   });
   await expect(frontlineIntro).not.toHaveText(
-    "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+    "Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters."
   );
   if (colorOnlySection) {
     await expect(colorOnlySection.summary).toHaveText(ZH_COLOR_ONLY.summary);

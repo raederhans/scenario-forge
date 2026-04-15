@@ -665,6 +665,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
         : !!data.layerVisibility.showTransport;
     state.showAirports = !!data.layerVisibility.showAirports;
     state.showPorts = !!data.layerVisibility.showPorts;
+    state.showRail = !!data.layerVisibility.showRail;
     state.showSpecialZones =
       data.layerVisibility.showSpecialZones === undefined
         ? false
@@ -761,6 +762,12 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   }
   if (state.showTransport && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
     await state.ensureContextLayerDataFn("ports", {
+      reason: "project-import",
+      renderNow: false,
+    });
+  }
+  if (state.showTransport && state.showRail && typeof state.ensureContextLayerDataFn === "function") {
+    await state.ensureContextLayerDataFn(["railways", "rail_stations_major"], {
       reason: "project-import",
       renderNow: false,
     });

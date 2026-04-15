@@ -1513,25 +1513,93 @@
                       </div>
                     </details>
 
-                    <details id="transportRailCard" class="appearance-mini-section transport-family-section transport-family-section-disabled">
+                    <details id="transportRailCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
                           <span id="lblTransportRailFamily" class="transport-family-summary-title">Rail</span>
-                          <span id="transportRailSummaryMeta" class="transport-family-summary-meta" data-i18n="Planned">Planned</span>
+                          <span id="transportRailSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
-                      <div id="transportRailPlaceholder" class="transport-family-body space-y-4 mt-3">
-                        <section class="space-y-2">
+                      <div id="transportRailControls" class="transport-family-body space-y-4 mt-3">
+                        <section class="space-y-3">
                           <h4 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
-                          <p class="panel-hint" data-i18n="Mainline-only visibility controls will land here when the coarse rail family is wired.">Mainline-only visibility controls will land here when the coarse rail family is wired.</p>
+                          <label class="toggle-label">
+                            <input id="toggleRail" type="checkbox" class="checkbox-input" />
+                            <span id="lblTransportRailToggle" data-i18n="Show Rail">Show Rail</span>
+                          </label>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRailVisualStrength" class="range-label" for="railVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                              <span id="railVisualStrengthValue" class="range-value">50%</span>
+                            </div>
+                            <input id="railVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRailOpacity" class="range-label" for="railOpacity" data-i18n="Opacity">Opacity</label>
+                              <span id="railOpacityValue" class="range-value">72%</span>
+                            </div>
+                            <input id="railOpacity" type="range" min="20" max="100" value="72" class="range-input" />
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRailPrimaryColor" class="range-label" for="railPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                            <input id="railPrimaryColor" type="color" value="#0f172a" class="color-input" />
+                          </div>
                         </section>
-                        <section class="space-y-2">
+
+                        <section class="space-y-3">
                           <h4 id="lblTransportRailLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
-                          <p class="panel-hint" data-i18n="Rail labels stay off by default until the coarse backbone data is ready.">Rail labels stay off by default until the coarse backbone data is ready.</p>
+                          <label class="toggle-label">
+                            <input id="railLabelsEnabled" type="checkbox" class="checkbox-input" />
+                            <span id="lblRailLabelsEnabled" data-i18n="Show Rail Labels">Show Rail Labels</span>
+                          </label>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRailLabelDensity" class="range-label" for="railLabelDensity" data-i18n="Label Density">Label Density</label>
+                            <select id="railLabelDensity" class="select-input">
+                              <option value="sparse" selected data-i18n="Sparse">Sparse</option>
+                              <option value="balanced" data-i18n="Balanced">Balanced</option>
+                              <option value="dense" data-i18n="Dense">Dense</option>
+                            </select>
+                          </div>
+                          <p class="panel-hint" data-i18n="Rail labels currently use line names only.">Rail labels currently use line names only.</p>
                         </section>
-                        <section class="space-y-2">
+
+                        <section class="space-y-3">
                           <h4 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
-                          <p class="panel-hint" data-i18n="Scope will start at global mainline backbone only.">Scope will start at global mainline backbone only.</p>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                              <span id="railCoverageReachValue" class="range-value">20%</span>
+                            </div>
+                            <input id="railCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                          </div>
+                          <label class="toggle-label">
+                            <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                          </label>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                            <span id="railScopeResolved" class="transport-readout-value">Mainline Only</span>
+                          </div>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                            <span id="railThresholdResolved" class="transport-readout-value">Primary</span>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRailScope" class="range-label" for="railScope" data-i18n="Manual Scope">Manual Scope</label>
+                            <select id="railScope" class="select-input">
+                              <option value="mainline_only" selected data-i18n="Mainline Only">Mainline Only</option>
+                              <option value="mainline_plus_regional" data-i18n="Mainline + Regional">Mainline + Regional</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRailImportanceThreshold" class="range-label" for="railImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                            <select id="railImportanceThreshold" class="select-input">
+                              <option value="primary" selected data-i18n="Primary">Primary</option>
+                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="all" data-i18n="All">All</option>
+                            </select>
+                          </div>
                         </section>
                       </div>
                     </details>
@@ -2292,12 +2360,12 @@
                     <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                     <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                   </svg>
-                  <span class="info-tooltip" data-i18n="Enable derived frontline overlays and strategic workspace tools for conflict views.">Enable derived frontline overlays and strategic workspace tools for conflict views.</span>
+                  <span class="info-tooltip" data-i18n="Review scenario-derived frontlines or open the project-local strategic workspace for operational overlays.">Review scenario-derived frontlines or open the project-local strategic workspace for operational overlays.</span>
                 </span>
               </summary>
               <div class="inspector-panel-body">
-                <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
-                  Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
+                <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.">
+                  Use Frontline after you apply a scenario. This section combines the derived conflict overlay with the project-local strategic workspace for operational lines, graphics, and unit counters.
                 </p>
                 <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
               </div>
@@ -2312,12 +2380,12 @@
                     <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                     <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                   </svg>
-                  <span class="info-tooltip" data-i18n="Open the export workbench for target, layer, and resolution controls.">Open the export workbench for target, layer, and resolution controls.</span>
+                  <span class="info-tooltip" data-i18n="Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.">Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.</span>
                 </span>
               </summary>
               <div class="inspector-panel-body">
-                <p class="sidebar-help-copy" data-i18n="Open the export workbench to choose target, layer order, format, and resolution.">
-                  Open the export workbench to choose target, layer order, format, and resolution.
+                <p class="sidebar-help-copy" data-i18n="Open the export workbench to preview the map, reorder layers, tune image adjustments, choose the target format, and export up to the current 8K limit.">
+                  Open the export workbench to preview the map, reorder layers, tune image adjustments, choose the target format, and export up to the current 8K limit.
                 </p>
                 <div class="sidebar-support-summary-row" aria-label="Export summary" data-i18n-aria-label="Export summary">
                   <div class="sidebar-support-summary-pill">
@@ -2346,8 +2414,8 @@
               </summary>
               <div class="inspector-panel-body">
                 <div class="inspector-utilities-shell sidebar-tool-panel">
-                  <p class="sidebar-help-copy" data-i18n="Keep the guide and reference tools nearby without mixing them into the main project workflow.">
-                    Keep the guide and reference tools nearby without mixing them into the main project workflow.
+                  <p class="sidebar-help-copy" data-i18n="Use Guide for workflow steps and Reference for visual alignment. Both stay in the Project tab so you can check instructions without losing context.">
+                    Use Guide for workflow steps and Reference for visual alignment. Both stay in the Project tab so you can check instructions without losing context.
                   </p>
                   <div class="inspector-utility-stack">
                     <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities">
@@ -2357,7 +2425,7 @@
 
                     <div id="dockReferencePopover" class="sidebar-tool-popover sidebar-tool-panel hidden" role="dialog" aria-label="Reference tools">
                       <h3 id="lblReferenceImage" class="sidebar-tool-title" data-i18n="Reference Image">Reference Image</h3>
-                      <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Keep a working reference visible while you line up opacity, scale, and offsets.">Keep a working reference visible while you line up opacity, scale, and offsets.</p>
+                      <p id="referenceToolHint" class="sidebar-help-copy" data-i18n="Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.">Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.</p>
                       <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
                       <div class="space-y-3 mt-4">
                         <div>
@@ -2430,7 +2498,7 @@
               <button type="button" class="transport-workbench-family-tab" data-transport-family="layers" role="tab" aria-selected="false" data-i18n="Layers">Layers</button>
             </div>
             <div class="transport-workbench-topbar-actions">
-              <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Info">Info</button>
+              <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Guide">Guide</button>
               <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench" data-i18n="Close" data-i18n-aria-label="Close transport workbench">Close</button>
             </div>
             <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
@@ -2727,16 +2795,88 @@
           Close
         </button>
       </div>
-      <p id="scenarioGuideSupportHint" class="sidebar-help-copy" data-i18n="Use this guide inside the support area so the shell stays quiet while the next step stays readable.">Use this guide inside the support area so the shell stays quiet while the next step stays readable.</p>
+      <p id="scenarioGuideSupportHint" class="sidebar-help-copy" data-i18n="Open this manual from the scenario bar or the Utilities panel. Both Guide buttons open the same help surface, so you can keep the next editing step visible while you work.">Open this manual from the scenario bar or the Utilities panel. Both Guide buttons open the same help surface, so you can keep the next editing step visible while you work.</p>
       <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
         <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
       </div>
-      <ol class="scenario-guide-list mt-2">
-        <li id="scenarioGuideStepApply" data-i18n="Apply Scenario">Apply Scenario</li>
-        <li id="scenarioGuideStepSelect" data-i18n="Select a country in Inspector">Select a country in Inspector</li>
-        <li id="scenarioGuideStepActive" data-i18n="Use an active owner for political actions">Use an active owner for political actions</li>
-        <li id="scenarioGuideStepApplyActions" data-i18n="Use Activate or Scenario Actions for ownership changes">Use Activate or Scenario Actions for ownership changes</li>
-      </ol>
+      <div id="scenarioGuideNav" class="scenario-guide-nav mt-3" role="tablist" aria-label="Guide sections" data-i18n-aria-label="Guide sections">
+        <button id="scenarioGuideTabQuick" type="button" class="scenario-guide-nav-btn is-active" data-guide-section="quick" role="tab" aria-selected="true" aria-controls="scenarioGuideSectionQuick" data-i18n="Quick path">Quick path</button>
+        <button id="scenarioGuideTabPrepare" type="button" class="scenario-guide-nav-btn" data-guide-section="prepare" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionPrepare" data-i18n="Before you edit">Before you edit</button>
+        <button id="scenarioGuideTabTools" type="button" class="scenario-guide-nav-btn" data-guide-section="tools" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionTools" data-i18n="Project tools">Project tools</button>
+        <button id="scenarioGuideTabChecks" type="button" class="scenario-guide-nav-btn" data-guide-section="checks" role="tab" aria-selected="false" aria-controls="scenarioGuideSectionChecks" data-i18n="Checks">Checks</button>
+      </div>
+      <div class="scenario-guide-manual mt-3">
+        <section id="scenarioGuideSectionQuick" class="scenario-guide-manual-section" data-guide-panel="quick" role="tabpanel" aria-labelledby="scenarioGuideTabQuick scenarioGuideQuickPathTitle">
+          <h4 id="scenarioGuideQuickPathTitle" class="scenario-guide-manual-title">Quick path / 快速路径</h4>
+          <p class="scenario-guide-manual-lead">Use this checklist when you want the shortest safe editing path. / 需要最短、最稳的编辑路径时，先按下面的顺序操作。</p>
+          <ol class="scenario-guide-list mt-2">
+            <li id="scenarioGuideStepApply" class="scenario-guide-step">
+              <strong>1. Apply Scenario / 应用场景</strong>
+              <span class="scenario-guide-step-line" lang="zh-CN">先应用场景，让 ownership、controller、support tools 和 project surfaces 进入同一套基线。</span>
+              <span class="scenario-guide-step-line" lang="en">Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.</span>
+            </li>
+            <li id="scenarioGuideStepSelect" class="scenario-guide-step">
+              <strong>2. Select the target country in Inspector / 在 Inspector 里选中目标国家</strong>
+              <span class="scenario-guide-step-line" lang="zh-CN">打开右侧 Inspector，先确认你正在查看的国家和想修改的国家是同一个对象。</span>
+              <span class="scenario-guide-step-line" lang="en">Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.</span>
+            </li>
+            <li id="scenarioGuideStepActive" class="scenario-guide-step">
+              <strong>3. Set the active owner / 设置 Active Owner</strong>
+              <span class="scenario-guide-step-line" lang="zh-CN">政治类操作会读取当前 Active Owner。真正落笔前，先确认上方状态条里的 Active 值正确。</span>
+              <span class="scenario-guide-step-line" lang="en">Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.</span>
+            </li>
+            <li id="scenarioGuideStepApplyActions" class="scenario-guide-step">
+              <strong>4. Use Activate or Scenario Actions / 使用 Activate 或 Scenario Actions</strong>
+              <span class="scenario-guide-step-line" lang="zh-CN">小范围切换用 Activate，批量或规则化调整用 Scenario Actions。做完一轮后，再看 View 和 Split 是否符合预期。</span>
+              <span class="scenario-guide-step-line" lang="en">Use Activate for focused ownership changes and Scenario Actions for broader rule-driven updates. After each pass, re-check the View and Split chips.</span>
+            </li>
+          </ol>
+        </section>
+
+        <section id="scenarioGuideSectionPrepare" class="scenario-guide-manual-section hidden" data-guide-panel="prepare" role="tabpanel" aria-labelledby="scenarioGuideTabPrepare scenarioGuidePreparationTitle" hidden>
+          <h4 id="scenarioGuidePreparationTitle" class="scenario-guide-manual-title">Before you edit / 开始前</h4>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN">如果你准备加载另一个 project file，先保存当前工作状态。加载项目会替换当前地图工作状态；当保存时使用的 scenario baseline 和当前资源不一致时，系统会先弹出确认提示。</p>
+            <p lang="en">Save the current working state before you load a different project file. Loading a project replaces the current map state, and the app prompts for confirmation when the saved scenario baseline differs from the current assets.</p>
+          </div>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN">Guide 可以从顶部 scenario bar 打开，也可以从 Project › Utilities 打开。两个按钮指向同一个面板，区别只在于你当时停留在哪个工作区。</p>
+            <p lang="en">You can open Guide from the top scenario bar or from Project › Utilities. Both buttons open the same panel; the only difference is which workspace you were using when you opened it.</p>
+          </div>
+        </section>
+
+        <section id="scenarioGuideSectionTools" class="scenario-guide-manual-section hidden" data-guide-panel="tools" role="tabpanel" aria-labelledby="scenarioGuideTabTools scenarioGuideProjectToolsTitle" hidden>
+          <h4 id="scenarioGuideProjectToolsTitle" class="scenario-guide-manual-title">Project tools in this tab / 这个 tab 里的项目工具</h4>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN"><strong>Project Management：</strong>下载当前地图状态，或从本地 JSON 恢复。适合在大改 ownership、frontline 或 overlays 之前做阶段性保存。</p>
+            <p lang="en"><strong>Project Management:</strong> Download the current map state or restore it from a local JSON file. Use it before major ownership, frontline, or overlay changes.</p>
+          </div>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN"><strong>Frontline：</strong>这里同时管理 derived frontline overlay 和 project-local strategic workspace。前者适合快速读 conflict edges，后者适合画 operational lines、graphics 和 unit counters。</p>
+            <p lang="en"><strong>Frontline:</strong> This section combines the derived frontline overlay with the project-local strategic workspace. Use the first for fast conflict-edge reading and the second for operational lines, graphics, and unit counters.</p>
+          </div>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN"><strong>Reference：</strong>上传本地图像后，按 opacity → scale → offset 的顺序对齐最稳。项目会保存这些对位参数，图像文件本身需要重新上传。</p>
+            <p lang="en"><strong>Reference:</strong> After you upload a local image, the most stable alignment order is opacity → scale → offsets. The project preserves the alignment values, while the image file itself must be uploaded again.</p>
+          </div>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN"><strong>Export：</strong>Open workbench 后，左侧处理图像调整，中间负责预览，右侧管理 layer order 和 text stacks。导出上限是 8K，同一时间只处理一个导出任务。</p>
+            <p lang="en"><strong>Export:</strong> After you open the workbench, the left column handles image adjustments, the center handles preview, and the right manages layer order and text stacks. Export is capped at 8K and only one export job runs at a time.</p>
+          </div>
+        </section>
+
+        <section id="scenarioGuideSectionChecks" class="scenario-guide-manual-section hidden" data-guide-panel="checks" role="tabpanel" aria-labelledby="scenarioGuideTabChecks scenarioGuideChecksTitle" hidden>
+          <h4 id="scenarioGuideChecksTitle" class="scenario-guide-manual-title">Success checks / 成功信号与常见漏项</h4>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN">状态条里的 <strong>Mode / View / Split</strong> 是最快的自检入口。它们和你预期一致时，通常说明当前编辑上下文正确。</p>
+            <p lang="en">The <strong>Mode / View / Split</strong> chips are the fastest self-check. When they match your expectation, the current editing context is usually correct.</p>
+          </div>
+          <div class="scenario-guide-bilingual-copy">
+            <p lang="zh-CN">如果操作结果看起来不对，优先检查三件事：场景是否已应用、Inspector 里的目标国家是否正确、Active Owner 是否已经切到你要写入的对象。</p>
+            <p lang="en">If a result looks wrong, check three things first: whether a scenario is applied, whether the Inspector is focused on the right country, and whether Active Owner already points to the target you want to write to.</p>
+          </div>
+        </section>
+      </div>
     </div>
     <div id="bootOverlay" class="boot-overlay" role="status" aria-live="polite" aria-busy="true">
       <div class="boot-overlay__panel">

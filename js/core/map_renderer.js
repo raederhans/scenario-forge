@@ -1851,6 +1851,7 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.showTransport ? "transport:on" : "transport:off",
       state.showAirports ? "airports:on" : "airports:off",
       state.showPorts ? "ports:on" : "ports:off",
+      state.showRail ? "rail:on" : "rail:off",
       `cities:${Number(state.cityLayerRevision || 0)}`,
       `colors:${Number(state.colorRevision || 0)}`,
       `context:${Number(state.contextLayerRevision || 0)}`,
@@ -14033,6 +14034,18 @@ function getTransportPortScopeThreshold(scope) {
   return 2;
 }
 
+function getTransportRailScopeThreshold(scope) {
+  const normalized = String(scope || "").trim().toLowerCase();
+  return normalized === "mainline_only" ? 1 : 2;
+}
+
+function getTransportRailRevealRankThreshold(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "primary") return 1;
+  if (normalized === "secondary") return 2;
+  return 3;
+}
+
 function getTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
   return ColorManager.normalizeHexColor(String(value || "").trim()) || fallback;
 }
@@ -14062,6 +14075,66 @@ function getTransportOverviewPortVisualStyle(primaryColor, visualStrength) {
   return buildTransportFacilityVisualStyle(primaryColor, visualStrength, "#b45309");
 }
 
+function getTransportOverviewRailVisualStyle(primaryColor, visualStrength) {
+  const resolvedPrimaryColor = getTransportOverviewPrimaryColor(primaryColor, "#0f172a");
+  const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.5, 0, 1);
+  return {
+    mainlineStroke: mixCanvasColors(resolvedPrimaryColor, "#020617", 0.35) || resolvedPrimaryColor,
+    regionalStroke: mixCanvasColors(resolvedPrimaryColor, "#cbd5e1", 0.38) || resolvedPrimaryColor,
+    mainlineWidth: 1.4 + (strength * 1.3),
+    regionalWidth: 0.8 + (strength * 0.75),
+    mainlineOpacity: 0.74 + (strength * 0.26),
+    regionalOpacity: 0.42 + (strength * 0.22),
+  };
+}
+
+function getTransportRailLabelGridSize(labelDensity) {
+  switch (String(labelDensity || "").trim().toLowerCase()) {
+    case "dense":
+      return 112;
+    case "sparse":
+      return 176;
+    default:
+      return 144;
+  }
+}
+
+function buildProjectedRailLines(geometry) {
+  if (!projection || !geometry || typeof geometry !== "object") return [];
+  const rawLines = geometry.type === "LineString"
+    ? [geometry.coordinates || []]
+    : geometry.type === "MultiLineString"
+      ? (geometry.coordinates || [])
+      : [];
+  return rawLines
+    .map((line) => (Array.isArray(line) ? line : []).map((coord) => projection(coord)).filter((point) => Array.isArray(point) && point.length >= 2 && Number.isFinite(point[0]) && Number.isFinite(point[1])))
+    .filter((line) => line.length >= 2);
+}
+
+function measureProjectedLineSetLength(lines) {
+  let total = 0;
+  (Array.isArray(lines) ? lines : []).forEach((line) => {
+    for (let index = 1; index < line.length; index += 1) {
+      const previous = line[index - 1];
+      const current = line[index];
+      total += Math.hypot(
+        Number(current?.[0] || 0) - Number(previous?.[0] || 0),
+        Number(current?.[1] || 0) - Number(previous?.[1] || 0),
+      );
+    }
+  });
+  return total;
+}
+
+function getRailFeatureLabelAnchor(feature) {
+  const geometry = feature?.geometry;
+  if (!geometry || typeof geometry !== "object") return null;
+  if (geometry.type === "LineString") {
+    return getLineMidpointFromCoordinates(Array.isArray(geometry.coordinates) ? geometry.coordinates : []);
+  }
+  return getMultiLineLabelAnchor(geometry, "midpoint");
+}
+
 function getTransportOverviewAirportLabelText(properties = {}, mode = "both") {
   const name = String(properties.name || "").trim();
   const code = String(properties.iata || properties.icao || "").trim();
@@ -14078,6 +14151,13 @@ function getTransportOverviewPortLabelText(properties = {}, mode = "mixed") {
   if (normalized === "cargo_focus") return designation || name;
   if (normalized === "name") return name || designation;
   return designation && name ? `${name} · ${designation}` : (name || designation);
+}
+
+function getTransportOverviewRailLabelText(properties = {}, mode = "name") {
+  const name = String(properties.name || "").trim();
+  const normalized = String(mode || "").trim().toLowerCase();
+  if (normalized === "ref") return name;
+  return name;
 }
 
 function buildContextFacilityEntries(
@@ -14342,6 +14422,203 @@ function drawPortsLayer(k, { interactive = false } = {}) {
     hoverScale: visualStyle.hoverScale,
     highlightStroke: visualStyle.highlightStroke,
     getLabelText: (properties) => getTransportOverviewPortLabelText(properties, portConfig.labelMode),
+  });
+}
+
+function drawRailwaysLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  const visible = !!state.showTransport && !!state.showRail;
+  const collection = state.railwaysData;
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  if (!visible) {
+    collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "hidden",
+    });
+    return;
+  }
+  if (interactive) {
+    collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: true,
+      skipped: true,
+      reason: "interactive-pass",
+    });
+    return;
+  }
+  if (!collection?.features?.length || !pathCanvas) {
+    collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !pathCanvas ? "no-path" : "no-data",
+    });
+    return;
+  }
+  const railConfig = getTransportOverviewFamilyConfig("rail");
+  const minimumScopeRank = getTransportRailScopeThreshold(railConfig.scope);
+  const maximumRevealRank = getTransportRailRevealRankThreshold(railConfig.importanceThreshold);
+  const visualStyle = getTransportOverviewRailVisualStyle(railConfig.primaryColor, railConfig.visualStrength);
+  const featuresByClass = {
+    regional: [],
+    mainline: [],
+  };
+  const labelCandidates = [];
+  collection.features.forEach((feature) => {
+    const properties = feature?.properties || {};
+    const lineClass = String(properties.class || "").trim().toLowerCase();
+    const revealRank = Math.max(1, Math.round(Number(properties.reveal_rank || (lineClass === "mainline" ? 1 : 2))));
+    if (revealRank > maximumRevealRank) return;
+    if (minimumScopeRank <= 1 && lineClass !== "mainline") return;
+    if (lineClass === "mainline") {
+      featuresByClass.mainline.push(feature);
+    } else if (lineClass === "regional") {
+      featuresByClass.regional.push(feature);
+    } else {
+      return;
+    }
+
+    const label = getTransportOverviewRailLabelText(properties, railConfig.labelMode);
+    if (!label || !railConfig.labelsEnabled) return;
+    const anchorGeo = getRailFeatureLabelAnchor(feature);
+    if (!Array.isArray(anchorGeo) || anchorGeo.length < 2) return;
+    const anchorProjected = projection(anchorGeo);
+    if (!Array.isArray(anchorProjected) || anchorProjected.length < 2 || !Number.isFinite(anchorProjected[0]) || !Number.isFinite(anchorProjected[1])) return;
+    const projectedLines = buildProjectedRailLines(feature.geometry);
+    const projectedLength = measureProjectedLineSetLength(projectedLines);
+    const minimumProjectedLength = lineClass === "mainline" ? 110 : 72;
+    if (projectedLength < minimumProjectedLength) return;
+    labelCandidates.push({
+      label,
+      lineClass,
+      projectedLength,
+      x: anchorProjected[0],
+      y: anchorProjected[1],
+    });
+  });
+  const stationCollection = state.railStationsMajorData;
+  const stationFeatureCount = getFeatureCollectionFeatureCount(stationCollection);
+  if (Array.isArray(stationCollection?.features) && stationCollection.features.length) {
+    drawContextFacilityPointLayer("drawRailStationsMajorLayer", stationCollection, k, {
+      familyId: "rail",
+      interactive,
+      visible,
+      thresholdRank: 1,
+      shape: "square",
+      fillStyle: visualStyle.regionalStroke,
+      strokeStyle: mixCanvasColors(visualStyle.regionalStroke, "#ffffff", 0.7) || "#ffffff",
+      labelColor: visualStyle.mainlineStroke,
+      opacity: clamp(Number(railConfig.opacity ?? 0.72), 0, 1) * 0.9,
+      labelsEnabled: false,
+      radiusScale: 0.92,
+      strokeScale: 0.95,
+      hoverScale: 1.1,
+      highlightStroke: "#ffffff",
+      getLabelText: null,
+    });
+  } else {
+    collectContextMetric("drawRailStationsMajorLayer", 0, {
+      featureCount: stationFeatureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: visible ? "no-data" : "hidden",
+    });
+  }
+  const labelZoomConfig = getTransportOverviewLabelZoomConfig("rail", railConfig.labelDensity);
+  const labelsEnabled = !!railConfig.labelsEnabled;
+  const visibleLabelEntries = [];
+  if (labelsEnabled) {
+    const gridSize = getTransportRailLabelGridSize(railConfig.labelDensity);
+    const usedBuckets = new Set();
+    labelCandidates
+      .filter((entry) => entry.lineClass === "mainline" ? k >= labelZoomConfig.nationalLabelScale : k >= labelZoomConfig.regionalLabelScale)
+      .sort((left, right) => {
+        if (left.lineClass !== right.lineClass) return left.lineClass === "mainline" ? -1 : 1;
+        return right.projectedLength - left.projectedLength;
+      })
+      .forEach((entry) => {
+        const bucketKey = `${Math.round(entry.x / gridSize)}:${Math.round(entry.y / gridSize)}:${entry.lineClass}`;
+        if (usedBuckets.has(bucketKey)) return;
+        usedBuckets.add(bucketKey);
+        visibleLabelEntries.push(entry);
+      });
+    }
+  });
+  const visibleFeatureCount = featuresByClass.mainline.length + featuresByClass.regional.length;
+  if (!visibleFeatureCount) {
+    collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "filtered",
+    });
+    return;
+  }
+
+  const drawFeatureSet = (features, strokeStyle, lineWidth, opacity) => {
+    if (!features.length || !(opacity > 0) || !(lineWidth > 0)) return;
+    context.save();
+    context.globalAlpha = clamp(Number(railConfig.opacity ?? 0.72), 0, 1) * opacity;
+    context.strokeStyle = strokeStyle;
+    context.lineWidth = lineWidth / Math.max(0.0001, Number(k || 1));
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    features.forEach((feature) => {
+      context.beginPath();
+      pathCanvas(feature);
+      context.stroke();
+    });
+    context.restore();
+  };
+
+  drawFeatureSet(
+    featuresByClass.regional,
+    visualStyle.regionalStroke,
+    visualStyle.regionalWidth,
+    visualStyle.regionalOpacity,
+  );
+  drawFeatureSet(
+    featuresByClass.mainline,
+    visualStyle.mainlineStroke,
+    visualStyle.mainlineWidth,
+    visualStyle.mainlineOpacity,
+  );
+
+  let labelCount = 0;
+  if (visibleLabelEntries.length) {
+    context.save();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    visibleLabelEntries.forEach((entry) => {
+      context.font = `${entry.lineClass === "mainline" ? 600 : 500} ${entry.lineClass === "mainline" ? 10.5 : 9.5}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
+      context.lineWidth = 3;
+      context.strokeStyle = "rgba(255,255,255,0.9)";
+      context.fillStyle = visualStyle.mainlineStroke;
+      context.strokeText(entry.label, entry.x, entry.y);
+      context.fillText(entry.label, entry.x, entry.y);
+      labelCount += 1;
+    });
+    context.restore();
+  }
+
+  collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
+    featureCount,
+    visibleFeatureCount,
+    labelCount,
+    interactive: !!interactive,
+    skipped: false,
   });
 }
 
@@ -17320,6 +17597,12 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         skipped: true,
         reason: "staged-apply",
       });
+      collectContextMetric("drawRailwaysLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.railwaysData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
       collectContextMetric("drawPortsLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(state.portsData),
         interactive: false,
@@ -17373,6 +17656,7 @@ function drawContextMarkersPass(k, { interactive = false } = {}) {
         reason: "staged-apply",
       });
     } else {
+      drawRailwaysLayer(k, { interactive });
       drawAirportsLayer(k, { interactive });
       drawPortsLayer(k, { interactive });
       if (interactive) {

@@ -29,9 +29,9 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn('id="scenarioGuidePopover"', content)
         self.assertIn('id="scenarioGuideCloseBtn"', content)
         self.assertIn("scenario-guide-modal", content)
-        self.assertIn("Use this guide inside the support area so the shell stays quiet while the next step stays readable.", content)
-        self.assertIn("Keep a working reference visible while you line up opacity, scale, and offsets.", content)
-        self.assertIn("Open the export workbench to choose target, layer order, format, and resolution.", content)
+        self.assertIn("Open this manual from the scenario bar or the Utilities panel. Both Guide buttons open the same help surface, so you can keep the next editing step visible while you work.", content)
+        self.assertIn("Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.", content)
+        self.assertIn("Open the export workbench to preview the map, reorder layers, tune image adjustments, choose the target format, and export up to the current 8K limit.", content)
         self.assertNotIn("lblExportInfoTooltip", content)
 
     def test_transport_shell_uses_phase03_titles_and_status_contract(self):

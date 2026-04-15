@@ -36,6 +36,8 @@ const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
 const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
+const GLOBAL_RAIL_CATALOG_URL = "data/transport_layers/global_rail/catalog.json";
+let globalRailContextCollectionsPromise = null;
 const CONTEXT_LAYER_PACKS = {
   airports: { url: "data/transport_layers/japan_airport/airports.geojson", format: "geojson" },
   ports: { url: "data/transport_layers/japan_port/ports.geojson", format: "geojson" },
@@ -565,6 +567,53 @@ function normalizeRequestedContextLayerNames(includeContextLayers) {
 async function loadContextLayerPackInternal(layerName, d3Client) {
   if (layerName === "rivers") {
     return loadRiversFallbackCollection(d3Client);
+  }
+  if (layerName === "railways" || layerName === "rail_stations_major") {
+    if (!globalThis.topojson || typeof globalThis.topojson.feature !== "function") {
+      console.warn("[data_loader] topojson-client unavailable. Ignoring railways deferred load.");
+      return null;
+    }
+    globalRailContextCollectionsPromise ||= (async () => {
+      const catalog = await d3Client.json(GLOBAL_RAIL_CATALOG_URL);
+      const entries = Array.isArray(catalog?.entries) ? catalog.entries : [];
+      const railFeatures = [];
+      const stationFeatures = [];
+      for (const entry of entries) {
+        const manifestPath = String(entry?.manifest_path || "").trim();
+        if (!manifestPath) continue;
+        const manifest = await d3Client.json(manifestPath);
+        const railwaysPath = String(manifest?.paths?.preview?.railways || "").trim();
+        if (railwaysPath && Number(entry?.feature_counts?.preview?.railways || 0) > 0) {
+          const topology = await d3Client.json(railwaysPath);
+          const railwaysObject = topology?.objects?.railways;
+          const railwaysCollection = railwaysObject ? globalThis.topojson.feature(topology, railwaysObject) : null;
+          if (Array.isArray(railwaysCollection?.features) && railwaysCollection.features.length) {
+            railFeatures.push(...railwaysCollection.features);
+          }
+        }
+        const stationsPath = String(manifest?.paths?.preview?.rail_stations_major || "").trim();
+        if (stationsPath) {
+          const stationsCollection = await d3Client.json(stationsPath);
+          if (Array.isArray(stationsCollection?.features) && stationsCollection.features.length) {
+            stationFeatures.push(...stationsCollection.features);
+          }
+        }
+      }
+      return {
+        railways: { type: "FeatureCollection", features: railFeatures },
+        rail_stations_major: { type: "FeatureCollection", features: stationFeatures },
+      };
+    })().catch((error) => {
+      globalRailContextCollectionsPromise = null;
+      throw error;
+    });
+    try {
+      const collections = await globalRailContextCollectionsPromise;
+      return collections?.[layerName] || null;
+    } catch (err) {
+      console.warn("[data_loader] Global rail catalog or shard payload missing/invalid. Ignoring rail runtime pack.", err);
+      return null;
+    }
   }
   const descriptor = CONTEXT_LAYER_PACKS[layerName];
   if (!descriptor) {

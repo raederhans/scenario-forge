@@ -1,6 +1,0 @@
-{
-  "last_turn_at": "2026-04-15T21:47:33.341Z",
-  "last_progress_at": "2026-04-15T21:47:33.341Z",
-  "turn_count": 34,
-  "last_agent_output": "结论：最短路径是保留现在的 `bbox intersects` 只做粗筛，把“唯一归属”收口到 `map_batch_rows()` 这一层，再在 `main()` 里先用 `--shard` 反查所"
-}

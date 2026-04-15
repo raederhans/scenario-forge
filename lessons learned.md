@@ -728,3 +728,20 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 63. manifest 输出层级一旦改成嵌套目录，共享 contract discovery 必须同波次递归化
 - 这次 rail manifest 从顶层 family 目录移到 `regions/.../shards/...` 后，旧的单层 `glob("*/manifest.json")` 会直接把全部新产物漏掉。
 - 更稳的做法是：manifest discovery 只保留一个递归 helper，CLI 和测试都复用它，避免工具修好了但测试还在偷跑旧发现逻辑。
+### 64. preview shard 总量足够小时，runtime 优先一次性 lazy load 全部 preview，而不是提前做 viewport shard 调度
+- 这次 global rail preview 全部 shard 加起来只有约 5 MB，如果一上来就做视口分片切换，会把 runtime、缓存、边界状态和测试复杂度一起拉高。
+- 更稳的最短路径是：继续保持不进 startup eager loader，但首次打开 family 时一次性拉全 preview shards，等真实性能压力出现再升级成 viewport shard 调度。
+
+### 65. 分阶段开放 runtime 时，要用测试把“主地图已开 / save-load 未开”这个边界钉死
+- 这次 rail runtime 接入只开放了主地图显示和 UI 开关，如果不额外补静态断言，很容易顺手把 `showRail` 漏进 file_manager 或 project import/export。
+- 更稳的做法是：在同一波里补一条边界测试，明确允许 state/toolbar/renderer 出现 `showRail`，但 file_manager 和 interaction_funnel 仍不许接它。
+### 66. 共享阈值 helper 不能直接套到 reveal_rank 语义不同的交通家族上
+- 这次 rail 的 manual threshold 如果直接复用机场/港口那套 `primary=3 / secondary=2 / all=1` 的重要度映射，会把 `all` 误变成最窄选项，因为 rail 这边的 `reveal_rank` 是数字越大范围越宽。
+- 更稳的做法是：遇到不同家族字段语义不一致时，单独建 family-specific threshold helper，不要为了省事强行共用一套排序。
+
+### 67. placeholder 数据家族一旦接进 runtime，返回值要稳定是空集合，不要在无数据时退回 null
+- 这次 `rail_stations_major` 当前真实数据还是空，如果 loader 返回 `null`，UI 和渲染层就会分不清“链路没接上”和“链路已接通但暂时为空”。
+- 更稳的做法是：占位数据也返回 `FeatureCollection(features=[])`，这样运行链能先接通，后面换成真实数据时不用再改状态语义。
+### 68. 带结构的帮助面板一旦继续挂在 id 级 i18n 覆写表上，初始化时整块 rich content 会被 textContent 直接抹平
+- 这次 Scenario Guide 从 4 条短步骤升级成章节式双语手册后，如果还保留 `scenarioGuideStep*` 在 `uiMap` 里，i18n 初始化会把 `<li>` 里的所有子节点整块覆盖掉。
+- 更稳的做法是：章节式 manual 用独立容器或独立 renderer，rich content 节点不要继续放进按 id 直接覆写 `textContent` 的翻译绑定表。

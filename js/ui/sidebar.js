@@ -1384,7 +1384,7 @@ function initSidebar({ render } = {}) {
     const hint = document.createElement("p");
     hint.id = "lblProjectHint";
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Save or load your map state as a project file.", "ui");
+    hint.textContent = t("Save the current map state as a project file or restore one from disk. Loading a project replaces the current working state, and the app asks before continuing when the saved scenario baseline differs from the current assets.", "ui");
 
     const actions = document.createElement("div");
     actions.className = "mt-3 flex flex-col gap-2";
@@ -1449,7 +1449,7 @@ function initSidebar({ render } = {}) {
     const hint = document.createElement("p");
     hint.id = "lblLegendHint";
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Paint regions to generate a legend.", "ui");
+    hint.textContent = t("Paint the map first, then rename each color entry here. Empty names clear the label, and the current legend list is kept inside this working session.", "ui");
 
     const list = document.createElement("div");
     list.id = "legendEditorList";
@@ -7258,7 +7258,7 @@ function initSidebar({ render } = {}) {
     if (!colors.length) {
       const empty = document.createElement("div");
       empty.className = "legend-empty-state";
-      empty.textContent = t("Paint regions to generate a legend.", "ui");
+      empty.textContent = t("Paint the map first, then rename each color entry here. Empty names clear the label, and the current legend list is kept inside this working session.", "ui");
       legendList.appendChild(empty);
       return;
     }
