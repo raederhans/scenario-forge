@@ -426,6 +426,14 @@ const CITY_COUNTRY_TIER_RANK = {
   D: 2,
   E: 1,
 };
+const CITY_COUNTRY_CLASS_RANK = Object.freeze({
+  global_core: 6,
+  regional_core: 5,
+  local_actor: 4,
+  fragmented_actor: 3,
+  micro: 2,
+  micro_subject: 1,
+});
 const CITY_COUNTRY_CLASS_WEIGHT = Object.freeze({
   global_core: 1.36,
   regional_core: 1.2,
@@ -585,17 +593,25 @@ const CITY_REVEAL_PHASES = [
   { id: "P0", minScale: 0, maxScale: 1.15, markerBudget: 18, labelBudget: 0 },
   { id: "P1", minScale: 1.15, maxScale: 1.45, markerBudget: 28, labelBudget: 0 },
   { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 0 },
-  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 0 },
+  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 8 },
   { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
   { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
 ];
 const CITY_MARKER_QUOTAS_BY_PHASE = Object.freeze({
-  P0: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 0 }),
+  P0: Object.freeze({ A: 1, B: 0, C: 0, D: 0, E: 0 }),
   P1: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 1 }),
-  P2: Object.freeze({ A: 3, B: 1, C: 0, D: 0, E: 0 }),
+  P2: Object.freeze({ A: 3, B: 1, C: 1, D: 1, E: 1 }),
   P3: Object.freeze({ A: 4, B: 2, C: 1, D: 1, E: 1 }),
   P4: Object.freeze({ A: 6, B: 4, C: 2, D: 1, E: 1 }),
   P5: Object.freeze({ A: 8, B: 6, C: 4, D: 2, E: 1 }),
+});
+const CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE = Object.freeze({
+  P0: 0.5,
+  P1: 0.5,
+  P2: 0.3,
+  P3: 0.3,
+  P4: 0,
+  P5: 0,
 });
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
@@ -11887,9 +11903,6 @@ function getCityCountryTierFromScenarioRecord(profile, record, { defaultCountry 
 
 function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
   const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
-  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
-    return "fragmented_actor";
-  }
   const controllerFeatureCount = Math.max(
     0,
     Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? 0) || 0
@@ -11901,6 +11914,9 @@ function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", f
   const entryKind = String(record?.entry_kind || record?.entryKind || "").trim().toLowerCase();
   const isSubject = !!parentOwnerTag || entryKind === "scenario_subject";
   if (isSubject) return "micro_subject";
+  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
+    return "fragmented_actor";
+  }
   if (isFeatured || controllerFeatureCount >= 120 || profileFeatureCount >= 200) return "global_core";
   if (controllerFeatureCount >= 40 || profileFeatureCount >= 80) return "regional_core";
   if (controllerFeatureCount >= 8 || profileFeatureCount >= 16) return "local_actor";
@@ -12036,6 +12052,10 @@ function getCityCountryProfileIndex(cityCollection) {
   profiles.forEach((profile) => {
     const record = profile.scenarioTag ? state.scenarioCountriesByTag?.[profile.scenarioTag] : null;
     const revealOverride = getCityCountryRevealOverride(record);
+    const isDefaultCountry = !!profile.scenarioTag && profile.scenarioTag === defaultCountry;
+    const isFeaturedCountry = !!record?.featured || featuredTags.has(profile.scenarioTag);
+    const isPrimaryPower = CITY_PRIMARY_POWER_TAGS.has(profile.scenarioTag);
+    const isSecondaryPower = CITY_SECONDARY_POWER_TAGS.has(profile.scenarioTag);
     profile.controllerFeatureCount = Math.max(
       0,
       Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? profile.featureCount ?? 0) || 0
@@ -12048,9 +12068,19 @@ function getCityCountryProfileIndex(cityCollection) {
       defaultCountry,
       featuredTags,
     });
+    profile.countryClassRank = CITY_COUNTRY_CLASS_RANK[profile.countryClass] || 0;
     profile.classWeightBias = Number(revealOverride.classWeightBias || 0);
     profile.minQuotaFloorBoost = Number(revealOverride.minQuotaFloorBoost || 0);
     profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
+    profile.isDefaultCountry = isDefaultCountry;
+    profile.isFeaturedCountry = isFeaturedCountry;
+    profile.isPrimaryPower = isPrimaryPower;
+    profile.isSecondaryPower = isSecondaryPower;
+    profile.isPriorityCountry = (
+      isDefaultCountry
+      || isPrimaryPower
+      || isSecondaryPower
+    );
   });
 
   cityCountryProfileCache.set(cityCollection, profiles);
@@ -12141,7 +12171,9 @@ function getCityInterpolatedRevealBucket(entry, scale) {
     return currentBucket + ((nextBucket - currentBucket) * t);
   }
   if (!Number.isFinite(currentBucket) && Number.isFinite(nextBucket)) {
-    return t >= 0.68 ? nextBucket + ((1 - t) * 0.5) : Number.POSITIVE_INFINITY;
+    const seed = `${String(entry?.cityId || "")}:${currentPhase.id}:${nextPhase.id}`;
+    const threshold = clamp(0.7 + (getSignedHashUnit(seed) * 0.12), 0.58, 0.82);
+    return t >= threshold ? nextBucket + ((1 - t) * 0.5) : Number.POSITIVE_INFINITY;
   }
   return currentBucket;
 }
@@ -12227,11 +12259,8 @@ function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1, viewpor
   const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
   const fromQuota = Number(getCityMarkerQuotaForTier(currentPhase.id, countryTier) || 0);
   const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) || fromQuota);
-  const viewportMultiplier = getCityViewportQuotaMultiplier(entry, viewportStats);
-  const interpolated = (fromQuota + ((toQuota - fromQuota) * t)) * viewportMultiplier;
-  const scaledInterpolated = scaleCityMarkerQuota(interpolated, markerDensity);
-  const sizeFloor = getCitySizeQuotaFloor(entry, scale, markerDensity);
-  return Math.max(scaledInterpolated, sizeFloor);
+  const interpolated = fromQuota + ((toQuota - fromQuota) * t);
+  return scaleCityMarkerQuota(interpolated, markerDensity);
 }
 
 function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
@@ -12242,20 +12271,89 @@ function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
   return Math.max(0, Math.round(interpolated * clamp(Number(markerDensity) || 1, 0.5, 2)));
 }
 
-function compareCityRevealEntries(left, right) {
+function getCityRevealCompetitionBand(phaseId = "") {
+  if (phaseId === "P0" || phaseId === "P1") return "low";
+  if (phaseId === "P2" || phaseId === "P3") return "mid";
+  return "high";
+}
+
+function getCityCountryClassScore(entry) {
+  const className = String(entry?.countryClass || "micro").trim().toLowerCase();
+  const rank = Number(entry?.countryClassRank || CITY_COUNTRY_CLASS_RANK[className] || 0);
+  const bias = clamp(Number(entry?.countryClassWeightBias || 0) || 0, -0.35, 0.75);
+  return rank + bias;
+}
+
+function getCityPriorityCountryReserveBudget(scale, markerBudget) {
+  const normalizedBudget = Math.max(0, Number(markerBudget) || 0);
+  if (normalizedBudget <= 0) return 0;
+  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
+  const fromShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[currentPhase.id] || 0);
+  const toShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[nextPhase.id] || fromShare);
+  const share = clamp(fromShare + ((toShare - fromShare) * t), 0, 0.5);
+  return Math.min(normalizedBudget, Math.max(0, Math.round(normalizedBudget * share)));
+}
+
+function getCityPriorityCountryReserveRank(entry) {
+  let score = 0;
+  if (entry?.isDefaultCountry) score += 600;
+  if (entry?.isPrimaryPower) score += 520;
+  if (entry?.isFeaturedCountry) score += 360;
+  if (entry?.isSecondaryPower) score += 260;
+  score += Number(entry?.countryTierRank || 0) * 24;
+  score += getCityCountryClassScore(entry) * 8;
+  if (entry?.feature?.properties?.__city_is_country_capital) score += 18;
+  return score;
+}
+
+function getCityViewportCenterDistanceNorm(entry) {
+  const point = Array.isArray(entry?.screenPoint) ? entry.screenPoint : null;
+  if (!point || point.length < 2) return 1;
+  const centerX = Number(state.width || 0) * 0.5;
+  const centerY = Number(state.height || 0) * 0.5;
+  const maxDistance = Math.max(1, Math.hypot(centerX + 48, centerY + 48));
+  return clamp(Math.hypot(Number(point[0] || 0) - centerX, Number(point[1] || 0) - centerY) / maxDistance, 0, 1);
+}
+
+function compareCityRevealEntries(left, right, phaseId = "P0") {
   const leftBucket = Number(left?.revealBucket ?? Number.POSITIVE_INFINITY);
   const rightBucket = Number(right?.revealBucket ?? Number.POSITIVE_INFINITY);
   if (leftBucket !== rightBucket) return leftBucket - rightBucket;
+  const competitionBand = getCityRevealCompetitionBand(phaseId);
   const leftCountryRank = Number(left?.countryTierRank || 0);
   const rightCountryRank = Number(right?.countryTierRank || 0);
-  if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
-  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
   const leftTierWeight = Number(left?.cityTierWeight || 0);
   const rightTierWeight = Number(right?.cityTierWeight || 0);
-  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
   const leftPopulation = Math.max(0, Number(left?.population || 0));
   const rightPopulation = Math.max(0, Number(right?.population || 0));
+  const leftCenterDistance = Number(left?.centerDistanceNorm ?? 1);
+  const rightCenterDistance = Number(right?.centerDistanceNorm ?? 1);
+  const leftCountryClassScore = getCityCountryClassScore(left);
+  const rightCountryClassScore = getCityCountryClassScore(right);
+
+  if (competitionBand === "low") {
+    if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+    if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+  } else {
+    if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+    if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
+    if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
+    if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
+    if (competitionBand === "mid") {
+      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    } else {
+      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
+      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
+    }
+  }
+  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
   if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
+  if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
   return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
 }
 
@@ -12271,6 +12369,9 @@ function getCityLabelBudget(phase, config = {}) {
 
 function isCityLabelEligibleForPhase(entry, phaseId) {
   const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  if (String(phaseId || "P0") === "P3") {
+    return !!entry?.isCapital;
+  }
   if (String(phaseId || "P0") === "P4") {
     return !!entry?.isCapital || cityTier === "major";
   }
@@ -12474,6 +12575,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   const countsByCountry = new Map();
   const markerDensity = getCityMarkerDensityMultiplier(config);
   const markerBudget = getCityInterpolatedMarkerBudget(scale, markerDensity);
+  const priorityReserveBudget = getCityPriorityCountryReserveBudget(scale, markerBudget);
   const labelBudget = getCityLabelBudget(phase, config);
   const labelEntries = [];
 
@@ -12491,8 +12593,14 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         maxPopulation: 0,
         controllerFeatureCount: 0,
         countryClass: "micro",
+        countryClassRank: CITY_COUNTRY_CLASS_RANK.micro,
         classWeightBias: 0,
         minQuotaFloorBoost: 0,
+        isDefaultCountry: false,
+        isFeaturedCountry: false,
+        isPrimaryPower: false,
+        isSecondaryPower: false,
+        isPriorityCountry: false,
       };
       const scenarioTag = String(profile.scenarioTag || getCityScenarioTag(feature) || "").trim().toUpperCase();
       if (isCityScenarioTagExcludedFromReveal(scenarioTag)) {
@@ -12522,16 +12630,24 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         countryControllerFeatureCount: Math.max(0, Number(profile.controllerFeatureCount || profile.featureCount || 0)),
         countryMaxPopulation: Math.max(0, Number(profile.maxPopulation || 0)),
         countryClass: String(profile.countryClass || "micro").trim().toLowerCase(),
+        countryClassRank: Number(profile.countryClassRank || CITY_COUNTRY_CLASS_RANK.micro),
         countryClassWeightBias: Number(profile.classWeightBias || 0),
         countryMinQuotaFloorBoost: Number(profile.minQuotaFloorBoost || 0),
+        isDefaultCountry: !!profile.isDefaultCountry,
+        isFeaturedCountry: !!profile.isFeaturedCountry,
+        isPrimaryPower: !!profile.isPrimaryPower,
+        isSecondaryPower: !!profile.isSecondaryPower,
+        isPriorityCountry: !!profile.isPriorityCountry,
         population: Math.max(0, Number(feature?.properties?.__city_population || 0)),
         sortWeight: getCitySortWeight(feature),
         urbanMatchId: urbanInfo.urbanMatchId,
         urbanFeature: urbanInfo.urbanFeature,
         hasUrbanMatch: urbanInfo.hasUrbanMatch,
         urbanMatchMethod: urbanInfo.urbanMatchMethod,
+        centerDistanceNorm: 1,
         acceptedLabelPlacement: "",
       };
+      entry.centerDistanceNorm = getCityViewportCenterDistanceNorm(entry);
       entry.revealBucket = getCityInterpolatedRevealBucket(entry, scale);
       if (!Number.isFinite(entry.revealBucket)) {
         return null;
@@ -12539,39 +12655,45 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
       return entry;
     })
     .filter(Boolean)
-    .sort(compareCityRevealEntries);
-  const viewportStats = buildCityViewportCountryStats(candidateEntries);
+    .sort((left, right) => compareCityRevealEntries(left, right, phase.id));
 
-  const capitalEntriesByCountry = new Map();
+  const priorityCapitalEntriesByCountry = new Map();
   candidateEntries.forEach((entry) => {
-    if (!entry.isCapital || capitalEntriesByCountry.has(entry.countryKey)) {
+    if (!entry.isCapital || !entry.isPriorityCountry) {
       return;
     }
-    capitalEntriesByCountry.set(entry.countryKey, entry);
+    const existing = priorityCapitalEntriesByCountry.get(entry.countryKey);
+    if (!existing || compareCityRevealEntries(entry, existing, phase.id) < 0) {
+      priorityCapitalEntriesByCountry.set(entry.countryKey, entry);
+    }
   });
   const acceptedCityIds = new Set();
-  capitalEntriesByCountry.forEach((entry) => {
-    const currentCount = countsByCountry.get(entry.countryKey) || 0;
-    const quota = Math.max(
-      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
-      1
-    );
-    if (currentCount >= quota) return;
-    entry.markerSizePx = getCityMarkerSizePx(entry, config);
-    markerEntries.push(entry);
-    countsByCountry.set(entry.countryKey, currentCount + 1);
-    acceptedCityIds.add(entry.cityId);
-  });
-  const effectiveMarkerBudget = Math.max(markerBudget, markerEntries.length);
+  Array.from(priorityCapitalEntriesByCountry.values())
+    .sort((left, right) => {
+      const leftRank = getCityPriorityCountryReserveRank(left);
+      const rightRank = getCityPriorityCountryReserveRank(right);
+      if (leftRank !== rightRank) return rightRank - leftRank;
+      if (left.population !== right.population) return right.population - left.population;
+      return String(left.cityId || "").localeCompare(String(right.cityId || ""));
+    })
+    .some((entry) => {
+      if (markerEntries.length >= markerBudget || markerEntries.length >= priorityReserveBudget) {
+        return true;
+      }
+      const currentCount = countsByCountry.get(entry.countryKey) || 0;
+      if (currentCount >= 1) return false;
+      entry.markerSizePx = getCityMarkerSizePx(entry, config);
+      markerEntries.push(entry);
+      countsByCountry.set(entry.countryKey, currentCount + 1);
+      acceptedCityIds.add(entry.cityId);
+      return false;
+    });
 
   for (const entry of candidateEntries) {
-    if (markerEntries.length >= effectiveMarkerBudget) break;
+    if (markerEntries.length >= markerBudget) break;
     if (acceptedCityIds.has(entry.cityId)) continue;
     const currentCount = countsByCountry.get(entry.countryKey) || 0;
-    const quota = Math.max(
-      getCityInterpolatedMarkerQuota(entry, scale, markerDensity, viewportStats),
-      entry.isCapital ? 1 : 0
-    );
+    const quota = getCityInterpolatedMarkerQuota(entry, scale, markerDensity);
     if (currentCount >= quota) continue;
     entry.markerSizePx = getCityMarkerSizePx(entry, config);
     markerEntries.push(entry);
@@ -12582,7 +12704,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   if (config.showLabels && !state.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
     markerEntries
       .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
-      .sort(compareCityRevealEntries)
+      .sort((left, right) => compareCityRevealEntries(left, right, phase.id))
       .some((entry) => {
         if (scale < Math.max(Number(config.labelMinZoom || 0), Number(entry.minZoom || 0))) {
           return false;
@@ -12594,6 +12716,8 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
 
   return {
     phase,
+    markerBudget,
+    priorityReserveBudget,
     markerEntries,
     labelEntries,
     candidateEntries,

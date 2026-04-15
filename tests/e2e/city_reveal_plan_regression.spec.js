@@ -67,6 +67,15 @@ async function setZoomPercent(page, percent) {
   await page.waitForTimeout(700);
 }
 
+async function waitForStableExactRender(page, { timeout = 20_000 } = {}) {
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return String(state.renderPhase || "") === "idle"
+      && !state.deferExactAfterSettle
+      && !state.exactAfterSettleHandle;
+  }, { timeout });
+}
+
 test("city reveal plan keeps capital coverage stable across low-zoom pan", async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
@@ -123,17 +132,35 @@ test("city reveal plan keeps capital coverage stable across low-zoom pan", async
           .filter((entry) => entry.isCapital)
           .map((entry) => entry.countryKey)
       );
+      const candidateProtectedCapitalCountries = new Set(
+        (Array.isArray(plan?.candidateEntries) ? plan.candidateEntries : [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
       const capitalMarkerCountries = new Set(
         (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
           .filter((entry) => entry.isCapital)
           .map((entry) => entry.countryKey)
       );
+      const protectedCapitalMarkerCountries = new Set(
+        (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
       return {
         candidateCapitalCountries,
+        candidateProtectedCapitalCountries,
         capitalMarkerCountries,
+        protectedCapitalMarkerCountries,
         markerCount: Array.isArray(plan?.markerEntries) ? plan.markerEntries.length : 0,
         candidateCount: Array.isArray(plan?.candidateEntries) ? plan.candidateEntries.length : 0,
-        markerBudget: Number(plan?.phase?.markerBudget || 0),
+        markerBudget: Number(plan?.markerBudget || 0),
+        priorityReserveBudget: Number(plan?.priorityReserveBudget || 0),
+        excludedScenarioTags: Array.from(new Set(
+          (Array.isArray(plan?.candidateEntries) ? plan.candidateEntries : [])
+            .map((entry) => String(entry?.scenarioTag || ""))
+            .filter((tag) => tag === "AFA" || tag === "RFA")
+        )),
       };
     };
 
@@ -153,15 +180,25 @@ test("city reveal plan keeps capital coverage stable across low-zoom pan", async
         markerCount: baseSummary.markerCount,
         candidateCount: baseSummary.candidateCount,
         candidateCapitalCount: baseSummary.candidateCapitalCountries.size,
+        candidateProtectedCapitalCount: baseSummary.candidateProtectedCapitalCountries.size,
         markerBudget: baseSummary.markerBudget,
+        priorityReserveBudget: baseSummary.priorityReserveBudget,
         missingCapitalCountries: commonCandidateCountries.filter((countryKey) => !baseSummary.capitalMarkerCountries.has(countryKey)),
+        missingProtectedCapitalCountries: Array.from(baseSummary.candidateProtectedCapitalCountries)
+          .filter((countryKey) => !baseSummary.protectedCapitalMarkerCountries.has(countryKey)),
+        excludedScenarioTags: baseSummary.excludedScenarioTags,
       },
       shifted: {
         markerCount: shiftedSummary.markerCount,
         candidateCount: shiftedSummary.candidateCount,
         candidateCapitalCount: shiftedSummary.candidateCapitalCountries.size,
+        candidateProtectedCapitalCount: shiftedSummary.candidateProtectedCapitalCountries.size,
         markerBudget: shiftedSummary.markerBudget,
+        priorityReserveBudget: shiftedSummary.priorityReserveBudget,
         missingCapitalCountries: commonCandidateCountries.filter((countryKey) => !shiftedSummary.capitalMarkerCountries.has(countryKey)),
+        missingProtectedCapitalCountries: Array.from(shiftedSummary.candidateProtectedCapitalCountries)
+          .filter((countryKey) => !shiftedSummary.protectedCapitalMarkerCountries.has(countryKey)),
+        excludedScenarioTags: shiftedSummary.excludedScenarioTags,
       },
       commonCandidateCountries,
       zoomScale: Number(baseTransform.k || 0),
@@ -172,8 +209,15 @@ test("city reveal plan keeps capital coverage stable across low-zoom pan", async
   expect(runtime.zoomScale).toBeLessThan(1.45);
   expect(runtime.commonCandidateCountries.length).toBeGreaterThan(8);
   expect(runtime.base.candidateCapitalCount).toBeGreaterThan(runtime.base.markerBudget);
-  expect(runtime.base.missingCapitalCountries).toEqual([]);
-  expect(runtime.shifted.missingCapitalCountries).toEqual([]);
+  expect(runtime.base.candidateProtectedCapitalCount).toBeGreaterThan(1);
+  expect(runtime.base.markerCount).toBeLessThanOrEqual(runtime.base.markerBudget);
+  expect(runtime.shifted.markerCount).toBeLessThanOrEqual(runtime.shifted.markerBudget);
+  expect(runtime.base.priorityReserveBudget).toBeLessThanOrEqual(runtime.base.markerBudget);
+  expect(runtime.shifted.priorityReserveBudget).toBeLessThanOrEqual(runtime.shifted.markerBudget);
+  expect(runtime.base.missingProtectedCapitalCountries).toEqual([]);
+  expect(runtime.shifted.missingProtectedCapitalCountries).toEqual([]);
+  expect(runtime.base.excludedScenarioTags).toEqual([]);
+  expect(runtime.shifted.excludedScenarioTags).toEqual([]);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
 });
@@ -211,13 +255,18 @@ test("point density changes marker budgets while label density only changes labe
   await ensureScenario(page, "tno_1962");
   await ensureBaseCityDataLoaded(page, "e2e-city-marker-density-regression");
   await setZoomPercent(page, 320);
+  await waitForStableExactRender(page);
 
   const runtime = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
     const { buildCityRevealPlan, getEffectiveCityCollection } = await import("/js/core/map_renderer.js");
 
     const cityCollection = getEffectiveCityCollection();
-    const baseConfig = { ...(state.styleConfig?.cityPoints || {}) };
+    const baseConfig = {
+      ...(state.styleConfig?.cityPoints || {}),
+      showLabels: true,
+      labelMinZoom: 0,
+    };
     const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
     const scale = Math.max(0.0001, Number(transform?.k || 1));
 
@@ -228,17 +277,30 @@ test("point density changes marker budgets while label density only changes labe
           .filter((entry) => entry.isCapital)
           .map((entry) => entry.countryKey)
       );
+      const candidateProtectedCapitalCountries = new Set(
+        (Array.isArray(plan?.candidateEntries) ? plan.candidateEntries : [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
       const acceptedCapitalCountries = new Set(
         (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
           .filter((entry) => entry.isCapital)
           .map((entry) => entry.countryKey)
       );
+      const acceptedProtectedCapitalCountries = new Set(
+        (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
+          .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
+          .map((entry) => entry.countryKey)
+      );
       return {
-        markerBudget: Number(plan?.phase?.markerBudget || 0),
+        markerBudget: Number(plan?.markerBudget || 0),
+        priorityReserveBudget: Number(plan?.priorityReserveBudget || 0),
         markerCount: Array.isArray(plan?.markerEntries) ? plan.markerEntries.length : 0,
         labelCount: Array.isArray(plan?.labelEntries) ? plan.labelEntries.length : 0,
         candidateCapitalCount: candidateCapitalCountries.size,
         acceptedCapitalCount: acceptedCapitalCountries.size,
+        candidateProtectedCapitalCount: candidateProtectedCapitalCountries.size,
+        acceptedProtectedCapitalCount: acceptedProtectedCapitalCountries.size,
       };
     };
 
@@ -251,10 +313,103 @@ test("point density changes marker budgets while label density only changes labe
   });
 
   expect(runtime.lowPointDensity.markerCount).toBeLessThanOrEqual(runtime.highPointDensity.markerCount);
-  expect(runtime.lowPointDensity.acceptedCapitalCount).toBe(runtime.lowPointDensity.candidateCapitalCount);
-  expect(runtime.highPointDensity.acceptedCapitalCount).toBe(runtime.highPointDensity.candidateCapitalCount);
+  expect(runtime.lowPointDensity.markerCount).toBeLessThanOrEqual(runtime.lowPointDensity.markerBudget);
+  expect(runtime.highPointDensity.markerCount).toBeLessThanOrEqual(runtime.highPointDensity.markerBudget);
+  expect(runtime.lowPointDensity.priorityReserveBudget).toBeLessThanOrEqual(runtime.lowPointDensity.markerBudget);
+  expect(runtime.highPointDensity.priorityReserveBudget).toBeLessThanOrEqual(runtime.highPointDensity.markerBudget);
+  expect(runtime.lowPointDensity.acceptedProtectedCapitalCount).toBe(runtime.lowPointDensity.candidateProtectedCapitalCount);
+  expect(runtime.highPointDensity.acceptedProtectedCapitalCount).toBe(runtime.highPointDensity.candidateProtectedCapitalCount);
   expect(runtime.sparseLabels.markerCount).toBe(runtime.denseLabels.markerCount);
   expect(runtime.sparseLabels.labelCount).toBeLessThan(runtime.denseLabels.labelCount);
+  expect(consoleIssues).toEqual([]);
+  expect(networkFailures).toEqual([]);
+});
+
+test("p3 city labels stay capital-only and respect the small early label budget", async ({ page }) => {
+  const consoleIssues = [];
+  const networkFailures = [];
+
+  page.on("console", (msg) => {
+    const type = msg.type();
+    if (type !== "warning" && type !== "error") return;
+    const text = msg.text();
+    if (IGNORED_CONSOLE_PATTERNS.some((pattern) => pattern.test(text))) {
+      return;
+    }
+    consoleIssues.push({ type, text });
+  });
+
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      networkFailures.push({ url: response.url(), status: response.status() });
+    }
+  });
+
+  page.on("requestfailed", (request) => {
+    networkFailures.push({
+      url: request.url(),
+      status: "failed",
+      errorText: request.failure() ? request.failure().errorText : "requestfailed",
+    });
+  });
+
+  await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await ensureScenario(page, "tno_1962");
+  await ensureBaseCityDataLoaded(page, "e2e-city-label-budget-regression");
+  await setZoomPercent(page, 200);
+  await waitForStableExactRender(page);
+
+  const runtime = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const { buildCityRevealPlan, getEffectiveCityCollection } = await import("/js/core/map_renderer.js");
+
+    const cityCollection = getEffectiveCityCollection();
+    const baseTransform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+    const config = {
+      ...(state.styleConfig?.cityPoints || {}),
+      showLabels: true,
+      labelMinZoom: 0,
+      labelDensity: "balanced",
+    };
+    const candidateTransforms = [
+      { x: Number(baseTransform?.x || 0), y: Number(baseTransform?.y || 0), k: Number(baseTransform?.k || 1) },
+      { x: Number(baseTransform?.x || 0) - 220, y: Number(baseTransform?.y || 0), k: Number(baseTransform?.k || 1) },
+      { x: Number(baseTransform?.x || 0) + 220, y: Number(baseTransform?.y || 0), k: Number(baseTransform?.k || 1) },
+    ];
+    const summaries = candidateTransforms.map((transform, index) => {
+      const plan = buildCityRevealPlan(
+        cityCollection,
+        Number(transform.k || 1),
+        transform,
+        config,
+      );
+      return {
+        sampleIndex: index,
+        phaseId: String(plan?.phase?.id || ""),
+        labelBudget: Number(plan?.phase?.labelBudget || 0),
+        labelCount: Array.isArray(plan?.labelEntries) ? plan.labelEntries.length : 0,
+        capitalMarkerCount: (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
+          .filter((entry) => !!entry?.isCapital)
+          .length,
+        nonCapitalLabels: (Array.isArray(plan?.labelEntries) ? plan.labelEntries : [])
+          .filter((entry) => !entry?.isCapital)
+          .map((entry) => String(entry?.cityId || ""))
+          .slice(0, 12),
+      };
+    });
+    const bestSummary = summaries
+      .slice()
+      .sort((left, right) => Number(right.labelCount || 0) - Number(left.labelCount || 0))[0];
+
+    return bestSummary;
+  });
+
+  expect(runtime.phaseId).toBe("P3");
+  expect(runtime.labelBudget).toBe(8);
+  expect(runtime.capitalMarkerCount).toBeGreaterThan(0);
+  expect(runtime.labelCount).toBeLessThanOrEqual(runtime.labelBudget);
+  expect(runtime.nonCapitalLabels).toEqual([]);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
 });

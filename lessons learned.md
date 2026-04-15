@@ -646,3 +646,7 @@
 ### 47. 线几何简化后必须立刻重算长度，并重新应用基于长度的阈值
 - reveal_rank、preview/full 过滤、导出字段只要依赖 length_m，就不能继续使用简化前长度；否则产物会和最终几何不一致。
 - 更稳的最短路径是：simplify -> measure_lengths -> 再做长度阈值过滤和分级。
+
+### 52. 城市点位 e2e 一旦依赖 labelEntries，就必须先等 exact render 稳定并在测试里显式打开 showLabels / labelMinZoom
+- 这次 city reveal 回归在单独跑能过、整组跑会偶发归零，根因不是 reveal 算法本身，而是 uildCityRevealPlan() 的 label 产出受 state.deferExactAfterSettle 和 styleConfig 开关控制。
+- 更稳的做法是：凡是断言 labelEntries 或 label density 差异的 Playwright 测试，都先等待 enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 showLabels: true、合适的 labelMinZoom。
