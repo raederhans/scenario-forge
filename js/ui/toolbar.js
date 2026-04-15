@@ -2572,7 +2572,6 @@ function initToolbar({ render } = {}) {
         nextOrder.splice(draggedIndex, 1);
         nextOrder.splice(targetIndex, 0, exportWorkbenchDraggedLayerId);
         state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(nextOrder);
-        markDirty("export-workbench-layer-order");
         renderExportWorkbenchLayerList();
       });
 
@@ -2603,7 +2602,6 @@ function initToolbar({ render } = {}) {
       input.addEventListener("change", () => {
         ensureExportWorkbenchUiState();
         state.exportWorkbenchUi.visibility[layer.id] = input.checked;
-        markDirty("export-workbench-layer-visibility");
       });
       const text = document.createElement("span");
       text.textContent = "Visible";
