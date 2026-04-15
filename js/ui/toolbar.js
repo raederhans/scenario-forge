@@ -264,8 +264,8 @@ const TRANSPORT_WORKBENCH_SORTABLE_LAYER_IDS = TRANSPORT_WORKBENCH_FAMILIES
 const EXPORT_MAIN_LAYER_VIEW_MODELS = Object.freeze([
   Object.freeze({ id: "background", name: "Background", passNames: Object.freeze(["background"]), baked: false }),
   Object.freeze({ id: "political", name: "Political", passNames: Object.freeze(["physicalBase", "political"]), baked: true }),
-  Object.freeze({ id: "context", name: "Context", passNames: Object.freeze(["contextBase", "contextScenario", "contextMarkers", "dayNight", "borders"]), baked: true }),
-  Object.freeze({ id: "effects", name: "Effects", passNames: Object.freeze(["effects", "lineEffects", "textureLabels"]), baked: true }),
+  Object.freeze({ id: "context", name: "Context", passNames: Object.freeze(["contextBase", "contextScenario"]), baked: true }),
+  Object.freeze({ id: "effects", name: "Effects", passNames: Object.freeze(["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"]), baked: true }),
   Object.freeze({ id: "labels", name: "Labels", passNames: Object.freeze(["labels"]), baked: false }),
 ]);
 const EXPORT_MAIN_LAYER_IDS = Object.freeze(EXPORT_MAIN_LAYER_VIEW_MODELS.map((layer) => layer.id));
