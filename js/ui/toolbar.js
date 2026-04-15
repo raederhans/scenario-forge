@@ -4798,7 +4798,9 @@ function initToolbar({ render } = {}) {
       return;
     }
     if (view === "export") {
-      state.openExportWorkbenchFn?.(dockExportBtn || null);
+      ensureProjectSupportSurface();
+      const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
+      state.openExportWorkbenchFn?.(exportTrigger);
       state.ui.restoredSupportSurfaceViewFromUrl = view;
       return;
     }
