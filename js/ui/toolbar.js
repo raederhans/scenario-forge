@@ -7615,28 +7615,47 @@ function initToolbar({ render } = {}) {
   const getLayerDependencyRevision = (layerId) => {
     const mapSvg = document.getElementById("map-svg");
     const mapSvgChildCount = mapSvg ? mapSvg.childElementCount : 0;
+    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
+      ? state.renderPassCache
+      : {};
+    const signatures = renderPassCache.signatures && typeof renderPassCache.signatures === "object"
+      ? renderPassCache.signatures
+      : {};
+    const dirtyRevision = Number(state.dirtyRevision || 0);
     if (layerId === "color") {
       return [
         `colorRevision:${Number(state.colorRevision) || 0}`,
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `dirtyRevision:${dirtyRevision}`,
+        `passPolitical:${String(signatures.political || "")}`,
+        `passContextBase:${String(signatures.contextBase || "")}`,
       ];
     }
     if (layerId === "line") {
       return [
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `dynamicDirty:${state.dynamicBordersDirty ? 1 : 0}`,
+        `dirtyRevision:${dirtyRevision}`,
+        `passBorders:${String(signatures.borders || "")}`,
+        `passLineEffects:${String(signatures.lineEffects || "")}`,
       ];
     }
     if (layerId === "text") {
       return [
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `svgChildren:${mapSvgChildCount}`,
+        `dirtyRevision:${dirtyRevision}`,
       ];
     }
     return [
       `colorRevision:${Number(state.colorRevision) || 0}`,
       `topologyRevision:${Number(state.topologyRevision) || 0}`,
       `svgChildren:${mapSvgChildCount}`,
+      `dirtyRevision:${dirtyRevision}`,
+      `passPolitical:${String(signatures.political || "")}`,
+      `passContextBase:${String(signatures.contextBase || "")}`,
+      `passBorders:${String(signatures.borders || "")}`,
+      `passLineEffects:${String(signatures.lineEffects || "")}`,
     ];
   };
 
@@ -7686,6 +7705,35 @@ function initToolbar({ render } = {}) {
     return entry;
   };
 
+  const drawRenderPassCanvasToBakeTarget = (passName, targetCtx) => {
+    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
+      ? state.renderPassCache
+      : null;
+    if (!renderPassCache || !targetCtx) return false;
+    const passCanvas = renderPassCache.canvases?.[passName];
+    if (!passCanvas) return false;
+    const layout = renderPassCache.layouts?.[passName] || {};
+    const dpr = Math.max(Number(state.dpr) || 1, 1);
+    const offsetX = Math.round(-Number(layout.offsetX || 0) * dpr);
+    const offsetY = Math.round(-Number(layout.offsetY || 0) * dpr);
+    targetCtx.drawImage(passCanvas, offsetX, offsetY);
+    return true;
+  };
+
+  const drawLineLayerToCanvas = (targetCtx) => {
+    let drewFromRenderPassCache = false;
+    drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget("lineEffects", targetCtx) || drewFromRenderPassCache;
+    drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget("borders", targetCtx) || drewFromRenderPassCache;
+    if (drewFromRenderPassCache) {
+      return true;
+    }
+    if (state.lineCanvas) {
+      targetCtx.drawImage(state.lineCanvas, 0, 0);
+      return true;
+    }
+    return false;
+  };
+
   const bakeLayer = async (layerId) => {
     const exportUi = ensureExportWorkbenchUiState();
     const normalizedLayerId = String(layerId || "").trim().toLowerCase();
@@ -7717,12 +7765,12 @@ function initToolbar({ render } = {}) {
     if (normalizedLayerId === "color") {
       if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
     } else if (normalizedLayerId === "line") {
-      if (state.lineCanvas) bakeCtx.drawImage(state.lineCanvas, 0, 0);
+      drawLineLayerToCanvas(bakeCtx);
     } else if (normalizedLayerId === "text") {
       await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
     } else {
       if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
-      if (state.lineCanvas) bakeCtx.drawImage(state.lineCanvas, 0, 0);
+      drawLineLayerToCanvas(bakeCtx);
       if (exportUi.includeTextLayer) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
       }
@@ -7753,9 +7801,10 @@ function initToolbar({ render } = {}) {
   };
 
   if (exportTarget && !exportTarget.dataset.bound) {
-    const exportUi = ensureExportWorkbenchUiState();
-    exportTarget.value = exportUi.target;
+    const exportUiState = ensureExportWorkbenchUiState();
+    exportTarget.value = exportUiState.target;
     exportTarget.addEventListener("change", () => {
+      const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
       exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
         ? nextTarget
@@ -7767,11 +7816,11 @@ function initToolbar({ render } = {}) {
         exportFormat.disabled = exportUi.target === "bake-pack";
       }
     });
-    if (exportUi.target === "per-layer") {
+    if (exportUiState.target === "per-layer") {
       exportFormat.value = "png";
       exportFormat.disabled = true;
     } else {
-      exportFormat.disabled = exportUi.target === "bake-pack";
+      exportFormat.disabled = exportUiState.target === "bake-pack";
     }
     exportTarget.dataset.bound = "true";
   }
