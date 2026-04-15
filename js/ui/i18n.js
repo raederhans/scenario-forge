@@ -54,6 +54,37 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
   "Composite image": { zh: "\u4e3b\u56fe\u5408\u6210", en: "Composite image" },
   "Per-layer PNG": { zh: "\u5355\u5c42 PNG", en: "Per-layer PNG" },
   "Bake pack (v1.1)": { zh: "\u70d8\u7119\u5305\uff08v1.1\uff09", en: "Bake pack (v1.1)" },
+  "Primary Color": { zh: "\u4e3b\u8272", en: "Primary Color" },
+  Tier: { zh: "\u7ea7\u522b", en: "Tier" },
+  airport: { zh: "\u673a\u573a", en: "airport" },
+  airports: { zh: "\u673a\u573a", en: "airports" },
+  port: { zh: "\u6e2f\u53e3", en: "port" },
+  ports: { zh: "\u6e2f\u53e3", en: "ports" },
+  "More fields": { zh: "\u66f4\u591a\u5b57\u6bb5", en: "More fields" },
+  "Less fields": { zh: "\u6536\u8d77\u5b57\u6bb5", en: "Less fields" },
+  "Locate and zoom": { zh: "\u5b9a\u4f4d\u5e76\u653e\u5927", en: "Locate and zoom" },
+  "Airport type": { zh: "\u673a\u573a\u7c7b\u578b", en: "Airport type" },
+  Owner: { zh: "\u6240\u6709\u65b9", en: "Owner" },
+  Manager: { zh: "\u7ba1\u7406\u65b9", en: "Manager" },
+  Status: { zh: "\u72b6\u6001", en: "Status" },
+  Agencies: { zh: "\u673a\u6784", en: "Agencies" },
+  "Ferry service": { zh: "\u6e21\u8f6e\u670d\u52a1", en: "Ferry service" },
+  "Unnamed facility": { zh: "\u672a\u547d\u540d\u8bbe\u65bd", en: "Unnamed facility" },
+  "Owner / Manager": { zh: "\u6240\u6709\u65b9 / \u8fd0\u8425\u65b9", en: "Owner / Manager" },
+  "Manager / Agencies": { zh: "\u7ba1\u7406\u65b9 / \u673a\u6784", en: "Manager / Agencies" },
+  "Runway": { zh: "\u8dd1\u9053", en: "Runway" },
+  "Passengers/day": { zh: "\u65e5\u5747\u65c5\u5ba2", en: "Passengers/day" },
+  "Landings/day": { zh: "\u65e5\u5747\u8d77\u964d", en: "Landings/day" },
+  "Hours": { zh: "\u8fd0\u8425\u65f6\u95f4", en: "Hours" },
+  "Designation": { zh: "\u6307\u5b9a\u7c7b\u522b", en: "Designation" },
+  "Class": { zh: "\u7b49\u7ea7", en: "Class" },
+  "Ferry": { zh: "\u6e21\u8f6e", en: "Ferry" },
+  "Mooring": { zh: "\u6cca\u4f4d", en: "Mooring" },
+  "Outer facility": { zh: "\u5916\u90e8\u8bbe\u65bd", en: "Outer facility" },
+  "Established": { zh: "\u8bbe\u7acb\u65f6\u95f4", en: "Established" },
+  "No facility details available yet.": { zh: "\u6682\u65f6\u6ca1\u6709\u53ef\u7528\u7684 facility \u8be6\u60c5\u3002", en: "No facility details available yet." },
+  Yes: { zh: "\u662f", en: "Yes" },
+  No: { zh: "\u5426", en: "No" },
   "Compare baseline": { zh: "\u5bf9\u6bd4\u57fa\u7ebf", en: "Compare baseline" },
   "Baseline unavailable": { zh: "\u57fa\u7ebf\u4e0d\u53ef\u7528", en: "Baseline unavailable" },
   "Baseline unavailable for this family": { zh: "\u8fd9\u4e2a family \u6ca1\u6709\u53ef\u7528\u57fa\u7ebf", en: "Baseline unavailable for this family" },
@@ -812,6 +843,12 @@ function updateUIText() {
   }
   if (typeof state.updateToolbarInputsFn === "function") {
     state.updateToolbarInputsFn();
+  }
+  if (typeof state.updateTransportAppearanceUIFn === "function") {
+    state.updateTransportAppearanceUIFn();
+  }
+  if (typeof state.updateFacilityInfoCardUiFn === "function") {
+    state.updateFacilityInfoCardUiFn();
   }
   if (typeof state.syncDeveloperModeUiFn === "function") {
     state.syncDeveloperModeUiFn();

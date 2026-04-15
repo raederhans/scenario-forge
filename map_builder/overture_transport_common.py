@@ -50,11 +50,19 @@ def places_dataset() -> ds.Dataset:
     )
 
 
-def transport_class_filter(subtype: str, allowed_classes: Iterable[str]):
+def transport_class_filter(
+    subtype: str,
+    allowed_classes: Iterable[str],
+    bbox_bounds: tuple[float, float] | None = None,
+):
     classes = [str(value).strip() for value in allowed_classes if str(value).strip()]
     if not classes:
         raise ValueError("allowed_classes must not be empty")
-    return (ds.field("subtype") == str(subtype).strip()) & ds.field("class").isin(classes)
+    expr = (ds.field("subtype") == str(subtype).strip()) & ds.field("class").isin(classes)
+    if bbox_bounds:
+        lon_min, lon_max = bbox_bounds
+        expr = expr & (ds.field("bbox", "xmax") >= float(lon_min)) & (ds.field("bbox", "xmin") < float(lon_max))
+    return expr
 
 
 def stream_transport_segment_rows(
@@ -62,12 +70,13 @@ def stream_transport_segment_rows(
     subtype: str,
     allowed_classes: Iterable[str],
     columns: Iterable[str],
-    batch_size: int = 20_000,
+    batch_size: int = 100_000,
+    bbox_bounds: tuple[float, float] | None = None,
 ) -> Iterable[list[dict[str, Any]]]:
     dataset = transport_segment_dataset()
     scanner = dataset.scanner(
         columns=list(columns),
-        filter=transport_class_filter(subtype, allowed_classes),
+        filter=transport_class_filter(subtype, allowed_classes, bbox_bounds=bbox_bounds),
         batch_size=batch_size,
     )
     for batch in scanner.to_batches():

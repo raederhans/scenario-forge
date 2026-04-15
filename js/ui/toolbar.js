@@ -36,6 +36,8 @@ import {
   cancelSpecialZoneDraw,
   deleteSelectedManualSpecialZone,
   selectSpecialZoneById,
+  RENDER_PASS_NAMES,
+  renderExportPassesToCanvas,
 } from "../core/map_renderer.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import {
@@ -258,6 +260,60 @@ const TRANSPORT_WORKBENCH_FAMILY_IDS = new Set(TRANSPORT_WORKBENCH_FAMILIES.map(
 const TRANSPORT_WORKBENCH_SORTABLE_LAYER_IDS = TRANSPORT_WORKBENCH_FAMILIES
   .filter((family) => family.id !== "layers")
   .map((family) => family.id);
+
+const EXPORT_MAIN_LAYER_VIEW_MODELS = Object.freeze([
+  Object.freeze({ id: "background", name: "Background", passNames: Object.freeze(["background"]), baked: false }),
+  Object.freeze({ id: "political", name: "Political", passNames: Object.freeze(["physicalBase", "political"]), baked: true }),
+  Object.freeze({ id: "context", name: "Context", passNames: Object.freeze(["contextBase", "contextScenario"]), baked: true }),
+  Object.freeze({ id: "effects", name: "Effects", passNames: Object.freeze(["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"]), baked: true }),
+  Object.freeze({ id: "labels", name: "Labels", passNames: Object.freeze(["labels"]), baked: false }),
+]);
+const EXPORT_MAIN_LAYER_IDS = Object.freeze(EXPORT_MAIN_LAYER_VIEW_MODELS.map((layer) => layer.id));
+const EXPORT_MAIN_LAYER_MODEL_BY_ID = new Map(EXPORT_MAIN_LAYER_VIEW_MODELS.map((layer) => [layer.id, layer]));
+
+function normalizeExportWorkbenchLayerOrder(value) {
+  const nextOrder = Array.isArray(value)
+    ? value
+      .map((entry) => String(entry || "").trim())
+      .filter((entry) => EXPORT_MAIN_LAYER_IDS.includes(entry))
+    : [];
+  const deduped = Array.from(new Set(nextOrder));
+  EXPORT_MAIN_LAYER_IDS.forEach((layerId) => {
+    if (!deduped.includes(layerId)) deduped.push(layerId);
+  });
+  return deduped;
+}
+
+function normalizeExportWorkbenchVisibility(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return Object.fromEntries(
+    EXPORT_MAIN_LAYER_IDS.map((layerId) => [layerId, source[layerId] !== false])
+  );
+}
+
+function ensureExportWorkbenchUiState() {
+  if (!state.exportWorkbenchUi || typeof state.exportWorkbenchUi !== "object") {
+    state.exportWorkbenchUi = {};
+  }
+  state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(state.exportWorkbenchUi.layerOrder);
+  state.exportWorkbenchUi.visibility = normalizeExportWorkbenchVisibility(state.exportWorkbenchUi.visibility);
+  return state.exportWorkbenchUi;
+}
+
+function resolveExportPassSequence(exportWorkbenchUi) {
+  const source = exportWorkbenchUi && typeof exportWorkbenchUi === "object"
+    ? exportWorkbenchUi
+    : {};
+  const layerOrder = normalizeExportWorkbenchLayerOrder(source.layerOrder);
+  const visibility = normalizeExportWorkbenchVisibility(source.visibility);
+  const selectedPasses = layerOrder.flatMap((layerId) => (
+    visibility[layerId] === false
+      ? []
+      : [...(EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId)?.passNames || [])]
+  ));
+  const deduped = Array.from(new Set(selectedPasses));
+  return deduped.filter((passName) => RENDER_PASS_NAMES.includes(passName));
+}
 
 const ROAD_CLASS_OPTIONS = [
   { value: "motorway", label: "Motorway" },
@@ -1704,6 +1760,7 @@ function initToolbar({ render } = {}) {
   const exportBtn = document.getElementById("exportBtn");
   const exportTarget = document.getElementById("exportTarget");
   const exportFormat = document.getElementById("exportFormat");
+  const exportWorkbenchLayerList = document.getElementById("exportWorkbenchLayerList");
   const textureSelect = document.getElementById("textureSelect");
   const textureOpacity = document.getElementById("textureOpacity");
   const texturePaperControls = document.getElementById("texturePaperControls");
@@ -1771,6 +1828,7 @@ function initToolbar({ render } = {}) {
   const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
   const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
+  const airportPrimaryColor = document.getElementById("airportPrimaryColor");
   const airportLabelsEnabled = document.getElementById("airportLabelsEnabled");
   const airportLabelDensity = document.getElementById("airportLabelDensity");
   const airportLabelMode = document.getElementById("airportLabelMode");
@@ -1783,6 +1841,7 @@ function initToolbar({ render } = {}) {
   const transportAirportSummaryMeta = document.getElementById("transportAirportSummaryMeta");
   const portVisualStrength = document.getElementById("portVisualStrength");
   const portOpacity = document.getElementById("portOpacity");
+  const portPrimaryColor = document.getElementById("portPrimaryColor");
   const portLabelsEnabled = document.getElementById("portLabelsEnabled");
   const portLabelDensity = document.getElementById("portLabelDensity");
   const portLabelMode = document.getElementById("portLabelMode");
@@ -1940,6 +1999,13 @@ function initToolbar({ render } = {}) {
   const inspectorUtilitiesSection = document.getElementById("inspectorUtilitiesSection");
   const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
+  const exportWorkbenchOverlay = document.getElementById("exportWorkbenchOverlay");
+  const exportWorkbenchPanel = document.getElementById("exportWorkbenchPanel");
+  const exportWorkbenchCloseBtn = document.getElementById("exportWorkbenchCloseBtn");
+  const exportWorkbenchPreviewState = document.getElementById("exportWorkbenchPreviewState");
+  const exportWorkbenchPreviewModeButtons = Array.from(document.querySelectorAll(".export-workbench-preview-toggle-btn"));
+  const exportWorkbenchFormat = document.getElementById("exportWorkbenchFormat");
+  const exportWorkbenchSnapshotBtn = document.getElementById("exportWorkbenchSnapshotBtn");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
@@ -2294,11 +2360,62 @@ function initToolbar({ render } = {}) {
       : resolveLinkedTransportOverviewScopeAndThreshold(familyId, familyConfig.coverageReach)
   );
 
+  const getTransportScopeThresholdRank = (familyId, scope) => {
+    const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+    const normalizedScope = String(scope || "").trim().toLowerCase();
+    if (normalizedFamilyId === "airport") {
+      if (normalizedScope === "international") return 3;
+      if (normalizedScope === "all_civil") return 1;
+      return 2;
+    }
+    if (normalizedFamilyId === "port") {
+      if (normalizedScope === "core") return 3;
+      if (normalizedScope === "expanded") return 1;
+      return 2;
+    }
+    return 1;
+  };
+
+  const getTransportImportanceThresholdRank = (threshold) => {
+    const normalized = String(threshold || "").trim().toLowerCase();
+    if (normalized === "primary") return 3;
+    if (normalized === "secondary") return 2;
+    return 1;
+  };
+
+  const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {
+    const collection = familyId === "port" ? state.portsData : state.airportsData;
+    const features = Array.isArray(collection?.features) ? collection.features : null;
+    if (!features) return null;
+    const minimumImportanceRank = Math.max(
+      getTransportScopeThresholdRank(familyId, effectiveScope.scope),
+      getTransportImportanceThresholdRank(effectiveScope.importanceThreshold),
+    );
+    return features.filter((feature) => {
+      const importanceRank = Math.max(1, Math.round(Number(feature?.properties?.importance_rank || 1)));
+      return importanceRank >= minimumImportanceRank;
+    }).length;
+  };
+
+  const formatTransportFamilyCountText = (familyId, count) => {
+    if (!Number.isFinite(count)) return "";
+    const roundedCount = Math.max(0, Math.round(count));
+    const noun = familyId === "port"
+      ? (roundedCount === 1 ? "port" : "ports")
+      : (roundedCount === 1 ? "airport" : "airports");
+    return `${roundedCount.toLocaleString()} ${t(noun, "ui")}`;
+  };
+
   const buildTransportFamilySummaryText = (familyId, masterEnabled, familyEnabled, familyConfig, effectiveScope) => {
     if (!familyEnabled) return t("Off", "ui");
     if (!masterEnabled) return `${t("On", "ui")} · ${t("hidden by master", "ui")}`;
-    const labelsPart = familyConfig.labelsEnabled ? t("labels on", "ui") : t("labels off", "ui");
-    return `${t("On", "ui")} · ${labelsPart} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
+    const countText = formatTransportFamilyCountText(
+      familyId,
+      getTransportFamilyFilteredCount(familyId, familyConfig, effectiveScope),
+    );
+    return countText
+      ? `${t("On", "ui")} · ${countText}`
+      : `${t("On", "ui")} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
   };
 
   const setTransportAppearanceGroupEnabled = (container, enabled) => {
@@ -2326,6 +2443,7 @@ function initToolbar({ render } = {}) {
     if (airportVisualStrengthValue) airportVisualStrengthValue.textContent = formatTransportPercent(airportConfig.visualStrength ?? 0.56);
     if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity ?? 0.82) * 100));
     if (airportOpacityValue) airportOpacityValue.textContent = formatTransportPercent(airportConfig.opacity ?? 0.82);
+    if (airportPrimaryColor) airportPrimaryColor.value = normalizeOceanFillColor(airportConfig.primaryColor || "#1d4ed8");
     if (airportLabelsEnabled) airportLabelsEnabled.checked = !!airportConfig.labelsEnabled;
     if (airportLabelDensity) airportLabelDensity.value = String(airportConfig.labelDensity || "balanced");
     if (airportLabelMode) airportLabelMode.value = String(airportConfig.labelMode || "both");
@@ -2354,6 +2472,7 @@ function initToolbar({ render } = {}) {
     if (portVisualStrengthValue) portVisualStrengthValue.textContent = formatTransportPercent(portConfig.visualStrength ?? 0.54);
     if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity ?? 0.78) * 100));
     if (portOpacityValue) portOpacityValue.textContent = formatTransportPercent(portConfig.opacity ?? 0.78);
+    if (portPrimaryColor) portPrimaryColor.value = normalizeOceanFillColor(portConfig.primaryColor || "#b45309");
     if (portLabelsEnabled) portLabelsEnabled.checked = !!portConfig.labelsEnabled;
     if (portLabelDensity) portLabelDensity.value = String(portConfig.labelDensity || "balanced");
     if (portLabelMode) portLabelMode.value = String(portConfig.labelMode || "mixed");
@@ -2383,6 +2502,7 @@ function initToolbar({ render } = {}) {
     [
       airportVisualStrength,
       airportOpacity,
+      airportPrimaryColor,
       airportLabelsEnabled,
       airportLabelDensity,
       airportLabelMode,
@@ -2395,6 +2515,7 @@ function initToolbar({ render } = {}) {
     [
       portVisualStrength,
       portOpacity,
+      portPrimaryColor,
       portLabelsEnabled,
       portLabelDensity,
       portLabelMode,
@@ -2423,6 +2544,9 @@ function initToolbar({ render } = {}) {
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const applyTransportAppearanceMasterToggle = (nextEnabled) => {
@@ -2441,6 +2565,8 @@ function initToolbar({ render } = {}) {
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
   };
+
+  state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;
 
   const focusOverlaySurface = (container) => focusSurface(container);
   const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
@@ -2483,6 +2609,80 @@ function initToolbar({ render } = {}) {
     });
   };
 
+  const renderExportWorkbenchLayerList = () => {
+    if (!exportWorkbenchLayerList) return;
+    ensureExportWorkbenchUiState();
+    exportWorkbenchLayerList.replaceChildren();
+    state.exportWorkbenchUi.layerOrder.forEach((layerId) => {
+      const layer = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId);
+      if (!layer) return;
+      const item = document.createElement("div");
+      item.className = "export-workbench-layer-item";
+      item.draggable = true;
+      item.dataset.exportLayerId = layer.id;
+
+      item.addEventListener("dragstart", () => {
+        exportWorkbenchDraggedLayerId = layer.id;
+        item.classList.add("is-dragging");
+      });
+      item.addEventListener("dragend", () => {
+        exportWorkbenchDraggedLayerId = "";
+        item.classList.remove("is-dragging");
+      });
+      item.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+      item.addEventListener("drop", (event) => {
+        event.preventDefault();
+        if (!exportWorkbenchDraggedLayerId || exportWorkbenchDraggedLayerId === layer.id) return;
+        const nextOrder = [...state.exportWorkbenchUi.layerOrder];
+        const draggedIndex = nextOrder.indexOf(exportWorkbenchDraggedLayerId);
+        const targetIndex = nextOrder.indexOf(layer.id);
+        if (draggedIndex === -1 || targetIndex === -1) return;
+        nextOrder.splice(draggedIndex, 1);
+        nextOrder.splice(targetIndex, 0, exportWorkbenchDraggedLayerId);
+        state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(nextOrder);
+        renderExportWorkbenchLayerList();
+      });
+
+      const handle = document.createElement("span");
+      handle.className = "export-workbench-layer-handle";
+      handle.textContent = ":::";
+      item.appendChild(handle);
+
+      const name = document.createElement("span");
+      name.className = "export-workbench-layer-name";
+      name.textContent = layer.name;
+      item.appendChild(name);
+
+      const controls = document.createElement("div");
+      controls.className = "export-workbench-layer-controls";
+
+      const badge = document.createElement("span");
+      badge.className = "export-workbench-layer-badge";
+      badge.textContent = layer.baked ? "Baked" : "Live";
+      if (layer.baked) badge.classList.add("is-baked");
+      controls.appendChild(badge);
+
+      const toggle = document.createElement("label");
+      toggle.className = "export-workbench-layer-toggle";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = state.exportWorkbenchUi.visibility[layer.id] !== false;
+      input.addEventListener("change", () => {
+        ensureExportWorkbenchUiState();
+        state.exportWorkbenchUi.visibility[layer.id] = input.checked;
+      });
+      const text = document.createElement("span");
+      text.textContent = "Visible";
+      toggle.append(input, text);
+      controls.appendChild(toggle);
+      item.appendChild(controls);
+
+      exportWorkbenchLayerList.appendChild(item);
+    });
+  };
+
   const closeTransportWorkbenchInfoPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchInfoPopover) return;
     transportWorkbenchInfoPopover.classList.add("hidden");
@@ -2498,6 +2698,8 @@ function initToolbar({ render } = {}) {
   let transportWorkbenchPreviewLastViewKey = "";
   let transportWorkbenchPreviewWarmupScheduled = false;
   let transportWorkbenchDraggedLayerId = "";
+  let exportWorkbenchDraggedLayerId = "";
+  let exportWorkbenchPreviewMode = "main";
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -4335,6 +4537,9 @@ function initToolbar({ render } = {}) {
     const willOpen = !!nextOpen;
     if (willOpen === wasOpen && !willOpen) {
       renderTransportWorkbenchUi();
+      if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+        state.syncFacilityInfoCardVisibilityFn();
+      }
       return;
     }
     if (willOpen) {
@@ -4345,6 +4550,7 @@ function initToolbar({ render } = {}) {
       state.toggleLeftPanelFn?.(false);
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
+      state.closeExportWorkbenchFn?.({ restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
@@ -4353,6 +4559,9 @@ function initToolbar({ render } = {}) {
     }
     uiState.open = willOpen;
     renderTransportWorkbenchUi();
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
     if (willOpen) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
@@ -4380,6 +4589,64 @@ function initToolbar({ render } = {}) {
     ensureTransportWorkbenchUiState();
     resetTransportWorkbenchCarrierView();
     syncTransportWorkbenchPreviewControls();
+  };
+
+  const renderExportWorkbenchUi = (isOpen) => {
+    if (!exportWorkbenchOverlay) return;
+    exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
+    exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    dockExportBtn?.classList.toggle("is-active", isOpen);
+    dockExportBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    if (exportWorkbenchFormat && exportFormat) {
+      exportWorkbenchFormat.value = exportFormat.value === "jpg" ? "jpg" : "png";
+    }
+    if (exportWorkbenchPreviewState) {
+      exportWorkbenchPreviewState.textContent = exportWorkbenchPreviewMode === "layer"
+        ? t("Single layer preview (placeholder)", "ui")
+        : t("Main image preview (placeholder)", "ui");
+    }
+    exportWorkbenchPreviewModeButtons.forEach((button) => {
+      const isActive = String(button.dataset.exportPreviewMode || "main") === exportWorkbenchPreviewMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  };
+
+  const setExportWorkbenchState = (nextOpen, { trigger = null, restoreFocus = true } = {}) => {
+    if (!exportWorkbenchOverlay || !exportWorkbenchPanel) return;
+    const willOpen = !!nextOpen;
+    const wasOpen = !exportWorkbenchOverlay.classList.contains("hidden");
+    if (willOpen === wasOpen) {
+      renderExportWorkbenchUi(willOpen);
+      return;
+    }
+    if (willOpen) {
+      closeDockPopover({ restoreFocus: false, syncUrl: false });
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+        closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
+      }
+      if (trigger instanceof HTMLElement) {
+        rememberOverlayTrigger(exportWorkbenchOverlay, trigger);
+      }
+      renderExportWorkbenchUi(true);
+      syncSupportSurfaceUrlState("export");
+      focusOverlaySurface(exportWorkbenchPanel);
+      return;
+    }
+    renderExportWorkbenchUi(false);
+    syncSupportSurfaceUrlState("");
+    if (restoreFocus) {
+      restoreOverlayTriggerFocus(exportWorkbenchOverlay);
+    }
+  };
+
+  state.openExportWorkbenchFn = (trigger = dockExportBtn) => {
+    setExportWorkbenchState(true, { trigger });
+    return true;
+  };
+  state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {
+    setExportWorkbenchState(false, { restoreFocus });
+    return false;
   };
 
   state.openTransportWorkbenchFn = (trigger = null) => {
@@ -4644,6 +4911,9 @@ function initToolbar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const closeSpecialZonePopover = () => {
@@ -4728,6 +4998,13 @@ function initToolbar({ render } = {}) {
         return;
       }
       toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
+      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      return;
+    }
+    if (view === "export") {
+      ensureProjectSupportSurface();
+      const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
+      state.openExportWorkbenchFn?.(exportTrigger);
       state.ui.restoredSupportSurfaceViewFromUrl = view;
       return;
     }
@@ -4984,7 +5261,7 @@ function initToolbar({ render } = {}) {
     return null;
   };
 
-  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference", "export"]);
+  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference"]);
   const isSupportDockPopoverKind = (kind) => SUPPORT_DOCK_POPOVER_KINDS.has(String(kind || ""));
 
   const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
@@ -5131,8 +5408,37 @@ function initToolbar({ render } = {}) {
       if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden") && !insideTransportWorkbenchSectionHelp) {
         closeTransportWorkbenchSectionHelpPopover();
       }
+      if (
+        exportWorkbenchOverlay
+        && exportWorkbenchPanel
+        && !exportWorkbenchOverlay.classList.contains("hidden")
+        && target === exportWorkbenchOverlay
+      ) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      }
     });
     document.addEventListener("keydown", (event) => {
+      if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
+        const focusables = getFocusableElements(exportWorkbenchPanel);
+        if (!focusables.length) {
+          event.preventDefault();
+          focusOverlaySurface(exportWorkbenchPanel);
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+          return;
+        }
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+          return;
+        }
+      }
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && event.key === "Tab") {
         const focusables = getFocusableElements(scenarioGuidePopover);
         if (!focusables.length) {
@@ -5169,6 +5475,10 @@ function initToolbar({ render } = {}) {
         }
         if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
           closeScenarioGuidePopover({ restoreFocus: true });
+          closedOverlay = true;
+        }
+        if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) {
+          state.closeExportWorkbenchFn?.({ restoreFocus: true });
           closedOverlay = true;
         }
         if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
@@ -7479,11 +7789,51 @@ function initToolbar({ render } = {}) {
 
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
     dockExportBtn.setAttribute("aria-haspopup", "dialog");
-    dockExportBtn.setAttribute("aria-controls", "dockExportPopover");
+    dockExportBtn.setAttribute("aria-controls", "exportWorkbenchOverlay");
     dockExportBtn.addEventListener("click", () => {
-      openDockPopover("export");
+      const isOpen = !!(exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden"));
+      if (isOpen) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      } else {
+        state.openExportWorkbenchFn?.(dockExportBtn);
+      }
     });
     dockExportBtn.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchCloseBtn && !exportWorkbenchCloseBtn.dataset.bound) {
+    exportWorkbenchCloseBtn.addEventListener("click", () => {
+      state.closeExportWorkbenchFn?.({ restoreFocus: true });
+    });
+    exportWorkbenchCloseBtn.dataset.bound = "true";
+  }
+
+  exportWorkbenchPreviewModeButtons.forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      exportWorkbenchPreviewMode = String(button.dataset.exportPreviewMode || "main") === "layer" ? "layer" : "main";
+      renderExportWorkbenchUi(true);
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (exportWorkbenchFormat && !exportWorkbenchFormat.dataset.bound) {
+    exportWorkbenchFormat.addEventListener("change", () => {
+      if (exportFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+    });
+    exportWorkbenchFormat.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchSnapshotBtn && !exportWorkbenchSnapshotBtn.dataset.bound) {
+    exportWorkbenchSnapshotBtn.addEventListener("click", () => {
+      if (exportFormat && exportWorkbenchFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+      exportBtn?.click();
+    });
+    exportWorkbenchSnapshotBtn.dataset.bound = "true";
   }
 
   if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
@@ -7962,6 +8312,26 @@ function initToolbar({ render } = {}) {
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
+      const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
+      const mapSvg = document.getElementById("map-svg");
+      const layerCanvases = {
+        ...(state.exportLayerCanvases || {}),
+      };
+      if (!layerCanvases.base && state.colorCanvas) {
+        layerCanvases.base = state.colorCanvas;
+      }
+      if (!layerCanvases.paint && state.colorCanvas) {
+        layerCanvases.paint = state.colorCanvas;
+      }
+      if (!layerCanvases.borders && state.lineCanvas) {
+        layerCanvases.borders = state.lineCanvas;
+      }
+      let runtimeState = {
+        colorCanvas: state.colorCanvas,
+        lineCanvas: state.lineCanvas,
+        mapSvg,
+        layerCanvases,
+      };
       try {
         syncExportWorkbenchControlsFromState();
         const exportUi = ensureExportWorkbenchUiState();
@@ -7993,12 +8363,22 @@ function initToolbar({ render } = {}) {
           tone: "success",
         });
       } catch (error) {
-        console.error("Snapshot export failed:", error);
-        showToast(t("Unable to export the map snapshot.", "ui"), {
-          title: t("Snapshot failed", "ui"),
-          tone: "error",
-          duration: 4200,
-        });
+        console.warn("Workbench export failed, fallback to quick export:", error);
+        try {
+          const fallbackCanvas = await renderQuickSnapshotToCanvas(runtimeState);
+          downloadExportOutputs([{ id: "quick", canvas: fallbackCanvas }], formatKey, (_output, _index, extension) => `map_snapshot.${extension}`);
+          showToast(t("Map snapshot downloaded.", "ui"), {
+            title: t("Snapshot exported", "ui"),
+            tone: "success",
+          });
+        } catch (fallbackError) {
+          console.error("Snapshot export failed:", fallbackError);
+          showToast(t("Unable to export the map snapshot.", "ui"), {
+            title: t("Snapshot failed", "ui"),
+            tone: "error",
+            duration: 4200,
+          });
+        }
       }
     });
   }
@@ -8440,6 +8820,15 @@ function initToolbar({ render } = {}) {
     airportOpacity.dataset.bound = "true";
   }
 
+  if (airportPrimaryColor && !airportPrimaryColor.dataset.bound) {
+    airportPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().airport.primaryColor = normalizeOceanFillColor(event.target.value || "#1d4ed8");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-primary-color");
+    });
+    airportPrimaryColor.dataset.bound = "true";
+  }
+
   if (airportLabelsEnabled && !airportLabelsEnabled.dataset.bound) {
     airportLabelsEnabled.addEventListener("change", (event) => {
       getTransportAppearanceConfig().airport.labelsEnabled = !!event.target.checked;
@@ -8538,6 +8927,15 @@ function initToolbar({ render } = {}) {
       renderDirty("transport-port-opacity");
     });
     portOpacity.dataset.bound = "true";
+  }
+
+  if (portPrimaryColor && !portPrimaryColor.dataset.bound) {
+    portPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().port.primaryColor = normalizeOceanFillColor(event.target.value || "#b45309");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-primary-color");
+    });
+    portPrimaryColor.dataset.bound = "true";
   }
 
   if (portLabelsEnabled && !portLabelsEnabled.dataset.bound) {
@@ -9945,6 +10343,7 @@ function initToolbar({ render } = {}) {
   renderPaletteLibrary();
   syncPanelToggleButtons();
   renderTransportWorkbenchUi();
+  renderExportWorkbenchLayerList();
   state.updatePaintModeUIFn();
   state.updateDockCollapsedUiFn = updateDockCollapsedUi;
   updateDockCollapsedUi();
@@ -9967,6 +10366,9 @@ function initToolbar({ render } = {}) {
   }
   if (dockExportPopover) {
     dockExportPopover.setAttribute("aria-hidden", "true");
+  }
+  if (exportWorkbenchOverlay) {
+    exportWorkbenchOverlay.setAttribute("aria-hidden", "true");
   }
   if (scenarioGuidePopover) {
     applyDialogContract(scenarioGuidePopover, {
@@ -9996,4 +10398,4 @@ function initToolbar({ render } = {}) {
 
 
 
-export { initToolbar };
+export { initToolbar, resolveExportPassSequence };

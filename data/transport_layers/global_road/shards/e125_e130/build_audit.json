@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-04-14T23:55:47.924940Z",
+  "adapter_id": "global_road_v1",
+  "recipe_version": "global_road_sources_v1",
+  "source_policy": "overture_only_checked_in_v1",
+  "raw_segment_count": 90441,
+  "filtered_segment_count": 21470,
+  "preview_feature_count": 1456,
+  "label_candidate_count": 0,
+  "preview_label_candidate_count": 0,
+  "class_counts": {
+    "motorway": 18335,
+    "trunk": 3135
+  },
+  "preview_thresholds_m": {
+    "motorway": 8000.0,
+    "trunk": 22000.0
+  },
+  "output_size_bytes": {
+    "roads_preview": 508363,
+    "roads_full": 5791771,
+    "labels_preview": 42,
+    "labels_full": 42
+  },
+  "source_signature": {
+    "overture_transport_segment": {
+      "release": "2026-02-18.0",
+      "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/"
+    },
+    "source_recipe": {
+      "filename": "data/transport_layers/global_road/shards/e125_e130/source_recipe.manual.json",
+      "size_bytes": 1229,
+      "sha256": "026785087699f50adb605a7b1e892fe1febc548ccaea9e9918630d2eb4cea506"
+    },
+    "shard": {
+      "id": "e125_e130",
+      "lon_min": 125.0,
+      "lon_max": 130.0
+    }
+  },
+  "phase_status": {
+    "backbone": "ready_for_phase_a_checked_in_outputs",
+    "road_labels": "phase_b_pending_ref_sidecar"
+  },
+  "runtime_readiness": {
+    "transport_overview_road": "backbone_only_not_ui_ready",
+    "road_labels": "placeholder_only"
+  },
+  "notes": [
+    "Global road coarse v1 uses Overture transportation segments as the only canonical source.",
+    "Preview backbone is intentionally limited to motorway and trunk so the first checked-in preview stays lightweight.",
+    "Phase A full backbone is currently limited to motorway and trunk so the first checked-in global road pack can be produced reliably.",
+    "Rows are filtered, simplified, and spilled to normalized temp parquet chunks before preview/full backbone assembly.",
+    "road_labels is emitted as an empty placeholder sidecar until the dedicated ref-label phase is finalized.",
+    "Shard scope: e125_e130 (125.0 to 130.0 longitude center assignment)."
+  ]
+}

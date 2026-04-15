@@ -827,7 +827,7 @@ function createDefaultCityLayerStyleConfig() {
     markerScale: 1,
     showLabels: true,
     labelSize: 11,
-    labelMinZoom: 2.45,
+    labelMinZoom: 1.9,
     showCapitalOverlay: true,
     capitalScale: 1.6,
   };
@@ -958,6 +958,7 @@ function createDefaultTransportOverviewFamilyConfig(familyId) {
       return {
         opacity: 0.82,
         visualStrength: 0.56,
+        primaryColor: "#1d4ed8",
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "both",
@@ -970,6 +971,7 @@ function createDefaultTransportOverviewFamilyConfig(familyId) {
       return {
         opacity: 0.78,
         visualStrength: 0.54,
+        primaryColor: "#b45309",
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "mixed",
@@ -1023,6 +1025,17 @@ function normalizeTransportOverviewLabelDensity(value, fallback = "balanced") {
   return TRANSPORT_OVERVIEW_LABEL_DENSITIES.includes(fallback) ? fallback : "balanced";
 }
 
+function normalizeTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
+  const candidate = String(value || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
+  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
+  }
+  const normalizedFallback = String(fallback || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(normalizedFallback)) return normalizedFallback.toLowerCase();
+  return "#1d4ed8";
+}
+
 function normalizeTransportOverviewImportanceThreshold(value, fallback = "primary") {
   const normalized = String(value || "").trim().toLowerCase();
   if (normalized === "national_core") return "primary";
@@ -1053,6 +1066,7 @@ function normalizeTransportOverviewFamilyConfig(rawConfig, familyId) {
     visualStrength: Object.prototype.hasOwnProperty.call(raw, "visualStrength")
       ? clampUnitInterval(raw.visualStrength, defaults.visualStrength)
       : mapLegacyTransportPresetToVisualStrength(raw.preset, defaults.visualStrength),
+    primaryColor: normalizeTransportOverviewPrimaryColor(raw.primaryColor, defaults.primaryColor),
     labelsEnabled: raw.labelsEnabled === undefined ? defaults.labelsEnabled : !!raw.labelsEnabled,
     labelDensity: normalizeTransportOverviewLabelDensity(raw.labelDensity, defaults.labelDensity),
     labelMode: String(raw.labelMode || defaults.labelMode).trim().toLowerCase() || defaults.labelMode,
@@ -1552,6 +1566,107 @@ function normalizeTransportWorkbenchDisplayConfigs(rawConfigs) {
       normalizeTransportWorkbenchDisplayConfig(source[familyId], familyId),
     ])
   );
+}
+
+
+const EXPORT_WORKBENCH_LAYER_IDS = Object.freeze([
+  "base",
+  "paint",
+  "borders",
+  "labels",
+  "overlay",
+]);
+
+function normalizeExportWorkbenchLayerOrder(rawOrder) {
+  const savedOrder = Array.isArray(rawOrder) ? rawOrder.map((value) => String(value || "").trim()).filter(Boolean) : [];
+  return EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => savedOrder.includes(layerId)).concat(
+    EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => !savedOrder.includes(layerId))
+  );
+}
+
+function normalizeExportWorkbenchLayerVisibility(rawVisibility) {
+  const source = rawVisibility && typeof rawVisibility === "object" ? rawVisibility : {};
+  return Object.fromEntries(
+    EXPORT_WORKBENCH_LAYER_IDS.map((layerId) => [
+      layerId,
+      source[layerId] === undefined ? true : !!source[layerId],
+    ])
+  );
+}
+
+function normalizeExportWorkbenchUiState(rawUi) {
+  const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
+  const textItems = Array.isArray(raw.textItems)
+    ? raw.textItems
+      .map((entry, index) => {
+        const source = entry && typeof entry === "object" ? entry : {};
+        const text = String(source.text || "");
+        if (!text.trim()) return null;
+        return {
+          id: String(source.id || "").trim() || `text_${index + 1}`,
+          text,
+          x: toFiniteNumber(source.x, 0),
+          y: toFiniteNumber(source.y, 0),
+          font: String(source.font || "600 20px Inter").trim() || "600 20px Inter",
+          fill: String(source.fill || "#ffffff").trim() || "#ffffff",
+          align: ["left", "center", "right"].includes(String(source.align || "").trim().toLowerCase())
+            ? String(source.align || "").trim().toLowerCase()
+            : "left",
+          baseline: ["top", "middle", "bottom", "alphabetic"].includes(String(source.baseline || "").trim().toLowerCase())
+            ? String(source.baseline || "").trim().toLowerCase()
+            : "alphabetic",
+        };
+      })
+      .filter(Boolean)
+    : [];
+  const exportTargets = Array.isArray(raw.exportTargets)
+    ? raw.exportTargets
+      .map((entry) => {
+        const source = entry && typeof entry === "object" ? entry : {};
+        const type = String(source.type || "").trim().toLowerCase();
+        if (!["composite", "layer"].includes(type)) return null;
+        const id = String(source.id || "").trim();
+        const layerId = String(source.layerId || "").trim();
+        if (type === "layer" && !EXPORT_WORKBENCH_LAYER_IDS.includes(layerId)) return null;
+        return {
+          id: id || (type === "layer" ? `${layerId}_layer` : "composite"),
+          type,
+          layerId: type === "layer" ? layerId : "",
+        };
+      })
+      .filter(Boolean)
+    : [];
+  const bakeQueue = Array.isArray(raw.bakeQueue)
+    ? raw.bakeQueue
+      .map((entry) => {
+        const source = entry && typeof entry === "object" ? entry : {};
+        const layerId = String(source.layerId || "").trim();
+        if (!EXPORT_WORKBENCH_LAYER_IDS.includes(layerId)) return null;
+        return {
+          layerId,
+          enabled: source.enabled === undefined ? true : !!source.enabled,
+          mode: ["none", "flatten", "multiply", "screen", "overlay"].includes(String(source.mode || "").trim().toLowerCase())
+            ? String(source.mode || "").trim().toLowerCase()
+            : "none",
+        };
+      })
+      .filter(Boolean)
+    : [];
+  return {
+    open: !!raw.open,
+    activePreset: String(raw.activePreset || "default").trim() || "default",
+    layerOrder: normalizeExportWorkbenchLayerOrder(raw.layerOrder),
+    layerVisibility: normalizeExportWorkbenchLayerVisibility(raw.layerVisibility),
+    bakeQueue,
+    textItems,
+    exportTargets: exportTargets.length ? exportTargets : [{ id: "composite", type: "composite", layerId: "" }],
+    imageAdjustments: {
+      brightness: clamp(toFiniteNumber(raw.imageAdjustments?.brightness, 1), 0.2, 2.5),
+      contrast: clamp(toFiniteNumber(raw.imageAdjustments?.contrast, 1), 0.2, 2.5),
+      saturation: clamp(toFiniteNumber(raw.imageAdjustments?.saturation, 1), 0, 3),
+      gamma: clamp(toFiniteNumber(raw.imageAdjustments?.gamma, 1), 0.3, 3),
+    },
+  };
 }
 
 function normalizeTransportWorkbenchUiState(rawUi) {
@@ -2215,12 +2330,7 @@ export const state = {
     restoreLeftDrawer: false,
     restoreRightDrawer: false,
   },
-  exportWorkbenchUi: {
-    target: "composite",
-    format: "png",
-    includeTextLayer: true,
-    bakeArtifacts: [],
-  },
+  exportWorkbenchUi: normalizeExportWorkbenchUiState(null),
   cachedBorders: null,
   cachedCountryBorders: null,
   cachedDynamicOwnerBorders: null,
@@ -2337,6 +2447,9 @@ export const state = {
   updateZoomUIFn: null,
   updateTextureUIFn: null,
   updateWaterInteractionUIFn: null,
+  updateTransportAppearanceUIFn: null,
+  updateFacilityInfoCardUiFn: null,
+  syncFacilityInfoCardVisibilityFn: null,
   updateScenarioSpecialRegionUIFn: null,
   updateScenarioReliefOverlayUIFn: null,
   updateParentBorderCountryListFn: null,
