@@ -1753,7 +1753,8 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
-  const exportTarget = document.getElementById("exportTarget");
+  const exportTarget = document.getElementById("exportTarget")
+    || document.getElementById("exportTargetSelect");
   const exportFormat = document.getElementById("exportFormat");
   const exportScale = document.getElementById("exportScale");
   const exportWorkbenchLayerList = document.getElementById("exportWorkbenchLayerList");
