@@ -1702,6 +1702,7 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
+  const exportTarget = document.getElementById("exportTarget");
   const exportFormat = document.getElementById("exportFormat");
   const textureSelect = document.getElementById("textureSelect");
   const textureOpacity = document.getElementById("textureOpacity");
@@ -7580,47 +7581,232 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  const ensureExportWorkbenchUiState = () => {
+    if (!state.exportWorkbenchUi || typeof state.exportWorkbenchUi !== "object") {
+      state.exportWorkbenchUi = {};
+    }
+    const normalizedTarget = String(state.exportWorkbenchUi.target || "").trim().toLowerCase();
+    state.exportWorkbenchUi.target = ["composite", "per-layer", "bake-pack"].includes(normalizedTarget)
+      ? normalizedTarget
+      : "composite";
+    state.exportWorkbenchUi.format = String(state.exportWorkbenchUi.format || "").trim().toLowerCase() === "jpg"
+      ? "jpg"
+      : "png";
+    state.exportWorkbenchUi.includeTextLayer = state.exportWorkbenchUi.includeTextLayer !== false;
+    state.exportWorkbenchUi.bakeArtifacts = Array.isArray(state.exportWorkbenchUi.bakeArtifacts)
+      ? state.exportWorkbenchUi.bakeArtifacts
+      : [];
+    state.exportWorkbenchUi.bakeCache = state.exportWorkbenchUi.bakeCache instanceof Map
+      ? state.exportWorkbenchUi.bakeCache
+      : new Map();
+    return state.exportWorkbenchUi;
+  };
+
+  const computeBakeHash = (parts) => {
+    const source = Array.isArray(parts) ? parts.join("|") : String(parts || "");
+    let hash = 2166136261;
+    for (let index = 0; index < source.length; index += 1) {
+      hash ^= source.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `fnv1a_${(hash >>> 0).toString(16).padStart(8, "0")}`;
+  };
+
+  const getLayerDependencyRevision = (layerId) => {
+    const mapSvg = document.getElementById("map-svg");
+    const mapSvgChildCount = mapSvg ? mapSvg.childElementCount : 0;
+    if (layerId === "color") {
+      return [
+        `colorRevision:${Number(state.colorRevision) || 0}`,
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+      ];
+    }
+    if (layerId === "line") {
+      return [
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `dynamicDirty:${state.dynamicBordersDirty ? 1 : 0}`,
+      ];
+    }
+    if (layerId === "text") {
+      return [
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `svgChildren:${mapSvgChildCount}`,
+      ];
+    }
+    return [
+      `colorRevision:${Number(state.colorRevision) || 0}`,
+      `topologyRevision:${Number(state.topologyRevision) || 0}`,
+      `svgChildren:${mapSvgChildCount}`,
+    ];
+  };
+
+  const drawSvgLayerToCanvas = async (targetCanvas, targetCtx) => {
+    const mapSvg = document.getElementById("map-svg");
+    if (!mapSvg || !targetCanvas || !targetCtx) return false;
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      await new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+          targetCtx.drawImage(image, 0, 0);
+          resolve();
+        };
+        image.onerror = () => reject(new Error("SVG overlay export failed."));
+        image.src = svgUrl;
+      });
+      return true;
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  };
+
+  const writeBakeArtifactMeta = (layerId, dependencies, canvas, dirtyFlag) => {
+    const exportUi = ensureExportWorkbenchUiState();
+    const entry = {
+      layerId,
+      updatedAt: Date.now(),
+      dependencies: [...dependencies],
+      canvasSize: {
+        width: Math.max(0, Math.round(Number(canvas?.width) || 0)),
+        height: Math.max(0, Math.round(Number(canvas?.height) || 0)),
+      },
+      dirtyFlag: !!dirtyFlag,
+    };
+    const nextArtifacts = Array.isArray(exportUi.bakeArtifacts) ? [...exportUi.bakeArtifacts] : [];
+    const existingIndex = nextArtifacts.findIndex((artifact) => artifact?.layerId === layerId);
+    if (existingIndex >= 0) {
+      nextArtifacts[existingIndex] = entry;
+    } else {
+      nextArtifacts.push(entry);
+    }
+    exportUi.bakeArtifacts = nextArtifacts;
+    return entry;
+  };
+
+  const bakeLayer = async (layerId) => {
+    const exportUi = ensureExportWorkbenchUiState();
+    const normalizedLayerId = String(layerId || "").trim().toLowerCase();
+    if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
+      throw new Error(`Unsupported bake layer: ${layerId}`);
+    }
+    const width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
+    const height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
+    const dependencies = getLayerDependencyRevision(normalizedLayerId);
+    const hash = computeBakeHash([normalizedLayerId, `${width}x${height}`, ...dependencies]);
+    const cacheEntry = exportUi.bakeCache.get(normalizedLayerId);
+    if (
+      cacheEntry
+      && cacheEntry.hash === hash
+      && cacheEntry.canvas
+      && cacheEntry.canvas.width === width
+      && cacheEntry.canvas.height === height
+    ) {
+      writeBakeArtifactMeta(normalizedLayerId, dependencies, cacheEntry.canvas, false);
+      return cacheEntry.canvas;
+    }
+    const bakeCanvas = document.createElement("canvas");
+    bakeCanvas.width = width;
+    bakeCanvas.height = height;
+    const bakeCtx = bakeCanvas.getContext("2d");
+    if (!bakeCtx) {
+      throw new Error("Canvas bake context unavailable.");
+    }
+    if (normalizedLayerId === "color") {
+      if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
+    } else if (normalizedLayerId === "line") {
+      if (state.lineCanvas) bakeCtx.drawImage(state.lineCanvas, 0, 0);
+    } else if (normalizedLayerId === "text") {
+      await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
+    } else {
+      if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
+      if (state.lineCanvas) bakeCtx.drawImage(state.lineCanvas, 0, 0);
+      if (exportUi.includeTextLayer) {
+        await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
+      }
+    }
+    const version = cacheEntry ? Number(cacheEntry.version || 0) + 1 : 1;
+    exportUi.bakeCache.set(normalizedLayerId, {
+      hash,
+      version,
+      canvas: bakeCanvas,
+      updatedAt: Date.now(),
+      dependencies,
+      canvasSize: { width, height },
+      dirtyFlag: true,
+    });
+    writeBakeArtifactMeta(normalizedLayerId, dependencies, bakeCanvas, true);
+    return bakeCanvas;
+  };
+
+  const triggerCanvasDownload = (canvas, extension, fileStem) => {
+    const format = extension === "jpg" ? "image/jpeg" : "image/png";
+    const dataUrl = canvas.toDataURL(format, 0.92);
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `${fileStem}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  if (exportTarget && !exportTarget.dataset.bound) {
+    const exportUi = ensureExportWorkbenchUiState();
+    exportTarget.value = exportUi.target;
+    exportTarget.addEventListener("change", () => {
+      const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
+      exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
+        ? nextTarget
+        : "composite";
+      if (exportUi.target === "per-layer") {
+        exportFormat.value = "png";
+        exportFormat.disabled = true;
+      } else {
+        exportFormat.disabled = exportUi.target === "bake-pack";
+      }
+    });
+    if (exportUi.target === "per-layer") {
+      exportFormat.value = "png";
+      exportFormat.disabled = true;
+    } else {
+      exportFormat.disabled = exportUi.target === "bake-pack";
+    }
+    exportTarget.dataset.bound = "true";
+  }
+
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
       try {
-        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
-        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = state.colorCanvas?.width || 0;
-        exportCanvas.height = state.colorCanvas?.height || 0;
-        const exportCtx = exportCanvas.getContext("2d");
-        if (!exportCtx) {
-          throw new Error("Canvas export context unavailable.");
+        const exportUi = ensureExportWorkbenchUiState();
+        if (exportTarget) {
+          const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
+          exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
+            ? nextTarget
+            : exportUi.target;
         }
-        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
-        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
-        const mapSvg = document.getElementById("map-svg");
-        if (mapSvg) {
-          const serializer = new XMLSerializer();
-          const svgMarkup = serializer.serializeToString(mapSvg);
-          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-          const svgUrl = URL.createObjectURL(svgBlob);
-          try {
-            await new Promise((resolve, reject) => {
-              const image = new Image();
-              image.onload = () => {
-                exportCtx.drawImage(image, 0, 0);
-                resolve();
-              };
-              image.onerror = () => reject(new Error("SVG overlay export failed."));
-              image.src = svgUrl;
-            });
-          } finally {
-            URL.revokeObjectURL(svgUrl);
+        const extension = exportUi.target === "per-layer"
+          ? "png"
+          : (exportFormat.value === "jpg" ? "jpg" : "png");
+        exportUi.format = extension;
+        const exportTargetKind = exportUi.target;
+
+        if (exportTargetKind === "per-layer") {
+          const colorCanvas = await bakeLayer("color");
+          triggerCanvasDownload(colorCanvas, "png", "map_layer_color");
+          const lineCanvas = await bakeLayer("line");
+          triggerCanvasDownload(lineCanvas, "png", "map_layer_line");
+          if (exportUi.includeTextLayer) {
+            const textCanvas = await bakeLayer("text");
+            triggerCanvasDownload(textCanvas, "png", "map_layer_text");
           }
+        } else if (exportTargetKind === "bake-pack") {
+          throw new Error("Bake pack export is planned for v1.1.");
+        } else {
+          const exportCanvas = await bakeLayer("composite");
+          triggerCanvasDownload(exportCanvas, extension, "map_snapshot");
         }
-        const dataUrl = exportCanvas.toDataURL(format, 0.92);
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = `map_snapshot.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
         showToast(t("Map snapshot downloaded.", "ui"), {
           title: t("Snapshot exported", "ui"),
           tone: "success",
