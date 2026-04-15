@@ -1753,8 +1753,10 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
+  const exportTarget = document.getElementById("exportTarget");
   const exportFormat = document.getElementById("exportFormat");
   const exportScale = document.getElementById("exportScale");
+  const exportWorkbenchLayerList = document.getElementById("exportWorkbenchLayerList");
   const textureSelect = document.getElementById("textureSelect");
   const textureOpacity = document.getElementById("textureOpacity");
   const texturePaperControls = document.getElementById("texturePaperControls");
@@ -1792,6 +1794,9 @@ function initToolbar({ render } = {}) {
   const dayNightUtcStatus = document.getElementById("dayNightUtcStatus");
   const dayNightCurrentTime = document.getElementById("dayNightCurrentTime");
   const dayNightCityLightsEnabled = document.getElementById("dayNightCityLightsEnabled");
+  if (exportWorkbenchLayerList && !exportWorkbenchLayerList.getAttribute("aria-label")) {
+    exportWorkbenchLayerList.setAttribute("aria-label", t("Main Layers", "ui"));
+  }
   const dayNightCityLightsStyle = document.getElementById("dayNightCityLightsStyle");
   const dayNightCityLightsIntensity = document.getElementById("dayNightCityLightsIntensity");
   const dayNightCityLightsTextureOpacity = document.getElementById("dayNightCityLightsTextureOpacity");
@@ -7714,6 +7719,13 @@ function initToolbar({ render } = {}) {
       }
       exportJobsInFlight += 1;
       try {
+        const selectedExportTarget = String(exportTarget?.value || "composite").trim().toLowerCase();
+        if (selectedExportTarget !== "composite") {
+          showToast(
+            t("Selected export target is not available yet. Falling back to Composite image.", "ui"),
+            { title: t("Export target fallback", "ui"), tone: "warning", duration: 4200 }
+          );
+        }
         const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
         const extension = exportFormat.value === "jpg" ? "jpg" : "png";
         const { width: baseWidth, height: baseHeight } = resolveExportBaseDimensions();
