@@ -5,7 +5,7 @@ async function expectSupportPopoverVisibility(page, { guide, reference, export: 
   await expect(page.locator("#scenarioGuidePopover"))[guide ? "toBeVisible" : "toBeHidden"]();
   await expect(page.locator("#scenarioGuideBackdrop"))[guide ? "toBeVisible" : "toBeHidden"]();
   await expect(page.locator("#dockReferencePopover"))[reference ? "toBeVisible" : "toBeHidden"]();
-  await expect(page.locator("#dockExportPopover"))[exportVisible ? "toBeVisible" : "toBeHidden"]();
+  await expect(page.locator("#exportWorkbenchOverlay"))[exportVisible ? "toBeVisible" : "toBeHidden"]();
 }
 
 async function activateSupportTrigger(page, selector) {
@@ -30,7 +30,7 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
 
   await expect(page.locator("#utilitiesGuideBtn")).toHaveText("Guide");
   await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
-  await expect(page.locator("#dockExportBtn")).toHaveText("Export");
+  await expect(page.locator("#dockExportBtn")).toHaveText("Open workbench");
 
   await activateSupportTrigger(page, "#utilitiesGuideBtn");
   await expectSupportPopoverVisibility(page, { guide: true, reference: false, export: false });
@@ -52,7 +52,7 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await page.locator("#dockExportBtn").focus();
   await page.keyboard.press("Enter");
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: true });
-  await expect(page.locator("#lblExport")).not.toHaveText("");
+  await expect(page.locator("#exportWorkbenchTitle")).not.toHaveText("");
 
   await activateSupportTrigger(page, "#utilitiesGuideBtn");
   await expectSupportPopoverVisibility(page, { guide: true, reference: false, export: false });
@@ -122,18 +122,18 @@ test("phase 03 support surfaces restore the export view and stay idempotent", as
   await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=export", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await expect(page.locator("#inspectorSidebarTabProject")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
-  await expect(page.locator("#dockExportPopover")).toBeVisible();
+  await expect(page.locator("#exportProjectSection")).toHaveJSProperty("open", true);
+  await expect(page.locator("#exportWorkbenchOverlay")).toBeVisible();
   await expect(page.locator("#dockExportBtn")).toHaveAttribute("aria-expanded", "true");
 
   const stateAfterRepeat = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
     state.restoreSupportSurfaceFromUrlFn?.();
     state.restoreSupportSurfaceFromUrlFn?.();
-    const popover = document.querySelector("#dockExportPopover");
+    const overlay = document.querySelector("#exportWorkbenchOverlay");
     const trigger = document.querySelector("#dockExportBtn");
     return {
-      visible: popover instanceof HTMLElement ? !popover.classList.contains("hidden") : false,
+      visible: overlay instanceof HTMLElement ? !overlay.classList.contains("hidden") : false,
       expanded: trigger?.getAttribute("aria-expanded") || "",
     };
   });
@@ -153,7 +153,7 @@ test("phase 03 ignores unknown support-surface view values", async ({ page }) =>
   await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
   await expect(page.locator("#scenarioGuideBackdrop")).toBeHidden();
   await expect(page.locator("#dockReferencePopover")).toBeHidden();
-  await expect(page.locator("#dockExportPopover")).toBeHidden();
+  await expect(page.locator("#exportWorkbenchOverlay")).toBeHidden();
 });
 
 test("phase 03 guide modal closes cleanly from backdrop without leaving drawer scrim behind", async ({ page }) => {

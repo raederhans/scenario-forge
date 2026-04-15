@@ -711,3 +711,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 60. 长扫描 builder 只在 flush 时打日志还不够，scan checkpoint 必须早于首次产物写出
 - 这次 rail builder 一开始改成按 4000 行再 flush 后，短观察窗口里又回到了“只看到 starting scan、看不到任何后续进度”的假卡死观感。
 - 更稳的做法是：除了 flush log，再单独加 batch 级 scan checkpoint，把 `raw_seen / kept / pending_rows / region_counts` 提前打出来，这样就算还没写任何 chunk，也能知道它是在慢扫、慢滤，还是完全没推进。
+
+### 61. 支持区工具一旦升级成一级功能区块，必须同波次迁移 URL restore、旧壳清理和契约测试
+- 这次 Export 从 Utilities 升成 Project 一级区块后，如果只挪 DOM、不同时改 sidebar.js / toolbar.js 的 restore 链、旧 popover 清理和 contract/e2e，界面会立刻出现‘入口新了，但状态恢复和测试还活在旧层级’的分裂。
+- 最稳的最短路径是：保留按钮 id 和 overlay id，只搬入口层级；同时把旧 support-surface 残链一次删干净。

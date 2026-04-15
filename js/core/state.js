@@ -1613,6 +1613,10 @@ const EXPORT_WORKBENCH_LAYER_IDS = Object.freeze([
   "effects",
   "labels",
 ]);
+const EXPORT_WORKBENCH_TEXT_LAYER_IDS = Object.freeze([
+  "render-labels",
+  "svg-annotations",
+]);
 const EXPORT_WORKBENCH_BAKE_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
 const EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES = Object.freeze({
   base: "background",
@@ -1620,6 +1624,12 @@ const EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES = Object.freeze({
   borders: "effects",
   labels: "labels",
   overlay: "context",
+});
+const EXPORT_WORKBENCH_TEXT_LAYER_ID_ALIASES = Object.freeze({
+  labels: "render-labels",
+  text: "render-labels",
+  svg: "svg-annotations",
+  annotations: "svg-annotations",
 });
 
 function normalizeExportWorkbenchLayerOrder(rawOrder) {
@@ -1681,21 +1691,57 @@ function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
     .filter(Boolean);
 }
 
+function normalizeExportWorkbenchAdjustment(value, fallback = 100) {
+  return Math.max(0, Math.min(200, Math.round(toFiniteNumber(value, fallback))));
+}
+
+function normalizeExportWorkbenchTextVisibility(rawVisibility, includeTextLayer = true) {
+  const source = rawVisibility && typeof rawVisibility === "object" ? rawVisibility : {};
+  const normalizedSource = Object.fromEntries(
+    Object.entries(source).map(([key, value]) => [
+      EXPORT_WORKBENCH_TEXT_LAYER_ID_ALIASES[String(key || "").trim().toLowerCase()] || String(key || "").trim().toLowerCase(),
+      value,
+    ])
+  );
+  return Object.fromEntries(
+    EXPORT_WORKBENCH_TEXT_LAYER_IDS.map((layerId) => [
+      layerId,
+      normalizedSource[layerId] === undefined ? !!includeTextLayer : !!normalizedSource[layerId],
+    ])
+  );
+}
+
 function normalizeExportWorkbenchUiState(rawUi) {
   const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
   const rawTarget = String(raw.target || "").trim().toLowerCase();
   const normalizedTarget = rawTarget === "per-layer-png"
     ? "per-layer"
-    : (rawTarget === "bake-pack" ? "composite" : rawTarget);
+    : rawTarget;
   const visibilitySource = raw.visibility && typeof raw.visibility === "object"
     ? raw.visibility
     : raw.layerVisibility;
+  const includeTextLayer = raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer;
+  const textVisibility = normalizeExportWorkbenchTextVisibility(raw.textVisibility, includeTextLayer);
+  const previewLayerId = String(raw.previewLayerId || raw.previewSource || "background").trim().toLowerCase();
   return {
     target: EXPORT_WORKBENCH_TARGETS.has(normalizedTarget) ? normalizedTarget : "composite",
     format: String(raw.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png",
-    includeTextLayer: raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer,
+    includeTextLayer: Object.values(textVisibility).some(Boolean),
     layerOrder: normalizeExportWorkbenchLayerOrder(raw.layerOrder),
     visibility: normalizeExportWorkbenchVisibility(visibilitySource),
+    textVisibility,
+    previewMode: String(raw.previewMode || "").trim().toLowerCase() === "layer" ? "layer" : "main",
+    previewLayerId: [
+      ...EXPORT_WORKBENCH_LAYER_IDS,
+      ...EXPORT_WORKBENCH_TEXT_LAYER_IDS,
+    ].includes(previewLayerId) ? previewLayerId : "background",
+    scale: ["1", "1.5", "2", "4"].includes(String(raw.scale || "").trim()) ? String(raw.scale).trim() : "2",
+    adjustments: {
+      brightness: normalizeExportWorkbenchAdjustment(raw.adjustments?.brightness ?? raw.brightness, 100),
+      contrast: normalizeExportWorkbenchAdjustment(raw.adjustments?.contrast ?? raw.contrast, 100),
+      saturation: normalizeExportWorkbenchAdjustment(raw.adjustments?.saturation ?? raw.saturation, 100),
+      clarity: normalizeExportWorkbenchAdjustment(raw.adjustments?.clarity ?? raw.clarity, 100),
+    },
     bakeArtifacts: normalizeExportWorkbenchBakeArtifacts(raw.bakeArtifacts),
   };
 }

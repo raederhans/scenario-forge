@@ -36,6 +36,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         order = [
             'id="projectLegendSection"',
             'id="frontlineProjectSection"',
+            'id="exportProjectSection"',
             'id="inspectorUtilitiesSection"',
             'id="diagnosticsSection"',
         ]

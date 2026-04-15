@@ -31,7 +31,7 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn("scenario-guide-modal", content)
         self.assertIn("Use this guide inside the support area so the shell stays quiet while the next step stays readable.", content)
         self.assertIn("Keep a working reference visible while you line up opacity, scale, and offsets.", content)
-        self.assertIn("Export the visible map as a PNG or JPG snapshot.", content)
+        self.assertIn("Open the export workbench to choose target, layer order, format, and resolution.", content)
         self.assertNotIn("lblExportInfoTooltip", content)
 
     def test_transport_shell_uses_phase03_titles_and_status_contract(self):
