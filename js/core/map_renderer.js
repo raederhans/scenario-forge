@@ -816,6 +816,20 @@ const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
 let cityMarkerSpriteCacheColorRevision = -1;
 let visibleCityHoverEntries = [];
+const visibleFacilityHoverEntriesByFamily = {
+  airport: [],
+  port: [],
+};
+let hoveredFacilityEntry = null;
+let selectedFacilityEntry = null;
+let facilityInfoCard = null;
+let facilityInfoCardTitle = null;
+let facilityInfoCardBody = null;
+let facilityInfoCardZoomBtn = null;
+let facilityInfoCardCloseBtn = null;
+let facilityInfoCardMoreBtn = null;
+let facilityInfoCardExpanded = false;
+let facilityInfoCardAnchor = null;
 let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
 let pendingIndexUiRefreshHandle = null;
@@ -4203,12 +4217,16 @@ function getInspectorOverlaySignature() {
 }
 
 function getHoverOverlaySignature() {
+  const activeFacilityEntry = getActiveFacilityHighlightEntry();
   return [
     getOverlayProjectionSignature(),
     String(state.renderPhase || RENDER_PHASE_IDLE),
     String(state.hoveredId || ""),
     String(state.hoveredWaterRegionId || ""),
     String(state.hoveredSpecialRegionId || ""),
+    buildFacilityEntryKey(activeFacilityEntry),
+    Number(activeFacilityEntry?.screenPoint?.[0] || 0).toFixed(1),
+    Number(activeFacilityEntry?.screenPoint?.[1] || 0).toFixed(1),
   ].join("::");
 }
 
@@ -13340,6 +13358,402 @@ function getHoveredCityTooltipEntry(event, hit) {
   return isCityEntryEligibleForLandHit(entry, hit) ? entry : null;
 }
 
+function listVisibleFacilityHoverEntries() {
+  return [
+    ...(Array.isArray(visibleFacilityHoverEntriesByFamily.airport) ? visibleFacilityHoverEntriesByFamily.airport : []),
+    ...(Array.isArray(visibleFacilityHoverEntriesByFamily.port) ? visibleFacilityHoverEntriesByFamily.port : []),
+  ];
+}
+
+function buildFacilityEntryKey(entry) {
+  const familyId = String(entry?.familyId || "").trim().toLowerCase();
+  const stableId = String(entry?.stableId || "").trim();
+  if (!familyId || !stableId) return "";
+  return `${familyId}:${stableId}`;
+}
+
+function clearFacilityHoverEntries(familyId = "") {
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+  if (normalizedFamilyId && Object.prototype.hasOwnProperty.call(visibleFacilityHoverEntriesByFamily, normalizedFamilyId)) {
+    visibleFacilityHoverEntriesByFamily[normalizedFamilyId] = [];
+  }
+  if (normalizedFamilyId && hoveredFacilityEntry?.familyId === normalizedFamilyId) {
+    hoveredFacilityEntry = null;
+    state.hoverOverlayDirty = true;
+  }
+  if (normalizedFamilyId && selectedFacilityEntry?.familyId === normalizedFamilyId) {
+    selectedFacilityEntry = null;
+    applyFacilityInfoCardState(null);
+    state.hoverOverlayDirty = true;
+  }
+}
+
+function setVisibleFacilityHoverEntries(familyId = "", entries = []) {
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+  if (!normalizedFamilyId || !Object.prototype.hasOwnProperty.call(visibleFacilityHoverEntriesByFamily, normalizedFamilyId)) {
+    return;
+  }
+  visibleFacilityHoverEntriesByFamily[normalizedFamilyId] = Array.isArray(entries) ? entries : [];
+  const nextEntriesByKey = new Map(
+    listVisibleFacilityHoverEntries()
+      .map((entry) => [buildFacilityEntryKey(entry), entry])
+      .filter(([key]) => !!key)
+  );
+  const hoveredKey = buildFacilityEntryKey(hoveredFacilityEntry);
+  const selectedKey = buildFacilityEntryKey(selectedFacilityEntry);
+  if (hoveredKey) {
+    const nextHoveredEntry = nextEntriesByKey.get(hoveredKey) || null;
+    if (nextHoveredEntry) {
+      hoveredFacilityEntry = nextHoveredEntry;
+      state.hoverOverlayDirty = true;
+    } else {
+      hoveredFacilityEntry = null;
+      state.hoverOverlayDirty = true;
+    }
+  }
+  if (selectedKey) {
+    const nextSelectedEntry = nextEntriesByKey.get(selectedKey) || null;
+    if (nextSelectedEntry) {
+      selectedFacilityEntry = nextSelectedEntry;
+      applyFacilityInfoCardState(nextSelectedEntry);
+      state.hoverOverlayDirty = true;
+    } else {
+      selectedFacilityEntry = null;
+      applyFacilityInfoCardState(null);
+      state.hoverOverlayDirty = true;
+    }
+  }
+}
+
+function getFacilityHoverRadiusPx(entry) {
+  return Math.max(8, Number(entry?.markerRadiusPx || 0) + 5);
+}
+
+function getHoveredFacilityEntryFromEvent(event) {
+  if (!mapSvg || !globalThis.d3?.pointer) {
+    return null;
+  }
+  const entries = listVisibleFacilityHoverEntries();
+  if (!entries.length) {
+    return null;
+  }
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  if (![sx, sy].every(Number.isFinite)) {
+    return null;
+  }
+  let bestEntry = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  entries.forEach((entry) => {
+    const [entryX, entryY] = entry?.screenPoint || [];
+    if (![entryX, entryY].every(Number.isFinite)) {
+      return;
+    }
+    const threshold = Math.max(6, Number(entry?.hoverRadiusPx || 0));
+    const distance = Math.hypot(sx - entryX, sy - entryY);
+    if (distance <= threshold && distance < bestDistance) {
+      bestDistance = distance;
+      bestEntry = entry;
+    }
+  });
+  return bestEntry;
+}
+
+function buildFacilityTooltipText(entry) {
+  if (!entry) return "";
+  const properties = entry.properties || {};
+  const lines = [String(properties.name || "").trim()];
+  if (entry.familyId === "airport") {
+    const typeLabel = String(properties.airport_type_label || properties.airport_type || properties.category || "").trim();
+    const code = String(properties.iata || properties.icao || "").trim();
+    if (typeLabel || code) {
+      lines.push([typeLabel, code].filter(Boolean).join(" · "));
+    }
+    const runwayLength = Number(properties.runway_length_m_max);
+    const passengerCount = Number(properties.passengers_per_day_latest);
+    const summaryBits = [];
+    if (Number.isFinite(runwayLength) && runwayLength > 0) {
+      summaryBits.push(`${t("Runway", "ui")}: ${Math.round(runwayLength).toLocaleString()}m`);
+    }
+    if (Number.isFinite(passengerCount) && passengerCount > 0) {
+      summaryBits.push(`${t("Passengers/day", "ui")}: ${Math.round(passengerCount).toLocaleString()}`);
+    }
+    if (summaryBits.length) {
+      lines.push(summaryBits.join(" · "));
+    }
+  } else if (entry.familyId === "port") {
+    const designation = String(properties.legal_designation_label || properties.legal_designation || properties.category || "").trim();
+    const portClass = String(properties.port_class || "").trim();
+    if (designation || portClass) {
+      lines.push([designation, portClass].filter(Boolean).join(" · "));
+    }
+    const mooringLength = Number(properties.mooring_facility_length_m);
+    const ferryService = properties.ferry_service === true || String(properties.ferry_service || "").trim().toLowerCase() === "true";
+    const summaryBits = [];
+    if (ferryService) {
+      summaryBits.push(t("Ferry service", "ui"));
+    }
+    if (Number.isFinite(mooringLength) && mooringLength > 0) {
+      summaryBits.push(`${t("Mooring", "ui")}: ${Math.round(mooringLength).toLocaleString()}m`);
+    }
+    if (summaryBits.length) {
+      lines.push(summaryBits.join(" · "));
+    }
+  }
+  return renderTooltipText({ lines: lines.filter(Boolean) });
+}
+
+function escapeFacilityHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function normalizeFacilityDisplayValue(value) {
+  if (value == null) return "";
+  const normalized = String(value).trim();
+  if (!normalized) return "";
+  const lower = normalized.toLowerCase();
+  if (["nan", "null", "none", "undefined"].includes(lower)) {
+    return "";
+  }
+  return normalized;
+}
+
+function buildFacilityInfoCardTitle(entry) {
+  const familyLabel = entry?.familyId === "port" ? t("Port", "ui") : t("Airport", "ui");
+  const name = String(entry?.properties?.name || "").trim() || t("Unnamed facility", "ui");
+  return `${familyLabel} · ${name}`;
+}
+
+function buildFacilityInfoCardFieldSections(entry) {
+  if (!entry) {
+    return { defaultRows: [], extraRows: [] };
+  }
+  const properties = entry.properties || {};
+  const defaultRows = [];
+  const extraRows = [];
+  const pushRow = (target, label, value) => {
+    const normalizedValue = normalizeFacilityDisplayValue(value);
+    if (!normalizedValue) return false;
+    target.push(
+      `<div class="facility-info-card-row"><span class="facility-info-card-label">${escapeFacilityHtml(label)}</span><span class="facility-info-card-value">${escapeFacilityHtml(normalizedValue)}</span></div>`
+    );
+    return true;
+  };
+  const appendFallbackRow = (target, rows) => {
+    for (const [label, value] of rows) {
+      if (pushRow(target, label, value)) return true;
+    }
+    return false;
+  };
+  pushRow(defaultRows, t("Tier", "ui"), String(properties.importance || "").replaceAll("_", " "));
+  if (entry.familyId === "airport") {
+    pushRow(defaultRows, t("Airport type", "ui"), properties.airport_type_label || properties.airport_type || properties.category);
+    pushRow(defaultRows, "IATA / ICAO", [properties.iata, properties.icao].filter(Boolean).join(" / "));
+    pushRow(defaultRows, t("Runway", "ui"), Number.isFinite(Number(properties.runway_length_m_max)) && Number(properties.runway_length_m_max) > 0
+      ? `${Math.round(Number(properties.runway_length_m_max)).toLocaleString()}m`
+      : "");
+    const passengersPerDay = Number.isFinite(Number(properties.passengers_per_day_latest)) && Number(properties.passengers_per_day_latest) > 0
+      ? Math.round(Number(properties.passengers_per_day_latest)).toLocaleString()
+      : "";
+    const landingsPerDay = Number.isFinite(Number(properties.landings_per_day_latest)) && Number(properties.landings_per_day_latest) > 0
+      ? Math.round(Number(properties.landings_per_day_latest)).toLocaleString()
+      : "";
+    const statusText = String(properties.status || properties.status_category || "").trim();
+    let usedAirportMetric = "";
+    if (pushRow(defaultRows, t("Passengers/day", "ui"), passengersPerDay)) {
+      usedAirportMetric = "passengers";
+    } else if (pushRow(defaultRows, t("Landings/day", "ui"), landingsPerDay)) {
+      usedAirportMetric = "landings";
+    } else if (pushRow(defaultRows, t("Status", "ui"), statusText)) {
+      usedAirportMetric = "status";
+    }
+    if (usedAirportMetric !== "landings") {
+      pushRow(extraRows, t("Landings/day", "ui"), landingsPerDay);
+    }
+    if (usedAirportMetric !== "passengers") {
+      pushRow(extraRows, t("Passengers/day", "ui"), passengersPerDay);
+    }
+    pushRow(extraRows, t("Hours", "ui"), [properties.operation_start, properties.operation_end].filter(Boolean).join(" - "));
+    appendFallbackRow(extraRows, [
+      [t("Owner / Manager", "ui"), [properties.owner, properties.manager].filter(Boolean).join(" / ")],
+      [t("Owner", "ui"), properties.owner],
+      [t("Manager", "ui"), properties.manager],
+    ]);
+  } else if (entry.familyId === "port") {
+    pushRow(defaultRows, t("Designation", "ui"), properties.legal_designation_label || properties.legal_designation);
+    pushRow(defaultRows, t("Class", "ui"), properties.port_class);
+    const mooringText = Number.isFinite(Number(properties.mooring_facility_length_m)) && Number(properties.mooring_facility_length_m) > 0
+      ? `${Math.round(Number(properties.mooring_facility_length_m)).toLocaleString()}m`
+      : "";
+    const outerFacilityText = Number.isFinite(Number(properties.outer_facility_length_m)) && Number(properties.outer_facility_length_m) > 0
+      ? `${Math.round(Number(properties.outer_facility_length_m)).toLocaleString()}m`
+      : "";
+    const ferryText = properties.ferry_service === true ? t("Yes", "ui") : properties.ferry_service === false ? t("No", "ui") : "";
+    const managerText = String(properties.manager || "").trim();
+    let usedPortMetric = "";
+    if (pushRow(defaultRows, t("Mooring", "ui"), mooringText)) {
+      usedPortMetric = "mooring";
+    } else if (pushRow(defaultRows, t("Outer facility", "ui"), outerFacilityText)) {
+      usedPortMetric = "outer";
+    }
+    let usedPortIdentity = "";
+    if (pushRow(defaultRows, t("Ferry", "ui"), ferryText)) {
+      usedPortIdentity = "ferry";
+    } else if (pushRow(defaultRows, t("Manager", "ui"), managerText)) {
+      usedPortIdentity = "manager";
+    }
+    if (usedPortMetric !== "outer") {
+      pushRow(extraRows, t("Outer facility", "ui"), outerFacilityText);
+    }
+    if (usedPortMetric !== "mooring") {
+      pushRow(extraRows, t("Mooring", "ui"), mooringText);
+    }
+    if (usedPortIdentity !== "manager") {
+      pushRow(extraRows, t("Manager", "ui"), managerText);
+    }
+    if (usedPortIdentity !== "ferry") {
+      pushRow(extraRows, t("Ferry", "ui"), ferryText);
+    }
+    pushRow(extraRows, t("Established", "ui"), properties.date_established);
+    appendFallbackRow(extraRows, [
+      [t("Manager / Agencies", "ui"), [properties.manager, properties.agency_labels].filter(Boolean).join(" / ")],
+      [t("Agencies", "ui"), properties.agency_labels],
+    ]);
+  }
+  return { defaultRows, extraRows };
+}
+
+function buildFacilityInfoCardBody(entry, expanded = false) {
+  const { defaultRows, extraRows } = buildFacilityInfoCardFieldSections(entry);
+  const rows = [...defaultRows, ...(expanded ? extraRows : [])];
+  if (!rows.length) {
+    return {
+      html: `<div class="facility-info-card-empty">${escapeFacilityHtml(t("No facility details available yet.", "ui"))}</div>`,
+      hasExtraRows: false,
+    };
+  }
+  return {
+    html: rows.join(""),
+    hasExtraRows: extraRows.length > 0,
+  };
+}
+
+function applyFacilityInfoCardState(entry, anchor = null) {
+  if (!facilityInfoCard || !facilityInfoCardTitle || !facilityInfoCardBody || !facilityInfoCardZoomBtn || !facilityInfoCardMoreBtn) {
+    return;
+  }
+  if (!entry) {
+    selectedFacilityEntry = null;
+    facilityInfoCardExpanded = false;
+    facilityInfoCardAnchor = null;
+    facilityInfoCard.classList.add("hidden");
+    facilityInfoCard.setAttribute("aria-hidden", "true");
+    facilityInfoCardTitle.textContent = "";
+    facilityInfoCardBody.innerHTML = "";
+    facilityInfoCardZoomBtn.disabled = true;
+    facilityInfoCardZoomBtn.dataset.familyKey = "";
+    facilityInfoCardMoreBtn.classList.add("hidden");
+    facilityInfoCardMoreBtn.textContent = t("More fields", "ui");
+    return;
+  }
+  selectedFacilityEntry = entry;
+  facilityInfoCardAnchor = anchor && Number.isFinite(Number(anchor?.x)) && Number.isFinite(Number(anchor?.y))
+    ? { x: Number(anchor.x), y: Number(anchor.y) }
+    : (facilityInfoCardAnchor || { x: 24, y: 24 });
+  facilityInfoCardTitle.textContent = buildFacilityInfoCardTitle(entry);
+  const bodyState = buildFacilityInfoCardBody(entry, facilityInfoCardExpanded);
+  facilityInfoCardBody.innerHTML = bodyState.html;
+  facilityInfoCardZoomBtn.disabled = false;
+  facilityInfoCardZoomBtn.dataset.familyKey = buildFacilityEntryKey(entry);
+  facilityInfoCardMoreBtn.classList.toggle("hidden", !bodyState.hasExtraRows);
+  facilityInfoCardMoreBtn.textContent = t(facilityInfoCardExpanded ? "Less fields" : "More fields", "ui");
+  facilityInfoCard.classList.remove("hidden");
+  facilityInfoCard.setAttribute("aria-hidden", "false");
+  const viewportWidth = Math.max(320, Number(globalThis.innerWidth || 0));
+  const viewportHeight = Math.max(280, Number(globalThis.innerHeight || 0));
+  const cardWidth = 340;
+  const cardHeight = 260;
+  const anchorX = Number(facilityInfoCardAnchor?.x || 0);
+  const anchorY = Number(facilityInfoCardAnchor?.y || 0);
+  const left = Math.max(16, Math.min(viewportWidth - cardWidth - 16, anchorX + 18));
+  const top = Math.max(16, Math.min(viewportHeight - cardHeight - 16, anchorY + 18));
+  facilityInfoCard.style.left = `${Math.round(left)}px`;
+  facilityInfoCard.style.top = `${Math.round(top)}px`;
+}
+
+function setMapInteractionCursor(nextCursor = "") {
+  if (!interactionRect) return;
+  interactionRect.style("cursor", nextCursor || null);
+}
+
+function getActiveFacilityHighlightEntry() {
+  return hoveredFacilityEntry || selectedFacilityEntry || null;
+}
+
+function zoomToFacilityEntry(entry, { targetScale = 4.8, durationMs = 420 } = {}) {
+  if (!entry?.coordinates || !projection || !interactionRect || !zoomBehavior || !globalThis.d3) {
+    return;
+  }
+  const projected = projection(entry.coordinates);
+  if (!Array.isArray(projected) || !projected.every(Number.isFinite)) {
+    return;
+  }
+  const nextScale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, Number(targetScale) || 4.8));
+  const nextTransform = globalThis.d3.zoomIdentity
+    .translate(state.width / 2, state.height / 2)
+    .scale(nextScale)
+    .translate(-projected[0], -projected[1]);
+  globalThis.d3
+    .select(interactionRect.node())
+    .transition()
+    .duration(durationMs)
+    .call(zoomBehavior.transform, nextTransform);
+}
+
+function syncFacilityInfoCardVisibility() {
+  if (!selectedFacilityEntry) {
+    return;
+  }
+  if (isFacilityDetailsSurfaceActive(selectedFacilityEntry.familyId)) {
+    return;
+  }
+  hoveredFacilityEntry = null;
+  applyFacilityInfoCardState(null);
+  state.hoverOverlayDirty = true;
+  renderHoverOverlayIfNeeded();
+  queueTooltipUpdate({ visible: false });
+  setMapInteractionCursor("");
+}
+
+function isFacilityDetailsSurfaceActive(familyId = "") {
+  const transportPanel = document.getElementById("appearancePanelTransport");
+  if (
+    transportPanel instanceof HTMLElement
+    && transportPanel.hidden !== true
+    && !transportPanel.classList.contains("hidden")
+  ) {
+    const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+    if (normalizedFamilyId === "airport") {
+      const airportCard = document.getElementById("transportAirportCard");
+      if (airportCard instanceof HTMLDetailsElement && airportCard.open) {
+        return true;
+      }
+    }
+    if (normalizedFamilyId === "port") {
+      const portCard = document.getElementById("transportPortCard");
+      if (portCard instanceof HTMLDetailsElement && portCard.open) {
+        return true;
+      }
+    }
+  }
+  const workbenchOverlay = document.getElementById("transportWorkbenchOverlay");
+  return workbenchOverlay instanceof HTMLElement && !workbenchOverlay.classList.contains("hidden");
+}
+
 function doScreenBoxesOverlap(a, b) {
   return (
     a.x < (b.x + b.w)
@@ -13604,26 +14018,33 @@ function getTransportPortScopeThreshold(scope) {
   return 2;
 }
 
-function getTransportOverviewAirportVisualStyle(visualStrength) {
+function getTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
+  return ColorManager.normalizeHexColor(String(value || "").trim()) || fallback;
+}
+
+function buildTransportFacilityVisualStyle(primaryColor, visualStrength, fallback = "#1d4ed8") {
+  const resolvedPrimaryColor = getTransportOverviewPrimaryColor(primaryColor, fallback);
   const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.56, 0, 1);
+  const luminance = getCanvasColorRelativeLuminance(resolvedPrimaryColor);
+  const strokeTarget = Number.isFinite(luminance) && luminance < 0.4 ? "#f8fbff" : "#ffffff";
+  const labelTarget = Number.isFinite(luminance) && luminance < 0.56 ? "#f8fafc" : "#0f172a";
   return {
-    fillStyle: strength >= 0.7 ? "#0f5fff" : strength <= 0.35 ? "#355c9a" : "#1d4ed8",
-    strokeStyle: strength >= 0.7 ? "#f8fbff" : "#dbeafe",
-    labelColor: strength >= 0.7 ? "#0f2b57" : strength <= 0.35 ? "#20385d" : "#15315f",
+    fillStyle: resolvedPrimaryColor,
+    strokeStyle: mixCanvasColors(resolvedPrimaryColor, strokeTarget, 0.72) || strokeTarget,
+    labelColor: mixCanvasColors(resolvedPrimaryColor, labelTarget, Number.isFinite(luminance) && luminance < 0.56 ? 0.48 : 0.78) || labelTarget,
+    highlightStroke: mixCanvasColors(resolvedPrimaryColor, "#ffffff", 0.82) || "#ffffff",
     radiusScale: 0.85 + (strength * 0.55),
     strokeScale: 0.9 + (strength * 0.35),
+    hoverScale: 1.12 + (strength * 0.12),
   };
 }
 
-function getTransportOverviewPortVisualStyle(visualStrength) {
-  const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.54, 0, 1);
-  return {
-    fillStyle: strength >= 0.7 ? "#d97706" : strength <= 0.35 ? "#8f5f1a" : "#b45309",
-    strokeStyle: strength >= 0.7 ? "#fff2df" : "#ffedd5",
-    labelColor: strength >= 0.7 ? "#7c2d12" : strength <= 0.35 ? "#70420d" : "#7c2d12",
-    radiusScale: 0.85 + (strength * 0.55),
-    strokeScale: 0.9 + (strength * 0.35),
-  };
+function getTransportOverviewAirportVisualStyle(primaryColor, visualStrength) {
+  return buildTransportFacilityVisualStyle(primaryColor, visualStrength, "#1d4ed8");
+}
+
+function getTransportOverviewPortVisualStyle(primaryColor, visualStrength) {
+  return buildTransportFacilityVisualStyle(primaryColor, visualStrength, "#b45309");
 }
 
 function getTransportOverviewAirportLabelText(properties = {}, mode = "both") {
@@ -13689,7 +14110,10 @@ function buildContextFacilityEntries(
         ? String(getLabelText(properties, feature) || "").trim()
         : String(properties.name || "").trim(),
       importanceRank,
-      properties,
+      properties: {
+        ...properties,
+        __coordinates: [coordinates[0], coordinates[1]],
+      },
     });
   });
   entries.sort((left, right) => left.importanceRank - right.importanceRank);
@@ -13706,6 +14130,7 @@ function drawContextFacilityPointLayer(
   collection,
   k,
   {
+    familyId = "",
     interactive = false,
     visible = true,
     thresholdRank = 1,
@@ -13720,10 +14145,14 @@ function drawContextFacilityPointLayer(
     getLabelText = null,
     radiusScale = 1,
     strokeScale = 1,
+    hoverScale = 1.18,
+    highlightStroke = "#ffffff",
   } = {},
 ) {
   const startedAt = nowMs();
+  const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
   if (!visible) {
+    clearFacilityHoverEntries(normalizedFamilyId);
     collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount: getFeatureCollectionFeatureCount(collection),
       visibleFeatureCount: 0,
@@ -13749,6 +14178,7 @@ function drawContextFacilityPointLayer(
     getLabelText,
   });
   if (renderState.skipped) {
+    clearFacilityHoverEntries(normalizedFamilyId);
     collectContextMetric(metricName, nowMs() - startedAt, {
       featureCount: renderState.featureCount,
       visibleFeatureCount: 0,
@@ -13759,6 +14189,8 @@ function drawContextFacilityPointLayer(
     });
     return;
   }
+  const activeHighlightKey = buildFacilityEntryKey(getActiveFacilityHighlightEntry());
+  const hoverEntries = [];
   let labelCount = 0;
   context.save();
   context.lineJoin = "round";
@@ -13766,7 +14198,22 @@ function drawContextFacilityPointLayer(
   context.globalAlpha = opacity;
   renderState.entries.forEach((entry) => {
     const radiusBase = entry.importanceRank >= 3 ? 5.2 : entry.importanceRank === 2 ? 4.3 : 3.5;
-    const radius = radiusBase * radiusScale;
+    const markerEntry = {
+      familyId: normalizedFamilyId,
+      stableId: String(entry.properties?.stable_key || entry.properties?.id || entry.label || `${entry.x}:${entry.y}`).trim(),
+      shape,
+      markerRadiusPx: radiusBase * radiusScale,
+      hoverScale: Number(hoverScale || 1.18),
+      highlightStroke: String(highlightStroke || strokeStyle || "#ffffff"),
+      screenPoint: [entry.x, entry.y],
+      coordinates: Array.isArray(entry.properties?.__coordinates) ? entry.properties.__coordinates : null,
+      properties: entry.properties,
+    };
+    markerEntry.hoverRadiusPx = getFacilityHoverRadiusPx(markerEntry);
+    markerEntry.tooltipText = buildFacilityTooltipText(markerEntry);
+    hoverEntries.push(markerEntry);
+    const highlightFactor = buildFacilityEntryKey(markerEntry) && buildFacilityEntryKey(markerEntry) === activeHighlightKey ? markerEntry.hoverScale : 1;
+    const radius = markerEntry.markerRadiusPx * highlightFactor;
     context.beginPath();
     if (shape === "square") {
       context.rect(entry.x - radius, entry.y - radius, radius * 2, radius * 2);
@@ -13784,6 +14231,7 @@ function drawContextFacilityPointLayer(
     context.stroke();
   });
   context.restore();
+  setVisibleFacilityHoverEntries(normalizedFamilyId, hoverEntries);
 
   if (!labelsEnabled) {
     collectContextMetric(metricName, nowMs() - startedAt, {
@@ -13825,10 +14273,11 @@ function drawContextFacilityPointLayer(
 function drawAirportsLayer(k, { interactive = false } = {}) {
   const airportConfig = getTransportOverviewFamilyConfig("airport");
   const labelZoomConfig = getTransportOverviewLabelZoomConfig("airport", airportConfig.labelDensity);
-  const visualStyle = getTransportOverviewAirportVisualStyle(airportConfig.visualStrength);
+  const visualStyle = getTransportOverviewAirportVisualStyle(airportConfig.primaryColor, airportConfig.visualStrength);
   const zoomAllowance = getTransportOverviewZoomRevealAllowance(k);
   const revealFloor = Math.max(getTransportAirportScopeThreshold(airportConfig.scope), 3 - zoomAllowance);
   drawContextFacilityPointLayer("drawAirportsLayer", state.airportsData, k, {
+    familyId: "airport",
     interactive,
     visible: !!state.showTransport && !!state.showAirports,
     thresholdRank: Math.max(
@@ -13845,6 +14294,8 @@ function drawAirportsLayer(k, { interactive = false } = {}) {
     regionalLabelScale: labelZoomConfig.regionalLabelScale,
     radiusScale: visualStyle.radiusScale,
     strokeScale: visualStyle.strokeScale,
+    hoverScale: visualStyle.hoverScale,
+    highlightStroke: visualStyle.highlightStroke,
     getLabelText: (properties) => getTransportOverviewAirportLabelText(properties, airportConfig.labelMode),
   });
 }
@@ -13852,10 +14303,11 @@ function drawAirportsLayer(k, { interactive = false } = {}) {
 function drawPortsLayer(k, { interactive = false } = {}) {
   const portConfig = getTransportOverviewFamilyConfig("port");
   const labelZoomConfig = getTransportOverviewLabelZoomConfig("port", portConfig.labelDensity);
-  const visualStyle = getTransportOverviewPortVisualStyle(portConfig.visualStrength);
+  const visualStyle = getTransportOverviewPortVisualStyle(portConfig.primaryColor, portConfig.visualStrength);
   const zoomAllowance = getTransportOverviewZoomRevealAllowance(k);
   const revealFloor = Math.max(getTransportPortScopeThreshold(portConfig.scope), 3 - zoomAllowance);
   drawContextFacilityPointLayer("drawPortsLayer", state.portsData, k, {
+    familyId: "port",
     interactive,
     visible: !!state.showTransport && !!state.showPorts,
     thresholdRank: Math.max(
@@ -13872,6 +14324,8 @@ function drawPortsLayer(k, { interactive = false } = {}) {
     regionalLabelScale: labelZoomConfig.regionalLabelScale,
     radiusScale: visualStyle.radiusScale,
     strokeScale: visualStyle.strokeScale,
+    hoverScale: visualStyle.hoverScale,
+    highlightStroke: visualStyle.highlightStroke,
     getLabelText: (properties) => getTransportOverviewPortLabelText(properties, portConfig.labelMode),
   });
 }
@@ -19692,6 +20146,7 @@ function renderHoverOverlay() {
 
   if (state.renderPhase !== RENDER_PHASE_IDLE) {
     hoverGroup.selectAll("path.hovered-feature").remove();
+    hoverGroup.selectAll("path.hovered-facility-marker").remove();
     hoverGroup.attr("aria-hidden", "true");
     return;
   }
@@ -19724,7 +20179,34 @@ function renderHoverOverlay() {
     .attr("stroke-width", 2.0);
 
   selection.exit().remove();
-  hoverGroup.attr("aria-hidden", data.length ? "false" : "true");
+
+  const activeFacilityEntry = getActiveFacilityHighlightEntry();
+  const facilityMarkerData = activeFacilityEntry?.screenPoint?.length >= 2 ? [activeFacilityEntry] : [];
+  const facilitySelection = hoverGroup
+    .selectAll("path.hovered-facility-marker")
+    .data(facilityMarkerData, (datum) => buildFacilityEntryKey(datum) || "hovered-facility");
+
+  facilitySelection
+    .enter()
+    .append("path")
+    .attr("class", "hovered-facility-marker")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .merge(facilitySelection)
+    .attr("d", (datum) => {
+      const [x, y] = datum.screenPoint || [];
+      const radius = Math.max(6.8, Number(datum.markerRadiusPx || 0) + 2.8);
+      if (datum.shape === "square") {
+        return `M ${x - radius} ${y - radius} L ${x + radius} ${y - radius} L ${x + radius} ${y + radius} L ${x - radius} ${y + radius} Z`;
+      }
+      return `M ${x} ${y - radius} L ${x + radius} ${y} L ${x} ${y + radius} L ${x - radius} ${y} Z`;
+    })
+    .attr("fill", "rgba(255,255,255,0.12)")
+    .attr("stroke", (datum) => String(datum.highlightStroke || "#ffffff"))
+    .attr("stroke-width", 2.1);
+
+  facilitySelection.exit().remove();
+  hoverGroup.attr("aria-hidden", data.length || facilityMarkerData.length ? "false" : "true");
 }
 
 function renderInspectorHighlightOverlay() {
@@ -21020,10 +21502,14 @@ function handleMouseMove(event) {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    if (hoveredFacilityEntry) {
+      hoveredFacilityEntry = null;
+    }
     updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
     return;
   }
 
@@ -21041,8 +21527,14 @@ function handleMouseMove(event) {
       state.hoverOverlayDirty = true;
       renderHoverOverlayIfNeeded();
     }
+    if (hoveredFacilityEntry) {
+      hoveredFacilityEntry = null;
+      state.hoverOverlayDirty = true;
+      renderHoverOverlayIfNeeded();
+    }
     updateDevHoverHit(null);
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
     return;
   }
   const hit = getHitFromEvent(event, {
@@ -21070,6 +21562,25 @@ function handleMouseMove(event) {
   updateDevHoverHit(id ? hit : null);
 
   if (!tooltip) return;
+  const hoveredFacility = getHoveredFacilityEntryFromEvent(event);
+  const facilityDetailsActive = hoveredFacility ? isFacilityDetailsSurfaceActive(hoveredFacility.familyId) : false;
+  const nextFacilityKey = buildFacilityEntryKey(hoveredFacility);
+  const previousFacilityKey = buildFacilityEntryKey(hoveredFacilityEntry);
+  if (nextFacilityKey !== previousFacilityKey) {
+    hoveredFacilityEntry = hoveredFacility || null;
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+  }
+  setMapInteractionCursor(facilityDetailsActive ? "pointer" : "");
+  if (hoveredFacility?.tooltipText) {
+    queueTooltipUpdate({
+      visible: true,
+      text: hoveredFacility.tooltipText,
+      x: event.clientX + 12,
+      y: event.clientY + 12,
+    });
+    return;
+  }
   const hoveredCityEntry = getHoveredCityTooltipEntry(event, hit);
   if (hoveredCityEntry?.tooltipText) {
     queueTooltipUpdate({
@@ -22202,6 +22713,28 @@ async function handleClick(event, _interactionContext = null) {
     return;
   }
 
+  const clickedFacilityEntry = getHoveredFacilityEntryFromEvent(event);
+  if (clickedFacilityEntry && isFacilityDetailsSurfaceActive(clickedFacilityEntry.familyId)) {
+    hoveredFacilityEntry = clickedFacilityEntry;
+    selectedFacilityEntry = clickedFacilityEntry;
+    facilityInfoCardExpanded = false;
+    queueTooltipUpdate({ visible: false });
+    applyFacilityInfoCardState(clickedFacilityEntry, {
+      x: event?.clientX,
+      y: event?.clientY,
+    });
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+    noteRenderAction("click-facility-info", actionStart);
+    return;
+  }
+  if (selectedFacilityEntry) {
+    selectedFacilityEntry = null;
+    applyFacilityInfoCardState(null);
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+  }
+
   const hit = getHitFromEvent(event, {
     enableSnap: true,
     snapPx: HIT_SNAP_RADIUS_CLICK_PX,
@@ -22826,10 +23359,12 @@ function bindEvents() {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    hoveredFacilityEntry = null;
     updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
+    setMapInteractionCursor("");
   });
   interactionRect.on("click", dispatchMapClick);
   interactionRect.on("dblclick", dispatchMapDoubleClick);
@@ -22850,6 +23385,12 @@ function initMap({
 
   mapContainer = document.getElementById(containerId);
   tooltip = document.getElementById("tooltip");
+  facilityInfoCard = document.getElementById("facilityInfoCard");
+  facilityInfoCardTitle = document.getElementById("facilityInfoCardTitle");
+  facilityInfoCardBody = document.getElementById("facilityInfoCardBody");
+  facilityInfoCardZoomBtn = document.getElementById("facilityInfoCardZoomBtn");
+  facilityInfoCardCloseBtn = document.getElementById("facilityInfoCardCloseBtn");
+  facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   state.refreshColorStateFn = refreshColorState;
   state.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
 
@@ -22857,6 +23398,38 @@ function initMap({
     console.error("Map container not found.");
     return;
   }
+
+  if (facilityInfoCardCloseBtn && !facilityInfoCardCloseBtn.dataset.bound) {
+    facilityInfoCardCloseBtn.addEventListener("click", () => {
+      applyFacilityInfoCardState(null);
+      state.hoverOverlayDirty = true;
+      renderHoverOverlayIfNeeded();
+    });
+    facilityInfoCardCloseBtn.dataset.bound = "true";
+  }
+  if (facilityInfoCardZoomBtn && !facilityInfoCardZoomBtn.dataset.bound) {
+    facilityInfoCardZoomBtn.addEventListener("click", () => {
+      const activeEntry = selectedFacilityEntry;
+      if (!activeEntry) return;
+      zoomToFacilityEntry(activeEntry);
+    });
+    facilityInfoCardZoomBtn.dataset.bound = "true";
+  }
+  if (facilityInfoCardMoreBtn && !facilityInfoCardMoreBtn.dataset.bound) {
+    facilityInfoCardMoreBtn.addEventListener("click", () => {
+      if (!selectedFacilityEntry) return;
+      facilityInfoCardExpanded = !facilityInfoCardExpanded;
+      applyFacilityInfoCardState(selectedFacilityEntry);
+    });
+    facilityInfoCardMoreBtn.dataset.bound = "true";
+  }
+  state.syncFacilityInfoCardVisibilityFn = syncFacilityInfoCardVisibility;
+  state.updateFacilityInfoCardUiFn = () => {
+    if (selectedFacilityEntry) {
+      applyFacilityInfoCardState(selectedFacilityEntry);
+    }
+  };
+  applyFacilityInfoCardState(null);
 
   ensureHybridLayers();
 

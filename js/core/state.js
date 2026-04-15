@@ -958,6 +958,7 @@ function createDefaultTransportOverviewFamilyConfig(familyId) {
       return {
         opacity: 0.82,
         visualStrength: 0.56,
+        primaryColor: "#1d4ed8",
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "both",
@@ -970,6 +971,7 @@ function createDefaultTransportOverviewFamilyConfig(familyId) {
       return {
         opacity: 0.78,
         visualStrength: 0.54,
+        primaryColor: "#b45309",
         labelsEnabled: true,
         labelDensity: "balanced",
         labelMode: "mixed",
@@ -1023,6 +1025,17 @@ function normalizeTransportOverviewLabelDensity(value, fallback = "balanced") {
   return TRANSPORT_OVERVIEW_LABEL_DENSITIES.includes(fallback) ? fallback : "balanced";
 }
 
+function normalizeTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
+  const candidate = String(value || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
+  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
+  }
+  const normalizedFallback = String(fallback || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(normalizedFallback)) return normalizedFallback.toLowerCase();
+  return "#1d4ed8";
+}
+
 function normalizeTransportOverviewImportanceThreshold(value, fallback = "primary") {
   const normalized = String(value || "").trim().toLowerCase();
   if (normalized === "national_core") return "primary";
@@ -1053,6 +1066,7 @@ function normalizeTransportOverviewFamilyConfig(rawConfig, familyId) {
     visualStrength: Object.prototype.hasOwnProperty.call(raw, "visualStrength")
       ? clampUnitInterval(raw.visualStrength, defaults.visualStrength)
       : mapLegacyTransportPresetToVisualStrength(raw.preset, defaults.visualStrength),
+    primaryColor: normalizeTransportOverviewPrimaryColor(raw.primaryColor, defaults.primaryColor),
     labelsEnabled: raw.labelsEnabled === undefined ? defaults.labelsEnabled : !!raw.labelsEnabled,
     labelDensity: normalizeTransportOverviewLabelDensity(raw.labelDensity, defaults.labelDensity),
     labelMode: String(raw.labelMode || defaults.labelMode).trim().toLowerCase() || defaults.labelMode,
@@ -2289,6 +2303,9 @@ export const state = {
   updateZoomUIFn: null,
   updateTextureUIFn: null,
   updateWaterInteractionUIFn: null,
+  updateTransportAppearanceUIFn: null,
+  updateFacilityInfoCardUiFn: null,
+  syncFacilityInfoCardVisibilityFn: null,
   updateScenarioSpecialRegionUIFn: null,
   updateScenarioReliefOverlayUIFn: null,
   updateParentBorderCountryListFn: null,

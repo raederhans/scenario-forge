@@ -1343,6 +1343,10 @@
                             </div>
                             <input id="airportOpacity" type="range" min="20" max="100" value="82" class="range-input" />
                           </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblAirportPrimaryColor" class="range-label" for="airportPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                            <input id="airportPrimaryColor" type="color" value="#1d4ed8" class="color-input" />
+                          </div>
                         </section>
 
                         <section class="space-y-3">
@@ -1437,6 +1441,10 @@
                               <span id="portOpacityValue" class="range-value">78%</span>
                             </div>
                             <input id="portOpacity" type="range" min="20" max="100" value="78" class="range-input" />
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblPortPrimaryColor" class="range-label" for="portPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                            <input id="portPrimaryColor" type="color" value="#b45309" class="color-input" />
                           </div>
                         </section>
 
@@ -2523,6 +2531,17 @@
     </div>
 
     <div id="tooltip"></div>
+    <div id="facilityInfoCard" class="facility-info-card hidden" aria-hidden="true" role="dialog" aria-labelledby="facilityInfoCardTitle">
+      <div class="facility-info-card-header">
+        <h3 id="facilityInfoCardTitle" class="facility-info-card-title"></h3>
+        <button id="facilityInfoCardCloseBtn" type="button" class="facility-info-card-close-btn" aria-label="Close facility details" data-i18n-aria-label="Close facility details">×</button>
+      </div>
+      <div id="facilityInfoCardBody" class="facility-info-card-body"></div>
+      <div class="facility-info-card-actions">
+        <button id="facilityInfoCardMoreBtn" type="button" class="btn-secondary facility-info-card-more-btn hidden" data-i18n="More fields">More fields</button>
+        <button id="facilityInfoCardZoomBtn" type="button" class="btn-secondary facility-info-card-zoom-btn" data-i18n="Locate and zoom">Locate and zoom</button>
+      </div>
+    </div>
     <div id="startupReadonlyBanner" class="startup-readonly-banner hidden" role="status" aria-live="polite" aria-busy="false">
       <div class="startup-readonly-banner__eyebrow" data-i18n="Read-only startup">Read-only startup</div>
       <div id="startupReadonlyMessage" class="startup-readonly-banner__message" data-i18n="Detailed interactions are still loading. Pan and zoom remain available.">Detailed interactions are still loading. Pan and zoom remain available.</div>

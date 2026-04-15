@@ -1770,6 +1770,7 @@ function initToolbar({ render } = {}) {
   const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
   const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
+  const airportPrimaryColor = document.getElementById("airportPrimaryColor");
   const airportLabelsEnabled = document.getElementById("airportLabelsEnabled");
   const airportLabelDensity = document.getElementById("airportLabelDensity");
   const airportLabelMode = document.getElementById("airportLabelMode");
@@ -1782,6 +1783,7 @@ function initToolbar({ render } = {}) {
   const transportAirportSummaryMeta = document.getElementById("transportAirportSummaryMeta");
   const portVisualStrength = document.getElementById("portVisualStrength");
   const portOpacity = document.getElementById("portOpacity");
+  const portPrimaryColor = document.getElementById("portPrimaryColor");
   const portLabelsEnabled = document.getElementById("portLabelsEnabled");
   const portLabelDensity = document.getElementById("portLabelDensity");
   const portLabelMode = document.getElementById("portLabelMode");
@@ -2293,11 +2295,62 @@ function initToolbar({ render } = {}) {
       : resolveLinkedTransportOverviewScopeAndThreshold(familyId, familyConfig.coverageReach)
   );
 
+  const getTransportScopeThresholdRank = (familyId, scope) => {
+    const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
+    const normalizedScope = String(scope || "").trim().toLowerCase();
+    if (normalizedFamilyId === "airport") {
+      if (normalizedScope === "international") return 3;
+      if (normalizedScope === "all_civil") return 1;
+      return 2;
+    }
+    if (normalizedFamilyId === "port") {
+      if (normalizedScope === "core") return 3;
+      if (normalizedScope === "expanded") return 1;
+      return 2;
+    }
+    return 1;
+  };
+
+  const getTransportImportanceThresholdRank = (threshold) => {
+    const normalized = String(threshold || "").trim().toLowerCase();
+    if (normalized === "primary") return 3;
+    if (normalized === "secondary") return 2;
+    return 1;
+  };
+
+  const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {
+    const collection = familyId === "port" ? state.portsData : state.airportsData;
+    const features = Array.isArray(collection?.features) ? collection.features : null;
+    if (!features) return null;
+    const minimumImportanceRank = Math.max(
+      getTransportScopeThresholdRank(familyId, effectiveScope.scope),
+      getTransportImportanceThresholdRank(effectiveScope.importanceThreshold),
+    );
+    return features.filter((feature) => {
+      const importanceRank = Math.max(1, Math.round(Number(feature?.properties?.importance_rank || 1)));
+      return importanceRank >= minimumImportanceRank;
+    }).length;
+  };
+
+  const formatTransportFamilyCountText = (familyId, count) => {
+    if (!Number.isFinite(count)) return "";
+    const roundedCount = Math.max(0, Math.round(count));
+    const noun = familyId === "port"
+      ? (roundedCount === 1 ? "port" : "ports")
+      : (roundedCount === 1 ? "airport" : "airports");
+    return `${roundedCount.toLocaleString()} ${t(noun, "ui")}`;
+  };
+
   const buildTransportFamilySummaryText = (familyId, masterEnabled, familyEnabled, familyConfig, effectiveScope) => {
     if (!familyEnabled) return t("Off", "ui");
     if (!masterEnabled) return `${t("On", "ui")} · ${t("hidden by master", "ui")}`;
-    const labelsPart = familyConfig.labelsEnabled ? t("labels on", "ui") : t("labels off", "ui");
-    return `${t("On", "ui")} · ${labelsPart} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
+    const countText = formatTransportFamilyCountText(
+      familyId,
+      getTransportFamilyFilteredCount(familyId, familyConfig, effectiveScope),
+    );
+    return countText
+      ? `${t("On", "ui")} · ${countText}`
+      : `${t("On", "ui")} · ${t(formatTransportScopeLabel(effectiveScope.scope), "ui")}`;
   };
 
   const setTransportAppearanceGroupEnabled = (container, enabled) => {
@@ -2325,6 +2378,7 @@ function initToolbar({ render } = {}) {
     if (airportVisualStrengthValue) airportVisualStrengthValue.textContent = formatTransportPercent(airportConfig.visualStrength ?? 0.56);
     if (airportOpacity) airportOpacity.value = String(Math.round(Number(airportConfig.opacity ?? 0.82) * 100));
     if (airportOpacityValue) airportOpacityValue.textContent = formatTransportPercent(airportConfig.opacity ?? 0.82);
+    if (airportPrimaryColor) airportPrimaryColor.value = normalizeOceanFillColor(airportConfig.primaryColor || "#1d4ed8");
     if (airportLabelsEnabled) airportLabelsEnabled.checked = !!airportConfig.labelsEnabled;
     if (airportLabelDensity) airportLabelDensity.value = String(airportConfig.labelDensity || "balanced");
     if (airportLabelMode) airportLabelMode.value = String(airportConfig.labelMode || "both");
@@ -2353,6 +2407,7 @@ function initToolbar({ render } = {}) {
     if (portVisualStrengthValue) portVisualStrengthValue.textContent = formatTransportPercent(portConfig.visualStrength ?? 0.54);
     if (portOpacity) portOpacity.value = String(Math.round(Number(portConfig.opacity ?? 0.78) * 100));
     if (portOpacityValue) portOpacityValue.textContent = formatTransportPercent(portConfig.opacity ?? 0.78);
+    if (portPrimaryColor) portPrimaryColor.value = normalizeOceanFillColor(portConfig.primaryColor || "#b45309");
     if (portLabelsEnabled) portLabelsEnabled.checked = !!portConfig.labelsEnabled;
     if (portLabelDensity) portLabelDensity.value = String(portConfig.labelDensity || "balanced");
     if (portLabelMode) portLabelMode.value = String(portConfig.labelMode || "mixed");
@@ -2382,6 +2437,7 @@ function initToolbar({ render } = {}) {
     [
       airportVisualStrength,
       airportOpacity,
+      airportPrimaryColor,
       airportLabelsEnabled,
       airportLabelDensity,
       airportLabelMode,
@@ -2394,6 +2450,7 @@ function initToolbar({ render } = {}) {
     [
       portVisualStrength,
       portOpacity,
+      portPrimaryColor,
       portLabelsEnabled,
       portLabelDensity,
       portLabelMode,
@@ -2422,6 +2479,9 @@ function initToolbar({ render } = {}) {
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const applyTransportAppearanceMasterToggle = (nextEnabled) => {
@@ -2440,6 +2500,8 @@ function initToolbar({ render } = {}) {
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
   };
+
+  state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;
 
   const focusOverlaySurface = (container) => focusSurface(container);
   const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
@@ -4334,6 +4396,9 @@ function initToolbar({ render } = {}) {
     const willOpen = !!nextOpen;
     if (willOpen === wasOpen && !willOpen) {
       renderTransportWorkbenchUi();
+      if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+        state.syncFacilityInfoCardVisibilityFn();
+      }
       return;
     }
     if (willOpen) {
@@ -4352,6 +4417,9 @@ function initToolbar({ render } = {}) {
     }
     uiState.open = willOpen;
     renderTransportWorkbenchUi();
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
     if (willOpen) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
@@ -4643,6 +4711,9 @@ function initToolbar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
+      state.syncFacilityInfoCardVisibilityFn();
+    }
   };
 
   const closeSpecialZonePopover = () => {
@@ -8073,6 +8144,15 @@ function initToolbar({ render } = {}) {
     airportOpacity.dataset.bound = "true";
   }
 
+  if (airportPrimaryColor && !airportPrimaryColor.dataset.bound) {
+    airportPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().airport.primaryColor = normalizeOceanFillColor(event.target.value || "#1d4ed8");
+      renderTransportAppearanceUi();
+      renderDirty("transport-airport-primary-color");
+    });
+    airportPrimaryColor.dataset.bound = "true";
+  }
+
   if (airportLabelsEnabled && !airportLabelsEnabled.dataset.bound) {
     airportLabelsEnabled.addEventListener("change", (event) => {
       getTransportAppearanceConfig().airport.labelsEnabled = !!event.target.checked;
@@ -8171,6 +8251,15 @@ function initToolbar({ render } = {}) {
       renderDirty("transport-port-opacity");
     });
     portOpacity.dataset.bound = "true";
+  }
+
+  if (portPrimaryColor && !portPrimaryColor.dataset.bound) {
+    portPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().port.primaryColor = normalizeOceanFillColor(event.target.value || "#b45309");
+      renderTransportAppearanceUi();
+      renderDirty("transport-port-primary-color");
+    });
+    portPrimaryColor.dataset.bound = "true";
   }
 
   if (portLabelsEnabled && !portLabelsEnabled.dataset.bound) {

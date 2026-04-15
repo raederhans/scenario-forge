@@ -650,3 +650,43 @@
 ### 52. 城市点位 e2e 一旦依赖 labelEntries，就必须先等 exact render 稳定并在测试里显式打开 showLabels / labelMinZoom
 - 这次 city reveal 回归在单独跑能过、整组跑会偶发归零，根因不是 reveal 算法本身，而是 uildCityRevealPlan() 的 label 产出受 state.deferExactAfterSettle 和 styleConfig 开关控制。
 - 更稳的做法是：凡是断言 labelEntries 或 label density 差异的 Playwright 测试，都先等待 enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 showLabels: true、合适的 labelMinZoom。
+
+### 47. 延迟加载的数据一旦会反推已挂载 UI 摘要，就要补显式 UI refresh 钩子
+- 这次 transport summary count 不是算不出来，而是 `airports/ports` pack 在 toggle 后异步落地，toolbar 如果没有显式刷新入口，就会一直停在旧摘要，直到下一次人工操作才更新。
+- 更稳的做法是：凡是 deferred data 会改变现有 summary/meta UI，都在 load success 处补一个最小刷新回调，不要赌别的交互会顺手触发重绘。
+
+### 48. 编辑器里的精确 overlay 点击，必须先按“相关面板是否真的在用”做门控
+- 这次机场/港口 marker 的点击信息卡如果全局常开，会直接抢走地图底下的 land paint 点击。
+- 更稳的最短路径是：只有在对应 surface（这里是 Appearance > Transport 或 Transport workbench）真的处于活跃态时，才让 marker click 接管主点击流。
+
+### 49. 一旦给已有视觉家族补独立主色，原来的“强度滑块顺手改色”就必须立即收口
+- 这次 Airport / Port 如果继续让 `visualStrength` 同时改颜色深浅，新增 color picker 就会变成“用户刚选完色，滑一下强度又偷偷换色”。
+- 更稳的做法是：color picker 只负责主色，strength 只负责大小、线宽和高亮力度，职责当场切干净。
+
+### 50. 浮动信息卡里做展开/收起时，要保存上一次锚点，不要每次重渲染都按空 anchor 回退
+- 这次 facility info card 如果在“更多字段”切换时直接重新走定位，卡片会跳到左上角。
+- 更稳的最短路径是：第一次打开时记录 anchor，后续同一张卡的重渲染都复用这份 anchor，直到卡片关闭再清掉。
+
+### 51. 如果 overlay click 还带条件门控，hover affordance 也必须跟着同一条件走
+- 这次 Airport / Port marker 的问题不是 hover 或 click 各自坏了，而是 hover 总给 pointer、click 却还要过 active-surface 门槛，用户感知会直接分裂。
+- 更稳的做法是：pointer 只在 click 真能生效时才出现；只读 tooltip 可以保留，但“可点击”的信号必须和真实点击能力一致。
+
+### 52. 信息卡 polish 的第一刀优先做减法：去冗余、分主次、降重量
+- 这次 facility info card 真正提升观感的不是加更多装饰，而是删掉重复的 Family 行、把 More fields 降成次级动作、把深色重弹层收成更轻的浮层。
+- 做 UI polish 时，先找重复信息和同权按钮，再决定要不要加新视觉元素，通常更稳也更像成品。
+
+### 53. 渲染 helper 里新增样式字段时，必须显式走参数链，不要偷读调用侧局部变量
+- 这次 facility marker 的 `hoverScale/highlightStroke` 在 `drawContextFacilityPointLayer()` 里直接读了并不存在的 `visualStyle`，结果一开机场/港口就会在渲染阶段直接 ReferenceError。
+- 更稳的做法是：凡是 renderer 需要的新样式值，都放进 options 参数并在调用处显式传入，避免 helper 隐式依赖外层局部变量。
+
+### 54. 命中缓存一旦在每次重绘都会重建，选中态就必须同步重绑到新 entry
+- 这次 facility hover cache 每轮都会换成新投影 entry，如果只保留旧 key、不把 selected/hovered 指针换到新对象，缩放和平移后高亮会停在旧像素位置。
+- 更稳的最短路径是：缓存刷新时先建 key -> entry 映射，再把 selected/hovered 重绑到新 entry；找不到时才清空。
+
+### 55. 浮动详情卡的宿主 surface 一旦被关闭，卡片和高亮必须同步撤场
+- 这次 transport facility card 的问题不是打开逻辑错了，而是 workbench / appearance tab 关闭后没有主动同步可见性，导致卡片和高亮孤零零留在地图上。
+- 更稳的做法是：宿主 surface 的开关点（tab 切换、overlay 关闭、相关卡片折叠后刷新）统一调用一条 visibility sync，而不是等用户下一次点地图来被动清理。
+
+### 56. 新增 UI 文案时，凡是 `t()` 动态拼出来的 key 都要和静态 DOM 文案一起补齐
+- 这次 review 暴露的不是单个翻译漏了，而是 summary 和 info card 里动态调用了 `airport/ports/Owner/Manager/Status/...` 这些 key，却只补了一部分静态按钮文案。
+- 更稳的最短路径是：每次新增一条 UI 路径后，把“静态 DOM 文案 + JS 里所有 `t()` 动态 key”一起 grep 一遍，再补 i18n，避免中英文混排。
