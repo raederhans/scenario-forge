@@ -7622,6 +7622,14 @@ function initToolbar({ render } = {}) {
       ? renderPassCache.signatures
       : {};
     const dirtyRevision = Number(state.dirtyRevision || 0);
+    const zoomTransform = state.zoomTransform && typeof state.zoomTransform === "object"
+      ? state.zoomTransform
+      : { k: 1, x: 0, y: 0 };
+    const transformSignature = [
+      `zoomK:${Number(zoomTransform.k || 1).toFixed(5)}`,
+      `zoomX:${Number(zoomTransform.x || 0).toFixed(2)}`,
+      `zoomY:${Number(zoomTransform.y || 0).toFixed(2)}`,
+    ];
     if (layerId === "color") {
       return [
         `colorRevision:${Number(state.colorRevision) || 0}`,
@@ -7645,6 +7653,7 @@ function initToolbar({ render } = {}) {
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `svgChildren:${mapSvgChildCount}`,
         `dirtyRevision:${dirtyRevision}`,
+        ...transformSignature,
       ];
     }
     return [
@@ -7652,6 +7661,7 @@ function initToolbar({ render } = {}) {
       `topologyRevision:${Number(state.topologyRevision) || 0}`,
       `svgChildren:${mapSvgChildCount}`,
       `dirtyRevision:${dirtyRevision}`,
+      ...transformSignature,
       `passPolitical:${String(signatures.political || "")}`,
       `passContextBase:${String(signatures.contextBase || "")}`,
       `passBorders:${String(signatures.borders || "")}`,
@@ -7734,6 +7744,30 @@ function initToolbar({ render } = {}) {
     return false;
   };
 
+  const drawColorLayerToCanvas = (targetCtx) => {
+    const basePassNames = [
+      "background",
+      "physicalBase",
+      "political",
+      "contextBase",
+      "contextScenario",
+      "effects",
+      "dayNight",
+    ];
+    let drewFromRenderPassCache = false;
+    basePassNames.forEach((passName) => {
+      drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget(passName, targetCtx) || drewFromRenderPassCache;
+    });
+    if (drewFromRenderPassCache) {
+      return "render-pass";
+    }
+    if (state.colorCanvas) {
+      targetCtx.drawImage(state.colorCanvas, 0, 0);
+      return "composite-canvas";
+    }
+    return "none";
+  };
+
   const bakeLayer = async (layerId) => {
     const exportUi = ensureExportWorkbenchUiState();
     const normalizedLayerId = String(layerId || "").trim().toLowerCase();
@@ -7763,13 +7797,16 @@ function initToolbar({ render } = {}) {
       throw new Error("Canvas bake context unavailable.");
     }
     if (normalizedLayerId === "color") {
-      if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
+      drawColorLayerToCanvas(bakeCtx);
     } else if (normalizedLayerId === "line") {
       drawLineLayerToCanvas(bakeCtx);
     } else if (normalizedLayerId === "text") {
       await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
     } else {
-      if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
+      const colorSource = drawColorLayerToCanvas(bakeCtx);
+      if (colorSource !== "composite-canvas") {
+        drawLineLayerToCanvas(bakeCtx);
+      }
       if (exportUi.includeTextLayer) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
       }
