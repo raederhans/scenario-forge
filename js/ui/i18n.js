@@ -50,6 +50,30 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
     zh: "\u628a\u5f53\u524d\u53ef\u89c1\u5730\u56fe\u5bfc\u51fa\u4e3a PNG \u6216 JPG \u5feb\u7167\u3002",
     en: "Export the visible map as a PNG or JPG snapshot.",
   },
+  "Export Resolution": {
+    zh: "\u5bfc\u51fa\u5206\u8fa8\u7387",
+    en: "Export Resolution",
+  },
+  "Current preview (1\u00d7)": {
+    zh: "\u5f53\u524d\u9884\u89c8\uff081\u00d7\uff09",
+    en: "Current preview (1\u00d7)",
+  },
+  "High (1.5\u00d7)": {
+    zh: "\u9ad8\uff081.5\u00d7\uff09",
+    en: "High (1.5\u00d7)",
+  },
+  "Ultra (2\u00d7)": {
+    zh: "\u8d85\u6e05\uff082\u00d7\uff09",
+    en: "Ultra (2\u00d7)",
+  },
+  "Maximum detail (4\u00d7)": {
+    zh: "\u6700\u9ad8\u7ec6\u8282\uff084\u00d7\uff09",
+    en: "Maximum detail (4\u00d7)",
+  },
+  "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 \u00d7 4320).": {
+    zh: "\u9884\u89c8\u6e32\u67d3\u4e0e\u6700\u7ec8\u5bfc\u51fa\u5206\u8fa8\u7387\u76f8\u4e92\u72ec\u7acb\u3002\u6700\u7ec8\u5bfc\u51fa\u4e0a\u9650\u4e3a 8K\uff087680 \u00d7 4320\uff09\u3002",
+    en: "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 \u00d7 4320).",
+  },
   "An export is already in progress. Wait for it to finish before starting another export.": {
     zh: "\u5bfc\u51fa\u4efb\u52a1\u6b63\u5728\u8fdb\u884c\u4e2d\u3002\u8bf7\u7b49\u5f85\u5f53\u524d\u4efb\u52a1\u5b8c\u6210\u540e\u518d\u53d1\u8d77\u65b0\u7684\u5bfc\u51fa\u3002",
     en: "An export is already in progress. Wait for it to finish before starting another export.",
@@ -489,6 +513,7 @@ function updateUIText() {
     ["scenarioAuditHint", "Coverage report unavailable"],
     ["lblExport", "Export Map"],
     ["lblExportFormat", "Format"],
+    ["lblExportScale", "Export Resolution"],
     ["exportBtn", "Download Snapshot"],
     ["lblEditingRules", "Editing Rules"],
     ["lblTexture", "Texture"],
