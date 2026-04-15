@@ -7180,6 +7180,25 @@ function initToolbar({ render } = {}) {
         `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
         + `scale(${state.referenceImageState.scale})`;
     }
+    const exportUiState = state.exportWorkbenchUi && typeof state.exportWorkbenchUi === "object"
+      ? state.exportWorkbenchUi
+      : { target: "composite", format: "png" };
+    const exportTargetValue = ["composite", "per-layer", "bake-pack"].includes(String(exportUiState.target || "").trim().toLowerCase())
+      ? String(exportUiState.target || "").trim().toLowerCase()
+      : "composite";
+    const exportFormatValue = String(exportUiState.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png";
+    if (exportTarget) {
+      exportTarget.value = exportTargetValue;
+    }
+    if (exportFormat) {
+      if (exportTargetValue === "per-layer") {
+        exportFormat.value = "png";
+        exportFormat.disabled = true;
+      } else {
+        exportFormat.value = exportFormatValue;
+        exportFormat.disabled = exportTargetValue === "bake-pack";
+      }
+    }
     renderTextureUI();
     renderDayNightUI();
     renderSpecialZoneEditorUI();
@@ -7901,58 +7920,54 @@ function initToolbar({ render } = {}) {
     link.remove();
   };
 
-  if (exportTarget && !exportTarget.dataset.bound) {
+  const syncExportWorkbenchControlsFromState = () => {
     const exportUiState = ensureExportWorkbenchUiState();
-    exportTarget.value = exportUiState.target;
-    exportFormat.value = exportUiState.format === "jpg" ? "jpg" : "png";
+    if (exportTarget) {
+      exportTarget.value = exportUiState.target;
+    }
+    if (exportFormat) {
+      if (exportUiState.target === "per-layer") {
+        exportFormat.value = "png";
+        exportFormat.disabled = true;
+      } else {
+        exportFormat.value = exportUiState.format === "jpg" ? "jpg" : "png";
+        exportFormat.disabled = exportUiState.target === "bake-pack";
+      }
+    }
+    return exportUiState;
+  };
+
+  if (exportTarget && !exportTarget.dataset.bound) {
+    syncExportWorkbenchControlsFromState();
     exportTarget.addEventListener("change", () => {
       const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
       exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
         ? nextTarget
         : "composite";
-      if (exportUi.target === "per-layer") {
-        exportFormat.value = "png";
-        exportFormat.disabled = true;
-      } else {
-        exportFormat.value = exportUi.format === "jpg" ? "jpg" : "png";
-        exportFormat.disabled = exportUi.target === "bake-pack";
-      }
+      syncExportWorkbenchControlsFromState();
     });
-    if (exportUiState.target === "per-layer") {
-      exportFormat.value = "png";
-      exportFormat.disabled = true;
-    } else {
-      exportFormat.disabled = exportUiState.target === "bake-pack";
-    }
     exportTarget.dataset.bound = "true";
   }
 
   if (exportFormat && !exportFormat.dataset.bound) {
-    const exportUi = ensureExportWorkbenchUiState();
+    syncExportWorkbenchControlsFromState();
     exportFormat.addEventListener("change", () => {
       const liveExportUi = ensureExportWorkbenchUiState();
       liveExportUi.format = exportFormat.value === "jpg" ? "jpg" : "png";
+      syncExportWorkbenchControlsFromState();
     });
-    if (exportTarget?.value !== "per-layer") {
-      exportFormat.value = exportUi.format === "jpg" ? "jpg" : "png";
-    }
     exportFormat.dataset.bound = "true";
   }
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
       try {
+        syncExportWorkbenchControlsFromState();
         const exportUi = ensureExportWorkbenchUiState();
-        if (exportTarget) {
-          const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
-          exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
-            ? nextTarget
-            : exportUi.target;
-        }
         const extension = exportUi.target === "per-layer"
           ? "png"
-          : (exportFormat.value === "jpg" ? "jpg" : "png");
+          : (exportUi.format === "jpg" ? "jpg" : "png");
         exportUi.format = extension;
         const exportTargetKind = exportUi.target;
 
