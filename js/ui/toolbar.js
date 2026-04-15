@@ -1941,6 +1941,13 @@ function initToolbar({ render } = {}) {
   const inspectorUtilitiesSection = document.getElementById("inspectorUtilitiesSection");
   const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
+  const exportWorkbenchOverlay = document.getElementById("exportWorkbenchOverlay");
+  const exportWorkbenchPanel = document.getElementById("exportWorkbenchPanel");
+  const exportWorkbenchCloseBtn = document.getElementById("exportWorkbenchCloseBtn");
+  const exportWorkbenchPreviewState = document.getElementById("exportWorkbenchPreviewState");
+  const exportWorkbenchPreviewModeButtons = Array.from(document.querySelectorAll(".export-workbench-preview-toggle-btn"));
+  const exportWorkbenchFormat = document.getElementById("exportWorkbenchFormat");
+  const exportWorkbenchSnapshotBtn = document.getElementById("exportWorkbenchSnapshotBtn");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
@@ -2559,6 +2566,7 @@ function initToolbar({ render } = {}) {
   let transportWorkbenchPreviewLastViewKey = "";
   let transportWorkbenchPreviewWarmupScheduled = false;
   let transportWorkbenchDraggedLayerId = "";
+  let exportWorkbenchPreviewMode = "main";
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -4409,6 +4417,7 @@ function initToolbar({ render } = {}) {
       state.toggleLeftPanelFn?.(false);
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
+      state.closeExportWorkbenchFn?.({ restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
@@ -4447,6 +4456,64 @@ function initToolbar({ render } = {}) {
     ensureTransportWorkbenchUiState();
     resetTransportWorkbenchCarrierView();
     syncTransportWorkbenchPreviewControls();
+  };
+
+  const renderExportWorkbenchUi = (isOpen) => {
+    if (!exportWorkbenchOverlay) return;
+    exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
+    exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    dockExportBtn?.classList.toggle("is-active", isOpen);
+    dockExportBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    if (exportWorkbenchFormat && exportFormat) {
+      exportWorkbenchFormat.value = exportFormat.value === "jpg" ? "jpg" : "png";
+    }
+    if (exportWorkbenchPreviewState) {
+      exportWorkbenchPreviewState.textContent = exportWorkbenchPreviewMode === "layer"
+        ? t("Single layer preview (placeholder)", "ui")
+        : t("Main image preview (placeholder)", "ui");
+    }
+    exportWorkbenchPreviewModeButtons.forEach((button) => {
+      const isActive = String(button.dataset.exportPreviewMode || "main") === exportWorkbenchPreviewMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  };
+
+  const setExportWorkbenchState = (nextOpen, { trigger = null, restoreFocus = true } = {}) => {
+    if (!exportWorkbenchOverlay || !exportWorkbenchPanel) return;
+    const willOpen = !!nextOpen;
+    const wasOpen = !exportWorkbenchOverlay.classList.contains("hidden");
+    if (willOpen === wasOpen) {
+      renderExportWorkbenchUi(willOpen);
+      return;
+    }
+    if (willOpen) {
+      closeDockPopover({ restoreFocus: false, syncUrl: false });
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+        closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
+      }
+      if (trigger instanceof HTMLElement) {
+        rememberOverlayTrigger(exportWorkbenchOverlay, trigger);
+      }
+      renderExportWorkbenchUi(true);
+      syncSupportSurfaceUrlState("export");
+      focusOverlaySurface(exportWorkbenchPanel);
+      return;
+    }
+    renderExportWorkbenchUi(false);
+    syncSupportSurfaceUrlState("");
+    if (restoreFocus) {
+      restoreOverlayTriggerFocus(exportWorkbenchOverlay);
+    }
+  };
+
+  state.openExportWorkbenchFn = (trigger = dockExportBtn) => {
+    setExportWorkbenchState(true, { trigger });
+    return true;
+  };
+  state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {
+    setExportWorkbenchState(false, { restoreFocus });
+    return false;
   };
 
   state.openTransportWorkbenchFn = (trigger = null) => {
@@ -4801,6 +4868,13 @@ function initToolbar({ render } = {}) {
       state.ui.restoredSupportSurfaceViewFromUrl = view;
       return;
     }
+    if (view === "export") {
+      ensureProjectSupportSurface();
+      const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
+      state.openExportWorkbenchFn?.(exportTrigger);
+      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      return;
+    }
     ensureProjectSupportSurface();
     const targetPopover = getDockPopoverByKind(view);
     if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
@@ -5054,7 +5128,7 @@ function initToolbar({ render } = {}) {
     return null;
   };
 
-  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference", "export"]);
+  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference"]);
   const isSupportDockPopoverKind = (kind) => SUPPORT_DOCK_POPOVER_KINDS.has(String(kind || ""));
 
   const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
@@ -5201,8 +5275,37 @@ function initToolbar({ render } = {}) {
       if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden") && !insideTransportWorkbenchSectionHelp) {
         closeTransportWorkbenchSectionHelpPopover();
       }
+      if (
+        exportWorkbenchOverlay
+        && exportWorkbenchPanel
+        && !exportWorkbenchOverlay.classList.contains("hidden")
+        && target === exportWorkbenchOverlay
+      ) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      }
     });
     document.addEventListener("keydown", (event) => {
+      if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
+        const focusables = getFocusableElements(exportWorkbenchPanel);
+        if (!focusables.length) {
+          event.preventDefault();
+          focusOverlaySurface(exportWorkbenchPanel);
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+          return;
+        }
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+          return;
+        }
+      }
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && event.key === "Tab") {
         const focusables = getFocusableElements(scenarioGuidePopover);
         if (!focusables.length) {
@@ -5239,6 +5342,10 @@ function initToolbar({ render } = {}) {
         }
         if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
           closeScenarioGuidePopover({ restoreFocus: true });
+          closedOverlay = true;
+        }
+        if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) {
+          state.closeExportWorkbenchFn?.({ restoreFocus: true });
           closedOverlay = true;
         }
         if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
@@ -7530,11 +7637,51 @@ function initToolbar({ render } = {}) {
 
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
     dockExportBtn.setAttribute("aria-haspopup", "dialog");
-    dockExportBtn.setAttribute("aria-controls", "dockExportPopover");
+    dockExportBtn.setAttribute("aria-controls", "exportWorkbenchOverlay");
     dockExportBtn.addEventListener("click", () => {
-      openDockPopover("export");
+      const isOpen = !!(exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden"));
+      if (isOpen) {
+        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+      } else {
+        state.openExportWorkbenchFn?.(dockExportBtn);
+      }
     });
     dockExportBtn.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchCloseBtn && !exportWorkbenchCloseBtn.dataset.bound) {
+    exportWorkbenchCloseBtn.addEventListener("click", () => {
+      state.closeExportWorkbenchFn?.({ restoreFocus: true });
+    });
+    exportWorkbenchCloseBtn.dataset.bound = "true";
+  }
+
+  exportWorkbenchPreviewModeButtons.forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      exportWorkbenchPreviewMode = String(button.dataset.exportPreviewMode || "main") === "layer" ? "layer" : "main";
+      renderExportWorkbenchUi(true);
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (exportWorkbenchFormat && !exportWorkbenchFormat.dataset.bound) {
+    exportWorkbenchFormat.addEventListener("change", () => {
+      if (exportFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+    });
+    exportWorkbenchFormat.dataset.bound = "true";
+  }
+
+  if (exportWorkbenchSnapshotBtn && !exportWorkbenchSnapshotBtn.dataset.bound) {
+    exportWorkbenchSnapshotBtn.addEventListener("click", () => {
+      if (exportFormat && exportWorkbenchFormat) {
+        exportFormat.value = exportWorkbenchFormat.value === "jpg" ? "jpg" : "png";
+      }
+      exportBtn?.click();
+    });
+    exportWorkbenchSnapshotBtn.dataset.bound = "true";
   }
 
   if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
@@ -9853,6 +10000,9 @@ function initToolbar({ render } = {}) {
   }
   if (dockExportPopover) {
     dockExportPopover.setAttribute("aria-hidden", "true");
+  }
+  if (exportWorkbenchOverlay) {
+    exportWorkbenchOverlay.setAttribute("aria-hidden", "true");
   }
   if (scenarioGuidePopover) {
     applyDialogContract(scenarioGuidePopover, {
