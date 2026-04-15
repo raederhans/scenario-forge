@@ -3,7 +3,7 @@
   "family": "road",
   "geometry_kind": "line",
   "schema_version": 1,
-  "generated_at": "2026-04-14T22:36:10.852670Z",
+  "generated_at": "2026-04-14T22:36:10.85267Z",
   "recipe_path": "data/transport_layers/global_road/shards/e016_e018/source_recipe.manual.json",
   "recipe_version": "global_road_sources_v1",
   "distribution_tier": "single_pack",
@@ -25,7 +25,7 @@
       "roads": 10982
     }
   },
-  "build_command": "python tools/build_global_transport_roads.py --lon-min 16.0 --lon-max 18.0 --shard-id e016_e018",
+  "build_command": "python tools/build_global_transport_roads.py --shard e016_e018",
   "runtime_consumer": "transport_overview_road",
   "source_signature": {
     "overture_transport_segment": {
@@ -88,3 +88,4 @@
     }
   }
 }
+

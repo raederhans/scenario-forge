@@ -8,30 +8,128 @@
     "theme": "transportation",
     "type": "segment",
     "subtype": "rail",
-    "classes": ["standard_gauge", "unknown"],
+    "classes": [
+      "standard_gauge",
+      "unknown"
+    ],
     "remote_path": "s3://overturemaps-us-west-2/release/2026-02-18.0/theme=transportation/type=segment/",
     "license": "ODbL-1.0"
   },
   "product_rules": {
-    "full_min_length_m": {
-      "standard_gauge": 8000,
-      "unknown": 20000
-    },
-    "preview_min_length_m": {
-      "standard_gauge": 35000,
-      "unknown": 90000
-    },
-    "preview_min_length_by_line_class": {
-      "mainline": 35000.0,
-      "regional": 35000.0,
-      "secondary": 90000.0
-    },
-    "simplify_meters": {
-      "standard_gauge": 120,
-      "unknown": 160
+    "focus_region_priority": [
+      "japan",
+      "europe",
+      "russia",
+      "east_asia",
+      "north_america"
+    ],
+    "region_policy": {
+      "japan": {
+        "full_min_length_m": {
+          "standard_gauge": 6000.0,
+          "unknown": 16000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 25000.0,
+          "regional": 28000.0,
+          "secondary": 70000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 90.0,
+          "unknown": 130.0
+        },
+        "drop_unnamed_standard_gauge": false,
+        "drop_unknown_without_name": false
+      },
+      "europe": {
+        "full_min_length_m": {
+          "standard_gauge": 8000.0,
+          "unknown": 20000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 35000.0,
+          "regional": 35000.0,
+          "secondary": 90000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 120.0,
+          "unknown": 160.0
+        },
+        "drop_unnamed_standard_gauge": false,
+        "drop_unknown_without_name": false
+      },
+      "russia": {
+        "full_min_length_m": {
+          "standard_gauge": 10000.0,
+          "unknown": 24000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 42000.0,
+          "regional": 52000.0,
+          "secondary": 120000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 140.0,
+          "unknown": 180.0
+        },
+        "drop_unnamed_standard_gauge": false,
+        "drop_unknown_without_name": false
+      },
+      "east_asia": {
+        "full_min_length_m": {
+          "standard_gauge": 8000.0,
+          "unknown": 20000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 35000.0,
+          "regional": 40000.0,
+          "secondary": 100000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 120.0,
+          "unknown": 160.0
+        },
+        "drop_unnamed_standard_gauge": false,
+        "drop_unknown_without_name": false
+      },
+      "north_america": {
+        "full_min_length_m": {
+          "standard_gauge": 10000.0,
+          "unknown": 24000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 45000.0,
+          "regional": 55000.0,
+          "secondary": 130000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 140.0,
+          "unknown": 180.0
+        },
+        "drop_unnamed_standard_gauge": false,
+        "drop_unknown_without_name": false
+      },
+      "low_priority": {
+        "full_min_length_m": {
+          "standard_gauge": 30000.0,
+          "unknown": 120000.0
+        },
+        "preview_min_length_by_line_class": {
+          "mainline": 150000.0,
+          "regional": 220000.0,
+          "secondary": 320000.0
+        },
+        "simplify_meters": {
+          "standard_gauge": 260.0,
+          "unknown": 320.0
+        },
+        "drop_unnamed_standard_gauge": true,
+        "drop_unknown_without_name": true
+      }
     },
     "line_class_policy": "standard_gauge long segments => mainline, other standard_gauge => regional, remaining => secondary",
     "stations_phase": "phase_b_pending_major_station_source",
-    "phase_a_scope": "line_only_backbone"
+    "phase_a_scope": "line_only_backbone",
+    "non_focus_strategy": "keep focus regions at baseline fidelity; drop unnamed low-priority lines early and raise thresholds outside focus regions"
   }
 }

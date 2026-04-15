@@ -28,7 +28,8 @@
     "test:e2e:interaction-funnel": "node node_modules/@playwright/test/cli.js test tests/e2e/interaction_funnel_contract.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:scenario-resilience": "node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1",
     "build:global-transport-roads": "python tools/build_global_transport_roads.py",
-    "build:global-transport-rail": "python tools/build_global_transport_rail.py"
+    "build:global-transport-rail": "python tools/build_global_transport_rail.py",
+    "build:global-transport-road-catalog": "python tools/build_global_transport_catalogs.py --family road"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

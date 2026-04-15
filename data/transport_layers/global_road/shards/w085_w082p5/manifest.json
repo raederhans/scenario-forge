@@ -25,7 +25,7 @@
       "roads": 27550
     }
   },
-  "build_command": "python tools/build_global_transport_roads.py --lon-min -85.0 --lon-max -82.5 --shard-id w085_w082p5",
+  "build_command": "python tools/build_global_transport_roads.py --shard w085_w082p5",
   "runtime_consumer": "transport_overview_road",
   "source_signature": {
     "overture_transport_segment": {
@@ -88,3 +88,4 @@
     }
   }
 }
+

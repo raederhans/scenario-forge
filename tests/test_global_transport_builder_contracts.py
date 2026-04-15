@@ -13,6 +13,9 @@ from shapely.geometry import LineString
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_ROAD_RECIPE = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'source_recipe.manual.json'
 GLOBAL_RAIL_RECIPE = REPO_ROOT / 'data' / 'transport_layers' / 'global_rail' / 'source_recipe.manual.json'
+GLOBAL_ROAD_CATALOG = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'catalog.json'
+GLOBAL_ROAD_SHARD_ROOT = REPO_ROOT / 'data' / 'transport_layers' / 'global_road' / 'shards'
+GLOBAL_TRANSPORT_CATALOG_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_catalogs.py'
 ROAD_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_roads.py'
 RAIL_BUILDER = REPO_ROOT / 'tools' / 'build_global_transport_rail.py'
 COMMON_HELPER = REPO_ROOT / 'map_builder' / 'overture_transport_common.py'
@@ -24,7 +27,14 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         cls.pyarrow_available = importlib.util.find_spec("pyarrow") is not None
 
     def test_new_global_transport_files_exist(self) -> None:
-        for path in (GLOBAL_ROAD_RECIPE, GLOBAL_RAIL_RECIPE, ROAD_BUILDER, RAIL_BUILDER, COMMON_HELPER):
+        for path in (
+            GLOBAL_ROAD_RECIPE,
+            GLOBAL_RAIL_RECIPE,
+            GLOBAL_TRANSPORT_CATALOG_BUILDER,
+            ROAD_BUILDER,
+            RAIL_BUILDER,
+            COMMON_HELPER,
+        ):
             self.assertTrue(path.exists(), path.as_posix())
 
     def test_global_road_recipe_uses_overture_single_source_policy(self) -> None:
@@ -64,6 +74,15 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         rules = payload.get('product_rules', {})
         self.assertEqual(rules.get('phase_a_scope'), 'line_only_backbone')
         self.assertEqual(rules.get('stations_phase'), 'phase_b_pending_major_station_source')
+        self.assertEqual(
+            rules.get('focus_region_priority'),
+            ['japan', 'europe', 'russia', 'east_asia', 'north_america'],
+        )
+        self.assertIn('low_priority', rules.get('region_policy', {}))
+        self.assertEqual(
+            rules.get('region_policy', {}).get('low_priority', {}).get('drop_unnamed_standard_gauge'),
+            True,
+        )
 
     def test_road_label_builder_handles_empty_input(self) -> None:
         if not self.pyarrow_available:
@@ -207,6 +226,15 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertNotIn('w090_w080', shard_ids)
         self.assertNotIn('e090_e100', shard_ids)
 
+    def test_checked_in_road_shard_dirs_match_builder_truth(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_roads import ROAD_SHARDS
+
+        expected_ids = {entry['id'] for entry in ROAD_SHARDS}
+        actual_ids = {path.name for path in GLOBAL_ROAD_SHARD_ROOT.iterdir() if path.is_dir()}
+        self.assertEqual(actual_ids, expected_ids)
+
     def test_custom_road_shard_spec_supports_dense_manual_splits(self) -> None:
         if not self.pyarrow_available:
             self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
@@ -241,6 +269,89 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn("OUTPUT_DIR / 'shards' / shard_spec['id']", content)
         self.assertIn("build_command = f\"{build_command} --shard {shard_spec['id']}\"", content)
 
+    def test_rail_builder_declares_phase_logs(self) -> None:
+        content = RAIL_BUILDER.read_text(encoding='utf-8')
+        self.assertIn("log_progress('starting normalized rail chunk scan')", content)
+        self.assertIn("log_progress('starting preview backbone assembly')", content)
+        self.assertIn("log_progress('starting full backbone assembly')", content)
+
+    def test_road_catalog_matches_current_shard_manifests(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_roads import ROAD_SHARDS
+
+        catalog = json.loads(GLOBAL_ROAD_CATALOG.read_text(encoding='utf-8'))
+        self.assertEqual(catalog.get('family'), 'road')
+        self.assertEqual(catalog.get('distribution_tier'), 'sharded_manifest_catalog')
+
+        entries = catalog.get('entries', [])
+        expected_ids = [entry['id'] for entry in ROAD_SHARDS]
+        self.assertEqual([entry.get('id') for entry in entries], expected_ids)
+
+        for shard, entry in zip(ROAD_SHARDS, entries):
+            manifest_path = REPO_ROOT / entry['manifest_path']
+            self.assertTrue(manifest_path.exists(), manifest_path.as_posix())
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            self.assertEqual(entry.get('lon_min'), float(shard['lon_min']))
+            self.assertEqual(entry.get('lon_max'), float(shard['lon_max']))
+            self.assertEqual(
+                manifest.get('build_command'),
+                f"python tools/build_global_transport_roads.py --shard {shard['id']}",
+            )
+            self.assertEqual(
+                ((manifest.get('extensions') or {}).get('road') or {}).get('shard'),
+                {
+                    'id': shard['id'],
+                    'lon_min': float(shard['lon_min']),
+                    'lon_max': float(shard['lon_max']),
+                },
+            )
+
+    def test_catalog_builder_defaults_to_road_until_rail_outputs_exist(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_catalogs import parse_args
+
+        with patch('sys.argv', ['build_global_transport_catalogs.py']):
+            args = parse_args()
+
+        self.assertEqual(args.family, 'road')
+
+    def test_rail_focus_region_prefilter_drops_low_priority_noise(self) -> None:
+        if not self.pyarrow_available:
+            self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
+        from tools.build_global_transport_rail import map_batch_rows
+
+        rows = map_batch_rows([
+            {
+                'id': 'focus_jp',
+                'class': 'standard_gauge',
+                'bbox': {'xmin': 139.0, 'xmax': 140.0, 'ymin': 35.0, 'ymax': 36.0},
+                'names': {},
+                'sources': [],
+                'geometry': b'noop',
+            },
+            {
+                'id': 'low_priority_unnamed',
+                'class': 'standard_gauge',
+                'bbox': {'xmin': 20.0, 'xmax': 21.0, 'ymin': -30.0, 'ymax': -29.0},
+                'names': {},
+                'sources': [],
+                'geometry': b'noop',
+            },
+            {
+                'id': 'low_priority_unknown',
+                'class': 'unknown',
+                'bbox': {'xmin': 20.0, 'xmax': 21.0, 'ymin': -30.0, 'ymax': -29.0},
+                'names': {'primary': ''},
+                'sources': [],
+                'geometry': b'noop',
+            },
+        ])
+
+        self.assertEqual([row['id'] for row in rows], ['focus_jp'])
+        self.assertEqual(rows[0]['focus_region'], 'japan')
+
     def test_rail_builder_keeps_stations_out_of_phase_a_manifest(self) -> None:
         if not self.pyarrow_available:
             self.skipTest("pyarrow is required to import transport builder helpers in this environment.")
@@ -248,7 +359,12 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
         audit = build_audit_payload(
             source_signature={'dummy': True},
-            result={'raw_line_count': 0, 'filtered_line_count': 0, 'line_class_counts': {'mainline': 0, 'regional': 0, 'secondary': 0}},
+            result={
+                'raw_line_count': 0,
+                'filtered_line_count': 0,
+                'line_class_counts': {'mainline': 0, 'regional': 0, 'secondary': 0},
+                'region_counts': {'japan': 0, 'europe': 0, 'russia': 0, 'east_asia': 0, 'north_america': 0, 'low_priority': 0},
+            },
             preview_railways=empty_railways_frame(),
             railways=empty_railways_frame(),
             major_stations=empty_station_collection(),
@@ -277,6 +393,13 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
             content = path.read_text(encoding='utf-8')
             self.assertNotIn('showRoad', content)
             self.assertNotIn('showRail', content)
+
+    def test_data_loader_no_longer_hardcodes_missing_global_transport_pack_paths(self) -> None:
+        content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
+        self.assertNotIn('data/transport_layers/global_road/roads.topo.json', content)
+        self.assertNotIn('data/transport_layers/global_road/road_labels.geojson', content)
+        self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', content)
+        self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', content)
 
 
 if __name__ == '__main__':

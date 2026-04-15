@@ -1,0 +1,712 @@
+{
+  "version": "global_transport_catalog_v1",
+  "family": "road",
+  "generated_at": "2026-04-15T20:01:33.871809Z",
+  "distribution_tier": "sharded_manifest_catalog",
+  "source_policy": "overture_only_checked_in_v1",
+  "default_variant": "default",
+  "entries": [
+    {
+      "id": "w180_w150",
+      "manifest_path": "data/transport_layers/global_road/shards/w180_w150/manifest.json",
+      "lon_min": -180.0,
+      "lon_max": -150.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 5
+        },
+        "full": {
+          "roads": 579
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w150_w120",
+      "manifest_path": "data/transport_layers/global_road/shards/w150_w120/manifest.json",
+      "lon_min": -150.0,
+      "lon_max": -120.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 423
+        },
+        "full": {
+          "roads": 27245
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w120_w090",
+      "manifest_path": "data/transport_layers/global_road/shards/w120_w090/manifest.json",
+      "lon_min": -120.0,
+      "lon_max": -90.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 4214
+        },
+        "full": {
+          "roads": 170283
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w090_w085",
+      "manifest_path": "data/transport_layers/global_road/shards/w090_w085/manifest.json",
+      "lon_min": -90.0,
+      "lon_max": -85.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1306
+        },
+        "full": {
+          "roads": 42345
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w085_w082p5",
+      "manifest_path": "data/transport_layers/global_road/shards/w085_w082p5/manifest.json",
+      "lon_min": -85.0,
+      "lon_max": -82.5,
+      "feature_counts": {
+        "preview": {
+          "roads": 608
+        },
+        "full": {
+          "roads": 27550
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w082p5_w080",
+      "manifest_path": "data/transport_layers/global_road/shards/w082p5_w080/manifest.json",
+      "lon_min": -82.5,
+      "lon_max": -80.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 731
+        },
+        "full": {
+          "roads": 35195
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w080_w075",
+      "manifest_path": "data/transport_layers/global_road/shards/w080_w075/manifest.json",
+      "lon_min": -80.0,
+      "lon_max": -75.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 940
+        },
+        "full": {
+          "roads": 52636
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w075_w070",
+      "manifest_path": "data/transport_layers/global_road/shards/w075_w070/manifest.json",
+      "lon_min": -75.0,
+      "lon_max": -70.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 739
+        },
+        "full": {
+          "roads": 52200
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w070_w065",
+      "manifest_path": "data/transport_layers/global_road/shards/w070_w065/manifest.json",
+      "lon_min": -70.0,
+      "lon_max": -65.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 429
+        },
+        "full": {
+          "roads": 12035
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w065_w060",
+      "manifest_path": "data/transport_layers/global_road/shards/w065_w060/manifest.json",
+      "lon_min": -65.0,
+      "lon_max": -60.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 241
+        },
+        "full": {
+          "roads": 7546
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w060_w030",
+      "manifest_path": "data/transport_layers/global_road/shards/w060_w030/manifest.json",
+      "lon_min": -60.0,
+      "lon_max": -30.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 154
+        },
+        "full": {
+          "roads": 59609
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w030_w020",
+      "manifest_path": "data/transport_layers/global_road/shards/w030_w020/manifest.json",
+      "lon_min": -30.0,
+      "lon_max": -20.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 2
+        },
+        "full": {
+          "roads": 134
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w020_w010",
+      "manifest_path": "data/transport_layers/global_road/shards/w020_w010/manifest.json",
+      "lon_min": -20.0,
+      "lon_max": -10.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 76
+        },
+        "full": {
+          "roads": 2635
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "w010_e000",
+      "manifest_path": "data/transport_layers/global_road/shards/w010_e000/manifest.json",
+      "lon_min": -10.0,
+      "lon_max": 0.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 2042
+        },
+        "full": {
+          "roads": 71227
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e000_e005",
+      "manifest_path": "data/transport_layers/global_road/shards/e000_e005/manifest.json",
+      "lon_min": 0.0,
+      "lon_max": 5.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1172
+        },
+        "full": {
+          "roads": 35680
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e005_e010",
+      "manifest_path": "data/transport_layers/global_road/shards/e005_e010/manifest.json",
+      "lon_min": 5.0,
+      "lon_max": 10.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1686
+        },
+        "full": {
+          "roads": 59642
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e010_e012",
+      "manifest_path": "data/transport_layers/global_road/shards/e010_e012/manifest.json",
+      "lon_min": 10.0,
+      "lon_max": 12.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 968
+        },
+        "full": {
+          "roads": 21216
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e012_e014",
+      "manifest_path": "data/transport_layers/global_road/shards/e012_e014/manifest.json",
+      "lon_min": 12.0,
+      "lon_max": 14.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 803
+        },
+        "full": {
+          "roads": 18710
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e014_e016",
+      "manifest_path": "data/transport_layers/global_road/shards/e014_e016/manifest.json",
+      "lon_min": 14.0,
+      "lon_max": 16.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 792
+        },
+        "full": {
+          "roads": 14250
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e016_e018",
+      "manifest_path": "data/transport_layers/global_road/shards/e016_e018/manifest.json",
+      "lon_min": 16.0,
+      "lon_max": 18.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 599
+        },
+        "full": {
+          "roads": 10982
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e018_e020",
+      "manifest_path": "data/transport_layers/global_road/shards/e018_e020/manifest.json",
+      "lon_min": 18.0,
+      "lon_max": 20.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 520
+        },
+        "full": {
+          "roads": 9545
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e020_e025",
+      "manifest_path": "data/transport_layers/global_road/shards/e020_e025/manifest.json",
+      "lon_min": 20.0,
+      "lon_max": 25.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1118
+        },
+        "full": {
+          "roads": 21586
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e025_e030",
+      "manifest_path": "data/transport_layers/global_road/shards/e025_e030/manifest.json",
+      "lon_min": 25.0,
+      "lon_max": 30.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 668
+        },
+        "full": {
+          "roads": 18713
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e030_e045",
+      "manifest_path": "data/transport_layers/global_road/shards/e030_e045/manifest.json",
+      "lon_min": 30.0,
+      "lon_max": 45.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1534
+        },
+        "full": {
+          "roads": 48356
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e045_e060",
+      "manifest_path": "data/transport_layers/global_road/shards/e045_e060/manifest.json",
+      "lon_min": 45.0,
+      "lon_max": 60.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1087
+        },
+        "full": {
+          "roads": 35886
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e060_e090",
+      "manifest_path": "data/transport_layers/global_road/shards/e060_e090/manifest.json",
+      "lon_min": 60.0,
+      "lon_max": 90.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 2234
+        },
+        "full": {
+          "roads": 33983
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e090_e095",
+      "manifest_path": "data/transport_layers/global_road/shards/e090_e095/manifest.json",
+      "lon_min": 90.0,
+      "lon_max": 95.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 496
+        },
+        "full": {
+          "roads": 4364
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e095_e100",
+      "manifest_path": "data/transport_layers/global_road/shards/e095_e100/manifest.json",
+      "lon_min": 95.0,
+      "lon_max": 100.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 671
+        },
+        "full": {
+          "roads": 6875
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e100_e105",
+      "manifest_path": "data/transport_layers/global_road/shards/e100_e105/manifest.json",
+      "lon_min": 100.0,
+      "lon_max": 105.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 2519
+        },
+        "full": {
+          "roads": 38467
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e105_e110",
+      "manifest_path": "data/transport_layers/global_road/shards/e105_e110/manifest.json",
+      "lon_min": 105.0,
+      "lon_max": 110.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 4826
+        },
+        "full": {
+          "roads": 54586
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e110_e115",
+      "manifest_path": "data/transport_layers/global_road/shards/e110_e115/manifest.json",
+      "lon_min": 110.0,
+      "lon_max": 115.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 5453
+        },
+        "full": {
+          "roads": 68960
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e115_e120",
+      "manifest_path": "data/transport_layers/global_road/shards/e115_e120/manifest.json",
+      "lon_min": 115.0,
+      "lon_max": 120.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 5029
+        },
+        "full": {
+          "roads": 64340
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e120_e125",
+      "manifest_path": "data/transport_layers/global_road/shards/e120_e125/manifest.json",
+      "lon_min": 120.0,
+      "lon_max": 125.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1825
+        },
+        "full": {
+          "roads": 31316
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e125_e130",
+      "manifest_path": "data/transport_layers/global_road/shards/e125_e130/manifest.json",
+      "lon_min": 125.0,
+      "lon_max": 130.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 1456
+        },
+        "full": {
+          "roads": 21470
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e130_e135",
+      "manifest_path": "data/transport_layers/global_road/shards/e130_e135/manifest.json",
+      "lon_min": 130.0,
+      "lon_max": 135.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 527
+        },
+        "full": {
+          "roads": 11911
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e135_e140",
+      "manifest_path": "data/transport_layers/global_road/shards/e135_e140/manifest.json",
+      "lon_min": 135.0,
+      "lon_max": 140.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 423
+        },
+        "full": {
+          "roads": 17759
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e140_e145",
+      "manifest_path": "data/transport_layers/global_road/shards/e140_e145/manifest.json",
+      "lon_min": 140.0,
+      "lon_max": 145.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 351
+        },
+        "full": {
+          "roads": 10233
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e145_e150",
+      "manifest_path": "data/transport_layers/global_road/shards/e145_e150/manifest.json",
+      "lon_min": 145.0,
+      "lon_max": 150.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 98
+        },
+        "full": {
+          "roads": 4962
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    },
+    {
+      "id": "e150_e180",
+      "manifest_path": "data/transport_layers/global_road/shards/e150_e180/manifest.json",
+      "lon_min": 150.0,
+      "lon_max": 180.0,
+      "feature_counts": {
+        "preview": {
+          "roads": 120
+        },
+        "full": {
+          "roads": 7795
+        }
+      },
+      "phase_status": {
+        "backbone": "ready_for_phase_a_checked_in_outputs",
+        "road_labels": "phase_b_pending_ref_sidecar"
+      }
+    }
+  ]
+}

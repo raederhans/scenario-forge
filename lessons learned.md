@@ -699,3 +699,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 41. 连续叠加同一 feature 的 PR 时，先收口唯一 state schema，再继续加 UI 和导出分支
 - 如果 state normalizer、DOM 控件、import 恢复链各自按不同字段名演化，最后合并时最容易留下“语法能过一半、运行链却分叉”的双轨残留。
 - 更稳的最短路径是：先固定唯一 canonical schema，再让 toolbar / file_manager / interaction_funnel 全部只认这一套；旧字段只做单向迁移，不要长期并存。
+
+### 58. checked-in shard 目录不能靠“看起来差不多”存活，必须和 builder 真相逐项对齐
+- 这次 global road 暴露的问题不是单个 shard 坏了，而是仓库里保留了旧分片目录、旧 build_command 和新 `ROAD_SHARDS` 同时存在，catalog 一旦按目录盲扫就会把 stale 产物误当正式输入。
+- 更稳的最短路径是：builder 定义的 shard 列表当唯一真相，checked-in 目录必须 exact match；多余目录直接清掉，catalog 和测试都只认这份列表。
+
+### 59. 未来全局 transport 家族在正式产物没落地前，不要先挂进默认 eager loader
+- 这次 `data_loader` 先接了还不存在的 `global_road/global_rail` 顶层 pack 路径，结果启动阶段只能一边请求一边报 missing warning，既没能力也没数据。
+- 更稳的做法是：正式产物出来前，先保持 family 在 deferred/catalog 边界之外；等 catalog 和真实 pack 都 ready 后，再单独接 lazy loader，而不是提前塞进默认 context pack 列表。
+
+### 60. 长扫描 builder 只在 flush 时打日志还不够，scan checkpoint 必须早于首次产物写出
+- 这次 rail builder 一开始改成按 4000 行再 flush 后，短观察窗口里又回到了“只看到 starting scan、看不到任何后续进度”的假卡死观感。
+- 更稳的做法是：除了 flush log，再单独加 batch 级 scan checkpoint，把 `raw_seen / kept / pending_rows / region_counts` 提前打出来，这样就算还没写任何 chunk，也能知道它是在慢扫、慢滤，还是完全没推进。
