@@ -1749,6 +1749,57 @@ function populatePaletteSourceOptions(select) {
   select.value = state.currentPaletteTheme;
 }
 
+const EXPORT_MAX_DIMENSION_PX = 7680;
+const EXPORT_MAX_PIXELS = 7680 * 4320;
+const EXPORT_MAX_CONCURRENT_JOBS = 1;
+let exportJobsInFlight = 0;
+
+function createExportError(kind, message) {
+  const error = new Error(message);
+  error.exportKind = kind;
+  return error;
+}
+
+function classifyExportFailure(error) {
+  const kind = String(error?.exportKind || "").trim();
+  if (kind) return kind;
+  const message = String(error?.message || "").toLowerCase();
+  if (message.includes("svg overlay export failed") || message.includes("tainted")) return "svg-cors";
+  if (message.includes("memory") || message.includes("allocation") || message.includes("out of memory")) return "out-of-memory";
+  return "invalid-params";
+}
+
+function showExportFailureToast(error) {
+  const failureKind = classifyExportFailure(error);
+  if (failureKind === "out-of-memory") {
+    showToast(
+      t("Export failed: not enough available memory. Reduce export resolution (for example 2× → 1×), close heavy tabs, then retry.", "ui"),
+      { title: t("Export failed · Out of memory", "ui"), tone: "error", duration: 7000 }
+    );
+    return;
+  }
+  if (failureKind === "svg-cors") {
+    showToast(
+      t("Export failed: SVG overlay includes cross-origin assets. Use same-origin assets, remove cross-origin images, or hide SVG overlays before retrying.", "ui"),
+      { title: t("Export failed · Cross-origin SVG", "ui"), tone: "warning", duration: 7600 }
+    );
+    return;
+  }
+  showToast(
+    t("Export failed: invalid parameters. Check export scale and format, then retry.", "ui"),
+    { title: t("Export failed · Invalid parameters", "ui"), tone: "warning", duration: 6200 }
+  );
+}
+
+function resolveExportBaseDimensions() {
+  const dpr = Math.max(1, Number(state.dpr || globalThis.devicePixelRatio || 1));
+  const fallbackLogicalWidth = Number(state.colorCanvas?.width || 0) / dpr;
+  const fallbackLogicalHeight = Number(state.colorCanvas?.height || 0) / dpr;
+  const width = Math.round(Number(state.width || fallbackLogicalWidth || 0));
+  const height = Math.round(Number(state.height || fallbackLogicalHeight || 0));
+  return { width, height };
+}
+
 
 function initToolbar({ render } = {}) {
   const OCEAN_ADVANCED_PRESETS = new Set([
@@ -1758,6 +1809,10 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
+  const exportTarget = document.getElementById("exportTarget")
+    || document.getElementById("exportTargetSelect");
+  const exportFormat = document.getElementById("exportFormat");
+  const exportScale = document.getElementById("exportScale");
   const exportTarget = document.getElementById("exportTarget");
   const exportFormat = document.getElementById("exportFormat");
   const exportWorkbenchLayerList = document.getElementById("exportWorkbenchLayerList");
@@ -1798,6 +1853,9 @@ function initToolbar({ render } = {}) {
   const dayNightUtcStatus = document.getElementById("dayNightUtcStatus");
   const dayNightCurrentTime = document.getElementById("dayNightCurrentTime");
   const dayNightCityLightsEnabled = document.getElementById("dayNightCityLightsEnabled");
+  if (exportWorkbenchLayerList && !exportWorkbenchLayerList.getAttribute("aria-label")) {
+    exportWorkbenchLayerList.setAttribute("aria-label", t("Main Layers", "ui"));
+  }
   const dayNightCityLightsStyle = document.getElementById("dayNightCityLightsStyle");
   const dayNightCityLightsIntensity = document.getElementById("dayNightCityLightsIntensity");
   const dayNightCityLightsTextureOpacity = document.getElementById("dayNightCityLightsTextureOpacity");
@@ -8312,6 +8370,72 @@ function initToolbar({ render } = {}) {
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
+      if (exportJobsInFlight >= EXPORT_MAX_CONCURRENT_JOBS) {
+        showToast(
+          t("An export is already in progress. Wait for it to finish before starting another export.", "ui"),
+          { title: t("Export queue is full", "ui"), tone: "warning", duration: 4200 }
+        );
+        return;
+      }
+      exportJobsInFlight += 1;
+      try {
+        const selectedExportTarget = String(exportTarget?.value || "composite").trim().toLowerCase();
+        if (selectedExportTarget !== "composite") {
+          showToast(
+            t("Selected export target is not available yet. Falling back to Composite image.", "ui"),
+            { title: t("Export target fallback", "ui"), tone: "warning", duration: 4200 }
+          );
+        }
+        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
+        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
+        const { width: baseWidth, height: baseHeight } = resolveExportBaseDimensions();
+        if (!(baseWidth > 0) || !(baseHeight > 0)) {
+          throw createExportError("invalid-params", "Missing preview canvas dimensions.");
+        }
+        const scale = clamp(Number(exportScale?.value || 1), 1, 4);
+        const targetWidth = Math.round(baseWidth * scale);
+        const targetHeight = Math.round(baseHeight * scale);
+        if (targetWidth > EXPORT_MAX_DIMENSION_PX || targetHeight > EXPORT_MAX_DIMENSION_PX) {
+          throw createExportError(
+            "invalid-params",
+            `Export size exceeds 8K cap (${targetWidth}x${targetHeight}).`
+          );
+        }
+        if (targetWidth * targetHeight > EXPORT_MAX_PIXELS) {
+          throw createExportError(
+            "invalid-params",
+            `Export pixel budget exceeded (${targetWidth}x${targetHeight}).`
+          );
+        }
+        const exportCanvas = document.createElement("canvas");
+        exportCanvas.width = targetWidth;
+        exportCanvas.height = targetHeight;
+        const exportCtx = exportCanvas.getContext("2d");
+        if (!exportCtx) {
+          throw createExportError("invalid-params", "Canvas export context unavailable.");
+        }
+        exportCtx.imageSmoothingEnabled = true;
+        exportCtx.imageSmoothingQuality = "high";
+        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0, targetWidth, targetHeight);
+        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0, targetWidth, targetHeight);
+        const mapSvg = document.getElementById("map-svg");
+        if (mapSvg) {
+          const serializer = new XMLSerializer();
+          const svgMarkup = serializer.serializeToString(mapSvg);
+          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+          const svgUrl = URL.createObjectURL(svgBlob);
+          try {
+            await new Promise((resolve, reject) => {
+              const image = new Image();
+              image.onload = () => {
+                exportCtx.drawImage(image, 0, 0, targetWidth, targetHeight);
+                resolve();
+              };
+              image.onerror = () => reject(createExportError("svg-cors", "SVG overlay export failed."));
+              image.src = svgUrl;
+            });
+          } finally {
+            URL.revokeObjectURL(svgUrl);
       const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
       const mapSvg = document.getElementById("map-svg");
       const layerCanvases = {
@@ -8358,11 +8482,31 @@ function initToolbar({ render } = {}) {
           const exportCanvas = await bakeLayer("composite");
           triggerCanvasDownload(exportCanvas, extension, "map_snapshot");
         }
+        let dataUrl = "";
+        try {
+          dataUrl = exportCanvas.toDataURL(format, 0.92);
+        } catch (error) {
+          const normalizedMessage = String(error?.message || "").toLowerCase();
+          if (normalizedMessage.includes("memory") || normalizedMessage.includes("allocation")) {
+            throw createExportError("out-of-memory", String(error?.message || "Out of memory during export."));
+          }
+          throw error;
+        }
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = `map_snapshot.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
         showToast(t("Map snapshot downloaded.", "ui"), {
           title: t("Snapshot exported", "ui"),
           tone: "success",
         });
       } catch (error) {
+        console.error("Snapshot export failed:", error);
+        showExportFailureToast(error);
+      } finally {
+        exportJobsInFlight = Math.max(0, exportJobsInFlight - 1);
         console.warn("Workbench export failed, fallback to quick export:", error);
         try {
           const fallbackCanvas = await renderQuickSnapshotToCanvas(runtimeState);
