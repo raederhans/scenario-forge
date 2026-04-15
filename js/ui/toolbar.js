@@ -7730,33 +7730,33 @@ function initToolbar({ render } = {}) {
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
-      const mapSvg = document.getElementById("map-svg");
-      const layerCanvases = {
-        ...(state.exportLayerCanvases || {}),
-      };
-      if (!layerCanvases.base && state.colorCanvas) {
-        layerCanvases.base = state.colorCanvas;
-      }
-      if (!layerCanvases.borders && state.lineCanvas) {
-        layerCanvases.borders = state.lineCanvas;
-      }
-      const overlayCanvas = await renderSvgOverlayCanvas(
-        mapSvg,
-        state.colorCanvas?.width || state.lineCanvas?.width || 0,
-        state.colorCanvas?.height || state.lineCanvas?.height || 0
-      );
-      if (overlayCanvas) {
-        if (!layerCanvases.overlay) layerCanvases.overlay = overlayCanvas;
-        if (!layerCanvases.labels) layerCanvases.labels = overlayCanvas;
-      }
-      const runtimeState = {
-        colorCanvas: state.colorCanvas,
-        lineCanvas: state.lineCanvas,
-        mapSvg,
-        layerCanvases,
-      };
       const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
+      let runtimeState = null;
       try {
+        const mapSvg = document.getElementById("map-svg");
+        const layerCanvases = {
+          ...(state.exportLayerCanvases || {}),
+        };
+        if (!layerCanvases.base && state.colorCanvas) {
+          layerCanvases.base = state.colorCanvas;
+        }
+        if (!layerCanvases.borders && state.lineCanvas) {
+          layerCanvases.borders = state.lineCanvas;
+        }
+        const overlayCanvas = await renderSvgOverlayCanvas(
+          mapSvg,
+          state.colorCanvas?.width || state.lineCanvas?.width || 0,
+          state.colorCanvas?.height || state.lineCanvas?.height || 0
+        );
+        if (overlayCanvas && !layerCanvases.overlay) {
+          layerCanvases.overlay = overlayCanvas;
+        }
+        runtimeState = {
+          colorCanvas: state.colorCanvas,
+          lineCanvas: state.lineCanvas,
+          mapSvg,
+          layerCanvases,
+        };
         const plan = buildExportRenderPlan(state.exportWorkbenchUi, runtimeState);
         const outputs = await renderExportPlanToCanvas(plan, runtimeState);
         downloadExportOutputs(outputs, formatKey, (output, index, extension) => {
