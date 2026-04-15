@@ -7635,8 +7635,13 @@ function initToolbar({ render } = {}) {
         `colorRevision:${Number(state.colorRevision) || 0}`,
         `topologyRevision:${Number(state.topologyRevision) || 0}`,
         `dirtyRevision:${dirtyRevision}`,
+        `passBackground:${String(signatures.background || "")}`,
+        `passPhysicalBase:${String(signatures.physicalBase || "")}`,
         `passPolitical:${String(signatures.political || "")}`,
         `passContextBase:${String(signatures.contextBase || "")}`,
+        `passContextScenario:${String(signatures.contextScenario || "")}`,
+        `passEffects:${String(signatures.effects || "")}`,
+        `passDayNight:${String(signatures.dayNight || "")}`,
       ];
     }
     if (layerId === "line") {
@@ -7664,8 +7669,14 @@ function initToolbar({ render } = {}) {
       ...transformSignature,
       `passPolitical:${String(signatures.political || "")}`,
       `passContextBase:${String(signatures.contextBase || "")}`,
+      `passContextScenario:${String(signatures.contextScenario || "")}`,
+      `passEffects:${String(signatures.effects || "")}`,
       `passBorders:${String(signatures.borders || "")}`,
       `passLineEffects:${String(signatures.lineEffects || "")}`,
+      `passDayNight:${String(signatures.dayNight || "")}`,
+      `passContextMarkers:${String(signatures.contextMarkers || "")}`,
+      `passTextureLabels:${String(signatures.textureLabels || "")}`,
+      `passLabels:${String(signatures.labels || "")}`,
     ];
   };
 
@@ -7724,9 +7735,37 @@ function initToolbar({ render } = {}) {
     if (!passCanvas) return false;
     const layout = renderPassCache.layouts?.[passName] || {};
     const dpr = Math.max(Number(state.dpr) || 1, 1);
-    const offsetX = Math.round(-Number(layout.offsetX || 0) * dpr);
-    const offsetY = Math.round(-Number(layout.offsetY || 0) * dpr);
-    targetCtx.drawImage(passCanvas, offsetX, offsetY);
+    const referenceTransform = renderPassCache.referenceTransforms?.[passName] || null;
+    const currentTransform = state.zoomTransform && typeof state.zoomTransform === "object"
+      ? state.zoomTransform
+      : { k: 1, x: 0, y: 0 };
+    const hasReferenceTransform = referenceTransform
+      && Number.isFinite(Number(referenceTransform.k))
+      && Number.isFinite(Number(referenceTransform.x))
+      && Number.isFinite(Number(referenceTransform.y));
+    const hasCurrentTransform = Number.isFinite(Number(currentTransform.k))
+      && Number.isFinite(Number(currentTransform.x))
+      && Number.isFinite(Number(currentTransform.y));
+    if (!hasReferenceTransform || !hasCurrentTransform) {
+      const offsetX = Math.round(-Number(layout.offsetX || 0) * dpr);
+      const offsetY = Math.round(-Number(layout.offsetY || 0) * dpr);
+      targetCtx.drawImage(passCanvas, offsetX, offsetY);
+      return true;
+    }
+    const referenceK = Math.max(Number(referenceTransform.k) || 1, 0.0001);
+    const currentK = Math.max(Number(currentTransform.k) || 1, 0.0001);
+    const scaleRatio = currentK / referenceK;
+    const dx = Number(currentTransform.x || 0) - (Number(referenceTransform.x || 0) * scaleRatio);
+    const dy = Number(currentTransform.y || 0) - (Number(referenceTransform.y || 0) * scaleRatio);
+    targetCtx.save();
+    targetCtx.setTransform(1, 0, 0, 1, 0, 0);
+    targetCtx.translate(
+      (dx - Number(layout.offsetX || 0) * scaleRatio) * dpr,
+      (dy - Number(layout.offsetY || 0) * scaleRatio) * dpr,
+    );
+    targetCtx.scale(scaleRatio, scaleRatio);
+    targetCtx.drawImage(passCanvas, 0, 0);
+    targetCtx.restore();
     return true;
   };
 
@@ -7756,6 +7795,35 @@ function initToolbar({ render } = {}) {
     ];
     let drewFromRenderPassCache = false;
     basePassNames.forEach((passName) => {
+      drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget(passName, targetCtx) || drewFromRenderPassCache;
+    });
+    if (drewFromRenderPassCache) {
+      return "render-pass";
+    }
+    if (state.colorCanvas) {
+      targetCtx.drawImage(state.colorCanvas, 0, 0);
+      return "composite-canvas";
+    }
+    return "none";
+  };
+
+  const drawCompositeLayerToCanvas = (targetCtx) => {
+    const compositePassNames = [
+      "background",
+      "physicalBase",
+      "political",
+      "contextBase",
+      "contextScenario",
+      "effects",
+      "lineEffects",
+      "dayNight",
+      "borders",
+      "contextMarkers",
+      "textureLabels",
+      "labels",
+    ];
+    let drewFromRenderPassCache = false;
+    compositePassNames.forEach((passName) => {
       drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget(passName, targetCtx) || drewFromRenderPassCache;
     });
     if (drewFromRenderPassCache) {
@@ -7803,10 +7871,7 @@ function initToolbar({ render } = {}) {
     } else if (normalizedLayerId === "text") {
       await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
     } else {
-      const colorSource = drawColorLayerToCanvas(bakeCtx);
-      if (colorSource !== "composite-canvas") {
-        drawLineLayerToCanvas(bakeCtx);
-      }
+      drawCompositeLayerToCanvas(bakeCtx);
       if (exportUi.includeTextLayer) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
       }
