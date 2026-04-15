@@ -7968,7 +7968,9 @@ function initToolbar({ render } = {}) {
         const extension = exportUi.target === "per-layer"
           ? "png"
           : (exportUi.format === "jpg" ? "jpg" : "png");
-        exportUi.format = extension;
+        if (exportUi.target !== "per-layer") {
+          exportUi.format = extension;
+        }
         const exportTargetKind = exportUi.target;
 
         if (exportTargetKind === "per-layer") {
