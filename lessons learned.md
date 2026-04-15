@@ -615,3 +615,34 @@
 ### 27. 全球静态交通 builder 不能先把全量世界主干网物化到 Python list，再做过滤和简化
 - 这次 `build_global_transport_roads.py` 审查直接暴露了一个典型问题：Overture 全球主干道路大约千万级，先 `to_pylist()` 全收进大 list 再转 `GeoDataFrame`，正常开发机和 CI 都会先被内存打爆。
 - 更稳的做法是：按 Arrow batch 流式读取，批内完成字段裁剪、长度过滤、几何简化，再把中间结果落到临时 parquet chunk，最后只对过滤后的结果做汇总和正式输出。
+### 38. 多产物地理 builder 不能把 preview / full / labels 绑成同一波总装
+- 就算前面已经做了 batch 读和临时 chunk，只要最后还是同时把 preview、full、labels 全部回收进内存，full-scale 构建还是会在总装阶段重新变重。
+- 更稳的最短路径是：先把 normalized chunks 当唯一中间真相，再串行落 preview backbone、full backbone，最后才做 sidecar labels。
+### 39. 串行 staged output 只能先解决波次耦合，不能自动解决最终 materialize + TopoJSON 汇总压力
+- 就算已经把 preview/full/labels 拆波次，只要 `materialize_*_from_chunks()` 还是把所有 chunk 读回内存再 `concat`，full-scale build 仍会在最终汇总阶段卡住。
+- 更稳的下一步不是再加更多 sidecar，而是继续压缩进入最终 TopoJSON 的 feature 数，或把最终汇总再拆细。
+### 40. 给超大全球 builder 补阶段日志，先分清是卡在扫描、归一化，还是卡在最终总装
+- 这次 road trial 证明“没有正式产物写出”不等于一定卡在 TopoJSON 总装；如果没有阶段日志，很容易误判真正瓶颈。
+- 最短稳路线是先在 normalize/spill、preview assemble、full assemble、labels 生成之间打清晰日志，再根据真实停留阶段收下一步优化。
+### 41. 全球 Overture builder 先要判断“卡在扫描归一化”还是“卡在最终总装”，不要把两类瓶颈混在一起
+- 这次 road 再跑更久后，日志证明它连 `starting preview backbone assembly` 都没走到，说明当前首要瓶颈其实还在 normalize/spill，不是后面的 preview/full/labels 波次。
+- 一旦阶段日志已经把瓶颈定位到扫描归一化，就该优先考虑更早的源侧筛选、批内几何处理成本、以及是否要按区域分治，而不是继续只盯 TopoJSON 汇总。
+### 42. 大文件远端扫描别轻易加大 Arrow read-ahead，先验证内存曲线
+- 这次给 Overture scanner 加 `batch_readahead / fragment_readahead` 后，没有明显提升 flush 进度，反而把 road build 的 private memory 顶到了约 13.75 GB。
+- 对远端大规模 parquet 扫描，read-ahead 不是默认越大越好；先用阶段日志和内存曲线确认收益，不行就立刻回退。
+### 43. 把产品口径继续收窄到 motorway+trunk 也不一定够，必须看几何处理链本身是不是主瓶颈
+- 这次 road phase A 已经收成 motorway+trunk only，但长试跑依然在 normalize/spill 前段就把 private memory 推到约 5 GB，说明问题不只在 feature 数，也在 GeoPandas/Shapely 处理链本身。
+- 当日志显示还没进入 preview/full assembly 就已经吃掉大内存时，下一步应该优先考虑区域分治、离线分片、或替换几何处理方式，而不是继续微调 staged output 波次。
+### 44. 全球分片 builder 要按密度分片，不要只按等宽经度切
+- 这次 `w180_w150` 轻 shard 已经能稳定产正式产物，但 `e000_e030` 这种欧洲高密度 shard 仍然在第一个 flush 前就把内存顶到约 4.69 GB，说明“等宽经度分片”不足以覆盖密度差异。
+- 真正要把全球数据准备跑完，分片规则必须开始按密度细化：高密地区更小 shard，低密海洋/荒漠区域可以保持大 shard。
+### 45. 高密区分片最好支持“固定密度 shard + 自定义经度窗口”双轨
+- 固定 shard 适合正式 checked-in 批处理，但当某个高密区仍然过重时，临时 `--lon-min/--lon-max/--shard-id` 能最快验证更细窗口是否可跑通。
+- 这次 `e010_e012` 和 `e012_e014` 都成功落正式产物，证明高密区先用自定义细窗验证，再回填固定 shard 列表，是最稳的推进方式。
+### 46. 对分片构建失败的半成品目录要及时清掉，避免把“只有 recipe”的失败尝试当成 ready shard
+- 这次 `e000_e030` 只写出了 `source_recipe.manual.json`，如果不清理，后面很容易被误当成已完成 shard。
+- 分片治理里，只有同时有 manifest/audit/preview/full 产物的目录才算 ready；失败尝试应及时删除或明确隔离。
+
+### 47. 线几何简化后必须立刻重算长度，并重新应用基于长度的阈值
+- reveal_rank、preview/full 过滤、导出字段只要依赖 length_m，就不能继续使用简化前长度；否则产物会和最终几何不一致。
+- 更稳的最短路径是：simplify -> measure_lengths -> 再做长度阈值过滤和分级。
