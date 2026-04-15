@@ -7770,7 +7770,6 @@ function initToolbar({ render } = {}) {
       await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
     } else {
       if (state.colorCanvas) bakeCtx.drawImage(state.colorCanvas, 0, 0);
-      drawLineLayerToCanvas(bakeCtx);
       if (exportUi.includeTextLayer) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
       }
@@ -7803,6 +7802,7 @@ function initToolbar({ render } = {}) {
   if (exportTarget && !exportTarget.dataset.bound) {
     const exportUiState = ensureExportWorkbenchUiState();
     exportTarget.value = exportUiState.target;
+    exportFormat.value = exportUiState.format === "jpg" ? "jpg" : "png";
     exportTarget.addEventListener("change", () => {
       const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
@@ -7813,6 +7813,7 @@ function initToolbar({ render } = {}) {
         exportFormat.value = "png";
         exportFormat.disabled = true;
       } else {
+        exportFormat.value = exportUi.format === "jpg" ? "jpg" : "png";
         exportFormat.disabled = exportUi.target === "bake-pack";
       }
     });
@@ -7823,6 +7824,18 @@ function initToolbar({ render } = {}) {
       exportFormat.disabled = exportUiState.target === "bake-pack";
     }
     exportTarget.dataset.bound = "true";
+  }
+
+  if (exportFormat && !exportFormat.dataset.bound) {
+    const exportUi = ensureExportWorkbenchUiState();
+    exportFormat.addEventListener("change", () => {
+      const liveExportUi = ensureExportWorkbenchUiState();
+      liveExportUi.format = exportFormat.value === "jpg" ? "jpg" : "png";
+    });
+    if (exportTarget?.value !== "per-layer") {
+      exportFormat.value = exportUi.format === "jpg" ? "jpg" : "png";
+    }
+    exportFormat.dataset.bound = "true";
   }
 
   if (exportBtn && exportFormat) {
