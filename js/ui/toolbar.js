@@ -1702,6 +1702,7 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
+  const exportTarget = document.getElementById("exportTarget");
   const exportFormat = document.getElementById("exportFormat");
   const textureSelect = document.getElementById("textureSelect");
   const textureOpacity = document.getElementById("textureOpacity");
@@ -7179,6 +7180,25 @@ function initToolbar({ render } = {}) {
         `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
         + `scale(${state.referenceImageState.scale})`;
     }
+    const exportUiState = state.exportWorkbenchUi && typeof state.exportWorkbenchUi === "object"
+      ? state.exportWorkbenchUi
+      : { target: "composite", format: "png" };
+    const exportTargetValue = ["composite", "per-layer", "bake-pack"].includes(String(exportUiState.target || "").trim().toLowerCase())
+      ? String(exportUiState.target || "").trim().toLowerCase()
+      : "composite";
+    const exportFormatValue = String(exportUiState.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png";
+    if (exportTarget) {
+      exportTarget.value = exportTargetValue;
+    }
+    if (exportFormat) {
+      if (exportTargetValue === "per-layer") {
+        exportFormat.value = "png";
+        exportFormat.disabled = true;
+      } else {
+        exportFormat.value = exportFormatValue;
+        exportFormat.disabled = exportTargetValue === "bake-pack";
+      }
+    }
     renderTextureUI();
     renderDayNightUI();
     renderSpecialZoneEditorUI();
@@ -7580,47 +7600,406 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  const ensureExportSnapshotUiState = () => {
+    if (!state.exportWorkbenchUi || typeof state.exportWorkbenchUi !== "object") {
+      state.exportWorkbenchUi = {};
+    }
+    const normalizedTarget = String(state.exportWorkbenchUi.target || "").trim().toLowerCase();
+    state.exportWorkbenchUi.target = ["composite", "per-layer", "bake-pack"].includes(normalizedTarget)
+      ? normalizedTarget
+      : "composite";
+    state.exportWorkbenchUi.format = String(state.exportWorkbenchUi.format || "").trim().toLowerCase() === "jpg"
+      ? "jpg"
+      : "png";
+    state.exportWorkbenchUi.includeTextLayer = state.exportWorkbenchUi.includeTextLayer !== false;
+    const layerOrderSource = Array.isArray(state.exportWorkbenchUi.layerOrder)
+      ? state.exportWorkbenchUi.layerOrder
+      : [];
+    const normalizedLayerOrder = ["color", "line", "text", "composite"].filter((layerId) => (
+      layerOrderSource.includes(layerId)
+    ));
+    ["color", "line", "text", "composite"].forEach((layerId) => {
+      if (!normalizedLayerOrder.includes(layerId)) {
+        normalizedLayerOrder.push(layerId);
+      }
+    });
+    state.exportWorkbenchUi.layerOrder = normalizedLayerOrder;
+    state.exportWorkbenchUi.bakeArtifacts = Array.isArray(state.exportWorkbenchUi.bakeArtifacts)
+      ? state.exportWorkbenchUi.bakeArtifacts
+      : [];
+    state.exportWorkbenchUi.bakeCache = state.exportWorkbenchUi.bakeCache instanceof Map
+      ? state.exportWorkbenchUi.bakeCache
+      : new Map();
+    return state.exportWorkbenchUi;
+  };
+
+  const computeBakeHash = (parts) => {
+    const source = Array.isArray(parts) ? parts.join("|") : String(parts || "");
+    let hash = 2166136261;
+    for (let index = 0; index < source.length; index += 1) {
+      hash ^= source.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `fnv1a_${(hash >>> 0).toString(16).padStart(8, "0")}`;
+  };
+
+  const getLayerDependencyRevision = (layerId) => {
+    const mapSvg = document.getElementById("map-svg");
+    const mapSvgChildCount = mapSvg ? mapSvg.childElementCount : 0;
+    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
+      ? state.renderPassCache
+      : {};
+    const signatures = renderPassCache.signatures && typeof renderPassCache.signatures === "object"
+      ? renderPassCache.signatures
+      : {};
+    const dirtyRevision = Number(state.dirtyRevision || 0);
+    const zoomTransform = state.zoomTransform && typeof state.zoomTransform === "object"
+      ? state.zoomTransform
+      : { k: 1, x: 0, y: 0 };
+    const transformSignature = [
+      `zoomK:${Number(zoomTransform.k || 1).toFixed(5)}`,
+      `zoomX:${Number(zoomTransform.x || 0).toFixed(2)}`,
+      `zoomY:${Number(zoomTransform.y || 0).toFixed(2)}`,
+    ];
+    if (layerId === "color") {
+      return [
+        `colorRevision:${Number(state.colorRevision) || 0}`,
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `dirtyRevision:${dirtyRevision}`,
+        `passBackground:${String(signatures.background || "")}`,
+        `passPhysicalBase:${String(signatures.physicalBase || "")}`,
+        `passPolitical:${String(signatures.political || "")}`,
+        `passContextBase:${String(signatures.contextBase || "")}`,
+        `passContextScenario:${String(signatures.contextScenario || "")}`,
+        `passEffects:${String(signatures.effects || "")}`,
+        `passDayNight:${String(signatures.dayNight || "")}`,
+      ];
+    }
+    if (layerId === "line") {
+      return [
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `dynamicDirty:${state.dynamicBordersDirty ? 1 : 0}`,
+        `dirtyRevision:${dirtyRevision}`,
+        `passBorders:${String(signatures.borders || "")}`,
+        `passLineEffects:${String(signatures.lineEffects || "")}`,
+      ];
+    }
+    if (layerId === "text") {
+      return [
+        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `svgChildren:${mapSvgChildCount}`,
+        `dirtyRevision:${dirtyRevision}`,
+        ...transformSignature,
+      ];
+    }
+    return [
+      `colorRevision:${Number(state.colorRevision) || 0}`,
+      `topologyRevision:${Number(state.topologyRevision) || 0}`,
+      `svgChildren:${mapSvgChildCount}`,
+      `dirtyRevision:${dirtyRevision}`,
+      ...transformSignature,
+      `passPolitical:${String(signatures.political || "")}`,
+      `passContextBase:${String(signatures.contextBase || "")}`,
+      `passContextScenario:${String(signatures.contextScenario || "")}`,
+      `passEffects:${String(signatures.effects || "")}`,
+      `passBorders:${String(signatures.borders || "")}`,
+      `passLineEffects:${String(signatures.lineEffects || "")}`,
+      `passDayNight:${String(signatures.dayNight || "")}`,
+      `passContextMarkers:${String(signatures.contextMarkers || "")}`,
+      `passTextureLabels:${String(signatures.textureLabels || "")}`,
+      `passLabels:${String(signatures.labels || "")}`,
+    ];
+  };
+
+  const drawSvgLayerToCanvas = async (targetCanvas, targetCtx) => {
+    const mapSvg = document.getElementById("map-svg");
+    if (!mapSvg || !targetCanvas || !targetCtx) return false;
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      await new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+          targetCtx.drawImage(image, 0, 0);
+          resolve();
+        };
+        image.onerror = () => reject(new Error("SVG overlay export failed."));
+        image.src = svgUrl;
+      });
+      return true;
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  };
+
+  const writeBakeArtifactMeta = (layerId, dependencies, canvas, dirtyFlag) => {
+    const exportUi = ensureExportSnapshotUiState();
+    const entry = {
+      layerId,
+      updatedAt: Date.now(),
+      dependencies: [...dependencies],
+      canvasSize: {
+        width: Math.max(0, Math.round(Number(canvas?.width) || 0)),
+        height: Math.max(0, Math.round(Number(canvas?.height) || 0)),
+      },
+      dirtyFlag: !!dirtyFlag,
+    };
+    const nextArtifacts = Array.isArray(exportUi.bakeArtifacts) ? [...exportUi.bakeArtifacts] : [];
+    const existingIndex = nextArtifacts.findIndex((artifact) => artifact?.layerId === layerId);
+    if (existingIndex >= 0) {
+      nextArtifacts[existingIndex] = entry;
+    } else {
+      nextArtifacts.push(entry);
+    }
+    exportUi.bakeArtifacts = nextArtifacts;
+    return entry;
+  };
+
+  const drawRenderPassCanvasToBakeTarget = (passName, targetCtx) => {
+    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
+      ? state.renderPassCache
+      : null;
+    if (!renderPassCache || !targetCtx) return false;
+    const passCanvas = renderPassCache.canvases?.[passName];
+    if (!passCanvas) return false;
+    const layout = renderPassCache.layouts?.[passName] || {};
+    const dpr = Math.max(Number(state.dpr) || 1, 1);
+    const referenceTransform = renderPassCache.referenceTransforms?.[passName] || null;
+    const currentTransform = state.zoomTransform && typeof state.zoomTransform === "object"
+      ? state.zoomTransform
+      : { k: 1, x: 0, y: 0 };
+    const hasReferenceTransform = referenceTransform
+      && Number.isFinite(Number(referenceTransform.k))
+      && Number.isFinite(Number(referenceTransform.x))
+      && Number.isFinite(Number(referenceTransform.y));
+    const hasCurrentTransform = Number.isFinite(Number(currentTransform.k))
+      && Number.isFinite(Number(currentTransform.x))
+      && Number.isFinite(Number(currentTransform.y));
+    if (!hasReferenceTransform || !hasCurrentTransform) {
+      const offsetX = Math.round(-Number(layout.offsetX || 0) * dpr);
+      const offsetY = Math.round(-Number(layout.offsetY || 0) * dpr);
+      targetCtx.drawImage(passCanvas, offsetX, offsetY);
+      return true;
+    }
+    const referenceK = Math.max(Number(referenceTransform.k) || 1, 0.0001);
+    const currentK = Math.max(Number(currentTransform.k) || 1, 0.0001);
+    const scaleRatio = currentK / referenceK;
+    const dx = Number(currentTransform.x || 0) - (Number(referenceTransform.x || 0) * scaleRatio);
+    const dy = Number(currentTransform.y || 0) - (Number(referenceTransform.y || 0) * scaleRatio);
+    targetCtx.save();
+    targetCtx.setTransform(1, 0, 0, 1, 0, 0);
+    targetCtx.translate(
+      (dx - Number(layout.offsetX || 0) * scaleRatio) * dpr,
+      (dy - Number(layout.offsetY || 0) * scaleRatio) * dpr,
+    );
+    targetCtx.scale(scaleRatio, scaleRatio);
+    targetCtx.drawImage(passCanvas, 0, 0);
+    targetCtx.restore();
+    return true;
+  };
+
+  const drawLineLayerToCanvas = (targetCtx) => {
+    let drewFromRenderPassCache = false;
+    drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget("lineEffects", targetCtx) || drewFromRenderPassCache;
+    drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget("borders", targetCtx) || drewFromRenderPassCache;
+    if (drewFromRenderPassCache) {
+      return true;
+    }
+    if (state.lineCanvas) {
+      targetCtx.drawImage(state.lineCanvas, 0, 0);
+      return true;
+    }
+    return false;
+  };
+
+  const drawColorLayerToCanvas = (targetCtx) => {
+    const basePassNames = [
+      "background",
+      "physicalBase",
+      "political",
+      "contextBase",
+      "contextScenario",
+      "effects",
+      "dayNight",
+    ];
+    let drewFromRenderPassCache = false;
+    basePassNames.forEach((passName) => {
+      drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget(passName, targetCtx) || drewFromRenderPassCache;
+    });
+    if (drewFromRenderPassCache) {
+      return "render-pass";
+    }
+    if (state.colorCanvas) {
+      targetCtx.drawImage(state.colorCanvas, 0, 0);
+      return "composite-canvas";
+    }
+    return "none";
+  };
+
+  const drawCompositeLayerToCanvas = (targetCtx) => {
+    const compositePassNames = [
+      "background",
+      "physicalBase",
+      "political",
+      "contextBase",
+      "contextScenario",
+      "effects",
+      "lineEffects",
+      "dayNight",
+      "borders",
+      "contextMarkers",
+      "textureLabels",
+      "labels",
+    ];
+    let drewFromRenderPassCache = false;
+    compositePassNames.forEach((passName) => {
+      drewFromRenderPassCache = drawRenderPassCanvasToBakeTarget(passName, targetCtx) || drewFromRenderPassCache;
+    });
+    if (drewFromRenderPassCache) {
+      return "render-pass";
+    }
+    if (state.colorCanvas) {
+      targetCtx.drawImage(state.colorCanvas, 0, 0);
+      return "composite-canvas";
+    }
+    return "none";
+  };
+
+  const bakeLayer = async (layerId) => {
+    const exportUi = ensureExportSnapshotUiState();
+    const normalizedLayerId = String(layerId || "").trim().toLowerCase();
+    if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
+      throw new Error(`Unsupported bake layer: ${layerId}`);
+    }
+    const width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
+    const height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
+    const dependencies = getLayerDependencyRevision(normalizedLayerId);
+    const hash = computeBakeHash([normalizedLayerId, `${width}x${height}`, ...dependencies]);
+    const cacheEntry = exportUi.bakeCache.get(normalizedLayerId);
+    if (
+      cacheEntry
+      && cacheEntry.hash === hash
+      && cacheEntry.canvas
+      && cacheEntry.canvas.width === width
+      && cacheEntry.canvas.height === height
+    ) {
+      writeBakeArtifactMeta(normalizedLayerId, dependencies, cacheEntry.canvas, false);
+      return cacheEntry.canvas;
+    }
+    const bakeCanvas = document.createElement("canvas");
+    bakeCanvas.width = width;
+    bakeCanvas.height = height;
+    const bakeCtx = bakeCanvas.getContext("2d");
+    if (!bakeCtx) {
+      throw new Error("Canvas bake context unavailable.");
+    }
+    if (normalizedLayerId === "color") {
+      drawColorLayerToCanvas(bakeCtx);
+    } else if (normalizedLayerId === "line") {
+      drawLineLayerToCanvas(bakeCtx);
+    } else if (normalizedLayerId === "text") {
+      await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
+    } else {
+      drawCompositeLayerToCanvas(bakeCtx);
+      if (exportUi.includeTextLayer) {
+        await drawSvgLayerToCanvas(bakeCanvas, bakeCtx);
+      }
+    }
+    const version = cacheEntry ? Number(cacheEntry.version || 0) + 1 : 1;
+    exportUi.bakeCache.set(normalizedLayerId, {
+      hash,
+      version,
+      canvas: bakeCanvas,
+      updatedAt: Date.now(),
+      dependencies,
+      canvasSize: { width, height },
+      dirtyFlag: true,
+    });
+    writeBakeArtifactMeta(normalizedLayerId, dependencies, bakeCanvas, true);
+    return bakeCanvas;
+  };
+
+  const triggerCanvasDownload = (canvas, extension, fileStem) => {
+    const format = extension === "jpg" ? "image/jpeg" : "image/png";
+    const dataUrl = canvas.toDataURL(format, 0.92);
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `${fileStem}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const syncExportWorkbenchControlsFromState = () => {
+    const exportUiState = ensureExportSnapshotUiState();
+    if (exportTarget) {
+      exportTarget.value = exportUiState.target;
+    }
+    if (exportFormat) {
+      if (exportUiState.target === "per-layer") {
+        exportFormat.value = "png";
+        exportFormat.disabled = true;
+      } else {
+        exportFormat.value = exportUiState.format === "jpg" ? "jpg" : "png";
+        exportFormat.disabled = exportUiState.target === "bake-pack";
+      }
+    }
+    return exportUiState;
+  };
+
+  if (exportTarget && !exportTarget.dataset.bound) {
+    syncExportWorkbenchControlsFromState();
+    exportTarget.addEventListener("change", () => {
+      const exportUi = ensureExportSnapshotUiState();
+      const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
+      exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
+        ? nextTarget
+        : "composite";
+      syncExportWorkbenchControlsFromState();
+    });
+    exportTarget.dataset.bound = "true";
+  }
+
+  if (exportFormat && !exportFormat.dataset.bound) {
+    syncExportWorkbenchControlsFromState();
+    exportFormat.addEventListener("change", () => {
+      const liveExportUi = ensureExportSnapshotUiState();
+      liveExportUi.format = exportFormat.value === "jpg" ? "jpg" : "png";
+      syncExportWorkbenchControlsFromState();
+    });
+    exportFormat.dataset.bound = "true";
+  }
+
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
       try {
-        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
-        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = state.colorCanvas?.width || 0;
-        exportCanvas.height = state.colorCanvas?.height || 0;
-        const exportCtx = exportCanvas.getContext("2d");
-        if (!exportCtx) {
-          throw new Error("Canvas export context unavailable.");
+        syncExportWorkbenchControlsFromState();
+        const exportUi = ensureExportSnapshotUiState();
+        const extension = exportUi.target === "per-layer"
+          ? "png"
+          : (exportUi.format === "jpg" ? "jpg" : "png");
+        if (exportUi.target !== "per-layer") {
+          exportUi.format = extension;
         }
-        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
-        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
-        const mapSvg = document.getElementById("map-svg");
-        if (mapSvg) {
-          const serializer = new XMLSerializer();
-          const svgMarkup = serializer.serializeToString(mapSvg);
-          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-          const svgUrl = URL.createObjectURL(svgBlob);
-          try {
-            await new Promise((resolve, reject) => {
-              const image = new Image();
-              image.onload = () => {
-                exportCtx.drawImage(image, 0, 0);
-                resolve();
-              };
-              image.onerror = () => reject(new Error("SVG overlay export failed."));
-              image.src = svgUrl;
-            });
-          } finally {
-            URL.revokeObjectURL(svgUrl);
+        const exportTargetKind = exportUi.target;
+
+        if (exportTargetKind === "per-layer") {
+          const colorCanvas = await bakeLayer("color");
+          triggerCanvasDownload(colorCanvas, "png", "map_layer_color");
+          const lineCanvas = await bakeLayer("line");
+          triggerCanvasDownload(lineCanvas, "png", "map_layer_line");
+          if (exportUi.includeTextLayer) {
+            const textCanvas = await bakeLayer("text");
+            triggerCanvasDownload(textCanvas, "png", "map_layer_text");
           }
+        } else if (exportTargetKind === "bake-pack") {
+          throw new Error("Bake pack export is planned for v1.1.");
+        } else {
+          const exportCanvas = await bakeLayer("composite");
+          triggerCanvasDownload(exportCanvas, extension, "map_snapshot");
         }
-        const dataUrl = exportCanvas.toDataURL(format, 0.92);
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = `map_snapshot.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
         showToast(t("Map snapshot downloaded.", "ui"), {
           title: t("Snapshot exported", "ui"),
           tone: "success",

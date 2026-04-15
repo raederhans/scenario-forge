@@ -1592,6 +1592,57 @@ function normalizeTransportWorkbenchUiState(rawUi) {
   };
 }
 
+const EXPORT_WORKBENCH_TARGETS = new Set(["composite", "per-layer", "bake-pack"]);
+const EXPORT_WORKBENCH_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
+
+function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
+  if (!Array.isArray(rawArtifacts)) return [];
+  return rawArtifacts
+    .map((entry) => {
+      const artifact = entry && typeof entry === "object" ? entry : {};
+      const layerId = String(artifact.layerId || "").trim().toLowerCase();
+      if (!EXPORT_WORKBENCH_LAYER_IDS.has(layerId)) return null;
+      const dependencies = Array.isArray(artifact.dependencies)
+        ? artifact.dependencies.map((value) => String(value || "").trim()).filter(Boolean)
+        : [];
+      const uniqueDependencies = Array.from(new Set(dependencies));
+      const canvasSize = artifact.canvasSize && typeof artifact.canvasSize === "object"
+        ? artifact.canvasSize
+        : {};
+      const width = Math.max(0, Math.round(toFiniteNumber(canvasSize.width, 0)));
+      const height = Math.max(0, Math.round(toFiniteNumber(canvasSize.height, 0)));
+      return {
+        layerId,
+        updatedAt: Math.max(0, Math.round(toFiniteNumber(artifact.updatedAt, 0))),
+        dependencies: uniqueDependencies,
+        canvasSize: { width, height },
+        dirtyFlag: artifact.dirtyFlag === undefined ? true : !!artifact.dirtyFlag,
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeExportWorkbenchUiState(rawUi) {
+  const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
+  const target = String(raw.target || "").trim().toLowerCase();
+  const layerOrderSource = Array.isArray(raw.layerOrder) ? raw.layerOrder : [];
+  const normalizedLayerOrder = Array.from(new Set(layerOrderSource
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter((value) => EXPORT_WORKBENCH_LAYER_IDS.has(value))));
+  EXPORT_WORKBENCH_LAYER_IDS.forEach((layerId) => {
+    if (!normalizedLayerOrder.includes(layerId)) {
+      normalizedLayerOrder.push(layerId);
+    }
+  });
+  return {
+    target: EXPORT_WORKBENCH_TARGETS.has(target) ? target : "composite",
+    format: String(raw.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png",
+    includeTextLayer: raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer,
+    layerOrder: normalizedLayerOrder,
+    bakeArtifacts: normalizeExportWorkbenchBakeArtifacts(raw.bakeArtifacts),
+  };
+}
+
 export {
   PALETTE_THEMES,
   countryPalette,
@@ -1638,6 +1689,7 @@ export {
   normalizeTransportWorkbenchDisplayConfig,
   normalizeTransportWorkbenchDisplayConfigs,
   normalizeTransportWorkbenchUiState,
+  normalizeExportWorkbenchUiState,
 };
 
 export function normalizeMapSemanticMode(value, fallback = "political") {
@@ -2173,6 +2225,7 @@ export const state = {
     restoreLeftDrawer: false,
     restoreRightDrawer: false,
   },
+  exportWorkbenchUi: normalizeExportWorkbenchUiState(null),
   cachedBorders: null,
   cachedCountryBorders: null,
   cachedDynamicOwnerBorders: null,
