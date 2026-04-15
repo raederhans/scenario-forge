@@ -610,7 +610,7 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = [
+export const RENDER_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
@@ -17024,6 +17024,57 @@ function drawTransformedPass(passName, currentTransform, referenceTransform = nu
   return true;
 }
 
+function composeRenderPassesToTarget(targetContext, passNames, currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity) {
+  if (!targetContext) return false;
+  const cache = getRenderPassCacheState();
+  (Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES).forEach((passName) => {
+    const passCanvas = cache.canvases?.[passName];
+    if (!passCanvas) return;
+    const referenceTransform = getPassReferenceTransform(passName);
+    if (referenceTransform && !areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
+      const layout = getRenderPassLayout(passName);
+      const current = cloneZoomTransform(currentTransform);
+      const reference = cloneZoomTransform(referenceTransform);
+      const scaleRatio = current.k / Math.max(reference.k, 0.0001);
+      const dx = current.x - (reference.x * scaleRatio);
+      const dy = current.y - (reference.y * scaleRatio);
+      targetContext.save();
+      targetContext.setTransform(1, 0, 0, 1, 0, 0);
+      targetContext.translate(
+        (dx - Number(layout?.offsetX || 0) * scaleRatio) * state.dpr,
+        (dy - Number(layout?.offsetY || 0) * scaleRatio) * state.dpr,
+      );
+      targetContext.scale(scaleRatio, scaleRatio);
+      targetContext.drawImage(passCanvas, 0, 0);
+      targetContext.restore();
+      return;
+    }
+    const layout = getRenderPassLayout(passName);
+    targetContext.drawImage(
+      passCanvas,
+      Math.round(-Number(layout?.offsetX || 0) * state.dpr),
+      Math.round(-Number(layout?.offsetY || 0) * state.dpr),
+    );
+  });
+  return true;
+}
+
+function renderExportPassesToCanvas(passNames) {
+  const width = Number(state.colorCanvas?.width || 0);
+  const height = Number(state.colorCanvas?.height || 0);
+  if (!width || !height) return null;
+  ensureIdleRenderPasses({});
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = width;
+  exportCanvas.height = height;
+  const exportContext = exportCanvas.getContext("2d");
+  if (!exportContext) return null;
+  exportContext.setTransform(1, 0, 0, 1, 0, 0);
+  exportContext.clearRect(0, 0, width, height);
+  composeRenderPassesToTarget(exportContext, passNames, state.zoomTransform || globalThis.d3.zoomIdentity);
+  return exportCanvas;
+}
+
 function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } = {}) {
   const currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity;
   const compositeStart = nowMs();
@@ -23316,6 +23367,7 @@ export {
   getCityMarkerRenderStyle,
   getEffectiveCityCollection,
   doesScenarioCountryHideCityPoints,
+  renderExportPassesToCanvas,
   getZoomPercent,
   resetZoomToFit,
   setZoomPercent,

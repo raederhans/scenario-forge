@@ -36,6 +36,8 @@ import {
   cancelSpecialZoneDraw,
   deleteSelectedManualSpecialZone,
   selectSpecialZoneById,
+  RENDER_PASS_NAMES,
+  renderExportPassesToCanvas,
 } from "../core/map_renderer.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import {
@@ -258,6 +260,60 @@ const TRANSPORT_WORKBENCH_FAMILY_IDS = new Set(TRANSPORT_WORKBENCH_FAMILIES.map(
 const TRANSPORT_WORKBENCH_SORTABLE_LAYER_IDS = TRANSPORT_WORKBENCH_FAMILIES
   .filter((family) => family.id !== "layers")
   .map((family) => family.id);
+
+const EXPORT_MAIN_LAYER_VIEW_MODELS = Object.freeze([
+  Object.freeze({ id: "background", name: "Background", passNames: Object.freeze(["background"]), baked: false }),
+  Object.freeze({ id: "political", name: "Political", passNames: Object.freeze(["physicalBase", "political", "borders"]), baked: true }),
+  Object.freeze({ id: "context", name: "Context", passNames: Object.freeze(["contextBase", "contextScenario", "contextMarkers", "dayNight"]), baked: true }),
+  Object.freeze({ id: "effects", name: "Effects", passNames: Object.freeze(["effects", "lineEffects", "textureLabels"]), baked: true }),
+  Object.freeze({ id: "labels", name: "Labels", passNames: Object.freeze(["labels"]), baked: false }),
+]);
+const EXPORT_MAIN_LAYER_IDS = Object.freeze(EXPORT_MAIN_LAYER_VIEW_MODELS.map((layer) => layer.id));
+const EXPORT_MAIN_LAYER_MODEL_BY_ID = new Map(EXPORT_MAIN_LAYER_VIEW_MODELS.map((layer) => [layer.id, layer]));
+
+function normalizeExportWorkbenchLayerOrder(value) {
+  const nextOrder = Array.isArray(value)
+    ? value
+      .map((entry) => String(entry || "").trim())
+      .filter((entry) => EXPORT_MAIN_LAYER_IDS.includes(entry))
+    : [];
+  const deduped = Array.from(new Set(nextOrder));
+  EXPORT_MAIN_LAYER_IDS.forEach((layerId) => {
+    if (!deduped.includes(layerId)) deduped.push(layerId);
+  });
+  return deduped;
+}
+
+function normalizeExportWorkbenchVisibility(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return Object.fromEntries(
+    EXPORT_MAIN_LAYER_IDS.map((layerId) => [layerId, source[layerId] !== false])
+  );
+}
+
+function ensureExportWorkbenchUiState() {
+  if (!state.exportWorkbenchUi || typeof state.exportWorkbenchUi !== "object") {
+    state.exportWorkbenchUi = {};
+  }
+  state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(state.exportWorkbenchUi.layerOrder);
+  state.exportWorkbenchUi.visibility = normalizeExportWorkbenchVisibility(state.exportWorkbenchUi.visibility);
+  return state.exportWorkbenchUi;
+}
+
+function resolveExportPassSequence(exportWorkbenchUi) {
+  const source = exportWorkbenchUi && typeof exportWorkbenchUi === "object"
+    ? exportWorkbenchUi
+    : {};
+  const layerOrder = normalizeExportWorkbenchLayerOrder(source.layerOrder);
+  const visibility = normalizeExportWorkbenchVisibility(source.visibility);
+  const selectedPasses = layerOrder.flatMap((layerId) => (
+    visibility[layerId] === false
+      ? []
+      : [...(EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId)?.passNames || [])]
+  ));
+  const deduped = Array.from(new Set(selectedPasses));
+  return deduped.filter((passName) => RENDER_PASS_NAMES.includes(passName));
+}
 
 const ROAD_CLASS_OPTIONS = [
   { value: "motorway", label: "Motorway" },
@@ -1703,6 +1759,7 @@ function initToolbar({ render } = {}) {
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
   const exportFormat = document.getElementById("exportFormat");
+  const exportWorkbenchLayerList = document.getElementById("exportWorkbenchLayerList");
   const textureSelect = document.getElementById("textureSelect");
   const textureOpacity = document.getElementById("textureOpacity");
   const texturePaperControls = document.getElementById("texturePaperControls");
@@ -2482,6 +2539,82 @@ function initToolbar({ render } = {}) {
     });
   };
 
+  const renderExportWorkbenchLayerList = () => {
+    if (!exportWorkbenchLayerList) return;
+    ensureExportWorkbenchUiState();
+    exportWorkbenchLayerList.replaceChildren();
+    state.exportWorkbenchUi.layerOrder.forEach((layerId) => {
+      const layer = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId);
+      if (!layer) return;
+      const item = document.createElement("div");
+      item.className = "export-workbench-layer-item";
+      item.draggable = true;
+      item.dataset.exportLayerId = layer.id;
+
+      item.addEventListener("dragstart", () => {
+        exportWorkbenchDraggedLayerId = layer.id;
+        item.classList.add("is-dragging");
+      });
+      item.addEventListener("dragend", () => {
+        exportWorkbenchDraggedLayerId = "";
+        item.classList.remove("is-dragging");
+      });
+      item.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+      item.addEventListener("drop", (event) => {
+        event.preventDefault();
+        if (!exportWorkbenchDraggedLayerId || exportWorkbenchDraggedLayerId === layer.id) return;
+        const nextOrder = [...state.exportWorkbenchUi.layerOrder];
+        const draggedIndex = nextOrder.indexOf(exportWorkbenchDraggedLayerId);
+        const targetIndex = nextOrder.indexOf(layer.id);
+        if (draggedIndex === -1 || targetIndex === -1) return;
+        nextOrder.splice(draggedIndex, 1);
+        nextOrder.splice(targetIndex, 0, exportWorkbenchDraggedLayerId);
+        state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(nextOrder);
+        markDirty("export-workbench-layer-order");
+        renderExportWorkbenchLayerList();
+      });
+
+      const handle = document.createElement("span");
+      handle.className = "export-workbench-layer-handle";
+      handle.textContent = ":::";
+      item.appendChild(handle);
+
+      const name = document.createElement("span");
+      name.className = "export-workbench-layer-name";
+      name.textContent = layer.name;
+      item.appendChild(name);
+
+      const controls = document.createElement("div");
+      controls.className = "export-workbench-layer-controls";
+
+      const badge = document.createElement("span");
+      badge.className = "export-workbench-layer-badge";
+      badge.textContent = layer.baked ? "Baked" : "Live";
+      if (layer.baked) badge.classList.add("is-baked");
+      controls.appendChild(badge);
+
+      const toggle = document.createElement("label");
+      toggle.className = "export-workbench-layer-toggle";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = state.exportWorkbenchUi.visibility[layer.id] !== false;
+      input.addEventListener("change", () => {
+        ensureExportWorkbenchUiState();
+        state.exportWorkbenchUi.visibility[layer.id] = input.checked;
+        markDirty("export-workbench-layer-visibility");
+      });
+      const text = document.createElement("span");
+      text.textContent = "Visible";
+      toggle.append(input, text);
+      controls.appendChild(toggle);
+      item.appendChild(controls);
+
+      exportWorkbenchLayerList.appendChild(item);
+    });
+  };
+
   const closeTransportWorkbenchInfoPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchInfoPopover) return;
     transportWorkbenchInfoPopover.classList.add("hidden");
@@ -2497,6 +2630,7 @@ function initToolbar({ render } = {}) {
   let transportWorkbenchPreviewLastViewKey = "";
   let transportWorkbenchPreviewWarmupScheduled = false;
   let transportWorkbenchDraggedLayerId = "";
+  let exportWorkbenchDraggedLayerId = "";
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -7585,15 +7719,16 @@ function initToolbar({ render } = {}) {
       try {
         const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
         const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = state.colorCanvas?.width || 0;
-        exportCanvas.height = state.colorCanvas?.height || 0;
+        const passSequence = resolveExportPassSequence(state.exportWorkbenchUi);
+        const exportCanvas = renderExportPassesToCanvas(passSequence) || document.createElement("canvas");
+        if (!exportCanvas.width || !exportCanvas.height) {
+          exportCanvas.width = state.colorCanvas?.width || 0;
+          exportCanvas.height = state.colorCanvas?.height || 0;
+        }
         const exportCtx = exportCanvas.getContext("2d");
         if (!exportCtx) {
           throw new Error("Canvas export context unavailable.");
         }
-        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
-        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
         const mapSvg = document.getElementById("map-svg");
         if (mapSvg) {
           const serializer = new XMLSerializer();
@@ -9578,6 +9713,7 @@ function initToolbar({ render } = {}) {
   renderPaletteLibrary();
   syncPanelToggleButtons();
   renderTransportWorkbenchUi();
+  renderExportWorkbenchLayerList();
   state.updatePaintModeUIFn();
   state.updateDockCollapsedUiFn = updateDockCollapsedUi;
   updateDockCollapsedUi();
@@ -9629,4 +9765,4 @@ function initToolbar({ render } = {}) {
 
 
 
-export { initToolbar };
+export { initToolbar, resolveExportPassSequence };

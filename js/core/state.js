@@ -2173,6 +2173,22 @@ export const state = {
     restoreLeftDrawer: false,
     restoreRightDrawer: false,
   },
+  exportWorkbenchUi: {
+    layerOrder: [
+      "background",
+      "political",
+      "context",
+      "effects",
+      "labels",
+    ],
+    visibility: {
+      background: true,
+      political: true,
+      context: true,
+      effects: true,
+      labels: true,
+    },
+  },
   cachedBorders: null,
   cachedCountryBorders: null,
   cachedDynamicOwnerBorders: null,
