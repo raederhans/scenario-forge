@@ -7893,7 +7893,7 @@ function initToolbar({ render } = {}) {
     exportWorkbenchTarget.addEventListener("change", () => {
       const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportWorkbenchTarget.value || "").trim().toLowerCase();
-      exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
+      exportUi.target = ["composite", "per-layer"].includes(nextTarget)
         ? nextTarget
         : "composite";
       renderExportWorkbenchUi(true);
@@ -8368,6 +8368,28 @@ function initToolbar({ render } = {}) {
     return scaleCanvasForExport(compositeCanvas, scaleMultiplier);
   };
 
+  const buildPerLayerExportOutputs = (exportUi, scaleMultiplier) => {
+    const outputs = [];
+    exportUi.layerOrder.forEach((layerId) => {
+      if (exportUi.visibility?.[layerId] === false) return;
+      if (layerId === "labels" && !exportUi.includeTextLayer) return;
+      const passNames = [...(EXPORT_MAIN_LAYER_MODEL_BY_ID.get(layerId)?.passNames || [])];
+      if (!passNames.length) return;
+      const layerCanvas = renderExportPassesToCanvas(passNames);
+      if (!layerCanvas) {
+        throw createExportError("invalid-params", `Layer export canvas unavailable for ${layerId}.`);
+      }
+      outputs.push({
+        id: layerId,
+        canvas: scaleCanvasForExport(layerCanvas, scaleMultiplier),
+      });
+    });
+    if (!outputs.length) {
+      throw createExportError("invalid-params", "No visible export layers are available for per-layer export.");
+    }
+    return outputs;
+  };
+
   const triggerCanvasDownload = (canvas, extension, fileStem) => {
     const format = extension === "jpg" ? "image/jpeg" : "image/png";
     const dataUrl = canvas.toDataURL(format, 0.92);
@@ -8407,7 +8429,7 @@ function initToolbar({ render } = {}) {
     exportTarget.addEventListener("change", () => {
       const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
-      exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
+      exportUi.target = ["composite", "per-layer"].includes(nextTarget)
         ? nextTarget
         : "composite";
       syncExportWorkbenchControlsFromState();
@@ -8446,13 +8468,10 @@ function initToolbar({ render } = {}) {
         }
         const exportTargetKind = exportUi.target;
         if (exportTargetKind === "per-layer") {
-          triggerCanvasDownload(scaleCanvasForExport(await bakeLayer("color"), scaleMultiplier), "png", "map_layer_color");
-          triggerCanvasDownload(scaleCanvasForExport(await bakeLayer("line"), scaleMultiplier), "png", "map_layer_line");
-          if (exportUi.includeTextLayer) {
-            triggerCanvasDownload(scaleCanvasForExport(await bakeLayer("text"), scaleMultiplier), "png", "map_layer_text");
-          }
-        } else if (exportTargetKind === "bake-pack") {
-          throw createExportError("invalid-params", "Bake pack export is planned for v1.1.");
+          const perLayerOutputs = buildPerLayerExportOutputs(exportUi, scaleMultiplier);
+          perLayerOutputs.forEach((output) => {
+            triggerCanvasDownload(output.canvas, "png", `map_layer_${output.id}`);
+          });
         } else {
           const exportCanvas = buildCompositeExportCanvas(exportUi, scaleMultiplier);
           triggerCanvasDownload(exportCanvas, extension, "map_snapshot");

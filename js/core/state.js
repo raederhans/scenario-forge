@@ -1614,22 +1614,42 @@ const EXPORT_WORKBENCH_LAYER_IDS = Object.freeze([
   "labels",
 ]);
 const EXPORT_WORKBENCH_BAKE_LAYER_IDS = new Set(["color", "line", "text", "composite"]);
+const EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES = Object.freeze({
+  base: "background",
+  paint: "political",
+  borders: "effects",
+  labels: "labels",
+  overlay: "context",
+});
 
 function normalizeExportWorkbenchLayerOrder(rawOrder) {
   const savedOrder = Array.isArray(rawOrder)
-    ? rawOrder.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean)
+    ? rawOrder
+      .map((value) => String(value || "").trim().toLowerCase())
+      .map((value) => EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES[value] || value)
+      .filter(Boolean)
     : [];
-  return EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => savedOrder.includes(layerId)).concat(
-    EXPORT_WORKBENCH_LAYER_IDS.filter((layerId) => !savedOrder.includes(layerId))
-  );
+  const deduped = Array.from(new Set(savedOrder.filter((layerId) => EXPORT_WORKBENCH_LAYER_IDS.includes(layerId))));
+  EXPORT_WORKBENCH_LAYER_IDS.forEach((layerId) => {
+    if (!deduped.includes(layerId)) {
+      deduped.push(layerId);
+    }
+  });
+  return deduped;
 }
 
 function normalizeExportWorkbenchVisibility(rawVisibility) {
   const source = rawVisibility && typeof rawVisibility === "object" ? rawVisibility : {};
+  const normalizedSource = Object.fromEntries(
+    Object.entries(source).map(([key, value]) => [
+      EXPORT_WORKBENCH_LEGACY_LAYER_ID_ALIASES[String(key || "").trim().toLowerCase()] || String(key || "").trim().toLowerCase(),
+      value,
+    ])
+  );
   return Object.fromEntries(
     EXPORT_WORKBENCH_LAYER_IDS.map((layerId) => [
       layerId,
-      source[layerId] === undefined ? true : !!source[layerId],
+      normalizedSource[layerId] === undefined ? true : !!normalizedSource[layerId],
     ])
   );
 }
@@ -1664,7 +1684,9 @@ function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
 function normalizeExportWorkbenchUiState(rawUi) {
   const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
   const rawTarget = String(raw.target || "").trim().toLowerCase();
-  const normalizedTarget = rawTarget === "per-layer-png" ? "per-layer" : rawTarget;
+  const normalizedTarget = rawTarget === "per-layer-png"
+    ? "per-layer"
+    : (rawTarget === "bake-pack" ? "composite" : rawTarget);
   const visibilitySource = raw.visibility && typeof raw.visibility === "object"
     ? raw.visibility
     : raw.layerVisibility;
