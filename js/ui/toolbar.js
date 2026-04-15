@@ -1809,6 +1809,7 @@ function initToolbar({ render } = {}) {
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
+  const exportTarget = document.getElementById("exportTarget");
   const exportTarget = document.getElementById("exportTarget")
     || document.getElementById("exportTargetSelect");
   const exportFormat = document.getElementById("exportFormat");
@@ -8008,6 +8009,7 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  const ensureExportSnapshotUiState = () => {
   const ensureExportWorkbenchUiState = () => {
     if (!state.exportWorkbenchUi || typeof state.exportWorkbenchUi !== "object") {
       state.exportWorkbenchUi = {};
@@ -8020,6 +8022,18 @@ function initToolbar({ render } = {}) {
       ? "jpg"
       : "png";
     state.exportWorkbenchUi.includeTextLayer = state.exportWorkbenchUi.includeTextLayer !== false;
+    const layerOrderSource = Array.isArray(state.exportWorkbenchUi.layerOrder)
+      ? state.exportWorkbenchUi.layerOrder
+      : [];
+    const normalizedLayerOrder = ["color", "line", "text", "composite"].filter((layerId) => (
+      layerOrderSource.includes(layerId)
+    ));
+    ["color", "line", "text", "composite"].forEach((layerId) => {
+      if (!normalizedLayerOrder.includes(layerId)) {
+        normalizedLayerOrder.push(layerId);
+      }
+    });
+    state.exportWorkbenchUi.layerOrder = normalizedLayerOrder;
     state.exportWorkbenchUi.bakeArtifacts = Array.isArray(state.exportWorkbenchUi.bakeArtifacts)
       ? state.exportWorkbenchUi.bakeArtifacts
       : [];
@@ -8131,6 +8145,7 @@ function initToolbar({ render } = {}) {
   };
 
   const writeBakeArtifactMeta = (layerId, dependencies, canvas, dirtyFlag) => {
+    const exportUi = ensureExportSnapshotUiState();
     const exportUi = ensureExportWorkbenchUiState();
     const entry = {
       layerId,
@@ -8264,6 +8279,7 @@ function initToolbar({ render } = {}) {
   };
 
   const bakeLayer = async (layerId) => {
+    const exportUi = ensureExportSnapshotUiState();
     const exportUi = ensureExportWorkbenchUiState();
     const normalizedLayerId = String(layerId || "").trim().toLowerCase();
     if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
@@ -8329,6 +8345,7 @@ function initToolbar({ render } = {}) {
   };
 
   const syncExportWorkbenchControlsFromState = () => {
+    const exportUiState = ensureExportSnapshotUiState();
     const exportUiState = ensureExportWorkbenchUiState();
     if (exportTarget) {
       exportTarget.value = exportUiState.target;
@@ -8348,6 +8365,7 @@ function initToolbar({ render } = {}) {
   if (exportTarget && !exportTarget.dataset.bound) {
     syncExportWorkbenchControlsFromState();
     exportTarget.addEventListener("change", () => {
+      const exportUi = ensureExportSnapshotUiState();
       const exportUi = ensureExportWorkbenchUiState();
       const nextTarget = String(exportTarget.value || "").trim().toLowerCase();
       exportUi.target = ["composite", "per-layer", "bake-pack"].includes(nextTarget)
@@ -8361,6 +8379,7 @@ function initToolbar({ render } = {}) {
   if (exportFormat && !exportFormat.dataset.bound) {
     syncExportWorkbenchControlsFromState();
     exportFormat.addEventListener("change", () => {
+      const liveExportUi = ensureExportSnapshotUiState();
       const liveExportUi = ensureExportWorkbenchUiState();
       liveExportUi.format = exportFormat.value === "jpg" ? "jpg" : "png";
       syncExportWorkbenchControlsFromState();
@@ -8379,6 +8398,14 @@ function initToolbar({ render } = {}) {
       }
       exportJobsInFlight += 1;
       try {
+        syncExportWorkbenchControlsFromState();
+        const exportUi = ensureExportSnapshotUiState();
+        const extension = exportUi.target === "per-layer"
+          ? "png"
+          : (exportUi.format === "jpg" ? "jpg" : "png");
+        if (exportUi.target !== "per-layer") {
+          exportUi.format = extension;
+        }
         const selectedExportTarget = String(exportTarget?.value || "composite").trim().toLowerCase();
         if (selectedExportTarget !== "composite") {
           showToast(
@@ -8475,6 +8502,13 @@ function initToolbar({ render } = {}) {
           if (exportUi.includeTextLayer) {
             const textCanvas = await bakeLayer("text");
             triggerCanvasDownload(textCanvas, "png", "map_layer_text");
+          }
+        } else if (exportTargetKind === "bake-pack") {
+          throw new Error("Bake pack export is planned for v1.1.");
+        } else {
+          const exportCanvas = await bakeLayer("composite");
+          triggerCanvasDownload(exportCanvas, extension, "map_snapshot");
+        }
           }
         } else if (exportTargetKind === "bake-pack") {
           throw new Error("Bake pack export is planned for v1.1.");

@@ -1740,10 +1740,20 @@ function normalizeExportWorkbenchBakeArtifacts(rawArtifacts) {
 function normalizeExportWorkbenchUiState(rawUi) {
   const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
   const target = String(raw.target || "").trim().toLowerCase();
+  const layerOrderSource = Array.isArray(raw.layerOrder) ? raw.layerOrder : [];
+  const normalizedLayerOrder = Array.from(new Set(layerOrderSource
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter((value) => EXPORT_WORKBENCH_LAYER_IDS.has(value))));
+  EXPORT_WORKBENCH_LAYER_IDS.forEach((layerId) => {
+    if (!normalizedLayerOrder.includes(layerId)) {
+      normalizedLayerOrder.push(layerId);
+    }
+  });
   return {
     target: EXPORT_WORKBENCH_TARGETS.has(target) ? target : "composite",
     format: String(raw.format || "").trim().toLowerCase() === "jpg" ? "jpg" : "png",
     includeTextLayer: raw.includeTextLayer === undefined ? true : !!raw.includeTextLayer,
+    layerOrder: normalizedLayerOrder,
     bakeArtifacts: normalizeExportWorkbenchBakeArtifacts(raw.bakeArtifacts),
   };
 }
