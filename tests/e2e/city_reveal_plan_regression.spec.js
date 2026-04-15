@@ -292,6 +292,10 @@ test("point density changes marker budgets while label density only changes labe
           .filter((entry) => entry.isCapital && (entry.isDefaultCountry || entry.isPrimaryPower))
           .map((entry) => entry.countryKey)
       );
+      const acceptedCountries = new Set(
+        (Array.isArray(plan?.markerEntries) ? plan.markerEntries : [])
+          .map((entry) => entry.countryKey)
+      );
       return {
         markerBudget: Number(plan?.markerBudget || 0),
         priorityReserveBudget: Number(plan?.priorityReserveBudget || 0),
@@ -301,6 +305,7 @@ test("point density changes marker budgets while label density only changes labe
         acceptedCapitalCount: acceptedCapitalCountries.size,
         candidateProtectedCapitalCount: candidateProtectedCapitalCountries.size,
         acceptedProtectedCapitalCount: acceptedProtectedCapitalCountries.size,
+        acceptedCountryCount: acceptedCountries.size,
       };
     };
 
@@ -315,10 +320,12 @@ test("point density changes marker budgets while label density only changes labe
   expect(runtime.lowPointDensity.markerCount).toBeLessThanOrEqual(runtime.highPointDensity.markerCount);
   expect(runtime.lowPointDensity.markerCount).toBeLessThanOrEqual(runtime.lowPointDensity.markerBudget);
   expect(runtime.highPointDensity.markerCount).toBeLessThanOrEqual(runtime.highPointDensity.markerBudget);
+  expect(runtime.lowPointDensity.markerCount).toBe(runtime.lowPointDensity.markerBudget);
   expect(runtime.lowPointDensity.priorityReserveBudget).toBeLessThanOrEqual(runtime.lowPointDensity.markerBudget);
   expect(runtime.highPointDensity.priorityReserveBudget).toBeLessThanOrEqual(runtime.highPointDensity.markerBudget);
   expect(runtime.lowPointDensity.acceptedProtectedCapitalCount).toBe(runtime.lowPointDensity.candidateProtectedCapitalCount);
   expect(runtime.highPointDensity.acceptedProtectedCapitalCount).toBe(runtime.highPointDensity.candidateProtectedCapitalCount);
+  expect(runtime.lowPointDensity.acceptedCountryCount).toBeGreaterThan(runtime.lowPointDensity.acceptedProtectedCapitalCount);
   expect(runtime.sparseLabels.markerCount).toBe(runtime.denseLabels.markerCount);
   expect(runtime.sparseLabels.labelCount).toBeLessThan(runtime.denseLabels.labelCount);
   expect(consoleIssues).toEqual([]);
@@ -369,7 +376,6 @@ test("p3 city labels stay capital-only and respect the small early label budget"
     const config = {
       ...(state.styleConfig?.cityPoints || {}),
       showLabels: true,
-      labelMinZoom: 0,
       labelDensity: "balanced",
     };
     const candidateTransforms = [
@@ -408,6 +414,7 @@ test("p3 city labels stay capital-only and respect the small early label budget"
   expect(runtime.phaseId).toBe("P3");
   expect(runtime.labelBudget).toBe(8);
   expect(runtime.capitalMarkerCount).toBeGreaterThan(0);
+  expect(runtime.labelCount).toBeGreaterThan(0);
   expect(runtime.labelCount).toBeLessThanOrEqual(runtime.labelBudget);
   expect(runtime.nonCapitalLabels).toEqual([]);
   expect(consoleIssues).toEqual([]);

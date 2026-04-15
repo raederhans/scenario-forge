@@ -12210,7 +12210,14 @@ function scaleCityMarkerQuota(baseQuota, markerDensity) {
   const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
   if (normalizedQuota <= 0) return 0;
   const scaledQuota = normalizedQuota * normalizedDensity;
-  return normalizedDensity < 1 ? Math.floor(scaledQuota) : Math.ceil(scaledQuota);
+  if (normalizedDensity < 1) {
+    const flooredQuota = Math.floor(scaledQuota);
+    if (normalizedQuota >= 1 && scaledQuota > 0) {
+      return Math.max(1, flooredQuota);
+    }
+    return flooredQuota;
+  }
+  return Math.ceil(scaledQuota);
 }
 
 function getCitySizeQuotaFloor(entry, scale, markerDensity = 1) {
@@ -12397,6 +12404,14 @@ function isCityLabelEligibleForPhase(entry, phaseId) {
     return true;
   }
   return false;
+}
+
+function getCityLabelMinZoom(entry, config = {}) {
+  const configuredMinZoom = Number(config?.labelMinZoom || 1.9);
+  if (entry?.isCapital) {
+    return configuredMinZoom;
+  }
+  return Math.max(configuredMinZoom, Number(entry?.minZoom || 0));
 }
 
 function getCityMarkerSizePx(entry, config = {}) {
@@ -12724,7 +12739,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
       .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
       .sort((left, right) => compareCityRevealEntries(left, right, phase.id))
       .some((entry) => {
-        if (scale < Math.max(Number(config.labelMinZoom || 0), Number(entry.minZoom || 0))) {
+        if (scale < getCityLabelMinZoom(entry, config)) {
           return false;
         }
         labelEntries.push(entry);
@@ -13869,7 +13884,7 @@ function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
       config,
       scale,
     });
-    const labelMinZoom = Math.max(Number(config?.labelMinZoom || 2.45), Number(visualEntry.minZoom || 0));
+    const labelMinZoom = getCityLabelMinZoom(visualEntry, config);
     if (!text || !entry.screenPoint || scale < labelMinZoom) return;
     const markerSizePx = Number(visualEntry.markerSizePx || getCityMarkerSizePx(visualEntry, config));
     const offsetPx = Math.max(7, markerSizePx + 4);

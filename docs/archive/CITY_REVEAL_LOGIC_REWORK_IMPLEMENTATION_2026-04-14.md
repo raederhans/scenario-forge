@@ -17,3 +17,10 @@
 - 2026-04-14 实施：已完成 map_renderer 主链改造，去掉 quota floor / candidate viewport multiplier 对最终配额的强制抬升，加入关键国家有限保底池和 phase 分段排序。
 - 2026-04-14 验证：已修正两份城市点位 Playwright 回归，补上预算硬上限、保护型首都、排除标签、P3 capital-only labels 的断言；针对单文件和单测做了定向验证。
 - 2026-04-14 修正：根据 review 收窄 `isPriorityCountry`，保底池不再自动纳入所有 featured / A-B tier 国家，避免 featured-heavy 场景下“名义 priority 但实际保护不了”的回归。
+- [x] 修复 review 暴露的两个回归：低 markerDensity 时保留有效国家配额；默认配置下让 P3 label phase 真正可见
+
+- 2026-04-14 review 修复启动：确认两个新回归都成立，按最短路径准备收口 quota floor 和默认 labelMinZoom。
+
+- 2026-04-14 review 修复完成：低密度 quota 重新保留最小有效国家配额；capital label 改为按独立 labelMinZoom 门控，默认配置下 P3 早期标签重新生效。
+- 2026-04-14 review 验证：定向通过 point density changes marker budgets while label density only changes labels 与 p3 city labels stay capital-only and respect the small early label budget。
+

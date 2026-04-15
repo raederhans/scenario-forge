@@ -827,7 +827,7 @@ function createDefaultCityLayerStyleConfig() {
     markerScale: 1,
     showLabels: true,
     labelSize: 11,
-    labelMinZoom: 2.45,
+    labelMinZoom: 1.9,
     showCapitalOverlay: true,
     capitalScale: 1.6,
   };

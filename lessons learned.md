@@ -690,3 +690,7 @@
 ### 56. 新增 UI 文案时，凡是 `t()` 动态拼出来的 key 都要和静态 DOM 文案一起补齐
 - 这次 review 暴露的不是单个翻译漏了，而是 summary 和 info card 里动态调用了 `airport/ports/Owner/Manager/Status/...` 这些 key，却只补了一部分静态按钮文案。
 - 更稳的最短路径是：每次新增一条 UI 路径后，把“静态 DOM 文案 + JS 里所有 `t()` 动态 key”一起 grep 一遍，再补 i18n，避免中英文混排。
+
+### 57. 早期 capital label phase 不能继续复用城市点位的 minZoom 门槛
+- 这次 P3 label phase 死掉，不只是默认 `labelMinZoom` 偏高，更关键是 capital label 仍被 `entry.minZoom`（很多 minor capital 默认 2.9）一起卡住。
+- 更稳的做法是：capital marker 可以继续有自己的 reveal 逻辑，但 capital label 的门槛要单独走 `labelMinZoom`，不要直接复用普通城市的 marker minZoom。
