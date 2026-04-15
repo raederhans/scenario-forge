@@ -7651,58 +7651,222 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  async function renderSvgOverlayCanvas(mapSvg, width, height) {
+    if (!mapSvg || !width || !height) return null;
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      const image = await new Promise((resolve, reject) => {
+        const nextImage = new Image();
+        nextImage.onload = () => resolve(nextImage);
+        nextImage.onerror = () => reject(new Error("SVG overlay export failed."));
+        nextImage.src = svgUrl;
+      });
+      const overlayCanvas = document.createElement("canvas");
+      overlayCanvas.width = width;
+      overlayCanvas.height = height;
+      const overlayCtx = overlayCanvas.getContext("2d");
+      if (!overlayCtx) {
+        throw new Error("Overlay export context unavailable.");
+      }
+      overlayCtx.drawImage(image, 0, 0);
+      return overlayCanvas;
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+
+  async function renderQuickSnapshotToCanvas(runtimeState) {
+    const safeState = runtimeState && typeof runtimeState === "object" ? runtimeState : {};
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = safeState.colorCanvas?.width || 0;
+    exportCanvas.height = safeState.colorCanvas?.height || 0;
+    const exportCtx = exportCanvas.getContext("2d");
+    if (!exportCtx) {
+      throw new Error("Canvas export context unavailable.");
+    }
+    if (safeState.colorCanvas) exportCtx.drawImage(safeState.colorCanvas, 0, 0);
+    if (safeState.lineCanvas) exportCtx.drawImage(safeState.lineCanvas, 0, 0);
+    const overlayCanvas = await renderSvgOverlayCanvas(safeState.mapSvg, exportCanvas.width, exportCanvas.height);
+    if (overlayCanvas) {
+      exportCtx.drawImage(overlayCanvas, 0, 0);
+    }
+    return exportCanvas;
+  }
+
+  function buildExportRenderPlan(exportWorkbenchUi, runtimeState) {
+    const ui = exportWorkbenchUi && typeof exportWorkbenchUi === "object" ? exportWorkbenchUi : {};
+    const layerOrder = Array.isArray(ui.layerOrder) ? ui.layerOrder : ["base", "paint", "borders", "labels", "overlay"];
+    const layerVisibility = ui.layerVisibility && typeof ui.layerVisibility === "object" ? ui.layerVisibility : {};
+    const visibleLayers = layerOrder.filter((layerId) => layerVisibility[layerId] !== false);
+    const layerCanvases = runtimeState.layerCanvases || {};
+    const renderableLayers = visibleLayers.filter((layerId) => layerId === "base" || layerCanvases[layerId]);
+    const bakeQueue = Array.isArray(ui.bakeQueue) ? ui.bakeQueue : [];
+    const exportTargets = Array.isArray(ui.exportTargets) && ui.exportTargets.length
+      ? ui.exportTargets
+      : [{ id: "composite", type: "composite", layerId: "" }];
+    return {
+      activePreset: String(ui.activePreset || "default").trim() || "default",
+      layers: renderableLayers,
+      bakeQueue,
+      textItems: Array.isArray(ui.textItems) ? ui.textItems : [],
+      exportTargets,
+      imageAdjustments: ui.imageAdjustments && typeof ui.imageAdjustments === "object" ? ui.imageAdjustments : {},
+    };
+  }
+
+  async function renderExportPlanToCanvas(plan, runtimeState) {
+    const outputs = [];
+    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
+    if (!width || !height) {
+      throw new Error("Export canvas is empty.");
+    }
+
+    const resolveLayerCanvas = (layerId) => {
+      const layerCanvas = runtimeState.layerCanvases?.[layerId];
+      if (!layerCanvas) return null;
+      if (!layerCanvas.width || !layerCanvas.height) return null;
+      return layerCanvas;
+    };
+
+    const drawTextItems = (ctx) => {
+      plan.textItems.forEach((item) => {
+        if (!item || !String(item.text || "").trim()) return;
+        ctx.save();
+        ctx.font = String(item.font || "600 20px Inter");
+        ctx.fillStyle = String(item.fill || "#ffffff");
+        ctx.textAlign = ["left", "center", "right"].includes(item.align) ? item.align : "left";
+        ctx.textBaseline = ["top", "middle", "bottom", "alphabetic"].includes(item.baseline) ? item.baseline : "alphabetic";
+        ctx.fillText(String(item.text), Number(item.x) || 0, Number(item.y) || 0);
+        ctx.restore();
+      });
+    };
+
+    const drawLayerStack = (ctx, layerIds) => {
+      let drawnCount = 0;
+      const drawnCanvases = new Set();
+      layerIds.forEach((layerId) => {
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas || drawnCanvases.has(layerCanvas)) return;
+        ctx.drawImage(layerCanvas, 0, 0);
+        drawnCanvases.add(layerCanvas);
+        drawnCount += 1;
+      });
+      return drawnCount;
+    };
+
+    for (const target of plan.exportTargets) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) continue;
+      const targetType = String(target?.type || "composite").toLowerCase();
+      if (targetType === "layer") {
+        const layerId = String(target?.layerId || "").trim();
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas) {
+          throw new Error(`Export layer target has no render data: ${layerId || "<unknown>"}`);
+        }
+        ctx.drawImage(layerCanvas, 0, 0);
+      } else {
+        const drawn = drawLayerStack(ctx, Array.isArray(plan.layers) ? plan.layers : []);
+        if (!drawn) {
+          throw new Error("Export render plan has no drawable layers.");
+        }
+      }
+      drawTextItems(ctx);
+      outputs.push({
+        id: String(target?.id || target?.layerId || "composite"),
+        canvas,
+      });
+    }
+
+    return outputs;
+  }
+
+  function downloadExportOutputs(outputs, format, namingRule) {
+    const normalizedFormat = format === "jpg" ? "jpg" : "png";
+    const mimeType = normalizedFormat === "jpg" ? "image/jpeg" : "image/png";
+    outputs.forEach((output, index) => {
+      const dataUrl = output.canvas.toDataURL(mimeType, 0.92);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = namingRule(output, index, normalizedFormat);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+  }
+
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
+      const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
+      const mapSvg = document.getElementById("map-svg");
+      const layerCanvases = {
+        ...(state.exportLayerCanvases || {}),
+      };
+      if (!layerCanvases.base && state.colorCanvas) {
+        layerCanvases.base = state.colorCanvas;
+      }
+      if (!layerCanvases.paint && state.colorCanvas) {
+        layerCanvases.paint = state.colorCanvas;
+      }
+      if (!layerCanvases.borders && state.lineCanvas) {
+        layerCanvases.borders = state.lineCanvas;
+      }
+      let runtimeState = {
+        colorCanvas: state.colorCanvas,
+        lineCanvas: state.lineCanvas,
+        mapSvg,
+        layerCanvases,
+      };
       try {
-        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
-        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = state.colorCanvas?.width || 0;
-        exportCanvas.height = state.colorCanvas?.height || 0;
-        const exportCtx = exportCanvas.getContext("2d");
-        if (!exportCtx) {
-          throw new Error("Canvas export context unavailable.");
+        const overlayCanvas = await renderSvgOverlayCanvas(
+          mapSvg,
+          state.colorCanvas?.width || state.lineCanvas?.width || 0,
+          state.colorCanvas?.height || state.lineCanvas?.height || 0
+        );
+        if (overlayCanvas) {
+          if (!layerCanvases.overlay) layerCanvases.overlay = overlayCanvas;
+          if (!layerCanvases.labels) layerCanvases.labels = overlayCanvas;
         }
-        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
-        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
-        const mapSvg = document.getElementById("map-svg");
-        if (mapSvg) {
-          const serializer = new XMLSerializer();
-          const svgMarkup = serializer.serializeToString(mapSvg);
-          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-          const svgUrl = URL.createObjectURL(svgBlob);
-          try {
-            await new Promise((resolve, reject) => {
-              const image = new Image();
-              image.onload = () => {
-                exportCtx.drawImage(image, 0, 0);
-                resolve();
-              };
-              image.onerror = () => reject(new Error("SVG overlay export failed."));
-              image.src = svgUrl;
-            });
-          } finally {
-            URL.revokeObjectURL(svgUrl);
-          }
-        }
-        const dataUrl = exportCanvas.toDataURL(format, 0.92);
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = `map_snapshot.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        runtimeState = {
+          colorCanvas: state.colorCanvas,
+          lineCanvas: state.lineCanvas,
+          mapSvg,
+          layerCanvases,
+        };
+        const plan = buildExportRenderPlan(state.exportWorkbenchUi, runtimeState);
+        const outputs = await renderExportPlanToCanvas(plan, runtimeState);
+        downloadExportOutputs(outputs, formatKey, (output, index, extension) => {
+          const suffix = outputs.length > 1 ? `_${index + 1}_${output.id}` : "";
+          return `map_snapshot${suffix}.${extension}`;
+        });
         showToast(t("Map snapshot downloaded.", "ui"), {
           title: t("Snapshot exported", "ui"),
           tone: "success",
         });
       } catch (error) {
-        console.error("Snapshot export failed:", error);
-        showToast(t("Unable to export the map snapshot.", "ui"), {
-          title: t("Snapshot failed", "ui"),
-          tone: "error",
-          duration: 4200,
-        });
+        console.warn("Workbench export failed, fallback to quick export:", error);
+        try {
+          const fallbackCanvas = await renderQuickSnapshotToCanvas(runtimeState);
+          downloadExportOutputs([{ id: "quick", canvas: fallbackCanvas }], formatKey, (_output, _index, extension) => `map_snapshot.${extension}`);
+          showToast(t("Map snapshot downloaded.", "ui"), {
+            title: t("Snapshot exported", "ui"),
+            tone: "success",
+          });
+        } catch (fallbackError) {
+          console.error("Snapshot export failed:", fallbackError);
+          showToast(t("Unable to export the map snapshot.", "ui"), {
+            title: t("Snapshot failed", "ui"),
+            tone: "error",
+            duration: 4200,
+          });
+        }
       }
     });
   }
