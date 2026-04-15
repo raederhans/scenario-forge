@@ -50,6 +50,38 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
     zh: "\u628a\u5f53\u524d\u53ef\u89c1\u5730\u56fe\u5bfc\u51fa\u4e3a PNG \u6216 JPG \u5feb\u7167\u3002",
     en: "Export the visible map as a PNG or JPG snapshot.",
   },
+  "An export is already in progress. Wait for it to finish before starting another export.": {
+    zh: "\u5bfc\u51fa\u4efb\u52a1\u6b63\u5728\u8fdb\u884c\u4e2d\u3002\u8bf7\u7b49\u5f85\u5f53\u524d\u4efb\u52a1\u5b8c\u6210\u540e\u518d\u53d1\u8d77\u65b0\u7684\u5bfc\u51fa\u3002",
+    en: "An export is already in progress. Wait for it to finish before starting another export.",
+  },
+  "Export queue is full": {
+    zh: "\u5bfc\u51fa\u961f\u5217\u5df2\u6ee1",
+    en: "Export queue is full",
+  },
+  "Export failed: not enough available memory. Reduce export resolution (for example 2\u00d7 \u2192 1\u00d7), close heavy tabs, then retry.": {
+    zh: "\u5bfc\u51fa\u5931\u8d25\uff1a\u53ef\u7528\u5185\u5b58\u4e0d\u8db3\u3002\u8bf7\u964d\u4f4e\u5bfc\u51fa\u5206\u8fa8\u7387\uff08\u4f8b\u5982 2\u00d7 \u2192 1\u00d7\uff09\uff0c\u5173\u95ed\u9ad8\u5360\u7528\u9875\u7b7e\u540e\u91cd\u8bd5\u3002",
+    en: "Export failed: not enough available memory. Reduce export resolution (for example 2\u00d7 \u2192 1\u00d7), close heavy tabs, then retry.",
+  },
+  "Export failed \u00b7 Out of memory": {
+    zh: "\u5bfc\u51fa\u5931\u8d25 \u00b7 \u5185\u5b58\u4e0d\u8db3",
+    en: "Export failed \u00b7 Out of memory",
+  },
+  "Export failed: SVG overlay includes cross-origin assets. Use same-origin assets, remove cross-origin images, or hide SVG overlays before retrying.": {
+    zh: "\u5bfc\u51fa\u5931\u8d25\uff1aSVG \u53e0\u52a0\u5c42\u5305\u542b\u8de8\u57df\u8d44\u6e90\u3002\u8bf7\u4f7f\u7528\u540c\u6e90\u8d44\u6e90\uff0c\u79fb\u9664\u8de8\u57df\u56fe\u7247\uff0c\u6216\u5148\u9690\u85cf SVG \u53e0\u52a0\u5c42\u540e\u91cd\u8bd5\u3002",
+    en: "Export failed: SVG overlay includes cross-origin assets. Use same-origin assets, remove cross-origin images, or hide SVG overlays before retrying.",
+  },
+  "Export failed \u00b7 Cross-origin SVG": {
+    zh: "\u5bfc\u51fa\u5931\u8d25 \u00b7 \u8de8\u57df SVG",
+    en: "Export failed \u00b7 Cross-origin SVG",
+  },
+  "Export failed: invalid parameters. Check export scale and format, then retry.": {
+    zh: "\u5bfc\u51fa\u5931\u8d25\uff1a\u53c2\u6570\u65e0\u6548\u3002\u8bf7\u68c0\u67e5\u5bfc\u51fa\u500d\u7387\u548c\u683c\u5f0f\u540e\u91cd\u8bd5\u3002",
+    en: "Export failed: invalid parameters. Check export scale and format, then retry.",
+  },
+  "Export failed \u00b7 Invalid parameters": {
+    zh: "\u5bfc\u51fa\u5931\u8d25 \u00b7 \u53c2\u6570\u9519\u8bef",
+    en: "Export failed \u00b7 Invalid parameters",
+  },
   "Primary Color": { zh: "\u4e3b\u8272", en: "Primary Color" },
   Tier: { zh: "\u7ea7\u522b", en: "Tier" },
   airport: { zh: "\u673a\u573a", en: "airport" },

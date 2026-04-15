@@ -1717,21 +1717,21 @@ function showExportFailureToast(error) {
   const failureKind = classifyExportFailure(error);
   if (failureKind === "out-of-memory") {
     showToast(
-      t("导出失败：可用内存不足。请降低导出分辨率（例如 2×→1×），关闭其他高占用标签页后重试。", "ui"),
-      { title: t("导出失败 · 内存不足", "ui"), tone: "error", duration: 7000 }
+      t("Export failed: not enough available memory. Reduce export resolution (for example 2× → 1×), close heavy tabs, then retry.", "ui"),
+      { title: t("Export failed · Out of memory", "ui"), tone: "error", duration: 7000 }
     );
     return;
   }
   if (failureKind === "svg-cors") {
     showToast(
-      t("导出失败：SVG 叠加层包含跨域资源。请改用同源资源、移除跨域图片后重试，或先关闭 SVG 叠加层。", "ui"),
-      { title: t("导出失败 · 跨域 SVG", "ui"), tone: "warning", duration: 7600 }
+      t("Export failed: SVG overlay includes cross-origin assets. Use same-origin assets, remove cross-origin images, or hide SVG overlays before retrying.", "ui"),
+      { title: t("Export failed · Cross-origin SVG", "ui"), tone: "warning", duration: 7600 }
     );
     return;
   }
   showToast(
-    t("导出失败：参数不合法。请确认分辨率倍率、导出格式并重试。", "ui"),
-    { title: t("导出失败 · 参数错误", "ui"), tone: "warning", duration: 6200 }
+    t("Export failed: invalid parameters. Check export scale and format, then retry.", "ui"),
+    { title: t("Export failed · Invalid parameters", "ui"), tone: "warning", duration: 6200 }
   );
 }
 
@@ -7698,8 +7698,8 @@ function initToolbar({ render } = {}) {
     exportBtn.addEventListener("click", async () => {
       if (exportJobsInFlight >= EXPORT_MAX_CONCURRENT_JOBS) {
         showToast(
-          t("已有导出任务进行中，请等待当前任务完成后再发起新的导出。", "ui"),
-          { title: t("导出队列已满", "ui"), tone: "warning", duration: 4200 }
+          t("An export is already in progress. Wait for it to finish before starting another export.", "ui"),
+          { title: t("Export queue is full", "ui"), tone: "warning", duration: 4200 }
         );
         return;
       }
