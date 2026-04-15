@@ -34,6 +34,7 @@ import {
   normalizePhysicalStyleConfig,
   normalizeTransportOverviewStyleConfig,
   normalizeUrbanStyleConfig,
+  normalizeExportWorkbenchUiState,
   normalizeTransportWorkbenchUiState,
   normalizeExportWorkbenchUiState,
   state,
@@ -504,6 +505,9 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.transportWorkbenchUi = data.transportWorkbenchUi
     ? cloneImportedProjectValue(data.transportWorkbenchUi)
     : cloneImportedProjectValue(state.transportWorkbenchUi);
+  state.exportWorkbenchUi = data.exportWorkbenchUi
+    ? cloneImportedProjectValue(data.exportWorkbenchUi)
+    : cloneImportedProjectValue(state.exportWorkbenchUi);
   state.specialZones = data.specialZones || {};
   state.parentBordersVisible = data.parentBordersVisible !== false;
   state.manualSpecialZones =
@@ -700,6 +704,18 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     };
   }
   if (data.exportWorkbenchUi && typeof data.exportWorkbenchUi === "object") {
+    const normalizedExportWorkbenchUi = normalizeExportWorkbenchUiState({
+      ...(state.exportWorkbenchUi || {}),
+      ...data.exportWorkbenchUi,
+      bakeArtifacts: Array.isArray(data.exportWorkbenchUi.bakeArtifacts)
+        ? data.exportWorkbenchUi.bakeArtifacts
+        : (state.exportWorkbenchUi?.bakeArtifacts || []),
+    });
+    state.exportWorkbenchUi = {
+      ...(state.exportWorkbenchUi || {}),
+      ...normalizedExportWorkbenchUi,
+      bakeArtifacts: normalizedExportWorkbenchUi.bakeArtifacts,
+    };
     state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
       ...(state.exportWorkbenchUi || {}),
       ...data.exportWorkbenchUi,

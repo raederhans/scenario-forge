@@ -513,6 +513,9 @@ class FileManager {
         if (!data.transportWorkbenchUi || typeof data.transportWorkbenchUi !== "object") {
           data.transportWorkbenchUi = null;
         }
+        if (!data.exportWorkbenchUi || typeof data.exportWorkbenchUi !== "object") {
+          data.exportWorkbenchUi = null;
+        }
         data.layerVisibility.showWaterRegions =
           data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
         data.layerVisibility.showOpenOceanRegions =
