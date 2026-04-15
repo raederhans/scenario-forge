@@ -2363,6 +2363,14 @@
                         <option value="png">PNG</option>
                         <option value="jpg">JPG</option>
                       </select>
+                      <label id="lblExportScale" class="sidebar-field-label mt-3" for="exportScale">Export Resolution</label>
+                      <select id="exportScale" name="export-scale" autocomplete="off" class="select-input mt-2">
+                        <option value="1">Current preview (1×)</option>
+                        <option value="1.5">High (1.5×)</option>
+                        <option value="2" selected>Ultra (2×)</option>
+                        <option value="4">Maximum detail (4×)</option>
+                      </select>
+                      <p id="exportResolutionHint" class="sidebar-help-copy mt-2">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
                       <button id="exportBtn" class="btn-primary sidebar-tool-action-primary mt-4">Download Snapshot</button>
                     </div>
                   </div>
