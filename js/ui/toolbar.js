@@ -7580,6 +7580,33 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  async function renderSvgOverlayCanvas(mapSvg, width, height) {
+    if (!mapSvg || !width || !height) return null;
+    const serializer = new XMLSerializer();
+    const svgMarkup = serializer.serializeToString(mapSvg);
+    const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    try {
+      const image = await new Promise((resolve, reject) => {
+        const nextImage = new Image();
+        nextImage.onload = () => resolve(nextImage);
+        nextImage.onerror = () => reject(new Error("SVG overlay export failed."));
+        nextImage.src = svgUrl;
+      });
+      const overlayCanvas = document.createElement("canvas");
+      overlayCanvas.width = width;
+      overlayCanvas.height = height;
+      const overlayCtx = overlayCanvas.getContext("2d");
+      if (!overlayCtx) {
+        throw new Error("Overlay export context unavailable.");
+      }
+      overlayCtx.drawImage(image, 0, 0);
+      return overlayCanvas;
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+
   async function renderQuickSnapshotToCanvas(runtimeState) {
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = runtimeState.colorCanvas?.width || 0;
@@ -7590,24 +7617,9 @@ function initToolbar({ render } = {}) {
     }
     if (runtimeState.colorCanvas) exportCtx.drawImage(runtimeState.colorCanvas, 0, 0);
     if (runtimeState.lineCanvas) exportCtx.drawImage(runtimeState.lineCanvas, 0, 0);
-    if (runtimeState.mapSvg) {
-      const serializer = new XMLSerializer();
-      const svgMarkup = serializer.serializeToString(runtimeState.mapSvg);
-      const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-      const svgUrl = URL.createObjectURL(svgBlob);
-      try {
-        await new Promise((resolve, reject) => {
-          const image = new Image();
-          image.onload = () => {
-            exportCtx.drawImage(image, 0, 0);
-            resolve();
-          };
-          image.onerror = () => reject(new Error("SVG overlay export failed."));
-          image.src = svgUrl;
-        });
-      } finally {
-        URL.revokeObjectURL(svgUrl);
-      }
+    const overlayCanvas = await renderSvgOverlayCanvas(runtimeState.mapSvg, exportCanvas.width, exportCanvas.height);
+    if (overlayCanvas) {
+      exportCtx.drawImage(overlayCanvas, 0, 0);
     }
     return exportCanvas;
   }
@@ -7635,12 +7647,18 @@ function initToolbar({ render } = {}) {
 
   async function renderExportPlanToCanvas(plan, runtimeState) {
     const outputs = [];
-    const baseComposite = await renderQuickSnapshotToCanvas(runtimeState);
-    const width = baseComposite.width;
-    const height = baseComposite.height;
+    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     if (!width || !height) {
       throw new Error("Export canvas is empty.");
     }
+
+    const resolveLayerCanvas = (layerId) => {
+      const layerCanvas = runtimeState.layerCanvases?.[layerId];
+      if (!layerCanvas) return null;
+      if (!layerCanvas.width || !layerCanvas.height) return null;
+      return layerCanvas;
+    };
 
     const drawTextItems = (ctx) => {
       plan.textItems.forEach((item) => {
@@ -7655,6 +7673,17 @@ function initToolbar({ render } = {}) {
       });
     };
 
+    const drawLayerStack = (ctx, layerIds) => {
+      let drawnCount = 0;
+      layerIds.forEach((layerId) => {
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas) return;
+        ctx.drawImage(layerCanvas, 0, 0);
+        drawnCount += 1;
+      });
+      return drawnCount;
+    };
+
     for (const target of plan.exportTargets) {
       const canvas = document.createElement("canvas");
       canvas.width = width;
@@ -7663,14 +7692,17 @@ function initToolbar({ render } = {}) {
       if (!ctx) continue;
       const targetType = String(target?.type || "composite").toLowerCase();
       if (targetType === "layer") {
-        const layerCanvas = runtimeState.layerCanvases?.[target.layerId];
-        if (layerCanvas) {
-          ctx.drawImage(layerCanvas, 0, 0);
-        } else if (target.layerId === "base") {
-          ctx.drawImage(baseComposite, 0, 0);
+        const layerId = String(target?.layerId || "").trim();
+        const layerCanvas = resolveLayerCanvas(layerId);
+        if (!layerCanvas) {
+          throw new Error(`Export layer target has no render data: ${layerId || "<unknown>"}`);
         }
+        ctx.drawImage(layerCanvas, 0, 0);
       } else {
-        ctx.drawImage(baseComposite, 0, 0);
+        const drawn = drawLayerStack(ctx, Array.isArray(plan.layers) ? plan.layers : []);
+        if (!drawn) {
+          throw new Error("Export render plan has no drawable layers.");
+        }
       }
       drawTextItems(ctx);
       outputs.push({
@@ -7679,9 +7711,6 @@ function initToolbar({ render } = {}) {
       });
     }
 
-    if (!outputs.length) {
-      outputs.push({ id: "composite", canvas: baseComposite });
-    }
     return outputs;
   }
 
@@ -7701,11 +7730,30 @@ function initToolbar({ render } = {}) {
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", async () => {
+      const mapSvg = document.getElementById("map-svg");
+      const layerCanvases = {
+        ...(state.exportLayerCanvases || {}),
+      };
+      if (!layerCanvases.base && state.colorCanvas) {
+        layerCanvases.base = state.colorCanvas;
+      }
+      if (!layerCanvases.borders && state.lineCanvas) {
+        layerCanvases.borders = state.lineCanvas;
+      }
+      const overlayCanvas = await renderSvgOverlayCanvas(
+        mapSvg,
+        state.colorCanvas?.width || state.lineCanvas?.width || 0,
+        state.colorCanvas?.height || state.lineCanvas?.height || 0
+      );
+      if (overlayCanvas) {
+        if (!layerCanvases.overlay) layerCanvases.overlay = overlayCanvas;
+        if (!layerCanvases.labels) layerCanvases.labels = overlayCanvas;
+      }
       const runtimeState = {
         colorCanvas: state.colorCanvas,
         lineCanvas: state.lineCanvas,
-        mapSvg: document.getElementById("map-svg"),
-        layerCanvases: state.exportLayerCanvases || {},
+        mapSvg,
+        layerCanvases,
       };
       const formatKey = exportFormat.value === "jpg" ? "jpg" : "png";
       try {
