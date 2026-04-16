@@ -2515,6 +2515,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return True
 
     def _read_json_body(self) -> dict[str, object]:
+        content_type_header = str(self.headers.get("Content-Type") or "")
+        media_type = content_type_header.split(";", 1)[0].strip().lower()
+        if media_type != "application/json" and not media_type.endswith("+json"):
+            raise DevServerError(
+                "invalid_content_type",
+                "Content-Type must be application/json.",
+                status=415,
+            )
         raw_length = self.headers.get("Content-Length", "").strip()
         if not raw_length:
             raise DevServerError("missing_content_length", "Request body is required.", status=400)
@@ -2538,6 +2546,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not isinstance(payload, dict):
             raise DevServerError("invalid_payload", "Request body must be a JSON object.", status=400)
         return payload
+
+    def _validate_same_origin_request(self) -> None:
+        allowed_origins = {
+            f"http://{BIND_ADDRESS}:{self.server.server_address[1]}",
+            f"http://localhost:{self.server.server_address[1]}",
+        }
+
+        origin = str(self.headers.get("Origin") or "").strip()
+        if origin and origin not in allowed_origins:
+            raise DevServerError("invalid_origin", "Origin header is not allowed for this endpoint.", status=403)
+
+        referer_header = str(self.headers.get("Referer") or "").strip()
+        if referer_header:
+            referer = urlparse(referer_header)
+            referer_origin = f"{referer.scheme}://{referer.netloc}" if referer.scheme and referer.netloc else ""
+            if referer_origin not in allowed_origins:
+                raise DevServerError("invalid_referer", "Referer header is not allowed for this endpoint.", status=403)
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -2576,6 +2601,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         route = urlparse(self.path or "").path
         try:
+            self._validate_same_origin_request()
             payload = self._read_json_body()
             if route == "/__dev/scenario/tag/create":
                 response = save_scenario_tag_create_payload(

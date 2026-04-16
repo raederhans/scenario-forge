@@ -1414,7 +1414,11 @@ class DevServerTest(unittest.TestCase):
 
     def test_read_json_body_rejects_oversized_payloads_before_reading(self) -> None:
         handler = object.__new__(dev_server.Handler)
-        handler.headers = {"Content-Length": str(dev_server.MAX_JSON_BODY_BYTES + 1)}
+        handler.server = type("Server", (), {"server_address": (dev_server.BIND_ADDRESS, 8000)})()
+        handler.headers = {
+            "Content-Type": "application/json",
+            "Content-Length": str(dev_server.MAX_JSON_BODY_BYTES + 1),
+        }
         handler.rfile = io.BytesIO(b"")
 
         with self.assertRaises(dev_server.DevServerError) as exc_info:
@@ -1422,6 +1426,39 @@ class DevServerTest(unittest.TestCase):
 
         self.assertEqual(exc_info.exception.code, "body_too_large")
         self.assertEqual(exc_info.exception.status, 413)
+
+    def test_read_json_body_rejects_non_json_content_type(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.server = type("Server", (), {"server_address": (dev_server.BIND_ADDRESS, 8000)})()
+        handler.headers = {
+            "Content-Type": "text/plain",
+            "Content-Length": "2",
+        }
+        handler.rfile = io.BytesIO(b"{}")
+
+        with self.assertRaises(dev_server.DevServerError) as exc_info:
+            dev_server.Handler._read_json_body(handler)
+
+        self.assertEqual(exc_info.exception.code, "invalid_content_type")
+        self.assertEqual(exc_info.exception.status, 415)
+
+    def test_validate_same_origin_request_rejects_foreign_origin(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.server = type("Server", (), {"server_address": (dev_server.BIND_ADDRESS, 8000)})()
+        handler.headers = {"Origin": "http://evil.test"}
+
+        with self.assertRaises(dev_server.DevServerError) as exc_info:
+            dev_server.Handler._validate_same_origin_request(handler)
+
+        self.assertEqual(exc_info.exception.code, "invalid_origin")
+        self.assertEqual(exc_info.exception.status, 403)
+
+    def test_validate_same_origin_request_accepts_localhost_referer(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.server = type("Server", (), {"server_address": (dev_server.BIND_ADDRESS, 8000)})()
+        handler.headers = {"Referer": "http://localhost:8000/app/"}
+
+        dev_server.Handler._validate_same_origin_request(handler)
 
     def test_maybe_send_gzip_static_compresses_static_json_when_client_accepts_gzip(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
