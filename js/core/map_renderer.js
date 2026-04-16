@@ -228,7 +228,11 @@ const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
 const RENDER_SETTLE_DURATION_MS = 200;
+const RENDER_SETTLE_DURATION_MS_MIN = 120;
 const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 700;
+const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS_MIN = 260;
+const ZOOM_SETTLE_ADAPTIVE_DELTA_MIN = 0.06;
+const ZOOM_SETTLE_ADAPTIVE_DELTA_MAX = 0.85;
 const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 640;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
@@ -3037,6 +3041,7 @@ function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
   state.exactAfterSettleHandle = null;
   if (clearDefer) {
     state.deferExactAfterSettle = false;
+    state.pendingExactPoliticalFastFrame = false;
   }
 }
 
@@ -4075,6 +4080,29 @@ function clearRenderPhaseTimer() {
   }
 }
 
+function clamp01(value) {
+  return Math.min(1, Math.max(0, Number(value) || 0));
+}
+
+function getAdaptiveSettleProfile(scaleDelta = Number(state.zoomGestureScaleDelta || 0)) {
+  const normalizedDelta = clamp01(
+    (Math.max(0, Number(scaleDelta) || 0) - ZOOM_SETTLE_ADAPTIVE_DELTA_MIN)
+    / Math.max(0.0001, ZOOM_SETTLE_ADAPTIVE_DELTA_MAX - ZOOM_SETTLE_ADAPTIVE_DELTA_MIN)
+  );
+  return {
+    scaleDelta: Math.max(0, Number(scaleDelta) || 0),
+    normalizedDelta,
+    settleDurationMs: Math.round(
+      RENDER_SETTLE_DURATION_MS_MIN
+      + ((RENDER_SETTLE_DURATION_MS - RENDER_SETTLE_DURATION_MS_MIN) * normalizedDelta)
+    ),
+    exactQuietWindowMs: Math.round(
+      EXACT_AFTER_SETTLE_QUIET_WINDOW_MS_MIN
+      + ((EXACT_AFTER_SETTLE_QUIET_WINDOW_MS - EXACT_AFTER_SETTLE_QUIET_WINDOW_MS_MIN) * normalizedDelta)
+    ),
+  };
+}
+
 function setRenderPhase(phase) {
   const previousPhase = state.renderPhase;
   state.renderPhase = phase;
@@ -4395,6 +4423,8 @@ function queueTooltipUpdate(nextState = null) {
 
 function scheduleRenderPhaseIdle() {
   clearRenderPhaseTimer();
+  const settleProfile = getAdaptiveSettleProfile();
+  state.adaptiveSettleProfile = settleProfile;
   state.renderPhaseTimerId = globalThis.setTimeout(() => {
     state.renderPhaseTimerId = null;
     setRenderPhase(RENDER_PHASE_IDLE);
@@ -4412,11 +4442,11 @@ function scheduleRenderPhaseIdle() {
       }
       state.deferExactAfterSettle = true;
       render();
-      scheduleExactAfterSettleRefresh();
+      scheduleExactAfterSettleRefresh(settleProfile);
       return;
     }
     render();
-  }, RENDER_SETTLE_DURATION_MS);
+  }, settleProfile.settleDurationMs);
 }
 
 function flushPendingScenarioChunkRefreshAfterExact(reason = "exact-after-settle") {
@@ -18102,6 +18132,20 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
     return false;
   }
   const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) => passName !== "labels");
+  if (
+    state.deferExactAfterSettle
+    && state.pendingExactPoliticalFastFrame
+    && !cache.dirty?.political
+  ) {
+    const fastExactStartedAt = nowMs();
+    renderPassToCache("political", (k) => drawPoliticalPass(k), currentTransform, timings);
+    state.pendingExactPoliticalFastFrame = false;
+    recordRenderPerfMetric("settlePoliticalFastExact", Math.max(0, nowMs() - fastExactStartedAt), {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      scaleDelta: Number(state.zoomGestureScaleDelta || 0),
+      zoomEndedAt: Number(state.zoomGestureEndedAt || 0),
+    });
+  }
   const drewAll = transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform)
   );
@@ -18217,16 +18261,20 @@ function drawCanvas() {
   incrementPerfCounter("frames");
 }
 
-function scheduleExactAfterSettleRefresh() {
+function scheduleExactAfterSettleRefresh(profile = state.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
   cancelExactAfterSettleRefresh({ clearDefer: false });
+  const scheduleStartedAt = nowMs();
+  const resolvedProfile = profile || getAdaptiveSettleProfile();
   state.exactAfterSettleHandle = {
     type: "timeout",
     id: globalThis.setTimeout(() => {
     state.exactAfterSettleHandle = null;
     if (state.renderPhase !== RENDER_PHASE_IDLE || !state.deferExactAfterSettle) return;
+    const callbackStartedAt = nowMs();
+    const settleWindowElapsedMs = Math.max(0, callbackStartedAt - scheduleStartedAt);
     const reuseDecision = getContextBaseReuseDecision();
     const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
-    const startedAt = nowMs();
+    const startedAt = callbackStartedAt;
     state.deferExactAfterSettle = false;
     cancelDeferredContextBaseEnhancement();
     if (forceExactContextBaseRefresh) {
@@ -18266,7 +18314,9 @@ function scheduleExactAfterSettleRefresh() {
     );
     render();
     flushPendingScenarioChunkRefreshAfterExact();
-    const durationMs = Math.max(0, nowMs() - startedAt);
+    const finishedAt = nowMs();
+    const durationMs = Math.max(0, finishedAt - startedAt);
+    const finalSharpnessMs = Math.max(0, finishedAt - Number(state.zoomGestureEndedAt || startedAt));
     recordRenderPerfMetric("settleExactRefresh", durationMs, {
       activeScenarioId: String(state.activeScenarioId || ""),
       contextBaseRefreshed: exactRefreshApplied,
@@ -18278,6 +18328,11 @@ function scheduleExactAfterSettleRefresh() {
       referenceZoomBucket: reuseDecision.referenceZoomBucket,
       crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
       crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+      scaleDelta: Number(state.zoomGestureScaleDelta || resolvedProfile.scaleDelta || 0),
+      settleDurationMs: Number(resolvedProfile.settleDurationMs || 0),
+      exactQuietWindowMs: Number(resolvedProfile.exactQuietWindowMs || 0),
+      settleWindowElapsedMs: Number(settleWindowElapsedMs || 0),
+      finalSharpnessMs: Number(finalSharpnessMs || 0),
     });
     if (exactRefreshApplied) {
       recordRenderPerfMetric("contextBaseExactRefresh", Number(state.renderPerfMetrics?.drawContextBasePass?.durationMs || durationMs), {
@@ -18295,7 +18350,7 @@ function scheduleExactAfterSettleRefresh() {
     if (deferContextBaseEnhancements) {
       scheduleDeferredContextBaseEnhancements();
     }
-    }, EXACT_AFTER_SETTLE_QUIET_WINDOW_MS),
+    }, resolvedProfile.exactQuietWindowMs),
   };
 }
 
@@ -23791,6 +23846,9 @@ function initZoom() {
     .on("start", () => {
       clearRenderPhaseTimer();
       cancelExactAfterSettleRefresh();
+      state.zoomGestureStartTransform = cloneZoomTransform(state.zoomTransform || globalThis.d3.zoomIdentity);
+      state.zoomGestureScaleDelta = 0;
+      state.pendingExactPoliticalFastFrame = false;
       setRenderPhase(RENDER_PHASE_INTERACTING);
       captureInteractionBorderSnapshot(state.zoomTransform || globalThis.d3.zoomIdentity);
       renderHoverOverlayIfNeeded({ force: true });
@@ -23820,6 +23878,11 @@ function initZoom() {
       setRenderPhase(RENDER_PHASE_SETTLING);
       state.pendingZoomTransform = null;
       updateMap(event.transform);
+      const startK = Math.max(0.0001, Number(state.zoomGestureStartTransform?.k || event.transform?.k || 1));
+      const endK = Math.max(0.0001, Number(event.transform?.k || startK));
+      state.zoomGestureScaleDelta = Math.abs(Math.log2(endK / startK));
+      state.zoomGestureEndedAt = nowMs();
+      state.pendingExactPoliticalFastFrame = true;
       if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
         state.scheduleScenarioChunkRefreshFn({
           reason: "zoom-end",
