@@ -5,6 +5,7 @@ const INLINE_UI_TRANSLATIONS = Object.freeze({
   Guide: { zh: "\u6307\u5357", en: "Guide" },
   Reference: { zh: "\u53c2\u8003", en: "Reference" },
   Export: { zh: "\u5bfc\u51fa", en: "Export" },
+  Language: { zh: "\u8bed\u8a00", en: "Language" },
   "Viewport controls": { zh: "\u89c6\u53e3\u63a7\u5236", en: "Viewport controls" },
   "System status": { zh: "\u7cfb\u7edf\u72b6\u6001", en: "System status" },
   "Workspace entry": { zh: "\u5de5\u4f5c\u533a\u5165\u53e3", en: "Workspace entry" },
