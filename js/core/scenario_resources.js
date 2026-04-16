@@ -1023,6 +1023,9 @@ function ensureRuntimeChunkLoadState() {
       selectionVersion: 0,
       pendingReason: "",
       pendingDelayMs: null,
+      focusCountryOverride: "",
+      zoomEndChunkVisibleMetric: null,
+      lastZoomEndToChunkVisibleMetric: null,
       pendingVisualPromotion: null,
       pendingInfraPromotion: null,
       inFlightByChunkId: {},
@@ -1050,6 +1053,20 @@ function ensureRuntimeChunkLoadState() {
   state.runtimeChunkLoadState.pendingDelayMs =
     Number.isFinite(Number(state.runtimeChunkLoadState.pendingDelayMs))
       ? Number(state.runtimeChunkLoadState.pendingDelayMs)
+      : null;
+  state.runtimeChunkLoadState.focusCountryOverride =
+    typeof state.runtimeChunkLoadState.focusCountryOverride === "string"
+      ? state.runtimeChunkLoadState.focusCountryOverride
+      : "";
+  state.runtimeChunkLoadState.zoomEndChunkVisibleMetric =
+    state.runtimeChunkLoadState.zoomEndChunkVisibleMetric
+    && typeof state.runtimeChunkLoadState.zoomEndChunkVisibleMetric === "object"
+      ? state.runtimeChunkLoadState.zoomEndChunkVisibleMetric
+      : null;
+  state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric =
+    state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
+    && typeof state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric === "object"
+      ? state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
       : null;
   state.runtimeChunkLoadState.selectionVersion = Math.max(
     0,
@@ -1099,7 +1116,26 @@ function markPendingScenarioChunkRefresh(reason = "refresh", delayMs = null) {
   return loadState;
 }
 
-function shouldDeferScenarioChunkRefresh() {
+function shouldZoomEndPromoteImmediately(bundle, reason = "") {
+  if (String(reason || "").trim().toLowerCase() !== "zoom-end") {
+    return false;
+  }
+  if (!scenarioBundleUsesChunkedLayer(bundle, "political")) {
+    return false;
+  }
+  const hints = normalizeScenarioRenderBudgetHints(
+    bundle?.runtimeShell?.renderBudgetHints || bundle?.manifest?.render_budget_hints || {}
+  );
+  const zoom = Number(state.zoomTransform?.k || 1);
+  return Number.isFinite(zoom) && zoom >= Number(hints.detail_zoom_threshold || 0);
+}
+
+function shouldDeferScenarioChunkRefreshFor({
+  reason = "",
+  bundle = null,
+} = {}) {
+  void bundle;
+  void reason;
   return !!(
     state.bootBlocking
     || state.scenarioApplyInFlight
@@ -1108,6 +1144,20 @@ function shouldDeferScenarioChunkRefresh() {
     || state.isInteracting
     || String(state.renderPhase || "idle") !== "idle"
   );
+}
+
+function shouldDeferScenarioChunkRefresh() {
+  return shouldDeferScenarioChunkRefreshFor({});
+}
+
+function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
+  return String(
+    state.activeSovereignCode
+    || state.selectedInspectorCountryCode
+    || loadState.focusCountryOverride
+    || getScenarioDefaultCountryCode(bundle?.manifest, bundle?.countriesPayload?.countries || {})
+    || ""
+  ).trim().toUpperCase();
 }
 
 function clearPendingScenarioChunkPromotion(loadState = ensureRuntimeChunkLoadState()) {
@@ -1340,6 +1390,9 @@ function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
     refreshTimerId: null,
     pendingReason: "",
     pendingDelayMs: null,
+    focusCountryOverride: "",
+    zoomEndChunkVisibleMetric: null,
+    lastZoomEndToChunkVisibleMetric: null,
     pendingPromotion: null,
     inFlightByChunkId: {},
     errorByChunkId: {},
@@ -1640,6 +1693,30 @@ function commitPendingScenarioChunkPromotion(bundle, pendingPromotion = null) {
       bundle.chunkLifecycle.politicalCoreReadyRecorded = true;
     }
   }
+  if (String(pendingPromotion.reason || "").trim().toLowerCase() === "zoom-end") {
+    const startedAt = Number(loadState.zoomEndChunkVisibleMetric?.startedAt || 0);
+    if (startedAt > 0) {
+      const endedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      const durationMs = Math.max(0, endedAt - startedAt);
+      loadState.lastZoomEndToChunkVisibleMetric = {
+        durationMs,
+        recordedAt: Date.now(),
+        scenarioId,
+        zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
+        threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
+        focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
+        requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
+      };
+      recordScenarioChunkRuntimeMetric("zoomEndToChunkVisibleMs", durationMs, {
+        scenarioId,
+        zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
+        threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
+        focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
+        requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
+      });
+    }
+    loadState.zoomEndChunkVisibleMetric = null;
+  }
   loadState.pendingPromotion = null;
   clearPendingScenarioChunkRefresh(loadState);
   return true;
@@ -1794,15 +1871,15 @@ async function refreshActiveScenarioChunks({
   d3Client = globalThis.d3,
   renderNow = true,
 } = {}) {
-  if (shouldDeferScenarioChunkRefresh()) {
+  const scenarioId = normalizeScenarioId(state.activeScenarioId);
+  if (!scenarioId) return null;
+  const bundle = getCachedScenarioBundle(scenarioId);
+  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
+  if (shouldDeferScenarioChunkRefreshFor({ reason, bundle })) {
     markPendingScenarioChunkRefresh(reason);
     return null;
   }
-  const scenarioId = normalizeScenarioId(state.activeScenarioId);
-  if (!scenarioId) return null;
   clearPendingScenarioChunkRefresh();
-  const bundle = getCachedScenarioBundle(scenarioId);
-  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
   await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
   const viewportBbox = typeof state.getViewportGeoBoundsFn === "function"
     ? state.getViewportGeoBoundsFn()
@@ -1816,6 +1893,8 @@ async function refreshActiveScenarioChunks({
   });
   const chunkState = ensureActiveScenarioChunkState();
   chunkState.scenarioId = scenarioId;
+  const loadState = ensureRuntimeChunkLoadState();
+  const focusCountry = resolveScenarioChunkFocusCountry(bundle, loadState);
   const selectionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const selection = selectScenarioChunks({
     scenarioId,
@@ -1823,7 +1902,7 @@ async function refreshActiveScenarioChunks({
     contextLodManifest: bundle.contextLodManifest,
     zoom: Number(state.zoomTransform?.k || 1),
     viewportBbox,
-    focusCountry: state.activeSovereignCode || getScenarioDefaultCountryCode(bundle.manifest, bundle.countriesPayload?.countries || {}),
+    focusCountry,
     renderBudgetHints: bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {},
     visibleLayers,
     loadedChunkIds: chunkState.loadedChunkIds,
@@ -1833,7 +1912,6 @@ async function refreshActiveScenarioChunks({
     scenarioId,
     reason: String(reason || "refresh"),
   });
-  const loadState = ensureRuntimeChunkLoadState();
   const previousSelection = loadState.lastSelection;
   const nextRequiredChunkIds = selection.requiredChunks.map((chunk) => chunk.id);
   const nextOptionalChunkIds = selection.optionalChunks.map((chunk) => chunk.id);
@@ -1851,6 +1929,27 @@ async function refreshActiveScenarioChunks({
     optionalChunkIds: nextOptionalChunkIds,
   };
   if (selectionUnchanged) {
+    if (String(reason || "").trim().toLowerCase() === "zoom-end" && Number(loadState.zoomEndChunkVisibleMetric?.startedAt || 0) > 0) {
+      const endedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      const durationMs = Math.max(0, endedAt - Number(loadState.zoomEndChunkVisibleMetric.startedAt || 0));
+      loadState.lastZoomEndToChunkVisibleMetric = {
+        durationMs,
+        recordedAt: Date.now(),
+        scenarioId,
+        zoom: Number(loadState.zoomEndChunkVisibleMetric.zoom || 0),
+        threshold: Number(loadState.zoomEndChunkVisibleMetric.threshold || 0),
+        focusCountry: String(loadState.zoomEndChunkVisibleMetric.focusCountry || ""),
+        requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+      };
+      recordScenarioChunkRuntimeMetric("zoomEndToChunkVisibleMs", durationMs, {
+        scenarioId,
+        zoom: Number(loadState.zoomEndChunkVisibleMetric.zoom || 0),
+        threshold: Number(loadState.zoomEndChunkVisibleMetric.threshold || 0),
+        focusCountry: String(loadState.zoomEndChunkVisibleMetric.focusCountry || ""),
+        requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+      });
+      loadState.zoomEndChunkVisibleMetric = null;
+    }
     clearPendingScenarioChunkRefresh();
     return selection;
   }
@@ -1939,7 +2038,7 @@ async function refreshActiveScenarioChunks({
     selectionVersion: nextSelectionVersion,
     politicalFeatureIds,
   };
-  if (shouldDeferScenarioChunkRefresh()) {
+  if (shouldDeferScenarioChunkRefreshFor({ reason, bundle })) {
     markPendingScenarioChunkRefresh(reason);
     return selection;
   }
@@ -1967,21 +2066,35 @@ function scheduleScenarioChunkRefresh({
     : (flushPending && Number.isFinite(Number(loadState.pendingDelayMs))
       ? Number(loadState.pendingDelayMs)
       : null);
+  const zoomEndPriorityEnabled = shouldZoomEndPromoteImmediately(bundle, nextReason);
+  if (zoomEndPriorityEnabled) {
+    const hints = normalizeScenarioRenderBudgetHints(
+      bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {}
+    );
+    loadState.zoomEndChunkVisibleMetric = {
+      startedAt: globalThis.performance?.now ? globalThis.performance.now() : Date.now(),
+      scenarioId,
+      zoom: Number(state.zoomTransform?.k || 1),
+      threshold: Number(hints.detail_zoom_threshold || 0),
+      focusCountry: resolveScenarioChunkFocusCountry(bundle, loadState),
+    };
+  }
   if (loadState.refreshTimerId) {
     globalThis.clearTimeout(loadState.refreshTimerId);
     loadState.refreshTimerId = null;
     loadState.refreshScheduled = false;
   }
-  if (shouldDeferScenarioChunkRefresh()) {
+  if (shouldDeferScenarioChunkRefreshFor({ reason: nextReason, bundle })) {
     markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
     return "deferred";
   }
   clearPendingScenarioChunkRefresh(loadState);
   const resolvedDelayMs = nextDelayMs != null
     ? nextDelayMs
+    : (zoomEndPriorityEnabled ? 0
     : (String(nextReason || "").includes("interacting")
       ? SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING
-      : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE);
+      : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE));
   if (flushPending && resolvedDelayMs <= 0) {
     return executeScenarioChunkRefreshNow({
       bundle,
@@ -1994,7 +2107,7 @@ function scheduleScenarioChunkRefresh({
   loadState.refreshTimerId = globalThis.setTimeout(() => {
     loadState.refreshTimerId = null;
     loadState.refreshScheduled = false;
-    if (shouldDeferScenarioChunkRefresh()) {
+    if (shouldDeferScenarioChunkRefreshFor({ reason: nextReason, bundle })) {
       markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
       return;
     }

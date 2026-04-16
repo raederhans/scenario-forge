@@ -64,6 +64,9 @@ function sortChunksForSelection(chunks, focusCountry = "") {
   return [...chunks].sort((left, right) => {
     const leftFocus = normalizedFocusCountry && left.countryCodes.includes(normalizedFocusCountry) ? 1 : 0;
     const rightFocus = normalizedFocusCountry && right.countryCodes.includes(normalizedFocusCountry) ? 1 : 0;
+    const leftFocusDetail = leftFocus && left.lod === "detail" ? 1 : 0;
+    const rightFocusDetail = rightFocus && right.lod === "detail" ? 1 : 0;
+    if (leftFocusDetail !== rightFocusDetail) return rightFocusDetail - leftFocusDetail;
     if (leftFocus !== rightFocus) return rightFocus - leftFocus;
     if (left.priority !== right.priority) return right.priority - left.priority;
     if (left.lod !== right.lod) {
@@ -241,6 +244,7 @@ export function selectScenarioChunks({
   loadedChunkIds = [],
 } = {}) {
   const hints = normalizeScenarioRenderBudgetHints(renderBudgetHints);
+  const normalizedFocusCountry = String(focusCountry || "").trim().toUpperCase();
   const required = [];
   const optional = [];
   const visibleLayerSet = new Set((Array.isArray(visibleLayers) ? visibleLayers : []).map((value) => String(value || "").trim().toLowerCase()));
@@ -256,7 +260,22 @@ export function selectScenarioChunks({
       zoom,
     }).filter((chunk) => chunk.globalCoverage || boundsIntersect(chunk.bounds, viewportBbox));
     const ordered = sortChunksForSelection(candidates, focusCountry);
-    required.push(...ordered.slice(0, requiredBudget));
+    const focusDetailChunks = normalizedFocusCountry
+      ? ordered.filter((chunk) => chunk.lod === "detail" && chunk.countryCodes.includes(normalizedFocusCountry))
+      : [];
+    const prioritizedRequired = [];
+    const seenRequired = new Set();
+    focusDetailChunks.forEach((chunk) => {
+      if (seenRequired.has(chunk.id)) return;
+      seenRequired.add(chunk.id);
+      prioritizedRequired.push(chunk);
+    });
+    ordered.forEach((chunk) => {
+      if (seenRequired.has(chunk.id)) return;
+      seenRequired.add(chunk.id);
+      prioritizedRequired.push(chunk);
+    });
+    required.push(...prioritizedRequired.slice(0, requiredBudget));
     if (ordered.length > requiredBudget && optionalBudget > 0) {
       optional.push(...ordered.slice(requiredBudget, requiredBudget + optionalBudget));
     }
