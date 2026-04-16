@@ -2018,6 +2018,9 @@ export const state = {
   width: 0,
   height: 0,
   dpr: globalThis.devicePixelRatio || 1,
+  dprStage: "idle",
+  dprInteractiveScale: 0.72,
+  dprLastStageSwitchAt: 0,
 
   // Resolved colors used by canvas render/legend.
   colors: {},
@@ -2557,6 +2560,7 @@ export const state = {
   zoomGestureEndedAt: 0,
   adaptiveSettleProfile: null,
   pendingExactPoliticalFastFrame: false,
+  debugCountryCoverage: null,
   isInteracting: false,
   renderPhase: "idle",
   phaseEnteredAt: 0,

@@ -150,6 +150,7 @@ const RELIEF_DAM_APPROACH_COLOR = "rgba(102, 86, 62, 0.8)";
 const TNO_COASTAL_ACCENT_COLOR = "rgba(214, 232, 244, 0.88)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
 const GIANT_FEATURE_ALLOWLIST = new Set(["RU", "CA", "CN", "US", "AQ", "ATA"]);
+const HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST = new Set(["US", "CN", "RU", "JP", "DE", "GB", "FR", "IN", "BR", "CA"]);
 const INTERACTIVE_AGGREGATE_TIER_FILTERS = {
   GB: new Set(["nuts1_basic"]),
   GR: new Set(["adm1_basic"]),
@@ -3731,9 +3732,18 @@ function getSphericalFeatureDiagnostics(feature, { featureId = null, allowComput
 
 function getMaxDprForProfile(renderProfile) {
   const profile = String(renderProfile || "auto").trim().toLowerCase();
-  if (profile === "full") return Math.max(1, Number(globalThis.devicePixelRatio) || 1);
-  if (profile === "balanced") return 1.5;
-  return 1.25;
+  const deviceDpr = Math.max(1, Number(globalThis.devicePixelRatio) || 1);
+  const baseMaxDpr = profile === "full"
+    ? deviceDpr
+    : profile === "balanced"
+      ? 1.5
+      : 1.25;
+  const stage = String(state.dprStage || "idle").toLowerCase();
+  if (stage === "interactive") {
+    const scale = Math.min(1, Math.max(0.5, Number(state.dprInteractiveScale) || 0.72));
+    return Math.max(1, baseMaxDpr * scale);
+  }
+  return baseMaxDpr;
 }
 
 function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
@@ -3904,9 +3914,18 @@ function composePoliticalFeatureCollections(primaryCollection, detailCollection 
     };
   }
   const detailCountries = new Set();
+  const detailFeatureIdsByCountry = new Map();
   normalizedDetailCollection.features.forEach((feature) => {
     const code = getFeatureCountryCodeNormalized(feature);
     if (code) detailCountries.add(code);
+    const featureId = getFeatureId(feature);
+    if (!code || !featureId) return;
+    let ids = detailFeatureIdsByCountry.get(code);
+    if (!ids) {
+      ids = new Set();
+      detailFeatureIdsByCountry.set(code, ids);
+    }
+    ids.add(featureId);
   });
 
   const seen = new Set();
@@ -3923,7 +3942,23 @@ function composePoliticalFeatureCollections(primaryCollection, detailCollection 
   normalizedDetailCollection.features.forEach(pushIfUnique);
   normalizedPrimaryCollection.features.forEach((feature) => {
     const code = getFeatureCountryCodeNormalized(feature);
-    if (code && detailCountries.has(code)) return;
+    if (code && detailCountries.has(code)) {
+      const featureId = getFeatureId(feature);
+      const detailFeatureIds = detailFeatureIdsByCountry.get(code);
+      const countryPriority = HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST.has(code);
+      if (countryPriority && featureId && !(detailFeatureIds?.has(featureId))) {
+        const promotedFeature = {
+          ...feature,
+          properties: {
+            ...(feature?.properties || {}),
+            __source: "primary",
+            __coveragePromoted: true,
+          },
+        };
+        pushIfUnique(promotedFeature);
+      }
+      return;
+    }
     pushIfUnique(feature);
   });
 
@@ -3943,19 +3978,62 @@ function collectCountryCoverageStats(features = []) {
   const primaryCountries = new Set();
   let detailFeatureCount = 0;
   let primaryFeatureCount = 0;
+  const countryCoverage = new Map();
 
   features.forEach((feature) => {
     const countryCode = getFeatureCountryCodeNormalized(feature);
     if (!countryCode) return;
     const source = String(feature?.properties?.__source || "primary");
+    let countryEntry = countryCoverage.get(countryCode);
+    if (!countryEntry) {
+      countryEntry = {
+        countryCode,
+        totalFeatures: 0,
+        detailFeatures: 0,
+        primaryFeatures: 0,
+        promotedPrimaryFeatures: 0,
+        detailOnly: false,
+        priorityCountry: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST.has(countryCode),
+      };
+      countryCoverage.set(countryCode, countryEntry);
+    }
+    countryEntry.totalFeatures += 1;
     if (source === "detail") {
       detailCountries.add(countryCode);
       detailFeatureCount += 1;
+      countryEntry.detailFeatures += 1;
     } else {
       primaryCountries.add(countryCode);
       primaryFeatureCount += 1;
+      countryEntry.primaryFeatures += 1;
+      if (feature?.properties?.__coveragePromoted) {
+        countryEntry.promotedPrimaryFeatures += 1;
+      }
     }
   });
+
+  const detailCountryList = [];
+  const primaryCountryList = [];
+  const priorityCountryGaps = [];
+  Array.from(countryCoverage.values())
+    .sort((a, b) => a.countryCode.localeCompare(b.countryCode))
+    .forEach((entry) => {
+      entry.detailOnly = entry.detailFeatures > 0 && entry.primaryFeatures === 0;
+      if (entry.detailFeatures > 0) {
+        detailCountryList.push(entry);
+      }
+      if (entry.primaryFeatures > 0) {
+        primaryCountryList.push(entry);
+      }
+      if (entry.priorityCountry && entry.primaryFeatures > 0) {
+        priorityCountryGaps.push({
+          countryCode: entry.countryCode,
+          primaryFeatures: entry.primaryFeatures,
+          promotedPrimaryFeatures: entry.promotedPrimaryFeatures,
+          detailFeatures: entry.detailFeatures,
+        });
+      }
+    });
 
   const totalCountries = new Set([...detailCountries, ...primaryCountries]).size;
   return {
@@ -3965,7 +4043,22 @@ function collectCountryCoverageStats(features = []) {
     totalFeatures: features.length,
     detailFeatures: detailFeatureCount,
     primaryFeatures: primaryFeatureCount,
+    detailCountryList,
+    primaryCountryList,
+    priorityCountryGaps,
   };
+}
+
+function updateDprStage(nextStage = "idle", { force = false } = {}) {
+  const normalizedStage = String(nextStage || "idle").toLowerCase() === "interactive"
+    ? "interactive"
+    : "idle";
+  if (!force && state.dprStage === normalizedStage) {
+    return false;
+  }
+  state.dprStage = normalizedStage;
+  state.dprLastStageSwitchAt = nowMs();
+  return true;
 }
 
 function buildInteractiveLandData(fullCollection) {
@@ -4061,6 +4154,9 @@ function rebuildPoliticalLandCollections() {
   const interactiveCollection = buildInteractiveLandData(fullCollection);
   state.landDataFull = fullCollection;
   state.landData = interactiveCollection;
+  state.debugCountryCoverage = collectCountryCoverageStats(
+    Array.isArray(fullCollection?.features) ? fullCollection.features : []
+  );
 
   const fullCount = Array.isArray(fullCollection?.features) ? fullCollection.features.length : 0;
   const interactiveCount = Array.isArray(interactiveCollection?.features) ? interactiveCollection.features.length : 0;
@@ -4117,6 +4213,15 @@ function setRenderPhase(phase) {
   if (phase === RENDER_PHASE_IDLE && state.pendingDayNightRefresh) {
     state.pendingDayNightRefresh = false;
     invalidateRenderPasses("dayNight", "day-night-clock-deferred");
+  }
+  const dprStageChanged = phase === RENDER_PHASE_INTERACTING
+    ? updateDprStage("interactive")
+    : updateDprStage("idle");
+  if (dprStageChanged) {
+    setCanvasSize({
+      reason: `phase-${phase}-dpr-stage`,
+      targetPassesOnDprChange: ["political", "contextBase", "borders"],
+    });
   }
 }
 
@@ -5476,9 +5581,15 @@ function ensureHybridLayers() {
     .lower();
 }
 
-function setCanvasSize() {
+function setCanvasSize({
+  reason = "resize",
+  targetPassesOnDprChange = null,
+} = {}) {
   if (!mapCanvas || !mapSvg) return;
 
+  const previousWidth = Number(state.width || 0);
+  const previousHeight = Number(state.height || 0);
+  const previousDpr = Number(state.dpr || 1);
   const deviceDpr = Math.max(Number(globalThis.devicePixelRatio || 1), 1);
   state.dpr = Math.min(deviceDpr, getMaxDprForProfile(state.renderProfile));
   const rect = mapContainer?.getBoundingClientRect?.();
@@ -5493,6 +5604,11 @@ function setCanvasSize() {
 
   const scaledW = Math.floor(state.width * state.dpr);
   const scaledH = Math.floor(state.height * state.dpr);
+  const sizeChanged = previousWidth !== state.width || previousHeight !== state.height;
+  const dprChanged = Math.abs(previousDpr - state.dpr) >= 0.01;
+  if (!sizeChanged && !dprChanged) {
+    return;
+  }
 
   mapCanvas.width = scaledW;
   mapCanvas.height = scaledH;
@@ -5507,7 +5623,15 @@ function setCanvasSize() {
   textureNoiseTileCache.clear();
   clearProjectedBoundsCache();
   state.hitCanvasDirty = true;
-  invalidateAllRenderPasses("resize");
+  if (sizeChanged) {
+    invalidateAllRenderPasses(reason || "resize");
+  } else {
+    const passes = Array.isArray(targetPassesOnDprChange) && targetPassesOnDprChange.length
+      ? targetPassesOnDprChange
+      : RENDER_PASS_NAMES;
+    invalidateRenderPasses(passes, reason || "dpr-change");
+    clearRenderPassReferenceTransforms(passes);
+  }
 
   const svg = globalThis.d3.select(mapSvg);
   svg.attr("width", state.width).attr("height", state.height);
@@ -11210,7 +11334,10 @@ function shouldForceExactContextBaseRefresh(reuseDecision = null) {
 }
 
 function getPhysicalExactRefreshPasses() {
-  return state.showPhysical ? ["physicalBase", "contextBase"] : ["contextBase"];
+  const passes = state.showPhysical
+    ? ["physicalBase", "political", "contextBase", "borders"]
+    : ["political", "contextBase", "borders"];
+  return passes;
 }
 
 function getUrbanFeatureOwnerId(feature) {
@@ -18275,6 +18402,11 @@ function scheduleExactAfterSettleRefresh(profile = state.adaptiveSettleProfile |
     const reuseDecision = getContextBaseReuseDecision();
     const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
     const startedAt = callbackStartedAt;
+    updateDprStage("idle", { force: true });
+    setCanvasSize({
+      reason: "exact-after-settle-dpr-restore",
+      targetPassesOnDprChange: ["political", "contextBase", "borders"],
+    });
     state.deferExactAfterSettle = false;
     cancelDeferredContextBaseEnhancement();
     if (forceExactContextBaseRefresh) {
@@ -20982,6 +21114,7 @@ function updatePerfOverlay() {
       return `${name}=${duration}ms${callCount > 1 ? `#${callCount}` : ""}`;
     })
     .join(", ");
+  const coverageDebug = state.debugCountryCoverage || {};
   overlay.textContent = [
     `phase=${frame.phase || state.renderPhase} total=${Number(frame.totalMs || 0).toFixed(1)}ms`,
     `action=${cache.lastAction || "-"} ${Number(cache.lastActionDurationMs || 0).toFixed(1)}ms`,
@@ -20990,6 +21123,7 @@ function updatePerfOverlay() {
     `contextBreakdown ${contextBreakdownEntries || "none"}`,
     `ops ${opEntries || "none"}`,
     `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
+    `coverage countries=${Number(coverageDebug.totalCountries || 0)} detail=${Number(coverageDebug.detailCountries || 0)} primary=${Number(coverageDebug.primaryCountries || 0)} priorityGap=${Array.isArray(coverageDebug.priorityCountryGaps) ? coverageDebug.priorityCountryGaps.length : 0}`,
     `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
     `invalidations ${invalidations}`,
     `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} labels=${cache.counters.labelPassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
@@ -24145,7 +24279,7 @@ function setMapData({
   const { fullCollection, interactiveCollection } = rebuildPoliticalLandCollections();
 
   if (state.topologyBundleMode === "composite" && Array.isArray(fullCollection?.features)) {
-    const coverage = collectCountryCoverageStats(fullCollection.features);
+    const coverage = state.debugCountryCoverage || collectCountryCoverageStats(fullCollection.features);
     const interactiveFeatureCount = Array.isArray(interactiveCollection?.features)
       ? interactiveCollection.features.length
       : 0;
@@ -24153,6 +24287,19 @@ function setMapData({
       `[map_renderer] Composite coverage: countries detail=${coverage.detailCountries}, primaryFallback=${coverage.primaryCountries}, total=${coverage.totalCountries}; features detail=${coverage.detailFeatures}, primary=${coverage.primaryFeatures}, total=${coverage.totalFeatures}.`
       + ` interactive=${interactiveFeatureCount}.`
     );
+    console.info("[map_renderer] Composite country coverage detail/primary", {
+      summary: {
+        totalCountries: coverage.totalCountries,
+        detailCountries: coverage.detailCountries,
+        primaryCountries: coverage.primaryCountries,
+        totalFeatures: coverage.totalFeatures,
+        detailFeatures: coverage.detailFeatures,
+        primaryFeatures: coverage.primaryFeatures,
+      },
+      priorityCountryGaps: coverage.priorityCountryGaps,
+      detailCountries: coverage.detailCountryList,
+      primaryCountries: coverage.primaryCountryList,
+    });
   }
 
   state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
