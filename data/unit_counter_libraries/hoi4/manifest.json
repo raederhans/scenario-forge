@@ -3,7 +3,7 @@
   "libraryId": "hoi4",
   "label": "Hearts of Iron IV",
   "sourceScope": "vanilla",
-  "sourceRoot": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV",
+  "sourceRoot": "",
   "entryCount": 136,
   "entries": [
     {
@@ -14,7 +14,7 @@
       "spriteAliases": [
         "GFX_unit_category_tanks"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_armor.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_all_armor.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -38,7 +38,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_all_infantry",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_infantry.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_all_infantry.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -61,7 +61,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_recon",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_recon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_all_recon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -88,7 +88,7 @@
       "spriteAliases": [
         "GFX_unit_category_army"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_army.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_army.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -115,7 +115,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_artillery",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_artillery.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_artillery.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -139,7 +139,7 @@
       "kind": "division_large",
       "spriteName": "GFX_category_bomber",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_bomber.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_bomber.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -163,7 +163,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_cas",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_cas.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_cas.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -187,7 +187,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_fighter",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_fighter.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_fighter.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -211,7 +211,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_heavy_fighter",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_heavy_fighter.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_heavy_fighter.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -236,7 +236,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_light_infantry",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_light_infantry.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_light_infantry.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -259,7 +259,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_line_artillery",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_line_artillery.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_line_artillery.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -284,7 +284,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_nav_bomber",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_nav_bomber.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_nav_bomber.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -310,7 +310,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_strat_bomber",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_strat_bomber.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_strat_bomber.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -336,7 +336,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_support_battalions",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_support_battalions.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_support_battalions.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -359,7 +359,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_support_artillery",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -383,7 +383,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_category_tac_bomber",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_tac_bomber.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/category_tac_bomber.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -409,7 +409,7 @@
       "kind": "division_small",
       "spriteName": "GFX_unit_helicopter_brigade_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_helicopter_brigade_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_helicopter_brigade_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -431,7 +431,7 @@
       "kind": "division_small",
       "spriteName": "GFX_unit_no_intel_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_no_intel_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_no_intel_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -453,7 +453,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_pioneer_support_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\pioneers_support.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/pioneers_support.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -478,7 +478,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_battle_cruiser_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battlecruiser.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battlecruiser.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -504,7 +504,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_battle_cruiser_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battlecruiser_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battlecruiser_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -530,7 +530,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_battleship_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battleship.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battleship.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -554,7 +554,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_battleship_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battleship_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battleship_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -581,7 +581,7 @@
       "spriteAliases": [
         "GFX_unit_escort_carrier_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_carrier.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_carrier.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -608,7 +608,7 @@
       "spriteAliases": [
         "GFX_unit_escort_carrier_icon_medium_black"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_carrier_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_carrier_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -633,7 +633,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_destroyer_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_destroyer.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_destroyer.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -657,7 +657,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_destroyer_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_destroyer_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_destroyer_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -681,7 +681,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_support_ship_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_general_support_ship.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_general_support_ship.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -706,7 +706,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_support_ship_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_general_support_ship_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_general_support_ship_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -731,7 +731,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_heavy_cruiser_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_heavy_cruiser.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_heavy_cruiser.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -756,7 +756,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_heavy_cruiser_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_heavy_cruiser_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_heavy_cruiser_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -781,7 +781,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_light_cruiser_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_light_cruiser.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_light_cruiser.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -806,7 +806,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_light_cruiser_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_light_cruiser_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_light_cruiser_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -831,7 +831,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_repair_ship_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_repair_support_ship.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_repair_support_ship.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -856,7 +856,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_repair_ship_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_repair_support_ship_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_repair_support_ship_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -881,7 +881,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_sh_battleship_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_sh_battleship.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_sh_battleship.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -904,7 +904,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_sh_battleship_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_sh_battleship_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_sh_battleship_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -930,7 +930,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_submarine_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_submarine.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_submarine.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -954,7 +954,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_submarine_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_submarine_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_submarine_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -978,7 +978,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_transport_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_transport.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_transport.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -1002,7 +1002,7 @@
       "kind": "ship_small",
       "spriteName": "GFX_unit_convoy_icon_medium_black",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_transport_inverted.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_transport_inverted.dds",
       "sourceScope": "vanilla",
       "domain": "naval",
@@ -1027,7 +1027,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_airborne_light_armor_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_airborne_armored_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_airborne_armored_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1055,7 +1055,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_anti_air_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_anti_air_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_anti_air_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1080,7 +1080,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_armored_car_recon_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_armored_car_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_armored_car_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1106,7 +1106,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_light_tank_recon_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_armored_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_armored_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1133,7 +1133,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_artillery_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1158,7 +1158,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_anti_tank_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1184,7 +1184,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_field_hospital_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_field_hospital_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_field_hospital_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1207,7 +1207,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_logistics_company_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_logistics_company_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_logistics_company_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1234,7 +1234,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_maintenance_company_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_maintenance_company_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_maintenance_company_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1257,7 +1257,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_military_police_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_military_police_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_military_police_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1280,7 +1280,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_mot_recon_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_motorized_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_motorized_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1306,7 +1306,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_rangers_support_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_rangers_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_rangers_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1330,7 +1330,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_rocket_artillery_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_rocket_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_rocket_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1356,7 +1356,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_signal_company_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_signal_company_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_signal_company_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1381,7 +1381,7 @@
       "spriteAliases": [
         "GFX_unit_amphibious_mechanized_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_amphibious_mechanized_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_amphibious_mechanized_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1408,7 +1408,7 @@
         "GFX_unit_amphibious_armor_icon_medium_white",
         "GFX_unit_category_amphibious_tanks"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_amphibious_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_amphibious_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1439,7 +1439,7 @@
         "GFX_unit_anti_air_icon_medium_white",
         "GFX_unit_category_anti_air"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_anti_air_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_anti_air_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1469,7 +1469,7 @@
       "spriteAliases": [
         "GFX_unit_armored_car_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_car_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_car_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1495,7 +1495,7 @@
       "spriteAliases": [
         "GFX_unit_armored_engineer_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_engineer_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_engineer_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1521,7 +1521,7 @@
       "spriteAliases": [
         "GFX_unit_armored_maintenance_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_maintenance_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_maintenance_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1545,7 +1545,7 @@
       "spriteAliases": [
         "GFX_unit_armored_signal_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_signal_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_signal_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1572,7 +1572,7 @@
         "GFX_unit_artillery_brigade_icon_medium_white",
         "GFX_unit_artillery_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1604,7 +1604,7 @@
       "spriteAliases": [
         "GFX_unit_assault_engineer_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_assault_engineer_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_assault_engineer_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1633,7 +1633,7 @@
         "GFX_unit_at_icon_medium_white",
         "GFX_unit_category_anti_tank"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1664,7 +1664,7 @@
       "spriteAliases": [
         "GFX_unit_bicycle_battalion_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_bicycle_infantry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_bicycle_infantry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1691,7 +1691,7 @@
       "spriteAliases": [
         "GFX_unit_unit_blackshirt_assault_battalion_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_blackshirt_assault_battalion_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_blackshirt_assault_battalion_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1718,7 +1718,7 @@
       "spriteAliases": [
         "GFX_unit_camelry_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_camelry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_camelry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1744,7 +1744,7 @@
         "GFX_unit_cavalry_icon_medium",
         "GFX_unit_cavalry_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_cavalry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_cavalry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1773,7 +1773,7 @@
       "spriteAliases": [
         "GFX_unit_elephantry_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_elephantry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_elephantry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1798,7 +1798,7 @@
       "spriteAliases": [
         "GFX_unit_engineer_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_engineer_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_engineer_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1826,7 +1826,7 @@
       "spriteAliases": [
         "GFX_unit_fake_intel_unit_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_fake_intel_unit_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_fake_intel_unit_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1848,7 +1848,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_guided_missile_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_guided_missile_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_guided_missile_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1872,7 +1872,7 @@
       "spriteAliases": [
         "GFX_unit_amphibious_heavy_armor_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_amphibious_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_amphibious_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1898,7 +1898,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_heavy_sp_anti_air_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_antiair_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_antiair_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1927,7 +1927,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_heavy_sp_artillery_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1954,7 +1954,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_heavy_tank_destroyer_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -1987,7 +1987,7 @@
         "GFX_unit_heavy_sp_artillery_brigade_icon_medium_white",
         "GFX_unit_heavy_tank_destroyer_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_armor_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_armor_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2022,7 +2022,7 @@
         "GFX_unit_heavy_flamethrower_tank_icon_medium",
         "GFX_unit_heavy_flamethrower_tank_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_flamethrower_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_flamethrower_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2050,7 +2050,7 @@
       "spriteAliases": [
         "GFX_unit_helicopter_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_helicopter_brigade_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_helicopter_brigade_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2077,7 +2077,7 @@
       "spriteAliases": [
         "GFX_unit_helicopter_field_hospital_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_field_hospital_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_field_hospital_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2102,7 +2102,7 @@
       "spriteAliases": [
         "GFX_unit_helicopter_recon_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2128,7 +2128,7 @@
       "spriteAliases": [
         "GFX_unit_helicopter_transport_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_transport_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_transport_icon.dds",
       "sourceScope": "vanilla",
       "domain": "air",
@@ -2156,7 +2156,7 @@
         "GFX_unit_infantry_icon_medium",
         "GFX_unit_infantry_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_infantry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_infantry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2185,7 +2185,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_integralist_militia_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_integralist_militia_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_integralist_militia_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2211,7 +2211,7 @@
       "spriteAliases": [
         "GFX_unit_irregular_infantry_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_irregular_infantry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_irregular_infantry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2237,7 +2237,7 @@
       "spriteAliases": [
         "GFX_unit_jungle_pioneers_support_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_jungle_pioneers_support_icon_white.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_jungle_pioneers_support_icon_white.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2264,7 +2264,7 @@
       "spriteAliases": [
         "GFX_unit_land_cruiser_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_land_cruiser_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_land_cruiser_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2290,7 +2290,7 @@
       "spriteAliases": [
         "GFX_unit_amphibious_light_armor_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_amphibious_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_amphibious_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2320,7 +2320,7 @@
         "GFX_unit_light_flamethrower_tank_icon_medium",
         "GFX_unit_light_flamethrower_tank_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_flamethrower_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_flamethrower_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2348,7 +2348,7 @@
       "spriteAliases": [
         "GFX_unit_light_sp_anti_air_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_antiair_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_antiair_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2382,7 +2382,7 @@
       "spriteAliases": [
         "GFX_unit_light_sp_artillery_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2414,7 +2414,7 @@
       "spriteAliases": [
         "GFX_unit_light_tank_destroyer_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2449,7 +2449,7 @@
         "GFX_unit_light_tank_destroyer_brigade_icon_medium_white",
         "GFX_unit_light_tank_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2482,7 +2482,7 @@
       "spriteAliases": [
         "GFX_unit_long_range_patrol_support_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_long_range_patrol_support_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_long_range_patrol_support_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2508,7 +2508,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_marine_commando_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_marine_commando_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_marine_commando_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2537,7 +2537,7 @@
         "GFX_unit_marine_icon_medium",
         "GFX_unit_marine_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_marine_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_marine_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2570,7 +2570,7 @@
       "spriteAliases": [
         "GFX_unit_mechanized_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mechanized_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mechanized_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2598,7 +2598,7 @@
       "spriteAliases": [
         "GFX_unit_amphibious_medium_armor_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_amphibious_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_amphibious_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2627,7 +2627,7 @@
         "GFX_unit_medium_flamethrower_tank_icon_medium",
         "GFX_unit_medium_flamethrower_tank_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_flamethrower_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_flamethrower_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2652,7 +2652,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_medium_sp_anti_air_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_antiair_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_antiair_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2682,7 +2682,7 @@
       "spriteAliases": [
         "GFX_unit_medium_sp_artillery_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2712,7 +2712,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_medium_tank_destroyer_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2745,7 +2745,7 @@
         "GFX_unit_medium_tank_destroyer_brigade_icon_medium_white",
         "GFX_unit_medium_tank_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_tank_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_tank_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2779,7 +2779,7 @@
       "spriteAliases": [
         "GFX_unit_militia_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_militia_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_militia_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2805,7 +2805,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_modern_sp_anti_air_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_antiair_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_antiair_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2834,7 +2834,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_modern_sp_artillery_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2861,7 +2861,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_modern_tank_destroyer_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2894,7 +2894,7 @@
         "GFX_unit_modern_sp_artillery_brigade_icon_medium_white",
         "GFX_unit_modern_tank_destroyer_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_modern_armor_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_modern_armor_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2927,7 +2927,7 @@
       "spriteAliases": [
         "GFX_unit_mot_anti_air_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_anti_air_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_anti_air_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2958,7 +2958,7 @@
         "GFX_unit_mot_artillery_brigade_icon_medium",
         "GFX_unit_mot_artillery_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -2995,7 +2995,7 @@
         "GFX_unit_mot_anti_tank_brigade_icon_medium",
         "GFX_unit_mot_anti_tank_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3025,7 +3025,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_mot_rocket_artillery_brigade_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_mot_rocket_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_mot_rocket_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3051,7 +3051,7 @@
       "kind": "division_small",
       "spriteName": "GFX_unit_mot_rocket_artillery_brigade_icon_medium_white",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_rocket_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_rocket_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3076,7 +3076,7 @@
       "kind": "division_large",
       "spriteName": "GFX_unit_mothership_icon_medium",
       "spriteAliases": [],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_mothership_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_mothership_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3104,7 +3104,7 @@
         "GFX_unit_motorized_icon_medium",
         "GFX_unit_motorized_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3137,7 +3137,7 @@
       "spriteAliases": [
         "GFX_unit_motorized_military_police_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_military_police_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_military_police_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3164,7 +3164,7 @@
       "spriteAliases": [
         "GFX_unit_motorized_rocket_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_rocket_brigade_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_rocket_brigade_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3192,7 +3192,7 @@
         "GFX_unit_mountaineers_icon_medium",
         "GFX_unit_mountaineers_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mountain_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mountain_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3222,7 +3222,7 @@
       "spriteAliases": [
         "GFX_unit_mountaineers_ski_icon_medium_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mountain_ski_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mountain_ski_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3250,7 +3250,7 @@
         "GFX_unit_paratrooper_icon_medium",
         "GFX_unit_paratrooper_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_paratroop_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_paratroop_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3281,7 +3281,7 @@
       "spriteAliases": [
         "GFX_unit_penal_battalion_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_penal_infantry_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_penal_infantry_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3308,7 +3308,7 @@
       "spriteAliases": [
         "GFX_unit_railway_gun_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_railway_gun_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_railway_gun_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3333,7 +3333,7 @@
         "GFX_unit_ranger_battalion_icon_medium",
         "GFX_unit_ranger_battalion_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_ranger_battalion_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_ranger_battalion_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3361,7 +3361,7 @@
       "spriteAliases": [
         "GFX_unit_recon_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_recon_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_recon_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3389,7 +3389,7 @@
       "spriteAliases": [
         "GFX_unit_rocket_artillery_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_rocket_art_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_rocket_art_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3418,7 +3418,7 @@
       "spriteAliases": [
         "GFX_unit_rocket_artillery_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_rocket_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_rocket_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3443,7 +3443,7 @@
       "spriteAliases": [
         "GFX_unit_self_propelled_super_heavy_artillery_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_self_propelled_super_heavy_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_self_propelled_super_heavy_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3472,7 +3472,7 @@
       "spriteAliases": [
         "GFX_unit_sturmtruppe_battalion_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_sturmtruppe_battalion_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_sturmtruppe_battalion_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3499,7 +3499,7 @@
         "GFX_unit_super_heavy_armor_antiair_icon_medium_white",
         "GFX_unit_super_heavy_sp_anti_air_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_antiair_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_antiair_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3532,7 +3532,7 @@
         "GFX_unit_super_heavy_armor_artillery_icon_medium_white",
         "GFX_unit_super_heavy_sp_artillery_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3563,7 +3563,7 @@
         "GFX_unit_super_heavy_armor_at_icon_medium_white",
         "GFX_unit_super_heavy_tank_destroyer_brigade_icon_medium"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_at_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_at_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3597,7 +3597,7 @@
         "GFX_unit_super_heavy_sp_artillery_brigade_icon_medium_white",
         "GFX_unit_super_heavy_tank_destroyer_brigade_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3631,7 +3631,7 @@
       "spriteAliases": [
         "GFX_unit_super_heavy_artillery_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_artillery_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_artillery_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3658,7 +3658,7 @@
       "spriteAliases": [
         "GFX_unit_super_heavy_railway_gun_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_railway_gun_unit_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_railway_gun_unit_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
@@ -3684,7 +3684,7 @@
       "spriteAliases": [
         "GFX_unit_winter_logistics_support_icon_medium_white"
       ],
-      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_winter_logistics_support_icon.dds",
+      "sourceGamePath": "",
       "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_winter_logistics_support_icon.dds",
       "sourceScope": "vanilla",
       "domain": "ground",
