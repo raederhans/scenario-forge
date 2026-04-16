@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import copy
 from contextlib import contextmanager
-import gzip
 import http.server
 import json
 import math
@@ -2500,10 +2499,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not target_path:
             return False
         gzip_path = target_path.with_name(f"{target_path.name}.gz")
-        if gzip_path.is_file():
-            compressed_body = gzip_path.read_bytes()
-        else:
-            compressed_body = gzip.compress(target_path.read_bytes(), compresslevel=6)
+        if not gzip_path.is_file():
+            return False
+        compressed_body = gzip_path.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", self.guess_type(str(target_path)))
         self.send_header("Content-Encoding", "gzip")

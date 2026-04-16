@@ -1423,11 +1423,13 @@ class DevServerTest(unittest.TestCase):
         self.assertEqual(exc_info.exception.code, "body_too_large")
         self.assertEqual(exc_info.exception.status, 413)
 
-    def test_maybe_send_gzip_static_compresses_static_json_when_client_accepts_gzip(self) -> None:
+    def test_maybe_send_gzip_static_serves_precompressed_json_when_available(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             target_path = Path(tmp_dir) / "sample.json"
             target_payload = {"hello": "world"}
             _write_json(target_path, target_payload)
+            compressed_body = gzip.compress(target_path.read_bytes(), compresslevel=6)
+            target_path.with_name(f"{target_path.name}.gz").write_bytes(compressed_body)
             handler, events = self._build_handler_for_static_response(target_path=target_path)
 
             handled = dev_server.Handler._maybe_send_gzip_static(handler, head_only=False)
@@ -1441,6 +1443,18 @@ class DevServerTest(unittest.TestCase):
                 json.loads(gzip.decompress(compressed_body).decode("utf-8")),
                 target_payload,
             )
+
+    def test_maybe_send_gzip_static_skips_when_precompressed_json_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target_path = Path(tmp_dir) / "sample.json"
+            _write_json(target_path, {"hello": "world"})
+            handler, events = self._build_handler_for_static_response(target_path=target_path)
+
+            handled = dev_server.Handler._maybe_send_gzip_static(handler, head_only=False)
+
+            self.assertFalse(handled)
+            self.assertEqual(events, [])
+            self.assertEqual(handler.wfile.getvalue(), b"")
 
     def test_maybe_send_gzip_static_skips_static_json_when_client_does_not_accept_gzip(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
