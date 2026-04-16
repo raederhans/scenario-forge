@@ -206,6 +206,14 @@ function normalizeUnitCounterNationSource(value) {
   return ["display", "controller", "owner", "active", "manual"].includes(source) ? source : "display";
 }
 
+const UNIT_COUNTER_MILSTD_SIDC_PATTERN = /^[A-Z0-9*-]{10,40}$/;
+
+function normalizeImportedUnitCounterSidc(value, renderer = "game") {
+  const token = String(value || "").trim().toUpperCase();
+  if (renderer !== "milstd") return token;
+  return UNIT_COUNTER_MILSTD_SIDC_PATTERN.test(token) ? token : "";
+}
+
 function normalizeUnitCounters(rawCounters) {
   if (!Array.isArray(rawCounters)) return [];
   return rawCounters
@@ -217,7 +225,7 @@ function normalizeUnitCounters(rawCounters) {
       if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
       const renderer = String(raw.renderer || "game").trim().toLowerCase() === "milstd" ? "milstd" : "game";
       const size = String(raw.size || "medium").trim().toLowerCase();
-      const sidc = String(raw.sidc || raw.symbolCode || raw.templateId || "").trim().toUpperCase();
+      const sidc = normalizeImportedUnitCounterSidc(raw.sidc || raw.symbolCode || raw.templateId || "", renderer);
       const presetId = String(raw.presetId || raw.templateId || "").trim().toLowerCase();
       const nationTag = String(raw.nationTag || raw.countryTag || raw.ownerTag || "").trim().toUpperCase();
       const layoutAnchorSource = raw.layoutAnchor && typeof raw.layoutAnchor === "object" ? raw.layoutAnchor : {};
