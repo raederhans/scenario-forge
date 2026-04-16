@@ -1134,9 +1134,8 @@ function shouldDeferScenarioChunkRefreshFor({
   reason = "",
   bundle = null,
 } = {}) {
-  if (shouldZoomEndPromoteImmediately(bundle, reason)) {
-    return false;
-  }
+  void bundle;
+  void reason;
   return !!(
     state.bootBlocking
     || state.scenarioApplyInFlight
