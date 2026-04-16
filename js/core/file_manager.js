@@ -207,10 +207,18 @@ function normalizeUnitCounterNationSource(value) {
 }
 
 const UNIT_COUNTER_MILSTD_SIDC_PATTERN = /^[A-Z0-9*-]{10,40}$/;
+const UNIT_COUNTER_MILSTD_SIDC_ALIASES = new Set([
+  "INF",
+  "ARMORED",
+  "ARM",
+  "HQ",
+  "ART",
+]);
 
 function normalizeImportedUnitCounterSidc(value, renderer = "game") {
   const token = String(value || "").trim().toUpperCase();
   if (renderer !== "milstd") return token;
+  if (UNIT_COUNTER_MILSTD_SIDC_ALIASES.has(token)) return token;
   return UNIT_COUNTER_MILSTD_SIDC_PATTERN.test(token) ? token : "";
 }
 
