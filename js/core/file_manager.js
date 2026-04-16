@@ -152,7 +152,11 @@ function normalizeProjectCoordinatePair(value) {
 function normalizeManualSpecialZoneRing(rawRing, coordinateBudget) {
   if (!Array.isArray(rawRing) || coordinateBudget.remaining < 4) return null;
   const normalized = [];
-  for (let i = 0; i < rawRing.length; i += 1) {
+  const maxRingVerticesToScan = Math.min(
+    rawRing.length,
+    MAX_MANUAL_SPECIAL_ZONE_COORDINATES_PER_FEATURE,
+  );
+  for (let i = 0; i < maxRingVerticesToScan; i += 1) {
     if (coordinateBudget.remaining <= 0) break;
     const coord = normalizeProjectCoordinatePair(rawRing[i]);
     if (!coord) continue;
