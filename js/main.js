@@ -1639,6 +1639,34 @@ function hasDetailTopologyLoaded() {
   return !!state.topologyDetail?.objects?.political;
 }
 
+function getViewportFocusCountryCode() {
+  return String(
+    state.activeSovereignCode
+    || state.selectedInspectorCountryCode
+    || ""
+  ).trim().toUpperCase();
+}
+
+function prioritizeViewportFocusCountry({
+  reason = "detail-promotion",
+  flushPending = false,
+} = {}) {
+  const focusCountry = getViewportFocusCountryCode();
+  if (!focusCountry) {
+    return;
+  }
+  if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
+    state.runtimeChunkLoadState.focusCountryOverride = focusCountry;
+  }
+  if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+    state.scheduleScenarioChunkRefreshFn({
+      reason,
+      delayMs: 0,
+      flushPending,
+    });
+  }
+}
+
 function syncScenarioReadyUiAfterDetailPromotion() {
   refreshScenarioDataHealth({
     showWarningToast: false,
@@ -1654,6 +1682,10 @@ async function ensureDetailTopologyReady({
   requireIdle = false,
   applyMapData = true,
 } = {}) {
+  prioritizeViewportFocusCountry({
+    reason: "detail-promotion-focus",
+    flushPending: true,
+  });
   if (hasDetailTopologyLoaded()) {
     if (state.topologyBundleMode !== "composite") {
       state.topologyBundleMode = "composite";
@@ -1953,6 +1985,10 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
       scheduleDeferredDetailPromotion(renderDispatcher);
       return;
     }
+    prioritizeViewportFocusCountry({
+      reason: "detail-promotion-idle-focus",
+      flushPending: true,
+    });
     const promoted = await ensureDetailTopologyReady({
       renderDispatcher,
       requireIdle: true,
