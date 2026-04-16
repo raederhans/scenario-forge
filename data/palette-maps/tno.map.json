@@ -222,8 +222,7 @@
     "FFR": {
       "iso2": "FR",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "FIN": {
       "iso2": "FI",
@@ -233,8 +232,7 @@
     "FRI": {
       "iso2": "IN",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "GAB": {
       "iso2": "GA",
@@ -390,8 +388,7 @@
     "KOR": {
       "iso2": "KR",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "KRS": {
       "iso2": "RU",
@@ -665,8 +662,7 @@
     "SER": {
       "iso2": "RS",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "SHX": {
       "iso2": "CN",
@@ -698,8 +694,7 @@
     "SVR": {
       "iso2": "RU",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "SWE": {
       "iso2": "SE",
@@ -798,8 +793,7 @@
     "VIN": {
       "iso2": "VN",
       "match_kind": "manual_exact",
-      "decision_source": "manual_verified",
-      "expose_as_runtime_default": false
+      "decision_source": "manual_verified"
     },
     "VOL": {
       "iso2": "RU",

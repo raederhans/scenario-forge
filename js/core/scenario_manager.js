@@ -98,6 +98,10 @@ import {
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
 import {
+  buildRuntimeDefaultColorsByIso2,
+  buildScenarioRuntimeDefaultTagColors,
+} from "./palette_runtime_bridge.js";
+import {
   getRuntimeGeometryFeatureId,
   getScenarioRuntimeGeometryCountryCode,
   hasExplicitScenarioAssignment,
@@ -690,16 +694,19 @@ function getMissingScenarioNameTags(countryMap = {}, scenarioNameMap = {}) {
   return missing;
 }
 
-function getScenarioFixedOwnerColors(countryMap = {}) {
-  const next = {};
-  Object.entries(countryMap || {}).forEach(([tag, entry]) => {
-    const normalizedTag = String(tag || "").trim().toUpperCase();
-    const color = String(entry?.color_hex || entry?.colorHex || "").trim().toLowerCase();
-    if (normalizedTag && /^#[0-9a-f]{6}$/.test(color)) {
-      next[normalizedTag] = color;
-    }
-  });
-  return next;
+function getScenarioFixedOwnerColors(
+  countryMap = {},
+  {
+    palettePack = null,
+    paletteMap = null,
+    baseColorByTag = {},
+  } = {}
+) {
+  return buildScenarioRuntimeDefaultTagColors(countryMap, {
+    palettePack,
+    paletteMap,
+    fallbackColorByTag: baseColorByTag,
+  }).byTag;
 }
 
 function mergeReleasableCatalogs(baseCatalog, overlayCatalog) {
@@ -1180,7 +1187,13 @@ function buildScenarioCoarseColorMap({
   startupApplySeed,
   countryMap,
   scenarioColorMap,
+  palettePack = null,
+  paletteMap = null,
 }) {
+  const bridgedColorsByIso2 = buildRuntimeDefaultColorsByIso2(palettePack, paletteMap, {
+    fallbackColorByTag: scenarioColorMap,
+  });
+
   if (startupApplySeed?.coarse_color_map && typeof startupApplySeed.coarse_color_map === "object") {
     const sanitized = {};
     Object.entries(startupApplySeed.coarse_color_map).forEach(([rawIso2, rawColor]) => {
@@ -1190,7 +1203,10 @@ function buildScenarioCoarseColorMap({
         sanitized[iso2] = color;
       }
     });
-    return sanitized;
+    return {
+      ...sanitized,
+      ...bridgedColorsByIso2,
+    };
   }
   const coarseCandidates = {};
   Object.entries(countryMap || {}).forEach(([rawTag, rawEntry]) => {
@@ -1219,7 +1235,10 @@ function buildScenarioCoarseColorMap({
       coarseColorMap[iso2] = entry.color;
     }
   });
-  return coarseColorMap;
+  return {
+    ...coarseColorMap,
+    ...bridgedColorsByIso2,
+  };
 }
 
 async function prepareScenarioApplyState(
@@ -1353,13 +1372,23 @@ async function prepareScenarioApplyState(
       `Scenario "${scenarioId}" is missing display names for active tags: ${missingScenarioNameTags.slice(0, 12).join(", ")}`
     );
   }
-  const scenarioColorMap = startupApplySeed?.scenario_color_map && typeof startupApplySeed.scenario_color_map === "object"
+  const seedScenarioColorMap = startupApplySeed?.scenario_color_map && typeof startupApplySeed.scenario_color_map === "object"
     ? { ...startupApplySeed.scenario_color_map }
-    : getScenarioFixedOwnerColors(countryMap);
+    : {};
+  const scenarioColorMap = {
+    ...seedScenarioColorMap,
+    ...getScenarioFixedOwnerColors(countryMap, {
+      palettePack: state.activePalettePack,
+      paletteMap: state.activePaletteMap,
+      baseColorByTag: seedScenarioColorMap,
+    }),
+  };
   const coarseColorMap = buildScenarioCoarseColorMap({
     startupApplySeed,
     countryMap,
     scenarioColorMap,
+    palettePack: state.activePalettePack,
+    paletteMap: state.activePaletteMap,
   });
   const scenarioOwnerBackfill = startupApplySeed?.resolved_owners && typeof startupApplySeed.resolved_owners === "object"
     ? {}

@@ -302,6 +302,31 @@ def normalize_non_default_runtime_tags(raw_values: list | None) -> set[str]:
     return normalized
 
 
+def ensure_exposed_runtime_default_bridges(mapped: dict[str, dict]) -> None:
+    grouped_tags: dict[str, list[str]] = defaultdict(list)
+    exposed_by_iso2: set[str] = set()
+    for tag, payload in mapped.items():
+        if not isinstance(payload, dict):
+            continue
+        iso2 = str(payload.get("iso2") or "").strip().upper()
+        if not iso2:
+            continue
+        grouped_tags[iso2].append(str(tag).strip().upper())
+        if payload.get("expose_as_runtime_default", True) is not False:
+            exposed_by_iso2.add(iso2)
+
+    missing_iso2 = sorted(iso2 for iso2 in grouped_tags if iso2 not in exposed_by_iso2)
+    if missing_iso2:
+        details = ", ".join(
+            f"{iso2}=>{'/'.join(sorted(grouped_tags.get(iso2, [])))}"
+            for iso2 in missing_iso2
+        )
+        raise SystemExit(
+            "palette map is missing an exposed runtime default bridge for: "
+            + details
+        )
+
+
 def normalize_deny_tags(raw_deny_tags: dict | None) -> dict[str, dict[str, str]]:
     deny_tags: dict[str, dict[str, str]] = {}
     for raw_tag, raw_value in (raw_deny_tags or {}).items():
@@ -619,6 +644,7 @@ def resolve_mapping_state(
                 audit_entry["suggested_iso2"] = unmapped_payload["suggested_iso2"]
             audit_entries[tag] = audit_entry
 
+    ensure_exposed_runtime_default_bridges(mapped)
     return mapped, unmapped, audit_entries
 
 

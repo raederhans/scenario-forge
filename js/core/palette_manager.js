@@ -1,5 +1,9 @@
 import { state, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+import {
+  buildRuntimeDefaultColorsByIso2,
+  getRuntimeBridgeMappedIso2,
+} from "./palette_runtime_bridge.js";
 
 function normalizeCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -28,18 +32,7 @@ function replaceObjectContents(target, nextValues) {
 }
 
 function getMappedIso2(mappedEntry) {
-  if (typeof mappedEntry === "string") {
-    return normalizeCountryCode(mappedEntry);
-  }
-  if (mappedEntry && typeof mappedEntry === "object") {
-    return normalizeCountryCode(mappedEntry.iso2);
-  }
-  return "";
-}
-
-function shouldExposeAsRuntimeDefault(mappedEntry) {
-  if (!mappedEntry || typeof mappedEntry !== "object") return true;
-  return mappedEntry.expose_as_runtime_default !== false;
+  return normalizeCountryCode(getRuntimeBridgeMappedIso2(mappedEntry));
 }
 
 function getUnmappedReason(unmappedEntry) {
@@ -99,17 +92,7 @@ function getPaletteFileLabel(entry, tag) {
 }
 
 function buildFixedPaletteColorsByIso2(palettePack, paletteMap) {
-  const mapped = paletteMap?.mapped && typeof paletteMap.mapped === "object" ? paletteMap.mapped : {};
-  const entries = palettePack?.entries && typeof palettePack.entries === "object" ? palettePack.entries : {};
-  const fixed = {};
-  Object.entries(mapped).forEach(([tag, mappedEntry]) => {
-    if (!shouldExposeAsRuntimeDefault(mappedEntry)) return;
-    const iso2 = getMappedIso2(mappedEntry);
-    const hex = normalizeHexColor(entries?.[tag]?.map_hex || entries?.[tag]?.country_file_hex || entries?.[tag]?.ui_hex);
-    if (!iso2 || !hex) return;
-    fixed[iso2] = hex;
-  });
-  return fixed;
+  return buildRuntimeDefaultColorsByIso2(palettePack, paletteMap);
 }
 
 function resolveDefaultCountryPalette() {

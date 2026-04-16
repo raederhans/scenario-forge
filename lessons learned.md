@@ -761,3 +761,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 72. 最后专题项如果依赖非 runtime 锚点，优先保留专题状态，不要为了清零 unmapped 强行并到大国锚点
 - 这次 `SIK / TIB / XIK` 暴露的是同一类问题：它们在世界观语义上更像新疆 / 西藏 / 西康专题锚点，当前 runtime-country 体系还没有承接这些 code。
 - 更稳的做法是先只收 `PRC / SIC` 这种已经能安全挂到 `CN` 的 overlay，剩余专题项维持 `unmapped`，等自定义 anchor 机制准备好再推进。
+
+### 73. runtime default bridge 一旦引入 `expose_as_runtime_default`，scenario 主地图颜色桥也要同波次切到同一份 canonical 语义
+- 这次问题的根因是默认色板已经开始尊重 `palette map + expose_as_runtime_default`，但 active scenario 仍直接吃 `countries.json` 的 tag 色和 `feature_count` 赢家色，结果 `RKM / RAJ` 这类专题 TAG 继续接管 live map 默认色。
+- 更稳的最短路径是：default palette、scenario tag 色桥、coarse iso2 bridge 三条链共用同一份 runtime default bridge helper，并在 palette import 阶段强制校验“每个已映射 iso2 至少保留一个 exposed bridge”。

@@ -6,7 +6,11 @@ from pathlib import Path
 import unittest
 
 from scenario_builder.hoi4.crosswalk import build_iso2_to_mapped_tag
-from tools.import_country_palette import PaletteEntry, resolve_mapping_state
+from tools.import_country_palette import (
+    PaletteEntry,
+    ensure_exposed_runtime_default_bridges,
+    resolve_mapping_state,
+)
 
 
 def _entry(tag: str, *, localized_name: str) -> PaletteEntry:
@@ -108,7 +112,25 @@ class ImportCountryPaletteTest(unittest.TestCase):
             },
         )
 
-    def test_tno_manual_second_wave_tags_are_verified_and_non_default(self) -> None:
+    def test_ensure_exposed_runtime_default_bridges_rejects_hidden_only_iso2(self) -> None:
+        with self.assertRaisesRegex(
+            SystemExit,
+            "palette map is missing an exposed runtime default bridge for: RU=>MAG/SAM",
+        ):
+            ensure_exposed_runtime_default_bridges(
+                {
+                    "MAG": {
+                        "iso2": "RU",
+                        "expose_as_runtime_default": False,
+                    },
+                    "SAM": {
+                        "iso2": "RU",
+                        "expose_as_runtime_default": False,
+                    },
+                }
+            )
+
+    def test_tno_manual_second_wave_tags_are_verified(self) -> None:
         payload = json.loads(Path("data/palette-maps/tno.manual.json").read_text(encoding="utf-8"))
         verified = payload.get("verified_exact_tag_to_iso2") or {}
         non_default = set(payload.get("non_default_runtime_tags") or [])
@@ -147,7 +169,27 @@ class ImportCountryPaletteTest(unittest.TestCase):
 
         for tag, iso2 in expected.items():
             self.assertEqual(verified.get(tag), iso2)
+        for tag in set(expected) - {"KOR", "SVR"}:
             self.assertIn(tag, non_default)
+        for tag in ["KOR", "SVR"]:
+            self.assertNotIn(tag, non_default)
+
+    def test_tno_manual_runtime_default_bridge_tags_stay_exposed(self) -> None:
+        payload = json.loads(Path("data/palette-maps/tno.manual.json").read_text(encoding="utf-8"))
+        verified = payload.get("verified_exact_tag_to_iso2") or {}
+        non_default = set(payload.get("non_default_runtime_tags") or [])
+        expected = {
+            "FFR": "FR",
+            "FRI": "IN",
+            "KOR": "KR",
+            "SER": "RS",
+            "SVR": "RU",
+            "VIN": "VN",
+        }
+
+        for tag, iso2 in expected.items():
+            self.assertEqual(verified.get(tag), iso2)
+            self.assertNotIn(tag, non_default)
 
     def test_tno_manual_final_wave_tags_are_verified_and_non_default(self) -> None:
         payload = json.loads(Path("data/palette-maps/tno.manual.json").read_text(encoding="utf-8"))
@@ -165,6 +207,22 @@ class ImportCountryPaletteTest(unittest.TestCase):
         for tag in ["SIK", "TIB", "XIK"]:
             self.assertNotIn(tag, verified)
             self.assertNotIn(tag, non_default)
+
+    def test_tno_generated_map_keeps_runtime_default_bridges_for_critical_iso2(self) -> None:
+        payload_map = json.loads(Path("data/palette-maps/tno.map.json").read_text(encoding="utf-8"))
+        iso2_to_tag = build_iso2_to_mapped_tag(payload_map)
+
+        self.assertEqual(
+            {iso2: iso2_to_tag.get(iso2) for iso2 in ["FR", "IN", "KR", "RS", "RU", "VN"]},
+            {
+                "FR": "FFR",
+                "IN": "FRI",
+                "KR": "KOR",
+                "RS": "SER",
+                "RU": "SVR",
+                "VN": "VIN",
+            },
+        )
 
     def test_tno_generated_map_and_audit_final_wave_tags_match_topic_status(self) -> None:
         payload_map = json.loads(Path("data/palette-maps/tno.map.json").read_text(encoding="utf-8"))
