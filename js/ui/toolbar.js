@@ -9688,6 +9688,9 @@ function initToolbar({ render } = {}) {
     toggleRail.checked = !!state.showRail;
     toggleRail.addEventListener("change", (event) => {
       state.showRail = !!event.target.checked;
+      if (state.showRail && state.showTransport === false) {
+        state.showTransport = true;
+      }
       if (state.showRail && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "toolbar-toggle", renderNow: true });
       }
@@ -9700,6 +9703,9 @@ function initToolbar({ render } = {}) {
     toggleRoad.checked = !!state.showRoad;
     toggleRoad.addEventListener("change", (event) => {
       state.showRoad = !!event.target.checked;
+      if (state.showRoad && state.showTransport === false) {
+        state.showTransport = true;
+      }
       if (state.showRoad && typeof state.ensureContextLayerDataFn === "function") {
         void state.ensureContextLayerDataFn("roads", { reason: "toolbar-toggle", renderNow: true });
       }
