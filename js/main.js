@@ -14,6 +14,7 @@ import {
   buildInteractionInfrastructureAfterStartup,
   initMap,
   invalidateContextLayerVisualStateBatch,
+  refreshMapDataForScenarioApply,
   setMapData,
   render,
 } from "./core/map_renderer.js";
@@ -1677,24 +1678,56 @@ function syncScenarioReadyUiAfterDetailPromotion() {
   }
 }
 
+function applyDetailPromotionMapRefresh({
+  interactionLevel = "full",
+  deferInteractionInfrastructure = false,
+} = {}) {
+  const hasActiveScenario = !!String(state.activeScenarioId || "").trim();
+  if (hasActiveScenario) {
+    try {
+      refreshMapDataForScenarioApply({ suppressRender: true });
+      return "light";
+    } catch (error) {
+      console.warn("[main] Detail promotion lightweight refresh failed, falling back to setMapData.", error);
+    }
+  }
+  setMapData({
+    refitProjection: false,
+    resetZoom: false,
+    suppressRender: true,
+    interactionLevel,
+    deferInteractionInfrastructure,
+  });
+  return hasActiveScenario ? "setMapData-fallback" : "setMapData";
+}
+
 async function ensureDetailTopologyReady({
   renderDispatcher = null,
   requireIdle = false,
   applyMapData = true,
+  suppressRender = false,
+  interactionLevel = "full",
+  deferInteractionInfrastructure = false,
+  flushPendingFocusRefresh = true,
 } = {}) {
   prioritizeViewportFocusCountry({
     reason: "detail-promotion-focus",
-    flushPending: true,
+    flushPending: flushPendingFocusRefresh,
   });
   if (hasDetailTopologyLoaded()) {
     if (state.topologyBundleMode !== "composite") {
       state.topologyBundleMode = "composite";
       if (applyMapData) {
-        setMapData({ refitProjection: false, resetZoom: false });
-        if (renderDispatcher?.schedule) {
-          renderDispatcher.schedule();
-        } else {
-          requestMainRender("detail-topology-ready");
+        applyDetailPromotionMapRefresh({
+          interactionLevel,
+          deferInteractionInfrastructure,
+        });
+        if (!suppressRender) {
+          if (renderDispatcher?.schedule) {
+            renderDispatcher.schedule();
+          } else {
+            requestMainRender("detail-topology-ready");
+          }
         }
       }
     }
@@ -1740,12 +1773,18 @@ async function ensureDetailTopologyReady({
       `[main] Detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
     );
     if (applyMapData) {
-      setMapData({ refitProjection: false, resetZoom: false });
-      if (renderDispatcher?.schedule) {
-        renderDispatcher.schedule();
-      } else {
-        requestMainRender("detail-topology-promoted");
+      const refreshMode = applyDetailPromotionMapRefresh({
+        interactionLevel,
+        deferInteractionInfrastructure,
+      });
+      if (!suppressRender) {
+        if (renderDispatcher?.schedule) {
+          renderDispatcher.schedule();
+        } else {
+          requestMainRender("detail-topology-promoted");
+        }
       }
+      console.info(`[main] Detail promotion refresh path=${refreshMode}.`);
     }
     syncScenarioReadyUiAfterDetailPromotion();
     return true;
@@ -1775,7 +1814,11 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     const promoted = await ensureDetailTopologyReady({
       renderDispatcher,
       requireIdle: false,
-      applyMapData: false,
+      applyMapData: true,
+      suppressRender: true,
+      interactionLevel: "readonly-startup",
+      deferInteractionInfrastructure: true,
+      flushPendingFocusRefresh: false,
     });
     const detailReady = promoted || hasDetailTopologyLoaded();
     if (!detailReady) {
@@ -1799,23 +1842,8 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
       ? state.scenarioBundleCacheById?.[activeScenarioId] || null
       : null;
     if (cachedBundle?.manifest) {
-      await applyScenarioBundleCommand(cachedBundle, {
-        renderMode: "none",
-        suppressRender: true,
-        markDirtyReason: "",
-        showToastOnComplete: false,
-        interactionLevel: "full",
-      });
       warnOnStartupBundleIntegrity(cachedBundle, {
         source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
-      });
-    } else {
-      setMapData({
-        refitProjection: false,
-        resetZoom: false,
-        suppressRender: true,
-        interactionLevel: "full",
-        deferInteractionInfrastructure: true,
       });
     }
     renderDispatcher?.flush?.();

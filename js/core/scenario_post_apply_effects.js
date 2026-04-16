@@ -50,21 +50,57 @@ function runPaletteAndToolbarRefreshCallbacks() {
   }
 }
 
-async function ensureChunkedScenarioFirstFrameReady({
+function scheduleAfterFirstFrame(callback) {
+  if (typeof callback !== "function") return;
+  const runAsync = () => {
+    if (typeof globalThis.setTimeout === "function") {
+      globalThis.setTimeout(callback, 0);
+      return;
+    }
+    callback();
+  };
+  if (typeof globalThis.requestAnimationFrame === "function") {
+    globalThis.requestAnimationFrame(() => {
+      if (typeof globalThis.requestAnimationFrame === "function") {
+        globalThis.requestAnimationFrame(() => {
+          runAsync();
+        });
+        return;
+      }
+      runAsync();
+    });
+    return;
+  }
+  runAsync();
+}
+
+function ensureChunkedScenarioFirstFrameReady({
   bundle,
   scenarioId = "",
 } = {}) {
   if (!scenarioSupportsChunkedRuntime(bundle)) return;
-  try {
-    await preloadScenarioCoarseChunks(bundle);
-  } catch (error) {
-    console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
-  } finally {
-    scheduleScenarioChunkRefresh({
-      reason: "scenario-apply",
-      delayMs: 0,
-    });
-  }
+  const normalizedScenarioId = String(scenarioId || "").trim();
+  const runPrewarm = async () => {
+    if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+      return;
+    }
+    try {
+      await preloadScenarioCoarseChunks(bundle);
+    } catch (error) {
+      console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
+    } finally {
+      if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+        return;
+      }
+      scheduleScenarioChunkRefresh({
+        reason: "scenario-apply",
+        delayMs: 0,
+      });
+    }
+  };
+  scheduleAfterFirstFrame(() => {
+    void runPrewarm();
+  });
 }
 
 async function runPostScenarioApplyEffects({
@@ -85,7 +121,7 @@ async function runPostScenarioApplyEffects({
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioSupportsChunkedRuntime(bundle)) {
-    await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
+    ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
   } else if (!state.bootBlocking) {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {

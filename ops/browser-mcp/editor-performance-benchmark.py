@@ -5,9 +5,13 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import json
+import math
 import os
+import sys
+from queue import Empty, Queue
 import re
 import subprocess
+from threading import Lock, Thread
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -18,6 +22,17 @@ SESSION_ID = "editor-perf-benchmark"
 BROWSER_OPENED = False
 SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]
 RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders"]
+BROWSER_OPEN_TIMEOUT_SEC = 45
+OPEN_BROWSER_CANDIDATES = ("msedge", "chromium")
+WRAPPER_BACKEND = "wrapper"
+LOCAL_NODE_PLAYWRIGHT_BACKEND = "local-node-playwright"
+LOCAL_NODE_PLAYWRIGHT_HEADLESS = os.environ.get("EDITOR_PERF_BENCHMARK_FALLBACK_HEADLESS", "1").strip().lower() not in {
+    "0",
+    "false",
+    "no",
+    "off",
+}
+PLAYWRIGHT_BACKEND = WRAPPER_BACKEND
 CONTEXT_PROBE_CASES = [
     ("baseline", {}),
     ("physical_off", {"showPhysical": False}),
@@ -62,6 +77,348 @@ def resolve_playwright_cli_wrapper() -> Path:
 
 
 PWCLI = resolve_playwright_cli_wrapper()
+
+LOCAL_NODE_PLAYWRIGHT_WORKER = r"""
+const fs = require('node:fs');
+const path = require('node:path');
+const readline = require('node:readline');
+
+function serializeError(error) {
+  if (!error) {
+    return { message: 'Unknown error', stack: null };
+  }
+  return {
+    message: String(error.message || error),
+    stack: error.stack ? String(error.stack) : null,
+  };
+}
+
+let chromium;
+try {
+  ({ chromium } = require('playwright'));
+} catch (error) {
+  process.stdout.write(JSON.stringify({ type: 'ready', ok: false, error: serializeError(error) }) + '\n');
+  process.exit(0);
+}
+
+let browser = null;
+let context = null;
+let page = null;
+let activeBrowserName = null;
+let consoleIssues = [];
+let networkIssues = [];
+const MAX_ISSUES = 400;
+
+function pushBounded(target, value) {
+  target.push(value);
+  if (target.length > MAX_ISSUES) {
+    target.splice(0, target.length - MAX_ISSUES);
+  }
+}
+
+function ensurePageListeners(targetPage) {
+  if (!targetPage || targetPage.__editorPerfListenersAttached) {
+    return;
+  }
+  targetPage.__editorPerfListenersAttached = true;
+  targetPage.on('console', (message) => {
+    pushBounded(consoleIssues, {
+      type: String(message.type() || 'log'),
+      text: String(message.text() || ''),
+      location: message.location() || null,
+    });
+  });
+  targetPage.on('pageerror', (error) => {
+    pushBounded(consoleIssues, {
+      type: 'pageerror',
+      text: String(error?.message || error || ''),
+      location: null,
+    });
+  });
+  targetPage.on('requestfailed', (request) => {
+    pushBounded(networkIssues, {
+      kind: 'requestfailed',
+      url: String(request.url() || ''),
+      method: String(request.method() || ''),
+      status: null,
+      failureText: String(request.failure()?.errorText || ''),
+    });
+  });
+  targetPage.on('response', (response) => {
+    const status = Number(response.status() || 0);
+    if (status < 400) {
+      return;
+    }
+    pushBounded(networkIssues, {
+      kind: 'response',
+      url: String(response.url() || ''),
+      method: String(response.request()?.method?.() || ''),
+      status,
+      failureText: '',
+    });
+  });
+}
+
+async function closeBrowser() {
+  if (page) {
+    await page.close().catch(() => {});
+    page = null;
+  }
+  if (context) {
+    await context.close().catch(() => {});
+    context = null;
+  }
+  if (browser) {
+    await browser.close().catch(() => {});
+    browser = null;
+  }
+  activeBrowserName = null;
+}
+
+async function ensurePage(payload) {
+  const requestedBrowser = String(payload?.browserName || 'chromium');
+  const launchOptions = { headless: !!payload?.headless };
+  if (requestedBrowser === 'msedge') {
+    launchOptions.channel = 'msedge';
+  }
+  if (!browser || !page || activeBrowserName !== requestedBrowser) {
+    await closeBrowser();
+    browser = await chromium.launch(launchOptions);
+    context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    page = await context.newPage();
+    activeBrowserName = requestedBrowser;
+    ensurePageListeners(page);
+  }
+  return page;
+}
+
+function formatConsoleIssue(issue) {
+  return `[${issue.type}] ${issue.text}`.trim();
+}
+
+function formatNetworkIssue(issue) {
+  const parts = [`[${issue.kind}]`];
+  if (issue.status) {
+    parts.push(String(issue.status));
+  }
+  if (issue.method) {
+    parts.push(issue.method);
+  }
+  if (issue.url) {
+    parts.push(issue.url);
+  }
+  if (issue.failureText) {
+    parts.push(issue.failureText);
+  }
+  return parts.join(' ').trim();
+}
+
+async function handleRequest(request) {
+  switch (request.command) {
+    case 'open': {
+      const payload = request.payload || {};
+      const targetPage = await ensurePage(payload);
+      const url = String(payload.url || '').trim();
+      if (url) {
+        await targetPage.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
+      }
+      return {
+        browserName: activeBrowserName || String(payload.browserName || 'chromium'),
+        headless: !!payload.headless,
+        url: targetPage.url(),
+      };
+    }
+    case 'run-code': {
+      if (!page) {
+        throw new Error('No active Playwright page for run-code.');
+      }
+      const fn = eval(String(request.payload?.code || ''));
+      if (typeof fn !== 'function') {
+        throw new Error('run-code payload did not evaluate to a function.');
+      }
+      return await fn(page);
+    }
+    case 'console': {
+      const level = String(request.payload?.level || '').toLowerCase();
+      const entries = consoleIssues.filter((issue) => {
+        if (level === 'warning') {
+          return ['warning', 'error', 'assert', 'pageerror'].includes(issue.type);
+        }
+        return true;
+      }).map(formatConsoleIssue);
+      if (request.payload?.clear) {
+        consoleIssues = [];
+      }
+      return entries;
+    }
+    case 'network': {
+      const entries = networkIssues.map(formatNetworkIssue);
+      if (request.payload?.clear) {
+        networkIssues = [];
+      }
+      return entries;
+    }
+    case 'screenshot': {
+      if (!page) {
+        throw new Error('No active Playwright page for screenshot.');
+      }
+      const filename = path.resolve(String(request.payload?.filename || ''));
+      await fs.promises.mkdir(path.dirname(filename), { recursive: true });
+      await page.screenshot({ path: filename, fullPage: !!request.payload?.fullPage });
+      return filename;
+    }
+    case 'close': {
+      await closeBrowser();
+      return { ok: true };
+    }
+    default:
+      throw new Error(`Unsupported fallback command: ${request.command}`);
+  }
+}
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  crlfDelay: Infinity,
+});
+
+let chain = Promise.resolve();
+process.stdout.write(JSON.stringify({ type: 'ready', ok: true }) + '\n');
+rl.on('line', (line) => {
+  if (!line) {
+    return;
+  }
+  chain = chain.then(async () => {
+    let request = null;
+    try {
+      request = JSON.parse(line);
+      const result = await handleRequest(request);
+      process.stdout.write(JSON.stringify({ id: request.id, ok: true, result }) + '\n');
+    } catch (error) {
+      process.stdout.write(JSON.stringify({
+        id: request?.id ?? null,
+        ok: false,
+        error: serializeError(error),
+      }) + '\n');
+    }
+  });
+});
+""".strip()
+
+
+class LocalPlaywrightWorker:
+    def __init__(self) -> None:
+      self.proc = subprocess.Popen(
+          ["node", "-e", LOCAL_NODE_PLAYWRIGHT_WORKER],
+          cwd=ROOT_DIR,
+          stdin=subprocess.PIPE,
+          stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE,
+          text=True,
+          encoding="utf-8",
+          errors="replace",
+          bufsize=1,
+      )
+      if self.proc.stdin is None or self.proc.stdout is None or self.proc.stderr is None:
+          raise RuntimeError("Failed to create local Playwright fallback worker pipes.")
+      self.stdin = self.proc.stdin
+      self.stdout_queue: Queue[str] = Queue()
+      self.stderr_queue: Queue[str] = Queue()
+      self._request_lock = Lock()
+      self._request_id = 0
+      Thread(target=self._pump_stream, args=(self.proc.stdout, self.stdout_queue), daemon=True).start()
+      Thread(target=self._pump_stream, args=(self.proc.stderr, self.stderr_queue), daemon=True).start()
+      ready = self._read_message(15)
+      if not ready.get("ok"):
+          error_message = ready.get("error", {}).get("message") if isinstance(ready.get("error"), dict) else ready.get("error")
+          self.stop()
+          raise RuntimeError(f"Local Playwright fallback worker failed to start: {error_message}")
+
+    @staticmethod
+    def _pump_stream(stream, queue: Queue[str]) -> None:
+      try:
+          for line in iter(stream.readline, ""):
+              if line:
+                  queue.put(line)
+      finally:
+          stream.close()
+
+    def _collect_stderr(self) -> str:
+      chunks: list[str] = []
+      while True:
+          try:
+              chunks.append(self.stderr_queue.get_nowait())
+          except Empty:
+              break
+      return "".join(chunks).strip()
+
+    def _read_message(self, timeout_sec: int) -> dict:
+      try:
+          raw_line = self.stdout_queue.get(timeout=timeout_sec)
+      except Empty as exc:
+          stderr_output = self._collect_stderr()
+          raise RuntimeError(
+              "Timed out waiting for local Playwright fallback worker response."
+              + (f"\nSTDERR:\n{stderr_output}" if stderr_output else "")
+          ) from exc
+      try:
+          return json.loads(raw_line)
+      except json.JSONDecodeError as exc:
+          stderr_output = self._collect_stderr()
+          raise RuntimeError(
+              "Failed to parse local Playwright fallback worker output."
+              f"\nSTDOUT:\n{raw_line.strip()}"
+              + (f"\nSTDERR:\n{stderr_output}" if stderr_output else "")
+          ) from exc
+
+    def request(self, command: str, payload: dict | None = None, timeout_sec: int = 240) -> object:
+      if self.proc.poll() is not None:
+          stderr_output = self._collect_stderr()
+          raise RuntimeError(
+              "Local Playwright fallback worker exited unexpectedly."
+              + (f"\nSTDERR:\n{stderr_output}" if stderr_output else "")
+          )
+      with self._request_lock:
+          self._request_id += 1
+          self.stdin.write(json.dumps({
+              "id": self._request_id,
+              "command": command,
+              "payload": payload or {},
+          }) + "\n")
+          self.stdin.flush()
+          response = self._read_message(timeout_sec)
+      if not response.get("ok"):
+          error = response.get("error")
+          message = error.get("message") if isinstance(error, dict) else str(error)
+          stack = error.get("stack") if isinstance(error, dict) else None
+          raise RuntimeError(message + (f"\n{stack}" if stack else ""))
+      return response.get("result")
+
+    def stop(self) -> None:
+      if self.proc.poll() is None:
+          self.proc.terminate()
+          try:
+              self.proc.wait(timeout=5)
+          except subprocess.TimeoutExpired:
+              self.proc.kill()
+      self._collect_stderr()
+
+
+LOCAL_PLAYWRIGHT_WORKER_SESSION: LocalPlaywrightWorker | None = None
+
+
+def ensure_local_playwright_worker() -> LocalPlaywrightWorker:
+    global LOCAL_PLAYWRIGHT_WORKER_SESSION
+    if LOCAL_PLAYWRIGHT_WORKER_SESSION is None:
+      LOCAL_PLAYWRIGHT_WORKER_SESSION = LocalPlaywrightWorker()
+    return LOCAL_PLAYWRIGHT_WORKER_SESSION
+
+
+def stop_local_playwright_worker() -> None:
+    global LOCAL_PLAYWRIGHT_WORKER_SESSION
+    if LOCAL_PLAYWRIGHT_WORKER_SESSION is None:
+      return
+    LOCAL_PLAYWRIGHT_WORKER_SESSION.stop()
+    LOCAL_PLAYWRIGHT_WORKER_SESSION = None
 
 
 def normalize_bash_path(path: Path) -> str:
@@ -134,7 +491,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def run_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
+def run_wrapper_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
     env = os.environ.copy()
     env["PLAYWRIGHT_CLI_SESSION"] = SESSION_ID
     PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
@@ -165,8 +522,76 @@ def run_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dic
     return json.loads(match.group(1).strip())
 
 
+def run_local_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
+    if not args:
+      raise RuntimeError("Missing local Playwright fallback command.")
+    command = args[0]
+    worker = ensure_local_playwright_worker()
+    if command == "open":
+      browser_name = "chromium"
+      if "--browser" in args:
+          browser_index = args.index("--browser")
+          if browser_index + 1 >= len(args):
+              raise RuntimeError("Missing browser name for local Playwright fallback open command.")
+          browser_name = args[browser_index + 1]
+      result = worker.request("open", {
+          "url": args[1] if len(args) > 1 else "",
+          "browserName": browser_name,
+          "headless": LOCAL_NODE_PLAYWRIGHT_HEADLESS,
+      }, timeout_sec=timeout_sec)
+      return result if expect_json else str(result)
+    if command == "run-code":
+      result = worker.request("run-code", {"code": args[1] if len(args) > 1 else ""}, timeout_sec=timeout_sec)
+      return result if expect_json else json.dumps(result, ensure_ascii=False)
+    if command == "console":
+      level = args[1] if len(args) > 1 and not args[1].startswith("--") else ""
+      result = worker.request("console", {
+          "level": level,
+          "clear": "--clear" in args,
+      }, timeout_sec=timeout_sec)
+      if expect_json:
+          return result
+      return "\n".join(str(line) for line in result if str(line).strip())
+    if command == "network":
+      result = worker.request("network", {"clear": "--clear" in args}, timeout_sec=timeout_sec)
+      if expect_json:
+          return result
+      return "\n".join(str(line) for line in result if str(line).strip())
+    if command == "screenshot":
+      filename = ""
+      if "--filename" in args:
+          filename_index = args.index("--filename")
+          if filename_index + 1 >= len(args):
+              raise RuntimeError("Missing filename for local Playwright fallback screenshot command.")
+          filename = args[filename_index + 1]
+      result = worker.request("screenshot", {
+          "filename": filename,
+          "fullPage": "--full-page" in args,
+      }, timeout_sec=timeout_sec)
+      return result if expect_json else str(result)
+    if command == "close":
+      result = worker.request("close", {}, timeout_sec=min(timeout_sec, 30))
+      return result if expect_json else str(result)
+    raise RuntimeError(f"Unsupported local Playwright fallback command: {' '.join(args)}")
+
+
+def run_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
+    if PLAYWRIGHT_BACKEND == LOCAL_NODE_PLAYWRIGHT_BACKEND:
+      return run_local_pw(*args, expect_json=expect_json, timeout_sec=timeout_sec)
+    return run_wrapper_pw(*args, expect_json=expect_json, timeout_sec=timeout_sec)
+
+
 def close_session() -> None:
-    global BROWSER_OPENED
+    global BROWSER_OPENED, PLAYWRIGHT_BACKEND
+    if PLAYWRIGHT_BACKEND == LOCAL_NODE_PLAYWRIGHT_BACKEND:
+      try:
+          run_local_pw("close", timeout_sec=10)
+      except RuntimeError:
+          pass
+      stop_local_playwright_worker()
+      PLAYWRIGHT_BACKEND = WRAPPER_BACKEND
+      BROWSER_OPENED = False
+      return
     env = os.environ.copy()
     env["PLAYWRIGHT_CLI_SESSION"] = SESSION_ID
     PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
@@ -212,9 +637,10 @@ def clone_metrics_js(source: str) -> str:
     return f"""JSON.parse(JSON.stringify({source} || {{}}))"""
 
 
-def navigate(url: str) -> None:
+def navigate(url: str) -> dict:
     js = f"""
 async (page) => {{
+  const benchmarkStartedAt = Date.now();
   page.on('dialog', async (dialog) => {{
     try {{
       await dialog.accept();
@@ -255,19 +681,118 @@ async (page) => {{
       window.__perfBench.longTaskObserverAttached = false;
     }}
   }});
-  return {{ url: page.url(), title: await page.title() }};
+  const pageLoad = await page.evaluate(() => {{
+    const navigationEntry = performance.getEntriesByType('navigation')?.[0] || null;
+    const paintEntries = Object.fromEntries(
+      performance.getEntriesByType('paint').map((entry) => [entry.name, Number(entry.startTime || 0)])
+    );
+    const asMetric = (value) => {{
+      const numeric = Number(value || 0);
+      return Number.isFinite(numeric) && numeric > 0 ? Number(numeric.toFixed(3)) : null;
+    }};
+    return {{
+      measuredAt: Date.now(),
+      url: location.href,
+      title: document.title,
+      navigationType: navigationEntry?.type || null,
+      domInteractiveMs: asMetric(navigationEntry?.domInteractive),
+      domContentLoadedMs: asMetric(navigationEntry?.domContentLoadedEventEnd),
+      loadEventEndMs: asMetric(navigationEntry?.loadEventEnd),
+      responseEndMs: asMetric(navigationEntry?.responseEnd),
+      firstPaintMs: asMetric(paintEntries['first-paint']),
+      firstContentfulPaintMs: asMetric(paintEntries['first-contentful-paint']),
+    }};
+  }});
+  return {{
+    ...pageLoad,
+    pageReadyMs: Number((Date.now() - benchmarkStartedAt).toFixed(3)),
+  }};
 }}
 """.strip()
-    compact = " ".join(line.strip() for line in js.splitlines() if line.strip())
-    run_pw("run-code", compact, expect_json=False)
+    return run_code_json(js)  # type: ignore[return-value]
 
 
-def open_page(url: str) -> None:
-    global BROWSER_OPENED
+def open_page(urls: list[str] | tuple[str, ...] | str) -> dict:
+    global BROWSER_OPENED, PLAYWRIGHT_BACKEND
+    candidate_urls = unique_strings([urls] if isinstance(urls, str) else list(urls))
+    if not candidate_urls:
+        raise RuntimeError("No benchmark URL candidates were provided.")
     if not BROWSER_OPENED:
-      run_pw("open", url, "--browser", "msedge")
-      BROWSER_OPENED = True
-    navigate(url)
+      attempts: list[str] = []
+      if PWCLI.exists():
+          for browser_name in OPEN_BROWSER_CANDIDATES:
+              for candidate_url in candidate_urls:
+                  attempts.append(f"{browser_name}:{candidate_url}")
+                  try:
+                      PLAYWRIGHT_BACKEND = WRAPPER_BACKEND
+                      run_wrapper_pw("open", candidate_url, "--browser", browser_name, timeout_sec=BROWSER_OPEN_TIMEOUT_SEC)
+                      BROWSER_OPENED = True
+                      page_load = navigate(candidate_url)
+                      if isinstance(page_load, dict):
+                          page_load["openBrowser"] = browser_name
+                          page_load["openUrl"] = candidate_url
+                          page_load["openFallbackUsed"] = len(attempts) > 1
+                          page_load["openAttempts"] = attempts
+                          page_load["openTransport"] = WRAPPER_BACKEND
+                      return page_load
+                  except RuntimeError:
+                      close_session()
+      else:
+          attempts.append(f"{WRAPPER_BACKEND}:missing-cli-wrapper")
+      for browser_name in OPEN_BROWSER_CANDIDATES:
+          for candidate_url in candidate_urls:
+              attempts.append(f"{LOCAL_NODE_PLAYWRIGHT_BACKEND}:{browser_name}:{candidate_url}")
+              try:
+                  PLAYWRIGHT_BACKEND = LOCAL_NODE_PLAYWRIGHT_BACKEND
+                  fallback_open = run_local_pw(
+                      "open",
+                      candidate_url,
+                      "--browser",
+                      browser_name,
+                      timeout_sec=BROWSER_OPEN_TIMEOUT_SEC,
+                      expect_json=True,
+                  )
+                  BROWSER_OPENED = True
+                  page_load = navigate(candidate_url)
+                  if isinstance(page_load, dict):
+                      page_load["openBrowser"] = (
+                          fallback_open.get("browserName")
+                          if isinstance(fallback_open, dict)
+                          else browser_name
+                      )
+                      page_load["openUrl"] = candidate_url
+                      page_load["openFallbackUsed"] = True
+                      page_load["openAttempts"] = attempts
+                      page_load["openTransport"] = LOCAL_NODE_PLAYWRIGHT_BACKEND
+                      if isinstance(fallback_open, dict):
+                          page_load["openHeadless"] = bool(fallback_open.get("headless"))
+                  return page_load
+              except RuntimeError:
+                  close_session()
+      raise RuntimeError(
+          "Unable to open benchmark browser session. Attempts: "
+          + ", ".join(attempts)
+      )
+    reuse_attempts: list[str] = []
+    for candidate_url in candidate_urls:
+        reuse_attempts.append(f"{PLAYWRIGHT_BACKEND}:{candidate_url}")
+        try:
+            page_load = navigate(candidate_url)
+            if isinstance(page_load, dict):
+                page_load["openBrowser"] = None
+                page_load["openUrl"] = candidate_url
+                page_load["openFallbackUsed"] = PLAYWRIGHT_BACKEND == LOCAL_NODE_PLAYWRIGHT_BACKEND
+                page_load["openAttempts"] = reuse_attempts
+                page_load["openTransport"] = PLAYWRIGHT_BACKEND
+                if PLAYWRIGHT_BACKEND == LOCAL_NODE_PLAYWRIGHT_BACKEND:
+                    page_load["openHeadless"] = LOCAL_NODE_PLAYWRIGHT_HEADLESS
+            return page_load
+        except RuntimeError:
+            continue
+    raise RuntimeError(
+        "Unable to navigate benchmark browser session after open. Attempts: "
+        + ", ".join(reuse_attempts)
+    )
 
 
 def with_query_overrides(url: str, **overrides: str) -> str:
@@ -276,6 +801,30 @@ def with_query_overrides(url: str, **overrides: str) -> str:
     for key, value in overrides.items():
       query[key] = value
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+
+
+def ensure_app_path_url(url: str) -> str:
+    parts = urlsplit(str(url or "").strip())
+    path = parts.path or "/"
+    if path.startswith("/app/") or path == "/app":
+        normalized_path = path if path.startswith("/app/") else "/app/"
+    elif path == "/":
+        normalized_path = "/app/"
+    else:
+        normalized_path = f"/app{path}" if path.startswith("/") else f"/app/{path}"
+    return urlunsplit((parts.scheme, parts.netloc, normalized_path, parts.query, parts.fragment))
+
+
+def unique_strings(values: list[str] | tuple[str, ...]) -> list[str]:
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        normalized = str(value or "").strip()
+        if not normalized or normalized in seen:
+            continue
+        ordered.append(normalized)
+        seen.add(normalized)
+    return ordered
 
 
 def clear_browser_buffers() -> None:
@@ -295,10 +844,166 @@ def capture_network_issues() -> list[str]:
 
 def take_screenshot(target_path: Path) -> str:
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    run_pw("screenshot", "--filename", normalize_bash_path(target_path.resolve()), "--full-page", timeout_sec=120)
+    filename = (
+      str(target_path.resolve())
+      if PLAYWRIGHT_BACKEND == LOCAL_NODE_PLAYWRIGHT_BACKEND
+      else normalize_bash_path(target_path.resolve())
+    )
+    run_pw("screenshot", "--filename", filename, "--full-page", timeout_sec=120)
     if not target_path.exists():
       raise RuntimeError(f"Screenshot was not created at {target_path}")
     return str(target_path)
+
+
+def as_finite_number(value: object) -> float | None:
+    try:
+      numeric = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+      return None
+    if not math.isfinite(numeric):
+      return None
+    return numeric
+
+
+def iter_perf_metric_maps(node: object, path: str = ""):
+    if isinstance(node, dict):
+      for key, value in node.items():
+        next_path = f"{path}.{key}" if path else key
+        if key in {"renderMetrics", "scenarioMetrics"} and isinstance(value, dict):
+          yield next_path, key, value
+        if isinstance(value, (dict, list)):
+          yield from iter_perf_metric_maps(value, next_path)
+      return
+    if isinstance(node, list):
+      for index, value in enumerate(node):
+        next_path = f"{path}[{index}]"
+        if isinstance(value, (dict, list)):
+          yield from iter_perf_metric_maps(value, next_path)
+
+
+def find_latest_perf_metric(suite: dict, category: str, metric_name: str) -> dict | None:
+    best_match: dict | None = None
+    best_rank = (-1.0, -1)
+    for order, (path, map_name, metrics) in enumerate(iter_perf_metric_maps(suite)):
+      if map_name != category or not isinstance(metrics, dict):
+        continue
+      entry = metrics.get(metric_name)
+      if not isinstance(entry, dict):
+        continue
+      recorded_at = as_finite_number(entry.get("recordedAt"))
+      rank = (recorded_at if recorded_at is not None else -1.0, order)
+      if rank >= best_rank:
+        best_rank = rank
+        best_match = {
+          "source": f"{path}.{metric_name}",
+          "entry": entry,
+        }
+    return best_match
+
+
+def summarize_metric(metric_match: dict | None, *, count_key: str | None = None) -> dict:
+    summary = {
+      "present": False,
+      "source": None,
+      "durationMs": None,
+      "recordedAt": None,
+      "count": None,
+      "details": None,
+    }
+    if not metric_match:
+      return summary
+    entry = metric_match.get("entry")
+    if not isinstance(entry, dict):
+      return summary
+    details = {
+      key: value
+      for key, value in entry.items()
+      if key not in {"durationMs", "recordedAt", count_key}
+    }
+    summary.update({
+      "present": True,
+      "source": metric_match.get("source"),
+      "durationMs": as_finite_number(entry.get("durationMs")),
+      "recordedAt": as_finite_number(entry.get("recordedAt")),
+      "count": as_finite_number(entry.get(count_key)) if count_key else None,
+      "details": details,
+    })
+    return summary
+
+
+def summarize_page_load(page_load: object) -> dict:
+    summary = {
+      "present": False,
+      "source": None,
+      "durationMs": None,
+      "recordedAt": None,
+      "count": None,
+      "details": None,
+    }
+    if not isinstance(page_load, dict):
+      return summary
+    selected_field = None
+    duration_ms = None
+    for field_name in ("pageReadyMs", "loadEventEndMs", "domContentLoadedMs", "domInteractiveMs"):
+      duration_ms = as_finite_number(page_load.get(field_name))
+      if duration_ms is not None:
+        selected_field = field_name
+        break
+    details = dict(page_load)
+    if selected_field:
+      details["selectedField"] = selected_field
+    summary.update({
+      "present": selected_field is not None,
+      "source": f"pageLoad.{selected_field}" if selected_field else None,
+      "durationMs": duration_ms,
+      "recordedAt": as_finite_number(page_load.get("measuredAt")),
+      "details": details,
+    })
+    return summary
+
+
+def build_suite_benchmark_metrics(suite: dict) -> dict:
+    page_load_metric = summarize_page_load(suite.get("pageLoad"))
+    load_metric = summarize_metric(find_latest_perf_metric(suite, "scenarioMetrics", "loadScenarioBundle"))
+    if not load_metric["present"]:
+      load_metric = page_load_metric
+    settle_exact_metric = summarize_metric(
+      find_latest_perf_metric(suite, "renderMetrics", "settleExactRefresh")
+    )
+    if not settle_exact_metric["present"]:
+      settle_exact_metric = summarize_metric(
+        find_latest_perf_metric(suite, "renderMetrics", "settlePoliticalFastExact")
+      )
+    black_frame_metric = summarize_metric(
+      find_latest_perf_metric(suite, "renderMetrics", "blackFrameCount"),
+      count_key="count",
+    )
+    if not black_frame_metric["present"]:
+      black_frame_metric = {
+        "present": True,
+        "source": "implicit-zero",
+        "durationMs": 0.0,
+        "recordedAt": None,
+        "count": 0.0,
+        "details": {
+          "reason": "no-black-frame-metric-recorded",
+        },
+      }
+    return {
+      "load": load_metric,
+      "pageLoad": page_load_metric,
+      "timeToInteractive": summarize_metric(
+        find_latest_perf_metric(suite, "scenarioMetrics", "timeToInteractiveCoarseFrame")
+      ),
+      "timeToPoliticalCoreReady": summarize_metric(
+        find_latest_perf_metric(suite, "scenarioMetrics", "timeToPoliticalCoreReady")
+      ),
+      "settleExactRefresh": settle_exact_metric,
+      "zoomEndToChunkVisible": summarize_metric(
+        find_latest_perf_metric(suite, "renderMetrics", "zoomEndToChunkVisibleMs")
+      ),
+      "blackFrame": black_frame_metric,
+    }
 
 
 def apply_scenario(scenario_id: str) -> dict:
@@ -352,6 +1057,34 @@ async (page) => {{
       lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
+      overlay: document.getElementById('perf-overlay')?.textContent || '',
+    }};
+  }}, {json.dumps(scenario_id)});
+}}
+""".strip()
+    return run_code_json(js)  # type: ignore[return-value]
+
+
+def measure_post_apply_metrics(scenario_id: str) -> dict | None:
+    if scenario_id == "none":
+      return None
+    js = f"""
+async (page) => {{
+  return await page.evaluate(async (expectedScenarioId) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const previousPoliticalReadyRecordedAt = Number(state.scenarioPerfMetrics?.timeToPoliticalCoreReady?.recordedAt || 0);
+    const startedAt = performance.now();
+    while (
+      String(state.activeScenarioId || '') === String(expectedScenarioId || '')
+      && Number(state.scenarioPerfMetrics?.timeToPoliticalCoreReady?.recordedAt || 0) <= previousPoliticalReadyRecordedAt
+      && (performance.now() - startedAt) < 12000
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }}
+    return {{
+      waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+      scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
+      renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       overlay: document.getElementById('perf-overlay')?.textContent || '',
     }};
   }}, {json.dumps(scenario_id)});
@@ -537,6 +1270,50 @@ async (page) => {{
       renderMetrics: settleMetrics,
       overlay: document.getElementById('perf-overlay')?.textContent || '',
     }};
+  }});
+}}
+""".strip()
+    return run_code_json(js)  # type: ignore[return-value]
+
+
+def measure_zoom_end_chunk_visible(scenario_id: str) -> dict | None:
+    if scenario_id != "tno_1962":
+      return None
+    js = f"""
+async (page) => {{
+  return await page.evaluate(async () => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const {{ setZoomPercent }} = await import('/js/core/map_renderer.js');
+    const previousRecordedAt = Number(
+      state.renderPerfMetrics?.zoomEndToChunkVisibleMs?.recordedAt
+      || state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric?.recordedAt
+      || 0
+    );
+    const originalZoomPercent = Math.round(Math.max(1, Number(state.zoomTransform?.k || 1) * 100));
+    const targetPercent = originalZoomPercent >= 120 ? 105 : 120;
+    setZoomPercent(targetPercent);
+    const startedAt = performance.now();
+    while (
+      Number(
+        state.renderPerfMetrics?.zoomEndToChunkVisibleMs?.recordedAt
+        || state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric?.recordedAt
+        || 0
+      ) <= previousRecordedAt
+      && (performance.now() - startedAt) < 12000
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }}
+    const result = {{
+      waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+      zoomPercentBefore: originalZoomPercent,
+      zoomPercentAfter: targetPercent,
+      renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
+      scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
+      runtimeChunkLoadState: {clone_metrics_js("state.runtimeChunkLoadState")},
+      overlay: document.getElementById('perf-overlay')?.textContent || '',
+    }};
+    setZoomPercent(originalZoomPercent);
+    return result;
   }});
 }}
 """.strip()
@@ -797,17 +1574,22 @@ async (page) => {{
     return run_code_json(collect_js)  # type: ignore[return-value]
 
 
-def run_scenario_suite(base_url: str, scenario_id: str, screenshot_dir: Path) -> dict:
+def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
-    open_page(with_query_overrides(base_url, perf_overlay="1"))
+    page_load = open_page([
+      with_query_overrides(base_url, perf_overlay="1")
+      for base_url in unique_strings(base_urls)
+    ])
     clear_browser_buffers()
     print(f"[benchmark] apply scenario={scenario_id}", flush=True)
     scenario_apply = apply_scenario(scenario_id)
+    post_apply_metrics = measure_post_apply_metrics(scenario_id)
     print(f"[benchmark] idle redraw scenario={scenario_id}", flush=True)
     idle_full_redraw = force_idle_full_redraw(f"benchmark-{scenario_id}-idle-full-redraw")
     context_probes = measure_context_probes(scenario_id)
     print(f"[benchmark] zoom settle scenario={scenario_id}", flush=True)
     zoom_settle_redraw = measure_zoom_settle_redraw()
+    zoom_end_chunk_visible = measure_zoom_end_chunk_visible(scenario_id)
     print(f"[benchmark] interactive pan scenario={scenario_id}", flush=True)
     interactive_pan_frame = measure_interactive_pan_frame()
     print(f"[benchmark] single fill scenario={scenario_id}", flush=True)
@@ -818,12 +1600,15 @@ def run_scenario_suite(base_url: str, scenario_id: str, screenshot_dir: Path) ->
     network_issues = capture_network_issues()
     screenshot_path = take_screenshot(screenshot_dir / f"{scenario_id or 'none'}-home.png")
     print(f"[benchmark] done scenario={scenario_id}", flush=True)
-    return {
+    suite = {
       "scenarioId": scenario_id,
+      "pageLoad": page_load,
       "scenarioApply": scenario_apply,
+      "postApplyMetrics": post_apply_metrics,
       "idleFullRedraw": idle_full_redraw,
       "contextProbes": context_probes,
       "zoomSettleFullRedraw": zoom_settle_redraw,
+      "zoomEndChunkVisible": zoom_end_chunk_visible,
       "interactivePanFrame": interactive_pan_frame,
       "singleFill": single_fill,
       "doubleClickFill": double_click_fill,
@@ -833,12 +1618,17 @@ def run_scenario_suite(base_url: str, scenario_id: str, screenshot_dir: Path) ->
         "home": screenshot_path,
       },
     }
+    suite["benchmarkMetrics"] = build_suite_benchmark_metrics(suite)
+    return suite
 
 
 def main() -> None:
     args = parse_args()
-    if not PWCLI.exists():
-      raise SystemExit(f"Missing Playwright CLI wrapper: {PWCLI}")
+    if hasattr(sys.stdout, "reconfigure"):
+      try:
+          sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+      except Exception:
+          pass
     PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
 
     out_path = (ROOT_DIR / args.out).resolve()
@@ -849,12 +1639,23 @@ def main() -> None:
     effective_url = normalize_playwright_url(args.url)
 
     try:
-      suites = {scenario_id: run_scenario_suite(effective_url, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
+      suite_base_urls = unique_strings([
+          effective_url,
+          ensure_app_path_url(effective_url),
+          args.url,
+          ensure_app_path_url(args.url),
+      ])
+      suites = {scenario_id: run_scenario_suite(suite_base_urls, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
       report = {
         "createdAt": datetime.now(timezone.utc).astimezone().isoformat(),
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
+        "benchmarkMetricsSchemaVersion": 1,
+        "benchmarkMetricsByScenario": {
+          scenario_id: suites[scenario_id].get("benchmarkMetrics", {})
+          for scenario_id in SCENARIO_IDS
+        },
         "suites": suites,
       }
       out_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -896,6 +896,9 @@ function getRenderPassCacheState() {
   cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
     ? cache.referenceTransforms
     : {};
+  cache.contextScenarioLayerCache = cache.contextScenarioLayerCache && typeof cache.contextScenarioLayerCache === "object"
+    ? cache.contextScenarioLayerCache
+    : {};
   cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
     ? cache.borderSnapshot
     : {
@@ -1162,6 +1165,7 @@ function clearRenderPassReferenceTransforms(passNames = null) {
   if (!passNames) {
     cache.referenceTransform = null;
     cache.referenceTransforms = {};
+    cache.contextScenarioLayerCache = {};
     invalidateInteractionBorderSnapshot("clear-reference-transform");
     invalidatePoliticalPathCache("clear-reference-transform");
     return;
@@ -1760,15 +1764,53 @@ function getScenarioRuntimeTopologySignatureToken() {
   ].join("|");
 }
 
+function getScenarioWaterVisualRevisionToken() {
+  return [
+    state.topologyRevision || 0,
+    state.activeScenarioId || "",
+    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `water-global:${getFeatureCollectionFeatureCount(state.waterRegionsData)}`,
+    `water-scenario:${getFeatureCollectionFeatureCount(state.scenarioWaterRegionsData)}`,
+    `water-overrides:${stableJson(state.waterRegionOverrides || {})}`,
+    state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
+    state.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
+    state.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
+    state.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
+    `ocean-fill:${getOceanBaseFillColor()}`,
+    `lake-fill:${getLakeBaseFillColor()}`,
+    `lake-style:${stableJson(getLakeStyleConfig())}`,
+  ].join("|");
+}
+
+function getScenarioSpecialVisualRevisionToken() {
+  return [
+    state.topologyRevision || 0,
+    state.activeScenarioId || "",
+    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `special-count:${getFeatureCollectionFeatureCount(state.scenarioSpecialRegionsData)}`,
+    `special-overrides:${stableJson(state.specialRegionOverrides || {})}`,
+    state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
+  ].join("|");
+}
+
+function getScenarioReliefVisualRevisionToken() {
+  return [
+    state.topologyRevision || 0,
+    state.activeScenarioId || "",
+    Number(state.scenarioReliefOverlayRevision || 0),
+    `relief-count:${getFeatureCollectionFeatureCount(state.scenarioReliefOverlaysData)}`,
+    state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
+  ].join("|");
+}
+
 function getScenarioOverlaySignatureToken() {
   return [
-    Number(state.scenarioReliefOverlayRevision || 0),
-    getFeatureCollectionFeatureCount(state.scenarioWaterRegionsData),
-    getFeatureCollectionFeatureCount(state.scenarioSpecialRegionsData),
-    getFeatureCollectionFeatureCount(state.scenarioReliefOverlaysData),
     String(state.topologyBundleMode || "single"),
     state.detailPromotionCompleted ? "detail-ready" : "detail-pending",
     state.detailPromotionInFlight ? "detail-in-flight" : "detail-idle",
+    `water:${getScenarioWaterVisualRevisionToken()}`,
+    `special:${getScenarioSpecialVisualRevisionToken()}`,
+    `relief:${getScenarioReliefVisualRevisionToken()}`,
   ].join("|");
 }
 
@@ -3100,6 +3142,10 @@ function shouldEnableContextBaseTransformReuse() {
   );
 }
 
+function shouldEnableContextScenarioTransformReuse() {
+  return String(state.renderProfile || "auto") === "balanced" && !!state.activeScenarioId;
+}
+
 function getPassReferenceTransform(passName) {
   const cache = getRenderPassCacheState();
   if (cache.referenceTransforms?.[passName]) {
@@ -4223,6 +4269,10 @@ function setRenderPhase(phase) {
       targetPassesOnDprChange: ["political", "contextBase", "borders"],
     });
   }
+}
+
+function isInteractionRecoveryBlocked() {
+  return state.renderPhase !== RENDER_PHASE_IDLE || state.isInteracting;
 }
 
 function markOverlaysDirty({
@@ -8614,7 +8664,7 @@ function scheduleSecondarySpatialIndexBuild({
   cancelDeferredWork(secondarySpatialBuildHandle);
   secondarySpatialBuildHandle = scheduleDeferredWork(() => {
     secondarySpatialBuildHandle = null;
-    if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+    if (isInteractionRecoveryBlocked()) {
       scheduleSecondarySpatialIndexBuild({ timeout, reason });
       return;
     }
@@ -9005,7 +9055,7 @@ async function buildFullInteractionInfrastructureAfterStartup({
       inFlight: true,
     });
     try {
-      while (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle || state.isInteracting) {
+      while (isInteractionRecoveryBlocked()) {
         await yieldToMain();
       }
       ensureSovereigntyState({ force: true });
@@ -17742,6 +17792,204 @@ function drawPoliticalPass(k) {
   });
 }
 
+function getContextScenarioLayerCacheEntry(layerName) {
+  const cache = getRenderPassCacheState();
+  const resolvedLayerName = String(layerName || "default").trim() || "default";
+  const existing = cache.contextScenarioLayerCache?.[resolvedLayerName];
+  if (existing && typeof existing === "object") {
+    return existing;
+  }
+  const next = {
+    canvas: null,
+    signature: "",
+    referenceTransform: null,
+    renderedCount: 0,
+  };
+  cache.contextScenarioLayerCache[resolvedLayerName] = next;
+  return next;
+}
+
+function ensureContextScenarioLayerCanvas(layerName) {
+  const layerEntry = getContextScenarioLayerCacheEntry(layerName);
+  if (!layerEntry.canvas) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    layerEntry.canvas = canvas;
+  }
+  const layout = getRenderPassLayout("contextScenario");
+  if (layerEntry.canvas.width !== layout.pixelWidth || layerEntry.canvas.height !== layout.pixelHeight) {
+    layerEntry.canvas.width = layout.pixelWidth;
+    layerEntry.canvas.height = layout.pixelHeight;
+    layerEntry.signature = "";
+    layerEntry.referenceTransform = null;
+    layerEntry.renderedCount = 0;
+  }
+  return layerEntry.canvas;
+}
+
+function drawCachedContextScenarioLayer(layerName, currentTransform) {
+  const layerEntry = getContextScenarioLayerCacheEntry(layerName);
+  const layerCanvas = layerEntry.canvas;
+  const referenceTransform = layerEntry.referenceTransform
+    ? cloneZoomTransform(layerEntry.referenceTransform)
+    : null;
+  if (!layerCanvas || !referenceTransform) return false;
+  const layout = getRenderPassLayout("contextScenario");
+  if (layerCanvas.width !== layout.pixelWidth || layerCanvas.height !== layout.pixelHeight) {
+    return false;
+  }
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
+    context.drawImage(
+      layerCanvas,
+      Math.round(-Number(layout?.offsetX || 0) * state.dpr),
+      Math.round(-Number(layout?.offsetY || 0) * state.dpr),
+    );
+    context.restore();
+    return true;
+  }
+  const current = cloneZoomTransform(currentTransform);
+  const scaleRatio = current.k / Math.max(referenceTransform.k, 0.0001);
+  const dx = current.x - (referenceTransform.x * scaleRatio);
+  const dy = current.y - (referenceTransform.y * scaleRatio);
+  context.translate(
+    (dx - Number(layout?.offsetX || 0) * scaleRatio) * state.dpr,
+    (dy - Number(layout?.offsetY || 0) * scaleRatio) * state.dpr,
+  );
+  context.scale(scaleRatio, scaleRatio);
+  context.drawImage(layerCanvas, 0, 0);
+  context.restore();
+  return true;
+}
+
+function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
+  const startedAt = nowMs();
+  let renderedWaterCount = 0;
+  if (!waterFeatures.length) {
+    collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "no-features",
+    });
+    return 0;
+  }
+  waterFeatures.forEach((feature, index) => {
+    const id = getFeatureId(feature) || `water-${index}`;
+    if (!isWaterRegionEnabled(feature)) return;
+    if (!pathBoundsInScreen(feature)) return;
+    const defaultStyle = getWaterRegionDefaultStyle(feature);
+    const fillOpacity = defaultStyle.opacity;
+    if (!(fillOpacity > 0)) return;
+    context.beginPath();
+    pathCanvas(feature);
+    context.save();
+    context.globalAlpha = fillOpacity;
+    context.fillStyle = getWaterRegionColor(id);
+    context.fill();
+    context.restore();
+    renderedWaterCount += 1;
+  });
+  collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+    featureCount: waterFeatures.length,
+    renderedCount: renderedWaterCount,
+    skipped: renderedWaterCount === 0,
+    reason: renderedWaterCount === 0 ? "culled" : "",
+  });
+  return renderedWaterCount;
+}
+
+function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures) {
+  const layerEntry = getContextScenarioLayerCacheEntry("water");
+  const layerCanvas = ensureContextScenarioLayerCanvas("water");
+  const layerContext = layerCanvas.getContext("2d");
+  if (!layerContext) {
+    layerEntry.signature = "";
+    layerEntry.referenceTransform = null;
+    layerEntry.renderedCount = 0;
+    return 0;
+  }
+  const layout = getRenderPassLayout("contextScenario");
+  let renderedWaterCount = 0;
+  withRenderTarget(layerContext, () => {
+    const layerK = prepareTargetContext(layerContext, currentTransform, layout);
+    renderedWaterCount = drawScenarioWaterFillLayer(layerK, { waterFeatures });
+  });
+  layerEntry.signature = getScenarioWaterVisualRevisionToken();
+  layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
+  layerEntry.renderedCount = renderedWaterCount;
+  return renderedWaterCount;
+}
+
+function drawScenarioWaterHighlightLayer(k) {
+  const highlightIds = new Set([
+    String(state.selectedWaterRegionId || "").trim(),
+    String(state.hoveredWaterRegionId || "").trim(),
+  ].filter(Boolean));
+  let highlightedCount = 0;
+  highlightIds.forEach((id) => {
+    const feature = state.waterRegionsById?.get(id);
+    if (!feature) return;
+    if (!isWaterRegionEnabled(feature)) return;
+    if (!pathBoundsInScreen(feature)) return;
+    const isMacroOcean = isMacroOceanWaterRegion(feature);
+    context.beginPath();
+    pathCanvas(feature);
+    context.save();
+    context.globalAlpha = isMacroOcean ? 0.92 : 1;
+    context.strokeStyle = "#f1c40f";
+    context.lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
+    context.lineJoin = "round";
+    context.stroke();
+    context.restore();
+    highlightedCount += 1;
+  });
+  return highlightedCount;
+}
+
+function drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures = [] } = {}) {
+  const startedAt = nowMs();
+  let renderedSpecialCount = 0;
+  if (!specialFeatures.length) {
+    collectContextMetric("drawScenarioSpecialRegionOverlaysLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "no-features",
+    });
+    return 0;
+  }
+  specialFeatures.forEach((feature, index) => {
+    const id = getFeatureId(feature) || `special-${index}`;
+    const renderAsBase = isBaseGeographyScenarioFeature(feature);
+    if (!isSpecialRegionEnabled(feature)) return;
+    if (!pathBoundsInScreen(feature)) return;
+    context.beginPath();
+    pathCanvas(feature);
+    context.save();
+    context.globalAlpha = renderAsBase
+      ? Math.max(getSpecialRegionOpacity(feature, id), 0.94)
+      : getSpecialRegionOpacity(feature, id);
+    context.fillStyle = getSpecialRegionColor(id, feature);
+    context.fill();
+    context.restore();
+    context.strokeStyle = getSpecialRegionStrokeColor(feature);
+    context.lineWidth = 1 / Math.max(0.0001, k);
+    context.lineJoin = "round";
+    context.stroke();
+    renderedSpecialCount += 1;
+  });
+  collectContextMetric("drawScenarioSpecialRegionOverlaysLayer", nowMs() - startedAt, {
+    featureCount: specialFeatures.length,
+    renderedCount: renderedSpecialCount,
+    skipped: renderedSpecialCount === 0,
+    reason: renderedSpecialCount === 0 ? "culled" : "",
+  });
+  return renderedSpecialCount;
+}
+
 function drawScenarioRegionOverlaysPass(k) {
   const startedAt = nowMs();
   const showWater = !!state.showWaterRegions;
@@ -17750,6 +17998,8 @@ function drawScenarioRegionOverlaysPass(k) {
   const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
   let renderedWaterCount = 0;
   let renderedSpecialCount = 0;
+  let highlightedWaterCount = 0;
+  let waterCacheMode = "disabled";
   if (!showWater && !showSpecial) {
     collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
       featureCount: 0,
@@ -17757,6 +18007,8 @@ function drawScenarioRegionOverlaysPass(k) {
       specialFeatureCount: 0,
       renderedWaterCount: 0,
       renderedSpecialCount: 0,
+      highlightedWaterCount: 0,
+      waterCacheMode,
       skipped: true,
       reason: "disabled",
     });
@@ -17764,58 +18016,31 @@ function drawScenarioRegionOverlaysPass(k) {
   }
 
   if (showWater) {
-    waterFeatures.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `water-${index}`;
-      if (!isWaterRegionEnabled(feature)) return;
-      if (!pathBoundsInScreen(feature)) return;
-      const isMacroOcean = isMacroOceanWaterRegion(feature);
-      const defaultStyle = getWaterRegionDefaultStyle(feature);
-      const isHighlighted = state.selectedWaterRegionId === id || state.hoveredWaterRegionId === id;
-      const fillOpacity = defaultStyle.opacity;
-      context.beginPath();
-      pathCanvas(feature);
-      if (fillOpacity > 0) {
-        context.save();
-        context.globalAlpha = fillOpacity;
-        context.fillStyle = getWaterRegionColor(id);
-        context.fill();
-        context.restore();
+    const currentTransform = cloneZoomTransform(state.zoomTransform || globalThis.d3?.zoomIdentity);
+    const waterLayerEntry = getContextScenarioLayerCacheEntry("water");
+    const waterVisualRevision = getScenarioWaterVisualRevisionToken();
+    const canReuseWaterLayer = (
+      shouldEnableContextScenarioTransformReuse()
+      && waterLayerEntry.signature === waterVisualRevision
+      && !!waterLayerEntry.canvas
+      && !!waterLayerEntry.referenceTransform
+    );
+    if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
+      waterCacheMode = "reuse";
+      renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
+    } else {
+      waterCacheMode = "redraw";
+      renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
+      if (!drawCachedContextScenarioLayer("water", currentTransform)) {
+        waterCacheMode = "direct";
+        renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
       }
-      if (isHighlighted) {
-        context.save();
-        context.globalAlpha = isMacroOcean ? 0.92 : 1;
-        context.strokeStyle = "#f1c40f";
-        context.lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
-        context.lineJoin = "round";
-        context.stroke();
-        context.restore();
-      }
-      renderedWaterCount += 1;
-    });
+    }
+    highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
   }
 
   if (showSpecial) {
-    specialFeatures.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `special-${index}`;
-      const renderAsBase = isBaseGeographyScenarioFeature(feature);
-      if (!renderAsBase && !showSpecial) return;
-      if (!isSpecialRegionEnabled(feature)) return;
-      if (!pathBoundsInScreen(feature)) return;
-      context.beginPath();
-      pathCanvas(feature);
-      context.save();
-      context.globalAlpha = renderAsBase
-        ? Math.max(getSpecialRegionOpacity(feature, id), 0.94)
-        : getSpecialRegionOpacity(feature, id);
-      context.fillStyle = getSpecialRegionColor(id, feature);
-      context.fill();
-      context.restore();
-      context.strokeStyle = getSpecialRegionStrokeColor(feature);
-      context.lineWidth = 1 / Math.max(0.0001, k);
-      context.lineJoin = "round";
-      context.stroke();
-      renderedSpecialCount += 1;
-    });
+    renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures });
   }
   collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
     featureCount: waterFeatures.length + specialFeatures.length,
@@ -17823,6 +18048,8 @@ function drawScenarioRegionOverlaysPass(k) {
     specialFeatureCount: specialFeatures.length,
     renderedWaterCount,
     renderedSpecialCount,
+    highlightedWaterCount,
+    waterCacheMode,
     skipped: false,
   });
 }
@@ -18115,6 +18342,19 @@ function ensureIdleRenderPasses(timings) {
         cache.dirty[passName] = true;
         cache.reasons[passName] = reuseDecision.reason || "context-base-threshold";
       }
+    }
+    if (
+      passName === "contextScenario"
+      && shouldEnableContextScenarioTransformReuse()
+      && cache.dirty[passName]
+      && String(cache.reasons[passName] || "") === "signature"
+    ) {
+      cache.dirty[passName] = false;
+      recordRenderPerfMetric("contextScenarioReuseSkipped", 0, {
+        activeScenarioId: String(state.activeScenarioId || ""),
+        reason: "transform-reuse",
+        transformK: Number(transform?.k || state.zoomTransform?.k || 1),
+      });
     }
     if (!cache.dirty[passName]) return;
     if (
@@ -24152,6 +24392,7 @@ function initMap({
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
+  renderPassCache.contextScenarioLayerCache = {};
   renderPassCache.lastGoodFrame.valid = false;
   renderPassCache.lastGoodFrame.referenceTransform = null;
   renderPassCache.lastGoodFrame.reason = "init-map";
@@ -24269,6 +24510,7 @@ function setMapData({
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
+  renderPassCache.contextScenarioLayerCache = {};
   renderPassCache.lastGoodFrame.valid = false;
   renderPassCache.lastGoodFrame.referenceTransform = null;
   renderPassCache.lastGoodFrame.reason = "set-map-data";
@@ -24432,7 +24674,7 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
   if (promotionVersion !== scenarioChunkPromotionVersion) {
     return false;
   }
-  if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle || state.isInteracting) {
+  if (isInteractionRecoveryBlocked()) {
     scheduleDeferredScenarioChunkPromotionInfraRefresh({
       reason,
       suppressRender,

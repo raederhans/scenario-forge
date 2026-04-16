@@ -208,3 +208,26 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
 });
+
+test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", async ({ page }) => {
+  await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
+
+  const contract = await page.evaluate(async () => {
+    const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
+    const rendererSource = await fetch(rendererSourceUrl).then((response) => response.text());
+
+    return {
+      drawContextScenarioPassKeepsScenarioOverlayBoundary:
+        /function drawContextScenarioPass\(k, \{ interactive = false \} = \{\}\) \{[\s\S]*?drawScenarioRegionOverlaysPass\(k\);[\s\S]*?drawScenarioReliefOverlaysLayer\(k\);[\s\S]*?recordRenderPerfMetric\("drawContextScenarioPass"/.test(rendererSource),
+      signatureOnlyContextScenarioInvalidationUsesTransformReuse:
+        /passName === "contextScenario"[\s\S]*?shouldEnableContextScenarioTransformReuse\(\)[\s\S]*?cache\.dirty\[passName\] = false;[\s\S]*?recordRenderPerfMetric\("contextScenarioReuseSkipped", 0, \{/.test(rendererSource),
+      exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
+        /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
+        && /scheduleExactAfterSettleRefresh[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(rendererSource),
+    };
+  });
+
+  expect(contract.drawContextScenarioPassKeepsScenarioOverlayBoundary).toBe(true);
+  expect(contract.signatureOnlyContextScenarioInvalidationUsesTransformReuse).toBe(true);
+  expect(contract.exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses).toBe(true);
+});

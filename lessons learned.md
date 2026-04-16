@@ -780,3 +780,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 3. palette audit 只能覆盖 palette 优先区，不能一刀切压掉 scenario_extension 的显式色
 - 这次第二轮回归暴露的关键问题是：`tno.audit.json.map_hex -> countries.json.color_hex` 的 blanket 同步会把 `PHI / MAL / LAO / ARM / BRG` 这类已有场景规则或代码显式色的国家重新刷回 palette 色。
 - 更稳的做法是：最终同步阶段先划分“显式特例保留集”和“palette 优先区”；显式特例继续保留场景源色，palette 优先区再对齐 audit。
+
+### 76. 浏览器 benchmark fallback 在 Windows 上要同时处理 transport、URL 入口和截图路径
+- 这次真正卡住 benchmark 的不是单一 open 失败，而是三层问题叠加：wrapper open 不稳、根路径 `/?...` 和真实 `/app/?...` 入口混用、本地 screenshot 继续按 bash path 写入时会落错盘。
+- 更稳的最短路径是：benchmark 内部同时准备 wrapper + local node-playwright 两条 transport，URL 候选默认补 `/app/` 版本，本地 fallback 写截图时直接用 Windows 原生绝对路径。
+
+### 77. chunked runtime 的 coarse prewarm 一旦算进 time-to-interactive，首帧指标会被整段放大
+- 这次 `tno_1962.timeToInteractive` 从约 2554ms 降到约 731ms，关键动作就是把 `preloadScenarioCoarseChunks()` 从 `runPostScenarioApplyEffects()` 的同步等待里挪到首帧后异步调度。
+- 更稳的最短路径是：首帧只做 coarse 可见必需链，chunk prewarm 放到首帧后后台推进，指标里再单独量它自己的 ready 时间。
