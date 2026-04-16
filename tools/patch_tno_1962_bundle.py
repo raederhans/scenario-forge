@@ -3982,7 +3982,7 @@ TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
         "base_iso2": "KR",
         "lookup_iso2": "KR",
         "provenance_iso2": "KR",
-        "color_hex": "#82132e",
+        "color_hex": "#009163",
         "notes": "Japanese colonial administration over Korea restyled as the Korean Residency-General in the 1962 scenario.",
         "entry_kind": "scenario_subject",
         "parent_owner_tag": "JAP",

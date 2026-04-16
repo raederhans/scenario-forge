@@ -749,3 +749,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 69. 色板导入完成后，必须单独核对“已导入颜色”和“已审核映射”是不是同一层真相
 - 这次 TNO 颜色资产里，`tno.palette.json` 已经导入了 511 条原始颜色，但 `tno.map.json` 的 118 个 mapped TAG 仍完全继承自 `hoi4_vanilla`。
 - 更稳的做法是每次导入新剧本色板后，立刻做一轮场景国家清单 vs 色板条目 vs 映射结果的三方核对，先找出“色板有颜色但映射还没审核”的国家，再处理完全缺席的扩展 TAG。
+
+### 70. 继承的 deny_tags 不能压过子剧本里显式确认的 verified 映射
+- 这次 TNO 要把 `MAN / MEN / SHX / VIN` 从 inherited vanilla deny 清单里拉出来做 reviewed 映射，如果只叠加 local verified 而不移除 inherited deny，导入器会把它们再次过滤掉。
+- 更稳的做法是：子 manual 里显式写入 verified 的 TAG，先从继承 deny 集里剔除，再应用本地 deny，保证“本地确认”优先级高于“父层保守拒绝”。
+
+### 71. reviewed 映射层和 runtime 默认色桥拆开后，生成器与消费端都要同时认同一份白名单语义
+- 这次第二波把 30 个 alt-history / regional TAG 推进到 reviewed 映射层后，只有在 `tools/import_country_palette.py`、`scenario_builder/hoi4/crosswalk.py`、`js/core/palette_manager.js` 三处同时尊重 `expose_as_runtime_default=false`，才能避免它们反向接管 `CN / RU / FR` 这类默认桥。
+- 更稳的做法是：每次补 reviewed 映射时，同步补一条“生成器输出 + Python 反查 + JS 默认桥”三联保护测试。
+
+### 72. 最后专题项如果依赖非 runtime 锚点，优先保留专题状态，不要为了清零 unmapped 强行并到大国锚点
+- 这次 `SIK / TIB / XIK` 暴露的是同一类问题：它们在世界观语义上更像新疆 / 西藏 / 西康专题锚点，当前 runtime-country 体系还没有承接这些 code。
+- 更稳的做法是先只收 `PRC / SIC` 这种已经能安全挂到 `CN` 的 overlay，剩余专题项维持 `unmapped`，等自定义 anchor 机制准备好再推进。

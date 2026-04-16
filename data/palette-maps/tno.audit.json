@@ -1,11 +1,11 @@
 {
   "version": 1,
   "palette_id": "tno",
-  "generated_at": "2026-03-03T02:44:23.859442+00:00",
+  "generated_at": "2026-04-16T01:45:05.041816+00:00",
   "summary": {
     "total_entries": 511,
-    "mapped_count": 118,
-    "unmapped_count": 393
+    "mapped_count": 163,
+    "unmapped_count": 348
   },
   "entries": {
     "AAA": {
@@ -246,14 +246,16 @@
       "decision_source": "manual_verified"
     },
     "ALT": {
-      "localized_name": "ALT",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#7e887d",
       "ui_hex": "#7e887d",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "AMR": {
       "localized_name": "AMR",
@@ -553,14 +555,16 @@
       "reason": "unreviewed"
     },
     "BKR": {
-      "localized_name": "BKR",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#92ba8b",
       "ui_hex": "#92ba8b",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "BKU": {
       "localized_name": "BKU",
@@ -697,10 +701,12 @@
       "country_file_label": "Germany - Proper",
       "name_source": "exact_tag_loc",
       "country_file_is_shared_template": true,
-      "map_hex": "#1a1a1a",
-      "ui_hex": "#2a2a2a",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "map_hex": "#442849",
+      "ui_hex": "#442849",
+      "status": "mapped",
+      "mapped_iso2": "FR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "BRM": {
       "localized_name": "Myanmar",
@@ -755,14 +761,16 @@
       "reason": "unreviewed"
     },
     "BRY": {
-      "localized_name": "BRY",
+      "localized_name": "Russia",
       "country_file_label": "Far East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#af0f1c",
       "ui_hex": "#af0f1c",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "BSQ": {
       "localized_name": "Basque Republic",
@@ -955,14 +963,16 @@
       "decision_source": "manual_verified"
     },
     "CHT": {
-      "localized_name": "CHT",
+      "localized_name": "Russia",
       "country_file_label": "Far East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#8e838a",
       "ui_hex": "#8e838a",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "CLC": {
       "localized_name": "CLC",
@@ -1646,14 +1656,16 @@
       "reason": "unreviewed"
     },
     "FFR": {
-      "localized_name": "FFR",
+      "localized_name": "France",
       "country_file_label": "West Europe",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#464678",
       "ui_hex": "#464678",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "FR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "FGB": {
       "localized_name": "FGB",
@@ -1778,14 +1790,16 @@
       "reason": "unreviewed"
     },
     "FRI": {
-      "localized_name": "FRI",
+      "localized_name": "India",
       "country_file_label": "Asia - Sphere",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#2a62a2",
       "ui_hex": "#2a62a2",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "IN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "FRM": {
       "localized_name": "French Republic",
@@ -1910,14 +1924,16 @@
       "reason": "unreviewed"
     },
     "GAY": {
-      "localized_name": "GAY",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#4b4150",
       "ui_hex": "#4b4150",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "GAZ": {
       "localized_name": "GAZ",
@@ -2037,14 +2053,16 @@
       "reason": "unreviewed"
     },
     "GNG": {
-      "localized_name": "GNG",
+      "localized_name": "China",
       "country_file_label": "Japan - Overseas",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#7a2e41",
       "ui_hex": "#7a2e41",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "GNS": {
       "localized_name": "Government of National Salvation",
@@ -2057,14 +2075,16 @@
       "reason": "unreviewed"
     },
     "GOR": {
-      "localized_name": "GOR",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#a07683",
       "ui_hex": "#a07683",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "GRE": {
       "localized_name": "Hellenic Republic",
@@ -2303,14 +2323,16 @@
       "decision_source": "manual_verified"
     },
     "IBR": {
-      "localized_name": "IBR",
+      "localized_name": "Spain",
       "country_file_label": "Iberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#c6ac82",
       "ui_hex": "#c6ac82",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "ES",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ICE": {
       "localized_name": "Iceland",
@@ -2429,14 +2451,16 @@
       "reason": "unreviewed"
     },
     "IRK": {
-      "localized_name": "IRK",
+      "localized_name": "Russia",
       "country_file_label": "Far East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#912b40",
       "ui_hex": "#a3111f",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "IRL": {
       "localized_name": "IRL",
@@ -2727,24 +2751,28 @@
       "reason": "unreviewed"
     },
     "KOM": {
-      "localized_name": "KOM",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#5e83a2",
       "ui_hex": "#5e83a2",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "KOR": {
-      "localized_name": "KOR",
+      "localized_name": "South Korea",
       "country_file_label": "Japan - Overseas",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#009163",
       "ui_hex": "#009163",
-      "status": "unmapped",
-      "reason": "split_state"
+      "status": "mapped",
+      "mapped_iso2": "KR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "KRK": {
       "localized_name": "KRK",
@@ -2767,14 +2795,16 @@
       "reason": "unreviewed"
     },
     "KRS": {
-      "localized_name": "KRS",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#d7d4ae",
       "ui_hex": "#d7d4ae",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "KSI": {
       "localized_name": "KSI",
@@ -2807,14 +2837,16 @@
       "reason": "unreviewed"
     },
     "KUR": {
-      "localized_name": "KUR",
+      "localized_name": "Iraq",
       "country_file_label": "Middle East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#635988",
       "ui_hex": "#635988",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "IQ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "KUW": {
       "localized_name": "Kuwait",
@@ -2985,14 +3017,16 @@
       "decision_source": "manual_verified"
     },
     "MAG": {
-      "localized_name": "MAG",
+      "localized_name": "Russia",
       "country_file_label": "Far East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#cac6b2",
       "ui_hex": "#cac6b2",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "MAL": {
       "localized_name": "Malaysia",
@@ -3013,9 +3047,10 @@
       "country_file_is_shared_template": true,
       "map_hex": "#a80043",
       "ui_hex": "#a80043",
-      "status": "unmapped",
-      "reason": "split_state",
-      "suggested_iso2": "CN"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "MAU": {
       "localized_name": "MAU",
@@ -3068,14 +3103,16 @@
       "reason": "unreviewed"
     },
     "MEN": {
-      "localized_name": "MEN",
+      "localized_name": "China",
       "country_file_label": "China",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#8f354b",
       "ui_hex": "#8f354b",
-      "status": "unmapped",
-      "reason": "historical_union_or_predecessor"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "MEX": {
       "localized_name": "Mexico",
@@ -3320,14 +3357,16 @@
       "decision_source": "manual_verified"
     },
     "NOV": {
-      "localized_name": "NOV",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#5e7d88",
       "ui_hex": "#5e7d88",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "NRB": {
       "localized_name": "NRB",
@@ -3464,34 +3503,40 @@
       "reason": "unreviewed"
     },
     "OMS": {
-      "localized_name": "OMS",
+      "localized_name": "Russia",
       "country_file_label": "West Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#2b322b",
       "ui_hex": "#2b322b",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ONG": {
-      "localized_name": "ONG",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#51875b",
       "ui_hex": "#51875b",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ORE": {
-      "localized_name": "ORE",
+      "localized_name": "Russia",
       "country_file_label": "South Urals",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#567856",
       "ui_hex": "#567856",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ORM": {
       "localized_name": "ORM",
@@ -3690,15 +3735,16 @@
       "reason": "unreviewed"
     },
     "PRC": {
-      "localized_name": "PRC",
+      "localized_name": "China",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#701510",
       "ui_hex": "#701510",
-      "status": "unmapped",
-      "reason": "split_state",
-      "suggested_iso2": "CN"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "PRK": {
       "localized_name": "PRK",
@@ -3711,14 +3757,16 @@
       "reason": "unreviewed"
     },
     "PRM": {
-      "localized_name": "PRM",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#aa8c55",
       "ui_hex": "#aa8c55",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "PRU": {
       "localized_name": "Peru",
@@ -3941,14 +3989,16 @@
       "decision_source": "manual_verified"
     },
     "SAM": {
-      "localized_name": "SAM",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#c2a994",
       "ui_hex": "#c2a994",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SAO": {
       "localized_name": "SAO",
@@ -3973,14 +4023,16 @@
       "decision_source": "manual_verified"
     },
     "SBA": {
-      "localized_name": "SBA",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#000000",
       "ui_hex": "#000000",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SCO": {
       "localized_name": "Republic of Scotland",
@@ -3989,8 +4041,10 @@
       "country_file_is_shared_template": true,
       "map_hex": "#606a9c",
       "ui_hex": "#606a9c",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "GB",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SDF": {
       "localized_name": "SDF",
@@ -4013,14 +4067,16 @@
       "reason": "unreviewed"
     },
     "SER": {
-      "localized_name": "SER",
+      "localized_name": "Republic of Serbia",
       "country_file_label": "East Europe - Pakt",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#141e6e",
       "ui_hex": "#141e6e",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RS",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SFG": {
       "localized_name": "SFG",
@@ -4064,25 +4120,28 @@
       "reason": "unreviewed"
     },
     "SHX": {
-      "localized_name": "SHX",
+      "localized_name": "China",
       "country_file_label": "China",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#955a74",
       "ui_hex": "#955a74",
-      "status": "unmapped",
-      "reason": "warlord_or_regional_tag",
-      "suggested_iso2": "CN"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SIC": {
-      "localized_name": "SIC",
+      "localized_name": "China",
       "country_file_label": "Japan - Overseas",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#c15a7d",
       "ui_hex": "#c15a7d",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SIK": {
       "localized_name": "SIK",
@@ -4372,14 +4431,16 @@
       "reason": "unreviewed"
     },
     "SVR": {
-      "localized_name": "SVR",
+      "localized_name": "Russia",
       "country_file_label": "West Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#8c6e7c",
       "ui_hex": "#8c6e7c",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "SWB": {
       "localized_name": "SWB",
@@ -4450,14 +4511,16 @@
       "decision_source": "manual_verified"
     },
     "TAN": {
-      "localized_name": "TAN",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#701510",
       "ui_hex": "#701510",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "TAR": {
       "localized_name": "TAR",
@@ -4783,14 +4846,16 @@
       "reason": "unreviewed"
     },
     "TOM": {
-      "localized_name": "TOM",
+      "localized_name": "Russia",
       "country_file_label": "Central Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#547245",
       "ui_hex": "#547245",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "TOO": {
       "localized_name": "TOO",
@@ -4859,14 +4924,16 @@
       "decision_source": "manual_verified"
     },
     "TYM": {
-      "localized_name": "TYM",
+      "localized_name": "Russia",
       "country_file_label": "West Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#823d3d",
       "ui_hex": "#823d3d",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "UAE": {
       "localized_name": "United Arab Emirates",
@@ -4975,14 +5042,16 @@
       "decision_source": "manual_verified"
     },
     "URL": {
-      "localized_name": "URL",
+      "localized_name": "Russia",
       "country_file_label": "South Urals",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#b4b3da",
       "ui_hex": "#b4b3da",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "URP": {
       "localized_name": "URP",
@@ -5091,44 +5160,52 @@
       "reason": "unreviewed"
     },
     "VIN": {
-      "localized_name": "VIN",
+      "localized_name": "Vietnam",
       "country_file_label": "Asia - Sphere",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#a76286",
       "ui_hex": "#a76286",
-      "status": "unmapped",
-      "reason": "split_state"
+      "status": "mapped",
+      "mapped_iso2": "VN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "VOL": {
-      "localized_name": "VOL",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#6e6e85",
       "ui_hex": "#6e6e85",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "VOR": {
-      "localized_name": "VOR",
+      "localized_name": "Russia",
       "country_file_label": "West Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#87bdb8",
       "ui_hex": "#87bdb8",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "VYT": {
-      "localized_name": "VYT",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#41642a",
       "ui_hex": "#41642a",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "WAL": {
       "localized_name": "WAL",
@@ -5161,14 +5238,16 @@
       "reason": "unreviewed"
     },
     "WRS": {
-      "localized_name": "WRS",
+      "localized_name": "Russia",
       "country_file_label": "West Russia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#a3424c",
       "ui_hex": "#a3424c",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "WSM": {
       "localized_name": "WSM",
@@ -5191,24 +5270,28 @@
       "reason": "unreviewed"
     },
     "XIN": {
-      "localized_name": "XIN",
+      "localized_name": "China",
       "country_file_label": "China",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#5f8e9c",
       "ui_hex": "#5f8e9c",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "YAK": {
-      "localized_name": "YAK",
+      "localized_name": "Russia",
       "country_file_label": "Far East",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#4f6365",
       "ui_hex": "#4f6365",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "YEM": {
       "localized_name": "Yemen",
@@ -5249,8 +5332,10 @@
       "country_file_is_shared_template": true,
       "map_hex": "#763446",
       "ui_hex": "#763446",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ZAM": {
       "localized_name": "Zambia",
@@ -5297,14 +5382,16 @@
       "decision_source": "manual_verified"
     },
     "ZLT": {
-      "localized_name": "ZLT",
+      "localized_name": "Russia",
       "country_file_label": "West Siberia",
-      "name_source": "tag_fallback",
+      "name_source": "mapped_project_name",
       "country_file_is_shared_template": true,
       "map_hex": "#a95838",
       "ui_hex": "#a95838",
-      "status": "unmapped",
-      "reason": "unreviewed"
+      "status": "mapped",
+      "mapped_iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
     },
     "ZMO": {
       "localized_name": "ZMO",

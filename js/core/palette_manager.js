@@ -37,6 +37,11 @@ function getMappedIso2(mappedEntry) {
   return "";
 }
 
+function shouldExposeAsRuntimeDefault(mappedEntry) {
+  if (!mappedEntry || typeof mappedEntry !== "object") return true;
+  return mappedEntry.expose_as_runtime_default !== false;
+}
+
 function getUnmappedReason(unmappedEntry) {
   if (typeof unmappedEntry === "string") {
     return String(unmappedEntry || "").trim();
@@ -98,6 +103,7 @@ function buildFixedPaletteColorsByIso2(palettePack, paletteMap) {
   const entries = palettePack?.entries && typeof palettePack.entries === "object" ? palettePack.entries : {};
   const fixed = {};
   Object.entries(mapped).forEach(([tag, mappedEntry]) => {
+    if (!shouldExposeAsRuntimeDefault(mappedEntry)) return;
     const iso2 = getMappedIso2(mappedEntry);
     const hex = normalizeHexColor(entries?.[tag]?.map_hex || entries?.[tag]?.country_file_hex || entries?.[tag]?.ui_hex);
     if (!iso2 || !hex) return;

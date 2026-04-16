@@ -927,6 +927,77 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(raj_entry["parent_owner_tag"], "")
         self.assertEqual(raj_entry["subject_kind"], "")
 
+    def test_second_wave_color_sources_match_expected_targets(self) -> None:
+        manual_overrides = json.loads(
+            Path("data/scenarios/tno_1962/scenario_manual_overrides.json").read_text(encoding="utf-8")
+        )
+        east_asia_rules = json.loads(
+            Path("data/scenario-rules/tno_1962.east_asia_ownership.manual.json").read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(
+            tno_bundle.TNO_1962_MANUAL_COUNTRY_OVERRIDES["KOR"]["color_hex"],
+            "#009163",
+        )
+        gng_rule = next(
+            rule for rule in east_asia_rules["country_rules"]
+            if rule.get("rule_id") == "japan_guangdong_client_1962"
+        )
+        self.assertEqual(gng_rule["color_hex"], "#7A2E41")
+        self.assertEqual(manual_overrides["countries"]["MAG"]["color_hex"], "#cac6b2")
+        self.assertEqual(manual_overrides["countries"]["ONG"]["color_hex"], "#51875b")
+        self.assertEqual(manual_overrides["countries"]["GAY"]["color_hex"], "#4b4150")
+
+    def test_second_wave_runtime_colors_match_tno_audit_targets(self) -> None:
+        countries_payload = json.loads(
+            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
+        )["countries"]
+        audit_entries = json.loads(
+            Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
+        )["entries"]
+
+        expected_tags = ["KOR", "GNG", "MAG", "ONG", "GAY"]
+        for tag in expected_tags:
+            self.assertEqual(
+                countries_payload[tag]["color_hex"],
+                audit_entries[tag]["map_hex"],
+            )
+
+    def test_final_wave_runtime_colors_match_tno_audit_targets(self) -> None:
+        countries_payload = json.loads(
+            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
+        )["countries"]
+        audit_entries = json.loads(
+            Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
+        )["entries"]
+
+        expected_tags = ["PRC", "SIC", "SIK", "TIB", "XIK"]
+        for tag in expected_tags:
+            self.assertEqual(
+                countries_payload[tag]["color_hex"],
+                audit_entries[tag]["map_hex"],
+            )
+
+    def test_final_wave_runtime_entries_keep_expected_sources_and_entry_kinds(self) -> None:
+        countries = json.loads(
+            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
+        )["countries"]
+
+        self.assertEqual(countries["PRC"]["entry_kind"], "controller_only")
+        self.assertEqual(countries["PRC"]["primary_rule_source"], "tno_1962_controller_only_prc")
+
+        self.assertEqual(countries["SIC"]["entry_kind"], "controller_only")
+        self.assertEqual(countries["SIC"]["primary_rule_source"], "tno_1962_controller_only_sic")
+
+        self.assertEqual(countries["SIK"]["entry_kind"], "controller_only")
+        self.assertEqual(countries["SIK"]["primary_rule_source"], "tno_1962_controller_only_sik")
+
+        self.assertEqual(countries["TIB"]["entry_kind"], "scenario_subject")
+        self.assertEqual(countries["TIB"]["primary_rule_source"], "japan_tibet_client_1962")
+
+        self.assertEqual(countries["XIK"]["entry_kind"], "scenario_country")
+        self.assertEqual(countries["XIK"]["primary_rule_source"], "dev_manual_tag_create")
+
     def test_validate_geo_locale_manual_overrides_requires_exact_override_entries(self) -> None:
         geo_locale_payload = {
             "geo": {

@@ -293,6 +293,15 @@ def normalize_verified_mapping(raw_mapping: dict | None) -> dict[str, str]:
     return normalized
 
 
+def normalize_non_default_runtime_tags(raw_values: list | None) -> set[str]:
+    normalized: set[str] = set()
+    for raw_value in raw_values or []:
+        value = str(raw_value or "").strip().upper()
+        if value:
+            normalized.add(value)
+    return normalized
+
+
 def normalize_deny_tags(raw_deny_tags: dict | None) -> dict[str, dict[str, str]]:
     deny_tags: dict[str, dict[str, str]] = {}
     for raw_tag, raw_value in (raw_deny_tags or {}).items():
@@ -492,16 +501,26 @@ def resolve_mapping_state(
     verified_exact = {}
     verified_alias = {}
     deny_tags = {}
+    non_default_runtime_tags: set[str] = set()
+    local_verified_exact = normalize_verified_mapping(manual.get("verified_exact_tag_to_iso2"))
+    local_verified_alias = normalize_verified_mapping(manual.get("verified_alias_tag_to_iso2"))
+    local_deny_tags = normalize_deny_tags(manual.get("deny_tags"))
 
     if manual.get("inherit_exact_verified"):
         verified_exact.update(normalize_verified_mapping(inherited_manual.get("verified_exact_tag_to_iso2")))
     if manual.get("inherit_alias_verified"):
         verified_alias.update(normalize_verified_mapping(inherited_manual.get("verified_alias_tag_to_iso2")))
     deny_tags.update(normalize_deny_tags(inherited_manual.get("deny_tags")))
+    non_default_runtime_tags.update(
+        normalize_non_default_runtime_tags(inherited_manual.get("non_default_runtime_tags"))
+    )
 
-    verified_exact.update(normalize_verified_mapping(manual.get("verified_exact_tag_to_iso2")))
-    verified_alias.update(normalize_verified_mapping(manual.get("verified_alias_tag_to_iso2")))
-    deny_tags.update(normalize_deny_tags(manual.get("deny_tags")))
+    verified_exact.update(local_verified_exact)
+    verified_alias.update(local_verified_alias)
+    for tag in set(local_verified_exact) | set(local_verified_alias):
+        deny_tags.pop(tag, None)
+    deny_tags.update(local_deny_tags)
+    non_default_runtime_tags.update(normalize_non_default_runtime_tags(manual.get("non_default_runtime_tags")))
 
     for tag in list(verified_exact):
         if tag not in entries or tag in deny_tags:
@@ -509,6 +528,14 @@ def resolve_mapping_state(
     for tag in list(verified_alias):
         if tag not in entries or tag in deny_tags:
             verified_alias.pop(tag, None)
+
+    verified_tags = set(verified_exact) | set(verified_alias)
+    invalid_non_default_runtime_tags = sorted(non_default_runtime_tags - verified_tags)
+    if invalid_non_default_runtime_tags:
+        raise SystemExit(
+            "non_default_runtime_tags entries require verified mappings: "
+            + ", ".join(invalid_non_default_runtime_tags)
+        )
 
     for tag, iso2 in {**verified_exact, **verified_alias}.items():
         if iso2 not in runtime_country_codes:
@@ -561,6 +588,8 @@ def resolve_mapping_state(
             unmapped_payload = {"reason": "unreviewed"}
 
         if mapped_payload:
+            if tag in non_default_runtime_tags:
+                mapped_payload["expose_as_runtime_default"] = False
             mapped[tag] = mapped_payload
             audit_entries[tag] = {
                 "localized_name": entry.localized_name,

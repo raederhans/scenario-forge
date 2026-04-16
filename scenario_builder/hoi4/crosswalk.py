@@ -108,6 +108,8 @@ def build_iso2_to_mapped_tag(palette_map: dict) -> dict[str, str]:
     for tag, entry in mapped.items():
         if not isinstance(entry, dict):
             continue
+        if entry.get("expose_as_runtime_default", True) is False:
+            continue
         iso2 = str(entry.get("iso2") or "").strip().upper()
         if iso2 and iso2 not in result:
             result[iso2] = str(tag).strip().upper()

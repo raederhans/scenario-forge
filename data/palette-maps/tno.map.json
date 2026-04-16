@@ -19,6 +19,12 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "ALT": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "ANG": {
       "iso2": "AO",
       "match_kind": "manual_exact",
@@ -59,6 +65,12 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "BKR": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "BLR": {
       "iso2": "BY",
       "match_kind": "localized_exact",
@@ -84,10 +96,22 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "BRG": {
+      "iso2": "FR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "BRM": {
       "iso2": "MM",
       "match_kind": "approved_alias",
       "decision_source": "manual_verified"
+    },
+    "BRY": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "BUL": {
       "iso2": "BG",
@@ -113,6 +137,12 @@
       "iso2": "CL",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "CHT": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "CMR": {
       "iso2": "CM",
@@ -189,15 +219,33 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "FFR": {
+      "iso2": "FR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "FIN": {
       "iso2": "FI",
       "match_kind": "localized_exact",
       "decision_source": "manual_verified"
     },
+    "FRI": {
+      "iso2": "IN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "GAB": {
       "iso2": "GA",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "GAY": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "GEO": {
       "iso2": "GE",
@@ -213,6 +261,18 @@
       "iso2": "GW",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "GNG": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "GOR": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "GRE": {
       "iso2": "GR",
@@ -249,6 +309,12 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "IBR": {
+      "iso2": "ES",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "ICE": {
       "iso2": "IS",
       "match_kind": "localized_exact",
@@ -263,6 +329,12 @@
       "iso2": "IE",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "IRK": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "IRQ": {
       "iso2": "IQ",
@@ -309,6 +381,30 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "KOM": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "KOR": {
+      "iso2": "KR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "KRS": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "KUR": {
+      "iso2": "IQ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "KUW": {
       "iso2": "KW",
       "match_kind": "manual_exact",
@@ -354,10 +450,28 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "MAG": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "MAL": {
       "iso2": "MY",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "MAN": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "MEN": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "MEX": {
       "iso2": "MX",
@@ -414,6 +528,12 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "NOV": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "NZL": {
       "iso2": "NZ",
       "match_kind": "manual_exact",
@@ -423,6 +543,24 @@
       "iso2": "OM",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "OMS": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "ONG": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "ORE": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "PAK": {
       "iso2": "PK",
@@ -464,6 +602,18 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "PRC": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "PRM": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "PRU": {
       "iso2": "PE",
       "match_kind": "manual_exact",
@@ -489,10 +639,46 @@
       "match_kind": "approved_alias",
       "decision_source": "manual_verified"
     },
+    "SAM": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "SAU": {
       "iso2": "SA",
       "match_kind": "approved_alias",
       "decision_source": "manual_verified"
+    },
+    "SBA": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "SCO": {
+      "iso2": "GB",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "SER": {
+      "iso2": "RS",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "SHX": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "SIC": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "SLO": {
       "iso2": "SK",
@@ -508,6 +694,12 @@
       "iso2": "SR",
       "match_kind": "localized_exact",
       "decision_source": "manual_verified"
+    },
+    "SVR": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "SWE": {
       "iso2": "SE",
@@ -529,10 +721,22 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "TAN": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "TMS": {
       "iso2": "TM",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "TOM": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "TRI": {
       "iso2": "TT",
@@ -549,6 +753,12 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "TYM": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "UAE": {
       "iso2": "AE",
       "match_kind": "manual_exact",
@@ -563,6 +773,12 @@
       "iso2": "UY",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "URL": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "USA": {
       "iso2": "US",
@@ -579,10 +795,58 @@
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
     },
+    "VIN": {
+      "iso2": "VN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "VOL": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "VOR": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "VYT": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "WRS": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "XIN": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
+    "YAK": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
+    },
     "YEM": {
       "iso2": "YE",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "YUN": {
+      "iso2": "CN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     },
     "ZAM": {
       "iso2": "ZM",
@@ -593,6 +857,12 @@
       "iso2": "ZW",
       "match_kind": "manual_exact",
       "decision_source": "manual_verified"
+    },
+    "ZLT": {
+      "iso2": "RU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified",
+      "expose_as_runtime_default": false
     }
   },
   "unmapped": {
@@ -657,9 +927,6 @@
     "AGS": {
       "reason": "unreviewed"
     },
-    "ALT": {
-      "reason": "unreviewed"
-    },
     "AMR": {
       "reason": "unreviewed"
     },
@@ -721,9 +988,6 @@
     "BKF": {
       "reason": "unreviewed"
     },
-    "BKR": {
-      "reason": "unreviewed"
-    },
     "BKU": {
       "reason": "unreviewed"
     },
@@ -745,9 +1009,6 @@
     "BRB": {
       "reason": "unreviewed"
     },
-    "BRG": {
-      "reason": "unreviewed"
-    },
     "BRP": {
       "reason": "unreviewed"
     },
@@ -758,9 +1019,6 @@
       "reason": "unreviewed"
     },
     "BRU": {
-      "reason": "unreviewed"
-    },
-    "BRY": {
       "reason": "unreviewed"
     },
     "BSQ": {
@@ -800,9 +1058,6 @@
       "reason": "unreviewed"
     },
     "CHF": {
-      "reason": "unreviewed"
-    },
-    "CHT": {
       "reason": "unreviewed"
     },
     "CLC": {
@@ -956,9 +1211,6 @@
     "FEN": {
       "reason": "unreviewed"
     },
-    "FFR": {
-      "reason": "unreviewed"
-    },
     "FGB": {
       "reason": "unreviewed"
     },
@@ -990,9 +1242,6 @@
       "reason": "unreviewed"
     },
     "FRD": {
-      "reason": "unreviewed"
-    },
-    "FRI": {
       "reason": "unreviewed"
     },
     "FRM": {
@@ -1028,9 +1277,6 @@
     "GAX": {
       "reason": "unreviewed"
     },
-    "GAY": {
-      "reason": "unreviewed"
-    },
     "GAZ": {
       "reason": "unreviewed"
     },
@@ -1056,13 +1302,7 @@
     "GND": {
       "reason": "unreviewed"
     },
-    "GNG": {
-      "reason": "unreviewed"
-    },
     "GNS": {
-      "reason": "unreviewed"
-    },
-    "GOR": {
       "reason": "unreviewed"
     },
     "GRO": {
@@ -1112,9 +1352,6 @@
     "HRR": {
       "reason": "unreviewed"
     },
-    "IBR": {
-      "reason": "unreviewed"
-    },
     "IEA": {
       "reason": "unreviewed"
     },
@@ -1137,9 +1374,6 @@
       "reason": "unreviewed"
     },
     "IRI": {
-      "reason": "unreviewed"
-    },
-    "IRK": {
       "reason": "unreviewed"
     },
     "IRL": {
@@ -1196,19 +1430,10 @@
     "KNM": {
       "reason": "unreviewed"
     },
-    "KOM": {
-      "reason": "unreviewed"
-    },
-    "KOR": {
-      "reason": "split_state"
-    },
     "KRK": {
       "reason": "unreviewed"
     },
     "KRL": {
-      "reason": "unreviewed"
-    },
-    "KRS": {
       "reason": "unreviewed"
     },
     "KSI": {
@@ -1218,9 +1443,6 @@
       "reason": "unreviewed"
     },
     "KTG": {
-      "reason": "unreviewed"
-    },
-    "KUR": {
       "reason": "unreviewed"
     },
     "KYK": {
@@ -1241,13 +1463,6 @@
     "MAC": {
       "reason": "unreviewed"
     },
-    "MAG": {
-      "reason": "unreviewed"
-    },
-    "MAN": {
-      "reason": "split_state",
-      "suggested_iso2": "CN"
-    },
     "MAU": {
       "reason": "unreviewed"
     },
@@ -1262,9 +1477,6 @@
     },
     "MDM": {
       "reason": "unreviewed"
-    },
-    "MEN": {
-      "reason": "historical_union_or_predecessor"
     },
     "MGN": {
       "reason": "unreviewed"
@@ -1297,9 +1509,6 @@
       "reason": "unreviewed"
     },
     "NNG": {
-      "reason": "unreviewed"
-    },
-    "NOV": {
       "reason": "unreviewed"
     },
     "NRB": {
@@ -1335,15 +1544,6 @@
     "OMO": {
       "reason": "unreviewed"
     },
-    "OMS": {
-      "reason": "unreviewed"
-    },
-    "ONG": {
-      "reason": "unreviewed"
-    },
-    "ORE": {
-      "reason": "unreviewed"
-    },
     "ORM": {
       "reason": "unreviewed"
     },
@@ -1374,14 +1574,7 @@
     "PPR": {
       "reason": "unreviewed"
     },
-    "PRC": {
-      "reason": "split_state",
-      "suggested_iso2": "CN"
-    },
     "PRK": {
-      "reason": "unreviewed"
-    },
-    "PRM": {
       "reason": "unreviewed"
     },
     "PUR": {
@@ -1432,25 +1625,13 @@
     "SAB": {
       "reason": "unreviewed"
     },
-    "SAM": {
-      "reason": "unreviewed"
-    },
     "SAO": {
-      "reason": "unreviewed"
-    },
-    "SBA": {
-      "reason": "unreviewed"
-    },
-    "SCO": {
       "reason": "unreviewed"
     },
     "SDF": {
       "reason": "unreviewed"
     },
     "SDS": {
-      "reason": "unreviewed"
-    },
-    "SER": {
       "reason": "unreviewed"
     },
     "SFG": {
@@ -1464,13 +1645,6 @@
       "reason": "unreviewed"
     },
     "SHO": {
-      "reason": "unreviewed"
-    },
-    "SHX": {
-      "reason": "warlord_or_regional_tag",
-      "suggested_iso2": "CN"
-    },
-    "SIC": {
       "reason": "unreviewed"
     },
     "SIK": {
@@ -1549,16 +1723,10 @@
     "SVI": {
       "reason": "unreviewed"
     },
-    "SVR": {
-      "reason": "unreviewed"
-    },
     "SWB": {
       "reason": "unreviewed"
     },
     "SWZ": {
-      "reason": "unreviewed"
-    },
-    "TAN": {
       "reason": "unreviewed"
     },
     "TAR": {
@@ -1655,9 +1823,6 @@
     "TNZ": {
       "reason": "unreviewed"
     },
-    "TOM": {
-      "reason": "unreviewed"
-    },
     "TOO": {
       "reason": "unreviewed"
     },
@@ -1665,9 +1830,6 @@
       "reason": "unreviewed"
     },
     "TRZ": {
-      "reason": "unreviewed"
-    },
-    "TYM": {
       "reason": "unreviewed"
     },
     "UAR": {
@@ -1691,9 +1853,6 @@
     "UPO": {
       "reason": "unreviewed"
     },
-    "URL": {
-      "reason": "unreviewed"
-    },
     "URP": {
       "reason": "unreviewed"
     },
@@ -1715,18 +1874,6 @@
     "VIL": {
       "reason": "unreviewed"
     },
-    "VIN": {
-      "reason": "split_state"
-    },
-    "VOL": {
-      "reason": "unreviewed"
-    },
-    "VOR": {
-      "reason": "unreviewed"
-    },
-    "VYT": {
-      "reason": "unreviewed"
-    },
     "WAL": {
       "reason": "unreviewed"
     },
@@ -1736,19 +1883,10 @@
     "WOL": {
       "reason": "unreviewed"
     },
-    "WRS": {
-      "reason": "unreviewed"
-    },
     "WSM": {
       "reason": "unreviewed"
     },
     "XIK": {
-      "reason": "unreviewed"
-    },
-    "XIN": {
-      "reason": "unreviewed"
-    },
-    "YAK": {
       "reason": "unreviewed"
     },
     "YGR": {
@@ -1757,16 +1895,10 @@
     "YOR": {
       "reason": "unreviewed"
     },
-    "YUN": {
-      "reason": "unreviewed"
-    },
     "ZAR": {
       "reason": "unreviewed"
     },
     "ZBO": {
-      "reason": "unreviewed"
-    },
-    "ZLT": {
       "reason": "unreviewed"
     },
     "ZMO": {

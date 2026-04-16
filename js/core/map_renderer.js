@@ -14578,8 +14578,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
         usedBuckets.add(bucketKey);
         visibleLabelEntries.push(entry);
       });
-    }
-  });
+  }
   const visibleFeatureCount = featuresByClass.mainline.length + featuresByClass.regional.length;
   if (!visibleFeatureCount) {
     collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
