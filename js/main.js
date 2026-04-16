@@ -295,6 +295,7 @@ const BOOT_PHASE_WINDOWS = {
 };
 const CONTEXT_LAYER_LOAD_ORDER = [
   "rivers",
+  "roads",
   "railways",
   "rail_stations_major",
   "urban",
@@ -1326,7 +1327,13 @@ async function ensureContextLayerDataReady(
         state.contextLayerLoadStateByName[layerName] = "loaded";
         if (
           typeof state.updateTransportAppearanceUIFn === "function"
-          && (layerName === "airports" || layerName === "ports" || layerName === "railways" || layerName === "rail_stations_major")
+          && (
+            layerName === "airports"
+            || layerName === "ports"
+            || layerName === "roads"
+            || layerName === "railways"
+            || layerName === "rail_stations_major"
+          )
         ) {
           state.updateTransportAppearanceUIFn();
         }

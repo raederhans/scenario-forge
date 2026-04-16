@@ -2371,6 +2371,9 @@ TNO_1962_ITALY_REMOVED_FRENCH_BASELINE_TARGETS = {
 }
 TNO_DECOLONIZATION_CANONICAL_TAGS = ("BZ", "GY", "MC")
 TNO_DECOLONIZATION_INDEPENDENT_TAGS = ("CEY", "AST", "BWA", "RAJ", "SAF")
+TNO_DECOLONIZATION_FIXED_COLORS = {
+    "RAJ": "#cc5668",
+}
 TNO_DECOLONIZATION_NOTES = {
     "CEY": "Ceylon retained as an independent state after the British decolonization cleanup in TNO 1962.",
     "AST": "Australian dependencies approximation retained outside the British subject tree in TNO 1962.",
@@ -4180,6 +4183,13 @@ TNO_1962_AMERICA_CONTINENT_IDS = {
     "continent_south_america",
 }
 
+TNO_1962_BASELINE_TNO_COLOR_TAGS = {
+    "FRA",
+    "LIB",
+    "MON",
+    "SOV",
+}
+
 TNO_1962_TNO_COLOR_PROXY_TAGS = {
     "FRA": "FRM",
     "WLS": "WAL",
@@ -4201,9 +4211,11 @@ TNO_1962_TNO_COLOR_FIXED_HEX = {
     "INS": "#9f344d",
     "MAN": "#a80043",
     "MEN": "#8f354b",
+    "MON": "#666057",
     "PAK": "#21331e",
     "RKM": "#4f4554",
     "SHX": "#955a74",
+    "SOV": "#7d0d18",
     "TIB": "#c8c8c8",
     "VIN": "#a76286",
     "XIK": "#6873a0",
@@ -6387,13 +6399,17 @@ def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) 
 
     target_tags = (
         set(TNO_1962_DIRECT_TNO_COLOR_TAGS)
+        | set(TNO_1962_BASELINE_TNO_COLOR_TAGS)
         | set(TNO_1962_TNO_COLOR_PROXY_TAGS.keys())
         | set(TNO_1962_TNO_COLOR_FIXED_HEX.keys())
     )
     for tag, country_entry in countries.items():
         normalized_tag = normalize_tag(tag)
         continent_id = str(country_entry.get("continent_id") or "").strip()
-        should_patch = normalized_tag in target_tags or continent_id in TNO_1962_AMERICA_CONTINENT_IDS
+        should_patch = (
+            normalized_tag in target_tags
+            or continent_id in TNO_1962_AMERICA_CONTINENT_IDS
+        )
         if not should_patch:
             continue
         color_hex = resolve_tno_palette_color(normalized_tag, tno_palette_entries)
@@ -6923,7 +6939,7 @@ def apply_tno_decolonization_metadata(countries_payload: dict) -> None:
             lookup_iso2=str(existing_entry.get("lookup_iso2") or ""),
             provenance_iso2=str(existing_entry.get("provenance_iso2") or ""),
             display_name=str(existing_entry.get("display_name") or ""),
-            color_hex=str(existing_entry.get("color_hex") or ""),
+            color_hex=TNO_DECOLONIZATION_FIXED_COLORS.get(tag, str(existing_entry.get("color_hex") or "")),
             rule_id=f"tno_1962_independent_{tag.lower()}",
             notes=TNO_DECOLONIZATION_NOTES.get(tag, str(existing_entry.get("notes") or "").strip()),
             source=str(existing_entry.get("source") or "manual_rule").strip() or "manual_rule",

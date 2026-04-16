@@ -1849,6 +1849,7 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
       state.showCityPoints ? "cities:on" : "cities:off",
       state.showTransport ? "transport:on" : "transport:off",
+      state.showRoad ? "road:on" : "road:off",
       state.showAirports ? "airports:on" : "airports:off",
       state.showPorts ? "ports:on" : "ports:off",
       state.showRail ? "rail:on" : "rail:off",
@@ -14046,6 +14047,18 @@ function getTransportRailRevealRankThreshold(value) {
   return 3;
 }
 
+function getTransportRoadRevealRankThreshold(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "primary") return 1;
+  if (normalized === "secondary") return 2;
+  return 3;
+}
+
+function getTransportRoadScopeThreshold(scope) {
+  const normalized = String(scope || "").trim().toLowerCase();
+  return normalized === "motorway_only" ? 1 : 2;
+}
+
 function getTransportOverviewPrimaryColor(value, fallback = "#1d4ed8") {
   return ColorManager.normalizeHexColor(String(value || "").trim()) || fallback;
 }
@@ -14085,6 +14098,19 @@ function getTransportOverviewRailVisualStyle(primaryColor, visualStrength) {
     regionalWidth: 0.8 + (strength * 0.75),
     mainlineOpacity: 0.74 + (strength * 0.26),
     regionalOpacity: 0.42 + (strength * 0.22),
+  };
+}
+
+function getTransportOverviewRoadVisualStyle(primaryColor, visualStrength) {
+  const resolvedPrimaryColor = getTransportOverviewPrimaryColor(primaryColor, "#374151");
+  const strength = clamp(Number.isFinite(Number(visualStrength)) ? Number(visualStrength) : 0.5, 0, 1);
+  return {
+    motorwayStroke: mixCanvasColors(resolvedPrimaryColor, "#111827", 0.28) || resolvedPrimaryColor,
+    trunkStroke: mixCanvasColors(resolvedPrimaryColor, "#e5e7eb", 0.26) || resolvedPrimaryColor,
+    motorwayWidth: 1.55 + (strength * 1.45),
+    trunkWidth: 0.95 + (strength * 0.95),
+    motorwayOpacity: 0.72 + (strength * 0.24),
+    trunkOpacity: 0.48 + (strength * 0.2),
   };
 }
 
@@ -14617,6 +14643,115 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     featureCount,
     visibleFeatureCount,
     labelCount,
+    interactive: !!interactive,
+    skipped: false,
+  });
+}
+
+function drawRoadsLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  const visible = !!state.showTransport && !!state.showRoad;
+  const collection = state.roadsData;
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  if (!visible) {
+    collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "hidden",
+    });
+    return;
+  }
+  if (interactive) {
+    collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: true,
+      skipped: true,
+      reason: "interactive-pass",
+    });
+    return;
+  }
+  if (!collection?.features?.length || !pathCanvas) {
+    collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !pathCanvas ? "no-path" : "no-data",
+    });
+    return;
+  }
+  const roadConfig = getTransportOverviewFamilyConfig("road");
+  const minimumScopeRank = getTransportRoadScopeThreshold(roadConfig.scope);
+  const maximumRevealRank = getTransportRoadRevealRankThreshold(roadConfig.importanceThreshold);
+  const visualStyle = getTransportOverviewRoadVisualStyle(roadConfig.primaryColor, roadConfig.visualStrength);
+  const featuresByClass = {
+    trunk: [],
+    motorway: [],
+  };
+  collection.features.forEach((feature) => {
+    const properties = feature?.properties || {};
+    const roadClass = String(properties.class || "").trim().toLowerCase();
+    const revealRank = Math.max(1, Math.round(Number(properties.reveal_rank || (roadClass === "motorway" ? 1 : 2))));
+    if (revealRank > maximumRevealRank) return;
+    if (minimumScopeRank <= 1 && roadClass !== "motorway") return;
+    if (roadClass === "motorway") {
+      featuresByClass.motorway.push(feature);
+    } else if (roadClass === "trunk") {
+      featuresByClass.trunk.push(feature);
+    }
+  });
+  const visibleFeatureCount = featuresByClass.motorway.length + featuresByClass.trunk.length;
+  if (!visibleFeatureCount) {
+    collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "filtered",
+    });
+    return;
+  }
+
+  const drawFeatureSet = (features, strokeStyle, lineWidth, opacity) => {
+    if (!features.length || !(opacity > 0) || !(lineWidth > 0)) return;
+    context.save();
+    context.globalAlpha = clamp(Number(roadConfig.opacity ?? 0.72), 0, 1) * opacity;
+    context.strokeStyle = strokeStyle;
+    context.lineWidth = lineWidth / Math.max(0.0001, Number(k || 1));
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    features.forEach((feature) => {
+      context.beginPath();
+      pathCanvas(feature);
+      context.stroke();
+    });
+    context.restore();
+  };
+
+  drawFeatureSet(
+    featuresByClass.trunk,
+    visualStyle.trunkStroke,
+    visualStyle.trunkWidth,
+    visualStyle.trunkOpacity,
+  );
+  drawFeatureSet(
+    featuresByClass.motorway,
+    visualStyle.motorwayStroke,
+    visualStyle.motorwayWidth,
+    visualStyle.motorwayOpacity,
+  );
+
+  collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
+    featureCount,
+    visibleFeatureCount,
+    labelCount: 0,
     interactive: !!interactive,
     skipped: false,
   });
@@ -17597,6 +17732,12 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         skipped: true,
         reason: "staged-apply",
       });
+      collectContextMetric("drawRoadsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.roadsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
       collectContextMetric("drawRailwaysLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(state.railwaysData),
         interactive: false,
@@ -17656,6 +17797,7 @@ function drawContextMarkersPass(k, { interactive = false } = {}) {
         reason: "staged-apply",
       });
     } else {
+      drawRoadsLayer(k, { interactive });
       drawRailwaysLayer(k, { interactive });
       drawAirportsLayer(k, { interactive });
       drawPortsLayer(k, { interactive });

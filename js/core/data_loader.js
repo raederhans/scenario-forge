@@ -37,6 +37,8 @@ const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
 const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
 const GLOBAL_RAIL_CATALOG_URL = "data/transport_layers/global_rail/catalog.json";
+const GLOBAL_ROAD_CATALOG_URL = "data/transport_layers/global_road/catalog.json";
+let globalRoadContextCollectionsPromise = null;
 let globalRailContextCollectionsPromise = null;
 const CONTEXT_LAYER_PACKS = {
   airports: { url: "data/transport_layers/japan_airport/airports.geojson", format: "geojson" },
@@ -567,6 +569,44 @@ function normalizeRequestedContextLayerNames(includeContextLayers) {
 async function loadContextLayerPackInternal(layerName, d3Client) {
   if (layerName === "rivers") {
     return loadRiversFallbackCollection(d3Client);
+  }
+  if (layerName === "roads") {
+    if (!globalThis.topojson || typeof globalThis.topojson.feature !== "function") {
+      console.warn("[data_loader] topojson-client unavailable. Ignoring roads deferred load.");
+      return null;
+    }
+    globalRoadContextCollectionsPromise ||= (async () => {
+      const catalog = await d3Client.json(GLOBAL_ROAD_CATALOG_URL);
+      const entries = Array.isArray(catalog?.entries) ? catalog.entries : [];
+      const roadFeatures = [];
+      for (const entry of entries) {
+        if (Number(entry?.feature_counts?.preview?.roads || 0) <= 0) continue;
+        const manifestPath = String(entry?.manifest_path || "").trim();
+        if (!manifestPath) continue;
+        const manifest = await d3Client.json(manifestPath);
+        const roadsPath = String(manifest?.paths?.preview?.roads || "").trim();
+        if (!roadsPath) continue;
+        const topology = await d3Client.json(roadsPath);
+        const roadsObject = topology?.objects?.roads;
+        const roadsCollection = roadsObject ? globalThis.topojson.feature(topology, roadsObject) : null;
+        if (Array.isArray(roadsCollection?.features) && roadsCollection.features.length) {
+          roadFeatures.push(...roadsCollection.features);
+        }
+      }
+      return {
+        roads: { type: "FeatureCollection", features: roadFeatures },
+      };
+    })().catch((error) => {
+      globalRoadContextCollectionsPromise = null;
+      throw error;
+    });
+    try {
+      const collections = await globalRoadContextCollectionsPromise;
+      return collections?.roads || null;
+    } catch (err) {
+      console.warn("[data_loader] Global road catalog or shard payload missing/invalid. Ignoring road runtime pack.", err);
+      return null;
+    }
   }
   if (layerName === "railways" || layerName === "rail_stations_major") {
     if (!globalThis.topojson || typeof globalThis.topojson.feature !== "function") {

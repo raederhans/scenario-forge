@@ -793,7 +793,7 @@
     {
       "tag": "PAL",
       "display_name_override": "Italian Palestine",
-      "color_hex_override": "#557d47",
+      "color_hex_override": "#66a56d",
       "parent_owner_tag": "ITA",
       "release_lookup_iso2": "IL",
       "scenario_ids": [
@@ -818,7 +818,7 @@
     {
       "tag": "JOR",
       "display_name_override": "Italian Transjordan",
-      "color_hex_override": "#486b3a",
+      "color_hex_override": "#566c50",
       "parent_owner_tag": "ITA",
       "release_lookup_iso2": "JO",
       "scenario_ids": [
@@ -887,7 +887,7 @@
     {
       "tag": "SYR",
       "display_name_override": "Syrian Protectorate",
-      "color_hex_override": "#58724b",
+      "color_hex_override": "#c8c896",
       "parent_owner_tag": "ITA",
       "release_lookup_iso2": "SY",
       "scenario_ids": [
@@ -918,7 +918,7 @@
     {
       "tag": "LEB",
       "display_name_override": "Lebanese Protectorate",
-      "color_hex_override": "#739766",
+      "color_hex_override": "#146b44",
       "parent_owner_tag": "ITA",
       "release_lookup_iso2": "LB",
       "scenario_ids": [

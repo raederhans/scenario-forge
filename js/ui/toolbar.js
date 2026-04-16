@@ -1924,6 +1924,7 @@ function initToolbar({ render } = {}) {
   const toggleAirports = document.getElementById("toggleAirports");
   const togglePorts = document.getElementById("togglePorts");
   const toggleRail = document.getElementById("toggleRail");
+  const toggleRoad = document.getElementById("toggleRoad");
   const transportAppearanceMasterToggle = document.getElementById("transportAppearanceMasterToggle");
   const transportAppearanceWorkbenchBtn = document.getElementById("transportAppearanceWorkbenchBtn");
   const transportAirportCard = document.getElementById("transportAirportCard");
@@ -1933,7 +1934,7 @@ function initToolbar({ render } = {}) {
   const transportAirportControls = document.getElementById("transportAirportControls");
   const transportPortControls = document.getElementById("transportPortControls");
   const transportRailControls = document.getElementById("transportRailControls");
-  const transportRoadPlaceholder = document.getElementById("transportRoadPlaceholder");
+  const transportRoadControls = document.getElementById("transportRoadControls");
   const airportVisualStrength = document.getElementById("airportVisualStrength");
   const airportOpacity = document.getElementById("airportOpacity");
   const airportPrimaryColor = document.getElementById("airportPrimaryColor");
@@ -1975,6 +1976,18 @@ function initToolbar({ render } = {}) {
   const railScope = document.getElementById("railScope");
   const railImportanceThreshold = document.getElementById("railImportanceThreshold");
   const transportRailSummaryMeta = document.getElementById("transportRailSummaryMeta");
+  const roadVisualStrength = document.getElementById("roadVisualStrength");
+  const roadVisualStrengthValue = document.getElementById("roadVisualStrengthValue");
+  const roadOpacity = document.getElementById("roadOpacity");
+  const roadOpacityValue = document.getElementById("roadOpacityValue");
+  const roadPrimaryColor = document.getElementById("roadPrimaryColor");
+  const roadCoverageReach = document.getElementById("roadCoverageReach");
+  const roadCoverageReachValue = document.getElementById("roadCoverageReachValue");
+  const roadScopeLinked = document.getElementById("roadScopeLinked");
+  const roadScopeResolved = document.getElementById("roadScopeResolved");
+  const roadThresholdResolved = document.getElementById("roadThresholdResolved");
+  const roadScope = document.getElementById("roadScope");
+  const roadImportanceThreshold = document.getElementById("roadImportanceThreshold");
   const transportRoadSummaryMeta = document.getElementById("transportRoadSummaryMeta");
   const toggleCityPoints = document.getElementById("toggleCityPoints");
   const toggleWaterRegions = document.getElementById("toggleWaterRegions");
@@ -2549,6 +2562,9 @@ function initToolbar({ render } = {}) {
     if (normalizedFamilyId === "rail") {
       return normalizedScope === "mainline_only" ? 1 : 2;
     }
+    if (normalizedFamilyId === "road") {
+      return normalizedScope === "motorway_only" ? 1 : 2;
+    }
     return 1;
   };
 
@@ -2578,6 +2594,20 @@ function initToolbar({ render } = {}) {
         return lineClass === "mainline" || lineClass === "regional";
       }).length;
     }
+    if (familyId === "road") {
+      const features = Array.isArray(state.roadsData?.features) ? state.roadsData.features : null;
+      if (!features) return null;
+      const scopeThreshold = getTransportScopeThresholdRank(familyId, effectiveScope.scope);
+      const revealThreshold = String(effectiveScope.importanceThreshold || "").trim().toLowerCase() === "primary" ? 1 : 2;
+      return features.filter((feature) => {
+        const properties = feature?.properties || {};
+        const roadClass = String(properties.class || "").trim().toLowerCase();
+        const revealRank = Math.max(1, Math.round(Number(properties.reveal_rank || (roadClass === "motorway" ? 1 : 2))));
+        if (revealRank > revealThreshold) return false;
+        if (scopeThreshold <= 1 && roadClass !== "motorway") return false;
+        return roadClass === "motorway" || roadClass === "trunk";
+      }).length;
+    }
     const collection = familyId === "port" ? state.portsData : state.airportsData;
     const features = Array.isArray(collection?.features) ? collection.features : null;
     if (!features) return null;
@@ -2596,6 +2626,9 @@ function initToolbar({ render } = {}) {
     const roundedCount = Math.max(0, Math.round(count));
     if (familyId === "rail") {
       return `${roundedCount.toLocaleString()} ${t(roundedCount === 1 ? "railway" : "railways", "ui")}`;
+    }
+    if (familyId === "road") {
+      return `${roundedCount.toLocaleString()} ${t(roundedCount === 1 ? "road" : "roads", "ui")}`;
     }
     const noun = familyId === "port"
       ? (roundedCount === 1 ? "port" : "ports")
@@ -2627,13 +2660,16 @@ function initToolbar({ render } = {}) {
     const airportConfig = transportConfig.airport || {};
     const portConfig = transportConfig.port || {};
     const railConfig = transportConfig.rail || {};
+    const roadConfig = transportConfig.road || {};
     const transportEnabled = state.showTransport !== false;
     const airportEnabled = transportEnabled && !!state.showAirports;
     const portEnabled = transportEnabled && !!state.showPorts;
     const railEnabled = transportEnabled && !!state.showRail;
+    const roadEnabled = transportEnabled && !!state.showRoad;
     const airportScopeState = getEffectiveTransportScopeState("airport", airportConfig);
     const portScopeState = getEffectiveTransportScopeState("port", portConfig);
     const railScopeState = getEffectiveTransportScopeState("rail", railConfig);
+    const roadScopeState = getEffectiveTransportScopeState("road", roadConfig);
 
     if (transportAppearanceMasterToggle) {
       transportAppearanceMasterToggle.checked = transportEnabled;
@@ -2720,7 +2756,28 @@ function initToolbar({ render } = {}) {
         railScopeState,
       );
     }
-    if (transportRoadSummaryMeta) transportRoadSummaryMeta.textContent = t("Live in Transport Workbench", "ui");
+    if (roadVisualStrength) roadVisualStrength.value = String(Math.round(Number(roadConfig.visualStrength ?? 0.5) * 100));
+    if (roadVisualStrengthValue) roadVisualStrengthValue.textContent = formatTransportPercent(roadConfig.visualStrength ?? 0.5);
+    if (roadOpacity) roadOpacity.value = String(Math.round(Number(roadConfig.opacity ?? 0.72) * 100));
+    if (roadOpacityValue) roadOpacityValue.textContent = formatTransportPercent(roadConfig.opacity ?? 0.72);
+    if (roadPrimaryColor) roadPrimaryColor.value = normalizeOceanFillColor(roadConfig.primaryColor || "#374151");
+    if (roadCoverageReach) roadCoverageReach.value = String(Math.round(Number(roadConfig.coverageReach ?? 0.2) * 100));
+    if (roadCoverageReachValue) roadCoverageReachValue.textContent = formatTransportPercent(roadConfig.coverageReach ?? 0.2);
+    if (roadScopeLinked) roadScopeLinked.checked = String(roadConfig.scopeLinkMode || "linked") !== "manual";
+    if (roadScopeResolved) roadScopeResolved.textContent = t(formatTransportScopeLabel(roadScopeState.scope), "ui");
+    if (roadThresholdResolved) roadThresholdResolved.textContent = t(formatTransportThresholdLabel(roadScopeState.importanceThreshold), "ui");
+    if (roadScope) roadScope.value = String(roadConfig.scope || "motorway_only");
+    if (roadImportanceThreshold) roadImportanceThreshold.value = String(roadConfig.importanceThreshold || "primary");
+    if (toggleRoad) toggleRoad.checked = !!state.showRoad;
+    if (transportRoadSummaryMeta) {
+      transportRoadSummaryMeta.textContent = buildTransportFamilySummaryText(
+        "road",
+        transportEnabled,
+        !!state.showRoad,
+        roadConfig,
+        roadScopeState,
+      );
+    }
 
     [
       airportVisualStrength,
@@ -2761,10 +2818,22 @@ function initToolbar({ render } = {}) {
     ].forEach((control) => {
       if (control) control.disabled = !transportEnabled;
     });
+    [
+      roadVisualStrength,
+      roadOpacity,
+      roadPrimaryColor,
+      roadScopeLinked,
+      roadScope,
+      roadImportanceThreshold,
+      toggleRoad,
+    ].forEach((control) => {
+      if (control) control.disabled = !transportEnabled;
+    });
 
     const airportManual = String(airportConfig.scopeLinkMode || "linked") === "manual";
     const portManual = String(portConfig.scopeLinkMode || "linked") === "manual";
     const railManual = String(railConfig.scopeLinkMode || "linked") === "manual";
+    const roadManual = String(roadConfig.scopeLinkMode || "linked") === "manual";
     if (airportCoverageReach) airportCoverageReach.disabled = !transportEnabled || airportManual;
     if (airportScope) airportScope.disabled = !transportEnabled || !airportManual;
     if (airportImportanceThreshold) airportImportanceThreshold.disabled = !transportEnabled || !airportManual;
@@ -2774,11 +2843,14 @@ function initToolbar({ render } = {}) {
     if (railCoverageReach) railCoverageReach.disabled = !transportEnabled || railManual;
     if (railScope) railScope.disabled = !transportEnabled || !railManual;
     if (railImportanceThreshold) railImportanceThreshold.disabled = !transportEnabled || !railManual;
+    if (roadCoverageReach) roadCoverageReach.disabled = !transportEnabled || roadManual;
+    if (roadScope) roadScope.disabled = !transportEnabled || !roadManual;
+    if (roadImportanceThreshold) roadImportanceThreshold.disabled = !transportEnabled || !roadManual;
 
     setTransportAppearanceGroupEnabled(transportAirportControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportPortControls, transportEnabled);
     setTransportAppearanceGroupEnabled(transportRailControls, transportEnabled);
-    setTransportAppearanceGroupEnabled(transportRoadPlaceholder, transportEnabled);
+    setTransportAppearanceGroupEnabled(transportRoadControls, transportEnabled);
 
     transportAirportCard?.classList.toggle("opacity-60", !transportEnabled);
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
@@ -2804,6 +2876,9 @@ function initToolbar({ render } = {}) {
     }
     if (normalized && state.showRail && typeof state.ensureContextLayerDataFn === "function") {
       void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "transport-master-toggle", renderNow: true });
+    }
+    if (normalized && state.showRoad && typeof state.ensureContextLayerDataFn === "function") {
+      void state.ensureContextLayerDataFn("roads", { reason: "transport-master-toggle", renderNow: true });
     }
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
@@ -9621,6 +9696,18 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (toggleRoad) {
+    toggleRoad.checked = !!state.showRoad;
+    toggleRoad.addEventListener("change", (event) => {
+      state.showRoad = !!event.target.checked;
+      if (state.showRoad && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("roads", { reason: "toolbar-toggle", renderNow: true });
+      }
+      renderTransportAppearanceUi();
+      renderDirty("toggle-road");
+    });
+  }
+
   if (airportVisualStrength && !airportVisualStrength.dataset.bound) {
     airportVisualStrength.addEventListener("input", (event) => {
       const value = Number(event.target.value);
@@ -9937,6 +10024,88 @@ function initToolbar({ render } = {}) {
       renderDirty("transport-rail-importance-threshold");
     });
     railImportanceThreshold.dataset.bound = "true";
+  }
+
+  if (roadVisualStrength && !roadVisualStrength.dataset.bound) {
+    roadVisualStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().road.visualStrength = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-visual-strength");
+    });
+    roadVisualStrength.dataset.bound = "true";
+  }
+
+  if (roadOpacity && !roadOpacity.dataset.bound) {
+    roadOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      getTransportAppearanceConfig().road.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0.2, 1);
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-opacity");
+    });
+    roadOpacity.dataset.bound = "true";
+  }
+
+  if (roadPrimaryColor && !roadPrimaryColor.dataset.bound) {
+    roadPrimaryColor.addEventListener("input", (event) => {
+      getTransportAppearanceConfig().road.primaryColor = normalizeOceanFillColor(event.target.value || "#374151");
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-primary-color");
+    });
+    roadPrimaryColor.dataset.bound = "true";
+  }
+
+  if (roadCoverageReach && !roadCoverageReach.dataset.bound) {
+    roadCoverageReach.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const config = getTransportAppearanceConfig().road;
+      config.coverageReach = clamp(Number.isFinite(value) ? value / 100 : 0.2, 0, 1);
+      if (String(config.scopeLinkMode || "linked") !== "manual") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("road", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-coverage-reach");
+    });
+    roadCoverageReach.dataset.bound = "true";
+  }
+
+  if (roadScopeLinked && !roadScopeLinked.dataset.bound) {
+    roadScopeLinked.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().road;
+      config.scopeLinkMode = event.target.checked ? "linked" : "manual";
+      if (config.scopeLinkMode === "linked") {
+        const linked = resolveLinkedTransportOverviewScopeAndThreshold("road", config.coverageReach);
+        config.scope = linked.scope;
+        config.importanceThreshold = linked.importanceThreshold;
+      }
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-scope-link");
+    });
+    roadScopeLinked.dataset.bound = "true";
+  }
+
+  if (roadScope && !roadScope.dataset.bound) {
+    roadScope.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().road;
+      config.scopeLinkMode = "manual";
+      config.scope = String(event.target.value || "motorway_only");
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-scope");
+    });
+    roadScope.dataset.bound = "true";
+  }
+
+  if (roadImportanceThreshold && !roadImportanceThreshold.dataset.bound) {
+    roadImportanceThreshold.addEventListener("change", (event) => {
+      const config = getTransportAppearanceConfig().road;
+      config.scopeLinkMode = "manual";
+      config.importanceThreshold = String(event.target.value || "primary");
+      renderTransportAppearanceUi();
+      renderDirty("transport-road-importance-threshold");
+    });
+    roadImportanceThreshold.dataset.bound = "true";
   }
 
   if (toggleCityPoints) {

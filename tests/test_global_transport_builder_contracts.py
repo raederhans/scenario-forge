@@ -582,17 +582,7 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 entry.get('phase_status'),
             )
 
-    def test_road_runtime_gate_stays_closed_while_rail_runtime_opens_and_saves(self) -> None:
-        road_guard_paths = (
-            REPO_ROOT / 'js' / 'core' / 'file_manager.js',
-            REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js',
-            REPO_ROOT / 'js' / 'ui' / 'toolbar.js',
-            REPO_ROOT / 'js' / 'core' / 'map_renderer.js',
-        )
-        for path in road_guard_paths:
-            content = path.read_text(encoding='utf-8')
-            self.assertNotIn('showRoad', content)
-
+    def test_rail_runtime_opens_and_saves(self) -> None:
         state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
         toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
         renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
@@ -607,6 +597,23 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn('data.layerVisibility.showRail', file_manager_content)
         self.assertIn('state.showRail = !!data.layerVisibility.showRail', interaction_content)
 
+    def test_road_runtime_opens_main_map_only(self) -> None:
+        state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
+        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        main_content = (REPO_ROOT / 'js' / 'main.js').read_text(encoding='utf-8')
+        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
+        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
+
+        self.assertIn('showRoad', state_content)
+        self.assertIn('showRoad', toolbar_content)
+        self.assertIn('showRoad', renderer_content)
+        self.assertIn('layerName === "roads"', main_content)
+        self.assertNotIn('showRoad', file_manager_content)
+        self.assertNotIn('showRoad', interaction_content)
+        self.assertNotIn('data.layerVisibility.showRoad', file_manager_content)
+        self.assertNotIn('state.showRoad = !!data.layerVisibility.showRoad', interaction_content)
+
     def test_rail_runtime_loader_uses_catalog_not_eager_pack(self) -> None:
         data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
         self.assertIn('data/transport_layers/global_rail/catalog.json', data_loader_content)
@@ -614,6 +621,16 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', data_loader_content)
         self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8'))
         self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
+
+    def test_road_runtime_loader_uses_catalog_roads_only(self) -> None:
+        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
+        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
+        self.assertIn('data/transport_layers/global_road/catalog.json', data_loader_content)
+        self.assertIn('layerName === "roads"', data_loader_content)
+        self.assertNotIn('road_labels.geojson', data_loader_content)
+        self.assertNotIn('ensureContextLayerDataFn("road_labels"', toolbar_content)
+        self.assertNotIn('ensureContextLayerDataFn("road_labels"', interaction_content)
 
     def test_transport_appearance_ui_exposes_live_rail_controls(self) -> None:
         toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
@@ -628,6 +645,17 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn('id="railLabelsEnabled"', html_content)
         self.assertIn('id="railLabelDensity"', html_content)
         self.assertNotIn('data-i18n="Planned">Planned</span>', html_content.split('transportRailSummaryMeta', 1)[1].split('</details>', 1)[0])
+
+    def test_transport_appearance_ui_exposes_live_road_controls_without_labels(self) -> None:
+        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        html_content = (REPO_ROOT / 'index.html').read_text(encoding='utf-8')
+        self.assertIn('toggleRoad', toolbar_content)
+        self.assertIn('transportRoadControls', toolbar_content)
+        self.assertIn('drawRoadsLayer', (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8'))
+        self.assertIn('id="toggleRoad"', html_content)
+        self.assertIn('id="transportRoadControls"', html_content)
+        self.assertNotIn('data-i18n="Planned">Planned</span>', html_content.split('transportRoadSummaryMeta', 1)[1].split('</details>', 1)[0])
+        self.assertNotIn('id="roadLabelsEnabled"', html_content)
 
     def test_rail_renderer_consumes_label_config_and_station_layer(self) -> None:
         renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
@@ -644,6 +672,19 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn('if (normalized === "secondary") return 2;', renderer_content)
         self.assertIn('return 3;', renderer_content)
         self.assertIn('if (revealRank > maximumRevealRank) return;', renderer_content)
+
+    def test_road_renderer_uses_road_scope_threshold_helper(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        self.assertIn('function getTransportRoadScopeThreshold(scope)', renderer_content)
+        self.assertIn('return normalized === "motorway_only" ? 1 : 2;', renderer_content)
+        self.assertIn('const minimumScopeRank = getTransportRoadScopeThreshold(roadConfig.scope);', renderer_content)
+
+    def test_road_renderer_threshold_order_keeps_all_as_broadest_setting(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        self.assertIn('function getTransportRoadRevealRankThreshold(value)', renderer_content)
+        self.assertIn('if (normalized === "primary") return 1;', renderer_content)
+        self.assertIn('if (normalized === "secondary") return 2;', renderer_content)
+        self.assertIn('return 3;', renderer_content)
 
     def test_rail_transport_overview_default_primary_color_is_dark(self) -> None:
         state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
@@ -666,6 +707,20 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
         self.assertIn('rail_stations_major', data_loader_content)
         self.assertIn('features: stationFeatures', data_loader_content)
+
+    def test_road_renderer_consumes_roads_without_labels(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        self.assertIn('function drawRoadsLayer(k, { interactive = false } = {})', renderer_content)
+        self.assertIn('state.roadsData', renderer_content)
+        self.assertIn('!!state.showTransport && !!state.showRoad', renderer_content)
+        self.assertNotIn('state.roadLabelsData', renderer_content)
+
+    def test_road_save_load_gate_stays_closed(self) -> None:
+        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
+        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
+        self.assertNotIn('data.layerVisibility.showRoad', file_manager_content)
+        self.assertNotIn('state.showRoad = !!data.layerVisibility.showRoad', interaction_content)
+        self.assertNotIn('ensureContextLayerDataFn("roads"', interaction_content)
 
     def test_data_loader_no_longer_hardcodes_missing_global_transport_pack_paths(self) -> None:
         content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')

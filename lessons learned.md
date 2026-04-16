@@ -745,3 +745,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 68. 带结构的帮助面板一旦继续挂在 id 级 i18n 覆写表上，初始化时整块 rich content 会被 textContent 直接抹平
 - 这次 Scenario Guide 从 4 条短步骤升级成章节式双语手册后，如果还保留 `scenarioGuideStep*` 在 `uiMap` 里，i18n 初始化会把 `<li>` 里的所有子节点整块覆盖掉。
 - 更稳的做法是：章节式 manual 用独立容器或独立 renderer，rich content 节点不要继续放进按 id 直接覆写 `textContent` 的翻译绑定表。
+
+### 69. 色板导入完成后，必须单独核对“已导入颜色”和“已审核映射”是不是同一层真相
+- 这次 TNO 颜色资产里，`tno.palette.json` 已经导入了 511 条原始颜色，但 `tno.map.json` 的 118 个 mapped TAG 仍完全继承自 `hoi4_vanilla`。
+- 更稳的做法是每次导入新剧本色板后，立刻做一轮场景国家清单 vs 色板条目 vs 映射结果的三方核对，先找出“色板有颜色但映射还没审核”的国家，再处理完全缺席的扩展 TAG。

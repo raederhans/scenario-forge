@@ -25,6 +25,7 @@ from tools.patch_tno_1962_bundle import (
     apply_tno_greece_coarse_owner_backfill,
     apply_tno_owner_only_backfill,
     apply_tno_feature_assignment_overrides,
+    apply_tno_decolonization_metadata,
     apply_dev_manual_overrides,
     build_relief_overlays,
     build_tno_bathymetry_payload,
@@ -37,6 +38,7 @@ from tools.patch_tno_1962_bundle import (
     build_startup_assets_stage,
     ensure_water_stage_checkpoints,
     detect_unsynced_manual_edits,
+    patch_tno_palette_defaults,
     rebuild_feature_maps_from_political_gdf,
     normalize_feature_core_map,
     resolve_tno_palette_color,
@@ -838,8 +840,10 @@ class TnoBundleBuilderTest(unittest.TestCase):
             "INS": "#9f344d",
             "MAN": "#a80043",
             "MEN": "#8f354b",
+            "MON": "#666057",
             "PAK": "#21331e",
             "SHX": "#955a74",
+            "SOV": "#7d0d18",
             "TIB": "#c8c8c8",
             "VIN": "#a76286",
             "XIK": "#6873a0",
@@ -849,6 +853,79 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
         for tag, color_hex in expected_colors.items():
             self.assertEqual(resolve_tno_palette_color(tag, {}), color_hex)
+
+    def test_patch_tno_palette_defaults_patches_selected_tno_baseline_entries(self) -> None:
+        countries_payload = {
+            "countries": {
+                "LIB": {
+                    "tag": "LIB",
+                    "display_name": "Liberia",
+                    "color_hex": "#9882bf",
+                    "source_type": "tno_baseline",
+                    "continent_id": "continent_africa",
+                },
+                "JOR": {
+                    "tag": "JOR",
+                    "display_name": "Italian Transjordan",
+                    "color_hex": "#486b3a",
+                    "source_type": "tno_baseline",
+                    "continent_id": "continent_asia",
+                },
+                "FRA": {
+                    "tag": "FRA",
+                    "display_name": "France",
+                    "color_hex": "#111111",
+                    "source_type": "tno_baseline",
+                    "continent_id": "continent_europe",
+                },
+                "SOV": {
+                    "tag": "SOV",
+                    "display_name": "Soviet Union",
+                    "color_hex": "#111111",
+                    "source_type": "tno_baseline",
+                    "continent_id": "continent_europe",
+                },
+                "ARM": {
+                    "tag": "ARM",
+                    "display_name": "Armenia",
+                    "color_hex": "#b066b4",
+                    "source_type": "scenario_extension",
+                    "continent_id": "continent_asia",
+                },
+            }
+        }
+        manifest_payload = {"style_defaults": {}}
+
+        patch_tno_palette_defaults(countries_payload, manifest_payload)
+
+        self.assertEqual(countries_payload["countries"]["LIB"]["color_hex"], "#78828c")
+        self.assertEqual(countries_payload["countries"]["JOR"]["color_hex"], "#486b3a")
+        self.assertEqual(countries_payload["countries"]["FRA"]["color_hex"], "#0f0f65")
+        self.assertEqual(countries_payload["countries"]["SOV"]["color_hex"], "#7d0d18")
+        self.assertEqual(countries_payload["countries"]["ARM"]["color_hex"], "#b066b4")
+        self.assertEqual(manifest_payload["palette_id"], "tno")
+
+    def test_apply_tno_decolonization_metadata_sets_explicit_raj_color(self) -> None:
+        countries_payload = {
+            "countries": {
+                "BZ": {"tag": "BZ", "display_name": "Belize", "color_hex": "#111111", "continent_id": "continent_north_america", "continent_label": "North America", "subregion_id": "subregion_central_america", "subregion_label": "Central America", "base_iso2": "BZ", "lookup_iso2": "BZ", "provenance_iso2": "BZ"},
+                "GY": {"tag": "GY", "display_name": "Guyana", "color_hex": "#111111", "continent_id": "continent_south_america", "continent_label": "South America", "subregion_id": "subregion_south_america", "subregion_label": "South America", "base_iso2": "GY", "lookup_iso2": "GY", "provenance_iso2": "GY"},
+                "MC": {"tag": "MC", "display_name": "Macau", "color_hex": "#111111", "continent_id": "continent_asia", "continent_label": "Asia", "subregion_id": "subregion_eastern_asia", "subregion_label": "Eastern Asia", "base_iso2": "MO", "lookup_iso2": "MO", "provenance_iso2": "MO"},
+                "CEY": {"tag": "CEY", "display_name": "Ceylon", "color_hex": "#111111", "continent_id": "continent_asia", "continent_label": "Asia", "subregion_id": "subregion_southern_asia", "subregion_label": "Southern Asia", "base_iso2": "LK", "lookup_iso2": "LK", "provenance_iso2": "LK", "source_type": "scenario_extension", "historical_fidelity": "tno_baseline"},
+                "AST": {"tag": "AST", "display_name": "Australia", "color_hex": "#111111", "continent_id": "continent_oceania", "continent_label": "Oceania", "subregion_id": "subregion_melanesia", "subregion_label": "Melanesia", "base_iso2": "PG", "lookup_iso2": "PG", "provenance_iso2": "PG", "source_type": "scenario_extension", "historical_fidelity": "tno_baseline"},
+                "BWA": {"tag": "BWA", "display_name": "British West Africa", "color_hex": "#111111", "continent_id": "continent_africa", "continent_label": "Africa", "subregion_id": "subregion_western_africa", "subregion_label": "Western Africa", "base_iso2": "NG", "lookup_iso2": "NG", "provenance_iso2": "NG", "source_type": "scenario_extension", "historical_fidelity": "tno_baseline"},
+                "RAJ": {"tag": "RAJ", "display_name": "British Raj", "color_hex": "#111111", "continent_id": "continent_asia", "continent_label": "Asia", "subregion_id": "subregion_southern_asia", "subregion_label": "Southern Asia", "base_iso2": "IN", "lookup_iso2": "IN", "provenance_iso2": "IN", "parent_owner_tag": "ENG", "parent_owner_tags": ["ENG"], "subject_kind": "raj", "entry_kind": "scenario_subject", "source_type": "tno_baseline", "historical_fidelity": "tno_baseline"},
+                "SAF": {"tag": "SAF", "display_name": "South Africa", "color_hex": "#111111", "continent_id": "continent_africa", "continent_label": "Africa", "subregion_id": "subregion_southern_africa", "subregion_label": "Southern Africa", "base_iso2": "ZA", "lookup_iso2": "ZA", "provenance_iso2": "ZA", "source_type": "scenario_extension", "historical_fidelity": "tno_baseline"},
+            }
+        }
+
+        apply_tno_decolonization_metadata(countries_payload)
+
+        raj_entry = countries_payload["countries"]["RAJ"]
+        self.assertEqual(raj_entry["color_hex"], "#cc5668")
+        self.assertEqual(raj_entry["entry_kind"], "scenario_country")
+        self.assertEqual(raj_entry["parent_owner_tag"], "")
+        self.assertEqual(raj_entry["subject_kind"], "")
 
     def test_validate_geo_locale_manual_overrides_requires_exact_override_entries(self) -> None:
         geo_locale_payload = {

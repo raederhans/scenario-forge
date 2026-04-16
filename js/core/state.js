@@ -997,6 +997,7 @@ function createDefaultTransportOverviewFamilyConfig(familyId) {
       return {
         opacity: 0.72,
         visualStrength: 0.5,
+        primaryColor: "#374151",
         labelsEnabled: false,
         labelDensity: "sparse",
         labelMode: "ref",
@@ -2198,6 +2199,7 @@ export const state = {
   showAirports: false,
   showPorts: false,
   showRail: false,
+  showRoad: false,
   showSpecialZones: false,
   cityLayerRevision: 0,
   manualSpecialZones: {

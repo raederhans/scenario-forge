@@ -1604,25 +1604,79 @@
                       </div>
                     </details>
 
-                    <details id="transportRoadCard" class="appearance-mini-section transport-family-section transport-family-section-disabled">
+                    <details id="transportRoadCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
                           <span id="lblTransportRoadFamily" class="transport-family-summary-title">Road</span>
-                          <span id="transportRoadSummaryMeta" class="transport-family-summary-meta" data-i18n="Planned">Planned</span>
+                          <span id="transportRoadSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
-                      <div id="transportRoadPlaceholder" class="transport-family-body space-y-4 mt-3">
-                        <section class="space-y-2">
+                      <div id="transportRoadControls" class="transport-family-body space-y-4 mt-3">
+                        <section class="space-y-3">
                           <h4 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
-                          <p class="panel-hint" data-i18n="Motorway and trunk visibility controls will land here when the coarse road family is wired.">Motorway and trunk visibility controls will land here when the coarse road family is wired.</p>
+                          <label class="toggle-label">
+                            <input id="toggleRoad" type="checkbox" class="checkbox-input" />
+                            <span id="lblTransportRoadToggle" data-i18n="Show Road">Show Road</span>
+                          </label>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRoadVisualStrength" class="range-label" for="roadVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                              <span id="roadVisualStrengthValue" class="range-value">50%</span>
+                            </div>
+                            <input id="roadVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRoadOpacity" class="range-label" for="roadOpacity" data-i18n="Opacity">Opacity</label>
+                              <span id="roadOpacityValue" class="range-value">72%</span>
+                            </div>
+                            <input id="roadOpacity" type="range" min="20" max="100" value="72" class="range-input" />
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRoadPrimaryColor" class="range-label" for="roadPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                            <input id="roadPrimaryColor" type="color" value="#374151" class="color-input" />
+                          </div>
                         </section>
                         <section class="space-y-2">
                           <h4 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
-                          <p class="panel-hint" data-i18n="Road labels stay off by default until the coarse skeleton data is ready.">Road labels stay off by default until the coarse skeleton data is ready.</p>
+                          <p class="panel-hint" data-i18n="Road labels stay off in this first runtime pass.">Road labels stay off in this first runtime pass.</p>
                         </section>
-                        <section class="space-y-2">
+                        <section class="space-y-3">
                           <h4 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
-                          <p class="panel-hint" data-i18n="Scope will start at motorway and trunk skeleton only.">Scope will start at motorway and trunk skeleton only.</p>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                              <span id="roadCoverageReachValue" class="range-value">20%</span>
+                            </div>
+                            <input id="roadCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                          </div>
+                          <label class="toggle-label">
+                            <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
+                            <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                          </label>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                            <span id="roadScopeResolved" class="transport-readout-value">Motorway Only</span>
+                          </div>
+                          <div class="transport-readout-row">
+                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                            <span id="roadThresholdResolved" class="transport-readout-value">Primary</span>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRoadScope" class="range-label" for="roadScope" data-i18n="Manual Scope">Manual Scope</label>
+                            <select id="roadScope" class="select-input">
+                              <option value="motorway_only" selected data-i18n="Motorway Only">Motorway Only</option>
+                              <option value="motorway_trunk" data-i18n="Motorway + Trunk">Motorway + Trunk</option>
+                            </select>
+                          </div>
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblRoadImportanceThreshold" class="range-label" for="roadImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                            <select id="roadImportanceThreshold" class="select-input">
+                              <option value="primary" selected data-i18n="Primary">Primary</option>
+                              <option value="secondary" data-i18n="Secondary">Secondary</option>
+                              <option value="all" data-i18n="All">All</option>
+                            </select>
+                          </div>
                         </section>
                       </div>
                     </details>
