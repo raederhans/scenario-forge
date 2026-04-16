@@ -99,6 +99,7 @@ RELEASABLE_SOURCE_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.sourc
 RELEASABLE_CATALOG_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.catalog.json"
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
+TNO_PALETTE_AUDIT_PATH = ROOT / "data/palette-maps/tno.audit.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
 CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
@@ -4223,6 +4224,14 @@ TNO_1962_TNO_COLOR_FIXED_HEX = {
     "YUN": "#763446",
 }
 
+TNO_1962_SCENARIO_COLOR_EXPLICIT_EXCEPTIONS = {
+    "ARM",
+    "BRG",
+    "LAO",
+    "MAL",
+    "PHI",
+}
+
 UNAPPLIED_ACTION_IDS = (
     "arctic_islands_to_ger",
 )
@@ -6391,6 +6400,40 @@ def resolve_tno_palette_color(tag: str, palette_entries: dict[str, dict]) -> str
         return ""
     proxy_entry = palette_entries.get(proxy_tag, {})
     return normalize_hex(proxy_entry.get("map_hex")) or ""
+
+
+def load_tno_palette_audit_entries() -> dict[str, dict]:
+    if not TNO_PALETTE_AUDIT_PATH.exists():
+        return {}
+    payload = load_json(TNO_PALETTE_AUDIT_PATH)
+    entries = payload.get("entries", {}) if isinstance(payload, dict) else {}
+    return entries if isinstance(entries, dict) else {}
+
+
+def sync_tno_country_colors_from_palette_audit(countries_payload: dict) -> dict[str, list[str]]:
+    countries = countries_payload.setdefault("countries", {})
+    audit_entries = load_tno_palette_audit_entries()
+    touched_tags: list[str] = []
+    skipped_tags: list[str] = []
+    for raw_tag, raw_entry in countries.items():
+        tag = normalize_tag(raw_tag)
+        if not tag or not isinstance(raw_entry, dict):
+            continue
+        if tag in TNO_1962_SCENARIO_COLOR_EXPLICIT_EXCEPTIONS:
+            skipped_tags.append(tag)
+            continue
+        audit_entry = audit_entries.get(tag, {})
+        color_hex = normalize_hex(audit_entry.get("map_hex")) if isinstance(audit_entry, dict) else ""
+        if not color_hex:
+            continue
+        if normalize_hex(raw_entry.get("color_hex")) == color_hex:
+            continue
+        raw_entry["color_hex"] = color_hex
+        touched_tags.append(tag)
+    return {
+        "synced_tags": touched_tags,
+        "skipped_explicit_tags": skipped_tags,
+    }
 
 
 def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) -> None:
@@ -10218,6 +10261,7 @@ def build_countries_stage_state(
         manual_overrides_payload,
         audit_payload,
     )
+    palette_audit_color_sync_summary = sync_tno_country_colors_from_palette_audit(countries_payload)
 
     stage_metadata = {
         "generated_at": generated_at,
@@ -10234,6 +10278,8 @@ def build_countries_stage_state(
         "owner_only_backfill_diagnostics": owner_only_backfill_diagnostics,
         "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
         "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
+        "palette_audit_color_sync_tags": palette_audit_color_sync_summary.get("synced_tags", []),
+        "palette_audit_color_sync_skipped_explicit_tags": palette_audit_color_sync_summary.get("skipped_explicit_tags", []),
     }
 
     return {

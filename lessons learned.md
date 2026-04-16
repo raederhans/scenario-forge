@@ -765,3 +765,18 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 73. runtime default bridge 一旦引入 `expose_as_runtime_default`，scenario 主地图颜色桥也要同波次切到同一份 canonical 语义
 - 这次问题的根因是默认色板已经开始尊重 `palette map + expose_as_runtime_default`，但 active scenario 仍直接吃 `countries.json` 的 tag 色和 `feature_count` 赢家色，结果 `RKM / RAJ` 这类专题 TAG 继续接管 live map 默认色。
 - 更稳的最短路径是：default palette、scenario tag 色桥、coarse iso2 bridge 三条链共用同一份 runtime default bridge helper，并在 palette import 阶段强制校验“每个已映射 iso2 至少保留一个 exposed bridge”。
+
+## 2026-04-16 - TNO 颜色桥与场景色边界
+
+### 1. active scenario 的 tag 颜色不能复用 ISO2 runtime default bridge
+- runtime bridge 适合 default palette / canonical ISO2 颜色桥。
+- TNO 这类一个 ISO2 对应多个 scenario tag 的剧本里，active scenario 直接复用这条桥会把多个国家压成同色，视觉上会像边界和国家分配一起被覆盖。
+- 更稳的做法是：active scenario 始终按 `countries.json` 的 tag 显式颜色渲染，runtime bridge 只留给默认 palette 路径。
+
+### 2. TNO 静态颜色修正要放一个最终 audit 对齐口
+- `patch_tno_palette_defaults`、regional rules、decolonization、manual overrides 分多步写颜色时，前面步骤对的颜色也可能被后面步骤重新带偏。
+- 更稳的最短路径是：在 countries stage 末尾做一次 `tno.audit.json.map_hex -> countries.json.color_hex` 的最终同步，只覆盖 audit 已有明确颜色的 tag。
+
+### 3. palette audit 只能覆盖 palette 优先区，不能一刀切压掉 scenario_extension 的显式色
+- 这次第二轮回归暴露的关键问题是：`tno.audit.json.map_hex -> countries.json.color_hex` 的 blanket 同步会把 `PHI / MAL / LAO / ARM / BRG` 这类已有场景规则或代码显式色的国家重新刷回 palette 色。
+- 更稳的做法是：最终同步阶段先划分“显式特例保留集”和“palette 优先区”；显式特例继续保留场景源色，palette 优先区再对齐 audit。

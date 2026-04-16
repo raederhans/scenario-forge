@@ -998,6 +998,68 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(countries["XIK"]["entry_kind"], "scenario_country")
         self.assertEqual(countries["XIK"]["primary_rule_source"], "dev_manual_tag_create")
 
+    def test_tno_runtime_country_colors_follow_mixed_palette_policy(self) -> None:
+        countries = json.loads(
+            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
+        )["countries"]
+        audit_entries = json.loads(
+            Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
+        )["entries"]
+
+        explicit_scenario_color_tags = {
+            "PHI": "#5b83a4",
+            "MAL": "#d39d80",
+            "LAO": "#c7a18d",
+            "ARM": "#b066b4",
+            "BRG": "#1a1a1a",
+        }
+        palette_priority_tags = {
+            "KAZ": "#aa233c",
+            "UZB": "#9b2b40",
+            "ANG": "#c15e5e",
+            "MZB": "#492a25",
+            "RWA": "#438f00",
+            "ZAM": "#9666a7",
+            "ZIM": "#004a00",
+            "EGY": "#89bb78",
+            "TUN": "#b54613",
+            "LBA": "#bcc2a3",
+            "MAD": "#3d5069",
+            "MOR": "#ac8b6c",
+        }
+
+        mismatches = []
+        for tag, country_entry in countries.items():
+            audit_entry = audit_entries.get(tag, {})
+            audit_hex = str(audit_entry.get("map_hex") or "").strip().lower()
+            country_hex = str(country_entry.get("color_hex") or "").strip().lower()
+
+            if tag in explicit_scenario_color_tags:
+                self.assertEqual(country_hex, explicit_scenario_color_tags[tag])
+                continue
+            if tag in palette_priority_tags:
+                self.assertEqual(country_hex, palette_priority_tags[tag])
+                self.assertEqual(country_hex, audit_hex)
+                continue
+            if not audit_hex:
+                continue
+            if country_hex != audit_hex:
+                mismatches.append((tag, country_hex, audit_hex))
+
+        self.assertEqual(mismatches, [])
+
+    def test_tno_palette_audit_sync_keeps_explicit_scenario_color_exceptions(self) -> None:
+        source = Path("tools/patch_tno_1962_bundle.py").read_text(encoding="utf-8")
+        for tag in ["PHI", "MAL", "LAO", "ARM", "BRG"]:
+            self.assertIn(f'    "{tag}",', source)
+
+    def test_scenario_manager_keeps_active_scenario_colors_tag_scoped(self) -> None:
+        source = Path("js/core/scenario_manager.js").read_text(encoding="utf-8")
+        self.assertNotIn("buildScenarioRuntimeDefaultTagColors", source)
+        self.assertNotIn("buildRuntimeDefaultColorsByIso2", source)
+        self.assertIn("function getScenarioFixedOwnerColors(", source)
+        self.assertIn("next[tag] = color;", source)
+
     def test_validate_geo_locale_manual_overrides_requires_exact_override_entries(self) -> None:
         geo_locale_payload = {
             "geo": {
