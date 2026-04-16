@@ -1150,6 +1150,16 @@ function shouldDeferScenarioChunkRefresh() {
   return shouldDeferScenarioChunkRefreshFor({});
 }
 
+function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
+  return String(
+    state.activeSovereignCode
+    || state.selectedInspectorCountryCode
+    || loadState.focusCountryOverride
+    || getScenarioDefaultCountryCode(bundle?.manifest, bundle?.countriesPayload?.countries || {})
+    || ""
+  ).trim().toUpperCase();
+}
+
 function clearPendingScenarioChunkPromotion(loadState = ensureRuntimeChunkLoadState()) {
   loadState.pendingPromotion = null;
 }
@@ -1884,12 +1894,7 @@ async function refreshActiveScenarioChunks({
   const chunkState = ensureActiveScenarioChunkState();
   chunkState.scenarioId = scenarioId;
   const loadState = ensureRuntimeChunkLoadState();
-  const focusCountry = String(
-    loadState.focusCountryOverride
-    || state.activeSovereignCode
-    || state.selectedInspectorCountryCode
-    || getScenarioDefaultCountryCode(bundle.manifest, bundle.countriesPayload?.countries || {})
-  ).trim().toUpperCase();
+  const focusCountry = resolveScenarioChunkFocusCountry(bundle, loadState);
   const selectionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const selection = selectScenarioChunks({
     scenarioId,
@@ -2071,12 +2076,7 @@ function scheduleScenarioChunkRefresh({
       scenarioId,
       zoom: Number(state.zoomTransform?.k || 1),
       threshold: Number(hints.detail_zoom_threshold || 0),
-      focusCountry: String(
-        loadState.focusCountryOverride
-        || state.activeSovereignCode
-        || state.selectedInspectorCountryCode
-        || ""
-      ).trim().toUpperCase(),
+      focusCountry: resolveScenarioChunkFocusCountry(bundle, loadState),
     };
   }
   if (loadState.refreshTimerId) {
