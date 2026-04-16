@@ -1998,9 +1998,14 @@ function initSidebar({ render } = {}) {
     return [`${nationMeta.tag || "AUTO"} · ${primaryLabel}`, detailTokens.join(" · ")].filter(Boolean).join(" · ");
   };
   const UNIT_COUNTER_PREVIEW_SVG_CACHE_LIMIT = 48;
+  const UNIT_COUNTER_MILSTD_SIDC_PATTERN = /^[A-Z0-9*-]{10,40}$/;
   const unitCounterPreviewSvgCache = new Map();
+  const normalizeUnitCounterMilstdSidc = (sidc = "") => {
+    const token = String(sidc || "").trim().toUpperCase();
+    return UNIT_COUNTER_MILSTD_SIDC_PATTERN.test(token) ? token : "";
+  };
   const getUnitCounterPreviewSvg = (sidc = "") => {
-    const normalizedSidc = String(sidc || "").trim();
+    const normalizedSidc = normalizeUnitCounterMilstdSidc(sidc);
     if (!normalizedSidc || !globalThis.ms?.Symbol) {
       return null;
     }
@@ -2154,7 +2159,7 @@ function initSidebar({ render } = {}) {
     const previewSubLabel = String(subLabel || "").trim() || `${nationMeta.displayName} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`;
     const previewStrength = String(strengthText || "").trim();
     const previewRenderer = String(renderer || presetMeta.defaultRenderer || "game").trim().toLowerCase();
-    const previewSidc = String(sidc || "").trim().toUpperCase();
+    const previewSidc = normalizeUnitCounterMilstdSidc(sidc);
     const previewSymbolToken = String(symbolCode || sidc || presetMeta.shortCode || "").trim().toUpperCase() || presetMeta.shortCode;
     const previewSymbolKey = previewRenderer === "milstd"
       ? `milstd:${previewSidc}`
