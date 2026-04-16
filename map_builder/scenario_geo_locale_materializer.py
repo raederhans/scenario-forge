@@ -129,9 +129,6 @@ def resolve_geo_locale_builder_path(
 ) -> Path | None:
     if fallback_builder_path is not None:
         return Path(fallback_builder_path)
-    configured_builder_path = context.get("geoLocaleBuilderPath")
-    if configured_builder_path:
-        return Path(configured_builder_path)
     registered_builder_path = get_registered_geo_locale_builder_path(
         str(context["scenarioId"])
     )

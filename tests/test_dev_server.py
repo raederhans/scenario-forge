@@ -1904,7 +1904,7 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(patch_payload["geo"]["AAA-1"]["zh"], "\u963f\u5c14\u6cd5")
             self.assertEqual(mutations_payload["geo_locale"]["AAA-1"]["en"], "Alpha")
 
-    def test_save_scenario_geo_locale_entry_prefers_manifest_builder_override(self) -> None:
+    def test_save_scenario_geo_locale_entry_uses_registered_builder_when_manifest_override_present(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             override_builder = root / "tools" / "override_builder.py"
@@ -1932,7 +1932,7 @@ class DevServerTest(unittest.TestCase):
 
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
-            self.assertEqual(patch_payload["generated_at"], "override")
+            self.assertEqual(patch_payload["generated_at"], "registry")
 
     def test_save_scenario_geo_locale_entry_rolls_back_manual_overrides_on_builder_failure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
