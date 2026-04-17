@@ -1778,6 +1778,10 @@ def build_water_cache_delta_summary(context_probes: dict | None) -> dict | None:
     water_off = context_probes.get("water_off")
     if not isinstance(baseline, dict) or not isinstance(water_off, dict):
       return None
+    baseline_error = baseline.get("error")
+    water_off_error = water_off.get("error")
+    if isinstance(baseline_error, str) or isinstance(water_off_error, str):
+      return None
     baseline_samples = baseline.get("samples") if isinstance(baseline.get("samples"), list) else []
     water_off_samples = water_off.get("samples") if isinstance(water_off.get("samples"), list) else []
     baseline_draw_canvas = context_probe_case_metric_samples(baseline_samples, ("counterDelta", "drawCanvas"))
@@ -1812,6 +1816,17 @@ def metric_distribution_is_sustained_negative(distribution: dict) -> bool:
     return max(finite_values) < 0.0
 
 
+def metric_distribution_has_recommendation_signal(distribution: dict) -> bool:
+    if not isinstance(distribution, dict):
+      return False
+    samples = distribution.get("samples")
+    if not isinstance(samples, list) or len(samples) < CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION:
+      return False
+    normalized = [as_finite_number(value) for value in samples]
+    finite_values = [value for value in normalized if value is not None]
+    return len(finite_values) >= CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION
+
+
 def decide_water_cache_low_coverage_recommendation(scenario_id: str, water_cache_delta: dict | None) -> dict:
     if not isinstance(water_cache_delta, dict):
       return {
@@ -1820,6 +1835,21 @@ def decide_water_cache_low_coverage_recommendation(scenario_id: str, water_cache
         "isLowWaterCoverageScenario": False,
         "recommendDisableWaterCacheLowCoverage": False,
         "reason": "missing-water-cache-delta",
+      }
+    has_recommendation_signal = all(
+      (
+        metric_distribution_has_recommendation_signal(water_cache_delta.get("drawCanvasDelta")),
+        metric_distribution_has_recommendation_signal(water_cache_delta.get("framesDelta")),
+        metric_distribution_has_recommendation_signal(water_cache_delta.get("contextScenarioDurationDeltaMs")),
+      )
+    )
+    if not has_recommendation_signal:
+      return {
+        "scenarioId": scenario_id,
+        "hasRecommendationSignal": False,
+        "isLowWaterCoverageScenario": False,
+        "recommendDisableWaterCacheLowCoverage": False,
+        "reason": "insufficient-water-cache-delta-samples",
       }
     metrics = {
       "drawCanvasDelta": metric_distribution_is_sustained_negative(water_cache_delta.get("drawCanvasDelta")),
