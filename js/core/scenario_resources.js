@@ -1116,7 +1116,18 @@ function ensureRuntimeChunkLoadState() {
 }
 
 function isTimerHandle(value) {
-  return typeof value === "number" || (value != null && typeof value === "object");
+  if (typeof value === "number") {
+    return Number.isFinite(value);
+  }
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  return (
+    typeof value.ref === "function"
+    || typeof value.unref === "function"
+    || typeof value.hasRef === "function"
+    || typeof value.refresh === "function"
+  );
 }
 
 function clearPendingScenarioChunkRefresh(loadState = ensureRuntimeChunkLoadState()) {

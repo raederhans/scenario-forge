@@ -81,6 +81,14 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             ),
         )
 
+    def test_timer_handle_check_requires_live_timer_shape(self):
+        self.assertIn('if (state.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(state.runtimeChunkLoadState.promotionTimerId)) {', self.scenario_resources_source)
+        self.assertIn('return Number.isFinite(value);', self.scenario_resources_source)
+        self.assertIn('typeof value.ref === "function"', self.scenario_resources_source)
+        self.assertIn('typeof value.unref === "function"', self.scenario_resources_source)
+        self.assertIn('typeof value.hasRef === "function"', self.scenario_resources_source)
+        self.assertIn('typeof value.refresh === "function"', self.scenario_resources_source)
+
     def test_promotion_pipeline_uses_single_commit_entrypoint(self):
         self.assertIn("Promotion scheduling contract:", self.scenario_resources_source)
         self.assertIn('commitPendingScenarioChunkPromotion();', self.scenario_resources_source)
