@@ -123,16 +123,28 @@ import {
   normalizeScenarioLanguage,
   getScenarioGeoLocalePatchDescriptor as sharedGetScenarioGeoLocalePatchDescriptor,
 } from "./scenario/shared.js";
+import {
+  getScenarioRegistryEntries as getBundleLoaderScenarioRegistryEntries,
+  getScenarioDisplayName as getBundleLoaderScenarioDisplayName,
+  getScenarioNameMap as getBundleLoaderScenarioNameMap,
+  getScenarioFixedOwnerColors as getBundleLoaderScenarioFixedOwnerColors,
+  mergeReleasableCatalogs,
+  getScenarioMetaById as getBundleLoaderScenarioMetaById,
+  getDefaultScenarioId as getBundleLoaderDefaultScenarioId,
+  getScenarioManifestVersion,
+  getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
+  getScenarioBaselineHashFromBundle,
+  getScenarioBlockerCount,
+  getScenarioDefaultCountryCode,
+} from "./scenario/bundle_loader.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
-const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
-let scenarioRegistryPromise = null;
 let activeScenarioApplyPromise = null;
 const EMPTY_FROZEN_LIST = Object.freeze([]);
 const hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology = new WeakMap();
@@ -463,34 +475,15 @@ function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = 
 }
 
 function getScenarioRegistryEntries() {
-  return Array.isArray(state.scenarioRegistry?.scenarios) ? state.scenarioRegistry.scenarios : [];
+  return getBundleLoaderScenarioRegistryEntries(state);
 }
 
 function getScenarioDisplayName(source, fallbackId = "") {
-  const entry = source && typeof source === "object" ? source : null;
-  const rawDisplayName = String(
-    entry?.display_name
-    || entry?.displayName
-    || fallbackId
-    || (!entry ? source : "")
-    || ""
-  ).trim();
-  if (!rawDisplayName) {
-    return "";
-  }
-  return t(rawDisplayName, "geo") || rawDisplayName;
+  return getBundleLoaderScenarioDisplayName(source, fallbackId, t);
 }
 
 function getScenarioNameMap(countryMap = {}) {
-  const next = {};
-  Object.entries(countryMap || {}).forEach(([tag, entry]) => {
-    const normalizedTag = String(tag || "").trim().toUpperCase();
-    const displayName = String(entry?.display_name || entry?.displayName || normalizedTag).trim();
-    if (normalizedTag && displayName) {
-      next[normalizedTag] = displayName;
-    }
-  });
-  return next;
+  return getBundleLoaderScenarioNameMap(countryMap);
 }
 
 function getMissingScenarioNameTags(countryMap = {}, scenarioNameMap = {}) {
@@ -511,70 +504,20 @@ function getMissingScenarioNameTags(countryMap = {}, scenarioNameMap = {}) {
 function getScenarioFixedOwnerColors(
   countryMap = {}
 ) {
-  const next = {};
-  Object.entries(countryMap || {}).forEach(([rawTag, rawEntry]) => {
-    const tag = String(rawTag || "").trim().toUpperCase();
-    const entry = rawEntry && typeof rawEntry === "object" ? rawEntry : {};
-    const color = String(entry.color_hex || entry.colorHex || "").trim().toLowerCase();
-    if (tag && /^#[0-9a-f]{6}$/.test(color)) {
-      next[tag] = color;
-    }
-  });
-  return next;
-}
-
-function mergeReleasableCatalogs(baseCatalog, overlayCatalog) {
-  const baseEntries = Array.isArray(baseCatalog?.entries) ? baseCatalog.entries : [];
-  const overlayEntries = Array.isArray(overlayCatalog?.entries) ? overlayCatalog.entries : [];
-  if (!baseEntries.length && !overlayEntries.length) {
-    return overlayCatalog || baseCatalog || null;
-  }
-  const mergedByTag = new Map();
-  baseEntries.forEach((entry) => {
-    const tag = String(entry?.tag || "").trim().toUpperCase();
-    if (!tag) return;
-    mergedByTag.set(tag, entry);
-  });
-  overlayEntries.forEach((entry) => {
-    const tag = String(entry?.tag || "").trim().toUpperCase();
-    if (!tag) return;
-    mergedByTag.set(tag, entry);
-  });
-  const scenarioIds = Array.from(new Set([
-    ...(Array.isArray(baseCatalog?.scenario_ids) ? baseCatalog.scenario_ids : []),
-    ...(Array.isArray(overlayCatalog?.scenario_ids) ? overlayCatalog.scenario_ids : []),
-  ]));
-  return {
-    ...(baseCatalog && typeof baseCatalog === "object" ? baseCatalog : {}),
-    ...(overlayCatalog && typeof overlayCatalog === "object" ? overlayCatalog : {}),
-    scenario_ids: scenarioIds,
-    entries: Array.from(mergedByTag.values()),
-  };
+  return getBundleLoaderScenarioFixedOwnerColors(countryMap);
 }
 
 
 function getScenarioMetaById(scenarioId) {
-  const targetId = normalizeScenarioId(scenarioId);
-  return getScenarioRegistryEntries().find(
-    (entry) => normalizeScenarioId(entry?.scenario_id) === targetId
-  ) || null;
+  return getBundleLoaderScenarioMetaById(state, normalizeScenarioId, scenarioId);
 }
 
 function getDefaultScenarioId() {
-  return normalizeScenarioId(state.scenarioRegistry?.default_scenario_id);
-}
-
-function getScenarioManifestVersion(manifest) {
-  const version = Number(manifest?.version || 1);
-  return Number.isFinite(version) && version > 0 ? version : 1;
+  return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
 }
 
 function getScenarioManifestSummary(manifest = state.activeScenarioManifest) {
-  return manifest?.summary && typeof manifest.summary === "object" ? manifest.summary : {};
-}
-
-function getScenarioBaselineHashFromBundle(bundle) {
-  return String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
+  return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
 function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = state.activeScenarioId) {
@@ -594,25 +537,8 @@ function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = state.a
 }
 
 
-function getScenarioBlockerCount(summary = {}) {
-  const flattened = Number(summary.blocker_count);
-  if (Number.isFinite(flattened)) {
-    return flattened;
-  }
-  return (
-    Number(summary.geometry_blocker_count || 0)
-    + Number(summary.topology_blocker_count || 0)
-    + Number(summary.scenario_rule_blocker_count || 0)
-  );
-}
-
 function getScenarioDefaultCountryCode(manifest, countryMap = {}) {
-  return String(
-    manifest?.default_active_country_code
-    || manifest?.default_country
-    || Object.keys(countryMap || {})[0]
-    || ""
-  ).trim().toUpperCase();
+  return getBundleLoaderDefaultCountryCode(manifest, countryMap);
 }
 
 function getScenarioMapSemanticMode(manifest, fallback = "political") {

@@ -4,6 +4,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_RESOURCES = REPO_ROOT / "js" / "core" / "scenario_resources.js"
+SCENARIO_BUNDLE_LOADER = REPO_ROOT / "js" / "core" / "scenario" / "bundle_loader.js"
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
 SCENARIO_POST_APPLY_EFFECTS = REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
 MAIN_JS = REPO_ROOT / "js" / "main.js"
@@ -28,6 +29,17 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("ensureActiveScenarioOptionalLayersForVisibility,", content)
         self.assertIn("ensureScenarioGeoLocalePatchForLanguage,", content)
         self.assertIn("validateImportedScenarioBaseline,", content)
+
+    def test_bundle_loader_stays_internal_and_one_way(self):
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        bundle_loader_content = SCENARIO_BUNDLE_LOADER.read_text(encoding="utf-8")
+
+        self.assertIn('./scenario/bundle_loader.js', resources_content)
+        self.assertNotIn('./scenario_resources.js', bundle_loader_content)
+        self.assertNotIn('./scenario_manager.js', bundle_loader_content)
+        self.assertIn("createScenarioRegistryLoader", bundle_loader_content)
+        self.assertIn("createScenarioAuditPayloadLoader", bundle_loader_content)
+        self.assertIn("createImportedScenarioBaselineValidator", bundle_loader_content)
 
     def test_external_callers_no_longer_pull_resource_api_from_scenario_manager(self):
         self.assertIn('./core/scenario_resources.js', MAIN_JS.read_text(encoding="utf-8"))

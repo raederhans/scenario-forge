@@ -20,7 +20,7 @@
 ### Wave 1: 收口 scenario 边界
 - [x] 新建 `js/core/scenario/` 内部目录
 - [x] 抽 `shared.js`：`cacheBust`、`normalizeScenarioId`、timeout loader 等纯 helper
-- [ ] 抽 `bundle_loader.js`：registry、bundle load、import baseline 校验
+- [x] 抽第一版 `bundle_loader.js`：registry、audit、bundle metadata、import baseline 校验
 - [ ] 抽 `chunk_runtime.js`：chunk state、promotion、refresh、schedule
 - [ ] 抽 `startup_hydration.js`：startup bundle、hydrate、health gate
 - [ ] `scenario_resources.js` 保持资源 facade
@@ -113,4 +113,6 @@
   - async detail prewarm 现在会在成功后补一次 `scheduleScenarioChunkRefresh(...)`，并增加场景切换后的二次校验，避免旧任务污染当前 metric。
   - `js/core/scenario/shared.js` 已落地，先收口 `cacheBust`、scenario id/language/core map、timeout loader、required/optional resource 校验等共享 helper。
   - `scenario_manager.js` 与 `scenario_resources.js` 已切到 `shared.js`，完成第一批重复逻辑下沉。
-  - 已验证：67 条静态边界与 startup 相关 Python tests 全绿。
+  - `js/core/scenario/bundle_loader.js` 已落地，先收口 registry、display/meta、baseline compare、audit loader，并让 `scenario_resources.js` 继续做稳定 facade 转发。
+  - `bundle_loader.js` 进一步接管了 runtime shell / contract / chunked-runtime 判定 helper，`scenario_manager.js` 与 `scenario_resources.js` 已开始复用同一组 bundle metadata helper。
+  - 已验证：68 条静态边界与 startup 相关 Python tests 全绿。

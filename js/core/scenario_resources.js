@@ -30,7 +30,6 @@ import {
 import {
   normalizeIndexedCoreAssignmentPayload,
   normalizeIndexedTagAssignmentPayload,
-  normalizeRuntimePoliticalMeta as normalizeStartupBundleRuntimePoliticalMeta,
 } from "./startup_bundle_compaction.js";
 import {
   decodeRuntimeChunkViaWorker,
@@ -72,9 +71,7 @@ import {
 import {
   cacheBust,
   getSearchParams,
-  shouldBypassScenarioCache,
   normalizeScenarioBundleLevel,
-  getScenarioBundleHydrationRank,
   scenarioBundleSatisfiesLevel,
   normalizeScenarioCoreTag,
   normalizeScenarioCoreValue,
@@ -89,6 +86,31 @@ import {
   normalizeScenarioLanguage,
   getScenarioGeoLocalePatchDescriptor as sharedGetScenarioGeoLocalePatchDescriptor,
 } from "./scenario/shared.js";
+import {
+  getScenarioRegistryEntries as getBundleLoaderScenarioRegistryEntries,
+  getScenarioDisplayName as getBundleLoaderScenarioDisplayName,
+  getScenarioNameMap as getBundleLoaderScenarioNameMap,
+  getScenarioFixedOwnerColors as getBundleLoaderScenarioFixedOwnerColors,
+  mergeReleasableCatalogs,
+  getScenarioMetaById as getBundleLoaderScenarioMetaById,
+  getDefaultScenarioId as getBundleLoaderDefaultScenarioId,
+  getScenarioManifestVersion,
+  getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
+  getScenarioBaselineHashFromBundle,
+  getScenarioBlockerCount,
+  getScenarioDefaultCountryCode,
+  normalizeScenarioRuntimeTopologyPayload as normalizeBundleLoaderScenarioRuntimeTopologyPayload,
+  normalizeScenarioRuntimePoliticalMeta as normalizeBundleLoaderScenarioRuntimePoliticalMeta,
+  getScenarioRuntimePoliticalFeatureCount as getBundleLoaderScenarioRuntimePoliticalFeatureCount,
+  validateScenarioRuntimeShellContract as validateBundleLoaderScenarioRuntimeShellContract,
+  hasScenarioRuntimeShellContract as hasBundleLoaderScenarioRuntimeShellContract,
+  normalizeScenarioRuntimeShell as normalizeBundleLoaderScenarioRuntimeShell,
+  scenarioSupportsChunkedRuntime as bundleLoaderScenarioSupportsChunkedRuntime,
+  scenarioBundleHasChunkedData as bundleLoaderScenarioBundleHasChunkedData,
+  createScenarioRegistryLoader,
+  createScenarioAuditPayloadLoader,
+  createImportedScenarioBaselineValidator,
+} from "./scenario/bundle_loader.js";
 import { consumeScenarioTestHook } from "./scenario_recovery.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
@@ -101,12 +123,6 @@ const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 const SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO = 0.85;
 const SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES = 1000;
-const SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS = Object.freeze([
-  "land_mask",
-  "context_land_mask",
-  "scenario_water",
-]);
-let scenarioRegistryPromise = null;
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
     bundleField: "waterRegionsPayload",
@@ -140,6 +156,8 @@ const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   },
 };
 
+const normalizeStartupBundleRuntimePoliticalMeta = normalizeBundleLoaderScenarioRuntimePoliticalMeta;
+
 function normalizeScenarioCoreMap(rawMap) {
   return sharedNormalizeScenarioCoreMap(rawMap, { normalizeFeatureText: normalizeCityText });
 }
@@ -167,6 +185,12 @@ async function loadMeasuredRequiredScenarioResource(d3Client, url, options = {})
 function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentLanguage) {
   return sharedGetScenarioGeoLocalePatchDescriptor(manifest, language);
 }
+
+const loadScenarioRegistry = createScenarioRegistryLoader({
+  state,
+  scenarioRegistryUrl: SCENARIO_REGISTRY_URL,
+  loadScenarioJsonWithTimeout,
+});
 
 function buildHoi4FarEastSovietOwnerBackfill(
   scenarioId,
@@ -396,123 +420,31 @@ function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = 
 }
 
 function getScenarioRegistryEntries() {
-  return Array.isArray(state.scenarioRegistry?.scenarios) ? state.scenarioRegistry.scenarios : [];
+  return getBundleLoaderScenarioRegistryEntries(state);
 }
 
 function getScenarioDisplayName(source, fallbackId = "") {
-  const entry = source && typeof source === "object" ? source : null;
-  const rawDisplayName = String(
-    entry?.display_name
-    || entry?.displayName
-    || fallbackId
-    || (!entry ? source : "")
-    || ""
-  ).trim();
-  if (!rawDisplayName) {
-    return "";
-  }
-  return t(rawDisplayName, "geo") || rawDisplayName;
+  return getBundleLoaderScenarioDisplayName(source, fallbackId, t);
 }
 
 function getScenarioNameMap(countryMap = {}) {
-  const next = {};
-  Object.entries(countryMap || {}).forEach(([tag, entry]) => {
-    const normalizedTag = String(tag || "").trim().toUpperCase();
-    const displayName = String(entry?.display_name || entry?.displayName || normalizedTag).trim();
-    if (normalizedTag && displayName) {
-      next[normalizedTag] = displayName;
-    }
-  });
-  return next;
+  return getBundleLoaderScenarioNameMap(countryMap);
 }
 
 function getScenarioFixedOwnerColors(countryMap = {}) {
-  const next = {};
-  Object.entries(countryMap || {}).forEach(([tag, entry]) => {
-    const normalizedTag = String(tag || "").trim().toUpperCase();
-    const color = String(entry?.color_hex || entry?.colorHex || "").trim().toLowerCase();
-    if (normalizedTag && /^#[0-9a-f]{6}$/.test(color)) {
-      next[normalizedTag] = color;
-    }
-  });
-  return next;
-}
-
-function mergeReleasableCatalogs(baseCatalog, overlayCatalog) {
-  const baseEntries = Array.isArray(baseCatalog?.entries) ? baseCatalog.entries : [];
-  const overlayEntries = Array.isArray(overlayCatalog?.entries) ? overlayCatalog.entries : [];
-  if (!baseEntries.length && !overlayEntries.length) {
-    return overlayCatalog || baseCatalog || null;
-  }
-  const mergedByTag = new Map();
-  baseEntries.forEach((entry) => {
-    const tag = String(entry?.tag || "").trim().toUpperCase();
-    if (!tag) return;
-    mergedByTag.set(tag, entry);
-  });
-  overlayEntries.forEach((entry) => {
-    const tag = String(entry?.tag || "").trim().toUpperCase();
-    if (!tag) return;
-    mergedByTag.set(tag, entry);
-  });
-  const scenarioIds = Array.from(new Set([
-    ...(Array.isArray(baseCatalog?.scenario_ids) ? baseCatalog.scenario_ids : []),
-    ...(Array.isArray(overlayCatalog?.scenario_ids) ? overlayCatalog.scenario_ids : []),
-  ]));
-  return {
-    ...(baseCatalog && typeof baseCatalog === "object" ? baseCatalog : {}),
-    ...(overlayCatalog && typeof overlayCatalog === "object" ? overlayCatalog : {}),
-    scenario_ids: scenarioIds,
-    entries: Array.from(mergedByTag.values()),
-  };
-}
-
-async function loadScenarioRegistry({ d3Client = globalThis.d3 } = {}) {
-  if (state.scenarioRegistry) {
-    return state.scenarioRegistry;
-  }
-  if (scenarioRegistryPromise) {
-    return scenarioRegistryPromise;
-  }
-  if (!d3Client || typeof d3Client.json !== "function") {
-    throw new Error("d3.json is not available for scenario registry loading.");
-  }
-  scenarioRegistryPromise = loadScenarioJsonWithTimeout(d3Client, SCENARIO_REGISTRY_URL, {
-    resourceLabel: "scenario_registry",
-  })
-    .then((registry) => {
-      state.scenarioRegistry = registry || { version: 1, default_scenario_id: "", scenarios: [] };
-      return state.scenarioRegistry;
-    })
-    .catch((error) => {
-      scenarioRegistryPromise = null;
-      throw error;
-    });
-  return scenarioRegistryPromise;
+  return getBundleLoaderScenarioFixedOwnerColors(countryMap);
 }
 
 function getScenarioMetaById(scenarioId) {
-  const targetId = normalizeScenarioId(scenarioId);
-  return getScenarioRegistryEntries().find(
-    (entry) => normalizeScenarioId(entry?.scenario_id) === targetId
-  ) || null;
+  return getBundleLoaderScenarioMetaById(state, normalizeScenarioId, scenarioId);
 }
 
 function getDefaultScenarioId() {
-  return normalizeScenarioId(state.scenarioRegistry?.default_scenario_id);
-}
-
-function getScenarioManifestVersion(manifest) {
-  const version = Number(manifest?.version || 1);
-  return Number.isFinite(version) && version > 0 ? version : 1;
+  return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
 }
 
 function getScenarioManifestSummary(manifest = state.activeScenarioManifest) {
-  return manifest?.summary && typeof manifest.summary === "object" ? manifest.summary : {};
-}
-
-function getScenarioBaselineHashFromBundle(bundle) {
-  return String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
+  return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
 
@@ -528,27 +460,6 @@ function refreshMapDataColorsForScenarioShell(featureIds) {
   refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
 }
 
-
-function getScenarioBlockerCount(summary = {}) {
-  const flattened = Number(summary.blocker_count);
-  if (Number.isFinite(flattened)) {
-    return flattened;
-  }
-  return (
-    Number(summary.geometry_blocker_count || 0)
-    + Number(summary.topology_blocker_count || 0)
-    + Number(summary.scenario_rule_blocker_count || 0)
-  );
-}
-
-function getScenarioDefaultCountryCode(manifest, countryMap = {}) {
-  return String(
-    manifest?.default_active_country_code
-    || manifest?.default_country
-    || Object.keys(countryMap || {})[0]
-    || ""
-  ).trim().toUpperCase();
-}
 
 function getScenarioMapSemanticMode(manifest, fallback = "political") {
   return normalizeMapSemanticMode(manifest?.map_mode, fallback);
@@ -610,22 +521,7 @@ function getScenarioOptionalLayerConfig(layerKey) {
 }
 
 function normalizeScenarioRuntimeTopologyPayload(payload) {
-  if (!payload || typeof payload !== "object") {
-    return null;
-  }
-  if (!payload.objects || typeof payload.objects !== "object") {
-    return null;
-  }
-  if (
-    !payload.objects.political
-    && !payload.objects.scenario_water
-    && !payload.objects.scenario_special_land
-    && !payload.objects.land_mask
-    && !payload.objects.land
-  ) {
-    return null;
-  }
-  return payload;
+  return normalizeBundleLoaderScenarioRuntimeTopologyPayload(payload);
 }
 
 function hasScenarioRuntimePoliticalPayload(payload) {
@@ -702,13 +598,7 @@ function scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client = globalT
 }
 
 function getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta = null) {
-  const geometryCount = Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)
-    ? runtimeTopologyPayload.objects.political.geometries.length
-    : 0;
-  if (geometryCount > 0) {
-    return geometryCount;
-  }
-  return Array.isArray(runtimePoliticalMeta?.featureIds) ? runtimePoliticalMeta.featureIds.length : 0;
+  return getBundleLoaderScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta);
 }
 
 function hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload) {
@@ -719,67 +609,32 @@ function validateScenarioRuntimeShellContract({
   runtimeTopologyPayload = null,
   runtimePoliticalMeta = null,
 } = {}) {
-  const normalizedTopologyPayload = normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload);
-  const normalizedMeta = normalizeScenarioRuntimePoliticalMeta(runtimePoliticalMeta);
-  const missingObjects = normalizedTopologyPayload
-    ? SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS.filter((objectName) => !normalizedTopologyPayload?.objects?.[objectName])
-    : [...SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS];
-  const politicalFeatureCount = getScenarioRuntimePoliticalFeatureCount(normalizedTopologyPayload, normalizedMeta);
-  return {
-    ok: !!normalizedTopologyPayload && missingObjects.length === 0 && politicalFeatureCount > 0,
-    missingObjects,
-    missingPoliticalMeta: politicalFeatureCount <= 0,
-    politicalFeatureCount,
-    runtimeTopologyPayload: normalizedTopologyPayload,
-    runtimePoliticalMeta: normalizedMeta,
-  };
+  return validateBundleLoaderScenarioRuntimeShellContract({
+    runtimeTopologyPayload,
+    runtimePoliticalMeta,
+  });
 }
 
 function hasScenarioRuntimeShellContract({
   runtimeTopologyPayload = null,
   runtimePoliticalMeta = null,
 } = {}) {
-  return validateScenarioRuntimeShellContract({
+  return hasBundleLoaderScenarioRuntimeShellContract({
     runtimeTopologyPayload,
     runtimePoliticalMeta,
-  }).ok;
+  });
 }
 
 function normalizeScenarioRuntimeShell(manifest) {
-  if (!manifest || typeof manifest !== "object") {
-    return null;
-  }
-  const startupTopologyUrl = String(
-    manifest.startup_topology_url
-    || manifest.runtime_bootstrap_topology_url
-    || manifest.runtime_topology_url
-    || ""
-  ).trim();
-  const detailChunkManifestUrl = String(manifest.detail_chunk_manifest_url || "").trim();
-  const runtimeMetaUrl = String(manifest.runtime_meta_url || "").trim();
-  const meshPackUrl = String(manifest.mesh_pack_url || "").trim();
-  const contextLodManifestUrl = String(manifest.context_lod_manifest || "").trim();
-  if (!startupTopologyUrl && !detailChunkManifestUrl && !runtimeMetaUrl && !meshPackUrl && !contextLodManifestUrl) {
-    return null;
-  }
-  return {
-    scenarioId: normalizeScenarioId(manifest.scenario_id),
-    startupTopologyUrl,
-    detailChunkManifestUrl,
-    runtimeMetaUrl,
-    meshPackUrl,
-    contextLodManifestUrl,
-    renderBudgetHints: normalizeScenarioRenderBudgetHints(manifest.render_budget_hints || {}),
-  };
+  return normalizeBundleLoaderScenarioRuntimeShell(manifest, { normalizeScenarioId });
 }
 
 function scenarioSupportsChunkedRuntime(bundleOrManifest) {
-  const manifest = bundleOrManifest?.manifest || bundleOrManifest;
-  return !!normalizeScenarioRuntimeShell(manifest)?.detailChunkManifestUrl;
+  return bundleLoaderScenarioSupportsChunkedRuntime(bundleOrManifest, { normalizeScenarioId });
 }
 
 function scenarioBundleHasChunkedData(bundle) {
-  return Array.isArray(bundle?.chunkRegistry?.chunks) && bundle.chunkRegistry.chunks.length > 0;
+  return bundleLoaderScenarioBundleHasChunkedData(bundle);
 }
 
 function scenarioBundleUsesChunkedLayer(bundle, layerKey = "") {
@@ -3686,117 +3541,22 @@ async function loadScenarioBundle(
   return bundle;
 }
 
-async function loadScenarioAuditPayload(
-  bundleOrScenarioId,
-  {
-    d3Client = globalThis.d3,
-    forceReload = false,
-  } = {}
-) {
-  const bundle = typeof bundleOrScenarioId === "string"
-    ? await loadScenarioBundle(bundleOrScenarioId, { d3Client, bundleLevel: "full" })
-    : bundleOrScenarioId;
-  const requestedScenarioId = normalizeScenarioId(
-    bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id
-  );
-  if (!bundle?.manifest?.audit_url) {
-    return null;
-  }
-  if (bundle.auditPayload && !forceReload) {
-    if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
-      state.scenarioAudit = bundle.auditPayload;
-      setScenarioAuditUiState({
-        loading: false,
-        loadedForScenarioId: requestedScenarioId,
-        errorMessage: "",
-      });
-      syncScenarioUi();
-    }
-    return bundle.auditPayload;
-  }
-  if (!d3Client || typeof d3Client.json !== "function") {
-    throw new Error("d3.json is not available for scenario audit loading.");
-  }
+const loadScenarioAuditPayload = createScenarioAuditPayloadLoader({
+  state,
+  normalizeScenarioId,
+  loadScenarioBundle,
+  setScenarioAuditUiState,
+  syncScenarioUi,
+  loadMeasuredJsonResource,
+  cacheBust,
+});
 
-  if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
-    setScenarioAuditUiState({
-      loading: true,
-      errorMessage: "",
-    });
-    syncScenarioUi();
-  }
-
-  try {
-    const { payload: auditPayload } = await loadMeasuredJsonResource(cacheBust(bundle.manifest.audit_url), {
-      d3Client,
-      label: "scenario:audit",
-    });
-    bundle.auditPayload = auditPayload || null;
-    if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
-      state.scenarioAudit = bundle.auditPayload;
-      setScenarioAuditUiState({
-        loading: false,
-        loadedForScenarioId: bundle.auditPayload ? requestedScenarioId : "",
-        errorMessage: "",
-      });
-      syncScenarioUi();
-    }
-    return bundle.auditPayload;
-  } catch (error) {
-    if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
-      setScenarioAuditUiState({
-        loading: false,
-        errorMessage: String(error?.message || "Unable to load audit details."),
-      });
-      syncScenarioUi();
-    }
-    throw error;
-  }
-}
-
-async function validateImportedScenarioBaseline(projectScenario, { d3Client = globalThis.d3 } = {}) {
-  const scenarioId = normalizeScenarioId(projectScenario?.id);
-  if (!scenarioId) {
-    return { ok: true, bundle: null, message: "" };
-  }
-
-  let bundle = null;
-  try {
-    bundle = await loadScenarioBundle(scenarioId, { d3Client, bundleLevel: "full" });
-  } catch (error) {
-    return {
-      ok: false,
-      bundle: null,
-      message: `Scenario "${scenarioId}" is not available in the current asset set.`,
-      reason: "missing_scenario",
-      error,
-    };
-  }
-
-  const currentVersion = getScenarioManifestVersion(bundle.manifest);
-  const currentBaselineHash = getScenarioBaselineHashFromBundle(bundle);
-  const expectedVersion = Number(projectScenario?.version || 1) || 1;
-  const expectedBaselineHash = String(projectScenario?.baselineHash || "").trim();
-  const mismatches = [];
-
-  if (currentVersion !== expectedVersion) {
-    mismatches.push(`version ${expectedVersion} -> ${currentVersion}`);
-  }
-  if (expectedBaselineHash !== currentBaselineHash) {
-    mismatches.push("baseline hash differs");
-  }
-
-  return {
-    ok: mismatches.length === 0,
-    bundle,
-    message: mismatches.length
-      ? `Saved scenario baseline does not match current assets (${mismatches.join(", ")}).`
-      : "",
-    reason: mismatches.length ? "baseline_mismatch" : "",
-    currentVersion,
-    currentBaselineHash,
-  };
-}
+const validateImportedScenarioBaseline = createImportedScenarioBaselineValidator({
+  normalizeScenarioId,
+  loadScenarioBundle,
+  getScenarioManifestVersion,
+  getScenarioBaselineHashFromBundle,
+});
 
 export {
   applyBlankScenarioPresentationDefaults,

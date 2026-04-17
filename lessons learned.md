@@ -821,3 +821,8 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次红测和实现漂移的根因是把“调用方必须等待的首帧 coarse prewarm”和“首帧后的 detail cache 预热”揉成了同一个 helper，还用 `mode=sync/async` 偷渡语义，结果调用点看起来在 `await`，异步路径却没有真正等待首帧合同。
 - 更稳的最短路径是：先 `await` coarse first-frame ready，再把 detail prewarm 放到 post-frame 路径；如果 detail prewarm 只写 cache，不直接 apply runtime，就要在成功后显式补一次 `scheduleScenarioChunkRefresh(...)`。
 - perf metric 也要按一次 run 重建，不能沿用 merge 写法残留上一次的失败或 detail 字段。
+
+### 81. 内部 loader 模块首轮下沉时，先抽纯加载合同和 metadata helper，facade 继续持有 active state / UI side effect
+- 这次 `scenario_resources -> scenario/shared + scenario/bundle_loader` 的最稳切法，是先把 registry、baseline compare、runtime shell contract、chunked-runtime 判定这类纯加载 helper 抽走，再让 facade 继续持有 `state`、`syncScenarioUi()`、optional layer apply、hydrate、health gate。
+- 如果一开始就把 active state 写回和 UI 同步一起搬进 loader，新模块会立刻跨进运行态事务，边界会重新糊掉。
+- 更稳的最短路径是：新模块优先用 dependency injection 或低层 import，只保留单向依赖；facade 继续做对外 export 和副作用收口。
