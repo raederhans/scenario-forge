@@ -1041,7 +1041,7 @@ function ensureRuntimeChunkLoadState() {
       mergedLayerPayloadCache: {},
     };
   }
-  if (state.runtimeChunkLoadState.refreshTimerId && typeof state.runtimeChunkLoadState.refreshTimerId !== "number") {
+  if (state.runtimeChunkLoadState.refreshTimerId && !isTimerHandle(state.runtimeChunkLoadState.refreshTimerId)) {
     state.runtimeChunkLoadState.refreshTimerId = null;
   }
   state.runtimeChunkLoadState.inFlightByChunkId =
@@ -1086,7 +1086,7 @@ function ensureRuntimeChunkLoadState() {
     state.runtimeChunkLoadState.pendingInfraPromotion && typeof state.runtimeChunkLoadState.pendingInfraPromotion === "object"
       ? state.runtimeChunkLoadState.pendingInfraPromotion
       : null;
-  if (state.runtimeChunkLoadState.promotionTimerId && typeof state.runtimeChunkLoadState.promotionTimerId !== "number") {
+  if (state.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(state.runtimeChunkLoadState.promotionTimerId)) {
     state.runtimeChunkLoadState.promotionTimerId = null;
   }
   state.runtimeChunkLoadState.promotionScheduled = state.runtimeChunkLoadState.promotionTimerId != null;
@@ -1113,6 +1113,10 @@ function ensureRuntimeChunkLoadState() {
       ? state.runtimeChunkLoadState.mergedLayerPayloadCache
       : {};
   return state.runtimeChunkLoadState;
+}
+
+function isTimerHandle(value) {
+  return typeof value === "number" || (value != null && typeof value === "object");
 }
 
 function clearPendingScenarioChunkRefresh(loadState = ensureRuntimeChunkLoadState()) {
@@ -1148,12 +1152,7 @@ function shouldZoomEndPromoteImmediately(bundle, reason = "") {
   return Number.isFinite(zoom) && zoom >= Number(hints.detail_zoom_threshold || 0);
 }
 
-function shouldDeferScenarioChunkRefreshFor({
-  reason = "",
-  bundle = null,
-} = {}) {
-  void bundle;
-  void reason;
+function shouldDeferScenarioChunkRefreshFor() {
   return !!(
     state.bootBlocking
     || state.scenarioApplyInFlight
@@ -1165,7 +1164,7 @@ function shouldDeferScenarioChunkRefreshFor({
 }
 
 function shouldDeferScenarioChunkRefresh() {
-  return shouldDeferScenarioChunkRefreshFor({});
+  return shouldDeferScenarioChunkRefreshFor();
 }
 
 function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
@@ -2008,7 +2007,7 @@ async function refreshActiveScenarioChunks({
   if (!scenarioId) return null;
   const bundle = getCachedScenarioBundle(scenarioId);
   if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
-  if (shouldDeferScenarioChunkRefreshFor({ reason, bundle })) {
+  if (shouldDeferScenarioChunkRefreshFor()) {
     markPendingScenarioChunkRefresh(reason);
     return null;
   }
@@ -2212,7 +2211,7 @@ async function refreshActiveScenarioChunks({
   };
   loadState.promotionRetryCount = 0;
   loadState.lastPromotionRetryAt = 0;
-  if (shouldDeferScenarioChunkRefreshFor({ reason, bundle })) {
+  if (shouldDeferScenarioChunkRefreshFor()) {
     markPendingScenarioChunkRefresh(reason);
     return selection;
   }
@@ -2260,7 +2259,7 @@ function scheduleScenarioChunkRefresh({
     loadState.refreshTimerId = null;
     loadState.refreshScheduled = false;
   }
-  if (shouldDeferScenarioChunkRefreshFor({ reason: nextReason, bundle })) {
+  if (shouldDeferScenarioChunkRefreshFor()) {
     markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
     return "deferred";
   }
@@ -2283,7 +2282,7 @@ function scheduleScenarioChunkRefresh({
   loadState.refreshTimerId = globalThis.setTimeout(() => {
     loadState.refreshTimerId = null;
     loadState.refreshScheduled = false;
-    if (shouldDeferScenarioChunkRefreshFor({ reason: nextReason, bundle })) {
+    if (shouldDeferScenarioChunkRefreshFor()) {
       markPendingScenarioChunkRefresh(nextReason, nextDelayMs);
       return;
     }
