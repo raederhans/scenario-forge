@@ -804,15 +804,20 @@ def with_query_overrides(url: str, **overrides: str) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
-def build_suite_open_urls(base_urls: list[str], scenario_id: str) -> list[str]:
+def build_scenario_open_urls(base_urls: list[str], scenario_id: str) -> list[str]:
     urls: list[str] = []
     normalized_scenario_id = str(scenario_id or "").strip()
     for base_url in unique_strings(base_urls):
       perf_url = with_query_overrides(ensure_app_path_url(base_url), perf_overlay="1")
-      urls.append(perf_url)
       if normalized_scenario_id and normalized_scenario_id != "none":
-        urls.append(with_query_overrides(perf_url, default_scenario=normalized_scenario_id))
+        scenario_perf_url = with_query_overrides(perf_url, default_scenario=normalized_scenario_id)
+        urls.append(scenario_perf_url)
+      urls.append(perf_url)
     return unique_strings(urls)
+
+
+def build_suite_open_urls(base_urls: list[str], scenario_id: str) -> list[str]:
+    return build_scenario_open_urls(base_urls, scenario_id)
 
 
 def ensure_app_path_url(url: str) -> str:
@@ -1019,6 +1024,19 @@ def is_fresh_metric_entry(entry: object, previous_recorded_at: object) -> bool:
     return recorded_at is not None and recorded_at > baseline
 
 
+def is_same_scenario_fresh_metric_entry(
+    entry: object,
+    scenario_id: object,
+    previous_recorded_at: object,
+    *field_names: str,
+) -> bool:
+    return is_fresh_metric_entry(entry, previous_recorded_at) and metric_entry_matches_scenario(
+      entry,
+      scenario_id,
+      *(field_names or ("scenarioId", "activeScenarioId")),
+    )
+
+
 def summarize_freshest_direct_metric_entry(
     candidates: list[tuple[object, str, object]],
     *,
@@ -1046,6 +1064,112 @@ def summarize_freshest_direct_metric_entry(
     }
 
 
+def summarize_freshest_same_scenario_metric_entry(
+    candidates: list[tuple[object, str, object]],
+    scenario_id: object,
+    *,
+    field_names: tuple[str, ...] = ("scenarioId", "activeScenarioId"),
+    count_key: str | None = None,
+) -> dict:
+    freshest_summary: dict | None = None
+    freshest_recorded_at = -1.0
+    for entry, source, baseline in candidates:
+      if not is_same_scenario_fresh_metric_entry(entry, scenario_id, baseline, *field_names):
+        continue
+      summary = summarize_direct_metric_entry(entry, source, count_key=count_key)
+      recorded_at = as_finite_number(summary.get("recordedAt")) or -1.0
+      if recorded_at >= freshest_recorded_at:
+        freshest_summary = summary
+        freshest_recorded_at = recorded_at
+    if freshest_summary is not None:
+      return freshest_summary
+    return {
+      "present": False,
+      "source": None,
+      "durationMs": None,
+      "recordedAt": None,
+      "count": None,
+      "details": None,
+    }
+
+
+def with_metric_context(
+    summary: dict,
+    *,
+    metric_name: str,
+    requested_scenario_id: str,
+    selected_via: str,
+    probe: object = None,
+    baselines: object = None,
+    candidate_sources: list[str] | tuple[str, ...] | None = None,
+) -> dict:
+    normalized_requested_scenario_id = str(requested_scenario_id or "").strip()
+    expected_metric_scenario_id = "" if normalized_requested_scenario_id == "none" else normalized_requested_scenario_id
+    normalized_summary = dict(summary)
+    details = dict(normalized_summary.get("details") or {})
+    details.update({
+      "metricName": metric_name,
+      "requestedScenarioId": normalized_requested_scenario_id,
+      "expectedMetricScenarioId": expected_metric_scenario_id,
+      "selectedVia": selected_via,
+      "sameScenario": (
+        metric_entry_matches_scenario(details, expected_metric_scenario_id, "scenarioId", "activeScenarioId")
+        if isinstance(details, dict)
+        else False
+      ),
+    })
+    if candidate_sources:
+      details["candidateSources"] = list(candidate_sources)
+    if isinstance(baselines, dict):
+      details["metricBaselines"] = dict(baselines)
+    if isinstance(probe, dict):
+      details["probe"] = {
+        key: value
+        for key, value in probe.items()
+        if key not in {"scenarioMetrics", "renderMetrics", "runtimeChunkLoadState"}
+      }
+    normalized_summary["details"] = details
+    return normalized_summary
+
+
+def build_suite_scenario_consistency(suite: dict) -> dict:
+    page_load = suite.get("pageLoad") if isinstance(suite.get("pageLoad"), dict) else {}
+    scenario_apply = suite.get("scenarioApply") if isinstance(suite.get("scenarioApply"), dict) else {}
+    requested_scenario_id = str(
+      scenario_apply.get("requestedScenarioId")
+      or suite.get("scenarioId")
+      or ""
+    ).strip()
+    expected_active_scenario_id = "" if requested_scenario_id == "none" else requested_scenario_id
+    page_load_active = str(page_load.get("activeScenarioId") or "").strip()
+    page_load_open_url = str(page_load.get("openUrl") or "").strip()
+    scenario_apply_active = str(scenario_apply.get("activeScenarioId") or "").strip()
+    scenario_apply_requested = str(scenario_apply.get("requestedScenarioId") or "").strip()
+    page_load_matches = (
+      True
+      if requested_scenario_id == "none"
+      else (
+        page_load_active == expected_active_scenario_id
+        or f"default_scenario={expected_active_scenario_id}" in page_load_open_url
+      )
+    )
+    scenario_apply_matches = (
+      scenario_apply_requested == requested_scenario_id
+      and scenario_apply_active == expected_active_scenario_id
+    )
+    return {
+      "requestedScenarioId": requested_scenario_id,
+      "expectedActiveScenarioId": expected_active_scenario_id,
+      "pageLoadActiveScenarioId": page_load_active,
+      "pageLoadOpenUrl": page_load_open_url,
+      "scenarioApplyRequestedScenarioId": scenario_apply_requested,
+      "scenarioApplyActiveScenarioId": scenario_apply_active,
+      "pageLoadMatches": page_load_matches,
+      "scenarioApplyMatches": scenario_apply_matches,
+      "consistent": page_load_matches and scenario_apply_matches,
+    }
+
+
 def build_suite_benchmark_metrics(suite: dict) -> dict:
     page_load_metric = summarize_page_load(suite.get("pageLoad"))
     scenario_apply = suite.get("scenarioApply") if isinstance(suite.get("scenarioApply"), dict) else {}
@@ -1058,45 +1182,76 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       or suite.get("scenarioId")
       or ""
     ).strip()
+    expected_metric_scenario_id = "" if requested_scenario_id == "none" else requested_scenario_id
     captured_current_scenario = bool(scenario_apply.get("capturedCurrentScenario"))
 
-    if captured_current_scenario and metric_entry_matches_scenario(
+    if metric_entry_matches_scenario(
       scenario_apply_metrics.get("loadScenarioBundle"),
-      requested_scenario_id,
+      expected_metric_scenario_id,
       "scenarioId",
     ):
       load_metric = summarize_direct_metric_entry(
         scenario_apply_metrics.get("loadScenarioBundle"),
         "scenarioApply.scenarioMetrics.loadScenarioBundle",
       )
-    elif is_fresh_metric_entry(
+      load_selected_via = "same-scenario-direct"
+    elif is_same_scenario_fresh_metric_entry(
       scenario_apply_metrics.get("loadScenarioBundle"),
+      expected_metric_scenario_id,
       baselines.get("loadScenarioBundleRecordedAt"),
+      "scenarioId",
     ):
       load_metric = summarize_direct_metric_entry(
         scenario_apply_metrics.get("loadScenarioBundle"),
         "scenarioApply.scenarioMetrics.loadScenarioBundle",
       )
+      load_selected_via = "fresh-same-scenario"
     else:
       load_metric = page_load_metric
+      load_selected_via = "page-load-fallback"
+    load_metric = with_metric_context(
+      load_metric,
+      metric_name="load",
+      requested_scenario_id=requested_scenario_id,
+      selected_via=load_selected_via,
+      candidate_sources=[
+        "scenarioApply.scenarioMetrics.loadScenarioBundle",
+        "pageLoad.pageReadyMs",
+      ],
+      baselines=baselines,
+    )
 
-    if captured_current_scenario and metric_entry_matches_scenario(
+    if metric_entry_matches_scenario(
       scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
-      requested_scenario_id,
+      expected_metric_scenario_id,
       "scenarioId",
     ):
       time_to_interactive_metric = summarize_direct_metric_entry(
         scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
         "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
       )
-    elif is_fresh_metric_entry(
+      time_to_interactive_selected_via = "same-scenario-direct"
+    elif is_same_scenario_fresh_metric_entry(
       scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
+      expected_metric_scenario_id,
       baselines.get("timeToInteractiveCoarseFrameRecordedAt"),
+      "scenarioId",
     ):
       time_to_interactive_metric = summarize_direct_metric_entry(
         scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
         "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
       )
+      time_to_interactive_selected_via = "fresh-same-scenario"
+    elif expected_metric_scenario_id:
+      time_to_interactive_metric = {
+        "present": False,
+        "source": None,
+        "durationMs": None,
+        "recordedAt": None,
+        "count": None,
+        "details": None,
+      }
+      time_to_interactive_selected_via = "missing-fresh-same-scenario"
     else:
       time_to_interactive_metric = summarize_direct_metric_entry(
         {
@@ -1107,27 +1262,41 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         },
         "scenarioApply.durationMs",
       )
+      time_to_interactive_selected_via = "scenario-apply-duration-fallback"
+    time_to_interactive_metric = with_metric_context(
+      time_to_interactive_metric,
+      metric_name="timeToInteractive",
+      requested_scenario_id=requested_scenario_id,
+      selected_via=time_to_interactive_selected_via,
+      baselines=baselines,
+      candidate_sources=[
+        "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
+        "scenarioApply.durationMs",
+      ],
+    )
 
     post_apply_metrics = suite.get("postApplyMetrics") if isinstance(suite.get("postApplyMetrics"), dict) else {}
     post_apply_scenario_metrics = post_apply_metrics.get("scenarioMetrics") if isinstance(post_apply_metrics.get("scenarioMetrics"), dict) else {}
     post_apply_baselines = post_apply_metrics.get("metricBaselines") if isinstance(post_apply_metrics.get("metricBaselines"), dict) else {}
-    if captured_current_scenario and metric_entry_matches_scenario(
+    if metric_entry_matches_scenario(
       scenario_apply_metrics.get("timeToPoliticalCoreReady"),
-      requested_scenario_id,
+      expected_metric_scenario_id,
       "scenarioId",
     ):
       political_core_ready_metric = summarize_direct_metric_entry(
         scenario_apply_metrics.get("timeToPoliticalCoreReady"),
         "scenarioApply.scenarioMetrics.timeToPoliticalCoreReady",
       )
+      political_core_selected_via = "same-scenario-direct"
     else:
-      political_core_ready_metric = summarize_freshest_direct_metric_entry([
+      political_core_ready_metric = summarize_freshest_same_scenario_metric_entry([
         (
           post_apply_scenario_metrics.get("timeToPoliticalCoreReady"),
           "postApplyMetrics.scenarioMetrics.timeToPoliticalCoreReady",
           post_apply_baselines.get("timeToPoliticalCoreReadyRecordedAt", baselines.get("timeToPoliticalCoreReadyRecordedAt")),
         ),
-      ])
+      ], expected_metric_scenario_id, field_names=("scenarioId",))
+      political_core_selected_via = "post-apply-fresh-same-scenario"
     if not political_core_ready_metric.get("present"):
       if (
         time_to_interactive_metric.get("present")
@@ -1142,6 +1311,7 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
             "fallback": "timeToInteractiveCoarseFrame",
           },
         }
+        political_core_selected_via = "time-to-interactive-fallback"
       else:
         political_core_ready_metric = {
           "present": False,
@@ -1151,11 +1321,25 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
           "count": None,
           "details": None,
         }
+        political_core_selected_via = "missing"
+    political_core_ready_metric = with_metric_context(
+      political_core_ready_metric,
+      metric_name="timeToPoliticalCoreReady",
+      requested_scenario_id=requested_scenario_id,
+      selected_via=political_core_selected_via,
+      probe=post_apply_metrics,
+      baselines=post_apply_baselines or baselines,
+      candidate_sources=[
+        "scenarioApply.scenarioMetrics.timeToPoliticalCoreReady",
+        "postApplyMetrics.scenarioMetrics.timeToPoliticalCoreReady",
+        "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
+      ],
+    )
 
     zoom_settle = suite.get("zoomSettleFullRedraw") if isinstance(suite.get("zoomSettleFullRedraw"), dict) else {}
     zoom_settle_render_metrics = zoom_settle.get("renderMetrics") if isinstance(zoom_settle.get("renderMetrics"), dict) else {}
     zoom_settle_baselines = zoom_settle.get("metricBaselines") if isinstance(zoom_settle.get("metricBaselines"), dict) else {}
-    settle_exact_metric = summarize_freshest_direct_metric_entry([
+    settle_exact_metric = summarize_freshest_same_scenario_metric_entry([
       (
         zoom_settle_render_metrics.get("settleExactRefresh"),
         "zoomSettleFullRedraw.renderMetrics.settleExactRefresh",
@@ -1166,13 +1350,26 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "zoomSettleFullRedraw.renderMetrics.settlePoliticalFastExact",
         zoom_settle_baselines.get("settlePoliticalFastExactRecordedAt"),
       ),
-    ])
+    ], expected_metric_scenario_id, field_names=("activeScenarioId",))
+    settle_exact_selected_via = "fresh-same-scenario" if settle_exact_metric.get("present") else "missing"
+    settle_exact_metric = with_metric_context(
+      settle_exact_metric,
+      metric_name="settleExactRefresh",
+      requested_scenario_id=requested_scenario_id,
+      selected_via=settle_exact_selected_via,
+      probe=zoom_settle,
+      baselines=zoom_settle_baselines,
+      candidate_sources=[
+        "zoomSettleFullRedraw.renderMetrics.settleExactRefresh",
+        "zoomSettleFullRedraw.renderMetrics.settlePoliticalFastExact",
+      ],
+    )
 
     zoom_end_chunk_visible = suite.get("zoomEndChunkVisible") if isinstance(suite.get("zoomEndChunkVisible"), dict) else {}
     zoom_end_render_metrics = zoom_end_chunk_visible.get("renderMetrics") if isinstance(zoom_end_chunk_visible.get("renderMetrics"), dict) else {}
     zoom_end_runtime_chunk_state = zoom_end_chunk_visible.get("runtimeChunkLoadState") if isinstance(zoom_end_chunk_visible.get("runtimeChunkLoadState"), dict) else {}
     zoom_end_baselines = zoom_end_chunk_visible.get("metricBaselines") if isinstance(zoom_end_chunk_visible.get("metricBaselines"), dict) else {}
-    zoom_end_chunk_visible_metric = summarize_freshest_direct_metric_entry([
+    zoom_end_chunk_visible_metric = summarize_freshest_same_scenario_metric_entry([
       (
         zoom_end_render_metrics.get("zoomEndToChunkVisibleMs"),
         "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
@@ -1183,7 +1380,20 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
         zoom_end_baselines.get("lastZoomEndToChunkVisibleRecordedAt"),
       ),
-    ])
+    ], expected_metric_scenario_id, field_names=("scenarioId",))
+    zoom_end_selected_via = "fresh-same-scenario" if zoom_end_chunk_visible_metric.get("present") else "missing"
+    zoom_end_chunk_visible_metric = with_metric_context(
+      zoom_end_chunk_visible_metric,
+      metric_name="zoomEndToChunkVisible",
+      requested_scenario_id=requested_scenario_id,
+      selected_via=zoom_end_selected_via,
+      probe=zoom_end_chunk_visible,
+      baselines=zoom_end_baselines,
+      candidate_sources=[
+        "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
+        "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
+      ],
+    )
 
     current_black_count = as_finite_number((scenario_apply_render_metrics.get("blackFrameCount") or {}).get("count")) or 0.0
     previous_black_count = as_finite_number(baselines.get("blackFrameCount")) or 0.0
@@ -1198,6 +1408,16 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "previousCount": previous_black_count,
       },
     }
+    black_frame_metric = with_metric_context(
+      black_frame_metric,
+      metric_name="blackFrame",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="counter-delta",
+      baselines=baselines,
+      candidate_sources=[
+        "scenarioApply.renderMetrics.blackFrameCount",
+      ],
+    )
     return {
       "load": load_metric,
       "pageLoad": page_load_metric,
@@ -1353,6 +1573,8 @@ async (page) => {{
       await new Promise((resolve) => setTimeout(resolve, 50));
     }}
     return {{
+      requestedScenarioId: expectedScenarioId,
+      activeScenarioId: String(state.activeScenarioId || ''),
       waitedMs: Number((performance.now() - startedAt).toFixed(3)),
       politicalCoreReadyObserved: hasFreshPoliticalReadyMetric(),
       metricBaselines: {{
@@ -1482,7 +1704,7 @@ def measure_zoom_settle_redraw() -> dict:
 async (page) => {{
   return await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
-    const {{ render, scheduleRenderPhaseIdle }} = await import('/js/core/map_renderer.js');
+    const {{ render, scheduleRenderPhaseIdle, scheduleExactAfterSettleRefresh }} = await import('/js/core/map_renderer.js');
     const clearExactAfterSettle = () => {{
       if (state.exactAfterSettleHandle) {{
         if (state.exactAfterSettleHandle.type === 'idle' && typeof cancelIdleCallback === 'function') {{
@@ -1530,7 +1752,10 @@ async (page) => {{
     state.renderPhase = 'settling';
     state.phaseEnteredAt = performance.now();
     state.isInteracting = false;
+    state.deferExactAfterSettle = true;
+    state.pendingExactPoliticalFastFrame = true;
     render();
+    scheduleExactAfterSettleRefresh();
     const settleFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
     scheduleRenderPhaseIdle();
     const idleFastStartedAt = performance.now();
@@ -1573,6 +1798,9 @@ async (page) => {{
     }}
     render();
     return {{
+      requestedScenarioId: expectedScenarioId || 'none',
+      activeScenarioId: String(state.activeScenarioId || ''),
+      benchmarkZoomEndedAt: benchmarkZoomEndedAt,
       counterDelta: {{
         drawCanvas: Number(state.renderPassCache?.counters?.drawCanvas || 0) - before.drawCanvas,
         frames: Number(state.renderPassCache?.counters?.frames || 0) - before.frames,
@@ -1605,6 +1833,7 @@ async (page) => {{
   return await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
     const {{ setZoomPercent }} = await import('/js/core/map_renderer.js');
+    const {{ scheduleScenarioChunkRefresh }} = await import('/js/core/scenario_resources.js');
     const expectedScenarioId = String(state.activeScenarioId || '');
     const previousRenderRecordedAt = Number(state.renderPerfMetrics?.zoomEndToChunkVisibleMs?.recordedAt || 0);
     const previousRuntimeRecordedAt = Number(
@@ -1620,9 +1849,16 @@ async (page) => {{
       && String(entry?.scenarioId || '') === expectedScenarioId
       && Math.abs(Number(entry?.zoom || 0) - expectedZoom) <= 0.02;
     const originalZoomPercent = Math.round(Math.max(1, Number(state.zoomTransform?.k || 1) * 100));
-    const targetPercent = originalZoomPercent >= 120 ? 105 : 120;
+    const detailZoomThreshold = Number(state.activeScenarioManifest?.render_budget_hints?.detail_zoom_threshold || 0);
+    const minimumTriggerPercent = Math.max(120, Math.ceil(detailZoomThreshold * 100) + 5);
+    const targetPercent = originalZoomPercent >= minimumTriggerPercent ? Math.max(105, minimumTriggerPercent - 20) : minimumTriggerPercent;
     const expectedZoom = Number((targetPercent / 100).toFixed(4));
     setZoomPercent(targetPercent);
+    scheduleScenarioChunkRefresh({{
+      reason: 'zoom-end',
+      delayMs: 0,
+      flushPending: true,
+    }});
     const registrationStartedAt = performance.now();
     while (
       Math.abs(Number(state.runtimeChunkLoadState?.zoomEndChunkVisibleMetric?.zoom || 0) - expectedZoom) > 0.02
@@ -1639,6 +1875,8 @@ async (page) => {{
       await new Promise((resolve) => setTimeout(resolve, 50));
     }}
     const result = {{
+      requestedScenarioId: expectedScenarioId,
+      activeScenarioId: String(state.activeScenarioId || ''),
       waitedMs: Number((performance.now() - startedAt).toFixed(3)),
       renderMetricObserved: hasFreshChunkVisibleMetric(
         state.renderPerfMetrics?.zoomEndToChunkVisibleMs,
@@ -1923,7 +2161,7 @@ async (page) => {{
 
 def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
-    page_load = open_page(build_suite_open_urls(base_urls, scenario_id))
+    page_load = open_page(build_scenario_open_urls(base_urls, scenario_id))
     clear_browser_buffers()
     normalized_scenario_id = str(scenario_id or "").strip()
     active_scenario_id = str(page_load.get("activeScenarioId") or "").strip()
@@ -1971,6 +2209,7 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
         "home": screenshot_path,
       },
     }
+    suite["scenarioConsistency"] = build_suite_scenario_consistency(suite)
     suite["benchmarkMetrics"] = build_suite_benchmark_metrics(suite)
     return suite
 
@@ -2004,9 +2243,13 @@ def main() -> None:
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
-        "benchmarkMetricsSchemaVersion": 1,
+        "benchmarkMetricsSchemaVersion": 2,
         "benchmarkMetricsByScenario": {
           scenario_id: suites[scenario_id].get("benchmarkMetrics", {})
+          for scenario_id in SCENARIO_IDS
+        },
+        "scenarioConsistencyByScenario": {
+          scenario_id: suites[scenario_id].get("scenarioConsistency", {})
           for scenario_id in SCENARIO_IDS
         },
         "suites": suites,

@@ -47,3 +47,34 @@
 
 ### HOI4 定向补充 probe
 - hoi4_1939.timeToInteractiveCoarseFrame: 约 11943ms -> 1406ms`n- hoi4_1939.applyScenarioBundle: 约 11945ms -> 1408ms`n- hoi4_1939.scenarioApplyMapRefresh: 约 28138ms 级误报消失，当前定向 probe 下约 780ms`n- 新判断：前置链里最重的不是 palette/backfill 本身，而是『apply 前强等 detail topology』这条链；在确认 chunked political runtime 可用后跳过这段，收益最大。
+
+### Stage 3 最新结果 2026-04-16 22:31 -0400
+- 定向回归 `tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js` 已通过 4/4。
+- 最新 benchmark 文件：`.runtime/output/perf/editor-performance-benchmark.json`
+- schema 已升级到 `benchmarkMetricsSchemaVersion = 2`
+- `scenarioConsistencyByScenario`：
+  - `none = true`
+  - `hoi4_1939 = true`
+  - `tno_1962 = true`
+
+### 最新关键指标
+- `tno_1962.timeToInteractive`: `531.5ms`
+- `tno_1962.timeToPoliticalCoreReady`: `531.5ms`
+- `tno_1962.settleExactRefresh`: `436.9ms`
+- `tno_1962.zoomEndToChunkVisible`: `3950.5ms`
+- `tno_1962.blackFrame`: `0`
+- `hoi4_1939.timeToInteractive`: `1261.9ms`
+- `hoi4_1939.timeToPoliticalCoreReady`: `1261.8ms`
+- `hoi4_1939.settleExactRefresh`: `377.2ms`
+- `hoi4_1939.blackFrame`: `0`
+
+### 当前判断
+- benchmark 口径收口已经完成：scenario-aware URL、生效场景一致性、same-scenario direct/fresh metric 选择、schema 2 汇总层都已落地。
+- `drawPoliticalPass` 的细分指标已经落地，perf overlay 能看到：
+  - `politicalBg`
+  - `politicalFill`
+  - `politicalStroke`
+  - `bgCacheBuild`
+  - `bgCacheReplay`
+- `timeToPoliticalCoreReady` 与 `settleExactRefresh` 已经稳定采到。
+- 当前最重的剩余问题已经进一步收口到 `tno_1962.zoomEndToChunkVisible`，本轮 benchmark 里它仍明显高于阶段目标。

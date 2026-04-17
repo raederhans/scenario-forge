@@ -796,3 +796,18 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 79. 只要 scenario 已有 chunked political runtime，apply 前就别再强等 detail topology
 - 这次 `hoi4_1939.timeToInteractive` 从约 11943ms 直接压到约 1406ms，最大收益来自：在 `prepareScenarioApplyState()` 里确认场景已有 chunked political runtime 后，跳过 apply 前那条 detail promotion 等待链。
 - 更稳的最短路径是：chunked political runtime 负责 coarse 首帧，detail topology 留给后续 promotion；不要把两套“政治细节可见”机制串联成一个同步门槛。
+
+### 41. benchmark 汇总层必须把“same-scenario fresh metric”当成硬门槛
+- 只要 perf report 会跨场景串行跑多套 suite，`timeToInteractive` 这类主指标就不能再用“最新一条看起来像新的 metric”偷懒汇总。
+- 更稳的最短路径是：每条 metric 同时校验 `requestedScenarioId`、`activeScenarioId`、metric 自带的 `scenarioId/activeScenarioId` 和 `recordedAt`，缺口直接暴露成 `present=false`。
+- 这样文档里的性能结论才能和同时间窗 JSON 对得上，避免 fallback 把旧场景或旧阶段数据混进新结论。
+
+### 42. full-pass Canvas 背景合批要缓存“可重放结果”，只缓存 entry 列表收益不够
+- scenario political background 如果每次重画都重新分组、重建 `Path2D.addPath()`，热点只会从 feature loop 挪到背景合批。
+- 更稳的做法是把 full pass 的分组结果和 merged path 作为 durable cache 留下来，并把失效边界收紧到 scenario/runtime/color/transform/path-cache 签名。
+- 这样 exact-after-settle 和重复 full redraw 才能真正复用同一批背景路径。
+
+### 43. benchmark 主动触发型指标必须满足运行时前置条件，探针本身也要和产品逻辑同构
+- `settleExactRefresh` 这类指标只调用 schedule 函数还不够，相关 state flag 也要进入“待执行”状态，metric 才会真正落盘。
+- `zoomEndToChunkVisible` 这类指标还受 `detail_zoom_threshold` 约束；如果 benchmark zoom 根本没跨过阈值，就算代码没问题，报告也只会一直 `present=false`。
+- 更稳的最短路径是：先把产品里真正触发该指标的前置状态复刻到 benchmark，再讨论汇总层要不要补 fallback。

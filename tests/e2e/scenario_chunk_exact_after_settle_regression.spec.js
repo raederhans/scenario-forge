@@ -6,6 +6,7 @@ const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app")
 test.setTimeout(120_000);
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
+const FAST_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
 
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
@@ -44,6 +45,22 @@ async function setZoomPercent(page, percent) {
     const { setZoomPercent } = await import("/js/core/map_renderer.js");
     setZoomPercent(targetPercent);
   }, percent);
+  await page.waitForTimeout(700);
+}
+
+async function dragMap(page, { dx = 180, dy = 24, steps = 8 } = {}) {
+  const box = await page.locator("#mapContainer").boundingBox();
+  if (!box) {
+    throw new Error("mapContainer bounding box unavailable");
+  }
+  const startX = box.x + (box.width * 0.5);
+  const startY = box.y + (box.height * 0.5);
+  await page.mouse.move(startX, startY);
+  await page.mouse.down();
+  await page.mouse.move(startX + dx, startY + dy, {
+    steps,
+  });
+  await page.mouse.up();
   await page.waitForTimeout(700);
 }
 
@@ -136,7 +153,7 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
     });
   });
 
-  await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await ensureScenario(page, "tno_1962", "TNO 1962");
   await waitForStableExactRender(page);
@@ -213,8 +230,51 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
   expect(networkFailures).toEqual([]);
 });
 
+test("tno drag interaction settles cleanly without black-frame regression", async ({ page }) => {
+  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await ensureScenario(page, "tno_1962", "TNO 1962");
+  await waitForStableExactRender(page);
+
+  const beforeDrag = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      blackFrameCount: Number(metrics.blackFrameCount?.count || 0),
+    };
+  });
+
+  expect(beforeDrag.activeScenarioId).toBe("tno_1962");
+
+  await dragMap(page);
+  await waitForStableExactRender(page, { timeout: 30_000 });
+
+  const afterDrag = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      renderPhase: String(state.renderPhase || ""),
+      deferExactAfterSettle: !!state.deferExactAfterSettle,
+      hasExactAfterSettleHandle: !!state.exactAfterSettleHandle,
+      isInteracting: !!state.isInteracting,
+      blackFrameCount: Number(metrics.blackFrameCount?.count || 0),
+    };
+  });
+
+  expect(afterDrag.activeScenarioId).toBe("tno_1962");
+  expect(afterDrag.renderPhase).toBe("idle");
+  expect(afterDrag.isInteracting).toBe(false);
+  expect(afterDrag.blackFrameCount).toBe(beforeDrag.blackFrameCount);
+});
+
 test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", async ({ page }) => {
-  await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
 
   const contract = await page.evaluate(async () => {
     const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
@@ -244,9 +304,11 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
 
   const rendererChecks = {
     politicalPassStartsWithBackgroundFills:
-      /function drawPoliticalPass\(k\) \{[\s\S]*?drawPoliticalBackgroundFills\(\);[\s\S]*?if \(!state\.landData\?\.features\?\.length\) return;[\s\S]*?collectVisibleLandSpatialItems\(\)/.test(rendererSource),
+      /function drawPoliticalPass\(k\) \{[\s\S]*?const visibleItems = debugMode === "PROD" \? collectVisibleLandSpatialItems\(\) : null;[\s\S]*?drawPoliticalBackgroundFills\(\{[\s\S]*?returnSummary: true,[\s\S]*?\}\);[\s\S]*?if \(!state\.landData\?\.features\?\.length\) return;/.test(rendererSource),
     backgroundFillHelperKeepsScenarioMergeSplit:
-      /function drawPoliticalBackgroundFills\(options = \{\}\) \{[\s\S]*?if \(shouldUseScenarioPoliticalBackgroundMerge\(\)\) \{[\s\S]*?drawScenarioPoliticalBackgroundFills\(options\);[\s\S]*?return;[\s\S]*?\}[\s\S]*?drawAdmin0BackgroundFills\(options\);/.test(rendererSource),
+      /function drawPoliticalBackgroundFills\(options = \{\}\) \{[\s\S]*?if \(shouldUseScenarioPoliticalBackgroundMerge\(\)\) \{[\s\S]*?return drawScenarioPoliticalBackgroundFills\(options\);[\s\S]*?\}[\s\S]*?drawAdmin0BackgroundFills\(options\);/.test(rendererSource),
+    backgroundFullPassCacheBuildsAndReplays:
+      /function getScenarioPoliticalBackgroundFullPassGroups\([\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheReplay"[\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheBuild"/.test(rendererSource),
   };
 
   const scenarioChecks = {
@@ -262,11 +324,13 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
     ensureAppPathUrlRewritesRootAndNestedPaths:
       /def ensure_app_path_url\(url: str\) -> str:[\s\S]*?if path\.startswith\("\/app\/"\) or path == "\/app":[\s\S]*?elif path == "\/":[\s\S]*?normalized_path = "\/app\/"[\s\S]*?else:[\s\S]*?normalized_path = f"\/app\{path\}" if path\.startswith\("\/"\) else f"\/app\/\{path\}"/.test(benchmarkSource),
     buildScenarioOpenUrlsAddsPerfOverlayAndScenarioCandidate:
-      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1"\)[\s\S]*?urls\.append\(perf_url\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?urls\.append\(with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)\)/.test(benchmarkSource),
+      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1"\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?scenario_perf_url = with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)[\s\S]*?urls\.append\(scenario_perf_url\)[\s\S]*?urls\.append\(perf_url\)/.test(benchmarkSource),
     openPageKeepsWrapperThenLocalFallbackAcrossCandidates:
       /def open_page\(urls: list\[str\] \| tuple\[str, \.\.\.\] \| str\) -> dict:[\s\S]*?if PWCLI\.exists\(\):[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_wrapper_pw\("open", candidate_url, "--browser", browser_name,[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_local_pw\(\s*"open",\s*candidate_url,\s*"--browser",\s*browser_name,/.test(benchmarkSource),
     suiteBaseUrlsKeepOriginalAndAppVariants:
       /suite_base_urls = unique_strings\(\[[\s\S]*?effective_url,[\s\S]*?ensure_app_path_url\(effective_url\),[\s\S]*?args\.url,[\s\S]*?ensure_app_path_url\(args\.url\),/.test(benchmarkSource),
+    sameScenarioFreshMetricSelectionIsExplicit:
+      /def is_same_scenario_fresh_metric_entry\([\s\S]*?def summarize_freshest_same_scenario_metric_entry\(/.test(benchmarkSource),
   };
 
   const playwrightAppChecks = {

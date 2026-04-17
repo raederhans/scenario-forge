@@ -1642,6 +1642,32 @@ async function applyScenarioBundle(
         );
       }
     }
+    const currentPoliticalCoreReadyMetric = state.scenarioPerfMetrics?.timeToPoliticalCoreReady;
+    const hasCurrentPoliticalCoreReadyMetric =
+      currentPoliticalCoreReadyMetric
+      && String(currentPoliticalCoreReadyMetric.scenarioId || "") === staged.scenarioId;
+    if (
+      !hasCurrentPoliticalCoreReadyMetric
+      && (
+        hasChunkedRuntime
+        || !!state.scenarioPoliticalChunkData
+        || hasRenderableScenarioPoliticalTopology(state.runtimePoliticalTopology)
+      )
+    ) {
+      recordScenarioPerfMetric(
+        "timeToPoliticalCoreReady",
+        (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
+        {
+          scenarioId: staged.scenarioId,
+          source: "post-apply-coarse-ready",
+          hasChunkedRuntime,
+          mapRefreshMode: scenarioMapRefreshMode,
+        }
+      );
+      if (bundle?.chunkLifecycle) {
+        bundle.chunkLifecycle.politicalCoreReadyRecorded = true;
+      }
+    }
     recordScenarioPerfMetric(
       "timeToInteractiveCoarseFrame",
       (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
