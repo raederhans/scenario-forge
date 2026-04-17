@@ -174,6 +174,7 @@
 
 - `js/core/scenario_resources.js:1126` 定义了 `preloadScenarioCoarseChunks(...)`
 - 主 apply 路径仍主要走 `refreshActiveScenarioChunks(...)`
+- promotion 提交链路统一为 `refreshActiveScenarioChunks(...) -> schedulePendingScenarioChunkPromotionCommit(...) -> commitPendingScenarioChunkPromotion(...)`
 
 问题：
 

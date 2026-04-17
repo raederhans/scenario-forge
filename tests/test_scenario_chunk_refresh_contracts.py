@@ -61,7 +61,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertRegex(
             self.scenario_resources_source,
             re.compile(
-                r'if \(shouldDeferScenarioChunkRefresh\(\)\) \{[\s\S]*?markPendingScenarioChunkRefresh\(\s*pendingPromotion\.reason \|\| loadState\.pendingReason \|\| "chunk-promotion-deferred",\s*retryDelayMs,\s*\);\s*recordScenarioChunkRuntimeMetric\("chunkPromotionDeferredRetryMs", retryDelayMs, \{\s*scenarioId,',
+                r'if \(shouldDeferScenarioChunkRefresh\(\)\) \{[\s\S]*?markPendingScenarioChunkRefresh\(\s*resolvedPendingPromotion\.reason \|\| loadState\.pendingReason \|\| "chunk-promotion-deferred",\s*retryDelayMs,\s*\);\s*recordScenarioChunkRuntimeMetric\("chunkPromotionDeferredRetryMs", retryDelayMs, \{\s*scenarioId,',
                 re.S,
             ),
         )
@@ -80,6 +80,12 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
                 re.S,
             ),
         )
+
+    def test_promotion_pipeline_uses_single_commit_entrypoint(self):
+        self.assertIn("Promotion scheduling contract:", self.scenario_resources_source)
+        self.assertIn('commitPendingScenarioChunkPromotion();', self.scenario_resources_source)
+        self.assertNotIn("function commitScenarioChunkPromotion(", self.scenario_resources_source)
+        self.assertNotIn("function storePendingScenarioChunkPromotion(", self.scenario_resources_source)
 
 
 if __name__ == "__main__":
