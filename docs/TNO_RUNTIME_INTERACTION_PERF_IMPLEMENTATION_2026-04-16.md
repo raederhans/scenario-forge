@@ -52,3 +52,5 @@ one 约 714ms，hoi4_1939 仍偏高约 12692ms。
 
 - 2026-04-17 01: scenario_manager 继续收口：chunked political runtime 存在时，apply 前不再强行等 detail topology；HOI4 Far East backfill 走 runtimeTopology 候选缓存；同 palette 重复 apply 走快路径。
 - 2026-04-17 01: 定向 hoi4_1939 apply probe 结果：	imeToInteractiveCoarseFrame 约从 11943ms 进一步降到 1406ms。
+
+- 2026-04-17 01: benchmark 继续收口：suite open URL 统一补到 /app/，并开始按 scenario-aware URL 打开，避免根路径与当前激活场景串味。

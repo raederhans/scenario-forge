@@ -17011,15 +17011,74 @@ function buildScenarioPoliticalBackgroundEntries() {
   return entries;
 }
 
+function buildScenarioPoliticalBackgroundEntriesFromSpatialItems(items = []) {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    feature: item?.feature || null,
+    index: Number(item?.drawOrder || 0),
+    id: item?.id || "",
+    projectedBounds: item
+      ? {
+        minX: Number(item.minX),
+        minY: Number(item.minY),
+        maxX: Number(item.maxX),
+        maxY: Number(item.maxY),
+      }
+      : null,
+  })).filter((entry) => entry.feature?.geometry && entry.id && entry.projectedBounds);
+}
+
+function collectScenarioPoliticalBackgroundSpatialEntries({
+  screenRects = null,
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  visibleItems = null,
+} = {}) {
+  const landCollection = state.landDataFull || state.landData;
+  if (landCollection !== state.landData) {
+    return null;
+  }
+  if (Array.isArray(visibleItems)) {
+    return buildScenarioPoliticalBackgroundEntriesFromSpatialItems(visibleItems);
+  }
+  if (!Array.isArray(state.spatialItems) || !state.spatialItems.length) {
+    return null;
+  }
+  if (!Array.isArray(screenRects) || !screenRects.length) {
+    const items = collectVisibleLandSpatialItems();
+    return Array.isArray(items)
+      ? buildScenarioPoliticalBackgroundEntriesFromSpatialItems(items)
+      : null;
+  }
+  const projectedRects = screenRects
+    .map((rect) => screenRectToProjectedRect(rect, transform))
+    .filter(Boolean);
+  if (!projectedRects.length) {
+    return [];
+  }
+  const candidateResult = collectLandSpatialItemsForProjectedRects(projectedRects);
+  if (!candidateResult || candidateResult.overflow) {
+    return null;
+  }
+  return buildScenarioPoliticalBackgroundEntriesFromSpatialItems(candidateResult.items);
+}
+
 function drawScenarioPoliticalBackgroundFills({
   screenRects = null,
   transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  visibleItems = null,
 } = {}) {
-  const entries = buildScenarioPoliticalBackgroundEntries();
+  const entries =
+    collectScenarioPoliticalBackgroundSpatialEntries({
+      screenRects,
+      transform,
+      visibleItems,
+    })
+    || buildScenarioPoliticalBackgroundEntries();
   if (!entries.length) return;
-  const visibleEntries = entries.filter(({ projectedBounds }) =>
-    projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })
-  );
+  const visibleEntries = Array.isArray(screenRects) && screenRects.length
+    ? entries.filter(({ projectedBounds }) =>
+      projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })
+    )
+    : entries;
   drawPoliticalBackgroundFillsForEntries(visibleEntries);
 }
 
@@ -17345,6 +17404,7 @@ function drawPoliticalBackgroundFills(options = {}) {
 
 function drawPoliticalBackgroundFillsForEntries(entries = []) {
   if (debugMode !== "PROD") return 0;
+  const useScenarioBackgroundMerge = shouldUseScenarioPoliticalBackgroundMerge();
   const groupedEntries = new Map();
   (Array.isArray(entries) ? entries : []).forEach(({ feature, index, id, path = null }) => {
     if (!feature?.geometry) return;
@@ -17356,7 +17416,7 @@ function drawPoliticalBackgroundFillsForEntries(entries = []) {
       getSafeCanvasColor(state.colors?.[resolvedId], null) ||
       getSafeCanvasColor(getResolvedFeatureColor(feature, resolvedId), null) ||
       LAND_FILL_COLOR;
-    const displayCode = shouldUseScenarioPoliticalBackgroundMerge()
+    const displayCode = useScenarioBackgroundMerge
       ? (
         getDisplayOwnerCode(feature, resolvedId) ||
         getFeatureCountryCodeNormalized(feature) ||
@@ -17758,10 +17818,13 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
 function drawPoliticalPass(k) {
   const transform = state.zoomTransform || globalThis.d3?.zoomIdentity;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  drawPoliticalBackgroundFills();
+  const visibleItems = debugMode === "PROD" ? collectVisibleLandSpatialItems() : null;
+  drawPoliticalBackgroundFills({
+    transform,
+    visibleItems,
+  });
   if (!state.landData?.features?.length) return;
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
-  const visibleItems = debugMode === "PROD" ? collectVisibleLandSpatialItems() : null;
   if (Array.isArray(visibleItems)) {
     visibleItems.forEach((item) => {
       drawPoliticalFeature(item.feature, item.drawOrder, {

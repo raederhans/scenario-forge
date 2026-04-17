@@ -1,7 +1,11 @@
+const fs = require("fs");
+const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
 
 test.setTimeout(120_000);
+
+const REPO_ROOT = path.resolve(__dirname, "..", "..");
 
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
@@ -230,4 +234,61 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
   expect(contract.drawContextScenarioPassKeepsScenarioOverlayBoundary).toBe(true);
   expect(contract.signatureOnlyContextScenarioInvalidationUsesTransformReuse).toBe(true);
   expect(contract.exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses).toBe(true);
+});
+
+test("perf contracts keep coarse first frame and benchmark app-path fallback boundaries", async () => {
+  const rendererSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "map_renderer.js"), "utf8");
+  const scenarioManagerSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "scenario_manager.js"), "utf8");
+  const benchmarkSource = fs.readFileSync(path.join(REPO_ROOT, "ops", "browser-mcp", "editor-performance-benchmark.py"), "utf8");
+  const playwrightAppSource = fs.readFileSync(path.join(REPO_ROOT, "tests", "e2e", "support", "playwright-app.js"), "utf8");
+
+  const rendererChecks = {
+    politicalPassStartsWithBackgroundFills:
+      /function drawPoliticalPass\(k\) \{[\s\S]*?drawPoliticalBackgroundFills\(\);[\s\S]*?if \(!state\.landData\?\.features\?\.length\) return;[\s\S]*?collectVisibleLandSpatialItems\(\)/.test(rendererSource),
+    backgroundFillHelperKeepsScenarioMergeSplit:
+      /function drawPoliticalBackgroundFills\(options = \{\}\) \{[\s\S]*?if \(shouldUseScenarioPoliticalBackgroundMerge\(\)\) \{[\s\S]*?drawScenarioPoliticalBackgroundFills\(options\);[\s\S]*?return;[\s\S]*?\}[\s\S]*?drawAdmin0BackgroundFills\(options\);/.test(rendererSource),
+  };
+
+  const scenarioChecks = {
+    chunkedRuntimeSkipsBlockingDetailPromotion:
+      /const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime\(bundle\)[\s\S]*?const detailPromoted = \(startupReadonly \|\| supportsChunkedPoliticalRuntime\)\s*\?\s*false\s*:\s*await ensureScenarioDetailTopologyLoaded\(\{ applyMapData: false \}\);/.test(scenarioManagerSource),
+    unconfirmedDetailPromotionStillWarnsBeforeHealthGate:
+      /if \(!detailReady && state\.topologyBundleMode !== "composite"\) \{[\s\S]*?console\.warn\("\[scenario\] Applying bundle without confirmed detail promotion; health gate will validate runtime topology\."\);/.test(scenarioManagerSource),
+    coarseInteractiveMetricRecordedAfterPostApplyEffects:
+      /const \{ dataHealth, scenarioMapRefreshMode, hasChunkedRuntime \} = await runPostScenarioApplyEffects\([\s\S]*?recordScenarioPerfMetric\(\s*"timeToInteractiveCoarseFrame",[\s\S]*?hasChunkedRuntime,[\s\S]*?mapRefreshMode: scenarioMapRefreshMode,/.test(scenarioManagerSource),
+  };
+
+  const benchmarkChecks = {
+    ensureAppPathUrlRewritesRootAndNestedPaths:
+      /def ensure_app_path_url\(url: str\) -> str:[\s\S]*?if path\.startswith\("\/app\/"\) or path == "\/app":[\s\S]*?elif path == "\/":[\s\S]*?normalized_path = "\/app\/"[\s\S]*?else:[\s\S]*?normalized_path = f"\/app\{path\}" if path\.startswith\("\/"\) else f"\/app\/\{path\}"/.test(benchmarkSource),
+    buildScenarioOpenUrlsAddsPerfOverlayAndScenarioCandidate:
+      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1"\)[\s\S]*?urls\.append\(perf_url\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?urls\.append\(with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)\)/.test(benchmarkSource),
+    openPageKeepsWrapperThenLocalFallbackAcrossCandidates:
+      /def open_page\(urls: list\[str\] \| tuple\[str, \.\.\.\] \| str\) -> dict:[\s\S]*?if PWCLI\.exists\(\):[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_wrapper_pw\("open", candidate_url, "--browser", browser_name,[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_local_pw\(\s*"open",\s*candidate_url,\s*"--browser",\s*browser_name,/.test(benchmarkSource),
+    suiteBaseUrlsKeepOriginalAndAppVariants:
+      /suite_base_urls = unique_strings\(\[[\s\S]*?effective_url,[\s\S]*?ensure_app_path_url\(effective_url\),[\s\S]*?args\.url,[\s\S]*?ensure_app_path_url\(args\.url\),/.test(benchmarkSource),
+  };
+
+  const playwrightAppChecks = {
+    e2eHarnessDefaultsToAppPath:
+      playwrightAppSource.includes('const DEFAULT_APP_PATH = "/app/";')
+      && playwrightAppSource.includes('const DEFAULT_OPEN_PATH = "/app/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";'),
+    normalizeAppPathKeepsRootQueryAndHashOnAppRoute:
+      playwrightAppSource.includes('if (normalizedTarget === "/") {')
+      && playwrightAppSource.includes('if (normalizedTarget.startsWith("/app/")) {')
+      && playwrightAppSource.includes('if (normalizedTarget === "/app") {')
+      && playwrightAppSource.includes('if (normalizedTarget.startsWith("/?") || normalizedTarget.startsWith("/#")) {')
+      && playwrightAppSource.includes('return `/app${normalizedTarget}`;'),
+  };
+
+  const checks = {
+    ...rendererChecks,
+    ...scenarioChecks,
+    ...benchmarkChecks,
+    ...playwrightAppChecks,
+  };
+
+  Object.entries(checks).forEach(([label, ok]) => {
+    expect(ok, label).toBe(true);
+  });
 });

@@ -701,6 +701,7 @@ async (page) => {{
       responseEndMs: asMetric(navigationEntry?.responseEnd),
       firstPaintMs: asMetric(paintEntries['first-paint']),
       firstContentfulPaintMs: asMetric(paintEntries['first-contentful-paint']),
+      activeScenarioId: String(document.querySelector('#scenarioSelect')?.value || ''),
     }};
   }});
   return {{
@@ -801,6 +802,17 @@ def with_query_overrides(url: str, **overrides: str) -> str:
     for key, value in overrides.items():
       query[key] = value
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+
+
+def build_suite_open_urls(base_urls: list[str], scenario_id: str) -> list[str]:
+    urls: list[str] = []
+    normalized_scenario_id = str(scenario_id or "").strip()
+    for base_url in unique_strings(base_urls):
+      perf_url = with_query_overrides(ensure_app_path_url(base_url), perf_overlay="1")
+      urls.append(perf_url)
+      if normalized_scenario_id and normalized_scenario_id != "none":
+        urls.append(with_query_overrides(perf_url, default_scenario=normalized_scenario_id))
+    return unique_strings(urls)
 
 
 def ensure_app_path_url(url: str) -> str:
@@ -987,6 +999,18 @@ def summarize_direct_metric_entry(entry: object, source: str, *, count_key: str 
     }
 
 
+def metric_entry_matches_scenario(entry: object, scenario_id: object, *field_names: str) -> bool:
+    if not isinstance(entry, dict):
+      return False
+    normalized_scenario_id = str(scenario_id or "").strip()
+    if not normalized_scenario_id:
+      return not any(str(entry.get(field_name) or "").strip() for field_name in field_names or ("scenarioId", "activeScenarioId"))
+    for field_name in field_names or ("scenarioId", "activeScenarioId"):
+      if str(entry.get(field_name) or "").strip() == normalized_scenario_id:
+        return True
+    return False
+
+
 def is_fresh_metric_entry(entry: object, previous_recorded_at: object) -> bool:
     if not isinstance(entry, dict):
       return False
@@ -1028,8 +1052,24 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     scenario_apply_metrics = scenario_apply.get("scenarioMetrics") if isinstance(scenario_apply.get("scenarioMetrics"), dict) else {}
     scenario_apply_render_metrics = scenario_apply.get("renderMetrics") if isinstance(scenario_apply.get("renderMetrics"), dict) else {}
     baselines = scenario_apply.get("metricBaselines") if isinstance(scenario_apply.get("metricBaselines"), dict) else {}
+    requested_scenario_id = str(
+      scenario_apply.get("requestedScenarioId")
+      or scenario_apply.get("activeScenarioId")
+      or suite.get("scenarioId")
+      or ""
+    ).strip()
+    captured_current_scenario = bool(scenario_apply.get("capturedCurrentScenario"))
 
-    if is_fresh_metric_entry(
+    if captured_current_scenario and metric_entry_matches_scenario(
+      scenario_apply_metrics.get("loadScenarioBundle"),
+      requested_scenario_id,
+      "scenarioId",
+    ):
+      load_metric = summarize_direct_metric_entry(
+        scenario_apply_metrics.get("loadScenarioBundle"),
+        "scenarioApply.scenarioMetrics.loadScenarioBundle",
+      )
+    elif is_fresh_metric_entry(
       scenario_apply_metrics.get("loadScenarioBundle"),
       baselines.get("loadScenarioBundleRecordedAt"),
     ):
@@ -1040,7 +1080,16 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     else:
       load_metric = page_load_metric
 
-    if is_fresh_metric_entry(
+    if captured_current_scenario and metric_entry_matches_scenario(
+      scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
+      requested_scenario_id,
+      "scenarioId",
+    ):
+      time_to_interactive_metric = summarize_direct_metric_entry(
+        scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
+        "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
+      )
+    elif is_fresh_metric_entry(
       scenario_apply_metrics.get("timeToInteractiveCoarseFrame"),
       baselines.get("timeToInteractiveCoarseFrameRecordedAt"),
     ):
@@ -1062,36 +1111,46 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     post_apply_metrics = suite.get("postApplyMetrics") if isinstance(suite.get("postApplyMetrics"), dict) else {}
     post_apply_scenario_metrics = post_apply_metrics.get("scenarioMetrics") if isinstance(post_apply_metrics.get("scenarioMetrics"), dict) else {}
     post_apply_baselines = post_apply_metrics.get("metricBaselines") if isinstance(post_apply_metrics.get("metricBaselines"), dict) else {}
-    political_core_ready_metric = summarize_freshest_direct_metric_entry([
-      (
-        post_apply_scenario_metrics.get("timeToPoliticalCoreReady"),
-        "postApplyMetrics.scenarioMetrics.timeToPoliticalCoreReady",
-        post_apply_baselines.get("timeToPoliticalCoreReadyRecordedAt", baselines.get("timeToPoliticalCoreReadyRecordedAt")),
-      ),
-    ])
-    if (
-      not political_core_ready_metric.get("present")
-      time_to_interactive_metric.get("present")
-      and isinstance(scenario_apply_metrics.get("timeToInteractiveCoarseFrame"), dict)
-      and scenario_apply_metrics.get("timeToInteractiveCoarseFrame", {}).get("hasChunkedRuntime") is False
+    if captured_current_scenario and metric_entry_matches_scenario(
+      scenario_apply_metrics.get("timeToPoliticalCoreReady"),
+      requested_scenario_id,
+      "scenarioId",
     ):
-      political_core_ready_metric = {
-        **time_to_interactive_metric,
-        "source": "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
-        "details": {
-          **(time_to_interactive_metric.get("details") or {}),
-          "fallback": "timeToInteractiveCoarseFrame",
-        },
-      }
+      political_core_ready_metric = summarize_direct_metric_entry(
+        scenario_apply_metrics.get("timeToPoliticalCoreReady"),
+        "scenarioApply.scenarioMetrics.timeToPoliticalCoreReady",
+      )
     else:
-      political_core_ready_metric = {
-        "present": False,
-        "source": None,
-        "durationMs": None,
-        "recordedAt": None,
-        "count": None,
-        "details": None,
-      }
+      political_core_ready_metric = summarize_freshest_direct_metric_entry([
+        (
+          post_apply_scenario_metrics.get("timeToPoliticalCoreReady"),
+          "postApplyMetrics.scenarioMetrics.timeToPoliticalCoreReady",
+          post_apply_baselines.get("timeToPoliticalCoreReadyRecordedAt", baselines.get("timeToPoliticalCoreReadyRecordedAt")),
+        ),
+      ])
+    if not political_core_ready_metric.get("present"):
+      if (
+        time_to_interactive_metric.get("present")
+        and isinstance(scenario_apply_metrics.get("timeToInteractiveCoarseFrame"), dict)
+        and scenario_apply_metrics.get("timeToInteractiveCoarseFrame", {}).get("hasChunkedRuntime") is False
+      ):
+        political_core_ready_metric = {
+          **time_to_interactive_metric,
+          "source": "scenarioApply.scenarioMetrics.timeToInteractiveCoarseFrame",
+          "details": {
+            **(time_to_interactive_metric.get("details") or {}),
+            "fallback": "timeToInteractiveCoarseFrame",
+          },
+        }
+      else:
+        political_core_ready_metric = {
+          "present": False,
+          "source": None,
+          "durationMs": None,
+          "recordedAt": None,
+          "count": None,
+          "details": None,
+        }
 
     zoom_settle = suite.get("zoomSettleFullRedraw") if isinstance(suite.get("zoomSettleFullRedraw"), dict) else {}
     zoom_settle_render_metrics = zoom_settle.get("renderMetrics") if isinstance(zoom_settle.get("renderMetrics"), dict) else {}
@@ -1156,6 +1215,7 @@ async (page) => {{
   return await page.evaluate(async (scenarioId) => {{
     const {{ state }} = await import('/js/core/state.js');
     const scenarioManager = await import('/js/core/scenario_manager.js');
+    const normalizedScenarioId = String(scenarioId || '');
     const before = {{
       drawCanvas: Number(state.renderPassCache?.counters?.drawCanvas || 0),
       frames: Number(state.renderPassCache?.counters?.frames || 0),
@@ -1171,7 +1231,7 @@ async (page) => {{
     }};
     window.__perfBench.longTasks = [];
     const startedAt = performance.now();
-    if (!scenarioId || scenarioId === 'none') {{
+    if (!normalizedScenarioId || normalizedScenarioId === 'none') {{
       if (state.activeScenarioId) {{
         scenarioManager.clearActiveScenario({{
           renderNow: true,
@@ -1182,6 +1242,14 @@ async (page) => {{
         window.renderNow();
       }}
     }} else {{
+      if (String(state.activeScenarioId || '') === normalizedScenarioId) {{
+        scenarioManager.clearActiveScenario({{
+          renderNow: true,
+          markDirtyReason: '',
+          showToastOnComplete: false,
+        }});
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }}
       await scenarioManager.applyScenarioById(scenarioId, {{
         renderNow: true,
         markDirtyReason: '',
@@ -1206,6 +1274,50 @@ async (page) => {{
       }},
       longTaskCount: Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0,
       metricBaselines,
+      lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
+      renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
+      scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
+      overlay: document.getElementById('perf-overlay')?.textContent || '',
+    }};
+  }}, {json.dumps(scenario_id)});
+}}
+""".strip()
+    return run_code_json(js)  # type: ignore[return-value]
+
+
+def capture_current_scenario_metrics(scenario_id: str) -> dict:
+    js = f"""
+async (page) => {{
+  return await page.evaluate(async (expectedScenarioId) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const currentScenarioId = String(state.activeScenarioId || '');
+    if (String(expectedScenarioId || '') !== currentScenarioId) {{
+      throw new Error(`Current scenario "${{currentScenarioId}}" did not match expected "${{expectedScenarioId}}".`);
+    }}
+    return {{
+      capturedCurrentScenario: true,
+      requestedScenarioId: expectedScenarioId,
+      activeScenarioId: currentScenarioId,
+      durationMs: 0,
+      renderProfile: String(state.renderProfile || 'auto'),
+      dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+      showWaterRegions: !!state.showWaterRegions,
+      showScenarioSpecialRegions: !!state.showScenarioSpecialRegions,
+      showScenarioReliefOverlays: !!state.showScenarioReliefOverlays,
+      counterDelta: {{
+        drawCanvas: 0,
+        frames: 0,
+        transformedFrames: 0,
+        dynamicBorderRebuilds: 0,
+      }},
+      longTaskCount: 0,
+      metricBaselines: {{
+        loadScenarioBundleRecordedAt: Number(state.scenarioPerfMetrics?.loadScenarioBundle?.recordedAt || 0),
+        timeToInteractiveCoarseFrameRecordedAt: Number(state.scenarioPerfMetrics?.timeToInteractiveCoarseFrame?.recordedAt || 0),
+        timeToPoliticalCoreReadyRecordedAt: Number(state.scenarioPerfMetrics?.timeToPoliticalCoreReady?.recordedAt || 0),
+        blackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+        blackFrameRecordedAt: Number(state.renderPerfMetrics?.blackFrameCount?.recordedAt || 0),
+      }},
       lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
@@ -1371,23 +1483,50 @@ async (page) => {{
   return await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
     const {{ render, scheduleRenderPhaseIdle }} = await import('/js/core/map_renderer.js');
+    const clearExactAfterSettle = () => {{
+      if (state.exactAfterSettleHandle) {{
+        if (state.exactAfterSettleHandle.type === 'idle' && typeof cancelIdleCallback === 'function') {{
+          cancelIdleCallback(state.exactAfterSettleHandle.id);
+        }} else {{
+          clearTimeout(state.exactAfterSettleHandle.id);
+        }}
+      }}
+      state.exactAfterSettleHandle = null;
+      state.deferExactAfterSettle = false;
+      state.pendingExactPoliticalFastFrame = false;
+    }};
+    clearExactAfterSettle();
+    state.renderPhase = 'idle';
+    state.phaseEnteredAt = performance.now();
+    state.isInteracting = false;
+    render();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const before = {{
       drawCanvas: Number(state.renderPassCache?.counters?.drawCanvas || 0),
       frames: Number(state.renderPassCache?.counters?.frames || 0),
       transformedFrames: Number(state.renderPassCache?.counters?.transformedFrames || 0),
     }};
     const expectedScenarioId = String(state.activeScenarioId || '');
+    const originalZoomGestureScaleDelta = Number(state.zoomGestureScaleDelta || 0);
+    const originalZoomGestureEndedAt = Number(state.zoomGestureEndedAt || 0);
     const previousExactRefreshRecordedAt = Number(state.renderPerfMetrics?.settleExactRefresh?.recordedAt || 0);
     const previousFastExactRecordedAt = Number(state.renderPerfMetrics?.settlePoliticalFastExact?.recordedAt || 0);
+    const benchmarkZoomEndedAt = performance.now();
     const hasFreshSettleMetric = (entry, baselineRecordedAt) =>
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
-      && String(entry?.activeScenarioId || '') === expectedScenarioId;
+      && String(entry?.activeScenarioId || '') === expectedScenarioId
+      && Number(entry?.zoomEndedAt || benchmarkZoomEndedAt) >= benchmarkZoomEndedAt;
     const originalTransform = {{ ...(state.zoomTransform || {{ x: 0, y: 0, k: 1 }}) }};
     state.zoomTransform = {{
       x: originalTransform.x + 54,
       y: originalTransform.y + 28,
       k: Number((originalTransform.k * 1.12).toFixed(4)),
     }};
+    state.zoomGestureScaleDelta = Math.abs(Math.log2(
+      Math.max(0.0001, Number(state.zoomTransform?.k || 1))
+      / Math.max(0.0001, Number(originalTransform.k || 1))
+    ));
+    state.zoomGestureEndedAt = benchmarkZoomEndedAt;
     state.renderPhase = 'settling';
     state.phaseEnteredAt = performance.now();
     state.isInteracting = false;
@@ -1421,16 +1560,10 @@ async (page) => {{
     );
     const exactRefreshFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
     const settleMetrics = {clone_metrics_js("state.renderPerfMetrics")};
-    if (state.exactAfterSettleHandle) {{
-      if (state.exactAfterSettleHandle.type === 'idle' && typeof cancelIdleCallback === 'function') {{
-        cancelIdleCallback(state.exactAfterSettleHandle.id);
-      }} else {{
-        clearTimeout(state.exactAfterSettleHandle.id);
-      }}
-      state.exactAfterSettleHandle = null;
-    }}
-    state.deferExactAfterSettle = false;
+    clearExactAfterSettle();
     state.zoomTransform = originalTransform;
+    state.zoomGestureScaleDelta = originalZoomGestureScaleDelta;
+    state.zoomGestureEndedAt = originalZoomGestureEndedAt;
     state.renderPhase = 'idle';
     state.phaseEnteredAt = performance.now();
     state.isInteracting = false;
@@ -1478,12 +1611,25 @@ async (page) => {{
       state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric?.recordedAt
       || 0
     );
+    if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === 'object') {{
+      state.runtimeChunkLoadState.zoomEndChunkVisibleMetric = null;
+    }}
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const hasFreshChunkVisibleMetric = (entry, baselineRecordedAt) =>
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
-      && String(entry?.scenarioId || '') === expectedScenarioId;
+      && String(entry?.scenarioId || '') === expectedScenarioId
+      && Math.abs(Number(entry?.zoom || 0) - expectedZoom) <= 0.02;
     const originalZoomPercent = Math.round(Math.max(1, Number(state.zoomTransform?.k || 1) * 100));
     const targetPercent = originalZoomPercent >= 120 ? 105 : 120;
+    const expectedZoom = Number((targetPercent / 100).toFixed(4));
     setZoomPercent(targetPercent);
+    const registrationStartedAt = performance.now();
+    while (
+      Math.abs(Number(state.runtimeChunkLoadState?.zoomEndChunkVisibleMetric?.zoom || 0) - expectedZoom) > 0.02
+      && (performance.now() - registrationStartedAt) < 2000
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }}
     const startedAt = performance.now();
     while (
       !hasFreshChunkVisibleMetric(state.renderPerfMetrics?.zoomEndToChunkVisibleMs, previousRenderRecordedAt)
@@ -1777,13 +1923,16 @@ async (page) => {{
 
 def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
-    page_load = open_page([
-      with_query_overrides(base_url, perf_overlay="1")
-      for base_url in unique_strings(base_urls)
-    ])
+    page_load = open_page(build_suite_open_urls(base_urls, scenario_id))
     clear_browser_buffers()
-    print(f"[benchmark] apply scenario={scenario_id}", flush=True)
-    scenario_apply = apply_scenario(scenario_id)
+    normalized_scenario_id = str(scenario_id or "").strip()
+    active_scenario_id = str(page_load.get("activeScenarioId") or "").strip()
+    if normalized_scenario_id and normalized_scenario_id != "none" and active_scenario_id == normalized_scenario_id:
+      print(f"[benchmark] capture current scenario={scenario_id}", flush=True)
+      scenario_apply = capture_current_scenario_metrics(scenario_id)
+    else:
+      print(f"[benchmark] apply scenario={scenario_id}", flush=True)
+      scenario_apply = apply_scenario(scenario_id)
     post_apply_metrics = measure_post_apply_metrics(
       scenario_id,
       (scenario_apply.get("metricBaselines") or {}).get("timeToPoliticalCoreReadyRecordedAt"),
