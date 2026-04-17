@@ -230,6 +230,45 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
   expect(networkFailures).toEqual([]);
 });
 
+test("sync prewarm threshold completes first-frame chunk prewarm before promotion stage", async ({ page }) => {
+  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await ensureScenario(page, "hoi4_1939", "HOI4 1939");
+
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const prewarmMetric = state.scenarioPerfMetrics?.chunkedFirstFramePrewarm || null;
+    const visualPromotionMetric = state.renderPerfMetrics?.scenarioChunkPromotionVisualStage || null;
+    return !!prewarmMetric
+      && prewarmMetric.mode === "sync"
+      && Number(prewarmMetric.prewarmCompletedAt || 0) > 0
+      && Number(prewarmMetric.refreshScheduledAt || 0) >= Number(prewarmMetric.prewarmCompletedAt || 0)
+      && !!visualPromotionMetric
+      && Number(visualPromotionMetric.recordedAt || 0) >= Number(prewarmMetric.prewarmCompletedAt || 0);
+  }, { timeout: 30_000 });
+
+  const stageOrder = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const prewarmMetric = state.scenarioPerfMetrics?.chunkedFirstFramePrewarm || null;
+    const visualPromotionMetric = state.renderPerfMetrics?.scenarioChunkPromotionVisualStage || null;
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      prewarmMetric,
+      visualPromotionMetric,
+    };
+  });
+
+  expect(stageOrder.activeScenarioId).toBe("hoi4_1939");
+  expect(stageOrder.prewarmMetric).toBeTruthy();
+  expect(stageOrder.prewarmMetric.mode).toBe("sync");
+  expect(stageOrder.prewarmMetric.synchronous).toBe(true);
+  expect(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0)).toBeGreaterThan(0);
+  expect(Number(stageOrder.prewarmMetric.refreshScheduledAt || 0))
+    .toBeGreaterThanOrEqual(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0));
+  expect(Number(stageOrder.visualPromotionMetric?.recordedAt || 0))
+    .toBeGreaterThanOrEqual(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0));
+});
+
 test("tno drag interaction settles cleanly without black-frame regression", async ({ page }) => {
   await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);

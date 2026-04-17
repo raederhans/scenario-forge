@@ -75,31 +75,91 @@ function scheduleAfterFirstFrame(callback) {
   runAsync();
 }
 
+function ensureScenarioPerfMetrics() {
+  if (!state.scenarioPerfMetrics || typeof state.scenarioPerfMetrics !== "object") {
+    state.scenarioPerfMetrics = {};
+  }
+  return state.scenarioPerfMetrics;
+}
+
+function updateChunkedFirstFramePrewarmMetric(details = {}) {
+  const metrics = ensureScenarioPerfMetrics();
+  const previousEntry = metrics.chunkedFirstFramePrewarm && typeof metrics.chunkedFirstFramePrewarm === "object"
+    ? metrics.chunkedFirstFramePrewarm
+    : {};
+  metrics.chunkedFirstFramePrewarm = {
+    ...previousEntry,
+    ...details,
+    recordedAt: Date.now(),
+  };
+  globalThis.__scenarioPerfMetrics = metrics;
+  return metrics.chunkedFirstFramePrewarm;
+}
+
 function ensureChunkedScenarioFirstFrameReady({
   bundle,
   scenarioId = "",
+  mode = "async",
 } = {}) {
   if (!scenarioSupportsChunkedRuntime(bundle)) return;
   const normalizedScenarioId = String(scenarioId || "").trim();
+  const normalizedMode = String(mode || "").trim().toLowerCase() === "sync" ? "sync" : "async";
+  const prewarmStartedAt = Date.now();
+  updateChunkedFirstFramePrewarmMetric({
+    scenarioId: normalizedScenarioId,
+    mode: normalizedMode,
+    synchronous: normalizedMode === "sync",
+    prewarmStartedAt,
+  });
   const runPrewarm = async () => {
     if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
       return;
     }
+    let prewarmCompletedAt = 0;
     try {
       await preloadScenarioCoarseChunks(bundle);
       await preloadScenarioFocusCountryPoliticalDetailChunk(bundle);
+      prewarmCompletedAt = Date.now();
+      updateChunkedFirstFramePrewarmMetric({
+        scenarioId: normalizedScenarioId,
+        mode: normalizedMode,
+        synchronous: normalizedMode === "sync",
+        prewarmStartedAt,
+        prewarmCompletedAt,
+      });
     } catch (error) {
       console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
+      updateChunkedFirstFramePrewarmMetric({
+        scenarioId: normalizedScenarioId,
+        mode: normalizedMode,
+        synchronous: normalizedMode === "sync",
+        prewarmStartedAt,
+        prewarmCompletedAt: prewarmCompletedAt || Date.now(),
+        prewarmFailed: true,
+        prewarmFailure: String(error?.message || error || "Unknown prewarm error"),
+      });
     } finally {
       if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
         return;
       }
+      const refreshScheduledAt = Date.now();
       scheduleScenarioChunkRefresh({
         reason: "scenario-apply",
         delayMs: 0,
       });
+      updateChunkedFirstFramePrewarmMetric({
+        scenarioId: normalizedScenarioId,
+        mode: normalizedMode,
+        synchronous: normalizedMode === "sync",
+        prewarmStartedAt,
+        prewarmCompletedAt: prewarmCompletedAt || Date.now(),
+        refreshScheduledAt,
+      });
     }
   };
+  if (normalizedMode === "sync") {
+    return runPrewarm();
+  }
   scheduleAfterFirstFrame(() => {
     void runPrewarm();
   });
@@ -136,7 +196,11 @@ async function runPostScenarioApplyEffects({
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioSupportsChunkedRuntime(bundle)) {
-    ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
+    await ensureChunkedScenarioFirstFrameReady({
+      bundle,
+      scenarioId,
+      mode: shouldSynchronouslyPrewarm ? "sync" : "async",
+    });
   } else if (!state.bootBlocking) {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {
