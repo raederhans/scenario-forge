@@ -54,13 +54,14 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         )
 
     def test_deferred_promotion_flush_records_retry_metric_and_reschedules_commit(self):
+        self.assertIn("const hasExplicitPendingDelayMs =", self.scenario_resources_source)
         self.assertIn('recordScenarioChunkRuntimeMetric("chunkPromotionDeferredRetryMs", retryDelayMs, {', self.scenario_resources_source)
         self.assertIn('schedulePendingScenarioChunkPromotionCommit({', self.scenario_resources_source)
         self.assertIn('retry: true,', self.scenario_resources_source)
         self.assertRegex(
             self.scenario_resources_source,
             re.compile(
-                r'if \(shouldDeferScenarioChunkRefresh\(\)\) \{\s*const retryDelayMs = .*?;\s*markPendingScenarioChunkRefresh\(\s*pendingPromotion\.reason \|\| loadState\.pendingReason \|\| "chunk-promotion-deferred",\s*retryDelayMs,\s*\);\s*recordScenarioChunkRuntimeMetric\("chunkPromotionDeferredRetryMs", retryDelayMs, \{\s*scenarioId,',
+                r'if \(shouldDeferScenarioChunkRefresh\(\)\) \{[\s\S]*?markPendingScenarioChunkRefresh\(\s*pendingPromotion\.reason \|\| loadState\.pendingReason \|\| "chunk-promotion-deferred",\s*retryDelayMs,\s*\);\s*recordScenarioChunkRuntimeMetric\("chunkPromotionDeferredRetryMs", retryDelayMs, \{\s*scenarioId,',
                 re.S,
             ),
         )

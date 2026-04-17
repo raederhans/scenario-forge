@@ -1313,9 +1313,11 @@ function flushPendingScenarioChunkPromotion({ renderNow = null } = {}) {
     return false;
   }
   if (shouldDeferScenarioChunkRefresh()) {
+    const hasExplicitPendingDelayMs =
+      loadState.pendingDelayMs != null && Number.isFinite(Number(loadState.pendingDelayMs));
     const retryDelayMs = Math.max(
       0,
-      Number.isFinite(Number(loadState.pendingDelayMs))
+      hasExplicitPendingDelayMs
         ? Number(loadState.pendingDelayMs)
         : (state.isInteracting ? SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE),
     );
