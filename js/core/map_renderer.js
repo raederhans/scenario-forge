@@ -1826,11 +1826,20 @@ function getScenarioRuntimeTopologySignatureToken() {
   ].join("|");
 }
 
+function getScenarioDetailPhaseSignatureToken() {
+  return [
+    String(state.topologyBundleMode || "single"),
+    state.detailPromotionCompleted ? "detail-ready" : "detail-pending",
+    state.detailPromotionInFlight ? "detail-in-flight" : "detail-idle",
+  ].join("/");
+}
+
 function getScenarioWaterVisualRevisionToken() {
   return [
     state.topologyRevision || 0,
     state.activeScenarioId || "",
     `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
     `water-global:${getFeatureCollectionFeatureCount(state.waterRegionsData)}`,
     `water-scenario:${getFeatureCollectionFeatureCount(state.scenarioWaterRegionsData)}`,
     `water-overrides:${stableJson(state.waterRegionOverrides || {})}`,
@@ -1849,6 +1858,7 @@ function getScenarioSpecialVisualRevisionToken() {
     state.topologyRevision || 0,
     state.activeScenarioId || "",
     `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
     `special-count:${getFeatureCollectionFeatureCount(state.scenarioSpecialRegionsData)}`,
     `special-overrides:${stableJson(state.specialRegionOverrides || {})}`,
     state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
@@ -1860,6 +1870,7 @@ function getScenarioReliefVisualRevisionToken() {
     state.topologyRevision || 0,
     state.activeScenarioId || "",
     Number(state.scenarioReliefOverlayRevision || 0),
+    `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
     `relief-count:${getFeatureCollectionFeatureCount(state.scenarioReliefOverlaysData)}`,
     state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
   ].join("|");
