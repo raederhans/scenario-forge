@@ -41,8 +41,11 @@ CONTEXT_PROBE_CASES = [
     ("water_off", {"showWaterRegions": False}),
     ("physical_urban_rivers_off", {"showPhysical": False, "showUrban": False, "showRivers": False}),
 ]
+CONTEXT_PROBE_SAMPLE_COUNT = 5
+CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION = 3
 WSL_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
 WSL_GATEWAY_HOST = None
+WATER_CACHE_REPORT_PATH = ".runtime/reports/generated/editor-performance-water-cache-summary.json"
 
 
 def resolve_playwright_cli_wrapper() -> Path:
@@ -882,6 +885,45 @@ def as_finite_number(value: object) -> float | None:
     return numeric
 
 
+def percentile(values: list[float], quantile: float) -> float | None:
+    if not values:
+      return None
+    if len(values) == 1:
+      return values[0]
+    clamped_quantile = min(max(quantile, 0.0), 1.0)
+    sorted_values = sorted(values)
+    rank = (len(sorted_values) - 1) * clamped_quantile
+    lower_index = math.floor(rank)
+    upper_index = math.ceil(rank)
+    if lower_index == upper_index:
+      return sorted_values[lower_index]
+    lower_value = sorted_values[lower_index]
+    upper_value = sorted_values[upper_index]
+    weight = rank - lower_index
+    return lower_value + (upper_value - lower_value) * weight
+
+
+def stddev(values: list[float]) -> float | None:
+    if not values:
+      return None
+    mean = sum(values) / len(values)
+    variance = sum((value - mean) ** 2 for value in values) / len(values)
+    return math.sqrt(variance)
+
+
+def summarize_distribution(values: list[float]) -> dict:
+    return {
+      "count": len(values),
+      "p50": percentile(values, 0.5),
+      "p90": percentile(values, 0.9),
+      "stddev": stddev(values),
+      "min": min(values) if values else None,
+      "max": max(values) if values else None,
+      "mean": (sum(values) / len(values)) if values else None,
+      "samples": values,
+    }
+
+
 def iter_perf_metric_maps(node: object, path: str = ""):
     if isinstance(node, dict):
       for key, value in node.items():
@@ -1693,6 +1735,111 @@ async (page) => {{
     return run_code_json(js)  # type: ignore[return-value]
 
 
+def context_probe_case_metric_samples(samples: list[dict], key_path: tuple[str, ...]) -> list[float]:
+    values: list[float] = []
+    for sample in samples:
+      current: object = sample
+      for key in key_path:
+        if not isinstance(current, dict):
+          current = None
+          break
+        current = current.get(key)
+      numeric = as_finite_number(current)
+      if numeric is None:
+        continue
+      values.append(numeric)
+    return values
+
+
+def build_context_probe_case_summary(label: str, flags: dict[str, bool], samples: list[dict]) -> dict:
+    draw_canvas_values = context_probe_case_metric_samples(samples, ("counterDelta", "drawCanvas"))
+    frame_values = context_probe_case_metric_samples(samples, ("counterDelta", "frames"))
+    context_scenario_values = context_probe_case_metric_samples(samples, ("lastFrame", "durations", "contextScenario"))
+    return {
+      "label": label,
+      "flags": flags,
+      "sampleCount": len(samples),
+      "drawCanvas": summarize_distribution(draw_canvas_values),
+      "frames": summarize_distribution(frame_values),
+      "contextScenarioDurationMs": summarize_distribution(context_scenario_values),
+      "samples": samples,
+    }
+
+
+def pairwise_delta(left: list[float], right: list[float]) -> list[float]:
+    size = min(len(left), len(right))
+    return [left[index] - right[index] for index in range(size)]
+
+
+def build_water_cache_delta_summary(context_probes: dict | None) -> dict | None:
+    if not isinstance(context_probes, dict):
+      return None
+    baseline = context_probes.get("baseline")
+    water_off = context_probes.get("water_off")
+    if not isinstance(baseline, dict) or not isinstance(water_off, dict):
+      return None
+    baseline_samples = baseline.get("samples") if isinstance(baseline.get("samples"), list) else []
+    water_off_samples = water_off.get("samples") if isinstance(water_off.get("samples"), list) else []
+    baseline_draw_canvas = context_probe_case_metric_samples(baseline_samples, ("counterDelta", "drawCanvas"))
+    baseline_frames = context_probe_case_metric_samples(baseline_samples, ("counterDelta", "frames"))
+    baseline_context_scenario = context_probe_case_metric_samples(baseline_samples, ("lastFrame", "durations", "contextScenario"))
+    water_off_draw_canvas = context_probe_case_metric_samples(water_off_samples, ("counterDelta", "drawCanvas"))
+    water_off_frames = context_probe_case_metric_samples(water_off_samples, ("counterDelta", "frames"))
+    water_off_context_scenario = context_probe_case_metric_samples(water_off_samples, ("lastFrame", "durations", "contextScenario"))
+    delta_draw_canvas = pairwise_delta(water_off_draw_canvas, baseline_draw_canvas)
+    delta_frames = pairwise_delta(water_off_frames, baseline_frames)
+    delta_context_scenario = pairwise_delta(water_off_context_scenario, baseline_context_scenario)
+    return {
+      "baselineSampleCount": len(baseline_samples),
+      "waterOffSampleCount": len(water_off_samples),
+      "pairedSampleCount": min(len(baseline_samples), len(water_off_samples)),
+      "drawCanvasDelta": summarize_distribution(delta_draw_canvas),
+      "framesDelta": summarize_distribution(delta_frames),
+      "contextScenarioDurationDeltaMs": summarize_distribution(delta_context_scenario),
+    }
+
+
+def metric_distribution_is_sustained_negative(distribution: dict) -> bool:
+    if not isinstance(distribution, dict):
+      return False
+    samples = distribution.get("samples")
+    if not isinstance(samples, list) or len(samples) < CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION:
+      return False
+    normalized = [as_finite_number(value) for value in samples]
+    finite_values = [value for value in normalized if value is not None]
+    if len(finite_values) < CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION:
+      return False
+    return max(finite_values) < 0.0
+
+
+def decide_water_cache_low_coverage_recommendation(scenario_id: str, water_cache_delta: dict | None) -> dict:
+    if not isinstance(water_cache_delta, dict):
+      return {
+        "scenarioId": scenario_id,
+        "hasRecommendationSignal": False,
+        "isLowWaterCoverageScenario": False,
+        "recommendDisableWaterCacheLowCoverage": False,
+        "reason": "missing-water-cache-delta",
+      }
+    metrics = {
+      "drawCanvasDelta": metric_distribution_is_sustained_negative(water_cache_delta.get("drawCanvasDelta")),
+      "framesDelta": metric_distribution_is_sustained_negative(water_cache_delta.get("framesDelta")),
+      "contextScenarioDurationDeltaMs": metric_distribution_is_sustained_negative(
+        water_cache_delta.get("contextScenarioDurationDeltaMs")
+      ),
+    }
+    matched = [name for name, value in metrics.items() if value]
+    is_low_water_coverage = len(matched) >= 2
+    return {
+      "scenarioId": scenario_id,
+      "hasRecommendationSignal": True,
+      "isLowWaterCoverageScenario": is_low_water_coverage,
+      "recommendDisableWaterCacheLowCoverage": is_low_water_coverage,
+      "negativeBenefitMetrics": matched,
+      "reason": "sustained-negative-deltas" if is_low_water_coverage else "delta-signal-insufficient",
+    }
+
+
 def measure_context_probes(scenario_id: str) -> dict | None:
     if scenario_id != "tno_1962":
       return None
@@ -1700,7 +1847,14 @@ def measure_context_probes(scenario_id: str) -> dict | None:
     for label, flags in CONTEXT_PROBE_CASES:
       print(f"[benchmark] context probe scenario={scenario_id} case={label}", flush=True)
       try:
-        probes[label] = measure_context_probe_case(label, flags)
+        samples = []
+        for sample_index in range(CONTEXT_PROBE_SAMPLE_COUNT):
+          print(
+            f"[benchmark] context probe scenario={scenario_id} case={label} sample={sample_index + 1}/{CONTEXT_PROBE_SAMPLE_COUNT}",
+            flush=True,
+          )
+          samples.append(measure_context_probe_case(label, flags))
+        probes[label] = build_context_probe_case_summary(label, flags, samples)
       except RuntimeError as exc:
         probes[label] = {
           "label": label,
@@ -2232,7 +2386,26 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     }
     suite["scenarioConsistency"] = build_suite_scenario_consistency(suite)
     suite["benchmarkMetrics"] = build_suite_benchmark_metrics(suite)
+    water_cache_delta = build_water_cache_delta_summary(context_probes)
+    suite["waterCacheDelta"] = water_cache_delta
+    suite["waterCacheRecommendation"] = decide_water_cache_low_coverage_recommendation(scenario_id, water_cache_delta)
     return suite
+
+
+def build_water_cache_summary_by_scenario(suites: dict[str, dict]) -> dict[str, dict]:
+    summary: dict[str, dict] = {}
+    for scenario_id, suite in suites.items():
+      water_cache_delta = suite.get("waterCacheDelta") if isinstance(suite.get("waterCacheDelta"), dict) else None
+      recommendation = (
+        suite.get("waterCacheRecommendation")
+        if isinstance(suite.get("waterCacheRecommendation"), dict)
+        else decide_water_cache_low_coverage_recommendation(scenario_id, water_cache_delta)
+      )
+      summary[scenario_id] = {
+        "waterCacheDelta": water_cache_delta,
+        "waterCacheRecommendation": recommendation,
+      }
+    return summary
 
 
 def main() -> None:
@@ -2245,8 +2418,10 @@ def main() -> None:
     PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
 
     out_path = (ROOT_DIR / args.out).resolve()
+    water_cache_out_path = (ROOT_DIR / WATER_CACHE_REPORT_PATH).resolve()
     screenshot_dir = (ROOT_DIR / args.screenshot_dir).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    water_cache_out_path.parent.mkdir(parents=True, exist_ok=True)
     screenshot_dir.mkdir(parents=True, exist_ok=True)
 
     effective_url = normalize_playwright_url(args.url)
@@ -2259,6 +2434,7 @@ def main() -> None:
           ensure_app_path_url(args.url),
       ])
       suites = {scenario_id: run_scenario_suite(suite_base_urls, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
+      water_cache_summary_by_scenario = build_water_cache_summary_by_scenario(suites)
       report = {
         "createdAt": datetime.now(timezone.utc).astimezone().isoformat(),
         "url": args.url,
@@ -2273,9 +2449,18 @@ def main() -> None:
           scenario_id: suites[scenario_id].get("scenarioConsistency", {})
           for scenario_id in SCENARIO_IDS
         },
+        "waterCacheSummaryByScenario": water_cache_summary_by_scenario,
+        "waterCacheSummaryPath": str(water_cache_out_path),
         "suites": suites,
       }
+      water_cache_report = {
+        "createdAt": report["createdAt"],
+        "sourceBenchmarkPath": str(out_path),
+        "scenarioIds": SCENARIO_IDS,
+        "waterCacheSummaryByScenario": water_cache_summary_by_scenario,
+      }
       out_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+      water_cache_out_path.write_text(json.dumps(water_cache_report, indent=2, ensure_ascii=False), encoding="utf-8")
       print(json.dumps(report, indent=2, ensure_ascii=False))
     finally:
       close_session()
