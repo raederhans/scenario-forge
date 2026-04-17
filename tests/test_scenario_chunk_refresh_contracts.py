@@ -53,6 +53,34 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             ),
         )
 
+    def test_deferred_promotion_flush_records_retry_metric_and_reschedules_commit(self):
+        self.assertIn("const hasExplicitPendingDelayMs =", self.scenario_resources_source)
+        self.assertIn('recordScenarioChunkRuntimeMetric("chunkPromotionDeferredRetryMs", retryDelayMs, {', self.scenario_resources_source)
+        self.assertIn('schedulePendingScenarioChunkPromotionCommit({', self.scenario_resources_source)
+        self.assertIn('retry: true,', self.scenario_resources_source)
+        self.assertRegex(
+            self.scenario_resources_source,
+            re.compile(
+                r'if \(shouldDeferScenarioChunkRefresh\(\)\) \{[\s\S]*?markPendingScenarioChunkRefresh\(\s*pendingPromotion\.reason \|\| loadState\.pendingReason \|\| "chunk-promotion-deferred",\s*retryDelayMs,\s*\);\s*recordScenarioChunkRuntimeMetric\("chunkPromotionDeferredRetryMs", retryDelayMs, \{\s*scenarioId,',
+                re.S,
+            ),
+        )
+
+    def test_runtime_chunk_load_state_tracks_promotion_retry_observability_fields(self):
+        self.assertIn('promotionRetryCount: 0,', self.scenario_resources_source)
+        self.assertIn('lastPromotionRetryAt: 0,', self.scenario_resources_source)
+        self.assertIn('state.runtimeChunkLoadState.promotionRetryCount = Math.max(', self.scenario_resources_source)
+        self.assertIn('state.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(', self.scenario_resources_source)
+
+    def test_execute_chunk_refresh_reschedules_pending_promotion_without_active_timer(self):
+        self.assertRegex(
+            self.scenario_resources_source,
+            re.compile(
+                r'if \(loadState\.pendingPromotion && !loadState\.promotionScheduled\) \{\s*const delayMs = .*?;\s*schedulePendingScenarioChunkPromotionCommit\(\{ delayMs \}\);\s*if \(loadState\.pendingPromotion && loadState\.promotionScheduled\) \{\s*return "promotion-scheduled";',
+                re.S,
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
