@@ -723,7 +723,10 @@ const layerResolverCache = {
   detailRef: null,
   bundleMode: null,
   contextRevision: 0,
+  waterRegionsDataToken: "",
 };
+const objectIdentityTokenCache = new WeakMap();
+let nextObjectIdentityToken = 1;
 const politicalFeatureCollectionCache = new WeakMap();
 let admin0MergedCache = {
   topologyRef: null,
@@ -976,6 +979,7 @@ function getRenderPassCacheState() {
     politicalPathWarmupCancels: 0,
     blackFrameCount: 0,
     lastGoodFrameReuses: 0,
+    waterAdaptiveStateResetCount: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -1075,6 +1079,19 @@ function endContextMetricSession() {
 function incrementPerfCounter(counterName, amount = 1) {
   const cache = getRenderPassCacheState();
   cache.counters[counterName] = (Number(cache.counters[counterName]) || 0) + Number(amount || 0);
+}
+
+function resetScenarioWaterCacheAdaptiveState(reason = "water-adaptive-state-reset") {
+  lastScenarioWaterRenderedCount = 0;
+  incrementPerfCounter("waterAdaptiveStateResetCount");
+  const metrics = ensureRenderPerfMetrics();
+  const previousCount = Math.max(0, Number(metrics.waterAdaptiveStateResetCount?.count || 0));
+  metrics.waterAdaptiveStateResetCount = {
+    count: previousCount + 1,
+    reason: String(reason || "water-adaptive-state-reset"),
+    recordedAt: Date.now(),
+  };
+  globalThis.__renderPerfMetrics = metrics;
 }
 
 function stableJson(value) {
@@ -1206,6 +1223,7 @@ function invalidateOceanTextureVisualState(reason = "ocean-texture") {
 }
 
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
+  resetScenarioWaterCacheAdaptiveState(reason);
   cancelExactAfterSettleRefresh({ clearDefer: true });
   invalidateRenderPasses(["background", "physicalBase", "contextScenario"], reason);
   clearRenderPassReferenceTransforms(["background", "physicalBase", "contextScenario"]);
@@ -5509,11 +5527,23 @@ function ensureLayerDataFromTopology() {
 
   state.oceanData = resolveContextLayerData("ocean");
   state.landBgData = resolveContextLayerData("land");
-  state.waterRegionsData = resolveContextLayerData("water_regions");
+  const previousWaterRegionsDataToken = String(layerResolverCache.waterRegionsDataToken || "");
+  const nextWaterRegionsData = resolveContextLayerData("water_regions");
+  state.waterRegionsData = nextWaterRegionsData;
+  const nextWaterRegionsDataToken = getContextLayerStableSourceToken("water_regions", nextWaterRegionsData, {
+    primaryTopology,
+    detailTopology: state.topologyDetail,
+    externalCollection: state.contextLayerExternalDataByName?.water_regions,
+    source: state.contextLayerSourceByName?.water_regions,
+  });
+  layerResolverCache.waterRegionsDataToken = nextWaterRegionsDataToken;
   state.riversData = resolveContextLayerData("rivers");
   state.urbanData = resolveContextLayerData("urban");
   state.physicalData = resolveContextLayerData("physical");
   state.specialZonesData = resolveContextLayerData("special_zones");
+  if (previousWaterRegionsDataToken !== nextWaterRegionsDataToken) {
+    resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
+  }
   ensureBathymetryDataAvailability({ required: false });
 
   const diag = state.layerDataDiagnostics || {};
@@ -5566,6 +5596,7 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   layerResolverCache.contextRevision = Number.NaN;
+  layerResolverCache.waterRegionsDataToken = "";
   const targetPasses = new Set(["contextBase"]);
   const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
   normalizedLayerNames.forEach((layerName) => {
@@ -11001,6 +11032,59 @@ function estimateTopologyObjectArcRefs(topology, objectName) {
 
 function getFeatureCollectionFeatureCount(collection) {
   return Array.isArray(collection?.features) ? collection.features.length : 0;
+}
+
+function getObjectIdentityToken(value, prefix = "obj") {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return `${prefix}:none`;
+  let token = objectIdentityTokenCache.get(value);
+  if (!token) {
+    token = `${prefix}:${nextObjectIdentityToken++}`;
+    objectIdentityTokenCache.set(value, token);
+  }
+  return token;
+}
+
+function getContextLayerStableSourceToken(layerName, collection, {
+  primaryTopology = null,
+  detailTopology = null,
+  externalCollection = null,
+  source = "",
+} = {}) {
+  const normalizedLayerName = String(layerName || "").trim().toLowerCase();
+  const normalizedSource = String(source || "").trim().toLowerCase();
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  const primaryObject = primaryTopology?.objects?.[normalizedLayerName] || null;
+  const detailObject = detailTopology?.objects?.[normalizedLayerName] || null;
+
+  if (normalizedSource === "primary") {
+    return [
+      "src:primary",
+      getObjectIdentityToken(primaryTopology, "topology"),
+      getObjectIdentityToken(primaryObject, "topology-object"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  if (normalizedSource === "detail") {
+    return [
+      "src:detail",
+      getObjectIdentityToken(detailTopology, "topology"),
+      getObjectIdentityToken(detailObject, "topology-object"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  if (normalizedSource === "external") {
+    const externalRef = externalCollection || collection;
+    return [
+      "src:external",
+      getObjectIdentityToken(externalRef, "external-layer"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  return [
+    "src:other",
+    getObjectIdentityToken(collection, "layer-collection"),
+    `features:${featureCount}`,
+  ].join("|");
 }
 
 function getPhysicalLandMaskInfo() {
@@ -25440,6 +25524,9 @@ function refreshMapDataForScenarioChunkPromotion({
   if (hasPoliticalChange) {
     refreshResolvedColorsForFeatures(politicalFeatureIds, { renderNow: false });
   }
+  if ((Array.isArray(changedLayerKeys) ? changedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
+    resetScenarioWaterCacheAdaptiveState("scenario-water-regions-data-replaced");
+  }
   const targetPasses = getScenarioChunkPromotionTargetPasses({
     changedLayerKeys,
     hasPoliticalChange,
@@ -25544,6 +25631,7 @@ function refreshMapDataForScenarioApply({
   scheduleSecondarySpatialIndexBuild({
     reason: "scenario-apply-secondary-spatial",
   });
+  resetScenarioWaterCacheAdaptiveState("scenario-switch-complete");
   if (!suppressRender) {
     render();
   }

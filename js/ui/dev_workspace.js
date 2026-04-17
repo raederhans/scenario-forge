@@ -2192,6 +2192,7 @@ function resolveRenderRows() {
     [ui("Context Scenario Reuse"), Number(counters.contextScenarioReuseCount || 0)],
     [ui("Context Scenario Exact"), Number(counters.contextScenarioExactRefreshCount || 0)],
     [ui("Context Scenario Reason"), String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "")],
+    [ui("Water Adaptive State Resets"), Number(counters.waterAdaptiveStateResetCount || 0)],
   ].filter(([, value]) => String(value || "").trim());
 }
 
