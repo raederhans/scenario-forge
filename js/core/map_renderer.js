@@ -3179,10 +3179,18 @@ function normalizeScenarioWaterCacheStrategyMode(rawMode) {
   return SCENARIO_WATER_CACHE_MODES.has(normalized) ? normalized : "";
 }
 
+function getFirstValidScenarioWaterCacheStrategyMode(...rawModes) {
+  for (let index = 0; index < rawModes.length; index += 1) {
+    const mode = normalizeScenarioWaterCacheStrategyMode(rawModes[index]);
+    if (mode) return mode;
+  }
+  return "";
+}
+
 function getForcedScenarioWaterCacheMode() {
-  const queryMode = normalizeScenarioWaterCacheStrategyMode(
-    readSearchParam(SCENARIO_WATER_CACHE_MODE_PARAM)
-    || readSearchParam(SCENARIO_WATER_CACHE_MODE_ALT_PARAM)
+  const queryMode = getFirstValidScenarioWaterCacheStrategyMode(
+    readSearchParam(SCENARIO_WATER_CACHE_MODE_PARAM),
+    readSearchParam(SCENARIO_WATER_CACHE_MODE_ALT_PARAM)
   );
   if (queryMode) {
     return {
@@ -3191,11 +3199,12 @@ function getForcedScenarioWaterCacheMode() {
     };
   }
 
-  const profileMode = normalizeScenarioWaterCacheStrategyMode(
-    state.renderProfile && typeof state.renderProfile === "object"
-      ? state.renderProfile.waterCacheMode || state.renderProfile.scenarioWaterCacheMode
-      : ""
-  );
+  const profileMode = state.renderProfile && typeof state.renderProfile === "object"
+    ? getFirstValidScenarioWaterCacheStrategyMode(
+      state.renderProfile.waterCacheMode,
+      state.renderProfile.scenarioWaterCacheMode
+    )
+    : "";
   if (profileMode) {
     return {
       mode: profileMode,
@@ -3203,8 +3212,9 @@ function getForcedScenarioWaterCacheMode() {
     };
   }
 
-  const stateMode = normalizeScenarioWaterCacheStrategyMode(
-    state.scenarioWaterCacheMode || state.waterCacheMode
+  const stateMode = getFirstValidScenarioWaterCacheStrategyMode(
+    state.scenarioWaterCacheMode,
+    state.waterCacheMode
   );
   if (stateMode) {
     return {
