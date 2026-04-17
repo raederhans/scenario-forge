@@ -811,3 +811,8 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - `settleExactRefresh` 这类指标只调用 schedule 函数还不够，相关 state flag 也要进入“待执行”状态，metric 才会真正落盘。
 - `zoomEndToChunkVisible` 这类指标还受 `detail_zoom_threshold` 约束；如果 benchmark zoom 根本没跨过阈值，就算代码没问题，报告也只会一直 `present=false`。
 - 更稳的最短路径是：先把产品里真正触发该指标的前置状态复刻到 benchmark，再讨论汇总层要不要补 fallback。
+
+### 44. 视觉阶段指标和 runtime 收尾指标要分开看，用户体感优先用 visual stage
+- `scenarioChunkPromotionVisualStage` 已经能代表“首批 detail 真正可见”，而 `lastZoomEndToChunkVisibleMetric` 这类 runtime 记账经常会更晚，因为它会包含后续提交或收尾时机。
+- 如果 benchmark 目标是用户感知到的可见时间，汇总层应优先采用 visual stage；runtime 记账更适合做链路诊断。
+- 否则会出现“产品其实已经变快了，但报告还在读更晚的内部事件”的假慢。

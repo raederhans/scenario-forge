@@ -9,6 +9,7 @@ import { refreshScenarioDataHealth } from "./scenario_data_health.js";
 import {
   ensureActiveScenarioOptionalLayersForVisibility,
   preloadScenarioCoarseChunks,
+  preloadScenarioFocusCountryPoliticalDetailChunk,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
   scenarioSupportsChunkedRuntime,
@@ -86,6 +87,7 @@ function ensureChunkedScenarioFirstFrameReady({
     }
     try {
       await preloadScenarioCoarseChunks(bundle);
+      await preloadScenarioFocusCountryPoliticalDetailChunk(bundle);
     } catch (error) {
       console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
     } finally {

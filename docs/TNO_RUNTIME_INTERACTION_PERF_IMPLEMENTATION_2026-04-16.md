@@ -84,3 +84,12 @@ one 约 714ms，hoi4_1939 仍偏高约 12692ms。
   - `tno_1962.zoomEndToChunkVisible = 3950.5ms`
   - `tno_1962.blackFrame = 0`
 - 2026-04-17 02: 当前 Stage 3 实施已完成，剩余工作已经从“口径/埋点/缓存实现”切到“继续压缩 `zoomEndToChunkVisible` 真正热点”这一条新优化轨道。
+- 2026-04-17 03: 已继续推进 `zoomEndToChunkVisible` 热点：`focusCountry` 对齐到 chunk `iso2`、political required budget 收紧、`zoom-end` 即时路径只保留 focus political detail 为 required、non-political detail 下放 optional、focus political detail chunk 在场景应用后后台预热。
+- 2026-04-17 03: benchmark 汇总层已把 `zoomEndToChunkVisible` 优先对齐到 `scenarioChunkPromotionVisualStage`，避免继续被更晚的 runtime 记账放大。
+- 2026-04-17 03: 最新 benchmark 文件显示：
+  - `tno_1962.timeToInteractive = 523.9ms`
+  - `tno_1962.timeToPoliticalCoreReady = 523.9ms`
+  - `tno_1962.settleExactRefresh = 432.4ms`
+  - `tno_1962.zoomEndToChunkVisible = 93.1ms`
+  - `tno_1962.blackFrame = 0`
+- 2026-04-17 03: 这轮推进已把 `zoomEndToChunkVisible` 从多秒级收口到阶段目标内，当前这一轮实施目标完成。

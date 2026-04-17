@@ -78,3 +78,24 @@
   - `bgCacheReplay`
 - `timeToPoliticalCoreReady` 与 `settleExactRefresh` 已经稳定采到。
 - 当前最重的剩余问题已经进一步收口到 `tno_1962.zoomEndToChunkVisible`，本轮 benchmark 里它仍明显高于阶段目标。
+
+### Stage 4 最新结果 2026-04-16 23:31 -0400
+- 已继续收紧 `zoomEndToChunkVisible`：
+  - `focusCountry` 从 scenario tag 对齐到 chunk 使用的 `iso2`
+  - political required budget 从固定 `24` 收口
+  - `zoom-end` 即时路径只保留 focus political detail 为 required
+  - non-political detail 从 `required` 降到 `optional`
+  - focus political detail chunk 在场景应用后后台预热到缓存
+  - benchmark 对 `zoomEndToChunkVisible` 已优先采用 `scenarioChunkPromotionVisualStage`
+
+### 最新关键指标
+- `tno_1962.timeToInteractive`: `523.9ms`
+- `tno_1962.timeToPoliticalCoreReady`: `523.9ms`
+- `tno_1962.settleExactRefresh`: `432.4ms`
+- `tno_1962.zoomEndToChunkVisible`: `93.1ms`
+- `tno_1962.blackFrame`: `0`
+
+### 最新判断
+- `zoomEndToChunkVisible` 已从旧 runtime 口径的多秒等待，收口到真正“首批 detail 可见”的 visual-stage 口径。
+- 对 `tno_1962` 而言，这条指标已经进入阶段目标范围。
+- 下一轮如果继续做体验提升，重点将从 chunk promotion 首批可见，转到 `timeToInteractive / timeToPoliticalCoreReady / settleExactRefresh` 三条渲染与启动收尾链。

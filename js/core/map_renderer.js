@@ -24496,12 +24496,20 @@ function getViewportGeoBounds() {
     return [-180, -90, 180, 90];
   }
   const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const width = Math.max(1, Number(state.width || 1));
+  const height = Math.max(1, Number(state.height || 1));
+  const insetX = Math.min(width * 0.12, 160);
+  const insetY = Math.min(height * 0.12, 120);
   const samplePoints = [
-    [0, 0],
-    [state.width, 0],
-    [0, state.height],
-    [state.width, state.height],
-    [state.width * 0.5, state.height * 0.5],
+    [insetX, insetY],
+    [width * 0.5, insetY],
+    [Math.max(insetX, width - insetX), insetY],
+    [insetX, height * 0.5],
+    [width * 0.5, height * 0.5],
+    [Math.max(insetX, width - insetX), height * 0.5],
+    [insetX, Math.max(insetY, height - insetY)],
+    [width * 0.5, Math.max(insetY, height - insetY)],
+    [Math.max(insetX, width - insetX), Math.max(insetY, height - insetY)],
   ];
   const longitudes = [];
   const latitudes = [];
@@ -24522,11 +24530,14 @@ function getViewportGeoBounds() {
   if (!longitudes.length || !latitudes.length) {
     return [-180, -90, 180, 90];
   }
+  const sortedLongitudes = [...longitudes].sort((left, right) => left - right);
+  const sortedLatitudes = [...latitudes].sort((left, right) => left - right);
+  const trimCount = sortedLongitudes.length >= 7 && sortedLatitudes.length >= 7 ? 1 : 0;
   return [
-    Math.min(...longitudes),
-    Math.min(...latitudes),
-    Math.max(...longitudes),
-    Math.max(...latitudes),
+    sortedLongitudes[trimCount],
+    sortedLatitudes[trimCount],
+    sortedLongitudes[sortedLongitudes.length - 1 - trimCount],
+    sortedLatitudes[sortedLatitudes.length - 1 - trimCount],
   ];
 }
 

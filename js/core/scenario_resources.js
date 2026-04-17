@@ -49,6 +49,7 @@ import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
 } from "./scenario_districts.js";
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 import { buildScenarioReleasableIndex } from "./releasable_manager.js";
@@ -1158,13 +1159,32 @@ function shouldDeferScenarioChunkRefresh() {
 }
 
 function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
-  return String(
+  const rawFocusCountry = String(
     state.activeSovereignCode
     || state.selectedInspectorCountryCode
     || loadState.focusCountryOverride
     || getScenarioDefaultCountryCode(bundle?.manifest, bundle?.countriesPayload?.countries || {})
     || ""
   ).trim().toUpperCase();
+  if (!rawFocusCountry) {
+    return "";
+  }
+  const countries = bundle?.countriesPayload?.countries && typeof bundle.countriesPayload.countries === "object"
+    ? bundle.countriesPayload.countries
+    : {};
+  const focusCountryEntry = countries[rawFocusCountry] && typeof countries[rawFocusCountry] === "object"
+    ? countries[rawFocusCountry]
+    : null;
+  const mappedIso2 = String(
+    focusCountryEntry?.lookup_iso2
+    || focusCountryEntry?.base_iso2
+    || focusCountryEntry?.provenance_iso2
+    || ""
+  ).trim().toUpperCase();
+  if (mappedIso2) {
+    return normalizeCountryCodeAlias(mappedIso2);
+  }
+  return normalizeCountryCodeAlias(rawFocusCountry);
 }
 
 function clearPendingScenarioChunkPromotion(loadState = ensureRuntimeChunkLoadState()) {
@@ -1910,6 +1930,28 @@ async function preloadScenarioCoarseChunks(
   return null;
 }
 
+async function preloadScenarioFocusCountryPoliticalDetailChunk(
+  bundle,
+  {
+    d3Client = globalThis.d3,
+  } = {}
+) {
+  if (!scenarioSupportsChunkedRuntime(bundle?.manifest)) return null;
+  await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+  const focusCountry = resolveScenarioChunkFocusCountry(bundle);
+  if (!focusCountry) return null;
+  const politicalChunks = Array.isArray(bundle?.chunkRegistry?.byLayer?.political)
+    ? bundle.chunkRegistry.byLayer.political
+    : [];
+  const targetChunk = politicalChunks.find((chunk) =>
+    chunk?.lod === "detail"
+    && Array.isArray(chunk.countryCodes)
+    && chunk.countryCodes.includes(focusCountry)
+  ) || null;
+  if (!targetChunk) return null;
+  return loadScenarioChunkPayload(bundle, targetChunk, { d3Client });
+}
+
 async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3 } = {}) {
   const normalizedChunkId = String(chunkMeta?.id || "").trim();
   if (!bundle || !normalizedChunkId) return null;
@@ -1990,6 +2032,37 @@ async function refreshActiveScenarioChunks({
     visibleLayers,
     loadedChunkIds: chunkState.loadedChunkIds,
   });
+  const normalizedReason = String(reason || "refresh").trim().toLowerCase();
+  if (normalizedReason === "zoom-end") {
+    const demotedNonPoliticalDetailOptional = selection.requiredChunks.filter(
+      (chunk) => chunk.layer !== "political" && chunk.lod === "detail"
+    );
+    if (demotedNonPoliticalDetailOptional.length) {
+      const demotedIdSet = new Set(demotedNonPoliticalDetailOptional.map((chunk) => chunk.id));
+      selection.requiredChunks = selection.requiredChunks.filter((chunk) => !demotedIdSet.has(chunk.id));
+      selection.optionalChunks = [
+        ...demotedNonPoliticalDetailOptional,
+        ...selection.optionalChunks,
+      ].filter((chunk, index, array) => array.findIndex((candidate) => candidate.id === chunk.id) === index);
+    }
+    const politicalRequired = selection.requiredChunks.filter((chunk) => chunk.layer === "political");
+    if (politicalRequired.length > 1) {
+      const focusMatchedPoliticalRequired = politicalRequired.filter((chunk) => chunk.countryCodes.includes(focusCountry));
+      const retainedPoliticalRequired = focusMatchedPoliticalRequired.length
+        ? focusMatchedPoliticalRequired.slice(0, 1)
+        : politicalRequired.slice(0, 1);
+      const retainedPoliticalIdSet = new Set(retainedPoliticalRequired.map((chunk) => chunk.id));
+      const demotedPoliticalOptional = politicalRequired.filter((chunk) => !retainedPoliticalIdSet.has(chunk.id));
+      selection.requiredChunks = [
+        ...selection.requiredChunks.filter((chunk) => chunk.layer !== "political"),
+        ...retainedPoliticalRequired,
+      ];
+      selection.optionalChunks = [
+        ...demotedPoliticalOptional,
+        ...selection.optionalChunks,
+      ].filter((chunk, index, array) => array.findIndex((candidate) => candidate.id === chunk.id) === index);
+    }
+  }
   const selectionEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   recordScenarioChunkRuntimeMetric("chunkSelectionMs", selectionEndedAt - selectionStartedAt, {
     scenarioId,
@@ -3931,6 +4004,7 @@ export {
   ensureRuntimeChunkLoadState,
   resetScenarioChunkRuntimeState,
   preloadScenarioCoarseChunks,
+  preloadScenarioFocusCountryPoliticalDetailChunk,
   scheduleScenarioChunkRefresh,
   scenarioBundleHasChunkedData,
   scenarioSupportsChunkedRuntime,

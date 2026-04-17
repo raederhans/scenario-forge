@@ -36,6 +36,37 @@ function boundsIntersect(leftBounds, rightBounds) {
   );
 }
 
+function getBoundsOverlapArea(leftBounds, rightBounds) {
+  const [leftMinLon, leftMinLat, leftMaxLon, leftMaxLat] = normalizeBounds(leftBounds);
+  const [rightMinLon, rightMinLat, rightMaxLon, rightMaxLat] = normalizeBounds(rightBounds);
+  const overlapMinLon = Math.max(leftMinLon, rightMinLon);
+  const overlapMinLat = Math.max(leftMinLat, rightMinLat);
+  const overlapMaxLon = Math.min(leftMaxLon, rightMaxLon);
+  const overlapMaxLat = Math.min(leftMaxLat, rightMaxLat);
+  if (overlapMaxLon <= overlapMinLon || overlapMaxLat <= overlapMinLat) {
+    return 0;
+  }
+  return (overlapMaxLon - overlapMinLon) * (overlapMaxLat - overlapMinLat);
+}
+
+function getBoundsArea(bounds) {
+  const [minLon, minLat, maxLon, maxLat] = normalizeBounds(bounds);
+  if (maxLon <= minLon || maxLat <= minLat) {
+    return 0;
+  }
+  return (maxLon - minLon) * (maxLat - minLat);
+}
+
+function getBoundsCenterDistance(bounds, viewportBbox) {
+  const [minLon, minLat, maxLon, maxLat] = normalizeBounds(bounds);
+  const [viewMinLon, viewMinLat, viewMaxLon, viewMaxLat] = normalizeBounds(viewportBbox);
+  const centerLon = (minLon + maxLon) / 2;
+  const centerLat = (minLat + maxLat) / 2;
+  const viewportCenterLon = (viewMinLon + viewMaxLon) / 2;
+  const viewportCenterLat = (viewMinLat + viewMaxLat) / 2;
+  return Math.hypot(centerLon - viewportCenterLon, centerLat - viewportCenterLat);
+}
+
 function normalizeChunkEntry(rawChunk = {}) {
   const chunkId = String(rawChunk.id || rawChunk.chunk_id || "").trim();
   const chunkUrl = String(rawChunk.url || rawChunk.chunk_url || "").trim();
@@ -59,8 +90,10 @@ function normalizeChunkEntry(rawChunk = {}) {
   };
 }
 
-function sortChunksForSelection(chunks, focusCountry = "") {
+function sortChunksForSelection(chunks, focusCountry = "", viewportBbox = [-180, -90, 180, 90], loadedChunkIds = []) {
   const normalizedFocusCountry = String(focusCountry || "").trim().toUpperCase();
+  const normalizedViewportBbox = normalizeBounds(viewportBbox);
+  const loadedChunkIdSet = new Set((Array.isArray(loadedChunkIds) ? loadedChunkIds : []).map((value) => String(value || "").trim()));
   return [...chunks].sort((left, right) => {
     const leftFocus = normalizedFocusCountry && left.countryCodes.includes(normalizedFocusCountry) ? 1 : 0;
     const rightFocus = normalizedFocusCountry && right.countryCodes.includes(normalizedFocusCountry) ? 1 : 0;
@@ -68,6 +101,18 @@ function sortChunksForSelection(chunks, focusCountry = "") {
     const rightFocusDetail = rightFocus && right.lod === "detail" ? 1 : 0;
     if (leftFocusDetail !== rightFocusDetail) return rightFocusDetail - leftFocusDetail;
     if (leftFocus !== rightFocus) return rightFocus - leftFocus;
+    const leftLoaded = loadedChunkIdSet.has(left.id) ? 1 : 0;
+    const rightLoaded = loadedChunkIdSet.has(right.id) ? 1 : 0;
+    if (leftLoaded !== rightLoaded) return rightLoaded - leftLoaded;
+    const leftOverlapArea = getBoundsOverlapArea(left.bounds, normalizedViewportBbox);
+    const rightOverlapArea = getBoundsOverlapArea(right.bounds, normalizedViewportBbox);
+    const leftOverlapRatio = leftOverlapArea / Math.max(1, getBoundsArea(left.bounds));
+    const rightOverlapRatio = rightOverlapArea / Math.max(1, getBoundsArea(right.bounds));
+    if (Math.abs(leftOverlapRatio - rightOverlapRatio) > 0.0001) return rightOverlapRatio - leftOverlapRatio;
+    const leftCenterDistance = getBoundsCenterDistance(left.bounds, normalizedViewportBbox);
+    const rightCenterDistance = getBoundsCenterDistance(right.bounds, normalizedViewportBbox);
+    if (Math.abs(leftCenterDistance - rightCenterDistance) > 0.0001) return leftCenterDistance - rightCenterDistance;
+    if (Math.abs(leftOverlapArea - rightOverlapArea) > 0.0001) return rightOverlapArea - leftOverlapArea;
     if (left.priority !== right.priority) return right.priority - left.priority;
     if (left.lod !== right.lod) {
       if (left.lod === "detail") return -1;
@@ -250,7 +295,7 @@ export function selectScenarioChunks({
   const visibleLayerSet = new Set((Array.isArray(visibleLayers) ? visibleLayers : []).map((value) => String(value || "").trim().toLowerCase()));
   visibleLayerSet.forEach((layerKey) => {
     const requiredBudget = layerKey === "political"
-      ? Math.max(hints.max_required_chunks * 4, 24)
+      ? Math.min(hints.max_required_chunks * 2, 12)
       : hints.max_required_chunks;
     const optionalBudget = layerKey === "political" ? 0 : hints.max_optional_chunks;
     const candidates = resolveLayerChunksForZoom({
@@ -259,7 +304,7 @@ export function selectScenarioChunks({
       layerKey,
       zoom,
     }).filter((chunk) => chunk.globalCoverage || boundsIntersect(chunk.bounds, viewportBbox));
-    const ordered = sortChunksForSelection(candidates, focusCountry);
+    const ordered = sortChunksForSelection(candidates, focusCountry, viewportBbox, loadedChunkIds);
     const focusDetailChunks = normalizedFocusCountry
       ? ordered.filter((chunk) => chunk.lod === "detail" && chunk.countryCodes.includes(normalizedFocusCountry))
       : [];

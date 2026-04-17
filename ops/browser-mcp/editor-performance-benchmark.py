@@ -1369,19 +1369,30 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     zoom_end_render_metrics = zoom_end_chunk_visible.get("renderMetrics") if isinstance(zoom_end_chunk_visible.get("renderMetrics"), dict) else {}
     zoom_end_runtime_chunk_state = zoom_end_chunk_visible.get("runtimeChunkLoadState") if isinstance(zoom_end_chunk_visible.get("runtimeChunkLoadState"), dict) else {}
     zoom_end_baselines = zoom_end_chunk_visible.get("metricBaselines") if isinstance(zoom_end_chunk_visible.get("metricBaselines"), dict) else {}
-    zoom_end_chunk_visible_metric = summarize_freshest_same_scenario_metric_entry([
+    zoom_end_visual_stage_metric = summarize_freshest_same_scenario_metric_entry([
       (
-        zoom_end_render_metrics.get("zoomEndToChunkVisibleMs"),
-        "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
-        zoom_end_baselines.get("zoomEndToChunkVisibleRecordedAt"),
+        zoom_end_render_metrics.get("scenarioChunkPromotionVisualStage"),
+        "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
+        zoom_end_baselines.get("scenarioChunkPromotionVisualStageRecordedAt"),
       ),
-      (
-        zoom_end_runtime_chunk_state.get("lastZoomEndToChunkVisibleMetric"),
-        "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
-        zoom_end_baselines.get("lastZoomEndToChunkVisibleRecordedAt"),
-      ),
-    ], expected_metric_scenario_id, field_names=("scenarioId",))
-    zoom_end_selected_via = "fresh-same-scenario" if zoom_end_chunk_visible_metric.get("present") else "missing"
+    ], expected_metric_scenario_id, field_names=("activeScenarioId",))
+    if zoom_end_visual_stage_metric.get("present"):
+      zoom_end_chunk_visible_metric = zoom_end_visual_stage_metric
+      zoom_end_selected_via = "visual-stage-priority"
+    else:
+      zoom_end_chunk_visible_metric = summarize_freshest_same_scenario_metric_entry([
+        (
+          zoom_end_render_metrics.get("zoomEndToChunkVisibleMs"),
+          "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
+          zoom_end_baselines.get("zoomEndToChunkVisibleRecordedAt"),
+        ),
+        (
+          zoom_end_runtime_chunk_state.get("lastZoomEndToChunkVisibleMetric"),
+          "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
+          zoom_end_baselines.get("lastZoomEndToChunkVisibleRecordedAt"),
+        ),
+      ], expected_metric_scenario_id, field_names=("scenarioId", "activeScenarioId"))
+      zoom_end_selected_via = "fresh-same-scenario" if zoom_end_chunk_visible_metric.get("present") else "missing"
     zoom_end_chunk_visible_metric = with_metric_context(
       zoom_end_chunk_visible_metric,
       metric_name="zoomEndToChunkVisible",
@@ -1836,6 +1847,7 @@ async (page) => {{
     const {{ scheduleScenarioChunkRefresh }} = await import('/js/core/scenario_resources.js');
     const expectedScenarioId = String(state.activeScenarioId || '');
     const previousRenderRecordedAt = Number(state.renderPerfMetrics?.zoomEndToChunkVisibleMs?.recordedAt || 0);
+    const previousVisualStageRecordedAt = Number(state.renderPerfMetrics?.scenarioChunkPromotionVisualStage?.recordedAt || 0);
     const previousRuntimeRecordedAt = Number(
       state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric?.recordedAt
       || 0
@@ -1848,6 +1860,9 @@ async (page) => {{
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
       && String(entry?.scenarioId || '') === expectedScenarioId
       && Math.abs(Number(entry?.zoom || 0) - expectedZoom) <= 0.02;
+    const hasFreshVisualStageMetric = (entry, baselineRecordedAt) =>
+      Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
+      && String(entry?.activeScenarioId || '') === expectedScenarioId;
     const originalZoomPercent = Math.round(Math.max(1, Number(state.zoomTransform?.k || 1) * 100));
     const detailZoomThreshold = Number(state.activeScenarioManifest?.render_budget_hints?.detail_zoom_threshold || 0);
     const minimumTriggerPercent = Math.max(120, Math.ceil(detailZoomThreshold * 100) + 5);
@@ -1868,7 +1883,8 @@ async (page) => {{
     }}
     const startedAt = performance.now();
     while (
-      !hasFreshChunkVisibleMetric(state.renderPerfMetrics?.zoomEndToChunkVisibleMs, previousRenderRecordedAt)
+      !hasFreshVisualStageMetric(state.renderPerfMetrics?.scenarioChunkPromotionVisualStage, previousVisualStageRecordedAt)
+      && !hasFreshChunkVisibleMetric(state.renderPerfMetrics?.zoomEndToChunkVisibleMs, previousRenderRecordedAt)
       && !hasFreshChunkVisibleMetric(state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric, previousRuntimeRecordedAt)
       && (performance.now() - startedAt) < 12000
     ) {{
@@ -1878,6 +1894,10 @@ async (page) => {{
       requestedScenarioId: expectedScenarioId,
       activeScenarioId: String(state.activeScenarioId || ''),
       waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+      visualStageObserved: hasFreshVisualStageMetric(
+        state.renderPerfMetrics?.scenarioChunkPromotionVisualStage,
+        previousVisualStageRecordedAt,
+      ),
       renderMetricObserved: hasFreshChunkVisibleMetric(
         state.renderPerfMetrics?.zoomEndToChunkVisibleMs,
         previousRenderRecordedAt,
@@ -1889,6 +1909,7 @@ async (page) => {{
       zoomPercentBefore: originalZoomPercent,
       zoomPercentAfter: targetPercent,
       metricBaselines: {{
+        scenarioChunkPromotionVisualStageRecordedAt: previousVisualStageRecordedAt,
         zoomEndToChunkVisibleRecordedAt: previousRenderRecordedAt,
         lastZoomEndToChunkVisibleRecordedAt: previousRuntimeRecordedAt,
       }},
