@@ -1032,6 +1032,8 @@ function ensureRuntimeChunkLoadState() {
       pendingPromotion: null,
       promotionTimerId: null,
       promotionScheduled: false,
+      promotionRetryCount: 0,
+      lastPromotionRetryAt: 0,
       inFlightByChunkId: {},
       errorByChunkId: {},
       lastSelection: null,
@@ -1088,6 +1090,14 @@ function ensureRuntimeChunkLoadState() {
     state.runtimeChunkLoadState.promotionTimerId = null;
   }
   state.runtimeChunkLoadState.promotionScheduled = state.runtimeChunkLoadState.promotionTimerId != null;
+  state.runtimeChunkLoadState.promotionRetryCount = Math.max(
+    0,
+    Number(state.runtimeChunkLoadState.promotionRetryCount || 0),
+  );
+  state.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(
+    0,
+    Number(state.runtimeChunkLoadState.lastPromotionRetryAt || 0),
+  );
   state.runtimeChunkLoadState.pendingPromotion =
     state.runtimeChunkLoadState.pendingPromotion && typeof state.runtimeChunkLoadState.pendingPromotion === "object"
       ? state.runtimeChunkLoadState.pendingPromotion
@@ -1196,6 +1206,8 @@ function clearPendingScenarioChunkPromotion(loadState = ensureRuntimeChunkLoadSt
   loadState.pendingVisualPromotion = null;
   loadState.pendingInfraPromotion = null;
   loadState.pendingPromotion = null;
+  loadState.promotionRetryCount = 0;
+  loadState.lastPromotionRetryAt = 0;
 }
 
 function storePendingScenarioChunkPromotion(promotion, loadState = ensureRuntimeChunkLoadState()) {
@@ -1209,6 +1221,7 @@ function storePendingScenarioChunkPromotion(promotion, loadState = ensureRuntime
 
 function schedulePendingScenarioChunkPromotionCommit({
   delayMs = 0,
+  retry = false,
 } = {}) {
   const loadState = ensureRuntimeChunkLoadState();
   if (!loadState.pendingPromotion) {
@@ -1220,6 +1233,10 @@ function schedulePendingScenarioChunkPromotionCommit({
     loadState.promotionTimerId = null;
   }
   const resolvedDelayMs = Math.max(0, Number(delayMs) || 0);
+  if (retry) {
+    loadState.promotionRetryCount = Math.max(0, Number(loadState.promotionRetryCount || 0)) + 1;
+    loadState.lastPromotionRetryAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  }
   loadState.promotionScheduled = true;
   loadState.promotionTimerId = globalThis.setTimeout(() => {
     loadState.promotionTimerId = null;
@@ -1296,6 +1313,25 @@ function flushPendingScenarioChunkPromotion({ renderNow = null } = {}) {
     return false;
   }
   if (shouldDeferScenarioChunkRefresh()) {
+    const retryDelayMs = Math.max(
+      0,
+      Number.isFinite(Number(loadState.pendingDelayMs))
+        ? Number(loadState.pendingDelayMs)
+        : (state.isInteracting ? SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE),
+    );
+    markPendingScenarioChunkRefresh(
+      pendingPromotion.reason || loadState.pendingReason || "chunk-promotion-deferred",
+      retryDelayMs,
+    );
+    recordScenarioChunkRuntimeMetric("chunkPromotionDeferredRetryMs", retryDelayMs, {
+      scenarioId,
+      reason: String(pendingPromotion.reason || "refresh"),
+      retryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)) + 1,
+    });
+    schedulePendingScenarioChunkPromotionCommit({
+      delayMs: retryDelayMs,
+      retry: true,
+    });
     return false;
   }
   return commitPendingScenarioChunkPromotion(bundle, {
@@ -1319,6 +1355,15 @@ function executeScenarioChunkRefreshNow({
   }
   if (loadState.pendingPromotion && loadState.promotionScheduled) {
     return "promotion-scheduled";
+  }
+  if (loadState.pendingPromotion && !loadState.promotionScheduled) {
+    const delayMs = Number.isFinite(Number(loadState.pendingDelayMs))
+      ? Math.max(0, Number(loadState.pendingDelayMs))
+      : 0;
+    schedulePendingScenarioChunkPromotionCommit({ delayMs });
+    if (loadState.pendingPromotion && loadState.promotionScheduled) {
+      return "promotion-scheduled";
+    }
   }
   if (loadState.pendingPromotion && commitPendingScenarioChunkPromotion(bundle, loadState.pendingPromotion)) {
     return "promotion-committed";
@@ -1459,6 +1504,8 @@ function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
     pendingPromotion: null,
     promotionTimerId: null,
     promotionScheduled: false,
+    promotionRetryCount: 0,
+    lastPromotionRetryAt: 0,
     inFlightByChunkId: {},
     errorByChunkId: {},
     lastSelection: null,
@@ -2202,6 +2249,8 @@ async function refreshActiveScenarioChunks({
     politicalFeatureIds,
     queuedAt: promotionQueuedAt,
   };
+  loadState.promotionRetryCount = 0;
+  loadState.lastPromotionRetryAt = 0;
   if (shouldDeferScenarioChunkRefreshFor({ reason, bundle })) {
     markPendingScenarioChunkRefresh(reason);
     return selection;
