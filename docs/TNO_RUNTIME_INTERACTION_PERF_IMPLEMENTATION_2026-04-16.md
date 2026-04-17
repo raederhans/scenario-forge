@@ -46,3 +46,9 @@
 - 2026-04-17 00: benchmark 已补 implicit zero blackFrame 汇总，并修复 Windows 控制台打印 Unicode 报错。
 - 2026-04-17 00: 最新 benchmark 文件显示 	no_1962.timeToInteractive 已降到约 731ms，
 one 约 714ms，hoi4_1939 仍偏高约 12692ms。
+
+- 2026-04-17 01: scenario_manager 已补 palette 快路径与 HOI4 Far East SOV backfill 候选缓存，hoi4_1939.timeToInteractive 约从 12692ms 降到 11943ms。
+- 2026-04-17 01: 当前剩余主瓶颈更像 drawPoliticalPass 的 HOI4 几何复杂度真慢，而不是 benchmark 串味。
+
+- 2026-04-17 01: scenario_manager 继续收口：chunked political runtime 存在时，apply 前不再强行等 detail topology；HOI4 Far East backfill 走 runtimeTopology 候选缓存；同 palette 重复 apply 走快路径。
+- 2026-04-17 01: 定向 hoi4_1939 apply probe 结果：	imeToInteractiveCoarseFrame 约从 11943ms 进一步降到 1406ms。

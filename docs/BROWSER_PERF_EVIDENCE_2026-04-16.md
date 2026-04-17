@@ -39,3 +39,11 @@
 - `zoomEndToChunkVisible`
 
 这三项在当前 benchmark 输出里仍未稳定采全，下一步继续补采样链，而不是再盲调渲染热路径。
+
+### 最新补充判断
+- hoi4_1939.timeToInteractive 已从约 12692ms 降到约 11943ms，说明 palette/backfill 热链有真实收益，但还远远不够。
+- 结合静态复核和 probe，当前更像 drawPoliticalPass 对 HOI4 大量复杂 polygon 首帧真慢。
+- 下一刀应先切 drawPoliticalBackgroundFills()，再看 drawPoliticalFeature 的逐要素填充/描边。
+
+### HOI4 定向补充 probe
+- hoi4_1939.timeToInteractiveCoarseFrame: 约 11943ms -> 1406ms`n- hoi4_1939.applyScenarioBundle: 约 11945ms -> 1408ms`n- hoi4_1939.scenarioApplyMapRefresh: 约 28138ms 级误报消失，当前定向 probe 下约 780ms`n- 新判断：前置链里最重的不是 palette/backfill 本身，而是『apply 前强等 detail topology』这条链；在确认 chunked political runtime 可用后跳过这段，收益最大。

@@ -103,6 +103,18 @@ function ensureChunkedScenarioFirstFrameReady({
   });
 }
 
+function shouldSynchronouslyPrewarmChunkedScenario(bundle) {
+  if (!scenarioSupportsChunkedRuntime(bundle)) return false;
+  const featureCount = Number(bundle?.manifest?.summary?.feature_count || 0);
+  const hints = bundle?.manifest?.performance_hints && typeof bundle.manifest.performance_hints === "object"
+    ? bundle.manifest.performance_hints
+    : {};
+  return featureCount >= 18_000
+    && hints.water_regions_default === false
+    && hints.special_regions_default === false
+    && hints.scenario_relief_overlays_default === false;
+}
+
 async function runPostScenarioApplyEffects({
   bundle,
   scenarioId = "",
@@ -111,6 +123,7 @@ async function runPostScenarioApplyEffects({
 } = {}) {
   refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${scenarioId}` });
   let scenarioMapRefreshMode = "light";
+  const shouldSynchronouslyPrewarm = shouldSynchronouslyPrewarmChunkedScenario(bundle);
   try {
     refreshMapDataForScenarioApply({ suppressRender });
   } catch (refreshError) {
@@ -136,7 +149,7 @@ async function runPostScenarioApplyEffects({
   return {
     dataHealth,
     scenarioMapRefreshMode,
-    hasChunkedRuntime: scenarioBundleUsesChunkedLayer(bundle) && scenarioBundleHasChunkedData(bundle),
+    hasChunkedRuntime: scenarioSupportsChunkedRuntime(bundle),
   };
 }
 

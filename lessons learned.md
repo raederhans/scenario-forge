@@ -788,3 +788,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 77. chunked runtime 的 coarse prewarm 一旦算进 time-to-interactive，首帧指标会被整段放大
 - 这次 `tno_1962.timeToInteractive` 从约 2554ms 降到约 731ms，关键动作就是把 `preloadScenarioCoarseChunks()` 从 `runPostScenarioApplyEffects()` 的同步等待里挪到首帧后异步调度。
 - 更稳的最短路径是：首帧只做 coarse 可见必需链，chunk prewarm 放到首帧后后台推进，指标里再单独量它自己的 ready 时间。
+
+### 78. benchmark 串味收口后，如果 HOI4 首帧仍然接近 12s，就该直接盯 `drawPoliticalPass`
+- 这次把 palette 快路径和 HOI4 Far East backfill 缓存接上后，`hoi4_1939.timeToInteractive` 只从约 12692ms 降到约 11943ms，说明 apply 前置链确实有成本，但不是最大头。
+- 更稳的判断是：首帧主瓶颈已经收口到 `drawPoliticalPass`，下一刀优先切 `drawPoliticalBackgroundFills()`，再看逐要素 fill/stroke。
+
+### 79. 只要 scenario 已有 chunked political runtime，apply 前就别再强等 detail topology
+- 这次 `hoi4_1939.timeToInteractive` 从约 11943ms 直接压到约 1406ms，最大收益来自：在 `prepareScenarioApplyState()` 里确认场景已有 chunked political runtime 后，跳过 apply 前那条 detail promotion 等待链。
+- 更稳的最短路径是：chunked political runtime 负责 coarse 首帧，detail topology 留给后续 promotion；不要把两套“政治细节可见”机制串联成一个同步门槛。

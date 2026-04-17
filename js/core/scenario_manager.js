@@ -47,7 +47,7 @@ import {
 } from "./scenario_districts.js";
 import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
-import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
+import { applyActivePaletteState, setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
   buildScenarioReleasableIndex,
@@ -116,6 +116,8 @@ const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 let scenarioRegistryPromise = null;
 let activeScenarioApplyPromise = null;
+const EMPTY_FROZEN_LIST = Object.freeze([]);
+const hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology = new WeakMap();
 
 function cacheBust(url) {
   if (!url) return url;
@@ -394,26 +396,62 @@ function buildHoi4FarEastSovietOwnerBackfill(
   if (!shouldApplyHoi4FarEastSovietBackfill(scenarioId)) {
     return {};
   }
-  const geometries = runtimeTopology?.objects?.political?.geometries;
-  if (!Array.isArray(geometries) || !geometries.length) {
+  const candidateFeatureIds = getHoi4FarEastSovietRuntimeCandidateFeatureIds(runtimeTopology);
+  if (!candidateFeatureIds.length) {
     return {};
   }
   const next = {};
-  geometries.forEach((geometry) => {
-    const featureId = getRuntimeGeometryFeatureId(geometry);
-    if (!featureId) return;
+  candidateFeatureIds.forEach((featureId) => {
     if (
       hasExplicitScenarioAssignment(ownersByFeatureId, featureId) ||
       hasExplicitScenarioAssignment(controllersByFeatureId, featureId)
     ) {
       return;
     }
-    if (getScenarioRuntimeGeometryCountryCode(geometry) !== "RU") {
-      return;
-    }
     next[featureId] = "SOV";
   });
   return next;
+}
+
+function getHoi4FarEastSovietRuntimeCandidateFeatureIds(runtimeTopology) {
+  if (!runtimeTopology || typeof runtimeTopology !== "object") {
+    return EMPTY_FROZEN_LIST;
+  }
+  const cached = hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.get(runtimeTopology);
+  if (cached) {
+    return cached;
+  }
+  const geometries = runtimeTopology?.objects?.political?.geometries;
+  if (!Array.isArray(geometries) || !geometries.length) {
+    hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.set(runtimeTopology, EMPTY_FROZEN_LIST);
+    return EMPTY_FROZEN_LIST;
+  }
+  const candidateFeatureIds = [];
+  geometries.forEach((geometry) => {
+    const featureId = getRuntimeGeometryFeatureId(geometry);
+    if (!featureId) return;
+    if (getScenarioRuntimeGeometryCountryCode(geometry) !== "RU") {
+      return;
+    }
+    candidateFeatureIds.push(featureId);
+  });
+  const frozenCandidateFeatureIds = Object.freeze(candidateFeatureIds);
+  hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.set(runtimeTopology, frozenCandidateFeatureIds);
+  return frozenCandidateFeatureIds;
+}
+
+function getScenarioTargetPaletteId(manifest) {
+  return normalizeScenarioId(manifest?.palette_id) || "hoi4_vanilla";
+}
+
+function hasActiveScenarioPaletteLoaded(paletteId) {
+  const targetPaletteId = normalizeScenarioId(paletteId);
+  if (!targetPaletteId) {
+    return false;
+  }
+  return normalizeScenarioId(state.activePaletteId) === targetPaletteId
+    && !!state.activePalettePack
+    && !!state.activePaletteMap;
 }
 
 function normalizeScenarioViewMode(value) {
@@ -1233,12 +1271,15 @@ async function prepareScenarioApplyState(
   } = {}
 ) {
   const startupReadonly = interactionLevel === "readonly-startup";
-  const detailPromoted = startupReadonly
+  const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime(bundle)
+    && (!!bundle?.manifest?.detail_chunk_manifest_url || !!bundle?.manifest?.runtime_meta_url);
+  const detailPromoted = (startupReadonly || supportsChunkedPoliticalRuntime)
     ? false
     : await ensureScenarioDetailTopologyLoaded({ applyMapData: false });
   const politicalChunkedReady =
-    scenarioBundleUsesChunkedLayer(bundle, "political")
-    && scenarioBundleHasChunkedData(bundle);
+    supportsChunkedPoliticalRuntime
+    || (scenarioBundleUsesChunkedLayer(bundle, "political")
+      && scenarioBundleHasChunkedData(bundle));
   const detailReady = (
     state.topologyBundleMode === "composite"
     && hasUsablePoliticalTopology(state.topologyDetail)
@@ -1256,17 +1297,22 @@ async function prepareScenarioApplyState(
     console.warn("[scenario] Applying bundle without confirmed detail promotion; health gate will validate runtime topology.");
   }
   if (syncPalette) {
-    const paletteApplied = await setActivePaletteSource(
-      normalizeScenarioId(bundle.manifest?.palette_id) || "hoi4_vanilla",
-      {
-        syncUI: true,
-        overwriteCountryPalette: false,
-      }
-    );
-    if (!paletteApplied) {
-      throw new Error(
-        `Unable to load palette for scenario "${normalizeScenarioId(bundle.manifest?.scenario_id || bundle.meta?.scenario_id)}".`
+    const targetPaletteId = getScenarioTargetPaletteId(bundle.manifest);
+    if (hasActiveScenarioPaletteLoaded(targetPaletteId)) {
+      applyActivePaletteState({ overwriteCountryPalette: false });
+    } else {
+      const paletteApplied = await setActivePaletteSource(
+        targetPaletteId,
+        {
+          syncUI: true,
+          overwriteCountryPalette: false,
+        }
       );
+      if (!paletteApplied || !hasActiveScenarioPaletteLoaded(targetPaletteId)) {
+        throw new Error(
+          `Unable to load palette for scenario "${normalizeScenarioId(bundle.manifest?.scenario_id || bundle.meta?.scenario_id)}".`
+        );
+      }
     }
   }
 
