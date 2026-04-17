@@ -3343,19 +3343,21 @@ function getScenarioWaterVisibleCoverageRatioGrid(waterFeatures = []) {
   const transform = cloneZoomTransform(state.zoomTransform || globalThis.d3?.zoomIdentity);
   const covered = new Uint8Array(totalCellCount);
   let coveredCount = 0;
-  (Array.isArray(waterFeatures) ? waterFeatures : []).forEach((feature) => {
+  const safeWaterFeatures = Array.isArray(waterFeatures) ? waterFeatures : [];
+  for (const feature of safeWaterFeatures) {
+    if (coveredCount >= totalCellCount) break;
     const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
-    if (!bounds) return;
+    if (!bounds) continue;
     const minX = bounds.minX * transform.k + transform.x;
     const minY = bounds.minY * transform.k + transform.y;
     const maxX = bounds.maxX * transform.k + transform.x;
     const maxY = bounds.maxY * transform.k + transform.y;
-    if (![minX, minY, maxX, maxY].every(Number.isFinite)) return;
+    if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
     const clippedMinX = Math.max(0, Math.min(minX, viewportWidth));
     const clippedMinY = Math.max(0, Math.min(minY, viewportHeight));
     const clippedMaxX = Math.max(0, Math.min(maxX, viewportWidth));
     const clippedMaxY = Math.max(0, Math.min(maxY, viewportHeight));
-    if (!(clippedMaxX > clippedMinX && clippedMaxY > clippedMinY)) return;
+    if (!(clippedMaxX > clippedMinX && clippedMaxY > clippedMinY)) continue;
 
     const colStart = Math.max(0, Math.min(gridColumns - 1, Math.floor((clippedMinX / viewportWidth) * gridColumns)));
     const colEnd = Math.max(0, Math.min(
@@ -3367,7 +3369,7 @@ function getScenarioWaterVisibleCoverageRatioGrid(waterFeatures = []) {
       gridRows - 1,
       Math.ceil((clippedMaxY / viewportHeight) * gridRows) - 1
     ));
-    if (colEnd < colStart || rowEnd < rowStart) return;
+    if (colEnd < colStart || rowEnd < rowStart) continue;
 
     for (let row = rowStart; row <= rowEnd; row += 1) {
       const rowOffset = row * gridColumns;
@@ -3376,9 +3378,11 @@ function getScenarioWaterVisibleCoverageRatioGrid(waterFeatures = []) {
         if (covered[cellIndex]) continue;
         covered[cellIndex] = 1;
         coveredCount += 1;
+        if (coveredCount >= totalCellCount) break;
       }
+      if (coveredCount >= totalCellCount) break;
     }
-  });
+  }
   return Math.max(0, Math.min(1, coveredCount / totalCellCount));
 }
 
