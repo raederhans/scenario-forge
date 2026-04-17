@@ -976,6 +976,7 @@ function getRenderPassCacheState() {
     politicalPathWarmupCancels: 0,
     blackFrameCount: 0,
     lastGoodFrameReuses: 0,
+    waterAdaptiveStateResetCount: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -1075,6 +1076,19 @@ function endContextMetricSession() {
 function incrementPerfCounter(counterName, amount = 1) {
   const cache = getRenderPassCacheState();
   cache.counters[counterName] = (Number(cache.counters[counterName]) || 0) + Number(amount || 0);
+}
+
+function resetScenarioWaterCacheAdaptiveState(reason = "water-adaptive-state-reset") {
+  lastScenarioWaterRenderedCount = 0;
+  incrementPerfCounter("waterAdaptiveStateResetCount");
+  const metrics = ensureRenderPerfMetrics();
+  const previousCount = Math.max(0, Number(metrics.waterAdaptiveStateResetCount?.count || 0));
+  metrics.waterAdaptiveStateResetCount = {
+    count: previousCount + 1,
+    reason: String(reason || "water-adaptive-state-reset"),
+    recordedAt: Date.now(),
+  };
+  globalThis.__renderPerfMetrics = metrics;
 }
 
 function stableJson(value) {
@@ -1206,6 +1220,7 @@ function invalidateOceanTextureVisualState(reason = "ocean-texture") {
 }
 
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
+  resetScenarioWaterCacheAdaptiveState(reason);
   cancelExactAfterSettleRefresh({ clearDefer: true });
   invalidateRenderPasses(["background", "physicalBase", "contextScenario"], reason);
   clearRenderPassReferenceTransforms(["background", "physicalBase", "contextScenario"]);
@@ -5509,11 +5524,16 @@ function ensureLayerDataFromTopology() {
 
   state.oceanData = resolveContextLayerData("ocean");
   state.landBgData = resolveContextLayerData("land");
-  state.waterRegionsData = resolveContextLayerData("water_regions");
+  const previousWaterRegionsData = state.waterRegionsData;
+  const nextWaterRegionsData = resolveContextLayerData("water_regions");
+  state.waterRegionsData = nextWaterRegionsData;
   state.riversData = resolveContextLayerData("rivers");
   state.urbanData = resolveContextLayerData("urban");
   state.physicalData = resolveContextLayerData("physical");
   state.specialZonesData = resolveContextLayerData("special_zones");
+  if (previousWaterRegionsData !== nextWaterRegionsData) {
+    resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
+  }
   ensureBathymetryDataAvailability({ required: false });
 
   const diag = state.layerDataDiagnostics || {};
@@ -25440,6 +25460,9 @@ function refreshMapDataForScenarioChunkPromotion({
   if (hasPoliticalChange) {
     refreshResolvedColorsForFeatures(politicalFeatureIds, { renderNow: false });
   }
+  if ((Array.isArray(changedLayerKeys) ? changedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
+    resetScenarioWaterCacheAdaptiveState("scenario-water-regions-data-replaced");
+  }
   const targetPasses = getScenarioChunkPromotionTargetPasses({
     changedLayerKeys,
     hasPoliticalChange,
@@ -25544,6 +25567,7 @@ function refreshMapDataForScenarioApply({
   scheduleSecondarySpatialIndexBuild({
     reason: "scenario-apply-secondary-spatial",
   });
+  resetScenarioWaterCacheAdaptiveState("scenario-switch-complete");
   if (!suppressRender) {
     render();
   }
