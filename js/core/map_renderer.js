@@ -18621,6 +18621,13 @@ function drawScenarioRegionOverlaysPass(k) {
           renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
         }
       }
+    } else if (strategy === "redraw") {
+      waterCacheMode = "redraw";
+      renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
+      if (!drawCachedContextScenarioLayer("water", currentTransform)) {
+        waterCacheMode = "direct";
+        renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
+      }
     } else {
       if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
         waterCacheMode = "reuse";
