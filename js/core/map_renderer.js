@@ -121,6 +121,7 @@ let lastUnitCountersOverlaySignature = "";
 let lastInspectorOverlaySignature = "";
 let lastHoverOverlaySignature = "";
 let lastDevSelectionOverlaySignature = "";
+let lastScenarioWaterRenderedCount = 0;
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -241,6 +242,12 @@ const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
 const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
 const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
 const CONTEXT_SCENARIO_REUSE_FRAME_LIMIT = 24;
+const SCENARIO_WATER_CACHE_MODE_PARAM = "water_cache_mode";
+const SCENARIO_WATER_CACHE_MODE_ALT_PARAM = "scenario_water_cache_mode";
+const SCENARIO_WATER_CACHE_MODES = new Set(["adaptive", "reuse", "redraw", "direct"]);
+const SCENARIO_WATER_LOW_COMPLEXITY_FEATURE_MAX = 24;
+const SCENARIO_WATER_LOW_COMPLEXITY_COVERAGE_MAX = 0.2;
+const SCENARIO_WATER_LOW_COMPLEXITY_PREV_RENDERED_MAX = 28;
 const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
   low: Object.freeze({
     majorIntervalMultiplier: 3,
@@ -3165,6 +3172,103 @@ function shouldEnableContextBaseTransformReuse() {
 
 function shouldEnableContextScenarioTransformReuse() {
   return String(state.renderProfile || "auto") === "balanced" && !!state.activeScenarioId;
+}
+
+function normalizeScenarioWaterCacheStrategyMode(rawMode) {
+  const normalized = String(rawMode || "").trim().toLowerCase();
+  return SCENARIO_WATER_CACHE_MODES.has(normalized) ? normalized : "";
+}
+
+function getFirstValidScenarioWaterCacheStrategyMode(...rawModes) {
+  for (let index = 0; index < rawModes.length; index += 1) {
+    const mode = normalizeScenarioWaterCacheStrategyMode(rawModes[index]);
+    if (mode) return mode;
+  }
+  return "";
+}
+
+function getForcedScenarioWaterCacheMode() {
+  const queryMode = getFirstValidScenarioWaterCacheStrategyMode(
+    readSearchParam(SCENARIO_WATER_CACHE_MODE_PARAM),
+    readSearchParam(SCENARIO_WATER_CACHE_MODE_ALT_PARAM)
+  );
+  if (queryMode) {
+    return {
+      mode: queryMode,
+      source: "query-param",
+    };
+  }
+
+  const profileMode = state.renderProfile && typeof state.renderProfile === "object"
+    ? getFirstValidScenarioWaterCacheStrategyMode(
+      state.renderProfile.waterCacheMode,
+      state.renderProfile.scenarioWaterCacheMode
+    )
+    : "";
+  if (profileMode) {
+    return {
+      mode: profileMode,
+      source: "render-profile",
+    };
+  }
+
+  const stateMode = getFirstValidScenarioWaterCacheStrategyMode(
+    state.scenarioWaterCacheMode,
+    state.waterCacheMode
+  );
+  if (stateMode) {
+    return {
+      mode: stateMode,
+      source: "state",
+    };
+  }
+
+  return {
+    mode: "adaptive",
+    source: "default",
+  };
+}
+
+function getScenarioWaterVisibleCoverageRatio(waterFeatures = []) {
+  const viewportWidth = Math.max(1, Number(state.width || 0));
+  const viewportHeight = Math.max(1, Number(state.height || 0));
+  const viewportArea = viewportWidth * viewportHeight;
+  if (!(viewportArea > 0)) return 0;
+  const transform = cloneZoomTransform(state.zoomTransform || globalThis.d3?.zoomIdentity);
+  let clippedArea = 0;
+  (Array.isArray(waterFeatures) ? waterFeatures : []).forEach((feature) => {
+    const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
+    if (!bounds) return;
+    const minX = bounds.minX * transform.k + transform.x;
+    const minY = bounds.minY * transform.k + transform.y;
+    const maxX = bounds.maxX * transform.k + transform.x;
+    const maxY = bounds.maxY * transform.k + transform.y;
+    if (![minX, minY, maxX, maxY].every(Number.isFinite)) return;
+    const clippedWidth = Math.max(0, Math.min(maxX, viewportWidth) - Math.max(minX, 0));
+    const clippedHeight = Math.max(0, Math.min(maxY, viewportHeight) - Math.max(minY, 0));
+    if (!(clippedWidth > 0 && clippedHeight > 0)) return;
+    clippedArea += clippedWidth * clippedHeight;
+  });
+  return Math.max(0, Math.min(1, clippedArea / viewportArea));
+}
+
+function getScenarioWaterCacheComplexitySignals(waterFeatures = []) {
+  const featureCount = Array.isArray(waterFeatures) ? waterFeatures.length : 0;
+  const visibleCoverageRatio = getScenarioWaterVisibleCoverageRatio(waterFeatures);
+  const previousRenderedCount = Math.max(0, Number(lastScenarioWaterRenderedCount || 0));
+  return {
+    featureCount,
+    visibleCoverageRatio: Number(visibleCoverageRatio.toFixed(4)),
+    previousRenderedCount,
+  };
+}
+
+function shouldUseDirectScenarioWaterDraw(signals) {
+  return (
+    Number(signals?.featureCount || 0) <= SCENARIO_WATER_LOW_COMPLEXITY_FEATURE_MAX
+    && Number(signals?.visibleCoverageRatio || 0) <= SCENARIO_WATER_LOW_COMPLEXITY_COVERAGE_MAX
+    && Number(signals?.previousRenderedCount || 0) <= SCENARIO_WATER_LOW_COMPLEXITY_PREV_RENDERED_MAX
+  );
 }
 
 function getPassReferenceTransform(passName) {
@@ -18468,6 +18572,10 @@ function drawScenarioRegionOverlaysPass(k) {
   let renderedSpecialCount = 0;
   let highlightedWaterCount = 0;
   let waterCacheMode = "disabled";
+  let waterCacheStrategyMode = "disabled";
+  let waterCacheStrategySource = "disabled";
+  let waterVisibleCoverageRatio = 0;
+  let waterPrevRenderedCount = Math.max(0, Number(lastScenarioWaterRenderedCount || 0));
   if (!showWater && !showSpecial) {
     collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
       featureCount: 0,
@@ -18476,7 +18584,11 @@ function drawScenarioRegionOverlaysPass(k) {
       renderedWaterCount: 0,
       renderedSpecialCount: 0,
       highlightedWaterCount: 0,
+      waterVisibleCoverageRatio,
+      waterPrevRenderedCount,
       waterCacheMode,
+      waterCacheStrategyMode,
+      waterCacheStrategySource,
       skipped: true,
       reason: "disabled",
     });
@@ -18484,6 +18596,13 @@ function drawScenarioRegionOverlaysPass(k) {
   }
 
   if (showWater) {
+    const forcedWaterCache = getForcedScenarioWaterCacheMode();
+    waterCacheStrategyMode = forcedWaterCache.mode;
+    waterCacheStrategySource = forcedWaterCache.source;
+    const signals = getScenarioWaterCacheComplexitySignals(waterFeatures);
+    waterVisibleCoverageRatio = signals.visibleCoverageRatio;
+    waterPrevRenderedCount = signals.previousRenderedCount;
+
     const currentTransform = cloneZoomTransform(state.zoomTransform || globalThis.d3?.zoomIdentity);
     const waterLayerEntry = getContextScenarioLayerCacheEntry("water");
     const waterVisualRevision = getScenarioWaterVisualRevisionToken();
@@ -18493,18 +18612,47 @@ function drawScenarioRegionOverlaysPass(k) {
       && !!waterLayerEntry.canvas
       && !!waterLayerEntry.referenceTransform
     );
-    if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
-      waterCacheMode = "reuse";
-      renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
-    } else {
+
+    const useAdaptiveDirect = forcedWaterCache.mode === "adaptive" && shouldUseDirectScenarioWaterDraw(signals);
+    const strategy = useAdaptiveDirect ? "adaptive-direct" : forcedWaterCache.mode;
+
+    if (strategy === "direct" || strategy === "adaptive-direct") {
+      waterCacheMode = strategy;
+      renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
+    } else if (strategy === "reuse") {
+      if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
+        waterCacheMode = "reuse";
+        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
+      } else {
+        waterCacheMode = "redraw";
+        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
+        if (!drawCachedContextScenarioLayer("water", currentTransform)) {
+          waterCacheMode = "direct";
+          renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
+        }
+      }
+    } else if (strategy === "redraw") {
       waterCacheMode = "redraw";
       renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
       if (!drawCachedContextScenarioLayer("water", currentTransform)) {
         waterCacheMode = "direct";
         renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
       }
+    } else {
+      if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
+        waterCacheMode = "reuse";
+        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
+      } else {
+        waterCacheMode = "redraw";
+        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
+        if (!drawCachedContextScenarioLayer("water", currentTransform)) {
+          waterCacheMode = "direct";
+          renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
+        }
+      }
     }
     highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
+    lastScenarioWaterRenderedCount = Math.max(0, Number(renderedWaterCount || 0));
   }
 
   if (showSpecial) {
@@ -18517,10 +18665,15 @@ function drawScenarioRegionOverlaysPass(k) {
     renderedWaterCount,
     renderedSpecialCount,
     highlightedWaterCount,
+    waterVisibleCoverageRatio,
+    waterPrevRenderedCount,
     waterCacheMode,
+    waterCacheStrategyMode,
+    waterCacheStrategySource,
     skipped: false,
   });
 }
+
 
 function drawEffectsPass(k, { interactive = false } = {}) {
   const texture = getTextureStyleConfig();
