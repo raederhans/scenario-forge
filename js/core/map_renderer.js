@@ -19230,7 +19230,7 @@ function ensureIdleRenderPasses(timings) {
       const reuseDecision = getContextScenarioReuseDecision(transform);
       if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
         cache.dirty[passName] = true;
-        cache.reasons.contextScenario = reuseDecision.reason || "signature";
+        cache.reasons.contextScenario = "signature";
         incrementPerfCounter("contextScenarioExactRefreshCount");
         recordRenderPerfMetric("contextScenarioExactRefresh", 0, {
           activeScenarioId: String(state.activeScenarioId || ""),
