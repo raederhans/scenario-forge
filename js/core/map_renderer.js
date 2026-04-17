@@ -942,6 +942,9 @@ function getRenderPassCacheState() {
   cache.politicalPathWarmupSignature = typeof cache.politicalPathWarmupSignature === "string"
     ? cache.politicalPathWarmupSignature
     : "";
+  cache.contextScenarioReasonMismatchSignature = typeof cache.contextScenarioReasonMismatchSignature === "string"
+    ? cache.contextScenarioReasonMismatchSignature
+    : "";
   cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
   cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
   cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
@@ -986,6 +989,7 @@ function getRenderPassCacheState() {
     blackFrameCount: 0,
     lastGoodFrameReuses: 0,
     waterAdaptiveStateResetCount: 0,
+    contextScenarioReasonMismatchWarnings: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -1085,6 +1089,43 @@ function endContextMetricSession() {
 function incrementPerfCounter(counterName, amount = 1) {
   const cache = getRenderPassCacheState();
   cache.counters[counterName] = (Number(cache.counters[counterName]) || 0) + Number(amount || 0);
+}
+
+function resolveContextScenarioReasonSnapshot({
+  cache = getRenderPassCacheState(),
+  renderPerf = state.renderPerfMetrics || {},
+} = {}) {
+  const cacheReason = String(cache.reasons?.contextScenario || "").trim();
+  const perfReason = String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "").trim();
+  const displayReason = cacheReason || perfReason || "-";
+  return {
+    cacheReason: cacheReason || "-",
+    perfReason: perfReason || "-",
+    displayReason,
+    mismatch: Boolean(cacheReason && perfReason && cacheReason !== perfReason),
+  };
+}
+
+function detectContextScenarioReasonMismatch({
+  cache = getRenderPassCacheState(),
+  renderPerf = state.renderPerfMetrics || {},
+} = {}) {
+  const reasonSnapshot = resolveContextScenarioReasonSnapshot({ cache, renderPerf });
+  if (!reasonSnapshot.mismatch) {
+    cache.contextScenarioReasonMismatchSignature = "";
+    return reasonSnapshot;
+  }
+  const signature = `${reasonSnapshot.cacheReason}::${reasonSnapshot.perfReason}`;
+  if (cache.contextScenarioReasonMismatchSignature !== signature) {
+    cache.contextScenarioReasonMismatchSignature = signature;
+    incrementPerfCounter("contextScenarioReasonMismatchWarnings");
+    recordRenderPerfMetric("contextScenarioReasonMismatchWarning", 0, {
+      cacheReason: reasonSnapshot.cacheReason,
+      perfReason: reasonSnapshot.perfReason,
+      warningCount: Number(cache.counters.contextScenarioReasonMismatchWarnings || 0),
+    });
+  }
+  return reasonSnapshot;
 }
 
 function resetScenarioWaterCacheAdaptiveState(reason = "water-adaptive-state-reset") {
@@ -19189,7 +19230,7 @@ function ensureIdleRenderPasses(timings) {
       const reuseDecision = getContextScenarioReuseDecision(transform);
       if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
         cache.dirty[passName] = true;
-        cache.reasons.contextScenario = "signature";
+        cache.reasons.contextScenario = reuseDecision.reason || "signature";
         incrementPerfCounter("contextScenarioExactRefreshCount");
         recordRenderPerfMetric("contextScenarioExactRefresh", 0, {
           activeScenarioId: String(state.activeScenarioId || ""),
@@ -19237,6 +19278,7 @@ function ensureIdleRenderPasses(timings) {
       Math.max(0, Number(timings.contextBase || 0))
       + Math.max(0, Number(timings.contextScenario || 0));
   }
+  detectContextScenarioReasonMismatch({ cache, renderPerf: state.renderPerfMetrics || {} });
 }
 
 function resetMainCanvas() {
@@ -22189,6 +22231,7 @@ function updatePerfOverlay() {
     .join(", ");
   const renderPerf = state.renderPerfMetrics || {};
   const scenarioPerf = state.scenarioPerfMetrics || {};
+  const contextScenarioReasonSnapshot = resolveContextScenarioReasonSnapshot({ cache, renderPerf });
   const opEntries = [
     ["setMapData", renderPerf.setMapData?.durationMs],
     ["firstPaint", renderPerf.setMapDataFirstPaint?.durationMs],
@@ -22235,7 +22278,7 @@ function updatePerfOverlay() {
     `contextBreakdown ${contextBreakdownEntries || "none"}`,
     `ops ${opEntries || "none"}`,
     `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
-    `ctxScenario reuse=${cache.counters.contextScenarioReuseCount || 0} exact=${cache.counters.contextScenarioExactRefreshCount || 0} reason=${String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "-")}`,
+    `ctxScenario reuse=${cache.counters.contextScenarioReuseCount || 0} exact=${cache.counters.contextScenarioExactRefreshCount || 0} reason=${contextScenarioReasonSnapshot.displayReason} cacheReason=${contextScenarioReasonSnapshot.cacheReason} perfReason=${contextScenarioReasonSnapshot.perfReason} mismatchWarn=${cache.counters.contextScenarioReasonMismatchWarnings || 0}`,
     `coverage countries=${Number(coverageDebug.totalCountries || 0)} detail=${Number(coverageDebug.detailCountries || 0)} primary=${Number(coverageDebug.primaryCountries || 0)} priorityGap=${Array.isArray(coverageDebug.priorityCountryGaps) ? coverageDebug.priorityCountryGaps.length : 0}`,
     `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
     `invalidations ${invalidations}`,

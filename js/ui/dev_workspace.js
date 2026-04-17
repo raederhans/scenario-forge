@@ -2172,6 +2172,9 @@ function resolveRenderRows() {
   const frame = cache.lastFrame || {};
   const timings = frame.timings || {};
   const counters = cache.counters || {};
+  const contextScenarioCacheReason = String(cache.reasons?.contextScenario || "");
+  const contextScenarioPerfReason = String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "");
+  const contextScenarioReason = contextScenarioCacheReason || contextScenarioPerfReason;
   return [
     [ui("Render Profile"), String(state.renderProfile || "auto")],
     [ui("Bundle Mode"), String(state.topologyBundleMode || "single")],
@@ -2191,7 +2194,10 @@ function resolveRenderRows() {
     [ui("Borders Pass"), Number.isFinite(Number(timings.borders)) ? `${Number(timings.borders).toFixed(1)}ms` : ""],
     [ui("Context Scenario Reuse"), Number(counters.contextScenarioReuseCount || 0)],
     [ui("Context Scenario Exact"), Number(counters.contextScenarioExactRefreshCount || 0)],
-    [ui("Context Scenario Reason"), String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "")],
+    [ui("Context Scenario Reason"), contextScenarioReason],
+    [ui("Context Scenario Cache Reason"), contextScenarioCacheReason],
+    [ui("Context Scenario Perf Reason"), contextScenarioPerfReason],
+    [ui("Context Scenario Reason Warnings"), Number(counters.contextScenarioReasonMismatchWarnings || 0)],
     [ui("Water Adaptive State Resets"), Number(counters.waterAdaptiveStateResetCount || 0)],
   ].filter(([, value]) => String(value || "").trim());
 }
