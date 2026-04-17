@@ -18238,11 +18238,7 @@ function drawCachedContextScenarioLayer(layerName, currentTransform) {
   context.save();
   context.setTransform(1, 0, 0, 1, 0, 0);
   if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
-    context.drawImage(
-      layerCanvas,
-      Math.round(-Number(layout?.offsetX || 0) * state.dpr),
-      Math.round(-Number(layout?.offsetY || 0) * state.dpr),
-    );
+    context.drawImage(layerCanvas, 0, 0);
     context.restore();
     return true;
   }
@@ -18250,9 +18246,11 @@ function drawCachedContextScenarioLayer(layerName, currentTransform) {
   const scaleRatio = current.k / Math.max(referenceTransform.k, 0.0001);
   const dx = current.x - (referenceTransform.x * scaleRatio);
   const dy = current.y - (referenceTransform.y * scaleRatio);
+  const offsetX = Number(layout?.offsetX || 0);
+  const offsetY = Number(layout?.offsetY || 0);
   context.translate(
-    (dx - Number(layout?.offsetX || 0) * scaleRatio) * state.dpr,
-    (dy - Number(layout?.offsetY || 0) * scaleRatio) * state.dpr,
+    (dx + offsetX * (1 - scaleRatio)) * state.dpr,
+    (dy + offsetY * (1 - scaleRatio)) * state.dpr,
   );
   context.scale(scaleRatio, scaleRatio);
   context.drawImage(layerCanvas, 0, 0);
