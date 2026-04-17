@@ -723,7 +723,10 @@ const layerResolverCache = {
   detailRef: null,
   bundleMode: null,
   contextRevision: 0,
+  waterRegionsDataToken: "",
 };
+const objectIdentityTokenCache = new WeakMap();
+let nextObjectIdentityToken = 1;
 const politicalFeatureCollectionCache = new WeakMap();
 let admin0MergedCache = {
   topologyRef: null,
@@ -5524,14 +5527,21 @@ function ensureLayerDataFromTopology() {
 
   state.oceanData = resolveContextLayerData("ocean");
   state.landBgData = resolveContextLayerData("land");
-  const previousWaterRegionsData = state.waterRegionsData;
+  const previousWaterRegionsDataToken = String(layerResolverCache.waterRegionsDataToken || "");
   const nextWaterRegionsData = resolveContextLayerData("water_regions");
   state.waterRegionsData = nextWaterRegionsData;
+  const nextWaterRegionsDataToken = getContextLayerStableSourceToken("water_regions", nextWaterRegionsData, {
+    primaryTopology,
+    detailTopology: state.topologyDetail,
+    externalCollection: state.contextLayerExternalDataByName?.water_regions,
+    source: state.contextLayerSourceByName?.water_regions,
+  });
+  layerResolverCache.waterRegionsDataToken = nextWaterRegionsDataToken;
   state.riversData = resolveContextLayerData("rivers");
   state.urbanData = resolveContextLayerData("urban");
   state.physicalData = resolveContextLayerData("physical");
   state.specialZonesData = resolveContextLayerData("special_zones");
-  if (previousWaterRegionsData !== nextWaterRegionsData) {
+  if (previousWaterRegionsDataToken !== nextWaterRegionsDataToken) {
     resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
   }
   ensureBathymetryDataAvailability({ required: false });
@@ -5586,6 +5596,7 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   layerResolverCache.contextRevision = Number.NaN;
+  layerResolverCache.waterRegionsDataToken = "";
   const targetPasses = new Set(["contextBase"]);
   const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
   normalizedLayerNames.forEach((layerName) => {
@@ -11021,6 +11032,59 @@ function estimateTopologyObjectArcRefs(topology, objectName) {
 
 function getFeatureCollectionFeatureCount(collection) {
   return Array.isArray(collection?.features) ? collection.features.length : 0;
+}
+
+function getObjectIdentityToken(value, prefix = "obj") {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return `${prefix}:none`;
+  let token = objectIdentityTokenCache.get(value);
+  if (!token) {
+    token = `${prefix}:${nextObjectIdentityToken++}`;
+    objectIdentityTokenCache.set(value, token);
+  }
+  return token;
+}
+
+function getContextLayerStableSourceToken(layerName, collection, {
+  primaryTopology = null,
+  detailTopology = null,
+  externalCollection = null,
+  source = "",
+} = {}) {
+  const normalizedLayerName = String(layerName || "").trim().toLowerCase();
+  const normalizedSource = String(source || "").trim().toLowerCase();
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  const primaryObject = primaryTopology?.objects?.[normalizedLayerName] || null;
+  const detailObject = detailTopology?.objects?.[normalizedLayerName] || null;
+
+  if (normalizedSource === "primary") {
+    return [
+      "src:primary",
+      getObjectIdentityToken(primaryTopology, "topology"),
+      getObjectIdentityToken(primaryObject, "topology-object"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  if (normalizedSource === "detail") {
+    return [
+      "src:detail",
+      getObjectIdentityToken(detailTopology, "topology"),
+      getObjectIdentityToken(detailObject, "topology-object"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  if (normalizedSource === "external") {
+    const externalRef = externalCollection || collection;
+    return [
+      "src:external",
+      getObjectIdentityToken(externalRef, "external-layer"),
+      `features:${featureCount}`,
+    ].join("|");
+  }
+  return [
+    "src:other",
+    getObjectIdentityToken(collection, "layer-collection"),
+    `features:${featureCount}`,
+  ].join("|");
 }
 
 function getPhysicalLandMaskInfo() {
