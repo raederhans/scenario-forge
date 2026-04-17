@@ -816,3 +816,8 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - `scenarioChunkPromotionVisualStage` 已经能代表“首批 detail 真正可见”，而 `lastZoomEndToChunkVisibleMetric` 这类 runtime 记账经常会更晚，因为它会包含后续提交或收尾时机。
 - 如果 benchmark 目标是用户感知到的可见时间，汇总层应优先采用 visual stage；runtime 记账更适合做链路诊断。
 - 否则会出现“产品其实已经变快了，但报告还在读更晚的内部事件”的假慢。
+
+### 80. 首帧 coarse gate 和 post-frame detail prewarm 必须拆成两条显式合同
+- 这次红测和实现漂移的根因是把“调用方必须等待的首帧 coarse prewarm”和“首帧后的 detail cache 预热”揉成了同一个 helper，还用 `mode=sync/async` 偷渡语义，结果调用点看起来在 `await`，异步路径却没有真正等待首帧合同。
+- 更稳的最短路径是：先 `await` coarse first-frame ready，再把 detail prewarm 放到 post-frame 路径；如果 detail prewarm 只写 cache，不直接 apply runtime，就要在成功后显式补一次 `scheduleScenarioChunkRefresh(...)`。
+- perf metric 也要按一次 run 重建，不能沿用 merge 写法残留上一次的失败或 detail 字段。
