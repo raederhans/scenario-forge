@@ -2171,6 +2171,7 @@ function resolveRenderRows() {
   const cache = state.renderPassCache || {};
   const frame = cache.lastFrame || {};
   const timings = frame.timings || {};
+  const counters = cache.counters || {};
   return [
     [ui("Render Profile"), String(state.renderProfile || "auto")],
     [ui("Bundle Mode"), String(state.topologyBundleMode || "single")],
@@ -2188,6 +2189,9 @@ function resolveRenderRows() {
     [ui("Border Reason"), String(state.dynamicBordersDirtyReason || "")],
     [ui("Political Pass"), Number.isFinite(Number(timings.political)) ? `${Number(timings.political).toFixed(1)}ms` : ""],
     [ui("Borders Pass"), Number.isFinite(Number(timings.borders)) ? `${Number(timings.borders).toFixed(1)}ms` : ""],
+    [ui("Context Scenario Reuse"), Number(counters.contextScenarioReuseCount || 0)],
+    [ui("Context Scenario Exact"), Number(counters.contextScenarioExactRefreshCount || 0)],
+    [ui("Context Scenario Reason"), String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "")],
   ].filter(([, value]) => String(value || "").trim());
 }
 

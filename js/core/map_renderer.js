@@ -240,6 +240,7 @@ const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
 const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
 const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
 const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
+const CONTEXT_SCENARIO_REUSE_FRAME_LIMIT = 24;
 const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
   low: Object.freeze({
     majorIntervalMultiplier: 3,
@@ -948,6 +949,8 @@ function getRenderPassCacheState() {
     contextPassRenders: 0,
     contextBasePassRenders: 0,
     contextScenarioPassRenders: 0,
+    contextScenarioReuseCount: 0,
+    contextScenarioExactRefreshCount: 0,
     dayNightPassRenders: 0,
     borderPassRenders: 0,
     borderSnapshotRenders: 0,
@@ -3254,6 +3257,77 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
     referenceZoomBucket: referenceBucket,
     crossesZoomBucket,
     crossesMinorContourThreshold,
+    referenceTransform,
+    currentTransform: delta.current,
+  };
+}
+
+function getContextScenarioReuseDecision(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const cache = getRenderPassCacheState();
+  const referenceTransform = getPassReferenceTransform("contextScenario");
+  const currentBucket = getContextBaseZoomBucketId(transform?.k || state.zoomTransform?.k || 1);
+  const reuseFrameCount = Math.max(0, Number(cache.counters?.contextScenarioReuseCount || 0));
+  if (!shouldEnableContextScenarioTransformReuse()) {
+    return {
+      enabled: false,
+      shouldExactRefresh: true,
+      reason: "reuse-disabled",
+      scaleRatio: 1,
+      distancePx: 0,
+      maxDistancePx: getContextBaseReuseMaxDistancePx(),
+      zoomBucket: currentBucket,
+      referenceZoomBucket: currentBucket,
+      crossesZoomBucket: false,
+      reuseFrameCount,
+      reuseFrameLimit: CONTEXT_SCENARIO_REUSE_FRAME_LIMIT,
+      referenceTransform,
+    };
+  }
+  if (!referenceTransform) {
+    return {
+      enabled: true,
+      shouldExactRefresh: true,
+      reason: "no-reference-transform",
+      scaleRatio: 1,
+      distancePx: 0,
+      maxDistancePx: getContextBaseReuseMaxDistancePx(),
+      zoomBucket: currentBucket,
+      referenceZoomBucket: "",
+      crossesZoomBucket: false,
+      reuseFrameCount,
+      reuseFrameLimit: CONTEXT_SCENARIO_REUSE_FRAME_LIMIT,
+      referenceTransform: null,
+    };
+  }
+  const delta = getTransformReuseDelta(transform, referenceTransform);
+  const referenceBucket = getContextBaseZoomBucketId(referenceTransform?.k || 1);
+  const crossesZoomBucket = currentBucket !== referenceBucket;
+  const maxDistancePx = getContextBaseReuseMaxDistancePx();
+  const reachesReuseFrameLimit = reuseFrameCount >= CONTEXT_SCENARIO_REUSE_FRAME_LIMIT;
+  const shouldExactRefresh =
+    crossesZoomBucket
+    || delta.distancePx > maxDistancePx
+    || reachesReuseFrameLimit;
+  let reason = "transform-reuse";
+  if (crossesZoomBucket) {
+    reason = "zoom-bucket-change";
+  } else if (delta.distancePx > maxDistancePx) {
+    reason = "distance-threshold";
+  } else if (reachesReuseFrameLimit) {
+    reason = "reuse-frame-limit";
+  }
+  return {
+    enabled: true,
+    shouldExactRefresh,
+    reason,
+    scaleRatio: Number(delta.scaleRatio.toFixed(4)),
+    distancePx: Number(delta.distancePx.toFixed(2)),
+    maxDistancePx: Number(maxDistancePx.toFixed(2)),
+    zoomBucket: currentBucket,
+    referenceZoomBucket: referenceBucket,
+    crossesZoomBucket,
+    reuseFrameCount,
+    reuseFrameLimit: CONTEXT_SCENARIO_REUSE_FRAME_LIMIT,
     referenceTransform,
     currentTransform: delta.current,
   };
@@ -18695,6 +18769,9 @@ function renderPassToCache(passName, drawFn, transform, timings) {
   }
   recordPassTiming(timings, passName, passStart);
   getPassCounterNames(passName).forEach((counterName) => incrementPerfCounter(counterName));
+  if (passName === "contextScenario") {
+    cache.counters.contextScenarioReuseCount = 0;
+  }
 }
 
 function ensureIdleRenderPasses(timings) {
@@ -18743,12 +18820,42 @@ function ensureIdleRenderPasses(timings) {
       && cache.dirty[passName]
       && String(cache.reasons[passName] || "") === "signature"
     ) {
-      cache.dirty[passName] = false;
-      recordRenderPerfMetric("contextScenarioReuseSkipped", 0, {
-        activeScenarioId: String(state.activeScenarioId || ""),
-        reason: "transform-reuse",
-        transformK: Number(transform?.k || state.zoomTransform?.k || 1),
-      });
+      const reuseDecision = getContextScenarioReuseDecision(transform);
+      if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
+        cache.dirty[passName] = true;
+        cache.reasons.contextScenario = reuseDecision.reason || "context-scenario-exact";
+        incrementPerfCounter("contextScenarioExactRefreshCount");
+        recordRenderPerfMetric("contextScenarioExactRefresh", 0, {
+          activeScenarioId: String(state.activeScenarioId || ""),
+          reason: reuseDecision.reason,
+          scaleRatio: reuseDecision.scaleRatio,
+          distancePx: reuseDecision.distancePx,
+          maxDistancePx: reuseDecision.maxDistancePx,
+          zoomBucket: reuseDecision.zoomBucket,
+          referenceZoomBucket: reuseDecision.referenceZoomBucket,
+          crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
+          reuseFrameCount: reuseDecision.reuseFrameCount,
+          reuseFrameLimit: reuseDecision.reuseFrameLimit,
+        });
+      } else {
+        cache.dirty[passName] = false;
+        cache.counters.contextScenarioReuseCount = Math.max(
+          0,
+          Number(cache.counters.contextScenarioReuseCount || 0) + 1,
+        );
+        recordRenderPerfMetric("contextScenarioReuseSkipped", 0, {
+          activeScenarioId: String(state.activeScenarioId || ""),
+          reason: reuseDecision.reason || "transform-reuse",
+          transformK: Number(transform?.k || state.zoomTransform?.k || 1),
+          scaleRatio: reuseDecision.scaleRatio,
+          distancePx: reuseDecision.distancePx,
+          maxDistancePx: reuseDecision.maxDistancePx,
+          zoomBucket: reuseDecision.zoomBucket,
+          referenceZoomBucket: reuseDecision.referenceZoomBucket,
+          reuseFrameCount: reuseDecision.reuseFrameCount,
+          reuseFrameLimit: reuseDecision.reuseFrameLimit,
+        });
+      }
     }
     if (!cache.dirty[passName]) return;
     if (
@@ -21762,6 +21869,7 @@ function updatePerfOverlay() {
     `contextBreakdown ${contextBreakdownEntries || "none"}`,
     `ops ${opEntries || "none"}`,
     `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
+    `ctxScenario reuse=${cache.counters.contextScenarioReuseCount || 0} exact=${cache.counters.contextScenarioExactRefreshCount || 0} reason=${String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "-")}`,
     `coverage countries=${Number(coverageDebug.totalCountries || 0)} detail=${Number(coverageDebug.detailCountries || 0)} primary=${Number(coverageDebug.primaryCountries || 0)} priorityGap=${Array.isArray(coverageDebug.priorityCountryGaps) ? coverageDebug.priorityCountryGaps.length : 0}`,
     `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
     `invalidations ${invalidations}`,
