@@ -18750,6 +18750,7 @@ function drawLabelsPass(k, { interactive = false } = {}) {
 }
 
 function renderPassToCache(passName, drawFn, transform, timings) {
+  const cache = getRenderPassCacheState();
   const passCanvas = ensureRenderPassCanvas(passName);
   const passContext = passCanvas.getContext("2d");
   if (!passContext) return;
@@ -18760,10 +18761,9 @@ function renderPassToCache(passName, drawFn, transform, timings) {
     drawFn(k);
   });
   setPassReferenceTransform(passName, transform);
-  getRenderPassCacheState().signatures[passName] = getRenderPassSignature(passName, transform);
-  getRenderPassCacheState().dirty[passName] = false;
+  cache.signatures[passName] = getRenderPassSignature(passName, transform);
+  cache.dirty[passName] = false;
   if (passName === "political") {
-    const cache = getRenderPassCacheState();
     cache.partialPoliticalDirtyIds.clear();
     schedulePoliticalPathWarmup(transform);
   }
