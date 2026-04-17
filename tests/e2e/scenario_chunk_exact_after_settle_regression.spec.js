@@ -233,7 +233,7 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
 test("sync prewarm threshold completes first-frame chunk prewarm before promotion stage", async ({ page }) => {
   await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
-  await ensureScenario(page, "tno_1962", "TNO 1962");
+  await ensureScenario(page, "hoi4_1939", "HOI4 1939");
 
   await page.waitForFunction(async () => {
     const { state } = await import("/js/core/state.js");
@@ -258,7 +258,7 @@ test("sync prewarm threshold completes first-frame chunk prewarm before promotio
     };
   });
 
-  expect(stageOrder.activeScenarioId).toBe("tno_1962");
+  expect(stageOrder.activeScenarioId).toBe("hoi4_1939");
   expect(stageOrder.prewarmMetric).toBeTruthy();
   expect(stageOrder.prewarmMetric.mode).toBe("sync");
   expect(stageOrder.prewarmMetric.synchronous).toBe(true);
