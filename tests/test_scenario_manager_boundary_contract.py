@@ -5,6 +5,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
+SCENARIO_APPLY_PIPELINE = REPO_ROOT / "js" / "core" / "scenario_apply_pipeline.js"
 
 
 class ScenarioManagerBoundaryContractTest(unittest.TestCase):
@@ -14,8 +15,6 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertNotIn('document.getElementById("scenario', content)
         self.assertIsNone(re.search(r"state\.updateScenarioUIFn\s*=(?!=)", content))
         self.assertNotIn("initScenarioManager", content)
-        self.assertNotIn("recalculateScenarioOwnerControllerDiffCount,", content)
-        self.assertNotIn("syncScenarioLocalizationState,", content)
         self.assertNotIn("function syncScenarioUi()", content)
         self.assertIsNone(re.search(r"^function\s+captureScenarioApplyRollbackSnapshot\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^function\s+restoreScenarioApplyRollbackSnapshot\b", content, re.MULTILINE))
@@ -45,7 +44,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\brefreshScenarioShellOverlays\b", content))
 
     def test_active_scenario_country_names_do_not_fall_back_to_global_map(self):
-        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+        content = SCENARIO_APPLY_PIPELINE.read_text(encoding="utf-8")
 
         self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', content)
         self.assertIn('? { ...countryNames }', content)
@@ -54,6 +53,42 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
             "state.countryNames = {\n      ...countryNames,\n      ...staged.scenarioNameMap,\n    };",
             content,
         )
+
+    def test_scenario_manager_keeps_transaction_coordinator_role(self):
+        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertIn("applyScenarioBundle,", content)
+        self.assertIn("applyScenarioById,", content)
+        self.assertIn("resetToScenarioBaseline,", content)
+        self.assertIn("clearActiveScenario,", content)
+        self.assertIn("let activeScenarioApplyPromise = null;", content)
+        self.assertIn("captureScenarioApplyRollbackSnapshot()", content)
+        self.assertIn("restoreScenarioApplyRollbackSnapshot(rollbackSnapshot", content)
+        self.assertIn("enterScenarioFatalRecovery({", content)
+        self.assertIn('loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" })', content)
+
+    def test_scenario_manager_releases_state_apply_pipeline_owner(self):
+        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertNotRegex(content, r"^async function prepareScenarioApplyState\b", re.MULTILINE)
+        self.assertNotIn("state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;", content)
+        self.assertNotIn("state.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };", content)
+        self.assertNotIn('state.countryNames = staged.mapSemanticMode', content)
+        self.assertNotIn('state.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;', content)
+        self.assertNotIn('cityOverridesPayload: staged.mapSemanticMode === "blank"', content)
+
+    def test_apply_pipeline_owner_moves_to_new_module(self):
+        content = SCENARIO_APPLY_PIPELINE.read_text(encoding="utf-8")
+
+        self.assertIn("prepareScenarioApplyState", content)
+        self.assertIn("applyPreparedScenarioState", content)
+        self.assertIn("state.scenarioRuntimeTopologyData =", content)
+        self.assertIn("state.scenarioBaselineOwnersByFeatureId =", content)
+        self.assertIn('state.countryNames = staged.mapSemanticMode', content)
+        self.assertIn("state.scheduleScenarioChunkRefreshFn =", content)
+        self.assertIn("syncScenarioLocalizationState({", content)
+        self.assertIn("resetScenarioChunkRuntimeState(", content)
+        self.assertNotIn('./scenario_manager.js', content)
 
 
 if __name__ == "__main__":

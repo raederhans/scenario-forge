@@ -29,6 +29,9 @@ class StartupShellTest(unittest.TestCase):
         data_loader_js = (REPO_ROOT / "js" / "core" / "data_loader.js").read_text(encoding="utf-8")
         startup_cache_js = (REPO_ROOT / "js" / "core" / "startup_cache.js").read_text(encoding="utf-8")
         scenario_resources_js = (REPO_ROOT / "js" / "core" / "scenario_resources.js").read_text(encoding="utf-8")
+        scenario_apply_pipeline_js = (
+            REPO_ROOT / "js" / "core" / "scenario_apply_pipeline.js"
+        ).read_text(encoding="utf-8")
         scenario_post_apply_effects_js = (
             REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
         ).read_text(encoding="utf-8")
@@ -70,8 +73,8 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn('async function ensureChunkedScenarioFirstFrameReady({', scenario_post_apply_effects_js)
         self.assertIn('await preloadScenarioCoarseChunks(bundle);', scenario_post_apply_effects_js)
         self.assertIn('await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });', scenario_post_apply_effects_js)
-        self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', scenario_manager_js)
-        self.assertIn(': { ...staged.scenarioNameMap };', scenario_manager_js)
+        self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', scenario_apply_pipeline_js)
+        self.assertIn(': { ...staged.scenarioNameMap };', scenario_apply_pipeline_js)
         self.assertIn('normalizeIndexedTagAssignmentPayload', scenario_manager_js)
         self.assertIn('normalizeIndexedCoreAssignmentPayload', scenario_manager_js)
         self.assertIn('consumeStartupSupportKeyUsageAuditReport', main_js)

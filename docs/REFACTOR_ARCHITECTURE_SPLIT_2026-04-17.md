@@ -21,10 +21,10 @@
 - [x] 新建 `js/core/scenario/` 内部目录
 - [x] 抽 `shared.js`：`cacheBust`、`normalizeScenarioId`、timeout loader 等纯 helper
 - [x] 抽第一版 `bundle_loader.js`：registry、audit、bundle metadata、import baseline 校验
-- [ ] 抽 `chunk_runtime.js`：chunk state、promotion、refresh、schedule
-- [ ] 抽 `startup_hydration.js`：startup bundle、hydrate、health gate
-- [ ] `scenario_resources.js` 保持资源 facade
-- [ ] `scenario_manager.js` 收成事务协调器，仅保留 apply/reset/clear/view-mode 与状态文案
+- [x] 抽 `chunk_runtime.js`：chunk state、promotion、refresh、schedule
+- [x] 抽 `startup_hydration.js`：startup bundle、hydrate、health gate
+- [x] `scenario_resources.js` 保持资源 facade
+- [x] `scenario_manager.js` 收成事务协调器，仅保留 apply/reset/clear/view-mode 与状态文案
 
 ### Wave 2: 按工作台拆 UI 控制器
 - [ ] `toolbar.js` -> `transport_workbench_controller.js`
@@ -115,4 +115,17 @@
   - `scenario_manager.js` 与 `scenario_resources.js` 已切到 `shared.js`，完成第一批重复逻辑下沉。
   - `js/core/scenario/bundle_loader.js` 已落地，先收口 registry、display/meta、baseline compare、audit loader，并让 `scenario_resources.js` 继续做稳定 facade 转发。
   - `bundle_loader.js` 进一步接管了 runtime shell / contract / chunked-runtime 判定 helper，`scenario_manager.js` 与 `scenario_resources.js` 已开始复用同一组 bundle metadata helper。
-  - 已验证：68 条静态边界与 startup 相关 Python tests 全绿。
+  - 已验证：80 条静态边界与 startup 相关 Python tests 全绿。
+  - `bundle_loader.js` 已继续接管 chunk 文件读取、chunk registry ensurer、bootstrap bundle 组装、startup bundle 组装、runtime topology 读取。
+  - `bundle_loader.js` 新增 `createScenarioBundleAssembler(...)`，继续承接 fresh bundle 的纯读取与纯组装主链。
+  - `scenario_resources.js` 继续保留 facade，对外 export 形状未变，内部通过 `createScenarioChunkRegistryEnsurer(...)` 装配运行态 registry 更新，并继续持有 startup cache state、perf metric、deferred metadata scheduling。
+  - `tests/test_scenario_resources_boundary_contract.py` 已补 facade factory wiring、fresh bundle assembler 边界和 startup cache writeback 保护。
+  - 新增 `js/core/scenario/chunk_runtime.js`，把 chunk runtime 的 state、selection、promotion、refresh/schedule 整体下沉成 `createScenarioChunkRuntimeController(...)`。
+  - `scenario_resources.js` 继续保留 facade 和 hydrate 主交易，只通过 late-bound `ensureScenarioChunkRegistryLoaded(...)` 把 runtime controller 与 registry loader 接起来。
+  - `tests/test_scenario_chunk_refresh_contracts.py` 与 `tests/test_scenario_resources_boundary_contract.py` 已同步迁到新的 owner 文件边界，chunk runtime 相关 contract 继续受保护。
+  - 新增 `js/core/scenario/startup_hydration.js`，把 topology decode、geo locale patch、hydrate、health gate 下沉成 `createScenarioStartupHydrationController(...)`。
+  - `scenario_resources.js` 继续保留 facade，只通过 late-bound `loadScenarioBundle` 把 startup hydration controller 与 bundle facade 接起来。
+  - 新增 `tests/test_startup_hydration_boundary_contract.py`，把 hydrate 布尔合同、health gate retry、merged payload fallback、geo locale patch 与 blank defaults 都钉在新的 owner 文件上。
+  - 新增 `js/core/scenario_apply_pipeline.js`，把 `prepareScenarioApplyState()` 与 staged state commit 从 `scenario_manager.js` 下沉出来。
+  - `scenario_manager.js` 继续保留事务入口、single-flight、rollback/fatal recovery、post-apply 与用户可见入口。
+  - `tests/test_scenario_manager_boundary_contract.py` 与 `tests/test_startup_shell.py` 已同步到新的 owner 边界，scenario apply pipeline contract 继续受保护。

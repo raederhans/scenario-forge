@@ -5,6 +5,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_RESOURCES = REPO_ROOT / "js" / "core" / "scenario_resources.js"
 SCENARIO_BUNDLE_LOADER = REPO_ROOT / "js" / "core" / "scenario" / "bundle_loader.js"
+SCENARIO_CHUNK_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "chunk_runtime.js"
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
 SCENARIO_POST_APPLY_EFFECTS = REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
 MAIN_JS = REPO_ROOT / "js" / "main.js"
@@ -41,6 +42,46 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("createScenarioAuditPayloadLoader", bundle_loader_content)
         self.assertIn("createImportedScenarioBaselineValidator", bundle_loader_content)
 
+    def test_bundle_loader_owns_chunk_and_bootstrap_helper_extraction(self):
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        bundle_loader_content = SCENARIO_BUNDLE_LOADER.read_text(encoding="utf-8")
+
+        self.assertIn("loadScenarioChunkFile", bundle_loader_content)
+        self.assertIn("createScenarioChunkRegistryEnsurer", bundle_loader_content)
+        self.assertIn("createScenarioBootstrapBundleFromCache", bundle_loader_content)
+        self.assertIn("createStartupScenarioBundleFromPayload", bundle_loader_content)
+        self.assertIn("loadScenarioRuntimeTopologyForBundle", bundle_loader_content)
+        self.assertIn("loadScenarioChunkFile,", resources_content)
+        self.assertIn("createScenarioChunkRegistryEnsurer,", resources_content)
+        self.assertIn("createScenarioBootstrapBundleFromCache,", resources_content)
+        self.assertIn("createStartupScenarioBundleFromPayload,", resources_content)
+        self.assertIn("ensureScenarioChunkRegistryLoaded = createScenarioChunkRegistryEnsurer({", resources_content)
+
+    def test_resources_module_keeps_loader_factory_wiring(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertIn("const loadScenarioRegistry = createScenarioRegistryLoader({", content)
+        self.assertIn("const loadScenarioAuditPayload = createScenarioAuditPayloadLoader({", content)
+        self.assertIn("const validateImportedScenarioBaseline = createImportedScenarioBaselineValidator({", content)
+
+    def test_fresh_bundle_assembly_moves_to_bundle_loader_factory(self):
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        bundle_loader_content = SCENARIO_BUNDLE_LOADER.read_text(encoding="utf-8")
+
+        self.assertIn("createScenarioBundleAssembler", bundle_loader_content)
+        self.assertIn("const assembleScenarioBundle = createScenarioBundleAssembler({", resources_content)
+        self.assertNotIn('./state.js', bundle_loader_content)
+        self.assertNotIn('./scenario_ui_sync.js', bundle_loader_content)
+
+    def test_load_scenario_bundle_keeps_facade_cache_and_startup_cache_writeback(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertIn('state.scenarioBundleCacheById[targetId] = bundle', content)
+        self.assertIn('state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled"', content)
+        self.assertIn('state.startupBootCacheState.scenarioBootstrap = "written"', content)
+        self.assertIn('createSerializableStartupScenarioBootstrapCorePayload({', content)
+        self.assertIn('createSerializableStartupScenarioBootstrapLocalePayload({', content)
+
     def test_external_callers_no_longer_pull_resource_api_from_scenario_manager(self):
         self.assertIn('./core/scenario_resources.js', MAIN_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', I18N_JS.read_text(encoding="utf-8"))
@@ -59,10 +100,12 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
 
     def test_chunk_runtime_state_stays_out_of_bundle_cache(self):
         resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        chunk_runtime_content = SCENARIO_CHUNK_RUNTIME.read_text(encoding="utf-8")
         manager_content = SCENARIO_MANAGER.read_text(encoding="utf-8")
 
-        self.assertIn("chunkPayloadPromisesById", resources_content)
-        self.assertIn("hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)", resources_content)
+        self.assertIn("./scenario/chunk_runtime.js", resources_content)
+        self.assertIn("chunkPayloadPromisesById", chunk_runtime_content)
+        self.assertIn("hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)", chunk_runtime_content)
         self.assertNotIn("bundle.chunkMergedLayerPayloads", resources_content)
         self.assertNotIn("chunkMergedLayerPayloads:", resources_content)
         self.assertNotIn("bundle.chunkMergedLayerPayloads", manager_content)
@@ -85,13 +128,14 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn('manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""', content)
 
     def test_startup_core_bundle_path_uses_compaction_helpers_and_no_longer_reads_apply_seed_from_payload(self):
-        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        bundle_loader_content = SCENARIO_BUNDLE_LOADER.read_text(encoding="utf-8")
 
-        self.assertIn("normalizeIndexedTagAssignmentPayload", content)
-        self.assertIn("normalizeIndexedCoreAssignmentPayload", content)
-        self.assertIn("normalizeStartupBundleRuntimePoliticalMeta", content)
-        self.assertIn("startupApplySeed: null,", content)
-        self.assertNotIn('payload?.scenario?.apply_seed', content)
+        self.assertIn("normalizeIndexedTagAssignmentPayload", bundle_loader_content)
+        self.assertIn("normalizeIndexedCoreAssignmentPayload", bundle_loader_content)
+        self.assertIn("normalizeStartupBundleRuntimePoliticalMeta", resources_content)
+        self.assertIn("startupApplySeed: null,", bundle_loader_content)
+        self.assertNotIn('payload?.scenario?.apply_seed', bundle_loader_content)
 
 
 if __name__ == "__main__":

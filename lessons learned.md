@@ -826,3 +826,23 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `scenario_resources -> scenario/shared + scenario/bundle_loader` 的最稳切法，是先把 registry、baseline compare、runtime shell contract、chunked-runtime 判定这类纯加载 helper 抽走，再让 facade 继续持有 `state`、`syncScenarioUi()`、optional layer apply、hydrate、health gate。
 - 如果一开始就把 active state 写回和 UI 同步一起搬进 loader，新模块会立刻跨进运行态事务，边界会重新糊掉。
 - 更稳的最短路径是：新模块优先用 dependency injection 或低层 import，只保留单向依赖；facade 继续做对外 export 和副作用收口。
+
+### 91. 边界测试如果把 helper 所有权钉死在 donor 文件上，模块下沉后会先炸测试，再误导重构判断
+- 这次把 startup bundle 组装和 compaction helper 从 `scenario_resources.js` 下沉到 `scenario/bundle_loader.js` 后，旧静态断言还在 donor 文件里找 `normalizeIndexedTagAssignmentPayload`，结果代码边界已经更清楚，测试却先报红。
+- 更稳的最短路径是：边界测试继续守住 facade export 和 wiring，同时把“具体 helper 属于哪个模块”的断言迁到新的 owner 文件，避免测试把合理拆分误判成回归。
+
+### 92. 对超大 donor 文件做批量文本替换时，先锁定更窄上下文，再动同名局部变量
+- 这次为了从 `loadScenarioBundle` 里删掉一个死变量，直接按整行替换 `const hints = normalizeScenarioPerformanceHints(manifest);`，顺手把 `applyScenarioPerformanceHints()` 里的同名局部变量也删掉了，静态语法检查照样会过，运行时才会炸。
+- 更稳的最短路径是：先用函数级上下文或 AST 级匹配锁定目标块，再做替换；改完后要顺手 grep 同名局部变量的剩余位置，避免 donor 文件里多个相似片段互相误伤。
+
+### 93. 当 runtime controller 和 loader helper 共享同一份单例状态时，用 late-bound 回调接线最稳
+- 这次 `chunk_runtime.js` 里的 controller 需要调用 `ensureScenarioChunkRegistryLoaded(...)`，而 registry ensurer 自己又依赖 `ensureRuntimeChunkLoadState()`；这是一条天然的初始化环。
+- 更稳的最短路径是：让 facade 先创建 controller，再把 `ensureScenarioChunkRegistryLoaded` 用闭包回调晚绑定进去。这样单例 state 仍然只有一份，模块之间也能继续保持单向 import。
+
+### 94. 当 hydrate controller 需要回调 facade 的 load 函数时，也用晚绑定保住出口稳定
+- 这次 `startup_hydration.js` 里的 `ensureScenarioGeoLocalePatchForLanguage()` 和 `enforceScenarioHydrationHealthGate()` 都需要回调 `loadScenarioBundle()`，如果直接反向 import `scenario_resources.js`，模块边界会立刻重新缠回去。
+- 更稳的最短路径是：controller 只吃 `getLoadScenarioBundle()` 这种晚绑定依赖，facade 在函数定义完成后再把本地 `loadScenarioBundle` 填进去。这样对外出口不变，内部依赖方向也保持单向。
+
+### 95. apply pipeline 下沉后，旧边界测试要改成“事务 owner”和“状态 owner”两层断言
+- 这次把 `prepareScenarioApplyState()` 和 staged state commit 从 `scenario_manager.js` 挪到 `scenario_apply_pipeline.js` 后，旧测试里那种“字符串还在 donor 文件里”断言会把正常拆分误判成回归。
+- 更稳的最短路径是：一层测试守 `scenario_manager` 继续拥有 single-flight、rollback、fatal recovery 和公开入口；另一层测试守新 owner 文件继续拥有 staged state commit、countryNames 选择、chunk runtime 激活和 localization 写入。
