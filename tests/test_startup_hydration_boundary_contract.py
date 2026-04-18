@@ -15,6 +15,14 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("./scenario/startup_hydration.js", resources_content)
         self.assertIn("createScenarioStartupHydrationController", resources_content)
+        self.assertIn(
+            "hasRenderableScenarioPoliticalTopology: hasRenderableScenarioPoliticalTopologyFromStartupHydration",
+            resources_content,
+        )
+        self.assertIn(
+            "const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;",
+            resources_content,
+        )
         self.assertIn("hydrateActiveScenarioBundle,", resources_content)
         self.assertIn("evaluateScenarioHydrationHealthGateState,", resources_content)
         self.assertIn("enforceScenarioHydrationHealthGate,", resources_content)
@@ -26,6 +34,11 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
     def test_hydrate_bundle_guard_and_boolean_contract_stay_stable(self):
         content = SCENARIO_STARTUP_HYDRATION.read_text(encoding="utf-8")
 
+        self.assertIn("areScenarioFeatureCollectionsEquivalent,", content)
+        self.assertIn(
+            "!areScenarioFeatureCollectionsEquivalent(nextScenarioPoliticalPayload, previousScenarioPoliticalPayload)",
+            content,
+        )
         self.assertIn("bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)", content)
         self.assertIn("return false;", content)
         self.assertIn("return true;", content)

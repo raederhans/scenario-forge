@@ -129,3 +129,5 @@
   - 新增 `js/core/scenario_apply_pipeline.js`，把 `prepareScenarioApplyState()` 与 staged state commit 从 `scenario_manager.js` 下沉出来。
   - `scenario_manager.js` 继续保留事务入口、single-flight、rollback/fatal recovery、post-apply 与用户可见入口。
   - `tests/test_scenario_manager_boundary_contract.py` 与 `tests/test_startup_shell.py` 已同步到新的 owner 边界，scenario apply pipeline contract 继续受保护。
+  - 已修复一轮 review 暴露的 3 个收口问题：`scenario_manager.js` 的 import/wrapper 重名、`scenario_resources.js` 的 startup hydration 解构重名、`startup_hydration.js` 缺失 `areScenarioFeatureCollectionsEquivalent` 依赖。
+  - 已补针对性边界断言，并重新验证 `node --check` 与 80 条静态边界 / startup tests 全绿。

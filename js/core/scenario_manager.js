@@ -137,7 +137,7 @@ import {
   getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
   getScenarioBaselineHashFromBundle,
   getScenarioBlockerCount,
-  getScenarioDefaultCountryCode,
+  getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode,
 } from "./scenario/bundle_loader.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";

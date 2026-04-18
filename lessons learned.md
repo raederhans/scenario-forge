@@ -846,3 +846,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 95. apply pipeline 下沉后，旧边界测试要改成“事务 owner”和“状态 owner”两层断言
 - 这次把 `prepareScenarioApplyState()` 和 staged state commit 从 `scenario_manager.js` 挪到 `scenario_apply_pipeline.js` 后，旧测试里那种“字符串还在 donor 文件里”断言会把正常拆分误判成回归。
 - 更稳的最短路径是：一层测试守 `scenario_manager` 继续拥有 single-flight、rollback、fatal recovery 和公开入口；另一层测试守新 owner 文件继续拥有 staged state commit、countryNames 选择、chunk runtime 激活和 localization 写入。
+
+### 96. 模块下沉后，facade 的本地 wrapper 和新 import 必须先做符号去重
+- 这次 `scenario_manager.js` 里保留了本地 `getScenarioDefaultCountryCode()` wrapper，同时又直接 import 了同名符号；`scenario_resources.js` 里也出现了本地 helper 和 startup hydration 解构结果同名，结果模块在解析阶段就直接炸掉。
+- 更稳的最短路径是：下沉后统一采用 `import { foo as loaderFoo }` 或 `const { foo: fooFromController } = ...` 这类显式别名，再由 facade 决定是否保留本地公开名。
+
+### 97. 提取 controller 时，旧 donor 文件里继续会用到的 helper 依赖要显式注入到新模块
+- 这次 `startup_hydration.js` 在 donor 文件里原本依赖 `areScenarioFeatureCollectionsEquivalent()`，下沉后如果没有把它一起迁走或显式注入，运行到 hydrate fallback 分支就会直接 `ReferenceError`。
+- 更稳的最短路径是：提取 controller 时逐条核对自由变量，能留在 donor 的 helper 就通过依赖注入传入；需要变成 owner 的 helper 就同波次搬走，并补 owner-file 边界测试。

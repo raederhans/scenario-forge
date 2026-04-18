@@ -66,6 +66,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("restoreScenarioApplyRollbackSnapshot(rollbackSnapshot", content)
         self.assertIn("enterScenarioFatalRecovery({", content)
         self.assertIn('loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" })', content)
+        self.assertIn("getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode", content)
 
     def test_scenario_manager_releases_state_apply_pipeline_owner(self):
         content = SCENARIO_MANAGER.read_text(encoding="utf-8")

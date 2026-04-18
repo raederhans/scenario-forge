@@ -13,6 +13,7 @@ function createScenarioStartupHydrationController({
   getScenarioDecodedCollection,
   getScenarioRuntimeMergedLayerPayloads,
   hasScenarioMergedLayerPayload,
+  areScenarioFeatureCollectionsEquivalent,
   applyScenarioPoliticalChunkPayload,
   loadOptionalScenarioResource,
   getScenarioGeoLocalePatchDescriptor,

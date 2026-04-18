@@ -715,7 +715,7 @@ const {
   applyBlankScenarioPresentationDefaults,
   hydrateActiveScenarioBundle,
   buildScenarioRuntimeVersionTag,
-  hasRenderableScenarioPoliticalTopology,
+  hasRenderableScenarioPoliticalTopology: hasRenderableScenarioPoliticalTopologyFromStartupHydration,
   evaluateScenarioHydrationHealthGateState,
   enforceScenarioHydrationHealthGate,
 } = createScenarioStartupHydrationController({
@@ -729,6 +729,7 @@ const {
   getScenarioDecodedCollection,
   getScenarioRuntimeMergedLayerPayloads,
   hasScenarioMergedLayerPayload,
+  areScenarioFeatureCollectionsEquivalent,
   applyScenarioPoliticalChunkPayload,
   loadOptionalScenarioResource,
   getScenarioGeoLocalePatchDescriptor,
@@ -752,6 +753,8 @@ const {
   ownerFeatureCoverageMinRatio: SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO,
   ownerFeatureCoverageMinFeatures: SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES,
 });
+
+const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;
 
 function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints = normalizeScenarioPerformanceHints(manifest)) {
   const config = getScenarioOptionalLayerConfig(layerKey);
