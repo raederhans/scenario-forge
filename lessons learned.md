@@ -218,6 +218,9 @@
 - Keep empty named topology objects plus runtime_political_meta in startup bundle, and leave real overlay geometry to deferred hydration.
 
 ### 37. �Ӿ��ع������� render pass ʱ������ͬʱ���� signature / invalidation / transformed frame / exact refresh ��·
+### 38. UI controller 拆分后，静态合同要跟着切到新的 owner 文件
+- 像 transport workbench 这种大面板拆到 `toolbar/*_controller.js` 之后，旧测试如果还盯 `toolbar.js` 的实现细节，会把正确的 owner 迁移误报成回归。
+- 更稳的做法是把 facade 合同继续钉在 `toolbar.js`，把内部文案、manifest/runtime 读取、面板事件绑定这些 owner 合同切到新的 controller 文件。
 - ��� terrain ��� physicalBase �����ֻ�ӻ��ƺ�������ͬ���ӽ� RENDER_PASS_NAMES��signature����ɫʧЧ��context layer invalidation �� settle �� exact refresh���ͻ����һ����¡�һ�����þɻ���ļ��޸���
 ### 38. ��Ҫ�����ᾲĬʧЧ�� fallback��������ʽ����Ҳ��Ҫ��װ����
 - physical ���� fallback ������Դ�ļ�����Ϊ��ʱ�������� fallback ֻ������������Ρ����ȵ�������ֱ�ӱ�¶ȱʧ״̬��������Ӿ��˻����гɵ������⡣

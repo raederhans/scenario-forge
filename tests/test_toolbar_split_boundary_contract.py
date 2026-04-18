@@ -10,6 +10,7 @@ PALETTE_LIBRARY_PANEL_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "palette_librar
 SCENARIO_GUIDE_POPOVER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "scenario_guide_popover.js"
 SPECIAL_ZONE_EDITOR_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zone_editor.js"
 EXPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_workbench_controller.js"
+TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -27,6 +28,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createScenarioGuidePopoverController", content)
         self.assertIn('./toolbar/export_workbench_controller.js', content)
         self.assertIn("createExportWorkbenchController", content)
+        self.assertIn('./toolbar/transport_workbench_controller.js', content)
+        self.assertIn("createTransportWorkbenchController", content)
 
     def test_export_failure_owner_moves_out_of_toolbar(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -170,6 +173,36 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("data.exportWorkbenchUi = normalizeExportWorkbenchUiState(data.exportWorkbenchUi);", file_manager)
         self.assertIn("state.exportWorkbenchUi = normalizeExportWorkbenchUiState({", interaction_funnel)
         self.assertIn("...(data.exportWorkbenchUi.visibility || data.exportWorkbenchUi.layerVisibility || {})", interaction_funnel)
+
+    def test_transport_workbench_owner_moves_to_controller_module(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createTransportWorkbenchController", owner_content)
+        self.assertIn("const renderTransportWorkbenchUi = () => {", owner_content)
+        self.assertIn("const bindTransportWorkbenchEvents = () => {", owner_content)
+        self.assertIn("const initializeTransportWorkbenchRuntime = () => {", owner_content)
+        self.assertIn("const openTransportWorkbench = (trigger = null) => {", owner_content)
+        self.assertIn("const closeTransportWorkbench = ({ restoreFocus = true } = {}) => {", owner_content)
+        self.assertNotIn("function normalizeTransportWorkbenchFamily", toolbar_content)
+        self.assertNotIn("function normalizeTransportWorkbenchInspectorTab", toolbar_content)
+        self.assertNotIn("function normalizeRoadTransportWorkbenchConfig", toolbar_content)
+        self.assertNotIn("function ensureTransportWorkbenchUiState", toolbar_content)
+
+    def test_toolbar_keeps_transport_workbench_facade_and_surface_coordination_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("state.openTransportWorkbenchFn = (trigger = null) => {", content)
+        self.assertIn("return openTransportWorkbench(trigger);", content)
+        self.assertIn("state.closeTransportWorkbenchFn = ({ restoreFocus = true } = {}) => {", content)
+        self.assertIn("return closeTransportWorkbench({ restoreFocus });", content)
+        self.assertIn("state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;", content)
+        self.assertIn("initializeTransportWorkbenchRuntime();", content)
+        self.assertIn("state.ui?.restoredSupportSurfaceViewFromUrl === view", content)
+        self.assertIn('["guide", "reference", "export"].includes(view)', content)
+        self.assertIn("document.body.classList.contains(\"left-drawer-open\")", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
+        self.assertIn("state.closeDockPopoverFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
+        self.assertIn("state.closeExportWorkbenchFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

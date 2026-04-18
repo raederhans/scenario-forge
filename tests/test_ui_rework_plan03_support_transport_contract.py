@@ -47,10 +47,11 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
             self.assertIn(token, content)
 
     def test_toolbar_drops_legacy_transport_info_renderer_and_uses_new_copy(self):
-        content = (REPO_ROOT / "js" / "ui" / "toolbar.js").read_text(encoding="utf-8")
-        self.assertNotIn("renderTransportWorkbenchInfoPopoverLegacy", content)
-        self.assertIn("transportWorkbenchCompareStatus.textContent", content)
-        self.assertIn('transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} inspector`;', content)
+        toolbar_content = (REPO_ROOT / "js" / "ui" / "toolbar.js").read_text(encoding="utf-8")
+        controller_content = (REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js").read_text(encoding="utf-8")
+        self.assertNotIn("renderTransportWorkbenchInfoPopoverLegacy", toolbar_content)
+        self.assertIn("transportWorkbenchCompareStatus.textContent", controller_content)
+        self.assertIn('transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} inspector`;', controller_content)
 
 
 if __name__ == "__main__":

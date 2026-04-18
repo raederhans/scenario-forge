@@ -7,6 +7,7 @@ VARIANT_HELPER_JS = REPO_ROOT / "js" / "ui" / "transport_workbench_manifest_vari
 PORT_PREVIEW_JS = REPO_ROOT / "js" / "ui" / "transport_workbench_port_preview.js"
 INDUSTRIAL_PREVIEW_JS = REPO_ROOT / "js" / "ui" / "transport_workbench_industrial_zone_preview.js"
 TOOLBAR_JS = REPO_ROOT / "js" / "ui" / "toolbar.js"
+TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js"
 
 
 class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
@@ -40,16 +41,18 @@ class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
         self.assertNotIn("default_distribution_variant", content)
 
     def test_toolbar_no_longer_reads_legacy_transport_variant_fields(self) -> None:
-        content = TOOLBAR_JS.read_text(encoding="utf-8")
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        controller_content = TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
 
-        self.assertIn('./transport_workbench_manifest_variants.js', content)
-        self.assertIn("listTransportWorkbenchManifestVariantEntries", content)
-        self.assertIn("getTransportWorkbenchManifestDefaultVariantId", content)
-        self.assertIn("getTransportWorkbenchManifestVariantMeta", content)
-        self.assertNotIn("coverage_variants", content)
-        self.assertNotIn("distribution_variants", content)
-        self.assertNotIn("default_coverage_tier", content)
-        self.assertNotIn("default_distribution_variant", content)
+        self.assertIn('./toolbar/transport_workbench_controller.js', toolbar_content)
+        self.assertIn('../transport_workbench_manifest_variants.js', controller_content)
+        self.assertIn("listTransportWorkbenchManifestVariantEntries", controller_content)
+        self.assertIn("getTransportWorkbenchManifestDefaultVariantId", controller_content)
+        self.assertIn("getTransportWorkbenchManifestVariantMeta", controller_content)
+        self.assertNotIn("coverage_variants", controller_content)
+        self.assertNotIn("distribution_variants", controller_content)
+        self.assertNotIn("default_coverage_tier", controller_content)
+        self.assertNotIn("default_distribution_variant", controller_content)
 
 
 if __name__ == "__main__":
