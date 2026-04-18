@@ -13,6 +13,7 @@ EXPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_w
 TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js"
 WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "workspace_chrome_support_surface_controller.js"
 APPEARANCE_CONTROLS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "appearance_controls_controller.js"
+OCEAN_LAKE_CONTROLS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "ocean_lake_controls_controller.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -36,6 +37,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createWorkspaceChromeSupportSurfaceController", content)
         self.assertIn('./toolbar/appearance_controls_controller.js', content)
         self.assertIn("createAppearanceControlsController", content)
+        self.assertIn('./toolbar/ocean_lake_controls_controller.js', content)
+        self.assertIn("createOceanLakeControlsController", content)
 
     def test_export_failure_owner_moves_out_of_toolbar(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -290,6 +293,51 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("renderAppearanceStyleControlsUi();", content)
         self.assertIn("specialZoneEditorController.renderSpecialZoneEditorUI();", content)
         self.assertIn("state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;", content)
+
+    def test_appearance_controller_owns_reference_overlay_logic(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("const renderReferenceOverlayUi = () => {", owner_content)
+        self.assertIn("referenceImageInput.addEventListener(\"change\", (event) => {", owner_content)
+        self.assertIn("markDirty(\"reference-image-file\");", owner_content)
+        self.assertIn("markDirty(\"reference-offset-y\");", owner_content)
+        self.assertNotIn("const applyReferenceStyles = () => {", toolbar_content)
+        self.assertNotIn("referenceImageInput.addEventListener(\"change\", (event) => {", toolbar_content)
+
+    def test_toolbar_keeps_reference_refresh_facade_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("renderReferenceOverlayUi();", content)
+        self.assertIn("state.updateToolbarInputsFn = () => {", content)
+
+    def test_ocean_lake_controller_owns_water_appearance_logic(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = OCEAN_LAKE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createOceanLakeControlsController", owner_content)
+        self.assertIn("const beginLakeHistoryCapture = () => {", owner_content)
+        self.assertIn("const commitLakeHistory = (kind = \"lake-style\") => {", owner_content)
+        self.assertIn("const renderOceanLakeControlsUi = () => {", owner_content)
+        self.assertIn("const renderOceanCoastalAccentUi = () => {", owner_content)
+        self.assertIn("const applyAutoFillOceanColor = () => {", owner_content)
+        self.assertIn("const bindOceanVisualInput = (element, onInput, onChange = null) => {", owner_content)
+        self.assertNotIn("let lakeHistoryBefore = null;", toolbar_content)
+        self.assertNotIn("const beginLakeHistoryCapture = () => {", toolbar_content)
+        self.assertNotIn("const commitLakeHistory = (kind = \"lake-style\") => {", toolbar_content)
+        self.assertNotIn("const bindOceanVisualInput = (element, onInput, onChange = null) => {", toolbar_content)
+
+    def test_toolbar_keeps_ocean_lake_facade_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("bindEvents: bindOceanLakeControlEvents,", content)
+        self.assertIn("renderOceanCoastalAccentUi,", content)
+        self.assertIn("renderOceanLakeControlsUi,", content)
+        self.assertIn("applyAutoFillOceanColor,", content)
+        self.assertIn("renderOceanCoastalAccentUi();", content)
+        self.assertIn("renderOceanLakeControlsUi();", content)
+        self.assertIn("bindOceanLakeControlEvents();", content)
+        self.assertIn("const nextOceanFill = applyAutoFillOceanColor();", content)
 
     def test_workspace_chrome_support_surface_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")

@@ -148,10 +148,16 @@
   - Wave 2 已继续推进：新增 `js/ui/toolbar/appearance_controls_controller.js`，先把 appearance shell 的 tab/filter、transport appearance、recent colors、parent border country list 从 `toolbar.js` 下沉成独立 controller。
   - Wave 2 已继续推进：把 `texture / dayNight` 的 state 归一、history、UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
   - Wave 2 已继续推进：把 `city / urban / physical / rivers` 的 state 归一、UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
+  - Wave 2 已继续推进：把 `reference overlay` 的 UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/ocean_lake_controls_controller.js`，把 ocean / lake 的 visual invalidation、bathymetry preset UI、lake history、render 和事件绑定从 `toolbar.js` 下沉成独立 controller。
   - `toolbar.js` 继续保留 appearance facade：仍负责 `state.updateTransportAppearanceUIFn / updateRecentUI / updateParentBorderCountryListFn` 注册，以及 `updateToolbarInputsFn`、special zone popover 外壳和主初始化编排。
   - `toolbar.js` 继续保留 texture/dayNight facade：仍负责 `state.updateTextureUIFn` 注册，以及 `state.updateToolbarInputsFn` 里的总刷新编排。
   - `toolbar.js` 继续保留 city/urban/physical facade：仍负责 `renderSpecialZoneEditorUI` 这层 host wrapper、`state.updateSpecialZoneEditorUIFn` 注册，以及 special zone editor 和 appearance owner 的组合编排。
+  - `toolbar.js` 继续保留 reference 刷新 facade：仍通过 `state.updateToolbarInputsFn` 触发 `renderReferenceOverlayUi()`，project import / startup / scenario 回填链保持原样。
+  - `toolbar.js` 继续保留 water facade：仍负责 `refreshWorkspaceStatus()` 里的 coastal accent 刷新、`state.updateToolbarInputsFn` 里的 water 总刷新，以及 auto-fill 工作流里的 ocean color handoff。
   - `tests/test_toolbar_split_boundary_contract.py` 与 `tests/test_transport_facility_interactions_contract.py` 已同步切到新的 appearance owner 文件，transport appearance 的 filtered count、primary color、facility info card visibility 合同继续受保护。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 texture/dayNight owner 与 facade 断言，继续钉住 `state.updateTextureUIFn` 和 `state.updateToolbarInputsFn` 的合同。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 city/urban/physical/rivers owner 与 facade 断言，继续钉住 `state.updateSpecialZoneEditorUIFn` 的 host contract。
-  - 已重新验证 123 条静态边界 / UI contract tests 全绿。
+  - `tests/test_toolbar_split_boundary_contract.py` 已补 reference overlay owner 与 facade 断言，继续钉住 `state.updateToolbarInputsFn` 的 reference 刷新链。
+  - `tests/test_toolbar_split_boundary_contract.py` 已补 ocean/lake owner 与 facade 断言，继续钉住 water controller 的 history、refresh 和 auto-fill handoff 合同。
+  - 已重新验证 127 条静态边界 / UI contract tests 全绿。

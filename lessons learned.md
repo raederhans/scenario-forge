@@ -891,3 +891,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 104. 当一个独立 editor 仍然嵌在大面板里时，toolbar 继续保留 host wrapper 最稳
 - 这次 `city/urban/physical/rivers` 下沉后，`special_zone_editor` 仍然要和 appearance 面板一起刷新。直接让两个 controller 互相知道对方会把边界重新搅混。
 - 更稳的最短路径是：让 owner controller 只管自己的字段和事件，`toolbar.js` 保留一层 `renderSpecialZoneEditorUI` host wrapper，把 appearance owner、special zone owner、updateToolUI 串起来。
+
+### 105. UI owner 下沉时，微型 history helper 要和事件绑定一起迁走
+- 这次 lake controls 的真实风险点是 `beginLakeHistoryCapture()` / `commitLakeHistory()` 只有调用点，没有实现；静态 syntax 和大部分 boundary test 都能过，真实交互一触发就会炸。
+- 更稳的最短路径是：凡是 event handler 里用到的 `before/after` history helper、style path 列表、pending state 变量，都和绑定逻辑同波次迁到 owner controller，并补一条 owner/facade 边界测试钉住它。

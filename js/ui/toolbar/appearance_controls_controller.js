@@ -26,6 +26,7 @@ export function createAppearanceControlsController({
   state,
   t,
   clamp,
+  markDirty,
   renderDirty,
   ensureActiveScenarioOptionalLayerLoaded,
   normalizeOceanFillColor,
@@ -176,6 +177,11 @@ export function createAppearanceControlsController({
   const riversOutlineColor = document.getElementById("riversOutlineColor");
   const riversOutlineWidth = document.getElementById("riversOutlineWidth");
   const riversDashStyle = document.getElementById("riversDashStyle");
+  const referenceImageInput = document.getElementById("referenceImageInput");
+  const referenceOpacity = document.getElementById("referenceOpacity");
+  const referenceScale = document.getElementById("referenceScale");
+  const referenceOffsetX = document.getElementById("referenceOffsetX");
+  const referenceOffsetY = document.getElementById("referenceOffsetY");
   const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
   const cityPointsMarkerDensityValue = document.getElementById("cityPointsMarkerDensityValue");
   const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
@@ -199,6 +205,10 @@ export function createAppearanceControlsController({
   const riversOpacityValue = document.getElementById("riversOpacityValue");
   const riversWidthValue = document.getElementById("riversWidthValue");
   const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
+  const referenceOpacityValue = document.getElementById("referenceOpacityValue");
+  const referenceScaleValue = document.getElementById("referenceScaleValue");
+  const referenceOffsetXValue = document.getElementById("referenceOffsetXValue");
+  const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
   const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
@@ -877,6 +887,24 @@ export function createAppearanceControlsController({
     if (riversOutlineWidth) riversOutlineWidth.value = String(Number(state.styleConfig.rivers.outlineWidth).toFixed(2));
     if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
     if (riversDashStyle) riversDashStyle.value = state.styleConfig.rivers.dashStyle;
+  };
+
+  const renderReferenceOverlayUi = () => {
+    if (referenceOpacity) referenceOpacity.value = String(Math.round(state.referenceImageState.opacity * 100));
+    if (referenceOpacityValue) referenceOpacityValue.textContent = `${Math.round(state.referenceImageState.opacity * 100)}%`;
+    if (referenceScale) referenceScale.value = String(Number(state.referenceImageState.scale).toFixed(2));
+    if (referenceScaleValue) referenceScaleValue.textContent = `${Number(state.referenceImageState.scale).toFixed(2)}x`;
+    if (referenceOffsetX) referenceOffsetX.value = String(Math.round(state.referenceImageState.offsetX));
+    if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${Math.round(state.referenceImageState.offsetX)}px`;
+    if (referenceOffsetY) referenceOffsetY.value = String(Math.round(state.referenceImageState.offsetY));
+    if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${Math.round(state.referenceImageState.offsetY)}px`;
+    const referenceImage = document.getElementById("referenceImage");
+    if (referenceImage) {
+      referenceImage.style.opacity = String(state.referenceImageState.opacity);
+      referenceImage.style.transform =
+        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
+        + `scale(${state.referenceImageState.scale})`;
+    }
   };
 
   const getTransportAppearanceConfig = () => {
@@ -2281,12 +2309,96 @@ export function createAppearanceControlsController({
       });
       riversDashStyle.dataset.bound = "true";
     }
+
+    const applyReferenceStyles = () => {
+      const referenceImage = document.getElementById("referenceImage");
+      if (!referenceImage) return;
+      referenceImage.style.opacity = String(state.referenceImageState.opacity);
+      referenceImage.style.transform =
+        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
+        + `scale(${state.referenceImageState.scale})`;
+    };
+
+    if (referenceImageInput && referenceImageInput.dataset.bound !== "true") {
+      referenceImageInput.addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        const referenceImage = document.getElementById("referenceImage");
+        if (!referenceImage) return;
+        if (!file) {
+          if (state.referenceImageUrl) {
+            URL.revokeObjectURL(state.referenceImageUrl);
+            state.referenceImageUrl = null;
+          }
+          referenceImage.src = "";
+          referenceImage.style.opacity = "0";
+          markDirty("reference-image-clear");
+          return;
+        }
+        if (state.referenceImageUrl) {
+          URL.revokeObjectURL(state.referenceImageUrl);
+        }
+        state.referenceImageUrl = URL.createObjectURL(file);
+        referenceImage.src = state.referenceImageUrl;
+        applyReferenceStyles();
+        markDirty("reference-image-file");
+      });
+      referenceImageInput.dataset.bound = "true";
+    }
+    if (referenceOpacity && referenceOpacity.dataset.bound !== "true") {
+      state.referenceImageState.opacity = Number(referenceOpacity.value) / 100;
+      if (referenceOpacityValue) referenceOpacityValue.textContent = `${referenceOpacity.value}%`;
+      referenceOpacity.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.referenceImageState.opacity = Number.isFinite(value) ? value / 100 : 0.6;
+        if (referenceOpacityValue) referenceOpacityValue.textContent = `${event.target.value}%`;
+        applyReferenceStyles();
+        markDirty("reference-opacity");
+      });
+      referenceOpacity.dataset.bound = "true";
+    }
+    if (referenceScale && referenceScale.dataset.bound !== "true") {
+      state.referenceImageState.scale = Number(referenceScale.value);
+      if (referenceScaleValue) referenceScaleValue.textContent = `${Number(referenceScale.value).toFixed(2)}x`;
+      referenceScale.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.referenceImageState.scale = Number.isFinite(value) ? value : 1;
+        if (referenceScaleValue) referenceScaleValue.textContent = `${state.referenceImageState.scale.toFixed(2)}x`;
+        applyReferenceStyles();
+        markDirty("reference-scale");
+      });
+      referenceScale.dataset.bound = "true";
+    }
+    if (referenceOffsetX && referenceOffsetX.dataset.bound !== "true") {
+      state.referenceImageState.offsetX = Number(referenceOffsetX.value);
+      if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${referenceOffsetX.value}px`;
+      referenceOffsetX.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.referenceImageState.offsetX = Number.isFinite(value) ? value : 0;
+        if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${state.referenceImageState.offsetX}px`;
+        applyReferenceStyles();
+        markDirty("reference-offset-x");
+      });
+      referenceOffsetX.dataset.bound = "true";
+    }
+    if (referenceOffsetY && referenceOffsetY.dataset.bound !== "true") {
+      state.referenceImageState.offsetY = Number(referenceOffsetY.value);
+      if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${referenceOffsetY.value}px`;
+      referenceOffsetY.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.referenceImageState.offsetY = Number.isFinite(value) ? value : 0;
+        if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${state.referenceImageState.offsetY}px`;
+        applyReferenceStyles();
+        markDirty("reference-offset-y");
+      });
+      referenceOffsetY.dataset.bound = "true";
+    }
   };
 
   return {
     applyAppearanceFilter,
     bindEvents,
     renderAppearanceStyleControlsUi,
+    renderReferenceOverlayUi,
     renderParentBorderCountryList,
     renderRecentColors,
     renderDayNightUI,

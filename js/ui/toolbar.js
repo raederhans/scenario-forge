@@ -57,6 +57,7 @@ import {
   createExportError,
   showExportFailureToast,
 } from "./toolbar/export_failure_handler.js";
+import { createOceanLakeControlsController } from "./toolbar/ocean_lake_controls_controller.js";
 import {
   EXPORT_BAKE_OUTPUT_MODELS,
   EXPORT_MAIN_LAYER_IDS,
@@ -1498,70 +1499,9 @@ function initToolbar({ render } = {}) {
     markDirty(reason);
     if (render) render();
   };
-  let pendingOceanVisualFrame = 0;
-  let pendingOceanVisualReason = "";
-  const pendingOceanVisualInvalidations = new Map();
-  const flushPendingOceanVisualUpdates = () => {
-    pendingOceanVisualFrame = 0;
-    const queuedInvalidations = Array.from(pendingOceanVisualInvalidations.entries());
-    pendingOceanVisualInvalidations.clear();
-    queuedInvalidations.forEach(([invalidateFn, reason]) => {
-      if (typeof invalidateFn === "function") {
-        invalidateFn(reason);
-      }
-    });
-    if (pendingOceanVisualReason) {
-      renderDirty(pendingOceanVisualReason);
-      pendingOceanVisualReason = "";
-    }
-  };
-  const scheduleOceanVisualUpdate = (invalidateFn, reason) => {
-    if (typeof invalidateFn !== "function") return;
-    pendingOceanVisualInvalidations.set(invalidateFn, reason);
-    pendingOceanVisualReason = String(reason || pendingOceanVisualReason || "ocean-visual");
-    if (pendingOceanVisualFrame) return;
-    pendingOceanVisualFrame = globalThis.requestAnimationFrame(flushPendingOceanVisualUpdates);
-  };
-  const applyOceanVisualUpdateNow = (invalidateFn, reason) => {
-    if (pendingOceanVisualFrame) {
-      globalThis.cancelAnimationFrame(pendingOceanVisualFrame);
-      pendingOceanVisualFrame = 0;
-    }
-    pendingOceanVisualInvalidations.clear();
-    pendingOceanVisualReason = "";
-    if (typeof invalidateFn === "function") {
-      invalidateFn(reason);
-    }
-    renderDirty(reason);
-  };
-  const bindOceanVisualInput = (element, onInput, onChange = null) => {
-    if (!element || element.dataset.bound === "true") return;
-    element.addEventListener("input", (event) => {
-      onInput?.(event, false);
-    });
-    element.addEventListener("change", (event) => {
-      if (typeof onChange === "function") {
-        onChange(event, true);
-        return;
-      }
-      onInput?.(event, true);
-    });
-    element.dataset.bound = "true";
-  };
   const persistCityViewSettings = () => {
     state.persistViewSettingsFn?.();
   };
-  const lakeStylePaths = [
-    "styleConfig.lakes.linkedToOcean",
-    "styleConfig.lakes.fillColor",
-  ];
-  let lakeHistoryBefore = null;
-
-  const syncLakeConfig = () => {
-    state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
-    return state.styleConfig.lakes;
-  };
-
 
   const refreshActiveSovereignLabel = () => {
     const code = String(state.activeSovereignCode || "").trim().toUpperCase();
@@ -1629,50 +1569,6 @@ function initToolbar({ render } = {}) {
       return candidate;
     }
     return "flat";
-  };
-  const getOceanPresetHint = (preset) => {
-    const normalizedPreset = normalizeOceanPreset(preset);
-    if (normalizedPreset === "bathymetry_soft") {
-      return t("Bathymetry Soft emphasizes depth bands while keeping contours subtle.", "ui");
-    }
-    if (normalizedPreset === "bathymetry_contours") {
-      return t("Bathymetry Contours emphasizes contour lines while bands stay in the background.", "ui");
-    }
-    return t("Flat Blue keeps the ocean fill clean with no bathymetry overlay.", "ui");
-  };
-  const syncOceanPresetControlValues = () => {
-    if (oceanStyleSelect) {
-      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
-    }
-    if (oceanTextureOpacity) {
-      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100));
-    }
-    if (oceanTextureOpacityValue) {
-      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100)}%`;
-    }
-    if (oceanTextureScale) {
-      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
-    }
-    if (oceanTextureScaleValue) {
-      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
-    }
-    if (oceanContourStrength) {
-      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100));
-    }
-    if (oceanContourStrengthValue) {
-      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100)}%`;
-    }
-    if (oceanStylePresetHint) {
-      oceanStylePresetHint.textContent = getOceanPresetHint(state.styleConfig.ocean.preset || "flat");
-    }
-  };
-  const applyBathymetryPresetDefaults = (preset) => {
-    const defaults = getBathymetryPresetStyleDefaults(preset);
-    if (!defaults) return false;
-    state.styleConfig.ocean.opacity = defaults.opacity;
-    state.styleConfig.ocean.scale = defaults.scale;
-    state.styleConfig.ocean.contourStrength = defaults.contourStrength;
-    return true;
   };
   const normalizeOceanFillColor = (value) => {
     const candidate = String(value || "").trim();
@@ -1877,132 +1773,6 @@ function initToolbar({ render } = {}) {
     1000
   );
 
-  if (oceanFillColor) {
-    oceanFillColor.value = state.styleConfig.ocean.fillColor;
-    bindOceanVisualInput(oceanFillColor, (event, commitNow) => {
-      state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
-      renderLakeUi();
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanBackgroundVisualState, "ocean-fill");
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanBackgroundVisualState, "ocean-fill");
-    });
-  }
-
-  const renderLakeUi = () => {
-    const lakeConfig = syncLakeConfig();
-    const resolvedLakeColor = lakeConfig.linkedToOcean
-      ? normalizeOceanFillColor(state.styleConfig.ocean.fillColor)
-      : normalizeOceanFillColor(lakeConfig.fillColor || state.styleConfig.ocean.fillColor);
-    if (lakeLinkToOcean) {
-      lakeLinkToOcean.checked = lakeConfig.linkedToOcean;
-    }
-    if (lakeFillColor) {
-      lakeFillColor.value = resolvedLakeColor;
-      lakeFillColor.disabled = lakeConfig.linkedToOcean;
-      lakeFillColor.title = lakeConfig.linkedToOcean
-        ? t("Linked to the current ocean fill color.", "ui")
-        : "";
-    }
-  };
-
-  const oceanAdvancedStylesEnabled = () => state.styleConfig.ocean.experimentalAdvancedStyles === true;
-  const isTno1962Scenario = () => String(state.activeScenarioId || "").trim().toLowerCase() === "tno_1962";
-
-  const renderOceanAdvancedStylesUi = () => {
-    const enabled = oceanAdvancedStylesEnabled();
-    const selectDisabledTitle = t("Enable Experimental Bathymetry to unlock data-driven depth presets.", "ui");
-    const sliderDisabledTitle = t("Available when Experimental Bathymetry is enabled.", "ui");
-    if (!enabled && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
-      state.styleConfig.ocean.preset = "flat";
-    }
-    if (oceanAdvancedStylesToggle) {
-      oceanAdvancedStylesToggle.checked = enabled;
-    }
-    if (oceanStyleSelect) {
-      Array.from(oceanStyleSelect.options).forEach((option) => {
-        if (OCEAN_ADVANCED_PRESETS.has(option.value)) {
-          option.disabled = !enabled;
-        }
-      });
-      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
-      oceanStyleSelect.title = enabled ? "" : selectDisabledTitle;
-    }
-    [
-      oceanTextureOpacity,
-      oceanTextureScale,
-      oceanContourStrength,
-      oceanShallowFadeEndZoom,
-      oceanMidFadeEndZoom,
-      oceanDeepFadeEndZoom,
-      oceanScenarioSyntheticContourFadeEndZoom,
-      oceanScenarioShallowContourFadeEndZoom,
-    ].forEach((control) => {
-      if (!control) return;
-      control.disabled = !enabled;
-      control.title = enabled ? "" : sliderDisabledTitle;
-    });
-    if (oceanBathymetryDebugDetails) {
-      oceanBathymetryDebugDetails.classList.toggle("opacity-60", !enabled);
-    }
-  };
-  const renderOceanCoastalAccentUi = () => {
-    const visible = isTno1962Scenario();
-    if (oceanCoastalAccentRow) {
-      oceanCoastalAccentRow.classList.toggle("hidden", !visible);
-    }
-    if (oceanCoastalAccentToggle) {
-      oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
-      oceanCoastalAccentToggle.disabled = !visible;
-      oceanCoastalAccentToggle.title = visible ? "" : t("Available only in the TNO 1962 scenario.", "ui");
-    }
-  };
-  const renderOceanBathymetryDebugUi = () => {
-    const syncZoomSlider = (input, valueEl, value, min, max) => {
-      if (input) {
-        input.value = String(Math.round(clamp(value, min, max) * 100));
-      }
-      if (valueEl) {
-        valueEl.textContent = `${clamp(value, min, max).toFixed(2)}x`;
-      }
-    };
-    syncZoomSlider(oceanShallowFadeEndZoom, oceanShallowFadeEndZoomValue, state.styleConfig.ocean.shallowBandFadeEndZoom || 2.8, 2.1, 4.8);
-    syncZoomSlider(oceanMidFadeEndZoom, oceanMidFadeEndZoomValue, state.styleConfig.ocean.midBandFadeEndZoom || 3.4, 2.7, 5.2);
-    syncZoomSlider(oceanDeepFadeEndZoom, oceanDeepFadeEndZoomValue, state.styleConfig.ocean.deepBandFadeEndZoom || 4.2, 3.3, 6);
-    syncZoomSlider(
-      oceanScenarioSyntheticContourFadeEndZoom,
-      oceanScenarioSyntheticContourFadeEndZoomValue,
-      state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom || 3.0,
-      2.1,
-      4.6
-    );
-    syncZoomSlider(
-      oceanScenarioShallowContourFadeEndZoom,
-      oceanScenarioShallowContourFadeEndZoomValue,
-      state.styleConfig.ocean.scenarioShallowContourFadeEndZoom || 3.4,
-      2.5,
-      5
-    );
-    if (oceanStylePresetHint) {
-      oceanStylePresetHint.textContent = getOceanPresetHint(state.styleConfig.ocean.preset || "flat");
-    }
-    if (oceanBathymetrySourceValue) {
-      const bathymetrySourceLabel = String(state.activeBathymetrySource || "").trim();
-      oceanBathymetrySourceValue.textContent = bathymetrySourceLabel || t("None", "ui");
-    }
-    if (oceanBathymetryBandsValue) {
-      oceanBathymetryBandsValue.textContent = String(state.activeBathymetryBandsData?.features?.length || 0);
-    }
-    if (oceanBathymetryContoursValue) {
-      oceanBathymetryContoursValue.textContent = String(state.activeBathymetryContoursData?.features?.length || 0);
-    }
-  };
-  renderLakeUi();
-  renderOceanAdvancedStylesUi();
-  renderOceanCoastalAccentUi();
-  renderOceanBathymetryDebugUi();
-
   const paletteLibraryPanelController = createPaletteLibraryPanelController({
     themeSelect,
     paletteLibraryToggle,
@@ -2026,16 +1796,6 @@ function initToolbar({ render } = {}) {
   state.updatePaletteSourceUIFn = syncPaletteSourceControls;
   state.renderPaletteFn = renderPalette;
 
-  function applyAutoFillOceanColor() {
-    const oceanMeta = state.activePaletteOceanMeta || state.activePalettePack?.ocean || null;
-    const nextFillColor = normalizeOceanFillColor(
-      oceanMeta?.apply_on_autofill ? oceanMeta?.fill_color : "#aadaff"
-    );
-    if (oceanFillColor) {
-      oceanFillColor.value = nextFillColor;
-    }
-    return nextFillColor;
-  }
   state.updatePaletteLibraryUIFn = renderPaletteLibrary;
 
   function renderSpecialZoneEditorUI() {
@@ -2101,6 +1861,7 @@ function initToolbar({ render } = {}) {
     state,
     t,
     clamp,
+    markDirty,
     renderDirty,
     ensureActiveScenarioOptionalLayerLoaded,
     normalizeOceanFillColor,
@@ -2114,6 +1875,7 @@ function initToolbar({ render } = {}) {
     renderDayNightUI,
     renderParentBorderCountryList,
     renderRecentColors,
+    renderReferenceOverlayUi,
     renderTextureUI,
     renderTransportAppearanceUi,
     setAppearanceTab,
@@ -2126,6 +1888,56 @@ function initToolbar({ render } = {}) {
     renderPaletteLibrary();
   };
   state.updateParentBorderCountryListFn = renderParentBorderCountryList;
+
+  const oceanLakeControlsController = createOceanLakeControlsController({
+    state,
+    t,
+    clamp,
+    renderDirty,
+    normalizeOceanFillColor,
+    normalizeOceanPreset,
+    advancedPresets: OCEAN_ADVANCED_PRESETS,
+    getBathymetryPresetStyleDefaults,
+    invalidateOceanBackgroundVisualState,
+    invalidateOceanCoastalAccentVisualState,
+    invalidateOceanVisualState,
+    invalidateOceanWaterInteractionVisualState,
+    oceanFillColor,
+    lakeLinkToOcean,
+    lakeFillColor,
+    oceanCoastalAccentRow,
+    oceanCoastalAccentToggle,
+    oceanAdvancedStylesToggle,
+    oceanStyleSelect,
+    oceanStylePresetHint,
+    oceanTextureOpacity,
+    oceanTextureScale,
+    oceanContourStrength,
+    oceanBathymetryDebugDetails,
+    oceanBathymetrySourceValue,
+    oceanBathymetryBandsValue,
+    oceanBathymetryContoursValue,
+    oceanShallowFadeEndZoom,
+    oceanMidFadeEndZoom,
+    oceanDeepFadeEndZoom,
+    oceanScenarioSyntheticContourFadeEndZoom,
+    oceanScenarioShallowContourFadeEndZoom,
+    oceanTextureOpacityValue,
+    oceanTextureScaleValue,
+    oceanContourStrengthValue,
+    oceanShallowFadeEndZoomValue,
+    oceanMidFadeEndZoomValue,
+    oceanDeepFadeEndZoomValue,
+    oceanScenarioSyntheticContourFadeEndZoomValue,
+    oceanScenarioShallowContourFadeEndZoomValue,
+  });
+  const {
+    applyAutoFillOceanColor,
+    bindEvents: bindOceanLakeControlEvents,
+    renderOceanCoastalAccentUi,
+    renderOceanLakeControlsUi,
+  } = oceanLakeControlsController;
+  renderOceanLakeControlsUi();
 
   const specialZoneEditorController = createSpecialZoneEditorController({
     state,
@@ -2367,53 +2179,14 @@ function initToolbar({ render } = {}) {
       coastlineWidthValue.textContent = Number(state.styleConfig.coastlines.width).toFixed(1);
     }
     syncParentBorderVisibilityUI();
-    if (oceanFillColor) {
-      oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
-    }
-    if (oceanStyleSelect) {
-      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
-    }
-    syncOceanPresetControlValues();
-    renderOceanAdvancedStylesUi();
-    renderOceanCoastalAccentUi();
-    renderOceanBathymetryDebugUi();
-    renderLakeUi();
+    renderOceanLakeControlsUi();
     if (colorModeSelect) {
       colorModeSelect.value = state.colorMode || "political";
     }
     if (themeSelect) {
       themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
     }
-    if (referenceOpacity) {
-      referenceOpacity.value = String(Math.round(state.referenceImageState.opacity * 100));
-    }
-    if (referenceOpacityValue) {
-      referenceOpacityValue.textContent = `${Math.round(state.referenceImageState.opacity * 100)}%`;
-    }
-    if (referenceScale) {
-      referenceScale.value = String(Number(state.referenceImageState.scale).toFixed(2));
-    }
-    if (referenceScaleValue) {
-      referenceScaleValue.textContent = `${Number(state.referenceImageState.scale).toFixed(2)}x`;
-    }
-    if (referenceOffsetX) {
-      referenceOffsetX.value = String(Math.round(state.referenceImageState.offsetX));
-    }
-    if (referenceOffsetXValue) {
-      referenceOffsetXValue.textContent = `${Math.round(state.referenceImageState.offsetX)}px`;
-    }
-    if (referenceOffsetY) {
-      referenceOffsetY.value = String(Math.round(state.referenceImageState.offsetY));
-    }
-    if (referenceOffsetYValue) {
-      referenceOffsetYValue.textContent = `${Math.round(state.referenceImageState.offsetY)}px`;
-    }
-    if (referenceImage) {
-      referenceImage.style.opacity = String(state.referenceImageState.opacity);
-      referenceImage.style.transform =
-        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
-        + `scale(${state.referenceImageState.scale})`;
-    }
+    renderReferenceOverlayUi();
     syncExportWorkbenchControlsFromState();
     renderTextureUI();
     renderDayNightUI();
@@ -3234,6 +3007,7 @@ function initToolbar({ render } = {}) {
   }
 
   bindAppearanceControlEvents();
+  bindOceanLakeControlEvents();
   specialZoneEditorController.bindSpecialZoneEditorEvents();
 
   if (presetPolitical) {
@@ -3583,299 +3357,6 @@ function initToolbar({ render } = {}) {
       });
       renderParentBorderCountryList();
       renderDirty("parent-border-disable-all");
-    });
-  }
-
-  if (oceanStyleSelect) {
-    renderOceanAdvancedStylesUi();
-    oceanStyleSelect.addEventListener("change", (event) => {
-      const nextPreset = normalizeOceanPreset(event.target.value);
-      if (!oceanAdvancedStylesEnabled() && OCEAN_ADVANCED_PRESETS.has(nextPreset)) {
-        state.styleConfig.ocean.preset = "flat";
-        event.target.value = "flat";
-      } else {
-        state.styleConfig.ocean.preset = nextPreset;
-        applyBathymetryPresetDefaults(nextPreset);
-      }
-      syncOceanPresetControlValues();
-      renderOceanBathymetryDebugUi();
-      applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-style");
-    });
-  }
-
-  if (oceanTextureOpacity) {
-    const initial = Math.round((state.styleConfig.ocean.opacity || 0.72) * 100);
-    oceanTextureOpacity.value = String(clamp(initial, 0, 100));
-    if (oceanTextureOpacityValue) {
-      oceanTextureOpacityValue.textContent = `${oceanTextureOpacity.value}%`;
-    }
-    bindOceanVisualInput(oceanTextureOpacity, (event, commitNow) => {
-      const value = Number(event.target.value);
-      state.styleConfig.ocean.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1);
-      if (oceanTextureOpacityValue) {
-        oceanTextureOpacityValue.textContent = `${event.target.value}%`;
-      }
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-opacity");
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-opacity");
-    });
-  }
-
-  if (oceanTextureScale) {
-    const initial = state.styleConfig.ocean.scale || 1;
-    oceanTextureScale.value = String(Math.round(clamp(initial, 0.6, 2.4) * 100));
-    if (oceanTextureScaleValue) {
-      oceanTextureScaleValue.textContent = `${(Number(oceanTextureScale.value) / 100).toFixed(2)}x`;
-    }
-    bindOceanVisualInput(oceanTextureScale, (event, commitNow) => {
-      const value = Number(event.target.value);
-      state.styleConfig.ocean.scale = clamp(Number.isFinite(value) ? value / 100 : 1, 0.6, 2.4);
-      if (oceanTextureScaleValue) {
-        oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
-      }
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-scale");
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-scale");
-    });
-  }
-
-  if (oceanContourStrength) {
-    const initial = Math.round((state.styleConfig.ocean.contourStrength || 0.75) * 100);
-    oceanContourStrength.value = String(clamp(initial, 0, 100));
-    if (oceanContourStrengthValue) {
-      oceanContourStrengthValue.textContent = `${oceanContourStrength.value}%`;
-    }
-    bindOceanVisualInput(oceanContourStrength, (event, commitNow) => {
-      const value = Number(event.target.value);
-      state.styleConfig.ocean.contourStrength = clamp(Number.isFinite(value) ? value / 100 : 0.75, 0, 1);
-      if (oceanContourStrengthValue) {
-        oceanContourStrengthValue.textContent = `${event.target.value}%`;
-      }
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-contour");
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-contour");
-    });
-  }
-
-  if (oceanAdvancedStylesToggle && !oceanAdvancedStylesToggle.dataset.bound) {
-    oceanAdvancedStylesToggle.checked = oceanAdvancedStylesEnabled();
-    oceanAdvancedStylesToggle.addEventListener("change", (event) => {
-      state.styleConfig.ocean.experimentalAdvancedStyles = !!event.target.checked;
-      if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
-        state.styleConfig.ocean.preset = "flat";
-      }
-      syncOceanPresetControlValues();
-      renderOceanAdvancedStylesUi();
-      renderOceanBathymetryDebugUi();
-      applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-experimental-advanced-styles");
-    });
-    oceanAdvancedStylesToggle.dataset.bound = "true";
-  }
-
-  if (oceanCoastalAccentToggle && !oceanCoastalAccentToggle.dataset.bound) {
-    oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
-    oceanCoastalAccentToggle.addEventListener("change", (event) => {
-      state.styleConfig.ocean.coastalAccentEnabled = !!event.target.checked;
-      applyOceanVisualUpdateNow(invalidateOceanCoastalAccentVisualState, "ocean-coastal-accent");
-    });
-    oceanCoastalAccentToggle.dataset.bound = "true";
-  }
-
-  const bindOceanZoomDebugInput = (element, valueEl, stateKey, min, max, reason) => {
-    if (!element) return;
-    element.value = String(Math.round(clamp(Number(state.styleConfig.ocean[stateKey]) || min, min, max) * 100));
-    if (valueEl) {
-      valueEl.textContent = `${(Number(element.value) / 100).toFixed(2)}x`;
-    }
-    bindOceanVisualInput(element, (event, commitNow) => {
-      const nextValue = clamp(Number(event.target.value) / 100, min, max);
-      state.styleConfig.ocean[stateKey] = nextValue;
-      if (valueEl) {
-        valueEl.textContent = `${nextValue.toFixed(2)}x`;
-      }
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanVisualState, reason);
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanVisualState, reason);
-    });
-  };
-
-  bindOceanZoomDebugInput(
-    oceanShallowFadeEndZoom,
-    oceanShallowFadeEndZoomValue,
-    "shallowBandFadeEndZoom",
-    2.1,
-    4.8,
-    "ocean-shallow-band-fade"
-  );
-  bindOceanZoomDebugInput(
-    oceanMidFadeEndZoom,
-    oceanMidFadeEndZoomValue,
-    "midBandFadeEndZoom",
-    2.7,
-    5.2,
-    "ocean-mid-band-fade"
-  );
-  bindOceanZoomDebugInput(
-    oceanDeepFadeEndZoom,
-    oceanDeepFadeEndZoomValue,
-    "deepBandFadeEndZoom",
-    3.3,
-    6,
-    "ocean-deep-band-fade"
-  );
-  bindOceanZoomDebugInput(
-    oceanScenarioSyntheticContourFadeEndZoom,
-    oceanScenarioSyntheticContourFadeEndZoomValue,
-    "scenarioSyntheticContourFadeEndZoom",
-    2.1,
-    4.6,
-    "ocean-scenario-synthetic-contour-fade"
-  );
-  bindOceanZoomDebugInput(
-    oceanScenarioShallowContourFadeEndZoom,
-    oceanScenarioShallowContourFadeEndZoomValue,
-    "scenarioShallowContourFadeEndZoom",
-    2.5,
-    5,
-    "ocean-scenario-shallow-contour-fade"
-  );
-
-  if (lakeLinkToOcean && !lakeLinkToOcean.dataset.bound) {
-    lakeLinkToOcean.checked = !!syncLakeConfig().linkedToOcean;
-    lakeLinkToOcean.addEventListener("change", (event) => {
-      beginLakeHistoryCapture();
-      const lakeConfig = syncLakeConfig();
-      lakeConfig.linkedToOcean = !!event.target.checked;
-      renderLakeUi();
-      applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "lake-link");
-      commitLakeHistory("lake-link");
-    });
-    lakeLinkToOcean.dataset.bound = "true";
-  }
-
-  if (lakeFillColor && !lakeFillColor.dataset.bound) {
-    bindOceanVisualInput(lakeFillColor, (event, commitNow) => {
-      const lakeConfig = syncLakeConfig();
-      if (lakeConfig.linkedToOcean) {
-        renderLakeUi();
-        return;
-      }
-      beginLakeHistoryCapture();
-      lakeConfig.fillColor = normalizeOceanFillColor(event.target.value);
-      renderLakeUi();
-      if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "lake-fill");
-        return;
-      }
-      scheduleOceanVisualUpdate(invalidateOceanWaterInteractionVisualState, "lake-fill");
-    }, () => {
-      const lakeConfig = syncLakeConfig();
-      if (lakeConfig.linkedToOcean) return;
-      commitLakeHistory("lake-fill");
-      applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "lake-fill");
-    });
-  }
-
-  const referenceImage = document.getElementById("referenceImage");
-  const applyReferenceStyles = () => {
-    if (!referenceImage) return;
-    referenceImage.style.opacity = String(state.referenceImageState.opacity);
-    referenceImage.style.transform = `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) scale(${state.referenceImageState.scale})`;
-  };
-
-  if (referenceImageInput) {
-    referenceImageInput.addEventListener("change", (event) => {
-      const file = event.target.files?.[0];
-      if (!referenceImage) return;
-      if (!file) {
-        if (state.referenceImageUrl) {
-          URL.revokeObjectURL(state.referenceImageUrl);
-          state.referenceImageUrl = null;
-        }
-        referenceImage.src = "";
-        referenceImage.style.opacity = "0";
-        markDirty("reference-image-clear");
-        return;
-      }
-      if (state.referenceImageUrl) {
-        URL.revokeObjectURL(state.referenceImageUrl);
-      }
-      state.referenceImageUrl = URL.createObjectURL(file);
-      referenceImage.src = state.referenceImageUrl;
-      applyReferenceStyles();
-      markDirty("reference-image-file");
-    });
-  }
-
-  if (referenceOpacity) {
-    state.referenceImageState.opacity = Number(referenceOpacity.value) / 100;
-    if (referenceOpacityValue) {
-      referenceOpacityValue.textContent = `${referenceOpacity.value}%`;
-    }
-    referenceOpacity.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.referenceImageState.opacity = Number.isFinite(value) ? value / 100 : 0.6;
-      if (referenceOpacityValue) {
-        referenceOpacityValue.textContent = `${event.target.value}%`;
-      }
-      applyReferenceStyles();
-      markDirty("reference-opacity");
-    });
-  }
-
-  if (referenceScale) {
-    state.referenceImageState.scale = Number(referenceScale.value);
-    if (referenceScaleValue) {
-      referenceScaleValue.textContent = `${Number(referenceScale.value).toFixed(2)}x`;
-    }
-    referenceScale.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.referenceImageState.scale = Number.isFinite(value) ? value : 1;
-      if (referenceScaleValue) {
-        referenceScaleValue.textContent = `${state.referenceImageState.scale.toFixed(2)}x`;
-      }
-      applyReferenceStyles();
-      markDirty("reference-scale");
-    });
-  }
-
-  if (referenceOffsetX) {
-    state.referenceImageState.offsetX = Number(referenceOffsetX.value);
-    if (referenceOffsetXValue) {
-      referenceOffsetXValue.textContent = `${referenceOffsetX.value}px`;
-    }
-    referenceOffsetX.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.referenceImageState.offsetX = Number.isFinite(value) ? value : 0;
-      if (referenceOffsetXValue) {
-        referenceOffsetXValue.textContent = `${state.referenceImageState.offsetX}px`;
-      }
-      applyReferenceStyles();
-      markDirty("reference-offset-x");
-    });
-  }
-
-  if (referenceOffsetY) {
-    state.referenceImageState.offsetY = Number(referenceOffsetY.value);
-    if (referenceOffsetYValue) {
-      referenceOffsetYValue.textContent = `${referenceOffsetY.value}px`;
-    }
-    referenceOffsetY.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.referenceImageState.offsetY = Number.isFinite(value) ? value : 0;
-      if (referenceOffsetYValue) {
-        referenceOffsetYValue.textContent = `${state.referenceImageState.offsetY}px`;
-      }
-      applyReferenceStyles();
-      markDirty("reference-offset-y");
     });
   }
 
