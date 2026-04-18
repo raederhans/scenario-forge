@@ -81,6 +81,7 @@ import { createPaletteLibraryPanelController } from "./toolbar/palette_library_p
 import { createScenarioGuidePopoverController } from "./toolbar/scenario_guide_popover.js";
 import { createSpecialZoneEditorController } from "./toolbar/special_zone_editor.js";
 import { createTransportWorkbenchController } from "./toolbar/transport_workbench_controller.js";
+import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
 
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
@@ -1188,42 +1189,6 @@ function initToolbar({ render } = {}) {
   const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => (
     restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger)
   );
-  const isFocusableGuideTriggerVisible = (element) => {
-    if (!(element instanceof HTMLElement)) return false;
-    if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
-    const style = globalThis.getComputedStyle ? globalThis.getComputedStyle(element) : null;
-    if (style && (style.display === "none" || style.visibility === "hidden")) return false;
-    const rect = element.getBoundingClientRect();
-    if (!rect.width || !rect.height) return false;
-    return rect.right > 0
-      && rect.bottom > 0
-      && rect.left < (globalThis.innerWidth || 0)
-      && rect.top < (globalThis.innerHeight || 0);
-  };
-  const getGuideFocusReturnTrigger = (preferredTrigger = null) => {
-    if (isFocusableGuideTriggerVisible(preferredTrigger)) return preferredTrigger;
-    if (isFocusableGuideTriggerVisible(utilitiesGuideBtn)) return utilitiesGuideBtn;
-    if (isFocusableGuideTriggerVisible(scenarioGuideBtn)) return scenarioGuideBtn;
-    return preferredTrigger || utilitiesGuideBtn || scenarioGuideBtn || null;
-  };
-  const replaceUiUrlParams = (mutator) => {
-    if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    mutator?.(params);
-    const nextQuery = params.toString();
-    const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
-    globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
-  };
-  const syncSupportSurfaceUrlState = (view = "") => {
-    replaceUiUrlParams((params) => {
-      if (view) {
-        params.set(UI_URL_STATE_KEYS.view, view);
-      } else if (["guide", "reference", "export"].includes(String(params.get(UI_URL_STATE_KEYS.view) || ""))) {
-        params.delete(UI_URL_STATE_KEYS.view);
-      }
-    });
-  };
-
   const getExportBakeVisibilitySignature = (exportUi) => {
     const main = EXPORT_MAIN_LAYER_IDS
       .map((layerId) => `${layerId}:${exportUi?.visibility?.[layerId] === false ? "0" : "1"}`)
@@ -1294,6 +1259,122 @@ function initToolbar({ render } = {}) {
     openTransportWorkbench,
     renderTransportWorkbenchUi,
   } = transportWorkbenchController;
+
+  const workspaceChromeSupportSurfaceController = createWorkspaceChromeSupportSurfaceController({
+    state,
+    uiUrlStateKeys: UI_URL_STATE_KEYS,
+    scenarioGuideBtn,
+    utilitiesGuideBtn,
+    scenarioGuidePopover,
+    scenarioGuideBackdrop,
+    openScenarioGuideSurface,
+    closeScenarioGuideSurface,
+    dockReferenceBtn,
+    dockEditPopoverBtn,
+    dockQuickFillBtn,
+    dockReferencePopover,
+    dockEditPopover,
+    dockQuickFillRow,
+    exportWorkbenchOverlay,
+    exportWorkbenchPanel,
+    dockExportBtn,
+    exportProjectSection,
+    inspectorUtilitiesSection,
+    inspectorSidebarTabProject,
+    appearanceSpecialZoneBtn,
+    specialZonePopover,
+    isSpecialZoneInline: () => specialZoneEditorInline,
+    closeSpecialZonePopover: () => closeSpecialZonePopover(),
+    closeTransportWorkbenchInfoPopover,
+    closeTransportWorkbenchSectionHelpPopover,
+    transportWorkbenchInfoPopover,
+    transportWorkbenchInfoBtn,
+    transportWorkbenchSectionHelpPopover,
+    rememberOverlayTrigger,
+    restoreOverlayTriggerFocus,
+    focusOverlaySurface,
+    getFocusableElements,
+    ensureTransportWorkbenchUiState,
+    ensureRightPanelVisible: () => state.toggleRightPanelFn?.(true),
+    openExportWorkbench: (trigger = dockExportBtn) => state.openExportWorkbenchFn?.(trigger),
+    closeExportWorkbench: ({ restoreFocus = true } = {}) => state.closeExportWorkbenchFn?.({ restoreFocus }),
+  });
+  const {
+    bindDockPopoverDismiss,
+    closeDockPopover,
+    closeScenarioGuidePopover,
+    openDockPopover,
+    restoreSupportSurfaceFromUrl,
+    syncSupportSurfaceUrlState,
+    toggleScenarioGuidePopover,
+  } = workspaceChromeSupportSurfaceController;
+  state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;
+  state.closeDockPopoverFn = closeDockPopover;
+
+  const syncPanelToggleButtons = () => {
+    leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
+    rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
+  };
+
+  const toggleLeftPanel = (force) => {
+    if (state.transportWorkbenchUi?.open && force !== false) {
+      return false;
+    }
+    closeDockPopover();
+    const next = typeof force === "boolean" ? force : !document.body.classList.contains("left-drawer-open");
+    document.body.classList.toggle("left-drawer-open", next);
+    document.body.classList.toggle("right-drawer-open", false);
+    syncPanelToggleButtons();
+    refreshScenarioContextBar();
+    return next;
+  };
+
+  const toggleRightPanel = (force) => {
+    if (state.transportWorkbenchUi?.open && force !== false) {
+      return false;
+    }
+    closeDockPopover();
+    const next = typeof force === "boolean" ? force : !document.body.classList.contains("right-drawer-open");
+    document.body.classList.toggle("right-drawer-open", next);
+    document.body.classList.toggle("left-drawer-open", false);
+    syncPanelToggleButtons();
+    refreshScenarioContextBar();
+    return next;
+  };
+
+  const toggleDock = (force) => {
+    state.ui.dockCollapsed = typeof force === "boolean" ? force : !state.ui.dockCollapsed;
+    if (state.ui.dockCollapsed) {
+      closeDockPopover();
+    }
+    updateDockCollapsedUi();
+    return state.ui.dockCollapsed;
+  };
+
+  state.toggleLeftPanelFn = toggleLeftPanel;
+  state.toggleRightPanelFn = toggleRightPanel;
+  state.toggleDockFn = toggleDock;
+  state.syncDeveloperModeUiFn = syncDeveloperModeUi;
+  state.toggleDeveloperModeFn = () => {
+    const shouldOpen = !state.ui.developerMode;
+    if (shouldOpen) {
+      setDeveloperMode(true);
+      if (typeof state.setDevWorkspaceExpandedFn === "function") {
+        state.setDevWorkspaceExpandedFn(true);
+      } else if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
+        devWorkspaceToggleBtn.click();
+      }
+      return true;
+    }
+
+    if (typeof state.setDevWorkspaceExpandedFn === "function") {
+      state.setDevWorkspaceExpandedFn(false);
+    } else if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
+      devWorkspaceToggleBtn.click();
+    }
+    setDeveloperMode(false);
+    return false;
+  };
 
   const syncExportPreviewSourceOptions = () => {
     return exportWorkbenchController?.syncExportPreviewSourceOptions();
@@ -1626,94 +1707,6 @@ function initToolbar({ render } = {}) {
     focusOverlaySurface(specialZonePopover);
   };
 
-  const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
-    if (!scenarioGuidePopover) return;
-    closeScenarioGuideSurface({
-      restoreFocus,
-      restoreOverlayTriggerFocus,
-    });
-    if (syncUrl) {
-      syncSupportSurfaceUrlState("");
-    }
-  };
-
-  const ensureProjectSupportSurface = (sectionKind = "utilities") => {
-    if (!document.body.classList.contains("right-drawer-open")) {
-      toggleRightPanel(true);
-    }
-    inspectorSidebarTabProject?.click();
-    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute("aria-selected") !== "true") {
-      const inspectorSidebarPanel = document.getElementById("inspectorSidebarPanel");
-      const projectSidebarPanel = document.getElementById("projectSidebarPanel");
-      const inspectorSidebarTabInspector = document.getElementById("inspectorSidebarTabInspector");
-      inspectorSidebarTabProject.classList.add("is-active");
-      inspectorSidebarTabProject.setAttribute("aria-selected", "true");
-      inspectorSidebarTabInspector?.classList.remove("is-active");
-      inspectorSidebarTabInspector?.setAttribute("aria-selected", "false");
-      projectSidebarPanel?.classList.add("is-active");
-      if (projectSidebarPanel instanceof HTMLElement) projectSidebarPanel.hidden = false;
-      inspectorSidebarPanel?.classList.remove("is-active");
-      if (inspectorSidebarPanel instanceof HTMLElement) inspectorSidebarPanel.hidden = true;
-    }
-    if (sectionKind === "export" && exportProjectSection instanceof HTMLDetailsElement) {
-      exportProjectSection.open = true;
-    }
-    if (sectionKind !== "export" && inspectorUtilitiesSection instanceof HTMLDetailsElement) {
-      inspectorUtilitiesSection.open = true;
-    }
-  };
-
-  const restoreSupportSurfaceFromUrl = () => {
-    if (!globalThis.URLSearchParams || !globalThis.location) return;
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
-    if (!["guide", "reference", "export"].includes(view)) return;
-    ensureTransportWorkbenchUiState();
-    if (state.ui?.restoredSupportSurfaceViewFromUrl === view) {
-      return;
-    }
-    if (view === "guide") {
-      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-        state.ui.restoredSupportSurfaceViewFromUrl = view;
-        return;
-      }
-      toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
-      return;
-    }
-    if (view === "export") {
-      ensureProjectSupportSurface("export");
-      const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
-      state.openExportWorkbenchFn?.(exportTrigger);
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
-      return;
-    }
-    ensureProjectSupportSurface("utilities");
-    const targetPopover = getDockPopoverByKind(view);
-    if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
-      return;
-    }
-    openDockPopover(view);
-    state.ui.restoredSupportSurfaceViewFromUrl = view;
-  };
-  state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;
-
-  const toggleScenarioGuidePopover = (trigger = scenarioGuideBtn) => {
-    if (!scenarioGuidePopover) return;
-    const willOpen = scenarioGuidePopover.classList.contains("hidden");
-    if (!willOpen) {
-      closeScenarioGuidePopover({ restoreFocus: true });
-      return;
-    }
-    closeDockPopover({ restoreFocus: false, syncUrl: false });
-    state.closeExportWorkbenchFn?.({ restoreFocus: false });
-    closeSpecialZonePopover();
-    rememberOverlayTrigger(scenarioGuidePopover, trigger);
-    openScenarioGuideSurface({ focusOverlaySurface });
-    syncSupportSurfaceUrlState("guide");
-  };
-
   const getScenarioOverlayLeftInset = () => (
     globalThis.innerWidth <= 767 ? SCENARIO_BAR_MOBILE_LEFT_OFFSET : SCENARIO_BAR_LEFT_OFFSET
   );
@@ -1871,248 +1864,6 @@ function initToolbar({ render } = {}) {
         : "Fill",
     "ui"
   );
-
-  const getDockPopoverByKind = (kind) => {
-    if (kind === "reference") return dockReferencePopover;
-    if (kind === "edit") return dockEditPopover;
-    if (kind === "quickfill") return dockQuickFillRow;
-    return null;
-  };
-  const getDockPopoverTrigger = (kind) => {
-    if (kind === "reference") return dockReferenceBtn;
-    if (kind === "edit") return dockEditPopoverBtn;
-    if (kind === "quickfill") return dockQuickFillBtn;
-    return null;
-  };
-
-  const SUPPORT_DOCK_POPOVER_KINDS = new Set(["reference"]);
-  const isSupportDockPopoverKind = (kind) => SUPPORT_DOCK_POPOVER_KINDS.has(String(kind || ""));
-
-  const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
-    const activeKind = String(state.activeDockPopover || "");
-    const activePopover = getDockPopoverByKind(activeKind);
-    const activeTrigger = getDockPopoverTrigger(activeKind);
-    state.activeDockPopover = "";
-    dockReferencePopover?.classList.add("hidden");
-    dockEditPopover?.classList.add("hidden");
-    dockQuickFillRow?.classList.add("hidden");
-    dockReferencePopover?.setAttribute("aria-hidden", "true");
-    dockEditPopover?.setAttribute("aria-hidden", "true");
-    dockQuickFillRow?.setAttribute("aria-hidden", "true");
-    dockReferenceBtn?.classList.remove("is-active");
-    dockEditPopoverBtn?.classList.remove("is-active");
-    dockQuickFillBtn?.classList.remove("is-active");
-    dockReferenceBtn?.setAttribute("aria-expanded", "false");
-    dockEditPopoverBtn?.setAttribute("aria-expanded", "false");
-    dockQuickFillBtn?.setAttribute("aria-expanded", "false");
-    if (restoreFocus && activePopover) {
-      restoreOverlayTriggerFocus(activePopover, activeTrigger);
-    }
-    if (syncUrl && isSupportDockPopoverKind(activeKind)) {
-      syncSupportSurfaceUrlState("");
-    }
-  };
-  state.closeDockPopoverFn = closeDockPopover;
-
-  const syncPanelToggleButtons = () => {
-    leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
-    rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
-  };
-
-  const toggleLeftPanel = (force) => {
-    if (state.transportWorkbenchUi?.open && force !== false) {
-      return false;
-    }
-    closeDockPopover();
-    const next = typeof force === "boolean" ? force : !document.body.classList.contains("left-drawer-open");
-    document.body.classList.toggle("left-drawer-open", next);
-    document.body.classList.toggle("right-drawer-open", false);
-    syncPanelToggleButtons();
-    refreshScenarioContextBar();
-    return next;
-  };
-
-  const toggleRightPanel = (force) => {
-    if (state.transportWorkbenchUi?.open && force !== false) {
-      return false;
-    }
-    closeDockPopover();
-    const next = typeof force === "boolean" ? force : !document.body.classList.contains("right-drawer-open");
-    document.body.classList.toggle("right-drawer-open", next);
-    document.body.classList.toggle("left-drawer-open", false);
-    syncPanelToggleButtons();
-    refreshScenarioContextBar();
-    return next;
-  };
-
-  const toggleDock = (force) => {
-    state.ui.dockCollapsed = typeof force === "boolean" ? force : !state.ui.dockCollapsed;
-    if (state.ui.dockCollapsed) {
-      closeDockPopover();
-    }
-    updateDockCollapsedUi();
-    return state.ui.dockCollapsed;
-  };
-
-  state.toggleLeftPanelFn = toggleLeftPanel;
-  state.toggleRightPanelFn = toggleRightPanel;
-  state.toggleDockFn = toggleDock;
-  state.syncDeveloperModeUiFn = syncDeveloperModeUi;
-  state.toggleDeveloperModeFn = () => {
-    const shouldOpen = !state.ui.developerMode;
-    if (shouldOpen) {
-      setDeveloperMode(true);
-      if (typeof state.setDevWorkspaceExpandedFn === "function") {
-        state.setDevWorkspaceExpandedFn(true);
-      } else if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
-        devWorkspaceToggleBtn.click();
-      }
-      return true;
-    }
-
-    if (typeof state.setDevWorkspaceExpandedFn === "function") {
-      state.setDevWorkspaceExpandedFn(false);
-    } else if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
-      devWorkspaceToggleBtn.click();
-    }
-    setDeveloperMode(false);
-    return false;
-  };
-
-  const openDockPopover = (kind) => {
-    const target = getDockPopoverByKind(kind);
-    const trigger = getDockPopoverTrigger(kind);
-    if (!target) return;
-    const nextKind = state.activeDockPopover === kind ? "" : kind;
-    closeDockPopover();
-    if (!nextKind) return;
-    if (isSupportDockPopoverKind(nextKind) && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-      closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
-    }
-    state.closeExportWorkbenchFn?.({ restoreFocus: false });
-    state.activeDockPopover = nextKind;
-    rememberOverlayTrigger(target, trigger);
-    target.classList.remove("hidden");
-    target.setAttribute("aria-hidden", "false");
-    trigger?.classList.add("is-active");
-    trigger?.setAttribute("aria-expanded", "true");
-    if (isSupportDockPopoverKind(nextKind)) {
-      syncSupportSurfaceUrlState(nextKind);
-    }
-    focusOverlaySurface(target);
-  };
-
-  const bindDockPopoverDismiss = () => {
-    if (dockPopoverCloseBound) return;
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const insideDockPopover = target.closest(
-        "#dockReferencePopover, #dockEditPopover, #dockQuickFillRow, #dockReferenceBtn, #dockEditPopoverBtn, #dockQuickFillBtn"
-      );
-      if (state.activeDockPopover && !insideDockPopover) {
-        closeDockPopover();
-      }
-      const insideSpecialZone = target.closest("#specialZonePopover, #appearanceSpecialZoneBtn");
-      if (!specialZoneEditorInline && specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
-        closeSpecialZonePopover();
-      }
-      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn, #utilitiesGuideBtn, #scenarioGuideBackdrop");
-      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && !insideScenarioGuide) {
-        closeScenarioGuidePopover();
-      }
-      const insideTransportWorkbenchInfo = target.closest("#transportWorkbenchInfoPopover, #transportWorkbenchInfoBtn");
-      if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden") && !insideTransportWorkbenchInfo) {
-        closeTransportWorkbenchInfoPopover();
-      }
-      const insideTransportWorkbenchSectionHelp = target.closest("#transportWorkbenchSectionHelpPopover, .transport-workbench-section-help-btn");
-      if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden") && !insideTransportWorkbenchSectionHelp) {
-        closeTransportWorkbenchSectionHelpPopover();
-      }
-      if (
-        exportWorkbenchOverlay
-        && exportWorkbenchPanel
-        && !exportWorkbenchOverlay.classList.contains("hidden")
-        && target === exportWorkbenchOverlay
-      ) {
-        state.closeExportWorkbenchFn?.({ restoreFocus: true });
-      }
-    });
-    document.addEventListener("keydown", (event) => {
-      if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
-        const focusables = getFocusableElements(exportWorkbenchPanel);
-        if (!focusables.length) {
-          event.preventDefault();
-          focusOverlaySurface(exportWorkbenchPanel);
-          return;
-        }
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        const active = document.activeElement;
-        if (event.shiftKey && active === first) {
-          event.preventDefault();
-          last.focus({ preventScroll: true });
-          return;
-        }
-        if (!event.shiftKey && active === last) {
-          event.preventDefault();
-          first.focus({ preventScroll: true });
-          return;
-        }
-      }
-      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && event.key === "Tab") {
-        const focusables = getFocusableElements(scenarioGuidePopover);
-        if (!focusables.length) {
-          event.preventDefault();
-          focusOverlaySurface(scenarioGuidePopover);
-          return;
-        }
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        const active = document.activeElement;
-        if (event.shiftKey && active === first) {
-          event.preventDefault();
-          last.focus({ preventScroll: true });
-          return;
-        }
-        if (!event.shiftKey && active === last) {
-          event.preventDefault();
-          first.focus({ preventScroll: true });
-          return;
-        }
-      }
-      if (event.key === "Escape") {
-        let closedOverlay = false;
-        if (state.activeDockPopover) {
-          closeDockPopover({ restoreFocus: true });
-          closedOverlay = true;
-        }
-        if (!specialZoneEditorInline) {
-          if (specialZonePopover && !specialZonePopover.classList.contains("hidden")) {
-            closeSpecialZonePopover();
-            restoreOverlayTriggerFocus(specialZonePopover, appearanceSpecialZoneBtn);
-            closedOverlay = true;
-          }
-        }
-        if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-          closeScenarioGuidePopover({ restoreFocus: true });
-          closedOverlay = true;
-        }
-        if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden")) {
-          state.closeExportWorkbenchFn?.({ restoreFocus: true });
-          closedOverlay = true;
-        }
-        if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
-          closeTransportWorkbenchInfoPopover({ restoreFocus: true });
-          closedOverlay = true;
-        }
-        if (closedOverlay) {
-          event.preventDefault();
-        }
-      }
-    });
-    dockPopoverCloseBound = true;
-  };
 
   const setToolCursorClass = () => {
     if (!mapContainer) return;

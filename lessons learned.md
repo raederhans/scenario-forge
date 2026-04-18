@@ -221,6 +221,12 @@
 ### 38. UI controller 拆分后，静态合同要跟着切到新的 owner 文件
 - 像 transport workbench 这种大面板拆到 `toolbar/*_controller.js` 之后，旧测试如果还盯 `toolbar.js` 的实现细节，会把正确的 owner 迁移误报成回归。
 - 更稳的做法是把 facade 合同继续钉在 `toolbar.js`，把内部文案、manifest/runtime 读取、面板事件绑定这些 owner 合同切到新的 controller 文件。
+### 39. support surface 这类壳层协调要单独成 owner，别和具体面板实现搅在一起
+- guide、dock reference、URL restore、outside click、Escape 关闭链属于同一层 workspace chrome 协调，和 export/transport/special zone 的面板内部实现是两层职责。
+- 更稳的拆法是：面板内部逻辑进各自 controller，support surface 壳层再单独进 `workspace_chrome_support_surface_controller.js`，测试也分成 facade 合同和 owner 合同两层。
+### 40. facade 还在运行链上时，拆 owner 不能顺手带走 facade
+- `toggleLeftPanel`、`toggleRightPanel`、`toggleDock`、`syncPanelToggleButtons`、`state.toggle*` 这类函数如果还被 shortcuts、restore 链、其他 controller 直接调用，就属于 `toolbar.js` 的运行态 facade。
+- 更稳的拆法是：owner 逻辑下沉，新旧 facade 继续留在 `toolbar.js`，等所有调用方一起迁完再决定是否收口。
 - ��� terrain ��� physicalBase �����ֻ�ӻ��ƺ�������ͬ���ӽ� RENDER_PASS_NAMES��signature����ɫʧЧ��context layer invalidation �� settle �� exact refresh���ͻ����һ����¡�һ�����þɻ���ļ��޸���
 ### 38. ��Ҫ�����ᾲĬʧЧ�� fallback��������ʽ����Ҳ��Ҫ��װ����
 - physical ���� fallback ������Դ�ļ�����Ϊ��ʱ�������� fallback ֻ������������Ρ����ȵ�������ֱ�ӱ�¶ȱʧ״̬��������Ӿ��˻����гɵ������⡣
@@ -873,3 +879,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 101. export workbench 这类大面板要先抽 controller，再保留 toolbar 的 overlay facade
 - 这次 `export_workbench_controller.js` 最稳的切法是：新模块接管 `exportWorkbenchUi` 归一、layer/text list、preview、bake/export 动作和 workbench 内部事件绑定，`toolbar.js` 继续保留 `setExportWorkbenchState()`、URL handoff、focus return 和与 guide/dock/transport 的互斥协调。
 - 更稳的最短路径是：先把面板内部闭环整块收进 controller，再让 toolbar 只负责 support surface 的壳层协调；这样既能明显减小 donor 文件，又能保住 `view=export` 恢复链和 overlay 互斥合同。
+
+### 102. 抽离闭环 UI controller 时，owner 的 schema/default/state helper 要整块同迁
+- 这次 `transport_workbench_controller.js` 拆出后，`ROAD_CLASS_OPTIONS`、`TRANSPORT_WORKBENCH_CONTROL_SCHEMAS`、`ensureTransportWorkbenchUiState()` 这一整块 owner 代码留在 donor 外面，结果 `createTransportWorkbenchController()` 在构造期就直接 `ReferenceError`。
+- 更稳的最短路径是：先按“模块自己是否直接引用”收口 top-level 常量、默认配置、normalizer 和 state initializer，再做 facade wiring；拆完后至少跑一次 owner-file 的自由变量检查和构造期 smoke。

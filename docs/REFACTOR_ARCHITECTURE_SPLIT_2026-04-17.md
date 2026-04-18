@@ -27,9 +27,9 @@
 - [x] `scenario_manager.js` 收成事务协调器，仅保留 apply/reset/clear/view-mode 与状态文案
 
 ### Wave 2: 按工作台拆 UI 控制器
-- [ ] `toolbar.js` -> `transport_workbench_controller.js`
-- [ ] `toolbar.js` -> `workspace_chrome_support_surface_controller.js`
-- [ ] `toolbar.js` -> `export_workbench_controller.js`
+- [x] `toolbar.js` -> `transport_workbench_controller.js`
+- [x] `toolbar.js` -> `workspace_chrome_support_surface_controller.js`
+- [x] `toolbar.js` -> `export_workbench_controller.js`
 - [ ] `toolbar.js` -> `appearance_controls_controller.js`
 - [ ] `sidebar.js` -> `country_inspector_controller.js`
 - [ ] `sidebar.js` -> `strategic_overlay_controller.js`
@@ -137,10 +137,12 @@
   - Wave 2 已继续推进：新增 `js/ui/toolbar/special_zone_editor.js`，把 special zone 的 state 归一、面板渲染和 editor 自己的事件绑定下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/toolbar/export_workbench_controller.js`，把 export workbench 的状态归一、layer/text list 渲染、preview、bake/export 动作和 workbench 内部事件绑定下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/toolbar/transport_workbench_controller.js`，把 transport workbench 的状态归一、内部渲染、preview 联动、manifest/runtime 读取和面板内部事件绑定下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/workspace_chrome_support_surface_controller.js`，把 guide / dock support surface / URL restore / 全局 dismiss 这层外壳协调从 `toolbar.js` 下沉成独立 controller。
+  - 已修复一轮 review 暴露的 facade 回归：`syncPanelToggleButtons`、`toggleLeftPanel`、`toggleRightPanel`、`toggleDock`、`state.toggle*` 与 `state.syncDeveloperModeUiFn` 继续保留在 `toolbar.js`，support-surface split 只下沉 owner 逻辑，不动这些运行链 facade。
   - `toolbar.js` 继续保留 facade：仍负责 `state.updatePaletteSourceUIFn / state.updatePaletteLibraryUIFn / state.renderPaletteFn` 注册，以及 `renderPalette()` 与主初始化编排。
   - `toolbar.js` 继续保留 scenario guide 的 facade：仍负责跨面板仲裁、URL restore、shared dismiss 与总入口 `toggleScenarioGuidePopover / closeScenarioGuidePopover`。
   - `toolbar.js` 继续保留 special zone 的 facade：仍负责 popover 打开关闭、全局 dismiss 和跨 overlay 的互斥仲裁。
   - `toolbar.js` 继续保留 export workbench 的 facade：仍负责 overlay open/close、focus return、URL restore、以及与 dock/guide/transport 的互斥协调。
   - `toolbar.js` 继续保留 transport workbench 的 facade：仍负责 `state.openTransportWorkbenchFn / closeTransportWorkbenchFn / refreshTransportWorkbenchUiFn` 注册，以及 support surface 总体协调。
-  - 新增 `tests/test_toolbar_split_boundary_contract.py` 的 transport owner/facade 断言，并把 transport manifest/runtime 合同测试切到新的 owner 文件。
-  - 已重新验证 115 条静态边界 / UI contract tests 全绿。
+  - 新增 `tests/test_toolbar_split_boundary_contract.py` 的 transport / support-surface owner/facade 断言，并把 transport manifest/runtime、support surface URL 合同测试切到新的 owner 文件。
+  - 已重新验证 117 条静态边界 / UI contract tests 全绿。

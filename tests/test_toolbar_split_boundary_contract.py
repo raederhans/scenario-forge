@@ -11,6 +11,7 @@ SCENARIO_GUIDE_POPOVER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "scenario_guid
 SPECIAL_ZONE_EDITOR_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zone_editor.js"
 EXPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_workbench_controller.js"
 TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js"
+WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "workspace_chrome_support_surface_controller.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -30,6 +31,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createExportWorkbenchController", content)
         self.assertIn('./toolbar/transport_workbench_controller.js', content)
         self.assertIn("createTransportWorkbenchController", content)
+        self.assertIn('./toolbar/workspace_chrome_support_surface_controller.js', content)
+        self.assertIn("createWorkspaceChromeSupportSurfaceController", content)
 
     def test_export_failure_owner_moves_out_of_toolbar(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -122,9 +125,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
 
     def test_toolbar_keeps_scenario_guide_facade_and_url_restore_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
+        support_owner = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
 
         self.assertIn("state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;", content)
-        self.assertIn('syncSupportSurfaceUrlState("guide")', content)
+        self.assertIn('syncSupportSurfaceUrlState("guide")', support_owner)
         self.assertIn("bindScenarioGuideEvents({", content)
         self.assertIn("toggleScenarioGuidePopover(trigger);", content)
         self.assertIn('closeScenarioGuidePopover({ restoreFocus: true });', content)
@@ -191,6 +195,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
 
     def test_toolbar_keeps_transport_workbench_facade_and_surface_coordination_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
+        support_owner = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
 
         self.assertIn("state.openTransportWorkbenchFn = (trigger = null) => {", content)
         self.assertIn("return openTransportWorkbench(trigger);", content)
@@ -198,11 +203,37 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("return closeTransportWorkbench({ restoreFocus });", content)
         self.assertIn("state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;", content)
         self.assertIn("initializeTransportWorkbenchRuntime();", content)
-        self.assertIn("state.ui?.restoredSupportSurfaceViewFromUrl === view", content)
-        self.assertIn('["guide", "reference", "export"].includes(view)', content)
+        self.assertIn("state.ui?.restoredSupportSurfaceViewFromUrl === view", support_owner)
+        self.assertIn('["guide", "reference", "export"].includes(view)', support_owner)
         self.assertIn("document.body.classList.contains(\"left-drawer-open\")", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
         self.assertIn("state.closeDockPopoverFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
         self.assertIn("state.closeExportWorkbenchFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
+
+    def test_workspace_chrome_support_surface_owner_moves_to_controller_module(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createWorkspaceChromeSupportSurfaceController", owner_content)
+        self.assertIn("const syncSupportSurfaceUrlState = (view = \"\") => {", owner_content)
+        self.assertIn("const restoreSupportSurfaceFromUrl = () => {", owner_content)
+        self.assertIn("const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {", owner_content)
+        self.assertIn("const openDockPopover = (kind) => {", owner_content)
+        self.assertIn("const bindDockPopoverDismiss = () => {", owner_content)
+        self.assertNotIn("const syncSupportSurfaceUrlState = (view = \"\") => {", toolbar_content)
+        self.assertNotIn("const restoreSupportSurfaceFromUrl = () => {", toolbar_content)
+        self.assertNotIn("const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {", toolbar_content)
+        self.assertNotIn("const openDockPopover = (kind) => {", toolbar_content)
+        self.assertNotIn("const bindDockPopoverDismiss = () => {", toolbar_content)
+
+    def test_toolbar_keeps_support_surface_facade_and_registration_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;", content)
+        self.assertIn("state.closeDockPopoverFn = closeDockPopover;", content)
+        self.assertIn("bindDockPopoverDismiss();", content)
+        self.assertIn("restoreSupportSurfaceFromUrl();", content)
+        self.assertIn("bindScenarioGuideEvents({", content)
+        self.assertIn("toggleScenarioGuidePopover(trigger);", content)
 
 
 if __name__ == "__main__":

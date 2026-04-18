@@ -45,9 +45,10 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
 
     def test_toolbar_and_sidebar_write_url_contract_keys(self):
         toolbar = (REPO_ROOT / "js" / "ui" / "toolbar.js").read_text(encoding="utf-8")
+        support_surface = (REPO_ROOT / "js" / "ui" / "toolbar" / "workspace_chrome_support_surface_controller.js").read_text(encoding="utf-8")
         sidebar = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
         self.assertIn("syncSupportSurfaceUrlState", toolbar)
-        self.assertIn("UI_URL_STATE_KEYS.view", toolbar)
+        self.assertIn("uiUrlStateKeys.view", support_surface)
         self.assertIn("syncRightSidebarUrlState", sidebar)
         self.assertIn("UI_URL_STATE_KEYS.scope", sidebar)
         self.assertIn("UI_URL_STATE_KEYS.section", sidebar)
