@@ -883,3 +883,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 102. 抽离闭环 UI controller 时，owner 的 schema/default/state helper 要整块同迁
 - 这次 `transport_workbench_controller.js` 拆出后，`ROAD_CLASS_OPTIONS`、`TRANSPORT_WORKBENCH_CONTROL_SCHEMAS`、`ensureTransportWorkbenchUiState()` 这一整块 owner 代码留在 donor 外面，结果 `createTransportWorkbenchController()` 在构造期就直接 `ReferenceError`。
 - 更稳的最短路径是：先按“模块自己是否直接引用”收口 top-level 常量、默认配置、normalizer 和 state initializer，再做 facade wiring；拆完后至少跑一次 owner-file 的自由变量检查和构造期 smoke。
+
+### 103. UI 面板拆分时，texture 和 dayNight 这种相邻功能也要按真实事务语义分组
+- 这次 texture 和 dayNight 都在 appearance 面板里，看起来很像一组控件，但它们的事务语义不同：texture 有 `input` 预览加 `change` history commit，dayNight 只有实时 renderDirty。
+- 更稳的最短路径是：可以把它们下沉到同一个 owner controller，但要继续保留两套输入语义，不能为了“统一 binder”把 history 行为混平。

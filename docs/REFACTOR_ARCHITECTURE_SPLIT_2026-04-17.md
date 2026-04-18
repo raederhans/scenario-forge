@@ -30,7 +30,7 @@
 - [x] `toolbar.js` -> `transport_workbench_controller.js`
 - [x] `toolbar.js` -> `workspace_chrome_support_surface_controller.js`
 - [x] `toolbar.js` -> `export_workbench_controller.js`
-- [ ] `toolbar.js` -> `appearance_controls_controller.js`
+- [x] `toolbar.js` -> `appearance_controls_controller.js`
 - [ ] `sidebar.js` -> `country_inspector_controller.js`
 - [ ] `sidebar.js` -> `strategic_overlay_controller.js`
 - [ ] `sidebar.js` -> `water_special_region_controller.js`
@@ -145,4 +145,10 @@
   - `toolbar.js` 继续保留 export workbench 的 facade：仍负责 overlay open/close、focus return、URL restore、以及与 dock/guide/transport 的互斥协调。
   - `toolbar.js` 继续保留 transport workbench 的 facade：仍负责 `state.openTransportWorkbenchFn / closeTransportWorkbenchFn / refreshTransportWorkbenchUiFn` 注册，以及 support surface 总体协调。
   - 新增 `tests/test_toolbar_split_boundary_contract.py` 的 transport / support-surface owner/facade 断言，并把 transport manifest/runtime、support surface URL 合同测试切到新的 owner 文件。
-  - 已重新验证 117 条静态边界 / UI contract tests 全绿。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/appearance_controls_controller.js`，先把 appearance shell 的 tab/filter、transport appearance、recent colors、parent border country list 从 `toolbar.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：把 `texture / dayNight` 的 state 归一、history、UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
+  - `toolbar.js` 继续保留 appearance facade：仍负责 `state.updateTransportAppearanceUIFn / updateRecentUI / updateParentBorderCountryListFn` 注册，以及 `updateToolbarInputsFn`、special zone popover 外壳和主初始化编排。
+  - `toolbar.js` 继续保留 texture/dayNight facade：仍负责 `state.updateTextureUIFn` 注册，以及 `state.updateToolbarInputsFn` 里的总刷新编排。
+  - `tests/test_toolbar_split_boundary_contract.py` 与 `tests/test_transport_facility_interactions_contract.py` 已同步切到新的 appearance owner 文件，transport appearance 的 filtered count、primary color、facility info card visibility 合同继续受保护。
+  - `tests/test_toolbar_split_boundary_contract.py` 已补 texture/dayNight owner 与 facade 断言，继续钉住 `state.updateTextureUIFn` 和 `state.updateToolbarInputsFn` 的合同。
+  - 已重新验证 121 条静态边界 / UI contract tests 全绿。

@@ -12,6 +12,7 @@ SPECIAL_ZONE_EDITOR_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zone_edi
 EXPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_workbench_controller.js"
 TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js"
 WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "workspace_chrome_support_surface_controller.js"
+APPEARANCE_CONTROLS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "appearance_controls_controller.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -33,6 +34,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createTransportWorkbenchController", content)
         self.assertIn('./toolbar/workspace_chrome_support_surface_controller.js', content)
         self.assertIn("createWorkspaceChromeSupportSurfaceController", content)
+        self.assertIn('./toolbar/appearance_controls_controller.js', content)
+        self.assertIn("createAppearanceControlsController", content)
 
     def test_export_failure_owner_moves_out_of_toolbar(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -151,12 +154,14 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
 
     def test_toolbar_keeps_special_zone_facade_and_callback_registration(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
+        appearance_owner = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
 
         self.assertIn("state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;", content)
         self.assertIn("specialZoneEditorController.normalizeSpecialZoneEditorState();", content)
         self.assertIn("specialZoneEditorController.bindSpecialZoneEditorEvents();", content)
-        self.assertIn("openSpecialZonePopover();", content)
-        self.assertIn('appearanceSpecialZoneBtn.setAttribute("aria-controls", "specialZonePopover");', content)
+        self.assertIn("const openSpecialZonePopover = () => {", content)
+        self.assertIn("openSpecialZonePopover();", appearance_owner)
+        self.assertIn('appearanceSpecialZoneBtn.setAttribute("aria-controls", "specialZonePopover");', appearance_owner)
 
     def test_special_zone_persistence_contract_stays_stable(self):
         file_manager = FILE_MANAGER_JS.read_text(encoding="utf-8")
@@ -208,6 +213,59 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("document.body.classList.contains(\"left-drawer-open\")", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
         self.assertIn("state.closeDockPopoverFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
         self.assertIn("state.closeExportWorkbenchFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
+
+    def test_appearance_controller_owns_transport_appearance_and_shell_logic(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createAppearanceControlsController", owner_content)
+        self.assertIn("const applyAppearanceFilter = () => {", owner_content)
+        self.assertIn("const setAppearanceTab = (tabId = \"ocean\") => {", owner_content)
+        self.assertIn("const getTransportAppearanceConfig = () => {", owner_content)
+        self.assertIn("const renderTransportAppearanceUi = () => {", owner_content)
+        self.assertIn("const renderRecentColors = () => {", owner_content)
+        self.assertIn("const renderParentBorderCountryList = () => {", owner_content)
+        self.assertIn("const bindEvents = () => {", owner_content)
+        self.assertNotIn("const getTransportAppearanceConfig = () => {", toolbar_content)
+        self.assertNotIn("const applyAppearanceFilter = () => {", toolbar_content)
+        self.assertNotIn("function renderRecentColors()", toolbar_content)
+        self.assertNotIn("function renderParentBorderCountryList()", toolbar_content)
+
+    def test_toolbar_keeps_appearance_facade_and_state_registration_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;", content)
+        self.assertIn("state.updateRecentUI = () => {", content)
+        self.assertIn("state.updateParentBorderCountryListFn = renderParentBorderCountryList;", content)
+        self.assertIn("bindAppearanceControlEvents();", content)
+        self.assertIn("setAppearanceTab(\"ocean\");", content)
+        self.assertIn("applyAppearanceFilter();", content)
+
+    def test_appearance_controller_owns_texture_and_day_night_logic(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("const syncDayNightConfig = () => {", owner_content)
+        self.assertIn("const renderTextureModePanels = (mode = state.styleConfig.texture?.mode || \"none\") => {", owner_content)
+        self.assertIn("const renderTextureUI = () => {", owner_content)
+        self.assertIn("const renderDayNightUI = () => {", owner_content)
+        self.assertIn("const updateTextureStyle = (mutate, { historyKind = \"texture-style\", commitHistory = false } = {}) => {", owner_content)
+        self.assertIn("const bindTextureRange = (element, handler) => {", owner_content)
+        self.assertIn("const bindTextureColorInput = (element, handler) => {", owner_content)
+        self.assertNotIn("const syncDayNightConfig = () => {", toolbar_content)
+        self.assertNotIn("const renderTextureUI = () => {", toolbar_content)
+        self.assertNotIn("const renderDayNightUI = () => {", toolbar_content)
+        self.assertNotIn("const updateTextureStyle = (mutate, { historyKind = \"texture-style\", commitHistory = false } = {}) => {", toolbar_content)
+        self.assertNotIn("const bindTextureRange = (element, handler) => {", toolbar_content)
+        self.assertNotIn("const bindTextureColorInput = (element, handler) => {", toolbar_content)
+
+    def test_toolbar_keeps_texture_facade_and_refresh_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("state.updateTextureUIFn = renderTextureUI;", content)
+        self.assertIn("renderTextureUI();", content)
+        self.assertIn("renderDayNightUI();", content)
+        self.assertIn("state.updateToolbarInputsFn = () => {", content)
 
     def test_workspace_chrome_support_surface_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
