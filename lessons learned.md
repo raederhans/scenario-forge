@@ -887,3 +887,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 103. UI 面板拆分时，texture 和 dayNight 这种相邻功能也要按真实事务语义分组
 - 这次 texture 和 dayNight 都在 appearance 面板里，看起来很像一组控件，但它们的事务语义不同：texture 有 `input` 预览加 `change` history commit，dayNight 只有实时 renderDirty。
 - 更稳的最短路径是：可以把它们下沉到同一个 owner controller，但要继续保留两套输入语义，不能为了“统一 binder”把 history 行为混平。
+
+### 104. 当一个独立 editor 仍然嵌在大面板里时，toolbar 继续保留 host wrapper 最稳
+- 这次 `city/urban/physical/rivers` 下沉后，`special_zone_editor` 仍然要和 appearance 面板一起刷新。直接让两个 controller 互相知道对方会把边界重新搅混。
+- 更稳的最短路径是：让 owner controller 只管自己的字段和事件，`toolbar.js` 保留一层 `renderSpecialZoneEditorUI` host wrapper，把 appearance owner、special zone owner、updateToolUI 串起来。

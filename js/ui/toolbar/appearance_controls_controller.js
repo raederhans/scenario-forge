@@ -1,8 +1,13 @@
 import {
+  createPhysicalStyleConfigForPreset,
+  normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
+  normalizePhysicalPreset,
+  normalizePhysicalStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
   normalizeTransportOverviewStyleConfig,
+  normalizeUrbanStyleConfig,
   resolveLinkedTransportOverviewScopeAndThreshold,
 } from "../../core/state.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
@@ -22,6 +27,7 @@ export function createAppearanceControlsController({
   t,
   clamp,
   renderDirty,
+  ensureActiveScenarioOptionalLayerLoaded,
   normalizeOceanFillColor,
   updateSwatchUI,
   openSpecialZonePopover,
@@ -105,6 +111,94 @@ export function createAppearanceControlsController({
   const dayNightHistoricalCityLightsSecondaryRetentionValue = document.getElementById("dayNightHistoricalCityLightsSecondaryRetentionValue");
   const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
   const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
+  const toggleUrban = document.getElementById("toggleUrban");
+  const togglePhysical = document.getElementById("togglePhysical");
+  const toggleRivers = document.getElementById("toggleRivers");
+  const toggleCityPoints = document.getElementById("toggleCityPoints");
+  const cityPointsTheme = document.getElementById("cityPointsTheme");
+  const cityPointsThemeHint = document.getElementById("cityPointsThemeHint");
+  const cityPointsMarkerScale = document.getElementById("cityPointsMarkerScale");
+  const cityPointsMarkerDensity = document.getElementById("cityPointsMarkerDensity");
+  const cityPointsMarkerDensityHint = document.getElementById("cityPointsMarkerDensityHint");
+  const cityPointsLabelDensity = document.getElementById("cityPointsLabelDensity");
+  const cityPointsColor = document.getElementById("cityPointsColor");
+  const cityPointsCapitalColor = document.getElementById("cityPointsCapitalColor");
+  const cityPointsOpacity = document.getElementById("cityPointsOpacity");
+  const cityPointLabelsEnabled = document.getElementById("cityPointLabelsEnabled");
+  const cityPointsLabelSize = document.getElementById("cityPointsLabelSize");
+  const cityCapitalOverlayEnabled = document.getElementById("cityCapitalOverlayEnabled");
+  const urbanMode = document.getElementById("urbanMode");
+  const urbanAdaptiveControls = document.getElementById("urbanAdaptiveControls");
+  const urbanManualControls = document.getElementById("urbanManualControls");
+  const lblUrbanOpacity = document.getElementById("lblUrbanOpacity");
+  const urbanColor = document.getElementById("urbanColor");
+  const urbanOpacity = document.getElementById("urbanOpacity");
+  const urbanBlendMode = document.getElementById("urbanBlendMode");
+  const urbanAdaptiveStrength = document.getElementById("urbanAdaptiveStrength");
+  const urbanStrokeOpacity = document.getElementById("urbanStrokeOpacity");
+  const urbanToneBias = document.getElementById("urbanToneBias");
+  const urbanAdaptiveTintEnabled = document.getElementById("urbanAdaptiveTintEnabled");
+  const urbanAdaptiveTintColor = document.getElementById("urbanAdaptiveTintColor");
+  const urbanAdaptiveTintStrength = document.getElementById("urbanAdaptiveTintStrength");
+  const urbanMinArea = document.getElementById("urbanMinArea");
+  const urbanAdaptiveStatus = document.getElementById("urbanAdaptiveStatus");
+  const physicalPreset = document.getElementById("physicalPreset");
+  const physicalPresetHint = document.getElementById("physicalPresetHint");
+  const physicalMode = document.getElementById("physicalMode");
+  const physicalOpacity = document.getElementById("physicalOpacity");
+  const physicalAtlasIntensity = document.getElementById("physicalAtlasIntensity");
+  const physicalRainforestEmphasis = document.getElementById("physicalRainforestEmphasis");
+  const physicalContourColor = document.getElementById("physicalContourColor");
+  const physicalContourOpacity = document.getElementById("physicalContourOpacity");
+  const physicalMinorContours = document.getElementById("physicalMinorContours");
+  const physicalContourMajorWidth = document.getElementById("physicalContourMajorWidth");
+  const physicalContourMinorWidth = document.getElementById("physicalContourMinorWidth");
+  const physicalContourMajorInterval = document.getElementById("physicalContourMajorInterval");
+  const physicalContourMinorInterval = document.getElementById("physicalContourMinorInterval");
+  const physicalContourMajorLowReliefCutoff = document.getElementById("physicalContourMajorLowReliefCutoff");
+  const physicalContourMinorLowReliefCutoff = document.getElementById("physicalContourMinorLowReliefCutoff");
+  const physicalBlendMode = document.getElementById("physicalBlendMode");
+  const physicalClassMountain = document.getElementById("physicalClassMountain");
+  const physicalClassMountainHills = document.getElementById("physicalClassMountainHills");
+  const physicalClassPlateau = document.getElementById("physicalClassPlateau");
+  const physicalClassBadlands = document.getElementById("physicalClassBadlands");
+  const physicalClassPlains = document.getElementById("physicalClassPlains");
+  const physicalClassBasin = document.getElementById("physicalClassBasin");
+  const physicalClassWetlands = document.getElementById("physicalClassWetlands");
+  const physicalClassForestTemperate = document.getElementById("physicalClassForestTemperate");
+  const physicalClassRainforestTropical = document.getElementById("physicalClassRainforestTropical");
+  const physicalClassGrassland = document.getElementById("physicalClassGrassland");
+  const physicalClassDesert = document.getElementById("physicalClassDesert");
+  const physicalClassTundra = document.getElementById("physicalClassTundra");
+  const riversColor = document.getElementById("riversColor");
+  const riversOpacity = document.getElementById("riversOpacity");
+  const riversWidth = document.getElementById("riversWidth");
+  const riversOutlineColor = document.getElementById("riversOutlineColor");
+  const riversOutlineWidth = document.getElementById("riversOutlineWidth");
+  const riversDashStyle = document.getElementById("riversDashStyle");
+  const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
+  const cityPointsMarkerDensityValue = document.getElementById("cityPointsMarkerDensityValue");
+  const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
+  const cityPointsLabelSizeValue = document.getElementById("cityPointsLabelSizeValue");
+  const urbanOpacityValue = document.getElementById("urbanOpacityValue");
+  const urbanAdaptiveStrengthValue = document.getElementById("urbanAdaptiveStrengthValue");
+  const urbanStrokeOpacityValue = document.getElementById("urbanStrokeOpacityValue");
+  const urbanToneBiasValue = document.getElementById("urbanToneBiasValue");
+  const urbanAdaptiveTintStrengthValue = document.getElementById("urbanAdaptiveTintStrengthValue");
+  const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
+  const physicalOpacityValue = document.getElementById("physicalOpacityValue");
+  const physicalAtlasIntensityValue = document.getElementById("physicalAtlasIntensityValue");
+  const physicalRainforestEmphasisValue = document.getElementById("physicalRainforestEmphasisValue");
+  const physicalContourOpacityValue = document.getElementById("physicalContourOpacityValue");
+  const physicalContourMajorWidthValue = document.getElementById("physicalContourMajorWidthValue");
+  const physicalContourMinorWidthValue = document.getElementById("physicalContourMinorWidthValue");
+  const physicalContourMajorIntervalValue = document.getElementById("physicalContourMajorIntervalValue");
+  const physicalContourMinorIntervalValue = document.getElementById("physicalContourMinorIntervalValue");
+  const physicalContourMajorLowReliefCutoffValue = document.getElementById("physicalContourMajorLowReliefCutoffValue");
+  const physicalContourMinorLowReliefCutoffValue = document.getElementById("physicalContourMinorLowReliefCutoffValue");
+  const riversOpacityValue = document.getElementById("riversOpacityValue");
+  const riversWidthValue = document.getElementById("riversWidthValue");
+  const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
   const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
@@ -199,6 +293,20 @@ export function createAppearanceControlsController({
   const roadThresholdResolved = document.getElementById("roadThresholdResolved");
   const roadScope = document.getElementById("roadScope");
   const roadImportanceThreshold = document.getElementById("roadImportanceThreshold");
+  const physicalClassToggleMap = {
+    mountain_high_relief: physicalClassMountain,
+    mountain_hills: physicalClassMountainHills,
+    upland_plateau: physicalClassPlateau,
+    badlands_canyon: physicalClassBadlands,
+    plains_lowlands: physicalClassPlains,
+    basin_lowlands: physicalClassBasin,
+    wetlands_delta: physicalClassWetlands,
+    forest_temperate: physicalClassForestTemperate,
+    rainforest_tropical: physicalClassRainforestTropical,
+    grassland_steppe: physicalClassGrassland,
+    desert_bare: physicalClassDesert,
+    tundra_ice: physicalClassTundra,
+  };
 
   const applyAppearanceFilter = () => {
     const query = String(appearanceLayerFilter?.value || "").trim().toLowerCase();
@@ -479,6 +587,296 @@ export function createAppearanceControlsController({
       handler(event, true);
     });
     element.dataset.bound = "true";
+  };
+
+  const persistCityViewSettings = () => {
+    state.persistViewSettingsFn?.();
+  };
+
+  const syncCityPointsConfig = () => {
+    state.styleConfig.cityPoints = normalizeCityLayerStyleConfig(state.styleConfig.cityPoints);
+    return state.styleConfig.cityPoints;
+  };
+
+  const CITY_POINTS_THEME_OPTIONS = [
+    { value: "classic_graphite", labelKey: "optCityPointsThemeClassicGraphite", fallback: "Classic Graphite" },
+    { value: "atlas_ink", labelKey: "optCityPointsThemeAtlasInk", fallback: "Atlas Ink" },
+    { value: "parchment_sepia", labelKey: "optCityPointsThemeParchmentSepia", fallback: "Parchment Sepia" },
+    { value: "slate_blue", labelKey: "optCityPointsThemeSlateBlue", fallback: "Slate Blue" },
+    { value: "ivory_outline", labelKey: "optCityPointsThemeIvoryOutline", fallback: "Ivory Outline" },
+  ];
+
+  const getCityPointsThemeMeta = (themeValue) =>
+    CITY_POINTS_THEME_OPTIONS.find((option) => option.value === String(themeValue || "").trim().toLowerCase())
+    || CITY_POINTS_THEME_OPTIONS[0];
+
+  const getCityPointsThemeLabel = (themeValue) => {
+    const meta = getCityPointsThemeMeta(themeValue);
+    return t(meta.fallback, "ui");
+  };
+
+  const CITY_POINTS_THEME_DEFAULT_STYLES = {
+    classic_graphite: {
+      color: "#2f343a",
+      capitalColor: "#9f9072",
+      hintEn: "Neutral graphite markers that stay readable on mixed political fills.",
+      hintZh: "中性的石墨灰点位，适合混合政治底图，整体最稳。 ",
+    },
+    atlas_ink: {
+      color: "#35506e",
+      capitalColor: "#d2aa72",
+      hintEn: "Cool blue-ink markers with a cleaner atlas feel and clearer outlines.",
+      hintZh: "偏蓝墨水感的点位，轮廓更清楚，更像地图集标注。",
+    },
+    parchment_sepia: {
+      color: "#866245",
+      capitalColor: "#c78d55",
+      hintEn: "Warmer sepia markers tuned for historical overlays and paper-like palettes.",
+      hintZh: "更暖的棕褐色点位，适合历史纸面和偏暖色地图。",
+    },
+    slate_blue: {
+      color: "#566c86",
+      capitalColor: "#d4b178",
+      hintEn: "Cool slate-blue markers that sit quietly on modern, cleaner political maps.",
+      hintZh: "偏冷的石板蓝点位，适合更现代、更干净的政治底图。",
+    },
+    ivory_outline: {
+      color: "#ddd2bf",
+      capitalColor: "#b27a4a",
+      hintEn: "Light ivory fills with darker rims for stronger contrast on darker land colors.",
+      hintZh: "浅象牙底配深描边，在深色国土上会更显眼。",
+    },
+  };
+
+  const getCityPointsThemeStyle = (themeValue) =>
+    CITY_POINTS_THEME_DEFAULT_STYLES[getCityPointsThemeMeta(themeValue).value]
+    || CITY_POINTS_THEME_DEFAULT_STYLES.classic_graphite;
+
+  const getCityPointsThemeHint = (themeValue) => {
+    const themeStyle = getCityPointsThemeStyle(themeValue);
+    return state.currentLanguage === "zh" ? themeStyle.hintZh.trim() : themeStyle.hintEn;
+  };
+
+  const getCityPointsLabelDensityHint = (densityValue) => {
+    const normalized = String(densityValue || "balanced").trim().toLowerCase();
+    if (state.currentLanguage === "zh") {
+      if (normalized === "sparse") return "Sparse · 标签预算 P4 16 / P5 32，只保留更关键的名称。";
+      if (normalized === "dense") return "Dense · 标签预算 P4 32 / P5 64，会显示更多次级城市名称。";
+      return "Balanced · 标签预算 P4 24 / P5 48，是默认的均衡读图方案。";
+    }
+    if (normalized === "sparse") return "Sparse · label budget P4 16 / P5 32, favoring only the most important names.";
+    if (normalized === "dense") return "Dense · label budget P4 32 / P5 64, allowing more secondary city labels.";
+    return "Balanced · label budget P4 24 / P5 48, the default readability mix.";
+  };
+
+  const ensureCityPointsThemeOptions = () => {
+    if (!cityPointsTheme) return;
+    const normalizedExisting = Array.from(cityPointsTheme.options || []).map((option) => String(option.value || ""));
+    const expected = CITY_POINTS_THEME_OPTIONS.map((option) => option.value);
+    const matchesExisting =
+      normalizedExisting.length === expected.length
+      && normalizedExisting.every((value, index) => value === expected[index]);
+    if (matchesExisting) {
+      Array.from(cityPointsTheme.options || []).forEach((optionNode, index) => {
+        const meta = CITY_POINTS_THEME_OPTIONS[index];
+        if (!meta) return;
+        optionNode.id = meta.labelKey;
+        optionNode.textContent = getCityPointsThemeLabel(meta.value);
+      });
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    CITY_POINTS_THEME_OPTIONS.forEach((optionMeta) => {
+      const option = document.createElement("option");
+      option.value = optionMeta.value;
+      option.id = optionMeta.labelKey;
+      option.textContent = getCityPointsThemeLabel(optionMeta.value);
+      fragment.appendChild(option);
+    });
+    cityPointsTheme.replaceChildren(fragment);
+  };
+
+  const formatCityPointsDensityValue = (value) => `${Number(value || 1).toFixed(2)}x`;
+
+  const syncUrbanConfig = () => {
+    state.styleConfig.urban = normalizeUrbanStyleConfig(state.styleConfig.urban);
+    if (state.styleConfig.urban.mode === "manual") {
+      state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
+    }
+    state.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(state.styleConfig.urban.adaptiveTintColor || "#f2dea1");
+    return state.styleConfig.urban;
+  };
+
+  const getUrbanCapability = () => {
+    const capability = state.urbanLayerCapability && typeof state.urbanLayerCapability === "object"
+      ? state.urbanLayerCapability
+      : null;
+    if (capability) return capability;
+    return {
+      adaptiveAvailable: false,
+      unavailableReason: "Urban layer metadata is still loading.",
+    };
+  };
+
+  const getEffectiveUrbanMode = (urbanConfig, capability = getUrbanCapability()) => {
+    if (urbanConfig?.mode === "adaptive" && !capability?.adaptiveAvailable) {
+      return "manual";
+    }
+    return urbanConfig?.mode === "manual" ? "manual" : "adaptive";
+  };
+
+  const formatUrbanToneBias = (rawValue) => {
+    const percent = Math.round((Number(rawValue) || 0) * 100);
+    return `${percent >= 0 ? "+" : ""}${percent}%`;
+  };
+
+  const syncPhysicalConfig = () => {
+    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
+    state.styleConfig.physical.contourColor = normalizeOceanFillColor(
+      state.styleConfig.physical.contourColor || "#6b5947",
+    );
+    return state.styleConfig.physical;
+  };
+
+  const applyPhysicalPresetConfig = (preset, { preserveMode = true } = {}) => {
+    const current = syncPhysicalConfig();
+    const resolvedPreset = normalizePhysicalPreset(preset);
+    const next = createPhysicalStyleConfigForPreset(resolvedPreset);
+    state.styleConfig.physical = normalizePhysicalStyleConfig({
+      ...next,
+      mode: preserveMode ? current.mode : next.mode,
+      contourColor: current.contourColor || next.contourColor,
+    });
+    return state.styleConfig.physical;
+  };
+
+  const getPhysicalPresetHint = (preset) => {
+    const normalizedPreset = normalizePhysicalPreset(preset);
+    if (normalizedPreset === "political_clean") {
+      return t("Political Clean keeps only the clearest landform cues over political fills.", "ui");
+    }
+    if (normalizedPreset === "terrain_rich") {
+      return t("Terrain Rich pushes the atlas and contour layer for the strongest relief read.", "ui");
+    }
+    return t("Balanced keeps terrain visible while staying cleaner over political fills.", "ui");
+  };
+
+  const syncUrbanControls = () => {
+    const urbanConfig = syncUrbanConfig();
+    const capability = getUrbanCapability();
+    const adaptiveAvailable = !!capability.adaptiveAvailable;
+    const effectiveMode = getEffectiveUrbanMode(urbanConfig, capability);
+    const isManual = effectiveMode === "manual";
+    if (urbanMode) {
+      urbanMode.value = effectiveMode;
+      const adaptiveOption = urbanMode.querySelector('option[value="adaptive"]');
+      if (adaptiveOption) adaptiveOption.disabled = !adaptiveAvailable;
+    }
+    if (urbanAdaptiveStatus) {
+      const statusText = adaptiveAvailable ? "" : String(capability.unavailableReason || "").trim();
+      urbanAdaptiveStatus.textContent = statusText;
+      urbanAdaptiveStatus.classList.toggle("hidden", !statusText);
+    }
+    if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? t("Opacity", "ui") : t("Fill Opacity", "ui");
+    if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
+    if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
+    if (urbanColor) urbanColor.value = urbanConfig.color;
+    if (urbanOpacity) urbanOpacity.value = String(Math.round(urbanConfig.fillOpacity * 100));
+    if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(urbanConfig.fillOpacity * 100)}%`;
+    if (urbanBlendMode) urbanBlendMode.value = urbanConfig.blendMode;
+    if (urbanAdaptiveStrength) urbanAdaptiveStrength.value = String(Math.round(urbanConfig.adaptiveStrength * 100));
+    if (urbanAdaptiveStrengthValue) urbanAdaptiveStrengthValue.textContent = `${Math.round(urbanConfig.adaptiveStrength * 100)}%`;
+    if (urbanStrokeOpacity) urbanStrokeOpacity.value = String(Math.round(urbanConfig.strokeOpacity * 100));
+    if (urbanStrokeOpacityValue) urbanStrokeOpacityValue.textContent = `${Math.round(urbanConfig.strokeOpacity * 100)}%`;
+    if (urbanToneBias) urbanToneBias.value = String(Math.round(urbanConfig.toneBias * 100));
+    if (urbanToneBiasValue) urbanToneBiasValue.textContent = formatUrbanToneBias(urbanConfig.toneBias);
+    if (urbanAdaptiveTintEnabled) urbanAdaptiveTintEnabled.checked = !!urbanConfig.adaptiveTintEnabled;
+    if (urbanAdaptiveTintColor) urbanAdaptiveTintColor.value = urbanConfig.adaptiveTintColor || "#f2dea1";
+    if (urbanAdaptiveTintStrength) urbanAdaptiveTintStrength.value = String(Math.round((urbanConfig.adaptiveTintStrength || 0) * 100));
+    if (urbanAdaptiveTintStrengthValue) urbanAdaptiveTintStrengthValue.textContent = `${Math.round((urbanConfig.adaptiveTintStrength || 0) * 100)}%`;
+    [urbanAdaptiveStrength, urbanStrokeOpacity, urbanToneBias, urbanAdaptiveTintEnabled, urbanAdaptiveTintColor, urbanAdaptiveTintStrength].forEach((element) => {
+      if (element) element.disabled = !adaptiveAvailable;
+    });
+    if (urbanAdaptiveTintColor) urbanAdaptiveTintColor.disabled = !adaptiveAvailable || !urbanConfig.adaptiveTintEnabled;
+    if (urbanAdaptiveTintStrength) urbanAdaptiveTintStrength.disabled = !adaptiveAvailable || !urbanConfig.adaptiveTintEnabled;
+    if (urbanMinArea) urbanMinArea.value = String(Math.round(urbanConfig.minAreaPx));
+    if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(urbanConfig.minAreaPx)}`;
+    return urbanConfig;
+  };
+
+  const renderAppearanceStyleControlsUi = () => {
+    if (toggleCityPoints) toggleCityPoints.checked = !!state.showCityPoints;
+    if (toggleUrban) toggleUrban.checked = !!state.showUrban;
+    if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
+    if (toggleRivers) toggleRivers.checked = !!state.showRivers;
+
+    const cityPointsConfig = syncCityPointsConfig();
+    ensureCityPointsThemeOptions();
+    if (cityPointsTheme) cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
+    if (cityPointsThemeHint) cityPointsThemeHint.textContent = getCityPointsThemeHint(cityPointsConfig.theme || "classic_graphite");
+    if (cityPointsMarkerScale) cityPointsMarkerScale.value = Number(cityPointsConfig.markerScale || 1).toFixed(2);
+    if (cityPointsMarkerScaleValue) cityPointsMarkerScaleValue.textContent = `${Number(cityPointsConfig.markerScale || 1).toFixed(2)}x`;
+    if (cityPointsMarkerDensity) cityPointsMarkerDensity.value = Number(cityPointsConfig.markerDensity || 1).toFixed(2);
+    if (cityPointsMarkerDensityValue) cityPointsMarkerDensityValue.textContent = formatCityPointsDensityValue(cityPointsConfig.markerDensity || 1);
+    if (cityPointsMarkerDensityHint) {
+      cityPointsMarkerDensityHint.textContent = state.currentLanguage === "zh"
+        ? "控制每个缩放阶段最多允许出现多少个城市点。"
+        : "Controls how many city markers can surface at each zoom stage.";
+    }
+    if (cityPointsLabelDensity) cityPointsLabelDensity.value = String(cityPointsConfig.labelDensity || "balanced");
+    if (cityPointsLabelDensityHint) cityPointsLabelDensityHint.textContent = getCityPointsLabelDensityHint(cityPointsConfig.labelDensity || "balanced");
+    if (cityPointsColor) cityPointsColor.value = normalizeOceanFillColor(cityPointsConfig.color || "#2f343a");
+    if (cityPointsCapitalColor) cityPointsCapitalColor.value = normalizeOceanFillColor(cityPointsConfig.capitalColor || "#9f9072");
+    if (cityPointsOpacity) cityPointsOpacity.value = String(Math.round(cityPointsConfig.opacity * 100));
+    if (cityPointsOpacityValue) cityPointsOpacityValue.textContent = `${Math.round(cityPointsConfig.opacity * 100)}%`;
+    if (cityPointLabelsEnabled) cityPointLabelsEnabled.checked = !!cityPointsConfig.showLabels;
+    if (cityPointsLabelSize) cityPointsLabelSize.value = String(Math.round(cityPointsConfig.labelSize));
+    if (cityPointsLabelSizeValue) cityPointsLabelSizeValue.textContent = `${Math.round(cityPointsConfig.labelSize)}px`;
+    if (cityCapitalOverlayEnabled) cityCapitalOverlayEnabled.checked = !!cityPointsConfig.showCapitalOverlay;
+
+    syncUrbanControls();
+
+    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
+    const activePhysicalPreset = normalizePhysicalPreset(state.styleConfig.physical.preset || "balanced");
+    if (physicalPreset) physicalPreset.value = activePhysicalPreset;
+    if (physicalPresetHint) physicalPresetHint.textContent = getPhysicalPresetHint(activePhysicalPreset);
+    if (physicalMode) physicalMode.value = state.styleConfig.physical.mode;
+    if (physicalOpacity) physicalOpacity.value = String(Math.round(state.styleConfig.physical.opacity * 100));
+    if (physicalOpacityValue) physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
+    if (physicalAtlasIntensity) physicalAtlasIntensity.value = String(Math.round(state.styleConfig.physical.atlasIntensity * 100));
+    if (physicalAtlasIntensityValue) physicalAtlasIntensityValue.textContent = `${Math.round(state.styleConfig.physical.atlasIntensity * 100)}%`;
+    if (physicalRainforestEmphasis) physicalRainforestEmphasis.value = String(Math.round(state.styleConfig.physical.rainforestEmphasis * 100));
+    if (physicalRainforestEmphasisValue) physicalRainforestEmphasisValue.textContent = `${Math.round(state.styleConfig.physical.rainforestEmphasis * 100)}%`;
+    if (physicalContourColor) physicalContourColor.value = state.styleConfig.physical.contourColor;
+    if (physicalContourOpacity) physicalContourOpacity.value = String(Math.round(state.styleConfig.physical.contourOpacity * 100));
+    if (physicalContourOpacityValue) physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
+    if (physicalMinorContours) physicalMinorContours.checked = !!state.styleConfig.physical.contourMinorVisible;
+    if (physicalContourMajorWidth) physicalContourMajorWidth.value = String(Number(state.styleConfig.physical.contourMajorWidth).toFixed(2));
+    if (physicalContourMajorWidthValue) physicalContourMajorWidthValue.textContent = Number(state.styleConfig.physical.contourMajorWidth).toFixed(2);
+    if (physicalContourMinorWidth) physicalContourMinorWidth.value = String(Number(state.styleConfig.physical.contourMinorWidth).toFixed(2));
+    if (physicalContourMinorWidthValue) physicalContourMinorWidthValue.textContent = Number(state.styleConfig.physical.contourMinorWidth).toFixed(2);
+    if (physicalContourMajorInterval) physicalContourMajorInterval.value = String(Math.round(state.styleConfig.physical.contourMajorIntervalM));
+    if (physicalContourMajorIntervalValue) physicalContourMajorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorIntervalM)}`;
+    if (physicalContourMinorInterval) physicalContourMinorInterval.value = String(Math.round(state.styleConfig.physical.contourMinorIntervalM));
+    if (physicalContourMinorIntervalValue) physicalContourMinorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorIntervalM)}`;
+    if (physicalContourMajorLowReliefCutoff) physicalContourMajorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM));
+    if (physicalContourMajorLowReliefCutoffValue) physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM)}`;
+    if (physicalContourMinorLowReliefCutoff) physicalContourMinorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM));
+    if (physicalContourMinorLowReliefCutoffValue) physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM)}`;
+    if (physicalBlendMode) physicalBlendMode.value = state.styleConfig.physical.blendMode;
+    Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
+      if (element) element.checked = state.styleConfig.physical.atlasClassVisibility?.[key] !== false;
+    });
+
+    if (riversColor) riversColor.value = state.styleConfig.rivers.color;
+    if (riversOpacity) riversOpacity.value = String(Math.round(state.styleConfig.rivers.opacity * 100));
+    if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
+    if (riversWidth) riversWidth.value = String(Number(state.styleConfig.rivers.width).toFixed(2));
+    if (riversWidthValue) riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
+    if (riversOutlineColor) riversOutlineColor.value = state.styleConfig.rivers.outlineColor;
+    if (riversOutlineWidth) riversOutlineWidth.value = String(Number(state.styleConfig.rivers.outlineWidth).toFixed(2));
+    if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
+    if (riversDashStyle) riversDashStyle.value = state.styleConfig.rivers.dashStyle;
   };
 
   const getTransportAppearanceConfig = () => {
@@ -1419,11 +1817,476 @@ export function createAppearanceControlsController({
       const dayNight = syncDayNightConfig();
       dayNight.twilightWidthDeg = clamp(Number.isFinite(value) ? value : 10, 2, 28);
     }, "day-night-twilight-width");
+
+    if (toggleUrban && toggleUrban.dataset.bound !== "true") {
+      toggleUrban.checked = !!state.showUrban;
+      toggleUrban.addEventListener("change", (event) => {
+        state.showUrban = event.target.checked;
+        if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
+          void state.ensureContextLayerDataFn("urban", { reason: "toolbar-toggle", renderNow: true });
+        }
+        renderDirty("toggle-urban");
+      });
+      toggleUrban.dataset.bound = "true";
+    }
+
+    if (togglePhysical && togglePhysical.dataset.bound !== "true") {
+      togglePhysical.checked = !!state.showPhysical;
+      togglePhysical.addEventListener("change", (event) => {
+        state.showPhysical = event.target.checked;
+        if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
+          void state.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], { reason: "toolbar-toggle", renderNow: true });
+        }
+        renderDirty("toggle-physical");
+      });
+      togglePhysical.dataset.bound = "true";
+    }
+
+    if (toggleRivers && toggleRivers.dataset.bound !== "true") {
+      toggleRivers.checked = !!state.showRivers;
+      toggleRivers.addEventListener("change", (event) => {
+        state.showRivers = event.target.checked;
+        if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
+          void state.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
+        }
+        renderDirty("toggle-rivers");
+      });
+      toggleRivers.dataset.bound = "true";
+    }
+
+    if (toggleCityPoints && toggleCityPoints.dataset.bound !== "true") {
+      toggleCityPoints.checked = !!state.showCityPoints;
+      toggleCityPoints.addEventListener("change", (event) => {
+        state.showCityPoints = !!event.target.checked;
+        if (state.showCityPoints) {
+          if (typeof state.ensureBaseCityDataFn === "function") {
+            void state.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: true });
+          }
+          void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
+        }
+        persistCityViewSettings();
+        renderDirty("toggle-city-points");
+      });
+      toggleCityPoints.dataset.bound = "true";
+    }
+
+    if (urbanMode && urbanMode.dataset.bound !== "true") {
+      urbanMode.addEventListener("change", (event) => {
+        const cfg = syncUrbanConfig();
+        const requestedMode = String(event.target.value || "adaptive");
+        const capability = getUrbanCapability();
+        cfg.mode = requestedMode === "adaptive" && !capability.adaptiveAvailable ? "manual" : requestedMode;
+        syncUrbanControls();
+        renderDirty("urban-mode");
+      });
+      urbanMode.dataset.bound = "true";
+    }
+    if (urbanColor && urbanColor.dataset.bound !== "true") {
+      urbanColor.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        cfg.color = normalizeOceanFillColor(event.target.value);
+        renderDirty("urban-color");
+      });
+      urbanColor.dataset.bound = "true";
+    }
+    if (cityPointsColor && cityPointsColor.dataset.bound !== "true") {
+      cityPointsColor.addEventListener("input", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.color = normalizeOceanFillColor(event.target.value);
+        persistCityViewSettings();
+        renderDirty("city-points-color");
+      });
+      cityPointsColor.dataset.bound = "true";
+    }
+    if (cityPointsTheme && cityPointsTheme.dataset.bound !== "true") {
+      cityPointsTheme.addEventListener("change", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.theme = getCityPointsThemeMeta(event.target.value || "classic_graphite").value;
+        const themeStyle = getCityPointsThemeStyle(cfg.theme);
+        cfg.color = themeStyle.color;
+        cfg.capitalColor = themeStyle.capitalColor;
+        if (cityPointsThemeHint) cityPointsThemeHint.textContent = getCityPointsThemeHint(cfg.theme);
+        if (cityPointsColor) cityPointsColor.value = normalizeOceanFillColor(cfg.color);
+        if (cityPointsCapitalColor) cityPointsCapitalColor.value = normalizeOceanFillColor(cfg.capitalColor);
+        persistCityViewSettings();
+        renderDirty("city-points-theme");
+      });
+      cityPointsTheme.dataset.bound = "true";
+    }
+    if (cityPointsMarkerScale && cityPointsMarkerScale.dataset.bound !== "true") {
+      cityPointsMarkerScale.addEventListener("input", (event) => {
+        const cfg = syncCityPointsConfig();
+        const value = Number(event.target.value);
+        cfg.markerScale = clamp(Number.isFinite(value) ? value : 1, 0.75, 2.5);
+        if (cityPointsMarkerScaleValue) cityPointsMarkerScaleValue.textContent = `${Number(cfg.markerScale).toFixed(2)}x`;
+        persistCityViewSettings();
+        renderDirty("city-points-marker-scale");
+      });
+      cityPointsMarkerScale.dataset.bound = "true";
+    }
+    if (cityPointsMarkerDensity && cityPointsMarkerDensity.dataset.bound !== "true") {
+      const syncMarkerDensity = (event) => {
+        const cfg = syncCityPointsConfig();
+        const value = Number(event.target.value);
+        cfg.markerDensity = clamp(Number.isFinite(value) ? value : 1, 0.5, 2);
+        if (cityPointsMarkerDensityValue) cityPointsMarkerDensityValue.textContent = formatCityPointsDensityValue(cfg.markerDensity);
+        persistCityViewSettings();
+        renderDirty("city-points-marker-density");
+      };
+      cityPointsMarkerDensity.addEventListener("input", syncMarkerDensity);
+      cityPointsMarkerDensity.addEventListener("change", syncMarkerDensity);
+      cityPointsMarkerDensity.dataset.bound = "true";
+    }
+    if (cityPointsLabelDensity && cityPointsLabelDensity.dataset.bound !== "true") {
+      cityPointsLabelDensity.addEventListener("change", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.labelDensity = String(event.target.value || "balanced");
+        if (cityPointsLabelDensityHint) cityPointsLabelDensityHint.textContent = getCityPointsLabelDensityHint(cfg.labelDensity);
+        persistCityViewSettings();
+        renderDirty("city-points-label-density");
+      });
+      cityPointsLabelDensity.dataset.bound = "true";
+    }
+    if (cityPointsCapitalColor && cityPointsCapitalColor.dataset.bound !== "true") {
+      cityPointsCapitalColor.addEventListener("input", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.capitalColor = normalizeOceanFillColor(event.target.value);
+        persistCityViewSettings();
+        renderDirty("city-points-capital-color");
+      });
+      cityPointsCapitalColor.dataset.bound = "true";
+    }
+    if (cityPointsOpacity && cityPointsOpacity.dataset.bound !== "true") {
+      cityPointsOpacity.addEventListener("input", (event) => {
+        const cfg = syncCityPointsConfig();
+        const value = Number(event.target.value);
+        cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.92, 0, 1);
+        if (cityPointsOpacityValue) cityPointsOpacityValue.textContent = `${Math.round(cfg.opacity * 100)}%`;
+        persistCityViewSettings();
+        renderDirty("city-points-opacity");
+      });
+      cityPointsOpacity.dataset.bound = "true";
+    }
+    if (cityPointLabelsEnabled && cityPointLabelsEnabled.dataset.bound !== "true") {
+      cityPointLabelsEnabled.addEventListener("change", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.showLabels = !!event.target.checked;
+        persistCityViewSettings();
+        renderDirty("city-points-labels-toggle");
+      });
+      cityPointLabelsEnabled.dataset.bound = "true";
+    }
+    if (cityPointsLabelSize && cityPointsLabelSize.dataset.bound !== "true") {
+      cityPointsLabelSize.addEventListener("input", (event) => {
+        const cfg = syncCityPointsConfig();
+        const value = Number(event.target.value);
+        cfg.labelSize = clamp(Math.round(Number.isFinite(value) ? value : 12), 8, 24);
+        if (cityPointsLabelSizeValue) cityPointsLabelSizeValue.textContent = `${Math.round(cfg.labelSize)}px`;
+        persistCityViewSettings();
+        renderDirty("city-points-label-size");
+      });
+      cityPointsLabelSize.dataset.bound = "true";
+    }
+    if (cityCapitalOverlayEnabled && cityCapitalOverlayEnabled.dataset.bound !== "true") {
+      cityCapitalOverlayEnabled.addEventListener("change", (event) => {
+        const cfg = syncCityPointsConfig();
+        cfg.showCapitalOverlay = !!event.target.checked;
+        persistCityViewSettings();
+        renderDirty("city-points-capital-overlay");
+      });
+      cityCapitalOverlayEnabled.dataset.bound = "true";
+    }
+    if (urbanOpacity && urbanOpacity.dataset.bound !== "true") {
+      urbanOpacity.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.fillOpacity = clamp(Number.isFinite(value) ? value / 100 : cfg.fillOpacity, 0, 1);
+        if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(cfg.fillOpacity * 100)}%`;
+        renderDirty("urban-opacity");
+      });
+      urbanOpacity.dataset.bound = "true";
+    }
+    if (urbanBlendMode && urbanBlendMode.dataset.bound !== "true") {
+      urbanBlendMode.addEventListener("change", (event) => {
+        const cfg = syncUrbanConfig();
+        cfg.blendMode = String(event.target.value || "multiply");
+        renderDirty("urban-blend");
+      });
+      urbanBlendMode.dataset.bound = "true";
+    }
+    if (urbanAdaptiveStrength && urbanAdaptiveStrength.dataset.bound !== "true") {
+      urbanAdaptiveStrength.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.adaptiveStrength = clamp(Number.isFinite(value) ? value / 100 : cfg.adaptiveStrength, 0, 1);
+        if (urbanAdaptiveStrengthValue) urbanAdaptiveStrengthValue.textContent = `${Math.round(cfg.adaptiveStrength * 100)}%`;
+        renderDirty("urban-adaptive-strength");
+      });
+      urbanAdaptiveStrength.dataset.bound = "true";
+    }
+    if (urbanStrokeOpacity && urbanStrokeOpacity.dataset.bound !== "true") {
+      urbanStrokeOpacity.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.strokeOpacity = clamp(Number.isFinite(value) ? value / 100 : cfg.strokeOpacity, 0, 1);
+        if (urbanStrokeOpacityValue) urbanStrokeOpacityValue.textContent = `${Math.round(cfg.strokeOpacity * 100)}%`;
+        renderDirty("urban-stroke-opacity");
+      });
+      urbanStrokeOpacity.dataset.bound = "true";
+    }
+    if (urbanToneBias && urbanToneBias.dataset.bound !== "true") {
+      urbanToneBias.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.toneBias = clamp(Number.isFinite(value) ? value / 100 : cfg.toneBias, -0.3, 0.3);
+        if (urbanToneBiasValue) urbanToneBiasValue.textContent = formatUrbanToneBias(cfg.toneBias);
+        renderDirty("urban-tone-bias");
+      });
+      urbanToneBias.dataset.bound = "true";
+    }
+    if (urbanAdaptiveTintEnabled && urbanAdaptiveTintEnabled.dataset.bound !== "true") {
+      urbanAdaptiveTintEnabled.addEventListener("change", (event) => {
+        const cfg = syncUrbanConfig();
+        cfg.adaptiveTintEnabled = !!event.target.checked;
+        syncUrbanControls();
+        renderDirty("urban-adaptive-tint-enabled");
+      });
+      urbanAdaptiveTintEnabled.dataset.bound = "true";
+    }
+    if (urbanAdaptiveTintColor && urbanAdaptiveTintColor.dataset.bound !== "true") {
+      urbanAdaptiveTintColor.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        cfg.adaptiveTintColor = normalizeOceanFillColor(event.target.value || cfg.adaptiveTintColor || "#f2dea1");
+        renderDirty("urban-adaptive-tint-color");
+      });
+      urbanAdaptiveTintColor.dataset.bound = "true";
+    }
+    if (urbanAdaptiveTintStrength && urbanAdaptiveTintStrength.dataset.bound !== "true") {
+      urbanAdaptiveTintStrength.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.adaptiveTintStrength = clamp(Number.isFinite(value) ? value / 100 : cfg.adaptiveTintStrength, 0, 0.5);
+        if (urbanAdaptiveTintStrengthValue) urbanAdaptiveTintStrengthValue.textContent = `${Math.round(cfg.adaptiveTintStrength * 100)}%`;
+        renderDirty("urban-adaptive-tint-strength");
+      });
+      urbanAdaptiveTintStrength.dataset.bound = "true";
+    }
+    if (urbanMinArea && urbanMinArea.dataset.bound !== "true") {
+      urbanMinArea.addEventListener("input", (event) => {
+        const cfg = syncUrbanConfig();
+        const value = Number(event.target.value);
+        cfg.minAreaPx = clamp(Number.isFinite(value) ? value : 1, 1, 80);
+        if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(cfg.minAreaPx)}`;
+        renderDirty("urban-area");
+      });
+      urbanMinArea.dataset.bound = "true";
+    }
+    if (physicalPreset && physicalPreset.dataset.bound !== "true") {
+      physicalPreset.addEventListener("change", (event) => {
+        applyPhysicalPresetConfig(event.target.value || "balanced");
+        renderAppearanceStyleControlsUi();
+        renderDirty("physical-preset-select");
+      });
+      physicalPreset.dataset.bound = "true";
+    }
+    if (physicalMode && physicalMode.dataset.bound !== "true") {
+      physicalMode.addEventListener("change", (event) => {
+        const cfg = syncPhysicalConfig();
+        cfg.mode = String(event.target.value || "atlas_and_contours");
+        renderDirty("physical-mode");
+      });
+      physicalMode.dataset.bound = "true";
+    }
+    if (physicalOpacity && physicalOpacity.dataset.bound !== "true") {
+      physicalOpacity.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
+        if (physicalOpacityValue) physicalOpacityValue.textContent = `${Math.round(cfg.opacity * 100)}%`;
+        renderDirty("physical-opacity");
+      });
+      physicalOpacity.dataset.bound = "true";
+    }
+    if (physicalAtlasIntensity && physicalAtlasIntensity.dataset.bound !== "true") {
+      physicalAtlasIntensity.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.atlasIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.9, 0.2, 1.4);
+        if (physicalAtlasIntensityValue) physicalAtlasIntensityValue.textContent = `${Math.round(cfg.atlasIntensity * 100)}%`;
+        renderDirty("physical-atlas-intensity");
+      });
+      physicalAtlasIntensity.dataset.bound = "true";
+    }
+    if (physicalRainforestEmphasis && physicalRainforestEmphasis.dataset.bound !== "true") {
+      physicalRainforestEmphasis.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.rainforestEmphasis = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1);
+        if (physicalRainforestEmphasisValue) physicalRainforestEmphasisValue.textContent = `${Math.round(cfg.rainforestEmphasis * 100)}%`;
+        renderDirty("physical-rainforest-emphasis");
+      });
+      physicalRainforestEmphasis.dataset.bound = "true";
+    }
+    if (physicalContourColor && physicalContourColor.dataset.bound !== "true") {
+      physicalContourColor.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        cfg.contourColor = normalizeOceanFillColor(event.target.value);
+        renderDirty("physical-contour-color");
+      });
+      physicalContourColor.dataset.bound = "true";
+    }
+    if (physicalContourOpacity && physicalContourOpacity.dataset.bound !== "true") {
+      physicalContourOpacity.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
+        if (physicalContourOpacityValue) physicalContourOpacityValue.textContent = `${Math.round(cfg.contourOpacity * 100)}%`;
+        renderDirty("physical-contour-opacity");
+      });
+      physicalContourOpacity.dataset.bound = "true";
+    }
+    if (physicalMinorContours && physicalMinorContours.dataset.bound !== "true") {
+      physicalMinorContours.addEventListener("change", (event) => {
+        const cfg = syncPhysicalConfig();
+        cfg.contourMinorVisible = !!event.target.checked;
+        renderDirty("physical-contour-minor-toggle");
+      });
+      physicalMinorContours.dataset.bound = "true";
+    }
+    if (physicalContourMajorWidth && physicalContourMajorWidth.dataset.bound !== "true") {
+      physicalContourMajorWidth.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMajorWidth = clamp(Number.isFinite(value) ? value : 0.8, 0.2, 3);
+        if (physicalContourMajorWidthValue) physicalContourMajorWidthValue.textContent = Number(cfg.contourMajorWidth).toFixed(2);
+        renderDirty("physical-contour-major-width");
+      });
+      physicalContourMajorWidth.dataset.bound = "true";
+    }
+    if (physicalContourMinorWidth && physicalContourMinorWidth.dataset.bound !== "true") {
+      physicalContourMinorWidth.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMinorWidth = clamp(Number.isFinite(value) ? value : 0.45, 0.1, 2);
+        if (physicalContourMinorWidthValue) physicalContourMinorWidthValue.textContent = Number(cfg.contourMinorWidth).toFixed(2);
+        renderDirty("physical-contour-minor-width");
+      });
+      physicalContourMinorWidth.dataset.bound = "true";
+    }
+    if (physicalContourMajorInterval && physicalContourMajorInterval.dataset.bound !== "true") {
+      physicalContourMajorInterval.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMajorIntervalM = clamp(Number.isFinite(value) ? Math.round(value / 500) * 500 : 500, 500, 2000);
+        if (physicalContourMajorIntervalValue) physicalContourMajorIntervalValue.textContent = `${Math.round(cfg.contourMajorIntervalM)}`;
+        renderDirty("physical-contour-major-interval");
+      });
+      physicalContourMajorInterval.dataset.bound = "true";
+    }
+    if (physicalContourMinorInterval && physicalContourMinorInterval.dataset.bound !== "true") {
+      physicalContourMinorInterval.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMinorIntervalM = clamp(Number.isFinite(value) ? Math.round(value / 100) * 100 : 100, 100, 1000);
+        if (physicalContourMinorIntervalValue) physicalContourMinorIntervalValue.textContent = `${Math.round(cfg.contourMinorIntervalM)}`;
+        renderDirty("physical-contour-minor-interval");
+      });
+      physicalContourMinorInterval.dataset.bound = "true";
+    }
+    if (physicalContourMajorLowReliefCutoff && physicalContourMajorLowReliefCutoff.dataset.bound !== "true") {
+      physicalContourMajorLowReliefCutoff.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMajorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 200, 0, 2000);
+        if (physicalContourMajorLowReliefCutoffValue) physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(cfg.contourMajorLowReliefCutoffM)}`;
+        renderDirty("physical-contour-major-low-relief-cutoff");
+      });
+      physicalContourMajorLowReliefCutoff.dataset.bound = "true";
+    }
+    if (physicalContourMinorLowReliefCutoff && physicalContourMinorLowReliefCutoff.dataset.bound !== "true") {
+      physicalContourMinorLowReliefCutoff.addEventListener("input", (event) => {
+        const cfg = syncPhysicalConfig();
+        const value = Number(event.target.value);
+        cfg.contourMinorLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 280, 0, 2000);
+        if (physicalContourMinorLowReliefCutoffValue) physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(cfg.contourMinorLowReliefCutoffM)}`;
+        renderDirty("physical-contour-minor-low-relief-cutoff");
+      });
+      physicalContourMinorLowReliefCutoff.dataset.bound = "true";
+    }
+    if (physicalBlendMode && physicalBlendMode.dataset.bound !== "true") {
+      physicalBlendMode.addEventListener("change", (event) => {
+        const cfg = syncPhysicalConfig();
+        cfg.blendMode = String(event.target.value || "source-over");
+        renderDirty("physical-blend");
+      });
+      physicalBlendMode.dataset.bound = "true";
+    }
+    Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
+      if (!element || element.dataset.bound === "true") return;
+      element.addEventListener("change", (event) => {
+        const cfg = syncPhysicalConfig();
+        cfg.atlasClassVisibility = {
+          ...(cfg.atlasClassVisibility || {}),
+          [key]: !!event.target.checked,
+        };
+        renderDirty(`physical-class-${key}`);
+      });
+      element.dataset.bound = "true";
+    });
+    if (riversColor && riversColor.dataset.bound !== "true") {
+      riversColor.addEventListener("input", (event) => {
+        state.styleConfig.rivers.color = normalizeOceanFillColor(event.target.value);
+        renderDirty("rivers-color");
+      });
+      riversColor.dataset.bound = "true";
+    }
+    if (riversOpacity && riversOpacity.dataset.bound !== "true") {
+      riversOpacity.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.styleConfig.rivers.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
+        if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
+        renderDirty("rivers-opacity");
+      });
+      riversOpacity.dataset.bound = "true";
+    }
+    if (riversWidth && riversWidth.dataset.bound !== "true") {
+      riversWidth.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 0.5, 0.2, 4);
+        if (riversWidthValue) riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
+        renderDirty("rivers-width");
+      });
+      riversWidth.dataset.bound = "true";
+    }
+    if (riversOutlineColor && riversOutlineColor.dataset.bound !== "true") {
+      riversOutlineColor.addEventListener("input", (event) => {
+        state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(event.target.value);
+        renderDirty("rivers-outline-color");
+      });
+      riversOutlineColor.dataset.bound = "true";
+    }
+    if (riversOutlineWidth && riversOutlineWidth.dataset.bound !== "true") {
+      riversOutlineWidth.addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        state.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.25, 0, 3);
+        if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
+        renderDirty("rivers-outline-width");
+      });
+      riversOutlineWidth.dataset.bound = "true";
+    }
+    if (riversDashStyle && riversDashStyle.dataset.bound !== "true") {
+      riversDashStyle.addEventListener("change", (event) => {
+        state.styleConfig.rivers.dashStyle = String(event.target.value || "solid");
+        renderDirty("rivers-dash");
+      });
+      riversDashStyle.dataset.bound = "true";
+    }
   };
 
   return {
     applyAppearanceFilter,
     bindEvents,
+    renderAppearanceStyleControlsUi,
     renderParentBorderCountryList,
     renderRecentColors,
     renderDayNightUI,

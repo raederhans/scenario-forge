@@ -267,6 +267,30 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("renderDayNightUI();", content)
         self.assertIn("state.updateToolbarInputsFn = () => {", content)
 
+    def test_appearance_controller_owns_city_urban_physical_rivers_logic(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("const syncCityPointsConfig = () => {", owner_content)
+        self.assertIn("const syncPhysicalConfig = () => {", owner_content)
+        self.assertIn("const renderAppearanceStyleControlsUi = () => {", owner_content)
+        self.assertIn("toggleUrban.addEventListener(\"change\", (event) => {", owner_content)
+        self.assertIn("physicalPreset.addEventListener(\"change\", (event) => {", owner_content)
+        self.assertIn("riversDashStyle.addEventListener(\"change\", (event) => {", owner_content)
+        self.assertNotIn("const syncCityPointsConfig = () => {", toolbar_content)
+        self.assertNotIn("const syncPhysicalConfig = () => {", toolbar_content)
+        self.assertNotIn("toggleUrban.addEventListener(\"change\", (event) => {", toolbar_content)
+        self.assertNotIn("physicalPreset.addEventListener(\"change\", (event) => {", toolbar_content)
+        self.assertNotIn("riversDashStyle.addEventListener(\"change\", (event) => {", toolbar_content)
+
+    def test_toolbar_keeps_city_urban_physical_special_zone_facade_contract(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("function renderSpecialZoneEditorUI() {", content)
+        self.assertIn("renderAppearanceStyleControlsUi();", content)
+        self.assertIn("specialZoneEditorController.renderSpecialZoneEditorUI();", content)
+        self.assertIn("state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;", content)
+
     def test_workspace_chrome_support_surface_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
         owner_content = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
