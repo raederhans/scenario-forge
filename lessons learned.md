@@ -866,3 +866,7 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 100. special zone 这类编辑面板要把“面板闭环”和“popover 外壳”分两层拆
 - 这次 `special_zone_editor.js` 最稳的切法是：新模块接管 `styleConfig.specialZones` 归一、manual zone 列表渲染、start/undo/finish/cancel/select/delete 事件绑定，`toolbar.js` 继续保留 `openSpecialZonePopover / closeSpecialZonePopover` 和全局 dismiss。
 - 更稳的最短路径是：让编辑器模块只关心自己的表单和 core action wiring，把 overlay 打开关闭、focus restore、与 guide/export 的互斥留在 toolbar facade，这样拆分后保存链和交互链都更稳。
+
+### 101. export workbench 这类大面板要先抽 controller，再保留 toolbar 的 overlay facade
+- 这次 `export_workbench_controller.js` 最稳的切法是：新模块接管 `exportWorkbenchUi` 归一、layer/text list、preview、bake/export 动作和 workbench 内部事件绑定，`toolbar.js` 继续保留 `setExportWorkbenchState()`、URL handoff、focus return 和与 guide/dock/transport 的互斥协调。
+- 更稳的最短路径是：先把面板内部闭环整块收进 controller，再让 toolbar 只负责 support surface 的壳层协调；这样既能明显减小 donor 文件，又能保住 `view=export` 恢复链和 overlay 互斥合同。

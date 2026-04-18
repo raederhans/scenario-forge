@@ -52,6 +52,13 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         self.assertIn("UI_URL_STATE_KEYS.scope", sidebar)
         self.assertIn("UI_URL_STATE_KEYS.section", sidebar)
 
+    def test_sidebar_hands_export_view_restore_back_to_toolbar(self):
+        sidebar = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
+
+        self.assertIn('if (viewValue === "export") {', sidebar)
+        self.assertIn("exportDetails.open = true;", sidebar)
+        self.assertIn("state.restoreSupportSurfaceFromUrlFn?.();", sidebar)
+
 
 if __name__ == "__main__":
     unittest.main()

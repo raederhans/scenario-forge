@@ -135,7 +135,9 @@
   - Wave 2 已开始：新增 `js/ui/toolbar/palette_library_panel.js`，把 palette library 的分组、筛选、source tab、toggle 和 panel DOM 更新下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/toolbar/scenario_guide_popover.js`，把 scenario guide 的 section/status 渲染、trigger 同步和 guide 自己的事件绑定下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/toolbar/special_zone_editor.js`，把 special zone 的 state 归一、面板渲染和 editor 自己的事件绑定下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/export_workbench_controller.js`，把 export workbench 的状态归一、layer/text list 渲染、preview、bake/export 动作和 workbench 内部事件绑定下沉成独立 controller。
   - `toolbar.js` 继续保留 facade：仍负责 `state.updatePaletteSourceUIFn / state.updatePaletteLibraryUIFn / state.renderPaletteFn` 注册，以及 `renderPalette()` 与主初始化编排。
   - `toolbar.js` 继续保留 scenario guide 的 facade：仍负责跨面板仲裁、URL restore、shared dismiss 与总入口 `toggleScenarioGuidePopover / closeScenarioGuidePopover`。
   - `toolbar.js` 继续保留 special zone 的 facade：仍负责 popover 打开关闭、全局 dismiss 和跨 overlay 的互斥仲裁。
-  - 新增 `tests/test_toolbar_split_boundary_contract.py`，并重新验证 109 条静态边界 / UI contract tests 全绿。
+  - `toolbar.js` 继续保留 export workbench 的 facade：仍负责 overlay open/close、focus return、URL restore、以及与 dock/guide/transport 的互斥协调。
+  - 新增 `tests/test_toolbar_split_boundary_contract.py`，并重新验证 113 条静态边界 / UI contract tests 全绿。

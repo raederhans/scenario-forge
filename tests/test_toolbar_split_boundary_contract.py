@@ -9,6 +9,7 @@ EXPORT_FAILURE_HANDLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_failur
 PALETTE_LIBRARY_PANEL_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "palette_library_panel.js"
 SCENARIO_GUIDE_POPOVER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "scenario_guide_popover.js"
 SPECIAL_ZONE_EDITOR_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zone_editor.js"
+EXPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "export_workbench_controller.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -24,6 +25,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createPaletteLibraryPanelController", content)
         self.assertIn('./toolbar/scenario_guide_popover.js', content)
         self.assertIn("createScenarioGuidePopoverController", content)
+        self.assertIn('./toolbar/export_workbench_controller.js', content)
+        self.assertIn("createExportWorkbenchController", content)
 
     def test_export_failure_owner_moves_out_of_toolbar(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -60,9 +63,43 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("syncPaletteLibraryPanelVisibility();", content)
 
     def test_toolbar_keeps_export_failure_handler_call_sites(self):
+        owner_content = EXPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertGreaterEqual(owner_content.count("showExportFailureToast(error);"), 2)
+
+    def test_export_workbench_owner_moves_to_controller_module(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+        owner_content = EXPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("function createExportWorkbenchController", owner_content)
+        self.assertIn("function ensureExportWorkbenchUiState", owner_content)
+        self.assertIn("function resolveExportPassSequence", owner_content)
+        self.assertIn("const renderExportWorkbenchPreview = async () => {", owner_content)
+        self.assertIn("const renderExportWorkbenchUi = (isOpen) => {", owner_content)
+        self.assertIn("const bindExportWorkbenchEvents = () => {", owner_content)
+        self.assertIn("return exportWorkbenchController?.renderExportWorkbenchPreview();", toolbar_content)
+        self.assertIn("return exportWorkbenchController?.renderExportWorkbenchBakeArtifactList();", toolbar_content)
+        self.assertIn("return exportWorkbenchController?.syncExportPreviewSourceOptions();", toolbar_content)
+        self.assertIn('id: "background"', owner_content)
+        self.assertIn('id: "political"', owner_content)
+        self.assertIn('id: "context"', owner_content)
+        self.assertIn('id: "effects"', owner_content)
+        self.assertIn('id: "labels"', owner_content)
+        self.assertIn('passNames: ["background"]', owner_content)
+        self.assertIn('passNames: ["physicalBase", "political"]', owner_content)
+        self.assertIn('passNames: ["contextBase", "contextScenario"]', owner_content)
+        self.assertIn('passNames: ["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"]', owner_content)
+
+    def test_toolbar_keeps_export_workbench_facade_and_url_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertGreaterEqual(content.count("showExportFailureToast(error);"), 2)
+        self.assertIn("state.openExportWorkbenchFn = (trigger = dockExportBtn) => {", content)
+        self.assertIn("state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {", content)
+        self.assertIn("closeDockPopover({ restoreFocus: false, syncUrl: false });", content)
+        self.assertIn("closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });", content)
+        self.assertIn("exportProjectSection.open = true;", content)
+        self.assertIn('syncSupportSurfaceUrlState("export")', content)
+        self.assertIn('syncSupportSurfaceUrlState("")', content)
 
     def test_scenario_guide_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -124,6 +161,15 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("state.specialZones = data.specialZones || {}", interaction_funnel)
         self.assertIn("state.manualSpecialZones =", interaction_funnel)
         self.assertIn("state.styleConfig.specialZones = {", interaction_funnel)
+
+    def test_export_workbench_persistence_contract_stays_stable(self):
+        file_manager = FILE_MANAGER_JS.read_text(encoding="utf-8")
+        interaction_funnel = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
+
+        self.assertIn("exportWorkbenchUi: normalizeExportWorkbenchUiState(appState.exportWorkbenchUi)", file_manager)
+        self.assertIn("data.exportWorkbenchUi = normalizeExportWorkbenchUiState(data.exportWorkbenchUi);", file_manager)
+        self.assertIn("state.exportWorkbenchUi = normalizeExportWorkbenchUiState({", interaction_funnel)
+        self.assertIn("...(data.exportWorkbenchUi.visibility || data.exportWorkbenchUi.layerVisibility || {})", interaction_funnel)
 
 
 if __name__ == "__main__":
