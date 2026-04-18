@@ -42,13 +42,9 @@ import {
 } from "../core/map_renderer.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import {
-  buildPaletteLibraryEntries,
   buildPaletteQuickSwatches,
   getPaletteSourceOptions,
-  getSuggestedIso2,
-  getUnmappedReason,
   normalizeHexColor,
-  setActivePaletteSource,
 } from "../core/palette_manager.js";
 import { ensureActiveScenarioOptionalLayerLoaded } from "../core/scenario_resources.js";
 import { resetScenarioToBaselineCommand } from "../core/scenario_dispatcher.js";
@@ -91,6 +87,13 @@ import {
   isTransportWorkbenchManifestOnlyRuntimeFamily,
   listTransportWorkbenchWarmupPlans,
 } from "./transport_workbench_family_registry.js";
+import {
+  createExportError,
+  showExportFailureToast,
+} from "./toolbar/export_failure_handler.js";
+import { createPaletteLibraryPanelController } from "./toolbar/palette_library_panel.js";
+import { createScenarioGuidePopoverController } from "./toolbar/scenario_guide_popover.js";
+import { createSpecialZoneEditorController } from "./toolbar/special_zone_editor.js";
 import {
   getTransportWorkbenchManifestDefaultVariantId,
   getTransportWorkbenchManifestVariantMeta,
@@ -1802,43 +1805,6 @@ const EXPORT_MAX_PIXELS = 7680 * 4320;
 const EXPORT_MAX_CONCURRENT_JOBS = 1;
 let exportJobsInFlight = 0;
 
-function createExportError(kind, message) {
-  const error = new Error(message);
-  error.exportKind = kind;
-  return error;
-}
-
-function classifyExportFailure(error) {
-  const kind = String(error?.exportKind || "").trim();
-  if (kind) return kind;
-  const message = String(error?.message || "").toLowerCase();
-  if (message.includes("svg overlay export failed") || message.includes("tainted")) return "svg-cors";
-  if (message.includes("memory") || message.includes("allocation") || message.includes("out of memory")) return "out-of-memory";
-  return "invalid-params";
-}
-
-function showExportFailureToast(error) {
-  const failureKind = classifyExportFailure(error);
-  if (failureKind === "out-of-memory") {
-    showToast(
-      t("Export failed: not enough available memory. Reduce export resolution (for example 2× → 1×), close heavy tabs, then retry.", "ui"),
-      { title: t("Export failed · Out of memory", "ui"), tone: "error", duration: 7000 }
-    );
-    return;
-  }
-  if (failureKind === "svg-cors") {
-    showToast(
-      t("Export failed: SVG overlay includes cross-origin assets. Use same-origin assets, remove cross-origin images, or hide SVG overlays before retrying.", "ui"),
-      { title: t("Export failed · Cross-origin SVG", "ui"), tone: "warning", duration: 7600 }
-    );
-    return;
-  }
-  showToast(
-    t("Export failed: invalid parameters. Check export scale and format, then retry.", "ui"),
-    { title: t("Export failed · Invalid parameters", "ui"), tone: "warning", duration: 6200 }
-  );
-}
-
 function resolveExportBaseDimensions() {
   const dpr = Math.max(1, Number(state.dpr || globalThis.devicePixelRatio || 1));
   const fallbackLogicalWidth = Number(state.colorCanvas?.width || 0) / dpr;
@@ -2369,15 +2335,8 @@ function initToolbar({ render } = {}) {
   };
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
-  let scenarioGuideActiveSection = "quick";
   let dockPopoverCloseBound = false;
   const overlayFocusReturnTargets = createFocusReturnRegistry();
-  const PALETTE_LIBRARY_GROUPS = [
-    { key: "essentials", label: () => t("Essentials", "ui"), defaultOpen: true },
-    { key: "dynamic", label: () => t("Dynamic / Runtime", "ui"), defaultOpen: false },
-    { key: "countries", label: () => t("Countries", "ui"), defaultOpen: false },
-    { key: "extra", label: () => t("Extra", "ui"), defaultOpen: false },
-  ];
   const MOBILE_WORKSPACE_MAX_WIDTH = 767;
   const TABLET_WORKSPACE_MAX_WIDTH = 1023;
   const SCENARIO_BAR_LEFT_OFFSET = 18;
@@ -2402,35 +2361,27 @@ function initToolbar({ render } = {}) {
     state.ui.paletteLibrarySections = {};
   }
 
-  const normalizeScenarioGuideSection = (value = "") => {
-    const normalizedValue = String(value || "").trim().toLowerCase();
-    return ["quick", "prepare", "tools", "checks"].includes(normalizedValue) ? normalizedValue : "quick";
-  };
-
-  const renderScenarioGuideSection = (section = "quick") => {
-    scenarioGuideActiveSection = normalizeScenarioGuideSection(section);
-    scenarioGuideNavButtons.forEach((button) => {
-      const isActive = String(button.dataset.guideSection || "").trim().toLowerCase() === scenarioGuideActiveSection;
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-selected", isActive ? "true" : "false");
-      button.tabIndex = isActive ? 0 : -1;
-    });
-    scenarioGuidePanels.forEach((panel) => {
-      const isActive = String(panel.dataset.guidePanel || "").trim().toLowerCase() === scenarioGuideActiveSection;
-      panel.classList.toggle("hidden", !isActive);
-      panel.hidden = !isActive;
-    });
-  };
-
-  const focusScenarioGuideSectionButton = (section = "quick") => {
-    const normalizedSection = normalizeScenarioGuideSection(section);
-    const button = scenarioGuideNavButtons.find(
-      (candidate) => String(candidate.dataset.guideSection || "").trim().toLowerCase() === normalizedSection
-    );
-    if (button && typeof button.focus === "function") {
-      button.focus({ preventScroll: true });
-    }
-  };
+  const scenarioGuidePopoverController = createScenarioGuidePopoverController({
+    state,
+    scenarioGuideBtn,
+    utilitiesGuideBtn,
+    scenarioGuideBackdrop,
+    scenarioGuidePopover,
+    scenarioGuideCloseBtn,
+    scenarioGuideStatus,
+    scenarioGuideStatusChips,
+    scenarioGuideNavButtons,
+    scenarioGuidePanels,
+    t,
+  });
+  const {
+    bindScenarioGuideEvents,
+    closeScenarioGuideSurface,
+    openScenarioGuideSurface,
+    renderScenarioGuideSection,
+    renderScenarioGuideStatus,
+    syncScenarioGuideTriggerButtons,
+  } = scenarioGuidePopoverController;
 
   const getResponsiveChromeTier = () => {
     const viewportWidth = Number(globalThis.innerWidth) || 0;
@@ -5526,22 +5477,12 @@ function initToolbar({ render } = {}) {
 
   const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     if (!scenarioGuidePopover) return;
-    document.body.classList.remove("scenario-guide-open");
-    scenarioGuideBackdrop?.classList.add("hidden");
-    scenarioGuideBackdrop?.setAttribute("aria-hidden", "true");
-    scenarioGuidePopover.classList.add("hidden");
-    scenarioGuidePopover.setAttribute("aria-hidden", "true");
-    scenarioGuideBtn?.classList.remove("is-active");
-    utilitiesGuideBtn?.classList.remove("is-active");
-    scenarioGuideBtn?.setAttribute("aria-expanded", "false");
-    utilitiesGuideBtn?.setAttribute("aria-expanded", "false");
-    scenarioGuideBtn?.setAttribute("title", t("Show guide", "ui"));
-    utilitiesGuideBtn?.setAttribute("title", t("Show guide", "ui"));
+    closeScenarioGuideSurface({
+      restoreFocus,
+      restoreOverlayTriggerFocus,
+    });
     if (syncUrl) {
       syncSupportSurfaceUrlState("");
-    }
-    if (restoreFocus) {
-      restoreOverlayTriggerFocus(scenarioGuidePopover);
     }
   };
 
@@ -5618,62 +5559,13 @@ function initToolbar({ render } = {}) {
     state.closeExportWorkbenchFn?.({ restoreFocus: false });
     closeSpecialZonePopover();
     rememberOverlayTrigger(scenarioGuidePopover, trigger);
-    document.body.classList.add("scenario-guide-open");
-    scenarioGuideBackdrop?.classList.remove("hidden");
-    scenarioGuideBackdrop?.setAttribute("aria-hidden", "false");
-    scenarioGuidePopover.classList.remove("hidden");
-    scenarioGuidePopover.setAttribute("aria-hidden", "false");
-    scenarioGuideBtn?.classList.add("is-active");
-    utilitiesGuideBtn?.classList.add("is-active");
-    scenarioGuideBtn?.setAttribute("aria-expanded", "true");
-    utilitiesGuideBtn?.setAttribute("aria-expanded", "true");
-    scenarioGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
-    utilitiesGuideBtn?.setAttribute("title", t("Hide guide", "ui"));
-    renderScenarioGuideSection("quick");
+    openScenarioGuideSurface({ focusOverlaySurface });
     syncSupportSurfaceUrlState("guide");
-    focusOverlaySurface(scenarioGuidePopover);
   };
 
   const getScenarioOverlayLeftInset = () => (
     globalThis.innerWidth <= 767 ? SCENARIO_BAR_MOBILE_LEFT_OFFSET : SCENARIO_BAR_LEFT_OFFSET
   );
-
-  const renderScenarioGuideStatus = ({
-    activeScenario = "",
-    modeLabel = "",
-    scenarioViewLabel = "",
-    splitCount = 0,
-  } = {}) => {
-    if (!scenarioGuideStatusChips) return;
-    const statusChips = [
-      { label: t("Mode", "ui"), value: modeLabel },
-    ];
-    if (activeScenario) {
-      statusChips.push(
-        { label: t("View", "ui"), value: scenarioViewLabel },
-        { label: t("Split", "ui"), value: String(splitCount) }
-      );
-    }
-    scenarioGuideStatusChips.replaceChildren();
-    statusChips
-      .filter((chip) => String(chip.value || "").trim())
-      .forEach((chip) => {
-        const pill = document.createElement("span");
-        pill.className = "scenario-guide-status-pill";
-
-        const label = document.createElement("span");
-        label.className = "scenario-guide-status-pill-label";
-        label.textContent = `${chip.label}:`;
-
-        const value = document.createElement("span");
-        value.textContent = chip.value;
-
-        pill.appendChild(label);
-        pill.appendChild(value);
-        scenarioGuideStatusChips.appendChild(pill);
-      });
-    scenarioGuideStatus?.classList.toggle("hidden", !scenarioGuideStatusChips.childElementCount);
-  };
 
   const applyScenarioOverlaySafeLayout = () => {
     if (!scenarioContextBar || !zoomControls) return;
@@ -5736,17 +5628,10 @@ function initToolbar({ render } = {}) {
         ? t("Expand", "ui")
         : t("Collapse", "ui"));
     }
-    if (scenarioGuideBtn) {
-      scenarioGuideBtn.classList.toggle("hidden", !state.ui.tutorialEntryVisible);
-      scenarioGuideBtn.textContent = t("Guide", "ui");
-      const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
-      scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
-    }
-    if (utilitiesGuideBtn) {
-      const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
-      utilitiesGuideBtn.textContent = t("Guide", "ui");
-      utilitiesGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
-    }
+    syncScenarioGuideTriggerButtons({
+      isOpen: !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")),
+      tutorialEntryVisible: !!state.ui.tutorialEntryVisible,
+    });
     if (scenarioTransportWorkbenchBtn) {
       scenarioTransportWorkbenchBtn.textContent = t("Transport", "ui");
       scenarioTransportWorkbenchBtn.setAttribute("title", state.transportWorkbenchUi?.open
@@ -6988,55 +6873,7 @@ function initToolbar({ render } = {}) {
   );
   state.styleConfig.rivers.dashStyle = String(state.styleConfig.rivers.dashStyle || "solid");
 
-  if (!state.styleConfig.specialZones || typeof state.styleConfig.specialZones !== "object") {
-    state.styleConfig.specialZones = {};
-  }
-  state.styleConfig.specialZones.disputedFill = normalizeOceanFillColor(
-    state.styleConfig.specialZones.disputedFill || "#f97316"
-  );
-  state.styleConfig.specialZones.disputedStroke = normalizeOceanFillColor(
-    state.styleConfig.specialZones.disputedStroke || "#ea580c"
-  );
-  state.styleConfig.specialZones.wastelandFill = normalizeOceanFillColor(
-    state.styleConfig.specialZones.wastelandFill || "#dc2626"
-  );
-  state.styleConfig.specialZones.wastelandStroke = normalizeOceanFillColor(
-    state.styleConfig.specialZones.wastelandStroke || "#b91c1c"
-  );
-  state.styleConfig.specialZones.customFill = normalizeOceanFillColor(
-    state.styleConfig.specialZones.customFill || "#8b5cf6"
-  );
-  state.styleConfig.specialZones.customStroke = normalizeOceanFillColor(
-    state.styleConfig.specialZones.customStroke || "#6d28d9"
-  );
-  state.styleConfig.specialZones.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.specialZones.opacity))
-      ? Number(state.styleConfig.specialZones.opacity)
-      : 0.32,
-    0,
-    1
-  );
-  state.styleConfig.specialZones.strokeWidth = clamp(
-    Number.isFinite(Number(state.styleConfig.specialZones.strokeWidth))
-      ? Number(state.styleConfig.specialZones.strokeWidth)
-      : 1.3,
-    0.4,
-    4
-  );
-  state.styleConfig.specialZones.dashStyle = String(state.styleConfig.specialZones.dashStyle || "dashed");
   state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
-
-  if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
-    state.manualSpecialZones = { type: "FeatureCollection", features: [] };
-  }
-  if (!Array.isArray(state.manualSpecialZones.features)) {
-    state.manualSpecialZones.features = [];
-  }
-  if (!state.specialZoneEditor || typeof state.specialZoneEditor !== "object") {
-    state.specialZoneEditor = {};
-  }
-  state.specialZoneEditor.zoneType = String(state.specialZoneEditor.zoneType || "custom");
-  state.specialZoneEditor.label = String(state.specialZoneEditor.label || "");
   if (!state.referenceImageState || typeof state.referenceImageState !== "object") {
     state.referenceImageState = {};
   }
@@ -7210,180 +7047,28 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  function syncPaletteSourceControls() {
-    const activeValue = String(state.activePaletteId || "");
-    if (themeSelect && themeSelect.value !== activeValue) {
-      themeSelect.value = activeValue;
-    }
-  }
+  const paletteLibraryPanelController = createPaletteLibraryPanelController({
+    themeSelect,
+    paletteLibraryToggle,
+    paletteLibraryPanel,
+    paletteLibrarySources,
+    paletteLibrarySearch,
+    paletteLibrarySummary,
+    paletteLibraryList,
+    paletteLibraryToggleLabel,
+    renderPalette,
+    updateSwatchUI,
+  });
+  const {
+    bindEvents: bindPaletteLibraryPanelEvents,
+    handlePaletteSourceChange,
+    handleResize: handlePaletteLibraryResize,
+    renderPaletteLibrary,
+    syncPaletteSourceControls,
+    syncPanelVisibility: syncPaletteLibraryPanelVisibility,
+  } = paletteLibraryPanelController;
   state.updatePaletteSourceUIFn = syncPaletteSourceControls;
   state.renderPaletteFn = renderPalette;
-
-  const ensurePaletteLibrarySectionState = (sourceId) => {
-    const key = String(sourceId || "legacy").trim() || "legacy";
-    if (!state.ui.paletteLibrarySections[key] || typeof state.ui.paletteLibrarySections[key] !== "object") {
-      state.ui.paletteLibrarySections[key] = {};
-    }
-    return state.ui.paletteLibrarySections[key];
-  };
-
-  const buildPaletteLibraryGroups = (entries) => {
-    const groups = {
-      essentials: [],
-      dynamic: [],
-      countries: [],
-      extra: [],
-    };
-    entries.forEach((entry) => {
-      if (Number.isFinite(entry.quickIndex)) {
-        groups.essentials.push(entry);
-        return;
-      }
-      if (entry.dynamic) {
-        groups.dynamic.push(entry);
-        return;
-      }
-      if (entry.mapped) {
-        groups.countries.push(entry);
-        return;
-      }
-      groups.extra.push(entry);
-    });
-    return PALETTE_LIBRARY_GROUPS.map((group) => ({
-      ...group,
-      entries: groups[group.key] || [],
-    })).filter((group) => group.entries.length > 0);
-  };
-
-  const createPaletteLibraryRow = (entry) => {
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "palette-library-row";
-    row.dataset.color = entry.color;
-    row.dataset.tag = entry.sourceTag;
-    row.dataset.iso2 = entry.mappedIso2 || "";
-    if (entry.color === state.selectedColor) {
-      row.classList.add("is-selected");
-    }
-    row.addEventListener("click", () => {
-      state.selectedColor = entry.color;
-      updateSwatchUI();
-    });
-
-    const swatch = document.createElement("span");
-    swatch.className = "color-swatch";
-    swatch.dataset.color = entry.color;
-    swatch.style.backgroundColor = entry.color;
-
-    const meta = document.createElement("span");
-    meta.className = "palette-library-meta";
-
-    const title = document.createElement("span");
-    title.className = "palette-library-title";
-    title.textContent = entry.localizedName || entry.label;
-
-    const subtitle = document.createElement("span");
-    subtitle.className = "palette-library-subtitle";
-    const isoTag = entry.mappedIso2 || entry.iso2 || "--";
-    const sourceTag = entry.sourceLabel || entry.sourceTag || "Palette";
-    subtitle.textContent = `${isoTag} · ${sourceTag}`;
-    row.title = [
-      entry.localizedName || entry.label,
-      entry.sourceTag,
-      entry.countryFileLabel,
-      entry.mappedIso2
-        ? `${t("Mapped to", "ui")} ${entry.mappedIso2}`
-        : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`,
-    ].filter(Boolean).join(" · ");
-
-    meta.appendChild(title);
-    meta.appendChild(subtitle);
-    row.appendChild(swatch);
-    row.appendChild(meta);
-    return row;
-  };
-
-  const renderPaletteLibrarySourceTabs = (sourceOptions) => {
-    if (!paletteLibrarySources) return;
-    paletteLibrarySources.replaceChildren();
-    if (!sourceOptions.length) {
-      paletteLibrarySources.classList.add("hidden");
-      return;
-    }
-    paletteLibrarySources.classList.remove("hidden");
-    sourceOptions.forEach((optionData) => {
-      const button = document.createElement("button");
-      const isActive = optionData.value === state.activePaletteId;
-      button.type = "button";
-      button.className = "palette-library-source-btn";
-      button.setAttribute("role", "tab");
-      button.setAttribute("aria-selected", String(isActive));
-      button.classList.toggle("is-active", isActive);
-      button.textContent = optionData.label;
-      button.addEventListener("click", async () => {
-        if (isActive) return;
-        await handlePaletteSourceChange(optionData.value);
-      });
-      paletteLibrarySources.appendChild(button);
-    });
-  };
-
-  const PALETTE_LIBRARY_HEIGHT = {
-    base: 240,
-    cap: 480,
-  };
-  let adaptivePaletteLibraryHeightFrame = 0;
-
-  const clampPaletteLibraryHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
-
-  const syncAdaptivePaletteLibraryHeight = () => {
-    adaptivePaletteLibraryHeightFrame = 0;
-    if (!paletteLibraryList || !state.paletteLibraryOpen) return;
-    const scrollHeight = Number(paletteLibraryList.scrollHeight || 0);
-    const nextHeight = clampPaletteLibraryHeight(
-      scrollHeight,
-      PALETTE_LIBRARY_HEIGHT.base,
-      PALETTE_LIBRARY_HEIGHT.cap
-    );
-    paletteLibraryList.style.height = `${Math.round(nextHeight)}px`;
-    paletteLibraryList.style.maxHeight = `${Math.round(nextHeight)}px`;
-  };
-
-  const scheduleAdaptivePaletteLibraryHeight = () => {
-    if (adaptivePaletteLibraryHeightFrame) {
-      globalThis.cancelAnimationFrame(adaptivePaletteLibraryHeightFrame);
-    }
-    adaptivePaletteLibraryHeightFrame = globalThis.requestAnimationFrame(syncAdaptivePaletteLibraryHeight);
-  };
-
-  const syncPaletteLibraryToggleUi = () => {
-    if (!paletteLibraryToggle) return;
-    const label = state.paletteLibraryOpen
-      ? t("Hide Color Library", "ui")
-      : t("Browse All Colors", "ui");
-    paletteLibraryToggle.setAttribute("aria-expanded", state.paletteLibraryOpen ? "true" : "false");
-    paletteLibraryToggle.setAttribute("aria-label", label);
-    paletteLibraryToggle.setAttribute("title", label);
-    paletteLibraryToggle.dataset.expanded = state.paletteLibraryOpen ? "true" : "false";
-    if (paletteLibraryToggleLabel) {
-      paletteLibraryToggleLabel.textContent = label;
-    }
-  };
-
-  async function handlePaletteSourceChange(nextPaletteId) {
-    const targetId = String(nextPaletteId || "").trim();
-    if (!targetId || targetId === state.activePaletteId) {
-      syncPaletteSourceControls();
-      return;
-    }
-    const didChange = await setActivePaletteSource(targetId, {
-      syncUI: true,
-      overwriteCountryPalette: false,
-    });
-    if (!didChange) {
-      syncPaletteSourceControls();
-    }
-  }
 
   function applyAutoFillOceanColor() {
     const oceanMeta = state.activePaletteOceanMeta || state.activePalettePack?.ocean || null;
@@ -7400,131 +7085,7 @@ function initToolbar({ render } = {}) {
     renderPalette(state.currentPaletteTheme);
     renderPaletteLibrary();
   };
-
-  function renderPaletteLibrary() {
-    if (!paletteLibraryList) return;
-
-    const searchTerm = String(state.paletteLibrarySearch || "").trim().toLowerCase();
-    const sourceOptions = getPaletteSourceOptions();
-    renderPaletteLibrarySourceTabs(sourceOptions);
-    const sourceLabel = state.activePaletteMeta?.display_name || state.currentPaletteTheme || "Palette";
-    const summarizeResults = (count) => (
-      state.currentLanguage === "zh"
-        ? `${count} 个颜色，来源 ${sourceLabel}`
-        : `${count} colors from ${sourceLabel}`
-    );
-    let entries = [];
-    if (state.activePalettePack?.entries) {
-      entries = buildPaletteLibraryEntries();
-    } else {
-      entries = (PALETTE_THEMES[state.currentPaletteTheme] || []).map((color, index) => ({
-        key: `legacy-${index}`,
-        sourceTag: `LEGACY-${index + 1}`,
-        iso2: "",
-        color,
-        label: `Palette Color ${index + 1}`,
-        sourceLabel,
-        mapped: false,
-        unmappedReason: "",
-        dynamic: false,
-      }));
-    }
-
-    const filtered = entries.filter((entry) => {
-      if (!searchTerm) return true;
-      return [
-        entry.label,
-        entry.localizedName,
-        entry.countryFileLabel,
-        entry.iso2,
-        entry.sourceTag,
-        entry.sourceLabel,
-        entry.mappingStatus,
-        entry.mappedIso2,
-        entry.unmappedReason,
-        entry.suggestedIso2,
-      ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
-    });
-    const groupedEntries = buildPaletteLibraryGroups(filtered);
-    const activeSourceId = String(state.activePaletteId || state.currentPaletteTheme || "legacy").trim() || "legacy";
-    const sectionState = ensurePaletteLibrarySectionState(activeSourceId);
-
-    paletteLibraryList.replaceChildren();
-    if (paletteLibrarySummary) {
-      paletteLibrarySummary.textContent = summarizeResults(filtered.length);
-    }
-
-    if (!filtered.length) {
-      const empty = document.createElement("div");
-      empty.className = "palette-library-empty";
-      empty.textContent = t("No palette colors match the current search.", "ui");
-      paletteLibraryList.appendChild(empty);
-      scheduleAdaptivePaletteLibraryHeight();
-      return;
-    }
-
-    groupedEntries.forEach((group) => {
-      const section = document.createElement("details");
-      section.className = "palette-library-section";
-      const isOpen = searchTerm
-        ? group.entries.length > 0
-        : (typeof sectionState[group.key] === "boolean" ? sectionState[group.key] : group.defaultOpen);
-      section.open = isOpen;
-      section.addEventListener("toggle", () => {
-        if (searchTerm) return;
-        sectionState[group.key] = section.open;
-        scheduleAdaptivePaletteLibraryHeight();
-      });
-
-      const summary = document.createElement("summary");
-
-      const heading = document.createElement("div");
-      heading.className = "palette-library-section-heading";
-
-      const title = document.createElement("div");
-      title.className = "palette-library-section-title";
-      title.textContent = group.label();
-
-      const count = document.createElement("div");
-      count.className = "palette-library-section-count";
-      count.textContent = String(group.entries.length);
-
-      heading.appendChild(title);
-      heading.appendChild(count);
-      summary.appendChild(heading);
-      section.appendChild(summary);
-
-      const list = document.createElement("div");
-      list.className = "palette-library-section-list";
-      group.entries.forEach((entry) => {
-        list.appendChild(createPaletteLibraryRow(entry));
-      });
-      section.appendChild(list);
-      paletteLibraryList.appendChild(section);
-    });
-    scheduleAdaptivePaletteLibraryHeight();
-    syncPaletteLibraryToggleUi();
-  }
   state.updatePaletteLibraryUIFn = renderPaletteLibrary;
-
-  function formatPaletteReason(entry) {
-    const reason = getUnmappedReason(entry) || String(entry?.mappingReason || "").trim();
-    if (reason === "dynamic_tag_not_mapped") return t("Dynamic tag", "ui");
-    if (reason === "unsupported_runtime_country") {
-      const suggested = getSuggestedIso2(entry);
-      return suggested
-        ? `${t("Unsupported runtime country", "ui")} (${suggested})`
-        : t("Unsupported runtime country", "ui");
-    }
-    if (reason === "colonial_predecessor") return t("Colonial predecessor", "ui");
-    if (reason === "historical_union_or_predecessor") return t("Historical predecessor", "ui");
-    if (reason === "split_state") return t("Split state", "ui");
-    if (reason === "warlord_or_regional_tag") return t("Warlord / regional tag", "ui");
-    if (reason === "fictional_or_alt_history") return t("Fictional / alt-history", "ui");
-    if (reason === "ambiguous_identity") return t("Ambiguous identity", "ui");
-    if (reason === "unreviewed") return t("Unreviewed", "ui");
-    return reason || t("Unreviewed", "ui");
-  }
 
   function normalizeParentBorderEnabledMap() {
     const supported = Array.isArray(state.parentBorderSupportedCountries)
@@ -7762,71 +7323,7 @@ function initToolbar({ render } = {}) {
     }
     if (riversDashStyle) riversDashStyle.value = state.styleConfig.rivers.dashStyle;
 
-    if (specialZonesDisputedFill) specialZonesDisputedFill.value = state.styleConfig.specialZones.disputedFill;
-    if (specialZonesDisputedStroke) specialZonesDisputedStroke.value = state.styleConfig.specialZones.disputedStroke;
-    if (specialZonesWastelandFill) specialZonesWastelandFill.value = state.styleConfig.specialZones.wastelandFill;
-    if (specialZonesWastelandStroke) {
-      specialZonesWastelandStroke.value = state.styleConfig.specialZones.wastelandStroke;
-    }
-    if (specialZonesCustomFill) specialZonesCustomFill.value = state.styleConfig.specialZones.customFill;
-    if (specialZonesCustomStroke) specialZonesCustomStroke.value = state.styleConfig.specialZones.customStroke;
-    if (specialZonesOpacity) specialZonesOpacity.value = String(Math.round(state.styleConfig.specialZones.opacity * 100));
-    if (specialZonesOpacityValue) {
-      specialZonesOpacityValue.textContent = `${Math.round(state.styleConfig.specialZones.opacity * 100)}%`;
-    }
-    if (specialZonesStrokeWidth) {
-      specialZonesStrokeWidth.value = String(Number(state.styleConfig.specialZones.strokeWidth).toFixed(2));
-    }
-    if (specialZonesStrokeWidthValue) {
-      specialZonesStrokeWidthValue.textContent = Number(state.styleConfig.specialZones.strokeWidth).toFixed(2);
-    }
-    if (specialZonesDashStyle) specialZonesDashStyle.value = state.styleConfig.specialZones.dashStyle;
-
-    const manualFeatures = Array.isArray(state.manualSpecialZones?.features)
-      ? state.manualSpecialZones.features
-      : [];
-    if (specialZoneFeatureList) {
-      const selectedId = state.specialZoneEditor?.selectedId || "";
-      specialZoneFeatureList.replaceChildren();
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = t("No manual zones", "ui");
-      specialZoneFeatureList.appendChild(placeholder);
-
-      manualFeatures.forEach((feature, index) => {
-        const id = String(feature?.properties?.id || `manual_sz_${index + 1}`);
-        const label = String(feature?.properties?.label || feature?.properties?.name || id);
-        const option = document.createElement("option");
-        option.value = id;
-        option.textContent = `${label} (${id})`;
-        specialZoneFeatureList.appendChild(option);
-      });
-      specialZoneFeatureList.value = selectedId && manualFeatures.some((f) => String(f?.properties?.id || "") === selectedId)
-        ? selectedId
-        : "";
-    }
-
-    if (specialZoneTypeSelect) {
-      specialZoneTypeSelect.value = String(state.specialZoneEditor?.zoneType || "custom");
-    }
-    if (specialZoneLabelInput) {
-      specialZoneLabelInput.value = String(state.specialZoneEditor?.label || "");
-    }
-
-    const isDrawing = !!state.specialZoneEditor?.active;
-    if (specialZoneStartBtn) specialZoneStartBtn.disabled = isDrawing;
-    if (specialZoneUndoBtn) specialZoneUndoBtn.disabled = !isDrawing;
-    if (specialZoneFinishBtn) specialZoneFinishBtn.disabled = !isDrawing;
-    if (specialZoneCancelBtn) specialZoneCancelBtn.disabled = !isDrawing;
-    if (specialZoneDeleteBtn) {
-      specialZoneDeleteBtn.disabled = !state.specialZoneEditor?.selectedId;
-    }
-    if (specialZoneEditorHint) {
-      specialZoneEditorHint.textContent = isDrawing
-        ? t("Drawing in progress: click map to add vertices, double-click to finish.", "ui")
-        : t("Click map to add vertices, double-click to finish.", "ui");
-    }
-    renderTransportAppearanceUi();
+    specialZoneEditorController.renderSpecialZoneEditorUI();
     updateToolUI();
   }
   state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
@@ -7877,6 +7374,47 @@ function initToolbar({ render } = {}) {
     updateDirtyIndicator();
   }
   state.updateToolUIFn = updateToolUI;
+
+  const specialZoneEditorController = createSpecialZoneEditorController({
+    state,
+    specialZonesDisputedFill,
+    specialZonesDisputedStroke,
+    specialZonesWastelandFill,
+    specialZonesWastelandStroke,
+    specialZonesCustomFill,
+    specialZonesCustomStroke,
+    specialZonesOpacity,
+    specialZonesStrokeWidth,
+    specialZonesDashStyle,
+    specialZoneTypeSelect,
+    specialZoneLabelInput,
+    specialZoneStartBtn,
+    specialZoneUndoBtn,
+    specialZoneFinishBtn,
+    specialZoneCancelBtn,
+    specialZoneFeatureList,
+    specialZoneDeleteBtn,
+    specialZoneEditorHint,
+    specialZonesOpacityValue,
+    specialZonesStrokeWidthValue,
+    normalizeOceanFillColor,
+    clamp,
+    markDirty,
+    dismissOnboardingHint,
+    updateToolUI,
+    renderTransportAppearanceUi,
+    render,
+    startSpecialZoneDraw,
+    undoSpecialZoneVertex,
+    finishSpecialZoneDraw,
+    cancelSpecialZoneDraw,
+    deleteSelectedManualSpecialZone,
+    selectSpecialZoneById,
+    showAppDialog,
+    showToast,
+    t,
+  });
+  specialZoneEditorController.normalizeSpecialZoneEditorState();
 
   function updateHistoryUi() {
     if (undoBtn) undoBtn.disabled = !canUndoHistory();
@@ -8521,60 +8059,14 @@ function initToolbar({ render } = {}) {
     scenarioContextCollapseBtn.dataset.bound = "true";
   }
 
-  if (scenarioGuideBtn && !scenarioGuideBtn.dataset.bound) {
-    scenarioGuideBtn.setAttribute("aria-haspopup", "dialog");
-    scenarioGuideBtn.setAttribute("aria-controls", "scenarioGuidePopover");
-    scenarioGuideBtn.addEventListener("click", () => {
-      toggleScenarioGuidePopover(scenarioGuideBtn);
-    });
-    scenarioGuideBtn.dataset.bound = "true";
-  }
-
-  if (utilitiesGuideBtn && !utilitiesGuideBtn.dataset.bound) {
-    utilitiesGuideBtn.setAttribute("aria-haspopup", "dialog");
-    utilitiesGuideBtn.setAttribute("aria-controls", "scenarioGuidePopover");
-    utilitiesGuideBtn.addEventListener("click", () => {
-      toggleScenarioGuidePopover(utilitiesGuideBtn);
-    });
-    utilitiesGuideBtn.dataset.bound = "true";
-  }
-
-  scenarioGuideNavButtons.forEach((button) => {
-    if (button.dataset.bound) return;
-    button.addEventListener("click", () => {
-      renderScenarioGuideSection(button.dataset.guideSection || "quick");
-    });
-    button.addEventListener("keydown", (event) => {
-      const currentIndex = scenarioGuideNavButtons.indexOf(button);
-      if (currentIndex < 0) return;
-      let nextIndex = currentIndex;
-      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % scenarioGuideNavButtons.length;
-      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + scenarioGuideNavButtons.length) % scenarioGuideNavButtons.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = scenarioGuideNavButtons.length - 1;
-      if (nextIndex === currentIndex) return;
-      event.preventDefault();
-      const nextButton = scenarioGuideNavButtons[nextIndex];
-      const nextSection = nextButton?.dataset.guideSection || "quick";
-      renderScenarioGuideSection(nextSection);
-      focusScenarioGuideSectionButton(nextSection);
-    });
-    button.dataset.bound = "true";
+  bindScenarioGuideEvents({
+    onToggle: (trigger) => {
+      toggleScenarioGuidePopover(trigger);
+    },
+    onClose: () => {
+      closeScenarioGuidePopover({ restoreFocus: true });
+    },
   });
-
-  if (scenarioGuideCloseBtn && !scenarioGuideCloseBtn.dataset.bound) {
-    scenarioGuideCloseBtn.addEventListener("click", () => {
-      closeScenarioGuidePopover({ restoreFocus: true });
-    });
-    scenarioGuideCloseBtn.dataset.bound = "true";
-  }
-
-  if (scenarioGuideBackdrop && !scenarioGuideBackdrop.dataset.bound) {
-    scenarioGuideBackdrop.addEventListener("click", () => {
-      closeScenarioGuidePopover({ restoreFocus: true });
-    });
-    scenarioGuideBackdrop.dataset.bound = "true";
-  }
 
   if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
     appearanceSpecialZoneBtn.setAttribute("aria-haspopup", "dialog");
@@ -10597,171 +10089,7 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  const onSpecialZonesStyleChange = () => {
-    renderDirty("special-zone-style");
-  };
-  if (specialZonesDisputedFill) {
-    specialZonesDisputedFill.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.disputedFill = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesDisputedStroke) {
-    specialZonesDisputedStroke.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.disputedStroke = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesWastelandFill) {
-    specialZonesWastelandFill.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.wastelandFill = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesWastelandStroke) {
-    specialZonesWastelandStroke.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.wastelandStroke = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesCustomFill) {
-    specialZonesCustomFill.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.customFill = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesCustomStroke) {
-    specialZonesCustomStroke.addEventListener("input", (event) => {
-      state.styleConfig.specialZones.customStroke = normalizeOceanFillColor(event.target.value);
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesOpacity) {
-    specialZonesOpacity.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.styleConfig.specialZones.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.32, 0, 1);
-      if (specialZonesOpacityValue) {
-        specialZonesOpacityValue.textContent = `${Math.round(state.styleConfig.specialZones.opacity * 100)}%`;
-      }
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesStrokeWidth) {
-    specialZonesStrokeWidth.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.styleConfig.specialZones.strokeWidth = clamp(Number.isFinite(value) ? value : 1.3, 0.4, 4);
-      if (specialZonesStrokeWidthValue) {
-        specialZonesStrokeWidthValue.textContent = Number(state.styleConfig.specialZones.strokeWidth).toFixed(2);
-      }
-      onSpecialZonesStyleChange();
-    });
-  }
-  if (specialZonesDashStyle) {
-    specialZonesDashStyle.addEventListener("change", (event) => {
-      state.styleConfig.specialZones.dashStyle = String(event.target.value || "dashed");
-      onSpecialZonesStyleChange();
-    });
-  }
-
-  if (specialZoneTypeSelect) {
-    specialZoneTypeSelect.addEventListener("change", (event) => {
-      state.specialZoneEditor.zoneType = String(event.target.value || "custom");
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      markDirty("special-zone-type");
-    });
-  }
-  if (specialZoneLabelInput) {
-    specialZoneLabelInput.addEventListener("input", (event) => {
-      state.specialZoneEditor.label = String(event.target.value || "");
-      markDirty("special-zone-label");
-    });
-  }
-  if (specialZoneStartBtn) {
-    specialZoneStartBtn.addEventListener("click", () => {
-      startSpecialZoneDraw({
-        zoneType: String(specialZoneTypeSelect?.value || state.specialZoneEditor.zoneType || "custom"),
-        label: String(specialZoneLabelInput?.value || state.specialZoneEditor.label || ""),
-      });
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      dismissOnboardingHint();
-      updateToolUI();
-      if (render) render();
-    });
-  }
-  if (specialZoneUndoBtn) {
-    specialZoneUndoBtn.addEventListener("click", () => {
-      undoSpecialZoneVertex();
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      updateToolUI();
-      if (render) render();
-    });
-  }
-  if (specialZoneFinishBtn) {
-    specialZoneFinishBtn.addEventListener("click", () => {
-      const didFinish = finishSpecialZoneDraw();
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      updateToolUI();
-      if (didFinish) {
-        markDirty("special-zone-finish");
-      }
-      if (render) render();
-    });
-  }
-  if (specialZoneCancelBtn) {
-    specialZoneCancelBtn.addEventListener("click", () => {
-      cancelSpecialZoneDraw();
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      updateToolUI();
-      if (render) render();
-    });
-  }
-  if (specialZoneFeatureList) {
-    specialZoneFeatureList.addEventListener("change", (event) => {
-      selectSpecialZoneById(String(event.target.value || ""));
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      if (render) render();
-    });
-  }
-  if (specialZoneDeleteBtn && !specialZoneDeleteBtn.dataset.bound) {
-    specialZoneDeleteBtn.addEventListener("click", async () => {
-      if (!state.specialZoneEditor?.selectedId) return;
-      const confirmed = await showAppDialog({
-        title: t("Delete Selected", "ui"),
-        message: t("Delete the selected special region?", "ui"),
-        details: t(
-          "This removes the selected manual zone from the current project. You can undo the deletion from history.",
-          "ui"
-        ),
-        confirmLabel: t("Delete Zone", "ui"),
-        cancelLabel: t("Cancel", "ui"),
-        tone: "warning",
-      });
-      if (!confirmed) return;
-      deleteSelectedManualSpecialZone();
-      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-        state.updateSpecialZoneEditorUIFn();
-      }
-      markDirty("special-zone-delete");
-      if (render) render();
-      showToast(t("Selected special region was deleted.", "ui"), {
-        title: t("Delete Selected", "ui"),
-        tone: "warning",
-      });
-    });
-    specialZoneDeleteBtn.dataset.bound = "true";
-  }
+  specialZoneEditorController.bindSpecialZoneEditorEvents();
 
   if (presetPolitical) {
     presetPolitical.addEventListener("click", async () => {
@@ -10943,23 +10271,7 @@ function initToolbar({ render } = {}) {
       await handlePaletteSourceChange(event.target.value);
     });
   }
-
-  if (paletteLibraryToggle) {
-    paletteLibraryToggle.addEventListener("click", () => {
-      state.paletteLibraryOpen = !state.paletteLibraryOpen;
-      paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
-      syncPaletteLibraryToggleUi();
-      renderPaletteLibrary();
-    });
-  }
-
-  if (paletteLibrarySearch) {
-    paletteLibrarySearch.value = state.paletteLibrarySearch || "";
-    paletteLibrarySearch.addEventListener("input", (event) => {
-      state.paletteLibrarySearch = String(event.target.value || "");
-      renderPaletteLibrary();
-    });
-  }
+  bindPaletteLibraryPanelEvents();
 
   if (internalBorderAutoColor) {
     internalBorderAutoColor.checked = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
@@ -11427,13 +10739,12 @@ function initToolbar({ render } = {}) {
       applyResponsiveChromeDefaults();
       updateDockCollapsedUi();
       refreshScenarioContextBar();
-      scheduleAdaptivePaletteLibraryHeight();
+      handlePaletteLibraryResize();
     });
     state.ui.overlayResizeBound = true;
   }
 
-  paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
-  syncPaletteLibraryToggleUi();
+  syncPaletteLibraryPanelVisibility();
   syncPaletteSourceControls();
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();
@@ -11475,6 +10786,10 @@ function initToolbar({ render } = {}) {
     scenarioGuideBackdrop.setAttribute("aria-hidden", "true");
   }
   renderScenarioGuideSection("quick");
+  syncScenarioGuideTriggerButtons({
+    isOpen: false,
+    tutorialEntryVisible: !!state.ui.tutorialEntryVisible,
+  });
   if (specialZonePopover) {
     specialZonePopover.setAttribute("aria-hidden", specialZonePopover.classList.contains("hidden") ? "true" : "false");
   }

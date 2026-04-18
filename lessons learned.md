@@ -854,3 +854,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 97. 提取 controller 时，旧 donor 文件里继续会用到的 helper 依赖要显式注入到新模块
 - 这次 `startup_hydration.js` 在 donor 文件里原本依赖 `areScenarioFeatureCollectionsEquivalent()`，下沉后如果没有把它一起迁走或显式注入，运行到 hydrate fallback 分支就会直接 `ReferenceError`。
 - 更稳的最短路径是：提取 controller 时逐条核对自由变量，能留在 donor 的 helper 就通过依赖注入传入；需要变成 owner 的 helper 就同波次搬走，并补 owner-file 边界测试。
+
+### 98. UI 大文件首刀先拆“闭环面板”和“纯错误处理”，toolbar 继续保留 state callback 注册
+- 这次 `toolbar.js` 第一批最稳的切口是 `export_failure_handler` 和 `palette_library_panel`：前者纯错误分类，后者是完整的色板库面板闭环；这两块下沉后能立刻减轻 donor 文件，又不会碰 guide/export overlay 的跨面板仲裁。
+- 更稳的最短路径是：新模块接管面板内部 DOM 与局部逻辑，`toolbar.js` 继续保留 `state.updatePaletteSourceUIFn / state.updatePaletteLibraryUIFn / state.renderPaletteFn` 这类全局 callback 注册和主初始化编排，再用静态 owner/facade 测试钉住边界。
+
+### 99. overlay 类 UI 第二刀先拆“面板内部闭环”，把跨 surface 仲裁和 URL restore 留在 toolbar facade
+- 这次 `scenario guide` 最稳的切法是：把 section/status 渲染、guide 按钮同步和面板自己的事件绑定下沉到 `scenario_guide_popover.js`，同时把 `toggleScenarioGuidePopover / closeScenarioGuidePopover / restoreSupportSurfaceFromUrl` 继续留在 `toolbar.js`。
+- 更稳的最短路径是：新模块只知道 guide 自己的 DOM 和小范围 UI helper，`toolbar.js` 继续统一处理 dock/export/special-zone 的互斥、focus return 和 URL state，这样拆分后最不容易引入 overlay 互相打架的回归。
+
+### 100. special zone 这类编辑面板要把“面板闭环”和“popover 外壳”分两层拆
+- 这次 `special_zone_editor.js` 最稳的切法是：新模块接管 `styleConfig.specialZones` 归一、manual zone 列表渲染、start/undo/finish/cancel/select/delete 事件绑定，`toolbar.js` 继续保留 `openSpecialZonePopover / closeSpecialZonePopover` 和全局 dismiss。
+- 更稳的最短路径是：让编辑器模块只关心自己的表单和 core action wiring，把 overlay 打开关闭、focus restore、与 guide/export 的互斥留在 toolbar facade，这样拆分后保存链和交互链都更稳。

@@ -131,3 +131,11 @@
   - `tests/test_scenario_manager_boundary_contract.py` 与 `tests/test_startup_shell.py` 已同步到新的 owner 边界，scenario apply pipeline contract 继续受保护。
   - 已修复一轮 review 暴露的 3 个收口问题：`scenario_manager.js` 的 import/wrapper 重名、`scenario_resources.js` 的 startup hydration 解构重名、`startup_hydration.js` 缺失 `areScenarioFeatureCollectionsEquivalent` 依赖。
   - 已补针对性边界断言，并重新验证 `node --check` 与 80 条静态边界 / startup tests 全绿。
+  - Wave 2 已开始：新增 `js/ui/toolbar/export_failure_handler.js`，把 export error 分类与 toast 提示从 `toolbar.js` 下沉出去。
+  - Wave 2 已开始：新增 `js/ui/toolbar/palette_library_panel.js`，把 palette library 的分组、筛选、source tab、toggle 和 panel DOM 更新下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/scenario_guide_popover.js`，把 scenario guide 的 section/status 渲染、trigger 同步和 guide 自己的事件绑定下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/toolbar/special_zone_editor.js`，把 special zone 的 state 归一、面板渲染和 editor 自己的事件绑定下沉成独立 controller。
+  - `toolbar.js` 继续保留 facade：仍负责 `state.updatePaletteSourceUIFn / state.updatePaletteLibraryUIFn / state.renderPaletteFn` 注册，以及 `renderPalette()` 与主初始化编排。
+  - `toolbar.js` 继续保留 scenario guide 的 facade：仍负责跨面板仲裁、URL restore、shared dismiss 与总入口 `toggleScenarioGuidePopover / closeScenarioGuidePopover`。
+  - `toolbar.js` 继续保留 special zone 的 facade：仍负责 popover 打开关闭、全局 dismiss 和跨 overlay 的互斥仲裁。
+  - 新增 `tests/test_toolbar_split_boundary_contract.py`，并重新验证 109 条静态边界 / UI contract tests 全绿。
