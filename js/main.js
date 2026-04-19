@@ -1,5 +1,27 @@
 // App entry point (Phase 13)
 import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
+import { createStartupBootOverlayController } from "./bootstrap/startup_boot_overlay.js";
+import {
+  createRenderDispatcher,
+  createStartupBootArtifactsOverride,
+  createStartupBundleLoadDiagnostics,
+  formatStartupRuntimeShellContractFailure,
+  getBootLanguage,
+  getConfiguredDefaultScenarioId,
+  getDeferredPromotionDelay,
+  getStartupBundleLanguage,
+  getStartupBundleUrl,
+  getStartupScenarioSupportUrl,
+  hydrateLanguage,
+  hydrateViewSettings,
+  initLongAnimationFrameObserver,
+  normalizeBatchFillScopes,
+  nowMs,
+  persistViewSettings,
+  postStartupSupportKeyUsageReport,
+  processHierarchyData,
+  warnOnStartupBundleIntegrity,
+} from "./bootstrap/startup_bootstrap_support.js";
 import {
   buildCityLocalizationPatch,
   loadCitySupportData,
@@ -23,7 +45,6 @@ import {
   hydrateActiveScenarioBundle,
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
-  hasScenarioRuntimeShellContract,
   validateScenarioRuntimeShellContract,
   loadScenarioBundle,
   loadScenarioRegistry,
@@ -32,268 +53,25 @@ import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/r
 import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";
 import { syncScenarioLocalizationState } from "./core/scenario_localization_state.js";
-import { consumeStartupSupportKeyUsageAuditReport, initTranslations } from "./ui/i18n.js";
+import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
-import { normalizeCountryCodeAlias } from "./core/country_code_aliases.js";
 import { loadStartupBundleViaWorker } from "./core/startup_worker_client.js";
-
-const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
-const STARTUP_SUPPORT_AUDIT_PARAM = "startup_support_audit";
-const STARTUP_SUPPORT_AUDIT_LABEL_PARAM = "startup_support_audit_label";
-const STARTUP_SUPPORT_AUDIT_DEFER_PARAM = "startup_support_audit_defer";
-const STARTUP_SUPPORT_AUDIT_REPORT_URL = "/__dev/startup-support/key-usage-report";
-const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
 
 function requestMainRender(reason = "", { flush = false } = {}) {
   return flush ? flushRenderBoundary(reason) : requestRender(reason);
 }
 
-function normalizeCountryCode(rawCode) {
-  return normalizeCountryCodeAlias(rawCode);
-}
-
-function normalizeBatchFillScopes(rawScopes) {
-  const scopes = Array.isArray(rawScopes) ? rawScopes : [];
-  const normalized = scopes
-    .map((scope) => String(scope || "").trim().toLowerCase())
-    .filter((scope) => VALID_BATCH_FILL_SCOPES.has(scope));
-  return normalized.length ? Array.from(new Set(normalized)) : ["parent", "country"];
-}
-
-function isStartupSupportAuditEnabled() {
-  try {
-    const params = new URLSearchParams(globalThis.location?.search || "");
-    const raw = String(params.get(STARTUP_SUPPORT_AUDIT_PARAM) || "").trim().toLowerCase();
-    return ["1", "true", "yes", "on"].includes(raw);
-  } catch (_error) {
-    return false;
-  }
-}
-
-function shouldDeferStartupSupportAuditPost() {
-  try {
-    const params = new URLSearchParams(globalThis.location?.search || "");
-    const raw = String(params.get(STARTUP_SUPPORT_AUDIT_DEFER_PARAM) || "").trim().toLowerCase();
-    return ["1", "true", "yes", "on"].includes(raw);
-  } catch (_error) {
-    return false;
-  }
-}
-
-async function postStartupSupportKeyUsageReport({ scenarioId = "", source = "" } = {}) {
-  if (!isStartupSupportAuditEnabled()) {
-    return;
-  }
-  if (shouldDeferStartupSupportAuditPost()) {
-    return;
-  }
-  const usage = consumeStartupSupportKeyUsageAuditReport();
-  if (!usage) {
-    return;
-  }
-  try {
-    const params = new URLSearchParams(globalThis.location?.search || "");
-    const sampleLabel = String(params.get(STARTUP_SUPPORT_AUDIT_LABEL_PARAM) || "").trim();
-    await fetch(STARTUP_SUPPORT_AUDIT_REPORT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        scenarioId: String(scenarioId || "").trim(),
-        source: String(source || "").trim(),
-        sampleLabel,
-        usage,
-      }),
-    });
-  } catch (error) {
-    console.warn("[startup-support-audit] Unable to persist startup support key-usage report.", error);
-  }
-}
-
-function processHierarchyData(data) {
-  state.hierarchyData = data || null;
-  state.hierarchyGroupsByCode = new Map();
-  state.countryGroupsData = state.hierarchyData?.country_groups || null;
-  state.countryGroupMetaByCode = new Map();
-  state.countryInteractionPoliciesByCode = new Map();
-
-  if (state.hierarchyData?.groups) {
-    const labels = state.hierarchyData.labels || {};
-    Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
-      const code = normalizeCountryCode(groupId.split("_")[0]);
-      if (!code) return;
-      const list = state.hierarchyGroupsByCode.get(code) || [];
-      list.push({
-        id: groupId,
-        label: labels[groupId] || groupId,
-        children: Array.isArray(children) ? children : [],
-      });
-      state.hierarchyGroupsByCode.set(code, list);
-    });
-  }
-
-  state.hierarchyGroupsByCode.forEach((groups) => {
-    groups.sort((a, b) => a.label.localeCompare(b.label));
-  });
-
-  const countryMeta = state.countryGroupsData?.country_meta || {};
-  Object.entries(countryMeta).forEach(([rawCode, meta]) => {
-    const code = normalizeCountryCode(rawCode);
-    if (!code || !meta || typeof meta !== "object") return;
-    state.countryGroupMetaByCode.set(code, {
-      continentId: String(meta.continent_id || "").trim(),
-      continentLabel: String(meta.continent_label || "").trim(),
-      subregionId: String(meta.subregion_id || "").trim(),
-      subregionLabel: String(meta.subregion_label || "").trim(),
-    });
-  });
-
-  const interactionPolicies = state.hierarchyData?.interaction_policies || {};
-  Object.entries(interactionPolicies).forEach(([rawCode, policy]) => {
-    const code = normalizeCountryCode(rawCode);
-    if (!code || !policy || typeof policy !== "object") return;
-    state.countryInteractionPoliciesByCode.set(code, {
-      leafSource: String(policy.leaf_source || "").trim().toLowerCase(),
-      leafKind: String(policy.leaf_kind || "").trim().toLowerCase(),
-      parentSource: String(policy.parent_source || "").trim().toLowerCase(),
-      parentScopeLabel: String(policy.parent_scope_label || "").trim(),
-      requiresComposite: !!policy.requires_composite,
-      quickFillScopes: normalizeBatchFillScopes(policy.quick_fill_scopes),
-    });
-  });
-}
-
-function hydrateLanguage() {
-  try {
-    const storedLang = localStorage.getItem("map_lang");
-    if (storedLang) {
-      state.currentLanguage = storedLang;
-    }
-  } catch (error) {
-    console.warn("Language preference not available:", error);
-  }
-}
-
-function hydrateViewSettings() {
-  try {
-    const raw = localStorage.getItem(VIEW_SETTINGS_STORAGE_KEY);
-    if (!raw) return;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return;
-    const cityPoints = parsed.cityPoints && typeof parsed.cityPoints === "object"
-      ? parsed.cityPoints
-      : {};
-    if (cityPoints.show !== undefined) {
-      state.showCityPoints = !!cityPoints.show;
-    }
-    if (cityPoints.style && typeof cityPoints.style === "object") {
-      state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
-        ...(state.styleConfig.cityPoints || {}),
-        ...cityPoints.style,
-      });
-    }
-  } catch (error) {
-    console.warn("View settings preference not available:", error);
-  }
-}
-
-function persistViewSettings() {
-  try {
-    localStorage.setItem(
-      VIEW_SETTINGS_STORAGE_KEY,
-      JSON.stringify({
-        schemaVersion: 1,
-        cityPoints: {
-          show: state.showCityPoints !== false,
-          style: normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints),
-        },
-      })
-    );
-  } catch (error) {
-    console.warn("Unable to persist view settings:", error);
-  }
-}
-
-function createRenderDispatcher(renderFn) {
-  let framePending = false;
-
-  const flush = () => {
-    framePending = false;
-    renderFn();
-  };
-
-  const schedule = () => {
-    if (framePending) return;
-    framePending = true;
-    globalThis.requestAnimationFrame(flush);
-  };
-
-  return { schedule, flush };
-}
-
-function initLongAnimationFrameObserver() {
-  if (typeof globalThis.PerformanceObserver !== "function") return;
-  try {
-    const observer = new globalThis.PerformanceObserver((list) => {
-      const entries = list.getEntries ? list.getEntries() : [];
-      if (!entries.length) return;
-      const latest = entries[entries.length - 1];
-      if (!latest) return;
-      if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
-        state.renderPerfMetrics = {};
-      }
-      state.renderPerfMetrics.longAnimationFrameBlockingDuration = {
-        durationMs: Math.max(0, Number(latest.duration || 0)),
-        blockingDuration: Math.max(0, Number(latest.blockingDuration || 0)),
-        startTime: Math.max(0, Number(latest.startTime || 0)),
-        renderStart: Math.max(0, Number(latest.renderStart || 0)),
-        firstUIEventTimestamp: Math.max(0, Number(latest.firstUIEventTimestamp || 0)),
-        recordedAt: Date.now(),
-      };
-      globalThis.__renderPerfMetrics = state.renderPerfMetrics;
-    });
-    observer.observe({ type: "long-animation-frame", buffered: true });
-    state.longAnimationFrameObserver = observer;
-  } catch (_error) {
-    // Experimental API; ignore unsupported browsers.
-  }
-}
-
-function getDeferredPromotionDelay(profile) {
-  if (profile === "balanced") return 250;
-  if (profile === "auto") return 1200;
-  return 0;
-}
-
 let deferredPromotionHandle = null;
-let bootOverlayBound = false;
-let bootContinueHandler = null;
-let bootProgressAnimationHandle = null;
-let bootProgressPhaseStartedAt = nowMs();
 let milsymbolLoadPromise = null;
 let deferredUiBootstrapPromise = null;
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let postReadyTaskHandles = new Map();
 let postReadyTaskEpoch = 0;
-let startupReadonlyUnlockHandle = null;
-let bootMetricsLogged = false;
 let forcedStartupReadonlyInfraRetryCount = 0;
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
 
-const BOOT_PHASE_WINDOWS = {
-  shell: { min: 0, max: 8, durationMs: 900 },
-  "base-data": { min: 8, max: 52, durationMs: 8800 },
-  "scenario-bundle": { min: 52, max: 80, durationMs: 6400 },
-  "scenario-apply": { min: 80, max: 94, durationMs: 3400 },
-  warmup: { min: 94, max: 96, durationMs: 1200 },
-  "detail-promotion": { min: 96, max: 98, durationMs: 2200 },
-  "interaction-infra": { min: 98, max: 99, durationMs: 2800 },
-  ready: { min: 100, max: 100, durationMs: 0 },
-  error: { min: 0, max: 99, durationMs: 0 },
-};
 const CONTEXT_LAYER_LOAD_ORDER = [
   "rivers",
   "roads",
@@ -314,578 +92,25 @@ const PHYSICAL_CONTOUR_LAYER_SET = [
   "physical_contours_minor",
 ];
 
-const BOOT_COPY = {
-  en: {
-    shell: {
-      title: "Preparing application shell",
-      message: "Loading the workspace frame before interaction unlocks.",
-      retry: "Retry",
-      continue: "Continue without scenario",
-    },
-    "base-data": {
-      title: "Loading base map",
-      message: "Fetching topology, palette, hierarchy, and core localization data.",
-    },
-    "scenario-bundle": {
-      title: "Loading default scenario",
-      message: "Preparing the TNO 1962 scenario bundle for the first visible frame.",
-    },
-    "scenario-apply": {
-      title: "Applying default scenario",
-      message: "Composing ownership, controllers, runtime topology, and UI state in one pass.",
-    },
-    warmup: {
-      title: "Finalizing first render",
-      message: "Flushing the first visible frame before detailed interactions finish preparing.",
-    },
-    "detail-promotion": {
-      title: "Preparing detailed interactions",
-      message: "Promoting the detailed topology behind the visible map.",
-    },
-    "interaction-infra": {
-      title: "Building interaction indexes",
-      message: "Finishing selection, hover, and hit-testing before the interface unlocks.",
-    },
-    ready: {
-      title: "Ready",
-      message: "The default scenario is loaded.",
-    },
-    error: {
-      title: "Startup blocked",
-      message: "The default scenario could not be prepared. Retry or continue with the base map.",
-    },
-  },
-  zh: {
-    shell: {
-      title: "正在准备应用框架",
-      message: "先完成工作区壳层初始化，再开放交互。",
-      retry: "重试",
-      continue: "无剧本继续",
-    },
-    "base-data": {
-      title: "正在加载基础地图",
-      message: "正在获取基础拓扑、调色板、层级和核心地名数据。",
-    },
-    "scenario-bundle": {
-      title: "正在加载默认剧本",
-      message: "正在准备 TNO 1962 剧本包，用于首个可见画面。",
-    },
-    "scenario-apply": {
-      title: "正在应用默认剧本",
-      message: "正在一次性组合归属、控制、运行时拓扑和 UI 状态。",
-    },
-    warmup: {
-      title: "正在完成首帧渲染",
-      message: "首个可见画面即将就绪，随后继续准备细分交互。",
-    },
-    "detail-promotion": {
-      title: "正在准备细分交互",
-      message: "正在在可见地图背后提升细分拓扑。",
-    },
-    "interaction-infra": {
-      title: "正在建立交互索引",
-      message: "正在完成点击、悬停与选择支持，随后开放交互。",
-    },
-    ready: {
-      title: "加载完成",
-      message: "默认剧本已经就绪。",
-    },
-    error: {
-      title: "启动被阻断",
-      message: "默认剧本未能完成启动。你可以重试，或先进入基础地图。",
-    },
-  },
-};
-
-const STARTUP_READONLY_COPY = {
-  en: {
-    pending: "Detailed interactions are still loading. Pan and zoom remain available.",
-    loading: "Preparing detailed interactions. The map is view-only for a moment.",
-    failed: "Detailed interactions are unavailable right now. The map stays view-only until the detail layer recovers.",
-    healthGate: "Scenario data is being held in safe mode. The map stays view-only until startup recovery finishes.",
-  },
-  zh: {
-    pending: "细分交互仍在加载中。当前可平移缩放，但保持只读。",
-    loading: "正在准备细分交互。当前地图暂时只读。",
-    failed: "细分交互暂时不可用。在细分图层恢复前，地图将保持只读。",
-    healthGate: "场景数据已切换到安全模式。在启动恢复完成前，地图将保持只读。",
-  },
-};
-
-function nowMs() {
-  return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-}
-
-function getBootLanguage() {
-  return String(state.currentLanguage || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
-}
-
-function getConfiguredDefaultScenarioId() {
-  if (typeof document === "undefined") {
-    return "";
-  }
-  try {
-    const params = typeof globalThis.URLSearchParams === "function"
-      ? new globalThis.URLSearchParams(globalThis.location?.search || "")
-      : null;
-    const queryOverride = String(params?.get("default_scenario") || "").trim();
-    if (queryOverride) {
-      return queryOverride;
-    }
-  } catch (_error) {
-    // Ignore malformed location/search state and fall back to the static default.
-  }
-  const configured = document
-    .querySelector('meta[name="default-scenario"]')
-    ?.getAttribute("content");
-  return String(configured || "").trim();
-}
-
-function getStartupBundleLanguage() {
-  return getBootLanguage() === "zh" ? "zh" : "en";
-}
-
-function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage()) {
-  const normalizedScenarioId = String(scenarioId || "").trim();
-  if (!normalizedScenarioId) {
-    return "";
-  }
-  const bundleLanguage = String(language || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
-  return `data/scenarios/${normalizedScenarioId}/startup.bundle.${bundleLanguage}.json`;
-}
-
-function getStartupScenarioSupportUrl(scenarioId, filename) {
-  const normalizedScenarioId = String(scenarioId || "").trim();
-  const normalizedFilename = String(filename || "").trim();
-  if (!normalizedScenarioId || !normalizedFilename) {
-    return "";
-  }
-  return `data/scenarios/${normalizedScenarioId}/${normalizedFilename}`;
-}
-
-function createStartupBundleLoadDiagnostics({
-  startupBundleUrl = "",
-  language = "en",
-  metrics = null,
-} = {}) {
-  const runtimeTopologyAvailable = Number(metrics?.runtimeTopology?.featureCount || 0) > 0;
-  const bootstrapStrategy = String(metrics?.startupBundle?.bootstrapStrategy || "").trim();
-  return {
-    optionalResources: {
-      runtime_topology: {
-        ok: runtimeTopologyAvailable,
-        reason: runtimeTopologyAvailable ? "startup-bundle" : (bootstrapStrategy || "deferred"),
-        errorMessage: "",
-        metrics: metrics?.runtimeTopology || null,
-        url: startupBundleUrl,
-      },
-      geo_locale_patch: {
-        ok: !!metrics?.geoLocalePatch?.present,
-        reason: "startup-bundle",
-        errorMessage: "",
-        language,
-        localeSpecific: true,
-        metrics: metrics?.geoLocalePatch || null,
-      },
-    },
-    requiredResources: {
-      manifest: metrics?.startupBundle || null,
-      countries: metrics?.countries || null,
-      owners: metrics?.owners || null,
-      controllers: metrics?.controllers || null,
-      cores: metrics?.cores || null,
-    },
-    bundleLevel: "bootstrap",
-    startupBundle: true,
-  };
-}
-
-function createStartupBootArtifactsOverride({
-  payload = null,
-  baseDecodedCollections = null,
-  metrics = null,
-} = {}) {
-  const hasScenarioRuntimeBootstrap = hasScenarioRuntimeShellContract({
-    runtimeTopologyPayload: payload?.scenario?.runtime_topology_bootstrap || null,
-    runtimePoliticalMeta: payload?.scenario?.runtime_political_meta || null,
-  });
-  return {
-    topologyPrimary: payload?.base?.topology_primary || null,
-    locales: payload?.base?.locales || null,
-    geoAliases: payload?.base?.geo_aliases || null,
-    hasScenarioRuntimeBootstrap,
-    localeLevel: "startup",
-    startupBootCacheState: {
-      enabled: false,
-      baseTopology: "startup-bundle",
-      localization: "startup-bundle",
-      scenarioBootstrap: "startup-bundle",
-    },
-    startupWorkerUsed: true,
-    decodedCollections: baseDecodedCollections || null,
-    resourceMetrics: {
-      topologyPrimary: metrics?.topologyPrimary || null,
-      locales: null,
-      geoAliases: null,
-    },
-  };
-}
-
-function formatStartupRuntimeShellContractFailure(contract) {
-  const missingParts = [
-    ...(Array.isArray(contract?.missingObjects) ? contract.missingObjects.map((objectName) => `missing-${objectName}`) : []),
-    ...(contract?.missingPoliticalMeta ? ["missing-runtime-political-meta"] : []),
-  ];
-  return missingParts.join(", ") || "incomplete-runtime-shell";
-}
-
-function warnOnStartupBundleIntegrity(bundle, { source = "" } = {}) {
-  if (String(source || "").trim() !== "startup-bundle") {
-    return;
-  }
-  const missingCollections = [];
-  const baseObjects = state.topologyPrimary?.objects || {};
-  const runtimeObjects = bundle?.runtimeTopologyPayload?.objects || {};
-  if (baseObjects.ocean && !Array.isArray(state.oceanData?.features)) {
-    missingCollections.push("base.ocean");
-  }
-  if (baseObjects.land && !Array.isArray(state.landBgData?.features)) {
-    missingCollections.push("base.land");
-  }
-  if (baseObjects.water_regions && !Array.isArray(state.waterRegionsData?.features)) {
-    missingCollections.push("base.water_regions");
-  }
-  if (runtimeObjects.scenario_water && !Array.isArray(state.scenarioWaterRegionsData?.features)) {
-    missingCollections.push("scenario.scenario_water");
-  }
-  if (runtimeObjects.context_land_mask && !Array.isArray(state.scenarioContextLandMaskData?.features)) {
-    missingCollections.push("scenario.context_land_mask");
-  }
-  if (!missingCollections.length) {
-    return;
-  }
-  console.warn(
-    `[startup-bundle] Boot completed with missing startup collections: ${missingCollections.join(", ")}.`,
-    {
-      activeScenarioId: String(state.activeScenarioId || bundle?.manifest?.scenario_id || ""),
-      topologyBundleMode: String(state.topologyBundleMode || ""),
-    }
-  );
-}
-
-function getBootCopy(phase = state.bootPhase) {
-  const language = getBootLanguage();
-  return BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
-}
-
-function getBootDom() {
-  if (typeof document === "undefined") {
-    return {};
-  }
-  return {
-    appShell: document.getElementById("appShell"),
-    overlay: document.getElementById("bootOverlay"),
-    title: document.getElementById("bootOverlayTitle"),
-    message: document.getElementById("bootOverlayMessage"),
-    progressTrack: document.getElementById("bootOverlayProgress"),
-    progressBar: document.getElementById("bootOverlayProgressBar"),
-    progressText: document.getElementById("bootOverlayProgressText"),
-    actions: document.getElementById("bootOverlayActions"),
-    retryBtn: document.getElementById("bootRetryBtn"),
-    continueBtn: document.getElementById("bootContinueBtn"),
-    readonlyBanner: document.getElementById("startupReadonlyBanner"),
-    readonlyMessage: document.getElementById("startupReadonlyMessage"),
-  };
-}
-
-function getStartupReadonlyCopy() {
-  const language = getBootLanguage();
-  return STARTUP_READONLY_COPY[language] || STARTUP_READONLY_COPY.en;
-}
-
-function getStartupReadonlyMessage() {
-  const copy = getStartupReadonlyCopy();
-  if (state.startupReadonlyReason === "detail-promotion-failed") {
-    return copy.failed;
-  }
-  if (state.startupReadonlyReason === "scenario-health-gate") {
-    return copy.healthGate;
-  }
-  if (state.startupReadonlyUnlockInFlight) {
-    return copy.loading;
-  }
-  return copy.pending;
-}
-
-function resolveStartupInteractionMode() {
-  const search = globalThis.location?.search || "";
-  if (search && globalThis.URLSearchParams) {
-    const params = new globalThis.URLSearchParams(search);
-    const raw = String(params.get("startup_interaction") || "").trim().toLowerCase();
-    if (raw === "full" || raw === "readonly") {
-      return raw;
-    }
-  }
-  return "readonly";
-}
-
-function clearStartupReadonlyUnlockHandle() {
-  if (startupReadonlyUnlockHandle === null) return;
-  globalThis.clearTimeout?.(startupReadonlyUnlockHandle);
-  startupReadonlyUnlockHandle = null;
-}
-
-function setStartupReadonlyState(active, { reason = "", unlockInFlight = false } = {}) {
-  state.startupReadonly = !!active;
-  state.startupReadonlyReason = state.startupReadonly ? String(reason || "detail-promotion").trim() : "";
-  state.startupReadonlyUnlockInFlight = state.startupReadonly ? !!unlockInFlight : false;
-  state.startupReadonlySince = state.startupReadonly
-    ? (Number(state.startupReadonlySince) || Date.now())
-    : 0;
-  if (!state.startupReadonly) {
-    clearStartupReadonlyUnlockHandle();
-  }
-  syncBootOverlay();
-}
+const bootOverlayController = createStartupBootOverlayController();
+const {
+  checkpointBootMetric,
+  checkpointBootMetricOnce,
+  completeBootSequenceLogging,
+  finishBootMetric,
+  getBootProgressWindow,
+  hasStartupReadonlyUnlockScheduled,
+  initializeBootOverlay,
+  resetBootMetrics,
+  resolveStartupInteractionMode,
+  scheduleStartupReadonlyUnlockTimer,
+  setBootContinueHandler,
+  setBootPreviewVisible,
+  setBootState,
+  setStartupReadonlyState,
+  startBootMetric,
+} = bootOverlayController;
 state.setStartupReadonlyStateFn = setStartupReadonlyState;
-
-function setBootPreviewVisible(active) {
-  state.bootPreviewVisible = !!active;
-  syncBootOverlay();
-}
-
-function getBootProgressWindow(phase = state.bootPhase) {
-  return BOOT_PHASE_WINDOWS[phase] || BOOT_PHASE_WINDOWS.shell;
-}
-
-function sampleBootPhaseProgress(phase = state.bootPhase) {
-  const window = getBootProgressWindow(phase);
-  if (phase === "ready") {
-    return 100;
-  }
-  if (phase === "error") {
-    return Math.max(window.min, Math.min(99, Number(state.bootProgress) || window.min));
-  }
-  const elapsedMs = Math.max(0, nowMs() - bootProgressPhaseStartedAt);
-  const normalizedElapsed = Math.min(1, elapsedMs / Math.max(1, window.durationMs || 1));
-  const shapedProgress = (normalizedElapsed * 0.68) + ((normalizedElapsed * normalizedElapsed) * 0.32);
-  const ceiling = phase === "warmup" || phase === "interaction-infra"
-    ? 99
-    : Math.max(window.min, window.max - 0.35);
-  return Math.max(window.min, Math.min(ceiling, window.min + ((window.max - window.min) * shapedProgress)));
-}
-
-function stopBootProgressAnimation() {
-  if (bootProgressAnimationHandle !== null) {
-    globalThis.cancelAnimationFrame?.(bootProgressAnimationHandle);
-    bootProgressAnimationHandle = null;
-  }
-}
-
-function startBootProgressAnimation() {
-  stopBootProgressAnimation();
-  const tick = () => {
-    bootProgressAnimationHandle = null;
-    if (state.bootPhase === "ready" || state.bootPhase === "error") {
-      return;
-    }
-    const nextProgress = sampleBootPhaseProgress(state.bootPhase);
-    if (nextProgress > Number(state.bootProgress || 0)) {
-      state.bootProgress = nextProgress;
-      syncBootOverlay();
-    }
-    bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
-  };
-  bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
-}
-
-function syncBootOverlay() {
-  if (typeof document === "undefined") {
-    return;
-  }
-  const dom = getBootDom();
-  if (!dom.overlay) {
-    return;
-  }
-  const copy = getBootCopy(state.bootPhase);
-  const progress = Math.max(0, Math.min(100, Number(state.bootProgress) || 0));
-  const showPreviewPeek = !!state.bootPreviewVisible && state.bootPhase !== "ready" && state.bootPhase !== "error";
-  document.body?.classList.toggle("app-booting", !!state.bootBlocking);
-  document.body?.classList.toggle("app-startup-readonly", !!state.startupReadonly);
-  if (dom.appShell) {
-    dom.appShell.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
-  }
-  dom.overlay.classList.toggle("hidden", state.bootPhase === "ready");
-  dom.overlay.classList.toggle("is-peek", showPreviewPeek);
-  dom.overlay.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
-  if (dom.title) {
-    dom.title.textContent = copy.title;
-  }
-  if (dom.message) {
-    dom.message.textContent = state.bootPhase === "error"
-      ? (state.bootError || copy.message)
-      : (state.bootMessage || copy.message);
-  }
-  if (dom.progressBar) {
-    dom.progressBar.style.width = `${progress}%`;
-  }
-  if (dom.progressTrack) {
-    dom.progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
-    dom.progressTrack.setAttribute("aria-valuetext", `${Math.round(progress)}%`);
-  }
-  if (dom.progressText) {
-    dom.progressText.textContent = `${Math.round(progress)}%`;
-  }
-  if (dom.retryBtn) {
-    dom.retryBtn.textContent = copy.retry || BOOT_COPY.en.shell.retry;
-  }
-  if (dom.continueBtn) {
-    dom.continueBtn.textContent = copy.continue || BOOT_COPY.en.shell.continue;
-  }
-  if (dom.actions) {
-    const showActions = state.bootPhase === "error";
-    dom.actions.classList.toggle("hidden", !showActions);
-  }
-  if (dom.continueBtn) {
-    dom.continueBtn.classList.toggle("hidden", !state.bootCanContinueWithoutScenario);
-  }
-  if (dom.readonlyBanner) {
-    dom.readonlyBanner.classList.toggle("hidden", state.bootBlocking || !state.startupReadonly);
-    dom.readonlyBanner.setAttribute("aria-busy", state.startupReadonlyUnlockInFlight ? "true" : "false");
-  }
-  if (dom.readonlyMessage) {
-    dom.readonlyMessage.textContent = getStartupReadonlyMessage();
-  }
-}
-
-function initializeBootOverlay() {
-  const dom = getBootDom();
-  if (!dom.overlay || bootOverlayBound) {
-    syncBootOverlay();
-    return;
-  }
-  dom.retryBtn?.addEventListener("click", () => {
-    globalThis.location.reload();
-  });
-  dom.continueBtn?.addEventListener("click", () => {
-    if (typeof bootContinueHandler === "function") {
-      void bootContinueHandler();
-    }
-  });
-  bootOverlayBound = true;
-  syncBootOverlay();
-}
-
-function setBootState(
-  phase,
-  {
-    message = null,
-    progress = undefined,
-    blocking = null,
-    error = null,
-    canContinueWithoutScenario = null,
-  } = {}
-) {
-  const previousPhase = String(state.bootPhase || "");
-  state.bootPhase = phase;
-  state.bootMessage = message ?? getBootCopy(phase).message;
-  state.bootBlocking = blocking == null ? phase !== "ready" : !!blocking;
-  state.bootError = phase === "error" ? String(error || state.bootError || "") : "";
-  state.bootCanContinueWithoutScenario =
-    canContinueWithoutScenario == null
-      ? (phase === "error" ? !!state.bootCanContinueWithoutScenario : false)
-      : !!canContinueWithoutScenario;
-  const window = getBootProgressWindow(phase);
-  if (phase !== previousPhase) {
-    bootProgressPhaseStartedAt = nowMs();
-  }
-  if (phase === "ready" || phase === "error") {
-    state.bootPreviewVisible = false;
-  }
-  if (progress !== undefined) {
-    state.bootProgress = Math.max(0, Math.min(100, Number(progress) || 0));
-  } else if (phase === "ready") {
-    state.bootProgress = 100;
-  } else if (phase === "error") {
-    state.bootProgress = Math.max(window.min, Math.min(99, Number(state.bootProgress) || window.min));
-  } else {
-    state.bootProgress = Math.max(Number(state.bootProgress) || 0, window.min);
-  }
-  if (phase === "ready" || phase === "error") {
-    stopBootProgressAnimation();
-  } else {
-    startBootProgressAnimation();
-  }
-  syncBootOverlay();
-}
-
-function resetBootMetrics() {
-  state.bootMetrics = {
-    total: {
-      startedAt: nowMs(),
-    },
-  };
-}
-
-function startBootMetric(name) {
-  state.bootMetrics[name] = {
-    ...(state.bootMetrics[name] || {}),
-    startedAt: nowMs(),
-  };
-}
-
-function finishBootMetric(name, extra = {}) {
-  const finishedAt = nowMs();
-  const metric = {
-    ...(state.bootMetrics[name] || {}),
-    finishedAt,
-    ...extra,
-  };
-  if (Number.isFinite(metric.startedAt)) {
-    metric.durationMs = finishedAt - metric.startedAt;
-  }
-  state.bootMetrics[name] = metric;
-  return metric;
-}
-
-function checkpointBootMetric(name) {
-  const startedAt = Number(state.bootMetrics?.total?.startedAt);
-  state.bootMetrics[name] = {
-    atMs: Number.isFinite(startedAt) ? nowMs() - startedAt : 0,
-  };
-  return state.bootMetrics[name];
-}
-
-function checkpointBootMetricOnce(name) {
-  if (state.bootMetrics?.[name]) {
-    return state.bootMetrics[name];
-  }
-  return checkpointBootMetric(name);
-}
-
-function logBootMetrics() {
-  const summary = Object.entries(state.bootMetrics || {}).reduce((accumulator, [name, metric]) => {
-    if (Number.isFinite(metric?.durationMs)) {
-      accumulator[name] = `${metric.durationMs.toFixed(1)}ms`;
-      return accumulator;
-    }
-    if (Number.isFinite(metric?.atMs)) {
-      accumulator[name] = `${metric.atMs.toFixed(1)}ms`;
-    }
-    return accumulator;
-  }, {});
-  console.info("[boot] Startup metrics:", summary);
-}
-
-function completeBootSequenceLogging() {
-  if (bootMetricsLogged) {
-    return;
-  }
-  bootMetricsLogged = true;
-  finishBootMetric("total");
-  logBootMetrics();
-  console.log("Initial render complete.");
-}
 
 function yieldToMain() {
   return new Promise((resolve) => {
@@ -1840,7 +1065,7 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     const activeScenarioId = String(state.activeScenarioId || "").trim();
     const cachedBundle = activeScenarioId
       ? state.scenarioBundleCacheById?.[activeScenarioId] || null
-      : null;
+      : null);
     if (cachedBundle?.manifest) {
       warnOnStartupBundleIntegrity(cachedBundle, {
         source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
@@ -1905,11 +1130,10 @@ function scheduleStartupReadonlyUnlock(
   renderDispatcher,
   { delayMs = 120, attempt = 0, maxAttempts = 5 } = {},
 ) {
-  if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || startupReadonlyUnlockHandle !== null) {
+  if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || hasStartupReadonlyUnlockScheduled()) {
     return;
   }
-  startupReadonlyUnlockHandle = globalThis.setTimeout(() => {
-    startupReadonlyUnlockHandle = null;
+  scheduleStartupReadonlyUnlockTimer(() => {
     if (attempt >= maxAttempts) {
       console.warn(`[boot] Startup readonly unlock failed after ${maxAttempts} attempts, force-unlocking.`);
       setStartupReadonlyState(true, {
@@ -1977,7 +1201,7 @@ function scheduleStartupReadonlyUnlock(
         setBootState("error", {
           error: error?.message || "Failed to initialize interaction infrastructure during startup recovery.",
           canContinueWithoutScenario: false,
-          progress: state.bootProgress || BOOT_PHASE_WINDOWS["interaction-infra"].min,
+          progress: state.bootProgress || getBootProgressWindow("interaction-infra").min,
         });
       });
       return;
@@ -2054,7 +1278,7 @@ async function finalizeReadyState(renderDispatcher) {
   if (shouldUseChunkedCoarseStartup) {
     setBootState("interaction-infra", {
       blocking: true,
-      progress: Math.max(Number(state.bootProgress) || 0, BOOT_PHASE_WINDOWS["detail-promotion"].min),
+      progress: Math.max(Number(state.bootProgress) || 0, getBootProgressWindow("detail-promotion").min),
       canContinueWithoutScenario: false,
     });
     startBootMetric("interaction-infra");
@@ -2091,7 +1315,7 @@ async function finalizeReadyState(renderDispatcher) {
     });
     setBootState("detail-promotion", {
       blocking: true,
-      progress: Math.max(Number(state.bootProgress) || 0, BOOT_PHASE_WINDOWS["detail-promotion"].min),
+      progress: Math.max(Number(state.bootProgress) || 0, getBootProgressWindow("detail-promotion").min),
       canContinueWithoutScenario: false,
     });
     scheduleStartupReadonlyUnlock(renderDispatcher);
@@ -2127,11 +1351,10 @@ async function bootstrap() {
   resetBootMetrics();
   state.bootPreviewVisible = false;
   setBootState("shell", {
-    progress: BOOT_PHASE_WINDOWS.shell.min,
+    progress: getBootProgressWindow("shell").min,
     canContinueWithoutScenario: false,
   });
-  bootContinueHandler = null;
-  bootMetricsLogged = false;
+  setBootContinueHandler(null);
   deferredUiBootstrapPromise = null;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
@@ -2590,7 +1813,7 @@ async function bootstrap() {
     const canContinueWithoutScenario =
       !!state.landData?.features?.length
       && !!renderDispatcher?.flush;
-    bootContinueHandler = canContinueWithoutScenario
+    setBootContinueHandler(canContinueWithoutScenario
       ? async () => {
         if (deferredUiBootstrapPromise) {
           await deferredUiBootstrapPromise;
@@ -2606,11 +1829,11 @@ async function bootstrap() {
         checkpointBootMetricOnce("first-visible-base");
         await finalizeReadyState(renderDispatcher);
       }
-      : null;
+      : null);
     setBootState("error", {
       error: error?.message || "Failed to load the default startup scenario.",
       canContinueWithoutScenario,
-      progress: state.bootProgress || BOOT_PHASE_WINDOWS["scenario-apply"].min,
+      progress: state.bootProgress || getBootProgressWindow("scenario-apply").min,
     });
   }
 }

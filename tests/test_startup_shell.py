@@ -26,6 +26,12 @@ class StartupShellTest(unittest.TestCase):
 
     def test_main_bootstrap_uses_dynamic_ui_imports_and_boot_metrics(self) -> None:
         main_js = (REPO_ROOT / "js" / "main.js").read_text(encoding="utf-8")
+        startup_bootstrap_support_js = (
+            REPO_ROOT / "js" / "bootstrap" / "startup_bootstrap_support.js"
+        ).read_text(encoding="utf-8")
+        startup_boot_overlay_js = (
+            REPO_ROOT / "js" / "bootstrap" / "startup_boot_overlay.js"
+        ).read_text(encoding="utf-8")
         data_loader_js = (REPO_ROOT / "js" / "core" / "data_loader.js").read_text(encoding="utf-8")
         startup_cache_js = (REPO_ROOT / "js" / "core" / "startup_cache.js").read_text(encoding="utf-8")
         scenario_resources_js = (REPO_ROOT / "js" / "core" / "scenario_resources.js").read_text(encoding="utf-8")
@@ -46,10 +52,11 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn('import("./ui/shortcuts.js")', main_js)
         self.assertIn('"first-visible-base"', main_js)
         self.assertIn('"first-visible-scenario"', main_js)
-        self.assertIn('state.bootPreviewVisible = !!active;', main_js)
-        self.assertIn('locales: payload?.base?.locales || null,', main_js)
-        self.assertIn('geoAliases: payload?.base?.geo_aliases || null,', main_js)
-        self.assertIn('data/scenarios/${normalizedScenarioId}/${normalizedFilename}', main_js)
+        self.assertIn('state.bootPreviewVisible = !!active;', startup_boot_overlay_js)
+        self.assertIn('import {\n  createRenderDispatcher,', main_js)
+        self.assertIn('locales: payload?.base?.locales || null,', startup_bootstrap_support_js)
+        self.assertIn('geoAliases: payload?.base?.geo_aliases || null,', startup_bootstrap_support_js)
+        self.assertIn('data/scenarios/${normalizedScenarioId}/${normalizedFilename}', startup_bootstrap_support_js)
         self.assertNotIn('data/locales.startup.json', data_loader_js)
         self.assertNotIn('data/geo_aliases.startup.json', data_loader_js)
         self.assertIn('scenario-scoped', data_loader_js)
@@ -77,11 +84,11 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn(': { ...staged.scenarioNameMap };', scenario_apply_pipeline_js)
         self.assertIn('normalizeIndexedTagAssignmentPayload', scenario_manager_js)
         self.assertIn('normalizeIndexedCoreAssignmentPayload', scenario_manager_js)
-        self.assertIn('consumeStartupSupportKeyUsageAuditReport', main_js)
-        self.assertIn('/__dev/startup-support/key-usage-report', main_js)
-        self.assertIn('STARTUP_SUPPORT_AUDIT_PARAM', main_js)
-        self.assertIn('STARTUP_SUPPORT_AUDIT_LABEL_PARAM', main_js)
-        self.assertIn('sampleLabel', main_js)
+        self.assertIn('consumeStartupSupportKeyUsageAuditReport', startup_bootstrap_support_js)
+        self.assertIn('/__dev/startup-support/key-usage-report', startup_bootstrap_support_js)
+        self.assertIn('STARTUP_SUPPORT_AUDIT_PARAM', startup_bootstrap_support_js)
+        self.assertIn('STARTUP_SUPPORT_AUDIT_LABEL_PARAM', startup_bootstrap_support_js)
+        self.assertIn('sampleLabel', startup_bootstrap_support_js)
         self.assertIn('consumeStartupSupportKeyUsageAuditReport', (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8"))
         self.assertIn('startup_support_audit', (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8"))
         self.assertNotIn(

@@ -933,3 +933,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 113. donor 自己在初始化期要用到的 defaults，必须继续显式 import
 - 这次 `state.js` 拆分后，`defaultZoom` 已经迁到 `state_defaults.js`，但 donor 里还有 `zoomTransform: defaultZoom` 这条初始化引用，少掉本地 import 就会在模块求值阶段直接炸。
 - 更稳的最短路径是：凡是 donor 初始化时直接读到的默认值，都继续保留显式 import；`export *` 只负责对外转发，不能代替 donor 自己的本地绑定。
+
+### 114. 启动壳拆分时，先搬纯 startup helper，再让 main.js 保留状态推进
+- 这次 `main.js` 最稳的切口，是把默认场景解析、startup bundle URL 组装、启动审计、视图设置持久化和 startup diagnostics 先迁进 `startup_bootstrap_support.js`。
+- 更稳的最短路径是：让 `main.js` 继续保留 boot overlay、phase 进度、readonly 切换和最终 `bootstrap()` 顺序，把纯 helper 先收走，再用边界测试钉住 facade。
+
+### 115. 启动 overlay 拆分时，用 controller 收住内部句柄最稳
+- 这次 `main.js` 的 boot overlay 层里，`continue handler`、progress animation handle、readonly unlock handle 和 boot metrics log flag 都是内部句柄，直接散在 donor 里会继续撑大主文件。
+- 更稳的最短路径是：把这些内部句柄收进 `startup_boot_overlay.js` 的 controller，让 `main.js` 只拿 `setBootState / startBootMetric / setStartupReadonlyState` 这类方法，外部 facade 更稳定。
+
+### 116. donor 读取 controller 内部常量时，要改成显式 API
+- 这次 `main.js` 把 `BOOT_PHASE_WINDOWS` 和 `bootMetricsLogged` 收进 `startup_boot_overlay.js` 后，donor 里仍然直接读取旧名字，启动期就会立刻抛 `ReferenceError`。
+- 更稳的最短路径是：把这类内部状态改成 controller API，例如 `getBootProgressWindow()`，同时让 controller 自己在 `resetBootMetrics()` 里重置内部标记。
