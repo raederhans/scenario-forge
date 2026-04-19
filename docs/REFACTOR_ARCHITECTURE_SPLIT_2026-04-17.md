@@ -31,9 +31,9 @@
 - [x] `toolbar.js` -> `workspace_chrome_support_surface_controller.js`
 - [x] `toolbar.js` -> `export_workbench_controller.js`
 - [x] `toolbar.js` -> `appearance_controls_controller.js`
-- [ ] `sidebar.js` -> `country_inspector_controller.js`
-- [ ] `sidebar.js` -> `strategic_overlay_controller.js`
-- [ ] `sidebar.js` -> `water_special_region_controller.js`
+- [x] `sidebar.js` -> `country_inspector_controller.js`
+- [x] `sidebar.js` -> `strategic_overlay_controller.js`
+- [x] `sidebar.js` -> `water_special_region_controller.js`
 - [ ] `sidebar.js` -> `project_support_diagnostics_controller.js`
 - [ ] `dev_workspace.js` -> `scenario_tag_creator_controller.js`
 - [ ] `dev_workspace.js` -> `selection_ownership_controller.js`
@@ -150,14 +150,24 @@
   - Wave 2 已继续推进：把 `city / urban / physical / rivers` 的 state 归一、UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
   - Wave 2 已继续推进：把 `reference overlay` 的 UI 渲染和事件绑定继续下沉到 `js/ui/toolbar/appearance_controls_controller.js`。
   - Wave 2 已继续推进：新增 `js/ui/toolbar/ocean_lake_controls_controller.js`，把 ocean / lake 的 visual invalidation、bathymetry preset UI、lake history、render 和事件绑定从 `toolbar.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/sidebar/country_inspector_controller.js`，把 country inspector 的 explorer list、search、selection、detail card、active owner / color picker 事件闭环从 `sidebar.js` 下沉成独立 controller。
   - `toolbar.js` 继续保留 appearance facade：仍负责 `state.updateTransportAppearanceUIFn / updateRecentUI / updateParentBorderCountryListFn` 注册，以及 `updateToolbarInputsFn`、special zone popover 外壳和主初始化编排。
   - `toolbar.js` 继续保留 texture/dayNight facade：仍负责 `state.updateTextureUIFn` 注册，以及 `state.updateToolbarInputsFn` 里的总刷新编排。
   - `toolbar.js` 继续保留 city/urban/physical facade：仍负责 `renderSpecialZoneEditorUI` 这层 host wrapper、`state.updateSpecialZoneEditorUIFn` 注册，以及 special zone editor 和 appearance owner 的组合编排。
   - `toolbar.js` 继续保留 reference 刷新 facade：仍通过 `state.updateToolbarInputsFn` 触发 `renderReferenceOverlayUi()`，project import / startup / scenario 回填链保持原样。
   - `toolbar.js` 继续保留 water facade：仍负责 `refreshWorkspaceStatus()` 里的 coastal accent 刷新、`state.updateToolbarInputsFn` 里的 water 总刷新，以及 auto-fill 工作流里的 ocean color handoff。
+  - `sidebar.js` 继续保留 country inspector facade：仍负责 `state.renderCountryListFn / refreshCountryListRowsFn / refreshCountryInspectorDetailFn` 注册，以及 preset tree、scenario actions、宿主级 layout / scroll 关闭链。
+  - Wave 2 已继续推进：新增 `js/ui/sidebar/strategic_overlay_controller.js`，把 frontline overlay controls、strategic workspace chrome、operational line / operation graphic / unit counter 编辑器的 refresh、modal、event binding 和 perf 计数从 `sidebar.js` 下沉成独立 controller。
+  - `sidebar.js` 继续保留 strategic overlay facade：仍负责 `setRightSidebarTab()` 里的 tab/url 外壳、`state.updateStrategicOverlayUIFn / getStrategicOverlayPerfCountersFn` 注册、startup URL restore 顺序、以及 `importProjectThroughFunnel(... hooks.invalidateFrontlineOverlayState)` 这条导入 hook。
+  - 新增 `tests/test_strategic_overlay_sidebar_boundary_contract.py`，继续钉住 strategic overlay owner / facade、DOM surface、renderer/import funnel callback 合同。
+  - Wave 2 已继续推进：新增 `js/ui/sidebar/water_special_region_controller.js`，把 water inspector 与 special region inspector 的过滤、详情、legend、color picker、batch action、visibility toggle 和本面板事件绑定从 `sidebar.js` 下沉成独立 controller。
+  - `sidebar.js` 继续保留 water / special facade：仍负责 `state.renderWaterRegionListFn / updateWaterInteractionUIFn / renderSpecialRegionListFn / updateScenarioSpecialRegionUIFn / updateScenarioReliefOverlayUIFn` 注册，以及 shared layout 调度、scroll/wheel 关闭 picker、主初始化编排。
+  - 新增 `tests/test_water_special_region_sidebar_boundary_contract.py`，继续钉住 water/special owner / facade、history snapshot、renderer/history/import funnel callback 合同。
   - `tests/test_toolbar_split_boundary_contract.py` 与 `tests/test_transport_facility_interactions_contract.py` 已同步切到新的 appearance owner 文件，transport appearance 的 filtered count、primary color、facility info card visibility 合同继续受保护。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 texture/dayNight owner 与 facade 断言，继续钉住 `state.updateTextureUIFn` 和 `state.updateToolbarInputsFn` 的合同。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 city/urban/physical/rivers owner 与 facade 断言，继续钉住 `state.updateSpecialZoneEditorUIFn` 的 host contract。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 reference overlay owner 与 facade 断言，继续钉住 `state.updateToolbarInputsFn` 的 reference 刷新链。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 ocean/lake owner 与 facade 断言，继续钉住 water controller 的 history、refresh 和 auto-fill handoff 合同。
-  - 已重新验证 127 条静态边界 / UI contract tests 全绿。
+  - 新增 `tests/test_sidebar_split_boundary_contract.py`，继续钉住 country inspector owner 与 facade 合同。
+  - 当前已重新验证 145 条静态边界 / UI contract tests 全绿。
+  - 新暴露的后续红线：`history_manager.js` 的 strategic overlay 快照仍未覆盖 `operationalLines`，这条属于既有合同缺口，本轮先保留拆分主线，后续单独收口。

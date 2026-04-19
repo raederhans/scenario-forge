@@ -895,3 +895,10 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 105. UI owner 下沉时，微型 history helper 要和事件绑定一起迁走
 - 这次 lake controls 的真实风险点是 `beginLakeHistoryCapture()` / `commitLakeHistory()` 只有调用点，没有实现；静态 syntax 和大部分 boundary test 都能过，真实交互一触发就会炸。
 - 更稳的最短路径是：凡是 event handler 里用到的 `before/after` history helper、style path 列表、pending state 变量，都和绑定逻辑同波次迁到 owner controller，并补一条 owner/facade 边界测试钉住它。
+
+### 106. 大型 inspector 拆分时，先让 donor 保留 runtime 容器，再把 owner 逻辑下沉
+- 这次 `country inspector` 同时被 list、detail、preset tree、scenario actions 共用，`latestCountryStatesByCode`、row refs、color picker open 这种运行态容器如果一刀切离开 donor，会立刻放大引用改动面。
+- 更稳的最短路径是：先让 `sidebar.js` 保留这些 runtime 容器，通过 getter/setter 注入给新 controller，把 owner 逻辑先下沉；等 facade 稳住后，再决定要不要继续把容器和 scenario actions 一起迁走。
+### 41. strategic overlay 的 history snapshot 要把 `operationalLines` 和 dirty flag 一起纳入
+- `captureHistoryState({ strategicOverlay: true })` 如果只收 `annotationView / operationGraphics / unitCounters`，operational line 的 create/update/delete 就会在 undo/redo 后出现假恢复。
+- 拆 strategic overlay owner 前，先把这条合同当成显式红线；owner 可以先下沉，history 缺口要单独补齐并加静态断言。
