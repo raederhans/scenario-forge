@@ -94,7 +94,7 @@ test("phase 03 support surfaces restore the requested view from URL", async ({ p
 
 test("phase 03 support surfaces restore the guide view from URL", async ({ page }) => {
   test.setTimeout(240_000);
-  await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide&section=tools", { waitUntil: "domcontentloaded" });
+  await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide&guide_section=tools", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await expect(page.locator("#scenarioGuideBackdrop")).toBeVisible();
   await expect(page.locator("#scenarioGuidePopover")).toBeVisible();

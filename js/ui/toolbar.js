@@ -707,6 +707,8 @@ function initToolbar({ render } = {}) {
     const params = new globalThis.URLSearchParams(globalThis.location.search || "");
     const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
     if (view !== "guide") return "";
+    const guideSectionValue = String(params.get(UI_URL_STATE_KEYS.guideSection) || "").trim().toLowerCase();
+    if (guideSectionValue) return guideSectionValue;
     return String(params.get(UI_URL_STATE_KEYS.section) || "").trim().toLowerCase();
   };
   const syncScenarioGuideSectionUrlState = (section = "quick") => {
@@ -714,7 +716,8 @@ function initToolbar({ render } = {}) {
     const params = new globalThis.URLSearchParams(globalThis.location.search || "");
     const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
     if (view !== "guide") return;
-    params.set(UI_URL_STATE_KEYS.section, String(section || "").trim().toLowerCase() || "quick");
+    params.set(UI_URL_STATE_KEYS.guideSection, String(section || "").trim().toLowerCase() || "quick");
+    params.delete(UI_URL_STATE_KEYS.section);
     const nextQuery = params.toString();
     const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
     globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
