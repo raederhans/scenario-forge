@@ -97,11 +97,12 @@ import {
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
 import {
-  getRuntimeGeometryFeatureId,
-  getScenarioRuntimeGeometryCountryCode,
-  hasExplicitScenarioAssignment,
-  shouldApplyHoi4FarEastSovietBackfill,
-} from "./scenario_runtime_queries.js";
+  SCENARIO_RENDER_PROFILES,
+  buildHoi4FarEastSovietOwnerBackfill,
+  normalizeScenarioOceanFillColor,
+  normalizeScenarioRenderProfile,
+  recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
+} from "./scenario/pure_helpers.js";
 import {
   createScenarioApplyPipeline,
 } from "./scenario_apply_pipeline.js";
@@ -142,14 +143,10 @@ import {
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
-const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
-const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 let activeScenarioApplyPromise = null;
-const EMPTY_FROZEN_LIST = Object.freeze([]);
-const hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology = new WeakMap();
 
 function normalizeScenarioCoreMap(rawMap) {
   return sharedNormalizeScenarioCoreMap(rawMap, { normalizeFeatureText: normalizeCityText });
@@ -179,61 +176,6 @@ function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentL
   return sharedGetScenarioGeoLocalePatchDescriptor(manifest, language);
 }
 
-function buildHoi4FarEastSovietOwnerBackfill(
-  scenarioId,
-  {
-    runtimeTopology = null,
-    ownersByFeatureId = {},
-    controllersByFeatureId = {},
-  } = {}
-) {
-  if (!shouldApplyHoi4FarEastSovietBackfill(scenarioId)) {
-    return {};
-  }
-  const candidateFeatureIds = getHoi4FarEastSovietRuntimeCandidateFeatureIds(runtimeTopology);
-  if (!candidateFeatureIds.length) {
-    return {};
-  }
-  const next = {};
-  candidateFeatureIds.forEach((featureId) => {
-    if (
-      hasExplicitScenarioAssignment(ownersByFeatureId, featureId) ||
-      hasExplicitScenarioAssignment(controllersByFeatureId, featureId)
-    ) {
-      return;
-    }
-    next[featureId] = "SOV";
-  });
-  return next;
-}
-
-function getHoi4FarEastSovietRuntimeCandidateFeatureIds(runtimeTopology) {
-  if (!runtimeTopology || typeof runtimeTopology !== "object") {
-    return EMPTY_FROZEN_LIST;
-  }
-  const cached = hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.get(runtimeTopology);
-  if (cached) {
-    return cached;
-  }
-  const geometries = runtimeTopology?.objects?.political?.geometries;
-  if (!Array.isArray(geometries) || !geometries.length) {
-    hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.set(runtimeTopology, EMPTY_FROZEN_LIST);
-    return EMPTY_FROZEN_LIST;
-  }
-  const candidateFeatureIds = [];
-  geometries.forEach((geometry) => {
-    const featureId = getRuntimeGeometryFeatureId(geometry);
-    if (!featureId) return;
-    if (getScenarioRuntimeGeometryCountryCode(geometry) !== "RU") {
-      return;
-    }
-    candidateFeatureIds.push(featureId);
-  });
-  const frozenCandidateFeatureIds = Object.freeze(candidateFeatureIds);
-  hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology.set(runtimeTopology, frozenCandidateFeatureIds);
-  return frozenCandidateFeatureIds;
-}
-
 function getScenarioTargetPaletteId(manifest) {
   return normalizeScenarioId(manifest?.palette_id) || "hoi4_vanilla";
 }
@@ -252,42 +194,8 @@ function normalizeScenarioViewMode(value) {
   return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
 }
 
-function normalizeScenarioOceanFillColor(value, fallback = DEFAULT_OCEAN_FILL_COLOR) {
-  const candidate = String(value || "").trim();
-  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
-  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
-    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
-  }
-  return fallback;
-}
-
-function normalizeScenarioRenderProfile(value, fallback = "auto") {
-  const normalizedFallback = SCENARIO_RENDER_PROFILES.has(String(fallback || "").trim().toLowerCase())
-    ? String(fallback || "").trim().toLowerCase()
-    : "auto";
-  const candidate = String(value || "").trim().toLowerCase();
-  return SCENARIO_RENDER_PROFILES.has(candidate) ? candidate : normalizedFallback;
-}
-
-function ensureScenarioPerfMetrics() {
-  if (!state.scenarioPerfMetrics || typeof state.scenarioPerfMetrics !== "object") {
-    state.scenarioPerfMetrics = {};
-  }
-  return state.scenarioPerfMetrics;
-}
-
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
-  const metrics = ensureScenarioPerfMetrics();
-  const normalizedName = String(name || "").trim();
-  if (!normalizedName) return null;
-  const nextEntry = {
-    durationMs: Math.max(0, Number(durationMs) || 0),
-    recordedAt: Date.now(),
-    ...details,
-  };
-  metrics[normalizedName] = nextEntry;
-  globalThis.__scenarioPerfMetrics = metrics;
-  return nextEntry;
+  return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
 }
 
 function normalizeScenarioPerformanceHints(manifest) {

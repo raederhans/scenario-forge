@@ -107,6 +107,12 @@
 - [x] 计划已留档
 - [x] 开始实施
 
+## w1 场景模块拆分后 helper 归属规则
+- `js/core/scenario/shared.js` 负责跨模块通用且与场景业务语义弱耦合的纯 helper（URL/cache-bust、id/language/core normalizer、timeout/resource loader、required/optional 校验）。
+- `js/core/scenario/pure_helpers.js` 负责场景业务语义强相关、同时被 `scenario_manager.js` 与 `scenario_resources.js` 复用的纯函数（owner backfill、render/ocean normalizer、perf metric 记录协议）。
+- `scenario_manager.js` 与 `scenario_resources.js` 保留 facade/wrapper 和交易编排，新增同类 helper 时先落 owner 文件，再由 facade import 复用。
+- 涉及 topology identity 的扫描逻辑统一采用 `WeakMap` 缓存并配套回归断言，确保重复调用同一 topology 命中缓存路径。
+
 ## 进度记录
 - 2026-04-17：
   - `js/core/scenario_post_apply_effects.js` 已修复“首帧 coarse prewarm 需要被调用方真正等待”的合同漂移。

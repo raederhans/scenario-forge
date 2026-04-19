@@ -52,11 +52,12 @@ import {
   enterScenarioFatalRecovery,
 } from "./scenario_recovery.js";
 import {
-  getRuntimeGeometryFeatureId,
-  getScenarioRuntimeGeometryCountryCode,
-  hasExplicitScenarioAssignment,
-  shouldApplyHoi4FarEastSovietBackfill,
-} from "./scenario_runtime_queries.js";
+  SCENARIO_RENDER_PROFILES,
+  buildHoi4FarEastSovietOwnerBackfill,
+  normalizeScenarioOceanFillColor,
+  normalizeScenarioRenderProfile,
+  recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
+} from "./scenario/pure_helpers.js";
 import {
   cacheBust,
   getSearchParams,
@@ -117,8 +118,6 @@ import { consumeScenarioTestHook } from "./scenario_recovery.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
-const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
-const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
@@ -207,79 +206,12 @@ const assembleScenarioBundle = createScenarioBundleAssembler({
   loadOptionalScenarioResource,
 });
 
-function buildHoi4FarEastSovietOwnerBackfill(
-  scenarioId,
-  {
-    runtimeTopology = null,
-    ownersByFeatureId = {},
-    controllersByFeatureId = {},
-  } = {}
-) {
-  if (!shouldApplyHoi4FarEastSovietBackfill(scenarioId)) {
-    return {};
-  }
-  const geometries = runtimeTopology?.objects?.political?.geometries;
-  if (!Array.isArray(geometries) || !geometries.length) {
-    return {};
-  }
-  const next = {};
-  geometries.forEach((geometry) => {
-    const featureId = getRuntimeGeometryFeatureId(geometry);
-    if (!featureId) return;
-    if (
-      hasExplicitScenarioAssignment(ownersByFeatureId, featureId) ||
-      hasExplicitScenarioAssignment(controllersByFeatureId, featureId)
-    ) {
-      return;
-    }
-    if (getScenarioRuntimeGeometryCountryCode(geometry) !== "RU") {
-      return;
-    }
-    next[featureId] = "SOV";
-  });
-  return next;
-}
-
 function normalizeScenarioViewMode(value) {
   return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
 }
 
-function normalizeScenarioOceanFillColor(value, fallback = DEFAULT_OCEAN_FILL_COLOR) {
-  const candidate = String(value || "").trim();
-  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
-  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
-    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
-  }
-  return fallback;
-}
-
-function normalizeScenarioRenderProfile(value, fallback = "auto") {
-  const normalizedFallback = SCENARIO_RENDER_PROFILES.has(String(fallback || "").trim().toLowerCase())
-    ? String(fallback || "").trim().toLowerCase()
-    : "auto";
-  const candidate = String(value || "").trim().toLowerCase();
-  return SCENARIO_RENDER_PROFILES.has(candidate) ? candidate : normalizedFallback;
-}
-
-function ensureScenarioPerfMetrics() {
-  if (!state.scenarioPerfMetrics || typeof state.scenarioPerfMetrics !== "object") {
-    state.scenarioPerfMetrics = {};
-  }
-  return state.scenarioPerfMetrics;
-}
-
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
-  const metrics = ensureScenarioPerfMetrics();
-  const normalizedName = String(name || "").trim();
-  if (!normalizedName) return null;
-  const nextEntry = {
-    durationMs: Math.max(0, Number(durationMs) || 0),
-    recordedAt: Date.now(),
-    ...details,
-  };
-  metrics[normalizedName] = nextEntry;
-  globalThis.__scenarioPerfMetrics = metrics;
-  return nextEntry;
+  return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
 }
 
 function normalizeScenarioPerformanceHints(manifest) {
