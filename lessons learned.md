@@ -608,7 +608,8 @@
 - 更稳的最短路径是：先补 tab、state、save/load、renderer 和 lazy load，再单独评估要不要进 scenario publish / chunk contract。
 
 ### 25. 总显隐开关不能顺手覆写子图层可见性，尤其当保存链会把子图层状态当成真值写盘时
-- 这次 Transport Overview 暴露出一个典型坑：如果总开关关闭时直接把 showAirports/showPorts 改成 alse，项目保存后就会把“临时总隐藏”误写成“family 真的关闭了”。
+- 这次 Transport Overview 暴露出一个典型坑：如果总开关关闭时直接把 showAirports/showPorts 改成 
+alse，项目保存后就会把“临时总隐藏”误写成“family 真的关闭了”。
 - 更稳的做法是：总开关只负责渲染门控；family 自己的可见性继续单独保存，必要时再单独持久化“上次展开状态”，不要混用同一组字段。
 ### 26. 未来 family 的占位状态如果还没接通 runtime，就不要先写进项目保存链
 - 这次 `showRail/showRoad` 先写进 save/load，实际却还没有对应的加载、渲染、缓存失效入口，马上就暴露出“状态能恢复，但行为没接上”的半接通风险。
@@ -965,3 +966,12 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 121. boot overlay 的测试等待条件要以真实 boot state 为准，不能只盯 overlay hidden/aria-busy
 - 这次应用已经到 Ready，但 `#bootOverlay` 仍保留在 DOM 里，`aria-busy` 也没及时回落，导致 Playwright 一直误判成“未就绪”。
 - 更稳的最短路径是：等待 `state.bootBlocking === false` 或 `body.app-booting` 已移除，并同时确认 `!state.scenarioApplyInFlight`；overlay hidden 只作为兼容条件，不要当唯一标准。
+
+### 122. render helper 拆分时，dirty/signature/history owner 继续留在 donor 最稳
+- 这次 strategic overlay 第二刀里，leaf draw helper 可以下沉到 `strategic_overlay_helpers.js`，但 `render*IfNeeded()`、overlay signature cache、dirty flag 和 history transaction 继续留在 `map_renderer.js`，编排边界更清晰。
+- 更稳的最短路径是：owner 只接管 SVG leaf draw 和 zoom-scale patch，donor 继续持有 render kernel、frontline derived overlay、dirty/signature gate 与对外 facade。
+
+### 123. 启动链 data pipeline 可以下沉，但 boot 编排必须继续留在 main
+- 这次 `startup_data_pipeline.js` 最稳的切法，是把 startup bundle 解析、base data 加载、context layer deferred load、localization/city 补水和 primary collection decode 下沉成 owner。
+- 更稳的最短路径是：`main.js` 继续持有 boot overlay、render boundary、scenario apply、ready/readonly/detail promotion 顺序，把数据装配和 state hydrate 交给 owner。
+

@@ -13,10 +13,10 @@ class MainBootstrapSplitBoundaryContractTest(unittest.TestCase):
         content = MAIN_JS.read_text(encoding="utf-8")
 
         self.assertIn('./bootstrap/startup_bootstrap_support.js', content.replace('"', "'"))
+        self.assertIn('./bootstrap/startup_data_pipeline.js', content.replace('"', "'"))
         self.assertIn('./bootstrap/startup_boot_overlay.js', content.replace('"', "'"))
-        self.assertIn("createStartupBundleLoadDiagnostics", content)
-        self.assertIn("getConfiguredDefaultScenarioId", content)
         self.assertIn("warnOnStartupBundleIntegrity", content)
+        self.assertIn("createStartupDataPipelineOwner", content)
 
     def test_startup_bootstrap_support_owns_startup_helpers(self):
         donor_content = MAIN_JS.read_text(encoding="utf-8")
@@ -42,6 +42,11 @@ class MainBootstrapSplitBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("function requestMainRender(reason = \"\", { flush = false } = {}) {", content)
         self.assertIn("const bootOverlayController = createStartupBootOverlayController();", content)
+        self.assertIn("const startupDataPipeline = getStartupDataPipelineOwner();", content)
+        self.assertIn("startupDataPipeline.resolveStartupScenarioBootstrap({ d3Client });", content)
+        self.assertIn("startupDataPipeline.loadStartupBaseData({", content)
+        self.assertIn("startupDataPipeline.hydrateStartupBaseState({", content)
+        self.assertIn("startupDataPipeline.decodeStartupPrimaryCollections({", content)
         self.assertIn("async function bootstrap()", content)
         self.assertIn("bootstrap();", content)
 

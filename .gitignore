@@ -45,6 +45,7 @@ skills-lock.json
 .tmp/
 .omx/
 .claude/
+.superpowers/
 
 # Local scratch workspaces and evidence dumps
 /historic geographic overhaul/

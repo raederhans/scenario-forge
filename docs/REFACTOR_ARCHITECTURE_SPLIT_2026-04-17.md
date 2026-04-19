@@ -45,14 +45,14 @@
 ### Wave 3: 渐进抽离 `map_renderer.js`
 - [x] 保持 `map_renderer.js` 为稳定 facade 与 render transaction owner
 - [x] 新建 `js/core/renderer/urban_city_policy.js`
-- [ ] 新建 `js/core/renderer/strategic_overlay_helpers.js`
-- [ ] 抽 strategic overlay draw helper：special zones / operational lines / operation graphics / unit counters
+- [x] 新建 `js/core/renderer/strategic_overlay_helpers.js`
+- [x] 抽 strategic overlay draw helper：special zones / operational lines / operation graphics / unit counters
 - [ ] 保持 render kernel、scenario refresh、hit canvas、zoom/init/bindEvents、facility info card 原位
 
 ### Wave 4: 收口入口与全局状态
 - [x] `main.js` -> `js/bootstrap/startup_bootstrap_support.js`（默认场景解析 / startup bundle URL / startup diagnostics helper owner）
 - [x] `main.js` -> `js/bootstrap/startup_boot_overlay.js`（boot overlay / readonly / boot metric owner）
-- [ ] `main.js` -> `js/bootstrap/startup_data_pipeline.js`
+- [x] `main.js` -> `js/bootstrap/startup_data_pipeline.js`
 - [ ] `main.js` -> `js/bootstrap/startup_scenario_boot.js`
 - [ ] `main.js` -> `js/bootstrap/deferred_detail_promotion.js`
 - [x] `state.js` -> `js/core/state_defaults.js`（defaults / normalizer owner；`state.js` 保留 compat facade）
@@ -185,6 +185,18 @@
   - `js/core/map_renderer.js` 继续保留 facade 和 render transaction owner，本轮通过 wrapper 转发 `urban_city_policy` 的公开入口，保留 `getCityLayerRenderState()`、`drawCityPointsLayer()`、`drawLabelsPass()` 与 donor 侧 shared helper/cache。
   - 新增 `tests/test_map_renderer_urban_city_policy_boundary_contract.py`，继续钉住 `urban_city_policy` owner / `map_renderer` facade 合同。
   - 已验证命令：`python -m unittest tests.test_map_renderer_urban_city_policy_boundary_contract tests.test_frontend_render_boundary_contract`
+  - Wave 3 第二刀已落地：新增 `js/core/renderer/strategic_overlay_helpers.js`，把 `renderSpecialZones()`、`renderOperationalLinesOverlay()`、`renderOperationGraphicsOverlay()`、`renderUnitCountersOverlay()` 与 `syncUnitCounterScalesDuringZoom()` 下沉成 leaf draw owner。
+  - `js/core/map_renderer.js` 继续保留 render kernel、`render*IfNeeded()`、overlay signature cache、dirty/history transaction owner、frontline derived overlay 与导出 facade；本轮只把 strategic overlay 的 leaf draw wiring 收口到 owner。
+  - 新增 `tests/test_map_renderer_strategic_overlay_helpers_boundary_contract.py`，继续钉住 strategic overlay helper owner / `map_renderer` facade、render 编排顺序、signature cache 仍留 donor 的合同。
+  - 已验证命令：`python -m unittest tests.test_map_renderer_strategic_overlay_helpers_boundary_contract tests.test_map_renderer_urban_city_policy_boundary_contract tests.test_frontend_render_boundary_contract`
+  - 已验证命令：`python -m unittest tests.test_strategic_overlay_sidebar_boundary_contract tests.test_history_manager_strategic_overlay_contract`
+  - `node --check` 已通过：`js/core/map_renderer.js`、`js/core/renderer/strategic_overlay_helpers.js`
+  - Wave 4 已继续推进：新增 `js/bootstrap/startup_data_pipeline.js`，把 `ensureBaseCityDataReady()`、`ensureFullLocalizationDataReady()`、`ensureActiveScenarioBundleHydrated()`、`ensureContextLayerDataReady()`、startup bundle 解析、startup base data 加载、startup state hydrate 和 primary collection decode 下沉成 startup data pipeline owner。
+  - `main.js` 继续保留 boot overlay、render boundary、scenario apply、ready/readonly/detail promotion 编排；本轮只把 startup 数据装配和补水逻辑收口到 owner。
+  - 新增 `tests/test_main_startup_data_pipeline_boundary_contract.py`，并更新 `tests/test_main_bootstrap_split_boundary_contract.py`，继续钉住 startup data pipeline owner / `main.js` facade 与 boot 编排保留合同。
+  - 已验证命令：`python -m unittest tests.test_main_bootstrap_split_boundary_contract tests.test_main_boot_overlay_split_boundary_contract tests.test_main_startup_data_pipeline_boundary_contract -v`
+  - 已验证命令：`python -m unittest tests.test_startup_shell tests.test_startup_bootstrap_assets -v`
+  - `node --check` 已通过：`js/main.js`、`js/bootstrap/startup_data_pipeline.js`
   - `node --check` 已通过：`js/main.js`、`js/core/scenario_resources.js`、`js/core/interaction_funnel.js`、`js/core/scenario_manager.js`、`js/core/map_renderer.js`、`js/core/renderer/urban_city_policy.js`、`js/ui/toolbar.js`、`js/ui/toolbar/transport_workbench_controller.js`、`tests/e2e/support/playwright-app.js`
   - 为恢复启动链，本轮顺手修掉了 6 个既有阻塞点：`js/main.js` 语法错误、`js/core/scenario_resources.js` 重复声明、`js/core/interaction_funnel.js` 启动期循环依赖、`js/core/scenario_resources.js` 缺少 `applyScenarioPoliticalChunkPayload` 绑定、`js/core/scenario_manager.js` 缺少 `syncScenarioLocalizationState` import、`js/ui/toolbar.js` / `js/ui/toolbar/transport_workbench_controller.js` 的 export / 常量绑定缺口。
   - 浏览器直开验证已恢复：localhost app 可从 `8% -> 52% -> 100%` 进入 `Ready`，默认场景 `TNO 1962` 已加载；当前只剩 `favicon.ico` 404 和几条非阻塞 warning。
