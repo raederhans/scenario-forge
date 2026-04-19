@@ -102,6 +102,16 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('passNames: ["contextBase", "contextScenario"]', owner_content)
         self.assertIn('passNames: ["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"]', owner_content)
 
+    def test_export_pipeline_relies_on_controller_pass_flow(self):
+        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
+
+        self.assertNotIn("const drawLineLayerToCanvas = (targetCtx) => {", toolbar_content)
+        self.assertNotIn("const drawColorLayerToCanvas = (targetCtx) => {", toolbar_content)
+        self.assertNotIn("const drawCompositeLayerToCanvas = (targetCtx) => {", toolbar_content)
+        self.assertIn("const bakePassNames = getBakePassNamesForLayer(normalizedLayerId, exportUi);", toolbar_content)
+        self.assertIn("const compositeCanvas = await buildCompositeSourceCanvas(exportUi);", toolbar_content)
+        self.assertIn("const passCanvas = renderExportPassesToCanvas(bakePassNames);", toolbar_content)
+
     def test_toolbar_keeps_export_workbench_facade_and_url_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
