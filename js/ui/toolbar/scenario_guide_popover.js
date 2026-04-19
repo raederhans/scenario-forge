@@ -28,9 +28,11 @@ function createScenarioGuidePopoverController({
     return ["quick", "prepare", "tools", "checks"].includes(normalizedValue);
   };
 
-  const renderScenarioGuideSection = (section = "quick") => {
+  const renderScenarioGuideSection = (section = "quick", { syncUrl = true } = {}) => {
     scenarioGuideActiveSection = normalizeScenarioGuideSection(section);
-    onSectionChange?.(scenarioGuideActiveSection);
+    if (syncUrl) {
+      onSectionChange?.(scenarioGuideActiveSection);
+    }
     scenarioGuideNavButtons.forEach((button) => {
       const isActive = String(button.dataset.guideSection || "").trim().toLowerCase() === scenarioGuideActiveSection;
       button.classList.toggle("is-active", isActive);

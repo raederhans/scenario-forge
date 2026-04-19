@@ -3366,7 +3366,7 @@ function initToolbar({ render } = {}) {
   if (scenarioGuideBackdrop) {
     scenarioGuideBackdrop.setAttribute("aria-hidden", "true");
   }
-  renderScenarioGuideSection("quick");
+  renderScenarioGuideSection("quick", { syncUrl: false });
   syncScenarioGuideTriggerButtons({
     isOpen: false,
     tutorialEntryVisible: !!state.ui.tutorialEntryVisible,
