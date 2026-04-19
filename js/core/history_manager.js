@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { markDirty } from "./dirty_state.js";
 import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
@@ -99,6 +100,7 @@ function captureHistoryState({
 
   if (strategicOverlay) {
     snapshot.annotationView = cloneStructuredValue(state.annotationView || {});
+    snapshot.operationalLines = cloneStructuredValue(state.operationalLines || []);
     snapshot.operationGraphics = cloneStructuredValue(state.operationGraphics || []);
     snapshot.unitCounters = cloneStructuredValue(state.unitCounters || []);
   }
@@ -231,6 +233,13 @@ function refreshUiAfterHistory(direction, entry) {
 
 function applyHistorySnapshot(snapshot, direction, entry) {
   if (!snapshot || typeof snapshot !== "object") return false;
+  const hasAnnotationView = !!(snapshot.annotationView && typeof snapshot.annotationView === "object");
+  const appliesStrategicOverlay = !!(
+    hasAnnotationView
+    || Array.isArray(snapshot.operationalLines)
+    || Array.isArray(snapshot.operationGraphics)
+    || Array.isArray(snapshot.unitCounters)
+  );
 
   state.visualOverrides = state.visualOverrides || {};
   state.featureOverrides = state.featureOverrides || {};
@@ -260,8 +269,12 @@ function applyHistorySnapshot(snapshot, direction, entry) {
     markLegacyColorStateDirty();
   }
   applyStyleSnapshot(snapshot.styleConfig);
-  if (snapshot.annotationView && typeof snapshot.annotationView === "object") {
+  if (hasAnnotationView) {
     state.annotationView = cloneStructuredValue(snapshot.annotationView);
+  }
+  if (Array.isArray(snapshot.operationalLines)) {
+    state.operationalLines = cloneStructuredValue(snapshot.operationalLines);
+    state.operationalLinesDirty = true;
   }
   if (Array.isArray(snapshot.operationGraphics)) {
     state.operationGraphics = cloneStructuredValue(snapshot.operationGraphics);
@@ -271,10 +284,14 @@ function applyHistorySnapshot(snapshot, direction, entry) {
     state.unitCounters = cloneStructuredValue(snapshot.unitCounters);
     state.unitCountersDirty = true;
   }
-  if (snapshot.annotationView && typeof snapshot.annotationView === "object") {
+  if (hasAnnotationView) {
     state.frontlineOverlayDirty = true;
+    state.operationalLinesDirty = true;
     state.operationGraphicsDirty = true;
     state.unitCountersDirty = true;
+  }
+  if (appliesStrategicOverlay) {
+    markDirty(`history-${direction}`);
   }
 
   refreshUiAfterHistory(direction, entry);

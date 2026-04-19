@@ -1,11 +1,13 @@
 {
-  "pid": 41484,
-  "parent_pid": 19780,
-  "started_at": "2026-04-07T23:57:30.315Z",
+  "pid": 77496,
+  "parent_pid": 6696,
+  "started_at": "2026-04-19T14:09:18.705Z",
   "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
-  "authority_only": false,
-  "poll_ms": 250,
+  "authority_only": true,
+  "poll_ms": 75,
+  "effective_poll_ms": 75,
+  "idle_max_poll_ms": 1000,
   "pid_file": null,
   "max_lifetime_ms": 0,
   "tracked_files": 0,
@@ -15,7 +17,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-07T23:57:30.328Z",
+    "last_tick_at": "2026-04-19T14:09:18.710Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -27,8 +29,8 @@
     "enabled": true,
     "leader_only": true,
     "stale_threshold_ms": 180000,
-    "precomputed_leader_stale": false,
-    "last_tick_at": "2026-04-07T23:57:30.330Z",
+    "precomputed_leader_stale": true,
+    "last_tick_at": "2026-04-19T14:09:18.718Z",
     "last_error": null,
     "run_count": 1
   },
@@ -46,6 +48,8 @@
     "pane_id": "",
     "pane_current_command": "",
     "current_phase": "",
+    "subagent_session_id": "",
+    "active_subagent_thread_ids": [],
     "shared_timestamp_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\.omx\\state\\ralph-last-steer-at",
     "shared_last_sent_at": "",
     "singleton_lock_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\.omx\\state\\ralph-continue-steer.lock"
@@ -53,13 +57,32 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-07T23:57:30.338Z",
-    "last_turn_at": "2026-04-07T23:57:16.153Z",
-    "last_turn_count": 0,
-    "last_message": "",
-    "last_reason": "hud_state_incomplete",
+    "last_tick_at": "2026-04-19T14:09:18.727Z",
+    "last_turn_at": "2026-04-19T14:07:37.464Z",
+    "last_turn_count": 18,
+    "last_message": "结论：任务 1 和任务 2 都已经完成，`/review` 自检通过，architect 复核是 `APPROVE`，Ralph 状态也已经清理完成。\n\n这次实际落地的文件：\n- `docs/REFA",
+    "last_reason": "eligible_but_not_sent",
     "last_error": null,
     "last_nudged_signature": "",
     "last_nudged_at": ""
-  }
+  },
+  "authority_backoff": {
+    "active": false,
+    "reason": "pid_missing",
+    "primary_pid": null,
+    "primary_last_tick_at": "",
+    "freshness_ms": null,
+    "threshold_ms": null
+  },
+  "adaptive_poll": {
+    "enabled": true,
+    "base_ms": 75,
+    "max_ms": 1000,
+    "current_ms": 75,
+    "idle_streak": 0,
+    "last_tick_at": "2026-04-19T14:09:18.734Z",
+    "last_activity_at": "2026-04-19T14:09:18.734Z",
+    "last_activity_reason": "leader_nudge"
+  },
+  "last_cycle_activity": "leader_nudge"
 }

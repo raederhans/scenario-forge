@@ -945,3 +945,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 116. donor 读取 controller 内部常量时，要改成显式 API
 - 这次 `main.js` 把 `BOOT_PHASE_WINDOWS` 和 `bootMetricsLogged` 收进 `startup_boot_overlay.js` 后，donor 里仍然直接读取旧名字，启动期就会立刻抛 `ReferenceError`。
 - 更稳的最短路径是：把这类内部状态改成 controller API，例如 `getBootProgressWindow()`，同时让 controller 自己在 `resetBootMetrics()` 里重置内部标记。
+
+### 117. 文件拆分计划的验证矩阵要分成“文件存在”和“已跑通”两层
+- owner 文件、donor 接线、测试文件落地，只说明结构已经到位；真实执行通过需要单独记测试名、日期和产物路径。
+- 如果这两层混在一个勾选里，计划会同时出现“代码已经做完但文档全红”和“测试没跑却看起来像完成”的双重漂移。
+
+### 118. 多日拆分推进要按自然日期留进度，不能把后续提交混写进旧日期块
+- 文件拆分这类连续任务会跨多天推进，进度记录必须按当天新增内容分块写。
+- 这样回看时才能直接对应提交、勾选和真实验收证据，避免主计划失去 source of truth 价值。
