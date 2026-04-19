@@ -6,6 +6,12 @@ import { applyOwnerControllerAssignmentsToFeatureIds } from "../../core/scenario
 import { buildScenarioReleasableIndex, rebuildPresetState } from "../../core/releasable_manager.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";
+import {
+  normalizeScenarioTagInput,
+  normalizeScenarioNameInput,
+  normalizeScenarioColorInput,
+  sanitizeScenarioColorList,
+} from "./dev_workspace_normalizers.js";
 
 const TAG_CREATOR_RECENT_COLORS_STORAGE_KEY = "mapcreator_scenario_tag_recent_colors";
 const TAG_CREATOR_FALLBACK_SWATCHES = [
@@ -45,10 +51,6 @@ export function createScenarioTagCreatorController({
   renderMetaRows,
   syncSelectOptions,
   normalizeOwnerInput,
-  normalizeScenarioTagInput,
-  normalizeScenarioNameInput,
-  normalizeScenarioColorInput,
-  sanitizeScenarioColorList,
   resolveFeatureName,
   sanitizeSelectionState,
   resolveOwnershipTargetIds,

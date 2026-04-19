@@ -4,6 +4,10 @@ import { syncScenarioLocalizationState } from "../../core/scenario_localization_
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";
+import {
+  normalizeScenarioTagInput,
+  normalizeScenarioNameInput,
+} from "./dev_workspace_normalizers.js";
 
 function ui(key) {
   return t(key, "ui");
@@ -25,8 +29,6 @@ export function createScenarioTextEditorsController({
   renderWorkspace,
   renderMetaRows,
   syncSelectOptions,
-  normalizeScenarioTagInput,
-  normalizeScenarioNameInput,
   resolveFeatureName,
   resolveOwnershipTargetIds,
   collectScenarioCountryOptions,
