@@ -20,6 +20,12 @@ import {
   createDevWorkspacePanel,
   createDevWorkspaceQuickbar,
 } from "./dev_workspace/dev_workspace_shell_builder.js";
+import {
+  normalizeScenarioTagInput,
+  normalizeScenarioNameInput,
+  normalizeScenarioColorInput,
+  sanitizeScenarioColorList,
+} from "./dev_workspace/dev_workspace_normalizers.js";
 
 const DEV_WORKSPACE_STORAGE_KEY = "mapcreator_dev_workspace_expanded";
 const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
@@ -157,28 +163,6 @@ function buildClipboardText(format = "names_with_ids") {
 
 function normalizeOwnerInput(value) {
   return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
-}
-
-function normalizeScenarioTagInput(value) {
-  return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
-}
-
-function normalizeScenarioNameInput(value) {
-  return String(value || "").trim().replace(/\s+/g, " ");
-}
-
-function normalizeScenarioColorInput(value) {
-  const text = String(value || "").trim().replace(/\s+/g, "").toUpperCase();
-  if (!text) return "";
-  return text.startsWith("#") ? text : `#${text}`;
-}
-
-function sanitizeScenarioColorList(values = [], limit = 10) {
-  return Array.from(new Set(
-    (Array.isArray(values) ? values : [])
-      .map((value) => normalizeScenarioColorInput(value))
-      .filter((color) => /^#[0-9A-F]{6}$/.test(color))
-  )).slice(0, limit);
 }
 
 function resolveOwnershipTargetIds() {
@@ -1013,10 +997,6 @@ function initDevWorkspace() {
     renderMetaRows,
     syncSelectOptions,
     normalizeOwnerInput,
-    normalizeScenarioTagInput,
-    normalizeScenarioNameInput,
-    normalizeScenarioColorInput,
-    sanitizeScenarioColorList,
     resolveFeatureName,
     sanitizeSelectionState,
     resolveOwnershipTargetIds,
@@ -1045,8 +1025,6 @@ function initDevWorkspace() {
     renderWorkspace,
     renderMetaRows,
     syncSelectOptions,
-    normalizeScenarioTagInput,
-    normalizeScenarioNameInput,
     resolveFeatureName,
     resolveOwnershipTargetIds,
     collectScenarioCountryOptions,
