@@ -69,13 +69,16 @@ import {
   normalizeExportWorkbenchLayerOrder as normalizeExportWorkbenchLayerOrderFromController,
   normalizeExportWorkbenchTextVisibility as normalizeExportWorkbenchTextVisibilityFromController,
   normalizeExportWorkbenchVisibility as normalizeExportWorkbenchVisibilityFromController,
-  resolveExportPassSequence as resolveExportPassSequenceFromController,
+  resolveExportPassSequence,
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController } from "./toolbar/palette_library_panel.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioGuidePopoverController } from "./toolbar/scenario_guide_popover.js";
 import { createSpecialZoneEditorController } from "./toolbar/special_zone_editor.js";
-import { createTransportWorkbenchController } from "./toolbar/transport_workbench_controller.js";
+import {
+  createTransportWorkbenchController,
+  TRANSPORT_WORKBENCH_INSPECTOR_TABS,
+} from "./toolbar/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
 
 function renderPalette(themeName) {
@@ -1900,7 +1903,7 @@ function initToolbar({ render } = {}) {
     renderReferenceOverlayUi,
     renderTextureUI,
     renderTransportAppearanceUi,
-    setAppearanceTab,
+    setAppearanceTab: setAppearanceTabController,
     syncParentBorderVisibilityUI,
   } = appearanceControlsController;
   state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;

@@ -953,3 +953,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 118. 多日拆分推进要按自然日期留进度，不能把后续提交混写进旧日期块
 - 文件拆分这类连续任务会跨多天推进，进度记录必须按当天新增内容分块写。
 - 这样回看时才能直接对应提交、勾选和真实验收证据，避免主计划失去 source of truth 价值。
+
+### 119. 启动链连续报 boot overlay 卡死时，先用浏览器直开抓首个阻断级脚本错误
+- Playwright 超时只会告诉你“没 ready”，真正的首错常常是一串被前一个错误遮住的语法或绑定缺口。
+- 更稳的顺序是：浏览器直开 localhost，拿到当前第一条 blocking error，再按模块求值顺序一层层清理，直到 boot 能稳定到 Ready。
+
+### 120. 大文件拆分后，导出面和 wiring 缺口会沿启动链串联放大
+- 这次 `main.js`、`scenario_resources.js`、`interaction_funnel.js`、`scenario_manager.js`、`toolbar.js` 连续暴露的都是真实的 symbol/export/wiring 缺口。
+- 更稳的最短路径是：每做一刀 owner 下沉后，立刻补 `node --check`、边界测试、再用浏览器直开过一遍 startup，尽早在模块加载阶段把缺口炸出来。
+
+### 121. boot overlay 的测试等待条件要以真实 boot state 为准，不能只盯 overlay hidden/aria-busy
+- 这次应用已经到 Ready，但 `#bootOverlay` 仍保留在 DOM 里，`aria-busy` 也没及时回落，导致 Playwright 一直误判成“未就绪”。
+- 更稳的最短路径是：等待 `state.bootBlocking === false` 或 `body.app-booting` 已移除，并同时确认 `!state.scenarioApplyInFlight`；overlay hidden 只作为兼容条件，不要当唯一标准。

@@ -602,6 +602,7 @@ const {
   ensureRuntimeChunkLoadState,
   hasScenarioMergedLayerPayload,
   getScenarioRuntimeMergedLayerPayloads,
+  applyScenarioPoliticalChunkPayload,
   resetScenarioChunkRuntimeState,
   preloadScenarioCoarseChunks,
   preloadScenarioFocusCountryPoliticalDetailChunk,
@@ -685,7 +686,6 @@ const {
   ownerFeatureCoverageMinRatio: SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO,
   ownerFeatureCoverageMinFeatures: SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES,
 });
-
 const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;
 
 function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints = normalizeScenarioPerformanceHints(manifest)) {

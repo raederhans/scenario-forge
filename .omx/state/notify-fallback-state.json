@@ -1,7 +1,7 @@
 {
-  "pid": 77496,
+  "pid": 98748,
   "parent_pid": 6696,
-  "started_at": "2026-04-19T14:09:18.705Z",
+  "started_at": "2026-04-19T21:35:14.923Z",
   "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
   "authority_only": true,
@@ -17,7 +17,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-19T14:09:18.710Z",
+    "last_tick_at": "2026-04-19T21:35:14.927Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -30,7 +30,7 @@
     "leader_only": true,
     "stale_threshold_ms": 180000,
     "precomputed_leader_stale": true,
-    "last_tick_at": "2026-04-19T14:09:18.718Z",
+    "last_tick_at": "2026-04-19T21:35:14.934Z",
     "last_error": null,
     "run_count": 1
   },
@@ -57,10 +57,10 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-19T14:09:18.727Z",
-    "last_turn_at": "2026-04-19T14:07:37.464Z",
-    "last_turn_count": 18,
-    "last_message": "结论：任务 1 和任务 2 都已经完成，`/review` 自检通过，architect 复核是 `APPROVE`，Ralph 状态也已经清理完成。\n\n这次实际落地的文件：\n- `docs/REFA",
+    "last_tick_at": "2026-04-19T21:35:14.942Z",
+    "last_turn_at": "2026-04-19T21:34:54.503Z",
+    "last_turn_count": 49,
+    "last_message": "结论：这两个问题已经修好，对应边界测试都过了。\n\n已修内容：\n- `js/core/scenario_resources.js`\n  - 补回 facade alias：\n    - `const h",
     "last_reason": "eligible_but_not_sent",
     "last_error": null,
     "last_nudged_signature": "",
@@ -80,8 +80,8 @@
     "max_ms": 1000,
     "current_ms": 75,
     "idle_streak": 0,
-    "last_tick_at": "2026-04-19T14:09:18.734Z",
-    "last_activity_at": "2026-04-19T14:09:18.734Z",
+    "last_tick_at": "2026-04-19T21:35:14.949Z",
+    "last_activity_at": "2026-04-19T21:35:14.949Z",
     "last_activity_reason": "leader_nudge"
   },
   "last_cycle_activity": "leader_nudge"

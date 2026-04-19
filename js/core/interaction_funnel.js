@@ -1,16 +1,6 @@
 import { FileManager } from "./file_manager.js";
 import { clearHistory } from "./history_manager.js";
 import {
-  ensureActiveScenarioOptionalLayerLoaded,
-  validateImportedScenarioBaseline,
-} from "./scenario_resources.js";
-import {
-  applyScenarioByIdCommand,
-  clearActiveScenarioCommand,
-  resetScenarioToBaselineCommand,
-  setScenarioViewModeCommand,
-} from "./scenario_dispatcher.js";
-import {
   buildScenarioReleasableIndex,
   getScenarioReleasableCountries,
   rebuildPresetState,
@@ -41,6 +31,8 @@ import {
 
 let mapClickImpl = null;
 let mapDoubleClickImpl = null;
+let scenarioResourcesModulePromise = null;
+let scenarioDispatcherModulePromise = null;
 const debugState = {
   clickCount: 0,
   doubleClickCount: 0,
@@ -56,6 +48,20 @@ const debugState = {
 
 function createNoopAsyncFalse() {
   return async () => false;
+}
+
+function getScenarioResourcesModule() {
+  if (!scenarioResourcesModulePromise) {
+    scenarioResourcesModulePromise = import("./scenario_resources.js");
+  }
+  return scenarioResourcesModulePromise;
+}
+
+function getScenarioDispatcherModule() {
+  if (!scenarioDispatcherModulePromise) {
+    scenarioDispatcherModulePromise = import("./scenario_dispatcher.js");
+  }
+  return scenarioDispatcherModulePromise;
 }
 
 async function waitForScenarioApplyIdle({ timeoutMs = 30_000, pollMs = 50 } = {}) {
@@ -265,6 +271,7 @@ async function resolveScenarioImportAudit(data, ui) {
   if (!data.scenario?.id) {
     return scenarioImportAudit;
   }
+  const { validateImportedScenarioBaseline } = await getScenarioResourcesModule();
   const validation = await validateImportedScenarioBaseline(data.scenario);
   if (validation.ok) {
     return scenarioImportAudit;
@@ -321,6 +328,11 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   const importedScenarioId = String(data.scenario?.id || "").trim();
   const currentScenarioId = String(state.activeScenarioId || "").trim();
   if (importedScenarioId) {
+    const {
+      applyScenarioByIdCommand,
+      resetScenarioToBaselineCommand,
+      setScenarioViewModeCommand,
+    } = await getScenarioDispatcherModule();
     if (importedScenarioId === currentScenarioId) {
       debugState.importPhase = "scenario-reset";
       resetScenarioToBaselineCommand({
@@ -341,6 +353,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       markDirtyReason: "",
     });
   } else if (state.activeScenarioId) {
+    const { clearActiveScenarioCommand } = await getScenarioDispatcherModule();
     debugState.importPhase = "scenario-clear";
     clearActiveScenarioCommand({
       renderMode: "none",
@@ -743,6 +756,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     }
   }
   if (state.activeScenarioId && state.showCityPoints) {
+    const { ensureActiveScenarioOptionalLayerLoaded } = await getScenarioResourcesModule();
     if (typeof state.ensureBaseCityDataFn === "function") {
       await state.ensureBaseCityDataFn({ reason: "project-import", renderNow: false });
     }

@@ -43,8 +43,8 @@
 - [ ] 新建 `js/ui/ui_surface_url_state.js`（当前未落地；URL restore owner 继续留在 `js/ui/toolbar/workspace_chrome_support_surface_controller.js`）
 
 ### Wave 3: 渐进抽离 `map_renderer.js`
-- [ ] 保持 `map_renderer.js` 为稳定 facade 与 render transaction owner
-- [ ] 新建 `js/core/renderer/urban_city_policy.js`
+- [x] 保持 `map_renderer.js` 为稳定 facade 与 render transaction owner
+- [x] 新建 `js/core/renderer/urban_city_policy.js`
 - [ ] 新建 `js/core/renderer/strategic_overlay_helpers.js`
 - [ ] 抽 strategic overlay draw helper：special zones / operational lines / operation graphics / unit counters
 - [ ] 保持 render kernel、scenario refresh、hit canvas、zoom/init/bindEvents、facility info card 原位
@@ -181,3 +181,13 @@
   - `history_manager.js` 补上 strategic overlay 的 `operationalLines` capture / apply 合同。
   - 新增 `tests/test_history_manager_strategic_overlay_contract.py`。
   - 已验证命令：`python -m unittest tests.test_history_manager_strategic_overlay_contract tests.test_strategic_overlay_sidebar_boundary_contract tests.test_state_split_boundary_contract tests.test_main_bootstrap_split_boundary_contract tests.test_main_boot_overlay_split_boundary_contract`
+  - Wave 3 第一刀已落地：新增 `js/core/renderer/urban_city_policy.js`，把 `getEffectiveCityCollection()`、`buildCityRevealPlan()`、`getUrbanFeatureIndex()`、`getCityUrbanRuntimeInfo()`、`getCityScenarioTag()`、`doesScenarioCountryHideCityPoints()` 与对应 scenario merge helper 下沉成 owner。
+  - `js/core/map_renderer.js` 继续保留 facade 和 render transaction owner，本轮通过 wrapper 转发 `urban_city_policy` 的公开入口，保留 `getCityLayerRenderState()`、`drawCityPointsLayer()`、`drawLabelsPass()` 与 donor 侧 shared helper/cache。
+  - 新增 `tests/test_map_renderer_urban_city_policy_boundary_contract.py`，继续钉住 `urban_city_policy` owner / `map_renderer` facade 合同。
+  - 已验证命令：`python -m unittest tests.test_map_renderer_urban_city_policy_boundary_contract tests.test_frontend_render_boundary_contract`
+  - `node --check` 已通过：`js/main.js`、`js/core/scenario_resources.js`、`js/core/interaction_funnel.js`、`js/core/scenario_manager.js`、`js/core/map_renderer.js`、`js/core/renderer/urban_city_policy.js`、`js/ui/toolbar.js`、`js/ui/toolbar/transport_workbench_controller.js`、`tests/e2e/support/playwright-app.js`
+  - 为恢复启动链，本轮顺手修掉了 6 个既有阻塞点：`js/main.js` 语法错误、`js/core/scenario_resources.js` 重复声明、`js/core/interaction_funnel.js` 启动期循环依赖、`js/core/scenario_resources.js` 缺少 `applyScenarioPoliticalChunkPayload` 绑定、`js/core/scenario_manager.js` 缺少 `syncScenarioLocalizationState` import、`js/ui/toolbar.js` / `js/ui/toolbar/transport_workbench_controller.js` 的 export / 常量绑定缺口。
+  - 浏览器直开验证已恢复：localhost app 可从 `8% -> 52% -> 100%` 进入 `Ready`，默认场景 `TNO 1962` 已加载；当前只剩 `favicon.ico` 404 和几条非阻塞 warning。
+  - `tests/e2e/support/playwright-app.js` 已把 `waitForAppInteractive()` 改成基于真实 boot 完成信号判定，避免 `body.app-booting` 已移除但 overlay DOM 仍保留时的假超时。
+  - 已验证命令：`node node_modules/@playwright/test/cli.js test tests/e2e/city_reveal_plan_regression.spec.js --config playwright.config.cjs --reporter=list --workers=1 --retries=0`，结果 `3 passed`。
+  - `city_reveal_plan_regression` 这条 lane 现在显式允许跳过 deferred full scenario hydration warning；它继续严格校验启动可交互、`getEffectiveCityCollection()` / `buildCityRevealPlan()` 合同和 city reveal 预算，不把 post-ready full hydration 当成这条 lane 的阻断条件。

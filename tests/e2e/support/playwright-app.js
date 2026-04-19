@@ -77,13 +77,14 @@ async function readBootStateSnapshot(page) {
       const state = stateModule?.state || {};
       return {
         bootPhase: String(state.bootPhase || ""),
-        bootBlocking: !!state.bootBlocking,
+        bootBlocking: state.bootBlocking === false ? false : !!state.bootBlocking,
         startupReadonly: !!state.startupReadonly,
         startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
         detailDeferred: !!state.detailDeferred,
         detailPromotionInFlight: !!state.detailPromotionInFlight,
         scenarioApplyInFlight: !!state.scenarioApplyInFlight,
         activeScenarioId: String(state.activeScenarioId || ""),
+        bodyAppBooting: !!document.body?.classList?.contains("app-booting"),
         overlayHidden: !!overlay?.classList?.contains("hidden"),
         overlayAriaBusy: String(overlay?.getAttribute("aria-busy") || ""),
         bootError: String(state.bootError || ""),
@@ -99,12 +100,23 @@ async function readBootStateSnapshot(page) {
 
 async function waitForAppInteractive(page, { timeout = 90_000 } = {}) {
   try {
-    await page.waitForFunction(() => {
+    await page.waitForFunction(async () => {
       const overlay = document.querySelector("#bootOverlay");
-      if (!overlay) {
-        return true;
+      const overlayReady = !overlay
+        || (overlay.classList.contains("hidden") && overlay.getAttribute("aria-busy") === "false");
+      const bodyBooting = !!document.body?.classList?.contains("app-booting");
+
+      try {
+        const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
+        const stateModule = await import(stateModuleUrl);
+        const state = stateModule?.state || {};
+        const bootStateReady = state.bootBlocking === false;
+        const bodyReady = !bodyBooting;
+        const scenarioIdle = !state.scenarioApplyInFlight;
+        return scenarioIdle && (bootStateReady || bodyReady || overlayReady);
+      } catch (error) {
+        return overlayReady && !bodyBooting;
       }
-      return overlay.classList.contains("hidden") && overlay.getAttribute("aria-busy") === "false";
     }, { timeout });
   } catch (error) {
     const snapshot = await readBootStateSnapshot(page);

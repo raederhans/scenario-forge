@@ -72,6 +72,7 @@ import {
   syncCountryUi,
   syncScenarioUi,
 } from "./scenario_ui_sync.js";
+import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
 import {
   applyBlankScenarioPresentationDefaults,
   ensureRuntimeChunkLoadState,

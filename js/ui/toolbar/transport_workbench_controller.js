@@ -352,7 +352,7 @@ const TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS = [
   { value: "category", label: "Anchor + category" },
 ];
 
-const TRANSPORT_WORKBENCH_INSPECTOR_TABS = [
+export const TRANSPORT_WORKBENCH_INSPECTOR_TABS = [
   { id: "inspect", label: "Inspect" },
   { id: "display", label: "Display" },
   { id: "aggregation", label: "Aggregation" },

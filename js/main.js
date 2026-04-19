@@ -1065,7 +1065,7 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     const activeScenarioId = String(state.activeScenarioId || "").trim();
     const cachedBundle = activeScenarioId
       ? state.scenarioBundleCacheById?.[activeScenarioId] || null
-      : null);
+      : null;
     if (cachedBundle?.manifest) {
       warnOnStartupBundleIntegrity(cachedBundle, {
         source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
