@@ -75,7 +75,11 @@ class TransportFacilityInteractionsContractTest(unittest.TestCase):
             self.assertIn(token, owner_content)
 
     def test_state_and_i18n_cover_transport_primary_color_and_more_fields(self):
-        state_content = (REPO_ROOT / "js" / "core" / "state.js").read_text(encoding="utf-8")
+        state_content = (
+            (REPO_ROOT / "js" / "core" / "state.js").read_text(encoding="utf-8")
+            + "\n"
+            + (REPO_ROOT / "js" / "core" / "state_defaults.js").read_text(encoding="utf-8")
+        )
         i18n_content = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
         self.assertIn('primaryColor: "#1d4ed8"', state_content)
         self.assertIn('primaryColor: "#b45309"', state_content)

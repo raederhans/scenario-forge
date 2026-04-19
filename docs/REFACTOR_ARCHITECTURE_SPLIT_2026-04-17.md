@@ -176,10 +176,16 @@
   - Wave 2 已继续推进：新增 `js/ui/dev_workspace/selection_ownership_controller.js`，把 ownership panel、quick ownership controls、apply/reset/save owners 和对应输入事件从 `dev_workspace.js` 下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/dev_workspace/scenario_text_editors_controller.js`，把 country / capital / locale 三块编辑器的局部 render、保存链、search 交互和输入事件从 `dev_workspace.js` 下沉成独立 controller。
   - Wave 2 已继续推进：新增 `js/ui/dev_workspace/district_editor_controller.js`，把 district editor 的局部 state、draft model、保存链、shared template 链、局部 render 和输入/按钮事件绑定从 `dev_workspace.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/dev_workspace/dev_workspace_shell_builder.js`，把 dev workspace 的 panel / quickbar DOM 搭建和展开态 dock chrome 同步从 `dev_workspace.js` 下沉成独立宿主模块。
+  - Wave 2 已继续推进：新增 `js/core/state_defaults.js`，把 `state.js` 里的 palette 常量、style defaults、transport/export workbench normalizer 和纯配置 helper 下沉成独立模块。
   - `dev_workspace.js` 继续保留 dev workspace facade：仍负责 `initDevWorkspace`、`renderWorkspace`、`state.updateDevWorkspaceUIFn / setDevWorkspaceExpandedFn` 注册、panel 宿主编排，以及共享 runtime 回写 helper。
+  - `state.js` 继续保留运行态 singleton：仍负责 `state` 对象本体，并继续通过 re-export 维持 `PALETTE_THEMES`、`normalize*`、transport/export workbench helper 的兼容出口。
+  - 已修复一轮 review 暴露的启动阻塞问题：`state.js` 现在重新显式 import `defaultZoom`，`state_defaults.js` 也继续导出它，`zoomTransform: defaultZoom` 的模块初始化链已恢复正常。
   - 新增 `tests/test_dev_workspace_split_boundary_contract.py`，继续钉住 Scenario Tag Creator owner / facade、tag create endpoint、color popover dismiss handler 与 render boundary flush 合同。
   - 新增 `tests/test_dev_workspace_selection_ownership_boundary_contract.py`，继续钉住 ownership owner / facade、quick ownership bridge、owners save endpoint 与 donor render facade 合同。
   - 新增 `tests/test_dev_workspace_scenario_text_editors_boundary_contract.py`，继续钉住 text editors owner / facade、country/capital/locale 保存链、`getScenarioGeoLocaleEntry` 导出合同。
   - 新增 `tests/test_dev_workspace_district_editor_boundary_contract.py`，继续钉住 district editor owner / facade、district save/template apply 路径、mesh rebuild 与 manifest `district_groups_url` 回写合同。
-  - 当前已重新验证 168 条静态边界 / UI contract tests 全绿。
+  - 新增 `tests/test_dev_workspace_shell_builder_boundary_contract.py`，继续钉住 dev workspace shell builder 的 panel / quickbar / dock chrome owner，以及 `dev_workspace.js` 的宿主 facade 合同。
+  - 新增 `tests/test_state_split_boundary_contract.py`，继续钉住 `state_defaults.js` 的 pure helper owner，以及 `state.js` 的 compat re-export 和 singleton 合同。
+  - 当前已重新验证 175 条静态边界 / UI contract tests 全绿。
   - 新暴露的后续红线：`history_manager.js` 的 strategic overlay 快照仍未覆盖 `operationalLines`，这条属于既有合同缺口，本轮先保留拆分主线，后续单独收口。

@@ -921,3 +921,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 110. 带有 draft model 和模板保存链的 editor，拆分时要把整条事务链一起迁走
 - 这次 `district_editor_controller` 最稳的切法，是把 `state.devScenarioDistrictEditor`、draft tag 归一、selection assign/remove、district save、shared template save/apply 一整组 owner 逻辑一起下沉。
 - 更稳的最短路径是：让 donor 只保留宿主 panel 显隐、`renderWorkspace()` 总编排和 controller 装配，把带有本地事务状态的 editor 当成一个完整闭环迁走，再用边界测试钉住 mesh rebuild、manifest url 回写和 facade 合同。
+
+### 111. 大型宿主壳拆分时，DOM builder 和 dock chrome 要同波次迁走
+- 这次 `dev_workspace.js` 最后一刀里，`createDevWorkspacePanel`、`createDevWorkspaceQuickbar`、toggle button 文案和 dock collapsed 同步本来就是同一层宿主职责。
+- 更稳的最短路径是：把这组 panel/quickbar builder 和 expand chrome helper 一起迁进 `dev_workspace_shell_builder.js`，让 donor 继续保留 `initDevWorkspace`、`renderWorkspace`、持久化和 state facade。
+
+### 112. 纯配置模块拆分时，先做 compat re-export，再补跨文件合同测试
+- 这次 `state.js` 拆出 `state_defaults.js` 时，外部大量模块还在直接从 `state.js` import `PALETTE_THEMES`、`normalize*` 和 workbench helper。
+- 更稳的最短路径是：先让 donor 继续 re-export 新模块，再补边界测试覆盖旧 import 面和新 owner 文件，最后再做更深的入口收口。
+
+### 113. donor 自己在初始化期要用到的 defaults，必须继续显式 import
+- 这次 `state.js` 拆分后，`defaultZoom` 已经迁到 `state_defaults.js`，但 donor 里还有 `zoomTransform: defaultZoom` 这条初始化引用，少掉本地 import 就会在模块求值阶段直接炸。
+- 更稳的最短路径是：凡是 donor 初始化时直接读到的默认值，都继续保留显式 import；`export *` 只负责对外转发，不能代替 donor 自己的本地绑定。
