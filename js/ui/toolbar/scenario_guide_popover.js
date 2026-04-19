@@ -13,6 +13,8 @@ function createScenarioGuidePopoverController({
   scenarioGuideStatusChips = null,
   scenarioGuideNavButtons = [],
   scenarioGuidePanels = [],
+  getGuideSectionFromUrl = null,
+  onSectionChange = null,
   t,
 } = {}) {
   let scenarioGuideActiveSection = "quick";
@@ -21,9 +23,16 @@ function createScenarioGuidePopoverController({
     const normalizedValue = String(value || "").trim().toLowerCase();
     return ["quick", "prepare", "tools", "checks"].includes(normalizedValue) ? normalizedValue : "quick";
   };
+  const hasScenarioGuideSectionValue = (value = "") => {
+    const normalizedValue = String(value || "").trim().toLowerCase();
+    return ["quick", "prepare", "tools", "checks"].includes(normalizedValue);
+  };
 
-  const renderScenarioGuideSection = (section = "quick") => {
+  const renderScenarioGuideSection = (section = "quick", { syncUrl = true } = {}) => {
     scenarioGuideActiveSection = normalizeScenarioGuideSection(section);
+    if (syncUrl) {
+      onSectionChange?.(scenarioGuideActiveSection);
+    }
     scenarioGuideNavButtons.forEach((button) => {
       const isActive = String(button.dataset.guideSection || "").trim().toLowerCase() === scenarioGuideActiveSection;
       button.classList.toggle("is-active", isActive);
@@ -105,13 +114,17 @@ function createScenarioGuidePopoverController({
 
   const openScenarioGuideSurface = ({ focusOverlaySurface = null } = {}) => {
     if (!scenarioGuidePopover) return;
+    const urlSection = getGuideSectionFromUrl?.();
+    const nextSection = hasScenarioGuideSectionValue(urlSection)
+      ? normalizeScenarioGuideSection(urlSection)
+      : scenarioGuideActiveSection;
     document.body.classList.add("scenario-guide-open");
     scenarioGuideBackdrop?.classList.remove("hidden");
     scenarioGuideBackdrop?.setAttribute("aria-hidden", "false");
     scenarioGuidePopover.classList.remove("hidden");
     scenarioGuidePopover.setAttribute("aria-hidden", "false");
     syncScenarioGuideTriggerButtons({ isOpen: true });
-    renderScenarioGuideSection("quick");
+    renderScenarioGuideSection(nextSection);
     if (typeof focusOverlaySurface === "function") {
       focusOverlaySurface(scenarioGuidePopover);
     }

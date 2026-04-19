@@ -94,12 +94,14 @@ test("phase 03 support surfaces restore the requested view from URL", async ({ p
 
 test("phase 03 support surfaces restore the guide view from URL", async ({ page }) => {
   test.setTimeout(240_000);
-  await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide", { waitUntil: "domcontentloaded" });
+  await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=guide&guide_section=tools", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await expect(page.locator("#scenarioGuideBackdrop")).toBeVisible();
   await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
   await expect(page.locator("body")).toHaveClass(/scenario-guide-open/);
   await expect(page.locator("#scenarioGuideBtn")).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#scenarioGuideTabTools")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#scenarioGuideSectionTools")).toBeVisible();
 });
 
 test("phase 03 guide URL restore returns focus to visible topbar trigger on compact viewport", async ({ page }) => {
@@ -115,6 +117,26 @@ test("phase 03 guide URL restore returns focus to visible topbar trigger on comp
   await expect(page.locator("#scenarioGuideBackdrop")).toBeHidden();
   await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
   await expect(page.locator("#scenarioGuideBtn")).toBeFocused();
+});
+
+test("phase 03 guide remembers active section across close and reopen", async ({ page }) => {
+  test.setTimeout(240_000);
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+
+  await page.locator("#scenarioGuideBtn").click();
+  await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
+  await page.locator("#scenarioGuideTabTools").click();
+  await expect(page.locator("#scenarioGuideTabTools")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#scenarioGuideSectionTools")).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#scenarioGuidePopover")).toBeHidden();
+
+  await page.locator("#scenarioGuideBtn").click();
+  await expect(page.locator("#scenarioGuidePopover")).toBeVisible();
+  await expect(page.locator("#scenarioGuideTabTools")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#scenarioGuideSectionTools")).toBeVisible();
 });
 
 test("phase 03 support surfaces restore the export view and stay idempotent", async ({ page }) => {
