@@ -909,3 +909,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 107. 大块搬走 UI owner 时，要先点名 donor 里仍然复用的 shared helper
 - 这次 `Scenario Tag Creator` 首轮抽离时，批量删掉 tag creator 旧代码时顺手把 `resolveOwnershipTargetIds`、`resolveOwnershipEditorModel`、`collectScenarioCountryOptions` 这类别的 editor 还在用的 shared helper 一起抹掉了。
 - 更稳的最短路径是：先列出 donor 内剩余调用点，再按 “owner-only / shared” 两类切；shared helper 继续留 donor 或单独抽公共模块，最后再做删除。
+
+### 108. controller 下沉后，selection 和快捷条上的 donor 绑定要单独复核
+- 这次 `selection_ownership_controller` 拆出后，ownership 本体接线是通的，但 `devQuickRebuildBordersBtn`、selection sort、copy 按钮这些仍归 donor 持有的绑定被顺手删掉了。
+- 更稳的最短路径是：拆 owner 前先把按钮分成 “owner 控件” 和 “donor 控件”，然后在边界测试里显式钉住 donor 侧还要继续保留的事件绑定。
+
+### 109. 宿主 panel 的 DOM 引用和 category 显隐合同要成对保留
+- 这次 `scenario_text_editors_controller` 下沉后，`scenarioCountryPanel / scenarioCapitalPanel / scenarioLocalePanel` 的宿主 query 被删掉了，但 donor 里的 `syncCategoryPanel(...)` 还在继续用，`renderWorkspace()` 首次执行就会直接炸。
+- 更稳的最短路径是：只要 donor 还负责 category 显隐，它就必须继续持有对应的 panel 引用；或者把显隐逻辑和 panel 引用一起整组迁进 controller，并在边界测试里固定这条宿主合同。
+
+### 110. 带有 draft model 和模板保存链的 editor，拆分时要把整条事务链一起迁走
+- 这次 `district_editor_controller` 最稳的切法，是把 `state.devScenarioDistrictEditor`、draft tag 归一、selection assign/remove、district save、shared template save/apply 一整组 owner 逻辑一起下沉。
+- 更稳的最短路径是：让 donor 只保留宿主 panel 显隐、`renderWorkspace()` 总编排和 controller 装配，把带有本地事务状态的 editor 当成一个完整闭环迁走，再用边界测试钉住 mesh rebuild、manifest url 回写和 facade 合同。

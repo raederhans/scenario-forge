@@ -36,8 +36,8 @@
 - [x] `sidebar.js` -> `water_special_region_controller.js`
 - [x] `sidebar.js` -> `project_support_diagnostics_controller.js`
 - [x] `dev_workspace.js` -> `scenario_tag_creator_controller.js`
-- [ ] `dev_workspace.js` -> `selection_ownership_controller.js`
-- [ ] `dev_workspace.js` -> `scenario_text_editors_controller.js`
+- [x] `dev_workspace.js` -> `selection_ownership_controller.js`
+- [x] `dev_workspace.js` -> `scenario_text_editors_controller.js`
 - [ ] `dev_workspace.js` -> `district_editor_controller.js`
 - [ ] `dev_workspace.js` -> `dev_workspace_shell_builder.js`
 - [ ] 新建 `js/ui/ui_surface_url_state.js`
@@ -173,7 +173,13 @@
   - `tests/test_toolbar_split_boundary_contract.py` 已补 ocean/lake owner 与 facade 断言，继续钉住 water controller 的 history、refresh 和 auto-fill handoff 合同。
   - 新增 `tests/test_sidebar_split_boundary_contract.py`，继续钉住 country inspector owner 与 facade 合同。
   - Wave 2 已继续推进：新增 `js/ui/dev_workspace/scenario_tag_creator_controller.js`，把 Scenario Tag Creator 的表单 state、颜色面板、payload 校验、创建提交、局部 render 和局部事件绑定从 `dev_workspace.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/dev_workspace/selection_ownership_controller.js`，把 ownership panel、quick ownership controls、apply/reset/save owners 和对应输入事件从 `dev_workspace.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/dev_workspace/scenario_text_editors_controller.js`，把 country / capital / locale 三块编辑器的局部 render、保存链、search 交互和输入事件从 `dev_workspace.js` 下沉成独立 controller。
+  - Wave 2 已继续推进：新增 `js/ui/dev_workspace/district_editor_controller.js`，把 district editor 的局部 state、draft model、保存链、shared template 链、局部 render 和输入/按钮事件绑定从 `dev_workspace.js` 下沉成独立 controller。
   - `dev_workspace.js` 继续保留 dev workspace facade：仍负责 `initDevWorkspace`、`renderWorkspace`、`state.updateDevWorkspaceUIFn / setDevWorkspaceExpandedFn` 注册、panel 宿主编排，以及共享 runtime 回写 helper。
   - 新增 `tests/test_dev_workspace_split_boundary_contract.py`，继续钉住 Scenario Tag Creator owner / facade、tag create endpoint、color popover dismiss handler 与 render boundary flush 合同。
-  - 当前已重新验证 156 条静态边界 / UI contract tests 全绿。
+  - 新增 `tests/test_dev_workspace_selection_ownership_boundary_contract.py`，继续钉住 ownership owner / facade、quick ownership bridge、owners save endpoint 与 donor render facade 合同。
+  - 新增 `tests/test_dev_workspace_scenario_text_editors_boundary_contract.py`，继续钉住 text editors owner / facade、country/capital/locale 保存链、`getScenarioGeoLocaleEntry` 导出合同。
+  - 新增 `tests/test_dev_workspace_district_editor_boundary_contract.py`，继续钉住 district editor owner / facade、district save/template apply 路径、mesh rebuild 与 manifest `district_groups_url` 回写合同。
+  - 当前已重新验证 168 条静态边界 / UI contract tests 全绿。
   - 新暴露的后续红线：`history_manager.js` 的 strategic overlay 快照仍未覆盖 `operationalLines`，这条属于既有合同缺口，本轮先保留拆分主线，后续单独收口。
