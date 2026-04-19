@@ -48,7 +48,7 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;', content)
         self.assertIn('state.getStrategicOverlayPerfCountersFn = getStrategicOverlayPerfCounters;', content)
 
-    def test_sidebar_keeps_strategic_overlay_dom_surface_and_import_hook(self):
+    def test_sidebar_keeps_strategic_overlay_dom_surface_and_frontline_invalidation_hook(self):
         content = SIDEBAR_JS.read_text(encoding="utf-8")
 
         for token in [
@@ -62,7 +62,6 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         ]:
             self.assertIn(token, content)
         self.assertIn('invalidateFrontlineOverlayState,', content)
-        self.assertIn('importProjectThroughFunnel(', content)
 
     def test_controller_keeps_refresh_scopes_and_runtime_tokens(self):
         content = STRATEGIC_OVERLAY_CONTROLLER_JS.read_text(encoding="utf-8")

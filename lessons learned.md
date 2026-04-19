@@ -902,3 +902,10 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 41. strategic overlay 的 history snapshot 要把 `operationalLines` 和 dirty flag 一起纳入
 - `captureHistoryState({ strategicOverlay: true })` 如果只收 `annotationView / operationGraphics / unitCounters`，operational line 的 create/update/delete 就会在 undo/redo 后出现假恢复。
 - 拆 strategic overlay owner 前，先把这条合同当成显式红线；owner 可以先下沉，history 缺口要单独补齐并加静态断言。
+### 42. project import owner 可以下沉，但 overlay invalidation hook 必须继续显式注入
+- project import / export 迁到独立 controller 后，`importProjectThroughFunnel` 这条链仍然要拿到 `invalidateFrontlineOverlayState`，不然 strategic overlay 的缓存会在导入后滞后。
+- 更稳的做法是让 donor 继续持有 facade 和 hook 来源，controller 只消费注入的 callback。
+
+### 107. 大块搬走 UI owner 时，要先点名 donor 里仍然复用的 shared helper
+- 这次 `Scenario Tag Creator` 首轮抽离时，批量删掉 tag creator 旧代码时顺手把 `resolveOwnershipTargetIds`、`resolveOwnershipEditorModel`、`collectScenarioCountryOptions` 这类别的 editor 还在用的 shared helper 一起抹掉了。
+- 更稳的最短路径是：先列出 donor 内剩余调用点，再按 “owner-only / shared” 两类切；shared helper 继续留 donor 或单独抽公共模块，最后再做删除。

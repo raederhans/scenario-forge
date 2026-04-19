@@ -34,8 +34,8 @@
 - [x] `sidebar.js` -> `country_inspector_controller.js`
 - [x] `sidebar.js` -> `strategic_overlay_controller.js`
 - [x] `sidebar.js` -> `water_special_region_controller.js`
-- [ ] `sidebar.js` -> `project_support_diagnostics_controller.js`
-- [ ] `dev_workspace.js` -> `scenario_tag_creator_controller.js`
+- [x] `sidebar.js` -> `project_support_diagnostics_controller.js`
+- [x] `dev_workspace.js` -> `scenario_tag_creator_controller.js`
 - [ ] `dev_workspace.js` -> `selection_ownership_controller.js`
 - [ ] `dev_workspace.js` -> `scenario_text_editors_controller.js`
 - [ ] `dev_workspace.js` -> `district_editor_controller.js`
@@ -163,11 +163,17 @@
   - Wave 2 已继续推进：新增 `js/ui/sidebar/water_special_region_controller.js`，把 water inspector 与 special region inspector 的过滤、详情、legend、color picker、batch action、visibility toggle 和本面板事件绑定从 `sidebar.js` 下沉成独立 controller。
   - `sidebar.js` 继续保留 water / special facade：仍负责 `state.renderWaterRegionListFn / updateWaterInteractionUIFn / renderSpecialRegionListFn / updateScenarioSpecialRegionUIFn / updateScenarioReliefOverlayUIFn` 注册，以及 shared layout 调度、scroll/wheel 关闭 picker、主初始化编排。
   - 新增 `tests/test_water_special_region_sidebar_boundary_contract.py`，继续钉住 water/special owner / facade、history snapshot、renderer/history/import funnel callback 合同。
+  - Wave 2 已继续推进：新增 `js/ui/sidebar/project_support_diagnostics_controller.js`，把 scenario audit panel、legend editor、project import/export、debug mode 的渲染与事件绑定从 `sidebar.js` 下沉成独立 controller。
+  - `sidebar.js` 继续保留 project support / diagnostics facade：仍负责 `state.updateLegendUI / renderScenarioAuditPanelFn` 注册、启动阶段首轮 `refreshLegendEditor() / renderScenarioAuditPanel()`、以及右侧栏宿主编排。
+  - 新增 `tests/test_project_support_diagnostics_sidebar_boundary_contract.py`，继续钉住 project support owner / facade、LegendManager/FileManager/helper 注入、interaction_funnel / map_renderer callback 合同。
   - `tests/test_toolbar_split_boundary_contract.py` 与 `tests/test_transport_facility_interactions_contract.py` 已同步切到新的 appearance owner 文件，transport appearance 的 filtered count、primary color、facility info card visibility 合同继续受保护。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 texture/dayNight owner 与 facade 断言，继续钉住 `state.updateTextureUIFn` 和 `state.updateToolbarInputsFn` 的合同。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 city/urban/physical/rivers owner 与 facade 断言，继续钉住 `state.updateSpecialZoneEditorUIFn` 的 host contract。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 reference overlay owner 与 facade 断言，继续钉住 `state.updateToolbarInputsFn` 的 reference 刷新链。
   - `tests/test_toolbar_split_boundary_contract.py` 已补 ocean/lake owner 与 facade 断言，继续钉住 water controller 的 history、refresh 和 auto-fill handoff 合同。
   - 新增 `tests/test_sidebar_split_boundary_contract.py`，继续钉住 country inspector owner 与 facade 合同。
-  - 当前已重新验证 145 条静态边界 / UI contract tests 全绿。
+  - Wave 2 已继续推进：新增 `js/ui/dev_workspace/scenario_tag_creator_controller.js`，把 Scenario Tag Creator 的表单 state、颜色面板、payload 校验、创建提交、局部 render 和局部事件绑定从 `dev_workspace.js` 下沉成独立 controller。
+  - `dev_workspace.js` 继续保留 dev workspace facade：仍负责 `initDevWorkspace`、`renderWorkspace`、`state.updateDevWorkspaceUIFn / setDevWorkspaceExpandedFn` 注册、panel 宿主编排，以及共享 runtime 回写 helper。
+  - 新增 `tests/test_dev_workspace_split_boundary_contract.py`，继续钉住 Scenario Tag Creator owner / facade、tag create endpoint、color popover dismiss handler 与 render boundary flush 合同。
+  - 当前已重新验证 156 条静态边界 / UI contract tests 全绿。
   - 新暴露的后续红线：`history_manager.js` 的 strategic overlay 快照仍未覆盖 `operationalLines`，这条属于既有合同缺口，本轮先保留拆分主线，后续单独收口。
