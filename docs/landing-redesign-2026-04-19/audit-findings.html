@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>前端审计报告 — Scenario Forge</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: #f7f7f5;
+    color: #111;
+    padding: 40px 32px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .page-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 6px; }
+  .page-sub { color: #666; font-size: 1rem; margin-bottom: 48px; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tag-critical { background: #fee2e2; color: #b91c1c; }
+  .tag-major { background: #fef3c7; color: #92400e; }
+  .tag-minor { background: #e0f2fe; color: #0369a1; }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 16px;
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+  .cat-card {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+  .cat-card__num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 4px;
+  }
+  .cat-card__label { font-size: 0.92rem; color: #555; }
+  .num-red { color: #dc2626; }
+  .num-yellow { color: #d97706; }
+  .num-blue { color: #2563eb; }
+
+  .issues { display: flex; flex-direction: column; gap: 14px; margin-bottom: 52px; }
+  .issue {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+  .issue-num {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #bbb;
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  .issue-body h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 5px; letter-spacing: -0.01em; }
+  .issue-body p { font-size: 0.88rem; color: #555; line-height: 1.55; }
+  .issue-body .fix {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #f0f9ff;
+    border-radius: 10px;
+    border-left: 3px solid #3b82f6;
+    font-size: 0.85rem;
+    color: #1e40af;
+  }
+  .issue-body .fix strong { display: block; margin-bottom: 2px; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: #3b82f6; }
+
+  .ref-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 52px;
+  }
+  .ref-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    border: 1.5px solid;
+  }
+  .ref-openai { border-color: #10a37f; color: #10a37f; background: #f0fdf9; }
+  .ref-anthropic { border-color: #d97706; color: #92400e; background: #fffbeb; }
+  .ref-apple { border-color: #555; color: #333; background: #f5f5f5; }
+  .ref-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-openai { background: #10a37f; }
+  .dot-anthropic { background: #d97706; }
+  .dot-apple { background: #555; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .compare-box {
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .compare-box h4 { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+  .compare-box.current { background: #faf3ee; border-color: rgba(200,120,60,0.2); }
+  .compare-box.current h4 { color: #92400e; }
+  .compare-box.target { background: #f0f9ff; border-color: rgba(59,130,246,0.2); }
+  .compare-box.target h4 { color: #1d4ed8; }
+
+  .hero-mock { border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 10px; }
+  .hero-mock-inner {
+    background: #f5f1ea;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 16px;
+    align-items: center;
+    min-height: 140px;
+  }
+  .mock-nav { height: 36px; background: rgba(255,255,255,0.8); border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #666; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.08); }
+  .mock-h1 { height: 52px; background: rgba(0,0,0,0.12); border-radius: 8px; margin-bottom: 8px; }
+  .mock-p { height: 30px; background: rgba(0,0,0,0.06); border-radius: 6px; margin-bottom: 6px; }
+  .mock-p.short { width: 70%; }
+  .mock-btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .mock-btn { height: 28px; width: 80px; border-radius: 999px; background: #18222f; }
+  .mock-btn.ghost { background: transparent; border: 1px solid #ccc; }
+  .mock-screen { background: #0c141f; border-radius: 10px; height: 90px; }
+  .mock-chip-row { display: flex; gap: 4px; margin-top: 4px; }
+  .mock-chip { height: 18px; width: 70px; border-radius: 999px; background: rgba(255,255,255,0.9); }
+  .issue-desc { font-size: 0.8rem; color: #888; font-style: italic; }
+
+  .hero-mock-inner.new {
+    background: #fff;
+    padding: 20px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .new-nav { height: 36px; background: rgba(0,0,0,0.04); border-radius: 999px; border: 1px solid rgba(0,0,0,0.06); }
+  .new-h1-big { height: 44px; background: linear-gradient(135deg, #111 0%, #333 100%); border-radius: 8px; width: 80%; }
+  .new-screen-hero {
+    height: 100px;
+    background: linear-gradient(135deg, #0c141f 0%, #1a2d4a 100%);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    margin-top: 4px;
+  }
+  .new-screen-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.05) 100%);
+  }
+  .glow { position: absolute; width: 60px; height: 60px; border-radius: 50%; background: rgba(35,77,131,0.4); filter: blur(20px); top: 10px; left: 30px; }
+
+  hr { border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 40px 0; }
+</style>
+</head>
+<body>
+  <p class="page-title">Scenario Forge 落地页 — 前端设计审计</p>
+  <p class="page-sub">对标 OpenAI · Anthropic · Apple 官网风格 / 2026-04-19</p>
+
+  <p class="section-label">问题汇总</p>
+  <div class="cat-grid">
+    <div class="cat-card">
+      <div class="cat-card__num num-red">4</div>
+      <div class="cat-card__label">严重问题 ─ 直接影响第一印象</div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card__num num-yellow">6</div>
+      <div class="cat-card__label">重要问题 ─ 影响专业感与深度</div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card__num num-blue">5</div>
+      <div class="cat-card__label">优化点 ─ 细节打磨提升质感</div>
+    </div>
+  </div>
+
+  <p class="section-label">对标品牌特征</p>
+  <div class="ref-row" style="margin-bottom: 28px;">
+    <div class="ref-chip ref-openai"><span class="ref-dot dot-openai"></span>OpenAI — 极简纯白 · 大面积留白 · 深色产品截图悬浮感</div>
+    <div class="ref-chip ref-anthropic"><span class="ref-dot dot-anthropic"></span>Anthropic — 温暖奶白 · 圆润卡片 · 精准字体层级</div>
+    <div class="ref-chip ref-apple"><span class="ref-dot dot-apple"></span>Apple — 戏剧性Hero · 产品主角化 · 节奏强烈的滚动叙事</div>
+  </div>
+
+  <hr>
+
+  <p class="section-label" style="color: #b91c1c;">严重问题 (Critical)</p>
+  <div class="issues">
+
+    <div class="issue">
+      <span class="issue-num">C-1</span>
+      <div class="issue-body">
+        <h3>Hero 产品截图缺乏"主角感" — 直接放图，无悬浮/深度感</h3>
+        <p>当前截图直接铺在 product-frame 内，背景 #0c141f 虽深，但卡片本身没有投影层次，截图与页面背景的关系是"贴在纸上"，不是"漂浮在空间里"。对比 OpenAI 的产品页，截图有大面积暗色背景 + 精确 box-shadow(0 40px 80px) + 轻微 3D 透视角度，产生强烈的产品展示感。</p>
+        <div class="fix"><strong>改进方向</strong>加深 product-frame 背景到纯 #000 或深蓝，增大 box-shadow (0 60px 120px rgba(0,0,0,0.4))，考虑为截图区域增加顶部光晕 gradient overlay，让截图"发光"而非"平铺"。</div>
+      </div>
+      <span class="tag tag-critical">严重</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">C-2</span>
+      <div class="issue-body">
+        <h3>同一张截图在 Hero 和 Works 第一张卡片重复出现</h3>
+        <p>workspace-overview.webp 同时用于 Hero 区产品展示和 Works Section 第一张宽卡片 (work-card--wide)。用户滚动几秒就会再次看到完全相同的图，这在专业产品页面中几乎不会出现。Anthropic、OpenAI 的每一个 section 都有独立的视觉资产。</p>
+        <div class="fix"><strong>改进方向</strong>Works section 必须使用独立截图资产，或考虑将 Hero 换成更"产品印象"的抽象视觉（渐变、粒子、交互演示），Works 才展示真实截图。</div>
+      </div>
+      <span class="tag tag-critical">严重</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">C-3</span>
+      <div class="issue-body">
+        <h3>页面留白严重不足 — 节奏密集，无"呼吸感"</h3>
+        <p>当前 .section { padding: 52px 0 } 与 .section--muted 的上下 margin: 28px，在 1240px 宽屏下各 section 之间几乎无视觉间距。对比 Apple 官网，section 之间通常有 100px–200px 的空白，让每个内容块有独立的视觉重量。当前页面感觉"一直在说话，没有停顿"。</p>
+        <div class="fix"><strong>改进方向</strong>.section padding 至少提升到 80px–120px 0，关键 section 如 Hero 增加 140px+ 顶部空间，section--muted margin 增加到 48px+。</div>
+      </div>
+      <span class="tag tag-critical">严重</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">C-4</span>
+      <div class="issue-body">
+        <h3>零动效 — 页面完全静态，缺乏现代产品感</h3>
+        <p>整页除了按钮 hover translateY(-1px) 外没有任何动效。OpenAI、Anthropic、Apple 的产品页都使用 scroll-triggered 淡入/上移动画（IntersectionObserver + CSS transition），这让用户感受到内容"被揭示"的节奏感，是现代 SaaS/产品页的基本期望。</p>
+        <div class="fix"><strong>改进方向</strong>为所有 section-heading、卡片添加 data-animate 属性，通过 IntersectionObserver 在进入视口时触发 opacity: 0→1 + translateY(24px→0) 的 400ms ease-out 动画。</div>
+      </div>
+      <span class="tag tag-critical">严重</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p class="section-label" style="color: #92400e;">重要问题 (Major)</p>
+  <div class="issues">
+
+    <div class="issue">
+      <span class="issue-num">M-1</span>
+      <div class="issue-body">
+        <h3>Eyebrow 标签风格过时 — 橙色大写 + 大字间距</h3>
+        <p>每个 section 都有 .eyebrow { color: #9a5d31; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase } 的标签。这是 2015–2020 年 SaaS 网站的典型风格。Anthropic 和 OpenAI 几乎不使用橙色 eyebrow，而是用轻量的灰色或配色系统中的强调色，且减少 letter-spacing 至 0.05em 以内。</p>
+        <div class="fix"><strong>改进方向</strong>eyebrow 改为 color: var(--text-tertiary)，font-weight: 500，letter-spacing: 0.04em，去掉全大写或改为首字母大写。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">M-2</span>
+      <div class="issue-body">
+        <h3>Features/Audience/Roadmap 三个 section 视觉上几乎一样</h3>
+        <p>这三个 section 共用相同的卡片样式（白色半透明 + 圆角 + 文字），无图标、无截图、无视觉区分。用户在视觉上无法区分这些内容的重要性差异。Apple 产品页每个 section 都有独特的视觉"结构"。</p>
+        <div class="fix"><strong>改进方向</strong>Features section 增加 feature icon（SVG 图标，每个 feature group 配一个）。Audience section 改为更大字体的有序列表样式。Roadmap 增加进度条或状态 badge。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">M-3</span>
+      <div class="issue-body">
+        <h3>Why/Comparison section 视觉太弱 — 两个白盒子 + 列表</h3>
+        <p>Problem vs. Solution 对比是产品页的核心说服时刻，但当前实现只是两个颜色略有差别的白卡片，里面是 bullet list。OpenAI 的同类对比会用 ❌/✓ icon、颜色对比强烈的卡片来强调差异。</p>
+        <div class="fix"><strong>改进方向</strong>Problem 侧加 ✗ prefix + 红色色调（#fff5f5），Solution 侧加 ✓ prefix + 蓝色色调（#f0f7ff），增加彩色图标前缀提升说服力。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">M-4</span>
+      <div class="issue-body">
+        <h3>Hero facts list 感觉像 README 而非营销文案</h3>
+        <p>三条 hero__facts 列表条目用的是带 border 的白色圆角小盒子，内容是密集的功能说明句。这在视觉上打断了 hero 区的叙事节奏，让人感觉进入了"技术文档"模式。</p>
+        <div class="fix"><strong>改进方向</strong>将 hero facts 完全移除，详情留给 Features section。Hero 只保留 eyebrow badge + H1 + subtext + 2个CTA。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">M-5</span>
+      <div class="issue-body">
+        <h3>Works section 宽卡片文字区过小且内容空洞</h3>
+        <p>work-card--wide 的文字区 padding: 24px 感觉像附注，而非主要说明。label + h3 + p 三层文字塞在窄区域内，H3 的 font-size 被 clamp(1.4rem, 2vw, 2rem) 限制，在宽屏下偏小。</p>
+        <div class="fix"><strong>改进方向</strong>改用 Bento Grid 布局（1张大卡 + 2张小卡），截图作背景，文字叠加在底部渐变蒙层上。参考 Apple/Linear 产品展示页。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">M-6</span>
+      <div class="issue-body">
+        <h3>导航栏信息密度过高 — 品牌 + 4个nav + 语言切换 + 2个按钮</h3>
+        <p>当前 topbar 有 8 个交互元素，Apple 的导航通常只有 品牌 + 核心导航 + 1个CTA，语言切换被收入 footer 或下拉菜单。过多的 topbar 元素分散了用户对主 CTA "Open demo" 的注意力。</p>
+        <div class="fix"><strong>改进方向</strong>将语言切换移至 footer，topbar 精简为 品牌 + 导航 + GitHub + 1个主CTA（共 7 元素 → 5 元素）。</div>
+      </div>
+      <span class="tag tag-major">重要</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p class="section-label" style="color: #0369a1;">优化点 (Minor)</p>
+  <div class="issues">
+
+    <div class="issue">
+      <span class="issue-num">P-1</span>
+      <div class="issue-body">
+        <h3>H1 字间距 letter-spacing: -0.06em 在小屏幕上难以阅读</h3>
+        <p>在 3rem (clamp 下限) 时 -0.06em 的字间距会让英文在小屏幕上偏紧。</p>
+        <div class="fix"><strong>改进方向</strong>用 @media 在小屏幕下将 letter-spacing 放宽到 -0.03em。</div>
+      </div>
+      <span class="tag tag-minor">优化</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">P-2</span>
+      <div class="issue-body">
+        <h3>CTA Panel 左右布局在移动端 stacked 后按钮组很突兀</h3>
+        <p>cta-panel__actions 在折叠后上下排列按钮，但 CTA 文字区的 h2 相对较大，整体比例失调。</p>
+        <div class="fix"><strong>改进方向</strong>改为居中单列布局：eyebrow + h2 + p 居中，按钮组居中 flex。</div>
+      </div>
+      <span class="tag tag-minor">优化</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">P-3</span>
+      <div class="issue-body">
+        <h3>button--primary 颜色 #18222f 无品牌个性</h3>
+        <p>当前主 CTA 按钮是几乎纯黑色，在奶油色背景下稍显生硬，且与品牌色 #234d83 无关联。</p>
+        <div class="fix"><strong>改进方向</strong>将 button--primary 改为 var(--accent) (#234d83 深蓝) + 白色文字，与页面品牌色统一。</div>
+      </div>
+      <span class="tag tag-minor">优化</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">P-4</span>
+      <div class="issue-body">
+        <h3>footer 结构不清晰 — 两列无分隔，数据归因段落冗长</h3>
+        <p>footer__meta 中的数据来源文字是一段密集的散文，难以扫读。</p>
+        <div class="fix"><strong>改进方向</strong>添加顶部分隔线，数据来源改为轻量小字（0.78rem, color:#aaa），语言切换移入 footer。</div>
+      </div>
+      <span class="tag tag-minor">优化</span>
+    </div>
+
+    <div class="issue">
+      <span class="issue-num">P-5</span>
+      <div class="issue-body">
+        <h3>Works section 缺少宏观标题的视觉重量</h3>
+        <p>section-heading max-width: 760px 且居左，标题字号在 clamp 最小值时缺乏足够的视觉引导作用。</p>
+        <div class="fix"><strong>改进方向</strong>section-heading 居中对齐，h2 字号提升至 clamp(2.6rem, 5vw, 4.5rem)。</div>
+      </div>
+      <span class="tag tag-minor">优化</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p class="section-label">当前 vs 目标 — Hero 区对比示意</p>
+  <div class="compare-grid">
+    <div class="compare-box current">
+      <h4>当前状态</h4>
+      <div class="hero-mock">
+        <div class="hero-mock-inner">
+          <div>
+            <div class="mock-h1"></div>
+            <div class="mock-p"></div>
+            <div class="mock-p short"></div>
+            <div class="mock-btn-row">
+              <div class="mock-btn"></div>
+              <div class="mock-btn ghost"></div>
+            </div>
+            <div class="mock-p" style="height:18px;margin-top:4px;"></div>
+            <div class="mock-p" style="height:18px;"></div>
+            <div class="mock-p short" style="height:18px;"></div>
+          </div>
+          <div>
+            <div class="mock-screen"></div>
+            <div class="mock-chip-row">
+              <div class="mock-chip"></div><div class="mock-chip"></div><div class="mock-chip"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="issue-desc">截图平铺；Hero facts 列表占据大量空间；截图投影不足；chips 覆盖截图。</p>
+    </div>
+    <div class="compare-box target">
+      <h4>目标方向（参考 OpenAI/Apple）</h4>
+      <div class="hero-mock">
+        <div class="hero-mock-inner new" style="background:#060d18;">
+          <div class="new-nav" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.12);"></div>
+          <div style="padding: 0 20px; text-align:center;">
+            <div class="new-h1-big" style="margin:0 auto 8px; background:rgba(255,255,255,0.9);"></div>
+            <div class="mock-p" style="margin:0 auto 5px; background:rgba(255,255,255,0.2); height:8px;"></div>
+            <div class="mock-p short" style="margin:0 auto; background:rgba(255,255,255,0.15); height:8px;"></div>
+            <div class="mock-btn-row" style="margin-top:10px; justify-content:center;">
+              <div class="mock-btn" style="background:rgba(255,255,255,0.9);"></div>
+              <div class="mock-btn ghost" style="border-color:rgba(255,255,255,0.25);"></div>
+            </div>
+          </div>
+          <div class="new-screen-hero" style="margin:8px 20px 0;">
+            <div class="glow"></div>
+          </div>
+        </div>
+      </div>
+      <p class="issue-desc">深色首屏；居中文字；截图从底部升起有光晕；无 facts 列表。</p>
+    </div>
+  </div>
+</body>
+</html>

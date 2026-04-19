@@ -975,3 +975,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `startup_data_pipeline.js` 最稳的切法，是把 startup bundle 解析、base data 加载、context layer deferred load、localization/city 补水和 primary collection decode 下沉成 owner。
 - 更稳的最短路径是：`main.js` 继续持有 boot overlay、render boundary、scenario apply、ready/readonly/detail promotion 顺序，把数据装配和 state hydrate 交给 owner。
 
+### 124. startup scenario boot 拆分时，bundle apply recovery 可以下沉，ready-state 编排继续留在 main
+- 这次 `startup_scenario_boot.js` 最稳的切口，是把 `scenario-bundle` metric、startup bundle apply、legacy bootstrap fallback 和 `scenarioApplyInFlight` 事务收成一个 owner。
+- 更稳的最短路径是：`main.js` 继续保留 deferred UI bootstrap、render wiring、warmup flush、`finalizeReadyState()` 和顶层 error/continue facade，让 scenario boot 模块只处理默认场景启动事务。
+
+### 125. detail promotion 拆分时，transaction 可以下沉，ready-state 分支判断继续留在 main
+- 这次 `deferred_detail_promotion.js` 最稳的切口，是把 detail topology load、readonly unlock 重试、idle promote 调度和内部句柄收成一个 owner。
+- 更稳的最短路径是：`main.js` 继续保留 `finalizeReadyState()`、boot shell 和 warmup/ready 编排，让 owner 专注处理 detail promotion transaction。
+

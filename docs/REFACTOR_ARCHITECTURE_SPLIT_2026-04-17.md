@@ -53,8 +53,8 @@
 - [x] `main.js` -> `js/bootstrap/startup_bootstrap_support.js`（默认场景解析 / startup bundle URL / startup diagnostics helper owner）
 - [x] `main.js` -> `js/bootstrap/startup_boot_overlay.js`（boot overlay / readonly / boot metric owner）
 - [x] `main.js` -> `js/bootstrap/startup_data_pipeline.js`
-- [ ] `main.js` -> `js/bootstrap/startup_scenario_boot.js`
-- [ ] `main.js` -> `js/bootstrap/deferred_detail_promotion.js`
+- [x] `main.js` -> `js/bootstrap/startup_scenario_boot.js`
+- [x] `main.js` -> `js/bootstrap/deferred_detail_promotion.js`
 - [x] `state.js` -> `js/core/state_defaults.js`（defaults / normalizer owner；`state.js` 保留 compat facade）
 - [ ] `state.js` -> `js/core/state_catalog.js`
 - [ ] 新建 `js/core/runtime_hooks.js`
@@ -203,3 +203,13 @@
   - `tests/e2e/support/playwright-app.js` 已把 `waitForAppInteractive()` 改成基于真实 boot 完成信号判定，避免 `body.app-booting` 已移除但 overlay DOM 仍保留时的假超时。
   - 已验证命令：`node node_modules/@playwright/test/cli.js test tests/e2e/city_reveal_plan_regression.spec.js --config playwright.config.cjs --reporter=list --workers=1 --retries=0`，结果 `3 passed`。
   - `city_reveal_plan_regression` 这条 lane 现在显式允许跳过 deferred full scenario hydration warning；它继续严格校验启动可交互、`getEffectiveCityCollection()` / `buildCityRevealPlan()` 合同和 city reveal 预算，不把 post-ready full hydration 当成这条 lane 的阻断条件。
+  - Wave 4 已继续推进：新增 `js/bootstrap/startup_scenario_boot.js`，把 startup scenario bundle metric 整形、scenario apply、startup bundle apply recovery 与 legacy bootstrap fallback 收口成独立 owner。
+  - `main.js` 继续保留 boot overlay、render wiring、deferred UI bootstrap、warmup / ready / readonly / detail promotion 编排；本轮只把 startup scenario boot transaction 下沉到 owner。
+  - 新增 `tests/test_main_startup_scenario_boot_boundary_contract.py`，并更新 `tests/test_main_bootstrap_split_boundary_contract.py`，继续钉住 startup scenario boot owner / `main.js` facade 与 ready-state 编排保留合同。
+  - 已验证命令：`python -m unittest tests.test_main_bootstrap_split_boundary_contract tests.test_main_startup_scenario_boot_boundary_contract tests.test_main_boot_overlay_split_boundary_contract tests.test_main_startup_data_pipeline_boundary_contract tests.test_startup_shell tests.test_startup_bootstrap_assets -v`
+  - `node --check` 已通过：`js/bootstrap/startup_scenario_boot.js`、`js/main.js`
+  - Wave 4 已继续推进：新增 `js/bootstrap/deferred_detail_promotion.js`，把 detail topology promote、readonly unlock 重试、deferred detail idle promote 与相关内部句柄收口成独立 owner。
+  - `main.js` 继续保留 finalizeReadyState、boot shell、render wiring、warmup / ready 编排；本轮只把 detail promotion transaction 和 startup readonly unlock transaction 下沉到 owner。
+  - 新增 `tests/test_main_deferred_detail_promotion_boundary_contract.py`，并更新 `tests/test_main_bootstrap_split_boundary_contract.py`，继续钉住 deferred detail promotion owner / `main.js` ready-state facade 保留合同。
+  - 已验证命令：`python -m unittest tests.test_main_bootstrap_split_boundary_contract tests.test_main_boot_overlay_split_boundary_contract tests.test_main_startup_data_pipeline_boundary_contract tests.test_main_startup_scenario_boot_boundary_contract tests.test_main_deferred_detail_promotion_boundary_contract tests.test_startup_shell tests.test_startup_bootstrap_assets -v`
+  - `node --check` 已通过：`js/bootstrap/deferred_detail_promotion.js`、`js/main.js`

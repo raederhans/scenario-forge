@@ -75,6 +75,12 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
         self.assertIn("createStartupBundleLoadDiagnostics({", owner_content)
         self.assertIn('getStartupScenarioSupportUrl(startupFallbackScenarioId, "locales.startup.json")', owner_content)
         self.assertIn('getStartupScenarioSupportUrl(startupFallbackScenarioId, "geo_aliases.startup.json")', owner_content)
+        self.assertIn("state.topologyDetail = topologyDetail || null;", owner_content)
+        self.assertIn('state.topologyBundleMode = topologyBundleMode || "single";', owner_content)
+        self.assertIn("state.detailDeferred = !!detailDeferred;", owner_content)
+        self.assertIn('state.detailSourceRequested = detailSourceRequested || "na_v2";', owner_content)
+        self.assertIn("state.detailPromotionInFlight = false;", owner_content)
+        self.assertIn("state.detailPromotionCompleted = !detailDeferred;", owner_content)
 
 
 if __name__ == "__main__":

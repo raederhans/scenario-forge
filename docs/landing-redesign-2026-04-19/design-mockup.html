@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全页重设计方案</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: #f0f0ee;
+    color: #111;
+    padding: 40px 24px 100px;
+    max-width: 1080px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .report-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 6px; }
+  .report-sub { color: #666; font-size: 0.9rem; margin-bottom: 48px; }
+
+  .ds { margin-bottom: 48px; }
+  .ds-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #999; margin-bottom: 12px;
+  }
+  .ds-label .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #111; color: #fff; font-size: 0.65rem; font-weight: 800;
+  }
+  .ds-label .change-tag {
+    padding: 2px 8px; border-radius: 999px; font-size: 0.68rem;
+    background: #dcfce7; color: #15803d;
+  }
+  .ds-label .change-tag.big { background: #fee2e2; color: #b91c1c; }
+  .ds-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .ds-desc { font-size: 0.86rem; color: #555; margin-bottom: 14px; line-height: 1.55; }
+
+  .page-mock {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+
+  .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .swatch { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .swatch-block { width: 56px; height: 40px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); }
+  .swatch-label { font-size: 0.68rem; color: #888; font-family: monospace; }
+  .swatch-name { font-size: 0.72rem; color: #444; font-weight: 600; }
+
+  .mock-topbar {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .mock-brand { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; color: #111; }
+  .mock-brand-dot { width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, #234d83, #9a5d31); }
+  .mock-nav-links { display: flex; gap: 20px; }
+  .mock-nav-link { font-size: 0.82rem; color: #555; text-decoration: none; }
+  .mock-nav-actions { display: flex; gap: 8px; align-items: center; }
+  .mock-btn-sm {
+    font-size: 0.8rem; padding: 7px 14px; border-radius: 999px; font-weight: 600;
+    display: inline-flex; align-items: center;
+  }
+  .mock-btn-sm.ghost { border: 1px solid rgba(0,0,0,0.12); color: #444; background: transparent; }
+  .mock-btn-sm.primary { background: #234d83; color: #fff; }
+
+  .mock-hero {
+    background: linear-gradient(160deg, #060d18 0%, #0e1c2e 50%, #111827 100%);
+    padding: 90px 40px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 460px;
+  }
+  .mock-hero-glow-1 {
+    position: absolute; width: 400px; height: 300px;
+    background: radial-gradient(circle, rgba(35,77,131,0.22) 0%, transparent 65%);
+    top: -60px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .mock-hero-glow-2 {
+    position: absolute; width: 300px; height: 200px;
+    background: radial-gradient(circle, rgba(154,93,49,0.12) 0%, transparent 65%);
+    top: 20px; right: 10%;
+    pointer-events: none;
+  }
+  .mock-hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 0.76rem; font-weight: 600; color: rgba(255,255,255,0.65);
+    margin-bottom: 24px; letter-spacing: 0.04em;
+  }
+  .mock-hero-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: #60a5fa; }
+  .mock-hero-h1 {
+    font-size: clamp(2.8rem, 6vw, 4.6rem);
+    font-weight: 800; letter-spacing: -0.055em; line-height: 0.95;
+    color: #ffffff; margin-bottom: 20px;
+    text-shadow: 0 2px 40px rgba(59,130,246,0.15);
+  }
+  .mock-hero-h1 em { color: rgba(255,255,255,0.45); font-style: normal; }
+  .mock-hero-sub {
+    font-size: 1.05rem; color: rgba(255,255,255,0.5); line-height: 1.65;
+    max-width: 480px; margin: 0 auto 32px;
+  }
+  .mock-hero-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 52px; }
+  .mock-hero-btn-p {
+    padding: 12px 24px; border-radius: 999px; font-size: 0.9rem; font-weight: 700;
+    background: #ffffff; color: #0a0a0a;
+    box-shadow: 0 4px 16px rgba(255,255,255,0.15);
+  }
+  .mock-hero-btn-s {
+    padding: 12px 24px; border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .mock-hero-screen-wrap {
+    position: relative; max-width: 700px; margin: 0 auto;
+    filter: drop-shadow(0 -12px 60px rgba(35,77,131,0.3)) drop-shadow(0 40px 80px rgba(0,0,0,0.6));
+  }
+  .mock-hero-screen {
+    background: linear-gradient(160deg, #0d1b2e 0%, #162d4d 60%, #1e3a5f 100%);
+    border-radius: 16px 16px 0 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom: none;
+    height: 170px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mock-hero-screen::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  }
+  .mock-screen-toolbar {
+    height: 28px; background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; padding: 0 12px; gap: 6px;
+  }
+  .mock-screen-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+  .mock-screen-content {
+    display: grid; grid-template-columns: 200px 1fr 120px; height: calc(100% - 28px); gap: 0;
+  }
+  .mock-screen-sidebar { background: rgba(0,0,0,0.2); border-right: 1px solid rgba(255,255,255,0.04); }
+  .mock-screen-map {
+    background: linear-gradient(135deg, #1a3560 0%, #2a5080 50%, #1d3e60 100%);
+    position: relative; overflow: hidden;
+  }
+  .mock-screen-map::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='120' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 40 Q30 20 50 35 Q70 50 90 30 Q110 10 115 40' stroke='rgba(255,255,255,0.08)' fill='none' stroke-width='1'/%3E%3Cpath d='M5 55 Q25 45 55 50 Q80 55 100 42' stroke='rgba(255,255,255,0.06)' fill='none' stroke-width='1'/%3E%3C/svg%3E") repeat;
+  }
+  .mock-screen-panel { background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.04); }
+
+  .mock-works { background: #ffffff; padding: 80px 40px; }
+  .mock-section-eyebrow { font-size: 0.76rem; font-weight: 600; color: #888; letter-spacing: 0.04em; margin-bottom: 10px; }
+  .mock-section-h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; letter-spacing: -0.045em; line-height: 1; color: #0a0a0a; margin-bottom: 10px; }
+  .mock-section-sub { font-size: 0.92rem; color: #777; max-width: 540px; line-height: 1.6; margin-bottom: 36px; }
+
+  .mock-bento { display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: 220px 180px; gap: 14px; }
+  .mock-bento-card {
+    border-radius: 20px; overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #0c141f 0%, #1a2d48 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .mock-bento-card.tall { grid-row: 1 / 3; }
+  .mock-bento-label {
+    position: absolute; bottom: 36px; left: 16px;
+    font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.55); letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .mock-bento-h3 {
+    position: absolute; bottom: 16px; left: 16px; right: 16px;
+    font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.9); line-height: 1.3;
+  }
+  .mock-bento-img { position: absolute; inset: 0; background: linear-gradient(160deg, #1a3560 0%, #2a5080 40%, #0c1828 100%); }
+  .mock-bento-img::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.6) 100%);
+  }
+  .mock-bento-glow { position: absolute; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(35,77,131,0.4), transparent); top: 20px; right: 20px; filter: blur(20px); }
+
+  .mock-why { background: #f9f9f7; padding: 80px 40px; }
+  .mock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+  .mock-compare-card {
+    border-radius: 18px; padding: 26px;
+    border: 1px solid rgba(0,0,0,0.07);
+  }
+  .mock-compare-card.prob { background: #fff5f5; }
+  .mock-compare-card.sol { background: #f0f7ff; }
+  .mock-compare-h3 { font-size: 0.82rem; font-weight: 700; margin-bottom: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .mock-compare-card.prob .mock-compare-h3 { color: #b91c1c; }
+  .mock-compare-card.sol .mock-compare-h3 { color: #1d4ed8; }
+  .mock-compare-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 0.85rem; line-height: 1.45; }
+  .mock-compare-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+
+  .mock-workflow { background: #ffffff; padding: 80px 40px; }
+  .mock-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 36px; }
+  .mock-step { padding: 28px; border-radius: 20px; background: #f9f9f7; border: 1px solid rgba(0,0,0,0.06); }
+  .mock-step-num { font-size: 3rem; font-weight: 800; letter-spacing: -0.06em; color: rgba(0,0,0,0.07); line-height: 1; margin-bottom: 12px; }
+  .mock-step-h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: #0a0a0a; }
+  .mock-step-p { font-size: 0.82rem; color: #777; line-height: 1.55; }
+
+  .mock-features { background: #f9f9f7; padding: 80px 40px; }
+  .mock-feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 36px; }
+  .mock-feature-card { background: #ffffff; border-radius: 18px; padding: 24px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .mock-icon-box {
+    width: 40px; height: 40px; border-radius: 12px; margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-blue { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+  .icon-green { background: linear-gradient(135deg, #10b981, #3b82f6); }
+  .icon-orange { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .icon-purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+  .mock-feature-h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: #0a0a0a; }
+  .mock-feature-p { font-size: 0.82rem; color: #777; line-height: 1.55; }
+
+  .mock-audience { background: #ffffff; padding: 80px 40px; }
+  .mock-audience-list { display: flex; flex-direction: column; gap: 0; margin-top: 32px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.07); }
+  .mock-audience-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    background: #fff;
+  }
+  .mock-audience-item:last-child { border-bottom: none; }
+  .mock-audience-left { display: flex; align-items: center; gap: 12px; }
+  .mock-audience-num { font-size: 0.75rem; font-weight: 700; color: #bbb; min-width: 20px; }
+  .mock-audience-name { font-size: 0.95rem; font-weight: 600; color: #0a0a0a; }
+  .mock-audience-arrow { color: #bbb; font-size: 0.9rem; }
+
+  .mock-cta {
+    background: linear-gradient(160deg, #060d18, #0e1c2e);
+    padding: 80px 40px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .mock-cta-glow {
+    position: absolute; width: 300px; height: 200px;
+    background: radial-gradient(circle, rgba(35,77,131,0.3) 0%, transparent 70%);
+    top: -40px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .mock-cta-eyebrow { font-size: 0.76rem; color: rgba(255,255,255,0.45); letter-spacing: 0.06em; margin-bottom: 14px; }
+  .mock-cta-h2 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.04em; color: #fff; line-height: 1.05; margin-bottom: 16px; }
+  .mock-cta-sub { font-size: 0.9rem; color: rgba(255,255,255,0.45); margin-bottom: 28px; }
+  .mock-cta-btns { display: flex; gap: 10px; justify-content: center; }
+  .mock-cta-btn-p { padding: 13px 26px; border-radius: 999px; background: #fff; color: #0a0a0a; font-size: 0.9rem; font-weight: 700; }
+  .mock-cta-btn-s { padding: 13px 26px; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.65); font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); }
+
+  .mock-footer { background: #f9f9f7; padding: 32px 40px; border-top: 1px solid rgba(0,0,0,0.07); }
+  .mock-footer-inner { display: flex; align-items: center; justify-content: space-between; }
+  .mock-footer-brand { font-size: 0.85rem; font-weight: 700; color: #333; }
+  .mock-footer-links { display: flex; gap: 16px; }
+  .mock-footer-link { font-size: 0.8rem; color: #888; }
+
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 8px; }
+  .spec-table th { text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #999; padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .spec-table td { padding: 8px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: top; }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table td:first-child { font-weight: 600; color: #333; white-space: nowrap; }
+  .spec-table td:last-child { color: #555; }
+  .old-val { color: #dc2626; text-decoration: line-through; font-family: monospace; font-size: 0.78rem; }
+  .new-val { color: #16a34a; font-family: monospace; font-size: 0.78rem; }
+
+  hr { border: none; border-top: 1px solid rgba(0,0,0,0.08); margin: 40px 0; }
+
+  .anim-demo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+  .anim-card { background: white; border-radius: 12px; padding: 14px; text-align: center; border: 1px solid rgba(0,0,0,0.07); }
+  .anim-label { font-size: 0.72rem; font-weight: 600; color: #666; margin-bottom: 8px; }
+  .anim-bar { height: 6px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 999px; margin-bottom: 4px; }
+  .anim-val { font-size: 0.7rem; color: #aaa; font-family: monospace; }
+</style>
+</head>
+<body>
+  <p class="report-title">全页重设计方案 — Scenario Forge</p>
+  <p class="report-sub">方向：OpenAI 白底基调 · 深色戏剧 Hero · SVG 图标 Features · 滚动动效 / 2026-04-19</p>
+
+  <hr>
+
+  <!-- COLOR SYSTEM -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">0</span> 色彩系统 <span class="change-tag big">全面更新</span></div>
+    <div class="ds-title">从暖奶油色 → OpenAI 白底</div>
+    <div class="ds-desc">将全页背景从 #f5f1ea 改为 #ffffff，辅助背景改为 #f9f9f7（极浅灰），保留品牌蓝 #234d83，品牌暖橙 #9a5d31 改为仅作 icon accent 使用，不再作全局 eyebrow 色。</div>
+    <div class="color-row">
+      <div class="swatch"><div class="swatch-block" style="background:#ffffff; border:1.5px solid #e5e5e5;"></div><div class="swatch-name">Page BG</div><div class="swatch-label">#ffffff</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#f9f9f7;"></div><div class="swatch-name">Muted BG</div><div class="swatch-label">#f9f9f7</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#0a0a0a;"></div><div class="swatch-name">Text Primary</div><div class="swatch-label">#0a0a0a</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#525252;"></div><div class="swatch-name">Text Secondary</div><div class="swatch-label">#525252</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#234d83;"></div><div class="swatch-name">Brand Blue</div><div class="swatch-label">#234d83</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#060d18;"></div><div class="swatch-name">Hero BG</div><div class="swatch-label">#060d18</div></div>
+    </div>
+    <div style="margin-top:6px;">
+      <span class="old-val">#f5f1ea</span> → <span class="new-val">#ffffff</span> &nbsp;|&nbsp;
+      <span class="old-val">#9a5d31 eyebrow</span> → <span class="new-val">#888 eyebrow</span> &nbsp;|&nbsp;
+      <span class="new-val">button--primary: #234d83</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- TYPOGRAPHY SPEC -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">0</span> 字体层级 <span class="change-tag">更新规范</span></div>
+    <table class="spec-table">
+      <thead><tr><th>角色</th><th>旧值</th><th>新值</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr><td>H1 (Hero)</td><td class="old-val">clamp(3rem,6vw,5.6rem) / ls:-0.06em</td><td class="new-val">clamp(3.5rem,7vw,6rem) / ls:-0.055em</td><td>Hero 区白色，更大更戏剧</td></tr>
+        <tr><td>H2 (Section)</td><td class="old-val">clamp(2.2rem,4vw,3.8rem) / ls:-0.05em</td><td class="new-val">clamp(2.4rem,4.5vw,4rem) / ls:-0.045em</td><td>居中对齐，配合大留白</td></tr>
+        <tr><td>Eyebrow</td><td class="old-val">0.84rem / 700 / uppercase / color:#9a5d31 / ls:0.12em</td><td class="new-val">0.76rem / 600 / title-case / color:#888 / ls:0.04em</td><td>去橙色，减间距，现代感</td></tr>
+        <tr><td>Body</td><td class="old-val">line-height:1.6</td><td class="new-val">line-height:1.7</td><td>更宽松</td></tr>
+        <tr><td>Section padding</td><td class="old-val">52px 0</td><td class="new-val">100px 0</td><td>接近 OpenAI 标准</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <!-- NAV -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">1</span> 导航栏 <span class="change-tag">精简</span></div>
+    <div class="ds-title">从 8 个元素 → 5 个，语言切换移至 Footer</div>
+    <div class="ds-desc">去掉 pill 圆角外形，改为全宽白色 sticky bar + 底部细线。主 CTA 改为品牌蓝 #234d83。</div>
+    <div class="page-mock" style="border-radius:12px;">
+      <div class="mock-topbar">
+        <div class="mock-brand"><div class="mock-brand-dot"></div>Scenario Forge</div>
+        <div class="mock-nav-links">
+          <span class="mock-nav-link">Works</span>
+          <span class="mock-nav-link">Workflow</span>
+          <span class="mock-nav-link">Features</span>
+          <span class="mock-nav-link">Roadmap</span>
+        </div>
+        <div class="mock-nav-actions">
+          <span class="mock-btn-sm ghost">GitHub ↗</span>
+          <span class="mock-btn-sm primary">Open demo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- HERO -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">2</span> Hero 首屏 <span class="change-tag big">全面重建</span></div>
+    <div class="ds-title">深色戏剧首屏 · 居中布局 · 产品截图从底部升起</div>
+    <div class="ds-desc">移除 hero__facts 列表，改为居中的 eyebrow badge + 大标题 + 简短 subtext + 2个 CTA。产品截图横向全宽，下方截断（仅露顶部），有蓝色光晕 glow 效果。</div>
+    <div class="page-mock">
+      <div class="mock-hero">
+        <div class="mock-hero-glow-1"></div>
+        <div class="mock-hero-glow-2"></div>
+        <div class="mock-hero-eyebrow"><span class="mock-hero-eyebrow-dot"></span>Scenario-first political map workbench</div>
+        <div class="mock-hero-h1">Forge political maps<br><em>that feel alive.</em></div>
+        <div class="mock-hero-sub">Build from a world state, reshape ownership and control, layer context, and export a map that can actually carry a story.</div>
+        <div class="mock-hero-btns">
+          <div class="mock-hero-btn-p">Open live demo</div>
+          <div class="mock-hero-btn-s">View on GitHub ↗</div>
+        </div>
+        <div class="mock-hero-screen-wrap">
+          <div class="mock-hero-screen">
+            <div class="mock-screen-toolbar">
+              <div class="mock-screen-dot"></div>
+              <div class="mock-screen-dot"></div>
+              <div class="mock-screen-dot"></div>
+            </div>
+            <div class="mock-screen-content">
+              <div class="mock-screen-sidebar"></div>
+              <div class="mock-screen-map"></div>
+              <div class="mock-screen-panel"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- WORKS -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">3</span> Works Section <span class="change-tag big">布局重构</span></div>
+    <div class="ds-title">从两列卡片 → Bento Grid（大+两小）</div>
+    <div class="ds-desc">受 Apple/Linear 的 bento grid 启发，第一张卡占左侧全高，右侧两张小卡上下排列。解决了截图重复问题（三张卡用三张不同截图）。</div>
+    <div class="page-mock">
+      <div class="mock-works">
+        <div class="mock-section-eyebrow">Selected works</div>
+        <div class="mock-section-h2">Show the result first.</div>
+        <div class="mock-section-sub">Scenario Forge is easiest to understand when you see the maps it can produce.</div>
+        <div class="mock-bento">
+          <div class="mock-bento-card tall">
+            <div class="mock-bento-img"><div class="mock-bento-glow"></div></div>
+            <div class="mock-bento-label">Alternate history baseline</div>
+            <div class="mock-bento-h3">Start from a scenario,<br>not a blank canvas.</div>
+          </div>
+          <div class="mock-bento-card">
+            <div class="mock-bento-img"></div>
+            <div class="mock-bento-label">Conflict and context</div>
+            <div class="mock-bento-h3">Overlay political change with real-world texture.</div>
+          </div>
+          <div class="mock-bento-card">
+            <div class="mock-bento-img" style="background: linear-gradient(135deg, #1a2e20, #2a4535 60%, #0c1a10);"></div>
+            <div class="mock-bento-label">Atlas-style output</div>
+            <div class="mock-bento-h3">Push toward a cleaner, calmer final map.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- WHY -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">4</span> Why Section <span class="change-tag">更新视觉</span></div>
+    <div class="ds-title">Problem ✗红 vs Solution ✓蓝，增加图标前缀</div>
+    <div class="ds-desc">Problem 侧底色改为浅红 #fff5f5，Solution 侧为浅蓝 #f0f7ff，每行加 ✗ / ✓ 前缀图标。</div>
+    <div class="page-mock">
+      <div class="mock-why">
+        <div class="mock-section-eyebrow">Why Scenario Forge</div>
+        <div class="mock-section-h2" style="max-width:600px;">Stop stitching five tools together to tell one story.</div>
+        <div class="mock-compare">
+          <div class="mock-compare-card prob">
+            <div class="mock-compare-h3">✗ Typical workflow</div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#dc2626;">✗</span><span style="color:#555;">One tool for painting political states.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#dc2626;">✗</span><span style="color:#555;">Another for labels or overlays.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#dc2626;">✗</span><span style="color:#555;">Another for exports or cleanup.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#dc2626;">✗</span><span style="color:#555;">No real scenario baseline to start from.</span></div>
+          </div>
+          <div class="mock-compare-card sol">
+            <div class="mock-compare-h3">✓ Scenario Forge</div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#1d4ed8;">✓</span><span style="color:#555;">Begin from a named world state.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#1d4ed8;">✓</span><span style="color:#555;">Repaint ownership inside one workspace.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#1d4ed8;">✓</span><span style="color:#555;">Layer context without leaving the tool.</span></div>
+            <div class="mock-compare-item"><span class="mock-compare-icon" style="color:#1d4ed8;">✓</span><span style="color:#555;">Save the project or export the result.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- WORKFLOW -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">5</span> Workflow Section <span class="change-tag">优化视觉</span></div>
+    <div class="ds-title">步骤编号改为装饰性大数字</div>
+    <div class="ds-desc">从 badge 改为 font-size:3rem 的装饰性大数字（color:rgba(0,0,0,0.07)），悬浮在卡片左上角，更有空间感。</div>
+    <div class="page-mock">
+      <div class="mock-workflow">
+        <div class="mock-section-eyebrow">Workflow</div>
+        <div class="mock-section-h2">A short path from baseline to story-ready map.</div>
+        <div class="mock-steps">
+          <div class="mock-step">
+            <div class="mock-step-num">01</div>
+            <div class="mock-step-h3">Start from a world state</div>
+            <div class="mock-step-p">Use built-in baselines like Blank Map, Modern World, HOI4 1936, or TNO 1962.</div>
+          </div>
+          <div class="mock-step">
+            <div class="mock-step-num">02</div>
+            <div class="mock-step-h3">Repaint control and ownership</div>
+            <div class="mock-step-p">Shift who owns what and how the map should read politically.</div>
+          </div>
+          <div class="mock-step">
+            <div class="mock-step-num">03</div>
+            <div class="mock-step-h3">Layer context and export</div>
+            <div class="mock-step-p">Add rivers, city points, legends, and export a clean PNG or JPG snapshot.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- FEATURES -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">6</span> Features Section <span class="change-tag big">增加 SVG 图标</span></div>
+    <div class="ds-title">2×2 卡片 + 渐变色图标方块（inline SVG，无外部文件）</div>
+    <div class="ds-desc">每个 feature group 增加 40×40 渐变色 SVG 图标。蓝/紫=地图，绿/蓝=画笔，橙/红=图层，紫/粉=导出。</div>
+    <div class="page-mock">
+      <div class="mock-features">
+        <div class="mock-section-eyebrow">Feature groups</div>
+        <div class="mock-section-h2">Organized around tasks.</div>
+        <div class="mock-feature-grid">
+          <div class="mock-feature-card">
+            <div class="mock-icon-box icon-blue">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.5"/><path d="M6 10 Q8 7 10 10 Q12 13 14 10" stroke="white" stroke-width="1.5" fill="none"/></svg>
+            </div>
+            <div class="mock-feature-h3">Scenario baselines</div>
+            <div class="mock-feature-p">Named starting points, default scenarios, palette packs, and scenario-aware startup flow.</div>
+          </div>
+          <div class="mock-feature-card">
+            <div class="mock-icon-box icon-green">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 14 L8 5 L12 12 L15 8" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="14" r="2" fill="white"/></svg>
+            </div>
+            <div class="mock-feature-h3">Political editing</div>
+            <div class="mock-feature-p">Ownership, controller, frontline-style views, brushes, selected objects, and scenario-level map changes.</div>
+          </div>
+          <div class="mock-feature-card">
+            <div class="mock-icon-box icon-orange">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="10" width="12" height="2" rx="1" fill="white"/><rect x="4" y="6" width="12" height="2" rx="1" fill="rgba(255,255,255,0.6)"/><rect x="4" y="14" width="12" height="2" rx="1" fill="rgba(255,255,255,0.4)"/></svg>
+            </div>
+            <div class="mock-feature-h3">Presentation layers</div>
+            <div class="mock-feature-p">Physical regions, rivers, urban areas, city points, water regions, special zones, and display tuning.</div>
+          </div>
+          <div class="mock-feature-card">
+            <div class="mock-icon-box icon-purple">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 5 L7 15 M13 5 L13 15 M5 10 L15 10" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="4" y="4" width="12" height="12" rx="3" stroke="white" stroke-width="1.5" fill="none"/></svg>
+            </div>
+            <div class="mock-feature-h3">Project and export</div>
+            <div class="mock-feature-p">Project save/load, bilingual UI, snapshot export, and a workspace that keeps editorial polish close.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- AUDIENCE -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">7</span> Audience Section <span class="change-tag big">布局重构</span></div>
+    <div class="ds-title">从小方块 → 有序列表 + 分隔线风格（Linear/Vercel 参考）</div>
+    <div class="ds-desc">全宽 list，每行：编号 + 名称 + 右箭头。hover 时背景轻变为 #f9f9f7。</div>
+    <div class="page-mock">
+      <div class="mock-audience">
+        <div class="mock-section-eyebrow">Built for</div>
+        <div class="mock-section-h2">People who need the map<br>to carry the scenario.</div>
+        <div class="mock-audience-list" style="margin-top:28px;">
+          <div class="mock-audience-item"><div class="mock-audience-left"><span class="mock-audience-num">01</span><span class="mock-audience-name">Alternate-history creators</span></div><span class="mock-audience-arrow">→</span></div>
+          <div class="mock-audience-item"><div class="mock-audience-left"><span class="mock-audience-num">02</span><span class="mock-audience-name">HOI4, TNO, and Kaiserreich modders</span></div><span class="mock-audience-arrow">→</span></div>
+          <div class="mock-audience-item"><div class="mock-audience-left"><span class="mock-audience-num">03</span><span class="mock-audience-name">Scenario and campaign designers</span></div><span class="mock-audience-arrow">→</span></div>
+          <div class="mock-audience-item"><div class="mock-audience-left"><span class="mock-audience-num">04</span><span class="mock-audience-name">Geopolitical storytellers</span></div><span class="mock-audience-arrow">→</span></div>
+          <div class="mock-audience-item"><div class="mock-audience-left"><span class="mock-audience-num">05</span><span class="mock-audience-name">Researchers and presenters</span></div><span class="mock-audience-arrow">→</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- CTA + FOOTER -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">8</span> CTA + Footer <span class="change-tag">更新布局</span></div>
+    <div class="ds-title">居中深色 CTA（首尾呼应 Hero）· 语言切换移入 Footer</div>
+    <div class="ds-desc">形成页面"深色 Hero → 白色正文 → 深色 CTA"的叙事弧线。Footer 增加语言切换，数据归因改为轻量小字。</div>
+    <div class="page-mock">
+      <div class="mock-cta">
+        <div class="mock-cta-glow"></div>
+        <div class="mock-cta-eyebrow">Ready to open the workbench?</div>
+        <div class="mock-cta-h2">Step into the editor when you<br>want to move from idea to map.</div>
+        <div class="mock-cta-sub">The showcase explains the product. The editor is where you actually shape the scenario.</div>
+        <div class="mock-cta-btns">
+          <div class="mock-cta-btn-p">Open the live demo</div>
+          <div class="mock-cta-btn-s">Browse the repository ↗</div>
+        </div>
+      </div>
+      <div class="mock-footer">
+        <div class="mock-footer-inner">
+          <div class="mock-footer-brand">Scenario Forge</div>
+          <div class="mock-footer-links">
+            <span class="mock-footer-link">EN / 中文</span>
+            <span class="mock-footer-link">Open demo</span>
+            <span class="mock-footer-link">GitHub ↗</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ANIMATION -->
+  <div class="ds">
+    <div class="ds-label"><span class="badge">9</span> 滚动动效 <span class="change-tag big">全新加入</span></div>
+    <div class="ds-title">IntersectionObserver · 所有 section 淡入+上移 · stagger delay</div>
+    <div class="ds-desc">在 app.js 中新增 initScrollAnimations()，约 30 行。为所有卡片和 section-heading 添加 data-animate 属性。grid 子项按 stagger delay 顺序出现。支持 prefers-reduced-motion。</div>
+    <div class="anim-demo">
+      <div class="anim-card">
+        <div class="anim-label">初始状态</div>
+        <div class="anim-bar" style="opacity:0; width:0%;"></div>
+        <div class="anim-val">opacity:0 / translateY(20px)</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-label">触发时机</div>
+        <div class="anim-bar" style="width:40%; background: linear-gradient(90deg, #f59e0b, #ef4444);"></div>
+        <div class="anim-val">threshold: 0.15</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-label">过渡曲线</div>
+        <div class="anim-bar" style="width:80%;"></div>
+        <div class="anim-val">400ms cubic-bezier(.16,1,.3,1)</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-label">Stagger</div>
+        <div class="anim-bar" style="width:100%;"></div>
+        <div class="anim-val">0 / 80 / 160 / 240ms</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
