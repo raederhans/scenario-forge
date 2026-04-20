@@ -56,11 +56,27 @@
 - [x] 清掉 `chunk_runtime.js` 里 `runtimeChunkLoadState` 的第二份完整默认 shape。
 - [x] 补齐 renderer runtime / border cache / spatial index 合同与行为测试。
 - [x] 跑 Batch 4 renderer runtime 定向验证并回填状态。
+- [x] 收紧 Batch 5 的生产 consumer import 面，去掉命中的 `import * as mapRenderer`。
+- [x] 新增 `js/core/scenario/scenario_renderer_bridge.js`，把 scenario/startup 刷新链从 `map_renderer.js` 的公开面里逻辑分层出去。
+- [x] 给 `map_renderer.js` 的 export block 补上 facade 分组注释。
+- [x] 补齐 Batch 5 的 renderer facade / scenario bridge 合同测试。
+- [x] 跑 Batch 5 的静态验证和 scenario resilience smoke。
+- [x] 新增 `js/core/renderer/strategic_overlay_runtime_owner.js`，收口 operation graphics / special zone 的 runtime 事务与 unit counter 读 helper。
+- [x] 让 `map_renderer.js` 把命中的 strategic overlay facade 降成 owner wrapper。
+- [x] 补齐 strategic overlay runtime owner 合同与行为测试。
+- [ ] 继续判断 full `strategic_overlay_editing` e2e 的 startup readiness 超时是否属于现有环境问题还是本轮新回归。
 
 ## 当前 approved plan 对齐
 1. 先继续收紧 `scenario` 边界和事务 owner。
 2. 再推进 `runtime_hooks/state ownership`，保持 `state.js` 单例 facade 稳定。
 3. 最后整理 `renderer API`，让 `map_renderer.js` 保留稳定 facade 和编排面。
+4. Batch 5 当前切口：
+   - 生产 consumer 改成 named import 或局部 helper bridge
+   - scenario/startup 事务优先走 `scenario_renderer_bridge`
+   - `map_renderer.js` 继续保留稳定 facade 和兼容 export
+5. Batch 5 follow-up 当前切口：
+   - 先抽 `operation graphics / special zone` runtime owner
+   - `operational line + unit counter attachment` 留到下一刀整组收口
 
 ## 完成标准
 - 三个标准留档文件已存在。
@@ -72,5 +88,8 @@
 - `state` 的 history/dev/strategic overlay 默认 shape 已经收进内部 owner。
 - `state` 的 scenario runtime 默认 shape 已经收进内部 owner。
 - `state` 的 renderer runtime / border cache / spatial index 默认 shape 已经收进内部 owner。
+- Batch 5 的生产 consumer import 已从 namespace import 收紧到 named import / 局部 helper bridge。
+- Batch 5 的 scenario/startup renderer 依赖已先收成内部 `scenario_renderer_bridge`。
+- Batch 5 的 strategic overlay runtime 已开始从 donor 下沉到独立 owner。
 - 合同测试、静态检查、定向 smoke 都有对应证据。
 

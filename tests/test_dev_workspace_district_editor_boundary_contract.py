@@ -53,7 +53,8 @@ class DevWorkspaceDistrictEditorBoundaryContractTest(unittest.TestCase):
         self.assertIn("state.devScenarioDistrictEditor = {", owner_content)
         self.assertIn("state.scenarioDistrictGroupsData = nextPayload;", owner_content)
         self.assertIn("state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);", owner_content)
-        self.assertIn("mapRenderer.rebuildStaticMeshes();", owner_content)
+        self.assertIn('import { rebuildStaticMeshes } from "../../core/map_renderer.js";', owner_content)
+        self.assertIn("rebuildStaticMeshes();", owner_content)
         self.assertIn('flushDevWorkspaceRender("dev-workspace-district-save");', owner_content)
         self.assertIn("district_groups_url: String(result.districtGroupsUrl", owner_content)
 

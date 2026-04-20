@@ -23,7 +23,8 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
             "const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;",
             resources_content,
         )
-        self.assertIn("refreshScenarioOpeningOwnerBorders,", resources_content.split('} from "./map_renderer.js";')[0])
+        self.assertIn("./scenario/scenario_renderer_bridge.js", resources_content)
+        self.assertIn("refreshScenarioOpeningOwnerBorders,", resources_content.split('} from "./scenario/scenario_renderer_bridge.js";')[0])
         self.assertIn("hydrateActiveScenarioBundle,", resources_content)
         self.assertIn("evaluateScenarioHydrationHealthGateState,", resources_content)
         self.assertIn("enforceScenarioHydrationHealthGate,", resources_content)

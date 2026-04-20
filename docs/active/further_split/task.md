@@ -55,7 +55,20 @@
 - [x] 修复 startup hydration 下 opening-owner mesh pack 到位但缓存不刷新的代码路径
 - [x] 修复 opening-owner mesh pack 直用路径被 baseline owner 条件错误拦住的问题
 - [x] 修复 opening-owner fallback 绕过 `runtimePoliticalTopology` renderable 回退链的问题
-- [ ] 让 `scenario_boundary_regression` 重新稳定变绿
+- [x] 让 `scenario_boundary_regression` 重新稳定变绿
+- [x] 去掉命中的 `import * as mapRenderer` 生产 consumer
+- [x] 新增 `js/core/scenario/scenario_renderer_bridge.js`
+- [x] 让 scenario/startup renderer 刷新链优先通过 bridge 接线
+- [x] 给 `map_renderer.js` export block 补 facade 分组注释
+- [x] 新增 Batch 5 的 import / bridge 合同测试
+- [x] 跑 Batch 5 scenario resilience smoke
+- [x] 新增 `js/core/renderer/strategic_overlay_runtime_owner.js`
+- [x] 让 `map_renderer.js` 把命中的 special zone / operation graphics facade 降成 owner wrapper
+- [x] 把 `getUnitCounterPreviewData` / `resolveUnitCounterNationForPlacement` 收进 runtime owner
+- [x] 新增 strategic overlay runtime owner 合同测试
+- [x] 新增 strategic overlay runtime owner 行为测试
+- [x] 修复 runtime owner preview 路径丢失 `ensureUnitCounterEditorState()` 的副作用
+- [ ] 判断 full `strategic_overlay_editing` e2e 的 startup readiness 超时是否属于本轮新回归
 
 ## 本轮交付
 - 文档基线已经补齐。
@@ -70,6 +83,13 @@
 - Batch 4 的 strategic overlay 默认形状已经统一成单一真源。
 - Batch 4 的 scenario runtime 默认 shape 已经统一成单一真源。
 - Batch 4 的 renderer runtime / border cache / spatial index 默认 shape 已经统一成内部 owner。
+- Batch 5 当前波次已经把 renderer API 的两层边界收紧：
+  - 生产 consumer import 面
+  - scenario/startup 内部 renderer bridge
+- Batch 5 follow-up 已继续收口 strategic overlay runtime：
+  - operation graphics
+  - special zone
+  - unit counter read helper
 
 ## 复核清单
 - 文档与代码口径一致
@@ -86,13 +106,16 @@
 - scenario chunk/runtime health/reset/rollback 的默认 shape 已统一复用
 - renderer runtime / border cache / spatial index 默认 shape 已统一复用
 - `scenario_chunk_exact_after_settle_regression` 继续通过
-- `scenario_boundary_regression` 当前卡在 smoke 环境稳定性，代码侧 opening-owner 初始缓存链已经补上
+- `scenario_boundary_regression` 已重新变绿
+- Batch 5 当前波次的 smoke 证据已经补到 `.runtime/tmp/batch5_renderer_api_smoke.*`
+- strategic overlay runtime owner 的静态门和行为测试都已补齐
+- full `strategic_overlay_editing` 当前仍卡在 startup readiness 超时
 - 汇报里列出修改文件、验证和剩余风险
 
 - [x] 收紧 startup hydrate -> opening-owner promotion 的 `hasPoliticalPayloadChange` 标记
 - [x] 收紧 `scenario_boundary_regression` 的 ready gate，使其等待 opening-owner cache materialize 完成
 - [x] 新增 opening-owner / startup hydration 轻量行为测试
-- [ ] 继续定位 `scenario_boundary_regression` 剩余的 startup boot 0% 超时
+- [x] 继续定位 `scenario_boundary_regression` 剩余的 startup boot 0% 超时
 - [x] 修复 startup boot 0% 的真实根因：`scenario_resources.js` 缺少 `refreshScenarioOpeningOwnerBorders` import
 - [x] 修复 shared ready gate 的 `waitForFunction(async ...)` 伪等待问题
 - [x] 新增 playwright ready gate 合同测试

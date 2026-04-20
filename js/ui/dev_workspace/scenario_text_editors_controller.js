@@ -1,5 +1,5 @@
 import { state } from "../../core/state.js";
-import * as mapRenderer from "../../core/map_renderer.js";
+import { getEffectiveCityCollection } from "../../core/map_renderer.js";
 import { syncScenarioLocalizationState } from "../../core/scenario_localization_state.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { t } from "../i18n.js";
@@ -118,7 +118,7 @@ export function createScenarioTextEditorsController({
     const normalizedFeatureId = String(featureId || "").trim();
     const normalizedTag = normalizeScenarioTagInput(tag);
     if (!normalizedFeatureId || !normalizedTag) return null;
-    const cityCollection = mapRenderer.getEffectiveCityCollection();
+    const cityCollection = getEffectiveCityCollection();
     const candidates = Array.isArray(cityCollection?.features)
       ? cityCollection.features.filter((feature) => String(feature?.properties?.__city_host_feature_id || "").trim() === normalizedFeatureId)
       : [];

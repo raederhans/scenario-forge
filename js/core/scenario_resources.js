@@ -6,11 +6,11 @@ import {
   invalidateOceanWaterInteractionVisualState,
   recomputeDynamicBordersNow,
   refreshColorState,
-  refreshScenarioOpeningOwnerBorders,
-  refreshResolvedColorsForFeatures,
   refreshMapDataForScenarioChunkPromotion,
+  refreshResolvedColorsForFeatures,
+  refreshScenarioOpeningOwnerBorders,
   setMapData,
-} from "./map_renderer.js";
+} from "./scenario/scenario_renderer_bridge.js";
 import {
   loadDeferredDetailBundle,
   loadMeasuredJsonResource,

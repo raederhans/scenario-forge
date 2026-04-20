@@ -485,3 +485,156 @@
     - `.runtime/tmp/scenario_boundary_regression_green.out.log`
     - `.runtime/tmp/scenario_boundary_regression_green.err.log`
     - `.runtime/tmp/scenario_boundary_regression_green.exit.txt`
+
+## 2026-04-20 Batch 5 renderer API 收口（当前波次）
+- `js/core/map_renderer.js`
+  - export block 现在按 consumer lane 加了 facade 分组注释：
+    - core render lifecycle
+    - scenario refresh and color synchronization
+    - strategic overlay editing
+    - render cache / visual invalidation
+    - dev workspace selection and fill
+    - read-model helpers
+    - viewport / diagnostics / render scheduling
+- `js/core/scenario/scenario_renderer_bridge.js`
+  - 新增内部 bridge，统一承接 scenario/startup 事务常用的 renderer refresh surface。
+  - 当前 re-export：
+    - `setMapData`
+    - `refreshMapDataForScenarioApply`
+    - `refreshMapDataForScenarioChunkPromotion`
+    - `refreshScenarioOpeningOwnerBorders`
+    - `refreshResolvedColorsForFeatures`
+    - `refreshColorState`
+    - `recomputeDynamicBordersNow`
+    - `invalidateOceanBackgroundVisualState`
+    - `invalidateOceanWaterInteractionVisualState`
+    - `invalidateContextLayerVisualStateBatch`
+- 以下内部 caller 已切到 `scenario_renderer_bridge`：
+  - `js/core/scenario_manager.js`
+  - `js/core/scenario_resources.js`
+  - `js/core/scenario_post_apply_effects.js`
+  - `js/core/scenario_shell_overlay.js`
+  - `js/bootstrap/deferred_detail_promotion.js`
+- 生产 consumer import 面已收紧：
+  - `js/ui/dev_workspace.js`
+  - `js/core/scenario_ownership_editor.js`
+  - `js/ui/dev_workspace/district_editor_controller.js`
+  - `js/ui/dev_workspace/scenario_tag_creator_controller.js`
+  - `js/ui/dev_workspace/scenario_text_editors_controller.js`
+  - 这些文件已经去掉 `import * as mapRenderer`
+- `js/ui/sidebar.js`
+  - 保留一个局部 `mapRenderer` helper object，专门喂给 sidebar controllers。
+  - 这个 helper object 只暴露 controller 真正命中的 renderer 方法，不再依赖 namespace import。
+
+## 2026-04-20 Batch 5 验证证据
+- 结构合同
+  - `python -m unittest tests.test_scenario_manager_boundary_contract tests.test_scenario_resources_boundary_contract tests.test_startup_hydration_boundary_contract tests.test_scenario_renderer_bridge_boundary_contract tests.test_map_renderer_public_api_import_contract tests.test_dev_workspace_district_editor_boundary_contract`
+  - 结果：`Ran 34 tests / OK`
+- 静态检查
+  - `node --check`
+    - `js/core/map_renderer.js`
+    - `js/core/scenario/scenario_renderer_bridge.js`
+    - `js/core/scenario_manager.js`
+    - `js/core/scenario_resources.js`
+    - `js/core/scenario_post_apply_effects.js`
+    - `js/core/scenario_shell_overlay.js`
+    - `js/bootstrap/deferred_detail_promotion.js`
+    - `js/ui/sidebar.js`
+    - `js/ui/dev_workspace.js`
+    - `js/core/scenario_ownership_editor.js`
+    - `js/ui/dev_workspace/district_editor_controller.js`
+    - `js/ui/dev_workspace/scenario_tag_creator_controller.js`
+    - `js/ui/dev_workspace/scenario_text_editors_controller.js`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/map_renderer.js`
+    - `js/core/scenario/scenario_renderer_bridge.js`
+    - `js/core/scenario_manager.js`
+    - `js/core/scenario_resources.js`
+    - `js/ui/sidebar.js`
+    - `js/ui/dev_workspace.js`
+    - `js/core/scenario_ownership_editor.js`
+    - `js/bootstrap/deferred_detail_promotion.js`
+  - 结果：全部 `0 error`
+- 定向 smoke
+  - `npm run test:e2e:scenario-resilience`
+  - 结果：`3 passed (4.4m)`
+  - 证据：
+    - `.runtime/tmp/batch5_renderer_api_smoke.out.log`
+    - `.runtime/tmp/batch5_renderer_api_smoke.err.log`
+    - `.runtime/tmp/batch5_renderer_api_smoke.exit.txt`
+
+## 2026-04-20 Batch 5 调试教训
+- 这轮把 `sidebar.js` 的 namespace import 收掉后，第一次 smoke 暴露了 startup blocker：
+  - `mapRenderer is not defined`
+- 根因：
+  - sidebar 本体已经改成 named import，但它还要把一个 `mapRenderer` helper 传给 `water_special_region_controller`、`project_support_diagnostics_controller`、`strategic_overlay_controller`
+- 修正：
+  - 在 `sidebar.js` 里显式建立局部 `const mapRenderer = Object.freeze({...})`
+  - helper object 只保留 controller 真正需要的方法
+
+## 2026-04-20 Batch 5 strategic overlay runtime owner follow-up
+- 新增 `js/core/renderer/strategic_overlay_runtime_owner.js`
+  - 当前这刀先接管最稳的 strategic overlay runtime 事务：
+    - special zone：
+      - `append/start/undo/cancel/finish/select/delete`
+    - operation graphics：
+      - `append/start/undo/cancel/finish/select/delete/update/deleteVertex`
+    - unit counter read helper：
+      - `getUnitCounterPreviewData`
+      - `resolveUnitCounterNationForPlacement`
+- `js/core/map_renderer.js`
+  - 新增 `getStrategicOverlayRuntimeOwner()`
+  - strategic overlay 里命中的 donor 函数现在降成 facade wrapper：
+    - special zone 事务
+    - operation graphics 事务
+    - unit counter preview / nation resolution helper
+  - `operational line + unit counter attachment` 写事务继续留在 donor，保持这一刀最短路径
+- 这轮选择只先动 operation graphics / special zone 的原因：
+  - 它们的 runtime 事务闭环更完整
+  - 不和 `operational line + unit counter attachment` 的级联关系绑在一起
+  - 更适合在 Batch 5 里先拿到一刀稳定的 owner 下沉
+
+## 2026-04-20 Batch 5 strategic overlay runtime 验证证据
+- 结构合同
+  - `python -m unittest tests.test_map_renderer_strategic_overlay_runtime_owner_boundary_contract tests.test_map_renderer_strategic_overlay_helpers_boundary_contract tests.test_strategic_overlay_state_boundary_contract tests.test_map_renderer_public_api_import_contract`
+  - 结果：`Ran 8 tests / OK`
+- 行为测试
+  - `node --test tests/strategic_overlay_runtime_owner_behavior.test.mjs tests/strategic_overlay_state_behavior.test.mjs`
+  - 结果：`7 passed`
+- 静态检查
+  - `node --check js/core/renderer/strategic_overlay_runtime_owner.js`
+  - `node --check js/core/map_renderer.js`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/renderer/strategic_overlay_runtime_owner.js`
+    - `js/core/map_renderer.js`
+    - `tests/test_map_renderer_strategic_overlay_runtime_owner_boundary_contract.py`
+    - `tests/strategic_overlay_runtime_owner_behavior.test.mjs`
+  - 结果：全部 `0 error`
+
+## 2026-04-20 Batch 5 strategic overlay runtime 剩余风险
+- `tests/e2e/strategic_overlay_editing.spec.js`
+  - 当前现场没有先落到具体 assertion，而是统一停在 startup readiness 超时
+  - 第一条失败现场证据：
+    - `.runtime/tests/playwright/strategic_overlay_editing--39c3f-raw-entry-and-style-editing/error-context.md`
+  - 失败时 UI 仍停在：
+    - `Applying default scenario`
+    - `Composing ownership, controllers, runtime topology, and UI state in one pass.`
+- 当前判断：
+  - 这条红灯还没有证实是本轮 strategic overlay runtime owner 引入
+  - 它更像一条现有的 startup readiness / localhost timing 问题
+  - 下一步最值得做的是把这条 full e2e 拆成：
+    - 一条更轻的 strategic overlay browser smoke
+    - 再单独追 startup readiness 的根因
+
+## 2026-04-20 Batch 5 strategic overlay runtime review follow-up
+- reviewer 发现一条真实边界问题：
+  - `getUnitCounterPreviewData()` 下沉到 runtime owner 后，丢掉了 `ensureUnitCounterEditorState()` 的初始化与归一化副作用
+- 已修：
+  - `getStrategicOverlayRuntimeOwner()` helper 注入补上 `ensureUnitCounterEditorState`
+  - `strategic_overlay_runtime_owner.js` 的 `getUnitCounterPreviewData()` 开头恢复调用
+  - 行为测试新增：
+    - `unit counter preview seeds editor defaults before reading preview data`

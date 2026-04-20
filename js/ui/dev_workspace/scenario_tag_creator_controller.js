@@ -1,5 +1,9 @@
 import { state } from "../../core/state.js";
-import * as mapRenderer from "../../core/map_renderer.js";
+import {
+  clearDevSelection,
+  refreshResolvedColorsForFeatures,
+  scheduleDynamicBorderRecompute,
+} from "../../core/map_renderer.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "../../core/scenario_owner_metrics.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { applyOwnerControllerAssignmentsToFeatureIds } from "../../core/scenario_ownership_editor.js";
@@ -631,8 +635,8 @@ export function createScenarioTagCreatorController({
     state.selectedInspectorCountryCode = normalizedTag;
     state.inspectorHighlightCountryCode = normalizedTag;
     recalculateScenarioOwnerControllerDiffCount();
-    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    mapRenderer.scheduleDynamicBorderRecompute("dev-workspace-tag-create", 90);
+    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    scheduleDynamicBorderRecompute("dev-workspace-tag-create", 90);
     flushDevWorkspaceRender("dev-workspace-tag-create");
     if (typeof state.updateScenarioUIFn === "function") {
       state.updateScenarioUIFn();
@@ -701,7 +705,7 @@ export function createScenarioTagCreatorController({
   };
 
   const clearScenarioTagCreatorSelectionTarget = () => {
-    mapRenderer.clearDevSelection();
+    clearDevSelection();
     state.devSelectedHit = null;
     flushDevWorkspaceRender("dev-workspace-tag-clear-target");
   };

@@ -8,7 +8,35 @@ import {
 } from "../core/state.js";
 import { createDefaultSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
-import * as mapRenderer from "../core/map_renderer.js";
+import {
+  cancelActiveStrategicInteractionModes,
+  cancelOperationGraphicDraw,
+  cancelOperationalLineDraw,
+  cancelUnitCounterPlacement,
+  deleteSelectedOperationGraphic,
+  deleteSelectedOperationGraphicVertex,
+  deleteSelectedOperationalLine,
+  deleteSelectedUnitCounter,
+  finishOperationGraphicDraw,
+  finishOperationalLineDraw,
+  getWaterRegionColor,
+  refreshColorState,
+  refreshResolvedColorsForFeatures,
+  renderLegend,
+  scheduleDynamicBorderRecompute,
+  selectOperationGraphicById,
+  selectOperationalLineById,
+  selectUnitCounterById,
+  setDebugMode,
+  startOperationGraphicDraw,
+  startOperationalLineDraw,
+  startUnitCounterPlacement,
+  undoOperationGraphicVertex,
+  undoOperationalLineVertex,
+  updateSelectedOperationGraphic,
+  updateSelectedOperationalLine,
+  updateSelectedUnitCounter,
+} from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { canUndoHistory, captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
@@ -64,6 +92,36 @@ import {
   loadHoi4UnitIconManifest,
   saveHoi4UnitIconReviewDraft,
 } from "../core/unit_counter_icon_libraries.js";
+
+// Batch 5: sidebar controllers consume a curated renderer helper surface so
+// renderer API drift stays visible in one place instead of hiding in namespace imports.
+const mapRenderer = Object.freeze({
+  cancelActiveStrategicInteractionModes,
+  cancelOperationGraphicDraw,
+  cancelOperationalLineDraw,
+  cancelUnitCounterPlacement,
+  deleteSelectedOperationGraphic,
+  deleteSelectedOperationGraphicVertex,
+  deleteSelectedOperationalLine,
+  deleteSelectedUnitCounter,
+  finishOperationGraphicDraw,
+  finishOperationalLineDraw,
+  getWaterRegionColor,
+  refreshColorState,
+  renderLegend,
+  selectOperationGraphicById,
+  selectOperationalLineById,
+  selectUnitCounterById,
+  setDebugMode,
+  startOperationGraphicDraw,
+  startOperationalLineDraw,
+  startUnitCounterPlacement,
+  undoOperationGraphicVertex,
+  undoOperationalLineVertex,
+  updateSelectedOperationGraphic,
+  updateSelectedOperationalLine,
+  updateSelectedUnitCounter,
+});
 
 function flushSidebarRender(reason = "") {
   return flushRenderBoundary(reason);
@@ -736,7 +794,7 @@ function applyVisualOverridesToFeatureIds(
     state.featureOverrides[id] = colorToApply;
   });
   markLegacyColorStateDirty();
-  mapRenderer.refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
+  refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (render) render();
   if (addToRecent) {
     addRecentColor(colorToApply);
@@ -808,7 +866,7 @@ function clearVisualOverridesForFeatureIds(
     delete state.featureOverrides[id];
   });
   markLegacyColorStateDirty();
-  mapRenderer.refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
+  refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
   if (render) render();
   markDirty(dirtyReason);
   pushHistoryEntry({
@@ -886,9 +944,9 @@ function applyOwnershipToFeatureIds(
     sovereigntyFeatureIds: normalizedTargetIds,
   });
   const changed = setFeatureOwnerCodes(normalizedTargetIds, normalizedOwnerCode);
-  mapRenderer.refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
+  refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (changed > 0) {
-    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
       kind: historyKind,
@@ -995,8 +1053,8 @@ function applyScenarioOwnerControllerAssignments(
   if (changedFeatureIds.size) {
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
-    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
       kind: historyKind,
@@ -2487,7 +2545,7 @@ function initSidebar({ render } = {}) {
       if (event?.type === "pointerdown") {
         skipDeleteGraphicVertexClick = true;
       }
-      mapRenderer.deleteSelectedOperationGraphicVertex();
+      deleteSelectedOperationGraphicVertex();
       refreshStrategicOverlayUI();
     };
     graphicsDeleteVertexBtn.addEventListener("pointerdown", handleDeleteGraphicVertex);

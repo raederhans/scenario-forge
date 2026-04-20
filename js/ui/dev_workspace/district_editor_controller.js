@@ -1,5 +1,5 @@
 import { state } from "../../core/state.js";
-import * as mapRenderer from "../../core/map_renderer.js";
+import { rebuildStaticMeshes } from "../../core/map_renderer.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
   getScenarioDistrictTagRecord,
@@ -881,7 +881,7 @@ export function createDistrictEditorController({
           ...(state.activeScenarioManifest || {}),
           district_groups_url: String(result.districtGroupsUrl || state.activeScenarioManifest?.district_groups_url || ""),
         };
-        mapRenderer.rebuildStaticMeshes();
+        rebuildStaticMeshes();
         flushDevWorkspaceRender("dev-workspace-district-save");
         showToast(ui("Scenario districts file saved."), {
           title: ui("Scenario District Editor"),

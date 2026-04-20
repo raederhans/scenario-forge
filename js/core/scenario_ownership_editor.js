@@ -1,6 +1,9 @@
 import { state } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
-import * as mapRenderer from "./map_renderer.js";
+import {
+  refreshResolvedColorsForFeatures,
+  scheduleDynamicBorderRecompute,
+} from "./map_renderer.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
@@ -96,9 +99,9 @@ function applyOwnerToFeatureIds(
     sovereigntyFeatureIds: matchedIds,
   });
   const changed = setFeatureOwnerCodes(matchedIds, normalizedOwnerCode);
-  mapRenderer.refreshResolvedColorsForFeatures(matchedIds, { renderNow: false });
+  refreshResolvedColorsForFeatures(matchedIds, { renderNow: false });
   if (changed > 0) {
-    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
       kind: historyKind,
@@ -196,9 +199,9 @@ function resetOwnersToScenarioBaselineForFeatureIds(
   groupedIdsByOwner.forEach((featureIds, ownerCode) => {
     changed += setFeatureOwnerCodes(featureIds, ownerCode);
   });
-  mapRenderer.refreshResolvedColorsForFeatures(baselineTargetIds, { renderNow: false });
+  refreshResolvedColorsForFeatures(baselineTargetIds, { renderNow: false });
   if (changed > 0) {
-    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
       kind: historyKind,
@@ -306,8 +309,8 @@ function applyOwnerControllerAssignmentsToFeatureIds(
   if (changedFeatureIds.size) {
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
-    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
       kind: historyKind,

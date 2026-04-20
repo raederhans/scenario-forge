@@ -2,9 +2,11 @@ import { loadDeferredDetailBundle } from "../core/data_loader.js";
 import { refreshScenarioDataHealth } from "../core/scenario_data_health.js";
 import {
   buildInteractionInfrastructureAfterStartup,
+} from "../core/map_renderer.js";
+import {
   refreshMapDataForScenarioApply,
   setMapData,
-} from "../core/map_renderer.js";
+} from "../core/scenario/scenario_renderer_bridge.js";
 import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;

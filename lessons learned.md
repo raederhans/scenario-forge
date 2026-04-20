@@ -1075,3 +1075,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `waitForAppInteractive()` 和 `scenario_boundary_regression` 都用了 `page.waitForFunction(async () => ...)`，结果 gate 提前放行，表面像 runtime 状态漂移，实际是测试自己没等到。
 - 更稳的最短路径是：先在页面里挂住 live state 引用，再让 `waitForFunction(() => ...)` 同步读取；一旦 `bootError` 有值，立即早失败。
 - 这种坑会直接把 startup boot、scenario apply、opening-owner 这类异步链的真实问题藏起来，必须用 source contract 锁住。
+
+### 140. 收紧 namespace import 时，要把仍然向 controller 传递的 helper bag 一起显式化
+- 这次把 sidebar 的 `mapRenderer` namespace import 改成 named import 后，真正的运行时缺口出在 controller 依赖的 helper bag 还需要一个 `mapRenderer` 对象。
+- 更稳的最短路径是：把 controller 真正命中的 renderer 方法收成局部 Object.freeze({...}) helper，再把 app 文件本体继续保持 named import。
+
+### 141. 把 read helper 下沉到 owner 时，要把原本顺手做的 state 初始化副作用一起带走
+- 这次 getUnitCounterPreviewData() 迁进 strategic overlay runtime owner 后，最先丢的不是返回值计算，而是 nsureUnitCounterEditorState() 这类播种和归一化副作用。
+- 更稳的最短路径是：只要公开 facade 过去会顺手初始化 editor state，owner 版实现也要先保住这层副作用，再谈纯读 helper。

@@ -3,7 +3,7 @@ import {
   refreshMapDataForScenarioApply,
   refreshScenarioOpeningOwnerBorders,
   setMapData,
-} from "./map_renderer.js";
+} from "./scenario/scenario_renderer_bridge.js";
 import { rebuildPresetState } from "./releasable_manager.js";
 import { refreshScenarioDataHealth } from "./scenario_data_health.js";
 import {

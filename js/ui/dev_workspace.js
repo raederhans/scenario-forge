@@ -1,5 +1,14 @@
 import { state } from "../core/state.js";
-import * as mapRenderer from "../core/map_renderer.js";
+import {
+  addFeatureToDevSelection,
+  applyDevMacroFillCurrentCountry,
+  applyDevMacroFillCurrentOwnerScope,
+  applyDevMacroFillCurrentParentGroup,
+  applyDevSelectionFill,
+  clearDevSelection,
+  removeLastDevSelection,
+  toggleFeatureInDevSelection,
+} from "../core/map_renderer.js";
 import { getFeatureOwnerCode, markLegacyColorStateDirty } from "../core/sovereignty_manager.js";
 import {
   filterEditableOwnershipFeatureIds,
@@ -1076,30 +1085,30 @@ function initDevWorkspace() {
     if (!hoveredId) {
       return;
     }
-    mapRenderer.addFeatureToDevSelection(hoveredId);
+    addFeatureToDevSelection(hoveredId);
   });
   bindButtonAction(panel.querySelector("#devSelectionToggleSelectedBtn"), () => {
     const selectedId = state.devSelectedHit?.targetType === "land" ? state.devSelectedHit.id : "";
-    mapRenderer.toggleFeatureInDevSelection(selectedId);
+    toggleFeatureInDevSelection(selectedId);
   });
   bindButtonAction(panel.querySelector("#devSelectionRemoveLastBtn"), () => {
-    mapRenderer.removeLastDevSelection();
+    removeLastDevSelection();
   });
   bindButtonAction(panel.querySelector("#devSelectionClearBtn"), () => {
-    mapRenderer.clearDevSelection();
+    clearDevSelection();
   });
 
   bindButtonAction(panel.querySelector("#devMacroCountryBtn"), () => {
-    mapRenderer.applyDevMacroFillCurrentCountry();
+    applyDevMacroFillCurrentCountry();
   });
   bindButtonAction(panel.querySelector("#devMacroParentBtn"), () => {
-    mapRenderer.applyDevMacroFillCurrentParentGroup();
+    applyDevMacroFillCurrentParentGroup();
   });
   bindButtonAction(panel.querySelector("#devMacroOwnerBtn"), () => {
-    mapRenderer.applyDevMacroFillCurrentOwnerScope();
+    applyDevMacroFillCurrentOwnerScope();
   });
   bindButtonAction(panel.querySelector("#devMacroSelectionBtn"), () => {
-    mapRenderer.applyDevSelectionFill();
+    applyDevSelectionFill();
   });
   scenarioTagCreatorController.bindEvents();
   selectionOwnershipController.bindEvents();

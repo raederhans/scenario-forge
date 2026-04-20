@@ -4,10 +4,10 @@ import {
   invalidateOceanBackgroundVisualState,
   recomputeDynamicBordersNow,
   refreshColorState,
-  refreshResolvedColorsForFeatures,
   refreshMapDataForScenarioChunkPromotion,
+  refreshResolvedColorsForFeatures,
   setMapData,
-} from "./map_renderer.js";
+} from "./scenario/scenario_renderer_bridge.js";
 import {
   loadDeferredDetailBundle,
   loadMeasuredJsonResource,

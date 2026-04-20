@@ -76,6 +76,7 @@ import {
 } from "./interaction_funnel.js";
 import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
+import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
 import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
 import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
 import { createRendererAssetUrlPolicyOwner } from "./renderer/asset_url_policy.js";
@@ -822,6 +823,7 @@ const cityLayerCache = {
 // --- owner 初始化区：集中持有 owner 单例引用，并在 getter 中按需延迟创建。 ---
 let urbanCityPolicyOwner = null;
 let strategicOverlayHelpersOwner = null;
+let strategicOverlayRuntimeOwner = null;
 let politicalCollectionOwner = null;
 let contextLayerResolverOwner = null;
 let rendererAssetUrlPolicyOwner = null;
@@ -1335,6 +1337,58 @@ function getRenderPassCacheState() {
     cache.overlayElement = defaults.overlayElement;
   }
   return cache;
+}
+
+function getStrategicOverlayRuntimeOwner() {
+  if (strategicOverlayRuntimeOwner) {
+    return strategicOverlayRuntimeOwner;
+  }
+  strategicOverlayRuntimeOwner = createStrategicOverlayRuntimeOwner({
+    state,
+    constants: {
+      defaultOperationGraphicKind: DEFAULT_OPERATION_GRAPHIC_KIND,
+      defaultSpecialZoneType: DEFAULT_SPECIAL_ZONE_TYPE,
+      defaultUnitCounterEquipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+      defaultUnitCounterOrganizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+      defaultUnitCounterPresetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
+      defaultUnitCounterRenderer: DEFAULT_UNIT_COUNTER_RENDERER,
+    },
+    helpers: {
+      canonicalCountryCode,
+      captureHistoryState,
+      commitHistoryEntry,
+      ensureManualSpecialZoneCounter,
+      ensureOperationGraphicCounter,
+      ensureOperationGraphicsEditorState,
+      ensureSpecialZoneEditorState,
+      ensureUnitCounterEditorState,
+      getDisplayOwnerCode,
+      getFeatureOwnerCode,
+      getMapLonLatFromEvent,
+      getManualSpecialZoneFeatures,
+      getNormalizedUnitCounterCombatState,
+      getOperationGraphicById,
+      getOperationGraphicMinPoints,
+      getUnitCounterCardModel,
+      getUnitCounterPresetById,
+      markDirty,
+      normalizeOperationGraphicOpacity,
+      normalizeOperationGraphicStroke,
+      normalizeOperationGraphicStylePreset,
+      normalizeOperationGraphicWidth,
+      normalizeUnitCounterNationSource,
+      renderNow: () => {
+        if (context) render();
+      },
+      renderOperationGraphicsIfNeeded,
+      renderSpecialZoneEditorOverlay,
+      showToast,
+      t,
+      updateSpecialZoneEditorUI,
+      updateStrategicOverlayUi,
+    },
+  });
+  return strategicOverlayRuntimeOwner;
 }
 
 function getSidebarPerfState() {
@@ -18612,41 +18666,11 @@ function normalizeUnitCounterNationSource(value, fallback = "display") {
 }
 
 function resolveUnitCounterNationForPlacement(featureId = "", manualTag = "", preferredSource = "display") {
-  const normalizedFeatureId = String(featureId || "").trim();
-  const normalizedManualTag = canonicalCountryCode(manualTag);
-  if (normalizedManualTag) {
-    return { tag: normalizedManualTag, source: "manual" };
-  }
-  const requestedSource = normalizeUnitCounterNationSource(preferredSource, "display");
-  const feature = normalizedFeatureId ? state.landIndex?.get(normalizedFeatureId) || null : null;
-  const displayTag = canonicalCountryCode(
-    normalizedFeatureId ? getDisplayOwnerCode(feature, normalizedFeatureId) : ""
+  return getStrategicOverlayRuntimeOwner().resolveUnitCounterNationForPlacement(
+    featureId,
+    manualTag,
+    preferredSource,
   );
-  if (requestedSource === "display" && displayTag) {
-    return { tag: displayTag, source: "display" };
-  }
-  const controllerTag = canonicalCountryCode(state.scenarioControllersByFeatureId?.[normalizedFeatureId] || "");
-  if (requestedSource === "controller" && controllerTag) {
-    return { tag: controllerTag, source: "controller" };
-  }
-  const ownerTag = canonicalCountryCode(getFeatureOwnerCode(normalizedFeatureId) || "");
-  if (requestedSource === "controller" && ownerTag) {
-    return { tag: ownerTag, source: "controller" };
-  }
-  if (requestedSource === "owner" && ownerTag) {
-    return { tag: ownerTag, source: "owner" };
-  }
-  if (requestedSource === "display" && ownerTag) {
-    return { tag: ownerTag, source: "display" };
-  }
-  if (requestedSource === "display" && controllerTag) {
-    return { tag: controllerTag, source: "display" };
-  }
-  const activeTag = canonicalCountryCode(state.activeSovereignCode || state.selectedInspectorCountryCode || "");
-  if (activeTag) {
-    return { tag: activeTag, source: requestedSource };
-  }
-  return { tag: "", source: requestedSource };
 }
 
 function getUnitCounterScreenMetrics(size = "medium") {
@@ -18697,25 +18721,7 @@ function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
 }
 
 function getUnitCounterPreviewData(partialCounter = {}) {
-  ensureUnitCounterEditorState();
-  return getUnitCounterCardModel({
-    renderer: partialCounter.renderer || state.unitCounterEditor.renderer || DEFAULT_UNIT_COUNTER_RENDERER,
-    sidc: partialCounter.sidc || partialCounter.symbolCode || state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "",
-    symbolCode: partialCounter.symbolCode || partialCounter.sidc || state.unitCounterEditor.symbolCode || state.unitCounterEditor.sidc || "",
-    nationTag: partialCounter.nationTag || state.unitCounterEditor.nationTag || "",
-    presetId: partialCounter.presetId || state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID,
-    unitType: partialCounter.unitType || state.unitCounterEditor.unitType || "",
-    echelon: partialCounter.echelon || state.unitCounterEditor.echelon || "",
-    label: partialCounter.label || state.unitCounterEditor.label || "",
-    subLabel: partialCounter.subLabel || state.unitCounterEditor.subLabel || "",
-    strengthText: partialCounter.strengthText || state.unitCounterEditor.strengthText || "",
-    baseFillColor: partialCounter.baseFillColor ?? state.unitCounterEditor.baseFillColor ?? "",
-    organizationPct: partialCounter.organizationPct ?? state.unitCounterEditor.organizationPct ?? DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
-    equipmentPct: partialCounter.equipmentPct ?? state.unitCounterEditor.equipmentPct ?? DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-    statsPresetId: partialCounter.statsPresetId || state.unitCounterEditor.statsPresetId || "regular",
-    statsSource: partialCounter.statsSource || state.unitCounterEditor.statsSource || "preset",
-    size: partialCounter.size || state.unitCounterEditor.size || "medium",
-  });
+  return getStrategicOverlayRuntimeOwner().getUnitCounterPreviewData(partialCounter);
 }
 
 function getUnitCounterIconPath(iconId = "") {
@@ -19393,110 +19399,31 @@ function ensureManualSpecialZoneCounter() {
 }
 
 function appendSpecialZoneVertexFromEvent(event) {
-  ensureSpecialZoneEditorState();
-  const coord = getMapLonLatFromEvent(event);
-  if (!coord) return false;
-  state.specialZoneEditor.vertices.push(coord);
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  renderSpecialZoneEditorOverlay();
-  return true;
+  return getStrategicOverlayRuntimeOwner().appendSpecialZoneVertexFromEvent(event);
 }
 
 function startSpecialZoneDraw({ zoneType = DEFAULT_SPECIAL_ZONE_TYPE, label = "" } = {}) {
-  ensureSpecialZoneEditorState();
-  state.specialZoneEditor.active = true;
-  state.specialZoneEditor.vertices = [];
-  state.specialZoneEditor.zoneType = String(zoneType || DEFAULT_SPECIAL_ZONE_TYPE);
-  state.specialZoneEditor.label = String(label || "");
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().startSpecialZoneDraw({ zoneType, label });
 }
 
 function undoSpecialZoneVertex() {
-  ensureSpecialZoneEditorState();
-  if (!state.specialZoneEditor.active || !state.specialZoneEditor.vertices.length) return;
-  state.specialZoneEditor.vertices.pop();
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().undoSpecialZoneVertex();
 }
 
 function cancelSpecialZoneDraw() {
-  ensureSpecialZoneEditorState();
-  state.specialZoneEditor.active = false;
-  state.specialZoneEditor.vertices = [];
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().cancelSpecialZoneDraw();
 }
 
 function finishSpecialZoneDraw() {
-  ensureSpecialZoneEditorState();
-  const vertices = state.specialZoneEditor.vertices || [];
-  if (!state.specialZoneEditor.active || vertices.length < 3) {
-    cancelSpecialZoneDraw();
-    return false;
-  }
-
-  ensureManualSpecialZoneCounter();
-  const id = `manual_sz_${state.specialZoneEditor.counter}`;
-  const zoneType = String(state.specialZoneEditor.zoneType || DEFAULT_SPECIAL_ZONE_TYPE);
-  const labelText = String(state.specialZoneEditor.label || `${zoneType} zone`).trim() || `${zoneType} zone`;
-  const feature = {
-    type: "Feature",
-    properties: {
-      id,
-      name: labelText,
-      label: labelText,
-      type: zoneType,
-      claimants: [],
-      cntr_code: "",
-      __source: "manual",
-    },
-    geometry: {
-      type: "Polygon",
-      coordinates: [[...vertices, vertices[0]]],
-    },
-  };
-  state.manualSpecialZones.features.push(feature);
-  state.specialZoneEditor.counter += 1;
-  state.specialZoneEditor.selectedId = id;
-  state.specialZoneEditor.active = false;
-  state.specialZoneEditor.vertices = [];
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  if (context) render();
-  return true;
+  return getStrategicOverlayRuntimeOwner().finishSpecialZoneDraw();
 }
 
 function selectSpecialZoneById(id) {
-  ensureSpecialZoneEditorState();
-  const next = String(id || "").trim();
-  state.specialZoneEditor.selectedId = next || null;
-  state.specialZonesOverlayDirty = true;
-  updateSpecialZoneEditorUI();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().selectSpecialZoneById(id);
 }
 
 function deleteSelectedManualSpecialZone() {
-  ensureSpecialZoneEditorState();
-  const selectedId = String(state.specialZoneEditor.selectedId || "").trim();
-  if (!selectedId) return false;
-  const before = getManualSpecialZoneFeatures().length;
-  state.manualSpecialZones.features = getManualSpecialZoneFeatures().filter(
-    (feature) => String(feature?.properties?.id || "").trim() !== selectedId
-  );
-  const removed = before - state.manualSpecialZones.features.length;
-  if (removed > 0) {
-    state.specialZoneEditor.selectedId = null;
-    state.specialZonesOverlayDirty = true;
-    updateSpecialZoneEditorUI();
-    if (context) render();
-    return true;
-  }
-  return false;
+  return getStrategicOverlayRuntimeOwner().deleteSelectedManualSpecialZone();
 }
 
 function ensureOperationGraphicCounter() {
@@ -19510,14 +19437,7 @@ function ensureOperationGraphicCounter() {
 }
 
 function appendOperationGraphicVertexFromEvent(event) {
-  ensureOperationGraphicsEditorState();
-  const coord = getMapLonLatFromEvent(event);
-  if (!coord) return false;
-  state.operationGraphicsEditor.points.push(coord);
-  state.operationGraphicsDirty = true;
-  updateStrategicOverlayUi();
-  renderOperationGraphicsIfNeeded({ force: true });
-  return true;
+  return getStrategicOverlayRuntimeOwner().appendOperationGraphicVertexFromEvent(event);
 }
 
 function startOperationGraphicDraw({
@@ -19528,199 +19448,42 @@ function startOperationGraphicDraw({
   width = 0,
   opacity = 1,
 } = {}) {
-  ensureOperationGraphicsEditorState();
-  state.operationGraphicsEditor.active = true;
-  state.operationGraphicsEditor.mode = "draw";
-  state.operationGraphicsEditor.points = [];
-  state.operationGraphicsEditor.kind = String(kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  state.operationGraphicsEditor.label = String(label || "");
-  state.operationGraphicsEditor.stylePreset = normalizeOperationGraphicStylePreset(stylePreset, kind);
-  state.operationGraphicsEditor.stroke = normalizeOperationGraphicStroke(stroke);
-  state.operationGraphicsEditor.width = normalizeOperationGraphicWidth(width);
-  state.operationGraphicsEditor.opacity = normalizeOperationGraphicOpacity(opacity);
-  state.operationGraphicsEditor.selectedId = null;
-  state.operationGraphicsEditor.selectedVertexIndex = -1;
-  state.operationGraphicsDirty = true;
-  updateStrategicOverlayUi();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().startOperationGraphicDraw({
+    kind,
+    label,
+    stylePreset,
+    stroke,
+    width,
+    opacity,
+  });
 }
 
 function undoOperationGraphicVertex() {
-  ensureOperationGraphicsEditorState();
-  if (!state.operationGraphicsEditor.active || !state.operationGraphicsEditor.points.length) return;
-  state.operationGraphicsEditor.points.pop();
-  state.operationGraphicsDirty = true;
-  updateStrategicOverlayUi();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().undoOperationGraphicVertex();
 }
 
 function cancelOperationGraphicDraw() {
-  ensureOperationGraphicsEditorState();
-  state.operationGraphicsEditor.active = false;
-  state.operationGraphicsEditor.mode = state.operationGraphicsEditor.selectedId ? "edit" : "idle";
-  state.operationGraphicsEditor.points = [];
-  state.operationGraphicsEditor.selectedVertexIndex = -1;
-  state.operationGraphicsDirty = true;
-  updateStrategicOverlayUi();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().cancelOperationGraphicDraw();
 }
 
 function finishOperationGraphicDraw() {
-  ensureOperationGraphicsEditorState();
-  const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  const minPoints = getOperationGraphicMinPoints(kind);
-  const points = Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [];
-  if (!state.operationGraphicsEditor.active || points.length < minPoints) {
-    cancelOperationGraphicDraw();
-    return false;
-  }
-  ensureOperationGraphicCounter();
-  const before = captureHistoryState({ strategicOverlay: true });
-  const id = `opg_${state.operationGraphicsEditor.counter}`;
-  state.operationGraphics.push({
-    id,
-    kind,
-    label: String(state.operationGraphicsEditor.label || "").trim(),
-    points: [...points],
-    stylePreset: normalizeOperationGraphicStylePreset(state.operationGraphicsEditor.stylePreset, kind),
-    stroke: normalizeOperationGraphicStroke(state.operationGraphicsEditor.stroke) || null,
-    width: normalizeOperationGraphicWidth(state.operationGraphicsEditor.width),
-    opacity: normalizeOperationGraphicOpacity(state.operationGraphicsEditor.opacity),
-  });
-  state.operationGraphicsEditor.counter += 1;
-  state.operationGraphicsEditor.selectedId = id;
-  state.operationGraphicsEditor.active = false;
-  state.operationGraphicsEditor.mode = "edit";
-  state.operationGraphicsEditor.points = [...points];
-  state.operationGraphicsEditor.selectedVertexIndex = -1;
-  state.operationGraphicsDirty = true;
-  commitHistoryEntry({
-    kind: "finish-operation-graphic",
-    before,
-    after: captureHistoryState({ strategicOverlay: true }),
-  });
-  markDirty("finish-operation-graphic");
-  updateStrategicOverlayUi();
-  if (context) render();
-  return true;
+  return getStrategicOverlayRuntimeOwner().finishOperationGraphicDraw();
 }
 
 function selectOperationGraphicById(id) {
-  ensureOperationGraphicsEditorState();
-  const selectedId = String(id || "").trim();
-  const graphic = getOperationGraphicById(selectedId);
-  state.operationGraphicsEditor.selectedId = selectedId || null;
-  state.operationGraphicsEditor.selectedVertexIndex = -1;
-  if (graphic) {
-    state.operationGraphicsEditor.kind = String(graphic.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-    state.operationGraphicsEditor.label = String(graphic.label || "");
-    state.operationGraphicsEditor.stylePreset = normalizeOperationGraphicStylePreset(graphic.stylePreset, graphic.kind);
-    state.operationGraphicsEditor.stroke = normalizeOperationGraphicStroke(graphic.stroke);
-    state.operationGraphicsEditor.width = normalizeOperationGraphicWidth(graphic.width);
-    state.operationGraphicsEditor.opacity = normalizeOperationGraphicOpacity(graphic.opacity);
-    state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? [...graphic.points] : [];
-    state.operationGraphicsEditor.mode = "edit";
-  } else {
-    state.operationGraphicsEditor.points = [];
-    state.operationGraphicsEditor.mode = "idle";
-  }
-  state.operationGraphicsDirty = true;
-  updateStrategicOverlayUi();
-  if (context) render();
+  return getStrategicOverlayRuntimeOwner().selectOperationGraphicById(id);
 }
 
 function deleteSelectedOperationGraphic() {
-  ensureOperationGraphicsEditorState();
-  const selectedId = String(state.operationGraphicsEditor.selectedId || "").trim();
-  if (!selectedId) return false;
-  const before = captureHistoryState({ strategicOverlay: true });
-  const nextGraphics = (state.operationGraphics || []).filter((entry) => String(entry?.id || "") !== selectedId);
-  if (nextGraphics.length === (state.operationGraphics || []).length) return false;
-  state.operationGraphics = nextGraphics;
-  state.operationGraphicsEditor.selectedId = null;
-  state.operationGraphicsEditor.points = [];
-  state.operationGraphicsEditor.selectedVertexIndex = -1;
-  state.operationGraphicsEditor.mode = "idle";
-  state.operationGraphicsDirty = true;
-  commitHistoryEntry({
-    kind: "delete-operation-graphic",
-    before,
-    after: captureHistoryState({ strategicOverlay: true }),
-  });
-  markDirty("delete-operation-graphic");
-  updateStrategicOverlayUi();
-  if (context) render();
-  return true;
+  return getStrategicOverlayRuntimeOwner().deleteSelectedOperationGraphic();
 }
 
 function updateSelectedOperationGraphic(partial = {}) {
-  ensureOperationGraphicsEditorState();
-  const selectedId = String(state.operationGraphicsEditor.selectedId || "").trim();
-  if (!selectedId) return false;
-  const target = (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId);
-  if (!target) return false;
-  const nextKind = partial.kind ? String(partial.kind || DEFAULT_OPERATION_GRAPHIC_KIND) : String(target.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  if (
-    partial.kind
-    && Array.isArray(target.points)
-    && target.points.length < getOperationGraphicMinPoints(nextKind)
-  ) {
-    showToast(t("Add more vertices before switching this graphic to a closed style.", "ui"), {
-      title: t("More points required", "ui"),
-      tone: "warning",
-    });
-    return false;
-  }
-  const before = captureHistoryState({ strategicOverlay: true });
-  if (partial.kind) target.kind = nextKind;
-  if (partial.label !== undefined) target.label = String(partial.label || "");
-  if (partial.stylePreset !== undefined) {
-    target.stylePreset = normalizeOperationGraphicStylePreset(partial.stylePreset, target.kind);
-  }
-  if (partial.stroke !== undefined) {
-    target.stroke = normalizeOperationGraphicStroke(partial.stroke) || null;
-  }
-  if (partial.width !== undefined) {
-    target.width = normalizeOperationGraphicWidth(partial.width);
-  }
-  if (partial.opacity !== undefined) {
-    target.opacity = normalizeOperationGraphicOpacity(partial.opacity);
-  }
-  state.operationGraphicsEditor.points = Array.isArray(target.points) ? [...target.points] : [];
-  selectOperationGraphicById(selectedId);
-  state.operationGraphicsDirty = true;
-  commitHistoryEntry({
-    kind: "update-operation-graphic",
-    before,
-    after: captureHistoryState({ strategicOverlay: true }),
-  });
-  markDirty("update-operation-graphic");
-  updateStrategicOverlayUi();
-  if (context) render();
-  return true;
+  return getStrategicOverlayRuntimeOwner().updateSelectedOperationGraphic(partial);
 }
 
 function deleteSelectedOperationGraphicVertex() {
-  ensureOperationGraphicsEditorState();
-  const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
-  const vertexIndex = Number(state.operationGraphicsEditor.selectedVertexIndex);
-  if (!graphic || !Number.isInteger(vertexIndex) || vertexIndex < 0) return false;
-  const minPoints = getOperationGraphicMinPoints(graphic.kind);
-  if (!Array.isArray(graphic.points) || graphic.points.length <= minPoints) return false;
-  const before = captureHistoryState({ strategicOverlay: true });
-  graphic.points.splice(vertexIndex, 1);
-  state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? [...graphic.points] : [];
-  state.operationGraphicsEditor.selectedVertexIndex = Math.min(vertexIndex, graphic.points.length - 1);
-  state.operationGraphicsDirty = true;
-  commitHistoryEntry({
-    kind: "delete-operation-graphic-vertex",
-    before,
-    after: captureHistoryState({ strategicOverlay: true }),
-  });
-  markDirty("delete-operation-graphic-vertex");
-  updateStrategicOverlayUi();
-  if (context) render();
-  return true;
+  return getStrategicOverlayRuntimeOwner().deleteSelectedOperationGraphicVertex();
 }
 
 function ensureOperationalLineCounter() {
@@ -22746,14 +22509,28 @@ function refreshMapDataForScenarioApply({
   });
 }
 
+// Batch 5 facade note:
+// 1) 生产代码侧尽量只用 named imports，避免 namespace import 把 donor surface 继续放大。
+// 2) 这里按 consumer lane 分组公开 stable facade，owner-backed 细节继续留在模块内部。
 export {
+  // Core render lifecycle facade.
   initMap,
   setMapData,
-  refreshMapDataForScenarioChunkPromotion,
-  refreshMapDataForScenarioApply,
   buildInteractionInfrastructureAfterStartup,
   render,
-  autoFillMap,
+
+  // Scenario refresh and color synchronization facade.
+  refreshMapDataForScenarioChunkPromotion,
+  refreshMapDataForScenarioApply,
+  refreshColorState,
+  refreshResolvedColorsForFeatures,
+  refreshResolvedColorsForOwners,
+  refreshScenarioOpeningOwnerBorders,
+  markDynamicBordersDirty,
+  recomputeDynamicBordersNow,
+  scheduleDynamicBorderRecompute,
+
+  // Strategic overlay editing facade.
   startOperationalLineDraw,
   undoOperationalLineVertex,
   finishOperationalLineDraw,
@@ -22783,15 +22560,10 @@ export {
   cancelSpecialZoneDraw,
   deleteSelectedManualSpecialZone,
   selectSpecialZoneById,
+
+  // Render cache and visual invalidation facade.
   rebuildStaticMeshes,
   invalidateBorderCache,
-  refreshColorState,
-  refreshResolvedColorsForFeatures,
-  refreshResolvedColorsForOwners,
-  refreshScenarioOpeningOwnerBorders,
-  markDynamicBordersDirty,
-  recomputeDynamicBordersNow,
-  scheduleDynamicBorderRecompute,
   invalidateContextLayerVisualState,
   invalidateContextLayerVisualStateBatch,
   invalidateOceanBackgroundVisualState,
@@ -22799,8 +22571,8 @@ export {
   invalidateOceanWaterInteractionVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
-  getBathymetryPresetStyleDefaults,
-  setDebugMode,
+
+  // Dev workspace selection and fill facade.
   addFeatureToDevSelection,
   toggleFeatureInDevSelection,
   removeLastDevSelection,
@@ -22809,6 +22581,10 @@ export {
   applyDevMacroFillCurrentParentGroup,
   applyDevMacroFillCurrentOwnerScope,
   applyDevSelectionFill,
+
+  // Read-model helpers for UI, diagnostics, and export tooling.
+  autoFillMap,
+  getBathymetryPresetStyleDefaults,
   getWaterRegionColor,
   getUrbanLayerCapability,
   computeUrbanAdaptivePaintFromHostColor,
@@ -22820,6 +22596,9 @@ export {
   getEffectiveCityCollection,
   doesScenarioCountryHideCityPoints,
   renderExportPassesToCanvas,
+
+  // Viewport, diagnostics, and render scheduling facade.
+  setDebugMode,
   getZoomPercent,
   resetZoomToFit,
   setZoomPercent,

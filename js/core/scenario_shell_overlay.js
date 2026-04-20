@@ -3,7 +3,7 @@ import {
   recomputeDynamicBordersNow,
   refreshResolvedColorsForFeatures,
   refreshScenarioOpeningOwnerBorders,
-} from "./map_renderer.js";
+} from "./scenario/scenario_renderer_bridge.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import {
   canonicalScenarioCountryCode,
