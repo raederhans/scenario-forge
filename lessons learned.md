@@ -198,6 +198,13 @@
 ### 33. ����Ĭ�� startup scenario �� e2e ��Ҫ�� smoke ���������� boot overlay ȫ��������
 - �� scenario_apply_resilience.spec.js ����Ŀ���ǲ� scenario rollback / fatal recovery ��������ǰ������Ӧ������Ϊ��scenario manager ���ȶ�������Ҫ����� ootOverlay hidden ���ֺ����������޹ء����� CI �����Ϻܹ����������
 - ���ȵ����·���Ǹ�������ڼ� default_scenario query ���ǣ��ò�����ʽѡ��Ϻ��ʵ� startup baseline����ƷĬ�ϳ������ֲ�����
+### 34. JS split 后要警惕同名 helper 的“双声明”，这种错误会在 boot 最早阶段把整页卡死
+- 这次 `scenario_resources.js` 同时保留了旧 `function hasRenderableScenarioPoliticalTopology(...)` 和新的 `const hasRenderableScenarioPoliticalTopology = ...`，浏览器直接抛 `SyntaxError`，主壳停在 `bootPhase = shell`。
+- 这类问题最稳的收口方式是：拆分后补一条 owner 边界测试，至少钉住“同名 helper 只保留一个声明”。
+
+### 35. UI i18n smoke 的中文断言要跟 canonical locale 资产对齐
+- 这次 transport compare 按钮的运行时文案来自 `data/locales.json`，已经是“比较基线 / 这个家族没有可用基线”，旧 e2e 还在断言早期文案“对比基线 / 这个 family 没有可用基线”。
+- 这类断言要优先跟当前 canonical locale 资产同步，避免 inline fallback 和 startup locale 覆盖把 smoke 误打红。
 ### 34. Playwright ��ʱ��־Ҫֱ�Ӵ�����̬���գ���Ҫֻ���� timeout
 - ����ȴ��������� ootPhase��startupReadonly��scenarioApplyInFlight ��������̬�����Ը���������ʱʱӦ��������Щ״̬һ���׳����������Ų��һֱ���ڡ�������ֻ�ǳ�ʱ����
 ### 34. Readonly startup unlock should only wait for interactions that are truly blocking

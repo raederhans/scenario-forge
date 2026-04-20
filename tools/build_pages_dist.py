@@ -1,26 +1,21 @@
 from __future__ import annotations
 
-import os
 import shutil
+import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.app_entry_resolver import (
+    repo_display_path,
+    resolve_editor_entry_path,
+    resolve_landing_entry_path,
+)
+
 DIST_ROOT = ROOT / "dist"
 APP_DIST_ROOT = DIST_ROOT / "app"
-
-LANDING_ENTRY_CANDIDATES = (
-    "landing/index.html",
-    "site/index.html",
-    "marketing/index.html",
-    "index.html",
-)
-EDITOR_ENTRY_CANDIDATES = (
-    "app/index.html",
-    "editor/index.html",
-    "workspace/index.html",
-    "index.html",
-)
 ROOT_PUBLIC_FILES = (
     ".nojekyll",
     "CNAME",
@@ -41,24 +36,6 @@ ROOT_PUBLIC_FILE_SUFFIXES = {
     ".avif",
 }
 APP_SHARED_DIRS = ("css", "js", "vendor", "data")
-
-
-def resolve_entry_path(env_var_name: str, candidates: tuple[str, ...]) -> Path:
-    raw_override = str(os.environ.get(env_var_name, "") or "").strip()
-    candidate_paths: list[Path] = []
-    if raw_override:
-        override_path = Path(raw_override)
-        if not override_path.is_absolute():
-            override_path = ROOT / override_path
-        candidate_paths.append(override_path)
-    candidate_paths.extend(ROOT / candidate for candidate in candidates)
-    for candidate_path in candidate_paths:
-        if candidate_path.is_file():
-            return candidate_path.resolve()
-    raise FileNotFoundError(
-        f"Unable to find a source file for {env_var_name}. Tried: "
-        + ", ".join(str(path) for path in candidate_paths)
-    )
 
 
 def reset_dist() -> None:
@@ -129,16 +106,16 @@ def write_nojekyll() -> None:
 
 
 def main() -> None:
-    landing_entry = resolve_entry_path("MAPCREATOR_LANDING_ENTRY", LANDING_ENTRY_CANDIDATES)
-    editor_entry = resolve_entry_path("MAPCREATOR_EDITOR_ENTRY", EDITOR_ENTRY_CANDIDATES)
+    landing_entry = resolve_landing_entry_path(root=ROOT)
+    editor_entry = resolve_editor_entry_path(root=ROOT)
 
     reset_dist()
     build_landing_dist(landing_entry)
     build_editor_dist(editor_entry)
     write_nojekyll()
 
-    print(f"[build_pages_dist] landing source: {landing_entry.relative_to(ROOT)}")
-    print(f"[build_pages_dist] editor source: {editor_entry.relative_to(ROOT)}")
+    print(f"[build_pages_dist] landing source: {repo_display_path(landing_entry, root=ROOT)}")
+    print(f"[build_pages_dist] editor source: {repo_display_path(editor_entry, root=ROOT)}")
     print(f"[build_pages_dist] output: {DIST_ROOT}")
 
 

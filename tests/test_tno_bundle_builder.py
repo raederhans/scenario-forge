@@ -1054,11 +1054,13 @@ class TnoBundleBuilderTest(unittest.TestCase):
             self.assertIn(f'    "{tag}",', source)
 
     def test_scenario_manager_keeps_active_scenario_colors_tag_scoped(self) -> None:
-        source = Path("js/core/scenario_manager.js").read_text(encoding="utf-8")
-        self.assertNotIn("buildScenarioRuntimeDefaultTagColors", source)
-        self.assertNotIn("buildRuntimeDefaultColorsByIso2", source)
-        self.assertIn("function getScenarioFixedOwnerColors(", source)
-        self.assertIn("next[tag] = color;", source)
+        manager_source = Path("js/core/scenario_manager.js").read_text(encoding="utf-8")
+        bundle_loader_source = Path("js/core/scenario/bundle_loader.js").read_text(encoding="utf-8")
+        self.assertNotIn("buildScenarioRuntimeDefaultTagColors", manager_source)
+        self.assertNotIn("buildRuntimeDefaultColorsByIso2", manager_source)
+        self.assertIn("function getScenarioFixedOwnerColors(", manager_source)
+        self.assertIn("function getScenarioFixedOwnerColors(countryMap = {})", bundle_loader_source)
+        self.assertIn("next[normalizedTag] = color;", bundle_loader_source)
 
     def test_validate_geo_locale_manual_overrides_requires_exact_override_entries(self) -> None:
         geo_locale_payload = {

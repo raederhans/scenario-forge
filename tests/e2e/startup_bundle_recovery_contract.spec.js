@@ -3,8 +3,9 @@ const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+const { DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("./support/startup-paths");
 
-const DEFAULT_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
+const DEFAULT_STARTUP_PATH = toRootPath(DEFAULT_FAST_APP_OPEN_PATH);
 
 async function readStartupRuntime(page) {
   return page.evaluate(async () => {

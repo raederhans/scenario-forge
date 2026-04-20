@@ -66,6 +66,13 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("const loadScenarioAuditPayload = createScenarioAuditPayloadLoader({", content)
         self.assertIn("const validateImportedScenarioBaseline = createImportedScenarioBaselineValidator({", content)
 
+    def test_renderable_runtime_topology_helper_has_single_owner(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertEqual(content.count("hasRenderableScenarioPoliticalTopologyFromStartupHydration"), 2)
+        self.assertEqual(content.count("const hasRenderableScenarioPoliticalTopology ="), 1)
+        self.assertEqual(content.count("function hasRenderableScenarioPoliticalTopology("), 0)
+
     def test_fresh_bundle_assembly_moves_to_bundle_loader_factory(self):
         resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
         bundle_loader_content = SCENARIO_BUNDLE_LOADER.read_text(encoding="utf-8")

@@ -554,10 +554,6 @@ function getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtime
   return getBundleLoaderScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta);
 }
 
-function hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload) {
-  return !!getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political");
-}
-
 function validateScenarioRuntimeShellContract({
   runtimeTopologyPayload = null,
   runtimePoliticalMeta = null,

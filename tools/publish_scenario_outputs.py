@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder.scenario_context import ensure_path_within_allowed_bases
 from map_builder.scenario_publish_service import publish_scenario_outputs
 
 
@@ -45,11 +46,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    checkpoint_dir = Path(args.checkpoint_dir).resolve() if str(args.checkpoint_dir or "").strip() else None
+    root = Path(args.root).resolve()
+    checkpoint_dir = None
+    if str(args.checkpoint_dir or "").strip():
+        raw_checkpoint_dir = Path(args.checkpoint_dir)
+        if not raw_checkpoint_dir.is_absolute():
+            raw_checkpoint_dir = root / raw_checkpoint_dir
+        checkpoint_dir = ensure_path_within_allowed_bases(
+            raw_checkpoint_dir.resolve(),
+            allowed_bases=(root / ".runtime",),
+            label="checkpoint-dir",
+            root=root,
+            error_cls=ValueError,
+        )
     result = run_publish_scenario_outputs(
         args.scenario_id,
         target=args.target,
-        root=Path(args.root).resolve(),
+        root=root,
         checkpoint_dir=checkpoint_dir,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))

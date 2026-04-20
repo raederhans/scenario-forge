@@ -1,12 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
+const { DEFAULT_OPEN_PATH, getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
+const { DEFAULT_APP_PATH, DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("./support/startup-paths");
 
 test.setTimeout(120_000);
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
-const FAST_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
+const FAST_STARTUP_PATH = toRootPath(DEFAULT_FAST_APP_OPEN_PATH);
 
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
@@ -374,8 +375,9 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
 
   const playwrightAppChecks = {
     e2eHarnessDefaultsToAppPath:
-      playwrightAppSource.includes('const DEFAULT_APP_PATH = "/app/";')
-      && playwrightAppSource.includes('const DEFAULT_OPEN_PATH = "/app/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";'),
+      DEFAULT_APP_PATH === "/app/"
+      && DEFAULT_OPEN_PATH === DEFAULT_FAST_APP_OPEN_PATH
+      && playwrightAppSource.includes("const DEFAULT_OPEN_PATH = DEFAULT_FAST_APP_OPEN_PATH;"),
     normalizeAppPathKeepsRootQueryAndHashOnAppRoute:
       playwrightAppSource.includes('if (normalizedTarget === "/") {')
       && playwrightAppSource.includes('if (normalizedTarget.startsWith("/app/")) {')

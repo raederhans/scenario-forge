@@ -3,9 +3,9 @@ const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 const ZH_TRANSPORT_COMPARE = {
   labels: "\u6807\u7b7e",
-  compare: "\u5bf9\u6bd4\u57fa\u7ebf",
+  compare: "\u6bd4\u8f83\u57fa\u7ebf",
   unavailable: "\u57fa\u7ebf\u4e0d\u53ef\u7528",
-  unavailableStatus: "\u8fd9\u4e2a family \u6ca1\u6709\u53ef\u7528\u57fa\u7ebf",
+  unavailableStatus: "\u8fd9\u4e2a\u5bb6\u65cf\u6ca1\u6709\u53ef\u7528\u57fa\u7ebf",
   preview: "\u57fa\u7ebf\u9884\u89c8\u4e2d",
   live: "\u5f53\u524d\u5de5\u4f5c\u72b6\u6001",
 };

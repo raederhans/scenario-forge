@@ -1,0 +1,14 @@
+# task
+- [x] 建立本轮留档目录
+- [x] 修复启动 mode 参数转发
+- [x] 统一 Windows Python launcher
+- [x] 抽共享 entry resolver 并接入 dev/build
+- [x] 加 entry path 白名单
+- [x] 加 dev token 鉴权
+- [x] 收紧 publish CLI 路径输入
+- [x] 修复过时 contract tests
+- [x] 收紧 workflow 权限并 pin actions
+- [x] 生成 Python lock files 并改 CI 安装
+- [x] 跑 targeted 验证
+- [x] 跑全量验证
+- [x] review 自检

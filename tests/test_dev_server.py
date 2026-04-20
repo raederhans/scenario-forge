@@ -9,6 +9,7 @@ import tempfile
 import time
 import unittest
 import urllib.request
+from types import SimpleNamespace
 from pathlib import Path
 from unittest import mock
 
@@ -1455,8 +1456,18 @@ class DevServerTest(unittest.TestCase):
 
     def test_validate_same_origin_request_accepts_localhost_referer(self) -> None:
         handler = object.__new__(dev_server.Handler)
-        handler.server = type("Server", (), {"server_address": (dev_server.BIND_ADDRESS, 8000)})()
-        handler.headers = {"Referer": "http://localhost:8000/app/"}
+        handler.server = type(
+            "Server",
+            (),
+            {
+                "dev_token": "expected-token",
+                "server_address": (dev_server.BIND_ADDRESS, 8000),
+            },
+        )()
+        handler.headers = {
+            "Referer": "http://localhost:8000/app/",
+            "Cookie": "mapcreator_dev_token=expected-token",
+        }
 
         dev_server.Handler._validate_same_origin_request(handler)
 
@@ -2266,6 +2277,50 @@ class DevServerTest(unittest.TestCase):
 
         resolve_open_path_mock.assert_called_once_with("/")
         start_server_mock.assert_called_once_with("/", preferred_port=8011)
+
+    def test_validate_same_origin_request_rejects_missing_dev_token_cookie(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.headers = {}
+        handler.server = SimpleNamespace(
+            dev_token="expected-token",
+            server_address=(dev_server.BIND_ADDRESS, 8000),
+        )
+
+        with self.assertRaisesRegex(ScenarioServiceError, "development token"):
+            handler._validate_same_origin_request()
+
+    def test_validate_same_origin_request_accepts_matching_dev_token_cookie(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.headers = {
+            "Origin": "http://127.0.0.1:8000",
+            "Cookie": "mapcreator_dev_token=expected-token",
+        }
+        handler.server = SimpleNamespace(
+            dev_token="expected-token",
+            server_address=(dev_server.BIND_ADDRESS, 8000),
+        )
+
+        handler._validate_same_origin_request()
+
+    def test_end_headers_sets_dev_token_cookie(self) -> None:
+        events: list[tuple[str, object]] = []
+        handler = object.__new__(dev_server.Handler)
+        handler.path = "/app/"
+        handler.headers = {}
+        handler.server = SimpleNamespace(
+            dev_token="cookie-token",
+            server_address=(dev_server.BIND_ADDRESS, 8000),
+        )
+        handler.translate_path = lambda _path: str(Path(__file__).resolve())
+        handler.send_header = lambda name, value: events.append((name, value))
+
+        with mock.patch.object(dev_server.http.server.SimpleHTTPRequestHandler, "end_headers", return_value=None):
+            handler.end_headers()
+
+        self.assertIn(
+            ("Set-Cookie", "mapcreator_dev_token=cookie-token; Path=/; HttpOnly; SameSite=Strict"),
+            events,
+        )
 
 
 if __name__ == "__main__":

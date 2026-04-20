@@ -1,0 +1,23 @@
+# context
+- 2026-04-20：已本地复现 `start_dev.bat fast` 实际写入 `/fast`，访问返回 404。
+- GitHub Actions `Build and Deploy Scenario Forge` 最近一次失败 run：24667456006。
+- 失败主因在 `Run Python unit tests`，当前已确认 5 个失败 + 1 个本地缺 pytest 的环境误差。
+- 5 个真实失败里，4 个来自 transport appearance / rail-road owner 已迁移到 split controller 文件，1 个来自 scenario fixed owner color owner 已迁移到 bundle loader。
+- `tools/dev_server.py` 当前写接口只靠 Origin/Referer，缺少真正鉴权。
+- `tools/dev_server.py` 与 `tools/build_pages_dist.py` 当前读取两套 entry env var，存在本地预览和 Pages 构筑漂移风险。
+- 本轮实现顺序：先修启动链和测试红灯，再统一 resolver 与安全边界，最后收口 workflow 与验证。
+- 已落地实现：
+  - `start_dev.bat` mode 参数不再把 `fast/fresh/full` 继续传给 `dev_server.py`。
+  - `run_server.bat` / `build_data.bat` 统一优先 `py -3`，回退 `python`。
+  - `tools/app_entry_resolver.py` 成为 dev/build 共用入口解析器，并兼容 legacy `*_SOURCE` env。
+  - `tools/dev_server.py` 为所有 `POST /__dev/*` 加 `HttpOnly + SameSite=Strict` dev token cookie 校验。
+  - `tools/publish_scenario_build.py` / `tools/publish_scenario_outputs.py` 现在只接受 repo 内允许目录。
+  - workflow 已改成 job 级 permissions + pinned action SHA + Python lock file 安装。
+- 额外发现并修复：
+  - `js/core/scenario_resources.js` 内重复声明 `hasRenderableScenarioPoliticalTopology`，会让主壳在 boot shell 阶段直接卡死。
+  - `tests/e2e/main_shell_i18n.spec.js` 的 transport compare 中文预期落后于当前 `data/locales.json`。
+- 验证结果：
+  - targeted unittest 通过
+  - 全量 `python -m unittest discover -s tests -p "test_*.py"` 通过
+  - strict TNO scenario contract 通过
+  - smoke e2e 在显式 base URL 指向干净 dev server 的情况下 4/4 通过

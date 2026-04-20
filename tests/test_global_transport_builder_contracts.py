@@ -584,13 +584,15 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
     def test_rail_runtime_opens_and_saves(self) -> None:
         state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
-        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        appearance_controller_content = (
+            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'appearance_controls_controller.js'
+        ).read_text(encoding='utf-8')
         renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
         file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
         interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
 
         self.assertIn('showRail', state_content)
-        self.assertIn('showRail', toolbar_content)
+        self.assertIn('showRail', appearance_controller_content)
         self.assertIn('showRail', renderer_content)
         self.assertIn('showRail', file_manager_content)
         self.assertIn('showRail', interaction_content)
@@ -599,16 +601,18 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
     def test_road_runtime_opens_main_map_only(self) -> None:
         state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
-        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
+        appearance_controller_content = (
+            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'appearance_controls_controller.js'
+        ).read_text(encoding='utf-8')
         renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
-        main_content = (REPO_ROOT / 'js' / 'main.js').read_text(encoding='utf-8')
+        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
         file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
         interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
 
         self.assertIn('showRoad', state_content)
-        self.assertIn('showRoad', toolbar_content)
+        self.assertIn('showRoad', appearance_controller_content)
         self.assertIn('showRoad', renderer_content)
-        self.assertIn('layerName === "roads"', main_content)
+        self.assertIn('layerName === "roads"', data_loader_content)
         self.assertNotIn('showRoad', file_manager_content)
         self.assertNotIn('showRoad', interaction_content)
         self.assertNotIn('data.layerVisibility.showRoad', file_manager_content)
@@ -616,10 +620,13 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
     def test_rail_runtime_loader_uses_catalog_not_eager_pack(self) -> None:
         data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
+        appearance_controller_content = (
+            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'appearance_controls_controller.js'
+        ).read_text(encoding='utf-8')
         self.assertIn('data/transport_layers/global_rail/catalog.json', data_loader_content)
         self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', data_loader_content)
         self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', data_loader_content)
-        self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8'))
+        self.assertIn('["railways", "rail_stations_major"]', appearance_controller_content)
         self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
 
     def test_road_runtime_loader_uses_catalog_roads_only(self) -> None:
@@ -687,9 +694,9 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn('return 3;', renderer_content)
 
     def test_rail_transport_overview_default_primary_color_is_dark(self) -> None:
-        state_content = (REPO_ROOT / 'js' / 'core' / 'state.js').read_text(encoding='utf-8')
-        self.assertIn('case "rail":', state_content)
-        self.assertIn('primaryColor: "#0f172a"', state_content)
+        state_defaults_content = (REPO_ROOT / 'js' / 'core' / 'state_defaults.js').read_text(encoding='utf-8')
+        self.assertIn('case "rail":', state_defaults_content)
+        self.assertIn('primaryColor: "#0f172a"', state_defaults_content)
 
     def test_rail_stations_placeholder_sidecars_remain_real_empty_collections(self) -> None:
         sample_station_path = (

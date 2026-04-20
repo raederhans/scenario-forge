@@ -1,4 +1,8 @@
 const path = require("path");
+const {
+  DEFAULT_APP_PATH,
+  DEFAULT_FAST_APP_OPEN_PATH,
+} = require("./startup-paths");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const DEFAULT_TEST_SERVER_PORT = String(
@@ -7,8 +11,7 @@ const DEFAULT_TEST_SERVER_PORT = String(
   || "8810"
 ).trim();
 const DEFAULT_APP_ORIGIN = `http://127.0.0.1:${DEFAULT_TEST_SERVER_PORT}`;
-const DEFAULT_APP_PATH = "/app/";
-const DEFAULT_OPEN_PATH = "/app/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
+const DEFAULT_OPEN_PATH = DEFAULT_FAST_APP_OPEN_PATH;
 
 function normalizeAppOrigin(value) {
   const normalized = String(value || "").trim();
@@ -160,6 +163,8 @@ function getWebServerConfig() {
 }
 
 module.exports = {
+  DEFAULT_APP_PATH,
+  DEFAULT_OPEN_PATH,
   DEFAULT_APP_ORIGIN,
   getAppUrl,
   getConfiguredAppOrigin,

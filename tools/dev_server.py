@@ -5,11 +5,13 @@ import copy
 from contextlib import contextmanager
 import gzip
 import http.server
+from http.cookies import SimpleCookie
 import json
 import math
 import os
 import re
 from pathlib import Path
+import secrets
 import socketserver
 import sys
 from datetime import datetime
@@ -67,6 +69,10 @@ from map_builder.scenario_political_materializer import (
 )
 from map_builder import scenario_political_support
 from map_builder.scenario_service_errors import ScenarioServiceError as DevServerError
+from tools.app_entry_resolver import (
+    resolve_editor_entry_path,
+    resolve_landing_entry_path,
+)
 
 # Define the range of ports to try
 PORT_START = 8000
@@ -76,6 +82,7 @@ RUNTIME_ACTIVE_SERVER_PATH = Path(".runtime") / "dev" / "active_server.json"
 STARTUP_SUPPORT_KEY_USAGE_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "scenarios"
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 MAX_JSON_BODY_BYTES = 1024 * 1024
+DEV_TOKEN_COOKIE_NAME = "mapcreator_dev_token"
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
 COUNTRY_CODE_PATTERN = re.compile(r"^[A-Z]{2,3}$")
 DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
@@ -83,18 +90,6 @@ COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
 GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
 DEFAULT_OPEN_PATH = "/app/"
-LANDING_SOURCE_CANDIDATES = (
-    "landing/index.html",
-    "site/index.html",
-    "marketing/index.html",
-    "index.html",
-)
-EDITOR_SOURCE_CANDIDATES = (
-    "app/index.html",
-    "editor/index.html",
-    "workspace/index.html",
-    "index.html",
-)
 
 
 class DevServerTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -2264,37 +2259,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def _resolve_index_source_path(
-    env_var_name: str,
-    candidates: tuple[str, ...],
-    *,
-    root: Path = ROOT,
-) -> Path:
-    raw_override = str(os.environ.get(env_var_name, "") or "").strip()
-    candidate_paths: list[Path] = []
-    if raw_override:
-        override_path = Path(raw_override)
-        if not override_path.is_absolute():
-            override_path = root / override_path
-        candidate_paths.append(override_path)
-    candidate_paths.extend(root / candidate for candidate in candidates)
-    for candidate_path in candidate_paths:
-        try:
-            resolved_candidate = candidate_path.resolve()
-        except OSError:
-            continue
-        if resolved_candidate.is_file():
-            return _ensure_path_within_root(resolved_candidate, root=root)
-    fallback = root / candidates[-1]
-    return _ensure_path_within_root(fallback.resolve(), root=root)
-
-
 def resolve_landing_source_path(*, root: Path = ROOT) -> Path:
-    return _resolve_index_source_path("MAPCREATOR_LANDING_SOURCE", LANDING_SOURCE_CANDIDATES, root=root)
+    return resolve_landing_entry_path(root=root)
 
 
 def resolve_editor_source_path(*, root: Path = ROOT) -> Path:
-    return _resolve_index_source_path("MAPCREATOR_EDITOR_SOURCE", EDITOR_SOURCE_CANDIDATES, root=root)
+    return resolve_editor_entry_path(root=root)
 
 
 def _resolve_prefixed_asset_path(
@@ -2386,7 +2356,6 @@ def write_active_server_metadata(base_url, open_path, port):
         "started_at": _now_iso(),
         "open_path": open_path,
         "cwd": str(Path.cwd()),
-        "command": " ".join(sys.argv),
         "topology_variant": (query.get("topology_variant") or [""])[0],
         "render_profile_default": (query.get("render_profile") or [""])[0],
     }
@@ -2433,6 +2402,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def _resolve_static_path(self) -> Path:
         return Path(self.translate_path(self.path))
 
+    def _read_dev_token_cookie(self) -> str:
+        raw_cookie = str(self.headers.get("Cookie") or "").strip()
+        if not raw_cookie:
+            return ""
+        cookie = SimpleCookie()
+        try:
+            cookie.load(raw_cookie)
+        except Exception:
+            return ""
+        morsel = cookie.get(DEV_TOKEN_COOKIE_NAME)
+        return str(morsel.value or "").strip() if morsel else ""
+
+    def _validate_dev_token(self) -> None:
+        expected_token = str(getattr(self.server, "dev_token", "") or "").strip()
+        if not expected_token:
+            raise DevServerError(
+                "dev_token_unavailable",
+                "The development server token is unavailable.",
+                status=500,
+            )
+        provided_token = self._read_dev_token_cookie()
+        if not provided_token or not secrets.compare_digest(provided_token, expected_token):
+            raise DevServerError(
+                "invalid_dev_token",
+                "Missing or invalid development token.",
+                status=403,
+            )
+
     def _resolve_cache_headers(self) -> dict[str, str]:
         route = urlparse(self.path or "").path
         if route.startswith("/__dev/"):
@@ -2465,6 +2462,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         }
 
     def end_headers(self):
+        dev_token = str(getattr(self.server, "dev_token", "") or "").strip()
+        if dev_token:
+            self.send_header(
+                "Set-Cookie",
+                f"{DEV_TOKEN_COOKIE_NAME}={dev_token}; Path=/; HttpOnly; SameSite=Strict",
+            )
         for header_name, header_value in self._resolve_cache_headers().items():
             self.send_header(header_name, header_value)
         super().end_headers()
@@ -2563,6 +2566,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             referer_origin = f"{referer.scheme}://{referer.netloc}" if referer.scheme and referer.netloc else ""
             if referer_origin not in allowed_origins:
                 raise DevServerError("invalid_referer", "Referer header is not allowed for this endpoint.", status=403)
+        self._validate_dev_token()
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -2730,12 +2734,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 def start_server(open_path=DEFAULT_OPEN_PATH, preferred_port: int | None = None):
     candidate_ports = [preferred_port] if preferred_port else list(range(PORT_START, PORT_END + 1))
+    dev_token = secrets.token_urlsafe(24)
     for port in candidate_ports:
         try:
             # Attempt to create the server
             # allow_reuse_address=False on Windows helps avoid some zombie socket issues,
             # but binding to a new port is the safest bet.
             httpd = DevServerTCPServer((BIND_ADDRESS, port), Handler)
+            httpd.dev_token = dev_token
 
             base_url = f"http://{BIND_ADDRESS}:{port}"
             open_url = f"{base_url}{open_path}"

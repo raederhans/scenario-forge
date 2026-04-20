@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder.scenario_context import ensure_path_within_allowed_bases
 from map_builder.scenario_bundle_publish_service import publish_scenario_build_in_locked_session
 from tools import patch_tno_1962_bundle as tno_bundle
 
@@ -18,6 +19,26 @@ def _resolve_input_path(value: str, *, root: Path) -> Path:
     if not raw_path.is_absolute():
         raw_path = root / raw_path
     return raw_path.resolve()
+
+
+def _resolve_allowed_scenario_dir(value: str, *, root: Path) -> Path:
+    return ensure_path_within_allowed_bases(
+        _resolve_input_path(value, root=root),
+        allowed_bases=(root / "data" / "scenarios",),
+        label="scenario-dir",
+        root=root,
+        error_cls=ValueError,
+    )
+
+
+def _resolve_allowed_checkpoint_dir(value: str, *, root: Path) -> Path:
+    return ensure_path_within_allowed_bases(
+        _resolve_input_path(value, root=root),
+        allowed_bases=(root / ".runtime",),
+        label="checkpoint-dir",
+        root=root,
+        error_cls=ValueError,
+    )
 
 
 def run_publish_scenario_build(
@@ -59,11 +80,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     root = Path(args.root).resolve()
-    scenario_dir = _resolve_input_path(args.scenario_dir, root=root)
+    scenario_dir = _resolve_allowed_scenario_dir(args.scenario_dir, root=root)
     checkpoint_dir = (
-        _resolve_input_path(args.checkpoint_dir, root=root)
+        _resolve_allowed_checkpoint_dir(args.checkpoint_dir, root=root)
         if str(args.checkpoint_dir or "").strip()
-        else tno_bundle.resolve_default_checkpoint_dir(scenario_dir)
+        else ensure_path_within_allowed_bases(
+            tno_bundle.resolve_default_checkpoint_dir(scenario_dir),
+            allowed_bases=(root / ".runtime",),
+            label="checkpoint-dir",
+            root=root,
+            error_cls=ValueError,
+        )
     )
     result = run_publish_scenario_build(
         scenario_dir,
