@@ -2,6 +2,11 @@
 // 这个模块只负责 chunk runtime 的 state、selection、promotion、refresh/schedule。
 // facade、startup cache、hydrate 主交易仍留在 scenario_resources.js。
 
+import {
+  createDefaultActiveScenarioChunksState,
+  createDefaultRuntimeChunkLoadState,
+} from "../state/scenario_runtime_state.js";
+
 function createScenarioChunkRuntimeController({
   state,
   getSearchParams,
@@ -335,13 +340,7 @@ function createScenarioChunkRuntimeController({
 
   function ensureActiveScenarioChunkState() {
     if (!state.activeScenarioChunks || typeof state.activeScenarioChunks !== "object") {
-      state.activeScenarioChunks = {
-        scenarioId: "",
-        loadedChunkIds: [],
-        payloadByChunkId: {},
-        mergedLayerPayloads: {},
-        lruChunkIds: [],
-      };
+      state.activeScenarioChunks = createDefaultActiveScenarioChunksState();
     }
     state.activeScenarioChunks.loadedChunkIds = Array.isArray(state.activeScenarioChunks.loadedChunkIds)
       ? state.activeScenarioChunks.loadedChunkIds
@@ -408,36 +407,10 @@ function createScenarioChunkRuntimeController({
 
   function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
     const normalizedScenarioId = normalizeScenarioId(scenarioId);
-    state.activeScenarioChunks = {
+    state.activeScenarioChunks = createDefaultActiveScenarioChunksState(normalizedScenarioId);
+    state.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState({
       scenarioId: normalizedScenarioId,
-      loadedChunkIds: [],
-      payloadByChunkId: {},
-      mergedLayerPayloads: {},
-      lruChunkIds: [],
-    };
-    state.runtimeChunkLoadState = {
-      shellStatus: normalizedScenarioId ? "ready" : "idle",
-      registryStatus: normalizedScenarioId ? "ready" : "idle",
-      refreshScheduled: false,
-      refreshTimerId: null,
-      pendingReason: "",
-      pendingDelayMs: null,
-      focusCountryOverride: "",
-      zoomEndChunkVisibleMetric: null,
-      lastZoomEndToChunkVisibleMetric: null,
-      pendingVisualPromotion: null,
-      pendingInfraPromotion: null,
-      pendingPromotion: null,
-      promotionTimerId: null,
-      promotionScheduled: false,
-      promotionRetryCount: 0,
-      lastPromotionRetryAt: 0,
-      inFlightByChunkId: {},
-      errorByChunkId: {},
-      lastSelection: null,
-      layerSelectionSignatures: {},
-      mergedLayerPayloadCache: {},
-    };
+    });
   }
 
   function getScenarioChunkIdsByLayer(chunkState, layerKey) {

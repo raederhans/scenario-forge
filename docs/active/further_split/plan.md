@@ -34,6 +34,19 @@
 - [x] 让 `scenario_apply_pipeline.js` 继续只消费 lifecycle helper，不再污染 startup runtime baseline。
 - [x] 补齐 lifecycle boundary contract。
 - [x] 修正 shell overlay 定向合同，使它对齐当前 codebase 的 helper owner surface。
+- [x] 新增 `js/core/scenario/bundle_runtime.js`。
+- [x] 让 `scenario_resources.js` 的 `loadScenarioBundle` 主交易改成 bundle/cache owner 接线。
+- [x] 补齐 bundle/cache owner boundary contract。
+- [x] 新增 `js/core/state/history_state.js`。
+- [x] 新增 `js/core/state/dev_state.js`。
+- [x] 让 `state.js` 通过 history/dev owner 注入默认 shape。
+- [x] 让 `runtime_hooks.js` 按内部分类收口但保持公开 surface 不变。
+- [x] 新增 `js/core/state/strategic_overlay_state.js`。
+- [x] 统一 `state.js` / `interaction_funnel.js` / `map_renderer.js` 的 strategic overlay 默认形状。
+- [x] 补齐 state owner / strategic overlay owner 合同与行为测试。
+- [x] 新增 `js/core/state/scenario_runtime_state.js`。
+- [x] 统一 `state.js` / `chunk_runtime.js` / `lifecycle_runtime.js` / `scenario_rollback.js` / `scenario_data_health.js` 的 scenario runtime 默认形状。
+- [x] 补齐 scenario runtime owner 合同与定向 smoke。
 - [x] 跑定向验证并回填状态。
 
 ## 当前 approved plan 对齐
@@ -47,5 +60,8 @@
 - 两份旧文档都写清下一步顺序和新验证矩阵。
 - `scenario` presentation 重复事务已经收进共享 owner。
 - `scenario` lifecycle reset / clear 事务已经收进共享 owner。
+- `scenario` bundle/cache 装配链已经收进共享 owner。
+- `state` 的 history/dev/strategic overlay 默认 shape 已经收进内部 owner。
+- `state` 的 scenario runtime 默认 shape 已经收进内部 owner。
 - 合同测试、静态检查、定向 smoke 都有对应证据。
 

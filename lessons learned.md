@@ -1015,6 +1015,21 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 更稳的最短路径是：`clearActiveScenario()` 恢复 base map 时，用 `state.topologyDetail` 判断 `topologyBundleMode` 和 `detailPromotionCompleted`，再用 `defaultRuntimePoliticalTopology && !topologyDetail` 恢复 `detailDeferred`。
 - 这样退出 scenario 后，deferred detail promotion 还能继续按原计划执行。
 
+### 132. 拆 bundle/cache owner 时，让 facade 继续持有对外 export 和 getter 桥接最稳
+- `loadScenarioBundle`、bootstrap cache probe/write、cache-hit restore 很适合下沉成独立 owner。
+- 更稳的最短路径是：`scenario_resources.js` 继续保留对外 import 面、`loadScenarioBundleForStartupHydration` 这类 getter 桥接，以及 audit/startup hydration 接线；新 owner 只接管主交易。
+- 这样 startup hydration、UI 和外部调用方都不用改 import 路径，回归面最小。
+
+### 133. strategic overlay 默认形状要有单一真源，尤其是 `unitCounterEditor`
+- `state.js`、project import reset、renderer fallback 三条路径很容易各写一份默认对象，字段一多就会漂。
+- 更稳的最短路径是：把 `specialZoneEditor / operationGraphicsEditor / unitCounterEditor / operationalLineEditor / strategicOverlayUi` 收成同一组 factory，然后让 `state.js`、`interaction_funnel.js`、`map_renderer.js` 全部复用。
+- `unitCounterEditor` 至少要统一守住 `presetId / iconId / layoutAnchor / attachment / returnSelectionId` 这组字段。
+
+### 134. scenario runtime 默认 shape 也要让 reset / rollback / health 共用同一组 factory
+- `activeScenarioChunks`、`runtimeChunkLoadState`、`scenarioDataHealth`、`scenarioHydrationHealthGate` 这种状态会同时出现在 cold init、chunk reset、clear、rollback、health fallback。
+- 更稳的最短路径是：把它们收成 `scenario_runtime_state` factory，然后让 `state.js`、`chunk_runtime.js`、`lifecycle_runtime.js`、`scenario_rollback.js`、`scenario_data_health.js` 统一复用。
+- 这样一处新增字段时，chunk runtime、rollback 和 clear 路径都会一起跟上。
+
 ### 41. map_renderer 后续拆分先抽 mesh builder，再动 draw 和 render pass
 - owner border、source border、coastline source 这类“输入 topology，输出 mesh”的 helper 很适合先下沉成 owner；draw pass、render invalidation、viewport 驱动延迟加载继续留在 donor，回归面最小。
 - 这样可以先把几何生成链和 transaction/render 链切开，再决定下一刀是否继续拆 `drawHierarchicalBorders`。

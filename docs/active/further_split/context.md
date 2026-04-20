@@ -133,3 +133,164 @@
     - deferred coarse baseline clear 后继续保留 `detailDeferred=true`
     - 已加载 detail baseline clear 后继续保持 `composite`
     - reset 首次 UI side effect 前已完成 split count 重算
+
+## 2026-04-20 Batch 3 落地结果
+- 新增 `js/core/scenario/bundle_runtime.js`
+  - 导出 `createScenarioBundleRuntimeController`
+  - owner 内部承接：
+    - `loadScenarioBundle`
+    - startup bootstrap cache probe / cache-hit restore
+    - startup bootstrap cache writeback
+    - full/bootstrap bundle assemble 后的 cache/store 与 metric 记录
+- `js/core/scenario_resources.js`
+  - 继续保留 facade 与外部 export 面
+  - 继续保留 startup hydration、optional layer、audit payload、registry facade
+  - `loadScenarioBundle` 改成通过 `createScenarioBundleRuntimeController({...})` 接线
+  - `loadScenarioBundleForStartupHydration` 继续只持有 facade 引用
+- 新增 `tests/test_scenario_bundle_runtime_boundary_contract.py`
+- 更新 `tests/test_scenario_resources_boundary_contract.py`
+  - bundle/cache owner 合同改成指向 `scenario/bundle_runtime.js`
+
+## 2026-04-20 Batch 3 验证证据
+- 结构合同
+  - `python -m unittest tests.test_scenario_resources_boundary_contract tests.test_scenario_bundle_runtime_boundary_contract`
+  - 结果：`Ran 16 tests / OK`
+- 静态检查
+  - `node --check js/core/scenario/bundle_runtime.js`
+  - `node --check js/core/scenario_resources.js`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/scenario/bundle_runtime.js`
+    - `js/core/scenario_resources.js`
+    - `tests/test_scenario_bundle_runtime_boundary_contract.py`
+  - 结果：全部 `0 error`
+- 定向 smoke
+  - `node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1`
+  - 结果：`3 passed (53.5s)`
+  - 日志：
+    - `.runtime/tmp/batch3_scenario_bundle_runtime.smoke.out.log`
+    - `.runtime/tmp/batch3_scenario_bundle_runtime.smoke.err.log`
+    - `.runtime/tmp/batch3_scenario_bundle_runtime.smoke.exit.txt`
+
+## 2026-04-20 Batch 4 落地结果
+- 新增 `js/core/state/history_state.js`
+  - 导出 `createDefaultHistoryState`
+- 新增 `js/core/state/dev_state.js`
+  - 导出 `createDefaultDevState`
+- `js/core/runtime_hooks.js`
+  - 继续保留 `createDefaultRuntimeHooks`
+  - 内部改成 UI / command / data / render 四组 helper 收口
+- `js/core/state.js`
+  - 继续保留唯一公开入口
+  - 改成通过内部 owner 注入：
+    - `...createDefaultHistoryState()`
+    - `...createDefaultDevState()`
+
+## 2026-04-20 Batch 4 strategic overlay follow-up
+- 新增 `js/core/state/strategic_overlay_state.js`
+  - 导出：
+    - `createDefaultSpecialZoneEditorState`
+    - `createDefaultOperationGraphicsEditorState`
+    - `createDefaultUnitCounterEditorState`
+    - `createDefaultOperationalLineEditorState`
+    - `createDefaultStrategicOverlayUiState`
+    - `createDefaultStrategicOverlayState`
+- `js/core/state.js`
+  - strategic overlay 默认形状改成 `...createDefaultStrategicOverlayState()`
+- `js/core/interaction_funnel.js`
+  - project import/reset 路径统一复用 strategic overlay factory
+- `js/core/map_renderer.js`
+  - `ensure*EditorState()` fallback 统一复用同一组 factory
+- 这次统一后，`unitCounterEditor` 默认形状在三条路径上对齐：
+  - cold init
+  - import/reset
+  - renderer fallback
+
+## 2026-04-20 Batch 4 验证证据
+- 结构合同
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_strategic_overlay_state_boundary_contract`
+  - 结果：`Ran 10 tests / OK`
+- 行为测试
+  - `node --test tests/strategic_overlay_state_behavior.test.mjs`
+  - 结果：`2 passed`
+- 静态检查
+  - `node --check js/core/state.js`
+  - `node --check js/core/runtime_hooks.js`
+  - `node --check js/core/state/history_state.js`
+  - `node --check js/core/state/dev_state.js`
+  - `node --check js/core/state/strategic_overlay_state.js`
+  - `node --check js/core/interaction_funnel.js`
+  - `node --check js/core/map_renderer.js`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/state.js`
+    - `js/core/runtime_hooks.js`
+    - `js/core/state/history_state.js`
+    - `js/core/state/dev_state.js`
+    - `js/core/state/strategic_overlay_state.js`
+    - `js/core/interaction_funnel.js`
+    - `js/core/map_renderer.js`
+    - `tests/test_strategic_overlay_state_boundary_contract.py`
+  - 结果：全部 `0 error`
+- 定向 smoke
+  - `tests/e2e/shortcut_history_render_boundary.spec.js`
+  - 结果：
+    - `history undo and redo flush through render boundary` 通过
+    - `Escape shortcut flushes for strategic overlay cancel and special-zone cancel` 失败，稳定复现
+  - 失败点：
+    - 预期 `shortcut-strategic-overlay-cancel`
+    - 实际 flush 数组为空
+  - 当前判断：这是现有 shortcut / strategic overlay 交互链问题，和本轮 state ownership 拆分面没有直接耦合
+
+## 2026-04-20 Batch 4 state scenario runtime 继续推进
+- 新增 `js/core/state/scenario_runtime_state.js`
+  - 导出：
+    - `createDefaultActiveScenarioChunksState`
+    - `createDefaultRuntimeChunkLoadState`
+    - `createDefaultScenarioDataHealth`
+    - `createDefaultScenarioHydrationHealthGate`
+    - `createDefaultScenarioRuntimeState`
+- `js/core/state.js`
+  - 场景运行时默认 shape 改成 `...createDefaultScenarioRuntimeState()`
+- `js/core/scenario/chunk_runtime.js`
+  - `ensureActiveScenarioChunkState()` 与 `resetScenarioChunkRuntimeState()` 改成复用 scenario runtime factory
+- `js/core/scenario/lifecycle_runtime.js`
+  - clear 路径重置 `scenarioHydrationHealthGate` / `scenarioDataHealth` 改成复用 scenario runtime factory
+- `js/core/scenario_rollback.js`
+  - rollback fallback 的 `activeScenarioChunks` / `runtimeChunkLoadState` 改成复用 scenario runtime factory
+- `js/core/scenario_data_health.js`
+  - 无 active scenario 时的空健康状态改成复用 scenario runtime factory
+
+## 2026-04-20 Batch 4 state scenario runtime 验证证据
+- 结构合同
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_scenario_runtime_state_boundary_contract tests.test_strategic_overlay_state_boundary_contract tests.test_scenario_lifecycle_runtime_boundary_contract`
+  - 结果：`Ran 15 tests / OK`
+- 静态检查
+  - `node --check js/core/state.js`
+  - `node --check js/core/state/scenario_runtime_state.js`
+  - `node --check js/core/scenario/chunk_runtime.js`
+  - `node --check js/core/scenario/lifecycle_runtime.js`
+  - `node --check js/core/scenario_rollback.js`
+  - `node --check js/core/scenario_data_health.js`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/state/scenario_runtime_state.js`
+    - `js/core/scenario/chunk_runtime.js`
+    - `js/core/scenario/lifecycle_runtime.js`
+    - `js/core/scenario_rollback.js`
+    - `js/core/scenario_data_health.js`
+    - `tests/test_scenario_runtime_state_boundary_contract.py`
+  - 结果：全部 `0 error`
+- 定向 smoke
+  - `node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1`
+  - 结果：`3 passed (59.6s)`
+  - 日志：
+    - `.runtime/tmp/batch4_state_scenario_runtime.smoke.out.log`
+    - `.runtime/tmp/batch4_state_scenario_runtime.smoke.err.log`
+    - `.runtime/tmp/batch4_state_scenario_runtime.smoke.exit.txt`
+- architect 复核
+  - 结果：批准当前阶段完成
+  - 追加修正：`scenario_rollback.js` 的 `scenarioHydrationHealthGate` fallback 也已改成复用 `createDefaultScenarioHydrationHealthGate()`

@@ -28,6 +28,13 @@ import {
   normalizeTransportWorkbenchUiState,
   state,
 } from "./state.js";
+import {
+  createDefaultOperationGraphicsEditorState,
+  createDefaultOperationalLineEditorState,
+  createDefaultSpecialZoneEditorState,
+  createDefaultStrategicOverlayUiState,
+  createDefaultUnitCounterEditorState,
+} from "./state/strategic_overlay_state.js";
 
 let mapClickImpl = null;
 let mapDoubleClickImpl = null;
@@ -421,14 +428,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.devClipboardFallbackText = "";
   state.devClipboardPreviewFormat = "names_with_ids";
   ensureSovereigntyState({ force: true });
-  state.specialZoneEditor = {
-    active: false,
-    vertices: [],
-    zoneType: "custom",
-    label: "",
-    selectedId: null,
-    counter: 1,
-  };
+  state.specialZoneEditor = createDefaultSpecialZoneEditorState();
   state.annotationView = normalizeAnnotationView({
     ...(state.annotationView || {}),
     ...(data.annotationView || {}),
@@ -442,74 +442,12 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.unitCounters = Array.isArray(data.unitCounters)
     ? cloneImportedProjectValue(data.unitCounters)
     : [];
-  state.operationalLineEditor = {
-    active: false,
-    mode: "idle",
-    points: [],
-    kind: "frontline",
-    label: "",
-    stylePreset: "frontline",
-    stroke: "",
-    width: 0,
-    opacity: 1,
-    selectedId: null,
-    selectedVertexIndex: -1,
-    counter: 1,
-  };
-  state.operationGraphicsEditor = {
-    active: false,
-    mode: "idle",
-    collection: "operationGraphics",
-    points: [],
-    kind: "attack",
-    label: "",
-    stylePreset: "attack",
-    stroke: "",
-    width: 0,
-    opacity: 1,
-    selectedId: null,
-    selectedVertexIndex: -1,
-    counter: 1,
-  };
-  state.unitCounterEditor = {
-    active: false,
-    renderer: String(state.annotationView?.unitRendererDefault || "game"),
-    label: "",
-    sidc: "",
-    symbolCode: "",
-    nationTag: "",
-    nationSource: "display",
-    presetId: "inf",
-    iconId: "",
-    unitType: "",
-    echelon: "",
-    subLabel: "",
-    strengthText: "",
-    layoutAnchor: { kind: "feature", key: "", slotIndex: null },
-    attachment: null,
-    baseFillColor: "",
-    organizationPct: 78,
-    equipmentPct: 74,
-    statsPresetId: "regular",
-    statsSource: "preset",
-    size: "medium",
-    selectedId: null,
-    counter: 1,
-  };
-  state.strategicOverlayUi = {
-    activeMode: "idle",
-    modalOpen: false,
-    modalSection: "line",
-    modalEntityId: "",
-    modalEntityType: "",
-    counterEditorModalOpen: false,
-    counterCatalogSource: "internal",
-    counterCatalogCategory: "all",
-    counterCatalogQuery: "",
-    hoi4CounterCategory: "all",
-    hoi4CounterQuery: "",
-    hoi4CounterVariant: "small",
-  };
+  state.operationalLineEditor = createDefaultOperationalLineEditorState();
+  state.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();
+  state.unitCounterEditor = createDefaultUnitCounterEditorState({
+    renderer: state.annotationView?.unitRendererDefault || "game",
+  });
+  state.strategicOverlayUi = createDefaultStrategicOverlayUiState();
   hooks.invalidateFrontlineOverlayState?.();
   state.operationalLinesDirty = true;
   state.operationGraphicsDirty = true;

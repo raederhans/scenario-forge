@@ -1,3 +1,8 @@
+import {
+  createDefaultScenarioDataHealth,
+  createDefaultScenarioHydrationHealthGate,
+} from "../state/scenario_runtime_state.js";
+
 function createScenarioLifecycleRuntime({
   state,
   countryNames,
@@ -245,24 +250,8 @@ function createScenarioLifecycleRuntime({
     state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
     state.scenarioOwnerControllerDiffCount = 0;
-    state.scenarioHydrationHealthGate = {
-      status: "idle",
-      reason: "",
-      checkedAt: 0,
-      attemptedRetry: false,
-      ownerFeatureOverlapRatio: 1,
-      ownerFeatureOverlapCount: 0,
-      ownerFeatureRenderedCount: 0,
-      degradedWaterOverlay: false,
-    };
-    state.scenarioDataHealth = {
-      expectedFeatureCount: 0,
-      runtimeFeatureCount: 0,
-      ratio: 1,
-      minRatio: scenarioDetailMinRatioStrict,
-      warning: "",
-      severity: "",
-    };
+    state.scenarioHydrationHealthGate = createDefaultScenarioHydrationHealthGate();
+    state.scenarioDataHealth = createDefaultScenarioDataHealth(scenarioDetailMinRatioStrict);
     state.scenarioViewMode = "ownership";
     state.countryNames = { ...countryNames };
     state.selectedWaterRegionId = "";

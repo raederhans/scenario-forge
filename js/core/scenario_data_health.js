@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { createDefaultScenarioDataHealth } from "./state/scenario_runtime_state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
@@ -53,14 +54,7 @@ function refreshScenarioDataHealth({
   minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT,
 } = {}) {
   if (!state.activeScenarioId || !state.activeScenarioManifest) {
-    state.scenarioDataHealth = {
-      expectedFeatureCount: 0,
-      runtimeFeatureCount: 0,
-      ratio: 1,
-      minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
-      warning: "",
-      severity: "",
-    };
+    state.scenarioDataHealth = createDefaultScenarioDataHealth(SCENARIO_DETAIL_MIN_RATIO_STRICT);
     return state.scenarioDataHealth;
   }
   const health = evaluateScenarioDataHealth(state.activeScenarioManifest, { minRatio });

@@ -13,6 +13,12 @@ import {
   state,
 } from "./state.js";
 import {
+  createDefaultOperationGraphicsEditorState,
+  createDefaultOperationalLineEditorState,
+  createDefaultSpecialZoneEditorState,
+  createDefaultUnitCounterEditorState,
+} from "./state/strategic_overlay_state.js";
+import {
   MODERN_CITY_LIGHTS_BASE_THRESHOLD,
   MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD,
   MODERN_CITY_LIGHTS_GRID,
@@ -17266,7 +17272,7 @@ function ensureSpecialZoneEditorState() {
     state.manualSpecialZones.features = [];
   }
   if (!state.specialZoneEditor || typeof state.specialZoneEditor !== "object") {
-    state.specialZoneEditor = {};
+    state.specialZoneEditor = createDefaultSpecialZoneEditorState();
   }
   if (!Array.isArray(state.specialZoneEditor.vertices)) {
     state.specialZoneEditor.vertices = [];
@@ -17484,21 +17490,7 @@ function updateStrategicOverlayUi() {
 
 function ensureOperationGraphicsEditorState() {
   if (!state.operationGraphicsEditor || typeof state.operationGraphicsEditor !== "object") {
-    state.operationGraphicsEditor = {
-      active: false,
-      mode: "idle",
-      collection: "operationGraphics",
-      points: [],
-      kind: DEFAULT_OPERATION_GRAPHIC_KIND,
-      label: "",
-      stylePreset: DEFAULT_OPERATION_GRAPHIC_KIND,
-      stroke: "",
-      width: 0,
-      opacity: 1,
-      selectedId: null,
-      selectedVertexIndex: -1,
-      counter: 1,
-    };
+    state.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();
   }
   if (typeof state.operationGraphicsEditor.mode !== "string") {
     state.operationGraphicsEditor.mode = state.operationGraphicsEditor.active ? "draw" : "idle";
@@ -17518,20 +17510,7 @@ function ensureOperationGraphicsEditorState() {
 
 function ensureOperationalLineEditorState() {
   if (!state.operationalLineEditor || typeof state.operationalLineEditor !== "object") {
-    state.operationalLineEditor = {
-      active: false,
-      mode: "idle",
-      points: [],
-      kind: DEFAULT_OPERATIONAL_LINE_KIND,
-      label: "",
-      stylePreset: DEFAULT_OPERATIONAL_LINE_KIND,
-      stroke: "",
-      width: 0,
-      opacity: 1,
-      selectedId: null,
-      selectedVertexIndex: -1,
-      counter: 1,
-    };
+    state.operationalLineEditor = createDefaultOperationalLineEditorState();
   }
   if (typeof state.operationalLineEditor.mode !== "string") {
     state.operationalLineEditor.mode = state.operationalLineEditor.active ? "draw" : "idle";
@@ -17623,32 +17602,12 @@ function assignUnitCounterEditorFromCounter(counter = null) {
 
 function ensureUnitCounterEditorState() {
   if (!state.unitCounterEditor || typeof state.unitCounterEditor !== "object") {
-    state.unitCounterEditor = {
-      active: false,
+    state.unitCounterEditor = createDefaultUnitCounterEditorState({
       renderer: DEFAULT_UNIT_COUNTER_RENDERER,
-      label: "",
-      sidc: "",
-      symbolCode: "",
-      nationTag: "",
-      nationSource: "display",
       presetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
-      iconId: "",
-      unitType: "",
-      echelon: "",
-      subLabel: "",
-      strengthText: "",
-      layoutAnchor: { kind: "feature", key: "", slotIndex: null },
-      attachment: null,
-      baseFillColor: "",
       organizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
       equipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-      statsPresetId: "regular",
-      statsSource: "preset",
-      size: "medium",
-      selectedId: null,
-      returnSelectionId: null,
-      counter: 1,
-    };
+    });
   }
   state.unitCounterEditor.sidc = String(
     state.unitCounterEditor.sidc

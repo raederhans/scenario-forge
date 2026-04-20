@@ -2,6 +2,11 @@ import { countryNames, defaultCountryPalette, state } from "./state.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
+import {
+  createDefaultActiveScenarioChunksState,
+  createDefaultScenarioHydrationHealthGate,
+  createDefaultRuntimeChunkLoadState,
+} from "./state/scenario_runtime_state.js";
 import { ensureScenarioAuditUiState, setScenarioAuditUiState } from "./scenario_ui_sync.js";
 import { scheduleScenarioChunkRefresh } from "./scenario_resources.js";
 
@@ -270,16 +275,8 @@ export function restoreScenarioApplyRollbackSnapshot(
   state.scenarioWaterOverlayVersionTag = String(snapshot.scenarioWaterOverlayVersionTag || "");
   state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
   state.scenarioRuntimeTopologyVersionTag = String(snapshot.scenarioRuntimeTopologyVersionTag || "");
-  state.scenarioHydrationHealthGate = cloneScenarioStateValue(snapshot.scenarioHydrationHealthGate) || {
-    status: "idle",
-    reason: "",
-    checkedAt: 0,
-    attemptedRetry: false,
-    ownerFeatureOverlapRatio: 1,
-    ownerFeatureOverlapCount: 0,
-    ownerFeatureRenderedCount: 0,
-    degradedWaterOverlay: false,
-  };
+  state.scenarioHydrationHealthGate =
+    cloneScenarioStateValue(snapshot.scenarioHydrationHealthGate) || createDefaultScenarioHydrationHealthGate();
   state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
   state.scenarioDistrictGroupsData = cloneScenarioStateValue(snapshot.scenarioDistrictGroupsData);
   state.scenarioDistrictGroupByFeatureId = cloneScenarioStateValue(snapshot.scenarioDistrictGroupByFeatureId) || new Map();
@@ -349,22 +346,10 @@ export function restoreScenarioApplyRollbackSnapshot(
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
   state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
   state.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
-  state.activeScenarioChunks = cloneScenarioStateValue(snapshot.activeScenarioChunks) || {
-    scenarioId: "",
-    loadedChunkIds: [],
-    payloadByChunkId: {},
-    mergedLayerPayloads: {},
-    lruChunkIds: [],
-  };
-  state.runtimeChunkLoadState = cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || {
-    shellStatus: "idle",
-    registryStatus: "idle",
-    refreshScheduled: false,
-    refreshTimerId: null,
-    inFlightByChunkId: {},
-    errorByChunkId: {},
-    lastSelection: null,
-  };
+  state.activeScenarioChunks =
+    cloneScenarioStateValue(snapshot.activeScenarioChunks) || createDefaultActiveScenarioChunksState();
+  state.runtimeChunkLoadState =
+    cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || createDefaultRuntimeChunkLoadState();
   state.renderProfile = String(snapshot.renderProfile || "auto");
   state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
   state.showCityPoints = snapshot.showCityPoints !== false;

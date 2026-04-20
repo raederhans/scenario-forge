@@ -1,9 +1,5 @@
-export function createDefaultRuntimeHooks() {
+function createDefaultUiRuntimeHooks() {
   return {
-    setStartupReadonlyStateFn: null,
-    ensureFullLocalizationDataReadyFn: null,
-    getViewportGeoBoundsFn: null,
-    scheduleScenarioChunkRefreshFn: null,
     updateRecentUI: null,
     updateHistoryUIFn: null,
     updateLegendUI: null,
@@ -33,6 +29,11 @@ export function createDefaultRuntimeHooks() {
     updateDockCollapsedUiFn: null,
     triggerScenarioGuideFn: null,
     syncDeveloperModeUiFn: null,
+  };
+}
+
+function createDefaultCommandRuntimeHooks() {
+  return {
     toggleLeftPanelFn: null,
     toggleRightPanelFn: null,
     toggleDockFn: null,
@@ -55,9 +56,23 @@ export function createDefaultRuntimeHooks() {
     runBrushModeToggleFn: null,
     runHistoryActionFn: null,
     persistViewSettingsFn: null,
+  };
+}
+
+function createDefaultDataRuntimeHooks() {
+  return {
+    setStartupReadonlyStateFn: null,
+    ensureFullLocalizationDataReadyFn: null,
+    getViewportGeoBoundsFn: null,
+    scheduleScenarioChunkRefreshFn: null,
     ensureBaseCityDataFn: null,
     ensureContextLayerDataFn: null,
     ensureDetailTopologyFn: null,
+  };
+}
+
+function createDefaultRenderRuntimeHooks() {
+  return {
     renderCountryListFn: null,
     refreshCountryListRowsFn: null,
     refreshCountryInspectorDetailFn: null,
@@ -71,5 +86,14 @@ export function createDefaultRuntimeHooks() {
     getStrategicOverlayPerfCountersFn: null,
     renderNowFn: null,
     showToastFn: null,
+  };
+}
+
+export function createDefaultRuntimeHooks() {
+  return {
+    ...createDefaultUiRuntimeHooks(),
+    ...createDefaultCommandRuntimeHooks(),
+    ...createDefaultDataRuntimeHooks(),
+    ...createDefaultRenderRuntimeHooks(),
   };
 }

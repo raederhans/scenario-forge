@@ -8,6 +8,10 @@ STATE_JS = REPO_ROOT / "js" / "core" / "state.js"
 STATE_DEFAULTS_JS = REPO_ROOT / "js" / "core" / "state_defaults.js"
 STATE_CATALOG_JS = REPO_ROOT / "js" / "core" / "state_catalog.js"
 RUNTIME_HOOKS_JS = REPO_ROOT / "js" / "core" / "runtime_hooks.js"
+STATE_HISTORY_JS = REPO_ROOT / "js" / "core" / "state" / "history_state.js"
+STATE_DEV_JS = REPO_ROOT / "js" / "core" / "state" / "dev_state.js"
+STATE_STRATEGIC_OVERLAY_JS = REPO_ROOT / "js" / "core" / "state" / "strategic_overlay_state.js"
+STATE_SCENARIO_RUNTIME_JS = REPO_ROOT / "js" / "core" / "state" / "scenario_runtime_state.js"
 
 
 class StateSplitBoundaryContractTest(unittest.TestCase):
@@ -17,6 +21,10 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('./state_defaults.js', content.replace('"', "'"))
         self.assertIn('./state_catalog.js', content.replace('"', "'"))
         self.assertIn('./runtime_hooks.js', content.replace('"', "'"))
+        self.assertIn('./state/history_state.js', content.replace('"', "'"))
+        self.assertIn('./state/dev_state.js', content.replace('"', "'"))
+        self.assertIn('./state/strategic_overlay_state.js', content.replace('"', "'"))
+        self.assertIn('./state/scenario_runtime_state.js', content.replace('"', "'"))
         self.assertIn('export const state = {', content)
 
     def test_state_defaults_owns_constants_and_normalizers(self):
@@ -74,6 +82,10 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         owner_content = RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
 
         self.assertIn("export function createDefaultRuntimeHooks()", owner_content)
+        self.assertIn("function createDefaultUiRuntimeHooks()", owner_content)
+        self.assertIn("function createDefaultCommandRuntimeHooks()", owner_content)
+        self.assertIn("function createDefaultDataRuntimeHooks()", owner_content)
+        self.assertIn("function createDefaultRenderRuntimeHooks()", owner_content)
         self.assertIn("setStartupReadonlyStateFn: null,", owner_content)
         self.assertIn("ensureFullLocalizationDataReadyFn: null,", owner_content)
         self.assertIn("updateScenarioUIFn: null,", owner_content)
@@ -84,6 +96,60 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("...createDefaultRuntimeHooks(),", donor_content)
         self.assertIsNone(re.search(r"updateScenarioUIFn:\s*null,", donor_content))
         self.assertIsNone(re.search(r"renderNowFn:\s*null,", donor_content))
+
+    def test_history_state_owner_holds_undo_redo_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_HISTORY_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultHistoryState()", owner_content)
+        self.assertIn("historyPast: [],", owner_content)
+        self.assertIn("historyFuture: [],", owner_content)
+        self.assertIn("historyMax: 80,", owner_content)
+        self.assertIn("...createDefaultHistoryState(),", donor_content)
+        self.assertIsNone(re.search(r"historyPast:\s*\[\],", donor_content))
+        self.assertIsNone(re.search(r"historyFuture:\s*\[\],", donor_content))
+
+    def test_dev_state_owner_holds_dev_workspace_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_DEV_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultDevState()", owner_content)
+        self.assertIn("devHoverHit: null,", owner_content)
+        self.assertIn("devScenarioEditor: {", owner_content)
+        self.assertIn("devScenarioTagCreator: {", owner_content)
+        self.assertIn("devScenarioCountryEditor: {", owner_content)
+        self.assertIn("devLocaleEditor: {", owner_content)
+        self.assertIn("devScenarioDistrictEditor: {", owner_content)
+        self.assertIn("...createDefaultDevState(),", donor_content)
+        self.assertIsNone(re.search(r"devHoverHit:\s*null,", donor_content))
+        self.assertIsNone(re.search(r"devScenarioEditor:\s*\{", donor_content))
+
+    def test_strategic_overlay_state_owner_holds_overlay_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_STRATEGIC_OVERLAY_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultSpecialZoneEditorState()", owner_content)
+        self.assertIn("export function createDefaultOperationGraphicsEditorState()", owner_content)
+        self.assertIn("export function createDefaultUnitCounterEditorState({", owner_content)
+        self.assertIn("export function createDefaultOperationalLineEditorState()", owner_content)
+        self.assertIn("export function createDefaultStrategicOverlayUiState()", owner_content)
+        self.assertIn("export function createDefaultStrategicOverlayState(options = {})", owner_content)
+        self.assertIn("...createDefaultStrategicOverlayState(),", donor_content)
+        self.assertIsNone(re.search(r"specialZoneEditor:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"unitCounterEditor:\s*\{", donor_content))
+
+    def test_scenario_runtime_state_owner_holds_scenario_runtime_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_SCENARIO_RUNTIME_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultActiveScenarioChunksState(scenarioId = \"\")", owner_content)
+        self.assertIn("export function createDefaultRuntimeChunkLoadState({ scenarioId = \"\" } = {})", owner_content)
+        self.assertIn("export function createDefaultScenarioDataHealth(minRatio = 0.7)", owner_content)
+        self.assertIn("export function createDefaultScenarioHydrationHealthGate()", owner_content)
+        self.assertIn("export function createDefaultScenarioRuntimeState({", owner_content)
+        self.assertIn("...createDefaultScenarioRuntimeState(),", donor_content)
+        self.assertIsNone(re.search(r"activeScenarioChunks:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"runtimeChunkLoadState:\s*\{", donor_content))
 
 
 if __name__ == "__main__":

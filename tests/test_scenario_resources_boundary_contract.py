@@ -6,6 +6,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_RESOURCES = REPO_ROOT / "js" / "core" / "scenario_resources.js"
 SCENARIO_BUNDLE_LOADER = REPO_ROOT / "js" / "core" / "scenario" / "bundle_loader.js"
+SCENARIO_BUNDLE_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "bundle_runtime.js"
 SCENARIO_CHUNK_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "chunk_runtime.js"
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
 SCENARIO_POST_APPLY_EFFECTS = REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
@@ -66,6 +67,8 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("const loadScenarioRegistry = createScenarioRegistryLoader({", content)
         self.assertIn("const loadScenarioAuditPayload = createScenarioAuditPayloadLoader({", content)
         self.assertIn("const validateImportedScenarioBaseline = createImportedScenarioBaselineValidator({", content)
+        self.assertIn("getLoadScenarioBundle: () => loadScenarioBundleForStartupHydration,", content)
+        self.assertIn("loadScenarioBundleForStartupHydration = loadScenarioBundle;", content)
 
     def test_renderable_runtime_topology_helper_has_single_owner(self):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
@@ -83,14 +86,20 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn('./state.js', bundle_loader_content)
         self.assertNotIn('./scenario_ui_sync.js', bundle_loader_content)
 
-    def test_load_scenario_bundle_keeps_facade_cache_and_startup_cache_writeback(self):
-        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+    def test_bundle_runtime_owner_holds_bundle_cache_and_startup_cache_writeback(self):
+        resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        runtime_content = SCENARIO_BUNDLE_RUNTIME.read_text(encoding="utf-8")
 
-        self.assertIn('state.scenarioBundleCacheById[targetId] = bundle', content)
-        self.assertIn('state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled"', content)
-        self.assertIn('state.startupBootCacheState.scenarioBootstrap = "written"', content)
-        self.assertIn('createSerializableStartupScenarioBootstrapCorePayload({', content)
-        self.assertIn('createSerializableStartupScenarioBootstrapLocalePayload({', content)
+        self.assertIn('./scenario/bundle_runtime.js', resources_content)
+        self.assertIn("createScenarioBundleRuntimeController({", resources_content)
+        self.assertIn("loadScenarioBundle,", resources_content)
+        self.assertIn('state.scenarioBundleCacheById[targetId] = bundle', runtime_content)
+        self.assertIn('state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled"', runtime_content)
+        self.assertIn('state.startupBootCacheState.scenarioBootstrap = "written"', runtime_content)
+        self.assertIn('createSerializableStartupScenarioBootstrapCorePayload({', runtime_content)
+        self.assertIn('createSerializableStartupScenarioBootstrapLocalePayload({', runtime_content)
+        self.assertNotIn('./scenario_resources.js', runtime_content)
+        self.assertNotIn('./scenario_manager.js', runtime_content)
 
     def test_external_callers_no_longer_pull_resource_api_from_scenario_manager(self):
         self.assertNotIn('./core/scenario_resources.js', MAIN_JS.read_text(encoding="utf-8"))
@@ -149,7 +158,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn('reason: "scenario-apply"', content)
 
     def test_full_bundle_prefers_runtime_topology_even_with_chunk_manifest(self):
-        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        content = SCENARIO_BUNDLE_RUNTIME.read_text(encoding="utf-8")
 
         self.assertNotIn("preferStartupTopologyForFullBundle", content)
         self.assertIn('manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""', content)
