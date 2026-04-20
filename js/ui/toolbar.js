@@ -43,6 +43,7 @@ import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
+import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
 import {
   applyDialogContract,
   createFocusReturnRegistry,
@@ -705,26 +706,15 @@ function initToolbar({ render } = {}) {
   if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
     state.ui.paletteLibrarySections = {};
   }
-  const getScenarioGuideSectionFromUrl = () => {
-    if (!globalThis.URLSearchParams || !globalThis.location) return "";
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
-    if (view !== "guide") return "";
-    const guideSectionValue = String(params.get(UI_URL_STATE_KEYS.guideSection) || "").trim().toLowerCase();
-    if (guideSectionValue) return guideSectionValue;
-    return String(params.get(UI_URL_STATE_KEYS.section) || "").trim().toLowerCase();
-  };
-  const syncScenarioGuideSectionUrlState = (section = "quick") => {
-    if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    const view = String(params.get(UI_URL_STATE_KEYS.view) || "").trim().toLowerCase();
-    if (view !== "guide") return;
-    params.set(UI_URL_STATE_KEYS.guideSection, String(section || "").trim().toLowerCase() || "quick");
-    params.delete(UI_URL_STATE_KEYS.section);
-    const nextQuery = params.toString();
-    const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
-    globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
-  };
+  const uiSurfaceUrlState = createUiSurfaceUrlState({
+    uiUrlStateKeys: UI_URL_STATE_KEYS,
+  });
+  const {
+    getScenarioGuideSectionFromUrl,
+    getSupportSurfaceViewFromUrl,
+    syncScenarioGuideSectionUrlState,
+    syncSupportSurfaceUrlState,
+  } = uiSurfaceUrlState;
 
   const scenarioGuidePopoverController = createScenarioGuidePopoverController({
     state,
@@ -903,7 +893,7 @@ function initToolbar({ render } = {}) {
 
   const workspaceChromeSupportSurfaceController = createWorkspaceChromeSupportSurfaceController({
     state,
-    uiUrlStateKeys: UI_URL_STATE_KEYS,
+    getSupportSurfaceViewFromUrl,
     scenarioGuideBtn,
     utilitiesGuideBtn,
     scenarioGuidePopover,
@@ -936,6 +926,7 @@ function initToolbar({ render } = {}) {
     focusOverlaySurface,
     getFocusableElements,
     ensureTransportWorkbenchUiState,
+    syncSupportSurfaceUrlState,
     ensureRightPanelVisible: () => state.toggleRightPanelFn?.(true),
     openExportWorkbench: (trigger = dockExportBtn) => state.openExportWorkbenchFn?.(trigger),
     closeExportWorkbench: ({ restoreFocus = true } = {}) => state.closeExportWorkbenchFn?.({ restoreFocus }),
@@ -946,7 +937,6 @@ function initToolbar({ render } = {}) {
     closeScenarioGuidePopover,
     openDockPopover,
     restoreSupportSurfaceFromUrl,
-    syncSupportSurfaceUrlState,
     toggleScenarioGuidePopover,
   } = workspaceChromeSupportSurfaceController;
   state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;

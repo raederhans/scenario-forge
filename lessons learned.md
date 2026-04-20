@@ -983,3 +983,19 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `deferred_detail_promotion.js` 最稳的切口，是把 detail topology load、readonly unlock 重试、idle promote 调度和内部句柄收成一个 owner。
 - 更稳的最短路径是：`main.js` 继续保留 `finalizeReadyState()`、boot shell 和 warmup/ready 编排，让 owner 专注处理 detail promotion transaction。
 
+### 126. state singleton 拆分时，优先下沉默认 state slice factory，再让 donor 保留单例壳
+- 这次 `state_catalog.js` 最稳的切口，是把 releasable catalog 和 scenario audit 的默认形状收成纯 factory，让 `state.js` 继续负责 singleton 和 compat re-export。
+- 更稳的最短路径是：owner 提供 `createDefault*` factory，`scenario_ui_sync.js` 和 `scenario_manager.js` 也复用同一份 factory，避免默认形状在多个文件里漂移。
+
+### 127. runtime hook 拆分时，要把“已声明的 hook”和“运行时动态挂上的 hook”一起显式化
+- 这次 `runtime_hooks.js` 最稳的切口，是把 `state.js` 里现有的 hook 槽位和 `toolbar.js` / `sidebar.js` / `dev_workspace.js` / `main.js` 运行时会挂上的 hook 一起收成默认 shape。
+- 更稳的最短路径是：owner 提供一份完整 hook surface，donor 继续保留 singleton；这样模块接线和 e2e 依赖的 state shape 都更稳定。
+
+### 128. URL 状态拆分时，query helper 下沉，restore 编排继续留在 support-surface controller
+- 这次 `ui_surface_url_state.js` 最稳的切口，是把 support surface 和 scenario guide 的 URL 读写 helper 收成 owner，让 `toolbar.js` 和 `workspace_chrome_support_surface_controller.js` 只消费同一套接口。
+- 更稳的最短路径是：owner 只处理 query 解析和回写，support surface 的打开关闭、focus return、overlay 协调继续留在 controller。
+
+### 129. donor import 面收窄后，旧边界测试要同步改成 owner 接线合同
+- 这次 `main.js` 把 `scenario_resources.js` 依赖下沉到 startup owner 后，旧测试还继续要求 donor 直接 import 资源模块，结果 review 阶段才暴露红灯。
+- 更稳的最短路径是：一旦 donor 只保留 facade、owner 接管真实依赖，就把边界测试同步改成“owner 持有 import、donor 不再直连”的合同。
+

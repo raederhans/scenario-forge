@@ -9,6 +9,8 @@ SCENARIO_CHUNK_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "chunk_runtime
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
 SCENARIO_POST_APPLY_EFFECTS = REPO_ROOT / "js" / "core" / "scenario_post_apply_effects.js"
 MAIN_JS = REPO_ROOT / "js" / "main.js"
+STARTUP_DATA_PIPELINE_JS = REPO_ROOT / "js" / "bootstrap" / "startup_data_pipeline.js"
+STARTUP_SCENARIO_BOOT_JS = REPO_ROOT / "js" / "bootstrap" / "startup_scenario_boot.js"
 I18N_JS = REPO_ROOT / "js" / "ui" / "i18n.js"
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
 TOOLBAR_JS = REPO_ROOT / "js" / "ui" / "toolbar.js"
@@ -83,7 +85,9 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn('createSerializableStartupScenarioBootstrapLocalePayload({', content)
 
     def test_external_callers_no_longer_pull_resource_api_from_scenario_manager(self):
-        self.assertIn('./core/scenario_resources.js', MAIN_JS.read_text(encoding="utf-8"))
+        self.assertNotIn('./core/scenario_resources.js', MAIN_JS.read_text(encoding="utf-8"))
+        self.assertIn('../core/scenario_resources.js', STARTUP_DATA_PIPELINE_JS.read_text(encoding="utf-8"))
+        self.assertIn('../core/scenario_resources.js', STARTUP_SCENARIO_BOOT_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', I18N_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', SIDEBAR_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', TOOLBAR_JS.read_text(encoding="utf-8"))

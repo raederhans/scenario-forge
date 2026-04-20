@@ -4,7 +4,7 @@
 
 export function createWorkspaceChromeSupportSurfaceController({
   state,
-  uiUrlStateKeys,
+  getSupportSurfaceViewFromUrl = () => "",
   scenarioGuideBtn = null,
   utilitiesGuideBtn = null,
   scenarioGuidePopover = null,
@@ -37,6 +37,7 @@ export function createWorkspaceChromeSupportSurfaceController({
   focusOverlaySurface,
   getFocusableElements,
   ensureTransportWorkbenchUiState = () => {},
+  syncSupportSurfaceUrlState = () => {},
   ensureRightPanelVisible = () => {},
   openExportWorkbench = () => {},
   closeExportWorkbench = () => {},
@@ -62,25 +63,6 @@ export function createWorkspaceChromeSupportSurfaceController({
     if (isFocusableGuideTriggerVisible(utilitiesGuideBtn)) return utilitiesGuideBtn;
     if (isFocusableGuideTriggerVisible(scenarioGuideBtn)) return scenarioGuideBtn;
     return preferredTrigger || utilitiesGuideBtn || scenarioGuideBtn || null;
-  };
-
-  const replaceUiUrlParams = (mutator) => {
-    if (!globalThis.URLSearchParams || !globalThis.history?.replaceState || !globalThis.location) return;
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    mutator?.(params);
-    const nextQuery = params.toString();
-    const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
-    globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
-  };
-
-  const syncSupportSurfaceUrlState = (view = "") => {
-    replaceUiUrlParams((params) => {
-      if (view) {
-        params.set(uiUrlStateKeys.view, view);
-      } else if (["guide", "reference", "export"].includes(String(params.get(uiUrlStateKeys.view) || ""))) {
-        params.delete(uiUrlStateKeys.view);
-      }
-    });
   };
 
   const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
@@ -184,9 +166,7 @@ export function createWorkspaceChromeSupportSurfaceController({
   };
 
   const restoreSupportSurfaceFromUrl = () => {
-    if (!globalThis.URLSearchParams || !globalThis.location) return;
-    const params = new globalThis.URLSearchParams(globalThis.location.search || "");
-    const view = String(params.get(uiUrlStateKeys.view) || "").trim().toLowerCase();
+    const view = String(getSupportSurfaceViewFromUrl?.() || "").trim().toLowerCase();
     if (!["guide", "reference", "export"].includes(view)) return;
     ensureTransportWorkbenchUiState?.();
     if (state.ui?.restoredSupportSurfaceViewFromUrl === view) {

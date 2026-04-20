@@ -1,4 +1,4 @@
-﻿import { countryNames, defaultCountryPalette, state } from "./state.js";
+import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, state } from "./state.js";
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
@@ -1255,11 +1255,7 @@ function clearActiveScenario(
   state.scenarioDistrictGroupByFeatureId = new Map();
   state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
   applyBlankScenarioPresentationDefaults();
-  state.scenarioReleasableIndex = {
-    byTag: {},
-    childTagsByParent: {},
-    consumedPresetNamesByParentLookup: {},
-  };
+  state.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();
   state.releasableCatalog = state.defaultReleasableCatalog || null;
   state.scenarioImportAudit = null;
   state.scenarioBaselineHash = "";
@@ -1380,3 +1376,4 @@ export {
   resetToScenarioBaseline,
   setScenarioViewMode,
 };
+

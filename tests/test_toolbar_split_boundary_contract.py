@@ -14,6 +14,7 @@ TRANSPORT_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "trans
 WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "workspace_chrome_support_surface_controller.js"
 APPEARANCE_CONTROLS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "appearance_controls_controller.js"
 OCEAN_LAKE_CONTROLS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "ocean_lake_controls_controller.js"
+UI_SURFACE_URL_STATE_JS = REPO_ROOT / "js" / "ui" / "ui_surface_url_state.js"
 FILE_MANAGER_JS = REPO_ROOT / "js" / "core" / "file_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
 
@@ -35,6 +36,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createTransportWorkbenchController", content)
         self.assertIn('./toolbar/workspace_chrome_support_surface_controller.js', content)
         self.assertIn("createWorkspaceChromeSupportSurfaceController", content)
+        self.assertIn('./ui_surface_url_state.js', content)
+        self.assertIn("createUiSurfaceUrlState", content)
         self.assertIn('./toolbar/appearance_controls_controller.js', content)
         self.assertIn("createAppearanceControlsController", content)
         self.assertIn('./toolbar/ocean_lake_controls_controller.js', content)
@@ -142,9 +145,17 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_scenario_guide_facade_and_url_restore_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
         support_owner = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
+        url_owner = UI_SURFACE_URL_STATE_JS.read_text(encoding="utf-8")
 
         self.assertIn("state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;", content)
+        self.assertIn("const uiSurfaceUrlState = createUiSurfaceUrlState({", content)
+        self.assertIn("getScenarioGuideSectionFromUrl,", content)
+        self.assertIn("syncScenarioGuideSectionUrlState,", content)
+        self.assertIn("getSupportSurfaceViewFromUrl,", content)
+        self.assertIn("syncSupportSurfaceUrlState,", content)
         self.assertIn('syncSupportSurfaceUrlState("guide")', support_owner)
+        self.assertIn("getScenarioGuideSectionFromUrl", url_owner)
+        self.assertIn("syncScenarioGuideSectionUrlState", url_owner)
         self.assertIn("bindScenarioGuideEvents({", content)
         self.assertIn("toggleScenarioGuidePopover(trigger);", content)
         self.assertIn('closeScenarioGuidePopover({ restoreFocus: true });', content)
@@ -352,14 +363,19 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_workspace_chrome_support_surface_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
         owner_content = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
+        url_owner = UI_SURFACE_URL_STATE_JS.read_text(encoding="utf-8")
 
         self.assertIn("export function createWorkspaceChromeSupportSurfaceController", owner_content)
-        self.assertIn("const syncSupportSurfaceUrlState = (view = \"\") => {", owner_content)
         self.assertIn("const restoreSupportSurfaceFromUrl = () => {", owner_content)
         self.assertIn("const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {", owner_content)
         self.assertIn("const openDockPopover = (kind) => {", owner_content)
         self.assertIn("const bindDockPopoverDismiss = () => {", owner_content)
-        self.assertNotIn("const syncSupportSurfaceUrlState = (view = \"\") => {", toolbar_content)
+        self.assertIn("export function createUiSurfaceUrlState({", url_owner)
+        self.assertIn("const syncSupportSurfaceUrlState = (view = \"\") => {", url_owner)
+        self.assertIn("const getSupportSurfaceViewFromUrl = () => {", url_owner)
+        self.assertNotIn("const syncSupportSurfaceUrlState = (view = \"\") => {", owner_content)
+        self.assertNotIn("const getScenarioGuideSectionFromUrl = () => {", toolbar_content)
+        self.assertNotIn("const syncScenarioGuideSectionUrlState = (section = \"quick\") => {", toolbar_content)
         self.assertNotIn("const restoreSupportSurfaceFromUrl = () => {", toolbar_content)
         self.assertNotIn("const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {", toolbar_content)
         self.assertNotIn("const openDockPopover = (kind) => {", toolbar_content)

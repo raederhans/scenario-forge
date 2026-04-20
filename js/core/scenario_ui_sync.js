@@ -1,13 +1,9 @@
-import { state } from "./state.js";
+import { createDefaultScenarioAuditUiState, state } from "./state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 
 export function ensureScenarioAuditUiState() {
   if (!state.scenarioAuditUi || typeof state.scenarioAuditUi !== "object") {
-    state.scenarioAuditUi = {
-      loading: false,
-      loadedForScenarioId: "",
-      errorMessage: "",
-    };
+    state.scenarioAuditUi = createDefaultScenarioAuditUiState();
   }
   if (typeof state.scenarioAuditUi.loading !== "boolean") {
     state.scenarioAuditUi.loading = false;

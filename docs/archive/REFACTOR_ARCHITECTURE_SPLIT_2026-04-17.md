@@ -6,9 +6,9 @@
 - 用渐进式拆分替代大爆炸重写
 
 ## 当前结论
-- 先恢复当前红测与首帧契约，再开始拆分
-- 主线顺序：scenario 边界 -> UI 控制器 -> map_renderer helper -> main/state 收口
-- 兼容策略：前两波保留 `map_renderer.js`、`scenario_resources.js`、`state.js` 的对外 export 形状，内部代码逐步下沉
+- 计划内拆分项已完成，当前进入最终 review 与收尾留档阶段
+- 实际落地顺序与原宗旨一致：scenario 边界 -> UI 控制器 -> map_renderer helper -> main/state 收口
+- donor 稳定 facade 仍保留在 `map_renderer.js`、`scenario_resources.js`、`state.js`，owner 逻辑已按波次下沉
 
 ## 实施计划与进度
 
@@ -40,14 +40,14 @@
 - [x] `dev_workspace.js` -> `scenario_text_editors_controller.js`
 - [x] `dev_workspace.js` -> `district_editor_controller.js`
 - [x] `dev_workspace.js` -> `dev_workspace_shell_builder.js`
-- [ ] 新建 `js/ui/ui_surface_url_state.js`（当前未落地；URL restore owner 继续留在 `js/ui/toolbar/workspace_chrome_support_surface_controller.js`）
+- [x] 新建 `js/ui/ui_surface_url_state.js`（URL query helper owner；support surface restore 编排继续留在 `js/ui/toolbar/workspace_chrome_support_surface_controller.js`）
 
 ### Wave 3: 渐进抽离 `map_renderer.js`
 - [x] 保持 `map_renderer.js` 为稳定 facade 与 render transaction owner
 - [x] 新建 `js/core/renderer/urban_city_policy.js`
 - [x] 新建 `js/core/renderer/strategic_overlay_helpers.js`
 - [x] 抽 strategic overlay draw helper：special zones / operational lines / operation graphics / unit counters
-- [ ] 保持 render kernel、scenario refresh、hit canvas、zoom/init/bindEvents、facility info card 原位
+- [x] 保持 render kernel、scenario refresh、hit canvas、zoom/init/bindEvents、facility info card 原位
 
 ### Wave 4: 收口入口与全局状态
 - [x] `main.js` -> `js/bootstrap/startup_bootstrap_support.js`（默认场景解析 / startup bundle URL / startup diagnostics helper owner）
@@ -56,8 +56,8 @@
 - [x] `main.js` -> `js/bootstrap/startup_scenario_boot.js`
 - [x] `main.js` -> `js/bootstrap/deferred_detail_promotion.js`
 - [x] `state.js` -> `js/core/state_defaults.js`（defaults / normalizer owner；`state.js` 保留 compat facade）
-- [ ] `state.js` -> `js/core/state_catalog.js`
-- [ ] 新建 `js/core/runtime_hooks.js`
+- [x] `state.js` -> `js/core/state_catalog.js`
+- [x] 新建 `js/core/runtime_hooks.js`
 
 ## 验证矩阵
 
@@ -80,6 +80,9 @@
 ## 当前状态
 - [x] 计划已留档
 - [x] 开始实施
+- [x] 计划内拆分项已完成
+- [ ] 最终 review 完成
+- [ ] 归档迁移完成
 
 ## w1 场景模块拆分后 helper 归属规则
 - `js/core/scenario/shared.js` 负责跨模块通用且与场景业务语义弱耦合的纯 helper（URL/cache-bust、id/language/core normalizer、timeout/resource loader、required/optional 校验）。
@@ -213,3 +216,20 @@
   - 新增 `tests/test_main_deferred_detail_promotion_boundary_contract.py`，并更新 `tests/test_main_bootstrap_split_boundary_contract.py`，继续钉住 deferred detail promotion owner / `main.js` ready-state facade 保留合同。
   - 已验证命令：`python -m unittest tests.test_main_bootstrap_split_boundary_contract tests.test_main_boot_overlay_split_boundary_contract tests.test_main_startup_data_pipeline_boundary_contract tests.test_main_startup_scenario_boot_boundary_contract tests.test_main_deferred_detail_promotion_boundary_contract tests.test_startup_shell tests.test_startup_bootstrap_assets -v`
   - `node --check` 已通过：`js/bootstrap/deferred_detail_promotion.js`、`js/main.js`
+  - Wave 4 已继续推进：新增 `js/core/state_catalog.js`，把 releasable catalog / scenario audit 相关默认 state slice 和纯 factory 从 `state.js` 收口成独立 owner。
+  - `state.js` 继续保留 singleton、本地初始化和 compat re-export；本轮只把 catalog 相关默认形状下沉到 owner。
+  - 新增 `tests/test_state_catalog_boundary_contract.py`，并更新 `tests/test_state_split_boundary_contract.py`，继续钉住 state catalog owner / `state.js` singleton facade、`scenario_ui_sync.js` 与 `scenario_manager.js` 的 factory 接线合同。
+  - 已验证命令：`python -m unittest tests.test_state_split_boundary_contract tests.test_state_catalog_boundary_contract tests.test_scenario_manager_boundary_contract -v`
+  - `node --check` 已通过：`js/core/state_catalog.js`、`js/core/state.js`、`js/core/scenario_ui_sync.js`、`js/core/scenario_manager.js`
+  - Wave 4 已继续推进：新增 `js/core/runtime_hooks.js`，把 UI / render / startup wiring 的 runtime hook 默认槽位从 `state.js` 收口成独立 owner。
+  - `state.js` 继续保留 singleton、本地初始化和 compat re-export；本轮只把 hook 默认槽位和缺失的显式 hook shape 下沉到 owner。
+  - 新增 `tests/test_runtime_hooks_boundary_contract.py`，并更新 `tests/test_state_split_boundary_contract.py`，继续钉住 runtime hooks owner / `state.js` singleton facade，以及 `main.js`、`toolbar.js`、`sidebar.js`、`dev_workspace.js` 的 hook 接线合同。
+  - 已验证命令：`python -m unittest tests.test_state_split_boundary_contract tests.test_state_catalog_boundary_contract tests.test_runtime_hooks_boundary_contract tests.test_scenario_manager_boundary_contract -v`
+  - `node --check` 已通过：`js/core/runtime_hooks.js`、`js/core/state.js`
+  - Wave 2 已补完 URL query helper owner：新增 `js/ui/ui_surface_url_state.js`，把 support surface / scenario guide 的 URL 读写 helper 从 `toolbar.js` 收口成独立 owner。
+  - `workspace_chrome_support_surface_controller.js` 继续保留 support surface restore 编排和 overlay 协调；本轮只把 URL query read/write helper 下沉到 owner。
+  - 已更新 `tests/test_toolbar_split_boundary_contract.py` 与 `tests/test_ui_rework_plan02_mainline_contract.py`，继续钉住 `ui_surface_url_state.js` owner、`toolbar.js` wiring、support surface controller restore 合同。
+  - 已验证命令：`python -m unittest tests.test_toolbar_split_boundary_contract tests.test_ui_rework_plan02_mainline_contract -v`
+  - `node --check` 已通过：`js/ui/ui_surface_url_state.js`、`js/ui/toolbar.js`、`js/ui/toolbar/workspace_chrome_support_surface_controller.js`
+  - 收尾审计已开始：Wave 0 ~ Wave 4 的计划内拆分项已全部落地，`map_renderer.js` donor 保留项也已按原计划显式确认。
+  - 当前进入最终 review 阶段，待 review 收口后再执行归档迁移。
