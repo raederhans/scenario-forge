@@ -233,3 +233,9 @@
   - `node --check` 已通过：`js/ui/ui_surface_url_state.js`、`js/ui/toolbar.js`、`js/ui/toolbar/workspace_chrome_support_surface_controller.js`
   - 收尾审计已开始：Wave 0 ~ Wave 4 的计划内拆分项已全部落地，`map_renderer.js` donor 保留项也已按原计划显式确认。
   - 当前进入最终 review 阶段，待 review 收口后再执行归档迁移。
+
+## map_renderer 拆分准则（2026-04-20 更新）
+- `js/core/map_renderer.js` 保留 render orchestration、状态交易、稳定 API facade 与 owner 装配。
+- 业务实现与算法细节优先下沉到对应 owner（urban / strategic / border / spatial 等）。
+- 对 owner 的单行 pass-through 优先采用模块级常量绑定或集中 facade 对象，减少 donor 侧重复样板函数。
+- 兼容层 facade 保留在主文件，并通过边界测试锁定保留项与 owner 责任边界。

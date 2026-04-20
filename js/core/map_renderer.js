@@ -7851,17 +7851,11 @@ function buildRuntimePoliticalMeta() {
   state.runtimePoliticalMetaSeed = null;
 }
 
-function resetSecondarySpatialIndexState() {
-  return getSpatialIndexRuntimeOwner().resetSecondarySpatialIndexState();
-}
+const resetSecondarySpatialIndexState = (...args) =>
+  getSpatialIndexRuntimeOwner().resetSecondarySpatialIndexState(...args);
 
-function buildSecondarySpatialIndexes({
-  allowComputeMissingBounds = true,
-} = {}) {
-  return getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes({
-    allowComputeMissingBounds,
-  });
-}
+const buildSecondarySpatialIndexes = (...args) =>
+  getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes(...args);
 
 function scheduleSecondarySpatialIndexBuild({
   timeout = 48,
@@ -7987,27 +7981,10 @@ function buildSpatialIndex({
   });
 }
 
-async function buildIndexChunked({
-  scheduleUiMode = "immediate",
-  keepReady = false,
-} = {}) {
-  return getSpatialIndexRuntimeOwner().buildIndexChunked({
-    scheduleUiMode,
-    keepReady,
-  });
-}
+const buildIndexChunked = (...args) => getSpatialIndexRuntimeOwner().buildIndexChunked(...args);
 
-async function buildSpatialIndexChunked({
-  includeSecondary = true,
-  allowComputeMissingBounds = true,
-  keepReady = false,
-} = {}) {
-  return getSpatialIndexRuntimeOwner().buildSpatialIndexChunked({
-    includeSecondary,
-    allowComputeMissingBounds,
-    keepReady,
-  });
-}
+const buildSpatialIndexChunked = (...args) =>
+  getSpatialIndexRuntimeOwner().buildSpatialIndexChunked(...args);
 
 async function buildHitCanvasAfterStartup({ keepReady = false } = {}) {
   setInteractionInfrastructureState("building-hit-canvas", {
@@ -8194,41 +8171,18 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function drawMeshCollection(meshCollection, strokeStyle, lineWidth, options = {}) {
-  return getBorderDrawOwner().drawMeshCollection(meshCollection, strokeStyle, lineWidth, options);
-}
+const drawMeshCollection = (...args) => getBorderDrawOwner().drawMeshCollection(...args);
 
-function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {
-  return getBorderDrawOwner().declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg);
-}
+const declutterProjectedPolyline = (...args) => getBorderDrawOwner().declutterProjectedPolyline(...args);
 
-function getProjectedPolylineMetrics(line) {
-  return getBorderDrawOwner().getProjectedPolylineMetrics(line);
-}
+const getProjectedPolylineMetrics = (...args) => getBorderDrawOwner().getProjectedPolylineMetrics(...args);
 
-function buildRenderableBoundaryMesh(mesh, {
-  simplifyDistancePx = 0,
-  minLengthPx = 0,
-  minSpanPx = 0,
-  minAreaPx = 0,
-  angleThresholdDeg = COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG,
-} = {}) {
-  return getBorderDrawOwner().buildRenderableBoundaryMesh(mesh, {
-    simplifyDistancePx,
-    minLengthPx,
-    minSpanPx,
-    minAreaPx,
-    angleThresholdDeg,
-  });
-}
+const buildRenderableBoundaryMesh = (...args) => getBorderDrawOwner().buildRenderableBoundaryMesh(...args);
 
-function getViewportAwareCoastlineCollection(collection, k) {
-  return getBorderDrawOwner().getViewportAwareCoastlineCollection(collection, k);
-}
+const getViewportAwareCoastlineCollection = (...args) =>
+  getBorderDrawOwner().getViewportAwareCoastlineCollection(...args);
 
-function getBoundaryMeshTransform(kind, k) {
-  return getBorderDrawOwner().getBoundaryMeshTransform(kind, k);
-}
+const getBoundaryMeshTransform = (...args) => getBorderDrawOwner().getBoundaryMeshTransform(...args);
 
 function getProjectedLineDensityStats(line) {
   const sanitized = sanitizePolyline(line);
@@ -10629,13 +10583,9 @@ function getUrbanFeatureStableId(feature) {
   return String(props.ID ?? "").trim();
 }
 
-function getUrbanFeatureIndex() {
-  return getUrbanCityPolicyOwner().getUrbanFeatureIndex();
-}
+const getUrbanFeatureIndex = (...args) => getUrbanCityPolicyOwner().getUrbanFeatureIndex(...args);
 
-function getCityUrbanRuntimeInfo(feature, urbanIndex = getUrbanFeatureIndex()) {
-  return getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex);
-}
+const getCityUrbanRuntimeInfo = (...args) => getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(...args);
 
 function getCityRadiusMultiplier(feature) {
   switch (getCityTier(feature)) {
@@ -11412,21 +11362,14 @@ function getCityMarkerSprite(entry, config = {}) {
   return sprite;
 }
 
-function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
-  return getUrbanCityPolicyOwner().buildCityRevealPlan(cityCollection, scale, transform, config);
-}
+const buildCityRevealPlan = (...args) => getUrbanCityPolicyOwner().buildCityRevealPlan(...args);
 
-function getCityScenarioTag(feature) {
-  return getUrbanCityPolicyOwner().getCityScenarioTag(feature);
-}
+const getCityScenarioTag = (...args) => getUrbanCityPolicyOwner().getCityScenarioTag(...args);
 
-function doesScenarioCountryHideCityPoints(tag) {
-  return getUrbanCityPolicyOwner().doesScenarioCountryHideCityPoints(tag);
-}
+const doesScenarioCountryHideCityPoints = (...args) =>
+  getUrbanCityPolicyOwner().doesScenarioCountryHideCityPoints(...args);
 
-function getEffectiveCityCollection() {
-  return getUrbanCityPolicyOwner().getEffectiveCityCollection();
-}
+const getEffectiveCityCollection = (...args) => getUrbanCityPolicyOwner().getEffectiveCityCollection(...args);
 
 function getCityAnchor(feature) {
   if (!feature || !projection) return null;
@@ -18637,13 +18580,11 @@ function getOperationGraphicLabelAnchor(projectedPoints = [], { closed = false }
   return [anchorX - (dy / length) * 9, anchorY + (dx / length) * 9];
 }
 
-function renderOperationalLinesOverlay() {
-  return getStrategicOverlayHelpersOwner().renderOperationalLinesOverlay();
-}
+const renderOperationalLinesOverlay = (...args) =>
+  getStrategicOverlayHelpersOwner().renderOperationalLinesOverlay(...args);
 
-function renderOperationGraphicsOverlay() {
-  return getStrategicOverlayHelpersOwner().renderOperationGraphicsOverlay();
-}
+const renderOperationGraphicsOverlay = (...args) =>
+  getStrategicOverlayHelpersOwner().renderOperationGraphicsOverlay(...args);
 
 function getUnitCounterNationMeta(tag) {
   const normalizedTag = canonicalCountryCode(tag);
@@ -18893,9 +18834,8 @@ function getUnitCounterNodeTransform(entry) {
   return `translate(${projected[0]},${projected[1]}) scale(${localScale}) translate(${slotOffset[0]},${slotOffset[1]})`;
 }
 
-function syncUnitCounterScalesDuringZoom() {
-  return getStrategicOverlayHelpersOwner().syncUnitCounterScalesDuringZoom();
-}
+const syncUnitCounterScalesDuringZoom = (...args) =>
+  getStrategicOverlayHelpersOwner().syncUnitCounterScalesDuringZoom(...args);
 
 function renderUnitCountersOverlay() {
   getStrategicOverlayHelpersOwner().renderUnitCountersOverlay();
@@ -19082,9 +19022,7 @@ function renderInspectorHighlightOverlay() {
     .attr("aria-label", data.length ? `Inspector highlight overlay for ${code}` : "Inspector highlight overlay");
 }
 
-function renderSpecialZones() {
-  return getStrategicOverlayHelpersOwner().renderSpecialZones();
-}
+const renderSpecialZones = (...args) => getStrategicOverlayHelpersOwner().renderSpecialZones(...args);
 
 export function renderLegend(uniqueColors = null, labels = null) {
   if (!legendGroup || !legendItemsGroup || !legendBackground) return;
