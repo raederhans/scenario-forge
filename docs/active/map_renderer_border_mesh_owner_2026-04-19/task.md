@@ -3,6 +3,16 @@
 - [x] 新建 border mesh owner 文件
 - [x] donor wrapper 收口
 - [x] dynamic/opening owner border transaction 下沉
+- [x] 新建 border draw owner 文件
+- [x] border draw helper 下沉
+- [x] drawHierarchicalBorders 主体下沉
+- [x] 新建 interaction border snapshot owner 文件
+- [x] interaction border snapshot 逻辑下沉
+- [x] orchestration contract test
+- [x] 新建 spatial index runtime owner 文件
+- [x] spatial/index runtime 6 函数下沉
+- [x] spatial runtime orchestration contract test
 - [x] 边界测试
 - [x] 最小验证
 - [x] review 自检
+- [x] 全面审计与停止条件判定

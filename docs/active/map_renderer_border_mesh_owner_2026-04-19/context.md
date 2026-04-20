@@ -1,7 +1,11 @@
 # context
-- 2026-04-19：继续 map renderer 拆分。
-- `border_mesh_owner.js` 现在已继续接管 dynamic/opening owner border transaction。
-- `map_renderer.js` 保留 `recomputeDynamicBordersNow()`、`scheduleDynamicBorderRecompute()`、`drawBordersPass()`、`drawHierarchicalBorders()` 和 render/timer facade。
-- 已更新 `tests/test_map_renderer_border_mesh_owner_boundary_contract.py`。
-- 已完成最小验证：`node --check` 通过，23 条 targeted unittest 通过，LSP diagnostics 为 0。
-- 子代理静态复核结论：当前最稳的边界是 owner 负责 mesh materialize/cache，donor 继续保留 timer/render facade；下一刀适合 `border_draw_owner`。
+- 2026-04-19：完成 map renderer 最后一刀高收益拆分。
+- 已新增 `js/core/renderer/spatial_index_runtime_owner.js`。
+- 下沉函数：`buildIndex()`、`resetSecondarySpatialIndexState()`、`buildSecondarySpatialIndexes()`、`buildSpatialIndex()`、`buildIndexChunked()`、`buildSpatialIndexChunked()`。
+- `rebuildRuntimeDerivedState()` 继续留在 `map_renderer.js`，保持 runtime transaction owner 边界。
+- 已修正 owner 漂移：special region spatial bounds 继续使用 `getProjectedFeatureBounds(feature, { featureId, allowCompute })` 合同。
+- 已新增 `tests/test_map_renderer_spatial_index_runtime_owner_boundary_contract.py`。
+- 已新增 `tests/test_map_renderer_spatial_index_runtime_orchestration_contract.py`，钉住 basic startup 顺序和 chunk promotion infra 顺序。
+- 已完成最小验证：`node --check` 通过，32 条 targeted unittest 通过，LSP diagnostics 为 0。
+- 当前 `js/core/map_renderer.js` 已降到 21425 行 / 848946 字节。
+- 明确结论：高收益拆分已完成，当前进入收尾阶段最稳。

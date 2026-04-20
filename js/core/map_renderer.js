@@ -69,6 +69,9 @@ import { createContextLayerResolverOwner } from "./renderer/context_layer_resolv
 import { createRendererAssetUrlPolicyOwner } from "./renderer/asset_url_policy.js";
 import { createFacilitySurfaceOwner } from "./renderer/facility_surface.js";
 import { createBorderMeshOwner } from "./renderer/border_mesh_owner.js";
+import { createBorderDrawOwner } from "./renderer/border_draw_owner.js";
+import { createInteractionBorderSnapshotOwner } from "./renderer/interaction_border_snapshot_owner.js";
+import { createSpatialIndexRuntimeOwner } from "./renderer/spatial_index_runtime_owner.js";
 
 const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
 const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
@@ -811,6 +814,9 @@ let contextLayerResolverOwner = null;
 let rendererAssetUrlPolicyOwner = null;
 let facilitySurfaceOwner = null;
 let borderMeshOwner = null;
+let borderDrawOwner = null;
+let interactionBorderSnapshotOwner = null;
+let spatialIndexRuntimeOwner = null;
 
 function getStrategicOverlayHelpersOwner() {
   if (strategicOverlayHelpersOwner) {
@@ -1028,6 +1034,143 @@ function getBorderMeshOwner() {
     },
   });
   return borderMeshOwner;
+}
+
+function getBorderDrawOwner() {
+  if (borderDrawOwner) {
+    return borderDrawOwner;
+  }
+  borderDrawOwner = createBorderDrawOwner({
+    state,
+    constants: {
+      boundaryDefaultLineCap: BOUNDARY_DEFAULT_LINE_CAP,
+      boundaryDefaultLineJoin: BOUNDARY_DEFAULT_LINE_JOIN,
+      boundaryDefaultMiterLimit: BOUNDARY_DEFAULT_MITER_LIMIT,
+      coastlineLodLowZoomMax: COASTLINE_LOD_LOW_ZOOM_MAX,
+      coastlineLodMidZoomMax: COASTLINE_LOD_MID_ZOOM_MAX,
+      coastlineViewSimplifyCollinearAngleDeg: COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG,
+      coastlineViewSimplifyLowMinDistancePx: COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX,
+      coastlineViewSimplifyMidMinDistancePx: COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX,
+      detailAdmBorderAlphaScale: DETAIL_ADM_BORDER_ALPHA_SCALE,
+      detailAdmBorderColor: DETAIL_ADM_BORDER_COLOR,
+      detailAdmBorderMinWidth: DETAIL_ADM_BORDER_MIN_WIDTH,
+      detailAdmBorderTargetMaxAlpha: DETAIL_ADM_BORDER_TARGET_MAX_ALPHA,
+      detailAdmBorderTargetMinAlpha: DETAIL_ADM_BORDER_TARGET_MIN_ALPHA,
+      detailAdmBorderWidthScale: DETAIL_ADM_BORDER_WIDTH_SCALE,
+      detailAdmBordersMinZoom: DETAIL_ADM_BORDERS_MIN_ZOOM,
+      internalBorderLocalAlphaScale: INTERNAL_BORDER_LOCAL_ALPHA_SCALE,
+      internalBorderLocalMinAlpha: INTERNAL_BORDER_LOCAL_MIN_ALPHA,
+      internalBorderLocalMinWidth: INTERNAL_BORDER_LOCAL_MIN_WIDTH,
+      internalBorderLocalWidthScale: INTERNAL_BORDER_LOCAL_WIDTH_SCALE,
+      internalBorderProvinceMinAlpha: INTERNAL_BORDER_PROVINCE_MIN_ALPHA,
+      internalBorderProvinceMinWidth: INTERNAL_BORDER_PROVINCE_MIN_WIDTH,
+      localBordersMinZoom: LOCAL_BORDERS_MIN_ZOOM,
+      provinceBordersFadeStartZoom: PROVINCE_BORDERS_FADE_START_ZOOM,
+      provinceBordersFarAlpha: PROVINCE_BORDERS_FAR_ALPHA,
+      provinceBordersFarWidthMaxZoom: PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM,
+      provinceBordersFarWidthScale: PROVINCE_BORDERS_FAR_WIDTH_SCALE,
+      provinceBordersNearAlphaScale: PROVINCE_BORDERS_NEAR_ALPHA_SCALE,
+      provinceBordersNearWidthScale: PROVINCE_BORDERS_NEAR_WIDTH_SCALE,
+      provinceBordersNearZoomStart: PROVINCE_BORDERS_NEAR_ZOOM_START,
+      provinceBordersTransitionAlpha: PROVINCE_BORDERS_TRANSITION_ALPHA,
+      provinceBordersTransitionEndZoom: PROVINCE_BORDERS_TRANSITION_END_ZOOM,
+    },
+    getters: {
+      getContext: () => context,
+      getPathCanvas: () => pathCanvas,
+      getProjection: () => projection,
+      getDetailAdmMeshBuildState: () => detailAdmMeshBuildState,
+      getScenarioOwnerOnlyCanonicalFallbackWarnings: () => scenarioOwnerOnlyCanonicalFallbackWarnings,
+      getVisibleInternalBorderMeshSignature: () => visibleInternalBorderMeshSignature,
+    },
+    helpers: {
+      buildCountryParentBorderMeshes,
+      buildDetailAdmMeshSignature,
+      clamp,
+      drawTnoCoastalAccentLayer,
+      getCoastlineCollectionForZoom,
+      getInternalBorderStrokeColor,
+      getSafeCanvasColor,
+      getVisibleCountryCodesForBorderMeshes,
+      isUsableMesh,
+      isDynamicBordersEnabled,
+      sanitizePolyline,
+      scheduleDeferredHeavyBorderMeshes,
+      setDetailAdmMeshBuildState: (nextState) => {
+        detailAdmMeshBuildState = nextState;
+      },
+      setVisibleInternalBorderMeshSignature: (signature) => {
+        visibleInternalBorderMeshSignature = signature;
+      },
+      syncStaticMeshSnapshot,
+    },
+  });
+  return borderDrawOwner;
+}
+
+function getInteractionBorderSnapshotOwner() {
+  if (interactionBorderSnapshotOwner) {
+    return interactionBorderSnapshotOwner;
+  }
+  interactionBorderSnapshotOwner = createInteractionBorderSnapshotOwner({
+    state,
+    constants: {
+      renderPassOverscanRatioPerSide: RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
+    },
+    getters: {
+      getContext: () => context,
+      getRenderPassCacheState,
+    },
+    helpers: {
+      cloneZoomTransform,
+      drawBordersPass,
+      incrementPerfCounter,
+      invalidateInteractionBorderSnapshotFacade: (reason) => invalidateInteractionBorderSnapshot(reason),
+      nowMs,
+      prepareTargetContext,
+      recordRenderPerfMetric,
+      withRenderTarget,
+    },
+  });
+  return interactionBorderSnapshotOwner;
+}
+
+function getSpatialIndexRuntimeOwner() {
+  if (spatialIndexRuntimeOwner) {
+    return spatialIndexRuntimeOwner;
+  }
+  spatialIndexRuntimeOwner = createSpatialIndexRuntimeOwner({
+    state,
+    constants: {
+      chunkedIndexBuildSliceSize: CHUNKED_INDEX_BUILD_SLICE_SIZE,
+      chunkedSpatialBuildSliceSize: CHUNKED_SPATIAL_BUILD_SLICE_SIZE,
+    },
+    getters: {
+      getPathSvg: () => pathSVG,
+    },
+    helpers: {
+      rebuildAuxiliaryRegionIndexes,
+      getLogicalCanvasDimensions,
+      computeProjectedFeatureBounds,
+      getProjectedFeatureBounds,
+      shouldSkipFeature,
+      queueIndexUiRefresh,
+      finalizeIndexBuildEffects,
+      getFeatureId,
+      getFeatureCountryCodeNormalized,
+      shouldExcludePoliticalInteractionFeature,
+      buildSpatialGrid,
+      nowMs,
+      recordRenderPerfMetric,
+      setInteractionInfrastructureState,
+      yieldToMain,
+      getEffectiveWaterRegionFeatures,
+      getEffectiveSpecialRegionFeatures,
+      collectFeatureHitGeometries,
+      computeProjectedGeoBounds,
+    },
+  });
+  return spatialIndexRuntimeOwner;
 }
 const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
@@ -1620,43 +1763,15 @@ function drawLastGoodFrameFallback(currentTransform = state.zoomTransform || glo
 }
 
 function buildInteractionBorderSnapshotLayout() {
-  const dpr = Math.max(state.dpr || 1, 1);
-  const logicalWidth = Math.max(1, Number(state.width || 1));
-  const logicalHeight = Math.max(1, Number(state.height || 1));
-  const offsetX = Math.ceil(logicalWidth * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE);
-  const offsetY = Math.ceil(logicalHeight * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE);
-  const paddedWidth = logicalWidth + offsetX * 2;
-  const paddedHeight = logicalHeight + offsetY * 2;
-  return {
-    offsetX,
-    offsetY,
-    logicalWidth,
-    logicalHeight,
-    paddedWidth,
-    paddedHeight,
-    pixelWidth: Math.max(1, Math.floor(paddedWidth * dpr)),
-    pixelHeight: Math.max(1, Math.floor(paddedHeight * dpr)),
-    dpr,
-  };
+  return getInteractionBorderSnapshotOwner().buildInteractionBorderSnapshotLayout();
 }
 
 function getInteractionBorderSnapshotState() {
-  const cache = getRenderPassCacheState();
-  return cache.borderSnapshot;
+  return getInteractionBorderSnapshotOwner().getInteractionBorderSnapshotState();
 }
 
 function ensureInteractionBorderSnapshotCanvas() {
-  const snapshot = getInteractionBorderSnapshotState();
-  if (!snapshot.canvas) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    snapshot.canvas = canvas;
-  }
-  snapshot.layout = buildInteractionBorderSnapshotLayout();
-  if (snapshot.canvas.width !== snapshot.layout.pixelWidth) snapshot.canvas.width = snapshot.layout.pixelWidth;
-  if (snapshot.canvas.height !== snapshot.layout.pixelHeight) snapshot.canvas.height = snapshot.layout.pixelHeight;
-  return snapshot.canvas;
+  return getInteractionBorderSnapshotOwner().ensureInteractionBorderSnapshotCanvas();
 }
 
 function getPoliticalPassStaticSignature(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
@@ -1957,70 +2072,15 @@ function schedulePoliticalPathWarmup(transform = state.zoomTransform || globalTh
 }
 
 function invalidateInteractionBorderSnapshot(reason = "unspecified") {
-  const snapshot = getInteractionBorderSnapshotState();
-  snapshot.valid = false;
-  snapshot.reason = String(reason || "unspecified");
-  snapshot.referenceTransform = null;
+  return getInteractionBorderSnapshotOwner().invalidateInteractionBorderSnapshot(reason);
 }
 
 function captureInteractionBorderSnapshot(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
-  if (!state.landData?.features?.length) {
-    invalidateInteractionBorderSnapshot("empty-land-data");
-    return false;
-  }
-  const canvas = ensureInteractionBorderSnapshotCanvas();
-  const snapshot = getInteractionBorderSnapshotState();
-  const targetContext = canvas?.getContext?.("2d");
-  if (!targetContext) {
-    invalidateInteractionBorderSnapshot("missing-context");
-    return false;
-  }
-  const referenceTransform = cloneZoomTransform(transform);
-  const startedAt = nowMs();
-  const k = prepareTargetContext(targetContext, referenceTransform, snapshot.layout);
-  withRenderTarget(targetContext, () => {
-    drawBordersPass(k, { interactive: true });
-  });
-  snapshot.referenceTransform = referenceTransform;
-  snapshot.valid = true;
-  snapshot.reason = "captured";
-  incrementPerfCounter("borderSnapshotRenders");
-  recordRenderPerfMetric("interactionBorderSnapshotBuild", nowMs() - startedAt, {
-    activeScenarioId: String(state.activeScenarioId || ""),
-    transformK: Number(referenceTransform.k || 1),
-  });
-  return true;
+  return getInteractionBorderSnapshotOwner().captureInteractionBorderSnapshot(transform);
 }
 
 function drawInteractionBorderSnapshot(currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity) {
-  const snapshot = getInteractionBorderSnapshotState();
-  if (!snapshot.valid || !snapshot.canvas || !snapshot.referenceTransform || !snapshot.layout) {
-    return false;
-  }
-  const expectedLayout = buildInteractionBorderSnapshotLayout();
-  if (
-    snapshot.canvas.width !== expectedLayout.pixelWidth
-    || snapshot.canvas.height !== expectedLayout.pixelHeight
-  ) {
-    invalidateInteractionBorderSnapshot("layout-mismatch");
-    return false;
-  }
-  const current = cloneZoomTransform(currentTransform);
-  const reference = cloneZoomTransform(snapshot.referenceTransform);
-  const scaleRatio = current.k / Math.max(reference.k, 0.0001);
-  const dx = current.x - (reference.x * scaleRatio);
-  const dy = current.y - (reference.y * scaleRatio);
-  context.save();
-  context.setTransform(1, 0, 0, 1, 0, 0);
-  context.translate(
-    (dx - Number(snapshot.layout.offsetX || 0) * scaleRatio) * state.dpr,
-    (dy - Number(snapshot.layout.offsetY || 0) * scaleRatio) * state.dpr,
-  );
-  context.scale(scaleRatio, scaleRatio);
-  context.drawImage(snapshot.canvas, 0, 0);
-  context.restore();
-  incrementPerfCounter("borderSnapshotReuses");
-  return true;
+  return getInteractionBorderSnapshotOwner().drawInteractionBorderSnapshot(currentTransform);
 }
 
 function getScenarioRuntimeTopologySignatureToken() {
@@ -7738,40 +7798,7 @@ function finalizeIndexBuildEffects() {
 }
 
 function buildIndex({ scheduleUiMode = "immediate" } = {}) {
-  state.landIndex.clear();
-  state.countryToFeatureIds.clear();
-  state.idToKey.clear();
-  state.keyToId.clear();
-  rebuildAuxiliaryRegionIndexes();
-
-  if (!state.landData || !state.landData.features) {
-    queueIndexUiRefresh({
-      renderWaterRegionList: true,
-      renderSpecialRegionList: true,
-    }, scheduleUiMode);
-    return;
-  }
-  state.landData.features.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `feature-${index}`;
-    state.landIndex.set(id, feature);
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (countryCode) {
-      const ids = state.countryToFeatureIds.get(countryCode) || [];
-      ids.push(id);
-      state.countryToFeatureIds.set(countryCode, ids);
-    }
-    const key = index + 1;
-    state.idToKey.set(id, key);
-    state.keyToId.set(key, id);
-  });
-
-  queueIndexUiRefresh({
-    renderCountryList: true,
-    renderWaterRegionList: true,
-    renderSpecialRegionList: true,
-  }, scheduleUiMode);
-  finalizeIndexBuildEffects();
+  return getSpatialIndexRuntimeOwner().buildIndex({ scheduleUiMode });
 }
 
 function adoptRuntimePoliticalMeta(payload) {
@@ -7832,82 +7859,14 @@ function buildRuntimePoliticalMeta() {
 }
 
 function resetSecondarySpatialIndexState() {
-  state.waterSpatialItems = [];
-  state.waterSpatialIndex = null;
-  state.waterSpatialGrid = new Map();
-  state.waterSpatialGridMeta = null;
-  state.waterSpatialItemsById = new Map();
-  state.specialSpatialItems = [];
-  state.specialSpatialIndex = null;
-  state.specialSpatialGrid = new Map();
-  state.specialSpatialGridMeta = null;
-  state.specialSpatialItemsById = new Map();
+  return getSpatialIndexRuntimeOwner().resetSecondarySpatialIndexState();
 }
 
 function buildSecondarySpatialIndexes({
   allowComputeMissingBounds = true,
 } = {}) {
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  const buildSecondarySpatialGrid = (items, assign) => {
-    const previousGrid = state.spatialGrid;
-    const previousMeta = state.spatialGridMeta;
-    const previousItemsById = state.spatialItemsById;
-    buildSpatialGrid(items, canvasWidth, canvasHeight);
-    assign();
-    state.spatialGrid = previousGrid;
-    state.spatialGridMeta = previousMeta;
-    state.spatialItemsById = previousItemsById;
-  };
-
-  getEffectiveWaterRegionFeatures().forEach((feature) => {
-    const id = getFeatureId(feature);
-    if (!id) return;
-    const hitGeometries = collectFeatureHitGeometries(feature);
-    hitGeometries.forEach((hitGeometry, partIndex) => {
-      const bounds = computeProjectedGeoBounds(hitGeometry);
-      if (!bounds) return;
-      state.waterSpatialItems.push({
-        id: `${id}::part:${partIndex}`,
-        featureId: id,
-        feature,
-        hitGeometry,
-        countryCode: "",
-        source: String(feature?.properties?.__source || "primary"),
-        minX: bounds.minX,
-        minY: bounds.minY,
-        maxX: bounds.maxX,
-        maxY: bounds.maxY,
-        bboxArea: bounds.area,
-      });
-    });
-  });
-  buildSecondarySpatialGrid(state.waterSpatialItems, () => {
-    state.waterSpatialGrid = state.spatialGrid;
-    state.waterSpatialGridMeta = state.spatialGridMeta;
-    state.waterSpatialItemsById = state.spatialItemsById;
-  });
-
-  getEffectiveSpecialRegionFeatures().forEach((feature) => {
-    const id = getFeatureId(feature);
-    if (!id) return;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
-    if (!bounds) return;
-    state.specialSpatialItems.push({
-      id,
-      feature,
-      countryCode: "",
-      source: String(feature?.properties?.__source || "scenario"),
-      minX: bounds.minX,
-      minY: bounds.minY,
-      maxX: bounds.maxX,
-      maxY: bounds.maxY,
-      bboxArea: bounds.area,
-    });
-  });
-  buildSecondarySpatialGrid(state.specialSpatialItems, () => {
-    state.specialSpatialGrid = state.spatialGrid;
-    state.specialSpatialGridMeta = state.spatialGridMeta;
-    state.specialSpatialItemsById = state.spatialItemsById;
+  return getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes({
+    allowComputeMissingBounds,
   });
 }
 
@@ -8029,61 +7988,9 @@ function buildSpatialIndex({
   includeSecondary = true,
   allowComputeMissingBounds = true,
 } = {}) {
-  const startedAt = nowMs();
-  state.spatialItems = [];
-  state.spatialIndex = null;
-  state.spatialGrid = new Map();
-  state.spatialGridMeta = null;
-  state.spatialItemsById = new Map();
-  resetSecondarySpatialIndexState();
-  if (!state.landData || !state.landData.features || !pathSVG) {
-    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-      landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-      spatialItems: 0,
-      waterItems: 0,
-      specialItems: 0,
-      skipped: true,
-    });
-    return;
-  }
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-
-  for (const [drawOrder, feature] of state.landData.features.entries()) {
-    const id = getFeatureId(feature);
-    if (!id) continue;
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
-    if (!bounds) continue;
-
-    state.spatialItems.push({
-      id,
-      drawOrder,
-      feature,
-      countryCode: getFeatureCountryCodeNormalized(feature),
-      source: String(feature?.properties?.__source || "primary"),
-      minX: bounds.minX,
-      minY: bounds.minY,
-      maxX: bounds.maxX,
-      maxY: bounds.maxY,
-      bboxArea: bounds.area,
-    });
-  }
-
-  buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
-  state.spatialIndex = null;
-  if (includeSecondary) {
-    buildSecondarySpatialIndexes({
-      allowComputeMissingBounds,
-    });
-  }
-  state.hitCanvasDirty = true;
-  recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-    landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-    spatialItems: state.spatialItems.length,
-    waterItems: state.waterSpatialItems.length,
-    specialItems: state.specialSpatialItems.length,
-    skipped: false,
+  return getSpatialIndexRuntimeOwner().buildSpatialIndex({
+    includeSecondary,
+    allowComputeMissingBounds,
   });
 }
 
@@ -8091,58 +7998,10 @@ async function buildIndexChunked({
   scheduleUiMode = "immediate",
   keepReady = false,
 } = {}) {
-  setInteractionInfrastructureState("building-index", {
-    ready: keepReady ? true : false,
-    inFlight: true,
+  return getSpatialIndexRuntimeOwner().buildIndexChunked({
+    scheduleUiMode,
+    keepReady,
   });
-  await yieldToMain();
-  state.landIndex.clear();
-  state.countryToFeatureIds.clear();
-  state.idToKey.clear();
-  state.keyToId.clear();
-  rebuildAuxiliaryRegionIndexes();
-
-  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
-  if (!features.length) {
-    queueIndexUiRefresh({
-      renderCountryList: true,
-      renderWaterRegionList: true,
-      renderSpecialRegionList: true,
-    }, scheduleUiMode);
-    finalizeIndexBuildEffects();
-    await yieldToMain();
-    return;
-  }
-
-  for (let start = 0; start < features.length; start += CHUNKED_INDEX_BUILD_SLICE_SIZE) {
-    const end = Math.min(features.length, start + CHUNKED_INDEX_BUILD_SLICE_SIZE);
-    for (let index = start; index < end; index += 1) {
-      const feature = features[index];
-      const id = getFeatureId(feature) || `feature-${index}`;
-      state.landIndex.set(id, feature);
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      if (countryCode) {
-        const ids = state.countryToFeatureIds.get(countryCode) || [];
-        ids.push(id);
-        state.countryToFeatureIds.set(countryCode, ids);
-      }
-      const key = index + 1;
-      state.idToKey.set(id, key);
-      state.keyToId.set(key, id);
-    }
-    if (end < features.length) {
-      await yieldToMain();
-    }
-  }
-
-  queueIndexUiRefresh({
-    renderCountryList: true,
-    renderWaterRegionList: true,
-    renderSpecialRegionList: true,
-  }, scheduleUiMode);
-  finalizeIndexBuildEffects();
-  await yieldToMain();
 }
 
 async function buildSpatialIndexChunked({
@@ -8150,91 +8009,11 @@ async function buildSpatialIndexChunked({
   allowComputeMissingBounds = true,
   keepReady = false,
 } = {}) {
-  setInteractionInfrastructureState("building-spatial", {
-    ready: keepReady ? true : false,
-    inFlight: true,
+  return getSpatialIndexRuntimeOwner().buildSpatialIndexChunked({
+    includeSecondary,
+    allowComputeMissingBounds,
+    keepReady,
   });
-  await yieldToMain();
-  const startedAt = nowMs();
-  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
-  if (!features.length || !pathSVG) {
-    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-      landCount: features.length,
-      spatialItems: 0,
-      waterItems: 0,
-      specialItems: 0,
-      skipped: true,
-      chunked: true,
-    });
-    await yieldToMain();
-    return;
-  }
-
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  const nextSpatialItems = [];
-  for (let start = 0; start < features.length; start += CHUNKED_SPATIAL_BUILD_SLICE_SIZE) {
-    const end = Math.min(features.length, start + CHUNKED_SPATIAL_BUILD_SLICE_SIZE);
-    for (let index = start; index < end; index += 1) {
-      const feature = features[index];
-      const id = getFeatureId(feature);
-      if (!id) continue;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
-      if (!bounds) continue;
-      nextSpatialItems.push({
-        id,
-        drawOrder: index,
-        feature,
-        countryCode: getFeatureCountryCodeNormalized(feature),
-        source: String(feature?.properties?.__source || "primary"),
-        minX: bounds.minX,
-        minY: bounds.minY,
-        maxX: bounds.maxX,
-        maxY: bounds.maxY,
-        bboxArea: bounds.area,
-      });
-    }
-    if (end < features.length) {
-      await yieldToMain();
-    }
-  }
-
-  const previousItems = state.spatialItems;
-  const previousGrid = state.spatialGrid;
-  const previousGridMeta = state.spatialGridMeta;
-  const previousItemsById = state.spatialItemsById;
-  state.spatialItems = nextSpatialItems;
-  buildSpatialGrid(nextSpatialItems, canvasWidth, canvasHeight);
-  const nextGrid = state.spatialGrid;
-  const nextGridMeta = state.spatialGridMeta;
-  const nextItemsById = state.spatialItemsById;
-  state.spatialItems = previousItems;
-  state.spatialGrid = previousGrid;
-  state.spatialGridMeta = previousGridMeta;
-  state.spatialItemsById = previousItemsById;
-
-  state.spatialItems = nextSpatialItems;
-  state.spatialIndex = null;
-  state.spatialGrid = nextGrid;
-  state.spatialGridMeta = nextGridMeta;
-  state.spatialItemsById = nextItemsById;
-  resetSecondarySpatialIndexState();
-  if (includeSecondary) {
-    buildSecondarySpatialIndexes({
-      allowComputeMissingBounds,
-    });
-  }
-  state.hitCanvasDirty = true;
-  recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-    landCount: features.length,
-    spatialItems: state.spatialItems.length,
-    waterItems: state.waterSpatialItems.length,
-    specialItems: state.specialSpatialItems.length,
-    skipped: false,
-    chunked: true,
-  });
-  await yieldToMain();
 }
 
 async function buildHitCanvasAfterStartup({ keepReady = false } = {}) {
@@ -8423,118 +8202,15 @@ function clamp(value, min, max) {
 }
 
 function drawMeshCollection(meshCollection, strokeStyle, lineWidth, options = {}) {
-  if (!meshCollection || !meshCollection.length) return;
-  context.strokeStyle = strokeStyle;
-  context.lineWidth = lineWidth;
-  context.lineJoin = options.lineJoin || BOUNDARY_DEFAULT_LINE_JOIN;
-  context.lineCap = options.lineCap || BOUNDARY_DEFAULT_LINE_CAP;
-  context.miterLimit = Number.isFinite(Number(options.miterLimit))
-    ? Number(options.miterLimit)
-    : BOUNDARY_DEFAULT_MITER_LIMIT;
-  const meshTransform = typeof options.transformMesh === "function" ? options.transformMesh : null;
-  meshCollection.forEach((mesh) => {
-    if (!mesh) return;
-    const renderMesh = meshTransform ? meshTransform(mesh) : mesh;
-    if (!isUsableMesh(renderMesh)) return;
-    context.beginPath();
-    pathCanvas(renderMesh);
-    context.stroke();
-  });
-}
-
-function getScreenSpaceTurnAngleDeg(previousPoint, currentPoint, nextPoint) {
-  if (!previousPoint || !currentPoint || !nextPoint) return 180;
-  const ax = currentPoint[0] - previousPoint[0];
-  const ay = currentPoint[1] - previousPoint[1];
-  const bx = nextPoint[0] - currentPoint[0];
-  const by = nextPoint[1] - currentPoint[1];
-  const aLength = Math.hypot(ax, ay);
-  const bLength = Math.hypot(bx, by);
-  if (!(aLength > 0) || !(bLength > 0)) return 180;
-  const cosine = clamp((ax * bx + ay * by) / (aLength * bLength), -1, 1);
-  const interiorAngleDeg = Math.acos(cosine) * (180 / Math.PI);
-  return Math.abs(180 - interiorAngleDeg);
+  return getBorderDrawOwner().drawMeshCollection(meshCollection, strokeStyle, lineWidth, options);
 }
 
 function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {
-  const sanitized = sanitizePolyline(line);
-  if (sanitized.length <= 2 || !projection) return sanitized;
-
-  const projected = sanitized.map((point) => projection(point));
-  const keptIndices = [0];
-
-  for (let index = 1; index < sanitized.length - 1; index += 1) {
-    const projectedPoint = projected[index];
-    const previousKeptProjected = projected[keptIndices[keptIndices.length - 1]];
-    const nextProjected = projected[index + 1];
-    if (!projectedPoint || !previousKeptProjected || !nextProjected) {
-      keptIndices.push(index);
-      continue;
-    }
-    const distancePx = Math.hypot(
-      projectedPoint[0] - previousKeptProjected[0],
-      projectedPoint[1] - previousKeptProjected[1],
-    );
-    const turnAngleDeg = getScreenSpaceTurnAngleDeg(previousKeptProjected, projectedPoint, nextProjected);
-    if (distancePx < minDistancePx && turnAngleDeg < angleThresholdDeg) {
-      continue;
-    }
-    keptIndices.push(index);
-  }
-
-  keptIndices.push(sanitized.length - 1);
-  const result = [];
-  keptIndices.forEach((index) => {
-    const point = sanitized[index];
-    if (!point) return;
-    const previousPoint = result[result.length - 1];
-    if (previousPoint && previousPoint[0] === point[0] && previousPoint[1] === point[1]) return;
-    result.push(point);
-  });
-  return result.length >= 2 ? result : sanitized.slice(0, 2);
+  return getBorderDrawOwner().declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg);
 }
 
 function getProjectedPolylineMetrics(line) {
-  const sanitized = sanitizePolyline(line);
-  if (sanitized.length < 2 || !projection) {
-    return {
-      lengthPx: 0,
-      bboxAreaPx: 0,
-      maxSpanPx: 0,
-    };
-  }
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  let lengthPx = 0;
-  let previousProjected = null;
-  sanitized.forEach((point) => {
-    const projected = projection(point);
-    if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return;
-    minX = Math.min(minX, projected[0]);
-    minY = Math.min(minY, projected[1]);
-    maxX = Math.max(maxX, projected[0]);
-    maxY = Math.max(maxY, projected[1]);
-    if (previousProjected) {
-      lengthPx += Math.hypot(projected[0] - previousProjected[0], projected[1] - previousProjected[1]);
-    }
-    previousProjected = projected;
-  });
-  if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
-    return {
-      lengthPx,
-      bboxAreaPx: 0,
-      maxSpanPx: 0,
-    };
-  }
-  const widthPx = Math.max(0, maxX - minX);
-  const heightPx = Math.max(0, maxY - minY);
-  return {
-    lengthPx,
-    bboxAreaPx: widthPx * heightPx,
-    maxSpanPx: Math.max(widthPx, heightPx),
-  };
+  return getBorderDrawOwner().getProjectedPolylineMetrics(line);
 }
 
 function buildRenderableBoundaryMesh(mesh, {
@@ -8544,126 +8220,21 @@ function buildRenderableBoundaryMesh(mesh, {
   minAreaPx = 0,
   angleThresholdDeg = COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG,
 } = {}) {
-  if (!isUsableMesh(mesh)) return null;
-  const nextCoordinates = mesh.coordinates
-    .map((line) => {
-      const simplified = simplifyDistancePx > 0
-        ? declutterProjectedPolyline(line, simplifyDistancePx, angleThresholdDeg)
-        : sanitizePolyline(line);
-      if (!Array.isArray(simplified) || simplified.length < 2) return null;
-      const metrics = getProjectedPolylineMetrics(simplified);
-      if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
-      if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
-      if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
-      return simplified;
-    })
-    .filter((line) => Array.isArray(line) && line.length >= 2);
-  if (!nextCoordinates.length) return null;
-  return {
-    type: "MultiLineString",
-    coordinates: nextCoordinates,
-  };
-}
-
-function getViewportAwareCoastlineCollection(collection, k) {
-  const minDistancePx = k < COASTLINE_LOD_LOW_ZOOM_MAX
-    ? COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX
-    : k < COASTLINE_LOD_MID_ZOOM_MAX
-      ? COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX
-      : 0;
-  if (!(minDistancePx > 0) || !Array.isArray(collection) || !collection.length || !projection) {
-    return collection;
-  }
-  return collection.map((mesh) => {
-    if (!isUsableMesh(mesh)) return mesh;
-    const nextCoordinates = mesh.coordinates
-      .map((line) => declutterProjectedPolyline(line, minDistancePx, COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG))
-      .filter((line) => Array.isArray(line) && line.length >= 2);
-    if (!nextCoordinates.length) return mesh;
-    return {
-      type: "MultiLineString",
-      coordinates: nextCoordinates,
-    };
+  return getBorderDrawOwner().buildRenderableBoundaryMesh(mesh, {
+    simplifyDistancePx,
+    minLengthPx,
+    minSpanPx,
+    minAreaPx,
+    angleThresholdDeg,
   });
 }
 
+function getViewportAwareCoastlineCollection(collection, k) {
+  return getBorderDrawOwner().getViewportAwareCoastlineCollection(collection, k);
+}
+
 function getBoundaryMeshTransform(kind, k) {
-  const zoom = Math.max(0, Number(k) || 0);
-  if (kind === "internal-local") {
-    if (zoom < 1.5) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 3.6,
-        minLengthPx: 22,
-        minSpanPx: 5,
-        minAreaPx: 20,
-      });
-    }
-    if (zoom < 2.4) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 2.2,
-        minLengthPx: 14,
-        minSpanPx: 3,
-        minAreaPx: 10,
-      });
-    }
-    return (mesh) => buildRenderableBoundaryMesh(mesh, {
-      simplifyDistancePx: 0.75,
-      minLengthPx: 4,
-    });
-  }
-  if (kind === "internal-province") {
-    if (zoom < 1.25) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 2.4,
-        minLengthPx: 16,
-        minSpanPx: 4,
-        minAreaPx: 12,
-      });
-    }
-    if (zoom < 1.9) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 1.6,
-        minLengthPx: 10,
-        minSpanPx: 2,
-      });
-    }
-    return (mesh) => buildRenderableBoundaryMesh(mesh, {
-      simplifyDistancePx: 0.6,
-      minLengthPx: 4,
-    });
-  }
-  if (kind === "empire") {
-    if (zoom < 1.4) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 1.8,
-        minLengthPx: 6,
-      });
-    }
-    if (zoom < 2.2) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 1.1,
-        minLengthPx: 4,
-      });
-    }
-    return null;
-  }
-  if (kind === "coastline") {
-    if (zoom < COASTLINE_LOD_LOW_ZOOM_MAX) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 2.4,
-        minLengthPx: 14,
-        minSpanPx: 3,
-      });
-    }
-    if (zoom < COASTLINE_LOD_MID_ZOOM_MAX) {
-      return (mesh) => buildRenderableBoundaryMesh(mesh, {
-        simplifyDistancePx: 1.2,
-        minLengthPx: 8,
-        minSpanPx: 2,
-      });
-    }
-  }
-  return null;
+  return getBorderDrawOwner().getBoundaryMeshTransform(kind, k);
 }
 
 function getProjectedLineDensityStats(line) {
@@ -8697,247 +8268,7 @@ function getProjectedLineDensityStats(line) {
 }
 
 function drawHierarchicalBorders(k, { interactive = false } = {}) {
-  const kEff = clamp(k, 1, 8);
-  const t = (kEff - 1) / 7;
-  const kDenom = Math.max(0.0001, k);
-  const lowZoomDeclutter = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.82 : 1;
-  const lowZoomWidthScale = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.92 : 1;
-  const internal = state.styleConfig?.internalBorders || {};
-  const empire = state.styleConfig?.empireBorders || {};
-  const coast = state.styleConfig?.coastlines || {};
-  const parent = state.styleConfig?.parentBorders || {};
-
-  const empireColor = getSafeCanvasColor(empire.color, "#666666");
-  const internalColor = getSafeCanvasColor(internal.color, "#cccccc");
-  const coastColor = getSafeCanvasColor(coast.color, "#333333");
-  const parentColor = getSafeCanvasColor(parent.color, "#4b5563");
-  const provinceMeshTransform = getBoundaryMeshTransform("internal-province", k);
-  const localMeshTransform = getBoundaryMeshTransform("internal-local", k);
-  const empireMeshTransform = getBoundaryMeshTransform("empire", k);
-  const coastlineMeshTransform = getBoundaryMeshTransform("coastline", k);
-
-  const empireWidthBase = Number(empire.width) || 1;
-  const internalWidthBase = Number(internal.width) || 0.5;
-  const coastWidthBase = Number(coast.width) || 1.2;
-  const parentWidthBase = Number(parent.width) || 1.1;
-  const internalOpacity = Number.isFinite(Number(internal.opacity)) ? Number(internal.opacity) : 1;
-  const parentOpacity = clamp(
-    Number.isFinite(Number(parent.opacity)) ? Number(parent.opacity) : 0.85,
-    0,
-    1
-  );
-  const scenarioOwnerOnlyBorders =
-    !!state.activeScenarioId && state.scenarioBorderMode === "scenario_owner_only";
-  const dynamicOwnerMeshes =
-    isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
-      ? [state.cachedDynamicOwnerBorders]
-      : null;
-  const openingOwnerMeshes =
-    scenarioOwnerOnlyBorders
-    && String(state.scenarioViewMode || "ownership") === "ownership"
-    && !isDynamicBordersEnabled()
-    && isUsableMesh(state.cachedScenarioOpeningOwnerBorders)
-      ? [state.cachedScenarioOpeningOwnerBorders]
-      : null;
-  let empireMeshes = dynamicOwnerMeshes || state.cachedCountryBorders;
-  if (scenarioOwnerOnlyBorders) {
-    empireMeshes = dynamicOwnerMeshes || openingOwnerMeshes || null;
-    if (!dynamicOwnerMeshes && !openingOwnerMeshes && state.cachedCountryBorders?.length) {
-      const scenarioId = String(state.activeScenarioId || "").trim() || "(unknown)";
-      if (!scenarioOwnerOnlyCanonicalFallbackWarnings.has(scenarioId)) {
-        scenarioOwnerOnlyCanonicalFallbackWarnings.add(scenarioId);
-        console.warn(
-          `[map_renderer] scenario_owner_only borders unavailable for scenario=${scenarioId}; canonical country-border fallback suppressed to preserve scenario integrity.`
-        );
-      }
-    }
-  }
-
-  if (interactive) {
-    const countryWidth = (empireWidthBase * 0.95) / kDenom;
-    const coastWidth = (coastWidthBase * 0.88) / kDenom;
-    const coastlineLow = state.cachedCoastlinesLow?.length
-      ? state.cachedCoastlinesLow
-      : (state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh);
-
-    context.globalAlpha = 0.88;
-    drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
-
-    context.globalAlpha = 0.78;
-    drawMeshCollection(coastlineLow, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
-
-    context.globalAlpha = 1.0;
-    return;
-  }
-
-  const countryAlpha = 0.90;
-  const regularProvinceAlpha = clamp(
-    internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter,
-    INTERNAL_BORDER_PROVINCE_MIN_ALPHA,
-    0.74
-  );
-  let provinceAlpha = regularProvinceAlpha;
-  if (k <= PROVINCE_BORDERS_FADE_START_ZOOM) {
-    provinceAlpha = PROVINCE_BORDERS_FAR_ALPHA;
-  } else if (k < PROVINCE_BORDERS_TRANSITION_END_ZOOM) {
-    const fadeT = clamp(
-      (k - PROVINCE_BORDERS_FADE_START_ZOOM)
-      / (PROVINCE_BORDERS_TRANSITION_END_ZOOM - PROVINCE_BORDERS_FADE_START_ZOOM),
-      0,
-      1
-    );
-    provinceAlpha = PROVINCE_BORDERS_FAR_ALPHA
-      + ((PROVINCE_BORDERS_TRANSITION_ALPHA - PROVINCE_BORDERS_FAR_ALPHA) * fadeT);
-  } else {
-    provinceAlpha = Math.max(regularProvinceAlpha, PROVINCE_BORDERS_TRANSITION_ALPHA);
-  }
-  const localAlpha = clamp(
-    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter * INTERNAL_BORDER_LOCAL_ALPHA_SCALE,
-    INTERNAL_BORDER_LOCAL_MIN_ALPHA * INTERNAL_BORDER_LOCAL_ALPHA_SCALE,
-    0.48 * INTERNAL_BORDER_LOCAL_ALPHA_SCALE
-  );
-  const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
-  const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
-  const detailAdmAlpha = clamp(
-    (0.20 + 0.12 * t) * DETAIL_ADM_BORDER_ALPHA_SCALE,
-    DETAIL_ADM_BORDER_TARGET_MIN_ALPHA,
-    DETAIL_ADM_BORDER_TARGET_MAX_ALPHA
-  );
-
-  const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
-  let provinceWidth = Math.max(
-    INTERNAL_BORDER_PROVINCE_MIN_WIDTH,
-    internalWidthBase * (0.72 + 0.65 * t) * lowZoomWidthScale
-  ) / kDenom;
-  if (k < PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM) {
-    provinceWidth *= PROVINCE_BORDERS_FAR_WIDTH_SCALE;
-  }
-  if (k >= PROVINCE_BORDERS_NEAR_ZOOM_START) {
-    provinceAlpha *= PROVINCE_BORDERS_NEAR_ALPHA_SCALE;
-    provinceWidth *= PROVINCE_BORDERS_NEAR_WIDTH_SCALE;
-  }
-  const localWidth = Math.max(
-    INTERNAL_BORDER_LOCAL_MIN_WIDTH,
-    internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
-  ) * INTERNAL_BORDER_LOCAL_WIDTH_SCALE / kDenom;
-  const parentWidth = (parentWidthBase * (0.90 + 0.35 * t)) / kDenom;
-  const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
-  const detailAdmWidth = Math.max(
-    DETAIL_ADM_BORDER_MIN_WIDTH,
-    internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
-  ) * DETAIL_ADM_BORDER_WIDTH_SCALE / kDenom;
-  const coastlineCollection = getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k);
-  const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
-  if (visibleCountryCodes.size > 0) {
-    const includeProvinceMeshes = k >= PROVINCE_BORDERS_TRANSITION_END_ZOOM;
-    const includeLocalMeshes = k >= LOCAL_BORDERS_MIN_ZOOM;
-    const nextVisibleMeshSignature = [
-      includeProvinceMeshes ? "province" : "country",
-      includeLocalMeshes ? "local" : "nolocal",
-      ...Array.from(visibleCountryCodes).sort((left, right) => left.localeCompare(right)),
-    ].join("|");
-    if (
-      nextVisibleMeshSignature !== visibleInternalBorderMeshSignature
-      && (includeProvinceMeshes || includeLocalMeshes)
-    ) {
-      visibleInternalBorderMeshSignature = nextVisibleMeshSignature;
-      scheduleDeferredHeavyBorderMeshes();
-    }
-  }
-
-  if (k >= LOCAL_BORDERS_MIN_ZOOM) {
-    context.globalAlpha = localAlpha;
-    visibleCountryCodes.forEach((countryCode) => {
-      const meshes = state.cachedLocalBordersByCountry?.get(countryCode) || [];
-      drawMeshCollection(
-        meshes,
-        getInternalBorderStrokeColor(countryCode, internalColor),
-        localWidth,
-        { transformMesh: localMeshTransform }
-      );
-    });
-  }
-
-  context.globalAlpha = provinceAlpha;
-  visibleCountryCodes.forEach((countryCode) => {
-    const meshes = state.cachedProvinceBordersByCountry?.get(countryCode) || [];
-    drawMeshCollection(
-      meshes,
-      getInternalBorderStrokeColor(countryCode, internalColor),
-      provinceWidth,
-      { transformMesh: provinceMeshTransform }
-    );
-  });
-
-  if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
-    const detailAdmMeta = buildDetailAdmMeshSignature(visibleCountryCodes, k);
-    const signatureChanged = detailAdmMeta.signature !== detailAdmMeshBuildState.signature;
-    if (signatureChanged) {
-      const hadDetailAdmBorders = state.cachedDetailAdmBorders.length > 0;
-      state.cachedDetailAdmBorders = [];
-      if (detailAdmMeta.detailCountries.length > 0) {
-        detailAdmMeshBuildState = {
-          signature: detailAdmMeta.signature,
-          status: "building",
-        };
-        if (hadDetailAdmBorders) {
-          syncStaticMeshSnapshot();
-        }
-        scheduleDeferredHeavyBorderMeshes();
-      } else {
-        detailAdmMeshBuildState = {
-          signature: detailAdmMeta.signature,
-          status: "empty",
-        };
-        if (hadDetailAdmBorders) {
-          syncStaticMeshSnapshot();
-        }
-      }
-    } else if (
-      !state.cachedDetailAdmBorders.length
-      && detailAdmMeshBuildState.status === "idle"
-      && detailAdmMeta.detailCountries.length > 0
-    ) {
-      detailAdmMeshBuildState = {
-        signature: detailAdmMeta.signature,
-        status: "building",
-      };
-      scheduleDeferredHeavyBorderMeshes();
-    }
-  }
-
-  if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
-    context.globalAlpha = detailAdmAlpha;
-    drawMeshCollection(state.cachedDetailAdmBorders, DETAIL_ADM_BORDER_COLOR, detailAdmWidth);
-  }
-
-  const enabledParentCountries = state.parentBordersVisible === false
-    ? []
-    : (state.parentBorderSupportedCountries || []).filter(
-    (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]
-  );
-  if (enabledParentCountries.length > 0) {
-    context.globalAlpha = parentAlpha;
-    enabledParentCountries.forEach((countryCode) => {
-      let meshes = state.cachedParentBordersByCountry?.get(countryCode);
-      if (!meshes) {
-        meshes = buildCountryParentBorderMeshes(countryCode);
-        if (state.cachedParentBordersByCountry instanceof Map) {
-          state.cachedParentBordersByCountry.set(countryCode, meshes);
-        }
-      }
-      drawMeshCollection(meshes, parentColor, parentWidth);
-    });
-  }
-
-  context.globalAlpha = countryAlpha;
-  drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
-
-  context.globalAlpha = coastAlpha;
-  drawMeshCollection(coastlineCollection, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
-  drawTnoCoastalAccentLayer(k, { interactive });
-
-  context.globalAlpha = 1.0;
+  return getBorderDrawOwner().drawHierarchicalBorders(k, { interactive });
 }
 
 function normalizeOceanPreset(value) {

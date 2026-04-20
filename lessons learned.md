@@ -1006,3 +1006,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 41. map_renderer 后续拆分先抽 mesh builder，再动 draw 和 render pass
 - owner border、source border、coastline source 这类“输入 topology，输出 mesh”的 helper 很适合先下沉成 owner；draw pass、render invalidation、viewport 驱动延迟加载继续留在 donor，回归面最小。
 - 这样可以先把几何生成链和 transaction/render 链切开，再决定下一刀是否继续拆 `drawHierarchicalBorders`。
+### 42. border draw 拆分先搬纯 helper，draw 主体后移一刀更稳
+- `drawMeshCollection`、viewport-aware coastline simplify、boundary mesh transform 这类纯绘制 helper 很适合先下沉到独立 owner；`drawHierarchicalBorders()` 主体里还带着 detailAdm 调度、parent border 缓存和 scenario_owner_only 警告链，继续留 donor 回归面更小。
+- 这样可以先把 canvas helper 和 draw transaction 分开，再在下一刀单独处理 `drawHierarchicalBorders()` 主体。
+### 43. drawHierarchicalBorders 主体下沉时，要把共用 coastline simplify 链继续收口在 donor facade 上
+- `drawHierarchicalBorders()` 和 `drawTnoCoastalAccentLayer()` 共用 `getViewportAwareCoastlineCollection()` 时，最稳的做法是让 donor facade 保持唯一入口，owner 通过同一条 wrapper 取结果。
+- 这样可以避免主描边和 accent 层在同一缩放级别出现 coastline LOD 漂移。
+### 44. interaction border snapshot 这类“离屏缓存小事务”适合独立 owner，drawBordersPass 继续留 donor
+- snapshot 的 layout、canvas、capture、draw、invalidate 属于一组很完整的局部事务，抽成 owner 后边界很清楚。
+- `drawBordersPass()` 继续留在 donor，可以保证 snapshot 和主渲染共用同一条 border pass 入口，运行态更稳。
+### 45. spatial/index runtime 拆分时，索引构建可以下沉，runtime refresh 交易继续留 donor
+- `buildIndex`、`buildSpatialIndex`、chunked 版本和 secondary spatial 这类“只重建交互索引”的函数很适合集中进 owner。
+- `rebuildRuntimeDerivedState()` 同时处理 runtimePoliticalMeta、color sanitize、projected bounds cache 和 UI refresh，这类跨多个状态面的交易继续留在 donor 更稳。
