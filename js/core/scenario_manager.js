@@ -149,6 +149,13 @@ const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 let activeScenarioApplyPromise = null;
 
+/**
+ * Cross-module shared high-frequency state fields.
+ * - activeScenarioId: active scenario selector used by UI sync, resources, and apply pipeline.
+ * - scenarioBundleCacheById: bundle cache keyed by normalized scenario id for startup/full reuse.
+ * - scenarioControllerRevision: revision counter for owner/controller overlay refresh and dependent UI.
+ */
+
 function normalizeScenarioCoreMap(rawMap) {
   return sharedNormalizeScenarioCoreMap(rawMap, { normalizeFeatureText: normalizeCityText });
 }
@@ -571,6 +578,7 @@ async function loadScenarioRuntimeTopologyForBundle({
   requestedBundleLevel,
   runtimeTopologyUrl,
 } = {}) {
+  // bootstrap uses startup bundle decode path, full uses full bundle decode path.
   const runtimeLabel = requestedBundleLevel === "bootstrap" ? "runtime_bootstrap_topology" : "runtime_topology";
   const allowWorkerDecode = !!runtimeTopologyUrl && shouldUseStartupWorker();
   if (allowWorkerDecode) {
@@ -594,6 +602,7 @@ async function loadScenarioRuntimeTopologyForBundle({
       console.warn(`[scenario] Startup worker failed for ${runtimeLabel} of "${scenarioId}", falling back to main thread.`, error);
     }
   }
+  // startup bundle worker path keeps legacy fallback on main-thread resource loading.
   const fallbackResult = await loadOptionalScenarioResource(d3Client, runtimeTopologyUrl, {
     scenarioId,
     resourceLabel: runtimeLabel,
@@ -1048,6 +1057,13 @@ async function applyScenarioBundle(
   }
 }
 
+/**
+ * Scenario switch entrypoint for selecting and applying one scenario id.
+ * Major state write surface:
+ * - state.scenarioApplyInFlight / activeScenarioApplyPromise lifecycle.
+ * - state.scenarioBundleCacheById reuse via full bundle loading.
+ * - active scenario state fields written by applyScenarioBundle pipeline.
+ */
 async function applyScenarioById(
   scenarioId,
   {
@@ -1376,4 +1392,3 @@ export {
   resetToScenarioBaseline,
   setScenarioViewMode,
 };
-
