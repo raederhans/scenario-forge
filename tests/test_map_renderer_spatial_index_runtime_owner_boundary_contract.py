@@ -39,6 +39,7 @@ class MapRendererSpatialIndexRuntimeOwnerBoundaryContractTest(unittest.TestCase)
         self.assertIn("function refreshMapDataForScenarioApply({", renderer_content)
 
         self.assertIn("export function createSpatialIndexRuntimeOwner({", owner_content)
+        self.assertIn("rebuildAuxiliaryRegionIndexes = () => {},", owner_content)
         self.assertIn("function buildIndex({ scheduleUiMode = \"immediate\" } = {}) {", owner_content)
         self.assertIn("function resetSecondarySpatialIndexState() {", owner_content)
         self.assertIn("function buildSecondarySpatialIndexes({", owner_content)
