@@ -66,6 +66,21 @@ function getAppUrl(targetPath = DEFAULT_APP_PATH) {
   return new URL(pathname, `${getConfiguredAppOrigin()}/`).toString();
 }
 
+async function primeStateRef(page) {
+  // Playwright `waitForFunction(async ...)` only waits on the returned Promise object itself,
+  // so shared ready gates pin the live singleton state onto `globalThis` first and then poll
+  // it synchronously inside `waitForFunction`.
+  await page.evaluate(async () => {
+    if (globalThis.__playwrightStateRef) {
+      return true;
+    }
+    const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
+    const stateModule = await import(stateModuleUrl);
+    globalThis.__playwrightStateRef = stateModule?.state || null;
+    return !!globalThis.__playwrightStateRef;
+  });
+}
+
 async function gotoApp(page, targetPath = DEFAULT_APP_PATH, options = {}) {
   return page.goto(getAppUrl(targetPath), options);
 }
@@ -103,23 +118,18 @@ async function readBootStateSnapshot(page) {
 
 async function waitForAppInteractive(page, { timeout = 90_000 } = {}) {
   try {
-    await page.waitForFunction(async () => {
-      const overlay = document.querySelector("#bootOverlay");
-      const overlayReady = !overlay
-        || (overlay.classList.contains("hidden") && overlay.getAttribute("aria-busy") === "false");
-      const bodyBooting = !!document.body?.classList?.contains("app-booting");
-
-      try {
-        const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
-        const stateModule = await import(stateModuleUrl);
-        const state = stateModule?.state || {};
-        const bootStateReady = state.bootBlocking === false;
-        const bodyReady = !bodyBooting;
-        const scenarioIdle = !state.scenarioApplyInFlight;
-        return scenarioIdle && (bootStateReady || bodyReady || overlayReady);
-      } catch (error) {
-        return overlayReady && !bodyBooting;
+    await primeStateRef(page);
+    await page.waitForFunction(() => {
+      const state = globalThis.__playwrightStateRef || null;
+      if (!state) return false;
+      if (String(state.bootError || "").trim()) {
+        throw new Error(`[playwright-app] bootError=${state.bootError}`);
       }
+      return (
+        state.bootBlocking === false
+        && !state.scenarioApplyInFlight
+        && !state.startupReadonlyUnlockInFlight
+      );
     }, { timeout });
   } catch (error) {
     const snapshot = await readBootStateSnapshot(page);
@@ -171,5 +181,6 @@ module.exports = {
   getWebServerConfig,
   gotoApp,
   readBootStateSnapshot,
+  primeStateRef,
   waitForAppInteractive,
 };

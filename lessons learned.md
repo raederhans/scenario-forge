@@ -1066,3 +1066,12 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 137. opening-owner mesh 的 mesh-pack 直用路径要和 runtime fallback 路径分开判断
 - `opening_owner_borders` 已经在 mesh pack 里存在时，`refreshScenarioOpeningOwnerBorders()` 只需要场景模式和 mesh 可用；runtime fallback 才需要 `scenarioBaselineOwnersByFeatureId`。
 - startup/bootstrap 到 full hydrate 的窗口里，mesh pack 和 baseline owners 很容易不同步；把两条路径绑在同一个条件里，缓存会被错误清空成 `null`。
+
+### 138. startup 场景 ready 判定要包含 opening-owner cache，就绪条件只看 mesh pack 会放过半完成状态
+- `activeScenarioMeshPack.meshes.opening_owner_borders` 已到位，只说明资源到了；真正绘制 `scenario_owner_only` 依赖的是 `cachedScenarioOpeningOwnerBorders`。
+- `waitForAppInteractive()`、`ensureScenario()` 和 startup full hydrate 的轻量测试应该至少有一层把 opening-owner cache ready 纳入断言，否则 blocker 会从断言失败漂成 startup timeout。
+
+### 139. Playwright 的 `waitForFunction(async ...)` 会把 Promise 本身当成 truthy，ready gate 必须改成同步轮询
+- 这次 `waitForAppInteractive()` 和 `scenario_boundary_regression` 都用了 `page.waitForFunction(async () => ...)`，结果 gate 提前放行，表面像 runtime 状态漂移，实际是测试自己没等到。
+- 更稳的最短路径是：先在页面里挂住 live state 引用，再让 `waitForFunction(() => ...)` 同步读取；一旦 `bootError` 有值，立即早失败。
+- 这种坑会直接把 startup boot、scenario apply、opening-owner 这类异步链的真实问题藏起来，必须用 source contract 锁住。

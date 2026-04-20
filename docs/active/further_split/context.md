@@ -395,3 +395,93 @@
     - `.runtime/tmp/boundary_after_fix4.out.log`
     - `.runtime/tmp/boundary_after_fix5.out.log`
     - `.runtime/tmp/boundary_after_fix6.out.log`
+## 2026-04-20 opening-owner ready gate follow-up
+- 继续沿着 `scenario_boundary_regression` 的 opening-owner blocker 收口，先做了两层最小修复：
+  - `js/core/scenario/startup_hydration.js`
+    - 当 runtime political payload 和前一版不同，调用 `refreshMapDataForScenarioChunkPromotion()` 时显式带上 `hasPoliticalPayloadChange: true`
+    - 这样 visual-stage 的 opening-owner sync 会沿通用 promotion 链触发，不再只靠单独特判刷新
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+    - `ensureScenario()` 的 ready gate 从“mesh pack opening-owner 已到位”收紧为“mesh pack + cached opening-owner 都已到位”
+    - 这样 e2e 会等到真实绘制依赖的 cache materialize 完成后再往下走
+- 新增轻量行为测试：
+  - `tests/border_mesh_owner_behavior.test.mjs`
+    - 覆盖 mesh-pack 直用
+    - 覆盖 runtime fallback
+    - 覆盖 startup state 未就绪时清空 cache
+  - `tests/startup_hydration_behavior.test.mjs`
+    - 新增 runtime political payload 变化时，promotion call 显式带 `hasPoliticalPayloadChange: true`
+- 本轮验证：
+  - `node --check`
+    - `js/core/scenario/startup_hydration.js`
+    - `tests/e2e/scenario_boundary_regression.spec.js`
+    - `tests/startup_hydration_behavior.test.mjs`
+    - `tests/border_mesh_owner_behavior.test.mjs`
+    - 全部通过
+  - `node --test tests/startup_hydration_behavior.test.mjs tests/border_mesh_owner_behavior.test.mjs`
+    - `5 passed`
+  - `python -m unittest tests.test_startup_hydration_boundary_contract tests.test_map_renderer_border_mesh_owner_boundary_contract`
+    - `Ran 6 tests / OK`
+  - `lsp_diagnostics`
+    - 上述 4 个改动文件全部 `0 error`
+- 最新 smoke 结果：
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+  - 当前不再停在 `openingOwnerSegmentCount === 0`
+  - 最新现场回到 startup boot：`waitForScenarioUiReady()` 超时，boot overlay 停在 `Preparing default scenario / 0%`
+  - 证据：
+    - `.runtime/tests/playwright/scenario_boundary_regressi-8f951-dary-regressions-stay-fixed/test-failed-1.png`
+    - `.runtime/tests/playwright/scenario_boundary_regressi-8f951-dary-regressions-stay-fixed/error-context.md`
+- 当前判断：
+  - opening-owner cache 这条半完成状态已经被代码和轻量测试收紧
+  - `scenario_boundary_regression` 剩余 blocker 现在是 startup boot 稳定性，而不是 opening-owner 初始 cache 断言本身
+## 2026-04-20 review follow-up: e2e ready gate tightened again
+- reviewer 复核后确认 `scenario_boundary_regression.spec.js` 还存在伪阳性：
+  - 之前只要求 `mesh pack` 和 `cached opening-owner` 各自有坐标
+  - 这会放过“cache 里还是旧 runtime fallback mesh，但 full mesh pack 已经到了”的状态
+- 已修正：
+  - `ensureScenario()` 现在要求 `state.cachedScenarioOpeningOwnerBorders === state.activeScenarioMeshPack.meshes.opening_owner_borders`
+  - chunk promotion 手动重放现在会：
+    - 先清空 `state.cachedScenarioOpeningOwnerBorders`
+    - 显式传 `hasPoliticalPayloadChange: true`
+    - 断言 `meshRebuilt === true`
+- 这样 e2e 的 ready gate 和 promotion check 都直接对齐这次生产修复的真实目标：cache 必须 materialize 成 mesh pack 本体，而不是任意非空 mesh
+## 2026-04-20 startup boot 0% root cause and ready-gate收口
+- 本轮真正卡住 startup boot 0% 的根因已经确认：
+  - `scenario_resources.js` 把 `refreshScenarioOpeningOwnerBorders` 传给 startup hydration controller 时，缺少从 `map_renderer.js` 的 import
+  - 浏览器现场错误：`ReferenceError: refreshScenarioOpeningOwnerBorders is not defined at /js/core/scenario_resources.js:563:3`
+  - 这会让页面停在 boot 初始态，`map-canvas` 不出现
+- 已修：
+  - `js/core/scenario_resources.js` 补上 `refreshScenarioOpeningOwnerBorders` import
+  - `tests/test_startup_hydration_boundary_contract.py` 补强约束，要求这个 symbol 来自 `./map_renderer.js`
+- 修完后，startup 不再卡 0%，现场推进到真正的 opening-owner 缺口：
+  - `scenario_boundary_regression` 回到 `openingOwnerSegmentCount === 0`
+- 继续往下查时，发现另一个根因：
+  - `tests/e2e/support/playwright-app.js` 和 `tests/e2e/scenario_boundary_regression.spec.js` 里多处写成 `page.waitForFunction(async () => ...)`
+  - 这类写法会把 Promise 对象本身当 truthy，导致 ready gate 提前放行
+  - 直接证据：临时 inspect spec 里，`waitForFunction` 已返回，但 snapshot 仍显示 `scenarioApplyInFlight: true`、`meshPackOpeningOwnerSegmentCount: 0`
+- 已修：
+  - `tests/e2e/support/playwright-app.js`
+    - 新增 `primeStateRef(page)`
+    - 把 shared ready gate 改成同步轮询 `globalThis.__playwrightStateRef`
+    - `waitForAppInteractive()` 现在要求：
+      - `bootBlocking === false`
+      - `!scenarioApplyInFlight`
+      - `!startupReadonlyUnlockInFlight`
+      - `bootError` 非空时立即失败
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+    - 所有关键 `waitForFunction` 都改成同步读取 `globalThis.__playwrightStateRef`
+    - 继续保留 opening-owner mesh pack + cache identity gate
+    - chunk promotion 手动重放仍然要求 `hasPoliticalPayloadChange: true`
+- 新增轻量合同：
+  - `tests/test_playwright_app_ready_gate_contract.py`
+  - 锁死 shared ready gate 不再使用 `waitForFunction(async ...)`
+- 当前最新结果：
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+  - 在复用本地 dev server 的单条 smoke 下已通过：`1 passed (3.0m)`
+- 合规后台 smoke 复跑：
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+  - 命令以后台日志方式运行，复用本地 dev server
+  - 结果：`1 passed (2.0m)`
+  - 证据：
+    - `.runtime/tmp/scenario_boundary_regression_green.out.log`
+    - `.runtime/tmp/scenario_boundary_regression_green.err.log`
+    - `.runtime/tmp/scenario_boundary_regression_green.exit.txt`

@@ -297,7 +297,10 @@ function createScenarioStartupHydrationController({
         nextScenarioPoliticalPayload
         && !areScenarioFeatureCollectionsEquivalent(nextScenarioPoliticalPayload, previousScenarioPoliticalPayload)
       ) {
-        refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
+        refreshMapDataForScenarioChunkPromotion({
+          suppressRender: !renderNow,
+          hasPoliticalPayloadChange: true,
+        });
       }
     }
     if (bundle.districtGroupsPayload) {

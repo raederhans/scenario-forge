@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
+const { getAppUrl, primeStateRef, waitForAppInteractive } = require("./support/playwright-app");
 
 test.setTimeout(120000);
 
@@ -22,21 +22,26 @@ async function dismissStartupBlocker(page) {
 }
 
 async function ensureScenario(page, scenarioId) {
+  await primeStateRef(page);
   await page.waitForFunction((expectedScenarioId) => {
     const select = document.querySelector("#scenarioSelect");
     return !!select && !!select.querySelector(`option[value="${expectedScenarioId}"]`);
   }, scenarioId, { timeout: 120000 });
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    return !state.scenarioApplyInFlight;
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
+    return !!state && !state.scenarioApplyInFlight;
   }, { timeout: 120000 });
   const scenarioReady = await page.evaluate(async (expectedScenarioId) => {
     const { state } = await import("/js/core/state.js");
     const openingOwnerMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+    const cachedOpeningOwnerMesh = state.cachedScenarioOpeningOwnerBorders;
     return state.activeScenarioId === expectedScenarioId
       && !state.scenarioApplyInFlight
       && Array.isArray(openingOwnerMesh?.coordinates)
-      && openingOwnerMesh.coordinates.length > 0;
+      && openingOwnerMesh.coordinates.length > 0
+      && cachedOpeningOwnerMesh === openingOwnerMesh
+      && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
+      && cachedOpeningOwnerMesh.coordinates.length > 0;
   }, scenarioId);
   if (!scenarioReady) {
     const initialScenarioId = await page.evaluate(async () => {
@@ -45,13 +50,17 @@ async function ensureScenario(page, scenarioId) {
     });
     if (initialScenarioId === scenarioId) {
       try {
-        await page.waitForFunction(async (expectedScenarioId) => {
-          const { state } = await import("/js/core/state.js");
-          const openingOwnerMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+        await page.waitForFunction((expectedScenarioId) => {
+          const state = globalThis.__playwrightStateRef || null;
+          const openingOwnerMesh = state?.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+          const cachedOpeningOwnerMesh = state?.cachedScenarioOpeningOwnerBorders;
           return state.activeScenarioId === expectedScenarioId
             && !state.scenarioApplyInFlight
             && Array.isArray(openingOwnerMesh?.coordinates)
-            && openingOwnerMesh.coordinates.length > 0;
+            && openingOwnerMesh.coordinates.length > 0
+            && cachedOpeningOwnerMesh === openingOwnerMesh
+            && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
+            && cachedOpeningOwnerMesh.coordinates.length > 0;
         }, scenarioId, { timeout: 20000 });
         return;
       } catch (_error) {
@@ -82,13 +91,17 @@ async function ensureScenario(page, scenarioId) {
       }, scenarioId);
     }
   }
-  await page.waitForFunction(async (expectedScenarioId) => {
-    const { state } = await import("/js/core/state.js");
-    const openingOwnerMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+  await page.waitForFunction((expectedScenarioId) => {
+    const state = globalThis.__playwrightStateRef || null;
+    const openingOwnerMesh = state?.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+    const cachedOpeningOwnerMesh = state?.cachedScenarioOpeningOwnerBorders;
     return state.activeScenarioId === expectedScenarioId
       && !state.scenarioApplyInFlight
       && Array.isArray(openingOwnerMesh?.coordinates)
-      && openingOwnerMesh.coordinates.length > 0;
+      && openingOwnerMesh.coordinates.length > 0
+      && cachedOpeningOwnerMesh === openingOwnerMesh
+      && Array.isArray(cachedOpeningOwnerMesh?.coordinates)
+      && cachedOpeningOwnerMesh.coordinates.length > 0;
   }, scenarioId, { timeout: 120000 });
   await page.waitForTimeout(1500);
 }
@@ -227,7 +240,11 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
       return response.json();
     });
     state.scenarioPoliticalChunkData = payload;
-    refreshMapDataForScenarioChunkPromotion({ suppressRender: true });
+    state.cachedScenarioOpeningOwnerBorders = null;
+    refreshMapDataForScenarioChunkPromotion({
+      suppressRender: true,
+      hasPoliticalPayloadChange: true,
+    });
     return {
       beforeRevision,
       afterRevision: Number(state.topologyRevision || 0),
@@ -244,6 +261,7 @@ test("scenario boundary regressions stay fixed", async ({ page }) => {
   });
   expect(chunkPromotionRuntime.afterRevision).toBeGreaterThan(chunkPromotionRuntime.beforeRevision);
   expect(chunkPromotionRuntime.meshPackSegmentCount).toBeGreaterThan(0);
+  expect(chunkPromotionRuntime.meshRebuilt).toBe(true);
   expect(chunkPromotionRuntime.openingOwnerSegmentCount).toBeGreaterThan(0);
   expect(chunkPromotionRuntime.openingOwnerMatchesMeshPack).toBe(true);
 

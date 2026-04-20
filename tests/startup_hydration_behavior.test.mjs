@@ -86,3 +86,82 @@ test("startup hydration refreshes opening owner borders when full mesh pack arri
   assert.equal(calls[0]?.renderNow, false);
   assert.equal(calls[0]?.reason, "scenario-hydrate-opening");
 });
+
+test("startup hydration marks political promotion as changed when runtime political payload changes", () => {
+  const promotionCalls = [];
+  const state = {
+    activeScenarioId: "tno_1962",
+    scenarioBorderMode: "scenario_owner_only",
+    scenarioViewMode: "ownership",
+    activeScenarioMeshPack: null,
+    runtimePoliticalTopology: null,
+    scenarioRuntimeTopologyData: null,
+    scenarioWaterRegionsData: null,
+    scenarioSpecialRegionsData: null,
+    scenarioPoliticalChunkData: { type: "FeatureCollection", features: [{ id: "old" }] },
+    scenarioLandMaskData: null,
+    scenarioContextLandMaskData: null,
+    scenarioWaterOverlayVersionTag: "",
+    scenarioLandMaskVersionTag: "",
+    scenarioContextLandMaskVersionTag: "",
+    scenarioGeoLocalePatchData: null,
+    scenarioCityOverridesData: null,
+    scenarioDistrictGroupByFeatureId: new Map(),
+    defaultRuntimePoliticalTopology: null,
+    renderPerfMetrics: {},
+    defaultReleasableCatalog: null,
+    releasableCatalog: null,
+    scenarioReleasableIndex: null,
+    scenarioAudit: null,
+  };
+  const changedPoliticalPayload = {
+    type: "FeatureCollection",
+    features: [{ id: "new" }],
+  };
+
+  const { hydrateActiveScenarioBundle } = createScenarioStartupHydrationController({
+    state,
+    normalizeScenarioId: (value) => String(value || "").trim(),
+    normalizeScenarioRuntimeTopologyPayload: (value) => value,
+    normalizeScenarioGeoLocalePatchPayload: (value) => value,
+    normalizeFeatureText: (value) => String(value || "").trim(),
+    normalizeScenarioFeatureCollection: (value) => value,
+    getScenarioRuntimePoliticalFeatureCount: () => 1,
+    getScenarioDecodedCollection: (_bundle, key) => (key === "politicalData" ? changedPoliticalPayload : null),
+    getScenarioRuntimeMergedLayerPayloads: () => ({}),
+    hasScenarioMergedLayerPayload: () => false,
+    areScenarioFeatureCollectionsEquivalent: () => false,
+    applyScenarioPoliticalChunkPayload: () => false,
+    loadOptionalScenarioResource: async () => null,
+    getScenarioGeoLocalePatchDescriptor: () => ({ url: "", language: "en", localeSpecific: false }),
+    getLoadScenarioBundle: () => async () => null,
+    syncScenarioLocalizationState: () => {},
+    syncCountryUi: () => {},
+    syncScenarioUi: () => {},
+    setScenarioAuditUiState: () => {},
+    mergeReleasableCatalogs: () => null,
+    buildScenarioDistrictGroupByFeatureId: () => new Map(),
+    buildScenarioReleasableIndex: () => null,
+    invalidateContextLayerVisualStateBatch: () => {},
+    invalidateOceanWaterInteractionVisualState: () => {},
+    refreshColorState: () => {},
+    refreshMapDataForScenarioChunkPromotion: (options) => {
+      promotionCalls.push(options);
+    },
+    refreshScenarioOpeningOwnerBorders: () => true,
+    flushRenderBoundary: () => {},
+    enterScenarioFatalRecovery: () => {},
+    consumeScenarioTestHook: () => false,
+    t: (value) => value,
+    showToast: () => {},
+  });
+
+  const hydrated = hydrateActiveScenarioBundle({
+    manifest: { scenario_id: "tno_1962" },
+  });
+
+  assert.equal(hydrated, true);
+  assert.equal(promotionCalls.length, 1);
+  assert.equal(promotionCalls[0]?.suppressRender, false);
+  assert.equal(promotionCalls[0]?.hasPoliticalPayloadChange, true);
+});

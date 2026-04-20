@@ -6,6 +6,7 @@ import {
   invalidateOceanWaterInteractionVisualState,
   recomputeDynamicBordersNow,
   refreshColorState,
+  refreshScenarioOpeningOwnerBorders,
   refreshResolvedColorsForFeatures,
   refreshMapDataForScenarioChunkPromotion,
   setMapData,

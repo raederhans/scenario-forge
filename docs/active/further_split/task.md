@@ -89,3 +89,11 @@
 - `scenario_boundary_regression` 当前卡在 smoke 环境稳定性，代码侧 opening-owner 初始缓存链已经补上
 - 汇报里列出修改文件、验证和剩余风险
 
+- [x] 收紧 startup hydrate -> opening-owner promotion 的 `hasPoliticalPayloadChange` 标记
+- [x] 收紧 `scenario_boundary_regression` 的 ready gate，使其等待 opening-owner cache materialize 完成
+- [x] 新增 opening-owner / startup hydration 轻量行为测试
+- [ ] 继续定位 `scenario_boundary_regression` 剩余的 startup boot 0% 超时
+- [x] 修复 startup boot 0% 的真实根因：`scenario_resources.js` 缺少 `refreshScenarioOpeningOwnerBorders` import
+- [x] 修复 shared ready gate 的 `waitForFunction(async ...)` 伪等待问题
+- [x] 新增 playwright ready gate 合同测试
+- [x] 让 `scenario_boundary_regression` 在单条 smoke 下重新变绿
