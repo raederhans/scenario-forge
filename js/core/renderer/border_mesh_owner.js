@@ -40,6 +40,9 @@ export function createBorderMeshOwner({
     updateDynamicBorderStatusUI = () => {},
   } = helpers;
 
+  // scenarioCoastlineSourceCache 只缓存“当前拓扑引用 + scenarioId”对应的海岸线来源判定，
+  // 让 resolveCoastlineTopologySource 在同一帧内重复调用时复用 decision 结果，
+  // 同时在 primaryRef/runtimeRef/scenarioId 任一变化时立即触发重判定。
   let scenarioCoastlineSourceCache = {
     primaryRef: null,
     runtimeRef: null,
@@ -58,6 +61,9 @@ export function createBorderMeshOwner({
   };
   const scenarioCoastlineDecisionWarnings = new Set();
 
+  // cachedDynamicBordersHash 的 key 由主权修订、场景视图模式、控制权修订、壳层修订组成，
+  // 覆盖 ownership/controller/shell 三类边界来源。任一字段变化都代表边界归属语义变化，
+  // rebuildDynamicBorders 会据此强制重建 state.cachedDynamicOwnerBorders。
   function buildDynamicBorderHash() {
     return [
       `rev:${Number(state.sovereigntyRevision) || 0}`,
@@ -167,6 +173,9 @@ export function createBorderMeshOwner({
     return true;
   }
 
+  // scenarioOpeningOwnerBorderCache 绑定 runtimeRef/meshPackRef/scenarioId/baselineHash/shellRevision，
+  // 目标是锁定“场景开启时 owner 边界”的快照语义。baselineHash 或 shellRevision 变化会直接触发重建，
+  // baselineHash 缺失时回退到 baselineOwnersRef 引用比较，保证旧数据源也能被正确失效。
   function refreshScenarioOpeningOwnerBorders(reason = "") {
     const startedAt = nowMs();
     let cacheMatches = false;
@@ -503,6 +512,9 @@ export function createBorderMeshOwner({
     };
   }
 
+  // 海岸线来源判定使用 scenarioCoastlineSourceCache，key=primaryRef+runtimeRef+scenarioId。
+  // 当 runtime land mask 的面积/洞数量超出阈值时强制回退 primary，
+  // 这样可以避免异常场景蒙版污染 cachedCoastlines* 的可视化质量。
   function resolveCoastlineTopologySource() {
     const primaryTopology = state.topologyPrimary || state.topology || null;
     const runtimeTopology = state.runtimePoliticalTopology || null;

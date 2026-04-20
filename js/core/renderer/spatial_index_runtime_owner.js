@@ -35,6 +35,8 @@ export function createSpatialIndexRuntimeOwner({
     computeProjectedGeoBounds = () => null,
   } = helpers;
 
+  // buildIndex 负责主索引映射层（landIndex/countryToFeatureIds/idToKey/keyToId），
+  // 为渲染与交互提供 feature-id 级别的稳定检索键；空间网格由 buildSpatialIndex 系列负责。
   function buildIndex({ scheduleUiMode = "immediate" } = {}) {
     state.landIndex.clear();
     state.countryToFeatureIds.clear();
@@ -155,6 +157,8 @@ export function createSpatialIndexRuntimeOwner({
     });
   }
 
+  // buildSpatialIndex 负责主空间索引（state.spatialItems + state.spatialGrid + spatialGridMeta），
+  // 并在 includeSecondary=true 时追加 water/special 次级索引，确保命中测试共享统一网格语义。
   function buildSpatialIndex({
     includeSecondary = true,
     allowComputeMissingBounds = true,
@@ -278,6 +282,9 @@ export function createSpatialIndexRuntimeOwner({
     await yieldToMain();
   }
 
+  // buildSpatialIndexChunked 与 buildSpatialIndex 产物一致，差异在于分片构建与让出主线程；
+  // 它先在临时容器生成 nextSpatialItems/nextGrid/spatialGridMeta，再原子替换到 state，
+  // 这样 UI 在大数据量下保持响应，同时延续主索引与次级索引的同一失效策略。
   async function buildSpatialIndexChunked({
     includeSecondary = true,
     allowComputeMissingBounds = true,

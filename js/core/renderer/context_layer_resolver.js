@@ -38,6 +38,9 @@ export function createContextLayerResolverOwner({
     }
   }
 
+  // layer score 用于比较 primary/detail 数据源覆盖质量：
+  // normalizedArea 体现地理覆盖范围，densityBoost 体现要素密度，
+  // 两者合成后写入 layerDataDiagnostics.*Score，便于定位来源切换原因。
   function computeLayerCoverageScore(collection) {
     if (!collection?.features?.length || !globalThis.d3?.geoBounds) return 0;
     try {
@@ -157,6 +160,9 @@ export function createContextLayerResolverOwner({
     return canRenderUrbanCollection(capability) && !!capability?.hasStableId && !!capability?.hasOwnerMeta;
   }
 
+  // 选择逻辑遵循“可用性优先 + 覆盖分数兜底”：
+  // 先处理空集可用性，再按 minScore 与 primary/detail 比值选源，
+  // 输出 source 会回写到 state.contextLayerSourceByName 作为后续缓存与诊断依据。
   function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
     const minScore = Number.isFinite(Number(policy.minScore))
       ? Number(policy.minScore)
@@ -243,6 +249,9 @@ export function createContextLayerResolverOwner({
     };
   }
 
+  // resolveContextLayerData 汇总外部源、primary、detail 三路输入。
+  // 回退策略遵循 source 优先级并同步 layerDataDiagnostics/contextLayerSourceByName，
+  // 保证 ensureLayerDataFromTopology 能以稳定字段追踪每层来源与降级路径。
   function resolveContextLayerData(layerName) {
     const externalContextCollection = state.contextLayerExternalDataByName?.[layerName];
     if (
