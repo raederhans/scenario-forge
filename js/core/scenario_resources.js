@@ -195,6 +195,12 @@ function getScenarioDecodedCollection(bundle, collectionKey) {
   return getBundleLoaderScenarioDecodedCollection(bundle, collectionKey);
 }
 
+/**
+ * Load and cache scenario registry metadata used by bundle resolution.
+ * @param {{ d3Client?: { json: Function } }} [options]
+ * @returns {Promise<object>} Registry payload with scenario entries and default scenario metadata.
+ * @throws {Error} Propagates fetch or parse errors from the registry loader.
+ */
 const loadScenarioRegistry = createScenarioRegistryLoader({
   state,
   scenarioRegistryUrl: SCENARIO_REGISTRY_URL,
@@ -646,9 +652,21 @@ const {
   getScenarioTopologyFeatureCollection,
   ensureScenarioGeoLocalePatchForLanguage,
   applyBlankScenarioPresentationDefaults,
+  /**
+   * Hydrate active scenario runtime payloads into state from a startup bundle.
+   * @param {{ bundle: object, scenarioId?: string, phase?: string }} [options]
+   * @returns {Promise<{ ok: boolean, reason: string, appliedLayerKeys: string[] }>} Hydration outcome and applied payload summary.
+   * @throws {Error} Throws when startup hydration cannot satisfy required runtime shell constraints.
+   */
   hydrateActiveScenarioBundle,
   buildScenarioRuntimeVersionTag,
   hasRenderableScenarioPoliticalTopology: hasRenderableScenarioPoliticalTopologyFromStartupHydration,
+  /**
+   * Evaluate startup hydration health gate from active runtime ownership/controller coverage.
+   * @param {{ phase?: string }} [options]
+   * @returns {{ ok: boolean, report: object, overlayConsistency: object }} Health gate verdict and diagnostics.
+   * @throws {Error} Does not throw under normal flow; callers treat failed health as non-throwing state.
+   */
   evaluateScenarioHydrationHealthGateState,
   enforceScenarioHydrationHealthGate,
 } = createScenarioStartupHydrationController({
@@ -945,6 +963,19 @@ function syncScenarioInspectorSelection(countryCode = "") {
   }
 }
 
+/**
+ * Load scenario bundle data for bootstrap or full flow and cache by scenario id.
+ *
+ * bundleLevel path terms:
+ * - "bootstrap": startup bundle path for startup bundle hydration.
+ * - "full": full bundle path for complete runtime payloads.
+ *
+ * runtime topology URL fallback order keeps startup bundle/legacy fallback naming aligned with manifest fields.
+ * @param {string} scenarioId
+ * @param {{ d3Client?: { json: Function }, forceReload?: boolean, bundleLevel?: "bootstrap"|"full" }} [options]
+ * @returns {Promise<object>} Scenario bundle with manifest, core payloads, runtime payloads, diagnostics, and chunk metadata.
+ * @throws {Error} Throws for unknown scenario id, unavailable d3 client, required resource load failures, and invalid runtime shell payloads.
+ */
 async function loadScenarioBundle(
   scenarioId,
   {
@@ -992,6 +1023,7 @@ async function loadScenarioBundle(
   const priorBundle = !forceReload && cachedBundle ? cachedBundle : null;
   const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
+  // bootstrap/full runtime topology resolution, with startup bundle/legacy fallback ordering from manifest/runtime shell fields.
   const runtimeTopologyUrl = String(
     requestedBundleLevel === "bootstrap"
       ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
