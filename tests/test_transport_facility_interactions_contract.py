@@ -5,6 +5,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOOLBAR_JS = REPO_ROOT / "js" / "ui" / "toolbar.js"
 APPEARANCE_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "appearance_controls_controller.js"
+FACILITY_SURFACE_JS = REPO_ROOT / "js" / "core" / "renderer" / "facility_surface.js"
 
 
 class TransportFacilityInteractionsContractTest(unittest.TestCase):
@@ -36,25 +37,28 @@ class TransportFacilityInteractionsContractTest(unittest.TestCase):
 
     def test_map_renderer_wires_facility_hover_and_card_logic(self):
         content = (REPO_ROOT / "js" / "core" / "map_renderer.js").read_text(encoding="utf-8")
+        owner_content = FACILITY_SURFACE_JS.read_text(encoding="utf-8")
         required_tokens = [
             "function getHoveredFacilityEntryFromEvent",
             "function buildFacilityTooltipText",
             "function buildFacilityInfoCardFieldSections",
             "function applyFacilityInfoCardState",
             "function zoomToFacilityEntry",
+            "getFacilitySurfaceOwner().buildFacilityTooltipText(entry);",
+            "getFacilitySurfaceOwner().applyFacilityInfoCardState(entry, {",
             "setVisibleFacilityHoverEntries(normalizedFamilyId, hoverEntries);",
             "const nextEntriesByKey = new Map(",
             "hoveredFacilityEntry = nextHoveredEntry;",
             "selectedFacilityEntry = nextSelectedEntry;",
             "const facilityDetailsActive = hoveredFacility ? isFacilityDetailsSurfaceActive(hoveredFacility.familyId) : false;",
             'setMapInteractionCursor(facilityDetailsActive ? "pointer" : "");',
-            'facilityInfoCardMoreBtn.textContent = t(facilityInfoCardExpanded ? "Less fields" : "More fields", "ui");',
             "if (clickedFacilityEntry && isFacilityDetailsSurfaceActive(clickedFacilityEntry.familyId)) {",
             'noteRenderAction("click-facility-info", actionStart);',
             "transportPanel.hidden !== true",
         ]
         for token in required_tokens:
             self.assertIn(token, content)
+        self.assertIn('facilityInfoCardMoreBtn.textContent = t(expanded ? "Less fields" : "More fields", "ui");', owner_content)
 
     def test_toolbar_summary_uses_filtered_transport_counts(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")

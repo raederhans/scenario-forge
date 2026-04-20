@@ -7,6 +7,25 @@ function resolveBaseUrl() {
   return getAppUrl();
 }
 
+function shouldReadServedSourceText() {
+  return !!(
+    process.env.PLAYWRIGHT_TEST_BASE_URL
+    || process.env.MAPCREATOR_BASE_URL
+    || process.env.MAPCREATOR_APP_URL
+  );
+}
+
+async function readSourceTextForAssertions(request, pageUrl, repoRoot, relativePath) {
+  if (!shouldReadServedSourceText()) {
+    return fs.readFileSync(path.join(repoRoot, ...relativePath.split("/")), "utf8");
+  }
+
+  const sourceUrl = new URL(relativePath, pageUrl).toString();
+  const response = await request.get(sourceUrl);
+  expect(response.ok()).toBeTruthy();
+  return await response.text();
+}
+
 async function waitForMapReady(page) {
   await page.waitForFunction(() => {
     const select = document.querySelector("#scenarioSelect");
@@ -55,9 +74,10 @@ function getMeanRgbDiff(snapshotA, snapshotB) {
   return diffTotal / snapshotA.pixels.length;
 }
 
-test("physical layer defaults and atlas rendering regression", async ({ page }) => {
+test("physical layer defaults and atlas rendering regression", async ({ page, request }) => {
   test.setTimeout(60000);
   const baseUrl = resolveBaseUrl();
+  const repoRoot = path.resolve(__dirname, "..", "..");
   const consoleErrors = [];
   const pageErrors = [];
   const networkFailures = [];
@@ -89,17 +109,46 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await waitForMapReady(page);
 
-  const inspection = await page.evaluate(async () => {
+  const rendererSource = await readSourceTextForAssertions(
+    request,
+    page.url(),
+    repoRoot,
+    "js/core/map_renderer.js",
+  );
+  const mainSource = await readSourceTextForAssertions(
+    request,
+    page.url(),
+    repoRoot,
+    "js/main.js",
+  );
+  const startupDataPipelineSource = await readSourceTextForAssertions(
+    request,
+    page.url(),
+    repoRoot,
+    "js/bootstrap/startup_data_pipeline.js",
+  );
+  const appearanceControllerSource = await readSourceTextForAssertions(
+    request,
+    page.url(),
+    repoRoot,
+    "js/ui/toolbar/appearance_controls_controller.js",
+  );
+  const interactionFunnelSource = await readSourceTextForAssertions(
+    request,
+    page.url(),
+    repoRoot,
+    "js/core/interaction_funnel.js",
+  );
+
+  const inspection = await page.evaluate(async ({
+    interactionFunnelSource,
+    appearanceControllerSource,
+    mainSource,
+    rendererSource,
+    startupDataPipelineSource,
+  }) => {
     const stateModuleUrl = new URL("js/core/state.js", document.baseURI).href;
-    const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
-    const mainSourceUrl = new URL("js/main.js", document.baseURI).href;
-    const toolbarSourceUrl = new URL("js/ui/toolbar.js", document.baseURI).href;
-    const interactionFunnelSourceUrl = new URL("js/core/interaction_funnel.js", document.baseURI).href;
     const stateModule = await import(stateModuleUrl);
-    const rendererSource = await fetch(rendererSourceUrl).then((response) => response.text());
-    const mainSource = await fetch(mainSourceUrl).then((response) => response.text());
-    const toolbarSource = await fetch(toolbarSourceUrl).then((response) => response.text());
-    const interactionFunnelSource = await fetch(interactionFunnelSourceUrl).then((response) => response.text());
     const {
       normalizePhysicalStyleConfig,
       PHYSICAL_ATLAS_PALETTE,
@@ -228,7 +277,7 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
           /function shouldPreferImmediateExactContextBaseRefresh\(reuseDecision = null\)/.test(rendererSource) === false
           && /const deferredReuseDecision = state\.deferExactAfterSettle \? getContextBaseReuseDecision\(\) : null;/.test(rendererSource) === false,
         contourZoomBucketRefreshesAfterQuietWindow:
-          /function scheduleExactAfterSettleRefresh\(\) \{[\s\S]*?const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh\(reuseDecision\);/.test(rendererSource)
+          /function scheduleExactAfterSettleRefresh[\s\S]*?const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh\(reuseDecision\);/.test(rendererSource)
           && /if \(forceExactContextBaseRefresh\) \{[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(rendererSource),
         hasMountainMultiplier:
           /if \(normalized === "mountain_high_relief"\) return 1\.18;/.test(rendererSource),
@@ -251,21 +300,27 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
       },
       mainSourceChecks: {
         physicalSetDefersContours:
-          /const PHYSICAL_CONTEXT_LAYER_SET = \[\s*"physical",\s*"physical_semantics",\s*\];/.test(mainSource),
+          /const PHYSICAL_CONTEXT_LAYER_SET = \[\s*"physical",\s*"physical_semantics",\s*\];/.test(startupDataPipelineSource),
         hasSeparateContourWarmupSet:
-          /const PHYSICAL_CONTOUR_LAYER_SET = \[[\s\S]*?"physical_contours_major",[\s\S]*?"physical_contours_minor",[\s\S]*?\];/.test(mainSource)
-          && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return PHYSICAL_CONTOUR_LAYER_SET;/.test(mainSource),
+          /const PHYSICAL_CONTOUR_LAYER_SET = \[[\s\S]*?"physical_contours_major",[\s\S]*?"physical_contours_minor",[\s\S]*?\];/.test(startupDataPipelineSource)
+          && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return PHYSICAL_CONTOUR_LAYER_SET;/.test(startupDataPipelineSource),
         schedulesDeferredContourWarmup:
           /if \(state\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(mainSource)
           && /schedulePostReadyTask\("post-ready-contour-warmup", async \(\) => \{[\s\S]*?ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",/.test(mainSource),
       },
       integrationSourceChecks: {
         toolbarToggleLoadsFullPhysicalSet:
-          /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(toolbarSource),
+          /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(appearanceControllerSource),
         projectImportLoadsFullPhysicalSet:
           /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{[\s\S]*?reason: "project-import",[\s\S]*?renderNow: false,/.test(interactionFunnelSource),
       },
     };
+  }, {
+    interactionFunnelSource,
+    appearanceControllerSource,
+    mainSource,
+    rendererSource,
+    startupDataPipelineSource,
   });
 
   expect(inspection.defaults.normalizedDefault.blendMode).toBe("source-over");

@@ -64,6 +64,10 @@ import {
 } from "./interaction_funnel.js";
 import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
+import { createPoliticalCollectionOwner } from "./renderer/political_collection_owner.js";
+import { createContextLayerResolverOwner } from "./renderer/context_layer_resolver.js";
+import { createRendererAssetUrlPolicyOwner } from "./renderer/asset_url_policy.js";
+import { createFacilitySurfaceOwner } from "./renderer/facility_surface.js";
 
 const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
 const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
@@ -735,17 +739,10 @@ const layerResolverCache = {
 };
 const objectIdentityTokenCache = new WeakMap();
 let nextObjectIdentityToken = 1;
-const politicalFeatureCollectionCache = new WeakMap();
 let admin0MergedCache = {
   topologyRef: null,
   featureCount: 0,
   entries: [],
-};
-let composedPoliticalCollectionCache = {
-  primaryRef: null,
-  detailRef: null,
-  overrideRef: null,
-  result: null,
 };
 let scenarioCoastlineSourceCache = {
   primaryRef: null,
@@ -825,6 +822,10 @@ const cityLayerCache = {
 };
 let urbanCityPolicyOwner = null;
 let strategicOverlayHelpersOwner = null;
+let politicalCollectionOwner = null;
+let contextLayerResolverOwner = null;
+let rendererAssetUrlPolicyOwner = null;
+let facilitySurfaceOwner = null;
 
 function getStrategicOverlayHelpersOwner() {
   if (strategicOverlayHelpersOwner) {
@@ -923,6 +924,80 @@ function getUrbanCityPolicyOwner() {
     },
   });
   return urbanCityPolicyOwner;
+}
+
+function getPoliticalCollectionOwner() {
+  if (politicalCollectionOwner) {
+    return politicalCollectionOwner;
+  }
+  politicalCollectionOwner = createPoliticalCollectionOwner({
+    state,
+    constants: {
+      highFrequencyCountryDetailWhitelist: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST,
+      interactiveAggregateTierFilters: INTERACTIVE_AGGREGATE_TIER_FILTERS,
+    },
+    helpers: {
+      getDetailTier,
+      getFeatureCountryCodeNormalized,
+      getFeatureId,
+      isPoliticalInteractionRenderableFeature,
+      isRenderDiagEnabled: () => renderDiag.enabled,
+    },
+  });
+  return politicalCollectionOwner;
+}
+
+function getContextLayerResolverOwner() {
+  if (contextLayerResolverOwner) {
+    return contextLayerResolverOwner;
+  }
+  contextLayerResolverOwner = createContextLayerResolverOwner({
+    state,
+    caches: {
+      layerResolverCache,
+    },
+    constants: {
+      contextLayerMinScore: CONTEXT_LAYER_MIN_SCORE,
+      layerDiagPrefix: LAYER_DIAG_PREFIX,
+      urbanCorruptBoundsHeightDeg: URBAN_CORRUPT_BOUNDS_HEIGHT_DEG,
+      urbanCorruptBoundsWidthDeg: URBAN_CORRUPT_BOUNDS_WIDTH_DEG,
+    },
+    helpers: {
+      clamp,
+      ensureBathymetryDataAvailability,
+      getContextLayerStableSourceToken,
+      getUrbanFeatureOwnerId,
+      getUrbanFeatureStableId,
+      resetScenarioWaterCacheAdaptiveState,
+    },
+  });
+  return contextLayerResolverOwner;
+}
+
+function getRendererAssetUrlPolicyOwner() {
+  if (rendererAssetUrlPolicyOwner) {
+    return rendererAssetUrlPolicyOwner;
+  }
+  rendererAssetUrlPolicyOwner = createRendererAssetUrlPolicyOwner({
+    state,
+    constants: {
+      globalBathymetryTopologyUrl: GLOBAL_BATHYMETRY_TOPOLOGY_URL,
+    },
+  });
+  return rendererAssetUrlPolicyOwner;
+}
+
+function getFacilitySurfaceOwner() {
+  if (facilitySurfaceOwner) {
+    return facilitySurfaceOwner;
+  }
+  facilitySurfaceOwner = createFacilitySurfaceOwner({
+    helpers: {
+      renderTooltipText,
+      t,
+    },
+  });
+  return facilitySurfaceOwner;
 }
 const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
@@ -4133,100 +4208,7 @@ function getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd = fals
 }
 
 function getPoliticalFeatureCollection(topology, sourceName) {
-  if (!topology?.objects?.political || !globalThis.topojson) {
-    return { type: "FeatureCollection", features: [] };
-  }
-  const cachedCollections = politicalFeatureCollectionCache.get(topology);
-  if (cachedCollections?.has(sourceName)) {
-    return cachedCollections.get(sourceName);
-  }
-  const seededCollection =
-    sourceName === "runtime"
-    && topology === state.runtimePoliticalTopology
-    && Array.isArray(state.runtimePoliticalFeatureCollectionSeed?.features)
-      ? state.runtimePoliticalFeatureCollectionSeed
-      : null;
-  const collection = seededCollection || globalThis.topojson.feature(topology, topology.objects.political);
-  const features = Array.isArray(collection?.features) ? collection.features : [];
-  const normalizedCollection = {
-    type: "FeatureCollection",
-    features: features.map((feature) => {
-      const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: sourceName });
-      const existingSource = String(normalizedFeature?.properties?.__source || "").trim();
-      return {
-        ...normalizedFeature,
-        properties: {
-          ...(normalizedFeature?.properties || {}),
-          __source: existingSource || sourceName,
-        },
-      };
-    }),
-  };
-  const nextCollections = cachedCollections || new Map();
-  nextCollections.set(sourceName, normalizedCollection);
-  politicalFeatureCollectionCache.set(topology, nextCollections);
-  if (seededCollection) {
-    state.runtimePoliticalFeatureCollectionSeed = normalizedCollection;
-  }
-  return normalizedCollection;
-}
-
-function parseReplaceFeatureIds(rawValue) {
-  if (Array.isArray(rawValue)) {
-    return rawValue
-      .map((item) => String(item || "").trim())
-      .filter(Boolean);
-  }
-
-  const text = String(rawValue || "").trim();
-  if (!text) return [];
-  return text
-    .split(/[,\n;|]+/)
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
-}
-
-function getRingOrientationAccumulator(ring) {
-  if (!Array.isArray(ring) || ring.length < 4) return 0;
-  let total = 0;
-  for (let index = 0; index < ring.length - 1; index += 1) {
-    const start = ring[index];
-    const end = ring[index + 1];
-    if (!Array.isArray(start) || !Array.isArray(end)) continue;
-    total += (Number(end[0]) - Number(start[0])) * (Number(end[1]) + Number(start[1]));
-  }
-  return total;
-}
-
-function orientRingCoordinates(ring, clockwise) {
-  if (!Array.isArray(ring) || ring.length < 4) return ring;
-  const signed = getRingOrientationAccumulator(ring);
-  const isClockwise = signed > 0;
-  if (clockwise === isClockwise) return ring;
-  return [...ring].reverse();
-}
-
-function rewindGeometryRings(geometry) {
-  if (!geometry || !geometry.type || !geometry.coordinates) return null;
-  if (geometry.type === "Polygon") {
-    return {
-      ...geometry,
-      coordinates: geometry.coordinates.map((ring, index) =>
-        orientRingCoordinates(ring, index === 0)
-      ),
-    };
-  }
-  if (geometry.type === "MultiPolygon") {
-    return {
-      ...geometry,
-      coordinates: geometry.coordinates.map((polygon) =>
-        Array.isArray(polygon)
-          ? polygon.map((ring, index) => orientRingCoordinates(ring, index === 0))
-          : polygon
-      ),
-    };
-  }
-  return null;
+  return getPoliticalCollectionOwner().getPoliticalFeatureCollection(topology, sourceName);
 }
 
 function isWorldBounds(bounds) {
@@ -4287,306 +4269,23 @@ function getMaxDprForProfile(renderProfile) {
 }
 
 function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
-  if (!feature?.geometry || !globalThis.d3?.geoArea) {
-    return feature;
-  }
-
-  let area = null;
-  try {
-    area = globalThis.d3.geoArea(feature);
-  } catch (_error) {
-    return feature;
-  }
-  if (!Number.isFinite(area) || area <= Math.PI * 2) {
-    return feature;
-  }
-
-  const rewoundGeometry = rewindGeometryRings(feature.geometry);
-  if (!rewoundGeometry) return feature;
-  const rewoundFeature = {
-    ...feature,
-    geometry: rewoundGeometry,
-  };
-
-  try {
-    const rewoundArea = globalThis.d3.geoArea(rewoundFeature);
-    if (Number.isFinite(rewoundArea) && rewoundArea < area) {
-      const featureId = getFeatureId(feature) || "(unknown)";
-      const logKey = `${sourceLabel}::${featureId}`;
-      if (renderDiag.enabled && !rewoundFeatureLogKeys.has(logKey)) {
-        rewoundFeatureLogKeys.add(logKey);
-        console.warn(
-          `[map_renderer] Rewound ${sourceLabel} feature orientation for ${featureId}. area=${area.toFixed(5)} -> ${rewoundArea.toFixed(5)}`
-        );
-      }
-      return rewoundFeature;
-    }
-  } catch (_error) {
-    return feature;
-  }
-  return feature;
+  return getPoliticalCollectionOwner().normalizeFeatureGeometry(feature, { sourceLabel });
 }
 
 function mergeOverrideFeatures(baseFeatures, overrideCollection) {
-  const order = [];
-  const featureById = new Map();
-
-  baseFeatures.forEach((feature) => {
-    const featureId = getFeatureId(feature);
-    if (!featureId || featureById.has(featureId)) return;
-    order.push(featureId);
-    featureById.set(featureId, feature);
-  });
-
-  let applied = 0;
-  let replaced = 0;
-
-  const overrides = Array.isArray(overrideCollection?.features)
-    ? overrideCollection.features
-    : [];
-  overrides.forEach((feature) => {
-    if (!feature?.geometry) return;
-    const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "ru_override" });
-    const featureId = getFeatureId(normalizedFeature);
-    if (!featureId) return;
-
-    const replaceIds = parseReplaceFeatureIds(
-      normalizedFeature?.properties?.replace_ids ??
-      normalizedFeature?.properties?.replaceIds ??
-      ""
-    );
-    replaceIds.forEach((replaceId) => {
-      if (featureById.delete(replaceId)) {
-        replaced += 1;
-      }
-    });
-
-    const existing = featureById.has(featureId);
-    featureById.set(featureId, {
-      ...normalizedFeature,
-      properties: {
-        ...(normalizedFeature?.properties || {}),
-        __source: "ru_override",
-      },
-    });
-    if (!existing) {
-      order.push(featureId);
-    }
-    applied += 1;
-  });
-
-  if (applied > 0) {
-    console.info(
-      `[map_renderer] Applied RU city overrides: injected=${applied}, replaced=${replaced}.`
-    );
-  }
-
-  return order
-    .filter((id) => featureById.has(id))
-    .map((id) => featureById.get(id));
+  return getPoliticalCollectionOwner().mergeOverrideFeatures(baseFeatures, overrideCollection);
 }
 
 function composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection = null) {
-  const cacheMatches =
-    composedPoliticalCollectionCache.primaryRef === primaryTopology &&
-    composedPoliticalCollectionCache.detailRef === detailTopology &&
-    composedPoliticalCollectionCache.overrideRef === overrideCollection;
-  if (cacheMatches && composedPoliticalCollectionCache.result) {
-    return composedPoliticalCollectionCache.result;
-  }
-  const primaryCollection = getPoliticalFeatureCollection(primaryTopology, "primary");
-  if (!detailTopology) {
-    const baseFeatures = primaryCollection.features;
-    const features = overrideCollection
-      ? mergeOverrideFeatures(baseFeatures, overrideCollection)
-      : baseFeatures;
-    const result = {
-      type: "FeatureCollection",
-      features,
-    };
-    composedPoliticalCollectionCache = {
-      primaryRef: primaryTopology,
-      detailRef: detailTopology,
-      overrideRef: overrideCollection,
-      result,
-    };
-    return result;
-  }
-
-  const detailCollection = getPoliticalFeatureCollection(detailTopology, "detail");
-  const result = composePoliticalFeatureCollections(primaryCollection, detailCollection, overrideCollection);
-  composedPoliticalCollectionCache = {
-    primaryRef: primaryTopology,
-    detailRef: detailTopology,
-    overrideRef: overrideCollection,
-    result,
-  };
-  return result;
+  return getPoliticalCollectionOwner().composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection);
 }
 
 function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
-  const normalizedPrimaryCollection = Array.isArray(primaryCollection?.features)
-    ? primaryCollection
-    : { type: "FeatureCollection", features: [] };
-  const normalizedDetailCollection = Array.isArray(detailCollection?.features)
-    ? {
-      type: "FeatureCollection",
-      features: detailCollection.features.map((feature) => {
-        const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
-        return {
-          ...normalizedFeature,
-          properties: {
-            ...(normalizedFeature?.properties || {}),
-            __source: "detail",
-          },
-        };
-      }),
-    }
-    : null;
-  if (!normalizedDetailCollection) {
-    const baseFeatures = normalizedPrimaryCollection.features;
-    const features = overrideCollection
-      ? mergeOverrideFeatures(baseFeatures, overrideCollection)
-      : baseFeatures;
-    return {
-      type: "FeatureCollection",
-      features,
-    };
-  }
-  const detailCountries = new Set();
-  const detailFeatureIdsByCountry = new Map();
-  normalizedDetailCollection.features.forEach((feature) => {
-    const code = getFeatureCountryCodeNormalized(feature);
-    if (code) detailCountries.add(code);
-    const featureId = getFeatureId(feature);
-    if (!code || !featureId) return;
-    let ids = detailFeatureIdsByCountry.get(code);
-    if (!ids) {
-      ids = new Set();
-      detailFeatureIdsByCountry.set(code, ids);
-    }
-    ids.add(featureId);
-  });
-
-  const seen = new Set();
-  const features = [];
-
-  const pushIfUnique = (feature) => {
-    const id = getFeatureId(feature);
-    if (!id) return;
-    if (seen.has(id)) return;
-    seen.add(id);
-    features.push(feature);
-  };
-
-  normalizedDetailCollection.features.forEach(pushIfUnique);
-  normalizedPrimaryCollection.features.forEach((feature) => {
-    const code = getFeatureCountryCodeNormalized(feature);
-    if (code && detailCountries.has(code)) {
-      const featureId = getFeatureId(feature);
-      const detailFeatureIds = detailFeatureIdsByCountry.get(code);
-      const countryPriority = HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST.has(code);
-      if (countryPriority && featureId && !(detailFeatureIds?.has(featureId))) {
-        const promotedFeature = {
-          ...feature,
-          properties: {
-            ...(feature?.properties || {}),
-            __source: "primary",
-            __coveragePromoted: true,
-          },
-        };
-        pushIfUnique(promotedFeature);
-      }
-      return;
-    }
-    pushIfUnique(feature);
-  });
-
-  const mergedFeatures = overrideCollection
-    ? mergeOverrideFeatures(features, overrideCollection)
-    : features;
-
-  const result = {
-    type: "FeatureCollection",
-    features: mergedFeatures,
-  };
-  return result;
+  return getPoliticalCollectionOwner().composePoliticalFeatureCollections(primaryCollection, detailCollection, overrideCollection);
 }
 
 function collectCountryCoverageStats(features = []) {
-  const detailCountries = new Set();
-  const primaryCountries = new Set();
-  let detailFeatureCount = 0;
-  let primaryFeatureCount = 0;
-  const countryCoverage = new Map();
-
-  features.forEach((feature) => {
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (!countryCode) return;
-    const source = String(feature?.properties?.__source || "primary");
-    let countryEntry = countryCoverage.get(countryCode);
-    if (!countryEntry) {
-      countryEntry = {
-        countryCode,
-        totalFeatures: 0,
-        detailFeatures: 0,
-        primaryFeatures: 0,
-        promotedPrimaryFeatures: 0,
-        detailOnly: false,
-        priorityCountry: HIGH_FREQUENCY_COUNTRY_DETAIL_WHITELIST.has(countryCode),
-      };
-      countryCoverage.set(countryCode, countryEntry);
-    }
-    countryEntry.totalFeatures += 1;
-    if (source === "detail") {
-      detailCountries.add(countryCode);
-      detailFeatureCount += 1;
-      countryEntry.detailFeatures += 1;
-    } else {
-      primaryCountries.add(countryCode);
-      primaryFeatureCount += 1;
-      countryEntry.primaryFeatures += 1;
-      if (feature?.properties?.__coveragePromoted) {
-        countryEntry.promotedPrimaryFeatures += 1;
-      }
-    }
-  });
-
-  const detailCountryList = [];
-  const primaryCountryList = [];
-  const priorityCountryGaps = [];
-  Array.from(countryCoverage.values())
-    .sort((a, b) => a.countryCode.localeCompare(b.countryCode))
-    .forEach((entry) => {
-      entry.detailOnly = entry.detailFeatures > 0 && entry.primaryFeatures === 0;
-      if (entry.detailFeatures > 0) {
-        detailCountryList.push(entry);
-      }
-      if (entry.primaryFeatures > 0) {
-        primaryCountryList.push(entry);
-      }
-      if (entry.priorityCountry && entry.primaryFeatures > 0) {
-        priorityCountryGaps.push({
-          countryCode: entry.countryCode,
-          primaryFeatures: entry.primaryFeatures,
-          promotedPrimaryFeatures: entry.promotedPrimaryFeatures,
-          detailFeatures: entry.detailFeatures,
-        });
-      }
-    });
-
-  const totalCountries = new Set([...detailCountries, ...primaryCountries]).size;
-  return {
-    totalCountries,
-    detailCountries: detailCountries.size,
-    primaryCountries: primaryCountries.size,
-    totalFeatures: features.length,
-    detailFeatures: detailFeatureCount,
-    primaryFeatures: primaryFeatureCount,
-    detailCountryList,
-    primaryCountryList,
-    priorityCountryGaps,
-  };
+  return getPoliticalCollectionOwner().collectCountryCoverageStats(features);
 }
 
 function updateDprStage(nextStage = "idle", { force = false } = {}) {
@@ -4602,72 +4301,7 @@ function updateDprStage(nextStage = "idle", { force = false } = {}) {
 }
 
 function buildInteractiveLandData(fullCollection) {
-  if (!Array.isArray(fullCollection?.features) || !fullCollection.features.length) {
-    return fullCollection;
-  }
-
-  const explicitFeatures = fullCollection.features.filter((feature) =>
-    isPoliticalInteractionRenderableFeature(feature, getFeatureId(feature))
-  );
-  const explicitCollection = explicitFeatures.length === fullCollection.features.length
-    ? fullCollection
-    : {
-      type: "FeatureCollection",
-      features: explicitFeatures,
-    };
-  if (!Array.isArray(explicitCollection?.features) || !explicitCollection.features.length) {
-    return explicitCollection;
-  }
-
-  const filterStateByCountry = new Map();
-  explicitCollection.features.forEach((feature) => {
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    const blockedTiers = INTERACTIVE_AGGREGATE_TIER_FILTERS[countryCode];
-    if (!countryCode || !blockedTiers?.size) return;
-
-    const tier = getDetailTier(feature).toLowerCase();
-    let entry = filterStateByCountry.get(countryCode);
-    if (!entry) {
-      entry = {
-        blockedTiers,
-        hasLeaf: false,
-        hasBlocked: false,
-      };
-      filterStateByCountry.set(countryCode, entry);
-    }
-
-    if (blockedTiers.has(tier)) {
-      entry.hasBlocked = true;
-      return;
-    }
-
-    if (String(feature?.properties?.__source || "primary") === "detail") {
-      entry.hasLeaf = true;
-    }
-  });
-
-  const activeFilters = new Map(
-    Array.from(filterStateByCountry.entries()).filter(([, entry]) => entry.hasLeaf && entry.hasBlocked)
-  );
-  if (!activeFilters.size) {
-    return explicitCollection;
-  }
-
-  const filteredFeatures = explicitCollection.features.filter((feature) => {
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    const entry = activeFilters.get(countryCode);
-    if (!entry) return true;
-    return !entry.blockedTiers.has(getDetailTier(feature).toLowerCase());
-  });
-
-  if (filteredFeatures.length === explicitCollection.features.length) {
-    return explicitCollection;
-  }
-
-  return {
-    type: "FeatureCollection",
-    features: filteredFeatures,
-  };
+  return getPoliticalCollectionOwner().buildInteractiveLandData(fullCollection);
 }
 
 function rebuildPoliticalLandCollections() {
@@ -5420,451 +5054,46 @@ function getContourVisibleFeatures(
 }
 
 function getLayerFeatureCollection(topology, layerName) {
-  if (!topology?.objects || !globalThis.topojson) return null;
-  const object = topology.objects[layerName];
-  if (!object) return null;
-  try {
-    const collection = globalThis.topojson.feature(topology, object);
-    if (!collection || !Array.isArray(collection.features)) return null;
-    return collection;
-  } catch (error) {
-    console.warn(`${LAYER_DIAG_PREFIX} Failed to decode layer "${layerName}":`, error);
-    return null;
-  }
+  return getContextLayerResolverOwner().getLayerFeatureCollection(topology, layerName);
 }
 
 function computeLayerCoverageScore(collection) {
-  if (!collection?.features?.length || !globalThis.d3?.geoBounds) return 0;
-  try {
-    const [[minLon, minLat], [maxLon, maxLat]] = globalThis.d3.geoBounds(collection);
-    if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return 0;
-    let width = maxLon - minLon;
-    if (width < 0) width += 360;
-    const height = Math.max(0, maxLat - minLat);
-    const normalizedArea = clamp((width * height) / (360 * 180), 0, 1);
-    const densityBoost = Math.min(1, Math.log10(collection.features.length + 1) / 4);
-    return clamp(normalizedArea * 0.8 + densityBoost * 0.2, 0, 1);
-  } catch (_error) {
-    return 0;
-  }
+  return getContextLayerResolverOwner().computeLayerCoverageScore(collection);
 }
 
 const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
 const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
 
 function createUrbanLayerCapability(overrides = {}) {
-  return {
-    featureCount: 0,
-    hasGeometry: false,
-    hasStableId: false,
-    hasOwnerMeta: false,
-    hasCorruptBounds: false,
-    missingStableIdCount: 0,
-    missingOwnerCount: 0,
-    corruptBoundsCount: 0,
-    adaptiveAvailable: false,
-    unavailableReason: "Urban layer data unavailable.",
-    ...overrides,
-  };
+  return getContextLayerResolverOwner().createUrbanLayerCapability(overrides);
 }
 
 function getUrbanFeatureGeoBounds(feature) {
-  if (!feature || !globalThis.d3?.geoBounds) return null;
-  try {
-    const bounds = globalThis.d3.geoBounds(feature);
-    if (!Array.isArray(bounds) || bounds.length !== 2) return null;
-    const [[minLon, minLat], [maxLon, maxLat]] = bounds;
-    if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return null;
-    let width = maxLon - minLon;
-    if (width < 0) width += 360;
-    const height = Math.max(0, maxLat - minLat);
-    return {
-      width,
-      height,
-    };
-  } catch (_error) {
-    return null;
-  }
-}
-
-function getUrbanCapabilityUnavailableReason(capability) {
-  if (!capability?.hasGeometry) {
-    return "Urban layer data unavailable.";
-  }
-  if (capability.hasCorruptBounds) {
-    return "Urban layer geometry is corrupt; rebuild the topology before using Adaptive mode.";
-  }
-  if (!capability.hasStableId) {
-    return "Urban layer is missing stable IDs; Adaptive mode is disabled until the topology is rebuilt.";
-  }
-  if (!capability.hasOwnerMeta) {
-    return "Urban layer is missing country owner metadata; Adaptive mode is disabled until the topology is rebuilt.";
-  }
-  return "";
+  return getContextLayerResolverOwner().getUrbanFeatureGeoBounds(feature);
 }
 
 function getUrbanLayerCapability(collection) {
-  const features = Array.isArray(collection?.features) ? collection.features : [];
-  if (!features.length) {
-    return createUrbanLayerCapability();
-  }
-
-  let missingStableIdCount = 0;
-  let missingOwnerCount = 0;
-  let corruptBoundsCount = 0;
-
-  features.forEach((feature) => {
-    if (!getUrbanFeatureStableId(feature)) {
-      missingStableIdCount += 1;
-    }
-    if (!getUrbanFeatureOwnerId(feature)) {
-      missingOwnerCount += 1;
-    }
-    const bounds = getUrbanFeatureGeoBounds(feature);
-    if (
-      bounds
-      && (bounds.width >= URBAN_CORRUPT_BOUNDS_WIDTH_DEG || bounds.height >= URBAN_CORRUPT_BOUNDS_HEIGHT_DEG)
-    ) {
-      corruptBoundsCount += 1;
-    }
-  });
-
-  const capability = createUrbanLayerCapability({
-    featureCount: features.length,
-    hasGeometry: true,
-    hasStableId: missingStableIdCount === 0,
-    hasOwnerMeta: missingOwnerCount === 0,
-    hasCorruptBounds: corruptBoundsCount > 0,
-    missingStableIdCount,
-    missingOwnerCount,
-    corruptBoundsCount,
-  });
-  capability.adaptiveAvailable = capability.hasGeometry
-    && capability.hasStableId
-    && capability.hasOwnerMeta
-    && !capability.hasCorruptBounds;
-  capability.unavailableReason = getUrbanCapabilityUnavailableReason(capability);
-  return capability;
+  return getContextLayerResolverOwner().getUrbanLayerCapability(collection);
 }
 
 function canRenderUrbanCollection(capability) {
-  return !!capability?.hasGeometry && !capability?.hasCorruptBounds;
+  return getContextLayerResolverOwner().canRenderUrbanCollection(capability);
 }
 
 function canPreferUrbanDetailCollection(capability) {
-  return canRenderUrbanCollection(capability) && !!capability?.hasStableId && !!capability?.hasOwnerMeta;
+  return getContextLayerResolverOwner().canPreferUrbanDetailCollection(capability);
 }
 
 function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
-  const minScore = Number.isFinite(Number(policy.minScore))
-    ? Number(policy.minScore)
-    : CONTEXT_LAYER_MIN_SCORE;
-  const preferDetailWhenPrimaryEmpty = !!policy.preferDetailWhenPrimaryEmpty;
-  const primaryCount = Array.isArray(primaryCollection?.features) ? primaryCollection.features.length : 0;
-  const detailCount = Array.isArray(detailCollection?.features) ? detailCollection.features.length : 0;
-  const primaryScore = computeLayerCoverageScore(primaryCollection);
-  const detailScore = computeLayerCoverageScore(detailCollection);
-
-  if (!primaryCount && !detailCount) {
-    return {
-      collection: null,
-      source: "none",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  if (!primaryCount && detailCount) {
-    return {
-      collection: detailCollection,
-      source: "detail",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  if (primaryCount && !detailCount) {
-    return {
-      collection: primaryCollection,
-      source: "primary",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  if (preferDetailWhenPrimaryEmpty && primaryCount === 0 && detailCount > 0) {
-    return {
-      collection: detailCollection,
-      source: "detail",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  if (primaryScore >= minScore && primaryScore >= detailScore * 0.65) {
-    return {
-      collection: primaryCollection,
-      source: "primary",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  if (detailScore > primaryScore || detailCount > primaryCount * 1.25) {
-    return {
-      collection: detailCollection,
-      source: "detail",
-      primaryScore,
-      detailScore,
-      primaryCount,
-      detailCount,
-    };
-  }
-
-  return {
-    collection: primaryCollection,
-    source: "primary",
-    primaryScore,
-    detailScore,
-    primaryCount,
-    detailCount,
-  };
+  return getContextLayerResolverOwner().pickBestLayerSource(primaryCollection, detailCollection, policy);
 }
 
 function resolveContextLayerData(layerName) {
-  const externalContextCollection = state.contextLayerExternalDataByName?.[layerName];
-  if (
-    layerName === "special_zones" &&
-    Array.isArray(state.specialZonesExternalData?.features)
-  ) {
-    if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-      state.layerDataDiagnostics = {};
-    }
-    if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-      state.contextLayerSourceByName = {};
-    }
-    state.contextLayerSourceByName[layerName] = "external";
-    state.layerDataDiagnostics[layerName] = {
-      source: "external",
-      primaryCount: 0,
-      detailCount: state.specialZonesExternalData.features.length,
-      primaryScore: 0,
-      detailScore: 1,
-    };
-    return state.specialZonesExternalData;
-  }
-
-  const primaryTopology = state.topologyPrimary || state.topology;
-  const detailTopology = state.topologyDetail;
-  const primaryCollection = getLayerFeatureCollection(primaryTopology, layerName);
-  const detailCollection = getLayerFeatureCollection(detailTopology, layerName);
-  const isUrbanLayer = layerName === "urban";
-  const primaryUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(primaryCollection) : null;
-  const detailUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(detailCollection) : null;
-  const externalUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(externalContextCollection) : null;
-  const preferExternalUrban =
-    isUrbanLayer
-    && canPreferUrbanDetailCollection(externalUrbanCapability)
-    && !canPreferUrbanDetailCollection(primaryUrbanCapability)
-    && !canPreferUrbanDetailCollection(detailUrbanCapability);
-
-  if (preferExternalUrban) {
-    if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-      state.layerDataDiagnostics = {};
-    }
-    if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-      state.contextLayerSourceByName = {};
-    }
-    state.contextLayerSourceByName[layerName] = "external";
-    state.layerDataDiagnostics[layerName] = {
-      source: "external",
-      primaryCount: Array.isArray(primaryCollection?.features) ? primaryCollection.features.length : 0,
-      detailCount: Array.isArray(detailCollection?.features) ? detailCollection.features.length : 0,
-      primaryScore: Number(computeLayerCoverageScore(primaryCollection).toFixed(3)),
-      detailScore: Number(computeLayerCoverageScore(detailCollection).toFixed(3)),
-      externalCount: Array.isArray(externalContextCollection?.features) ? externalContextCollection.features.length : 0,
-      externalScore: Number(computeLayerCoverageScore(externalContextCollection).toFixed(3)),
-      primaryAdaptiveAvailable: !!primaryUrbanCapability?.adaptiveAvailable,
-      detailAdaptiveAvailable: !!detailUrbanCapability?.adaptiveAvailable,
-      externalAdaptiveAvailable: !!externalUrbanCapability?.adaptiveAvailable,
-      primaryMissingStableIds: Number(primaryUrbanCapability?.missingStableIdCount || 0),
-      primaryMissingOwnerMeta: Number(primaryUrbanCapability?.missingOwnerCount || 0),
-      detailMissingStableIds: Number(detailUrbanCapability?.missingStableIdCount || 0),
-      detailMissingOwnerMeta: Number(detailUrbanCapability?.missingOwnerCount || 0),
-      externalMissingStableIds: Number(externalUrbanCapability?.missingStableIdCount || 0),
-      externalMissingOwnerMeta: Number(externalUrbanCapability?.missingOwnerCount || 0),
-    };
-    state.urbanLayerCapability = externalUrbanCapability;
-    return externalContextCollection;
-  }
-
-  const pick = pickBestLayerSource(
-    isUrbanLayer && !canRenderUrbanCollection(primaryUrbanCapability) ? null : primaryCollection,
-    isUrbanLayer && !canPreferUrbanDetailCollection(detailUrbanCapability) ? null : detailCollection,
-    {
-    minScore: layerName === "special_zones" ? 0 : CONTEXT_LAYER_MIN_SCORE,
-    preferDetailWhenPrimaryEmpty: layerName === "special_zones",
-    }
-  );
-
-  if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-    state.layerDataDiagnostics = {};
-  }
-  if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-    state.contextLayerSourceByName = {};
-  }
-
-  state.contextLayerSourceByName[layerName] = pick.source;
-  state.layerDataDiagnostics[layerName] = {
-    source: pick.source,
-    primaryCount: pick.primaryCount,
-    detailCount: pick.detailCount,
-    primaryScore: Number(pick.primaryScore.toFixed(3)),
-    detailScore: Number(pick.detailScore.toFixed(3)),
-    ...(isUrbanLayer
-      ? {
-          primaryAdaptiveAvailable: !!primaryUrbanCapability?.adaptiveAvailable,
-          detailAdaptiveAvailable: !!detailUrbanCapability?.adaptiveAvailable,
-          primaryMissingStableIds: Number(primaryUrbanCapability?.missingStableIdCount || 0),
-          primaryMissingOwnerMeta: Number(primaryUrbanCapability?.missingOwnerCount || 0),
-          primaryCorruptBounds: Number(primaryUrbanCapability?.corruptBoundsCount || 0),
-          detailMissingStableIds: Number(detailUrbanCapability?.missingStableIdCount || 0),
-          detailMissingOwnerMeta: Number(detailUrbanCapability?.missingOwnerCount || 0),
-          detailCorruptBounds: Number(detailUrbanCapability?.corruptBoundsCount || 0),
-        }
-      : {}),
-  };
-
-  if (isUrbanLayer) {
-    state.urbanLayerCapability = pick.source === "detail"
-      ? detailUrbanCapability
-      : primaryUrbanCapability;
-  }
-
-  if (pick.source === "none" && Array.isArray(externalContextCollection?.features)) {
-    if (isUrbanLayer && !canRenderUrbanCollection(externalUrbanCapability)) {
-      state.urbanLayerCapability = externalUrbanCapability;
-      return pick.collection;
-    }
-    state.contextLayerSourceByName[layerName] = "external";
-    state.layerDataDiagnostics[layerName] = {
-      source: "external",
-      primaryCount: pick.primaryCount,
-      detailCount: externalContextCollection.features.length,
-      primaryScore: Number(pick.primaryScore.toFixed(3)),
-      detailScore: 1,
-      ...(isUrbanLayer
-        ? {
-            externalAdaptiveAvailable: !!externalUrbanCapability?.adaptiveAvailable,
-            externalMissingStableIds: Number(externalUrbanCapability?.missingStableIdCount || 0),
-            externalMissingOwnerMeta: Number(externalUrbanCapability?.missingOwnerCount || 0),
-            externalCorruptBounds: Number(externalUrbanCapability?.corruptBoundsCount || 0),
-          }
-        : {}),
-    };
-    if (isUrbanLayer) {
-      state.urbanLayerCapability = externalUrbanCapability;
-    }
-    return externalContextCollection;
-  }
-
-  if (isUrbanLayer && !state.urbanLayerCapability) {
-    state.urbanLayerCapability = createUrbanLayerCapability();
-  }
-
-  return pick.collection;
+  return getContextLayerResolverOwner().resolveContextLayerData(layerName);
 }
 
 function ensureLayerDataFromTopology() {
-  const primaryTopology = state.topologyPrimary || state.topology;
-  if (!primaryTopology || !globalThis.topojson) return;
-
-  if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
-    state.manualSpecialZones = { type: "FeatureCollection", features: [] };
-  }
-  if (!Array.isArray(state.manualSpecialZones.features)) {
-    state.manualSpecialZones.features = [];
-  }
-
-  const sameSource =
-    layerResolverCache.primaryRef === primaryTopology &&
-    layerResolverCache.detailRef === state.topologyDetail &&
-    layerResolverCache.bundleMode === state.topologyBundleMode &&
-    layerResolverCache.contextRevision === Number(state.contextLayerRevision || 0);
-  if (sameSource) {
-    return;
-  }
-
-  state.oceanData = resolveContextLayerData("ocean");
-  state.landBgData = resolveContextLayerData("land");
-  const previousWaterRegionsDataToken = String(layerResolverCache.waterRegionsDataToken || "");
-  const nextWaterRegionsData = resolveContextLayerData("water_regions");
-  state.waterRegionsData = nextWaterRegionsData;
-  const nextWaterRegionsDataToken = getContextLayerStableSourceToken("water_regions", nextWaterRegionsData, {
-    primaryTopology,
-    detailTopology: state.topologyDetail,
-    externalCollection: state.contextLayerExternalDataByName?.water_regions,
-    source: state.contextLayerSourceByName?.water_regions,
-  });
-  layerResolverCache.waterRegionsDataToken = nextWaterRegionsDataToken;
-  state.riversData = resolveContextLayerData("rivers");
-  state.urbanData = resolveContextLayerData("urban");
-  state.physicalData = resolveContextLayerData("physical");
-  state.specialZonesData = resolveContextLayerData("special_zones");
-  if (previousWaterRegionsDataToken !== nextWaterRegionsDataToken) {
-    resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
-  }
-  ensureBathymetryDataAvailability({ required: false });
-
-  const diag = state.layerDataDiagnostics || {};
-  console.info(
-    `${LAYER_DIAG_PREFIX} sources: ocean=${diag.ocean?.source || "none"}, `
-      + `land=${diag.land?.source || "none"}, water_regions=${diag.water_regions?.source || "none"}, `
-      + `rivers=${diag.rivers?.source || "none"}, `
-      + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
-      + `special_zones=${diag.special_zones?.source || "none"}, `
-      + `bathymetry=${state.activeBathymetrySource || "none"}`
-  );
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-
-  // Composite mode owns state.landData and must not be overwritten by primary political-only data.
-  if (state.topologyBundleMode !== "composite" && primaryTopology?.objects?.political) {
-    const expectedCount = Array.isArray(primaryTopology.objects.political.geometries)
-      ? primaryTopology.objects.political.geometries.length
-      : 0;
-    const currentCount = Array.isArray(state.landData?.features)
-      ? state.landData.features.length
-      : 0;
-    const fullCount = Array.isArray(state.landDataFull?.features)
-      ? state.landDataFull.features.length
-      : 0;
-    if (currentCount !== expectedCount || fullCount !== expectedCount) {
-      const primaryCollection = globalThis.topojson.feature(primaryTopology, primaryTopology.objects.political);
-      state.landDataFull = primaryCollection;
-      state.landData = primaryCollection;
-    }
-  }
-
-  layerResolverCache.primaryRef = primaryTopology;
-  layerResolverCache.detailRef = state.topologyDetail;
-  layerResolverCache.bundleMode = state.topologyBundleMode;
-  layerResolverCache.contextRevision = Number(state.contextLayerRevision || 0);
-
-  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-    state.updateSpecialZoneEditorUIFn();
-  }
+  return getContextLayerResolverOwner().ensureLayerDataFromTopology();
 }
 
 function invalidateContextLayerVisualState(layerName, reason = "context-layer-loaded", { renderNow = true } = {}) {
@@ -10291,7 +9520,7 @@ function getBoundsArea(bounds) {
 }
 
 function getScenarioBathymetryTopologyUrl() {
-  return String(state.activeScenarioManifest?.bathymetry_topology_url || "").trim();
+  return getRendererAssetUrlPolicyOwner().getScenarioBathymetryTopologyUrl();
 }
 
 function doesOceanStyleRequireBathymetry(oceanStyle = getOceanStyleConfig()) {
@@ -10302,10 +9531,7 @@ function doesOceanStyleRequireBathymetry(oceanStyle = getOceanStyleConfig()) {
 }
 
 function getDesiredBathymetryTopologyUrl(slot) {
-  if (slot === "scenario") {
-    return getScenarioBathymetryTopologyUrl();
-  }
-  return GLOBAL_BATHYMETRY_TOPOLOGY_URL;
+  return getRendererAssetUrlPolicyOwner().getDesiredBathymetryTopologyUrl(slot);
 }
 
 function clearBathymetryStateSlot(slot) {
@@ -10375,13 +9601,15 @@ function mergeBathymetryFeatureCollections(scenarioCollection, globalCollection)
 
 function syncActiveBathymetryState() {
   const scenarioUrl = getScenarioBathymetryTopologyUrl();
+  const globalUrl = getDesiredBathymetryTopologyUrl("global");
   const scenarioReady =
     !!state.activeScenarioId &&
     !!scenarioUrl &&
     state.scenarioBathymetryTopologyUrl === scenarioUrl &&
     (!!state.scenarioBathymetryBandsData || !!state.scenarioBathymetryContoursData);
   const globalReady =
-    state.globalBathymetryTopologyUrl === GLOBAL_BATHYMETRY_TOPOLOGY_URL &&
+    !!globalUrl &&
+    state.globalBathymetryTopologyUrl === globalUrl &&
     (!!state.globalBathymetryBandsData || !!state.globalBathymetryContoursData);
 
   if (scenarioReady && globalReady) {
@@ -10394,7 +9622,7 @@ function syncActiveBathymetryState() {
       state.globalBathymetryContoursData
     );
     state.activeBathymetrySource = "merged";
-    state.activeBathymetryTopologyUrl = `${scenarioUrl}|${GLOBAL_BATHYMETRY_TOPOLOGY_URL}`;
+    state.activeBathymetryTopologyUrl = `${scenarioUrl}|${globalUrl}`;
     return;
   }
   if (scenarioReady) {
@@ -10408,7 +9636,7 @@ function syncActiveBathymetryState() {
     state.activeBathymetryBandsData = mergeBathymetryFeatureCollections(null, state.globalBathymetryBandsData);
     state.activeBathymetryContoursData = mergeBathymetryFeatureCollections(null, state.globalBathymetryContoursData);
     state.activeBathymetrySource = "global";
-    state.activeBathymetryTopologyUrl = GLOBAL_BATHYMETRY_TOPOLOGY_URL;
+    state.activeBathymetryTopologyUrl = globalUrl;
     return;
   }
   state.activeBathymetryBandsData = null;
@@ -10457,18 +9685,21 @@ function applyResolvedBathymetryEntry(slot, url, entry) {
 }
 
 async function loadBathymetryTopology(url, { slot = "global" } = {}) {
-  if (!url) return null;
-  const response = await fetch(url, { cache: "default" });
+  const normalizedUrl = String(url || "").trim();
+  if (!normalizedUrl || !getRendererAssetUrlPolicyOwner().isDesiredBathymetryUrl(slot, normalizedUrl)) {
+    return null;
+  }
+  const response = await fetch(normalizedUrl, { cache: "default" });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
   const payload = await response.json();
-  const entry = normalizeBathymetryTopologyEntry(url, payload);
+  const entry = normalizeBathymetryTopologyEntry(normalizedUrl, payload);
   if (!entry) {
     throw new Error("Missing bathymetry_bands / bathymetry_contours objects");
   }
-  bathymetryTopologyCacheByUrl.set(url, entry);
-  applyResolvedBathymetryEntry(slot, url, entry);
+  bathymetryTopologyCacheByUrl.set(normalizedUrl, entry);
+  applyResolvedBathymetryEntry(slot, normalizedUrl, entry);
   invalidateOceanVisualState(`bathymetry-loaded:${slot}`);
   if (context) {
     render();
@@ -10510,7 +9741,12 @@ function ensureBathymetryDataAvailability({ required = doesOceanStyleRequireBath
     disableActiveBathymetryState();
     return false;
   }
-  scheduleBathymetryTopologyLoad(GLOBAL_BATHYMETRY_TOPOLOGY_URL, { slot: "global" });
+  const globalUrl = getDesiredBathymetryTopologyUrl("global");
+  if (globalUrl) {
+    scheduleBathymetryTopologyLoad(globalUrl, { slot: "global" });
+  } else {
+    clearBathymetryStateSlot("global");
+  }
   const scenarioUrl = getScenarioBathymetryTopologyUrl();
   if (state.activeScenarioId && scenarioUrl) {
     scheduleBathymetryTopologyLoad(scenarioUrl, { slot: "scenario" });
@@ -13823,187 +13059,23 @@ function getHoveredFacilityEntryFromEvent(event) {
 }
 
 function buildFacilityTooltipText(entry) {
-  if (!entry) return "";
-  const properties = entry.properties || {};
-  const lines = [String(properties.name || "").trim()];
-  if (entry.familyId === "airport") {
-    const typeLabel = String(properties.airport_type_label || properties.airport_type || properties.category || "").trim();
-    const code = String(properties.iata || properties.icao || "").trim();
-    if (typeLabel || code) {
-      lines.push([typeLabel, code].filter(Boolean).join(" · "));
-    }
-    const runwayLength = Number(properties.runway_length_m_max);
-    const passengerCount = Number(properties.passengers_per_day_latest);
-    const summaryBits = [];
-    if (Number.isFinite(runwayLength) && runwayLength > 0) {
-      summaryBits.push(`${t("Runway", "ui")}: ${Math.round(runwayLength).toLocaleString()}m`);
-    }
-    if (Number.isFinite(passengerCount) && passengerCount > 0) {
-      summaryBits.push(`${t("Passengers/day", "ui")}: ${Math.round(passengerCount).toLocaleString()}`);
-    }
-    if (summaryBits.length) {
-      lines.push(summaryBits.join(" · "));
-    }
-  } else if (entry.familyId === "port") {
-    const designation = String(properties.legal_designation_label || properties.legal_designation || properties.category || "").trim();
-    const portClass = String(properties.port_class || "").trim();
-    if (designation || portClass) {
-      lines.push([designation, portClass].filter(Boolean).join(" · "));
-    }
-    const mooringLength = Number(properties.mooring_facility_length_m);
-    const ferryService = properties.ferry_service === true || String(properties.ferry_service || "").trim().toLowerCase() === "true";
-    const summaryBits = [];
-    if (ferryService) {
-      summaryBits.push(t("Ferry service", "ui"));
-    }
-    if (Number.isFinite(mooringLength) && mooringLength > 0) {
-      summaryBits.push(`${t("Mooring", "ui")}: ${Math.round(mooringLength).toLocaleString()}m`);
-    }
-    if (summaryBits.length) {
-      lines.push(summaryBits.join(" · "));
-    }
-  }
-  return renderTooltipText({ lines: lines.filter(Boolean) });
-}
-
-function escapeFacilityHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function normalizeFacilityDisplayValue(value) {
-  if (value == null) return "";
-  const normalized = String(value).trim();
-  if (!normalized) return "";
-  const lower = normalized.toLowerCase();
-  if (["nan", "null", "none", "undefined"].includes(lower)) {
-    return "";
-  }
-  return normalized;
+  return getFacilitySurfaceOwner().buildFacilityTooltipText(entry);
 }
 
 function buildFacilityInfoCardTitle(entry) {
-  const familyLabel = entry?.familyId === "port" ? t("Port", "ui") : t("Airport", "ui");
-  const name = String(entry?.properties?.name || "").trim() || t("Unnamed facility", "ui");
-  return `${familyLabel} · ${name}`;
+  return getFacilitySurfaceOwner().buildFacilityInfoCardTitle(entry);
 }
 
 function buildFacilityInfoCardFieldSections(entry) {
-  if (!entry) {
-    return { defaultRows: [], extraRows: [] };
-  }
-  const properties = entry.properties || {};
-  const defaultRows = [];
-  const extraRows = [];
-  const pushRow = (target, label, value) => {
-    const normalizedValue = normalizeFacilityDisplayValue(value);
-    if (!normalizedValue) return false;
-    target.push(
-      `<div class="facility-info-card-row"><span class="facility-info-card-label">${escapeFacilityHtml(label)}</span><span class="facility-info-card-value">${escapeFacilityHtml(normalizedValue)}</span></div>`
-    );
-    return true;
+  const model = getFacilitySurfaceOwner().buildFacilityInfoCardFieldSections(entry, false);
+  return {
+    defaultRows: Array.isArray(model?.rows) ? model.rows : [],
+    extraRows: [],
   };
-  const appendFallbackRow = (target, rows) => {
-    for (const [label, value] of rows) {
-      if (pushRow(target, label, value)) return true;
-    }
-    return false;
-  };
-  pushRow(defaultRows, t("Tier", "ui"), String(properties.importance || "").replaceAll("_", " "));
-  if (entry.familyId === "airport") {
-    pushRow(defaultRows, t("Airport type", "ui"), properties.airport_type_label || properties.airport_type || properties.category);
-    pushRow(defaultRows, "IATA / ICAO", [properties.iata, properties.icao].filter(Boolean).join(" / "));
-    pushRow(defaultRows, t("Runway", "ui"), Number.isFinite(Number(properties.runway_length_m_max)) && Number(properties.runway_length_m_max) > 0
-      ? `${Math.round(Number(properties.runway_length_m_max)).toLocaleString()}m`
-      : "");
-    const passengersPerDay = Number.isFinite(Number(properties.passengers_per_day_latest)) && Number(properties.passengers_per_day_latest) > 0
-      ? Math.round(Number(properties.passengers_per_day_latest)).toLocaleString()
-      : "";
-    const landingsPerDay = Number.isFinite(Number(properties.landings_per_day_latest)) && Number(properties.landings_per_day_latest) > 0
-      ? Math.round(Number(properties.landings_per_day_latest)).toLocaleString()
-      : "";
-    const statusText = String(properties.status || properties.status_category || "").trim();
-    let usedAirportMetric = "";
-    if (pushRow(defaultRows, t("Passengers/day", "ui"), passengersPerDay)) {
-      usedAirportMetric = "passengers";
-    } else if (pushRow(defaultRows, t("Landings/day", "ui"), landingsPerDay)) {
-      usedAirportMetric = "landings";
-    } else if (pushRow(defaultRows, t("Status", "ui"), statusText)) {
-      usedAirportMetric = "status";
-    }
-    if (usedAirportMetric !== "landings") {
-      pushRow(extraRows, t("Landings/day", "ui"), landingsPerDay);
-    }
-    if (usedAirportMetric !== "passengers") {
-      pushRow(extraRows, t("Passengers/day", "ui"), passengersPerDay);
-    }
-    pushRow(extraRows, t("Hours", "ui"), [properties.operation_start, properties.operation_end].filter(Boolean).join(" - "));
-    appendFallbackRow(extraRows, [
-      [t("Owner / Manager", "ui"), [properties.owner, properties.manager].filter(Boolean).join(" / ")],
-      [t("Owner", "ui"), properties.owner],
-      [t("Manager", "ui"), properties.manager],
-    ]);
-  } else if (entry.familyId === "port") {
-    pushRow(defaultRows, t("Designation", "ui"), properties.legal_designation_label || properties.legal_designation);
-    pushRow(defaultRows, t("Class", "ui"), properties.port_class);
-    const mooringText = Number.isFinite(Number(properties.mooring_facility_length_m)) && Number(properties.mooring_facility_length_m) > 0
-      ? `${Math.round(Number(properties.mooring_facility_length_m)).toLocaleString()}m`
-      : "";
-    const outerFacilityText = Number.isFinite(Number(properties.outer_facility_length_m)) && Number(properties.outer_facility_length_m) > 0
-      ? `${Math.round(Number(properties.outer_facility_length_m)).toLocaleString()}m`
-      : "";
-    const ferryText = properties.ferry_service === true ? t("Yes", "ui") : properties.ferry_service === false ? t("No", "ui") : "";
-    const managerText = String(properties.manager || "").trim();
-    let usedPortMetric = "";
-    if (pushRow(defaultRows, t("Mooring", "ui"), mooringText)) {
-      usedPortMetric = "mooring";
-    } else if (pushRow(defaultRows, t("Outer facility", "ui"), outerFacilityText)) {
-      usedPortMetric = "outer";
-    }
-    let usedPortIdentity = "";
-    if (pushRow(defaultRows, t("Ferry", "ui"), ferryText)) {
-      usedPortIdentity = "ferry";
-    } else if (pushRow(defaultRows, t("Manager", "ui"), managerText)) {
-      usedPortIdentity = "manager";
-    }
-    if (usedPortMetric !== "outer") {
-      pushRow(extraRows, t("Outer facility", "ui"), outerFacilityText);
-    }
-    if (usedPortMetric !== "mooring") {
-      pushRow(extraRows, t("Mooring", "ui"), mooringText);
-    }
-    if (usedPortIdentity !== "manager") {
-      pushRow(extraRows, t("Manager", "ui"), managerText);
-    }
-    if (usedPortIdentity !== "ferry") {
-      pushRow(extraRows, t("Ferry", "ui"), ferryText);
-    }
-    pushRow(extraRows, t("Established", "ui"), properties.date_established);
-    appendFallbackRow(extraRows, [
-      [t("Manager / Agencies", "ui"), [properties.manager, properties.agency_labels].filter(Boolean).join(" / ")],
-      [t("Agencies", "ui"), properties.agency_labels],
-    ]);
-  }
-  return { defaultRows, extraRows };
 }
 
 function buildFacilityInfoCardBody(entry, expanded = false) {
-  const { defaultRows, extraRows } = buildFacilityInfoCardFieldSections(entry);
-  const rows = [...defaultRows, ...(expanded ? extraRows : [])];
-  if (!rows.length) {
-    return {
-      html: `<div class="facility-info-card-empty">${escapeFacilityHtml(t("No facility details available yet.", "ui"))}</div>`,
-      hasExtraRows: false,
-    };
-  }
-  return {
-    html: rows.join(""),
-    hasExtraRows: extraRows.length > 0,
-  };
+  return getFacilitySurfaceOwner().buildFacilityInfoCardFieldSections(entry, expanded);
 }
 
 function applyFacilityInfoCardState(entry, anchor = null) {
@@ -14014,39 +13086,38 @@ function applyFacilityInfoCardState(entry, anchor = null) {
     selectedFacilityEntry = null;
     facilityInfoCardExpanded = false;
     facilityInfoCardAnchor = null;
-    facilityInfoCard.classList.add("hidden");
-    facilityInfoCard.setAttribute("aria-hidden", "true");
-    facilityInfoCardTitle.textContent = "";
-    facilityInfoCardBody.innerHTML = "";
-    facilityInfoCardZoomBtn.disabled = true;
-    facilityInfoCardZoomBtn.dataset.familyKey = "";
-    facilityInfoCardMoreBtn.classList.add("hidden");
-    facilityInfoCardMoreBtn.textContent = t("More fields", "ui");
+    getFacilitySurfaceOwner().applyFacilityInfoCardState(null, {
+      expanded: false,
+      previousAnchor: null,
+      dom: {
+        facilityInfoCard,
+        facilityInfoCardBody,
+        facilityInfoCardMoreBtn,
+        facilityInfoCardTitle,
+        facilityInfoCardZoomBtn,
+      },
+      entryKey: "",
+    });
     return;
   }
   selectedFacilityEntry = entry;
   facilityInfoCardAnchor = anchor && Number.isFinite(Number(anchor?.x)) && Number.isFinite(Number(anchor?.y))
     ? { x: Number(anchor.x), y: Number(anchor.y) }
     : (facilityInfoCardAnchor || { x: 24, y: 24 });
-  facilityInfoCardTitle.textContent = buildFacilityInfoCardTitle(entry);
-  const bodyState = buildFacilityInfoCardBody(entry, facilityInfoCardExpanded);
-  facilityInfoCardBody.innerHTML = bodyState.html;
-  facilityInfoCardZoomBtn.disabled = false;
-  facilityInfoCardZoomBtn.dataset.familyKey = buildFacilityEntryKey(entry);
-  facilityInfoCardMoreBtn.classList.toggle("hidden", !bodyState.hasExtraRows);
-  facilityInfoCardMoreBtn.textContent = t(facilityInfoCardExpanded ? "Less fields" : "More fields", "ui");
-  facilityInfoCard.classList.remove("hidden");
-  facilityInfoCard.setAttribute("aria-hidden", "false");
-  const viewportWidth = Math.max(320, Number(globalThis.innerWidth || 0));
-  const viewportHeight = Math.max(280, Number(globalThis.innerHeight || 0));
-  const cardWidth = 340;
-  const cardHeight = 260;
-  const anchorX = Number(facilityInfoCardAnchor?.x || 0);
-  const anchorY = Number(facilityInfoCardAnchor?.y || 0);
-  const left = Math.max(16, Math.min(viewportWidth - cardWidth - 16, anchorX + 18));
-  const top = Math.max(16, Math.min(viewportHeight - cardHeight - 16, anchorY + 18));
-  facilityInfoCard.style.left = `${Math.round(left)}px`;
-  facilityInfoCard.style.top = `${Math.round(top)}px`;
+  const cardState = getFacilitySurfaceOwner().applyFacilityInfoCardState(entry, {
+    anchor,
+    expanded: facilityInfoCardExpanded,
+    previousAnchor: facilityInfoCardAnchor,
+    dom: {
+      facilityInfoCard,
+      facilityInfoCardBody,
+      facilityInfoCardMoreBtn,
+      facilityInfoCardTitle,
+      facilityInfoCardZoomBtn,
+    },
+    entryKey: buildFacilityEntryKey(entry),
+  });
+  facilityInfoCardAnchor = cardState.anchor;
 }
 
 function setMapInteractionCursor(nextCursor = "") {

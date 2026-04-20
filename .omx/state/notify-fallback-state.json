@@ -1,7 +1,7 @@
 {
-  "pid": 33496,
+  "pid": 102880,
   "parent_pid": 6696,
-  "started_at": "2026-04-20T00:08:08.789Z",
+  "started_at": "2026-04-20T00:39:11.200Z",
   "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
   "authority_only": true,
@@ -17,7 +17,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-20T00:08:08.793Z",
+    "last_tick_at": "2026-04-20T00:39:11.204Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -30,7 +30,7 @@
     "leader_only": true,
     "stale_threshold_ms": 180000,
     "precomputed_leader_stale": true,
-    "last_tick_at": "2026-04-20T00:08:08.801Z",
+    "last_tick_at": "2026-04-20T00:39:11.212Z",
     "last_error": null,
     "run_count": 1
   },
@@ -57,11 +57,11 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-20T00:08:08.810Z",
-    "last_turn_at": "2026-04-20T00:06:02.991Z",
-    "last_turn_count": 75,
-    "last_message": "结论：整个拆分工作的全量 review 已完成，当前结果可以通过。修复方案已经一起收口：我找到了 3 个真实问题，全部修完并复验通过。\n\n这次 review 的真实问题：\n1. `toolbar.js",
-    "last_reason": "eligible_but_not_sent",
+    "last_tick_at": "2026-04-20T00:39:11.220Z",
+    "last_turn_at": "2026-04-20T00:27:51.799Z",
+    "last_turn_count": 80,
+    "last_message": "",
+    "last_reason": "no_last_message",
     "last_error": null,
     "last_nudged_signature": "",
     "last_nudged_at": ""
@@ -80,8 +80,8 @@
     "max_ms": 1000,
     "current_ms": 75,
     "idle_streak": 0,
-    "last_tick_at": "2026-04-20T00:08:08.819Z",
-    "last_activity_at": "2026-04-20T00:08:08.819Z",
+    "last_tick_at": "2026-04-20T00:39:11.221Z",
+    "last_activity_at": "2026-04-20T00:39:11.221Z",
     "last_activity_reason": "leader_nudge"
   },
   "last_cycle_activity": "leader_nudge"
