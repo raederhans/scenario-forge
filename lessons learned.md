@@ -1003,3 +1003,6 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `physical_layer_regression.spec.js` 的静态断言一开始从浏览器侧 `fetch("/js/...")` 读源码，结果 donor/source of truth 迁移后，排查路径被 dev server 状态和旧假设一起搅乱。
 - 更稳的最短路径是：source-level 合同直接在 Node 侧用 `fs.readFileSync(...)` 读取仓库文件，再把真正的运行态断言留给页面交互和 canvas snapshot。
 
+### 41. map_renderer 后续拆分先抽 mesh builder，再动 draw 和 render pass
+- owner border、source border、coastline source 这类“输入 topology，输出 mesh”的 helper 很适合先下沉成 owner；draw pass、render invalidation、viewport 驱动延迟加载继续留在 donor，回归面最小。
+- 这样可以先把几何生成链和 transaction/render 链切开，再决定下一刀是否继续拆 `drawHierarchicalBorders`。

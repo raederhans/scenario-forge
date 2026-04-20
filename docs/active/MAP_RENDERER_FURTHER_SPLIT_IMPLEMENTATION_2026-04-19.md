@@ -23,9 +23,15 @@
   - 已新增 owner：`js/core/renderer/asset_url_policy.js`
   - 已新增 owner：`js/core/renderer/facility_surface.js`
   - `map_renderer.js` 继续保留 render transaction owner，只把政治集合、context layer resolver、bathymetry URL policy、facility surface 下沉成 owner。
-  - 已新增边界测试：`tests/test_map_renderer_political_collection_boundary_contract.py`
-  - 已新增边界测试：`tests/test_map_renderer_context_layer_resolver_boundary_contract.py`
-  - 已新增边界测试：`tests/test_map_renderer_asset_url_and_facility_surface_contract.py`
+  - 已新增边界测试：`tests/test_map_renderer_border_mesh_owner_boundary_contract.py`
+  - `border_mesh_owner.js` 已继续接管 dynamic/opening owner border transaction。
+  - `map_renderer.js` 当前继续保留 `recomputeDynamicBordersNow()`、`scheduleDynamicBorderRecompute()`、`drawBordersPass()` 和 `drawHierarchicalBorders()`。
+  - 已新增边界测试：`tests/test_map_renderer_border_mesh_owner_boundary_contract.py`
+  - `border_mesh_owner.js` 已继续接管 dynamic/opening owner border transaction。
+  - `map_renderer.js` 当前继续保留 `recomputeDynamicBordersNow()`、`scheduleDynamicBorderRecompute()`、`drawBordersPass()` 和 `drawHierarchicalBorders()`。
+  - 已新增边界测试：`tests/test_map_renderer_border_mesh_owner_boundary_contract.py`
+  - `border_mesh_owner.js` 已继续接管 dynamic/opening owner border transaction。
+  - `map_renderer.js` 当前继续保留 `recomputeDynamicBordersNow()`、`scheduleDynamicBorderRecompute()`、`drawBordersPass()` 和 `drawHierarchicalBorders()`。
   - 已更新：`tests/test_transport_facility_interactions_contract.py`
   - 已更新：`tests/e2e/physical_layer_regression.spec.js`，把旧 donor/source 假设切到新的 owner/source of truth。
   - 已验证：
@@ -39,6 +45,18 @@
   - 架构复核：APPROVE
   - reviewer 复核先指出 global bathymetry 仍有第二处 source of truth；已改成统一走 `getDesiredBathymetryTopologyUrl("global")`
   - review 补充指出 `tests/e2e/physical_layer_regression.spec.js` 在 remote base URL 模式下不应读取本地仓库源码；已改成“远端模式读 served app，本地默认模式读 repo 文件”。
+  - 已新增 owner：`js/core/renderer/border_mesh_owner.js`
+  - `map_renderer.js` 已新增 `createBorderMeshOwner` import、owner getter 和 border mesh / coastline 相关 facade wrapper。
+  - 已新增边界测试：`tests/test_map_renderer_border_mesh_owner_boundary_contract.py`
+  - `border_mesh_owner.js` 已继续接管 dynamic/opening owner border transaction。
+  - `map_renderer.js` 当前继续保留 `recomputeDynamicBordersNow()`、`scheduleDynamicBorderRecompute()`、`drawBordersPass()` 和 `drawHierarchicalBorders()`。
+  - map_renderer.js 当前继续保留 
+  - 已额外验证：
+    - `node --check js/core/renderer/border_mesh_owner.js`
+    - `node --check js/core/map_renderer.js`
+    - `python -m unittest tests.test_map_renderer_border_mesh_owner_boundary_contract tests.test_map_renderer_political_collection_boundary_contract tests.test_map_renderer_context_layer_resolver_boundary_contract tests.test_map_renderer_asset_url_and_facility_surface_contract tests.test_map_renderer_urban_city_policy_boundary_contract tests.test_map_renderer_strategic_overlay_helpers_boundary_contract tests.test_frontend_render_boundary_contract tests.test_transport_facility_interactions_contract tests.test_scenario_chunk_refresh_contracts -v`
   - Playwright 尝试结果：
     - `tests/e2e/physical_layer_regression.spec.js` 当前卡在运行时 canvas snapshot 缺失
     - `tests/e2e/tno_1962_ui_smoke.spec.js` 当前表现为长时间等待，无新的失败输出
+
+
