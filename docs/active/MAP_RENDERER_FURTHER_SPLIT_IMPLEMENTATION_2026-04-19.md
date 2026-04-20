@@ -67,5 +67,7 @@
     - `tests/e2e/physical_layer_regression.spec.js` 当前卡在运行时 canvas snapshot 缺失
     - `tests/e2e/tno_1962_ui_smoke.spec.js` 当前表现为长时间等待，无新的失败输出
 
+## 新增约束规则
+- owner 依赖采用显式最小注入：`map_renderer.js` 仅注入 owner 内部实际解构并使用的 helper 字段，禁止透传冗余字段。
 
 
