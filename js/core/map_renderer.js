@@ -19,6 +19,12 @@ import {
   createDefaultUnitCounterEditorState,
 } from "./state/strategic_overlay_state.js";
 import {
+  createDefaultProjectedBoundsCacheState,
+  createDefaultProjectedBoundsDiagnostics,
+  createDefaultRenderPassCacheState,
+  createDefaultSidebarPerfState,
+} from "./state/renderer_runtime_state.js";
+import {
   MODERN_CITY_LIGHTS_BASE_THRESHOLD,
   MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD,
   MODERN_CITY_LIGHTS_GRID,
@@ -1248,62 +1254,51 @@ function isPerfOverlayEnabled() {
 
 function getRenderPassCacheState() {
   if (!state.renderPassCache || typeof state.renderPassCache !== "object") {
-    state.renderPassCache = {};
+    state.renderPassCache = createDefaultRenderPassCacheState();
   }
   // cache 子结构：canvases/layouts/signatures/referenceTransforms/borderSnapshot。
   // 维护意图：统一生命周期与默认值，确保各 pass 读写稳定且可复用。
   const cache = state.renderPassCache;
-  cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : {};
-  cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : {};
-  cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : {};
+  const defaults = createDefaultRenderPassCacheState();
+  cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : defaults.canvases;
+  cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : defaults.layouts;
+  cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : defaults.signatures;
   cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
     ? cache.referenceTransforms
-    : {};
+    : defaults.referenceTransforms;
   cache.contextScenarioLayerCache = cache.contextScenarioLayerCache && typeof cache.contextScenarioLayerCache === "object"
     ? cache.contextScenarioLayerCache
-    : {};
+    : defaults.contextScenarioLayerCache;
   cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
     ? cache.borderSnapshot
-    : {
-      canvas: null,
-      layout: null,
-      referenceTransform: null,
-      valid: false,
-      reason: "init",
-    };
+    : { ...defaults.borderSnapshot };
   cache.lastGoodFrame = cache.lastGoodFrame && typeof cache.lastGoodFrame === "object"
     ? cache.lastGoodFrame
-    : {
-      canvas: null,
-      referenceTransform: null,
-      valid: false,
-      capturedAt: 0,
-      reason: "init",
-    };
+    : { ...defaults.lastGoodFrame };
   cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
     ? cache.partialPoliticalDirtyIds
-    : new Set();
+    : defaults.partialPoliticalDirtyIds;
   cache.politicalPathCache = cache.politicalPathCache instanceof Map
     ? cache.politicalPathCache
-    : new Map();
+    : defaults.politicalPathCache;
   cache.politicalPathCacheSignature = typeof cache.politicalPathCacheSignature === "string"
     ? cache.politicalPathCacheSignature
-    : "";
+    : defaults.politicalPathCacheSignature;
   cache.politicalPathCacheTransform = cache.politicalPathCacheTransform
     ? cloneZoomTransform(cache.politicalPathCacheTransform)
-    : null;
+    : defaults.politicalPathCacheTransform;
   cache.politicalPathWarmupQueue = Array.isArray(cache.politicalPathWarmupQueue)
     ? cache.politicalPathWarmupQueue
-    : [];
+    : defaults.politicalPathWarmupQueue;
   cache.politicalPathWarmupHandle = cache.politicalPathWarmupHandle && typeof cache.politicalPathWarmupHandle === "object"
     ? cache.politicalPathWarmupHandle
-    : null;
+    : defaults.politicalPathWarmupHandle;
   cache.politicalPathWarmupSignature = typeof cache.politicalPathWarmupSignature === "string"
     ? cache.politicalPathWarmupSignature
-    : "";
+    : defaults.politicalPathWarmupSignature;
   cache.contextScenarioReasonMismatchSignature = typeof cache.contextScenarioReasonMismatchSignature === "string"
     ? cache.contextScenarioReasonMismatchSignature
-    : "";
+    : defaults.contextScenarioReasonMismatchSignature;
   cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
   cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
   cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
@@ -1315,57 +1310,60 @@ function getRenderPassCacheState() {
       cache.reasons[passName] = "init";
     }
   });
-  const counterDefaults = {
-    frames: 0,
-    composites: 0,
-    transformedFrames: 0,
-    drawCanvas: 0,
-    backgroundPassRenders: 0,
-    physicalBasePassRenders: 0,
-    politicalPassRenders: 0,
-    effectsPassRenders: 0,
-    contextPassRenders: 0,
-    contextBasePassRenders: 0,
-    contextScenarioPassRenders: 0,
-    contextScenarioReuseCount: 0,
-    contextScenarioExactRefreshCount: 0,
-    dayNightPassRenders: 0,
-    borderPassRenders: 0,
-    borderSnapshotRenders: 0,
-    borderSnapshotReuses: 0,
-    labelPassRenders: 0,
-    hitCanvasRenders: 0,
-    dynamicBorderRebuilds: 0,
-    politicalPartialRepaints: 0,
-    politicalPartialFallbacks: 0,
-    politicalPartialCandidateCount: 0,
-    politicalPartialPathCacheMisses: 0,
-    politicalPartialPathBuild: 0,
-    politicalPathCacheBuild: 0,
-    politicalPathWarmupBuild: 0,
-    politicalPathWarmupSlices: 0,
-    politicalPathWarmupCancels: 0,
-    blackFrameCount: 0,
-    lastGoodFrameReuses: 0,
-    waterAdaptiveStateResetCount: 0,
-    contextScenarioReasonMismatchWarnings: 0,
-  };
+  const counterDefaults = defaults.counters;
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
       cache.counters[counterName] = initialValue;
     }
   });
+  if (!("lastFrame" in cache)) {
+    cache.lastFrame = defaults.lastFrame;
+  }
+  if (typeof cache.lastAction !== "string") {
+    cache.lastAction = defaults.lastAction;
+  }
+  if (!Number.isFinite(Number(cache.lastActionDurationMs))) {
+    cache.lastActionDurationMs = defaults.lastActionDurationMs;
+  }
+  if (!Number.isFinite(Number(cache.lastActionAt))) {
+    cache.lastActionAt = defaults.lastActionAt;
+  }
+  if (typeof cache.perfOverlayEnabled !== "boolean") {
+    cache.perfOverlayEnabled = defaults.perfOverlayEnabled;
+  }
+  if (!("overlayElement" in cache)) {
+    cache.overlayElement = defaults.overlayElement;
+  }
   return cache;
 }
 
 function getSidebarPerfState() {
+  const defaults = createDefaultSidebarPerfState();
   if (!state.sidebarPerf || typeof state.sidebarPerf !== "object") {
-    state.sidebarPerf = {};
+    state.sidebarPerf = defaults;
   }
   if (!state.sidebarPerf.counters || typeof state.sidebarPerf.counters !== "object") {
     state.sidebarPerf.counters = {};
   }
+  Object.entries(defaults.counters).forEach(([counterName, initialValue]) => {
+    if (!Number.isFinite(Number(state.sidebarPerf.counters[counterName]))) {
+      state.sidebarPerf.counters[counterName] = initialValue;
+    }
+  });
   return state.sidebarPerf;
+}
+
+function resetProjectedBoundsCacheState() {
+  const defaults = createDefaultProjectedBoundsCacheState();
+  state.projectedBoundsById = defaults.projectedBoundsById;
+  state.sphericalFeatureDiagnosticsById = defaults.sphericalFeatureDiagnosticsById;
+}
+
+function ensureSphericalFeatureDiagnosticsCache() {
+  if (!(state.sphericalFeatureDiagnosticsById instanceof Map)) {
+    state.sphericalFeatureDiagnosticsById = createDefaultProjectedBoundsCacheState().sphericalFeatureDiagnosticsById;
+  }
+  return state.sphericalFeatureDiagnosticsById;
 }
 
 function ensureRenderPerfMetrics() {
@@ -2374,11 +2372,7 @@ function resetRenderDiagnostics() {
   renderDiag.skippedByReason = new Map();
   renderDiag.skippedByCountry = new Map();
   renderDiag.sampleByReason = new Map();
-  state.projectedBoundsDiagnostics = {
-    total: 0,
-    byGeometryType: {},
-    byReason: {},
-  };
+  state.projectedBoundsDiagnostics = createDefaultProjectedBoundsDiagnostics();
   if (!renderDiag.enabled) {
     delete globalThis.__mapRenderDiag;
   } else {
@@ -3934,7 +3928,7 @@ function shouldStartExactAfterSettleFastPath() {
 
 function ensureProjectedBoundsCache() {
   if (!(state.projectedBoundsById instanceof Map)) {
-    state.projectedBoundsById = new Map();
+    state.projectedBoundsById = createDefaultProjectedBoundsCacheState().projectedBoundsById;
   }
   return state.projectedBoundsById;
 }
@@ -4327,8 +4321,9 @@ function isWorldBounds(bounds) {
 
 function getSphericalFeatureDiagnostics(feature, { featureId = null, allowCompute = true } = {}) {
   const resolvedFeatureId = featureId || getFeatureId(feature);
-  if (resolvedFeatureId && state.sphericalFeatureDiagnosticsById?.has(resolvedFeatureId)) {
-    return state.sphericalFeatureDiagnosticsById.get(resolvedFeatureId) || null;
+  const diagnosticsCache = ensureSphericalFeatureDiagnosticsCache();
+  if (resolvedFeatureId && diagnosticsCache.has(resolvedFeatureId)) {
+    return diagnosticsCache.get(resolvedFeatureId) || null;
   }
   if (!allowCompute || !globalThis.d3?.geoArea || !globalThis.d3?.geoBounds || !feature?.geometry) {
     return null;
@@ -4345,7 +4340,7 @@ function getSphericalFeatureDiagnostics(feature, { featureId = null, allowComput
     };
     diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
     if (resolvedFeatureId) {
-      state.sphericalFeatureDiagnosticsById.set(resolvedFeatureId, diagnostics);
+      ensureSphericalFeatureDiagnosticsCache().set(resolvedFeatureId, diagnostics);
     }
     return diagnostics;
   } catch (_error) {
@@ -6753,6 +6748,29 @@ function rebuildStaticMeshes() {
     } else {
       state.cachedCoastlinesLow.push(coastlineMesh);
     }
+  }
+
+  const shouldPrewarmScenarioLocalBorders =
+    !!state.activeScenarioId
+    && state.scenarioBorderMode === "scenario_owner_only"
+    && String(state.scenarioViewMode || "ownership") === "ownership";
+  if (shouldPrewarmScenarioLocalBorders) {
+    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
+    visibleCountryCodes.forEach((countryCode) => {
+      ensureCountrySourceBorderMeshes(countryCode, {
+        includeLocal: true,
+      });
+    });
+  }
+  if (
+    state.activeScenarioId
+    && state.scenarioBorderMode === "scenario_owner_only"
+    && String(state.scenarioViewMode || "ownership") === "ownership"
+  ) {
+    refreshScenarioOpeningOwnerBorders({
+      renderNow: false,
+      reason: "rebuild-static-meshes:opening",
+    });
   }
 
   // Backward compatibility: expose local boundaries as "grid lines".
@@ -22265,8 +22283,7 @@ function initMap({
   state.deferHitCanvasBuild = false;
   state.deferExactAfterSettle = false;
   state.hitCanvasBuildScheduled = null;
-  state.projectedBoundsById = new Map();
-  state.sphericalFeatureDiagnosticsById = new Map();
+  resetProjectedBoundsCacheState();
   invalidateAllRenderPasses("init-map");
   ensureDayNightClockTimer();
 
@@ -22394,7 +22411,7 @@ function setMapData({
     count: 0,
     neighbors: [],
   };
-  state.sphericalFeatureDiagnosticsById = new Map();
+  ensureSphericalFeatureDiagnosticsCache().clear();
   const shouldDeferInteractionInfrastructure =
     deferInteractionInfrastructure || interactionLevel === "readonly-startup";
   if (!shouldDeferInteractionInfrastructure) {
@@ -22656,6 +22673,12 @@ function refreshMapDataForScenarioChunkPromotion({
     promotionVersion: scenarioChunkPromotionVersion,
     stage: "visual",
   });
+  if (hasPoliticalChange && isUsableMesh(state.activeScenarioMeshPack?.meshes?.opening_owner_borders)) {
+    refreshScenarioOpeningOwnerBorders({
+      renderNow: false,
+      reason: `${reason}-opening-sync`,
+    });
+  }
 }
 
 function refreshMapDataForScenarioApply({

@@ -43,6 +43,19 @@
 - [x] 让 `chunk_runtime.js` / `lifecycle_runtime.js` / `scenario_rollback.js` / `scenario_data_health.js` 复用 scenario runtime factory
 - [x] 新增 scenario runtime owner 合同测试
 - [x] 跑 Batch 4 scenario runtime 定向验证
+- [x] 新增 `js/core/state/renderer_runtime_state.js`
+- [x] 新增 `js/core/state/border_cache_state.js`
+- [x] 新增 `js/core/state/spatial_index_state.js`
+- [x] 让 `state.js` 通过 renderer/border/spatial owner 注入默认 shape
+- [x] 让 `map_renderer.js` / `sidebar.js` / `spatial_index_runtime_owner.js` 复用新的 shared factory
+- [x] 清理 `chunk_runtime.js` 里 `runtimeChunkLoadState` 的重复默认 shape
+- [x] 新增 renderer/spatial owner 合同与行为测试
+- [x] 跑 Batch 4 renderer runtime 定向验证
+- [x] 修复 `scenario_boundary_regression` 的 `localOnlyCountryCount === 0`
+- [x] 修复 startup hydration 下 opening-owner mesh pack 到位但缓存不刷新的代码路径
+- [x] 修复 opening-owner mesh pack 直用路径被 baseline owner 条件错误拦住的问题
+- [x] 修复 opening-owner fallback 绕过 `runtimePoliticalTopology` renderable 回退链的问题
+- [ ] 让 `scenario_boundary_regression` 重新稳定变绿
 
 ## 本轮交付
 - 文档基线已经补齐。
@@ -56,6 +69,7 @@
 - Batch 4 的 history/dev/runtime_hooks 内部 owner 已落地。
 - Batch 4 的 strategic overlay 默认形状已经统一成单一真源。
 - Batch 4 的 scenario runtime 默认 shape 已经统一成单一真源。
+- Batch 4 的 renderer runtime / border cache / spatial index 默认 shape 已经统一成内部 owner。
 
 ## 复核清单
 - 文档与代码口径一致
@@ -70,5 +84,8 @@
 - `state.js` 继续是唯一公开 state 入口
 - strategic overlay editor 默认 shape 在 cold init / import reset / renderer fallback 三条路径对齐
 - scenario chunk/runtime health/reset/rollback 的默认 shape 已统一复用
+- renderer runtime / border cache / spatial index 默认 shape 已统一复用
+- `scenario_chunk_exact_after_settle_regression` 继续通过
+- `scenario_boundary_regression` 当前卡在 smoke 环境稳定性，代码侧 opening-owner 初始缓存链已经补上
 - 汇报里列出修改文件、验证和剩余风险
 

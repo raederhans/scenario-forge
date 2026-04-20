@@ -1,3 +1,8 @@
+import {
+  createDefaultSecondarySpatialIndexState,
+  createDefaultSpatialIndexState,
+} from "../state/spatial_index_state.js";
+
 export function createSpatialIndexRuntimeOwner({
   state,
   constants = {},
@@ -75,16 +80,17 @@ export function createSpatialIndexRuntimeOwner({
   }
 
   function resetSecondarySpatialIndexState() {
-    state.waterSpatialItems = [];
-    state.waterSpatialIndex = null;
-    state.waterSpatialGrid = new Map();
-    state.waterSpatialGridMeta = null;
-    state.waterSpatialItemsById = new Map();
-    state.specialSpatialItems = [];
-    state.specialSpatialIndex = null;
-    state.specialSpatialGrid = new Map();
-    state.specialSpatialGridMeta = null;
-    state.specialSpatialItemsById = new Map();
+    const defaults = createDefaultSecondarySpatialIndexState();
+    state.waterSpatialItems = defaults.waterSpatialItems;
+    state.waterSpatialIndex = defaults.waterSpatialIndex;
+    state.waterSpatialGrid = defaults.waterSpatialGrid;
+    state.waterSpatialGridMeta = defaults.waterSpatialGridMeta;
+    state.waterSpatialItemsById = defaults.waterSpatialItemsById;
+    state.specialSpatialItems = defaults.specialSpatialItems;
+    state.specialSpatialIndex = defaults.specialSpatialIndex;
+    state.specialSpatialGrid = defaults.specialSpatialGrid;
+    state.specialSpatialGridMeta = defaults.specialSpatialGridMeta;
+    state.specialSpatialItemsById = defaults.specialSpatialItemsById;
   }
 
   function buildSecondarySpatialIndexes({
@@ -164,11 +170,12 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
   } = {}) {
     const startedAt = nowMs();
-    state.spatialItems = [];
-    state.spatialIndex = null;
-    state.spatialGrid = new Map();
-    state.spatialGridMeta = null;
-    state.spatialItemsById = new Map();
+    const defaults = createDefaultSpatialIndexState();
+    state.spatialItems = defaults.spatialItems;
+    state.spatialIndex = defaults.spatialIndex;
+    state.spatialGrid = defaults.spatialGrid;
+    state.spatialGridMeta = defaults.spatialGridMeta;
+    state.spatialItemsById = defaults.spatialItemsById;
     resetSecondarySpatialIndexState();
     if (!state.landData || !state.landData.features || !getPathSvg()) {
       recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {

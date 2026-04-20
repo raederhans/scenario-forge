@@ -28,6 +28,7 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("enforceScenarioHydrationHealthGate,", resources_content)
         self.assertIn("ensureScenarioGeoLocalePatchForLanguage,", resources_content)
         self.assertIn("applyBlankScenarioPresentationDefaults,", resources_content)
+        self.assertIn("refreshScenarioOpeningOwnerBorders,", resources_content)
         self.assertNotIn("./scenario_resources.js", startup_hydration_content)
         self.assertNotIn("./scenario_manager.js", startup_hydration_content)
 
@@ -68,6 +69,8 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("mergedPoliticalPayload !== undefined", content)
         self.assertIn('getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political")', content)
         self.assertIn("|| state.scenarioPoliticalChunkData", content)
+        self.assertIn('reason: "scenario-hydrate-opening"', content)
+        self.assertIn("state.activeScenarioMeshPack?.meshes?.opening_owner_borders", content)
         self.assertIn("mergedCitiesPayload !== undefined", content)
         self.assertIn("bundle.cityOverridesPayload || null", content)
         self.assertIn("hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)", chunk_runtime_content)

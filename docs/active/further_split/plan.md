@@ -48,6 +48,14 @@
 - [x] 统一 `state.js` / `chunk_runtime.js` / `lifecycle_runtime.js` / `scenario_rollback.js` / `scenario_data_health.js` 的 scenario runtime 默认形状。
 - [x] 补齐 scenario runtime owner 合同与定向 smoke。
 - [x] 跑定向验证并回填状态。
+- [x] 新增 `js/core/state/renderer_runtime_state.js`。
+- [x] 新增 `js/core/state/border_cache_state.js`。
+- [x] 新增 `js/core/state/spatial_index_state.js`。
+- [x] 让 `state.js` 通过 renderer/border/spatial owner 注入默认 shape。
+- [x] 让 `map_renderer.js` / `sidebar.js` / `spatial_index_runtime_owner.js` 复用 renderer/spatial shared factory。
+- [x] 清掉 `chunk_runtime.js` 里 `runtimeChunkLoadState` 的第二份完整默认 shape。
+- [x] 补齐 renderer runtime / border cache / spatial index 合同与行为测试。
+- [x] 跑 Batch 4 renderer runtime 定向验证并回填状态。
 
 ## 当前 approved plan 对齐
 1. 先继续收紧 `scenario` 边界和事务 owner。
@@ -63,5 +71,6 @@
 - `scenario` bundle/cache 装配链已经收进共享 owner。
 - `state` 的 history/dev/strategic overlay 默认 shape 已经收进内部 owner。
 - `state` 的 scenario runtime 默认 shape 已经收进内部 owner。
+- `state` 的 renderer runtime / border cache / spatial index 默认 shape 已经收进内部 owner。
 - 合同测试、静态检查、定向 smoke 都有对应证据。
 

@@ -12,6 +12,9 @@ STATE_HISTORY_JS = REPO_ROOT / "js" / "core" / "state" / "history_state.js"
 STATE_DEV_JS = REPO_ROOT / "js" / "core" / "state" / "dev_state.js"
 STATE_STRATEGIC_OVERLAY_JS = REPO_ROOT / "js" / "core" / "state" / "strategic_overlay_state.js"
 STATE_SCENARIO_RUNTIME_JS = REPO_ROOT / "js" / "core" / "state" / "scenario_runtime_state.js"
+STATE_BORDER_CACHE_JS = REPO_ROOT / "js" / "core" / "state" / "border_cache_state.js"
+STATE_RENDERER_RUNTIME_JS = REPO_ROOT / "js" / "core" / "state" / "renderer_runtime_state.js"
+STATE_SPATIAL_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "spatial_index_state.js"
 
 
 class StateSplitBoundaryContractTest(unittest.TestCase):
@@ -25,6 +28,9 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('./state/dev_state.js', content.replace('"', "'"))
         self.assertIn('./state/strategic_overlay_state.js', content.replace('"', "'"))
         self.assertIn('./state/scenario_runtime_state.js', content.replace('"', "'"))
+        self.assertIn('./state/border_cache_state.js', content.replace('"', "'"))
+        self.assertIn('./state/renderer_runtime_state.js', content.replace('"', "'"))
+        self.assertIn('./state/spatial_index_state.js', content.replace('"', "'"))
         self.assertIn('export const state = {', content)
 
     def test_state_defaults_owns_constants_and_normalizers(self):
@@ -150,6 +156,44 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("...createDefaultScenarioRuntimeState(),", donor_content)
         self.assertIsNone(re.search(r"activeScenarioChunks:\s*\{", donor_content))
         self.assertIsNone(re.search(r"runtimeChunkLoadState:\s*\{", donor_content))
+
+    def test_renderer_runtime_owner_holds_renderer_runtime_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_RENDERER_RUNTIME_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultRendererInfrastructureState()", owner_content)
+        self.assertIn("export function createDefaultRenderPassCacheState()", owner_content)
+        self.assertIn("export function createDefaultSidebarPerfState()", owner_content)
+        self.assertIn("export function createDefaultProjectedBoundsCacheState()", owner_content)
+        self.assertIn("export function createDefaultRendererTransientRuntimeState()", owner_content)
+        self.assertIn("...createDefaultRendererInfrastructureState(),", donor_content)
+        self.assertIn("...createDefaultRendererTransientRuntimeState(),", donor_content)
+        self.assertIsNone(re.search(r"renderPassCache:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"sidebarPerf:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"hitCanvasDirty:\s*true,", donor_content))
+
+    def test_border_cache_owner_holds_border_cache_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_BORDER_CACHE_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultBorderCacheState()", owner_content)
+        self.assertIn("cachedProvinceBordersByCountry: new Map(),", owner_content)
+        self.assertIn("cachedParentBordersByCountry: new Map(),", owner_content)
+        self.assertIn("...createDefaultBorderCacheState(),", donor_content)
+        self.assertIsNone(re.search(r"cachedBorders:\s*null,", donor_content))
+        self.assertIsNone(re.search(r"cachedCoastlines:\s*null,", donor_content))
+
+    def test_spatial_index_owner_holds_lookup_and_spatial_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_SPATIAL_INDEX_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultSecondarySpatialIndexState()", owner_content)
+        self.assertIn("export function createDefaultSpatialIndexState()", owner_content)
+        self.assertIn("landIndex: new Map(),", owner_content)
+        self.assertIn("waterSpatialGrid: new Map(),", owner_content)
+        self.assertIn("...createDefaultSpatialIndexState(),", donor_content)
+        self.assertIsNone(re.search(r"landIndex:\s*new Map\(\),", donor_content))
+        self.assertIsNone(re.search(r"waterSpatialItems:\s*\[\],", donor_content))
 
 
 if __name__ == "__main__":

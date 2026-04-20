@@ -6,6 +6,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
+import { createDefaultSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
@@ -3390,13 +3391,22 @@ function initSidebar({ render } = {}) {
   let latestCountryStatesByCode = new Map();
   const countryRowRefsByCode = new Map();
   const incrementSidebarCounter = (counterName, amount = 1) => {
+    const defaults = createDefaultSidebarPerfState();
     if (!state.sidebarPerf || typeof state.sidebarPerf !== "object") {
-      state.sidebarPerf = {};
+      state.sidebarPerf = defaults;
     }
     if (!state.sidebarPerf.counters || typeof state.sidebarPerf.counters !== "object") {
       state.sidebarPerf.counters = {};
     }
-    state.sidebarPerf.counters[counterName] = (Number(state.sidebarPerf.counters[counterName]) || 0) + Number(amount || 0);
+    Object.entries(defaults.counters).forEach(([defaultCounterName, initialValue]) => {
+      if (!Number.isFinite(Number(state.sidebarPerf.counters[defaultCounterName]))) {
+        state.sidebarPerf.counters[defaultCounterName] = initialValue;
+      }
+    });
+    if (!Number.isFinite(Number(state.sidebarPerf.counters[counterName]))) {
+      state.sidebarPerf.counters[counterName] = 0;
+    }
+    state.sidebarPerf.counters[counterName] += Number(amount || 0);
   };
 
   const getInspectorCountryDisplayName = (code) => {

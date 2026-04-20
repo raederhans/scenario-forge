@@ -560,6 +560,7 @@ const {
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
   refreshMapDataForScenarioChunkPromotion,
+  refreshScenarioOpeningOwnerBorders,
   flushRenderBoundary,
   enterScenarioFatalRecovery,
   consumeScenarioTestHook,

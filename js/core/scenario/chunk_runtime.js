@@ -52,30 +52,7 @@ function createScenarioChunkRuntimeController({
 
   function ensureRuntimeChunkLoadState() {
     if (!state.runtimeChunkLoadState || typeof state.runtimeChunkLoadState !== "object") {
-      state.runtimeChunkLoadState = {
-        shellStatus: "idle",
-        registryStatus: "idle",
-        refreshScheduled: false,
-        refreshTimerId: null,
-        selectionVersion: 0,
-        pendingReason: "",
-        pendingDelayMs: null,
-        focusCountryOverride: "",
-        zoomEndChunkVisibleMetric: null,
-        lastZoomEndToChunkVisibleMetric: null,
-        pendingVisualPromotion: null,
-        pendingInfraPromotion: null,
-        pendingPromotion: null,
-        promotionTimerId: null,
-        promotionScheduled: false,
-        promotionRetryCount: 0,
-        lastPromotionRetryAt: 0,
-        inFlightByChunkId: {},
-        errorByChunkId: {},
-        lastSelection: null,
-        layerSelectionSignatures: {},
-        mergedLayerPayloadCache: {},
-      };
+      state.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState();
     }
     if (state.runtimeChunkLoadState.refreshTimerId && !isTimerHandle(state.runtimeChunkLoadState.refreshTimerId)) {
       state.runtimeChunkLoadState.refreshTimerId = null;

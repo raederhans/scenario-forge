@@ -29,6 +29,7 @@ function createScenarioStartupHydrationController({
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
   refreshMapDataForScenarioChunkPromotion,
+  refreshScenarioOpeningOwnerBorders = () => false,
   flushRenderBoundary,
   enterScenarioFatalRecovery,
   consumeScenarioTestHook,
@@ -262,6 +263,16 @@ function createScenarioStartupHydrationController({
       state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
     }
     state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
+    if (
+      state.activeScenarioMeshPack?.meshes?.opening_owner_borders
+      && state.scenarioBorderMode === "scenario_owner_only"
+      && String(state.scenarioViewMode || "ownership") === "ownership"
+    ) {
+      refreshScenarioOpeningOwnerBorders({
+        renderNow: false,
+        reason: "scenario-hydrate-opening",
+      });
+    }
     const nextScenarioPoliticalPayload = normalizeScenarioFeatureCollection(
       mergedPoliticalPayload !== undefined
         ? mergedPoliticalPayload

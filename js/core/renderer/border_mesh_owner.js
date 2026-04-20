@@ -178,18 +178,22 @@ export function createBorderMeshOwner({
   // baselineHash 缺失时回退到 baselineOwnersRef 引用比较，保证旧数据源也能被正确失效。
   function refreshScenarioOpeningOwnerBorders(reason = "") {
     const startedAt = nowMs();
+    const runtimeTopologyForOpeningOwner = state.runtimePoliticalTopology;
     let cacheMatches = false;
     const meshPackMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
     const hasMeshPackMesh = isUsableMesh(meshPackMesh);
+    const hasBaselineOwners = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
     const shouldBuild =
       !!state.activeScenarioId
       && state.scenarioBorderMode === "scenario_owner_only"
       && String(state.scenarioViewMode || "ownership") === "ownership"
-      && (hasMeshPackMesh || !!state.runtimePoliticalTopology?.objects?.political)
-      && Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
+      && (
+        hasMeshPackMesh
+        || (!!runtimeTopologyForOpeningOwner?.objects?.political && hasBaselineOwners)
+      );
 
     if (shouldBuild) {
-      const runtimeRef = state.runtimePoliticalTopology;
+      const runtimeRef = runtimeTopologyForOpeningOwner;
       const meshPackRef = state.activeScenarioMeshPack || null;
       const scenarioId = String(state.activeScenarioId || "");
       const baselineHash = String(state.scenarioBaselineHash || "");

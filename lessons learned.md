@@ -1054,3 +1054,15 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 clear blank baseline 漂移的根因，是 scenario_apply_pipeline.js 把 defaultRuntimePoliticalTopology 从场景 runtime 里补写了一次，导致退出场景后 blank 底图被 scenario runtime 污染。
 - 更稳的最短路径是：startup baseline 只在 startup 链建立；scenario apply 只消费它，不能回写它。
 - 遇到这类 clear/revert 漂移，优先抓两次基线的 untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数对比，很快能定位污染源。
+
+### 135. 做 state owner 拆分时，合同测试要直接封住 consumer 里的第二份默认 shape
+- 只检查 donor import owner、只检查某些 reset 路径复用 factory 还不够；`chunk_runtime.ensureRuntimeChunkLoadState()` 这类 consumer 很容易继续藏一份 inline fallback 默认对象。
+- 更稳的最短路径是：合同里同时校验 owner factory 命中、consumer 不再内联完整默认 shape、关键字段只在 owner 真源里定义一次。
+
+### 136. renderer runtime / border cache / spatial index 要按“默认 shape + 复位点”一起收口
+- 只把 `state.js` 里的大对象搬进 owner 还不够，`map_renderer.js`、`sidebar.js`、`spatial_index_runtime_owner.js` 里的 fallback / reset 也要一起切到同一组 factory。
+- 更稳的最短路径是：把 `renderPassCache`、`sidebarPerf`、projected-bounds cache、border cache、spatial index 都收成小 factory，再让 renderer 的 reset/fallback 直接复用。
+
+### 137. opening-owner mesh 的 mesh-pack 直用路径要和 runtime fallback 路径分开判断
+- `opening_owner_borders` 已经在 mesh pack 里存在时，`refreshScenarioOpeningOwnerBorders()` 只需要场景模式和 mesh 可用；runtime fallback 才需要 `scenarioBaselineOwnersByFeatureId`。
+- startup/bootstrap 到 full hydrate 的窗口里，mesh pack 和 baseline owners 很容易不同步；把两条路径绑在同一个条件里，缓存会被错误清空成 `null`。

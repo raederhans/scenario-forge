@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 
 
@@ -29,6 +30,7 @@ class ScenarioRuntimeStateBoundaryContractTest(unittest.TestCase):
         self.assertIn("../state/scenario_runtime_state.js", chunk_content)
         self.assertIn("createDefaultActiveScenarioChunksState()", chunk_content)
         self.assertIn("createDefaultRuntimeChunkLoadState({", chunk_content)
+        self.assertIsNone(re.search(r"state\.runtimeChunkLoadState\s*=\s*\{\s*shellStatus:\s*\"idle\"", chunk_content))
         self.assertIn("../state/scenario_runtime_state.js", lifecycle_content)
         self.assertIn("createDefaultScenarioHydrationHealthGate()", lifecycle_content)
         self.assertIn("createDefaultScenarioDataHealth(", lifecycle_content)

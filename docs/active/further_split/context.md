@@ -294,3 +294,104 @@
 - architect 复核
   - 结果：批准当前阶段完成
   - 追加修正：`scenario_rollback.js` 的 `scenarioHydrationHealthGate` fallback 也已改成复用 `createDefaultScenarioHydrationHealthGate()`
+
+## 2026-04-20 Batch 4 renderer runtime / border cache / spatial index 继续推进
+- 新增 `js/core/state/renderer_runtime_state.js`
+  - 导出：
+    - `createDefaultRendererInfrastructureState`
+    - `createDefaultRenderPassCacheState`
+    - `createDefaultSidebarPerfState`
+    - `createDefaultProjectedBoundsCacheState`
+    - `createDefaultProjectedBoundsDiagnostics`
+    - `createDefaultRendererTransientRuntimeState`
+- 新增 `js/core/state/border_cache_state.js`
+  - 导出 `createDefaultBorderCacheState`
+- 新增 `js/core/state/spatial_index_state.js`
+  - 导出：
+    - `createDefaultSecondarySpatialIndexState`
+    - `createDefaultSpatialIndexState`
+- `js/core/state.js`
+  - 继续保留唯一公开入口
+  - 改成通过内部 owner 注入：
+    - `...createDefaultRendererInfrastructureState()`
+    - `...createDefaultBorderCacheState()`
+    - `...createDefaultSpatialIndexState()`
+    - `...createDefaultRendererTransientRuntimeState()`
+- `js/core/map_renderer.js`
+  - `renderPassCache` / `sidebarPerf` / projected-bounds cache / projected-bounds diagnostics 的 fallback 和 reset 改成复用 renderer runtime factory
+- `js/ui/sidebar.js`
+  - sidebar perf counter fallback 改成复用 `createDefaultSidebarPerfState()`
+- `js/core/renderer/spatial_index_runtime_owner.js`
+  - 次级 spatial index reset 和主 spatial index reset 改成复用 shared factory
+- `js/core/scenario/chunk_runtime.js`
+  - `ensureRuntimeChunkLoadState()` 改成直接复用 `createDefaultRuntimeChunkLoadState()`
+  - scenario runtime owner 不再保留第二份完整默认 shape
+- `js/core/scenario/startup_hydration.js`
+  - full bundle hydrate 到位且 `opening_owner_borders` 可用时，主动调用 `refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: "scenario-hydrate-opening" })`
+  - 这样 startup/bootstrap -> full hydrate 这条链即使 political payload 没变化，也会把 opening-owner 缓存补齐
+- `js/core/renderer/border_mesh_owner.js`
+  - `refreshScenarioOpeningOwnerBorders()` 改成把 mesh-pack 直用路径和 runtime fallback 路径分开
+  - 现在有 `meshPackMesh` 时直接允许构建；只有 runtime fallback 才要求 `scenarioBaselineOwnersByFeatureId`
+  - review follow-up：opening-owner fallback 继续跟随已校验的 `state.runtimePoliticalTopology`
+  - 这样不会绕过 `hydrateActiveScenarioBundle()` 的 runtime topology renderable 回退链
+
+## 2026-04-20 本轮验证证据
+- 结构合同
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_renderer_runtime_state_boundary_contract tests.test_spatial_index_state_boundary_contract tests.test_scenario_runtime_state_boundary_contract tests.test_startup_hydration_boundary_contract tests.test_map_renderer_border_mesh_owner_boundary_contract`
+  - 结果：`Ran 25 tests / OK`
+- 行为测试
+  - `node --test tests/renderer_runtime_state_behavior.test.mjs tests/scenario_runtime_state_behavior.test.mjs tests/strategic_overlay_state_behavior.test.mjs`
+  - 结果：`6 passed`
+  - `node --test tests/startup_hydration_behavior.test.mjs`
+  - 结果：`1 passed`
+- 静态检查
+  - `node --check`
+    - `js/core/state.js`
+    - `js/core/state/renderer_runtime_state.js`
+    - `js/core/state/border_cache_state.js`
+    - `js/core/state/spatial_index_state.js`
+    - `js/core/map_renderer.js`
+    - `js/core/renderer/spatial_index_runtime_owner.js`
+    - `js/core/scenario/chunk_runtime.js`
+    - `js/ui/sidebar.js`
+    - `tests/renderer_runtime_state_behavior.test.mjs`
+    - `tests/scenario_runtime_state_behavior.test.mjs`
+  - 结果：全部通过
+- 诊断
+  - `lsp_diagnostics`
+    - `js/core/state.js`
+    - `js/core/map_renderer.js`
+    - `js/core/renderer/spatial_index_runtime_owner.js`
+    - `js/ui/sidebar.js`
+    - `js/core/scenario/chunk_runtime.js`
+    - `js/core/state/renderer_runtime_state.js`
+    - `js/core/state/border_cache_state.js`
+    - `js/core/state/spatial_index_state.js`
+    - `tests/test_state_split_boundary_contract.py`
+    - `tests/test_renderer_runtime_state_boundary_contract.py`
+    - `tests/test_spatial_index_state_boundary_contract.py`
+    - `tests/test_scenario_runtime_state_boundary_contract.py`
+  - 结果：全部 `0 error`
+- 定向 smoke
+  - `tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js`
+  - 结果：主断言通过；日志见 `.runtime/tmp/batch4_renderer_chunk_exact.out.log`
+  - `tests/e2e/scenario_boundary_regression.spec.js`
+  - 结果：仍失败；先后暴露两条边界问题：
+    - `localOnlyCountryCount === 0`
+    - `openingOwnerSegmentCount === 0`
+  - 当前已修：
+    - `rebuildStaticMeshes()` 里为 `scenario_owner_only` 初始稳定态预热 local border mesh，`localOnlyCountryCount` 已过
+    - `refreshMapDataForScenarioChunkPromotion()` 对 opening-owner mesh pack 的同步刷新改到 visual metrics 之后，`scenario_chunk_exact_after_settle_regression` 继续通过
+  - 当前剩余 blocker：
+    - 在补了 startup hydration 与 mesh-pack fallback 之后，`scenario_boundary_regression` 的现场从断言失败漂到 startup 超时，当前 smoke 环境不稳定
+    - 现有代码级证据已把根因锁到 startup/bootstrap -> full hydrate -> opening-owner cache 这条链，并已补上对应约束测试
+  - 日志：
+    - `.runtime/tmp/batch4_renderer_state_smoke.out.log`
+    - `.runtime/tmp/batch4_renderer_state_smoke.err.log`
+    - `.runtime/tmp/batch4_renderer_chunk_exact.out.log`
+    - `.runtime/tmp/batch4_renderer_chunk_exact.err.log`
+    - `.runtime/tmp/chunk_exact_after_fix2.out.log`
+    - `.runtime/tmp/boundary_after_fix3.out.log`
+    - `.runtime/tmp/boundary_after_fix4.out.log`
+    - `.runtime/tmp/boundary_after_fix5.out.log`
+    - `.runtime/tmp/boundary_after_fix6.out.log`
