@@ -1,6 +1,5 @@
-import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, state } from "./state.js";
+import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, normalizeMapSemanticMode, state } from "./state.js";
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
-import { normalizeMapSemanticMode } from "./state.js";
 import {
   invalidateOceanBackgroundVisualState,
   recomputeDynamicBordersNow,
@@ -45,7 +44,7 @@ import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
 } from "./scenario_districts.js";
-import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
+import { ensureDetailTopologyBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 import { applyActivePaletteState, setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
@@ -98,12 +97,15 @@ import {
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
 import {
-  SCENARIO_RENDER_PROFILES,
   buildHoi4FarEastSovietOwnerBackfill,
-  normalizeScenarioOceanFillColor,
-  normalizeScenarioRenderProfile,
   recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
 } from "./scenario/pure_helpers.js";
+import {
+  createScenarioPresentationRuntime,
+} from "./scenario/presentation_runtime.js";
+import {
+  createScenarioLifecycleRuntime,
+} from "./scenario/lifecycle_runtime.js";
 import {
   createScenarioApplyPipeline,
 } from "./scenario_apply_pipeline.js";
@@ -205,175 +207,45 @@ function normalizeScenarioViewMode(value) {
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
   return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
 }
+const {
+  applyScenarioPerformanceHints,
+  restoreScenarioDisplaySettingsAfterExit,
+  restoreScenarioOceanFillAfterExit,
+  syncScenarioOceanFillForActivation,
+} = createScenarioPresentationRuntime({
+  state,
+  invalidateOceanBackgroundVisualState,
+});
 
-function normalizeScenarioPerformanceHints(manifest) {
-  const raw = manifest?.performance_hints;
-  if (!raw || typeof raw !== "object") {
-    return {
-      renderProfileDefault: "",
-      dynamicBordersDefault: null,
-      parentBordersDefault: null,
-      scenarioReliefOverlaysDefault: null,
-      waterRegionsDefault: null,
-      specialRegionsDefault: null,
-    };
-  }
-  const renderProfileDefault = String(raw.render_profile_default || "").trim().toLowerCase();
-  return {
-    renderProfileDefault: SCENARIO_RENDER_PROFILES.has(renderProfileDefault) ? renderProfileDefault : "",
-    dynamicBordersDefault:
-      typeof raw.dynamic_borders_default === "boolean" ? raw.dynamic_borders_default : null,
-    parentBordersDefault:
-      typeof raw.parent_borders_default === "boolean" ? raw.parent_borders_default : null,
-    scenarioReliefOverlaysDefault:
-      typeof raw.scenario_relief_overlays_default === "boolean" ? raw.scenario_relief_overlays_default : null,
-    waterRegionsDefault:
-      typeof raw.water_regions_default === "boolean" ? raw.water_regions_default : null,
-    specialRegionsDefault:
-      typeof raw.special_regions_default === "boolean" ? raw.special_regions_default : null,
-  };
-}
-
-function captureScenarioDisplaySettingsBeforeActivate() {
-  if (state.activeScenarioId || state.scenarioDisplaySettingsBeforeActivate) {
-    return state.scenarioDisplaySettingsBeforeActivate;
-  }
-  state.scenarioDisplaySettingsBeforeActivate = {
-    renderProfile: normalizeScenarioRenderProfile(state.renderProfile, "auto"),
-    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
-    parentBordersVisible: state.parentBordersVisible !== false,
-    showWaterRegions: state.showWaterRegions !== false,
-    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
-  };
-  return state.scenarioDisplaySettingsBeforeActivate;
-}
-
-function applyScenarioPerformanceHints(manifest) {
-  captureScenarioDisplaySettingsBeforeActivate();
-  const hints = normalizeScenarioPerformanceHints(manifest);
-  state.activeScenarioPerformanceHints = hints;
-  if (hints.renderProfileDefault) {
-    state.renderProfile = normalizeScenarioRenderProfile(hints.renderProfileDefault, state.renderProfile || "auto");
-  }
-  if (typeof hints.dynamicBordersDefault === "boolean") {
-    state.dynamicBordersEnabled = hints.dynamicBordersDefault;
-  }
-  state.parentBordersVisible = typeof hints.parentBordersDefault === "boolean"
-    ? hints.parentBordersDefault
-    : false;
-  if (typeof hints.waterRegionsDefault === "boolean") {
-    state.showWaterRegions = hints.waterRegionsDefault;
-  }
-  if (typeof hints.specialRegionsDefault === "boolean") {
-    state.showScenarioSpecialRegions = hints.specialRegionsDefault;
-  }
-  if (typeof hints.scenarioReliefOverlaysDefault === "boolean") {
-    state.showScenarioReliefOverlays = hints.scenarioReliefOverlaysDefault;
-  }
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-}
-
-function restoreScenarioDisplaySettingsAfterExit() {
-  const snapshot = state.scenarioDisplaySettingsBeforeActivate;
-  if (snapshot && typeof snapshot === "object") {
-    state.renderProfile = normalizeScenarioRenderProfile(snapshot.renderProfile, state.renderProfile || "auto");
-    state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
-    state.parentBordersVisible = snapshot.parentBordersVisible !== false;
-    state.showWaterRegions = snapshot.showWaterRegions !== false;
-    state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
-    state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
-  }
-  state.scenarioDisplaySettingsBeforeActivate = null;
-  state.activeScenarioPerformanceHints = null;
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-}
-
-function getScenarioOceanFillOverride(manifest) {
-  const rawValue = String(manifest?.style_defaults?.ocean?.fillColor || "").trim();
-  return rawValue ? normalizeScenarioOceanFillColor(rawValue, "") : "";
-}
-
-function updateScenarioOceanFill(fillColor, reason) {
-  if (!state.styleConfig || typeof state.styleConfig !== "object") {
-    state.styleConfig = {};
-  }
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
-  }
-  const previousFill = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
-  const nextFill = normalizeScenarioOceanFillColor(fillColor);
-  state.styleConfig.ocean.fillColor = nextFill;
-  if (previousFill !== nextFill) {
-    invalidateOceanBackgroundVisualState(reason);
-    return true;
-  }
-  return false;
-}
-
-function syncScenarioOceanFillForActivation(manifest) {
-  const nextOverride = getScenarioOceanFillOverride(manifest);
-  const previousOverride = getScenarioOceanFillOverride(state.activeScenarioManifest);
-  if (!state.styleConfig || typeof state.styleConfig !== "object") {
-    state.styleConfig = {};
-  }
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
-  }
-  if (state.scenarioOceanFillBeforeActivate === null) {
-    state.scenarioOceanFillBeforeActivate = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
-  }
-  if (nextOverride) {
-    updateScenarioOceanFill(nextOverride, "scenario-ocean-fill-activate");
-  } else if (previousOverride && state.scenarioOceanFillBeforeActivate !== null) {
-    updateScenarioOceanFill(
-      state.scenarioOceanFillBeforeActivate,
-      "scenario-ocean-fill-restore-baseline"
-    );
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-}
-
-function restoreScenarioOceanFillAfterExit() {
-  if (state.scenarioOceanFillBeforeActivate === null) {
-    return;
-  }
-  updateScenarioOceanFill(state.scenarioOceanFillBeforeActivate, "scenario-ocean-fill-clear");
-  state.scenarioOceanFillBeforeActivate = null;
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-}
+const {
+  applyScenarioPaintMode,
+  clearActiveScenario: clearActiveScenarioRuntime,
+  disableScenarioParentBorders,
+  resetToScenarioBaseline: resetToScenarioBaselineRuntime,
+  syncScenarioInspectorSelection,
+} = createScenarioLifecycleRuntime({
+  state,
+  countryNames,
+  defaultCountryPalette,
+  createDefaultScenarioReleasableIndex,
+  ensureSovereigntyState,
+  getScenarioDefaultCountryCode,
+  getScenarioMapSemanticMode,
+  markDirty,
+  markLegacyColorStateDirty,
+  normalizeScenarioId,
+  recalculateScenarioOwnerControllerDiffCount,
+  releaseScenarioAuditPayload,
+  resetScenarioChunkRuntimeState,
+  restoreScenarioDisplaySettingsAfterExit,
+  restoreScenarioOceanFillAfterExit,
+  runPostScenarioClearEffects,
+  runPostScenarioResetEffects,
+  scenarioDetailMinRatioStrict: SCENARIO_DETAIL_MIN_RATIO_STRICT,
+  setScenarioAuditUiState,
+  syncResolvedDefaultCountryPalette,
+  applyBlankScenarioPresentationDefaults,
+});
 
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
   const normalizedId = String(featureId || "").trim();
@@ -614,19 +486,6 @@ async function loadScenarioRuntimeTopologyForBundle({
   };
 }
 
-function syncScenarioInspectorSelection(countryCode = "") {
-  const normalized = String(countryCode || "").trim().toUpperCase();
-  state.selectedInspectorCountryCode = normalized;
-  state.inspectorHighlightCountryCode = normalized;
-  state.inspectorExpansionInitialized = false;
-  if (state.expandedInspectorContinents instanceof Set) {
-    state.expandedInspectorContinents.clear();
-  }
-  if (state.expandedInspectorReleaseParents instanceof Set) {
-    state.expandedInspectorReleaseParents.clear();
-  }
-}
-
 function setScenarioViewMode(
   viewMode,
   {
@@ -740,75 +599,6 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
     return false;
   } finally {
     state.detailPromotionInFlight = false;
-  }
-}
-
-function disableScenarioParentBorders() {
-  if (!state.activeScenarioId && state.scenarioParentBorderEnabledBeforeActivate === null) {
-    state.scenarioParentBorderEnabledBeforeActivate = {
-      ...(state.parentBorderEnabledByCountry || {}),
-    };
-  }
-  const next = {};
-  Object.keys(state.parentBorderEnabledByCountry || {}).forEach((countryCode) => {
-    next[countryCode] = false;
-  });
-  state.parentBorderEnabledByCountry = next;
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-}
-
-function restoreParentBordersAfterScenario() {
-  if (state.scenarioParentBorderEnabledBeforeActivate && typeof state.scenarioParentBorderEnabledBeforeActivate === "object") {
-    state.parentBorderEnabledByCountry = {
-      ...state.scenarioParentBorderEnabledBeforeActivate,
-    };
-  }
-  state.scenarioParentBorderEnabledBeforeActivate = null;
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-}
-
-function applyScenarioPaintMode() {
-  if (!state.scenarioPaintModeBeforeActivate) {
-    state.scenarioPaintModeBeforeActivate = {
-      paintMode: String(state.paintMode || "visual") === "sovereignty" ? "sovereignty" : "visual",
-      interactionGranularity: String(state.interactionGranularity || "subdivision") === "country"
-        ? "country"
-        : "subdivision",
-      batchFillScope: String(state.batchFillScope || "parent") === "country" ? "country" : "parent",
-      politicalEditingExpanded: !!state.ui?.politicalEditingExpanded,
-    };
-  }
-  state.paintMode = "sovereignty";
-  state.interactionGranularity = "subdivision";
-  if (state.ui && typeof state.ui === "object") {
-    state.ui.politicalEditingExpanded = false;
-    state.ui.scenarioVisualAdjustmentsOpen = false;
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-}
-
-function restorePaintModeAfterScenario() {
-  const previous = state.scenarioPaintModeBeforeActivate;
-  if (previous && typeof previous === "object") {
-    state.paintMode = previous.paintMode === "sovereignty" ? "sovereignty" : "visual";
-    state.interactionGranularity = previous.interactionGranularity === "country"
-      ? "country"
-      : "subdivision";
-    state.batchFillScope = previous.batchFillScope === "country" ? "country" : "parent";
-    if (state.ui && typeof state.ui === "object") {
-      state.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
-      state.ui.scenarioVisualAdjustmentsOpen = false;
-    }
-  }
-  state.scenarioPaintModeBeforeActivate = null;
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
   }
 }
 
@@ -1136,205 +926,36 @@ async function applyDefaultScenarioOnStartup(
   });
 }
 
-function resetToScenarioBaseline(
-  {
+function resetToScenarioBaseline(options = {}) {
+  assertScenarioInteractionsAllowed("reset the active scenario");
+  const {
     renderNow = true,
     markDirtyReason = "scenario-reset",
     showToastOnComplete = false,
-  } = {}
-) {
-  assertScenarioInteractionsAllowed("reset the active scenario");
-  if (!state.activeScenarioId || !state.scenarioBaselineOwnersByFeatureId) {
-    return false;
-  }
-  const previousSelectedInspectorCountryCode = String(state.selectedInspectorCountryCode || "").trim().toUpperCase();
-  const previousExpandedInspectorContinents = state.expandedInspectorContinents instanceof Set
-    ? new Set(state.expandedInspectorContinents)
-    : new Set();
-  const previousExpandedInspectorReleaseParents = state.expandedInspectorReleaseParents instanceof Set
-    ? new Set(state.expandedInspectorReleaseParents)
-    : new Set();
-  const previousInspectorExpansionInitialized = !!state.inspectorExpansionInitialized;
-  state.sovereigntyByFeatureId = { ...(state.scenarioBaselineOwnersByFeatureId || {}) };
-  state.scenarioControllersByFeatureId = { ...(state.scenarioBaselineControllersByFeatureId || {}) };
-  state.scenarioAutoShellOwnerByFeatureId = {};
-  state.scenarioAutoShellControllerByFeatureId = {};
-  state.mapSemanticMode = getScenarioMapSemanticMode(state.activeScenarioManifest, state.mapSemanticMode);
-  if (state.mapSemanticMode === "blank") {
-    applyBlankScenarioPresentationDefaults();
-  }
-  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-  state.scenarioViewMode = "ownership";
-  state.sovereigntyInitialized = false;
-  ensureSovereigntyState({ force: true });
-  recalculateScenarioOwnerControllerDiffCount();
-  state.parentBordersVisible = false;
-  state.visualOverrides = {};
-  state.featureOverrides = {};
-  state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  markLegacyColorStateDirty();
-  state.activeSovereignCode = state.mapSemanticMode === "blank"
-    ? ""
-    : (
-      getScenarioDefaultCountryCode(
-        state.activeScenarioManifest,
-        state.scenarioCountriesByTag
-      ) || String(state.activeSovereignCode || "").trim().toUpperCase()
-    );
-  if (state.ui && typeof state.ui === "object") {
-    state.ui.scenarioVisualAdjustmentsOpen = false;
-  }
-  const restoredInspectorCode =
-    previousSelectedInspectorCountryCode && state.scenarioCountriesByTag?.[previousSelectedInspectorCountryCode]
-      ? previousSelectedInspectorCountryCode
-      : state.activeSovereignCode;
-  state.selectedInspectorCountryCode = restoredInspectorCode;
-  state.inspectorHighlightCountryCode = restoredInspectorCode;
-  state.expandedInspectorContinents = previousExpandedInspectorContinents;
-  state.expandedInspectorReleaseParents = previousExpandedInspectorReleaseParents;
-  state.inspectorExpansionInitialized =
-    previousInspectorExpansionInitialized || previousExpandedInspectorContinents.size > 0;
-  setScenarioAuditUiState({
-    loading: false,
-    errorMessage: "",
-  });
-  state.scenarioBorderMode = "scenario_owner_only";
-  disableScenarioParentBorders();
-  runPostScenarioResetEffects({
-    scenarioId: state.activeScenarioId,
+  } = options;
+  return resetToScenarioBaselineRuntime({
     renderNow,
+    markDirtyReason,
+    showToastOnComplete,
+    showToast,
+    t,
   });
-  if (markDirtyReason) {
-    markDirty(markDirtyReason);
-  }
-  if (showToastOnComplete) {
-    showToast(t("Scenario reset to baseline.", "ui"), {
-      title: t("Scenario reset", "ui"),
-      tone: "success",
-    });
-  }
-  return true;
 }
 
-function clearActiveScenario(
-  {
+function clearActiveScenario(options = {}) {
+  assertScenarioInteractionsAllowed("exit the active scenario");
+  const {
     renderNow = true,
     markDirtyReason = "scenario-clear",
     showToastOnComplete = false,
-  } = {}
-) {
-  assertScenarioInteractionsAllowed("exit the active scenario");
-  const previousScenarioId = normalizeScenarioId(state.activeScenarioId);
-  if (state.runtimeChunkLoadState?.refreshTimerId) {
-    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
-  }
-  releaseScenarioAuditPayload(previousScenarioId, { syncUi: false });
-  state.activeScenarioId = "";
-  state.scenarioBorderMode = "canonical";
-  state.activeScenarioManifest = null;
-  state.activeScenarioMeshPack = null;
-  state.scenarioCountriesByTag = {};
-  state.scenarioFixedOwnerColors = {};
-  state.scenarioRuntimeTopologyData = null;
-  state.scenarioRuntimeTopologyVersionTag = "";
-  state.scenarioPoliticalChunkData = null;
-  state.scenarioLandMaskData = null;
-  state.scenarioContextLandMaskData = null;
-  state.scenarioLandMaskVersionTag = "";
-  state.scenarioContextLandMaskVersionTag = "";
-  state.mapSemanticMode = "blank";
-  state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
-  state.activeScenarioChunks = {
-    scenarioId: "",
-    loadedChunkIds: [],
-    payloadByChunkId: {},
-    mergedLayerPayloads: {},
-    lruChunkIds: [],
-  };
-  state.runtimeChunkLoadState = {
-    shellStatus: "idle",
-    registryStatus: "idle",
-    refreshScheduled: false,
-    refreshTimerId: null,
-    inFlightByChunkId: {},
-    errorByChunkId: {},
-    lastSelection: null,
-  };
-  state.scheduleScenarioChunkRefreshFn = null;
-  state.scenarioWaterRegionsData = null;
-  state.scenarioWaterOverlayVersionTag = "";
-  state.scenarioSpecialRegionsData = null;
-  state.scenarioReliefOverlaysData = null;
-  state.scenarioDistrictGroupsData = null;
-  state.scenarioDistrictGroupByFeatureId = new Map();
-  state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
-  applyBlankScenarioPresentationDefaults();
-  state.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();
-  state.releasableCatalog = state.defaultReleasableCatalog || null;
-  state.scenarioImportAudit = null;
-  state.scenarioBaselineHash = "";
-  state.scenarioBaselineOwnersByFeatureId = {};
-  state.scenarioControllersByFeatureId = {};
-  state.scenarioAutoShellOwnerByFeatureId = {};
-  state.scenarioAutoShellControllerByFeatureId = {};
-  state.scenarioBaselineControllersByFeatureId = {};
-  state.scenarioBaselineCoresByFeatureId = {};
-  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-  state.scenarioOwnerControllerDiffCount = 0;
-  state.scenarioHydrationHealthGate = {
-    status: "idle",
-    reason: "",
-    checkedAt: 0,
-    attemptedRetry: false,
-    ownerFeatureOverlapRatio: 1,
-    ownerFeatureOverlapCount: 0,
-    ownerFeatureRenderedCount: 0,
-    degradedWaterOverlay: false,
-  };
-  state.scenarioDataHealth = {
-    expectedFeatureCount: 0,
-    runtimeFeatureCount: 0,
-    ratio: 1,
-    minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
-    warning: "",
-    severity: "",
-  };
-  state.scenarioViewMode = "ownership";
-  state.countryNames = { ...countryNames };
-  state.selectedWaterRegionId = "";
-  state.selectedSpecialRegionId = "";
-  state.hoveredWaterRegionId = null;
-  state.hoveredSpecialRegionId = null;
-  state.sovereigntyByFeatureId = {};
-  state.scenarioControllersByFeatureId = {};
-  state.scenarioAutoShellOwnerByFeatureId = {};
-  state.scenarioAutoShellControllerByFeatureId = {};
-  state.sovereigntyInitialized = false;
-  state.visualOverrides = {};
-  state.featureOverrides = {};
-  const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
-  state.sovereignBaseColors = { ...(defaults || state.resolvedDefaultCountryPalette || defaultCountryPalette) };
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  markLegacyColorStateDirty();
-  state.activeSovereignCode = "";
-  syncScenarioInspectorSelection("");
-  restoreParentBordersAfterScenario();
-  restorePaintModeAfterScenario();
-  restoreScenarioOceanFillAfterExit();
-  restoreScenarioDisplaySettingsAfterExit();
-  runPostScenarioClearEffects({ renderNow });
-  if (markDirtyReason) {
-    markDirty(markDirtyReason);
-  }
-  if (showToastOnComplete) {
-    showToast(t("Scenario cleared.", "ui"), {
-      title: t("Scenario cleared", "ui"),
-      tone: "success",
-    });
-  }
+  } = options;
+  return clearActiveScenarioRuntime({
+    renderNow,
+    markDirtyReason,
+    showToastOnComplete,
+    showToast,
+    t,
+  });
 }
 
 function formatScenarioStatusText() {

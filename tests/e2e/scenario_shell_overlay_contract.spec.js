@@ -69,10 +69,11 @@ async function clearScenario(page) {
 async function readShellState(page) {
   return page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const landIds = Array.isArray(state.landData?.features)
-      ? state.landData.features.map((feature) => String(feature?.properties?.id || feature?.id || "")).filter(Boolean)
-      : [];
-    const ruPolarId = landIds.find((id) => id.startsWith("RU_ARCTIC_FB_")) || "";
+    const shellIds = Array.from(new Set([
+      ...Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}),
+      ...Object.keys(state.scenarioAutoShellControllerByFeatureId || {}),
+    ]));
+    const ruPolarId = shellIds.find((id) => id.startsWith("RU_ARCTIC_FB_")) || "";
     return {
       activeScenarioId: String(state.activeScenarioId || ""),
       borderMode: String(state.scenarioBorderMode || ""),

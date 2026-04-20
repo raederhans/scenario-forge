@@ -6,6 +6,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_MANAGER = REPO_ROOT / "js" / "core" / "scenario_manager.js"
 SCENARIO_APPLY_PIPELINE = REPO_ROOT / "js" / "core" / "scenario_apply_pipeline.js"
+SCENARIO_LIFECYCLE_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "lifecycle_runtime.js"
 
 
 class ScenarioManagerBoundaryContractTest(unittest.TestCase):
@@ -57,6 +58,10 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
     def test_scenario_manager_keeps_transaction_coordinator_role(self):
         content = SCENARIO_MANAGER.read_text(encoding="utf-8")
 
+        self.assertIn('./scenario/presentation_runtime.js', content)
+        self.assertIn('./scenario/lifecycle_runtime.js', content)
+        self.assertIn("createScenarioPresentationRuntime({", content)
+        self.assertIn("createScenarioLifecycleRuntime({", content)
         self.assertIn("applyScenarioBundle,", content)
         self.assertIn("applyScenarioById,", content)
         self.assertIn("resetToScenarioBaseline,", content)
@@ -67,6 +72,41 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("enterScenarioFatalRecovery({", content)
         self.assertIn('loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" })', content)
         self.assertIn("getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode", content)
+
+    def test_scenario_manager_delegates_presentation_runtime_owner(self):
+        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertIsNone(re.search(r"^function\s+captureScenarioDisplaySettingsBeforeActivate\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+applyScenarioPerformanceHints\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreScenarioDisplaySettingsAfterExit\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+getScenarioOceanFillOverride\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+updateScenarioOceanFill\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+syncScenarioOceanFillForActivation\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreScenarioOceanFillAfterExit\b", content, re.MULTILINE))
+        self.assertIn("const {", content)
+        self.assertIn("applyScenarioPerformanceHints,", content)
+        self.assertIn("restoreScenarioDisplaySettingsAfterExit,", content)
+        self.assertIn("restoreScenarioOceanFillAfterExit,", content)
+        self.assertIn("syncScenarioOceanFillForActivation,", content)
+
+    def test_scenario_manager_delegates_lifecycle_runtime_owner(self):
+        content = SCENARIO_MANAGER.read_text(encoding="utf-8")
+
+        self.assertIsNone(re.search(r"^function\s+syncScenarioInspectorSelection\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+disableScenarioParentBorders\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreParentBordersAfterScenario\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+applyScenarioPaintMode\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restorePaintModeAfterScenario\b", content, re.MULTILINE))
+        self.assertIn("createScenarioLifecycleRuntime({", content)
+        self.assertIn("clearActiveScenario: clearActiveScenarioRuntime,", content)
+        self.assertIn("resetToScenarioBaseline: resetToScenarioBaselineRuntime,", content)
+        self.assertIn("syncScenarioInspectorSelection,", content)
+        self.assertIn("disableScenarioParentBorders,", content)
+        self.assertIn("applyScenarioPaintMode,", content)
+        self.assertIn("recalculateScenarioOwnerControllerDiffCount,", content)
+        self.assertIn("resetToScenarioBaselineRuntime({", content)
+        self.assertIn("clearActiveScenarioRuntime({", content)
+        self.assertNotIn("if (changed) {\n    recalculateScenarioOwnerControllerDiffCount();\n  }", content)
 
     def test_scenario_manager_releases_state_apply_pipeline_owner(self):
         content = SCENARIO_MANAGER.read_text(encoding="utf-8")
@@ -80,6 +120,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
 
     def test_apply_pipeline_owner_moves_to_new_module(self):
         content = SCENARIO_APPLY_PIPELINE.read_text(encoding="utf-8")
+        lifecycle_content = SCENARIO_LIFECYCLE_RUNTIME.read_text(encoding="utf-8")
 
         self.assertIn("prepareScenarioApplyState", content)
         self.assertIn("applyPreparedScenarioState", content)
@@ -89,7 +130,12 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("state.scheduleScenarioChunkRefreshFn =", content)
         self.assertIn("syncScenarioLocalizationState({", content)
         self.assertIn("resetScenarioChunkRuntimeState(", content)
+        self.assertNotIn("state.defaultRuntimePoliticalTopology =", content)
         self.assertNotIn('./scenario_manager.js', content)
+        self.assertIn("syncScenarioInspectorSelection(state.activeSovereignCode);", content)
+        self.assertIn("disableScenarioParentBorders();", content)
+        self.assertIn("applyScenarioPaintMode();", content)
+        self.assertNotIn('./scenario_apply_pipeline.js', lifecycle_content)
 
 
 if __name__ == "__main__":

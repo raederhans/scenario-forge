@@ -52,10 +52,7 @@ import {
   enterScenarioFatalRecovery,
 } from "./scenario_recovery.js";
 import {
-  SCENARIO_RENDER_PROFILES,
   buildHoi4FarEastSovietOwnerBackfill,
-  normalizeScenarioOceanFillColor,
-  normalizeScenarioRenderProfile,
   recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
 } from "./scenario/pure_helpers.js";
 import {
@@ -79,6 +76,9 @@ import {
 import {
   createScenarioChunkRuntimeController,
 } from "./scenario/chunk_runtime.js";
+import {
+  normalizeScenarioPerformanceHints,
+} from "./scenario/presentation_runtime.js";
 import {
   createScenarioStartupHydrationController,
 } from "./scenario/startup_hydration.js";
@@ -218,141 +218,6 @@ function normalizeScenarioViewMode(value) {
 
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
   return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
-}
-
-function normalizeScenarioPerformanceHints(manifest) {
-  const raw = manifest?.performance_hints;
-  if (!raw || typeof raw !== "object") {
-    return {
-      renderProfileDefault: "",
-      dynamicBordersDefault: null,
-      scenarioReliefOverlaysDefault: null,
-      waterRegionsDefault: null,
-      specialRegionsDefault: null,
-    };
-  }
-  const renderProfileDefault = String(raw.render_profile_default || "").trim().toLowerCase();
-  return {
-    renderProfileDefault: SCENARIO_RENDER_PROFILES.has(renderProfileDefault) ? renderProfileDefault : "",
-    dynamicBordersDefault:
-      typeof raw.dynamic_borders_default === "boolean" ? raw.dynamic_borders_default : null,
-    scenarioReliefOverlaysDefault:
-      typeof raw.scenario_relief_overlays_default === "boolean" ? raw.scenario_relief_overlays_default : null,
-    waterRegionsDefault:
-      typeof raw.water_regions_default === "boolean" ? raw.water_regions_default : null,
-    specialRegionsDefault:
-      typeof raw.special_regions_default === "boolean" ? raw.special_regions_default : null,
-  };
-}
-
-function captureScenarioDisplaySettingsBeforeActivate() {
-  if (state.activeScenarioId || state.scenarioDisplaySettingsBeforeActivate) {
-    return state.scenarioDisplaySettingsBeforeActivate;
-  }
-  state.scenarioDisplaySettingsBeforeActivate = {
-    renderProfile: normalizeScenarioRenderProfile(state.renderProfile, "auto"),
-    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
-    showWaterRegions: state.showWaterRegions !== false,
-    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
-  };
-  return state.scenarioDisplaySettingsBeforeActivate;
-}
-
-function applyScenarioPerformanceHints(manifest) {
-  captureScenarioDisplaySettingsBeforeActivate();
-  const hints = normalizeScenarioPerformanceHints(manifest);
-  state.activeScenarioPerformanceHints = hints;
-  if (hints.renderProfileDefault) {
-    state.renderProfile = normalizeScenarioRenderProfile(hints.renderProfileDefault, state.renderProfile || "auto");
-  }
-  if (typeof hints.dynamicBordersDefault === "boolean") {
-    state.dynamicBordersEnabled = hints.dynamicBordersDefault;
-  }
-  if (typeof hints.waterRegionsDefault === "boolean") {
-    state.showWaterRegions = hints.waterRegionsDefault;
-  }
-  if (typeof hints.specialRegionsDefault === "boolean") {
-    state.showScenarioSpecialRegions = hints.specialRegionsDefault;
-  }
-  if (typeof hints.scenarioReliefOverlaysDefault === "boolean") {
-    state.showScenarioReliefOverlays = hints.scenarioReliefOverlaysDefault;
-  }
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-}
-
-function restoreScenarioDisplaySettingsAfterExit() {
-  const snapshot = state.scenarioDisplaySettingsBeforeActivate;
-  if (snapshot && typeof snapshot === "object") {
-    state.renderProfile = normalizeScenarioRenderProfile(snapshot.renderProfile, state.renderProfile || "auto");
-    state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
-    state.showWaterRegions = snapshot.showWaterRegions !== false;
-    state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
-    state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
-  }
-  state.scenarioDisplaySettingsBeforeActivate = null;
-  state.activeScenarioPerformanceHints = null;
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-}
-
-function getScenarioOceanFillOverride(manifest) {
-  const rawValue = String(manifest?.style_defaults?.ocean?.fillColor || "").trim();
-  return rawValue ? normalizeScenarioOceanFillColor(rawValue, "") : "";
-}
-
-function syncScenarioOceanFillForActivation(manifest) {
-  const nextOverride = getScenarioOceanFillOverride(manifest);
-  const previousOverride = getScenarioOceanFillOverride(state.activeScenarioManifest);
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
-  }
-  if (state.scenarioOceanFillBeforeActivate === null) {
-    state.scenarioOceanFillBeforeActivate = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
-  }
-  if (nextOverride) {
-    state.styleConfig.ocean.fillColor = nextOverride;
-  } else if (previousOverride && state.scenarioOceanFillBeforeActivate !== null) {
-    state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-}
-
-function restoreScenarioOceanFillAfterExit() {
-  if (state.scenarioOceanFillBeforeActivate === null) {
-    return;
-  }
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
-  }
-  state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
-  state.scenarioOceanFillBeforeActivate = null;
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
 }
 
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
@@ -943,19 +808,6 @@ function releaseScenarioAuditPayload(scenarioId = state.activeScenarioId, { sync
     if (syncUi) {
       syncScenarioUi();
     }
-  }
-}
-
-function syncScenarioInspectorSelection(countryCode = "") {
-  const normalized = String(countryCode || "").trim().toUpperCase();
-  state.selectedInspectorCountryCode = normalized;
-  state.inspectorHighlightCountryCode = normalized;
-  state.inspectorExpansionInitialized = false;
-  if (state.expandedInspectorContinents instanceof Set) {
-    state.expandedInspectorContinents.clear();
-  }
-  if (state.expandedInspectorReleaseParents instanceof Set) {
-    state.expandedInspectorReleaseParents.clear();
   }
 }
 

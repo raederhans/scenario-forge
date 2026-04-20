@@ -359,7 +359,6 @@ function createScenarioApplyPipeline({
     state.activeScenarioManifest = bundle.manifest || null;
     state.mapSemanticMode = staged.mapSemanticMode;
     state.scenarioCountriesByTag = staged.countryMap;
-    state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
     state.activeScenarioMeshPack = bundle.meshPackPayload || null;
     state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
     state.runtimePoliticalTopology = hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload)

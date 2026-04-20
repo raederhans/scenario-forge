@@ -1010,6 +1010,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `physical_layer_regression.spec.js` 的静态断言一开始从浏览器侧 `fetch("/js/...")` 读源码，结果 donor/source of truth 迁移后，排查路径被 dev server 状态和旧假设一起搅乱。
 - 更稳的最短路径是：source-level 合同直接在 Node 侧用 `fs.readFileSync(...)` 读取仓库文件，再把真正的运行态断言留给页面交互和 canvas snapshot。
 
+### 131. clear 场景时，detail ready 状态要看 `topologyDetail`，不要拿 runtime topology 代替
+- startup coarse 模式也可能已经有 `defaultRuntimePoliticalTopology`；它只说明 runtime political baseline 在，不能说明 detail promotion 已完成。
+- 更稳的最短路径是：`clearActiveScenario()` 恢复 base map 时，用 `state.topologyDetail` 判断 `topologyBundleMode` 和 `detailPromotionCompleted`，再用 `defaultRuntimePoliticalTopology && !topologyDetail` 恢复 `detailDeferred`。
+- 这样退出 scenario 后，deferred detail promotion 还能继续按原计划执行。
+
 ### 41. map_renderer 后续拆分先抽 mesh builder，再动 draw 和 render pass
 - owner border、source border、coastline source 这类“输入 topology，输出 mesh”的 helper 很适合先下沉成 owner；draw pass、render invalidation、viewport 驱动延迟加载继续留在 donor，回归面最小。
 - 这样可以先把几何生成链和 transaction/render 链切开，再决定下一刀是否继续拆 `drawHierarchicalBorders`。
@@ -1025,3 +1030,12 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 45. spatial/index runtime 拆分时，索引构建可以下沉，runtime refresh 交易继续留 donor
 - `buildIndex`、`buildSpatialIndex`、chunked 版本和 secondary spatial 这类“只重建交互索引”的函数很适合集中进 owner。
 - `rebuildRuntimeDerivedState()` 同时处理 runtimePoliticalMeta、color sanitize、projected bounds cache 和 UI refresh，这类跨多个状态面的交易继续留在 donor 更稳。
+
+### 41. 抽 shared presentation owner 时，要把 stateless parser 和 stateful runtime 一起分层
+- 这次 `normalizeScenarioPerformanceHints` 既被资源/预热链消费，也被激活事务消费；只搬走 stateful helper 会先把 resources 里的 live consumer 打断。
+- 更稳的最短路径是：shared 文件同时导出 stateless parser 和 stateful runtime controller，manager 负责事务调用，resources 继续消费 parser。
+
+### 42. startup runtime topology baseline 不能在 scenario apply 里二次播种
+- 这次 clear blank baseline 漂移的根因，是 scenario_apply_pipeline.js 把 defaultRuntimePoliticalTopology 从场景 runtime 里补写了一次，导致退出场景后 blank 底图被 scenario runtime 污染。
+- 更稳的最短路径是：startup baseline 只在 startup 链建立；scenario apply 只消费它，不能回写它。
+- 遇到这类 clear/revert 漂移，优先抓两次基线的 untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数对比，很快能定位污染源。

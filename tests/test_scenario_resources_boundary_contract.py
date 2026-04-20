@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 
 
@@ -108,6 +109,21 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
 
         self.assertNotIn("let activeScenarioApplyPromise = null;", content)
+
+    def test_resources_module_releases_presentation_runtime_owner(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertIn('./scenario/presentation_runtime.js', content)
+        self.assertIn("normalizeScenarioPerformanceHints,", content)
+        self.assertNotIn("createScenarioPresentationRuntime(", content)
+        self.assertNotIn("SCENARIO_RENDER_PROFILES", content)
+        self.assertIsNone(re.search(r"^function\s+syncScenarioInspectorSelection\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+captureScenarioDisplaySettingsBeforeActivate\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+applyScenarioPerformanceHints\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreScenarioDisplaySettingsAfterExit\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+getScenarioOceanFillOverride\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+syncScenarioOceanFillForActivation\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreScenarioOceanFillAfterExit\b", content, re.MULTILINE))
 
     def test_chunk_runtime_state_stays_out_of_bundle_cache(self):
         resources_content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
