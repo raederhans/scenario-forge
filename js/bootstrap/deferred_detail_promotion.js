@@ -101,6 +101,11 @@ export function createDeferredDetailPromotionOwner({
     return hasActiveScenario ? "setMapData-fallback" : "setMapData";
   }
 
+  /**
+   * 事务：detail topology 准备。
+   * 成功路径：加载 detail bundle -> 写入 topology/detail/runtime state -> 刷新 map data -> 标记 detailPromotionCompleted。
+   * 恢复路径：加载失败或无 topologyDetail 时保留当前可运行状态并返回 false，调用方按既有启动路径继续。
+   */
   async function ensureDetailTopologyReady({
     renderDispatcher = null,
     requireIdle = false,
@@ -197,8 +202,9 @@ export function createDeferredDetailPromotionOwner({
   }
 
   async function unlockStartupReadonlyWithDetail(renderDispatcher) {
-    // Keep readonly unlock and detail promotion in one transaction so startup
-    // can either reach a clean ready state or surface one explicit recovery path.
+    // 事务：startup readonly 解锁。
+    // 成功路径：detail promotion 成功 + interaction infra basic 构建完成 -> 进入 ready 并释放 readonly。
+    // 恢复路径：detail promotion 未就绪 -> 记录失败指标并保持 readonly，等待后续调度重试。
     if (!state.startupReadonly || state.startupReadonlyUnlockInFlight) {
       return false;
     }
