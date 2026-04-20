@@ -21,6 +21,25 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             ),
         )
 
+
+    def test_spatial_owner_pass_through_uses_module_level_bindings(self):
+        self.assertIn(
+            "const resetSecondarySpatialIndexState = (...args) =>\n  getSpatialIndexRuntimeOwner().resetSecondarySpatialIndexState(...args);",
+            self.renderer_content,
+        )
+        self.assertIn(
+            "const buildSecondarySpatialIndexes = (...args) =>\n  getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes(...args);",
+            self.renderer_content,
+        )
+        self.assertIn(
+            "const buildIndexChunked = (...args) => getSpatialIndexRuntimeOwner().buildIndexChunked(...args);",
+            self.renderer_content,
+        )
+        self.assertIn(
+            "const buildSpatialIndexChunked = (...args) =>\n  getSpatialIndexRuntimeOwner().buildSpatialIndexChunked(...args);",
+            self.renderer_content,
+        )
+
     def test_chunk_promotion_infra_keeps_index_then_spatial_then_secondary_schedule(self):
         self.assertRegex(
             self.renderer_content,
