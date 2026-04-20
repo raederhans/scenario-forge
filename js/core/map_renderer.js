@@ -807,6 +807,7 @@ const cityLayerCache = {
   sovereigntyRevision: -1,
   merged: null,
 };
+// --- owner 初始化区：集中持有 owner 单例引用，并在 getter 中按需延迟创建。 ---
 let urbanCityPolicyOwner = null;
 let strategicOverlayHelpersOwner = null;
 let politicalCollectionOwner = null;
@@ -818,6 +819,7 @@ let borderDrawOwner = null;
 let interactionBorderSnapshotOwner = null;
 let spatialIndexRuntimeOwner = null;
 
+// --- owner 初始化区：getXxxOwner() 统一承载组装入口与依赖注入。 ---
 function getStrategicOverlayHelpersOwner() {
   if (strategicOverlayHelpersOwner) {
     return strategicOverlayHelpersOwner;
@@ -1165,6 +1167,11 @@ function getSpatialIndexRuntimeOwner() {
   });
   return spatialIndexRuntimeOwner;
 }
+
+// --- 注释锚点：缓存状态（cache state）章节 ---
+// --- 注释锚点：pass-through facade 章节 ---
+// --- 注释锚点：实际渲染实现（render implementation）章节 ---
+
 const cityCountryProfileCache = new WeakMap();
 const cityMarkerSpriteCache = new Map();
 let cityMarkerSpriteCacheColorRevision = -1;
@@ -1237,6 +1244,8 @@ function getRenderPassCacheState() {
   if (!state.renderPassCache || typeof state.renderPassCache !== "object") {
     state.renderPassCache = {};
   }
+  // cache 子结构：canvases/layouts/signatures/referenceTransforms/borderSnapshot。
+  // 维护意图：统一生命周期与默认值，确保各 pass 读写稳定且可复用。
   const cache = state.renderPassCache;
   cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : {};
   cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : {};
@@ -2065,14 +2074,17 @@ function schedulePoliticalPathWarmup(transform = state.zoomTransform || globalTh
 }
 
 function invalidateInteractionBorderSnapshot(reason = "unspecified") {
+  // 入口负责编排 snapshot 生命周期与时机，像素细节由 owner 实现。
   return getInteractionBorderSnapshotOwner().invalidateInteractionBorderSnapshot(reason);
 }
 
 function captureInteractionBorderSnapshot(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  // 入口负责编排 snapshot 生命周期与时机，像素细节由 owner 实现。
   return getInteractionBorderSnapshotOwner().captureInteractionBorderSnapshot(transform);
 }
 
 function drawInteractionBorderSnapshot(currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity) {
+  // 入口负责编排 snapshot 生命周期与时机，像素细节由 owner 实现。
   return getInteractionBorderSnapshotOwner().drawInteractionBorderSnapshot(currentTransform);
 }
 
@@ -7791,6 +7803,7 @@ function finalizeIndexBuildEffects() {
 }
 
 function buildIndex({ scheduleUiMode = "immediate" } = {}) {
+  // 入口负责编排 spatial index 构建流程，索引细节由 owner 实现。
   return getSpatialIndexRuntimeOwner().buildIndex({ scheduleUiMode });
 }
 
@@ -7975,6 +7988,7 @@ function buildSpatialIndex({
   includeSecondary = true,
   allowComputeMissingBounds = true,
 } = {}) {
+  // 入口负责编排 spatial index 构建流程，索引细节由 owner 实现。
   return getSpatialIndexRuntimeOwner().buildSpatialIndex({
     includeSecondary,
     allowComputeMissingBounds,
@@ -8215,6 +8229,7 @@ function getProjectedLineDensityStats(line) {
 }
 
 function drawHierarchicalBorders(k, { interactive = false } = {}) {
+  // 入口负责编排边界绘制阶段与参数，笔触/采样等细节由 owner 实现。
   return getBorderDrawOwner().drawHierarchicalBorders(k, { interactive });
 }
 
