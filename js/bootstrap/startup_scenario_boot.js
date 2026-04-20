@@ -74,6 +74,7 @@ export function createStartupScenarioBootOwner({
         interactionLevel: startupInteractionMode === "readonly" ? "readonly-startup" : "full",
       });
     } catch (startupApplyError) {
+      // Fallback trigger: source=startup-bundle 且首次 apply 抛错时，切换到 legacy-bootstrap-recovery 重新加载并重放 apply。
       if (scenarioBundleSource !== "startup-bundle") {
         throw startupApplyError;
       }

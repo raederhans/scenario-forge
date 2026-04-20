@@ -61,6 +61,12 @@ let startupDataPipelineOwner = null;
 let deferredDetailPromotionOwner = null;
 let startupScenarioBootOwner = null;
 
+/**
+ * Startup owner boundaries:
+ * 1) StartupDataPipelineOwner: drives bootstrap data ingestion and base-state hydration.
+ * 2) StartupScenarioBootOwner: applies the startup scenario bundle onto hydrated base state.
+ * 3) DeferredDetailPromotionOwner: promotes delayed detail topology and unlocks interaction readiness.
+ */
 function getStartupDataPipelineOwner() {
   if (startupDataPipelineOwner) {
     return startupDataPipelineOwner;
@@ -655,6 +661,7 @@ async function bootstrap() {
   let renderDispatcher = null;
   try {
     bindBeforeUnload();
+    // Phase: 加载基础拓扑 | Input: 启动配置与 bootstrap 资源 promise | Output: startupBaseData + 已注入基础 state 字段。
     setBootState("base-data");
     startBootMetric("base-data");
     const d3Client = globalThis.d3;
@@ -691,6 +698,7 @@ async function bootstrap() {
       );
     }
     initLongAnimationFrameObserver();
+    // Phase: 初始化地图骨架 | Input: startup interaction mode + 基础拓扑/语言状态 | Output: map shell + 首次渲染调度器。
     const startupInteractionLevel = state.startupInteractionMode === "readonly" ? "readonly-startup" : "full";
     initMap({
       suppressRender: true,
@@ -732,6 +740,7 @@ async function bootstrap() {
     void loadDeferredMilsymbol();
     deferredUiBootstrapPromise = bootstrapDeferredUi(renderApp);
 
+    // Phase: 应用启动场景 | Input: scenarioBundlePromise + UI bootstrap promise | Output: active scenario state + source/recovery metadata。
     const startupScenarioBoot = getStartupScenarioBootOwner();
     const {
       defaultScenarioBundle,
@@ -747,6 +756,7 @@ async function bootstrap() {
     renderDispatcher.flush();
     checkpointBootMetricOnce("first-visible");
     checkpointBootMetricOnce("first-visible-scenario");
+    // Phase: 触发 detail promotion | Input: 当前 scenario/state/renderDispatcher | Output: ready state 或 readonly 解锁调度。
     await finalizeReadyState(renderDispatcher);
     void postStartupSupportKeyUsageReport({
       scenarioId: String(state.activeScenarioId || defaultScenarioBundle?.manifest?.scenario_id || "").trim(),

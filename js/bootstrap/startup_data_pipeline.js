@@ -455,6 +455,11 @@ export function createStartupDataPipelineOwner({
     return results;
   }
 
+  /**
+   * Startup阶段：场景引导解析。
+   * 位置：base-data 入口，早于基础拓扑注入与场景 apply。
+   * 状态副作用字段：返回启动 promise 组合，驱动后续 scenarioBundle/source 选择与 fallback 路径。
+   */
   function resolveStartupScenarioBootstrap({ d3Client } = {}) {
     const configuredDefaultScenarioId = getConfiguredDefaultScenarioId();
     const scenarioRegistryPromise = configuredDefaultScenarioId
@@ -567,6 +572,11 @@ export function createStartupDataPipelineOwner({
     };
   }
 
+  /**
+   * Startup阶段：基础资源加载。
+   * 位置：场景引导解析之后、基础 state hydrate 之前。
+   * 状态副作用字段：函数本身无直接写入；返回的 startupBaseData 将被下一阶段写入 state.topology/state.locales 等字段。
+   */
   async function loadStartupBaseData({
     d3Client,
     startupFallbackScenarioId,
@@ -587,6 +597,13 @@ export function createStartupDataPipelineOwner({
     });
   }
 
+  /**
+   * Startup阶段：基础状态注入。
+   * 位置：基础资源加载之后、地图初始化与场景 apply 之前。
+   * 状态副作用字段：写入 topology/topologyPrimary/topologyDetail/runtimePoliticalTopology、
+   * topologyBundleMode/detailDeferred/detailPromotionCompleted、locales/baseLocalization*、
+   * contextLayer*、baseCity*、palette* 与启动期函数句柄（ensureBaseCityDataFn 等）。
+   */
   function hydrateStartupBaseState({
     ensureBaseCityDataReadyFn,
     ensureContextLayerDataReadyFn,
