@@ -8,6 +8,8 @@ export function createBorderDrawOwner({
     boundaryDefaultLineCap = "round",
     boundaryDefaultLineJoin = "round",
     boundaryDefaultMiterLimit = 4,
+    // coastline LOD 采用两级阈值：低缩放(<coastlineLodLowZoomMax)优先压噪，
+    // 中缩放(<coastlineLodMidZoomMax)平衡细节与性能，高缩放保留原始几何细节。
     coastlineLodLowZoomMax = 1.8,
     coastlineLodMidZoomMax = 3.2,
     coastlineViewSimplifyCollinearAngleDeg = 4,
@@ -185,6 +187,9 @@ export function createBorderDrawOwner({
     };
   }
 
+  // buildRenderableBoundaryMesh 面向“屏幕可读性”做几何简化：
+  // 通过 simplifyDistancePx + angleThresholdDeg 合并近共线点，再用 minLengthPx/minSpanPx/minAreaPx
+  // 过滤视觉贡献低的短线段，目标是降低低缩放抖动与过绘，同时保持边界形状识别度。
   function buildRenderableBoundaryMesh(mesh, {
     simplifyDistancePx = 0,
     minLengthPx = 0,
@@ -297,6 +302,8 @@ export function createBorderDrawOwner({
       return null;
     }
     if (kind === "coastline") {
+      // 海岸线 transform 与 LOD 阈值一致：低缩放使用更强简化阈值，
+      // 中缩放降低简化力度，高缩放交给原 mesh，保证缩放连续性与轮廓稳定性。
       if (zoom < coastlineLodLowZoomMax) {
         return (mesh) => buildRenderableBoundaryMesh(mesh, {
           simplifyDistancePx: 2.4,
