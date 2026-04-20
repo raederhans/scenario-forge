@@ -6,9 +6,83 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 STRATEGIC_OVERLAY_HELPERS_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_helpers.js"
+EXPECTED_STRATEGIC_OVERLAY_HELPER_WHITELIST = [
+    "renderStrategicDefs",
+    "ensureOperationalLineEditorState",
+    "getOperationalLinePreset",
+    "projectStrategicPoints",
+    "createOperationGraphicPath",
+    "getOperationGraphicLabelAnchor",
+    "selectOperationalLineById",
+    "getOperationGraphicPreset",
+    "selectOperationGraphicById",
+    "renderOperationGraphicsEditorOverlay",
+    "ensureUnitCounterEditorState",
+    "getProjectedPoint",
+    "getUnitCounterRenderEntries",
+    "getUnitCounterCardModel",
+    "getUnitCounterRenderScale",
+    "getUnitCounterSlotOffset",
+    "compareUnitCounterRenderOrder",
+    "getUnitCounterNodeTransform",
+    "getUnitCounterIconPath",
+    "updateSpecialZonesPaths",
+    "renderSpecialZoneEditorOverlay",
+    "getEffectiveSpecialZonesFeatureCollection",
+]
 
 
 class MapRendererStrategicOverlayHelpersBoundaryContractTest(unittest.TestCase):
+    @staticmethod
+    def _extract_object_keys(content: str, anchor: str) -> list[str]:
+        start = content.find(anchor)
+        if start == -1:
+            return []
+        brace_start = content.find("{", start)
+        if brace_start == -1:
+            return []
+        depth = 0
+        end = None
+        for idx in range(brace_start, len(content)):
+            ch = content[idx]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    end = idx
+                    break
+        if end is None:
+            return []
+        block = content[brace_start + 1:end]
+        keys = []
+        for raw_line in block.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("//"):
+                continue
+            line = line.rstrip(",")
+            if ":" in line:
+                line = line.split(":", 1)[0].strip()
+            keys.append(line)
+        return keys
+
+    @staticmethod
+    def _extract_owner_helpers_destructured_fields(owner_content: str) -> list[str]:
+        anchor = "= helpers;"
+        end = owner_content.find(anchor)
+        if end == -1:
+            return []
+        start = owner_content.rfind("const {", 0, end)
+        if start == -1:
+            return []
+        body_start = owner_content.find("{", start)
+        body = owner_content[body_start + 1:end].rsplit("}", 1)[0]
+        return [
+            line.strip().rstrip(",")
+            for line in body.splitlines()
+            if line.strip()
+        ]
+
     def test_map_renderer_keeps_facade_while_owner_takes_strategic_overlay_draw_helpers(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         owner_content = STRATEGIC_OVERLAY_HELPERS_JS.read_text(encoding="utf-8")
@@ -68,7 +142,27 @@ class MapRendererStrategicOverlayHelpersBoundaryContractTest(unittest.TestCase):
         self.assertNotIn('markDirty("move-unit-counter");', owner_content)
         self.assertNotIn('renderUnitCountersIfNeeded({ force: true });', owner_content)
 
+    def test_owner_helper_injection_matches_owner_helper_contract_whitelist(self):
+        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        owner_content = STRATEGIC_OVERLAY_HELPERS_JS.read_text(encoding="utf-8")
+
+        owner_helper_fields = self._extract_owner_helpers_destructured_fields(owner_content)
+        self.assertGreater(len(owner_helper_fields), 0)
+
+        renderer_injected_helper_fields = self._extract_object_keys(renderer_content, "helpers: {")
+        self.assertGreater(len(renderer_injected_helper_fields), 0)
+
+        self.assertEqual(
+            renderer_injected_helper_fields,
+            owner_helper_fields,
+            "Strategic overlay owner helper injection must stay explicit and minimal.",
+        )
+        self.assertEqual(
+            renderer_injected_helper_fields,
+            EXPECTED_STRATEGIC_OVERLAY_HELPER_WHITELIST,
+            "Strategic overlay owner helper injection whitelist changed.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
-
