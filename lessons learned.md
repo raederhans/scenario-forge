@@ -1083,3 +1083,19 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 141. 把 read helper 下沉到 owner 时，要把原本顺手做的 state 初始化副作用一起带走
 - 这次 getUnitCounterPreviewData() 迁进 strategic overlay runtime owner 后，最先丢的不是返回值计算，而是 nsureUnitCounterEditorState() 这类播种和归一化副作用。
 - 更稳的最短路径是：只要公开 facade 过去会顺手初始化 editor state，owner 版实现也要先保住这层副作用，再谈纯读 helper。
+
+### 142. strategic overlay 的浏览器回归要对齐真实 DOM 壳层，不要继续假设旧的 Frontline tab
+- 这次 smoke 暴露的真实问题，是页面已经切到 `Project` panel + `#frontlineProjectSection` 结构，旧 spec 还在找 `#inspectorSidebarTabFrontline`。
+- 更稳的最短路径是：先用当前 DOM 真相重写 open helper，再让 full regression 继续复用这层 helper。
+
+### 143. project roundtrip full regression 里，schema 和 annotationView 断言要跟着真实导出契约走
+- 这次 roundtrip 先被 `schemaVersion === 19` 卡住，随后又被 annotationView 新字段卡住，问题都出在 spec 继续硬编码旧导出形状。
+- 更稳的最短路径是：schemaVersion 跟当前 source of truth 对齐，annotationView 用 `toMatchObject(...)` 约束关键字段，把完整深比较留给真正需要的 payload。
+
+### 144. strategic-only roundtrip regression 适合直连 import transaction，不必绑死 file input 壳层
+- 这次 `strategic_overlay_roundtrip.spec.js` 真正想守的是 operational line 和 counter attachment 的持久化关系，不是 project upload 控件本身。
+- 更稳的最短路径是：导出仍走真实 download，导入直接用 `importProjectThroughFunnel(new File(...))`，把 file input 交互留给更通用的 `project_save_load_roundtrip.spec.js`。
+
+### 145. Playwright 遇到 hidden overlay 拦截点击时，优先走 DOM 侧 value+event 驱动
+- 这次 `frontlineEnabledToggle` 的真实问题不是控件不可见，而是 hidden boot overlay 仍在命中 pointer interception。
+- 更稳的最短路径是：对 checkbox/select 这类控件直接在页面里写值并派发 `input/change`，避免把测试稳定性绑在层叠点击命中上。

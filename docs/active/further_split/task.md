@@ -69,6 +69,23 @@
 - [x] 新增 strategic overlay runtime owner 行为测试
 - [x] 修复 runtime owner preview 路径丢失 `ensureUnitCounterEditorState()` 的副作用
 - [ ] 判断 full `strategic_overlay_editing` e2e 的 startup readiness 超时是否属于本轮新回归
+- [x] 让 `strategic_overlay_runtime_owner` 继续接管 operational line 事务
+- [x] 让 `strategic_overlay_runtime_owner` 继续接管 unit counter 写事务与 attachment 同步
+- [x] 让 `map_renderer.js` 把剩余 strategic overlay facade 降成 owner wrapper
+- [x] 给 strategic overlay runtime owner 新增行为测试与边界合同
+- [x] 给 `tests/e2e/support/playwright-app.js` 新增 shared scenario/apply/import helper
+- [x] 去掉 strategic overlay 三个 spec 的本地 startup ready helper
+- [x] 新增 `tests/e2e/strategic_overlay_smoke.spec.js`
+- [x] 新增 strategic overlay e2e ready gate 合同测试
+- [x] 修正 `tests/test_startup_shell.py` 的旧 owner 断言，改到 `scenario/bundle_runtime.js`
+- [x] 新增 `tests/test_pages_dist_startup_shell.py`
+- [x] 新增 interaction funnel 驱动的 project import completion helper
+- [x] 把 `strategic_overlay_frontline.spec.js` 减重到业务主线断言
+- [x] 把 `strategic_overlay_roundtrip.spec.js` 继续减到 strategic-only 关系链断言
+- [x] 给 `strategic_overlay_roundtrip.spec.js` 增加 project import/export 绑定完成等待
+- [x] 把 `strategic_overlay_roundtrip.spec.js` 的导入路径改成 direct `importProjectThroughFunnel(File)`
+- [x] 更新 `package.json` 的 renderer split / strategic overlay smoke / pages dist script
+- [x] 更新 `.github/workflows/deploy.yml`，把 renderer split 行为测试、strategic overlay smoke、Pages dist gate 纳入流水线
 
 ## 本轮交付
 - 文档基线已经补齐。
@@ -110,6 +127,8 @@
 - Batch 5 当前波次的 smoke 证据已经补到 `.runtime/tmp/batch5_renderer_api_smoke.*`
 - strategic overlay runtime owner 的静态门和行为测试都已补齐
 - full `strategic_overlay_editing` 当前仍卡在 startup readiness 超时
+- strategic overlay smoke 已补齐并本地跑通
+- Pages dist 静态 gate 已补齐并本地跑通
 - 汇报里列出修改文件、验证和剩余风险
 
 - [x] 收紧 startup hydrate -> opening-owner promotion 的 `hasPoliticalPayloadChange` 标记
@@ -120,3 +139,7 @@
 - [x] 修复 shared ready gate 的 `waitForFunction(async ...)` 伪等待问题
 - [x] 新增 playwright ready gate 合同测试
 - [x] 让 `scenario_boundary_regression` 在单条 smoke 下重新变绿
+- [x] 本地通过 `npm run verify:pages-dist`
+- [x] 本地通过 `npm run test:e2e:strategic-overlay-smoke`
+- [x] `tests/e2e/strategic_overlay_roundtrip.spec.js` 已收绿
+- [x] `tests/e2e/strategic_overlay_frontline.spec.js` 已收绿

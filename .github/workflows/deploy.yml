@@ -42,11 +42,17 @@ jobs:
       - name: Run Python unit tests
         run: python -m unittest discover -s tests -p "test_*.py"
 
+      - name: Run renderer split node behavior tests
+        run: npm run test:node:renderer-splits
+
       - name: Run strict TNO scenario contract gate
         run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
         run: npm run test:e2e:smoke
+
+      - name: Run strategic overlay smoke E2E
+        run: npm run test:e2e:strategic-overlay-smoke
 
   build:
     runs-on: ubuntu-latest
@@ -72,6 +78,9 @@ jobs:
 
       - name: Assemble Pages dist
         run: python tools/build_pages_dist.py
+
+      - name: Verify Pages dist startup shell
+        run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5

@@ -35,6 +35,9 @@ class StartupShellTest(unittest.TestCase):
         data_loader_js = (REPO_ROOT / "js" / "core" / "data_loader.js").read_text(encoding="utf-8")
         startup_cache_js = (REPO_ROOT / "js" / "core" / "startup_cache.js").read_text(encoding="utf-8")
         scenario_resources_js = (REPO_ROOT / "js" / "core" / "scenario_resources.js").read_text(encoding="utf-8")
+        scenario_bundle_runtime_js = (
+            REPO_ROOT / "js" / "core" / "scenario" / "bundle_runtime.js"
+        ).read_text(encoding="utf-8")
         scenario_apply_pipeline_js = (
             REPO_ROOT / "js" / "core" / "scenario_apply_pipeline.js"
         ).read_text(encoding="utf-8")
@@ -72,10 +75,10 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn('needGeoAliases: !geoAliases,', data_loader_js)
         self.assertIn('topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;', data_loader_js)
         self.assertIn('startupWorkerUsed,', data_loader_js)
-        self.assertIn('requestedBundleLevel === "bootstrap"', scenario_resources_js)
+        self.assertIn('requestedBundleLevel === "bootstrap"', scenario_bundle_runtime_js)
         self.assertIn(
             ': manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""',
-            scenario_resources_js,
+            scenario_bundle_runtime_js,
         )
         self.assertIn('async function ensureChunkedScenarioFirstFrameReady({', scenario_post_apply_effects_js)
         self.assertIn('await preloadScenarioCoarseChunks(bundle);', scenario_post_apply_effects_js)

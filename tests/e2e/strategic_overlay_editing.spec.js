@@ -1,60 +1,51 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl } = require("./support/playwright-app");
-function resolveBaseUrl() {
-  return getAppUrl();
-}
-
-const BASE_URL = getAppUrl();
-
-async function waitForAppReady(page) {
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    return typeof state.updateStrategicOverlayUIFn === "function"
-      && typeof state.renderCountryListFn === "function"
-      && !!document.querySelector("#inspectorSidebarTabFrontline")
-      && !!document.querySelector("#operationGraphicList")
-      && !!document.querySelector("#unitCounterList")
-      && !!document.querySelector("g.operation-graphics-layer")
-      && !!document.querySelector("g.unit-counters-layer")
-      && !!document.querySelector("rect.interaction-layer");
-  }, { timeout: 120000 });
-}
+const {
+  applyScenarioAndWaitIdle,
+  gotoApp,
+  primeStateRef,
+  waitForAppInteractive,
+  waitForScenarioSelectReady,
+} = require("./support/playwright-app");
 
 async function openFrontlineTab(page) {
-  await expect(page.locator("#inspectorSidebarTabFrontline")).toBeVisible();
   await page.evaluate(async () => {
     const sidebarModule = await import("/js/ui/sidebar.js");
     const mapRendererModule = await import("/js/core/map_renderer.js");
-    if (!document.querySelector("#operationGraphicList") || !document.querySelector("#unitCounterList")) {
+    if (
+      !document.querySelector("#frontlineProjectSection")
+      || !document.querySelector("#operationGraphicList")
+      || !document.querySelector("#unitCounterList")
+    ) {
       sidebarModule.initSidebar({ render: mapRendererModule.render });
     }
   });
-  await page.locator("#inspectorSidebarTabFrontline").click();
-  await page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    if (!state.ui || typeof state.ui !== "object") {
-      state.ui = {};
+  await page.evaluate(() => {
+    const projectTab = document.querySelector("#inspectorSidebarTabProject");
+    if (projectTab instanceof HTMLElement) {
+      projectTab.click();
     }
-    state.ui.rightSidebarTab = "frontline";
-    document.querySelectorAll("[data-inspector-tab]").forEach((button) => {
-      const isActive = String(button.getAttribute("data-inspector-tab") || "").trim().toLowerCase() === "frontline";
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-selected", isActive ? "true" : "false");
-    });
-    document.querySelectorAll("[data-inspector-panel]").forEach((panel) => {
-      const isActive = String(panel.getAttribute("data-inspector-panel") || "").trim().toLowerCase() === "frontline";
-      panel.classList.toggle("is-active", isActive);
-      panel.hidden = !isActive;
-    });
   });
+  await page.evaluate(async () => {
+    const section = document.querySelector("#frontlineProjectSection");
+    if (section instanceof HTMLDetailsElement) {
+      section.open = true;
+    }
+    const { state } = await import("/js/core/state.js");
+    if (!state.ui || typeof state.ui !== "object") state.ui = {};
+    state.ui.rightSidebarTab = "project";
+    state.updateScenarioUIFn?.();
+    state.updateStrategicOverlayUIFn?.();
+  });
+  await expect(page.locator("#frontlineProjectSection")).toBeVisible();
   await page.waitForFunction(() => {
-    const panel = document.querySelector("#frontlineSidebarPanel");
-    const button = document.querySelector("#inspectorSidebarTabFrontline");
-    return !!panel && !panel.hidden && button?.getAttribute("aria-selected") === "true";
+    const section = document.querySelector("#frontlineProjectSection");
+    const overlayPanel = document.querySelector("#frontlineOverlayPanel");
+    const strategicPanel = document.querySelector("#strategicOverlayPanel");
+    return !!section?.open && !!overlayPanel && !!strategicPanel;
   });
-  await expect(page.locator("#frontlineSidebarPanel")).toBeVisible();
+  await expect(page.locator("#strategicOverlayPanel")).toBeVisible();
 }
 
 async function openCounterEditorModal(page) {
@@ -64,53 +55,11 @@ async function openCounterEditorModal(page) {
   await expect(page.locator("#unitCounterEditorModal")).toBeVisible();
 }
 
-async function waitForScenarioUiReady(page) {
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    const scenarioSelect = document.querySelector("#scenarioSelect");
-    return typeof state.renderCountryListFn === "function"
-      && !!scenarioSelect
-      && !!scenarioSelect.querySelector('option[value="tno_1962"]');
-  }, { timeout: 120000 });
-}
-
-async function applyScenario(page, scenarioId) {
-  await page.evaluate(async (expectedScenarioId) => {
-    const select = document.querySelector("#scenarioSelect");
-    if (select instanceof HTMLSelectElement) {
-      select.value = expectedScenarioId;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
-    let lastError = null;
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      try {
-        await applyScenarioById(expectedScenarioId, {
-          renderNow: true,
-          markDirtyReason: "playwright-apply-scenario",
-          showToastOnComplete: false,
-        });
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 400 * (attempt + 1)));
-      }
-    }
-    if (lastError) {
-      throw lastError;
-    }
-  }, scenarioId);
-  await page.waitForFunction(async (expectedScenarioId) => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === expectedScenarioId;
-  }, scenarioId, { timeout: 120000 });
-}
-
 test("operation graphics support style editing and vertex editing after creation", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   await page.evaluate(async () => {
@@ -189,8 +138,9 @@ test("operation graphics support style editing and vertex editing after creation
 
 test("operational lines support direct command-bar draw entry and style editing", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   await page.locator("#strategicCommandOffensiveBtn").click();
@@ -249,8 +199,9 @@ test("operational lines support direct command-bar draw entry and style editing"
 
 test("milstd counters keep attachments on click and detach only after a real drag", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   await page.evaluate(async () => {
@@ -329,8 +280,9 @@ test("milstd counters keep attachments on click and detach only after a real dra
 
 test("co-located counters render into deterministic slot positions instead of a single stacked badge", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   await page.evaluate(async () => {
@@ -363,8 +315,9 @@ test("co-located counters render into deterministic slot positions instead of a 
 
 test("unit counters open a centered modal editor, support symbol search, and still clamp with zoom", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   await page.evaluate(async () => {
@@ -581,8 +534,9 @@ test("unit counters open a centered modal editor, support symbol search, and sti
 
 test("unit counter placement cancels on escape or tab switch, resets after delete, and keeps compact sidebar overflow-safe", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await waitForAppReady(page);
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
   await openFrontlineTab(page);
 
   const longLabel = "Army Group Center Counter Title That Should Never Spill Outside The Compact Preview Shell";
@@ -675,11 +629,11 @@ test("unit counter placement cancels on escape or tab switch, resets after delet
 
 test("unit counter auto nation follows displayed political code and keeps legacy/controller/manual compatibility", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1200);
-  await waitForAppReady(page);
-  await waitForScenarioUiReady(page);
-  await applyScenario(page, "tno_1962");
+  await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120000 });
+  await primeStateRef(page);
+  await waitForScenarioSelectReady(page, { scenarioId: "tno_1962", timeout: 120000 });
+  await applyScenarioAndWaitIdle(page, "tno_1962", { timeout: 120000 });
   await openFrontlineTab(page);
 
   await expect(page.locator("#unitCounterNationModeSelect")).toHaveValue("display");

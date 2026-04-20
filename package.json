@@ -23,10 +23,13 @@
     "test:e2e:ui-rework-mainline": "node node_modules/@playwright/test/cli.js test tests/e2e/ui_rework_mainline_shell_sidebar.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:ui-rework-support": "node node_modules/@playwright/test/cli.js test tests/e2e/ui_rework_support_transport_hardening.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
+    "test:node:renderer-splits": "node --test tests/strategic_overlay_runtime_owner_behavior.test.mjs tests/strategic_overlay_state_behavior.test.mjs",
     "test:e2e:smoke": "node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1",
+    "test:e2e:strategic-overlay-smoke": "node node_modules/@playwright/test/cli.js test tests/e2e/strategic_overlay_smoke.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:project-save-load": "node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --reporter=list --workers=1",
     "test:e2e:interaction-funnel": "node node_modules/@playwright/test/cli.js test tests/e2e/interaction_funnel_contract.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:scenario-resilience": "node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1",
+    "verify:pages-dist": "python tools/build_pages_dist.py && python -m unittest tests.test_pages_dist_startup_shell -q",
     "build:global-transport-roads": "python tools/build_global_transport_roads.py",
     "build:global-transport-rail": "python tools/build_global_transport_rail.py",
     "build:global-transport-road-catalog": "python tools/build_global_transport_catalogs.py --family road"

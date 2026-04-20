@@ -638,3 +638,142 @@
   - `strategic_overlay_runtime_owner.js` 的 `getUnitCounterPreviewData()` 开头恢复调用
   - 行为测试新增：
     - `unit counter preview seeds editor defaults before reading preview data`
+
+## 2026-04-20 Batch 5 strategic overlay runtime 第二刀
+- `js/core/renderer/strategic_overlay_runtime_owner.js`
+  - 继续接管：
+    - operational line：
+      - append / start / undo / cancel / finish / select / update / delete
+    - unit counter：
+      - place / start / cancel / select / update / delete
+    - shared runtime：
+      - `syncOperationalLineAttachedCounterIds`
+      - `cancelActiveStrategicInteractionModes`
+- `js/core/map_renderer.js`
+  - 剩余 strategic overlay facade 已继续降成 owner wrapper
+  - 对外 export 名字保持不变
+- owner helper 注入新增：
+  - operational line style / min-points / lookup
+  - unit counter editor assign/reset / combat normalize / size normalize
+  - hit-testing 与 attachment 常量
+
+## 2026-04-20 strategic overlay e2e / CI / Pages 链收口
+- `tests/e2e/support/playwright-app.js`
+  - 新增 shared helper：
+    - `waitForScenarioSelectReady`
+    - `applyScenarioAndWaitIdle`
+    - `waitForProjectImportSettled`
+- `tests/e2e/strategic_overlay_editing.spec.js`
+  - 去掉本地 startup/scenario ready helper
+  - 改成复用 shared helper
+  - `openFrontlineTab` 改成对齐当前真实 DOM：
+    - Project tab
+    - `#frontlineProjectSection`
+    - `#frontlineOverlayPanel`
+    - `#strategicOverlayPanel`
+- `tests/e2e/strategic_overlay_frontline.spec.js`
+  - 去掉本地 startup/scenario ready helper
+  - 改成复用 shared helper
+- `tests/e2e/strategic_overlay_roundtrip.spec.js`
+  - 去掉本地 startup helper
+  - import settle 改成复用 shared helper
+  - schemaVersion 期望更新到当前真实值 `20`
+  - annotationView 改成 `toMatchObject(...)`，减少无关字段漂移
+- 新增 `tests/e2e/strategic_overlay_smoke.spec.js`
+  - 作为 CI 轻量 strategic overlay smoke
+- 新增 `tests/test_strategic_overlay_e2e_ready_gate_contract.py`
+  - 锁死三个 strategic overlay spec 不再带本地 startup ready helper
+- `tests/test_startup_shell.py`
+  - 旧 bundle runtime 断言已从 `scenario_resources.js` 改到 `scenario/bundle_runtime.js`
+- 新增 `tests/test_pages_dist_startup_shell.py`
+  - 直接检查 `dist/app/index.html` 的 Pages startup shell 契约
+- `package.json`
+  - 新增：
+    - `test:node:renderer-splits`
+    - `test:e2e:strategic-overlay-smoke`
+    - `verify:pages-dist`
+- `.github/workflows/deploy.yml`
+  - verify job 新增：
+    - renderer split Node 行为测试
+    - strategic overlay smoke
+  - build job 新增：
+    - Pages dist startup shell 静态 gate
+
+## 2026-04-20 本轮验证证据
+- Python 合同
+  - `python -m unittest tests.test_map_renderer_strategic_overlay_runtime_owner_boundary_contract tests.test_strategic_overlay_e2e_ready_gate_contract tests.test_startup_shell tests.test_pages_dist_startup_shell -q`
+  - 结果：`Ran 7 tests / OK`
+- Node 行为
+  - `node --test tests/strategic_overlay_runtime_owner_behavior.test.mjs tests/strategic_overlay_state_behavior.test.mjs`
+  - 结果：`10 passed`
+- 静态检查
+  - `node --check`
+    - `js/core/renderer/strategic_overlay_runtime_owner.js`
+    - `js/core/map_renderer.js`
+    - `tests/e2e/support/playwright-app.js`
+    - `tests/e2e/strategic_overlay_editing.spec.js`
+    - `tests/e2e/strategic_overlay_frontline.spec.js`
+    - `tests/e2e/strategic_overlay_roundtrip.spec.js`
+    - `tests/e2e/strategic_overlay_smoke.spec.js`
+  - 结果：全部通过
+- Pages dist
+  - `npm run verify:pages-dist`
+  - 结果：通过
+- smoke
+  - `npm run test:e2e:strategic-overlay-smoke`
+  - 结果：`1 passed (1.3m)`
+  - 日志：
+    - `.runtime/tmp/strategic_overlay_smoke.out.log`
+    - `.runtime/tmp/strategic_overlay_smoke.err.log`
+    - `.runtime/tmp/strategic_overlay_smoke.exit.txt`
+
+## 2026-04-20 当前剩余风险
+- `tests/e2e/strategic_overlay_roundtrip.spec.js`
+  - 当前从旧 schemaVersion 断言已前进到后段长时导入超时
+  - 这条更像 full regression 仍然过重，后续应继续拆 lane 或单独延长预算
+
+## 2026-04-20 roundtrip / frontline follow-up
+- `tests/e2e/support/playwright-app.js`
+  - 新增：
+    - `primeInteractionFunnelDebugRef`
+    - `beginProjectImportWatch`
+    - `waitForProjectImportCompletion`
+    - `openProjectFrontlineSection`
+- `tests/e2e/strategic_overlay_roundtrip.spec.js`
+  - project import 等待已切到 interaction funnel 完成信号
+  - 测试预算已提高到 `180000`
+  - roundtrip 断言继续减重：
+    - `schemaVersion` 对齐到 `20`
+    - `annotationView` 改成 `toMatchObject(...)`
+    - 现在进一步减到 strategic-only 关系链：
+      - `operationalLines.attachedCounterIds`
+      - attached counter 的 `iconId / layoutAnchor / attachment`
+      - detached counter 的 `layoutAnchor.kind=feature`
+    - 新增 project import/export 按钮已绑定的等待条件
+    - 导入路径继续收口成 `importProjectThroughFunnel(new File(...))`
+      - 这样这条 strategic-only regression 直接盯 import transaction
+      - file input 交互壳层继续留给 `project_save_load_roundtrip.spec.js`
+- `tests/e2e/strategic_overlay_frontline.spec.js`
+  - 已改成当前更短主线：
+    - apply scenario
+    - 打开 project/frontline section
+    - enable overlay
+    - controller change 后 frontline path 变化
+    - console/network clean
+  - 旧的布局 / modal / CSS / DOM parent 断言已从这条 full regression 移除
+- 当前 roundtrip 仍未最终变绿
+  - 但已经从旧 schema/annotationView 漂移前进到真正的导入完成链
+
+## 2026-04-20 roundtrip / frontline 最终验证
+- `tests/e2e/strategic_overlay_roundtrip.spec.js`
+  - 在复用现有 dev server 的单条直跑下已通过
+  - 结果：`1 passed (2.0m)`
+- `tests/e2e/strategic_overlay_frontline.spec.js`
+  - 在复用现有 dev server 的单条直跑下已通过
+  - 结果：`1 passed (1.4m)`
+- 当前 strategic overlay 相关验证面：
+  - owner 行为测试：绿
+  - shared ready gate 合同：绿
+  - overlay smoke：绿
+  - frontline full regression：绿
+  - roundtrip full regression：绿

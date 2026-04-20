@@ -64,6 +64,9 @@
 - [x] 新增 `js/core/renderer/strategic_overlay_runtime_owner.js`，收口 operation graphics / special zone 的 runtime 事务与 unit counter 读 helper。
 - [x] 让 `map_renderer.js` 把命中的 strategic overlay facade 降成 owner wrapper。
 - [x] 补齐 strategic overlay runtime owner 合同与行为测试。
+- [x] 继续让 `strategic_overlay_runtime_owner` 接管 operational line / unit counter 写事务。
+- [x] 收口 strategic overlay e2e 的 shared ready / scenario apply / project import helper。
+- [x] 新增 strategic overlay smoke 与 Pages dist startup shell gate。
 - [ ] 继续判断 full `strategic_overlay_editing` e2e 的 startup readiness 超时是否属于现有环境问题还是本轮新回归。
 
 ## 当前 approved plan 对齐
@@ -77,6 +80,10 @@
 5. Batch 5 follow-up 当前切口：
    - 先抽 `operation graphics / special zone` runtime owner
    - `operational line + unit counter attachment` 留到下一刀整组收口
+6. Batch 5 当前剩余口径：
+   - 主线 smoke 进入 CI
+   - Pages dist 静态 gate 进入 build 链
+   - full roundtrip / editing 继续作为重型 regression lane 观察
 
 ## 完成标准
 - 三个标准留档文件已存在。
@@ -91,5 +98,7 @@
 - Batch 5 的生产 consumer import 已从 namespace import 收紧到 named import / 局部 helper bridge。
 - Batch 5 的 scenario/startup renderer 依赖已先收成内部 `scenario_renderer_bridge`。
 - Batch 5 的 strategic overlay runtime 已开始从 donor 下沉到独立 owner。
+- Batch 5 的 strategic overlay runtime 第二刀已经覆盖 operational line / unit counter 主交易。
+- strategic overlay smoke 和 Pages dist gate 已进入执行清单。
 - 合同测试、静态检查、定向 smoke 都有对应证据。
 

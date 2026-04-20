@@ -144,6 +144,66 @@ test("special zone runtime owner creates manual feature and preserves isolated s
   assert.equal(renderCount, 1);
 });
 
+test("operational line runtime owner commits history and updates modal selection on finish", () => {
+  const historyEntries = [];
+  const dirtyReasons = [];
+  let uiRefreshCount = 0;
+  let renderCount = 0;
+  const state = {
+    operationGraphicsEditor: {
+      selectedId: "opg_selected",
+    },
+    operationalLines: [],
+    operationalLinesDirty: false,
+    operationalLineEditor: {
+      active: true,
+      counter: 3,
+      kind: "frontline",
+      label: "Baltic Screen",
+      opacity: 0.82,
+      points: [[8, 48], [13, 49], [18, 51]],
+      selectedId: null,
+      selectedVertexIndex: -1,
+      stroke: "#6b7280",
+      stylePreset: "frontline",
+      width: 2.1,
+    },
+    strategicOverlayUi: {},
+  };
+
+  const owner = createStrategicOverlayRuntimeOwner({
+    state,
+    helpers: {
+      captureHistoryState: (payload) => ({ snapshot: payload }),
+      commitHistoryEntry: (entry) => historyEntries.push(entry),
+      ensureOperationalLineCounter: () => {},
+      ensureOperationalLineEditorState: () => {},
+      normalizeOperationalLineStylePreset: (value) => String(value),
+      normalizeOperationGraphicOpacity: (value) => Number(value),
+      normalizeOperationGraphicStroke: (value) => String(value),
+      normalizeOperationGraphicWidth: (value) => Number(value),
+      getOperationalLineMinPoints: () => 2,
+      markDirty: (reason) => dirtyReasons.push(reason),
+      renderNow: () => {
+        renderCount += 1;
+      },
+      updateStrategicOverlayUi: () => {
+        uiRefreshCount += 1;
+      },
+    },
+  });
+
+  assert.equal(owner.finishOperationalLineDraw(), true);
+  assert.equal(state.operationalLines.length, 1);
+  assert.equal(state.operationalLines[0].id, "opl_3");
+  assert.equal(state.operationalLineEditor.selectedId, "opl_3");
+  assert.equal(state.strategicOverlayUi.modalEntityId, "opl_3");
+  assert.equal(historyEntries[0].kind, "create-operational-line");
+  assert.deepEqual(dirtyReasons, ["create-operational-line"]);
+  assert.equal(uiRefreshCount, 1);
+  assert.equal(renderCount, 1);
+});
+
 test("unit counter nation resolution keeps controller fallback source semantics", () => {
   const state = {
     activeSovereignCode: "FRA",
@@ -170,6 +230,94 @@ test("unit counter nation resolution keeps controller fallback source semantics"
     owner.resolveUnitCounterNationForPlacement("", "", "controller"),
     { tag: "FRA", source: "controller" },
   );
+});
+
+test("unit counter runtime owner placement syncs line attachments and history", () => {
+  const historyEntries = [];
+  const dirtyReasons = [];
+  let uiRefreshCount = 0;
+  let renderCount = 0;
+  const state = {
+    HIT_SNAP_RADIUS_CLICK_PX: 10,
+    annotationView: {
+      unitRendererDefault: "game",
+    },
+    operationalLines: [{
+      id: "opl_1",
+      attachedCounterIds: [],
+    }],
+    operationalLinesDirty: false,
+    unitCounters: [],
+    unitCountersDirty: false,
+    unitCounterEditor: {
+      active: true,
+      attachment: { kind: "operational-line", lineId: "opl_1" },
+      baseFillColor: "#e8decd",
+      counter: 1,
+      echelon: "corps",
+      equipmentPct: 73,
+      iconId: "infantry",
+      label: "1st Corps",
+      nationSource: "display",
+      nationTag: "",
+      organizationPct: 84,
+      presetId: "inf",
+      renderer: "milstd",
+      returnSelectionId: null,
+      sidc: "",
+      size: "medium",
+      statsPresetId: "regular",
+      statsSource: "preset",
+      strengthText: "",
+      subLabel: "Nord",
+      symbolCode: "",
+      unitType: "INF",
+    },
+  };
+
+  const owner = createStrategicOverlayRuntimeOwner({
+    state,
+    constants: {
+      defaultUnitCounterMilstdSidc: "130310001412110000000000000000",
+    },
+    helpers: {
+      captureHistoryState: (payload) => ({ snapshot: payload }),
+      commitHistoryEntry: (entry) => historyEntries.push(entry),
+      ensureUnitCounterCounter: () => {},
+      ensureUnitCounterEditorState: () => {},
+      getHitFromEvent: () => ({ id: "GER", targetType: "land" }),
+      getMapLonLatFromEvent: () => [12, 48],
+      getNormalizedUnitCounterCombatState: (value) => value,
+      getUnitCounterPresetById: () => ({
+        baseSidc: "",
+        defaultEchelon: "corps",
+        defaultRenderer: "milstd",
+        iconId: "infantry",
+        id: "inf",
+        unitType: "INF",
+      }),
+      markDirty: (reason) => dirtyReasons.push(reason),
+      normalizeUnitCounterNationSource: (value, fallback = "display") => String(value || fallback).trim().toLowerCase(),
+      normalizeUnitCounterSizeToken: (value) => String(value),
+      renderNow: () => {
+        renderCount += 1;
+      },
+      updateStrategicOverlayUi: () => {
+        uiRefreshCount += 1;
+      },
+      resolveUnitCounterNationForPlacement: undefined,
+    },
+  });
+
+  assert.equal(owner.placeUnitCounterFromEvent({ type: "click" }), true);
+  assert.equal(state.unitCounters.length, 1);
+  assert.equal(state.unitCounters[0].attachment.lineId, "opl_1");
+  assert.equal(state.unitCounters[0].layoutAnchor.kind, "attachment");
+  assert.deepEqual(state.operationalLines[0].attachedCounterIds, ["unit_1"]);
+  assert.equal(historyEntries[0].kind, "place-unit-counter");
+  assert.deepEqual(dirtyReasons, ["place-unit-counter"]);
+  assert.equal(uiRefreshCount, 1);
+  assert.equal(renderCount, 1);
 });
 
 test("unit counter preview seeds editor defaults before reading preview data", () => {
@@ -210,4 +358,49 @@ test("unit counter preview seeds editor defaults before reading preview data", (
   assert.equal(state.unitCounterEditor.presetId, "inf");
   assert.equal(preview.renderer, "game");
   assert.equal(preview.organizationPct, 78);
+});
+
+test("cancel active strategic modes unwinds unit counter, line, and graphics editors", () => {
+  const state = {
+    operationGraphicsEditor: {
+      active: true,
+      mode: "draw",
+      points: [[0, 0]],
+      selectedId: null,
+      selectedVertexIndex: 0,
+    },
+    operationalLineEditor: {
+      active: true,
+      mode: "draw",
+      points: [[0, 0]],
+      selectedId: null,
+      selectedVertexIndex: 0,
+    },
+    strategicOverlayUi: {
+      activeMode: "frontline",
+    },
+    unitCounterEditor: {
+      active: true,
+      returnSelectionId: null,
+    },
+  };
+
+  const owner = createStrategicOverlayRuntimeOwner({
+    state,
+    helpers: {
+      ensureOperationGraphicsEditorState: () => {},
+      ensureOperationalLineEditorState: () => {},
+      ensureUnitCounterEditorState: () => {},
+      resetUnitCounterEditorState: () => {
+        state.unitCounterEditor.active = false;
+      },
+      updateStrategicOverlayUi: () => {},
+    },
+  });
+
+  assert.equal(owner.cancelActiveStrategicInteractionModes(), true);
+  assert.equal(state.unitCounterEditor.active, false);
+  assert.equal(state.operationalLineEditor.active, false);
+  assert.equal(state.operationGraphicsEditor.active, false);
+  assert.equal(state.strategicOverlayUi.activeMode, "idle");
 });
