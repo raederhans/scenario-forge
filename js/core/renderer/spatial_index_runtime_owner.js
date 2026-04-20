@@ -14,6 +14,7 @@ export function createSpatialIndexRuntimeOwner({
   } = getters;
 
   const {
+    rebuildAuxiliaryRegionIndexes = () => {},
     getLogicalCanvasDimensions = () => [1, 1],
     computeProjectedFeatureBounds = () => null,
     shouldSkipFeature = () => false,
