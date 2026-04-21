@@ -22,6 +22,8 @@
 - [x] 调整 PR gate 为 `tno_1962 + hoi4_1939`
 - [x] 将 `blank_base` 下调为 observation sample
 - [x] 只有证据明确时才追加更深的 perf 修补
+- [x] startup scenario apply 与 deferred UI bootstrap 改成并行
+- [x] `perf:gate` 回绿（`.runtime/tmp/perf_gate_wave2.out.log`）
 
 ## 暂缓到下一阶段
 
@@ -44,5 +46,6 @@
 - [x] strategic overlay smoke 通过
 - [x] strategic overlay frontline 通过
 - [x] strategic overlay roundtrip 通过
-- [ ] strategic overlay editing 全量新日志
-- [ ] `perf:gate` 回绿
+- [x] strategic overlay editing 第一波 `waitForFunction(async ...)` 清理
+- [x] strategic overlay editing 稳定化：显式 move update / preset 断言修正 / 可见性等待加固
+- [x] strategic overlay editing 全量新日志（`.runtime/tmp/strategic_overlay_editing_wave17.out.log`）

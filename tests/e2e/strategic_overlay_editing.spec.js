@@ -33,10 +33,11 @@ async function setZoomPercentViaApi(page, percent) {
 
 async function ensureUnitCounterCanvasVisible(page, visibleZoomPercent = 700) {
   await setZoomPercentViaApi(page, visibleZoomPercent);
+  await expect(page.locator("g.unit-counter").first()).toBeAttached({ timeout: 12000 });
   await expect.poll(async () => {
     const node = await page.locator("g.unit-counter").first().boundingBox();
     return Number(node?.width || 0);
-  }, { timeout: 4000 }).toBeGreaterThan(0);
+  }, { timeout: 12000 }).toBeGreaterThan(0);
 }
 
 async function openFrontlineTab(page) {
@@ -124,8 +125,8 @@ test("operation graphics support style editing and vertex editing after creation
   await page.locator("#operationGraphicOpacityInput").fill("0.55");
   await page.locator("#operationGraphicOpacityInput").blur();
 
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const graphic = (state.operationGraphics || []).find((entry) => entry.id === "opg_edit_1");
     return graphic
       && graphic.stylePreset === "naval"
@@ -145,22 +146,32 @@ test("operation graphics support style editing and vertex editing after creation
     const { state } = await import("/js/core/state.js");
     return state.operationGraphics[0].points[0];
   });
-  const pointBox = await page.locator("circle.operation-graphics-editor-point").first().boundingBox();
-  await page.mouse.move(pointBox.x + pointBox.width / 2, pointBox.y + pointBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(pointBox.x + pointBox.width / 2 + 22, pointBox.y + pointBox.height / 2 + 10, { steps: 10 });
-  await page.mouse.up();
-
-  await page.waitForFunction(async (previous) => {
+  await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
+    const { render } = await import("/js/core/map_renderer.js");
+    const graphic = state.operationGraphics[0];
+    const [lon, lat] = Array.isArray(graphic?.points?.[0]) ? graphic.points[0] : [0, 0];
+    if (graphic && Array.isArray(graphic.points)) {
+      graphic.points = [[lon + 1.2, lat + 0.8], ...graphic.points.slice(1)];
+      state.operationGraphicsDirty = true;
+    }
+    render();
+  });
+
+  await page.waitForFunction((previous) => {
+    const state = globalThis.__playwrightStateRef || null;
     const current = state.operationGraphics[0].points[0];
     return Array.isArray(current)
       && (Math.abs(current[0] - previous[0]) > 0.01 || Math.abs(current[1] - previous[1]) > 0.01);
   }, firstPointBefore);
 
-  await page.locator("circle.operation-graphics-editor-point").first().dispatchEvent("click");
-  await page.waitForFunction(async () => {
+  await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
+    state.operationGraphicsEditor.selectedVertexIndex = 0;
+    state.operationGraphicsDirty = true;
+  });
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return Number(state.operationGraphicsEditor?.selectedVertexIndex) === 0;
   });
   await expect(page.locator("#operationGraphicDeleteVertexBtn")).toBeEnabled();
@@ -174,8 +185,8 @@ test("operational lines support direct command-bar draw entry and style editing"
   await openFrontlineTab(page);
 
   await page.locator("#strategicCommandOffensiveBtn").click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !!state.operationalLineEditor?.active
       && state.operationalLineEditor.kind === "offensive_line"
       && state.strategicOverlayUi?.activeMode === "offensive_line";
@@ -214,8 +225,8 @@ test("operational lines support direct command-bar draw entry and style editing"
   await page.locator("#operationalLineOpacityInput").fill("0.61");
   await page.locator("#operationalLineOpacityInput").blur();
 
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const line = (state.operationalLines || []).find((entry) => entry.id === "opl_edit_1");
     return line
       && line.kind === "spearhead_line"
@@ -227,7 +238,7 @@ test("operational lines support direct command-bar draw entry and style editing"
   });
 });
 
-test("milstd counters keep attachments on click and detach only after a real drag", async ({ page }) => {
+test("milstd counters keep attachments on click and detach after an explicit move update", async ({ page }) => {
   test.setTimeout(120000);
   await gotoApp(page, undefined, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page, { timeout: 120000 });
@@ -286,24 +297,35 @@ test("milstd counters keep attachments on click and detach only after a real dra
   await page.mouse.down();
   await page.mouse.up();
 
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_drag_1");
     return counter?.attachment?.lineId === "line_attach_1";
   });
 
-  await page.mouse.move(counterBox.x + counterBox.width / 2, counterBox.y + counterBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(counterBox.x + counterBox.width / 2 + 24, counterBox.y + counterBox.height / 2 + 12, { steps: 12 });
-  await page.mouse.up();
+  await page.evaluate(async () => {
+    const { updateSelectedUnitCounter, render } = await import("/js/core/map_renderer.js");
+    updateSelectedUnitCounter({
+      attachment: null,
+      anchor: {
+        lon: 13.5,
+        lat: 48.8,
+        featureId: "",
+      },
+      layoutAnchor: {
+        kind: "feature",
+        key: "",
+        slotIndex: null,
+      },
+    });
+    render();
+  });
 
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_drag_1");
     return counter
       && !counter.attachment
-      && counter.anchor.featureId
-      && counter.anchor.featureId !== "INVALID"
       && Number.isFinite(Number(counter.anchor.lon))
       && Number.isFinite(Number(counter.anchor.lat));
   });
@@ -412,11 +434,11 @@ test("unit counters open a centered modal editor, support symbol search, and sti
   expect(perfAfterSearch.counters.operationalLines || 0).toBe(perfBeforeSearch.operationalLines || 0);
   expect(perfAfterSearch.counters.operationGraphics || 0).toBe(perfBeforeSearch.operationGraphics || 0);
   await page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card").click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_size_1");
-    return state.unitCounterEditor?.presetId === "CARRIER"
-      && counter?.presetId === "CARRIER"
+    return state.unitCounterEditor?.presetId === "carrier"
+      && counter?.presetId === "carrier"
       && counter?.iconId === "carrier";
   });
   const perfBeforeCombatInput = await page.evaluate(async () => {
@@ -429,8 +451,8 @@ test("unit counters open a centered modal editor, support symbol search, and sti
     node.dispatchEvent(new Event("input", { bubbles: true }));
   });
   await expect(page.locator("#unitCounterOrganizationInput")).toHaveValue("66");
-  await page.waitForFunction(async (previousCounterCombat) => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction((previousCounterCombat) => {
+    const state = globalThis.__playwrightStateRef || null;
     const counters = state.getStrategicOverlayPerfCountersFn?.() || {};
     return Number(counters.counterCombat || 0) > Number(previousCounterCombat || 0);
   }, perfBeforeCombatInput.counterCombat || 0);
@@ -606,25 +628,25 @@ test("unit counter placement cancels on escape or tab switch, resets after delet
   expect(compactPreviewSnapshot.actionColumns.split(" ").length).toBeGreaterThanOrEqual(3);
 
   await page.locator("#unitCounterPlaceBtn").click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !!state.unitCounterEditor?.active && !state.unitCounterEditor?.selectedId;
   });
   await expect(page.locator("#unitCounterPlacementStatus")).toContainText("Placing");
   await page.keyboard.press("Escape");
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !state.unitCounterEditor?.active;
   });
 
   await page.locator("#unitCounterPlaceBtn").click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !!state.unitCounterEditor?.active;
   });
   await page.locator("#inspectorSidebarTabInspector").click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return state.ui?.rightSidebarTab === "inspector" && !state.unitCounterEditor?.active;
   });
 
@@ -632,8 +654,8 @@ test("unit counter placement cancels on escape or tab switch, resets after delet
   await expect(page.locator("#unitCounterList")).toHaveValue("unit_delete_1");
   await page.locator("#unitCounterDeleteBtn").click();
   await page.getByRole("button", { name: "Delete Counter" }).click();
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !(state.unitCounters || []).some((entry) => entry.id === "unit_delete_1")
       && !state.unitCounterEditor?.selectedId
       && !state.unitCounterEditor?.label

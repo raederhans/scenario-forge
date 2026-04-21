@@ -748,10 +748,13 @@ async function bootstrap() {
       scenarioBundleSource,
     } = await startupScenarioBoot.runStartupScenarioBoot({
       d3Client,
-      deferredUiBootstrapPromise,
       scenarioBundlePromise,
       startupInteractionMode: state.startupInteractionMode,
     });
+    if (deferredUiBootstrapPromise) {
+      await deferredUiBootstrapPromise;
+      callRuntimeHook(state, "updateScenarioUIFn");
+    }
 
     setBootState("warmup");
     renderDispatcher.flush();

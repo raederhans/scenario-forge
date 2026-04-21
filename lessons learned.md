@@ -1117,3 +1117,12 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 guardrail 初版先用 `rg` 生成 allowlist，再用 `scanContentForStateWrites()` 校验，结果立刻出现一批 stale entry。
 - 更稳的最短路径是：allowlist 生成和校验都复用同一个 scanner，实现上只保留一套 `scanContentForStateWrites()` 真源。
 - 这样才能保证“新增 direct state write 会报错、已迁移文件会自动退出 allowlist”这两个目标同时成立。
+
+### 150. startup scenario apply 不要串行等待 deferred UI bootstrap
+- 这次 `runStartupScenarioBoot()` 先等 `deferredUiBootstrapPromise`，把 toolbar/sidebar/scenario controls 的初始化时间整段算进 `scenarioAppliedMs`。
+- 更稳的最短路径是：先启动 deferred UI bootstrap，让它和 startup scenario apply 并行；等 apply 完成后再 await UI promise 并补一次 UI 同步。
+- 这样能把 UI 初始化时间从 startup apply 的关键路径里挪开，同时保持最终 ready 前 UI 状态一致。
+
+### 151. Playwright 的 `boundingBox()` 不适合直接驱动深度 transform 的 SVG 交互
+- 这次 strategic overlay 里的 `g.unit-counter` / `operation-graphics` 叠了 viewport transform 和局部 scale，Playwright 取到的 `boundingBox()` 会落到负坐标或失真坐标。
+- 更稳的最短路径是：E2E 里优先验证稳定的显式更新路径；如果必须拿屏幕坐标，就从 SVG 自己的 transform / rect 真值换算，不直接把 `boundingBox()` 当拖拽坐标真源。

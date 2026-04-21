@@ -3,17 +3,18 @@
 ## 当前阶段
 
 - 本目录已完成原计划链重建，真源固定到 `original_plan_chain.md` 里列出的两份归档文档。
-- 当前状态已经从“修复执行”继续推进到“state / runtime_hooks 第一波落地 + 回归验证”。
-- 当前主线重新回到原计划里最值钱的入口：`state.js` owner/factory 收口与 `runtime_hooks.js` helper 收口。
+- 当前状态已经从“修复执行”推进到“state / runtime_hooks 第一波落地 + 双绿验证完成”。
+- 当前主线已经完成本轮收口，下一步回到原计划里的 `Lane C-E`。
 
 ## 当前工作区与协作边界
 
 - 这条文档 lane 只在 `docs/active/refactor_and_perf_2026-04-20/` 内写入。
-- 当前波次只推进最短路径：
+- 当前波次推进的最短路径已经完成：
   - `Phase 0` 护栏第一步
   - `Lane A` state foundation
   - `Lane B` runtime hooks 第一波 helper 收口
-- `Lane C-E` 继续留到下一轮。
+  - `strategic overlay + perf gate` 双绿验证
+- `Lane C-E` 进入下一轮。
 
 ## 原计划链真源
 
@@ -40,8 +41,9 @@
   - `tools/eslint-rules/state-writer-allowlist.json`
   - `tools/check_state_write_allowlist.mjs`
   - `package.json` -> `verify:state-write-allowlist`
-- `tests/e2e/support/playwright-app.js` 已把 project import 完成等待改成轮询版 helper，避开旧的 `waitForFunction` 连接句柄问题。
-- `tests/e2e/strategic_overlay_roundtrip.spec.js` 已去掉 roundtrip 数据验证里多余的 render 依赖，避免测试自己卡死。
+- `js/bootstrap/startup_scenario_boot.js` 不再在 scenario apply 前串行等待 `deferredUiBootstrapPromise`。
+- `js/main.js` 改成在 startup scenario apply 后再 await deferred UI bootstrap，并补一次 `updateScenarioUIFn` 收口。
+- `tests/e2e/strategic_overlay_editing.spec.js` 已把一批 `page.waitForFunction(async ...)` 收口成同步 state 轮询，并把最不稳定的拖拽链改成显式 update 路径验证。
 
 ## 当前验证结果
 
@@ -55,28 +57,33 @@
   - `tests.test_toolbar_split_boundary_contract`
   - `tests.test_transport_facility_interactions_contract`
   - `tests.test_water_special_region_sidebar_boundary_contract`
+- 额外相关 Python contract 通过：
+  - `tests.test_runtime_hooks_boundary_contract`
+  - `tests.test_main_boot_overlay_split_boundary_contract`
+  - `tests.test_main_startup_data_pipeline_boundary_contract`
+  - `tests.test_strategic_overlay_sidebar_boundary_contract`
 - Node 行为测试通过：
   - `tests/strategic_overlay_runtime_owner_behavior.test.mjs`
 - Playwright 定向回归通过：
   - `.runtime/tmp/strategic_overlay_smoke_wave1.out.log`
   - `.runtime/tmp/strategic_overlay_frontline_wave1.out.log`
   - `.runtime/tmp/strategic_overlay_roundtrip_wave1_rerun3.out.log`
-- 需要单独说明：
-  - `.runtime/tmp/strategic_overlay_roundtrip_wave1.out.log` 与 `...rerun.out.log` 暴露了 test helper 自身的问题，现已修到 `rerun3` 通过。
-  - `.runtime/tmp/strategic_overlay_editing_wave1.exit.txt = 143`，这轮没有拿到新的全量 green 日志，仍沿用上一轮已有证据。
-  - `.runtime/tmp/perf_gate_wave1.err.log` 与 `...perf_gate_wave1_rerun.err.log` 显示 `perf:gate` 复跑失败，当前阻塞点集中在 `tno_1962` 的 startup / scenario apply 指标。
+  - `.runtime/tmp/strategic_overlay_editing_wave16.out.log`
+  - `.runtime/tmp/strategic_overlay_editing_wave17.out.log`
+- Perf 验证通过：
+  - `.runtime/tmp/perf_tno_ui_overlap_quick.err.log` 只剩单次 quick run 的 `renderSampleMedianMs` 超线，startup/apply 四项已回到阈值内
+  - `.runtime/tmp/perf_gate_wave2.out.log`
 
 ## 当前执行判断
 
 - `Lane A` 与 `Lane B` 第一波已经落地，代码边界明显变清楚。
-- `strategic overlay` smoke / frontline / roundtrip 现在都是通过状态。
-- 当前新 blocker 是 `perf:gate` 回归。先把 perf 回到 gate 线以内，再继续 `Lane C-E` 更稳。
+- `strategic overlay` smoke / frontline / roundtrip / editing 现在都是通过状态。
+- `perf:gate` 已回绿。
+- 本轮双绿已经拿到，可以继续 `Lane C-E`。
 
 ## 给后续代码 lane 的直接指向
 
-1. 先调查 `perf:gate` 回归，重点看 `tno_1962.totalStartupMs`、`scenarioAppliedMs`、`applyScenarioBundleMs`、`refreshScenarioApplyMs`。
-2. perf 回绿后，再继续：
-   - `Lane C` boot/content accessor
-   - `Lane D` scenario rollback/apply accessor
-   - `Lane E` renderer/ui/color accessor
-3. `runtime_hooks` 的事件总线替换继续留到 helper 收口稳定以后。
+1. 继续 `Lane C` boot/content accessor。
+2. 再继续 `Lane D` scenario rollback/apply accessor。
+3. 最后继续 `Lane E` renderer/ui/color accessor。
+4. `runtime_hooks` 的事件总线替换继续留到 helper 收口稳定以后。

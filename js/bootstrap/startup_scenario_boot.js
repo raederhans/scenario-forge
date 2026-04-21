@@ -27,7 +27,6 @@ export function createStartupScenarioBootOwner({
 
   async function runStartupScenarioBoot({
     d3Client,
-    deferredUiBootstrapPromise,
     scenarioBundlePromise,
     startupInteractionMode = "full",
   } = {}) {
@@ -55,8 +54,6 @@ export function createStartupScenarioBootOwner({
       bundleLevel: defaultScenarioBundle?.bundleLevel || "bootstrap",
       resourceMetrics: buildScenarioBundleBootMetrics(defaultScenarioBundle),
     });
-
-    await deferredUiBootstrapPromise;
 
     setBootState?.("scenario-apply");
     startBootMetric?.("scenario-apply");
