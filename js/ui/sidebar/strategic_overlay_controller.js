@@ -248,8 +248,17 @@ export function createStrategicOverlayController({
     if (!document.contains(unitCounterDetailToggleBtn)) {
       return false;
     }
+    if (unitCounterDetailToggleBtn.disabled) {
+      return false;
+    }
+    if (unitCounterDetailToggleBtn.tabIndex < 0) {
+      return false;
+    }
+    if (unitCounterDetailToggleBtn.offsetParent === null) {
+      return false;
+    }
     unitCounterDetailToggleBtn.focus({ preventScroll: true });
-    return true;
+    return document.activeElement === unitCounterDetailToggleBtn;
   };
   const setCounterEditorModalState = (nextOpen, { restoreFocus = true } = {}) => {
     ensureStrategicOverlayUiState();
