@@ -32,6 +32,7 @@ import {
   renderExportPassesToCanvas,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/runtime_hooks.js";
 import {
   buildPaletteQuickSwatches,
   getPaletteSourceOptions,
@@ -107,9 +108,7 @@ function renderPalette(themeName) {
     btn.title = normalized;
     btn.addEventListener("click", () => {
       state.selectedColor = normalized;
-      if (typeof state.updateSwatchUIFn === "function") {
-        state.updateSwatchUIFn();
-      }
+      callRuntimeHook(state, "updateSwatchUIFn");
     });
     paletteGrid.appendChild(btn);
   });
@@ -117,9 +116,7 @@ function renderPalette(themeName) {
   if (!normalizeHexColor(state.selectedColor) && swatches.length > 0) {
     state.selectedColor = swatches[0];
   }
-  if (typeof state.updateSwatchUIFn === "function") {
-    state.updateSwatchUIFn();
-  }
+  callRuntimeHook(state, "updateSwatchUIFn");
 }
 
 function populatePaletteSourceOptions(select) {
@@ -788,7 +785,7 @@ function initToolbar({ render } = {}) {
     }
     if (!state.ui.developerMode && state.ui.devWorkspaceExpanded) {
       if (typeof state.setDevWorkspaceExpandedFn === "function") {
-        state.setDevWorkspaceExpandedFn(false);
+        callRuntimeHook(state, "setDevWorkspaceExpandedFn", false);
       } else if (devWorkspaceToggleBtn) {
         devWorkspaceToggleBtn.click();
       }
@@ -939,8 +936,8 @@ function initToolbar({ render } = {}) {
     restoreSupportSurfaceFromUrl,
     toggleScenarioGuidePopover,
   } = workspaceChromeSupportSurfaceController;
-  state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;
-  state.closeDockPopoverFn = closeDockPopover;
+  registerRuntimeHook(state, "restoreSupportSurfaceFromUrlFn", restoreSupportSurfaceFromUrl);
+  registerRuntimeHook(state, "closeDockPopoverFn", closeDockPopover);
 
   const syncPanelToggleButtons = () => {
     leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
@@ -982,30 +979,35 @@ function initToolbar({ render } = {}) {
     return state.ui.dockCollapsed;
   };
 
-  state.toggleLeftPanelFn = toggleLeftPanel;
-  state.toggleRightPanelFn = toggleRightPanel;
-  state.toggleDockFn = toggleDock;
-  state.syncDeveloperModeUiFn = syncDeveloperModeUi;
-  state.toggleDeveloperModeFn = () => {
+  registerRuntimeHook(state, "toggleLeftPanelFn", toggleLeftPanel);
+  registerRuntimeHook(state, "toggleRightPanelFn", toggleRightPanel);
+  registerRuntimeHook(state, "toggleDockFn", toggleDock);
+  registerRuntimeHook(state, "syncDeveloperModeUiFn", syncDeveloperModeUi);
+  registerRuntimeHook(state, "toggleDeveloperModeFn", () => {
     const shouldOpen = !state.ui.developerMode;
     if (shouldOpen) {
       setDeveloperMode(true);
       if (typeof state.setDevWorkspaceExpandedFn === "function") {
-        state.setDevWorkspaceExpandedFn(true);
-      } else if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
+        callRuntimeHook(state, "setDevWorkspaceExpandedFn", true);
+        return true;
+      }
+      if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
         devWorkspaceToggleBtn.click();
       }
       return true;
     }
 
     if (typeof state.setDevWorkspaceExpandedFn === "function") {
-      state.setDevWorkspaceExpandedFn(false);
-    } else if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
+      callRuntimeHook(state, "setDevWorkspaceExpandedFn", false);
+      setDeveloperMode(false);
+      return false;
+    }
+    if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
       devWorkspaceToggleBtn.click();
     }
     setDeveloperMode(false);
     return false;
-  };
+  });
 
   const syncExportPreviewSourceOptions = () => {
     return exportWorkbenchController?.syncExportPreviewSourceOptions();
@@ -1059,22 +1061,20 @@ function initToolbar({ render } = {}) {
     }
   };
 
-  state.openExportWorkbenchFn = (trigger = dockExportBtn) => {
+  registerRuntimeHook(state, "openExportWorkbenchFn", (trigger = dockExportBtn) => {
     setExportWorkbenchState(true, { trigger });
     return true;
-  };
-  state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {
+  });
+  registerRuntimeHook(state, "closeExportWorkbenchFn", ({ restoreFocus = true } = {}) => {
     setExportWorkbenchState(false, { restoreFocus });
     return false;
-  };
+  });
 
-  state.openTransportWorkbenchFn = (trigger = null) => {
-    return openTransportWorkbench(trigger);
-  };
-  state.closeTransportWorkbenchFn = ({ restoreFocus = true } = {}) => {
-    return closeTransportWorkbench({ restoreFocus });
-  };
-  state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;
+  registerRuntimeHook(state, "openTransportWorkbenchFn", (trigger = null) => openTransportWorkbench(trigger));
+  registerRuntimeHook(state, "closeTransportWorkbenchFn", ({ restoreFocus = true } = {}) => (
+    closeTransportWorkbench({ restoreFocus })
+  ));
+  registerRuntimeHook(state, "refreshTransportWorkbenchUiFn", renderTransportWorkbenchUi);
   initializeTransportWorkbenchRuntime();
 
   const getPaintModeLabel = () => (
@@ -1137,7 +1137,7 @@ function initToolbar({ render } = {}) {
     refreshScenarioSelectionChip();
     renderOceanCoastalAccentUi();
   };
-  state.updateWorkspaceStatusFn = refreshWorkspaceStatus;
+  registerRuntimeHook(state, "updateWorkspaceStatusFn", refreshWorkspaceStatus);
 
   const getActiveQuickFillPolicy = () => {
     const selectedCode = normalizeCountryCode(
@@ -1434,8 +1434,8 @@ function initToolbar({ render } = {}) {
       scenarioContextBar.classList.remove("is-highlight");
     }, 3000);
   };
-  state.updateScenarioContextBarFn = refreshScenarioContextBar;
-  state.triggerScenarioGuideFn = triggerScenarioGuide;
+  registerRuntimeHook(state, "updateScenarioContextBarFn", refreshScenarioContextBar);
+  registerRuntimeHook(state, "triggerScenarioGuideFn", triggerScenarioGuide);
   let onboardingAutoTimer = 0;
   const dismissOnboardingHint = () => {
     if (onboardingAutoTimer) { clearTimeout(onboardingAutoTimer); onboardingAutoTimer = 0; }
@@ -1452,8 +1452,8 @@ function initToolbar({ render } = {}) {
     if (onboardingAutoTimer) clearTimeout(onboardingAutoTimer);
     onboardingAutoTimer = setTimeout(dismissOnboardingHint, 5000);
   };
-  state.dismissOnboardingHintFn = dismissOnboardingHint;
-  state.showOnboardingHintFn = showOnboardingHint;
+  registerRuntimeHook(state, "dismissOnboardingHintFn", dismissOnboardingHint);
+  registerRuntimeHook(state, "showOnboardingHintFn", showOnboardingHint);
 
   const showToolHud = (message, { duration = 1200 } = {}) => {
     if (!toolHudChip || !message) return;
@@ -1534,7 +1534,7 @@ function initToolbar({ render } = {}) {
       state.renderPresetTreeFn();
     }
   };
-  state.updateActiveSovereignUIFn = refreshActiveSovereignLabel;
+  registerRuntimeHook(state, "updateActiveSovereignUIFn", refreshActiveSovereignLabel);
   const refreshDynamicBorderStatus = () => {
     if (dynamicBorderStatus) {
       if (!state.runtimePoliticalTopology?.objects?.political) {
@@ -1549,8 +1549,8 @@ function initToolbar({ render } = {}) {
       recalculateBordersBtn.disabled = !state.dynamicBordersDirty;
     }
   };
-  state.updateDynamicBorderStatusUIFn = refreshDynamicBorderStatus;
-  state.updatePaintModeUIFn = () => {
+  registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  registerRuntimeHook(state, "updatePaintModeUIFn", () => {
     if (paintModeSelect) {
       paintModeSelect.value = state.paintMode || "visual";
     }
@@ -1570,7 +1570,7 @@ function initToolbar({ render } = {}) {
     refreshDynamicBorderStatus();
     refreshWorkspaceStatus();
     updateDockCollapsedUi();
-  };
+  });
   const normalizeOceanPreset = (value) => {
     const candidate = String(value || "flat").trim().toLowerCase();
     if (candidate === "wave_hachure") {
@@ -1808,10 +1808,10 @@ function initToolbar({ render } = {}) {
     syncPaletteSourceControls,
     syncPanelVisibility: syncPaletteLibraryPanelVisibility,
   } = paletteLibraryPanelController;
-  state.updatePaletteSourceUIFn = syncPaletteSourceControls;
-  state.renderPaletteFn = renderPalette;
+  registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);
+  registerRuntimeHook(state, "renderPaletteFn", renderPalette);
 
-  state.updatePaletteLibraryUIFn = renderPaletteLibrary;
+  registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
 
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
@@ -1823,7 +1823,7 @@ function initToolbar({ render } = {}) {
     specialZoneEditorController.renderSpecialZoneEditorUI();
     updateToolUI();
   }
-  state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
+  registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);
 
   function updateSwatchUI() {
     const swatches = document.querySelectorAll(".color-swatch");
@@ -1849,7 +1849,7 @@ function initToolbar({ render } = {}) {
       selectedColorValue.textContent = String(state.selectedColor || "").toUpperCase();
     }
   }
-  state.updateSwatchUIFn = updateSwatchUI;
+  registerRuntimeHook(state, "updateSwatchUIFn", updateSwatchUI);
 
   function updateToolUI() {
     toolButtons.forEach((button) => {
@@ -1870,7 +1870,7 @@ function initToolbar({ render } = {}) {
     setToolCursorClass();
     updateDirtyIndicator();
   }
-  state.updateToolUIFn = updateToolUI;
+  registerRuntimeHook(state, "updateToolUIFn", updateToolUI);
 
   const appearanceControlsController = createAppearanceControlsController({
     state,
@@ -1896,13 +1896,13 @@ function initToolbar({ render } = {}) {
     setAppearanceTab: setAppearanceTabController,
     syncParentBorderVisibilityUI,
   } = appearanceControlsController;
-  state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;
-  state.updateRecentUI = () => {
+  registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
+  registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
     renderPalette(state.currentPaletteTheme);
     renderPaletteLibrary();
-  };
-  state.updateParentBorderCountryListFn = renderParentBorderCountryList;
+  });
+  registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 
   const oceanLakeControlsController = createOceanLakeControlsController({
     state,
@@ -2029,7 +2029,7 @@ function initToolbar({ render } = {}) {
     exportSectionSummaryFormat,
     exportSectionSummaryScale,
     onRequestClose: ({ restoreFocus = true } = {}) => {
-      state.closeExportWorkbenchFn?.({ restoreFocus });
+      callRuntimeHook(state, "closeExportWorkbenchFn", { restoreFocus });
     },
     buildCompositeSourceCanvas: (...args) => buildCompositeSourceCanvas(...args),
     buildSingleExportSourceCanvas: (...args) => buildSingleExportSourceCanvas(...args),
@@ -2048,7 +2048,7 @@ function initToolbar({ render } = {}) {
     if (undoBtn) undoBtn.disabled = !canUndoHistory();
     if (redoBtn) redoBtn.disabled = !canRedoHistory();
   }
-  state.updateHistoryUIFn = updateHistoryUi;
+  registerRuntimeHook(state, "updateHistoryUIFn", updateHistoryUi);
 
   function updateZoomUi() {
     const text = getZoomPercent();
@@ -2061,7 +2061,7 @@ function initToolbar({ render } = {}) {
       zoomPercentInput.setCustomValidity("");
     }
   }
-  state.updateZoomUIFn = updateZoomUi;
+  registerRuntimeHook(state, "updateZoomUIFn", updateZoomUi);
 
   function parseZoomInputValue(rawValue) {
     const normalized = String(rawValue || "").trim().replace(/%/g, "");
@@ -2147,14 +2147,14 @@ function initToolbar({ render } = {}) {
     resetZoomToFit();
   };
 
-  state.runToolSelectionFn = runToolSelection;
-  state.runBrushModeToggleFn = runBrushModeToggle;
-  state.runHistoryActionFn = runHistoryAction;
-  state.runZoomStepFn = runZoomStep;
-  state.runZoomResetFn = runZoomReset;
-  state.commitZoomInputValueFn = commitZoomInputValue;
+  registerRuntimeHook(state, "runToolSelectionFn", runToolSelection);
+  registerRuntimeHook(state, "runBrushModeToggleFn", runBrushModeToggle);
+  registerRuntimeHook(state, "runHistoryActionFn", runHistoryAction);
+  registerRuntimeHook(state, "runZoomStepFn", runZoomStep);
+  registerRuntimeHook(state, "runZoomResetFn", runZoomReset);
+  registerRuntimeHook(state, "commitZoomInputValueFn", commitZoomInputValue);
 
-  state.updateToolbarInputsFn = () => {
+  registerRuntimeHook(state, "updateToolbarInputsFn", () => {
     const internalAutoColorEnabled = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
     if (internalBorderAutoColor) {
       internalBorderAutoColor.checked = internalAutoColorEnabled;
@@ -2206,8 +2206,8 @@ function initToolbar({ render } = {}) {
     renderTextureUI();
     renderDayNightUI();
     renderSpecialZoneEditorUI();
-  };
-  state.updateTextureUIFn = renderTextureUI;
+  });
+  registerRuntimeHook(state, "updateTextureUIFn", renderTextureUI);
 
   if (customColor) {
     customColor.addEventListener("input", (event) => {
@@ -2936,12 +2936,8 @@ function initToolbar({ render } = {}) {
       if (!state.showOpenOceanRegions) {
         state.hoveredWaterRegionId = null;
       }
-      if (typeof state.updateWaterInteractionUIFn === "function") {
-        state.updateWaterInteractionUIFn();
-      }
-      if (typeof state.renderWaterRegionListFn === "function") {
-        state.renderWaterRegionListFn();
-      }
+      callRuntimeHook(state, "updateWaterInteractionUIFn");
+      callRuntimeHook(state, "renderWaterRegionListFn");
       renderDirty("toggle-open-ocean-regions");
     });
   }
@@ -3116,7 +3112,7 @@ function initToolbar({ render } = {}) {
         actionLabel: t("Undo", "ui"),
         onAction: () => {
           if (typeof state.runHistoryActionFn === "function") {
-            state.runHistoryActionFn("undo");
+            callRuntimeHook(state, "runHistoryActionFn", "undo");
             return;
           }
           undoHistory();
@@ -3325,8 +3321,8 @@ function initToolbar({ render } = {}) {
   syncPanelToggleButtons();
   renderTransportWorkbenchUi();
   renderExportWorkbenchLayerList();
-  state.updatePaintModeUIFn();
-  state.updateDockCollapsedUiFn = updateDockCollapsedUi;
+  callRuntimeHook(state, "updatePaintModeUIFn");
+  registerRuntimeHook(state, "updateDockCollapsedUiFn", updateDockCollapsedUi);
   updateDockCollapsedUi();
   setAppearanceTab("ocean");
   applyAppearanceFilter();

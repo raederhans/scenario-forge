@@ -15,6 +15,7 @@
     "playwright:install": "playwright install",
     "playwright:install:chromium": "playwright install --with-deps chromium",
     "verify:ui-contract-foundation": "python -m unittest tests/test_ui_rework_plan01_foundation_contract.py",
+    "verify:state-write-allowlist": "node tools/check_state_write_allowlist.mjs",
     "verify:ui-rework-mainline": "python -m unittest tests/test_ui_rework_plan02_mainline_contract.py",
     "verify:ui-rework-support": "python -m unittest tests/test_ui_rework_plan03_support_transport_contract.py",
     "verify:scenario-contracts": "python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962",

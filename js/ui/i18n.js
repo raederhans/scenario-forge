@@ -1,5 +1,6 @@
 // Translation helpers (Phase 13)
 import { state } from "../core/state.js";
+import { callRuntimeHook, callRuntimeHooks } from "../core/runtime_hooks.js";
 
 const INLINE_UI_TRANSLATIONS = Object.freeze({
   Guide: { zh: "\u6307\u5357", en: "Guide" },
@@ -1043,33 +1044,17 @@ function updateUIText() {
     }
   });
 
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
-  if (typeof state.updateHistoryUIFn === "function") {
-    state.updateHistoryUIFn();
-  }
-  if (typeof state.updateZoomUIFn === "function") {
-    state.updateZoomUIFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateDevWorkspaceUIFn === "function") {
-    state.updateDevWorkspaceUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.updateTransportAppearanceUIFn === "function") {
-    state.updateTransportAppearanceUIFn();
-  }
-  if (typeof state.updateFacilityInfoCardUiFn === "function") {
-    state.updateFacilityInfoCardUiFn();
-  }
-  if (typeof state.syncDeveloperModeUiFn === "function") {
-    state.syncDeveloperModeUiFn();
-  }
+  callRuntimeHooks(state, [
+    "updateToolUIFn",
+    "updateHistoryUIFn",
+    "updateZoomUIFn",
+    "updatePaintModeUIFn",
+    "updateDevWorkspaceUIFn",
+    "updateToolbarInputsFn",
+    "updateTransportAppearanceUIFn",
+    "updateFacilityInfoCardUiFn",
+    "syncDeveloperModeUiFn",
+  ]);
 
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
@@ -1180,27 +1165,15 @@ function updateUIText() {
     rightPanelToggle.textContent = t("Inspector", "ui");
   }
 
-  if (typeof state.updateActiveSovereignUIFn === "function") {
-    state.updateActiveSovereignUIFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateWorkspaceStatusFn === "function") {
-    state.updateWorkspaceStatusFn();
-  }
-  if (typeof state.refreshTransportWorkbenchUiFn === "function") {
-    state.refreshTransportWorkbenchUiFn();
-  }
-  if (typeof state.updatePaletteLibraryUIFn === "function") {
-    state.updatePaletteLibraryUIFn();
-  }
-  if (typeof state.updateScenarioUIFn === "function") {
-    state.updateScenarioUIFn();
-  }
-  if (typeof state.renderScenarioAuditPanelFn === "function") {
-    state.renderScenarioAuditPanelFn();
-  }
+  callRuntimeHooks(state, [
+    "updateActiveSovereignUIFn",
+    "updatePaintModeUIFn",
+    "updateWorkspaceStatusFn",
+    "refreshTransportWorkbenchUiFn",
+    "updatePaletteLibraryUIFn",
+    "updateScenarioUIFn",
+    "renderScenarioAuditPanelFn",
+  ]);
 }
 
 async function toggleLanguage() {
@@ -1211,38 +1184,24 @@ async function toggleLanguage() {
   } catch (error) {
     console.warn("Unable to persist language preference:", error);
   }
-  if (typeof state.ensureFullLocalizationDataReadyFn === "function") {
-    try {
-      await state.ensureFullLocalizationDataReadyFn({
-        reason: "language-toggle",
-        renderNow: false,
-      });
-    } catch (error) {
-      console.warn("Unable to hydrate full localization data before language toggle:", error);
-    }
+  try {
+    await callRuntimeHook(state, "ensureFullLocalizationDataReadyFn", {
+      reason: "language-toggle",
+      renderNow: false,
+    });
+  } catch (error) {
+    console.warn("Unable to hydrate full localization data before language toggle:", error);
   }
   updateUIText();
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateDevWorkspaceUIFn === "function") {
-    state.updateDevWorkspaceUIFn();
-  }
-  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-    state.updateSpecialZoneEditorUIFn();
-  }
+  callRuntimeHooks(state, [
+    "updateToolbarInputsFn",
+    "renderCountryListFn",
+    "renderPresetTreeFn",
+    "updateParentBorderCountryListFn",
+    "updatePaintModeUIFn",
+    "updateDevWorkspaceUIFn",
+    "updateSpecialZoneEditorUIFn",
+  ]);
   try {
     const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario_resources.js");
     if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
@@ -1251,9 +1210,7 @@ async function toggleLanguage() {
   } catch (error) {
     console.warn("Unable to refresh scenario geo locale patch for active language:", error);
   }
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  callRuntimeHook(state, "renderNowFn");
 }
 
 function initTranslations() {

@@ -1107,3 +1107,13 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 147. perf 采样脚本的 ready 条件要直接绑定核心 state，不要直接复用更严格的 UI e2e gate
 - 这次直接复用 `waitForAppInteractive` 会被 UI 层细节卡住，出现 `bootPhase=ready` 仍被判定超时。
 - 更稳的做法是 perf 脚本只使用 `bootPhase/bootBlocking/scenarioApplyInFlight/startupReadonlyUnlockInFlight` 这组核心条件，并在超时时回传状态快照。
+
+### 148. Playwright 的 project import watch 更稳的做法是页面轮询 debug snapshot，不要把整段完成判定塞进 `page.waitForFunction`
+- 这次 `strategic_overlay_roundtrip.spec.js` 先遇到 `Object with guid handle ... was not bound in the connection`，随后又卡在长时间 evaluate，根因都在 import 完成判定和 test 自己的额外 render 依赖太重。
+- 更稳的最短路径是：像 `project_save_load_roundtrip.spec.js` 一样，先在页面里暴露 debug getter，再由测试侧循环 `page.evaluate(() => getDebugState())` 读纯 JSON snapshot，完成条件用主线程轮询判断。
+- roundtrip 只验证数据时，直接改 state 并导出即可，避免把 render/UI 刷新一起塞进同一个验证步骤。
+
+### 149. state write allowlist 必须和检查器共用同一套扫描逻辑，不能一边用 rg，一边用另一套正则
+- 这次 guardrail 初版先用 `rg` 生成 allowlist，再用 `scanContentForStateWrites()` 校验，结果立刻出现一批 stale entry。
+- 更稳的最短路径是：allowlist 生成和校验都复用同一个 scanner，实现上只保留一套 `scanContentForStateWrites()` 真源。
+- 这样才能保证“新增 direct state write 会报错、已迁移文件会自动退出 allowlist”这两个目标同时成立。

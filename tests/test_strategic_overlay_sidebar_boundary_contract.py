@@ -45,8 +45,8 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('invalidateFrontlineOverlayState,', content)
         self.assertIn('refreshUI: refreshStrategicOverlayUI,', content)
         self.assertIn('bindStrategicOverlayEvents();', content)
-        self.assertIn('state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;', content)
-        self.assertIn('state.getStrategicOverlayPerfCountersFn = getStrategicOverlayPerfCounters;', content)
+        self.assertIn('registerRuntimeHook(state, "updateStrategicOverlayUIFn", refreshStrategicOverlayUI);', content)
+        self.assertIn('registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);', content)
         self.assertIn('document.body.classList.toggle("frontline-mode-active", activeId === "project");', content)
         self.assertIn('scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"]', content)
 
@@ -108,7 +108,7 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         content = SIDEBAR_JS.read_text(encoding="utf-8")
 
         self.assertIn("const requestStrategicOverlayCatalogRefresh = () => {", content)
-        self.assertIn('state.updateStrategicOverlayUIFn({ scopes: ["counterCatalog"] });', content)
+        self.assertIn('callRuntimeHook(state, "updateStrategicOverlayUIFn", { scopes: ["counterCatalog"] });', content)
         self.assertIn("requestStrategicOverlayCatalogRefresh();", content)
 
     def test_renderer_and_import_funnel_keep_state_callback_contract(self):

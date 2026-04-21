@@ -45,11 +45,11 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('renderSpecialRegionInspectorUi,', content)
         self.assertIn('renderSpecialRegionList,', content)
         self.assertIn('bindWaterSpecialRegionEvents();', content)
-        self.assertIn('state.renderWaterRegionListFn = renderWaterRegionList;', content)
-        self.assertIn('state.updateWaterInteractionUIFn = renderWaterInteractionUi;', content)
-        self.assertIn('state.renderSpecialRegionListFn = renderSpecialRegionList;', content)
-        self.assertIn('state.updateScenarioSpecialRegionUIFn = renderSpecialRegionInspectorUi;', content)
-        self.assertIn('state.updateScenarioReliefOverlayUIFn = renderSpecialRegionInspectorUi;', content)
+        self.assertIn('registerRuntimeHook(state, "renderWaterRegionListFn", renderWaterRegionList);', content)
+        self.assertIn('registerRuntimeHook(state, "updateWaterInteractionUIFn", renderWaterInteractionUi);', content)
+        self.assertIn('registerRuntimeHook(state, "renderSpecialRegionListFn", renderSpecialRegionList);', content)
+        self.assertIn('registerRuntimeHook(state, "updateScenarioSpecialRegionUIFn", renderSpecialRegionInspectorUi);', content)
+        self.assertIn('registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);', content)
 
     def test_water_search_binding_moves_to_controller(self):
         sidebar_content = SIDEBAR_JS.read_text(encoding="utf-8")
@@ -67,8 +67,8 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('captureHistoryState({ specialRegionIds: [selectedId] })', owner_content)
         self.assertIn('updateSpecialZoneEditorUi();', owner_content)
         self.assertIn('updateWorkspaceStatus();', owner_content)
-        self.assertIn('updateSpecialZoneEditorUi: () => state.updateSpecialZoneEditorUIFn?.(),', sidebar_content)
-        self.assertIn('updateWorkspaceStatus: () => state.updateWorkspaceStatusFn?.(),', sidebar_content)
+        self.assertIn('updateSpecialZoneEditorUi: () => callRuntimeHook(state, "updateSpecialZoneEditorUIFn"),', sidebar_content)
+        self.assertIn('updateWorkspaceStatus: () => callRuntimeHook(state, "updateWorkspaceStatusFn"),', sidebar_content)
 
     def test_renderer_history_and_import_funnel_keep_water_special_callbacks(self):
         map_renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
@@ -77,8 +77,8 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
 
         self.assertIn('state.renderWaterRegionListFn();', map_renderer_content)
         self.assertIn('state.renderSpecialRegionListFn();', map_renderer_content)
-        self.assertIn('state.renderWaterRegionListFn();', history_manager_content)
-        self.assertIn('state.renderSpecialRegionListFn();', history_manager_content)
+        self.assertIn('"renderWaterRegionListFn",', history_manager_content)
+        self.assertIn('"renderSpecialRegionListFn",', history_manager_content)
         self.assertIn('state.renderWaterRegionListFn();', interaction_funnel_content)
         self.assertIn('state.renderSpecialRegionListFn();', interaction_funnel_content)
 

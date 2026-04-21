@@ -47,7 +47,7 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
         self.assertIn("return getStartupDataPipelineOwner().ensureActiveScenarioBundleHydrated({ reason, renderNow });", content)
         self.assertIn("return getStartupDataPipelineOwner().shouldFastTrackScenarioHydration();", content)
         self.assertIn("return getStartupDataPipelineOwner().ensureContextLayerDataReady(requestedLayerNames, {", content)
-        self.assertIn("state.ensureFullLocalizationDataReadyFn = ensureFullLocalizationDataReady;", content)
+        self.assertIn('registerRuntimeHook(state, "ensureFullLocalizationDataReadyFn", ensureFullLocalizationDataReady);', content)
         self.assertIn("ensureBaseCityDataReadyFn: ensureBaseCityDataReady,", content)
         self.assertIn("ensureContextLayerDataReadyFn: ensureContextLayerDataReady,", content)
         self.assertIn("persistViewSettingsFn: persistViewSettings,", content)

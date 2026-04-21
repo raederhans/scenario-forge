@@ -40,8 +40,8 @@ class DevWorkspaceShellBuilderBoundaryContractTest(unittest.TestCase):
         self.assertIn("const quickbar = createDevWorkspaceQuickbar(bottomDock);", content)
         self.assertIn("const panel = createDevWorkspacePanel(bottomDock);", content)
         self.assertIn("applyDevWorkspaceExpandedChrome({", content)
-        self.assertIn("state.updateDevWorkspaceUIFn = renderWorkspace;", content)
-        self.assertIn("state.setDevWorkspaceExpandedFn = (nextValue) => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);', content)
+        self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', content)
         self.assertIn("export { getScenarioGeoLocaleEntry, initDevWorkspace };", content)
 
     def test_shell_builder_preserves_dom_surface_contracts(self):

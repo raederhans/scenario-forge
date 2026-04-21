@@ -22,6 +22,7 @@ import {
   render,
 } from "./core/map_renderer/public.js";
 import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
+import { callRuntimeHook, registerRuntimeHook } from "./core/runtime_hooks.js";
 import { initPresetState } from "./core/preset_state.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
@@ -56,7 +57,7 @@ const {
   setStartupReadonlyState,
   startBootMetric,
 } = bootOverlayController;
-state.setStartupReadonlyStateFn = setStartupReadonlyState;
+registerRuntimeHook(state, "setStartupReadonlyStateFn", setStartupReadonlyState);
 let startupDataPipelineOwner = null;
 let deferredDetailPromotionOwner = null;
 let startupScenarioBootOwner = null;
@@ -216,7 +217,7 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
   return getStartupDataPipelineOwner().ensureFullLocalizationDataReady({ reason, renderNow });
 }
 
-state.ensureFullLocalizationDataReadyFn = ensureFullLocalizationDataReady;
+registerRuntimeHook(state, "ensureFullLocalizationDataReadyFn", ensureFullLocalizationDataReady);
 
 async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", renderNow = true } = {}) {
   return getStartupDataPipelineOwner().ensureActiveScenarioBundleHydrated({ reason, renderNow });
@@ -727,12 +728,12 @@ async function bootstrap() {
     });
     const flushRenderNow = () => flushRenderBoundary("legacy-render-now");
     globalThis.renderNow = flushRenderNow;
-    state.renderNowFn = flushRenderNow;
-    state.ensureDetailTopologyFn = (options = {}) =>
+    registerRuntimeHook(state, "renderNowFn", flushRenderNow);
+    registerRuntimeHook(state, "ensureDetailTopologyFn", (options = {}) =>
       ensureDetailTopologyReady({
         renderDispatcher,
         ...options,
-      });
+      }));
 
     initToast();
     setBootPreviewVisible(false);
@@ -764,9 +765,7 @@ async function bootstrap() {
     });
   } catch (error) {
     state.scenarioApplyInFlight = false;
-    if (typeof state.updateScenarioUIFn === "function") {
-      state.updateScenarioUIFn();
-    }
+    callRuntimeHook(state, "updateScenarioUIFn");
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);
     console.error("Stack trace:", error?.stack);

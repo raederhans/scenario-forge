@@ -40,8 +40,8 @@ class DevWorkspaceSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("scenarioTagCreatorController = createScenarioTagCreatorController({", content)
         self.assertIn("scenarioTagCreatorController?.render({ hasActiveScenario });", content)
         self.assertIn("scenarioTagCreatorController.bindEvents();", content)
-        self.assertIn("state.updateDevWorkspaceUIFn = renderWorkspace;", content)
-        self.assertIn("state.setDevWorkspaceExpandedFn = (nextValue) => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);', content)
+        self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', content)
         self.assertIn("export { getScenarioGeoLocaleEntry, initDevWorkspace };", content)
 
     def test_controller_keeps_tag_create_runtime_contracts(self):

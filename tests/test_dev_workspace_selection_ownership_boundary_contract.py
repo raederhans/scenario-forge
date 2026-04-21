@@ -41,8 +41,8 @@ class DevWorkspaceSelectionOwnershipBoundaryContractTest(unittest.TestCase):
         self.assertIn('bindButtonAction(panel.querySelector("#devCopyNamesIdsBtn"), () => {', content)
         self.assertIn('bindButtonAction(panel.querySelector("#devCopyIdsBtn"), () => {', content)
         self.assertIn('selectionSortMode.addEventListener("change", (event) => {', content)
-        self.assertIn("state.updateDevWorkspaceUIFn = renderWorkspace;", content)
-        self.assertIn("state.setDevWorkspaceExpandedFn = (nextValue) => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);', content)
+        self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', content)
 
     def test_selection_ownership_controller_keeps_runtime_contracts(self):
         owner_content = SELECTION_OWNERSHIP_CONTROLLER_JS.read_text(encoding="utf-8")

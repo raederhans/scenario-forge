@@ -6,6 +6,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/runtime_hooks.js";
 import { createDefaultSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import {
@@ -1177,9 +1178,7 @@ function addRecentColor(color) {
   if (state.recentColors.length > 10) {
     state.recentColors = state.recentColors.slice(0, 10);
   }
-  if (typeof state.updateRecentUI === "function") {
-    state.updateRecentUI();
-  }
+  callRuntimeHook(state, "updateRecentUI");
 }
 
 function filterToVisibleFeatureIds(featureIds = []) {
@@ -1798,9 +1797,7 @@ function initSidebar({ render } = {}) {
     });
   };
   const requestStrategicOverlayCatalogRefresh = () => {
-    if (typeof state.updateStrategicOverlayUIFn === "function") {
-      state.updateStrategicOverlayUIFn({ scopes: ["counterCatalog"] });
-    }
+    callRuntimeHook(state, "updateStrategicOverlayUIFn", { scopes: ["counterCatalog"] });
   };
   const ensureHoi4UnitIconManifest = () => {
     if (hoi4UnitIconManifestStatus === "loading" || hoi4UnitIconManifestStatus === "ready") {
@@ -3800,9 +3797,7 @@ function initSidebar({ render } = {}) {
   const syncSelectedColorFromCountry = (countryState) => {
     const resolvedColor = getDisplayCountryColor(countryState);
     state.selectedColor = resolvedColor;
-    if (typeof state.updateSwatchUIFn === "function") {
-      state.updateSwatchUIFn();
-    }
+    callRuntimeHook(state, "updateSwatchUIFn");
   };
 
   const setScenarioVisualAdjustmentsOpen = (nextOpen, { scrollIntoView = false } = {}) => {
@@ -3813,14 +3808,12 @@ function initSidebar({ render } = {}) {
         selectedCountryActionsSection.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
-    if (typeof state.renderPresetTreeFn === "function") {
-      state.renderPresetTreeFn();
-    }
+    callRuntimeHook(state, "renderPresetTreeFn");
   };
 
-  state.openScenarioVisualAdjustmentsFn = ({ scrollIntoView = false } = {}) => {
+  registerRuntimeHook(state, "openScenarioVisualAdjustmentsFn", ({ scrollIntoView = false } = {}) => {
     setScenarioVisualAdjustmentsOpen(true, { scrollIntoView });
-  };
+  });
 
   const setScenarioMapPaintMode = (nextMode) => {
     const normalizedMode = nextMode === "ownership" ? "sovereignty" : "visual";
@@ -3828,9 +3821,7 @@ function initSidebar({ render } = {}) {
     if (normalizedMode === "sovereignty") {
       state.interactionGranularity = "subdivision";
     }
-    if (typeof state.updatePaintModeUIFn === "function") {
-      state.updatePaintModeUIFn();
-    }
+    callRuntimeHook(state, "updatePaintModeUIFn");
     flushSidebarRender(`sidebar-paint-mode:${normalizedMode}`);
   };
 
@@ -4097,9 +4088,7 @@ function initSidebar({ render } = {}) {
         setScenarioMapPaintMode("ownership");
       }
       state.activeSovereignCode = countryState.code;
-      if (typeof state.updateActiveSovereignUIFn === "function") {
-        state.updateActiveSovereignUIFn();
-      }
+      callRuntimeHook(state, "updateActiveSovereignUIFn");
       const requestedTargetIds = Array.isArray(presetRef.preset?.ids) ? presetRef.preset.ids : [];
       const {
         requestedIds,
@@ -4782,9 +4771,7 @@ function initSidebar({ render } = {}) {
       if (!alreadyActive) {
         markDirty("set-active-sovereign");
       }
-      if (typeof state.updateActiveSovereignUIFn === "function") {
-        state.updateActiveSovereignUIFn();
-      }
+      callRuntimeHook(state, "updateActiveSovereignUIFn");
       refreshCountryRows({
         countryCodes: [previousActiveCode, normalizedCountryCode, selectedCode],
         refreshInspector: true,
@@ -5119,7 +5106,7 @@ function initSidebar({ render } = {}) {
     scheduleAdaptiveInspectorHeights();
   };
 
-  state.renderPresetTreeFn = renderPresetTree;
+  registerRuntimeHook(state, "renderPresetTreeFn", renderPresetTree);
   const setRightSidebarTab = (tabId) => {
     const normalizedId = String(tabId || "").trim().toLowerCase();
     const activeId = normalizedId === "frontline"
@@ -5148,11 +5135,9 @@ function initSidebar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
-    if (typeof state.updateStrategicOverlayUIFn === "function") {
-      state.updateStrategicOverlayUIFn({
-        scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"],
-      });
-    }
+    callRuntimeHook(state, "updateStrategicOverlayUIFn", {
+      scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"],
+    });
     syncRightSidebarUrlState();
     scheduleAdaptiveInspectorHeights();
   };
@@ -5232,8 +5217,8 @@ function initSidebar({ render } = {}) {
       ensureActiveScenarioOptionalLayerLoaded,
       createEmptyNote,
       scheduleAdaptiveInspectorHeights,
-      updateSpecialZoneEditorUi: () => state.updateSpecialZoneEditorUIFn?.(),
-      updateWorkspaceStatus: () => state.updateWorkspaceStatusFn?.(),
+      updateSpecialZoneEditorUi: () => callRuntimeHook(state, "updateSpecialZoneEditorUIFn"),
+      updateWorkspaceStatus: () => callRuntimeHook(state, "updateWorkspaceStatusFn"),
     },
   }));
 
@@ -5423,21 +5408,21 @@ function initSidebar({ render } = {}) {
 
   bindStrategicOverlayEvents();
 
-  state.renderCountryListFn = renderList;
-  state.renderWaterRegionListFn = renderWaterRegionList;
-  state.updateWaterInteractionUIFn = renderWaterInteractionUi;
-  state.renderSpecialRegionListFn = renderSpecialRegionList;
-  state.updateScenarioSpecialRegionUIFn = renderSpecialRegionInspectorUi;
-  state.updateScenarioReliefOverlayUIFn = renderSpecialRegionInspectorUi;
-  state.updateLegendUI = refreshLegendEditor;
-  state.renderScenarioAuditPanelFn = renderScenarioAuditPanel;
-  state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;
-  state.getStrategicOverlayPerfCountersFn = getStrategicOverlayPerfCounters;
-  state.refreshCountryListRowsFn = refreshCountryRows;
-  state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;
+  registerRuntimeHook(state, "renderCountryListFn", renderList);
+  registerRuntimeHook(state, "renderWaterRegionListFn", renderWaterRegionList);
+  registerRuntimeHook(state, "updateWaterInteractionUIFn", renderWaterInteractionUi);
+  registerRuntimeHook(state, "renderSpecialRegionListFn", renderSpecialRegionList);
+  registerRuntimeHook(state, "updateScenarioSpecialRegionUIFn", renderSpecialRegionInspectorUi);
+  registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);
+  registerRuntimeHook(state, "updateLegendUI", refreshLegendEditor);
+  registerRuntimeHook(state, "renderScenarioAuditPanelFn", renderScenarioAuditPanel);
+  registerRuntimeHook(state, "updateStrategicOverlayUIFn", refreshStrategicOverlayUI);
+  registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);
+  registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);
+  registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);
   const requestedSidebarTab = restoreRightSidebarUrlState();
   setRightSidebarTab(requestedSidebarTab || state.ui?.rightSidebarTab || "inspector");
-  state.restoreSupportSurfaceFromUrlFn?.();
+  callRuntimeHook(state, "restoreSupportSurfaceFromUrlFn");
   refreshStrategicOverlayUI();
 
   inspectorSidebarTabButtons.forEach((button) => {
@@ -5497,9 +5482,7 @@ function initSidebar({ render } = {}) {
       if (!confirmed) return;
       resetCountryColors();
       markDirty("reset-country-colors");
-      if (typeof state.renderCountryListFn === "function") {
-        state.renderCountryListFn();
-      }
+      callRuntimeHook(state, "renderCountryListFn");
       flushSidebarRender("sidebar-reset-country-colors");
       scheduleAdaptiveInspectorHeights();
       showToast(t("Country colors were reset.", "ui"), {

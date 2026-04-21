@@ -3,6 +3,7 @@ import { markDirty } from "./dirty_state.js";
 import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
+import { callRuntimeHook, callRuntimeHooks } from "./runtime_hooks.js";
 
 function uniqueKeys(values) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)));
@@ -170,9 +171,7 @@ function pushHistoryEntry(entry) {
     state.historyPast = state.historyPast.slice(state.historyPast.length - max);
   }
 
-  if (typeof state.updateHistoryUIFn === "function") {
-    state.updateHistoryUIFn();
-  }
+  callRuntimeHook(state, "updateHistoryUIFn");
   return true;
 }
 
@@ -189,45 +188,23 @@ function refreshUiAfterHistory(direction, entry) {
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
   }
-  if (typeof state.refreshColorStateFn === "function") {
-    state.refreshColorStateFn({ renderNow: false });
+  callRuntimeHook(state, "refreshColorStateFn", { renderNow: false });
+  if (entry?.meta?.affectsSovereignty || affectsScenarioControllers) {
+    callRuntimeHook(state, "recomputeDynamicBordersNowFn", { renderNow: false, reason: `history-${direction}` });
   }
-  if ((entry?.meta?.affectsSovereignty || affectsScenarioControllers) && typeof state.recomputeDynamicBordersNowFn === "function") {
-    state.recomputeDynamicBordersNowFn({ renderNow: false, reason: `history-${direction}` });
-  }
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
-  if (typeof state.updateSwatchUIFn === "function") {
-    state.updateSwatchUIFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.updateActiveSovereignUIFn === "function") {
-    state.updateActiveSovereignUIFn();
-  }
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.renderWaterRegionListFn === "function") {
-    state.renderWaterRegionListFn();
-  }
-  if (typeof state.renderSpecialRegionListFn === "function") {
-    state.renderSpecialRegionListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-  if (typeof state.updateLegendUI === "function") {
-    state.updateLegendUI();
-  }
-  if (typeof state.updateStrategicOverlayUIFn === "function") {
-    state.updateStrategicOverlayUIFn();
-  }
+  callRuntimeHooks(state, [
+    "updateToolUIFn",
+    "updateSwatchUIFn",
+    "updatePaintModeUIFn",
+    "updateToolbarInputsFn",
+    "updateActiveSovereignUIFn",
+    "renderCountryListFn",
+    "renderWaterRegionListFn",
+    "renderSpecialRegionListFn",
+    "renderPresetTreeFn",
+    "updateLegendUI",
+    "updateStrategicOverlayUIFn",
+  ]);
   flushHistoryRender(`history-${direction}`);
 }
 
@@ -312,9 +289,7 @@ function undoHistory() {
   state.historyFuture = Array.isArray(state.historyFuture) ? state.historyFuture : [];
   state.historyFuture.push(entry);
   applyHistorySnapshot(entry.before, "undo", entry);
-  if (typeof state.updateHistoryUIFn === "function") {
-    state.updateHistoryUIFn();
-  }
+  callRuntimeHook(state, "updateHistoryUIFn");
   return true;
 }
 
@@ -324,18 +299,14 @@ function redoHistory() {
   state.historyPast = Array.isArray(state.historyPast) ? state.historyPast : [];
   state.historyPast.push(entry);
   applyHistorySnapshot(entry.after, "redo", entry);
-  if (typeof state.updateHistoryUIFn === "function") {
-    state.updateHistoryUIFn();
-  }
+  callRuntimeHook(state, "updateHistoryUIFn");
   return true;
 }
 
 function clearHistory() {
   state.historyPast = [];
   state.historyFuture = [];
-  if (typeof state.updateHistoryUIFn === "function") {
-    state.updateHistoryUIFn();
-  }
+  callRuntimeHook(state, "updateHistoryUIFn");
 }
 
 export {

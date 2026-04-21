@@ -71,9 +71,9 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_palette_callbacks_and_render_entry(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.updatePaletteSourceUIFn = syncPaletteSourceControls;", content)
-        self.assertIn("state.updatePaletteLibraryUIFn = renderPaletteLibrary;", content)
-        self.assertIn("state.renderPaletteFn = renderPalette;", content)
+        self.assertIn('registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);', content)
+        self.assertIn('registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);', content)
+        self.assertIn('registerRuntimeHook(state, "renderPaletteFn", renderPalette);', content)
         self.assertIn("bindPaletteLibraryPanelEvents();", content)
         self.assertIn("syncPaletteLibraryPanelVisibility();", content)
 
@@ -118,8 +118,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_export_workbench_facade_and_url_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.openExportWorkbenchFn = (trigger = dockExportBtn) => {", content)
-        self.assertIn("state.closeExportWorkbenchFn = ({ restoreFocus = true } = {}) => {", content)
+        self.assertIn('registerRuntimeHook(state, "openExportWorkbenchFn", (trigger = dockExportBtn) => {', content)
+        self.assertIn('registerRuntimeHook(state, "closeExportWorkbenchFn", ({ restoreFocus = true } = {}) => {', content)
         self.assertIn("closeDockPopover({ restoreFocus: false, syncUrl: false });", content)
         self.assertIn("closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });", content)
         self.assertIn("exportProjectSection.open = true;", content)
@@ -147,7 +147,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         support_owner = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
         url_owner = UI_SURFACE_URL_STATE_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;", content)
+        self.assertIn('registerRuntimeHook(state, "restoreSupportSurfaceFromUrlFn", restoreSupportSurfaceFromUrl);', content)
         self.assertIn("const uiSurfaceUrlState = createUiSurfaceUrlState({", content)
         self.assertIn("getScenarioGuideSectionFromUrl,", content)
         self.assertIn("syncScenarioGuideSectionUrlState,", content)
@@ -180,7 +180,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
         appearance_owner = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;", content)
+        self.assertIn('registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);', content)
         self.assertIn("specialZoneEditorController.normalizeSpecialZoneEditorState();", content)
         self.assertIn("specialZoneEditorController.bindSpecialZoneEditorEvents();", content)
         self.assertIn("const openSpecialZonePopover = () => {", content)
@@ -226,11 +226,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
         support_owner = WORKSPACE_CHROME_SUPPORT_SURFACE_CONTROLLER_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.openTransportWorkbenchFn = (trigger = null) => {", content)
-        self.assertIn("return openTransportWorkbench(trigger);", content)
-        self.assertIn("state.closeTransportWorkbenchFn = ({ restoreFocus = true } = {}) => {", content)
-        self.assertIn("return closeTransportWorkbench({ restoreFocus });", content)
-        self.assertIn("state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;", content)
+        self.assertIn('registerRuntimeHook(state, "openTransportWorkbenchFn", (trigger = null) => openTransportWorkbench(trigger));', content)
+        self.assertIn('registerRuntimeHook(state, "closeTransportWorkbenchFn", ({ restoreFocus = true } = {}) => (', content)
+        self.assertIn("closeTransportWorkbench({ restoreFocus })", content)
+        self.assertIn('registerRuntimeHook(state, "refreshTransportWorkbenchUiFn", renderTransportWorkbenchUi);', content)
         self.assertIn("initializeTransportWorkbenchRuntime();", content)
         self.assertIn("state.ui?.restoredSupportSurfaceViewFromUrl === view", support_owner)
         self.assertIn('["guide", "reference", "export"].includes(view)', support_owner)
@@ -258,9 +257,9 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_appearance_facade_and_state_registration_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;", content)
-        self.assertIn("state.updateRecentUI = () => {", content)
-        self.assertIn("state.updateParentBorderCountryListFn = renderParentBorderCountryList;", content)
+        self.assertIn('registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);', content)
+        self.assertIn('registerRuntimeHook(state, "updateRecentUI", () => {', content)
+        self.assertIn('registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);', content)
         self.assertIn("bindAppearanceControlEvents();", content)
         self.assertIn("setAppearanceTab(\"ocean\");", content)
         self.assertIn("applyAppearanceFilter();", content)
@@ -286,10 +285,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_texture_facade_and_refresh_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.updateTextureUIFn = renderTextureUI;", content)
+        self.assertIn('registerRuntimeHook(state, "updateTextureUIFn", renderTextureUI);', content)
         self.assertIn("renderTextureUI();", content)
         self.assertIn("renderDayNightUI();", content)
-        self.assertIn("state.updateToolbarInputsFn = () => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateToolbarInputsFn", () => {', content)
 
     def test_appearance_controller_owns_city_urban_physical_rivers_logic(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -313,7 +312,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("function renderSpecialZoneEditorUI() {", content)
         self.assertIn("renderAppearanceStyleControlsUi();", content)
         self.assertIn("specialZoneEditorController.renderSpecialZoneEditorUI();", content)
-        self.assertIn("state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;", content)
+        self.assertIn('registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);', content)
 
     def test_appearance_controller_owns_reference_overlay_logic(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -330,7 +329,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
         self.assertIn("renderReferenceOverlayUi();", content)
-        self.assertIn("state.updateToolbarInputsFn = () => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateToolbarInputsFn", () => {', content)
 
     def test_ocean_lake_controller_owns_water_appearance_logic(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -384,8 +383,8 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_support_surface_facade_and_registration_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.restoreSupportSurfaceFromUrlFn = restoreSupportSurfaceFromUrl;", content)
-        self.assertIn("state.closeDockPopoverFn = closeDockPopover;", content)
+        self.assertIn('registerRuntimeHook(state, "restoreSupportSurfaceFromUrlFn", restoreSupportSurfaceFromUrl);', content)
+        self.assertIn('registerRuntimeHook(state, "closeDockPopoverFn", closeDockPopover);', content)
         self.assertIn("bindDockPopoverDismiss();", content)
         self.assertIn("restoreSupportSurfaceFromUrl();", content)
         self.assertIn("bindScenarioGuideEvents({", content)

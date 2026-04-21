@@ -44,8 +44,8 @@ class DevWorkspaceDistrictEditorBoundaryContractTest(unittest.TestCase):
         self.assertIn("districtEditorController.bindEvents();", content)
         self.assertIn('const scenarioDistrictPanel = panel.querySelector("#devScenarioDistrictPanel");', content)
         self.assertIn('syncCategoryPanel(scenarioDistrictPanel, "scenario", hasActiveScenario);', content)
-        self.assertIn("state.updateDevWorkspaceUIFn = renderWorkspace;", content)
-        self.assertIn("state.setDevWorkspaceExpandedFn = (nextValue) => {", content)
+        self.assertIn('registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);', content)
+        self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', content)
 
     def test_district_editor_controller_keeps_runtime_contracts(self):
         owner_content = DISTRICT_EDITOR_CONTROLLER_JS.read_text(encoding="utf-8")
@@ -53,7 +53,7 @@ class DevWorkspaceDistrictEditorBoundaryContractTest(unittest.TestCase):
         self.assertIn("state.devScenarioDistrictEditor = {", owner_content)
         self.assertIn("state.scenarioDistrictGroupsData = nextPayload;", owner_content)
         self.assertIn("state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);", owner_content)
-        self.assertIn('import { rebuildStaticMeshes } from "../../core/map_renderer.js";', owner_content)
+        self.assertIn('import { rebuildStaticMeshes } from "../../core/map_renderer/public.js";', owner_content)
         self.assertIn("rebuildStaticMeshes();", owner_content)
         self.assertIn('flushDevWorkspaceRender("dev-workspace-district-save");', owner_content)
         self.assertIn("district_groups_url: String(result.districtGroupsUrl", owner_content)

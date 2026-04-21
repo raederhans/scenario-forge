@@ -15,6 +15,10 @@ STATE_SCENARIO_RUNTIME_JS = REPO_ROOT / "js" / "core" / "state" / "scenario_runt
 STATE_BORDER_CACHE_JS = REPO_ROOT / "js" / "core" / "state" / "border_cache_state.js"
 STATE_RENDERER_RUNTIME_JS = REPO_ROOT / "js" / "core" / "state" / "renderer_runtime_state.js"
 STATE_SPATIAL_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "spatial_index_state.js"
+STATE_BOOT_JS = REPO_ROOT / "js" / "core" / "state" / "boot_state.js"
+STATE_CONTENT_JS = REPO_ROOT / "js" / "core" / "state" / "content_state.js"
+STATE_COLOR_JS = REPO_ROOT / "js" / "core" / "state" / "color_state.js"
+STATE_UI_JS = REPO_ROOT / "js" / "core" / "state" / "ui_state.js"
 
 
 class StateSplitBoundaryContractTest(unittest.TestCase):
@@ -31,6 +35,10 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('./state/border_cache_state.js', content.replace('"', "'"))
         self.assertIn('./state/renderer_runtime_state.js', content.replace('"', "'"))
         self.assertIn('./state/spatial_index_state.js', content.replace('"', "'"))
+        self.assertIn('./state/boot_state.js', content.replace('"', "'"))
+        self.assertIn('./state/content_state.js', content.replace('"', "'"))
+        self.assertIn('./state/color_state.js', content.replace('"', "'"))
+        self.assertIn('./state/ui_state.js', content.replace('"', "'"))
         self.assertIn('export const state = {', content)
 
     def test_state_defaults_owns_constants_and_normalizers(self):
@@ -56,7 +64,6 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         content = STATE_JS.read_text(encoding="utf-8")
         defaults_content = STATE_DEFAULTS_JS.read_text(encoding="utf-8")
 
-        self.assertIn("defaultZoom", content)
         self.assertIn("defaultZoom", defaults_content)
         self.assertIn('} from "./state_defaults.js";', content)
         self.assertIn('} from "./state_catalog.js";', content)
@@ -64,10 +71,11 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('export * from "./state_defaults.js";', content)
         self.assertIn('export * from "./state_catalog.js";', content)
         self.assertIn('export * from "./runtime_hooks.js";', content)
+        self.assertIn('export * from "./state/boot_state.js";', content)
+        self.assertIn('export * from "./state/content_state.js";', content)
+        self.assertIn('export * from "./state/color_state.js";', content)
+        self.assertIn('export * from "./state/ui_state.js";', content)
         self.assertIn("normalizeMapSemanticMode", defaults_content)
-        self.assertIn("zoomTransform: defaultZoom,", content)
-        self.assertIn('selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],', content)
-        self.assertIn("exportWorkbenchUi: normalizeExportWorkbenchUiState(null),", content)
         self.assertIn("countryPalette,", content)
 
     def test_state_catalog_owns_catalog_state_factories(self):
@@ -194,6 +202,67 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("...createDefaultSpatialIndexState(),", donor_content)
         self.assertIsNone(re.search(r"landIndex:\s*new Map\(\),", donor_content))
         self.assertIsNone(re.search(r"waterSpatialItems:\s*\[\],", donor_content))
+
+    def test_boot_state_owner_holds_boot_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_BOOT_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultStartupBootCacheState()", owner_content)
+        self.assertIn("export function createDefaultBootState()", owner_content)
+        self.assertIn('bootPhase: "shell",', owner_content)
+        self.assertIn('startupInteractionMode: "readonly",', owner_content)
+        self.assertIn("startupBootCacheState: createDefaultStartupBootCacheState(),", owner_content)
+        self.assertIn("...createDefaultBootState(),", donor_content)
+        self.assertIsNone(re.search(r'bootPhase:\s*"shell",', donor_content))
+        self.assertIsNone(re.search(r"startupBootCacheState:\s*\{", donor_content))
+
+    def test_content_state_owner_holds_content_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_CONTENT_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultLocalesState()", owner_content)
+        self.assertIn("export function createDefaultContextLayerLoadStateByName()", owner_content)
+        self.assertIn("export function createDefaultContentState()", owner_content)
+        self.assertIn("locales: createDefaultLocalesState(),", owner_content)
+        self.assertIn("contextLayerLoadStateByName: createDefaultContextLayerLoadStateByName(),", owner_content)
+        self.assertIn("hierarchyGroupsByCode: new Map(),", owner_content)
+        self.assertIn("...createDefaultContentState(),", donor_content)
+        self.assertIsNone(re.search(r"locales:\s*\{\s*ui:\s*\{\},\s*geo:\s*\{\s*\}\s*\},", donor_content))
+        self.assertIsNone(re.search(r"contextLayerLoadStateByName:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"hierarchyGroupsByCode:\s*new Map\(\),", donor_content))
+
+    def test_color_state_owner_holds_palette_and_preset_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_COLOR_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultColorState()", owner_content)
+        self.assertIn("resolvedDefaultCountryPalette: { ...defaultCountryPalette },", owner_content)
+        self.assertIn('selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],', owner_content)
+        self.assertIn("editingPresetIds: new Set(),", owner_content)
+        self.assertIn("expandedPresetCountries: new Set(),", owner_content)
+        self.assertIn("...createDefaultColorState(),", donor_content)
+        self.assertIsNone(re.search(r"colors:\s*\{\},", donor_content))
+        self.assertIsNone(re.search(r'selectedColor:\s*PALETTE_THEMES\["HOI4 Vanilla"\]\[0\],', donor_content))
+        self.assertIsNone(re.search(r"editingPresetIds:\s*new Set\(\),", donor_content))
+
+    def test_ui_state_owner_holds_ui_and_style_defaults(self):
+        donor_content = STATE_JS.read_text(encoding="utf-8")
+        owner_content = STATE_UI_JS.read_text(encoding="utf-8")
+
+        self.assertIn("export function createDefaultManualSpecialZonesState()", owner_content)
+        self.assertIn("export function createDefaultTransportWorkbenchUiState()", owner_content)
+        self.assertIn("export function createDefaultReferenceImageState()", owner_content)
+        self.assertIn("export function createDefaultStyleConfig()", owner_content)
+        self.assertIn("export function createDefaultUiPanelState()", owner_content)
+        self.assertIn("export function createDefaultUiState()", owner_content)
+        self.assertIn("manualSpecialZones: createDefaultManualSpecialZonesState(),", owner_content)
+        self.assertIn("transportWorkbenchUi: createDefaultTransportWorkbenchUiState(),", owner_content)
+        self.assertIn("styleConfig: createDefaultStyleConfig(),", owner_content)
+        self.assertIn("ui: createDefaultUiPanelState(),", owner_content)
+        self.assertIn("...createDefaultUiState(),", donor_content)
+        self.assertIsNone(re.search(r"transportWorkbenchUi:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"referenceImageState:\s*\{", donor_content))
+        self.assertIsNone(re.search(r"ui:\s*\{\s*dockCollapsed:\s*false,", donor_content))
 
 
 if __name__ == "__main__":

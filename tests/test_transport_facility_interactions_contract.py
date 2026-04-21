@@ -64,7 +64,7 @@ class TransportFacilityInteractionsContractTest(unittest.TestCase):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
         owner_content = APPEARANCE_CONTROLLER_JS.read_text(encoding="utf-8")
         toolbar_required_tokens = [
-            "state.updateTransportAppearanceUIFn = renderTransportAppearanceUi;",
+            'registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);',
         ]
         owner_required_tokens = [
             "const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {",

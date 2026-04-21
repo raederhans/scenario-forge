@@ -36,7 +36,6 @@ test("strategic overlay state roundtrips through project import/export", async (
 
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
     state.annotationView = {
       frontlineEnabled: true,
       frontlineStyle: "dual-rail",
@@ -119,15 +118,20 @@ test("strategic overlay state roundtrips through project import/export", async (
     state.operationalLinesDirty = true;
     state.operationGraphicsDirty = true;
     state.unitCountersDirty = true;
-    state.updateStrategicOverlayUIFn?.();
-    render();
   });
 
-  await page.waitForFunction(() => {
-    const state = globalThis.__playwrightStateRef || null;
-    return !!state
-      && (state.operationGraphics || []).length === 2
-      && (state.unitCounters || []).length === 2;
+  const seededCounts = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      operationalLines: Array.isArray(state.operationalLines) ? state.operationalLines.length : 0,
+      operationGraphics: Array.isArray(state.operationGraphics) ? state.operationGraphics.length : 0,
+      unitCounters: Array.isArray(state.unitCounters) ? state.unitCounters.length : 0,
+    };
+  });
+  expect(seededCounts).toMatchObject({
+    operationalLines: 1,
+    operationGraphics: 2,
+    unitCounters: 2,
   });
 
   const exportPath = path.join(artifactDir, "strategic-overlay-export.json");
@@ -135,7 +139,6 @@ test("strategic overlay state roundtrips through project import/export", async (
 
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
     state.annotationView = {
       frontlineEnabled: false,
       frontlineStyle: "clean",
@@ -151,8 +154,6 @@ test("strategic overlay state roundtrips through project import/export", async (
     state.operationalLinesDirty = true;
     state.operationGraphicsDirty = true;
     state.unitCountersDirty = true;
-    state.updateStrategicOverlayUIFn?.();
-    render();
   });
 
   const importWatch = await beginProjectImportWatch(page, {

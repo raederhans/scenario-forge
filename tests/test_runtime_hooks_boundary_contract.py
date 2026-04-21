@@ -30,14 +30,27 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         sidebar_content = SIDEBAR_JS.read_text(encoding="utf-8")
         dev_workspace_content = DEV_WORKSPACE_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.setStartupReadonlyStateFn = setStartupReadonlyState;", main_content)
-        self.assertIn("state.ensureFullLocalizationDataReadyFn = ensureFullLocalizationDataReady;", main_content)
-        self.assertIn("state.syncDeveloperModeUiFn = syncDeveloperModeUi;", toolbar_content)
-        self.assertIn("state.updateWorkspaceStatusFn = refreshWorkspaceStatus;", toolbar_content)
-        self.assertIn("state.openTransportWorkbenchFn = (trigger = null) => {", toolbar_content)
-        self.assertIn("state.closeTransportWorkbenchFn = ({ restoreFocus = true } = {}) => {", toolbar_content)
-        self.assertIn("state.getStrategicOverlayPerfCountersFn = getStrategicOverlayPerfCounters;", sidebar_content)
-        self.assertIn("state.setDevWorkspaceExpandedFn = (nextValue) => {", dev_workspace_content)
+        self.assertIn('registerRuntimeHook(state, "setStartupReadonlyStateFn", setStartupReadonlyState);', main_content)
+        self.assertIn('registerRuntimeHook(state, "ensureFullLocalizationDataReadyFn", ensureFullLocalizationDataReady);', main_content)
+        self.assertIn('registerRuntimeHook(state, "syncDeveloperModeUiFn", syncDeveloperModeUi);', toolbar_content)
+        self.assertIn('registerRuntimeHook(state, "updateWorkspaceStatusFn", refreshWorkspaceStatus);', toolbar_content)
+        self.assertIn('registerRuntimeHook(state, "openTransportWorkbenchFn", (trigger = null) => openTransportWorkbench(trigger));', toolbar_content)
+        self.assertIn('registerRuntimeHook(state, "closeTransportWorkbenchFn", ({ restoreFocus = true } = {}) => (', toolbar_content)
+        self.assertIn('registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);', sidebar_content)
+        self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', dev_workspace_content)
+
+    def test_runtime_hook_helpers_coordinate_safe_calls(self):
+        runtime_hooks_content = RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
+        history_content = (REPO_ROOT / "js" / "core" / "history_manager.js").read_text(encoding="utf-8")
+        i18n_content = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
+
+        self.assertIn("function registerRuntimeHook(target, hookName, hook) {", runtime_hooks_content)
+        self.assertIn("function callRuntimeHook(target, hookName, ...args) {", runtime_hooks_content)
+        self.assertIn("function callRuntimeHooks(target, hookNames, ...args) {", runtime_hooks_content)
+        self.assertIn('callRuntimeHook(state, "updateHistoryUIFn");', history_content)
+        self.assertIn('callRuntimeHooks(state, [', history_content)
+        self.assertIn('await callRuntimeHook(state, "ensureFullLocalizationDataReadyFn", {', i18n_content)
+        self.assertIn('callRuntimeHooks(state, [', i18n_content)
 
 
 if __name__ == "__main__":

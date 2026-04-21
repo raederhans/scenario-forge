@@ -37,7 +37,7 @@ class MainBootOverlaySplitBoundaryContractTest(unittest.TestCase):
         content = MAIN_JS.read_text(encoding="utf-8")
 
         self.assertIn("const bootOverlayController = createStartupBootOverlayController();", content)
-        self.assertIn("state.setStartupReadonlyStateFn = setStartupReadonlyState;", content)
+        self.assertIn('registerRuntimeHook(state, "setStartupReadonlyStateFn", setStartupReadonlyState);', content)
         self.assertIn("function requestMainRender(reason = \"\", { flush = false } = {}) {", content)
         self.assertIn("async function bootstrap()", content)
         self.assertIn("bootstrap();", content)

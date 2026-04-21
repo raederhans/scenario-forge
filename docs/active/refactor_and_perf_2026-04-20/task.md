@@ -28,3 +28,21 @@
 - [ ] `state.js` 全量 Phase 0-4 执行
 - [ ] `runtime_hooks.js` 完整事件总线替换
 - [ ] 更大范围 renderer / scenario / UI 深层架构切分
+
+## 本轮新增推进
+
+- [x] 新增 `boot_state.js`
+- [x] 新增 `content_state.js`
+- [x] 新增 `color_state.js`
+- [x] 新增 `ui_state.js`
+- [x] `state.js` 接入 4 个新 owner/factory
+- [x] 新增 runtime hook helper：register/read/call/callMany
+- [x] 第一波 hook 注册/调用迁移到 helper
+- [x] 新增 state write allowlist guardrail
+- [x] Python contract 套件通过
+- [x] Node strategic overlay runtime owner test 通过
+- [x] strategic overlay smoke 通过
+- [x] strategic overlay frontline 通过
+- [x] strategic overlay roundtrip 通过
+- [ ] strategic overlay editing 全量新日志
+- [ ] `perf:gate` 回绿

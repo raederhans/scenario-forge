@@ -49,7 +49,7 @@ class DevWorkspaceScenarioTextEditorsBoundaryContractTest(unittest.TestCase):
         self.assertIn('syncCategoryPanel(scenarioCapitalPanel, "scenario", hasActiveScenario);', content)
         self.assertIn('syncCategoryPanel(scenarioLocalePanel, "scenario", hasActiveScenario);', content)
         self.assertIn("export { getScenarioGeoLocaleEntry, initDevWorkspace };", content)
-        self.assertIn("state.updateDevWorkspaceUIFn = renderWorkspace;", content)
+        self.assertIn('registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);', content)
 
     def test_controller_keeps_country_capital_locale_runtime_contracts(self):
         owner_content = SCENARIO_TEXT_EDITORS_CONTROLLER_JS.read_text(encoding="utf-8")

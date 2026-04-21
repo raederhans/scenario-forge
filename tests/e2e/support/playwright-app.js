@@ -253,25 +253,31 @@ async function waitForProjectImportCompletion(page, importWatchState, { timeout 
   const watchState = importWatchState && typeof importWatchState === "object" ? importWatchState : {};
   const expectedFileName = String(watchState.expectedFileName || "").trim();
   await primeInteractionFunnelDebugRef(page);
-  await page.waitForFunction((expected) => {
-    const getDebugState = globalThis.__playwrightInteractionFunnelDebugRef || null;
-    if (typeof getDebugState !== "function") return false;
-    const debug = getDebugState() || null;
-    const importStarted = Number(debug?.importStartCount || 0) > Number(expected.initialImportStartCount || 0);
-    if (!importStarted) return false;
-    if (String(debug?.lastImportError || "").trim()) {
-      throw new Error(`Project import failed: ${String(debug.lastImportError).trim()}`);
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const debug = await page.evaluate(() => {
+      const getDebugState = globalThis.__playwrightInteractionFunnelDebugRef || null;
+      return typeof getDebugState === "function" ? getDebugState() : null;
+    });
+    const importStarted = Number(debug?.importStartCount || 0) > Number(watchState.initialImportStartCount || 0);
+    if (importStarted) {
+      const importError = String(debug?.lastImportError || "").trim();
+      if (importError) {
+        throw new Error(`Project import failed: ${importError}`);
+      }
+      const importApplied = Number(debug?.importApplyCount || 0) > Number(watchState.initialImportApplyCount || 0);
+      const phaseComplete = String(debug?.importPhase || "") === "complete";
+      const fileMatches = !expectedFileName || String(debug?.lastImportFileName || "") === expectedFileName;
+      if (importApplied && phaseComplete && fileMatches) {
+        return;
+      }
     }
-    return (
-      Number(debug?.importApplyCount || 0) > Number(expected.initialImportApplyCount || 0)
-      && String(debug?.importPhase || "") === "complete"
-      && (!expected.expectedFileName || String(debug?.lastImportFileName || "") === expected.expectedFileName)
-    );
-  }, {
-    expectedFileName,
-    initialImportStartCount: Number(watchState.initialImportStartCount || 0),
-    initialImportApplyCount: Number(watchState.initialImportApplyCount || 0),
-  }, { timeout });
+    await page.waitForTimeout(200);
+  }
+  const snapshot = await readBootStateSnapshot(page);
+  throw new Error(
+    `[playwright-app] waitForProjectImportCompletion timed out after ${timeout}ms. Boot snapshot: ${JSON.stringify(snapshot)}`
+  );
 }
 
 async function openProjectFrontlineSection(page, { timeout = 30_000 } = {}) {

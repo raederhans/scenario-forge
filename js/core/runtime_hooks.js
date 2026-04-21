@@ -97,3 +97,37 @@ export function createDefaultRuntimeHooks() {
     ...createDefaultRenderRuntimeHooks(),
   };
 }
+
+function normalizeRuntimeHook(hook) {
+  return typeof hook === "function" ? hook : null;
+}
+
+function readRuntimeHook(target, hookName) {
+  if (!target || !hookName) return null;
+  return normalizeRuntimeHook(target[hookName]);
+}
+
+function registerRuntimeHook(target, hookName, hook) {
+  if (!target || !hookName) return null;
+  const normalizedHook = normalizeRuntimeHook(hook);
+  target[hookName] = normalizedHook;
+  return normalizedHook;
+}
+
+function callRuntimeHook(target, hookName, ...args) {
+  const hook = readRuntimeHook(target, hookName);
+  if (!hook) return undefined;
+  return hook(...args);
+}
+
+function callRuntimeHooks(target, hookNames, ...args) {
+  const normalizedNames = Array.isArray(hookNames) ? hookNames : [];
+  return normalizedNames.map((hookName) => callRuntimeHook(target, hookName, ...args));
+}
+
+export {
+  callRuntimeHook,
+  callRuntimeHooks,
+  readRuntimeHook,
+  registerRuntimeHook,
+};

@@ -1,4 +1,5 @@
 import { state } from "../core/state.js";
+import { registerRuntimeHook } from "../core/runtime_hooks.js";
 import {
   addFeatureToDevSelection,
   applyDevMacroFillCurrentCountry,
@@ -1056,10 +1057,10 @@ function initDevWorkspace() {
     flushDevWorkspaceRender,
   });
 
-  state.updateDevWorkspaceUIFn = renderWorkspace;
-  state.setDevWorkspaceExpandedFn = (nextValue) => {
+  registerRuntimeHook(state, "updateDevWorkspaceUIFn", renderWorkspace);
+  registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {
     setExpandedState(nextValue, { bottomDock, panel, toggleBtn });
-  };
+  });
 
   bindButtonAction(toggleBtn, () => {
     const next = !state.ui.devWorkspaceExpanded;
