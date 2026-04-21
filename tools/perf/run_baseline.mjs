@@ -10,12 +10,27 @@ import { chromium } from "playwright";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DEFAULT_SCENARIOS = ["blank_base", "tno_1962", "hoi4_1939"];
+const DEFAULT_GATE_SCENARIOS = ["tno_1962", "hoi4_1939"];
 const DEFAULT_BASELINE_JSON = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-04-20.json");
 const DEFAULT_BASELINE_MD = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-04-20.md");
 const DEFAULT_RAW_DIR = path.join(REPO_ROOT, ".runtime", "output", "perf", "baseline_2026-04-20");
 const ACTIVE_SERVER_PATH = path.join(REPO_ROOT, ".runtime", "dev", "active_server.json");
 const DEV_SERVER_OUT = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.out.log");
 const DEV_SERVER_ERR = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.err.log");
+const PERF_URL_QUERY = Object.freeze({
+  render_profile: "balanced",
+  startup_interaction: "full",
+  startup_worker: 1,
+  startup_cache: 0,
+  perf: 1,
+});
+const GATE_METRICS = Object.freeze([
+  { key: "totalStartupMs", label: "totalStartupMs" },
+  { key: "scenarioAppliedMs", label: "scenarioAppliedMs" },
+  { key: "applyScenarioBundleMs", label: "applyScenarioBundleMs" },
+  { key: "refreshScenarioApplyMs", label: "refreshScenarioApplyMs" },
+  { key: "renderSampleMedianMs", label: "renderSampleMedianMs", threshold: 1.25 },
+]);
 const SCENARIO_MANIFEST_MAP = Object.fromEntries(
   DEFAULT_SCENARIOS.map((scenarioId) => [
     scenarioId,
@@ -185,12 +200,10 @@ async function stopServer(serverOwner) {
 
 function buildScenarioUrl(baseUrl, scenarioId) {
   const url = new URL("/app/", baseUrl);
-  url.searchParams.set("render_profile", "balanced");
-  url.searchParams.set("startup_interaction", "full");
-  url.searchParams.set("startup_worker", "1");
-  url.searchParams.set("startup_cache", "0");
+  for (const [key, value] of Object.entries(PERF_URL_QUERY)) {
+    url.searchParams.set(key, String(value));
+  }
   url.searchParams.set("default_scenario", scenarioId);
-  url.searchParams.set("perf", "1");
   return url.toString();
 }
 
@@ -242,6 +255,42 @@ function summarizeSnapshot(snapshot) {
   };
 }
 
+function normalizeScenarioId(value) {
+  return String(value || "").trim();
+}
+
+function getScenarioSampleRole(scenarioId) {
+  return DEFAULT_GATE_SCENARIOS.includes(scenarioId) ? "gate" : "observation";
+}
+
+function normalizeOsPlatform(value) {
+  const label = String(value || "").trim();
+  if (!label) {
+    return "";
+  }
+  const [platformLabel = ""] = label.split(/\s+/, 1);
+  return platformLabel.trim();
+}
+
+function parseNodeMajor(value) {
+  const match = String(value || "").trim().match(/^v?(?<major>\d+)/);
+  if (!match?.groups?.major) {
+    return 0;
+  }
+  return finiteNumber(match.groups.major, 0);
+}
+
+function collectEnvironment() {
+  return {
+    os: `${os.platform()} ${os.release()}`,
+    platform: os.platform(),
+    release: os.release(),
+    node: process.version,
+    nodeMajor: parseNodeMajor(process.version),
+    browser: "chromium-headless",
+  };
+}
+
 function aggregateRuns(runs) {
   const summaries = runs.map((run) => run.summary || {});
   const fieldNames = [
@@ -288,6 +337,11 @@ async function measureOneRun(browser, baseUrl, scenarioId) {
       const stateModule = await import(stateModuleUrl);
       return String(stateModule?.state?.activeScenarioId || "").trim();
     });
+    if (activeScenarioId !== normalizeScenarioId(scenarioId)) {
+      throw new Error(
+        `[perf-baseline] Scenario activation mismatch for ${scenarioId}: activeScenarioId=${activeScenarioId || "<empty>"}`
+      );
+    }
     return {
       url: targetUrl,
       activeScenarioId,
@@ -366,6 +420,7 @@ async function runScenarioSeries(browser, baseUrl, scenarioId, options) {
   }
   return {
     scenarioId,
+    sampleRole: getScenarioSampleRole(scenarioId),
     featureCount,
     warmups,
     runs,
@@ -378,6 +433,10 @@ function formatMetricRow(label, value) {
 }
 
 function buildMarkdown(report) {
+  const gateScenarios = DEFAULT_GATE_SCENARIOS.join(", ");
+  const observationScenarios = DEFAULT_SCENARIOS
+    .filter((scenarioId) => !DEFAULT_GATE_SCENARIOS.includes(scenarioId))
+    .join(", ");
   const lines = [
     "# Perf baseline 2026-04-20",
     "",
@@ -387,12 +446,15 @@ function buildMarkdown(report) {
     `- OS: ${report.environment.os}`,
     `- Node: ${report.environment.node}`,
     `- Browser: ${report.environment.browser}`,
+    `- Gate scenarios: ${gateScenarios}`,
+    `- Observation samples: ${observationScenarios}`,
     "",
   ];
   for (const scenarioId of Object.keys(report.scenarios)) {
     const entry = report.scenarios[scenarioId];
     const summary = entry.summary || {};
     lines.push(`## Scenario: ${scenarioId}`);
+    lines.push(`- sample_role: ${String(entry.sampleRole || getScenarioSampleRole(scenarioId))}`);
     lines.push(`- Runs: ${entry.runs.length}`);
     lines.push(`- feature_count: ${entry.featureCount}`);
     lines.push(formatMetricRow("Total startup", summary.totalStartupMs));
@@ -452,19 +514,24 @@ function compareAgainstBaseline(currentReport, baselineReport, threshold) {
   for (const scenarioId of Object.keys(currentReport.scenarios)) {
     const currentSummary = currentReport.scenarios[scenarioId]?.summary || {};
     const baselineSummary = baselineReport?.scenarios?.[scenarioId]?.summary || {};
-    const baselineTotal = finiteNumber(baselineSummary.totalStartupMs);
-    const currentTotal = finiteNumber(currentSummary.totalStartupMs);
-    if (baselineTotal <= 0) {
-      continue;
-    }
-    const limit = baselineTotal * threshold;
-    if (currentTotal > limit) {
-      failures.push({
-        scenarioId,
-        baselineTotal,
-        currentTotal,
-        limit,
-      });
+    for (const metric of GATE_METRICS) {
+      const baselineValue = finiteNumber(baselineSummary?.[metric.key]);
+      const currentValue = finiteNumber(currentSummary?.[metric.key]);
+      if (baselineValue <= 0) {
+        continue;
+      }
+      const allowedRatio = Number.isFinite(metric.threshold) ? metric.threshold : threshold;
+      const limit = baselineValue * allowedRatio;
+      if (currentValue > limit) {
+        failures.push({
+          scenarioId,
+          metricKey: metric.key,
+          allowedRatio,
+          baselineValue,
+          currentValue,
+          limit,
+        });
+      }
     }
   }
   return failures;
@@ -486,9 +553,14 @@ function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
       missing.push(scenarioId);
       continue;
     }
-    const totalStartupMs = Number(summary.totalStartupMs);
-    if (!(Number.isFinite(totalStartupMs) && totalStartupMs > 0)) {
-      invalid.push(scenarioId);
+    const invalidMetrics = GATE_METRICS
+      .map((metric) => metric.key)
+      .filter((metricKey) => {
+        const metricValue = Number(summary[metricKey]);
+        return !(Number.isFinite(metricValue) && metricValue > 0);
+      });
+    if (invalidMetrics.length) {
+      invalid.push(`${scenarioId}: ${invalidMetrics.join(", ")}`);
     }
   }
   if (missing.length) {
@@ -498,9 +570,48 @@ function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
   }
   if (invalid.length) {
     throw new Error(
-      `[perf-baseline] Baseline report has invalid totalStartupMs for scenarios (${invalid.join(", ")}): ${baselinePath}`
+      `[perf-baseline] Baseline report has invalid gate metrics for scenarios (${invalid.join("; ")}): ${baselinePath}`
     );
   }
+}
+
+function collectBaselineContractMismatches(currentReport, baselineReport) {
+  const mismatches = [];
+  const baselinePlatform = normalizeOsPlatform(
+    baselineReport?.environment?.platform || baselineReport?.environment?.os
+  );
+  const currentPlatform = normalizeOsPlatform(
+    currentReport?.environment?.platform || currentReport?.environment?.os
+  );
+  if (baselinePlatform && currentPlatform && baselinePlatform !== currentPlatform) {
+    mismatches.push(`os platform mismatch: baseline=${baselinePlatform} current=${currentPlatform}`);
+  }
+
+  const baselineNodeMajor = parseNodeMajor(
+    baselineReport?.environment?.nodeMajor || baselineReport?.environment?.node
+  );
+  const currentNodeMajor = parseNodeMajor(
+    currentReport?.environment?.nodeMajor || currentReport?.environment?.node
+  );
+  if (baselineNodeMajor > 0 && currentNodeMajor > 0 && baselineNodeMajor !== currentNodeMajor) {
+    mismatches.push(`node major mismatch: baseline=${baselineNodeMajor} current=${currentNodeMajor}`);
+  }
+
+  const baselineBrowser = String(baselineReport?.environment?.browser || "").trim();
+  const currentBrowser = String(currentReport?.environment?.browser || "").trim();
+  if (baselineBrowser && currentBrowser && baselineBrowser !== currentBrowser) {
+    mismatches.push(`browser mismatch: baseline=${baselineBrowser} current=${currentBrowser}`);
+  }
+
+  const baselineQuery = baselineReport?.config?.urlQuery || {};
+  const currentQuery = currentReport?.config?.urlQuery || {};
+  if (JSON.stringify(baselineQuery) !== JSON.stringify(currentQuery)) {
+    mismatches.push(
+      `urlQuery mismatch: baseline=${JSON.stringify(baselineQuery)} current=${JSON.stringify(currentQuery)}`
+    );
+  }
+
+  return mismatches;
 }
 
 async function main() {
@@ -527,29 +638,27 @@ async function main() {
       runs: options.runs,
       warmups: options.warmups,
       threshold: options.threshold,
-      urlQuery: {
-        render_profile: "balanced",
-        startup_interaction: "full",
-        startup_worker: 1,
-        startup_cache: 0,
-        perf: 1,
-      },
+      urlQuery: PERF_URL_QUERY,
     },
-    environment: {
-      os: `${os.platform()} ${os.release()}`,
-      node: process.version,
-      browser: "chromium-headless",
-    },
+    environment: collectEnvironment(),
     scenarios: measurement.scenarios,
   };
 
   if (options.mode === "gate") {
+    const contractMismatches = collectBaselineContractMismatches(report, baselineReportForGate);
     const failures = compareAgainstBaseline(report, baselineReportForGate, options.threshold);
     const gateReportPath = path.join(options.rawDir, "perf-gate-current.json");
-    await writeJson(gateReportPath, { report, failures });
+    await writeJson(gateReportPath, { report, contractMismatches, failures });
+    if (contractMismatches.length) {
+      throw new Error(
+        `Perf gate baseline contract mismatch.\n${contractMismatches.map((item) => `- ${item}`).join("\n")}`
+      );
+    }
     if (failures.length) {
       const message = failures
-        .map((failure) => `${failure.scenarioId}: current=${failure.currentTotal.toFixed(1)}ms baseline=${failure.baselineTotal.toFixed(1)}ms limit=${failure.limit.toFixed(1)}ms`)
+        .map(
+          (failure) => `${failure.scenarioId}.${failure.metricKey}: current=${failure.currentValue.toFixed(1)}ms baseline=${failure.baselineValue.toFixed(1)}ms limit=${failure.limit.toFixed(1)}ms ratio=${failure.allowedRatio.toFixed(2)}`
+        )
         .join("\n");
       throw new Error(`Perf gate failed.\n${message}`);
     }

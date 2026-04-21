@@ -1,80 +1,67 @@
 # 现状快照
 
-## 当前工作区
+## 当前阶段
 
-- `js/bootstrap/startup_boot_overlay.js` 的旧 hotfix 已经脱离当前工作区，不再是前置阻塞。
-- 当前需要忽略的本地运行态文件主要是 `.omx/*`。
-- 开工前已经清掉越界生成的 `lessons learned.md` 修改和 `docs/archive/validation_audit_refactor_and_perf_2026-04-20/` 草稿目录。
+- 本目录已完成原计划链重建，真源固定到 `original_plan_chain.md` 里列出的两份归档文档。
+- 当前状态已从“triage 完成”推进到“修复执行已启动”。
+- 本轮剩余主线已经收敛成两条：`strategic overlay` 稳定化、`perf gate` 收口。
 
-## 历史计划真源
+## 当前工作区与协作边界
 
-- Batch 1-5 历史材料在 `docs/archive/further_split/`。
-- 旧的 active further_split 路径已经失效；后续引用统一改成 `docs/archive/further_split/`。
+- 这条文档 lane 只在 `docs/active/refactor_and_perf_2026-04-20/` 内写入。
+- 代码与测试会由其他代理继续推进；当前文档只负责给出真源、阶段状态和执行顺序。
+- 本次更新没有运行长测试。
 
-## 当前代码结构事实
+## 原计划链真源
 
-- `js/core/map_renderer.js` 仍是外部 importer 最多的渲染核心。
-- `js/core/map_renderer/public.js` 已新增并冻结第一版 app/UI facade。
-- 当前直接 import `map_renderer.js` 的 12 个文件里，本轮迁移范围只覆盖 app/UI importer：
-  - `js/main.js`
-  - `js/bootstrap/deferred_detail_promotion.js`
-  - `js/ui/toolbar.js`
-  - `js/ui/shortcuts.js`
-  - `js/ui/dev_workspace.js`
-  - `js/ui/dev_workspace/district_editor_controller.js`
-  - `js/ui/dev_workspace/scenario_tag_creator_controller.js`
-  - `js/ui/dev_workspace/scenario_text_editors_controller.js`
-  - `js/ui/sidebar.js`
-- 本轮继续保留内部 bridge / core helper 直连：
-  - `js/core/logic.js`
-  - `js/core/scenario_ownership_editor.js`
-  - `js/core/scenario/scenario_renderer_bridge.js`
+- `docs/archive/further_split/original/file_split.md`
+- `docs/archive/further_split/original/STATE_JS_SLICE_SPLIT_PLAN_2026-04-20.md`
+- 当前 active 目录中的重建入口：`original_plan_chain.md`
 
-## perf 真源
+## 已落地基础
 
-仓库已经有三条现成指标链：
+- `map_renderer/public.js` facade 已落地，app/UI importer 迁移已完成。
+- `docs/perf/baseline_2026-04-20.json` 与 `docs/perf/baseline_2026-04-20.md` 已产出。
+- `.github/workflows/perf-pr-gate.yml` 已收紧到与当前 baseline 环境一致，PR gate 场景改为 `tno_1962 + hoi4_1939`，`blank_base` 只保留 observation sample 角色。
+- `strategic_overlay_editing.spec.js` 的 triage 已完成，入口状态机、counter 画布可见性契约和 placement cancel 恢复链都已修复。
 
-- `state.bootMetrics`
-- `state.renderPerfMetrics`
-- `state.scenarioPerfMetrics`
+## 当前这轮新增完成项
 
-当前还已有运行态暴露：
+- 新增 `docs/active/refactor_and_perf_2026-04-20/original_plan_chain.md`，把原计划链重新留档。
+- `js/ui/sidebar.js` 已把 `frontline-mode-active` 和右侧 tab 状态收口到同一条切换入口。
+- `js/ui/sidebar/strategic_overlay_controller.js` 已把 counter modal 关闭后的焦点回退固定到 `#unitCounterDetailToggleBtn`。
+- `js/core/renderer/strategic_overlay_runtime_owner.js` 已修复 placement cancel 回选旧 counter 时 `unitCounterEditor.active` 残留的问题。
+- `tools/perf/run_baseline.mjs` 已增加：
+  - `activeScenarioId === scenarioId` 硬断言
+  - 关键子指标 gate
+  - baseline / environment 一致性校验
+- `tests/test_map_renderer_public_contract.py` 已升级为目录级 public facade 防直连合同。
+- `tests/test_perf_gate_contract.py` 已新增并通过。
 
-- `globalThis.__renderPerfMetrics`
-- `globalThis.__scenarioPerfMetrics`
+## 当前验证结果
 
-本轮 Step 0 采用“适配现有指标 + 补缺口”的方案：
+- Python 合同测试通过：
+  - `tests.test_strategic_overlay_sidebar_boundary_contract`
+  - `tests.test_map_renderer_public_contract`
+  - `tests.test_perf_gate_contract`
+  - `tests.test_refactor_and_perf_plan_contract`
+- Node 行为测试通过：
+  - `tests/strategic_overlay_runtime_owner_behavior.test.mjs`
+- Playwright 定向回归通过：
+  - `tests/e2e/strategic_overlay_sidebar_entry_smoke.spec.js`
+  - `tests/e2e/strategic_overlay_counter_canvas_smoke.spec.js`
+  - `tests/e2e/strategic_overlay_smoke.spec.js`
+  - `tests/e2e/strategic_overlay_editing.spec.js` 当前核心 7 条里，首次全量回归已验证 1-4、6-7；补丁后重跑覆盖了原先失败的第 5 条以及 6-7，并全部通过
+- 真实 `npm run perf:gate` 已通过。
 
-- 复用现有 metrics schema。
-- 只补 `globalThis.__bootMetrics` 暴露、render 样本分布、少量缺口 span。
-- 统一对外暴露 `globalThis.__mc_perf__.snapshot()`。
+## 当前执行判断
 
-## 基线场景
+- 当前最短主线已经从“继续做 triage”推进到“修复完成并通过定向验证”。
+- `strategic overlay` 这轮主要问题已经收口，下一步可以回到更小步的后续重构或剩余 perf 观察。
+- `perf gate` 已从合同级修正推进到真实命令通过，当前主要剩余事项是后续是否重生一版完全对齐新结构的 baseline JSON。
 
-- `blank_base`：空白基线场景。
-- `tno_1962`：默认启动路径，也是主要优化目标；`feature_count = 12798`。
-- `hoi4_1939`：最大几何压力场景；`feature_count = 22502`。
+## 给后续代码 lane 的直接指向
 
-## 产物约束
-
-- raw 运行产物写入 `.runtime/output/perf/`。
-- 基线真源写入 `docs/perf/baseline_2026-04-20.json`。
-- 人工阅读版写入 `docs/perf/baseline_2026-04-20.md`。
-- 本轮不改 README / CONTRIBUTING。
-
-## 当前执行结果（2026-04-21）
-
-- 文档收口完成：Step 0 口径、路径引用、Step 4 后移、`state.runtimeHooks.*` 目标命名已同步。
-- facade 与 importer 迁移完成：
-  - `js/core/map_renderer/public.js` 已落地。
-  - app/UI 9 个 importer 已切到 `map_renderer/public.js`。
-  - `scenario_renderer_bridge`、`logic.js`、`scenario_ownership_editor.js` 继续走内部 lane。
-- Step 0 baseline 已产出：
-  - `docs/perf/baseline_2026-04-20.json`
-  - `docs/perf/baseline_2026-04-20.md`
-- Step 5 gate 已落地：
-  - `.github/workflows/perf-pr-gate.yml`
-  - `npm run perf:gate` 本地跑通。
-- Step 1 triage 当前结论：
-  - `strategic_overlay_editing.spec.js` 7 条中 5 条失败。
-  - 失败集中在 strategic overlay 入口控件可见性 / 可用状态与 counter 交互链。
+1. 当前波次已经完成 `strategic overlay` 入口控件、counter 交互链和 perf gate 收口。
+2. 下一步优先做更小范围的后续优化或剩余 perf 观察，不重新打开大范围 state / runtime_hooks 战线。
+3. `runtime_hooks` 深改和全量 state slice 迁移继续留在下一阶段，不挤进当前修复波次。

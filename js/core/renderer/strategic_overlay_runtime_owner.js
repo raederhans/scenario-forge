@@ -853,6 +853,7 @@ export function createStrategicOverlayRuntimeOwner({
     const selectedId = String(id || "").trim();
     const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId) || null;
     if (counter) {
+      state.unitCounterEditor.active = false;
       state.unitCounterEditor.selectedId = selectedId || null;
       state.unitCounterEditor.returnSelectionId = null;
       assignUnitCounterEditorFromCounter(counter);

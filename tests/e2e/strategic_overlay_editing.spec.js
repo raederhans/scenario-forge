@@ -9,6 +9,36 @@ const {
   waitForScenarioSelectReady,
 } = require("./support/playwright-app");
 
+async function readZoomK(page) {
+  return page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return Number(state.zoomTransform?.k || 0);
+  });
+}
+
+async function waitForZoomPercent(page, expectedPercent) {
+  await expect.poll(async () => {
+    const zoomK = await readZoomK(page);
+    return Math.round(zoomK * 100);
+  }, { timeout: 4000 }).toBe(expectedPercent);
+}
+
+async function setZoomPercentViaApi(page, percent) {
+  await page.evaluate(async (nextPercent) => {
+    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    setZoomPercent(nextPercent);
+  }, percent);
+  await waitForZoomPercent(page, percent);
+}
+
+async function ensureUnitCounterCanvasVisible(page, visibleZoomPercent = 700) {
+  await setZoomPercentViaApi(page, visibleZoomPercent);
+  await expect.poll(async () => {
+    const node = await page.locator("g.unit-counter").first().boundingBox();
+    return Number(node?.width || 0);
+  }, { timeout: 4000 }).toBeGreaterThan(0);
+}
+
 async function openFrontlineTab(page) {
   await page.evaluate(async () => {
     const sidebarModule = await import("/js/ui/sidebar.js");
@@ -246,6 +276,7 @@ test("milstd counters keep attachments on click and detach only after a real dra
     render();
   });
 
+  await ensureUnitCounterCanvasVisible(page);
   await expect(page.locator('g.unit-counter[data-counter-id="unit_drag_1"]')).toBeVisible();
   const symbolHref = await page.locator('g.unit-counter[data-counter-id="unit_drag_1"] image.unit-counter-milsymbol').getAttribute("href");
   expect(symbolHref).toContain("data:image/svg+xml");
@@ -300,6 +331,7 @@ test("co-located counters render into deterministic slot positions instead of a 
     render();
   });
 
+  await ensureUnitCounterCanvasVisible(page);
   const stackGroups = page.locator("g.unit-counter");
   await expect(stackGroups).toHaveCount(4);
   await expect(page.locator('g.unit-counter[data-counter-id="stack_4"]')).toBeVisible();
@@ -352,6 +384,7 @@ test("unit counters open a centered modal editor, support symbol search, and sti
     setZoomPercent(700);
   });
 
+  await ensureUnitCounterCanvasVisible(page);
   const counterShell = page.locator('g.unit-counter[data-counter-id="unit_size_1"] rect.unit-counter-shell');
   await expect(counterShell).toBeVisible();
   await openCounterEditorModal(page);
@@ -420,10 +453,6 @@ test("unit counters open a centered modal editor, support symbol search, and sti
   const zoomPercentInput = page.locator("#zoomPercentInput");
   const unitCounterFixedScaleRange = page.locator("#unitCounterFixedScaleRange");
   const unitCounterFixedScaleValue = page.locator("#unitCounterFixedScaleValue");
-  const readZoomK = async () => page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    return Number(state.zoomTransform?.k || 0);
-  });
   const readCounterVisibility = async () => page.evaluate(() => {
     const node = document.querySelector('g.unit-counter[data-counter-id="unit_size_1"]');
     if (!node) return null;
@@ -432,46 +461,33 @@ test("unit counters open a centered modal editor, support symbol search, and sti
       opacity: Number(node.getAttribute("opacity") || 1),
     };
   });
-  const waitForZoomK = async (expectedPercent) => {
-    await expect.poll(async () => {
-      const zoomK = await readZoomK();
-      return Math.round(zoomK * 100);
-    }, { timeout: 4000 }).toBe(expectedPercent);
-  };
-  const setZoomPercentViaApi = async (percent) => {
-    await page.evaluate(async (nextPercent) => {
-      const { setZoomPercent } = await import("/js/core/map_renderer.js");
-      setZoomPercent(nextPercent);
-    }, percent);
-    await waitForZoomK(percent);
-  };
   const setZoomPercentViaInput = async (percent) => {
     await zoomPercentInput.click();
     await zoomPercentInput.fill(String(percent));
     await zoomPercentInput.press("Enter");
-    await waitForZoomK(percent);
+    await waitForZoomPercent(page, percent);
     await expect.poll(async () => {
       const rawValue = await zoomPercentInput.inputValue();
       return Number(rawValue.replace(/[^0-9.]/g, ""));
     }, { timeout: 4000 }).toBe(percent);
   };
 
-  await setZoomPercentViaApi(50);
-  const zoomAt50 = await readZoomK();
+  await setZoomPercentViaApi(page, 50);
+  const zoomAt50 = await readZoomK(page);
   const counterStateAt50 = await readCounterVisibility();
 
-  await setZoomPercentViaApi(100);
+  await setZoomPercentViaApi(page, 100);
   const counterStateAt100 = await readCounterVisibility();
 
-  await setZoomPercentViaApi(500);
+  await setZoomPercentViaApi(page, 500);
   const counterStateAt500 = await readCounterVisibility();
 
   await setZoomPercentViaInput(600);
-  const zoomAt600 = await readZoomK();
+  const zoomAt600 = await readZoomK(page);
   const counterStateAt600 = await readCounterVisibility();
 
-  await setZoomPercentViaApi(700);
-  const zoomAt700 = await readZoomK();
+  await setZoomPercentViaApi(page, 700);
+  const zoomAt700 = await readZoomK(page);
   const boxAt700 = await counterShell.boundingBox();
   await expect(unitCounterFixedScaleRange).toHaveValue("150");
   await expect(unitCounterFixedScaleValue).toHaveText("1.50x");
@@ -491,7 +507,7 @@ test("unit counters open a centered modal editor, support symbol search, and sti
   const boxAt700ScaledUp = await counterShell.boundingBox();
 
   await setZoomPercentViaInput(3000);
-  const zoomAt3000 = await readZoomK();
+  const zoomAt3000 = await readZoomK(page);
   const counterStateAt3000 = await readCounterVisibility();
   const boxAt3000 = await counterShell.boundingBox();
 

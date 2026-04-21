@@ -404,3 +404,56 @@ test("cancel active strategic modes unwinds unit counter, line, and graphics edi
   assert.equal(state.operationGraphicsEditor.active, false);
   assert.equal(state.strategicOverlayUi.activeMode, "idle");
 });
+
+test("cancel unit counter placement restores prior selection and clears active placement mode", () => {
+  let uiRefreshCount = 0;
+  let renderCount = 0;
+  const state = {
+    unitCounters: [{
+      id: "unit_existing_1",
+      renderer: "game",
+      sidc: "INF",
+      symbolCode: "INF",
+      nationTag: "GER",
+      nationSource: "manual",
+      presetId: "inf",
+      iconId: "infantry",
+      unitType: "INF",
+      echelon: "corps",
+      label: "Existing Counter",
+      organizationPct: 84,
+      equipmentPct: 73,
+      size: "medium",
+      anchor: { lon: 12, lat: 48, featureId: "GER" },
+    }],
+    unitCounterEditor: {
+      active: true,
+      selectedId: null,
+      returnSelectionId: "unit_existing_1",
+    },
+  };
+
+  const owner = createStrategicOverlayRuntimeOwner({
+    state,
+    helpers: {
+      assignUnitCounterEditorFromCounter: (counter) => {
+        state.unitCounterEditor.label = String(counter.label || "");
+      },
+      ensureUnitCounterEditorState: () => {},
+      renderNow: () => {
+        renderCount += 1;
+      },
+      updateStrategicOverlayUi: () => {
+        uiRefreshCount += 1;
+      },
+    },
+  });
+
+  owner.cancelUnitCounterPlacement();
+  assert.equal(state.unitCounterEditor.active, false);
+  assert.equal(state.unitCounterEditor.selectedId, "unit_existing_1");
+  assert.equal(state.unitCounterEditor.returnSelectionId, null);
+  assert.equal(state.unitCounterEditor.label, "Existing Counter");
+  assert.equal(uiRefreshCount, 1);
+  assert.equal(renderCount, 1);
+});

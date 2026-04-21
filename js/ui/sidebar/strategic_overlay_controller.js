@@ -241,6 +241,16 @@ export function createStrategicOverlayController({
       && element.tabIndex >= 0
     ));
   };
+  const focusUnitCounterDetailToggle = () => {
+    if (!(unitCounterDetailToggleBtn instanceof HTMLElement)) {
+      return false;
+    }
+    if (!document.contains(unitCounterDetailToggleBtn)) {
+      return false;
+    }
+    unitCounterDetailToggleBtn.focus({ preventScroll: true });
+    return true;
+  };
   const setCounterEditorModalState = (nextOpen, { restoreFocus = true } = {}) => {
     ensureStrategicOverlayUiState();
     const isOpen = !!nextOpen;
@@ -264,9 +274,18 @@ export function createStrategicOverlayController({
           unitCounterEditorModal?.focus({ preventScroll: true });
         }
       });
-    } else if (restoreFocus && counterEditorModalPreviouslyFocused && document.contains(counterEditorModalPreviouslyFocused)) {
-      counterEditorModalPreviouslyFocused.focus({ preventScroll: true });
-      counterEditorModalPreviouslyFocused = null;
+      return;
+    }
+    const previousFocused = counterEditorModalPreviouslyFocused;
+    counterEditorModalPreviouslyFocused = null;
+    if (!restoreFocus) {
+      return;
+    }
+    if (focusUnitCounterDetailToggle()) {
+      return;
+    }
+    if (previousFocused && document.contains(previousFocused)) {
+      previousFocused.focus({ preventScroll: true });
     }
   };
   const cancelStrategicEditingModes = () => {

@@ -1,15 +1,17 @@
 # refactor_and_perf_2026-04-20
 
-先读 `context.md`，再读 `plan.md`，然后看 `task.md` 和 `step0_perf_probe_skeleton.md`。
+当前阶段已经进入修复执行。
 
-这轮计划已经修正为两条主线：
+先读 `original_plan_chain.md`，再读 `context.md`、`plan.md`、`task.md`。`step0_perf_probe_skeleton.md` 继续作为 perf 基线实现附录。
 
-1. 文档与工作区收口，先把旧口径清干净。
-2. 代码实现按 `public.js` facade、importer 迁移、perf baseline、低风险性能修复、CI gate 顺序推进。
+当前剩余主线只有两条：
 
-本轮约束：
+1. `strategic overlay` 稳定化
+2. `perf gate` 收口
 
-- `docs/archive/further_split/` 是 Batch 1-5 的历史真源。
-- `js/core/scenario/scenario_renderer_bridge.js` 本轮继续保留内部 bridge。
-- `runtime_hooks` 结构化改造后移；文档里统一目标名称为 `state.runtimeHooks.*`。
-- perf 基线真源是 `docs/perf/baseline_2026-04-20.json`，Markdown 只做人工阅读。
+本目录约束：
+
+- 原计划链真源固定为 `docs/archive/further_split/original/file_split.md` 与 `docs/archive/further_split/original/STATE_JS_SLICE_SPLIT_PLAN_2026-04-20.md`
+- 当前 active 文档负责把阶段从 triage 后推进到修复执行
+- Step 4 后移到下一轮，当前只保留 `state.runtimeHooks.*` 命名目标
+- `runtime_hooks` 深改、全量 state slice 迁移、更大范围架构切分留到下一阶段

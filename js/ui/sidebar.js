@@ -5129,7 +5129,7 @@ function initSidebar({ render } = {}) {
       state.ui = {};
     }
     state.ui.rightSidebarTab = activeId;
-    document.body.classList.remove("frontline-mode-active");
+    document.body.classList.toggle("frontline-mode-active", activeId === "project");
     if (activeId !== "project") {
       closeCounterEditorModal({ restoreFocus: false });
       cancelStrategicEditingModes();
@@ -5148,6 +5148,11 @@ function initSidebar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+    if (typeof state.updateStrategicOverlayUIFn === "function") {
+      state.updateStrategicOverlayUIFn({
+        scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"],
+      });
+    }
     syncRightSidebarUrlState();
     scheduleAdaptiveInspectorHeights();
   };

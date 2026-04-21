@@ -47,6 +47,8 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('bindStrategicOverlayEvents();', content)
         self.assertIn('state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;', content)
         self.assertIn('state.getStrategicOverlayPerfCountersFn = getStrategicOverlayPerfCounters;', content)
+        self.assertIn('document.body.classList.toggle("frontline-mode-active", activeId === "project");', content)
+        self.assertIn('scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"]', content)
 
     def test_sidebar_keeps_strategic_overlay_dom_surface_and_frontline_invalidation_hook(self):
         content = SIDEBAR_JS.read_text(encoding="utf-8")
@@ -62,6 +64,15 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         ]:
             self.assertIn(token, content)
         self.assertIn('invalidateFrontlineOverlayState,', content)
+
+    def test_controller_keeps_counter_modal_focus_return_to_toggle(self):
+        content = STRATEGIC_OVERLAY_CONTROLLER_JS.read_text(encoding="utf-8")
+
+        self.assertIn("const focusUnitCounterDetailToggle = () => {", content)
+        self.assertIn("unitCounterDetailToggleBtn.focus({ preventScroll: true });", content)
+        self.assertIn("const previousFocused = counterEditorModalPreviouslyFocused;", content)
+        self.assertIn("counterEditorModalPreviouslyFocused = null;", content)
+        self.assertIn("if (focusUnitCounterDetailToggle()) {", content)
 
     def test_controller_keeps_refresh_scopes_and_runtime_tokens(self):
         content = STRATEGIC_OVERLAY_CONTROLLER_JS.read_text(encoding="utf-8")
