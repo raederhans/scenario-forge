@@ -212,8 +212,12 @@ export function createStartupBootOverlayController() {
     document.body?.classList.toggle("app-booting", blocking);
     document.body?.classList.toggle("app-startup-readonly", !!state.startupReadonly);
     if (dom.overlay) {
-      dom.overlay.hidden = !blocking;
-      dom.overlay.classList.toggle("boot-overlay--visible", blocking);
+      // CSS `.boot-overlay` sets `display: flex`, which overrides the HTML
+      // `[hidden]` attribute's default `display: none`. The actual fade-out
+      // rule lives at `.boot-overlay.hidden { opacity: 0; visibility: hidden }`,
+      // so we must toggle the `.hidden` class — not the HTML attribute, and
+      // not a `--visible` modifier class that doesn't exist in the stylesheet.
+      dom.overlay.classList.toggle("hidden", !blocking);
     }
     if (dom.appShell) {
       dom.appShell.classList.toggle("boot-preview-visible", !!state.bootPreviewVisible);
@@ -245,8 +249,10 @@ export function createStartupBootOverlayController() {
     }
     if (dom.readonlyBanner) {
       const readonlyVisible = !!state.startupReadonly && !blocking;
+      // `.startup-readonly-banner` has no `display` override, so the HTML
+      // `[hidden]` attribute works here. The previous `--visible` class toggle
+      // targeted a CSS rule that does not exist and was dead code.
       dom.readonlyBanner.hidden = !readonlyVisible;
-      dom.readonlyBanner.classList.toggle("startup-readonly-banner--visible", readonlyVisible);
     }
     if (dom.readonlyMessage) {
       dom.readonlyMessage.textContent = getStartupReadonlyMessage();
