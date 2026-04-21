@@ -37,6 +37,9 @@ function persistEnabledFlag(nextValue) {
 }
 
 export function cloneJsonLike(value) {
+  if (value === undefined) {
+    return undefined;
+  }
   if (typeof globalThis.structuredClone === "function") {
     try {
       return globalThis.structuredClone(value);
@@ -44,7 +47,11 @@ export function cloneJsonLike(value) {
       // Fall through to JSON clone fallback.
     }
   }
-  return JSON.parse(JSON.stringify(value));
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch (_error) {
+    return undefined;
+  }
 }
 
 function cloneMetricObject(metric) {

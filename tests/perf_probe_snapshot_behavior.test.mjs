@@ -52,3 +52,27 @@ test("snapshot metrics stay isolated from external nested mutations", () => {
     globalThis.__scenarioPerfMetrics = originalScenarioPerfMetrics;
   }
 });
+
+test("snapshot returns safe empty metric objects when structuredClone is unavailable and globals are unset", () => {
+  const originalStructuredClone = globalThis.structuredClone;
+  const originalBootMetrics = globalThis.__bootMetrics;
+  const originalRenderPerfMetrics = globalThis.__renderPerfMetrics;
+  const originalScenarioPerfMetrics = globalThis.__scenarioPerfMetrics;
+
+  globalThis.structuredClone = undefined;
+  globalThis.__bootMetrics = undefined;
+  globalThis.__renderPerfMetrics = undefined;
+  globalThis.__scenarioPerfMetrics = undefined;
+
+  try {
+    const result = snapshot();
+    assert.deepEqual(result.bootMetrics, {});
+    assert.deepEqual(result.renderPerfMetrics, {});
+    assert.deepEqual(result.scenarioPerfMetrics, {});
+  } finally {
+    globalThis.structuredClone = originalStructuredClone;
+    globalThis.__bootMetrics = originalBootMetrics;
+    globalThis.__renderPerfMetrics = originalRenderPerfMetrics;
+    globalThis.__scenarioPerfMetrics = originalScenarioPerfMetrics;
+  }
+});
