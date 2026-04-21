@@ -8,7 +8,7 @@ import {
   resetZoomToFit,
   undoSpecialZoneVertex,
   zoomByStep,
-} from "../core/map_renderer.js";
+} from "../core/map_renderer/public.js";
 
 function isEditableTarget(target) {
   const node = target instanceof Element ? target : null;
@@ -313,3 +313,4 @@ function initShortcuts() {
 }
 
 export { initShortcuts };
+

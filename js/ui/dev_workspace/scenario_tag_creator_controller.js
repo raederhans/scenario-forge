@@ -3,7 +3,7 @@ import {
   clearDevSelection,
   refreshResolvedColorsForFeatures,
   scheduleDynamicBorderRecompute,
-} from "../../core/map_renderer.js";
+} from "../../core/map_renderer/public.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "../../core/scenario_owner_metrics.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { applyOwnerControllerAssignmentsToFeatureIds } from "../../core/scenario_ownership_editor.js";
@@ -1231,3 +1231,4 @@ export function createScenarioTagCreatorController({
     render,
   };
 }
+

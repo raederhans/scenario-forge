@@ -30,7 +30,7 @@ import {
   selectSpecialZoneById,
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
-} from "../core/map_renderer.js";
+} from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import {
   buildPaletteQuickSwatches,
@@ -3382,3 +3382,4 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar, resolveExportPassSequence };
+

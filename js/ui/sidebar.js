@@ -36,7 +36,7 @@ import {
   updateSelectedOperationGraphic,
   updateSelectedOperationalLine,
   updateSelectedUnitCounter,
-} from "../core/map_renderer.js";
+} from "../core/map_renderer/public.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { canUndoHistory, captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
@@ -5529,3 +5529,4 @@ function initSidebar({ render } = {}) {
 }
 
 export { initSidebar };
+

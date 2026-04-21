@@ -245,14 +245,19 @@ async function runPostScenarioApplyEffects({
   renderNow = false,
   suppressRender = false,
 } = {}) {
+  const useSingleFinalRender = !!renderNow && !suppressRender;
   refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${scenarioId}` });
   let scenarioMapRefreshMode = "light";
   try {
-    refreshMapDataForScenarioApply({ suppressRender });
+    refreshMapDataForScenarioApply({ suppressRender: useSingleFinalRender ? true : suppressRender });
   } catch (refreshError) {
     scenarioMapRefreshMode = "setMapData-fallback";
     console.warn("[scenario] Lightweight scenario apply refresh failed; falling back to setMapData.", refreshError);
-    setMapData({ refitProjection: false, resetZoom: false, suppressRender });
+    setMapData({
+      refitProjection: false,
+      resetZoom: false,
+      suppressRender: useSingleFinalRender ? true : suppressRender,
+    });
   }
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
@@ -268,7 +273,7 @@ async function runPostScenarioApplyEffects({
     showWarningToast: true,
     showErrorToast: true,
   });
-  syncCountryUi({ renderNow: renderNow && !suppressRender });
+  syncCountryUi({ renderNow: useSingleFinalRender ? true : (renderNow && !suppressRender) });
   return {
     dataHealth,
     scenarioMapRefreshMode,

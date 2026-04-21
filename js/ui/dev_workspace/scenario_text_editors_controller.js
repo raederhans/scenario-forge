@@ -1,5 +1,5 @@
 import { state } from "../../core/state.js";
-import { getEffectiveCityCollection } from "../../core/map_renderer.js";
+import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
 import { syncScenarioLocalizationState } from "../../core/scenario_localization_state.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
 import { t } from "../i18n.js";
@@ -1019,3 +1019,4 @@ export function createScenarioTextEditorsController({
     render,
   };
 }
+

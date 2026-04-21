@@ -1099,3 +1099,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 145. Playwright 遇到 hidden overlay 拦截点击时，优先走 DOM 侧 value+event 驱动
 - 这次 `frontlineEnabledToggle` 的真实问题不是控件不可见，而是 hidden boot overlay 仍在命中 pointer interception。
 - 更稳的最短路径是：对 checkbox/select 这类控件直接在页面里写值并派发 `input/change`，避免把测试稳定性绑在层叠点击命中上。
+
+### 146. 运行态 server metadata 字段要兼容 `url` 和 `base_url`，否则工具会误判“服务未启动”
+- 这次 baseline 脚本最开始只读 `base_url`，而 `.runtime/dev/active_server.json` 当前字段是 `url`，导致脚本一直轮询超时。
+- 更稳的做法是工具层统一兼容两个字段，并在探活失败时再启动新 server。
+
+### 147. perf 采样脚本的 ready 条件要直接绑定核心 state，不要直接复用更严格的 UI e2e gate
+- 这次直接复用 `waitForAppInteractive` 会被 UI 层细节卡住，出现 `bootPhase=ready` 仍被判定超时。
+- 更稳的做法是 perf 脚本只使用 `bootPhase/bootBlocking/scenarioApplyInFlight/startupReadonlyUnlockInFlight` 这组核心条件，并在超时时回传状态快照。

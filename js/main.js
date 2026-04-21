@@ -20,7 +20,7 @@ import {
   invalidateContextLayerVisualStateBatch,
   setMapData,
   render,
-} from "./core/map_renderer.js";
+} from "./core/map_renderer/public.js";
 import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
 import { initPresetState } from "./core/preset_state.js";
 import { initTranslations } from "./ui/i18n.js";
@@ -800,3 +800,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+

@@ -8,7 +8,7 @@ import {
   clearDevSelection,
   removeLastDevSelection,
   toggleFeatureInDevSelection,
-} from "../core/map_renderer.js";
+} from "../core/map_renderer/public.js";
 import { getFeatureOwnerCode, markLegacyColorStateDirty } from "../core/sovereignty_manager.js";
 import {
   filterEditableOwnershipFeatureIds,
@@ -1183,3 +1183,4 @@ function initDevWorkspace() {
 }
 
 export { getScenarioGeoLocaleEntry, initDevWorkspace };
+

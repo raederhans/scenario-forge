@@ -1,5 +1,5 @@
 import { state } from "../../core/state.js";
-import { rebuildStaticMeshes } from "../../core/map_renderer.js";
+import { rebuildStaticMeshes } from "../../core/map_renderer/public.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
   getScenarioDistrictTagRecord,
@@ -1131,3 +1131,4 @@ export function createDistrictEditorController({
     bindEvents,
   };
 }
+

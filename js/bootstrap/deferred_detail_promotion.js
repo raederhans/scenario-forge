@@ -2,7 +2,7 @@ import { loadDeferredDetailBundle } from "../core/data_loader.js";
 import { refreshScenarioDataHealth } from "../core/scenario_data_health.js";
 import {
   buildInteractionInfrastructureAfterStartup,
-} from "../core/map_renderer.js";
+} from "../core/map_renderer/public.js";
 import {
   refreshMapDataForScenarioApply,
   setMapData,
@@ -455,3 +455,4 @@ export function createDeferredDetailPromotionOwner({
     unlockStartupReadonlyWithDetail,
   };
 }
+

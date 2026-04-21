@@ -49,6 +49,7 @@ import {
 } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { markDirty } from "./dirty_state.js";
+import { perfIsEnabled, recordRenderSample } from "./perf_probe.js";
 import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
 import {
   ensureSovereigntyState,
@@ -4472,6 +4473,7 @@ function buildInteractiveLandData(fullCollection) {
 }
 
 function rebuildPoliticalLandCollections() {
+  const startedAt = nowMs();
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
   const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
@@ -4507,6 +4509,10 @@ function rebuildPoliticalLandCollections() {
     );
   }
 
+  recordRenderPerfMetric("rebuildPoliticalLandCollections", nowMs() - startedAt, {
+    fullFeatureCount: fullCount,
+    interactiveFeatureCount: interactiveCount,
+  });
   return { fullCollection, interactiveCollection };
 }
 
@@ -4986,19 +4992,45 @@ function getResolvedFeatureColor(feature, id) {
   );
 }
 
+function syncPlainObjectMirror(targetValue, sourceValue) {
+  const source = sourceValue && typeof sourceValue === "object" ? sourceValue : {};
+  const target = targetValue && typeof targetValue === "object" ? targetValue : {};
+  const sourceKeys = new Set(Object.keys(source));
+  Object.keys(target).forEach((key) => {
+    if (!sourceKeys.has(key)) {
+      delete target[key];
+    }
+  });
+  sourceKeys.forEach((key) => {
+    const nextValue = source[key];
+    if (target[key] !== nextValue) {
+      target[key] = nextValue;
+    }
+  });
+  return target;
+}
+
+function syncResolvedColorMirrors() {
+  state.countryBaseColors = syncPlainObjectMirror(state.countryBaseColors, state.sovereignBaseColors);
+  state.featureOverrides = syncPlainObjectMirror(state.featureOverrides, state.visualOverrides);
+}
+
 function rebuildResolvedColors() {
+  const startedAt = nowMs();
   migrateLegacyColorState();
   ensureSovereigntyState();
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.featureOverrides = { ...state.visualOverrides };
+  syncResolvedColorMirrors();
 
   const nextColors = {};
   if (!state.landData?.features?.length) {
     state.colors = nextColors;
+    recordRenderPerfMetric("rebuildResolvedColors", nowMs() - startedAt, {
+      featureCount: 0,
+    });
     return nextColors;
   }
 
@@ -5016,6 +5048,9 @@ function rebuildResolvedColors() {
   state.colors = nextColors;
   state.colorRevision = Number(state.colorRevision || 0) + 1;
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
+  recordRenderPerfMetric("rebuildResolvedColors", nowMs() - startedAt, {
+    featureCount: Object.keys(nextColors).length,
+  });
   return nextColors;
 }
 
@@ -5060,10 +5095,15 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
 }
 
 function refreshColorState({ renderNow = true } = {}) {
+  const startedAt = nowMs();
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   rebuildResolvedColors();
   invalidateRenderPasses("contextScenario", "refresh-colors");
+  recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
+    renderNow: !!renderNow,
+    featureCount: Object.keys(state.colors || {}).length,
+  });
   if (renderNow && context) {
     render();
   }
@@ -6872,8 +6912,12 @@ function rebuildStaticMeshes() {
 }
 
 function invalidateBorderCache() {
+  const startedAt = nowMs();
   rebuildDynamicBorders();
   invalidateRenderPasses("borders", "border-cache");
+  recordRenderPerfMetric("invalidateBorderCache", nowMs() - startedAt, {
+    dynamicBorderCount: Array.isArray(state.dynamicBorderFeatures) ? state.dynamicBorderFeatures.length : 0,
+  });
 }
 
 function createHitResult(overrides = {}) {
@@ -8012,8 +8056,7 @@ function rebuildRuntimeDerivedState({
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.featureOverrides = { ...state.visualOverrides };
+  syncResolvedColorMirrors();
 
   clearProjectedBoundsCache();
   const projectedBoundsCache = ensureProjectedBoundsCache();
@@ -19238,6 +19281,7 @@ function updatePerfOverlay() {
 }
 
 function render() {
+  const startedAt = perfIsEnabled() ? nowMs() : 0;
   drawCanvas();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
@@ -19257,6 +19301,12 @@ function render() {
     }
   }
   updatePerfOverlay();
+  if (startedAt > 0) {
+    recordRenderSample(nowMs() - startedAt, {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      phase: String(state.renderPhase || ""),
+    });
+  }
 }
 
 function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = null } = {}) {

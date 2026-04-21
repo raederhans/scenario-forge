@@ -361,12 +361,14 @@ export function createStartupBootOverlayController() {
         startedAt: nowMs(),
       },
     };
+    globalThis.__bootMetrics = state.bootMetrics;
   };
 
   const startBootMetric = (name) => {
     state.bootMetrics[name] = {
       startedAt: nowMs(),
     };
+    globalThis.__bootMetrics = state.bootMetrics;
   };
 
   const finishBootMetric = (name, extra = {}) => {
@@ -379,6 +381,7 @@ export function createStartupBootOverlayController() {
       finishedAt,
       durationMs: Number.isFinite(startedAt) ? finishedAt - startedAt : null,
     };
+    globalThis.__bootMetrics = state.bootMetrics;
   };
 
   const checkpointBootMetric = (name) => {
@@ -388,6 +391,7 @@ export function createStartupBootOverlayController() {
       ...metric,
       atMs: Number.isFinite(totalStartedAt) ? nowMs() - totalStartedAt : 0,
     };
+    globalThis.__bootMetrics = state.bootMetrics;
     return state.bootMetrics[name];
   };
 
