@@ -36,12 +36,32 @@ function persistEnabledFlag(nextValue) {
   }
 }
 
+export function cloneJsonLike(value) {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof globalThis.structuredClone === "function") {
+    try {
+      return globalThis.structuredClone(value);
+    } catch (_error) {
+      // Fall through to JSON clone fallback.
+    }
+  }
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch (_error) {
+    return undefined;
+  }
+}
+
 function cloneMetricObject(metric) {
-  return metric && typeof metric === "object" ? { ...metric } : {};
+  const clonedMetric = cloneJsonLike(metric);
+  return clonedMetric && typeof clonedMetric === "object" ? clonedMetric : {};
 }
 
 function cloneRenderSamples() {
-  return renderSamples.map((sample) => ({ ...sample }));
+  const clonedSamples = cloneJsonLike(renderSamples);
+  return Array.isArray(clonedSamples) ? clonedSamples : [];
 }
 
 function buildRenderSampleSummary() {
