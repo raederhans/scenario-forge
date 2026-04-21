@@ -254,7 +254,14 @@ export function createStrategicOverlayController({
     if (unitCounterDetailToggleBtn.tabIndex < 0) {
       return false;
     }
-    if (unitCounterDetailToggleBtn.offsetParent === null) {
+    const isVisible = typeof unitCounterDetailToggleBtn.checkVisibility === "function"
+      ? unitCounterDetailToggleBtn.checkVisibility({
+        visibilityProperty: true,
+        opacityProperty: true,
+        contentVisibilityAuto: true,
+      })
+      : !unitCounterDetailToggleBtn.hidden && unitCounterDetailToggleBtn.getAttribute("aria-hidden") !== "true";
+    if (!isVisible) {
       return false;
     }
     unitCounterDetailToggleBtn.focus({ preventScroll: true });
