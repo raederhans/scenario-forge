@@ -36,12 +36,25 @@ function persistEnabledFlag(nextValue) {
   }
 }
 
+export function cloneJsonLike(value) {
+  if (typeof globalThis.structuredClone === "function") {
+    try {
+      return globalThis.structuredClone(value);
+    } catch (_error) {
+      // Fall through to JSON clone fallback.
+    }
+  }
+  return JSON.parse(JSON.stringify(value));
+}
+
 function cloneMetricObject(metric) {
-  return metric && typeof metric === "object" ? { ...metric } : {};
+  const clonedMetric = cloneJsonLike(metric);
+  return clonedMetric && typeof clonedMetric === "object" ? clonedMetric : {};
 }
 
 function cloneRenderSamples() {
-  return renderSamples.map((sample) => ({ ...sample }));
+  const clonedSamples = cloneJsonLike(renderSamples);
+  return Array.isArray(clonedSamples) ? clonedSamples : [];
 }
 
 function buildRenderSampleSummary() {
