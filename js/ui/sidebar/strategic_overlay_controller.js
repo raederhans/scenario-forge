@@ -248,8 +248,24 @@ export function createStrategicOverlayController({
     if (!document.contains(unitCounterDetailToggleBtn)) {
       return false;
     }
+    if (unitCounterDetailToggleBtn.disabled) {
+      return false;
+    }
+    if (unitCounterDetailToggleBtn.tabIndex < 0) {
+      return false;
+    }
+    const isVisible = typeof unitCounterDetailToggleBtn.checkVisibility === "function"
+      ? unitCounterDetailToggleBtn.checkVisibility({
+        visibilityProperty: true,
+        opacityProperty: true,
+        contentVisibilityAuto: true,
+      })
+      : !unitCounterDetailToggleBtn.hidden && unitCounterDetailToggleBtn.getAttribute("aria-hidden") !== "true";
+    if (!isVisible) {
+      return false;
+    }
     unitCounterDetailToggleBtn.focus({ preventScroll: true });
-    return true;
+    return document.activeElement === unitCounterDetailToggleBtn;
   };
   const setCounterEditorModalState = (nextOpen, { restoreFocus = true } = {}) => {
     ensureStrategicOverlayUiState();

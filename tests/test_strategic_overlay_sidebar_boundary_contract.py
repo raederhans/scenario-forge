@@ -70,6 +70,7 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("const focusUnitCounterDetailToggle = () => {", content)
         self.assertIn("unitCounterDetailToggleBtn.focus({ preventScroll: true });", content)
+        self.assertIn("return document.activeElement === unitCounterDetailToggleBtn;", content)
         self.assertIn("const previousFocused = counterEditorModalPreviouslyFocused;", content)
         self.assertIn("counterEditorModalPreviouslyFocused = null;", content)
         self.assertIn("if (focusUnitCounterDetailToggle()) {", content)
