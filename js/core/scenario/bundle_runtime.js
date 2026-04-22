@@ -41,7 +41,6 @@ function createScenarioBundleRuntimeController({
     targetId,
     requestedBundleLevel,
     currentLanguage,
-    scenarioRegistryVersion,
     runtimeShellVersion,
   }) {
     const normalizedLanguage = normalizeScenarioLanguage(currentLanguage);
@@ -49,7 +48,6 @@ function createScenarioBundleRuntimeController({
       `scenario=${normalizeBundleLoadKeyPart(targetId)}`,
       `level=${normalizeBundleLoadKeyPart(requestedBundleLevel, "full")}`,
       `language=${normalizeBundleLoadKeyPart(normalizedLanguage, "en")}`,
-      `registry=${normalizeBundleLoadKeyPart(scenarioRegistryVersion, "1")}`,
       `runtime_shell=${normalizeBundleLoadKeyPart(runtimeShellVersion, "1")}`,
     ].join("|");
   }
@@ -274,7 +272,6 @@ function createScenarioBundleRuntimeController({
       targetId,
       requestedBundleLevel,
       currentLanguage: state.currentLanguage,
-      scenarioRegistryVersion: state.scenarioRegistry?.version,
       runtimeShellVersion: state.scenarioRuntimeShellVersion,
     });
     const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;

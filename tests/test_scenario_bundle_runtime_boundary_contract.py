@@ -23,7 +23,6 @@ class ScenarioBundleRuntimeBoundaryContractTest(unittest.TestCase):
         self.assertIn('`language=${normalizeBundleLoadKeyPart(normalizedLanguage, "en")}`', runtime_content)
         self.assertIn("const bundleLoadKey = buildBundleLoadKey({", runtime_content)
         self.assertIn("currentLanguage: state.currentLanguage,", runtime_content)
-        self.assertIn("scenarioRegistryVersion: state.scenarioRegistry?.version,", runtime_content)
         self.assertIn("runtimeShellVersion: state.scenarioRuntimeShellVersion,", runtime_content)
         self.assertIn("if (!forceReload && bundleLoadPromisesByKey.has(bundleLoadKey)) {", runtime_content)
         self.assertIn("bundleLoadPromisesByKey.set(bundleLoadKey, loadPromise);", runtime_content)
