@@ -837,6 +837,7 @@ const {
   STARTUP_CACHE_KINDS,
   normalizeScenarioId,
   normalizeScenarioBundleLevel,
+  normalizeScenarioLanguage,
   scenarioBundleSatisfiesLevel,
   scenarioBundleUsesChunkedLayer,
   scenarioSupportsChunkedRuntime,
