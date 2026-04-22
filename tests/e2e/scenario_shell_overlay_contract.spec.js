@@ -95,7 +95,7 @@ async function readPostBootstrapUiSnapshot(page) {
     const { state } = await import("/js/core/state.js");
     const scenarioSelect = document.querySelector("#scenarioSelect");
     const themeSelect = document.querySelector("#themeSelect");
-    const countryRows = document.querySelectorAll("#countryList .inspector-item-btn").length;
+    const countryRows = document.querySelectorAll("#countryList .country-select-main-btn").length;
     const specialRegionRows = document.querySelectorAll("#specialRegionList .inspector-item-btn").length;
     return {
       activeScenarioId: String(state.activeScenarioId || ""),
