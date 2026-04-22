@@ -15,6 +15,7 @@ import {
 } from "./scenario_resources.js";
 import { refreshScenarioShellOverlays } from "./scenario_shell_overlay.js";
 import { syncCountryUi } from "./scenario_ui_sync.js";
+import { requestRender } from "./render_boundary.js";
 
 function runPaletteAndToolbarRefreshCallbacks() {
   if (typeof state.renderPaletteFn === "function") {
@@ -285,10 +286,15 @@ function runPostScenarioResetEffects({
   scenarioId = "",
   renderNow = false,
 } = {}) {
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-reset-opening:${scenarioId}` });
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario-reset:${scenarioId}` });
-  refreshScenarioDataHealth({ showWarningToast: false });
-  syncCountryUi({ renderNow });
+  scheduleAfterFirstFrame(() => {
+    refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-reset-opening:${scenarioId}` });
+    refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario-reset:${scenarioId}` });
+    refreshScenarioDataHealth({ showWarningToast: false });
+    syncCountryUi({ renderNow });
+    if (!renderNow) {
+      requestRender(`scenario-reset-post-frame:${scenarioId}`);
+    }
+  });
 }
 
 function runPostScenarioClearEffects({ renderNow = false } = {}) {

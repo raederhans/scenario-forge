@@ -33,6 +33,8 @@ function createScenarioBundleRuntimeController({
   assembleScenarioBundle,
   scheduleScenarioDeferredBundleMetadataLoad,
 } = {}) {
+  const bundleLoadPromisesByKey = new Map();
+
   async function tryLoadBootstrapBundleFromPersistentCache({
     d3Client,
     targetId,
@@ -249,6 +251,7 @@ function createScenarioBundleRuntimeController({
     if (!targetId) {
       throw new Error("Scenario id is required.");
     }
+    const bundleLoadKey = `${targetId}:${requestedBundleLevel}`;
     const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
     if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
       if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioBundleUsesChunkedLayer(cachedBundle)) {
@@ -266,142 +269,157 @@ function createScenarioBundleRuntimeController({
       );
       return cachedBundle;
     }
-    await loadScenarioRegistry({ d3Client });
-    const meta = getScenarioMetaById(targetId);
-    if (!meta?.manifest_url) {
-      throw new Error(`Unknown scenario id: ${targetId}`);
+    if (!forceReload && bundleLoadPromisesByKey.has(bundleLoadKey)) {
+      return bundleLoadPromisesByKey.get(bundleLoadKey);
     }
-    if (!d3Client || typeof d3Client.json !== "function") {
-      throw new Error("d3.json is not available for scenario loading.");
-    }
-    const manifestResult = await loadScenarioJsonResourceWithTimeout(d3Client, meta.manifest_url, {
-      scenarioId: targetId,
-      resourceLabel: "manifest",
-    });
-    const manifest = manifestResult.payload;
-    const priorBundle = !forceReload && cachedBundle ? cachedBundle : null;
-    const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
-    const runtimeShell = normalizeScenarioRuntimeShell(manifest);
-    const runtimeTopologyUrl = String(
-      requestedBundleLevel === "bootstrap"
-        ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
-        : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
-    ).trim();
-    const scenarioBootstrapCoreCacheKey =
-      requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
-        ? createStartupScenarioBootstrapCoreCacheKey({
-          scenarioRegistry: state.scenarioRegistry,
-          scenarioId: targetId,
-          bundleLevel: requestedBundleLevel,
-          manifest,
-          runtimeBootstrapTopologyUrl: runtimeTopologyUrl,
-        })
-        : "";
-    const scenarioBootstrapLocaleCacheKey =
-      requestedBundleLevel === "bootstrap" && isStartupCacheEnabled() && geoLocalePatchDescriptor.url
-        ? createStartupScenarioBootstrapLocaleCacheKey({
-          scenarioRegistry: state.scenarioRegistry,
-          scenarioId: targetId,
-          bundleLevel: requestedBundleLevel,
-          manifest,
-          currentLanguage: state.currentLanguage,
-          geoLocalePatchUrl: geoLocalePatchDescriptor.url,
-        })
-        : "";
-    if (requestedBundleLevel === "bootstrap" && state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
-      state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled";
-    }
-    const cachedBootstrapBundle = await tryLoadBootstrapBundleFromPersistentCache({
-      d3Client,
-      targetId,
-      requestedBundleLevel,
-      priorBundle,
-      meta,
-      manifest,
-      runtimeShell,
-      runtimeTopologyUrl,
-      geoLocalePatchDescriptor,
-      scenarioBootstrapCoreCacheKey,
-      scenarioBootstrapLocaleCacheKey,
-      loadStartedAt,
-    });
-    if (cachedBootstrapBundle) {
-      return cachedBootstrapBundle;
-    }
-    const {
-      bundle,
-      countriesResult,
-      ownersResult,
-      controllersResult,
-      coresResult,
-      runtimeTopologyResult,
-      geoLocalePatchResult,
-      ownerCount,
-      controllerCount,
-      countryCount,
-    } = await assembleScenarioBundle({
-      d3Client,
-      targetId,
-      requestedBundleLevel,
-      meta,
-      manifest,
-      priorBundle,
-      runtimeShell,
-      runtimeTopologyUrl,
-      geoLocalePatchDescriptor,
-    });
-    void countriesResult;
-    void ownersResult;
-    void controllersResult;
-    void coresResult;
-    bundle.loadDiagnostics.requiredResources.manifest = manifestResult.metrics || null;
-    if (requestedBundleLevel === "full") {
-      if (scenarioSupportsChunkedRuntime(bundle)) {
-        await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+    const loadPromise = (async () => {
+      await loadScenarioRegistry({ d3Client });
+      const meta = getScenarioMetaById(targetId);
+      if (!meta?.manifest_url) {
+        throw new Error(`Unknown scenario id: ${targetId}`);
       }
-      scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client });
+      if (!d3Client || typeof d3Client.json !== "function") {
+        throw new Error("d3.json is not available for scenario loading.");
+      }
+      const manifestResult = await loadScenarioJsonResourceWithTimeout(d3Client, meta.manifest_url, {
+        scenarioId: targetId,
+        resourceLabel: "manifest",
+      });
+      const manifest = manifestResult.payload;
+      const priorBundle = !forceReload && cachedBundle ? cachedBundle : null;
+      const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
+      const runtimeShell = normalizeScenarioRuntimeShell(manifest);
+      const runtimeTopologyUrl = String(
+        requestedBundleLevel === "bootstrap"
+          ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
+          : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
+      ).trim();
+      const scenarioBootstrapCoreCacheKey =
+        requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
+          ? createStartupScenarioBootstrapCoreCacheKey({
+            scenarioRegistry: state.scenarioRegistry,
+            scenarioId: targetId,
+            bundleLevel: requestedBundleLevel,
+            manifest,
+            runtimeBootstrapTopologyUrl: runtimeTopologyUrl,
+          })
+          : "";
+      const scenarioBootstrapLocaleCacheKey =
+        requestedBundleLevel === "bootstrap" && isStartupCacheEnabled() && geoLocalePatchDescriptor.url
+          ? createStartupScenarioBootstrapLocaleCacheKey({
+            scenarioRegistry: state.scenarioRegistry,
+            scenarioId: targetId,
+            bundleLevel: requestedBundleLevel,
+            manifest,
+            currentLanguage: state.currentLanguage,
+            geoLocalePatchUrl: geoLocalePatchDescriptor.url,
+          })
+          : "";
+      if (requestedBundleLevel === "bootstrap" && state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled";
+      }
+      const cachedBootstrapBundle = await tryLoadBootstrapBundleFromPersistentCache({
+        d3Client,
+        targetId,
+        requestedBundleLevel,
+        priorBundle,
+        meta,
+        manifest,
+        runtimeShell,
+        runtimeTopologyUrl,
+        geoLocalePatchDescriptor,
+        scenarioBootstrapCoreCacheKey,
+        scenarioBootstrapLocaleCacheKey,
+        loadStartedAt,
+      });
+      if (cachedBootstrapBundle) {
+        return cachedBootstrapBundle;
+      }
+      const {
+        bundle,
+        countriesResult,
+        ownersResult,
+        controllersResult,
+        coresResult,
+        runtimeTopologyResult,
+        geoLocalePatchResult,
+        ownerCount,
+        controllerCount,
+        countryCount,
+      } = await assembleScenarioBundle({
+        d3Client,
+        targetId,
+        requestedBundleLevel,
+        meta,
+        manifest,
+        priorBundle,
+        runtimeShell,
+        runtimeTopologyUrl,
+        geoLocalePatchDescriptor,
+      });
+      void countriesResult;
+      void ownersResult;
+      void controllersResult;
+      void coresResult;
+      bundle.loadDiagnostics.requiredResources.manifest = manifestResult.metrics || null;
+      if (requestedBundleLevel === "full") {
+        if (scenarioSupportsChunkedRuntime(bundle)) {
+          await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+        }
+        scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client });
+      }
+      const runtimeTopologyEquivalentMs =
+        Number(runtimeTopologyResult.metrics?.totalMs || runtimeTopologyResult.metrics?.durationMs || 0)
+        + Number(bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.totalMs || bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.durationMs || 0)
+        + Number(bundle.chunkRegistryLoadMetrics?.runtimeMeta?.totalMs || bundle.chunkRegistryLoadMetrics?.runtimeMeta?.durationMs || 0)
+        + Number(bundle.chunkRegistryLoadMetrics?.meshPack?.totalMs || bundle.chunkRegistryLoadMetrics?.meshPack?.durationMs || 0);
+      console.log(
+        `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
+      );
+      state.scenarioBundleCacheById[targetId] = bundle;
+      queueBootstrapBundleCacheWrite({
+        targetId,
+        requestedBundleLevel,
+        manifest,
+        bundle,
+        scenarioBootstrapCoreCacheKey,
+        scenarioBootstrapLocaleCacheKey,
+      });
+      recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
+        scenarioId: targetId,
+        cacheHit: false,
+        bundleLevel: requestedBundleLevel,
+        countryCount,
+        ownerCount,
+        controllerCount,
+        workerDecodeMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalTopology?.totalMs || 0),
+        workerMetaBuildMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalMeta?.buildMs || 0),
+        runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
+        resourceMetrics: {
+          manifest: manifestResult.metrics || null,
+          runtimeTopology: runtimeTopologyResult.metrics || null,
+          geoLocalePatch: geoLocalePatchResult.metrics || null,
+          chunkRegistry: bundle.chunkRegistryLoadMetrics || null,
+        },
+      });
+      recordScenarioPerfMetric("runtimeTopologyEquivalent", runtimeTopologyEquivalentMs, {
+        scenarioId: targetId,
+        bundleLevel: requestedBundleLevel,
+        runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
+        hasChunkedRuntime: scenarioBundleHasChunkedData(bundle),
+      });
+      return bundle;
+    })();
+    if (!forceReload) {
+      bundleLoadPromisesByKey.set(bundleLoadKey, loadPromise);
     }
-    const runtimeTopologyEquivalentMs =
-      Number(runtimeTopologyResult.metrics?.totalMs || runtimeTopologyResult.metrics?.durationMs || 0)
-      + Number(bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.totalMs || bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.durationMs || 0)
-      + Number(bundle.chunkRegistryLoadMetrics?.runtimeMeta?.totalMs || bundle.chunkRegistryLoadMetrics?.runtimeMeta?.durationMs || 0)
-      + Number(bundle.chunkRegistryLoadMetrics?.meshPack?.totalMs || bundle.chunkRegistryLoadMetrics?.meshPack?.durationMs || 0);
-    console.log(
-      `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
-    );
-    state.scenarioBundleCacheById[targetId] = bundle;
-    queueBootstrapBundleCacheWrite({
-      targetId,
-      requestedBundleLevel,
-      manifest,
-      bundle,
-      scenarioBootstrapCoreCacheKey,
-      scenarioBootstrapLocaleCacheKey,
-    });
-    recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
-      scenarioId: targetId,
-      cacheHit: false,
-      bundleLevel: requestedBundleLevel,
-      countryCount,
-      ownerCount,
-      controllerCount,
-      workerDecodeMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalTopology?.totalMs || 0),
-      workerMetaBuildMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalMeta?.buildMs || 0),
-      runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
-      resourceMetrics: {
-        manifest: manifestResult.metrics || null,
-        runtimeTopology: runtimeTopologyResult.metrics || null,
-        geoLocalePatch: geoLocalePatchResult.metrics || null,
-        chunkRegistry: bundle.chunkRegistryLoadMetrics || null,
-      },
-    });
-    recordScenarioPerfMetric("runtimeTopologyEquivalent", runtimeTopologyEquivalentMs, {
-      scenarioId: targetId,
-      bundleLevel: requestedBundleLevel,
-      runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
-      hasChunkedRuntime: scenarioBundleHasChunkedData(bundle),
-    });
-    return bundle;
+    try {
+      return await loadPromise;
+    } finally {
+      if (!forceReload) {
+        bundleLoadPromisesByKey.delete(bundleLoadKey);
+      }
+    }
   }
 
   return {

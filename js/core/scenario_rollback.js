@@ -17,6 +17,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "activeScenarioManifest",
   "scenarioCountriesByTag",
   "scenarioFixedOwnerColors",
+  "activeScenarioMeshPack",
   "defaultRuntimePoliticalTopology",
   "scenarioRuntimeTopologyData",
   "scenarioLandMaskData",
@@ -85,6 +86,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "scenarioPoliticalChunkData",
   "activeScenarioChunks",
   "runtimeChunkLoadState",
+  "scheduleScenarioChunkRefreshEnabled",
   "renderProfile",
   "dynamicBordersEnabled",
   "showCityPoints",
@@ -126,6 +128,7 @@ function captureScenarioRuntimeSnapshot() {
     activeScenarioManifest: cloneScenarioStateValue(state.activeScenarioManifest),
     scenarioCountriesByTag: cloneScenarioStateValue(state.scenarioCountriesByTag),
     scenarioFixedOwnerColors: cloneScenarioStateValue(state.scenarioFixedOwnerColors),
+    activeScenarioMeshPack: cloneScenarioStateValue(state.activeScenarioMeshPack),
     defaultRuntimePoliticalTopology: cloneScenarioStateValue(state.defaultRuntimePoliticalTopology),
     scenarioRuntimeTopologyData: cloneScenarioStateValue(state.scenarioRuntimeTopologyData),
     scenarioLandMaskData: cloneScenarioStateValue(state.scenarioLandMaskData),
@@ -177,6 +180,7 @@ function captureScenarioRuntimeSnapshot() {
       ...(state.runtimeChunkLoadState || {}),
       refreshTimerId: null,
     }),
+    scheduleScenarioChunkRefreshEnabled: state.scheduleScenarioChunkRefreshFn === scheduleScenarioChunkRefresh,
     renderProfile: String(state.renderProfile || "auto"),
     dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
     showCityPoints: state.showCityPoints !== false,
@@ -247,6 +251,7 @@ function restoreScenarioRuntimeSnapshot(snapshot) {
   state.activeScenarioManifest = cloneScenarioStateValue(snapshot.activeScenarioManifest);
   state.scenarioCountriesByTag = cloneScenarioStateValue(snapshot.scenarioCountriesByTag);
   state.scenarioFixedOwnerColors = cloneScenarioStateValue(snapshot.scenarioFixedOwnerColors);
+  state.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);
   state.defaultRuntimePoliticalTopology = cloneScenarioStateValue(snapshot.defaultRuntimePoliticalTopology);
   state.scenarioRuntimeTopologyData = cloneScenarioStateValue(snapshot.scenarioRuntimeTopologyData);
   state.scenarioLandMaskData = cloneScenarioStateValue(snapshot.scenarioLandMaskData);
@@ -299,6 +304,7 @@ function restoreScenarioRuntimeSnapshot(snapshot) {
     cloneScenarioStateValue(snapshot.activeScenarioChunks) || createDefaultActiveScenarioChunksState();
   state.runtimeChunkLoadState =
     cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || createDefaultRuntimeChunkLoadState();
+  state.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;
   state.renderProfile = String(snapshot.renderProfile || "auto");
   state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
   state.showCityPoints = snapshot.showCityPoints !== false;
@@ -376,7 +382,6 @@ export function restoreScenarioApplyRollbackSnapshot(
   restoreScenarioRuntimeSnapshot(snapshot);
   restoreScenarioPresentationSnapshot(snapshot);
   restoreScenarioPaletteSnapshot(snapshot);
-  state.scheduleScenarioChunkRefreshFn = snapshot.activeScenarioId ? scheduleScenarioChunkRefresh : null;
   syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
   return true;
 }

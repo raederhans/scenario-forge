@@ -1141,3 +1141,23 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 - 这次 `scenario_apply_concurrency.spec.js` 和 `scenario_shell_overlay_contract.spec.js` 一开始看起来像 apply 事务坏了，继续拆后才发现 contract、node 行为、`scenario_apply_resilience.spec.js` 都是绿的，红灯集中在 Playwright 下的资源加载超时和控制面操作路径。
 - 更稳的最短路径是：先用 command-driven repro 确认 `applyScenarioByIdCommand` 是否真能走通，再单独判断是资源层 timeout、UI 控件路径，还是 shell overlay 合同本身。
 - 这样不会把场景资源慢路径、UI click flaky、状态 accessor 回归混成一个问题一起追。
+
+### 155. scenario rollback snapshot 要覆盖资源 owner 和 capability，不能只回滚 id 与 assignment map
+- 这次 `scenario_rollback.js` 漏掉了 `activeScenarioMeshPack` 和 chunk refresh capability，导致 apply 失败后 active scenario 能回去，mesh/runtime capability 还停在失败场景。
+- 更稳的最短路径是：rollback snapshot 把“资源 owner + capability flag”一起带上，恢复时按快照写回，不再用 `activeScenarioId` 猜能力。
+
+### 156. same-scenario early return 要看 cached bundle 的完整就绪条件，不要只看 active id 和几张 map
+- 这次 `scenario_manager.js` 的 same-scenario early return 只看 active id、full cache 和几张 shell/baseline map，startup 或恢复后的半成品状态会被误判成“可复用”。
+- 更稳的最短路径是：同时校验 cached manifest id、active manifest id、baseline hash、split 场景 shell readiness，以及 `mesh_pack_url` 对应的 `activeScenarioMeshPack`。
+
+### 157. scenario single-flight 的 promise 要先建立，再同步 UI
+- 这次并发 apply 卡住，真正的风险点在 `state.scenarioApplyInFlight = true` 和 `activeScenarioApplyPromise = ...` 中间还插了 `syncScenarioUi()`。
+- 更稳的最短路径是：先把共享 promise 建好，再让 UI 看到 in-flight 状态，这样任何重入路径都只能复用同一个 promise。
+
+### 158. bundle load 也需要按 scenarioId + bundleLevel 做 in-flight 复用
+- 这次 `applyScenarioById()` 已经有 single-flight，但 `loadScenarioBundle()` 自己没有同键复用，遇到重入或边缘重排时，bundle 层仍可能被重复启动。
+- 更稳的最短路径是：在 bundle runtime controller 里按 `scenarioId + bundleLevel` 建 promise map，加载结束后统一清理。
+
+### 159. 延迟到下一帧的 reset 后处理要自己补 render
+- 这次把 reset 的 shell/opening-owner/UI 刷新延到帧后，标准 reset 按钮路径就会先完成 dispatcher 的 render，再落地副作用，屏幕上留下陈旧 overlay。
+- 更稳的最短路径是：保留帧后执行，但在副作用落地后显式 `requestRender()`，让同一轮用户路径一定看到更新后的边界和 overlay。

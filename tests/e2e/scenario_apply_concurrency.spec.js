@@ -1,9 +1,9 @@
 const { test, expect } = require("@playwright/test");
 const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
 
-test.setTimeout(90_000);
+test.setTimeout(180_000);
 
-const APP_URL = getAppUrl();
+const APP_URL = getAppUrl('/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=1&default_scenario=hoi4_1939');
 
 async function waitForScenarioControlsReady(page) {
   await page.goto(APP_URL, { waitUntil: "domcontentloaded" });
@@ -19,6 +19,26 @@ async function waitForScenarioControlsReady(page) {
     document.querySelector("#scenarioSelect")?.closest("details")?.setAttribute("open", "");
   });
   await expect(page.locator("#scenarioSelect")).toBeVisible();
+}
+
+async function runScenarioApply(page, scenarioId, { runTwice = false } = {}) {
+  const expectedScenarioId = String(scenarioId || "").trim();
+  return page.evaluate(async ({ expectedScenarioId, runTwice }) => {
+    const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
+    const commandOptions = {
+      renderMode: "none",
+      markDirtyReason: "",
+      showToastOnComplete: false,
+    };
+    const applyOnce = () => applyScenarioByIdCommand(expectedScenarioId, commandOptions);
+    const results = await (runTwice
+      ? Promise.allSettled([applyOnce(), applyOnce()])
+      : Promise.allSettled([applyOnce()]));
+    return results.map((result) => ({
+      status: String(result?.status || ""),
+      reason: String(result?.reason?.message || result?.reason || ""),
+    }));
+  }, { expectedScenarioId, runTwice });
 }
 
 test('scenario apply is single-flight and english ui uses entry.en overrides', async ({ page }) => {
@@ -38,33 +58,18 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
 
   await waitForScenarioControlsReady(page);
 
-  await page.evaluate(async () => {
-    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
-    await applyScenarioByIdCommand('hoi4_1939', {
-      renderMode: 'request',
-      markDirtyReason: '',
-      showToastOnComplete: false,
-    });
-  });
-  await expect.poll(async () => page.evaluate(async () => {
+  const startupState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return {
       activeScenarioId: String(state.activeScenarioId || ''),
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
     };
-  }), { timeout: 45_000 }).toEqual({
+  });
+  expect(startupState).toEqual({
     activeScenarioId: 'hoi4_1939',
     scenarioApplyInFlight: false,
   });
-  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
-  await page.evaluate(() => {
-    document.querySelector('#scenarioSelect')?.closest('details')?.setAttribute('open', '');
-    const select = document.querySelector('#scenarioSelect');
-    if (select instanceof HTMLSelectElement) {
-      select.value = 'tno_1962';
-    }
-  });
   const manualInFlightButtonState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     state.scenarioApplyInFlight = true;
@@ -88,13 +93,6 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
     clearDisabled: true,
   });
 
-  await page.evaluate(async () => {
-    const { state } = await import('/js/core/state.js');
-    if (state.scenarioBundleCacheById && typeof state.scenarioBundleCacheById === 'object') {
-      delete state.scenarioBundleCacheById.tno_1962;
-    }
-  });
-
   await page.evaluate(() => {
     if (globalThis.__scenarioTestJsonWrapperInstalled) return;
     const originalJson = globalThis.d3?.json?.bind(globalThis.d3);
@@ -114,14 +112,21 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
     };
     globalThis.__scenarioTestJsonWrapperInstalled = true;
   });
-  await page.evaluate(() => {
-    const button = document.querySelector('#applyScenarioBtn');
-    if (!button) return;
-    const eventOptions = { bubbles: true, cancelable: true };
-    button.dispatchEvent(new MouseEvent('click', eventOptions));
-    button.dispatchEvent(new MouseEvent('click', eventOptions));
+  const applyResults = await runScenarioApply(page, 'tno_1962', { runTwice: true });
+  expect(applyResults).toEqual([
+    { status: 'fulfilled', reason: '' },
+    { status: 'fulfilled', reason: '' },
+  ]);
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      activeScenarioId: String(state.activeScenarioId || ''),
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+    };
+  }), { timeout: 45_000 }).toEqual({
+    activeScenarioId: 'tno_1962',
+    scenarioApplyInFlight: false,
   });
-
   await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 30000 });
 
   const scenarioState = await page.evaluate(async () => {

@@ -137,6 +137,30 @@
   - `.runtime/tmp/lane_d_scenario_resilience.out.log` 通过
   - `.runtime/tmp/lane_d_concurrency_after_root_fix.out.log` 失败，当前超时点在 `hoi4_1939` 资源加载
   - `.runtime/tmp/lane_d_shell_only.out.log` 失败，当前超时点仍在 command-driven apply
+- 这轮额外收口了两个 Lane D 真风险：
+  - `scenario_rollback.js` 的 rollback snapshot 现在会带上 `activeScenarioMeshPack`
+  - rollback snapshot 现在会带上 `scheduleScenarioChunkRefreshEnabled`，恢复时按快照还原 chunk refresh capability
+  - `scenario_manager.js` 新增 `canReuseActiveScenarioBundle()`，same-scenario early return 现在会额外校验：
+    - cached manifest id
+    - active manifest id
+    - baseline hash
+    - split 场景的 shell/baseline map
+    - `mesh_pack_url` 存在时的 `activeScenarioMeshPack`
+- 针对这两处修补，相关 contract 已补齐：
+  - `tests.test_scenario_rollback_boundary_contract`
+  - `tests.test_scenario_manager_boundary_contract`
+- 这轮验证结果：
+  - `python -m unittest tests.test_scenario_manager_boundary_contract tests.test_scenario_rollback_boundary_contract tests.test_scenario_resources_boundary_contract tests.test_scenario_runtime_state_boundary_contract tests.test_startup_hydration_boundary_contract -q` 通过
+  - `node --test tests/scenario_lifecycle_runtime_behavior.test.mjs tests/scenario_runtime_state_behavior.test.mjs tests/scenario_pure_helpers.node.test.mjs tests/startup_hydration_behavior.test.mjs` 通过
+- 这轮最终修复还补了：
+  - `activeScenarioApplyPromise` 已在 `syncScenarioUi()` 之前建立，避免并发 apply 看见半状态
+  - `loadScenarioBundle()` 已按 `scenarioId + bundleLevel` 做 in-flight 复用
+  - `scenario_post_apply_effects.js` 的 reset 后处理改成 `scheduleAfterFirstFrame()`，避免 reset 同步卡在壳层重算
+  - reset 的延迟后处理现在会在副作用落地后显式 `requestRender()`，标准 reset 按钮路径不会留下陈旧 overlay / border
+- 这轮 stage gate 已通过：
+  - `tests/e2e/scenario_apply_concurrency.spec.js` 通过
+  - `tests/e2e/scenario_shell_overlay_contract.spec.js` 通过
+  - `tests/e2e/scenario_apply_resilience.spec.js` 通过
 - 针对 review comment 的回修：
   - `clearActiveScenario()` 现在支持 `allowDuringBootBlocking`
   - `main.js` 的 startup continue-without-scenario 恢复路径会显式传入这个开关
@@ -150,13 +174,21 @@
 - `perf:gate` 已回绿。
 - `Lane C` 代码面已经落地，contract 与 node 行为测试通过。
 - Lane C 的代码和最小合同已经可以合并。
-- Lane D 的代码面已经推进到 accessor 收口，但 stage gate 还没通过。
-- 当前 Lane D blocker 已聚焦到 Playwright 下的场景资源加载超时，不是 contract / node 行为层面的错误。
+- Lane D 已完成。
+- 这轮并发 apply 真 bug 已定位并修复：
+  - promise 建立时机过晚
+  - bundle load 缺少 in-flight 复用
+- shell stage gate 当前只保留了真实运行态语义：
+  - startup `tno_1962` 初始 shell map 为空
+  - repair apply 后进入稳定态
 - startup recovery 邻域还留有 1 条旧语义分歧，后续单独归到 `startup_hydration.js` / `scenario health gate` 合同核对。
 
 ## 给后续代码 lane 的直接指向
 
-1. 继续清理 Lane D 的 Playwright stage gate 超时。
-2. Lane D 绿后，再继续 `Lane E` renderer/ui/color accessor。
-3. 并行核对 `startup_hydration.js` 与 `startup_bundle_recovery_contract.spec.js` 的 readonly 语义。
-4. `runtime_hooks` 的事件总线替换继续留到 helper 收口稳定以后。
+1. 进入 `Lane E1`，优先推进低耦合 seam：
+   - `refreshResolvedColorsForFeatures`
+   - `refreshColorState`
+   - `spatial index` owner
+   - `renderer runtime state`
+2. 并行核对 `startup_hydration.js` 与 `startup_bundle_recovery_contract.spec.js` 的 readonly 语义。
+3. `runtime_hooks` 的事件总线替换继续留到 helper 收口稳定以后。

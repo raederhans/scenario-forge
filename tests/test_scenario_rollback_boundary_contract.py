@@ -19,6 +19,18 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
         self.assertIn("export function captureScenarioApplyRollbackSnapshot()", content)
         self.assertIn("export function restoreScenarioApplyRollbackSnapshot(", content)
         self.assertIn("const ROLLBACK_REQUIRED_KEYS = Object.freeze([", content)
+        self.assertIn('"activeScenarioMeshPack"', content)
+        self.assertIn('"scheduleScenarioChunkRefreshEnabled"', content)
+        self.assertIn("activeScenarioMeshPack: cloneScenarioStateValue(state.activeScenarioMeshPack)", content)
+        self.assertIn(
+            "scheduleScenarioChunkRefreshEnabled: state.scheduleScenarioChunkRefreshFn === scheduleScenarioChunkRefresh",
+            content,
+        )
+        self.assertIn("state.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);", content)
+        self.assertIn(
+            "state.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;",
+            content,
+        )
         self.assertIn("Invalid rollback snapshot: missing required keys:", content)
         self.assertNotIn('from "./scenario_recovery.js"', content)
         self.assertNotIn("setMapData(", content)

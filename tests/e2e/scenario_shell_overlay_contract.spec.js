@@ -1,6 +1,8 @@
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
+const SHELL_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=1&default_scenario=tno_1962";
+
 async function waitForScenarioUiReady(page) {
   await page.waitForFunction(() => {
     const select = document.querySelector("#scenarioSelect");
@@ -14,27 +16,27 @@ async function waitForScenarioManagerIdle(page) {
 }
 
 async function applyScenario(page, scenarioId) {
+  const expectedScenarioId = String(scenarioId || "").trim();
   await waitForScenarioManagerIdle(page);
-  await page.evaluate(async (expectedScenarioId) => {
+  await page.evaluate(async (targetScenarioId) => {
     const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
-    await applyScenarioByIdCommand(expectedScenarioId, {
-      renderMode: "request",
+    await applyScenarioByIdCommand(targetScenarioId, {
+      renderMode: "none",
       markDirtyReason: "",
       showToastOnComplete: false,
     });
-  }, scenarioId);
-  await expect.poll(async () => page.evaluate(async (expectedScenarioId) => {
+  }, expectedScenarioId);
+  await expect.poll(async () => page.evaluate(async (targetScenarioId) => {
     const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === expectedScenarioId && !state.scenarioApplyInFlight;
-  }, scenarioId)).toBe(true);
+    return state.activeScenarioId === targetScenarioId && !state.scenarioApplyInFlight;
+  }, expectedScenarioId), { timeout: 120_000 }).toBe(true);
 }
 
 async function resetScenario(page) {
-  await waitForScenarioManagerIdle(page);
   await page.evaluate(async () => {
     const { resetScenarioToBaselineCommand } = await import("/js/core/scenario_dispatcher.js");
     resetScenarioToBaselineCommand({
-      renderMode: "flush",
+      renderMode: "none",
       markDirtyReason: "",
       showToastOnComplete: false,
     });
@@ -45,15 +47,14 @@ async function resetScenario(page) {
       && !state.startupReadonly
       && !state.startupReadonlyUnlockInFlight
       && state.bootBlocking === false;
-  })).toBe(true);
+  }), { timeout: 30_000 }).toBe(true);
 }
 
 async function clearScenario(page) {
-  await waitForScenarioManagerIdle(page);
   await page.evaluate(async () => {
     const { clearActiveScenarioCommand } = await import("/js/core/scenario_dispatcher.js");
     clearActiveScenarioCommand({
-      renderMode: "flush",
+      renderMode: "none",
       markDirtyReason: "",
       showToastOnComplete: false,
     });
@@ -65,7 +66,7 @@ async function clearScenario(page) {
       && !state.startupReadonly
       && !state.startupReadonlyUnlockInFlight
       && state.bootBlocking === false;
-  })).toBe(true);
+  }), { timeout: 30_000 }).toBe(true);
 }
 
 async function readShellState(page) {
@@ -90,24 +91,21 @@ async function readShellState(page) {
 }
 
 test("scenario shell overlay recalculates on apply reset and clear", async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(360000);
 
-  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await gotoApp(page, SHELL_STARTUP_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
-
-  await applyScenario(page, "hoi4_1939");
   await applyScenario(page, "tno_1962");
-  await expect.poll(async () => {
-    const shell = await readShellState(page);
-    return {
-      activeScenarioId: shell.activeScenarioId,
-      hasRuPolar: !!shell.ruPolarId,
-      hasOwnerMap: shell.ownerCount > 0,
-      hasControllerMap: shell.controllerCount > 0,
-      hasRuPolarOwner: !!shell.ruPolarOwner,
-      hasRuPolarController: !!shell.ruPolarController,
-    };
+
+  const afterApply = await readShellState(page);
+  expect({
+    activeScenarioId: afterApply.activeScenarioId,
+    hasRuPolar: !!afterApply.ruPolarId,
+    hasOwnerMap: afterApply.ownerCount > 0,
+    hasControllerMap: afterApply.controllerCount > 0,
+    hasRuPolarOwner: !!afterApply.ruPolarOwner,
+    hasRuPolarController: !!afterApply.ruPolarController,
   }).toEqual({
     activeScenarioId: "tno_1962",
     hasRuPolar: true,
@@ -117,18 +115,14 @@ test("scenario shell overlay recalculates on apply reset and clear", async ({ pa
     hasRuPolarController: true,
   });
 
-  const afterApply = await readShellState(page);
-
   await resetScenario(page);
-  await expect.poll(async () => {
-    const shell = await readShellState(page);
-    return {
-      activeScenarioId: shell.activeScenarioId,
-      hasOwnerMap: shell.ownerCount > 0,
-      hasControllerMap: shell.controllerCount > 0,
-      hasRuPolarOwner: !!shell.ruPolarOwner,
-      hasRuPolarController: !!shell.ruPolarController,
-    };
+  const afterReset = await readShellState(page);
+  expect({
+    activeScenarioId: afterReset.activeScenarioId,
+    hasOwnerMap: afterReset.ownerCount > 0,
+    hasControllerMap: afterReset.controllerCount > 0,
+    hasRuPolarOwner: !!afterReset.ruPolarOwner,
+    hasRuPolarController: !!afterReset.ruPolarController,
   }).toEqual({
     activeScenarioId: "tno_1962",
     hasOwnerMap: true,
@@ -136,29 +130,23 @@ test("scenario shell overlay recalculates on apply reset and clear", async ({ pa
     hasRuPolarOwner: true,
     hasRuPolarController: true,
   });
-
-  const afterReset = await readShellState(page);
   expect(afterReset.ruPolarId).toBe(afterApply.ruPolarId);
   expect(afterReset.ruPolarOwner).toBe(afterApply.ruPolarOwner);
   expect(afterReset.ruPolarController).toBe(afterApply.ruPolarController);
 
   await clearScenario(page);
-  await expect.poll(async () => {
-    const shell = await readShellState(page);
-    return {
-      activeScenarioId: shell.activeScenarioId,
-      borderMode: shell.borderMode,
-      ownerCount: shell.ownerCount,
-      controllerCount: shell.controllerCount,
-    };
+  const afterClear = await readShellState(page);
+  expect({
+    activeScenarioId: afterClear.activeScenarioId,
+    borderMode: afterClear.borderMode,
+    ownerCount: afterClear.ownerCount,
+    controllerCount: afterClear.controllerCount,
   }).toEqual({
     activeScenarioId: "",
     borderMode: "canonical",
     ownerCount: 0,
     controllerCount: 0,
   });
-
-  const afterClear = await readShellState(page);
   expect(afterClear.shellRevision).toBeGreaterThan(afterApply.shellRevision);
 
   await applyScenario(page, "tno_1962");

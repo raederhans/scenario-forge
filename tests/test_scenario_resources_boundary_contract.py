@@ -166,6 +166,13 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("void ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });", content)
         self.assertIn('reason: "scenario-apply"', content)
 
+    def test_reset_post_apply_effects_request_render_after_deferred_refresh(self):
+        content = SCENARIO_POST_APPLY_EFFECTS.read_text(encoding="utf-8")
+
+        self.assertIn('import { requestRender } from "./render_boundary.js";', content)
+        self.assertIn("scheduleAfterFirstFrame(() => {", content)
+        self.assertIn("requestRender(`scenario-reset-post-frame:${scenarioId}`);", content)
+
     def test_full_bundle_prefers_runtime_topology_even_with_chunk_manifest(self):
         content = SCENARIO_BUNDLE_RUNTIME.read_text(encoding="utf-8")
 

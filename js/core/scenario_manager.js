@@ -205,6 +205,57 @@ function normalizeScenarioViewMode(value) {
   return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
 }
 
+function canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId) {
+  if (!normalizedScenarioId || normalizeScenarioId(state.activeScenarioId) !== normalizedScenarioId) {
+    return false;
+  }
+  if (state.startupReadonly || state.startupReadonlyUnlockInFlight) {
+    return false;
+  }
+  if (String(state.topologyBundleMode || "") !== "composite") {
+    return false;
+  }
+  if (!cachedScenarioBundle || !scenarioBundleSatisfiesLevel(cachedScenarioBundle, "full")) {
+    return false;
+  }
+
+  const cachedManifest = cachedScenarioBundle.manifest || null;
+  const cachedManifestId = normalizeScenarioId(cachedManifest?.scenario_id || cachedScenarioBundle?.meta?.scenario_id);
+  if (!cachedManifestId || cachedManifestId !== normalizedScenarioId) {
+    return false;
+  }
+
+  const activeManifestId = normalizeScenarioId(state.activeScenarioManifest?.scenario_id);
+  if (!activeManifestId || activeManifestId !== normalizedScenarioId) {
+    return false;
+  }
+
+  const activeBaselineHash = String(state.scenarioBaselineHash || "").trim();
+  const cachedBaselineHash = String(getScenarioBaselineHashFromBundle(cachedScenarioBundle) || "").trim();
+  if (activeBaselineHash !== cachedBaselineHash) {
+    return false;
+  }
+
+  const hasSplitFeatures = Number(cachedManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
+  if (!hasSplitFeatures) {
+    return true;
+  }
+
+  const hasShellOwnerMap = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length > 0;
+  const hasShellControllerMap = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length > 0;
+  const hasBaselineOwnerMap = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
+  const hasBaselineControllerMap = Object.keys(state.scenarioBaselineControllersByFeatureId || {}).length > 0;
+  const requiresMeshPack = !!String(cachedManifest?.mesh_pack_url || "").trim();
+  const hasMeshPack = !requiresMeshPack || !!state.activeScenarioMeshPack;
+  return (
+    hasShellOwnerMap
+    && hasShellControllerMap
+    && hasBaselineOwnerMap
+    && hasBaselineControllerMap
+    && hasMeshPack
+  );
+}
+
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
   return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
 }
@@ -870,28 +921,7 @@ async function applyScenarioById(
     throw new Error("[scenario] Scenario id is required.");
   }
   const cachedScenarioBundle = state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
-  const hasSplitFeatures = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
-  const hasShellOwnerMap = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length > 0;
-  const hasShellControllerMap = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length > 0;
-  const hasBaselineOwnerMap = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
-  const hasBaselineControllerMap = Object.keys(state.scenarioBaselineControllersByFeatureId || {}).length > 0;
-  if (
-    normalizeScenarioId(state.activeScenarioId) === normalizedScenarioId
-    && !state.startupReadonly
-    && !state.startupReadonlyUnlockInFlight
-    && String(state.topologyBundleMode || "") === "composite"
-    && !!cachedScenarioBundle
-    && scenarioBundleSatisfiesLevel(cachedScenarioBundle, "full")
-    && (
-      !hasSplitFeatures
-      || (
-        hasShellOwnerMap
-        && hasShellControllerMap
-        && hasBaselineOwnerMap
-        && hasBaselineControllerMap
-      )
-    )
-  ) {
+  if (canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId)) {
     return cachedScenarioBundle;
   }
   if (state.scenarioApplyInFlight && activeScenarioApplyPromise) {
@@ -899,8 +929,8 @@ async function applyScenarioById(
   }
 
   state.scenarioApplyInFlight = true;
-  syncScenarioUi();
   activeScenarioApplyPromise = (async () => {
+    syncScenarioUi();
     const bundle = await loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" });
     await applyScenarioBundle(bundle, {
       renderNow,

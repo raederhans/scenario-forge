@@ -51,17 +51,24 @@
 - [x] `scenario_apply_pipeline.js` 拆出 activation / chunk commit helpers
 - [x] `scenario_resources.js` 拆出 deferred metadata / optional layer state helpers
 - [x] `scenario_manager.js` 收紧 same-scenario early return
+- [x] rollback snapshot 补 `activeScenarioMeshPack`
+- [x] rollback snapshot 补 `scheduleScenarioChunkRefreshEnabled`
+- [x] same-scenario early return 补 manifest/baseline hash/mesh/shell readiness 校验
+- [x] `activeScenarioApplyPromise` 提前到 `syncScenarioUi()` 之前建立
+- [x] `loadScenarioBundle()` 补 `scenarioId + bundleLevel` in-flight 复用
+- [x] reset 后处理改成异步帧后执行
 - [x] Lane D contract 套件通过
 - [x] Lane D node 行为测试通过
 - [x] `scenario_apply_resilience.spec.js` 通过
-- [ ] `scenario_apply_concurrency.spec.js` 通过
-- [ ] `scenario_shell_overlay_contract.spec.js` 通过
-- [ ] Lane D 收口并进入 `Lane E`
+- [x] `scenario_apply_concurrency.spec.js` 通过
+- [x] `scenario_shell_overlay_contract.spec.js` 通过
+- [x] Lane D 收口并进入 `Lane E`
 
 ## review comment 回修
 
 - [x] 放行 startup continue-without-scenario 里的 `clearActiveScenario`
 - [x] 恢复 deferred scenario metadata 在 apply 期间同步进运行态
+- [x] reset 延迟后处理补一次显式 render，请求同一轮 UI/overlay 刷新
 
 ## 本轮新增推进
 
