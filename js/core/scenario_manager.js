@@ -128,6 +128,7 @@ import {
   normalizeScenarioId,
   normalizeScenarioLanguage,
   getScenarioGeoLocalePatchDescriptor as sharedGetScenarioGeoLocalePatchDescriptor,
+  cloneScenarioStateValue,
 } from "./scenario/shared.js";
 import {
   getScenarioRegistryEntries as getBundleLoaderScenarioRegistryEntries,
@@ -652,6 +653,7 @@ const {
   recalculateScenarioOwnerControllerDiffCount,
   hasRenderableScenarioPoliticalTopology,
   normalizeScenarioFeatureCollection,
+  cloneScenarioStateValue,
 });
 
 async function applyScenarioBundle(
@@ -867,13 +869,30 @@ async function applyScenarioById(
   if (!normalizedScenarioId) {
     throw new Error("[scenario] Scenario id is required.");
   }
+  const cachedScenarioBundle = state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+  const hasSplitFeatures = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
+  const hasShellOwnerMap = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length > 0;
+  const hasShellControllerMap = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length > 0;
+  const hasBaselineOwnerMap = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
+  const hasBaselineControllerMap = Object.keys(state.scenarioBaselineControllersByFeatureId || {}).length > 0;
   if (
     normalizeScenarioId(state.activeScenarioId) === normalizedScenarioId
     && !state.startupReadonly
     && !state.startupReadonlyUnlockInFlight
     && String(state.topologyBundleMode || "") === "composite"
+    && !!cachedScenarioBundle
+    && scenarioBundleSatisfiesLevel(cachedScenarioBundle, "full")
+    && (
+      !hasSplitFeatures
+      || (
+        hasShellOwnerMap
+        && hasShellControllerMap
+        && hasBaselineOwnerMap
+        && hasBaselineControllerMap
+      )
+    )
   ) {
-    return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+    return cachedScenarioBundle;
   }
   if (state.scenarioApplyInFlight && activeScenarioApplyPromise) {
     return activeScenarioApplyPromise;
@@ -943,7 +962,12 @@ function resetToScenarioBaseline(options = {}) {
 }
 
 function clearActiveScenario(options = {}) {
-  assertScenarioInteractionsAllowed("exit the active scenario");
+  const {
+    allowDuringBootBlocking = false,
+  } = options;
+  assertScenarioInteractionsAllowed("exit the active scenario", {
+    allowDuringBootBlocking,
+  });
   const {
     renderNow = true,
     markDirtyReason = "scenario-clear",

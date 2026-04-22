@@ -404,19 +404,33 @@ function scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client = globalT
         }
       }
       if (normalizeScenarioId(state.activeScenarioId) === scenarioId) {
-        if (bundle.releasableCatalog) {
-          state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
-          state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId, { excludeTags: [] });
-        }
-        if (bundle.districtGroupsPayload) {
-          state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
-          state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
-        }
-        syncScenarioUi();
+        applyDeferredScenarioMetadata(bundle, { scenarioId });
       }
       resolve();
     }, 1200);
   });
+}
+
+function applyDeferredScenarioMetadata(bundle, { scenarioId = "" } = {}) {
+  const normalizedScenarioId = normalizeScenarioId(
+    scenarioId || bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id
+  );
+  if (
+    !normalizedScenarioId
+    || normalizeScenarioId(state.activeScenarioId) !== normalizedScenarioId
+  ) {
+    return false;
+  }
+  if (bundle.releasableCatalog) {
+    state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
+    state.scenarioReleasableIndex = buildScenarioReleasableIndex(normalizedScenarioId, { excludeTags: [] });
+  }
+  if (bundle.districtGroupsPayload) {
+    state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
+    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
+  }
+  syncScenarioUi();
+  return true;
 }
 
 function getScenarioRuntimePoliticalFeatureCount(runtimeTopologyPayload, runtimePoliticalMeta = null) {
@@ -593,7 +607,7 @@ function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopolog
   return !!manifest?.[config.urlField];
 }
 
-function assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload) {
+function applyScenarioOptionalLayerState(bundle, layerKey, payload) {
   const config = getScenarioOptionalLayerConfig(layerKey);
   if (!config) return false;
   const bundleScenarioId = getScenarioBundleId(bundle);
@@ -633,7 +647,7 @@ async function loadScenarioOptionalLayerPayload(
   if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
     const payload = await bundle.optionalLayerPromises[layerKey];
     if (applyToActiveScenario) {
-      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+      applyScenarioOptionalLayerState(bundle, layerKey, payload);
     }
     return payload;
   }
@@ -643,7 +657,7 @@ async function loadScenarioOptionalLayerPayload(
   if (!forceReload && bundle.optionalLayerSettledByKey[layerKey] === true) {
     const payload = bundle[config.bundleField] ?? null;
     if (applyToActiveScenario) {
-      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+      applyScenarioOptionalLayerState(bundle, layerKey, payload);
     }
     return payload;
   }
@@ -694,7 +708,7 @@ async function loadScenarioOptionalLayerPayload(
       cacheHit: false,
     });
     if (applyToActiveScenario) {
-      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+      applyScenarioOptionalLayerState(bundle, layerKey, payload);
     }
     return payload;
   } finally {

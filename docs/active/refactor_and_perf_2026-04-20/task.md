@@ -31,6 +31,38 @@
 - [ ] `runtime_hooks.js` 完整事件总线替换
 - [ ] 更大范围 renderer / scenario / UI 深层架构切分
 
+## 当前阶段：Lane C
+
+- [x] 在 `boot_state.js` 补最小 boot accessor
+- [x] 在 `content_state.js` 补最小 content accessor
+- [x] `startup_boot_overlay.js` 切到 boot accessor
+- [x] `startup_bootstrap_support.js` 切到 content accessor
+- [x] `startup_data_pipeline.js` 切到 content accessor
+- [x] `data_loader.js` 显式接收 `currentLanguage`
+- [x] `main.js` 切 `bootPreviewVisible` / `startupInteractionMode` 到 boot accessor
+- [x] Lane C contract 套件通过
+- [x] Lane C node 行为测试通过
+- [x] 定性 `startup_bundle_recovery_contract.spec.js` 的最后 1 条失败，当前按旧语义分歧记录
+- [x] 进入 `Lane D`
+
+## 当前阶段：Lane D
+
+- [x] `scenario_rollback.js` 拆出 runtime / presentation / palette snapshot helpers
+- [x] `scenario_apply_pipeline.js` 拆出 activation / chunk commit helpers
+- [x] `scenario_resources.js` 拆出 deferred metadata / optional layer state helpers
+- [x] `scenario_manager.js` 收紧 same-scenario early return
+- [x] Lane D contract 套件通过
+- [x] Lane D node 行为测试通过
+- [x] `scenario_apply_resilience.spec.js` 通过
+- [ ] `scenario_apply_concurrency.spec.js` 通过
+- [ ] `scenario_shell_overlay_contract.spec.js` 通过
+- [ ] Lane D 收口并进入 `Lane E`
+
+## review comment 回修
+
+- [x] 放行 startup continue-without-scenario 里的 `clearActiveScenario`
+- [x] 恢复 deferred scenario metadata 在 apply 期间同步进运行态
+
 ## 本轮新增推进
 
 - [x] 新增 `boot_state.js`
@@ -49,3 +81,9 @@
 - [x] strategic overlay editing 第一波 `waitForFunction(async ...)` 清理
 - [x] strategic overlay editing 稳定化：显式 move update / preset 断言修正 / 可见性等待加固
 - [x] strategic overlay editing 全量新日志（`.runtime/tmp/strategic_overlay_editing_wave17.out.log`）
+
+- [x] deferred UI bootstrap 失败态保留到局部 promise 并显式 await
+- [x] deferred UI 失败后的 continue 分支先回退 scenario 再继续 base map
+- [x] strategic overlay smoke 复跑通过（.runtime/tmp/strategic_overlay_smoke_wave2.out.log）
+- [x] perf:gate 复跑通过（.runtime/tmp/perf_gate_wave3.out.log）
+

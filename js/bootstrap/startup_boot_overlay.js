@@ -1,4 +1,11 @@
 import { state } from "../core/state.js";
+import {
+  replaceBootMetricsState,
+  setBootPreviewVisibleState,
+  setBootStateFields,
+  setStartupReadonlyStateFields,
+} from "../core/state/boot_state.js";
+import { callRuntimeHook } from "../core/runtime_hooks.js";
 import { getBootLanguage, nowMs } from "./startup_bootstrap_support.js";
 
 const BOOT_PHASE_WINDOWS = {
@@ -268,7 +275,7 @@ export function createStartupBootOverlayController() {
       }
       const nextProgress = sampleBootPhaseProgress(state.bootPhase);
       if (nextProgress > state.bootProgress) {
-        state.bootProgress = nextProgress;
+        setBootStateFields(state, { progress: nextProgress });
         syncBootOverlay();
       }
       bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
@@ -283,20 +290,20 @@ export function createStartupBootOverlayController() {
   };
 
   const setStartupReadonlyState = (active, { reason = "", unlockInFlight = false } = {}) => {
-    state.startupReadonly = !!active;
-    state.startupReadonlyReason = state.startupReadonly ? String(reason || "detail-promotion").trim() : "";
-    state.startupReadonlyUnlockInFlight = state.startupReadonly ? !!unlockInFlight : false;
-    state.startupReadonlySince = state.startupReadonly
-      ? (Number(state.startupReadonlySince) || Date.now())
-      : 0;
+    setStartupReadonlyStateFields(state, {
+      active,
+      reason,
+      unlockInFlight,
+    });
     if (!state.startupReadonly) {
       clearStartupReadonlyUnlockHandle();
     }
     syncBootOverlay();
+    callRuntimeHook(state, "updateScenarioUIFn");
   };
 
   const setBootPreviewVisible = (active) => {
-    state.bootPreviewVisible = !!active;
+    setBootPreviewVisibleState(state, active);
     syncBootOverlay();
   };
 
@@ -328,23 +335,27 @@ export function createStartupBootOverlayController() {
       canContinueWithoutScenario = false,
     } = {},
   ) => {
-    state.bootPhase = phase;
-    state.bootMessage = message ?? getBootCopy(phase).message;
-    state.bootError = String(error || "");
-    state.bootCanContinueWithoutScenario = !!canContinueWithoutScenario;
+    setBootStateFields(state, {
+      phase,
+      message: message ?? getBootCopy(phase).message,
+      error,
+      canContinueWithoutScenario,
+    });
     if (blocking !== null) {
-      state.bootBlocking = !!blocking;
+      setBootStateFields(state, { blocking });
     } else if (phase === "ready") {
-      state.bootBlocking = false;
+      setBootStateFields(state, { blocking: false });
     } else if (phase === "error") {
-      state.bootBlocking = true;
+      setBootStateFields(state, { blocking: true });
     }
     const window = getBootProgressWindow(phase);
     if (progress === null) {
       bootProgressPhaseStartedAt = nowMs();
-      state.bootProgress = window.min;
+      setBootStateFields(state, { progress: window.min });
     } else {
-      state.bootProgress = Math.max(window.min, Math.min(window.max, Number(progress || 0)));
+      setBootStateFields(state, {
+        progress: Math.max(window.min, Math.min(window.max, Number(progress || 0))),
+      });
     }
     if (phase === "ready" || phase === "error") {
       stopBootProgressAnimation();
@@ -352,22 +363,27 @@ export function createStartupBootOverlayController() {
       startBootProgressAnimation();
     }
     syncBootOverlay();
+    callRuntimeHook(state, "updateScenarioUIFn");
   };
 
   const resetBootMetrics = () => {
     bootMetricsLogged = false;
-    state.bootMetrics = {
+    replaceBootMetricsState(state, {
       total: {
         startedAt: nowMs(),
       },
-    };
+    });
     globalThis.__bootMetrics = state.bootMetrics;
   };
 
   const startBootMetric = (name) => {
-    state.bootMetrics[name] = {
-      startedAt: nowMs(),
+    const nextMetrics = {
+      ...(state.bootMetrics || {}),
+      [name]: {
+        startedAt: nowMs(),
+      },
     };
+    replaceBootMetricsState(state, nextMetrics);
     globalThis.__bootMetrics = state.bootMetrics;
   };
 
@@ -375,22 +391,28 @@ export function createStartupBootOverlayController() {
     const finishedAt = nowMs();
     const metric = state.bootMetrics[name] || {};
     const startedAt = Number(metric.startedAt);
-    state.bootMetrics[name] = {
-      ...metric,
-      ...extra,
-      finishedAt,
-      durationMs: Number.isFinite(startedAt) ? finishedAt - startedAt : null,
-    };
+    replaceBootMetricsState(state, {
+      ...(state.bootMetrics || {}),
+      [name]: {
+        ...metric,
+        ...extra,
+        finishedAt,
+        durationMs: Number.isFinite(startedAt) ? finishedAt - startedAt : null,
+      },
+    });
     globalThis.__bootMetrics = state.bootMetrics;
   };
 
   const checkpointBootMetric = (name) => {
     const metric = state.bootMetrics[name] || {};
     const totalStartedAt = Number(state.bootMetrics?.total?.startedAt);
-    state.bootMetrics[name] = {
-      ...metric,
-      atMs: Number.isFinite(totalStartedAt) ? nowMs() - totalStartedAt : 0,
-    };
+    replaceBootMetricsState(state, {
+      ...(state.bootMetrics || {}),
+      [name]: {
+        ...metric,
+        atMs: Number.isFinite(totalStartedAt) ? nowMs() - totalStartedAt : 0,
+      },
+    });
     globalThis.__bootMetrics = state.bootMetrics;
     return state.bootMetrics[name];
   };

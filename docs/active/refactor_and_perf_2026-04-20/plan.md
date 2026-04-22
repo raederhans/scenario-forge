@@ -2,9 +2,9 @@
 
 ## 当前阶段
 
-- 当前阶段：修复执行已收口。
+- 当前阶段：进入 `Lane C` 执行。
 - 原计划链真源：见 `original_plan_chain.md`。
-- 当前任务目标：在不扩 scope 的前提下，完成 `state / runtime_hooks` 第一波推进，并补齐 `strategic overlay + perf gate` 的双绿验证。
+- 当前任务目标：按 `Lane C -> Lane D -> Lane E` 顺序推进 accessor 迁移，并把日常验证压到 contract + node + targeted e2e。
 
 ## 已完成前置
 
@@ -22,12 +22,12 @@
 2. `Lane B` runtime hook helper 收口。已完成。
 3. 合同测试与 targeted 回归。已完成，并已补齐 `editing` 全量新日志。
 
-### 主线 B：perf 回归调查
+### 主线 B：Lane C boot/content accessor
 
-1. 保持 `docs/perf/baseline_2026-04-20.json` 作为机器真源。
-2. 复跑 gate，确认回归存在于 `startup/apply` 热路径。已完成。
-3. `deferred UI bootstrap` 已从 startup scenario apply 计时窗中并行化。已完成。
-4. `perf:gate` 已回绿，下一步可以继续 Lane C-E。
+1. `C1` boot accessor：已实现首版。
+2. `C2` content accessor：已实现首版。
+3. `data_loader.js` 已改成显式接收 `currentLanguage`，切断 startup cache key 对全局 state 的直连。
+4. 下一步进入 `Lane D` scenario accessor。
 
 ## 执行顺序
 
@@ -36,14 +36,14 @@
 3. 已完成 Python contract、Node test、strategic overlay smoke/frontline/roundtrip。
 4. 已完成 `strategic_overlay_editing.spec.js` fresh green。
 5. 已完成 `perf:gate` 回绿。
-6. 下一步进入 Lane C-E。
+6. 已完成 `Lane C` 首版落地，下一步进入 `Lane D`。
 
 ## 暂缓事项
 
-1. `Lane C` boot/content accessor 迁移。
-2. `Lane D` scenario accessor 迁移。
-3. `Lane E` renderer / ui / color accessor 迁移。
-4. `runtime_hooks.js` 到事件总线的完整替换。
+1. `Lane D` scenario accessor 迁移。
+2. `Lane E` renderer / ui / color accessor 迁移。
+3. `runtime_hooks.js` 到事件总线的完整替换。
+4. `state/index.js` / `config.js` / `bus.js` / Proxy 门面收口。
 
 ## 完成标准
 

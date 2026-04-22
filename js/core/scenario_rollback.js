@@ -9,6 +9,7 @@ import {
 } from "./state/scenario_runtime_state.js";
 import { ensureScenarioAuditUiState, setScenarioAuditUiState } from "./scenario_ui_sync.js";
 import { scheduleScenarioChunkRefresh } from "./scenario_resources.js";
+import { cloneScenarioStateValue } from "./scenario/shared.js";
 
 const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "activeScenarioId",
@@ -118,30 +119,7 @@ function validateScenarioApplyRollbackSnapshot(snapshot) {
   throw new Error(`Invalid rollback snapshot: missing required keys: ${preview}${suffix}`);
 }
 
-function cloneScenarioStateValue(value) {
-  if (value === null || value === undefined) {
-    return value;
-  }
-  if (typeof value !== "object") {
-    return value;
-  }
-  if (value instanceof Map) {
-    return new Map(Array.from(value.entries(), ([key, entry]) => [key, cloneScenarioStateValue(entry)]));
-  }
-  if (value instanceof Set) {
-    return new Set(Array.from(value, (entry) => cloneScenarioStateValue(entry)));
-  }
-  if (Array.isArray(value)) {
-    return value.map((entry) => cloneScenarioStateValue(entry));
-  }
-  const cloned = {};
-  Object.entries(value).forEach(([key, entry]) => {
-    cloned[key] = cloneScenarioStateValue(entry);
-  });
-  return cloned;
-}
-
-export function captureScenarioApplyRollbackSnapshot() {
+function captureScenarioRuntimeSnapshot() {
   return {
     activeScenarioId: state.activeScenarioId,
     scenarioBorderMode: state.scenarioBorderMode,
@@ -192,6 +170,24 @@ export function captureScenarioApplyRollbackSnapshot() {
     featureOverrides: cloneScenarioStateValue(state.featureOverrides),
     sovereignBaseColors: cloneScenarioStateValue(state.sovereignBaseColors),
     countryBaseColors: cloneScenarioStateValue(state.countryBaseColors),
+    activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
+    scenarioPoliticalChunkData: cloneScenarioStateValue(state.scenarioPoliticalChunkData),
+    activeScenarioChunks: cloneScenarioStateValue(state.activeScenarioChunks),
+    runtimeChunkLoadState: cloneScenarioStateValue({
+      ...(state.runtimeChunkLoadState || {}),
+      refreshTimerId: null,
+    }),
+    renderProfile: String(state.renderProfile || "auto"),
+    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+    showCityPoints: state.showCityPoints !== false,
+    showWaterRegions: state.showWaterRegions !== false,
+    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+  };
+}
+
+function captureScenarioPresentationSnapshot() {
+  return {
     activeSovereignCode: String(state.activeSovereignCode || ""),
     selectedWaterRegionId: String(state.selectedWaterRegionId || ""),
     selectedSpecialRegionId: String(state.selectedSpecialRegionId || ""),
@@ -218,19 +214,11 @@ export function captureScenarioApplyRollbackSnapshot() {
     locales: cloneScenarioStateValue(state.locales),
     geoAliasToStableKey: cloneScenarioStateValue(state.geoAliasToStableKey),
     scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
-    activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
-    scenarioPoliticalChunkData: cloneScenarioStateValue(state.scenarioPoliticalChunkData),
-    activeScenarioChunks: cloneScenarioStateValue(state.activeScenarioChunks),
-    runtimeChunkLoadState: cloneScenarioStateValue({
-      ...(state.runtimeChunkLoadState || {}),
-      refreshTimerId: null,
-    }),
-    renderProfile: String(state.renderProfile || "auto"),
-    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
-    showCityPoints: state.showCityPoints !== false,
-    showWaterRegions: state.showWaterRegions !== false,
-    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+  };
+}
+
+function captureScenarioPaletteSnapshot() {
+  return {
     activePaletteId: String(state.activePaletteId || ""),
     activePaletteMeta: cloneScenarioStateValue(state.activePaletteMeta),
     activePalettePack: cloneScenarioStateValue(state.activePalettePack),
@@ -245,20 +233,15 @@ export function captureScenarioApplyRollbackSnapshot() {
   };
 }
 
-export function restoreScenarioApplyRollbackSnapshot(
-  snapshot,
-  {
-    shouldFailRestore = false,
-  } = {}
-) {
-  validateScenarioApplyRollbackSnapshot(snapshot);
-  if (shouldFailRestore) {
-    throw new Error("Injected rollback restore failure.");
-  }
-  if (state.runtimeChunkLoadState?.refreshTimerId) {
-    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
-  }
+export function captureScenarioApplyRollbackSnapshot() {
+  return {
+    ...captureScenarioRuntimeSnapshot(),
+    ...captureScenarioPresentationSnapshot(),
+    ...captureScenarioPaletteSnapshot(),
+  };
+}
 
+function restoreScenarioRuntimeSnapshot(snapshot) {
   state.activeScenarioId = snapshot.activeScenarioId;
   state.scenarioBorderMode = snapshot.scenarioBorderMode;
   state.activeScenarioManifest = cloneScenarioStateValue(snapshot.activeScenarioManifest);
@@ -310,6 +293,21 @@ export function restoreScenarioApplyRollbackSnapshot(
   state.sovereignBaseColors = cloneScenarioStateValue(snapshot.sovereignBaseColors);
   state.countryBaseColors = cloneScenarioStateValue(snapshot.countryBaseColors);
   markLegacyColorStateDirty();
+  state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
+  state.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
+  state.activeScenarioChunks =
+    cloneScenarioStateValue(snapshot.activeScenarioChunks) || createDefaultActiveScenarioChunksState();
+  state.runtimeChunkLoadState =
+    cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || createDefaultRuntimeChunkLoadState();
+  state.renderProfile = String(snapshot.renderProfile || "auto");
+  state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
+  state.showCityPoints = snapshot.showCityPoints !== false;
+  state.showWaterRegions = snapshot.showWaterRegions !== false;
+  state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
+  state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
+}
+
+function restoreScenarioPresentationSnapshot(snapshot) {
   state.activeSovereignCode = String(snapshot.activeSovereignCode || "");
   state.selectedWaterRegionId = String(snapshot.selectedWaterRegionId || "");
   state.selectedSpecialRegionId = String(snapshot.selectedSpecialRegionId || "");
@@ -344,18 +342,9 @@ export function restoreScenarioApplyRollbackSnapshot(
   state.geoAliasToStableKey = cloneScenarioStateValue(snapshot.geoAliasToStableKey) || {};
   state.scenarioDisplaySettingsBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
-  state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
-  state.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
-  state.activeScenarioChunks =
-    cloneScenarioStateValue(snapshot.activeScenarioChunks) || createDefaultActiveScenarioChunksState();
-  state.runtimeChunkLoadState =
-    cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || createDefaultRuntimeChunkLoadState();
-  state.renderProfile = String(snapshot.renderProfile || "auto");
-  state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
-  state.showCityPoints = snapshot.showCityPoints !== false;
-  state.showWaterRegions = snapshot.showWaterRegions !== false;
-  state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
-  state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
+}
+
+function restoreScenarioPaletteSnapshot(snapshot) {
   state.activePaletteId = String(snapshot.activePaletteId || "");
   state.activePaletteMeta = cloneScenarioStateValue(snapshot.activePaletteMeta);
   state.activePalettePack = cloneScenarioStateValue(snapshot.activePalettePack);
@@ -368,6 +357,25 @@ export function restoreScenarioApplyRollbackSnapshot(
   state.paletteLibraryEntries = cloneScenarioStateValue(snapshot.paletteLibraryEntries) || [];
   state.paletteQuickSwatches = cloneScenarioStateValue(snapshot.paletteQuickSwatches) || [];
   state.paletteLoadErrorById = cloneScenarioStateValue(snapshot.paletteLoadErrorById) || {};
+}
+
+export function restoreScenarioApplyRollbackSnapshot(
+  snapshot,
+  {
+    shouldFailRestore = false,
+  } = {}
+) {
+  validateScenarioApplyRollbackSnapshot(snapshot);
+  if (shouldFailRestore) {
+    throw new Error("Injected rollback restore failure.");
+  }
+  if (state.runtimeChunkLoadState?.refreshTimerId) {
+    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
+  }
+
+  restoreScenarioRuntimeSnapshot(snapshot);
+  restoreScenarioPresentationSnapshot(snapshot);
+  restoreScenarioPaletteSnapshot(snapshot);
   state.scheduleScenarioChunkRefreshFn = snapshot.activeScenarioId ? scheduleScenarioChunkRefresh : null;
   syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
   return true;

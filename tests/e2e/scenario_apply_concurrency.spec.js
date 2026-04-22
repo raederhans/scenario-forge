@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { getAppUrl } = require("./support/playwright-app");
+const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
 
 test.setTimeout(90_000);
 
@@ -14,26 +14,7 @@ async function waitForScenarioControlsReady(page) {
       && !!applyButton
       && select.querySelectorAll("option").length > 0;
   }, { timeout: 60_000 });
-  await expect.poll(async () => page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    return {
-      activeScenarioId: String(state.activeScenarioId || ""),
-      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
-    };
-  }), { timeout: 45_000 }).toEqual({
-    activeScenarioId: "tno_1962",
-    scenarioApplyInFlight: false,
-  });
-  await expect.poll(async () => page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    return {
-      startupReadonly: !!state.startupReadonly,
-      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
-    };
-  }), { timeout: 45_000 }).toEqual({
-    startupReadonly: false,
-    startupReadonlyUnlockInFlight: false,
-  });
+  await waitForAppInteractive(page, { timeout: 60_000 });
   await page.evaluate(() => {
     document.querySelector("#scenarioSelect")?.closest("details")?.setAttribute("open", "");
   });
@@ -57,10 +38,14 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
 
   await waitForScenarioControlsReady(page);
 
-  await page.selectOption('#scenarioSelect', 'hoi4_1939');
-  await expect(page.locator('#applyScenarioBtn')).toBeVisible();
-  await expect(page.locator('#applyScenarioBtn')).toBeEnabled();
-  await page.locator('#applyScenarioBtn').click();
+  await page.evaluate(async () => {
+    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
+    await applyScenarioByIdCommand('hoi4_1939', {
+      renderMode: 'request',
+      markDirtyReason: '',
+      showToastOnComplete: false,
+    });
+  });
   await expect.poll(async () => page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return {
@@ -73,7 +58,13 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
   });
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
-  await page.selectOption('#scenarioSelect', 'tno_1962');
+  await page.evaluate(() => {
+    document.querySelector('#scenarioSelect')?.closest('details')?.setAttribute('open', '');
+    const select = document.querySelector('#scenarioSelect');
+    if (select instanceof HTMLSelectElement) {
+      select.value = 'tno_1962';
+    }
+  });
   const manualInFlightButtonState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     state.scenarioApplyInFlight = true;

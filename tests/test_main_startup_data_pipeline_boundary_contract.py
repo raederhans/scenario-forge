@@ -6,6 +6,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAIN_JS = REPO_ROOT / "js" / "main.js"
 STARTUP_DATA_PIPELINE_JS = REPO_ROOT / "js" / "bootstrap" / "startup_data_pipeline.js"
+DATA_LOADER_JS = REPO_ROOT / "js" / "core" / "data_loader.js"
 
 
 class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
@@ -75,12 +76,19 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
         self.assertIn("createStartupBundleLoadDiagnostics({", owner_content)
         self.assertIn('getStartupScenarioSupportUrl(startupFallbackScenarioId, "locales.startup.json")', owner_content)
         self.assertIn('getStartupScenarioSupportUrl(startupFallbackScenarioId, "geo_aliases.startup.json")', owner_content)
-        self.assertIn("state.topologyDetail = topologyDetail || null;", owner_content)
-        self.assertIn('state.topologyBundleMode = topologyBundleMode || "single";', owner_content)
-        self.assertIn("state.detailDeferred = !!detailDeferred;", owner_content)
-        self.assertIn('state.detailSourceRequested = detailSourceRequested || "na_v2";', owner_content)
-        self.assertIn("state.detailPromotionInFlight = false;", owner_content)
-        self.assertIn("state.detailPromotionCompleted = !detailDeferred;", owner_content)
+        self.assertIn("currentLanguage: state.currentLanguage || \"en\",", owner_content)
+        self.assertIn("hydrateStartupBaseContentState(state, {", owner_content)
+        self.assertIn("decodeStartupPrimaryCollectionsIntoState(state, {", owner_content)
+
+    def test_data_loader_uses_explicit_language_input_for_startup_cache_keys(self):
+        content = DATA_LOADER_JS.read_text(encoding="utf-8")
+
+        self.assertIn('currentLanguage = "en",', content)
+        self.assertIn("createStartupLocalizationCacheKey({", content)
+        self.assertIn('currentLanguage: String(currentLanguage || "en").trim() || "en",', content)
+        self.assertIn('language: String(currentLanguage || "en").trim() || "en",', content)
+        self.assertNotIn('import { state } from "./state.js";', content)
+        self.assertNotIn("state.currentLanguage", content)
 
 
 if __name__ == "__main__":

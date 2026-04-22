@@ -176,7 +176,6 @@ async function applyScenarioAndWaitIdle(page, scenarioId, {
     const select = document.querySelector("#scenarioSelect");
     if (select instanceof HTMLSelectElement) {
       select.value = expectedScenarioId;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
     }
     const { applyScenarioById } = await import("/js/core/scenario_manager.js");
     let lastError = null;

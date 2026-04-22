@@ -58,13 +58,30 @@ class MainBootstrapSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("async function bootstrap()", content)
         self.assertIn("bootstrap();", content)
 
+    def test_main_keeps_startup_ui_bootstrap_failure_and_recovery_contract(self):
+        content = MAIN_JS.read_text(encoding="utf-8")
+
+        self.assertIn("async function rollbackStartupScenarioToBaseMap() {", content)
+        self.assertIn('const { clearActiveScenario } = await import("./core/scenario_manager.js");', content)
+        self.assertIn("let startupUiBootstrapPromise = null;", content)
+        self.assertIn("let startupUiBootstrapAwaited = false;", content)
+        self.assertIn("let startupUiBootstrapFailed = false;", content)
+        self.assertIn("startupUiBootstrapPromise = bootstrapDeferredUi(renderApp);", content)
+        self.assertIn("if (startupUiBootstrapPromise) {", content)
+        self.assertIn("startupUiBootstrapAwaited = true;", content)
+        self.assertIn("startupUiBootstrapFailed = true;", content)
+        self.assertIn("if (startupUiBootstrapPromise && !startupUiBootstrapAwaited) {", content)
+        self.assertIn("await rollbackStartupScenarioToBaseMap();", content)
+        self.assertIn("allowDuringBootBlocking: true,", content)
+
     def test_startup_bootstrap_support_keeps_runtime_contracts(self):
         owner_content = STARTUP_BOOTSTRAP_SUPPORT_JS.read_text(encoding="utf-8")
 
         self.assertIn('const STARTUP_SUPPORT_AUDIT_REPORT_URL = "/__dev/startup-support/key-usage-report";', owner_content)
         self.assertIn("consumeStartupSupportKeyUsageAuditReport()", owner_content)
-        self.assertIn("state.countryInteractionPoliciesByCode.set(code, {", owner_content)
-        self.assertIn("state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({", owner_content)
+        self.assertIn("hydrateHierarchyState(state, data, {", owner_content)
+        self.assertIn("setCurrentLanguage(state, storedLang);", owner_content)
+        self.assertIn("hydrateStoredViewSettings(state, parsed, { normalizeCityLayerStyleConfig });", owner_content)
         self.assertIn("const hasScenarioRuntimeBootstrap = hasScenarioRuntimeShellContract({", owner_content)
 
 

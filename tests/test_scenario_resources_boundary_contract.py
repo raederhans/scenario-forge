@@ -70,6 +70,15 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("getLoadScenarioBundle: () => loadScenarioBundleForStartupHydration,", content)
         self.assertIn("loadScenarioBundleForStartupHydration = loadScenarioBundle;", content)
 
+    def test_resources_module_keeps_runtime_state_write_helpers(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertIn("function applyDeferredScenarioMetadata(bundle, { scenarioId = \"\" } = {}) {", content)
+        self.assertIn("applyDeferredScenarioMetadata(bundle, { scenarioId });", content)
+        self.assertIn("function applyScenarioOptionalLayerState(bundle, layerKey, payload) {", content)
+        self.assertNotIn("assignOptionalLayerPayloadToActiveScenario", content)
+        self.assertNotIn("state.scenarioApplyInFlight", content)
+
     def test_renderable_runtime_topology_helper_has_single_owner(self):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
 

@@ -10,12 +10,7 @@ async function waitForScenarioUiReady(page) {
 }
 
 async function waitForScenarioManagerIdle(page) {
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    return !state.scenarioApplyInFlight
-      && !state.startupReadonly
-      && !state.startupReadonlyUnlockInFlight;
-  });
+  await waitForAppInteractive(page, { timeout: 120_000 });
 }
 
 async function applyScenario(page, scenarioId) {
@@ -23,15 +18,15 @@ async function applyScenario(page, scenarioId) {
   await page.evaluate(async (expectedScenarioId) => {
     const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
     await applyScenarioByIdCommand(expectedScenarioId, {
-      renderMode: "flush",
+      renderMode: "request",
       markDirtyReason: "",
       showToastOnComplete: false,
     });
   }, scenarioId);
-  await page.waitForFunction(async (expectedScenarioId) => {
+  await expect.poll(async () => page.evaluate(async (expectedScenarioId) => {
     const { state } = await import("/js/core/state.js");
     return state.activeScenarioId === expectedScenarioId && !state.scenarioApplyInFlight;
-  }, scenarioId);
+  }, scenarioId)).toBe(true);
 }
 
 async function resetScenario(page) {
@@ -44,10 +39,13 @@ async function resetScenario(page) {
       showToastOnComplete: false,
     });
   });
-  await page.waitForFunction(async () => {
+  await expect.poll(async () => page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    return !state.scenarioApplyInFlight;
-  });
+    return !state.scenarioApplyInFlight
+      && !state.startupReadonly
+      && !state.startupReadonlyUnlockInFlight
+      && state.bootBlocking === false;
+  })).toBe(true);
 }
 
 async function clearScenario(page) {
@@ -60,10 +58,14 @@ async function clearScenario(page) {
       showToastOnComplete: false,
     });
   });
-  await page.waitForFunction(async () => {
+  await expect.poll(async () => page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    return !state.activeScenarioId && !state.scenarioApplyInFlight;
-  });
+    return !state.activeScenarioId
+      && !state.scenarioApplyInFlight
+      && !state.startupReadonly
+      && !state.startupReadonlyUnlockInFlight
+      && state.bootBlocking === false;
+  })).toBe(true);
 }
 
 async function readShellState(page) {
@@ -94,6 +96,7 @@ test("scenario shell overlay recalculates on apply reset and clear", async ({ pa
   await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
 
+  await applyScenario(page, "hoi4_1939");
   await applyScenario(page, "tno_1962");
   await expect.poll(async () => {
     const shell = await readShellState(page);

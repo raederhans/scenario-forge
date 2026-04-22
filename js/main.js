@@ -1,5 +1,9 @@
 // App entry point (Phase 13)
 import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
+import {
+  setBootPreviewVisibleState,
+  setStartupInteractionMode,
+} from "./core/state/boot_state.js";
 import { createStartupBootOverlayController } from "./bootstrap/startup_boot_overlay.js";
 import { createStartupDataPipelineOwner } from "./bootstrap/startup_data_pipeline.js";
 import { createDeferredDetailPromotionOwner } from "./bootstrap/deferred_detail_promotion.js";
@@ -202,11 +206,21 @@ function bootstrapDeferredUi(renderApp) {
     initTranslations();
     initShortcuts();
     return true;
-  })().catch((error) => {
-    deferredUiBootstrapPromise = null;
-    throw error;
-  });
+  })();
   return deferredUiBootstrapPromise;
+}
+
+async function rollbackStartupScenarioToBaseMap() {
+  if (!String(state.activeScenarioId || "").trim()) {
+    return false;
+  }
+  const { clearActiveScenario } = await import("./core/scenario_manager.js");
+  return !!clearActiveScenario({
+    renderNow: false,
+    markDirtyReason: "",
+    showToastOnComplete: false,
+    allowDuringBootBlocking: true,
+  });
 }
 
 async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
@@ -645,7 +659,7 @@ async function bootstrap() {
 
   hydrateLanguage();
   resetBootMetrics();
-  state.bootPreviewVisible = false;
+  setBootPreviewVisibleState(state, false);
   setBootState("shell", {
     progress: getBootProgressWindow("shell").min,
     canContinueWithoutScenario: false,
@@ -656,10 +670,13 @@ async function bootstrap() {
   postReadyHydrationScheduled = false;
   postReadyTaskEpoch += 1;
   clearAllScheduledPostReadyTasks();
-  state.startupInteractionMode = resolveStartupInteractionMode();
+  setStartupInteractionMode(state, resolveStartupInteractionMode());
   setStartupReadonlyState(false);
 
   let renderDispatcher = null;
+  let startupUiBootstrapPromise = null;
+  let startupUiBootstrapAwaited = false;
+  let startupUiBootstrapFailed = false;
   try {
     bindBeforeUnload();
     // Phase: 加载基础拓扑 | Input: 启动配置与 bootstrap 资源 promise | Output: startupBaseData + 已注入基础 state 字段。
@@ -739,7 +756,7 @@ async function bootstrap() {
     setBootPreviewVisible(false);
     initPresetState();
     void loadDeferredMilsymbol();
-    deferredUiBootstrapPromise = bootstrapDeferredUi(renderApp);
+    startupUiBootstrapPromise = bootstrapDeferredUi(renderApp);
 
     // Phase: 应用启动场景 | Input: scenarioBundlePromise + UI bootstrap promise | Output: active scenario state + source/recovery metadata。
     const startupScenarioBoot = getStartupScenarioBootOwner();
@@ -751,8 +768,14 @@ async function bootstrap() {
       scenarioBundlePromise,
       startupInteractionMode: state.startupInteractionMode,
     });
-    if (deferredUiBootstrapPromise) {
-      await deferredUiBootstrapPromise;
+    if (startupUiBootstrapPromise) {
+      startupUiBootstrapAwaited = true;
+      try {
+        await startupUiBootstrapPromise;
+      } catch (uiBootstrapError) {
+        startupUiBootstrapFailed = true;
+        throw uiBootstrapError;
+      }
       callRuntimeHook(state, "updateScenarioUIFn");
     }
 
@@ -767,6 +790,16 @@ async function bootstrap() {
       source: scenarioBundleSource,
     });
   } catch (error) {
+    let deferredUiBootstrapError = null;
+    if (startupUiBootstrapPromise && !startupUiBootstrapAwaited) {
+      try {
+        await startupUiBootstrapPromise;
+      } catch (uiBootstrapError) {
+        startupUiBootstrapFailed = true;
+        deferredUiBootstrapError = uiBootstrapError;
+        console.error("Deferred UI bootstrap failed during startup:", uiBootstrapError);
+      }
+    }
     state.scenarioApplyInFlight = false;
     callRuntimeHook(state, "updateScenarioUIFn");
     finishBootMetric("total", { failed: true });
@@ -778,8 +811,11 @@ async function bootstrap() {
       && !!renderDispatcher?.flush;
     setBootContinueHandler(canContinueWithoutScenario
       ? async () => {
-        if (deferredUiBootstrapPromise) {
-          await deferredUiBootstrapPromise;
+        if (String(state.activeScenarioId || "").trim()) {
+          await rollbackStartupScenarioToBaseMap();
+        }
+        if (startupUiBootstrapPromise && !startupUiBootstrapFailed && !deferredUiBootstrapError) {
+          await startupUiBootstrapPromise;
         }
         setBootState("warmup", {
           message: getBootLanguage() === "zh"

@@ -29,6 +29,10 @@ import {
   nowMs,
   processHierarchyData,
 } from "./startup_bootstrap_support.js";
+import {
+  decodeStartupPrimaryCollectionsIntoState,
+  hydrateStartupBaseContentState,
+} from "../core/state/content_state.js";
 
 const CONTEXT_LAYER_LOAD_ORDER = [
   "rivers",
@@ -583,6 +587,7 @@ export function createStartupDataPipelineOwner({
     startupBundleResultPromise,
   } = {}) {
     return loadMapData({
+      currentLanguage: state.currentLanguage || "en",
       d3Client,
       includeCityData: false,
       includeContextLayers: ["urban"],
@@ -634,57 +639,23 @@ export function createStartupDataPipelineOwner({
       startupBootCacheState,
     } = startupBaseData || {};
 
-    state.topology = topology || topologyPrimary || topologyDetail;
-    state.topologyPrimary = topologyPrimary || state.topology;
-    state.topologyDetail = topologyDetail || null;
-    state.runtimePoliticalTopology = runtimePoliticalTopology || null;
-    state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
-    state.topologyBundleMode = topologyBundleMode || "single";
-    state.renderProfile = renderProfile || "auto";
-    state.detailDeferred = !!detailDeferred;
-    state.detailSourceRequested = detailSourceRequested || "na_v2";
-    state.detailPromotionInFlight = false;
-    state.detailPromotionCompleted = !detailDeferred;
-    state.locales = locales || { ui: {}, geo: {} };
-    state.baseLocalizationLevel = localeLevel || "full";
-    state.baseLocalizationDataState = state.baseLocalizationLevel === "full" ? "loaded" : "partial";
-    state.baseLocalizationDataError = "";
-    state.baseLocalizationDataPromise = null;
-    state.baseGeoLocales = { ...(state.locales?.geo || {}) };
-    state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
-    state.baseGeoAliasToStableKey = { ...state.geoAliasToStableKey };
-    state.startupBootCacheState = startupBootCacheState || state.startupBootCacheState;
-    state.worldCitiesData = null;
-    state.baseCityAliasesData = null;
-    state.baseCityDataState = "idle";
-    state.baseCityDataError = "";
-    state.baseCityDataPromise = null;
-    state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
-    state.ruCityOverrides = ruCityOverrides || null;
-    state.specialZonesExternalData = specialZones || null;
-    state.contextLayerExternalDataByName = contextLayerExternal || {};
-    state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
-    state.contextLayerLoadStateByName = {
-      rivers: "idle",
-      urban: "idle",
-      airports: "idle",
-      ports: "idle",
-      roads: "idle",
-      road_labels: "idle",
-      railways: "idle",
-      rail_stations_major: "idle",
-      physical: "idle",
-      physical_semantics: "idle",
-      physical_contours_major: "idle",
-      physical_contours_minor: "idle",
-    };
-    state.contextLayerLoadErrorByName = {};
-    state.contextLayerLoadPromiseByName = {};
-    state.physicalSemanticsData = null;
-    state.physicalContourMajorData = null;
-    state.physicalContourMinorData = null;
-    state.airportsData = null;
-    state.portsData = null;
+    hydrateStartupBaseContentState(state, {
+      topology,
+      topologyPrimary,
+      topologyDetail,
+      runtimePoliticalTopology,
+      topologyBundleMode,
+      renderProfile,
+      detailDeferred,
+      detailSourceRequested,
+      locales,
+      geoAliases,
+      localeLevel,
+      startupBootCacheState,
+      ruCityOverrides,
+      specialZones,
+      contextLayerExternal,
+    });
     state.paletteRegistry = paletteRegistry || null;
     state.defaultReleasableCatalog = releasableCatalog || null;
     state.releasableCatalog = releasableCatalog || null;
@@ -747,46 +718,10 @@ export function createStartupDataPipelineOwner({
     );
 
     const baseTopologyDecodeStartedAt = nowMs();
-    state.landData =
-      startupDecodedCollections?.landData
-      || globalThis.topojson.feature(state.topologyPrimary, objects.political);
-
-    if (state.specialZonesExternalData?.features) {
-      state.specialZonesData = state.specialZonesExternalData;
-    } else if (objects.special_zones) {
-      state.specialZonesData = startupDecodedCollections?.specialZonesData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.special_zones);
-    }
-    if (objects.rivers) {
-      state.riversData = startupDecodedCollections?.riversData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.rivers);
-    } else if (Array.isArray(state.contextLayerExternalDataByName?.rivers?.features)) {
-      state.riversData = state.contextLayerExternalDataByName.rivers;
-    }
-    if (objects.water_regions) {
-      state.waterRegionsData = startupDecodedCollections?.waterRegionsData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.water_regions);
-    }
-    if (objects.ocean) {
-      state.oceanData = startupDecodedCollections?.oceanData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
-    }
-    if (objects.land) {
-      state.landBgData = startupDecodedCollections?.landBgData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.land);
-    }
-    if (objects.urban) {
-      state.urbanData = startupDecodedCollections?.urbanData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.urban);
-    } else if (Array.isArray(state.contextLayerExternalDataByName?.urban?.features)) {
-      state.urbanData = state.contextLayerExternalDataByName.urban;
-    }
-    if (objects.physical) {
-      state.physicalData = startupDecodedCollections?.physicalData
-        || globalThis.topojson.feature(state.topologyPrimary, objects.physical);
-    } else if (Array.isArray(state.contextLayerExternalDataByName?.physical?.features)) {
-      state.physicalData = state.contextLayerExternalDataByName.physical;
-    }
+    decodeStartupPrimaryCollectionsIntoState(state, {
+      startupDecodedCollections,
+      topojsonClient: globalThis.topojson,
+    });
     const baseTopologyDecodeMs = nowMs() - baseTopologyDecodeStartedAt;
     finishBootMetric?.("base-data", {
       topologyBundleMode: state.topologyBundleMode,

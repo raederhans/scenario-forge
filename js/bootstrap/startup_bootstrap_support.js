@@ -1,4 +1,9 @@
 import { normalizeCityLayerStyleConfig, state } from "../core/state.js";
+import {
+  hydrateHierarchyState,
+  hydrateStoredViewSettings,
+  setCurrentLanguage,
+} from "../core/state/content_state.js";
 import { hasScenarioRuntimeShellContract } from "../core/scenario_resources.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { consumeStartupSupportKeyUsageAuditReport } from "../ui/i18n.js";
@@ -80,55 +85,9 @@ export async function postStartupSupportKeyUsageReport({ scenarioId = "", source
 }
 
 export function processHierarchyData(data) {
-  state.hierarchyData = data || null;
-  state.hierarchyGroupsByCode = new Map();
-  state.countryGroupsData = state.hierarchyData?.country_groups || null;
-  state.countryGroupMetaByCode = new Map();
-  state.countryInteractionPoliciesByCode = new Map();
-
-  if (state.hierarchyData?.groups) {
-    const labels = state.hierarchyData.labels || {};
-    Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
-      const code = normalizeCountryCode(groupId.split("_")[0]);
-      if (!code) return;
-      const list = state.hierarchyGroupsByCode.get(code) || [];
-      list.push({
-        id: groupId,
-        label: labels[groupId] || groupId,
-        children: Array.isArray(children) ? children : [],
-      });
-      state.hierarchyGroupsByCode.set(code, list);
-    });
-  }
-
-  state.hierarchyGroupsByCode.forEach((groups) => {
-    groups.sort((a, b) => a.label.localeCompare(b.label));
-  });
-
-  const countryMeta = state.countryGroupsData?.country_meta || {};
-  Object.entries(countryMeta).forEach(([rawCode, meta]) => {
-    const code = normalizeCountryCode(rawCode);
-    if (!code || !meta || typeof meta !== "object") return;
-    state.countryGroupMetaByCode.set(code, {
-      continentId: String(meta.continent_id || "").trim(),
-      continentLabel: String(meta.continent_label || "").trim(),
-      subregionId: String(meta.subregion_id || "").trim(),
-      subregionLabel: String(meta.subregion_label || "").trim(),
-    });
-  });
-
-  const interactionPolicies = state.hierarchyData?.interaction_policies || {};
-  Object.entries(interactionPolicies).forEach(([rawCode, policy]) => {
-    const code = normalizeCountryCode(rawCode);
-    if (!code || !policy || typeof policy !== "object") return;
-    state.countryInteractionPoliciesByCode.set(code, {
-      leafSource: String(policy.leaf_source || "").trim().toLowerCase(),
-      leafKind: String(policy.leaf_kind || "").trim().toLowerCase(),
-      parentSource: String(policy.parent_source || "").trim().toLowerCase(),
-      parentScopeLabel: String(policy.parent_scope_label || "").trim(),
-      requiresComposite: !!policy.requires_composite,
-      quickFillScopes: normalizeBatchFillScopes(policy.quick_fill_scopes),
-    });
+  return hydrateHierarchyState(state, data, {
+    normalizeCountryCode,
+    normalizeBatchFillScopes,
   });
 }
 
@@ -136,7 +95,7 @@ export function hydrateLanguage() {
   try {
     const storedLang = localStorage.getItem("map_lang");
     if (storedLang) {
-      state.currentLanguage = storedLang;
+      setCurrentLanguage(state, storedLang);
     }
   } catch (error) {
     console.warn("Language preference not available:", error);
@@ -148,19 +107,7 @@ export function hydrateViewSettings() {
     const raw = localStorage.getItem(VIEW_SETTINGS_STORAGE_KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return;
-    const cityPoints = parsed.cityPoints && typeof parsed.cityPoints === "object"
-      ? parsed.cityPoints
-      : {};
-    if (cityPoints.show !== undefined) {
-      state.showCityPoints = !!cityPoints.show;
-    }
-    if (cityPoints.style && typeof cityPoints.style === "object") {
-      state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
-        ...(state.styleConfig.cityPoints || {}),
-        ...cityPoints.style,
-      });
-    }
+    hydrateStoredViewSettings(state, parsed, { normalizeCityLayerStyleConfig });
   } catch (error) {
     console.warn("View settings preference not available:", error);
   }

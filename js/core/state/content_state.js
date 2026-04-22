@@ -104,3 +104,226 @@ export function createDefaultContentState() {
     dpr: globalThis.devicePixelRatio || 1,
   };
 }
+
+export function setCurrentLanguage(target, language = "en") {
+  if (!target || typeof target !== "object") {
+    return "en";
+  }
+  const normalizedLanguage = String(language || "en").trim() || "en";
+  target.currentLanguage = normalizedLanguage;
+  return target.currentLanguage;
+}
+
+export function hydrateHierarchyState(
+  target,
+  data,
+  {
+    normalizeCountryCode = (value) => String(value || "").trim().toUpperCase(),
+    normalizeBatchFillScopes = () => ["parent", "country"],
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.hierarchyData = data || null;
+  target.hierarchyGroupsByCode = new Map();
+  target.countryGroupsData = target.hierarchyData?.country_groups || null;
+  target.countryGroupMetaByCode = new Map();
+  target.countryInteractionPoliciesByCode = new Map();
+
+  if (target.hierarchyData?.groups) {
+    const labels = target.hierarchyData.labels || {};
+    Object.entries(target.hierarchyData.groups).forEach(([groupId, children]) => {
+      const code = normalizeCountryCode(groupId.split("_")[0]);
+      if (!code) return;
+      const list = target.hierarchyGroupsByCode.get(code) || [];
+      list.push({
+        id: groupId,
+        label: labels[groupId] || groupId,
+        children: Array.isArray(children) ? children : [],
+      });
+      target.hierarchyGroupsByCode.set(code, list);
+    });
+  }
+
+  target.hierarchyGroupsByCode.forEach((groups) => {
+    groups.sort((a, b) => a.label.localeCompare(b.label));
+  });
+
+  const countryMeta = target.countryGroupsData?.country_meta || {};
+  Object.entries(countryMeta).forEach(([rawCode, meta]) => {
+    const code = normalizeCountryCode(rawCode);
+    if (!code || !meta || typeof meta !== "object") return;
+    target.countryGroupMetaByCode.set(code, {
+      continentId: String(meta.continent_id || "").trim(),
+      continentLabel: String(meta.continent_label || "").trim(),
+      subregionId: String(meta.subregion_id || "").trim(),
+      subregionLabel: String(meta.subregion_label || "").trim(),
+    });
+  });
+
+  const interactionPolicies = target.hierarchyData?.interaction_policies || {};
+  Object.entries(interactionPolicies).forEach(([rawCode, policy]) => {
+    const code = normalizeCountryCode(rawCode);
+    if (!code || !policy || typeof policy !== "object") return;
+    target.countryInteractionPoliciesByCode.set(code, {
+      leafSource: String(policy.leaf_source || "").trim().toLowerCase(),
+      leafKind: String(policy.leaf_kind || "").trim().toLowerCase(),
+      parentSource: String(policy.parent_source || "").trim().toLowerCase(),
+      parentScopeLabel: String(policy.parent_scope_label || "").trim(),
+      requiresComposite: !!policy.requires_composite,
+      quickFillScopes: normalizeBatchFillScopes(policy.quick_fill_scopes),
+    });
+  });
+
+  return target.hierarchyData;
+}
+
+export function hydrateStoredViewSettings(
+  target,
+  rawSettings,
+  { normalizeCityLayerStyleConfig = (value) => value } = {},
+) {
+  if (!target || typeof target !== "object" || !rawSettings || typeof rawSettings !== "object") {
+    return false;
+  }
+  const cityPoints = rawSettings.cityPoints && typeof rawSettings.cityPoints === "object"
+    ? rawSettings.cityPoints
+    : {};
+  if (cityPoints.show !== undefined) {
+    target.showCityPoints = !!cityPoints.show;
+  }
+  if (cityPoints.style && typeof cityPoints.style === "object") {
+    target.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
+      ...(target.styleConfig.cityPoints || {}),
+      ...cityPoints.style,
+    });
+  }
+  return true;
+}
+
+export function hydrateStartupBaseContentState(
+  target,
+  {
+    topology,
+    topologyPrimary,
+    topologyDetail,
+    runtimePoliticalTopology,
+    topologyBundleMode,
+    renderProfile,
+    detailDeferred,
+    detailSourceRequested,
+    locales,
+    geoAliases,
+    localeLevel,
+    startupBootCacheState,
+    ruCityOverrides,
+    specialZones,
+    contextLayerExternal,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.topology = topology || topologyPrimary || topologyDetail || null;
+  target.topologyPrimary = topologyPrimary || target.topology;
+  target.topologyDetail = topologyDetail || null;
+  target.runtimePoliticalTopology = runtimePoliticalTopology || null;
+  target.defaultRuntimePoliticalTopology = target.runtimePoliticalTopology || null;
+  target.topologyBundleMode = topologyBundleMode || "single";
+  target.renderProfile = renderProfile || "auto";
+  target.detailDeferred = !!detailDeferred;
+  target.detailSourceRequested = detailSourceRequested || "na_v2";
+  target.detailPromotionInFlight = false;
+  target.detailPromotionCompleted = !detailDeferred;
+  target.locales = locales || createDefaultLocalesState();
+  target.baseLocalizationLevel = localeLevel || "full";
+  target.baseLocalizationDataState = target.baseLocalizationLevel === "full" ? "loaded" : "partial";
+  target.baseLocalizationDataError = "";
+  target.baseLocalizationDataPromise = null;
+  target.baseGeoLocales = { ...(target.locales?.geo || {}) };
+  target.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
+  target.baseGeoAliasToStableKey = { ...target.geoAliasToStableKey };
+  target.worldCitiesData = null;
+  target.baseCityAliasesData = null;
+  target.baseCityDataState = "idle";
+  target.baseCityDataError = "";
+  target.baseCityDataPromise = null;
+  target.cityLayerRevision = (Number(target.cityLayerRevision) || 0) + 1;
+  target.ruCityOverrides = ruCityOverrides || null;
+  target.specialZonesExternalData = specialZones || null;
+  target.contextLayerExternalDataByName = contextLayerExternal || {};
+  target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+  target.contextLayerLoadStateByName = createDefaultContextLayerLoadStateByName();
+  target.contextLayerLoadErrorByName = {};
+  target.contextLayerLoadPromiseByName = {};
+  target.physicalSemanticsData = null;
+  target.physicalContourMajorData = null;
+  target.physicalContourMinorData = null;
+  target.airportsData = null;
+  target.portsData = null;
+  if (startupBootCacheState && typeof startupBootCacheState === "object") {
+    target.startupBootCacheState = startupBootCacheState;
+  }
+  return target.topologyPrimary;
+}
+
+export function decodeStartupPrimaryCollectionsIntoState(
+  target,
+  {
+    startupDecodedCollections = null,
+    topojsonClient = globalThis.topojson,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  if (!target.topologyPrimary) {
+    throw new Error("CRITICAL: TopoJSON file loaded but is null/undefined");
+  }
+  const objects = target.topologyPrimary.objects || {};
+  if (!objects.political) {
+    throw new Error("CRITICAL: 'political' object missing from TopoJSON");
+  }
+  target.landData =
+    startupDecodedCollections?.landData
+    || topojsonClient.feature(target.topologyPrimary, objects.political);
+
+  if (target.specialZonesExternalData?.features) {
+    target.specialZonesData = target.specialZonesExternalData;
+  } else if (objects.special_zones) {
+    target.specialZonesData = startupDecodedCollections?.specialZonesData
+      || topojsonClient.feature(target.topologyPrimary, objects.special_zones);
+  }
+  if (objects.rivers) {
+    target.riversData = startupDecodedCollections?.riversData
+      || topojsonClient.feature(target.topologyPrimary, objects.rivers);
+  } else if (Array.isArray(target.contextLayerExternalDataByName?.rivers?.features)) {
+    target.riversData = target.contextLayerExternalDataByName.rivers;
+  }
+  if (objects.water_regions) {
+    target.waterRegionsData = startupDecodedCollections?.waterRegionsData
+      || topojsonClient.feature(target.topologyPrimary, objects.water_regions);
+  }
+  if (objects.ocean) {
+    target.oceanData = startupDecodedCollections?.oceanData
+      || topojsonClient.feature(target.topologyPrimary, objects.ocean);
+  }
+  if (objects.land) {
+    target.landBgData = startupDecodedCollections?.landBgData
+      || topojsonClient.feature(target.topologyPrimary, objects.land);
+  }
+  if (objects.urban) {
+    target.urbanData = startupDecodedCollections?.urbanData
+      || topojsonClient.feature(target.topologyPrimary, objects.urban);
+  } else if (Array.isArray(target.contextLayerExternalDataByName?.urban?.features)) {
+    target.urbanData = target.contextLayerExternalDataByName.urban;
+  }
+  if (objects.physical) {
+    target.physicalData = startupDecodedCollections?.physicalData
+      || topojsonClient.feature(target.topologyPrimary, objects.physical);
+  } else if (Array.isArray(target.contextLayerExternalDataByName?.physical?.features)) {
+    target.physicalData = target.contextLayerExternalDataByName.physical;
+  }
+  return target.landData;
+}

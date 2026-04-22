@@ -10,6 +10,12 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
     def test_scenario_rollback_owns_snapshot_without_recovery_layer_dependency(self):
         content = SCENARIO_ROLLBACK.read_text(encoding="utf-8")
 
+        self.assertIn("function captureScenarioRuntimeSnapshot()", content)
+        self.assertIn("function captureScenarioPresentationSnapshot()", content)
+        self.assertIn("function captureScenarioPaletteSnapshot()", content)
+        self.assertIn("function restoreScenarioRuntimeSnapshot(snapshot)", content)
+        self.assertIn("function restoreScenarioPresentationSnapshot(snapshot)", content)
+        self.assertIn("function restoreScenarioPaletteSnapshot(snapshot)", content)
         self.assertIn("export function captureScenarioApplyRollbackSnapshot()", content)
         self.assertIn("export function restoreScenarioApplyRollbackSnapshot(", content)
         self.assertIn("const ROLLBACK_REQUIRED_KEYS = Object.freeze([", content)

@@ -149,7 +149,15 @@ export function assertStartupReadonlyUnlocked(actionLabel = "complete this start
   );
 }
 
-export function assertScenarioInteractionsAllowed(actionLabel = "complete this scenario action") {
+export function assertScenarioInteractionsAllowed(
+  actionLabel = "complete this scenario action",
+  { allowDuringBootBlocking = false } = {}
+) {
+  if (!allowDuringBootBlocking && state.bootBlocking !== false) {
+    throw new Error(
+      `Startup is still completing. Unable to ${actionLabel} until the workspace leaves boot blocking mode.`
+    );
+  }
   assertStartupReadonlyUnlocked(actionLabel);
   if (!getScenarioFatalRecoveryState()) return;
   throw buildScenarioFatalRecoveryError(actionLabel);

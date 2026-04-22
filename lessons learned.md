@@ -1126,3 +1126,18 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 151. Playwright 的 `boundingBox()` 不适合直接驱动深度 transform 的 SVG 交互
 - 这次 strategic overlay 里的 `g.unit-counter` / `operation-graphics` 叠了 viewport transform 和局部 scale，Playwright 取到的 `boundingBox()` 会落到负坐标或失真坐标。
 - 更稳的最短路径是：E2E 里优先验证稳定的显式更新路径；如果必须拿屏幕坐标，就从 SVG 自己的 transform / rect 真值换算，不直接把 `boundingBox()` 当拖拽坐标真源。
+
+### 152. startup 里的并行 promise 不能只挂全局引用，必须保留本次启动的局部 promise
+- 这次 deferred UI bootstrap 一旦在全局 promise 的 catch 里把引用清空，后面的 startup catch 和 continue 分支就可能直接跳过 await。
+- 更稳的最短路径是：每次 bootstrap 都保存一份局部 promise 引用，主流程和恢复分支都基于这份局部引用判断是否已经 await、是否失败。
+- 如果 UI 在 scenario apply 之后失败，continue 分支还要先回退 active scenario，再进入 base map 恢复语义。
+
+### 153. startup cache key 的输入要走显式参数，不要让 data loader 偷读全局 state
+- 这次 `loadStartupBootArtifacts()` 只为了拿 `currentLanguage` 去拼 localization cache key，却直接 import `state`，让启动链的底层 loader 和全局运行态重新耦合在一起。
+- 更稳的最短路径是：把 cache key 需要的输入显式放进 `loadStartupBootArtifacts/loadMapData` 参数，由启动编排层传入。
+- 这样 startup loader 能保持纯输入驱动，后续再切 boot/content accessor 时改动面也会更小。
+
+### 154. scenario Playwright 长测里，资源加载超时和 UI 操作路径要分开定性
+- 这次 `scenario_apply_concurrency.spec.js` 和 `scenario_shell_overlay_contract.spec.js` 一开始看起来像 apply 事务坏了，继续拆后才发现 contract、node 行为、`scenario_apply_resilience.spec.js` 都是绿的，红灯集中在 Playwright 下的资源加载超时和控制面操作路径。
+- 更稳的最短路径是：先用 command-driven repro 确认 `applyScenarioByIdCommand` 是否真能走通，再单独判断是资源层 timeout、UI 控件路径，还是 shell overlay 合同本身。
+- 这样不会把场景资源慢路径、UI click flaky、状态 accessor 回归混成一个问题一起追。

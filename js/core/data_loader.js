@@ -14,7 +14,6 @@ import {
   loadBaseStartupViaWorker,
   shouldUseStartupWorker,
 } from "./startup_worker_client.js";
-import { state } from "./state.js";
 
 const TOPOLOGY_VARIANT_URLS = {
   highres: "data/europe_topology.highres.json",
@@ -1093,6 +1092,7 @@ export async function loadStartupBootArtifacts({
   localesUrl = null,
   geoAliasesUrl = null,
   localeLevel = "startup",
+  currentLanguage = "en",
   d3Client = globalThis.d3,
   useWorker = true,
   useStartupCache = true,
@@ -1132,7 +1132,7 @@ export async function loadStartupBootArtifacts({
   const localizationCacheKey = startupBootCacheState.enabled && !localizationUsesScenarioScopedStartupFiles
     ? createStartupLocalizationCacheKey({
       localeLevel: resolvedLocalization.localeLevel,
-      currentLanguage: state.currentLanguage || "en",
+      currentLanguage: String(currentLanguage || "en").trim() || "en",
       localesUrl: resolvedLocalization.localesUrl,
       geoAliasesUrl: resolvedLocalization.geoAliasesUrl,
       buildManifest,
@@ -1251,7 +1251,7 @@ export async function loadStartupBootArtifacts({
       payload: createSerializableStartupLocalizationPayload({ locales, geoAliases }),
       keyParts: {
         localeLevel: resolvedLocalization.localeLevel,
-        language: state.currentLanguage || "en",
+        language: String(currentLanguage || "en").trim() || "en",
       },
     }).then(() => {
       startupBootCacheState.localization = "written";
@@ -1324,6 +1324,7 @@ export async function loadMapData({
   topologyUrl = "data/europe_topology.json",
   localesUrl = null,
   geoAliasesUrl = null,
+  currentLanguage = "en",
   worldCitiesUrls = WORLD_CITIES_URLS,
   cityAliasesUrls = CITY_ALIASES_URLS,
   hierarchyUrl = "data/hierarchy.json",
@@ -1361,6 +1362,7 @@ export async function loadMapData({
           localesUrl,
           geoAliasesUrl,
           localeLevel,
+          currentLanguage,
           d3Client,
           useWorker: useStartupWorker,
           useStartupCache,

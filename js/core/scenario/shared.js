@@ -1,5 +1,5 @@
 const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
-const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
+const SCENARIO_LOAD_TIMEOUT_MS = 60_000;
 
 function cacheBust(url) {
   if (!url) return url;
@@ -87,6 +87,32 @@ function normalizeScenarioCoreMap(rawMap, { normalizeFeatureText = (value) => St
     cores[featureId] = coreTags;
   });
   return cores;
+}
+
+function cloneScenarioStateValue(value) {
+  if (value == null || typeof value !== "object") {
+    return value;
+  }
+  if (value instanceof Date) {
+    return new Date(value.getTime());
+  }
+  if (value instanceof Map) {
+    return new Map(Array.from(value.entries(), ([key, entry]) => [
+      cloneScenarioStateValue(key),
+      cloneScenarioStateValue(entry),
+    ]));
+  }
+  if (value instanceof Set) {
+    return new Set(Array.from(value, (entry) => cloneScenarioStateValue(entry)));
+  }
+  if (Array.isArray(value)) {
+    return value.map((entry) => cloneScenarioStateValue(entry));
+  }
+  const cloned = {};
+  Object.entries(value).forEach(([key, entry]) => {
+    cloned[key] = cloneScenarioStateValue(entry);
+  });
+  return cloned;
 }
 
 function withScenarioLoadTimeout(promise, ms, { scenarioId = "", resourceLabel = "resource" } = {}) {
@@ -286,6 +312,7 @@ export {
   normalizeScenarioCoreTag,
   normalizeScenarioCoreValue,
   normalizeScenarioCoreMap,
+  cloneScenarioStateValue,
   withScenarioLoadTimeout,
   loadScenarioJsonWithTimeout,
   loadScenarioJsonResourceWithTimeout,

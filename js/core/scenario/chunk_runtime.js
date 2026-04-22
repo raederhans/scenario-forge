@@ -798,7 +798,10 @@ function createScenarioChunkRuntimeController({
       showWaterRegions: normalizeScenarioPerformanceHints(bundle.manifest).waterRegionsDefault !== false,
       showScenarioSpecialRegions: normalizeScenarioPerformanceHints(bundle.manifest).specialRegionsDefault !== false,
       showScenarioReliefOverlays: normalizeScenarioPerformanceHints(bundle.manifest).scenarioReliefOverlaysDefault === true,
-      showCityPoints: state.showCityPoints !== false,
+      // First-frame coarse prewarm keeps the apply transaction focused on
+      // political/runtime shell readiness. City chunks continue to load through
+      // follow-up visibility refreshes after the scenario is interactive.
+      showCityPoints: false,
     });
     const coarseSelection = selectScenarioChunks({
       scenarioId: getScenarioBundleId(bundle),

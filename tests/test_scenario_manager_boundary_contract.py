@@ -72,6 +72,8 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("enterScenarioFatalRecovery({", content)
         self.assertIn('loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" })', content)
         self.assertIn("getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode", content)
+        self.assertIn('assertScenarioInteractionsAllowed("exit the active scenario", {', content)
+        self.assertIn("allowDuringBootBlocking,", content)
 
     def test_scenario_manager_delegates_presentation_runtime_owner(self):
         content = SCENARIO_MANAGER.read_text(encoding="utf-8")
@@ -122,6 +124,9 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         content = SCENARIO_APPLY_PIPELINE.read_text(encoding="utf-8")
         lifecycle_content = SCENARIO_LIFECYCLE_RUNTIME.read_text(encoding="utf-8")
 
+        self.assertIn("prepareScenarioActivationContext(bundle)", content)
+        self.assertIn("commitScenarioActivationState(bundle, staged)", content)
+        self.assertIn("commitScenarioChunkRuntimeState(bundle, staged)", content)
         self.assertIn("prepareScenarioApplyState", content)
         self.assertIn("applyPreparedScenarioState", content)
         self.assertIn("state.scenarioRuntimeTopologyData =", content)
