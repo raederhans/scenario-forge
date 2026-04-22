@@ -1,4 +1,4 @@
-import { state } from "../core/state.js";
+import { state as runtimeState } from "../core/state.js";
 import {
   clearActiveScenarioCommand,
   applyScenarioByIdCommand,
@@ -20,6 +20,7 @@ import {
 import { loadScenarioRegistry } from "../core/scenario_resources.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
+const state = runtimeState;
 
 export function initScenarioControls() {
   const scenarioSelect = document.getElementById("scenarioSelect");
@@ -34,13 +35,13 @@ export function initScenarioControls() {
 
   const renderScenarioControls = () => {
     const entries = getScenarioRegistryEntries();
-    const isApplyInFlight = !!state.scenarioApplyInFlight;
-    const isBootBlocking = state.bootBlocking !== false;
+    const isApplyInFlight = !!runtimeState.scenarioApplyInFlight;
+    const isBootBlocking = runtimeState.bootBlocking !== false;
     const fatalState = getScenarioFatalRecoveryState();
     const isFatalLocked = !!fatalState;
     const fatalMessage = formatScenarioFatalRecoveryMessage(fatalState);
     if (scenarioSelect) {
-      const activeValue = normalizeScenarioId(state.activeScenarioId);
+      const activeValue = normalizeScenarioId(runtimeState.activeScenarioId);
       const hasPendingOption = !!pendingScenarioId
         && entries.some((entry) => normalizeScenarioId(entry.scenario_id) === pendingScenarioId);
       const currentValue = (hasPendingOption ? pendingScenarioId : "") || activeValue;
@@ -70,10 +71,10 @@ export function initScenarioControls() {
       scenarioAuditHint.classList.toggle("hidden", !auditText);
     }
     if (scenarioViewModeSelect) {
-      const hasScenario = !!state.activeScenarioId;
-      const hasControllerData = Object.keys(state.scenarioControllersByFeatureId || {}).length > 0;
-      const hasSplit = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
-      scenarioViewModeSelect.value = normalizeScenarioViewMode(state.scenarioViewMode);
+      const hasScenario = !!runtimeState.activeScenarioId;
+      const hasControllerData = Object.keys(runtimeState.scenarioControllersByFeatureId || {}).length > 0;
+      const hasSplit = Number(runtimeState.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
+      scenarioViewModeSelect.value = normalizeScenarioViewMode(runtimeState.scenarioViewMode);
       scenarioViewModeSelect.disabled = isFatalLocked || !hasScenario || !hasControllerData || !hasSplit;
       scenarioViewModeSelect.classList.toggle("hidden", !hasScenario);
       scenarioViewModeLabel?.classList.toggle("hidden", !hasScenario);
@@ -85,20 +86,20 @@ export function initScenarioControls() {
     }
     if (resetScenarioBtn) {
       resetScenarioBtn.textContent = t("Reset", "ui");
-      resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isBootBlocking || isFatalLocked;
-      resetScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
+      resetScenarioBtn.disabled = !runtimeState.activeScenarioId || isApplyInFlight || isBootBlocking || isFatalLocked;
+      resetScenarioBtn.classList.toggle("hidden", !runtimeState.activeScenarioId);
       resetScenarioBtn.title = isFatalLocked ? fatalMessage : "";
     }
     if (clearScenarioBtn) {
       clearScenarioBtn.textContent = t("Exit Scenario", "ui");
-      clearScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isBootBlocking || isFatalLocked;
-      clearScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
+      clearScenarioBtn.disabled = !runtimeState.activeScenarioId || isApplyInFlight || isBootBlocking || isFatalLocked;
+      clearScenarioBtn.classList.toggle("hidden", !runtimeState.activeScenarioId);
       clearScenarioBtn.title = isFatalLocked ? fatalMessage : "";
     }
     if (applyScenarioBtn) {
       const selectedScenarioId = pendingScenarioId || normalizeScenarioId(scenarioSelect?.value);
       const isSelectedScenarioActive =
-        !!selectedScenarioId && selectedScenarioId === normalizeScenarioId(state.activeScenarioId);
+        !!selectedScenarioId && selectedScenarioId === normalizeScenarioId(runtimeState.activeScenarioId);
       applyScenarioBtn.textContent = t("Apply", "ui");
       applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive || isApplyInFlight || isBootBlocking || isFatalLocked;
       applyScenarioBtn.classList.toggle("hidden", isSelectedScenarioActive);
@@ -106,7 +107,7 @@ export function initScenarioControls() {
     }
   };
 
-  state.updateScenarioUIFn = renderScenarioControls;
+  runtimeState.updateScenarioUIFn = renderScenarioControls;
 
   if (scenarioSelect && !scenarioSelect.dataset.bound) {
     scenarioSelect.addEventListener("change", () => {
@@ -139,7 +140,7 @@ export function initScenarioControls() {
           markDirtyReason: "scenario-apply",
           showToastOnComplete: true,
         });
-        pendingScenarioId = normalizeScenarioId(state.activeScenarioId);
+        pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       } catch (error) {
         console.error("Failed to apply scenario:", error);
@@ -156,14 +157,14 @@ export function initScenarioControls() {
 
   if (resetScenarioBtn && !resetScenarioBtn.dataset.bound) {
     resetScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
+      if (!runtimeState.activeScenarioId || runtimeState.scenarioApplyInFlight) return;
       const changed = resetScenarioToBaselineCommand({
         renderMode: "request",
         markDirtyReason: "scenario-reset",
         showToastOnComplete: true,
       });
       if (changed) {
-        pendingScenarioId = normalizeScenarioId(state.activeScenarioId);
+        pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       }
     });
@@ -172,13 +173,13 @@ export function initScenarioControls() {
 
   if (clearScenarioBtn && !clearScenarioBtn.dataset.bound) {
     clearScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
+      if (!runtimeState.activeScenarioId || runtimeState.scenarioApplyInFlight) return;
       clearActiveScenarioCommand({
         renderMode: "request",
         markDirtyReason: "scenario-clear",
         showToastOnComplete: true,
       });
-      pendingScenarioId = normalizeScenarioId(state.activeScenarioId);
+      pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
       renderScenarioControls();
     });
     clearScenarioBtn.dataset.bound = "true";
@@ -193,3 +194,4 @@ export function initScenarioControls() {
       renderScenarioControls();
     });
 }
+

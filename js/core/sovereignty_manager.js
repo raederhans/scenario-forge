@@ -2,15 +2,16 @@ import {
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
   normalizeTextureMode,
-  state,
+  state as runtimeState,
 } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+const state = runtimeState;
 
 const FEATURE_MIGRATION_URLS = ["data/feature-migrations/by_hybrid_v1.json"];
 let featureMigrationMapPromise = null;
 
 function markLegacyColorStateDirty() {
-  state.legacyColorStateDirty = true;
+  runtimeState.legacyColorStateDirty = true;
 }
 
 function normalizeOwnerCode(rawCode) {
@@ -95,64 +96,64 @@ function seedSovereigntyFromLandData(featureCollection) {
 }
 
 function migrateLegacyColorState() {
-  if (state.legacyColorStateDirty === false) {
+  if (runtimeState.legacyColorStateDirty === false) {
     return;
   }
-  state.sovereignBaseColors = {
-    ...(state.countryBaseColors || {}),
-    ...(state.sovereignBaseColors || {}),
+  runtimeState.sovereignBaseColors = {
+    ...(runtimeState.countryBaseColors || {}),
+    ...(runtimeState.sovereignBaseColors || {}),
   };
-  state.visualOverrides = {
-    ...(state.featureOverrides || {}),
-    ...(state.visualOverrides || {}),
+  runtimeState.visualOverrides = {
+    ...(runtimeState.featureOverrides || {}),
+    ...(runtimeState.visualOverrides || {}),
   };
-  state.legacyColorStateDirty = false;
+  runtimeState.legacyColorStateDirty = false;
 }
 
 function ensureOwnerIndexMaps() {
-  if (!(state.ownerToFeatureIds instanceof Map)) {
-    state.ownerToFeatureIds = new Map();
+  if (!(runtimeState.ownerToFeatureIds instanceof Map)) {
+    runtimeState.ownerToFeatureIds = new Map();
   }
 }
 
 function rebuildOwnerIndex() {
   ensureOwnerIndexMaps();
-  state.ownerToFeatureIds.clear();
-  Object.entries(state.sovereigntyByFeatureId || {}).forEach(([id, ownerCode]) => {
+  runtimeState.ownerToFeatureIds.clear();
+  Object.entries(runtimeState.sovereigntyByFeatureId || {}).forEach(([id, ownerCode]) => {
     const code = normalizeOwnerCode(ownerCode);
-    const feature = state.landIndex?.get(id);
+    const feature = runtimeState.landIndex?.get(id);
     if (shouldExcludeScenarioPoliticalFeature(feature, id)) return;
     if (!id || !code) return;
-    const bucket = state.ownerToFeatureIds.get(code) || new Set();
+    const bucket = runtimeState.ownerToFeatureIds.get(code) || new Set();
     bucket.add(id);
-    state.ownerToFeatureIds.set(code, bucket);
+    runtimeState.ownerToFeatureIds.set(code, bucket);
   });
 }
 
 function ensureSovereigntyState({ force = false } = {}) {
   migrateLegacyColorState();
-  state.sovereignBaseColors = state.sovereignBaseColors || {};
-  state.visualOverrides = state.visualOverrides || {};
-  state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
-  state.mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
+  runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
+  runtimeState.visualOverrides = runtimeState.visualOverrides || {};
+  runtimeState.sovereigntyByFeatureId = runtimeState.sovereigntyByFeatureId || {};
+  runtimeState.mapSemanticMode = normalizeMapSemanticMode(runtimeState.mapSemanticMode);
 
-  if (state.sovereigntyInitialized && !force) {
+  if (runtimeState.sovereigntyInitialized && !force) {
     ensureOwnerIndexMaps();
-    return state.sovereigntyByFeatureId;
+    return runtimeState.sovereigntyByFeatureId;
   }
 
-  if (state.mapSemanticMode === "blank") {
-    state.sovereigntyByFeatureId = { ...state.sovereigntyByFeatureId };
+  if (runtimeState.mapSemanticMode === "blank") {
+    runtimeState.sovereigntyByFeatureId = { ...runtimeState.sovereigntyByFeatureId };
   } else {
-    const seeded = seedSovereigntyFromLandData(state.landData);
-    state.sovereigntyByFeatureId = {
+    const seeded = seedSovereigntyFromLandData(runtimeState.landData);
+    runtimeState.sovereigntyByFeatureId = {
       ...seeded,
-      ...state.sovereigntyByFeatureId,
+      ...runtimeState.sovereigntyByFeatureId,
     };
   }
-  state.sovereigntyInitialized = true;
+  runtimeState.sovereigntyInitialized = true;
   rebuildOwnerIndex();
-  return state.sovereigntyByFeatureId;
+  return runtimeState.sovereigntyByFeatureId;
 }
 
 function getFeatureOwnerCode(featureOrId, { skipEnsure = true } = {}) {
@@ -161,14 +162,14 @@ function getFeatureOwnerCode(featureOrId, { skipEnsure = true } = {}) {
   if (!skipEnsure) {
     ensureSovereigntyState();
   }
-  const direct = normalizeOwnerCode(state.sovereigntyByFeatureId?.[id] || "");
+  const direct = normalizeOwnerCode(runtimeState.sovereigntyByFeatureId?.[id] || "");
   if (direct) return direct;
-  const feature = typeof featureOrId === "string" ? state.landIndex?.get(id) : featureOrId;
+  const feature = typeof featureOrId === "string" ? runtimeState.landIndex?.get(id) : featureOrId;
   return getCanonicalCountryCodeForFeature(feature);
 }
 
 function touchSovereigntyRevision() {
-  state.sovereigntyRevision = (Number(state.sovereigntyRevision) || 0) + 1;
+  runtimeState.sovereigntyRevision = (Number(runtimeState.sovereigntyRevision) || 0) + 1;
 }
 
 function updateOwnerIndexForMove(featureId, prevOwnerCode, nextOwnerCode) {
@@ -176,18 +177,18 @@ function updateOwnerIndexForMove(featureId, prevOwnerCode, nextOwnerCode) {
   const prevCode = normalizeOwnerCode(prevOwnerCode);
   const nextCode = normalizeOwnerCode(nextOwnerCode);
   if (prevCode) {
-    const prevBucket = state.ownerToFeatureIds.get(prevCode);
+    const prevBucket = runtimeState.ownerToFeatureIds.get(prevCode);
     if (prevBucket instanceof Set) {
       prevBucket.delete(featureId);
       if (prevBucket.size === 0) {
-        state.ownerToFeatureIds.delete(prevCode);
+        runtimeState.ownerToFeatureIds.delete(prevCode);
       }
     }
   }
   if (nextCode) {
-    const nextBucket = state.ownerToFeatureIds.get(nextCode) || new Set();
+    const nextBucket = runtimeState.ownerToFeatureIds.get(nextCode) || new Set();
     nextBucket.add(featureId);
-    state.ownerToFeatureIds.set(nextCode, nextBucket);
+    runtimeState.ownerToFeatureIds.set(nextCode, nextBucket);
   }
 }
 
@@ -195,7 +196,7 @@ function setFeatureOwnerCode(featureId, ownerCode) {
   const id = getFeatureId(featureId);
   const code = normalizeOwnerCode(ownerCode);
   if (!id || !code) return false;
-  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
   if (landIndex && landIndex.size > 0 && !landIndex.has(id)) {
     // Ignore writes for features that are not currently present in the loaded map topology.
     return false;
@@ -206,7 +207,7 @@ function setFeatureOwnerCode(featureId, ownerCode) {
   ensureSovereigntyState();
   const prev = getFeatureOwnerCode(id, { skipEnsure: true });
   if (prev === code) return false;
-  state.sovereigntyByFeatureId[id] = code;
+  runtimeState.sovereigntyByFeatureId[id] = code;
   updateOwnerIndexForMove(id, prev, code);
   touchSovereigntyRevision();
   return true;
@@ -228,13 +229,13 @@ function resetFeatureOwnerCode(featureId) {
   const id = getFeatureId(featureId);
   if (!id) return false;
   ensureSovereigntyState();
-  const feature = state.landIndex?.get(id);
+  const feature = runtimeState.landIndex?.get(id);
   if (shouldExcludeScenarioPoliticalFeature(feature, id)) return false;
   const canonical = getCanonicalCountryCodeForFeature(feature);
   if (!canonical) return false;
   const prev = getFeatureOwnerCode(id, { skipEnsure: true });
   if (prev === canonical) return false;
-  state.sovereigntyByFeatureId[id] = canonical;
+  runtimeState.sovereigntyByFeatureId[id] = canonical;
   updateOwnerIndexForMove(id, prev, canonical);
   touchSovereigntyRevision();
   return true;
@@ -253,9 +254,9 @@ function resetFeatureOwnerCodes(featureIds) {
 }
 
 function resetAllFeatureOwnersToCanonical() {
-  state.mapSemanticMode = "political";
-  state.sovereigntyByFeatureId = seedSovereigntyFromLandData(state.landData);
-  state.sovereigntyInitialized = true;
+  runtimeState.mapSemanticMode = "political";
+  runtimeState.sovereigntyByFeatureId = seedSovereigntyFromLandData(runtimeState.landData);
+  runtimeState.sovereigntyInitialized = true;
   rebuildOwnerIndex();
   touchSovereigntyRevision();
 }
@@ -264,7 +265,7 @@ function getFeatureIdsForOwner(ownerCode) {
   ensureOwnerIndexMaps();
   const code = normalizeOwnerCode(ownerCode);
   if (!code) return [];
-  const bucket = state.ownerToFeatureIds.get(code);
+  const bucket = runtimeState.ownerToFeatureIds.get(code);
   if (!(bucket instanceof Set)) return [];
   return Array.from(bucket);
 }
@@ -551,3 +552,4 @@ export {
   migrateImportedProjectData,
   migrateFeatureScopedProjectDataToCurrentTopology,
 };
+

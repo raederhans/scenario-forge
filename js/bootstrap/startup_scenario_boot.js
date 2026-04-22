@@ -15,7 +15,7 @@ function buildScenarioBundleBootMetrics(bundle) {
 }
 
 export function createStartupScenarioBootOwner({
-  state,
+  runtimeState,
   helpers = {},
 } = {}) {
   const {
@@ -31,7 +31,7 @@ export function createStartupScenarioBootOwner({
     startupInteractionMode = "full",
   } = {}) {
     // Keep startup bundle selection, apply, and recovery in one transaction so
-    // main.js can stay focused on shell bootstrap and ready-state orchestration.
+    // main.js can stay focused on shell bootstrap and ready-runtimeState orchestration.
     setBootState?.("scenario-bundle");
 
     const scenarioBundleResult = await scenarioBundlePromise;
@@ -57,9 +57,9 @@ export function createStartupScenarioBootOwner({
 
     setBootState?.("scenario-apply");
     startBootMetric?.("scenario-apply");
-    state.scenarioApplyInFlight = true;
-    if (typeof state.updateScenarioUIFn === "function") {
-      state.updateScenarioUIFn();
+    runtimeState.scenarioApplyInFlight = true;
+    if (typeof runtimeState.updateScenarioUIFn === "function") {
+      runtimeState.updateScenarioUIFn();
     }
 
     try {
@@ -94,9 +94,9 @@ export function createStartupScenarioBootOwner({
         interactionLevel: startupInteractionMode === "readonly" ? "readonly-startup" : "full",
       });
     } finally {
-      state.scenarioApplyInFlight = false;
-      if (typeof state.updateScenarioUIFn === "function") {
-        state.updateScenarioUIFn();
+      runtimeState.scenarioApplyInFlight = false;
+      if (typeof runtimeState.updateScenarioUIFn === "function") {
+        runtimeState.updateScenarioUIFn();
       }
     }
 
@@ -104,7 +104,7 @@ export function createStartupScenarioBootOwner({
       source: scenarioBundleSource,
     });
     finishBootMetric?.("scenario-apply", {
-      activeScenarioId: String(state.activeScenarioId || ""),
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
       source: scenarioBundleSource,
       startupRecoveryReason,
     });

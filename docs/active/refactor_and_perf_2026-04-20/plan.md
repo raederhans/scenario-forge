@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-- 当前阶段：`Lane E` 三点已完成，下一步进入 `runtime_hooks.js` 到事件总线的完整替换。
+- 当前阶段：任务包 A 已完成，下一步进入 `runtime_hooks.js` 到事件总线的完整替换。
 - 原计划链真源：见 `original_plan_chain.md`。
 - 当前任务目标：按 `Lane C -> Lane D -> Lane E` 顺序推进 accessor 迁移，并把日常验证压到 contract + node + targeted e2e。
 
@@ -48,10 +48,9 @@
 
 ## 暂缓事项
 
-1. `Lane E` renderer / ui / color accessor 迁移。
-2. `startup_hydration.js` 与 recovery 合同尾项核对。
-3. `runtime_hooks.js` 到事件总线的完整替换。
-4. `state/index.js` / `config.js` / `bus.js` / Proxy 门面收口。
+1. `runtime_hooks.js` 到事件总线的完整替换。
+2. `state/index.js` / `config.js` / `bus.js` / Proxy 门面收口。
+3. 剩余 `import { state }` 与 `state.*Fn` / `*DataFn` 清零。
 
 ## 完成标准
 
@@ -60,3 +59,13 @@
 - `strategic_overlay_editing.spec.js` fresh green。
 - `perf:gate` 绿色。
 - 可以继续更深的 lane。
+
+## 2026-04-22 任务包 B 实施补记
+
+- 本轮直接按既有批准计划推进 `B1 -> B2 -> B3`，不再重开方案讨论。
+- 实施策略：保留最小 compat surface，删除 `runtime_hooks.js` 文件本体，把 helper/compat 收口到 `js/core/state/index.js`，`bus.js` 只保留纯事件总线能力，`config.js` 收口 hook 名称与事件名常量。
+- 生产代码目标：
+  1. `js/` 下清零 `runtime_hooks.js` import
+  2. `js/` 下清零 `import { state }`
+  3. `js/` 下清零 `state.*Fn / *DataFn`
+- 外部兼容目标：保留 state compat 属性 setter/getter，让现有 e2e 里直接读写 `window.state.*Fn` 的用法还能工作一轮。

@@ -29,6 +29,11 @@ import {
   state,
 } from "./state.js";
 import {
+  STATE_BUS_EVENTS,
+  callRuntimeHook,
+  emitStateBusEvent,
+} from "./state/index.js";
+import {
   createDefaultOperationGraphicsEditorState,
   createDefaultOperationalLineEditorState,
   createDefaultSpecialZoneEditorState,
@@ -213,64 +218,28 @@ function syncProjectImportUiState({ scenarioImportAudit, hooks }) {
   state.scenarioImportAudit = state.activeScenarioId
     ? cloneImportedProjectValue(scenarioImportAudit)
     : null;
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-    state.updateSpecialZoneEditorUIFn();
-  }
-  if (typeof state.updateStrategicOverlayUIFn === "function") {
-    state.updateStrategicOverlayUIFn();
-  }
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateActiveSovereignUIFn === "function") {
-    state.updateActiveSovereignUIFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.updateRecentUI === "function") {
-    state.updateRecentUI();
-  }
-  if (typeof state.updateScenarioContextBarFn === "function") {
-    state.updateScenarioContextBarFn();
-  }
-  state.persistViewSettingsFn?.();
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PARENT_BORDER_COUNTRY_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SPECIAL_ZONE_EDITOR_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_WATER_INTERACTION);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_SPECIAL_REGION);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_ACTIVE_SOVEREIGN_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PAINT_MODE);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DYNAMIC_BORDER_STATUS);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_RECENT_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_CONTEXT_BAR);
+  callRuntimeHook(state, "persistViewSettingsFn");
   rebuildPresetState();
   hooks.refreshColorState?.({ renderNow: false });
   requestRender("project-import");
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.refreshCountryInspectorDetailFn === "function") {
-    state.refreshCountryInspectorDetailFn();
-  }
-  if (typeof state.renderWaterRegionListFn === "function") {
-    state.renderWaterRegionListFn();
-  }
-  if (typeof state.renderSpecialRegionListFn === "function") {
-    state.renderSpecialRegionListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-  if (typeof state.updateLegendUI === "function") {
-    state.updateLegendUI();
-  }
-  if (typeof state.renderScenarioAuditPanelFn === "function") {
-    state.renderScenarioAuditPanelFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_COUNTRY_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.REFRESH_COUNTRY_INSPECTOR_DETAIL);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_WATER_REGION_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SPECIAL_REGION_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_PRESET_TREE);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);
 }
 
 async function resolveScenarioImportAudit(data, ui) {
@@ -695,43 +664,41 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   }
   if (state.activeScenarioId && state.showCityPoints) {
     const { ensureActiveScenarioOptionalLayerLoaded } = await getScenarioResourcesModule();
-    if (typeof state.ensureBaseCityDataFn === "function") {
-      await state.ensureBaseCityDataFn({ reason: "project-import", renderNow: false });
-    }
+    await callRuntimeHook(state, "ensureBaseCityDataFn", { reason: "project-import", renderNow: false });
     await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
   }
-  if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn("rivers", {
+  if (state.showRivers) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", "rivers", {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showTransport && state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn("airports", {
+  if (state.showTransport && state.showAirports) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", "airports", {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showTransport && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn("ports", {
+  if (state.showTransport && state.showPorts) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", "ports", {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showTransport && state.showRail && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn(["railways", "rail_stations_major"], {
+  if (state.showTransport && state.showRail) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", ["railways", "rail_stations_major"], {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn("urban", {
+  if (state.showUrban) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", "urban", {
       reason: "project-import",
       renderNow: false,
     });
   }
-  if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
-    await state.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], {
+  if (state.showPhysical) {
+    await callRuntimeHook(state, "ensureContextLayerDataFn", ["physical-set", "physical-contours-set"], {
       reason: "project-import",
       renderNow: false,
     });

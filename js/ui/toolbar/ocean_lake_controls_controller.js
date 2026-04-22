@@ -7,7 +7,7 @@ import { captureHistoryState, pushHistoryEntry } from "../../core/history_manage
  * toolbar.js 继续保留更高层 facade：
  * - startup 阶段的 ocean / lake styleConfig 归一
  * - workspace status 刷新链
- * - state.updateToolbarInputsFn 总刷新入口
+ * - toolbar inputs 总刷新入口
  * - auto-fill 工作流里的 ocean color handoff
  */
 export function createOceanLakeControlsController({

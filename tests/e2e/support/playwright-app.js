@@ -168,42 +168,81 @@ async function waitForScenarioSelectReady(page, { scenarioId = "tno_1962", timeo
 
 async function applyScenarioAndWaitIdle(page, scenarioId, {
   timeout = 120_000,
+  renderMode = "none",
   markDirtyReason = "playwright-apply-scenario",
   showToastOnComplete = false,
 } = {}) {
   const expectedScenarioId = String(scenarioId || "").trim();
-  await page.evaluate(async ({ expectedScenarioId, markDirtyReason, showToastOnComplete }) => {
-    const select = document.querySelector("#scenarioSelect");
-    if (select instanceof HTMLSelectElement) {
-      select.value = expectedScenarioId;
-    }
-    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
-    let lastError = null;
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      try {
-        await applyScenarioById(expectedScenarioId, {
-          renderNow: true,
-          markDirtyReason,
-          showToastOnComplete,
-        });
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 400 * (attempt + 1)));
-      }
-    }
-    if (lastError) {
-      throw lastError;
-    }
-  }, {
+  await waitForAppInteractive(page, { timeout });
+  await waitForScenarioSelectReady(page, { scenarioId: expectedScenarioId, timeout });
+  const applyPayload = {
     expectedScenarioId,
+    renderMode,
     markDirtyReason,
     showToastOnComplete,
-  });
+  };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await page.evaluate(async ({
+        expectedScenarioId,
+        renderMode,
+        markDirtyReason,
+        showToastOnComplete,
+      }) => {
+        const select = document.querySelector("#scenarioSelect");
+        if (select instanceof HTMLSelectElement) {
+          select.value = expectedScenarioId;
+        }
+        globalThis.__playwrightScenarioApplyState = {
+          targetScenarioId: expectedScenarioId,
+          settled: false,
+          error: "",
+          startedAt: Date.now(),
+        };
+        const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
+        void (async () => {
+          let lastError = null;
+          for (let commandAttempt = 0; commandAttempt < 3; commandAttempt += 1) {
+            try {
+              await applyScenarioByIdCommand(expectedScenarioId, {
+                renderMode,
+                markDirtyReason,
+                showToastOnComplete,
+              });
+              lastError = null;
+              break;
+            } catch (error) {
+              lastError = error;
+              await new Promise((resolve) => globalThis.setTimeout(resolve, 400 * (commandAttempt + 1)));
+            }
+          }
+          globalThis.__playwrightScenarioApplyState = {
+            targetScenarioId: expectedScenarioId,
+            settled: true,
+            error: lastError ? String(lastError?.message || lastError) : "",
+            finishedAt: Date.now(),
+          };
+        })();
+      }, applyPayload);
+      break;
+    } catch (error) {
+      const message = String(error?.message || error || "");
+      const shouldRetry = attempt < 2 && /Execution context was destroyed/i.test(message);
+      if (!shouldRetry) {
+        throw error;
+      }
+      await page.waitForLoadState("domcontentloaded", { timeout });
+      await waitForAppInteractive(page, { timeout });
+      await waitForScenarioSelectReady(page, { scenarioId: expectedScenarioId, timeout });
+    }
+  }
   await primeStateRef(page);
   await page.waitForFunction((targetScenarioId) => {
     const state = globalThis.__playwrightStateRef || null;
+    const applyState = globalThis.__playwrightScenarioApplyState || null;
+    if (applyState?.targetScenarioId === targetScenarioId && String(applyState?.error || "").trim()) {
+      throw new Error(`[playwright-app] scenario apply failed: ${applyState.error}`);
+    }
     if (!state) return false;
     return state.activeScenarioId === targetScenarioId && !state.scenarioApplyInFlight;
   }, expectedScenarioId, { timeout });

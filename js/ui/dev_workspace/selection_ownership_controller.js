@@ -1,4 +1,4 @@
-import { state } from "../../core/state.js";
+import { state as runtimeState } from "../../core/state.js";
 import {
   applyOwnerToFeatureIds,
   buildScenarioOwnershipSavePayload,
@@ -6,6 +6,7 @@ import {
 } from "../../core/scenario_ownership_editor.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";
+const state = runtimeState;
 
 function ui(key) {
   return t(key, "ui");
@@ -56,15 +57,15 @@ export function createSelectionOwnershipController({
 
   const render = ({ hasActiveScenario }) => {
     const ownershipModel = resolveOwnershipEditorModel();
-    const editorState = state.devScenarioEditor || {};
+    const editorState = runtimeState.devScenarioEditor || {};
     const requestedOwnerCode = normalizeOwnerInput(editorState.targetOwnerCode);
-    const fallbackOwnerCode = normalizeOwnerInput(state.activeSovereignCode);
+    const fallbackOwnerCode = normalizeOwnerInput(runtimeState.activeSovereignCode);
     const effectiveOwnerCode = requestedOwnerCode || fallbackOwnerCode;
 
     scenarioOwnershipPanel?.classList.toggle("hidden", !hasActiveScenario);
     if (scenarioOwnershipTitle) {
       scenarioOwnershipTitle.textContent = hasActiveScenario
-        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
         : ui("No active scenario");
     }
     if (scenarioOwnershipHint) {
@@ -167,8 +168,8 @@ export function createSelectionOwnershipController({
   const bindEvents = () => {
     bindButtonAction(applyOwnerBtn, () => {
       const targetIds = resolveOwnershipTargetIds();
-      const requestedOwnerCode = normalizeOwnerInput(state.devScenarioEditor?.targetOwnerCode);
-      const ownerCode = requestedOwnerCode || normalizeOwnerInput(state.activeSovereignCode);
+      const requestedOwnerCode = normalizeOwnerInput(runtimeState.devScenarioEditor?.targetOwnerCode);
+      const ownerCode = requestedOwnerCode || normalizeOwnerInput(runtimeState.activeSovereignCode);
       const result = applyOwnerToFeatureIds(targetIds, ownerCode, {
         historyKind: "dev-workspace-ownership-apply",
         dirtyReason: "dev-workspace-ownership-apply",
@@ -228,10 +229,10 @@ export function createSelectionOwnershipController({
     });
 
     bindButtonAction(saveOwnersBtn, async () => {
-      if (!state.activeScenarioId || state.devScenarioEditor?.isSaving) return;
+      if (!runtimeState.activeScenarioId || runtimeState.devScenarioEditor?.isSaving) return;
       const payload = buildScenarioOwnershipSavePayload();
-      state.devScenarioEditor = {
-        ...(state.devScenarioEditor || {}),
+      runtimeState.devScenarioEditor = {
+        ...(runtimeState.devScenarioEditor || {}),
         isSaving: true,
         lastSaveMessage: "",
         lastSaveTone: "",
@@ -253,8 +254,8 @@ export function createSelectionOwnershipController({
         if (!response.ok || !result?.ok) {
           throw new Error(String(result?.message || `HTTP ${response.status}`));
         }
-        state.devScenarioEditor = {
-          ...(state.devScenarioEditor || {}),
+        runtimeState.devScenarioEditor = {
+          ...(runtimeState.devScenarioEditor || {}),
           isSaving: false,
           lastSavedAt: String(result.savedAt || ""),
           lastSavedPath: String(result.filePath || ""),
@@ -266,8 +267,8 @@ export function createSelectionOwnershipController({
           tone: "success",
         });
       } catch (error) {
-        state.devScenarioEditor = {
-          ...(state.devScenarioEditor || {}),
+        runtimeState.devScenarioEditor = {
+          ...(runtimeState.devScenarioEditor || {}),
           isSaving: false,
           lastSaveMessage: String(error?.message || ui("Unable to save ownership file.")),
           lastSaveTone: "critical",
@@ -290,8 +291,8 @@ export function createSelectionOwnershipController({
       const inferredTag = ownershipModel.isMixedOwner
         ? ""
         : normalizeOwnerInput(ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0] || "");
-      state.devScenarioEditor = {
-        ...(state.devScenarioEditor || {}),
+      runtimeState.devScenarioEditor = {
+        ...(runtimeState.devScenarioEditor || {}),
         targetOwnerCode: inferredTag,
       };
       renderWorkspace();
@@ -299,8 +300,8 @@ export function createSelectionOwnershipController({
 
     if (scenarioOwnerInput && scenarioOwnerInput.dataset.bound !== "true") {
       scenarioOwnerInput.addEventListener("input", (event) => {
-        state.devScenarioEditor = {
-          ...(state.devScenarioEditor || {}),
+        runtimeState.devScenarioEditor = {
+          ...(runtimeState.devScenarioEditor || {}),
           targetOwnerCode: normalizeOwnerInput(event.target.value),
         };
         renderWorkspace();
@@ -310,8 +311,8 @@ export function createSelectionOwnershipController({
 
     if (devQuickOwnerInput && devQuickOwnerInput.dataset.bound !== "true") {
       devQuickOwnerInput.addEventListener("input", (event) => {
-        state.devScenarioEditor = {
-          ...(state.devScenarioEditor || {}),
+        runtimeState.devScenarioEditor = {
+          ...(runtimeState.devScenarioEditor || {}),
           targetOwnerCode: normalizeOwnerInput(event.target.value),
         };
         renderWorkspace();
@@ -325,3 +326,4 @@ export function createSelectionOwnershipController({
     render,
   };
 }
+

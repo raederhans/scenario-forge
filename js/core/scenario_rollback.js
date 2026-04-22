@@ -1,5 +1,6 @@
-import { countryNames, defaultCountryPalette, state } from "./state.js";
+import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
 import { normalizeMapSemanticMode } from "./state.js";
+import { readRegisteredRuntimeHookSource } from "./state/index.js";
 import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import {
@@ -10,6 +11,7 @@ import {
 import { ensureScenarioAuditUiState, setScenarioAuditUiState } from "./scenario_ui_sync.js";
 import { scheduleScenarioChunkRefresh } from "./scenario_resources.js";
 import { cloneScenarioStateValue } from "./scenario/shared.js";
+const state = runtimeState;
 
 const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "activeScenarioId",
@@ -123,117 +125,118 @@ function validateScenarioApplyRollbackSnapshot(snapshot) {
 
 function captureScenarioRuntimeSnapshot() {
   return {
-    activeScenarioId: state.activeScenarioId,
-    scenarioBorderMode: state.scenarioBorderMode,
-    activeScenarioManifest: cloneScenarioStateValue(state.activeScenarioManifest),
-    scenarioCountriesByTag: cloneScenarioStateValue(state.scenarioCountriesByTag),
-    scenarioFixedOwnerColors: cloneScenarioStateValue(state.scenarioFixedOwnerColors),
-    activeScenarioMeshPack: cloneScenarioStateValue(state.activeScenarioMeshPack),
-    defaultRuntimePoliticalTopology: cloneScenarioStateValue(state.defaultRuntimePoliticalTopology),
-    scenarioRuntimeTopologyData: cloneScenarioStateValue(state.scenarioRuntimeTopologyData),
-    scenarioLandMaskData: cloneScenarioStateValue(state.scenarioLandMaskData),
-    scenarioContextLandMaskData: cloneScenarioStateValue(state.scenarioContextLandMaskData),
-    scenarioLandMaskVersionTag: String(state.scenarioLandMaskVersionTag || ""),
-    scenarioContextLandMaskVersionTag: String(state.scenarioContextLandMaskVersionTag || ""),
-    runtimePoliticalTopology: cloneScenarioStateValue(state.runtimePoliticalTopology),
-    scenarioWaterRegionsData: cloneScenarioStateValue(state.scenarioWaterRegionsData),
-    scenarioWaterOverlayVersionTag: String(state.scenarioWaterOverlayVersionTag || ""),
-    scenarioSpecialRegionsData: cloneScenarioStateValue(state.scenarioSpecialRegionsData),
-    scenarioRuntimeTopologyVersionTag: String(state.scenarioRuntimeTopologyVersionTag || ""),
-    scenarioHydrationHealthGate: cloneScenarioStateValue(state.scenarioHydrationHealthGate),
-    scenarioReliefOverlaysData: cloneScenarioStateValue(state.scenarioReliefOverlaysData),
-    scenarioDistrictGroupsData: cloneScenarioStateValue(state.scenarioDistrictGroupsData),
-    scenarioDistrictGroupByFeatureId: cloneScenarioStateValue(state.scenarioDistrictGroupByFeatureId),
-    scenarioReliefOverlayRevision: Number(state.scenarioReliefOverlayRevision) || 0,
-    scenarioGeoLocalePatchData: cloneScenarioStateValue(state.scenarioGeoLocalePatchData),
-    scenarioCityOverridesData: cloneScenarioStateValue(state.scenarioCityOverridesData),
-    cityLayerRevision: Number(state.cityLayerRevision) || 0,
-    scenarioReleasableIndex: cloneScenarioStateValue(state.scenarioReleasableIndex),
-    releasableCatalog: cloneScenarioStateValue(state.releasableCatalog),
-    scenarioAudit: cloneScenarioStateValue(state.scenarioAudit),
+    activeScenarioId: runtimeState.activeScenarioId,
+    scenarioBorderMode: runtimeState.scenarioBorderMode,
+    activeScenarioManifest: cloneScenarioStateValue(runtimeState.activeScenarioManifest),
+    scenarioCountriesByTag: cloneScenarioStateValue(runtimeState.scenarioCountriesByTag),
+    scenarioFixedOwnerColors: cloneScenarioStateValue(runtimeState.scenarioFixedOwnerColors),
+    activeScenarioMeshPack: cloneScenarioStateValue(runtimeState.activeScenarioMeshPack),
+    defaultRuntimePoliticalTopology: cloneScenarioStateValue(runtimeState.defaultRuntimePoliticalTopology),
+    scenarioRuntimeTopologyData: cloneScenarioStateValue(runtimeState.scenarioRuntimeTopologyData),
+    scenarioLandMaskData: cloneScenarioStateValue(runtimeState.scenarioLandMaskData),
+    scenarioContextLandMaskData: cloneScenarioStateValue(runtimeState.scenarioContextLandMaskData),
+    scenarioLandMaskVersionTag: String(runtimeState.scenarioLandMaskVersionTag || ""),
+    scenarioContextLandMaskVersionTag: String(runtimeState.scenarioContextLandMaskVersionTag || ""),
+    runtimePoliticalTopology: cloneScenarioStateValue(runtimeState.runtimePoliticalTopology),
+    scenarioWaterRegionsData: cloneScenarioStateValue(runtimeState.scenarioWaterRegionsData),
+    scenarioWaterOverlayVersionTag: String(runtimeState.scenarioWaterOverlayVersionTag || ""),
+    scenarioSpecialRegionsData: cloneScenarioStateValue(runtimeState.scenarioSpecialRegionsData),
+    scenarioRuntimeTopologyVersionTag: String(runtimeState.scenarioRuntimeTopologyVersionTag || ""),
+    scenarioHydrationHealthGate: cloneScenarioStateValue(runtimeState.scenarioHydrationHealthGate),
+    scenarioReliefOverlaysData: cloneScenarioStateValue(runtimeState.scenarioReliefOverlaysData),
+    scenarioDistrictGroupsData: cloneScenarioStateValue(runtimeState.scenarioDistrictGroupsData),
+    scenarioDistrictGroupByFeatureId: cloneScenarioStateValue(runtimeState.scenarioDistrictGroupByFeatureId),
+    scenarioReliefOverlayRevision: Number(runtimeState.scenarioReliefOverlayRevision) || 0,
+    scenarioGeoLocalePatchData: cloneScenarioStateValue(runtimeState.scenarioGeoLocalePatchData),
+    scenarioCityOverridesData: cloneScenarioStateValue(runtimeState.scenarioCityOverridesData),
+    cityLayerRevision: Number(runtimeState.cityLayerRevision) || 0,
+    scenarioReleasableIndex: cloneScenarioStateValue(runtimeState.scenarioReleasableIndex),
+    releasableCatalog: cloneScenarioStateValue(runtimeState.releasableCatalog),
+    scenarioAudit: cloneScenarioStateValue(runtimeState.scenarioAudit),
     scenarioAuditUi: cloneScenarioStateValue(ensureScenarioAuditUiState()),
-    scenarioImportAudit: cloneScenarioStateValue(state.scenarioImportAudit),
-    scenarioBaselineHash: String(state.scenarioBaselineHash || ""),
-    scenarioBaselineOwnersByFeatureId: cloneScenarioStateValue(state.scenarioBaselineOwnersByFeatureId),
-    scenarioControllersByFeatureId: cloneScenarioStateValue(state.scenarioControllersByFeatureId),
-    scenarioAutoShellOwnerByFeatureId: cloneScenarioStateValue(state.scenarioAutoShellOwnerByFeatureId),
-    scenarioAutoShellControllerByFeatureId: cloneScenarioStateValue(state.scenarioAutoShellControllerByFeatureId),
-    scenarioBaselineControllersByFeatureId: cloneScenarioStateValue(state.scenarioBaselineControllersByFeatureId),
-    scenarioBaselineCoresByFeatureId: cloneScenarioStateValue(state.scenarioBaselineCoresByFeatureId),
-    scenarioShellOverlayRevision: Number(state.scenarioShellOverlayRevision) || 0,
-    scenarioControllerRevision: Number(state.scenarioControllerRevision) || 0,
-    scenarioOwnerControllerDiffCount: Number(state.scenarioOwnerControllerDiffCount) || 0,
-    scenarioDataHealth: cloneScenarioStateValue(state.scenarioDataHealth),
-    scenarioViewMode: String(state.scenarioViewMode || "ownership"),
-    mapSemanticMode: normalizeMapSemanticMode(state.mapSemanticMode),
-    countryNames: cloneScenarioStateValue(state.countryNames),
-    sovereigntyByFeatureId: cloneScenarioStateValue(state.sovereigntyByFeatureId),
-    sovereigntyInitialized: !!state.sovereigntyInitialized,
-    visualOverrides: cloneScenarioStateValue(state.visualOverrides),
-    featureOverrides: cloneScenarioStateValue(state.featureOverrides),
-    sovereignBaseColors: cloneScenarioStateValue(state.sovereignBaseColors),
-    countryBaseColors: cloneScenarioStateValue(state.countryBaseColors),
-    activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
-    scenarioPoliticalChunkData: cloneScenarioStateValue(state.scenarioPoliticalChunkData),
-    activeScenarioChunks: cloneScenarioStateValue(state.activeScenarioChunks),
+    scenarioImportAudit: cloneScenarioStateValue(runtimeState.scenarioImportAudit),
+    scenarioBaselineHash: String(runtimeState.scenarioBaselineHash || ""),
+    scenarioBaselineOwnersByFeatureId: cloneScenarioStateValue(runtimeState.scenarioBaselineOwnersByFeatureId),
+    scenarioControllersByFeatureId: cloneScenarioStateValue(runtimeState.scenarioControllersByFeatureId),
+    scenarioAutoShellOwnerByFeatureId: cloneScenarioStateValue(runtimeState.scenarioAutoShellOwnerByFeatureId),
+    scenarioAutoShellControllerByFeatureId: cloneScenarioStateValue(runtimeState.scenarioAutoShellControllerByFeatureId),
+    scenarioBaselineControllersByFeatureId: cloneScenarioStateValue(runtimeState.scenarioBaselineControllersByFeatureId),
+    scenarioBaselineCoresByFeatureId: cloneScenarioStateValue(runtimeState.scenarioBaselineCoresByFeatureId),
+    scenarioShellOverlayRevision: Number(runtimeState.scenarioShellOverlayRevision) || 0,
+    scenarioControllerRevision: Number(runtimeState.scenarioControllerRevision) || 0,
+    scenarioOwnerControllerDiffCount: Number(runtimeState.scenarioOwnerControllerDiffCount) || 0,
+    scenarioDataHealth: cloneScenarioStateValue(runtimeState.scenarioDataHealth),
+    scenarioViewMode: String(runtimeState.scenarioViewMode || "ownership"),
+    mapSemanticMode: normalizeMapSemanticMode(runtimeState.mapSemanticMode),
+    countryNames: cloneScenarioStateValue(runtimeState.countryNames),
+    sovereigntyByFeatureId: cloneScenarioStateValue(runtimeState.sovereigntyByFeatureId),
+    sovereigntyInitialized: !!runtimeState.sovereigntyInitialized,
+    visualOverrides: cloneScenarioStateValue(runtimeState.visualOverrides),
+    featureOverrides: cloneScenarioStateValue(runtimeState.featureOverrides),
+    sovereignBaseColors: cloneScenarioStateValue(runtimeState.sovereignBaseColors),
+    countryBaseColors: cloneScenarioStateValue(runtimeState.countryBaseColors),
+    activeScenarioPerformanceHints: cloneScenarioStateValue(runtimeState.activeScenarioPerformanceHints),
+    scenarioPoliticalChunkData: cloneScenarioStateValue(runtimeState.scenarioPoliticalChunkData),
+    activeScenarioChunks: cloneScenarioStateValue(runtimeState.activeScenarioChunks),
     runtimeChunkLoadState: cloneScenarioStateValue({
-      ...(state.runtimeChunkLoadState || {}),
+      ...(runtimeState.runtimeChunkLoadState || {}),
       refreshTimerId: null,
     }),
-    scheduleScenarioChunkRefreshEnabled: state.scheduleScenarioChunkRefreshFn === scheduleScenarioChunkRefresh,
-    renderProfile: String(state.renderProfile || "auto"),
-    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
-    showCityPoints: state.showCityPoints !== false,
-    showWaterRegions: state.showWaterRegions !== false,
-    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+    scheduleScenarioChunkRefreshEnabled:
+      readRegisteredRuntimeHookSource(runtimeState, "scheduleScenarioChunkRefreshFn") === scheduleScenarioChunkRefresh,
+    renderProfile: String(runtimeState.renderProfile || "auto"),
+    dynamicBordersEnabled: runtimeState.dynamicBordersEnabled !== false,
+    showCityPoints: runtimeState.showCityPoints !== false,
+    showWaterRegions: runtimeState.showWaterRegions !== false,
+    showScenarioSpecialRegions: runtimeState.showScenarioSpecialRegions !== false,
+    showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
   };
 }
 
 function captureScenarioPresentationSnapshot() {
   return {
-    activeSovereignCode: String(state.activeSovereignCode || ""),
-    selectedWaterRegionId: String(state.selectedWaterRegionId || ""),
-    selectedSpecialRegionId: String(state.selectedSpecialRegionId || ""),
-    hoveredWaterRegionId: state.hoveredWaterRegionId ?? null,
-    hoveredSpecialRegionId: state.hoveredSpecialRegionId ?? null,
-    selectedInspectorCountryCode: String(state.selectedInspectorCountryCode || ""),
-    inspectorHighlightCountryCode: String(state.inspectorHighlightCountryCode || ""),
-    inspectorExpansionInitialized: !!state.inspectorExpansionInitialized,
-    expandedInspectorContinents: cloneScenarioStateValue(state.expandedInspectorContinents),
-    expandedInspectorReleaseParents: cloneScenarioStateValue(state.expandedInspectorReleaseParents),
-    parentBordersVisible: state.parentBordersVisible !== false,
-    scenarioParentBorderEnabledBeforeActivate: cloneScenarioStateValue(state.scenarioParentBorderEnabledBeforeActivate),
-    parentBorderEnabledByCountry: cloneScenarioStateValue(state.parentBorderEnabledByCountry),
-    scenarioPaintModeBeforeActivate: cloneScenarioStateValue(state.scenarioPaintModeBeforeActivate),
-    paintMode: String(state.paintMode || "visual"),
-    interactionGranularity: String(state.interactionGranularity || "subdivision"),
-    batchFillScope: String(state.batchFillScope || "parent"),
+    activeSovereignCode: String(runtimeState.activeSovereignCode || ""),
+    selectedWaterRegionId: String(runtimeState.selectedWaterRegionId || ""),
+    selectedSpecialRegionId: String(runtimeState.selectedSpecialRegionId || ""),
+    hoveredWaterRegionId: runtimeState.hoveredWaterRegionId ?? null,
+    hoveredSpecialRegionId: runtimeState.hoveredSpecialRegionId ?? null,
+    selectedInspectorCountryCode: String(runtimeState.selectedInspectorCountryCode || ""),
+    inspectorHighlightCountryCode: String(runtimeState.inspectorHighlightCountryCode || ""),
+    inspectorExpansionInitialized: !!runtimeState.inspectorExpansionInitialized,
+    expandedInspectorContinents: cloneScenarioStateValue(runtimeState.expandedInspectorContinents),
+    expandedInspectorReleaseParents: cloneScenarioStateValue(runtimeState.expandedInspectorReleaseParents),
+    parentBordersVisible: runtimeState.parentBordersVisible !== false,
+    scenarioParentBorderEnabledBeforeActivate: cloneScenarioStateValue(runtimeState.scenarioParentBorderEnabledBeforeActivate),
+    parentBorderEnabledByCountry: cloneScenarioStateValue(runtimeState.parentBorderEnabledByCountry),
+    scenarioPaintModeBeforeActivate: cloneScenarioStateValue(runtimeState.scenarioPaintModeBeforeActivate),
+    paintMode: String(runtimeState.paintMode || "visual"),
+    interactionGranularity: String(runtimeState.interactionGranularity || "subdivision"),
+    batchFillScope: String(runtimeState.batchFillScope || "parent"),
     scenarioUiState: {
-      politicalEditingExpanded: !!state.ui?.politicalEditingExpanded,
-      scenarioVisualAdjustmentsOpen: !!state.ui?.scenarioVisualAdjustmentsOpen,
+      politicalEditingExpanded: !!runtimeState.ui?.politicalEditingExpanded,
+      scenarioVisualAdjustmentsOpen: !!runtimeState.ui?.scenarioVisualAdjustmentsOpen,
     },
-    scenarioOceanFillBeforeActivate: state.scenarioOceanFillBeforeActivate,
-    styleConfigOcean: cloneScenarioStateValue(state.styleConfig?.ocean || {}),
-    locales: cloneScenarioStateValue(state.locales),
-    geoAliasToStableKey: cloneScenarioStateValue(state.geoAliasToStableKey),
-    scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
+    scenarioOceanFillBeforeActivate: runtimeState.scenarioOceanFillBeforeActivate,
+    styleConfigOcean: cloneScenarioStateValue(runtimeState.styleConfig?.ocean || {}),
+    locales: cloneScenarioStateValue(runtimeState.locales),
+    geoAliasToStableKey: cloneScenarioStateValue(runtimeState.geoAliasToStableKey),
+    scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(runtimeState.scenarioDisplaySettingsBeforeActivate),
   };
 }
 
 function captureScenarioPaletteSnapshot() {
   return {
-    activePaletteId: String(state.activePaletteId || ""),
-    activePaletteMeta: cloneScenarioStateValue(state.activePaletteMeta),
-    activePalettePack: cloneScenarioStateValue(state.activePalettePack),
-    activePaletteMap: cloneScenarioStateValue(state.activePaletteMap),
-    currentPaletteTheme: String(state.currentPaletteTheme || ""),
-    activePaletteOceanMeta: cloneScenarioStateValue(state.activePaletteOceanMeta),
-    fixedPaletteColorsByIso2: cloneScenarioStateValue(state.fixedPaletteColorsByIso2),
-    resolvedDefaultCountryPalette: cloneScenarioStateValue(state.resolvedDefaultCountryPalette),
-    paletteLibraryEntries: cloneScenarioStateValue(state.paletteLibraryEntries),
-    paletteQuickSwatches: cloneScenarioStateValue(state.paletteQuickSwatches),
-    paletteLoadErrorById: cloneScenarioStateValue(state.paletteLoadErrorById),
+    activePaletteId: String(runtimeState.activePaletteId || ""),
+    activePaletteMeta: cloneScenarioStateValue(runtimeState.activePaletteMeta),
+    activePalettePack: cloneScenarioStateValue(runtimeState.activePalettePack),
+    activePaletteMap: cloneScenarioStateValue(runtimeState.activePaletteMap),
+    currentPaletteTheme: String(runtimeState.currentPaletteTheme || ""),
+    activePaletteOceanMeta: cloneScenarioStateValue(runtimeState.activePaletteOceanMeta),
+    fixedPaletteColorsByIso2: cloneScenarioStateValue(runtimeState.fixedPaletteColorsByIso2),
+    resolvedDefaultCountryPalette: cloneScenarioStateValue(runtimeState.resolvedDefaultCountryPalette),
+    paletteLibraryEntries: cloneScenarioStateValue(runtimeState.paletteLibraryEntries),
+    paletteQuickSwatches: cloneScenarioStateValue(runtimeState.paletteQuickSwatches),
+    paletteLoadErrorById: cloneScenarioStateValue(runtimeState.paletteLoadErrorById),
   };
 }
 
@@ -246,123 +249,123 @@ export function captureScenarioApplyRollbackSnapshot() {
 }
 
 function restoreScenarioRuntimeSnapshot(snapshot) {
-  state.activeScenarioId = snapshot.activeScenarioId;
-  state.scenarioBorderMode = snapshot.scenarioBorderMode;
-  state.activeScenarioManifest = cloneScenarioStateValue(snapshot.activeScenarioManifest);
-  state.scenarioCountriesByTag = cloneScenarioStateValue(snapshot.scenarioCountriesByTag);
-  state.scenarioFixedOwnerColors = cloneScenarioStateValue(snapshot.scenarioFixedOwnerColors);
-  state.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);
-  state.defaultRuntimePoliticalTopology = cloneScenarioStateValue(snapshot.defaultRuntimePoliticalTopology);
-  state.scenarioRuntimeTopologyData = cloneScenarioStateValue(snapshot.scenarioRuntimeTopologyData);
-  state.scenarioLandMaskData = cloneScenarioStateValue(snapshot.scenarioLandMaskData);
-  state.scenarioContextLandMaskData = cloneScenarioStateValue(snapshot.scenarioContextLandMaskData);
-  state.scenarioLandMaskVersionTag = String(snapshot.scenarioLandMaskVersionTag || "");
-  state.scenarioContextLandMaskVersionTag = String(snapshot.scenarioContextLandMaskVersionTag || "");
-  state.runtimePoliticalTopology = cloneScenarioStateValue(snapshot.runtimePoliticalTopology);
-  state.scenarioWaterRegionsData = cloneScenarioStateValue(snapshot.scenarioWaterRegionsData);
-  state.scenarioWaterOverlayVersionTag = String(snapshot.scenarioWaterOverlayVersionTag || "");
-  state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
-  state.scenarioRuntimeTopologyVersionTag = String(snapshot.scenarioRuntimeTopologyVersionTag || "");
-  state.scenarioHydrationHealthGate =
+  runtimeState.activeScenarioId = snapshot.activeScenarioId;
+  runtimeState.scenarioBorderMode = snapshot.scenarioBorderMode;
+  runtimeState.activeScenarioManifest = cloneScenarioStateValue(snapshot.activeScenarioManifest);
+  runtimeState.scenarioCountriesByTag = cloneScenarioStateValue(snapshot.scenarioCountriesByTag);
+  runtimeState.scenarioFixedOwnerColors = cloneScenarioStateValue(snapshot.scenarioFixedOwnerColors);
+  runtimeState.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);
+  runtimeState.defaultRuntimePoliticalTopology = cloneScenarioStateValue(snapshot.defaultRuntimePoliticalTopology);
+  runtimeState.scenarioRuntimeTopologyData = cloneScenarioStateValue(snapshot.scenarioRuntimeTopologyData);
+  runtimeState.scenarioLandMaskData = cloneScenarioStateValue(snapshot.scenarioLandMaskData);
+  runtimeState.scenarioContextLandMaskData = cloneScenarioStateValue(snapshot.scenarioContextLandMaskData);
+  runtimeState.scenarioLandMaskVersionTag = String(snapshot.scenarioLandMaskVersionTag || "");
+  runtimeState.scenarioContextLandMaskVersionTag = String(snapshot.scenarioContextLandMaskVersionTag || "");
+  runtimeState.runtimePoliticalTopology = cloneScenarioStateValue(snapshot.runtimePoliticalTopology);
+  runtimeState.scenarioWaterRegionsData = cloneScenarioStateValue(snapshot.scenarioWaterRegionsData);
+  runtimeState.scenarioWaterOverlayVersionTag = String(snapshot.scenarioWaterOverlayVersionTag || "");
+  runtimeState.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
+  runtimeState.scenarioRuntimeTopologyVersionTag = String(snapshot.scenarioRuntimeTopologyVersionTag || "");
+  runtimeState.scenarioHydrationHealthGate =
     cloneScenarioStateValue(snapshot.scenarioHydrationHealthGate) || createDefaultScenarioHydrationHealthGate();
-  state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
-  state.scenarioDistrictGroupsData = cloneScenarioStateValue(snapshot.scenarioDistrictGroupsData);
-  state.scenarioDistrictGroupByFeatureId = cloneScenarioStateValue(snapshot.scenarioDistrictGroupByFeatureId) || new Map();
-  state.scenarioReliefOverlayRevision = Number(snapshot.scenarioReliefOverlayRevision) || 0;
-  state.scenarioGeoLocalePatchData = cloneScenarioStateValue(snapshot.scenarioGeoLocalePatchData);
-  state.scenarioCityOverridesData = cloneScenarioStateValue(snapshot.scenarioCityOverridesData);
-  state.cityLayerRevision = Number(snapshot.cityLayerRevision) || 0;
-  state.scenarioReleasableIndex = cloneScenarioStateValue(snapshot.scenarioReleasableIndex);
-  state.releasableCatalog = cloneScenarioStateValue(snapshot.releasableCatalog);
-  state.scenarioAudit = cloneScenarioStateValue(snapshot.scenarioAudit);
+  runtimeState.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
+  runtimeState.scenarioDistrictGroupsData = cloneScenarioStateValue(snapshot.scenarioDistrictGroupsData);
+  runtimeState.scenarioDistrictGroupByFeatureId = cloneScenarioStateValue(snapshot.scenarioDistrictGroupByFeatureId) || new Map();
+  runtimeState.scenarioReliefOverlayRevision = Number(snapshot.scenarioReliefOverlayRevision) || 0;
+  runtimeState.scenarioGeoLocalePatchData = cloneScenarioStateValue(snapshot.scenarioGeoLocalePatchData);
+  runtimeState.scenarioCityOverridesData = cloneScenarioStateValue(snapshot.scenarioCityOverridesData);
+  runtimeState.cityLayerRevision = Number(snapshot.cityLayerRevision) || 0;
+  runtimeState.scenarioReleasableIndex = cloneScenarioStateValue(snapshot.scenarioReleasableIndex);
+  runtimeState.releasableCatalog = cloneScenarioStateValue(snapshot.releasableCatalog);
+  runtimeState.scenarioAudit = cloneScenarioStateValue(snapshot.scenarioAudit);
   setScenarioAuditUiState(cloneScenarioStateValue(snapshot.scenarioAuditUi) || {});
-  state.scenarioImportAudit = cloneScenarioStateValue(snapshot.scenarioImportAudit);
-  state.scenarioBaselineHash = String(snapshot.scenarioBaselineHash || "");
-  state.scenarioBaselineOwnersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineOwnersByFeatureId);
-  state.scenarioControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioControllersByFeatureId);
-  state.scenarioAutoShellOwnerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellOwnerByFeatureId);
-  state.scenarioAutoShellControllerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellControllerByFeatureId);
-  state.scenarioBaselineControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineControllersByFeatureId);
-  state.scenarioBaselineCoresByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineCoresByFeatureId);
-  state.scenarioShellOverlayRevision = Number(snapshot.scenarioShellOverlayRevision) || 0;
-  state.scenarioControllerRevision = Number(snapshot.scenarioControllerRevision) || 0;
-  state.scenarioOwnerControllerDiffCount = Number(snapshot.scenarioOwnerControllerDiffCount) || 0;
-  state.scenarioDataHealth = cloneScenarioStateValue(snapshot.scenarioDataHealth);
-  state.scenarioViewMode = String(snapshot.scenarioViewMode || "ownership");
-  state.mapSemanticMode = normalizeMapSemanticMode(snapshot.mapSemanticMode);
-  state.countryNames = cloneScenarioStateValue(snapshot.countryNames) || { ...countryNames };
-  state.sovereigntyByFeatureId = cloneScenarioStateValue(snapshot.sovereigntyByFeatureId);
-  state.sovereigntyInitialized = !!snapshot.sovereigntyInitialized;
-  state.visualOverrides = cloneScenarioStateValue(snapshot.visualOverrides);
-  state.featureOverrides = cloneScenarioStateValue(snapshot.featureOverrides);
-  state.sovereignBaseColors = cloneScenarioStateValue(snapshot.sovereignBaseColors);
-  state.countryBaseColors = cloneScenarioStateValue(snapshot.countryBaseColors);
+  runtimeState.scenarioImportAudit = cloneScenarioStateValue(snapshot.scenarioImportAudit);
+  runtimeState.scenarioBaselineHash = String(snapshot.scenarioBaselineHash || "");
+  runtimeState.scenarioBaselineOwnersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineOwnersByFeatureId);
+  runtimeState.scenarioControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioControllersByFeatureId);
+  runtimeState.scenarioAutoShellOwnerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellOwnerByFeatureId);
+  runtimeState.scenarioAutoShellControllerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellControllerByFeatureId);
+  runtimeState.scenarioBaselineControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineControllersByFeatureId);
+  runtimeState.scenarioBaselineCoresByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineCoresByFeatureId);
+  runtimeState.scenarioShellOverlayRevision = Number(snapshot.scenarioShellOverlayRevision) || 0;
+  runtimeState.scenarioControllerRevision = Number(snapshot.scenarioControllerRevision) || 0;
+  runtimeState.scenarioOwnerControllerDiffCount = Number(snapshot.scenarioOwnerControllerDiffCount) || 0;
+  runtimeState.scenarioDataHealth = cloneScenarioStateValue(snapshot.scenarioDataHealth);
+  runtimeState.scenarioViewMode = String(snapshot.scenarioViewMode || "ownership");
+  runtimeState.mapSemanticMode = normalizeMapSemanticMode(snapshot.mapSemanticMode);
+  runtimeState.countryNames = cloneScenarioStateValue(snapshot.countryNames) || { ...countryNames };
+  runtimeState.sovereigntyByFeatureId = cloneScenarioStateValue(snapshot.sovereigntyByFeatureId);
+  runtimeState.sovereigntyInitialized = !!snapshot.sovereigntyInitialized;
+  runtimeState.visualOverrides = cloneScenarioStateValue(snapshot.visualOverrides);
+  runtimeState.featureOverrides = cloneScenarioStateValue(snapshot.featureOverrides);
+  runtimeState.sovereignBaseColors = cloneScenarioStateValue(snapshot.sovereignBaseColors);
+  runtimeState.countryBaseColors = cloneScenarioStateValue(snapshot.countryBaseColors);
   markLegacyColorStateDirty();
-  state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
-  state.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
-  state.activeScenarioChunks =
+  runtimeState.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
+  runtimeState.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
+  runtimeState.activeScenarioChunks =
     cloneScenarioStateValue(snapshot.activeScenarioChunks) || createDefaultActiveScenarioChunksState();
-  state.runtimeChunkLoadState =
+  runtimeState.runtimeChunkLoadState =
     cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || createDefaultRuntimeChunkLoadState();
-  state.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;
-  state.renderProfile = String(snapshot.renderProfile || "auto");
-  state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
-  state.showCityPoints = snapshot.showCityPoints !== false;
-  state.showWaterRegions = snapshot.showWaterRegions !== false;
-  state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
-  state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
+  runtimeState.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;
+  runtimeState.renderProfile = String(snapshot.renderProfile || "auto");
+  runtimeState.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
+  runtimeState.showCityPoints = snapshot.showCityPoints !== false;
+  runtimeState.showWaterRegions = snapshot.showWaterRegions !== false;
+  runtimeState.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
+  runtimeState.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
 }
 
 function restoreScenarioPresentationSnapshot(snapshot) {
-  state.activeSovereignCode = String(snapshot.activeSovereignCode || "");
-  state.selectedWaterRegionId = String(snapshot.selectedWaterRegionId || "");
-  state.selectedSpecialRegionId = String(snapshot.selectedSpecialRegionId || "");
-  state.hoveredWaterRegionId = snapshot.hoveredWaterRegionId ?? null;
-  state.hoveredSpecialRegionId = snapshot.hoveredSpecialRegionId ?? null;
-  state.selectedInspectorCountryCode = String(snapshot.selectedInspectorCountryCode || "");
-  state.inspectorHighlightCountryCode = String(snapshot.inspectorHighlightCountryCode || "");
-  state.inspectorExpansionInitialized = !!snapshot.inspectorExpansionInitialized;
-  state.expandedInspectorContinents =
+  runtimeState.activeSovereignCode = String(snapshot.activeSovereignCode || "");
+  runtimeState.selectedWaterRegionId = String(snapshot.selectedWaterRegionId || "");
+  runtimeState.selectedSpecialRegionId = String(snapshot.selectedSpecialRegionId || "");
+  runtimeState.hoveredWaterRegionId = snapshot.hoveredWaterRegionId ?? null;
+  runtimeState.hoveredSpecialRegionId = snapshot.hoveredSpecialRegionId ?? null;
+  runtimeState.selectedInspectorCountryCode = String(snapshot.selectedInspectorCountryCode || "");
+  runtimeState.inspectorHighlightCountryCode = String(snapshot.inspectorHighlightCountryCode || "");
+  runtimeState.inspectorExpansionInitialized = !!snapshot.inspectorExpansionInitialized;
+  runtimeState.expandedInspectorContinents =
     cloneScenarioStateValue(snapshot.expandedInspectorContinents) || new Set();
-  state.expandedInspectorReleaseParents =
+  runtimeState.expandedInspectorReleaseParents =
     cloneScenarioStateValue(snapshot.expandedInspectorReleaseParents) || new Set();
-  state.parentBordersVisible = snapshot.parentBordersVisible !== false;
-  state.scenarioParentBorderEnabledBeforeActivate =
+  runtimeState.parentBordersVisible = snapshot.parentBordersVisible !== false;
+  runtimeState.scenarioParentBorderEnabledBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioParentBorderEnabledBeforeActivate);
-  state.parentBorderEnabledByCountry = cloneScenarioStateValue(snapshot.parentBorderEnabledByCountry) || {};
-  state.scenarioPaintModeBeforeActivate = cloneScenarioStateValue(snapshot.scenarioPaintModeBeforeActivate);
-  state.paintMode = String(snapshot.paintMode || "visual");
-  state.interactionGranularity = String(snapshot.interactionGranularity || "subdivision");
-  state.batchFillScope = String(snapshot.batchFillScope || "parent");
-  if (!state.ui || typeof state.ui !== "object") {
-    state.ui = {};
+  runtimeState.parentBorderEnabledByCountry = cloneScenarioStateValue(snapshot.parentBorderEnabledByCountry) || {};
+  runtimeState.scenarioPaintModeBeforeActivate = cloneScenarioStateValue(snapshot.scenarioPaintModeBeforeActivate);
+  runtimeState.paintMode = String(snapshot.paintMode || "visual");
+  runtimeState.interactionGranularity = String(snapshot.interactionGranularity || "subdivision");
+  runtimeState.batchFillScope = String(snapshot.batchFillScope || "parent");
+  if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+    runtimeState.ui = {};
   }
-  state.ui.politicalEditingExpanded = !!snapshot.scenarioUiState?.politicalEditingExpanded;
-  state.ui.scenarioVisualAdjustmentsOpen = !!snapshot.scenarioUiState?.scenarioVisualAdjustmentsOpen;
-  state.scenarioOceanFillBeforeActivate = snapshot.scenarioOceanFillBeforeActivate;
-  if (!state.styleConfig || typeof state.styleConfig !== "object") {
-    state.styleConfig = {};
+  runtimeState.ui.politicalEditingExpanded = !!snapshot.scenarioUiState?.politicalEditingExpanded;
+  runtimeState.ui.scenarioVisualAdjustmentsOpen = !!snapshot.scenarioUiState?.scenarioVisualAdjustmentsOpen;
+  runtimeState.scenarioOceanFillBeforeActivate = snapshot.scenarioOceanFillBeforeActivate;
+  if (!runtimeState.styleConfig || typeof runtimeState.styleConfig !== "object") {
+    runtimeState.styleConfig = {};
   }
-  state.styleConfig.ocean = cloneScenarioStateValue(snapshot.styleConfigOcean) || {};
-  state.locales = cloneScenarioStateValue(snapshot.locales) || { ui: {}, geo: {} };
-  state.geoAliasToStableKey = cloneScenarioStateValue(snapshot.geoAliasToStableKey) || {};
-  state.scenarioDisplaySettingsBeforeActivate =
+  runtimeState.styleConfig.ocean = cloneScenarioStateValue(snapshot.styleConfigOcean) || {};
+  runtimeState.locales = cloneScenarioStateValue(snapshot.locales) || { ui: {}, geo: {} };
+  runtimeState.geoAliasToStableKey = cloneScenarioStateValue(snapshot.geoAliasToStableKey) || {};
+  runtimeState.scenarioDisplaySettingsBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
 }
 
 function restoreScenarioPaletteSnapshot(snapshot) {
-  state.activePaletteId = String(snapshot.activePaletteId || "");
-  state.activePaletteMeta = cloneScenarioStateValue(snapshot.activePaletteMeta);
-  state.activePalettePack = cloneScenarioStateValue(snapshot.activePalettePack);
-  state.activePaletteMap = cloneScenarioStateValue(snapshot.activePaletteMap);
-  state.currentPaletteTheme = String(snapshot.currentPaletteTheme || "");
-  state.activePaletteOceanMeta = cloneScenarioStateValue(snapshot.activePaletteOceanMeta);
-  state.fixedPaletteColorsByIso2 = cloneScenarioStateValue(snapshot.fixedPaletteColorsByIso2) || {};
-  state.resolvedDefaultCountryPalette =
+  runtimeState.activePaletteId = String(snapshot.activePaletteId || "");
+  runtimeState.activePaletteMeta = cloneScenarioStateValue(snapshot.activePaletteMeta);
+  runtimeState.activePalettePack = cloneScenarioStateValue(snapshot.activePalettePack);
+  runtimeState.activePaletteMap = cloneScenarioStateValue(snapshot.activePaletteMap);
+  runtimeState.currentPaletteTheme = String(snapshot.currentPaletteTheme || "");
+  runtimeState.activePaletteOceanMeta = cloneScenarioStateValue(snapshot.activePaletteOceanMeta);
+  runtimeState.fixedPaletteColorsByIso2 = cloneScenarioStateValue(snapshot.fixedPaletteColorsByIso2) || {};
+  runtimeState.resolvedDefaultCountryPalette =
     cloneScenarioStateValue(snapshot.resolvedDefaultCountryPalette) || { ...defaultCountryPalette };
-  state.paletteLibraryEntries = cloneScenarioStateValue(snapshot.paletteLibraryEntries) || [];
-  state.paletteQuickSwatches = cloneScenarioStateValue(snapshot.paletteQuickSwatches) || [];
-  state.paletteLoadErrorById = cloneScenarioStateValue(snapshot.paletteLoadErrorById) || {};
+  runtimeState.paletteLibraryEntries = cloneScenarioStateValue(snapshot.paletteLibraryEntries) || [];
+  runtimeState.paletteQuickSwatches = cloneScenarioStateValue(snapshot.paletteQuickSwatches) || [];
+  runtimeState.paletteLoadErrorById = cloneScenarioStateValue(snapshot.paletteLoadErrorById) || {};
 }
 
 export function restoreScenarioApplyRollbackSnapshot(
@@ -375,8 +378,8 @@ export function restoreScenarioApplyRollbackSnapshot(
   if (shouldFailRestore) {
     throw new Error("Injected rollback restore failure.");
   }
-  if (state.runtimeChunkLoadState?.refreshTimerId) {
-    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
+  if (runtimeState.runtimeChunkLoadState?.refreshTimerId) {
+    globalThis.clearTimeout(runtimeState.runtimeChunkLoadState.refreshTimerId);
   }
 
   restoreScenarioRuntimeSnapshot(snapshot);
@@ -385,3 +388,4 @@ export function restoreScenarioApplyRollbackSnapshot(
   syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
   return true;
 }
+

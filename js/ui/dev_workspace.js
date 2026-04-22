@@ -1,5 +1,5 @@
-import { state } from "../core/state.js";
-import { registerRuntimeHook } from "../core/runtime_hooks.js";
+import { state as runtimeState } from "../core/state.js";
+import { registerRuntimeHook } from "../core/state/index.js";
 import {
   addFeatureToDevSelection,
   applyDevMacroFillCurrentCountry,
@@ -36,6 +36,7 @@ import {
   normalizeScenarioColorInput,
   sanitizeScenarioColorList,
 } from "./dev_workspace/dev_workspace_normalizers.js";
+const state = runtimeState;
 
 const DEV_WORKSPACE_STORAGE_KEY = "mapcreator_dev_workspace_expanded";
 const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
@@ -77,7 +78,7 @@ function writeStoredExpanded(nextValue) {
   try {
     localStorage.setItem(DEV_WORKSPACE_STORAGE_KEY, nextValue ? "1" : "0");
   } catch (_error) {
-    // Ignore storage failures in dev-only UI state.
+    // Ignore storage failures in dev-only UI runtimeState.
   }
 }
 
@@ -91,9 +92,9 @@ function normalizeDevWorkspaceCategory(value) {
 
 function resolveFeatureFromHit(hit) {
   if (!hit?.id) return null;
-  if (hit.targetType === "special") return state.specialRegionsById?.get(hit.id) || null;
-  if (hit.targetType === "water") return state.waterRegionsById?.get(hit.id) || null;
-  return state.landIndex?.get(hit.id) || null;
+  if (hit.targetType === "special") return runtimeState.specialRegionsById?.get(hit.id) || null;
+  if (hit.targetType === "water") return runtimeState.waterRegionsById?.get(hit.id) || null;
+  return runtimeState.landIndex?.get(hit.id) || null;
 }
 
 function resolveFeatureName(feature, fallbackId = "") {
@@ -102,33 +103,33 @@ function resolveFeatureName(feature, fallbackId = "") {
 }
 
 function resolveNeighborCount(featureId) {
-  const index = state.runtimeFeatureIndexById?.get(featureId);
+  const index = runtimeState.runtimeFeatureIndexById?.get(featureId);
   if (!Number.isInteger(index)) return "";
-  const neighbors = state.runtimeNeighborGraph?.[index];
+  const neighbors = runtimeState.runtimeNeighborGraph?.[index];
   return Array.isArray(neighbors) ? String(neighbors.filter((value) => Number.isInteger(value)).length) : "";
 }
 
 function sanitizeSelectionState() {
-  const rawIds = Array.isArray(state.devSelectionOrder)
-    ? state.devSelectionOrder.map((value) => String(value || "").trim()).filter(Boolean)
+  const rawIds = Array.isArray(runtimeState.devSelectionOrder)
+    ? runtimeState.devSelectionOrder.map((value) => String(value || "").trim()).filter(Boolean)
     : [];
   const nextIds = [];
   const seen = new Set();
   rawIds.forEach((id) => {
     if (!id || seen.has(id)) return;
-    const feature = state.landIndex?.get(id);
+    const feature = runtimeState.landIndex?.get(id);
     if (!feature) return;
     seen.add(id);
     nextIds.push(id);
   });
   const changed = rawIds.length !== nextIds.length || rawIds.some((id, index) => id !== nextIds[index]);
   if (changed) {
-    state.devSelectionOrder = nextIds;
-    state.devSelectionFeatureIds = new Set(nextIds);
-    state.devClipboardFallbackText = "";
-    state.devSelectionOverlayDirty = true;
-  } else if (!(state.devSelectionFeatureIds instanceof Set)) {
-    state.devSelectionFeatureIds = new Set(nextIds);
+    runtimeState.devSelectionOrder = nextIds;
+    runtimeState.devSelectionFeatureIds = new Set(nextIds);
+    runtimeState.devClipboardFallbackText = "";
+    runtimeState.devSelectionOverlayDirty = true;
+  } else if (!(runtimeState.devSelectionFeatureIds instanceof Set)) {
+    runtimeState.devSelectionFeatureIds = new Set(nextIds);
   }
   return nextIds;
 }
@@ -136,7 +137,7 @@ function sanitizeSelectionState() {
 function resolveSelectionEntries() {
   return sanitizeSelectionState()
     .map((featureId, index) => {
-      const feature = state.landIndex?.get(featureId);
+      const feature = runtimeState.landIndex?.get(featureId);
       if (!feature) return null;
       return {
         id: featureId,
@@ -149,7 +150,7 @@ function resolveSelectionEntries() {
 
 function sortSelectionEntries(entries = []) {
   const nextEntries = [...entries];
-  if (state.devSelectionSortMode === "name") {
+  if (runtimeState.devSelectionSortMode === "name") {
     nextEntries.sort((a, b) => {
       const nameDelta = a.name.localeCompare(b.name);
       if (nameDelta !== 0) return nameDelta;
@@ -180,8 +181,8 @@ function resolveOwnershipTargetIds() {
   if (selectedIds.length > 0) {
     return selectedIds;
   }
-  const selectedId = state.devSelectedHit?.targetType === "land"
-    ? String(state.devSelectedHit.id || "").trim()
+  const selectedId = runtimeState.devSelectedHit?.targetType === "land"
+    ? String(runtimeState.devSelectedHit.id || "").trim()
     : "";
   return filterEditableOwnershipFeatureIds(selectedId ? [selectedId] : []).matchedIds;
 }
@@ -190,10 +191,10 @@ function resolveOwnershipEditorModel() {
   const targetIds = resolveOwnershipTargetIds();
   const summary = summarizeOwnershipForFeatureIds(targetIds);
   const singleFeatureId = targetIds.length === 1 ? targetIds[0] : "";
-  const singleFeature = singleFeatureId ? state.landIndex?.get(singleFeatureId) || null : null;
+  const singleFeature = singleFeatureId ? runtimeState.landIndex?.get(singleFeatureId) || null : null;
   const currentOwnerCode = singleFeatureId ? normalizeOwnerInput(getFeatureOwnerCode(singleFeatureId)) : "";
   const currentControllerCode = singleFeatureId
-    ? normalizeOwnerInput(state.scenarioControllersByFeatureId?.[singleFeatureId] || currentOwnerCode)
+    ? normalizeOwnerInput(runtimeState.scenarioControllersByFeatureId?.[singleFeatureId] || currentOwnerCode)
     : "";
   return {
     targetIds,
@@ -229,7 +230,7 @@ function buildOwnershipMetaRows(model) {
 }
 
 function resolveOwnershipEditorHint(model) {
-  if (!state.activeScenarioId) {
+  if (!runtimeState.activeScenarioId) {
     return ui("Activate a scenario to edit and save political ownership.");
   }
   if (!model.selectionCount) {
@@ -242,13 +243,13 @@ function resolveOwnershipEditorHint(model) {
 }
 
 function collectScenarioCountryOptions({ includeReleasable = true } = {}) {
-  return Object.entries(state.scenarioCountriesByTag || {})
+  return Object.entries(runtimeState.scenarioCountriesByTag || {})
     .map(([rawTag, rawEntry]) => {
       const tag = normalizeScenarioTagInput(rawTag || rawEntry?.tag);
       if (!tag || !rawEntry || typeof rawEntry !== "object") return null;
       const releasable = !!rawEntry.releasable || String(rawEntry.entry_kind || "").trim() === "releasable";
       if (!includeReleasable && releasable) return null;
-      const displayName = getScenarioCountryDisplayName(rawEntry, state.countryNames?.[tag] || tag) || tag;
+      const displayName = getScenarioCountryDisplayName(rawEntry, runtimeState.countryNames?.[tag] || tag) || tag;
       const nameEn = normalizeScenarioNameInput(rawEntry.display_name_en || rawEntry.display_name || displayName || tag);
       const nameZh = normalizeScenarioNameInput(rawEntry.display_name_zh);
       const featureCount = Number(rawEntry.feature_count ?? rawEntry.controller_feature_count ?? 0) || 0;
@@ -276,8 +277,8 @@ function resolvePreferredScenarioTagCode(...candidateValues) {
   const candidates = [
     ...candidateValues,
     inferredSelectionTag,
-    normalizeScenarioTagInput(state.selectedInspectorCountryCode),
-    normalizeScenarioTagInput(state.activeSovereignCode),
+    normalizeScenarioTagInput(runtimeState.selectedInspectorCountryCode),
+    normalizeScenarioTagInput(runtimeState.activeSovereignCode),
   ];
   return candidates
     .map((value) => normalizeScenarioTagInput(value))
@@ -303,18 +304,18 @@ function resolveSingleSelectionScenarioTag(availableTags = null) {
 }
 
 function getActiveScenarioBundle() {
-  const scenarioId = String(state.activeScenarioId || "").trim();
-  if (!scenarioId || !state.scenarioBundleCacheById || typeof state.scenarioBundleCacheById !== "object") {
+  const scenarioId = String(runtimeState.activeScenarioId || "").trim();
+  if (!scenarioId || !runtimeState.scenarioBundleCacheById || typeof runtimeState.scenarioBundleCacheById !== "object") {
     return null;
   }
-  return state.scenarioBundleCacheById[scenarioId] || null;
+  return runtimeState.scenarioBundleCacheById[scenarioId] || null;
 }
 
 function syncActiveScenarioManifestUrl(field, nextValue) {
   const normalizedValue = String(nextValue || "").trim();
   if (!normalizedValue) return;
-  state.activeScenarioManifest = {
-    ...(state.activeScenarioManifest || {}),
+  runtimeState.activeScenarioManifest = {
+    ...(runtimeState.activeScenarioManifest || {}),
     [field]: normalizedValue,
   };
   const bundle = getActiveScenarioBundle();
@@ -412,13 +413,13 @@ function upsertRuntimeReleasableCatalogEntry(entry) {
       ],
     };
   };
-  state.releasableCatalog = replaceEntry(state.releasableCatalog);
+  runtimeState.releasableCatalog = replaceEntry(runtimeState.releasableCatalog);
   const bundle = getActiveScenarioBundle();
   if (bundle) {
     bundle.releasableCatalog = replaceEntry(bundle.releasableCatalog);
   }
-  state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId, {
-    excludeTags: Object.keys(state.scenarioCountriesByTag || {}),
+  runtimeState.scenarioReleasableIndex = buildScenarioReleasableIndex(runtimeState.activeScenarioId, {
+    excludeTags: Object.keys(runtimeState.scenarioCountriesByTag || {}),
   });
   rebuildPresetState();
 }
@@ -426,42 +427,42 @@ function upsertRuntimeReleasableCatalogEntry(entry) {
 function upsertScenarioCountryRuntimeEntry(tag, entry) {
   const normalizedTag = normalizeScenarioTagInput(tag || entry?.tag);
   if (!normalizedTag || !entry || typeof entry !== "object") return null;
-  const priorEntry = state.scenarioCountriesByTag?.[normalizedTag] && typeof state.scenarioCountriesByTag[normalizedTag] === "object"
-    ? state.scenarioCountriesByTag[normalizedTag]
+  const priorEntry = runtimeState.scenarioCountriesByTag?.[normalizedTag] && typeof runtimeState.scenarioCountriesByTag[normalizedTag] === "object"
+    ? runtimeState.scenarioCountriesByTag[normalizedTag]
     : {};
   const nextEntry = {
     ...priorEntry,
     ...entry,
     tag: normalizedTag,
   };
-  state.scenarioCountriesByTag = {
-    ...(state.scenarioCountriesByTag || {}),
+  runtimeState.scenarioCountriesByTag = {
+    ...(runtimeState.scenarioCountriesByTag || {}),
     [normalizedTag]: nextEntry,
   };
   const englishName = normalizeScenarioNameInput(
     nextEntry.display_name_en
     || nextEntry.display_name
-    || state.countryNames?.[normalizedTag]
+    || runtimeState.countryNames?.[normalizedTag]
     || normalizedTag
   );
   if (englishName) {
-    state.countryNames = {
-      ...(state.countryNames || {}),
+    runtimeState.countryNames = {
+      ...(runtimeState.countryNames || {}),
       [normalizedTag]: englishName,
     };
   }
   const colorHex = normalizeScenarioColorInput(nextEntry.color_hex);
   if (/^#[0-9A-F]{6}$/.test(colorHex)) {
-    state.scenarioFixedOwnerColors = {
-      ...(state.scenarioFixedOwnerColors || {}),
+    runtimeState.scenarioFixedOwnerColors = {
+      ...(runtimeState.scenarioFixedOwnerColors || {}),
       [normalizedTag]: colorHex,
     };
-    state.sovereignBaseColors = {
-      ...(state.sovereignBaseColors || {}),
+    runtimeState.sovereignBaseColors = {
+      ...(runtimeState.sovereignBaseColors || {}),
       [normalizedTag]: colorHex,
     };
-    state.countryBaseColors = {
-      ...(state.countryBaseColors || {}),
+    runtimeState.countryBaseColors = {
+      ...(runtimeState.countryBaseColors || {}),
       [normalizedTag]: colorHex,
     };
     markLegacyColorStateDirty();
@@ -472,21 +473,21 @@ function upsertScenarioCountryRuntimeEntry(tag, entry) {
 
 function syncRuntimeScenarioCityOverrides(payload) {
   if (!payload || typeof payload !== "object") return;
-  state.scenarioCityOverridesData = payload;
+  runtimeState.scenarioCityOverridesData = payload;
   const bundle = getActiveScenarioBundle();
   if (bundle) {
     bundle.cityOverridesPayload = payload;
   }
   syncScenarioLocalizationState({
     cityOverridesPayload: payload,
-    geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+    geoLocalePatchPayload: runtimeState.scenarioGeoLocalePatchData,
   });
 }
 
 function buildLowFeatureTagInspectorRows(threshold = 3) {
   const normalizedThreshold = Math.max(0, Number.parseInt(threshold, 10) || 0);
   const counts = new Map();
-  state.landIndex?.forEach((_feature, featureId) => {
+  runtimeState.landIndex?.forEach((_feature, featureId) => {
     const ownerCode = normalizeScenarioTagInput(getFeatureOwnerCode(featureId));
     if (!ownerCode) return;
     counts.set(ownerCode, (counts.get(ownerCode) || 0) + 1);
@@ -496,7 +497,7 @@ function buildLowFeatureTagInspectorRows(threshold = 3) {
     .map((entry) => ({
       ...entry,
       featureCountLive: counts.get(entry.tag) || 0,
-      isHighlighted: normalizeScenarioTagInput(state.inspectorHighlightCountryCode) === entry.tag,
+      isHighlighted: normalizeScenarioTagInput(runtimeState.inspectorHighlightCountryCode) === entry.tag,
     }))
     .filter((entry) => entry.featureCountLive <= normalizedThreshold)
     .sort((a, b) => (a.featureCountLive - b.featureCountLive) || a.displayName.localeCompare(b.displayName) || a.tag.localeCompare(b.tag));
@@ -554,10 +555,10 @@ function renderCapitalEditorSearchResults(container, matches = [], query = "") {
 }
 
 function selectScenarioCapitalEditorTag(tag, { clearSearch = false } = {}) {
-  state.devScenarioCapitalEditor = {
-    ...(state.devScenarioCapitalEditor || {}),
+  runtimeState.devScenarioCapitalEditor = {
+    ...(runtimeState.devScenarioCapitalEditor || {}),
     tag: normalizeScenarioTagInput(tag),
-    searchQuery: clearSearch ? "" : normalizeScenarioNameInput(state.devScenarioCapitalEditor?.searchQuery),
+    searchQuery: clearSearch ? "" : normalizeScenarioNameInput(runtimeState.devScenarioCapitalEditor?.searchQuery),
     lastSaveMessage: "",
     lastSaveTone: "",
   };
@@ -570,19 +571,19 @@ function normalizeLocaleInput(value) {
 function getScenarioGeoLocaleEntry(featureId) {
   const normalizedFeatureId = String(featureId || "").trim();
   const baseEntry = normalizedFeatureId
-    ? (state.baseGeoLocales?.[normalizedFeatureId] && typeof state.baseGeoLocales[normalizedFeatureId] === "object"
-      ? state.baseGeoLocales[normalizedFeatureId]
+    ? (runtimeState.baseGeoLocales?.[normalizedFeatureId] && typeof runtimeState.baseGeoLocales[normalizedFeatureId] === "object"
+      ? runtimeState.baseGeoLocales[normalizedFeatureId]
       : null)
     : null;
   const patchEntry = normalizedFeatureId
-    ? (state.scenarioGeoLocalePatchData?.geo?.[normalizedFeatureId]
-      && typeof state.scenarioGeoLocalePatchData.geo[normalizedFeatureId] === "object"
-      ? state.scenarioGeoLocalePatchData.geo[normalizedFeatureId]
+    ? (runtimeState.scenarioGeoLocalePatchData?.geo?.[normalizedFeatureId]
+      && typeof runtimeState.scenarioGeoLocalePatchData.geo[normalizedFeatureId] === "object"
+      ? runtimeState.scenarioGeoLocalePatchData.geo[normalizedFeatureId]
       : null)
     : null;
   const effectiveEntry = normalizedFeatureId
-    ? (state.locales?.geo?.[normalizedFeatureId] && typeof state.locales.geo[normalizedFeatureId] === "object"
-      ? state.locales.geo[normalizedFeatureId]
+    ? (runtimeState.locales?.geo?.[normalizedFeatureId] && typeof runtimeState.locales.geo[normalizedFeatureId] === "object"
+      ? runtimeState.locales.geo[normalizedFeatureId]
       : null)
     : null;
   return {
@@ -597,7 +598,7 @@ function getScenarioGeoLocaleEntry(featureId) {
 }
 
 function resolveInspectorRows() {
-  const hit = state.devSelectedHit?.id ? state.devSelectedHit : state.devHoverHit;
+  const hit = runtimeState.devSelectedHit?.id ? runtimeState.devSelectedHit : runtimeState.devHoverHit;
   if (!hit?.id) {
     return {
       title: "No active feature",
@@ -610,7 +611,7 @@ function resolveInspectorRows() {
   const tooltipModel = buildTooltipModel(feature);
   const detailTier = String(feature?.properties?.detail_tier || "").trim();
   const parentGroup =
-    hit.targetType === "land" ? String(state.parentGroupByFeatureId?.get(hit.id) || "").trim() : "";
+    hit.targetType === "land" ? String(runtimeState.parentGroupByFeatureId?.get(hit.id) || "").trim() : "";
   const source = String(
     feature?.properties?.__source
       || (hit.targetType === "special" ? "scenario" : hit.targetType === "water" ? "context" : "primary")
@@ -619,7 +620,7 @@ function resolveInspectorRows() {
     ? String(getFeatureOwnerCode(hit.id) || tooltipModel.countryCode || hit.countryCode || "").trim().toUpperCase()
     : "";
   const controllerCode = hit.targetType === "land"
-    ? String(state.scenarioControllersByFeatureId?.[hit.id] || "").trim().toUpperCase()
+    ? String(runtimeState.scenarioControllersByFeatureId?.[hit.id] || "").trim().toUpperCase()
     : "";
 
   const rows = [
@@ -631,7 +632,7 @@ function resolveInspectorRows() {
     [ui("Detail Tier"), detailTier],
     [ui("Owner"), ownerCode],
     [ui("Controller"), controllerCode],
-    [ui("Scenario View"), String(state.scenarioViewMode || "ownership")],
+    [ui("Scenario View"), String(runtimeState.scenarioViewMode || "ownership")],
     [ui("Hit Source"), String(hit.hitSource || "spatial")],
     [ui("Snap"), hit.viaSnap ? ui("Snap hit") : hit.strict ? ui("Strict hit") : ui("No")],
     [ui("Source Topology"), source],
@@ -646,8 +647,8 @@ function resolveInspectorRows() {
 }
 
 function resolveRenderRows() {
-  const renderPerf = state.renderPerfMetrics || {};
-  const cache = state.renderPassCache || {};
+  const renderPerf = runtimeState.renderPerfMetrics || {};
+  const cache = runtimeState.renderPassCache || {};
   const frame = cache.lastFrame || {};
   const timings = frame.timings || {};
   const counters = cache.counters || {};
@@ -655,11 +656,11 @@ function resolveRenderRows() {
   const contextScenarioPerfReason = String(renderPerf.contextScenarioExactRefresh?.reason || renderPerf.contextScenarioReuseSkipped?.reason || "");
   const contextScenarioReason = contextScenarioCacheReason || contextScenarioPerfReason;
   return [
-    [ui("Render Profile"), String(state.renderProfile || "auto")],
-    [ui("Bundle Mode"), String(state.topologyBundleMode || "single")],
-    [ui("Detail Deferred"), state.detailDeferred ? ui("Yes") : ui("No")],
-    [ui("Detail Source"), String(state.detailSourceRequested || "")],
-    [ui("Phase"), String(state.renderPhase || "idle")],
+    [ui("Render Profile"), String(runtimeState.renderProfile || "auto")],
+    [ui("Bundle Mode"), String(runtimeState.topologyBundleMode || "single")],
+    [ui("Detail Deferred"), runtimeState.detailDeferred ? ui("Yes") : ui("No")],
+    [ui("Detail Source"), String(runtimeState.detailSourceRequested || "")],
+    [ui("Phase"), String(runtimeState.renderPhase || "idle")],
     [ui("Last Frame"), Number.isFinite(Number(frame.totalMs)) ? `${Number(frame.totalMs).toFixed(1)}ms` : ""],
     [ui("Last Action"), String(cache.lastAction || "")],
     [ui("Action Time"), Number.isFinite(Number(cache.lastActionDurationMs)) ? `${Number(cache.lastActionDurationMs).toFixed(1)}ms` : ""],
@@ -668,7 +669,7 @@ function resolveRenderRows() {
     [ui("Static Meshes"), Number.isFinite(Number(renderPerf.rebuildStaticMeshes?.durationMs)) ? `${Number(renderPerf.rebuildStaticMeshes.durationMs).toFixed(1)}ms` : ""],
     [ui("Hit Canvas"), Number.isFinite(Number(renderPerf.buildHitCanvas?.durationMs)) ? `${Number(renderPerf.buildHitCanvas.durationMs).toFixed(1)}ms` : ""],
     [ui("Dynamic Borders"), Number.isFinite(Number(renderPerf.rebuildDynamicBorders?.durationMs)) ? `${Number(renderPerf.rebuildDynamicBorders.durationMs).toFixed(1)}ms` : ""],
-    [ui("Border Reason"), String(state.dynamicBordersDirtyReason || "")],
+    [ui("Border Reason"), String(runtimeState.dynamicBordersDirtyReason || "")],
     [ui("Political Pass"), Number.isFinite(Number(timings.political)) ? `${Number(timings.political).toFixed(1)}ms` : ""],
     [ui("Borders Pass"), Number.isFinite(Number(timings.borders)) ? `${Number(timings.borders).toFixed(1)}ms` : ""],
     [ui("Context Scenario Reuse"), Number(counters.contextScenarioReuseCount || 0)],
@@ -682,12 +683,12 @@ function resolveRenderRows() {
 }
 
 function resolveRuntimeRows() {
-  const runtimeMeta = state.devRuntimeMeta;
+  const runtimeMeta = runtimeState.devRuntimeMeta;
   if (!runtimeMeta || typeof runtimeMeta !== "object") {
     return {
       title: "Runtime metadata unavailable",
       hint: isLocalHost()
-        ? (state.devRuntimeMetaError || ui("Runtime metadata not available yet."))
+        ? (runtimeState.devRuntimeMetaError || ui("Runtime metadata not available yet."))
         : ui("Runtime metadata is only available on the local dev server."),
       rows: [],
     };
@@ -766,9 +767,9 @@ function syncSelectOptions(select, options, { placeholderLabel = "", placeholder
 
 async function loadRuntimeMeta() {
   if (!isLocalHost()) {
-    state.devRuntimeMeta = null;
-    state.devRuntimeMetaError = ui("Runtime metadata is only available on localhost.");
-    state.updateDevWorkspaceUIFn?.();
+    runtimeState.devRuntimeMeta = null;
+    runtimeState.devRuntimeMetaError = ui("Runtime metadata is only available on localhost.");
+    runtimeState.updateDevWorkspaceUIFn?.();
     return;
   }
 
@@ -779,13 +780,13 @@ async function loadRuntimeMeta() {
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    state.devRuntimeMeta = await response.json();
-    state.devRuntimeMetaError = "";
+    runtimeState.devRuntimeMeta = await response.json();
+    runtimeState.devRuntimeMetaError = "";
   } catch (error) {
-    state.devRuntimeMeta = null;
-    state.devRuntimeMetaError = String(error?.message || ui("Unable to fetch runtime metadata."));
+    runtimeState.devRuntimeMeta = null;
+    runtimeState.devRuntimeMetaError = String(error?.message || ui("Unable to fetch runtime metadata."));
   }
-  state.updateDevWorkspaceUIFn?.();
+  runtimeState.updateDevWorkspaceUIFn?.();
 }
 
 function bindButtonAction(button, action) {
@@ -796,34 +797,34 @@ function bindButtonAction(button, action) {
 
 function setExpandedState(nextValue, { bottomDock, panel, toggleBtn, persist = true } = {}) {
   const expanded = !!nextValue;
-  state.ui.devWorkspaceExpanded = expanded;
-  state.devSelectionModeEnabled = expanded;
+  runtimeState.ui.devWorkspaceExpanded = expanded;
+  runtimeState.devSelectionModeEnabled = expanded;
   panel?.classList.toggle("is-hidden", !expanded);
   applyDevWorkspaceExpandedChrome({
     bottomDock,
     toggleBtn,
     expanded,
-    updateDockCollapsedUi: state.updateDockCollapsedUiFn,
+    updateDockCollapsedUi: runtimeState.updateDockCollapsedUiFn,
   });
   if (persist) {
     writeStoredExpanded(expanded);
   }
-  state.updateDevWorkspaceUIFn?.();
+  runtimeState.updateDevWorkspaceUIFn?.();
 }
 
 function copySelectionToClipboard(format, previewEl) {
   const text = buildClipboardText(format);
-  state.devClipboardPreviewFormat = format;
+  runtimeState.devClipboardPreviewFormat = format;
   if (!text) {
     showToast(ui("No selected regions to copy."), {
       title: ui("Selection Clipboard"),
       tone: "warning",
     });
-    state.updateDevWorkspaceUIFn?.();
+    runtimeState.updateDevWorkspaceUIFn?.();
     return;
   }
 
-  state.devClipboardFallbackText = text;
+  runtimeState.devClipboardFallbackText = text;
   if (!globalThis.navigator?.clipboard?.writeText) {
     previewEl?.focus();
     previewEl?.select();
@@ -832,7 +833,7 @@ function copySelectionToClipboard(format, previewEl) {
       tone: "warning",
       duration: 4200,
     });
-    state.updateDevWorkspaceUIFn?.();
+    runtimeState.updateDevWorkspaceUIFn?.();
     return;
   }
 
@@ -843,7 +844,7 @@ function copySelectionToClipboard(format, previewEl) {
         title: ui("Selection copied"),
         tone: "success",
       });
-      state.updateDevWorkspaceUIFn?.();
+      runtimeState.updateDevWorkspaceUIFn?.();
     })
     .catch(() => {
       previewEl?.focus();
@@ -853,7 +854,7 @@ function copySelectionToClipboard(format, previewEl) {
         tone: "warning",
         duration: 4200,
       });
-      state.updateDevWorkspaceUIFn?.();
+      runtimeState.updateDevWorkspaceUIFn?.();
     });
 }
 
@@ -896,14 +897,14 @@ function initDevWorkspace() {
   let selectionOwnershipController = null;
   let scenarioTextEditorsController = null;
   let districtEditorController = null;
-  if (!state.ui || typeof state.ui !== "object") {
-    state.ui = {};
+  if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+    runtimeState.ui = {};
   }
-  state.ui.devWorkspaceCategory = normalizeDevWorkspaceCategory(state.ui.devWorkspaceCategory);
+  runtimeState.ui.devWorkspaceCategory = normalizeDevWorkspaceCategory(runtimeState.ui.devWorkspaceCategory);
 
   const renderWorkspace = () => {
-    let activeDevCategory = normalizeDevWorkspaceCategory(state.ui.devWorkspaceCategory);
-    state.ui.devWorkspaceCategory = activeDevCategory;
+    let activeDevCategory = normalizeDevWorkspaceCategory(runtimeState.ui.devWorkspaceCategory);
+    runtimeState.ui.devWorkspaceCategory = activeDevCategory;
 
     const inspector = resolveInspectorRows();
     if (featureInspectorTitle) {
@@ -914,10 +915,10 @@ function initDevWorkspace() {
     }
     renderMetaRows(featureInspectorMeta, inspector.rows);
 
-    const hasActiveScenario = !!String(state.activeScenarioId || "").trim();
+    const hasActiveScenario = !!String(runtimeState.activeScenarioId || "").trim();
     if (activeDevCategory === "scenario" && !hasActiveScenario) {
       activeDevCategory = "selection";
-      state.ui.devWorkspaceCategory = activeDevCategory;
+      runtimeState.ui.devWorkspaceCategory = activeDevCategory;
     }
     categoryTabButtons.forEach((button) => {
       const tabCategory = normalizeDevWorkspaceCategory(button.dataset.devWorkspaceCategory);
@@ -932,7 +933,7 @@ function initDevWorkspace() {
 
     selectionOwnershipController?.render({ hasActiveScenario });
     if (devQuickRebuildBordersBtn) {
-      devQuickRebuildBordersBtn.disabled = !state.dynamicBordersDirty;
+      devQuickRebuildBordersBtn.disabled = !runtimeState.dynamicBordersDirty;
     }
 
     const syncCategoryPanel = (panelElement, category, isAvailable = true) => {
@@ -965,8 +966,8 @@ function initDevWorkspace() {
     }
     renderMetaRows(runtimeMeta, runtime.rows);
 
-    if (selectionSortMode && selectionSortMode.value !== state.devSelectionSortMode) {
-      selectionSortMode.value = state.devSelectionSortMode;
+    if (selectionSortMode && selectionSortMode.value !== runtimeState.devSelectionSortMode) {
+      selectionSortMode.value = runtimeState.devSelectionSortMode;
     }
 
     const entries = sortSelectionEntries(resolveSelectionEntries());
@@ -975,16 +976,16 @@ function initDevWorkspace() {
       selectionSummary.textContent = localizeSelectionSummary(entryCount);
     }
     if (selectionPreview) {
-      selectionPreview.value = buildClipboardText(state.devClipboardPreviewFormat || "names_with_ids")
-        || state.devClipboardFallbackText
+      selectionPreview.value = buildClipboardText(runtimeState.devClipboardPreviewFormat || "names_with_ids")
+        || runtimeState.devClipboardFallbackText
         || "";
     }
-    const hoveredSelectionId = state.devHoverHit?.targetType === "land"
-      ? String(state.devHoverHit.id || "").trim()
+    const hoveredSelectionId = runtimeState.devHoverHit?.targetType === "land"
+      ? String(runtimeState.devHoverHit.id || "").trim()
       : "";
     const addHoveredBtn = panel.querySelector("#devSelectionAddHoveredBtn");
     if (addHoveredBtn) {
-      addHoveredBtn.disabled = !hoveredSelectionId || !state.landIndex?.get(hoveredSelectionId);
+      addHoveredBtn.disabled = !hoveredSelectionId || !runtimeState.landIndex?.get(hoveredSelectionId);
     }
 
     [
@@ -1063,7 +1064,7 @@ function initDevWorkspace() {
   });
 
   bindButtonAction(toggleBtn, () => {
-    const next = !state.ui.devWorkspaceExpanded;
+    const next = !runtimeState.ui.devWorkspaceExpanded;
     setExpandedState(next, { bottomDock, panel, toggleBtn });
     if (next) {
       loadRuntimeMeta();
@@ -1073,15 +1074,15 @@ function initDevWorkspace() {
   });
   categoryTabButtons.forEach((button) => {
     bindButtonAction(button, () => {
-      state.ui.devWorkspaceCategory = normalizeDevWorkspaceCategory(button.dataset.devWorkspaceCategory);
+      runtimeState.ui.devWorkspaceCategory = normalizeDevWorkspaceCategory(button.dataset.devWorkspaceCategory);
       panel.scrollTop = 0;
       renderWorkspace();
     });
   });
 
   bindButtonAction(panel.querySelector("#devSelectionAddHoveredBtn"), () => {
-    const hoveredId = state.devHoverHit?.targetType === "land"
-      ? String(state.devHoverHit.id || "").trim()
+    const hoveredId = runtimeState.devHoverHit?.targetType === "land"
+      ? String(runtimeState.devHoverHit.id || "").trim()
       : "";
     if (!hoveredId) {
       return;
@@ -1089,7 +1090,7 @@ function initDevWorkspace() {
     addFeatureToDevSelection(hoveredId);
   });
   bindButtonAction(panel.querySelector("#devSelectionToggleSelectedBtn"), () => {
-    const selectedId = state.devSelectedHit?.targetType === "land" ? state.devSelectedHit.id : "";
+    const selectedId = runtimeState.devSelectedHit?.targetType === "land" ? runtimeState.devSelectedHit.id : "";
     toggleFeatureInDevSelection(selectedId);
   });
   bindButtonAction(panel.querySelector("#devSelectionRemoveLastBtn"), () => {
@@ -1132,15 +1133,15 @@ function initDevWorkspace() {
   });
 
   bindButtonAction(panel.querySelector("#devScenarioTagInspectorClearHighlightBtn"), () => {
-    state.inspectorHighlightCountryCode = "";
+    runtimeState.inspectorHighlightCountryCode = "";
     flushDevWorkspaceRender("dev-workspace-tag-inspector-clear-highlight");
     renderWorkspace();
   });
 
   if (scenarioTagInspectorThresholdInput && scenarioTagInspectorThresholdInput.dataset.bound !== "true") {
     scenarioTagInspectorThresholdInput.addEventListener("input", (event) => {
-      state.devScenarioTagInspector = {
-        ...(state.devScenarioTagInspector || {}),
+      runtimeState.devScenarioTagInspector = {
+        ...(runtimeState.devScenarioTagInspector || {}),
         threshold: Math.max(0, Number.parseInt(event.target.value, 10) || 0),
       };
       renderWorkspace();
@@ -1152,12 +1153,12 @@ function initDevWorkspace() {
     scenarioTagInspectorSelect.addEventListener("change", (event) => {
       const tag = normalizeScenarioTagInput(event.target.value);
       if (!tag) return;
-      state.devScenarioTagInspector = {
-        ...(state.devScenarioTagInspector || {}),
+      runtimeState.devScenarioTagInspector = {
+        ...(runtimeState.devScenarioTagInspector || {}),
         selectedTag: tag,
       };
-      state.selectedInspectorCountryCode = tag;
-      state.inspectorHighlightCountryCode = tag;
+      runtimeState.selectedInspectorCountryCode = tag;
+      runtimeState.inspectorHighlightCountryCode = tag;
       flushDevWorkspaceRender("dev-workspace-tag-inspector-select");
       renderWorkspace();
     });
@@ -1166,13 +1167,13 @@ function initDevWorkspace() {
 
   if (selectionSortMode && selectionSortMode.dataset.bound !== "true") {
     selectionSortMode.addEventListener("change", (event) => {
-      state.devSelectionSortMode = String(event.target.value || "selection") === "name" ? "name" : "selection";
+      runtimeState.devSelectionSortMode = String(event.target.value || "selection") === "name" ? "name" : "selection";
       renderWorkspace();
     });
     selectionSortMode.dataset.bound = "true";
   }
 
-  const initialExpanded = !!state.ui.developerMode;
+  const initialExpanded = !!runtimeState.ui.developerMode;
   setExpandedState(initialExpanded, {
     bottomDock,
     panel,
@@ -1184,4 +1185,6 @@ function initDevWorkspace() {
 }
 
 export { getScenarioGeoLocaleEntry, initDevWorkspace };
+
+
 

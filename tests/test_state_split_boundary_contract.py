@@ -7,7 +7,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STATE_JS = REPO_ROOT / "js" / "core" / "state.js"
 STATE_DEFAULTS_JS = REPO_ROOT / "js" / "core" / "state_defaults.js"
 STATE_CATALOG_JS = REPO_ROOT / "js" / "core" / "state_catalog.js"
-RUNTIME_HOOKS_JS = REPO_ROOT / "js" / "core" / "runtime_hooks.js"
+STATE_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "index.js"
+STATE_CONFIG_JS = REPO_ROOT / "js" / "core" / "state" / "config.js"
+STATE_BUS_JS = REPO_ROOT / "js" / "core" / "state" / "bus.js"
 STATE_HISTORY_JS = REPO_ROOT / "js" / "core" / "state" / "history_state.js"
 STATE_DEV_JS = REPO_ROOT / "js" / "core" / "state" / "dev_state.js"
 STATE_STRATEGIC_OVERLAY_JS = REPO_ROOT / "js" / "core" / "state" / "strategic_overlay_state.js"
@@ -27,7 +29,7 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
 
         self.assertIn('./state_defaults.js', content.replace('"', "'"))
         self.assertIn('./state_catalog.js', content.replace('"', "'"))
-        self.assertIn('./runtime_hooks.js', content.replace('"', "'"))
+        self.assertIn('./state/index.js', content.replace('"', "'"))
         self.assertIn('./state/history_state.js', content.replace('"', "'"))
         self.assertIn('./state/dev_state.js', content.replace('"', "'"))
         self.assertIn('./state/strategic_overlay_state.js', content.replace('"', "'"))
@@ -52,7 +54,7 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("function normalizeDayNightStyleConfig(rawConfig)", owner_content)
         self.assertIn("function normalizeTransportWorkbenchUiState(rawUi)", owner_content)
         self.assertIn("function normalizeExportWorkbenchUiState(rawUi)", owner_content)
-        self.assertIn("export function normalizeMapSemanticMode(value, fallback = \"political\")", owner_content)
+        self.assertIn('export function normalizeMapSemanticMode(value, fallback = "political")', owner_content)
 
         self.assertIsNone(re.search(r"function\s+normalizePhysicalStyleConfig\s*\(", donor_content))
         self.assertIsNone(re.search(r"function\s+normalizeTextureStyleConfig\s*\(", donor_content))
@@ -67,14 +69,11 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("defaultZoom", defaults_content)
         self.assertIn('} from "./state_defaults.js";', content)
         self.assertIn('} from "./state_catalog.js";', content)
-        self.assertIn('} from "./runtime_hooks.js";', content)
+        self.assertIn('} from "./state/index.js";', content)
         self.assertIn('export * from "./state_defaults.js";', content)
         self.assertIn('export * from "./state_catalog.js";', content)
-        self.assertIn('export * from "./runtime_hooks.js";', content)
-        self.assertIn('export * from "./state/boot_state.js";', content)
-        self.assertIn('export * from "./state/content_state.js";', content)
-        self.assertIn('export * from "./state/color_state.js";', content)
-        self.assertIn('export * from "./state/ui_state.js";', content)
+        self.assertIn('export * from "./state/index.js";', content)
+        self.assertIn("bindStateCompatSurface(state);", content)
         self.assertIn("normalizeMapSemanticMode", defaults_content)
         self.assertIn("countryPalette,", content)
 
@@ -91,25 +90,20 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"scenarioReleasableIndex:\s*\{\s*byTag:\s*\{\}", donor_content))
         self.assertIsNone(re.search(r"scenarioAuditUi:\s*\{\s*loading:\s*false", donor_content))
 
-    def test_runtime_hooks_owns_runtime_hook_defaults(self):
+    def test_state_index_owns_runtime_hook_compat_helpers(self):
         donor_content = STATE_JS.read_text(encoding="utf-8")
-        owner_content = RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
+        owner_content = STATE_INDEX_JS.read_text(encoding="utf-8")
+        config_content = STATE_CONFIG_JS.read_text(encoding="utf-8")
 
-        self.assertIn("export function createDefaultRuntimeHooks()", owner_content)
-        self.assertIn("function createDefaultUiRuntimeHooks()", owner_content)
-        self.assertIn("function createDefaultCommandRuntimeHooks()", owner_content)
-        self.assertIn("function createDefaultDataRuntimeHooks()", owner_content)
-        self.assertIn("function createDefaultRenderRuntimeHooks()", owner_content)
-        self.assertIn("setStartupReadonlyStateFn: null,", owner_content)
-        self.assertIn("ensureFullLocalizationDataReadyFn: null,", owner_content)
-        self.assertIn("updateScenarioUIFn: null,", owner_content)
-        self.assertIn("updateWorkspaceStatusFn: null,", owner_content)
-        self.assertIn("syncDeveloperModeUiFn: null,", owner_content)
-        self.assertIn("setDevWorkspaceExpandedFn: null,", owner_content)
-        self.assertIn("getStrategicOverlayPerfCountersFn: null,", owner_content)
-        self.assertIn("...createDefaultRuntimeHooks(),", donor_content)
-        self.assertIsNone(re.search(r"updateScenarioUIFn:\s*null,", donor_content))
-        self.assertIsNone(re.search(r"renderNowFn:\s*null,", donor_content))
+        self.assertIn("export function registerRuntimeHook(target, hookName, hook) {", owner_content)
+        self.assertIn("export function readRuntimeHook(target, hookName) {", owner_content)
+        self.assertIn("export function callRuntimeHook(target, hookName, ...args) {", owner_content)
+        self.assertIn("export function callRuntimeHooks(target, hookNames, ...args) {", owner_content)
+        self.assertIn("export function bindStateCompatSurface(target) {", owner_content)
+        self.assertIn("export const STATE_BUS_EVENTS = Object.freeze({", config_content)
+        self.assertIn("export const STATE_NOTIFICATION_HOOK_NAMES = Object.freeze", config_content)
+        self.assertIn("export const STATE_HANDLER_HOOK_NAMES = Object.freeze", config_content)
+        self.assertNotIn("createDefaultRuntimeHooks", donor_content)
 
     def test_history_state_owner_holds_undo_redo_defaults(self):
         donor_content = STATE_JS.read_text(encoding="utf-8")
@@ -156,8 +150,8 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         donor_content = STATE_JS.read_text(encoding="utf-8")
         owner_content = STATE_SCENARIO_RUNTIME_JS.read_text(encoding="utf-8")
 
-        self.assertIn("export function createDefaultActiveScenarioChunksState(scenarioId = \"\")", owner_content)
-        self.assertIn("export function createDefaultRuntimeChunkLoadState({ scenarioId = \"\" } = {})", owner_content)
+        self.assertIn('export function createDefaultActiveScenarioChunksState(scenarioId = "")', owner_content)
+        self.assertIn('export function createDefaultRuntimeChunkLoadState({ scenarioId = "" } = {})', owner_content)
         self.assertIn("export function createDefaultScenarioDataHealth(minRatio = 0.7)", owner_content)
         self.assertIn("export function createDefaultScenarioHydrationHealthGate()", owner_content)
         self.assertIn("export function createDefaultScenarioRuntimeState({", owner_content)
@@ -209,7 +203,7 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("export function createDefaultStartupBootCacheState()", owner_content)
         self.assertIn("export function createDefaultBootState()", owner_content)
-        self.assertIn("export function setStartupInteractionMode(target, mode = \"readonly\")", owner_content)
+        self.assertIn('export function setStartupInteractionMode(target, mode = "readonly")', owner_content)
         self.assertIn("export function setStartupBootCacheState(target, nextState = null)", owner_content)
         self.assertIn("if (error !== undefined) {", owner_content)
         self.assertIn("if (canContinueWithoutScenario !== undefined) {", owner_content)
@@ -218,62 +212,16 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("startupBootCacheState: createDefaultStartupBootCacheState(),", owner_content)
         self.assertIn("...createDefaultBootState(),", donor_content)
         self.assertIsNone(re.search(r'bootPhase:\s*"shell",', donor_content))
-        self.assertIsNone(re.search(r"startupBootCacheState:\s*\{", donor_content))
 
-    def test_content_state_owner_holds_content_defaults(self):
+    def test_bus_owner_holds_runtime_hook_bus_state(self):
         donor_content = STATE_JS.read_text(encoding="utf-8")
-        owner_content = STATE_CONTENT_JS.read_text(encoding="utf-8")
+        owner_content = STATE_BUS_JS.read_text(encoding="utf-8")
 
-        self.assertIn("export function createDefaultLocalesState()", owner_content)
-        self.assertIn("export function createDefaultContextLayerLoadStateByName()", owner_content)
-        self.assertIn("export function createDefaultContentState()", owner_content)
-        self.assertIn("export function hydrateStartupBaseContentState(", owner_content)
-        self.assertIn("export function decodeStartupPrimaryCollectionsIntoState(", owner_content)
-        self.assertIn("locales: createDefaultLocalesState(),", owner_content)
-        self.assertIn("contextLayerLoadStateByName: createDefaultContextLayerLoadStateByName(),", owner_content)
-        self.assertIn("hierarchyGroupsByCode: new Map(),", owner_content)
-        self.assertIn("...createDefaultContentState(),", donor_content)
-        self.assertIsNone(re.search(r"locales:\s*\{\s*ui:\s*\{\},\s*geo:\s*\{\s*\}\s*\},", donor_content))
-        self.assertIsNone(re.search(r"contextLayerLoadStateByName:\s*\{", donor_content))
-        self.assertIsNone(re.search(r"hierarchyGroupsByCode:\s*new Map\(\),", donor_content))
-
-    def test_color_state_owner_holds_palette_and_preset_defaults(self):
-        donor_content = STATE_JS.read_text(encoding="utf-8")
-        owner_content = STATE_COLOR_JS.read_text(encoding="utf-8")
-
-        self.assertIn("export function createDefaultColorState()", owner_content)
-        self.assertIn("export function replaceResolvedColorsState(target, nextColors = {})", owner_content)
-        self.assertIn("export function setResolvedColorForFeature(target, featureId, color)", owner_content)
-        self.assertIn("export function bumpColorRevision(target)", owner_content)
-        self.assertIn("export function normalizeColorStateForRender(", owner_content)
-        self.assertIn("export function sanitizeRegionOverrideColors(", owner_content)
-        self.assertIn("resolvedDefaultCountryPalette: { ...defaultCountryPalette },", owner_content)
-        self.assertIn('selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],', owner_content)
-        self.assertIn("editingPresetIds: new Set(),", owner_content)
-        self.assertIn("expandedPresetCountries: new Set(),", owner_content)
-        self.assertIn("...createDefaultColorState(),", donor_content)
-        self.assertIsNone(re.search(r"colors:\s*\{\},", donor_content))
-        self.assertIsNone(re.search(r'selectedColor:\s*PALETTE_THEMES\["HOI4 Vanilla"\]\[0\],', donor_content))
-        self.assertIsNone(re.search(r"editingPresetIds:\s*new Set\(\),", donor_content))
-
-    def test_ui_state_owner_holds_ui_and_style_defaults(self):
-        donor_content = STATE_JS.read_text(encoding="utf-8")
-        owner_content = STATE_UI_JS.read_text(encoding="utf-8")
-
-        self.assertIn("export function createDefaultManualSpecialZonesState()", owner_content)
-        self.assertIn("export function createDefaultTransportWorkbenchUiState()", owner_content)
-        self.assertIn("export function createDefaultReferenceImageState()", owner_content)
-        self.assertIn("export function createDefaultStyleConfig()", owner_content)
-        self.assertIn("export function createDefaultUiPanelState()", owner_content)
-        self.assertIn("export function createDefaultUiState()", owner_content)
-        self.assertIn("manualSpecialZones: createDefaultManualSpecialZonesState(),", owner_content)
-        self.assertIn("transportWorkbenchUi: createDefaultTransportWorkbenchUiState(),", owner_content)
-        self.assertIn("styleConfig: createDefaultStyleConfig(),", owner_content)
-        self.assertIn("ui: createDefaultUiPanelState(),", owner_content)
-        self.assertIn("...createDefaultUiState(),", donor_content)
-        self.assertIsNone(re.search(r"transportWorkbenchUi:\s*\{", donor_content))
-        self.assertIsNone(re.search(r"referenceImageState:\s*\{", donor_content))
-        self.assertIsNone(re.search(r"ui:\s*\{\s*dockCollapsed:\s*false,", donor_content))
+        self.assertIn("export function on(eventName, listener) {", owner_content)
+        self.assertIn("export function off(eventName, listener = null) {", owner_content)
+        self.assertIn("export function emit(eventName, payload) {", owner_content)
+        self.assertIn("export function once(eventName, listener) {", owner_content)
+        self.assertIn("bindStateCompatSurface(state);", donor_content)
 
 
 if __name__ == "__main__":

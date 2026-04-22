@@ -214,7 +214,14 @@ function finiteNumber(value, fallback = 0) {
 
 function median(values) {
   const numbers = values.map((value) => finiteNumber(value, NaN)).filter(Number.isFinite).sort((a, b) => a - b);
-  return numbers.length ? numbers[Math.floor(numbers.length / 2)] : 0;
+  if (!numbers.length) {
+    return 0;
+  }
+  const middleIndex = Math.floor(numbers.length / 2);
+  if (numbers.length % 2 === 0) {
+    return (numbers[middleIndex - 1] + numbers[middleIndex]) / 2;
+  }
+  return numbers[middleIndex];
 }
 
 function metricAtMs(metric, bootTotal) {

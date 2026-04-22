@@ -1,10 +1,11 @@
-import { normalizeMapSemanticMode, state } from "./state.js";
+import { normalizeMapSemanticMode, state as runtimeState } from "./state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import {
   getScenarioEffectiveControllerCodeByFeatureId,
   getScenarioEffectiveOwnerCodeByFeatureId,
 } from "./scenario_runtime_queries.js";
+const state = runtimeState;
 
 function getScenarioTestHooks() {
   return globalThis.__scenarioTestHooks && typeof globalThis.__scenarioTestHooks === "object"
@@ -22,13 +23,13 @@ function consumeScenarioTestHook(name) {
 export { consumeScenarioTestHook };
 
 export function getScenarioFatalRecoveryState() {
-  return state.scenarioFatalRecovery && typeof state.scenarioFatalRecovery === "object"
-    ? state.scenarioFatalRecovery
+  return runtimeState.scenarioFatalRecovery && typeof runtimeState.scenarioFatalRecovery === "object"
+    ? runtimeState.scenarioFatalRecovery
     : null;
 }
 
 export function clearScenarioFatalRecoveryState() {
-  state.scenarioFatalRecovery = null;
+  runtimeState.scenarioFatalRecovery = null;
 }
 
 export function formatScenarioFatalRecoveryMessage(fatalState = getScenarioFatalRecoveryState()) {
@@ -50,15 +51,15 @@ export function buildScenarioFatalRecoveryError(actionLabel = "complete this sce
 
 export function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "apply" } = {}) {
   const problems = [];
-  const activeScenarioId = String(state.activeScenarioId || "").trim();
-  const manifestScenarioId = String(state.activeScenarioManifest?.scenario_id || "").trim();
+  const activeScenarioId = String(runtimeState.activeScenarioId || "").trim();
+  const manifestScenarioId = String(runtimeState.activeScenarioManifest?.scenario_id || "").trim();
   const normalizedExpectedScenarioId = String(expectedScenarioId || "").trim();
-  const mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
+  const mapSemanticMode = normalizeMapSemanticMode(runtimeState.mapSemanticMode);
   const requiredObjects = [
-    ["sovereigntyByFeatureId", state.sovereigntyByFeatureId],
-    ["scenarioControllersByFeatureId", state.scenarioControllersByFeatureId],
-    ["scenarioBaselineOwnersByFeatureId", state.scenarioBaselineOwnersByFeatureId],
-    ["scenarioBaselineControllersByFeatureId", state.scenarioBaselineControllersByFeatureId],
+    ["sovereigntyByFeatureId", runtimeState.sovereigntyByFeatureId],
+    ["scenarioControllersByFeatureId", runtimeState.scenarioControllersByFeatureId],
+    ["scenarioBaselineOwnersByFeatureId", runtimeState.scenarioBaselineOwnersByFeatureId],
+    ["scenarioBaselineControllersByFeatureId", runtimeState.scenarioBaselineControllersByFeatureId],
   ];
 
   if (normalizedExpectedScenarioId && activeScenarioId !== normalizedExpectedScenarioId) {
@@ -67,7 +68,7 @@ export function validateScenarioRuntimeConsistency({ expectedScenarioId = "", ph
   if (activeScenarioId && manifestScenarioId !== activeScenarioId) {
     problems.push(`manifest scenario id mismatch (${manifestScenarioId || "none"} != ${activeScenarioId}).`);
   }
-  if (activeScenarioId && !String(state.scenarioBaselineHash || "").trim()) {
+  if (activeScenarioId && !String(runtimeState.scenarioBaselineHash || "").trim()) {
     problems.push("scenarioBaselineHash is empty while a scenario is active.");
   }
   requiredObjects.forEach(([fieldName, value]) => {
@@ -77,13 +78,13 @@ export function validateScenarioRuntimeConsistency({ expectedScenarioId = "", ph
   });
 
   const sampleFeatureId =
-    Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).find(Boolean) ||
-    Object.keys(state.sovereigntyByFeatureId || {}).find(Boolean) ||
-    Object.keys(state.scenarioBaselineControllersByFeatureId || {}).find(Boolean) ||
-    Object.keys(state.scenarioControllersByFeatureId || {}).find(Boolean) ||
+    Object.keys(runtimeState.scenarioBaselineOwnersByFeatureId || {}).find(Boolean) ||
+    Object.keys(runtimeState.sovereigntyByFeatureId || {}).find(Boolean) ||
+    Object.keys(runtimeState.scenarioBaselineControllersByFeatureId || {}).find(Boolean) ||
+    Object.keys(runtimeState.scenarioControllersByFeatureId || {}).find(Boolean) ||
     "";
   if (activeScenarioId && !sampleFeatureId && mapSemanticMode !== "blank") {
-    problems.push("No feature assignments are available in the active scenario state.");
+    problems.push("No feature assignments are available in the active scenario runtimeState.");
   } else if (sampleFeatureId) {
     if (!getScenarioEffectiveOwnerCodeByFeatureId(sampleFeatureId)) {
       problems.push(`Effective owner lookup failed for ${sampleFeatureId}.`);
@@ -122,7 +123,7 @@ export function enterScenarioFatalRecovery({
   const detail = rollbackError
     ? t("Rollback recovery failed.", "ui")
     : problemSummary || t("Rollback validation failed.", "ui");
-  state.scenarioFatalRecovery = {
+  runtimeState.scenarioFatalRecovery = {
     phase: String(phase || "rollback"),
     message: detail,
     recordedAt: new Date().toISOString(),
@@ -130,8 +131,8 @@ export function enterScenarioFatalRecovery({
     rootErrorMessage: String(rootError?.message || "").trim(),
     rollbackErrorMessage: String(rollbackError?.message || "").trim(),
   };
-  state.scenarioApplyInFlight = false;
-  showToast(formatScenarioFatalRecoveryMessage(state.scenarioFatalRecovery), {
+  runtimeState.scenarioApplyInFlight = false;
+  showToast(formatScenarioFatalRecoveryMessage(runtimeState.scenarioFatalRecovery), {
     title: t("Scenario recovery failed", "ui"),
     tone: "error",
     duration: 7000,
@@ -139,11 +140,11 @@ export function enterScenarioFatalRecovery({
   if (typeof syncUi === "function") {
     syncUi();
   }
-  return state.scenarioFatalRecovery;
+  return runtimeState.scenarioFatalRecovery;
 }
 
 export function assertStartupReadonlyUnlocked(actionLabel = "complete this startup action") {
-  if (!state.startupReadonly) return;
+  if (!runtimeState.startupReadonly) return;
   throw new Error(
     `Detailed interactions are still loading. Unable to ${actionLabel} while the startup view is read-only.`
   );
@@ -153,7 +154,7 @@ export function assertScenarioInteractionsAllowed(
   actionLabel = "complete this scenario action",
   { allowDuringBootBlocking = false } = {}
 ) {
-  if (!allowDuringBootBlocking && state.bootBlocking !== false) {
+  if (!allowDuringBootBlocking && runtimeState.bootBlocking !== false) {
     throw new Error(
       `Startup is still completing. Unable to ${actionLabel} until the workspace leaves boot blocking mode.`
     );
@@ -162,3 +163,4 @@ export function assertScenarioInteractionsAllowed(
   if (!getScenarioFatalRecoveryState()) return;
   throw buildScenarioFatalRecoveryError(actionLabel);
 }
+

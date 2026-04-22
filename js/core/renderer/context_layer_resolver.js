@@ -1,5 +1,5 @@
 export function createContextLayerResolverOwner({
-  state,
+  runtimeState,
   caches = {},
   constants = {},
   helpers = {},
@@ -162,7 +162,7 @@ export function createContextLayerResolverOwner({
 
   // 选择逻辑遵循“可用性优先 + 覆盖分数兜底”：
   // 先处理空集可用性，再按 minScore 与 primary/detail 比值选源，
-  // 输出 source 会回写到 state.contextLayerSourceByName 作为后续缓存与诊断依据。
+  // 输出 source 会回写到 runtimeState.contextLayerSourceByName 作为后续缓存与诊断依据。
   function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
     const minScore = Number.isFinite(Number(policy.minScore))
       ? Number(policy.minScore)
@@ -253,30 +253,30 @@ export function createContextLayerResolverOwner({
   // 回退策略遵循 source 优先级并同步 layerDataDiagnostics/contextLayerSourceByName，
   // 保证 ensureLayerDataFromTopology 能以稳定字段追踪每层来源与降级路径。
   function resolveContextLayerData(layerName) {
-    const externalContextCollection = state.contextLayerExternalDataByName?.[layerName];
+    const externalContextCollection = runtimeState.contextLayerExternalDataByName?.[layerName];
     if (
       layerName === "special_zones" &&
-      Array.isArray(state.specialZonesExternalData?.features)
+      Array.isArray(runtimeState.specialZonesExternalData?.features)
     ) {
-      if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-        state.layerDataDiagnostics = {};
+      if (!runtimeState.layerDataDiagnostics || typeof runtimeState.layerDataDiagnostics !== "object") {
+        runtimeState.layerDataDiagnostics = {};
       }
-      if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-        state.contextLayerSourceByName = {};
+      if (!runtimeState.contextLayerSourceByName || typeof runtimeState.contextLayerSourceByName !== "object") {
+        runtimeState.contextLayerSourceByName = {};
       }
-      state.contextLayerSourceByName[layerName] = "external";
-      state.layerDataDiagnostics[layerName] = {
+      runtimeState.contextLayerSourceByName[layerName] = "external";
+      runtimeState.layerDataDiagnostics[layerName] = {
         source: "external",
         primaryCount: 0,
-        detailCount: state.specialZonesExternalData.features.length,
+        detailCount: runtimeState.specialZonesExternalData.features.length,
         primaryScore: 0,
         detailScore: 1,
       };
-      return state.specialZonesExternalData;
+      return runtimeState.specialZonesExternalData;
     }
 
-    const primaryTopology = state.topologyPrimary || state.topology;
-    const detailTopology = state.topologyDetail;
+    const primaryTopology = runtimeState.topologyPrimary || runtimeState.topology;
+    const detailTopology = runtimeState.topologyDetail;
     const primaryCollection = getLayerFeatureCollection(primaryTopology, layerName);
     const detailCollection = getLayerFeatureCollection(detailTopology, layerName);
     const isUrbanLayer = layerName === "urban";
@@ -290,14 +290,14 @@ export function createContextLayerResolverOwner({
       && !canPreferUrbanDetailCollection(detailUrbanCapability);
 
     if (preferExternalUrban) {
-      if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-        state.layerDataDiagnostics = {};
+      if (!runtimeState.layerDataDiagnostics || typeof runtimeState.layerDataDiagnostics !== "object") {
+        runtimeState.layerDataDiagnostics = {};
       }
-      if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-        state.contextLayerSourceByName = {};
+      if (!runtimeState.contextLayerSourceByName || typeof runtimeState.contextLayerSourceByName !== "object") {
+        runtimeState.contextLayerSourceByName = {};
       }
-      state.contextLayerSourceByName[layerName] = "external";
-      state.layerDataDiagnostics[layerName] = {
+      runtimeState.contextLayerSourceByName[layerName] = "external";
+      runtimeState.layerDataDiagnostics[layerName] = {
         source: "external",
         primaryCount: Array.isArray(primaryCollection?.features) ? primaryCollection.features.length : 0,
         detailCount: Array.isArray(detailCollection?.features) ? detailCollection.features.length : 0,
@@ -315,7 +315,7 @@ export function createContextLayerResolverOwner({
         externalMissingStableIds: Number(externalUrbanCapability?.missingStableIdCount || 0),
         externalMissingOwnerMeta: Number(externalUrbanCapability?.missingOwnerCount || 0),
       };
-      state.urbanLayerCapability = externalUrbanCapability;
+      runtimeState.urbanLayerCapability = externalUrbanCapability;
       return externalContextCollection;
     }
 
@@ -328,15 +328,15 @@ export function createContextLayerResolverOwner({
       }
     );
 
-    if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
-      state.layerDataDiagnostics = {};
+    if (!runtimeState.layerDataDiagnostics || typeof runtimeState.layerDataDiagnostics !== "object") {
+      runtimeState.layerDataDiagnostics = {};
     }
-    if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
-      state.contextLayerSourceByName = {};
+    if (!runtimeState.contextLayerSourceByName || typeof runtimeState.contextLayerSourceByName !== "object") {
+      runtimeState.contextLayerSourceByName = {};
     }
 
-    state.contextLayerSourceByName[layerName] = pick.source;
-    state.layerDataDiagnostics[layerName] = {
+    runtimeState.contextLayerSourceByName[layerName] = pick.source;
+    runtimeState.layerDataDiagnostics[layerName] = {
       source: pick.source,
       primaryCount: pick.primaryCount,
       detailCount: pick.detailCount,
@@ -357,18 +357,18 @@ export function createContextLayerResolverOwner({
     };
 
     if (isUrbanLayer) {
-      state.urbanLayerCapability = pick.source === "detail"
+      runtimeState.urbanLayerCapability = pick.source === "detail"
         ? detailUrbanCapability
         : primaryUrbanCapability;
     }
 
     if (pick.source === "none" && Array.isArray(externalContextCollection?.features)) {
       if (isUrbanLayer && !canRenderUrbanCollection(externalUrbanCapability)) {
-        state.urbanLayerCapability = externalUrbanCapability;
+        runtimeState.urbanLayerCapability = externalUrbanCapability;
         return pick.collection;
       }
-      state.contextLayerSourceByName[layerName] = "external";
-      state.layerDataDiagnostics[layerName] = {
+      runtimeState.contextLayerSourceByName[layerName] = "external";
+      runtimeState.layerDataDiagnostics[layerName] = {
         source: "external",
         primaryCount: pick.primaryCount,
         detailCount: externalContextCollection.features.length,
@@ -384,96 +384,96 @@ export function createContextLayerResolverOwner({
           : {}),
       };
       if (isUrbanLayer) {
-        state.urbanLayerCapability = externalUrbanCapability;
+        runtimeState.urbanLayerCapability = externalUrbanCapability;
       }
       return externalContextCollection;
     }
 
-    if (isUrbanLayer && !state.urbanLayerCapability) {
-      state.urbanLayerCapability = createUrbanLayerCapability();
+    if (isUrbanLayer && !runtimeState.urbanLayerCapability) {
+      runtimeState.urbanLayerCapability = createUrbanLayerCapability();
     }
 
     return pick.collection;
   }
 
   function ensureLayerDataFromTopology() {
-    const primaryTopology = state.topologyPrimary || state.topology;
+    const primaryTopology = runtimeState.topologyPrimary || runtimeState.topology;
     if (!primaryTopology || !globalThis.topojson) return;
 
-    if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
-      state.manualSpecialZones = { type: "FeatureCollection", features: [] };
+    if (!runtimeState.manualSpecialZones || runtimeState.manualSpecialZones.type !== "FeatureCollection") {
+      runtimeState.manualSpecialZones = { type: "FeatureCollection", features: [] };
     }
-    if (!Array.isArray(state.manualSpecialZones.features)) {
-      state.manualSpecialZones.features = [];
+    if (!Array.isArray(runtimeState.manualSpecialZones.features)) {
+      runtimeState.manualSpecialZones.features = [];
     }
 
     const sameSource =
       layerResolverCache.primaryRef === primaryTopology &&
-      layerResolverCache.detailRef === state.topologyDetail &&
-      layerResolverCache.bundleMode === state.topologyBundleMode &&
-      layerResolverCache.contextRevision === Number(state.contextLayerRevision || 0);
+      layerResolverCache.detailRef === runtimeState.topologyDetail &&
+      layerResolverCache.bundleMode === runtimeState.topologyBundleMode &&
+      layerResolverCache.contextRevision === Number(runtimeState.contextLayerRevision || 0);
     if (sameSource) {
       return;
     }
 
-    state.oceanData = resolveContextLayerData("ocean");
-    state.landBgData = resolveContextLayerData("land");
+    runtimeState.oceanData = resolveContextLayerData("ocean");
+    runtimeState.landBgData = resolveContextLayerData("land");
     const previousWaterRegionsDataToken = String(layerResolverCache.waterRegionsDataToken || "");
     const nextWaterRegionsData = resolveContextLayerData("water_regions");
-    state.waterRegionsData = nextWaterRegionsData;
+    runtimeState.waterRegionsData = nextWaterRegionsData;
     const nextWaterRegionsDataToken = getContextLayerStableSourceToken("water_regions", nextWaterRegionsData, {
       primaryTopology,
-      detailTopology: state.topologyDetail,
-      externalCollection: state.contextLayerExternalDataByName?.water_regions,
-      source: state.contextLayerSourceByName?.water_regions,
+      detailTopology: runtimeState.topologyDetail,
+      externalCollection: runtimeState.contextLayerExternalDataByName?.water_regions,
+      source: runtimeState.contextLayerSourceByName?.water_regions,
     });
     layerResolverCache.waterRegionsDataToken = nextWaterRegionsDataToken;
-    state.riversData = resolveContextLayerData("rivers");
-    state.urbanData = resolveContextLayerData("urban");
-    state.physicalData = resolveContextLayerData("physical");
-    state.specialZonesData = resolveContextLayerData("special_zones");
+    runtimeState.riversData = resolveContextLayerData("rivers");
+    runtimeState.urbanData = resolveContextLayerData("urban");
+    runtimeState.physicalData = resolveContextLayerData("physical");
+    runtimeState.specialZonesData = resolveContextLayerData("special_zones");
     if (previousWaterRegionsDataToken !== nextWaterRegionsDataToken) {
       resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
     }
     ensureBathymetryDataAvailability({ required: false });
 
-    const diag = state.layerDataDiagnostics || {};
+    const diag = runtimeState.layerDataDiagnostics || {};
     console.info(
       `${layerDiagPrefix} sources: ocean=${diag.ocean?.source || "none"}, `
         + `land=${diag.land?.source || "none"}, water_regions=${diag.water_regions?.source || "none"}, `
         + `rivers=${diag.rivers?.source || "none"}, `
         + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
         + `special_zones=${diag.special_zones?.source || "none"}, `
-        + `bathymetry=${state.activeBathymetrySource || "none"}`
+        + `bathymetry=${runtimeState.activeBathymetrySource || "none"}`
     );
-    if (typeof state.updateToolbarInputsFn === "function") {
-      state.updateToolbarInputsFn();
+    if (typeof runtimeState.updateToolbarInputsFn === "function") {
+      runtimeState.updateToolbarInputsFn();
     }
 
-    if (state.topologyBundleMode !== "composite" && primaryTopology?.objects?.political) {
+    if (runtimeState.topologyBundleMode !== "composite" && primaryTopology?.objects?.political) {
       const expectedCount = Array.isArray(primaryTopology.objects.political.geometries)
         ? primaryTopology.objects.political.geometries.length
         : 0;
-      const currentCount = Array.isArray(state.landData?.features)
-        ? state.landData.features.length
+      const currentCount = Array.isArray(runtimeState.landData?.features)
+        ? runtimeState.landData.features.length
         : 0;
-      const fullCount = Array.isArray(state.landDataFull?.features)
-        ? state.landDataFull.features.length
+      const fullCount = Array.isArray(runtimeState.landDataFull?.features)
+        ? runtimeState.landDataFull.features.length
         : 0;
       if (currentCount !== expectedCount || fullCount !== expectedCount) {
         const primaryCollection = globalThis.topojson.feature(primaryTopology, primaryTopology.objects.political);
-        state.landDataFull = primaryCollection;
-        state.landData = primaryCollection;
+        runtimeState.landDataFull = primaryCollection;
+        runtimeState.landData = primaryCollection;
       }
     }
 
     layerResolverCache.primaryRef = primaryTopology;
-    layerResolverCache.detailRef = state.topologyDetail;
-    layerResolverCache.bundleMode = state.topologyBundleMode;
-    layerResolverCache.contextRevision = Number(state.contextLayerRevision || 0);
+    layerResolverCache.detailRef = runtimeState.topologyDetail;
+    layerResolverCache.bundleMode = runtimeState.topologyBundleMode;
+    layerResolverCache.contextRevision = Number(runtimeState.contextLayerRevision || 0);
 
-    if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-      state.updateSpecialZoneEditorUIFn();
+    if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {
+      runtimeState.updateSpecialZoneEditorUIFn();
     }
   }
 

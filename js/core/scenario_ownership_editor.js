@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
   refreshResolvedColorsForFeatures,
@@ -13,6 +13,7 @@ import {
   setFeatureOwnerCodes,
   shouldExcludeScenarioPoliticalFeature,
 } from "./sovereignty_manager.js";
+const state = runtimeState;
 
 function uniqueIds(featureIds = []) {
   return Array.from(new Set(
@@ -35,7 +36,7 @@ function filterEditableOwnershipFeatureIds(featureIds = []) {
       missingIds: [],
     };
   }
-  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
   if (!landIndex || landIndex.size === 0) {
     return {
       requestedIds,
@@ -149,11 +150,11 @@ function resetOwnersToScenarioBaselineForFeatureIds(
       mode: "ownership",
     };
   }
-  const baselineMap = state.scenarioBaselineOwnersByFeatureId
-    && typeof state.scenarioBaselineOwnersByFeatureId === "object"
-      ? state.scenarioBaselineOwnersByFeatureId
+  const baselineMap = runtimeState.scenarioBaselineOwnersByFeatureId
+    && typeof runtimeState.scenarioBaselineOwnersByFeatureId === "object"
+      ? runtimeState.scenarioBaselineOwnersByFeatureId
       : null;
-  if (!state.activeScenarioId || !baselineMap) {
+  if (!runtimeState.activeScenarioId || !baselineMap) {
     return {
       applied: false,
       changed: 0,
@@ -280,15 +281,15 @@ function applyOwnerControllerAssignmentsToFeatureIds(
     sovereigntyFeatureIds: targetIds,
     scenarioControllerFeatureIds: targetIds,
   });
-  state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+  runtimeState.scenarioControllersByFeatureId = runtimeState.scenarioControllersByFeatureId || {};
   const ownerFeatureIdsByCode = new Map();
   const changedFeatureIds = new Set();
 
   entries.forEach(({ featureId, ownerCode, controllerCode }) => {
     if (!targetIds.includes(featureId)) return;
-    const currentOwnerCode = normalizeOwnerCode(state.sovereigntyByFeatureId?.[featureId]);
+    const currentOwnerCode = normalizeOwnerCode(runtimeState.sovereigntyByFeatureId?.[featureId]);
     const currentControllerCode = normalizeOwnerCode(
-      state.scenarioControllersByFeatureId?.[featureId] || currentOwnerCode
+      runtimeState.scenarioControllersByFeatureId?.[featureId] || currentOwnerCode
     );
     if (currentOwnerCode !== ownerCode) {
       if (!ownerFeatureIdsByCode.has(ownerCode)) {
@@ -298,7 +299,7 @@ function applyOwnerControllerAssignmentsToFeatureIds(
       changedFeatureIds.add(featureId);
     }
     if (currentControllerCode !== controllerCode) {
-      state.scenarioControllersByFeatureId[featureId] = controllerCode;
+      runtimeState.scenarioControllersByFeatureId[featureId] = controllerCode;
       changedFeatureIds.add(featureId);
     }
   });
@@ -307,7 +308,7 @@ function applyOwnerControllerAssignmentsToFeatureIds(
     setFeatureOwnerCodes(featureIds, ownerCode);
   });
   if (changedFeatureIds.size) {
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
     refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
@@ -339,9 +340,9 @@ function applyOwnerControllerAssignmentsToFeatureIds(
 }
 
 function buildScenarioOwnershipSavePayload() {
-  const scenarioId = String(state.activeScenarioId || "").trim();
-  const baselineHash = String(state.scenarioBaselineHash || "").trim();
-  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  const scenarioId = String(runtimeState.activeScenarioId || "").trim();
+  const baselineHash = String(runtimeState.scenarioBaselineHash || "").trim();
+  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
   const owners = {};
 
   if (landIndex && landIndex.size > 0) {
@@ -353,7 +354,7 @@ function buildScenarioOwnershipSavePayload() {
       owners[id] = ownerCode;
     });
   } else {
-    Object.entries(state.sovereigntyByFeatureId || {}).forEach(([featureId, ownerCode]) => {
+    Object.entries(runtimeState.sovereigntyByFeatureId || {}).forEach(([featureId, ownerCode]) => {
       const id = String(featureId || "").trim();
       const normalizedOwnerCode = normalizeOwnerCode(ownerCode);
       if (!id || !normalizedOwnerCode) return;
@@ -391,3 +392,4 @@ export {
   resetOwnersToScenarioBaselineForFeatureIds,
   summarizeOwnershipForFeatureIds,
 };
+

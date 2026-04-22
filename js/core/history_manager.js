@@ -1,9 +1,10 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import { markDirty } from "./dirty_state.js";
 import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
-import { callRuntimeHook, callRuntimeHooks } from "./runtime_hooks.js";
+import { callRuntimeHook, callRuntimeHooks } from "./state/index.js";
+const state = runtimeState;
 
 function uniqueKeys(values) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)));
@@ -25,7 +26,7 @@ function captureStylePaths(paths) {
   const snapshot = {};
   uniqueKeys(paths).forEach((path) => {
     const segments = path.split(".").filter(Boolean);
-    let cursor = state.styleConfig;
+    let cursor = runtimeState.styleConfig;
     for (const segment of segments) {
       if (!cursor || typeof cursor !== "object") {
         cursor = undefined;
@@ -66,31 +67,31 @@ function captureHistoryState({
   const styleKeys = uniqueKeys(stylePaths);
 
   if (ids.length) {
-    snapshot.visualOverrides = captureEntries(state.visualOverrides || {}, ids);
-    snapshot.featureOverrides = captureEntries(state.featureOverrides || {}, ids);
+    snapshot.visualOverrides = captureEntries(runtimeState.visualOverrides || {}, ids);
+    snapshot.featureOverrides = captureEntries(runtimeState.featureOverrides || {}, ids);
   }
 
   if (waterIds.length) {
-    snapshot.waterRegionOverrides = captureEntries(state.waterRegionOverrides || {}, waterIds);
+    snapshot.waterRegionOverrides = captureEntries(runtimeState.waterRegionOverrides || {}, waterIds);
   }
 
   if (specialIds.length) {
-    snapshot.specialRegionOverrides = captureEntries(state.specialRegionOverrides || {}, specialIds);
+    snapshot.specialRegionOverrides = captureEntries(runtimeState.specialRegionOverrides || {}, specialIds);
   }
 
   if (ownerKeys.length) {
-    snapshot.sovereignBaseColors = captureEntries(state.sovereignBaseColors || {}, ownerKeys);
-    snapshot.countryBaseColors = captureEntries(state.countryBaseColors || {}, ownerKeys);
-    snapshot.countryPalette = captureEntries(state.countryPalette || {}, ownerKeys);
+    snapshot.sovereignBaseColors = captureEntries(runtimeState.sovereignBaseColors || {}, ownerKeys);
+    snapshot.countryBaseColors = captureEntries(runtimeState.countryBaseColors || {}, ownerKeys);
+    snapshot.countryPalette = captureEntries(runtimeState.countryPalette || {}, ownerKeys);
   }
 
   if (sovereigntyIds.length) {
-    snapshot.sovereigntyByFeatureId = captureEntries(state.sovereigntyByFeatureId || {}, sovereigntyIds);
+    snapshot.sovereigntyByFeatureId = captureEntries(runtimeState.sovereigntyByFeatureId || {}, sovereigntyIds);
   }
 
   if (scenarioControllerIds.length) {
     snapshot.scenarioControllersByFeatureId = captureEntries(
-      state.scenarioControllersByFeatureId || {},
+      runtimeState.scenarioControllersByFeatureId || {},
       scenarioControllerIds
     );
   }
@@ -100,10 +101,10 @@ function captureHistoryState({
   }
 
   if (strategicOverlay) {
-    snapshot.annotationView = cloneStructuredValue(state.annotationView || {});
-    snapshot.operationalLines = cloneStructuredValue(state.operationalLines || []);
-    snapshot.operationGraphics = cloneStructuredValue(state.operationGraphics || []);
-    snapshot.unitCounters = cloneStructuredValue(state.unitCounters || []);
+    snapshot.annotationView = cloneStructuredValue(runtimeState.annotationView || {});
+    snapshot.operationalLines = cloneStructuredValue(runtimeState.operationalLines || []);
+    snapshot.operationGraphics = cloneStructuredValue(runtimeState.operationGraphics || []);
+    snapshot.unitCounters = cloneStructuredValue(runtimeState.unitCounters || []);
   }
 
   return snapshot;
@@ -135,7 +136,7 @@ function applyStyleSnapshot(stylePatch) {
   Object.entries(stylePatch).forEach(([path, value]) => {
     const segments = String(path || "").split(".").filter(Boolean);
     if (!segments.length) return;
-    let cursor = state.styleConfig;
+    let cursor = runtimeState.styleConfig;
     for (let index = 0; index < segments.length - 1; index += 1) {
       const segment = segments[index];
       if (!cursor[segment] || typeof cursor[segment] !== "object") {
@@ -162,13 +163,13 @@ function pushHistoryEntry(entry) {
     return false;
   }
 
-  state.historyPast = Array.isArray(state.historyPast) ? state.historyPast : [];
-  state.historyFuture = [];
-  state.historyPast.push(nextEntry);
+  runtimeState.historyPast = Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast : [];
+  runtimeState.historyFuture = [];
+  runtimeState.historyPast.push(nextEntry);
 
-  const max = Math.max(1, Number(state.historyMax) || 80);
-  if (state.historyPast.length > max) {
-    state.historyPast = state.historyPast.slice(state.historyPast.length - max);
+  const max = Math.max(1, Number(runtimeState.historyMax) || 80);
+  if (runtimeState.historyPast.length > max) {
+    runtimeState.historyPast = runtimeState.historyPast.slice(runtimeState.historyPast.length - max);
   }
 
   callRuntimeHook(state, "updateHistoryUIFn");
@@ -181,11 +182,11 @@ function refreshUiAfterHistory(direction, entry) {
     || entry?.after?.scenarioControllersByFeatureId
   );
   if (entry?.before?.sovereigntyByFeatureId || entry?.after?.sovereigntyByFeatureId) {
-    state.sovereigntyInitialized = true;
+    runtimeState.sovereigntyInitialized = true;
     rebuildOwnerIndex();
   }
   if (affectsScenarioControllers) {
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
   }
   callRuntimeHook(state, "refreshColorStateFn", { renderNow: false });
@@ -218,25 +219,25 @@ function applyHistorySnapshot(snapshot, direction, entry) {
     || Array.isArray(snapshot.unitCounters)
   );
 
-  state.visualOverrides = state.visualOverrides || {};
-  state.featureOverrides = state.featureOverrides || {};
-  state.waterRegionOverrides = state.waterRegionOverrides || {};
-  state.specialRegionOverrides = state.specialRegionOverrides || {};
-  state.sovereignBaseColors = state.sovereignBaseColors || {};
-  state.countryBaseColors = state.countryBaseColors || {};
-  state.countryPalette = state.countryPalette || {};
-  state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
-  state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+  runtimeState.visualOverrides = runtimeState.visualOverrides || {};
+  runtimeState.featureOverrides = runtimeState.featureOverrides || {};
+  runtimeState.waterRegionOverrides = runtimeState.waterRegionOverrides || {};
+  runtimeState.specialRegionOverrides = runtimeState.specialRegionOverrides || {};
+  runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
+  runtimeState.countryBaseColors = runtimeState.countryBaseColors || {};
+  runtimeState.countryPalette = runtimeState.countryPalette || {};
+  runtimeState.sovereigntyByFeatureId = runtimeState.sovereigntyByFeatureId || {};
+  runtimeState.scenarioControllersByFeatureId = runtimeState.scenarioControllersByFeatureId || {};
 
-  applyEntries(state.visualOverrides, snapshot.visualOverrides);
-  applyEntries(state.featureOverrides, snapshot.featureOverrides);
-  applyEntries(state.waterRegionOverrides, snapshot.waterRegionOverrides);
-  applyEntries(state.specialRegionOverrides, snapshot.specialRegionOverrides);
-  applyEntries(state.sovereignBaseColors, snapshot.sovereignBaseColors);
-  applyEntries(state.countryBaseColors, snapshot.countryBaseColors);
-  applyEntries(state.countryPalette, snapshot.countryPalette);
-  applyEntries(state.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
-  applyEntries(state.scenarioControllersByFeatureId, snapshot.scenarioControllersByFeatureId);
+  applyEntries(runtimeState.visualOverrides, snapshot.visualOverrides);
+  applyEntries(runtimeState.featureOverrides, snapshot.featureOverrides);
+  applyEntries(runtimeState.waterRegionOverrides, snapshot.waterRegionOverrides);
+  applyEntries(runtimeState.specialRegionOverrides, snapshot.specialRegionOverrides);
+  applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
+  applyEntries(runtimeState.countryBaseColors, snapshot.countryBaseColors);
+  applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
+  applyEntries(runtimeState.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
+  applyEntries(runtimeState.scenarioControllersByFeatureId, snapshot.scenarioControllersByFeatureId);
   if (
     snapshot.visualOverrides
     || snapshot.featureOverrides
@@ -247,25 +248,25 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   }
   applyStyleSnapshot(snapshot.styleConfig);
   if (hasAnnotationView) {
-    state.annotationView = cloneStructuredValue(snapshot.annotationView);
+    runtimeState.annotationView = cloneStructuredValue(snapshot.annotationView);
   }
   if (Array.isArray(snapshot.operationalLines)) {
-    state.operationalLines = cloneStructuredValue(snapshot.operationalLines);
-    state.operationalLinesDirty = true;
+    runtimeState.operationalLines = cloneStructuredValue(snapshot.operationalLines);
+    runtimeState.operationalLinesDirty = true;
   }
   if (Array.isArray(snapshot.operationGraphics)) {
-    state.operationGraphics = cloneStructuredValue(snapshot.operationGraphics);
-    state.operationGraphicsDirty = true;
+    runtimeState.operationGraphics = cloneStructuredValue(snapshot.operationGraphics);
+    runtimeState.operationGraphicsDirty = true;
   }
   if (Array.isArray(snapshot.unitCounters)) {
-    state.unitCounters = cloneStructuredValue(snapshot.unitCounters);
-    state.unitCountersDirty = true;
+    runtimeState.unitCounters = cloneStructuredValue(snapshot.unitCounters);
+    runtimeState.unitCountersDirty = true;
   }
   if (hasAnnotationView) {
-    state.frontlineOverlayDirty = true;
-    state.operationalLinesDirty = true;
-    state.operationGraphicsDirty = true;
-    state.unitCountersDirty = true;
+    runtimeState.frontlineOverlayDirty = true;
+    runtimeState.operationalLinesDirty = true;
+    runtimeState.operationGraphicsDirty = true;
+    runtimeState.unitCountersDirty = true;
   }
   if (appliesStrategicOverlay) {
     markDirty(`history-${direction}`);
@@ -276,18 +277,18 @@ function applyHistorySnapshot(snapshot, direction, entry) {
 }
 
 function canUndoHistory() {
-  return Array.isArray(state.historyPast) && state.historyPast.length > 0;
+  return Array.isArray(runtimeState.historyPast) && runtimeState.historyPast.length > 0;
 }
 
 function canRedoHistory() {
-  return Array.isArray(state.historyFuture) && state.historyFuture.length > 0;
+  return Array.isArray(runtimeState.historyFuture) && runtimeState.historyFuture.length > 0;
 }
 
 function undoHistory() {
   if (!canUndoHistory()) return false;
-  const entry = state.historyPast.pop();
-  state.historyFuture = Array.isArray(state.historyFuture) ? state.historyFuture : [];
-  state.historyFuture.push(entry);
+  const entry = runtimeState.historyPast.pop();
+  runtimeState.historyFuture = Array.isArray(runtimeState.historyFuture) ? runtimeState.historyFuture : [];
+  runtimeState.historyFuture.push(entry);
   applyHistorySnapshot(entry.before, "undo", entry);
   callRuntimeHook(state, "updateHistoryUIFn");
   return true;
@@ -295,17 +296,17 @@ function undoHistory() {
 
 function redoHistory() {
   if (!canRedoHistory()) return false;
-  const entry = state.historyFuture.pop();
-  state.historyPast = Array.isArray(state.historyPast) ? state.historyPast : [];
-  state.historyPast.push(entry);
+  const entry = runtimeState.historyFuture.pop();
+  runtimeState.historyPast = Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast : [];
+  runtimeState.historyPast.push(entry);
   applyHistorySnapshot(entry.after, "redo", entry);
   callRuntimeHook(state, "updateHistoryUIFn");
   return true;
 }
 
 function clearHistory() {
-  state.historyPast = [];
-  state.historyFuture = [];
+  runtimeState.historyPast = [];
+  runtimeState.historyFuture = [];
   callRuntimeHook(state, "updateHistoryUIFn");
 }
 
@@ -319,3 +320,5 @@ export {
   redoHistory,
   undoHistory,
 };
+
+

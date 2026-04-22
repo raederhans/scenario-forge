@@ -75,12 +75,12 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         history_manager_content = HISTORY_MANAGER_JS.read_text(encoding="utf-8")
         interaction_funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
 
-        self.assertIn('state.renderWaterRegionListFn();', map_renderer_content)
-        self.assertIn('state.renderSpecialRegionListFn();', map_renderer_content)
+        self.assertTrue('runtimeState.renderWaterRegionListFn();' in map_renderer_content or 'state.renderWaterRegionListFn();' in map_renderer_content)
+        self.assertTrue('runtimeState.renderSpecialRegionListFn();' in map_renderer_content or 'state.renderSpecialRegionListFn();' in map_renderer_content)
         self.assertIn('"renderWaterRegionListFn",', history_manager_content)
         self.assertIn('"renderSpecialRegionListFn",', history_manager_content)
-        self.assertIn('state.renderWaterRegionListFn();', interaction_funnel_content)
-        self.assertIn('state.renderSpecialRegionListFn();', interaction_funnel_content)
+        self.assertTrue('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_WATER_REGION_LIST);' in interaction_funnel_content or 'state.renderWaterRegionListFn();' in interaction_funnel_content)
+        self.assertTrue('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SPECIAL_REGION_LIST);' in interaction_funnel_content or 'state.renderSpecialRegionListFn();' in interaction_funnel_content)
 
 
 if __name__ == "__main__":

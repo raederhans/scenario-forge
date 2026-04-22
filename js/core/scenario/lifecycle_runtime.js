@@ -4,7 +4,8 @@ import {
 } from "../state/scenario_runtime_state.js";
 
 function createScenarioLifecycleRuntime({
-  state,
+  state = null,
+  runtimeState: explicitRuntimeState = null,
   countryNames,
   defaultCountryPalette,
   createDefaultScenarioReleasableIndex,
@@ -26,85 +27,87 @@ function createScenarioLifecycleRuntime({
   syncResolvedDefaultCountryPalette,
   applyBlankScenarioPresentationDefaults,
 } = {}) {
+  const runtimeState = explicitRuntimeState || state;
+
   function syncScenarioInspectorSelection(countryCode = "") {
     const normalized = String(countryCode || "").trim().toUpperCase();
-    state.selectedInspectorCountryCode = normalized;
-    state.inspectorHighlightCountryCode = normalized;
-    state.inspectorExpansionInitialized = false;
-    if (state.expandedInspectorContinents instanceof Set) {
-      state.expandedInspectorContinents.clear();
+    runtimeState.selectedInspectorCountryCode = normalized;
+    runtimeState.inspectorHighlightCountryCode = normalized;
+    runtimeState.inspectorExpansionInitialized = false;
+    if (runtimeState.expandedInspectorContinents instanceof Set) {
+      runtimeState.expandedInspectorContinents.clear();
     }
-    if (state.expandedInspectorReleaseParents instanceof Set) {
-      state.expandedInspectorReleaseParents.clear();
+    if (runtimeState.expandedInspectorReleaseParents instanceof Set) {
+      runtimeState.expandedInspectorReleaseParents.clear();
     }
   }
 
   function disableScenarioParentBorders() {
-    if (!state.activeScenarioId && state.scenarioParentBorderEnabledBeforeActivate === null) {
-      state.scenarioParentBorderEnabledBeforeActivate = {
-        ...(state.parentBorderEnabledByCountry || {}),
+    if (!runtimeState.activeScenarioId && runtimeState.scenarioParentBorderEnabledBeforeActivate === null) {
+      runtimeState.scenarioParentBorderEnabledBeforeActivate = {
+        ...(runtimeState.parentBorderEnabledByCountry || {}),
       };
     }
     const next = {};
-    Object.keys(state.parentBorderEnabledByCountry || {}).forEach((countryCode) => {
+    Object.keys(runtimeState.parentBorderEnabledByCountry || {}).forEach((countryCode) => {
       next[countryCode] = false;
     });
-    state.parentBorderEnabledByCountry = next;
-    if (typeof state.updateParentBorderCountryListFn === "function") {
-      state.updateParentBorderCountryListFn();
+    runtimeState.parentBorderEnabledByCountry = next;
+    if (typeof runtimeState.updateParentBorderCountryListFn === "function") {
+      runtimeState.updateParentBorderCountryListFn();
     }
   }
 
   function restoreParentBordersAfterScenario() {
-    if (state.scenarioParentBorderEnabledBeforeActivate && typeof state.scenarioParentBorderEnabledBeforeActivate === "object") {
-      state.parentBorderEnabledByCountry = {
-        ...state.scenarioParentBorderEnabledBeforeActivate,
+    if (runtimeState.scenarioParentBorderEnabledBeforeActivate && typeof runtimeState.scenarioParentBorderEnabledBeforeActivate === "object") {
+      runtimeState.parentBorderEnabledByCountry = {
+        ...runtimeState.scenarioParentBorderEnabledBeforeActivate,
       };
     }
-    state.scenarioParentBorderEnabledBeforeActivate = null;
-    if (typeof state.updateParentBorderCountryListFn === "function") {
-      state.updateParentBorderCountryListFn();
+    runtimeState.scenarioParentBorderEnabledBeforeActivate = null;
+    if (typeof runtimeState.updateParentBorderCountryListFn === "function") {
+      runtimeState.updateParentBorderCountryListFn();
     }
   }
 
   function applyScenarioPaintMode() {
-    if (!state.scenarioPaintModeBeforeActivate) {
-      state.scenarioPaintModeBeforeActivate = {
-        paintMode: String(state.paintMode || "visual") === "sovereignty" ? "sovereignty" : "visual",
-        interactionGranularity: String(state.interactionGranularity || "subdivision") === "country"
+    if (!runtimeState.scenarioPaintModeBeforeActivate) {
+      runtimeState.scenarioPaintModeBeforeActivate = {
+        paintMode: String(runtimeState.paintMode || "visual") === "sovereignty" ? "sovereignty" : "visual",
+        interactionGranularity: String(runtimeState.interactionGranularity || "subdivision") === "country"
           ? "country"
           : "subdivision",
-        batchFillScope: String(state.batchFillScope || "parent") === "country" ? "country" : "parent",
-        politicalEditingExpanded: !!state.ui?.politicalEditingExpanded,
+        batchFillScope: String(runtimeState.batchFillScope || "parent") === "country" ? "country" : "parent",
+        politicalEditingExpanded: !!runtimeState.ui?.politicalEditingExpanded,
       };
     }
-    state.paintMode = "sovereignty";
-    state.interactionGranularity = "subdivision";
-    if (state.ui && typeof state.ui === "object") {
-      state.ui.politicalEditingExpanded = false;
-      state.ui.scenarioVisualAdjustmentsOpen = false;
+    runtimeState.paintMode = "sovereignty";
+    runtimeState.interactionGranularity = "subdivision";
+    if (runtimeState.ui && typeof runtimeState.ui === "object") {
+      runtimeState.ui.politicalEditingExpanded = false;
+      runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
     }
-    if (typeof state.updatePaintModeUIFn === "function") {
-      state.updatePaintModeUIFn();
+    if (typeof runtimeState.updatePaintModeUIFn === "function") {
+      runtimeState.updatePaintModeUIFn();
     }
   }
 
   function restorePaintModeAfterScenario() {
-    const previous = state.scenarioPaintModeBeforeActivate;
+    const previous = runtimeState.scenarioPaintModeBeforeActivate;
     if (previous && typeof previous === "object") {
-      state.paintMode = previous.paintMode === "sovereignty" ? "sovereignty" : "visual";
-      state.interactionGranularity = previous.interactionGranularity === "country"
+      runtimeState.paintMode = previous.paintMode === "sovereignty" ? "sovereignty" : "visual";
+      runtimeState.interactionGranularity = previous.interactionGranularity === "country"
         ? "country"
         : "subdivision";
-      state.batchFillScope = previous.batchFillScope === "country" ? "country" : "parent";
-      if (state.ui && typeof state.ui === "object") {
-        state.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
-        state.ui.scenarioVisualAdjustmentsOpen = false;
+      runtimeState.batchFillScope = previous.batchFillScope === "country" ? "country" : "parent";
+      if (runtimeState.ui && typeof runtimeState.ui === "object") {
+        runtimeState.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
+        runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
       }
     }
-    state.scenarioPaintModeBeforeActivate = null;
-    if (typeof state.updatePaintModeUIFn === "function") {
-      state.updatePaintModeUIFn();
+    runtimeState.scenarioPaintModeBeforeActivate = null;
+    if (typeof runtimeState.updatePaintModeUIFn === "function") {
+      runtimeState.updatePaintModeUIFn();
     }
   }
 
@@ -117,66 +120,66 @@ function createScenarioLifecycleRuntime({
       t = null,
     } = {}
   ) {
-    if (!state.activeScenarioId || !state.scenarioBaselineOwnersByFeatureId) {
+    if (!runtimeState.activeScenarioId || !runtimeState.scenarioBaselineOwnersByFeatureId) {
       return false;
     }
-    const previousSelectedInspectorCountryCode = String(state.selectedInspectorCountryCode || "").trim().toUpperCase();
-    const previousExpandedInspectorContinents = state.expandedInspectorContinents instanceof Set
-      ? new Set(state.expandedInspectorContinents)
+    const previousSelectedInspectorCountryCode = String(runtimeState.selectedInspectorCountryCode || "").trim().toUpperCase();
+    const previousExpandedInspectorContinents = runtimeState.expandedInspectorContinents instanceof Set
+      ? new Set(runtimeState.expandedInspectorContinents)
       : new Set();
-    const previousExpandedInspectorReleaseParents = state.expandedInspectorReleaseParents instanceof Set
-      ? new Set(state.expandedInspectorReleaseParents)
+    const previousExpandedInspectorReleaseParents = runtimeState.expandedInspectorReleaseParents instanceof Set
+      ? new Set(runtimeState.expandedInspectorReleaseParents)
       : new Set();
-    const previousInspectorExpansionInitialized = !!state.inspectorExpansionInitialized;
-    state.sovereigntyByFeatureId = { ...(state.scenarioBaselineOwnersByFeatureId || {}) };
-    state.scenarioControllersByFeatureId = { ...(state.scenarioBaselineControllersByFeatureId || {}) };
-    state.scenarioAutoShellOwnerByFeatureId = {};
-    state.scenarioAutoShellControllerByFeatureId = {};
-    state.mapSemanticMode = getScenarioMapSemanticMode(state.activeScenarioManifest, state.mapSemanticMode);
-    if (state.mapSemanticMode === "blank") {
+    const previousInspectorExpansionInitialized = !!runtimeState.inspectorExpansionInitialized;
+    runtimeState.sovereigntyByFeatureId = { ...(runtimeState.scenarioBaselineOwnersByFeatureId || {}) };
+    runtimeState.scenarioControllersByFeatureId = { ...(runtimeState.scenarioBaselineControllersByFeatureId || {}) };
+    runtimeState.scenarioAutoShellOwnerByFeatureId = {};
+    runtimeState.scenarioAutoShellControllerByFeatureId = {};
+    runtimeState.mapSemanticMode = getScenarioMapSemanticMode(runtimeState.activeScenarioManifest, runtimeState.mapSemanticMode);
+    if (runtimeState.mapSemanticMode === "blank") {
       applyBlankScenarioPresentationDefaults();
     }
-    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-    state.scenarioViewMode = "ownership";
+    runtimeState.scenarioShellOverlayRevision = (Number(runtimeState.scenarioShellOverlayRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioViewMode = "ownership";
     recalculateScenarioOwnerControllerDiffCount();
-    state.sovereigntyInitialized = false;
+    runtimeState.sovereigntyInitialized = false;
     ensureSovereigntyState({ force: true });
-    state.parentBordersVisible = false;
-    state.visualOverrides = {};
-    state.featureOverrides = {};
-    state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };
-    state.countryBaseColors = { ...state.sovereignBaseColors };
+    runtimeState.parentBordersVisible = false;
+    runtimeState.visualOverrides = {};
+    runtimeState.featureOverrides = {};
+    runtimeState.sovereignBaseColors = { ...(runtimeState.scenarioFixedOwnerColors || {}) };
+    runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
     markLegacyColorStateDirty();
-    state.activeSovereignCode = state.mapSemanticMode === "blank"
+    runtimeState.activeSovereignCode = runtimeState.mapSemanticMode === "blank"
       ? ""
       : (
         getScenarioDefaultCountryCode(
-          state.activeScenarioManifest,
-          state.scenarioCountriesByTag
-        ) || String(state.activeSovereignCode || "").trim().toUpperCase()
+          runtimeState.activeScenarioManifest,
+          runtimeState.scenarioCountriesByTag
+        ) || String(runtimeState.activeSovereignCode || "").trim().toUpperCase()
       );
-    if (state.ui && typeof state.ui === "object") {
-      state.ui.scenarioVisualAdjustmentsOpen = false;
+    if (runtimeState.ui && typeof runtimeState.ui === "object") {
+      runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
     }
     const restoredInspectorCode =
-      previousSelectedInspectorCountryCode && state.scenarioCountriesByTag?.[previousSelectedInspectorCountryCode]
+      previousSelectedInspectorCountryCode && runtimeState.scenarioCountriesByTag?.[previousSelectedInspectorCountryCode]
         ? previousSelectedInspectorCountryCode
-        : state.activeSovereignCode;
-    state.selectedInspectorCountryCode = restoredInspectorCode;
-    state.inspectorHighlightCountryCode = restoredInspectorCode;
-    state.expandedInspectorContinents = previousExpandedInspectorContinents;
-    state.expandedInspectorReleaseParents = previousExpandedInspectorReleaseParents;
-    state.inspectorExpansionInitialized =
+        : runtimeState.activeSovereignCode;
+    runtimeState.selectedInspectorCountryCode = restoredInspectorCode;
+    runtimeState.inspectorHighlightCountryCode = restoredInspectorCode;
+    runtimeState.expandedInspectorContinents = previousExpandedInspectorContinents;
+    runtimeState.expandedInspectorReleaseParents = previousExpandedInspectorReleaseParents;
+    runtimeState.inspectorExpansionInitialized =
       previousInspectorExpansionInitialized || previousExpandedInspectorContinents.size > 0;
     setScenarioAuditUiState({
       loading: false,
       errorMessage: "",
     });
-    state.scenarioBorderMode = "scenario_owner_only";
+    runtimeState.scenarioBorderMode = "scenario_owner_only";
     disableScenarioParentBorders();
     runPostScenarioResetEffects({
-      scenarioId: state.activeScenarioId,
+      scenarioId: runtimeState.activeScenarioId,
       renderNow,
     });
     if (markDirtyReason) {
@@ -200,73 +203,73 @@ function createScenarioLifecycleRuntime({
       t = null,
     } = {}
   ) {
-    const previousScenarioId = normalizeScenarioId(state.activeScenarioId);
-    const hasBaselineRuntimeTopology = !!state.defaultRuntimePoliticalTopology?.objects?.political;
-    const hasBaselineDetailTopology = !!state.topologyDetail?.objects?.political;
-    if (state.runtimeChunkLoadState?.refreshTimerId) {
-      globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
+    const previousScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    const hasBaselineRuntimeTopology = !!runtimeState.defaultRuntimePoliticalTopology?.objects?.political;
+    const hasBaselineDetailTopology = !!runtimeState.topologyDetail?.objects?.political;
+    if (runtimeState.runtimeChunkLoadState?.refreshTimerId) {
+      globalThis.clearTimeout(runtimeState.runtimeChunkLoadState.refreshTimerId);
     }
     releaseScenarioAuditPayload(previousScenarioId, { syncUi: false });
-    state.activeScenarioId = "";
-    state.scenarioBorderMode = "canonical";
-    state.activeScenarioManifest = null;
-    state.activeScenarioMeshPack = null;
-    state.scenarioCountriesByTag = {};
-    state.scenarioFixedOwnerColors = {};
-    state.scenarioRuntimeTopologyData = null;
-    state.scenarioRuntimeTopologyVersionTag = "";
-    state.scenarioPoliticalChunkData = null;
-    state.scenarioLandMaskData = null;
-    state.scenarioContextLandMaskData = null;
-    state.scenarioLandMaskVersionTag = "";
-    state.scenarioContextLandMaskVersionTag = "";
-    state.mapSemanticMode = "blank";
-    state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
+    runtimeState.activeScenarioId = "";
+    runtimeState.scenarioBorderMode = "canonical";
+    runtimeState.activeScenarioManifest = null;
+    runtimeState.activeScenarioMeshPack = null;
+    runtimeState.scenarioCountriesByTag = {};
+    runtimeState.scenarioFixedOwnerColors = {};
+    runtimeState.scenarioRuntimeTopologyData = null;
+    runtimeState.scenarioRuntimeTopologyVersionTag = "";
+    runtimeState.scenarioPoliticalChunkData = null;
+    runtimeState.scenarioLandMaskData = null;
+    runtimeState.scenarioContextLandMaskData = null;
+    runtimeState.scenarioLandMaskVersionTag = "";
+    runtimeState.scenarioContextLandMaskVersionTag = "";
+    runtimeState.mapSemanticMode = "blank";
+    runtimeState.runtimePoliticalTopology = runtimeState.defaultRuntimePoliticalTopology || null;
     // startup coarse mode can still carry defaultRuntimePoliticalTopology while detail promotion remains deferred
-    state.topologyBundleMode = hasBaselineDetailTopology ? "composite" : "single";
-    state.detailDeferred = hasBaselineRuntimeTopology && !hasBaselineDetailTopology;
-    state.detailPromotionInFlight = false;
-    state.detailPromotionCompleted = hasBaselineDetailTopology;
+    runtimeState.topologyBundleMode = hasBaselineDetailTopology ? "composite" : "single";
+    runtimeState.detailDeferred = hasBaselineRuntimeTopology && !hasBaselineDetailTopology;
+    runtimeState.detailPromotionInFlight = false;
+    runtimeState.detailPromotionCompleted = hasBaselineDetailTopology;
     resetScenarioChunkRuntimeState({ scenarioId: "" });
-    state.scheduleScenarioChunkRefreshFn = null;
-    state.scenarioWaterRegionsData = null;
-    state.scenarioWaterOverlayVersionTag = "";
-    state.scenarioSpecialRegionsData = null;
-    state.scenarioReliefOverlaysData = null;
-    state.scenarioDistrictGroupsData = null;
-    state.scenarioDistrictGroupByFeatureId = new Map();
-    state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
+    runtimeState.scheduleScenarioChunkRefreshFn = null;
+    runtimeState.scenarioWaterRegionsData = null;
+    runtimeState.scenarioWaterOverlayVersionTag = "";
+    runtimeState.scenarioSpecialRegionsData = null;
+    runtimeState.scenarioReliefOverlaysData = null;
+    runtimeState.scenarioDistrictGroupsData = null;
+    runtimeState.scenarioDistrictGroupByFeatureId = new Map();
+    runtimeState.scenarioReliefOverlayRevision = (Number(runtimeState.scenarioReliefOverlayRevision) || 0) + 1;
     applyBlankScenarioPresentationDefaults();
-    state.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();
-    state.releasableCatalog = state.defaultReleasableCatalog || null;
-    state.scenarioImportAudit = null;
-    state.scenarioBaselineHash = "";
-    state.scenarioBaselineOwnersByFeatureId = {};
-    state.scenarioControllersByFeatureId = {};
-    state.scenarioAutoShellOwnerByFeatureId = {};
-    state.scenarioAutoShellControllerByFeatureId = {};
-    state.scenarioBaselineControllersByFeatureId = {};
-    state.scenarioBaselineCoresByFeatureId = {};
-    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-    state.scenarioOwnerControllerDiffCount = 0;
-    state.scenarioHydrationHealthGate = createDefaultScenarioHydrationHealthGate();
-    state.scenarioDataHealth = createDefaultScenarioDataHealth(scenarioDetailMinRatioStrict);
-    state.scenarioViewMode = "ownership";
-    state.countryNames = { ...countryNames };
-    state.selectedWaterRegionId = "";
-    state.selectedSpecialRegionId = "";
-    state.hoveredWaterRegionId = null;
-    state.hoveredSpecialRegionId = null;
-    state.sovereigntyByFeatureId = {};
-    state.sovereigntyInitialized = false;
-    state.visualOverrides = {};
-    state.featureOverrides = {};
+    runtimeState.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();
+    runtimeState.releasableCatalog = runtimeState.defaultReleasableCatalog || null;
+    runtimeState.scenarioImportAudit = null;
+    runtimeState.scenarioBaselineHash = "";
+    runtimeState.scenarioBaselineOwnersByFeatureId = {};
+    runtimeState.scenarioControllersByFeatureId = {};
+    runtimeState.scenarioAutoShellOwnerByFeatureId = {};
+    runtimeState.scenarioAutoShellControllerByFeatureId = {};
+    runtimeState.scenarioBaselineControllersByFeatureId = {};
+    runtimeState.scenarioBaselineCoresByFeatureId = {};
+    runtimeState.scenarioShellOverlayRevision = (Number(runtimeState.scenarioShellOverlayRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioOwnerControllerDiffCount = 0;
+    runtimeState.scenarioHydrationHealthGate = createDefaultScenarioHydrationHealthGate();
+    runtimeState.scenarioDataHealth = createDefaultScenarioDataHealth(scenarioDetailMinRatioStrict);
+    runtimeState.scenarioViewMode = "ownership";
+    runtimeState.countryNames = { ...countryNames };
+    runtimeState.selectedWaterRegionId = "";
+    runtimeState.selectedSpecialRegionId = "";
+    runtimeState.hoveredWaterRegionId = null;
+    runtimeState.hoveredSpecialRegionId = null;
+    runtimeState.sovereigntyByFeatureId = {};
+    runtimeState.sovereigntyInitialized = false;
+    runtimeState.visualOverrides = {};
+    runtimeState.featureOverrides = {};
     const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
-    state.sovereignBaseColors = { ...(defaults || state.resolvedDefaultCountryPalette || defaultCountryPalette) };
-    state.countryBaseColors = { ...state.sovereignBaseColors };
+    runtimeState.sovereignBaseColors = { ...(defaults || runtimeState.resolvedDefaultCountryPalette || defaultCountryPalette) };
+    runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
     markLegacyColorStateDirty();
-    state.activeSovereignCode = "";
+    runtimeState.activeSovereignCode = "";
     syncScenarioInspectorSelection("");
     restoreParentBordersAfterScenario();
     restorePaintModeAfterScenario();

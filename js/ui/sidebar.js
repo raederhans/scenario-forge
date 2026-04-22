@@ -1,12 +1,12 @@
 // Sidebar UI (Phase 13)
 import {
-  state,
+  state as runtimeState,
   countryNames,
   defaultCountryPalette,
   normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/runtime_hooks.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import {
@@ -93,6 +93,7 @@ import {
   loadHoi4UnitIconManifest,
   saveHoi4UnitIconReviewDraft,
 } from "../core/unit_counter_icon_libraries.js";
+const state = runtimeState;
 
 // Batch 5: sidebar controllers consume a curated renderer helper surface so
 // renderer API drift stays visible in one place instead of hiding in namespace imports.
@@ -162,12 +163,12 @@ function isScenarioShellLikeFeature(feature, featureId = "") {
 
 function getScenarioInteractionLockMessage() {
   const baseMessage = t("Scenario state is inconsistent. Reload the page before continuing.", "ui");
-  const detail = String(state.scenarioFatalRecovery?.message || "").trim();
+  const detail = String(runtimeState.scenarioFatalRecovery?.message || "").trim();
   return detail ? `${baseMessage} ${detail}` : baseMessage;
 }
 
 function blockLockedScenarioInteraction() {
-  if (!state.activeScenarioId || !state.scenarioFatalRecovery) return false;
+  if (!runtimeState.activeScenarioId || !runtimeState.scenarioFatalRecovery) return false;
   showToast(getScenarioInteractionLockMessage(), {
     title: t("Scenario locked", "ui"),
     tone: "error",
@@ -205,7 +206,7 @@ function getCountryNameFromProps(props = {}) {
 function collectCountryNameByCode() {
   const nameByCode = new Map();
 
-  const primaryGeometries = state.topologyPrimary?.objects?.political?.geometries;
+  const primaryGeometries = runtimeState.topologyPrimary?.objects?.political?.geometries;
   if (Array.isArray(primaryGeometries)) {
     primaryGeometries.forEach((geometry) => {
       const props = geometry?.properties || {};
@@ -218,8 +219,8 @@ function collectCountryNameByCode() {
     });
   }
 
-  if (Array.isArray(state.landData?.features)) {
-    state.landData.features.forEach((feature) => {
+  if (Array.isArray(runtimeState.landData?.features)) {
+    runtimeState.landData.features.forEach((feature) => {
       const props = feature?.properties || {};
       const code = getCountryCodeFromProps(props, feature?.id);
       if (!code || nameByCode.has(code)) return;
@@ -241,12 +242,12 @@ function getDynamicCountryEntries() {
     return entryKind === "controller_only" ? controllerFeatureCount : ownerFeatureCount;
   };
 
-  if (state.activeScenarioId && state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object") {
-    const scenarioEntries = Object.entries(state.scenarioCountriesByTag)
+  if (runtimeState.activeScenarioId && runtimeState.scenarioCountriesByTag && typeof runtimeState.scenarioCountriesByTag === "object") {
+    const scenarioEntries = Object.entries(runtimeState.scenarioCountriesByTag)
       .map(([rawCode, scenarioCountry]) => {
         const code = normalizeCountryCode(rawCode);
         if (!code) return null;
-        const name = getScenarioCountryDisplayName(scenarioCountry, state.countryNames?.[code] || code) || code;
+        const name = getScenarioCountryDisplayName(scenarioCountry, runtimeState.countryNames?.[code] || code) || code;
         const displayName = t(name, "geo") || name || code;
         const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
         const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
@@ -305,13 +306,13 @@ function getDynamicCountryEntries() {
 
   const codes = new Set();
 
-  if (state.countryToFeatureIds instanceof Map && state.countryToFeatureIds.size > 0) {
-    state.countryToFeatureIds.forEach((_ids, rawCode) => {
+  if (runtimeState.countryToFeatureIds instanceof Map && runtimeState.countryToFeatureIds.size > 0) {
+    runtimeState.countryToFeatureIds.forEach((_ids, rawCode) => {
       const code = normalizeCountryCode(rawCode);
       if (code) codes.add(code);
     });
-  } else if (Array.isArray(state.landData?.features)) {
-    state.landData.features.forEach((feature) => {
+  } else if (Array.isArray(runtimeState.landData?.features)) {
+    runtimeState.landData.features.forEach((feature) => {
       const code = getCountryCodeFromProps(feature?.properties || {}, feature?.id);
       if (code) codes.add(code);
     });
@@ -327,7 +328,7 @@ function getDynamicCountryEntries() {
   const nameByCode = collectCountryNameByCode();
   return Array.from(codes)
     .map((code) => {
-      const name = nameByCode.get(code) || state.countryNames?.[code] || countryNames[code] || code;
+      const name = nameByCode.get(code) || runtimeState.countryNames?.[code] || countryNames[code] || code;
       const displayName = t(name, "geo") || code;
       return { code, name, displayName };
     })
@@ -346,15 +347,15 @@ function ensureCountryPaletteColor(code, fallbackIndex = 0) {
   const normalizedCode = normalizeCountryCode(code);
   if (!normalizedCode) return "#cccccc";
 
-  const existing = state.countryPalette?.[normalizedCode] || defaultCountryPalette[normalizedCode];
+  const existing = runtimeState.countryPalette?.[normalizedCode] || defaultCountryPalette[normalizedCode];
   if (existing) {
-    state.countryPalette[normalizedCode] = existing;
+    runtimeState.countryPalette[normalizedCode] = existing;
     return existing;
   }
 
   const generated =
     ColorManager.getPoliticalFallbackColor(normalizedCode, fallbackIndex) || "#cccccc";
-  state.countryPalette[normalizedCode] = generated;
+  runtimeState.countryPalette[normalizedCode] = generated;
   return generated;
 }
 
@@ -363,8 +364,8 @@ function getScenarioCountryMeta(entryOrCode) {
     ? entryOrCode.code
     : entryOrCode;
   const normalizedCode = normalizeCountryCode(rawCode);
-  if (!normalizedCode || !state.activeScenarioId) return null;
-  const entry = state.scenarioCountriesByTag?.[normalizedCode];
+  if (!normalizedCode || !runtimeState.activeScenarioId) return null;
+  const entry = runtimeState.scenarioCountriesByTag?.[normalizedCode];
   if (!entry || typeof entry !== "object") return null;
   return entry;
 }
@@ -428,7 +429,7 @@ function resolveScenarioInspectorGroupMeta(entryOrCode) {
   const explicitEntryGroup = readExplicitInspectorGroupMeta(entry || {});
   if (explicitEntryGroup.id) return explicitEntryGroup;
 
-  if (String(state.activeScenarioId || "").trim() !== TNO_SCENARIO_ID) {
+  if (String(runtimeState.activeScenarioId || "").trim() !== TNO_SCENARIO_ID) {
     return explicitEntryGroup;
   }
 
@@ -458,7 +459,7 @@ function resolveScenarioLookupCode(entryOrCode) {
       ? entryOrCode.code
       : entryOrCode
   );
-  if (!state.activeScenarioId) {
+  if (!runtimeState.activeScenarioId) {
     return fallbackCode;
   }
 
@@ -496,7 +497,7 @@ function resolveInspectorDataCode(entryOrCode) {
       ? entryOrCode.code
       : entryOrCode
   );
-  if (!state.activeScenarioId) {
+  if (!runtimeState.activeScenarioId) {
     return fallbackCode;
   }
 
@@ -535,13 +536,13 @@ function resolveCountryGroupingCode(entryOrCode) {
 function getHierarchyGroupsForCode(code) {
   const normalizedCode = normalizeCountryCode(code);
   if (!normalizedCode) return [];
-  if (state.hierarchyGroupsByCode.size > 0) {
-    return state.hierarchyGroupsByCode.get(normalizedCode) || [];
+  if (runtimeState.hierarchyGroupsByCode.size > 0) {
+    return runtimeState.hierarchyGroupsByCode.get(normalizedCode) || [];
   }
-  if (!state.hierarchyData || !state.hierarchyData.groups) return [];
-  const labels = state.hierarchyData.labels || {};
+  if (!runtimeState.hierarchyData || !runtimeState.hierarchyData.groups) return [];
+  const labels = runtimeState.hierarchyData.labels || {};
   const groups = [];
-  Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
+  Object.entries(runtimeState.hierarchyData.groups).forEach(([groupId, children]) => {
     if (!groupId.startsWith(`${normalizedCode}_`)) return;
     const label = labels[groupId] || groupId.replace(`${normalizedCode}_`, "").replace(/_/g, " ");
     groups.push({
@@ -556,12 +557,12 @@ function getHierarchyGroupsForCode(code) {
 
 function getCountryGroupingMeta(entryOrCode) {
   const normalizedCode = resolveCountryGroupingCode(entryOrCode);
-  if (!normalizedCode || !(state.countryGroupMetaByCode instanceof Map)) return null;
-  return state.countryGroupMetaByCode.get(normalizedCode) || null;
+  if (!normalizedCode || !(runtimeState.countryGroupMetaByCode instanceof Map)) return null;
+  return runtimeState.countryGroupMetaByCode.get(normalizedCode) || null;
 }
 
 function getPriorityCountryOrderMap() {
-  const priorityByContinent = state.countryGroupsData?.priority_by_continent || {};
+  const priorityByContinent = runtimeState.countryGroupsData?.priority_by_continent || {};
   const priorityOrderMap = new Map();
 
   Object.entries(priorityByContinent).forEach(([continentId, rawCodes]) => {
@@ -640,8 +641,8 @@ function getInspectorTopLevelGroupIdForCode(code) {
 function buildCountryColorTree(entries) {
   const tree = new Map();
   const topLevelOrder = new Map();
-  const configuredContinents = Array.isArray(state.countryGroupsData?.continents)
-    ? state.countryGroupsData.continents
+  const configuredContinents = Array.isArray(runtimeState.countryGroupsData?.continents)
+    ? runtimeState.countryGroupsData.continents
     : [];
   const priorityOrderMap = getPriorityCountryOrderMap();
   const anchoredScenarioGroups = new Map();
@@ -726,11 +727,11 @@ function buildCountryColorTree(entries) {
 }
 
 function getDefaultExpandedInspectorGroupId(groupedEntries = []) {
-  const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+  const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
   const selectedGroupId = getInspectorTopLevelGroupIdForCode(selectedCode);
   if (selectedGroupId) return selectedGroupId;
 
-  const activeCode = normalizeCountryCode(state.activeSovereignCode);
+  const activeCode = normalizeCountryCode(runtimeState.activeSovereignCode);
   const activeGroupId = getInspectorTopLevelGroupIdForCode(activeCode);
   if (activeGroupId) return activeGroupId;
 
@@ -741,26 +742,26 @@ function getDefaultExpandedInspectorGroupId(groupedEntries = []) {
 }
 
 function ensureInitialInspectorExpansion(groupedEntries = []) {
-  if (state.inspectorExpansionInitialized || !groupedEntries.length) return;
-  if (!(state.expandedInspectorContinents instanceof Set)) {
-    state.expandedInspectorContinents = new Set();
+  if (runtimeState.inspectorExpansionInitialized || !groupedEntries.length) return;
+  if (!(runtimeState.expandedInspectorContinents instanceof Set)) {
+    runtimeState.expandedInspectorContinents = new Set();
   }
 
-  if (state.expandedInspectorContinents.size > 0) {
-    state.inspectorExpansionInitialized = true;
+  if (runtimeState.expandedInspectorContinents.size > 0) {
+    runtimeState.inspectorExpansionInitialized = true;
     return;
   }
 
   const defaultGroupId = getDefaultExpandedInspectorGroupId(groupedEntries);
   if (defaultGroupId) {
-    state.expandedInspectorContinents.add(getInspectorGroupExpansionKey(defaultGroupId));
+    runtimeState.expandedInspectorContinents.add(getInspectorGroupExpansionKey(defaultGroupId));
   }
-  state.inspectorExpansionInitialized = true;
+  runtimeState.inspectorExpansionInitialized = true;
 }
 
 function normalizeActionMode(mode = "auto") {
   if (mode === "ownership" || mode === "visual") return mode;
-  return String(state.paintMode || "visual") === "sovereignty" ? "ownership" : "visual";
+  return String(runtimeState.paintMode || "visual") === "sovereignty" ? "ownership" : "visual";
 }
 
 function applyVisualOverridesToFeatureIds(
@@ -786,13 +787,13 @@ function applyVisualOverridesToFeatureIds(
     };
   }
 
-  const colorToApply = color || state.selectedColor;
+  const colorToApply = color || runtimeState.selectedColor;
   const before = captureHistoryState({
     featureIds: normalizedTargetIds,
   });
   normalizedTargetIds.forEach((id) => {
-    state.visualOverrides[id] = colorToApply;
-    state.featureOverrides[id] = colorToApply;
+    runtimeState.visualOverrides[id] = colorToApply;
+    runtimeState.featureOverrides[id] = colorToApply;
   });
   markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
@@ -844,8 +845,8 @@ function clearVisualOverridesForFeatureIds(
   }
 
   const changedIds = normalizedTargetIds.filter((id) => (
-    Object.prototype.hasOwnProperty.call(state.visualOverrides || {}, id)
-    || Object.prototype.hasOwnProperty.call(state.featureOverrides || {}, id)
+    Object.prototype.hasOwnProperty.call(runtimeState.visualOverrides || {}, id)
+    || Object.prototype.hasOwnProperty.call(runtimeState.featureOverrides || {}, id)
   ));
   if (!changedIds.length) {
     return {
@@ -863,8 +864,8 @@ function clearVisualOverridesForFeatureIds(
     featureIds: changedIds,
   });
   changedIds.forEach((id) => {
-    delete state.visualOverrides[id];
-    delete state.featureOverrides[id];
+    delete runtimeState.visualOverrides[id];
+    delete runtimeState.featureOverrides[id];
   });
   markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
@@ -1025,14 +1026,14 @@ function applyScenarioOwnerControllerAssignments(
     scenarioControllerFeatureIds: targetIds,
   });
 
-  state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+  runtimeState.scenarioControllersByFeatureId = runtimeState.scenarioControllersByFeatureId || {};
   const ownerFeatureIdsByCode = new Map();
   const changedFeatureIds = new Set();
 
   entries.forEach(({ featureId, ownerCode, controllerCode }) => {
-    const currentOwnerCode = normalizeCountryCode(state.sovereigntyByFeatureId?.[featureId]);
+    const currentOwnerCode = normalizeCountryCode(runtimeState.sovereigntyByFeatureId?.[featureId]);
     const currentControllerCode = normalizeCountryCode(
-      state.scenarioControllersByFeatureId?.[featureId] || currentOwnerCode
+      runtimeState.scenarioControllersByFeatureId?.[featureId] || currentOwnerCode
     );
     if (currentOwnerCode !== ownerCode) {
       if (!ownerFeatureIdsByCode.has(ownerCode)) {
@@ -1042,7 +1043,7 @@ function applyScenarioOwnerControllerAssignments(
       changedFeatureIds.add(featureId);
     }
     if (currentControllerCode !== controllerCode) {
-      state.scenarioControllersByFeatureId[featureId] = controllerCode;
+      runtimeState.scenarioControllersByFeatureId[featureId] = controllerCode;
       changedFeatureIds.add(featureId);
     }
   });
@@ -1052,7 +1053,7 @@ function applyScenarioOwnerControllerAssignments(
     ownerChanged += setFeatureOwnerCodes(featureIds, ownerCode);
   });
   if (changedFeatureIds.size) {
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
     refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
@@ -1149,14 +1150,14 @@ function applyHierarchyGroupWithMode(
     : [];
   const resolvedMode = normalizeActionMode(mode);
   if (resolvedMode === "ownership") {
-    return applyOwnershipToFeatureIds(targetIds, ownerCode || state.activeSovereignCode, {
+    return applyOwnershipToFeatureIds(targetIds, ownerCode || runtimeState.activeSovereignCode, {
       render,
       historyKind: ownershipHistoryKind,
       dirtyReason: ownershipDirtyReason,
       recomputeReason: "sidebar-hierarchy-batch",
     });
   }
-  return applyVisualOverridesToFeatureIds(targetIds, color || state.selectedColor, {
+  return applyVisualOverridesToFeatureIds(targetIds, color || runtimeState.selectedColor, {
     render,
     historyKind: visualHistoryKind,
     dirtyReason: visualDirtyReason,
@@ -1173,10 +1174,10 @@ function applyHierarchyGroup(group, color, render) {
 
 function addRecentColor(color) {
   if (!color) return;
-  state.recentColors = state.recentColors.filter((value) => value !== color);
-  state.recentColors.unshift(color);
-  if (state.recentColors.length > 10) {
-    state.recentColors = state.recentColors.slice(0, 10);
+  runtimeState.recentColors = runtimeState.recentColors.filter((value) => value !== color);
+  runtimeState.recentColors.unshift(color);
+  if (runtimeState.recentColors.length > 10) {
+    runtimeState.recentColors = runtimeState.recentColors.slice(0, 10);
   }
   callRuntimeHook(state, "updateRecentUI");
 }
@@ -1192,7 +1193,7 @@ function filterToVisibleFeatureIds(featureIds = []) {
       missingIds: [],
     };
   }
-  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
   if (!landIndex || landIndex.size === 0) {
     return {
       requestedIds,
@@ -1228,15 +1229,15 @@ function getOwnedVisibleFeatureIds(ownerCode) {
   }
 
   let requestedIds = [];
-  if (state.sovereigntyByFeatureId && typeof state.sovereigntyByFeatureId === "object") {
-    requestedIds = Object.entries(state.sovereigntyByFeatureId)
+  if (runtimeState.sovereigntyByFeatureId && typeof runtimeState.sovereigntyByFeatureId === "object") {
+    requestedIds = Object.entries(runtimeState.sovereigntyByFeatureId)
       .filter(([, rawOwnerCode]) => normalizeCountryCode(rawOwnerCode) === normalizedOwnerCode)
       .map(([featureId]) => featureId);
   }
 
-  if (!requestedIds.length && state.countryToFeatureIds instanceof Map) {
-    requestedIds = Array.isArray(state.countryToFeatureIds?.get(normalizedOwnerCode))
-      ? state.countryToFeatureIds.get(normalizedOwnerCode)
+  if (!requestedIds.length && runtimeState.countryToFeatureIds instanceof Map) {
+    requestedIds = Array.isArray(runtimeState.countryToFeatureIds?.get(normalizedOwnerCode))
+      ? runtimeState.countryToFeatureIds.get(normalizedOwnerCode)
       : [];
   }
 
@@ -1258,7 +1259,7 @@ function applyPresetWithMode(
   } = {}
 ) {
   const presetLookupCode = resolveScenarioLookupCode(countryCode);
-  const presets = state.presetsState[presetLookupCode];
+  const presets = runtimeState.presetsState[presetLookupCode];
   if (!presets || !presets[presetIndex]) {
     console.warn(`Preset not found: ${presetLookupCode}[${presetIndex}]`);
     return {
@@ -1318,7 +1319,7 @@ function applyPresetWithMode(
 
   const resolvedMode = normalizeActionMode(mode);
   if (resolvedMode === "ownership") {
-    const result = applyOwnershipToFeatureIds(targetIds, ownerCode || state.activeSovereignCode, {
+    const result = applyOwnershipToFeatureIds(targetIds, ownerCode || runtimeState.activeSovereignCode, {
       render,
       historyKind: ownershipHistoryKind,
       dirtyReason: ownershipDirtyReason,
@@ -1332,7 +1333,7 @@ function applyPresetWithMode(
     };
   }
 
-  const result = applyVisualOverridesToFeatureIds(targetIds, color || state.selectedColor, {
+  const result = applyVisualOverridesToFeatureIds(targetIds, color || runtimeState.selectedColor, {
     render,
     historyKind: visualHistoryKind,
     dirtyReason: visualDirtyReason,
@@ -2024,7 +2025,7 @@ function initSidebar({ render } = {}) {
       };
     }
     const scenarioMeta = getScenarioCountryMeta(normalizedTag);
-    const fallbackName = state.countryNames?.[normalizedTag] || countryNames[normalizedTag] || normalizedTag;
+    const fallbackName = runtimeState.countryNames?.[normalizedTag] || countryNames[normalizedTag] || normalizedTag;
     const scenarioName = scenarioMeta
       ? getScenarioCountryDisplayName(scenarioMeta, fallbackName) || fallbackName
       : fallbackName;
@@ -3106,7 +3107,7 @@ function initSidebar({ render } = {}) {
     .join(",");
   const syncRightSidebarUrlState = () => {
     replaceUiUrlParams((params) => {
-      const scopeValue = getScopeParamForTab(state.ui?.rightSidebarTab || "inspector");
+      const scopeValue = getScopeParamForTab(runtimeState.ui?.rightSidebarTab || "inspector");
       params.set(UI_URL_STATE_KEYS.scope, scopeValue);
       const openSections = collectOpenRightSidebarSections();
       if (openSections) {
@@ -3304,8 +3305,8 @@ function initSidebar({ render } = {}) {
   initDevWorkspace();
 
   const updateScenarioInspectorLayout = () => {
-    const isScenarioMode = !!state.activeScenarioId;
-    const scenarioDefaultsKey = String(state.activeScenarioId || "__base__");
+    const isScenarioMode = !!runtimeState.activeScenarioId;
+    const scenarioDefaultsKey = String(runtimeState.activeScenarioId || "__base__");
     if (scenarioDefaultsKey !== lastScenarioInspectorDefaultsKey) {
       collapseScenarioManagedSections();
       lastScenarioInspectorDefaultsKey = scenarioDefaultsKey;
@@ -3424,23 +3425,23 @@ function initSidebar({ render } = {}) {
     projectFileName.textContent = t("No file selected", "ui");
   }
 
-  if (!(state.expandedInspectorContinents instanceof Set)) {
-    state.expandedInspectorContinents = new Set();
+  if (!(runtimeState.expandedInspectorContinents instanceof Set)) {
+    runtimeState.expandedInspectorContinents = new Set();
   }
-  if (!(state.expandedInspectorReleaseParents instanceof Set)) {
-    state.expandedInspectorReleaseParents = new Set();
+  if (!(runtimeState.expandedInspectorReleaseParents instanceof Set)) {
+    runtimeState.expandedInspectorReleaseParents = new Set();
   }
-  if (typeof state.selectedInspectorCountryCode !== "string") {
-    state.selectedInspectorCountryCode = "";
+  if (typeof runtimeState.selectedInspectorCountryCode !== "string") {
+    runtimeState.selectedInspectorCountryCode = "";
   }
-  if (typeof state.ui?.scenarioVisualAdjustmentsOpen !== "boolean") {
-    state.ui.scenarioVisualAdjustmentsOpen = false;
+  if (typeof runtimeState.ui?.scenarioVisualAdjustmentsOpen !== "boolean") {
+    runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
   }
-  if (typeof state.ui?.politicalEditingExpanded !== "boolean") {
-    state.ui.politicalEditingExpanded = false;
+  if (typeof runtimeState.ui?.politicalEditingExpanded !== "boolean") {
+    runtimeState.ui.politicalEditingExpanded = false;
   }
-  if (typeof state.inspectorExpansionInitialized !== "boolean") {
-    state.inspectorExpansionInitialized = false;
+  if (typeof runtimeState.inspectorExpansionInitialized !== "boolean") {
+    runtimeState.inspectorExpansionInitialized = false;
   }
 
   let latestCountryStatesByCode = new Map();
@@ -3460,12 +3461,12 @@ function initSidebar({ render } = {}) {
     if (inspectorState?.displayName) {
       return inspectorState.displayName;
     }
-    const scenarioCountry = state.scenarioCountriesByTag?.[normalized];
+    const scenarioCountry = runtimeState.scenarioCountriesByTag?.[normalized];
     const scenarioName = getScenarioCountryDisplayName(scenarioCountry);
     if (scenarioName) {
       return t(scenarioName, "geo") || scenarioName;
     }
-    const fallbackName = String(state.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
+    const fallbackName = String(runtimeState.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
     return t(fallbackName, "geo") || fallbackName || normalized;
   };
 
@@ -3575,7 +3576,7 @@ function initSidebar({ render } = {}) {
       inspectorDataCode,
       presetLookupCode,
       groupingCode: groupLookupCode,
-      presets: state.presetsState[presetLookupCode] || [],
+      presets: runtimeState.presetsState[presetLookupCode] || [],
       hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
       continentId,
       continentLabel,
@@ -3689,8 +3690,8 @@ function initSidebar({ render } = {}) {
   const getReleasableChildrenForParent = (parentTag) => {
     const normalizedParent = normalizeCountryCode(parentTag);
     if (!normalizedParent) return [];
-    const childTags = Array.isArray(state.scenarioReleasableIndex?.childTagsByParent?.[normalizedParent])
-      ? state.scenarioReleasableIndex.childTagsByParent[normalizedParent]
+    const childTags = Array.isArray(runtimeState.scenarioReleasableIndex?.childTagsByParent?.[normalizedParent])
+      ? runtimeState.scenarioReleasableIndex.childTagsByParent[normalizedParent]
       : [];
     return childTags
       .map((childTag, childIndex) => {
@@ -3702,7 +3703,7 @@ function initSidebar({ render } = {}) {
         if (existingState?.scenarioSubject && existingParentTags.includes(normalizedParent)) {
           return null;
         }
-        const releasableEntry = state.scenarioReleasableIndex?.byTag?.[normalizedChild];
+        const releasableEntry = runtimeState.scenarioReleasableIndex?.byTag?.[normalizedChild];
         if (releasableEntry && typeof releasableEntry === "object") {
           return createCountryInspectorState({
             code: normalizedChild,
@@ -3773,9 +3774,9 @@ function initSidebar({ render } = {}) {
     if (!countryState?.code) return "#cccccc";
     const fallbackColor = ensureCountryPaletteColor(countryState.code, countryState.fallbackIndex || 0);
     return (
-      state.sovereignBaseColors?.[countryState.code] ||
-      state.countryBaseColors?.[countryState.code] ||
-      state.countryPalette?.[countryState.code] ||
+      runtimeState.sovereignBaseColors?.[countryState.code] ||
+      runtimeState.countryBaseColors?.[countryState.code] ||
+      runtimeState.countryPalette?.[countryState.code] ||
       fallbackColor
     );
   };
@@ -3785,12 +3786,12 @@ function initSidebar({ render } = {}) {
 
   const syncSelectedColorFromCountry = (countryState) => {
     const resolvedColor = getDisplayCountryColor(countryState);
-    state.selectedColor = resolvedColor;
+    runtimeState.selectedColor = resolvedColor;
     callRuntimeHook(state, "updateSwatchUIFn");
   };
 
   const setScenarioVisualAdjustmentsOpen = (nextOpen, { scrollIntoView = false } = {}) => {
-    state.ui.scenarioVisualAdjustmentsOpen = !!nextOpen;
+    runtimeState.ui.scenarioVisualAdjustmentsOpen = !!nextOpen;
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.open = true;
       if (scrollIntoView) {
@@ -3806,9 +3807,9 @@ function initSidebar({ render } = {}) {
 
   const setScenarioMapPaintMode = (nextMode) => {
     const normalizedMode = nextMode === "ownership" ? "sovereignty" : "visual";
-    state.paintMode = normalizedMode;
+    runtimeState.paintMode = normalizedMode;
     if (normalizedMode === "sovereignty") {
-      state.interactionGranularity = "subdivision";
+      runtimeState.interactionGranularity = "subdivision";
     }
     callRuntimeHook(state, "updatePaintModeUIFn");
     flushSidebarRender(`sidebar-paint-mode:${normalizedMode}`);
@@ -3965,7 +3966,7 @@ function initSidebar({ render } = {}) {
 
   const getPrimaryReleasablePresetRef = (countryState, { warnOnMissing = true } = {}) => {
     const presetLookupCode = countryState?.presetLookupCode || countryState?.code;
-    const presets = Array.isArray(state.presetsState?.[presetLookupCode]) ? state.presetsState[presetLookupCode] : [];
+    const presets = Array.isArray(runtimeState.presetsState?.[presetLookupCode]) ? runtimeState.presetsState[presetLookupCode] : [];
     const presetIndex = presets.findIndex((preset) => String(preset?.preset_kind || "").trim() === "releasable_core");
     if (presetIndex >= 0) {
       return {
@@ -4073,10 +4074,10 @@ function initSidebar({ render } = {}) {
     }
 
     if (actionMode === "ownership") {
-      if (forceSovereignty && String(state.paintMode || "visual") !== "sovereignty") {
+      if (forceSovereignty && String(runtimeState.paintMode || "visual") !== "sovereignty") {
         setScenarioMapPaintMode("ownership");
       }
-      state.activeSovereignCode = countryState.code;
+      runtimeState.activeSovereignCode = countryState.code;
       callRuntimeHook(state, "updateActiveSovereignUIFn");
       const requestedTargetIds = Array.isArray(presetRef.preset?.ids) ? presetRef.preset.ids : [];
       const {
@@ -4121,12 +4122,12 @@ function initSidebar({ render } = {}) {
           return;
         }
         const baselineOwnerCode = normalizeCountryCode(
-          state.scenarioBaselineOwnersByFeatureId?.[normalizedId]
-            || state.runtimeCanonicalCountryByFeatureId?.[normalizedId]
+          runtimeState.scenarioBaselineOwnersByFeatureId?.[normalizedId]
+            || runtimeState.runtimeCanonicalCountryByFeatureId?.[normalizedId]
             || ""
         );
         const baselineControllerCode = normalizeCountryCode(
-          state.scenarioBaselineControllersByFeatureId?.[normalizedId]
+          runtimeState.scenarioBaselineControllersByFeatureId?.[normalizedId]
             || baselineOwnerCode
             || ""
         );
@@ -4356,7 +4357,7 @@ function initSidebar({ render } = {}) {
   };
 
   const buildPresetEntries = (presetLookupCode, predicate = null) => {
-    const presets = Array.isArray(state.presetsState?.[presetLookupCode]) ? state.presetsState[presetLookupCode] : [];
+    const presets = Array.isArray(runtimeState.presetsState?.[presetLookupCode]) ? runtimeState.presetsState[presetLookupCode] : [];
     return presets
       .map((preset, presetIndex) => ({ preset, presetIndex }))
       .filter(({ preset }) => (typeof predicate === "function" ? predicate(preset) : true));
@@ -4382,7 +4383,7 @@ function initSidebar({ render } = {}) {
 
     const disableForMissingActiveSovereign = (
       !!requireActiveOwner &&
-      !normalizeCountryCode(state.activeSovereignCode)
+      !normalizeCountryCode(runtimeState.activeSovereignCode)
     );
 
     presetEntries.forEach(({ preset, presetIndex }) => {
@@ -4408,7 +4409,7 @@ function initSidebar({ render } = {}) {
           onApply({ preset, presetIndex, presetLookupCode });
           return;
         }
-        applyPreset(presetLookupCode, presetIndex, state.selectedColor, render);
+        applyPreset(presetLookupCode, presetIndex, runtimeState.selectedColor, render);
       });
       container.appendChild(nameBtn);
     });
@@ -4429,11 +4430,11 @@ function initSidebar({ render } = {}) {
   };
 
   const renderNoActiveGuard = (container) => {
-    const needsGuard = state.activeScenarioId
-      ? !normalizeCountryCode(state.activeSovereignCode)
+    const needsGuard = runtimeState.activeScenarioId
+      ? !normalizeCountryCode(runtimeState.activeSovereignCode)
       : (
-        String(state.paintMode || "visual") === "sovereignty" &&
-        !normalizeCountryCode(state.activeSovereignCode)
+        String(runtimeState.paintMode || "visual") === "sovereignty" &&
+        !normalizeCountryCode(runtimeState.activeSovereignCode)
       );
     if (!needsGuard) return false;
     container.appendChild(
@@ -4444,16 +4445,16 @@ function initSidebar({ render } = {}) {
 
   const getFilteredRegionalPresets = (countryState) => {
     const presetLookupCode = countryState?.presetLookupCode || countryState?.code;
-    const consumedPresetNames = state.activeScenarioId
-      ? Array.isArray(state.scenarioReleasableIndex?.consumedPresetNamesByParentLookup?.[presetLookupCode])
-        ? state.scenarioReleasableIndex.consumedPresetNamesByParentLookup[presetLookupCode]
+    const consumedPresetNames = runtimeState.activeScenarioId
+      ? Array.isArray(runtimeState.scenarioReleasableIndex?.consumedPresetNamesByParentLookup?.[presetLookupCode])
+        ? runtimeState.scenarioReleasableIndex.consumedPresetNamesByParentLookup[presetLookupCode]
         : []
       : [];
-    const disabledPresetNames = state.activeScenarioId && Array.isArray(countryState?.disabledRegionalPresetNames)
+    const disabledPresetNames = runtimeState.activeScenarioId && Array.isArray(countryState?.disabledRegionalPresetNames)
       ? countryState.disabledRegionalPresetNames
       : [];
     return buildPresetEntries(presetLookupCode, (preset) => {
-      if (!state.activeScenarioId) return true;
+      if (!runtimeState.activeScenarioId) return true;
       const normalizedPresetName = normalizePresetName(preset?.name);
       return (
         !consumedPresetNames.includes(normalizedPresetName)
@@ -4508,7 +4509,7 @@ function initSidebar({ render } = {}) {
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
           t(group.label, "geo") || group.label,
-          () => applyHierarchyGroup(group, state.selectedColor, render)
+          () => applyHierarchyGroup(group, runtimeState.selectedColor, render)
         );
         button.disabled = actionGuarded;
         if (actionGuarded) {
@@ -4750,11 +4751,11 @@ function initSidebar({ render } = {}) {
     activateBtn.textContent = isReleasable ? t("Activate Releasable", "ui") : t("Target This Country", "ui");
     activateBtn.addEventListener("click", () => {
       const normalizedCountryCode = normalizeCountryCode(countryState.code);
-      const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(state.activeSovereignCode);
-      const previousActiveCode = normalizeCountryCode(state.activeSovereignCode);
-      const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+      const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(runtimeState.activeSovereignCode);
+      const previousActiveCode = normalizeCountryCode(runtimeState.activeSovereignCode);
+      const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
       if (normalizedCountryCode) {
-        state.activeSovereignCode = normalizedCountryCode;
+        runtimeState.activeSovereignCode = normalizedCountryCode;
       }
       setScenarioMapPaintMode("ownership");
       if (!alreadyActive) {
@@ -4850,12 +4851,12 @@ function initSidebar({ render } = {}) {
   const renderScenarioVisualAdjustments = (container, countryState) => {
     const details = document.createElement("details");
     details.className = "scenario-visual-adjustments inspector-action-section";
-    details.open = !!state.ui?.scenarioVisualAdjustmentsOpen;
+    details.open = !!runtimeState.ui?.scenarioVisualAdjustmentsOpen;
     details.addEventListener("toggle", () => {
-      if (!state.ui || typeof state.ui !== "object") {
-        state.ui = {};
+      if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+        runtimeState.ui = {};
       }
-      state.ui.scenarioVisualAdjustmentsOpen = details.open;
+      runtimeState.ui.scenarioVisualAdjustmentsOpen = details.open;
       scheduleAdaptiveInspectorHeights();
     });
 
@@ -4876,16 +4877,16 @@ function initSidebar({ render } = {}) {
     body.appendChild(note);
 
     const brushSection = appendActionSection(body, t("Brush", "ui"));
-    const isVisualBrush = String(state.paintMode || "visual") !== "sovereignty";
+    const isVisualBrush = String(runtimeState.paintMode || "visual") !== "sovereignty";
     const brushBtn = createInspectorActionButton(
       isVisualBrush
         ? t("Return to Political Ownership Brush", "ui")
         : t("Use Visual Color Brush", "ui"),
       () => {
-        if (!state.ui || typeof state.ui !== "object") {
-          state.ui = {};
+        if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+          runtimeState.ui = {};
         }
-        state.ui.scenarioVisualAdjustmentsOpen = true;
+        runtimeState.ui.scenarioVisualAdjustmentsOpen = true;
         setScenarioMapPaintMode(isVisualBrush ? "ownership" : "visual");
       }
     );
@@ -5012,7 +5013,7 @@ function initSidebar({ render } = {}) {
             () => {
               applyHierarchyGroupWithMode(group, {
                 mode: "visual",
-                color: state.selectedColor,
+                color: runtimeState.selectedColor,
                 render,
                 visualHistoryKind: "scenario-hierarchy-apply-visual",
                 visualDirtyReason: "scenario-hierarchy-apply-visual",
@@ -5035,7 +5036,7 @@ function initSidebar({ render } = {}) {
             onApply: ({ presetIndex, presetLookupCode }) => {
               applyPresetWithMode(presetLookupCode, presetIndex, {
                 mode: "visual",
-                color: state.selectedColor,
+                color: runtimeState.selectedColor,
                 render,
                 visualHistoryKind: "scenario-preset-apply-visual",
                 visualDirtyReason: "scenario-preset-apply-visual",
@@ -5080,7 +5081,7 @@ function initSidebar({ render } = {}) {
     const selectedCode = ensureSelectedInspectorCountry();
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
 
-    if (state.activeScenarioId) {
+    if (runtimeState.activeScenarioId) {
       renderScenarioActionsPanel(presetTree, countryState);
       scheduleAdaptiveInspectorHeights();
       return;
@@ -5101,10 +5102,10 @@ function initSidebar({ render } = {}) {
     const activeId = normalizedId === "frontline"
       ? "project"
       : (["inspector", "project"].includes(normalizedId) ? normalizedId : "inspector");
-    if (!state.ui || typeof state.ui !== "object") {
-      state.ui = {};
+    if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+      runtimeState.ui = {};
     }
-    state.ui.rightSidebarTab = activeId;
+    runtimeState.ui.rightSidebarTab = activeId;
     document.body.classList.toggle("frontline-mode-active", activeId === "project");
     if (activeId !== "project") {
       closeCounterEditorModal({ restoreFocus: false });
@@ -5410,7 +5411,7 @@ function initSidebar({ render } = {}) {
   registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);
   registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);
   const requestedSidebarTab = restoreRightSidebarUrlState();
-  setRightSidebarTab(requestedSidebarTab || state.ui?.rightSidebarTab || "inspector");
+  setRightSidebarTab(requestedSidebarTab || runtimeState.ui?.rightSidebarTab || "inspector");
   callRuntimeHook(state, "restoreSupportSurfaceFromUrlFn");
   refreshStrategicOverlayUI();
 
@@ -5506,4 +5507,6 @@ function initSidebar({ render } = {}) {
 }
 
 export { initSidebar };
+
+
 

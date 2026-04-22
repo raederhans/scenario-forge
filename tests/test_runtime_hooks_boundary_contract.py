@@ -7,22 +7,20 @@ MAIN_JS = REPO_ROOT / "js" / "main.js"
 TOOLBAR_JS = REPO_ROOT / "js" / "ui" / "toolbar.js"
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
 DEV_WORKSPACE_JS = REPO_ROOT / "js" / "ui" / "dev_workspace.js"
-RUNTIME_HOOKS_JS = REPO_ROOT / "js" / "core" / "runtime_hooks.js"
+STATE_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "index.js"
+STATE_BUS_JS = REPO_ROOT / "js" / "core" / "state" / "bus.js"
 
 
 class RuntimeHooksBoundaryContractTest(unittest.TestCase):
-    def test_runtime_hooks_keeps_explicit_hook_surface(self):
-        content = RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
+    def test_state_index_keeps_runtime_hook_compat_surface(self):
+        content = STATE_INDEX_JS.read_text(encoding="utf-8")
 
-        self.assertIn("setStartupReadonlyStateFn: null,", content)
-        self.assertIn("ensureFullLocalizationDataReadyFn: null,", content)
-        self.assertIn("scheduleScenarioChunkRefreshFn: null,", content)
-        self.assertIn("updateScenarioUIFn: null,", content)
-        self.assertIn("updateWorkspaceStatusFn: null,", content)
-        self.assertIn("syncDeveloperModeUiFn: null,", content)
-        self.assertIn("setDevWorkspaceExpandedFn: null,", content)
-        self.assertIn("getStrategicOverlayPerfCountersFn: null,", content)
-        self.assertIn("showToastFn: null,", content)
+        self.assertIn("export function registerRuntimeHook(target, hookName, hook) {", content)
+        self.assertIn("export function readRuntimeHook(target, hookName) {", content)
+        self.assertIn("export function callRuntimeHook(target, hookName, ...args) {", content)
+        self.assertIn("export function callRuntimeHooks(target, hookNames, ...args) {", content)
+        self.assertIn("export function bindStateCompatSurface(target) {", content)
+        self.assertIn("export function registerRuntimeHookBusListener(target, hookName, listener) {", content)
 
     def test_main_toolbar_sidebar_and_dev_workspace_keep_hook_wiring(self):
         main_content = MAIN_JS.read_text(encoding="utf-8")
@@ -40,13 +38,17 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', dev_workspace_content)
 
     def test_runtime_hook_helpers_coordinate_safe_calls(self):
-        runtime_hooks_content = RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
+        index_content = STATE_INDEX_JS.read_text(encoding="utf-8")
+        bus_content = STATE_BUS_JS.read_text(encoding="utf-8")
         history_content = (REPO_ROOT / "js" / "core" / "history_manager.js").read_text(encoding="utf-8")
         i18n_content = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
 
-        self.assertIn("function registerRuntimeHook(target, hookName, hook) {", runtime_hooks_content)
-        self.assertIn("function callRuntimeHook(target, hookName, ...args) {", runtime_hooks_content)
-        self.assertIn("function callRuntimeHooks(target, hookNames, ...args) {", runtime_hooks_content)
+        self.assertIn("export function emitStateBusEvent(eventName, payload) {", index_content)
+        self.assertIn("export function subscribeStateBusEvent(eventName, listener) {", index_content)
+        self.assertIn("export function on(eventName, listener) {", bus_content)
+        self.assertIn("export function off(eventName, listener = null) {", bus_content)
+        self.assertIn("export function emit(eventName, payload) {", bus_content)
+        self.assertIn("export function once(eventName, listener) {", bus_content)
         self.assertIn('callRuntimeHook(state, "updateHistoryUIFn");', history_content)
         self.assertIn('callRuntimeHooks(state, [', history_content)
         self.assertIn('await callRuntimeHook(state, "ensureFullLocalizationDataReadyFn", {', i18n_content)

@@ -11,8 +11,8 @@ import {
   createDefaultStateCatalog,
 } from "./state_catalog.js";
 import {
-  createDefaultRuntimeHooks,
-} from "./runtime_hooks.js";
+  bindStateCompatSurface,
+} from "./state/index.js";
 import {
   createDefaultHistoryState,
 } from "./state/history_state.js";
@@ -53,11 +53,7 @@ import {
 
 export * from "./state_defaults.js";
 export * from "./state_catalog.js";
-export * from "./runtime_hooks.js";
-export * from "./state/boot_state.js";
-export * from "./state/content_state.js";
-export * from "./state/color_state.js";
-export * from "./state/ui_state.js";
+export * from "./state/index.js";
 
 export const state = {
   ...createDefaultBootState(),
@@ -72,7 +68,6 @@ export const state = {
   ...createDefaultBorderCacheState(),
   ...createDefaultUiPresentationState(),
   ...createDefaultHistoryState(),
-  ...createDefaultRuntimeHooks(),
   ...createDefaultColorPresetState(),
   ...createDefaultUiChromeState(),
 
@@ -85,3 +80,5 @@ export const state = {
   ...createDefaultSpatialIndexState(),
   ...createDefaultRendererTransientRuntimeState(),
 };
+
+bindStateCompatSurface(state);

@@ -8,11 +8,11 @@
  * sidebar.js keeps the higher-level facade:
  * - scenario action/preset tree
  * - cross-panel orchestration
- * - state callback registration
+ * - runtimeState callback registration
  * - shared scenario/releasable domain helpers
  */
 export function createCountryInspectorController({
-  state,
+  runtimeState,
   list,
   searchInput,
   selectedCountryActionsSection,
@@ -79,8 +79,8 @@ export function createCountryInspectorController({
 
   const syncCountryRowVisuals = (ref, countryState) => {
     if (!ref || !countryState) return;
-    const isSelected = state.selectedInspectorCountryCode === countryState.code;
-    const isActiveOwner = state.activeSovereignCode === countryState.code;
+    const isSelected = runtimeState.selectedInspectorCountryCode === countryState.code;
+    const isActiveOwner = runtimeState.activeSovereignCode === countryState.code;
     ref.row?.classList.toggle("is-selected", isSelected);
     ref.row?.classList.toggle("is-active-owner", isActiveOwner);
     ref.wrapper?.classList.toggle("is-selected", isSelected);
@@ -103,13 +103,13 @@ export function createCountryInspectorController({
 
   const ensureSelectedInspectorCountry = () => {
     const latestCountryStatesByCode = getLatestCountryStatesByCode();
-    const normalized = normalizeCountryCode(state.selectedInspectorCountryCode);
+    const normalized = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     const resolved = normalized && latestCountryStatesByCode.has(normalized)
       ? normalized
       : "";
 
-    state.selectedInspectorCountryCode = resolved;
-    state.inspectorHighlightCountryCode = resolved;
+    runtimeState.selectedInspectorCountryCode = resolved;
+    runtimeState.inspectorHighlightCountryCode = resolved;
     return resolved;
   };
 
@@ -117,29 +117,29 @@ export function createCountryInspectorController({
     const normalized = normalizeCountryCode(code);
     if (!normalized) return;
     const latestCountryStatesByCode = getLatestCountryStatesByCode();
-    const previousSelectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+    const previousSelectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     const countryState = latestCountryStatesByCode.get(normalized);
     let requiresListRebuild = false;
     if (countryState?.topLevelGroupId) {
       const groupKey = getInspectorGroupExpansionKey(countryState.topLevelGroupId);
-      if (!state.expandedInspectorContinents.has(groupKey)) {
-        state.expandedInspectorContinents.add(groupKey);
+      if (!runtimeState.expandedInspectorContinents.has(groupKey)) {
+        runtimeState.expandedInspectorContinents.add(groupKey);
         requiresListRebuild = true;
       }
     }
-    if (countryState?.releasable && countryState.parentOwnerTag && state.expandedInspectorReleaseParents instanceof Set) {
-      if (!state.expandedInspectorReleaseParents.has(countryState.parentOwnerTag)) {
-        state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
+    if (countryState?.releasable && countryState.parentOwnerTag && runtimeState.expandedInspectorReleaseParents instanceof Set) {
+      if (!runtimeState.expandedInspectorReleaseParents.has(countryState.parentOwnerTag)) {
+        runtimeState.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
         requiresListRebuild = true;
       }
     }
-    state.selectedInspectorCountryCode = normalized;
-    state.inspectorHighlightCountryCode = normalized;
+    runtimeState.selectedInspectorCountryCode = normalized;
+    runtimeState.inspectorHighlightCountryCode = normalized;
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.open = true;
     }
-    if (typeof state.updatePaintModeUIFn === "function") {
-      state.updatePaintModeUIFn();
+    if (typeof runtimeState.updatePaintModeUIFn === "function") {
+      runtimeState.updatePaintModeUIFn();
     }
     flushSidebarRender(`sidebar-inspector-country:${normalized}`);
     if (requiresListRebuild) {
@@ -173,21 +173,21 @@ export function createCountryInspectorController({
       0
     );
     const hasChildren = childCount > 0;
-    const isActiveOwner = state.activeSovereignCode === countryState.code;
+    const isActiveOwner = runtimeState.activeSovereignCode === countryState.code;
     const hasReleasableActivateAction = !!(
-      state.activeScenarioId &&
+      runtimeState.activeScenarioId &&
       countryState.releasable &&
       getPrimaryReleasablePresetRef(countryState)
     );
     const isExpanded = hasChildren && (
       forceExpanded ||
-      state.expandedInspectorReleaseParents.has(countryState.code)
+      runtimeState.expandedInspectorReleaseParents.has(countryState.code)
     );
 
     const row = document.createElement("div");
     row.className = "country-select-row";
     row.dataset.countryCode = countryState.code;
-    const isSelected = state.selectedInspectorCountryCode === countryState.code;
+    const isSelected = runtimeState.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
     row.classList.toggle("is-active-owner", isActiveOwner);
     row.classList.toggle("has-children", hasChildren);
@@ -228,10 +228,10 @@ export function createCountryInspectorController({
         toggleBtn.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          if (state.expandedInspectorReleaseParents.has(countryState.code)) {
-            state.expandedInspectorReleaseParents.delete(countryState.code);
+          if (runtimeState.expandedInspectorReleaseParents.has(countryState.code)) {
+            runtimeState.expandedInspectorReleaseParents.delete(countryState.code);
           } else {
-            state.expandedInspectorReleaseParents.add(countryState.code);
+            runtimeState.expandedInspectorReleaseParents.add(countryState.code);
           }
           renderList();
         });
@@ -429,8 +429,8 @@ export function createCountryInspectorController({
   const renderGroupedCountryExplorer = (countryStates) => {
     const latestCountryStatesByCode = getLatestCountryStatesByCode();
     const hasCountryGrouping =
-      Array.isArray(state.countryGroupsData?.continents) &&
-      state.countryGroupsData.continents.length > 0;
+      Array.isArray(runtimeState.countryGroupsData?.continents) &&
+      runtimeState.countryGroupsData.continents.length > 0;
 
     if (!hasCountryGrouping) {
       countryStates.forEach((countryState) => {
@@ -453,7 +453,7 @@ export function createCountryInspectorController({
       if (!countries.length) return;
 
       const groupKey = getInspectorGroupExpansionKey(continent.id);
-      const isOpen = state.expandedInspectorContinents.has(groupKey);
+      const isOpen = runtimeState.expandedInspectorContinents.has(groupKey);
 
       const group = document.createElement("div");
       group.className = "country-explorer-group";
@@ -463,10 +463,10 @@ export function createCountryInspectorController({
       header.className = "inspector-accordion-btn country-explorer-header";
       header.setAttribute("aria-expanded", String(isOpen));
       header.addEventListener("click", () => {
-        if (state.expandedInspectorContinents.has(groupKey)) {
-          state.expandedInspectorContinents.delete(groupKey);
+        if (runtimeState.expandedInspectorContinents.has(groupKey)) {
+          runtimeState.expandedInspectorContinents.delete(groupKey);
         } else {
-          state.expandedInspectorContinents.add(groupKey);
+          runtimeState.expandedInspectorContinents.add(groupKey);
         }
         renderList();
       });
@@ -545,9 +545,9 @@ export function createCountryInspectorController({
       return;
     }
 
-    const isScenarioReleasable = !!state.activeScenarioId && !!countryState.releasable;
+    const isScenarioReleasable = !!runtimeState.activeScenarioId && !!countryState.releasable;
     if (countryInspectorSetActive) {
-      const isActive = state.activeSovereignCode === countryState.code;
+      const isActive = runtimeState.activeSovereignCode === countryState.code;
       countryInspectorSetActive.disabled = false;
       countryInspectorSetActive.classList.toggle("hidden", isScenarioReleasable);
       countryInspectorSetActive.classList.toggle("is-active", !isScenarioReleasable && isActive);
@@ -617,11 +617,11 @@ export function createCountryInspectorController({
     }
 
     renderCountryInspectorDetail();
-    if (typeof state.renderPresetTreeFn === "function") {
-      state.renderPresetTreeFn();
+    if (typeof runtimeState.renderPresetTreeFn === "function") {
+      runtimeState.renderPresetTreeFn();
     }
-    if (typeof state.updateWorkspaceStatusFn === "function") {
-      state.updateWorkspaceStatusFn();
+    if (typeof runtimeState.updateWorkspaceStatusFn === "function") {
+      runtimeState.updateWorkspaceStatusFn();
     }
     scheduleAdaptiveInspectorHeights();
   };
@@ -638,8 +638,8 @@ export function createCountryInspectorController({
         .map((code) => normalizeCountryCode(code))
         .filter(Boolean)
     ));
-    const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
-    const activeCode = normalizeCountryCode(state.activeSovereignCode);
+    const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
+    const activeCode = normalizeCountryCode(runtimeState.activeSovereignCode);
     if (selectedCode) normalizedCodes.push(selectedCode);
     if (activeCode) normalizedCodes.push(activeCode);
     const targetCodes = forceAll || !normalizedCodes.length
@@ -657,11 +657,11 @@ export function createCountryInspectorController({
     if (refreshInspector) {
       renderCountryInspectorDetail();
     }
-    if (refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
-      state.renderPresetTreeFn();
+    if (refreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
+      runtimeState.renderPresetTreeFn();
     }
-    if (typeof state.updateWorkspaceStatusFn === "function") {
-      state.updateWorkspaceStatusFn();
+    if (typeof runtimeState.updateWorkspaceStatusFn === "function") {
+      runtimeState.updateWorkspaceStatusFn();
     }
     scheduleAdaptiveInspectorHeights();
   };
@@ -670,8 +670,8 @@ export function createCountryInspectorController({
     if (searchInput && !searchInput.dataset.bound) {
       searchInput.addEventListener("input", () => {
         renderList();
-        if (typeof state.renderPresetTreeFn === "function") {
-          state.renderPresetTreeFn();
+        if (typeof runtimeState.renderPresetTreeFn === "function") {
+          runtimeState.renderPresetTreeFn();
         }
       });
       searchInput.dataset.bound = "true";
@@ -683,15 +683,15 @@ export function createCountryInspectorController({
         const selectedCode = ensureSelectedInspectorCountry();
         if (!selectedCode) return;
         const countryState = latestCountryStatesByCode.get(selectedCode);
-        if (state.activeScenarioId && countryState?.releasable) {
+        if (runtimeState.activeScenarioId && countryState?.releasable) {
           return;
         }
-        const isCurrentlyActive = state.activeSovereignCode === selectedCode;
-        const previousActiveCode = state.activeSovereignCode;
-        state.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
+        const isCurrentlyActive = runtimeState.activeSovereignCode === selectedCode;
+        const previousActiveCode = runtimeState.activeSovereignCode;
+        runtimeState.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
         markDirty(isCurrentlyActive ? "set-inactive-sovereign" : "set-active-sovereign");
-        if (typeof state.updateActiveSovereignUIFn === "function") {
-          state.updateActiveSovereignUIFn();
+        if (typeof runtimeState.updateActiveSovereignUIFn === "function") {
+          runtimeState.updateActiveSovereignUIFn();
         }
         flushSidebarRender(
           isCurrentlyActive ? "sidebar-active-sovereign:clear" : `sidebar-active-sovereign:${selectedCode}`

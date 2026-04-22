@@ -221,8 +221,68 @@
   - repair apply 后进入稳定态
 - startup recovery 邻域还留有 1 条旧语义分歧，后续单独归到 `startup_hydration.js` / `scenario health gate` 合同核对。
 
+## 2026-04-22 任务包 A 收口追加
+
+- `tests/e2e/support/playwright-app.js`
+  - `applyScenarioAndWaitIdle()` 已切到 `scenario_dispatcher.js` 的 command-driven apply。
+  - 共享 helper 现在会先等 `waitForScenarioSelectReady()`，并对 execution context 被导航销毁的情况做定向重试。
+- `tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js`
+  - `ensureScenario()` 已改成走 shared command-driven helper。
+  - `sync prewarm threshold ...` 这条红灯已经改成真实当前合同：确认 sync prewarm 在 refresh handoff 前完成，并确认 `hoi4_1939` 的 visual promotion stage 已记录。
+  - perf contract 里 `chunkedRuntimeSkipsBlockingDetailPromotion` 与 `unconfirmedDetailPromotionStillWarnsBeforeHealthGate` 已改读 `js/core/scenario_apply_pipeline.js`。
+- `tests/e2e/scenario_shell_overlay_contract.spec.js`
+  - 已切到 shared `applyScenarioAndWaitIdle()`，作为共享 helper 回归。
+- fresh 证据：
+  - `.runtime/tmp/scenario_chunk_exact_waveD.out.log`：`5 passed`
+  - `.runtime/tmp/scenario_shell_overlay_waveC.out.log`：`2 passed`
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_runtime_hooks_boundary_contract -q`：通过
+- perf gate 结构性问题已定性并修复：
+  - 当前 `tno_1962.renderSampleMedianMs` 超线来自偶数样本时取“上中位数”的采样口径漂移。
+  - `js/core/perf_probe.js` 与 `tools/perf/run_baseline.mjs` 现在都改成偶数样本取两中位数均值。
+  - `.runtime/tmp/perf_gate_wave_closeoutD.out.log`：`Perf gate passed against docs\\perf\\baseline_2026-04-20.json`
+- 当前下一步：
+  - 进入任务包 B1：`runtime_hooks.js` 到事件总线的 adapter-first 迁移。
+
 ## 给后续代码 lane 的直接指向
 
 1. 进入 `runtime_hooks.js` 到事件总线的完整替换。
 2. 再推进 `state/index.js` / `config.js` / `bus.js` / Proxy 门面收口。
 3. `scenario_chunk_exact_after_settle_regression.spec.js` 当前 2 条红灯继续作为阶段门问题单独跟踪。
+
+## 2026-04-22 任务包 B 开工记录
+
+- 主线程已重新读取当前 `state.js` / `runtime_hooks.js` / `state/bus.js` / contract tests / allowlist。
+- 当前基线已不是纯旧态：仓库里已经存在一版 `state/bus.js` 和 `runtime_hooks.js -> bus` 的半适配实现。
+- 本轮判断：继续在这条线上收口最稳，直接把 helper 迁进 `state/index.js`，让 `runtime_hooks.js` 退出运行链。
+- 已派 3 个子代理做静态分工：
+  - B1 bus adapter/compat 收口
+  - B2 state/index/config 与通知调用集群迁移
+  - 合同风险与 allowlist 收紧建议
+
+## 2026-04-22 任务包 B 实施结果
+
+- `js/core/runtime_hooks.js` 已删除。
+- `js/core/state/config.js` / `js/core/state/index.js` / `js/core/state/bus.js` 已落地。
+- `js/core/state.js` 已切成更薄的 compat facade，并通过 `bindStateCompatSurface(state)` 维持 legacy hook surface。
+- 当前 `js/` grep 结果：
+  - `import { state }` = 0
+  - `runtime_hooks.js` = 0
+  - `state.*Fn / *DataFn` = 0
+- 已通过验证：
+  - `python -m unittest tests.test_runtime_hooks_boundary_contract tests.test_state_split_boundary_contract tests.test_state_write_guardrail_contract tests.test_main_bootstrap_split_boundary_contract tests.test_main_startup_data_pipeline_boundary_contract tests.test_renderer_runtime_state_boundary_contract tests.test_toolbar_split_boundary_contract tests.test_strategic_overlay_sidebar_boundary_contract tests.test_water_special_region_sidebar_boundary_contract -q`
+  - `node --test tests/startup_hydration_behavior.test.mjs tests/renderer_runtime_state_behavior.test.mjs`
+  - `node tools/check_state_write_allowlist.mjs`
+- 最终长验证现状：
+  - `scenario_shell_overlay_contract.spec.js` 背景启动后长时间无日志输出，已停止，当前更像本地 e2e 环境/服务挂起，未定性成代码回归。
+  - `npm run perf:gate` 背景启动后只输出脚本头部，长时间无后续日志，已停止，当前更像本地 perf harness 挂起，未定性成代码回归。
+
+## 2026-04-22 review follow-up
+
+- 已修复 review 提到的两个真实回归：
+  - `js/core/scenario/chunk_runtime.js` / `js/core/scenario/lifecycle_runtime.js` 的错误 `../runtimeState/...` import 已改回 `../state/...`。
+  - `js/core/scenario_rollback.js` 的 chunk-refresh snapshot 已改成读取 compat 层里登记的原始 handler，而不是读 dispatcher wrapper。
+- 同时补回了 `createScenarioChunkRuntimeController` / `createScenarioLifecycleRuntime` 对 `{ state }` 调用形态的兼容，避免现有 owner 调用面和行为测试继续炸。
+- 本轮补充验证：
+  - `python -m unittest tests.test_scenario_rollback_boundary_contract -q`：通过
+  - `node --test tests/scenario_lifecycle_runtime_behavior.test.mjs`：通过
+  - `node --input-type=module -e "await import('./js/core/scenario_resources.js')"`：通过

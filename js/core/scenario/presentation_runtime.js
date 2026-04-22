@@ -3,6 +3,10 @@ import {
   normalizeScenarioOceanFillColor,
   normalizeScenarioRenderProfile,
 } from "./pure_helpers.js";
+import {
+  STATE_BUS_EVENTS,
+  emitStateBusEvent,
+} from "../state/index.js";
 
 function normalizeScenarioPerformanceHints(manifest) {
   const raw = manifest?.performance_hints;
@@ -37,21 +41,11 @@ function createScenarioPresentationRuntime({
   invalidateOceanBackgroundVisualState = null,
 } = {}) {
   function syncScenarioPresentationUi() {
-    if (typeof state.updateWaterInteractionUIFn === "function") {
-      state.updateWaterInteractionUIFn();
-    }
-    if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-      state.updateScenarioSpecialRegionUIFn();
-    }
-    if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-      state.updateScenarioReliefOverlayUIFn();
-    }
-    if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-      state.updateDynamicBorderStatusUIFn();
-    }
-    if (typeof state.updateToolbarInputsFn === "function") {
-      state.updateToolbarInputsFn();
-    }
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_WATER_INTERACTION);
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_SPECIAL_REGION);
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_RELIEF_OVERLAY);
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DYNAMIC_BORDER_STATUS);
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
   }
 
   function captureScenarioDisplaySettingsBeforeActivate() {
@@ -145,9 +139,7 @@ function createScenarioPresentationRuntime({
         "scenario-ocean-fill-restore-baseline"
       );
     }
-    if (typeof state.updateToolbarInputsFn === "function") {
-      state.updateToolbarInputsFn();
-    }
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
   }
 
   function restoreScenarioOceanFillAfterExit() {
@@ -156,9 +148,7 @@ function createScenarioPresentationRuntime({
     }
     updateScenarioOceanFill(state.scenarioOceanFillBeforeActivate, "scenario-ocean-fill-clear");
     state.scenarioOceanFillBeforeActivate = null;
-    if (typeof state.updateToolbarInputsFn === "function") {
-      state.updateToolbarInputsFn();
-    }
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
   }
 
   return {

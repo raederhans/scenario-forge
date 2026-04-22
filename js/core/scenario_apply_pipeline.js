@@ -1,9 +1,9 @@
 // Scenario apply pipeline.
-// 这个模块只负责“准备 staged apply state”和“把 staged state 落到 runtime state”。
+// 这个模块只负责“准备 staged apply runtimeState”和“把 staged runtimeState 落到 runtime runtimeState”。
 // scenario_manager.js 继续保留事务协调、回滚、post-apply、入口控制。
 
 function createScenarioApplyPipeline({
-  state,
+  runtimeState,
   countryNames,
   normalizeScenarioId,
   scenarioSupportsChunkedRuntime,
@@ -53,23 +53,23 @@ function createScenarioApplyPipeline({
 } = {}) {
   function prepareScenarioActivationContext(bundle) {
     const scenarioParentBorderEnabledBeforeActivate =
-      state.scenarioParentBorderEnabledBeforeActivate === null && !state.activeScenarioId
-        ? { ...(state.parentBorderEnabledByCountry || {}) }
-        : cloneScenarioStateValue(state.scenarioParentBorderEnabledBeforeActivate);
+      runtimeState.scenarioParentBorderEnabledBeforeActivate === null && !runtimeState.activeScenarioId
+        ? { ...(runtimeState.parentBorderEnabledByCountry || {}) }
+        : cloneScenarioStateValue(runtimeState.scenarioParentBorderEnabledBeforeActivate);
     const scenarioDisplaySettingsBeforeActivate =
-      !state.activeScenarioId && !state.scenarioDisplaySettingsBeforeActivate
+      !runtimeState.activeScenarioId && !runtimeState.scenarioDisplaySettingsBeforeActivate
         ? {
-          renderProfile: String(state.renderProfile || "").trim().toLowerCase() || "auto",
-          dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
-          parentBordersVisible: state.parentBordersVisible !== false,
-          showWaterRegions: state.showWaterRegions !== false,
-          showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-          showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+          renderProfile: String(runtimeState.renderProfile || "").trim().toLowerCase() || "auto",
+          dynamicBordersEnabled: runtimeState.dynamicBordersEnabled !== false,
+          parentBordersVisible: runtimeState.parentBordersVisible !== false,
+          showWaterRegions: runtimeState.showWaterRegions !== false,
+          showScenarioSpecialRegions: runtimeState.showScenarioSpecialRegions !== false,
+          showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
         }
-        : cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate);
-    const scenarioOceanFillBeforeActivate = state.scenarioOceanFillBeforeActivate === null
-      ? String(state.styleConfig?.ocean?.fillColor || "").trim().toLowerCase()
-      : state.scenarioOceanFillBeforeActivate;
+        : cloneScenarioStateValue(runtimeState.scenarioDisplaySettingsBeforeActivate);
+    const scenarioOceanFillBeforeActivate = runtimeState.scenarioOceanFillBeforeActivate === null
+      ? String(runtimeState.styleConfig?.ocean?.fillColor || "").trim().toLowerCase()
+      : runtimeState.scenarioOceanFillBeforeActivate;
     return {
       scenarioParentBorderEnabledBeforeActivate,
       scenarioDisplaySettingsBeforeActivate,
@@ -79,42 +79,42 @@ function createScenarioApplyPipeline({
   }
 
   function commitScenarioActivationState(bundle, staged) {
-    state.scenarioParentBorderEnabledBeforeActivate =
+    runtimeState.scenarioParentBorderEnabledBeforeActivate =
       cloneScenarioStateValue(staged.scenarioParentBorderEnabledBeforeActivate);
-    state.scenarioDisplaySettingsBeforeActivate =
+    runtimeState.scenarioDisplaySettingsBeforeActivate =
       cloneScenarioStateValue(staged.scenarioDisplaySettingsBeforeActivate);
-    state.scenarioOceanFillBeforeActivate = staged.scenarioOceanFillBeforeActivate;
-    state.activeScenarioId = staged.scenarioId;
-    state.scenarioBorderMode = "scenario_owner_only";
-    state.activeScenarioManifest = staged.scenarioManifest;
-    state.mapSemanticMode = staged.mapSemanticMode;
-    state.scenarioCountriesByTag = staged.countryMap;
-    state.activeScenarioMeshPack = bundle.meshPackPayload || null;
-    state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
-    state.runtimePoliticalTopology = hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload)
+    runtimeState.scenarioOceanFillBeforeActivate = staged.scenarioOceanFillBeforeActivate;
+    runtimeState.activeScenarioId = staged.scenarioId;
+    runtimeState.scenarioBorderMode = "scenario_owner_only";
+    runtimeState.activeScenarioManifest = staged.scenarioManifest;
+    runtimeState.mapSemanticMode = staged.mapSemanticMode;
+    runtimeState.scenarioCountriesByTag = staged.countryMap;
+    runtimeState.activeScenarioMeshPack = bundle.meshPackPayload || null;
+    runtimeState.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
+    runtimeState.runtimePoliticalTopology = hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload)
       ? staged.runtimeTopologyPayload
-      : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
-    state.scenarioPoliticalChunkData = scenarioSupportsChunkedRuntime(bundle)
+      : (runtimeState.defaultRuntimePoliticalTopology || runtimeState.runtimePoliticalTopology || null);
+    runtimeState.scenarioPoliticalChunkData = scenarioSupportsChunkedRuntime(bundle)
       ? null
       : (
         normalizeScenarioFeatureCollection(
           getActiveScenarioMergedChunkLayerPayload("political", staged.scenarioId)
         ) || null
       );
-    state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
-    state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
-    state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
-    state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
-    state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
-    state.scenarioRuntimeTopologyVersionTag = String(staged.runtimeVersionTag || "");
-    state.scenarioLandMaskVersionTag = state.scenarioLandMaskData ? String(staged.runtimeVersionTag || "") : "";
-    state.scenarioContextLandMaskVersionTag = state.scenarioContextLandMaskData ? String(staged.runtimeVersionTag || "") : "";
-    state.scenarioWaterOverlayVersionTag = state.scenarioWaterRegionsData ? String(staged.runtimeVersionTag || "") : "";
-    state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
-    state.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
-    state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
-    state.scenarioDistrictGroupsData = staged.districtGroupsPayload;
-    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(staged.districtGroupsPayload);
+    runtimeState.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
+    runtimeState.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
+    runtimeState.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
+    runtimeState.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
+    runtimeState.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+    runtimeState.scenarioRuntimeTopologyVersionTag = String(staged.runtimeVersionTag || "");
+    runtimeState.scenarioLandMaskVersionTag = runtimeState.scenarioLandMaskData ? String(staged.runtimeVersionTag || "") : "";
+    runtimeState.scenarioContextLandMaskVersionTag = runtimeState.scenarioContextLandMaskData ? String(staged.runtimeVersionTag || "") : "";
+    runtimeState.scenarioWaterOverlayVersionTag = runtimeState.scenarioWaterRegionsData ? String(staged.runtimeVersionTag || "") : "";
+    runtimeState.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
+    runtimeState.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
+    runtimeState.scenarioReliefOverlayRevision = (Number(runtimeState.scenarioReliefOverlayRevision) || 0) + 1;
+    runtimeState.scenarioDistrictGroupsData = staged.districtGroupsPayload;
+    runtimeState.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(staged.districtGroupsPayload);
     syncScenarioLocalizationState({
       cityOverridesPayload: staged.mapSemanticMode === "blank" ? null : (staged.scenarioCityOverridesPayload || null),
       geoLocalePatchPayload: staged.mapSemanticMode === "blank" ? null : (bundle.geoLocalePatchPayload || null),
@@ -122,32 +122,32 @@ function createScenarioApplyPipeline({
     if (staged.mapSemanticMode === "blank") {
       applyBlankScenarioPresentationDefaults({ resetLocalization: false });
     }
-    state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
-    state.scenarioReleasableIndex = staged.releasableIndex;
-    state.scenarioAudit = bundle.auditPayload || null;
+    runtimeState.releasableCatalog = mergeReleasableCatalogs(runtimeState.defaultReleasableCatalog, bundle.releasableCatalog);
+    runtimeState.scenarioReleasableIndex = staged.releasableIndex;
+    runtimeState.scenarioAudit = bundle.auditPayload || null;
     setScenarioAuditUiState({
       loading: false,
       loadedForScenarioId: bundle.auditPayload ? staged.scenarioId : "",
       errorMessage: "",
     });
-    state.scenarioImportAudit = null;
-    state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
-    state.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };
-    state.scenarioControllersByFeatureId = { ...staged.controllers };
-    state.scenarioAutoShellOwnerByFeatureId = {};
-    state.scenarioAutoShellControllerByFeatureId = {};
-    state.scenarioBaselineControllersByFeatureId = { ...staged.controllers };
-    state.scenarioBaselineCoresByFeatureId = { ...staged.cores };
-    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-    state.scenarioViewMode = "ownership";
-    state.countryNames = staged.mapSemanticMode === "blank"
+    runtimeState.scenarioImportAudit = null;
+    runtimeState.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
+    runtimeState.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };
+    runtimeState.scenarioControllersByFeatureId = { ...staged.controllers };
+    runtimeState.scenarioAutoShellOwnerByFeatureId = {};
+    runtimeState.scenarioAutoShellControllerByFeatureId = {};
+    runtimeState.scenarioBaselineControllersByFeatureId = { ...staged.controllers };
+    runtimeState.scenarioBaselineCoresByFeatureId = { ...staged.cores };
+    runtimeState.scenarioShellOverlayRevision = (Number(runtimeState.scenarioShellOverlayRevision) || 0) + 1;
+    runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
+    runtimeState.scenarioViewMode = "ownership";
+    runtimeState.countryNames = staged.mapSemanticMode === "blank"
       ? { ...countryNames }
       : { ...staged.scenarioNameMap };
-    state.sovereigntyByFeatureId = { ...staged.resolvedOwners };
-    state.sovereigntyInitialized = false;
-    state.visualOverrides = {};
-    state.featureOverrides = {};
+    runtimeState.sovereigntyByFeatureId = { ...staged.resolvedOwners };
+    runtimeState.sovereigntyInitialized = false;
+    runtimeState.visualOverrides = {};
+    runtimeState.featureOverrides = {};
     const fixedOwnerColors = { ...staged.scenarioColorMap };
     if (staged.coarseColorMap && typeof staged.coarseColorMap === "object") {
       Object.entries(staged.coarseColorMap).forEach(([iso2, color]) => {
@@ -156,26 +156,26 @@ function createScenarioApplyPipeline({
         }
       });
     }
-    state.scenarioFixedOwnerColors = { ...fixedOwnerColors };
-    state.sovereignBaseColors = { ...fixedOwnerColors };
-    state.countryBaseColors = { ...fixedOwnerColors };
+    runtimeState.scenarioFixedOwnerColors = { ...fixedOwnerColors };
+    runtimeState.sovereignBaseColors = { ...fixedOwnerColors };
+    runtimeState.countryBaseColors = { ...fixedOwnerColors };
     markLegacyColorStateDirty();
-    state.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
-    state.selectedWaterRegionId = "";
-    state.selectedSpecialRegionId = "";
-    state.hoveredWaterRegionId = null;
-    state.hoveredSpecialRegionId = null;
+    runtimeState.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
+    runtimeState.selectedWaterRegionId = "";
+    runtimeState.selectedSpecialRegionId = "";
+    runtimeState.hoveredWaterRegionId = null;
+    runtimeState.hoveredSpecialRegionId = null;
   }
 
   function commitScenarioChunkRuntimeState(bundle, staged) {
-    state.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;
+    runtimeState.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;
     if (scenarioSupportsChunkedRuntime(bundle)) {
       resetScenarioChunkRuntimeState({ scenarioId: staged.scenarioId });
       const chunkIds = Object.keys(bundle.chunkPayloadCacheById || {});
       if (chunkIds.length) {
-        state.activeScenarioChunks.loadedChunkIds = [...chunkIds];
-        state.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
-        state.activeScenarioChunks.lruChunkIds = [...chunkIds];
+        runtimeState.activeScenarioChunks.loadedChunkIds = [...chunkIds];
+        runtimeState.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
+        runtimeState.activeScenarioChunks.lruChunkIds = [...chunkIds];
       }
       ensureRuntimeChunkLoadState().shellStatus = chunkIds.length ? "ready" : "idle";
       ensureRuntimeChunkLoadState().registryStatus = scenarioBundleHasChunkedData(bundle) ? "ready" : "idle";
@@ -253,8 +253,8 @@ function createScenarioApplyPipeline({
       || (scenarioBundleUsesChunkedLayer(bundle, "political")
         && scenarioBundleHasChunkedData(bundle));
     const detailReady = (
-      state.topologyBundleMode === "composite"
-      && hasUsablePoliticalTopology(state.topologyDetail)
+      runtimeState.topologyBundleMode === "composite"
+      && hasUsablePoliticalTopology(runtimeState.topologyDetail)
     ) || !!detailPromoted || politicalChunkedReady;
     if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest) && !startupReadonly) {
       const scenarioLabel = getScenarioDisplayName(
@@ -265,7 +265,7 @@ function createScenarioApplyPipeline({
       console.error(`[scenario] ${message}`);
       throw new Error(message);
     }
-    if (!detailReady && state.topologyBundleMode !== "composite") {
+    if (!detailReady && runtimeState.topologyBundleMode !== "composite") {
       console.warn("[scenario] Applying bundle without confirmed detail promotion; health gate will validate runtime topology.");
     }
     if (syncPalette) {
@@ -391,7 +391,7 @@ function createScenarioApplyPipeline({
       : buildHoi4FarEastSovietOwnerBackfill(scenarioId, {
         runtimeTopology: runtimeTopologyPayload?.objects?.political
           ? runtimeTopologyPayload
-          : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null),
+          : (runtimeState.defaultRuntimePoliticalTopology || runtimeState.runtimePoliticalTopology || null),
         ownersByFeatureId: owners,
         controllersByFeatureId: controllers,
       });
@@ -439,7 +439,7 @@ function createScenarioApplyPipeline({
 
   function applyPreparedScenarioState(bundle, staged) {
     commitScenarioActivationState(bundle, staged);
-    syncScenarioInspectorSelection(state.activeSovereignCode);
+    syncScenarioInspectorSelection(runtimeState.activeSovereignCode);
 
     disableScenarioParentBorders();
     applyScenarioPaintMode();

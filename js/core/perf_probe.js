@@ -71,12 +71,18 @@ function buildRenderSampleSummary() {
     .sort((left, right) => left - right);
   const count = durations.length;
   const totalMs = durations.reduce((sum, value) => sum + value, 0);
+  const middleIndex = Math.floor(count / 2);
+  const medianMs = count === 0
+    ? 0
+    : (count % 2 === 0
+      ? (durations[middleIndex - 1] + durations[middleIndex]) / 2
+      : durations[middleIndex]);
   return {
     count,
     totalMs,
     minMs: count ? durations[0] : 0,
     maxMs: count ? durations[count - 1] : 0,
-    medianMs: count ? durations[Math.floor(count / 2)] : 0,
+    medianMs,
     samples: cloneRenderSamples(),
   };
 }

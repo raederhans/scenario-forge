@@ -2,7 +2,7 @@
 // 这个模块只负责色板库面板的分组、筛选、切换和 DOM 更新。
 // toolbar.js 继续保留主初始化、快捷色板、主题选择和其他面板编排。
 
-import { PALETTE_THEMES, state } from "../../core/state.js";
+import { PALETTE_THEMES, state as runtimeState } from "../../core/state.js";
 import {
   buildPaletteLibraryEntries,
   getPaletteSourceOptions,
@@ -12,6 +12,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
+const state = runtimeState;
 
 function createPaletteLibraryPanelController({
   themeSelect = null,
@@ -39,10 +40,10 @@ function createPaletteLibraryPanelController({
 
   const ensurePaletteLibrarySectionState = (sourceId) => {
     const key = String(sourceId || "legacy").trim() || "legacy";
-    if (!state.ui.paletteLibrarySections[key] || typeof state.ui.paletteLibrarySections[key] !== "object") {
-      state.ui.paletteLibrarySections[key] = {};
+    if (!runtimeState.ui.paletteLibrarySections[key] || typeof runtimeState.ui.paletteLibrarySections[key] !== "object") {
+      runtimeState.ui.paletteLibrarySections[key] = {};
     }
-    return state.ui.paletteLibrarySections[key];
+    return runtimeState.ui.paletteLibrarySections[key];
   };
 
   const buildPaletteLibraryGroups = (entries) => {
@@ -99,11 +100,11 @@ function createPaletteLibraryPanelController({
     row.dataset.color = entry.color;
     row.dataset.tag = entry.sourceTag;
     row.dataset.iso2 = entry.mappedIso2 || "";
-    if (entry.color === state.selectedColor) {
+    if (entry.color === runtimeState.selectedColor) {
       row.classList.add("is-selected");
     }
     row.addEventListener("click", () => {
-      state.selectedColor = entry.color;
+      runtimeState.selectedColor = entry.color;
       updateSwatchUI?.();
     });
 
@@ -150,7 +151,7 @@ function createPaletteLibraryPanelController({
     paletteLibrarySources.classList.remove("hidden");
     sourceOptions.forEach((optionData) => {
       const button = document.createElement("button");
-      const isActive = optionData.value === state.activePaletteId;
+      const isActive = optionData.value === runtimeState.activePaletteId;
       button.type = "button";
       button.className = "palette-library-source-btn";
       button.setAttribute("role", "tab");
@@ -169,7 +170,7 @@ function createPaletteLibraryPanelController({
 
   const syncAdaptivePaletteLibraryHeight = () => {
     adaptivePaletteLibraryHeightFrame = 0;
-    if (!paletteLibraryList || !state.paletteLibraryOpen) return;
+    if (!paletteLibraryList || !runtimeState.paletteLibraryOpen) return;
     const scrollHeight = Number(paletteLibraryList.scrollHeight || 0);
     const nextHeight = clampPaletteLibraryHeight(
       scrollHeight,
@@ -189,20 +190,20 @@ function createPaletteLibraryPanelController({
 
   const syncPaletteLibraryToggleUi = () => {
     if (!paletteLibraryToggle) return;
-    const label = state.paletteLibraryOpen
+    const label = runtimeState.paletteLibraryOpen
       ? t("Hide Color Library", "ui")
       : t("Browse All Colors", "ui");
-    paletteLibraryToggle.setAttribute("aria-expanded", state.paletteLibraryOpen ? "true" : "false");
+    paletteLibraryToggle.setAttribute("aria-expanded", runtimeState.paletteLibraryOpen ? "true" : "false");
     paletteLibraryToggle.setAttribute("aria-label", label);
     paletteLibraryToggle.setAttribute("title", label);
-    paletteLibraryToggle.dataset.expanded = state.paletteLibraryOpen ? "true" : "false";
+    paletteLibraryToggle.dataset.expanded = runtimeState.paletteLibraryOpen ? "true" : "false";
     if (paletteLibraryToggleLabel) {
       paletteLibraryToggleLabel.textContent = label;
     }
   };
 
   const syncPaletteSourceControls = () => {
-    const activeValue = String(state.activePaletteId || "");
+    const activeValue = String(runtimeState.activePaletteId || "");
     if (themeSelect && themeSelect.value !== activeValue) {
       themeSelect.value = activeValue;
     }
@@ -210,7 +211,7 @@ function createPaletteLibraryPanelController({
 
   async function handlePaletteSourceChange(nextPaletteId) {
     const targetId = String(nextPaletteId || "").trim();
-    if (!targetId || targetId === state.activePaletteId) {
+    if (!targetId || targetId === runtimeState.activePaletteId) {
       syncPaletteSourceControls();
       return;
     }
@@ -226,20 +227,20 @@ function createPaletteLibraryPanelController({
   function renderPaletteLibrary() {
     if (!paletteLibraryList) return;
 
-    const searchTerm = String(state.paletteLibrarySearch || "").trim().toLowerCase();
+    const searchTerm = String(runtimeState.paletteLibrarySearch || "").trim().toLowerCase();
     const sourceOptions = getPaletteSourceOptions();
     renderPaletteLibrarySourceTabs(sourceOptions);
-    const sourceLabel = state.activePaletteMeta?.display_name || state.currentPaletteTheme || "Palette";
+    const sourceLabel = runtimeState.activePaletteMeta?.display_name || runtimeState.currentPaletteTheme || "Palette";
     const summarizeResults = (count) => (
-      state.currentLanguage === "zh"
+      runtimeState.currentLanguage === "zh"
         ? `${count} 个颜色，来源 ${sourceLabel}`
         : `${count} colors from ${sourceLabel}`
     );
     let entries = [];
-    if (state.activePalettePack?.entries) {
+    if (runtimeState.activePalettePack?.entries) {
       entries = buildPaletteLibraryEntries();
     } else {
-      entries = (PALETTE_THEMES[state.currentPaletteTheme] || []).map((color, index) => ({
+      entries = (PALETTE_THEMES[runtimeState.currentPaletteTheme] || []).map((color, index) => ({
         key: `legacy-${index}`,
         sourceTag: `LEGACY-${index + 1}`,
         iso2: "",
@@ -268,7 +269,7 @@ function createPaletteLibraryPanelController({
       ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
     });
     const groupedEntries = buildPaletteLibraryGroups(filtered);
-    const activeSourceId = String(state.activePaletteId || state.currentPaletteTheme || "legacy").trim() || "legacy";
+    const activeSourceId = String(runtimeState.activePaletteId || runtimeState.currentPaletteTheme || "legacy").trim() || "legacy";
     const sectionState = ensurePaletteLibrarySectionState(activeSourceId);
 
     paletteLibraryList.replaceChildren();
@@ -331,8 +332,8 @@ function createPaletteLibraryPanelController({
   const bindEvents = () => {
     if (paletteLibraryToggle && paletteLibraryToggle.dataset.bound !== "true") {
       paletteLibraryToggle.addEventListener("click", () => {
-        state.paletteLibraryOpen = !state.paletteLibraryOpen;
-        paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
+        runtimeState.paletteLibraryOpen = !runtimeState.paletteLibraryOpen;
+        paletteLibraryPanel?.classList.toggle("hidden", !runtimeState.paletteLibraryOpen);
         syncPaletteLibraryToggleUi();
         renderPaletteLibrary();
       });
@@ -340,9 +341,9 @@ function createPaletteLibraryPanelController({
     }
 
     if (paletteLibrarySearch && paletteLibrarySearch.dataset.bound !== "true") {
-      paletteLibrarySearch.value = state.paletteLibrarySearch || "";
+      paletteLibrarySearch.value = runtimeState.paletteLibrarySearch || "";
       paletteLibrarySearch.addEventListener("input", (event) => {
-        state.paletteLibrarySearch = String(event.target.value || "");
+        runtimeState.paletteLibrarySearch = String(event.target.value || "");
         renderPaletteLibrary();
       });
       paletteLibrarySearch.dataset.bound = "true";
@@ -350,7 +351,7 @@ function createPaletteLibraryPanelController({
   };
 
   const syncPanelVisibility = () => {
-    paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
+    paletteLibraryPanel?.classList.toggle("hidden", !runtimeState.paletteLibraryOpen);
     syncPaletteLibraryToggleUi();
   };
 
@@ -369,3 +370,4 @@ function createPaletteLibraryPanelController({
 }
 
 export { createPaletteLibraryPanelController };
+

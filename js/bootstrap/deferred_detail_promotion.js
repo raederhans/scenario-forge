@@ -12,7 +12,7 @@ import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
 
 export function createDeferredDetailPromotionOwner({
-  state,
+  runtimeState,
   helpers = {},
 } = {}) {
   const {
@@ -39,13 +39,13 @@ export function createDeferredDetailPromotionOwner({
   let forcedStartupReadonlyInfraRetryCount = 0;
 
   function hasDetailTopologyLoaded() {
-    return !!state.topologyDetail?.objects?.political;
+    return !!runtimeState.topologyDetail?.objects?.political;
   }
 
   function getViewportFocusCountryCode() {
     return String(
-      state.activeSovereignCode
-      || state.selectedInspectorCountryCode
+      runtimeState.activeSovereignCode
+      || runtimeState.selectedInspectorCountryCode
       || ""
     ).trim().toUpperCase();
   }
@@ -58,11 +58,11 @@ export function createDeferredDetailPromotionOwner({
     if (!focusCountry) {
       return;
     }
-    if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
-      state.runtimeChunkLoadState.focusCountryOverride = focusCountry;
+    if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
+      runtimeState.runtimeChunkLoadState.focusCountryOverride = focusCountry;
     }
-    if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
-      state.scheduleScenarioChunkRefreshFn({
+    if (typeof runtimeState.scheduleScenarioChunkRefreshFn === "function") {
+      runtimeState.scheduleScenarioChunkRefreshFn({
         reason,
         delayMs: 0,
         flushPending,
@@ -75,8 +75,8 @@ export function createDeferredDetailPromotionOwner({
       showWarningToast: false,
       showErrorToast: false,
     });
-    if (typeof state.updateScenarioUIFn === "function") {
-      state.updateScenarioUIFn();
+    if (typeof runtimeState.updateScenarioUIFn === "function") {
+      runtimeState.updateScenarioUIFn();
     }
   }
 
@@ -84,7 +84,7 @@ export function createDeferredDetailPromotionOwner({
     interactionLevel = "full",
     deferInteractionInfrastructure = false,
   } = {}) {
-    const hasActiveScenario = !!String(state.activeScenarioId || "").trim();
+    const hasActiveScenario = !!String(runtimeState.activeScenarioId || "").trim();
     if (hasActiveScenario) {
       try {
         refreshMapDataForScenarioApply({ suppressRender: true });
@@ -105,7 +105,7 @@ export function createDeferredDetailPromotionOwner({
 
   /**
    * 事务：detail topology 准备。
-   * 成功路径：加载 detail bundle -> 写入 topology/detail/runtime state -> 刷新 map data -> 标记 detailPromotionCompleted。
+   * 成功路径：加载 detail bundle -> 写入 topology/detail/runtime runtimeState -> 刷新 map data -> 标记 detailPromotionCompleted。
    * 恢复路径：加载失败或无 topologyDetail 时保留当前可运行状态并返回 false，调用方按既有启动路径继续。
    */
   async function ensureDetailTopologyReady({
@@ -122,8 +122,8 @@ export function createDeferredDetailPromotionOwner({
       flushPending: flushPendingFocusRefresh,
     });
     if (hasDetailTopologyLoaded()) {
-      if (state.topologyBundleMode !== "composite") {
-        state.topologyBundleMode = "composite";
+      if (runtimeState.topologyBundleMode !== "composite") {
+        runtimeState.topologyBundleMode = "composite";
         if (applyMapData) {
           applyDetailPromotionMapRefresh({
             interactionLevel,
@@ -138,18 +138,18 @@ export function createDeferredDetailPromotionOwner({
           }
         }
       }
-      state.detailDeferred = false;
-      state.detailPromotionCompleted = true;
+      runtimeState.detailDeferred = false;
+      runtimeState.detailPromotionCompleted = true;
       syncScenarioReadyUiAfterDetailPromotion();
       return true;
     }
 
-    if (state.detailPromotionInFlight) return false;
-    if (requireIdle && (state.isInteracting || state.renderPhase !== "idle")) {
+    if (runtimeState.detailPromotionInFlight) return false;
+    if (requireIdle && (runtimeState.isInteracting || runtimeState.renderPhase !== "idle")) {
       return false;
     }
 
-    state.detailPromotionInFlight = true;
+    runtimeState.detailPromotionInFlight = true;
     try {
       const {
         topologyDetail,
@@ -157,27 +157,27 @@ export function createDeferredDetailPromotionOwner({
         topologyBundleMode,
         detailSourceUsed,
       } = await loadDeferredDetailBundle({
-        detailSourceKey: state.detailSourceRequested,
+        detailSourceKey: runtimeState.detailSourceRequested,
       });
 
       if (!topologyDetail) {
-        state.detailDeferred = false;
+        runtimeState.detailDeferred = false;
         console.warn("[main] Detail promotion skipped: no detail topology was loaded.");
         return false;
       }
 
-      state.topologyDetail = topologyDetail;
-      state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
-      if (!state.activeScenarioId) {
-        state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
+      runtimeState.topologyDetail = topologyDetail;
+      runtimeState.runtimePoliticalTopology = runtimePoliticalTopology || runtimeState.runtimePoliticalTopology;
+      if (!runtimeState.activeScenarioId) {
+        runtimeState.defaultRuntimePoliticalTopology = runtimeState.runtimePoliticalTopology || null;
       }
-      state.topologyBundleMode = topologyBundleMode || "composite";
-      state.detailDeferred = false;
-      state.detailPromotionCompleted = true;
-      state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
+      runtimeState.topologyBundleMode = topologyBundleMode || "composite";
+      runtimeState.detailDeferred = false;
+      runtimeState.detailPromotionCompleted = true;
+      runtimeState.detailSourceRequested = detailSourceUsed || runtimeState.detailSourceRequested;
 
       console.info(
-        `[main] Detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
+        `[main] Detail promotion applied. source=${runtimeState.detailSourceRequested}, mode=${runtimeState.topologyBundleMode}.`
       );
       if (applyMapData) {
         const refreshMode = applyDetailPromotionMapRefresh({
@@ -199,7 +199,7 @@ export function createDeferredDetailPromotionOwner({
       console.warn("[main] Detail promotion failed:", error);
       return false;
     } finally {
-      state.detailPromotionInFlight = false;
+      runtimeState.detailPromotionInFlight = false;
     }
   }
 
@@ -207,7 +207,7 @@ export function createDeferredDetailPromotionOwner({
     // 事务：startup readonly 解锁。
     // 成功路径：detail promotion 成功 + interaction infra basic 构建完成 -> 进入 ready 并释放 readonly。
     // 恢复路径：detail promotion 未就绪 -> 记录失败指标并保持 readonly，等待后续调度重试。
-    if (!state.startupReadonly || state.startupReadonlyUnlockInFlight) {
+    if (!runtimeState.startupReadonly || runtimeState.startupReadonlyUnlockInFlight) {
       return false;
     }
     setStartupReadonlyState?.(true, {
@@ -245,11 +245,11 @@ export function createDeferredDetailPromotionOwner({
         return false;
       }
       finishBootMetric?.("detail-promotion", {
-        activeScenarioId: String(state.activeScenarioId || ""),
+        activeScenarioId: String(runtimeState.activeScenarioId || ""),
       });
-      const activeScenarioId = String(state.activeScenarioId || "").trim();
+      const activeScenarioId = String(runtimeState.activeScenarioId || "").trim();
       const cachedBundle = activeScenarioId
-        ? state.scenarioBundleCacheById?.[activeScenarioId] || null
+        ? runtimeState.scenarioBundleCacheById?.[activeScenarioId] || null
         : null;
       if (cachedBundle?.manifest) {
         warnOnStartupBundleIntegrity?.(cachedBundle, {
@@ -315,7 +315,7 @@ export function createDeferredDetailPromotionOwner({
     renderDispatcher,
     { delayMs = 120, attempt = 0, maxAttempts = 5 } = {},
   ) {
-    if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || hasStartupReadonlyUnlockScheduled?.()) {
+    if (!runtimeState.startupReadonly || runtimeState.startupReadonlyUnlockInFlight || hasStartupReadonlyUnlockScheduled?.()) {
       return;
     }
     scheduleStartupReadonlyUnlockTimer?.(() => {
@@ -337,7 +337,7 @@ export function createDeferredDetailPromotionOwner({
         }).then(() => {
           forcedStartupReadonlyInfraRetryCount = 0;
           finishBootMetric?.("interaction-infra", {
-            activeScenarioId: String(state.activeScenarioId || ""),
+            activeScenarioId: String(runtimeState.activeScenarioId || ""),
             forced: true,
           });
           setStartupReadonlyState?.(false);
@@ -386,13 +386,13 @@ export function createDeferredDetailPromotionOwner({
           setBootState?.("error", {
             error: error?.message || "Failed to initialize interaction infrastructure during startup recovery.",
             canContinueWithoutScenario: false,
-            progress: state.bootProgress || getBootProgressWindow?.("interaction-infra")?.min,
+            progress: runtimeState.bootProgress || getBootProgressWindow?.("interaction-infra")?.min,
           });
         });
         return;
       }
       void unlockStartupReadonlyWithDetail(renderDispatcher).then((unlocked) => {
-        if (!unlocked && state.startupReadonly) {
+        if (!unlocked && runtimeState.startupReadonly) {
           scheduleStartupReadonlyUnlock(renderDispatcher, {
             delayMs: 1600,
             attempt: attempt + 1,
@@ -405,9 +405,9 @@ export function createDeferredDetailPromotionOwner({
 
   function scheduleDeferredDetailPromotion(renderDispatcher) {
     if (
-      !state.detailDeferred ||
-      state.detailPromotionCompleted ||
-      state.detailPromotionInFlight ||
+      !runtimeState.detailDeferred ||
+      runtimeState.detailPromotionCompleted ||
+      runtimeState.detailPromotionInFlight ||
       deferredPromotionHandle !== null
     ) {
       return;
@@ -415,7 +415,7 @@ export function createDeferredDetailPromotionOwner({
 
     const runPromotion = async () => {
       deferredPromotionHandle = null;
-      if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+      if (!runtimeState.detailDeferred || runtimeState.detailPromotionCompleted || runtimeState.detailPromotionInFlight) {
         return;
       }
       if (!canRunPostReadyIdleWork?.()) {
@@ -430,12 +430,12 @@ export function createDeferredDetailPromotionOwner({
         renderDispatcher,
         requireIdle: true,
       });
-      if (!promoted && (state.isInteracting || state.renderPhase !== "idle")) {
+      if (!promoted && (runtimeState.isInteracting || runtimeState.renderPhase !== "idle")) {
         scheduleDeferredDetailPromotion(renderDispatcher);
       }
     };
 
-    const delayMs = getDeferredPromotionDelay(state.renderProfile);
+    const delayMs = getDeferredPromotionDelay(runtimeState.renderProfile);
     if (typeof globalThis.requestIdleCallback === "function") {
       deferredPromotionHandle = globalThis.requestIdleCallback(() => {
         void runPromotion();

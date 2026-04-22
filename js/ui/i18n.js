@@ -1,6 +1,7 @@
 // Translation helpers (Phase 13)
-import { state } from "../core/state.js";
-import { callRuntimeHook, callRuntimeHooks } from "../core/runtime_hooks.js";
+import { state as runtimeState } from "../core/state.js";
+import { callRuntimeHook, callRuntimeHooks } from "../core/state/index.js";
+const state = runtimeState;
 
 const INLINE_UI_TRANSLATIONS = Object.freeze({
   Guide: { zh: "\u6307\u5357", en: "Guide" },
@@ -415,7 +416,7 @@ function recordStartupSupportKeyUsage({
 
 function resolveGeoLocaleEntry(key) {
   const candidate = String(key || "").trim();
-  const geoLocales = state.locales?.geo || {};
+  const geoLocales = runtimeState.locales?.geo || {};
   if (geoLocales[candidate]) {
     recordStartupSupportKeyUsage({
       queryKey: candidate,
@@ -424,7 +425,7 @@ function resolveGeoLocaleEntry(key) {
     return geoLocales[candidate];
   }
 
-  const stableKey = state.geoAliasToStableKey?.[candidate];
+  const stableKey = runtimeState.geoAliasToStableKey?.[candidate];
   if (stableKey && geoLocales[stableKey]) {
     recordStartupSupportKeyUsage({
       queryKey: candidate,
@@ -451,8 +452,8 @@ function resolveGeoLocaleText(
   if (!candidate) return "";
   const entry = resolveGeoLocaleEntry(candidate);
   if (!entry || typeof entry !== "object") return "";
-  const preferred = state.currentLanguage === "zh" ? entry.zh : entry.en;
-  const secondary = state.currentLanguage === "zh" ? entry.en : entry.zh;
+  const preferred = runtimeState.currentLanguage === "zh" ? entry.zh : entry.en;
+  const secondary = runtimeState.currentLanguage === "zh" ? entry.en : entry.zh;
   return String(
     preferred
       || (allowCrossLanguageFallback ? secondary : "")
@@ -481,7 +482,7 @@ function getStrictGeoLabel(candidates = [], fallback = "") {
 function hasExplicitScenarioGeoLocaleEntry(key) {
   const candidate = String(key || "").trim();
   if (!candidate) return false;
-  const scenarioGeo = state.scenarioGeoLocalePatchData?.geo;
+  const scenarioGeo = runtimeState.scenarioGeoLocalePatchData?.geo;
   return !!(
     scenarioGeo
     && typeof scenarioGeo === "object"
@@ -582,8 +583,8 @@ function getGeoFeatureDisplayLabel(feature, fallback = "") {
 
 function t(key, type = "geo") {
   if (!key) return "";
-  const entry = type === "geo" ? resolveGeoLocaleEntry(key) : state.locales?.[type]?.[key];
-  const lang = state.currentLanguage === "zh" ? "zh" : "en";
+  const entry = type === "geo" ? resolveGeoLocaleEntry(key) : runtimeState.locales?.[type]?.[key];
+  const lang = runtimeState.currentLanguage === "zh" ? "zh" : "en";
   if (entry?.[lang] || entry?.en) {
     return entry?.[lang] || entry?.en || key;
   }
@@ -1177,8 +1178,8 @@ function updateUIText() {
 }
 
 async function toggleLanguage() {
-  const nextLang = state.currentLanguage === "zh" ? "en" : "zh";
-  state.currentLanguage = nextLang;
+  const nextLang = runtimeState.currentLanguage === "zh" ? "en" : "zh";
+  runtimeState.currentLanguage = nextLang;
   try {
     localStorage.setItem("map_lang", nextLang);
   } catch (error) {
@@ -1283,13 +1284,13 @@ function normalizeTooltipComparisonValue(value) {
 
 function getTooltipCountryContext(feature) {
   const featureId = getTooltipFeatureId(feature);
-  const scenarioBaselineCode = state.activeScenarioId
-    ? normalizeTooltipCountryCode(state.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
+  const scenarioBaselineCode = runtimeState.activeScenarioId
+    ? normalizeTooltipCountryCode(runtimeState.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
     : "";
   const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature);
   const rawCountryName =
-    getScenarioCountryDisplayName(state.scenarioCountriesByTag?.[countryCode]) ||
-    state.countryNames?.[countryCode] ||
+    getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[countryCode]) ||
+    runtimeState.countryNames?.[countryCode] ||
     countryCode;
   const countryDisplayName = t(rawCountryName, "geo") || rawCountryName || countryCode;
   return {
@@ -1324,7 +1325,7 @@ function buildLegacyTooltipModel(feature, { isWaterRegion = false, isSpecialRegi
   const name = getTooltipRegionName(feature, fallback);
   const code = getTooltipFeatureCountryCode(feature);
   const labelKey = isWaterRegion ? "Water Region" : "Region";
-  const label = state.currentLanguage === "zh" ? t(labelKey, "ui") : labelKey;
+  const label = runtimeState.currentLanguage === "zh" ? t(labelKey, "ui") : labelKey;
   const waterType = isWaterRegion ? String(feature?.properties?.water_type || "").trim() : "";
   const specialType = isSpecialRegion ? String(feature?.properties?.special_type || "").trim() : "";
   const lines = [];
@@ -1407,8 +1408,8 @@ function consumeStartupSupportKeyUsageAuditReport() {
   }
   return {
     enabled: true,
-    language: String(state.currentLanguage || "en").trim() || "en",
-    baseLocalizationLevel: String(state.baseLocalizationLevel || "").trim(),
+    language: String(runtimeState.currentLanguage || "en").trim() || "en",
+    baseLocalizationLevel: String(runtimeState.baseLocalizationLevel || "").trim(),
     queryKeys: Array.from(auditState.queryKeys).sort(),
     directLocaleKeys: Array.from(auditState.directLocaleKeys).sort(),
     aliasKeys: Array.from(auditState.aliasKeys).sort(),
@@ -1424,8 +1425,8 @@ function getStartupSupportKeyUsageAuditReport() {
   }
   return {
     enabled: true,
-    language: String(state.currentLanguage || "en").trim() || "en",
-    baseLocalizationLevel: String(state.baseLocalizationLevel || "").trim(),
+    language: String(runtimeState.currentLanguage || "en").trim() || "en",
+    baseLocalizationLevel: String(runtimeState.baseLocalizationLevel || "").trim(),
     queryKeys: Array.from(auditState.queryKeys).sort(),
     directLocaleKeys: Array.from(auditState.directLocaleKeys).sort(),
     aliasKeys: Array.from(auditState.aliasKeys).sort(),
@@ -1455,3 +1456,5 @@ export {
   renderTooltipText,
   getTooltipText,
 };
+
+

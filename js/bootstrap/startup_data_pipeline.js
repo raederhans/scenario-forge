@@ -33,6 +33,11 @@ import {
   decodeStartupPrimaryCollectionsIntoState,
   hydrateStartupBaseContentState,
 } from "../core/state/content_state.js";
+import {
+  STATE_BUS_EVENTS,
+  emitStateBusEvent,
+  registerRuntimeHook,
+} from "../core/state/index.js";
 
 const CONTEXT_LAYER_LOAD_ORDER = [
   "rivers",
@@ -126,9 +131,7 @@ export function createStartupDataPipelineOwner({
         }
         state.baseCityDataState = "loaded";
         state.baseCityDataPromise = null;
-        if (typeof state.updateDevWorkspaceUIFn === "function") {
-          state.updateDevWorkspaceUIFn();
-        }
+        emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (renderNow) {
           requestMainRender?.(`base-city-loaded:${reason}`, { flush: true });
         }
@@ -211,9 +214,7 @@ export function createStartupDataPipelineOwner({
           reason,
           resourceMetrics: result.resourceMetrics || {},
         });
-        if (typeof state.updateDevWorkspaceUIFn === "function") {
-          state.updateDevWorkspaceUIFn();
-        }
+        emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (renderNow) {
           requestMainRender?.(`localization-full-ready:${reason}`, { flush: true });
         }
@@ -400,16 +401,13 @@ export function createStartupDataPipelineOwner({
           state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
           state.contextLayerLoadStateByName[layerName] = "loaded";
           if (
-            typeof state.updateTransportAppearanceUIFn === "function"
-            && (
-              layerName === "airports"
-              || layerName === "ports"
-              || layerName === "roads"
-              || layerName === "railways"
-              || layerName === "rail_stations_major"
-            )
+            layerName === "airports"
+            || layerName === "ports"
+            || layerName === "roads"
+            || layerName === "railways"
+            || layerName === "rail_stations_major"
           ) {
-            state.updateTransportAppearanceUIFn();
+            emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TRANSPORT_APPEARANCE_UI);
           }
           finishBootMetric?.(`layer:${layerName}:load`, {
             featureCount: collection.features.length,
@@ -685,9 +683,9 @@ export function createStartupDataPipelineOwner({
     applyActivePaletteState({ overwriteCountryPalette: true });
     processHierarchyData(hierarchy);
     hydrateViewSettings();
-    state.persistViewSettingsFn = persistViewSettingsFn;
-    state.ensureBaseCityDataFn = ensureBaseCityDataReadyFn;
-    state.ensureContextLayerDataFn = ensureContextLayerDataReadyFn;
+    registerRuntimeHook(state, "persistViewSettingsFn", persistViewSettingsFn);
+    registerRuntimeHook(state, "ensureBaseCityDataFn", ensureBaseCityDataReadyFn);
+    registerRuntimeHook(state, "ensureContextLayerDataFn", ensureContextLayerDataReadyFn);
   }
 
   function decodeStartupPrimaryCollections({

@@ -1,4 +1,4 @@
-import { state } from "../../core/state.js";
+import { state as runtimeState } from "../../core/state.js";
 import { rebuildStaticMeshes } from "../../core/map_renderer/public.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
@@ -8,6 +8,7 @@ import {
 } from "../../core/scenario_districts.js";
 import { t } from "../i18n.js";
 import { showToast } from "../toast.js";
+const state = runtimeState;
 
 function ui(key) {
   return t(key, "ui");
@@ -55,8 +56,8 @@ export function createDistrictEditorController({
   const districtSaveBtn = panel.querySelector("#devScenarioDistrictSaveBtn");
 
   const updateDistrictEditorState = (nextPartial = {}) => {
-    const current = state.devScenarioDistrictEditor || {};
-    state.devScenarioDistrictEditor = {
+    const current = runtimeState.devScenarioDistrictEditor || {};
+    runtimeState.devScenarioDistrictEditor = {
       tagMode: "auto",
       manualTag: "",
       inferredTag: "",
@@ -99,7 +100,7 @@ export function createDistrictEditorController({
     const nextDraftTag = cloneDistrictTagRecord(normalizedTag, draftTag);
     const districtIds = Object.keys(nextDraftTag.districts || {});
     const requestedDistrictId = normalizeScenarioDistrictId(
-      nextOverrides.selectedDistrictId ?? state.devScenarioDistrictEditor?.selectedDistrictId
+      nextOverrides.selectedDistrictId ?? runtimeState.devScenarioDistrictEditor?.selectedDistrictId
     );
     const selectedDistrictId = districtIds.includes(requestedDistrictId)
       ? requestedDistrictId
@@ -107,13 +108,13 @@ export function createDistrictEditorController({
     const selectedDistrict = selectedDistrictId ? nextDraftTag.districts?.[selectedDistrictId] || null : null;
     updateDistrictEditorState({
       tag: normalizedTag,
-      loadedScenarioId: String(state.activeScenarioId || ""),
+      loadedScenarioId: String(runtimeState.activeScenarioId || ""),
       loadedTag: normalizedTag,
       draftTag: nextDraftTag,
       selectedDistrictId,
       nameEn: normalizeScenarioNameInput(nextOverrides.nameEn ?? selectedDistrict?.name_en ?? ""),
       nameZh: normalizeScenarioNameInput(nextOverrides.nameZh ?? selectedDistrict?.name_zh ?? ""),
-      templateTag: normalizeScenarioDistrictTag(nextOverrides.templateTag ?? state.devScenarioDistrictEditor?.templateTag ?? normalizedTag),
+      templateTag: normalizeScenarioDistrictTag(nextOverrides.templateTag ?? runtimeState.devScenarioDistrictEditor?.templateTag ?? normalizedTag),
       ...nextOverrides,
     });
   };
@@ -122,38 +123,38 @@ export function createDistrictEditorController({
     const normalizedTag = normalizeScenarioDistrictTag(tag);
     const nextPayload = normalizeScenarioDistrictGroupsPayload(
       {
-        ...(state.scenarioDistrictGroupsData || {}),
-        scenario_id: String(state.activeScenarioId || ""),
+        ...(runtimeState.scenarioDistrictGroupsData || {}),
+        scenario_id: String(runtimeState.activeScenarioId || ""),
         tags: {
-          ...((state.scenarioDistrictGroupsData && state.scenarioDistrictGroupsData.tags) || {}),
+          ...((runtimeState.scenarioDistrictGroupsData && runtimeState.scenarioDistrictGroupsData.tags) || {}),
           [normalizedTag]: tagPayload,
         },
       },
-      state.activeScenarioId
+      runtimeState.activeScenarioId
     );
-    state.scenarioDistrictGroupsData = nextPayload;
-    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);
+    runtimeState.scenarioDistrictGroupsData = nextPayload;
+    runtimeState.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);
   };
 
   const resolveSelectionScenarioTags = (targetIds = []) => {
     return Array.from(new Set(
       (Array.isArray(targetIds) ? targetIds : [])
-        .map((featureId) => normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]))
+        .map((featureId) => normalizeScenarioDistrictTag(runtimeState.sovereigntyByFeatureId?.[featureId]))
         .filter(Boolean)
     )).sort((left, right) => left.localeCompare(right));
   };
 
   const ensureDistrictDraftForTag = (tag = "") => {
     const normalizedTag = normalizeScenarioDistrictTag(tag);
-    const priorState = state.devScenarioDistrictEditor || {};
-    if (!normalizedTag || !state.activeScenarioId) {
+    const priorState = runtimeState.devScenarioDistrictEditor || {};
+    if (!normalizedTag || !runtimeState.activeScenarioId) {
       return {
         ...priorState,
         draftTag: null,
       };
     }
     const needsReload =
-      String(priorState.loadedScenarioId || "") !== String(state.activeScenarioId || "")
+      String(priorState.loadedScenarioId || "") !== String(runtimeState.activeScenarioId || "")
       || normalizeScenarioDistrictTag(priorState.loadedTag) !== normalizedTag
       || !priorState.draftTag;
     if (!needsReload) {
@@ -161,7 +162,7 @@ export function createDistrictEditorController({
     }
     const savedTag = cloneDistrictTagRecord(
       normalizedTag,
-      getScenarioDistrictTagRecord(state.scenarioDistrictGroupsData, normalizedTag)
+      getScenarioDistrictTagRecord(runtimeState.scenarioDistrictGroupsData, normalizedTag)
     );
     const districtIds = Object.keys(savedTag.districts);
     const normalizedSelectedDistrictId = normalizeScenarioDistrictId(priorState.selectedDistrictId);
@@ -172,7 +173,7 @@ export function createDistrictEditorController({
     const nextState = {
       ...priorState,
       tag: normalizedTag,
-      loadedScenarioId: String(state.activeScenarioId || ""),
+      loadedScenarioId: String(runtimeState.activeScenarioId || ""),
       loadedTag: normalizedTag,
       draftTag: savedTag,
       selectedDistrictId: nextSelectedDistrictId,
@@ -180,7 +181,7 @@ export function createDistrictEditorController({
       nameZh: normalizeScenarioNameInput(selectedDistrict?.name_zh || ""),
       templateTag: normalizeScenarioDistrictTag(priorState.templateTag) || normalizedTag,
     };
-    state.devScenarioDistrictEditor = nextState;
+    runtimeState.devScenarioDistrictEditor = nextState;
     return nextState;
   };
 
@@ -196,7 +197,7 @@ export function createDistrictEditorController({
       nameZh: "",
       draftTag: null,
       loadedTag: "",
-      loadedScenarioId: String(state.activeScenarioId || ""),
+      loadedScenarioId: String(runtimeState.activeScenarioId || ""),
       ...(clearStatus
         ? {
           lastSaveMessage: "",
@@ -210,12 +211,12 @@ export function createDistrictEditorController({
     const targetIds = resolveOwnershipTargetIds();
     const selectionTags = resolveSelectionScenarioTags(targetIds);
     const inferredTag = selectionTags.length === 1 ? selectionTags[0] : "";
-    const editorBaseState = state.devScenarioDistrictEditor || {};
+    const editorBaseState = runtimeState.devScenarioDistrictEditor || {};
     const manualTag = normalizeScenarioDistrictTag(editorBaseState.manualTag);
     const isManualMode = editorBaseState.tagMode === "manual" && !!manualTag;
     const tagMode = isManualMode ? "manual" : "auto";
     const tag = tagMode === "manual" ? manualTag : inferredTag;
-    const normalizedDistrictPayload = normalizeScenarioDistrictGroupsPayload(state.scenarioDistrictGroupsData, state.activeScenarioId);
+    const normalizedDistrictPayload = normalizeScenarioDistrictGroupsPayload(runtimeState.scenarioDistrictGroupsData, runtimeState.activeScenarioId);
     const legacyCountryCodes = Object.keys(normalizedDistrictPayload.legacy_countries || {});
     if (
       editorBaseState.inferredTag !== inferredTag
@@ -286,7 +287,7 @@ export function createDistrictEditorController({
   };
 
   const resolveDistrictEditorHint = (model) => {
-    if (!state.activeScenarioId) {
+    if (!runtimeState.activeScenarioId) {
       return ui("Activate a scenario to edit district groups.");
     }
     if (model.hasLegacyGeoCountryData) {
@@ -319,14 +320,14 @@ export function createDistrictEditorController({
       )).sort((left, right) => left.localeCompare(right)),
     }));
     return {
-      scenarioId: String(state.activeScenarioId || "").trim(),
+      scenarioId: String(runtimeState.activeScenarioId || "").trim(),
       tag: normalizeScenarioDistrictTag(model?.tag),
       districts,
     };
   };
 
   const selectDistrictDraft = (districtId = "") => {
-    const editorState = state.devScenarioDistrictEditor || {};
+    const editorState = runtimeState.devScenarioDistrictEditor || {};
     const draftTag = cloneDistrictTagRecord(editorState.tag, editorState.draftTag);
     const normalizedDistrictId = normalizeScenarioDistrictId(districtId);
     const selectedDistrict = normalizedDistrictId ? draftTag.districts?.[normalizedDistrictId] || null : null;
@@ -339,9 +340,9 @@ export function createDistrictEditorController({
   };
 
   const upsertDistrictDraft = (model) => {
-    const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
-    const nameEn = normalizeScenarioNameInput(state.devScenarioDistrictEditor?.nameEn);
-    const nameZh = normalizeScenarioNameInput(state.devScenarioDistrictEditor?.nameZh);
+    const districtId = normalizeScenarioDistrictId(runtimeState.devScenarioDistrictEditor?.selectedDistrictId);
+    const nameEn = normalizeScenarioNameInput(runtimeState.devScenarioDistrictEditor?.nameEn);
+    const nameZh = normalizeScenarioNameInput(runtimeState.devScenarioDistrictEditor?.nameZh);
     if (!model.tag || !districtId || !nameEn || !nameZh) {
       return {
         ok: false,
@@ -380,7 +381,7 @@ export function createDistrictEditorController({
   };
 
   const assignSelectionToDistrictDraft = (model) => {
-    const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
+    const districtId = normalizeScenarioDistrictId(runtimeState.devScenarioDistrictEditor?.selectedDistrictId);
     if (!model.tag || !districtId) {
       return {
         ok: false,
@@ -388,7 +389,7 @@ export function createDistrictEditorController({
       };
     }
     const selectionIds = model.targetIds.filter((featureId) => {
-      return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === model.tag;
+      return normalizeScenarioDistrictTag(runtimeState.sovereigntyByFeatureId?.[featureId]) === model.tag;
     });
     if (!selectionIds.length) {
       return {
@@ -424,7 +425,7 @@ export function createDistrictEditorController({
   };
 
   const removeSelectionFromDistrictDraft = (model) => {
-    const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
+    const districtId = normalizeScenarioDistrictId(runtimeState.devScenarioDistrictEditor?.selectedDistrictId);
     if (!model.tag || !districtId) {
       return {
         ok: false,
@@ -432,7 +433,7 @@ export function createDistrictEditorController({
       };
     }
     const selectionIds = model.targetIds.filter((featureId) => {
-      return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === model.tag;
+      return normalizeScenarioDistrictTag(runtimeState.sovereigntyByFeatureId?.[featureId]) === model.tag;
     });
     if (!selectionIds.length) {
       return {
@@ -466,7 +467,7 @@ export function createDistrictEditorController({
   };
 
   const deleteDistrictDraft = (model) => {
-    const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
+    const districtId = normalizeScenarioDistrictId(runtimeState.devScenarioDistrictEditor?.selectedDistrictId);
     if (!model.tag || !districtId) {
       return {
         ok: false,
@@ -502,7 +503,7 @@ export function createDistrictEditorController({
 
   const buildDistrictTemplatePayload = (model, templateTag = "") => {
     return {
-      scenarioId: String(state.activeScenarioId || "").trim(),
+      scenarioId: String(runtimeState.activeScenarioId || "").trim(),
       tag: normalizeScenarioDistrictTag(model?.tag),
       templateTag: normalizeScenarioDistrictTag(templateTag),
       districts: Object.values(model?.draftTag?.districts || {}).map((district) => ({
@@ -520,11 +521,11 @@ export function createDistrictEditorController({
 
   const render = ({ hasActiveScenario }) => {
     const districtModel = resolveDistrictEditorModel();
-    const districtState = state.devScenarioDistrictEditor || {};
+    const districtState = runtimeState.devScenarioDistrictEditor || {};
 
     if (scenarioDistrictTitle) {
       scenarioDistrictTitle.textContent = hasActiveScenario
-        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
         : ui("No active scenario");
     }
     if (scenarioDistrictHint) {
@@ -611,7 +612,7 @@ export function createDistrictEditorController({
     }
 
     const matchingSelectionIds = districtModel.targetIds.filter((featureId) => {
-      return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === districtModel.tag;
+      return normalizeScenarioDistrictTag(runtimeState.sovereigntyByFeatureId?.[featureId]) === districtModel.tag;
     });
     const districtIdValue = normalizeScenarioDistrictId(scenarioDistrictIdInput?.value || districtState.selectedDistrictId);
     const canUpsertDistrict = hasActiveScenario
@@ -735,7 +736,7 @@ export function createDistrictEditorController({
         renderWorkspace();
         return;
       }
-      if (!state.activeScenarioId || !model.tag) {
+      if (!runtimeState.activeScenarioId || !model.tag) {
         showToast(ui("Choose a scenario tag before editing districts."), {
           title: ui("Scenario District Editor"),
           tone: "warning",
@@ -752,7 +753,7 @@ export function createDistrictEditorController({
         renderWorkspace();
         return;
       }
-      showToast(state.devScenarioDistrictEditor?.lastSaveMessage || ui("District draft updated."), {
+      showToast(runtimeState.devScenarioDistrictEditor?.lastSaveMessage || ui("District draft updated."), {
         title: ui("Scenario District Editor"),
         tone: "success",
       });
@@ -782,7 +783,7 @@ export function createDistrictEditorController({
       const result = removeSelectionFromDistrictDraft(model);
       if (!result.ok) {
         showToast(
-          state.devScenarioDistrictEditor?.lastSaveMessage || result.message || ui("Unable to remove the current selection."),
+          runtimeState.devScenarioDistrictEditor?.lastSaveMessage || result.message || ui("Unable to remove the current selection."),
           {
             title: ui("Scenario District Editor"),
             tone: result.count === 0 ? "info" : "warning",
@@ -793,7 +794,7 @@ export function createDistrictEditorController({
       }
       showToast(result.changed === false
         ? (
-          state.devScenarioDistrictEditor?.lastSaveMessage
+          runtimeState.devScenarioDistrictEditor?.lastSaveMessage
           || ui("Selected features were not assigned to the current district draft.")
         )
         : ui("Removed selection from district."), {
@@ -831,7 +832,7 @@ export function createDistrictEditorController({
         renderWorkspace();
         return;
       }
-      if (!state.activeScenarioId || !model.tag) {
+      if (!runtimeState.activeScenarioId || !model.tag) {
         showToast(ui("Choose a scenario tag before saving districts."), {
           title: ui("Scenario District Editor"),
           tone: "warning",
@@ -877,9 +878,9 @@ export function createDistrictEditorController({
             lastSaveTone: "success",
           });
         }
-        state.activeScenarioManifest = {
-          ...(state.activeScenarioManifest || {}),
-          district_groups_url: String(result.districtGroupsUrl || state.activeScenarioManifest?.district_groups_url || ""),
+        runtimeState.activeScenarioManifest = {
+          ...(runtimeState.activeScenarioManifest || {}),
+          district_groups_url: String(result.districtGroupsUrl || runtimeState.activeScenarioManifest?.district_groups_url || ""),
         };
         rebuildStaticMeshes();
         flushDevWorkspaceRender("dev-workspace-district-save");
@@ -904,7 +905,7 @@ export function createDistrictEditorController({
 
     bindButtonAction(scenarioDistrictPromoteBtn, async () => {
       const model = resolveDistrictEditorModel();
-      const templateTag = normalizeScenarioDistrictTag(state.devScenarioDistrictEditor?.templateTag) || model.tag;
+      const templateTag = normalizeScenarioDistrictTag(runtimeState.devScenarioDistrictEditor?.templateTag) || model.tag;
       if (model.hasLegacyGeoCountryData) {
         showToast(ui("Legacy geo-country districts detected. Migrate them before promoting shared templates."), {
           title: ui("Scenario District Editor"),
@@ -913,7 +914,7 @@ export function createDistrictEditorController({
         renderWorkspace();
         return;
       }
-      if (!state.activeScenarioId || !model.tag || !templateTag) {
+      if (!runtimeState.activeScenarioId || !model.tag || !templateTag) {
         showToast(ui("Choose a scenario tag and template tag before promoting a shared template."), {
           title: ui("Scenario District Editor"),
           tone: "warning",
@@ -968,7 +969,7 @@ export function createDistrictEditorController({
 
     bindButtonAction(scenarioDistrictApplyTemplateBtn, async () => {
       const model = resolveDistrictEditorModel();
-      const templateTag = normalizeScenarioDistrictTag(state.devScenarioDistrictEditor?.templateTag) || model.tag;
+      const templateTag = normalizeScenarioDistrictTag(runtimeState.devScenarioDistrictEditor?.templateTag) || model.tag;
       if (model.hasLegacyGeoCountryData) {
         showToast(ui("Legacy geo-country districts detected. Migrate them before applying shared templates."), {
           title: ui("Scenario District Editor"),
@@ -977,7 +978,7 @@ export function createDistrictEditorController({
         renderWorkspace();
         return;
       }
-      if (!state.activeScenarioId || !model.tag || !templateTag) {
+      if (!runtimeState.activeScenarioId || !model.tag || !templateTag) {
         showToast(ui("Choose a scenario tag and template tag before applying a shared template."), {
           title: ui("Scenario District Editor"),
           tone: "warning",
@@ -998,7 +999,7 @@ export function createDistrictEditorController({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            scenarioId: String(state.activeScenarioId || "").trim(),
+            scenarioId: String(runtimeState.activeScenarioId || "").trim(),
             tag: model.tag,
             templateTag,
           }),
@@ -1131,4 +1132,5 @@ export function createDistrictEditorController({
     bindEvents,
   };
 }
+
 

@@ -1,13 +1,20 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { DEFAULT_OPEN_PATH, getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
+const {
+  applyScenarioAndWaitIdle,
+  DEFAULT_OPEN_PATH,
+  gotoApp,
+  waitForAppInteractive,
+  waitForScenarioSelectReady,
+} = require("./support/playwright-app");
 const { DEFAULT_APP_PATH, DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("./support/startup-paths");
 
 test.setTimeout(120_000);
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const FAST_STARTUP_PATH = toRootPath(DEFAULT_FAST_APP_OPEN_PATH);
+const HOI4_SYNC_PREWARM_PATH = `${FAST_STARTUP_PATH}&default_scenario=hoi4_1939`;
 
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
@@ -20,22 +27,18 @@ const IGNORED_CONSOLE_PATTERNS = [
 ];
 
 async function ensureScenario(page, scenarioId, label) {
-  await page.waitForFunction((expectedScenarioId) => {
-    const select = document.querySelector("#scenarioSelect");
-    return !!select && !!select.querySelector(`option[value="${expectedScenarioId}"]`);
-  }, scenarioId, { timeout: 120_000 });
+  await waitForScenarioSelectReady(page, { scenarioId, timeout: 120_000 });
   const currentScenarioId = await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
     return String(state.activeScenarioId || "");
   });
   if (currentScenarioId !== scenarioId) {
-    await page.selectOption("#scenarioSelect", scenarioId);
-    const applyButton = page.locator("#applyScenarioBtn");
-    if (await applyButton.isVisible().catch(() => false)) {
-      if (await applyButton.isEnabled().catch(() => false)) {
-        await applyButton.click();
-      }
-    }
+    await applyScenarioAndWaitIdle(page, scenarioId, {
+      timeout: 120_000,
+      renderMode: "none",
+      markDirtyReason: "",
+      showToastOnComplete: false,
+    });
   }
   await expect(page.locator("#scenarioStatus")).toContainText(label, { timeout: 20_000 });
   await page.waitForTimeout(1_000);
@@ -154,7 +157,7 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
     });
   });
 
-  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+  await gotoApp(page, FAST_STARTUP_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await ensureScenario(page, "tno_1962", "TNO 1962");
   await waitForStableExactRender(page);
@@ -231,10 +234,9 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
   expect(networkFailures).toEqual([]);
 });
 
-test("sync prewarm threshold completes first-frame chunk prewarm before promotion stage", async ({ page }) => {
-  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+test("sync prewarm threshold completes first-frame chunk prewarm before refresh handoff", async ({ page }) => {
+  await gotoApp(page, HOI4_SYNC_PREWARM_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
-  await ensureScenario(page, "hoi4_1939", "HOI4 1939");
 
   await page.waitForFunction(async () => {
     const { state } = await import("/js/core/state.js");
@@ -245,7 +247,8 @@ test("sync prewarm threshold completes first-frame chunk prewarm before promotio
       && Number(prewarmMetric.prewarmCompletedAt || 0) > 0
       && Number(prewarmMetric.refreshScheduledAt || 0) >= Number(prewarmMetric.prewarmCompletedAt || 0)
       && !!visualPromotionMetric
-      && Number(visualPromotionMetric.recordedAt || 0) >= Number(prewarmMetric.prewarmCompletedAt || 0);
+      && String(visualPromotionMetric.activeScenarioId || "") === "hoi4_1939"
+      && Number(visualPromotionMetric.promotionVersion || 0) >= 1;
   }, { timeout: 30_000 });
 
   const stageOrder = await page.evaluate(async () => {
@@ -266,12 +269,12 @@ test("sync prewarm threshold completes first-frame chunk prewarm before promotio
   expect(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0)).toBeGreaterThan(0);
   expect(Number(stageOrder.prewarmMetric.refreshScheduledAt || 0))
     .toBeGreaterThanOrEqual(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0));
-  expect(Number(stageOrder.visualPromotionMetric?.recordedAt || 0))
-    .toBeGreaterThanOrEqual(Number(stageOrder.prewarmMetric.prewarmCompletedAt || 0));
+  expect(String(stageOrder.visualPromotionMetric?.activeScenarioId || "")).toBe("hoi4_1939");
+  expect(Number(stageOrder.visualPromotionMetric?.promotionVersion || 0)).toBeGreaterThanOrEqual(1);
 });
 
 test("tno drag interaction settles cleanly without black-frame regression", async ({ page }) => {
-  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+  await gotoApp(page, FAST_STARTUP_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await ensureScenario(page, "tno_1962", "TNO 1962");
   await waitForStableExactRender(page);
@@ -314,7 +317,7 @@ test("tno drag interaction settles cleanly without black-frame regression", asyn
 });
 
 test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", async ({ page }) => {
-  await page.goto(getAppUrl(FAST_STARTUP_PATH), { waitUntil: "domcontentloaded" });
+  await gotoApp(page, FAST_STARTUP_PATH, { waitUntil: "domcontentloaded" });
 
   const contract = await page.evaluate(async () => {
     const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
@@ -339,6 +342,7 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
 test("perf contracts keep coarse first frame and benchmark app-path fallback boundaries", async () => {
   const rendererSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "map_renderer.js"), "utf8");
   const scenarioManagerSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "scenario_manager.js"), "utf8");
+  const scenarioApplyPipelineSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "scenario_apply_pipeline.js"), "utf8");
   const benchmarkSource = fs.readFileSync(path.join(REPO_ROOT, "ops", "browser-mcp", "editor-performance-benchmark.py"), "utf8");
   const playwrightAppSource = fs.readFileSync(path.join(REPO_ROOT, "tests", "e2e", "support", "playwright-app.js"), "utf8");
 
@@ -351,11 +355,14 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
       /function getScenarioPoliticalBackgroundFullPassGroups\([\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheReplay"[\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheBuild"/.test(rendererSource),
   };
 
-  const scenarioChecks = {
+  const scenarioApplyPipelineChecks = {
     chunkedRuntimeSkipsBlockingDetailPromotion:
-      /const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime\(bundle\)[\s\S]*?const detailPromoted = \(startupReadonly \|\| supportsChunkedPoliticalRuntime\)\s*\?\s*false\s*:\s*await ensureScenarioDetailTopologyLoaded\(\{ applyMapData: false \}\);/.test(scenarioManagerSource),
+      /const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime\(bundle\)[\s\S]*?const detailPromoted = \(startupReadonly \|\| supportsChunkedPoliticalRuntime\)\s*\?\s*false\s*:\s*await ensureScenarioDetailTopologyLoaded\(\{ applyMapData: false \}\);/.test(scenarioApplyPipelineSource),
     unconfirmedDetailPromotionStillWarnsBeforeHealthGate:
-      /if \(!detailReady && state\.topologyBundleMode !== "composite"\) \{[\s\S]*?console\.warn\("\[scenario\] Applying bundle without confirmed detail promotion; health gate will validate runtime topology\."\);/.test(scenarioManagerSource),
+      /if \(!detailReady && state\.topologyBundleMode !== "composite"\) \{[\s\S]*?console\.warn\("\[scenario\] Applying bundle without confirmed detail promotion; health gate will validate runtime topology\."\);/.test(scenarioApplyPipelineSource),
+  };
+
+  const scenarioManagerChecks = {
     coarseInteractiveMetricRecordedAfterPostApplyEffects:
       /const \{ dataHealth, scenarioMapRefreshMode, hasChunkedRuntime \} = await runPostScenarioApplyEffects\([\s\S]*?recordScenarioPerfMetric\(\s*"timeToInteractiveCoarseFrame",[\s\S]*?hasChunkedRuntime,[\s\S]*?mapRefreshMode: scenarioMapRefreshMode,/.test(scenarioManagerSource),
   };
@@ -388,7 +395,8 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
 
   const checks = {
     ...rendererChecks,
-    ...scenarioChecks,
+    ...scenarioApplyPipelineChecks,
+    ...scenarioManagerChecks,
     ...benchmarkChecks,
     ...playwrightAppChecks,
   };

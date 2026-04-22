@@ -18,12 +18,12 @@ import { captureHistoryState, pushHistoryEntry } from "../../core/history_manage
  * parent border country list 这些闭环逻辑。
  *
  * toolbar.js 继续保留更高层 facade：
- * - state callback 注册
+ * - runtimeState callback 注册
  * - special zone popover 壳层
  * - export / dock / workspace 编排
  */
 export function createAppearanceControlsController({
-  state,
+  runtimeState,
   t,
   clamp,
   markDirty,
@@ -374,13 +374,13 @@ export function createAppearanceControlsController({
   let textureHistoryBefore = null;
 
   const syncTextureConfig = () => {
-    state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
-    return state.styleConfig.texture;
+    runtimeState.styleConfig.texture = normalizeTextureStyleConfig(runtimeState.styleConfig.texture);
+    return runtimeState.styleConfig.texture;
   };
 
   const syncDayNightConfig = () => {
-    state.styleConfig.dayNight = normalizeDayNightStyleConfig(state.styleConfig.dayNight);
-    return state.styleConfig.dayNight;
+    runtimeState.styleConfig.dayNight = normalizeDayNightStyleConfig(runtimeState.styleConfig.dayNight);
+    return runtimeState.styleConfig.dayNight;
   };
 
   const beginTextureHistoryCapture = () => {
@@ -413,7 +413,7 @@ export function createAppearanceControlsController({
     return `${hours}:${minutes} UTC`;
   };
 
-  const renderTextureModePanels = (mode = state.styleConfig.texture?.mode || "none") => {
+  const renderTextureModePanels = (mode = runtimeState.styleConfig.texture?.mode || "none") => {
     texturePaperControls?.classList.toggle("hidden", mode !== "paper");
     textureGraticuleControls?.classList.toggle("hidden", mode !== "graticule");
     textureDraftGridControls?.classList.toggle("hidden", mode !== "draft_grid");
@@ -600,12 +600,12 @@ export function createAppearanceControlsController({
   };
 
   const persistCityViewSettings = () => {
-    state.persistViewSettingsFn?.();
+    runtimeState.persistViewSettingsFn?.();
   };
 
   const syncCityPointsConfig = () => {
-    state.styleConfig.cityPoints = normalizeCityLayerStyleConfig(state.styleConfig.cityPoints);
-    return state.styleConfig.cityPoints;
+    runtimeState.styleConfig.cityPoints = normalizeCityLayerStyleConfig(runtimeState.styleConfig.cityPoints);
+    return runtimeState.styleConfig.cityPoints;
   };
 
   const CITY_POINTS_THEME_OPTIONS = [
@@ -664,12 +664,12 @@ export function createAppearanceControlsController({
 
   const getCityPointsThemeHint = (themeValue) => {
     const themeStyle = getCityPointsThemeStyle(themeValue);
-    return state.currentLanguage === "zh" ? themeStyle.hintZh.trim() : themeStyle.hintEn;
+    return runtimeState.currentLanguage === "zh" ? themeStyle.hintZh.trim() : themeStyle.hintEn;
   };
 
   const getCityPointsLabelDensityHint = (densityValue) => {
     const normalized = String(densityValue || "balanced").trim().toLowerCase();
-    if (state.currentLanguage === "zh") {
+    if (runtimeState.currentLanguage === "zh") {
       if (normalized === "sparse") return "Sparse · 标签预算 P4 16 / P5 32，只保留更关键的名称。";
       if (normalized === "dense") return "Dense · 标签预算 P4 32 / P5 64，会显示更多次级城市名称。";
       return "Balanced · 标签预算 P4 24 / P5 48，是默认的均衡读图方案。";
@@ -709,17 +709,17 @@ export function createAppearanceControlsController({
   const formatCityPointsDensityValue = (value) => `${Number(value || 1).toFixed(2)}x`;
 
   const syncUrbanConfig = () => {
-    state.styleConfig.urban = normalizeUrbanStyleConfig(state.styleConfig.urban);
-    if (state.styleConfig.urban.mode === "manual") {
-      state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
+    runtimeState.styleConfig.urban = normalizeUrbanStyleConfig(runtimeState.styleConfig.urban);
+    if (runtimeState.styleConfig.urban.mode === "manual") {
+      runtimeState.styleConfig.urban.color = normalizeOceanFillColor(runtimeState.styleConfig.urban.color || "#4b5563");
     }
-    state.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(state.styleConfig.urban.adaptiveTintColor || "#f2dea1");
-    return state.styleConfig.urban;
+    runtimeState.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(runtimeState.styleConfig.urban.adaptiveTintColor || "#f2dea1");
+    return runtimeState.styleConfig.urban;
   };
 
   const getUrbanCapability = () => {
-    const capability = state.urbanLayerCapability && typeof state.urbanLayerCapability === "object"
-      ? state.urbanLayerCapability
+    const capability = runtimeState.urbanLayerCapability && typeof runtimeState.urbanLayerCapability === "object"
+      ? runtimeState.urbanLayerCapability
       : null;
     if (capability) return capability;
     return {
@@ -741,23 +741,23 @@ export function createAppearanceControlsController({
   };
 
   const syncPhysicalConfig = () => {
-    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
-    state.styleConfig.physical.contourColor = normalizeOceanFillColor(
-      state.styleConfig.physical.contourColor || "#6b5947",
+    runtimeState.styleConfig.physical = normalizePhysicalStyleConfig(runtimeState.styleConfig.physical);
+    runtimeState.styleConfig.physical.contourColor = normalizeOceanFillColor(
+      runtimeState.styleConfig.physical.contourColor || "#6b5947",
     );
-    return state.styleConfig.physical;
+    return runtimeState.styleConfig.physical;
   };
 
   const applyPhysicalPresetConfig = (preset, { preserveMode = true } = {}) => {
     const current = syncPhysicalConfig();
     const resolvedPreset = normalizePhysicalPreset(preset);
     const next = createPhysicalStyleConfigForPreset(resolvedPreset);
-    state.styleConfig.physical = normalizePhysicalStyleConfig({
+    runtimeState.styleConfig.physical = normalizePhysicalStyleConfig({
       ...next,
       mode: preserveMode ? current.mode : next.mode,
       contourColor: current.contourColor || next.contourColor,
     });
-    return state.styleConfig.physical;
+    return runtimeState.styleConfig.physical;
   };
 
   const getPhysicalPresetHint = (preset) => {
@@ -815,10 +815,10 @@ export function createAppearanceControlsController({
   };
 
   const renderAppearanceStyleControlsUi = () => {
-    if (toggleCityPoints) toggleCityPoints.checked = !!state.showCityPoints;
-    if (toggleUrban) toggleUrban.checked = !!state.showUrban;
-    if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
-    if (toggleRivers) toggleRivers.checked = !!state.showRivers;
+    if (toggleCityPoints) toggleCityPoints.checked = !!runtimeState.showCityPoints;
+    if (toggleUrban) toggleUrban.checked = !!runtimeState.showUrban;
+    if (togglePhysical) togglePhysical.checked = !!runtimeState.showPhysical;
+    if (toggleRivers) toggleRivers.checked = !!runtimeState.showRivers;
 
     const cityPointsConfig = syncCityPointsConfig();
     ensureCityPointsThemeOptions();
@@ -829,7 +829,7 @@ export function createAppearanceControlsController({
     if (cityPointsMarkerDensity) cityPointsMarkerDensity.value = Number(cityPointsConfig.markerDensity || 1).toFixed(2);
     if (cityPointsMarkerDensityValue) cityPointsMarkerDensityValue.textContent = formatCityPointsDensityValue(cityPointsConfig.markerDensity || 1);
     if (cityPointsMarkerDensityHint) {
-      cityPointsMarkerDensityHint.textContent = state.currentLanguage === "zh"
+      cityPointsMarkerDensityHint.textContent = runtimeState.currentLanguage === "zh"
         ? "控制每个缩放阶段最多允许出现多少个城市点。"
         : "Controls how many city markers can surface at each zoom stage.";
     }
@@ -846,72 +846,72 @@ export function createAppearanceControlsController({
 
     syncUrbanControls();
 
-    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
-    const activePhysicalPreset = normalizePhysicalPreset(state.styleConfig.physical.preset || "balanced");
+    runtimeState.styleConfig.physical = normalizePhysicalStyleConfig(runtimeState.styleConfig.physical);
+    const activePhysicalPreset = normalizePhysicalPreset(runtimeState.styleConfig.physical.preset || "balanced");
     if (physicalPreset) physicalPreset.value = activePhysicalPreset;
     if (physicalPresetHint) physicalPresetHint.textContent = getPhysicalPresetHint(activePhysicalPreset);
-    if (physicalMode) physicalMode.value = state.styleConfig.physical.mode;
-    if (physicalOpacity) physicalOpacity.value = String(Math.round(state.styleConfig.physical.opacity * 100));
-    if (physicalOpacityValue) physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
-    if (physicalAtlasIntensity) physicalAtlasIntensity.value = String(Math.round(state.styleConfig.physical.atlasIntensity * 100));
-    if (physicalAtlasIntensityValue) physicalAtlasIntensityValue.textContent = `${Math.round(state.styleConfig.physical.atlasIntensity * 100)}%`;
-    if (physicalRainforestEmphasis) physicalRainforestEmphasis.value = String(Math.round(state.styleConfig.physical.rainforestEmphasis * 100));
-    if (physicalRainforestEmphasisValue) physicalRainforestEmphasisValue.textContent = `${Math.round(state.styleConfig.physical.rainforestEmphasis * 100)}%`;
-    if (physicalContourColor) physicalContourColor.value = state.styleConfig.physical.contourColor;
-    if (physicalContourOpacity) physicalContourOpacity.value = String(Math.round(state.styleConfig.physical.contourOpacity * 100));
-    if (physicalContourOpacityValue) physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
-    if (physicalMinorContours) physicalMinorContours.checked = !!state.styleConfig.physical.contourMinorVisible;
-    if (physicalContourMajorWidth) physicalContourMajorWidth.value = String(Number(state.styleConfig.physical.contourMajorWidth).toFixed(2));
-    if (physicalContourMajorWidthValue) physicalContourMajorWidthValue.textContent = Number(state.styleConfig.physical.contourMajorWidth).toFixed(2);
-    if (physicalContourMinorWidth) physicalContourMinorWidth.value = String(Number(state.styleConfig.physical.contourMinorWidth).toFixed(2));
-    if (physicalContourMinorWidthValue) physicalContourMinorWidthValue.textContent = Number(state.styleConfig.physical.contourMinorWidth).toFixed(2);
-    if (physicalContourMajorInterval) physicalContourMajorInterval.value = String(Math.round(state.styleConfig.physical.contourMajorIntervalM));
-    if (physicalContourMajorIntervalValue) physicalContourMajorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorIntervalM)}`;
-    if (physicalContourMinorInterval) physicalContourMinorInterval.value = String(Math.round(state.styleConfig.physical.contourMinorIntervalM));
-    if (physicalContourMinorIntervalValue) physicalContourMinorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorIntervalM)}`;
-    if (physicalContourMajorLowReliefCutoff) physicalContourMajorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM));
-    if (physicalContourMajorLowReliefCutoffValue) physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorLowReliefCutoffM)}`;
-    if (physicalContourMinorLowReliefCutoff) physicalContourMinorLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM));
-    if (physicalContourMinorLowReliefCutoffValue) physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorLowReliefCutoffM)}`;
-    if (physicalBlendMode) physicalBlendMode.value = state.styleConfig.physical.blendMode;
+    if (physicalMode) physicalMode.value = runtimeState.styleConfig.physical.mode;
+    if (physicalOpacity) physicalOpacity.value = String(Math.round(runtimeState.styleConfig.physical.opacity * 100));
+    if (physicalOpacityValue) physicalOpacityValue.textContent = `${Math.round(runtimeState.styleConfig.physical.opacity * 100)}%`;
+    if (physicalAtlasIntensity) physicalAtlasIntensity.value = String(Math.round(runtimeState.styleConfig.physical.atlasIntensity * 100));
+    if (physicalAtlasIntensityValue) physicalAtlasIntensityValue.textContent = `${Math.round(runtimeState.styleConfig.physical.atlasIntensity * 100)}%`;
+    if (physicalRainforestEmphasis) physicalRainforestEmphasis.value = String(Math.round(runtimeState.styleConfig.physical.rainforestEmphasis * 100));
+    if (physicalRainforestEmphasisValue) physicalRainforestEmphasisValue.textContent = `${Math.round(runtimeState.styleConfig.physical.rainforestEmphasis * 100)}%`;
+    if (physicalContourColor) physicalContourColor.value = runtimeState.styleConfig.physical.contourColor;
+    if (physicalContourOpacity) physicalContourOpacity.value = String(Math.round(runtimeState.styleConfig.physical.contourOpacity * 100));
+    if (physicalContourOpacityValue) physicalContourOpacityValue.textContent = `${Math.round(runtimeState.styleConfig.physical.contourOpacity * 100)}%`;
+    if (physicalMinorContours) physicalMinorContours.checked = !!runtimeState.styleConfig.physical.contourMinorVisible;
+    if (physicalContourMajorWidth) physicalContourMajorWidth.value = String(Number(runtimeState.styleConfig.physical.contourMajorWidth).toFixed(2));
+    if (physicalContourMajorWidthValue) physicalContourMajorWidthValue.textContent = Number(runtimeState.styleConfig.physical.contourMajorWidth).toFixed(2);
+    if (physicalContourMinorWidth) physicalContourMinorWidth.value = String(Number(runtimeState.styleConfig.physical.contourMinorWidth).toFixed(2));
+    if (physicalContourMinorWidthValue) physicalContourMinorWidthValue.textContent = Number(runtimeState.styleConfig.physical.contourMinorWidth).toFixed(2);
+    if (physicalContourMajorInterval) physicalContourMajorInterval.value = String(Math.round(runtimeState.styleConfig.physical.contourMajorIntervalM));
+    if (physicalContourMajorIntervalValue) physicalContourMajorIntervalValue.textContent = `${Math.round(runtimeState.styleConfig.physical.contourMajorIntervalM)}`;
+    if (physicalContourMinorInterval) physicalContourMinorInterval.value = String(Math.round(runtimeState.styleConfig.physical.contourMinorIntervalM));
+    if (physicalContourMinorIntervalValue) physicalContourMinorIntervalValue.textContent = `${Math.round(runtimeState.styleConfig.physical.contourMinorIntervalM)}`;
+    if (physicalContourMajorLowReliefCutoff) physicalContourMajorLowReliefCutoff.value = String(Math.round(runtimeState.styleConfig.physical.contourMajorLowReliefCutoffM));
+    if (physicalContourMajorLowReliefCutoffValue) physicalContourMajorLowReliefCutoffValue.textContent = `${Math.round(runtimeState.styleConfig.physical.contourMajorLowReliefCutoffM)}`;
+    if (physicalContourMinorLowReliefCutoff) physicalContourMinorLowReliefCutoff.value = String(Math.round(runtimeState.styleConfig.physical.contourMinorLowReliefCutoffM));
+    if (physicalContourMinorLowReliefCutoffValue) physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(runtimeState.styleConfig.physical.contourMinorLowReliefCutoffM)}`;
+    if (physicalBlendMode) physicalBlendMode.value = runtimeState.styleConfig.physical.blendMode;
     Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
-      if (element) element.checked = state.styleConfig.physical.atlasClassVisibility?.[key] !== false;
+      if (element) element.checked = runtimeState.styleConfig.physical.atlasClassVisibility?.[key] !== false;
     });
 
-    if (riversColor) riversColor.value = state.styleConfig.rivers.color;
-    if (riversOpacity) riversOpacity.value = String(Math.round(state.styleConfig.rivers.opacity * 100));
-    if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
-    if (riversWidth) riversWidth.value = String(Number(state.styleConfig.rivers.width).toFixed(2));
-    if (riversWidthValue) riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
-    if (riversOutlineColor) riversOutlineColor.value = state.styleConfig.rivers.outlineColor;
-    if (riversOutlineWidth) riversOutlineWidth.value = String(Number(state.styleConfig.rivers.outlineWidth).toFixed(2));
-    if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
-    if (riversDashStyle) riversDashStyle.value = state.styleConfig.rivers.dashStyle;
+    if (riversColor) riversColor.value = runtimeState.styleConfig.rivers.color;
+    if (riversOpacity) riversOpacity.value = String(Math.round(runtimeState.styleConfig.rivers.opacity * 100));
+    if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(runtimeState.styleConfig.rivers.opacity * 100)}%`;
+    if (riversWidth) riversWidth.value = String(Number(runtimeState.styleConfig.rivers.width).toFixed(2));
+    if (riversWidthValue) riversWidthValue.textContent = Number(runtimeState.styleConfig.rivers.width).toFixed(2);
+    if (riversOutlineColor) riversOutlineColor.value = runtimeState.styleConfig.rivers.outlineColor;
+    if (riversOutlineWidth) riversOutlineWidth.value = String(Number(runtimeState.styleConfig.rivers.outlineWidth).toFixed(2));
+    if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(runtimeState.styleConfig.rivers.outlineWidth).toFixed(2);
+    if (riversDashStyle) riversDashStyle.value = runtimeState.styleConfig.rivers.dashStyle;
   };
 
   const renderReferenceOverlayUi = () => {
-    if (referenceOpacity) referenceOpacity.value = String(Math.round(state.referenceImageState.opacity * 100));
-    if (referenceOpacityValue) referenceOpacityValue.textContent = `${Math.round(state.referenceImageState.opacity * 100)}%`;
-    if (referenceScale) referenceScale.value = String(Number(state.referenceImageState.scale).toFixed(2));
-    if (referenceScaleValue) referenceScaleValue.textContent = `${Number(state.referenceImageState.scale).toFixed(2)}x`;
-    if (referenceOffsetX) referenceOffsetX.value = String(Math.round(state.referenceImageState.offsetX));
-    if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${Math.round(state.referenceImageState.offsetX)}px`;
-    if (referenceOffsetY) referenceOffsetY.value = String(Math.round(state.referenceImageState.offsetY));
-    if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${Math.round(state.referenceImageState.offsetY)}px`;
+    if (referenceOpacity) referenceOpacity.value = String(Math.round(runtimeState.referenceImageState.opacity * 100));
+    if (referenceOpacityValue) referenceOpacityValue.textContent = `${Math.round(runtimeState.referenceImageState.opacity * 100)}%`;
+    if (referenceScale) referenceScale.value = String(Number(runtimeState.referenceImageState.scale).toFixed(2));
+    if (referenceScaleValue) referenceScaleValue.textContent = `${Number(runtimeState.referenceImageState.scale).toFixed(2)}x`;
+    if (referenceOffsetX) referenceOffsetX.value = String(Math.round(runtimeState.referenceImageState.offsetX));
+    if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${Math.round(runtimeState.referenceImageState.offsetX)}px`;
+    if (referenceOffsetY) referenceOffsetY.value = String(Math.round(runtimeState.referenceImageState.offsetY));
+    if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${Math.round(runtimeState.referenceImageState.offsetY)}px`;
     const referenceImage = document.getElementById("referenceImage");
     if (referenceImage) {
-      referenceImage.style.opacity = String(state.referenceImageState.opacity);
+      referenceImage.style.opacity = String(runtimeState.referenceImageState.opacity);
       referenceImage.style.transform =
-        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
-        + `scale(${state.referenceImageState.scale})`;
+        `translate(${runtimeState.referenceImageState.offsetX}px, ${runtimeState.referenceImageState.offsetY}px) `
+        + `scale(${runtimeState.referenceImageState.scale})`;
     }
   };
 
   const getTransportAppearanceConfig = () => {
-    state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(
-      state.styleConfig?.transportOverview || {},
+    runtimeState.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(
+      runtimeState.styleConfig?.transportOverview || {},
     );
-    return state.styleConfig.transportOverview;
+    return runtimeState.styleConfig.transportOverview;
   };
 
   const formatTransportPercent = (value) => `${Math.round(Number(value || 0) * 100)}%`;
@@ -964,7 +964,7 @@ export function createAppearanceControlsController({
 
   const getTransportFamilyFilteredCount = (familyId, familyConfig, effectiveScope) => {
     if (familyId === "rail") {
-      const features = Array.isArray(state.railwaysData?.features) ? state.railwaysData.features : null;
+      const features = Array.isArray(runtimeState.railwaysData?.features) ? runtimeState.railwaysData.features : null;
       if (!features) return null;
       const scopeThreshold = getTransportScopeThresholdRank(familyId, effectiveScope.scope);
       const revealThreshold = String(effectiveScope.importanceThreshold || "").trim().toLowerCase() === "primary"
@@ -982,7 +982,7 @@ export function createAppearanceControlsController({
       }).length;
     }
     if (familyId === "road") {
-      const features = Array.isArray(state.roadsData?.features) ? state.roadsData.features : null;
+      const features = Array.isArray(runtimeState.roadsData?.features) ? runtimeState.roadsData.features : null;
       if (!features) return null;
       const scopeThreshold = getTransportScopeThresholdRank(familyId, effectiveScope.scope);
       const revealThreshold = String(effectiveScope.importanceThreshold || "").trim().toLowerCase() === "primary" ? 1 : 2;
@@ -995,7 +995,7 @@ export function createAppearanceControlsController({
         return roadClass === "motorway" || roadClass === "trunk";
       }).length;
     }
-    const collection = familyId === "port" ? state.portsData : state.airportsData;
+    const collection = familyId === "port" ? runtimeState.portsData : runtimeState.airportsData;
     const features = Array.isArray(collection?.features) ? collection.features : null;
     if (!features) return null;
     const minimumImportanceRank = Math.max(
@@ -1044,7 +1044,7 @@ export function createAppearanceControlsController({
     const portConfig = transportConfig.port || {};
     const railConfig = transportConfig.rail || {};
     const roadConfig = transportConfig.road || {};
-    const transportEnabled = state.showTransport !== false;
+    const transportEnabled = runtimeState.showTransport !== false;
     const airportScopeState = getEffectiveTransportScopeState("airport", airportConfig);
     const portScopeState = getEffectiveTransportScopeState("port", portConfig);
     const railScopeState = getEffectiveTransportScopeState("rail", railConfig);
@@ -1068,7 +1068,7 @@ export function createAppearanceControlsController({
     if (airportScope) airportScope.value = String(airportConfig.scope || "major_civil");
     if (airportImportanceThreshold) airportImportanceThreshold.value = String(airportConfig.importanceThreshold || "secondary");
     if (transportAirportSummaryMeta) {
-      transportAirportSummaryMeta.textContent = buildTransportFamilySummaryText("airport", transportEnabled, !!state.showAirports, airportConfig, airportScopeState);
+      transportAirportSummaryMeta.textContent = buildTransportFamilySummaryText("airport", transportEnabled, !!runtimeState.showAirports, airportConfig, airportScopeState);
     }
 
     if (portVisualStrength) portVisualStrength.value = String(Math.round(Number(portConfig.visualStrength ?? 0.54) * 100));
@@ -1087,7 +1087,7 @@ export function createAppearanceControlsController({
     if (portTier) portTier.value = String(portConfig.scope || "regional");
     if (portImportanceThreshold) portImportanceThreshold.value = String(portConfig.importanceThreshold || "secondary");
     if (transportPortSummaryMeta) {
-      transportPortSummaryMeta.textContent = buildTransportFamilySummaryText("port", transportEnabled, !!state.showPorts, portConfig, portScopeState);
+      transportPortSummaryMeta.textContent = buildTransportFamilySummaryText("port", transportEnabled, !!runtimeState.showPorts, portConfig, portScopeState);
     }
 
     if (railVisualStrength) railVisualStrength.value = String(Math.round(Number(railConfig.visualStrength ?? 0.5) * 100));
@@ -1104,9 +1104,9 @@ export function createAppearanceControlsController({
     if (railThresholdResolved) railThresholdResolved.textContent = t(formatTransportThresholdLabel(railScopeState.importanceThreshold), "ui");
     if (railScope) railScope.value = String(railConfig.scope || "mainline_only");
     if (railImportanceThreshold) railImportanceThreshold.value = String(railConfig.importanceThreshold || "primary");
-    if (toggleRail) toggleRail.checked = !!state.showRail;
+    if (toggleRail) toggleRail.checked = !!runtimeState.showRail;
     if (transportRailSummaryMeta) {
-      transportRailSummaryMeta.textContent = buildTransportFamilySummaryText("rail", transportEnabled, !!state.showRail, railConfig, railScopeState);
+      transportRailSummaryMeta.textContent = buildTransportFamilySummaryText("rail", transportEnabled, !!runtimeState.showRail, railConfig, railScopeState);
     }
 
     if (roadVisualStrength) roadVisualStrength.value = String(Math.round(Number(roadConfig.visualStrength ?? 0.5) * 100));
@@ -1121,9 +1121,9 @@ export function createAppearanceControlsController({
     if (roadThresholdResolved) roadThresholdResolved.textContent = t(formatTransportThresholdLabel(roadScopeState.importanceThreshold), "ui");
     if (roadScope) roadScope.value = String(roadConfig.scope || "motorway_only");
     if (roadImportanceThreshold) roadImportanceThreshold.value = String(roadConfig.importanceThreshold || "primary");
-    if (toggleRoad) toggleRoad.checked = !!state.showRoad;
+    if (toggleRoad) toggleRoad.checked = !!runtimeState.showRoad;
     if (transportRoadSummaryMeta) {
-      transportRoadSummaryMeta.textContent = buildTransportFamilySummaryText("road", transportEnabled, !!state.showRoad, roadConfig, roadScopeState);
+      transportRoadSummaryMeta.textContent = buildTransportFamilySummaryText("road", transportEnabled, !!runtimeState.showRoad, roadConfig, roadScopeState);
     }
 
     [
@@ -1169,27 +1169,27 @@ export function createAppearanceControlsController({
     transportPortCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRailCard?.classList.toggle("opacity-60", !transportEnabled);
     transportRoadCard?.classList.toggle("opacity-60", !transportEnabled);
-    state.syncFacilityInfoCardVisibilityFn?.();
+    runtimeState.syncFacilityInfoCardVisibilityFn?.();
   };
 
   const applyTransportAppearanceMasterToggle = (nextEnabled) => {
     const normalized = !!nextEnabled;
-    if ((state.showTransport !== false) === normalized) {
+    if ((runtimeState.showTransport !== false) === normalized) {
       renderTransportAppearanceUi();
       return;
     }
-    state.showTransport = normalized;
-    if (normalized && state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
-      void state.ensureContextLayerDataFn("airports", { reason: "transport-master-toggle", renderNow: true });
+    runtimeState.showTransport = normalized;
+    if (normalized && runtimeState.showAirports && typeof runtimeState.ensureContextLayerDataFn === "function") {
+      void runtimeState.ensureContextLayerDataFn("airports", { reason: "transport-master-toggle", renderNow: true });
     }
-    if (normalized && state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
-      void state.ensureContextLayerDataFn("ports", { reason: "transport-master-toggle", renderNow: true });
+    if (normalized && runtimeState.showPorts && typeof runtimeState.ensureContextLayerDataFn === "function") {
+      void runtimeState.ensureContextLayerDataFn("ports", { reason: "transport-master-toggle", renderNow: true });
     }
-    if (normalized && state.showRail && typeof state.ensureContextLayerDataFn === "function") {
-      void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "transport-master-toggle", renderNow: true });
+    if (normalized && runtimeState.showRail && typeof runtimeState.ensureContextLayerDataFn === "function") {
+      void runtimeState.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "transport-master-toggle", renderNow: true });
     }
-    if (normalized && state.showRoad && typeof state.ensureContextLayerDataFn === "function") {
-      void state.ensureContextLayerDataFn("roads", { reason: "transport-master-toggle", renderNow: true });
+    if (normalized && runtimeState.showRoad && typeof runtimeState.ensureContextLayerDataFn === "function") {
+      void runtimeState.ensureContextLayerDataFn("roads", { reason: "transport-master-toggle", renderNow: true });
     }
     renderTransportAppearanceUi();
     renderDirty("toggle-transport-overview");
@@ -1198,7 +1198,7 @@ export function createAppearanceControlsController({
   const renderRecentColors = () => {
     if (!recentContainer) return;
     recentContainer.replaceChildren();
-    const visibleRecentColors = state.recentColors.slice(0, 10);
+    const visibleRecentColors = runtimeState.recentColors.slice(0, 10);
     dockRecentDivider?.classList.toggle("hidden", visibleRecentColors.length === 0);
     visibleRecentColors.forEach((color) => {
       const normalized = normalizeHexColor(color);
@@ -1211,7 +1211,7 @@ export function createAppearanceControlsController({
       btn.title = normalized;
       btn.setAttribute("aria-label", `${t("Recent", "ui")}: ${normalized}`);
       btn.addEventListener("click", () => {
-        state.selectedColor = normalized;
+        runtimeState.selectedColor = normalized;
         updateSwatchUI();
       });
       recentContainer.appendChild(btn);
@@ -1219,19 +1219,19 @@ export function createAppearanceControlsController({
   };
 
   const normalizeParentBorderEnabledMap = () => {
-    const supported = Array.isArray(state.parentBorderSupportedCountries) ? state.parentBorderSupportedCountries : [];
-    const prev = state.parentBorderEnabledByCountry && typeof state.parentBorderEnabledByCountry === "object"
-      ? state.parentBorderEnabledByCountry
+    const supported = Array.isArray(runtimeState.parentBorderSupportedCountries) ? runtimeState.parentBorderSupportedCountries : [];
+    const prev = runtimeState.parentBorderEnabledByCountry && typeof runtimeState.parentBorderEnabledByCountry === "object"
+      ? runtimeState.parentBorderEnabledByCountry
       : {};
     const next = {};
     supported.forEach((countryCode) => {
       next[countryCode] = !!prev[countryCode];
     });
-    state.parentBorderEnabledByCountry = next;
+    runtimeState.parentBorderEnabledByCountry = next;
   };
 
   const syncParentBorderVisibilityUI = () => {
-    const enabled = state.parentBordersVisible !== false;
+    const enabled = runtimeState.parentBordersVisible !== false;
     if (parentBordersVisible) parentBordersVisible.checked = enabled;
     if (parentBorderColor) parentBorderColor.disabled = !enabled;
     if (parentBorderOpacity) parentBorderOpacity.disabled = !enabled;
@@ -1248,8 +1248,8 @@ export function createAppearanceControlsController({
     if (!parentBorderCountryList) return;
     normalizeParentBorderEnabledMap();
     syncParentBorderVisibilityUI();
-    const supported = Array.isArray(state.parentBorderSupportedCountries)
-      ? [...state.parentBorderSupportedCountries]
+    const supported = Array.isArray(runtimeState.parentBorderSupportedCountries)
+      ? [...runtimeState.parentBorderSupportedCountries]
       : [];
 
     parentBorderCountryList.replaceChildren();
@@ -1262,7 +1262,7 @@ export function createAppearanceControlsController({
     const entries = supported
       .map((code) => ({
         code,
-        displayName: t(state.countryNames?.[code] || code, "geo"),
+        displayName: t(runtimeState.countryNames?.[code] || code, "geo"),
       }))
       .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
@@ -1273,10 +1273,10 @@ export function createAppearanceControlsController({
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.className = "checkbox-input";
-      checkbox.checked = !!state.parentBorderEnabledByCountry?.[code];
-      checkbox.disabled = state.parentBordersVisible === false;
+      checkbox.checked = !!runtimeState.parentBorderEnabledByCountry?.[code];
+      checkbox.disabled = runtimeState.parentBordersVisible === false;
       checkbox.addEventListener("change", (event) => {
-        state.parentBorderEnabledByCountry[code] = !!event.target.checked;
+        runtimeState.parentBorderEnabledByCountry[code] = !!event.target.checked;
         renderDirty("parent-border-country");
       });
 
@@ -1322,11 +1322,11 @@ export function createAppearanceControlsController({
     }
 
     if (toggleAirports && !toggleAirports.dataset.bound) {
-      toggleAirports.checked = !!state.showAirports;
+      toggleAirports.checked = !!runtimeState.showAirports;
       toggleAirports.addEventListener("change", (event) => {
-        state.showAirports = !!event.target.checked;
-        if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showAirports = !!event.target.checked;
+        if (runtimeState.showAirports && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
         }
         renderTransportAppearanceUi();
         renderDirty("toggle-airports");
@@ -1335,11 +1335,11 @@ export function createAppearanceControlsController({
     }
 
     if (togglePorts && !togglePorts.dataset.bound) {
-      togglePorts.checked = !!state.showPorts;
+      togglePorts.checked = !!runtimeState.showPorts;
       togglePorts.addEventListener("change", (event) => {
-        state.showPorts = !!event.target.checked;
-        if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showPorts = !!event.target.checked;
+        if (runtimeState.showPorts && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
         }
         renderTransportAppearanceUi();
         renderDirty("toggle-ports");
@@ -1348,12 +1348,12 @@ export function createAppearanceControlsController({
     }
 
     if (toggleRail && !toggleRail.dataset.bound) {
-      toggleRail.checked = !!state.showRail;
+      toggleRail.checked = !!runtimeState.showRail;
       toggleRail.addEventListener("change", (event) => {
-        state.showRail = !!event.target.checked;
-        if (state.showRail && state.showTransport === false) state.showTransport = true;
-        if (state.showRail && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showRail = !!event.target.checked;
+        if (runtimeState.showRail && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        if (runtimeState.showRail && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "toolbar-toggle", renderNow: true });
         }
         renderTransportAppearanceUi();
         renderDirty("toggle-rail");
@@ -1362,12 +1362,12 @@ export function createAppearanceControlsController({
     }
 
     if (toggleRoad && !toggleRoad.dataset.bound) {
-      toggleRoad.checked = !!state.showRoad;
+      toggleRoad.checked = !!runtimeState.showRoad;
       toggleRoad.addEventListener("change", (event) => {
-        state.showRoad = !!event.target.checked;
-        if (state.showRoad && state.showTransport === false) state.showTransport = true;
-        if (state.showRoad && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn("roads", { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showRoad = !!event.target.checked;
+        if (runtimeState.showRoad && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        if (runtimeState.showRoad && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn("roads", { reason: "toolbar-toggle", renderNow: true });
         }
         renderTransportAppearanceUi();
         renderDirty("toggle-road");
@@ -1847,11 +1847,11 @@ export function createAppearanceControlsController({
     }, "day-night-twilight-width");
 
     if (toggleUrban && toggleUrban.dataset.bound !== "true") {
-      toggleUrban.checked = !!state.showUrban;
+      toggleUrban.checked = !!runtimeState.showUrban;
       toggleUrban.addEventListener("change", (event) => {
-        state.showUrban = event.target.checked;
-        if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn("urban", { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showUrban = event.target.checked;
+        if (runtimeState.showUrban && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn("urban", { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-urban");
       });
@@ -1859,11 +1859,11 @@ export function createAppearanceControlsController({
     }
 
     if (togglePhysical && togglePhysical.dataset.bound !== "true") {
-      togglePhysical.checked = !!state.showPhysical;
+      togglePhysical.checked = !!runtimeState.showPhysical;
       togglePhysical.addEventListener("change", (event) => {
-        state.showPhysical = event.target.checked;
-        if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showPhysical = event.target.checked;
+        if (runtimeState.showPhysical && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-physical");
       });
@@ -1871,11 +1871,11 @@ export function createAppearanceControlsController({
     }
 
     if (toggleRivers && toggleRivers.dataset.bound !== "true") {
-      toggleRivers.checked = !!state.showRivers;
+      toggleRivers.checked = !!runtimeState.showRivers;
       toggleRivers.addEventListener("change", (event) => {
-        state.showRivers = event.target.checked;
-        if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
-          void state.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showRivers = event.target.checked;
+        if (runtimeState.showRivers && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void runtimeState.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-rivers");
       });
@@ -1883,12 +1883,12 @@ export function createAppearanceControlsController({
     }
 
     if (toggleCityPoints && toggleCityPoints.dataset.bound !== "true") {
-      toggleCityPoints.checked = !!state.showCityPoints;
+      toggleCityPoints.checked = !!runtimeState.showCityPoints;
       toggleCityPoints.addEventListener("change", (event) => {
-        state.showCityPoints = !!event.target.checked;
-        if (state.showCityPoints) {
-          if (typeof state.ensureBaseCityDataFn === "function") {
-            void state.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: true });
+        runtimeState.showCityPoints = !!event.target.checked;
+        if (runtimeState.showCityPoints) {
+          if (typeof runtimeState.ensureBaseCityDataFn === "function") {
+            void runtimeState.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: true });
           }
           void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
         }
@@ -2263,7 +2263,7 @@ export function createAppearanceControlsController({
     });
     if (riversColor && riversColor.dataset.bound !== "true") {
       riversColor.addEventListener("input", (event) => {
-        state.styleConfig.rivers.color = normalizeOceanFillColor(event.target.value);
+        runtimeState.styleConfig.rivers.color = normalizeOceanFillColor(event.target.value);
         renderDirty("rivers-color");
       });
       riversColor.dataset.bound = "true";
@@ -2271,8 +2271,8 @@ export function createAppearanceControlsController({
     if (riversOpacity && riversOpacity.dataset.bound !== "true") {
       riversOpacity.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.styleConfig.rivers.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
-        if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
+        runtimeState.styleConfig.rivers.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
+        if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(runtimeState.styleConfig.rivers.opacity * 100)}%`;
         renderDirty("rivers-opacity");
       });
       riversOpacity.dataset.bound = "true";
@@ -2280,15 +2280,15 @@ export function createAppearanceControlsController({
     if (riversWidth && riversWidth.dataset.bound !== "true") {
       riversWidth.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 0.5, 0.2, 4);
-        if (riversWidthValue) riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
+        runtimeState.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 0.5, 0.2, 4);
+        if (riversWidthValue) riversWidthValue.textContent = Number(runtimeState.styleConfig.rivers.width).toFixed(2);
         renderDirty("rivers-width");
       });
       riversWidth.dataset.bound = "true";
     }
     if (riversOutlineColor && riversOutlineColor.dataset.bound !== "true") {
       riversOutlineColor.addEventListener("input", (event) => {
-        state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(event.target.value);
+        runtimeState.styleConfig.rivers.outlineColor = normalizeOceanFillColor(event.target.value);
         renderDirty("rivers-outline-color");
       });
       riversOutlineColor.dataset.bound = "true";
@@ -2296,15 +2296,15 @@ export function createAppearanceControlsController({
     if (riversOutlineWidth && riversOutlineWidth.dataset.bound !== "true") {
       riversOutlineWidth.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.25, 0, 3);
-        if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
+        runtimeState.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.25, 0, 3);
+        if (riversOutlineWidthValue) riversOutlineWidthValue.textContent = Number(runtimeState.styleConfig.rivers.outlineWidth).toFixed(2);
         renderDirty("rivers-outline-width");
       });
       riversOutlineWidth.dataset.bound = "true";
     }
     if (riversDashStyle && riversDashStyle.dataset.bound !== "true") {
       riversDashStyle.addEventListener("change", (event) => {
-        state.styleConfig.rivers.dashStyle = String(event.target.value || "solid");
+        runtimeState.styleConfig.rivers.dashStyle = String(event.target.value || "solid");
         renderDirty("rivers-dash");
       });
       riversDashStyle.dataset.bound = "true";
@@ -2313,10 +2313,10 @@ export function createAppearanceControlsController({
     const applyReferenceStyles = () => {
       const referenceImage = document.getElementById("referenceImage");
       if (!referenceImage) return;
-      referenceImage.style.opacity = String(state.referenceImageState.opacity);
+      referenceImage.style.opacity = String(runtimeState.referenceImageState.opacity);
       referenceImage.style.transform =
-        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
-        + `scale(${state.referenceImageState.scale})`;
+        `translate(${runtimeState.referenceImageState.offsetX}px, ${runtimeState.referenceImageState.offsetY}px) `
+        + `scale(${runtimeState.referenceImageState.scale})`;
     };
 
     if (referenceImageInput && referenceImageInput.dataset.bound !== "true") {
@@ -2325,31 +2325,31 @@ export function createAppearanceControlsController({
         const referenceImage = document.getElementById("referenceImage");
         if (!referenceImage) return;
         if (!file) {
-          if (state.referenceImageUrl) {
-            URL.revokeObjectURL(state.referenceImageUrl);
-            state.referenceImageUrl = null;
+          if (runtimeState.referenceImageUrl) {
+            URL.revokeObjectURL(runtimeState.referenceImageUrl);
+            runtimeState.referenceImageUrl = null;
           }
           referenceImage.src = "";
           referenceImage.style.opacity = "0";
           markDirty("reference-image-clear");
           return;
         }
-        if (state.referenceImageUrl) {
-          URL.revokeObjectURL(state.referenceImageUrl);
+        if (runtimeState.referenceImageUrl) {
+          URL.revokeObjectURL(runtimeState.referenceImageUrl);
         }
-        state.referenceImageUrl = URL.createObjectURL(file);
-        referenceImage.src = state.referenceImageUrl;
+        runtimeState.referenceImageUrl = URL.createObjectURL(file);
+        referenceImage.src = runtimeState.referenceImageUrl;
         applyReferenceStyles();
         markDirty("reference-image-file");
       });
       referenceImageInput.dataset.bound = "true";
     }
     if (referenceOpacity && referenceOpacity.dataset.bound !== "true") {
-      state.referenceImageState.opacity = Number(referenceOpacity.value) / 100;
+      runtimeState.referenceImageState.opacity = Number(referenceOpacity.value) / 100;
       if (referenceOpacityValue) referenceOpacityValue.textContent = `${referenceOpacity.value}%`;
       referenceOpacity.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.referenceImageState.opacity = Number.isFinite(value) ? value / 100 : 0.6;
+        runtimeState.referenceImageState.opacity = Number.isFinite(value) ? value / 100 : 0.6;
         if (referenceOpacityValue) referenceOpacityValue.textContent = `${event.target.value}%`;
         applyReferenceStyles();
         markDirty("reference-opacity");
@@ -2357,36 +2357,36 @@ export function createAppearanceControlsController({
       referenceOpacity.dataset.bound = "true";
     }
     if (referenceScale && referenceScale.dataset.bound !== "true") {
-      state.referenceImageState.scale = Number(referenceScale.value);
+      runtimeState.referenceImageState.scale = Number(referenceScale.value);
       if (referenceScaleValue) referenceScaleValue.textContent = `${Number(referenceScale.value).toFixed(2)}x`;
       referenceScale.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.referenceImageState.scale = Number.isFinite(value) ? value : 1;
-        if (referenceScaleValue) referenceScaleValue.textContent = `${state.referenceImageState.scale.toFixed(2)}x`;
+        runtimeState.referenceImageState.scale = Number.isFinite(value) ? value : 1;
+        if (referenceScaleValue) referenceScaleValue.textContent = `${runtimeState.referenceImageState.scale.toFixed(2)}x`;
         applyReferenceStyles();
         markDirty("reference-scale");
       });
       referenceScale.dataset.bound = "true";
     }
     if (referenceOffsetX && referenceOffsetX.dataset.bound !== "true") {
-      state.referenceImageState.offsetX = Number(referenceOffsetX.value);
+      runtimeState.referenceImageState.offsetX = Number(referenceOffsetX.value);
       if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${referenceOffsetX.value}px`;
       referenceOffsetX.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.referenceImageState.offsetX = Number.isFinite(value) ? value : 0;
-        if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${state.referenceImageState.offsetX}px`;
+        runtimeState.referenceImageState.offsetX = Number.isFinite(value) ? value : 0;
+        if (referenceOffsetXValue) referenceOffsetXValue.textContent = `${runtimeState.referenceImageState.offsetX}px`;
         applyReferenceStyles();
         markDirty("reference-offset-x");
       });
       referenceOffsetX.dataset.bound = "true";
     }
     if (referenceOffsetY && referenceOffsetY.dataset.bound !== "true") {
-      state.referenceImageState.offsetY = Number(referenceOffsetY.value);
+      runtimeState.referenceImageState.offsetY = Number(referenceOffsetY.value);
       if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${referenceOffsetY.value}px`;
       referenceOffsetY.addEventListener("input", (event) => {
         const value = Number(event.target.value);
-        state.referenceImageState.offsetY = Number.isFinite(value) ? value : 0;
-        if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${state.referenceImageState.offsetY}px`;
+        runtimeState.referenceImageState.offsetY = Number.isFinite(value) ? value : 0;
+        if (referenceOffsetYValue) referenceOffsetYValue.textContent = `${runtimeState.referenceImageState.offsetY}px`;
         applyReferenceStyles();
         markDirty("reference-offset-y");
       });
@@ -2408,3 +2408,4 @@ export function createAppearanceControlsController({
     syncParentBorderVisibilityUI,
   };
 }
+

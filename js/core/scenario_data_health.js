@@ -1,7 +1,8 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import { createDefaultScenarioDataHealth } from "./state/scenario_runtime_state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
+const state = runtimeState;
 
 const DETAIL_POLITICAL_MIN_FEATURES = 1000;
 const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
@@ -17,11 +18,11 @@ function hasUsablePoliticalTopology(topology, { minFeatures = DETAIL_POLITICAL_M
 }
 
 function evaluateScenarioDataHealth(
-  manifest = state.activeScenarioManifest,
+  manifest = runtimeState.activeScenarioManifest,
   { minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT } = {}
 ) {
   const expectedFeatureCount = Number(manifest?.summary?.feature_count || 0);
-  const runtimeFeatureCount = Array.isArray(state.landData?.features) ? state.landData.features.length : 0;
+  const runtimeFeatureCount = Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features.length : 0;
   const ratio = expectedFeatureCount > 0 ? runtimeFeatureCount / expectedFeatureCount : 1;
   const normalizedMinRatio = Math.min(Math.max(Number(minRatio) || SCENARIO_DETAIL_MIN_RATIO_STRICT, 0.1), 1);
   let warning = "";
@@ -44,7 +45,7 @@ function evaluateScenarioDataHealth(
   };
 }
 
-function scenarioNeedsDetailTopology(manifest = state.activeScenarioManifest) {
+function scenarioNeedsDetailTopology(manifest = runtimeState.activeScenarioManifest) {
   return Number(manifest?.summary?.feature_count || 0) >= DETAIL_POLITICAL_MIN_FEATURES;
 }
 
@@ -53,12 +54,12 @@ function refreshScenarioDataHealth({
   showErrorToast = false,
   minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT,
 } = {}) {
-  if (!state.activeScenarioId || !state.activeScenarioManifest) {
-    state.scenarioDataHealth = createDefaultScenarioDataHealth(SCENARIO_DETAIL_MIN_RATIO_STRICT);
-    return state.scenarioDataHealth;
+  if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
+    runtimeState.scenarioDataHealth = createDefaultScenarioDataHealth(SCENARIO_DETAIL_MIN_RATIO_STRICT);
+    return runtimeState.scenarioDataHealth;
   }
-  const health = evaluateScenarioDataHealth(state.activeScenarioManifest, { minRatio });
-  state.scenarioDataHealth = health;
+  const health = evaluateScenarioDataHealth(runtimeState.activeScenarioManifest, { minRatio });
+  runtimeState.scenarioDataHealth = health;
   const shouldToast = health.warning && (showErrorToast || showWarningToast);
   if (shouldToast) {
     const errorLevel = showErrorToast || health.severity === "error";
@@ -82,3 +83,4 @@ export {
   refreshScenarioDataHealth,
   scenarioNeedsDetailTopology,
 };
+

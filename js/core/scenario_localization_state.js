@@ -1,8 +1,9 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import {
   buildCityLocalizationPatch,
   normalizeCityText,
 } from "./data_loader.js";
+const state = runtimeState;
 
 function getScenarioOverrideLocaleEntry(overrideEntry) {
   const displayName = overrideEntry?.display_name && typeof overrideEntry.display_name === "object"
@@ -22,7 +23,7 @@ function getScenarioOverrideLocaleEntry(overrideEntry) {
 }
 
 function getScenarioOverrideSourceCityFeature(overrideEntry) {
-  const features = Array.isArray(state.worldCitiesData?.features) ? state.worldCitiesData.features : [];
+  const features = Array.isArray(runtimeState.worldCitiesData?.features) ? runtimeState.worldCitiesData.features : [];
   if (!features.length) return null;
   const candidates = new Set([
     normalizeCityText(overrideEntry?.city_id),
@@ -60,7 +61,7 @@ function getAngularDistanceDegrees(left, right) {
 
 function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
   const point = getFeaturePointCoordinates(cityFeature);
-  const overrideFeatures = Array.isArray(state.ruCityOverrides?.features) ? state.ruCityOverrides.features : [];
+  const overrideFeatures = Array.isArray(runtimeState.ruCityOverrides?.features) ? runtimeState.ruCityOverrides.features : [];
   if (!point || !overrideFeatures.length) return "";
 
   const geoContains = globalThis.d3?.geoContains;
@@ -98,7 +99,7 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
   const geo = {};
   const conflicts = [];
   let preservedExplicitPatchCount = 0;
-  const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
+  const overrideEntries = Object.values(runtimeState.scenarioCityOverridesData?.cities || {});
 
   overrideEntries.forEach((overrideEntry) => {
     const localeEntry = getScenarioOverrideLocaleEntry(overrideEntry);
@@ -149,35 +150,35 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
 }
 
 function applyScenarioGeoLocalization() {
-  const baseGeoLocales = state.baseGeoLocales && typeof state.baseGeoLocales === "object"
-    ? state.baseGeoLocales
+  const baseGeoLocales = runtimeState.baseGeoLocales && typeof runtimeState.baseGeoLocales === "object"
+    ? runtimeState.baseGeoLocales
     : {};
-  const baseAliasMap = state.baseGeoAliasToStableKey && typeof state.baseGeoAliasToStableKey === "object"
-    ? state.baseGeoAliasToStableKey
+  const baseAliasMap = runtimeState.baseGeoAliasToStableKey && typeof runtimeState.baseGeoAliasToStableKey === "object"
+    ? runtimeState.baseGeoAliasToStableKey
     : {};
-  const scenarioGeoPatch = state.scenarioGeoLocalePatchData?.geo
-    && typeof state.scenarioGeoLocalePatchData.geo === "object"
-    ? state.scenarioGeoLocalePatchData.geo
+  const scenarioGeoPatch = runtimeState.scenarioGeoLocalePatchData?.geo
+    && typeof runtimeState.scenarioGeoLocalePatchData.geo === "object"
+    ? runtimeState.scenarioGeoLocalePatchData.geo
     : {};
-  const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
+  const overrideEntries = Object.values(runtimeState.scenarioCityOverridesData?.cities || {});
   const patch = buildCityLocalizationPatch({
-    cityCollection: state.scenarioCityOverridesData?.featureCollection || null,
+    cityCollection: runtimeState.scenarioCityOverridesData?.featureCollection || null,
     cityAliases: { cities: overrideEntries },
   });
   const synchronizedNamePatch = buildScenarioCityNameSyncPatch({
     baseGeoLocales,
     scenarioGeoPatch,
   });
-  if (!state.locales || typeof state.locales !== "object") {
-    state.locales = { ui: {}, geo: {} };
+  if (!runtimeState.locales || typeof runtimeState.locales !== "object") {
+    runtimeState.locales = { ui: {}, geo: {} };
   }
-  state.locales.geo = {
+  runtimeState.locales.geo = {
     ...baseGeoLocales,
     ...patch.geo,
     ...synchronizedNamePatch.geo,
     ...scenarioGeoPatch,
   };
-  state.geoAliasToStableKey = {
+  runtimeState.geoAliasToStableKey = {
     ...baseAliasMap,
     ...patch.aliasToStableKey,
   };
@@ -192,11 +193,12 @@ function applyScenarioGeoLocalization() {
 }
 
 export function syncScenarioLocalizationState({
-  cityOverridesPayload = state.scenarioCityOverridesData,
-  geoLocalePatchPayload = state.scenarioGeoLocalePatchData,
+  cityOverridesPayload = runtimeState.scenarioCityOverridesData,
+  geoLocalePatchPayload = runtimeState.scenarioGeoLocalePatchData,
 } = {}) {
-  state.scenarioCityOverridesData = cityOverridesPayload || null;
-  state.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
-  state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
+  runtimeState.scenarioCityOverridesData = cityOverridesPayload || null;
+  runtimeState.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
+  runtimeState.cityLayerRevision = (Number(runtimeState.cityLayerRevision) || 0) + 1;
   applyScenarioGeoLocalization();
 }
+

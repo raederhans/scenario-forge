@@ -1,5 +1,6 @@
-import { state } from "../../core/state.js";
+import { state as runtimeState } from "../../core/state.js";
 import { applyDeclarativeTranslations, t } from "../i18n.js";
+const state = runtimeState;
 
 function ui(key) {
   return t(key, "ui");
@@ -345,7 +346,7 @@ export function createDevWorkspaceQuickbar(bottomDock) {
 
 function updateToggleButton(toggleBtn) {
   if (!toggleBtn) return;
-  const expanded = !!state.ui.devWorkspaceExpanded;
+  const expanded = !!runtimeState.ui.devWorkspaceExpanded;
   toggleBtn.classList.toggle("is-active", expanded);
   toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
   toggleBtn.setAttribute("aria-pressed", expanded ? "true" : "false");
@@ -359,7 +360,7 @@ function syncDockState(bottomDock, expanded) {
   bottomDock.classList.toggle("dev-workspace-mode", expanded);
   if (!expanded) return;
 
-  state.ui.dockCollapsed = false;
+  runtimeState.ui.dockCollapsed = false;
   bottomDock.classList.remove("is-collapsed");
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
   if (dockCollapseBtn) {
@@ -374,3 +375,4 @@ export function applyDevWorkspaceExpandedChrome({ bottomDock, toggleBtn, expande
   updateToggleButton(toggleBtn);
   updateDockCollapsedUi?.();
 }
+

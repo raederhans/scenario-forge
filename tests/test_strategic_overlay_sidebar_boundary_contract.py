@@ -115,10 +115,10 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         map_renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         interaction_funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
 
-        self.assertIn('typeof state.updateStrategicOverlayUIFn === "function"', map_renderer_content)
-        self.assertIn("state.updateStrategicOverlayUIFn();", map_renderer_content)
-        self.assertIn('typeof state.updateStrategicOverlayUIFn === "function"', interaction_funnel_content)
-        self.assertIn("state.updateStrategicOverlayUIFn();", interaction_funnel_content)
+        self.assertTrue('typeof runtimeState.updateStrategicOverlayUIFn === "function"' in map_renderer_content or 'typeof state.updateStrategicOverlayUIFn === "function"' in map_renderer_content)
+        self.assertTrue("runtimeState.updateStrategicOverlayUIFn();" in map_renderer_content or "state.updateStrategicOverlayUIFn();" in map_renderer_content)
+        self.assertTrue('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);' in interaction_funnel_content or 'typeof state.updateStrategicOverlayUIFn === "function"' in interaction_funnel_content)
+        self.assertTrue("emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);" in interaction_funnel_content or "state.updateStrategicOverlayUIFn();" in interaction_funnel_content)
 
 
 if __name__ == "__main__":

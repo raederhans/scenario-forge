@@ -1,9 +1,10 @@
-import { state, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
+import { state as runtimeState, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
   buildRuntimeDefaultColorsByIso2,
   getRuntimeBridgeMappedIso2,
 } from "./palette_runtime_bridge.js";
+const state = runtimeState;
 
 function normalizeCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -76,8 +77,8 @@ function getPaletteLabel(entry, tag) {
 
 function getPaletteMetaById(paletteId) {
   const targetId = String(paletteId || "").trim();
-  const registryEntries = Array.isArray(state.paletteRegistry?.palettes)
-    ? state.paletteRegistry.palettes
+  const registryEntries = Array.isArray(runtimeState.paletteRegistry?.palettes)
+    ? runtimeState.paletteRegistry.palettes
     : [];
   return registryEntries.find((entry) => String(entry?.palette_id || "").trim() === targetId) || null;
 }
@@ -98,23 +99,23 @@ function buildFixedPaletteColorsByIso2(palettePack, paletteMap) {
 function resolveDefaultCountryPalette() {
   return {
     ...legacyDefaultCountryPalette,
-    ...(state.fixedPaletteColorsByIso2 || {}),
+    ...(runtimeState.fixedPaletteColorsByIso2 || {}),
   };
 }
 
 function syncResolvedDefaultCountryPalette({ overwriteCountryPalette = false } = {}) {
   const next = resolveDefaultCountryPalette();
-  state.resolvedDefaultCountryPalette = next;
+  runtimeState.resolvedDefaultCountryPalette = next;
   replaceObjectContents(defaultCountryPalette, next);
   if (overwriteCountryPalette) {
-    replaceObjectContents(state.countryPalette, next);
+    replaceObjectContents(runtimeState.countryPalette, next);
   }
   return next;
 }
 
 function getPaletteSourceOptions() {
-  const registryEntries = Array.isArray(state.paletteRegistry?.palettes)
-    ? state.paletteRegistry.palettes
+  const registryEntries = Array.isArray(runtimeState.paletteRegistry?.palettes)
+    ? runtimeState.paletteRegistry.palettes
     : [];
   if (registryEntries.length) {
     return registryEntries.map((entry) => ({
@@ -127,20 +128,20 @@ function getPaletteSourceOptions() {
 }
 
 function buildPaletteLibraryEntries() {
-  const entries = state.activePalettePack?.entries;
+  const entries = runtimeState.activePalettePack?.entries;
   if (!entries || typeof entries !== "object") {
-    state.paletteLibraryEntries = [];
-    return state.paletteLibraryEntries;
+    runtimeState.paletteLibraryEntries = [];
+    return runtimeState.paletteLibraryEntries;
   }
 
-  const mapped = state.activePaletteMap?.mapped && typeof state.activePaletteMap.mapped === "object"
-    ? state.activePaletteMap.mapped
+  const mapped = runtimeState.activePaletteMap?.mapped && typeof runtimeState.activePaletteMap.mapped === "object"
+    ? runtimeState.activePaletteMap.mapped
     : {};
-  const unmapped = state.activePaletteMap?.unmapped && typeof state.activePaletteMap.unmapped === "object"
-    ? state.activePaletteMap.unmapped
+  const unmapped = runtimeState.activePaletteMap?.unmapped && typeof runtimeState.activePaletteMap.unmapped === "object"
+    ? runtimeState.activePaletteMap.unmapped
     : {};
-  const quickTags = Array.isArray(state.activePalettePack?.quick_tags)
-    ? state.activePalettePack.quick_tags.map((tag) => String(tag || "").trim().toUpperCase())
+  const quickTags = Array.isArray(runtimeState.activePalettePack?.quick_tags)
+    ? runtimeState.activePalettePack.quick_tags.map((tag) => String(tag || "").trim().toUpperCase())
     : [];
   const quickOrder = new Map();
   quickTags.forEach((tag, index) => {
@@ -192,21 +193,21 @@ function buildPaletteLibraryEntries() {
     return a.localizedName.localeCompare(b.localizedName) || a.sourceTag.localeCompare(b.sourceTag);
   });
 
-  state.paletteLibraryEntries = libraryEntries;
+  runtimeState.paletteLibraryEntries = libraryEntries;
   return libraryEntries;
 }
 
 function buildPaletteQuickSwatches(maxCount = 24) {
   const swatches = [];
   const seen = new Set();
-  const entries = state.activePalettePack?.entries && typeof state.activePalettePack.entries === "object"
-    ? state.activePalettePack.entries
+  const entries = runtimeState.activePalettePack?.entries && typeof runtimeState.activePalettePack.entries === "object"
+    ? runtimeState.activePalettePack.entries
     : {};
-  const mapped = state.activePaletteMap?.mapped && typeof state.activePaletteMap.mapped === "object"
-    ? state.activePaletteMap.mapped
+  const mapped = runtimeState.activePaletteMap?.mapped && typeof runtimeState.activePaletteMap.mapped === "object"
+    ? runtimeState.activePaletteMap.mapped
     : {};
-  const quickTags = Array.isArray(state.activePalettePack?.quick_tags)
-    ? state.activePalettePack.quick_tags
+  const quickTags = Array.isArray(runtimeState.activePalettePack?.quick_tags)
+    ? runtimeState.activePalettePack.quick_tags
     : [];
 
   quickTags.forEach((rawTag) => {
@@ -225,16 +226,16 @@ function buildPaletteQuickSwatches(maxCount = 24) {
     });
   });
 
-  state.paletteQuickSwatches = swatches.slice(0, maxCount);
-  return state.paletteQuickSwatches;
+  runtimeState.paletteQuickSwatches = swatches.slice(0, maxCount);
+  return runtimeState.paletteQuickSwatches;
 }
 
 function applyActivePaletteState({ overwriteCountryPalette = false } = {}) {
-  state.fixedPaletteColorsByIso2 = buildFixedPaletteColorsByIso2(
-    state.activePalettePack,
-    state.activePaletteMap
+  runtimeState.fixedPaletteColorsByIso2 = buildFixedPaletteColorsByIso2(
+    runtimeState.activePalettePack,
+    runtimeState.activePaletteMap
   );
-  state.activePaletteOceanMeta = state.activePalettePack?.ocean || null;
+  runtimeState.activePaletteOceanMeta = runtimeState.activePalettePack?.ocean || null;
   syncResolvedDefaultCountryPalette({ overwriteCountryPalette });
   buildPaletteLibraryEntries();
   buildPaletteQuickSwatches();
@@ -254,8 +255,8 @@ async function ensurePaletteAssetsLoaded(
     throw new Error(`Unknown palette source: ${targetId}`);
   }
 
-  const cachedPack = state.palettePackCacheById?.[targetId];
-  const cachedMap = state.paletteMapCacheById?.[targetId];
+  const cachedPack = runtimeState.palettePackCacheById?.[targetId];
+  const cachedMap = runtimeState.paletteMapCacheById?.[targetId];
   if (cachedPack && cachedMap) {
     return { meta, pack: cachedPack, map: cachedMap };
   }
@@ -274,15 +275,15 @@ async function ensurePaletteAssetsLoaded(
     d3Client.json(paletteUrl),
     d3Client.json(mapUrl),
   ]);
-  state.palettePackCacheById[targetId] = pack;
-  state.paletteMapCacheById[targetId] = map;
-  state.paletteLoadErrorById[targetId] = "";
+  runtimeState.palettePackCacheById[targetId] = pack;
+  runtimeState.paletteMapCacheById[targetId] = map;
+  runtimeState.paletteLoadErrorById[targetId] = "";
   return { meta, pack, map };
 }
 
 function syncPaletteSourceControls() {
-  if (typeof state.updatePaletteSourceUIFn === "function") {
-    state.updatePaletteSourceUIFn();
+  if (typeof runtimeState.updatePaletteSourceUIFn === "function") {
+    runtimeState.updatePaletteSourceUIFn();
   }
 }
 
@@ -295,29 +296,29 @@ async function setActivePaletteSource(
   } = {}
 ) {
   const previousState = {
-    activePaletteId: state.activePaletteId,
-    activePaletteMeta: state.activePaletteMeta,
-    activePalettePack: state.activePalettePack,
-    activePaletteMap: state.activePaletteMap,
-    currentPaletteTheme: state.currentPaletteTheme,
-    activePaletteOceanMeta: state.activePaletteOceanMeta,
+    activePaletteId: runtimeState.activePaletteId,
+    activePaletteMeta: runtimeState.activePaletteMeta,
+    activePalettePack: runtimeState.activePalettePack,
+    activePaletteMap: runtimeState.activePaletteMap,
+    currentPaletteTheme: runtimeState.currentPaletteTheme,
+    activePaletteOceanMeta: runtimeState.activePaletteOceanMeta,
   };
 
   try {
     const { meta, pack, map } = await ensurePaletteAssetsLoaded(paletteId, { d3Client });
-    state.activePaletteId = String(meta?.palette_id || paletteId || "").trim();
-    state.activePaletteMeta = meta || null;
-    state.activePalettePack = pack || null;
-    state.activePaletteMap = map || null;
-    state.currentPaletteTheme = String(
-      meta?.display_name || state.currentPaletteTheme || state.activePaletteId || "HOI4 Vanilla"
+    runtimeState.activePaletteId = String(meta?.palette_id || paletteId || "").trim();
+    runtimeState.activePaletteMeta = meta || null;
+    runtimeState.activePalettePack = pack || null;
+    runtimeState.activePaletteMap = map || null;
+    runtimeState.currentPaletteTheme = String(
+      meta?.display_name || runtimeState.currentPaletteTheme || runtimeState.activePaletteId || "HOI4 Vanilla"
     );
     applyActivePaletteState({ overwriteCountryPalette });
-    if (typeof state.renderPaletteFn === "function") {
-      state.renderPaletteFn(state.currentPaletteTheme);
+    if (typeof runtimeState.renderPaletteFn === "function") {
+      runtimeState.renderPaletteFn(runtimeState.currentPaletteTheme);
     }
-    if (typeof state.updatePaletteLibraryUIFn === "function") {
-      state.updatePaletteLibraryUIFn();
+    if (typeof runtimeState.updatePaletteLibraryUIFn === "function") {
+      runtimeState.updatePaletteLibraryUIFn();
     }
     if (syncUI) {
       syncPaletteSourceControls();
@@ -326,14 +327,14 @@ async function setActivePaletteSource(
   } catch (error) {
     const targetId = String(paletteId || "").trim();
     if (targetId) {
-      state.paletteLoadErrorById[targetId] = String(error?.message || error || "Unknown palette load error");
+      runtimeState.paletteLoadErrorById[targetId] = String(error?.message || error || "Unknown palette load error");
     }
-    state.activePaletteId = previousState.activePaletteId;
-    state.activePaletteMeta = previousState.activePaletteMeta;
-    state.activePalettePack = previousState.activePalettePack;
-    state.activePaletteMap = previousState.activePaletteMap;
-    state.currentPaletteTheme = previousState.currentPaletteTheme;
-    state.activePaletteOceanMeta = previousState.activePaletteOceanMeta;
+    runtimeState.activePaletteId = previousState.activePaletteId;
+    runtimeState.activePaletteMeta = previousState.activePaletteMeta;
+    runtimeState.activePalettePack = previousState.activePalettePack;
+    runtimeState.activePaletteMap = previousState.activePaletteMap;
+    runtimeState.currentPaletteTheme = previousState.currentPaletteTheme;
+    runtimeState.activePaletteOceanMeta = previousState.activePaletteOceanMeta;
     if (syncUI) {
       syncPaletteSourceControls();
     }
@@ -362,3 +363,4 @@ export {
   setActivePaletteSource,
   syncResolvedDefaultCountryPalette,
 };
+

@@ -1,5 +1,6 @@
-import { countryPresets, state } from "./state.js";
+import { countryPresets, state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+const state = runtimeState;
 
 const BOUNDARY_VARIANT_ID_ALIASES = {
   legacy_approx: "historical_reference",
@@ -116,9 +117,9 @@ function getStaticPresetsForCode(code) {
   return [];
 }
 
-function resolveCatalogEntriesForScenario(scenarioId = state.activeScenarioId) {
-  const entries = Array.isArray(state.releasableCatalog?.entries)
-    ? state.releasableCatalog.entries
+function resolveCatalogEntriesForScenario(scenarioId = runtimeState.activeScenarioId) {
+  const entries = Array.isArray(runtimeState.releasableCatalog?.entries)
+    ? runtimeState.releasableCatalog.entries
     : [];
   const normalizedScenarioId = String(scenarioId || "").trim();
 
@@ -162,8 +163,8 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   }
 
   if (sourceType === "hierarchy_group_ids" || sourceType === "feature_selection") {
-    const groups = state.hierarchyData?.groups && typeof state.hierarchyData.groups === "object"
-      ? state.hierarchyData.groups
+    const groups = runtimeState.hierarchyData?.groups && typeof runtimeState.hierarchyData.groups === "object"
+      ? runtimeState.hierarchyData.groups
       : {};
     const featureIds = new Set();
     normalizedPresetSource.feature_ids.forEach((featureId) => {
@@ -202,8 +203,8 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   if (sourceType === "feature_ids") {
     const ids = Array.from(new Set(normalizedPresetSource.feature_ids));
     normalizedPresetSource.group_ids.forEach((groupId) => {
-      const idsForGroup = Array.isArray(state.hierarchyData?.groups?.[groupId])
-        ? state.hierarchyData.groups[groupId]
+      const idsForGroup = Array.isArray(runtimeState.hierarchyData?.groups?.[groupId])
+        ? runtimeState.hierarchyData.groups[groupId]
         : [];
       idsForGroup.forEach((featureId) => {
         const normalized = String(featureId || "").trim();
@@ -234,14 +235,14 @@ function getSelectedBoundaryVariantId(entry = {}) {
   const tag = normalizeCountryCode(entry?.tag);
   const variants = normalizeBoundaryVariants(entry);
   if (!tag || !variants.length) return "";
-  const selectedId = normalizeBoundaryVariantId(state.releasableBoundaryVariantByTag?.[tag]);
+  const selectedId = normalizeBoundaryVariantId(runtimeState.releasableBoundaryVariantByTag?.[tag]);
   if (
     selectedId
-    && state.releasableBoundaryVariantByTag?.[tag]
-    && normalizeRuleId(state.releasableBoundaryVariantByTag[tag]) !== selectedId
+    && runtimeState.releasableBoundaryVariantByTag?.[tag]
+    && normalizeRuleId(runtimeState.releasableBoundaryVariantByTag[tag]) !== selectedId
   ) {
-    state.releasableBoundaryVariantByTag = {
-      ...state.releasableBoundaryVariantByTag,
+    runtimeState.releasableBoundaryVariantByTag = {
+      ...runtimeState.releasableBoundaryVariantByTag,
       [tag]: selectedId,
     };
   }
@@ -249,12 +250,12 @@ function getSelectedBoundaryVariantId(entry = {}) {
     return selectedId;
   }
   const defaultId = getDefaultBoundaryVariantId(entry);
-  if (!state.releasableBoundaryVariantByTag || typeof state.releasableBoundaryVariantByTag !== "object") {
-    state.releasableBoundaryVariantByTag = {};
+  if (!runtimeState.releasableBoundaryVariantByTag || typeof runtimeState.releasableBoundaryVariantByTag !== "object") {
+    runtimeState.releasableBoundaryVariantByTag = {};
   }
-  if (defaultId && state.releasableBoundaryVariantByTag[tag] !== defaultId) {
-    state.releasableBoundaryVariantByTag = {
-      ...state.releasableBoundaryVariantByTag,
+  if (defaultId && runtimeState.releasableBoundaryVariantByTag[tag] !== defaultId) {
+    runtimeState.releasableBoundaryVariantByTag = {
+      ...runtimeState.releasableBoundaryVariantByTag,
       [tag]: defaultId,
     };
   }
@@ -280,7 +281,7 @@ function resolveCompanionActionFeatureIds(action = {}, entry = {}) {
   return resolveFeatureIdsFromPresetSource(action?.preset_source, entry);
 }
 
-function resolveCatalogEntryForTag(tag, scenarioId = state.activeScenarioId) {
+function resolveCatalogEntryForTag(tag, scenarioId = runtimeState.activeScenarioId) {
   const normalizedTag = normalizeCountryCode(tag);
   if (!normalizedTag) return null;
   const scenarioEntry = getScenarioReleasableIndex(scenarioId)?.byTag?.[normalizedTag];
@@ -306,20 +307,20 @@ function setReleasableBoundaryVariant(tag, variantId) {
     || variants[0];
   if (!resolvedVariant) return null;
 
-  if (!state.releasableBoundaryVariantByTag || typeof state.releasableBoundaryVariantByTag !== "object") {
-    state.releasableBoundaryVariantByTag = {};
+  if (!runtimeState.releasableBoundaryVariantByTag || typeof runtimeState.releasableBoundaryVariantByTag !== "object") {
+    runtimeState.releasableBoundaryVariantByTag = {};
   }
-  state.releasableBoundaryVariantByTag = {
-    ...state.releasableBoundaryVariantByTag,
+  runtimeState.releasableBoundaryVariantByTag = {
+    ...runtimeState.releasableBoundaryVariantByTag,
     [normalizedTag]: resolvedVariant.id,
   };
 
   const featureIds = resolvePresetFeatureIds(entry);
-  if (state.scenarioCountriesByTag?.[normalizedTag]) {
-    state.scenarioCountriesByTag = {
-      ...state.scenarioCountriesByTag,
+  if (runtimeState.scenarioCountriesByTag?.[normalizedTag]) {
+    runtimeState.scenarioCountriesByTag = {
+      ...runtimeState.scenarioCountriesByTag,
       [normalizedTag]: {
-        ...state.scenarioCountriesByTag[normalizedTag],
+        ...runtimeState.scenarioCountriesByTag[normalizedTag],
         feature_count: featureIds.length,
         default_boundary_variant_id: getDefaultBoundaryVariantId(entry),
         selected_boundary_variant_id: resolvedVariant.id,
@@ -342,7 +343,7 @@ function setReleasableBoundaryVariant(tag, variantId) {
 
 function getReleasableGroupingMeta(entry = {}) {
   const groupingCode = normalizeCountryCode(entry.release_lookup_iso2 || entry.lookup_iso2 || entry.base_iso2);
-  if (!groupingCode || !(state.countryGroupMetaByCode instanceof Map)) {
+  if (!groupingCode || !(runtimeState.countryGroupMetaByCode instanceof Map)) {
     return {
       groupingCode: "",
       continentId: "",
@@ -351,7 +352,7 @@ function getReleasableGroupingMeta(entry = {}) {
       subregionLabel: "",
     };
   }
-  const meta = state.countryGroupMetaByCode.get(groupingCode) || {};
+  const meta = runtimeState.countryGroupMetaByCode.get(groupingCode) || {};
   return {
     groupingCode,
     continentId: String(meta.continentId || "").trim(),
@@ -377,7 +378,7 @@ function normalizeExcludedTags(values = []) {
   );
 }
 
-function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
+function buildScenarioReleasableIndex(scenarioId = runtimeState.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) {
     return createEmptyReleasableIndex();
@@ -435,18 +436,18 @@ function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId, { exc
   return index;
 }
 
-function getScenarioReleasableIndex(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
+function getScenarioReleasableIndex(scenarioId = runtimeState.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) {
     return createEmptyReleasableIndex();
   }
   if (
     !(Array.isArray(excludeTags) && excludeTags.length) &&
-    normalizedScenarioId === String(state.activeScenarioId || "").trim()
-    && state.scenarioReleasableIndex
-    && typeof state.scenarioReleasableIndex === "object"
+    normalizedScenarioId === String(runtimeState.activeScenarioId || "").trim()
+    && runtimeState.scenarioReleasableIndex
+    && typeof runtimeState.scenarioReleasableIndex === "object"
   ) {
-    return state.scenarioReleasableIndex;
+    return runtimeState.scenarioReleasableIndex;
   }
   return buildScenarioReleasableIndex(normalizedScenarioId, { excludeTags });
 }
@@ -477,7 +478,7 @@ function buildReleasablePresetOverlays() {
     });
   });
 
-  resolveCatalogEntriesForScenario(state.activeScenarioId).forEach((entry) => {
+  resolveCatalogEntriesForScenario(runtimeState.activeScenarioId).forEach((entry) => {
     const tag = normalizeCountryCode(entry.tag);
     const featureIds = resolvePresetFeatureIds(entry);
     if (!tag || !featureIds.length) return;
@@ -529,9 +530,9 @@ function mergePresetLayers(...layers) {
 }
 
 function buildScenarioRegionalPresetOverlays() {
-  if (!state.activeScenarioId) return {};
-  const scenarioCountries = state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object"
-    ? state.scenarioCountriesByTag
+  if (!runtimeState.activeScenarioId) return {};
+  const scenarioCountries = runtimeState.scenarioCountriesByTag && typeof runtimeState.scenarioCountriesByTag === "object"
+    ? runtimeState.scenarioCountriesByTag
     : {};
   const overlays = {};
   const assignOverlayPresets = (rawCode, presets) => {
@@ -573,18 +574,18 @@ function buildScenarioRegionalPresetOverlays() {
 function rebuildPresetState() {
   const { defaultOverlays, scenarioOverlays } = buildReleasablePresetOverlays();
   const scenarioRegionalPresetOverlays = buildScenarioRegionalPresetOverlays();
-  state.defaultReleasablePresetOverlays = defaultOverlays;
-  state.scenarioReleasablePresetOverlays = scenarioOverlays;
-  state.presetsState = mergePresetLayers(
+  runtimeState.defaultReleasablePresetOverlays = defaultOverlays;
+  runtimeState.scenarioReleasablePresetOverlays = scenarioOverlays;
+  runtimeState.presetsState = mergePresetLayers(
     countryPresets,
     scenarioRegionalPresetOverlays,
-    state.activeScenarioId ? scenarioOverlays : defaultOverlays,
-    state.customPresets || {}
+    runtimeState.activeScenarioId ? scenarioOverlays : defaultOverlays,
+    runtimeState.customPresets || {}
   );
-  return state.presetsState;
+  return runtimeState.presetsState;
 }
 
-function getScenarioReleasableCountries(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
+function getScenarioReleasableCountries(scenarioId = runtimeState.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) return {};
 
@@ -663,3 +664,4 @@ export {
   rebuildPresetState,
   setReleasableBoundaryVariant,
 };
+

@@ -234,8 +234,9 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("state.ui?.restoredSupportSurfaceViewFromUrl === view", support_owner)
         self.assertIn('["guide", "reference", "export"].includes(view)', support_owner)
         self.assertIn("document.body.classList.contains(\"left-drawer-open\")", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
-        self.assertIn("state.closeDockPopoverFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
-        self.assertIn("state.closeExportWorkbenchFn?.({ restoreFocus: false });", TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8"))
+        transport_content = TRANSPORT_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
+        self.assertTrue("state.closeDockPopoverFn?.({ restoreFocus: false });" in transport_content or "runtimeState.closeDockPopoverFn?.({ restoreFocus: false });" in transport_content)
+        self.assertTrue("state.closeExportWorkbenchFn?.({ restoreFocus: false });" in transport_content or "runtimeState.closeExportWorkbenchFn?.({ restoreFocus: false });" in transport_content)
 
     def test_appearance_controller_owns_transport_appearance_and_shell_logic(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -269,7 +270,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         owner_content = APPEARANCE_CONTROLS_CONTROLLER_JS.read_text(encoding="utf-8")
 
         self.assertIn("const syncDayNightConfig = () => {", owner_content)
-        self.assertIn("const renderTextureModePanels = (mode = state.styleConfig.texture?.mode || \"none\") => {", owner_content)
+        self.assertTrue(
+            "const renderTextureModePanels = (mode = state.styleConfig.texture?.mode || \"none\") => {" in owner_content
+            or "const renderTextureModePanels = (mode = runtimeState.styleConfig.texture?.mode || \"none\") => {" in owner_content
+        )
         self.assertIn("const renderTextureUI = () => {", owner_content)
         self.assertIn("const renderDayNightUI = () => {", owner_content)
         self.assertIn("const updateTextureStyle = (mutate, { historyKind = \"texture-style\", commitHistory = false } = {}) => {", owner_content)

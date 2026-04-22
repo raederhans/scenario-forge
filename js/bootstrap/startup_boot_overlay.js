@@ -1,12 +1,13 @@
-import { state } from "../core/state.js";
+import { state as runtimeState } from "../core/state.js";
 import {
   replaceBootMetricsState,
   setBootPreviewVisibleState,
   setBootStateFields,
   setStartupReadonlyStateFields,
 } from "../core/state/boot_state.js";
-import { callRuntimeHook } from "../core/runtime_hooks.js";
+import { callRuntimeHook } from "../core/state/index.js";
 import { getBootLanguage, nowMs } from "./startup_bootstrap_support.js";
+const state = runtimeState;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
@@ -118,7 +119,7 @@ const STARTUP_READONLY_COPY = {
   },
 };
 
-function getBootCopy(phase = state.bootPhase) {
+function getBootCopy(phase = runtimeState.bootPhase) {
   const language = getBootLanguage();
   return BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
 }
@@ -170,29 +171,29 @@ export function createStartupBootOverlayController() {
 
   const getStartupReadonlyMessage = () => {
     const copy = getStartupReadonlyCopy();
-    if (state.startupReadonlyReason === "detail-promotion-failed") {
+    if (runtimeState.startupReadonlyReason === "detail-promotion-failed") {
       return copy.failed;
     }
-    if (state.startupReadonlyReason === "scenario-health-gate") {
+    if (runtimeState.startupReadonlyReason === "scenario-health-gate") {
       return copy.healthGate;
     }
-    if (state.startupReadonlyUnlockInFlight) {
+    if (runtimeState.startupReadonlyUnlockInFlight) {
       return copy.loading;
     }
     return copy.pending;
   };
 
-  const getBootProgressWindow = (phase = state.bootPhase) => {
+  const getBootProgressWindow = (phase = runtimeState.bootPhase) => {
     return BOOT_PHASE_WINDOWS[phase] || BOOT_PHASE_WINDOWS.shell;
   };
 
-  const sampleBootPhaseProgress = (phase = state.bootPhase) => {
+  const sampleBootPhaseProgress = (phase = runtimeState.bootPhase) => {
     const window = getBootProgressWindow(phase);
     if (phase === "ready") {
       return 100;
     }
     if (phase === "error") {
-      return Math.max(window.min, Math.min(99, Number(state.bootProgress || window.min)));
+      return Math.max(window.min, Math.min(99, Number(runtimeState.bootProgress || window.min)));
     }
     const elapsedMs = Math.max(0, nowMs() - bootProgressPhaseStartedAt);
     const ratio = window.durationMs > 0
@@ -214,10 +215,10 @@ export function createStartupBootOverlayController() {
       return;
     }
     const dom = getBootDom();
-    const copy = getBootCopy(state.bootPhase);
-    const blocking = state.bootBlocking !== false;
+    const copy = getBootCopy(runtimeState.bootPhase);
+    const blocking = runtimeState.bootBlocking !== false;
     document.body?.classList.toggle("app-booting", blocking);
-    document.body?.classList.toggle("app-startup-readonly", !!state.startupReadonly);
+    document.body?.classList.toggle("app-startup-readonly", !!runtimeState.startupReadonly);
     if (dom.overlay) {
       // CSS `.boot-overlay` sets `display: flex`, which overrides the HTML
       // `[hidden]` attribute's default `display: none`. The actual fade-out
@@ -227,35 +228,35 @@ export function createStartupBootOverlayController() {
       dom.overlay.classList.toggle("hidden", !blocking);
     }
     if (dom.appShell) {
-      dom.appShell.classList.toggle("boot-preview-visible", !!state.bootPreviewVisible);
+      dom.appShell.classList.toggle("boot-preview-visible", !!runtimeState.bootPreviewVisible);
     }
     if (dom.title) {
-      dom.title.textContent = String(state.bootError ? copy.title : copy.title || "");
+      dom.title.textContent = String(runtimeState.bootError ? copy.title : copy.title || "");
     }
     if (dom.message) {
-      dom.message.textContent = String(state.bootError || state.bootMessage || copy.message || "");
+      dom.message.textContent = String(runtimeState.bootError || runtimeState.bootMessage || copy.message || "");
     }
     if (dom.progressTrack) {
       dom.progressTrack.hidden = !blocking;
     }
     if (dom.progressBar) {
-      dom.progressBar.style.width = `${Math.max(0, Math.min(100, Number(state.bootProgress || 0)))}%`;
+      dom.progressBar.style.width = `${Math.max(0, Math.min(100, Number(runtimeState.bootProgress || 0)))}%`;
     }
     if (dom.progressText) {
-      dom.progressText.textContent = `${Math.round(Math.max(0, Math.min(100, Number(state.bootProgress || 0))))}%`;
+      dom.progressText.textContent = `${Math.round(Math.max(0, Math.min(100, Number(runtimeState.bootProgress || 0))))}%`;
     }
     if (dom.actions) {
-      dom.actions.hidden = state.bootPhase !== "error";
+      dom.actions.hidden = runtimeState.bootPhase !== "error";
     }
     if (dom.retryBtn) {
       dom.retryBtn.textContent = copy.retry || BOOT_COPY.en.shell.retry;
     }
     if (dom.continueBtn) {
       dom.continueBtn.textContent = copy.continue || BOOT_COPY.en.shell.continue;
-      dom.continueBtn.hidden = !state.bootCanContinueWithoutScenario;
+      dom.continueBtn.hidden = !runtimeState.bootCanContinueWithoutScenario;
     }
     if (dom.readonlyBanner) {
-      const readonlyVisible = !!state.startupReadonly && !blocking;
+      const readonlyVisible = !!runtimeState.startupReadonly && !blocking;
       // `.startup-readonly-banner` has no `display` override, so the HTML
       // `[hidden]` attribute works here. The previous `--visible` class toggle
       // targeted a CSS rule that does not exist and was dead code.
@@ -270,11 +271,11 @@ export function createStartupBootOverlayController() {
     stopBootProgressAnimation();
     const tick = () => {
       bootProgressAnimationHandle = null;
-      if (state.bootPhase === "ready" || state.bootPhase === "error") {
+      if (runtimeState.bootPhase === "ready" || runtimeState.bootPhase === "error") {
         return;
       }
-      const nextProgress = sampleBootPhaseProgress(state.bootPhase);
-      if (nextProgress > state.bootProgress) {
+      const nextProgress = sampleBootPhaseProgress(runtimeState.bootPhase);
+      if (nextProgress > runtimeState.bootProgress) {
         setBootStateFields(state, { progress: nextProgress });
         syncBootOverlay();
       }
@@ -295,7 +296,7 @@ export function createStartupBootOverlayController() {
       reason,
       unlockInFlight,
     });
-    if (!state.startupReadonly) {
+    if (!runtimeState.startupReadonly) {
       clearStartupReadonlyUnlockHandle();
     }
     syncBootOverlay();
@@ -373,26 +374,26 @@ export function createStartupBootOverlayController() {
         startedAt: nowMs(),
       },
     });
-    globalThis.__bootMetrics = state.bootMetrics;
+    globalThis.__bootMetrics = runtimeState.bootMetrics;
   };
 
   const startBootMetric = (name) => {
     const nextMetrics = {
-      ...(state.bootMetrics || {}),
+      ...(runtimeState.bootMetrics || {}),
       [name]: {
         startedAt: nowMs(),
       },
     };
     replaceBootMetricsState(state, nextMetrics);
-    globalThis.__bootMetrics = state.bootMetrics;
+    globalThis.__bootMetrics = runtimeState.bootMetrics;
   };
 
   const finishBootMetric = (name, extra = {}) => {
     const finishedAt = nowMs();
-    const metric = state.bootMetrics[name] || {};
+    const metric = runtimeState.bootMetrics[name] || {};
     const startedAt = Number(metric.startedAt);
     replaceBootMetricsState(state, {
-      ...(state.bootMetrics || {}),
+      ...(runtimeState.bootMetrics || {}),
       [name]: {
         ...metric,
         ...extra,
@@ -400,33 +401,33 @@ export function createStartupBootOverlayController() {
         durationMs: Number.isFinite(startedAt) ? finishedAt - startedAt : null,
       },
     });
-    globalThis.__bootMetrics = state.bootMetrics;
+    globalThis.__bootMetrics = runtimeState.bootMetrics;
   };
 
   const checkpointBootMetric = (name) => {
-    const metric = state.bootMetrics[name] || {};
-    const totalStartedAt = Number(state.bootMetrics?.total?.startedAt);
+    const metric = runtimeState.bootMetrics[name] || {};
+    const totalStartedAt = Number(runtimeState.bootMetrics?.total?.startedAt);
     replaceBootMetricsState(state, {
-      ...(state.bootMetrics || {}),
+      ...(runtimeState.bootMetrics || {}),
       [name]: {
         ...metric,
         atMs: Number.isFinite(totalStartedAt) ? nowMs() - totalStartedAt : 0,
       },
     });
-    globalThis.__bootMetrics = state.bootMetrics;
-    return state.bootMetrics[name];
+    globalThis.__bootMetrics = runtimeState.bootMetrics;
+    return runtimeState.bootMetrics[name];
   };
 
   const checkpointBootMetricOnce = (name) => {
-    if (state.bootMetrics[name]?.atMs !== undefined) {
-      return state.bootMetrics[name];
+    if (runtimeState.bootMetrics[name]?.atMs !== undefined) {
+      return runtimeState.bootMetrics[name];
     }
     return checkpointBootMetric(name);
   };
 
   const logBootMetrics = () => {
     const printable = {};
-    Object.entries(state.bootMetrics || {}).forEach(([name, metric]) => {
+    Object.entries(runtimeState.bootMetrics || {}).forEach(([name, metric]) => {
       if (Number.isFinite(metric?.durationMs)) {
         printable[name] = `${metric.durationMs.toFixed(1)}ms`;
         return;
@@ -485,3 +486,5 @@ export function createStartupBootOverlayController() {
     getBootDom,
   };
 }
+
+

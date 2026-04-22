@@ -1,8 +1,9 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
+const state = runtimeState;
 
 function countOwnerControllerSplit({
-  ownersByFeatureId = state.sovereigntyByFeatureId || {},
-  controllersByFeatureId = state.scenarioControllersByFeatureId || {},
+  ownersByFeatureId = runtimeState.sovereigntyByFeatureId || {},
+  controllersByFeatureId = runtimeState.scenarioControllersByFeatureId || {},
 } = {}) {
   let split = 0;
   const seen = new Set();
@@ -29,11 +30,12 @@ function countOwnerControllerSplit({
 }
 
 export function recalculateScenarioOwnerControllerDiffCount() {
-  state.scenarioOwnerControllerDiffCount = state.activeScenarioId
+  runtimeState.scenarioOwnerControllerDiffCount = runtimeState.activeScenarioId
     ? countOwnerControllerSplit({
-      ownersByFeatureId: state.sovereigntyByFeatureId,
-      controllersByFeatureId: state.scenarioControllersByFeatureId,
+      ownersByFeatureId: runtimeState.sovereigntyByFeatureId,
+      controllersByFeatureId: runtimeState.scenarioControllersByFeatureId,
     })
     : 0;
-  return state.scenarioOwnerControllerDiffCount;
+  return runtimeState.scenarioOwnerControllerDiffCount;
 }
+

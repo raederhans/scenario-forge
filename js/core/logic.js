@@ -1,10 +1,11 @@
 // Shared map logic helpers (Phase 13)
-import { state, countryPalette, defaultCountryPalette } from "./state.js";
+import { state as runtimeState, countryPalette, defaultCountryPalette } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
+const state = runtimeState;
 
 function normalizeCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -20,15 +21,15 @@ function getCountryCode(feature) {
 }
 
 function applyCountryColor(code, color) {
-  if (!state.landData) return;
+  if (!runtimeState.landData) return;
   const target = normalizeCountryCode(code);
   if (!target) return;
   const before = captureHistoryState({
     ownerCodes: [target],
   });
-  state.countryPalette[target] = color;
-  state.sovereignBaseColors[target] = color;
-  state.countryBaseColors[target] = color;
+  runtimeState.countryPalette[target] = color;
+  runtimeState.sovereignBaseColors[target] = color;
+  runtimeState.countryBaseColors[target] = color;
   markLegacyColorStateDirty();
   refreshResolvedColorsForOwners([target], { renderNow: true });
   pushHistoryEntry({
@@ -45,12 +46,12 @@ function applyCountryColor(code, color) {
 
 function resetCountryColors() {
   const ownerCodes = Array.from(new Set([
-    ...Object.keys(state.sovereignBaseColors || {}),
+    ...Object.keys(runtimeState.sovereignBaseColors || {}),
     ...Object.keys(defaultCountryPalette || {}),
-    ...Object.keys(state.scenarioFixedOwnerColors || {}),
-    ...Object.keys(state.countryPalette || {}),
+    ...Object.keys(runtimeState.scenarioFixedOwnerColors || {}),
+    ...Object.keys(runtimeState.countryPalette || {}),
   ]));
-  const featureIds = Object.keys(state.visualOverrides || {});
+  const featureIds = Object.keys(runtimeState.visualOverrides || {});
   const before = captureHistoryState({
     featureIds,
     ownerCodes,
@@ -62,14 +63,14 @@ function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  state.sovereignBaseColors = {
+  runtimeState.sovereignBaseColors = {
     ...resolvedDefaults,
-    ...(state.activeScenarioId ? state.scenarioFixedOwnerColors || {} : {}),
+    ...(runtimeState.activeScenarioId ? runtimeState.scenarioFixedOwnerColors || {} : {}),
   };
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.colors = {};
-  state.visualOverrides = {};
-  state.featureOverrides = {};
+  runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
+  runtimeState.colors = {};
+  runtimeState.visualOverrides = {};
+  runtimeState.featureOverrides = {};
   markLegacyColorStateDirty();
   refreshColorState({ renderNow: true });
   pushHistoryEntry({
@@ -86,14 +87,14 @@ function resetCountryColors() {
 }
 
 function applyPaletteToMap() {
-  if (!state.landData) return;
+  if (!runtimeState.landData) return;
   const touchedOwners = new Set();
-  for (const feature of state.landData.features) {
+  for (const feature of runtimeState.landData.features) {
     const code = getCountryCode(feature);
     const color = countryPalette[code];
     if (color) {
-      state.sovereignBaseColors[code] = color;
-      state.countryBaseColors[code] = color;
+      runtimeState.sovereignBaseColors[code] = color;
+      runtimeState.countryBaseColors[code] = color;
       touchedOwners.add(code);
     }
   }
@@ -109,8 +110,8 @@ function saveMapState() {
       "map_colors",
       JSON.stringify({
         schemaVersion: 2,
-        countryBaseColors: state.sovereignBaseColors || state.countryBaseColors || {},
-        featureOverrides: state.visualOverrides || state.featureOverrides || {},
+        countryBaseColors: runtimeState.sovereignBaseColors || runtimeState.countryBaseColors || {},
+        featureOverrides: runtimeState.visualOverrides || runtimeState.featureOverrides || {},
       })
     );
   } catch (error) {
@@ -119,3 +120,4 @@ function saveMapState() {
 }
 
 export { applyCountryColor, resetCountryColors, applyPaletteToMap, saveMapState };
+

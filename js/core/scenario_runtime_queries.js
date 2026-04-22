@@ -1,5 +1,6 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+const state = runtimeState;
 
 export function canonicalScenarioCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -49,8 +50,8 @@ export function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return "";
   return String(
-    state.sovereigntyByFeatureId?.[normalizedId] ||
-    state.runtimeCanonicalCountryByFeatureId?.[normalizedId] ||
+    runtimeState.sovereigntyByFeatureId?.[normalizedId] ||
+    runtimeState.runtimeCanonicalCountryByFeatureId?.[normalizedId] ||
     ""
   )
     .trim()
@@ -61,7 +62,7 @@ export function getScenarioEffectiveControllerCodeByFeatureId(featureId) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return "";
   return String(
-    state.scenarioControllersByFeatureId?.[normalizedId] ||
+    runtimeState.scenarioControllersByFeatureId?.[normalizedId] ||
     getScenarioEffectiveOwnerCodeByFeatureId(normalizedId) ||
     ""
   )
@@ -81,3 +82,4 @@ export function hasExplicitScenarioAssignment(featureMap, featureId) {
     Object.prototype.hasOwnProperty.call(featureMap, featureId)
   );
 }
+

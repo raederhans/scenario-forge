@@ -1,4 +1,4 @@
-import { countryNames, defaultCountryPalette, state } from "./state.js";
+import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
@@ -121,6 +121,8 @@ import {
 import { consumeScenarioTestHook } from "./scenario_recovery.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
+
+const state = runtimeState;
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
@@ -187,7 +189,7 @@ async function loadMeasuredRequiredScenarioResource(d3Client, url, options = {})
   return sharedLoadMeasuredRequiredScenarioResource(loadMeasuredJsonResource, d3Client, url, options);
 }
 
-function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentLanguage) {
+function getScenarioGeoLocalePatchDescriptor(manifest, language = runtimeState.currentLanguage) {
   return sharedGetScenarioGeoLocalePatchDescriptor(manifest, language);
 }
 
@@ -228,9 +230,9 @@ function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = 
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
   const fallback = String(fallbackOwner || "").trim().toUpperCase();
-  const directOwner = String(state.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  const directController = String(state.scenarioControllersByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  if (!state.activeScenarioId || normalizeScenarioViewMode(state.scenarioViewMode) !== "frontline") {
+  const directOwner = String(runtimeState.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  const directController = String(runtimeState.scenarioControllersByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  if (!runtimeState.activeScenarioId || normalizeScenarioViewMode(runtimeState.scenarioViewMode) !== "frontline") {
     return directOwner || fallback;
   }
   return String(
@@ -265,7 +267,7 @@ function getDefaultScenarioId() {
   return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
 }
 
-function getScenarioManifestSummary(manifest = state.activeScenarioManifest) {
+function getScenarioManifestSummary(manifest = runtimeState.activeScenarioManifest) {
   return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
@@ -403,7 +405,7 @@ function scheduleScenarioDeferredBundleMetadataLoad(bundle, { d3Client = globalT
           };
         }
       }
-      if (normalizeScenarioId(state.activeScenarioId) === scenarioId) {
+      if (normalizeScenarioId(runtimeState.activeScenarioId) === scenarioId) {
         applyDeferredScenarioMetadata(bundle, { scenarioId });
       }
       resolve();
@@ -417,17 +419,17 @@ function applyDeferredScenarioMetadata(bundle, { scenarioId = "" } = {}) {
   );
   if (
     !normalizedScenarioId
-    || normalizeScenarioId(state.activeScenarioId) !== normalizedScenarioId
+    || normalizeScenarioId(runtimeState.activeScenarioId) !== normalizedScenarioId
   ) {
     return false;
   }
   if (bundle.releasableCatalog) {
-    state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
-    state.scenarioReleasableIndex = buildScenarioReleasableIndex(normalizedScenarioId, { excludeTags: [] });
+    runtimeState.releasableCatalog = mergeReleasableCatalogs(runtimeState.defaultReleasableCatalog, bundle.releasableCatalog);
+    runtimeState.scenarioReleasableIndex = buildScenarioReleasableIndex(normalizedScenarioId, { excludeTags: [] });
   }
   if (bundle.districtGroupsPayload) {
-    state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
-    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
+    runtimeState.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
+    runtimeState.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
   }
   syncScenarioUi();
   return true;
@@ -544,7 +546,7 @@ const {
    * Evaluate startup hydration health gate from active runtime ownership/controller coverage.
    * @param {{ phase?: string }} [options]
    * @returns {{ ok: boolean, report: object, overlayConsistency: object }} Health gate verdict and diagnostics.
-   * @throws {Error} Does not throw under normal flow; callers treat failed health as non-throwing state.
+   * @throws {Error} Does not throw under normal flow; callers treat failed health as non-throwing runtimeState.
    */
   evaluateScenarioHydrationHealthGateState,
   enforceScenarioHydrationHealthGate,
@@ -596,7 +598,7 @@ function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopolog
       : config.visibilityField === "showScenarioReliefOverlays"
         ? hints.scenarioReliefOverlaysDefault === true
         : config.visibilityField === "showCityPoints"
-          ? state.showCityPoints !== false
+          ? runtimeState.showCityPoints !== false
           : false;
   if (!visibleByDefault) {
     return false;
@@ -611,7 +613,7 @@ function applyScenarioOptionalLayerState(bundle, layerKey, payload) {
   const config = getScenarioOptionalLayerConfig(layerKey);
   if (!config) return false;
   const bundleScenarioId = getScenarioBundleId(bundle);
-  if (!bundleScenarioId || bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)) {
+  if (!bundleScenarioId || bundleScenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)) {
     return false;
   }
   if (config.stateField === "scenarioCityOverridesData") {
@@ -743,8 +745,8 @@ async function ensureActiveScenarioOptionalLayerLoaded(
   } = {}
 ) {
   const normalizedKey = normalizeScenarioOptionalLayerKey(layerKey);
-  if (!normalizedKey || !state.activeScenarioId) return null;
-  const bundle = state.scenarioBundleCacheById?.[normalizeScenarioId(state.activeScenarioId)];
+  if (!normalizedKey || !runtimeState.activeScenarioId) return null;
+  const bundle = runtimeState.scenarioBundleCacheById?.[normalizeScenarioId(runtimeState.activeScenarioId)];
   if (!bundle) return null;
   if (scenarioBundleUsesChunkedLayer(bundle, normalizedKey)) {
     scheduleScenarioChunkRefresh({
@@ -771,8 +773,8 @@ async function ensureActiveScenarioOptionalLayersForVisibility(
     renderNow = true,
   } = {}
 ) {
-  const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
-  const activeBundle = bundle || state.scenarioBundleCacheById?.[activeScenarioId] || null;
+  const activeScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+  const activeBundle = bundle || runtimeState.scenarioBundleCacheById?.[activeScenarioId] || null;
   if (!activeScenarioId || !activeBundle) return [];
   const requestedChunkedLayers = Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter(([, config]) => state[config.visibilityField])
@@ -805,20 +807,20 @@ async function ensureActiveScenarioOptionalLayersForVisibility(
   return payloads;
 }
 
-function getCachedScenarioBundle(scenarioId = state.activeScenarioId) {
+function getCachedScenarioBundle(scenarioId = runtimeState.activeScenarioId) {
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
   if (!normalizedScenarioId) return null;
-  return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+  return runtimeState.scenarioBundleCacheById?.[normalizedScenarioId] || null;
 }
 
-function releaseScenarioAuditPayload(scenarioId = state.activeScenarioId, { syncUi = true } = {}) {
+function releaseScenarioAuditPayload(scenarioId = runtimeState.activeScenarioId, { syncUi = true } = {}) {
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
   const bundle = getCachedScenarioBundle(normalizedScenarioId);
   if (bundle) {
     bundle.auditPayload = null;
   }
-  if (!normalizedScenarioId || normalizeScenarioId(state.activeScenarioId) === normalizedScenarioId) {
-    state.scenarioAudit = null;
+  if (!normalizedScenarioId || normalizeScenarioId(runtimeState.activeScenarioId) === normalizedScenarioId) {
+    runtimeState.scenarioAudit = null;
     setScenarioAuditUiState({
       loading: false,
       loadedForScenarioId: "",
@@ -913,3 +915,4 @@ export {
   releaseScenarioAuditPayload,
   validateImportedScenarioBaseline,
 };
+

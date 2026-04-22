@@ -1,4 +1,4 @@
-import { state } from "../../core/state.js";
+import { state as runtimeState } from "../../core/state.js";
 import { getEffectiveCityCollection } from "../../core/map_renderer/public.js";
 import { syncScenarioLocalizationState } from "../../core/scenario_localization_state.js";
 import { getFeatureOwnerCode } from "../../core/sovereignty_manager.js";
@@ -8,6 +8,7 @@ import {
   normalizeScenarioTagInput,
   normalizeScenarioNameInput,
 } from "./dev_workspace_normalizers.js";
+const state = runtimeState;
 
 function ui(key) {
   return t(key, "ui");
@@ -76,7 +77,7 @@ export function createScenarioTextEditorsController({
   const resolveCountryEditorModel = () => {
     const options = collectScenarioCountryOptions({ includeReleasable: true });
     const availableTags = new Set(options.map((entry) => entry.tag));
-    const explicitTag = normalizeScenarioTagInput(state.devScenarioCountryEditor?.tag);
+    const explicitTag = normalizeScenarioTagInput(runtimeState.devScenarioCountryEditor?.tag);
     const selectionTag = resolveSingleSelectionScenarioTag(availableTags);
     const fallbackTag = options.some((entry) => entry.tag === explicitTag)
       ? explicitTag
@@ -105,7 +106,7 @@ export function createScenarioTextEditorsController({
   };
 
   const resolveCountryEditorHint = (model) => {
-    if (!state.activeScenarioId) {
+    if (!runtimeState.activeScenarioId) {
       return ui("Activate a scenario to edit country names.");
     }
     if (!model.tag) {
@@ -123,7 +124,7 @@ export function createScenarioTextEditorsController({
       ? cityCollection.features.filter((feature) => String(feature?.properties?.__city_host_feature_id || "").trim() === normalizedFeatureId)
       : [];
     if (!candidates.length) return null;
-    const priorHint = state.scenarioCityOverridesData?.capital_city_hints?.[normalizedTag] || null;
+    const priorHint = runtimeState.scenarioCityOverridesData?.capital_city_hints?.[normalizedTag] || null;
     const scoreCandidate = (feature) => {
       const props = feature?.properties || {};
       const cityId = String(props.__city_id || feature?.id || "").trim();
@@ -159,13 +160,13 @@ export function createScenarioTextEditorsController({
       baseTier: String(props.__city_base_tier || "").trim(),
       lon: Array.isArray(feature?.geometry?.coordinates) ? Number(feature.geometry.coordinates[0]) : null,
       lat: Array.isArray(feature?.geometry?.coordinates) ? Number(feature.geometry.coordinates[1]) : null,
-      capitalStateId: priorHint?.capital_state_id ?? state.scenarioCountriesByTag?.[normalizedTag]?.capital_state_id ?? null,
+      capitalStateId: priorHint?.capital_state_id ?? runtimeState.scenarioCountriesByTag?.[normalizedTag]?.capital_state_id ?? null,
     };
   };
 
   const resolveCapitalEditorModel = () => {
     const options = collectScenarioCountryOptions({ includeReleasable: true });
-    const explicitTag = normalizeScenarioTagInput(state.devScenarioCapitalEditor?.tag);
+    const explicitTag = normalizeScenarioTagInput(runtimeState.devScenarioCapitalEditor?.tag);
     const tag = options.some((entry) => entry.tag === explicitTag)
       ? explicitTag
       : resolvePreferredScenarioTagCode(explicitTag);
@@ -173,7 +174,7 @@ export function createScenarioTextEditorsController({
     const entry = option?.entry || null;
     const targetIds = resolveOwnershipTargetIds();
     const featureId = targetIds.length === 1 ? targetIds[0] : "";
-    const feature = featureId ? state.landIndex?.get(featureId) || null : null;
+    const feature = featureId ? runtimeState.landIndex?.get(featureId) || null : null;
     const ownerCode = featureId ? normalizeScenarioTagInput(getFeatureOwnerCode(featureId)) : "";
     const ownerMatches = !!(featureId && tag && ownerCode === tag);
     const candidate = ownerMatches ? resolveCapitalCandidateForFeature(featureId, tag) : null;
@@ -255,7 +256,7 @@ export function createScenarioTextEditorsController({
   };
 
   const resolveCapitalEditorHint = (model) => {
-    if (!state.activeScenarioId) {
+    if (!runtimeState.activeScenarioId) {
       return ui("Activate a scenario to edit capitals.");
     }
     if (model.selectionCount !== 1) {
@@ -275,10 +276,10 @@ export function createScenarioTextEditorsController({
 
   const buildScenarioCountrySavePayload = () => {
     const model = resolveCountryEditorModel();
-    const editorState = state.devScenarioCountryEditor || {};
+    const editorState = runtimeState.devScenarioCountryEditor || {};
     const nameEn = normalizeScenarioNameInput(editorState.nameEn);
     const nameZh = normalizeScenarioNameInput(editorState.nameZh);
-    if (!state.activeScenarioId) {
+    if (!runtimeState.activeScenarioId) {
       return { ok: false, message: ui("Activate a scenario to edit country names.") };
     }
     if (!model.tag) {
@@ -290,7 +291,7 @@ export function createScenarioTextEditorsController({
     return {
       ok: true,
       payload: {
-        scenarioId: String(state.activeScenarioId || "").trim(),
+        scenarioId: String(runtimeState.activeScenarioId || "").trim(),
         tag: model.tag,
         nameEn,
         nameZh,
@@ -300,7 +301,7 @@ export function createScenarioTextEditorsController({
 
   const buildScenarioCapitalSavePayload = () => {
     const model = resolveCapitalEditorModel();
-    if (!state.activeScenarioId) {
+    if (!runtimeState.activeScenarioId) {
       return { ok: false, message: ui("Activate a scenario to edit capitals.") };
     }
     if (model.selectionCount !== 1 || !model.featureId) {
@@ -318,7 +319,7 @@ export function createScenarioTextEditorsController({
     return {
       ok: true,
       payload: {
-        scenarioId: String(state.activeScenarioId || "").trim(),
+        scenarioId: String(runtimeState.activeScenarioId || "").trim(),
         tag: model.tag,
         featureId: model.featureId,
         cityId: model.candidate.cityId,
@@ -354,8 +355,8 @@ export function createScenarioTextEditorsController({
     if (response?.catalogPath) {
       syncActiveScenarioManifestUrl("releasable_catalog_url", response.catalogPath);
     }
-    state.devScenarioCountryEditor = {
-      ...(state.devScenarioCountryEditor || {}),
+    runtimeState.devScenarioCountryEditor = {
+      ...(runtimeState.devScenarioCountryEditor || {}),
       tag: normalizedTag,
       nameEn: normalizeScenarioNameInput(nextEntry?.display_name_en || payload.nameEn),
       nameZh: normalizeScenarioNameInput(nextEntry?.display_name_zh || payload.nameZh),
@@ -379,11 +380,11 @@ export function createScenarioTextEditorsController({
     if (response?.catalogPath) {
       syncActiveScenarioManifestUrl("releasable_catalog_url", response.catalogPath);
     }
-    const priorOverrides = state.scenarioCityOverridesData && typeof state.scenarioCityOverridesData === "object"
-      ? state.scenarioCityOverridesData
+    const priorOverrides = runtimeState.scenarioCityOverridesData && typeof runtimeState.scenarioCityOverridesData === "object"
+      ? runtimeState.scenarioCityOverridesData
       : {
         version: 1,
-        scenario_id: String(state.activeScenarioId || "").trim(),
+        scenario_id: String(runtimeState.activeScenarioId || "").trim(),
         generated_at: "",
         cities: {},
         capitals_by_tag: {},
@@ -391,7 +392,7 @@ export function createScenarioTextEditorsController({
       };
     const nextOverrides = {
       ...priorOverrides,
-      scenario_id: String(state.activeScenarioId || "").trim(),
+      scenario_id: String(runtimeState.activeScenarioId || "").trim(),
       generated_at: String(response?.savedAt || priorOverrides.generated_at || ""),
       capitals_by_tag: {
         ...(priorOverrides.capitals_by_tag || {}),
@@ -411,8 +412,8 @@ export function createScenarioTextEditorsController({
     if (response?.cityOverridesPath) {
       syncActiveScenarioManifestUrl("city_overrides_url", response.cityOverridesPath);
     }
-    state.devScenarioCapitalEditor = {
-      ...(state.devScenarioCapitalEditor || {}),
+    runtimeState.devScenarioCapitalEditor = {
+      ...(runtimeState.devScenarioCapitalEditor || {}),
       tag: normalizedTag,
       lastSavedAt: String(response?.savedAt || ""),
       lastSavedPath: String(response?.cityOverridesPath || response?.filePath || ""),
@@ -456,10 +457,10 @@ export function createScenarioTextEditorsController({
   };
 
   const selectScenarioCapitalEditorTag = (tag, { clearSearch = false } = {}) => {
-    state.devScenarioCapitalEditor = {
-      ...(state.devScenarioCapitalEditor || {}),
+    runtimeState.devScenarioCapitalEditor = {
+      ...(runtimeState.devScenarioCapitalEditor || {}),
       tag: normalizeScenarioTagInput(tag),
-      searchQuery: clearSearch ? "" : normalizeScenarioNameInput(state.devScenarioCapitalEditor?.searchQuery),
+      searchQuery: clearSearch ? "" : normalizeScenarioNameInput(runtimeState.devScenarioCapitalEditor?.searchQuery),
       lastSaveMessage: "",
       lastSaveTone: "",
     };
@@ -468,14 +469,14 @@ export function createScenarioTextEditorsController({
   const resolveLocaleEditorModel = () => {
     const targetIds = resolveOwnershipTargetIds();
     const featureId = targetIds.length === 1 ? String(targetIds[0] || "").trim() : "";
-    const feature = featureId ? state.landIndex?.get(featureId) || null : null;
+    const feature = featureId ? runtimeState.landIndex?.get(featureId) || null : null;
     const localeEntry = getScenarioGeoLocaleEntry(featureId);
     return {
       featureId,
       feature,
       selectionCount: targetIds.length,
-      hasScenario: !!String(state.activeScenarioId || "").trim(),
-      hasGeoLocalePatch: !!String(state.activeScenarioManifest?.geo_locale_patch_url || "").trim(),
+      hasScenario: !!String(runtimeState.activeScenarioId || "").trim(),
+      hasGeoLocalePatch: !!String(runtimeState.activeScenarioManifest?.geo_locale_patch_url || "").trim(),
       ...localeEntry,
     };
   };
@@ -505,7 +506,7 @@ export function createScenarioTextEditorsController({
   };
 
   const render = ({ hasActiveScenario }) => {
-    const priorCountryEditorState = state.devScenarioCountryEditor || {};
+    const priorCountryEditorState = runtimeState.devScenarioCountryEditor || {};
     const countryModel = resolveCountryEditorModel();
     const currentCountryTag = normalizeScenarioTagInput(priorCountryEditorState.tag);
     const hasValidCountryTag = !!currentCountryTag && countryModel.options.some((entry) => entry.tag === currentCountryTag);
@@ -519,12 +520,12 @@ export function createScenarioTextEditorsController({
       }
       : priorCountryEditorState;
     if (needsCountryPrefill) {
-      state.devScenarioCountryEditor = countryEditorState;
+      runtimeState.devScenarioCountryEditor = countryEditorState;
     }
     scenarioCountryPanel?.classList.toggle("hidden", !hasActiveScenario);
     if (scenarioCountryTitle) {
       scenarioCountryTitle.textContent = hasActiveScenario
-        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
         : ui("No active scenario");
     }
     if (scenarioCountryHint) {
@@ -575,7 +576,7 @@ export function createScenarioTextEditorsController({
       scenarioCountryStatus.textContent = countryStatusBits.join(" | ");
     }
 
-    const priorCapitalEditorState = state.devScenarioCapitalEditor || {};
+    const priorCapitalEditorState = runtimeState.devScenarioCapitalEditor || {};
     const capitalModel = resolveCapitalEditorModel();
     const capitalSearchQuery = normalizeScenarioNameInput(priorCapitalEditorState.searchQuery);
     const capitalSearchMatches = buildCapitalEditorSearchMatches(capitalSearchQuery, capitalModel.options);
@@ -590,12 +591,12 @@ export function createScenarioTextEditorsController({
       }
       : priorCapitalEditorState;
     if (needsCapitalPrefill) {
-      state.devScenarioCapitalEditor = capitalEditorState;
+      runtimeState.devScenarioCapitalEditor = capitalEditorState;
     }
     scenarioCapitalPanel?.classList.toggle("hidden", !hasActiveScenario);
     if (scenarioCapitalTitle) {
       scenarioCapitalTitle.textContent = hasActiveScenario
-        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
         : ui("No active scenario");
     }
     if (scenarioCapitalHint) {
@@ -647,7 +648,7 @@ export function createScenarioTextEditorsController({
     }
 
     const localeModel = resolveLocaleEditorModel();
-    const priorLocaleEditorState = state.devLocaleEditor || {};
+    const priorLocaleEditorState = runtimeState.devLocaleEditor || {};
     const localeFeatureChanged = String(priorLocaleEditorState.featureId || "") !== String(localeModel.featureId || "");
     const localeEditorState = localeFeatureChanged
       ? {
@@ -658,12 +659,12 @@ export function createScenarioTextEditorsController({
       }
       : priorLocaleEditorState;
     if (localeFeatureChanged) {
-      state.devLocaleEditor = localeEditorState;
+      runtimeState.devLocaleEditor = localeEditorState;
     }
     scenarioLocalePanel?.classList.toggle("hidden", !hasActiveScenario);
     if (scenarioLocaleTitle) {
       scenarioLocaleTitle.textContent = hasActiveScenario
-        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
         : ui("No active scenario");
     }
     if (scenarioLocaleHint) {
@@ -711,8 +712,8 @@ export function createScenarioTextEditorsController({
         renderWorkspace();
         return;
       }
-      state.devScenarioCountryEditor = {
-        ...(state.devScenarioCountryEditor || {}),
+      runtimeState.devScenarioCountryEditor = {
+        ...(runtimeState.devScenarioCountryEditor || {}),
         isSaving: true,
         lastSaveMessage: "",
         lastSaveTone: "",
@@ -732,16 +733,16 @@ export function createScenarioTextEditorsController({
         }
         applyScenarioCountrySaveSuccess(result, built.payload);
         flushDevWorkspaceRender("dev-workspace-country-save");
-        if (typeof state.updateScenarioUIFn === "function") {
-          state.updateScenarioUIFn();
+        if (typeof runtimeState.updateScenarioUIFn === "function") {
+          runtimeState.updateScenarioUIFn();
         }
         showToast(ui("Country names saved."), {
           title: ui("Country Name Editor"),
           tone: "success",
         });
       } catch (error) {
-        state.devScenarioCountryEditor = {
-          ...(state.devScenarioCountryEditor || {}),
+        runtimeState.devScenarioCountryEditor = {
+          ...(runtimeState.devScenarioCountryEditor || {}),
           isSaving: false,
           lastSaveMessage: String(error?.message || ui("Unable to save country names.")),
           lastSaveTone: "critical",
@@ -752,8 +753,8 @@ export function createScenarioTextEditorsController({
           duration: 4200,
         });
       }
-      state.devScenarioCountryEditor = {
-        ...(state.devScenarioCountryEditor || {}),
+      runtimeState.devScenarioCountryEditor = {
+        ...(runtimeState.devScenarioCountryEditor || {}),
         isSaving: false,
       };
       renderWorkspace();
@@ -769,8 +770,8 @@ export function createScenarioTextEditorsController({
         renderWorkspace();
         return;
       }
-      state.devScenarioCapitalEditor = {
-        ...(state.devScenarioCapitalEditor || {}),
+      runtimeState.devScenarioCapitalEditor = {
+        ...(runtimeState.devScenarioCapitalEditor || {}),
         isSaving: true,
         lastSaveMessage: "",
         lastSaveTone: "",
@@ -790,16 +791,16 @@ export function createScenarioTextEditorsController({
         }
         applyScenarioCapitalSaveSuccess(result, built.payload);
         flushDevWorkspaceRender("dev-workspace-capital-save");
-        if (typeof state.updateScenarioUIFn === "function") {
-          state.updateScenarioUIFn();
+        if (typeof runtimeState.updateScenarioUIFn === "function") {
+          runtimeState.updateScenarioUIFn();
         }
         showToast(ui("Scenario capital saved."), {
           title: ui("Capital Editor"),
           tone: "success",
         });
       } catch (error) {
-        state.devScenarioCapitalEditor = {
-          ...(state.devScenarioCapitalEditor || {}),
+        runtimeState.devScenarioCapitalEditor = {
+          ...(runtimeState.devScenarioCapitalEditor || {}),
           isSaving: false,
           lastSaveMessage: String(error?.message || ui("Unable to save capital.")),
           lastSaveTone: "critical",
@@ -810,8 +811,8 @@ export function createScenarioTextEditorsController({
           duration: 4200,
         });
       }
-      state.devScenarioCapitalEditor = {
-        ...(state.devScenarioCapitalEditor || {}),
+      runtimeState.devScenarioCapitalEditor = {
+        ...(runtimeState.devScenarioCapitalEditor || {}),
         isSaving: false,
       };
       renderWorkspace();
@@ -819,7 +820,7 @@ export function createScenarioTextEditorsController({
 
     bindButtonAction(saveLocaleBtn, async () => {
       const localeModel = resolveLocaleEditorModel();
-      if (!state.activeScenarioId || !localeModel.featureId) {
+      if (!runtimeState.activeScenarioId || !localeModel.featureId) {
         showToast(ui("Select exactly one land feature before saving localized names."), {
           title: ui("Scenario Locale Editor"),
           tone: "warning",
@@ -827,7 +828,7 @@ export function createScenarioTextEditorsController({
         renderWorkspace();
         return;
       }
-      const geoLocalePatchUrl = String(state.activeScenarioManifest?.geo_locale_patch_url || "").trim();
+      const geoLocalePatchUrl = String(runtimeState.activeScenarioManifest?.geo_locale_patch_url || "").trim();
       if (!geoLocalePatchUrl) {
         showToast(ui("The active scenario does not declare a geo locale patch target."), {
           title: ui("Scenario Locale Editor"),
@@ -836,8 +837,8 @@ export function createScenarioTextEditorsController({
         renderWorkspace();
         return;
       }
-      const localeEditorState = state.devLocaleEditor || {};
-      state.devLocaleEditor = {
+      const localeEditorState = runtimeState.devLocaleEditor || {};
+      runtimeState.devLocaleEditor = {
         ...localeEditorState,
         isSaving: true,
         lastSaveMessage: "",
@@ -851,10 +852,10 @@ export function createScenarioTextEditorsController({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            scenarioId: state.activeScenarioId,
+            scenarioId: runtimeState.activeScenarioId,
             featureId: localeModel.featureId,
-            en: normalizeLocaleInput(state.devLocaleEditor?.en),
-            zh: normalizeLocaleInput(state.devLocaleEditor?.zh),
+            en: normalizeLocaleInput(runtimeState.devLocaleEditor?.en),
+            zh: normalizeLocaleInput(runtimeState.devLocaleEditor?.zh),
             mode: "manual_override",
           }),
         });
@@ -870,15 +871,15 @@ export function createScenarioTextEditorsController({
         }
         const patchPayload = await patchResponse.json();
         syncScenarioLocalizationState({
-          cityOverridesPayload: state.scenarioCityOverridesData,
+          cityOverridesPayload: runtimeState.scenarioCityOverridesData,
           geoLocalePatchPayload: patchPayload,
         });
-        state.devLocaleEditor = {
-          ...(state.devLocaleEditor || {}),
+        runtimeState.devLocaleEditor = {
+          ...(runtimeState.devLocaleEditor || {}),
           isSaving: false,
           featureId: localeModel.featureId,
-          en: normalizeLocaleInput(state.devLocaleEditor?.en),
-          zh: normalizeLocaleInput(state.devLocaleEditor?.zh),
+          en: normalizeLocaleInput(runtimeState.devLocaleEditor?.en),
+          zh: normalizeLocaleInput(runtimeState.devLocaleEditor?.zh),
           lastSavedAt: String(result.savedAt || ""),
           lastSaveMessage: `${ui("Saved")}: ${String(result.filePath || "")}`,
           lastSaveTone: "success",
@@ -889,8 +890,8 @@ export function createScenarioTextEditorsController({
           tone: "success",
         });
       } catch (error) {
-        state.devLocaleEditor = {
-          ...(state.devLocaleEditor || {}),
+        runtimeState.devLocaleEditor = {
+          ...(runtimeState.devLocaleEditor || {}),
           isSaving: false,
           lastSaveMessage: String(error?.message || ui("Unable to save localized names.")),
           lastSaveTone: "critical",
@@ -907,9 +908,9 @@ export function createScenarioTextEditorsController({
     if (scenarioCountrySelect && scenarioCountrySelect.dataset.bound !== "true") {
       scenarioCountrySelect.addEventListener("change", (event) => {
         const tag = normalizeScenarioTagInput(event.target.value);
-        const entry = state.scenarioCountriesByTag?.[tag] || {};
-        state.devScenarioCountryEditor = {
-          ...(state.devScenarioCountryEditor || {}),
+        const entry = runtimeState.scenarioCountriesByTag?.[tag] || {};
+        runtimeState.devScenarioCountryEditor = {
+          ...(runtimeState.devScenarioCountryEditor || {}),
           tag,
           nameEn: normalizeScenarioNameInput(entry.display_name_en || entry.display_name || ""),
           nameZh: normalizeScenarioNameInput(entry.display_name_zh),
@@ -923,8 +924,8 @@ export function createScenarioTextEditorsController({
 
     if (scenarioCountryNameEnInput && scenarioCountryNameEnInput.dataset.bound !== "true") {
       scenarioCountryNameEnInput.addEventListener("input", (event) => {
-        state.devScenarioCountryEditor = {
-          ...(state.devScenarioCountryEditor || {}),
+        runtimeState.devScenarioCountryEditor = {
+          ...(runtimeState.devScenarioCountryEditor || {}),
           nameEn: normalizeScenarioNameInput(event.target.value),
           lastSaveMessage: "",
           lastSaveTone: "",
@@ -936,8 +937,8 @@ export function createScenarioTextEditorsController({
 
     if (scenarioCountryNameZhInput && scenarioCountryNameZhInput.dataset.bound !== "true") {
       scenarioCountryNameZhInput.addEventListener("input", (event) => {
-        state.devScenarioCountryEditor = {
-          ...(state.devScenarioCountryEditor || {}),
+        runtimeState.devScenarioCountryEditor = {
+          ...(runtimeState.devScenarioCountryEditor || {}),
           nameZh: normalizeScenarioNameInput(event.target.value),
           lastSaveMessage: "",
           lastSaveTone: "",
@@ -957,8 +958,8 @@ export function createScenarioTextEditorsController({
 
     if (scenarioCapitalSearchInput && scenarioCapitalSearchInput.dataset.bound !== "true") {
       scenarioCapitalSearchInput.addEventListener("input", (event) => {
-        state.devScenarioCapitalEditor = {
-          ...(state.devScenarioCapitalEditor || {}),
+        runtimeState.devScenarioCapitalEditor = {
+          ...(runtimeState.devScenarioCapitalEditor || {}),
           searchQuery: normalizeScenarioNameInput(event.target.value),
           lastSaveMessage: "",
           lastSaveTone: "",
@@ -993,8 +994,8 @@ export function createScenarioTextEditorsController({
 
     if (scenarioLocaleEnInput && scenarioLocaleEnInput.dataset.bound !== "true") {
       scenarioLocaleEnInput.addEventListener("input", (event) => {
-        state.devLocaleEditor = {
-          ...(state.devLocaleEditor || {}),
+        runtimeState.devLocaleEditor = {
+          ...(runtimeState.devLocaleEditor || {}),
           en: normalizeLocaleInput(event.target.value),
         };
         renderWorkspace();
@@ -1004,8 +1005,8 @@ export function createScenarioTextEditorsController({
 
     if (scenarioLocaleZhInput && scenarioLocaleZhInput.dataset.bound !== "true") {
       scenarioLocaleZhInput.addEventListener("input", (event) => {
-        state.devLocaleEditor = {
-          ...(state.devLocaleEditor || {}),
+        runtimeState.devLocaleEditor = {
+          ...(runtimeState.devLocaleEditor || {}),
           zh: normalizeLocaleInput(event.target.value),
         };
         renderWorkspace();
@@ -1019,4 +1020,5 @@ export function createScenarioTextEditorsController({
     render,
   };
 }
+
 

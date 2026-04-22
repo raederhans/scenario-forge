@@ -1,20 +1,25 @@
-import { createDefaultScenarioAuditUiState, state } from "./state.js";
+import {
+  STATE_BUS_EVENTS,
+  createDefaultScenarioAuditUiState,
+  emitStateBusEvent,
+} from "./state/index.js";
+import { state as runtimeState } from "./state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 
 export function ensureScenarioAuditUiState() {
-  if (!state.scenarioAuditUi || typeof state.scenarioAuditUi !== "object") {
-    state.scenarioAuditUi = createDefaultScenarioAuditUiState();
+  if (!runtimeState.scenarioAuditUi || typeof runtimeState.scenarioAuditUi !== "object") {
+    runtimeState.scenarioAuditUi = createDefaultScenarioAuditUiState();
   }
-  if (typeof state.scenarioAuditUi.loading !== "boolean") {
-    state.scenarioAuditUi.loading = false;
+  if (typeof runtimeState.scenarioAuditUi.loading !== "boolean") {
+    runtimeState.scenarioAuditUi.loading = false;
   }
-  if (typeof state.scenarioAuditUi.loadedForScenarioId !== "string") {
-    state.scenarioAuditUi.loadedForScenarioId = "";
+  if (typeof runtimeState.scenarioAuditUi.loadedForScenarioId !== "string") {
+    runtimeState.scenarioAuditUi.loadedForScenarioId = "";
   }
-  if (typeof state.scenarioAuditUi.errorMessage !== "string") {
-    state.scenarioAuditUi.errorMessage = "";
+  if (typeof runtimeState.scenarioAuditUi.errorMessage !== "string") {
+    runtimeState.scenarioAuditUi.errorMessage = "";
   }
-  return state.scenarioAuditUi;
+  return runtimeState.scenarioAuditUi;
 }
 
 export function setScenarioAuditUiState(partial = {}) {
@@ -24,30 +29,16 @@ export function setScenarioAuditUiState(partial = {}) {
 }
 
 export function syncScenarioUi() {
-  if (typeof state.updateScenarioUIFn === "function") {
-    state.updateScenarioUIFn();
-  }
-  if (typeof state.renderScenarioAuditPanelFn === "function") {
-    state.renderScenarioAuditPanelFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);
 }
 
 export function syncCountryUi({ renderNow = false } = {}) {
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-  if (typeof state.updateActiveSovereignUIFn === "function") {
-    state.updateActiveSovereignUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-  if (typeof state.updateScenarioContextBarFn === "function") {
-    state.updateScenarioContextBarFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_COUNTRY_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_PRESET_TREE);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_ACTIVE_SOVEREIGN_UI);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DYNAMIC_BORDER_STATUS);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_CONTEXT_BAR);
   syncScenarioUi();
   if (renderNow) {
     flushRenderBoundary("scenario-country-ui");

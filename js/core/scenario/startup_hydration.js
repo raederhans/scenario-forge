@@ -2,6 +2,12 @@
 // 这个模块负责 startup shell decode、active scenario hydrate、health gate 与 locale patch 同步。
 // scenario_resources.js 继续保留 facade、bundle cache、startup cache 与对外 export 面。
 
+import {
+  STATE_BUS_EVENTS,
+  callRuntimeHook,
+  emitStateBusEvent,
+} from "../state/index.js";
+
 function createScenarioStartupHydrationController({
   state,
   normalizeScenarioId,
@@ -73,9 +79,7 @@ function createScenarioStartupHydrationController({
     if (!descriptor.url) {
       syncScenarioLocalizationState({ geoLocalePatchPayload: null });
       syncCountryUi({ renderNow });
-      if (typeof state.updateDevWorkspaceUIFn === "function") {
-        state.updateDevWorkspaceUIFn();
-      }
+      emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
       return null;
     }
 
@@ -109,9 +113,7 @@ function createScenarioStartupHydrationController({
     bundle.geoLocalePatchPayload = payload || null;
     syncScenarioLocalizationState({ geoLocalePatchPayload: payload || null });
     syncCountryUi({ renderNow });
-    if (typeof state.updateDevWorkspaceUIFn === "function") {
-      state.updateDevWorkspaceUIFn();
-    }
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
     return payload || null;
   }
 
@@ -123,9 +125,7 @@ function createScenarioStartupHydrationController({
       });
     }
     state.showCityPoints = false;
-    if (typeof state.updateToolbarInputsFn === "function") {
-      state.updateToolbarInputsFn();
-    }
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
   }
 
   function buildScenarioRuntimeVersionTag(bundle, runtimeTopologyPayload) {
@@ -507,11 +507,17 @@ function createScenarioStartupHydrationController({
         flushRenderBoundary("scenario-health-gate-retry-recovered");
       }
       if (
-        typeof state.setStartupReadonlyStateFn === "function"
-        && state.startupReadonly
+        state.startupReadonly
         && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
       ) {
-        state.setStartupReadonlyStateFn(false);
+        const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
+        if (handled !== undefined) {
+          // no-op: owner already synchronized readonly shell state
+        } else {
+          state.startupReadonly = false;
+          state.startupReadonlyReason = "";
+          state.startupReadonlyUnlockInFlight = false;
+        }
       } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
         state.startupReadonly = false;
         state.startupReadonlyReason = "";
@@ -549,11 +555,17 @@ function createScenarioStartupHydrationController({
         degradedWaterOverlay: false,
       };
       if (
-        typeof state.setStartupReadonlyStateFn === "function"
-        && state.startupReadonly
+        state.startupReadonly
         && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
       ) {
-        state.setStartupReadonlyStateFn(false);
+        const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
+        if (handled !== undefined) {
+          // no-op: owner already synchronized readonly shell state
+        } else {
+          state.startupReadonly = false;
+          state.startupReadonlyReason = "";
+          state.startupReadonlyUnlockInFlight = false;
+        }
       } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
         state.startupReadonly = false;
         state.startupReadonlyReason = "";
@@ -595,11 +607,17 @@ function createScenarioStartupHydrationController({
     invalidateOceanWaterInteractionVisualState("scenario-health-gate-water-fallback");
     refreshColorState({ renderNow: false });
     if (
-      typeof state.setStartupReadonlyStateFn === "function"
-      && state.startupReadonly
+      state.startupReadonly
       && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
     ) {
-      state.setStartupReadonlyStateFn(false);
+      const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
+      if (handled !== undefined) {
+        // no-op: owner already synchronized readonly shell state
+      } else {
+        state.startupReadonly = false;
+        state.startupReadonlyReason = "";
+        state.startupReadonlyUnlockInFlight = false;
+      }
     } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
       state.startupReadonly = false;
       state.startupReadonlyReason = "";

@@ -1169,3 +1169,16 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 161. hydration health gate 的主合同要以当前运行时语义为真源，恢复链测试要跟随统一
 - 这次 `startup_hydration.js` 在 overlay-only mismatch 下会清 overlay，但保持 editable fallback，`startupReadonly` 会回到 false。
 - 更稳的最短路径是：先用 `tno_ready_state_contract.spec.js` 锁住当前主合同，再把 `startup_bundle_recovery_contract.spec.js` 跟到同一口径，避免两条 e2e 各自维护一套相反语义。
+
+### 162. perf gate 的 render median 对偶数样本必须取两中位数均值
+- 这次 `tno_1962.renderSampleMedianMs` 超线，根因是样本数从 3 变成 2 后，旧实现直接取上中位数，把同一量级的总渲染时间放大成超线。
+- 更稳的最短路径是：`js/core/perf_probe.js` 和 `tools/perf/run_baseline.mjs` 都用标准 median 语义，偶数样本取中间两个值的均值。
+- 这样能把真实渲染变慢和采样口径漂移分开，gate 才有稳定意义。
+
+### 41. 批量把 `state` 改名时，导入路径和标识符要分开替换
+- 这次用脚本把 `state` 改成 `runtimeState` 时，连 `state.js` 路径也一起改成了 `runtimeState.js`，会直接打断整条 import 链。
+- 更稳的做法是先只改 import specifier，再按 `state.` 这种明确访问模式改调用点。
+
+### 42. 把函数指针改成 helper 调用时，要保留“无 handler 时的本地回退”
+- `startup_hydration.js` 里原来会在 `setStartupReadonlyStateFn` 缺席时走本地字段回退；直接改成 `callRuntimeHook(...)` 后，这条回退会静默消失。
+- 更稳的做法是用 helper 返回值判定是否已由 owner 接管，没有接管就继续跑原本的本地清理逻辑。

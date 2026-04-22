@@ -1,4 +1,4 @@
-import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, normalizeMapSemanticMode, state } from "./state.js";
+import { countryNames, createDefaultScenarioReleasableIndex, defaultCountryPalette, normalizeMapSemanticMode, state as runtimeState } from "./state.js";
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import {
   invalidateOceanBackgroundVisualState,
@@ -146,6 +146,7 @@ import {
 } from "./scenario/bundle_loader.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
+const state = runtimeState;
 
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
@@ -183,7 +184,7 @@ async function loadMeasuredRequiredScenarioResource(d3Client, url, options = {})
   return sharedLoadMeasuredRequiredScenarioResource(loadMeasuredJsonResource, d3Client, url, options);
 }
 
-function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentLanguage) {
+function getScenarioGeoLocalePatchDescriptor(manifest, language = runtimeState.currentLanguage) {
   return sharedGetScenarioGeoLocalePatchDescriptor(manifest, language);
 }
 
@@ -196,9 +197,9 @@ function hasActiveScenarioPaletteLoaded(paletteId) {
   if (!targetPaletteId) {
     return false;
   }
-  return normalizeScenarioId(state.activePaletteId) === targetPaletteId
-    && !!state.activePalettePack
-    && !!state.activePaletteMap;
+  return normalizeScenarioId(runtimeState.activePaletteId) === targetPaletteId
+    && !!runtimeState.activePalettePack
+    && !!runtimeState.activePaletteMap;
 }
 
 function normalizeScenarioViewMode(value) {
@@ -206,13 +207,13 @@ function normalizeScenarioViewMode(value) {
 }
 
 function canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId) {
-  if (!normalizedScenarioId || normalizeScenarioId(state.activeScenarioId) !== normalizedScenarioId) {
+  if (!normalizedScenarioId || normalizeScenarioId(runtimeState.activeScenarioId) !== normalizedScenarioId) {
     return false;
   }
-  if (state.startupReadonly || state.startupReadonlyUnlockInFlight) {
+  if (runtimeState.startupReadonly || runtimeState.startupReadonlyUnlockInFlight) {
     return false;
   }
-  if (String(state.topologyBundleMode || "") !== "composite") {
+  if (String(runtimeState.topologyBundleMode || "") !== "composite") {
     return false;
   }
   if (!cachedScenarioBundle || !scenarioBundleSatisfiesLevel(cachedScenarioBundle, "full")) {
@@ -225,12 +226,12 @@ function canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId
     return false;
   }
 
-  const activeManifestId = normalizeScenarioId(state.activeScenarioManifest?.scenario_id);
+  const activeManifestId = normalizeScenarioId(runtimeState.activeScenarioManifest?.scenario_id);
   if (!activeManifestId || activeManifestId !== normalizedScenarioId) {
     return false;
   }
 
-  const activeBaselineHash = String(state.scenarioBaselineHash || "").trim();
+  const activeBaselineHash = String(runtimeState.scenarioBaselineHash || "").trim();
   const cachedBaselineHash = String(getScenarioBaselineHashFromBundle(cachedScenarioBundle) || "").trim();
   if (activeBaselineHash !== cachedBaselineHash) {
     return false;
@@ -241,12 +242,12 @@ function canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId
     return true;
   }
 
-  const hasShellOwnerMap = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length > 0;
-  const hasShellControllerMap = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length > 0;
-  const hasBaselineOwnerMap = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
-  const hasBaselineControllerMap = Object.keys(state.scenarioBaselineControllersByFeatureId || {}).length > 0;
+  const hasShellOwnerMap = Object.keys(runtimeState.scenarioAutoShellOwnerByFeatureId || {}).length > 0;
+  const hasShellControllerMap = Object.keys(runtimeState.scenarioAutoShellControllerByFeatureId || {}).length > 0;
+  const hasBaselineOwnerMap = Object.keys(runtimeState.scenarioBaselineOwnersByFeatureId || {}).length > 0;
+  const hasBaselineControllerMap = Object.keys(runtimeState.scenarioBaselineControllersByFeatureId || {}).length > 0;
   const requiresMeshPack = !!String(cachedManifest?.mesh_pack_url || "").trim();
-  const hasMeshPack = !requiresMeshPack || !!state.activeScenarioMeshPack;
+  const hasMeshPack = !requiresMeshPack || !!runtimeState.activeScenarioMeshPack;
   return (
     hasShellOwnerMap
     && hasShellControllerMap
@@ -303,9 +304,9 @@ function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = 
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
   const fallback = String(fallbackOwner || "").trim().toUpperCase();
-  const directOwner = String(state.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  const directController = String(state.scenarioControllersByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  if (!state.activeScenarioId || normalizeScenarioViewMode(state.scenarioViewMode) !== "frontline") {
+  const directOwner = String(runtimeState.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  const directController = String(runtimeState.scenarioControllersByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  if (!runtimeState.activeScenarioId || normalizeScenarioViewMode(runtimeState.scenarioViewMode) !== "frontline") {
     return directOwner || fallback;
   }
   return String(
@@ -358,14 +359,14 @@ function getDefaultScenarioId() {
   return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
 }
 
-function getScenarioManifestSummary(manifest = state.activeScenarioManifest) {
+function getScenarioManifestSummary(manifest = runtimeState.activeScenarioManifest) {
   return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
-function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = state.activeScenarioId) {
-  const mergedLayerPayloads = state.activeScenarioChunks?.mergedLayerPayloads;
+function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = runtimeState.activeScenarioId) {
+  const mergedLayerPayloads = runtimeState.activeScenarioChunks?.mergedLayerPayloads;
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
-  const normalizedChunkScenarioId = normalizeScenarioId(state.activeScenarioChunks?.scenarioId);
+  const normalizedChunkScenarioId = normalizeScenarioId(runtimeState.activeScenarioChunks?.scenarioId);
   if (
     !normalizedScenarioId
     || normalizedChunkScenarioId !== normalizedScenarioId
@@ -397,10 +398,10 @@ function normalizeScenarioFeatureCollection(payload) {
   };
 }
 
-function getCachedScenarioBundle(scenarioId = state.activeScenarioId) {
+function getCachedScenarioBundle(scenarioId = runtimeState.activeScenarioId) {
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
   if (!normalizedScenarioId) return null;
-  return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+  return runtimeState.scenarioBundleCacheById?.[normalizedScenarioId] || null;
 }
 
 function createScenarioBootstrapBundleFromCache({
@@ -547,14 +548,14 @@ function setScenarioViewMode(
 ) {
   assertScenarioInteractionsAllowed("change scenario view mode");
   const nextMode = normalizeScenarioViewMode(viewMode);
-  if (!state.activeScenarioId) {
-    state.scenarioViewMode = "ownership";
+  if (!runtimeState.activeScenarioId) {
+    runtimeState.scenarioViewMode = "ownership";
     return false;
   }
-  if (state.scenarioViewMode === nextMode) {
+  if (runtimeState.scenarioViewMode === nextMode) {
     return false;
   }
-  state.scenarioViewMode = nextMode;
+  runtimeState.scenarioViewMode = nextMode;
   recalculateScenarioOwnerControllerDiffCount();
   if (markDirtyReason) {
     markDirty(markDirtyReason);
@@ -578,28 +579,28 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
     const promoted = await ensureDetailTopologyBoundary({ applyMapData });
     if (promoted) return true;
   }
-  const hasDetailNow = hasUsablePoliticalTopology(state.topologyDetail);
-  if (hasDetailNow && state.topologyBundleMode !== "composite") {
-    state.topologyBundleMode = "composite";
+  const hasDetailNow = hasUsablePoliticalTopology(runtimeState.topologyDetail);
+  if (hasDetailNow && runtimeState.topologyBundleMode !== "composite") {
+    runtimeState.topologyBundleMode = "composite";
     if (applyMapData) {
       setMapData({ refitProjection: false, resetZoom: false });
     }
-    state.detailDeferred = false;
-    state.detailPromotionCompleted = true;
+    runtimeState.detailDeferred = false;
+    runtimeState.detailPromotionCompleted = true;
     syncScenarioReadyUiAfterPromotion();
     return true;
   }
-  if (hasDetailNow && state.topologyBundleMode === "composite") {
+  if (hasDetailNow && runtimeState.topologyBundleMode === "composite") {
     return false;
   }
-  if (state.detailPromotionInFlight) {
+  if (runtimeState.detailPromotionInFlight) {
     return false;
   }
-  state.detailPromotionInFlight = true;
+  runtimeState.detailPromotionInFlight = true;
   try {
     const detailSourceKeys = Array.from(new Set([
-      String(state.detailSourceRequested || "").trim(),
-      String(state.activeScenarioManifest?.detail_source || "").trim(),
+      String(runtimeState.detailSourceRequested || "").trim(),
+      String(runtimeState.activeScenarioManifest?.detail_source || "").trim(),
       ...SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER,
     ].filter(Boolean)));
     try {
@@ -608,11 +609,11 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
         runtimePoliticalTopology,
         detailSourceUsed,
       } = await loadDeferredDetailBundle({
-        detailSourceKey: detailSourceKeys[0] || state.detailSourceRequested,
+        detailSourceKey: detailSourceKeys[0] || runtimeState.detailSourceRequested,
         detailSourceKeys,
       });
 
-      const runtimeFallback = runtimePoliticalTopology || state.runtimePoliticalTopology || null;
+      const runtimeFallback = runtimePoliticalTopology || runtimeState.runtimePoliticalTopology || null;
       const resolvedDetail = hasUsablePoliticalTopology(topologyDetail)
         ? topologyDetail
         : (hasUsablePoliticalTopology(runtimeFallback) ? runtimeFallback : null);
@@ -620,26 +621,26 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
         console.warn(
           `[scenario] Detail promotion resolved no usable topology. Tried sources: ${detailSourceKeys.join(", ") || "(default)"}.`
         );
-        state.detailDeferred = false;
+        runtimeState.detailDeferred = false;
         return false;
       }
 
       if (!hasUsablePoliticalTopology(topologyDetail) && hasUsablePoliticalTopology(runtimeFallback)) {
         console.warn("[scenario] Detail promotion using runtime political fallback.");
       }
-      state.topologyDetail = resolvedDetail;
-      state.runtimePoliticalTopology = runtimeFallback;
-      state.topologyBundleMode = "composite";
-      state.detailDeferred = false;
-      state.detailPromotionCompleted = true;
-      state.detailSourceRequested = detailSourceUsed || detailSourceKeys[0] || state.detailSourceRequested;
+      runtimeState.topologyDetail = resolvedDetail;
+      runtimeState.runtimePoliticalTopology = runtimeFallback;
+      runtimeState.topologyBundleMode = "composite";
+      runtimeState.detailDeferred = false;
+      runtimeState.detailPromotionCompleted = true;
+      runtimeState.detailSourceRequested = detailSourceUsed || detailSourceKeys[0] || runtimeState.detailSourceRequested;
       if (applyMapData) {
         setMapData({ refitProjection: false, resetZoom: false });
       }
       syncScenarioReadyUiAfterPromotion();
       return true;
     } catch (error) {
-      state.detailDeferred = false;
+      runtimeState.detailDeferred = false;
       console.warn(
         `[scenario] Detail topology could not be promoted. Tried sources: ${detailSourceKeys.join(", ") || "(default)"}. Staying on coarse map.`,
         error
@@ -650,7 +651,7 @@ async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) 
     console.warn("Unable to force-load detail topology before scenario apply:", error);
     return false;
   } finally {
-    state.detailPromotionInFlight = false;
+    runtimeState.detailPromotionInFlight = false;
   }
 }
 
@@ -761,7 +762,7 @@ async function applyScenarioBundle(
         );
       }
     }
-    const currentPoliticalCoreReadyMetric = state.scenarioPerfMetrics?.timeToPoliticalCoreReady;
+    const currentPoliticalCoreReadyMetric = runtimeState.scenarioPerfMetrics?.timeToPoliticalCoreReady;
     const hasCurrentPoliticalCoreReadyMetric =
       currentPoliticalCoreReadyMetric
       && String(currentPoliticalCoreReadyMetric.scenarioId || "") === staged.scenarioId;
@@ -769,8 +770,8 @@ async function applyScenarioBundle(
       !hasCurrentPoliticalCoreReadyMetric
       && (
         hasChunkedRuntime
-        || !!state.scenarioPoliticalChunkData
-        || hasRenderableScenarioPoliticalTopology(state.runtimePoliticalTopology)
+        || !!runtimeState.scenarioPoliticalChunkData
+        || hasRenderableScenarioPoliticalTopology(runtimeState.runtimePoliticalTopology)
       )
     ) {
       recordScenarioPerfMetric(
@@ -811,10 +812,10 @@ async function applyScenarioBundle(
       "CN_CITY_17275852B74586174185496",
       "CN_CITY_17275852B2295538790743",
     ];
-    if (String(state.debugMode || "PROD") !== "PROD") {
+    if (String(runtimeState.debugMode || "PROD") !== "PROD") {
       spotChecks.forEach((fid) => {
-        const owner = state.sovereigntyByFeatureId[fid];
-        const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
+        const owner = runtimeState.sovereigntyByFeatureId[fid];
+        const controller = runtimeState.scenarioControllersByFeatureId?.[fid] || owner;
         if (owner) {
           const color = staged.scenarioColorMap[owner] || "(no color)";
           console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
@@ -839,8 +840,8 @@ async function applyScenarioBundle(
     if (markDirtyReason) {
       markDirty(markDirtyReason);
     }
-    if (typeof state.triggerScenarioGuideFn === "function") {
-      state.triggerScenarioGuideFn();
+    if (typeof runtimeState.triggerScenarioGuideFn === "function") {
+      runtimeState.triggerScenarioGuideFn();
     }
 
     if (showToastOnComplete) {
@@ -856,7 +857,7 @@ async function applyScenarioBundle(
     recordScenarioPerfMetric("applyScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt, {
       scenarioId: staged.scenarioId,
       expectedFeatureCount: Number(bundle.manifest?.summary?.feature_count || 0),
-      runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+      runtimeFeatureCount: Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features.length : 0,
       topologyDecodeMs,
       mapRefreshMode: scenarioMapRefreshMode,
       applyMs: (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
@@ -903,8 +904,8 @@ async function applyScenarioBundle(
 /**
  * Scenario switch entrypoint for selecting and applying one scenario id.
  * Major state write surface:
- * - state.scenarioApplyInFlight / activeScenarioApplyPromise lifecycle.
- * - state.scenarioBundleCacheById reuse via full bundle loading.
+ * - runtimeState.scenarioApplyInFlight / activeScenarioApplyPromise lifecycle.
+ * - runtimeState.scenarioBundleCacheById reuse via full bundle loading.
  * - active scenario state fields written by applyScenarioBundle pipeline.
  */
 async function applyScenarioById(
@@ -920,15 +921,15 @@ async function applyScenarioById(
   if (!normalizedScenarioId) {
     throw new Error("[scenario] Scenario id is required.");
   }
-  const cachedScenarioBundle = state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+  const cachedScenarioBundle = runtimeState.scenarioBundleCacheById?.[normalizedScenarioId] || null;
   if (canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId)) {
     return cachedScenarioBundle;
   }
-  if (state.scenarioApplyInFlight && activeScenarioApplyPromise) {
+  if (runtimeState.scenarioApplyInFlight && activeScenarioApplyPromise) {
     return activeScenarioApplyPromise;
   }
 
-  state.scenarioApplyInFlight = true;
+  runtimeState.scenarioApplyInFlight = true;
   activeScenarioApplyPromise = (async () => {
     syncScenarioUi();
     const bundle = await loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" });
@@ -944,7 +945,7 @@ async function applyScenarioById(
     return await activeScenarioApplyPromise;
   } finally {
     activeScenarioApplyPromise = null;
-    state.scenarioApplyInFlight = false;
+    runtimeState.scenarioApplyInFlight = false;
     syncScenarioUi();
   }
 }
@@ -955,7 +956,7 @@ async function applyDefaultScenarioOnStartup(
     d3Client = globalThis.d3,
   } = {}
 ) {
-  if (state.activeScenarioId) {
+  if (runtimeState.activeScenarioId) {
     return null;
   }
   const registry = await loadScenarioRegistry({ d3Client });
@@ -1015,23 +1016,23 @@ function clearActiveScenario(options = {}) {
 function formatScenarioStatusText() {
   const fatalState = getScenarioFatalRecoveryState();
   if (fatalState) {
-    if (!state.activeScenarioId || !state.activeScenarioManifest) {
+    if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
       return formatScenarioFatalRecoveryMessage(fatalState);
     }
-    const displayName = getScenarioDisplayName(state.activeScenarioManifest, state.activeScenarioId);
+    const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, runtimeState.activeScenarioId);
     return `${displayName} - ${formatScenarioFatalRecoveryMessage(fatalState)}`;
   }
-  if (!state.activeScenarioId || !state.activeScenarioManifest) {
+  if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
     return t("No scenario active", "ui");
   }
-  const displayName = getScenarioDisplayName(state.activeScenarioManifest, state.activeScenarioId);
-  const liveHealth = evaluateScenarioDataHealth(state.activeScenarioManifest, {
-    minRatio: Number(state.scenarioDataHealth?.minRatio || SCENARIO_DETAIL_MIN_RATIO_STRICT),
+  const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, runtimeState.activeScenarioId);
+  const liveHealth = evaluateScenarioDataHealth(runtimeState.activeScenarioManifest, {
+    minRatio: Number(runtimeState.scenarioDataHealth?.minRatio || SCENARIO_DETAIL_MIN_RATIO_STRICT),
   });
-  const warning = String(liveHealth?.warning || state.scenarioDataHealth?.warning || "").trim();
+  const warning = String(liveHealth?.warning || runtimeState.scenarioDataHealth?.warning || "").trim();
   if (
-    state.scenarioHydrationHealthGate?.status === "degraded"
-    && String(state.scenarioHydrationHealthGate?.reason || "").startsWith("runtime-overlay-")
+    runtimeState.scenarioHydrationHealthGate?.status === "degraded"
+    && String(runtimeState.scenarioHydrationHealthGate?.reason || "").startsWith("runtime-overlay-")
   ) {
     return `${displayName} · ${t("Overlay fallback active; editing remains available.", "ui")}`;
   }
@@ -1042,10 +1043,10 @@ function formatScenarioAuditText() {
   if (getScenarioFatalRecoveryState()) {
     return t("Scenario controls are locked until the page reloads.", "ui");
   }
-  if (!state.activeScenarioId || !state.activeScenarioManifest) {
+  if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
     return "";
   }
-  const splitCount = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);
+  const splitCount = Number(runtimeState.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);
   if (splitCount > 0) {
     return `${t("Frontline", "ui")}: ${splitCount} split features.`;
   }
@@ -1067,3 +1068,4 @@ export {
   resetToScenarioBaseline,
   setScenarioViewMode,
 };
+

@@ -1,4 +1,8 @@
-import { state } from "./state.js";
+import {
+  STATE_BUS_EVENTS,
+  emitStateBusEvent,
+} from "./state/index.js";
+import { state as runtimeState } from "./state.js";
 import {
   refreshMapDataForScenarioApply,
   refreshScenarioOpeningOwnerBorders,
@@ -18,36 +22,16 @@ import { syncCountryUi } from "./scenario_ui_sync.js";
 import { requestRender } from "./render_boundary.js";
 
 function runPaletteAndToolbarRefreshCallbacks() {
-  if (typeof state.renderPaletteFn === "function") {
-    state.renderPaletteFn(state.currentPaletteTheme);
-  }
-  if (typeof state.updatePaletteLibraryUIFn === "function") {
-    state.updatePaletteLibraryUIFn();
-  }
-  if (typeof state.updatePaletteSourceUIFn === "function") {
-    state.updatePaletteSourceUIFn();
-  }
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_PALETTE, runtimeState.currentPaletteTheme);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PALETTE_LIBRARY);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PALETTE_SOURCE);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PARENT_BORDER_COUNTRY_LIST);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PAINT_MODE);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_WATER_INTERACTION);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_SPECIAL_REGION);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_RELIEF_OVERLAY);
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DYNAMIC_BORDER_STATUS);
 }
 
 function runPostScenarioUiReplay({ full = true, renderNow = false } = {}) {
@@ -82,10 +66,10 @@ function scheduleAfterFirstFrame(callback) {
 }
 
 function ensureScenarioPerfMetrics() {
-  if (!state.scenarioPerfMetrics || typeof state.scenarioPerfMetrics !== "object") {
-    state.scenarioPerfMetrics = {};
+  if (!runtimeState.scenarioPerfMetrics || typeof runtimeState.scenarioPerfMetrics !== "object") {
+    runtimeState.scenarioPerfMetrics = {};
   }
-  return state.scenarioPerfMetrics;
+  return runtimeState.scenarioPerfMetrics;
 }
 
 function updateChunkedFirstFramePrewarmMetric(details = {}, { replace = false } = {}) {
@@ -111,7 +95,7 @@ function scheduleScenarioDetailChunkPrewarm({
   const normalizedScenarioId = String(scenarioId || "").trim();
   scheduleAfterFirstFrame(() => {
     void (async () => {
-      if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+      if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
         return;
       }
       const detailPrewarmStartedAt = Date.now();
@@ -124,7 +108,7 @@ function scheduleScenarioDetailChunkPrewarm({
       });
       try {
         await preloadScenarioFocusCountryPoliticalDetailChunk(bundle);
-        if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+        if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
           return;
         }
         scheduleScenarioChunkRefresh({

@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { state as runtimeState } from "./state.js";
 import {
   recomputeDynamicBordersNow,
   refreshResolvedColorsForFeatures,
@@ -12,6 +12,7 @@ import {
   getScenarioEffectiveOwnerCodeByFeatureId,
   getScenarioRuntimeGeometryCountryCode,
 } from "./scenario_runtime_queries.js";
+const state = runtimeState;
 
 function getRuntimeGeometryFeatureName(geometry) {
   const props = geometry?.properties || {};
@@ -26,11 +27,11 @@ function isScenarioShellCandidate(featureId, featureName = "") {
 }
 
 function isScenarioShellOverlayEnabled() {
-  return !!state.runtimePoliticalTopology?.objects?.political;
+  return !!runtimeState.runtimePoliticalTopology?.objects?.political;
 }
 
 function getScenarioRuntimeNeighborGraph(geometries) {
-  const runtimeGraph = Array.isArray(state.runtimeNeighborGraph) ? state.runtimeNeighborGraph : [];
+  const runtimeGraph = Array.isArray(runtimeState.runtimeNeighborGraph) ? runtimeState.runtimeNeighborGraph : [];
   const hasPopulatedNeighbors = runtimeGraph.some((neighbors) => Array.isArray(neighbors) && neighbors.length > 0);
   if (runtimeGraph.length === geometries.length && hasPopulatedNeighbors) {
     return runtimeGraph.map((neighbors) => (Array.isArray(neighbors) ? neighbors : []));
@@ -145,13 +146,13 @@ export function refreshScenarioShellOverlays({
   renderNow = false,
   borderReason = "scenario-shell-overlay",
 } = {}) {
-  const previousOwnerMap = state.scenarioAutoShellOwnerByFeatureId || {};
-  const previousControllerMap = state.scenarioAutoShellControllerByFeatureId || {};
+  const previousOwnerMap = runtimeState.scenarioAutoShellOwnerByFeatureId || {};
+  const previousControllerMap = runtimeState.scenarioAutoShellControllerByFeatureId || {};
   let nextOwnerMap = {};
   let nextControllerMap = {};
 
-  if (state.activeScenarioId && isScenarioShellOverlayEnabled()) {
-    const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
+  if (runtimeState.activeScenarioId && isScenarioShellOverlayEnabled()) {
+    const geometries = runtimeState.runtimePoliticalTopology?.objects?.political?.geometries || [];
     if (Array.isArray(geometries) && geometries.length) {
       const neighborGraph = getScenarioRuntimeNeighborGraph(geometries);
       const { ownerFallbackByCountry, controllerFallbackByCountry } = buildScenarioCanonicalFallbackMaps(geometries);
@@ -173,9 +174,9 @@ export function refreshScenarioShellOverlays({
         });
 
         const canonicalCountryCode = getScenarioRuntimeGeometryCountryCode(geometry);
-        const directOwnerCode = canonicalScenarioCountryCode(state.sovereigntyByFeatureId?.[featureId] || "");
+        const directOwnerCode = canonicalScenarioCountryCode(runtimeState.sovereigntyByFeatureId?.[featureId] || "");
         const directControllerCode = canonicalScenarioCountryCode(
-          state.scenarioControllersByFeatureId?.[featureId] || ""
+          runtimeState.scenarioControllersByFeatureId?.[featureId] || ""
         );
         const resolvedOwnerCode =
           directOwnerCode || pickScenarioMajorityCode(ownerVotes) || ownerFallbackByCountry[canonicalCountryCode] || "";
@@ -200,10 +201,10 @@ export function refreshScenarioShellOverlays({
     !haveSameScenarioShellMapping(previousOwnerMap, nextOwnerMap) ||
     !haveSameScenarioShellMapping(previousControllerMap, nextControllerMap);
 
-  state.scenarioAutoShellOwnerByFeatureId = nextOwnerMap;
-  state.scenarioAutoShellControllerByFeatureId = nextControllerMap;
+  runtimeState.scenarioAutoShellOwnerByFeatureId = nextOwnerMap;
+  runtimeState.scenarioAutoShellControllerByFeatureId = nextControllerMap;
   if (changed) {
-    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
+    runtimeState.scenarioShellOverlayRevision = (Number(runtimeState.scenarioShellOverlayRevision) || 0) + 1;
     const affectedFeatureIds = Array.from(
       new Set([
         ...Object.keys(previousOwnerMap),
@@ -230,3 +231,4 @@ export function refreshScenarioShellOverlays({
     controllerCount: Object.keys(nextControllerMap).length,
   };
 }
+

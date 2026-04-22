@@ -1,4 +1,9 @@
-import { state } from "../core/state.js";
+import {
+  STATE_BUS_EVENTS,
+  callRuntimeHook,
+  emitStateBusEvent,
+} from "../core/state/index.js";
+import { state as runtimeState } from "../core/state.js";
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
@@ -9,6 +14,7 @@ import {
   undoSpecialZoneVertex,
   zoomByStep,
 } from "../core/map_renderer/public.js";
+const state = runtimeState;
 
 function isEditableTarget(target) {
   const node = target instanceof Element ? target : null;
@@ -24,48 +30,47 @@ function flushShortcutRender(reason = "shortcut") {
 }
 
 function setCurrentTool(tool) {
-  if (typeof state.runToolSelectionFn === "function") {
-    state.runToolSelectionFn(tool, { dismissHint: true });
+  if (callRuntimeHook(runtimeState, "runToolSelectionFn", tool, { dismissHint: true }) !== undefined) {
     return;
   }
-  state.currentTool = tool;
+  runtimeState.currentTool = tool;
   if (tool === "eyedropper") {
-    state.brushModeEnabled = false;
-    state.brushPanModifierActive = false;
+    runtimeState.brushModeEnabled = false;
+    runtimeState.brushPanModifierActive = false;
   }
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOL_UI);
 }
 
 function refreshAfterSpecialZoneShortcut() {
-  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-    state.updateSpecialZoneEditorUIFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SPECIAL_ZONE_EDITOR_UI);
   flushShortcutRender("shortcut-special-zone-cancel");
 }
 
 function syncToolUi() {
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOL_UI);
 }
 
 function toggleBrushMode() {
-  if (typeof state.runBrushModeToggleFn === "function") {
-    state.runBrushModeToggleFn(!state.brushModeEnabled, { dismissHint: true });
+  if (
+    callRuntimeHook(
+      runtimeState,
+      "runBrushModeToggleFn",
+      !runtimeState.brushModeEnabled,
+      { dismissHint: true },
+    ) !== undefined
+  ) {
     return;
   }
-  state.brushModeEnabled = !state.brushModeEnabled;
-  if (state.brushModeEnabled && state.currentTool === "eyedropper") {
-    state.currentTool = "fill";
+  runtimeState.brushModeEnabled = !runtimeState.brushModeEnabled;
+  if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+    runtimeState.currentTool = "fill";
   }
   syncToolUi();
 }
 
 function setBrushPanModifier(active) {
-  if (state.brushPanModifierActive === active) return;
-  state.brushPanModifierActive = active;
+  if (runtimeState.brushPanModifierActive === active) return;
+  runtimeState.brushPanModifierActive = active;
   syncToolUi();
 }
 
@@ -74,10 +79,8 @@ function pickQuickSwatch(index) {
   const button = swatches[index];
   const color = String(button?.dataset?.color || "").trim();
   if (!color) return false;
-  state.selectedColor = color;
-  if (typeof state.updateSwatchUIFn === "function") {
-    state.updateSwatchUIFn();
-  }
+  runtimeState.selectedColor = color;
+  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SWATCH_UI);
   return true;
 }
 
@@ -109,42 +112,42 @@ function initShortcuts() {
       return;
     }
 
-    if (state.bootBlocking) {
+    if (runtimeState.bootBlocking) {
       return;
     }
 
-    if (state.startupReadonly && !allowShortcutDuringStartupReadonly({ key, modifier })) {
+    if (runtimeState.startupReadonly && !allowShortcutDuringStartupReadonly({ key, modifier })) {
       return;
     }
 
     if (modifier && event.shiftKey && lower === "d") {
-      if (typeof state.toggleDeveloperModeFn === "function") {
+      if (runtimeState.toggleDeveloperModeFn) {
         event.preventDefault();
-        state.toggleDeveloperModeFn();
+        callRuntimeHook(runtimeState, "toggleDeveloperModeFn");
       }
       return;
     }
 
     if (modifier && key === "\\") {
-      if (typeof state.toggleRightPanelFn === "function") {
+      if (runtimeState.toggleRightPanelFn) {
         event.preventDefault();
-        state.toggleRightPanelFn();
+        callRuntimeHook(runtimeState, "toggleRightPanelFn");
       }
       return;
     }
 
     if (!modifier && key === "\\") {
-      if (typeof state.toggleLeftPanelFn === "function") {
+      if (runtimeState.toggleLeftPanelFn) {
         event.preventDefault();
-        state.toggleLeftPanelFn();
+        callRuntimeHook(runtimeState, "toggleLeftPanelFn");
       }
       return;
     }
 
     if (!modifier && key === "`") {
-      if (typeof state.toggleDockFn === "function") {
+      if (runtimeState.toggleDockFn) {
         event.preventDefault();
-        state.toggleDockFn();
+        callRuntimeHook(runtimeState, "toggleDockFn");
       }
       return;
     }
@@ -159,26 +162,26 @@ function initShortcuts() {
 
     if (modifier && lower === "s") {
       event.preventDefault();
-      FileManager.exportProject(state);
+      FileManager.exportProject(runtimeState);
       return;
     }
 
     if (modifier && lower === "z") {
       event.preventDefault();
-      if (state.specialZoneEditor?.active) {
+      if (runtimeState.specialZoneEditor?.active) {
         undoSpecialZoneVertex();
         refreshAfterSpecialZoneShortcut();
         return;
       }
       if (event.shiftKey) {
-        if (typeof state.runHistoryActionFn === "function") {
-          state.runHistoryActionFn("redo");
+        if (runtimeState.runHistoryActionFn) {
+          callRuntimeHook(runtimeState, "runHistoryActionFn", "redo");
         } else {
           redoHistory();
         }
       } else {
-        if (typeof state.runHistoryActionFn === "function") {
-          state.runHistoryActionFn("undo");
+        if (runtimeState.runHistoryActionFn) {
+          callRuntimeHook(runtimeState, "runHistoryActionFn", "undo");
         } else {
           undoHistory();
         }
@@ -188,8 +191,8 @@ function initShortcuts() {
 
     if (modifier && lower === "y") {
       event.preventDefault();
-      if (typeof state.runHistoryActionFn === "function") {
-        state.runHistoryActionFn("redo");
+      if (runtimeState.runHistoryActionFn) {
+        callRuntimeHook(runtimeState, "runHistoryActionFn", "redo");
       } else {
         redoHistory();
       }
@@ -248,8 +251,8 @@ function initShortcuts() {
     }
     if (!modifier && (key === "+" || key === "=")) {
       event.preventDefault();
-      if (typeof state.runZoomStepFn === "function") {
-        state.runZoomStepFn(1);
+      if (runtimeState.runZoomStepFn) {
+        callRuntimeHook(runtimeState, "runZoomStepFn", 1);
       } else {
         zoomByStep(1);
       }
@@ -257,8 +260,8 @@ function initShortcuts() {
     }
     if (!modifier && (key === "-" || key === "_")) {
       event.preventDefault();
-      if (typeof state.runZoomStepFn === "function") {
-        state.runZoomStepFn(-1);
+      if (runtimeState.runZoomStepFn) {
+        callRuntimeHook(runtimeState, "runZoomStepFn", -1);
       } else {
         zoomByStep(-1);
       }
@@ -266,8 +269,8 @@ function initShortcuts() {
     }
     if (!modifier && key === "0") {
       event.preventDefault();
-      if (typeof state.runZoomResetFn === "function") {
-        state.runZoomResetFn();
+      if (runtimeState.runZoomResetFn) {
+        callRuntimeHook(runtimeState, "runZoomResetFn");
       } else {
         resetZoomToFit();
       }
@@ -276,21 +279,19 @@ function initShortcuts() {
     if (!modifier && key === "Escape") {
       if (cancelActiveStrategicInteractionModes()) {
         event.preventDefault();
-        if (typeof state.updateStrategicOverlayUIFn === "function") {
-          state.updateStrategicOverlayUIFn();
-        }
+        emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);
         flushShortcutRender("shortcut-strategic-overlay-cancel");
         return;
       }
-      if (state.specialZoneEditor?.active) {
+      if (runtimeState.specialZoneEditor?.active) {
         event.preventDefault();
         cancelSpecialZoneDraw();
         refreshAfterSpecialZoneShortcut();
         return;
       }
-      if (state.brushModeEnabled) {
+      if (runtimeState.brushModeEnabled) {
         event.preventDefault();
-        state.brushModeEnabled = false;
+        runtimeState.brushModeEnabled = false;
         setBrushPanModifier(false);
         syncToolUi();
       }
@@ -298,7 +299,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
-    if (state.bootBlocking || state.startupReadonly) return;
+    if (runtimeState.bootBlocking || runtimeState.startupReadonly) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);
   });

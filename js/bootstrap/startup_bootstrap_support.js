@@ -1,4 +1,4 @@
-import { normalizeCityLayerStyleConfig, state } from "../core/state.js";
+import { normalizeCityLayerStyleConfig, state as runtimeState } from "../core/state.js";
 import {
   hydrateHierarchyState,
   hydrateStoredViewSettings,
@@ -7,6 +7,7 @@ import {
 import { hasScenarioRuntimeShellContract } from "../core/scenario_resources.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { consumeStartupSupportKeyUsageAuditReport } from "../ui/i18n.js";
+const state = runtimeState;
 
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
 const STARTUP_SUPPORT_AUDIT_PARAM = "startup_support_audit";
@@ -120,8 +121,8 @@ export function persistViewSettings() {
       JSON.stringify({
         schemaVersion: 1,
         cityPoints: {
-          show: state.showCityPoints !== false,
-          style: normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints),
+          show: runtimeState.showCityPoints !== false,
+          style: normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints),
         },
       })
     );
@@ -155,10 +156,10 @@ export function initLongAnimationFrameObserver() {
       if (!entries.length) return;
       const latest = entries[entries.length - 1];
       if (!latest) return;
-      if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
-        state.renderPerfMetrics = {};
+      if (!runtimeState.renderPerfMetrics || typeof runtimeState.renderPerfMetrics !== "object") {
+        runtimeState.renderPerfMetrics = {};
       }
-      state.renderPerfMetrics.longAnimationFrameBlockingDuration = {
+      runtimeState.renderPerfMetrics.longAnimationFrameBlockingDuration = {
         durationMs: Math.max(0, Number(latest.duration || 0)),
         blockingDuration: Math.max(0, Number(latest.blockingDuration || 0)),
         startTime: Math.max(0, Number(latest.startTime || 0)),
@@ -166,10 +167,10 @@ export function initLongAnimationFrameObserver() {
         firstUIEventTimestamp: Math.max(0, Number(latest.firstUIEventTimestamp || 0)),
         recordedAt: Date.now(),
       };
-      globalThis.__renderPerfMetrics = state.renderPerfMetrics;
+      globalThis.__renderPerfMetrics = runtimeState.renderPerfMetrics;
     });
     observer.observe({ type: "long-animation-frame", buffered: true });
-    state.longAnimationFrameObserver = observer;
+    runtimeState.longAnimationFrameObserver = observer;
   } catch (_error) {
     // Experimental API; ignore unsupported browsers.
   }
@@ -186,7 +187,7 @@ export function nowMs() {
 }
 
 export function getBootLanguage() {
-  return String(state.currentLanguage || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
+  return String(runtimeState.currentLanguage || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
 }
 
 export function getConfiguredDefaultScenarioId() {
@@ -313,21 +314,21 @@ export function warnOnStartupBundleIntegrity(bundle, { source = "" } = {}) {
     return;
   }
   const missingCollections = [];
-  const baseObjects = state.topologyPrimary?.objects || {};
+  const baseObjects = runtimeState.topologyPrimary?.objects || {};
   const runtimeObjects = bundle?.runtimeTopologyPayload?.objects || {};
-  if (baseObjects.ocean && !Array.isArray(state.oceanData?.features)) {
+  if (baseObjects.ocean && !Array.isArray(runtimeState.oceanData?.features)) {
     missingCollections.push("base.ocean");
   }
-  if (baseObjects.land && !Array.isArray(state.landBgData?.features)) {
+  if (baseObjects.land && !Array.isArray(runtimeState.landBgData?.features)) {
     missingCollections.push("base.land");
   }
-  if (baseObjects.water_regions && !Array.isArray(state.waterRegionsData?.features)) {
+  if (baseObjects.water_regions && !Array.isArray(runtimeState.waterRegionsData?.features)) {
     missingCollections.push("base.water_regions");
   }
-  if (runtimeObjects.scenario_water && !Array.isArray(state.scenarioWaterRegionsData?.features)) {
+  if (runtimeObjects.scenario_water && !Array.isArray(runtimeState.scenarioWaterRegionsData?.features)) {
     missingCollections.push("scenario.scenario_water");
   }
-  if (runtimeObjects.context_land_mask && !Array.isArray(state.scenarioContextLandMaskData?.features)) {
+  if (runtimeObjects.context_land_mask && !Array.isArray(runtimeState.scenarioContextLandMaskData?.features)) {
     missingCollections.push("scenario.context_land_mask");
   }
   if (!missingCollections.length) {
@@ -336,8 +337,9 @@ export function warnOnStartupBundleIntegrity(bundle, { source = "" } = {}) {
   console.warn(
     `[startup-bundle] Boot completed with missing startup collections: ${missingCollections.join(", ")}.`,
     {
-      activeScenarioId: String(state.activeScenarioId || bundle?.manifest?.scenario_id || ""),
-      topologyBundleMode: String(state.topologyBundleMode || ""),
+      activeScenarioId: String(runtimeState.activeScenarioId || bundle?.manifest?.scenario_id || ""),
+      topologyBundleMode: String(runtimeState.topologyBundleMode || ""),
     }
   );
 }
+

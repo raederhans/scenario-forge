@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+const { applyScenarioAndWaitIdle, gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 const SHELL_STARTUP_PATH = "/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=1&default_scenario=tno_1962";
 
@@ -11,25 +11,14 @@ async function waitForScenarioUiReady(page) {
   });
 }
 
-async function waitForScenarioManagerIdle(page) {
-  await waitForAppInteractive(page, { timeout: 120_000 });
-}
-
 async function applyScenario(page, scenarioId) {
   const expectedScenarioId = String(scenarioId || "").trim();
-  await waitForScenarioManagerIdle(page);
-  await page.evaluate(async (targetScenarioId) => {
-    const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
-    await applyScenarioByIdCommand(targetScenarioId, {
-      renderMode: "none",
-      markDirtyReason: "",
-      showToastOnComplete: false,
-    });
-  }, expectedScenarioId);
-  await expect.poll(async () => page.evaluate(async (targetScenarioId) => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === targetScenarioId && !state.scenarioApplyInFlight;
-  }, expectedScenarioId), { timeout: 120_000 }).toBe(true);
+  await applyScenarioAndWaitIdle(page, expectedScenarioId, {
+    timeout: 120_000,
+    renderMode: "none",
+    markDirtyReason: "",
+    showToastOnComplete: false,
+  });
 }
 
 async function resetScenario(page) {

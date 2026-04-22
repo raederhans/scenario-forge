@@ -21,14 +21,14 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
         self.assertIn("const ROLLBACK_REQUIRED_KEYS = Object.freeze([", content)
         self.assertIn('"activeScenarioMeshPack"', content)
         self.assertIn('"scheduleScenarioChunkRefreshEnabled"', content)
-        self.assertIn("activeScenarioMeshPack: cloneScenarioStateValue(state.activeScenarioMeshPack)", content)
+        self.assertIn("activeScenarioMeshPack: cloneScenarioStateValue(runtimeState.activeScenarioMeshPack)", content)
         self.assertIn(
-            "scheduleScenarioChunkRefreshEnabled: state.scheduleScenarioChunkRefreshFn === scheduleScenarioChunkRefresh",
+            'readRegisteredRuntimeHookSource(runtimeState, "scheduleScenarioChunkRefreshFn") === scheduleScenarioChunkRefresh',
             content,
         )
-        self.assertIn("state.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);", content)
+        self.assertIn("runtimeState.activeScenarioMeshPack = cloneScenarioStateValue(snapshot.activeScenarioMeshPack);", content)
         self.assertIn(
-            "state.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;",
+            "runtimeState.scheduleScenarioChunkRefreshFn = snapshot.scheduleScenarioChunkRefreshEnabled ? scheduleScenarioChunkRefresh : null;",
             content,
         )
         self.assertIn("Invalid rollback snapshot: missing required keys:", content)

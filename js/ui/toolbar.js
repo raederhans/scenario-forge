@@ -1,6 +1,6 @@
 // Toolbar UI (Phase 13)
 import {
-  state,
+  state as runtimeState,
   PALETTE_THEMES,
   normalizeExportWorkbenchUiState,
   normalizeLakeStyleConfig,
@@ -32,7 +32,7 @@ import {
   renderExportPassesToCanvas,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/runtime_hooks.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import {
   buildPaletteQuickSwatches,
   getPaletteSourceOptions,
@@ -82,15 +82,16 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./toolbar/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
+const state = runtimeState;
 
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
   if (!paletteGrid) return;
-  state.currentPaletteTheme = themeName;
+  runtimeState.currentPaletteTheme = themeName;
   paletteGrid.replaceChildren();
 
   let swatches = [];
-  if (state.activePalettePack?.entries) {
+  if (runtimeState.activePalettePack?.entries) {
     swatches = buildPaletteQuickSwatches(6).map((entry) => entry.color);
   } else {
     swatches = Array.isArray(PALETTE_THEMES[themeName]) ? PALETTE_THEMES[themeName].slice(0, 6) : [];
@@ -107,14 +108,14 @@ function renderPalette(themeName) {
     btn.setAttribute("aria-label", `${t("Quick Colors", "ui")}: ${normalized}`);
     btn.title = normalized;
     btn.addEventListener("click", () => {
-      state.selectedColor = normalized;
+      runtimeState.selectedColor = normalized;
       callRuntimeHook(state, "updateSwatchUIFn");
     });
     paletteGrid.appendChild(btn);
   });
 
-  if (!normalizeHexColor(state.selectedColor) && swatches.length > 0) {
-    state.selectedColor = swatches[0];
+  if (!normalizeHexColor(runtimeState.selectedColor) && swatches.length > 0) {
+    runtimeState.selectedColor = swatches[0];
   }
   callRuntimeHook(state, "updateSwatchUIFn");
 }
@@ -131,7 +132,7 @@ function populatePaletteSourceOptions(select) {
       option.textContent = optionData.label;
       select.appendChild(option);
     });
-    select.value = state.activePaletteId || sourceOptions[0]?.value || "";
+    select.value = runtimeState.activePaletteId || sourceOptions[0]?.value || "";
     return;
   }
 
@@ -141,7 +142,7 @@ function populatePaletteSourceOptions(select) {
     option.textContent = themeName;
     select.appendChild(option);
   });
-  select.value = state.currentPaletteTheme;
+  select.value = runtimeState.currentPaletteTheme;
 }
 
 const EXPORT_MAX_DIMENSION_PX = 7680;
@@ -149,11 +150,11 @@ const EXPORT_MAX_PIXELS = 7680 * 4320;
 const EXPORT_MAX_CONCURRENT_JOBS = 1;
 
 function resolveExportBaseDimensions() {
-  const dpr = Math.max(1, Number(state.dpr || globalThis.devicePixelRatio || 1));
-  const fallbackLogicalWidth = Number(state.colorCanvas?.width || 0) / dpr;
-  const fallbackLogicalHeight = Number(state.colorCanvas?.height || 0) / dpr;
-  const width = Math.round(Number(state.width || fallbackLogicalWidth || 0));
-  const height = Math.round(Number(state.height || fallbackLogicalHeight || 0));
+  const dpr = Math.max(1, Number(runtimeState.dpr || globalThis.devicePixelRatio || 1));
+  const fallbackLogicalWidth = Number(runtimeState.colorCanvas?.width || 0) / dpr;
+  const fallbackLogicalHeight = Number(runtimeState.colorCanvas?.height || 0) / dpr;
+  const width = Math.round(Number(runtimeState.width || fallbackLogicalWidth || 0));
+  const height = Math.round(Number(runtimeState.height || fallbackLogicalHeight || 0));
   return { width, height };
 }
 
@@ -688,20 +689,20 @@ function initToolbar({ render } = {}) {
   const SCENARIO_BAR_MIN_WIDTH = 172;
   const SCENARIO_GUIDE_MAX_WIDTH = 360;
   const SCENARIO_GUIDE_VERTICAL_GAP = 10;
-  if (!state.ui || typeof state.ui !== "object") {
-    state.ui = {};
+  if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
+    runtimeState.ui = {};
   }
-  state.ui.dockCollapsed = !!state.ui.dockCollapsed;
-  state.ui.scenarioBarCollapsed = !!state.ui.scenarioBarCollapsed;
-  state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
-  state.ui.politicalEditingExpanded = !!state.ui.politicalEditingExpanded;
-  state.ui.scenarioVisualAdjustmentsOpen = !!state.ui.scenarioVisualAdjustmentsOpen;
-  state.ui.developerMode = !!state.ui.developerMode;
-  state.ui.tutorialEntryVisible = state.ui.tutorialEntryVisible !== false;
-  state.ui.tutorialDismissed = !!state.ui.tutorialDismissed;
-  state.ui.responsiveChromeTier = String(state.ui.responsiveChromeTier || "");
-  if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
-    state.ui.paletteLibrarySections = {};
+  runtimeState.ui.dockCollapsed = !!runtimeState.ui.dockCollapsed;
+  runtimeState.ui.scenarioBarCollapsed = !!runtimeState.ui.scenarioBarCollapsed;
+  runtimeState.ui.scenarioGuideDismissed = !!runtimeState.ui.scenarioGuideDismissed;
+  runtimeState.ui.politicalEditingExpanded = !!runtimeState.ui.politicalEditingExpanded;
+  runtimeState.ui.scenarioVisualAdjustmentsOpen = !!runtimeState.ui.scenarioVisualAdjustmentsOpen;
+  runtimeState.ui.developerMode = !!runtimeState.ui.developerMode;
+  runtimeState.ui.tutorialEntryVisible = runtimeState.ui.tutorialEntryVisible !== false;
+  runtimeState.ui.tutorialDismissed = !!runtimeState.ui.tutorialDismissed;
+  runtimeState.ui.responsiveChromeTier = String(runtimeState.ui.responsiveChromeTier || "");
+  if (!runtimeState.ui.paletteLibrarySections || typeof runtimeState.ui.paletteLibrarySections !== "object") {
+    runtimeState.ui.paletteLibrarySections = {};
   }
   const uiSurfaceUrlState = createUiSurfaceUrlState({
     uiUrlStateKeys: UI_URL_STATE_KEYS,
@@ -746,12 +747,12 @@ function initToolbar({ render } = {}) {
 
   const applyResponsiveChromeDefaults = () => {
     const nextTier = getResponsiveChromeTier();
-    if (state.ui.responsiveChromeTier === nextTier) return;
+    if (runtimeState.ui.responsiveChromeTier === nextTier) return;
     if (nextTier === "mobile") {
-      state.ui.dockCollapsed = true;
-      state.ui.scenarioBarCollapsed = true;
+      runtimeState.ui.dockCollapsed = true;
+      runtimeState.ui.scenarioBarCollapsed = true;
     }
-    state.ui.responsiveChromeTier = nextTier;
+    runtimeState.ui.responsiveChromeTier = nextTier;
   };
   applyResponsiveChromeDefaults();
 
@@ -759,32 +760,32 @@ function initToolbar({ render } = {}) {
     try {
       globalThis.localStorage?.setItem(
         DEVELOPER_MODE_STORAGE_KEY,
-        state.ui.developerMode ? "true" : "false"
+        runtimeState.ui.developerMode ? "true" : "false"
       );
     } catch {}
   };
 
   const updateLanguageToggleUi = () => {
     if (!toggleLang) return;
-    const nextLang = state.currentLanguage === "zh" ? "EN" : "ZH";
-    const buttonLabel = state.currentLanguage === "zh" ? "ZH / EN" : "EN / ZH";
+    const nextLang = runtimeState.currentLanguage === "zh" ? "EN" : "ZH";
+    const buttonLabel = runtimeState.currentLanguage === "zh" ? "ZH / EN" : "EN / ZH";
     toggleLang.textContent = buttonLabel;
     toggleLang.setAttribute("title", `${t("Language", "ui")}: ${nextLang}`);
   };
 
   const syncDeveloperModeUi = () => {
-    document.body?.classList.toggle("developer-mode", !!state.ui.developerMode);
+    document.body?.classList.toggle("developer-mode", !!runtimeState.ui.developerMode);
     if (developerModeBtn) {
-      const buttonLabel = state.ui.developerMode
+      const buttonLabel = runtimeState.ui.developerMode
         ? t("Hide development workspace", "ui")
         : t("Show development workspace", "ui");
-      developerModeBtn.classList.toggle("is-active", !!state.ui.developerMode);
-      developerModeBtn.setAttribute("aria-pressed", state.ui.developerMode ? "true" : "false");
+      developerModeBtn.classList.toggle("is-active", !!runtimeState.ui.developerMode);
+      developerModeBtn.setAttribute("aria-pressed", runtimeState.ui.developerMode ? "true" : "false");
       developerModeBtn.setAttribute("aria-label", buttonLabel);
       developerModeBtn.setAttribute("title", buttonLabel);
     }
-    if (!state.ui.developerMode && state.ui.devWorkspaceExpanded) {
-      if (typeof state.setDevWorkspaceExpandedFn === "function") {
+    if (!runtimeState.ui.developerMode && runtimeState.ui.devWorkspaceExpanded) {
+      if (typeof runtimeState.setDevWorkspaceExpandedFn === "function") {
         callRuntimeHook(state, "setDevWorkspaceExpandedFn", false);
       } else if (devWorkspaceToggleBtn) {
         devWorkspaceToggleBtn.click();
@@ -794,11 +795,11 @@ function initToolbar({ render } = {}) {
 
   const setDeveloperMode = (nextValue) => {
     const normalized = !!nextValue;
-    if (state.ui.developerMode === normalized) {
+    if (runtimeState.ui.developerMode === normalized) {
       syncDeveloperModeUi();
       return;
     }
-    state.ui.developerMode = normalized;
+    runtimeState.ui.developerMode = normalized;
     persistDeveloperMode();
     syncDeveloperModeUi();
   };
@@ -806,7 +807,7 @@ function initToolbar({ render } = {}) {
   try {
     const storedDeveloperMode = globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY);
     if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
-      state.ui.developerMode = storedDeveloperMode === "true";
+      runtimeState.ui.developerMode = storedDeveloperMode === "true";
     }
   } catch {}
   updateLanguageToggleUi();
@@ -924,9 +925,9 @@ function initToolbar({ render } = {}) {
     getFocusableElements,
     ensureTransportWorkbenchUiState,
     syncSupportSurfaceUrlState,
-    ensureRightPanelVisible: () => state.toggleRightPanelFn?.(true),
-    openExportWorkbench: (trigger = dockExportBtn) => state.openExportWorkbenchFn?.(trigger),
-    closeExportWorkbench: ({ restoreFocus = true } = {}) => state.closeExportWorkbenchFn?.({ restoreFocus }),
+    ensureRightPanelVisible: () => runtimeState.toggleRightPanelFn?.(true),
+    openExportWorkbench: (trigger = dockExportBtn) => runtimeState.openExportWorkbenchFn?.(trigger),
+    closeExportWorkbench: ({ restoreFocus = true } = {}) => runtimeState.closeExportWorkbenchFn?.({ restoreFocus }),
   });
   const {
     bindDockPopoverDismiss,
@@ -945,7 +946,7 @@ function initToolbar({ render } = {}) {
   };
 
   const toggleLeftPanel = (force) => {
-    if (state.transportWorkbenchUi?.open && force !== false) {
+    if (runtimeState.transportWorkbenchUi?.open && force !== false) {
       return false;
     }
     closeDockPopover();
@@ -958,7 +959,7 @@ function initToolbar({ render } = {}) {
   };
 
   const toggleRightPanel = (force) => {
-    if (state.transportWorkbenchUi?.open && force !== false) {
+    if (runtimeState.transportWorkbenchUi?.open && force !== false) {
       return false;
     }
     closeDockPopover();
@@ -971,12 +972,12 @@ function initToolbar({ render } = {}) {
   };
 
   const toggleDock = (force) => {
-    state.ui.dockCollapsed = typeof force === "boolean" ? force : !state.ui.dockCollapsed;
-    if (state.ui.dockCollapsed) {
+    runtimeState.ui.dockCollapsed = typeof force === "boolean" ? force : !runtimeState.ui.dockCollapsed;
+    if (runtimeState.ui.dockCollapsed) {
       closeDockPopover();
     }
     updateDockCollapsedUi();
-    return state.ui.dockCollapsed;
+    return runtimeState.ui.dockCollapsed;
   };
 
   registerRuntimeHook(state, "toggleLeftPanelFn", toggleLeftPanel);
@@ -984,25 +985,25 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "toggleDockFn", toggleDock);
   registerRuntimeHook(state, "syncDeveloperModeUiFn", syncDeveloperModeUi);
   registerRuntimeHook(state, "toggleDeveloperModeFn", () => {
-    const shouldOpen = !state.ui.developerMode;
+    const shouldOpen = !runtimeState.ui.developerMode;
     if (shouldOpen) {
       setDeveloperMode(true);
-      if (typeof state.setDevWorkspaceExpandedFn === "function") {
+      if (typeof runtimeState.setDevWorkspaceExpandedFn === "function") {
         callRuntimeHook(state, "setDevWorkspaceExpandedFn", true);
         return true;
       }
-      if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
+      if (devWorkspaceToggleBtn && !runtimeState.ui.devWorkspaceExpanded) {
         devWorkspaceToggleBtn.click();
       }
       return true;
     }
 
-    if (typeof state.setDevWorkspaceExpandedFn === "function") {
+    if (typeof runtimeState.setDevWorkspaceExpandedFn === "function") {
       callRuntimeHook(state, "setDevWorkspaceExpandedFn", false);
       setDeveloperMode(false);
       return false;
     }
-    if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
+    if (devWorkspaceToggleBtn && runtimeState.ui.devWorkspaceExpanded) {
       devWorkspaceToggleBtn.click();
     }
     setDeveloperMode(false);
@@ -1078,13 +1079,13 @@ function initToolbar({ render } = {}) {
   initializeTransportWorkbenchRuntime();
 
   const getPaintModeLabel = () => (
-    String(state.paintMode || "visual") === "sovereignty"
+    String(runtimeState.paintMode || "visual") === "sovereignty"
       ? t("Political Ownership", "ui")
       : t("Visual Color", "ui")
   );
 
   const getPrimaryActionLabel = () => (
-    String(state.paintMode || "visual") === "sovereignty"
+    String(runtimeState.paintMode || "visual") === "sovereignty"
       ? t("Auto-Fill Ownership", "ui")
       : t("Auto-Fill Visuals", "ui")
   );
@@ -1094,26 +1095,26 @@ function initToolbar({ render } = {}) {
 
   const getFeatureDisplayName = (feature, fallback = "") => {
     const props = feature?.properties || {};
-    const rawLabel = state.currentLanguage === "zh"
+    const rawLabel = runtimeState.currentLanguage === "zh"
       ? (props.label_zh || props.name_zh || props.label || props.name)
       : (props.label_en || props.name_en || props.label || props.name);
     return String(rawLabel || props.id || feature?.id || fallback || "").trim();
   };
 
   const getWorkspaceSelectionLabel = () => {
-    const specialId = String(state.selectedSpecialRegionId || "").trim();
-    if (specialId && state.specialRegionsById?.has(specialId)) {
-      return getFeatureDisplayName(state.specialRegionsById.get(specialId), t("Special Region", "ui"));
+    const specialId = String(runtimeState.selectedSpecialRegionId || "").trim();
+    if (specialId && runtimeState.specialRegionsById?.has(specialId)) {
+      return getFeatureDisplayName(runtimeState.specialRegionsById.get(specialId), t("Special Region", "ui"));
     }
 
-    const waterId = String(state.selectedWaterRegionId || "").trim();
-    if (waterId && state.waterRegionsById?.has(waterId)) {
-      return getFeatureDisplayName(state.waterRegionsById.get(waterId), t("Water Region", "ui"));
+    const waterId = String(runtimeState.selectedWaterRegionId || "").trim();
+    if (waterId && runtimeState.waterRegionsById?.has(waterId)) {
+      return getFeatureDisplayName(runtimeState.waterRegionsById.get(waterId), t("Water Region", "ui"));
     }
 
-    const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+    const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     if (selectedCode) {
-      const label = String(state.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
+      const label = String(runtimeState.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
       return `${t(label, "geo") || label} (${selectedCode})`;
     }
 
@@ -1141,12 +1142,12 @@ function initToolbar({ render } = {}) {
 
   const getActiveQuickFillPolicy = () => {
     const selectedCode = normalizeCountryCode(
-      state.selectedInspectorCountryCode || state.inspectorHighlightCountryCode
+      runtimeState.selectedInspectorCountryCode || runtimeState.inspectorHighlightCountryCode
     );
-    if (!selectedCode || !(state.countryInteractionPoliciesByCode instanceof Map)) {
+    if (!selectedCode || !(runtimeState.countryInteractionPoliciesByCode instanceof Map)) {
       return null;
     }
-    return state.countryInteractionPoliciesByCode.get(selectedCode) || null;
+    return runtimeState.countryInteractionPoliciesByCode.get(selectedCode) || null;
   };
 
   const getQuickFillParentLabel = (policy) => {
@@ -1157,7 +1158,7 @@ function initToolbar({ render } = {}) {
   };
 
   const getQuickFillHint = (policy) => {
-    const requestedScope = String(state.batchFillScope || "parent") === "country" ? "country" : "parent";
+    const requestedScope = String(runtimeState.batchFillScope || "parent") === "country" ? "country" : "parent";
     if (requestedScope === "country") {
       return t("Single-click: one subdivision | Double-click: country batch", "ui");
     }
@@ -1168,9 +1169,9 @@ function initToolbar({ render } = {}) {
   };
 
   const refreshQuickFillControls = () => {
-    const isScenarioMode = !!state.activeScenarioId;
-    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
-    const isSubdivisionMode = String(state.interactionGranularity || "subdivision") !== "country";
+    const isScenarioMode = !!runtimeState.activeScenarioId;
+    const isOwnershipMode = String(runtimeState.paintMode || "visual") === "sovereignty";
+    const isSubdivisionMode = String(runtimeState.interactionGranularity || "subdivision") !== "country";
     const activePolicy = getActiveQuickFillPolicy();
     const parentEnabled = !activePolicy
       || !Array.isArray(activePolicy.quickFillScopes)
@@ -1183,14 +1184,14 @@ function initToolbar({ render } = {}) {
     if (dockQuickFillBtn) {
       dockQuickFillBtn.classList.toggle("hidden", !isVisible);
       dockQuickFillBtn.setAttribute("aria-hidden", isVisible ? "false" : "true");
-      dockQuickFillBtn.setAttribute("aria-expanded", state.activeDockPopover === "quickfill" ? "true" : "false");
+      dockQuickFillBtn.setAttribute("aria-expanded", runtimeState.activeDockPopover === "quickfill" ? "true" : "false");
     }
     if (dockQuickFillRow) {
-      const shouldShowPopover = isVisible && state.activeDockPopover === "quickfill";
+      const shouldShowPopover = isVisible && runtimeState.activeDockPopover === "quickfill";
       dockQuickFillRow.classList.toggle("hidden", !shouldShowPopover);
       dockQuickFillRow.setAttribute("aria-hidden", shouldShowPopover ? "false" : "true");
     }
-    if (!isVisible && state.activeDockPopover === "quickfill") {
+    if (!isVisible && runtimeState.activeDockPopover === "quickfill") {
       closeDockPopover();
     }
     if (quickFillParentBtn) {
@@ -1198,7 +1199,7 @@ function initToolbar({ render } = {}) {
       quickFillParentBtn.disabled = !parentEnabled;
       quickFillParentBtn.classList.toggle(
         "is-active",
-        parentEnabled && String(state.batchFillScope || "parent") !== "country"
+        parentEnabled && String(runtimeState.batchFillScope || "parent") !== "country"
       );
     }
     if (quickFillCountryBtn) {
@@ -1206,7 +1207,7 @@ function initToolbar({ render } = {}) {
       quickFillCountryBtn.disabled = !countryEnabled;
       quickFillCountryBtn.classList.toggle(
         "is-active",
-        countryEnabled && String(state.batchFillScope || "parent") === "country"
+        countryEnabled && String(runtimeState.batchFillScope || "parent") === "country"
       );
     }
     if (dockQuickFillHint) {
@@ -1215,10 +1216,10 @@ function initToolbar({ render } = {}) {
   };
 
   const refreshPaintControlsLayout = () => {
-    const isScenarioMode = !!state.activeScenarioId;
-    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
-    const showPoliticalPanel = !isScenarioMode && (state.ui.politicalEditingExpanded || isOwnershipMode);
-    const showBorderMaintenance = isScenarioMode || state.ui.politicalEditingExpanded || isOwnershipMode;
+    const isScenarioMode = !!runtimeState.activeScenarioId;
+    const isOwnershipMode = String(runtimeState.paintMode || "visual") === "sovereignty";
+    const showPoliticalPanel = !isScenarioMode && (runtimeState.ui.politicalEditingExpanded || isOwnershipMode);
+    const showBorderMaintenance = isScenarioMode || runtimeState.ui.politicalEditingExpanded || isOwnershipMode;
     const showGranularityField = !isScenarioMode;
     const showColorModeField = !isOwnershipMode;
     const showPoliticalEditingToggle = !isScenarioMode;
@@ -1252,7 +1253,7 @@ function initToolbar({ render } = {}) {
       dockPoliticalEditingPanel.setAttribute("aria-hidden", showPoliticalPanel ? "false" : "true");
     }
 
-    if (!showEditConfigButton && state.activeDockPopover === "edit") {
+    if (!showEditConfigButton && runtimeState.activeDockPopover === "edit") {
       closeDockPopover();
     }
     if (dockEditPopoverBtn) {
@@ -1278,20 +1279,20 @@ function initToolbar({ render } = {}) {
 
   const updateDockCollapsedUi = () => {
     if (!bottomDock) return;
-    bottomDock.classList.toggle("is-collapsed", !!state.ui.dockCollapsed);
+    bottomDock.classList.toggle("is-collapsed", !!runtimeState.ui.dockCollapsed);
     if (dockCollapseBtn) {
-      dockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
+      dockCollapseBtn.setAttribute("aria-pressed", runtimeState.ui.dockCollapsed ? "true" : "false");
       dockCollapseBtn.setAttribute(
         "aria-label",
-        state.ui.dockCollapsed ? t("Expand quick dock", "ui") : t("Collapse quick dock", "ui")
+        runtimeState.ui.dockCollapsed ? t("Expand quick dock", "ui") : t("Collapse quick dock", "ui")
       );
-      dockCollapseBtn.setAttribute("title", state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui"));
+      dockCollapseBtn.setAttribute("title", runtimeState.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui"));
     }
     if (dockHandleChevron) {
-      dockHandleChevron.textContent = state.ui.dockCollapsed ? "^" : "v";
+      dockHandleChevron.textContent = runtimeState.ui.dockCollapsed ? "^" : "v";
     }
     if (dockHandleLabel) {
-      dockHandleLabel.textContent = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
+      dockHandleLabel.textContent = runtimeState.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
     }
   };
 
@@ -1310,8 +1311,8 @@ function initToolbar({ render } = {}) {
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
-    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
-      state.syncFacilityInfoCardVisibilityFn();
+    if (typeof runtimeState.syncFacilityInfoCardVisibilityFn === "function") {
+      runtimeState.syncFacilityInfoCardVisibilityFn();
     }
   };
 
@@ -1365,20 +1366,20 @@ function initToolbar({ render } = {}) {
 
   const refreshScenarioContextBar = () => {
     if (!scenarioContextBar) return;
-    const activeScenario = String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "").trim();
-    const activeCode = String(state.activeSovereignCode || "").trim().toUpperCase();
-    const splitCount = Number(state.scenarioOwnerControllerDiffCount || 0);
+    const activeScenario = String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "").trim();
+    const activeCode = String(runtimeState.activeSovereignCode || "").trim().toUpperCase();
+    const splitCount = Number(runtimeState.scenarioOwnerControllerDiffCount || 0);
     const activeLabel = activeCode
-      ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode)
+      ? (t(runtimeState.countryNames?.[activeCode] || activeCode, "geo") || runtimeState.countryNames?.[activeCode] || activeCode)
       : t("None", "ui");
     const modeLabel = getPaintModeLabel();
-    const scenarioViewLabel = String(state.scenarioViewMode || "ownership") === "frontline"
+    const scenarioViewLabel = String(runtimeState.scenarioViewMode || "ownership") === "frontline"
       ? t("Frontline", "ui")
       : t("Ownership", "ui");
     const showScenarioState = !!activeScenario;
     const activeValue = activeCode ? `${activeLabel} (${activeCode})` : t("None", "ui");
     scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
-    scenarioContextBar.classList.toggle("is-collapsed", !!state.ui.scenarioBarCollapsed);
+    scenarioContextBar.classList.toggle("is-collapsed", !!runtimeState.ui.scenarioBarCollapsed);
     if (scenarioContextScenarioText) {
       const scenarioValue = activeScenario || t("None", "ui");
       scenarioContextScenarioText.textContent = scenarioValue;
@@ -1398,18 +1399,18 @@ function initToolbar({ render } = {}) {
       scenarioContextActiveText.setAttribute("title", `${t("Active", "ui")}: ${activeValue}`);
     }
     if (scenarioContextCollapseBtn) {
-      scenarioContextCollapseBtn.textContent = state.ui.scenarioBarCollapsed ? "+" : "-";
-      scenarioContextCollapseBtn.setAttribute("aria-label", state.ui.scenarioBarCollapsed
+      scenarioContextCollapseBtn.textContent = runtimeState.ui.scenarioBarCollapsed ? "+" : "-";
+      scenarioContextCollapseBtn.setAttribute("aria-label", runtimeState.ui.scenarioBarCollapsed
         ? t("Expand", "ui")
         : t("Collapse", "ui"));
     }
     syncScenarioGuideTriggerButtons({
       isOpen: !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")),
-      tutorialEntryVisible: !!state.ui.tutorialEntryVisible,
+      tutorialEntryVisible: !!runtimeState.ui.tutorialEntryVisible,
     });
     if (scenarioTransportWorkbenchBtn) {
       scenarioTransportWorkbenchBtn.textContent = t("Transport", "ui");
-      scenarioTransportWorkbenchBtn.setAttribute("title", state.transportWorkbenchUi?.open
+      scenarioTransportWorkbenchBtn.setAttribute("title", runtimeState.transportWorkbenchUi?.open
         ? t("Close transport workbench", "ui")
         : t("Open transport workbench", "ui"));
     }
@@ -1439,14 +1440,14 @@ function initToolbar({ render } = {}) {
   let onboardingAutoTimer = 0;
   const dismissOnboardingHint = () => {
     if (onboardingAutoTimer) { clearTimeout(onboardingAutoTimer); onboardingAutoTimer = 0; }
-    if (!mapOnboardingHint || state.onboardingDismissed) return;
-    state.onboardingDismissed = true;
+    if (!mapOnboardingHint || runtimeState.onboardingDismissed) return;
+    runtimeState.onboardingDismissed = true;
     mapOnboardingHint.classList.add("is-hidden");
     mapOnboardingHint.setAttribute("aria-hidden", "true");
   };
   const showOnboardingHint = () => {
     if (!mapOnboardingHint) return;
-    state.onboardingDismissed = false;
+    runtimeState.onboardingDismissed = false;
     mapOnboardingHint.classList.remove("is-hidden");
     mapOnboardingHint.setAttribute("aria-hidden", "false");
     if (onboardingAutoTimer) clearTimeout(onboardingAutoTimer);
@@ -1499,15 +1500,15 @@ function initToolbar({ render } = {}) {
   const setToolCursorClass = () => {
     if (!mapContainer) return;
     mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
-    if (state.specialZoneEditor?.active) {
+    if (runtimeState.specialZoneEditor?.active) {
       mapContainer.classList.add("tool-special-zone");
       return;
     }
-    if (state.brushModeEnabled && state.brushPanModifierActive) {
+    if (runtimeState.brushModeEnabled && runtimeState.brushPanModifierActive) {
       mapContainer.classList.add("tool-pan-override");
       return;
     }
-    mapContainer.classList.add(`tool-${state.currentTool || "fill"}`);
+    mapContainer.classList.add(`tool-${runtimeState.currentTool || "fill"}`);
   };
 
   const renderDirty = (reason) => {
@@ -1515,46 +1516,46 @@ function initToolbar({ render } = {}) {
     if (render) render();
   };
   const persistCityViewSettings = () => {
-    state.persistViewSettingsFn?.();
+    runtimeState.persistViewSettingsFn?.();
   };
 
   const refreshActiveSovereignLabel = () => {
-    const code = String(state.activeSovereignCode || "").trim().toUpperCase();
+    const code = String(runtimeState.activeSovereignCode || "").trim().toUpperCase();
     if (activeSovereignLabel) {
       if (!code) {
         activeSovereignLabel.textContent = t("None selected", "ui");
       } else {
-        const label = String(state.countryNames?.[code] || code).trim() || code;
+        const label = String(runtimeState.countryNames?.[code] || code).trim() || code;
         activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
       }
     }
     refreshScenarioContextBar();
     refreshWorkspaceStatus();
-    if (typeof state.renderPresetTreeFn === "function") {
-      state.renderPresetTreeFn();
+    if (typeof runtimeState.renderPresetTreeFn === "function") {
+      runtimeState.renderPresetTreeFn();
     }
   };
   registerRuntimeHook(state, "updateActiveSovereignUIFn", refreshActiveSovereignLabel);
   const refreshDynamicBorderStatus = () => {
     if (dynamicBorderStatus) {
-      if (!state.runtimePoliticalTopology?.objects?.political) {
+      if (!runtimeState.runtimePoliticalTopology?.objects?.political) {
         dynamicBorderStatus.textContent = t("Dynamic borders disabled", "ui");
-      } else if (state.dynamicBordersDirty) {
+      } else if (runtimeState.dynamicBordersDirty) {
         dynamicBorderStatus.textContent = t("Borders need recalculation", "ui");
       } else {
         dynamicBorderStatus.textContent = t("Borders up to date", "ui");
       }
     }
     if (recalculateBordersBtn) {
-      recalculateBordersBtn.disabled = !state.dynamicBordersDirty;
+      recalculateBordersBtn.disabled = !runtimeState.dynamicBordersDirty;
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
   registerRuntimeHook(state, "updatePaintModeUIFn", () => {
     if (paintModeSelect) {
-      paintModeSelect.value = state.paintMode || "visual";
+      paintModeSelect.value = runtimeState.paintMode || "visual";
     }
-    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
+    const isOwnershipMode = String(runtimeState.paintMode || "visual") === "sovereignty";
     [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
       if (!button) return;
       const buttonMode = button.dataset.paintMode || "visual";
@@ -1563,7 +1564,7 @@ function initToolbar({ render } = {}) {
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
     if (paintGranularitySelect) {
-      paintGranularitySelect.value = state.interactionGranularity || "subdivision";
+      paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     }
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
@@ -1593,197 +1594,197 @@ function initToolbar({ render } = {}) {
     }
     return "#aadaff";
   };
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
+  if (!runtimeState.styleConfig.ocean || typeof runtimeState.styleConfig.ocean !== "object") {
+    runtimeState.styleConfig.ocean = {};
   }
-  state.styleConfig.ocean.preset = normalizeOceanPreset(state.styleConfig.ocean.preset || "flat");
-  state.styleConfig.ocean.experimentalAdvancedStyles = state.styleConfig.ocean.experimentalAdvancedStyles === true;
-  if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
-    state.styleConfig.ocean.preset = "flat";
+  runtimeState.styleConfig.ocean.preset = normalizeOceanPreset(runtimeState.styleConfig.ocean.preset || "flat");
+  runtimeState.styleConfig.ocean.experimentalAdvancedStyles = runtimeState.styleConfig.ocean.experimentalAdvancedStyles === true;
+  if (!runtimeState.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(runtimeState.styleConfig.ocean.preset)) {
+    runtimeState.styleConfig.ocean.preset = "flat";
   }
-  state.styleConfig.ocean.coastalAccentEnabled = state.styleConfig.ocean.coastalAccentEnabled !== false;
-  state.styleConfig.ocean.fillColor = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
-  state.styleConfig.ocean.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.opacity)) ? Number(state.styleConfig.ocean.opacity) : 0.72,
+  runtimeState.styleConfig.ocean.coastalAccentEnabled = runtimeState.styleConfig.ocean.coastalAccentEnabled !== false;
+  runtimeState.styleConfig.ocean.fillColor = normalizeOceanFillColor(runtimeState.styleConfig.ocean.fillColor);
+  runtimeState.styleConfig.ocean.opacity = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.opacity)) ? Number(runtimeState.styleConfig.ocean.opacity) : 0.72,
     0,
     1
   );
-  state.styleConfig.ocean.scale = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.scale)) ? Number(state.styleConfig.ocean.scale) : 1,
+  runtimeState.styleConfig.ocean.scale = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.scale)) ? Number(runtimeState.styleConfig.ocean.scale) : 1,
     0.6,
     2.4
   );
-  state.styleConfig.ocean.contourStrength = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.contourStrength))
-      ? Number(state.styleConfig.ocean.contourStrength)
+  runtimeState.styleConfig.ocean.contourStrength = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.contourStrength))
+      ? Number(runtimeState.styleConfig.ocean.contourStrength)
       : 0.75,
     0,
     1
   );
-  state.styleConfig.ocean.shallowBandFadeEndZoom = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.shallowBandFadeEndZoom))
-      ? Number(state.styleConfig.ocean.shallowBandFadeEndZoom)
+  runtimeState.styleConfig.ocean.shallowBandFadeEndZoom = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.shallowBandFadeEndZoom))
+      ? Number(runtimeState.styleConfig.ocean.shallowBandFadeEndZoom)
       : 2.8,
     2.1,
     4.8
   );
-  state.styleConfig.ocean.midBandFadeEndZoom = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.midBandFadeEndZoom))
-      ? Number(state.styleConfig.ocean.midBandFadeEndZoom)
+  runtimeState.styleConfig.ocean.midBandFadeEndZoom = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.midBandFadeEndZoom))
+      ? Number(runtimeState.styleConfig.ocean.midBandFadeEndZoom)
       : 3.4,
     2.7,
     5.2
   );
-  state.styleConfig.ocean.deepBandFadeEndZoom = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.deepBandFadeEndZoom))
-      ? Number(state.styleConfig.ocean.deepBandFadeEndZoom)
+  runtimeState.styleConfig.ocean.deepBandFadeEndZoom = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.deepBandFadeEndZoom))
+      ? Number(runtimeState.styleConfig.ocean.deepBandFadeEndZoom)
       : 4.2,
     3.3,
     6
   );
-  state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom))
-      ? Number(state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom)
+  runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom))
+      ? Number(runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom)
       : 3.0,
     2.1,
     4.6
   );
-  state.styleConfig.ocean.scenarioShallowContourFadeEndZoom = clamp(
-    Number.isFinite(Number(state.styleConfig.ocean.scenarioShallowContourFadeEndZoom))
-      ? Number(state.styleConfig.ocean.scenarioShallowContourFadeEndZoom)
+  runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom))
+      ? Number(runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom)
       : 3.4,
     2.5,
     5
   );
-  state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
-  if (!state.styleConfig.internalBorders || typeof state.styleConfig.internalBorders !== "object") {
-    state.styleConfig.internalBorders = {};
+  runtimeState.styleConfig.lakes = normalizeLakeStyleConfig(runtimeState.styleConfig.lakes);
+  if (!runtimeState.styleConfig.internalBorders || typeof runtimeState.styleConfig.internalBorders !== "object") {
+    runtimeState.styleConfig.internalBorders = {};
   }
-  state.styleConfig.internalBorders.color = normalizeOceanFillColor(state.styleConfig.internalBorders.color || "#cccccc");
-  state.styleConfig.internalBorders.colorMode =
-    String(state.styleConfig.internalBorders.colorMode || "auto").trim().toLowerCase() === "manual"
+  runtimeState.styleConfig.internalBorders.color = normalizeOceanFillColor(runtimeState.styleConfig.internalBorders.color || "#cccccc");
+  runtimeState.styleConfig.internalBorders.colorMode =
+    String(runtimeState.styleConfig.internalBorders.colorMode || "auto").trim().toLowerCase() === "manual"
       ? "manual"
       : "auto";
-  state.styleConfig.internalBorders.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.internalBorders.opacity))
-      ? Number(state.styleConfig.internalBorders.opacity)
+  runtimeState.styleConfig.internalBorders.opacity = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.internalBorders.opacity))
+      ? Number(runtimeState.styleConfig.internalBorders.opacity)
       : 1,
     0,
     1
   );
-  state.styleConfig.internalBorders.width = clamp(
-    Number.isFinite(Number(state.styleConfig.internalBorders.width))
-      ? Number(state.styleConfig.internalBorders.width)
+  runtimeState.styleConfig.internalBorders.width = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.internalBorders.width))
+      ? Number(runtimeState.styleConfig.internalBorders.width)
       : 0.5,
     0.01,
     2
   );
-  if (!state.styleConfig.empireBorders || typeof state.styleConfig.empireBorders !== "object") {
-    state.styleConfig.empireBorders = {};
+  if (!runtimeState.styleConfig.empireBorders || typeof runtimeState.styleConfig.empireBorders !== "object") {
+    runtimeState.styleConfig.empireBorders = {};
   }
-  state.styleConfig.empireBorders.color = normalizeOceanFillColor(state.styleConfig.empireBorders.color || "#666666");
-  state.styleConfig.empireBorders.width = clamp(
-    Number.isFinite(Number(state.styleConfig.empireBorders.width))
-      ? Number(state.styleConfig.empireBorders.width)
+  runtimeState.styleConfig.empireBorders.color = normalizeOceanFillColor(runtimeState.styleConfig.empireBorders.color || "#666666");
+  runtimeState.styleConfig.empireBorders.width = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.empireBorders.width))
+      ? Number(runtimeState.styleConfig.empireBorders.width)
       : 1,
     0.01,
     5
   );
-  if (!state.styleConfig.coastlines || typeof state.styleConfig.coastlines !== "object") {
-    state.styleConfig.coastlines = {};
+  if (!runtimeState.styleConfig.coastlines || typeof runtimeState.styleConfig.coastlines !== "object") {
+    runtimeState.styleConfig.coastlines = {};
   }
-  state.styleConfig.coastlines.color = normalizeOceanFillColor(state.styleConfig.coastlines.color || "#333333");
-  state.styleConfig.coastlines.width = clamp(
-    Number.isFinite(Number(state.styleConfig.coastlines.width))
-      ? Number(state.styleConfig.coastlines.width)
+  runtimeState.styleConfig.coastlines.color = normalizeOceanFillColor(runtimeState.styleConfig.coastlines.color || "#333333");
+  runtimeState.styleConfig.coastlines.width = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.coastlines.width))
+      ? Number(runtimeState.styleConfig.coastlines.width)
       : 1.2,
     0.5,
     3
   );
-  if (!state.styleConfig.parentBorders || typeof state.styleConfig.parentBorders !== "object") {
-    state.styleConfig.parentBorders = {};
+  if (!runtimeState.styleConfig.parentBorders || typeof runtimeState.styleConfig.parentBorders !== "object") {
+    runtimeState.styleConfig.parentBorders = {};
   }
-  state.styleConfig.parentBorders.color = String(
-    state.styleConfig.parentBorders.color || "#4b5563"
+  runtimeState.styleConfig.parentBorders.color = String(
+    runtimeState.styleConfig.parentBorders.color || "#4b5563"
   );
-  state.styleConfig.parentBorders.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.parentBorders.opacity))
-      ? Number(state.styleConfig.parentBorders.opacity)
+  runtimeState.styleConfig.parentBorders.opacity = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.parentBorders.opacity))
+      ? Number(runtimeState.styleConfig.parentBorders.opacity)
       : 0.85,
     0,
     1
   );
-  state.styleConfig.parentBorders.width = clamp(
-    Number.isFinite(Number(state.styleConfig.parentBorders.width))
-      ? Number(state.styleConfig.parentBorders.width)
+  runtimeState.styleConfig.parentBorders.width = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.parentBorders.width))
+      ? Number(runtimeState.styleConfig.parentBorders.width)
       : 1.1,
     0.2,
     4
   );
-  if (!state.parentBorderEnabledByCountry || typeof state.parentBorderEnabledByCountry !== "object") {
-    state.parentBorderEnabledByCountry = {};
+  if (!runtimeState.parentBorderEnabledByCountry || typeof runtimeState.parentBorderEnabledByCountry !== "object") {
+    runtimeState.parentBorderEnabledByCountry = {};
   }
-  state.parentBordersVisible = state.parentBordersVisible !== false;
-  state.styleConfig.urban = normalizeUrbanStyleConfig(state.styleConfig.urban);
-  if (state.styleConfig.urban.mode === "manual") {
-    state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
+  runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
+  runtimeState.styleConfig.urban = normalizeUrbanStyleConfig(runtimeState.styleConfig.urban);
+  if (runtimeState.styleConfig.urban.mode === "manual") {
+    runtimeState.styleConfig.urban.color = normalizeOceanFillColor(runtimeState.styleConfig.urban.color || "#4b5563");
   }
-  state.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(
-    state.styleConfig.urban.adaptiveTintColor || "#f2dea1"
+  runtimeState.styleConfig.urban.adaptiveTintColor = normalizeOceanFillColor(
+    runtimeState.styleConfig.urban.adaptiveTintColor || "#f2dea1"
   );
 
-  state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
-  state.styleConfig.physical.contourColor = normalizeOceanFillColor(
-    state.styleConfig.physical.contourColor || "#6b5947"
+  runtimeState.styleConfig.physical = normalizePhysicalStyleConfig(runtimeState.styleConfig.physical);
+  runtimeState.styleConfig.physical.contourColor = normalizeOceanFillColor(
+    runtimeState.styleConfig.physical.contourColor || "#6b5947"
   );
 
-  if (!state.styleConfig.rivers || typeof state.styleConfig.rivers !== "object") {
-    state.styleConfig.rivers = {};
+  if (!runtimeState.styleConfig.rivers || typeof runtimeState.styleConfig.rivers !== "object") {
+    runtimeState.styleConfig.rivers = {};
   }
-  state.styleConfig.rivers.color = normalizeOceanFillColor(state.styleConfig.rivers.color || "#3b82f6");
-  state.styleConfig.rivers.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.rivers.opacity)) ? Number(state.styleConfig.rivers.opacity) : 0.88,
+  runtimeState.styleConfig.rivers.color = normalizeOceanFillColor(runtimeState.styleConfig.rivers.color || "#3b82f6");
+  runtimeState.styleConfig.rivers.opacity = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.rivers.opacity)) ? Number(runtimeState.styleConfig.rivers.opacity) : 0.88,
     0,
     1
   );
-  state.styleConfig.rivers.width = clamp(
-    Number.isFinite(Number(state.styleConfig.rivers.width)) ? Number(state.styleConfig.rivers.width) : 0.5,
+  runtimeState.styleConfig.rivers.width = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.rivers.width)) ? Number(runtimeState.styleConfig.rivers.width) : 0.5,
     0.2,
     4
   );
-  state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(
-    state.styleConfig.rivers.outlineColor || "#e2efff"
+  runtimeState.styleConfig.rivers.outlineColor = normalizeOceanFillColor(
+    runtimeState.styleConfig.rivers.outlineColor || "#e2efff"
   );
-  state.styleConfig.rivers.outlineWidth = clamp(
-    Number.isFinite(Number(state.styleConfig.rivers.outlineWidth))
-      ? Number(state.styleConfig.rivers.outlineWidth)
+  runtimeState.styleConfig.rivers.outlineWidth = clamp(
+    Number.isFinite(Number(runtimeState.styleConfig.rivers.outlineWidth))
+      ? Number(runtimeState.styleConfig.rivers.outlineWidth)
       : 0.25,
     0,
     3
   );
-  state.styleConfig.rivers.dashStyle = String(state.styleConfig.rivers.dashStyle || "solid");
+  runtimeState.styleConfig.rivers.dashStyle = String(runtimeState.styleConfig.rivers.dashStyle || "solid");
 
-  state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
-  if (!state.referenceImageState || typeof state.referenceImageState !== "object") {
-    state.referenceImageState = {};
+  runtimeState.styleConfig.texture = normalizeTextureStyleConfig(runtimeState.styleConfig.texture);
+  if (!runtimeState.referenceImageState || typeof runtimeState.referenceImageState !== "object") {
+    runtimeState.referenceImageState = {};
   }
-  state.referenceImageState.opacity = clamp(
-    Number.isFinite(Number(state.referenceImageState.opacity)) ? Number(state.referenceImageState.opacity) : 0.6,
+  runtimeState.referenceImageState.opacity = clamp(
+    Number.isFinite(Number(runtimeState.referenceImageState.opacity)) ? Number(runtimeState.referenceImageState.opacity) : 0.6,
     0,
     1
   );
-  state.referenceImageState.scale = clamp(
-    Number.isFinite(Number(state.referenceImageState.scale)) ? Number(state.referenceImageState.scale) : 1,
+  runtimeState.referenceImageState.scale = clamp(
+    Number.isFinite(Number(runtimeState.referenceImageState.scale)) ? Number(runtimeState.referenceImageState.scale) : 1,
     0.2,
     3
   );
-  state.referenceImageState.offsetX = clamp(
-    Number.isFinite(Number(state.referenceImageState.offsetX)) ? Number(state.referenceImageState.offsetX) : 0,
+  runtimeState.referenceImageState.offsetX = clamp(
+    Number.isFinite(Number(runtimeState.referenceImageState.offsetX)) ? Number(runtimeState.referenceImageState.offsetX) : 0,
     -1000,
     1000
   );
-  state.referenceImageState.offsetY = clamp(
-    Number.isFinite(Number(state.referenceImageState.offsetY)) ? Number(state.referenceImageState.offsetY) : 0,
+  runtimeState.referenceImageState.offsetY = clamp(
+    Number.isFinite(Number(runtimeState.referenceImageState.offsetY)) ? Number(runtimeState.referenceImageState.offsetY) : 0,
     -1000,
     1000
   );
@@ -1814,11 +1815,11 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
 
   function renderSpecialZoneEditorUI() {
-    if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
-    if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
-    if (toggleSpecialZones) toggleSpecialZones.checked = !!state.showSpecialZones;
-    if (toggleAirports) toggleAirports.checked = !!state.showAirports;
-    if (togglePorts) togglePorts.checked = !!state.showPorts;
+    if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
+    if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!runtimeState.showOpenOceanRegions;
+    if (toggleSpecialZones) toggleSpecialZones.checked = !!runtimeState.showSpecialZones;
+    if (toggleAirports) toggleAirports.checked = !!runtimeState.showAirports;
+    if (togglePorts) togglePorts.checked = !!runtimeState.showPorts;
     renderAppearanceStyleControlsUi();
     specialZoneEditorController.renderSpecialZoneEditorUI();
     updateToolUI();
@@ -1828,7 +1829,7 @@ function initToolbar({ render } = {}) {
   function updateSwatchUI() {
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
-      if (swatch.dataset.color === state.selectedColor) {
+      if (swatch.dataset.color === runtimeState.selectedColor) {
         swatch.classList.add("is-selected");
       } else {
         swatch.classList.remove("is-selected");
@@ -1836,36 +1837,36 @@ function initToolbar({ render } = {}) {
     });
     const libraryRows = document.querySelectorAll(".palette-library-row");
     libraryRows.forEach((row) => {
-      row.classList.toggle("is-selected", row.dataset.color === state.selectedColor);
+      row.classList.toggle("is-selected", row.dataset.color === runtimeState.selectedColor);
     });
     if (document.getElementById("customColor")) {
-      customColor.value = state.selectedColor;
+      customColor.value = runtimeState.selectedColor;
     }
     if (selectedColorPreview) {
-      selectedColorPreview.style.backgroundColor = state.selectedColor;
-      selectedColorPreview.setAttribute("aria-label", `${t("Selected color", "ui")}: ${state.selectedColor}`);
+      selectedColorPreview.style.backgroundColor = runtimeState.selectedColor;
+      selectedColorPreview.setAttribute("aria-label", `${t("Selected color", "ui")}: ${runtimeState.selectedColor}`);
     }
     if (selectedColorValue) {
-      selectedColorValue.textContent = String(state.selectedColor || "").toUpperCase();
+      selectedColorValue.textContent = String(runtimeState.selectedColor || "").toUpperCase();
     }
   }
   registerRuntimeHook(state, "updateSwatchUIFn", updateSwatchUI);
 
   function updateToolUI() {
     toolButtons.forEach((button) => {
-      const isActive = button.dataset.tool === state.currentTool;
+      const isActive = button.dataset.tool === runtimeState.currentTool;
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     });
-    const disableBrush = state.currentTool === "eyedropper" || !!state.specialZoneEditor?.active;
+    const disableBrush = runtimeState.currentTool === "eyedropper" || !!runtimeState.specialZoneEditor?.active;
     if (disableBrush) {
-      state.brushModeEnabled = false;
-      state.brushPanModifierActive = false;
+      runtimeState.brushModeEnabled = false;
+      runtimeState.brushPanModifierActive = false;
     }
     if (brushModeBtn) {
       brushModeBtn.disabled = disableBrush;
-      brushModeBtn.classList.toggle("is-active", !!state.brushModeEnabled && !disableBrush);
-      brushModeBtn.setAttribute("aria-pressed", String(!!state.brushModeEnabled && !disableBrush));
+      brushModeBtn.classList.toggle("is-active", !!runtimeState.brushModeEnabled && !disableBrush);
+      brushModeBtn.setAttribute("aria-pressed", String(!!runtimeState.brushModeEnabled && !disableBrush));
     }
     setToolCursorClass();
     updateDirtyIndicator();
@@ -1899,7 +1900,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    renderPalette(state.currentPaletteTheme);
+    renderPalette(runtimeState.currentPaletteTheme);
     renderPaletteLibrary();
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
@@ -2100,10 +2101,10 @@ function initToolbar({ render } = {}) {
 
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
     const nextTool = tool || "fill";
-    state.currentTool = nextTool;
+    runtimeState.currentTool = nextTool;
     if (nextTool === "eyedropper") {
-      state.brushModeEnabled = false;
-      state.brushPanModifierActive = false;
+      runtimeState.brushModeEnabled = false;
+      runtimeState.brushPanModifierActive = false;
     }
     updateToolUI();
     if (dismissHint) {
@@ -2112,17 +2113,17 @@ function initToolbar({ render } = {}) {
     emitTransientFeedback(feedbackLabel || getToolFeedbackLabel(nextTool));
   };
 
-  const runBrushModeToggle = (nextValue = !state.brushModeEnabled, { dismissHint = true } = {}) => {
-    state.brushModeEnabled = !!nextValue;
-    if (state.brushModeEnabled && state.currentTool === "eyedropper") {
-      state.currentTool = "fill";
+  const runBrushModeToggle = (nextValue = !runtimeState.brushModeEnabled, { dismissHint = true } = {}) => {
+    runtimeState.brushModeEnabled = !!nextValue;
+    if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+      runtimeState.currentTool = "fill";
     }
     updateToolUI();
     if (dismissHint) {
       dismissOnboardingHint();
     }
     emitTransientFeedback(t(
-      state.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
+      runtimeState.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
       "ui"
     ));
   };
@@ -2155,51 +2156,51 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "commitZoomInputValueFn", commitZoomInputValue);
 
   registerRuntimeHook(state, "updateToolbarInputsFn", () => {
-    const internalAutoColorEnabled = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
+    const internalAutoColorEnabled = String(runtimeState.styleConfig.internalBorders.colorMode || "auto") !== "manual";
     if (internalBorderAutoColor) {
       internalBorderAutoColor.checked = internalAutoColorEnabled;
     }
     if (internalBorderColor) {
-      internalBorderColor.value = state.styleConfig.internalBorders.color;
+      internalBorderColor.value = runtimeState.styleConfig.internalBorders.color;
       internalBorderColor.disabled = internalAutoColorEnabled;
     }
     if (internalBorderOpacity) {
-      internalBorderOpacity.value = String(Math.round(state.styleConfig.internalBorders.opacity * 100));
+      internalBorderOpacity.value = String(Math.round(runtimeState.styleConfig.internalBorders.opacity * 100));
     }
     if (internalBorderOpacityValue) {
-      internalBorderOpacityValue.textContent = `${Math.round(state.styleConfig.internalBorders.opacity * 100)}%`;
+      internalBorderOpacityValue.textContent = `${Math.round(runtimeState.styleConfig.internalBorders.opacity * 100)}%`;
     }
     if (internalBorderWidth) {
-      internalBorderWidth.value = String(Number(state.styleConfig.internalBorders.width).toFixed(2));
+      internalBorderWidth.value = String(Number(runtimeState.styleConfig.internalBorders.width).toFixed(2));
     }
     if (internalBorderWidthValue) {
-      internalBorderWidthValue.textContent = Number(state.styleConfig.internalBorders.width).toFixed(2);
+      internalBorderWidthValue.textContent = Number(runtimeState.styleConfig.internalBorders.width).toFixed(2);
     }
     if (empireBorderColor) {
-      empireBorderColor.value = state.styleConfig.empireBorders.color;
+      empireBorderColor.value = runtimeState.styleConfig.empireBorders.color;
     }
     if (empireBorderWidth) {
-      empireBorderWidth.value = String(Number(state.styleConfig.empireBorders.width).toFixed(2));
+      empireBorderWidth.value = String(Number(runtimeState.styleConfig.empireBorders.width).toFixed(2));
     }
     if (empireBorderWidthValue) {
-      empireBorderWidthValue.textContent = Number(state.styleConfig.empireBorders.width).toFixed(2);
+      empireBorderWidthValue.textContent = Number(runtimeState.styleConfig.empireBorders.width).toFixed(2);
     }
     if (coastlineColor) {
-      coastlineColor.value = state.styleConfig.coastlines.color;
+      coastlineColor.value = runtimeState.styleConfig.coastlines.color;
     }
     if (coastlineWidth) {
-      coastlineWidth.value = String(Number(state.styleConfig.coastlines.width).toFixed(1));
+      coastlineWidth.value = String(Number(runtimeState.styleConfig.coastlines.width).toFixed(1));
     }
     if (coastlineWidthValue) {
-      coastlineWidthValue.textContent = Number(state.styleConfig.coastlines.width).toFixed(1);
+      coastlineWidthValue.textContent = Number(runtimeState.styleConfig.coastlines.width).toFixed(1);
     }
     syncParentBorderVisibilityUI();
     renderOceanLakeControlsUi();
     if (colorModeSelect) {
-      colorModeSelect.value = state.colorMode || "political";
+      colorModeSelect.value = runtimeState.colorMode || "political";
     }
     if (themeSelect) {
-      themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
+      themeSelect.value = String(runtimeState.activePaletteId || themeSelect.value || "");
     }
     renderReferenceOverlayUi();
     syncExportWorkbenchControlsFromState();
@@ -2211,7 +2212,7 @@ function initToolbar({ render } = {}) {
 
   if (customColor) {
     customColor.addEventListener("input", (event) => {
-      state.selectedColor = event.target.value;
+      runtimeState.selectedColor = event.target.value;
       updateSwatchUI();
     });
   }
@@ -2321,7 +2322,7 @@ function initToolbar({ render } = {}) {
 
   if (developerModeBtn && !developerModeBtn.dataset.bound) {
     developerModeBtn.addEventListener("click", () => {
-      state.toggleDeveloperModeFn?.();
+      runtimeState.toggleDeveloperModeFn?.();
     });
     developerModeBtn.dataset.bound = "true";
   }
@@ -2333,11 +2334,11 @@ function initToolbar({ render } = {}) {
       if (paintModeSelect) {
         paintModeSelect.value = nextMode;
       }
-      state.paintMode = nextMode;
-      state.ui.politicalEditingExpanded = nextMode === "sovereignty";
+      runtimeState.paintMode = nextMode;
+      runtimeState.ui.politicalEditingExpanded = nextMode === "sovereignty";
       markDirty?.("paint-mode");
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
       if (typeof render === "function") {
         render();
@@ -2361,9 +2362,9 @@ function initToolbar({ render } = {}) {
     dockExportBtn.addEventListener("click", () => {
       const isOpen = !!(exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden"));
       if (isOpen) {
-        state.closeExportWorkbenchFn?.({ restoreFocus: true });
+        runtimeState.closeExportWorkbenchFn?.({ restoreFocus: true });
       } else {
-        state.openExportWorkbenchFn?.(dockExportBtn);
+        runtimeState.openExportWorkbenchFn?.(dockExportBtn);
       }
     });
     dockExportBtn.dataset.bound = "true";
@@ -2398,9 +2399,9 @@ function initToolbar({ render } = {}) {
 
   if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
     politicalEditingToggleBtn.addEventListener("click", () => {
-      state.ui.politicalEditingExpanded = !state.ui.politicalEditingExpanded;
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      runtimeState.ui.politicalEditingExpanded = !runtimeState.ui.politicalEditingExpanded;
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
     });
     politicalEditingToggleBtn.dataset.bound = "true";
@@ -2408,7 +2409,7 @@ function initToolbar({ render } = {}) {
 
   if (scenarioContextCollapseBtn && !scenarioContextCollapseBtn.dataset.bound) {
     scenarioContextCollapseBtn.addEventListener("click", () => {
-      state.ui.scenarioBarCollapsed = !state.ui.scenarioBarCollapsed;
+      runtimeState.ui.scenarioBarCollapsed = !runtimeState.ui.scenarioBarCollapsed;
       refreshScenarioContextBar();
     });
     scenarioContextCollapseBtn.dataset.bound = "true";
@@ -2443,15 +2444,15 @@ function initToolbar({ render } = {}) {
   const getLayerDependencyRevision = (layerId, exportUi = ensureExportWorkbenchUiState()) => {
     const mapSvg = document.getElementById("map-svg");
     const mapSvgChildCount = mapSvg ? mapSvg.childElementCount : 0;
-    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
-      ? state.renderPassCache
+    const renderPassCache = runtimeState.renderPassCache && typeof runtimeState.renderPassCache === "object"
+      ? runtimeState.renderPassCache
       : {};
     const signatures = renderPassCache.signatures && typeof renderPassCache.signatures === "object"
       ? renderPassCache.signatures
       : {};
-    const dirtyRevision = Number(state.dirtyRevision || 0);
-    const zoomTransform = state.zoomTransform && typeof state.zoomTransform === "object"
-      ? state.zoomTransform
+    const dirtyRevision = Number(runtimeState.dirtyRevision || 0);
+    const zoomTransform = runtimeState.zoomTransform && typeof runtimeState.zoomTransform === "object"
+      ? runtimeState.zoomTransform
       : { k: 1, x: 0, y: 0 };
     const transformSignature = [
       `zoomK:${Number(zoomTransform.k || 1).toFixed(5)}`,
@@ -2461,8 +2462,8 @@ function initToolbar({ render } = {}) {
     if (layerId === "color") {
       return [
         getExportBakeVisibilitySignature(exportUi),
-        `colorRevision:${Number(state.colorRevision) || 0}`,
-        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
+        `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
         `dirtyRevision:${dirtyRevision}`,
         `passBackground:${String(signatures.background || "")}`,
         `passPhysicalBase:${String(signatures.physicalBase || "")}`,
@@ -2476,8 +2477,8 @@ function initToolbar({ render } = {}) {
     if (layerId === "line") {
       return [
         getExportBakeVisibilitySignature(exportUi),
-        `topologyRevision:${Number(state.topologyRevision) || 0}`,
-        `dynamicDirty:${state.dynamicBordersDirty ? 1 : 0}`,
+        `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
+        `dynamicDirty:${runtimeState.dynamicBordersDirty ? 1 : 0}`,
         `dirtyRevision:${dirtyRevision}`,
         `passBorders:${String(signatures.borders || "")}`,
         `passLineEffects:${String(signatures.lineEffects || "")}`,
@@ -2486,7 +2487,7 @@ function initToolbar({ render } = {}) {
     if (layerId === "text") {
       return [
         getExportBakeVisibilitySignature(exportUi),
-        `topologyRevision:${Number(state.topologyRevision) || 0}`,
+        `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
         `svgChildren:${mapSvgChildCount}`,
         `dirtyRevision:${dirtyRevision}`,
         ...transformSignature,
@@ -2494,8 +2495,8 @@ function initToolbar({ render } = {}) {
     }
     return [
       getExportBakeVisibilitySignature(exportUi),
-      `colorRevision:${Number(state.colorRevision) || 0}`,
-      `topologyRevision:${Number(state.topologyRevision) || 0}`,
+      `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
+      `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
       `svgChildren:${mapSvgChildCount}`,
       `dirtyRevision:${dirtyRevision}`,
       ...transformSignature,
@@ -2559,17 +2560,17 @@ function initToolbar({ render } = {}) {
   };
 
   const drawRenderPassCanvasToBakeTarget = (passName, targetCtx) => {
-    const renderPassCache = state.renderPassCache && typeof state.renderPassCache === "object"
-      ? state.renderPassCache
+    const renderPassCache = runtimeState.renderPassCache && typeof runtimeState.renderPassCache === "object"
+      ? runtimeState.renderPassCache
       : null;
     if (!renderPassCache || !targetCtx) return false;
     const passCanvas = renderPassCache.canvases?.[passName];
     if (!passCanvas) return false;
     const layout = renderPassCache.layouts?.[passName] || {};
-    const dpr = Math.max(Number(state.dpr) || 1, 1);
+    const dpr = Math.max(Number(runtimeState.dpr) || 1, 1);
     const referenceTransform = renderPassCache.referenceTransforms?.[passName] || null;
-    const currentTransform = state.zoomTransform && typeof state.zoomTransform === "object"
-      ? state.zoomTransform
+    const currentTransform = runtimeState.zoomTransform && typeof runtimeState.zoomTransform === "object"
+      ? runtimeState.zoomTransform
       : { k: 1, x: 0, y: 0 };
     const hasReferenceTransform = referenceTransform
       && Number.isFinite(Number(referenceTransform.k))
@@ -2609,8 +2610,8 @@ function initToolbar({ render } = {}) {
     if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
       throw new Error(`Unsupported bake layer: ${layerId}`);
     }
-    const width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
-    const height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
+    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     const dependencies = getLayerDependencyRevision(normalizedLayerId, exportUi);
     const hash = computeBakeHash([normalizedLayerId, `${width}x${height}`, ...dependencies]);
     const cacheEntry = exportUi.bakeCache.get(normalizedLayerId);
@@ -2702,8 +2703,8 @@ function initToolbar({ render } = {}) {
   };
 
   const buildSvgAnnotationCanvas = async () => {
-    const width = state.colorCanvas?.width || state.lineCanvas?.width || 0;
-    const height = state.colorCanvas?.height || state.lineCanvas?.height || 0;
+    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     if (!(width > 0) || !(height > 0)) {
       throw createExportError("invalid-params", "SVG annotation canvas unavailable.");
     }
@@ -2917,10 +2918,10 @@ function initToolbar({ render } = {}) {
 
 
   if (toggleWaterRegions) {
-    toggleWaterRegions.checked = !!state.showWaterRegions;
+    toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
     toggleWaterRegions.addEventListener("change", (event) => {
-      state.showWaterRegions = event.target.checked;
-      if (state.showWaterRegions) {
+      runtimeState.showWaterRegions = event.target.checked;
+      if (runtimeState.showWaterRegions) {
         void ensureActiveScenarioOptionalLayerLoaded("water", { renderNow: true });
       }
       renderDirty("toggle-water-regions");
@@ -2928,13 +2929,13 @@ function initToolbar({ render } = {}) {
   }
 
   if (toggleOpenOceanRegions) {
-    toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
+    toggleOpenOceanRegions.checked = !!runtimeState.showOpenOceanRegions;
     toggleOpenOceanRegions.addEventListener("change", (event) => {
-      state.allowOpenOceanSelect = !!event.target.checked;
-      state.allowOpenOceanPaint = !!event.target.checked;
-      state.showOpenOceanRegions = !!event.target.checked;
-      if (!state.showOpenOceanRegions) {
-        state.hoveredWaterRegionId = null;
+      runtimeState.allowOpenOceanSelect = !!event.target.checked;
+      runtimeState.allowOpenOceanPaint = !!event.target.checked;
+      runtimeState.showOpenOceanRegions = !!event.target.checked;
+      if (!runtimeState.showOpenOceanRegions) {
+        runtimeState.hoveredWaterRegionId = null;
       }
       callRuntimeHook(state, "updateWaterInteractionUIFn");
       callRuntimeHook(state, "renderWaterRegionListFn");
@@ -2943,9 +2944,9 @@ function initToolbar({ render } = {}) {
   }
 
   if (toggleSpecialZones) {
-    toggleSpecialZones.checked = state.showSpecialZones;
+    toggleSpecialZones.checked = runtimeState.showSpecialZones;
     toggleSpecialZones.addEventListener("change", (event) => {
-      state.showSpecialZones = event.target.checked;
+      runtimeState.showSpecialZones = event.target.checked;
       renderDirty("toggle-special-zones");
     });
   }
@@ -2963,7 +2964,7 @@ function initToolbar({ render } = {}) {
       dismissOnboardingHint();
       try {
         await Promise.resolve();
-        autoFillMap(state.colorMode || "political", {
+        autoFillMap(runtimeState.colorMode || "political", {
           styleUpdates: {
             "ocean.fillColor": nextOceanFill,
           },
@@ -2978,61 +2979,61 @@ function initToolbar({ render } = {}) {
   }
 
   if (colorModeSelect) {
-    colorModeSelect.value = state.colorMode;
+    colorModeSelect.value = runtimeState.colorMode;
     colorModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "region");
-      state.colorMode = value === "political" ? "political" : "region";
+      runtimeState.colorMode = value === "political" ? "political" : "region";
     });
   }
 
   if (paintGranularitySelect) {
-    paintGranularitySelect.value = state.interactionGranularity || "subdivision";
+    paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     paintGranularitySelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "subdivision");
       const requested = value === "country" ? "country" : "subdivision";
-      state.interactionGranularity =
-        state.paintMode === "sovereignty" ? "subdivision" : requested;
-      paintGranularitySelect.value = state.interactionGranularity;
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      runtimeState.interactionGranularity =
+        runtimeState.paintMode === "sovereignty" ? "subdivision" : requested;
+      paintGranularitySelect.value = runtimeState.interactionGranularity;
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
     });
   }
 
   if (quickFillParentBtn) {
     quickFillParentBtn.addEventListener("click", () => {
-      state.batchFillScope = "parent";
+      runtimeState.batchFillScope = "parent";
       closeDockPopover();
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
     });
   }
 
   if (quickFillCountryBtn) {
     quickFillCountryBtn.addEventListener("click", () => {
-      state.batchFillScope = "country";
+      runtimeState.batchFillScope = "country";
       closeDockPopover();
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
     });
   }
 
   if (paintModeSelect) {
-    paintModeSelect.value = state.paintMode || "visual";
+    paintModeSelect.value = runtimeState.paintMode || "visual";
     paintModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "visual");
-      state.paintMode = value === "sovereignty" ? "sovereignty" : "visual";
-      if (state.paintMode === "sovereignty") {
-        state.interactionGranularity = "subdivision";
-        state.ui.politicalEditingExpanded = true;
+      runtimeState.paintMode = value === "sovereignty" ? "sovereignty" : "visual";
+      if (runtimeState.paintMode === "sovereignty") {
+        runtimeState.interactionGranularity = "subdivision";
+        runtimeState.ui.politicalEditingExpanded = true;
         if (paintGranularitySelect) {
           paintGranularitySelect.value = "subdivision";
         }
       }
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+      if (typeof runtimeState.updatePaintModeUIFn === "function") {
+        runtimeState.updatePaintModeUIFn();
       }
       if (render) render();
     });
@@ -3058,21 +3059,21 @@ function initToolbar({ render } = {}) {
         tone: "warning",
       });
       if (!confirmed) return;
-      const featureIds = Object.keys(state.visualOverrides || {});
+      const featureIds = Object.keys(runtimeState.visualOverrides || {});
       const ownerCodes = Array.from(new Set([
-        ...Object.keys(state.sovereignBaseColors || {}),
-        ...Object.keys(state.countryBaseColors || {}),
+        ...Object.keys(runtimeState.sovereignBaseColors || {}),
+        ...Object.keys(runtimeState.countryBaseColors || {}),
       ]));
-      const sovereigntyFeatureIds = String(state.paintMode || "visual") === "sovereignty"
-        ? Object.keys(state.sovereigntyByFeatureId || {})
+      const sovereigntyFeatureIds = String(runtimeState.paintMode || "visual") === "sovereignty"
+        ? Object.keys(runtimeState.sovereigntyByFeatureId || {})
         : [];
       const before = captureHistoryState({
         featureIds,
         ownerCodes,
         sovereigntyFeatureIds,
       });
-      if (state.paintMode === "sovereignty") {
-        if (state.activeScenarioId) {
+      if (runtimeState.paintMode === "sovereignty") {
+        if (runtimeState.activeScenarioId) {
           resetScenarioToBaselineCommand({
             renderMode: "none",
             markDirtyReason: "",
@@ -3083,11 +3084,11 @@ function initToolbar({ render } = {}) {
         }
         scheduleDynamicBorderRecompute("clear-sovereignty", 90);
       } else {
-        state.colors = {};
-        state.visualOverrides = {};
-        state.featureOverrides = {};
-        state.countryBaseColors = {};
-        state.sovereignBaseColors = {};
+        runtimeState.colors = {};
+        runtimeState.visualOverrides = {};
+        runtimeState.featureOverrides = {};
+        runtimeState.countryBaseColors = {};
+        runtimeState.sovereignBaseColors = {};
         markLegacyColorStateDirty();
       }
       refreshColorState({ renderNow: true });
@@ -3103,7 +3104,7 @@ function initToolbar({ render } = {}) {
           sovereigntyFeatureIds,
         }),
         meta: {
-          affectsSovereignty: state.paintMode === "sovereignty",
+          affectsSovereignty: runtimeState.paintMode === "sovereignty",
         },
       });
       showToast(t("Map cleared. Undo is available from history.", "ui"), {
@@ -3111,7 +3112,7 @@ function initToolbar({ render } = {}) {
         tone: "warning",
         actionLabel: t("Undo", "ui"),
         onAction: () => {
-          if (typeof state.runHistoryActionFn === "function") {
+          if (typeof runtimeState.runHistoryActionFn === "function") {
             callRuntimeHook(state, "runHistoryActionFn", "undo");
             return;
           }
@@ -3137,12 +3138,12 @@ function initToolbar({ render } = {}) {
   bindPaletteLibraryPanelEvents();
 
   if (internalBorderAutoColor) {
-    internalBorderAutoColor.checked = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
+    internalBorderAutoColor.checked = String(runtimeState.styleConfig.internalBorders.colorMode || "auto") !== "manual";
     if (internalBorderColor) {
       internalBorderColor.disabled = internalBorderAutoColor.checked;
     }
     internalBorderAutoColor.addEventListener("change", (event) => {
-      state.styleConfig.internalBorders.colorMode = event.target.checked ? "auto" : "manual";
+      runtimeState.styleConfig.internalBorders.colorMode = event.target.checked ? "auto" : "manual";
       if (internalBorderColor) {
         internalBorderColor.disabled = event.target.checked;
       }
@@ -3151,8 +3152,8 @@ function initToolbar({ render } = {}) {
   }
   if (internalBorderColor) {
     internalBorderColor.addEventListener("input", (event) => {
-      state.styleConfig.internalBorders.color = event.target.value;
-      state.styleConfig.internalBorders.colorMode = "manual";
+      runtimeState.styleConfig.internalBorders.color = event.target.value;
+      runtimeState.styleConfig.internalBorders.colorMode = "manual";
       if (internalBorderAutoColor) {
         internalBorderAutoColor.checked = false;
       }
@@ -3163,7 +3164,7 @@ function initToolbar({ render } = {}) {
   if (internalBorderOpacity) {
     internalBorderOpacity.addEventListener("input", (event) => {
       const value = Number(event.target.value) / 100;
-      state.styleConfig.internalBorders.opacity = Number.isFinite(value) ? value : 1;
+      runtimeState.styleConfig.internalBorders.opacity = Number.isFinite(value) ? value : 1;
       if (internalBorderOpacityValue) {
         internalBorderOpacityValue.textContent = `${event.target.value}%`;
       }
@@ -3173,14 +3174,14 @@ function initToolbar({ render } = {}) {
   if (internalBorderWidth) {
     const initialInternalWidth = Number(internalBorderWidth.value);
     if (Number.isFinite(initialInternalWidth)) {
-      state.styleConfig.internalBorders.width = initialInternalWidth;
+      runtimeState.styleConfig.internalBorders.width = initialInternalWidth;
       if (internalBorderWidthValue) {
         internalBorderWidthValue.textContent = initialInternalWidth.toFixed(2);
       }
     }
     internalBorderWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.internalBorders.width = Number.isFinite(value) ? value : 0.5;
+      runtimeState.styleConfig.internalBorders.width = Number.isFinite(value) ? value : 0.5;
       if (internalBorderWidthValue) {
         internalBorderWidthValue.textContent = value.toFixed(2);
       }
@@ -3190,21 +3191,21 @@ function initToolbar({ render } = {}) {
 
   if (empireBorderColor) {
     empireBorderColor.addEventListener("input", (event) => {
-      state.styleConfig.empireBorders.color = event.target.value;
+      runtimeState.styleConfig.empireBorders.color = event.target.value;
       renderDirty("empire-border-color");
     });
   }
   if (empireBorderWidth) {
     const initialEmpireWidth = Number(empireBorderWidth.value);
     if (Number.isFinite(initialEmpireWidth)) {
-      state.styleConfig.empireBorders.width = initialEmpireWidth;
+      runtimeState.styleConfig.empireBorders.width = initialEmpireWidth;
       if (empireBorderWidthValue) {
         empireBorderWidthValue.textContent = initialEmpireWidth.toFixed(2);
       }
     }
     empireBorderWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.empireBorders.width = Number.isFinite(value) ? value : 1.0;
+      runtimeState.styleConfig.empireBorders.width = Number.isFinite(value) ? value : 1.0;
       if (empireBorderWidthValue) {
         empireBorderWidthValue.textContent = value.toFixed(2);
       }
@@ -3214,14 +3215,14 @@ function initToolbar({ render } = {}) {
 
   if (coastlineColor) {
     coastlineColor.addEventListener("input", (event) => {
-      state.styleConfig.coastlines.color = event.target.value;
+      runtimeState.styleConfig.coastlines.color = event.target.value;
       renderDirty("coastline-color");
     });
   }
   if (coastlineWidth) {
     coastlineWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.coastlines.width = Number.isFinite(value) ? value : 1.2;
+      runtimeState.styleConfig.coastlines.width = Number.isFinite(value) ? value : 1.2;
       if (coastlineWidthValue) {
         coastlineWidthValue.textContent = value.toFixed(1);
       }
@@ -3230,21 +3231,21 @@ function initToolbar({ render } = {}) {
   }
 
   if (parentBorderColor) {
-    parentBorderColor.value = state.styleConfig.parentBorders.color || "#4b5563";
+    parentBorderColor.value = runtimeState.styleConfig.parentBorders.color || "#4b5563";
     parentBorderColor.addEventListener("input", (event) => {
-      state.styleConfig.parentBorders.color = event.target.value;
+      runtimeState.styleConfig.parentBorders.color = event.target.value;
       renderDirty("parent-border-color");
     });
   }
   if (parentBorderOpacity) {
-    const initial = Math.round((state.styleConfig.parentBorders.opacity || 0.85) * 100);
+    const initial = Math.round((runtimeState.styleConfig.parentBorders.opacity || 0.85) * 100);
     parentBorderOpacity.value = String(clamp(initial, 0, 100));
     if (parentBorderOpacityValue) {
       parentBorderOpacityValue.textContent = `${parentBorderOpacity.value}%`;
     }
     parentBorderOpacity.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.parentBorders.opacity = clamp(
+      runtimeState.styleConfig.parentBorders.opacity = clamp(
         Number.isFinite(value) ? value / 100 : 0.85,
         0,
         1
@@ -3256,24 +3257,24 @@ function initToolbar({ render } = {}) {
     });
   }
   if (parentBorderWidth) {
-    const initial = Number(state.styleConfig.parentBorders.width || 1.1);
+    const initial = Number(runtimeState.styleConfig.parentBorders.width || 1.1);
     parentBorderWidth.value = String(clamp(initial, 0.2, 4));
     if (parentBorderWidthValue) {
       parentBorderWidthValue.textContent = Number(parentBorderWidth.value).toFixed(2);
     }
     parentBorderWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.parentBorders.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
+      runtimeState.styleConfig.parentBorders.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
       if (parentBorderWidthValue) {
-        parentBorderWidthValue.textContent = state.styleConfig.parentBorders.width.toFixed(2);
+        parentBorderWidthValue.textContent = runtimeState.styleConfig.parentBorders.width.toFixed(2);
       }
       renderDirty("parent-border-width");
     });
   }
   if (parentBordersVisible) {
-    parentBordersVisible.checked = state.parentBordersVisible !== false;
+    parentBordersVisible.checked = runtimeState.parentBordersVisible !== false;
     parentBordersVisible.addEventListener("change", (event) => {
-      state.parentBordersVisible = !!event.target.checked;
+      runtimeState.parentBordersVisible = !!event.target.checked;
       syncParentBorderVisibilityUI();
       renderParentBorderCountryList();
       renderDirty("parent-border-visibility");
@@ -3281,11 +3282,11 @@ function initToolbar({ render } = {}) {
   }
   if (parentBorderEnableAll) {
     parentBorderEnableAll.addEventListener("click", () => {
-      const supported = Array.isArray(state.parentBorderSupportedCountries)
-        ? state.parentBorderSupportedCountries
+      const supported = Array.isArray(runtimeState.parentBorderSupportedCountries)
+        ? runtimeState.parentBorderSupportedCountries
         : [];
       supported.forEach((countryCode) => {
-        state.parentBorderEnabledByCountry[countryCode] = true;
+        runtimeState.parentBorderEnabledByCountry[countryCode] = true;
       });
       renderParentBorderCountryList();
       renderDirty("parent-border-enable-all");
@@ -3293,30 +3294,30 @@ function initToolbar({ render } = {}) {
   }
   if (parentBorderDisableAll) {
     parentBorderDisableAll.addEventListener("click", () => {
-      const supported = Array.isArray(state.parentBorderSupportedCountries)
-        ? state.parentBorderSupportedCountries
+      const supported = Array.isArray(runtimeState.parentBorderSupportedCountries)
+        ? runtimeState.parentBorderSupportedCountries
         : [];
       supported.forEach((countryCode) => {
-        state.parentBorderEnabledByCountry[countryCode] = false;
+        runtimeState.parentBorderEnabledByCountry[countryCode] = false;
       });
       renderParentBorderCountryList();
       renderDirty("parent-border-disable-all");
     });
   }
 
-  if (!state.ui.overlayResizeBound) {
+  if (!runtimeState.ui.overlayResizeBound) {
     globalThis.addEventListener("resize", () => {
       applyResponsiveChromeDefaults();
       updateDockCollapsedUi();
       refreshScenarioContextBar();
       handlePaletteLibraryResize();
     });
-    state.ui.overlayResizeBound = true;
+    runtimeState.ui.overlayResizeBound = true;
   }
 
   syncPaletteLibraryPanelVisibility();
   syncPaletteSourceControls();
-  renderPalette(state.currentPaletteTheme);
+  renderPalette(runtimeState.currentPaletteTheme);
   renderPaletteLibrary();
   syncPanelToggleButtons();
   renderTransportWorkbenchUi();
@@ -3358,7 +3359,7 @@ function initToolbar({ render } = {}) {
   renderScenarioGuideSection("quick", { syncUrl: false });
   syncScenarioGuideTriggerButtons({
     isOpen: false,
-    tutorialEntryVisible: !!state.ui.tutorialEntryVisible,
+    tutorialEntryVisible: !!runtimeState.ui.tutorialEntryVisible,
   });
   if (specialZonePopover) {
     specialZonePopover.setAttribute("aria-hidden", specialZonePopover.classList.contains("hidden") ? "true" : "false");
@@ -3366,7 +3367,7 @@ function initToolbar({ render } = {}) {
   if (mapOnboardingHint) {
     mapOnboardingHint.setAttribute("role", "status");
     mapOnboardingHint.setAttribute("aria-live", "polite");
-    if (state.onboardingDismissed) {
+    if (runtimeState.onboardingDismissed) {
       dismissOnboardingHint();
     } else {
       showOnboardingHint();
@@ -3378,4 +3379,6 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar, resolveExportPassSequence };
+
+
 

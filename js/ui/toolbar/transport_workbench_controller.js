@@ -3,7 +3,7 @@
 // toolbar.js 继续保留全局 overlay 协调、URL restore、顶层 chrome 和其他 support surface 的仲裁。
 
 import {
-  state,
+  state as runtimeState,
   createDefaultTransportWorkbenchDisplayConfig,
   normalizeTransportWorkbenchDisplayConfig,
 } from "../../core/state.js";
@@ -45,6 +45,7 @@ import {
   listTransportWorkbenchManifestVariantEntries,
 } from "../transport_workbench_manifest_variants.js";
 import { formatJapanRailVisibilityReason } from "../transport_workbench_rail_preview.js";
+const state = runtimeState;
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
   {
@@ -1013,70 +1014,70 @@ function normalizeLogisticsHubTransportWorkbenchConfig(value) {
 }
 
 function ensureTransportWorkbenchUiState() {
-  if (!state.transportWorkbenchUi || typeof state.transportWorkbenchUi !== "object") {
-    state.transportWorkbenchUi = {};
+  if (!runtimeState.transportWorkbenchUi || typeof runtimeState.transportWorkbenchUi !== "object") {
+    runtimeState.transportWorkbenchUi = {};
   }
-  state.transportWorkbenchUi.open = !!state.transportWorkbenchUi.open;
-  state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
-  state.transportWorkbenchUi.sampleCountry = "Japan";
-  state.transportWorkbenchUi.previewMode = "bounded_zoom_pan";
-  state.transportWorkbenchUi.previewAssetId = "japan_carrier_v3";
-  state.transportWorkbenchUi.previewInteractionMode = "bounded_zoom_pan";
-  if (!state.transportWorkbenchUi.previewCamera || typeof state.transportWorkbenchUi.previewCamera !== "object") {
-    state.transportWorkbenchUi.previewCamera = {};
+  runtimeState.transportWorkbenchUi.open = !!runtimeState.transportWorkbenchUi.open;
+  runtimeState.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(runtimeState.transportWorkbenchUi.activeFamily);
+  runtimeState.transportWorkbenchUi.sampleCountry = "Japan";
+  runtimeState.transportWorkbenchUi.previewMode = "bounded_zoom_pan";
+  runtimeState.transportWorkbenchUi.previewAssetId = "japan_carrier_v3";
+  runtimeState.transportWorkbenchUi.previewInteractionMode = "bounded_zoom_pan";
+  if (!runtimeState.transportWorkbenchUi.previewCamera || typeof runtimeState.transportWorkbenchUi.previewCamera !== "object") {
+    runtimeState.transportWorkbenchUi.previewCamera = {};
   }
-  state.transportWorkbenchUi.previewCamera.scale = Number(state.transportWorkbenchUi.previewCamera.scale) || 1;
-  state.transportWorkbenchUi.previewCamera.translateX = Number(state.transportWorkbenchUi.previewCamera.translateX) || 0;
-  state.transportWorkbenchUi.previewCamera.translateY = Number(state.transportWorkbenchUi.previewCamera.translateY) || 0;
-  state.transportWorkbenchUi.compareHeld = !!state.transportWorkbenchUi.compareHeld;
-  state.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(state.transportWorkbenchUi.activeInspectorTab);
-  state.transportWorkbenchUi.layerOrder = normalizeTransportWorkbenchLayerOrder(state.transportWorkbenchUi.layerOrder);
-  if (!state.transportWorkbenchUi.familyConfigs || typeof state.transportWorkbenchUi.familyConfigs !== "object") {
-    state.transportWorkbenchUi.familyConfigs = {};
+  runtimeState.transportWorkbenchUi.previewCamera.scale = Number(runtimeState.transportWorkbenchUi.previewCamera.scale) || 1;
+  runtimeState.transportWorkbenchUi.previewCamera.translateX = Number(runtimeState.transportWorkbenchUi.previewCamera.translateX) || 0;
+  runtimeState.transportWorkbenchUi.previewCamera.translateY = Number(runtimeState.transportWorkbenchUi.previewCamera.translateY) || 0;
+  runtimeState.transportWorkbenchUi.compareHeld = !!runtimeState.transportWorkbenchUi.compareHeld;
+  runtimeState.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(runtimeState.transportWorkbenchUi.activeInspectorTab);
+  runtimeState.transportWorkbenchUi.layerOrder = normalizeTransportWorkbenchLayerOrder(runtimeState.transportWorkbenchUi.layerOrder);
+  if (!runtimeState.transportWorkbenchUi.familyConfigs || typeof runtimeState.transportWorkbenchUi.familyConfigs !== "object") {
+    runtimeState.transportWorkbenchUi.familyConfigs = {};
   }
-  if (!state.transportWorkbenchUi.displayConfigs || typeof state.transportWorkbenchUi.displayConfigs !== "object") {
-    state.transportWorkbenchUi.displayConfigs = {};
+  if (!runtimeState.transportWorkbenchUi.displayConfigs || typeof runtimeState.transportWorkbenchUi.displayConfigs !== "object") {
+    runtimeState.transportWorkbenchUi.displayConfigs = {};
   }
-  state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.road);
-  state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.rail);
-  state.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.airport);
-  state.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.port);
-  state.transportWorkbenchUi.familyConfigs.mineral_resources = normalizeMineralResourceTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.mineral_resources);
-  state.transportWorkbenchUi.familyConfigs.energy_facilities = normalizeEnergyFacilityTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.energy_facilities);
-  state.transportWorkbenchUi.familyConfigs.industrial_zones = normalizeIndustrialTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.industrial_zones);
-  state.transportWorkbenchUi.familyConfigs.logistics_hubs = normalizeLogisticsHubTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.logistics_hubs);
+  runtimeState.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.road);
+  runtimeState.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.rail);
+  runtimeState.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.airport);
+  runtimeState.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.port);
+  runtimeState.transportWorkbenchUi.familyConfigs.mineral_resources = normalizeMineralResourceTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.mineral_resources);
+  runtimeState.transportWorkbenchUi.familyConfigs.energy_facilities = normalizeEnergyFacilityTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.energy_facilities);
+  runtimeState.transportWorkbenchUi.familyConfigs.industrial_zones = normalizeIndustrialTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.industrial_zones);
+  runtimeState.transportWorkbenchUi.familyConfigs.logistics_hubs = normalizeLogisticsHubTransportWorkbenchConfig(runtimeState.transportWorkbenchUi.familyConfigs.logistics_hubs);
   ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"].forEach((familyId) => {
-    state.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(
-      state.transportWorkbenchUi.displayConfigs[familyId],
+    runtimeState.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(
+      runtimeState.transportWorkbenchUi.displayConfigs[familyId],
       familyId
     );
   });
   ["airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"].forEach((familyId) => {
-    if (!state.transportWorkbenchUi.familyConfigs[familyId] || typeof state.transportWorkbenchUi.familyConfigs[familyId] !== "object") {
-      state.transportWorkbenchUi.familyConfigs[familyId] = {};
+    if (!runtimeState.transportWorkbenchUi.familyConfigs[familyId] || typeof runtimeState.transportWorkbenchUi.familyConfigs[familyId] !== "object") {
+      runtimeState.transportWorkbenchUi.familyConfigs[familyId] = {};
     }
   });
-  if (!state.transportWorkbenchUi.sectionOpen || typeof state.transportWorkbenchUi.sectionOpen !== "object") {
-    state.transportWorkbenchUi.sectionOpen = {};
+  if (!runtimeState.transportWorkbenchUi.sectionOpen || typeof runtimeState.transportWorkbenchUi.sectionOpen !== "object") {
+    runtimeState.transportWorkbenchUi.sectionOpen = {};
   }
   ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"].forEach((familyId) => {
     const defaults = TRANSPORT_WORKBENCH_SECTION_DEFAULTS[familyId];
-    const source = state.transportWorkbenchUi.sectionOpen[familyId] && typeof state.transportWorkbenchUi.sectionOpen[familyId] === "object"
-      ? state.transportWorkbenchUi.sectionOpen[familyId]
+    const source = runtimeState.transportWorkbenchUi.sectionOpen[familyId] && typeof runtimeState.transportWorkbenchUi.sectionOpen[familyId] === "object"
+      ? runtimeState.transportWorkbenchUi.sectionOpen[familyId]
       : {};
-    state.transportWorkbenchUi.sectionOpen[familyId] = Object.fromEntries(
+    runtimeState.transportWorkbenchUi.sectionOpen[familyId] = Object.fromEntries(
       Object.entries(defaults).map(([sectionKey, defaultValue]) => [sectionKey, source[sectionKey] !== undefined ? !!source[sectionKey] : defaultValue])
     );
   });
-  state.transportWorkbenchUi.shellPhase = "road-live-preview";
-  state.transportWorkbenchUi.restoreLeftDrawer = !!state.transportWorkbenchUi.restoreLeftDrawer;
-  state.transportWorkbenchUi.restoreRightDrawer = !!state.transportWorkbenchUi.restoreRightDrawer;
-  return state.transportWorkbenchUi;
+  runtimeState.transportWorkbenchUi.shellPhase = "road-live-preview";
+  runtimeState.transportWorkbenchUi.restoreLeftDrawer = !!runtimeState.transportWorkbenchUi.restoreLeftDrawer;
+  runtimeState.transportWorkbenchUi.restoreRightDrawer = !!runtimeState.transportWorkbenchUi.restoreRightDrawer;
+  return runtimeState.transportWorkbenchUi;
 }
 
 function resetTransportWorkbenchSectionState() {
   ensureTransportWorkbenchUiState();
-  state.transportWorkbenchUi.sectionOpen = {
+  runtimeState.transportWorkbenchUi.sectionOpen = {
     road: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.road },
     rail: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.rail },
     airport: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.airport },
@@ -1709,7 +1710,7 @@ export function createTransportWorkbenchController({
   };
 
   const getTransportWorkbenchDataContract = (familyId) => TRANSPORT_WORKBENCH_DATA_CONTRACTS[familyId] || null;
-  const pickUiCopy = (zh, en) => (state.currentLanguage === "zh" ? zh : en);
+  const pickUiCopy = (zh, en) => (runtimeState.currentLanguage === "zh" ? zh : en);
 
   const renderTransportWorkbenchInfoContent = (family) => {
     if (!transportWorkbenchInfoBody) return;
@@ -1802,7 +1803,7 @@ export function createTransportWorkbenchController({
 
   const getTransportWorkbenchFamilyMeta = () => {
     ensureTransportWorkbenchUiState();
-    const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
+    const activeFamily = normalizeTransportWorkbenchFamily(runtimeState.transportWorkbenchUi.activeFamily);
     return TRANSPORT_WORKBENCH_FAMILIES.find((family) => family.id === activeFamily) || TRANSPORT_WORKBENCH_FAMILIES[0];
   };
 
@@ -1813,14 +1814,14 @@ export function createTransportWorkbenchController({
         ? JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_BASELINE_CONFIGS[familyId]))
         : null;
     }
-    if (familyId === "road") return state.transportWorkbenchUi.familyConfigs.road;
-    if (familyId === "rail") return state.transportWorkbenchUi.familyConfigs.rail;
-    if (familyId === "airport") return state.transportWorkbenchUi.familyConfigs.airport;
-    if (familyId === "port") return state.transportWorkbenchUi.familyConfigs.port;
-    if (familyId === "mineral_resources") return state.transportWorkbenchUi.familyConfigs.mineral_resources;
-    if (familyId === "energy_facilities") return state.transportWorkbenchUi.familyConfigs.energy_facilities;
-    if (familyId === "industrial_zones") return state.transportWorkbenchUi.familyConfigs.industrial_zones;
-    if (familyId === "logistics_hubs") return state.transportWorkbenchUi.familyConfigs.logistics_hubs;
+    if (familyId === "road") return runtimeState.transportWorkbenchUi.familyConfigs.road;
+    if (familyId === "rail") return runtimeState.transportWorkbenchUi.familyConfigs.rail;
+    if (familyId === "airport") return runtimeState.transportWorkbenchUi.familyConfigs.airport;
+    if (familyId === "port") return runtimeState.transportWorkbenchUi.familyConfigs.port;
+    if (familyId === "mineral_resources") return runtimeState.transportWorkbenchUi.familyConfigs.mineral_resources;
+    if (familyId === "energy_facilities") return runtimeState.transportWorkbenchUi.familyConfigs.energy_facilities;
+    if (familyId === "industrial_zones") return runtimeState.transportWorkbenchUi.familyConfigs.industrial_zones;
+    if (familyId === "logistics_hubs") return runtimeState.transportWorkbenchUi.familyConfigs.logistics_hubs;
     return null;
   };
 
@@ -1833,7 +1834,7 @@ export function createTransportWorkbenchController({
       return createDefaultTransportWorkbenchDisplayConfig(familyId);
     }
     return normalizeTransportWorkbenchDisplayConfig(
-      state.transportWorkbenchUi.displayConfigs?.[familyId],
+      runtimeState.transportWorkbenchUi.displayConfigs?.[familyId],
       familyId
     );
   };
@@ -1942,15 +1943,15 @@ export function createTransportWorkbenchController({
     const family = getTransportWorkbenchFamilyMeta();
     if (!family.supportsDetailedControls) return;
     const normalized = !!nextHeld;
-    if (state.transportWorkbenchUi.compareHeld === normalized) return;
-    state.transportWorkbenchUi.compareHeld = normalized;
+    if (runtimeState.transportWorkbenchUi.compareHeld === normalized) return;
+    runtimeState.transportWorkbenchUi.compareHeld = normalized;
     renderTransportWorkbenchUi();
   };
 
   const updateTransportWorkbenchFamilyConfig = (familyId, key, nextValue, { appendValue = null } = {}) => {
     ensureTransportWorkbenchUiState();
     const family = TRANSPORT_WORKBENCH_FAMILIES.find((entry) => entry.id === familyId);
-    if (!family?.supportsDetailedControls || state.transportWorkbenchUi.compareHeld) return;
+    if (!family?.supportsDetailedControls || runtimeState.transportWorkbenchUi.compareHeld) return;
     const current = JSON.parse(JSON.stringify(getTransportWorkbenchWorkingConfig(familyId) || {}));
     if (appendValue !== null) {
       const currentValues = Array.isArray(current[key]) ? [...current[key]] : [];
@@ -1965,21 +1966,21 @@ export function createTransportWorkbenchController({
       current[key] = nextValue;
     }
     if (familyId === "road") {
-      state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(current);
     } else if (familyId === "rail") {
-      state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(current);
     } else if (familyId === "airport") {
-      state.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(current);
     } else if (familyId === "port") {
-      state.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(current);
     } else if (familyId === "mineral_resources") {
-      state.transportWorkbenchUi.familyConfigs.mineral_resources = normalizeMineralResourceTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.mineral_resources = normalizeMineralResourceTransportWorkbenchConfig(current);
     } else if (familyId === "energy_facilities") {
-      state.transportWorkbenchUi.familyConfigs.energy_facilities = normalizeEnergyFacilityTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.energy_facilities = normalizeEnergyFacilityTransportWorkbenchConfig(current);
     } else if (familyId === "industrial_zones") {
-      state.transportWorkbenchUi.familyConfigs.industrial_zones = normalizeIndustrialTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.industrial_zones = normalizeIndustrialTransportWorkbenchConfig(current);
     } else if (familyId === "logistics_hubs") {
-      state.transportWorkbenchUi.familyConfigs.logistics_hubs = normalizeLogisticsHubTransportWorkbenchConfig(current);
+      runtimeState.transportWorkbenchUi.familyConfigs.logistics_hubs = normalizeLogisticsHubTransportWorkbenchConfig(current);
     }
     markDirty("transport-workbench-config");
     const nextContext = getTransportWorkbenchRenderContext();
@@ -1995,7 +1996,7 @@ export function createTransportWorkbenchController({
     const current = getTransportWorkbenchDisplayConfig(familyId);
     const draft = JSON.parse(JSON.stringify(current));
     updateFn(draft);
-    state.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(draft, familyId);
+    runtimeState.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(draft, familyId);
     markDirty("transport-workbench-display-config");
     const nextContext = getTransportWorkbenchRenderContext();
     renderTransportWorkbenchLensSections(nextContext.family, nextContext.config, nextContext.compareHeld);
@@ -2006,10 +2007,10 @@ export function createTransportWorkbenchController({
 
   const toggleTransportWorkbenchSection = (familyId, sectionKey, nextOpen) => {
     ensureTransportWorkbenchUiState();
-    if (!state.transportWorkbenchUi.sectionOpen[familyId]) {
-      state.transportWorkbenchUi.sectionOpen[familyId] = {};
+    if (!runtimeState.transportWorkbenchUi.sectionOpen[familyId]) {
+      runtimeState.transportWorkbenchUi.sectionOpen[familyId] = {};
     }
-    state.transportWorkbenchUi.sectionOpen[familyId][sectionKey] = !!nextOpen;
+    runtimeState.transportWorkbenchUi.sectionOpen[familyId][sectionKey] = !!nextOpen;
   };
 
   const createTransportWorkbenchInspectorRow = (label, value) => {
@@ -2170,7 +2171,7 @@ export function createTransportWorkbenchController({
     if (!transportWorkbenchLayerOrderPanel || !transportWorkbenchLayerOrderList) return;
     ensureTransportWorkbenchUiState();
     transportWorkbenchLayerOrderList.replaceChildren();
-    state.transportWorkbenchUi.layerOrder.forEach((familyId) => {
+    runtimeState.transportWorkbenchUi.layerOrder.forEach((familyId) => {
       const family = getTransportWorkbenchLayerFamilyMeta(familyId);
       const item = document.createElement("div");
       item.className = "transport-workbench-layer-order-item";
@@ -2191,13 +2192,13 @@ export function createTransportWorkbenchController({
       item.addEventListener("drop", (event) => {
         event.preventDefault();
         if (!transportWorkbenchDraggedLayerId || transportWorkbenchDraggedLayerId === family.id) return;
-        const nextOrder = [...state.transportWorkbenchUi.layerOrder];
+        const nextOrder = [...runtimeState.transportWorkbenchUi.layerOrder];
         const draggedIndex = nextOrder.indexOf(transportWorkbenchDraggedLayerId);
         const targetIndex = nextOrder.indexOf(family.id);
         if (draggedIndex === -1 || targetIndex === -1) return;
         nextOrder.splice(draggedIndex, 1);
         nextOrder.splice(targetIndex, 0, transportWorkbenchDraggedLayerId);
-        state.transportWorkbenchUi.layerOrder = nextOrder;
+        runtimeState.transportWorkbenchUi.layerOrder = nextOrder;
         markDirty("transport-workbench-layer-order");
         const context = getTransportWorkbenchRenderContext();
         renderTransportWorkbenchLayerOrderPanel();
@@ -2375,7 +2376,7 @@ export function createTransportWorkbenchController({
     }
     const details = document.createElement("details");
     details.className = "transport-workbench-section";
-    details.open = !!state.transportWorkbenchUi.sectionOpen?.[family.id]?.[section.key];
+    details.open = !!runtimeState.transportWorkbenchUi.sectionOpen?.[family.id]?.[section.key];
     details.addEventListener("toggle", () => {
       toggleTransportWorkbenchSection(family.id, section.key, details.open);
     });
@@ -2731,7 +2732,7 @@ export function createTransportWorkbenchController({
           )
           : pickUiCopy(
             "这个 family 当前没有单独的页签控件。请在有内容的页签中调整真实规则，Inspect 会继续显示当前状态。",
-            "This family does not expose separate controls in this tab yet. Use the populated tabs for active tuning, and use Inspect to confirm the current state."
+            "This family does not expose separate controls in this tab yet. Use the populated tabs for active tuning, and use Inspect to confirm the current runtimeState."
           );
       empty.append(title, body);
       mountNode.appendChild(empty);
@@ -2740,8 +2741,8 @@ export function createTransportWorkbenchController({
 
   const renderTransportWorkbenchInspectorTabs = (family, config, compareHeld) => {
     ensureTransportWorkbenchUiState();
-    const activeTab = normalizeTransportWorkbenchInspectorTab(state.transportWorkbenchUi.activeInspectorTab);
-    state.transportWorkbenchUi.activeInspectorTab = activeTab;
+    const activeTab = normalizeTransportWorkbenchInspectorTab(runtimeState.transportWorkbenchUi.activeInspectorTab);
+    runtimeState.transportWorkbenchUi.activeInspectorTab = activeTab;
     transportWorkbenchInspectorTabButtons.forEach((button) => {
       const isActive = String(button.dataset.transportInspectorTab || "") === activeTab;
       button.classList.toggle("is-active", isActive);
@@ -2773,7 +2774,7 @@ export function createTransportWorkbenchController({
       body.className = "transport-workbench-empty-text";
       body.textContent = pickUiCopy(
         "使用中间排序板调整 8 个 transport families 的绘制顺序。左侧负责上下文，右侧负责状态查看。",
-        "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state."
+        "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current runtimeState."
       );
       card.append(title, body);
       transportWorkbenchLensSections.appendChild(card);
@@ -3257,7 +3258,7 @@ export function createTransportWorkbenchController({
       } else if (isTransportWorkbenchManifestOnlyRuntimeFamily(family.id)) {
         rows = buildManifestOnlyInspectorRows(family, previewSnapshot, dataContract);
       } else if (family.id === "layers") {
-        rows = state.transportWorkbenchUi.layerOrder.map((layerId, index) => {
+        rows = runtimeState.transportWorkbenchUi.layerOrder.map((layerId, index) => {
           const entry = getTransportWorkbenchLayerFamilyMeta(layerId);
           if (isTransportWorkbenchLivePreviewFamily(layerId)) {
             return [`${index + 1}`, `${entry.label} (live)`];
@@ -3335,7 +3336,7 @@ export function createTransportWorkbenchController({
 
   const getTransportWorkbenchRenderContext = () => {
     ensureTransportWorkbenchUiState();
-    const uiState = state.transportWorkbenchUi;
+    const uiState = runtimeState.transportWorkbenchUi;
     const family = getTransportWorkbenchFamilyMeta();
     const isOpen = !!uiState.open;
     const compareHeld = !!uiState.compareHeld && !!family.supportsDetailedControls;
@@ -3462,8 +3463,8 @@ export function createTransportWorkbenchController({
 
   const scheduleTransportWorkbenchPreviewViewSync = () => {
     ensureTransportWorkbenchUiState();
-    const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
-    if (!state.transportWorkbenchUi?.open || !isTransportWorkbenchFamilyLivePreviewCapable(activeFamily)) {
+    const activeFamily = normalizeTransportWorkbenchFamily(runtimeState.transportWorkbenchUi.activeFamily);
+    if (!runtimeState.transportWorkbenchUi?.open || !isTransportWorkbenchFamilyLivePreviewCapable(activeFamily)) {
       return;
     }
     const viewState = getTransportWorkbenchCarrierViewState() || {};
@@ -3511,13 +3512,13 @@ export function createTransportWorkbenchController({
       return;
     }
     ensureTransportWorkbenchUiState();
-    const uiState = state.transportWorkbenchUi;
+    const uiState = runtimeState.transportWorkbenchUi;
     const wasOpen = !!uiState.open;
     const willOpen = !!nextOpen;
     if (willOpen === wasOpen && !willOpen) {
       renderTransportWorkbenchUi();
-      if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
-        state.syncFacilityInfoCardVisibilityFn();
+      if (typeof runtimeState.syncFacilityInfoCardVisibilityFn === "function") {
+        runtimeState.syncFacilityInfoCardVisibilityFn();
       }
       return;
     }
@@ -3526,10 +3527,10 @@ export function createTransportWorkbenchController({
       uiState.restoreRightDrawer = document.body.classList.contains("right-drawer-open");
       uiState.compareHeld = false;
       resetTransportWorkbenchSectionState();
-      state.toggleLeftPanelFn?.(false);
-      state.toggleRightPanelFn?.(false);
-      state.closeDockPopoverFn?.({ restoreFocus: false });
-      state.closeExportWorkbenchFn?.({ restoreFocus: false });
+      runtimeState.toggleLeftPanelFn?.(false);
+      runtimeState.toggleRightPanelFn?.(false);
+      runtimeState.closeDockPopoverFn?.({ restoreFocus: false });
+      runtimeState.closeExportWorkbenchFn?.({ restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
@@ -3538,8 +3539,8 @@ export function createTransportWorkbenchController({
     }
     uiState.open = willOpen;
     renderTransportWorkbenchUi();
-    if (typeof state.syncFacilityInfoCardVisibilityFn === "function") {
-      state.syncFacilityInfoCardVisibilityFn();
+    if (typeof runtimeState.syncFacilityInfoCardVisibilityFn === "function") {
+      runtimeState.syncFacilityInfoCardVisibilityFn();
     }
     if (willOpen) {
       focusOverlaySurface(transportWorkbenchPanel);
@@ -3555,8 +3556,8 @@ export function createTransportWorkbenchController({
     destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
-    state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
-    state.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
+    runtimeState.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
+    runtimeState.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
     uiState.restoreLeftDrawer = false;
     uiState.restoreRightDrawer = false;
     if (restoreFocus) {
@@ -3600,7 +3601,7 @@ export function createTransportWorkbenchController({
   const bindTransportWorkbenchEvents = () => {
       if (scenarioTransportWorkbenchBtn && !scenarioTransportWorkbenchBtn.dataset.bound) {
         scenarioTransportWorkbenchBtn.addEventListener("click", () => {
-          if (state.transportWorkbenchUi?.open) {
+          if (runtimeState.transportWorkbenchUi?.open) {
             setTransportWorkbenchState(false);
             return;
           }
@@ -3688,8 +3689,8 @@ export function createTransportWorkbenchController({
         if (!button || button.dataset.bound === "true") return;
         button.addEventListener("click", () => {
           ensureTransportWorkbenchUiState();
-          state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(button.dataset.transportFamily || "road");
-          state.transportWorkbenchUi.compareHeld = false;
+          runtimeState.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(button.dataset.transportFamily || "road");
+          runtimeState.transportWorkbenchUi.compareHeld = false;
           renderTransportWorkbenchUi();
         });
         button.dataset.bound = "true";
@@ -3699,7 +3700,7 @@ export function createTransportWorkbenchController({
         if (!button || button.dataset.bound === "true") return;
         button.addEventListener("click", () => {
           ensureTransportWorkbenchUiState();
-          state.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(button.dataset.transportInspectorTab || "inspect");
+          runtimeState.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(button.dataset.transportInspectorTab || "inspect");
           const context = getTransportWorkbenchRenderContext();
           renderTransportWorkbenchShell(context);
           renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
@@ -3709,7 +3710,7 @@ export function createTransportWorkbenchController({
 
       if (!document.body.dataset.transportWorkbenchEscapeBound) {
         document.addEventListener("keydown", (event) => {
-          if (event.key !== "Escape" || !state.transportWorkbenchUi?.open) return;
+          if (event.key !== "Escape" || !runtimeState.transportWorkbenchUi?.open) return;
           if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden")) {
             event.preventDefault();
             closeTransportWorkbenchSectionHelpPopover({ restoreFocus: true });
@@ -3738,3 +3739,4 @@ export function createTransportWorkbenchController({
     renderTransportWorkbenchUi,
   };
 }
+

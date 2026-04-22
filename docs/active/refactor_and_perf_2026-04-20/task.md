@@ -27,8 +27,8 @@
 
 ## 暂缓到下一阶段
 
-- [ ] `state.js` 全量 Phase 0-4 执行
 - [ ] `runtime_hooks.js` 完整事件总线替换
+- [ ] `state.js` 全量 Phase 0-4 执行
 - [ ] 更大范围 renderer / scenario / UI 深层架构切分
 
 ## 当前阶段：Lane C
@@ -78,6 +78,22 @@
 - [x] `tno_ready_state_contract.spec.js` 通过，确认 spatial rebuild + readonly fallback 主合同
 - [x] `startup_bundle_recovery_contract.spec.js` 通过，确认 recovery 合同与主合同一致
 
+## 当前阶段：任务包 A
+
+- [x] `scenario_chunk_exact_after_settle_regression.spec.js` 切到 command-driven scenario 进入路径
+- [x] `scenario_chunk_exact_after_settle_regression.spec.js` 两条红灯收口
+- [x] `scenario_shell_overlay_contract.spec.js` 切到 shared `applyScenarioAndWaitIdle()` 并通过回归
+- [x] `python -m unittest tests.test_state_split_boundary_contract tests.test_runtime_hooks_boundary_contract -q`
+- [x] `npm run perf:gate`
+
+## 当前阶段：任务包 B
+
+- [ ] `runtime_hooks.js` 到事件总线的 adapter-first 迁移
+- [ ] `state/index.js` / `config.js` / `bus.js` / 薄 facade
+- [ ] 清理剩余 `import { state }`
+- [ ] 删除 `runtime_hooks.js`
+- [ ] 收紧 `state-writer-allowlist.json`
+
 ## review comment 回修
 
 - [x] 放行 startup continue-without-scenario 里的 `clearActiveScenario`
@@ -108,3 +124,23 @@
 - [x] strategic overlay smoke 复跑通过（.runtime/tmp/strategic_overlay_smoke_wave2.out.log）
 - [x] perf:gate 复跑通过（.runtime/tmp/perf_gate_wave3.out.log）
 
+- [ ] `js/core/state/config.js` 落地
+- [ ] `js/core/state/index.js` 落地
+- [ ] `js/core/state/bus.js` 收口成纯 bus + compat glue 改迁出
+- [ ] `js/core/runtime_hooks.js` 删除
+- [ ] `js/` 下 `runtime_hooks.js` import 清零
+- [ ] `js/` 下 `import { state }` 清零
+- [ ] `js/` 下 `state.*Fn / *DataFn` 清零
+- [x] `js/core/state/config.js` 落地
+- [x] `js/core/state/index.js` 落地
+- [x] `js/core/state/bus.js` 收口成纯 bus
+- [x] `js/core/runtime_hooks.js` 删除
+- [x] `js/` 下 `runtime_hooks.js` import 清零
+- [x] `js/` 下 `import { state }` 清零
+- [x] `js/` 下 `state.*Fn / *DataFn` 清零
+- [x] Python / Node 合同验证通过
+- [ ] Playwright 最终 gate 复核（当前本地挂起，待单独排查）
+- [ ] perf:gate 最终复核（当前本地挂起，待单独排查）
+- [x] 修复 `scenario_runtime_state` 错误 import path
+- [x] 修复 rollback 对 `scheduleScenarioChunkRefreshFn` 的真实状态快照
+- [x] 补回 chunk/lifecycle runtime 对 `{ state }` 调用形态兼容

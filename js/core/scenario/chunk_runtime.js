@@ -1,5 +1,5 @@
 // Chunk runtime controller.
-// 这个模块只负责 chunk runtime 的 state、selection、promotion、refresh/schedule。
+// 这个模块只负责 chunk runtime 的 runtimeState、selection、promotion、refresh/schedule。
 // facade、startup cache、hydrate 主交易仍留在 scenario_resources.js。
 
 import {
@@ -8,7 +8,8 @@ import {
 } from "../state/scenario_runtime_state.js";
 
 function createScenarioChunkRuntimeController({
-  state,
+  state = null,
+  runtimeState: explicitRuntimeState = null,
   getSearchParams,
   normalizeScenarioId,
   normalizeCountryCodeAlias,
@@ -35,6 +36,8 @@ function createScenarioChunkRuntimeController({
   refreshDelayInteracting = 180,
   refreshDelayIdle = 60,
 } = {}) {
+  const runtimeState = explicitRuntimeState || state;
+
   function isTimerHandle(value) {
     if (typeof value === "number") {
       return Number.isFinite(value);
@@ -51,81 +54,81 @@ function createScenarioChunkRuntimeController({
   }
 
   function ensureRuntimeChunkLoadState() {
-    if (!state.runtimeChunkLoadState || typeof state.runtimeChunkLoadState !== "object") {
-      state.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState();
+    if (!runtimeState.runtimeChunkLoadState || typeof runtimeState.runtimeChunkLoadState !== "object") {
+      runtimeState.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState();
     }
-    if (state.runtimeChunkLoadState.refreshTimerId && !isTimerHandle(state.runtimeChunkLoadState.refreshTimerId)) {
-      state.runtimeChunkLoadState.refreshTimerId = null;
+    if (runtimeState.runtimeChunkLoadState.refreshTimerId && !isTimerHandle(runtimeState.runtimeChunkLoadState.refreshTimerId)) {
+      runtimeState.runtimeChunkLoadState.refreshTimerId = null;
     }
-    state.runtimeChunkLoadState.inFlightByChunkId =
-      state.runtimeChunkLoadState.inFlightByChunkId && typeof state.runtimeChunkLoadState.inFlightByChunkId === "object"
-        ? state.runtimeChunkLoadState.inFlightByChunkId
+    runtimeState.runtimeChunkLoadState.inFlightByChunkId =
+      runtimeState.runtimeChunkLoadState.inFlightByChunkId && typeof runtimeState.runtimeChunkLoadState.inFlightByChunkId === "object"
+        ? runtimeState.runtimeChunkLoadState.inFlightByChunkId
         : {};
-    state.runtimeChunkLoadState.errorByChunkId =
-      state.runtimeChunkLoadState.errorByChunkId && typeof state.runtimeChunkLoadState.errorByChunkId === "object"
-        ? state.runtimeChunkLoadState.errorByChunkId
+    runtimeState.runtimeChunkLoadState.errorByChunkId =
+      runtimeState.runtimeChunkLoadState.errorByChunkId && typeof runtimeState.runtimeChunkLoadState.errorByChunkId === "object"
+        ? runtimeState.runtimeChunkLoadState.errorByChunkId
         : {};
-    state.runtimeChunkLoadState.pendingReason =
-      typeof state.runtimeChunkLoadState.pendingReason === "string"
-        ? state.runtimeChunkLoadState.pendingReason
+    runtimeState.runtimeChunkLoadState.pendingReason =
+      typeof runtimeState.runtimeChunkLoadState.pendingReason === "string"
+        ? runtimeState.runtimeChunkLoadState.pendingReason
         : "";
-    state.runtimeChunkLoadState.pendingDelayMs =
-      Number.isFinite(Number(state.runtimeChunkLoadState.pendingDelayMs))
-        ? Number(state.runtimeChunkLoadState.pendingDelayMs)
+    runtimeState.runtimeChunkLoadState.pendingDelayMs =
+      Number.isFinite(Number(runtimeState.runtimeChunkLoadState.pendingDelayMs))
+        ? Number(runtimeState.runtimeChunkLoadState.pendingDelayMs)
         : null;
-    state.runtimeChunkLoadState.focusCountryOverride =
-      typeof state.runtimeChunkLoadState.focusCountryOverride === "string"
-        ? state.runtimeChunkLoadState.focusCountryOverride
+    runtimeState.runtimeChunkLoadState.focusCountryOverride =
+      typeof runtimeState.runtimeChunkLoadState.focusCountryOverride === "string"
+        ? runtimeState.runtimeChunkLoadState.focusCountryOverride
         : "";
-    state.runtimeChunkLoadState.zoomEndChunkVisibleMetric =
-      state.runtimeChunkLoadState.zoomEndChunkVisibleMetric
-      && typeof state.runtimeChunkLoadState.zoomEndChunkVisibleMetric === "object"
-        ? state.runtimeChunkLoadState.zoomEndChunkVisibleMetric
+    runtimeState.runtimeChunkLoadState.zoomEndChunkVisibleMetric =
+      runtimeState.runtimeChunkLoadState.zoomEndChunkVisibleMetric
+      && typeof runtimeState.runtimeChunkLoadState.zoomEndChunkVisibleMetric === "object"
+        ? runtimeState.runtimeChunkLoadState.zoomEndChunkVisibleMetric
         : null;
-    state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric =
-      state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
-      && typeof state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric === "object"
-        ? state.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
+    runtimeState.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric =
+      runtimeState.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
+      && typeof runtimeState.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric === "object"
+        ? runtimeState.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric
         : null;
-    state.runtimeChunkLoadState.selectionVersion = Math.max(
+    runtimeState.runtimeChunkLoadState.selectionVersion = Math.max(
       0,
-      Number(state.runtimeChunkLoadState.selectionVersion || 0),
+      Number(runtimeState.runtimeChunkLoadState.selectionVersion || 0),
     );
-    state.runtimeChunkLoadState.pendingVisualPromotion =
-      state.runtimeChunkLoadState.pendingVisualPromotion && typeof state.runtimeChunkLoadState.pendingVisualPromotion === "object"
-        ? state.runtimeChunkLoadState.pendingVisualPromotion
+    runtimeState.runtimeChunkLoadState.pendingVisualPromotion =
+      runtimeState.runtimeChunkLoadState.pendingVisualPromotion && typeof runtimeState.runtimeChunkLoadState.pendingVisualPromotion === "object"
+        ? runtimeState.runtimeChunkLoadState.pendingVisualPromotion
         : null;
-    state.runtimeChunkLoadState.pendingInfraPromotion =
-      state.runtimeChunkLoadState.pendingInfraPromotion && typeof state.runtimeChunkLoadState.pendingInfraPromotion === "object"
-        ? state.runtimeChunkLoadState.pendingInfraPromotion
+    runtimeState.runtimeChunkLoadState.pendingInfraPromotion =
+      runtimeState.runtimeChunkLoadState.pendingInfraPromotion && typeof runtimeState.runtimeChunkLoadState.pendingInfraPromotion === "object"
+        ? runtimeState.runtimeChunkLoadState.pendingInfraPromotion
         : null;
-    if (state.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(state.runtimeChunkLoadState.promotionTimerId)) {
-      state.runtimeChunkLoadState.promotionTimerId = null;
+    if (runtimeState.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(runtimeState.runtimeChunkLoadState.promotionTimerId)) {
+      runtimeState.runtimeChunkLoadState.promotionTimerId = null;
     }
-    state.runtimeChunkLoadState.promotionScheduled = state.runtimeChunkLoadState.promotionTimerId != null;
-    state.runtimeChunkLoadState.promotionRetryCount = Math.max(
+    runtimeState.runtimeChunkLoadState.promotionScheduled = runtimeState.runtimeChunkLoadState.promotionTimerId != null;
+    runtimeState.runtimeChunkLoadState.promotionRetryCount = Math.max(
       0,
-      Number(state.runtimeChunkLoadState.promotionRetryCount || 0),
+      Number(runtimeState.runtimeChunkLoadState.promotionRetryCount || 0),
     );
-    state.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(
+    runtimeState.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(
       0,
-      Number(state.runtimeChunkLoadState.lastPromotionRetryAt || 0),
+      Number(runtimeState.runtimeChunkLoadState.lastPromotionRetryAt || 0),
     );
-    state.runtimeChunkLoadState.pendingPromotion =
-      state.runtimeChunkLoadState.pendingPromotion && typeof state.runtimeChunkLoadState.pendingPromotion === "object"
-        ? state.runtimeChunkLoadState.pendingPromotion
+    runtimeState.runtimeChunkLoadState.pendingPromotion =
+      runtimeState.runtimeChunkLoadState.pendingPromotion && typeof runtimeState.runtimeChunkLoadState.pendingPromotion === "object"
+        ? runtimeState.runtimeChunkLoadState.pendingPromotion
         : null;
-    state.runtimeChunkLoadState.layerSelectionSignatures =
-      state.runtimeChunkLoadState.layerSelectionSignatures
-      && typeof state.runtimeChunkLoadState.layerSelectionSignatures === "object"
-        ? state.runtimeChunkLoadState.layerSelectionSignatures
+    runtimeState.runtimeChunkLoadState.layerSelectionSignatures =
+      runtimeState.runtimeChunkLoadState.layerSelectionSignatures
+      && typeof runtimeState.runtimeChunkLoadState.layerSelectionSignatures === "object"
+        ? runtimeState.runtimeChunkLoadState.layerSelectionSignatures
         : {};
-    state.runtimeChunkLoadState.mergedLayerPayloadCache =
-      state.runtimeChunkLoadState.mergedLayerPayloadCache
-      && typeof state.runtimeChunkLoadState.mergedLayerPayloadCache === "object"
-        ? state.runtimeChunkLoadState.mergedLayerPayloadCache
+    runtimeState.runtimeChunkLoadState.mergedLayerPayloadCache =
+      runtimeState.runtimeChunkLoadState.mergedLayerPayloadCache
+      && typeof runtimeState.runtimeChunkLoadState.mergedLayerPayloadCache === "object"
+        ? runtimeState.runtimeChunkLoadState.mergedLayerPayloadCache
         : {};
-    return state.runtimeChunkLoadState;
+    return runtimeState.runtimeChunkLoadState;
   }
 
   function clearPendingScenarioChunkRefresh(loadState = ensureRuntimeChunkLoadState()) {
@@ -157,18 +160,18 @@ function createScenarioChunkRuntimeController({
     const hints = normalizeScenarioRenderBudgetHints(
       bundle?.runtimeShell?.renderBudgetHints || bundle?.manifest?.render_budget_hints || {}
     );
-    const zoom = Number(state.zoomTransform?.k || 1);
+    const zoom = Number(runtimeState.zoomTransform?.k || 1);
     return Number.isFinite(zoom) && zoom >= Number(hints.detail_zoom_threshold || 0);
   }
 
   function shouldDeferScenarioChunkRefreshFor() {
     return !!(
-      state.bootBlocking
-      || state.scenarioApplyInFlight
-      || state.startupReadonly
-      || state.startupReadonlyUnlockInFlight
-      || state.isInteracting
-      || String(state.renderPhase || "idle") !== "idle"
+      runtimeState.bootBlocking
+      || runtimeState.scenarioApplyInFlight
+      || runtimeState.startupReadonly
+      || runtimeState.startupReadonlyUnlockInFlight
+      || runtimeState.isInteracting
+      || String(runtimeState.renderPhase || "idle") !== "idle"
     );
   }
 
@@ -178,8 +181,8 @@ function createScenarioChunkRuntimeController({
 
   function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
     const rawFocusCountry = String(
-      state.activeSovereignCode
-      || state.selectedInspectorCountryCode
+      runtimeState.activeSovereignCode
+      || runtimeState.selectedInspectorCountryCode
       || loadState.focusCountryOverride
       || getScenarioDefaultCountryCode(bundle?.manifest, bundle?.countriesPayload?.countries || {})
       || ""
@@ -284,27 +287,27 @@ function createScenarioChunkRuntimeController({
       renderNow: true,
       d3Client,
     }).catch((error) => {
-      const scenarioId = normalizeScenarioId(state.activeScenarioId);
+      const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
       console.warn(`[scenario] Failed to refresh active scenario chunks for "${scenarioId}".`, error);
     });
     return "refresh-started";
   }
 
   function recordScenarioRenderMetric(name, durationMs, details = {}) {
-    if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
-      state.renderPerfMetrics = {};
+    if (!runtimeState.renderPerfMetrics || typeof runtimeState.renderPerfMetrics !== "object") {
+      runtimeState.renderPerfMetrics = {};
     }
-    state.renderPerfMetrics[String(name || "").trim()] = {
+    runtimeState.renderPerfMetrics[String(name || "").trim()] = {
       durationMs: Math.max(0, Number(durationMs) || 0),
       recordedAt: Date.now(),
       ...details,
     };
-    globalThis.__renderPerfMetrics = state.renderPerfMetrics;
+    globalThis.__renderPerfMetrics = runtimeState.renderPerfMetrics;
   }
 
   function shouldRecordScenarioChunkRuntimeMetric() {
-    const developerMode = !!state?.uiState?.developerMode;
-    const perfOverlayEnabled = !!state?.renderDiagnostics?.perfOverlayEnabled;
+    const developerMode = !!runtimeState?.uiState?.developerMode;
+    const perfOverlayEnabled = !!runtimeState?.renderDiagnostics?.perfOverlayEnabled;
     const params = getSearchParams();
     const runtimePerfFlag = String(params?.get("runtime_chunk_perf") || "").trim().toLowerCase();
     return developerMode || perfOverlayEnabled || ["1", "true", "yes", "on"].includes(runtimePerfFlag);
@@ -316,24 +319,24 @@ function createScenarioChunkRuntimeController({
   }
 
   function ensureActiveScenarioChunkState() {
-    if (!state.activeScenarioChunks || typeof state.activeScenarioChunks !== "object") {
-      state.activeScenarioChunks = createDefaultActiveScenarioChunksState();
+    if (!runtimeState.activeScenarioChunks || typeof runtimeState.activeScenarioChunks !== "object") {
+      runtimeState.activeScenarioChunks = createDefaultActiveScenarioChunksState();
     }
-    state.activeScenarioChunks.loadedChunkIds = Array.isArray(state.activeScenarioChunks.loadedChunkIds)
-      ? state.activeScenarioChunks.loadedChunkIds
+    runtimeState.activeScenarioChunks.loadedChunkIds = Array.isArray(runtimeState.activeScenarioChunks.loadedChunkIds)
+      ? runtimeState.activeScenarioChunks.loadedChunkIds
       : [];
-    state.activeScenarioChunks.payloadByChunkId =
-      state.activeScenarioChunks.payloadByChunkId && typeof state.activeScenarioChunks.payloadByChunkId === "object"
-        ? state.activeScenarioChunks.payloadByChunkId
+    runtimeState.activeScenarioChunks.payloadByChunkId =
+      runtimeState.activeScenarioChunks.payloadByChunkId && typeof runtimeState.activeScenarioChunks.payloadByChunkId === "object"
+        ? runtimeState.activeScenarioChunks.payloadByChunkId
         : {};
-    state.activeScenarioChunks.mergedLayerPayloads =
-      state.activeScenarioChunks.mergedLayerPayloads && typeof state.activeScenarioChunks.mergedLayerPayloads === "object"
-        ? state.activeScenarioChunks.mergedLayerPayloads
+    runtimeState.activeScenarioChunks.mergedLayerPayloads =
+      runtimeState.activeScenarioChunks.mergedLayerPayloads && typeof runtimeState.activeScenarioChunks.mergedLayerPayloads === "object"
+        ? runtimeState.activeScenarioChunks.mergedLayerPayloads
         : {};
-    state.activeScenarioChunks.lruChunkIds = Array.isArray(state.activeScenarioChunks.lruChunkIds)
-      ? state.activeScenarioChunks.lruChunkIds
+    runtimeState.activeScenarioChunks.lruChunkIds = Array.isArray(runtimeState.activeScenarioChunks.lruChunkIds)
+      ? runtimeState.activeScenarioChunks.lruChunkIds
       : [];
-    return state.activeScenarioChunks;
+    return runtimeState.activeScenarioChunks;
   }
 
   function ensureScenarioChunkPayloadCache(bundle) {
@@ -366,8 +369,8 @@ function createScenarioChunkRuntimeController({
 
   function getScenarioRuntimeMergedLayerPayloads(bundle = null) {
     const bundleScenarioId = getScenarioBundleId(bundle);
-    const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
-    const chunkScenarioId = normalizeScenarioId(state.activeScenarioChunks?.scenarioId);
+    const activeScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    const chunkScenarioId = normalizeScenarioId(runtimeState.activeScenarioChunks?.scenarioId);
     if (!bundleScenarioId || bundleScenarioId !== activeScenarioId || chunkScenarioId !== bundleScenarioId) {
       return {};
     }
@@ -384,8 +387,8 @@ function createScenarioChunkRuntimeController({
 
   function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
     const normalizedScenarioId = normalizeScenarioId(scenarioId);
-    state.activeScenarioChunks = createDefaultActiveScenarioChunksState(normalizedScenarioId);
-    state.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState({
+    runtimeState.activeScenarioChunks = createDefaultActiveScenarioChunksState(normalizedScenarioId);
+    runtimeState.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState({
       scenarioId: normalizedScenarioId,
     });
   }
@@ -454,7 +457,7 @@ function createScenarioChunkRuntimeController({
         return;
       }
       const nextPayload = mergedLayerPayloads[layerKey] || null;
-      const currentPayload = state[config.stateField] || null;
+      const currentPayload = runtimeState[config.stateField] || null;
       if (nextPayload === currentPayload) return;
       if (config.stateField === "scenarioCityOverridesData") {
         syncScenarioLocalizationState({ cityOverridesPayload: nextPayload });
@@ -462,9 +465,9 @@ function createScenarioChunkRuntimeController({
         changedLayerKeys.push(layerKey);
         return;
       }
-      state[config.stateField] = nextPayload;
+      runtimeState[config.stateField] = nextPayload;
       if (config.revisionField) {
-        state[config.revisionField] = (Number(state[config.revisionField]) || 0) + 1;
+        runtimeState[config.revisionField] = (Number(runtimeState[config.revisionField]) || 0) + 1;
       }
       changed = true;
       changedLayerKeys.push(layerKey);
@@ -486,16 +489,16 @@ function createScenarioChunkRuntimeController({
   } = {}) {
     const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     const normalizedPayload = normalizeScenarioFeatureCollection(politicalPayload);
-    const previousFeatureIds = getScenarioFeatureCollectionIdentityList(state.scenarioPoliticalChunkData);
+    const previousFeatureIds = getScenarioFeatureCollectionIdentityList(runtimeState.scenarioPoliticalChunkData);
     const nextFeatureIds = getScenarioFeatureCollectionIdentityList(normalizedPayload);
     const samePayload = areScenarioFeatureCollectionsEquivalent(
-      state.scenarioPoliticalChunkData,
+      runtimeState.scenarioPoliticalChunkData,
       normalizedPayload
     );
     if (samePayload) {
       return false;
     }
-    state.scenarioPoliticalChunkData = normalizedPayload || null;
+    runtimeState.scenarioPoliticalChunkData = normalizedPayload || null;
     const resolvedPoliticalFeatureIds = Array.isArray(politicalFeatureIds) && politicalFeatureIds.length
       ? Array.from(new Set(politicalFeatureIds))
       : Array.from(new Set([
@@ -529,8 +532,8 @@ function createScenarioChunkRuntimeController({
       }
       return false;
     }
-    const scenarioId = normalizeScenarioId(pendingPromotion.scenarioId || state.activeScenarioId);
-    if (!scenarioId || scenarioId !== normalizeScenarioId(state.activeScenarioId)) {
+    const scenarioId = normalizeScenarioId(pendingPromotion.scenarioId || runtimeState.activeScenarioId);
+    if (!scenarioId || scenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)) {
       if (loadState.pendingPromotion === pendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
@@ -591,8 +594,8 @@ function createScenarioChunkRuntimeController({
       {
         scenarioId,
         reason: String(pendingPromotion.reason || "refresh"),
-        loadedChunkCount: Array.isArray(state.activeScenarioChunks?.loadedChunkIds)
-          ? state.activeScenarioChunks.loadedChunkIds.length
+        loadedChunkCount: Array.isArray(runtimeState.activeScenarioChunks?.loadedChunkIds)
+          ? runtimeState.activeScenarioChunks.loadedChunkIds.length
           : 0,
       }
     );
@@ -656,7 +659,7 @@ function createScenarioChunkRuntimeController({
     if (!resolvedPendingPromotion || typeof resolvedPendingPromotion !== "object") {
       return false;
     }
-    const scenarioId = normalizeScenarioId(state.activeScenarioId);
+    const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     if (!scenarioId || scenarioId !== normalizeScenarioId(resolvedPendingPromotion.scenarioId)) {
       if (loadState.pendingPromotion === resolvedPendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
@@ -677,7 +680,7 @@ function createScenarioChunkRuntimeController({
         0,
         hasExplicitPendingDelayMs
           ? Number(loadState.pendingDelayMs)
-          : (state.isInteracting ? refreshDelayInteracting : refreshDelayIdle),
+          : (runtimeState.isInteracting ? refreshDelayInteracting : refreshDelayIdle),
       );
       markPendingScenarioChunkRefresh(
         resolvedPendingPromotion.reason || loadState.pendingReason || "chunk-promotion-deferred",
@@ -819,7 +822,7 @@ function createScenarioChunkRuntimeController({
     );
     bundle.chunkPreloaded = true;
     const bundleScenarioId = getScenarioBundleId(bundle);
-    if (bundleScenarioId && bundleScenarioId === normalizeScenarioId(state.activeScenarioId)) {
+    if (bundleScenarioId && bundleScenarioId === normalizeScenarioId(runtimeState.activeScenarioId)) {
       const chunkState = ensureActiveScenarioChunkState();
       chunkState.scenarioId = bundleScenarioId;
       coarseSelection.requiredChunks.forEach((chunk) => {
@@ -878,7 +881,7 @@ function createScenarioChunkRuntimeController({
     d3Client = globalThis.d3,
     renderNow = true,
   } = {}) {
-    const scenarioId = normalizeScenarioId(state.activeScenarioId);
+    const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     if (!scenarioId) return null;
     const bundle = getCachedScenarioBundle(scenarioId);
     if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
@@ -888,15 +891,15 @@ function createScenarioChunkRuntimeController({
     }
     clearPendingScenarioChunkRefresh();
     await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
-    const viewportBbox = typeof state.getViewportGeoBoundsFn === "function"
-      ? state.getViewportGeoBoundsFn()
+    const viewportBbox = typeof runtimeState.getViewportGeoBoundsFn === "function"
+      ? runtimeState.getViewportGeoBoundsFn()
       : [-180, -90, 180, 90];
     const visibleLayers = getVisibleScenarioChunkLayers({
       includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
-      showWaterRegions: state.showWaterRegions !== false,
-      showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
-      showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
-      showCityPoints: state.showCityPoints !== false,
+      showWaterRegions: runtimeState.showWaterRegions !== false,
+      showScenarioSpecialRegions: runtimeState.showScenarioSpecialRegions !== false,
+      showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
+      showCityPoints: runtimeState.showCityPoints !== false,
     });
     const chunkState = ensureActiveScenarioChunkState();
     chunkState.scenarioId = scenarioId;
@@ -907,7 +910,7 @@ function createScenarioChunkRuntimeController({
       scenarioId,
       chunkRegistry: bundle.chunkRegistry,
       contextLodManifest: bundle.contextLodManifest,
-      zoom: Number(state.zoomTransform?.k || 1),
+      zoom: Number(runtimeState.zoomTransform?.k || 1),
       viewportBbox,
       focusCountry,
       renderBudgetHints: bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {},
@@ -1101,7 +1104,7 @@ function createScenarioChunkRuntimeController({
     delayMs = null,
     flushPending = false,
   } = {}) {
-    const scenarioId = normalizeScenarioId(state.activeScenarioId);
+    const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     if (!scenarioId) return "noop";
     const bundle = getCachedScenarioBundle(scenarioId);
     if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return "noop";
@@ -1124,7 +1127,7 @@ function createScenarioChunkRuntimeController({
       loadState.zoomEndChunkVisibleMetric = {
         startedAt: globalThis.performance?.now ? globalThis.performance.now() : Date.now(),
         scenarioId,
-        zoom: Number(state.zoomTransform?.k || 1),
+        zoom: Number(runtimeState.zoomTransform?.k || 1),
         threshold: Number(hints.detail_zoom_threshold || 0),
         focusCountry: resolveScenarioChunkFocusCountry(bundle, loadState),
       };
