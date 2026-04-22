@@ -7,6 +7,7 @@ function createScenarioBundleRuntimeController({
   STARTUP_CACHE_KINDS,
   normalizeScenarioId,
   normalizeScenarioBundleLevel,
+  normalizeScenarioLanguage,
   scenarioBundleSatisfiesLevel,
   scenarioBundleUsesChunkedLayer,
   scenarioSupportsChunkedRuntime,
@@ -34,6 +35,22 @@ function createScenarioBundleRuntimeController({
   scheduleScenarioDeferredBundleMetadataLoad,
 } = {}) {
   const bundleLoadPromisesByKey = new Map();
+  const normalizeBundleLoadKeyPart = (value, fallback = "") => String(value ?? fallback).trim() || fallback;
+
+  function buildBundleLoadKey({
+    targetId,
+    requestedBundleLevel,
+    currentLanguage,
+    runtimeShellVersion,
+  }) {
+    const normalizedLanguage = normalizeScenarioLanguage(currentLanguage);
+    return [
+      `scenario=${normalizeBundleLoadKeyPart(targetId)}`,
+      `level=${normalizeBundleLoadKeyPart(requestedBundleLevel, "full")}`,
+      `language=${normalizeBundleLoadKeyPart(normalizedLanguage, "en")}`,
+      `runtime_shell=${normalizeBundleLoadKeyPart(runtimeShellVersion, "1")}`,
+    ].join("|");
+  }
 
   async function tryLoadBootstrapBundleFromPersistentCache({
     d3Client,
@@ -251,7 +268,12 @@ function createScenarioBundleRuntimeController({
     if (!targetId) {
       throw new Error("Scenario id is required.");
     }
-    const bundleLoadKey = `${targetId}:${requestedBundleLevel}`;
+    const bundleLoadKey = buildBundleLoadKey({
+      targetId,
+      requestedBundleLevel,
+      currentLanguage: state.currentLanguage,
+      runtimeShellVersion: state.scenarioRuntimeShellVersion,
+    });
     const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
     if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
       if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioBundleUsesChunkedLayer(cachedBundle)) {

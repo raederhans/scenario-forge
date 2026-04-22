@@ -17,7 +17,13 @@ class ScenarioBundleRuntimeBoundaryContractTest(unittest.TestCase):
         self.assertIn("function queueBootstrapBundleCacheWrite({", runtime_content)
         self.assertIn("async function loadScenarioBundle(", runtime_content)
         self.assertIn("const bundleLoadPromisesByKey = new Map();", runtime_content)
-        self.assertIn('const bundleLoadKey = `${targetId}:${requestedBundleLevel}`;', runtime_content)
+        self.assertIn("function buildBundleLoadKey({", runtime_content)
+        self.assertIn('`scenario=${normalizeBundleLoadKeyPart(targetId)}`', runtime_content)
+        self.assertIn('`level=${normalizeBundleLoadKeyPart(requestedBundleLevel, "full")}`', runtime_content)
+        self.assertIn('`language=${normalizeBundleLoadKeyPart(normalizedLanguage, "en")}`', runtime_content)
+        self.assertIn("const bundleLoadKey = buildBundleLoadKey({", runtime_content)
+        self.assertIn("currentLanguage: state.currentLanguage,", runtime_content)
+        self.assertIn("runtimeShellVersion: state.scenarioRuntimeShellVersion,", runtime_content)
         self.assertIn("if (!forceReload && bundleLoadPromisesByKey.has(bundleLoadKey)) {", runtime_content)
         self.assertIn("bundleLoadPromisesByKey.set(bundleLoadKey, loadPromise);", runtime_content)
         self.assertIn("bundleLoadPromisesByKey.delete(bundleLoadKey);", runtime_content)
@@ -39,6 +45,13 @@ class ScenarioBundleRuntimeBoundaryContractTest(unittest.TestCase):
         self.assertIn("const {", resources_content)
         self.assertIn("loadScenarioBundle,", resources_content)
         self.assertIn("loadScenarioAuditPayload,", resources_content)
+
+    def test_dedupe_key_distinguishes_concurrent_language_requests(self):
+        runtime_content = SCENARIO_BUNDLE_RUNTIME.read_text(encoding="utf-8")
+
+        self.assertIn("normalizeScenarioLanguage(currentLanguage)", runtime_content)
+        self.assertIn('`language=${normalizeBundleLoadKeyPart(normalizedLanguage, "en")}`', runtime_content)
+        self.assertIn("if (!forceReload && bundleLoadPromisesByKey.has(bundleLoadKey)) {", runtime_content)
 
 
 if __name__ == "__main__":
