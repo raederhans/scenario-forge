@@ -64,6 +64,20 @@
 - [x] `scenario_shell_overlay_contract.spec.js` 通过
 - [x] Lane D 收口并进入 `Lane E`
 
+## 当前阶段：Lane E1
+
+- [x] `color_state.js` 新增 resolved color / override sanitize 最小 accessor
+- [x] `color_state.js` 新增 render normalize accessor，收紧 mirror / sanitize 入口
+- [x] `map_renderer.js` 的 `refreshResolvedColorsForFeatures` / `refreshColorState` 写口切到 color accessor
+- [x] Lane E1 contract 套件通过
+- [x] Lane E1 node 行为测试通过
+- [x] 记录 `tno_open_ocean_rendering.spec.js` 当前失败点，先按阈值或运行时产物目录问题待定
+- [x] 推进 `spatial index` owner
+- [x] 推进 `renderer runtime state`
+- [x] 统一 `startup_hydration` readonly 语义尾项
+- [x] `tno_ready_state_contract.spec.js` 通过，确认 spatial rebuild + readonly fallback 主合同
+- [x] `startup_bundle_recovery_contract.spec.js` 通过，确认 recovery 合同与主合同一致
+
 ## review comment 回修
 
 - [x] 放行 startup continue-without-scenario 里的 `clearActiveScenario`

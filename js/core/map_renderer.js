@@ -1,6 +1,8 @@
 // Hybrid canvas + SVG rendering engine.
 import {
+  bumpColorRevision,
   normalizeCityLayerStyleConfig,
+  normalizeColorStateForRender,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
@@ -10,6 +12,8 @@ import {
   normalizeTextureStyleConfig,
   normalizeUrbanStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
+  replaceResolvedColorsState,
+  setResolvedColorForFeature,
   state,
 } from "./state.js";
 import {
@@ -21,8 +25,11 @@ import {
 import {
   createDefaultProjectedBoundsCacheState,
   createDefaultProjectedBoundsDiagnostics,
-  createDefaultRenderPassCacheState,
-  createDefaultSidebarPerfState,
+  ensureRenderPassCacheState,
+  ensureSidebarPerfState,
+  ensureSphericalFeatureDiagnosticsCache as ensureSphericalFeatureDiagnosticsCacheState,
+  resetProjectedBoundsCacheState as resetProjectedBoundsRuntimeCacheState,
+  setInteractionInfrastructureStateFields,
 } from "./state/renderer_runtime_state.js";
 import {
   MODERN_CITY_LIGHTS_BASE_THRESHOLD,
@@ -1163,6 +1170,7 @@ function getSpatialIndexRuntimeOwner() {
       getLogicalCanvasDimensions,
       computeProjectedFeatureBounds,
       getProjectedFeatureBounds,
+      getResolvedFeatureColor,
       shouldSkipFeature,
       queueIndexUiRefresh,
       finalizeIndexBuildEffects,
@@ -1256,88 +1264,10 @@ function isPerfOverlayEnabled() {
 }
 
 function getRenderPassCacheState() {
-  if (!state.renderPassCache || typeof state.renderPassCache !== "object") {
-    state.renderPassCache = createDefaultRenderPassCacheState();
-  }
-  // cache 子结构：canvases/layouts/signatures/referenceTransforms/borderSnapshot。
-  // 维护意图：统一生命周期与默认值，确保各 pass 读写稳定且可复用。
-  const cache = state.renderPassCache;
-  const defaults = createDefaultRenderPassCacheState();
-  cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : defaults.canvases;
-  cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : defaults.layouts;
-  cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : defaults.signatures;
-  cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
-    ? cache.referenceTransforms
-    : defaults.referenceTransforms;
-  cache.contextScenarioLayerCache = cache.contextScenarioLayerCache && typeof cache.contextScenarioLayerCache === "object"
-    ? cache.contextScenarioLayerCache
-    : defaults.contextScenarioLayerCache;
-  cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
-    ? cache.borderSnapshot
-    : { ...defaults.borderSnapshot };
-  cache.lastGoodFrame = cache.lastGoodFrame && typeof cache.lastGoodFrame === "object"
-    ? cache.lastGoodFrame
-    : { ...defaults.lastGoodFrame };
-  cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
-    ? cache.partialPoliticalDirtyIds
-    : defaults.partialPoliticalDirtyIds;
-  cache.politicalPathCache = cache.politicalPathCache instanceof Map
-    ? cache.politicalPathCache
-    : defaults.politicalPathCache;
-  cache.politicalPathCacheSignature = typeof cache.politicalPathCacheSignature === "string"
-    ? cache.politicalPathCacheSignature
-    : defaults.politicalPathCacheSignature;
-  cache.politicalPathCacheTransform = cache.politicalPathCacheTransform
-    ? cloneZoomTransform(cache.politicalPathCacheTransform)
-    : defaults.politicalPathCacheTransform;
-  cache.politicalPathWarmupQueue = Array.isArray(cache.politicalPathWarmupQueue)
-    ? cache.politicalPathWarmupQueue
-    : defaults.politicalPathWarmupQueue;
-  cache.politicalPathWarmupHandle = cache.politicalPathWarmupHandle && typeof cache.politicalPathWarmupHandle === "object"
-    ? cache.politicalPathWarmupHandle
-    : defaults.politicalPathWarmupHandle;
-  cache.politicalPathWarmupSignature = typeof cache.politicalPathWarmupSignature === "string"
-    ? cache.politicalPathWarmupSignature
-    : defaults.politicalPathWarmupSignature;
-  cache.contextScenarioReasonMismatchSignature = typeof cache.contextScenarioReasonMismatchSignature === "string"
-    ? cache.contextScenarioReasonMismatchSignature
-    : defaults.contextScenarioReasonMismatchSignature;
-  cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
-  cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
-  cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
-  RENDER_PASS_NAMES.forEach((passName) => {
-    if (!(passName in cache.dirty)) {
-      cache.dirty[passName] = true;
-    }
-    if (!(passName in cache.reasons)) {
-      cache.reasons[passName] = "init";
-    }
+  return ensureRenderPassCacheState(state, {
+    cloneZoomTransform,
+    renderPassNames: RENDER_PASS_NAMES,
   });
-  const counterDefaults = defaults.counters;
-  Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
-    if (!Number.isFinite(Number(cache.counters[counterName]))) {
-      cache.counters[counterName] = initialValue;
-    }
-  });
-  if (!("lastFrame" in cache)) {
-    cache.lastFrame = defaults.lastFrame;
-  }
-  if (typeof cache.lastAction !== "string") {
-    cache.lastAction = defaults.lastAction;
-  }
-  if (!Number.isFinite(Number(cache.lastActionDurationMs))) {
-    cache.lastActionDurationMs = defaults.lastActionDurationMs;
-  }
-  if (!Number.isFinite(Number(cache.lastActionAt))) {
-    cache.lastActionAt = defaults.lastActionAt;
-  }
-  if (typeof cache.perfOverlayEnabled !== "boolean") {
-    cache.perfOverlayEnabled = defaults.perfOverlayEnabled;
-  }
-  if (!("overlayElement" in cache)) {
-    cache.overlayElement = defaults.overlayElement;
-  }
-  return cache;
 }
 
 function getStrategicOverlayRuntimeOwner() {
@@ -1410,32 +1340,15 @@ function getStrategicOverlayRuntimeOwner() {
 }
 
 function getSidebarPerfState() {
-  const defaults = createDefaultSidebarPerfState();
-  if (!state.sidebarPerf || typeof state.sidebarPerf !== "object") {
-    state.sidebarPerf = defaults;
-  }
-  if (!state.sidebarPerf.counters || typeof state.sidebarPerf.counters !== "object") {
-    state.sidebarPerf.counters = {};
-  }
-  Object.entries(defaults.counters).forEach(([counterName, initialValue]) => {
-    if (!Number.isFinite(Number(state.sidebarPerf.counters[counterName]))) {
-      state.sidebarPerf.counters[counterName] = initialValue;
-    }
-  });
-  return state.sidebarPerf;
+  return ensureSidebarPerfState(state);
 }
 
 function resetProjectedBoundsCacheState() {
-  const defaults = createDefaultProjectedBoundsCacheState();
-  state.projectedBoundsById = defaults.projectedBoundsById;
-  state.sphericalFeatureDiagnosticsById = defaults.sphericalFeatureDiagnosticsById;
+  resetProjectedBoundsRuntimeCacheState(state);
 }
 
 function ensureSphericalFeatureDiagnosticsCache() {
-  if (!(state.sphericalFeatureDiagnosticsById instanceof Map)) {
-    state.sphericalFeatureDiagnosticsById = createDefaultProjectedBoundsCacheState().sphericalFeatureDiagnosticsById;
-  }
-  return state.sphericalFeatureDiagnosticsById;
+  return ensureSphericalFeatureDiagnosticsCacheState(state);
 }
 
 function ensureRenderPerfMetrics() {
@@ -4992,42 +4905,18 @@ function getResolvedFeatureColor(feature, id) {
   );
 }
 
-function syncPlainObjectMirror(targetValue, sourceValue) {
-  const source = sourceValue && typeof sourceValue === "object" ? sourceValue : {};
-  const target = targetValue && typeof targetValue === "object" ? targetValue : {};
-  const sourceKeys = new Set(Object.keys(source));
-  Object.keys(target).forEach((key) => {
-    if (!sourceKeys.has(key)) {
-      delete target[key];
-    }
-  });
-  sourceKeys.forEach((key) => {
-    const nextValue = source[key];
-    if (target[key] !== nextValue) {
-      target[key] = nextValue;
-    }
-  });
-  return target;
-}
-
-function syncResolvedColorMirrors() {
-  state.countryBaseColors = syncPlainObjectMirror(state.countryBaseColors, state.sovereignBaseColors);
-  state.featureOverrides = syncPlainObjectMirror(state.featureOverrides, state.visualOverrides);
-}
-
 function rebuildResolvedColors() {
   const startedAt = nowMs();
   migrateLegacyColorState();
   ensureSovereigntyState();
-  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
-  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
-  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
-  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  syncResolvedColorMirrors();
+  normalizeColorStateForRender(state, {
+    sanitizeColorMap,
+    sanitizeCountryColorMap,
+  });
 
   const nextColors = {};
   if (!state.landData?.features?.length) {
-    state.colors = nextColors;
+    replaceResolvedColorsState(state, nextColors);
     recordRenderPerfMetric("rebuildResolvedColors", nowMs() - startedAt, {
       featureCount: 0,
     });
@@ -5045,8 +4934,8 @@ function rebuildResolvedColors() {
     }
   });
 
-  state.colors = nextColors;
-  state.colorRevision = Number(state.colorRevision || 0) + 1;
+  replaceResolvedColorsState(state, nextColors);
+  bumpColorRevision(state);
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   recordRenderPerfMetric("rebuildResolvedColors", nowMs() - startedAt, {
     featureCount: Object.keys(nextColors).length,
@@ -5065,19 +4954,15 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   ids.forEach((id) => {
     const feature = state.landIndex?.get(id);
     if (!feature) {
-      delete state.colors[id];
+      setResolvedColorForFeature(state, id, null);
       return;
     }
     const resolved = getResolvedFeatureColor(feature, id);
-    if (resolved) {
-      state.colors[id] = resolved;
-    } else {
-      delete state.colors[id];
-    }
+    setResolvedColorForFeature(state, id, resolved);
     cache.partialPoliticalDirtyIds.add(id);
   });
 
-  state.colorRevision = Number(state.colorRevision || 0) + 1;
+  bumpColorRevision(state);
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "refresh-colors");
 
   if (renderNow && context) {
@@ -5096,8 +4981,10 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
 
 function refreshColorState({ renderNow = true } = {}) {
   const startedAt = nowMs();
-  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
-  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
+  normalizeColorStateForRender(state, {
+    sanitizeColorMap,
+    sanitizeCountryColorMap,
+  });
   rebuildResolvedColors();
   invalidateRenderPasses("contextScenario", "refresh-colors");
   recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
@@ -7874,13 +7761,10 @@ function setInteractionInfrastructureState(
     inFlight = null,
   } = {}
 ) {
-  state.interactionInfrastructureStage = String(stage || "idle").trim() || "idle";
-  if (ready != null) {
-    state.interactionInfrastructureReady = !!ready;
-  }
-  if (inFlight != null) {
-    state.interactionInfrastructureBuildInFlight = !!inFlight;
-  }
+  setInteractionInfrastructureStateFields(state, stage, {
+    ready,
+    inFlight,
+  });
 }
 
 function getInteractionInfrastructureStageRank(stage = state.interactionInfrastructureStage) {
@@ -8044,67 +7928,25 @@ function rebuildRuntimeDerivedState({
     buildRuntimePoliticalMeta();
   }
 
-  state.landIndex.clear();
-  state.countryToFeatureIds.clear();
-  state.idToKey.clear();
-  state.keyToId.clear();
-  rebuildAuxiliaryRegionIndexes();
-
   ensureSovereigntyState();
   migrateLegacyColorState();
-  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
-  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
-  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
-  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  syncResolvedColorMirrors();
+  normalizeColorStateForRender(state, {
+    sanitizeColorMap,
+    sanitizeCountryColorMap,
+  });
 
   clearProjectedBoundsCache();
   const projectedBoundsCache = ensureProjectedBoundsCache();
   const nextColors = {};
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  getSpatialIndexRuntimeOwner().rebuildRuntimePrimaryIndex({
+    projectedBoundsCache,
+    collectResolvedColor(id, resolvedColor) {
+      nextColors[id] = resolvedColor;
+    },
+  });
 
-  if (state.landData?.features?.length) {
-    state.landData.features.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `feature-${index}`;
-      if (!id) return;
-      state.landIndex.set(id, feature);
-      if (!shouldExcludePoliticalInteractionFeature(feature, id)) {
-        const countryCode = getFeatureCountryCodeNormalized(feature);
-        if (countryCode) {
-          const ids = state.countryToFeatureIds.get(countryCode) || [];
-          ids.push(id);
-          state.countryToFeatureIds.set(countryCode, ids);
-        }
-        const key = index + 1;
-        state.idToKey.set(id, key);
-        state.keyToId.set(key, id);
-      }
-      const bounds = computeProjectedFeatureBounds(feature);
-      if (bounds) {
-        projectedBoundsCache.set(id, bounds);
-      }
-      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
-        return;
-      }
-      const resolvedColor = getResolvedFeatureColor(feature, id);
-      if (resolvedColor) {
-        nextColors[id] = resolvedColor;
-      }
-    });
-  }
-
-  if (state.riversData?.features?.length) {
-    state.riversData.features.forEach((feature) => {
-      const featureId = getFeatureId(feature);
-      if (!featureId) return;
-      const bounds = computeProjectedFeatureBounds(feature);
-      if (!bounds) return;
-      projectedBoundsCache.set(featureId, bounds);
-    });
-  }
-
-  state.colors = nextColors;
-  state.colorRevision = Number(state.colorRevision || 0) + 1;
+  replaceResolvedColorsState(state, nextColors);
+  bumpColorRevision(state);
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   queueIndexUiRefresh({
     renderCountryList: true,
@@ -21695,13 +21537,10 @@ function initMap({
   state.lineCtx = null;
   migrateLegacyColorState();
   ensureSovereigntyState();
-  state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
-  state.featureOverrides = sanitizeColorMap(state.featureOverrides);
-  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
-  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
-  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
-  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  state.colors = sanitizeColorMap(state.colors);
+  normalizeColorStateForRender(state, {
+    sanitizeColorMap,
+    sanitizeCountryColorMap,
+  });
   state.debugMode = debugMode;
   resetRenderDiagnostics();
   clearRenderPhaseTimer();

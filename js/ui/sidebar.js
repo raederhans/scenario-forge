@@ -7,7 +7,7 @@ import {
   normalizeAnnotationView,
 } from "../core/state.js";
 import { callRuntimeHook, registerRuntimeHook } from "../core/runtime_hooks.js";
-import { createDefaultSidebarPerfState } from "../core/state/renderer_runtime_state.js";
+import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import {
   cancelActiveStrategicInteractionModes,
@@ -3446,22 +3446,11 @@ function initSidebar({ render } = {}) {
   let latestCountryStatesByCode = new Map();
   const countryRowRefsByCode = new Map();
   const incrementSidebarCounter = (counterName, amount = 1) => {
-    const defaults = createDefaultSidebarPerfState();
-    if (!state.sidebarPerf || typeof state.sidebarPerf !== "object") {
-      state.sidebarPerf = defaults;
+    const sidebarPerf = ensureSidebarPerfState(state);
+    if (!Number.isFinite(Number(sidebarPerf.counters[counterName]))) {
+      sidebarPerf.counters[counterName] = 0;
     }
-    if (!state.sidebarPerf.counters || typeof state.sidebarPerf.counters !== "object") {
-      state.sidebarPerf.counters = {};
-    }
-    Object.entries(defaults.counters).forEach(([defaultCounterName, initialValue]) => {
-      if (!Number.isFinite(Number(state.sidebarPerf.counters[defaultCounterName]))) {
-        state.sidebarPerf.counters[defaultCounterName] = initialValue;
-      }
-    });
-    if (!Number.isFinite(Number(state.sidebarPerf.counters[counterName]))) {
-      state.sidebarPerf.counters[counterName] = 0;
-    }
-    state.sidebarPerf.counters[counterName] += Number(amount || 0);
+    sidebarPerf.counters[counterName] += Number(amount || 0);
   };
 
   const getInspectorCountryDisplayName = (code) => {

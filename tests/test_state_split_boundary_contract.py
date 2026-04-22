@@ -242,6 +242,11 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         owner_content = STATE_COLOR_JS.read_text(encoding="utf-8")
 
         self.assertIn("export function createDefaultColorState()", owner_content)
+        self.assertIn("export function replaceResolvedColorsState(target, nextColors = {})", owner_content)
+        self.assertIn("export function setResolvedColorForFeature(target, featureId, color)", owner_content)
+        self.assertIn("export function bumpColorRevision(target)", owner_content)
+        self.assertIn("export function normalizeColorStateForRender(", owner_content)
+        self.assertIn("export function sanitizeRegionOverrideColors(", owner_content)
         self.assertIn("resolvedDefaultCountryPalette: { ...defaultCountryPalette },", owner_content)
         self.assertIn('selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],', owner_content)
         self.assertIn("editingPresetIds: new Set(),", owner_content)

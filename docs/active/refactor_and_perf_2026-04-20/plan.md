@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-- 当前阶段：`Lane D` 已完成，进入 `Lane E1` 预热与执行。
+- 当前阶段：`Lane E` 三点已完成，下一步进入 `runtime_hooks.js` 到事件总线的完整替换。
 - 原计划链真源：见 `original_plan_chain.md`。
 - 当前任务目标：按 `Lane C -> Lane D -> Lane E` 顺序推进 accessor 迁移，并把日常验证压到 contract + node + targeted e2e。
 
@@ -31,9 +31,9 @@
 
 ### 主线 C：Lane E1 renderer 低耦合 seam
 
-1. 先做 `refreshResolvedColorsForFeatures` / `refreshColorState`。
-2. 再做 `spatial index` owner 与 `renderer runtime state`。
-3. 继续避开依赖 scenario apply 事务的 seam。
+1. 先做 `refreshResolvedColorsForFeatures` / `refreshColorState`。已实现首版 state 写口收口。
+2. 再做 `spatial index` owner 与 `renderer runtime state`。已完成首版收口。
+3. `startup_hydration` readonly 语义尾项已统一到 editable fallback 口径。
 
 ## 执行顺序
 
@@ -44,7 +44,7 @@
 5. 已完成 `perf:gate` 回绿。
 6. 已完成 `Lane C` 首版落地。
 7. 已完成 `Lane D` runtime bug 修复与 stage gate 收口。
-8. 下一步进入 `Lane E1`。
+8. `Lane E` 三点已完成，下一步进入 `runtime_hooks.js` 到事件总线的完整替换。
 
 ## 暂缓事项
 

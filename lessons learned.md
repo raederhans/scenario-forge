@@ -1161,3 +1161,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 159. 延迟到下一帧的 reset 后处理要自己补 render
 - 这次把 reset 的 shell/opening-owner/UI 刷新延到帧后，标准 reset 按钮路径就会先完成 dispatcher 的 render，再落地副作用，屏幕上留下陈旧 overlay。
 - 更稳的最短路径是：保留帧后执行，但在副作用落地后显式 `requestRender()`，让同一轮用户路径一定看到更新后的边界和 overlay。
+
+### 160. renderer 大门面继续拆时，先收 state 写口，再动 facade 和调用链
+- 这次 Lane E1 只把 `refreshResolvedColorsForFeatures` 和 `refreshColorState` 命中的 root state 写口收进 `color_state.js` accessor，`map_renderer/public.js`、`scenario_renderer_bridge.js`、`refreshColorStateFn` 注册位都保持原样。
+- 更稳的最短路径是：先把 donor 里的直接 state 写入压成 owner/accessor，再保留原函数名和原导出位置，等行为稳定后再推进更深的 seam 和事件总线替换。
+
+### 161. hydration health gate 的主合同要以当前运行时语义为真源，恢复链测试要跟随统一
+- 这次 `startup_hydration.js` 在 overlay-only mismatch 下会清 overlay，但保持 editable fallback，`startupReadonly` 会回到 false。
+- 更稳的最短路径是：先用 `tno_ready_state_contract.spec.js` 锁住当前主合同，再把 `startup_bundle_recovery_contract.spec.js` 跟到同一口径，避免两条 e2e 各自维护一套相反语义。

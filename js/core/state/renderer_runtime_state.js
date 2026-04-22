@@ -168,3 +168,154 @@ export function createDefaultRendererTransientRuntimeState() {
     ...createDefaultProjectedBoundsCacheState(),
   };
 }
+
+export function ensureRenderPassCacheState(
+  target,
+  {
+    cloneZoomTransform = (value) => value,
+    renderPassNames = [],
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return createDefaultRenderPassCacheState();
+  }
+  if (!target.renderPassCache || typeof target.renderPassCache !== "object") {
+    target.renderPassCache = createDefaultRenderPassCacheState();
+  }
+  const cache = target.renderPassCache;
+  const defaults = createDefaultRenderPassCacheState();
+  cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : defaults.canvases;
+  cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : defaults.layouts;
+  cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : defaults.signatures;
+  cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
+    ? cache.referenceTransforms
+    : defaults.referenceTransforms;
+  cache.contextScenarioLayerCache = cache.contextScenarioLayerCache && typeof cache.contextScenarioLayerCache === "object"
+    ? cache.contextScenarioLayerCache
+    : defaults.contextScenarioLayerCache;
+  cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
+    ? cache.borderSnapshot
+    : { ...defaults.borderSnapshot };
+  cache.lastGoodFrame = cache.lastGoodFrame && typeof cache.lastGoodFrame === "object"
+    ? cache.lastGoodFrame
+    : { ...defaults.lastGoodFrame };
+  cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
+    ? cache.partialPoliticalDirtyIds
+    : defaults.partialPoliticalDirtyIds;
+  cache.politicalPathCache = cache.politicalPathCache instanceof Map
+    ? cache.politicalPathCache
+    : defaults.politicalPathCache;
+  cache.politicalPathCacheSignature = typeof cache.politicalPathCacheSignature === "string"
+    ? cache.politicalPathCacheSignature
+    : defaults.politicalPathCacheSignature;
+  cache.politicalPathCacheTransform = cache.politicalPathCacheTransform
+    ? cloneZoomTransform(cache.politicalPathCacheTransform)
+    : defaults.politicalPathCacheTransform;
+  cache.politicalPathWarmupQueue = Array.isArray(cache.politicalPathWarmupQueue)
+    ? cache.politicalPathWarmupQueue
+    : defaults.politicalPathWarmupQueue;
+  cache.politicalPathWarmupHandle = cache.politicalPathWarmupHandle && typeof cache.politicalPathWarmupHandle === "object"
+    ? cache.politicalPathWarmupHandle
+    : defaults.politicalPathWarmupHandle;
+  cache.politicalPathWarmupSignature = typeof cache.politicalPathWarmupSignature === "string"
+    ? cache.politicalPathWarmupSignature
+    : defaults.politicalPathWarmupSignature;
+  cache.contextScenarioReasonMismatchSignature = typeof cache.contextScenarioReasonMismatchSignature === "string"
+    ? cache.contextScenarioReasonMismatchSignature
+    : defaults.contextScenarioReasonMismatchSignature;
+  cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
+  cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
+  cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
+  renderPassNames.forEach((passName) => {
+    if (!(passName in cache.dirty)) {
+      cache.dirty[passName] = true;
+    }
+    if (!(passName in cache.reasons)) {
+      cache.reasons[passName] = "init";
+    }
+  });
+  Object.entries(defaults.counters).forEach(([counterName, initialValue]) => {
+    if (!Number.isFinite(Number(cache.counters[counterName]))) {
+      cache.counters[counterName] = initialValue;
+    }
+  });
+  if (!("lastFrame" in cache)) {
+    cache.lastFrame = defaults.lastFrame;
+  }
+  if (typeof cache.lastAction !== "string") {
+    cache.lastAction = defaults.lastAction;
+  }
+  if (!Number.isFinite(Number(cache.lastActionDurationMs))) {
+    cache.lastActionDurationMs = defaults.lastActionDurationMs;
+  }
+  if (!Number.isFinite(Number(cache.lastActionAt))) {
+    cache.lastActionAt = defaults.lastActionAt;
+  }
+  if (typeof cache.perfOverlayEnabled !== "boolean") {
+    cache.perfOverlayEnabled = defaults.perfOverlayEnabled;
+  }
+  if (!("overlayElement" in cache)) {
+    cache.overlayElement = defaults.overlayElement;
+  }
+  return cache;
+}
+
+export function ensureSidebarPerfState(target) {
+  if (!target || typeof target !== "object") {
+    return createDefaultSidebarPerfState();
+  }
+  const defaults = createDefaultSidebarPerfState();
+  if (!target.sidebarPerf || typeof target.sidebarPerf !== "object") {
+    target.sidebarPerf = defaults;
+  }
+  if (!target.sidebarPerf.counters || typeof target.sidebarPerf.counters !== "object") {
+    target.sidebarPerf.counters = {};
+  }
+  Object.entries(defaults.counters).forEach(([counterName, initialValue]) => {
+    if (!Number.isFinite(Number(target.sidebarPerf.counters[counterName]))) {
+      target.sidebarPerf.counters[counterName] = initialValue;
+    }
+  });
+  return target.sidebarPerf;
+}
+
+export function resetProjectedBoundsCacheState(target) {
+  if (!target || typeof target !== "object") {
+    return createDefaultProjectedBoundsCacheState();
+  }
+  const defaults = createDefaultProjectedBoundsCacheState();
+  target.projectedBoundsById = defaults.projectedBoundsById;
+  target.sphericalFeatureDiagnosticsById = defaults.sphericalFeatureDiagnosticsById;
+  return defaults;
+}
+
+export function ensureSphericalFeatureDiagnosticsCache(target) {
+  if (!target || typeof target !== "object") {
+    return createDefaultProjectedBoundsCacheState().sphericalFeatureDiagnosticsById;
+  }
+  if (!(target.sphericalFeatureDiagnosticsById instanceof Map)) {
+    target.sphericalFeatureDiagnosticsById = createDefaultProjectedBoundsCacheState().sphericalFeatureDiagnosticsById;
+  }
+  return target.sphericalFeatureDiagnosticsById;
+}
+
+export function setInteractionInfrastructureStateFields(
+  target,
+  stage,
+  {
+    ready = null,
+    inFlight = null,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return "idle";
+  }
+  target.interactionInfrastructureStage = String(stage || "idle").trim() || "idle";
+  if (ready != null) {
+    target.interactionInfrastructureReady = !!ready;
+  }
+  if (inFlight != null) {
+    target.interactionInfrastructureBuildInFlight = !!inFlight;
+  }
+  return target.interactionInfrastructureStage;
+}

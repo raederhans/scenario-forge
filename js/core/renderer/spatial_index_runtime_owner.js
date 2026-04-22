@@ -22,6 +22,7 @@ export function createSpatialIndexRuntimeOwner({
     rebuildAuxiliaryRegionIndexes = () => {},
     getLogicalCanvasDimensions = () => [1, 1],
     computeProjectedFeatureBounds = () => null,
+    getResolvedFeatureColor = () => null,
     shouldSkipFeature = () => false,
     queueIndexUiRefresh = () => {},
     finalizeIndexBuildEffects = () => {},
@@ -91,6 +92,59 @@ export function createSpatialIndexRuntimeOwner({
     state.specialSpatialGrid = defaults.specialSpatialGrid;
     state.specialSpatialGridMeta = defaults.specialSpatialGridMeta;
     state.specialSpatialItemsById = defaults.specialSpatialItemsById;
+  }
+
+  function rebuildRuntimePrimaryIndex({
+    projectedBoundsCache = null,
+    collectResolvedColor = () => {},
+  } = {}) {
+    state.landIndex.clear();
+    state.countryToFeatureIds.clear();
+    state.idToKey.clear();
+    state.keyToId.clear();
+    rebuildAuxiliaryRegionIndexes();
+
+    const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+
+    if (state.landData?.features?.length) {
+      state.landData.features.forEach((feature, index) => {
+        const id = getFeatureId(feature) || `feature-${index}`;
+        if (!id) return;
+        state.landIndex.set(id, feature);
+        if (!shouldExcludePoliticalInteractionFeature(feature, id)) {
+          const countryCode = getFeatureCountryCodeNormalized(feature);
+          if (countryCode) {
+            const ids = state.countryToFeatureIds.get(countryCode) || [];
+            ids.push(id);
+            state.countryToFeatureIds.set(countryCode, ids);
+          }
+          const key = index + 1;
+          state.idToKey.set(id, key);
+          state.keyToId.set(key, id);
+        }
+        const bounds = computeProjectedFeatureBounds(feature);
+        if (bounds && projectedBoundsCache?.set) {
+          projectedBoundsCache.set(id, bounds);
+        }
+        if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
+          return;
+        }
+        const resolvedColor = getResolvedFeatureColor(feature, id);
+        if (resolvedColor) {
+          collectResolvedColor(id, resolvedColor);
+        }
+      });
+    }
+
+    if (state.riversData?.features?.length && projectedBoundsCache?.set) {
+      state.riversData.features.forEach((feature) => {
+        const featureId = getFeatureId(feature);
+        if (!featureId) return;
+        const bounds = computeProjectedFeatureBounds(feature);
+        if (!bounds) return;
+        projectedBoundsCache.set(featureId, bounds);
+      });
+    }
   }
 
   function buildSecondarySpatialIndexes({
@@ -389,6 +443,7 @@ export function createSpatialIndexRuntimeOwner({
 
   return {
     buildIndex,
+    rebuildRuntimePrimaryIndex,
     resetSecondarySpatialIndexState,
     buildSecondarySpatialIndexes,
     buildSpatialIndex,

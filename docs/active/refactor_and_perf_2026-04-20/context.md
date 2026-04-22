@@ -78,6 +78,22 @@
   - split 场景必须已有 shell map 和 baseline owner/controller map
 - `js/core/scenario_recovery.js` 已把 `bootBlocking` 纳入 scenario interaction gate。
 - `js/ui/scenario_controls.js` 已把 `bootBlocking` 纳入 scenario controls disabled 条件。
+- `js/core/state/color_state.js` 已新增最小 color accessor：
+  - `normalizeColorStateForRender`
+  - `replaceResolvedColorsState`
+  - `setResolvedColorForFeature`
+  - `bumpColorRevision`
+  - `sanitizeRegionOverrideColors`
+- `js/core/map_renderer.js` 已把 `refreshResolvedColorsForFeatures` / `refreshColorState` 命中的 root state 写口切到 color accessor。
+- `js/core/renderer/spatial_index_runtime_owner.js` 已新增 `rebuildRuntimePrimaryIndex`，把 `rebuildRuntimeDerivedState()` 命中的主索引重建链继续压回 owner。
+- `js/core/map_renderer.js` 的 `rebuildRuntimeDerivedState()` 已改成通过 spatial owner 重建主索引与 projected bounds。
+- `js/core/state/renderer_runtime_state.js` 已新增最小 renderer runtime accessor：
+  - `ensureRenderPassCacheState`
+  - `ensureSidebarPerfState`
+  - `resetProjectedBoundsCacheState`
+  - `ensureSphericalFeatureDiagnosticsCache`
+  - `setInteractionInfrastructureStateFields`
+- `js/core/map_renderer.js` / `js/ui/sidebar.js` 已把命中的 render cache、sidebar perf、projected bounds、interaction infrastructure 兜底写口切到 renderer runtime accessor。
 - `tests/e2e/scenario_apply_concurrency.spec.js`
   - 已改成 command-driven 首次 apply
   - 已减少对隐藏/disabled select 的依赖
@@ -161,6 +177,26 @@
   - `tests/e2e/scenario_apply_concurrency.spec.js` 通过
   - `tests/e2e/scenario_shell_overlay_contract.spec.js` 通过
   - `tests/e2e/scenario_apply_resilience.spec.js` 通过
+- Lane E1 contract 通过：
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_map_renderer_public_contract tests.test_scenario_renderer_bridge_boundary_contract -q`
+- Lane E1 node 行为测试通过：
+  - `node --test tests/palette_runtime_bridge.node.test.mjs`
+- Lane E1 targeted e2e：
+  - `tests/e2e/tno_open_ocean_rendering.spec.js` 失败
+  - 当前断言点：`diffWhileInteractionOn.changedPixelCount` 期望 `> 80`，实测 `58`
+  - 附带暴露 `.runtime/tests/playwright/.playwright-artifacts-*` trace / zip 路径缺失
+  - 现阶段先按“测试阈值或运行时产物目录问题待定”记录，暂不把它定性成这轮 color accessor 回归
+- Lane E 后半段 contract 通过：
+  - `python -m unittest tests.test_spatial_index_state_boundary_contract tests.test_map_renderer_spatial_index_runtime_owner_boundary_contract tests.test_map_renderer_spatial_index_runtime_orchestration_contract tests.test_renderer_runtime_state_boundary_contract tests.test_startup_hydration_boundary_contract tests.test_map_renderer_border_mesh_owner_boundary_contract -q`
+- Lane E 后半段 node 行为测试通过：
+  - `node --test tests/renderer_runtime_state_behavior.test.mjs tests/startup_hydration_behavior.test.mjs tests/border_mesh_owner_behavior.test.mjs`
+- Lane E targeted e2e：
+  - `tests/e2e/tno_ready_state_contract.spec.js` 4 条通过
+  - `tests/e2e/startup_bundle_recovery_contract.spec.js` 3 条通过
+  - `tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js` 当前仍有 2 条红灯：
+    - `sync prewarm threshold completes first-frame chunk prewarm before promotion stage`
+    - `perf contracts keep coarse first frame and benchmark app-path fallback boundaries`
+  - 当前失败点更像 hidden `#scenarioSelect` 路径与 perf 合同本身，不像这轮 spatial/runtime/tail 改动直接回归
 - 针对 review comment 的回修：
   - `clearActiveScenario()` 现在支持 `allowDuringBootBlocking`
   - `main.js` 的 startup continue-without-scenario 恢复路径会显式传入这个开关
@@ -175,6 +211,8 @@
 - `Lane C` 代码面已经落地，contract 与 node 行为测试通过。
 - Lane C 的代码和最小合同已经可以合并。
 - Lane D 已完成。
+- Lane E1 第一刀已完成，当前只剩 targeted e2e 待定性。
+- Lane E 后半段已完成，`startup_hydration` readonly 语义已统一到 editable fallback。
 - 这轮并发 apply 真 bug 已定位并修复：
   - promise 建立时机过晚
   - bundle load 缺少 in-flight 复用
@@ -185,10 +223,6 @@
 
 ## 给后续代码 lane 的直接指向
 
-1. 进入 `Lane E1`，优先推进低耦合 seam：
-   - `refreshResolvedColorsForFeatures`
-   - `refreshColorState`
-   - `spatial index` owner
-   - `renderer runtime state`
-2. 并行核对 `startup_hydration.js` 与 `startup_bundle_recovery_contract.spec.js` 的 readonly 语义。
-3. `runtime_hooks` 的事件总线替换继续留到 helper 收口稳定以后。
+1. 进入 `runtime_hooks.js` 到事件总线的完整替换。
+2. 再推进 `state/index.js` / `config.js` / `bus.js` / Proxy 门面收口。
+3. `scenario_chunk_exact_after_settle_regression.spec.js` 当前 2 条红灯继续作为阶段门问题单独跟踪。

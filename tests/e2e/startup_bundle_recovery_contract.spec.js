@@ -77,7 +77,7 @@ test("startup apply health gate falls back to legacy bootstrap recovery when own
   expect(String(runtime.scenarioApplyMetric?.startupRecoveryReason || "")).toMatch(/Startup hydration health gate failed/i);
 });
 
-test("deferred hydration mask mismatch enters safe readonly mode and clears runtime overlays", async ({ page }) => {
+test("deferred hydration mask mismatch keeps editable fallback mode and clears runtime overlays", async ({ page }) => {
   test.setTimeout(240000);
   await gotoApp(page, DEFAULT_STARTUP_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page, { timeout: 120000 });
@@ -113,8 +113,8 @@ test("deferred hydration mask mismatch enters safe readonly mode and clears runt
   });
 
   expect(result.gateResult.ok).toBe(false);
-  expect(result.startupReadonly).toBe(true);
-  expect(result.startupReadonlyReason).toBe("scenario-health-gate");
+  expect(result.startupReadonly).toBe(false);
+  expect(result.startupReadonlyReason).toBe("");
   expect(result.scenarioHydrationHealthGate).toEqual({
     status: "degraded",
     reason: "runtime-overlay-context-land-mask-version-mismatch",

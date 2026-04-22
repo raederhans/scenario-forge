@@ -165,3 +165,102 @@ test("startup hydration marks political promotion as changed when runtime politi
   assert.equal(promotionCalls[0]?.suppressRender, false);
   assert.equal(promotionCalls[0]?.hasPoliticalPayloadChange, true);
 });
+
+test("startup hydration overlay mismatch degrades overlays and keeps startup readonly off", async () => {
+  const flushCalls = [];
+  const scenarioUiCalls = [];
+  const countryUiCalls = [];
+  const toastCalls = [];
+  const state = {
+    activeScenarioId: "tno_1962",
+    landData: {
+      type: "FeatureCollection",
+      features: [{ properties: { id: "feature-1" } }],
+    },
+    sovereigntyByFeatureId: {},
+    scenarioRuntimeTopologyVersionTag: "runtime-v1",
+    scenarioWaterRegionsData: { type: "FeatureCollection", features: [] },
+    scenarioLandMaskData: { type: "FeatureCollection", features: [] },
+    scenarioContextLandMaskData: { type: "FeatureCollection", features: [] },
+    scenarioWaterOverlayVersionTag: "runtime-v1",
+    scenarioLandMaskVersionTag: "runtime-v1",
+    scenarioContextLandMaskVersionTag: "runtime-v1",
+    startupReadonly: true,
+    startupReadonlyReason: "scenario-health-gate",
+    startupReadonlyUnlockInFlight: true,
+    scenarioHydrationHealthGate: null,
+  };
+
+  const { enforceScenarioHydrationHealthGate } = createScenarioStartupHydrationController({
+    state,
+    normalizeScenarioId: (value) => String(value || "").trim(),
+    normalizeScenarioRuntimeTopologyPayload: (value) => value,
+    normalizeScenarioGeoLocalePatchPayload: (value) => value,
+    normalizeFeatureText: (value) => String(value || "").trim(),
+    normalizeScenarioFeatureCollection: (value) => value,
+    getScenarioRuntimePoliticalFeatureCount: () => 1,
+    getScenarioDecodedCollection: () => null,
+    getScenarioRuntimeMergedLayerPayloads: () => ({}),
+    hasScenarioMergedLayerPayload: () => false,
+    areScenarioFeatureCollectionsEquivalent: () => true,
+    applyScenarioPoliticalChunkPayload: () => false,
+    loadOptionalScenarioResource: async () => null,
+    getScenarioGeoLocalePatchDescriptor: () => ({ url: "", language: "en", localeSpecific: false }),
+    getLoadScenarioBundle: () => async () => null,
+    syncScenarioLocalizationState: () => {},
+    syncCountryUi: (options) => {
+      countryUiCalls.push(options);
+    },
+    syncScenarioUi: () => {
+      scenarioUiCalls.push("sync");
+    },
+    setScenarioAuditUiState: () => {},
+    mergeReleasableCatalogs: () => null,
+    buildScenarioDistrictGroupByFeatureId: () => new Map(),
+    buildScenarioReleasableIndex: () => null,
+    invalidateContextLayerVisualStateBatch: () => {},
+    invalidateOceanWaterInteractionVisualState: () => {},
+    refreshColorState: () => {},
+    refreshMapDataForScenarioChunkPromotion: () => {},
+    refreshScenarioOpeningOwnerBorders: () => false,
+    flushRenderBoundary: (reason) => {
+      flushCalls.push(reason);
+    },
+    enterScenarioFatalRecovery: () => {},
+    consumeScenarioTestHook: (name) => name === "forceHydrationHealthGateMaskMismatchOnce",
+    t: (value) => value,
+    showToast: (...args) => {
+      toastCalls.push(args);
+    },
+  });
+
+  const result = await enforceScenarioHydrationHealthGate({
+    renderNow: false,
+    reason: "test-mask-mismatch",
+    autoRetry: false,
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.degradedWaterOverlay, true);
+  assert.equal(state.startupReadonly, false);
+  assert.equal(state.startupReadonlyReason, "");
+  assert.equal(state.startupReadonlyUnlockInFlight, false);
+  assert.deepEqual(state.scenarioHydrationHealthGate, {
+    status: "degraded",
+    reason: "runtime-overlay-context-land-mask-version-mismatch",
+    checkedAt: state.scenarioHydrationHealthGate.checkedAt,
+    attemptedRetry: false,
+    ownerFeatureOverlapRatio: 0,
+    ownerFeatureOverlapCount: 0,
+    ownerFeatureRenderedCount: 1,
+    degradedWaterOverlay: true,
+  });
+  assert.equal(state.scenarioWaterRegionsData, null);
+  assert.equal(state.scenarioLandMaskData, null);
+  assert.equal(state.scenarioContextLandMaskData, null);
+  assert.equal(flushCalls.length, 0);
+  assert.equal(scenarioUiCalls.length, 1);
+  assert.equal(countryUiCalls.length, 1);
+  assert.equal(countryUiCalls[0]?.renderNow, false);
+  assert.equal(toastCalls.length, 1);
+});

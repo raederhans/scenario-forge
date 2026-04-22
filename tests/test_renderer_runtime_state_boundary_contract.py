@@ -18,21 +18,29 @@ class RendererRuntimeStateBoundaryContractTest(unittest.TestCase):
         self.assertIn("createDefaultProjectedBoundsCacheState", owner_content)
         self.assertIn("createDefaultProjectedBoundsDiagnostics", owner_content)
         self.assertIn("createDefaultRendererTransientRuntimeState", owner_content)
+        self.assertIn("ensureRenderPassCacheState", owner_content)
+        self.assertIn("ensureSidebarPerfState", owner_content)
+        self.assertIn("resetProjectedBoundsCacheState", owner_content)
+        self.assertIn("ensureSphericalFeatureDiagnosticsCache", owner_content)
+        self.assertIn("setInteractionInfrastructureStateFields", owner_content)
 
     def test_map_renderer_reuses_renderer_runtime_factories(self):
         content = MAP_RENDERER_JS.read_text(encoding="utf-8")
 
         self.assertIn("./state/renderer_runtime_state.js", content)
-        self.assertIn("createDefaultRenderPassCacheState()", content)
-        self.assertIn("createDefaultSidebarPerfState()", content)
         self.assertIn("createDefaultProjectedBoundsCacheState()", content)
         self.assertIn("createDefaultProjectedBoundsDiagnostics()", content)
+        self.assertIn("ensureRenderPassCacheState(state,", content)
+        self.assertIn("ensureSidebarPerfState(state)", content)
+        self.assertIn("resetProjectedBoundsRuntimeCacheState(state);", content)
+        self.assertIn("ensureSphericalFeatureDiagnosticsCacheState(state)", content)
+        self.assertIn("setInteractionInfrastructureStateFields(state, stage,", content)
 
     def test_sidebar_reuses_sidebar_perf_factory(self):
         content = SIDEBAR_JS.read_text(encoding="utf-8")
 
         self.assertIn("../core/state/renderer_runtime_state.js", content)
-        self.assertIn("createDefaultSidebarPerfState()", content)
+        self.assertIn("ensureSidebarPerfState(state)", content)
 
 
 if __name__ == "__main__":

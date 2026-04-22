@@ -4,12 +4,25 @@ import { readFile } from "node:fs/promises";
 
 const source = await readFile(new URL("../js/core/palette_runtime_bridge.js", import.meta.url), "utf8");
 const runtimeBridge = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`);
+const stateDefaultsSource = await readFile(new URL("../js/core/state_defaults.js", import.meta.url), "utf8");
+const stateDefaultsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(stateDefaultsSource)}`;
+const colorStateSource = await readFile(new URL("../js/core/state/color_state.js", import.meta.url), "utf8");
+const patchedColorStateSource = colorStateSource.replace("../state_defaults.js", stateDefaultsDataUrl);
+const colorStateModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedColorStateSource)}`);
 
 const {
   buildRuntimeDefaultColorsByIso2,
   buildRuntimeDefaultTagByIso2,
   buildScenarioRuntimeDefaultTagColors,
 } = runtimeBridge;
+const {
+  createDefaultColorState,
+  normalizeColorStateForRender,
+  replaceResolvedColorsState,
+  sanitizeRegionOverrideColors,
+  setResolvedColorForFeature,
+  bumpColorRevision,
+} = colorStateModule;
 
 test("buildRuntimeDefaultTagByIso2 keeps one exposed bridge per iso2", () => {
   assert.deepEqual(
@@ -96,4 +109,82 @@ test("buildScenarioRuntimeDefaultTagColors pushes canonical bridge colors into s
   assert.equal(byTag.FRI, "#2a62a2");
   assert.equal(byTag.RKM, "#8c6e7c");
   assert.equal(byTag.SVR, "#8c6e7c");
+});
+
+test("color state accessors replace colors, patch individual entries, and bump revision", () => {
+  const state = createDefaultColorState();
+
+  replaceResolvedColorsState(state, {
+    A: "#112233",
+  });
+  assert.deepEqual(state.colors, {
+    A: "#112233",
+  });
+  assert.equal(state.colorRevision, undefined);
+
+  const applied = setResolvedColorForFeature(state, "B", "#445566");
+  assert.equal(applied, true);
+  assert.equal(state.colors.B, "#445566");
+
+  const deleted = setResolvedColorForFeature(state, "A", null);
+  assert.equal(deleted, false);
+  assert.equal("A" in state.colors, false);
+
+  assert.equal(bumpColorRevision(state), 1);
+  assert.equal(state.colorRevision, 1);
+
+  const sparseState = {};
+  assert.equal(setResolvedColorForFeature(sparseState, "C", "#778899"), true);
+  assert.deepEqual(sparseState.colors, { C: "#778899" });
+});
+
+test("color state accessor sanitizes water and special overrides through injected mapper", () => {
+  const state = createDefaultColorState();
+  state.waterRegionOverrides = {
+    ocean: "#ABCDEF",
+  };
+  state.specialRegionOverrides = {
+    inland: "#123456",
+  };
+
+  const next = sanitizeRegionOverrideColors(state, {
+    sanitizeColorMap(value) {
+      const entries = Object.entries(value || {}).map(([key, color]) => [
+        key,
+        String(color || "").trim().toLowerCase(),
+      ]);
+      return Object.fromEntries(entries);
+    },
+  });
+
+  assert.deepEqual(next, {
+    waterRegionOverrides: { ocean: "#abcdef" },
+    specialRegionOverrides: { inland: "#123456" },
+  });
+  assert.deepEqual(state.waterRegionOverrides, { ocean: "#abcdef" });
+  assert.deepEqual(state.specialRegionOverrides, { inland: "#123456" });
+});
+
+test("normalizeColorStateForRender sanitizes mirrors and resolved colors together", () => {
+  const state = createDefaultColorState();
+  state.sovereignBaseColors = { AAA: "#AABBCC" };
+  state.visualOverrides = { feature_1: "#DDEEFF" };
+  state.colors = { feature_2: "#ABCDEF" };
+
+  normalizeColorStateForRender(state, {
+    sanitizeColorMap(value) {
+      return Object.fromEntries(
+        Object.entries(value || {}).map(([key, color]) => [key, String(color || "").toLowerCase()]),
+      );
+    },
+    sanitizeCountryColorMap(value) {
+      return Object.fromEntries(
+        Object.entries(value || {}).map(([key, color]) => [key, String(color || "").toLowerCase()]),
+      );
+    },
+  });
+
+  assert.deepEqual(state.countryBaseColors, { AAA: "#aabbcc" });
+  assert.deepEqual(state.featureOverrides, { feature_1: "#ddeeff" });
+  assert.deepEqual(state.colors, { feature_2: "#abcdef" });
 });

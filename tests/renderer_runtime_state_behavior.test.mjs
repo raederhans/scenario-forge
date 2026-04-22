@@ -6,6 +6,11 @@ import {
   createDefaultRenderPassCacheState,
   createDefaultRendererTransientRuntimeState,
   createDefaultSidebarPerfState,
+  ensureRenderPassCacheState,
+  ensureSidebarPerfState,
+  ensureSphericalFeatureDiagnosticsCache,
+  resetProjectedBoundsCacheState,
+  setInteractionInfrastructureStateFields,
 } from "../js/core/state/renderer_runtime_state.js";
 import {
   createDefaultSpatialIndexState,
@@ -46,4 +51,39 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   assert.equal(spatialIndex.landIndex.size, 0);
   assert.equal(spatialIndex.waterSpatialItems.length, 0);
   assert.equal(spatialIndex.specialSpatialGrid.size, 0);
+});
+
+test("renderer runtime accessors normalize cache and infra holders in place", () => {
+  const state = {
+    renderPassCache: {
+      counters: { frames: 3 },
+      dirty: {},
+      reasons: {},
+    },
+    sidebarPerf: {},
+  };
+
+  const renderPassCache = ensureRenderPassCacheState(state, {
+    cloneZoomTransform(value) {
+      return value ? { ...value } : value;
+    },
+    renderPassNames: ["background", "political"],
+  });
+  const sidebarPerf = ensureSidebarPerfState(state);
+  resetProjectedBoundsCacheState(state);
+  const diagnostics = ensureSphericalFeatureDiagnosticsCache(state);
+  const stage = setInteractionInfrastructureStateFields(state, "basic-ready", {
+    ready: true,
+    inFlight: false,
+  });
+
+  assert.equal(renderPassCache.counters.frames, 3);
+  assert.equal(renderPassCache.dirty.background, true);
+  assert.equal(renderPassCache.reasons.political, "init");
+  assert.equal(sidebarPerf.counters.legendRenders, 0);
+  assert.equal(state.projectedBoundsById.size, 0);
+  assert.equal(diagnostics.size, 0);
+  assert.equal(stage, "basic-ready");
+  assert.equal(state.interactionInfrastructureReady, true);
+  assert.equal(state.interactionInfrastructureBuildInFlight, false);
 });
