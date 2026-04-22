@@ -154,7 +154,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("bundle.chunkMergedLayerPayloads", resources_content)
         self.assertNotIn("chunkMergedLayerPayloads:", resources_content)
         self.assertNotIn("bundle.chunkMergedLayerPayloads", manager_content)
-        self.assertIn("state.activeScenarioChunks?.mergedLayerPayloads", manager_content)
+        self.assertIn("runtimeState.activeScenarioChunks?.mergedLayerPayloads", manager_content)
 
     def test_post_apply_effects_waits_for_chunked_first_frame_before_returning(self):
         content = SCENARIO_POST_APPLY_EFFECTS.read_text(encoding="utf-8")

@@ -3874,7 +3874,7 @@ function initSidebar({ render } = {}) {
   };
 
   const countryInspectorController = createCountryInspectorController({
-    state,
+    runtimeState: state,
     list,
     searchInput,
     selectedCountryActionsSection,
@@ -5142,7 +5142,7 @@ function initSidebar({ render } = {}) {
     renderWaterInteractionUi,
     renderWaterRegionList,
   } = createWaterSpecialRegionController({
-    state,
+    runtimeState: state,
     elements: {
       waterInspectorSection,
       waterInspectorOpenOceanSelectToggle,

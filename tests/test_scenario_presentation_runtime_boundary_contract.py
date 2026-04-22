@@ -21,7 +21,7 @@ class ScenarioPresentationRuntimeBoundaryContractTest(unittest.TestCase):
         self.assertIn("function updateScenarioOceanFill(fillColor, reason)", content)
         self.assertIn("function syncScenarioOceanFillForActivation(manifest)", content)
         self.assertIn("function restoreScenarioOceanFillAfterExit()", content)
-        self.assertEqual(content.count("state.updateToolbarInputsFn();"), 3)
+        self.assertEqual(content.count("emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);"), 3)
         self.assertIn("invalidateOceanBackgroundVisualState(reason);", content)
         self.assertIn("export {", content)
         self.assertIn("createScenarioPresentationRuntime,", content)

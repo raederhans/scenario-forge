@@ -7,6 +7,20 @@ import {
   callRuntimeHook,
   emitStateBusEvent,
 } from "../state/index.js";
+import {
+  clearStartupReadonlyStateForReason,
+  hasStartupReadonlyReason,
+} from "../state/boot_state.js";
+import {
+  resetScenarioHydrationOverlayState,
+  setHydratedScenarioRuntimeTopologyState,
+  setScenarioHydrationHealthGateState,
+  setScenarioRuntimeOptionalLayerState,
+} from "../state/scenario_runtime_state.js";
+import {
+  hydrateScenarioReleasableCatalogState,
+  setScenarioAuditState,
+} from "../state_catalog.js";
 
 function createScenarioStartupHydrationController({
   state,
@@ -152,6 +166,20 @@ function createScenarioStartupHydrationController({
     return ids;
   }
 
+  function clearScenarioHealthGateReadonlyState() {
+    if (!hasStartupReadonlyReason(state, "scenario-health-gate")) {
+      return false;
+    }
+    if (state.startupReadonly) {
+      const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
+      if (handled !== undefined) {
+        return true;
+      }
+    }
+    clearStartupReadonlyStateForReason(state, "scenario-health-gate");
+    return true;
+  }
+
   function hydrateActiveScenarioBundle(
     bundle,
     {
@@ -249,20 +277,24 @@ function createScenarioStartupHydrationController({
         || state.runtimePoliticalTopology !== nextRuntimePoliticalTopology
         || state.scenarioLandMaskData !== nextScenarioLandMaskData
         || state.scenarioContextLandMaskData !== nextScenarioContextLandMaskData;
-      state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
-      state.runtimePoliticalTopology = nextRuntimePoliticalTopology;
-      state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
-      state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
-      state.scenarioLandMaskData = nextScenarioLandMaskData;
-      state.scenarioContextLandMaskData = nextScenarioContextLandMaskData;
-      state.scenarioWaterRegionsData = nextScenarioWaterRegionsData;
-      state.scenarioRuntimeTopologyVersionTag = runtimeVersionTag;
-      state.scenarioWaterOverlayVersionTag = nextScenarioWaterOverlayVersionTag;
-      state.scenarioLandMaskVersionTag = nextScenarioLandMaskVersionTag;
-      state.scenarioContextLandMaskVersionTag = nextScenarioContextLandMaskVersionTag;
-      state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
+      setHydratedScenarioRuntimeTopologyState(state, {
+        runtimeTopologyData: runtimeTopologyPayload,
+        runtimePoliticalTopology: nextRuntimePoliticalTopology,
+        runtimePoliticalMetaSeed: bundle.runtimePoliticalMeta || null,
+        runtimePoliticalFeatureCollectionSeed: getScenarioDecodedCollection(bundle, "politicalData") || null,
+        scenarioLandMaskData: nextScenarioLandMaskData,
+        scenarioContextLandMaskData: nextScenarioContextLandMaskData,
+        scenarioWaterRegionsData: nextScenarioWaterRegionsData,
+        scenarioRuntimeTopologyVersionTag: runtimeVersionTag,
+        scenarioWaterOverlayVersionTag: nextScenarioWaterOverlayVersionTag,
+        scenarioLandMaskVersionTag: nextScenarioLandMaskVersionTag,
+        scenarioContextLandMaskVersionTag: nextScenarioContextLandMaskVersionTag,
+        scenarioSpecialRegionsData: nextScenarioSpecialRegionsData,
+      });
     }
-    state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
+    setScenarioRuntimeOptionalLayerState(state, {
+      activeScenarioMeshPack: bundle.meshPackPayload || state.activeScenarioMeshPack || null,
+    });
     if (
       state.activeScenarioMeshPack?.meshes?.opening_owner_borders
       && state.scenarioBorderMode === "scenario_owner_only"
@@ -292,7 +324,9 @@ function createScenarioStartupHydrationController({
       }
     );
     if (!promotedScenarioPolitical) {
-      state.scenarioPoliticalChunkData = nextScenarioPoliticalPayload;
+      setScenarioRuntimeOptionalLayerState(state, {
+        scenarioPoliticalChunkData: nextScenarioPoliticalPayload,
+      });
       if (
         nextScenarioPoliticalPayload
         && !areScenarioFeatureCollectionsEquivalent(nextScenarioPoliticalPayload, previousScenarioPoliticalPayload)
@@ -304,24 +338,30 @@ function createScenarioStartupHydrationController({
       }
     }
     if (bundle.districtGroupsPayload) {
-      state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
-      state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
+      setScenarioRuntimeOptionalLayerState(state, {
+        scenarioDistrictGroupsData: bundle.districtGroupsPayload,
+        scenarioDistrictGroupByFeatureId: buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload),
+      });
     }
     if (bundle.releasableCatalog) {
-      state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
-      state.scenarioReleasableIndex = buildScenarioReleasableIndex(bundleScenarioId, { excludeTags: [] });
+      hydrateScenarioReleasableCatalogState(state, {
+        releasableCatalog: mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog),
+        scenarioReleasableIndex: buildScenarioReleasableIndex(bundleScenarioId, { excludeTags: [] }),
+      });
     }
     if (bundle.auditPayload) {
-      state.scenarioAudit = bundle.auditPayload;
+      setScenarioAuditState(state, bundle.auditPayload);
       setScenarioAuditUiState({
         loading: false,
         loadedForScenarioId: bundleScenarioId,
         errorMessage: "",
       });
     }
-    state.scenarioReliefOverlaysData = mergedReliefPayload !== undefined
-      ? mergedReliefPayload
-      : (bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null);
+    setScenarioRuntimeOptionalLayerState(state, {
+      scenarioReliefOverlaysData: mergedReliefPayload !== undefined
+        ? mergedReliefPayload
+        : (bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null),
+    });
     if (mergedCitiesPayload !== undefined || bundle.cityOverridesPayload) {
       syncScenarioLocalizationState({
         cityOverridesPayload: mergedCitiesPayload !== undefined
@@ -469,7 +509,7 @@ function createScenarioStartupHydrationController({
     if (report.healthy) {
       const ok = waterConsistency.healthy;
       if (ok) {
-        state.scenarioHydrationHealthGate = {
+        setScenarioHydrationHealthGateState(state, {
           status: "ok",
           reason: "ok",
           checkedAt: Date.now(),
@@ -478,7 +518,7 @@ function createScenarioStartupHydrationController({
           ownerFeatureOverlapCount: report.overlapCount,
           ownerFeatureRenderedCount: report.renderedFeatureCount,
           degradedWaterOverlay: false,
-        };
+        });
       }
       if (ok) {
         return { ok: true, attemptedRetry: false, degradedWaterOverlay: false, report, waterConsistency };
@@ -506,24 +546,8 @@ function createScenarioStartupHydrationController({
       if (attemptedRetry && renderNow) {
         flushRenderBoundary("scenario-health-gate-retry-recovered");
       }
-      if (
-        state.startupReadonly
-        && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
-      ) {
-        const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
-        if (handled !== undefined) {
-          // no-op: owner already synchronized readonly shell state
-        } else {
-          state.startupReadonly = false;
-          state.startupReadonlyReason = "";
-          state.startupReadonlyUnlockInFlight = false;
-        }
-      } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
-        state.startupReadonly = false;
-        state.startupReadonlyReason = "";
-        state.startupReadonlyUnlockInFlight = false;
-      }
-      state.scenarioHydrationHealthGate = {
+      clearScenarioHealthGateReadonlyState();
+      setScenarioHydrationHealthGateState(state, {
         status: "ok",
         reason: attemptedRetry ? "retry-recovered" : "ok",
         checkedAt: Date.now(),
@@ -532,7 +556,7 @@ function createScenarioStartupHydrationController({
         ownerFeatureOverlapCount: report.overlapCount,
         ownerFeatureRenderedCount: report.renderedFeatureCount,
         degradedWaterOverlay: false,
-      };
+      });
       syncScenarioUi();
       syncCountryUi({ renderNow: false });
       return { ok: true, attemptedRetry, degradedWaterOverlay: false, report, waterConsistency };
@@ -544,7 +568,7 @@ function createScenarioStartupHydrationController({
       if (waterConsistency?.reason && waterConsistency.reason !== "ok") {
         problemParts.push(`Overlay consistency also failed: ${waterConsistency.reason}.`);
       }
-      state.scenarioHydrationHealthGate = {
+      setScenarioHydrationHealthGateState(state, {
         status: "degraded",
         reason: "owner-feature-mismatch",
         checkedAt: Date.now(),
@@ -553,24 +577,8 @@ function createScenarioStartupHydrationController({
         ownerFeatureOverlapCount: report.overlapCount,
         ownerFeatureRenderedCount: report.renderedFeatureCount,
         degradedWaterOverlay: false,
-      };
-      if (
-        state.startupReadonly
-        && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
-      ) {
-        const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
-        if (handled !== undefined) {
-          // no-op: owner already synchronized readonly shell state
-        } else {
-          state.startupReadonly = false;
-          state.startupReadonlyReason = "";
-          state.startupReadonlyUnlockInFlight = false;
-        }
-      } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
-        state.startupReadonly = false;
-        state.startupReadonlyReason = "";
-        state.startupReadonlyUnlockInFlight = false;
-      }
+      });
+      clearScenarioHealthGateReadonlyState();
       enterScenarioFatalRecovery({
         phase: "hydration-health-gate",
         consistencyReport: {
@@ -593,36 +601,11 @@ function createScenarioStartupHydrationController({
         waterConsistency,
       };
     }
-    const hadScenarioOverlay =
-      !!state.scenarioWaterRegionsData
-      || !!state.scenarioLandMaskData
-      || !!state.scenarioContextLandMaskData;
-    state.scenarioWaterRegionsData = null;
-    state.scenarioWaterOverlayVersionTag = "";
-    state.scenarioLandMaskData = null;
-    state.scenarioContextLandMaskData = null;
-    state.scenarioLandMaskVersionTag = "";
-    state.scenarioContextLandMaskVersionTag = "";
+    const hadScenarioOverlay = resetScenarioHydrationOverlayState(state);
     invalidateContextLayerVisualStateBatch([], "scenario-health-gate-mask-fallback", { renderNow: false });
     invalidateOceanWaterInteractionVisualState("scenario-health-gate-water-fallback");
     refreshColorState({ renderNow: false });
-    if (
-      state.startupReadonly
-      && String(state.startupReadonlyReason || "").trim() === "scenario-health-gate"
-    ) {
-      const handled = callRuntimeHook(state, "setStartupReadonlyStateFn", false);
-      if (handled !== undefined) {
-        // no-op: owner already synchronized readonly shell state
-      } else {
-        state.startupReadonly = false;
-        state.startupReadonlyReason = "";
-        state.startupReadonlyUnlockInFlight = false;
-      }
-    } else if (String(state.startupReadonlyReason || "").trim() === "scenario-health-gate") {
-      state.startupReadonly = false;
-      state.startupReadonlyReason = "";
-      state.startupReadonlyUnlockInFlight = false;
-    }
+    clearScenarioHealthGateReadonlyState();
     showToast(
       t("Scenario runtime overlays were degraded. Editing remains available.", "ui"),
       {
@@ -634,7 +617,7 @@ function createScenarioStartupHydrationController({
     console.warn(
       `[scenario] Hydration health gate triggered fallback for "${scenarioId}". reason=${reason}, overlap=${report.overlapCount}/${report.renderedFeatureCount}, ratio=${report.overlapRatio.toFixed(3)}, waterConsistency=${waterConsistency.reason}.`
     );
-    state.scenarioHydrationHealthGate = {
+    setScenarioHydrationHealthGateState(state, {
       status: "degraded",
       reason: !report.healthy ? "owner-feature-mismatch" : `runtime-overlay-${waterConsistency.reason}`,
       checkedAt: Date.now(),
@@ -643,7 +626,7 @@ function createScenarioStartupHydrationController({
       ownerFeatureOverlapCount: report.overlapCount,
       ownerFeatureRenderedCount: report.renderedFeatureCount,
       degradedWaterOverlay: hadScenarioOverlay,
-    };
+    });
     syncScenarioUi();
     syncCountryUi({ renderNow: false });
     if (renderNow) {

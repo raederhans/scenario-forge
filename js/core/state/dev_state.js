@@ -94,3 +94,26 @@ export function createDefaultDevState() {
     },
   };
 }
+
+export function resetDevTransientImportState(
+  target,
+  {
+    previewFormat = "names_with_ids",
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  Object.assign(target, {
+    devHoverHit: null,
+    devSelectedHit: null,
+    devSelectionFeatureIds: new Set(),
+    devSelectionOrder: [],
+    devClipboardFallbackText: "",
+    devClipboardPreviewFormat: String(previewFormat || "names_with_ids"),
+  });
+  return {
+    devSelectionFeatureIds: target.devSelectionFeatureIds,
+    devSelectionOrder: target.devSelectionOrder,
+  };
+}

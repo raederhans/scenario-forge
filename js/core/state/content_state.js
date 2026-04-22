@@ -114,6 +114,259 @@ export function setCurrentLanguage(target, language = "en") {
   return target.currentLanguage;
 }
 
+function ensureLocalesContainer(target) {
+  if (!target.locales || typeof target.locales !== "object" || Array.isArray(target.locales)) {
+    target.locales = createDefaultLocalesState();
+  }
+  return target.locales;
+}
+
+// Startup pipeline still owns the fetch flow; these helpers only collapse the
+// repeated root-state writes for base city/localization hydration.
+export function applyBaseLocalizationSnapshot(
+  target,
+  {
+    uiLocales,
+    geoLocales,
+    aliasToStableKey,
+    bumpCityLayerRevision = false,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  const currentLocales = ensureLocalesContainer(target);
+  const locales = {
+    ...currentLocales,
+  };
+  if (uiLocales && typeof uiLocales === "object") {
+    locales.ui = { ...uiLocales };
+  }
+  if (geoLocales && typeof geoLocales === "object") {
+    locales.geo = { ...geoLocales };
+  }
+  target.locales = locales;
+  if (aliasToStableKey && typeof aliasToStableKey === "object") {
+    target.geoAliasToStableKey = { ...aliasToStableKey };
+  }
+  if (bumpCityLayerRevision) {
+    target.cityLayerRevision = (Number(target.cityLayerRevision) || 0) + 1;
+  }
+  return locales;
+}
+
+export function beginBaseCitySupportLoad(target) {
+  if (!target || typeof target !== "object") {
+    return "idle";
+  }
+  target.baseCityDataState = "loading";
+  target.baseCityDataError = "";
+  return target.baseCityDataState;
+}
+
+export function setBaseCityDataPromise(target, promise = null) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.baseCityDataPromise = promise || null;
+  return target.baseCityDataPromise;
+}
+
+export function commitBaseCitySupportData(
+  target,
+  result,
+  { scenarioActive = false } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.worldCitiesData = result?.worldCities || null;
+  target.baseCityAliasesData = result?.cityAliases || null;
+  target.baseGeoLocales = {
+    ...(
+      result?.locales?.geo && typeof result.locales.geo === "object"
+        ? result.locales.geo
+        : (target.baseGeoLocales || {})
+    ),
+  };
+  target.baseGeoAliasToStableKey = {
+    ...(
+      result?.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
+        ? result.geoAliases.alias_to_stable_key
+        : (target.baseGeoAliasToStableKey || {})
+    ),
+  };
+  if (!scenarioActive) {
+    applyBaseLocalizationSnapshot(target, {
+      geoLocales: target.baseGeoLocales,
+      aliasToStableKey: target.baseGeoAliasToStableKey,
+      bumpCityLayerRevision: true,
+    });
+  }
+  target.baseCityDataState = "loaded";
+  target.baseCityDataError = "";
+  target.baseCityDataPromise = null;
+  return target.worldCitiesData;
+}
+
+export function failBaseCitySupportLoad(target, error) {
+  if (!target || typeof target !== "object") {
+    return "";
+  }
+  target.baseCityDataState = "error";
+  target.baseCityDataError = error?.message || String(error || "Unknown city data loading error.");
+  target.baseCityDataPromise = null;
+  return target.baseCityDataError;
+}
+
+export function beginFullLocalizationLoad(target) {
+  if (!target || typeof target !== "object") {
+    return "idle";
+  }
+  target.baseLocalizationDataState = "loading";
+  target.baseLocalizationDataError = "";
+  return target.baseLocalizationDataState;
+}
+
+export function setBaseLocalizationDataPromise(target, promise = null) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.baseLocalizationDataPromise = promise || null;
+  return target.baseLocalizationDataPromise;
+}
+
+export function commitFullLocalizationData(
+  target,
+  {
+    uiLocales,
+    geoLocales,
+    aliasToStableKey,
+    scenarioActive = false,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.baseGeoLocales = geoLocales && typeof geoLocales === "object"
+    ? { ...geoLocales }
+    : {};
+  target.baseGeoAliasToStableKey = aliasToStableKey && typeof aliasToStableKey === "object"
+    ? { ...aliasToStableKey }
+    : {};
+  target.baseLocalizationLevel = "full";
+  applyBaseLocalizationSnapshot(target, {
+    uiLocales,
+    ...(scenarioActive
+      ? {}
+      : {
+          geoLocales: target.baseGeoLocales,
+          aliasToStableKey: target.baseGeoAliasToStableKey,
+        }),
+  });
+  target.baseLocalizationDataState = "loaded";
+  target.baseLocalizationDataError = "";
+  target.baseLocalizationDataPromise = null;
+  return target.locales;
+}
+
+export function failFullLocalizationLoad(target, error) {
+  if (!target || typeof target !== "object") {
+    return "";
+  }
+  target.baseLocalizationDataState = "error";
+  target.baseLocalizationDataError = error?.message || String(error || "Unknown localization hydration error.");
+  target.baseLocalizationDataPromise = null;
+  return target.baseLocalizationDataError;
+}
+
+const CONTEXT_LAYER_DATA_FIELD_BY_NAME = {
+  rivers: "riversData",
+  airports: "airportsData",
+  ports: "portsData",
+  roads: "roadsData",
+  road_labels: "roadLabelsData",
+  railways: "railwaysData",
+  rail_stations_major: "railStationsMajorData",
+  urban: "urbanData",
+  physical: "physicalData",
+  physical_semantics: "physicalSemanticsData",
+  physical_contours_major: "physicalContourMajorData",
+  physical_contours_minor: "physicalContourMinorData",
+};
+
+// Deferred context layers keep a single layer-name -> state-field mapping here,
+// so startup/bootstrap code no longer needs a long write switch.
+function ensureContextLayerLoadMaps(target) {
+  if (!target.contextLayerLoadStateByName || typeof target.contextLayerLoadStateByName !== "object") {
+    target.contextLayerLoadStateByName = createDefaultContextLayerLoadStateByName();
+  }
+  if (!target.contextLayerLoadErrorByName || typeof target.contextLayerLoadErrorByName !== "object") {
+    target.contextLayerLoadErrorByName = {};
+  }
+  if (!target.contextLayerLoadPromiseByName || typeof target.contextLayerLoadPromiseByName !== "object") {
+    target.contextLayerLoadPromiseByName = {};
+  }
+}
+
+export function commitContextLayerCollection(
+  target,
+  layerName,
+  collection,
+  { bumpRevision = false } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.contextLayerExternalDataByName = {
+    ...(target.contextLayerExternalDataByName || {}),
+    [layerName]: collection,
+  };
+  const targetField = CONTEXT_LAYER_DATA_FIELD_BY_NAME[layerName];
+  if (targetField) {
+    target[targetField] = collection;
+  }
+  if (bumpRevision) {
+    target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+  }
+  return collection;
+}
+
+export function setContextLayerLoadState(
+  target,
+  layerName,
+  loadState,
+  {
+    errorMessage,
+    clearError = false,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return "";
+  }
+  ensureContextLayerLoadMaps(target);
+  target.contextLayerLoadStateByName[layerName] = loadState;
+  if (errorMessage !== undefined) {
+    target.contextLayerLoadErrorByName[layerName] = errorMessage;
+  } else if (clearError) {
+    target.contextLayerLoadErrorByName[layerName] = "";
+  }
+  return target.contextLayerLoadStateByName[layerName];
+}
+
+export function setContextLayerLoadPromise(target, layerName, promise = null) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  ensureContextLayerLoadMaps(target);
+  if (promise) {
+    target.contextLayerLoadPromiseByName[layerName] = promise;
+    return promise;
+  }
+  delete target.contextLayerLoadPromiseByName[layerName];
+  return null;
+}
+
 export function hydrateHierarchyState(
   target,
   data,

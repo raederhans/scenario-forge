@@ -1,6 +1,5 @@
 {
   "files": [
-    "js/bootstrap/startup_data_pipeline.js",
     "js/core/interaction_funnel.js",
     "js/core/renderer/border_draw_owner.js",
     "js/core/renderer/border_mesh_owner.js",
@@ -10,11 +9,9 @@
     "js/core/scenario/bundle_loader.js",
     "js/core/scenario/presentation_runtime.js",
     "js/core/scenario/pure_helpers.js",
+    "js/core/scenario_resources.js",
     "js/core/scenario/startup_hydration.js",
     "js/ui/sidebar/strategic_overlay_controller.js",
-    "js/ui/toolbar/export_workbench_controller.js",
-    "js/ui/toolbar/workspace_chrome_support_surface_controller.js",
-    "js/ui/transport_workbench_manifest_preview.js",
     "tests/e2e/city_label_i18n_redraw.spec.js",
     "tests/e2e/dev_workspace_i18n.spec.js",
     "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -33,9 +30,6 @@
     "tests/e2e/strategic_overlay_smoke.spec.js",
     "tests/e2e/support/playwright-app.js",
     "tests/e2e/tno_open_ocean_rendering.spec.js",
-    "tests/e2e/tno_ready_state_contract.spec.js",
-    "tests/scenario_lifecycle_runtime_behavior.test.mjs",
-    "tests/strategic_overlay_runtime_owner_behavior.test.mjs",
-    "tests/palette_runtime_bridge.node.test.mjs"
+    "tests/e2e/tno_ready_state_contract.spec.js"
   ]
 }

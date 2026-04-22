@@ -30,9 +30,22 @@ import {
   processHierarchyData,
 } from "./startup_bootstrap_support.js";
 import {
+  beginBaseCitySupportLoad,
+  beginFullLocalizationLoad,
+  commitBaseCitySupportData,
+  commitContextLayerCollection,
+  commitFullLocalizationData,
   decodeStartupPrimaryCollectionsIntoState,
+  failBaseCitySupportLoad,
+  failFullLocalizationLoad,
   hydrateStartupBaseContentState,
+  setBaseCityDataPromise,
+  setBaseLocalizationDataPromise,
+  setContextLayerLoadPromise,
+  setContextLayerLoadState,
 } from "../core/state/content_state.js";
+import { hydrateStartupPaletteState } from "../core/state/color_state.js";
+import { hydrateStartupReleasableCatalogState } from "../core/state_catalog.js";
 import {
   STATE_BUS_EVENTS,
   emitStateBusEvent,
@@ -83,8 +96,7 @@ export function createStartupDataPipelineOwner({
     if (state.baseCityDataPromise) {
       return state.baseCityDataPromise;
     }
-    state.baseCityDataState = "loading";
-    state.baseCityDataError = "";
+    beginBaseCitySupportLoad(state);
     const promise = loadCitySupportData({
       d3Client: globalThis.d3,
       locales: {
@@ -100,37 +112,15 @@ export function createStartupDataPipelineOwner({
       },
     })
       .then((result) => {
-        state.worldCitiesData = result.worldCities || null;
-        state.baseCityAliasesData = result.cityAliases || null;
-        state.baseGeoLocales = {
-          ...(
-            result.locales?.geo && typeof result.locales.geo === "object"
-              ? result.locales.geo
-              : (state.baseGeoLocales || {})
-          ),
-        };
-        state.baseGeoAliasToStableKey = {
-          ...(
-            result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
-              ? result.geoAliases.alias_to_stable_key
-              : (state.baseGeoAliasToStableKey || {})
-          ),
-        };
+        commitBaseCitySupportData(state, result, {
+          scenarioActive: !!state.activeScenarioId,
+        });
         if (state.activeScenarioId) {
           syncScenarioLocalizationState({
             cityOverridesPayload: state.scenarioCityOverridesData,
             geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
           });
-        } else {
-          state.locales = {
-            ...(state.locales || {}),
-            geo: { ...state.baseGeoLocales },
-          };
-          state.geoAliasToStableKey = { ...state.baseGeoAliasToStableKey };
-          state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
         }
-        state.baseCityDataState = "loaded";
-        state.baseCityDataPromise = null;
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (renderNow) {
           requestMainRender?.(`base-city-loaded:${reason}`, { flush: true });
@@ -139,13 +129,11 @@ export function createStartupDataPipelineOwner({
         return state.worldCitiesData;
       })
       .catch((error) => {
-        state.baseCityDataState = "error";
-        state.baseCityDataError = error?.message || String(error || "Unknown city data loading error.");
-        state.baseCityDataPromise = null;
+        failBaseCitySupportLoad(state, error);
         console.warn(`[boot] Failed to load base city support data. reason=${reason}`, error);
         throw error;
       });
-    state.baseCityDataPromise = promise;
+    setBaseCityDataPromise(state, promise);
     return promise;
   }
 
@@ -159,8 +147,7 @@ export function createStartupDataPipelineOwner({
     if (state.baseLocalizationDataPromise) {
       return state.baseLocalizationDataPromise;
     }
-    state.baseLocalizationDataState = "loading";
-    state.baseLocalizationDataError = "";
+    beginFullLocalizationLoad(state);
     startBootMetric?.("localization:full:load");
     const promise = loadLocalizationData({
       d3Client: globalThis.d3,
@@ -187,29 +174,18 @@ export function createStartupDataPipelineOwner({
           Object.assign(fullBaseGeoLocales, cityPatch.geo || {});
           Object.assign(fullBaseAliasMap, cityPatch.aliasToStableKey || {});
         }
-        state.baseGeoLocales = fullBaseGeoLocales;
-        state.baseGeoAliasToStableKey = fullBaseAliasMap;
-        state.baseLocalizationLevel = "full";
-        state.locales = {
-          ...(state.locales || {}),
-          ui: fullUiLocales,
-        };
+        commitFullLocalizationData(state, {
+          uiLocales: fullUiLocales,
+          geoLocales: fullBaseGeoLocales,
+          aliasToStableKey: fullBaseAliasMap,
+          scenarioActive: !!state.activeScenarioId,
+        });
         if (state.activeScenarioId) {
           syncScenarioLocalizationState({
             cityOverridesPayload: state.scenarioCityOverridesData,
             geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
           });
-        } else {
-          state.locales = {
-            ...(state.locales || {}),
-            ui: fullUiLocales,
-            geo: { ...state.baseGeoLocales },
-          };
-          state.geoAliasToStableKey = { ...state.baseGeoAliasToStableKey };
         }
-        state.baseLocalizationDataState = "loaded";
-        state.baseLocalizationDataError = "";
-        state.baseLocalizationDataPromise = null;
         finishBootMetric?.("localization:full:load", {
           reason,
           resourceMetrics: result.resourceMetrics || {},
@@ -221,18 +197,16 @@ export function createStartupDataPipelineOwner({
         return result;
       })
       .catch((error) => {
-        state.baseLocalizationDataState = "error";
-        state.baseLocalizationDataError = error?.message || String(error || "Unknown localization hydration error.");
-        state.baseLocalizationDataPromise = null;
+        const errorMessage = failFullLocalizationLoad(state, error);
         finishBootMetric?.("localization:full:load", {
           reason,
           failed: true,
-          errorMessage: state.baseLocalizationDataError,
+          errorMessage,
         });
         console.warn(`[boot] Failed to hydrate full localization data. reason=${reason}`, error);
         throw error;
       });
-    state.baseLocalizationDataPromise = promise;
+    setBaseLocalizationDataPromise(state, promise);
     return promise;
   }
 
@@ -318,38 +292,6 @@ export function createStartupDataPipelineOwner({
     });
   }
 
-  function updateContextLayerDerivedState(layerName, collection) {
-    state.contextLayerExternalDataByName = {
-      ...(state.contextLayerExternalDataByName || {}),
-      [layerName]: collection,
-    };
-    if (layerName === "rivers") {
-      state.riversData = collection;
-    } else if (layerName === "airports") {
-      state.airportsData = collection;
-    } else if (layerName === "ports") {
-      state.portsData = collection;
-    } else if (layerName === "roads") {
-      state.roadsData = collection;
-    } else if (layerName === "road_labels") {
-      state.roadLabelsData = collection;
-    } else if (layerName === "railways") {
-      state.railwaysData = collection;
-    } else if (layerName === "rail_stations_major") {
-      state.railStationsMajorData = collection;
-    } else if (layerName === "urban") {
-      state.urbanData = collection;
-    } else if (layerName === "physical") {
-      state.physicalData = collection;
-    } else if (layerName === "physical_semantics") {
-      state.physicalSemanticsData = collection;
-    } else if (layerName === "physical_contours_major") {
-      state.physicalContourMajorData = collection;
-    } else if (layerName === "physical_contours_minor") {
-      state.physicalContourMinorData = collection;
-    }
-  }
-
   function topologyAlreadyProvidesContextLayer(layerName) {
     const primaryTopology = state.topologyPrimary || state.topology;
     const detailTopology = state.topologyDetail;
@@ -372,7 +314,7 @@ export function createStartupDataPipelineOwner({
         continue;
       }
       if (topologyAlreadyProvidesContextLayer(layerName)) {
-        state.contextLayerLoadStateByName[layerName] = "loaded";
+        setContextLayerLoadState(state, layerName, "loaded", { clearError: true });
         results[layerName] = null;
         continue;
       }
@@ -383,23 +325,22 @@ export function createStartupDataPipelineOwner({
         });
         continue;
       }
-      state.contextLayerLoadStateByName[layerName] = "loading";
-      state.contextLayerLoadErrorByName[layerName] = "";
+      setContextLayerLoadState(state, layerName, "loading", { clearError: true });
       startBootMetric?.(`layer:${layerName}:load`);
       const promise = loadContextLayerPack(layerName, globalThis.d3)
         .then((collection) => {
           if (!Array.isArray(collection?.features)) {
-            state.contextLayerLoadStateByName[layerName] = "error";
-            state.contextLayerLoadErrorByName[layerName] = `Deferred context layer "${layerName}" is unavailable.`;
+            setContextLayerLoadState(state, layerName, "error", {
+              errorMessage: `Deferred context layer "${layerName}" is unavailable.`,
+            });
             finishBootMetric?.(`layer:${layerName}:load`, {
               failed: true,
               reason,
             });
             return null;
           }
-          updateContextLayerDerivedState(layerName, collection);
-          state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
-          state.contextLayerLoadStateByName[layerName] = "loaded";
+          commitContextLayerCollection(state, layerName, collection, { bumpRevision: true });
+          setContextLayerLoadState(state, layerName, "loaded", { clearError: true });
           if (
             layerName === "airports"
             || layerName === "ports"
@@ -416,8 +357,9 @@ export function createStartupDataPipelineOwner({
           return collection;
         })
         .catch((error) => {
-          state.contextLayerLoadStateByName[layerName] = "error";
-          state.contextLayerLoadErrorByName[layerName] = error?.message || String(error || "Unknown context layer error.");
+          setContextLayerLoadState(state, layerName, "error", {
+            errorMessage: error?.message || String(error || "Unknown context layer error."),
+          });
           finishBootMetric?.(`layer:${layerName}:load`, {
             failed: true,
             reason,
@@ -426,9 +368,9 @@ export function createStartupDataPipelineOwner({
           return null;
         })
         .finally(() => {
-          delete state.contextLayerLoadPromiseByName[layerName];
+          setContextLayerLoadPromise(state, layerName, null);
         });
-      state.contextLayerLoadPromiseByName[layerName] = promise;
+      setContextLayerLoadPromise(state, layerName, promise);
       pendingEntries.push({ layerName, promise });
     }
 
@@ -654,32 +596,13 @@ export function createStartupDataPipelineOwner({
       specialZones,
       contextLayerExternal,
     });
-    state.paletteRegistry = paletteRegistry || null;
-    state.defaultReleasableCatalog = releasableCatalog || null;
-    state.releasableCatalog = releasableCatalog || null;
-    state.activePaletteMeta = activePaletteMeta || null;
-    state.activePalettePack = activePalettePack || null;
-    state.activePaletteMap = activePaletteMap || null;
-    state.activePaletteId = String(
-      activePaletteMeta?.palette_id
-      || paletteRegistry?.default_palette_id
-      || state.activePaletteId
-      || "hoi4_vanilla"
-    ).trim();
-    state.currentPaletteTheme = String(
-      activePaletteMeta?.display_name
-      || state.currentPaletteTheme
-      || "HOI4 Vanilla"
-    );
-    state.palettePackCacheById = state.palettePackCacheById || {};
-    state.paletteMapCacheById = state.paletteMapCacheById || {};
-    state.paletteLoadErrorById = state.paletteLoadErrorById || {};
-    if (state.activePaletteId && activePalettePack) {
-      state.palettePackCacheById[state.activePaletteId] = activePalettePack;
-    }
-    if (state.activePaletteId && activePaletteMap) {
-      state.paletteMapCacheById[state.activePaletteId] = activePaletteMap;
-    }
+    hydrateStartupReleasableCatalogState(state, releasableCatalog);
+    hydrateStartupPaletteState(state, {
+      paletteRegistry,
+      activePaletteMeta,
+      activePalettePack,
+      activePaletteMap,
+    });
     applyActivePaletteState({ overwriteCountryPalette: true });
     processHierarchyData(hierarchy);
     hydrateViewSettings();

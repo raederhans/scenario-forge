@@ -35,10 +35,10 @@ class ProjectSupportDiagnosticsSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('refreshLegendEditor,', content)
         self.assertIn('renderScenarioAuditPanel,', content)
         self.assertIn('bindProjectSupportDiagnosticsEvents();', content)
-        self.assertIn('state.renderScenarioAuditPanelFn = renderScenarioAuditPanel;', content)
-        self.assertIn('state.updateLegendUI = refreshLegendEditor;', content)
+        self.assertIn('registerRuntimeHook(state, "renderScenarioAuditPanelFn", renderScenarioAuditPanel);', content)
+        self.assertIn('registerRuntimeHook(state, "updateLegendUI", refreshLegendEditor);', content)
         self.assertGreater(
-            content.index('state.renderScenarioAuditPanelFn = renderScenarioAuditPanel;'),
+            content.index('registerRuntimeHook(state, "renderScenarioAuditPanelFn", renderScenarioAuditPanel);'),
             content.index('bindProjectSupportDiagnosticsEvents();')
         )
 
@@ -72,9 +72,9 @@ class ProjectSupportDiagnosticsSidebarBoundaryContractTest(unittest.TestCase):
         interaction_funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
         map_renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
 
-        self.assertIn('state.updateLegendUI();', interaction_funnel_content)
-        self.assertIn('state.renderScenarioAuditPanelFn();', interaction_funnel_content)
-        self.assertIn('state.updateLegendUI();', map_renderer_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);', interaction_funnel_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);', interaction_funnel_content)
+        self.assertIn('runtimeState.updateLegendUI();', map_renderer_content)
 
 
 if __name__ == "__main__":

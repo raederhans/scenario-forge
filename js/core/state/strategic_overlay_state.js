@@ -104,3 +104,30 @@ export function createDefaultStrategicOverlayState(options = {}) {
     strategicOverlayUi: createDefaultStrategicOverlayUiState(),
   };
 }
+
+export function resetStrategicOverlayEditorState(
+  target,
+  {
+    unitCounterRenderer = "game",
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  Object.assign(target, {
+    specialZoneEditor: createDefaultSpecialZoneEditorState(),
+    operationalLineEditor: createDefaultOperationalLineEditorState(),
+    operationGraphicsEditor: createDefaultOperationGraphicsEditorState(),
+    unitCounterEditor: createDefaultUnitCounterEditorState({
+      renderer: unitCounterRenderer,
+    }),
+    strategicOverlayUi: createDefaultStrategicOverlayUiState(),
+  });
+  return {
+    specialZoneEditor: target.specialZoneEditor,
+    operationalLineEditor: target.operationalLineEditor,
+    operationGraphicsEditor: target.operationGraphicsEditor,
+    unitCounterEditor: target.unitCounterEditor,
+    strategicOverlayUi: target.strategicOverlayUi,
+  };
+}

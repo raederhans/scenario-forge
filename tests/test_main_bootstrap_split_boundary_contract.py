@@ -44,6 +44,7 @@ class MainBootstrapSplitBoundaryContractTest(unittest.TestCase):
     def test_main_keeps_bootstrap_entry_and_overlay_facade(self):
         content = MAIN_JS.read_text(encoding="utf-8")
 
+        self.assertIn("runtimeState: state,", content)
         self.assertIn("function requestMainRender(reason = \"\", { flush = false } = {}) {", content)
         self.assertIn("const bootOverlayController = createStartupBootOverlayController();", content)
         self.assertIn("const startupDataPipeline = getStartupDataPipelineOwner();", content)

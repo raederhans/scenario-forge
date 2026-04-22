@@ -171,15 +171,37 @@ async function applyScenarioAndWaitIdle(page, scenarioId, {
   renderMode = "none",
   markDirtyReason = "playwright-apply-scenario",
   showToastOnComplete = false,
+  forceApply = false,
 } = {}) {
   const expectedScenarioId = String(scenarioId || "").trim();
   await waitForAppInteractive(page, { timeout });
   await waitForScenarioSelectReady(page, { scenarioId: expectedScenarioId, timeout });
+  const currentScenarioState = await page.evaluate(() => {
+    const state = globalThis.__playwrightStateRef || null;
+    const shellOwnerCount = Object.keys(state?.scenarioAutoShellOwnerByFeatureId || {}).length;
+    const shellControllerCount = Object.keys(state?.scenarioAutoShellControllerByFeatureId || {}).length;
+    const splitFeatureCount = Number(state?.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);
+    return {
+      activeScenarioId: String(state?.activeScenarioId || ""),
+      scenarioApplyInFlight: !!state?.scenarioApplyInFlight,
+      shellReady: splitFeatureCount <= 0 || (shellOwnerCount > 0 && shellControllerCount > 0),
+    };
+  });
+  if (
+    !forceApply
+    &&
+    currentScenarioState.activeScenarioId === expectedScenarioId
+    && !currentScenarioState.scenarioApplyInFlight
+    && currentScenarioState.shellReady
+  ) {
+    return;
+  }
   const applyPayload = {
     expectedScenarioId,
     renderMode,
     markDirtyReason,
     showToastOnComplete,
+    forceApply,
   };
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
@@ -244,7 +266,13 @@ async function applyScenarioAndWaitIdle(page, scenarioId, {
       throw new Error(`[playwright-app] scenario apply failed: ${applyState.error}`);
     }
     if (!state) return false;
-    return state.activeScenarioId === targetScenarioId && !state.scenarioApplyInFlight;
+    const shellOwnerCount = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length;
+    const shellControllerCount = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length;
+    const splitFeatureCount = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);
+    const shellReady = splitFeatureCount <= 0 || (shellOwnerCount > 0 && shellControllerCount > 0);
+    return state.activeScenarioId === targetScenarioId
+      && !state.scenarioApplyInFlight
+      && shellReady;
   }, expectedScenarioId, { timeout });
 }
 

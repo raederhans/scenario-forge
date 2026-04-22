@@ -17,6 +17,14 @@ class PlaywrightReadyGateContractTest(unittest.TestCase):
         self.assertIn("state.bootBlocking === false", content)
         self.assertIn("!state.scenarioApplyInFlight", content)
         self.assertIn("!state.startupReadonlyUnlockInFlight", content)
+        self.assertIn("currentScenarioState.activeScenarioId === expectedScenarioId", content)
+        self.assertIn("&& !currentScenarioState.scenarioApplyInFlight", content)
+        self.assertIn("&& currentScenarioState.shellReady", content)
+        self.assertIn("const shellOwnerCount = Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length;", content)
+        self.assertIn("const shellControllerCount = Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length;", content)
+        self.assertIn("const splitFeatureCount = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);", content)
+        self.assertIn("forceApply = false,", content)
+        self.assertIn("!forceApply", content)
         self.assertNotIn("page.waitForFunction(async () => {", content)
 
     def test_scenario_boundary_spec_uses_sync_wait_predicates_for_state_gate(self):

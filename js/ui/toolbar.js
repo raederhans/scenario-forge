@@ -1874,7 +1874,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateToolUIFn", updateToolUI);
 
   const appearanceControlsController = createAppearanceControlsController({
-    state,
+    runtimeState: state,
     t,
     clamp,
     markDirty,
@@ -1956,7 +1956,7 @@ function initToolbar({ render } = {}) {
   renderOceanLakeControlsUi();
 
   const specialZoneEditorController = createSpecialZoneEditorController({
-    state,
+    runtimeState: state,
     specialZonesDisputedFill,
     specialZonesDisputedStroke,
     specialZonesWastelandFill,

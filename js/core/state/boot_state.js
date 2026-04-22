@@ -68,6 +68,38 @@ export function setStartupReadonlyStateFields(
   return target.startupReadonly;
 }
 
+export function hasStartupReadonlyReason(target, reason = "") {
+  if (!target || typeof target !== "object") {
+    return false;
+  }
+  return String(target.startupReadonlyReason || "").trim() === String(reason || "").trim();
+}
+
+export function clearStartupReadonlyStateFields(target, { preserveSince = true } = {}) {
+  if (!target || typeof target !== "object") {
+    return false;
+  }
+  target.startupReadonly = false;
+  target.startupReadonlyReason = "";
+  target.startupReadonlyUnlockInFlight = false;
+  if (!preserveSince) {
+    target.startupReadonlySince = 0;
+  }
+  return target.startupReadonly;
+}
+
+export function clearStartupReadonlyStateForReason(
+  target,
+  reason = "",
+  { preserveSince = true } = {},
+) {
+  if (!hasStartupReadonlyReason(target, reason)) {
+    return false;
+  }
+  clearStartupReadonlyStateFields(target, { preserveSince });
+  return true;
+}
+
 export function setBootStateFields(
   target,
   {

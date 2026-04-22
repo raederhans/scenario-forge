@@ -80,6 +80,54 @@ export function createDefaultColorPresetState() {
   };
 }
 
+function ensurePaletteCacheRecord(target, key) {
+  if (!target[key] || typeof target[key] !== "object" || Array.isArray(target[key])) {
+    target[key] = {};
+  }
+  return target[key];
+}
+
+// Startup boot loads one initial palette pack/map pair; this helper keeps the
+// palette root writes in the color-state owner without changing runtime flow.
+export function hydrateStartupPaletteState(
+  target,
+  {
+    paletteRegistry,
+    activePaletteMeta,
+    activePalettePack,
+    activePaletteMap,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return "";
+  }
+  target.paletteRegistry = paletteRegistry || null;
+  target.activePaletteMeta = activePaletteMeta || null;
+  target.activePalettePack = activePalettePack || null;
+  target.activePaletteMap = activePaletteMap || null;
+  target.activePaletteId = String(
+    activePaletteMeta?.palette_id
+    || paletteRegistry?.default_palette_id
+    || target.activePaletteId
+    || "hoi4_vanilla"
+  ).trim();
+  target.currentPaletteTheme = String(
+    activePaletteMeta?.display_name
+    || target.currentPaletteTheme
+    || "HOI4 Vanilla"
+  ).trim() || "HOI4 Vanilla";
+  const palettePackCacheById = ensurePaletteCacheRecord(target, "palettePackCacheById");
+  const paletteMapCacheById = ensurePaletteCacheRecord(target, "paletteMapCacheById");
+  ensurePaletteCacheRecord(target, "paletteLoadErrorById");
+  if (target.activePaletteId && activePalettePack) {
+    palettePackCacheById[target.activePaletteId] = activePalettePack;
+  }
+  if (target.activePaletteId && activePaletteMap) {
+    paletteMapCacheById[target.activePaletteId] = activePaletteMap;
+  }
+  return target.activePaletteId;
+}
+
 export function replaceResolvedColorsState(target, nextColors = {}) {
   if (!target || typeof target !== "object") {
     return {};

@@ -144,3 +144,42 @@
 - [x] 修复 `scenario_runtime_state` 错误 import path
 - [x] 修复 rollback 对 `scheduleScenarioChunkRefreshFn` 的真实状态快照
 - [x] 补回 chunk/lifecycle runtime 对 `{ state }` 调用形态兼容
+
+
+- [x] 任务包 B：`runtime_hooks.js` 到事件总线的 adapter-first 迁移
+- [x] 任务包 B：`state/index.js` / `config.js` / `bus.js` / 薄 facade
+- [x] 任务包 B：清理剩余 `import { state }`
+- [x] 任务包 B：删除 `runtime_hooks.js`
+- [x] 任务包 B：收紧 `state-writer-allowlist.json`
+- [x] guardrail：`export_workbench_controller.js` / `workspace_chrome_support_surface_controller.js` 退出 allowlist
+- [x] guardrail：`transport_workbench_manifest_preview.js` 与 3 个 node test 的本地 `state` 噪音退出 allowlist
+- [x] guardrail：扫描器识别 `state[key] = ...`
+- [x] guardrail：`test_state_write_guardrail_contract.py` 增加 computed write 负样例
+- [x] contract：scenario resources / sidebar / presentation runtime 合同跟到 helper/bus/runtimeState 真源
+- [ ] Playwright 最终 gate 复核（真实环境）
+- [ ] perf:gate 最终复核（真实环境）
+- [ ] 下一轮 direct state write 大头：`interaction_funnel.js`
+- [ ] 下一轮 direct state write 大头：`startup_data_pipeline.js`
+- [ ] 下一轮 direct state write 大头：`startup_hydration.js`
+
+
+- [x] autopilot：复核 `perf:gate`，当前已回绿
+- [ ] autopilot：`scenario_shell_overlay_contract.spec.js` full spec 仍存在 runner/harness 结构性挂起，已完成代码面清障与手动路径验证
+- [x] 下一轮 direct state write 大头：`interaction_funnel.js` 第一轮收口完成
+- [x] 下一轮 direct state write 大头：`startup_data_pipeline.js` 第一轮收口完成
+- [x] 下一轮 direct state write 大头：`startup_hydration.js` 第一轮收口完成
+- [x] `interaction_funnel_contract.spec.js` 唯一失败用例已补绿
+- [x] `startup_bundle_recovery_contract.spec.js`
+- [x] `tno_ready_state_contract.spec.js`
+
+
+- [x] scanner：补 `state.foo ||= / ??= / +=` 这类 dot-member compound write 识别
+- [x] shell helper：`applyScenarioAndWaitIdle()` 增加 `forceApply`
+- [ ] shell gate：`scenario_shell_overlay_contract.spec.js` full-file runner follow-up
+- [x] shell gate：手动路径 `apply -> reset -> clear` 已验证通过
+- [x] `interaction_funnel_contract.spec.js` 失败用例 focused rerun 通过
+- [x] `startup_bundle_recovery_contract.spec.js`
+- [x] `tno_ready_state_contract.spec.js`
+- [x] validation：security review 通过
+- [x] validation：architect 代码面通过
+- [x] validation：code review COMMENT 放行

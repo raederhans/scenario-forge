@@ -18,6 +18,7 @@ async function applyScenario(page, scenarioId) {
     renderMode: "none",
     markDirtyReason: "",
     showToastOnComplete: false,
+    forceApply: true,
   });
 }
 

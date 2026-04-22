@@ -37,14 +37,15 @@ class SidebarSplitBoundaryContractTest(unittest.TestCase):
     def test_sidebar_keeps_country_inspector_facade_contract(self):
         content = SIDEBAR_JS.read_text(encoding="utf-8")
 
+        self.assertIn("runtimeState: state,", content)
         self.assertIn("bindEvents: bindCountryInspectorEvents,", content)
         self.assertIn("closeCountryInspectorColorPicker,", content)
         self.assertIn("refreshCountryRows,", content)
         self.assertIn("renderCountryInspectorDetail,", content)
         self.assertIn("renderList,", content)
-        self.assertIn("state.renderCountryListFn = renderList;", content)
-        self.assertIn("state.refreshCountryListRowsFn = refreshCountryRows;", content)
-        self.assertIn("state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;", content)
+        self.assertIn('registerRuntimeHook(state, "renderCountryListFn", renderList);', content)
+        self.assertIn('registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);', content)
+        self.assertIn('registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);', content)
         self.assertIn("bindCountryInspectorEvents();", content)
 
     def test_country_inspector_search_binding_moves_to_controller(self):

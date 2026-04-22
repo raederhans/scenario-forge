@@ -2,6 +2,8 @@
 // 这个模块负责 export workbench 的状态归一、列表渲染、预览、导出动作和面板内部事件绑定。
 // toolbar.js 继续保留 overlay 外壳、跨面板仲裁、URL/focus 协调和 open/close facade。
 
+import { replaceExportWorkbenchUiState } from "../../core/state/index.js";
+
 const EXPORT_MAIN_LAYER_VIEW_MODELS = Object.freeze([
   Object.freeze({ id: "background", name: "Background", summary: "Base frame", passNames: ["background"] }),
   Object.freeze({ id: "political", name: "Political", summary: "Terrain + ownership", passNames: ["physicalBase", "political"] }),
@@ -53,39 +55,41 @@ function normalizeExportWorkbenchTextVisibility(value, includeTextLayer = true) 
 }
 
 function ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState) {
-  state.exportWorkbenchUi = normalizeExportWorkbenchUiState(state.exportWorkbenchUi);
-  state.exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(state.exportWorkbenchUi.layerOrder);
-  state.exportWorkbenchUi.visibility = normalizeExportWorkbenchVisibility(state.exportWorkbenchUi.visibility);
-  state.exportWorkbenchUi.textVisibility = normalizeExportWorkbenchTextVisibility(
-    state.exportWorkbenchUi.textVisibility,
-    state.exportWorkbenchUi.includeTextLayer
+  const exportWorkbenchUi = replaceExportWorkbenchUiState(state, state.exportWorkbenchUi, {
+    normalizeState: normalizeExportWorkbenchUiState,
+  });
+  exportWorkbenchUi.layerOrder = normalizeExportWorkbenchLayerOrder(exportWorkbenchUi.layerOrder);
+  exportWorkbenchUi.visibility = normalizeExportWorkbenchVisibility(exportWorkbenchUi.visibility);
+  exportWorkbenchUi.textVisibility = normalizeExportWorkbenchTextVisibility(
+    exportWorkbenchUi.textVisibility,
+    exportWorkbenchUi.includeTextLayer
   );
-  state.exportWorkbenchUi.includeTextLayer = Object.values(state.exportWorkbenchUi.textVisibility).some(Boolean);
-  state.exportWorkbenchUi.scale = ["1", "1.5", "2", "4"].includes(String(state.exportWorkbenchUi.scale || "").trim())
-    ? String(state.exportWorkbenchUi.scale || "").trim()
+  exportWorkbenchUi.includeTextLayer = Object.values(exportWorkbenchUi.textVisibility).some(Boolean);
+  exportWorkbenchUi.scale = ["1", "1.5", "2", "4"].includes(String(exportWorkbenchUi.scale || "").trim())
+    ? String(exportWorkbenchUi.scale || "").trim()
     : "2";
-  state.exportWorkbenchUi.previewMode = String(state.exportWorkbenchUi.previewMode || "").trim().toLowerCase() === "layer"
+  exportWorkbenchUi.previewMode = String(exportWorkbenchUi.previewMode || "").trim().toLowerCase() === "layer"
     ? "layer"
     : "main";
-  state.exportWorkbenchUi.previewLayerId = [
+  exportWorkbenchUi.previewLayerId = [
     ...EXPORT_MAIN_LAYER_IDS,
     ...EXPORT_TEXT_LAYER_IDS,
-  ].includes(String(state.exportWorkbenchUi.previewLayerId || "").trim())
-    ? String(state.exportWorkbenchUi.previewLayerId || "").trim()
+  ].includes(String(exportWorkbenchUi.previewLayerId || "").trim())
+    ? String(exportWorkbenchUi.previewLayerId || "").trim()
     : "background";
-  const adjustments = state.exportWorkbenchUi.adjustments && typeof state.exportWorkbenchUi.adjustments === "object"
-    ? state.exportWorkbenchUi.adjustments
+  const adjustments = exportWorkbenchUi.adjustments && typeof exportWorkbenchUi.adjustments === "object"
+    ? exportWorkbenchUi.adjustments
     : {};
-  state.exportWorkbenchUi.adjustments = {
+  exportWorkbenchUi.adjustments = {
     brightness: Math.max(0, Math.min(200, Math.round(Number(adjustments.brightness) || 100))),
     contrast: Math.max(0, Math.min(200, Math.round(Number(adjustments.contrast) || 100))),
     saturation: Math.max(0, Math.min(200, Math.round(Number(adjustments.saturation) || 100))),
     clarity: Math.max(0, Math.min(200, Math.round(Number(adjustments.clarity) || 100))),
   };
-  state.exportWorkbenchUi.bakeCache = state.exportWorkbenchUi.bakeCache instanceof Map
-    ? state.exportWorkbenchUi.bakeCache
+  exportWorkbenchUi.bakeCache = exportWorkbenchUi.bakeCache instanceof Map
+    ? exportWorkbenchUi.bakeCache
     : new Map();
-  return state.exportWorkbenchUi;
+  return exportWorkbenchUi;
 }
 
 function resolveExportPassSequence(exportWorkbenchUi, renderPassNames) {

@@ -1053,7 +1053,8 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 42. startup runtime topology baseline 不能在 scenario apply 里二次播种
 - 这次 clear blank baseline 漂移的根因，是 scenario_apply_pipeline.js 把 defaultRuntimePoliticalTopology 从场景 runtime 里补写了一次，导致退出场景后 blank 底图被 scenario runtime 污染。
 - 更稳的最短路径是：startup baseline 只在 startup 链建立；scenario apply 只消费它，不能回写它。
-- 遇到这类 clear/revert 漂移，优先抓两次基线的 untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数对比，很快能定位污染源。
+- 遇到这类 clear/revert 漂移，优先抓两次基线的 
+untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数对比，很快能定位污染源。
 
 ### 135. 做 state owner 拆分时，合同测试要直接封住 consumer 里的第二份默认 shape
 - 只检查 donor import owner、只检查某些 reset 路径复用 factory 还不够；`chunk_runtime.ensureRuntimeChunkLoadState()` 这类 consumer 很容易继续藏一份 inline fallback 默认对象。
@@ -1182,3 +1183,11 @@ enderPhase=idle && !deferExactAfterSettle，并在测试配置里显式给出 sh
 ### 42. 把函数指针改成 helper 调用时，要保留“无 handler 时的本地回退”
 - `startup_hydration.js` 里原来会在 `setStartupReadonlyStateFn` 缺席时走本地字段回退；直接改成 `callRuntimeHook(...)` 后，这条回退会静默消失。
 - 更稳的做法是用 helper 返回值判定是否已由 owner 接管，没有接管就继续跑原本的本地清理逻辑。
+
+### 43. state write guardrail 既要识别 computed write，也要排掉本地测试/缓存对象的 `state` 噪音
+- 这次 allowlist 继续收紧时，真正漏掉的是 `state[key] = ...`，真正污染信号的是测试和本地缓存里随手起名的 `state`。
+- 更稳的最短路径是：扫描器补上 computed write，测试和本地缓存对象改成更具体的名字，让 allowlist 只跟真实 root state writer 对齐。
+
+### 44. owner factory 的参数名从 `state` 改成 `runtimeState` 后，要把所有调用点一次性跟上
+- 这次启动链连续炸了 4 处，根因都是 owner 文件已经改成解构 `runtimeState`，调用点还在传 `state`。
+- 更稳的最短路径是：每切一类 owner，就立刻补一条 boundary contract，直接断言调用点里存在 `runtimeState: state` 这类显式 wiring。

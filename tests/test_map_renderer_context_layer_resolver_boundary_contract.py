@@ -19,6 +19,7 @@ class MapRendererContextLayerResolverBoundaryContractTest(unittest.TestCase):
         )
         self.assertIn("let contextLayerResolverOwner = null;", renderer_content)
         self.assertIn("function getContextLayerResolverOwner() {", renderer_content)
+        self.assertIn("runtimeState: state,", renderer_content)
         self.assertIn("return getContextLayerResolverOwner().getLayerFeatureCollection(topology, layerName);", renderer_content)
         self.assertIn("return getContextLayerResolverOwner().computeLayerCoverageScore(collection);", renderer_content)
         self.assertIn("return getContextLayerResolverOwner().createUrbanLayerCapability(overrides);", renderer_content)

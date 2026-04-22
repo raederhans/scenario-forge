@@ -47,11 +47,11 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
     def test_active_scenario_country_names_do_not_fall_back_to_global_map(self):
         content = SCENARIO_APPLY_PIPELINE.read_text(encoding="utf-8")
 
-        self.assertIn('state.countryNames = staged.mapSemanticMode === "blank"', content)
+        self.assertIn('runtimeState.countryNames = staged.mapSemanticMode === "blank"', content)
         self.assertIn('? { ...countryNames }', content)
         self.assertIn(': { ...staged.scenarioNameMap };', content)
         self.assertNotIn(
-            "state.countryNames = {\n      ...countryNames,\n      ...staged.scenarioNameMap,\n    };",
+            "runtimeState.countryNames = {\n      ...countryNames,\n      ...staged.scenarioNameMap,\n    };",
             content,
         )
 
@@ -71,7 +71,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("restoreScenarioApplyRollbackSnapshot(rollbackSnapshot", content)
         self.assertIn("enterScenarioFatalRecovery({", content)
         self.assertIn('loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" })', content)
-        self.assertIn("state.scenarioApplyInFlight = true;", content)
+        self.assertIn("runtimeState.scenarioApplyInFlight = true;", content)
         self.assertIn("activeScenarioApplyPromise = (async () => {", content)
         self.assertIn("syncScenarioUi();", content)
         self.assertIn("getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode", content)
@@ -80,7 +80,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("const cachedManifest = cachedScenarioBundle.manifest || null;", content)
         self.assertIn("const cachedBaselineHash = String(getScenarioBaselineHashFromBundle(cachedScenarioBundle) || \"\").trim();", content)
         self.assertIn("const requiresMeshPack = !!String(cachedManifest?.mesh_pack_url || \"\").trim();", content)
-        self.assertIn("const hasMeshPack = !requiresMeshPack || !!state.activeScenarioMeshPack;", content)
+        self.assertIn("const hasMeshPack = !requiresMeshPack || !!runtimeState.activeScenarioMeshPack;", content)
         self.assertIn('assertScenarioInteractionsAllowed("exit the active scenario", {', content)
         self.assertIn("allowDuringBootBlocking,", content)
 
@@ -122,11 +122,12 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
     def test_scenario_manager_releases_state_apply_pipeline_owner(self):
         content = SCENARIO_MANAGER.read_text(encoding="utf-8")
 
+        self.assertIn("runtimeState: state,", content)
         self.assertNotRegex(content, r"^async function prepareScenarioApplyState\b", re.MULTILINE)
-        self.assertNotIn("state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;", content)
-        self.assertNotIn("state.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };", content)
-        self.assertNotIn('state.countryNames = staged.mapSemanticMode', content)
-        self.assertNotIn('state.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;', content)
+        self.assertNotIn("runtimeState.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;", content)
+        self.assertNotIn("runtimeState.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };", content)
+        self.assertNotIn('runtimeState.countryNames = staged.mapSemanticMode', content)
+        self.assertNotIn('runtimeState.scheduleScenarioChunkRefreshFn = scenarioSupportsChunkedRuntime(bundle) ? scheduleScenarioChunkRefresh : null;', content)
         self.assertNotIn('cityOverridesPayload: staged.mapSemanticMode === "blank"', content)
 
     def test_apply_pipeline_owner_moves_to_new_module(self):
@@ -138,15 +139,15 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIn("commitScenarioChunkRuntimeState(bundle, staged)", content)
         self.assertIn("prepareScenarioApplyState", content)
         self.assertIn("applyPreparedScenarioState", content)
-        self.assertIn("state.scenarioRuntimeTopologyData =", content)
-        self.assertIn("state.scenarioBaselineOwnersByFeatureId =", content)
-        self.assertIn('state.countryNames = staged.mapSemanticMode', content)
-        self.assertIn("state.scheduleScenarioChunkRefreshFn =", content)
+        self.assertIn("runtimeState.scenarioRuntimeTopologyData =", content)
+        self.assertIn("runtimeState.scenarioBaselineOwnersByFeatureId =", content)
+        self.assertIn('runtimeState.countryNames = staged.mapSemanticMode', content)
+        self.assertIn("runtimeState.scheduleScenarioChunkRefreshFn =", content)
         self.assertIn("syncScenarioLocalizationState({", content)
         self.assertIn("resetScenarioChunkRuntimeState(", content)
-        self.assertNotIn("state.defaultRuntimePoliticalTopology =", content)
+        self.assertNotIn("runtimeState.defaultRuntimePoliticalTopology =", content)
         self.assertNotIn('./scenario_manager.js', content)
-        self.assertIn("syncScenarioInspectorSelection(state.activeSovereignCode);", content)
+        self.assertIn("syncScenarioInspectorSelection(runtimeState.activeSovereignCode);", content)
         self.assertIn("disableScenarioParentBorders();", content)
         self.assertIn("applyScenarioPaintMode();", content)
         self.assertNotIn('./scenario_apply_pipeline.js', lifecycle_content)

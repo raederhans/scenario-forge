@@ -32,11 +32,12 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
         self.assertIn("async function ensureActiveScenarioBundleHydrated({ reason = \"post-ready\", renderNow = true } = {}) {", owner_content)
         self.assertIn("function shouldFastTrackScenarioHydration() {", owner_content)
         self.assertIn("function expandDeferredContextLayerNames(requestedLayerNames) {", owner_content)
-        self.assertIn("function updateContextLayerDerivedState(layerName, collection) {", owner_content)
+        self.assertIn("commitContextLayerCollection(state, layerName, collection, { bumpRevision: true });", owner_content)
+        self.assertIn("setContextLayerLoadState(state, layerName, \"loaded\", { clearError: true });", owner_content)
         self.assertIn("async function ensureContextLayerDataReady(", owner_content)
 
         self.assertIsNone(re.search(r"function\s+expandDeferredContextLayerNames\s*\(", donor_content))
-        self.assertIsNone(re.search(r"function\s+updateContextLayerDerivedState\s*\(", donor_content))
+        self.assertIsNone(re.search(r"function\s+commitContextLayerCollection\s*\(", donor_content))
         self.assertIsNone(re.search(r"function\s+topologyAlreadyProvidesContextLayer\s*\(", donor_content))
         self.assertIsNone(re.search(r"function\s+hasHydrationFeatureCollectionData\s*\(", donor_content))
 

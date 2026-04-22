@@ -65,6 +65,117 @@ export function createDefaultScenarioHydrationHealthGate() {
   };
 }
 
+export function setHydratedScenarioRuntimeTopologyState(
+  target,
+  {
+    runtimeTopologyData = null,
+    runtimePoliticalTopology = null,
+    runtimePoliticalMetaSeed = null,
+    runtimePoliticalFeatureCollectionSeed = null,
+    scenarioLandMaskData = null,
+    scenarioContextLandMaskData = null,
+    scenarioWaterRegionsData = null,
+    scenarioRuntimeTopologyVersionTag = "",
+    scenarioWaterOverlayVersionTag = "",
+    scenarioLandMaskVersionTag = "",
+    scenarioContextLandMaskVersionTag = "",
+    scenarioSpecialRegionsData = null,
+  } = {},
+) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  target.scenarioRuntimeTopologyData = runtimeTopologyData || null;
+  target.runtimePoliticalTopology = runtimePoliticalTopology || null;
+  target.runtimePoliticalMetaSeed = runtimePoliticalMetaSeed || null;
+  target.runtimePoliticalFeatureCollectionSeed = runtimePoliticalFeatureCollectionSeed || null;
+  target.scenarioLandMaskData = scenarioLandMaskData || null;
+  target.scenarioContextLandMaskData = scenarioContextLandMaskData || null;
+  target.scenarioWaterRegionsData = scenarioWaterRegionsData || null;
+  target.scenarioRuntimeTopologyVersionTag = String(scenarioRuntimeTopologyVersionTag || "");
+  target.scenarioWaterOverlayVersionTag = String(scenarioWaterOverlayVersionTag || "");
+  target.scenarioLandMaskVersionTag = String(scenarioLandMaskVersionTag || "");
+  target.scenarioContextLandMaskVersionTag = String(scenarioContextLandMaskVersionTag || "");
+  target.scenarioSpecialRegionsData = scenarioSpecialRegionsData || null;
+  return target.scenarioRuntimeTopologyData;
+}
+
+export function setScenarioRuntimeOptionalLayerState(target, nextState = {}) {
+  if (!target || typeof target !== "object") {
+    return null;
+  }
+  const hasOwn = Object.prototype.hasOwnProperty;
+  if (hasOwn.call(nextState, "activeScenarioMeshPack")) {
+    target.activeScenarioMeshPack = nextState.activeScenarioMeshPack || null;
+  }
+  if (hasOwn.call(nextState, "scenarioPoliticalChunkData")) {
+    target.scenarioPoliticalChunkData = nextState.scenarioPoliticalChunkData || null;
+  }
+  if (hasOwn.call(nextState, "scenarioDistrictGroupsData")) {
+    target.scenarioDistrictGroupsData = nextState.scenarioDistrictGroupsData || null;
+  }
+  if (hasOwn.call(nextState, "scenarioDistrictGroupByFeatureId")) {
+    target.scenarioDistrictGroupByFeatureId =
+      nextState.scenarioDistrictGroupByFeatureId instanceof Map
+        ? nextState.scenarioDistrictGroupByFeatureId
+        : new Map();
+  }
+  if (hasOwn.call(nextState, "scenarioReliefOverlaysData")) {
+    target.scenarioReliefOverlaysData = nextState.scenarioReliefOverlaysData || null;
+  }
+  return target;
+}
+
+export function setScenarioHydrationHealthGateState(target, nextState = {}) {
+  if (!target || typeof target !== "object") {
+    return createDefaultScenarioHydrationHealthGate();
+  }
+  const gateState = {
+    ...createDefaultScenarioHydrationHealthGate(),
+    ...(
+      nextState && typeof nextState === "object"
+        ? nextState
+        : {}
+    ),
+  };
+  gateState.status = String(gateState.status || "idle");
+  gateState.reason = String(gateState.reason || "");
+  gateState.checkedAt = Number(gateState.checkedAt) || Date.now();
+  gateState.attemptedRetry = !!gateState.attemptedRetry;
+  gateState.ownerFeatureOverlapRatio = Number(gateState.ownerFeatureOverlapRatio);
+  gateState.ownerFeatureOverlapRatio = Number.isFinite(gateState.ownerFeatureOverlapRatio)
+    ? gateState.ownerFeatureOverlapRatio
+    : 1;
+  gateState.ownerFeatureOverlapCount = Number(gateState.ownerFeatureOverlapCount);
+  gateState.ownerFeatureOverlapCount = Number.isFinite(gateState.ownerFeatureOverlapCount)
+    ? gateState.ownerFeatureOverlapCount
+    : 0;
+  gateState.ownerFeatureRenderedCount = Number(gateState.ownerFeatureRenderedCount);
+  gateState.ownerFeatureRenderedCount = Number.isFinite(gateState.ownerFeatureRenderedCount)
+    ? gateState.ownerFeatureRenderedCount
+    : 0;
+  gateState.degradedWaterOverlay = !!gateState.degradedWaterOverlay;
+  target.scenarioHydrationHealthGate = gateState;
+  return target.scenarioHydrationHealthGate;
+}
+
+export function resetScenarioHydrationOverlayState(target) {
+  if (!target || typeof target !== "object") {
+    return false;
+  }
+  const hadScenarioOverlay =
+    !!target.scenarioWaterRegionsData
+    || !!target.scenarioLandMaskData
+    || !!target.scenarioContextLandMaskData;
+  target.scenarioWaterRegionsData = null;
+  target.scenarioWaterOverlayVersionTag = "";
+  target.scenarioLandMaskData = null;
+  target.scenarioContextLandMaskData = null;
+  target.scenarioLandMaskVersionTag = "";
+  target.scenarioContextLandMaskVersionTag = "";
+  return hadScenarioOverlay;
+}
+
 export function createDefaultScenarioRuntimeState({
   scenarioId = "",
   detailMinRatio = 0.7,

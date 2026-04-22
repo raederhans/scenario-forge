@@ -96,7 +96,7 @@ function getStartupScenarioBootOwner() {
     return startupScenarioBootOwner;
   }
   startupScenarioBootOwner = createStartupScenarioBootOwner({
-    state,
+    runtimeState: state,
     helpers: {
       finishBootMetric,
       setBootState,
@@ -112,7 +112,7 @@ function getDeferredDetailPromotionOwner() {
     return deferredDetailPromotionOwner;
   }
   deferredDetailPromotionOwner = createDeferredDetailPromotionOwner({
-    state,
+    runtimeState: state,
     helpers: {
       canRunPostReadyIdleWork,
       checkpointBootMetric,

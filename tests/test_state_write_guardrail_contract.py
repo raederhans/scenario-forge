@@ -36,6 +36,69 @@ class StateWriteGuardrailContractTest(unittest.TestCase):
             self.fail(details or "state write allowlist check failed")
         self.assertIn("State write allowlist passed", result.stdout)
 
+    def test_scanner_flags_member_computed_and_object_assign_writes(self):
+        script = """
+const { scanContentForStateWrites } = require('./tools/eslint-rules/no-direct-state-mutation.js');
+const samples = {
+  member: 'state.foo = 1;',
+  memberOrAssign: 'state.foo ||= payload;',
+  memberNullishAssign: 'state.foo ??= payload;',
+  memberPlusAssign: 'state.foo += 1;',
+  computed: 'state[key] = payload;',
+  computedWithSpace: 'state [key] = payload;',
+  computedNested: 'state[keys[index]] = payload;',
+  computedOrAssign: 'state[key] ||= payload;',
+  objectAssign: 'Object.assign(state, payload);',
+};
+for (const [name, source] of Object.entries(samples)) {
+  const matches = scanContentForStateWrites(source);
+  if (!matches.length) {
+    console.error(`scanner missed ${name}`);
+    process.exit(1);
+  }
+}
+"""
+        result = subprocess.run(
+            ["node", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            details = "\n".join(
+                part for part in [result.stdout.strip(), result.stderr.strip()] if part
+            )
+            self.fail(details or "scanner did not detect direct state write sample")
+
+    def test_scanner_ignores_computed_read_comparisons(self):
+        script = """
+const { scanContentForStateWrites } = require('./tools/eslint-rules/no-direct-state-mutation.js');
+const samples = [
+  'if (state[key] === value) {}',
+  'if (state[key] == value) {}',
+];
+for (const source of samples) {
+  const matches = scanContentForStateWrites(source);
+  if (matches.length) {
+    console.error(`scanner falsely matched: ${source}`);
+    process.exit(1);
+  }
+}
+"""
+        result = subprocess.run(
+            ["node", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            details = "\n".join(
+                part for part in [result.stdout.strip(), result.stderr.strip()] if part
+            )
+            self.fail(details or "scanner falsely matched computed read comparison")
+
 
 if __name__ == "__main__":
     unittest.main()

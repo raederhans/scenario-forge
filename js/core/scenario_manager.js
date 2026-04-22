@@ -659,7 +659,7 @@ const {
   prepareScenarioApplyState,
   applyPreparedScenarioState,
 } = createScenarioApplyPipeline({
-  state,
+  runtimeState: state,
   countryNames,
   normalizeScenarioId,
   scenarioSupportsChunkedRuntime,

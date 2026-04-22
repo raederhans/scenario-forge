@@ -91,7 +91,7 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("cityOverridesPayload: null", content)
         self.assertIn("geoLocalePatchPayload: null", content)
         self.assertIn("state.showCityPoints = false", content)
-        self.assertIn("state.updateToolbarInputsFn()", content)
+        self.assertIn("emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);", content)
 
 
 if __name__ == "__main__":

@@ -30,13 +30,14 @@ class MainStartupScenarioBootBoundaryContractTest(unittest.TestCase):
         self.assertIn('scenarioBundleSource = "legacy-bootstrap-recovery";', owner_content)
         self.assertIn("warnOnStartupBundleIntegrity?.(defaultScenarioBundle, {", owner_content)
         self.assertIn('finishBootMetric?.("scenario-apply", {', owner_content)
-        self.assertIn("state.scenarioApplyInFlight = true;", owner_content)
-        self.assertIn("state.scenarioApplyInFlight = false;", owner_content)
+        self.assertIn("runtimeState.scenarioApplyInFlight = true;", owner_content)
+        self.assertIn("runtimeState.scenarioApplyInFlight = false;", owner_content)
 
     def test_main_keeps_bootstrap_entry_and_ready_state_facade(self):
         donor_content = MAIN_JS.read_text(encoding="utf-8")
 
         self.assertIn("function getStartupScenarioBootOwner()", donor_content)
+        self.assertIn("runtimeState: state,", donor_content)
         self.assertIn("const startupScenarioBoot = getStartupScenarioBootOwner();", donor_content)
         self.assertIn("startupScenarioBoot.runStartupScenarioBoot({", donor_content)
         self.assertIn("renderDispatcher.flush();", donor_content)

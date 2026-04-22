@@ -961,7 +961,7 @@ function getContextLayerResolverOwner() {
     return contextLayerResolverOwner;
   }
   contextLayerResolverOwner = createContextLayerResolverOwner({
-    state,
+    runtimeState: state,
     caches: {
       layerResolverCache,
     },

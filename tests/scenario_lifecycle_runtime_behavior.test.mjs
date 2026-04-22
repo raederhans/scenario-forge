@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 
 import { createScenarioLifecycleRuntime } from "../js/core/scenario/lifecycle_runtime.js";
 
-function createLifecycleRuntime(state, overrides = {}) {
+function createLifecycleRuntime(runtimeState, overrides = {}) {
   return createScenarioLifecycleRuntime({
-    state,
+    state: runtimeState,
     countryNames: { FR: "France", DE: "Germany" },
     defaultCountryPalette: { FR: "#00f", DE: "#000" },
     createDefaultScenarioReleasableIndex: () => ({ ids: [] }),
@@ -16,7 +16,7 @@ function createLifecycleRuntime(state, overrides = {}) {
     markLegacyColorStateDirty: () => {},
     normalizeScenarioId: (value) => String(value || "").trim(),
     recalculateScenarioOwnerControllerDiffCount: () => {
-      state.scenarioOwnerControllerDiffCount = 4;
+      runtimeState.scenarioOwnerControllerDiffCount = 4;
       return 4;
     },
     releaseScenarioAuditPayload: () => {},
@@ -129,47 +129,47 @@ function createBaseState(overrides = {}) {
 }
 
 test("clearActiveScenario restores deferred coarse baseline when detail topology is still pending", () => {
-  const state = createBaseState({
+  const runtimeState = createBaseState({
     topologyDetail: null,
     defaultRuntimePoliticalTopology: { objects: { political: {} } },
     topologyBundleMode: "composite",
     detailDeferred: false,
     detailPromotionCompleted: true,
   });
-  const runtime = createLifecycleRuntime(state);
+  const runtime = createLifecycleRuntime(runtimeState);
 
   runtime.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
 
-  assert.equal(state.activeScenarioId, "");
-  assert.equal(state.topologyBundleMode, "single");
-  assert.equal(state.detailDeferred, true);
-  assert.equal(state.detailPromotionCompleted, false);
-  assert.deepEqual(state.runtimePoliticalTopology, state.defaultRuntimePoliticalTopology);
+  assert.equal(runtimeState.activeScenarioId, "");
+  assert.equal(runtimeState.topologyBundleMode, "single");
+  assert.equal(runtimeState.detailDeferred, true);
+  assert.equal(runtimeState.detailPromotionCompleted, false);
+  assert.deepEqual(runtimeState.runtimePoliticalTopology, runtimeState.defaultRuntimePoliticalTopology);
 });
 
 test("clearActiveScenario keeps composite mode when baseline detail topology is already loaded", () => {
-  const state = createBaseState({
+  const runtimeState = createBaseState({
     topologyDetail: { objects: { political: {} } },
     defaultRuntimePoliticalTopology: { objects: { political: {} } },
     topologyBundleMode: "composite",
     detailDeferred: false,
     detailPromotionCompleted: true,
   });
-  const runtime = createLifecycleRuntime(state);
+  const runtime = createLifecycleRuntime(runtimeState);
 
   runtime.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
 
-  assert.equal(state.topologyBundleMode, "composite");
-  assert.equal(state.detailDeferred, false);
-  assert.equal(state.detailPromotionCompleted, true);
+  assert.equal(runtimeState.topologyBundleMode, "composite");
+  assert.equal(runtimeState.detailDeferred, false);
+  assert.equal(runtimeState.detailPromotionCompleted, true);
 });
 
 test("resetToScenarioBaseline recalculates split count before UI refresh side effects", () => {
-  const state = createBaseState();
+  const runtimeState = createBaseState();
   const seenCounts = [];
-  const runtime = createLifecycleRuntime(state, {
+  const runtime = createLifecycleRuntime(runtimeState, {
     runPostScenarioResetEffects: () => {
-      seenCounts.push(state.scenarioOwnerControllerDiffCount);
+      seenCounts.push(runtimeState.scenarioOwnerControllerDiffCount);
     },
   });
 
@@ -181,5 +181,5 @@ test("resetToScenarioBaseline recalculates split count before UI refresh side ef
 
   assert.equal(changed, true);
   assert.deepEqual(seenCounts, [4]);
-  assert.equal(state.scenarioOwnerControllerDiffCount, 4);
+  assert.equal(runtimeState.scenarioOwnerControllerDiffCount, 4);
 });

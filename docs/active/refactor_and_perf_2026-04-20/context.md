@@ -286,3 +286,113 @@
   - `python -m unittest tests.test_scenario_rollback_boundary_contract -q`：通过
   - `node --test tests/scenario_lifecycle_runtime_behavior.test.mjs`：通过
   - `node --input-type=module -e "await import('./js/core/scenario_resources.js')"`：通过
+
+
+## 2026-04-22 任务包 B 后续大推进：allowlist 与 contract 收紧
+
+- 本轮判断：任务包 B 主实现已经完成，当前最短路径是继续收紧 `state write guardrail`，把 allowlist 里的噪音和扫描盲区一起压掉。
+- 已完成代码收口：
+  - `js/core/state/ui_state.js` 新增
+    - `replaceExportWorkbenchUiState`
+    - `setActiveDockPopoverState`
+  - `js/ui/toolbar/export_workbench_controller.js` 改用 UI accessor，退出 allowlist
+  - `js/ui/toolbar/workspace_chrome_support_surface_controller.js` 改用 UI accessor，退出 allowlist
+  - `js/ui/transport_workbench_manifest_preview.js` 把本地缓存对象从 `state` 改名为 `previewRuntime`，退出 allowlist
+  - `tests/scenario_lifecycle_runtime_behavior.test.mjs`
+  - `tests/strategic_overlay_runtime_owner_behavior.test.mjs`
+  - `tests/palette_runtime_bridge.node.test.mjs`
+    - 这 3 个测试文件里的本地 `state` 命名已改掉，退出 allowlist
+- 已完成 guardrail 真收紧：
+  - `tools/eslint-rules/no-direct-state-mutation.js` 现在额外扫描 `state[key] = ...`
+  - 因扫描盲区消失，`js/core/scenario_resources.js` 被识别为真实 direct state writer，并已纳回 allowlist
+  - `tests/test_state_write_guardrail_contract.py` 新增 computed write 负样例
+- 已完成合同对齐：
+  - `tests/test_scenario_resources_boundary_contract.py`
+  - `tests/test_project_support_diagnostics_sidebar_boundary_contract.py`
+  - `tests/test_sidebar_split_boundary_contract.py`
+  - `tests/test_scenario_presentation_runtime_boundary_contract.py`
+  - `tests/test_strategic_overlay_sidebar_boundary_contract.py`
+  - `tests/test_water_special_region_sidebar_boundary_contract.py`
+  已跟到当前 `registerRuntimeHook / emitStateBusEvent / runtimeState` 真相。
+- fresh 证据：
+  - `node tools/check_state_write_allowlist.mjs` -> `State write allowlist passed with 32 tracked files.`
+  - `python -m unittest tests.test_state_write_guardrail_contract tests.test_toolbar_split_boundary_contract -q` 通过
+  - `python -m unittest tests.test_state_split_boundary_contract tests.test_runtime_hooks_boundary_contract tests.test_scenario_resources_boundary_contract tests.test_project_support_diagnostics_sidebar_boundary_contract tests.test_sidebar_split_boundary_contract tests.test_scenario_presentation_runtime_boundary_contract tests.test_strategic_overlay_sidebar_boundary_contract tests.test_water_special_region_sidebar_boundary_contract -q` 通过
+  - `node --test tests/scenario_lifecycle_runtime_behavior.test.mjs tests/strategic_overlay_runtime_owner_behavior.test.mjs tests/palette_runtime_bridge.node.test.mjs` 通过
+- 当前剩余：
+  - `scenario_shell_overlay_contract.spec.js` 与 `perf:gate` 仍需要一轮真实环境复核
+  - 生产 direct state write 压力仍主要集中在
+    - `js/core/interaction_funnel.js`
+    - `js/bootstrap/startup_data_pipeline.js`
+    - `js/core/scenario/startup_hydration.js`
+
+
+## 2026-04-22 autopilot 执行记录
+
+- environment gate 结果：
+  - `scenario_shell_overlay_contract.spec.js`
+    - 启动链真实代码回归已清掉，依次修了：
+      - `map_renderer -> context_layer_resolver` 参数名错传
+      - `toolbar/sidebar/startup_scenario_boot/scenario_apply_pipeline` owner wiring 错传
+      - `scenario_post_apply_effects.js` 残留裸 `state`
+      - `playwright-app.js` 的 same-scenario apply helper 过度短路
+    - 修完后：
+      - 手动脚本已跑通 `apply -> reset -> clear`
+      - full spec 仍表现为 Playwright runner 结构性挂起：日志长期停在 `Running 2 tests using 1 worker`，无 case 级输出
+      - 当前更像 runner/harness 结构问题，不再定性成业务代码回归
+    - 证据：
+      - `.runtime/tmp/autopilot_scenario_shell_overlay_20260422_171600.out.log`
+      - `.runtime/tmp/autopilot_scenario_shell_overlay_20260422_171600.err.log`
+  - `perf:gate`
+    - 复跑已通过
+    - 证据：
+      - `.runtime/tmp/autopilot_perf_gate_20260422_171054.out.log`
+      - `.runtime/tmp/autopilot_perf_gate_20260422_171054.err.log`
+- 三个 direct state write 大头推进结果：
+  - `interaction_funnel.js`：70 -> 29
+  - `startup_data_pipeline.js`：66 -> 0
+  - `startup_hydration.js`：49 -> 1
+- 当前 allowlist fresh 结果：
+  - `node tools/check_state_write_allowlist.mjs` -> `State write allowlist passed with 31 tracked files.`
+- fresh 定向验证：
+  - `tests/e2e/interaction_funnel_contract.spec.js`
+    - 3 条里 2 条 full run 通过
+    - 唯一红灯 `upload button dirty confirm and import path ...` 已用单测重跑通过
+    - 证据：
+      - `.runtime/tmp/autopilot_interaction_funnel_20260422_164507.out.log`
+      - `.runtime/tmp/autopilot_interaction_funnel_focus_20260422_165434.out.log`
+  - `tests/e2e/startup_bundle_recovery_contract.spec.js` -> 3 passed
+    - `.runtime/tmp/autopilot_startup_bundle_recovery_20260422_165720.out.log`
+  - `tests/e2e/tno_ready_state_contract.spec.js` -> 4 passed
+    - `.runtime/tmp/autopilot_tno_ready_state_20260422_170245.out.log`
+
+
+## 2026-04-22 autopilot 收尾补记
+
+- `interaction_funnel` 本轮新增：
+  - 导入路径的 annotation/style/workbench/dev transient reset 已收进 helper
+  - latest targeted e2e：
+    - `interaction_funnel_contract.spec.js` full run 里 2 条通过，剩余 1 条用 focused rerun 补绿
+    - 证据：
+      - `.runtime/tmp/autopilot_interaction_funnel_20260422_164507.out.log`
+      - `.runtime/tmp/autopilot_interaction_funnel_focus_20260422_165434.out.log`
+- `startup_data_pipeline` 本轮结果：
+  - direct root state write 清零
+  - stale allowlist entry 已移除
+- `startup_hydration` 本轮结果：
+  - direct root state write 压到 1 处（`showCityPoints = false`）
+  - `startup_bundle_recovery_contract.spec.js` 3 passed
+  - `tno_ready_state_contract.spec.js` 4 passed
+- scanner 本轮收尾补记：
+  - 已补 `state.foo ||= / ??= / +=` 等 dot-member compound write 识别
+  - `tests/test_state_write_guardrail_contract.py` 已跟到这组真源
+- shell gate 最新结论：
+  - `scenario_shell_overlay_contract.spec.js` 的业务代码问题已被逐个清掉
+  - 但 full-file Playwright runner 最新仍稳定卡在 header：
+    - `.runtime/tmp/autopilot_scenario_shell_overlay_20260422_174051.out.log`
+  - 同时单路径手动验证已跑通 `apply -> reset -> clear`
+  - 当前定性为：shared Playwright helper / full-file runner harness follow-up
+- validation lane 结果：
+  - security review：通过
+  - architect review：代码面通过，shell gate 单列 follow-up
+  - code review：代码层 COMMENT 放行，full shell gate 仍未闭环

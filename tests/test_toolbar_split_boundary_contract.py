@@ -190,22 +190,27 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_special_zone_persistence_contract_stays_stable(self):
         file_manager = FILE_MANAGER_JS.read_text(encoding="utf-8")
         interaction_funnel = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
+        ui_state = (REPO_ROOT / "js" / "core" / "state" / "ui_state.js").read_text(encoding="utf-8")
 
         self.assertIn("specialZones: appState.specialZones || {}", file_manager)
         self.assertIn('manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] }', file_manager)
         self.assertIn("specialZones: appState.styleConfig?.specialZones || null", file_manager)
         self.assertIn("state.specialZones = data.specialZones || {}", interaction_funnel)
         self.assertIn("state.manualSpecialZones =", interaction_funnel)
-        self.assertIn("state.styleConfig.specialZones = {", interaction_funnel)
+        self.assertIn("restoreImportedStyleConfigState(state, data.styleConfig);", interaction_funnel)
+        self.assertIn("specialZones: imported.specialZones && typeof imported.specialZones === \"object\"", ui_state)
 
     def test_export_workbench_persistence_contract_stays_stable(self):
         file_manager = FILE_MANAGER_JS.read_text(encoding="utf-8")
         interaction_funnel = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
+        ui_state = (REPO_ROOT / "js" / "core" / "state" / "ui_state.js").read_text(encoding="utf-8")
 
         self.assertIn("exportWorkbenchUi: normalizeExportWorkbenchUiState(appState.exportWorkbenchUi)", file_manager)
         self.assertIn("data.exportWorkbenchUi = normalizeExportWorkbenchUiState(data.exportWorkbenchUi);", file_manager)
-        self.assertIn("state.exportWorkbenchUi = normalizeExportWorkbenchUiState({", interaction_funnel)
-        self.assertIn("...(data.exportWorkbenchUi.visibility || data.exportWorkbenchUi.layerVisibility || {})", interaction_funnel)
+        self.assertIn("restoreImportedWorkbenchUiState(state, data, {", interaction_funnel)
+        self.assertIn("normalizeExportWorkbenchState = normalizeExportWorkbenchUiState", ui_state)
+        self.assertIn("importedState.exportWorkbenchUi.visibility", ui_state)
+        self.assertIn("importedState.exportWorkbenchUi.layerVisibility", ui_state)
 
     def test_transport_workbench_owner_moves_to_controller_module(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
@@ -258,6 +263,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
     def test_toolbar_keeps_appearance_facade_and_state_registration_contract(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
+        self.assertIn("runtimeState: state,", content)
         self.assertIn('registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);', content)
         self.assertIn('registerRuntimeHook(state, "updateRecentUI", () => {', content)
         self.assertIn('registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);', content)

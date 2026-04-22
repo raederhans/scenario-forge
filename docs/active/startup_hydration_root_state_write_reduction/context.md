@@ -1,0 +1,28 @@
+# Context Log
+
+- 2026-04-22: Task started. Read root lessons file and scoped files.
+- Current direct write hotspots in `startup_hydration.js`:
+  - runtime topology + version tag hydrate block around lines 252-263
+  - optional layer / catalog / audit hydrate block around lines 265-322
+  - readonly release repeated in three health-gate branches around lines 510-624
+  - hydration gate object writes around lines 472, 526, 547, 637
+  - overlay fallback reset around lines 600-605
+- Initial direct write snapshot from `rg -nP "state\.[A-Za-z0-9_]+\s*=(?!=)" js/core/scenario/startup_hydration.js` on HEAD:
+  - 49 matched direct writes
+- Implemented owner helpers:
+  - `boot_state.js`: readonly reason match + scoped clear helpers
+  - `scenario_runtime_state.js`: topology hydrate, optional layer hydrate, hydration gate commit, overlay reset
+  - `state_catalog.js`: scenario releasable catalog hydrate, scenario audit setter
+- Result snapshot from the same strict scan after the change:
+  - 1 matched direct write (`state.showCityPoints = false`)
+- Cluster reduction summary:
+  - runtime topology + optional layers: removed from `startup_hydration.js`
+  - readonly reset cluster: removed from `startup_hydration.js`
+  - hydration gate object writes: removed from `startup_hydration.js`
+  - overlay fallback reset: removed from `startup_hydration.js`
+  - scenario catalog + audit hydrate: removed from `startup_hydration.js`
+- Static verification:
+  - `lsp_diagnostics` on all four modified code files: 0 errors
+  - `node --check` on all four modified code files: pass
+  - `npm run verify:state-write-allowlist`: pass
+- Lessons file already contains nearby state-write ownership guidance; no new major lesson was added in this pass.

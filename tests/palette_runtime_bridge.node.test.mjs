@@ -112,26 +112,26 @@ test("buildScenarioRuntimeDefaultTagColors pushes canonical bridge colors into s
 });
 
 test("color state accessors replace colors, patch individual entries, and bump revision", () => {
-  const state = createDefaultColorState();
+  const colorRuntimeState = createDefaultColorState();
 
-  replaceResolvedColorsState(state, {
+  replaceResolvedColorsState(colorRuntimeState, {
     A: "#112233",
   });
-  assert.deepEqual(state.colors, {
+  assert.deepEqual(colorRuntimeState.colors, {
     A: "#112233",
   });
-  assert.equal(state.colorRevision, undefined);
+  assert.equal(colorRuntimeState.colorRevision, undefined);
 
-  const applied = setResolvedColorForFeature(state, "B", "#445566");
+  const applied = setResolvedColorForFeature(colorRuntimeState, "B", "#445566");
   assert.equal(applied, true);
-  assert.equal(state.colors.B, "#445566");
+  assert.equal(colorRuntimeState.colors.B, "#445566");
 
-  const deleted = setResolvedColorForFeature(state, "A", null);
+  const deleted = setResolvedColorForFeature(colorRuntimeState, "A", null);
   assert.equal(deleted, false);
-  assert.equal("A" in state.colors, false);
+  assert.equal("A" in colorRuntimeState.colors, false);
 
-  assert.equal(bumpColorRevision(state), 1);
-  assert.equal(state.colorRevision, 1);
+  assert.equal(bumpColorRevision(colorRuntimeState), 1);
+  assert.equal(colorRuntimeState.colorRevision, 1);
 
   const sparseState = {};
   assert.equal(setResolvedColorForFeature(sparseState, "C", "#778899"), true);
@@ -139,15 +139,15 @@ test("color state accessors replace colors, patch individual entries, and bump r
 });
 
 test("color state accessor sanitizes water and special overrides through injected mapper", () => {
-  const state = createDefaultColorState();
-  state.waterRegionOverrides = {
+  const colorRuntimeState = createDefaultColorState();
+  colorRuntimeState.waterRegionOverrides = {
     ocean: "#ABCDEF",
   };
-  state.specialRegionOverrides = {
+  colorRuntimeState.specialRegionOverrides = {
     inland: "#123456",
   };
 
-  const next = sanitizeRegionOverrideColors(state, {
+  const next = sanitizeRegionOverrideColors(colorRuntimeState, {
     sanitizeColorMap(value) {
       const entries = Object.entries(value || {}).map(([key, color]) => [
         key,
@@ -161,17 +161,17 @@ test("color state accessor sanitizes water and special overrides through injecte
     waterRegionOverrides: { ocean: "#abcdef" },
     specialRegionOverrides: { inland: "#123456" },
   });
-  assert.deepEqual(state.waterRegionOverrides, { ocean: "#abcdef" });
-  assert.deepEqual(state.specialRegionOverrides, { inland: "#123456" });
+  assert.deepEqual(colorRuntimeState.waterRegionOverrides, { ocean: "#abcdef" });
+  assert.deepEqual(colorRuntimeState.specialRegionOverrides, { inland: "#123456" });
 });
 
 test("normalizeColorStateForRender sanitizes mirrors and resolved colors together", () => {
-  const state = createDefaultColorState();
-  state.sovereignBaseColors = { AAA: "#AABBCC" };
-  state.visualOverrides = { feature_1: "#DDEEFF" };
-  state.colors = { feature_2: "#ABCDEF" };
+  const colorRuntimeState = createDefaultColorState();
+  colorRuntimeState.sovereignBaseColors = { AAA: "#AABBCC" };
+  colorRuntimeState.visualOverrides = { feature_1: "#DDEEFF" };
+  colorRuntimeState.colors = { feature_2: "#ABCDEF" };
 
-  normalizeColorStateForRender(state, {
+  normalizeColorStateForRender(colorRuntimeState, {
     sanitizeColorMap(value) {
       return Object.fromEntries(
         Object.entries(value || {}).map(([key, color]) => [key, String(color || "").toLowerCase()]),
@@ -184,7 +184,7 @@ test("normalizeColorStateForRender sanitizes mirrors and resolved colors togethe
     },
   });
 
-  assert.deepEqual(state.countryBaseColors, { AAA: "#aabbcc" });
-  assert.deepEqual(state.featureOverrides, { feature_1: "#ddeeff" });
-  assert.deepEqual(state.colors, { feature_2: "#abcdef" });
+  assert.deepEqual(colorRuntimeState.countryBaseColors, { AAA: "#aabbcc" });
+  assert.deepEqual(colorRuntimeState.featureOverrides, { feature_1: "#ddeeff" });
+  assert.deepEqual(colorRuntimeState.colors, { feature_2: "#abcdef" });
 });

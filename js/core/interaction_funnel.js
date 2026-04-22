@@ -16,16 +16,11 @@ import {
   normalizeFeatureOwnershipMap,
 } from "./sovereignty_manager.js";
 import {
-  normalizeAnnotationView,
-  normalizeCityLayerStyleConfig,
-  normalizeDayNightStyleConfig,
-  normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
-  normalizePhysicalStyleConfig,
-  normalizeTransportOverviewStyleConfig,
-  normalizeUrbanStyleConfig,
-  normalizeExportWorkbenchUiState,
-  normalizeTransportWorkbenchUiState,
+  restoreImportedAnnotationOverlayState,
+  restoreImportedLayerVisibilityState,
+  restoreImportedStyleConfigState,
+  restoreImportedWorkbenchUiState,
   state,
 } from "./state.js";
 import {
@@ -34,12 +29,9 @@ import {
   emitStateBusEvent,
 } from "./state/index.js";
 import {
-  createDefaultOperationGraphicsEditorState,
-  createDefaultOperationalLineEditorState,
-  createDefaultSpecialZoneEditorState,
-  createDefaultStrategicOverlayUiState,
-  createDefaultUnitCounterEditorState,
+  resetStrategicOverlayEditorState,
 } from "./state/strategic_overlay_state.js";
+import { resetDevTransientImportState } from "./state/dev_state.js";
 
 let mapClickImpl = null;
 let mapDoubleClickImpl = null;
@@ -390,43 +382,18 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   }
   state.dynamicBordersDirty = !!data.dynamicBordersDirty;
   state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
-  state.devHoverHit = null;
-  state.devSelectedHit = null;
-  state.devSelectionFeatureIds = new Set();
-  state.devSelectionOrder = [];
-  state.devClipboardFallbackText = "";
-  state.devClipboardPreviewFormat = "names_with_ids";
+  resetDevTransientImportState(state, { previewFormat: "names_with_ids" });
   ensureSovereigntyState({ force: true });
-  state.specialZoneEditor = createDefaultSpecialZoneEditorState();
-  state.annotationView = normalizeAnnotationView({
-    ...(state.annotationView || {}),
-    ...(data.annotationView || {}),
+  const importedOverlayState = restoreImportedAnnotationOverlayState(state, data, {
+    cloneValue: cloneImportedProjectValue,
   });
-  state.operationalLines = Array.isArray(data.operationalLines)
-    ? cloneImportedProjectValue(data.operationalLines)
-    : [];
-  state.operationGraphics = Array.isArray(data.operationGraphics)
-    ? cloneImportedProjectValue(data.operationGraphics)
-    : [];
-  state.unitCounters = Array.isArray(data.unitCounters)
-    ? cloneImportedProjectValue(data.unitCounters)
-    : [];
-  state.operationalLineEditor = createDefaultOperationalLineEditorState();
-  state.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();
-  state.unitCounterEditor = createDefaultUnitCounterEditorState({
-    renderer: state.annotationView?.unitRendererDefault || "game",
+  resetStrategicOverlayEditorState(state, {
+    unitCounterRenderer: importedOverlayState?.annotationView?.unitRendererDefault || "game",
   });
-  state.strategicOverlayUi = createDefaultStrategicOverlayUiState();
   hooks.invalidateFrontlineOverlayState?.();
-  state.operationalLinesDirty = true;
-  state.operationGraphicsDirty = true;
-  state.unitCountersDirty = true;
-  state.transportWorkbenchUi = data.transportWorkbenchUi
-    ? cloneImportedProjectValue(data.transportWorkbenchUi)
-    : cloneImportedProjectValue(state.transportWorkbenchUi);
-  state.exportWorkbenchUi = data.exportWorkbenchUi
-    ? cloneImportedProjectValue(data.exportWorkbenchUi)
-    : cloneImportedProjectValue(state.exportWorkbenchUi);
+  restoreImportedWorkbenchUiState(state, data, {
+    cloneValue: cloneImportedProjectValue,
+  });
   state.specialZones = data.specialZones || {};
   state.parentBordersVisible = data.parentBordersVisible !== false;
   state.manualSpecialZones =
@@ -445,197 +412,8 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     normalizedParentEnabled[countryCode] = !!importedParentEnabled[countryCode];
   });
   state.parentBorderEnabledByCountry = normalizedParentEnabled;
-  state.styleConfig.internalBorders = {
-    color: "#cccccc",
-    colorMode: "auto",
-    opacity: 1,
-    width: 0.5,
-  };
-  state.styleConfig.empireBorders = {
-    color: "#666666",
-    width: 1,
-  };
-  state.styleConfig.coastlines = {
-    color: "#333333",
-    width: 1.2,
-  };
-  if (data.styleConfig?.internalBorders && typeof data.styleConfig.internalBorders === "object") {
-    state.styleConfig.internalBorders = {
-      ...(state.styleConfig.internalBorders || {}),
-      ...data.styleConfig.internalBorders,
-    };
-  }
-  if (data.styleConfig?.empireBorders && typeof data.styleConfig.empireBorders === "object") {
-    state.styleConfig.empireBorders = {
-      ...(state.styleConfig.empireBorders || {}),
-      ...data.styleConfig.empireBorders,
-    };
-  }
-  if (data.styleConfig?.coastlines && typeof data.styleConfig.coastlines === "object") {
-    state.styleConfig.coastlines = {
-      ...(state.styleConfig.coastlines || {}),
-      ...data.styleConfig.coastlines,
-    };
-  }
-  if (data.styleConfig?.parentBorders && typeof data.styleConfig.parentBorders === "object") {
-    state.styleConfig.parentBorders = {
-      ...(state.styleConfig.parentBorders || {}),
-      ...data.styleConfig.parentBorders,
-    };
-  }
-  if (data.styleConfig?.ocean && typeof data.styleConfig.ocean === "object") {
-    state.styleConfig.ocean = {
-      ...(state.styleConfig.ocean || {}),
-      ...data.styleConfig.ocean,
-    };
-  }
-  state.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig?.lakes);
-  if (data.styleConfig?.cityPoints && typeof data.styleConfig.cityPoints === "object") {
-    state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
-      ...(state.styleConfig.cityPoints || {}),
-      ...data.styleConfig.cityPoints,
-    });
-  }
-  if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
-    state.styleConfig.urban = normalizeUrbanStyleConfig({
-      ...(state.styleConfig.urban || {}),
-      ...data.styleConfig.urban,
-    });
-  }
-  if (data.styleConfig?.physical && typeof data.styleConfig.physical === "object") {
-    state.styleConfig.physical = normalizePhysicalStyleConfig({
-      ...(state.styleConfig.physical || {}),
-      ...data.styleConfig.physical,
-    });
-  }
-  if (data.styleConfig?.transportOverview && typeof data.styleConfig.transportOverview === "object") {
-    state.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig({
-      ...(state.styleConfig.transportOverview || {}),
-      ...data.styleConfig.transportOverview,
-    });
-  }
-  if (data.styleConfig?.rivers && typeof data.styleConfig.rivers === "object") {
-    state.styleConfig.rivers = {
-      ...(state.styleConfig.rivers || {}),
-      ...data.styleConfig.rivers,
-    };
-  }
-  if (data.styleConfig?.specialZones && typeof data.styleConfig.specialZones === "object") {
-    state.styleConfig.specialZones = {
-      ...(state.styleConfig.specialZones || {}),
-      ...data.styleConfig.specialZones,
-    };
-  }
-  if (data.styleConfig?.texture && typeof data.styleConfig.texture === "object") {
-    state.styleConfig.texture = {
-      ...(state.styleConfig.texture || {}),
-      ...data.styleConfig.texture,
-      paper: {
-        ...(state.styleConfig.texture?.paper || {}),
-        ...(data.styleConfig.texture.paper || {}),
-      },
-      graticule: {
-        ...(state.styleConfig.texture?.graticule || {}),
-        ...(data.styleConfig.texture.graticule || {}),
-      },
-      draftGrid: {
-        ...(state.styleConfig.texture?.draftGrid || {}),
-        ...(data.styleConfig.texture.draftGrid || {}),
-      },
-    };
-  }
-  if (data.styleConfig?.dayNight && typeof data.styleConfig.dayNight === "object") {
-    state.styleConfig.dayNight = normalizeDayNightStyleConfig({
-      ...(state.styleConfig.dayNight || {}),
-      ...data.styleConfig.dayNight,
-    });
-  }
-  if (data.layerVisibility && typeof data.layerVisibility === "object") {
-    state.showWaterRegions =
-      data.layerVisibility.showWaterRegions === undefined
-        ? true
-        : !!data.layerVisibility.showWaterRegions;
-    state.allowOpenOceanSelect =
-      data.layerVisibility.allowOpenOceanSelect === undefined
-        ? (data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions)
-        : !!data.layerVisibility.allowOpenOceanSelect;
-    state.allowOpenOceanPaint =
-      data.layerVisibility.allowOpenOceanPaint === undefined
-        ? (data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions)
-        : !!data.layerVisibility.allowOpenOceanPaint;
-    state.showOpenOceanRegions = !!(state.allowOpenOceanSelect || state.allowOpenOceanPaint);
-    state.showScenarioSpecialRegions =
-      data.layerVisibility.showScenarioSpecialRegions === undefined
-        ? true
-        : !!data.layerVisibility.showScenarioSpecialRegions;
-    state.showScenarioReliefOverlays =
-      data.layerVisibility.showScenarioReliefOverlays === undefined
-        ? true
-        : !!data.layerVisibility.showScenarioReliefOverlays;
-    state.showCityPoints =
-      data.layerVisibility.showCityPoints === undefined
-        ? true
-        : !!data.layerVisibility.showCityPoints;
-    state.showUrban = !!data.layerVisibility.showUrban;
-    state.showPhysical = !!data.layerVisibility.showPhysical;
-    state.showRivers = !!data.layerVisibility.showRivers;
-    state.showTransport =
-      data.layerVisibility.showTransport === undefined
-        ? true
-        : !!data.layerVisibility.showTransport;
-    state.showAirports = !!data.layerVisibility.showAirports;
-    state.showPorts = !!data.layerVisibility.showPorts;
-    state.showRail = !!data.layerVisibility.showRail;
-    state.showSpecialZones =
-      data.layerVisibility.showSpecialZones === undefined
-        ? false
-        : !!data.layerVisibility.showSpecialZones;
-  }
-  state.recentColors = Array.isArray(data.recentColors) ? [...data.recentColors] : [];
-  state.interactionGranularity = data.interactionGranularity || "subdivision";
-  state.batchFillScope = data.batchFillScope || "parent";
-  state.referenceImageState = {
-    ...(state.referenceImageState || {}),
-    ...(data.referenceImageState || {}),
-  };
-  if (data.transportWorkbenchUi && typeof data.transportWorkbenchUi === "object") {
-    const normalizedTransportWorkbenchUi = normalizeTransportWorkbenchUiState({
-      ...(state.transportWorkbenchUi || {}),
-      ...data.transportWorkbenchUi,
-      familyConfigs: {
-        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.familyConfigs) || {}),
-        ...(data.transportWorkbenchUi.familyConfigs || {}),
-      },
-      displayConfigs: {
-        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.displayConfigs) || {}),
-        ...(data.transportWorkbenchUi.displayConfigs || {}),
-      },
-      sectionOpen: {
-        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.sectionOpen) || {}),
-        ...(data.transportWorkbenchUi.sectionOpen || {}),
-      },
-    });
-    state.transportWorkbenchUi = {
-      ...(state.transportWorkbenchUi || {}),
-      ...normalizedTransportWorkbenchUi,
-      familyConfigs: normalizedTransportWorkbenchUi.familyConfigs,
-      displayConfigs: normalizedTransportWorkbenchUi.displayConfigs,
-      sectionOpen: normalizedTransportWorkbenchUi.sectionOpen,
-    };
-  }
-  if (data.exportWorkbenchUi && typeof data.exportWorkbenchUi === "object") {
-    state.exportWorkbenchUi = normalizeExportWorkbenchUiState({
-      ...(state.exportWorkbenchUi || {}),
-      ...data.exportWorkbenchUi,
-      visibility: {
-        ...((state.exportWorkbenchUi && state.exportWorkbenchUi.visibility) || {}),
-        ...(data.exportWorkbenchUi.visibility || data.exportWorkbenchUi.layerVisibility || {}),
-      },
-      bakeArtifacts: Array.isArray(data.exportWorkbenchUi.bakeArtifacts)
-        ? data.exportWorkbenchUi.bakeArtifacts
-        : (state.exportWorkbenchUi?.bakeArtifacts || []),
-    });
-  }
+  restoreImportedStyleConfigState(state, data.styleConfig);
+  restoreImportedLayerVisibilityState(state, data.layerVisibility);
   state.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
   debugState.importPhase = "state-restored";

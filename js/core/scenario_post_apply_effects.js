@@ -125,7 +125,7 @@ function scheduleScenarioDetailChunkPrewarm({
         });
       } catch (error) {
         console.warn(`[scenario] Detail chunk prewarm failed for "${scenarioId}".`, error);
-        if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+        if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
           return;
         }
         updateChunkedFirstFramePrewarmMetric({
@@ -158,7 +158,7 @@ async function ensureChunkedScenarioFirstFrameReady({
     synchronous: normalizedMode === "sync",
     prewarmStartedAt,
   }, { replace: true });
-  if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+  if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
     return;
   }
   let prewarmCompletedAt = 0;
@@ -167,7 +167,7 @@ async function ensureChunkedScenarioFirstFrameReady({
     if (synchronous) {
       await preloadScenarioFocusCountryPoliticalDetailChunk(bundle);
     }
-    if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+    if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
       return;
     }
     prewarmCompletedAt = Date.now();
@@ -180,7 +180,7 @@ async function ensureChunkedScenarioFirstFrameReady({
     });
   } catch (error) {
     console.warn(`[scenario] Coarse chunk prewarm failed for "${scenarioId}".`, error);
-    if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+    if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
       return;
     }
     updateChunkedFirstFramePrewarmMetric({
@@ -193,7 +193,7 @@ async function ensureChunkedScenarioFirstFrameReady({
       prewarmFailure: String(error?.message || error || "Unknown prewarm error"),
     });
   } finally {
-    if (normalizedScenarioId && normalizedScenarioId !== String(state.activeScenarioId || "").trim()) {
+    if (normalizedScenarioId && normalizedScenarioId !== String(runtimeState.activeScenarioId || "").trim()) {
       return;
     }
     const refreshScheduledAt = Date.now();
@@ -255,7 +255,7 @@ async function runPostScenarioApplyEffects({
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   if (scenarioSupportsChunkedRuntime(bundle)) {
     await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
-  } else if (!state.bootBlocking) {
+  } else if (!runtimeState.bootBlocking) {
     await ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
       .catch((error) => {
         console.warn(`[scenario] Optional layer visibility sync failed for "${scenarioId}".`, error);

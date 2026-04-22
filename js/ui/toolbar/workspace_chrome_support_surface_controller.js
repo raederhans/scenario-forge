@@ -2,6 +2,8 @@
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
 // toolbar.js 继续保留 export workbench facade、special zone facade、drawer 切换和更高层的页面编排。
 
+import { setActiveDockPopoverState } from "../../core/state/index.js";
+
 export function createWorkspaceChromeSupportSurfaceController({
   state,
   getSupportSurfaceViewFromUrl = () => "",
@@ -121,7 +123,7 @@ export function createWorkspaceChromeSupportSurfaceController({
     const activeKind = String(state.activeDockPopover || "");
     const activePopover = getDockPopoverByKind(activeKind);
     const activeTrigger = getDockPopoverTrigger(activeKind);
-    state.activeDockPopover = "";
+    setActiveDockPopoverState(state, "");
     dockReferencePopover?.classList.add("hidden");
     dockEditPopover?.classList.add("hidden");
     dockQuickFillRow?.classList.add("hidden");
@@ -153,7 +155,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
     }
     closeExportWorkbench?.({ restoreFocus: false });
-    state.activeDockPopover = nextKind;
+    setActiveDockPopoverState(state, nextKind);
     rememberOverlayTrigger?.(target, trigger);
     target.classList.remove("hidden");
     target.setAttribute("aria-hidden", "false");

@@ -8,7 +8,7 @@ test("operation graphic runtime owner commits history and dirty state on finish"
   const dirtyReasons = [];
   let uiRefreshCount = 0;
   let renderCount = 0;
-  const state = {
+  const runtimeState = {
     operationGraphics: [],
     operationGraphicsDirty: false,
     operationGraphicsEditor: {
@@ -27,7 +27,7 @@ test("operation graphic runtime owner commits history and dirty state on finish"
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       captureHistoryState: (payload) => ({ snapshot: payload }),
       commitHistoryEntry: (entry) => historyEntries.push(entry),
@@ -49,10 +49,10 @@ test("operation graphic runtime owner commits history and dirty state on finish"
   });
 
   assert.equal(owner.finishOperationGraphicDraw(), true);
-  assert.equal(state.operationGraphics.length, 1);
-  assert.equal(state.operationGraphics[0].id, "opg_2");
-  assert.equal(state.operationGraphicsEditor.selectedId, "opg_2");
-  assert.equal(state.operationGraphicsEditor.mode, "edit");
+  assert.equal(runtimeState.operationGraphics.length, 1);
+  assert.equal(runtimeState.operationGraphics[0].id, "opg_2");
+  assert.equal(runtimeState.operationGraphicsEditor.selectedId, "opg_2");
+  assert.equal(runtimeState.operationGraphicsEditor.mode, "edit");
   assert.equal(historyEntries[0].kind, "finish-operation-graphic");
   assert.deepEqual(dirtyReasons, ["finish-operation-graphic"]);
   assert.equal(uiRefreshCount, 1);
@@ -61,7 +61,7 @@ test("operation graphic runtime owner commits history and dirty state on finish"
 
 test("operation graphic runtime owner keeps warning path for invalid closed-style switch", () => {
   const toasts = [];
-  const state = {
+  const runtimeState = {
     operationGraphics: [{
       id: "opg_1",
       kind: "front",
@@ -89,10 +89,10 @@ test("operation graphic runtime owner keeps warning path for invalid closed-styl
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       ensureOperationGraphicsEditorState: () => {},
-      getOperationGraphicById: () => state.operationGraphics[0],
+      getOperationGraphicById: () => runtimeState.operationGraphics[0],
       getOperationGraphicMinPoints: (kind) => (kind === "encirclement" ? 3 : 2),
       showToast: (message, options) => toasts.push({ message, options }),
       t: (key) => key,
@@ -100,7 +100,7 @@ test("operation graphic runtime owner keeps warning path for invalid closed-styl
   });
 
   assert.equal(owner.updateSelectedOperationGraphic({ kind: "encirclement" }), false);
-  assert.equal(state.operationGraphics[0].kind, "front");
+  assert.equal(runtimeState.operationGraphics[0].kind, "front");
   assert.equal(toasts.length, 1);
   assert.equal(toasts[0].options.title, "More points required");
 });
@@ -108,7 +108,7 @@ test("operation graphic runtime owner keeps warning path for invalid closed-styl
 test("special zone runtime owner creates manual feature and preserves isolated semantics", () => {
   let uiRefreshCount = 0;
   let renderCount = 0;
-  const state = {
+  const runtimeState = {
     manualSpecialZones: { type: "FeatureCollection", features: [] },
     specialZonesOverlayDirty: false,
     specialZoneEditor: {
@@ -122,7 +122,7 @@ test("special zone runtime owner creates manual feature and preserves isolated s
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       ensureManualSpecialZoneCounter: () => {},
       ensureSpecialZoneEditorState: () => {},
@@ -136,10 +136,10 @@ test("special zone runtime owner creates manual feature and preserves isolated s
   });
 
   assert.equal(owner.finishSpecialZoneDraw(), true);
-  assert.equal(state.manualSpecialZones.features.length, 1);
-  assert.equal(state.manualSpecialZones.features[0].properties.id, "manual_sz_1");
-  assert.equal(state.specialZoneEditor.selectedId, "manual_sz_1");
-  assert.equal(state.specialZoneEditor.active, false);
+  assert.equal(runtimeState.manualSpecialZones.features.length, 1);
+  assert.equal(runtimeState.manualSpecialZones.features[0].properties.id, "manual_sz_1");
+  assert.equal(runtimeState.specialZoneEditor.selectedId, "manual_sz_1");
+  assert.equal(runtimeState.specialZoneEditor.active, false);
   assert.equal(uiRefreshCount, 1);
   assert.equal(renderCount, 1);
 });
@@ -149,7 +149,7 @@ test("operational line runtime owner commits history and updates modal selection
   const dirtyReasons = [];
   let uiRefreshCount = 0;
   let renderCount = 0;
-  const state = {
+  const runtimeState = {
     operationGraphicsEditor: {
       selectedId: "opg_selected",
     },
@@ -172,7 +172,7 @@ test("operational line runtime owner commits history and updates modal selection
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       captureHistoryState: (payload) => ({ snapshot: payload }),
       commitHistoryEntry: (entry) => historyEntries.push(entry),
@@ -194,10 +194,10 @@ test("operational line runtime owner commits history and updates modal selection
   });
 
   assert.equal(owner.finishOperationalLineDraw(), true);
-  assert.equal(state.operationalLines.length, 1);
-  assert.equal(state.operationalLines[0].id, "opl_3");
-  assert.equal(state.operationalLineEditor.selectedId, "opl_3");
-  assert.equal(state.strategicOverlayUi.modalEntityId, "opl_3");
+  assert.equal(runtimeState.operationalLines.length, 1);
+  assert.equal(runtimeState.operationalLines[0].id, "opl_3");
+  assert.equal(runtimeState.operationalLineEditor.selectedId, "opl_3");
+  assert.equal(runtimeState.strategicOverlayUi.modalEntityId, "opl_3");
   assert.equal(historyEntries[0].kind, "create-operational-line");
   assert.deepEqual(dirtyReasons, ["create-operational-line"]);
   assert.equal(uiRefreshCount, 1);
@@ -205,7 +205,7 @@ test("operational line runtime owner commits history and updates modal selection
 });
 
 test("unit counter nation resolution keeps controller fallback source semantics", () => {
-  const state = {
+  const runtimeState = {
     activeSovereignCode: "FRA",
     landIndex: new Map([["feature-1", { id: "feature-1" }]]),
     scenarioControllersByFeatureId: { "feature-1": "" },
@@ -213,7 +213,7 @@ test("unit counter nation resolution keeps controller fallback source semantics"
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       canonicalCountryCode: (value) => String(value || "").trim().toUpperCase(),
       getDisplayOwnerCode: () => "",
@@ -237,7 +237,7 @@ test("unit counter runtime owner placement syncs line attachments and history", 
   const dirtyReasons = [];
   let uiRefreshCount = 0;
   let renderCount = 0;
-  const state = {
+  const runtimeState = {
     HIT_SNAP_RADIUS_CLICK_PX: 10,
     annotationView: {
       unitRendererDefault: "game",
@@ -276,7 +276,7 @@ test("unit counter runtime owner placement syncs line attachments and history", 
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     constants: {
       defaultUnitCounterMilstdSidc: "130310001412110000000000000000",
     },
@@ -310,10 +310,10 @@ test("unit counter runtime owner placement syncs line attachments and history", 
   });
 
   assert.equal(owner.placeUnitCounterFromEvent({ type: "click" }), true);
-  assert.equal(state.unitCounters.length, 1);
-  assert.equal(state.unitCounters[0].attachment.lineId, "opl_1");
-  assert.equal(state.unitCounters[0].layoutAnchor.kind, "attachment");
-  assert.deepEqual(state.operationalLines[0].attachedCounterIds, ["unit_1"]);
+  assert.equal(runtimeState.unitCounters.length, 1);
+  assert.equal(runtimeState.unitCounters[0].attachment.lineId, "opl_1");
+  assert.equal(runtimeState.unitCounters[0].layoutAnchor.kind, "attachment");
+  assert.deepEqual(runtimeState.operationalLines[0].attachedCounterIds, ["unit_1"]);
   assert.equal(historyEntries[0].kind, "place-unit-counter");
   assert.deepEqual(dirtyReasons, ["place-unit-counter"]);
   assert.equal(uiRefreshCount, 1);
@@ -322,14 +322,14 @@ test("unit counter runtime owner placement syncs line attachments and history", 
 
 test("unit counter preview seeds editor defaults before reading preview data", () => {
   let ensureCount = 0;
-  const state = {};
+  const runtimeState = {};
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       ensureUnitCounterEditorState: () => {
         ensureCount += 1;
-        state.unitCounterEditor = {
+        runtimeState.unitCounterEditor = {
           renderer: "game",
           sidc: "",
           symbolCode: "",
@@ -355,13 +355,13 @@ test("unit counter preview seeds editor defaults before reading preview data", (
 
   const preview = owner.getUnitCounterPreviewData();
   assert.equal(ensureCount, 1);
-  assert.equal(state.unitCounterEditor.presetId, "inf");
+  assert.equal(runtimeState.unitCounterEditor.presetId, "inf");
   assert.equal(preview.renderer, "game");
   assert.equal(preview.organizationPct, 78);
 });
 
 test("cancel active strategic modes unwinds unit counter, line, and graphics editors", () => {
-  const state = {
+  const runtimeState = {
     operationGraphicsEditor: {
       active: true,
       mode: "draw",
@@ -386,29 +386,29 @@ test("cancel active strategic modes unwinds unit counter, line, and graphics edi
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       ensureOperationGraphicsEditorState: () => {},
       ensureOperationalLineEditorState: () => {},
       ensureUnitCounterEditorState: () => {},
       resetUnitCounterEditorState: () => {
-        state.unitCounterEditor.active = false;
+        runtimeState.unitCounterEditor.active = false;
       },
       updateStrategicOverlayUi: () => {},
     },
   });
 
   assert.equal(owner.cancelActiveStrategicInteractionModes(), true);
-  assert.equal(state.unitCounterEditor.active, false);
-  assert.equal(state.operationalLineEditor.active, false);
-  assert.equal(state.operationGraphicsEditor.active, false);
-  assert.equal(state.strategicOverlayUi.activeMode, "idle");
+  assert.equal(runtimeState.unitCounterEditor.active, false);
+  assert.equal(runtimeState.operationalLineEditor.active, false);
+  assert.equal(runtimeState.operationGraphicsEditor.active, false);
+  assert.equal(runtimeState.strategicOverlayUi.activeMode, "idle");
 });
 
 test("cancel unit counter placement restores prior selection and clears active placement mode", () => {
   let uiRefreshCount = 0;
   let renderCount = 0;
-  const state = {
+  const runtimeState = {
     unitCounters: [{
       id: "unit_existing_1",
       renderer: "game",
@@ -434,10 +434,10 @@ test("cancel unit counter placement restores prior selection and clears active p
   };
 
   const owner = createStrategicOverlayRuntimeOwner({
-    state,
+    state: runtimeState,
     helpers: {
       assignUnitCounterEditorFromCounter: (counter) => {
-        state.unitCounterEditor.label = String(counter.label || "");
+        runtimeState.unitCounterEditor.label = String(counter.label || "");
       },
       ensureUnitCounterEditorState: () => {},
       renderNow: () => {
@@ -450,10 +450,10 @@ test("cancel unit counter placement restores prior selection and clears active p
   });
 
   owner.cancelUnitCounterPlacement();
-  assert.equal(state.unitCounterEditor.active, false);
-  assert.equal(state.unitCounterEditor.selectedId, "unit_existing_1");
-  assert.equal(state.unitCounterEditor.returnSelectionId, null);
-  assert.equal(state.unitCounterEditor.label, "Existing Counter");
+  assert.equal(runtimeState.unitCounterEditor.active, false);
+  assert.equal(runtimeState.unitCounterEditor.selectedId, "unit_existing_1");
+  assert.equal(runtimeState.unitCounterEditor.returnSelectionId, null);
+  assert.equal(runtimeState.unitCounterEditor.label, "Existing Counter");
   assert.equal(uiRefreshCount, 1);
   assert.equal(renderCount, 1);
 });

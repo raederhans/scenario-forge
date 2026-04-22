@@ -6,6 +6,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STATE_CATALOG_JS = REPO_ROOT / "js" / "core" / "state_catalog.js"
 SCENARIO_UI_SYNC_JS = REPO_ROOT / "js" / "core" / "scenario_ui_sync.js"
 SCENARIO_MANAGER_JS = REPO_ROOT / "js" / "core" / "scenario_manager.js"
+SCENARIO_LIFECYCLE_RUNTIME_JS = REPO_ROOT / "js" / "core" / "scenario" / "lifecycle_runtime.js"
 
 
 class StateCatalogBoundaryContractTest(unittest.TestCase):
@@ -13,13 +14,15 @@ class StateCatalogBoundaryContractTest(unittest.TestCase):
         content = SCENARIO_UI_SYNC_JS.read_text(encoding="utf-8")
 
         self.assertIn("createDefaultScenarioAuditUiState", content)
-        self.assertIn("state.scenarioAuditUi = createDefaultScenarioAuditUiState();", content)
+        self.assertIn("runtimeState.scenarioAuditUi = createDefaultScenarioAuditUiState();", content)
 
     def test_scenario_manager_uses_catalog_releasable_index_factory(self):
         content = SCENARIO_MANAGER_JS.read_text(encoding="utf-8")
+        lifecycle_content = SCENARIO_LIFECYCLE_RUNTIME_JS.read_text(encoding="utf-8")
 
         self.assertIn("createDefaultScenarioReleasableIndex", content)
-        self.assertIn("state.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();", content)
+        self.assertIn("createDefaultScenarioReleasableIndex,", content)
+        self.assertIn("runtimeState.scenarioReleasableIndex = createDefaultScenarioReleasableIndex();", lifecycle_content)
 
     def test_state_catalog_keeps_catalog_default_shape(self):
         content = STATE_CATALOG_JS.read_text(encoding="utf-8")

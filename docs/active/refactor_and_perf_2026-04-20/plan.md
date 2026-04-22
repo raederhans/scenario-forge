@@ -69,3 +69,47 @@
   2. `js/` 下清零 `import { state }`
   3. `js/` 下清零 `state.*Fn / *DataFn`
 - 外部兼容目标：保留 state compat 属性 setter/getter，让现有 e2e 里直接读写 `window.state.*Fn` 的用法还能工作一轮。
+
+
+## 2026-04-22 后续推进补记
+
+- 任务包 B 主实现已经完成，当前阶段改成“guardrail 收紧 + 合同跟真源”。
+- 本轮目标：
+  1. 缩小 `state-writer-allowlist.json`
+  2. 让扫描器识别 `state[key] = ...`
+  3. 把 sidebar / presentation / scenario resource 相关 contract 跟到 helper/bus/runtimeState 真源
+- 本轮完成后，下一步顺序固定为：
+  1. 用真实环境复核 `scenario_shell_overlay_contract.spec.js`
+  2. 用真实环境复核 `npm run perf:gate`
+  3. 再开下一轮，处理 `interaction_funnel` / `startup_data_pipeline` / `startup_hydration` 这三个 direct state write 大头
+
+
+## 2026-04-22 autopilot 进度补记
+
+- environment gate 当前状态：
+  1. `scenario_shell_overlay_contract.spec.js` 已从代码启动回归推进到 runner/harness 结构问题排查态
+  2. `npm run perf:gate` 已回绿
+- direct state write 大头推进已完成一轮：
+  1. `interaction_funnel.js` 大幅减量
+  2. `startup_data_pipeline.js` 清零
+  3. `startup_hydration.js` 压到 1 处残余
+- 下一步收尾顺序：
+  1. 完成多视角 review
+  2. 文档收口
+  3. 若确认 shell gate 仍属 runner 结构问题，则把本轮代码部分按已完成收口，单列后续问题单
+
+
+## 2026-04-22 autopilot 最终状态
+
+- 代码主线已完成：
+  1. `interaction_funnel` 第一轮 owner/helper 收口
+  2. `startup_data_pipeline` direct write 清零
+  3. `startup_hydration` 压到 1 处残余
+- 验证主线：
+  1. `perf:gate` 已通过
+  2. `startup_bundle_recovery_contract.spec.js` 已通过
+  3. `tno_ready_state_contract.spec.js` 已通过
+  4. `scenario_shell_overlay_contract.spec.js` full-file runner 仍未收口，当前单列 follow-up
+- 下一步最短路径已经收敛成两件事：
+  1. `interaction_funnel` 继续做最终 owner 化
+  2. Playwright shared helper / shell gate runner follow-up

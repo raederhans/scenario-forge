@@ -1,0 +1,24 @@
+# Context Log
+
+- 2026-04-22: Task started. Read root lessons file and scoped source files.
+- Focus area: project import path inside `applyImportedProjectState()`.
+- Dense safe clusters chosen for first pass:
+  - dev transient selection reset
+  - imported annotation/overlay collection restore + strategic overlay editor reset
+  - imported workbench / recent UI state restore
+  - imported style config + layer visibility restore
+- Added minimal helpers only in the assigned owner files:
+  - `resetDevTransientImportState()` in `dev_state.js`
+  - `resetStrategicOverlayEditorState()` in `strategic_overlay_state.js`
+  - `restoreImportedAnnotationOverlayState()` in `ui_state.js`
+  - `restoreImportedWorkbenchUiState()` in `ui_state.js`
+  - `restoreImportedStyleConfigState()` in `ui_state.js`
+  - `restoreImportedLayerVisibilityState()` in `ui_state.js`
+- `interaction_funnel.js` direct root state writes dropped from 70 to 29.
+- Cluster reduction snapshot:
+  - dev transient: 6 -> 2
+  - annotation + overlay reset: 12 -> 2
+  - style + visibility + workbench: 27 -> 2
+- Left direct writes in place where ownership sits outside the allowed files, such as imported content/state catalog fields.
+- Static diagnostics on modified files reported 0 errors.
+- `npm run verify:state-write-allowlist` currently fails on a pre-existing stale allowlist entry: `js/bootstrap/startup_data_pipeline.js`.
