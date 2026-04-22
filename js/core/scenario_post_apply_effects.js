@@ -50,6 +50,13 @@ function runPaletteAndToolbarRefreshCallbacks() {
   }
 }
 
+function runPostScenarioUiReplay({ full = true, renderNow = false } = {}) {
+  runPaletteAndToolbarRefreshCallbacks();
+  if (full) {
+    syncCountryUi({ renderNow });
+  }
+}
+
 function scheduleAfterFirstFrame(callback) {
   if (typeof callback !== "function") return;
   const runAsync = () => {
@@ -316,6 +323,7 @@ function runPostRollbackRestoreEffects({ renderNow = false } = {}) {
 }
 
 export {
+  runPostScenarioUiReplay,
   runPostRollbackRestoreEffects,
   runPostScenarioApplyEffects,
   runPostScenarioClearEffects,
