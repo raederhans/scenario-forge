@@ -90,6 +90,26 @@ async function readShellState(page) {
   });
 }
 
+async function readPostBootstrapUiSnapshot(page) {
+  return page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const scenarioSelect = document.querySelector("#scenarioSelect");
+    const themeSelect = document.querySelector("#themeSelect");
+    const countryRows = document.querySelectorAll("#countryList .inspector-item-btn").length;
+    const specialRegionRows = document.querySelectorAll("#specialRegionList .inspector-item-btn").length;
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      activePaletteId: String(state.activePaletteId || ""),
+      scenarioSelectValue: String(scenarioSelect?.value || ""),
+      hasScenarioOption: !!scenarioSelect?.querySelector('option[value="tno_1962"]'),
+      paletteSourceValue: String(themeSelect?.value || ""),
+      countryRows,
+      specialRegionRows,
+      specialRegionFeatureCount: Number(state.specialRegionsById?.size || 0),
+    };
+  });
+}
+
 test("scenario shell overlay recalculates on apply reset and clear", async ({ page }) => {
   test.setTimeout(360000);
 
@@ -155,4 +175,28 @@ test("scenario shell overlay recalculates on apply reset and clear", async ({ pa
   expect(afterReapply.ruPolarId).toBe(afterApply.ruPolarId);
   expect(afterReapply.ruPolarOwner).toBe(afterApply.ruPolarOwner);
   expect(afterReapply.ruPolarController).toBe(afterApply.ruPolarController);
+});
+
+test("delayed ui bootstrap keeps scenario sidebar palette and special region inspector in sync", async ({ page }) => {
+  test.setTimeout(360000);
+
+  await page.route(/\/js\/ui\/(toolbar|sidebar|scenario_controls|shortcuts)\.js$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    await route.continue();
+  });
+
+  await gotoApp(page, SHELL_STARTUP_PATH, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 120_000 });
+  await waitForScenarioUiReady(page);
+
+  const snapshot = await readPostBootstrapUiSnapshot(page);
+  expect(snapshot.activeScenarioId).toBe("tno_1962");
+  expect(snapshot.scenarioSelectValue).toBe("tno_1962");
+  expect(snapshot.hasScenarioOption).toBe(true);
+  expect(snapshot.countryRows).toBeGreaterThan(0);
+  expect(snapshot.paletteSourceValue).toBe(snapshot.activePaletteId);
+  expect(snapshot.paletteSourceValue).not.toBe("");
+  if (snapshot.specialRegionFeatureCount > 0) {
+    expect(snapshot.specialRegionRows).toBeGreaterThan(0);
+  }
 });

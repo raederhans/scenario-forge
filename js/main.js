@@ -26,8 +26,9 @@ import {
   render,
 } from "./core/map_renderer/public.js";
 import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
-import { callRuntimeHook, registerRuntimeHook } from "./core/runtime_hooks.js";
+import { registerRuntimeHook } from "./core/runtime_hooks.js";
 import { initPresetState } from "./core/preset_state.js";
+import { runPostScenarioUiReplay } from "./core/scenario_post_apply_effects.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
@@ -776,7 +777,7 @@ async function bootstrap() {
         startupUiBootstrapFailed = true;
         throw uiBootstrapError;
       }
-      callRuntimeHook(state, "updateScenarioUIFn");
+      runPostScenarioUiReplay({ full: true });
     }
 
     setBootState("warmup");
@@ -801,7 +802,7 @@ async function bootstrap() {
       }
     }
     state.scenarioApplyInFlight = false;
-    callRuntimeHook(state, "updateScenarioUIFn");
+    runPostScenarioUiReplay({ full: true });
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);
     console.error("Stack trace:", error?.stack);
@@ -838,4 +839,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
