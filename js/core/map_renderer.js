@@ -1134,6 +1134,7 @@ function getBorderMeshOwner() {
       shouldExcludePoliticalInteractionFeature,
       simplifyPolylineEffectiveArea,
       getStaticMeshSourceCountries: () => staticMeshSourceCountries,
+      getScenarioSurfaceVersionSignal,
       updateDynamicBorderStatusUI,
     },
   });
@@ -2203,13 +2204,29 @@ function getScenarioDetailPhaseSignatureToken() {
   ].join("/");
 }
 
-function getScenarioWaterVisualRevisionToken() {
+function isScenarioWaterTopologyExclusiveMode() {
+  return String(runtimeState.activeScenarioId || "").trim().toLowerCase() === "tno_1962";
+}
+
+function getScenarioSurfaceVersionSignal() {
+  const maskInfo = getPhysicalLandMaskInfo();
+  const runtimeTopologyRef = runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology || null;
+  const effectiveWaterFeatureCount = getEffectiveWaterRegionFeatures().length;
   return [
-    runtimeState.topologyRevision || 0,
     runtimeState.activeScenarioId || "",
-    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `runtime-tag:${String(runtimeState.scenarioRuntimeTopologyVersionTag || "").trim() || `${getObjectIdentityToken(runtimeTopologyRef, "scenario-runtime-topology")}:${getScenarioRuntimeTopologySignatureToken()}`}`,
     `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
-    `water-global:${getFeatureCollectionFeatureCount(runtimeState.waterRegionsData)}`,
+    `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`}`,
+    `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
+    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
+  ].join("|");
+}
+
+function getScenarioWaterVisualRevisionToken() {
+  const effectiveWaterFeatureCount = getEffectiveWaterRegionFeatures().length;
+  return [
+    getScenarioSurfaceVersionSignal(),
+    `water-effective:${effectiveWaterFeatureCount}`,
     `water-scenario:${getFeatureCollectionFeatureCount(runtimeState.scenarioWaterRegionsData)}`,
     `water-overrides:${stableJson(runtimeState.waterRegionOverrides || {})}`,
     runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
@@ -2648,9 +2665,15 @@ function isWaterRegionExcludedByScenario(feature) {
 }
 
 function getEffectiveWaterRegionFeatures() {
+  const scenarioFeatures = Array.isArray(runtimeState.scenarioWaterRegionsData?.features)
+    ? runtimeState.scenarioWaterRegionsData.features
+    : [];
+  if (isScenarioWaterTopologyExclusiveMode()) {
+    return scenarioFeatures.filter((feature) => !isWaterRegionExcludedByScenario(feature));
+  }
   return [
     ...(Array.isArray(runtimeState.waterRegionsData?.features) ? runtimeState.waterRegionsData.features : []),
-    ...(Array.isArray(runtimeState.scenarioWaterRegionsData?.features) ? runtimeState.scenarioWaterRegionsData.features : []),
+    ...scenarioFeatures,
   ].filter((feature) => !isWaterRegionExcludedByScenario(feature));
 }
 
@@ -6295,6 +6318,7 @@ function getCoastlineDecisionSignature(decision = null) {
     return "";
   }
   return [
+    String(decision.scenarioSurfaceVersionSignal || ""),
     String(decision.source || ""),
     String(decision.reason || ""),
     String(decision.scenarioId || ""),
@@ -7922,6 +7946,44 @@ function scheduleSecondarySpatialIndexBuild({
   }, { timeout });
 }
 
+function syncScenarioSecondaryRegionIndexes({
+  changedLayerKeys = [],
+  reason = "scenario-chunk-promotion",
+} = {}) {
+  const normalizedLayerKeys = new Set(
+    (Array.isArray(changedLayerKeys) ? changedLayerKeys : [])
+      .map((layerKey) => String(layerKey || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+  const hasWaterChange = normalizedLayerKeys.has("water");
+  const hasSpecialChange = normalizedLayerKeys.has("special");
+  if (!hasWaterChange && !hasSpecialChange) {
+    return false;
+  }
+  if (isInteractionRecoveryBlocked()) {
+    return false;
+  }
+  const startedAt = nowMs();
+  rebuildAuxiliaryRegionIndexes();
+  resetSecondarySpatialIndexState();
+  buildSecondarySpatialIndexes({
+    allowComputeMissingBounds: true,
+  });
+  queueIndexUiRefresh({
+    renderWaterRegionList: hasWaterChange,
+    renderSpecialRegionList: hasSpecialChange,
+  });
+  runtimeState.hitCanvasDirty = true;
+  recordRenderPerfMetric("scenarioChunkSecondaryRegionIndexesSync", nowMs() - startedAt, {
+    reason,
+    waterItems: runtimeState.waterSpatialItems.length,
+    specialItems: runtimeState.specialSpatialItems.length,
+    hasWaterChange,
+    hasSpecialChange,
+  });
+  return true;
+}
+
 function rebuildRuntimeDerivedState({
   includeRuntimePoliticalMeta = false,
   scheduleUiMode = "immediate",
@@ -9444,8 +9506,7 @@ function getPhysicalLandMask() {
 function getPhysicalLandClipCacheKey(maskInfo) {
   return [
     getProjectionRenderSignature(),
-    `mask:${maskInfo?.maskSource || "none"}:${maskInfo?.maskFeatureCount || 0}:${maskInfo?.maskArcRefEstimate ?? "na"}`,
-    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `scenario-surface:${getScenarioSurfaceVersionSignal()}`,
   ].join("::");
 }
 
@@ -21651,6 +21712,14 @@ function refreshMapDataForScenarioChunkPromotion({
   if ((Array.isArray(changedLayerKeys) ? changedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
     resetScenarioWaterCacheAdaptiveState("scenario-water-regions-data-replaced");
   }
+  const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes({
+    changedLayerKeys,
+    reason: `${reason}-secondary-sync`,
+  });
+  const shouldSkipDeferredInfraRefresh = synchronizedSecondaryRegionIndexes && !hasPoliticalChange;
+  if (shouldSkipDeferredInfraRefresh && runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
+    runtimeState.runtimeChunkLoadState.pendingInfraPromotion = null;
+  }
   const targetPasses = getScenarioChunkPromotionTargetPasses({
     changedLayerKeys,
     hasPoliticalChange,
@@ -21664,12 +21733,20 @@ function refreshMapDataForScenarioChunkPromotion({
   if (!suppressRender) {
     render();
   }
-  scheduleDeferredScenarioChunkPromotionInfraRefresh({
-    reason,
-    suppressRender,
-    promotionVersion: scenarioChunkPromotionVersion,
-    hasPoliticalGeometryChange: hasPoliticalChange,
-  });
+  if (shouldSkipDeferredInfraRefresh) {
+    if (runtimeState.hitCanvasDirty) {
+      scheduleHitCanvasBuildIfNeeded({
+        reason: `${reason}-secondary-hit-canvas`,
+      });
+    }
+  } else {
+    scheduleDeferredScenarioChunkPromotionInfraRefresh({
+      reason,
+      suppressRender,
+      promotionVersion: scenarioChunkPromotionVersion,
+      hasPoliticalGeometryChange: hasPoliticalChange,
+    });
+  }
   recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
     suppressRender: !!suppressRender,
@@ -21678,6 +21755,7 @@ function refreshMapDataForScenarioChunkPromotion({
       : 0,
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
+    synchronizedSecondaryRegionIndexes,
   });
   recordRenderPerfMetric("chunkPromotionVisualMs", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -21688,6 +21766,7 @@ function refreshMapDataForScenarioChunkPromotion({
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
     hasPoliticalGeometryChange: hasPoliticalChange,
+    synchronizedSecondaryRegionIndexes,
   });
   recordRenderPerfMetric("scenarioChunkPoliticalPromotion", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -21697,6 +21776,7 @@ function refreshMapDataForScenarioChunkPromotion({
       : 0,
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
+    synchronizedSecondaryRegionIndexes,
     stage: "visual",
   });
   if (hasPoliticalChange && isUsableMesh(runtimeState.activeScenarioMeshPack?.meshes?.opening_owner_borders)) {

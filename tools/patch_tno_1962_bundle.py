@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from map_builder.geo.topology import compute_neighbor_graph
+from map_builder.geo.utils import build_named_topology
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_build_session import (
@@ -88,6 +89,10 @@ from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topolog
 from tools.build_startup_bundle import build_startup_bundles
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
+from tools.validate_tno_water_geometries import (
+    build_report_from_collections as build_tno_water_geometry_report,
+    validate_report as validate_tno_water_geometry_report,
+)
 
 
 SCENARIO_ID = "tno_1962"
@@ -410,6 +415,7 @@ TNO_ARCTIC_OPEN_OCEAN_IDS = (
     "tno_western_arctic_ocean",
     "tno_eastern_arctic_ocean",
 )
+TNO_ARCTIC_SPLIT_LONGITUDE = 20.0
 TNO_SOUTHERN_OPEN_OCEAN_IDS = (
     "tno_south_atlantic_antarctic_ocean",
     "tno_south_indian_antarctic_ocean",
@@ -561,12 +567,12 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
             {
                 "id": TNO_ARCTIC_OPEN_OCEAN_IDS[0],
                 "name": "Western Arctic Ocean",
-                "bbox": (-180.0, 60.0, 0.0, 90.0),
+                "bbox": (-180.0, 60.0, TNO_ARCTIC_SPLIT_LONGITUDE, 90.0),
             },
             {
                 "id": TNO_ARCTIC_OPEN_OCEAN_IDS[1],
                 "name": "Eastern Arctic Ocean",
-                "bbox": (0.0, 60.0, 180.0, 90.0),
+                "bbox": (TNO_ARCTIC_SPLIT_LONGITUDE, 60.0, 180.0, 90.0),
             },
         ),
     },
@@ -646,6 +652,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l4='23736'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "supplement_bboxes": (
+            (-1.98, 50.58, -1.78, 50.66),
+        ),
         "simplify_tolerance": 0.004,
     },
     {
@@ -1242,6 +1251,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='36279'",
         "source_standard": "marine_regions_seavox_v19",
         "exclude_base_ids": ("marine_greenland_sea",),
+        "supplement_bboxes": (
+            (-2.5, 76.4, -0.5, 77.0),
+        ),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.01,
     },
@@ -1268,6 +1280,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24029'",
         "source_standard": "marine_regions_seavox_v19",
         "exclude_base_ids": ("marine_barents_sea",),
+        "supplement_bboxes": (
+            (0.0, 79.5, TNO_ARCTIC_SPLIT_LONGITUDE, 82.2),
+        ),
         "clip_open_ocean_ids": TNO_ARCTIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.01,
     },
@@ -1294,9 +1309,6 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid=4291",
         "source_standard": "marine_regions_iho_v3",
         "exclude_base_ids": ("marine_labrador_sea",),
-        "supplement_bboxes": (
-            (-64.7520475204752, 47.53888893, -43.99299356875491, 60.31812110621105),
-        ),
         "subtract_named_ids": ("tno_gulf_of_st_lawrence",),
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.01,
@@ -1430,6 +1442,10 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24192'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "supplement_bboxes": (
+            (-0.23, 53.60, -0.13, 53.67),
+        ),
+        "clip_against_land_mask": False,
         "simplify_tolerance": 0.004,
     },
     {
@@ -1504,6 +1520,12 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l4='23740'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "supplement_bboxes": (
+            (-4.88, 51.98, -4.40, 52.22),
+            (-4.67, 52.09, -4.59, 52.15),
+        ),
+        "supplement_respects_land_mask": False,
+        "clip_against_land_mask": False,
         "simplify_tolerance": 0.004,
     },
     {
@@ -1689,6 +1711,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "exclude_base_ids": ("marine_philippine_sea",),
         "supplement_bboxes": (
             (128.56, 2.4999, 128.684, 2.6481),
+            (128.66, 2.48, 128.72, 2.53),
         ),
         "subtract_named_ids": ("tno_sulu_sea", "tno_celebes_sea", "tno_molucca_sea", "tno_halmahera_sea"),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
@@ -1762,6 +1785,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24142'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "supplement_bboxes": (
+            (105.23, 8.73, 105.26, 8.76),
+        ),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.004,
     },
@@ -1775,9 +1801,6 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid=4312",
         "source_standard": "marine_regions_iho_v3",
         "exclude_base_ids": ("marine_gulf_of_alaska",),
-        "supplement_bboxes": (
-            (-163.36783367833678, 54.04918667486676, -136.579965799658, 60.664144681446814),
-        ),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.01,
     },
@@ -1791,9 +1814,6 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24096'",
         "source_standard": "marine_regions_seavox_v19",
         "exclude_base_ids": ("marine_tasman_sea",),
-        "supplement_bboxes": (
-            (146.37206372063724, -50.79764454144542, 175.24795247952483, -29.875877638776394),
-        ),
         "subtract_named_ids": ("tno_bass_strait",),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.006,
@@ -1856,6 +1876,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24147'",
         "source_standard": "marine_regions_seavox_v19",
         "exclude_base_ids": ("marine_ross_sea",),
+        "supplement_bboxes": (
+            (-169.0, -78.75, -167.0, -78.4),
+        ),
         "clip_open_ocean_ids": ("tno_south_pacific_antarctic_ocean",),
         "simplify_tolerance": 0.01,
     },
@@ -1926,6 +1949,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "exclude_base_ids": ("marine_gulf_of_oman",),
         "supplement_bboxes": (
             (55.8215, 25.6649, 56.2690, 25.7106),
+            (55.82, 25.69, 56.28, 25.73),
         ),
         "subtract_named_ids": ("tno_persian_gulf",),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
@@ -1941,6 +1965,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24080'",
         "source_standard": "marine_regions_seavox_v19",
         "exclude_base_ids": ("marine_persian_gulf",),
+        "supplement_bboxes": (
+            (55.80, 25.69, 55.84, 25.74),
+        ),
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.006,
     },
@@ -2069,6 +2096,9 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_sr='24136'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
+        "supplement_bboxes": (
+            (128.68, 2.48, 128.71, 2.52),
+        ),
         "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
         "simplify_tolerance": 0.006,
     },
@@ -5418,6 +5448,7 @@ def apply_tno_named_water_supplements(named_features: list[dict], land_mask_geom
         current_geom = base_geometries.get(feature_id)
         if feature is None or current_geom is None:
             continue
+        supplement_respects_land_mask = bool(spec.get("supplement_respects_land_mask", True))
         supplement_parts = []
         for supplement_bbox in spec.get("supplement_bboxes", ()) or ():
             if not supplement_bbox:
@@ -5425,7 +5456,7 @@ def apply_tno_named_water_supplements(named_features: list[dict], land_mask_geom
             supplement_geom = normalize_polygonal(box(*supplement_bbox))
             if supplement_geom is None:
                 continue
-            if land_mask_geom is not None:
+            if land_mask_geom is not None and supplement_respects_land_mask:
                 supplement_geom = normalize_polygonal(supplement_geom.difference(land_mask_geom))
             if supplement_geom is None:
                 continue
@@ -5450,6 +5481,32 @@ def apply_tno_named_water_supplements(named_features: list[dict], land_mask_geom
             make_feature(current_geom, dict(feature.get("properties", {})))
         )
     return supplemented_features
+
+
+def clip_named_water_features_to_land_mask(named_features: list[dict], land_mask_geom) -> list[dict]:
+    if land_mask_geom is None:
+        return list(named_features or [])
+    spec_by_id = {
+        str(spec.get("id") or "").strip(): spec
+        for spec in TNO_NAMED_MARGINAL_WATER_SPECS
+        if str(spec.get("id") or "").strip()
+    }
+    clipped_features: list[dict] = []
+    for feature in named_features or []:
+        properties = dict(feature.get("properties", {})) if isinstance(feature, dict) else {}
+        feature_id = str(properties.get("id") or "").strip() or "<unknown>"
+        current_geom = normalize_polygonal(shape(feature.get("geometry"))) if isinstance(feature, dict) and feature.get("geometry") else None
+        if current_geom is None:
+            raise ValueError(f"Named water feature '{feature_id}' has empty geometry before land-mask clipping.")
+        clip_against_land_mask = bool(spec_by_id.get(feature_id, {}).get("clip_against_land_mask", True))
+        if not clip_against_land_mask:
+            clipped_features.append(make_feature(current_geom, properties))
+            continue
+        clipped_geom = normalize_polygonal(current_geom.difference(land_mask_geom))
+        if clipped_geom is None:
+            raise ValueError(f"Named water feature '{feature_id}' collapsed after land-mask clipping.")
+        clipped_features.append(make_feature(clipped_geom, properties))
+    return clipped_features
 
 
 def sanitize_jsonable(value):
@@ -10005,36 +10062,19 @@ def build_runtime_topology_payload(
     ]
     available_columns = [column for column in keep_columns if column in political_gdf.columns]
     runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
-    topo = Topology(
-        [runtime_political_gdf, land_mask_gdf, context_land_mask_gdf],
-        object_name=["political", "land_mask", "context_land_mask"],
-        topology=True,
-        prequantize=False,
-        topoquantize=False,
-        presimplify=False,
-        toposimplify=False,
-        shared_coords=False,
-    )
-    topo_dict = topo.to_dict()
-    water_topo = Topology(
-        [water_gdf],
-        object_name=["scenario_water"],
-        topology=True,
-        prequantize=False,
-        topoquantize=False,
-        presimplify=False,
-        toposimplify=False,
-        shared_coords=False,
-    ).to_dict()
-    arc_offset = len(topo_dict.get("arcs", []))
-    topo_dict.setdefault("objects", {})["scenario_water"] = remap_topology_arc_indexes(
-        water_topo.get("objects", {}).get("scenario_water", {"type": "GeometryCollection", "geometries": []}),
-        arc_offset,
-    )
-    topo_dict["arcs"] = list(topo_dict.get("arcs", [])) + list(water_topo.get("arcs", []))
-    merged_bbox = merge_topology_bboxes(topo_dict.get("bbox"), water_topo.get("bbox"))
-    if merged_bbox is not None:
-        topo_dict["bbox"] = merged_bbox
+    if "id" in runtime_political_gdf.columns and "cntr_code" in runtime_political_gdf.columns:
+        feature_ids = runtime_political_gdf["id"].astype(str)
+        atl_runtime_mask = feature_ids.str.startswith("ATLISL_") | feature_ids.str.startswith("ATLSHL_")
+        runtime_political_gdf.loc[atl_runtime_mask, "cntr_code"] = ATL_TAG
+        if "interactive" in runtime_political_gdf.columns:
+            atl_shell_mask = feature_ids.str.startswith("ATLSHL_")
+            runtime_political_gdf.loc[atl_shell_mask, "interactive"] = False
+    topo_dict = build_named_topology([
+        ("political", runtime_political_gdf),
+        ("land_mask", land_mask_gdf),
+        ("context_land_mask", context_land_mask_gdf),
+        ("scenario_water", water_gdf),
+    ])
     topo_dict.setdefault("objects", {})["scenario_special_land"] = {
         "type": "GeometryCollection",
         "geometries": [],
@@ -10043,6 +10083,24 @@ def build_runtime_topology_payload(
     political_out = topology_object_to_gdf(topo_dict, "political")
     topo_dict["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(political_out)
     return topo_dict
+
+
+def validate_runtime_topology_water_outputs(
+    runtime_topology_payload: dict,
+    water_feature_collection: dict,
+    named_water_snapshot_payload: dict,
+) -> dict:
+    report = build_tno_water_geometry_report(
+        scenario_id=SCENARIO_ID,
+        source_water=water_feature_collection,
+        runtime_topology_payload=runtime_topology_payload,
+        named_water_snapshot=named_water_snapshot_payload,
+    )
+    return validate_tno_water_geometry_report(
+        report,
+        stage_label="runtime_topology.scenario_water",
+        require_chunks=False,
+    )
 
 
 def build_countries_stage_state(
@@ -10359,6 +10417,10 @@ def build_water_stage_state_from_countries_state(
         named_marginal_water_features,
         ocean_land_mask_geom,
     )
+    named_marginal_water_features = clip_named_water_features_to_land_mask(
+        named_marginal_water_features,
+        ocean_land_mask_geom,
+    )
     mediterranean_template_gdf = load_mediterranean_template_water_gdf()
     mediterranean_template_union = (
         safe_unary_union(mediterranean_template_gdf.geometry.tolist())
@@ -10505,12 +10567,14 @@ def build_runtime_topology_state(
         context_land_mask_gdf,
     )
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
+    water_feature_collection = gdf_to_feature_collection(water_gdf)
     runtime_water_regions = sanitize_feature_collection_polygonal_geometries(
         topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     )
-    validate_tno_water_geometries(
-        runtime_water_regions,
-        stage_label="runtime_topology.scenario_water",
+    validate_runtime_topology_water_outputs(
+        runtime_topology_payload,
+        water_feature_collection,
+        named_water_snapshot_payload,
     )
     runtime_special_regions = feature_collection_from_features([])
     relief_overlays_payload = round_geojson_coordinates(relief_overlays_payload, decimals=6)

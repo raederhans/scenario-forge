@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 import geopandas as gpd
-from shapely.geometry import Polygon, mapping
+from shapely.geometry import Point, Polygon, mapping, shape
 
 from map_builder.contracts import SCENARIO_BUNDLE_STAGE_DESCRIPTORS
 from tools.check_scenario_contracts import validate_publish_bundle_dir
@@ -29,6 +29,7 @@ from tools.patch_tno_1962_bundle import (
     apply_tno_decolonization_metadata,
     apply_dev_manual_overrides,
     build_relief_overlays,
+    clip_named_water_features_to_land_mask,
     build_tno_bathymetry_payload,
     build_polar_feature_diagnostics_from_topology,
     build_runtime_topology_state_from_countries_state,
@@ -45,6 +46,7 @@ from tools.patch_tno_1962_bundle import (
     resolve_tno_palette_color,
     resolve_publish_filenames,
     topology_object_to_gdf,
+    validate_runtime_topology_water_outputs,
     validate_geo_locale_manual_overrides,
     write_bundle_stage,
 )
@@ -458,6 +460,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
         )
 
         self.assertIn("land_mask", topo["objects"])
+        self.assertIn("scenario_water", topo["objects"])
         self.assertNotIn("land", topo["objects"])
 
         props_by_id = {
@@ -506,6 +509,83 @@ class TnoBundleBuilderTest(unittest.TestCase):
             },
         )
 
+    def test_build_runtime_topology_payload_builds_all_layers_in_single_topology_call(self) -> None:
+        political_gdf = gpd.GeoDataFrame(
+            [{"id": "AAA-1", "name": "Alpha", "cntr_code": "AAA", "geometry": _square(0, 0, 1.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        water_gdf = gpd.GeoDataFrame(
+            [{"id": "water-1", "name": "Lake", "geometry": _square(2, 2, 1.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        land_mask_gdf = gpd.GeoDataFrame(
+            [{"id": "mask-1", "name": "Mask", "geometry": _square(0, 0, 4.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        context_land_mask_gdf = gpd.GeoDataFrame(
+            [{"id": "context-mask-1", "name": "Context Mask", "geometry": _square(0, 0, 4.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        with patch.object(tno_bundle, "build_named_topology", wraps=tno_bundle.build_named_topology) as topology_mock:
+            build_runtime_topology_payload(
+                political_gdf,
+                water_gdf,
+                land_mask_gdf,
+                context_land_mask_gdf,
+            )
+
+        topology_mock.assert_called_once()
+        layer_names = [layer_name for layer_name, _ in topology_mock.call_args.args[0]]
+        self.assertEqual(
+            layer_names,
+            ["political", "land_mask", "context_land_mask", "scenario_water"],
+        )
+
+    def test_build_runtime_topology_payload_forces_atl_synthetic_country_code(self) -> None:
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {"id": "ATLISL_adriatica_corfu", "name": "Corfu", "cntr_code": "ITA", "geometry": _square(0, 0, 1.0)},
+                {"id": "ATLSHL_adriatica_4", "name": "Shelf", "cntr_code": "GRE", "geometry": _square(2, 0, 1.0)},
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        water_gdf = gpd.GeoDataFrame(
+            [{"id": "water-1", "name": "Lake", "geometry": _square(4, 4, 1.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        land_mask_gdf = gpd.GeoDataFrame(
+            [{"id": "mask-1", "name": "Mask", "geometry": _square(0, 0, 6.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        context_land_mask_gdf = gpd.GeoDataFrame(
+            [{"id": "context-mask-1", "name": "Context Mask", "geometry": _square(0, 0, 6.0)}],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        topo = build_runtime_topology_payload(
+            political_gdf,
+            water_gdf,
+            land_mask_gdf,
+            context_land_mask_gdf,
+        )
+        political_props = {
+            geometry.get("properties", {}).get("id"): geometry.get("properties", {})
+            for geometry in topo["objects"]["political"]["geometries"]
+        }
+
+        self.assertEqual(political_props["ATLISL_adriatica_corfu"]["cntr_code"], "ATL")
+        self.assertEqual(political_props["ATLSHL_adriatica_4"]["cntr_code"], "ATL")
+        self.assertIn(political_props["ATLSHL_adriatica_4"].get("interactive"), (False, None))
+
     def test_build_runtime_topology_state_keeps_water_stage_artifacts_in_full_state(self) -> None:
         source = Path(tno_bundle.__file__).read_text(encoding="utf-8")
         self.assertRegex(
@@ -515,6 +595,168 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 re.S,
             ),
         )
+
+    def test_validate_runtime_topology_water_outputs_uses_strong_validator_without_chunk_gate(self) -> None:
+        report = {"checks": {}}
+        runtime_topology_payload = {"type": "Topology", "objects": {}, "arcs": []}
+        water_feature_collection = {"type": "FeatureCollection", "features": []}
+        named_water_snapshot_payload = {"type": "FeatureCollection", "features": []}
+
+        with (
+            patch.object(tno_bundle, "build_tno_water_geometry_report", return_value=report) as build_report_mock,
+            patch.object(tno_bundle, "validate_tno_water_geometry_report", return_value=report) as validate_report_mock,
+        ):
+            result = validate_runtime_topology_water_outputs(
+                runtime_topology_payload,
+                water_feature_collection,
+                named_water_snapshot_payload,
+            )
+
+        self.assertIs(result, report)
+        build_report_mock.assert_called_once_with(
+            scenario_id=tno_bundle.SCENARIO_ID,
+            source_water=water_feature_collection,
+            runtime_topology_payload=runtime_topology_payload,
+            named_water_snapshot=named_water_snapshot_payload,
+        )
+        validate_report_mock.assert_called_once_with(
+            report,
+            stage_label="runtime_topology.scenario_water",
+            require_chunks=False,
+        )
+
+    def test_named_water_specs_include_regression_probe_supplements(self) -> None:
+        spec_map = {
+            spec["id"]: spec
+            for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+        }
+
+        for feature_id, point in (
+            ("tno_poole_bay", Point(-1.86, 50.62)),
+            ("tno_cardigan_bay", Point(-4.63, 52.12)),
+            ("tno_humber_estuary", Point(-0.18, 53.63)),
+            ("tno_greenland_sea", Point(-1.73, 76.73)),
+            ("tno_ross_sea", Point(-168.0911, -78.5673)),
+        ):
+            supplement_bboxes = tuple(spec_map[feature_id].get("supplement_bboxes") or ())
+            self.assertTrue(
+                any(
+                    bbox[0] <= point.x <= bbox[2] and bbox[1] <= point.y <= bbox[3]
+                    for bbox in supplement_bboxes
+                ),
+                f"{feature_id} should keep a supplement bbox covering validator regression probe {point.wkt}",
+            )
+
+    def test_tno_arctic_open_ocean_split_boundary_matches_barents_regression(self) -> None:
+        arctic_spec = next(
+            spec for spec in tno_bundle.TNO_OPEN_OCEAN_SPLIT_SPECS
+            if spec["source_id"] == "marine_arctic_ocean"
+        )
+        western_child, eastern_child = arctic_spec["children"]
+        self.assertEqual(western_child["bbox"][2], tno_bundle.TNO_ARCTIC_SPLIT_LONGITUDE)
+        self.assertEqual(eastern_child["bbox"][0], tno_bundle.TNO_ARCTIC_SPLIT_LONGITUDE)
+
+        barents_spec = next(
+            spec for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+            if spec["id"] == "tno_barents_sea"
+        )
+        self.assertIn(
+            (0.0, 79.5, tno_bundle.TNO_ARCTIC_SPLIT_LONGITUDE, 82.2),
+            tuple(barents_spec.get("supplement_bboxes") or ()),
+        )
+
+        cardigan_spec = next(
+            spec for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+            if spec["id"] == "tno_cardigan_bay"
+        )
+        self.assertFalse(cardigan_spec.get("supplement_respects_land_mask", True))
+        self.assertFalse(cardigan_spec.get("clip_against_land_mask", True))
+
+        humber_spec = next(
+            spec for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+            if spec["id"] == "tno_humber_estuary"
+        )
+        self.assertFalse(humber_spec.get("clip_against_land_mask", True))
+
+    def test_named_water_specs_include_seam_repair_supplements(self) -> None:
+        spec_map = {
+            spec["id"]: spec
+            for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+        }
+        self.assertTrue(
+            any(bbox[0] <= 55.821 <= bbox[2] and bbox[1] <= 25.711 <= bbox[3] for bbox in spec_map["tno_gulf_of_oman"].get("supplement_bboxes") or ()),
+        )
+        self.assertTrue(
+            any(bbox[0] <= 55.821 <= bbox[2] and bbox[1] <= 25.711 <= bbox[3] for bbox in spec_map["tno_persian_gulf"].get("supplement_bboxes") or ()),
+        )
+        self.assertTrue(
+            any(bbox[0] <= 105.236 <= bbox[2] and bbox[1] <= 8.743 <= bbox[3] for bbox in spec_map["tno_gulf_of_thailand"].get("supplement_bboxes") or ()),
+        )
+        self.assertTrue(
+            any(bbox[0] <= 128.689 <= bbox[2] and bbox[1] <= 2.494 <= bbox[3] for bbox in spec_map["tno_halmahera_sea"].get("supplement_bboxes") or ()),
+        )
+
+    def test_macro_named_seas_keep_validator_probes_without_extra_supplements(self) -> None:
+        spec_map = {
+            spec["id"]: spec
+            for spec in tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS
+        }
+        snapshot_payload = json.loads(
+            (Path(tno_bundle.SCENARIO_DIR) / "derived" / "marine_regions_named_waters.snapshot.geojson").read_text(
+                encoding="utf-8"
+            )
+        )
+        snapshot_feature_map = {
+            str(feature.get("properties", {}).get("id") or "").strip(): feature
+            for feature in snapshot_payload.get("features", [])
+            if str(feature.get("properties", {}).get("id") or "").strip()
+        }
+
+        for feature_id, point in (
+            ("tno_labrador_sea", Point(-52.7329, 53.9977)),
+            ("tno_gulf_of_alaska", Point(-147.3894, 57.3575)),
+            ("tno_tasman_sea", Point(160.0, -31.8)),
+        ):
+            self.assertEqual(tuple(spec_map[feature_id].get("supplement_bboxes") or ()), ())
+            snapshot_feature = snapshot_feature_map[feature_id]
+            snapshot_geom = tno_bundle.normalize_polygonal(shape(snapshot_feature.get("geometry")))
+            self.assertIsNotNone(snapshot_geom)
+            self.assertTrue(
+                snapshot_geom.contains(point) or snapshot_geom.touches(point),
+                f"{feature_id} snapshot geometry should already cover validator probe {point.wkt}",
+            )
+
+    def test_clip_named_water_features_to_land_mask_removes_macro_land_overlap(self) -> None:
+        named_features = [
+            {
+                "type": "Feature",
+                "properties": {"id": "macro-sea", "name": "Macro Sea"},
+                "geometry": mapping(_square(0, 0, 4.0)),
+            }
+        ]
+        land_mask_geom = _square(1, 1, 2.0)
+
+        clipped_features = clip_named_water_features_to_land_mask(named_features, land_mask_geom)
+
+        self.assertEqual(len(clipped_features), 1)
+        clipped_geom = shape(clipped_features[0]["geometry"])
+        self.assertTrue(clipped_geom.is_valid)
+        self.assertAlmostEqual(clipped_geom.intersection(land_mask_geom).area, 0.0)
+
+    def test_clip_named_water_features_to_land_mask_honors_detail_skip_flag(self) -> None:
+        named_features = [
+            {
+                "type": "Feature",
+                "properties": {"id": "tno_humber_estuary", "name": "Humber Estuary"},
+                "geometry": mapping(_square(0, 0, 2.0)),
+            }
+        ]
+        land_mask_geom = _square(0.5, 0.5, 1.0)
+
+        clipped_features = clip_named_water_features_to_land_mask(named_features, land_mask_geom)
+
+        clipped_geom = shape(clipped_features[0]["geometry"])
+        self.assertAlmostEqual(clipped_geom.intersection(land_mask_geom).area, 1.0)
 
     def test_build_relief_overlays_keeps_expected_overlay_kind_distribution(self) -> None:
         region_unions = {
@@ -673,7 +915,8 @@ class TnoBundleBuilderTest(unittest.TestCase):
             },
         }
 
-        result = build_runtime_topology_state_from_countries_state(state)
+        with patch.object(tno_bundle, "validate_runtime_topology_water_outputs", return_value={"ok": True}):
+            result = build_runtime_topology_state_from_countries_state(state)
 
         self.assertTrue(result["manifest_payload"]["performance_hints"]["scenario_relief_overlays_default"])
         self.assertEqual(

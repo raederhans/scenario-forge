@@ -60,6 +60,7 @@ export function createBorderMeshOwner({
     shouldExcludePoliticalInteractionFeature,
     simplifyPolylineEffectiveArea,
     getStaticMeshSourceCountries = () => ({ primary: new Set(), detail: new Set() }),
+    getScenarioSurfaceVersionSignal = () => "",
     updateDynamicBorderStatusUI = () => {},
   } = helpers;
 
@@ -70,6 +71,7 @@ export function createBorderMeshOwner({
     primaryRef: null,
     runtimeRef: null,
     scenarioId: "",
+    scenarioSurfaceVersionSignal: "",
     decision: null,
   };
   let scenarioOpeningOwnerBorderCache = {
@@ -286,11 +288,13 @@ export function createBorderMeshOwner({
     const primaryTopology = state.topologyPrimary || state.topology || null;
     const runtimeTopology = state.runtimePoliticalTopology || null;
     const scenarioId = String(state.activeScenarioId || "").trim();
+    const scenarioSurfaceVersionSignal = String(getScenarioSurfaceVersionSignal() || "");
 
     const cacheMatches =
       scenarioCoastlineSourceCache.primaryRef === primaryTopology &&
       scenarioCoastlineSourceCache.runtimeRef === runtimeTopology &&
-      scenarioCoastlineSourceCache.scenarioId === scenarioId;
+      scenarioCoastlineSourceCache.scenarioId === scenarioId &&
+      scenarioCoastlineSourceCache.scenarioSurfaceVersionSignal === scenarioSurfaceVersionSignal;
     if (cacheMatches && scenarioCoastlineSourceCache.decision) {
       return scenarioCoastlineSourceCache.decision;
     }
@@ -303,13 +307,17 @@ export function createBorderMeshOwner({
       scenarioCoastlineMaxInteriorRingRatio,
       isWorldBounds,
     });
+    const publishedDecision = publishScenarioCoastlineDecision({
+      ...decision,
+      scenarioSurfaceVersionSignal,
+    });
 
     if (scenarioId) {
-      const logKey = `${scenarioId}::${decision.source}::${decision.reason}`;
+      const logKey = `${scenarioId}::${publishedDecision.source}::${publishedDecision.reason}`;
       if (!scenarioCoastlineDecisionWarnings.has(logKey)) {
         scenarioCoastlineDecisionWarnings.add(logKey);
         console.info(
-          `[map_renderer] Scenario coastline source ${decision.source}: scenario=${scenarioId} reason=${decision.reason} runtimeObject=${decision.runtimeObjectName || "(none)"} areaDelta=${(Number(decision.areaDeltaRatio) || 0).toFixed(5)} interiorRings=${Number(decision.runtimeInteriorRingCount || 0)} parts=${Number(decision.runtimePolygonPartCount || 0)}`
+          `[map_renderer] Scenario coastline source ${publishedDecision.source}: scenario=${scenarioId} reason=${publishedDecision.reason} runtimeObject=${publishedDecision.runtimeObjectName || "(none)"} areaDelta=${(Number(publishedDecision.areaDeltaRatio) || 0).toFixed(5)} interiorRings=${Number(publishedDecision.runtimeInteriorRingCount || 0)} parts=${Number(publishedDecision.runtimePolygonPartCount || 0)}`
         );
       }
     }
@@ -318,7 +326,8 @@ export function createBorderMeshOwner({
       primaryRef: primaryTopology,
       runtimeRef: runtimeTopology,
       scenarioId,
-      decision: publishScenarioCoastlineDecision(decision),
+      scenarioSurfaceVersionSignal,
+      decision: publishedDecision,
     };
     return scenarioCoastlineSourceCache.decision;
   }

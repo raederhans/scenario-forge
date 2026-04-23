@@ -6,6 +6,7 @@ from typing import Iterable
 import geopandas as gpd
 from shapely.geometry import Point, box
 from shapely.ops import transform
+from topojson import Topology
 
 from map_builder import config as cfg
 
@@ -41,6 +42,27 @@ def round_geometries(gdf: gpd.GeoDataFrame, precision: int = 4) -> gpd.GeoDataFr
         lambda geom: transform(_rounder, geom) if geom is not None else geom
     )
     return gdf
+
+
+def build_named_topology(
+    layers: Iterable[tuple[str, gpd.GeoDataFrame]],
+) -> dict:
+    layer_names: list[str] = []
+    layer_gdfs: list[gpd.GeoDataFrame] = []
+    for layer_name, layer_gdf in layers:
+        layer_names.append(layer_name)
+        layer_gdfs.append(layer_gdf)
+    topology = Topology(
+        layer_gdfs,
+        object_name=layer_names,
+        topology=True,
+        prequantize=False,
+        topoquantize=False,
+        presimplify=False,
+        toposimplify=False,
+        shared_coords=False,
+    )
+    return topology.to_dict()
 
 
 def clip_to_map_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:

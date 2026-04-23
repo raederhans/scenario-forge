@@ -138,6 +138,82 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 owner_mesh,
             )
 
+    def test_political_detail_chunks_keep_atl_synthetic_features_in_atl_bucket(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "tno_1962"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            (scenario_dir / "owners.by_feature.json").write_text(
+                json.dumps({
+                    "owners": {
+                        "ATLISL_adriatica_corfu": "ITA",
+                        "ATLSHL_adriatica_4": "GRE",
+                    }
+                }),
+                encoding="utf-8",
+            )
+
+            political_gdf = gpd.GeoDataFrame(
+                [
+                    {
+                        "id": "ATLISL_adriatica_corfu",
+                        "name": "Corfu",
+                        "cntr_code": "ATL",
+                        "admin1_group": "atl_group",
+                        "detail_tier": "scenario_atlantropa",
+                        "__source": "detail",
+                        "interactive": True,
+                        "render_as_base_geography": False,
+                        "atl_geometry_role": "donor_island",
+                        "atl_join_mode": "boolean_weld",
+                        "geometry": _square(0, 0),
+                    },
+                    {
+                        "id": "ATLSHL_adriatica_4",
+                        "name": "Shelf",
+                        "cntr_code": "ATL",
+                        "admin1_group": "atl_group",
+                        "detail_tier": "scenario_atlantropa",
+                        "__source": "detail",
+                        "interactive": False,
+                        "render_as_base_geography": False,
+                        "atl_geometry_role": "shore_seal",
+                        "atl_join_mode": "gap_fill",
+                        "geometry": _square(2, 0),
+                    },
+                ],
+                geometry="geometry",
+                crs="EPSG:4326",
+            )
+            runtime_topology_payload = Topology(
+                [political_gdf],
+                object_name=["political"],
+                topology=True,
+                prequantize=False,
+                topoquantize=False,
+                presimplify=False,
+                toposimplify=False,
+                shared_coords=False,
+            ).to_dict()
+
+            result = scenario_chunk_assets.build_and_write_scenario_chunk_assets(
+                scenario_dir=scenario_dir,
+                manifest_payload={"scenario_id": "tno_1962", "generated_at": "2026-04-23T00:00:00Z"},
+                layer_payloads={},
+                startup_topology_payload=runtime_topology_payload,
+                runtime_topology_payload=runtime_topology_payload,
+                startup_topology_url="data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
+                runtime_topology_url="data/scenarios/tno_1962/runtime_topology.topo.json",
+                generated_at="2026-04-23T00:00:00Z",
+            )
+
+            atl_chunk = json.loads((scenario_dir / "chunks" / "political.detail.country.atl.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                sorted(feature["properties"]["id"] for feature in atl_chunk["features"]),
+                ["ATLISL_adriatica_corfu", "ATLSHL_adriatica_4"],
+            )
+            manifest_chunk = next(chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["id"] == "political.detail.country.atl")
+            self.assertEqual(manifest_chunk["country_codes"], ["ATL"])
+
     def test_political_coarse_falls_back_to_runtime_topology_when_startup_shell_has_no_political(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             scenario_dir = Path(tmp_dir) / "tno_1962"

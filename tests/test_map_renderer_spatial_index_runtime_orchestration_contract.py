@@ -49,6 +49,15 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             ),
         )
 
+    def test_chunk_promotion_water_and_special_sync_secondary_indexes_before_deferred_infra(self):
+        self.assertRegex(
+            self.renderer_content,
+            re.compile(
+                r'function syncScenarioSecondaryRegionIndexes\(\{[\s\S]*?rebuildAuxiliaryRegionIndexes\(\);\s*resetSecondarySpatialIndexState\(\);\s*buildSecondarySpatialIndexes\(\{\s*allowComputeMissingBounds: true,\s*\}\);[\s\S]*?const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes\(\{\s*changedLayerKeys,\s*reason: `\$\{reason\}-secondary-sync`,\s*\}\);',
+                re.S,
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

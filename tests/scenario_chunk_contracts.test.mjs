@@ -72,3 +72,27 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
     assert.equal(ok, true, label);
   });
 });
+
+test("TNO water topology contracts keep exclusive scenario water and shared surface version signal", () => {
+  const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+  const scenarioApplyPipelineSource = readRepoFile("js", "core", "scenario_apply_pipeline.js");
+
+  const checks = {
+    tnoWaterUsesScenarioCollectionOnly:
+      /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?if \(isScenarioWaterTopologyExclusiveMode\(\)\) \{[\s\S]*?return scenarioFeatures\.filter\(\(feature\) => !isWaterRegionExcludedByScenario\(feature\)\);/.test(rendererSource),
+    waterMaskAndCoastlineShareScenarioSurfaceSignal:
+      /function getScenarioSurfaceVersionSignal\(\) \{/.test(rendererSource)
+      && /`water-ref:\$\{getObjectIdentityToken\(runtimeState\.scenarioWaterRegionsData, "scenario-water"\)\}`/.test(rendererSource)
+      && /function getScenarioWaterVisualRevisionToken\(\) \{[\s\S]*?getScenarioSurfaceVersionSignal\(\)/.test(rendererSource)
+      && /function getPhysicalLandClipCacheKey\(maskInfo\) \{[\s\S]*?scenario-surface:\$\{getScenarioSurfaceVersionSignal\(\)\}/.test(rendererSource)
+      && /function getCoastlineDecisionSignature\(decision = null\) \{[\s\S]*?String\(decision\.scenarioSurfaceVersionSignal \|\| ""\)/.test(rendererSource),
+    chunkPromotionSkipsDeferredInfraWhenSecondaryIndexesAlreadySynced:
+      /const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes\(\{[\s\S]*?const shouldSkipDeferredInfraRefresh = synchronizedSecondaryRegionIndexes && !hasPoliticalChange;[\s\S]*?if \(shouldSkipDeferredInfraRefresh\) \{[\s\S]*?scheduleHitCanvasBuildIfNeeded\(\{[\s\S]*?\}\);[\s\S]*?\} else \{[\s\S]*?scheduleDeferredScenarioChunkPromotionInfraRefresh\(\{/.test(rendererSource),
+    scenarioApplyCommitsPreparedScenarioWaterPayloadOnly:
+      /runtimeState\.scenarioWaterRegionsData = staged\.scenarioWaterRegionsFromTopology \|\| null;/.test(scenarioApplyPipelineSource),
+  };
+
+  Object.entries(checks).forEach(([label, ok]) => {
+    assert.equal(ok, true, label);
+  });
+});

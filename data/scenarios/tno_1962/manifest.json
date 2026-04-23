@@ -63,14 +63,14 @@
     "FIC"
   ],
   "palette_id": "tno",
-  "baseline_hash": "c504032d4ab4177e9f0c8ad99e3f5d7171caafda9efa149f98f3a238bcea327a",
+  "baseline_hash": "741f20a2a025677dc3a9056d3c49c8812bd7b9e06b93348d840020eb9800dbe4",
   "countries_url": "data/scenarios/tno_1962/countries.json",
   "owners_url": "data/scenarios/tno_1962/owners.by_feature.json",
   "controllers_url": "data/scenarios/tno_1962/controllers.by_feature.json",
   "cores_url": "data/scenarios/tno_1962/cores.by_feature.json",
   "audit_url": "data/scenarios/tno_1962/audit.json",
   "summary": {
-    "feature_count": 12798,
+    "feature_count": 12811,
     "owner_count": 174,
     "controller_count": 175,
     "quality_counts": {
@@ -85,12 +85,12 @@
       "scenario_generated": 473,
       "tno_reichskommissariat_baseline": 1944
     },
-    "approximate_count": 919,
+    "approximate_count": 915,
     "manual_reviewed_feature_count": 9467,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
-    "synthetic_owner_feature_count": 463,
-    "synthetic_count": 463,
+    "synthetic_owner_feature_count": 468,
+    "synthetic_count": 468,
     "changed_feature_count": 2032,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
@@ -109,7 +109,7 @@
     "context_land_mask_tolerance": null,
     "context_land_mask_area_delta_ratio": 0.0,
     "context_land_mask_fallback_used": true,
-    "context_land_mask_arc_refs": 80159,
+    "context_land_mask_arc_refs": 130930,
     "tno_bathymetry_band_count": 90,
     "tno_bathymetry_contour_count": 74,
     "tno_named_marginal_water_count": 101
@@ -133,11 +133,12 @@
       "fillColor": "#2d4769"
     }
   },
-  "generated_at": "2026-04-13T01:45:34Z",
+  "generated_at": "2026-03-28T21:25:26Z",
   "releasable_catalog_url": "data/releasables/tno_1962.internal.phase1.catalog.json",
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
   "geo_locale_patch_url": "data/scenarios/tno_1962/geo_locale_patch.json",
   "city_overrides_url": "data/scenarios/tno_1962/city_overrides.json",
+  "capital_hints_url": "data/scenarios/tno_1962/capital_hints.json",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "excluded_water_region_ids": [
     "marine_andaman_sea",
