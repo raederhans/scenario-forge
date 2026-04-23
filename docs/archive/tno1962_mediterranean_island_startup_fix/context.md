@@ -1,0 +1,39 @@
+# Context Log
+
+- 2026-04-23: task reopened from review.
+- Review findings confirmed two real issues:
+  - `flushPending=true` had been widened too far; `render-phase-idle` would keep entering chunk refresh even with no pending work.
+  - owner-border/local/province border grouping still bucketed by `cntr_code`, so `ATLISL_*` with `cntr_code=ATL` could fall out of ITA/IBR/TUR/GRE border groups.
+- Root-cause fixes implemented:
+  - `js/main.js`
+    - `flushPendingScenarioChunkRefreshAfterReady()` now seeds one explicit pending refresh only for the first ready flush when `selectionVersion<=0` and no pending work exists.
+  - `js/core/scenario/chunk_runtime.js`
+    - restored `flushPending` gate to `if (!flushPending || !hasPendingReason) return "noop";`
+    - kept direct pending-promotion commit path and shell-status updates.
+  - `js/core/map_renderer.js`
+    - added `getFeatureBorderMeshCountryCodeNormalized()` and `getEntityBorderMeshCountryCode()`.
+    - `getVisibleCountryCodesForBorderMeshes()` now prefers `item.borderMeshCountryCode` over raw `item.countryCode`.
+  - `js/core/renderer/spatial_index_runtime_builders.js`
+    - spatial items now carry `borderMeshCountryCode` separately from interaction `countryCode`.
+  - `js/core/renderer/spatial_index_runtime_owner.js`
+    - forwards `getFeatureBorderMeshCountryCodeNormalized` into spatial-item building.
+  - `js/core/renderer/border_mesh_owner.js`
+    - source-country selection, source-border meshes, detail-adm meshes, and parent-border country grouping now use owner-aware border-mesh country code while canonical global country border mesh stays on raw `cntr_code`.
+- Published ATLISL artifacts remain on the intended contract after the fix:
+  - `runtime_topology.topo.json`: 62 ATLISL, all `cntr_code=ATL`, all `interactive=true`
+  - `chunks/political.coarse.r0c0.json`: 62 ATLISL, all `ATL`, all interactive
+  - `chunks/political.detail.country.atl.json`: 62 ATLISL
+  - `chunks/political.detail.country.{ita,ibr,tur}.json`: 0 ATLISL
+- Verification completed:
+  - `node --check` passed for modified JS files in this review-fix wave.
+  - `py -3 -m py_compile` passed for modified contract tests.
+  - targeted unittest passed:
+    - `tests.test_scenario_chunk_refresh_contracts`
+    - `tests.test_startup_hydration_boundary_contract`
+    - `tests.test_tno_bundle_builder`
+    - `tests.test_map_renderer_border_mesh_owner_boundary_contract`
+    - `tests.test_map_renderer_spatial_index_runtime_owner_boundary_contract`
+    - `tests.test_map_renderer_border_draw_owner_boundary_contract`
+    - total: `Ran 76 tests`, `OK`.
+- Remaining repo note:
+  - there are unrelated pre-existing working-tree items outside this task, including `js/ui/toolbar/appearance_controls_controller.js` and other docs folders; they were left untouched.

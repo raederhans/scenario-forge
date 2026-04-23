@@ -41,7 +41,12 @@ export function appendLandSpatialItemsRange({
   shouldSkipFeature = () => false,
   getProjectedFeatureBounds = () => null,
   getFeatureCountryCodeNormalized = () => "",
+  getFeatureBorderMeshCountryCodeNormalized = null,
 } = {}) {
+  const resolveBorderMeshCountryCode =
+    typeof getFeatureBorderMeshCountryCodeNormalized === "function"
+      ? getFeatureBorderMeshCountryCodeNormalized
+      : getFeatureCountryCodeNormalized;
   for (let index = start; index < end; index += 1) {
     const feature = features[index];
     const id = getFeatureId(feature);
@@ -58,6 +63,7 @@ export function appendLandSpatialItemsRange({
       drawOrder: index,
       feature,
       countryCode: getFeatureCountryCodeNormalized(feature),
+      borderMeshCountryCode: resolveBorderMeshCountryCode(feature),
       source: String(feature?.properties?.__source || "primary"),
       minX: bounds.minX,
       minY: bounds.minY,

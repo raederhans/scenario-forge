@@ -5,6 +5,7 @@ from contextlib import nullcontext
 import json
 import os
 from pathlib import Path
+import re
 import tempfile
 import threading
 import unittest
@@ -503,6 +504,16 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 "interactive": False,
                 "render_as_base_geography": False,
             },
+        )
+
+    def test_build_runtime_topology_state_keeps_water_stage_artifacts_in_full_state(self) -> None:
+        source = Path(tno_bundle.__file__).read_text(encoding="utf-8")
+        self.assertRegex(
+            source,
+            re.compile(
+                r'full_state = \{\s*\*\*countries_state,\s*\*\*water_state,\s*\}',
+                re.S,
+            ),
         )
 
     def test_build_relief_overlays_keeps_expected_overlay_kind_distribution(self) -> None:
@@ -1196,6 +1207,41 @@ class TnoBundleBuilderTest(unittest.TestCase):
         finally:
             tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = original_overrides
 
+    def test_apply_tno_feature_assignment_overrides_preserves_atlisl_runtime_country_code(self) -> None:
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {
+                    "id": "ATLISL_tyrrhenian_corsica",
+                    "name": "Corsica",
+                    "cntr_code": "ATL",
+                    "geometry": _square(0, 0),
+                },
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        original_overrides = tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES
+        tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {"ITA": ["ATLISL_tyrrhenian_corsica"]}
+        try:
+            owners_payload = {"owners": {}}
+            controllers_payload = {"controllers": {}}
+            cores_payload = {"cores": {}}
+
+            diagnostics = apply_tno_feature_assignment_overrides(
+                owners_payload=owners_payload,
+                controllers_payload=controllers_payload,
+                cores_payload=cores_payload,
+                scenario_political_gdf=political_gdf,
+            )
+
+            self.assertEqual(diagnostics["feature_count"], 1)
+            self.assertEqual(owners_payload["owners"]["ATLISL_tyrrhenian_corsica"], "ITA")
+            self.assertEqual(controllers_payload["controllers"]["ATLISL_tyrrhenian_corsica"], "ITA")
+            self.assertEqual(cores_payload["cores"]["ATLISL_tyrrhenian_corsica"], ["ITA"])
+            self.assertEqual(political_gdf.iloc[0]["cntr_code"], "ATL")
+        finally:
+            tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = original_overrides
+
     def test_apply_tno_owner_only_backfill_updates_only_owners_and_runtime_cntr_code(self) -> None:
         feature_ids = list(TNO_1962_OWNER_ONLY_BACKFILL.keys())
         political_gdf = gpd.GeoDataFrame(
@@ -1240,6 +1286,33 @@ class TnoBundleBuilderTest(unittest.TestCase):
         owner_counts = Counter(str(owner or "").strip() for owner in owners.values())
         for tag in affected_tags:
             self.assertEqual(countries.get(tag, {}).get("feature_count"), owner_counts[tag], tag)
+
+    def test_checked_in_tno_1962_atlisl_runtime_contract_stays_consistent(self) -> None:
+        scenario_dir = Path(tno_bundle.SCENARIO_DIR)
+        owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
+        runtime_topology = json.loads((scenario_dir / "runtime_topology.topo.json").read_text(encoding="utf-8"))
+
+        owners = owners_payload["owners"]
+        political_geometries = runtime_topology["objects"]["political"]["geometries"]
+        atlisl_props = [
+            geometry.get("properties", {})
+            for geometry in political_geometries
+            if str(geometry.get("properties", {}).get("id", "")).startswith("ATLISL_")
+        ]
+        atlshl_props = [
+            geometry.get("properties", {})
+            for geometry in political_geometries
+            if str(geometry.get("properties", {}).get("id", "")).startswith("ATLSHL_")
+        ]
+
+        self.assertTrue(atlisl_props)
+        for props in atlisl_props:
+            feature_id = props["id"]
+            self.assertIn(feature_id, owners, feature_id)
+            self.assertEqual(props.get("cntr_code"), "ATL", feature_id)
+            self.assertIs(props.get("interactive"), True, feature_id)
+        for props in atlshl_props:
+            self.assertIs(props.get("interactive"), False, props.get("id"))
 
     def test_atlantropa_west_med_owner_overrides_use_existing_algeria_subject_tags(self) -> None:
         overrides = ATLANTROPA_REGION_CONFIGS["west_med"]["state_owner_overrides"]

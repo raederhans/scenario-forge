@@ -1112,7 +1112,9 @@ function getBorderMeshOwner() {
       ensureSovereigntyState,
       getAdmin1Group,
       getEntityCountryCode,
+      getEntityBorderMeshCountryCode,
       getFeatureCountryCodeNormalized,
+      getFeatureBorderMeshCountryCodeNormalized,
       getFeatureId,
       getLatitudeAdjustedSimplifyEpsilon,
       getLineLength,
@@ -1261,6 +1263,7 @@ function getSpatialIndexRuntimeOwner() {
       finalizeIndexBuildEffects,
       getFeatureId,
       getFeatureCountryCodeNormalized,
+      getFeatureBorderMeshCountryCodeNormalized,
       shouldExcludePoliticalInteractionFeature,
       buildSpatialGrid,
       nowMs,
@@ -3014,6 +3017,15 @@ function getFeatureCountryCodeNormalized(feature) {
 
 function getFeatureCountryCode(feature) {
   return getFeatureCountryCodeNormalized(feature);
+}
+
+function getFeatureBorderMeshCountryCodeNormalized(feature) {
+  const featureId = getFeatureId(feature);
+  return canonicalCountryCode(
+    getDisplayOwnerCode(feature, featureId)
+    || getFeatureCountryCodeNormalized(feature)
+    || ""
+  );
 }
 
 function getAtlantropaSurfaceKind(feature) {
@@ -5631,6 +5643,11 @@ function getEntityCountryCode(entity) {
   return featureLike ? getFeatureCountryCodeNormalized(featureLike) : "";
 }
 
+function getEntityBorderMeshCountryCode(entity) {
+  const featureLike = asFeatureLike(entity);
+  return featureLike ? getFeatureBorderMeshCountryCodeNormalized(featureLike) : "";
+}
+
 function getEntityOwnerCode(entity) {
   const featureId = getEntityFeatureId(entity);
   if (!featureId) return "";
@@ -6119,7 +6136,7 @@ function getVisibleCountryCodesForBorderMeshes() {
   const maxX = Number(viewportBounds.maxX);
   const maxY = Number(viewportBounds.maxY);
   (runtimeState.spatialItems || []).forEach((item) => {
-    const countryCode = canonicalCountryCode(item?.countryCode || "");
+    const countryCode = canonicalCountryCode(item?.borderMeshCountryCode || item?.countryCode || "");
     if (!countryCode || visible.has(countryCode)) return;
     if (item.maxX < minX || item.maxY < minY || item.minX > maxX || item.minY > maxY) {
       return;

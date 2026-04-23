@@ -38,7 +38,9 @@ export function createBorderMeshOwner({
     ensureSovereigntyState = () => {},
     getAdmin1Group,
     getEntityCountryCode,
+    getEntityBorderMeshCountryCode = getEntityCountryCode,
     getFeatureCountryCodeNormalized,
+    getFeatureBorderMeshCountryCodeNormalized = getFeatureCountryCodeNormalized,
     getFeatureId,
     getLatitudeAdjustedSimplifyEpsilon,
     getLineLength,
@@ -230,14 +232,14 @@ export function createBorderMeshOwner({
       includedCountries,
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,
-      getEntityCountryCode,
+      getEntityCountryCode: getEntityBorderMeshCountryCode,
       isAdmDetailTier,
     });
 
   function getSourceCountrySets() {
     return getSourceCountrySetsFromSelection({
       state,
-      getFeatureCountryCodeNormalized,
+      getFeatureCountryCodeNormalized: getFeatureBorderMeshCountryCodeNormalized,
       getFeatureId,
       shouldExcludePoliticalInteractionFeature,
     });
@@ -249,7 +251,7 @@ export function createBorderMeshOwner({
       state,
       canonicalCountryCode,
       getStaticMeshSourceCountries,
-      getEntityCountryCode,
+      getEntityCountryCode: getEntityBorderMeshCountryCode,
       getParentGroupForEntity,
       isUsableMesh,
     });
@@ -262,7 +264,7 @@ export function createBorderMeshOwner({
       canonicalCountryCode,
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,
-      getFeatureCountryCodeNormalized,
+      getFeatureCountryCodeNormalized: getFeatureBorderMeshCountryCodeNormalized,
       getAdmin1Group,
       isUsableMesh,
     });

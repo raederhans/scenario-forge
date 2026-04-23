@@ -42,6 +42,7 @@ export function createSpatialIndexRuntimeOwner({
     finalizeIndexBuildEffects = () => {},
     getFeatureId = () => "",
     getFeatureCountryCodeNormalized = () => "",
+    getFeatureBorderMeshCountryCodeNormalized = () => "",
     getProjectedFeatureBounds = () => null,
     shouldExcludePoliticalInteractionFeature = () => false,
     buildSpatialGrid = () => {},
@@ -214,6 +215,7 @@ export function createSpatialIndexRuntimeOwner({
       shouldSkipFeature,
       getProjectedFeatureBounds,
       getFeatureCountryCodeNormalized,
+      getFeatureBorderMeshCountryCodeNormalized,
     });
     const nextGridSnapshot = captureSpatialGridBuild({
       state,
@@ -341,6 +343,7 @@ export function createSpatialIndexRuntimeOwner({
         shouldSkipFeature,
         getProjectedFeatureBounds,
         getFeatureCountryCodeNormalized,
+        getFeatureBorderMeshCountryCodeNormalized,
       });
       if (end < features.length) {
         await yieldToMain();

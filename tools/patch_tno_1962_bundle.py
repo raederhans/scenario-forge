@@ -7870,7 +7870,6 @@ def make_atl_row(
             ATL_GEOMETRY_ROLE_DONOR_ISLAND,
             ATL_GEOMETRY_ROLE_CAUSEWAY,
         }
-        and normalized_join_mode not in {ATL_JOIN_MODE_GAP_FILL, ATL_JOIN_MODE_BOOLEAN_WELD}
     )
     return {
         "id": feature_id,
@@ -8779,7 +8778,7 @@ def apply_tno_feature_assignment_overrides(
 
     if scenario_political_gdf is not None and not scenario_political_gdf.empty:
         id_series = scenario_political_gdf["id"].fillna("").astype(str).str.strip()
-        mask = id_series.isin(override_map)
+        mask = id_series.isin(override_map) & ~id_series.str.startswith("ATLISL_")
         if mask.any():
             scenario_political_gdf.loc[mask, "cntr_code"] = id_series.loc[mask].map(override_map)
 
@@ -10696,7 +10695,10 @@ def build_runtime_topology_state(
     stage_metadata["core_baseline_hash"] = core_baseline_hash
     stage_metadata["context_land_mask_arc_refs"] = context_land_mask_arc_refs
 
-    full_state = dict(countries_state)
+    full_state = {
+        **countries_state,
+        **water_state,
+    }
     full_state.update({
         "runtime_topology_payload": runtime_topology_payload,
         "runtime_bootstrap_topology_payload": build_bootstrap_runtime_topology(runtime_topology_payload),

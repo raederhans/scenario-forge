@@ -150,6 +150,15 @@ function createScenarioChunkRuntimeController({
     return loadState;
   }
 
+  function setScenarioChunkShellStatus(nextStatus = "", loadState = ensureRuntimeChunkLoadState()) {
+    const normalizedStatus = String(nextStatus || "").trim().toLowerCase();
+    if (!normalizedStatus) {
+      return loadState.shellStatus;
+    }
+    loadState.shellStatus = normalizedStatus;
+    return loadState.shellStatus;
+  }
+
   function shouldZoomEndPromoteImmediately(bundle, reason = "") {
     if (String(reason || "").trim().toLowerCase() !== "zoom-end") {
       return false;
@@ -262,9 +271,17 @@ function createScenarioChunkRuntimeController({
       return "noop";
     }
     if (loadState.pendingPromotion && loadState.promotionScheduled) {
-      return "promotion-scheduled";
+      if (flushPending) {
+        if (loadState.promotionTimerId) {
+          globalThis.clearTimeout(loadState.promotionTimerId);
+          loadState.promotionTimerId = null;
+        }
+        loadState.promotionScheduled = false;
+      } else {
+        return "promotion-scheduled";
+      }
     }
-    if (loadState.pendingPromotion && !loadState.promotionScheduled) {
+    if (loadState.pendingPromotion && !loadState.promotionScheduled && !flushPending) {
       const delayMs = Number.isFinite(Number(loadState.pendingDelayMs))
         ? Math.max(0, Number(loadState.pendingDelayMs))
         : 0;
@@ -282,6 +299,7 @@ function createScenarioChunkRuntimeController({
     if (!flushPending || !hasPendingReason) {
       return "noop";
     }
+    setScenarioChunkShellStatus("loading", loadState);
     void refreshActiveScenarioChunks({
       reason,
       renderNow: true,
@@ -644,6 +662,7 @@ function createScenarioChunkRuntimeController({
       }
       loadState.zoomEndChunkVisibleMetric = null;
     }
+    setScenarioChunkShellStatus("ready", loadState);
     clearPendingScenarioChunkPromotion(loadState);
     clearPendingScenarioChunkRefresh(loadState);
     return true;
@@ -674,6 +693,7 @@ function createScenarioChunkRuntimeController({
       return false;
     }
     if (shouldDeferScenarioChunkRefresh()) {
+      setScenarioChunkShellStatus("loading", loadState);
       const hasExplicitPendingDelayMs =
         loadState.pendingDelayMs != null && Number.isFinite(Number(loadState.pendingDelayMs));
       const retryDelayMs = Math.max(
@@ -885,11 +905,15 @@ function createScenarioChunkRuntimeController({
     if (!scenarioId) return null;
     const bundle = getCachedScenarioBundle(scenarioId);
     if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
+    const loadState = ensureRuntimeChunkLoadState();
     if (shouldDeferScenarioChunkRefreshFor()) {
       markPendingScenarioChunkRefresh(reason);
+      if (loadState.selectionVersion <= 0 && !runtimeState.activeScenarioChunks?.loadedChunkIds?.length) {
+        setScenarioChunkShellStatus("loading", loadState);
+      }
       return null;
     }
-    clearPendingScenarioChunkRefresh();
+    clearPendingScenarioChunkRefresh(loadState);
     await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
     const viewportBbox = typeof runtimeState.getViewportGeoBoundsFn === "function"
       ? runtimeState.getViewportGeoBoundsFn()
@@ -903,7 +927,7 @@ function createScenarioChunkRuntimeController({
     });
     const chunkState = ensureActiveScenarioChunkState();
     chunkState.scenarioId = scenarioId;
-    const loadState = ensureRuntimeChunkLoadState();
+    setScenarioChunkShellStatus("loading", loadState);
     const focusCountry = resolveScenarioChunkFocusCountry(bundle, loadState);
     const selectionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     const selection = selectScenarioChunks({
@@ -970,6 +994,9 @@ function createScenarioChunkRuntimeController({
       optionalChunkIds: nextOptionalChunkIds,
     };
     if (selectionUnchanged) {
+      if (nextRequiredChunkIds.length || chunkState.loadedChunkIds.length) {
+        setScenarioChunkShellStatus("ready", loadState);
+      }
       if (String(reason || "").trim().toLowerCase() === "zoom-end" && Number(loadState.zoomEndChunkVisibleMetric?.startedAt || 0) > 0) {
         const endedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
         const durationMs = Math.max(0, endedAt - Number(loadState.zoomEndChunkVisibleMetric.startedAt || 0));
@@ -1057,6 +1084,9 @@ function createScenarioChunkRuntimeController({
     if (!hasMergedLayerChange && !hasPoliticalFeatureChange) {
       clearPendingScenarioChunkPromotion(loadState);
       clearPendingScenarioChunkRefresh(loadState);
+      if (nextRequiredChunkIds.length || chunkState.loadedChunkIds.length) {
+        setScenarioChunkShellStatus("ready", loadState);
+      }
       return selection;
     }
     const promotionQueuedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
@@ -1089,6 +1119,7 @@ function createScenarioChunkRuntimeController({
     };
     loadState.promotionRetryCount = 0;
     loadState.lastPromotionRetryAt = 0;
+    setScenarioChunkShellStatus("loading", loadState);
     if (shouldDeferScenarioChunkRefreshFor()) {
       markPendingScenarioChunkRefresh(reason);
       return selection;
@@ -1148,7 +1179,7 @@ function createScenarioChunkRuntimeController({
       : (String(nextReason || "").includes("interacting")
         ? refreshDelayInteracting
         : refreshDelayIdle));
-    if (flushPending && resolvedDelayMs <= 0) {
+    if (flushPending) {
       return executeScenarioChunkRefreshNow({
         bundle,
         reason: nextReason,

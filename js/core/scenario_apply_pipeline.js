@@ -177,7 +177,7 @@ function createScenarioApplyPipeline({
         runtimeState.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
         runtimeState.activeScenarioChunks.lruChunkIds = [...chunkIds];
       }
-      ensureRuntimeChunkLoadState().shellStatus = chunkIds.length ? "ready" : "idle";
+      ensureRuntimeChunkLoadState().shellStatus = chunkIds.length ? "ready" : "loading";
       ensureRuntimeChunkLoadState().registryStatus = scenarioBundleHasChunkedData(bundle) ? "ready" : "idle";
       return;
     }

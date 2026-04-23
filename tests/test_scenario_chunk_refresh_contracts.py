@@ -6,6 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_PATH = ROOT / "js/core/map_renderer.js"
 SCENARIO_RESOURCES_PATH = ROOT / "js/core/scenario_resources.js"
 SCENARIO_CHUNK_RUNTIME_PATH = ROOT / "js/core/scenario/chunk_runtime.js"
+MAIN_JS_PATH = ROOT / "js/main.js"
+SCENARIO_RUNTIME_STATE_PATH = ROOT / "js/core/state/scenario_runtime_state.js"
 
 
 class ScenarioChunkRefreshContractsTest(unittest.TestCase):
@@ -14,6 +16,8 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         cls.map_renderer_source = MAP_RENDERER_PATH.read_text(encoding="utf-8")
         cls.scenario_resources_source = SCENARIO_RESOURCES_PATH.read_text(encoding="utf-8")
         cls.scenario_chunk_runtime_source = SCENARIO_CHUNK_RUNTIME_PATH.read_text(encoding="utf-8")
+        cls.main_source = MAIN_JS_PATH.read_text(encoding="utf-8")
+        cls.scenario_runtime_state_source = SCENARIO_RUNTIME_STATE_PATH.read_text(encoding="utf-8")
 
     def test_basic_ready_builds_land_spatial_index_before_unlock(self):
         self.assertIn('await buildSpatialIndexChunked({', self.map_renderer_source)
@@ -43,9 +47,10 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('allowRefreshStart = false,', self.scenario_chunk_runtime_source)
         self.assertIn('const hasPendingReason = !!allowRefreshStart || !!String(loadState.pendingReason || "").trim();', self.scenario_chunk_runtime_source)
         self.assertIn('allowRefreshStart: hadPendingReason,', self.scenario_chunk_runtime_source)
+        self.assertIn('if (!flushPending || !hasPendingReason) {', self.scenario_chunk_runtime_source)
 
     def test_political_chunk_promotion_refreshes_union_of_previous_and_next_feature_ids(self):
-        self.assertIn('const previousFeatureIds = getScenarioFeatureCollectionIdentityList(state.scenarioPoliticalChunkData);', self.scenario_chunk_runtime_source)
+        self.assertIn('const previousFeatureIds = getScenarioFeatureCollectionIdentityList(runtimeState.scenarioPoliticalChunkData);', self.scenario_chunk_runtime_source)
         self.assertIn('const nextFeatureIds = getScenarioFeatureCollectionIdentityList(normalizedPayload);', self.scenario_chunk_runtime_source)
         self.assertRegex(
             self.scenario_chunk_runtime_source,
@@ -69,22 +74,68 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         )
 
     def test_runtime_chunk_load_state_tracks_promotion_retry_observability_fields(self):
-        self.assertIn('promotionRetryCount: 0,', self.scenario_chunk_runtime_source)
-        self.assertIn('lastPromotionRetryAt: 0,', self.scenario_chunk_runtime_source)
-        self.assertIn('state.runtimeChunkLoadState.promotionRetryCount = Math.max(', self.scenario_chunk_runtime_source)
-        self.assertIn('state.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(', self.scenario_chunk_runtime_source)
+        self.assertIn('promotionRetryCount: 0,', self.scenario_runtime_state_source)
+        self.assertIn('lastPromotionRetryAt: 0,', self.scenario_runtime_state_source)
+        self.assertIn('runtimeState.runtimeChunkLoadState.promotionRetryCount = Math.max(', self.scenario_chunk_runtime_source)
+        self.assertIn('runtimeState.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(', self.scenario_chunk_runtime_source)
 
-    def test_execute_chunk_refresh_reschedules_pending_promotion_without_active_timer(self):
+    def test_execute_chunk_refresh_reschedules_pending_promotion_without_active_timer_when_not_flushing(self):
         self.assertRegex(
             self.scenario_chunk_runtime_source,
             re.compile(
-                r'if \(loadState\.pendingPromotion && !loadState\.promotionScheduled\) \{\s*const delayMs = .*?;\s*schedulePendingScenarioChunkPromotionCommit\(\{ delayMs \}\);\s*if \(loadState\.pendingPromotion && loadState\.promotionScheduled\) \{\s*return "promotion-scheduled";',
+                r'if \(loadState\.pendingPromotion && !loadState\.promotionScheduled && !flushPending\) \{\s*const delayMs = .*?;\s*schedulePendingScenarioChunkPromotionCommit\(\{ delayMs \}\);\s*if \(loadState\.pendingPromotion && loadState\.promotionScheduled\) \{\s*return "promotion-scheduled";',
+                re.S,
+            ),
+        )
+
+    def test_flush_pending_ready_path_commits_promotion_immediately(self):
+        self.assertIn("setScenarioChunkShellStatus(", self.scenario_chunk_runtime_source)
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'if \(loadState\.pendingPromotion && loadState\.promotionScheduled\) \{\s*if \(flushPending\) \{\s*if \(loadState\.promotionTimerId\) \{\s*globalThis\.clearTimeout\(loadState\.promotionTimerId\);',
+                re.S,
+            ),
+        )
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'if \(flushPending\) \{\s*return executeScenarioChunkRefreshNow\(\{\s*bundle,\s*reason: nextReason,\s*flushPending,\s*allowRefreshStart: hadPendingReason,',
+                re.S,
+            ),
+        )
+        self.assertIn('setScenarioChunkShellStatus("ready", loadState);', self.scenario_chunk_runtime_source)
+
+    def test_ready_state_flushes_pending_scenario_chunk_refresh_before_deferred_full_interaction(self):
+        self.assertRegex(
+            self.main_source,
+            re.compile(
+                r'completeBootSequenceLogging\(\);\s*flushPendingScenarioChunkRefreshAfterReady\("ready-state"\);\s*startDeferredFullInteractionInfrastructureBuild\("ready-state"\);',
+                re.S,
+            ),
+        )
+        self.assertRegex(
+            self.main_source,
+            re.compile(
+                r'runtimeState\.scheduleScenarioChunkRefreshFn\(\{\s*reason: normalizedReason,\s*delayMs: 0,\s*flushPending: true,',
+                re.S,
+            ),
+        )
+        self.assertIn("const shouldSeedFirstReadyFlush = !!(", self.main_source)
+        self.assertIn("loadState.pendingReason = normalizedReason;", self.main_source)
+        self.assertIn("loadState.pendingDelayMs = 0;", self.main_source)
+
+    def test_pending_promotion_keeps_same_selection_version_across_visual_infra_and_commit_payload(self):
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'const nextSelectionVersion = Math\.max\(0, Number\(loadState\.selectionVersion \|\| 0\)\) \+ 1;\s*loadState\.selectionVersion = nextSelectionVersion;[\s\S]*?pendingVisualPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingInfraPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,',
                 re.S,
             ),
         )
 
     def test_timer_handle_check_requires_live_timer_shape(self):
-        self.assertIn('if (state.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(state.runtimeChunkLoadState.promotionTimerId)) {', self.scenario_chunk_runtime_source)
+        self.assertIn('if (runtimeState.runtimeChunkLoadState.promotionTimerId && !isTimerHandle(runtimeState.runtimeChunkLoadState.promotionTimerId)) {', self.scenario_chunk_runtime_source)
         self.assertIn('return Number.isFinite(value);', self.scenario_chunk_runtime_source)
         self.assertIn('typeof value.ref === "function"', self.scenario_chunk_runtime_source)
         self.assertIn('typeof value.unref === "function"', self.scenario_chunk_runtime_source)

@@ -34,6 +34,7 @@ class MapRendererBorderDrawOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("return getBorderDrawOwner().drawHierarchicalBorders(k, { interactive });", renderer_content)
         self.assertIn("function drawHierarchicalBorders(k, { interactive = false } = {}) {", renderer_content)
         self.assertIn("function drawBordersPass(k, { interactive = false } = {}) {", renderer_content)
+        self.assertIn("item?.borderMeshCountryCode || item?.countryCode || \"\"", renderer_content)
 
         self.assertIn("export function createBorderDrawOwner({", owner_content)
         self.assertIn("state,", owner_content)

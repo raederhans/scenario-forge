@@ -299,8 +299,20 @@ function flushPendingScenarioChunkRefreshAfterReady(reason = "post-ready") {
   if (typeof runtimeState.scheduleScenarioChunkRefreshFn !== "function") {
     return;
   }
+  const loadState = runtimeState.runtimeChunkLoadState;
+  const normalizedReason = String(reason || "post-ready").trim() || "post-ready";
+  const shouldSeedFirstReadyFlush = !!(
+    loadState
+    && Number(loadState.selectionVersion || 0) <= 0
+    && !String(loadState.pendingReason || "").trim()
+    && !loadState.pendingPromotion
+  );
+  if (shouldSeedFirstReadyFlush) {
+    loadState.pendingReason = normalizedReason;
+    loadState.pendingDelayMs = 0;
+  }
   runtimeState.scheduleScenarioChunkRefreshFn({
-    reason,
+    reason: normalizedReason,
     delayMs: 0,
     flushPending: true,
   });
@@ -641,6 +653,7 @@ async function finalizeReadyState(renderDispatcher) {
   checkpointBootMetric("time-to-interactive");
   checkpointBootMetric("first-interactive");
   completeBootSequenceLogging();
+  flushPendingScenarioChunkRefreshAfterReady("ready-state");
   scheduleDeferredDetailPromotion(renderDispatcher);
   schedulePostReadyHydration();
   schedulePostReadyDeferredContextWarmup();

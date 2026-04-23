@@ -45,6 +45,8 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)", content)
         self.assertIn("return false;", content)
         self.assertIn("return true;", content)
+        self.assertNotIn("scheduleScenarioChunkRefreshFn", content)
+        self.assertNotIn("flushPendingScenarioChunkRefreshAfterReady", content)
 
     def test_health_gate_retry_and_result_shape_stay_stable(self):
         content = SCENARIO_STARTUP_HYDRATION.read_text(encoding="utf-8")
@@ -71,6 +73,9 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("mergedPoliticalPayload !== undefined", content)
         self.assertIn('getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political")', content)
         self.assertIn("|| state.scenarioPoliticalChunkData", content)
+        self.assertIn("applyScenarioPoliticalChunkPayload(", content)
+        self.assertIn('reason: "scenario-hydrate-political"', content)
+        self.assertIn("renderNow: false,", content)
         self.assertIn('reason: "scenario-hydrate-opening"', content)
         self.assertIn("state.activeScenarioMeshPack?.meshes?.opening_owner_borders", content)
         self.assertIn("mergedCitiesPayload !== undefined", content)

@@ -336,7 +336,10 @@ export function createAppearanceControlsController({
     });
     appearanceTabPanels.forEach((panel) => {
       const id = String(panel.dataset.appearancePanel || "").trim().toLowerCase();
-      panel.classList.toggle("hidden", id !== normalizedTabId);
+      const isActive = id === normalizedTabId;
+      panel.classList.toggle("is-active", isActive);
+      panel.classList.toggle("hidden", !isActive);
+      panel.hidden = !isActive;
     });
   };
 
