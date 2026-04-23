@@ -5,12 +5,14 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 SPATIAL_INDEX_RUNTIME_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "spatial_index_runtime_owner.js"
+SPATIAL_INDEX_RUNTIME_BUILDERS_JS = REPO_ROOT / "js" / "core" / "renderer" / "spatial_index_runtime_builders.js"
 
 
 class MapRendererSpatialIndexRuntimeOwnerBoundaryContractTest(unittest.TestCase):
     def test_map_renderer_keeps_interaction_startup_orchestration_while_spatial_runtime_moves_to_owner(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         owner_content = SPATIAL_INDEX_RUNTIME_OWNER_JS.read_text(encoding="utf-8")
+        builders_content = SPATIAL_INDEX_RUNTIME_BUILDERS_JS.read_text(encoding="utf-8")
         renderer_imports = renderer_content.replace('"', "'")
 
         self.assertIn(
@@ -43,14 +45,18 @@ class MapRendererSpatialIndexRuntimeOwnerBoundaryContractTest(unittest.TestCase)
 
         self.assertIn("export function createSpatialIndexRuntimeOwner({", owner_content)
         self.assertIn("rebuildAuxiliaryRegionIndexes = () => {},", owner_content)
+        self.assertIn("appendLandIndexEntriesRange", owner_content)
+        self.assertIn("appendLandSpatialItemsRange", owner_content)
+        self.assertIn("captureSpatialGridBuild", owner_content)
         self.assertIn("function buildIndex({ scheduleUiMode = \"immediate\" } = {}) {", owner_content)
         self.assertIn("function rebuildRuntimePrimaryIndex({", owner_content)
         self.assertIn("function resetSecondarySpatialIndexState() {", owner_content)
         self.assertIn("function buildSecondarySpatialIndexes({", owner_content)
-        self.assertIn("getProjectedFeatureBounds(feature, {", owner_content)
         self.assertIn("function buildSpatialIndex({", owner_content)
         self.assertIn("async function buildIndexChunked({", owner_content)
         self.assertIn("async function buildSpatialIndexChunked({", owner_content)
+        self.assertIn("getProjectedFeatureBounds(feature, {", builders_content)
+        self.assertIn("function captureSpatialGridBuild(", builders_content)
         self.assertIn("getSpatialIndexRuntimeOwner().rebuildRuntimePrimaryIndex({", renderer_content)
         self.assertNotIn("function rebuildRuntimeDerivedState({", owner_content)
 

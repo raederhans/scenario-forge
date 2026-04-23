@@ -7,6 +7,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
 PROJECT_SUPPORT_DIAGNOSTICS_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "sidebar" / "project_support_diagnostics_controller.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
+INTERACTION_FUNNEL_UI_SYNC_JS = REPO_ROOT / "js" / "core" / "interaction_funnel" / "ui_sync.js"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 
 
@@ -70,10 +71,12 @@ class ProjectSupportDiagnosticsSidebarBoundaryContractTest(unittest.TestCase):
 
     def test_interaction_funnel_and_renderer_keep_project_support_callbacks(self):
         interaction_funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
+        interaction_funnel_ui_sync_content = INTERACTION_FUNNEL_UI_SYNC_JS.read_text(encoding="utf-8")
         map_renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
 
-        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);', interaction_funnel_content)
-        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);', interaction_funnel_content)
+        self.assertIn('syncProjectImportUiStateHelper', interaction_funnel_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);', interaction_funnel_ui_sync_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);', interaction_funnel_ui_sync_content)
         self.assertIn('runtimeState.updateLegendUI();', map_renderer_content)
 
 

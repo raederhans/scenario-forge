@@ -1,3 +1,15 @@
+import {
+  evaluateCoastlineTopologySource,
+} from "./border_mesh_diagnostics.js";
+import {
+  buildCountryParentBorderMeshes as buildCountryParentBorderMeshesFromSources,
+  buildGlobalCoastlineMesh as buildGlobalCoastlineMeshFromSources,
+  buildGlobalCountryBorderMesh as buildGlobalCountryBorderMeshFromSources,
+  buildSourceBorderMeshes as buildSourceBorderMeshesFromSources,
+  getSourceCountrySets as getSourceCountrySetsFromSelection,
+  resolveScenarioOpeningOwnerBorderSelection,
+} from "./border_mesh_source_selection.js";
+
 export function createBorderMeshOwner({
   state,
   constants = {},
@@ -178,64 +190,45 @@ export function createBorderMeshOwner({
   // baselineHash 缺失时回退到 baselineOwnersRef 引用比较，保证旧数据源也能被正确失效。
   function refreshScenarioOpeningOwnerBorders(reason = "") {
     const startedAt = nowMs();
-    const runtimeTopologyForOpeningOwner = state.runtimePoliticalTopology;
+    const selection = resolveScenarioOpeningOwnerBorderSelection({
+      state,
+      isUsableMesh,
+    });
     let cacheMatches = false;
-    const meshPackMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
-    const hasMeshPackMesh = isUsableMesh(meshPackMesh);
-    const hasBaselineOwners = Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
-    const shouldBuild =
-      !!state.activeScenarioId
-      && state.scenarioBorderMode === "scenario_owner_only"
-      && String(state.scenarioViewMode || "ownership") === "ownership"
-      && (
-        hasMeshPackMesh
-        || (!!runtimeTopologyForOpeningOwner?.objects?.political && hasBaselineOwners)
-      );
 
-    if (shouldBuild) {
-      const runtimeRef = runtimeTopologyForOpeningOwner;
-      const meshPackRef = state.activeScenarioMeshPack || null;
-      const scenarioId = String(state.activeScenarioId || "");
-      const baselineHash = String(state.scenarioBaselineHash || "");
-      const shellRevision = Number(state.scenarioShellOverlayRevision) || 0;
-      const meshSource = hasMeshPackMesh ? "mesh_pack" : "runtime";
+    if (selection.shouldBuild) {
       cacheMatches =
-        scenarioOpeningOwnerBorderCache.meshSource === meshSource
-        && scenarioOpeningOwnerBorderCache.scenarioId === scenarioId
-        && (baselineHash
-          ? scenarioOpeningOwnerBorderCache.baselineHash === baselineHash
-          : scenarioOpeningOwnerBorderCache.baselineOwnersRef === state.scenarioBaselineOwnersByFeatureId)
-        && scenarioOpeningOwnerBorderCache.shellRevision === shellRevision
-        && (meshSource === "mesh_pack"
-          ? scenarioOpeningOwnerBorderCache.meshPackRef === meshPackRef
-          : scenarioOpeningOwnerBorderCache.runtimeRef === runtimeRef)
+        scenarioOpeningOwnerBorderCache.meshSource === selection.meshSource
+        && scenarioOpeningOwnerBorderCache.scenarioId === selection.scenarioId
+        && (selection.baselineHash
+          ? scenarioOpeningOwnerBorderCache.baselineHash === selection.baselineHash
+          : scenarioOpeningOwnerBorderCache.baselineOwnersRef === selection.baselineOwnersRef)
+        && scenarioOpeningOwnerBorderCache.shellRevision === selection.shellRevision
+        && (selection.meshSource === "mesh_pack"
+          ? scenarioOpeningOwnerBorderCache.meshPackRef === selection.meshPackRef
+          : scenarioOpeningOwnerBorderCache.runtimeRef === selection.runtimeRef)
         && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
 
       state.cachedScenarioOpeningOwnerBorders = cacheMatches
         ? scenarioOpeningOwnerBorderCache.mesh
         : (
-          hasMeshPackMesh
-            ? meshPackMesh
+          selection.hasMeshPackMesh
+            ? selection.meshPackMesh
             : buildOwnerBorderMesh(
-              runtimeRef,
-              {
-                ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
-                shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-                scenarioActive: false,
-                viewMode: "ownership",
-              },
+              selection.runtimeRef,
+              selection.fallbackOwnershipContext,
               { excludeSea: true }
             )
         );
 
       scenarioOpeningOwnerBorderCache = {
-        runtimeRef,
-        meshPackRef,
-        scenarioId,
-        baselineHash,
-        baselineOwnersRef: state.scenarioBaselineOwnersByFeatureId,
-        shellRevision,
-        meshSource,
+        runtimeRef: selection.runtimeRef,
+        meshPackRef: selection.meshPackRef,
+        scenarioId: selection.scenarioId,
+        baselineHash: selection.baselineHash,
+        baselineOwnersRef: selection.baselineOwnersRef,
+        shellRevision: selection.shellRevision,
+        meshSource: selection.meshSource,
         mesh: state.cachedScenarioOpeningOwnerBorders,
       };
     } else {
@@ -244,9 +237,9 @@ export function createBorderMeshOwner({
 
     invalidateRenderPasses("borders", reason || "scenario-opening-borders");
     recordRenderPerfMetric("refreshScenarioOpeningOwnerBorders", nowMs() - startedAt, {
-      enabled: shouldBuild,
-      cacheHit: !!shouldBuild && !!cacheMatches,
-      source: hasMeshPackMesh ? "mesh_pack" : "runtime",
+      enabled: selection.shouldBuild,
+      cacheHit: !!selection.shouldBuild && !!cacheMatches,
+      source: selection.meshSource,
       segmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
         ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
         : 0,
@@ -274,246 +267,47 @@ export function createBorderMeshOwner({
     });
   }
 
-  function getFullLandDataFeatures() {
-    if (Array.isArray(state.landDataFull?.features) && state.landDataFull.features.length) {
-      return state.landDataFull.features;
-    }
-    return Array.isArray(state.landData?.features) ? state.landData.features : [];
-  }
-
   function getSourceCountrySets() {
-    const sets = {
-      primary: new Set(),
-      detail: new Set(),
-    };
-
-    const features = getFullLandDataFeatures();
-    if (!features.length) {
-      return sets;
-    }
-
-    features.forEach((feature) => {
-      const source = String(feature?.properties?.__source || "primary");
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      const featureId = getFeatureId(feature);
-      if (!countryCode || shouldExcludePoliticalInteractionFeature(feature, featureId)) return;
-      if (source === "detail") {
-        sets.detail.add(countryCode);
-      } else {
-        sets.primary.add(countryCode);
-      }
+    return getSourceCountrySetsFromSelection({
+      state,
+      getFeatureCountryCodeNormalized,
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
     });
-
-    return sets;
   }
 
   function buildCountryParentBorderMeshes(countryCode) {
-    const normalizedCode = canonicalCountryCode(countryCode);
-    if (!normalizedCode || !globalThis.topojson) return [];
-
-    const sourceCountries = getStaticMeshSourceCountries();
-    const sources = [
-      { key: "detail", topology: state.topologyDetail },
-      { key: "primary", topology: state.topologyPrimary || state.topology },
-    ];
-    const meshes = [];
-
-    sources.forEach(({ key, topology }) => {
-      if (!topology?.objects?.political) return;
-      if (!sourceCountries[key]?.has(normalizedCode)) return;
-      const object = topology.objects.political;
-      const mesh = globalThis.topojson.mesh(
-        topology,
-        object,
-        (a, b) => {
-          if (!a || !b) return false;
-          const codeA = getEntityCountryCode(a);
-          const codeB = getEntityCountryCode(b);
-          if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
-          const groupA = getParentGroupForEntity(a);
-          const groupB = getParentGroupForEntity(b);
-          return !!(groupA && groupB && groupA !== groupB);
-        }
-      );
-      if (isUsableMesh(mesh)) meshes.push(mesh);
+    return buildCountryParentBorderMeshesFromSources({
+      countryCode,
+      state,
+      canonicalCountryCode,
+      getStaticMeshSourceCountries,
+      getEntityCountryCode,
+      getParentGroupForEntity,
+      isUsableMesh,
     });
-
-    return meshes;
   }
 
   function buildSourceBorderMeshes(topology, includedCountries) {
-    const object = topology?.objects?.political;
-    if (!object || !globalThis.topojson || !includedCountries?.size) {
-      return null;
-    }
-    const provinceMeshesByCountry = new Map();
-    const localMeshesByCountry = new Map();
-    const provinceMeshes = [];
-    const localMeshes = [];
-
-    includedCountries.forEach((countryCode) => {
-      const normalizedCode = canonicalCountryCode(countryCode);
-      if (!normalizedCode) return;
-      const provinceMesh = globalThis.topojson.mesh(
-        topology,
-        object,
-        (a, b) => {
-          if (!a || !b) return false;
-          if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
-            return false;
-          }
-          const codeA = getFeatureCountryCodeNormalized(a);
-          const codeB = getFeatureCountryCodeNormalized(b);
-          if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
-          const groupA = getAdmin1Group(a);
-          const groupB = getAdmin1Group(b);
-          return !!(groupA && groupB && groupA !== groupB);
-        }
-      );
-      if (isUsableMesh(provinceMesh)) {
-        provinceMeshesByCountry.set(normalizedCode, [provinceMesh]);
-        provinceMeshes.push(provinceMesh);
-      }
-
-      const localMesh = globalThis.topojson.mesh(
-        topology,
-        object,
-        (a, b) => {
-          if (!a || !b) return false;
-          if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
-            return false;
-          }
-          const codeA = getFeatureCountryCodeNormalized(a);
-          const codeB = getFeatureCountryCodeNormalized(b);
-          if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
-          const groupA = getAdmin1Group(a);
-          const groupB = getAdmin1Group(b);
-          return !(groupA && groupB && groupA !== groupB);
-        }
-      );
-      if (isUsableMesh(localMesh)) {
-        localMeshesByCountry.set(normalizedCode, [localMesh]);
-        localMeshes.push(localMesh);
-      }
+    return buildSourceBorderMeshesFromSources({
+      topology,
+      includedCountries,
+      canonicalCountryCode,
+      asFeatureLike,
+      shouldExcludePoliticalInteractionFeature,
+      getFeatureCountryCodeNormalized,
+      getAdmin1Group,
+      isUsableMesh,
     });
-
-    return {
-      provinceMeshes,
-      provinceMeshesByCountry,
-      localMeshes,
-      localMeshesByCountry,
-    };
   }
 
   function buildGlobalCountryBorderMesh(primaryTopology) {
-    const object = primaryTopology?.objects?.political;
-    if (!object || !globalThis.topojson) return null;
-
-    return globalThis.topojson.mesh(
+    return buildGlobalCountryBorderMeshFromSources({
       primaryTopology,
-      object,
-      (a, b) => {
-        if (!a || !b) return false;
-        if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
-          return false;
-        }
-        const codeA = getFeatureCountryCodeNormalized(a);
-        const codeB = getFeatureCountryCodeNormalized(b);
-        return !!(codeA && codeB && codeA !== codeB);
-      }
-    );
-  }
-
-  function getTopologyObjectFeatureCollection(topology, objectNames = []) {
-    if (!topology?.objects || typeof globalThis.topojson?.feature !== "function") {
-      return { objectName: "", collection: null };
-    }
-    for (const objectName of objectNames) {
-      const object = topology.objects?.[objectName];
-      if (!object) continue;
-      try {
-        const collection = globalThis.topojson.feature(topology, object);
-        if (collection?.features?.length) {
-          return { objectName, collection };
-        }
-      } catch (_error) {
-        continue;
-      }
-    }
-    return { objectName: "", collection: null };
-  }
-
-  function countGeometryPolygonParts(geometry) {
-    if (!geometry || !geometry.type) return { polygonPartCount: 0, interiorRingCount: 0 };
-    if (geometry.type === "Polygon") {
-      const rings = Array.isArray(geometry.coordinates) ? geometry.coordinates.length : 0;
-      return {
-        polygonPartCount: 1,
-        interiorRingCount: Math.max(0, rings - 1),
-      };
-    }
-    if (geometry.type === "MultiPolygon") {
-      const polygons = Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
-      const polygonPartCount = polygons.length;
-      const interiorRingCount = polygons.reduce((total, polygon) => {
-        const rings = Array.isArray(polygon) ? polygon.length : 0;
-        return total + Math.max(0, rings - 1);
-      }, 0);
-      return { polygonPartCount, interiorRingCount };
-    }
-    if (geometry.type === "GeometryCollection") {
-      return (geometry.geometries || []).reduce((acc, child) => {
-        const childCounts = countGeometryPolygonParts(child);
-        acc.polygonPartCount += childCounts.polygonPartCount;
-        acc.interiorRingCount += childCounts.interiorRingCount;
-        return acc;
-      }, { polygonPartCount: 0, interiorRingCount: 0 });
-    }
-    return { polygonPartCount: 0, interiorRingCount: 0 };
-  }
-
-  function getCoastlineTopologyMetrics(topology, objectNames = []) {
-    const { objectName, collection } = getTopologyObjectFeatureCollection(topology, objectNames);
-    if (!collection?.features?.length) {
-      return {
-        objectName: "",
-        featureCount: 0,
-        polygonPartCount: 0,
-        interiorRingCount: 0,
-        totalArea: 0,
-        bounds: null,
-        worldBounds: false,
-      };
-    }
-    let totalArea = 0;
-    collection.features.forEach((feature) => {
-      try {
-        totalArea += Number(globalThis.d3?.geoArea?.(feature)) || 0;
-      } catch (_error) {
-        // 单个 feature 失败不应让整条 coastline 选择链崩掉。
-      }
+      asFeatureLike,
+      shouldExcludePoliticalInteractionFeature,
+      getFeatureCountryCodeNormalized,
     });
-    const counts = collection.features.reduce((acc, feature) => {
-      const featureCounts = countGeometryPolygonParts(feature?.geometry);
-      acc.polygonPartCount += featureCounts.polygonPartCount;
-      acc.interiorRingCount += featureCounts.interiorRingCount;
-      return acc;
-    }, { polygonPartCount: 0, interiorRingCount: 0 });
-    let bounds = null;
-    try {
-      bounds = globalThis.d3?.geoBounds?.(collection) || null;
-    } catch (_error) {
-      bounds = null;
-    }
-    return {
-      objectName,
-      featureCount: collection.features.length,
-      polygonPartCount: counts.polygonPartCount,
-      interiorRingCount: counts.interiorRingCount,
-      totalArea,
-      bounds,
-      worldBounds: isWorldBounds(bounds),
-    };
   }
 
   // 海岸线来源判定使用 scenarioCoastlineSourceCache，key=primaryRef+runtimeRef+scenarioId。
@@ -531,59 +325,15 @@ export function createBorderMeshOwner({
     if (cacheMatches && scenarioCoastlineSourceCache.decision) {
       return scenarioCoastlineSourceCache.decision;
     }
-
-    const primaryMetrics = getCoastlineTopologyMetrics(primaryTopology, ["land_mask", "land"]);
-    const runtimeMaskMetrics = scenarioId
-      ? getCoastlineTopologyMetrics(runtimeTopology, ["context_land_mask", "land_mask", "land"])
-      : null;
-    let decision = {
-      source: "primary",
-      reason: scenarioId ? "missing_runtime_land_mask" : "no_active_scenario",
+    const { decision } = evaluateCoastlineTopologySource({
+      primaryTopology,
+      runtimeTopology,
       scenarioId,
-      primaryObjectName: primaryMetrics.objectName || "",
-      runtimeObjectName: runtimeMaskMetrics?.objectName || "",
-      primaryFeatureCount: Number(primaryMetrics.featureCount || 0),
-      runtimeFeatureCount: Number(runtimeMaskMetrics?.featureCount || 0),
-      primaryPolygonPartCount: Number(primaryMetrics.polygonPartCount || 0),
-      runtimePolygonPartCount: Number(runtimeMaskMetrics?.polygonPartCount || 0),
-      primaryInteriorRingCount: Number(primaryMetrics.interiorRingCount || 0),
-      runtimeInteriorRingCount: Number(runtimeMaskMetrics?.interiorRingCount || 0),
-      runtimeInteriorRingRatio: 0,
-      areaDeltaRatio: 0,
-      meshMode: "mask",
-      topology: primaryTopology,
-    };
-
-    if (scenarioId && runtimeMaskMetrics?.objectName && primaryMetrics.featureCount > 0) {
-      const areaBase = Math.max(1e-9, Number(primaryMetrics.totalArea) || 0);
-      const areaDeltaRatio = Math.abs((Number(runtimeMaskMetrics.totalArea) || 0) - areaBase) / areaBase;
-      const runtimeInteriorRingRatio =
-        Number(runtimeMaskMetrics.interiorRingCount || 0) / Math.max(1, Number(runtimeMaskMetrics.polygonPartCount || 0));
-      let accepted = true;
-      let reason = "scenario_accepted";
-      if (runtimeMaskMetrics.worldBounds) {
-        accepted = false;
-        reason = "runtime_world_bounds";
-      } else if (areaDeltaRatio > scenarioCoastlineMaxAreaDeltaRatio) {
-        accepted = false;
-        reason = "area_delta_exceeded";
-      } else if (Number(runtimeMaskMetrics.interiorRingCount || 0) > scenarioCoastlineMaxInteriorRingCount) {
-        accepted = false;
-        reason = "interior_ring_count_exceeded";
-      } else if (runtimeInteriorRingRatio > scenarioCoastlineMaxInteriorRingRatio) {
-        accepted = false;
-        reason = "interior_ring_ratio_exceeded";
-      }
-      decision = {
-        ...decision,
-        source: accepted ? "scenario" : "primary",
-        reason,
-        runtimeInteriorRingRatio,
-        areaDeltaRatio,
-        meshMode: "mask",
-        topology: accepted ? runtimeTopology : primaryTopology,
-      };
-    }
+      scenarioCoastlineMaxAreaDeltaRatio,
+      scenarioCoastlineMaxInteriorRingCount,
+      scenarioCoastlineMaxInteriorRingRatio,
+      isWorldBounds,
+    });
 
     if (scenarioId) {
       const logKey = `${scenarioId}::${decision.source}::${decision.reason}`;
@@ -605,33 +355,10 @@ export function createBorderMeshOwner({
   }
 
   function buildGlobalCoastlineMesh(primaryTopology) {
-    const topology = primaryTopology?.topology || primaryTopology;
-    const meshMode = String(primaryTopology?.meshMode || "mask");
-    if (!topology?.objects || !globalThis.topojson) return null;
-    if (meshMode === "political_outline" && topology.objects.political) {
-      return globalThis.topojson.mesh(
-        topology,
-        topology.objects.political,
-        (a, b) => !!(a && b && a === b && !shouldExcludeOwnerBorderEntity(a, { excludeSea: true }))
-      );
-    }
-    if (topology.objects.context_land_mask) {
-      return globalThis.topojson.mesh(topology, topology.objects.context_land_mask);
-    }
-    if (topology.objects.land_mask) {
-      return globalThis.topojson.mesh(topology, topology.objects.land_mask);
-    }
-    if (topology.objects.land) {
-      return globalThis.topojson.mesh(topology, topology.objects.land);
-    }
-    if (topology.objects.political) {
-      return globalThis.topojson.mesh(
-        topology,
-        topology.objects.political,
-        (a, b) => !!(a && !b)
-      );
-    }
-    return null;
+    return buildGlobalCoastlineMeshFromSources({
+      topologyInput: primaryTopology,
+      shouldExcludeOwnerBorderEntity,
+    });
   }
 
   function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {

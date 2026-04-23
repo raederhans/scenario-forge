@@ -9,6 +9,7 @@ WATER_SPECIAL_REGION_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "sidebar" / "wate
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 HISTORY_MANAGER_JS = REPO_ROOT / "js" / "core" / "history_manager.js"
 INTERACTION_FUNNEL_JS = REPO_ROOT / "js" / "core" / "interaction_funnel.js"
+INTERACTION_FUNNEL_UI_SYNC_JS = REPO_ROOT / "js" / "core" / "interaction_funnel" / "ui_sync.js"
 
 
 class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
@@ -75,13 +76,15 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         map_renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         history_manager_content = HISTORY_MANAGER_JS.read_text(encoding="utf-8")
         interaction_funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
+        interaction_funnel_ui_sync_content = INTERACTION_FUNNEL_UI_SYNC_JS.read_text(encoding="utf-8")
 
         self.assertIn('runtimeState.renderWaterRegionListFn();', map_renderer_content)
         self.assertIn('runtimeState.renderSpecialRegionListFn();', map_renderer_content)
         self.assertIn('"renderWaterRegionListFn",', history_manager_content)
         self.assertIn('"renderSpecialRegionListFn",', history_manager_content)
-        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_WATER_REGION_LIST);', interaction_funnel_content)
-        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SPECIAL_REGION_LIST);', interaction_funnel_content)
+        self.assertIn('syncProjectImportUiStateHelper', interaction_funnel_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_WATER_REGION_LIST);', interaction_funnel_ui_sync_content)
+        self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SPECIAL_REGION_LIST);', interaction_funnel_ui_sync_content)
 
 
 if __name__ == "__main__":

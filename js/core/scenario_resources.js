@@ -82,7 +82,7 @@ import {
 } from "./scenario/bundle_runtime.js";
 import {
   normalizeScenarioPerformanceHints,
-} from "./scenario/presentation_runtime.js";
+} from "./scenario/presentation_hint_helpers.js";
 import {
   createScenarioStartupHydrationController,
 } from "./scenario/startup_hydration.js";

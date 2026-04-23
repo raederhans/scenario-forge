@@ -131,7 +131,8 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
     def test_resources_module_releases_presentation_runtime_owner(self):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
 
-        self.assertIn('./scenario/presentation_runtime.js', content)
+        self.assertIn('./scenario/presentation_hint_helpers.js', content)
+        self.assertNotIn('./scenario/presentation_runtime.js', content)
         self.assertIn("normalizeScenarioPerformanceHints,", content)
         self.assertNotIn("createScenarioPresentationRuntime(", content)
         self.assertNotIn("SCENARIO_RENDER_PROFILES", content)

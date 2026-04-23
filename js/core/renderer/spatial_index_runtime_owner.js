@@ -2,6 +2,13 @@ import {
   createDefaultSecondarySpatialIndexState,
   createDefaultSpatialIndexState,
 } from "../state/spatial_index_state.js";
+import {
+  appendLandIndexEntriesRange,
+  appendLandSpatialItemsRange,
+  buildSpecialSpatialItems,
+  buildWaterSpatialItems,
+  captureSpatialGridBuild,
+} from "./spatial_index_runtime_builders.js";
 
 export function createSpatialIndexRuntimeOwner({
   state,
@@ -57,19 +64,12 @@ export function createSpatialIndexRuntimeOwner({
       }, scheduleUiMode);
       return;
     }
-    state.landData.features.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `feature-${index}`;
-      state.landIndex.set(id, feature);
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      if (countryCode) {
-        const ids = state.countryToFeatureIds.get(countryCode) || [];
-        ids.push(id);
-        state.countryToFeatureIds.set(countryCode, ids);
-      }
-      const key = index + 1;
-      state.idToKey.set(id, key);
-      state.keyToId.set(key, id);
+    appendLandIndexEntriesRange({
+      state,
+      features: state.landData.features,
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
+      getFeatureCountryCodeNormalized,
     });
 
     queueIndexUiRefresh({
@@ -105,23 +105,13 @@ export function createSpatialIndexRuntimeOwner({
     rebuildAuxiliaryRegionIndexes();
 
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-
-    if (state.landData?.features?.length) {
-      state.landData.features.forEach((feature, index) => {
-        const id = getFeatureId(feature) || `feature-${index}`;
-        if (!id) return;
-        state.landIndex.set(id, feature);
-        if (!shouldExcludePoliticalInteractionFeature(feature, id)) {
-          const countryCode = getFeatureCountryCodeNormalized(feature);
-          if (countryCode) {
-            const ids = state.countryToFeatureIds.get(countryCode) || [];
-            ids.push(id);
-            state.countryToFeatureIds.set(countryCode, ids);
-          }
-          const key = index + 1;
-          state.idToKey.set(id, key);
-          state.keyToId.set(key, id);
-        }
+    appendLandIndexEntriesRange({
+      state,
+      features: Array.isArray(state.landData?.features) ? state.landData.features : [],
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
+      getFeatureCountryCodeNormalized,
+      onLandFeatureIndexed: ({ feature, id }) => {
         const bounds = computeProjectedFeatureBounds(feature);
         if (bounds && projectedBoundsCache?.set) {
           projectedBoundsCache.set(id, bounds);
@@ -133,8 +123,8 @@ export function createSpatialIndexRuntimeOwner({
         if (resolvedColor) {
           collectResolvedColor(id, resolvedColor);
         }
-      });
-    }
+      },
+    });
 
     if (state.riversData?.features?.length && projectedBoundsCache?.set) {
       state.riversData.features.forEach((feature) => {
@@ -151,70 +141,39 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
   } = {}) {
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-    const buildSecondarySpatialGrid = (items, assign) => {
-      const previousGrid = state.spatialGrid;
-      const previousGridMeta = state.spatialGridMeta;
-      const previousItemsById = state.spatialItemsById;
-      buildSpatialGrid(items, canvasWidth, canvasHeight);
-      assign();
-      state.spatialGrid = previousGrid;
-      state.spatialGridMeta = previousGridMeta;
-      state.spatialItemsById = previousItemsById;
-    };
+    state.waterSpatialItems = buildWaterSpatialItems({
+      features: getEffectiveWaterRegionFeatures(),
+      getFeatureId,
+      collectFeatureHitGeometries,
+      computeProjectedGeoBounds,
+    });
+    const waterGridSnapshot = captureSpatialGridBuild({
+      state,
+      items: state.waterSpatialItems,
+      canvasWidth,
+      canvasHeight,
+      buildSpatialGrid,
+    });
+    state.waterSpatialGrid = waterGridSnapshot.grid;
+    state.waterSpatialGridMeta = waterGridSnapshot.gridMeta;
+    state.waterSpatialItemsById = waterGridSnapshot.itemsById;
 
-    getEffectiveWaterRegionFeatures().forEach((feature) => {
-      const id = getFeatureId(feature);
-      if (!id) return;
-      const hitGeometries = collectFeatureHitGeometries(feature);
-      hitGeometries.forEach((hitGeometry, partIndex) => {
-        const bounds = computeProjectedGeoBounds(hitGeometry);
-        if (!bounds) return;
-        state.waterSpatialItems.push({
-          id: `${id}::part:${partIndex}`,
-          featureId: id,
-          feature,
-          hitGeometry,
-          countryCode: "",
-          source: String(feature?.properties?.__source || "primary"),
-          minX: bounds.minX,
-          minY: bounds.minY,
-          maxX: bounds.maxX,
-          maxY: bounds.maxY,
-          bboxArea: bounds.area,
-        });
-      });
+    state.specialSpatialItems = buildSpecialSpatialItems({
+      features: getEffectiveSpecialRegionFeatures(),
+      allowComputeMissingBounds,
+      getFeatureId,
+      getProjectedFeatureBounds,
     });
-    buildSecondarySpatialGrid(state.waterSpatialItems, () => {
-      state.waterSpatialGrid = state.spatialGrid;
-      state.waterSpatialGridMeta = state.spatialGridMeta;
-      state.waterSpatialItemsById = state.spatialItemsById;
+    const specialGridSnapshot = captureSpatialGridBuild({
+      state,
+      items: state.specialSpatialItems,
+      canvasWidth,
+      canvasHeight,
+      buildSpatialGrid,
     });
-
-    getEffectiveSpecialRegionFeatures().forEach((feature) => {
-      const id = getFeatureId(feature);
-      if (!id) return;
-      const resolvedBounds = getProjectedFeatureBounds(feature, {
-        featureId: id,
-        allowCompute: allowComputeMissingBounds,
-      });
-      if (!resolvedBounds) return;
-      state.specialSpatialItems.push({
-        id,
-        feature,
-        countryCode: "",
-        source: String(feature?.properties?.__source || "scenario"),
-        minX: resolvedBounds.minX,
-        minY: resolvedBounds.minY,
-        maxX: resolvedBounds.maxX,
-        maxY: resolvedBounds.maxY,
-        bboxArea: resolvedBounds.area,
-      });
-    });
-    buildSecondarySpatialGrid(state.specialSpatialItems, () => {
-      state.specialSpatialGrid = state.spatialGrid;
-      state.specialSpatialGridMeta = state.spatialGridMeta;
-      state.specialSpatialItemsById = state.spatialItemsById;
-    });
+    state.specialSpatialGrid = specialGridSnapshot.grid;
+    state.specialSpatialGridMeta = specialGridSnapshot.gridMeta;
+    state.specialSpatialItemsById = specialGridSnapshot.itemsById;
   }
 
   // buildSpatialIndex 负责主空间索引（state.spatialItems + state.spatialGrid + spatialGridMeta），
@@ -243,30 +202,18 @@ export function createSpatialIndexRuntimeOwner({
     }
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
-    for (const [drawOrder, feature] of state.landData.features.entries()) {
-      const id = getFeatureId(feature);
-      if (!id) continue;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-      const bounds = getProjectedFeatureBounds(feature, {
-        featureId: id,
-        allowCompute: allowComputeMissingBounds,
-      });
-      if (!bounds) continue;
-
-      state.spatialItems.push({
-        id,
-        drawOrder,
-        feature,
-        countryCode: getFeatureCountryCodeNormalized(feature),
-        source: String(feature?.properties?.__source || "primary"),
-        minX: bounds.minX,
-        minY: bounds.minY,
-        maxX: bounds.maxX,
-        maxY: bounds.maxY,
-        bboxArea: bounds.area,
-      });
-    }
+    appendLandSpatialItemsRange({
+      targetItems: state.spatialItems,
+      features: state.landData.features,
+      canvasWidth,
+      canvasHeight,
+      allowComputeMissingBounds,
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
+      shouldSkipFeature,
+      getProjectedFeatureBounds,
+      getFeatureCountryCodeNormalized,
+    });
 
     buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
     state.spatialIndex = null;
@@ -314,21 +261,15 @@ export function createSpatialIndexRuntimeOwner({
 
     for (let start = 0; start < features.length; start += chunkedIndexBuildSliceSize) {
       const end = Math.min(features.length, start + chunkedIndexBuildSliceSize);
-      for (let index = start; index < end; index += 1) {
-        const feature = features[index];
-        const id = getFeatureId(feature) || `feature-${index}`;
-        state.landIndex.set(id, feature);
-        if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-        const countryCode = getFeatureCountryCodeNormalized(feature);
-        if (countryCode) {
-          const ids = state.countryToFeatureIds.get(countryCode) || [];
-          ids.push(id);
-          state.countryToFeatureIds.set(countryCode, ids);
-        }
-        const key = index + 1;
-        state.idToKey.set(id, key);
-        state.keyToId.set(key, id);
-      }
+      appendLandIndexEntriesRange({
+        state,
+        features,
+        start,
+        end,
+        getFeatureId,
+        shouldExcludePoliticalInteractionFeature,
+        getFeatureCountryCodeNormalized,
+      });
       if (end < features.length) {
         await yieldToMain();
       }
@@ -375,54 +316,37 @@ export function createSpatialIndexRuntimeOwner({
     const nextSpatialItems = [];
     for (let start = 0; start < features.length; start += chunkedSpatialBuildSliceSize) {
       const end = Math.min(features.length, start + chunkedSpatialBuildSliceSize);
-      for (let index = start; index < end; index += 1) {
-        const feature = features[index];
-        const id = getFeatureId(feature);
-        if (!id) continue;
-        if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-        if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-        const bounds = getProjectedFeatureBounds(feature, {
-          featureId: id,
-          allowCompute: allowComputeMissingBounds,
-        });
-        if (!bounds) continue;
-        nextSpatialItems.push({
-          id,
-          drawOrder: index,
-          feature,
-          countryCode: getFeatureCountryCodeNormalized(feature),
-          source: String(feature?.properties?.__source || "primary"),
-          minX: bounds.minX,
-          minY: bounds.minY,
-          maxX: bounds.maxX,
-          maxY: bounds.maxY,
-          bboxArea: bounds.area,
-        });
-      }
+      appendLandSpatialItemsRange({
+        targetItems: nextSpatialItems,
+        features,
+        start,
+        end,
+        canvasWidth,
+        canvasHeight,
+        allowComputeMissingBounds,
+        getFeatureId,
+        shouldExcludePoliticalInteractionFeature,
+        shouldSkipFeature,
+        getProjectedFeatureBounds,
+        getFeatureCountryCodeNormalized,
+      });
       if (end < features.length) {
         await yieldToMain();
       }
     }
-
-    const previousItems = state.spatialItems;
-    const previousGrid = state.spatialGrid;
-    const previousGridMeta = state.spatialGridMeta;
-    const previousItemsById = state.spatialItemsById;
-    state.spatialItems = nextSpatialItems;
-    buildSpatialGrid(nextSpatialItems, canvasWidth, canvasHeight);
-    const nextGrid = state.spatialGrid;
-    const nextGridMeta = state.spatialGridMeta;
-    const nextItemsById = state.spatialItemsById;
-    state.spatialItems = previousItems;
-    state.spatialGrid = previousGrid;
-    state.spatialGridMeta = previousGridMeta;
-    state.spatialItemsById = previousItemsById;
+    const nextGridSnapshot = captureSpatialGridBuild({
+      state,
+      items: nextSpatialItems,
+      canvasWidth,
+      canvasHeight,
+      buildSpatialGrid,
+    });
 
     state.spatialItems = nextSpatialItems;
     state.spatialIndex = null;
-    state.spatialGrid = nextGrid;
-    state.spatialGridMeta = nextGridMeta;
-    state.spatialItemsById = nextItemsById;
+    state.spatialGrid = nextGridSnapshot.grid;
+    state.spatialGridMeta = nextGridSnapshot.gridMeta;
+    state.spatialItemsById = nextGridSnapshot.itemsById;
     resetSecondarySpatialIndexState();
     if (includeSecondary) {
       buildSecondarySpatialIndexes({

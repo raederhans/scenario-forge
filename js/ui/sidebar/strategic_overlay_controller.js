@@ -1,3 +1,16 @@
+import {
+  renderUnitCounterCatalogSection,
+} from "./strategic_overlay/unit_counter_catalog_helper.js";
+import { setUnitCounterEditorModalState } from "./strategic_overlay/unit_counter_modal_helper.js";
+import { bindUnitCounterSidebarEvents } from "./strategic_overlay/unit_counter_bind_events_helper.js";
+import {
+  buildUnitCounterSectionViewModel,
+  refreshUnitCounterCombatSection,
+  refreshUnitCounterIdentitySection,
+  refreshUnitCounterListSection,
+  refreshUnitCounterPreviewSection,
+} from "./strategic_overlay/unit_counter_render_helpers.js";
+
 /**
  * Owns the strategic overlay workspace inside the sidebar:
  * - frontline overlay controls and refresh scheduling
@@ -165,9 +178,11 @@ export function createStrategicOverlayController({
   const strategicOverlayPerfCounters = Object.create(null);
   let pendingStrategicOverlayRefreshHandle = null;
   const pendingStrategicOverlayRefreshScopes = new Set();
-  let unitCounterCatalogSearchDebounceHandle = null;
-  let suppressUnitCounterListChange = false;
-  let counterEditorModalPreviouslyFocused = null;
+  const unitCounterUiState = {
+    catalogSearchDebounceHandle: null,
+    counterEditorModalPreviouslyFocused: null,
+    suppressListChange: false,
+  };
 
   const ensureStrategicOverlayUiState = () => {
     if (!state.strategicOverlayUi || typeof state.strategicOverlayUi !== "object") {
@@ -228,81 +243,22 @@ export function createStrategicOverlayController({
         flushPendingStrategicOverlayRefresh();
       }, 0);
   };
-  const getCounterEditorModalFocusableElements = () => {
-    if (!(unitCounterEditorModal instanceof HTMLElement)) {
-      return [];
-    }
-    return Array.from(unitCounterEditorModal.querySelectorAll(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )).filter((element) => (
-      element instanceof HTMLElement
-      && !element.hidden
-      && element.getAttribute("aria-hidden") !== "true"
-      && element.tabIndex >= 0
-    ));
-  };
-  const focusUnitCounterDetailToggle = () => {
-    if (!(unitCounterDetailToggleBtn instanceof HTMLElement)) {
-      return false;
-    }
-    if (!document.contains(unitCounterDetailToggleBtn)) {
-      return false;
-    }
-    if (unitCounterDetailToggleBtn.disabled) {
-      return false;
-    }
-    if (unitCounterDetailToggleBtn.tabIndex < 0) {
-      return false;
-    }
-    const isVisible = typeof unitCounterDetailToggleBtn.checkVisibility === "function"
-      ? unitCounterDetailToggleBtn.checkVisibility({
-        visibilityProperty: true,
-        opacityProperty: true,
-        contentVisibilityAuto: true,
-      })
-      : !unitCounterDetailToggleBtn.hidden && unitCounterDetailToggleBtn.getAttribute("aria-hidden") !== "true";
-    if (!isVisible) {
-      return false;
-    }
-    unitCounterDetailToggleBtn.focus({ preventScroll: true });
-    return document.activeElement === unitCounterDetailToggleBtn;
-  };
   const setCounterEditorModalState = (nextOpen, { restoreFocus = true } = {}) => {
-    ensureStrategicOverlayUiState();
-    const isOpen = !!nextOpen;
-    state.strategicOverlayUi.counterEditorModalOpen = isOpen;
-    if (unitCounterEditorModalOverlay) {
-      unitCounterEditorModalOverlay.classList.toggle("hidden", !isOpen);
-    }
-    if (unitCounterDetailDrawer) {
-      unitCounterDetailDrawer.classList.toggle("hidden", !isOpen);
-    }
-    document.body.classList.toggle("counter-editor-modal-open", isOpen);
-    if (isOpen) {
-      counterEditorModalPreviouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      if (state.strategicOverlayUi?.modalOpen) {
-        setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
-      }
-      globalThis.requestAnimationFrame(() => {
-        if (unitCounterCatalogSearchInput) {
-          unitCounterCatalogSearchInput.focus({ preventScroll: true });
-        } else {
-          unitCounterEditorModal?.focus({ preventScroll: true });
-        }
-      });
-      return;
-    }
-    const previousFocused = counterEditorModalPreviouslyFocused;
-    counterEditorModalPreviouslyFocused = null;
-    if (!restoreFocus) {
-      return;
-    }
-    if (focusUnitCounterDetailToggle()) {
-      return;
-    }
-    if (previousFocused && document.contains(previousFocused)) {
-      previousFocused.focus({ preventScroll: true });
-    }
+    setUnitCounterEditorModalState({
+      nextOpen,
+      state,
+      uiState: unitCounterUiState,
+      elements: {
+        unitCounterCatalogSearchInput,
+        unitCounterDetailDrawer,
+        unitCounterDetailToggleBtn,
+        unitCounterEditorModal,
+        unitCounterEditorModalOverlay,
+      },
+      ensureStrategicOverlayUiState,
+      setStrategicWorkspaceModalState,
+      restoreFocus,
+    });
   };
   const cancelStrategicEditingModes = () => {
     const cancelled = mapRenderer.cancelActiveStrategicInteractionModes();
@@ -614,451 +570,130 @@ export function createStrategicOverlayController({
     }
 
     if (hasStrategicOverlayScope(normalizedScopes, "counterIdentity", "counterCombat", "counterPreview", "counterCatalog", "counterList", "workspaceChrome")) {
-    const unitEditor = state.unitCounterEditor || {};
-    const selectedCounter = (state.unitCounters || []).find(
-      (counter) => String(counter?.id || "") === String(unitEditor.selectedId || "")
-    ) || null;
-    const effectivePresetId = String(
-      unitEditor.presetId
-      || selectedCounter?.presetId
-      || inferUnitCounterPresetId({
-        ...(selectedCounter || {}),
-        ...(unitEditor || {}),
-      })
-      || unitCounterPresets[0].id
-    ).trim().toUpperCase();
-    const effectivePreset = getUnitCounterPresetMeta(effectivePresetId);
-    const effectiveRenderer = String(
-      unitEditor.renderer
-      || selectedCounter?.renderer
-      || effectivePreset.defaultRenderer
-      || annotationView.unitRendererDefault
-      || "game"
-    );
-    const effectiveUnitCounterFixedScaleMultiplier = clampUnitCounterFixedScaleMultiplier(
-      annotationView.unitCounterFixedScaleMultiplier,
-      1.5,
-    );
-    const effectiveSize = String(unitEditor.size || selectedCounter?.size || "medium");
-    const effectiveNationSource = String(unitEditor.nationSource || selectedCounter?.nationSource || "display").trim().toLowerCase() || "display";
-    const effectiveNationTag = String(unitEditor.nationTag || selectedCounter?.nationTag || "").trim().toUpperCase();
-    const effectiveEchelon = String(unitEditor.echelon || selectedCounter?.echelon || effectivePreset.defaultEchelon || "").trim().toUpperCase();
-    const effectiveLabel = String(unitEditor.label || selectedCounter?.label || "").trim();
-    const effectiveSubLabel = String(unitEditor.subLabel || selectedCounter?.subLabel || "").trim();
-    const effectiveStrengthText = String(unitEditor.strengthText || selectedCounter?.strengthText || "").trim();
-    const effectiveCombatState = resolveUnitCounterCombatState({
-      organizationPct: unitEditor.organizationPct ?? selectedCounter?.organizationPct,
-      equipmentPct: unitEditor.equipmentPct ?? selectedCounter?.equipmentPct,
-      baseFillColor: unitEditor.baseFillColor ?? selectedCounter?.baseFillColor,
-      statsPresetId: unitEditor.statsPresetId || selectedCounter?.statsPresetId || "regular",
-      statsSource: unitEditor.statsSource || selectedCounter?.statsSource || "preset",
-    });
-    const rawEffectiveSymbol = String(
-      unitEditor.sidc
-      || unitEditor.symbolCode
-      || selectedCounter?.sidc
-      || selectedCounter?.symbolCode
-      || ""
-    ).trim().toUpperCase();
-    const effectiveSymbol = rawEffectiveSymbol || (
-      effectiveRenderer === "milstd"
-        ? String(effectivePreset.baseSidc || "").trim().toUpperCase()
-        : String(effectivePreset.shortCode || "").trim().toUpperCase()
-    );
-    const nationOptions = getUnitCounterNationOptions();
-    const shouldRefreshCounterIdentity = hasStrategicOverlayScope(normalizedScopes, "counterIdentity");
-    const shouldRefreshCounterCombat = hasStrategicOverlayScope(normalizedScopes, "counterCombat");
-    const shouldRefreshCounterPreview = hasStrategicOverlayScope(normalizedScopes, "counterPreview");
-    const shouldRefreshCounterCatalog = hasStrategicOverlayScope(normalizedScopes, "counterCatalog");
-    const shouldRefreshCounterList = hasStrategicOverlayScope(normalizedScopes, "counterList");
-    if (shouldRefreshCounterIdentity) {
-      recordStrategicOverlayPerfCounter("counterIdentity");
-      syncSelectOptions(unitCounterPresetSelect, getSidebarUnitCounterPresetOptions(effectivePresetId).map((preset) => ({
-        value: preset.id,
-        label: `${preset.label} · ${preset.shortCode}`,
-      })), {
-        value: effectivePresetId,
-        signatureKey: "presetOptionsSignature",
+      const unitCounterViewModel = buildUnitCounterSectionViewModel({
+        state,
+        annotationView,
+        unitCounterPresets,
+        inferUnitCounterPresetId,
+        getUnitCounterPresetMeta,
+        clampUnitCounterFixedScaleMultiplier,
+        resolveUnitCounterCombatState,
+        getUnitCounterNationOptions,
       });
-      if (unitCounterNationModeSelect) {
-        unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "display";
-      }
-      const selectedNationValue = effectiveNationTag;
-      const knownNationValues = new Set(["", ...nationOptions.map((entry) => entry.value)]);
-      const nextNationOptions = nationOptions.slice();
-      if (selectedNationValue && !knownNationValues.has(selectedNationValue)) {
-        const fallbackMeta = getUnitCounterNationMeta(selectedNationValue);
-        nextNationOptions.unshift({
-          value: selectedNationValue,
-          label: `${selectedNationValue} · ${fallbackMeta.displayName}`,
+      const shouldRefreshCounterIdentity = hasStrategicOverlayScope(normalizedScopes, "counterIdentity");
+      const shouldRefreshCounterCombat = hasStrategicOverlayScope(normalizedScopes, "counterCombat");
+      const shouldRefreshCounterPreview = hasStrategicOverlayScope(normalizedScopes, "counterPreview");
+      const shouldRefreshCounterCatalog = hasStrategicOverlayScope(normalizedScopes, "counterCatalog");
+      const shouldRefreshCounterList = hasStrategicOverlayScope(normalizedScopes, "counterList");
+      if (shouldRefreshCounterIdentity) {
+        recordStrategicOverlayPerfCounter("counterIdentity");
+        refreshUnitCounterIdentitySection({
+          elements: {
+            unitCounterAttachmentSelect,
+            unitCounterCancelBtn,
+            unitCounterDeleteBtn,
+            unitCounterEchelonSelect,
+            unitCounterFixedScaleRange,
+            unitCounterFixedScaleValue,
+            unitCounterLabelInput,
+            unitCounterLabelsToggle,
+            unitCounterNationModeSelect,
+            unitCounterNationSelect,
+            unitCounterPlaceBtn,
+            unitCounterPresetSelect,
+            unitCounterRendererSelect,
+            unitCounterSizeSelect,
+            unitCounterStrengthInput,
+            unitCounterSubLabelInput,
+            unitCounterSymbolHint,
+            unitCounterSymbolInput,
+          },
+          state,
+          t,
+          syncSelectOptions,
+          model: unitCounterViewModel,
+          getSidebarUnitCounterPresetOptions,
+          getUnitCounterNationMeta,
         });
       }
-      syncSelectOptions(unitCounterNationSelect, [
-        { value: "", label: t("Auto from placement", "ui") },
-        ...nextNationOptions,
-      ], {
-        value: selectedNationValue,
-        disabled: effectiveNationSource !== "manual",
-        signatureKey: "nationOptionsSignature",
-      });
-      const selectedAttachmentLineId = String(unitEditor.attachment?.lineId || selectedCounter?.attachment?.lineId || "").trim();
-      syncSelectOptions(unitCounterAttachmentSelect, [
-        { value: "", label: t("Anchor: Province / Free", "ui") },
-        ...(state.operationalLines || []).map((line) => ({
-          value: String(line.id || ""),
-          label: `${line.label || line.kind || line.id} (${line.kind})`,
-        })),
-      ], {
-        value: selectedAttachmentLineId,
-        signatureKey: "attachmentOptionsSignature",
-      });
-      if (unitCounterRendererSelect) unitCounterRendererSelect.value = effectiveRenderer;
-      if (unitCounterSizeSelect) unitCounterSizeSelect.value = effectiveSize;
-      if (unitCounterEchelonSelect) unitCounterEchelonSelect.value = effectiveEchelon;
-      if (unitCounterLabelInput) unitCounterLabelInput.value = effectiveLabel;
-      if (unitCounterSubLabelInput) unitCounterSubLabelInput.value = effectiveSubLabel;
-      if (unitCounterStrengthInput) unitCounterStrengthInput.value = effectiveStrengthText;
-      if (unitCounterSymbolInput) {
-        unitCounterSymbolInput.value = effectiveSymbol;
-        unitCounterSymbolInput.placeholder = effectiveRenderer === "milstd"
-          ? t("SIDC (e.g. 130310001412110000000000000000)", "ui")
-          : t("Short code (e.g. HQ / ARM / INF)", "ui");
-      }
-      if (unitCounterSymbolHint) {
-        unitCounterSymbolHint.textContent = effectiveRenderer === "milstd"
-          ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
-          : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
-      }
-      if (state.unitCounterEditor?.selectedId || state.unitCounterEditor?.active || state.strategicOverlayUi?.counterEditorModalOpen) {
-        const counterAccordion = document.getElementById("accordionCounters");
-        const counterAccordionHeader = counterAccordion?.querySelector?.(".strategic-accordion-header");
-        counterAccordion?.classList.add("is-open");
-        counterAccordionHeader?.setAttribute("aria-expanded", "true");
-      }
-      if (unitCounterPlaceBtn) unitCounterPlaceBtn.disabled = !!unitEditor.active;
-      if (unitCounterCancelBtn) unitCounterCancelBtn.disabled = !unitEditor.active;
-      if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
-      if (unitCounterLabelsToggle) {
-        unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
-      }
-      if (unitCounterFixedScaleRange) {
-        unitCounterFixedScaleRange.value = String(Math.round(effectiveUnitCounterFixedScaleMultiplier * 100));
-      }
-      if (unitCounterFixedScaleValue) {
-        unitCounterFixedScaleValue.textContent = `${effectiveUnitCounterFixedScaleMultiplier.toFixed(2)}x`;
-      }
-    }
-    const placementStatusText = unitEditor.active
-      ? t("Placing on map", "ui")
-      : "";
-    if (shouldRefreshCounterPreview) {
-      recordStrategicOverlayPerfCounter("counterPreview");
-      renderUnitCounterPreview(unitCounterPreviewCard, {
-      renderer: effectiveRenderer,
-      size: effectiveSize,
-      nationTag: effectiveNationTag,
-      nationSource: effectiveNationSource,
-      label: effectiveLabel,
-      subLabel: effectiveSubLabel,
-      strengthText: effectiveStrengthText,
-      sidc: effectiveSymbol,
-      symbolCode: effectiveSymbol,
-      presetId: effectivePresetId,
-      echelon: effectiveEchelon,
-      organizationPct: effectiveCombatState.organizationPct,
-      equipmentPct: effectiveCombatState.equipmentPct,
-      baseFillColor: effectiveCombatState.baseFillColor,
-      statusText: placementStatusText,
-      compactMode: true,
-    });
-      renderUnitCounterPreview(unitCounterDetailPreviewCard, {
-      renderer: effectiveRenderer,
-      size: effectiveSize,
-      nationTag: effectiveNationTag,
-      nationSource: effectiveNationSource,
-      label: effectiveLabel,
-      subLabel: effectiveSubLabel,
-      strengthText: effectiveStrengthText,
-      sidc: effectiveSymbol,
-      symbolCode: effectiveSymbol,
-      presetId: effectivePresetId,
-      echelon: effectiveEchelon,
-      organizationPct: effectiveCombatState.organizationPct,
-      equipmentPct: effectiveCombatState.equipmentPct,
-      baseFillColor: effectiveCombatState.baseFillColor,
-      statusText: placementStatusText,
-      detailMode: true,
-    });
-      if (unitCounterPlacementStatus) {
-        unitCounterPlacementStatus.textContent = placementStatusText || t("Use the gear button for the full counter editor.", "ui");
-        unitCounterPlacementStatus.classList.toggle("hidden", !placementStatusText);
-      }
-      if (unitCounterEditorModalStatus) {
-        unitCounterEditorModalStatus.textContent = placementStatusText || t("Apply a symbol, then return to the map to continue placement or edit the selected counter live.", "ui");
-        unitCounterEditorModalStatus.classList.toggle("hidden", false);
-        unitCounterEditorModalStatus.dataset.mode = placementStatusText ? "placing" : "idle";
-      }
-    }
-    if (shouldRefreshCounterCombat) {
-      recordStrategicOverlayPerfCounter("counterCombat");
-      if (unitCounterStatsPresetSelect) {
-      unitCounterStatsPresetSelect.value = effectiveCombatState.statsPresetId === "random"
-        ? "regular"
-        : effectiveCombatState.statsPresetId;
-      }
-      unitCounterStatsPresetButtons.forEach((button) => {
-        const value = String(button.dataset.value || "").trim().toLowerCase();
-        const active = effectiveCombatState.statsPresetId !== "random" && value === effectiveCombatState.statsPresetId;
-        button.classList.toggle("is-active", active);
-        button.setAttribute("aria-pressed", active ? "true" : "false");
-      });
-      if (unitCounterOrganizationInput) {
-        unitCounterOrganizationInput.value = String(effectiveCombatState.organizationPct);
-      }
-      if (unitCounterEquipmentInput) {
-        unitCounterEquipmentInput.value = String(effectiveCombatState.equipmentPct);
-      }
-      if (unitCounterOrganizationBar) {
-        unitCounterOrganizationBar.style.width = `${effectiveCombatState.organizationPct}%`;
-      }
-      if (unitCounterEquipmentBar) {
-        unitCounterEquipmentBar.style.width = `${effectiveCombatState.equipmentPct}%`;
-      }
-      const effectiveFillColor = effectiveCombatState.baseFillColor || "#f4f0e6";
-      if (unitCounterBaseFillSwatch) {
-        unitCounterBaseFillSwatch.style.setProperty("--unit-counter-fill-preview", effectiveFillColor);
-        unitCounterBaseFillSwatch.dataset.active = effectiveCombatState.baseFillColor ? "true" : "false";
-      }
-      if (unitCounterBaseFillColorInput) {
-        unitCounterBaseFillColorInput.value = /^#(?:[0-9a-f]{6})$/i.test(effectiveFillColor) ? effectiveFillColor : "#f4f0e6";
-      }
-      if (unitCounterBaseFillResetBtn) {
-        unitCounterBaseFillResetBtn.disabled = !effectiveCombatState.baseFillColor;
-      }
-      if (unitCounterBaseFillEyedropperBtn) {
-        unitCounterBaseFillEyedropperBtn.disabled = !("EyeDropper" in globalThis);
-      }
-    }
-    if (shouldRefreshCounterCatalog) {
-      recordStrategicOverlayPerfCounter("counterCatalog");
-      ensureStrategicOverlayUiState();
-      const catalogSource = state.strategicOverlayUi.counterCatalogSource || "internal";
-      const usingHoi4Catalog = catalogSource === "hoi4";
-      const hoi4PreferredVariant = state.strategicOverlayUi.hoi4CounterVariant === "large" ? "large" : "small";
-      const {
-        status: hoi4UnitIconManifestStatus,
-        error: hoi4UnitIconManifestError,
-        data: hoi4UnitIconManifestData,
-      } = getHoi4UnitIconManifestState();
-      if (unitCounterCatalogHeaderTitle) {
-        unitCounterCatalogHeaderTitle.textContent = usingHoi4Catalog
-          ? t("HOI4 Library", "ui")
-          : t("Symbol Browser", "ui");
-      }
-      if (unitCounterCatalogHeaderHint) {
-        unitCounterCatalogHeaderHint.textContent = usingHoi4Catalog
-          ? t("Review imported Hearts of Iron IV counter icons. This library is read-only for now.", "ui")
-          : t("Search the internal counter catalog, then apply a preset back into the editor.", "ui");
-      }
-      if (unitCounterCatalogSourceTabs) {
-        Array.from(unitCounterCatalogSourceTabs.querySelectorAll("[data-counter-catalog-source]")).forEach((element) => {
-          const button = element instanceof HTMLButtonElement ? element : null;
-          if (!button) return;
-          const active = String(button.dataset.counterCatalogSource || "") === catalogSource;
-          button.classList.toggle("is-active", active);
-          button.setAttribute("aria-pressed", active ? "true" : "false");
+      if (shouldRefreshCounterPreview) {
+        recordStrategicOverlayPerfCounter("counterPreview");
+        refreshUnitCounterPreviewSection({
+          elements: {
+            unitCounterDetailPreviewCard,
+            unitCounterEditorModalStatus,
+            unitCounterPlacementStatus,
+            unitCounterPreviewCard,
+          },
+          t,
+          renderUnitCounterPreview,
+          model: unitCounterViewModel,
         });
       }
-      if (unitCounterLibraryVariantRow) {
-        unitCounterLibraryVariantRow.classList.toggle("hidden", !usingHoi4Catalog);
-        Array.from(unitCounterLibraryVariantRow.querySelectorAll("[data-counter-library-variant]")).forEach((element) => {
-          const button = element instanceof HTMLButtonElement ? element : null;
-          if (!button) return;
-          const active = String(button.dataset.counterLibraryVariant || "small") === hoi4PreferredVariant;
-          button.classList.toggle("is-active", active);
-          button.setAttribute("aria-pressed", active ? "true" : "false");
+      if (shouldRefreshCounterCombat) {
+        recordStrategicOverlayPerfCounter("counterCombat");
+        refreshUnitCounterCombatSection({
+          elements: {
+            unitCounterBaseFillColorInput,
+            unitCounterBaseFillEyedropperBtn,
+            unitCounterBaseFillResetBtn,
+            unitCounterBaseFillSwatch,
+            unitCounterEquipmentBar,
+            unitCounterEquipmentInput,
+            unitCounterOrganizationBar,
+            unitCounterOrganizationInput,
+            unitCounterStatsPresetButtons,
+            unitCounterStatsPresetSelect,
+          },
+          model: unitCounterViewModel,
         });
       }
-      if (unitCounterLibraryReviewBar) {
-        unitCounterLibraryReviewBar.classList.toggle("hidden", !usingHoi4Catalog);
-      }
-      if (unitCounterLibraryReviewSummary) {
-        unitCounterLibraryReviewSummary.textContent = usingHoi4Catalog
-          ? getHoi4ReviewSummaryText(effectivePresetId)
-          : "";
-      }
-      if (unitCounterCatalogSearchInput) {
-        unitCounterCatalogSearchInput.value = usingHoi4Catalog
-          ? String(state.strategicOverlayUi?.hoi4CounterQuery || "")
-          : String(state.strategicOverlayUi?.counterCatalogQuery || "");
-        unitCounterCatalogSearchInput.placeholder = usingHoi4Catalog
-          ? t("Search HOI4 sprite names, labels, keywords...", "ui")
-          : t("Search internal presets, symbols, keywords...", "ui");
-      }
-      if (unitCounterCatalogCategoriesEl) {
-        const categoryOptions = usingHoi4Catalog
-          ? getHoi4CatalogFilterOptions(effectivePresetId)
-          : [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])];
-        const activeCategory = usingHoi4Catalog
-          ? String(state.strategicOverlayUi?.hoi4CounterCategory || "all")
-          : String(state.strategicOverlayUi?.counterCatalogCategory || "all");
-        unitCounterCatalogCategoriesEl.replaceChildren();
-        categoryOptions.forEach(([categoryValue, label]) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "counter-editor-category-btn";
-          button.dataset.counterCatalogCategory = String(categoryValue || "");
-          button.textContent = label;
-          const active = activeCategory === String(categoryValue || "");
-          button.classList.toggle("is-active", active);
-          button.setAttribute("aria-pressed", active ? "true" : "false");
-          unitCounterCatalogCategoriesEl.appendChild(button);
+      if (shouldRefreshCounterCatalog) {
+        recordStrategicOverlayPerfCounter("counterCatalog");
+        ensureStrategicOverlayUiState();
+        renderUnitCounterCatalogSection({
+          elements: {
+            unitCounterCatalogCategoriesEl,
+            unitCounterCatalogGrid,
+            unitCounterCatalogHeaderHint,
+            unitCounterCatalogHeaderTitle,
+            unitCounterCatalogSearchInput,
+            unitCounterCatalogSourceTabs,
+            unitCounterLibraryReviewBar,
+            unitCounterLibraryReviewSummary,
+            unitCounterLibraryVariantRow,
+          },
+          state,
+          t,
+          effectivePresetId: unitCounterViewModel.effectivePresetId,
+          helpers: {
+            cancelHoi4CatalogGridRender,
+            ensureHoi4UnitIconManifest,
+            filterHoi4UnitIconEntries,
+            getFilteredUnitCounterCatalog,
+            getHoi4CatalogFilterOptions,
+            getHoi4EffectiveMappedPresetIds,
+            getHoi4ReviewSummaryText,
+            getHoi4UnitIconManifestState,
+            getUnitCounterCategoryLabel,
+            getUnitCounterIconPathById,
+            renderHoi4CatalogCards,
+            unitCounterCatalogCategories,
+          },
         });
       }
-      if (unitCounterCatalogGrid && state.strategicOverlayUi?.counterEditorModalOpen) {
-        cancelHoi4CatalogGridRender(unitCounterCatalogGrid);
-        unitCounterCatalogGrid.replaceChildren();
-        const emptyState = document.createElement("div");
-        emptyState.className = "counter-editor-symbol-empty";
-        if (!usingHoi4Catalog) {
-          const filteredCatalog = getFilteredUnitCounterCatalog({
-            category: state.strategicOverlayUi?.counterCatalogCategory || "all",
-            query: state.strategicOverlayUi?.counterCatalogQuery || "",
-          });
-          if (!filteredCatalog.length) {
-            emptyState.textContent = t("No symbols match the current filter.", "ui");
-            unitCounterCatalogGrid.appendChild(emptyState);
-          } else {
-            filteredCatalog.forEach((preset) => {
-              const button = document.createElement("button");
-              button.type = "button";
-              button.className = "counter-editor-symbol-card";
-              button.dataset.unitCounterCatalogPreset = preset.id;
-              const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-              icon.setAttribute("viewBox", "-5 -5 10 10");
-              icon.setAttribute("aria-hidden", "true");
-              const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-              path.setAttribute("d", getUnitCounterIconPathById(preset.iconId));
-              icon.appendChild(path);
-              const title = document.createElement("span");
-              title.className = "counter-editor-symbol-card-title";
-              title.textContent = preset.label;
-              const subtitle = document.createElement("span");
-              subtitle.className = "counter-editor-symbol-card-subtitle";
-              subtitle.textContent = `${preset.shortCode} · ${getUnitCounterCategoryLabel(preset.category)}`;
-              const active = preset.id === effectivePresetId;
-              button.classList.toggle("is-active", active);
-              button.setAttribute("aria-pressed", active ? "true" : "false");
-              button.append(icon, title, subtitle);
-              unitCounterCatalogGrid.appendChild(button);
-            });
-          }
-        } else {
-          if (hoi4UnitIconManifestStatus === "idle") {
-            ensureHoi4UnitIconManifest();
-          }
-          if (hoi4UnitIconManifestStatus === "loading" || hoi4UnitIconManifestStatus === "idle") {
-            emptyState.textContent = t("Loading HOI4 unit icon library...", "ui");
-            unitCounterCatalogGrid.appendChild(emptyState);
-          } else if (hoi4UnitIconManifestStatus === "error") {
-            emptyState.textContent = hoi4UnitIconManifestError?.message
-              ? String(hoi4UnitIconManifestError.message)
-              : t("Failed to load the HOI4 unit icon library.", "ui");
-            unitCounterCatalogGrid.appendChild(emptyState);
-          } else {
-            const filteredEntries = filterHoi4UnitIconEntries(hoi4UnitIconManifestData?.entries || [], {
-              filter: state.strategicOverlayUi?.hoi4CounterCategory || "all",
-              query: state.strategicOverlayUi?.hoi4CounterQuery || "",
-              currentPresetId: effectivePresetId,
-              getMappedPresetIds: getHoi4EffectiveMappedPresetIds,
-            });
-            renderHoi4CatalogCards(unitCounterCatalogGrid, filteredEntries, {
-              effectivePresetId,
-              preferredVariant: hoi4PreferredVariant,
-            });
-            /* Legacy two-preview fallback retained only as commented reference during cleanup.
-              filteredEntries.forEach((entry) => {
-                const card = document.createElement("div");
-                card.className = "counter-editor-symbol-card counter-editor-hoi4-card";
-                const previewSet = getHoi4UnitIconPreviewSet(entry, hoi4PreferredVariant);
-                const previewRow = document.createElement("div");
-                previewRow.className = "counter-editor-hoi4-preview-row";
-                const createPreview = (label, src, preferred = false) => {
-                  const box = document.createElement("div");
-                  box.className = "counter-editor-hoi4-preview";
-                  if (preferred) {
-                    box.classList.add("is-preferred");
-                  }
-                  const previewLabel = document.createElement("span");
-                  previewLabel.className = "counter-editor-hoi4-preview-label";
-                  previewLabel.textContent = label;
-                  if (src) {
-                    const image = document.createElement("img");
-                    image.src = src;
-                    image.alt = `${entry.label} ${label}`;
-                    image.loading = "lazy";
-                    box.appendChild(image);
-                  } else {
-                    const fallback = document.createElement("span");
-                    fallback.className = "counter-editor-symbol-card-subtitle";
-                    fallback.textContent = t("Missing", "ui");
-                    box.appendChild(fallback);
-                  }
-                  box.appendChild(previewLabel);
-                  return box;
-                };
-                previewRow.append(
-                  createPreview(t("Small", "ui"), previewSet.small, hoi4PreferredVariant === "small"),
-                  createPreview(t("Large", "ui"), previewSet.large, hoi4PreferredVariant === "large")
-                );
-                const title = document.createElement("span");
-                title.className = "counter-editor-symbol-card-title";
-                title.textContent = entry.label;
-                const subtitle = document.createElement("span");
-                subtitle.className = "counter-editor-symbol-card-subtitle";
-                subtitle.textContent = `${entry.domain} · ${formatEntryKind(entry.kind)}`;
-                const path = document.createElement("div");
-                path.className = "counter-editor-hoi4-path";
-                path.textContent = entry.sourceGamePath || entry.sourceTextureFile || entry.spriteName;
-                const meta = document.createElement("div");
-                meta.className = "counter-editor-hoi4-meta";
-                meta.textContent = entry.spriteName;
-                const tags = document.createElement("div");
-                tags.className = "counter-editor-hoi4-tags";
-                const presetTags = Array.isArray(entry.mappedPresetIds) && entry.mappedPresetIds.length
-                  ? entry.mappedPresetIds
-                  : ["unmapped"];
-                presetTags.forEach((presetId) => {
-                  const tag = document.createElement("span");
-                  tag.className = "counter-editor-hoi4-tag";
-                  tag.textContent = presetId === "unmapped" ? t("Unmapped", "ui") : presetId.toUpperCase();
-                  tags.appendChild(tag);
-                });
-                card.append(previewRow, title, subtitle, meta, path, tags);
-                unitCounterCatalogGrid.appendChild(card);
-              }); */
-            }
-          }
-        }
-      }
-    if (shouldRefreshCounterList) {
-      recordStrategicOverlayPerfCounter("counterList");
-      suppressUnitCounterListChange = true;
-      try {
-        syncSelectOptions(unitCounterList, [
-          { value: "", label: t("No unit counters", "ui") },
-          ...(state.unitCounters || []).map((counter) => ({
-            value: String(counter.id || ""),
-            label: formatUnitCounterListLabel(counter),
-          })),
-        ], {
-          value: String(unitEditor.selectedId || ""),
-          signatureKey: "counterListOptionsSignature",
+      if (shouldRefreshCounterList) {
+        recordStrategicOverlayPerfCounter("counterList");
+        refreshUnitCounterListSection({
+          elements: { unitCounterList },
+          t,
+          syncSelectOptions,
+          formatUnitCounterListLabel,
+          state,
+          model: unitCounterViewModel,
+          uiState: unitCounterUiState,
         });
-      } finally {
-        suppressUnitCounterListChange = false;
       }
-    }
     }
 
     if (hasStrategicOverlayScope(normalizedScopes, "badgeCounts", "operationalLines", "operationGraphics", "counterList")) {
@@ -1472,575 +1107,73 @@ export function createStrategicOverlayController({
     operationGraphicDeleteVertexBtn.dataset.bound = "true";
   }
 
-  const syncUnitCounterCombatStateToSelection = (partial = {}, { commitSelected = true } = {}) => {
-    const nextCombatState = resolveUnitCounterCombatState({
-      organizationPct: partial.organizationPct ?? state.unitCounterEditor.organizationPct,
-      equipmentPct: partial.equipmentPct ?? state.unitCounterEditor.equipmentPct,
-      baseFillColor: partial.baseFillColor ?? state.unitCounterEditor.baseFillColor,
-      statsPresetId: partial.statsPresetId ?? state.unitCounterEditor.statsPresetId,
-      statsSource: partial.statsSource ?? state.unitCounterEditor.statsSource,
-    });
-    state.unitCounterEditor.organizationPct = nextCombatState.organizationPct;
-    state.unitCounterEditor.equipmentPct = nextCombatState.equipmentPct;
-    state.unitCounterEditor.baseFillColor = nextCombatState.baseFillColor;
-    state.unitCounterEditor.statsPresetId = nextCombatState.statsPresetId;
-    state.unitCounterEditor.statsSource = nextCombatState.statsSource;
-    if (commitSelected && !state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-      mapRenderer.updateSelectedUnitCounter(nextCombatState);
-    } else if (render) {
-      render();
-    }
-    scheduleStrategicOverlayRefresh(["counterCombat", "counterPreview"]);
-  };
-  const applyUnitCounterCombatPreset = (presetId, { source = "preset" } = {}) => {
-    const preset = getUnitCounterCombatPreset(presetId);
-    syncUnitCounterCombatStateToSelection({
-      organizationPct: preset.organizationPct,
-      equipmentPct: preset.equipmentPct,
-      statsPresetId: preset.id,
-      statsSource: source,
-    });
-  };
-  const applyUnitCounterPresetSelection = (nextPresetId, { commitSelected = true } = {}) => {
-    const normalizedPresetId = String(nextPresetId || unitCounterPresets[0].id).trim().toUpperCase();
-    const nextPreset = getUnitCounterPresetMeta(normalizedPresetId);
-    const nextRenderer = String(nextPreset.defaultRenderer || "game").trim().toLowerCase();
-    const fallbackToken = nextRenderer === "milstd"
-      ? String(nextPreset.baseSidc || "").trim().toUpperCase()
-      : String(nextPreset.shortCode || "").trim().toUpperCase();
-    state.unitCounterEditor.presetId = normalizedPresetId;
-    state.unitCounterEditor.iconId = String(nextPreset.iconId || "").trim().toLowerCase();
-    state.unitCounterEditor.unitType = String(nextPreset.unitType || nextPreset.id || "").trim().toUpperCase();
-    state.unitCounterEditor.renderer = nextRenderer;
-    state.unitCounterEditor.echelon = String(nextPreset.defaultEchelon || "").trim().toUpperCase();
-    state.unitCounterEditor.sidc = fallbackToken;
-    state.unitCounterEditor.symbolCode = fallbackToken;
-    if (commitSelected && !state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-      mapRenderer.updateSelectedUnitCounter({
-        presetId: normalizedPresetId,
-        iconId: state.unitCounterEditor.iconId,
-        unitType: state.unitCounterEditor.unitType,
-        renderer: String(state.unitCounterEditor.renderer || nextRenderer).trim().toLowerCase(),
-        echelon: String(state.unitCounterEditor.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
-        sidc: String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || fallbackToken || "").trim().toUpperCase(),
-      });
-    } else if (render) {
-      render();
-    }
-    scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterCatalog"]);
-  };
-
-  if (unitCounterPresetSelect && !unitCounterPresetSelect.dataset.bound) {
-    unitCounterPresetSelect.addEventListener("change", (event) => {
-      applyUnitCounterPresetSelection(String(event.target.value || unitCounterPresets[0].id));
-    });
-    unitCounterPresetSelect.dataset.bound = "true";
-  }
-  if (unitCounterNationModeSelect && !unitCounterNationModeSelect.dataset.bound) {
-    unitCounterNationModeSelect.addEventListener("change", (event) => {
-      const nextMode = String(event.target.value || "display").trim().toLowerCase();
-      state.unitCounterEditor.nationSource = nextMode === "manual" ? "manual" : "display";
-      if (nextMode !== "manual") {
-        state.unitCounterEditor.nationTag = "";
-      }
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({
-          nationSource: state.unitCounterEditor.nationSource,
-          nationTag: state.unitCounterEditor.nationTag,
-        });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterNationModeSelect.dataset.bound = "true";
-  }
-  if (unitCounterNationSelect && !unitCounterNationSelect.dataset.bound) {
-    unitCounterNationSelect.addEventListener("change", (event) => {
-      const nextNationTag = String(event.target.value || "").trim().toUpperCase();
-      state.unitCounterEditor.nationTag = nextNationTag;
-      state.unitCounterEditor.nationSource = nextNationTag ? "manual" : "display";
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({
-          nationTag: nextNationTag,
-          nationSource: state.unitCounterEditor.nationSource,
-        });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterNationSelect.dataset.bound = "true";
-  }
-  if (unitCounterAttachmentSelect && !unitCounterAttachmentSelect.dataset.bound) {
-    unitCounterAttachmentSelect.addEventListener("change", (event) => {
-      const nextLineId = String(event.target.value || "").trim();
-      state.unitCounterEditor.attachment = nextLineId
-        ? { kind: "operational-line", lineId: nextLineId }
-        : null;
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ attachment: state.unitCounterEditor.attachment });
-      } else if (render) {
-        render();
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterAttachmentSelect.dataset.bound = "true";
-  }
-  if (unitCounterRendererSelect && !unitCounterRendererSelect.dataset.bound) {
-    unitCounterRendererSelect.addEventListener("change", (event) => {
-      const nextRenderer = String(event.target.value || "game");
-      state.unitCounterEditor.renderer = nextRenderer;
-      if (nextRenderer === "milstd" && !String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "").trim()) {
-        state.unitCounterEditor.sidc = "130310001412110000000000000000";
-        state.unitCounterEditor.symbolCode = state.unitCounterEditor.sidc;
-      }
-      state.annotationView = {
-        ...(state.annotationView || {}),
-        unitRendererDefault: nextRenderer,
-      };
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ renderer: nextRenderer });
-      } else if (render) {
-        render();
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-      markDirty("unit-counter-renderer");
-    });
-    unitCounterRendererSelect.dataset.bound = "true";
-  }
-  if (unitCounterSizeSelect && !unitCounterSizeSelect.dataset.bound) {
-    unitCounterSizeSelect.addEventListener("change", (event) => {
-      const nextSize = String(event.target.value || "medium");
-      state.unitCounterEditor.size = nextSize;
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ size: nextSize });
-      } else if (render) {
-        render();
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterSizeSelect.dataset.bound = "true";
-  }
-  if (unitCounterEchelonSelect && !unitCounterEchelonSelect.dataset.bound) {
-    unitCounterEchelonSelect.addEventListener("change", (event) => {
-      state.unitCounterEditor.echelon = String(event.target.value || "").trim().toUpperCase();
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ echelon: state.unitCounterEditor.echelon });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterEchelonSelect.dataset.bound = "true";
-  }
-  if (unitCounterLabelInput && !unitCounterLabelInput.dataset.bound) {
-    unitCounterLabelInput.addEventListener("input", (event) => {
-      state.unitCounterEditor.label = String(event.target.value || "");
-      scheduleStrategicOverlayRefresh("counterPreview");
-    });
-    unitCounterLabelInput.addEventListener("change", (event) => {
-      const nextLabel = String(event.target.value || "");
-      state.unitCounterEditor.label = nextLabel;
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ label: nextLabel });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterList"]);
-    });
-    unitCounterLabelInput.dataset.bound = "true";
-  }
-  if (unitCounterSubLabelInput && !unitCounterSubLabelInput.dataset.bound) {
-    unitCounterSubLabelInput.addEventListener("input", (event) => {
-      state.unitCounterEditor.subLabel = String(event.target.value || "");
-      scheduleStrategicOverlayRefresh("counterPreview");
-    });
-    unitCounterSubLabelInput.addEventListener("change", (event) => {
-      state.unitCounterEditor.subLabel = String(event.target.value || "");
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ subLabel: state.unitCounterEditor.subLabel });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterSubLabelInput.dataset.bound = "true";
-  }
-  if (unitCounterStrengthInput && !unitCounterStrengthInput.dataset.bound) {
-    unitCounterStrengthInput.addEventListener("input", (event) => {
-      state.unitCounterEditor.strengthText = String(event.target.value || "");
-      scheduleStrategicOverlayRefresh("counterPreview");
-    });
-    unitCounterStrengthInput.addEventListener("change", (event) => {
-      state.unitCounterEditor.strengthText = String(event.target.value || "");
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ strengthText: state.unitCounterEditor.strengthText });
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterStrengthInput.dataset.bound = "true";
-  }
-  if (unitCounterSymbolInput && !unitCounterSymbolInput.dataset.bound) {
-    unitCounterSymbolInput.addEventListener("input", (event) => {
-      const nextToken = String(event.target.value || "").trim().toUpperCase();
-      state.unitCounterEditor.sidc = nextToken;
-      state.unitCounterEditor.symbolCode = nextToken;
-      scheduleStrategicOverlayRefresh("counterPreview");
-    });
-    unitCounterSymbolInput.addEventListener("change", (event) => {
-      const nextSymbol = String(event.target.value || "").trim().toUpperCase();
-      state.unitCounterEditor.sidc = nextSymbol;
-      state.unitCounterEditor.symbolCode = nextSymbol;
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ sidc: nextSymbol });
-      } else if (render) {
-        render();
-      }
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
-    });
-    unitCounterSymbolInput.dataset.bound = "true";
-  }
-  if (unitCounterDetailToggleBtn && !unitCounterDetailToggleBtn.dataset.bound) {
-    unitCounterDetailToggleBtn.addEventListener("click", () => {
-      ensureStrategicOverlayUiState();
-      state.strategicOverlayUi.counterEditorModalOpen = true;
-      refreshStrategicOverlayUI({
-        scopes: ["workspaceChrome", "counterIdentity", "counterCombat", "counterPreview", "counterCatalog"],
-      });
-    });
-    unitCounterDetailToggleBtn.dataset.bound = "true";
-  }
-  if (unitCounterEditorModalCloseBtn && !unitCounterEditorModalCloseBtn.dataset.bound) {
-    unitCounterEditorModalCloseBtn.addEventListener("click", () => {
-      setCounterEditorModalState(false);
-      refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
-    });
-    unitCounterEditorModalCloseBtn.dataset.bound = "true";
-  }
-  if (unitCounterEditorModalOverlay && !unitCounterEditorModalOverlay.dataset.bound) {
-    unitCounterEditorModalOverlay.addEventListener("click", (event) => {
-      if (event.target !== unitCounterEditorModalOverlay) return;
-      setCounterEditorModalState(false);
-      refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
-    });
-    unitCounterEditorModalOverlay.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setCounterEditorModalState(false);
-        refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const focusables = getCounterEditorModalFocusableElements();
-      if (!focusables.length) {
-        event.preventDefault();
-        unitCounterEditorModal?.focus({ preventScroll: true });
-        return;
-      }
-      const currentIndex = focusables.indexOf(document.activeElement);
-      if (currentIndex === -1) {
-        event.preventDefault();
-        focusables[0].focus({ preventScroll: true });
-        return;
-      }
-      event.preventDefault();
-      const delta = event.shiftKey ? -1 : 1;
-      const nextIndex = (currentIndex + delta + focusables.length) % focusables.length;
-      focusables[nextIndex].focus({ preventScroll: true });
-    });
-    unitCounterEditorModalOverlay.dataset.bound = "true";
-  }
-  if (unitCounterCatalogSearchInput && !unitCounterCatalogSearchInput.dataset.bound) {
-    unitCounterCatalogSearchInput.addEventListener("input", (event) => {
-      ensureStrategicOverlayUiState();
-      if (state.strategicOverlayUi.counterCatalogSource === "hoi4") {
-        state.strategicOverlayUi.hoi4CounterQuery = String(event.target.value || "");
-      } else {
-        state.strategicOverlayUi.counterCatalogQuery = String(event.target.value || "");
-      }
-      if (unitCounterCatalogSearchDebounceHandle !== null) {
-        globalThis.clearTimeout(unitCounterCatalogSearchDebounceHandle);
-      }
-      unitCounterCatalogSearchDebounceHandle = globalThis.setTimeout(() => {
-        unitCounterCatalogSearchDebounceHandle = null;
-        scheduleStrategicOverlayRefresh("counterCatalog");
-      }, 180);
-    });
-    unitCounterCatalogSearchInput.dataset.bound = "true";
-  }
-  if (unitCounterCatalogCategoriesEl && !unitCounterCatalogCategoriesEl.dataset.bound) {
-    unitCounterCatalogCategoriesEl.addEventListener("click", (event) => {
-      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-catalog-category]") : null;
-      if (!(button instanceof HTMLButtonElement)) return;
-      ensureStrategicOverlayUiState();
-      const nextCategory = String(button.dataset.counterCatalogCategory || "all").trim().toLowerCase() || "all";
-      if (state.strategicOverlayUi.counterCatalogSource === "hoi4") {
-        state.strategicOverlayUi.hoi4CounterCategory = nextCategory;
-      } else {
-        state.strategicOverlayUi.counterCatalogCategory = nextCategory;
-      }
-      scheduleStrategicOverlayRefresh("counterCatalog");
-    });
-    unitCounterCatalogCategoriesEl.dataset.bound = "true";
-  }
-  if (unitCounterCatalogSourceTabs && !unitCounterCatalogSourceTabs.dataset.bound) {
-    unitCounterCatalogSourceTabs.addEventListener("click", (event) => {
-      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-catalog-source]") : null;
-      if (!(button instanceof HTMLButtonElement)) return;
-      ensureStrategicOverlayUiState();
-      const nextSource = String(button.dataset.counterCatalogSource || "internal").trim().toLowerCase() === "hoi4"
-        ? "hoi4"
-        : "internal";
-      if (state.strategicOverlayUi.counterCatalogSource === nextSource) return;
-      state.strategicOverlayUi.counterCatalogSource = nextSource;
-      scheduleStrategicOverlayRefresh("counterCatalog");
-    });
-    unitCounterCatalogSourceTabs.dataset.bound = "true";
-  }
-  if (unitCounterLibraryVariantRow && !unitCounterLibraryVariantRow.dataset.bound) {
-    unitCounterLibraryVariantRow.addEventListener("click", (event) => {
-      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-library-variant]") : null;
-      if (!(button instanceof HTMLButtonElement)) return;
-      ensureStrategicOverlayUiState();
-      state.strategicOverlayUi.hoi4CounterVariant = String(button.dataset.counterLibraryVariant || "small").trim().toLowerCase() === "large"
-        ? "large"
-        : "small";
-      scheduleStrategicOverlayRefresh("counterCatalog");
-    });
-    unitCounterLibraryVariantRow.dataset.bound = "true";
-  }
-  if (unitCounterLibraryExportBtn && !unitCounterLibraryExportBtn.dataset.bound) {
-    unitCounterLibraryExportBtn.addEventListener("click", () => {
-      exportHoi4UnitIconReviewDraft();
-    });
-    unitCounterLibraryExportBtn.dataset.bound = "true";
-  }
-  if (unitCounterCatalogGrid && !unitCounterCatalogGrid.dataset.bound) {
-    unitCounterCatalogGrid.addEventListener("click", (event) => {
-      const reviewButton = event.target instanceof HTMLElement ? event.target.closest("[data-hoi4-review-action]") : null;
-      if (reviewButton instanceof HTMLButtonElement) {
-        const action = String(reviewButton.dataset.hoi4ReviewAction || "").trim();
-        const entryId = String(reviewButton.dataset.hoi4EntryId || "").trim();
-        const currentPresetId = String(state.unitCounterEditor?.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim();
-        if (action === "toggle-current-mapping") {
-          toggleHoi4EntryCurrentPresetMapping(entryId, currentPresetId);
-          scheduleStrategicOverlayRefresh("counterCatalog");
-          return;
-        }
-        if (action === "set-current-candidate") {
-          setHoi4CurrentPresetCandidate(entryId, currentPresetId);
-          scheduleStrategicOverlayRefresh("counterCatalog");
-          return;
-        }
-      }
-      const button = event.target instanceof HTMLElement ? event.target.closest("[data-unit-counter-catalog-preset]") : null;
-      if (!(button instanceof HTMLButtonElement)) return;
-      applyUnitCounterPresetSelection(String(button.dataset.unitCounterCatalogPreset || unitCounterPresets[0].id));
-    });
-    unitCounterCatalogGrid.dataset.bound = "true";
-  }
-  if (unitCounterStatsPresetSelect && !unitCounterStatsPresetSelect.dataset.bound) {
-    unitCounterStatsPresetSelect.addEventListener("change", (event) => {
-      applyUnitCounterCombatPreset(String(event.target.value || "regular"), { source: "preset" });
-    });
-    unitCounterStatsPresetSelect.dataset.bound = "true";
-  }
-  unitCounterStatsPresetButtons.forEach((button) => {
-    if (button.dataset.bound) return;
-    button.addEventListener("click", () => {
-      applyUnitCounterCombatPreset(String(button.dataset.value || "regular"), { source: "preset" });
-    });
-    button.dataset.bound = "true";
+  // Keep unit counter binding in its own owner helper so this controller stays as wiring.
+  bindUnitCounterSidebarEvents({
+    state,
+    elements: {
+      unitCounterAttachmentSelect,
+      unitCounterBaseFillColorInput,
+      unitCounterBaseFillEyedropperBtn,
+      unitCounterBaseFillResetBtn,
+      unitCounterBaseFillSwatch,
+      unitCounterCancelBtn,
+      unitCounterCatalogCategoriesEl,
+      unitCounterCatalogGrid,
+      unitCounterCatalogSearchInput,
+      unitCounterCatalogSourceTabs,
+      unitCounterDeleteBtn,
+      unitCounterDetailToggleBtn,
+      unitCounterEditorModal,
+      unitCounterEditorModalCloseBtn,
+      unitCounterEditorModalOverlay,
+      unitCounterEchelonSelect,
+      unitCounterEquipmentInput,
+      unitCounterFixedScaleRange,
+      unitCounterFixedScaleValue,
+      unitCounterLabelInput,
+      unitCounterLabelsToggle,
+      unitCounterLibraryExportBtn,
+      unitCounterLibraryVariantRow,
+      unitCounterList,
+      unitCounterNationModeSelect,
+      unitCounterNationSelect,
+      unitCounterOrganizationInput,
+      unitCounterPlaceBtn,
+      unitCounterPresetSelect,
+      unitCounterRendererSelect,
+      unitCounterSizeSelect,
+      unitCounterStatsPresetButtons,
+      unitCounterStatsPresetSelect,
+      unitCounterStatsRandomizeBtn,
+      unitCounterStrengthInput,
+      unitCounterSubLabelInput,
+      unitCounterSymbolInput,
+    },
+    uiState: unitCounterUiState,
+    helpers: {
+      clampUnitCounterFixedScaleMultiplier,
+      clampUnitCounterStatValue,
+      DEFAULT_UNIT_COUNTER_PRESET_ID,
+      ensureStrategicOverlayUiState,
+      exportHoi4UnitIconReviewDraft,
+      getRandomizedUnitCounterCombatState,
+      getUnitCounterCombatPreset,
+      getUnitCounterPresetMeta,
+      markDirty,
+      mapRenderer,
+      normalizeAnnotationView,
+      refreshStrategicOverlayUI,
+      render,
+      resolveUnitCounterCombatState,
+      scheduleStrategicOverlayRefresh,
+      setCounterEditorModalState,
+      setHoi4CurrentPresetCandidate,
+      showAppDialog,
+      t,
+      toggleHoi4EntryCurrentPresetMapping,
+      unitCounterPresets,
+    },
   });
-  if (unitCounterStatsRandomizeBtn && !unitCounterStatsRandomizeBtn.dataset.bound) {
-    unitCounterStatsRandomizeBtn.addEventListener("click", () => {
-      syncUnitCounterCombatStateToSelection(getRandomizedUnitCounterCombatState());
-    });
-    unitCounterStatsRandomizeBtn.dataset.bound = "true";
-  }
-  if (unitCounterOrganizationInput && !unitCounterOrganizationInput.dataset.bound) {
-    unitCounterOrganizationInput.addEventListener("input", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        organizationPct: event.target.value,
-        statsSource: "manual",
-      }, { commitSelected: false });
-    });
-    unitCounterOrganizationInput.addEventListener("change", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        organizationPct: event.target.value,
-        statsSource: "manual",
-      });
-    });
-    unitCounterOrganizationInput.dataset.bound = "true";
-  }
-  if (unitCounterEquipmentInput && !unitCounterEquipmentInput.dataset.bound) {
-    unitCounterEquipmentInput.addEventListener("input", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        equipmentPct: event.target.value,
-        statsSource: "manual",
-      }, { commitSelected: false });
-    });
-    unitCounterEquipmentInput.addEventListener("change", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        equipmentPct: event.target.value,
-        statsSource: "manual",
-      });
-    });
-    unitCounterEquipmentInput.dataset.bound = "true";
-  }
-  if (unitCounterBaseFillSwatch && !unitCounterBaseFillSwatch.dataset.bound) {
-    unitCounterBaseFillSwatch.addEventListener("click", () => {
-      unitCounterBaseFillColorInput?.click();
-    });
-    unitCounterBaseFillSwatch.dataset.bound = "true";
-  }
-  if (unitCounterBaseFillColorInput && !unitCounterBaseFillColorInput.dataset.bound) {
-    unitCounterBaseFillColorInput.addEventListener("input", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        baseFillColor: String(event.target.value || "").trim(),
-        statsSource: state.unitCounterEditor.statsSource || "manual",
-      }, { commitSelected: false });
-    });
-    unitCounterBaseFillColorInput.addEventListener("change", (event) => {
-      syncUnitCounterCombatStateToSelection({
-        baseFillColor: String(event.target.value || "").trim(),
-        statsSource: state.unitCounterEditor.statsSource || "manual",
-      });
-    });
-    unitCounterBaseFillColorInput.dataset.bound = "true";
-  }
-  if (unitCounterBaseFillResetBtn && !unitCounterBaseFillResetBtn.dataset.bound) {
-    unitCounterBaseFillResetBtn.addEventListener("click", () => {
-      syncUnitCounterCombatStateToSelection({
-        baseFillColor: "",
-        statsSource: state.unitCounterEditor.statsSource || "manual",
-      });
-    });
-    unitCounterBaseFillResetBtn.dataset.bound = "true";
-  }
-  if (unitCounterBaseFillEyedropperBtn && !unitCounterBaseFillEyedropperBtn.dataset.bound) {
-    unitCounterBaseFillEyedropperBtn.addEventListener("click", async () => {
-      if (!("EyeDropper" in globalThis)) return;
-      try {
-        const picker = new globalThis.EyeDropper();
-        const result = await picker.open();
-        syncUnitCounterCombatStateToSelection({
-          baseFillColor: String(result?.sRGBHex || "").trim(),
-          statsSource: state.unitCounterEditor.statsSource || "manual",
-        });
-      } catch (_error) {
-        // Ignore cancelled eyedropper sessions.
-      }
-    });
-    unitCounterBaseFillEyedropperBtn.dataset.bound = "true";
-  }
-  if (unitCounterLabelsToggle && !unitCounterLabelsToggle.dataset.bound) {
-    unitCounterLabelsToggle.addEventListener("change", (event) => {
-      state.annotationView = {
-        ...(state.annotationView || {}),
-        showUnitLabels: !!event.target.checked,
-      };
-      if (render) render();
-      scheduleStrategicOverlayRefresh("counterIdentity");
-      markDirty("unit-counter-label-visibility");
-    });
-    unitCounterLabelsToggle.dataset.bound = "true";
-  }
-  if (unitCounterFixedScaleRange && !unitCounterFixedScaleRange.dataset.bound) {
-    const applyUnitCounterFixedScale = (rawValue) => {
-      const nextScale = clampUnitCounterFixedScaleMultiplier(Number(rawValue) / 100, 1.5);
-      state.annotationView = normalizeAnnotationView({
-        ...(state.annotationView || {}),
-        unitCounterFixedScaleMultiplier: nextScale,
-      });
-      if (unitCounterFixedScaleValue) {
-        unitCounterFixedScaleValue.textContent = `${nextScale.toFixed(2)}x`;
-      }
-      if (render) render();
-      scheduleStrategicOverlayRefresh("counterIdentity");
-      markDirty("unit-counter-fixed-scale");
-    };
-    unitCounterFixedScaleRange.addEventListener("input", (event) => {
-      applyUnitCounterFixedScale(event.target.value);
-    });
-    unitCounterFixedScaleRange.addEventListener("change", (event) => {
-      applyUnitCounterFixedScale(event.target.value);
-    });
-    unitCounterFixedScaleRange.dataset.bound = "true";
-  }
-  if (unitCounterPlaceBtn && !unitCounterPlaceBtn.dataset.bound) {
-    unitCounterPlaceBtn.addEventListener("click", () => {
-      const nextPresetId = String(unitCounterPresetSelect?.value || state.unitCounterEditor?.presetId || unitCounterPresets[0].id).trim().toUpperCase();
-      const nextPreset = getUnitCounterPresetMeta(nextPresetId);
-      const nextRenderer = String(unitCounterRendererSelect?.value || state.unitCounterEditor?.renderer || nextPreset.defaultRenderer || "game");
-      const nextSymbol = String(
-        unitCounterSymbolInput?.value
-        || state.unitCounterEditor?.sidc
-        || state.unitCounterEditor?.symbolCode
-        || (String(nextRenderer).trim().toLowerCase() === "milstd"
-          ? nextPreset.baseSidc
-          : nextPreset.shortCode)
-        || ""
-      ).trim().toUpperCase();
-      mapRenderer.startUnitCounterPlacement({
-        renderer: nextRenderer,
-        label: String(unitCounterLabelInput?.value || state.unitCounterEditor?.label || ""),
-        sidc: nextSymbol,
-        symbolCode: nextSymbol,
-        size: String(unitCounterSizeSelect?.value || state.unitCounterEditor?.size || "medium"),
-        nationTag: String(unitCounterNationSelect?.value || state.unitCounterEditor?.nationTag || "").trim().toUpperCase(),
-        nationSource: String(unitCounterNationModeSelect?.value || state.unitCounterEditor?.nationSource || "display").trim().toLowerCase(),
-        presetId: nextPresetId,
-        iconId: String(nextPreset.iconId || "").trim().toLowerCase(),
-        unitType: String(nextPreset.unitType || nextPreset.id || "").trim().toUpperCase(),
-        echelon: String(unitCounterEchelonSelect?.value || state.unitCounterEditor?.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
-        subLabel: String(unitCounterSubLabelInput?.value || state.unitCounterEditor?.subLabel || ""),
-        strengthText: String(unitCounterStrengthInput?.value || state.unitCounterEditor?.strengthText || ""),
-        attachment: String(unitCounterAttachmentSelect?.value || state.unitCounterEditor?.attachment?.lineId || "").trim()
-          ? {
-            kind: "operational-line",
-            lineId: String(unitCounterAttachmentSelect?.value || state.unitCounterEditor?.attachment?.lineId || "").trim(),
-          }
-          : null,
-        baseFillColor: String(state.unitCounterEditor?.baseFillColor || ""),
-        organizationPct: clampUnitCounterStatValue(state.unitCounterEditor?.organizationPct, 78),
-        equipmentPct: clampUnitCounterStatValue(state.unitCounterEditor?.equipmentPct, 74),
-        statsPresetId: String(state.unitCounterEditor?.statsPresetId || "regular"),
-        statsSource: String(state.unitCounterEditor?.statsSource || "preset"),
-      });
-      const placementRefreshScopes = ["counterIdentity", "counterPreview", "counterList"];
-      scheduleStrategicOverlayRefresh(placementRefreshScopes);
-      globalThis.requestAnimationFrame?.(() => {
-        scheduleStrategicOverlayRefresh(placementRefreshScopes);
-      });
-    });
-    unitCounterPlaceBtn.dataset.bound = "true";
-  }
-  if (unitCounterCancelBtn && !unitCounterCancelBtn.dataset.bound) {
-    unitCounterCancelBtn.addEventListener("click", () => {
-      mapRenderer.cancelUnitCounterPlacement();
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterList"]);
-    });
-    unitCounterCancelBtn.dataset.bound = "true";
-  }
-  if (unitCounterList && !unitCounterList.dataset.bound) {
-    unitCounterList.addEventListener("change", (event) => {
-      if (suppressUnitCounterListChange) {
-        return;
-      }
-      mapRenderer.selectUnitCounterById(String(event.target.value || ""));
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterCombat", "counterPreview", "counterList"]);
-    });
-    unitCounterList.dataset.bound = "true";
-  }
-  if (unitCounterDeleteBtn && !unitCounterDeleteBtn.dataset.bound) {
-    unitCounterDeleteBtn.addEventListener("click", async () => {
-      if (!state.unitCounterEditor?.selectedId) return;
-      const confirmed = await showAppDialog({
-        title: t("Delete Selected", "ui"),
-        message: t("Delete the selected unit counter?", "ui"),
-        details: t("This removes the selected project-local counter from the map.", "ui"),
-        confirmLabel: t("Delete Counter", "ui"),
-        cancelLabel: t("Cancel", "ui"),
-        tone: "warning",
-      });
-      if (!confirmed) return;
-      mapRenderer.deleteSelectedUnitCounter();
-      scheduleStrategicOverlayRefresh(["counterIdentity", "counterCombat", "counterPreview", "counterList"]);
-    });
-    unitCounterDeleteBtn.dataset.bound = "true";
-  }
 
   };
 

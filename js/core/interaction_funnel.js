@@ -3,17 +3,11 @@ import { clearHistory } from "./history_manager.js";
 import {
   buildScenarioReleasableIndex,
   getScenarioReleasableCountries,
-  rebuildPresetState,
 } from "./releasable_manager.js";
-import { ensureDetailTopologyBoundary, requestRender } from "./render_boundary.js";
 import { setActivePaletteSource } from "./palette_manager.js";
 import {
   ensureSovereigntyState,
-  getFeatureId,
-  hasFeatureOwnershipMap,
   markLegacyColorStateDirty,
-  migrateFeatureScopedProjectDataToCurrentTopology,
-  normalizeFeatureOwnershipMap,
 } from "./sovereignty_manager.js";
 import {
   normalizeMapSemanticMode,
@@ -23,15 +17,13 @@ import {
   restoreImportedWorkbenchUiState,
   state,
 } from "./state.js";
-import {
-  STATE_BUS_EVENTS,
-  callRuntimeHook,
-  emitStateBusEvent,
-} from "./state/index.js";
+import { callRuntimeHook } from "./state/index.js";
 import {
   resetStrategicOverlayEditorState,
 } from "./state/strategic_overlay_state.js";
 import { resetDevTransientImportState } from "./state/dev_state.js";
+import { prepareImportedProjectState } from "./interaction_funnel/import_apply_orchestration.js";
+import { syncProjectImportUiState as syncProjectImportUiStateHelper } from "./interaction_funnel/ui_sync.js";
 
 let mapClickImpl = null;
 let mapDoubleClickImpl = null;
@@ -66,45 +58,6 @@ function getScenarioDispatcherModule() {
     scenarioDispatcherModulePromise = import("./scenario_dispatcher.js");
   }
   return scenarioDispatcherModulePromise;
-}
-
-async function waitForScenarioApplyIdle({ timeoutMs = 30_000, pollMs = 50 } = {}) {
-  if (!state.scenarioApplyInFlight) {
-    return true;
-  }
-  const deadline = Date.now() + Math.max(1, Number(timeoutMs) || 30_000);
-  while (state.scenarioApplyInFlight) {
-    if (Date.now() >= deadline) {
-      throw new Error("Timed out while waiting for scenario apply to settle before project import.");
-    }
-    await new Promise((resolve) => {
-      globalThis.setTimeout(resolve, Math.max(0, Number(pollMs) || 50));
-    });
-  }
-  return true;
-}
-
-async function waitForStartupReadonlyUnlock({ timeoutMs = 45_000, pollMs = 50 } = {}) {
-  if (!state.startupReadonly) {
-    return true;
-  }
-  try {
-    await ensureDetailTopologyBoundary({ applyMapData: false });
-  } catch {
-    // The startup unlock path owns the final recovery decision; keep waiting below.
-  }
-  const deadline = Date.now() + Math.max(1, Number(timeoutMs) || 45_000);
-  while (state.startupReadonly) {
-    if (Date.now() >= deadline) {
-      throw new Error(
-        "Detailed interactions are still loading. Project import could not continue before startup readonly unlocked."
-      );
-    }
-    await new Promise((resolve) => {
-      globalThis.setTimeout(resolve, Math.max(0, Number(pollMs) || 50));
-    });
-  }
-  return true;
 }
 
 function buildMapInteractionContext(kind, event) {
@@ -152,192 +105,22 @@ function cloneImportedProjectValue(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function getScenarioImportValidFeatureIds() {
-  if (!String(state.activeScenarioId || "").trim()) {
-    return null;
-  }
-  if (Array.isArray(state.runtimeFeatureIds) && state.runtimeFeatureIds.length) {
-    return new Set(
-      state.runtimeFeatureIds
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
-  }
-  if (state.runtimeFeatureIndexById instanceof Map && state.runtimeFeatureIndexById.size) {
-    return new Set(
-      Array.from(state.runtimeFeatureIndexById.keys())
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
-  }
-  const runtimeGeometries = state.runtimePoliticalTopology?.objects?.political?.geometries;
-  if (Array.isArray(runtimeGeometries) && runtimeGeometries.length) {
-    return new Set(
-      runtimeGeometries
-        .map((geometry) => getFeatureId(geometry))
-        .filter(Boolean)
-    );
-  }
-  return null;
-}
-
-function resolveImportedOwnershipState(data) {
-  const hasScenarioControllerMap = hasFeatureOwnershipMap(data?.scenarioControllersByFeatureId);
-  const importedOwnersByFeatureId = normalizeFeatureOwnershipMap(data.sovereigntyByFeatureId);
-  const importedControllersByFeatureId = hasScenarioControllerMap
-    ? normalizeFeatureOwnershipMap(data.scenarioControllersByFeatureId)
-    : null;
-  if (state.activeScenarioId) {
-    return {
-      sovereigntyByFeatureId: {
-        ...(state.scenarioBaselineOwnersByFeatureId || {}),
-        ...importedOwnersByFeatureId,
-      },
-      scenarioControllersByFeatureId: hasScenarioControllerMap
-        ? importedControllersByFeatureId
-        : { ...(state.scenarioBaselineControllersByFeatureId || {}) },
-      shouldRestoreScenarioBaselineControllers: !hasScenarioControllerMap,
-    };
-  }
-  return {
-    sovereigntyByFeatureId: importedOwnersByFeatureId,
-    scenarioControllersByFeatureId: hasScenarioControllerMap ? importedControllersByFeatureId : {},
-    shouldRestoreScenarioBaselineControllers: false,
-  };
-}
-
 function syncProjectImportUiState({ scenarioImportAudit, hooks }) {
-  state.scenarioImportAudit = state.activeScenarioId
-    ? cloneImportedProjectValue(scenarioImportAudit)
-    : null;
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PARENT_BORDER_COUNTRY_LIST);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SPECIAL_ZONE_EDITOR_UI);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_STRATEGIC_OVERLAY_UI);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_WATER_INTERACTION);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_SPECIAL_REGION);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_ACTIVE_SOVEREIGN_UI);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PAINT_MODE);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DYNAMIC_BORDER_STATUS);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TOOLBAR_INPUTS);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_RECENT_UI);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_CONTEXT_BAR);
-  callRuntimeHook(state, "persistViewSettingsFn");
-  rebuildPresetState();
-  hooks.refreshColorState?.({ renderNow: false });
-  requestRender("project-import");
-  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_COUNTRY_LIST);
-  emitStateBusEvent(STATE_BUS_EVENTS.REFRESH_COUNTRY_INSPECTOR_DETAIL);
-  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_WATER_REGION_LIST);
-  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SPECIAL_REGION_LIST);
-  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_PRESET_TREE);
-  emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);
-  emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);
-}
-
-async function resolveScenarioImportAudit(data, ui) {
-  let scenarioImportAudit = data.scenario?.importAudit || null;
-  if (!data.scenario?.id) {
-    return scenarioImportAudit;
-  }
-  const { validateImportedScenarioBaseline } = await getScenarioResourcesModule();
-  const validation = await validateImportedScenarioBaseline(data.scenario);
-  if (validation.ok) {
-    return scenarioImportAudit;
-  }
-  const shouldContinue =
-    validation.reason === "baseline_mismatch"
-      ? await ui.showAppDialog({
-          title: ui.t("Scenario Baseline Mismatch", "ui"),
-          message: validation.message,
-          details: ui.t(
-            "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.",
-            "ui"
-          ),
-          confirmLabel: ui.t("Load Anyway", "ui"),
-          cancelLabel: ui.t("Cancel Import", "ui"),
-          tone: "warning",
-        })
-      : false;
-  if (!shouldContinue) {
-    const error = new Error("Project import cancelled.");
-    error.code = "IMPORT_ABORTED";
-    error.toastTitle = ui.t("Import cancelled", "ui");
-    error.toastTone = validation.reason === "baseline_mismatch" ? "warning" : "error";
-    error.userMessage =
-      validation.reason === "missing_scenario"
-        ? validation.message
-        : ui.t(
-            "Project import cancelled because the saved scenario baseline does not match the current assets.",
-            "ui"
-          );
-    throw error;
-  }
-  if (validation.reason === "baseline_mismatch") {
-    scenarioImportAudit = {
-      scenarioId: String(data.scenario.id || "").trim(),
-      savedVersion: Number(data.scenario.version || 1) || 1,
-      currentVersion: Number(validation.currentVersion || 1) || 1,
-      savedBaselineHash: String(data.scenario.baselineHash || "").trim(),
-      currentBaselineHash: String(validation.currentBaselineHash || "").trim(),
-      acceptedAt: new Date().toISOString(),
-    };
-  }
-  return scenarioImportAudit;
+  return syncProjectImportUiStateHelper({ scenarioImportAudit, hooks });
 }
 
 async function applyImportedProjectState(data, { ui, hooks }) {
   debugState.importPhase = "begin";
   clearHistory();
-  const scenarioImportAudit = await resolveScenarioImportAudit(data, ui);
-  debugState.importPhase = "validated";
-  await waitForScenarioApplyIdle();
-  await waitForStartupReadonlyUnlock();
-  debugState.importPhase = "scenario-idle";
-  const importedScenarioId = String(data.scenario?.id || "").trim();
-  const currentScenarioId = String(state.activeScenarioId || "").trim();
-  if (importedScenarioId) {
-    const {
-      applyScenarioByIdCommand,
-      resetScenarioToBaselineCommand,
-      setScenarioViewModeCommand,
-    } = await getScenarioDispatcherModule();
-    if (importedScenarioId === currentScenarioId) {
-      debugState.importPhase = "scenario-reset";
-      resetScenarioToBaselineCommand({
-        renderMode: "none",
-        markDirtyReason: "",
-        showToastOnComplete: false,
-      });
-    } else {
-      debugState.importPhase = "scenario-apply";
-      await applyScenarioByIdCommand(importedScenarioId, {
-        renderMode: "none",
-        markDirtyReason: "",
-        showToastOnComplete: false,
-      });
-    }
-    setScenarioViewModeCommand(data.scenario.viewMode || "ownership", {
-      renderMode: "none",
-      markDirtyReason: "",
-    });
-  } else if (state.activeScenarioId) {
-    const { clearActiveScenarioCommand } = await getScenarioDispatcherModule();
-    debugState.importPhase = "scenario-clear";
-    clearActiveScenarioCommand({
-      renderMode: "none",
-      markDirtyReason: "",
-      showToastOnComplete: false,
-    });
-  }
-
-  debugState.importPhase = "migration";
-  const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds();
-  data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
-    landData: scenarioImportValidFeatureIds ? null : state.landData,
-    validFeatureIds: scenarioImportValidFeatureIds,
+  const preparedImport = await prepareImportedProjectState({
+    data,
+    ui,
+    debugState,
+    getScenarioResourcesModule,
+    getScenarioDispatcherModule,
   });
-  debugState.importPhase = "migration-done";
-  const importedOwnershipState = resolveImportedOwnershipState(data);
+  data = preparedImport.data;
+  const { importedOwnershipState, scenarioImportAudit } = preparedImport;
   state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
