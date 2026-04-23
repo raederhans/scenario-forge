@@ -1266,6 +1266,7 @@ function getSpatialIndexRuntimeOwner() {
       getFeatureCountryCodeNormalized,
       getFeatureBorderMeshCountryCodeNormalized,
       shouldExcludePoliticalInteractionFeature,
+      shouldExcludePoliticalVisualFeature,
       buildSpatialGrid,
       nowMs,
       recordRenderPerfMetric,
@@ -3051,6 +3052,15 @@ function getFeatureBorderMeshCountryCodeNormalized(feature) {
   );
 }
 
+function getFeatureInteractionCountryCodeNormalized(feature, featureId = null) {
+  const resolvedId = String(featureId || "").trim() || getFeatureId(feature);
+  return canonicalCountryCode(
+    getDisplayOwnerCode(feature, resolvedId)
+    || getFeatureCountryCodeNormalized(feature)
+    || ""
+  );
+}
+
 function getAtlantropaSurfaceKind(feature) {
   return String(feature?.properties?.atl_surface_kind || "").trim().toLowerCase();
 }
@@ -3217,7 +3227,7 @@ function buildCountryDominantFillColorMap() {
   getFullLandDataFeatures().forEach((feature, index) => {
     const countryCode = getFeatureCountryCodeNormalized(feature);
     const id = getFeatureId(feature) || `feature-${index}`;
-    if (!countryCode || !id || shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    if (!countryCode || !id || shouldExcludePoliticalVisualFeature(feature, id)) return;
     const color = getSafeCanvasColor(runtimeState.colors?.[id], null) || getResolvedFeatureColor(feature, id);
     if (!color) return;
     const countryCounts = countsByCountry.get(countryCode) || new Map();
@@ -4288,12 +4298,43 @@ function isAtlantropaSupportHelperFeature(feature, featureId = null) {
   );
 }
 
-function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
+function isAtlantropaVisualSupportHelperFeature(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (
+    candidate.startsWith("ATLSHL_")
+    || candidate.startsWith("ATLWLD_")
+    || candidate.startsWith("ATLSEA_FILL_")
+  ) {
+    return true;
+  }
+  const geometryRole = getAtlantropaGeometryRole(feature);
+  const joinMode = getAtlantropaJoinMode(feature);
+  return (
+    geometryRole === "shore_seal"
+    || geometryRole === "sea_completion"
+    || geometryRole === "donor_sea"
+    || joinMode === "gap_fill"
+  );
+}
+
+function isPoliticalVisualRenderableFeature(feature, featureId = null) {
   if (!feature) return false;
   if (isAntarcticSectorFeature(feature, featureId)) return false;
   if (isBaseGeographyScenarioFeature(feature)) return false;
-  if (feature?.properties?.interactive === false) return false;
   if (isScenarioShellFeature(feature, featureId)) return false;
+  if (isAtlantropaVisualSupportHelperFeature(feature, featureId)) return false;
+  return true;
+}
+
+function shouldExcludePoliticalVisualFeature(feature, featureId = null) {
+  return !isPoliticalVisualRenderableFeature(feature, featureId);
+}
+
+function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
+  if (!isPoliticalVisualRenderableFeature(feature, featureId)) return false;
+  if (feature?.properties?.interactive === false) return false;
   if (isAtlantropaSupportHelperFeature(feature, featureId)) return false;
   return true;
 }
@@ -5680,14 +5721,14 @@ function getEntityOwnerCode(entity) {
 function shouldExcludeOwnerBorderEntity(entity, { excludeSea = false } = {}) {
   if (!entity) return false;
   const feature = asFeatureLike(entity);
-  if (shouldExcludePoliticalInteractionFeature(feature)) return true;
+  if (shouldExcludePoliticalVisualFeature(feature)) return true;
   if (!excludeSea) return false;
   return isAtlantropaSeaFeature(feature);
 }
 
 function resolveOwnerBorderCode(entity, ownershipContext = {}) {
   const feature = asFeatureLike(entity);
-  if (shouldExcludePoliticalInteractionFeature(feature)) {
+  if (shouldExcludePoliticalVisualFeature(feature)) {
     return "";
   }
   const featureId = getEntityFeatureId(entity);
@@ -6844,6 +6885,7 @@ function createHitResult(overrides = {}) {
   return {
     id: null,
     countryCode: null,
+    runtimeCountryCode: null,
     targetType: null,
     feature: null,
     hitSource: "none",
@@ -6903,6 +6945,7 @@ function drawHitCanvas() {
     visibleSpatialItems.forEach((item) => {
       const key = runtimeState.idToKey.get(item.id);
       if (!key || !item?.feature) return;
+      if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
       hitContext.beginPath();
       pathHitCanvas(item.feature);
       hitContext.fillStyle = keyToHitColor(key);
@@ -7018,7 +7061,8 @@ function getHitResultFromCanvas(event) {
   }
   return createHitResult({
     id,
-    countryCode: getFeatureCountryCodeNormalized(feature),
+    countryCode: getFeatureInteractionCountryCodeNormalized(feature, id),
+    runtimeCountryCode: getFeatureCountryCodeNormalized(feature),
     targetType: "land",
     feature,
     hitSource: "canvas",
@@ -7211,6 +7255,7 @@ function collectVisibleLandSpatialItems() {
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
     seen.add(item.id);
+    if (shouldExcludePoliticalVisualFeature(item.feature, item.id)) return;
     if (!doesSpatialItemIntersectProjectedViewport(item, viewportBounds)) return;
     visibleItems.push(item);
   };
@@ -7389,11 +7434,21 @@ function getPointerProjectionPosition(event) {
 function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, targetType = "land" } = {}) {
   const resolvedId = String(candidate?.item?.featureId || candidate?.item?.id || "").trim();
   if (!resolvedId) return createHitResult();
+  const feature = candidate.item.feature || null;
+  const runtimeCountryCode = canonicalCountryCode(
+    candidate.item.countryCode
+    || getFeatureCountryCodeNormalized(feature)
+    || ""
+  );
+  const interactionCountryCode = feature
+    ? getFeatureInteractionCountryCodeNormalized(feature, resolvedId)
+    : canonicalCountryCode(candidate.item.interactionCountryCode || candidate.item.borderMeshCountryCode || runtimeCountryCode || "");
   return createHitResult({
     id: resolvedId,
-    countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
+    countryCode: interactionCountryCode || runtimeCountryCode,
+    runtimeCountryCode,
     targetType,
-    feature: candidate.item.feature || null,
+    feature,
     hitSource: "spatial",
     bboxArea: Number(candidate.bboxArea || candidate.item.bboxArea || Infinity),
     viaSnap,
@@ -15226,6 +15281,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     if (!feature?.geometry) return;
     if (isAntarcticSectorFeature(feature, id)) return;
     if (isBaseGeographyScenarioFeature(feature)) return;
+    if (shouldExcludePoliticalVisualFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
     const projectedBounds = getProjectedFeatureBounds(feature, {
       featureId: id,
@@ -15297,7 +15353,12 @@ function buildScenarioPoliticalBackgroundEntriesFromSpatialItems(items = []) {
         maxY: Number(item.maxY),
       }
       : null,
-  })).filter((entry) => entry.feature?.geometry && entry.id && entry.projectedBounds);
+  })).filter((entry) => (
+    entry.feature?.geometry
+    && entry.id
+    && entry.projectedBounds
+    && !shouldExcludePoliticalVisualFeature(entry.feature, entry.id)
+  ));
 }
 
 function collectScenarioPoliticalBackgroundSpatialEntries({
@@ -15775,7 +15836,7 @@ function drawPoliticalFeature(
   } = {},
 ) {
   const id = getFeatureId(feature) || `feature-${index}`;
-  if (shouldExcludePoliticalInteractionFeature(feature, id)) return false;
+  if (shouldExcludePoliticalVisualFeature(feature, id)) return false;
   if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return false;
   if (!skipScreenCheck && !pathBoundsInScreen(feature)) return false;
   const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
@@ -15912,7 +15973,7 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
       dirtyRects.push(null);
       return;
     }
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    if (shouldExcludePoliticalVisualFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
     const rect = getFeatureScreenBounds(feature, {
       featureId: id,
@@ -19189,7 +19250,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     const ownerColors = computed?.ownerColors || {};
     runtimeState.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+      if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
       if (!ownerCode || nextCountryBaseColors[ownerCode]) return;
@@ -19208,7 +19269,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     const countryRegionTag = new Map();
     runtimeState.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+      if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const countryCode = getFeatureCountryCodeNormalized(feature);
       if (!countryCode) return;
@@ -19503,6 +19564,18 @@ function getScenarioOwnerFeatureIds(ownerTag) {
     const candidateFeature = runtimeState.landIndex?.get(candidateId);
     return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
   });
+}
+
+function getInteractionCountryFeatureIds(feature, featureId) {
+  const interactionCountryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
+  const ownerIds = interactionCountryCode ? getScenarioOwnerFeatureIds(interactionCountryCode) : [];
+  if (ownerIds.length) return ownerIds;
+
+  const runtimeCountryCode = getFeatureCountryCodeNormalized(feature);
+  const runtimeIds = runtimeCountryCode ? getCountryFeatureIds(runtimeCountryCode) : [];
+  if (runtimeIds.length) return runtimeIds;
+
+  return interactionCountryCode ? getCountryFeatureIds(interactionCountryCode) : [];
 }
 
 function getCountryInteractionPolicy(countryCode) {
@@ -20060,11 +20133,11 @@ function resolveInteractionTargetIds(feature, id) {
   if (runtimeState.interactionGranularity !== "country") {
     return [id];
   }
-  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, id);
   if (!countryCode) {
     return [id];
   }
-  const ids = getCountryFeatureIds(countryCode);
+  const ids = getInteractionCountryFeatureIds(feature, id);
   return ids.length ? ids : [id];
 }
 
@@ -20090,7 +20163,7 @@ function resolveParentGroupKey(feature, featureId) {
   const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
   const scopeCode = scenarioDistrictGroup && scenarioOwnerTag
     ? scenarioOwnerTag
-    : getFeatureCountryCodeNormalized(feature);
+    : getFeatureInteractionCountryCodeNormalized(feature, featureId);
   if (!scopeCode) return "";
   const directGroup = getAdmin1Group(feature);
   const groupName = String(scenarioDistrictGroup || runtimeState.parentGroupByFeatureId?.get(featureId) || directGroup || "").trim();
@@ -20103,11 +20176,10 @@ function resolveParentGroupTargetIds(feature, featureId) {
   if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
   const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
   const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-  const countryCode = getFeatureCountryCodeNormalized(feature);
   const parentGroupKey = resolveParentGroupKey(feature, featureId);
   const ids = scenarioDistrictGroup && scenarioOwnerTag
     ? getScenarioOwnerFeatureIds(scenarioOwnerTag)
-    : getCountryFeatureIds(countryCode);
+    : getInteractionCountryFeatureIds(feature, featureId);
   if (!parentGroupKey || !ids.length) return [];
   const targetIds = ids.filter((candidateId) => {
     const candidateFeature = runtimeState.landIndex.get(candidateId);
@@ -20122,9 +20194,9 @@ function resolveParentGroupTargetIds(feature, featureId) {
 function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
   if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
   if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
   if (!countryCode) return [];
-  const ids = getCountryFeatureIds(countryCode).filter((candidateId) => {
+  const ids = getInteractionCountryFeatureIds(feature, featureId).filter((candidateId) => {
     const candidateFeature = runtimeState.landIndex.get(candidateId);
     return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
   });

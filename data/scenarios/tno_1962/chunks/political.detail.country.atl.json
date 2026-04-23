@@ -2624,7 +2624,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -2638,11 +2638,11 @@
               ],
               [
                 21.090763875066138,
-                39.0
+                39
               ],
               [
                 21.106132970628043,
-                39.0
+                39
               ],
               [
                 21.099138870035226,
@@ -19410,7 +19410,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -27730,7 +27730,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -34248,7 +34248,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -34934,7 +34934,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -43404,7 +43404,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -54062,7 +54062,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -55374,7 +55374,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -55614,7 +55614,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -55900,7 +55900,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -56180,7 +56180,7 @@
         "atl_surface_kind": "salt_flat_land",
         "atl_geometry_role": "donor_island",
         "atl_join_mode": "boolean_weld",
-        "interactive": true,
+        "interactive": false,
         "render_as_base_geography": false
       },
       "geometry": {
@@ -97048,11 +97048,11 @@
               41.56321075470388
             ],
             [
-              5.0,
+              5,
               41.571274616660574
             ],
             [
-              5.0,
+              5,
               40.88904245435286
             ],
             [
@@ -98506,11 +98506,11 @@
         "coordinates": [
           [
             [
-              5.0,
+              5,
               40.88904245435286
             ],
             [
-              5.0,
+              5,
               40.30427202951767
             ],
             [
@@ -98750,7 +98750,7 @@
               40.88619051504769
             ],
             [
-              5.0,
+              5,
               40.88904245435286
             ]
           ]
@@ -98994,7 +98994,7 @@
         "coordinates": [
           [
             [
-              5.0,
+              5,
               42.731934116978444
             ],
             [
@@ -99402,7 +99402,7 @@
               42.731863375214594
             ],
             [
-              5.0,
+              5,
               42.731934116978444
             ]
           ]
@@ -100659,7 +100659,7 @@
           [
             [
               5.0000368229331,
-              37.0
+              37
             ],
             [
               5.190431227564016,
@@ -100671,7 +100671,7 @@
             ],
             [
               5.0000368229331,
-              37.0
+              37
             ]
           ]
         ]
@@ -112772,11 +112772,11 @@
               36.49482151502789
             ],
             [
-              22.0,
+              22,
               36.49826859397613
             ],
             [
-              22.0,
+              22,
               34.72780180412847
             ],
             [

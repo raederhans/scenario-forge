@@ -7927,6 +7927,7 @@ def make_atl_row(
             ATL_GEOMETRY_ROLE_DONOR_ISLAND,
             ATL_GEOMETRY_ROLE_CAUSEWAY,
         }
+        and normalized_join_mode not in {ATL_JOIN_MODE_GAP_FILL, ATL_JOIN_MODE_BOOLEAN_WELD}
     )
     return {
         "id": feature_id,
@@ -10069,6 +10070,14 @@ def build_runtime_topology_payload(
         if "interactive" in runtime_political_gdf.columns:
             atl_shell_mask = feature_ids.str.startswith("ATLSHL_")
             runtime_political_gdf.loc[atl_shell_mask, "interactive"] = False
+            if "atl_join_mode" in runtime_political_gdf.columns:
+                atl_boolean_weld_mask = (
+                    feature_ids.str.startswith("ATLISL_")
+                    & runtime_political_gdf["atl_join_mode"].fillna("").astype(str).str.strip().str.lower().eq(
+                        ATL_JOIN_MODE_BOOLEAN_WELD
+                    )
+                )
+                runtime_political_gdf.loc[atl_boolean_weld_mask, "interactive"] = False
     topo_dict = build_named_topology([
         ("political", runtime_political_gdf),
         ("land_mask", land_mask_gdf),

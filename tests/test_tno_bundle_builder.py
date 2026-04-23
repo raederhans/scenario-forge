@@ -549,7 +549,22 @@ class TnoBundleBuilderTest(unittest.TestCase):
     def test_build_runtime_topology_payload_forces_atl_synthetic_country_code(self) -> None:
         political_gdf = gpd.GeoDataFrame(
             [
-                {"id": "ATLISL_adriatica_corfu", "name": "Corfu", "cntr_code": "ITA", "geometry": _square(0, 0, 1.0)},
+                {
+                    "id": "ATLISL_adriatica_corfu",
+                    "name": "Corfu",
+                    "cntr_code": "ITA",
+                    "atl_join_mode": "none",
+                    "interactive": True,
+                    "geometry": _square(0, 0, 1.0),
+                },
+                {
+                    "id": "ATLISL_adriatica_CRO_3",
+                    "name": "Welded Adriatica",
+                    "cntr_code": "CRO",
+                    "atl_join_mode": "boolean_weld",
+                    "interactive": True,
+                    "geometry": _square(1, 0, 1.0),
+                },
                 {"id": "ATLSHL_adriatica_4", "name": "Shelf", "cntr_code": "GRE", "geometry": _square(2, 0, 1.0)},
             ],
             geometry="geometry",
@@ -583,6 +598,9 @@ class TnoBundleBuilderTest(unittest.TestCase):
         }
 
         self.assertEqual(political_props["ATLISL_adriatica_corfu"]["cntr_code"], "ATL")
+        self.assertIs(political_props["ATLISL_adriatica_corfu"].get("interactive"), True)
+        self.assertEqual(political_props["ATLISL_adriatica_CRO_3"]["cntr_code"], "ATL")
+        self.assertIs(political_props["ATLISL_adriatica_CRO_3"].get("interactive"), False)
         self.assertEqual(political_props["ATLSHL_adriatica_4"]["cntr_code"], "ATL")
         self.assertIn(political_props["ATLSHL_adriatica_4"].get("interactive"), (False, None))
 
@@ -1533,9 +1551,15 @@ class TnoBundleBuilderTest(unittest.TestCase):
     def test_checked_in_tno_1962_atlisl_runtime_contract_stays_consistent(self) -> None:
         scenario_dir = Path(tno_bundle.SCENARIO_DIR)
         owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
+        controllers_payload = json.loads((scenario_dir / "controllers.by_feature.json").read_text(encoding="utf-8"))
+        cores_payload = json.loads((scenario_dir / "cores.by_feature.json").read_text(encoding="utf-8"))
+        countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
         runtime_topology = json.loads((scenario_dir / "runtime_topology.topo.json").read_text(encoding="utf-8"))
 
         owners = owners_payload["owners"]
+        controllers = controllers_payload["controllers"]
+        cores = cores_payload["cores"]
+        countries = countries_payload["countries"]
         political_geometries = runtime_topology["objects"]["political"]["geometries"]
         atlisl_props = [
             geometry.get("properties", {})
@@ -1552,8 +1576,24 @@ class TnoBundleBuilderTest(unittest.TestCase):
         for props in atlisl_props:
             feature_id = props["id"]
             self.assertIn(feature_id, owners, feature_id)
+            self.assertIn(feature_id, controllers, feature_id)
+            self.assertIn(feature_id, cores, feature_id)
             self.assertEqual(props.get("cntr_code"), "ATL", feature_id)
-            self.assertIs(props.get("interactive"), True, feature_id)
+            owner_tag = owners[feature_id]
+            controller_tag = controllers[feature_id]
+            core_tags = cores[feature_id]
+            self.assertIn(owner_tag, countries, feature_id)
+            self.assertIn(controller_tag, countries, feature_id)
+            self.assertNotEqual(owner_tag, "ATL", feature_id)
+            self.assertNotEqual(controller_tag, "ATL", feature_id)
+            self.assertTrue(core_tags, feature_id)
+            for core_tag in core_tags:
+                self.assertIn(core_tag, countries, feature_id)
+                self.assertNotEqual(core_tag, "ATL", feature_id)
+            if str(props.get("atl_join_mode") or "").strip().lower() == "boolean_weld":
+                self.assertIs(props.get("interactive"), False, feature_id)
+            else:
+                self.assertIs(props.get("interactive"), True, feature_id)
         for props in atlshl_props:
             self.assertIs(props.get("interactive"), False, props.get("id"))
 

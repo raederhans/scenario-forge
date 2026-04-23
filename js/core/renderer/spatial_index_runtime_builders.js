@@ -38,6 +38,7 @@ export function appendLandSpatialItemsRange({
   allowComputeMissingBounds = true,
   getFeatureId = () => "",
   shouldExcludePoliticalInteractionFeature = () => false,
+  shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature,
   shouldSkipFeature = () => false,
   getProjectedFeatureBounds = () => null,
   getFeatureCountryCodeNormalized = () => "",
@@ -51,7 +52,7 @@ export function appendLandSpatialItemsRange({
     const feature = features[index];
     const id = getFeatureId(feature);
     if (!id) continue;
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
+    if (shouldExcludePoliticalVisualFeature(feature, id)) continue;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
     const bounds = getProjectedFeatureBounds(feature, {
       featureId: id,
@@ -62,6 +63,7 @@ export function appendLandSpatialItemsRange({
       id,
       drawOrder: index,
       feature,
+      interactive: !shouldExcludePoliticalInteractionFeature(feature, id),
       countryCode: getFeatureCountryCodeNormalized(feature),
       borderMeshCountryCode: resolveBorderMeshCountryCode(feature),
       source: String(feature?.properties?.__source || "primary"),
