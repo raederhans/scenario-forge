@@ -1,0 +1,11 @@
+## 上下文
+- 2026-04-23: 开始处理 review 提出的两个可靠性问题。
+- 已确认 `playwright.config.cjs` 当前使用 `grepInvert: /@dev/`，它只按测试标题匹配，无法排除 `tests/e2e/dev/*.dev.spec.js` 文件路径。
+- 已确认 `.github/workflows/scenario-contract-matrix.yml` 当前只监听 `data/scenarios/**` 与 `tools/check_scenario_contracts.py`，而 checker 还直接依赖 `map_builder/config.py` 与 `map_builder/contracts.py`。
+- 计划采用最小改动：CI 直接忽略 `tests/e2e/dev/**` 路径；workflow 触发范围补到共享契约依赖文件。
+- 首轮尝试把 Playwright `testIgnore` 写成宽泛的 `dev/**` 思路，但仓库绝对路径本身包含 `Desktop\\dev\\...`，导致 `CI=1 --list` 误变成 0 个测试。
+- 已收敛为精确路径正则 `/[\\\\/]tests[\\\\/]e2e[\\\\/]dev[\\\\/]/`，只忽略真正的 dev-only 目录，同时保留 root 下普通 `dev_*` 文件。
+- 定向验证结果：
+  - `CI=1 node node_modules/@playwright/test/cli.js test --list` 现在列出 `83` 个测试。
+  - 列表中 `tests/e2e/dev/` 与 `@dev` 项都已消失。
+  - checker 直接 import 依赖仍是 `map_builder/config.py` 与 `map_builder/contracts.py`，workflow 已补齐对应路径。

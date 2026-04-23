@@ -6,6 +6,8 @@ on:
     paths:
       - "data/scenarios/**"
       - "tools/check_scenario_contracts.py"
+      - "map_builder/config.py"
+      - "map_builder/contracts.py"
 
 permissions:
   contents: read
