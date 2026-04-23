@@ -1,14 +1,21 @@
 import {
-  createDefaultSecondarySpatialIndexState,
-  createDefaultSpatialIndexState,
-} from "../state/spatial_index_state.js";
-import {
   appendLandIndexEntriesRange,
   appendLandSpatialItemsRange,
   buildSpecialSpatialItems,
   buildWaterSpatialItems,
   captureSpatialGridBuild,
 } from "./spatial_index_runtime_builders.js";
+import {
+  applyPrimarySpatialSnapshot,
+  applySecondarySpatialSnapshot,
+  clearPrimaryIndexMaps,
+  resetPrimarySpatialState,
+  resetSecondarySpatialState,
+} from "./spatial_index_runtime_state_ops.js";
+import {
+  createSpatialIndexPerfPayload,
+  deriveRuntimePrimaryFeaturePayload,
+} from "./spatial_index_runtime_derivation.js";
 
 export function createSpatialIndexRuntimeOwner({
   state,
@@ -51,10 +58,7 @@ export function createSpatialIndexRuntimeOwner({
   // buildIndex 负责主索引映射层（landIndex/countryToFeatureIds/idToKey/keyToId），
   // 为渲染与交互提供 feature-id 级别的稳定检索键；空间网格由 buildSpatialIndex 系列负责。
   function buildIndex({ scheduleUiMode = "immediate" } = {}) {
-    state.landIndex.clear();
-    state.countryToFeatureIds.clear();
-    state.idToKey.clear();
-    state.keyToId.clear();
+    clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
     if (!state.landData || !state.landData.features) {
@@ -81,27 +85,14 @@ export function createSpatialIndexRuntimeOwner({
   }
 
   function resetSecondarySpatialIndexState() {
-    const defaults = createDefaultSecondarySpatialIndexState();
-    state.waterSpatialItems = defaults.waterSpatialItems;
-    state.waterSpatialIndex = defaults.waterSpatialIndex;
-    state.waterSpatialGrid = defaults.waterSpatialGrid;
-    state.waterSpatialGridMeta = defaults.waterSpatialGridMeta;
-    state.waterSpatialItemsById = defaults.waterSpatialItemsById;
-    state.specialSpatialItems = defaults.specialSpatialItems;
-    state.specialSpatialIndex = defaults.specialSpatialIndex;
-    state.specialSpatialGrid = defaults.specialSpatialGrid;
-    state.specialSpatialGridMeta = defaults.specialSpatialGridMeta;
-    state.specialSpatialItemsById = defaults.specialSpatialItemsById;
+    resetSecondarySpatialState(state);
   }
 
   function rebuildRuntimePrimaryIndex({
     projectedBoundsCache = null,
     collectResolvedColor = () => {},
   } = {}) {
-    state.landIndex.clear();
-    state.countryToFeatureIds.clear();
-    state.idToKey.clear();
-    state.keyToId.clear();
+    clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
@@ -112,16 +103,21 @@ export function createSpatialIndexRuntimeOwner({
       shouldExcludePoliticalInteractionFeature,
       getFeatureCountryCodeNormalized,
       onLandFeatureIndexed: ({ feature, id }) => {
-        const bounds = computeProjectedFeatureBounds(feature);
-        if (bounds && projectedBoundsCache?.set) {
-          projectedBoundsCache.set(id, bounds);
-        }
-        if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
+        const payload = deriveRuntimePrimaryFeaturePayload({
+          feature,
+          id,
+          canvasWidth,
+          canvasHeight,
+          projectedBoundsCache,
+          computeProjectedFeatureBounds,
+          shouldSkipFeature,
+          getResolvedFeatureColor,
+        });
+        if (payload.skipped) {
           return;
         }
-        const resolvedColor = getResolvedFeatureColor(feature, id);
-        if (resolvedColor) {
-          collectResolvedColor(id, resolvedColor);
+        if (payload.resolvedColor) {
+          collectResolvedColor(id, payload.resolvedColor);
         }
       },
     });
@@ -141,7 +137,7 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
   } = {}) {
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-    state.waterSpatialItems = buildWaterSpatialItems({
+    const waterItems = buildWaterSpatialItems({
       features: getEffectiveWaterRegionFeatures(),
       getFeatureId,
       collectFeatureHitGeometries,
@@ -149,16 +145,13 @@ export function createSpatialIndexRuntimeOwner({
     });
     const waterGridSnapshot = captureSpatialGridBuild({
       state,
-      items: state.waterSpatialItems,
+      items: waterItems,
       canvasWidth,
       canvasHeight,
       buildSpatialGrid,
     });
-    state.waterSpatialGrid = waterGridSnapshot.grid;
-    state.waterSpatialGridMeta = waterGridSnapshot.gridMeta;
-    state.waterSpatialItemsById = waterGridSnapshot.itemsById;
 
-    state.specialSpatialItems = buildSpecialSpatialItems({
+    const specialItems = buildSpecialSpatialItems({
       features: getEffectiveSpecialRegionFeatures(),
       allowComputeMissingBounds,
       getFeatureId,
@@ -166,14 +159,25 @@ export function createSpatialIndexRuntimeOwner({
     });
     const specialGridSnapshot = captureSpatialGridBuild({
       state,
-      items: state.specialSpatialItems,
+      items: specialItems,
       canvasWidth,
       canvasHeight,
       buildSpatialGrid,
     });
-    state.specialSpatialGrid = specialGridSnapshot.grid;
-    state.specialSpatialGridMeta = specialGridSnapshot.gridMeta;
-    state.specialSpatialItemsById = specialGridSnapshot.itemsById;
+    applySecondarySpatialSnapshot(state, {
+      water: {
+        items: waterItems,
+        grid: waterGridSnapshot.grid,
+        gridMeta: waterGridSnapshot.gridMeta,
+        itemsById: waterGridSnapshot.itemsById,
+      },
+      special: {
+        items: specialItems,
+        grid: specialGridSnapshot.grid,
+        gridMeta: specialGridSnapshot.gridMeta,
+        itemsById: specialGridSnapshot.itemsById,
+      },
+    });
   }
 
   // buildSpatialIndex 负责主空间索引（state.spatialItems + state.spatialGrid + spatialGridMeta），
@@ -183,27 +187,24 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
   } = {}) {
     const startedAt = nowMs();
-    const defaults = createDefaultSpatialIndexState();
-    state.spatialItems = defaults.spatialItems;
-    state.spatialIndex = defaults.spatialIndex;
-    state.spatialGrid = defaults.spatialGrid;
-    state.spatialGridMeta = defaults.spatialGridMeta;
-    state.spatialItemsById = defaults.spatialItemsById;
-    resetSecondarySpatialIndexState();
+    resetPrimarySpatialState(state);
+    resetSecondarySpatialState(state);
     if (!state.landData || !state.landData.features || !getPathSvg()) {
-      recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-        landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-        spatialItems: 0,
-        waterItems: 0,
-        specialItems: 0,
-        skipped: true,
-      });
+      recordRenderPerfMetric(
+        "buildSpatialIndex",
+        nowMs() - startedAt,
+        createSpatialIndexPerfPayload({
+          landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+          skipped: true,
+        }),
+      );
       return;
     }
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
+    const nextSpatialItems = [];
     appendLandSpatialItemsRange({
-      targetItems: state.spatialItems,
+      targetItems: nextSpatialItems,
       features: state.landData.features,
       canvasWidth,
       canvasHeight,
@@ -214,22 +215,35 @@ export function createSpatialIndexRuntimeOwner({
       getProjectedFeatureBounds,
       getFeatureCountryCodeNormalized,
     });
-
-    buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
-    state.spatialIndex = null;
+    const nextGridSnapshot = captureSpatialGridBuild({
+      state,
+      items: nextSpatialItems,
+      canvasWidth,
+      canvasHeight,
+      buildSpatialGrid,
+    });
+    applyPrimarySpatialSnapshot(state, {
+      items: nextSpatialItems,
+      grid: nextGridSnapshot.grid,
+      gridMeta: nextGridSnapshot.gridMeta,
+      itemsById: nextGridSnapshot.itemsById,
+    });
     if (includeSecondary) {
       buildSecondarySpatialIndexes({
         allowComputeMissingBounds,
       });
     }
     state.hitCanvasDirty = true;
-    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-      landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-      spatialItems: state.spatialItems.length,
-      waterItems: state.waterSpatialItems.length,
-      specialItems: state.specialSpatialItems.length,
-      skipped: false,
-    });
+    recordRenderPerfMetric(
+      "buildSpatialIndex",
+      nowMs() - startedAt,
+      createSpatialIndexPerfPayload({
+        landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+        spatialItems: state.spatialItems.length,
+        waterItems: state.waterSpatialItems.length,
+        specialItems: state.specialSpatialItems.length,
+      }),
+    );
   }
 
   async function buildIndexChunked({
@@ -241,10 +255,7 @@ export function createSpatialIndexRuntimeOwner({
       inFlight: true,
     });
     await yieldToMain();
-    state.landIndex.clear();
-    state.countryToFeatureIds.clear();
-    state.idToKey.clear();
-    state.keyToId.clear();
+    clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
     const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
@@ -300,14 +311,15 @@ export function createSpatialIndexRuntimeOwner({
     const startedAt = nowMs();
     const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
     if (!features.length || !getPathSvg()) {
-      recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-        landCount: features.length,
-        spatialItems: 0,
-        waterItems: 0,
-        specialItems: 0,
-        skipped: true,
-        chunked: true,
-      });
+      recordRenderPerfMetric(
+        "buildSpatialIndex",
+        nowMs() - startedAt,
+        createSpatialIndexPerfPayload({
+          landCount: features.length,
+          skipped: true,
+          chunked: true,
+        }),
+      );
       await yieldToMain();
       return;
     }
@@ -341,27 +353,30 @@ export function createSpatialIndexRuntimeOwner({
       canvasHeight,
       buildSpatialGrid,
     });
-
-    state.spatialItems = nextSpatialItems;
-    state.spatialIndex = null;
-    state.spatialGrid = nextGridSnapshot.grid;
-    state.spatialGridMeta = nextGridSnapshot.gridMeta;
-    state.spatialItemsById = nextGridSnapshot.itemsById;
-    resetSecondarySpatialIndexState();
+    applyPrimarySpatialSnapshot(state, {
+      items: nextSpatialItems,
+      grid: nextGridSnapshot.grid,
+      gridMeta: nextGridSnapshot.gridMeta,
+      itemsById: nextGridSnapshot.itemsById,
+    });
+    resetSecondarySpatialState(state);
     if (includeSecondary) {
       buildSecondarySpatialIndexes({
         allowComputeMissingBounds,
       });
     }
     state.hitCanvasDirty = true;
-    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-      landCount: features.length,
-      spatialItems: state.spatialItems.length,
-      waterItems: state.waterSpatialItems.length,
-      specialItems: state.specialSpatialItems.length,
-      skipped: false,
-      chunked: true,
-    });
+    recordRenderPerfMetric(
+      "buildSpatialIndex",
+      nowMs() - startedAt,
+      createSpatialIndexPerfPayload({
+        landCount: features.length,
+        spatialItems: state.spatialItems.length,
+        waterItems: state.waterSpatialItems.length,
+        specialItems: state.specialSpatialItems.length,
+        chunked: true,
+      }),
+    );
     await yieldToMain();
   }
 

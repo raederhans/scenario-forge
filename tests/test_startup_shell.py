@@ -12,11 +12,8 @@ class StartupShellTest(unittest.TestCase):
         html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
 
         self.assertIn('<meta name="default-scenario" content="tno_1962" />', html)
-        for href in [
-            "data/europe_topology.json",
-            "data/scenarios/index.json",
-        ]:
-            self.assertIn(f'<link rel="preload" href="{href}" as="fetch" crossorigin />', html)
+        self.assertIn('<link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />', html)
+        self.assertNotIn('<link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />', html)
         self.assertNotIn('href="data/scenarios/tno_1962/manifest.json"', html)
         self.assertNotIn('href="data/locales.startup.json"', html)
         self.assertNotIn('href="data/geo_aliases.startup.json"', html)

@@ -41,9 +41,24 @@
 - [x] `test:e2e:scenario-shell-overlay-contract` 通过
 - [x] `perf:gate` 通过
 
+## 本轮 unit counter lane
+
+- [x] `strategic_overlay_controller.js` 的 unit counter 事件绑定下沉到 helper
+- [x] `strategic_overlay_runtime_owner.js` 的 unit counter 事务下沉到 runtime domain/helper
+- [x] sidebar/runtime boundary contract 跟随真实 owner 更新
+- [x] state write allowlist 跟随新 writer 文件更新
+- [x] `node --check` 通过
+- [x] `tests.test_strategic_overlay_sidebar_boundary_contract` 通过
+- [x] `tests.test_map_renderer_strategic_overlay_runtime_owner_boundary_contract` 通过
+- [x] `npm run verify:state-write-allowlist` 通过
+- [x] `npm run test:node:renderer-splits` 通过
+- [x] `npm run test:e2e:strategic-overlay-smoke` 通过
+- [x] 记录 focused e2e 慢路径验证债务：`strategic_overlay_sidebar_entry_smoke.spec.js`
+
 ## 下一轮建议
 
-- [x] 记录下一轮最优先 lane：`strategic overlay unit counter`
+- [x] 记录 `unit counter lane` 已完成
+- [x] 记录剩余主线：`map_renderer.js` facade/wiring、`spatial_index_runtime_owner`、`border_mesh_owner`、`state.js` compat surface
 
 ## 阶段收尾
 

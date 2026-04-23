@@ -1,0 +1,40 @@
+# Context Log
+
+- 2026-04-22: Task started from the carried plan for the next renderer size wave.
+- Read root lessons file, scoped AGENTS rules, current owner files, and boundary tests.
+- Wave targets confirmed:
+  - Wave 1: facade extraction from `map_renderer.js`
+  - Wave 2: spatial owner state write reduction
+  - Wave 3: border owner pure compute extraction
+- Freeze set confirmed from carried plan: render/init/setMapData/scenario refresh bodies, brush/dev selection large transactions, `public.js`, `border_draw_owner.js`, `interaction_border_snapshot_owner.js`, `strategic_overlay_helpers.js`.
+- Current active note: owner registry extraction is optional and depends on the post-Wave-1B shape.
+- Wave 1 shipped:
+  - added `js/core/map_renderer/facade_data_runtime.js`
+  - added `js/core/map_renderer/facade_border_runtime.js`
+  - added `js/core/map_renderer/facade_spatial_runtime.js`
+  - added `js/core/map_renderer/facade_overlay_runtime.js`
+  - removed the matching local facade wrapper definitions from `map_renderer.js`
+  - `map_renderer.js` now configures the facade modules once with owner getters
+- Owner registry gate review:
+  - registry stayed in `map_renderer.js`
+  - further extraction would have introduced a much wider constructor seam for owner wiring than this wave needs
+  - current shape already removed the high-value donor wrappers and kept the stable singleton semantics unchanged
+- Wave 2 shipped:
+  - added `js/core/renderer/spatial_index_runtime_state_ops.js`
+  - added `js/core/renderer/spatial_index_runtime_derivation.js`
+  - `spatial_index_runtime_owner.js` now clears/applies spatial state through `state_ops`
+  - owner-side primary feature side effects and perf payload assembly now route through `derivation`
+  - strict owner grep for spatial direct writes/clear calls now returns zero matches
+- Wave 3 shipped:
+  - added `js/core/renderer/border_mesh_dynamic_runtime.js`
+  - `border_mesh_owner.js` now keeps cache/invalidation orchestration and uses pure runtime helpers for dynamic hash, ownership context, mesh building, unresolved counting, detail mesh building, and coastline simplification
+  - strict owner grep for the moved pure function declarations now returns zero matches
+- Verification summary:
+  - `node --check` passed on all modified JS files
+  - `lsp_diagnostics` returned 0 errors on all modified JS and test files
+  - python contract suite passed
+  - node suites passed: border mesh owner, renderer splits, renderer runtime state, startup hydration
+  - e2e passed: `strategic-overlay-smoke`, `tno-ready-state-contract`
+  - e2e exception: `scenario-chunk-exact-after-settle-regression` failed on a console warning about preloaded `europe_topology.json` not being used within a few seconds
+  - perf exception: `npm run perf:gate` failed on `tno_1962.renderSampleMedianMs` ratio 1.25 vs limit 1.15
+- Lessons file already contains nearby guidance for optional preload timing and exact-after-settle; no new major lesson was appended in this pass.

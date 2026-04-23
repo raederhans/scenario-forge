@@ -6,6 +6,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 RENDERER_RUNTIME_STATE_JS = REPO_ROOT / "js" / "core" / "state" / "renderer_runtime_state.js"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
+SPATIAL_INDEX_RUNTIME_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "spatial_index_runtime_owner.js"
+SPATIAL_INDEX_RUNTIME_STATE_OPS_JS = REPO_ROOT / "js" / "core" / "renderer" / "spatial_index_runtime_state_ops.js"
+SPATIAL_INDEX_RUNTIME_DERIVATION_JS = REPO_ROOT / "js" / "core" / "renderer" / "spatial_index_runtime_derivation.js"
 
 
 class RendererRuntimeStateBoundaryContractTest(unittest.TestCase):
@@ -41,6 +44,27 @@ class RendererRuntimeStateBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("../core/state/renderer_runtime_state.js", content)
         self.assertIn("ensureSidebarPerfState(state)", content)
+
+    def test_spatial_runtime_owner_uses_scoped_state_ops_and_derivation_modules(self):
+        owner_content = SPATIAL_INDEX_RUNTIME_OWNER_JS.read_text(encoding="utf-8")
+        state_ops_content = SPATIAL_INDEX_RUNTIME_STATE_OPS_JS.read_text(encoding="utf-8")
+        derivation_content = SPATIAL_INDEX_RUNTIME_DERIVATION_JS.read_text(encoding="utf-8")
+
+        self.assertIn("./spatial_index_runtime_state_ops.js", owner_content)
+        self.assertIn("./spatial_index_runtime_derivation.js", owner_content)
+        self.assertIn("clearPrimaryIndexMaps(state);", owner_content)
+        self.assertIn("resetPrimarySpatialState(state);", owner_content)
+        self.assertIn("applyPrimarySpatialSnapshot(state, {", owner_content)
+        self.assertIn("applySecondarySpatialSnapshot(state, {", owner_content)
+        self.assertIn("deriveRuntimePrimaryFeaturePayload({", owner_content)
+        self.assertIn("createSpatialIndexPerfPayload({", owner_content)
+        self.assertIn("export function clearPrimaryIndexMaps(state) {", state_ops_content)
+        self.assertIn("export function resetPrimarySpatialState(state) {", state_ops_content)
+        self.assertIn("export function resetSecondarySpatialState(state) {", state_ops_content)
+        self.assertIn("export function applyPrimarySpatialSnapshot(state, {", state_ops_content)
+        self.assertIn("export function applySecondarySpatialSnapshot(state, {", state_ops_content)
+        self.assertIn("export function deriveRuntimePrimaryFeaturePayload({", derivation_content)
+        self.assertIn("export function createSpatialIndexPerfPayload({", derivation_content)
 
 
 if __name__ == "__main__":

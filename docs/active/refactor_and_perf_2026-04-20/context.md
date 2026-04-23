@@ -38,6 +38,8 @@
   - 文档重基线
   - 验证入口收口
   - 第二阶段 6 条 lane 的第一轮拆分
+- 本轮新增完成：
+  - `strategic overlay unit counter lane`
 - 本轮新增拆分结果：
   - `interaction_funnel` -> `import_apply_orchestration.js` / `wait_readiness.js` / `ui_sync.js`
   - `strategic_overlay_runtime_owner` -> `special_zones_runtime_domain.js` / `operation_graphics_runtime_domain.js`
@@ -45,6 +47,9 @@
   - `border_mesh_owner` -> `border_mesh_source_selection.js` / `border_mesh_diagnostics.js`
   - `presentation_runtime` -> `presentation_hint_helpers.js` / `presentation_display_restore.js` / `presentation_ocean_fill_restore.js`
   - `strategic_overlay_controller` -> `unit_counter_modal_helper.js` / `unit_counter_render_helpers.js` / `unit_counter_catalog_helper.js`
+- 本轮新增进一步拆分结果：
+  - `strategic_overlay_controller` -> `unit_counter_bind_events_helper.js`
+  - `strategic_overlay_runtime_owner` -> `unit_counter_runtime_domain.js` / `unit_counter_runtime_helpers.js`
 - 本轮新增验证入口：
   - Node：`test:node:scenario-lifecycle-runtime-behavior`、`test:node:scenario-runtime-state-behavior`、`test:node:startup-hydration-behavior`、`test:node:palette-runtime-bridge`、`test:node:renderer-runtime-state-behavior`、`test:node:border-mesh-owner-behavior`、`test:node:perf-probe-snapshot-behavior`
   - E2E：`test:e2e:scenario-apply-concurrency`、`test:e2e:startup-bundle-recovery-contract`、`test:e2e:tno-ready-state-contract`、`test:e2e:scenario-chunk-exact-after-settle-regression`、`test:e2e:scenario-shell-overlay-contract`
@@ -53,5 +58,20 @@
   - Node 8 组脚本：通过
   - `interaction_funnel`、`strategic_overlay_smoke`、`scenario_apply_concurrency`、`startup_bundle_recovery_contract`、`tno_ready_state_contract`、`scenario_chunk_exact_after_settle_regression`、`scenario_shell_overlay_contract`：通过
   - `perf:gate`：通过
+- 本轮 fresh 证据补充：
+  - `tests.test_strategic_overlay_sidebar_boundary_contract` + `tests.test_map_renderer_strategic_overlay_runtime_owner_boundary_contract`：通过
+  - `verify:state-write-allowlist`：通过
+  - `test:node:renderer-splits`：通过
+  - `test:e2e:strategic-overlay-smoke`：通过
+- focused e2e 观察：
+  - `strategic_overlay_sidebar_entry_smoke.spec.js` 当前在 `tno_1962` detail bundle promotion 上超时
+  - trace 显示 full bundle 约在 162s 才完成，这条更像现有启动 / detail promotion 慢路径验证债务
 - 当前已通过架构验收和 correctness review。
-- 下一轮最短路径：继续拆 `strategic overlay unit counter lane`。
+- 当前 lane 收口判断：
+  - unit counter 的 controller 事件写回链已从主 controller 下沉
+  - unit counter 的 runtime preview / nation resolution / transaction 已从主 owner 下沉
+  - 现有 facade、node 行为、contract、guardrail 保持稳定
+- 下一轮最短路径：
+  - 继续压 `map_renderer.js` 的 facade / owner wiring
+  - 继续拆 `spatial_index_runtime_owner`、`border_mesh_owner`
+  - 清理 `state.js` compat facade 的残余 direct dependency

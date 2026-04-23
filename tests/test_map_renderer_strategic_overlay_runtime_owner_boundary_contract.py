@@ -4,6 +4,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
+FACADE_OVERLAY_RUNTIME_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "facade_overlay_runtime.js"
 RUNTIME_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_runtime_owner.js"
 HELPERS_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_helpers.js"
 SPECIAL_ZONES_DOMAIN_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_runtime" / "special_zones_runtime_domain.js"
@@ -13,8 +14,9 @@ UNIT_COUNTER_HELPERS_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_ov
 
 
 class MapRendererStrategicOverlayRuntimeOwnerBoundaryContractTest(unittest.TestCase):
-    def test_map_renderer_keeps_facade_while_runtime_owner_takes_safe_transactions(self):
+    def test_map_renderer_keeps_overlay_render_orchestration_while_facade_hosts_pass_through_wrappers(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        facade_content = FACADE_OVERLAY_RUNTIME_JS.read_text(encoding="utf-8")
         owner_content = RUNTIME_OWNER_JS.read_text(encoding="utf-8")
         special_zones_content = SPECIAL_ZONES_DOMAIN_JS.read_text(encoding="utf-8")
         operation_graphics_content = OPERATION_GRAPHICS_DOMAIN_JS.read_text(encoding="utf-8")
@@ -23,32 +25,30 @@ class MapRendererStrategicOverlayRuntimeOwnerBoundaryContractTest(unittest.TestC
         renderer_imports = renderer_content.replace('"', "'")
 
         self.assertIn("import { createStrategicOverlayRuntimeOwner } from './renderer/strategic_overlay_runtime_owner.js';", renderer_imports)
+        self.assertIn("from './map_renderer/facade_overlay_runtime.js';", renderer_imports)
         self.assertIn("let strategicOverlayRuntimeOwner = null;", renderer_content)
         self.assertIn("function getStrategicOverlayRuntimeOwner() {", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().appendSpecialZoneVertexFromEvent(event);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().startSpecialZoneDraw({ zoneType, label });", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().finishSpecialZoneDraw();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().appendOperationGraphicVertexFromEvent(event);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().finishOperationGraphicDraw();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().updateSelectedOperationGraphic(partial);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().deleteSelectedOperationGraphicVertex();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().appendOperationalLineVertexFromEvent(event);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().finishOperationalLineDraw();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().updateSelectedOperationalLine(partial);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().deleteSelectedOperationalLine();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().placeUnitCounterFromEvent(event);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().startUnitCounterPlacement({", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().cancelUnitCounterPlacement();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().selectUnitCounterById(id);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().updateSelectedUnitCounter(partial);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().deleteSelectedUnitCounter();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().cancelActiveStrategicInteractionModes();", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().getUnitCounterPreviewData(partialCounter);", renderer_content)
-        self.assertIn("return getStrategicOverlayRuntimeOwner().resolveUnitCounterNationForPlacement(", renderer_content)
-        self.assertNotIn('kind: "finish-operation-graphic"', renderer_content)
-        self.assertNotIn('state.manualSpecialZones.features.push({', renderer_content)
-        self.assertNotIn('kind: "create-operational-line"', renderer_content)
-        self.assertNotIn('kind: "place-unit-counter"', renderer_content)
+        self.assertIn("function renderSpecialZonesIfNeeded({ force = false } = {}) {", renderer_content)
+        self.assertIn("function renderOperationGraphicsIfNeeded({ force = false } = {}) {", renderer_content)
+        self.assertIn("function renderOperationalLinesIfNeeded({ force = false } = {}) {", renderer_content)
+        self.assertIn("function renderUnitCountersIfNeeded({ force = false } = {}) {", renderer_content)
+        self.assertNotIn("function resolveUnitCounterNationForPlacement(featureId = \"\", manualTag = \"\", preferredSource = \"display\") {", renderer_content)
+        self.assertNotIn("function getUnitCounterPreviewData(partialCounter = {}) {", renderer_content)
+        self.assertNotIn("function startSpecialZoneDraw({ zoneType = DEFAULT_SPECIAL_ZONE_TYPE, label = \"\" } = {}) {", renderer_content)
+        self.assertNotIn("function startOperationGraphicDraw({", renderer_content)
+        self.assertNotIn("function startOperationalLineDraw({", renderer_content)
+        self.assertNotIn("function startUnitCounterPlacement({", renderer_content)
+        self.assertNotIn("function cancelActiveStrategicInteractionModes() {", renderer_content)
+
+        self.assertIn("export function configureOverlayRuntimeFacade(nextState = {}) {", facade_content)
+        self.assertIn("export function resolveUnitCounterNationForPlacement(featureId = '', manualTag = '', preferredSource = 'display') {", facade_content)
+        self.assertIn("export function getUnitCounterPreviewData(partialCounter = {}) {", facade_content)
+        self.assertIn("export function startSpecialZoneDraw({ zoneType, label } = {}) {", facade_content)
+        self.assertIn("export function startOperationGraphicDraw(params = {}) {", facade_content)
+        self.assertIn("export function startOperationalLineDraw(params = {}) {", facade_content)
+        self.assertIn("export function startUnitCounterPlacement(params = {}) {", facade_content)
+        self.assertIn("export function cancelActiveStrategicInteractionModes() {", facade_content)
+        self.assertIn("export function placeUnitCounterFromEvent(event) {", facade_content)
 
         self.assertIn("export function createStrategicOverlayRuntimeOwner({", owner_content)
         self.assertIn('createOperationGraphicsRuntimeDomain', owner_content)

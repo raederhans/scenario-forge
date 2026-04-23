@@ -9,6 +9,15 @@ import {
   getSourceCountrySets as getSourceCountrySetsFromSelection,
   resolveScenarioOpeningOwnerBorderSelection,
 } from "./border_mesh_source_selection.js";
+import {
+  buildDetailAdmBorderMesh as buildDetailAdmBorderMeshRuntime,
+  buildDynamicBorderHash,
+  buildDynamicOwnerBorderMesh as buildDynamicOwnerBorderMeshRuntime,
+  buildOwnerBorderMesh as buildOwnerBorderMeshRuntime,
+  countUnresolvedOwnerBorderEntities as countUnresolvedOwnerBorderEntitiesRuntime,
+  getDynamicBorderOwnershipContext,
+  simplifyCoastlineMesh as simplifyCoastlineMeshRuntime,
+} from "./border_mesh_dynamic_runtime.js";
 
 export function createBorderMeshOwner({
   state,
@@ -73,58 +82,30 @@ export function createBorderMeshOwner({
   };
   const scenarioCoastlineDecisionWarnings = new Set();
 
-  // cachedDynamicBordersHash 的 key 由主权修订、场景视图模式、控制权修订、壳层修订组成，
-  // 覆盖 ownership/controller/shell 三类边界来源。任一字段变化都代表边界归属语义变化，
-  // rebuildDynamicBorders 会据此强制重建 state.cachedDynamicOwnerBorders。
-  function buildDynamicBorderHash() {
-    return [
-      `rev:${Number(state.sovereigntyRevision) || 0}`,
-      `mode:${state.activeScenarioId ? String(state.scenarioViewMode || "ownership") : "ownership"}`,
-      `ctrl:${Number(state.scenarioControllerRevision) || 0}`,
-      `shell:${state.activeScenarioId ? Number(state.scenarioShellOverlayRevision) || 0 : 0}`,
-    ].join("|");
-  }
-
-  function getDynamicBorderOwnershipContext() {
-    return {
-      ownershipByFeatureId: state.sovereigntyByFeatureId,
-      controllerByFeatureId: state.scenarioControllersByFeatureId,
-      shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-      shellControllerByFeatureId: state.scenarioAutoShellControllerByFeatureId,
-      scenarioActive: !!state.activeScenarioId,
-      viewMode: state.scenarioViewMode,
-    };
-  }
-
-  function buildOwnerBorderMesh(runtimeTopology, ownershipContext = {}, { excludeSea = false } = {}) {
-    const object = runtimeTopology?.objects?.political;
-    if (!object || !globalThis.topojson) return null;
-    return globalThis.topojson.mesh(runtimeTopology, object, (a, b) => {
-      if (!a || !b) return false;
-      if (shouldExcludeOwnerBorderEntity(a, { excludeSea }) || shouldExcludeOwnerBorderEntity(b, { excludeSea })) {
-        return false;
-      }
-      const ownerA = resolveOwnerBorderCode(a, ownershipContext);
-      const ownerB = resolveOwnerBorderCode(b, ownershipContext);
-      return !!(ownerA && ownerB && ownerA !== ownerB);
+  const buildOwnerBorderMesh = (runtimeTopology, ownershipContext = {}, { excludeSea = false } = {}) =>
+    buildOwnerBorderMeshRuntime({
+      runtimeTopology,
+      ownershipContext,
+      excludeSea,
+      shouldExcludeOwnerBorderEntity,
+      resolveOwnerBorderCode,
     });
-  }
 
-  function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
-    return buildOwnerBorderMesh(runtimeTopology, ownershipContext, { excludeSea: true });
-  }
-
-  function countUnresolvedOwnerBorderEntities(runtimeTopology, ownershipContext = {}) {
-    const geometries = runtimeTopology?.objects?.political?.geometries;
-    if (!Array.isArray(geometries) || !geometries.length) return 0;
-    let unresolvedCount = 0;
-    geometries.forEach((geometry) => {
-      if (shouldExcludeOwnerBorderEntity(geometry, { excludeSea: true })) return;
-      if (resolveOwnerBorderCode(geometry, ownershipContext)) return;
-      unresolvedCount += 1;
+  const buildDynamicOwnerBorderMesh = (runtimeTopology, ownershipContext) =>
+    buildDynamicOwnerBorderMeshRuntime({
+      runtimeTopology,
+      ownershipContext,
+      shouldExcludeOwnerBorderEntity,
+      resolveOwnerBorderCode,
     });
-    return unresolvedCount;
-  }
+
+  const countUnresolvedOwnerBorderEntities = (runtimeTopology, ownershipContext = {}) =>
+    countUnresolvedOwnerBorderEntitiesRuntime({
+      runtimeTopology,
+      ownershipContext,
+      shouldExcludeOwnerBorderEntity,
+      resolveOwnerBorderCode,
+    });
 
   function rebuildDynamicBorders() {
     const startedAt = nowMs();
@@ -145,7 +126,13 @@ export function createBorderMeshOwner({
     }
 
     ensureSovereigntyState();
-    const nextHash = buildDynamicBorderHash();
+    const nextHash = buildDynamicBorderHash({
+      sovereigntyRevision: state.sovereigntyRevision,
+      activeScenarioId: state.activeScenarioId,
+      scenarioViewMode: state.scenarioViewMode,
+      scenarioControllerRevision: state.scenarioControllerRevision,
+      scenarioShellOverlayRevision: state.scenarioShellOverlayRevision,
+    });
     if (state.cachedDynamicBordersHash === nextHash && state.cachedDynamicOwnerBorders) {
       state.dynamicBordersDirty = false;
       state.dynamicBordersDirtyReason = "";
@@ -160,15 +147,9 @@ export function createBorderMeshOwner({
       return true;
     }
 
-    const ownershipContext = getDynamicBorderOwnershipContext();
-    state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(
-      state.runtimePoliticalTopology,
-      ownershipContext
-    );
-    const unresolvedEntityCount = countUnresolvedOwnerBorderEntities(
-      state.runtimePoliticalTopology,
-      ownershipContext
-    );
+    const ownershipContext = getDynamicBorderOwnershipContext(state);
+    state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(state.runtimePoliticalTopology, ownershipContext);
+    const unresolvedEntityCount = countUnresolvedOwnerBorderEntities(state.runtimePoliticalTopology, ownershipContext);
     state.cachedDynamicBordersHash = nextHash;
     state.dynamicBordersDirty = false;
     state.dynamicBordersDirtyReason = "";
@@ -214,11 +195,7 @@ export function createBorderMeshOwner({
         : (
           selection.hasMeshPackMesh
             ? selection.meshPackMesh
-            : buildOwnerBorderMesh(
-              selection.runtimeRef,
-              selection.fallbackOwnershipContext,
-              { excludeSea: true }
-            )
+            : buildOwnerBorderMesh(selection.runtimeRef, selection.fallbackOwnershipContext, { excludeSea: true })
         );
 
       scenarioOpeningOwnerBorderCache = {
@@ -247,25 +224,15 @@ export function createBorderMeshOwner({
     return !!state.cachedScenarioOpeningOwnerBorders;
   }
 
-  function buildDetailAdmBorderMesh(topology, includedCountries) {
-    const object = topology?.objects?.political;
-    if (!object || !globalThis.topojson || !includedCountries?.size) {
-      return null;
-    }
-
-    return globalThis.topojson.mesh(topology, object, (a, b) => {
-      if (!a || !b) return false;
-      if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
-        return false;
-      }
-      const codeA = getEntityCountryCode(a);
-      const codeB = getEntityCountryCode(b);
-      if (!codeA || !codeB || codeA !== codeB || !includedCountries.has(codeA)) {
-        return false;
-      }
-      return isAdmDetailTier(a) || isAdmDetailTier(b);
+  const buildDetailAdmBorderMesh = (topology, includedCountries) =>
+    buildDetailAdmBorderMeshRuntime({
+      topology,
+      includedCountries,
+      asFeatureLike,
+      shouldExcludePoliticalInteractionFeature,
+      getEntityCountryCode,
+      isAdmDetailTier,
     });
-  }
 
   function getSourceCountrySets() {
     return getSourceCountrySetsFromSelection({
@@ -361,27 +328,18 @@ export function createBorderMeshOwner({
     });
   }
 
-  function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
-    if (!isUsableMesh(mesh)) return null;
-    const simplifiedCoordinates = [];
-
-    mesh.coordinates.forEach((line) => {
-      const sanitized = sanitizePolyline(line);
-      if (sanitized.length < 2) return;
-      const adjustedEpsilon = getLatitudeAdjustedSimplifyEpsilon(epsilon, sanitized);
-      const effectiveAreaThreshold = adjustedEpsilon * adjustedEpsilon * coastlineEffectiveAreaMultiplier;
-      const simplified = simplifyPolylineEffectiveArea(sanitized, effectiveAreaThreshold);
-      if (simplified.length < 2) return;
-      if (getLineLength(simplified) < Math.max(0, Number(minLength) || 0)) return;
-      simplifiedCoordinates.push(simplified);
+  const simplifyCoastlineMesh = (mesh, { epsilon = 0, minLength = 0 } = {}) =>
+    simplifyCoastlineMeshRuntime({
+      mesh,
+      epsilon,
+      minLength,
+      isUsableMesh,
+      sanitizePolyline,
+      getLatitudeAdjustedSimplifyEpsilon,
+      coastlineEffectiveAreaMultiplier,
+      simplifyPolylineEffectiveArea,
+      getLineLength,
     });
-
-    if (!simplifiedCoordinates.length) return null;
-    return {
-      type: "MultiLineString",
-      coordinates: simplifiedCoordinates,
-    };
-  }
 
   return {
     buildOwnerBorderMesh,

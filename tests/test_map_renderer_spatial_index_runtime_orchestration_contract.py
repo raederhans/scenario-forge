@@ -32,11 +32,11 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             self.renderer_content,
         )
         self.assertIn(
-            "const buildIndexChunked = (...args) => getSpatialIndexRuntimeOwner().buildIndexChunked(...args);",
+            "buildIndexChunked,\n  buildSpatialIndex,\n  buildSpatialIndexChunked,\n  configureSpatialRuntimeFacade,\n} from \"./map_renderer/facade_spatial_runtime.js\";",
             self.renderer_content,
         )
         self.assertIn(
-            "const buildSpatialIndexChunked = (...args) =>\n  getSpatialIndexRuntimeOwner().buildSpatialIndexChunked(...args);",
+            "configureSpatialRuntimeFacade({\n  getSpatialIndexRuntimeOwner,\n});",
             self.renderer_content,
         )
 

@@ -17,8 +17,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn('<meta name="default-scenario" content="tno_1962" />', html)
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
         self.assertIn('<link rel="modulepreload" href="js/main.js" />', html)
-        self.assertIn('<link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />', html)
         self.assertIn('<link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />', html)
+        self.assertNotIn('<link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />', html)
         self.assertNotIn('href="data/locales.startup.json"', html)
         self.assertNotIn('href="data/geo_aliases.startup.json"', html)
 

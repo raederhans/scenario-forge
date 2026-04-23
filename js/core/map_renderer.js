@@ -93,6 +93,90 @@ import { createBorderMeshOwner } from "./renderer/border_mesh_owner.js";
 import { createBorderDrawOwner } from "./renderer/border_draw_owner.js";
 import { createInteractionBorderSnapshotOwner } from "./renderer/interaction_border_snapshot_owner.js";
 import { createSpatialIndexRuntimeOwner } from "./renderer/spatial_index_runtime_owner.js";
+import {
+  buildFacilityInfoCardBody,
+  buildFacilityInfoCardFieldSections,
+  buildFacilityInfoCardTitle,
+  buildFacilityTooltipText,
+  buildInteractiveLandData,
+  canPreferUrbanDetailCollection,
+  canRenderUrbanCollection,
+  collectCountryCoverageStats,
+  composePoliticalFeatureCollections,
+  composePoliticalFeatures,
+  computeLayerCoverageScore,
+  configureDataRuntimeFacade,
+  createUrbanLayerCapability,
+  ensureLayerDataFromTopology,
+  getDesiredBathymetryTopologyUrl,
+  getLayerFeatureCollection,
+  getPoliticalFeatureCollection,
+  getScenarioBathymetryTopologyUrl,
+  getUrbanFeatureGeoBounds,
+  getUrbanLayerCapability,
+  mergeOverrideFeatures,
+  normalizeFeatureGeometry,
+  pickBestLayerSource,
+  resolveContextLayerData,
+} from "./map_renderer/facade_data_runtime.js";
+import {
+  buildCountryParentBorderMeshes,
+  buildDetailAdmBorderMesh,
+  buildDynamicOwnerBorderMesh,
+  buildGlobalCoastlineMesh,
+  buildGlobalCountryBorderMesh,
+  buildOwnerBorderMesh,
+  buildSourceBorderMeshes,
+  configureBorderRuntimeFacade,
+  countUnresolvedOwnerBorderEntities,
+  getSourceCountrySets,
+  resolveCoastlineTopologySource,
+  simplifyCoastlineMesh,
+} from "./map_renderer/facade_border_runtime.js";
+import {
+  buildIndex,
+  buildIndexChunked,
+  buildSpatialIndex,
+  buildSpatialIndexChunked,
+  configureSpatialRuntimeFacade,
+} from "./map_renderer/facade_spatial_runtime.js";
+import {
+  appendOperationGraphicVertexFromEvent,
+  appendOperationalLineVertexFromEvent,
+  appendSpecialZoneVertexFromEvent,
+  cancelActiveStrategicInteractionModes,
+  cancelOperationGraphicDraw,
+  cancelOperationalLineDraw,
+  cancelSpecialZoneDraw,
+  cancelUnitCounterPlacement,
+  configureOverlayRuntimeFacade,
+  deleteSelectedManualSpecialZone,
+  deleteSelectedOperationGraphic,
+  deleteSelectedOperationGraphicVertex,
+  deleteSelectedOperationalLine,
+  deleteSelectedUnitCounter,
+  finishOperationGraphicDraw,
+  finishOperationalLineDraw,
+  finishSpecialZoneDraw,
+  getUnitCounterPreviewData,
+  placeUnitCounterFromEvent,
+  resolveUnitCounterNationForPlacement,
+  selectOperationGraphicById,
+  selectOperationalLineById,
+  selectSpecialZoneById,
+  selectUnitCounterById,
+  startOperationGraphicDraw,
+  startOperationalLineDraw,
+  startSpecialZoneDraw,
+  startUnitCounterPlacement,
+  syncOperationalLineAttachedCounterIds,
+  undoOperationGraphicVertex,
+  undoOperationalLineVertex,
+  undoSpecialZoneVertex,
+  updateSelectedOperationGraphic,
+  updateSelectedOperationalLine,
+  updateSelectedUnitCounter,
+} from "./map_renderer/facade_overlay_runtime.js";
 const state = runtimeState;
 
 const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
@@ -1339,6 +1423,25 @@ function getStrategicOverlayRuntimeOwner() {
   });
   return strategicOverlayRuntimeOwner;
 }
+
+configureDataRuntimeFacade({
+  getPoliticalCollectionOwner,
+  getContextLayerResolverOwner,
+  getRendererAssetUrlPolicyOwner,
+  getFacilitySurfaceOwner,
+});
+
+configureBorderRuntimeFacade({
+  getBorderMeshOwner,
+});
+
+configureSpatialRuntimeFacade({
+  getSpatialIndexRuntimeOwner,
+});
+
+configureOverlayRuntimeFacade({
+  getStrategicOverlayRuntimeOwner,
+});
 
 function getSidebarPerfState() {
   return ensureSidebarPerfState(state);
@@ -4288,10 +4391,6 @@ function getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd = fals
   );
 }
 
-function getPoliticalFeatureCollection(topology, sourceName) {
-  return getPoliticalCollectionOwner().getPoliticalFeatureCollection(topology, sourceName);
-}
-
 function isWorldBounds(bounds) {
   return !!(
     Array.isArray(bounds) &&
@@ -4350,26 +4449,6 @@ function getMaxDprForProfile(renderProfile) {
   return baseMaxDpr;
 }
 
-function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
-  return getPoliticalCollectionOwner().normalizeFeatureGeometry(feature, { sourceLabel });
-}
-
-function mergeOverrideFeatures(baseFeatures, overrideCollection) {
-  return getPoliticalCollectionOwner().mergeOverrideFeatures(baseFeatures, overrideCollection);
-}
-
-function composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection = null) {
-  return getPoliticalCollectionOwner().composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection);
-}
-
-function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
-  return getPoliticalCollectionOwner().composePoliticalFeatureCollections(primaryCollection, detailCollection, overrideCollection);
-}
-
-function collectCountryCoverageStats(features = []) {
-  return getPoliticalCollectionOwner().collectCountryCoverageStats(features);
-}
-
 function updateDprStage(nextStage = "idle", { force = false } = {}) {
   const normalizedStage = String(nextStage || "idle").toLowerCase() === "interactive"
     ? "interactive"
@@ -4380,10 +4459,6 @@ function updateDprStage(nextStage = "idle", { force = false } = {}) {
   runtimeState.dprStage = normalizedStage;
   runtimeState.dprLastStageSwitchAt = nowMs();
   return true;
-}
-
-function buildInteractiveLandData(fullCollection) {
-  return getPoliticalCollectionOwner().buildInteractiveLandData(fullCollection);
 }
 
 function rebuildPoliticalLandCollections() {
@@ -5148,48 +5223,8 @@ function getContourVisibleFeatures(
   return visibleFeatures;
 }
 
-function getLayerFeatureCollection(topology, layerName) {
-  return getContextLayerResolverOwner().getLayerFeatureCollection(topology, layerName);
-}
-
-function computeLayerCoverageScore(collection) {
-  return getContextLayerResolverOwner().computeLayerCoverageScore(collection);
-}
-
 const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
 const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
-
-function createUrbanLayerCapability(overrides = {}) {
-  return getContextLayerResolverOwner().createUrbanLayerCapability(overrides);
-}
-
-function getUrbanFeatureGeoBounds(feature) {
-  return getContextLayerResolverOwner().getUrbanFeatureGeoBounds(feature);
-}
-
-function getUrbanLayerCapability(collection) {
-  return getContextLayerResolverOwner().getUrbanLayerCapability(collection);
-}
-
-function canRenderUrbanCollection(capability) {
-  return getContextLayerResolverOwner().canRenderUrbanCollection(capability);
-}
-
-function canPreferUrbanDetailCollection(capability) {
-  return getContextLayerResolverOwner().canPreferUrbanDetailCollection(capability);
-}
-
-function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
-  return getContextLayerResolverOwner().pickBestLayerSource(primaryCollection, detailCollection, policy);
-}
-
-function resolveContextLayerData(layerName) {
-  return getContextLayerResolverOwner().resolveContextLayerData(layerName);
-}
-
-function ensureLayerDataFromTopology() {
-  return getContextLayerResolverOwner().ensureLayerDataFromTopology();
-}
 
 function invalidateContextLayerVisualState(layerName, reason = "context-layer-loaded", { renderNow = true } = {}) {
   return invalidateContextLayerVisualStateBatch([layerName], reason, { renderNow });
@@ -5637,22 +5672,6 @@ function resolveOwnerBorderCode(entity, ownershipContext = {}) {
   );
 }
 
-function buildOwnerBorderMesh(runtimeTopology, ownershipContext = {}, { excludeSea = false } = {}) {
-  return getBorderMeshOwner().buildOwnerBorderMesh(runtimeTopology, ownershipContext, { excludeSea });
-}
-
-function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
-  return getBorderMeshOwner().buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext);
-}
-
-function countUnresolvedOwnerBorderEntities(runtimeTopology, ownershipContext = {}) {
-  return getBorderMeshOwner().countUnresolvedOwnerBorderEntities(runtimeTopology, ownershipContext);
-}
-
-function buildDetailAdmBorderMesh(topology, includedCountries) {
-  return getBorderMeshOwner().buildDetailAdmBorderMesh(topology, includedCountries);
-}
-
 function getFullLandDataFeatures() {
   if (Array.isArray(runtimeState.landDataFull?.features) && runtimeState.landDataFull.features.length) {
     return runtimeState.landDataFull.features;
@@ -5966,14 +5985,6 @@ function getParentGroupForEntity(entity) {
   const group = runtimeState.parentGroupByFeatureId.get(featureId);
   if (group === null || group === undefined) return "";
   return String(group).trim();
-}
-
-function buildCountryParentBorderMeshes(countryCode) {
-  return getBorderMeshOwner().buildCountryParentBorderMeshes(countryCode);
-}
-
-function getSourceCountrySets() {
-  return getBorderMeshOwner().getSourceCountrySets();
 }
 
 function resetContourHostFillColorCache() {
@@ -6331,14 +6342,6 @@ function restoreStaticMeshSnapshot(snapshot) {
   syncParentBorderEnabledByCountry(runtimeState.parentBorderSupportedCountries);
 }
 
-function buildSourceBorderMeshes(topology, includedCountries) {
-  return getBorderMeshOwner().buildSourceBorderMeshes(topology, includedCountries);
-}
-
-function buildGlobalCountryBorderMesh(primaryTopology) {
-  return getBorderMeshOwner().buildGlobalCountryBorderMesh(primaryTopology);
-}
-
 function publishScenarioCoastlineDecision(decision) {
   if (!decision || typeof decision !== "object") return decision;
   const publicDecision = { ...decision };
@@ -6352,14 +6355,6 @@ function publishScenarioCoastlineDecision(decision) {
     };
   }
   return decision;
-}
-
-function resolveCoastlineTopologySource() {
-  return getBorderMeshOwner().resolveCoastlineTopologySource();
-}
-
-function buildGlobalCoastlineMesh(primaryTopology) {
-  return getBorderMeshOwner().buildGlobalCoastlineMesh(primaryTopology);
 }
 
 function getLineLength(line) {
@@ -6578,10 +6573,6 @@ function simplifyPolylineEffectiveArea(points, areaThreshold) {
     if (!removed[index]) simplified.push(points[index]);
   }
   return simplified.length >= 2 ? simplified : points.slice(0, 2);
-}
-
-function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
-  return getBorderMeshOwner().simplifyCoastlineMesh(mesh, { epsilon, minLength });
 }
 
 function rebuildStaticMeshes() {
@@ -7826,11 +7817,6 @@ function finalizeIndexBuildEffects() {
   runtimeState.hitCanvasDirty = true;
 }
 
-function buildIndex({ scheduleUiMode = "immediate" } = {}) {
-  // 入口负责编排 spatial index 构建流程，索引细节由 owner 实现。
-  return getSpatialIndexRuntimeOwner().buildIndex({ scheduleUiMode });
-}
-
 function adoptRuntimePoliticalMeta(payload) {
   const featureIds = Array.isArray(payload?.featureIds) ? payload.featureIds : [];
   const featureIndexById = payload?.featureIndexById && typeof payload.featureIndexById === "object"
@@ -7964,22 +7950,6 @@ function rebuildRuntimeDerivedState({
   }
   return nextColors;
 }
-
-function buildSpatialIndex({
-  includeSecondary = true,
-  allowComputeMissingBounds = true,
-} = {}) {
-  // 入口负责编排 spatial index 构建流程，索引细节由 owner 实现。
-  return getSpatialIndexRuntimeOwner().buildSpatialIndex({
-    includeSecondary,
-    allowComputeMissingBounds,
-  });
-}
-
-const buildIndexChunked = (...args) => getSpatialIndexRuntimeOwner().buildIndexChunked(...args);
-
-const buildSpatialIndexChunked = (...args) =>
-  getSpatialIndexRuntimeOwner().buildSpatialIndexChunked(...args);
 
 async function buildHitCanvasAfterStartup({ keepReady = false } = {}) {
   setInteractionInfrastructureState("building-hit-canvas", {
@@ -8311,19 +8281,11 @@ function getBoundsArea(bounds) {
   return Math.max(0, bounds.maxX - bounds.minX) * Math.max(0, bounds.maxY - bounds.minY);
 }
 
-function getScenarioBathymetryTopologyUrl() {
-  return getRendererAssetUrlPolicyOwner().getScenarioBathymetryTopologyUrl();
-}
-
 function doesOceanStyleRequireBathymetry(oceanStyle = getOceanStyleConfig()) {
   return !!(
     oceanStyle?.experimentalAdvancedStyles
     && String(oceanStyle?.preset || "flat").trim().toLowerCase() !== "flat"
   );
-}
-
-function getDesiredBathymetryTopologyUrl(slot) {
-  return getRendererAssetUrlPolicyOwner().getDesiredBathymetryTopologyUrl(slot);
 }
 
 function clearBathymetryStateSlot(slot) {
@@ -11837,26 +11799,6 @@ function getHoveredFacilityEntryFromEvent(event) {
     }
   });
   return bestEntry;
-}
-
-function buildFacilityTooltipText(entry) {
-  return getFacilitySurfaceOwner().buildFacilityTooltipText(entry);
-}
-
-function buildFacilityInfoCardTitle(entry) {
-  return getFacilitySurfaceOwner().buildFacilityInfoCardTitle(entry);
-}
-
-function buildFacilityInfoCardFieldSections(entry) {
-  const model = getFacilitySurfaceOwner().buildFacilityInfoCardFieldSections(entry, false);
-  return {
-    defaultRows: Array.isArray(model?.rows) ? model.rows : [],
-    extraRows: [],
-  };
-}
-
-function buildFacilityInfoCardBody(entry, expanded = false) {
-  return getFacilitySurfaceOwner().buildFacilityInfoCardFieldSections(entry, expanded);
 }
 
 function applyFacilityInfoCardState(entry, anchor = null) {
@@ -18568,14 +18510,6 @@ function normalizeUnitCounterNationSource(value, fallback = "display") {
   return ["display", "controller", "owner", "active", "manual"].includes(source) ? source : fallback;
 }
 
-function resolveUnitCounterNationForPlacement(featureId = "", manualTag = "", preferredSource = "display") {
-  return getStrategicOverlayRuntimeOwner().resolveUnitCounterNationForPlacement(
-    featureId,
-    manualTag,
-    preferredSource,
-  );
-}
-
 function getUnitCounterScreenMetrics(size = "medium") {
   const token = normalizeUnitCounterSizeToken(size);
   return UNIT_COUNTER_SCREEN_SIZE[token] || UNIT_COUNTER_SCREEN_SIZE.medium;
@@ -18621,10 +18555,6 @@ function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
       : "",
     sizeToken,
   };
-}
-
-function getUnitCounterPreviewData(partialCounter = {}) {
-  return getStrategicOverlayRuntimeOwner().getUnitCounterPreviewData(partialCounter);
 }
 
 function getUnitCounterIconPath(iconId = "") {
@@ -19308,34 +19238,6 @@ function ensureManualSpecialZoneCounter() {
   runtimeState.specialZoneEditor.counter = counter;
 }
 
-function appendSpecialZoneVertexFromEvent(event) {
-  return getStrategicOverlayRuntimeOwner().appendSpecialZoneVertexFromEvent(event);
-}
-
-function startSpecialZoneDraw({ zoneType = DEFAULT_SPECIAL_ZONE_TYPE, label = "" } = {}) {
-  return getStrategicOverlayRuntimeOwner().startSpecialZoneDraw({ zoneType, label });
-}
-
-function undoSpecialZoneVertex() {
-  return getStrategicOverlayRuntimeOwner().undoSpecialZoneVertex();
-}
-
-function cancelSpecialZoneDraw() {
-  return getStrategicOverlayRuntimeOwner().cancelSpecialZoneDraw();
-}
-
-function finishSpecialZoneDraw() {
-  return getStrategicOverlayRuntimeOwner().finishSpecialZoneDraw();
-}
-
-function selectSpecialZoneById(id) {
-  return getStrategicOverlayRuntimeOwner().selectSpecialZoneById(id);
-}
-
-function deleteSelectedManualSpecialZone() {
-  return getStrategicOverlayRuntimeOwner().deleteSelectedManualSpecialZone();
-}
-
 function ensureOperationGraphicCounter() {
   ensureOperationGraphicsEditorState();
   const used = new Set((runtimeState.operationGraphics || []).map((graphic) => String(graphic?.id || "")));
@@ -19344,56 +19246,6 @@ function ensureOperationGraphicCounter() {
     counter += 1;
   }
   runtimeState.operationGraphicsEditor.counter = counter;
-}
-
-function appendOperationGraphicVertexFromEvent(event) {
-  return getStrategicOverlayRuntimeOwner().appendOperationGraphicVertexFromEvent(event);
-}
-
-function startOperationGraphicDraw({
-  kind = DEFAULT_OPERATION_GRAPHIC_KIND,
-  label = "",
-  stylePreset = DEFAULT_OPERATION_GRAPHIC_KIND,
-  stroke = "",
-  width = 0,
-  opacity = 1,
-} = {}) {
-  return getStrategicOverlayRuntimeOwner().startOperationGraphicDraw({
-    kind,
-    label,
-    stylePreset,
-    stroke,
-    width,
-    opacity,
-  });
-}
-
-function undoOperationGraphicVertex() {
-  return getStrategicOverlayRuntimeOwner().undoOperationGraphicVertex();
-}
-
-function cancelOperationGraphicDraw() {
-  return getStrategicOverlayRuntimeOwner().cancelOperationGraphicDraw();
-}
-
-function finishOperationGraphicDraw() {
-  return getStrategicOverlayRuntimeOwner().finishOperationGraphicDraw();
-}
-
-function selectOperationGraphicById(id) {
-  return getStrategicOverlayRuntimeOwner().selectOperationGraphicById(id);
-}
-
-function deleteSelectedOperationGraphic() {
-  return getStrategicOverlayRuntimeOwner().deleteSelectedOperationGraphic();
-}
-
-function updateSelectedOperationGraphic(partial = {}) {
-  return getStrategicOverlayRuntimeOwner().updateSelectedOperationGraphic(partial);
-}
-
-function deleteSelectedOperationGraphicVertex() {
-  return getStrategicOverlayRuntimeOwner().deleteSelectedOperationGraphicVertex();
 }
 
 function ensureOperationalLineCounter() {
@@ -19406,56 +19258,6 @@ function ensureOperationalLineCounter() {
   runtimeState.operationalLineEditor.counter = counter;
 }
 
-function appendOperationalLineVertexFromEvent(event) {
-  return getStrategicOverlayRuntimeOwner().appendOperationalLineVertexFromEvent(event);
-}
-
-function startOperationalLineDraw({
-  kind = DEFAULT_OPERATIONAL_LINE_KIND,
-  label = "",
-  stylePreset = DEFAULT_OPERATIONAL_LINE_KIND,
-  stroke = "",
-  width = 0,
-  opacity = 1,
-} = {}) {
-  return getStrategicOverlayRuntimeOwner().startOperationalLineDraw({
-    kind,
-    label,
-    stylePreset,
-    stroke,
-    width,
-    opacity,
-  });
-}
-
-function undoOperationalLineVertex() {
-  return getStrategicOverlayRuntimeOwner().undoOperationalLineVertex();
-}
-
-function cancelOperationalLineDraw() {
-  return getStrategicOverlayRuntimeOwner().cancelOperationalLineDraw();
-}
-
-function finishOperationalLineDraw() {
-  return getStrategicOverlayRuntimeOwner().finishOperationalLineDraw();
-}
-
-function selectOperationalLineById(id) {
-  return getStrategicOverlayRuntimeOwner().selectOperationalLineById(id);
-}
-
-function updateSelectedOperationalLine(partial = {}) {
-  return getStrategicOverlayRuntimeOwner().updateSelectedOperationalLine(partial);
-}
-
-function deleteSelectedOperationalLine() {
-  return getStrategicOverlayRuntimeOwner().deleteSelectedOperationalLine();
-}
-
-function syncOperationalLineAttachedCounterIds() {
-  return getStrategicOverlayRuntimeOwner().syncOperationalLineAttachedCounterIds();
-}
-
 function ensureUnitCounterCounter() {
   ensureUnitCounterEditorState();
   const used = new Set((runtimeState.unitCounters || []).map((counter) => String(counter?.id || "")));
@@ -19464,74 +19266,6 @@ function ensureUnitCounterCounter() {
     counter += 1;
   }
   runtimeState.unitCounterEditor.counter = counter;
-}
-
-function placeUnitCounterFromEvent(event) {
-  return getStrategicOverlayRuntimeOwner().placeUnitCounterFromEvent(event);
-}
-
-function startUnitCounterPlacement({
-  renderer = DEFAULT_UNIT_COUNTER_RENDERER,
-  label = "",
-  sidc = "",
-  symbolCode = "",
-  nationTag = "",
-  nationSource = "display",
-  presetId = DEFAULT_UNIT_COUNTER_PRESET_ID,
-  unitType = "",
-  echelon = "",
-  subLabel = "",
-  strengthText = "",
-  iconId = "",
-  attachment = null,
-  baseFillColor = "",
-  organizationPct = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
-  equipmentPct = DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
-  statsPresetId = "regular",
-  statsSource = "preset",
-  size = "medium",
-} = {}) {
-  return getStrategicOverlayRuntimeOwner().startUnitCounterPlacement({
-    renderer,
-    label,
-    sidc,
-    symbolCode,
-    nationTag,
-    nationSource,
-    presetId,
-    unitType,
-    echelon,
-    subLabel,
-    strengthText,
-    iconId,
-    attachment,
-    baseFillColor,
-    organizationPct,
-    equipmentPct,
-    statsPresetId,
-    statsSource,
-    size,
-  });
-}
-
-function cancelUnitCounterPlacement() {
-  return getStrategicOverlayRuntimeOwner().cancelUnitCounterPlacement();
-}
-
-function selectUnitCounterById(id) {
-  return getStrategicOverlayRuntimeOwner().selectUnitCounterById(id);
-}
-
-function updateSelectedUnitCounter(partial = {}) {
-  return getStrategicOverlayRuntimeOwner().updateSelectedUnitCounter(partial);
-}
-
-function deleteSelectedUnitCounter() {
-  return getStrategicOverlayRuntimeOwner().deleteSelectedUnitCounter();
-}
-
-function cancelActiveStrategicInteractionModes() {
-  return getStrategicOverlayRuntimeOwner().cancelActiveStrategicInteractionModes();
 }
 
 function handleMouseMove(event) {
