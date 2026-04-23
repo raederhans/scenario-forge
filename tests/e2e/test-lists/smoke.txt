@@ -1,0 +1,4 @@
+main_shell_i18n.spec.js
+hoi4_1939_ui_smoke.spec.js
+tno_1962_ui_smoke.spec.js
+ui_contract_foundation.spec.js

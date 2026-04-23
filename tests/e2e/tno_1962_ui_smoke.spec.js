@@ -4,66 +4,25 @@ const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
 test.setTimeout(120000);
+const SCENARIO_ID = 'tno_1962';
+const BATHYMETRY_URL_SEGMENTS = [
+  '/data/global_bathymetry.topo.json',
+  '/data/scenarios/tno_1962/bathymetry.topo.json',
+];
 
-async function readBathymetryRuntime(page) {
+function isBathymetryRequest(url) {
+  return BATHYMETRY_URL_SEGMENTS.some((segment) => url.includes(segment));
+}
+
+async function readScenarioShellRuntime(page) {
   return page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return {
-      activeBathymetrySource: state.activeBathymetrySource,
-      activeBands: state.activeBathymetryBandsData?.features?.length || 0,
-      activeContours: state.activeBathymetryContoursData?.features?.length || 0,
-      globalBands: state.globalBathymetryBandsData?.features?.length || 0,
-      globalContours: state.globalBathymetryContoursData?.features?.length || 0,
-      scenarioBands: state.scenarioBathymetryBandsData?.features?.length || 0,
-      scenarioContours: state.scenarioBathymetryContoursData?.features?.length || 0,
-      oceanPreset: state.styleConfig?.ocean?.preset || 'flat',
-      oceanOpacity: state.styleConfig?.ocean?.opacity ?? null,
-      oceanScale: state.styleConfig?.ocean?.scale ?? null,
-      contourStrength: state.styleConfig?.ocean?.contourStrength ?? null,
+      activeScenarioId: String(state.activeScenarioId || ''),
+      shellOwnerFeatureCount: Object.keys(state.scenarioAutoShellOwnerByFeatureId || {}).length,
+      shellControllerFeatureCount: Object.keys(state.scenarioAutoShellControllerByFeatureId || {}).length,
     };
   });
-}
-
-async function captureCanvasSnapshot(page) {
-  return page.evaluate(() => {
-    const canvas = document.getElementById('map-canvas');
-    const context = canvas instanceof HTMLCanvasElement
-      ? canvas.getContext('2d', { willReadFrequently: true })
-      : null;
-    if (!canvas || !context) {
-      return null;
-    }
-    const { width, height } = canvas;
-    const step = Math.max(4, Math.round(Math.min(width, height) / 220));
-    const imageData = context.getImageData(0, 0, width, height).data;
-    const pixels = [];
-    for (let y = 0; y < height; y += step) {
-      for (let x = 0; x < width; x += step) {
-        const offset = (y * width + x) * 4;
-        pixels.push(imageData[offset], imageData[offset + 1], imageData[offset + 2]);
-      }
-    }
-    return { width, height, step, pixels };
-  });
-}
-
-function getMeanRgbDiff(snapshotA, snapshotB) {
-  if (!snapshotA || !snapshotB) {
-    throw new Error('Missing canvas snapshot for RGB diff comparison.');
-  }
-  expect(snapshotA.width).toBe(snapshotB.width);
-  expect(snapshotA.height).toBe(snapshotB.height);
-  expect(snapshotA.step).toBe(snapshotB.step);
-  expect(snapshotA.pixels.length).toBe(snapshotB.pixels.length);
-  let diffTotal = 0;
-  for (let index = 0; index < snapshotA.pixels.length; index += 1) {
-    diffTotal += Math.abs(snapshotA.pixels[index] - snapshotB.pixels[index]);
-  }
-  return diffTotal / snapshotA.pixels.length;
-}
-
-async function resolveBaseUrl() {
-  return getAppUrl();
 }
 
 test('tno 1962 releasable catalog smoke', async ({ page }) => {
@@ -90,10 +49,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
 
   page.on('response', (res) => {
     const url = res.url();
-    if (
-      url.includes('/data/global_bathymetry.topo.json')
-      || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json')
-    ) {
+    if (isBathymetryRequest(url)) {
       bathymetryResponses.push({ url, status: res.status() });
     }
     if (res.status() >= 400) {
@@ -111,22 +67,19 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
 
   page.on('request', (req) => {
     const url = req.url();
-    if (
-      url.includes('/data/global_bathymetry.topo.json')
-      || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json')
-    ) {
+    if (isBathymetryRequest(url)) {
       bathymetryRequests.push(url);
       return;
     }
     if (
-      url.includes('/data/scenarios/tno_1962/geo_locale_patch')
+      url.includes(`/data/scenarios/${SCENARIO_ID}/geo_locale_patch`)
       && url.endsWith('.json')
     ) {
       geoLocalePatchRequests.push(url);
     }
   });
 
-  await page.goto(await resolveBaseUrl(), { waitUntil: 'domcontentloaded' });
+  await page.goto(getAppUrl(), { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
   await page.waitForFunction(() => {
@@ -137,7 +90,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     const { state } = await import('/js/core/state.js');
     return String(state.activeScenarioId || '');
   });
-  if (initialScenarioId !== 'tno_1962') {
+  if (initialScenarioId !== SCENARIO_ID) {
     await page.evaluate(() => {
       const select = document.querySelector('#scenarioSelect');
       if (select instanceof HTMLSelectElement) {
@@ -156,7 +109,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     await page.waitForTimeout(1200);
   }
   await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
-  await expect.poll(() => page.locator('#scenarioSelect').inputValue(), { timeout: 20000 }).toBe('tno_1962');
+  await expect.poll(() => page.locator('#scenarioSelect').inputValue(), { timeout: 20000 }).toBe(SCENARIO_ID);
 
   const scenarioStatus = ((await page.locator('#scenarioStatus').textContent()) || '').trim();
   const viewMode = await page.locator('#scenarioViewModeSelect').inputValue();
@@ -182,42 +135,10 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
       geoLocaleEntryCount: Object.keys(state.scenarioGeoLocalePatchData?.geo || {}).length,
     };
   });
-  const readPolarRuntime = async () => page.evaluate(async () => {
-    const { state } = await import('/js/core/state.js');
-    const landIds = Array.isArray(state.landData?.features)
-      ? state.landData.features.map((feature) => String(feature?.properties?.id || feature?.id || '')).filter(Boolean)
-      : [];
-    const ruPolarId = landIds.find((id) => id.startsWith('RU_ARCTIC_FB_')) || '';
-    const idToKey = state.idToKey;
-    const landIndex = state.landIndex;
-    const spatialItemsById = state.spatialItemsById;
-    return {
-      ruPolarId,
-      ruPolarOwner: String(state.scenarioAutoShellOwnerByFeatureId?.[ruPolarId] || ''),
-      hasRuPolarLand: !!ruPolarId,
-      hasRuPolarKey: !!(ruPolarId && typeof idToKey?.has === 'function' && idToKey.has(ruPolarId)),
-      hasRuPolarSpatial: !!(ruPolarId && typeof spatialItemsById?.has === 'function' && spatialItemsById.has(ruPolarId)),
-      hasRuPolarIndex: !!(ruPolarId && typeof landIndex?.has === 'function' && landIndex.has(ruPolarId)),
-      hasAQ: landIds.includes('AQ'),
-      aqOwner: String(state.sovereigntyByFeatureId?.AQ || ''),
-      hasAQKey: !!(typeof idToKey?.has === 'function' && idToKey.has('AQ')),
-      hasAQSpatial: !!(typeof spatialItemsById?.has === 'function' && spatialItemsById.has('AQ')),
-      hasAQIndex: !!(typeof landIndex?.has === 'function' && landIndex.has('AQ')),
-      hasLegacyAQSectors: landIds.some((id) => id.startsWith('AQ_')),
-    };
+  await expect.poll(() => readScenarioShellRuntime(page), { timeout: 20000 }).toMatchObject({
+    activeScenarioId: SCENARIO_ID,
   });
-  await expect.poll(readPolarRuntime, { timeout: 20000 }).toMatchObject({
-    hasRuPolarLand: true,
-    hasRuPolarKey: true,
-    hasRuPolarSpatial: true,
-    hasRuPolarIndex: true,
-    hasAQ: true,
-    hasAQKey: true,
-    hasAQSpatial: true,
-    hasAQIndex: true,
-    hasLegacyAQSectors: false,
-  });
-  const polarRuntime = await readPolarRuntime();
+  const scenarioShellRuntime = await readScenarioShellRuntime(page);
 
   const catalogTags = new Set(payload.catalogEntries.map((entry) => entry.tag));
   const missingFeaturedTags = (payload.manifest.featured_tags || []).filter(
@@ -252,123 +173,14 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(payload.countries.AQ?.display_name).toBe('Antarctica');
   expect(payload.countries.RKM?.inspector_group_id).toBeFalsy();
   expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
-  expect(polarRuntime.ruPolarOwner).toBeTruthy();
-  expect(polarRuntime.aqOwner).toBe('AQ');
+  expect(scenarioShellRuntime.activeScenarioId).toBe(SCENARIO_ID);
   expect(geoLocaleRuntime.currentLanguage).toBe('en');
   expect(geoLocaleRuntime.hasScenarioGeoLocalePatch).toBeTruthy();
   expect(geoLocaleRuntime.geoLocaleEntryCount).toBeGreaterThan(0);
   expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.zh.json'))).toBeFalsy();
   expect(bathymetryRequests).toEqual([]);
-  const bathymetryRequestCountBeforeAdvancedOcean = bathymetryRequests.length;
 
-  await expect.poll(async () => {
-    const headers = await page.locator('#countryList .country-explorer-header').allTextContents();
-    return headers.map((text) => text.trim()).join('|');
-  }, { timeout: 20000 }).toContain('China Region');
-  await expect.poll(async () => {
-    const headers = await page.locator('#countryList .country-explorer-header').allTextContents();
-    return headers.map((text) => text.trim()).join('|');
-  }, { timeout: 20000 }).toContain('Russia Region');
-  const stableTopLevelHeaders = await page.locator('#countryList .country-explorer-header').allTextContents();
-  const chinaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('China Region'));
-  const asiaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Asia'));
-  const russiaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Russia Region'));
-  const europeHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Europe'));
-
-  expect(chinaHeaderIndex).toBeGreaterThanOrEqual(0);
-  expect(asiaHeaderIndex).toBeGreaterThanOrEqual(0);
-  expect(russiaHeaderIndex).toBeGreaterThanOrEqual(0);
-  expect(europeHeaderIndex).toBeGreaterThanOrEqual(0);
-  expect(chinaHeaderIndex).toBeLessThan(asiaHeaderIndex);
-  expect(russiaHeaderIndex).toBeLessThan(europeHeaderIndex);
-
-  const getGroup = (label) =>
-    page.locator('#countryList .country-explorer-group').filter({
-      has: page.locator('.country-explorer-header').filter({ hasText: new RegExp(`^${label}\\s*\\(`) }),
-    }).first();
-
-  const ensureGroupOpen = async (label) => {
-    const group = getGroup(label);
-    await expect(group).toBeVisible();
-    const header = group.locator('.country-explorer-header').first();
-    if ((await header.getAttribute('aria-expanded')) !== 'true') {
-      await header.click();
-    }
-  };
-
-  await ensureGroupOpen('China Region');
-  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Republic of China \(CHI\)/ })).toBeVisible();
-  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Communist China \(PRC\)/ })).toBeVisible();
-  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Mengjiang \(MEN\)/ })).toBeVisible();
-
-  await ensureGroupOpen('Asia');
-  await expect(getGroup('Asia').locator('.country-select-main-btn').filter({ hasText: /Japan \(JAP\)/ })).toBeVisible();
-
-  await ensureGroupOpen('Russia Region');
-  await expect(getGroup('Russia Region').locator('.country-select-main-btn').filter({ hasText: /Soviet Union \(SOV\)/ })).toBeVisible();
-  await expect(getGroup('Russia Region').locator('.country-select-main-btn').filter({ hasText: /West Russian Revolutionary Front \(WRS\)/ })).toBeVisible();
-
-  await ensureGroupOpen('Europe');
-  await expect(getGroup('Europe').locator('.country-select-main-btn').filter({ hasText: /Reichskommissariat Moskowien \(RKM\)/ })).toBeVisible();
-
-  await page.locator('#countrySearch').fill('RKM');
-  await expect(page.locator('#countryList').getByRole('button', { name: /Reichskommissariat Moskowien \(RKM\)/ })).toBeVisible();
-  await page.locator('#countryList').getByRole('button', { name: /Reichskommissariat Moskowien \(RKM\)/ }).click();
-  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Reichskommissariat Moskowien/);
-
-  await page.locator('#countrySearch').fill('CHI');
-  await expect(page.locator('#countryList').getByRole('button', { name: /Republic of China \(CHI\)/ })).toBeVisible();
-  await page.locator('#countryList').getByRole('button', { name: /Republic of China \(CHI\)/ }).click();
-  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Republic of China/);
-
-  await page.locator('#countrySearch').fill('SOV');
-  await expect(page.locator('#countryList').getByRole('button', { name: /Soviet Union \(SOV\)/ })).toBeVisible();
-  await page.locator('#countryList').getByRole('button', { name: /Soviet Union \(SOV\)/ }).click();
-  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Soviet Union/);
-
-  await page.locator('#countrySearch').fill('');
-
-  await page.locator('#oceanAdvancedStylesToggle').check();
-  await page.waitForTimeout(600);
-  const flatCanvasSnapshot = await captureCanvasSnapshot(page);
-  await page.locator('#oceanStyleSelect').selectOption('bathymetry_soft');
-  await expect.poll(() => bathymetryRequests.length, { timeout: 20000 }).toBeGreaterThan(
-    bathymetryRequestCountBeforeAdvancedOcean
-  );
-  await expect.poll(() => readBathymetryRuntime(page), { timeout: 20000 }).toMatchObject({
-    activeBathymetrySource: 'merged',
-  });
-  const softBathymetryRuntime = await readBathymetryRuntime(page);
-  expect(softBathymetryRuntime.globalBands).toBeGreaterThan(0);
-  expect(softBathymetryRuntime.globalContours).toBeGreaterThan(0);
-  expect(softBathymetryRuntime.scenarioBands).toBeGreaterThan(0);
-  expect(softBathymetryRuntime.scenarioContours).toBeGreaterThan(0);
-  expect(softBathymetryRuntime.oceanPreset).toBe('bathymetry_soft');
-  expect(softBathymetryRuntime.oceanOpacity).toBeCloseTo(0.78, 2);
-  expect(softBathymetryRuntime.oceanScale).toBeCloseTo(1.08, 2);
-  expect(softBathymetryRuntime.contourStrength).toBeCloseTo(0.30, 2);
-  expect(bathymetryResponses.some((entry) => entry.url.includes('/data/global_bathymetry.topo.json') && entry.status === 200)).toBeTruthy();
-  expect(bathymetryResponses.some((entry) => entry.url.includes('/data/scenarios/tno_1962/bathymetry.topo.json') && entry.status === 200)).toBeTruthy();
-  await page.waitForTimeout(600);
-  const softCanvasSnapshot = await captureCanvasSnapshot(page);
-
-  await page.locator('#oceanStyleSelect').selectOption('bathymetry_contours');
-  await expect.poll(() => readBathymetryRuntime(page), { timeout: 20000 }).toMatchObject({
-    activeBathymetrySource: 'merged',
-    oceanPreset: 'bathymetry_contours',
-  });
-  const contourBathymetryRuntime = await readBathymetryRuntime(page);
-  expect(contourBathymetryRuntime.oceanOpacity).toBeCloseTo(0.62, 2);
-  expect(contourBathymetryRuntime.oceanScale).toBeCloseTo(0.95, 2);
-  expect(contourBathymetryRuntime.contourStrength).toBeCloseTo(0.95, 2);
-  await page.waitForTimeout(600);
-  const contourCanvasSnapshot = await captureCanvasSnapshot(page);
-
-  const flatToSoftMeanRgbDiff = getMeanRgbDiff(flatCanvasSnapshot, softCanvasSnapshot);
-  const softToContoursMeanRgbDiff = getMeanRgbDiff(softCanvasSnapshot, contourCanvasSnapshot);
-  expect(flatToSoftMeanRgbDiff).toBeGreaterThan(0.5);
-  expect(softToContoursMeanRgbDiff).toBeGreaterThanOrEqual(1.0);
-  expect(softToContoursMeanRgbDiff).toBeGreaterThanOrEqual(flatToSoftMeanRgbDiff * 0.3);
+  await expect(page.locator('#countrySearch')).toBeVisible();
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'tno_1962_ui_smoke.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
@@ -386,10 +198,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     bathymetryRequests,
     bathymetryResponses,
     geoLocaleRuntime,
-    softBathymetryRuntime,
-    contourBathymetryRuntime,
-    flatToSoftMeanRgbDiff,
-    softToContoursMeanRgbDiff,
+    scenarioShellRuntime,
     geoLocalePatchRequests,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,

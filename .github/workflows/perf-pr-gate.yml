@@ -2,15 +2,9 @@ name: perf-pr-gate
 
 on:
   pull_request:
-    paths:
-      - ".github/workflows/perf-pr-gate.yml"
-      - "docs/perf/**"
-      - "js/**"
-      - "tests/e2e/support/playwright-app.js"
-      - "tools/perf/**"
-      - "tools/dev_server.py"
-      - "package.json"
-      - "package-lock.json"
+
+permissions:
+  contents: read
 
 jobs:
   perf-gate:
@@ -18,20 +12,180 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify perf-relevant changes
+        id: classify
+        shell: pwsh
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          New-Item -ItemType Directory -Force -Path '.runtime/reports/generated' | Out-Null
+
+          function Convert-GlobToRegex([string]$pattern) {
+            $normalized = $pattern.Replace('\', '/')
+            $escaped = [Regex]::Escape($normalized)
+            $escaped = $escaped.Replace('\*\*', '.*')
+            $escaped = $escaped.Replace('\*', '[^/]*')
+            $escaped = $escaped.Replace('\?', '[^/]')
+            return "^$escaped$"
+          }
+
+          $baseSha = $env:BASE_SHA
+          $headSha = $env:HEAD_SHA
+          $changedFiles = @(
+            git diff --name-only "$baseSha...$headSha" |
+              ForEach-Object { $_.Trim().Replace('\', '/') } |
+              Where-Object { $_ }
+          )
+
+          $rules = @(
+            @{
+              name = 'perf-workflow'
+              reason = 'perf gate workflow changed'
+              patterns = @('.github/workflows/perf-pr-gate.yml')
+            },
+            @{
+              name = 'perf-baseline-docs'
+              reason = 'perf baseline or perf docs changed'
+              patterns = @('docs/perf/**')
+            },
+            @{
+              name = 'runtime-js'
+              reason = 'runtime JavaScript can change measured behavior'
+              patterns = @('js/**')
+            },
+            @{
+              name = 'playwright-app-support'
+              reason = 'playwright app support affects perf harness'
+              patterns = @('tests/e2e/support/playwright-app.js')
+            },
+            @{
+              name = 'perf-tools'
+              reason = 'perf tooling changed'
+              patterns = @('tools/perf/**')
+            },
+            @{
+              name = 'dev-server'
+              reason = 'dev server behavior affects perf runs'
+              patterns = @('tools/dev_server.py')
+            },
+            @{
+              name = 'node-manifests'
+              reason = 'dependency manifest can affect perf gate environment'
+              patterns = @('package.json', 'package-lock.json')
+            }
+          )
+
+          $ruleHits = @()
+          foreach ($rule in $rules) {
+            $regexes = @($rule.patterns | ForEach-Object { Convert-GlobToRegex $_ })
+            $matchedFilesForRule = @(
+              $changedFiles |
+                Where-Object {
+                  $file = $_
+                  ($regexes | Where-Object { $file -match $_ } | Select-Object -First 1)
+                } |
+                Sort-Object -Unique
+            )
+
+            if ($matchedFilesForRule.Count -gt 0) {
+              $ruleHits += [ordered]@{
+                name = $rule.name
+                reason = $rule.reason
+                patterns = $rule.patterns
+                files = $matchedFilesForRule
+              }
+            }
+          }
+
+          $matchedRuleNames = @($ruleHits | ForEach-Object { $_.name })
+          $shouldRunPerf = $ruleHits.Count -gt 0
+          if ($shouldRunPerf) {
+            $reason = "run npm run perf:gate because matched rules: $($matchedRuleNames -join ', ')"
+          } elseif ($changedFiles.Count -eq 0) {
+            $reason = 'skip npm run perf:gate because no changed files were detected in the PR diff'
+          } else {
+            $reason = 'skip npm run perf:gate because no perf-related classifier rules matched'
+          }
+
+          $audit = [ordered]@{
+            base_sha = $baseSha
+            head_sha = $headSha
+            changed_files = $changedFiles
+            matched_rules = $ruleHits
+            should_run_perf = $shouldRunPerf
+            reason = $reason
+          }
+
+          $auditJsonPath = '.runtime/reports/generated/perf-pr-gate-classifier.json'
+          $auditMdPath = '.runtime/reports/generated/perf-pr-gate-classifier.md'
+          $audit | ConvertTo-Json -Depth 8 | Set-Content -Path $auditJsonPath
+
+          $changedFileLines = if ($changedFiles.Count -gt 0) {
+            ($changedFiles | ForEach-Object { '- `' + $_ + '`' }) -join "`n"
+          } else {
+            '- _none_'
+          }
+
+          $matchedRuleLines = if ($ruleHits.Count -gt 0) {
+            ($ruleHits | ForEach-Object {
+              $patterns = ($_.patterns | ForEach-Object { '`' + $_ + '`' }) -join ', '
+              $files = ($_.files | ForEach-Object { '`' + $_ + '`' }) -join ', '
+              ('- `' + $_.name + '` — ' + $_.reason + "`n  - patterns: $patterns`n  - files: $files")
+            }) -join "`n"
+          } else {
+            '- _none_'
+          }
+
+          $summary = @(
+            '## Perf classifier audit'
+            "- should run perf gate: $($shouldRunPerf.ToString().ToLowerInvariant())"
+            "- reason: $reason"
+            ''
+            '### Changed files'
+            $changedFileLines
+            ''
+            '### Matched rules'
+            $matchedRuleLines
+          ) -join "`n"
+          Set-Content -Path $auditMdPath -Value $summary
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $summary
+
+          "should_run_perf=$($shouldRunPerf.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "reason=$reason" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Upload perf classifier audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-pr-gate-classifier-audit
+          path: .runtime/reports/generated/perf-pr-gate-classifier.*
 
       - uses: actions/setup-node@v4
+        if: steps.classify.outputs.should_run_perf == 'true'
         with:
-          node-version: "22"
+          node-version: '22'
 
       - uses: actions/setup-python@v5
+        if: steps.classify.outputs.should_run_perf == 'true'
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install Node dependencies
+        if: steps.classify.outputs.should_run_perf == 'true'
         run: npm ci
 
       - name: Install Chromium
+        if: steps.classify.outputs.should_run_perf == 'true'
         run: npx playwright install chromium
 
       - name: Run perf gate
+        if: steps.classify.outputs.should_run_perf == 'true'
         run: npm run perf:gate
+
+      - name: Fast success for perf-unrelated changes
+        if: steps.classify.outputs.should_run_perf != 'true'
+        run: Write-Host "Perf gate skipped after classifier decision: ${{ steps.classify.outputs.reason }}"

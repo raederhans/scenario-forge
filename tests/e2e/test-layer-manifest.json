@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "scope": "tests/e2e/*.spec.js",
+  "specs": [
+    {
+      "specPath": "tests/e2e/city_label_i18n_redraw.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/city_lights_layer_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/city_marker_visibility_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/city_points_urban_runtime.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/city_reveal_plan_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/city_urban_rendering_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "city-runtime",
+      "ownerHint": "map-city"
+    },
+    {
+      "specPath": "tests/e2e/dev_workspace_i18n.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "dev-workspace",
+      "ownerHint": "dev-workspace"
+    },
+    {
+      "specPath": "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "dev-workspace",
+      "ownerHint": "dev-workspace"
+    },
+    {
+      "specPath": "tests/e2e/hoi4_1939_ui_smoke.spec.js",
+      "primaryLayer": "smoke",
+      "executionMode": "browser",
+      "domain": "hoi4-scenario",
+      "ownerHint": "scenario-hoi4"
+    },
+    {
+      "specPath": "tests/e2e/hoi4_rk_russia_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "hoi4-scenario",
+      "ownerHint": "scenario-hoi4"
+    },
+    {
+      "specPath": "tests/e2e/interaction_funnel_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "browser",
+      "domain": "shell-interaction",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/main_shell_i18n.spec.js",
+      "primaryLayer": "smoke",
+      "executionMode": "browser",
+      "domain": "main-shell",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/physical_layer_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/project_save_load_roundtrip.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "project-io",
+      "ownerHint": "project-persistence"
+    },
+    {
+      "specPath": "tests/e2e/review_regressions.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "review-workspace",
+      "ownerHint": "review-runtime"
+    },
+    {
+      "specPath": "tests/e2e/river_layer_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_apply_concurrency.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_apply_resilience.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_blank_exit.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_boundary_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_controls_dispatcher_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "hybrid",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
+      "specPath": "tests/e2e/scenario_shell_overlay_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "hybrid",
+      "domain": "scenario-shell",
+      "ownerHint": "scenario-shell"
+    },
+    {
+      "specPath": "tests/e2e/shortcut_history_render_boundary.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "shortcut-history",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/sidebar_default_collapse.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "sidebar-shell",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/startup_bundle_recovery_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "hybrid",
+      "domain": "startup",
+      "ownerHint": "startup-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_counter_canvas_smoke.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_editing.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_frontline.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_roundtrip.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_sidebar_entry_smoke.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/strategic_overlay_smoke.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "strategic-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/texture_overlay_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "texture-overlay",
+      "ownerHint": "overlay-runtime"
+    },
+    {
+      "specPath": "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "primaryLayer": "smoke",
+      "executionMode": "browser",
+      "domain": "tno-scenario",
+      "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/tno_named_water_rendering.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "tno-water",
+      "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/tno_open_ocean_rendering.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "tno-water",
+      "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/tno_ready_state_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "hybrid",
+      "domain": "tno-scenario",
+      "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "hybrid",
+      "domain": "tno-startup",
+      "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/transport_workbench_industrial_variants.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "transport-workbench",
+      "ownerHint": "transport-workbench"
+    },
+    {
+      "specPath": "tests/e2e/transport_workbench_label_rotation.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "transport-workbench",
+      "ownerHint": "transport-workbench"
+    },
+    {
+      "specPath": "tests/e2e/transport_workbench_port_coverage_tiers.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "transport-workbench",
+      "ownerHint": "transport-workbench"
+    },
+    {
+      "specPath": "tests/e2e/ui_contract_foundation.spec.js",
+      "primaryLayer": "smoke",
+      "executionMode": "browser",
+      "domain": "ui-foundation",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/ui_rework_mainline_shell_sidebar.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/ui_rework_support_transport_hardening.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "hybrid",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/water_cache_strategy_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "water-runtime",
+      "ownerHint": "water-runtime"
+    }
+  ]
+}
