@@ -6,6 +6,7 @@ module.exports = {
   outputDir: path.join(__dirname, ".runtime", "tests", "playwright"),
   reporter: "list",
   retries: process.env.CI ? 1 : 0,
+  grepInvert: process.env.CI ? /@dev/ : undefined,
   webServer: getWebServerConfig(),
   use: {
     baseURL: getConfiguredAppOrigin(),

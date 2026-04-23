@@ -11,6 +11,7 @@ hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 physical_layer_regression.spec.js
+physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js
 review_regressions.spec.js
 river_layer_regression.spec.js
@@ -18,7 +19,6 @@ scenario_apply_concurrency.spec.js
 scenario_apply_resilience.spec.js
 scenario_blank_exit.spec.js
 scenario_boundary_regression.spec.js
-scenario_chunk_exact_after_settle_regression.spec.js
 scenario_controls_dispatcher_contract.spec.js
 scenario_shell_overlay_contract.spec.js
 shortcut_history_render_boundary.spec.js
@@ -34,7 +34,6 @@ texture_overlay_regression.spec.js
 tno_1962_ui_smoke.spec.js
 tno_named_water_rendering.spec.js
 tno_open_ocean_rendering.spec.js
-tno_ready_state_contract.spec.js
 tno_startup_visible_context_layers_contract.spec.js
 transport_workbench_industrial_variants.spec.js
 transport_workbench_label_rotation.spec.js

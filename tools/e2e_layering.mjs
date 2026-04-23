@@ -24,9 +24,9 @@ const KNOWN_DIRECT_E2E_SCRIPT_TARGETS = new Set([
   "tests/e2e/ui_rework_support_transport_hardening.spec.js",
   "tests/e2e/scenario_apply_concurrency.spec.js",
   "tests/e2e/startup_bundle_recovery_contract.spec.js",
-  "tests/e2e/tno_ready_state_contract.spec.js",
-  "tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js",
   "tests/e2e/scenario_shell_overlay_contract.spec.js",
+  "tests/e2e/physical_layer_regression.spec.js",
+  "tests/e2e/physical_layer_runtime_contract.spec.js",
   "tests/e2e/main_shell_i18n.spec.js",
   "tests/e2e/hoi4_1939_ui_smoke.spec.js",
   "tests/e2e/tno_1962_ui_smoke.spec.js",
@@ -95,8 +95,8 @@ function validateManifest() {
   const seenSpecPaths = new Set();
 
   ensure(manifest?.scope === "tests/e2e/*.spec.js", `Unexpected manifest scope: ${manifest?.scope}`);
-  ensure(specs.length === 45, `Manifest must contain 45 specs, found ${specs.length}.`);
-  ensure(repoSpecs.length === 45, `Repository currently exposes ${repoSpecs.length} Playwright specs under tests/e2e.`);
+  ensure(specs.length === 44, `Manifest must contain 44 specs, found ${specs.length}.`);
+  ensure(repoSpecs.length === 44, `Repository currently exposes ${repoSpecs.length} Playwright specs under tests/e2e.`);
 
   for (const spec of specs) {
     ensure(typeof spec?.specPath === "string" && spec.specPath.startsWith("tests/e2e/"), `Invalid specPath: ${spec?.specPath}`);

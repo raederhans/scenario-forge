@@ -5,6 +5,7 @@
     "js/core/renderer/border_draw_owner.js",
     "js/core/renderer/border_mesh_owner.js",
     "js/core/renderer/political_collection_owner.js",
+    "js/core/renderer/spatial_index_runtime_state_ops.js",
     "js/core/renderer/spatial_index_runtime_owner.js",
     "js/core/renderer/spatial_index_runtime_builders.js",
     "js/core/renderer/strategic_overlay_runtime/operation_graphics_runtime_domain.js",
@@ -23,11 +24,11 @@
     "tests/e2e/dev_workspace_i18n.spec.js",
     "tests/e2e/dev_workspace_render_boundary.spec.js",
     "tests/e2e/physical_layer_regression.spec.js",
+    "tests/e2e/physical_layer_runtime_contract.spec.js",
     "tests/e2e/project_save_load_roundtrip.spec.js",
     "tests/e2e/river_layer_regression.spec.js",
     "tests/e2e/scenario_apply_concurrency.spec.js",
     "tests/e2e/scenario_boundary_regression.spec.js",
-    "tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js",
     "tests/e2e/shortcut_history_render_boundary.spec.js",
     "tests/e2e/strategic_overlay_counter_canvas_smoke.spec.js",
     "tests/e2e/strategic_overlay_editing.spec.js",
@@ -35,8 +36,10 @@
     "tests/e2e/strategic_overlay_roundtrip.spec.js",
     "tests/e2e/strategic_overlay_sidebar_entry_smoke.spec.js",
     "tests/e2e/strategic_overlay_smoke.spec.js",
-    "tests/e2e/support/playwright-app.js",
+    "tests/e2e/support/playwright-frontline-panel.js",
+    "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
+    "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
     "tests/e2e/tno_open_ocean_rendering.spec.js",
-    "tests/e2e/tno_ready_state_contract.spec.js"
+    "tests/renderer_runtime_state_behavior.test.mjs"
   ]
 }

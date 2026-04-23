@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { gotoApp } = require("./support/playwright-app");
+const { gotoApp } = require("../support/playwright-app");
 
 const TNO_READY_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&default_scenario=tno_1962";
 
@@ -73,6 +73,33 @@ test("TNO startup fast-tracks full hydration when startup shell lacks scenario m
     hasScenarioLandMask: true,
     hasScenarioContextLandMask: true,
     hydrationStatus: "ok",
+  });
+});
+
+test("TNO startup keeps default visible context layers after startup-topology slimming", async ({ page }) => {
+  test.setTimeout(240000);
+  await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });
+  await waitForTnoReady(page);
+
+  const visibleLayers = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      hasWaterRegionsData: !!state.waterRegionsData,
+      hasOceanData: !!state.oceanData,
+      hasLandBgData: !!state.landBgData,
+      hasUrbanData: !!state.urbanData,
+      hasPhysicalData: !!state.physicalData,
+      hasRiversData: !!state.riversData,
+    };
+  });
+
+  expect(visibleLayers).toEqual({
+    hasWaterRegionsData: true,
+    hasOceanData: true,
+    hasLandBgData: true,
+    hasUrbanData: true,
+    hasPhysicalData: true,
+    hasRiversData: true,
   });
 });
 

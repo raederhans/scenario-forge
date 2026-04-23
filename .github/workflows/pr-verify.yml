@@ -1,0 +1,10 @@
+name: pr-verify
+
+on:
+  pull_request:
+
+jobs:
+  verify:
+    uses: ./.github/workflows/verify-shared.yml
+    with:
+      run-e2e-smoke: true

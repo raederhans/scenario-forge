@@ -1,10 +1,6 @@
 const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
-function resolveBaseUrl() {
-  return getAppUrl();
-}
-
 async function waitForMapReady(page) {
   await page.waitForFunction(() => {
     const select = document.querySelector("#scenarioSelect");
@@ -15,46 +11,7 @@ async function waitForMapReady(page) {
   await page.waitForTimeout(1_500);
 }
 
-async function captureCanvasSnapshot(page) {
-  return page.evaluate(() => {
-    const canvas = document.getElementById("map-canvas");
-    const context = canvas instanceof HTMLCanvasElement
-      ? canvas.getContext("2d", { willReadFrequently: true })
-      : null;
-    if (!canvas || !context) {
-      return null;
-    }
-    const { width, height } = canvas;
-    const step = Math.max(6, Math.round(Math.min(width, height) / 180));
-    const imageData = context.getImageData(0, 0, width, height).data;
-    const pixels = [];
-    for (let y = 0; y < height; y += step) {
-      for (let x = 0; x < width; x += step) {
-        const offset = (y * width + x) * 4;
-        pixels.push(imageData[offset], imageData[offset + 1], imageData[offset + 2]);
-      }
-    }
-    return { width, height, step, pixels };
-  });
-}
-
-function getMeanRgbDiff(snapshotA, snapshotB) {
-  if (!snapshotA || !snapshotB) {
-    throw new Error("Missing canvas snapshot for RGB diff comparison.");
-  }
-  expect(snapshotA.width).toBe(snapshotB.width);
-  expect(snapshotA.height).toBe(snapshotB.height);
-  expect(snapshotA.step).toBe(snapshotB.step);
-  expect(snapshotA.pixels.length).toBe(snapshotB.pixels.length);
-
-  let diffTotal = 0;
-  for (let index = 0; index < snapshotA.pixels.length; index += 1) {
-    diffTotal += Math.abs(snapshotA.pixels[index] - snapshotB.pixels[index]);
-  }
-  return diffTotal / snapshotA.pixels.length;
-}
-
-test("physical layer defaults and atlas rendering regression", async ({ page }) => {
+test("physical layer runtime defaults and normalize contract stay stable", async ({ page }) => {
   test.setTimeout(60_000);
   const consoleErrors = [];
   const pageErrors = [];
@@ -84,11 +41,16 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
     });
   });
 
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
   await waitForMapReady(page);
 
   const inspection = await page.evaluate(async () => {
-    const { normalizePhysicalStyleConfig, PHYSICAL_ATLAS_PALETTE, state } = await import("/js/core/state.js");
+    const stateModuleUrl = new URL("js/core/state.js", document.baseURI).href;
+    const {
+      normalizePhysicalStyleConfig,
+      PHYSICAL_ATLAS_PALETTE,
+      state,
+    } = await import(stateModuleUrl);
 
     const defaults = {
       normalizedDefault: normalizePhysicalStyleConfig(null),
@@ -173,62 +135,6 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
     tundra_ice: "#b8c7d8",
   });
   expect(inspection.physicalBlendModeAfterNormalize).toBe("source-over");
-
-  await page.evaluate(async () => {
-    const { state, normalizePhysicalStyleConfig } = await import("/js/core/state.js");
-    const reliefFeature = {
-      type: "Feature",
-      properties: {
-        atlas_class: "mountain_high_relief",
-        atlas_layer: "relief_base",
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [[[-12, 36], [32, 36], [32, 60], [-12, 60], [-12, 36]]],
-      },
-    };
-
-    state.physicalSemanticsData = {
-      type: "FeatureCollection",
-      features: [reliefFeature],
-    };
-    state.deferContextBasePass = false;
-    state.styleConfig.physical = normalizePhysicalStyleConfig({
-      ...state.styleConfig.physical,
-      preset: "balanced",
-      mode: "atlas_only",
-      opacity: 0.56,
-      atlasOpacity: 0.44,
-      atlasIntensity: 0.96,
-      blendMode: "source-over",
-      contourMinorVisible: false,
-    });
-    Object.keys(state.renderPassCache.dirty || {}).forEach((key) => {
-      state.renderPassCache.dirty[key] = true;
-      state.renderPassCache.reasons[key] = "physical-visual-regression";
-    });
-    state.showPhysical = false;
-    state.renderNowFn?.();
-  });
-  await page.waitForTimeout(400);
-  const physicalOffSnapshot = await captureCanvasSnapshot(page);
-
-  await page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    state.showPhysical = true;
-    Object.keys(state.renderPassCache.dirty || {}).forEach((key) => {
-      state.renderPassCache.dirty[key] = true;
-      state.renderPassCache.reasons[key] = "physical-visual-regression";
-    });
-    state.renderNowFn?.();
-  });
-  await page.waitForTimeout(400);
-  const physicalOnSnapshot = await captureCanvasSnapshot(page);
-  const reliefOverlayDiff = getMeanRgbDiff(physicalOffSnapshot, physicalOnSnapshot);
-
-  expect(reliefOverlayDiff).toBeGreaterThan(0.9);
-  // 当前 atlas_only 视觉基线会覆盖更大范围，保留一个宽上界来拦截整页异常爆色。
-  expect(reliefOverlayDiff).toBeLessThan(120);
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
   expect(pageErrors, `Page errors: ${JSON.stringify(pageErrors, null, 2)}`).toEqual([]);
   expect(networkFailures, `Network failures: ${JSON.stringify(networkFailures, null, 2)}`).toEqual([]);

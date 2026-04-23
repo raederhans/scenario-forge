@@ -42,7 +42,7 @@ async function readFlushes(page) {
   return page.evaluate(() => [...(globalThis.__pwShortcutHistoryBoundary?.flushes || [])]);
 }
 
-test("history undo and redo flush through render boundary", async ({ page }) => {
+test("@dev history undo and redo flush through render boundary", async ({ page }) => {
   await gotoReady(page);
   await installBoundarySpy(page);
 
@@ -101,7 +101,7 @@ test("history undo and redo flush through render boundary", async ({ page }) => 
   ]);
 });
 
-test("Escape shortcut flushes for strategic overlay cancel and special-zone cancel", async ({ page }) => {
+test("@dev Escape shortcut flushes for strategic overlay cancel and special-zone cancel", async ({ page }) => {
   await gotoReady(page);
   await installBoundarySpy(page);
 

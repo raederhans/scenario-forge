@@ -1,18 +1,14 @@
-const fs = require("fs");
-const path = require("path");
 const { test, expect } = require("@playwright/test");
 const {
   applyScenarioAndWaitIdle,
-  DEFAULT_OPEN_PATH,
   gotoApp,
   waitForAppInteractive,
   waitForScenarioSelectReady,
-} = require("./support/playwright-app");
-const { DEFAULT_APP_PATH, DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("./support/startup-paths");
+} = require("../support/playwright-app");
+const { DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("../support/startup-paths");
 
 test.setTimeout(120_000);
 
-const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const FAST_STARTUP_PATH = toRootPath(DEFAULT_FAST_APP_OPEN_PATH);
 const HOI4_SYNC_PREWARM_PATH = `${FAST_STARTUP_PATH}&default_scenario=hoi4_1939`;
 
@@ -314,94 +310,4 @@ test("tno drag interaction settles cleanly without black-frame regression", asyn
   expect(afterDrag.renderPhase).toBe("idle");
   expect(afterDrag.isInteracting).toBe(false);
   expect(afterDrag.blackFrameCount).toBe(beforeDrag.blackFrameCount);
-});
-
-test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", async ({ page }) => {
-  await gotoApp(page, FAST_STARTUP_PATH, { waitUntil: "domcontentloaded" });
-
-  const contract = await page.evaluate(async () => {
-    const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
-    const rendererSource = await fetch(rendererSourceUrl).then((response) => response.text());
-
-    return {
-      drawContextScenarioPassKeepsScenarioOverlayBoundary:
-        /function drawContextScenarioPass\(k, \{ interactive = false \} = \{\}\) \{[\s\S]*?drawScenarioRegionOverlaysPass\(k\);[\s\S]*?drawScenarioReliefOverlaysLayer\(k\);[\s\S]*?recordRenderPerfMetric\("drawContextScenarioPass"/.test(rendererSource),
-      signatureOnlyContextScenarioInvalidationUsesTransformReuse:
-        /passName === "contextScenario"[\s\S]*?shouldEnableContextScenarioTransformReuse\(\)[\s\S]*?cache\.dirty\[passName\] = false;[\s\S]*?recordRenderPerfMetric\("contextScenarioReuseSkipped", 0, \{/.test(rendererSource),
-      exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
-        /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
-        && /scheduleExactAfterSettleRefresh[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(rendererSource),
-    };
-  });
-
-  expect(contract.drawContextScenarioPassKeepsScenarioOverlayBoundary).toBe(true);
-  expect(contract.signatureOnlyContextScenarioInvalidationUsesTransformReuse).toBe(true);
-  expect(contract.exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses).toBe(true);
-});
-
-test("perf contracts keep coarse first frame and benchmark app-path fallback boundaries", async () => {
-  const rendererSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "map_renderer.js"), "utf8");
-  const scenarioManagerSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "scenario_manager.js"), "utf8");
-  const scenarioApplyPipelineSource = fs.readFileSync(path.join(REPO_ROOT, "js", "core", "scenario_apply_pipeline.js"), "utf8");
-  const benchmarkSource = fs.readFileSync(path.join(REPO_ROOT, "ops", "browser-mcp", "editor-performance-benchmark.py"), "utf8");
-  const playwrightAppSource = fs.readFileSync(path.join(REPO_ROOT, "tests", "e2e", "support", "playwright-app.js"), "utf8");
-
-  const rendererChecks = {
-    politicalPassStartsWithBackgroundFills:
-      /function drawPoliticalPass\(k\) \{[\s\S]*?const visibleItems = debugMode === "PROD" \? collectVisibleLandSpatialItems\(\) : null;[\s\S]*?drawPoliticalBackgroundFills\(\{[\s\S]*?returnSummary: true,[\s\S]*?\}\);[\s\S]*?if \(!(?:runtimeState|state)\.landData\?\.features\?\.length\) return;/.test(rendererSource),
-    backgroundFillHelperKeepsScenarioMergeSplit:
-      /function drawPoliticalBackgroundFills\(options = \{\}\) \{[\s\S]*?if \(shouldUseScenarioPoliticalBackgroundMerge\(\)\) \{[\s\S]*?return drawScenarioPoliticalBackgroundFills\(options\);[\s\S]*?\}[\s\S]*?drawAdmin0BackgroundFills\(options\);/.test(rendererSource),
-    backgroundFullPassCacheBuildsAndReplays:
-      /function getScenarioPoliticalBackgroundFullPassGroups\([\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheReplay"[\s\S]*?recordRenderPerfMetric\("scenarioPoliticalBackgroundCacheBuild"/.test(rendererSource),
-  };
-
-  const scenarioApplyPipelineChecks = {
-    chunkedRuntimeSkipsBlockingDetailPromotion:
-      /const supportsChunkedPoliticalRuntime = scenarioSupportsChunkedRuntime\(bundle\)[\s\S]*?const detailPromoted = \(startupReadonly \|\| supportsChunkedPoliticalRuntime\)\s*\?\s*false\s*:\s*await ensureScenarioDetailTopologyLoaded\(\{ applyMapData: false \}\);/.test(scenarioApplyPipelineSource),
-    unconfirmedDetailPromotionStillWarnsBeforeHealthGate:
-      /if \(!detailReady && (?:runtimeState|state)\.topologyBundleMode !== "composite"\) \{[\s\S]*?console\.warn\("\[scenario\] Applying bundle without confirmed detail promotion; health gate will validate runtime topology\."\);/.test(scenarioApplyPipelineSource),
-  };
-
-  const scenarioManagerChecks = {
-    coarseInteractiveMetricRecordedAfterPostApplyEffects:
-      /const \{ dataHealth, scenarioMapRefreshMode, hasChunkedRuntime \} = await runPostScenarioApplyEffects\([\s\S]*?recordScenarioPerfMetric\(\s*"timeToInteractiveCoarseFrame",[\s\S]*?hasChunkedRuntime,[\s\S]*?mapRefreshMode: scenarioMapRefreshMode,/.test(scenarioManagerSource),
-  };
-
-  const benchmarkChecks = {
-    ensureAppPathUrlRewritesRootAndNestedPaths:
-      /def ensure_app_path_url\(url: str\) -> str:[\s\S]*?if path\.startswith\("\/app\/"\) or path == "\/app":[\s\S]*?elif path == "\/":[\s\S]*?normalized_path = "\/app\/"[\s\S]*?else:[\s\S]*?normalized_path = f"\/app\{path\}" if path\.startswith\("\/"\) else f"\/app\/\{path\}"/.test(benchmarkSource),
-    buildScenarioOpenUrlsAddsPerfOverlayAndScenarioCandidate:
-      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1"\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?scenario_perf_url = with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)[\s\S]*?urls\.append\(scenario_perf_url\)[\s\S]*?urls\.append\(perf_url\)/.test(benchmarkSource),
-    openPageKeepsWrapperThenLocalFallbackAcrossCandidates:
-      /def open_page\(urls: list\[str\] \| tuple\[str, \.\.\.\] \| str\) -> dict:[\s\S]*?if PWCLI\.exists\(\):[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_wrapper_pw\("open", candidate_url, "--browser", browser_name,[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_local_pw\(\s*"open",\s*candidate_url,\s*"--browser",\s*browser_name,/.test(benchmarkSource),
-    suiteBaseUrlsKeepOriginalAndAppVariants:
-      /suite_base_urls = unique_strings\(\[[\s\S]*?effective_url,[\s\S]*?ensure_app_path_url\(effective_url\),[\s\S]*?args\.url,[\s\S]*?ensure_app_path_url\(args\.url\),/.test(benchmarkSource),
-    sameScenarioFreshMetricSelectionIsExplicit:
-      /def is_same_scenario_fresh_metric_entry\([\s\S]*?def summarize_freshest_same_scenario_metric_entry\(/.test(benchmarkSource),
-  };
-
-  const playwrightAppChecks = {
-    e2eHarnessDefaultsToAppPath:
-      DEFAULT_APP_PATH === "/app/"
-      && DEFAULT_OPEN_PATH === DEFAULT_FAST_APP_OPEN_PATH
-      && playwrightAppSource.includes("const DEFAULT_OPEN_PATH = DEFAULT_FAST_APP_OPEN_PATH;"),
-    normalizeAppPathKeepsRootQueryAndHashOnAppRoute:
-      playwrightAppSource.includes('if (normalizedTarget === "/") {')
-      && playwrightAppSource.includes('if (normalizedTarget.startsWith("/app/")) {')
-      && playwrightAppSource.includes('if (normalizedTarget === "/app") {')
-      && playwrightAppSource.includes('if (normalizedTarget.startsWith("/?") || normalizedTarget.startsWith("/#")) {')
-      && playwrightAppSource.includes('return `/app${normalizedTarget}`;'),
-  };
-
-  const checks = {
-    ...rendererChecks,
-    ...scenarioApplyPipelineChecks,
-    ...scenarioManagerChecks,
-    ...benchmarkChecks,
-    ...playwrightAppChecks,
-  };
-
-  Object.entries(checks).forEach(([label, ok]) => {
-    expect(ok, label).toBe(true);
-  });
 });

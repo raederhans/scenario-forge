@@ -94,6 +94,13 @@
       "ownerHint": "map-runtime"
     },
     {
+      "specPath": "tests/e2e/physical_layer_runtime_contract.spec.js",
+      "primaryLayer": "contract",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
       "specPath": "tests/e2e/project_save_load_roundtrip.spec.js",
       "primaryLayer": "feature",
       "executionMode": "hybrid",
@@ -137,13 +144,6 @@
     },
     {
       "specPath": "tests/e2e/scenario_boundary_regression.spec.js",
-      "primaryLayer": "regression",
-      "executionMode": "browser",
-      "domain": "scenario-runtime",
-      "ownerHint": "scenario-runtime"
-    },
-    {
-      "specPath": "tests/e2e/scenario_chunk_exact_after_settle_regression.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",
       "domain": "scenario-runtime",
@@ -252,13 +252,6 @@
       "primaryLayer": "feature",
       "executionMode": "browser",
       "domain": "tno-water",
-      "ownerHint": "scenario-tno"
-    },
-    {
-      "specPath": "tests/e2e/tno_ready_state_contract.spec.js",
-      "primaryLayer": "contract",
-      "executionMode": "hybrid",
-      "domain": "tno-scenario",
       "ownerHint": "scenario-tno"
     },
     {

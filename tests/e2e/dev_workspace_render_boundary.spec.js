@@ -60,7 +60,7 @@ async function readBoundarySpy(page) {
   }));
 }
 
-test("dev workspace local selection and inspector actions flush through render boundary", async ({ page }) => {
+test("@dev dev workspace local selection and inspector actions flush through render boundary", async ({ page }) => {
   await gotoDevWorkspace(page);
   await installRenderBoundarySpy(page);
 
@@ -146,7 +146,7 @@ test("dev workspace local selection and inspector actions flush through render b
   )).toBe("");
 });
 
-test("dev workspace country save and locale save success flush through render boundary", async ({ page }) => {
+test("@dev dev workspace country save and locale save success flush through render boundary", async ({ page }) => {
   await gotoDevWorkspace(page);
   await installRenderBoundarySpy(page);
 

@@ -1,18 +1,28 @@
 # context
 
-- 任务边界已经收口到 1A + 1B：manifest、layer `--test-list`、layer 入口、smoke 重定义、覆盖检查、deploy smoke 统一入口，以及 perf-pr-gate required-check-safe 改造。
-- 已落地内容：
-  - 新增 `tests/e2e/test-layer-manifest.json`，只覆盖 `tests/e2e/*.spec.js` 这 45 个 Playwright spec。
-  - 新增 `tools/e2e_layering.mjs`，负责 manifest 校验、5 份 `test-list` 生成、layer 运行入口、覆盖检查。
-  - `test:e2e:smoke` 现已改成 `test:e2e:layer:smoke` 的兼容别名；smoke 固定为 4 个 spec，并在脚本层写死 `workers=2`、`retries=0`。
-  - smoke 第 4 条由 `strategic_overlay_smoke.spec.js` 调整为 `ui_contract_foundation.spec.js`。原因是前者在当前仓库和本地运行环境里持续出现超时，无法作为稳定 smoke；后者能稳定覆盖主 UI foundation 入口，且实跑通过。
-  - `scenario_apply_resilience.spec.js` 已留在 feature 层，从主 smoke 排除。
-  - `deploy.yml` 的 E2E smoke 已收口到统一 smoke 入口，单独 strategic overlay smoke 步骤已移除。
-  - `.github/workflows/perf-pr-gate.yml` 已改成 always-run `pull_request` workflow；`perf-gate` job 名保持不变；workflow 内新增 changed-files classifier、JSON/Markdown 审计产物和 artifact 上传。
-- 轻量验证策略：
+- 任务已完成并准备归档。
+- 本轮最终边界：1C + workflow reusable 收口 + 低成本 E2E 清理项。
+- guidance 文件保持原样，现实扩展范围只写入 plan/context/task。
+- `tools/build_*.py` 整合保持为下轮事项。
+- 稳定顶层 manifest 现为 44 个 `tests/e2e/*.spec.js`；两条长期 runtime 红的重型用例已移到 `tests/e2e/dev/`，保留专用 dev 入口，不再进入稳定 layer manifest。
+- 顶层稳定 TNO 合同入口已恢复为 `tests/e2e/tno_startup_visible_context_layers_contract.spec.js`；`test:e2e:tno-contracts` 现在跑它和 `tno_1962_ui_smoke.spec.js`。
+- 已完成实现：
+  - 新增 `tests/scenario_chunk_contracts.test.mjs` 与 `tests/physical_layer_contracts.test.mjs`。
+  - 新增 `tests/e2e/physical_layer_runtime_contract.spec.js`。
+  - `tests/e2e/physical_layer_regression.spec.js` 收到视觉回归。
+  - `tests/e2e/support/playwright-app.js` 已拆出 `playwright-app-paths.js`、`playwright-project-import.js`、`playwright-frontline-panel.js`、`playwright-web-server.js`。
+  - `tests/e2e/dev_workspace_render_boundary.spec.js` 与 `tests/e2e/shortcut_history_render_boundary.spec.js` 已标 `@dev`，`playwright.config.cjs` 已在 CI 排除 `@dev`。
+  - 新增 `verify-shared.yml`、`pr-verify.yml`、`scenario-contract-matrix.yml`；`deploy.yml` 与 `peripheral-contract-review.yml` 已收口。
+- 新鲜验证：
   - `npm run verify:test:e2e-layers` 通过。
-  - `npm run test:e2e:layer:all -- --list` 枚举到 95 tests / 45 files。
-  - `npm run test:e2e:smoke` 实跑通过，4 tests / 4 passed / 1.7m。
-  - 定向 smoke 复跑通过：`hoi4_1939_ui_smoke + tno_1962_ui_smoke` 通过，`main_shell_i18n` 单跑通过，`strategic_overlay_smoke` 单跑通过。
-  - JS 改动文件 `lsp_diagnostics` / `node --check` 为 0 error。
-  - `perf-pr-gate.yml` 已做 `git diff --check`，只剩 CRLF warning，没有格式错误。
+  - `npm run verify:state-write-allowlist` 通过。
+  - `npm run test:node:scenario-chunk-contracts` 通过。
+  - `npm run test:node:physical-layer-contracts` 通过。
+  - `npm run test:e2e:physical-layer-runtime-contract` 通过。
+  - `npm run test:e2e:physical-layer-regression` 通过。
+  - `npm run test:e2e:smoke` 通过，4 passed，1.1m。
+  - `npm run test:e2e:tno-contracts` 通过，2 passed，57.6s。
+  - `npm run verify:pages-dist` 通过。
+  - `python -m unittest tests.test_playwright_app_ready_gate_contract tests.test_strategic_overlay_e2e_ready_gate_contract -q` 通过。
+  - dev 入口 `tests/e2e/dev/tno_ready_state_contract.dev.spec.js` 与 `tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js` 已用 Playwright `--list` 验证可正常加载。
+- 终验：reviewer = APPROVE，architect = APPROVE，无阻塞点。

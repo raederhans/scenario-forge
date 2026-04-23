@@ -7,36 +7,6 @@ permissions:
   contents: read
 
 jobs:
-  hoi4-shared-contract-review:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        scenario_id:
-          - hoi4_1936
-          - hoi4_1939
-    steps:
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: "3.12"
-
-      - name: Prepare report directory
-        run: mkdir -p .runtime/reports/generated
-
-      - name: Run strict HOI4 shared contract review (${{ matrix.scenario_id }})
-        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/${{ matrix.scenario_id }} --report-path .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
-
-      - name: Upload HOI4 shared contract report (${{ matrix.scenario_id }})
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: ${{ matrix.scenario_id }}-strict-contract-report
-          path: .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
-
   hoi4-domain-contract-review:
     runs-on: ubuntu-latest
     strategy:
@@ -67,27 +37,3 @@ jobs:
           name: ${{ matrix.scenario_id }}-domain-review-inputs
           path: .runtime/reports/generated/scenarios/${{ matrix.scenario_id }}
           if-no-files-found: ignore
-
-  transport-manifest-review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: "3.12"
-
-      - name: Prepare report directory
-        run: mkdir -p .runtime/reports/generated
-
-      - name: Run transport manifest contract review
-        run: python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json
-
-      - name: Upload transport manifest report
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: transport-workbench-manifest-report
-          path: .runtime/reports/generated/transport_workbench_manifest_report.json

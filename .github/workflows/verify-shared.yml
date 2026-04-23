@@ -1,0 +1,60 @@
+name: verify-shared
+
+on:
+  workflow_call:
+    inputs:
+      run-e2e-smoke:
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Python test dependencies
+        run: python -m pip install -r requirements-dev.lock.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        if: inputs.run-e2e-smoke
+        run: npm run playwright:install:chromium
+
+      - name: Run Python unit tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Run renderer split node behavior tests
+        run: npm run test:node:renderer-splits
+
+      - name: Run scenario chunk static contracts
+        run: npm run test:node:scenario-chunk-contracts
+
+      - name: Run physical layer static contracts
+        run: npm run test:node:physical-layer-contracts
+
+      - name: Run strict TNO scenario contract gate
+        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
+
+      - name: Run smoke E2E
+        if: inputs.run-e2e-smoke
+        run: npm run test:e2e:smoke

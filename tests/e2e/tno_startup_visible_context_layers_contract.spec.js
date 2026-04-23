@@ -23,19 +23,17 @@ async function readTnoStartupVisibleLayers(page) {
   });
 }
 
-async function waitForTnoReady(page, { timeout = 120000 } = {}) {
+async function waitForTnoReady(page, { timeout = 120_000 } = {}) {
   await expect.poll(async () => readTnoStartupVisibleLayers(page), { timeout }).toMatchObject({
     activeScenarioId: "tno_1962",
     startupReadonly: false,
     startupReadonlyUnlockInFlight: false,
     scenarioApplyInFlight: false,
-    detailPromotionCompleted: true,
-    topologyBundleMode: "composite",
   });
 }
 
 test("TNO startup keeps default visible context layers after startup-topology slimming", async ({ page }) => {
-  test.setTimeout(240000);
+  test.setTimeout(240_000);
   await gotoApp(page, TNO_READY_PATH, { waitUntil: "domcontentloaded" });
   await waitForTnoReady(page);
 

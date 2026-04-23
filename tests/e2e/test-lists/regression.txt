@@ -8,7 +8,6 @@ physical_layer_regression.spec.js
 review_regressions.spec.js
 river_layer_regression.spec.js
 scenario_boundary_regression.spec.js
-scenario_chunk_exact_after_settle_regression.spec.js
 shortcut_history_render_boundary.spec.js
 texture_overlay_regression.spec.js
 water_cache_strategy_regression.spec.js

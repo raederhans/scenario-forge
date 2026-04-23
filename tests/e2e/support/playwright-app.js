@@ -1,70 +1,17 @@
-const path = require("path");
 const {
   DEFAULT_APP_PATH,
-  DEFAULT_FAST_APP_OPEN_PATH,
-} = require("./startup-paths");
-
-const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
-const DEFAULT_TEST_SERVER_PORT = String(
-  process.env.PLAYWRIGHT_TEST_SERVER_PORT
-  || process.env.MAPCREATOR_DEV_PORT
-  || "8810"
-).trim();
-const DEFAULT_APP_ORIGIN = `http://127.0.0.1:${DEFAULT_TEST_SERVER_PORT}`;
-const DEFAULT_OPEN_PATH = DEFAULT_FAST_APP_OPEN_PATH;
-
-function normalizeAppOrigin(value) {
-  const normalized = String(value || "").trim();
-  if (!normalized) {
-    return DEFAULT_APP_ORIGIN;
-  }
-  return normalized.replace(/\/+$/, "");
-}
-
-function getConfiguredAppOrigin() {
-  return normalizeAppOrigin(
-    process.env.PLAYWRIGHT_TEST_BASE_URL
-    || process.env.MAPCREATOR_BASE_URL
-    || process.env.MAPCREATOR_APP_URL
-    || DEFAULT_APP_ORIGIN
-  );
-}
-
-function shouldReuseExistingServer() {
-  const normalized = String(process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER || "").trim().toLowerCase();
-  if (["1", "true", "yes"].includes(normalized)) {
-    return true;
-  }
-  if (["0", "false", "no"].includes(normalized)) {
-    return false;
-  }
-  if (process.env.CODEX_CI) {
-    return false;
-  }
-  return !process.env.CI;
-}
-
-function normalizeAppPath(targetPath = DEFAULT_APP_PATH) {
-  const normalizedTarget = String(targetPath || DEFAULT_APP_PATH).trim() || DEFAULT_APP_PATH;
-  if (normalizedTarget === "/") {
-    return DEFAULT_APP_PATH;
-  }
-  if (normalizedTarget.startsWith("/app/")) {
-    return normalizedTarget;
-  }
-  if (normalizedTarget === "/app") {
-    return DEFAULT_APP_PATH;
-  }
-  if (normalizedTarget.startsWith("/?") || normalizedTarget.startsWith("/#")) {
-    return `/app${normalizedTarget}`;
-  }
-  return normalizedTarget.startsWith("/") ? normalizedTarget : `/${normalizedTarget}`;
-}
-
-function getAppUrl(targetPath = DEFAULT_APP_PATH) {
-  const pathname = normalizeAppPath(targetPath);
-  return new URL(pathname, `${getConfiguredAppOrigin()}/`).toString();
-}
+  DEFAULT_OPEN_PATH,
+  DEFAULT_APP_ORIGIN,
+  getAppUrl,
+  getConfiguredAppOrigin,
+} = require("./playwright-app-paths");
+const { openProjectFrontlineSection } = require("./playwright-frontline-panel");
+const {
+  waitForProjectImportSettled: waitForProjectImportSettledInternal,
+  beginProjectImportWatch: beginProjectImportWatchInternal,
+  waitForProjectImportCompletion: waitForProjectImportCompletionInternal,
+} = require("./playwright-project-import");
+const { getWebServerConfig } = require("./playwright-web-server");
 
 async function primeStateRef(page) {
   // Playwright `waitForFunction(async ...)` only waits on the returned Promise object itself,
@@ -276,147 +223,22 @@ async function applyScenarioAndWaitIdle(page, scenarioId, {
   }, expectedScenarioId, { timeout });
 }
 
-async function waitForProjectImportSettled(page, {
-  timeout = 30_000,
-  minOperationalLines = 0,
-  minOperationGraphics = 0,
-  minUnitCounters = 0,
-} = {}) {
+async function waitForProjectImportSettled(page, options = {}) {
   await primeStateRef(page);
-  await page.waitForFunction((expected) => {
-    const state = globalThis.__playwrightStateRef || null;
-    if (!state) return false;
-    const operationalLineCount = Array.isArray(state.operationalLines) ? state.operationalLines.length : 0;
-    const operationGraphicCount = Array.isArray(state.operationGraphics) ? state.operationGraphics.length : 0;
-    const unitCounterCount = Array.isArray(state.unitCounters) ? state.unitCounters.length : 0;
-    return (
-      !state.projectImportInFlight
-      && operationalLineCount >= expected.minOperationalLines
-      && operationGraphicCount >= expected.minOperationGraphics
-      && unitCounterCount >= expected.minUnitCounters
-    );
-  }, {
-    minOperationalLines: Math.max(0, Number(minOperationalLines) || 0),
-    minOperationGraphics: Math.max(0, Number(minOperationGraphics) || 0),
-    minUnitCounters: Math.max(0, Number(minUnitCounters) || 0),
-  }, { timeout });
+  return waitForProjectImportSettledInternal(page, options);
 }
 
 async function beginProjectImportWatch(page, { expectedFileName = "" } = {}) {
   await primeInteractionFunnelDebugRef(page);
-  const baseline = await page.evaluate(() => {
-    const getDebugState = globalThis.__playwrightInteractionFunnelDebugRef || null;
-    return typeof getDebugState === "function" ? getDebugState() : null;
-  });
-  return {
-    expectedFileName: String(expectedFileName || "").trim(),
-    initialImportStartCount: Number(baseline?.importStartCount || 0),
-    initialImportApplyCount: Number(baseline?.importApplyCount || 0),
-  };
+  return beginProjectImportWatchInternal(page, { expectedFileName });
 }
 
 async function waitForProjectImportCompletion(page, importWatchState, { timeout = 120_000 } = {}) {
-  const watchState = importWatchState && typeof importWatchState === "object" ? importWatchState : {};
-  const expectedFileName = String(watchState.expectedFileName || "").trim();
   await primeInteractionFunnelDebugRef(page);
-  const deadline = Date.now() + timeout;
-  while (Date.now() < deadline) {
-    const debug = await page.evaluate(() => {
-      const getDebugState = globalThis.__playwrightInteractionFunnelDebugRef || null;
-      return typeof getDebugState === "function" ? getDebugState() : null;
-    });
-    const importStarted = Number(debug?.importStartCount || 0) > Number(watchState.initialImportStartCount || 0);
-    if (importStarted) {
-      const importError = String(debug?.lastImportError || "").trim();
-      if (importError) {
-        throw new Error(`Project import failed: ${importError}`);
-      }
-      const importApplied = Number(debug?.importApplyCount || 0) > Number(watchState.initialImportApplyCount || 0);
-      const phaseComplete = String(debug?.importPhase || "") === "complete";
-      const fileMatches = !expectedFileName || String(debug?.lastImportFileName || "") === expectedFileName;
-      if (importApplied && phaseComplete && fileMatches) {
-        return;
-      }
-    }
-    await page.waitForTimeout(200);
-  }
-  const snapshot = await readBootStateSnapshot(page);
-  throw new Error(
-    `[playwright-app] waitForProjectImportCompletion timed out after ${timeout}ms. Boot snapshot: ${JSON.stringify(snapshot)}`
-  );
-}
-
-async function openProjectFrontlineSection(page, { timeout = 30_000 } = {}) {
-  await page.evaluate(async () => {
-    const sidebarModule = await import("/js/ui/sidebar.js");
-    const mapRendererModule = await import("/js/core/map_renderer.js");
-    if (
-      !document.querySelector("#frontlineProjectSection")
-      || !document.querySelector("#frontlineOverlayPanel")
-      || !document.querySelector("#strategicOverlayPanel")
-    ) {
-      sidebarModule.initSidebar({ render: mapRendererModule.render });
-    }
-    const projectTab = document.querySelector("#inspectorSidebarTabProject");
-    if (projectTab instanceof HTMLElement) {
-      projectTab.click();
-    }
-    const section = document.querySelector("#frontlineProjectSection");
-    if (section instanceof HTMLDetailsElement) {
-      section.open = true;
-    }
-    const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
-    const stateModule = await import(stateModuleUrl);
-    const state = stateModule?.state || null;
-    if (state && (!state.ui || typeof state.ui !== "object")) {
-      state.ui = {};
-    }
-    if (state) {
-      state.ui.rightSidebarTab = "project";
-      state.updateScenarioUIFn?.();
-      state.updateStrategicOverlayUIFn?.();
-    }
+  return waitForProjectImportCompletionInternal(page, importWatchState, {
+    timeout,
+    readBootStateSnapshot,
   });
-  await page.waitForFunction(() => {
-    const projectPanel = document.querySelector("#projectSidebarPanel");
-    const section = document.querySelector("#frontlineProjectSection");
-    return !!projectPanel
-      && !projectPanel.hidden
-      && !!section
-      && !!section.open
-      && !!document.querySelector("#frontlineOverlayPanel")
-      && !!document.querySelector("#strategicOverlayPanel");
-  }, { timeout });
-}
-
-function getWebServerConfig() {
-  if (
-    process.env.PLAYWRIGHT_TEST_BASE_URL
-    || process.env.MAPCREATOR_BASE_URL
-    || process.env.MAPCREATOR_APP_URL
-  ) {
-    return undefined;
-  }
-
-  const command = process.platform === "win32"
-    ? "py tools/dev_server.py"
-    : "python tools/dev_server.py";
-
-  return {
-    command,
-    cwd: REPO_ROOT,
-    url: getAppUrl(DEFAULT_APP_PATH),
-    timeout: 120_000,
-    reuseExistingServer: shouldReuseExistingServer(),
-    env: {
-      ...process.env,
-      MAPCREATOR_DEV_PORT: process.env.MAPCREATOR_DEV_PORT || DEFAULT_TEST_SERVER_PORT,
-      MAPCREATOR_OPEN_PATH: process.env.MAPCREATOR_OPEN_PATH || DEFAULT_OPEN_PATH,
-      MAPCREATOR_OPEN_BROWSER: "0",
-      MAPCREATOR_DEV_CACHE_MODE: process.env.MAPCREATOR_DEV_CACHE_MODE || "revalidate-static",
-      MAPCREATOR_RUNTIME_ROOT: process.env.MAPCREATOR_RUNTIME_ROOT || path.join(REPO_ROOT, ".runtime"),
-    },
-  };
 }
 
 module.exports = {
