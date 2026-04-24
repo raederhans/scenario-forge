@@ -523,7 +523,14 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawUrbanLayer",
   "drawRiversLayer",
   "drawScenarioRegionOverlaysPass",
+  "drawScenarioWaterFillLayer",
+  "drawScenarioSpecialRegionOverlaysLayer",
   "drawScenarioReliefOverlaysLayer",
+  "contextScenarioLayerWater",
+  "contextScenarioLayerSpecial",
+  "contextScenarioLayerRelief",
+  "contextScenarioLayerCacheHit",
+  "contextScenarioLayerCacheMiss",
 ]);
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
@@ -1323,6 +1330,7 @@ let deferredIndexUiRefreshState = null;
 let pendingSidebarRefreshHandle = null;
 let pendingSidebarRefreshState = null;
 let secondarySpatialBuildHandle = null;
+let pendingSecondarySpatialBuildReasons = new Set();
 let pendingScenarioChunkFlushAfterExactHandle = null;
 let deferredHeavyBorderMeshHandle = null;
 let deferredContextBaseEnhancementHandle = null;
@@ -1548,9 +1556,29 @@ function endContextMetricSession() {
   return breakdown;
 }
 
+function resetContextBreakdownForExactFrame() {
+  const metrics = ensureRenderPerfMetrics();
+  metrics.contextBreakdown = {};
+  globalThis.__renderPerfMetrics = metrics;
+}
+
 function incrementPerfCounter(counterName, amount = 1) {
   const cache = getRenderPassCacheState();
   cache.counters[counterName] = (Number(cache.counters[counterName]) || 0) + Number(amount || 0);
+}
+
+function recordUiRefreshMetric(name, details = {}) {
+  recordRenderPerfMetric(name, 0, {
+    recordedAt: Date.now(),
+    ...details,
+  });
+}
+
+function unwrapRuntimeHookResult(result) {
+  if (Array.isArray(result)) {
+    return result.find((entry) => entry && typeof entry === "object") || null;
+  }
+  return result && typeof result === "object" ? result : null;
 }
 
 function resolveContextScenarioReasonSnapshot({
@@ -2949,6 +2977,14 @@ function drawScenarioReliefOverlaysLayer(k) {
       skipped: true,
       reason: "no-overlays",
     });
+    collectContextMetric("contextScenarioLayerRelief", 0, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "no-overlays",
+      cacheMode: "direct",
+      signature: getScenarioReliefVisualRevisionToken(),
+    });
     return;
   }
   if (!runtimeState.showScenarioReliefOverlays) {
@@ -2958,6 +2994,14 @@ function drawScenarioReliefOverlaysLayer(k) {
       skipped: true,
       reason: "disabled",
     });
+    collectContextMetric("contextScenarioLayerRelief", 0, {
+      featureCount: overlays.length,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+      cacheMode: "direct",
+      signature: getScenarioReliefVisualRevisionToken(),
+    });
     return;
   }
   if (runtimeState.renderPhase === RENDER_PHASE_INTERACTING || runtimeState.renderPhase === RENDER_PHASE_SETTLING) {
@@ -2966,6 +3010,14 @@ function drawScenarioReliefOverlaysLayer(k) {
       renderedCount: 0,
       skipped: true,
       reason: runtimeState.renderPhase,
+    });
+    collectContextMetric("contextScenarioLayerRelief", 0, {
+      featureCount: overlays.length,
+      renderedCount: 0,
+      skipped: true,
+      reason: runtimeState.renderPhase,
+      cacheMode: "direct",
+      signature: getScenarioReliefVisualRevisionToken(),
     });
     return;
   }
@@ -3039,6 +3091,13 @@ function drawScenarioReliefOverlaysLayer(k) {
     renderedCount,
     skipped: false,
     phase: runtimeState.renderPhase,
+  });
+  collectContextMetric("contextScenarioLayerRelief", 0, {
+    featureCount: overlays.length,
+    renderedCount,
+    skipped: false,
+    cacheMode: "direct",
+    signature: getScenarioReliefVisualRevisionToken(),
   });
 }
 
@@ -3627,6 +3686,7 @@ function clearStagedMapDataTasks() {
   runtimeState.stagedContextBaseHandle = null;
   runtimeState.stagedHitCanvasHandle = null;
   secondarySpatialBuildHandle = null;
+  pendingSecondarySpatialBuildReasons.clear();
   deferredScenarioChunkPromotionInfraHandle = null;
   scenarioChunkPromotionVersion = 0;
 }
@@ -7685,6 +7745,78 @@ function shouldPreferWaterHit(landHit, waterHit, { eventType = "unknown" } = {})
   return false;
 }
 
+function collectInteractionHitMetricDetails(
+  pointer,
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", resolvedHit = null } = {}
+) {
+  if (!pointer) {
+    return {
+      eventType,
+      specialCandidateCount: 0,
+      landStrictCandidateCount: 0,
+      landSnapCandidateCount: 0,
+      waterStrictCandidateCount: 0,
+      waterSnapCandidateCount: 0,
+      resolvedTargetType: String(resolvedHit?.targetType || "empty"),
+    };
+  }
+  const snapRadiusPx = Number.isFinite(Number(snapPx))
+    ? Math.max(0, Number(snapPx))
+    : HIT_SNAP_RADIUS_PX;
+  const radiusProj = enableSnap && snapRadiusPx > 0
+    ? snapRadiusPx / Math.max(0.0001, pointer.zoomK)
+    : 0;
+  const specialStrict = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
+  const specialSnap = radiusProj > 0 ? collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj) : [];
+  const landStrict = collectGridCandidates(pointer.px, pointer.py, 0);
+  const landSnap = radiusProj > 0 ? collectGridCandidates(pointer.px, pointer.py, radiusProj) : [];
+  const waterStrict = collectWaterGridCandidates(pointer.px, pointer.py, 0);
+  const waterSnap = radiusProj > 0 ? collectWaterGridCandidates(pointer.px, pointer.py, radiusProj) : [];
+  return {
+    eventType,
+    specialCandidateCount: Math.max(specialStrict.length, specialSnap.length),
+    landStrictCandidateCount: landStrict.length,
+    landSnapCandidateCount: landSnap.length,
+    waterStrictCandidateCount: waterStrict.length,
+    waterSnapCandidateCount: waterSnap.length,
+    resolvedTargetType: String(resolvedHit?.targetType || "empty"),
+  };
+}
+
+function recordInteractionHitMetrics(pointer, options = {}) {
+  if (options.eventType === "hover") {
+    incrementPerfCounter("interactionHitCandidateCount", options.resolvedHit?.id ? 1 : 0);
+    if (options.resolvedHit?.hitSource === "canvas") {
+      incrementPerfCounter("interactionHitCanvasPreferredCount");
+    }
+    return;
+  }
+  const details = collectInteractionHitMetricDetails(pointer, options);
+  const totalCandidates =
+    details.specialCandidateCount
+    + details.landStrictCandidateCount
+    + details.landSnapCandidateCount
+    + details.waterStrictCandidateCount
+    + details.waterSnapCandidateCount;
+  incrementPerfCounter("interactionHitCandidateCount", totalCandidates);
+  if (options.resolvedHit?.hitSource === "canvas") {
+    incrementPerfCounter("interactionHitCanvasPreferredCount");
+  }
+  recordRenderPerfMetric("interactionHitCandidateCount", 0, {
+    ...details,
+    totalCandidateCount: totalCandidates,
+  });
+  recordRenderPerfMetric("interactionHitResolvedPath", 0, {
+    ...details,
+    hitSource: String(options.resolvedHit?.hitSource || "none"),
+    viaSnap: !!options.resolvedHit?.viaSnap,
+    strict: !!options.resolvedHit?.strict,
+  });
+  if (options.resolvedHit?.hitSource === "canvas") {
+    recordRenderPerfMetric("interactionHitCanvasPreferredCount", 0, details);
+  }
+}
+
 function getLandHitFromPointer(
   event,
   pointer,
@@ -7881,14 +8013,26 @@ function flushPendingIndexUiRefresh() {
   pendingIndexUiRefreshHandle = null;
   pendingIndexUiRefreshState = null;
   if (!pending) return;
+  const refreshedScopes = [];
   if (pending.renderCountryList && typeof runtimeState.renderCountryListFn === "function") {
     runtimeState.renderCountryListFn();
+    refreshedScopes.push("country");
   }
   if (pending.renderWaterRegionList && typeof runtimeState.renderWaterRegionListFn === "function") {
     runtimeState.renderWaterRegionListFn();
+    refreshedScopes.push("water");
   }
   if (pending.renderSpecialRegionList && typeof runtimeState.renderSpecialRegionListFn === "function") {
     runtimeState.renderSpecialRegionListFn();
+    refreshedScopes.push("special");
+  }
+  if (refreshedScopes.length) {
+    recordUiRefreshMetric("uiIndexFullRefresh", {
+      scope: refreshedScopes.length === 1 ? refreshedScopes[0] : "mixed",
+      refreshMode: "full",
+      fullRefreshReason: "full-index-rebuild",
+      refreshedScopes,
+    });
   }
 }
 
@@ -7968,6 +8112,62 @@ function normalizeSidebarRefreshOwnerCodes(values) {
     : [];
 }
 
+function refreshWaterRegionSidebarRowsNow(regionIds = [], { refreshInspector = true } = {}) {
+  const changedIds = normalizeSidebarRefreshIds(regionIds);
+  if (changedIds.length && typeof runtimeState.refreshWaterRegionListRowsFn === "function") {
+    const result = unwrapRuntimeHookResult(runtimeState.refreshWaterRegionListRowsFn({
+      regionIds: changedIds,
+      refreshInspector,
+    }));
+    const refreshMode = result?.refreshMode === "full" ? "full" : "row";
+    recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
+      scope: "water",
+      changedIds,
+      refreshMode,
+      fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
+      refreshInspector,
+    });
+    return;
+  }
+  if (typeof runtimeState.renderWaterRegionListFn === "function") {
+    runtimeState.renderWaterRegionListFn();
+    recordUiRefreshMetric("uiSidebarFullRefresh", {
+      scope: "water",
+      changedIds,
+      refreshMode: "full",
+      fullRefreshReason: changedIds.length ? "hook-unavailable" : "missing-changed-ids",
+    });
+  }
+}
+
+function refreshSpecialRegionSidebarRowsNow(regionIds = [], { refreshInspector = true } = {}) {
+  const changedIds = normalizeSidebarRefreshIds(regionIds);
+  if (changedIds.length && typeof runtimeState.refreshSpecialRegionListRowsFn === "function") {
+    const result = unwrapRuntimeHookResult(runtimeState.refreshSpecialRegionListRowsFn({
+      regionIds: changedIds,
+      refreshInspector,
+    }));
+    const refreshMode = result?.refreshMode === "full" ? "full" : "row";
+    recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
+      scope: "special",
+      changedIds,
+      refreshMode,
+      fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
+      refreshInspector,
+    });
+    return;
+  }
+  if (typeof runtimeState.renderSpecialRegionListFn === "function") {
+    runtimeState.renderSpecialRegionListFn();
+    recordUiRefreshMetric("uiSidebarFullRefresh", {
+      scope: "special",
+      changedIds,
+      refreshMode: "full",
+      fullRefreshReason: changedIds.length ? "hook-unavailable" : "missing-changed-ids",
+    });
+  }
+}
+
 function cancelPendingSidebarRefresh() {
   if (pendingSidebarRefreshHandle === null || pendingSidebarRefreshHandle === undefined) {
     pendingSidebarRefreshState = null;
@@ -7993,11 +8193,53 @@ function flushPendingSidebarRefresh() {
       ...pending.ownerCodes,
     ])
   );
-  if (typeof runtimeState.renderWaterRegionListFn === "function" && pending.waterRegionIds.length > 0) {
-    runtimeState.renderWaterRegionListFn();
+  const hasWaterRows = pending.waterRegionIds.length > 0;
+  const hasSpecialRows = pending.specialRegionIds.length > 0;
+  if (hasWaterRows) {
+    if (typeof runtimeState.refreshWaterRegionListRowsFn === "function") {
+      const result = unwrapRuntimeHookResult(runtimeState.refreshWaterRegionListRowsFn({
+        regionIds: pending.waterRegionIds,
+        refreshInspector: true,
+      }));
+      const refreshMode = result?.refreshMode === "full" ? "full" : "row";
+      recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
+        scope: "water",
+        changedIds: pending.waterRegionIds.slice(),
+        refreshMode,
+        fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
+      });
+    } else if (typeof runtimeState.renderWaterRegionListFn === "function") {
+      runtimeState.renderWaterRegionListFn();
+      recordUiRefreshMetric("uiSidebarFullRefresh", {
+        scope: "water",
+        changedIds: pending.waterRegionIds.slice(),
+        refreshMode: "full",
+        fullRefreshReason: "hook-unavailable",
+      });
+    }
   }
-  if (typeof runtimeState.renderSpecialRegionListFn === "function" && pending.specialRegionIds.length > 0) {
-    runtimeState.renderSpecialRegionListFn();
+  if (hasSpecialRows) {
+    if (typeof runtimeState.refreshSpecialRegionListRowsFn === "function") {
+      const result = unwrapRuntimeHookResult(runtimeState.refreshSpecialRegionListRowsFn({
+        regionIds: pending.specialRegionIds,
+        refreshInspector: true,
+      }));
+      const refreshMode = result?.refreshMode === "full" ? "full" : "row";
+      recordUiRefreshMetric(refreshMode === "row" ? "uiSidebarRowRefresh" : "uiSidebarFullRefresh", {
+        scope: "special",
+        changedIds: pending.specialRegionIds.slice(),
+        refreshMode,
+        fullRefreshReason: refreshMode === "full" ? String(result?.fullRefreshReason || "unstable-row-owner") : undefined,
+      });
+    } else if (typeof runtimeState.renderSpecialRegionListFn === "function") {
+      runtimeState.renderSpecialRegionListFn();
+      recordUiRefreshMetric("uiSidebarFullRefresh", {
+        scope: "special",
+        changedIds: pending.specialRegionIds.slice(),
+        refreshMode: "full",
+        fullRefreshReason: "hook-unavailable",
+      });
+    }
   }
   if (typeof runtimeState.refreshCountryListRowsFn === "function") {
     runtimeState.refreshCountryListRowsFn({
@@ -8005,10 +8247,26 @@ function flushPendingSidebarRefresh() {
       refreshInspector: true,
       refreshPresetTree: pending.refreshPresetTree,
     });
+    if (countryCodes.length > 0 || pending.refreshPresetTree) {
+      recordUiRefreshMetric("uiSidebarRowRefresh", {
+        scope: "country",
+        changedIds: countryCodes,
+        refreshMode: "row",
+        refreshInspector: true,
+        refreshPresetTree: pending.refreshPresetTree,
+      });
+    }
     return;
   }
   if (typeof runtimeState.renderCountryListFn === "function" && (countryCodes.length > 0 || pending.refreshPresetTree)) {
     runtimeState.renderCountryListFn();
+    recordUiRefreshMetric("uiSidebarFullRefresh", {
+      scope: "country",
+      changedIds: countryCodes,
+      refreshMode: "full",
+      fullRefreshReason: "hook-unavailable",
+      refreshPresetTree: pending.refreshPresetTree,
+    });
   }
   if (pending.refreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
     runtimeState.renderPresetTreeFn();
@@ -8190,13 +8448,25 @@ function scheduleSecondarySpatialIndexBuild({
   timeout = 48,
   reason = "deferred-secondary-spatial",
 } = {}) {
+  const normalizedReason = String(reason || "deferred-secondary-spatial").trim() || "deferred-secondary-spatial";
+  const hadPendingBuild = secondarySpatialBuildHandle !== null && secondarySpatialBuildHandle !== undefined;
+  pendingSecondarySpatialBuildReasons.add(normalizedReason);
+  if (!hadPendingBuild) {
+    incrementPerfCounter("interactionSecondaryIndexDemandCount");
+    recordRenderPerfMetric("interactionSecondaryIndexDemandCount", 0, {
+      reason: normalizedReason,
+      pendingReasonCount: pendingSecondarySpatialBuildReasons.size,
+    });
+  }
   cancelDeferredWork(secondarySpatialBuildHandle);
   secondarySpatialBuildHandle = scheduleDeferredWork(() => {
     secondarySpatialBuildHandle = null;
     if (isInteractionRecoveryBlocked()) {
-      scheduleSecondarySpatialIndexBuild({ timeout, reason });
+      scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
       return;
     }
+    const reasons = Array.from(pendingSecondarySpatialBuildReasons);
+    pendingSecondarySpatialBuildReasons.clear();
     const startedAt = nowMs();
     resetSecondarySpatialIndexState();
     buildSecondarySpatialIndexes({
@@ -8204,7 +8474,8 @@ function scheduleSecondarySpatialIndexBuild({
     });
     runtimeState.hitCanvasDirty = true;
     recordRenderPerfMetric("buildSecondarySpatialIndex", nowMs() - startedAt, {
-      reason,
+      reason: reasons.join(",") || normalizedReason,
+      reasons,
       waterItems: runtimeState.waterSpatialItems.length,
       specialItems: runtimeState.specialSpatialItems.length,
     });
@@ -8443,28 +8714,37 @@ function getHitFromEvent(
     enableSnap,
     snapPx,
   });
-  if (specialHit.id) {
-    return specialHit;
+  let resolvedHit = specialHit;
+  if (!resolvedHit.id) {
+    const landHit = getLandHitFromPointer(event, pointer, {
+      enableSnap,
+      snapPx,
+      eventType,
+    });
+    const waterHit = getWaterHitFromPointer(pointer, {
+      enableSnap,
+      snapPx,
+      eventType,
+    });
+    if (waterHit.id && isScenarioWaterRegion(waterHit.feature) && eventType !== "hover") {
+      resolvedHit = waterHit;
+    } else if (shouldPreferWaterHit(landHit, waterHit, { eventType })) {
+      resolvedHit = waterHit;
+    } else if (landHit.id) {
+      resolvedHit = landHit;
+    } else if (waterHit.id) {
+      resolvedHit = waterHit;
+    } else {
+      resolvedHit = createHitResult();
+    }
   }
-  const landHit = getLandHitFromPointer(event, pointer, {
+  recordInteractionHitMetrics(pointer, {
     enableSnap,
     snapPx,
     eventType,
+    resolvedHit,
   });
-  const waterHit = getWaterHitFromPointer(pointer, {
-    enableSnap,
-    snapPx,
-    eventType,
-  });
-  if (waterHit.id && isScenarioWaterRegion(waterHit.feature) && eventType !== "hover") {
-    return waterHit;
-  }
-  if (shouldPreferWaterHit(landHit, waterHit, { eventType })) {
-    return waterHit;
-  }
-  if (landHit.id) return landHit;
-  if (waterHit.id) return waterHit;
-  return createHitResult();
+  return resolvedHit;
 }
 
 function getFeatureIdFromEvent(event) {
@@ -16807,6 +17087,22 @@ function drawScenarioRegionOverlaysPass(k) {
   let waterVisibleCoverageRatio = 0;
   let waterPrevRenderedCount = Math.max(0, Number(lastScenarioWaterRenderedCount || 0));
   if (!showWater && !showSpecial) {
+    collectContextMetric("contextScenarioLayerWater", 0, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+      cacheMode: "disabled",
+      signature: getScenarioWaterVisualRevisionToken(),
+    });
+    collectContextMetric("contextScenarioLayerSpecial", 0, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+      cacheMode: "disabled",
+      signature: getScenarioSpecialVisualRevisionToken(),
+    });
     collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
       featureCount: 0,
       waterFeatureCount: 0,
@@ -16850,13 +17146,27 @@ function drawScenarioRegionOverlaysPass(k) {
 
     if (strategy === "direct" || strategy === "adaptive-direct") {
       waterCacheMode = strategy;
+      collectContextMetric("contextScenarioLayerCacheMiss", 0, {
+        layer: "water",
+        reason: strategy,
+        signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
+      });
       renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
     } else if (strategy === "reuse") {
       if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
         waterCacheMode = "reuse";
+        collectContextMetric("contextScenarioLayerCacheHit", 0, {
+          layer: "water",
+          renderedCount: Number(waterLayerEntry.renderedCount || 0),
+        });
         renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
       } else {
         waterCacheMode = "redraw";
+        collectContextMetric("contextScenarioLayerCacheMiss", 0, {
+          layer: "water",
+          reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
+          signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
+        });
         renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
         if (!drawCachedContextScenarioLayer("water", currentTransform)) {
           waterCacheMode = "direct";
@@ -16865,6 +17175,11 @@ function drawScenarioRegionOverlaysPass(k) {
       }
     } else if (strategy === "redraw") {
       waterCacheMode = "redraw";
+      collectContextMetric("contextScenarioLayerCacheMiss", 0, {
+        layer: "water",
+        reason: "forced-redraw",
+        signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
+      });
       renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
       if (!drawCachedContextScenarioLayer("water", currentTransform)) {
         waterCacheMode = "direct";
@@ -16873,9 +17188,18 @@ function drawScenarioRegionOverlaysPass(k) {
     } else {
       if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
         waterCacheMode = "reuse";
+        collectContextMetric("contextScenarioLayerCacheHit", 0, {
+          layer: "water",
+          renderedCount: Number(waterLayerEntry.renderedCount || 0),
+        });
         renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
       } else {
         waterCacheMode = "redraw";
+        collectContextMetric("contextScenarioLayerCacheMiss", 0, {
+          layer: "water",
+          reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
+          signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
+        });
         renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
         if (!drawCachedContextScenarioLayer("water", currentTransform)) {
           waterCacheMode = "direct";
@@ -16885,10 +17209,41 @@ function drawScenarioRegionOverlaysPass(k) {
     }
     highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
     lastScenarioWaterRenderedCount = Math.max(0, Number(renderedWaterCount || 0));
+    collectContextMetric("contextScenarioLayerWater", 0, {
+      featureCount: waterFeatures.length,
+      renderedCount: renderedWaterCount,
+      highlightedCount: highlightedWaterCount,
+      cacheMode: waterCacheMode,
+      signature: waterVisualRevision,
+    });
+  } else {
+    collectContextMetric("contextScenarioLayerWater", 0, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+      cacheMode: "disabled",
+      signature: getScenarioWaterVisualRevisionToken(),
+    });
   }
 
   if (showSpecial) {
     renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures });
+    collectContextMetric("contextScenarioLayerSpecial", 0, {
+      featureCount: specialFeatures.length,
+      renderedCount: renderedSpecialCount,
+      cacheMode: "direct",
+      signature: getScenarioSpecialVisualRevisionToken(),
+    });
+  } else {
+    collectContextMetric("contextScenarioLayerSpecial", 0, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+      cacheMode: "disabled",
+      signature: getScenarioSpecialVisualRevisionToken(),
+    });
   }
   collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
     featureCount: waterFeatures.length + specialFeatures.length,
@@ -17198,6 +17553,13 @@ function ensureIdleRenderPasses(timings) {
       cache.dirty[passName] = true;
       if (!cache.reasons[passName] || cache.reasons[passName] === "init") {
         cache.reasons[passName] = "signature";
+      }
+      if (passName === "contextScenario") {
+        recordRenderPerfMetric("contextScenarioSignatureChanged", 0, {
+          activeScenarioId: String(runtimeState.activeScenarioId || ""),
+          previousSignature: String(cache.signatures[passName] || ""),
+          nextSignature,
+        });
       }
     }
     if (
@@ -17510,6 +17872,7 @@ function drawCanvas() {
   }
 
   if (!useTransformedFrame || !drewFrame) {
+    resetContextBreakdownForExactFrame();
     ensureIdleRenderPasses(frameTimings);
     composeCachedPasses(RENDER_PASS_NAMES);
     drewFrame = true;
@@ -20670,9 +21033,7 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
   const currentColor = getWaterRegionColor(resolvedId);
   runtimeState.selectedWaterRegionId = resolvedId;
   if (currentColor === color) {
-    if (typeof runtimeState.renderWaterRegionListFn === "function") {
-      runtimeState.renderWaterRegionListFn();
-    }
+    refreshWaterRegionSidebarRowsNow([resolvedId]);
     return false;
   }
   const historyBefore = captureHistoryState({
@@ -21044,14 +21405,12 @@ async function handleClick(event, _interactionContext = null) {
   if (hit.targetType === "special") {
     const specialFeature = runtimeState.specialRegionsById.get(id);
     if (!specialFeature) return;
+    const previousWaterRegionId = String(runtimeState.selectedWaterRegionId || "").trim();
+    const previousSpecialRegionId = String(runtimeState.selectedSpecialRegionId || "").trim();
     runtimeState.selectedWaterRegionId = "";
-    if (typeof runtimeState.renderWaterRegionListFn === "function") {
-      runtimeState.renderWaterRegionListFn();
-    }
     runtimeState.selectedSpecialRegionId = id;
-    if (typeof runtimeState.renderSpecialRegionListFn === "function") {
-      runtimeState.renderSpecialRegionListFn();
-    }
+    if (previousWaterRegionId) refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
+    refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId, id]);
     if (runtimeState.currentTool === "eraser") {
       const historyBefore = captureHistoryState({ specialRegionIds: [id] });
       delete runtimeState.specialRegionOverrides[id];
@@ -21098,14 +21457,12 @@ async function handleClick(event, _interactionContext = null) {
   if (hit.targetType === "water") {
     const waterFeature = runtimeState.waterRegionsById.get(id);
     if (!waterFeature) return;
+    const previousSpecialRegionId = String(runtimeState.selectedSpecialRegionId || "").trim();
+    const previousWaterRegionId = String(runtimeState.selectedWaterRegionId || "").trim();
     runtimeState.selectedSpecialRegionId = "";
-    if (typeof runtimeState.renderSpecialRegionListFn === "function") {
-      runtimeState.renderSpecialRegionListFn();
-    }
     runtimeState.selectedWaterRegionId = id;
-    if (typeof runtimeState.renderWaterRegionListFn === "function") {
-      runtimeState.renderWaterRegionListFn();
-    }
+    if (previousSpecialRegionId) refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId]);
+    refreshWaterRegionSidebarRowsNow([previousWaterRegionId, id]);
     const macroOceanSelectionOnly =
       isMacroOceanWaterRegion(waterFeature) && !isOpenOceanPaintEnabled();
     if (macroOceanSelectionOnly) {
@@ -21144,16 +21501,14 @@ async function handleClick(event, _interactionContext = null) {
     return;
   }
   if (runtimeState.selectedWaterRegionId) {
+    const previousWaterRegionId = String(runtimeState.selectedWaterRegionId || "").trim();
     runtimeState.selectedWaterRegionId = "";
-    if (typeof runtimeState.renderWaterRegionListFn === "function") {
-      runtimeState.renderWaterRegionListFn();
-    }
+    refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
   }
   if (runtimeState.selectedSpecialRegionId) {
+    const previousSpecialRegionId = String(runtimeState.selectedSpecialRegionId || "").trim();
     runtimeState.selectedSpecialRegionId = "";
-    if (typeof runtimeState.renderSpecialRegionListFn === "function") {
-      runtimeState.renderSpecialRegionListFn();
-    }
+    refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId]);
   }
   let landHit = hit;
   let landId = id;
@@ -21872,6 +22227,7 @@ function setMapData({
   runtimeState.hitCanvasBuildScheduled = null;
   cancelDeferredWork(secondarySpatialBuildHandle);
   secondarySpatialBuildHandle = null;
+  pendingSecondarySpatialBuildReasons.clear();
   runtimeState.deferContextBasePass = false;
   runtimeState.deferHitCanvasBuild = false;
   runtimeState.deferExactAfterSettle = false;

@@ -72,3 +72,33 @@ Review result: current changes are minimal and targeted. No extra abstraction in
 - Fixed P2 by deriving `geo_locale_patch.en.json` / `geo_locale_patch.zh.json` from `geo_locale_patch.json` during HOI4 startup asset generation, so language URLs cannot hide base geo overrides.
 - Added tests for checked-in HOI4 legacy bootstrap political metadata, startup shell separation, startup bundle runtime meta, and language patch derivation.
 - Verification after remediation: `tests.test_startup_bootstrap_assets`, startup/perf/sidebar/UI/chunk unittest group, `npm run test:e2e:startup-bundle-recovery-contract`, focused HOI4 baseline with `startupBundleSource=startup-bundle`, and `npm run perf:gate` all passed.
+
+## 2026-04-24 Remaining overhaul fresh-context notes
+
+- Re-read AGENTS, lessons learned, ultrawork skill, and agent tiers.
+- Static-only subagents mapped UI fanout, contextScenario, interaction hit chain, and hydration. Parent kept live tests ownership.
+- Implemented row hooks and metrics in `map_renderer.js`, `sidebar.js`, `water_special_region_controller.js`, `config.js`, and `renderer_runtime_state.js`.
+- Hydration mapper found hook registration must remain eager; hidden panel deferral should be a separate guarded slice because URL replay and scenario boot depend on registered hooks.
+
+## 2026-04-24 Review remediation
+
+- Fixed review blockers:
+  - Water row refresh now falls back to full render for overrides-only and override-sort modes, and refreshes water filter counts after row updates.
+  - `contextBreakdown` is rebuilt from the current metric session only; disabled water/special layers emit explicit skipped layer metrics.
+  - Runtime hook return values are unwrapped from bus result arrays before telemetry classification.
+  - Secondary spatial demand metric records only when a new pending build is created.
+- Verification passed:
+  - `node --check js/core/map_renderer.js`
+  - `node --check js/ui/sidebar.js`
+  - `node --check js/ui/sidebar/water_special_region_controller.js`
+  - `node --check js/core/state/config.js`
+  - `node --check js/core/state/renderer_runtime_state.js`
+  - `python -m unittest tests.test_water_special_region_sidebar_boundary_contract tests.test_sidebar_split_boundary_contract`
+  - `python -m unittest tests.test_toolbar_split_boundary_contract`
+  - `npm run test:node:scenario-chunk-contracts`
+  - `npm run test:node:perf-probe-snapshot-behavior`
+
+## 2026-04-24 Review comment fix
+
+- Fixed `contextBreakdown` overwrite regression by resetting breakdown once at exact-frame start, then merging each context metric session into the current frame breakdown. This preserves base/markers/scenario entries in the same frame and avoids carrying stale entries across exact frames.
+- Verification passed: `node --check js/core/map_renderer.js`, `npm run test:node:scenario-chunk-contracts`, `npm run test:node:perf-probe-snapshot-behavior`.

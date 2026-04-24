@@ -622,6 +622,8 @@ export function createWaterSpecialRegionController({
       const button = document.createElement("button");
       button.type = "button";
       button.className = "inspector-item-btn";
+      button.dataset.regionId = featureId;
+      button.dataset.regionScope = "water";
       button.classList.toggle("is-active", featureId === runtimeState.selectedWaterRegionId);
       button.addEventListener("click", () => {
         runtimeState.selectedWaterRegionId = featureId;
@@ -666,6 +668,68 @@ export function createWaterSpecialRegionController({
     renderWaterLegend();
       updateWorkspaceStatus();
     scheduleAdaptiveInspectorHeights();
+  };
+
+  const refreshWaterRegionRows = ({ regionIds = [], refreshInspector = true } = {}) => {
+    const ids = Array.from(new Set(
+      (Array.isArray(regionIds) ? regionIds : [])
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+    ));
+    const sortMode = getWaterFilterValue(waterInspectorSortSelect) || "name";
+    if (waterInspectorOverridesOnlyToggle?.checked || sortMode === "override") {
+      renderWaterRegionList();
+      return {
+        refreshMode: "full",
+        fullRefreshReason: "unstable-row-owner",
+        changedIds: ids,
+      };
+    }
+    if (!ids.length) {
+      renderWaterRegionList();
+      return { refreshMode: "full", fullRefreshReason: "missing-changed-ids", changedIds: [] };
+    }
+    let needsFullRender = false;
+    ids.forEach((featureId) => {
+      const feature = runtimeState.waterRegionsById?.get(featureId);
+      const row = waterRowRefsById.get(featureId);
+      if (!feature || !row) {
+        needsFullRender = true;
+        return;
+      }
+      row.dataset.regionId = featureId;
+      row.dataset.regionScope = "water";
+      row.classList.toggle("is-active", featureId === runtimeState.selectedWaterRegionId);
+      const title = row.querySelector(".country-row-title");
+      if (title) title.textContent = getWaterFeatureDisplayName(feature);
+      const meta = row.querySelector(".country-select-meta");
+      if (meta) meta.textContent = getWaterFeatureMeta(feature);
+      const actions = row.querySelector(".country-row-actions");
+      if (actions) {
+        const swatch = document.createElement("span");
+        swatch.className = "country-select-swatch";
+        swatch.style.backgroundColor = getWaterFeatureColor(featureId);
+        actions.replaceChildren(swatch);
+        if (getWaterFeatureHasOverride(featureId)) {
+          const badge = document.createElement("span");
+          badge.className = "country-select-meta";
+          badge.textContent = "Override";
+          actions.appendChild(badge);
+        }
+      }
+    });
+    if (needsFullRender) {
+      renderWaterRegionList();
+      return { refreshMode: "full", fullRefreshReason: "unstable-row-owner", changedIds: ids };
+    }
+    renderWaterFilterUi();
+    if (refreshInspector) {
+      renderWaterInspectorDetail();
+      renderWaterLegend();
+    }
+    updateWorkspaceStatus();
+    scheduleAdaptiveInspectorHeights();
+    return { refreshMode: "row", changedIds: ids };
   };
 
   const getSpecialFeatureDisplayName = (feature) => {
@@ -888,6 +952,8 @@ export function createWaterSpecialRegionController({
       const button = document.createElement("button");
       button.type = "button";
       button.className = "inspector-item-btn";
+      button.dataset.regionId = featureId;
+      button.dataset.regionScope = "special";
       button.classList.toggle("is-active", featureId === runtimeState.selectedSpecialRegionId);
       button.addEventListener("click", () => {
         runtimeState.selectedSpecialRegionId = featureId;
@@ -926,6 +992,47 @@ export function createWaterSpecialRegionController({
     renderSpecialRegionLegend();
     updateWorkspaceStatus();
     scheduleAdaptiveInspectorHeights();
+  };
+
+  const refreshSpecialRegionRows = ({ regionIds = [], refreshInspector = true } = {}) => {
+    const ids = Array.from(new Set(
+      (Array.isArray(regionIds) ? regionIds : [])
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+    ));
+    if (!ids.length) {
+      renderSpecialRegionList();
+      return { refreshMode: "full", fullRefreshReason: "missing-changed-ids", changedIds: [] };
+    }
+    let needsFullRender = false;
+    ids.forEach((featureId) => {
+      const feature = runtimeState.specialRegionsById?.get(featureId);
+      const row = specialRegionRowRefsById.get(featureId);
+      if (!feature || !row) {
+        needsFullRender = true;
+        return;
+      }
+      row.dataset.regionId = featureId;
+      row.dataset.regionScope = "special";
+      row.classList.toggle("is-active", featureId === runtimeState.selectedSpecialRegionId);
+      const title = row.querySelector(".country-row-title");
+      if (title) title.textContent = getSpecialFeatureDisplayName(feature);
+      const meta = row.querySelector(".country-select-meta");
+      if (meta) meta.textContent = getSpecialFeatureMeta(feature);
+      const swatch = row.querySelector(".country-select-swatch");
+      if (swatch) swatch.style.backgroundColor = getSpecialFeatureColor(featureId, feature);
+    });
+    if (needsFullRender) {
+      renderSpecialRegionList();
+      return { refreshMode: "full", fullRefreshReason: "unstable-row-owner", changedIds: ids };
+    }
+    if (refreshInspector) {
+      renderSpecialRegionInspectorDetail();
+      renderSpecialRegionLegend();
+    }
+    updateWorkspaceStatus();
+    scheduleAdaptiveInspectorHeights();
+    return { refreshMode: "row", changedIds: ids };
   };
 
 
@@ -1206,7 +1313,9 @@ export function createWaterSpecialRegionController({
     closeWaterInspectorColorPicker,
     renderSpecialRegionInspectorUi,
     renderSpecialRegionList,
+    refreshSpecialRegionRows,
     renderWaterInteractionUi,
     renderWaterRegionList,
+    refreshWaterRegionRows,
   };
 }

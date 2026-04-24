@@ -18,3 +18,20 @@ Main thread owns implementation and verification. Subagents are static analysis 
 - [x] Inspect current fallback in flushPendingSidebarRefresh/applyAutoFill.
 - [x] Apply only a proven row-level refresh change.
 - [x] Run existing UI fanout contract if touched.
+
+## 2026-04-24 Remaining overhaul task progress
+
+- [x] Collect static mapper results.
+- [x] Implement UI fanout row hooks and metrics.
+- [x] Implement contextScenario metrics.
+- [x] Implement interaction hit metrics and secondary demand reason merge.
+- [ ] Hydration delayed-init implementation, split into a later guarded slice.
+- [ ] Full perf gate and e2e validation.
+
+## 2026-04-24 Review remediation task progress
+
+- [x] Fix water row refresh filter/sort consistency.
+- [x] Fix contextBreakdown current-frame metric semantics.
+- [x] Fix hook result telemetry unwrap.
+- [x] Fix secondary demand metric repeated counting.
+- [x] Run targeted syntax, contract, and node tests.

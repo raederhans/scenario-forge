@@ -3939,8 +3939,10 @@ function initSidebar({ render } = {}) {
   let closeSpecialRegionColorPicker = () => {};
   let renderWaterInteractionUi = () => {};
   let renderWaterRegionList = () => {};
+  let refreshWaterRegionRows = () => {};
   let renderSpecialRegionInspectorUi = () => {};
   let renderSpecialRegionList = () => {};
+  let refreshSpecialRegionRows = () => {};
 
   let bindProjectSupportDiagnosticsEvents = () => {};
   let refreshLegendEditor = () => {};
@@ -5139,8 +5141,10 @@ function initSidebar({ render } = {}) {
     closeSpecialRegionColorPicker,
     renderSpecialRegionInspectorUi,
     renderSpecialRegionList,
+    refreshSpecialRegionRows,
     renderWaterInteractionUi,
     renderWaterRegionList,
+    refreshWaterRegionRows,
   } = createWaterSpecialRegionController({
     runtimeState: state,
     elements: {
@@ -5400,8 +5404,10 @@ function initSidebar({ render } = {}) {
 
   registerRuntimeHook(state, "renderCountryListFn", renderList);
   registerRuntimeHook(state, "renderWaterRegionListFn", renderWaterRegionList);
+  registerRuntimeHook(state, "refreshWaterRegionListRowsFn", refreshWaterRegionRows);
   registerRuntimeHook(state, "updateWaterInteractionUIFn", renderWaterInteractionUi);
   registerRuntimeHook(state, "renderSpecialRegionListFn", renderSpecialRegionList);
+  registerRuntimeHook(state, "refreshSpecialRegionListRowsFn", refreshSpecialRegionRows);
   registerRuntimeHook(state, "updateScenarioSpecialRegionUIFn", renderSpecialRegionInspectorUi);
   registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);
   registerRuntimeHook(state, "updateLegendUI", refreshLegendEditor);
