@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-04-13T01:45:34Z",
+  "generated_at": "2026-03-28T21:25:26Z",
   "chunks": [
     {
       "id": "political.coarse.r0c0",
@@ -17,7 +17,7 @@
         90.0
       ],
       "priority": 100,
-      "feature_count": 13195,
+      "feature_count": 13208,
       "data_format": "geojson",
       "global_coverage": true,
       "country_codes": [
@@ -77,7 +77,6 @@
         "EC",
         "EE",
         "EG",
-        "ENG",
         "ER",
         "ES",
         "ET",
@@ -337,12 +336,12 @@
       "max_zoom": 99.0,
       "bounds": [
         -14.2939429394294,
-        5.617061749617491,
+        11.695967680676802,
         23.98163981639817,
         27.285531977319778
       ],
       "priority": 95,
-      "feature_count": 36,
+      "feature_count": 28,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -552,7 +551,7 @@
         45.75371313790748
       ],
       "priority": 95,
-      "feature_count": 862,
+      "feature_count": 899,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -951,7 +950,7 @@
         41.74506550265504
       ],
       "priority": 95,
-      "feature_count": 8,
+      "feature_count": 7,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -1442,27 +1441,6 @@
       ]
     },
     {
-      "id": "political.detail.country.eng",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/tno_1962/chunks/political.detail.country.eng.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        -4.555845558455587,
-        50.209013338133374,
-        -1.7838178381783791,
-        51.674060912609136
-      ],
-      "priority": 95,
-      "feature_count": 5,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "country_codes": [
-        "ENG"
-      ]
-    },
-    {
       "id": "political.detail.country.er",
       "layer": "political",
       "lod": "detail",
@@ -1533,13 +1511,13 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        -7.608676086760852,
+        -8.580685806858071,
         4.37072980829808,
-        -2.72342723427235,
-        7.351164269642695
+        -2.4930249302493053,
+        10.746464098640985
       ],
       "priority": 95,
-      "feature_count": 5,
+      "feature_count": 13,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -1644,7 +1622,7 @@
         37.17845267001695
       ],
       "priority": 95,
-      "feature_count": 16,
+      "feature_count": 13,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -1703,11 +1681,11 @@
       "bounds": [
         -5.7078570785707825,
         49.97293932139321,
-        -4.195841958419578,
-        50.92938625686257
+        -1.7838178381783791,
+        51.674060912609136
       ],
       "priority": 95,
-      "feature_count": 1,
+      "feature_count": 6,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -2148,7 +2126,7 @@
         37.17195293457393
       ],
       "priority": 95,
-      "feature_count": 29,
+      "feature_count": 28,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -2165,11 +2143,11 @@
       "bounds": [
         -17.0839708397084,
         20.80217570875709,
-        3.4398024802750724,
-        40.63577561999344
+        0.498869136272527,
+        40.36433950651821
       ],
       "priority": 95,
-      "feature_count": 14,
+      "feature_count": 8,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -2416,12 +2394,12 @@
       "max_zoom": 99.0,
       "bounds": [
         12.946977156404701,
-        39.0,
-        21.106132970628043,
+        40.24702394791671,
+        19.5343103600405,
         46.437036585365846
       ],
       "priority": 95,
-      "feature_count": 19,
+      "feature_count": 12,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -3828,7 +3806,7 @@
         54.83328672486725
       ],
       "priority": 95,
-      "feature_count": 378,
+      "feature_count": 380,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -4011,13 +3989,13 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        27.740077400774027,
+        43.850238502385025,
         48.04963042030421,
-        45.06705067050672,
-        59.99046248762487
+        47.579875798757996,
+        57.562024624246234
       ],
       "priority": 95,
-      "feature_count": 11,
+      "feature_count": 2,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -4032,13 +4010,13 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        22.700027000270012,
+        27.740077400774027,
         53.090505013050134,
         31.782917829178302,
-        59.948802367023674
+        59.99046248762487
       ],
       "priority": 95,
-      "feature_count": 4,
+      "feature_count": 12,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -4935,13 +4913,13 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        25.75,
+        26.159098063084794,
         34.07613163531636,
         43.97983979839799,
         42.163402547025456
       ],
       "priority": 95,
-      "feature_count": 18,
+      "feature_count": 12,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -5188,12 +5166,12 @@
       "max_zoom": 99.0,
       "bounds": [
         40.93060930609306,
-        57.09161242912428,
+        58.46813224732246,
         49.57069570695708,
         61.91724306543064
       ],
       "priority": 95,
-      "feature_count": 22,
+      "feature_count": 21,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -5456,7 +5434,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 9,
+      "feature_count": 10,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5475,7 +5453,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 45,
+      "feature_count": 44,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []

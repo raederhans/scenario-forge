@@ -77,6 +77,7 @@ import {
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
 import { flushRenderBoundary, requestRender } from "./render_boundary.js";
+import { registerRuntimeHook } from "./state/index.js";
 import {
   bindInteractionFunnel,
   dispatchMapClick,
@@ -517,6 +518,8 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawCityPointsLayer",
   "drawAirportsLayer",
   "drawPortsLayer",
+  "drawRoadsLayer",
+  "drawRailwaysLayer",
   "drawUrbanLayer",
   "drawRiversLayer",
   "drawScenarioRegionOverlaysPass",
@@ -1134,6 +1137,7 @@ function getBorderMeshOwner() {
       shouldExcludePoliticalInteractionFeature,
       simplifyPolylineEffectiveArea,
       getStaticMeshSourceCountries: () => staticMeshSourceCountries,
+      getScenarioSurfaceVersionSignal,
       updateDynamicBorderStatusUI,
     },
   });
@@ -1265,6 +1269,7 @@ function getSpatialIndexRuntimeOwner() {
       getFeatureCountryCodeNormalized,
       getFeatureBorderMeshCountryCodeNormalized,
       shouldExcludePoliticalInteractionFeature,
+      shouldExcludePoliticalVisualFeature,
       buildSpatialGrid,
       nowMs,
       recordRenderPerfMetric,
@@ -1665,6 +1670,36 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
 function invalidateAllRenderPasses(reason = "unspecified") {
   invalidateRenderPasses(RENDER_PASS_NAMES, reason);
 }
+
+function releaseDeferredContextBasePass(reason = "deferred-context-release") {
+  const normalizedReason = String(reason || "deferred-context-release").trim() || "deferred-context-release";
+  if (!runtimeState.deferContextBasePass) {
+    return false;
+  }
+  const hadStagedContextBaseHandle = !!runtimeState.stagedContextBaseHandle;
+  runtimeState.deferContextBasePass = false;
+  cancelDeferredWork(runtimeState.stagedContextBaseHandle);
+  runtimeState.stagedContextBaseHandle = null;
+  if (hadStagedContextBaseHandle && runtimeState.deferHitCanvasBuild) {
+    scheduleStagedHitCanvasWarmup(nowMs(), Number(runtimeState.stagedMapDataToken || 0));
+  }
+  invalidateRenderPasses(["contextBase", "contextMarkers"], normalizedReason);
+  clearRenderPassReferenceTransforms(["contextBase", "contextMarkers"]);
+  requestRendererRender(normalizedReason, {
+    flush: true,
+    fallback: () => {
+      if (context) render();
+    },
+  });
+  recordRenderPerfMetric("releaseDeferredContextBasePass", 0, {
+    canceledStagedContextBase: hadStagedContextBaseHandle,
+    released: true,
+    reason: normalizedReason,
+  });
+  return true;
+}
+
+registerRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", releaseDeferredContextBasePass);
 
 function isBootInteractionReady() {
   return String(runtimeState.bootPhase || "").trim().toLowerCase() === "ready" && !runtimeState.bootBlocking;
@@ -2203,13 +2238,29 @@ function getScenarioDetailPhaseSignatureToken() {
   ].join("/");
 }
 
-function getScenarioWaterVisualRevisionToken() {
+function isScenarioWaterTopologyExclusiveMode() {
+  return String(runtimeState.activeScenarioId || "").trim().toLowerCase() === "tno_1962";
+}
+
+function getScenarioSurfaceVersionSignal() {
+  const maskInfo = getPhysicalLandMaskInfo();
+  const runtimeTopologyRef = runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology || null;
+  const effectiveWaterFeatureCount = getEffectiveWaterRegionFeatures().length;
   return [
-    runtimeState.topologyRevision || 0,
     runtimeState.activeScenarioId || "",
-    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `runtime-tag:${String(runtimeState.scenarioRuntimeTopologyVersionTag || "").trim() || `${getObjectIdentityToken(runtimeTopologyRef, "scenario-runtime-topology")}:${getScenarioRuntimeTopologySignatureToken()}`}`,
     `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
-    `water-global:${getFeatureCollectionFeatureCount(runtimeState.waterRegionsData)}`,
+    `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`}`,
+    `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
+    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
+  ].join("|");
+}
+
+function getScenarioWaterVisualRevisionToken() {
+  const effectiveWaterFeatureCount = getEffectiveWaterRegionFeatures().length;
+  return [
+    getScenarioSurfaceVersionSignal(),
+    `water-effective:${effectiveWaterFeatureCount}`,
     `water-scenario:${getFeatureCollectionFeatureCount(runtimeState.scenarioWaterRegionsData)}`,
     `water-overrides:${stableJson(runtimeState.waterRegionOverrides || {})}`,
     runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
@@ -2648,9 +2699,15 @@ function isWaterRegionExcludedByScenario(feature) {
 }
 
 function getEffectiveWaterRegionFeatures() {
+  const scenarioFeatures = Array.isArray(runtimeState.scenarioWaterRegionsData?.features)
+    ? runtimeState.scenarioWaterRegionsData.features
+    : [];
+  if (isScenarioWaterTopologyExclusiveMode()) {
+    return scenarioFeatures.filter((feature) => !isWaterRegionExcludedByScenario(feature));
+  }
   return [
     ...(Array.isArray(runtimeState.waterRegionsData?.features) ? runtimeState.waterRegionsData.features : []),
-    ...(Array.isArray(runtimeState.scenarioWaterRegionsData?.features) ? runtimeState.scenarioWaterRegionsData.features : []),
+    ...scenarioFeatures,
   ].filter((feature) => !isWaterRegionExcludedByScenario(feature));
 }
 
@@ -3028,6 +3085,15 @@ function getFeatureBorderMeshCountryCodeNormalized(feature) {
   );
 }
 
+function getFeatureInteractionCountryCodeNormalized(feature, featureId = null) {
+  const resolvedId = String(featureId || "").trim() || getFeatureId(feature);
+  return canonicalCountryCode(
+    getDisplayOwnerCode(feature, resolvedId)
+    || getFeatureCountryCodeNormalized(feature)
+    || ""
+  );
+}
+
 function getAtlantropaSurfaceKind(feature) {
   return String(feature?.properties?.atl_surface_kind || "").trim().toLowerCase();
 }
@@ -3194,7 +3260,7 @@ function buildCountryDominantFillColorMap() {
   getFullLandDataFeatures().forEach((feature, index) => {
     const countryCode = getFeatureCountryCodeNormalized(feature);
     const id = getFeatureId(feature) || `feature-${index}`;
-    if (!countryCode || !id || shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    if (!countryCode || !id || shouldExcludePoliticalVisualFeature(feature, id)) return;
     const color = getSafeCanvasColor(runtimeState.colors?.[id], null) || getResolvedFeatureColor(feature, id);
     if (!color) return;
     const countryCounts = countsByCountry.get(countryCode) || new Map();
@@ -4265,12 +4331,43 @@ function isAtlantropaSupportHelperFeature(feature, featureId = null) {
   );
 }
 
-function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
+function isAtlantropaVisualSupportHelperFeature(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (
+    candidate.startsWith("ATLSHL_")
+    || candidate.startsWith("ATLWLD_")
+    || candidate.startsWith("ATLSEA_FILL_")
+  ) {
+    return true;
+  }
+  const geometryRole = getAtlantropaGeometryRole(feature);
+  const joinMode = getAtlantropaJoinMode(feature);
+  return (
+    geometryRole === "shore_seal"
+    || geometryRole === "sea_completion"
+    || geometryRole === "donor_sea"
+    || joinMode === "gap_fill"
+  );
+}
+
+function isPoliticalVisualRenderableFeature(feature, featureId = null) {
   if (!feature) return false;
   if (isAntarcticSectorFeature(feature, featureId)) return false;
   if (isBaseGeographyScenarioFeature(feature)) return false;
-  if (feature?.properties?.interactive === false) return false;
   if (isScenarioShellFeature(feature, featureId)) return false;
+  if (isAtlantropaVisualSupportHelperFeature(feature, featureId)) return false;
+  return true;
+}
+
+function shouldExcludePoliticalVisualFeature(feature, featureId = null) {
+  return !isPoliticalVisualRenderableFeature(feature, featureId);
+}
+
+function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
+  if (!isPoliticalVisualRenderableFeature(feature, featureId)) return false;
+  if (feature?.properties?.interactive === false) return false;
   if (isAtlantropaSupportHelperFeature(feature, featureId)) return false;
   return true;
 }
@@ -5657,14 +5754,14 @@ function getEntityOwnerCode(entity) {
 function shouldExcludeOwnerBorderEntity(entity, { excludeSea = false } = {}) {
   if (!entity) return false;
   const feature = asFeatureLike(entity);
-  if (shouldExcludePoliticalInteractionFeature(feature)) return true;
+  if (shouldExcludePoliticalVisualFeature(feature)) return true;
   if (!excludeSea) return false;
   return isAtlantropaSeaFeature(feature);
 }
 
 function resolveOwnerBorderCode(entity, ownershipContext = {}) {
   const feature = asFeatureLike(entity);
-  if (shouldExcludePoliticalInteractionFeature(feature)) {
+  if (shouldExcludePoliticalVisualFeature(feature)) {
     return "";
   }
   const featureId = getEntityFeatureId(entity);
@@ -6295,6 +6392,7 @@ function getCoastlineDecisionSignature(decision = null) {
     return "";
   }
   return [
+    String(decision.scenarioSurfaceVersionSignal || ""),
     String(decision.source || ""),
     String(decision.reason || ""),
     String(decision.scenarioId || ""),
@@ -6820,6 +6918,7 @@ function createHitResult(overrides = {}) {
   return {
     id: null,
     countryCode: null,
+    runtimeCountryCode: null,
     targetType: null,
     feature: null,
     hitSource: "none",
@@ -6879,6 +6978,7 @@ function drawHitCanvas() {
     visibleSpatialItems.forEach((item) => {
       const key = runtimeState.idToKey.get(item.id);
       if (!key || !item?.feature) return;
+      if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
       hitContext.beginPath();
       pathHitCanvas(item.feature);
       hitContext.fillStyle = keyToHitColor(key);
@@ -6994,7 +7094,8 @@ function getHitResultFromCanvas(event) {
   }
   return createHitResult({
     id,
-    countryCode: getFeatureCountryCodeNormalized(feature),
+    countryCode: getFeatureInteractionCountryCodeNormalized(feature, id),
+    runtimeCountryCode: getFeatureCountryCodeNormalized(feature),
     targetType: "land",
     feature,
     hitSource: "canvas",
@@ -7187,6 +7288,7 @@ function collectVisibleLandSpatialItems() {
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
     seen.add(item.id);
+    if (shouldExcludePoliticalVisualFeature(item.feature, item.id)) return;
     if (!doesSpatialItemIntersectProjectedViewport(item, viewportBounds)) return;
     visibleItems.push(item);
   };
@@ -7365,11 +7467,21 @@ function getPointerProjectionPosition(event) {
 function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, targetType = "land" } = {}) {
   const resolvedId = String(candidate?.item?.featureId || candidate?.item?.id || "").trim();
   if (!resolvedId) return createHitResult();
+  const feature = candidate.item.feature || null;
+  const runtimeCountryCode = canonicalCountryCode(
+    candidate.item.countryCode
+    || getFeatureCountryCodeNormalized(feature)
+    || ""
+  );
+  const interactionCountryCode = feature
+    ? getFeatureInteractionCountryCodeNormalized(feature, resolvedId)
+    : canonicalCountryCode(candidate.item.interactionCountryCode || candidate.item.borderMeshCountryCode || runtimeCountryCode || "");
   return createHitResult({
     id: resolvedId,
-    countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
+    countryCode: interactionCountryCode || runtimeCountryCode,
+    runtimeCountryCode,
     targetType,
-    feature: candidate.item.feature || null,
+    feature,
     hitSource: "spatial",
     bboxArea: Number(candidate.bboxArea || candidate.item.bboxArea || Infinity),
     viaSnap,
@@ -7920,6 +8032,44 @@ function scheduleSecondarySpatialIndexBuild({
       specialItems: runtimeState.specialSpatialItems.length,
     });
   }, { timeout });
+}
+
+function syncScenarioSecondaryRegionIndexes({
+  changedLayerKeys = [],
+  reason = "scenario-chunk-promotion",
+} = {}) {
+  const normalizedLayerKeys = new Set(
+    (Array.isArray(changedLayerKeys) ? changedLayerKeys : [])
+      .map((layerKey) => String(layerKey || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+  const hasWaterChange = normalizedLayerKeys.has("water");
+  const hasSpecialChange = normalizedLayerKeys.has("special");
+  if (!hasWaterChange && !hasSpecialChange) {
+    return false;
+  }
+  if (isInteractionRecoveryBlocked()) {
+    return false;
+  }
+  const startedAt = nowMs();
+  rebuildAuxiliaryRegionIndexes();
+  resetSecondarySpatialIndexState();
+  buildSecondarySpatialIndexes({
+    allowComputeMissingBounds: true,
+  });
+  queueIndexUiRefresh({
+    renderWaterRegionList: hasWaterChange,
+    renderSpecialRegionList: hasSpecialChange,
+  });
+  runtimeState.hitCanvasDirty = true;
+  recordRenderPerfMetric("scenarioChunkSecondaryRegionIndexesSync", nowMs() - startedAt, {
+    reason,
+    waterItems: runtimeState.waterSpatialItems.length,
+    specialItems: runtimeState.specialSpatialItems.length,
+    hasWaterChange,
+    hasSpecialChange,
+  });
+  return true;
 }
 
 function rebuildRuntimeDerivedState({
@@ -9444,8 +9594,7 @@ function getPhysicalLandMask() {
 function getPhysicalLandClipCacheKey(maskInfo) {
   return [
     getProjectionRenderSignature(),
-    `mask:${maskInfo?.maskSource || "none"}:${maskInfo?.maskFeatureCount || 0}:${maskInfo?.maskArcRefEstimate ?? "na"}`,
-    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+    `scenario-surface:${getScenarioSurfaceVersionSignal()}`,
   ].join("::");
 }
 
@@ -15165,6 +15314,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     if (!feature?.geometry) return;
     if (isAntarcticSectorFeature(feature, id)) return;
     if (isBaseGeographyScenarioFeature(feature)) return;
+    if (shouldExcludePoliticalVisualFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
     const projectedBounds = getProjectedFeatureBounds(feature, {
       featureId: id,
@@ -15236,7 +15386,12 @@ function buildScenarioPoliticalBackgroundEntriesFromSpatialItems(items = []) {
         maxY: Number(item.maxY),
       }
       : null,
-  })).filter((entry) => entry.feature?.geometry && entry.id && entry.projectedBounds);
+  })).filter((entry) => (
+    entry.feature?.geometry
+    && entry.id
+    && entry.projectedBounds
+    && !shouldExcludePoliticalVisualFeature(entry.feature, entry.id)
+  ));
 }
 
 function collectScenarioPoliticalBackgroundSpatialEntries({
@@ -15714,7 +15869,7 @@ function drawPoliticalFeature(
   } = {},
 ) {
   const id = getFeatureId(feature) || `feature-${index}`;
-  if (shouldExcludePoliticalInteractionFeature(feature, id)) return false;
+  if (shouldExcludePoliticalVisualFeature(feature, id)) return false;
   if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return false;
   if (!skipScreenCheck && !pathBoundsInScreen(feature)) return false;
   const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
@@ -15851,7 +16006,7 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
       dirtyRects.push(null);
       return;
     }
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    if (shouldExcludePoliticalVisualFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
     const rect = getFeatureScreenBounds(feature, {
       featureId: id,
@@ -16555,6 +16710,18 @@ function drawContextMarkersPass(k, { interactive = false } = {}) {
       });
       collectContextMetric("drawPortsLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(runtimeState.portsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawRoadsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(runtimeState.roadsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawRailwaysLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(runtimeState.railwaysData),
         interactive: false,
         skipped: true,
         reason: "staged-apply",
@@ -19128,7 +19295,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     const ownerColors = computed?.ownerColors || {};
     runtimeState.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+      if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
       if (!ownerCode || nextCountryBaseColors[ownerCode]) return;
@@ -19147,7 +19314,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     const countryRegionTag = new Map();
     runtimeState.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+      if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const countryCode = getFeatureCountryCodeNormalized(feature);
       if (!countryCode) return;
@@ -19442,6 +19609,18 @@ function getScenarioOwnerFeatureIds(ownerTag) {
     const candidateFeature = runtimeState.landIndex?.get(candidateId);
     return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
   });
+}
+
+function getInteractionCountryFeatureIds(feature, featureId) {
+  const interactionCountryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
+  const ownerIds = interactionCountryCode ? getScenarioOwnerFeatureIds(interactionCountryCode) : [];
+  if (ownerIds.length) return ownerIds;
+
+  const runtimeCountryCode = getFeatureCountryCodeNormalized(feature);
+  const runtimeIds = runtimeCountryCode ? getCountryFeatureIds(runtimeCountryCode) : [];
+  if (runtimeIds.length) return runtimeIds;
+
+  return interactionCountryCode ? getCountryFeatureIds(interactionCountryCode) : [];
 }
 
 function getCountryInteractionPolicy(countryCode) {
@@ -19999,11 +20178,11 @@ function resolveInteractionTargetIds(feature, id) {
   if (runtimeState.interactionGranularity !== "country") {
     return [id];
   }
-  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, id);
   if (!countryCode) {
     return [id];
   }
-  const ids = getCountryFeatureIds(countryCode);
+  const ids = getInteractionCountryFeatureIds(feature, id);
   return ids.length ? ids : [id];
 }
 
@@ -20029,7 +20208,7 @@ function resolveParentGroupKey(feature, featureId) {
   const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
   const scopeCode = scenarioDistrictGroup && scenarioOwnerTag
     ? scenarioOwnerTag
-    : getFeatureCountryCodeNormalized(feature);
+    : getFeatureInteractionCountryCodeNormalized(feature, featureId);
   if (!scopeCode) return "";
   const directGroup = getAdmin1Group(feature);
   const groupName = String(scenarioDistrictGroup || runtimeState.parentGroupByFeatureId?.get(featureId) || directGroup || "").trim();
@@ -20042,11 +20221,10 @@ function resolveParentGroupTargetIds(feature, featureId) {
   if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
   const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
   const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-  const countryCode = getFeatureCountryCodeNormalized(feature);
   const parentGroupKey = resolveParentGroupKey(feature, featureId);
   const ids = scenarioDistrictGroup && scenarioOwnerTag
     ? getScenarioOwnerFeatureIds(scenarioOwnerTag)
-    : getCountryFeatureIds(countryCode);
+    : getInteractionCountryFeatureIds(feature, featureId);
   if (!parentGroupKey || !ids.length) return [];
   const targetIds = ids.filter((candidateId) => {
     const candidateFeature = runtimeState.landIndex.get(candidateId);
@@ -20061,9 +20239,9 @@ function resolveParentGroupTargetIds(feature, featureId) {
 function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
   if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
   if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
   if (!countryCode) return [];
-  const ids = getCountryFeatureIds(countryCode).filter((candidateId) => {
+  const ids = getInteractionCountryFeatureIds(feature, featureId).filter((candidateId) => {
     const candidateFeature = runtimeState.landIndex.get(candidateId);
     return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
   });
@@ -21651,6 +21829,14 @@ function refreshMapDataForScenarioChunkPromotion({
   if ((Array.isArray(changedLayerKeys) ? changedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
     resetScenarioWaterCacheAdaptiveState("scenario-water-regions-data-replaced");
   }
+  const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes({
+    changedLayerKeys,
+    reason: `${reason}-secondary-sync`,
+  });
+  const shouldSkipDeferredInfraRefresh = synchronizedSecondaryRegionIndexes && !hasPoliticalChange;
+  if (shouldSkipDeferredInfraRefresh && runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
+    runtimeState.runtimeChunkLoadState.pendingInfraPromotion = null;
+  }
   const targetPasses = getScenarioChunkPromotionTargetPasses({
     changedLayerKeys,
     hasPoliticalChange,
@@ -21664,12 +21850,20 @@ function refreshMapDataForScenarioChunkPromotion({
   if (!suppressRender) {
     render();
   }
-  scheduleDeferredScenarioChunkPromotionInfraRefresh({
-    reason,
-    suppressRender,
-    promotionVersion: scenarioChunkPromotionVersion,
-    hasPoliticalGeometryChange: hasPoliticalChange,
-  });
+  if (shouldSkipDeferredInfraRefresh) {
+    if (runtimeState.hitCanvasDirty) {
+      scheduleHitCanvasBuildIfNeeded({
+        reason: `${reason}-secondary-hit-canvas`,
+      });
+    }
+  } else {
+    scheduleDeferredScenarioChunkPromotionInfraRefresh({
+      reason,
+      suppressRender,
+      promotionVersion: scenarioChunkPromotionVersion,
+      hasPoliticalGeometryChange: hasPoliticalChange,
+    });
+  }
   recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
     suppressRender: !!suppressRender,
@@ -21678,6 +21872,7 @@ function refreshMapDataForScenarioChunkPromotion({
       : 0,
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
+    synchronizedSecondaryRegionIndexes,
   });
   recordRenderPerfMetric("chunkPromotionVisualMs", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -21688,6 +21883,7 @@ function refreshMapDataForScenarioChunkPromotion({
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
     hasPoliticalGeometryChange: hasPoliticalChange,
+    synchronizedSecondaryRegionIndexes,
   });
   recordRenderPerfMetric("scenarioChunkPoliticalPromotion", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -21697,6 +21893,7 @@ function refreshMapDataForScenarioChunkPromotion({
       : 0,
     changedLayerCount: Array.isArray(changedLayerKeys) ? changedLayerKeys.length : 0,
     promotionVersion: scenarioChunkPromotionVersion,
+    synchronizedSecondaryRegionIndexes,
     stage: "visual",
   });
   if (hasPoliticalChange && isUsableMesh(runtimeState.activeScenarioMeshPack?.meshes?.opening_owner_borders)) {

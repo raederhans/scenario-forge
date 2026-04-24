@@ -90,6 +90,9 @@ def _extract_country_code_from_id(value: Any) -> str:
 
 def _feature_country_code(feature: dict[str, Any]) -> str:
     props = feature.get("properties") if isinstance(feature, dict) else {}
+    feature_id = _feature_identity(feature, 0).strip().upper()
+    if feature_id.startswith("ATLISL_") or feature_id.startswith("ATLSHL_"):
+        return "ATL"
     candidates = (
         props.get("cntr_code") if isinstance(props, dict) else None,
         props.get("CNTR_CODE") if isinstance(props, dict) else None,

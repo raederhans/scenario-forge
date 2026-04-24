@@ -618,6 +618,47 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertNotIn('data.layerVisibility.showRoad', file_manager_content)
         self.assertNotIn('state.showRoad = !!data.layerVisibility.showRoad', interaction_content)
 
+    def test_transport_toggles_release_deferred_context_markers(self) -> None:
+        appearance_controller_content = (
+            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'appearance_controls_controller.js'
+        ).read_text(encoding='utf-8')
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        state_config_content = (REPO_ROOT / 'js' / 'core' / 'state' / 'config.js').read_text(encoding='utf-8')
+
+        self.assertIn('"releaseDeferredContextBasePassFn"', state_config_content)
+        self.assertIn(
+            'registerRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", releaseDeferredContextBasePass);',
+            renderer_content,
+        )
+        self.assertIn('const hasVisibleTransportFamily = () => !!(', appearance_controller_content)
+        self.assertIn('if (normalized && hasVisibleTransportFamily()) {', appearance_controller_content)
+        self.assertIn('runtimeState.releaseDeferredContextBasePassFn?.("transport-master-toggle");', appearance_controller_content)
+        self.assertIn('const releaseDeferredContextForTransportToggle = (reason) => {', appearance_controller_content)
+        self.assertIn('runtimeState.releaseDeferredContextBasePassFn?.(reason);', appearance_controller_content)
+        for reason in ("toggle-airports", "toggle-ports", "toggle-rail", "toggle-road"):
+            self.assertIn(f'releaseDeferredContextForTransportToggle("{reason}");', appearance_controller_content)
+        toggle_expectations = {
+            "toggleAirports.addEventListener": (
+                'releaseDeferredContextForTransportToggle("toggle-airports");',
+                'runtimeState.ensureContextLayerDataFn("airports"',
+            ),
+            "togglePorts.addEventListener": (
+                'releaseDeferredContextForTransportToggle("toggle-ports");',
+                'runtimeState.ensureContextLayerDataFn("ports"',
+            ),
+            "toggleRail.addEventListener": (
+                'releaseDeferredContextForTransportToggle("toggle-rail");',
+                'runtimeState.ensureContextLayerDataFn(["railways", "rail_stations_major"]',
+            ),
+            "toggleRoad.addEventListener": (
+                'releaseDeferredContextForTransportToggle("toggle-road");',
+                'runtimeState.ensureContextLayerDataFn("roads"',
+            ),
+        }
+        for anchor, (release_token, ensure_token) in toggle_expectations.items():
+            section = appearance_controller_content.split(anchor, 1)[1].split("});", 1)[0]
+            self.assertLess(section.index(release_token), section.index(ensure_token))
+
     def test_rail_runtime_loader_uses_catalog_not_eager_pack(self) -> None:
         data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
         appearance_controller_content = (

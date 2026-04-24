@@ -105,7 +105,7 @@ function createScenarioApplyPipeline({
     runtimeState.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     runtimeState.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     runtimeState.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
-    runtimeState.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+    runtimeState.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || null;
     runtimeState.scenarioRuntimeTopologyVersionTag = String(staged.runtimeVersionTag || "");
     runtimeState.scenarioLandMaskVersionTag = runtimeState.scenarioLandMaskData ? String(staged.runtimeVersionTag || "") : "";
     runtimeState.scenarioContextLandMaskVersionTag = runtimeState.scenarioContextLandMaskData ? String(staged.runtimeVersionTag || "") : "";

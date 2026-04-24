@@ -294,6 +294,10 @@ def _load_chunk_feature_collections(scenario_dir: Path) -> list[tuple[str, dict]
 
 
 def _collect_chunk_metrics(scenario_dir: Path) -> dict:
+    return _collect_chunk_metrics_from_feature_collections(_load_chunk_feature_collections(scenario_dir))
+
+
+def _collect_chunk_metrics_from_feature_collections(chunk_feature_collections: list[tuple[str, dict]] | None) -> dict:
     metrics = []
     feature_ids = set()
     invalid = []
@@ -301,7 +305,7 @@ def _collect_chunk_metrics(scenario_dir: Path) -> dict:
     oversized_parts = []
     oversized_features = []
     antimeridian_split_features = []
-    for label, feature_collection in _load_chunk_feature_collections(scenario_dir):
+    for label, feature_collection in chunk_feature_collections or []:
         metric = _collect_feature_metrics(feature_collection, label=label)
         metrics.append(metric)
         feature_ids.update(metric["feature_ids"])
@@ -522,19 +526,29 @@ def _collect_named_water_snapshot_inflation(feature_collection: dict, snapshot_f
     }
 
 
-def build_report(scenario_dir: Path) -> dict:
-    source_water = _load_json(scenario_dir / "water_regions.geojson")
-    runtime_water = _load_runtime_topology_feature_collection(scenario_dir / "runtime_topology.topo.json", "scenario_water")
-    runtime_political = _load_runtime_topology_feature_collection(scenario_dir / "runtime_topology.topo.json", "political")
-    named_water_snapshot = _load_json(scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson")
-    chunk_metrics = _collect_chunk_metrics(scenario_dir)
+def build_report_from_collections(
+    *,
+    scenario_id: str,
+    source_water: dict,
+    named_water_snapshot: dict,
+    runtime_topology_payload: dict | None = None,
+    runtime_water: dict | None = None,
+    runtime_political: dict | None = None,
+    chunk_feature_collections: list[tuple[str, dict]] | None = None,
+) -> dict:
+    if runtime_topology_payload is not None:
+        runtime_water = runtime_water or serialize_as_geojson(runtime_topology_payload, objectname="scenario_water")
+        runtime_political = runtime_political or serialize_as_geojson(runtime_topology_payload, objectname="political")
+    if runtime_water is None or runtime_political is None:
+        raise ValueError("Runtime water validator requires runtime_water and runtime_political feature collections.")
+    chunk_metrics = _collect_chunk_metrics_from_feature_collections(chunk_feature_collections)
     source_metrics = _collect_feature_metrics(source_water, label="water_regions.geojson")
     runtime_metrics = _collect_feature_metrics(runtime_water, label="runtime_topology.topo.json::scenario_water")
     source_ids = set(source_metrics["feature_ids"])
     runtime_ids = set(runtime_metrics["feature_ids"])
     chunk_ids = set(chunk_metrics["feature_ids"])
     return {
-        "scenario_id": scenario_dir.name,
+        "scenario_id": scenario_id,
         "checks": {
             "source": source_metrics,
             "runtime": runtime_metrics,
@@ -558,10 +572,23 @@ def build_report(scenario_dir: Path) -> dict:
     }
 
 
-def summarize_failures(report: dict) -> list[str]:
+def build_report(scenario_dir: Path) -> dict:
+    return build_report_from_collections(
+        scenario_id=scenario_dir.name,
+        source_water=_load_json(scenario_dir / "water_regions.geojson"),
+        runtime_topology_payload=_load_json(scenario_dir / "runtime_topology.topo.json"),
+        named_water_snapshot=_load_json(scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson"),
+        chunk_feature_collections=_load_chunk_feature_collections(scenario_dir),
+    )
+
+
+def summarize_failures(report: dict, *, require_chunks: bool = True) -> list[str]:
     failures = []
     checks = report["checks"]
-    for section_name in ("source", "runtime", "chunks"):
+    section_names = ["source", "runtime"]
+    if require_chunks:
+        section_names.append("chunks")
+    for section_name in section_names:
         section = checks[section_name]
         if section["invalid_feature_ids"]:
             failures.append(f"{section_name}: invalid={len(section['invalid_feature_ids'])}")
@@ -594,9 +621,22 @@ def summarize_failures(report: dict) -> list[str]:
             f"suspicious={checks['named_water_snapshot_inflation']['suspicious_count']}"
         )
     id_consistency = checks["id_consistency"]
-    if id_consistency["source_only"] or id_consistency["runtime_only"] or id_consistency["chunk_missing"] or id_consistency["chunk_only"]:
+    if id_consistency["source_only"] or id_consistency["runtime_only"]:
+        failures.append("id_consistency mismatch")
+    if require_chunks and (id_consistency["chunk_missing"] or id_consistency["chunk_only"]):
         failures.append("id_consistency mismatch")
     return failures
+
+
+def validate_report(report: dict, *, stage_label: str, require_chunks: bool = True) -> dict:
+    failures = summarize_failures(report, require_chunks=require_chunks)
+    report["ok"] = not failures
+    report["failures"] = failures
+    if failures:
+        raise ValueError(
+            f"TNO water geometry validation failed at {stage_label}:\n- " + "\n- ".join(failures)
+        )
+    return report
 
 
 def parse_args() -> argparse.Namespace:
