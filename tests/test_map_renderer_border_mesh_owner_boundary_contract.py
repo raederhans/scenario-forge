@@ -25,7 +25,7 @@ class MapRendererBorderMeshOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("from './map_renderer/facade_border_runtime.js';", renderer_imports)
         self.assertIn("let borderMeshOwner = null;", renderer_content)
         self.assertIn("function getBorderMeshOwner() {", renderer_content)
-        self.assertIn("function rebuildStaticMeshes() {", renderer_content)
+        self.assertIn("function rebuildStaticMeshes({", renderer_content)
         self.assertIn("function drawHierarchicalBorders(k, { interactive = false } = {}) {", renderer_content)
         self.assertIn("function drawBordersPass(k, { interactive = false } = {}) {", renderer_content)
         self.assertIn("function getFeatureBorderMeshCountryCodeNormalized(feature) {", renderer_content)
@@ -92,6 +92,16 @@ class MapRendererBorderMeshOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("!!runtimeRef?.objects?.political && hasBaselineOwners", source_selection_content)
         self.assertIn("function getCoastlineTopologyMetrics({", diagnostics_content)
         self.assertIn("function evaluateCoastlineTopologySource({", diagnostics_content)
+
+    def test_static_mesh_rebuild_keeps_viewport_internal_border_meshes_deferred(self):
+        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        start = renderer_content.index("function rebuildStaticMeshes({")
+        end = renderer_content.index("function invalidateBorderCache()", start)
+        rebuild_source = renderer_content[start:end]
+
+        self.assertIn("scheduleDeferredHeavyBorderMeshes();", rebuild_source)
+        self.assertIn("Province/local border meshes are viewport- and zoom-dependent.", rebuild_source)
+        self.assertNotIn("ensureCountrySourceBorderMeshes(countryCode,", rebuild_source)
 
 
 if __name__ == "__main__":

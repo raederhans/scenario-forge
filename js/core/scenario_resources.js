@@ -2,6 +2,7 @@ import { countryNames, defaultCountryPalette, state as runtimeState } from "./st
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
+  createStartupHydrationRefreshPlan,
   invalidateContextLayerVisualStateBatch,
   invalidateOceanWaterInteractionVisualState,
   recomputeDynamicBordersNow,
@@ -576,6 +577,7 @@ const {
   invalidateContextLayerVisualStateBatch,
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
+  createStartupHydrationRefreshPlan,
   refreshMapDataForScenarioChunkPromotion,
   refreshScenarioOpeningOwnerBorders,
   flushRenderBoundary,

@@ -48,6 +48,7 @@ function createScenarioStartupHydrationController({
   invalidateContextLayerVisualStateBatch,
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
+  createStartupHydrationRefreshPlan = null,
   refreshMapDataForScenarioChunkPromotion,
   refreshScenarioOpeningOwnerBorders = () => false,
   flushRenderBoundary,
@@ -334,6 +335,12 @@ function createScenarioStartupHydrationController({
         refreshMapDataForScenarioChunkPromotion({
           suppressRender: !renderNow,
           hasPoliticalPayloadChange: true,
+          refreshPlan: typeof createStartupHydrationRefreshPlan === "function"
+            ? createStartupHydrationRefreshPlan({
+              changedLayerKeys: ["political"],
+              hasPoliticalChange: true,
+            })
+            : null,
         });
       }
     }

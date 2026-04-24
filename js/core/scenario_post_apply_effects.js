@@ -4,6 +4,7 @@ import {
 } from "./state/index.js";
 import { state as runtimeState } from "./state.js";
 import {
+  createScenarioApplyRefreshPlan,
   refreshMapDataForScenarioApply,
   refreshScenarioOpeningOwnerBorders,
   setMapData,
@@ -238,10 +239,15 @@ async function runPostScenarioApplyEffects({
   suppressRender = false,
 } = {}) {
   const useSingleFinalRender = !!renderNow && !suppressRender;
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${scenarioId}` });
+  const refreshPlan = createScenarioApplyRefreshPlan({
+    refreshOpeningOwnerBorders: false,
+  });
   let scenarioMapRefreshMode = "light";
   try {
-    refreshMapDataForScenarioApply({ suppressRender: useSingleFinalRender ? true : suppressRender });
+    refreshMapDataForScenarioApply({
+      suppressRender: useSingleFinalRender ? true : suppressRender,
+      refreshPlan,
+    });
   } catch (refreshError) {
     scenarioMapRefreshMode = "setMapData-fallback";
     console.warn("[scenario] Lightweight scenario apply refresh failed; falling back to setMapData.", refreshError);
@@ -252,7 +258,12 @@ async function runPostScenarioApplyEffects({
     });
   }
   rebuildPresetState();
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
+  refreshScenarioShellOverlays({
+    renderNow: false,
+    borderReason: `scenario:${scenarioId}`,
+    refreshOpeningOwnerBorders: false,
+  });
+  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario:${scenarioId}:opening` });
   if (scenarioSupportsChunkedRuntime(bundle)) {
     await ensureChunkedScenarioFirstFrameReady({ bundle, scenarioId });
   } else if (!runtimeState.bootBlocking) {

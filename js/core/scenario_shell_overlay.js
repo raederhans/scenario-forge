@@ -145,6 +145,7 @@ function refreshMapDataColorsForScenarioShell(featureIds) {
 export function refreshScenarioShellOverlays({
   renderNow = false,
   borderReason = "scenario-shell-overlay",
+  refreshOpeningOwnerBorders = true,
 } = {}) {
   const previousOwnerMap = runtimeState.scenarioAutoShellOwnerByFeatureId || {};
   const previousControllerMap = runtimeState.scenarioAutoShellControllerByFeatureId || {};
@@ -218,10 +219,12 @@ export function refreshScenarioShellOverlays({
     }
   }
   recomputeDynamicBordersNow({ renderNow: false, reason: borderReason });
-  refreshScenarioOpeningOwnerBorders({
-    renderNow: false,
-    reason: borderReason ? `${borderReason}:opening` : "scenario-shell-opening",
-  });
+  if (refreshOpeningOwnerBorders !== false) {
+    refreshScenarioOpeningOwnerBorders({
+      renderNow: false,
+      reason: borderReason ? `${borderReason}:opening` : "scenario-shell-opening",
+    });
+  }
   if (renderNow) {
     flushRenderBoundary(borderReason ? `${borderReason}:shell-overlay` : "scenario-shell-overlay");
   }

@@ -24,7 +24,9 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
             resources_content,
         )
         self.assertIn("./scenario/scenario_renderer_bridge.js", resources_content)
+        self.assertIn("createStartupHydrationRefreshPlan,", resources_content.split('} from "./scenario/scenario_renderer_bridge.js";')[0])
         self.assertIn("refreshScenarioOpeningOwnerBorders,", resources_content.split('} from "./scenario/scenario_renderer_bridge.js";')[0])
+        self.assertIn("createStartupHydrationRefreshPlan,", resources_content)
         self.assertIn("hydrateActiveScenarioBundle,", resources_content)
         self.assertIn("evaluateScenarioHydrationHealthGateState,", resources_content)
         self.assertIn("enforceScenarioHydrationHealthGate,", resources_content)
@@ -76,6 +78,8 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("applyScenarioPoliticalChunkPayload(", content)
         self.assertIn('reason: "scenario-hydrate-political"', content)
         self.assertIn("renderNow: false,", content)
+        self.assertIn("createStartupHydrationRefreshPlan = null,", content)
+        self.assertIn("refreshPlan: typeof createStartupHydrationRefreshPlan === \"function\"", content)
         self.assertIn('reason: "scenario-hydrate-opening"', content)
         self.assertIn("state.activeScenarioMeshPack?.meshes?.opening_owner_borders", content)
         self.assertIn("mergedCitiesPayload !== undefined", content)

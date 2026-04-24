@@ -897,6 +897,8 @@ const waterSphericalSanitizationWarnings = new Set();
 const sphericalGeometryDiagnosticsByObject = new WeakMap();
 const safeWaterRegionGeometryPartsByFeature = new WeakMap();
 const sanitizedWaterRegionFeatureByFeature = new WeakMap();
+let scenarioWaterPartPathCache = new WeakMap();
+let scenarioWaterFeaturePathCache = new WeakMap();
 const renderDiag = {
   enabled: false,
   seenKeys: new Set(),
@@ -4113,6 +4115,8 @@ function ensureProjectedBoundsCache() {
 
 function clearProjectedBoundsCache() {
   ensureProjectedBoundsCache().clear();
+  scenarioWaterPartPathCache = new WeakMap();
+  scenarioWaterFeaturePathCache = new WeakMap();
 }
 
 function isLineGeometryType(geometryType) {
@@ -6358,6 +6362,21 @@ function syncStaticMeshSnapshot() {
   staticMeshCache.snapshot = captureStaticMeshSnapshot();
 }
 
+function clearDeferredInternalBorderMeshCaches({ syncSnapshot = true } = {}) {
+  setStaticMeshSourceCountries(getSourceCountrySets());
+  runtimeState.cachedProvinceBorders = [];
+  runtimeState.cachedProvinceBordersByCountry = new Map();
+  runtimeState.cachedLocalBorders = [];
+  runtimeState.cachedLocalBordersByCountry = new Map();
+  runtimeState.cachedDetailAdmBorders = [];
+  runtimeState.cachedGridLines = [];
+  resetVisibleInternalBorderMeshSignature();
+  resetDetailAdmMeshBuildState();
+  if (syncSnapshot && staticMeshCache.snapshot) {
+    syncStaticMeshSnapshot();
+  }
+}
+
 function buildDetailAdmMeshSignature(visibleCountryCodes = new Set(), k = runtimeState.zoomTransform?.k || 1) {
   const detailCountries = Array.from(staticMeshSourceCountries.detail || new Set())
     .filter((countryCode) => visibleCountryCodes.has(countryCode))
@@ -6852,7 +6871,9 @@ function simplifyPolylineEffectiveArea(points, areaThreshold) {
   return simplified.length >= 2 ? simplified : points.slice(0, 2);
 }
 
-function rebuildStaticMeshes() {
+function rebuildStaticMeshes({
+  refreshOpeningOwnerBorders = true,
+} = {}) {
   const startedAt = nowMs();
   cancelDeferredHeavyBorderMeshes();
   resetVisibleInternalBorderMeshSignature();
@@ -7017,19 +7038,13 @@ function rebuildStaticMeshes() {
     }
   }
 
-  const shouldPrewarmScenarioLocalBorders =
-    !!runtimeState.activeScenarioId
-    && runtimeState.scenarioBorderMode === "scenario_owner_only"
-    && String(runtimeState.scenarioViewMode || "ownership") === "ownership";
-  if (shouldPrewarmScenarioLocalBorders) {
-    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
-    visibleCountryCodes.forEach((countryCode) => {
-      ensureCountrySourceBorderMeshes(countryCode, {
-        includeLocal: true,
-      });
-    });
-  }
+  // Province/local border meshes are viewport- and zoom-dependent. Building them
+  // synchronously here turns startup and chunk promotion into a per-country
+  // topojson.mesh fanout; the draw owner schedules them when the zoom level
+  // actually needs them.
   if (
+    refreshOpeningOwnerBorders !== false
+    &&
     runtimeState.activeScenarioId
     && runtimeState.scenarioBorderMode === "scenario_owner_only"
     && String(runtimeState.scenarioViewMode || "ownership") === "ownership"
@@ -16597,19 +16612,38 @@ function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
     if (!(fillOpacity > 0)) return;
     const parts = collectSafeWaterRegionGeometryParts(feature);
     if (!parts.length) return;
-    context.beginPath();
-    let visiblePartCount = 0;
+    const visibleParts = [];
     parts.forEach((part) => {
       if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
-      if (!pathCanvas) return;
-      pathCanvas(part);
-      visiblePartCount += 1;
+      visibleParts.push(part);
     });
-    if (!visiblePartCount) return;
+    if (!visibleParts.length) return;
     context.save();
     context.globalAlpha = fillOpacity;
     context.fillStyle = getWaterRegionColor(id);
-    context.fill();
+    const waterPath = visibleParts.length === parts.length
+      ? getScenarioWaterFeaturePath(feature, parts)
+      : null;
+    if (waterPath) {
+      context.fill(waterPath);
+    } else if (globalThis.Path2D) {
+      visibleParts.forEach((part) => {
+        const partPath = getScenarioWaterPartPath(part);
+        if (partPath) {
+          context.fill(partPath);
+        } else if (pathCanvas) {
+          context.beginPath();
+          pathCanvas(part);
+          context.fill();
+        }
+      });
+    } else {
+      context.beginPath();
+      visibleParts.forEach((part) => {
+        if (pathCanvas) pathCanvas(part);
+      });
+      context.fill();
+    }
     context.restore();
     renderedWaterCount += 1;
   });
@@ -16642,6 +16676,44 @@ function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures) {
   layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
   layerEntry.renderedCount = renderedWaterCount;
   return renderedWaterCount;
+}
+
+function getScenarioWaterPartPath(part) {
+  if (!part || typeof part !== "object" || !globalThis.Path2D || typeof pathSVG !== "function") {
+    return null;
+  }
+  if (scenarioWaterPartPathCache.has(part)) {
+    return scenarioWaterPartPathCache.get(part) || null;
+  }
+  let path = null;
+  try {
+    const pathString = pathSVG(part);
+    path = pathString ? new globalThis.Path2D(pathString) : null;
+  } catch (_error) {
+    path = null;
+  }
+  scenarioWaterPartPathCache.set(part, path);
+  return path;
+}
+
+function getScenarioWaterFeaturePath(feature, parts) {
+  if (!feature || typeof feature !== "object" || !globalThis.Path2D) {
+    return null;
+  }
+  if (scenarioWaterFeaturePathCache.has(feature)) {
+    return scenarioWaterFeaturePathCache.get(feature) || null;
+  }
+  const combinedPath = new globalThis.Path2D();
+  let added = false;
+  (Array.isArray(parts) ? parts : []).forEach((part) => {
+    const partPath = getScenarioWaterPartPath(part);
+    if (!partPath || typeof combinedPath.addPath !== "function") return;
+    combinedPath.addPath(partPath);
+    added = true;
+  });
+  const path = added ? combinedPath : null;
+  scenarioWaterFeaturePathCache.set(feature, path);
+  return path;
 }
 
 function drawScenarioWaterHighlightLayer(k) {
@@ -21944,6 +22016,28 @@ function getScenarioChunkPromotionTargetPasses({
   return Array.from(targetPasses);
 }
 
+function normalizeRendererRefreshPlan(refreshPlan, defaults = {}) {
+  const plan = refreshPlan && typeof refreshPlan === "object" ? refreshPlan : {};
+  const defaultTargetPasses = Array.isArray(defaults.targetPasses) ? defaults.targetPasses : [];
+  const targetPasses = Array.isArray(plan.targetPasses) && plan.targetPasses.length
+    ? plan.targetPasses
+    : defaultTargetPasses;
+  return {
+    source: String(plan.source || defaults.source || "renderer-refresh"),
+    targetPasses: Array.from(
+      new Set(
+        (Array.isArray(targetPasses) ? targetPasses : [])
+          .map((passName) => String(passName || "").trim())
+          .filter(Boolean)
+      )
+    ),
+    refreshOpeningOwnerBorders: plan.refreshOpeningOwnerBorders !== undefined
+      ? plan.refreshOpeningOwnerBorders !== false
+      : defaults.refreshOpeningOwnerBorders !== false,
+    resetWaterCacheReason: String(plan.resetWaterCacheReason || defaults.resetWaterCacheReason || ""),
+  };
+}
+
 function cancelDeferredScenarioChunkPromotionInfraRefresh() {
   cancelDeferredWork(deferredScenarioChunkPromotionInfraHandle);
   deferredScenarioChunkPromotionInfraHandle = null;
@@ -21954,6 +22048,7 @@ function scheduleDeferredScenarioChunkPromotionInfraRefresh({
   suppressRender = false,
   promotionVersion = scenarioChunkPromotionVersion,
   hasPoliticalGeometryChange = false,
+  refreshOpeningOwnerBorders = true,
 } = {}) {
   cancelDeferredScenarioChunkPromotionInfraRefresh();
   deferredScenarioChunkPromotionInfraHandle = scheduleDeferredWork(() => {
@@ -21963,6 +22058,7 @@ function scheduleDeferredScenarioChunkPromotionInfraRefresh({
       suppressRender,
       promotionVersion,
       hasPoliticalGeometryChange,
+      refreshOpeningOwnerBorders,
     });
   }, {
     timeout: 120,
@@ -21974,6 +22070,7 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
   suppressRender = false,
   promotionVersion = scenarioChunkPromotionVersion,
   hasPoliticalGeometryChange = false,
+  refreshOpeningOwnerBorders = true,
 } = {}) {
   if (promotionVersion !== scenarioChunkPromotionVersion) {
     return false;
@@ -21984,6 +22081,7 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
       suppressRender,
       promotionVersion,
       hasPoliticalGeometryChange,
+      refreshOpeningOwnerBorders,
     });
     return false;
   }
@@ -22010,11 +22108,12 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
   }
   if (hasPoliticalGeometryChange) {
     ensureSovereigntyState();
-    rebuildStaticMeshes();
-    refreshScenarioOpeningOwnerBorders({
-      renderNow: false,
-      reason: `${reason}-opening`,
-    });
+    if (refreshOpeningOwnerBorders !== false) {
+      refreshScenarioOpeningOwnerBorders({
+        renderNow: false,
+        reason: `${reason}-opening`,
+      });
+    }
     invalidateBorderCache();
     updateDynamicBorderStatusUI();
     updateSpecialZonesPaths();
@@ -22047,6 +22146,7 @@ function refreshMapDataForScenarioChunkPromotion({
   changedLayerKeys = [],
   politicalFeatureIds = [],
   hasPoliticalPayloadChange = false,
+  refreshPlan = null,
 } = {}) {
   const startedAt = nowMs();
   const hasPoliticalChange = !!hasPoliticalPayloadChange
@@ -22072,6 +22172,8 @@ function refreshMapDataForScenarioChunkPromotion({
   }
   if (hasPoliticalChange) {
     refreshResolvedColorsForFeatures(politicalFeatureIds, { renderNow: false });
+    clearDeferredInternalBorderMeshCaches();
+    scheduleDeferredHeavyBorderMeshes();
   }
   if ((Array.isArray(changedLayerKeys) ? changedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
     resetScenarioWaterCacheAdaptiveState("scenario-water-regions-data-replaced");
@@ -22084,12 +22186,17 @@ function refreshMapDataForScenarioChunkPromotion({
   if (shouldSkipDeferredInfraRefresh && runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
     runtimeState.runtimeChunkLoadState.pendingInfraPromotion = null;
   }
-  const targetPasses = getScenarioChunkPromotionTargetPasses({
+  const defaultTargetPasses = getScenarioChunkPromotionTargetPasses({
     changedLayerKeys,
     hasPoliticalChange,
   });
+  const rendererRefreshPlan = normalizeRendererRefreshPlan(refreshPlan, {
+    source: "scenario-chunk-promotion",
+    targetPasses: defaultTargetPasses,
+    refreshOpeningOwnerBorders: hasPoliticalChange,
+  });
   invalidateRenderPasses(
-    targetPasses.length ? targetPasses : ["political", "borders", "labels"],
+    rendererRefreshPlan.targetPasses.length ? rendererRefreshPlan.targetPasses : ["political", "borders", "labels"],
     reason,
   );
   markAllOverlaysDirty();
@@ -22097,6 +22204,10 @@ function refreshMapDataForScenarioChunkPromotion({
   if (!suppressRender) {
     render();
   }
+  const shouldRefreshOpeningOwnerBordersInVisual =
+    hasPoliticalChange
+    && rendererRefreshPlan.refreshOpeningOwnerBorders !== false
+    && isUsableMesh(runtimeState.activeScenarioMeshPack?.meshes?.opening_owner_borders);
   if (shouldSkipDeferredInfraRefresh) {
     if (runtimeState.hitCanvasDirty) {
       scheduleHitCanvasBuildIfNeeded({
@@ -22109,6 +22220,7 @@ function refreshMapDataForScenarioChunkPromotion({
       suppressRender,
       promotionVersion: scenarioChunkPromotionVersion,
       hasPoliticalGeometryChange: hasPoliticalChange,
+      refreshOpeningOwnerBorders: !shouldRefreshOpeningOwnerBordersInVisual,
     });
   }
   recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
@@ -22143,7 +22255,7 @@ function refreshMapDataForScenarioChunkPromotion({
     synchronizedSecondaryRegionIndexes,
     stage: "visual",
   });
-  if (hasPoliticalChange && isUsableMesh(runtimeState.activeScenarioMeshPack?.meshes?.opening_owner_borders)) {
+  if (shouldRefreshOpeningOwnerBordersInVisual) {
     refreshScenarioOpeningOwnerBorders({
       renderNow: false,
       reason: `${reason}-opening-sync`,
@@ -22153,8 +22265,15 @@ function refreshMapDataForScenarioChunkPromotion({
 
 function refreshMapDataForScenarioApply({
   suppressRender = false,
+  refreshPlan = null,
 } = {}) {
   const startedAt = nowMs();
+  const rendererRefreshPlan = normalizeRendererRefreshPlan(refreshPlan, {
+    source: "scenario-apply",
+    targetPasses: ["background", "physicalBase", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"],
+    refreshOpeningOwnerBorders: true,
+    resetWaterCacheReason: "scenario-switch-complete",
+  });
   clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
   cancelPendingIndexUiRefresh();
@@ -22192,11 +22311,13 @@ function refreshMapDataForScenarioApply({
   runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
   runtimeState.hitCanvasDirty = true;
   runtimeState.hitCanvasTopologyRevision = 0;
-  const targetPasses = ["background", "physicalBase", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+  const targetPasses = rendererRefreshPlan.targetPasses;
   invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
   clearRenderPassReferenceTransforms(targetPasses);
   markAllOverlaysDirty();
-  rebuildStaticMeshes();
+  rebuildStaticMeshes({
+    refreshOpeningOwnerBorders: rendererRefreshPlan.refreshOpeningOwnerBorders,
+  });
   invalidateBorderCache();
   updateDynamicBorderStatusUI();
   updateSpecialZonesPaths();
@@ -22205,7 +22326,7 @@ function refreshMapDataForScenarioApply({
   scheduleSecondarySpatialIndexBuild({
     reason: "scenario-apply-secondary-spatial",
   });
-  resetScenarioWaterCacheAdaptiveState("scenario-switch-complete");
+  resetScenarioWaterCacheAdaptiveState(rendererRefreshPlan.resetWaterCacheReason || "scenario-switch-complete");
   if (!suppressRender) {
     render();
   }

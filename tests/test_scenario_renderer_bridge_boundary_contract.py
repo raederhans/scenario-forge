@@ -16,6 +16,8 @@ class ScenarioRendererBridgeBoundaryContractTest(unittest.TestCase):
         content = BRIDGE_JS.read_text(encoding="utf-8")
 
         self.assertIn('} from "../map_renderer.js";', content)
+        self.assertIn("runRendererScenarioApplyRefresh,", content)
+        self.assertIn("runRendererScenarioChunkPromotionRefresh,", content)
         self.assertIn("refreshMapDataForScenarioApply,", content)
         self.assertIn("refreshMapDataForScenarioChunkPromotion,", content)
         self.assertIn("refreshScenarioOpeningOwnerBorders,", content)
@@ -26,6 +28,23 @@ class ScenarioRendererBridgeBoundaryContractTest(unittest.TestCase):
         self.assertIn("invalidateOceanWaterInteractionVisualState,", content)
         self.assertIn("invalidateContextLayerVisualStateBatch,", content)
         self.assertIn("setMapData,", content)
+        self.assertIn("function createScenarioApplyRefreshPlan(", content)
+        self.assertIn("function createScenarioChunkPromotionRefreshPlan(", content)
+        self.assertIn("function createStartupHydrationRefreshPlan(", content)
+        self.assertIn('kind: "ScenarioRefreshPlan"', content)
+        self.assertIn('kind: "RendererRefreshPlan"', content)
+
+    def test_bridge_wrappers_attach_renderer_refresh_plans(self):
+        content = BRIDGE_JS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            content,
+            r"function refreshMapDataForScenarioApply\(options = \{\}\) \{[\s\S]*?createScenarioApplyRefreshPlan\(\)[\s\S]*?runRendererScenarioApplyRefresh\(\{[\s\S]*?refreshPlan: getRendererRefreshPlan\(refreshPlan\),",
+        )
+        self.assertRegex(
+            content,
+            r"function refreshMapDataForScenarioChunkPromotion\(options = \{\}\) \{[\s\S]*?createScenarioChunkPromotionRefreshPlan\(\{[\s\S]*?runRendererScenarioChunkPromotionRefresh\(\{[\s\S]*?refreshPlan: getRendererRefreshPlan\(refreshPlan\),",
+        )
 
     def test_internal_scenario_callers_use_bridge_instead_of_full_renderer_surface(self):
         self.assertIn("./scenario/scenario_renderer_bridge.js", SCENARIO_MANAGER_JS.read_text(encoding="utf-8"))
