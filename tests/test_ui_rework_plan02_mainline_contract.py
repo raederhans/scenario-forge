@@ -61,7 +61,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
 
         self.assertIn('if (viewValue === "export") {', sidebar)
         self.assertIn("exportDetails.open = true;", sidebar)
-        self.assertIn("state.restoreSupportSurfaceFromUrlFn?.();", sidebar)
+        self.assertIn('callRuntimeHook(state, "restoreSupportSurfaceFromUrlFn");', sidebar)
 
 
 if __name__ == "__main__":

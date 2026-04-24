@@ -9,6 +9,7 @@ from tools import (
     audit_startup_bundle_family,
     audit_startup_support_family,
     build_startup_bootstrap_assets,
+    build_hoi4_scenario,
     build_startup_bundle,
     generate_startup_support_whitelist,
     materialize_startup_support_candidate,
@@ -41,6 +42,75 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
         self.assertEqual(shell["arcs"], [])
         self.assertEqual(shell["objects"]["scenario_water"]["geometries"], [])
         self.assertNotIn("political", shell["objects"])
+
+
+    def test_build_bootstrap_runtime_topology_keeps_required_empty_shell_objects(self) -> None:
+        shell = build_startup_bootstrap_assets.build_bootstrap_runtime_topology(
+            {"type": "Topology", "objects": {"political": {"type": "GeometryCollection", "geometries": []}}, "arcs": []}
+        )
+
+        self.assertEqual(
+            list(shell["objects"].keys()),
+            ["land_mask", "context_land_mask", "scenario_water", "scenario_special_land"],
+        )
+        self.assertEqual(shell["arcs"], [])
+
+    def test_hoi4_1939_checked_in_startup_bundle_contract(self) -> None:
+        scenario_dir = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "hoi4_1939"
+        manifest = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["startup_bundle_url_en"], "data/scenarios/hoi4_1939/startup.bundle.en.json")
+        self.assertEqual(manifest["startup_bundle_url_zh"], "data/scenarios/hoi4_1939/startup.bundle.zh.json")
+        self.assertEqual(manifest["startup_bundle_version"], build_startup_bundle.STARTUP_BUNDLE_VERSION)
+        self.assertEqual(manifest["startup_bootstrap_strategy"], build_startup_bundle.STARTUP_BOOTSTRAP_STRATEGY)
+        legacy_bootstrap = json.loads((scenario_dir / "runtime_topology.bootstrap.topo.json").read_text(encoding="utf-8"))
+        self.assertGreater(len(legacy_bootstrap["objects"]["political"]["geometries"]), 0)
+        self.assertGreater(len(legacy_bootstrap["arcs"]), 0)
+        startup_shell = json.loads((scenario_dir / "startup.runtime_shell.topo.json").read_text(encoding="utf-8"))
+        self.assertNotIn("political", startup_shell["objects"])
+        for object_name in ("land_mask", "context_land_mask", "scenario_water"):
+            self.assertIn(object_name, startup_shell["objects"])
+
+        for language in build_startup_bundle.SUPPORTED_LANGUAGES:
+            bundle_path = scenario_dir / f"startup.bundle.{language}.json"
+            gzip_path = scenario_dir / f"startup.bundle.{language}.json.gz"
+            self.assertTrue(bundle_path.exists(), bundle_path)
+            self.assertTrue(gzip_path.exists(), gzip_path)
+            self.assertLess(gzip_path.stat().st_size, build_startup_bundle.STARTUP_BUNDLE_GZIP_BUDGET_BYTES)
+            bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+            self.assertEqual(bundle["scenario_id"], "hoi4_1939")
+            self.assertEqual(bundle["scenario"]["bootstrap_strategy"], build_startup_bundle.STARTUP_BOOTSTRAP_STRATEGY)
+            runtime_objects = bundle["scenario"]["runtime_topology_bootstrap"]["objects"]
+            for object_name in ("land_mask", "context_land_mask", "scenario_water"):
+                self.assertIn(object_name, runtime_objects)
+            self.assertGreater(len(bundle["scenario"]["runtime_political_meta"]["featureIds"]), 0)
+
+
+    def test_hoi4_geo_locale_language_patches_derive_from_base_patch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir) / "hoi4_1939"
+            scenario_dir.mkdir(parents=True)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "hoi4_1939",
+                    "generated_at": "now",
+                    "geo": {
+                        "id::AAA-1": {"en": "Alpha", "zh": "阿尔法"},
+                        "id::BBB-1": {"en": "Beta"},
+                        "id::CCC-1": {"zh": "伽马"},
+                    },
+                },
+            )
+
+            build_hoi4_scenario.ensure_geo_locale_patch_inputs(scenario_dir, "hoi4_1939")
+
+            en_payload = json.loads((scenario_dir / "geo_locale_patch.en.json").read_text(encoding="utf-8"))
+            zh_payload = json.loads((scenario_dir / "geo_locale_patch.zh.json").read_text(encoding="utf-8"))
+            self.assertEqual(sorted(en_payload["geo"].keys()), ["id::AAA-1", "id::BBB-1"])
+            self.assertEqual(sorted(zh_payload["geo"].keys()), ["id::AAA-1", "id::CCC-1"])
+            self.assertEqual(en_payload["geo"]["id::AAA-1"]["en"], "Alpha")
+            self.assertEqual(zh_payload["geo"]["id::AAA-1"]["zh"], "阿尔法")
 
     def test_build_startup_bundle_payload_uses_full_runtime_topology_for_political_meta(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

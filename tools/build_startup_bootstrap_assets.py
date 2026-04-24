@@ -109,9 +109,8 @@ def resolve_startup_support_whitelist_path(
 def build_bootstrap_runtime_topology(full_topology: dict) -> dict:
     selected_objects = {}
     for object_name in BOOTSTRAP_RUNTIME_OBJECTS:
-        raw_object = full_topology.get("objects", {}).get(object_name)
-        if not isinstance(raw_object, dict):
-            continue
+        # Startup shell only needs object presence; empty collections keep scenarios
+        # without water/special overlays on the same chunked-coarse contract.
         selected_objects[object_name] = {
             "type": "GeometryCollection",
             "geometries": [],

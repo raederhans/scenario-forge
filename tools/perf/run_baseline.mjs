@@ -250,12 +250,20 @@ function summarizeSnapshot(snapshot) {
     topologyLoadedMs: metricAtMs(bootMetrics["base-data"], bootTotal),
     scenarioAppliedMs: metricAtMs(bootMetrics["scenario-apply"], bootTotal),
     firstInteractiveMs: metricAtMs(bootMetrics["time-to-interactive"], bootTotal),
+    scenarioFullHydrateMs: finiteNumber(bootMetrics["scenario:full:hydrate"]?.durationMs),
+    interactionInfraMs: finiteNumber(bootMetrics["interaction-infra"]?.durationMs),
+    startupBundleSource: String(bootMetrics["scenario-apply"]?.source || "").trim(),
     applyScenarioBundleMs: finiteNumber(scenarioPerfMetrics.applyScenarioBundle?.durationMs),
+    loadScenarioBundleMs: finiteNumber(scenarioPerfMetrics.loadScenarioBundle?.durationMs),
     refreshScenarioApplyMs: finiteNumber(renderPerfMetrics.scenarioApplyMapRefresh?.durationMs),
     refreshColorMs: finiteNumber(renderPerfMetrics.refreshColorState?.durationMs),
     rebuildPoliticalCollectionsMs: finiteNumber(renderPerfMetrics.rebuildPoliticalLandCollections?.durationMs),
     rebuildStaticMeshesMs: finiteNumber(renderPerfMetrics.rebuildStaticMeshes?.durationMs),
     invalidateBorderCacheMs: finiteNumber(renderPerfMetrics.invalidateBorderCache?.durationMs),
+    scenarioChunkPromotionInfraStageMs: finiteNumber(renderPerfMetrics.scenarioChunkPromotionInfraStage?.durationMs),
+    drawContextScenarioPassMs: finiteNumber(renderPerfMetrics.drawContextScenarioPass?.durationMs),
+    setMapDataFirstPaintMs: finiteNumber(renderPerfMetrics.setMapDataFirstPaint?.durationMs),
+    settleExactRefreshMs: finiteNumber(renderPerfMetrics.settleExactRefresh?.durationMs),
     renderSampleCount: finiteNumber(renderSamples.count),
     renderSampleTotalMs: finiteNumber(renderSamples.totalMs),
     renderSampleMedianMs: finiteNumber(renderSamples.medianMs),
@@ -305,12 +313,19 @@ function aggregateRuns(runs) {
     "topologyLoadedMs",
     "scenarioAppliedMs",
     "firstInteractiveMs",
+    "scenarioFullHydrateMs",
+    "interactionInfraMs",
     "applyScenarioBundleMs",
+    "loadScenarioBundleMs",
     "refreshScenarioApplyMs",
     "refreshColorMs",
     "rebuildPoliticalCollectionsMs",
     "rebuildStaticMeshesMs",
     "invalidateBorderCacheMs",
+    "scenarioChunkPromotionInfraStageMs",
+    "drawContextScenarioPassMs",
+    "setMapDataFirstPaintMs",
+    "settleExactRefreshMs",
     "renderSampleCount",
     "renderSampleTotalMs",
     "renderSampleMedianMs",
@@ -319,6 +334,9 @@ function aggregateRuns(runs) {
   for (const fieldName of fieldNames) {
     medianSummary[fieldName] = median(summaries.map((summary) => summary[fieldName]));
   }
+  medianSummary.startupBundleSource = summaries
+    .map((summary) => String(summary.startupBundleSource || "").trim())
+    .find(Boolean) || "";
   return medianSummary;
 }
 
@@ -468,12 +486,20 @@ function buildMarkdown(report) {
     lines.push(formatMetricRow("Topology loaded", summary.topologyLoadedMs));
     lines.push(formatMetricRow("Scenario applied", summary.scenarioAppliedMs));
     lines.push(formatMetricRow("First interactive", summary.firstInteractiveMs));
+    lines.push(formatMetricRow("scenario full hydrate", summary.scenarioFullHydrateMs));
+    lines.push(formatMetricRow("interaction infra", summary.interactionInfraMs));
+    lines.push(`- startup bundle source: ${String(summary.startupBundleSource || "") || "unknown"}`);
     lines.push(formatMetricRow("applyScenarioBundle", summary.applyScenarioBundleMs));
+    lines.push(formatMetricRow("loadScenarioBundle", summary.loadScenarioBundleMs));
     lines.push(formatMetricRow("refresh scenario apply", summary.refreshScenarioApplyMs));
     lines.push(formatMetricRow("refresh color", summary.refreshColorMs));
     lines.push(formatMetricRow("rebuild political collections", summary.rebuildPoliticalCollectionsMs));
     lines.push(formatMetricRow("rebuild static meshes", summary.rebuildStaticMeshesMs));
     lines.push(formatMetricRow("invalidate border cache", summary.invalidateBorderCacheMs));
+    lines.push(formatMetricRow("scenario chunk promotion infra stage", summary.scenarioChunkPromotionInfraStageMs));
+    lines.push(formatMetricRow("draw context scenario pass", summary.drawContextScenarioPassMs));
+    lines.push(formatMetricRow("setMapData first paint", summary.setMapDataFirstPaintMs));
+    lines.push(formatMetricRow("settle exact refresh", summary.settleExactRefreshMs));
     lines.push(`- render samples: ${finiteNumber(summary.renderSampleCount).toFixed(0)} calls / ${finiteNumber(summary.renderSampleTotalMs).toFixed(1)} ms total / ${finiteNumber(summary.renderSampleMedianMs).toFixed(1)} ms median`);
     lines.push("");
   }

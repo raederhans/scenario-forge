@@ -19699,7 +19699,14 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
       }),
     });
   }
-  if (typeof runtimeState.renderCountryListFn === "function") {
+  const changedCountryCodes = Object.keys(nextCountryBaseColors);
+  if (typeof runtimeState.refreshCountryListRowsFn === "function") {
+    runtimeState.refreshCountryListRowsFn({
+      countryCodes: changedCountryCodes,
+      refreshInspector: true,
+      refreshPresetTree: true,
+    });
+  } else if (typeof runtimeState.renderCountryListFn === "function") {
     runtimeState.renderCountryListFn();
   }
   if (context) {

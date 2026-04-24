@@ -27,7 +27,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertTrue(baseline_os.startswith("win32 "), baseline_os)
         self.assertTrue(baseline_node.startswith("v22."), baseline_node)
         self.assertIn("runs-on: windows-latest", workflow_content)
-        self.assertRegex(workflow_content, r'node-version:\s*"22"')
+        self.assertRegex(workflow_content, r'node-version:\s*[\"\']22[\"\']')
         self.assertIn("npx playwright install chromium", workflow_content)
         self.assertIn("npm run perf:gate", workflow_content)
 
@@ -47,6 +47,18 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('{ key: "applyScenarioBundleMs", label: "applyScenarioBundleMs" }', script)
         self.assertIn('{ key: "refreshScenarioApplyMs", label: "refreshScenarioApplyMs" }', script)
         self.assertIn('{ key: "renderSampleMedianMs", label: "renderSampleMedianMs", threshold: 1.25 }', script)
+        for field_name in (
+            "scenarioFullHydrateMs",
+            "interactionInfraMs",
+            "scenarioChunkPromotionInfraStageMs",
+            "startupBundleSource",
+            "loadScenarioBundleMs",
+            "drawContextScenarioPassMs",
+            "setMapDataFirstPaintMs",
+            "settleExactRefreshMs",
+        ):
+            self.assertIn(field_name, script)
+        self.assertIn('bootMetrics["scenario-apply"]?.source', script)
         self.assertIn("Perf gate baseline contract mismatch.", script)
 
 

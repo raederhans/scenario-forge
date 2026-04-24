@@ -46,3 +46,29 @@ Review result: current changes are minimal and targeted. No extra abstraction in
 - Fixed political chunk promotion stale internal border meshes by clearing province/local/detailAdm border mesh caches, refreshing source country sets, syncing the static mesh snapshot, and scheduling deferred heavy border mesh rebuild before the visual render can reuse old meshes.
 - Fixed scenario water Path2D drawing to use the combined feature path only when all safe parts are visible; partial visibility now fills cached per-part Path2D objects and falls back to pathCanvas per missing part.
 - Verification: node --check js/core/map_renderer.js passed; Python refresh contract suite 18/18 passed; combined Python Phase 1 contract suite 28/28 passed; scenario-chunk-contracts passed; border-mesh-owner-behavior passed; perf-probe-snapshot-behavior passed; startup-hydration-behavior passed.
+
+## 2026-04-24 Phase 2 v3.1 fresh execution
+- Re-read plan, AGENTS, lessons learned, active docs.
+- Loaded ultrawork/systematic-debugging skills.
+- Spawned static-only agents for metrics, HOI4 startup bundle, and UI fanout. Parent remains sole test owner.
+- Static findings: most requested perf fields already have runtime metrics; run_baseline summary needs mapping. HOI4 runtime_bootstrap currently contains full political topology (~42MB) and no startup bundles. UI fanout country row refresh already exists; remaining minimum change is avoiding unnecessary full country render in isolated paths.
+
+## 2026-04-24 Implementation notes
+- tools/perf/run_baseline.mjs now maps scenarioFullHydrateMs, interactionInfraMs, startupBundleSource, loadScenarioBundleMs, scenarioChunkPromotionInfraStageMs, drawContextScenarioPassMs, setMapDataFirstPaintMs, and settleExactRefreshMs into per-run and median summaries.
+- build_hoi4_scenario.py now generates scenario-scoped startup support files and startup bundle assets, writes startup bundle manifest fields, and enforces the gzip budget.
+- build_startup_bootstrap_assets.py now emits required empty runtime shell objects even when a scenario runtime topology lacks optional water/special layers; this lets chunked-coarse startup use the same shell contract for HOI4.
+- Generated hoi4_1939 startup.bundle.en/zh.json and .gz sidecars; gzip sizes are about 1.42MB, below the 5MB budget.
+- UI fanout minimum slice: auto-fill now prefers refreshCountryListRowsFn with changed country codes and keeps renderCountryListFn as the missing-hook fallback.
+
+## 2026-04-24 Verification and review
+- Syntax: py_compile for changed Python/tests passed; node --check for run_baseline.mjs and map_renderer.js passed.
+- Targeted tests passed: npm run test:node:perf-probe-snapshot-behavior; python unittest perf/startup/sidebar/chunk/UI contract suites; npm run test:node:scenario-chunk-contracts; npm run verify:ui-rework-mainline; npm run test:e2e:startup-bundle-recovery-contract; npm run test:e2e:ui-rework-mainline.
+- Focused baseline for hoi4_1939 confirms startupBundleSource=startup-bundle and startup dropped to about 4.64s in a 1-run sample.
+- npm run perf:gate passed for tno_1962 and hoi4_1939.
+- Review pass: reviewer subagent timed out and was closed; parent performed first-principles review. The smallest stable path is keeping startup shell objects empty and using runtimePoliticalMeta for feature identity, matching existing loader health contract.
+
+## 2026-04-24 Review blocker remediation
+- Fixed P1 by restoring `data/scenarios/hoi4_1939/runtime_topology.bootstrap.topo.json` as the legacy-compatible political bootstrap topology and writing the startup bundle shell to `startup.runtime_shell.topo.json`.
+- Fixed P2 by deriving `geo_locale_patch.en.json` / `geo_locale_patch.zh.json` from `geo_locale_patch.json` during HOI4 startup asset generation, so language URLs cannot hide base geo overrides.
+- Added tests for checked-in HOI4 legacy bootstrap political metadata, startup shell separation, startup bundle runtime meta, and language patch derivation.
+- Verification after remediation: `tests.test_startup_bootstrap_assets`, startup/perf/sidebar/UI/chunk unittest group, `npm run test:e2e:startup-bundle-recovery-contract`, focused HOI4 baseline with `startupBundleSource=startup-bundle`, and `npm run perf:gate` all passed.

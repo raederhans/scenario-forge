@@ -14,7 +14,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from scenario_builder.hoi4.audit import build_source_atlas, write_report_files
 from scenario_builder.hoi4.compiler import compile_scenario_bundle
 from map_builder.io.writers import write_json_atomic
-from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology
+from tools.build_startup_bootstrap_assets import build_startup_bootstrap_assets
+from tools.build_startup_bundle import (
+    STARTUP_BOOTSTRAP_STRATEGY,
+    STARTUP_BUNDLE_GZIP_BUDGET_BYTES,
+    STARTUP_BUNDLE_VERSION,
+    build_startup_bundles,
+)
 from scenario_builder.hoi4.parser import (
     discover_hoi4_source_root,
     load_hierarchy_groups,
@@ -234,6 +240,77 @@ def ensure_city_authoring_inputs(scenario_output_dir: Path, scenario_id: str) ->
         )
 
 
+
+def normalize_geo_locale_patch_payload(payload: object, scenario_id: str) -> dict:
+    normalized = payload if isinstance(payload, dict) else {}
+    return {
+        "version": int(normalized.get("version") or 1),
+        "scenario_id": str(normalized.get("scenario_id") or scenario_id).strip() or scenario_id,
+        "generated_at": str(normalized.get("generated_at") or "").strip(),
+        "geo": normalized.get("geo") if isinstance(normalized.get("geo"), dict) else {},
+    }
+
+
+def build_language_geo_locale_patch_payload(base_payload: dict, language: str) -> dict:
+    payload = dict(base_payload)
+    payload["geo"] = {
+        feature_id: dict(entry)
+        for feature_id, entry in base_payload.get("geo", {}).items()
+        if isinstance(entry, dict) and entry.get(language)
+    }
+    payload["language"] = language
+    return payload
+
+
+def ensure_geo_locale_patch_inputs(scenario_output_dir: Path, scenario_id: str) -> None:
+    base_path = scenario_output_dir / "geo_locale_patch.json"
+    base_payload = normalize_geo_locale_patch_payload(
+        read_json(base_path) if base_path.exists() else {},
+        scenario_id,
+    )
+    if not base_path.exists():
+        write_json(base_path, base_payload)
+
+    for language in ("en", "zh"):
+        path = scenario_output_dir / f"geo_locale_patch.{language}.json"
+        # Keep locale-specific files semantically derived from the base patch so
+        # manifest language URLs cannot hide existing scenario geo overrides.
+        write_json(path, build_language_geo_locale_patch_payload(base_payload, language))
+
+
+def build_startup_assets_for_scenario(scenario_output_dir: Path, report_dir: Path) -> dict:
+    support_report_path = report_dir / "startup_support_assets.report.json"
+    bundle_report_path = report_dir / "startup_bundle.report.json"
+    build_startup_bootstrap_assets(
+        base_topology_path=PROJECT_ROOT / "data" / "europe_topology.json",
+        full_locales_path=PROJECT_ROOT / "data" / "locales.json",
+        full_geo_aliases_path=PROJECT_ROOT / "data" / "geo_aliases.json",
+        full_runtime_topology_path=scenario_output_dir / "runtime_topology.topo.json",
+        scenario_geo_patch_path=scenario_output_dir / "geo_locale_patch.json",
+        runtime_bootstrap_output_path=scenario_output_dir / "startup.runtime_shell.topo.json",
+        startup_locales_output_path=scenario_output_dir / "locales.startup.json",
+        startup_geo_aliases_output_path=scenario_output_dir / "geo_aliases.startup.json",
+        report_path=support_report_path,
+    )
+    return build_startup_bundles(
+        scenario_manifest_path=scenario_output_dir / "manifest.json",
+        data_manifest_path=PROJECT_ROOT / "data" / "manifest.json",
+        topology_primary_path=PROJECT_ROOT / "data" / "europe_topology.json",
+        startup_locales_path=scenario_output_dir / "locales.startup.json",
+        geo_aliases_path=scenario_output_dir / "geo_aliases.startup.json",
+        full_runtime_topology_path=scenario_output_dir / "runtime_topology.topo.json",
+        runtime_bootstrap_topology_path=scenario_output_dir / "startup.runtime_shell.topo.json",
+        countries_path=scenario_output_dir / "countries.json",
+        owners_path=scenario_output_dir / "owners.by_feature.json",
+        controllers_path=scenario_output_dir / "controllers.by_feature.json",
+        cores_path=scenario_output_dir / "cores.by_feature.json",
+        geo_locale_patch_en_path=scenario_output_dir / "geo_locale_patch.en.json",
+        geo_locale_patch_zh_path=scenario_output_dir / "geo_locale_patch.zh.json",
+        output_en_path=scenario_output_dir / "startup.bundle.en.json",
+        output_zh_path=scenario_output_dir / "startup.bundle.zh.json",
+        report_path=bundle_report_path,
+    )
+
 def split_paths(raw_value: str) -> list[Path]:
     candidates = []
     for token in str(raw_value or "").replace(";", ",").split(","):
@@ -365,7 +442,9 @@ def main() -> int:
     definition_entries = parse_definition_csv(source_root / "map/definition.csv")
     runtime_topology_path = Path(args.runtime_topology)
     runtime_topology_payload = read_json(runtime_topology_path)
-    runtime_bootstrap_topology_payload = build_bootstrap_runtime_topology(runtime_topology_payload)
+    # Public bootstrap URL remains legacy-compatible and keeps political metadata;
+    # startup bundles use a separate empty runtime shell file.
+    runtime_bootstrap_topology_payload = runtime_topology_payload
     runtime_features = load_runtime_features(runtime_topology_path)
     runtime_country_names = load_runtime_country_names(runtime_topology_path)
     hierarchy_groups, country_meta_by_iso2 = load_hierarchy_groups(Path(args.hierarchy))
@@ -483,9 +562,30 @@ def main() -> int:
     manifest_payload["startup_topology_url"] = (
         f"data/scenarios/{args.scenario_id}/runtime_topology.bootstrap.topo.json"
     )
+    manifest_payload["startup_bundle_url_en"] = f"data/scenarios/{args.scenario_id}/startup.bundle.en.json"
+    manifest_payload["startup_bundle_url_zh"] = f"data/scenarios/{args.scenario_id}/startup.bundle.zh.json"
+    manifest_payload["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
+    manifest_payload["startup_bootstrap_strategy"] = STARTUP_BOOTSTRAP_STRATEGY
+    manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.json"
+    manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.en.json"
+    manifest_payload["geo_locale_patch_url_zh"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.zh.json"
     manifest_payload["city_overrides_url"] = f"data/scenarios/{args.scenario_id}/city_overrides.json"
     manifest_payload["capital_hints_url"] = f"data/scenarios/{args.scenario_id}/capital_hints.json"
     write_json(scenario_output_dir / "manifest.json", manifest_payload)
+
+    ensure_geo_locale_patch_inputs(scenario_output_dir, args.scenario_id)
+    startup_result = build_startup_assets_for_scenario(scenario_output_dir, report_dir)
+    gzip_sizes = {
+        language: Path(path).stat().st_size
+        for language, path in startup_result.get("gzip_outputs", {}).items()
+    }
+    oversized = {
+        language: size
+        for language, size in gzip_sizes.items()
+        if size > STARTUP_BUNDLE_GZIP_BUDGET_BYTES
+    }
+    if oversized:
+        raise ValueError(f"Startup bundle gzip budget exceeded: {oversized}")
 
     if delta_rows:
         write_json(
@@ -554,6 +654,7 @@ def main() -> int:
     print(f"[scenario] Quality counts: {bundle['audit']['summary']['quality_counts']}")
     print(f"[scenario] Geometry blockers: {bundle['audit']['summary']['geometry_blocker_count']}")
     print(f"[scenario] Critical unresolved: {bundle['audit']['summary']['critical_unresolved_count']}")
+    print(f"[scenario] Startup bundle gzip bytes: {gzip_sizes}")
     if delta_rows:
         print(f"[scenario] State owner delta count: {len(delta_rows)}")
     return 0

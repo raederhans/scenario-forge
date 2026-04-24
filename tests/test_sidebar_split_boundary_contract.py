@@ -6,6 +6,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
 COUNTRY_INSPECTOR_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "sidebar" / "country_inspector_controller.js"
+MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 
 
 class SidebarSplitBoundaryContractTest(unittest.TestCase):
@@ -47,6 +48,14 @@ class SidebarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);', content)
         self.assertIn('registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);', content)
         self.assertIn("bindCountryInspectorEvents();", content)
+
+
+    def test_auto_fill_refreshes_country_rows_before_full_list_fallback(self):
+        content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        self.assertRegex(
+            content,
+            r'const changedCountryCodes = Object\.keys\(nextCountryBaseColors\);[\s\S]*?runtimeState\.refreshCountryListRowsFn\(\{[\s\S]*?countryCodes: changedCountryCodes,[\s\S]*?refreshPresetTree: true,[\s\S]*?\}\);[\s\S]*?else if \(typeof runtimeState\.renderCountryListFn === "function"\)',
+        )
 
     def test_country_inspector_search_binding_moves_to_controller(self):
         sidebar_content = SIDEBAR_JS.read_text(encoding="utf-8")

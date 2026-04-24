@@ -119,5 +119,12 @@
     "max_required_chunks": 6,
     "max_optional_chunks": 3,
     "detail_zoom_threshold": 1.7
-  }
+  },
+  "startup_bundle_url_en": "data/scenarios/hoi4_1939/startup.bundle.en.json",
+  "startup_bundle_url_zh": "data/scenarios/hoi4_1939/startup.bundle.zh.json",
+  "startup_bundle_version": 5,
+  "startup_bootstrap_strategy": "chunked-coarse-first",
+  "geo_locale_patch_url": "data/scenarios/hoi4_1939/geo_locale_patch.json",
+  "geo_locale_patch_url_en": "data/scenarios/hoi4_1939/geo_locale_patch.en.json",
+  "geo_locale_patch_url_zh": "data/scenarios/hoi4_1939/geo_locale_patch.zh.json"
 }

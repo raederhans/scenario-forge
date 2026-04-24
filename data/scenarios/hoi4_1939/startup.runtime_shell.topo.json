@@ -1,0 +1,1 @@
+{"type":"Topology","objects":{"land_mask":{"type":"GeometryCollection","geometries":[]},"context_land_mask":{"type":"GeometryCollection","geometries":[]},"scenario_water":{"type":"GeometryCollection","geometries":[]},"scenario_special_land":{"type":"GeometryCollection","geometries":[]}},"arcs":[],"bbox":[-180.0,-89.9825,180.0,83.5996]}

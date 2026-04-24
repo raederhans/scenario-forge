@@ -1,17 +1,18 @@
 # App Performance Overhaul Plan
 
 ## Current phase
-Phase 0: fix rebuildStaticMeshes and TNO promotion infra regressions.
+Phase 2 v3.1 slice: metrics contract + hoi4_1939 startup bundle.
 
 ## Task list
-- [ ] Identify root cause for blank_base rebuildStaticMeshes ~50s.
-- [ ] Identify root cause for tno_1962 promotion infra ~7.95s.
-- [ ] Patch minimal code path without changing TNO water correctness.
-- [ ] Extend existing targeted tests.
-- [ ] Run affected tests and focused baseline.
-- [ ] Review/bug-check/first-principles pass.
+- [x] Preserve Phase 0/1 completed context.
+- [ ] Extend perf baseline summary with startup/chunk/context timing fields.
+- [ ] Generate and wire hoi4_1939 startup support + startup bundle assets.
+- [ ] Add static/contract coverage for new perf and startup bundle fields.
+- [ ] Evaluate UI fanout row-refresh minimum slice.
+- [ ] Run targeted verification and review pass.
 
-## Acceptance for Phase 0
-- blank_base rebuildStaticMeshes <= 800ms in focused baseline.
-- tno_1962 scenarioChunkPromotionInfraStage <= 120ms in focused baseline.
-- Existing TNO water contract remains green.
+## Acceptance for this slice
+- hoi4_1939 startup bundle files exist for en/zh with .gz sidecars below 5,000,000 bytes.
+- hoi4_1939 manifest advertises startup_bundle_url_en/zh, startup_bundle_version, startup_bootstrap_strategy.
+- perf summary exposes planned timing/source fields while gate still uses tno_1962 + hoi4_1939.
+- Parent thread owns all live test/baseline execution.
