@@ -77,6 +77,7 @@ import {
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
 import { flushRenderBoundary, requestRender } from "./render_boundary.js";
+import { registerRuntimeHook } from "./state/index.js";
 import {
   bindInteractionFunnel,
   dispatchMapClick,
@@ -517,6 +518,8 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawCityPointsLayer",
   "drawAirportsLayer",
   "drawPortsLayer",
+  "drawRoadsLayer",
+  "drawRailwaysLayer",
   "drawUrbanLayer",
   "drawRiversLayer",
   "drawScenarioRegionOverlaysPass",
@@ -1667,6 +1670,36 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
 function invalidateAllRenderPasses(reason = "unspecified") {
   invalidateRenderPasses(RENDER_PASS_NAMES, reason);
 }
+
+function releaseDeferredContextBasePass(reason = "deferred-context-release") {
+  const normalizedReason = String(reason || "deferred-context-release").trim() || "deferred-context-release";
+  if (!runtimeState.deferContextBasePass) {
+    return false;
+  }
+  const hadStagedContextBaseHandle = !!runtimeState.stagedContextBaseHandle;
+  runtimeState.deferContextBasePass = false;
+  cancelDeferredWork(runtimeState.stagedContextBaseHandle);
+  runtimeState.stagedContextBaseHandle = null;
+  if (hadStagedContextBaseHandle && runtimeState.deferHitCanvasBuild) {
+    scheduleStagedHitCanvasWarmup(nowMs(), Number(runtimeState.stagedMapDataToken || 0));
+  }
+  invalidateRenderPasses(["contextBase", "contextMarkers"], normalizedReason);
+  clearRenderPassReferenceTransforms(["contextBase", "contextMarkers"]);
+  requestRendererRender(normalizedReason, {
+    flush: true,
+    fallback: () => {
+      if (context) render();
+    },
+  });
+  recordRenderPerfMetric("releaseDeferredContextBasePass", 0, {
+    canceledStagedContextBase: hadStagedContextBaseHandle,
+    released: true,
+    reason: normalizedReason,
+  });
+  return true;
+}
+
+registerRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", releaseDeferredContextBasePass);
 
 function isBootInteractionReady() {
   return String(runtimeState.bootPhase || "").trim().toLowerCase() === "ready" && !runtimeState.bootBlocking;
@@ -16677,6 +16710,18 @@ function drawContextMarkersPass(k, { interactive = false } = {}) {
       });
       collectContextMetric("drawPortsLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(runtimeState.portsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawRoadsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(runtimeState.roadsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawRailwaysLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(runtimeState.railwaysData),
         interactive: false,
         skipped: true,
         reason: "staged-apply",

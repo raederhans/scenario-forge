@@ -28,6 +28,18 @@ test("physical layer source contracts stay wired to the expected renderer and st
     contextBaseStart >= 0 && contextBaseEnd > contextBaseStart
       ? rendererSource.slice(contextBaseStart, contextBaseEnd)
       : "";
+  const contextMarkersStart = rendererSource.indexOf("function drawContextMarkersPass");
+  const contextMarkersEnd = rendererSource.indexOf("function drawContextScenarioPass");
+  const contextMarkersSource =
+    contextMarkersStart >= 0 && contextMarkersEnd > contextMarkersStart
+      ? rendererSource.slice(contextMarkersStart, contextMarkersEnd)
+      : "";
+  const releaseDeferredContextStart = rendererSource.indexOf("function releaseDeferredContextBasePass");
+  const releaseDeferredContextEnd = rendererSource.indexOf("registerRuntimeHook(runtimeState, \"releaseDeferredContextBasePassFn\"", releaseDeferredContextStart);
+  const releaseDeferredContextSource =
+    releaseDeferredContextStart >= 0 && releaseDeferredContextEnd > releaseDeferredContextStart
+      ? rendererSource.slice(releaseDeferredContextStart, releaseDeferredContextEnd)
+      : "";
 
   const checks = {
     hasValidBlendModes:
@@ -115,6 +127,18 @@ test("physical layer source contracts stay wired to the expected renderer and st
       /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(appearanceControllerSource),
     projectImportLoadsFullPhysicalSet:
       /callRuntimeHook\(state, "ensureContextLayerDataFn", \["physical-set", "physical-contours-set"\], \{[\s\S]*?reason: "project-import",[\s\S]*?renderNow: false,/.test(interactionFunnelSource),
+    contextMarkersStagedMetricsCoverTransportLines:
+      /if \((?:runtimeState|state)\.deferContextBasePass && !interactive\) \{/.test(contextMarkersSource)
+      && contextMarkersSource.includes('collectContextMetric("drawRoadsLayer", 0, {')
+      && contextMarkersSource.includes('collectContextMetric("drawRailwaysLayer", 0, {')
+      && /collectContextMetric\("drawRoadsLayer", 0, \{[\s\S]*?reason: "staged-apply",/.test(contextMarkersSource)
+      && /collectContextMetric\("drawRailwaysLayer", 0, \{[\s\S]*?reason: "staged-apply",/.test(contextMarkersSource),
+    contextBreakdownCoversTransportLines:
+      /const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set\(\[[\s\S]*?"drawRoadsLayer",[\s\S]*?"drawRailwaysLayer",/.test(rendererSource),
+    releaseDeferredContextCancelsStagedContextWork:
+      releaseDeferredContextSource.includes("cancelDeferredWork(runtimeState.stagedContextBaseHandle);")
+      && releaseDeferredContextSource.includes("runtimeState.stagedContextBaseHandle = null;")
+      && releaseDeferredContextSource.includes("scheduleStagedHitCanvasWarmup(nowMs(), Number(runtimeState.stagedMapDataToken || 0));"),
   };
 
   Object.entries(checks).forEach(([label, ok]) => {

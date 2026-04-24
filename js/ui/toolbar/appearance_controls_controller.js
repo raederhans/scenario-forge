@@ -1182,6 +1182,9 @@ export function createAppearanceControlsController({
       return;
     }
     runtimeState.showTransport = normalized;
+    if (normalized && hasVisibleTransportFamily()) {
+      runtimeState.releaseDeferredContextBasePassFn?.("transport-master-toggle");
+    }
     if (normalized && runtimeState.showAirports && typeof runtimeState.ensureContextLayerDataFn === "function") {
       void runtimeState.ensureContextLayerDataFn("airports", { reason: "transport-master-toggle", renderNow: true });
     }
@@ -1220,6 +1223,17 @@ export function createAppearanceControlsController({
       recentContainer.appendChild(btn);
     });
   };
+
+  const releaseDeferredContextForTransportToggle = (reason) => {
+    runtimeState.releaseDeferredContextBasePassFn?.(reason);
+  };
+
+  const hasVisibleTransportFamily = () => !!(
+    runtimeState.showAirports
+    || runtimeState.showPorts
+    || runtimeState.showRail
+    || runtimeState.showRoad
+  );
 
   const normalizeParentBorderEnabledMap = () => {
     const supported = Array.isArray(runtimeState.parentBorderSupportedCountries) ? runtimeState.parentBorderSupportedCountries : [];
@@ -1328,6 +1342,9 @@ export function createAppearanceControlsController({
       toggleAirports.checked = !!runtimeState.showAirports;
       toggleAirports.addEventListener("change", (event) => {
         runtimeState.showAirports = !!event.target.checked;
+        if (runtimeState.showAirports) {
+          releaseDeferredContextForTransportToggle("toggle-airports");
+        }
         if (runtimeState.showAirports && typeof runtimeState.ensureContextLayerDataFn === "function") {
           void runtimeState.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
         }
@@ -1341,6 +1358,9 @@ export function createAppearanceControlsController({
       togglePorts.checked = !!runtimeState.showPorts;
       togglePorts.addEventListener("change", (event) => {
         runtimeState.showPorts = !!event.target.checked;
+        if (runtimeState.showPorts) {
+          releaseDeferredContextForTransportToggle("toggle-ports");
+        }
         if (runtimeState.showPorts && typeof runtimeState.ensureContextLayerDataFn === "function") {
           void runtimeState.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
         }
@@ -1355,6 +1375,9 @@ export function createAppearanceControlsController({
       toggleRail.addEventListener("change", (event) => {
         runtimeState.showRail = !!event.target.checked;
         if (runtimeState.showRail && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        if (runtimeState.showRail) {
+          releaseDeferredContextForTransportToggle("toggle-rail");
+        }
         if (runtimeState.showRail && typeof runtimeState.ensureContextLayerDataFn === "function") {
           void runtimeState.ensureContextLayerDataFn(["railways", "rail_stations_major"], { reason: "toolbar-toggle", renderNow: true });
         }
@@ -1369,6 +1392,9 @@ export function createAppearanceControlsController({
       toggleRoad.addEventListener("change", (event) => {
         runtimeState.showRoad = !!event.target.checked;
         if (runtimeState.showRoad && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        if (runtimeState.showRoad) {
+          releaseDeferredContextForTransportToggle("toggle-road");
+        }
         if (runtimeState.showRoad && typeof runtimeState.ensureContextLayerDataFn === "function") {
           void runtimeState.ensureContextLayerDataFn("roads", { reason: "toolbar-toggle", renderNow: true });
         }

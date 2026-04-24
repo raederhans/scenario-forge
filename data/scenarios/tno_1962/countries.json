@@ -990,7 +990,7 @@
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#0f0f65",
-      "feature_count": 294,
+      "feature_count": 295,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "FR",
@@ -1021,7 +1021,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 294
+      "controller_feature_count": 295
     },
     "GER": {
       "tag": "GER",
@@ -1517,7 +1517,7 @@
       "tag": "GRE",
       "display_name": "Greek Protectorate",
       "color_hex": "#799f99",
-      "feature_count": 169,
+      "feature_count": 162,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "GR",
@@ -1550,7 +1550,7 @@
       ],
       "subject_kind": "protectorate",
       "entry_kind": "scenario_subject",
-      "controller_feature_count": 169
+      "controller_feature_count": 162
     },
     "GRN": {
       "tag": "GRN",
@@ -1996,7 +1996,7 @@
         "Italian Greek Islands"
       ],
       "disabled_regional_preset_reason": "Already applied in scenario baseline",
-      "controller_feature_count": 243
+      "controller_feature_count": 244
     },
     "JAP": {
       "tag": "JAP",
@@ -4643,8 +4643,8 @@
       ],
       "subject_kind": "client_state",
       "entry_kind": "scenario_subject",
-      "feature_count": 38,
-      "controller_feature_count": 35
+      "feature_count": 48,
+      "controller_feature_count": 48
     },
     "SER": {
       "tag": "SER",
@@ -4689,7 +4689,7 @@
       "tag": "ATL",
       "display_name": "Atlantropa Reclamation Zone",
       "color_hex": "#d8c7a6",
-      "feature_count": 460,
+      "feature_count": 465,
       "quality": "manual_reviewed",
       "source": "scenario_generated",
       "base_iso2": "ZZ",
