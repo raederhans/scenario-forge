@@ -35,3 +35,13 @@ Main thread owns implementation and verification. Subagents are static analysis 
 - [x] Fix hook result telemetry unwrap.
 - [x] Fix secondary demand metric repeated counting.
 - [x] Run targeted syntax, contract, and node tests.
+
+
+## 2026-04-24 Direct interaction closeout task progress
+
+- [x] Add direct interaction duration metrics.
+- [x] Add hover metric sampling rule.
+- [x] Defer mousemove hover overlay render by one RAF.
+- [x] Keep click/dblclick hit path semantics unchanged.
+- [x] Add static contract coverage for hover RAF, metric names, secondary demand, and eager hooks.
+- [x] Run targeted validation and perf gate.

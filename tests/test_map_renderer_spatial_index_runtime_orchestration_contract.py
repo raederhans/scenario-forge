@@ -58,6 +58,33 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             ),
         )
 
+    def test_secondary_spatial_demand_metric_only_records_new_pending_build(self):
+        self.assertRegex(
+            self.renderer_content,
+            re.compile(
+                r'const hadPendingBuild = secondarySpatialBuildHandle !== null && secondarySpatialBuildHandle !== undefined;\s*pendingSecondarySpatialBuildReasons\.add\(normalizedReason\);\s*if \(!hadPendingBuild\) \{\s*incrementPerfCounter\("interactionSecondaryIndexDemandCount"\);\s*recordRenderPerfMetric\("interactionSecondaryIndexDemandCount", 0, \{[\s\S]*?pendingReasonCount: pendingSecondarySpatialBuildReasons\.size,',
+                re.S,
+            ),
+        )
+
+    def test_hover_hit_keeps_reduced_phase_before_precise_hit_resolution(self):
+        self.assertRegex(
+            self.renderer_content,
+            re.compile(
+                r'const reducedHoverPhase =[\s\S]*?if \(reducedHoverPhase\) \{[\s\S]*?return;\s*\}\s*const hit = getHitFromEvent\(event, \{\s*enableSnap: false,\s*snapPx: HIT_SNAP_RADIUS_HOVER_PX,\s*eventType: "hover",\s*\}\);',
+                re.S,
+            ),
+        )
+
+    def test_hit_rank_metric_carries_candidate_and_target_shape(self):
+        self.assertRegex(
+            self.renderer_content,
+            re.compile(
+                r'function rankCandidates\(candidates, lonLat, \{ eventType = "unknown", targetType = "unknown" \} = \{\}\) \{[\s\S]*?let geoContainsCount = 0;[\s\S]*?geoContainsCount \+= 1;[\s\S]*?recordInteractionDurationMetric\("interactionHitRankDuration", nowMs\(\) - startedAt, \{[\s\S]*?candidateCount: candidates\.length,[\s\S]*?geoContainsCount,[\s\S]*?containsGeoCount:[\s\S]*?eventType,[\s\S]*?targetType,',
+                re.S,
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

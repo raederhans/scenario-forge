@@ -29,3 +29,12 @@ Verification target for this slice:
 - `python -m unittest tests.test_water_special_region_sidebar_boundary_contract tests.test_sidebar_split_boundary_contract`
 - `npm run test:node:scenario-chunk-contracts`
 - `npm run test:node:perf-probe-snapshot-behavior`
+
+
+## 2026-04-24 Direct interaction performance closeout
+
+- Hover hot path: add interaction action/rank/hover overlay/facility probe/city probe duration metrics.
+- Hover metric sampling: counters increment every call; hover detail entries record every 10th call or any sample >= 8ms.
+- Hover overlay: mousemove path queues one RAF render; force render, mouseleave, facility card actions, and zoom start stay synchronous.
+- Click warmup: observe new click/action/rank metrics first; defer any hit-canvas warmup change until forced build cost is proven dominant.
+- Runtime hooks: keep sidebar and toolbar hooks eager for URL replay and startup boot.

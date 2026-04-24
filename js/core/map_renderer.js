@@ -826,6 +826,8 @@ const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
 const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
 const CHUNKED_INDEX_BUILD_SLICE_SIZE = 1200;
 const CHUNKED_SPATIAL_BUILD_SLICE_SIZE = 900;
+const HOVER_INTERACTION_METRIC_SAMPLE_RATE = 10;
+const HOVER_INTERACTION_SLOW_SAMPLE_MS = 8;
 let debugMode = "PROD";
 let islandNeighborsCache = {
   topologyRef: null,
@@ -1329,6 +1331,7 @@ let deferredIndexUiRefreshHandle = null;
 let deferredIndexUiRefreshState = null;
 let pendingSidebarRefreshHandle = null;
 let pendingSidebarRefreshState = null;
+let hoverOverlayRenderRafHandle = null;
 let secondarySpatialBuildHandle = null;
 let pendingSecondarySpatialBuildReasons = new Set();
 let pendingScenarioChunkFlushAfterExactHandle = null;
@@ -1567,6 +1570,29 @@ function incrementPerfCounter(counterName, amount = 1) {
   cache.counters[counterName] = (Number(cache.counters[counterName]) || 0) + Number(amount || 0);
 }
 
+function recordInteractionDurationMetric(name, durationMs, details = {}) {
+  const normalizedName = String(name || "").trim();
+  if (!normalizedName) return null;
+  const normalizedEventType = String(details.eventType || "unknown").trim().toLowerCase() || "unknown";
+  const normalizedDuration = Math.max(0, Number(durationMs) || 0);
+  const counterName = `${normalizedName}Count`;
+  incrementPerfCounter(counterName);
+  const callCount = Number(getRenderPassCacheState().counters[counterName] || 0);
+  const isHoverMetric = normalizedEventType === "hover";
+  const isSlowHoverMetric = isHoverMetric && normalizedDuration >= HOVER_INTERACTION_SLOW_SAMPLE_MS;
+  const shouldRecord = !isHoverMetric
+    || isSlowHoverMetric
+    || callCount % HOVER_INTERACTION_METRIC_SAMPLE_RATE === 0;
+  if (!shouldRecord) return null;
+  return recordRenderPerfMetric(normalizedName, normalizedDuration, {
+    ...details,
+    eventType: normalizedEventType,
+    sampleRate: isHoverMetric ? HOVER_INTERACTION_METRIC_SAMPLE_RATE : 1,
+    slowSample: isSlowHoverMetric,
+    callCount,
+  });
+}
+
 function recordUiRefreshMetric(name, details = {}) {
   recordRenderPerfMetric(name, 0, {
     recordedAt: Date.now(),
@@ -1674,6 +1700,10 @@ function noteRenderAction(label, startedAt = null) {
     : null;
   if (Number.isFinite(startedAt)) {
     cache.lastActionDurationMs = Math.max(0, nowMs() - Number(startedAt));
+    recordInteractionDurationMetric("interactionActionDuration", cache.lastActionDurationMs, {
+      actionLabel: cache.lastAction,
+      eventType: "action",
+    });
   }
 }
 
@@ -5104,14 +5134,45 @@ function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
   lastInspectorOverlaySignature = nextSignature;
 }
 
-function renderHoverOverlayIfNeeded({ force = false } = {}) {
+function renderHoverOverlayIfNeeded({ force = false, eventType = "hover" } = {}) {
   const nextSignature = getHoverOverlaySignature();
   if (!force && !runtimeState.hoverOverlayDirty && nextSignature === lastHoverOverlaySignature) {
     return;
   }
+  const startedAt = nowMs();
   renderHoverOverlay();
   runtimeState.hoverOverlayDirty = false;
   lastHoverOverlaySignature = nextSignature;
+  recordInteractionDurationMetric("interactionHoverOverlayDuration", nowMs() - startedAt, {
+    eventType,
+    force: !!force,
+  });
+}
+
+function cancelScheduledHoverOverlayRender() {
+  if (hoverOverlayRenderRafHandle === null || hoverOverlayRenderRafHandle === undefined) {
+    hoverOverlayRenderRafHandle = null;
+    return;
+  }
+  if (typeof globalThis.cancelAnimationFrame === "function") {
+    globalThis.cancelAnimationFrame(hoverOverlayRenderRafHandle);
+  } else {
+    globalThis.clearTimeout(hoverOverlayRenderRafHandle);
+  }
+  hoverOverlayRenderRafHandle = null;
+}
+
+function scheduleHoverOverlayRender() {
+  if (hoverOverlayRenderRafHandle !== null && hoverOverlayRenderRafHandle !== undefined) {
+    return;
+  }
+  const callback = () => {
+    hoverOverlayRenderRafHandle = null;
+    renderHoverOverlayIfNeeded({ eventType: "hover" });
+  };
+  hoverOverlayRenderRafHandle = typeof globalThis.requestAnimationFrame === "function"
+    ? globalThis.requestAnimationFrame(callback)
+    : globalThis.setTimeout(callback, 0);
 }
 
 function renderDevSelectionOverlay() {
@@ -7645,14 +7706,17 @@ function collectSpecialGridCandidates(px, py, radiusProj = 0) {
   return candidates;
 }
 
-function rankCandidates(candidates, lonLat) {
+function rankCandidates(candidates, lonLat, { eventType = "unknown", targetType = "unknown" } = {}) {
   if (!Array.isArray(candidates) || !candidates.length) return [];
 
+  const startedAt = nowMs();
+  let geoContainsCount = 0;
   const ranked = candidates.map((candidate) => {
     const feature = candidate.item?.feature;
     const hitGeometry = candidate.item?.hitGeometry || feature;
     let containsGeo = false;
     if (hitGeometry && lonLat && globalThis.d3?.geoContains) {
+      geoContainsCount += 1;
       try {
         containsGeo = !!globalThis.d3.geoContains(hitGeometry, lonLat);
       } catch (error) {
@@ -7679,6 +7743,16 @@ function rankCandidates(candidates, lonLat) {
     if (a.distanceProj !== b.distanceProj) return a.distanceProj - b.distanceProj;
     return String(a.item?.id || "").localeCompare(String(b.item?.id || ""));
   });
+
+  if (eventType !== "unknown" || targetType !== "unknown") {
+    recordInteractionDurationMetric("interactionHitRankDuration", nowMs() - startedAt, {
+      candidateCount: candidates.length,
+      geoContainsCount,
+      containsGeoCount: ranked.filter((candidate) => candidate.containsGeo).length,
+      eventType,
+      targetType,
+    });
+  }
 
   return ranked;
 }
@@ -7834,7 +7908,7 @@ function getLandHitFromPointer(
   }
 
   const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
   if (strictRanked.length > 0) {
     const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
     if (strictContainsGeo) {
@@ -7868,7 +7942,7 @@ function getLandHitFromPointer(
   if (radiusProj <= 0) return createHitResult();
 
   const snapCandidates = collectGridCandidates(pointer.px, pointer.py, radiusProj);
-  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "land" });
   if (!snapRanked.length) return createHitResult();
 
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
@@ -7896,7 +7970,7 @@ function getWaterHitFromPointer(
   }
 
   const strictCandidates = collectWaterGridCandidates(pointer.px, pointer.py, 0);
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "water" });
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
     if (eventType === "hover" && isMacroOceanWaterRegion(strictHit.item?.feature)) {
@@ -7922,7 +7996,7 @@ function getWaterHitFromPointer(
   if (radiusProj <= 0) return createHitResult();
 
   const snapCandidates = collectWaterGridCandidates(pointer.px, pointer.py, radiusProj);
-  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "water" });
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
   if (eventType === "hover" && isMacroOceanWaterRegion(chosen.item?.feature)) {
@@ -7941,7 +8015,7 @@ function getWaterHitFromPointer(
 
 function getSpecialHitFromPointer(
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
   if (!runtimeState.showScenarioSpecialRegions) return createHitResult();
   if (!runtimeState.specialSpatialItems?.length) {
@@ -7954,7 +8028,7 @@ function getSpecialHitFromPointer(
   }
 
   const strictCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "special" });
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
     return toHitResult(strictHit, {
@@ -7974,7 +8048,7 @@ function getSpecialHitFromPointer(
   if (radiusProj <= 0) return createHitResult();
 
   const snapCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj);
-  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "special" });
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
   return toHitResult(chosen, {
@@ -8713,6 +8787,7 @@ function getHitFromEvent(
   const specialHit = getSpecialHitFromPointer(pointer, {
     enableSnap,
     snapPx,
+    eventType,
   });
   let resolvedHit = specialHit;
   if (!resolvedHit.id) {
@@ -12352,11 +12427,25 @@ function cacheVisibleCityHoverEntries(entries = []) {
 }
 
 function getHoveredCityEntryFromEvent(event) {
+  const startedAt = nowMs();
+  const eventType = String(event?.type || "hover").toLowerCase() === "mousemove" ? "hover" : String(event?.type || "unknown").toLowerCase();
   if (!visibleCityHoverEntries.length || !mapSvg || !globalThis.d3?.pointer) {
+    recordInteractionDurationMetric("interactionHoverCityProbeDuration", nowMs() - startedAt, {
+      eventType,
+      entryCount: visibleCityHoverEntries.length,
+      hit: false,
+      skipped: true,
+    });
     return null;
   }
   const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
   if (![sx, sy].every(Number.isFinite)) {
+    recordInteractionDurationMetric("interactionHoverCityProbeDuration", nowMs() - startedAt, {
+      eventType,
+      entryCount: visibleCityHoverEntries.length,
+      hit: false,
+      skipped: true,
+    });
     return null;
   }
   let bestEntry = null;
@@ -12372,6 +12461,11 @@ function getHoveredCityEntryFromEvent(event) {
       bestDistance = distance;
       bestEntry = entry;
     }
+  });
+  recordInteractionDurationMetric("interactionHoverCityProbeDuration", nowMs() - startedAt, {
+    eventType,
+    entryCount: visibleCityHoverEntries.length,
+    hit: !!bestEntry,
   });
   return bestEntry;
 }
@@ -12465,15 +12559,35 @@ function getFacilityHoverRadiusPx(entry) {
 }
 
 function getHoveredFacilityEntryFromEvent(event) {
+  const startedAt = nowMs();
+  const eventType = String(event?.type || "hover").toLowerCase() === "mousemove" ? "hover" : String(event?.type || "unknown").toLowerCase();
   if (!mapSvg || !globalThis.d3?.pointer) {
+    recordInteractionDurationMetric("interactionHoverFacilityProbeDuration", nowMs() - startedAt, {
+      eventType,
+      entryCount: 0,
+      hit: false,
+      skipped: true,
+    });
     return null;
   }
   const entries = listVisibleFacilityHoverEntries();
   if (!entries.length) {
+    recordInteractionDurationMetric("interactionHoverFacilityProbeDuration", nowMs() - startedAt, {
+      eventType,
+      entryCount: 0,
+      hit: false,
+      skipped: true,
+    });
     return null;
   }
   const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
   if (![sx, sy].every(Number.isFinite)) {
+    recordInteractionDurationMetric("interactionHoverFacilityProbeDuration", nowMs() - startedAt, {
+      eventType,
+      entryCount: entries.length,
+      hit: false,
+      skipped: true,
+    });
     return null;
   }
   let bestEntry = null;
@@ -12489,6 +12603,11 @@ function getHoveredFacilityEntryFromEvent(event) {
       bestDistance = distance;
       bestEntry = entry;
     }
+  });
+  recordInteractionDurationMetric("interactionHoverFacilityProbeDuration", nowMs() - startedAt, {
+    eventType,
+    entryCount: entries.length,
+    hit: !!bestEntry,
   });
   return bestEntry;
 }
@@ -12574,7 +12693,7 @@ function syncFacilityInfoCardVisibility() {
   hoveredFacilityEntry = null;
   applyFacilityInfoCardState(null);
   runtimeState.hoverOverlayDirty = true;
-  renderHoverOverlayIfNeeded();
+  renderHoverOverlayIfNeeded({ eventType: "facility-card-visibility" });
   queueTooltipUpdate({ visible: false });
   setMapInteractionCursor("");
 }
@@ -19932,7 +20051,7 @@ function render() {
   renderSpecialZonesIfNeeded();
   renderDevSelectionOverlayIfNeeded();
   renderInspectorHighlightOverlayIfNeeded();
-  renderHoverOverlayIfNeeded();
+  renderHoverOverlayIfNeeded({ eventType: "render-frame" });
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     renderLegend();
     if (typeof runtimeState.updateLegendUI === "function") {
@@ -20155,7 +20274,7 @@ function handleMouseMove(event) {
     }
     updateDevHoverHit(null);
     runtimeState.hoverOverlayDirty = true;
-    renderHoverOverlayIfNeeded();
+    scheduleHoverOverlayRender();
     queueTooltipUpdate({ visible: false });
     setMapInteractionCursor("");
     return;
@@ -20173,12 +20292,12 @@ function handleMouseMove(event) {
       runtimeState.hoveredWaterRegionId = null;
       runtimeState.hoveredSpecialRegionId = null;
       runtimeState.hoverOverlayDirty = true;
-      renderHoverOverlayIfNeeded();
+      scheduleHoverOverlayRender();
     }
     if (hoveredFacilityEntry) {
       hoveredFacilityEntry = null;
       runtimeState.hoverOverlayDirty = true;
-      renderHoverOverlayIfNeeded();
+      scheduleHoverOverlayRender();
     }
     updateDevHoverHit(null);
     queueTooltipUpdate({ visible: false });
@@ -20204,7 +20323,7 @@ function handleMouseMove(event) {
     runtimeState.hoveredSpecialRegionId = nextHoveredSpecialId;
     runtimeState.hoverOverlayDirty = true;
     if (!reducedHoverPhase) {
-      renderHoverOverlayIfNeeded();
+      scheduleHoverOverlayRender();
     }
   }
   updateDevHoverHit(id ? hit : null);
@@ -20217,7 +20336,7 @@ function handleMouseMove(event) {
   if (nextFacilityKey !== previousFacilityKey) {
     hoveredFacilityEntry = hoveredFacility || null;
     runtimeState.hoverOverlayDirty = true;
-    renderHoverOverlayIfNeeded();
+    scheduleHoverOverlayRender();
   }
   setMapInteractionCursor(facilityDetailsActive ? "pointer" : "");
   if (hoveredFacility?.tooltipText) {
@@ -21381,7 +21500,7 @@ async function handleClick(event, _interactionContext = null) {
       y: event?.clientY,
     });
     runtimeState.hoverOverlayDirty = true;
-    renderHoverOverlayIfNeeded();
+    renderHoverOverlayIfNeeded({ eventType: "facility-card-open" });
     noteRenderAction("click-facility-info", actionStart);
     return;
   }
@@ -21389,7 +21508,7 @@ async function handleClick(event, _interactionContext = null) {
     selectedFacilityEntry = null;
     applyFacilityInfoCardState(null);
     runtimeState.hoverOverlayDirty = true;
-    renderHoverOverlayIfNeeded();
+    renderHoverOverlayIfNeeded({ eventType: "facility-card-clear" });
   }
 
   const hit = getHitFromEvent(event, {
@@ -21967,7 +22086,7 @@ function initZoom() {
       runtimeState.pendingExactPoliticalFastFrame = false;
       setRenderPhase(RENDER_PHASE_INTERACTING);
       captureInteractionBorderSnapshot(runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
-      renderHoverOverlayIfNeeded({ force: true });
+      renderHoverOverlayIfNeeded({ force: true, eventType: "zoom-start" });
       if (typeof runtimeState.dismissOnboardingHintFn === "function") {
         runtimeState.dismissOnboardingHintFn();
       }
@@ -22032,7 +22151,7 @@ function bindEvents() {
     hoveredFacilityEntry = null;
     updateDevHoverHit(null);
     runtimeState.hoverOverlayDirty = true;
-    renderHoverOverlayIfNeeded();
+    renderHoverOverlayIfNeeded({ eventType: "mouseleave" });
     queueTooltipUpdate({ visible: false });
     setMapInteractionCursor("");
   });
@@ -22073,7 +22192,7 @@ function initMap({
     facilityInfoCardCloseBtn.addEventListener("click", () => {
       applyFacilityInfoCardState(null);
       runtimeState.hoverOverlayDirty = true;
-      renderHoverOverlayIfNeeded();
+      renderHoverOverlayIfNeeded({ eventType: "facility-card-close" });
     });
     facilityInfoCardCloseBtn.dataset.bound = "true";
   }
@@ -22160,6 +22279,7 @@ function initMap({
   runtimeState.renderPhaseTimerId = null;
   runtimeState.tooltipPendingState = { visible: false };
   runtimeState.tooltipRafHandle = null;
+  cancelScheduledHoverOverlayRender();
   markAllOverlaysDirty();
   clearStagedMapDataTasks();
   cancelExactAfterSettleRefresh();
@@ -22219,6 +22339,7 @@ function setMapData({
   clearRenderPhaseTimer();
   cancelPendingIndexUiRefresh();
   cancelPendingSidebarRefresh();
+  cancelScheduledHoverOverlayRender();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
   clearStagedMapDataTasks();

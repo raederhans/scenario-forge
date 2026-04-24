@@ -22,6 +22,26 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && rendererSource.includes('"contextScenarioLayerSpecial"')
       && rendererSource.includes('"contextScenarioLayerRelief"')
       && rendererSource.includes('recordRenderPerfMetric("contextScenarioSignatureChanged"'),
+    interactionMetricsKeepDirectActionAndHitRankDurations:
+      rendererSource.includes('recordInteractionDurationMetric("interactionActionDuration"')
+      && /function rankCandidates\(candidates, lonLat, \{ eventType = "unknown", targetType = "unknown" \} = \{\}\) \{[\s\S]*?recordInteractionDurationMetric\("interactionHitRankDuration"[\s\S]*?candidateCount: candidates\.length,[\s\S]*?geoContainsCount,[\s\S]*?containsGeoCount:[\s\S]*?eventType,[\s\S]*?targetType,/.test(rendererSource),
+    hoverMetricsUseSamplingAndSlowSampleThreshold:
+      rendererSource.includes("const HOVER_INTERACTION_METRIC_SAMPLE_RATE = 10;")
+      && rendererSource.includes("const HOVER_INTERACTION_SLOW_SAMPLE_MS = 8;")
+      && /function recordInteractionDurationMetric\(name, durationMs, details = \{\}\) \{[\s\S]*?incrementPerfCounter\(counterName\);[\s\S]*?callCount % HOVER_INTERACTION_METRIC_SAMPLE_RATE === 0/.test(rendererSource),
+    hoverOverlayKeepsDirtySignatureGateAndRafQueue:
+      /function renderHoverOverlayIfNeeded\(\{ force = false, eventType = "hover" \} = \{\}\) \{[\s\S]*?!force && !runtimeState\.hoverOverlayDirty && nextSignature === lastHoverOverlaySignature[\s\S]*?recordInteractionDurationMetric\("interactionHoverOverlayDuration"/.test(rendererSource)
+      && /function scheduleHoverOverlayRender\(\) \{[\s\S]*?hoverOverlayRenderRafHandle !== null && hoverOverlayRenderRafHandle !== undefined[\s\S]*?requestAnimationFrame\(callback\)/.test(rendererSource),
+    hoverOverlayDirectPathsCarryExplicitEventTypes:
+      rendererSource.includes('renderHoverOverlayIfNeeded({ eventType: "facility-card-visibility" });')
+      && rendererSource.includes('renderHoverOverlayIfNeeded({ eventType: "facility-card-open" });')
+      && rendererSource.includes('renderHoverOverlayIfNeeded({ eventType: "facility-card-clear" });')
+      && rendererSource.includes('renderHoverOverlayIfNeeded({ force: true, eventType: "zoom-start" });')
+      && rendererSource.includes('renderHoverOverlayIfNeeded({ eventType: "mouseleave" });')
+      && rendererSource.includes('renderHoverOverlayIfNeeded({ eventType: "facility-card-close" });'),
+    hoverFacilityAndCityProbeMetricsRemainNamed:
+      rendererSource.includes('recordInteractionDurationMetric("interactionHoverFacilityProbeDuration"')
+      && rendererSource.includes('recordInteractionDurationMetric("interactionHoverCityProbeDuration"'),
     exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
       /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
       && /scheduleExactAfterSettleRefresh[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(rendererSource),

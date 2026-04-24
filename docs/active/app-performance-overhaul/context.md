@@ -102,3 +102,27 @@ Review result: current changes are minimal and targeted. No extra abstraction in
 
 - Fixed `contextBreakdown` overwrite regression by resetting breakdown once at exact-frame start, then merging each context metric session into the current frame breakdown. This preserves base/markers/scenario entries in the same frame and avoids carrying stale entries across exact frames.
 - Verification passed: `node --check js/core/map_renderer.js`, `npm run test:node:scenario-chunk-contracts`, `npm run test:node:perf-probe-snapshot-behavior`.
+
+
+## 2026-04-24 Direct interaction performance closeout implementation
+
+- Added sampled interaction duration metric helper in map_renderer.js.
+- Added interactionActionDuration, interactionHitRankDuration, interactionHoverOverlayDuration, interactionHoverFacilityProbeDuration, and interactionHoverCityProbeDuration.
+- Added scheduleHoverOverlayRender() with single RAF handle. Only handleMouseMove() now queues hover overlay renders; mouseleave, force render, facility card state changes, and zoom start remain direct.
+- initMap() and setMapData() cancel pending hover overlay RAF work to avoid stale hover overlays after renderer reset or data swap.
+- Static contracts extended for secondary spatial demand reason handling, hover RAF queue, metric names, and eager sidebar/toolbar runtime hooks.
+
+
+## 2026-04-24 Direct interaction closeout verification
+
+- Review pass found low-risk metric ambiguity; synchronous hover overlay paths now pass explicit event types for render-frame, facility-card, zoom-start, and mouseleave triggers.
+- Passed: 
+ode --check js/core/map_renderer.js; Python interaction/runtime/sidebar contract group 57/57; 
+pm run test:node:scenario-chunk-contracts; 
+pm run test:node:perf-probe-snapshot-behavior; 
+pm run test:e2e:interaction-funnel; 
+pm run test:e2e:tno-contracts; 
+pm run test:e2e:startup-bundle-recovery-contract; 
+pm run perf:gate.
+- 
+pm run test:e2e:water-rendering failed in adjacent water/river specs: river timeout during page.waitForTimeout(350) and water cache specs could not find #toggleOpenOceanRegions. These failures are outside the changed hover/click path and need a separate UI test maintenance slice.
