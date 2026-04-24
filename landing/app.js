@@ -10,21 +10,18 @@ const translations = {
     headerGithub: "GitHub",
     headerOpenApp: "Open demo",
     heroEyebrow: "Scenario-first political map workbench",
-    heroTitle: "Forge political maps that feel alive.",
+    heroTitle: "Forge political maps",
+    heroTitleAccent: "that feel alive.",
     heroBody:
       "Build from a world state, reshape ownership and control, layer context, and export a map that can actually carry a story.",
     heroPrimaryCta: "Open live demo",
     heroSecondaryCta: "View on GitHub",
-    heroFactOne:
-      "Built-in world states: Blank, Modern World, HOI4 1936, HOI4 1939, and TNO 1962.",
-    heroFactTwo:
-      "Political editing, context layers, bilingual UI, project save/load, PNG and JPG export.",
-    heroFactThree:
-      "Made for alternate history, strategy modding, and geopolitical storytelling.",
-    heroChipOne: "World states",
-    heroChipTwo: "Political ownership",
-    heroChipThree: "Context layers",
-    heroChipFour: "Export-ready",
+    heroMetricsLabel: "Core product facts",
+    productPreviewLabel: "Scenario Forge product preview",
+    productStageLabel: "Scenario Forge / Live workspace",
+    heroMetricOne: "Blank · Modern · HOI4 · TNO",
+    heroMetricTwo: "Ownership · control · context",
+    heroMetricThree: "PNG / JPG export",
     worksEyebrow: "Selected works",
     worksTitle: "Show the result first.",
     worksBody:
@@ -91,11 +88,14 @@ const translations = {
     roadmapTitle: "Transparent about what is ready and what is not.",
     roadmapBody:
       "Scenario Forge already has a strong core. Some transport-related surfaces are still intentionally presented as work in progress.",
+    roadmapStatusOne: "Active preview",
     roadmapOneTitle: "Transport workbench",
     roadmapOneBody:
       "Partially complete. It exists, but it is not yet the center of the product story.",
+    roadmapStatusTwo: "Mature sample",
     roadmapTwoTitle: "Japan road preview",
     roadmapTwoBody: "Currently the most mature transport sample inside the project.",
+    roadmapStatusThree: "Shell stage",
     roadmapThreeTitle: "Rail and other infrastructure families",
     roadmapThreeBody:
       "Still closer to baseline or shell stage and should be treated as in-progress, not product-defining yet.",
@@ -126,18 +126,18 @@ const translations = {
     headerGithub: "GitHub",
     headerOpenApp: "打开 Demo",
     heroEyebrow: "Scenario-first 政治地图工作台",
-    heroTitle: "让政治地图真正带着故事活起来。",
+    heroTitle: "让政治地图",
+    heroTitleAccent: "真正带着故事活起来。",
     heroBody:
       "从一个世界状态出发，改写归属与控制，叠加上下文图层，再导出一张真的能讲故事的地图。",
     heroPrimaryCta: "打开在线 Demo",
     heroSecondaryCta: "查看 GitHub",
-    heroFactOne: "内置 Blank、Modern World、HOI4 1936、HOI4 1939、TNO 1962 等 world states。",
-    heroFactTwo: "支持政治编辑、上下文图层、中英双语、项目保存回读，以及 PNG / JPG 导出。",
-    heroFactThree: "面向 alternate history、strategy modding 与 geopolitical storytelling。",
-    heroChipOne: "World states",
-    heroChipTwo: "政治归属",
-    heroChipThree: "上下文图层",
-    heroChipFour: "可直接导出",
+    heroMetricsLabel: "核心产品事实",
+    productPreviewLabel: "Scenario Forge 产品预览",
+    productStageLabel: "Scenario Forge / 实时工作台",
+    heroMetricOne: "Blank · Modern · HOI4 · TNO",
+    heroMetricTwo: "归属 · 控制 · 上下文",
+    heroMetricThree: "PNG / JPG 导出",
     worksEyebrow: "作品预览",
     worksTitle: "先看结果，再理解工具。",
     worksBody: "Scenario Forge 最容易打动人的，不是面板数量，而是它最终能做出什么样的地图结果。",
@@ -190,10 +190,13 @@ const translations = {
     roadmapEyebrow: "进行中",
     roadmapTitle: "清楚说明什么已经可用，什么还没完成。",
     roadmapBody: "Scenario Forge 的核心已经很鲜明，但 transport 相关能力目前仍然是有意保持透明的进行中状态。",
+    roadmapStatusOne: "预览中",
     roadmapOneTitle: "Transport workbench",
     roadmapOneBody: "已经有基础，但还不是这个产品当下的主叙事中心。",
+    roadmapStatusTwo: "成熟样例",
     roadmapTwoTitle: "Japan road preview",
     roadmapTwoBody: "目前是 transport 相关样例里最成熟的一块。",
+    roadmapStatusThree: "Shell 阶段",
     roadmapThreeTitle: "Rail 和其他基础设施 family",
     roadmapThreeBody: "目前更接近 baseline 或 shell 阶段，应被视为进行中，而不是产品主卖点。",
     ctaEyebrow: "准备打开工作台了吗？",
@@ -228,6 +231,12 @@ function applyLanguage(language) {
     if (!key || !(key in copy)) return;
     node.textContent = copy[key];
   });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
+    const key = node.getAttribute("data-i18n-aria-label");
+    if (!key || !(key in copy)) return;
+    node.setAttribute("aria-label", copy[key]);
+  });
+
   document.querySelectorAll("[data-lang]").forEach((button) => {
     const active = button.getAttribute("data-lang") === language;
     button.classList.toggle("is-active", active);
@@ -254,6 +263,34 @@ function applyLanguage(language) {
   }
 }
 
+function initScrollReveal() {
+  const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
+  if (motionQuery?.matches) return;
+
+  const revealNodes = Array.from(document.querySelectorAll("[data-reveal]"));
+  if (!revealNodes.length) return;
+
+  document.documentElement.dataset.reveal = "enabled";
+
+  if (!("IntersectionObserver" in globalThis)) {
+    revealNodes.forEach((node) => node.classList.add("is-revealed"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
+  );
+
+  revealNodes.forEach((node) => observer.observe(node));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const initialLanguage = getStoredLanguage();
   applyLanguage(initialLanguage);
@@ -262,4 +299,5 @@ document.addEventListener("DOMContentLoaded", () => {
       applyLanguage(button.getAttribute("data-lang") === "zh" ? "zh" : "en");
     });
   });
+  initScrollReveal();
 });
