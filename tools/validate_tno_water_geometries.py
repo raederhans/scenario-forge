@@ -1,5 +1,6 @@
 import argparse
 import json
+import subprocess
 from pathlib import Path
 
 from shapely import coverage_invalid_edges, coverage_is_valid
@@ -173,6 +174,51 @@ def _load_json(path: Path) -> dict:
     return payload
 
 
+def _topology_object_to_feature_collection(topology_payload: dict, object_name: str) -> dict | None:
+    if object_name not in (topology_payload.get("objects") or {}):
+        return None
+    return serialize_as_geojson(topology_payload, objectname=object_name)
+
+
+def _topology_objects_to_feature_collections_for_d3(
+    topology_payload: dict,
+    object_names: list[str],
+) -> dict[str, dict]:
+    target_names = [
+        object_name
+        for object_name in object_names
+        if object_name in (topology_payload.get("objects") or {})
+    ]
+    if not target_names:
+        return {}
+    script = r"""
+const fs = require("fs");
+const vm = require("vm");
+const payload = JSON.parse(fs.readFileSync(0, "utf8"));
+const sandbox = {};
+vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync("vendor/topojson-client.min.js", "utf8"), sandbox);
+const topojson = sandbox.topojson;
+const topology = payload.topology;
+const out = {};
+for (const objectName of payload.objectNames || []) {
+  if (topology && topology.objects && topology.objects[objectName]) {
+    out[objectName] = topojson.feature(topology, topology.objects[objectName]);
+  }
+}
+process.stdout.write(JSON.stringify(out));
+"""
+    completed = subprocess.run(
+        ["node", "-e", script],
+        input=json.dumps({"topology": topology_payload, "objectNames": target_names}),
+        text=True,
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    return json.loads(completed.stdout or "{}")
+
+
 def _iter_polygon_parts(geometry):
     if geometry.is_empty:
         return []
@@ -323,6 +369,100 @@ def _collect_chunk_metrics_from_feature_collections(chunk_feature_collections: l
         "oversized_part_bboxes": oversized_parts,
         "antimeridian_split_features": antimeridian_split_features,
     }
+
+
+def _collect_d3_spherical_metrics(feature_collections: dict[str, dict]) -> dict:
+    if not feature_collections:
+        return {}
+    script = r"""
+const fs = require("fs");
+const vm = require("vm");
+const payload = JSON.parse(fs.readFileSync(0, "utf8"));
+const sandbox = {};
+vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync("vendor/d3.v7.min.js", "utf8"), sandbox);
+const d3 = sandbox.d3;
+
+function isWorldBounds(bounds) {
+  return !!(
+    Array.isArray(bounds) &&
+    bounds.length === 2 &&
+    Math.abs(Number(bounds[0][0]) + 180) < 1e-9 &&
+    Math.abs(Number(bounds[0][1]) + 90) < 1e-9 &&
+    Math.abs(Number(bounds[1][0]) - 180) < 1e-9 &&
+    Math.abs(Number(bounds[1][1]) - 90) < 1e-9
+  );
+}
+
+function featureId(feature) {
+  const props = feature && feature.properties ? feature.properties : {};
+  return String(props.id || feature.id || "").trim() || "<unknown>";
+}
+
+function polygonParts(geometry) {
+  if (!geometry || typeof geometry !== "object") return [];
+  if (geometry.type === "Polygon") return [geometry];
+  if (geometry.type === "MultiPolygon") {
+    return (Array.isArray(geometry.coordinates) ? geometry.coordinates : [])
+      .map((coordinates) => ({ type: "Polygon", coordinates }));
+  }
+  if (geometry.type === "GeometryCollection") {
+    return (Array.isArray(geometry.geometries) ? geometry.geometries : []).flatMap(polygonParts);
+  }
+  return [];
+}
+
+function diagnostics(geometry) {
+  const feature = { type: "Feature", properties: {}, geometry };
+  const area = Number(d3.geoArea(feature));
+  const bounds = d3.geoBounds(feature);
+  const worldBounds = isWorldBounds(bounds);
+  const excessiveArea = Number.isFinite(area) && area > Math.PI * 2;
+  return { area, bounds, worldBounds, excessiveArea, invalid: worldBounds || excessiveArea };
+}
+
+function analyzeCollection(collection) {
+  const invalidFeatures = [];
+  const invalidParts = [];
+  const features = Array.isArray(collection && collection.features) ? collection.features : [];
+  for (const feature of features) {
+    if (!feature || !feature.geometry) continue;
+    const id = featureId(feature);
+    const featureDiagnostics = diagnostics(feature.geometry);
+    if (featureDiagnostics.invalid) {
+      invalidFeatures.push({ id, ...featureDiagnostics });
+    }
+    polygonParts(feature.geometry).forEach((part, index) => {
+      const partDiagnostics = diagnostics(part);
+      if (partDiagnostics.invalid) {
+        invalidParts.push({ id, partIndex: index, ...partDiagnostics });
+      }
+    });
+  }
+  return {
+    featureCount: features.length,
+    invalidFeatureCount: invalidFeatures.length,
+    invalidPartCount: invalidParts.length,
+    invalidFeatures,
+    invalidParts,
+  };
+}
+
+const report = {};
+for (const [label, collection] of Object.entries(payload.collections || {})) {
+  report[label] = analyzeCollection(collection);
+}
+process.stdout.write(JSON.stringify(report));
+"""
+    completed = subprocess.run(
+        ["node", "-e", script],
+        input=json.dumps({"collections": feature_collections}),
+        text=True,
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    return json.loads(completed.stdout or "{}")
 
 
 def _collect_ocean_macro_coverage(feature_collection: dict) -> dict:
@@ -534,16 +674,50 @@ def build_report_from_collections(
     runtime_topology_payload: dict | None = None,
     runtime_water: dict | None = None,
     runtime_political: dict | None = None,
+    runtime_land_mask: dict | None = None,
+    runtime_context_land_mask: dict | None = None,
     chunk_feature_collections: list[tuple[str, dict]] | None = None,
 ) -> dict:
     if runtime_topology_payload is not None:
-        runtime_water = runtime_water or serialize_as_geojson(runtime_topology_payload, objectname="scenario_water")
-        runtime_political = runtime_political or serialize_as_geojson(runtime_topology_payload, objectname="political")
+        runtime_water = runtime_water or _topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+        runtime_political = runtime_political or _topology_object_to_feature_collection(runtime_topology_payload, "political")
+        runtime_land_mask = runtime_land_mask or _topology_object_to_feature_collection(runtime_topology_payload, "land_mask")
+        runtime_context_land_mask = runtime_context_land_mask or _topology_object_to_feature_collection(
+            runtime_topology_payload,
+            "context_land_mask",
+        )
     if runtime_water is None or runtime_political is None:
         raise ValueError("Runtime water validator requires runtime_water and runtime_political feature collections.")
     chunk_metrics = _collect_chunk_metrics_from_feature_collections(chunk_feature_collections)
     source_metrics = _collect_feature_metrics(source_water, label="water_regions.geojson")
     runtime_metrics = _collect_feature_metrics(runtime_water, label="runtime_topology.topo.json::scenario_water")
+    runtime_land_mask_metrics = _collect_feature_metrics(
+        runtime_land_mask or {"type": "FeatureCollection", "features": []},
+        label="runtime_topology.topo.json::land_mask",
+    )
+    runtime_context_land_mask_metrics = _collect_feature_metrics(
+        runtime_context_land_mask or {"type": "FeatureCollection", "features": []},
+        label="runtime_topology.topo.json::context_land_mask",
+    )
+    d3_runtime_collections = {}
+    if runtime_topology_payload is not None:
+        d3_runtime_collections = _topology_objects_to_feature_collections_for_d3(
+            runtime_topology_payload,
+            ["scenario_water", "land_mask", "context_land_mask"],
+        )
+    d3_collections = {
+        "source": source_water,
+        "runtime": d3_runtime_collections.get("scenario_water") or runtime_water,
+        "runtime_land_mask": d3_runtime_collections.get("land_mask")
+        or runtime_land_mask
+        or {"type": "FeatureCollection", "features": []},
+        "runtime_context_land_mask": d3_runtime_collections.get("context_land_mask")
+        or runtime_context_land_mask
+        or {"type": "FeatureCollection", "features": []},
+    }
+    for label, collection in chunk_feature_collections or []:
+        d3_collections[f"chunk:{label}"] = collection
+    d3_spherical_metrics = _collect_d3_spherical_metrics(d3_collections)
     source_ids = set(source_metrics["feature_ids"])
     runtime_ids = set(runtime_metrics["feature_ids"])
     chunk_ids = set(chunk_metrics["feature_ids"])
@@ -552,7 +726,10 @@ def build_report_from_collections(
         "checks": {
             "source": source_metrics,
             "runtime": runtime_metrics,
+            "runtime_land_mask": runtime_land_mask_metrics,
+            "runtime_context_land_mask": runtime_context_land_mask_metrics,
             "chunks": chunk_metrics,
+            "d3_spherical": d3_spherical_metrics,
             "ocean_macro_coverage": _collect_ocean_macro_coverage(source_water),
             "first_wave_probe_coverage": _collect_probe_coverage(source_water),
             "first_wave_named_water_seams": _collect_named_water_seams(source_water),
@@ -585,7 +762,7 @@ def build_report(scenario_dir: Path) -> dict:
 def summarize_failures(report: dict, *, require_chunks: bool = True) -> list[str]:
     failures = []
     checks = report["checks"]
-    section_names = ["source", "runtime"]
+    section_names = ["source", "runtime", "runtime_land_mask", "runtime_context_land_mask"]
     if require_chunks:
         section_names.append("chunks")
     for section_name in section_names:
@@ -598,6 +775,13 @@ def summarize_failures(report: dict, *, require_chunks: bool = True) -> list[str
             failures.append(f"{section_name}: oversized_parts={len(section['oversized_part_bboxes'])}")
         if section["oversized_feature_bboxes"]:
             failures.append(f"{section_name}: oversized_features={len(section['oversized_feature_bboxes'])}")
+    for label, section in (checks.get("d3_spherical") or {}).items():
+        invalid_feature_count = int(section.get("invalidFeatureCount") or 0)
+        invalid_part_count = int(section.get("invalidPartCount") or 0)
+        if invalid_feature_count or invalid_part_count:
+            failures.append(
+                f"d3_spherical:{label}: invalid_features={invalid_feature_count} invalid_parts={invalid_part_count}"
+            )
     coverage = checks["ocean_macro_coverage"]
     if not coverage["is_valid"] or coverage["pairwise_overlap_count"]:
         failures.append(

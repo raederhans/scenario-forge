@@ -55,6 +55,7 @@ export function createSpatialIndexRuntimeOwner({
     getEffectiveSpecialRegionFeatures = () => [],
     collectFeatureHitGeometries = () => [],
     computeProjectedGeoBounds = () => null,
+    shouldExcludeWaterHitGeometry = () => false,
   } = helpers;
 
   // buildIndex 负责主索引映射层（landIndex/countryToFeatureIds/idToKey/keyToId），
@@ -144,6 +145,7 @@ export function createSpatialIndexRuntimeOwner({
       getFeatureId,
       collectFeatureHitGeometries,
       computeProjectedGeoBounds,
+      shouldExcludeWaterHitGeometry,
     });
     const waterGridSnapshot = captureSpatialGridBuild({
       state,

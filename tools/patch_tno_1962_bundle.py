@@ -588,6 +588,7 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
                 "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[1],
                 "name": "South Indian Antarctic Ocean",
                 "bbox": (20.0, -90.0, 147.0, -45.0),
+                "d3_reverse_orientation": True,
             },
             {
                 "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[2],
@@ -607,6 +608,20 @@ TNO_WATER_REGIONS_PROVENANCE_FILENAME = "derived/water_regions.provenance.json"
 LEGACY_MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME = "marine_regions_named_waters.snapshot.geojson"
 LEGACY_TNO_WATER_REGIONS_PROVENANCE_FILENAME = "water_regions.provenance.json"
 TNO_WATER_SUBTRACT_BUFFER_DEGREES = 0.0
+D3_SPHERICAL_SAFE_BBOX_WIDTH_THRESHOLD = 300.0
+D3_SPHERICAL_SAFE_SPLIT_EPSILON = 1e-6
+D3_SPHERICAL_SAFE_LONGITUDE_SPLIT_BBOXES = (
+    (-180.0, -90.0, -60.0 - D3_SPHERICAL_SAFE_SPLIT_EPSILON, 90.0),
+    (-60.0 + D3_SPHERICAL_SAFE_SPLIT_EPSILON, -90.0, 60.0 - D3_SPHERICAL_SAFE_SPLIT_EPSILON, 90.0),
+    (60.0 + D3_SPHERICAL_SAFE_SPLIT_EPSILON, -90.0, 180.0, 90.0),
+)
+D3_SPHERICAL_PRUNE_COMPONENT_MIN_AREA_BY_ID = {
+    "tno_sea_of_marmara": 0.000001,
+}
+D3_SPHERICAL_REVERSE_ORIENTATION_FEATURE_IDS = {
+    "tno_south_indian_antarctic_ocean",
+}
+TOPOLOGY_D3_SAFE_MAX_ARC_POINTS = 512
 MARINE_REGIONS_DATASET_META = {
     "seavox_v19": {
         "dataset_name": "Marine Regions SeaVoX SeaArea v19",
@@ -1204,6 +1219,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_standard": "marine_regions_iho_v3",
         "subtract_base_ids": ("marine_black_sea",),
         "simplify_tolerance": 0.005,
+        "component_min_area": 0.000001,
     },
     {
         "id": "tno_bosporus_dardanelles",
@@ -5258,6 +5274,12 @@ def build_tno_open_ocean_split_features(
                 raise ValueError(
                     f"TNO ocean split '{child_spec['id']}' produced empty geometry from '{source_id}'."
                 )
+            if child_spec.get("d3_reverse_orientation"):
+                child_geom = reverse_polygonal_orientation_for_d3(child_geom)
+                if child_geom is None:
+                    raise ValueError(
+                        f"TNO ocean split '{child_spec['id']}' collapsed after D3 orientation repair."
+                    )
             child_name = child_spec["name"]
             child_props = dict(source_props)
             child_props.update({
@@ -5286,8 +5308,10 @@ def clip_tno_open_ocean_split_features(
     split_features: list[dict],
     clip_geometries_by_id: dict[str, list],
     component_min_area_by_id: dict[str, float] | None = None,
+    d3_reverse_orientation_ids: set[str] | None = None,
 ) -> list[dict]:
     component_min_area_by_id = component_min_area_by_id or {}
+    d3_reverse_orientation_ids = d3_reverse_orientation_ids or set()
     clipped_features: list[dict] = []
     for feature in split_features:
         props = dict(feature.get("properties", {}))
@@ -5310,6 +5334,10 @@ def clip_tno_open_ocean_split_features(
         )
         if clipped_geom is None:
             raise ValueError(f"TNO ocean split feature '{feature_id}' collapsed after coastal clipping.")
+        if feature_id in d3_reverse_orientation_ids:
+            clipped_geom = reverse_polygonal_orientation_for_d3(clipped_geom)
+            if clipped_geom is None:
+                raise ValueError(f"TNO ocean split feature '{feature_id}' collapsed after D3 orientation repair.")
         clipped_features.append(make_feature(clipped_geom, props))
     validate_tno_water_geometries(
         clipped_features,
@@ -5370,6 +5398,11 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
         simplify_tolerance = float(spec.get("simplify_tolerance") or 0.0)
         if simplify_tolerance > 0:
             prepared_geom = smooth_polygonal(prepared_geom, simplify_tolerance=simplify_tolerance)
+        component_min_area = float(spec.get("component_min_area") or 0.0)
+        if component_min_area > 0:
+            prepared_geom = prune_polygonal_components(prepared_geom, min_area=component_min_area)
+            if prepared_geom is None:
+                raise ValueError(f"Named water feature '{spec['id']}' collapsed after component pruning.")
         prepared_geometries_by_id[spec["id"]] = prepared_geom
         diagnostics[spec["id"]] = {
             "name": spec["name"],
@@ -5412,6 +5445,11 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
         final_geom = safe_unary_union(iter_polygon_parts(final_geom))
         if final_geom is None:
             raise ValueError(f"Named water feature '{named_feature_id}' collapsed after final polygon normalization.")
+        component_min_area = float(spec.get("component_min_area") or 0.0)
+        if component_min_area > 0:
+            final_geom = prune_polygonal_components(final_geom, min_area=component_min_area)
+            if final_geom is None:
+                raise ValueError(f"Named water feature '{named_feature_id}' collapsed after final component pruning.")
         properties = {
             "id": named_feature_id,
             "name": spec["name"],
@@ -7297,6 +7335,198 @@ def normalize_polygonal(geom):
     if not parts:
         return None
     return parts[0] if len(parts) == 1 else MultiPolygon(parts)
+
+
+def reverse_polygonal_orientation_for_d3(geom):
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return None
+    reversed_parts = []
+    for part in iter_polygon_parts(candidate):
+        exterior = list(part.exterior.coords)[::-1]
+        interiors = [list(interior.coords)[::-1] for interior in part.interiors]
+        reversed_part = Polygon(exterior, interiors)
+        if not reversed_part.is_empty and reversed_part.area > 1e-9:
+            reversed_parts.append(reversed_part)
+    if not reversed_parts:
+        return None
+    return reversed_parts[0] if len(reversed_parts) == 1 else MultiPolygon(reversed_parts)
+
+
+def split_full_width_polygonal_parts_for_d3(geom):
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return None
+    safe_parts = []
+    for part in iter_polygon_parts(candidate):
+        min_x, _, max_x, _ = [float(value) for value in part.bounds]
+        if (max_x - min_x) <= D3_SPHERICAL_SAFE_BBOX_WIDTH_THRESHOLD:
+            safe_parts.append(part)
+            continue
+        split_parts = []
+        for split_bbox in D3_SPHERICAL_SAFE_LONGITUDE_SPLIT_BBOXES:
+            clipped = normalize_polygonal(part.intersection(box(*split_bbox)))
+            split_parts.extend(iter_polygon_parts(clipped))
+        safe_parts.extend(split_parts or [part])
+    if not safe_parts:
+        return None
+    return safe_parts[0] if len(safe_parts) == 1 else MultiPolygon([orient(part, sign=-1.0) for part in safe_parts])
+
+
+def make_geometry_d3_spherical_safe(feature_id: str, geom):
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return None
+    component_min_area = D3_SPHERICAL_PRUNE_COMPONENT_MIN_AREA_BY_ID.get(str(feature_id).strip())
+    if component_min_area is not None:
+        candidate = prune_polygonal_components(candidate, min_area=component_min_area)
+    candidate = split_full_width_polygonal_parts_for_d3(candidate) or candidate
+    if str(feature_id).strip() in D3_SPHERICAL_REVERSE_ORIENTATION_FEATURE_IDS:
+        candidate = reverse_polygonal_orientation_for_d3(candidate) or candidate
+    return candidate
+
+
+def apply_d3_spherical_safe_split_to_gdf(
+    gdf: gpd.GeoDataFrame,
+    *,
+    feature_ids: set[str] | None = None,
+) -> gpd.GeoDataFrame:
+    if gdf is None or gdf.empty or "geometry" not in gdf.columns:
+        return gdf
+    out = gdf.copy()
+    if "id" in out.columns:
+        target_ids = {str(value).strip() for value in feature_ids or set() if str(value).strip()}
+
+        def _repair_row(row):
+            feature_id = str(row.get("id") or "").strip()
+            if target_ids and feature_id not in target_ids:
+                return row.geometry
+            repaired = make_geometry_d3_spherical_safe(feature_id, row.geometry)
+            if repaired is None:
+                raise ValueError(f"D3 spherical repair collapsed geometry for '{feature_id or '<unknown>'}'.")
+            return repaired
+
+        out["geometry"] = out.apply(_repair_row, axis=1)
+    else:
+        def _repair_geometry(geom):
+            repaired = split_full_width_polygonal_parts_for_d3(geom)
+            if repaired is None:
+                raise ValueError("D3 spherical repair collapsed an unnamed geometry.")
+            return repaired
+
+        out["geometry"] = out["geometry"].apply(_repair_geometry)
+    return out
+
+
+def replace_topology_object_from_gdf_for_d3(topo_dict: dict, object_name: str, gdf: gpd.GeoDataFrame) -> None:
+    geometries = []
+    for index, row in gdf.reset_index(drop=True).iterrows():
+        geom = make_geometry_d3_spherical_safe(str(row.get("id") or ""), row.geometry)
+        if geom is None:
+            raise ValueError(f"D3 topology repair collapsed geometry for '{str(row.get('id') or '').strip() or '<unknown>'}'.")
+        properties = {}
+        for column, value in row.items():
+            if column == "geometry":
+                continue
+            if value is None:
+                properties[column] = None
+                continue
+            if isinstance(value, (float, np.floating)) and math.isnan(float(value)):
+                properties[column] = None
+                continue
+            properties[column] = sanitize_jsonable(value)
+        geometries.append(_geometry_to_topology_geometry(topo_dict, {"id": index, "properties": properties}, geom))
+    topo_dict.setdefault("objects", {})[object_name] = {
+        "type": "GeometryCollection",
+        "geometries": geometries,
+    }
+
+
+def _geometry_to_topology_geometry(topo_dict: dict, original: dict, geom) -> dict:
+    base = {
+        key: value
+        for key, value in original.items()
+        if key not in {"type", "arcs", "coordinates"}
+    }
+    parts = iter_polygon_parts(geom)
+    if isinstance(geom, Polygon) or len(parts) == 1:
+        polygon = geom if isinstance(geom, Polygon) else parts[0]
+        base["type"] = "Polygon"
+        base["arcs"] = _polygon_to_topology_arcs(topo_dict, polygon)
+        return base
+    base["type"] = "MultiPolygon"
+    base["arcs"] = [
+        _polygon_to_topology_arcs(topo_dict, part)
+        for part in parts
+        if not part.is_empty
+    ]
+    return base
+
+
+def _polygon_to_topology_arcs(topo_dict: dict, polygon: Polygon) -> list[list[int]]:
+    return [
+        _append_topology_ring_arcs(topo_dict, polygon.exterior.coords),
+        *[_append_topology_ring_arcs(topo_dict, interior.coords) for interior in polygon.interiors],
+    ]
+
+
+def _append_topology_ring_arcs(topo_dict: dict, coords) -> list[int]:
+    ring = [[float(x), float(y)] for x, y, *_ in coords]
+    if ring and ring[0] != ring[-1]:
+        ring.append(list(ring[0]))
+    if len(ring) <= TOPOLOGY_D3_SAFE_MAX_ARC_POINTS:
+        return [_append_topology_arc(topo_dict, ring)]
+    arc_indexes = []
+    step = TOPOLOGY_D3_SAFE_MAX_ARC_POINTS - 1
+    for start in range(0, len(ring) - 1, step):
+        segment = ring[start : min(start + TOPOLOGY_D3_SAFE_MAX_ARC_POINTS, len(ring))]
+        if len(segment) >= 2:
+            arc_indexes.append(_append_topology_arc(topo_dict, segment))
+    return arc_indexes
+
+
+def _append_topology_arc(topo_dict: dict, coords) -> int:
+    topo_dict.setdefault("arcs", []).append([[float(x), float(y)] for x, y, *_ in coords])
+    return len(topo_dict["arcs"]) - 1
+
+
+def compact_topology_arcs(topo_dict: dict) -> None:
+    referenced = []
+    seen = set()
+    for object_payload in (topo_dict.get("objects") or {}).values():
+        for geometry in object_payload.get("geometries") or []:
+            for arc_index in _iter_topology_arc_refs(geometry.get("arcs")):
+                if arc_index not in seen:
+                    seen.add(arc_index)
+                    referenced.append(arc_index)
+    old_arcs = topo_dict.get("arcs") or []
+    remap = {old_index: new_index for new_index, old_index in enumerate(referenced)}
+    topo_dict["arcs"] = [old_arcs[index] for index in referenced if 0 <= index < len(old_arcs)]
+    for object_payload in (topo_dict.get("objects") or {}).values():
+        for geometry in object_payload.get("geometries") or []:
+            if "arcs" in geometry:
+                geometry["arcs"] = _remap_topology_arc_refs(geometry.get("arcs"), remap)
+
+
+def _iter_topology_arc_refs(value) -> list[int]:
+    if isinstance(value, int):
+        return [(-value - 1) if value < 0 else value]
+    if isinstance(value, list):
+        refs = []
+        for item in value:
+            refs.extend(_iter_topology_arc_refs(item))
+        return refs
+    return []
+
+
+def _remap_topology_arc_refs(value, remap: dict[int, int]):
+    if isinstance(value, int):
+        old_index = (-value - 1) if value < 0 else value
+        new_index = remap[old_index]
+        return -new_index - 1 if value < 0 else new_index
+    if isinstance(value, list):
+        return [_remap_topology_arc_refs(item, remap) for item in value]
+    return value
 
 
 def safe_unary_union(geoms):
@@ -10063,6 +10293,10 @@ def build_runtime_topology_payload(
     ]
     available_columns = [column for column in keep_columns if column in political_gdf.columns]
     runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
+    runtime_political_gdf = apply_d3_spherical_safe_split_to_gdf(runtime_political_gdf, feature_ids={"AQ"})
+    water_gdf = apply_d3_spherical_safe_split_to_gdf(water_gdf)
+    land_mask_gdf = apply_d3_spherical_safe_split_to_gdf(land_mask_gdf)
+    context_land_mask_gdf = apply_d3_spherical_safe_split_to_gdf(context_land_mask_gdf)
     if "id" in runtime_political_gdf.columns and "cntr_code" in runtime_political_gdf.columns:
         feature_ids = runtime_political_gdf["id"].astype(str)
         atl_runtime_mask = feature_ids.str.startswith("ATLISL_") | feature_ids.str.startswith("ATLSHL_")
@@ -10084,6 +10318,10 @@ def build_runtime_topology_payload(
         ("context_land_mask", context_land_mask_gdf),
         ("scenario_water", water_gdf),
     ])
+    replace_topology_object_from_gdf_for_d3(topo_dict, "land_mask", land_mask_gdf)
+    replace_topology_object_from_gdf_for_d3(topo_dict, "context_land_mask", context_land_mask_gdf)
+    replace_topology_object_from_gdf_for_d3(topo_dict, "scenario_water", water_gdf)
+    compact_topology_arcs(topo_dict)
     topo_dict.setdefault("objects", {})["scenario_special_land"] = {
         "type": "GeometryCollection",
         "geometries": [],
@@ -10447,6 +10685,12 @@ def build_water_stage_state_from_countries_state(
         for child_spec in split_spec.get("children", ())
         if str(child_spec.get("id") or "").strip()
     }
+    open_ocean_d3_reverse_orientation_ids = {
+        str(child_spec.get("id")).strip()
+        for split_spec in TNO_OPEN_OCEAN_SPLIT_SPECS
+        for child_spec in split_spec.get("children", ())
+        if str(child_spec.get("id") or "").strip() and child_spec.get("d3_reverse_orientation")
+    }
     clip_open_ocean_geometries_by_id: dict[str, list] = {}
     for spec, feature in zip(TNO_NAMED_MARGINAL_WATER_SPECS, named_marginal_water_features):
         clip_geom = normalize_polygonal(shape(feature.get("geometry")))
@@ -10463,6 +10707,7 @@ def build_water_stage_state_from_countries_state(
         ),
         clip_open_ocean_geometries_by_id,
         open_ocean_component_min_area_by_id,
+        open_ocean_d3_reverse_orientation_ids,
     )
     scenario_water_features.extend(named_marginal_water_features)
     scenario_water_features.append(congo_feature)
@@ -10482,6 +10727,9 @@ def build_water_stage_state_from_countries_state(
     land_mask_geom = safe_unary_union([land_without_lake, atl_land_union])
     if land_mask_geom is None:
         raise ValueError("Scenario land mask collapsed to empty geometry.")
+    land_mask_geom = split_full_width_polygonal_parts_for_d3(land_mask_geom)
+    if land_mask_geom is None:
+        raise ValueError("Scenario land mask collapsed after D3 spherical split.")
     land_mask_gdf = gpd.GeoDataFrame([{
         "id": "tno_1962_land_mask",
         "name": "TNO 1962 Land Mask",
@@ -10494,6 +10742,9 @@ def build_water_stage_state_from_countries_state(
         context_land_mask_fallback_used,
         context_land_mask_arc_refs,
     ) = build_context_land_mask_geometry(land_mask_geom)
+    context_land_mask_geom = split_full_width_polygonal_parts_for_d3(context_land_mask_geom)
+    if context_land_mask_geom is None:
+        raise ValueError("Scenario context land mask collapsed after D3 spherical split.")
     context_land_mask_gdf = gpd.GeoDataFrame([{
         "id": "tno_1962_context_land_mask",
         "name": "TNO 1962 Context Land Mask",

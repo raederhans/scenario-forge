@@ -81,6 +81,7 @@ export function buildWaterSpatialItems({
   getFeatureId = () => "",
   collectFeatureHitGeometries = () => [],
   computeProjectedGeoBounds = () => null,
+  shouldExcludeWaterHitGeometry = () => false,
 } = {}) {
   const items = [];
   features.forEach((feature) => {
@@ -88,6 +89,7 @@ export function buildWaterSpatialItems({
     if (!id) return;
     const hitGeometries = collectFeatureHitGeometries(feature);
     hitGeometries.forEach((hitGeometry, partIndex) => {
+      if (shouldExcludeWaterHitGeometry(hitGeometry, feature, id)) return;
       const bounds = computeProjectedGeoBounds(hitGeometry);
       if (!bounds) return;
       items.push({

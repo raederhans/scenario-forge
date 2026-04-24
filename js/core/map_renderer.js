@@ -886,12 +886,17 @@ let physicalLandClipPathCache = {
   path: null,
 };
 const SCENARIO_BACKGROUND_MERGE_MAX_AREA = Math.PI * 2;
+const SPHERICAL_GEOMETRY_MAX_AREA = Math.PI * 2;
 const SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO = 0.02;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
 const suspiciousScenarioBackgroundMergeWarnings = new Set();
 const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
+const waterSphericalSanitizationWarnings = new Set();
+const sphericalGeometryDiagnosticsByObject = new WeakMap();
+const safeWaterRegionGeometryPartsByFeature = new WeakMap();
+const sanitizedWaterRegionFeatureByFeature = new WeakMap();
 const renderDiag = {
   enabled: false,
   seenKeys: new Set(),
@@ -1277,8 +1282,9 @@ function getSpatialIndexRuntimeOwner() {
       yieldToMain,
       getEffectiveWaterRegionFeatures,
       getEffectiveSpecialRegionFeatures,
-      collectFeatureHitGeometries,
+      collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,
       computeProjectedGeoBounds,
+      shouldExcludeWaterHitGeometry,
     },
   });
   return spatialIndexRuntimeOwner;
@@ -2250,7 +2256,7 @@ function getScenarioSurfaceVersionSignal() {
     runtimeState.activeScenarioId || "",
     `runtime-tag:${String(runtimeState.scenarioRuntimeTopologyVersionTag || "").trim() || `${getObjectIdentityToken(runtimeTopologyRef, "scenario-runtime-topology")}:${getScenarioRuntimeTopologySignatureToken()}`}`,
     `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
-    `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`}`,
+    `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`}`,
     `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
     `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
   ].join("|");
@@ -2325,7 +2331,7 @@ function getRenderPassSignature(passName, transform = runtimeState.zoomTransform
       runtimeState.topologyRevision || 0,
       runtimeState.activeScenarioId || "",
       runtimeState.showPhysical ? "physical:on" : "physical:off",
-      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
+      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
     ].join("::");
@@ -2362,7 +2368,7 @@ function getRenderPassSignature(passName, transform = runtimeState.zoomTransform
       runtimeState.showUrban ? "urban:on" : "urban:off",
       runtimeState.showRivers ? "rivers:on" : "rivers:off",
       `context:${Number(runtimeState.contextLayerRevision || 0)}`,
-      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
+      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(runtimeState.renderProfile || "auto"),
       stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
@@ -2703,12 +2709,12 @@ function getEffectiveWaterRegionFeatures() {
     ? runtimeState.scenarioWaterRegionsData.features
     : [];
   if (isScenarioWaterTopologyExclusiveMode()) {
-    return scenarioFeatures.filter((feature) => !isWaterRegionExcludedByScenario(feature));
+    return sanitizeWaterRegionFeatures(scenarioFeatures.filter((feature) => !isWaterRegionExcludedByScenario(feature)));
   }
-  return [
+  return sanitizeWaterRegionFeatures([
     ...(Array.isArray(runtimeState.waterRegionsData?.features) ? runtimeState.waterRegionsData.features : []),
     ...scenarioFeatures,
-  ].filter((feature) => !isWaterRegionExcludedByScenario(feature));
+  ].filter((feature) => !isWaterRegionExcludedByScenario(feature)));
 }
 
 function getSpecialRegionName(feature) {
@@ -3808,17 +3814,19 @@ function getScenarioWaterVisibleCoverageRatioLegacy(waterFeatures = []) {
   const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
   let clippedArea = 0;
   (Array.isArray(waterFeatures) ? waterFeatures : []).forEach((feature) => {
-    const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
-    if (!bounds) return;
-    const minX = bounds.minX * transform.k + transform.x;
-    const minY = bounds.minY * transform.k + transform.y;
-    const maxX = bounds.maxX * transform.k + transform.x;
-    const maxY = bounds.maxY * transform.k + transform.y;
-    if (![minX, minY, maxX, maxY].every(Number.isFinite)) return;
-    const clippedWidth = Math.max(0, Math.min(maxX, viewportWidth) - Math.max(minX, 0));
-    const clippedHeight = Math.max(0, Math.min(maxY, viewportHeight) - Math.max(minY, 0));
-    if (!(clippedWidth > 0 && clippedHeight > 0)) return;
-    clippedArea += clippedWidth * clippedHeight;
+    collectSafeWaterRegionGeometryParts(feature).forEach((part) => {
+      const bounds = computeProjectedGeoBounds(part);
+      if (!bounds) return;
+      const minX = bounds.minX * transform.k + transform.x;
+      const minY = bounds.minY * transform.k + transform.y;
+      const maxX = bounds.maxX * transform.k + transform.x;
+      const maxY = bounds.maxY * transform.k + transform.y;
+      if (![minX, minY, maxX, maxY].every(Number.isFinite)) return;
+      const clippedWidth = Math.max(0, Math.min(maxX, viewportWidth) - Math.max(minX, 0));
+      const clippedHeight = Math.max(0, Math.min(maxY, viewportHeight) - Math.max(minY, 0));
+      if (!(clippedWidth > 0 && clippedHeight > 0)) return;
+      clippedArea += clippedWidth * clippedHeight;
+    });
   });
   return Math.max(0, Math.min(1, clippedArea / viewportArea));
 }
@@ -3838,41 +3846,44 @@ function getScenarioWaterVisibleCoverageRatioGrid(waterFeatures = []) {
   const safeWaterFeatures = Array.isArray(waterFeatures) ? waterFeatures : [];
   for (const feature of safeWaterFeatures) {
     if (coveredCount >= totalCellCount) break;
-    const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
-    if (!bounds) continue;
-    const minX = bounds.minX * transform.k + transform.x;
-    const minY = bounds.minY * transform.k + transform.y;
-    const maxX = bounds.maxX * transform.k + transform.x;
-    const maxY = bounds.maxY * transform.k + transform.y;
-    if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
-    const clippedMinX = Math.max(0, Math.min(minX, viewportWidth));
-    const clippedMinY = Math.max(0, Math.min(minY, viewportHeight));
-    const clippedMaxX = Math.max(0, Math.min(maxX, viewportWidth));
-    const clippedMaxY = Math.max(0, Math.min(maxY, viewportHeight));
-    if (!(clippedMaxX > clippedMinX && clippedMaxY > clippedMinY)) continue;
+    for (const part of collectSafeWaterRegionGeometryParts(feature)) {
+      if (coveredCount >= totalCellCount) break;
+      const bounds = computeProjectedGeoBounds(part);
+      if (!bounds) continue;
+      const minX = bounds.minX * transform.k + transform.x;
+      const minY = bounds.minY * transform.k + transform.y;
+      const maxX = bounds.maxX * transform.k + transform.x;
+      const maxY = bounds.maxY * transform.k + transform.y;
+      if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
+      const clippedMinX = Math.max(0, Math.min(minX, viewportWidth));
+      const clippedMinY = Math.max(0, Math.min(minY, viewportHeight));
+      const clippedMaxX = Math.max(0, Math.min(maxX, viewportWidth));
+      const clippedMaxY = Math.max(0, Math.min(maxY, viewportHeight));
+      if (!(clippedMaxX > clippedMinX && clippedMaxY > clippedMinY)) continue;
 
-    const colStart = Math.max(0, Math.min(gridColumns - 1, Math.floor((clippedMinX / viewportWidth) * gridColumns)));
-    const colEnd = Math.max(0, Math.min(
-      gridColumns - 1,
-      Math.ceil((clippedMaxX / viewportWidth) * gridColumns) - 1
-    ));
-    const rowStart = Math.max(0, Math.min(gridRows - 1, Math.floor((clippedMinY / viewportHeight) * gridRows)));
-    const rowEnd = Math.max(0, Math.min(
-      gridRows - 1,
-      Math.ceil((clippedMaxY / viewportHeight) * gridRows) - 1
-    ));
-    if (colEnd < colStart || rowEnd < rowStart) continue;
+      const colStart = Math.max(0, Math.min(gridColumns - 1, Math.floor((clippedMinX / viewportWidth) * gridColumns)));
+      const colEnd = Math.max(0, Math.min(
+        gridColumns - 1,
+        Math.ceil((clippedMaxX / viewportWidth) * gridColumns) - 1
+      ));
+      const rowStart = Math.max(0, Math.min(gridRows - 1, Math.floor((clippedMinY / viewportHeight) * gridRows)));
+      const rowEnd = Math.max(0, Math.min(
+        gridRows - 1,
+        Math.ceil((clippedMaxY / viewportHeight) * gridRows) - 1
+      ));
+      if (colEnd < colStart || rowEnd < rowStart) continue;
 
-    for (let row = rowStart; row <= rowEnd; row += 1) {
-      const rowOffset = row * gridColumns;
-      for (let col = colStart; col <= colEnd; col += 1) {
-        const cellIndex = rowOffset + col;
-        if (covered[cellIndex]) continue;
-        covered[cellIndex] = 1;
-        coveredCount += 1;
+      for (let row = rowStart; row <= rowEnd; row += 1) {
+        const rowOffset = row * gridColumns;
+        for (let col = colStart; col <= colEnd; col += 1) {
+          const cellIndex = rowOffset + col;
+          if (covered[cellIndex]) continue;
+          covered[cellIndex] = 1;
+          coveredCount += 1;
+          if (coveredCount >= totalCellCount) break;
+        }
         if (coveredCount >= totalCellCount) break;
       }
-      if (coveredCount >= totalCellCount) break;
     }
   }
   return Math.max(0, Math.min(1, coveredCount / totalCellCount));
@@ -4173,6 +4184,52 @@ function computeProjectedGeoBounds(geoObject) {
   };
 }
 
+function normalizeGeoObjectForSphericalDiagnostics(geoObject) {
+  if (!geoObject || typeof geoObject !== "object") return null;
+  const objectType = String(geoObject.type || "").trim();
+  if (objectType === "Feature" || objectType === "FeatureCollection" || objectType === "Sphere") {
+    return geoObject;
+  }
+  if (objectType) {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry: geoObject,
+    };
+  }
+  return null;
+}
+
+function getSphericalGeometryDiagnostics(geoObject) {
+  const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
+  if (!normalizedGeoObject || !globalThis.d3?.geoArea || !globalThis.d3?.geoBounds) {
+    return null;
+  }
+  if (sphericalGeometryDiagnosticsByObject.has(geoObject)) {
+    return sphericalGeometryDiagnosticsByObject.get(geoObject) || null;
+  }
+
+  try {
+    const area = Number(globalThis.d3.geoArea(normalizedGeoObject));
+    const bounds = globalThis.d3.geoBounds(normalizedGeoObject);
+    const diagnostics = {
+      area,
+      bounds,
+      isWorldBounds: isWorldBounds(bounds),
+      hasExcessiveSphereArea: Number.isFinite(area) && area > SPHERICAL_GEOMETRY_MAX_AREA,
+    };
+    diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
+    sphericalGeometryDiagnosticsByObject.set(geoObject, diagnostics);
+    return diagnostics;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function isSphericalGeometryUnsafe(geoObject) {
+  return !!getSphericalGeometryDiagnostics(geoObject)?.invalid;
+}
+
 function collectPolygonalGeometryParts(geometry) {
   if (!geometry || typeof geometry !== "object") return [];
   const geometryType = String(geometry.type || "");
@@ -4199,6 +4256,104 @@ function collectFeatureHitGeometries(feature) {
   const geometry = feature?.geometry;
   const polygonParts = collectPolygonalGeometryParts(geometry);
   return polygonParts.length ? polygonParts : (geometry ? [geometry] : []);
+}
+
+function buildWaterRegionFeatureFromParts(feature, parts) {
+  const safeParts = Array.isArray(parts) ? parts : [];
+  if (!feature || !safeParts.length) return null;
+  if (safeParts.length === 1) {
+    return {
+      ...feature,
+      geometry: safeParts[0],
+    };
+  }
+  return {
+    ...feature,
+    geometry: {
+      type: "MultiPolygon",
+      coordinates: safeParts
+        .filter((part) => String(part?.type || "") === "Polygon" && Array.isArray(part.coordinates))
+        .map((part) => part.coordinates),
+    },
+  };
+}
+
+function collectSafeWaterRegionGeometryPartsInfo(feature) {
+  if (!feature || typeof feature !== "object") {
+    return { parts: [], rawCount: 0, removedCount: 0 };
+  }
+  if (safeWaterRegionGeometryPartsByFeature.has(feature)) {
+    return safeWaterRegionGeometryPartsByFeature.get(feature);
+  }
+  const rawParts = collectFeatureHitGeometries(feature);
+  const safeParts = [];
+  let removedCount = 0;
+  rawParts.forEach((part) => {
+    if (isSphericalGeometryUnsafe(part)) {
+      removedCount += 1;
+      return;
+    }
+    safeParts.push(part);
+  });
+  const info = {
+    parts: safeParts,
+    rawCount: rawParts.length,
+    removedCount,
+  };
+  safeWaterRegionGeometryPartsByFeature.set(feature, info);
+  return info;
+}
+
+function collectSafeWaterRegionGeometryParts(feature) {
+  return collectSafeWaterRegionGeometryPartsInfo(feature).parts;
+}
+
+function shouldExcludeWaterHitGeometry(hitGeometry) {
+  return isSphericalGeometryUnsafe(hitGeometry);
+}
+
+function sanitizeWaterRegionFeature(feature) {
+  if (!feature || typeof feature !== "object") return null;
+  if (sanitizedWaterRegionFeatureByFeature.has(feature)) {
+    return sanitizedWaterRegionFeatureByFeature.get(feature);
+  }
+  const partInfo = collectSafeWaterRegionGeometryPartsInfo(feature);
+  const sanitized = partInfo.removedCount > 0
+    ? buildWaterRegionFeatureFromParts(feature, partInfo.parts)
+    : feature;
+  sanitizedWaterRegionFeatureByFeature.set(feature, sanitized);
+  return sanitized;
+}
+
+function sanitizeWaterRegionFeatures(features = []) {
+  const sanitizedFeatures = [];
+  const changedFeatureIds = [];
+  let removedPartCount = 0;
+  (Array.isArray(features) ? features : []).forEach((feature) => {
+    const sanitized = sanitizeWaterRegionFeature(feature);
+    const partInfo = collectSafeWaterRegionGeometryPartsInfo(feature);
+    if (partInfo.removedCount > 0) {
+      const featureId = getFeatureId(feature);
+      if (featureId) changedFeatureIds.push(featureId);
+      removedPartCount += partInfo.removedCount;
+    }
+    if (sanitized) sanitizedFeatures.push(sanitized);
+  });
+  if (removedPartCount > 0) {
+    const uniqueIds = Array.from(new Set(changedFeatureIds)).sort();
+    recordRenderPerfMetric("waterSphericalSanitization", 0, {
+      removedPartCount,
+      featureIds: uniqueIds,
+    });
+    const warningKey = `${runtimeState.activeScenarioId || ""}:${uniqueIds.join(",")}:${removedPartCount}`;
+    if (!waterSphericalSanitizationWarnings.has(warningKey)) {
+      waterSphericalSanitizationWarnings.add(warningKey);
+      console.warn(
+        `[map_renderer] Removed ${removedPartCount} D3-unsafe water geometry part(s): ${uniqueIds.join(", ")}`
+      );
+    }
+  }
+  return sanitizedFeatures;
 }
 
 function rebuildProjectedBoundsCache() {
@@ -4523,23 +4678,11 @@ function getSphericalFeatureDiagnostics(feature, { featureId = null, allowComput
     return null;
   }
 
-  try {
-    const area = Number(globalThis.d3.geoArea(feature));
-    const bounds = globalThis.d3.geoBounds(feature);
-    const diagnostics = {
-      area,
-      bounds,
-      isWorldBounds: isWorldBounds(bounds),
-      hasExcessiveSphereArea: Number.isFinite(area) && area > Math.PI * 2,
-    };
-    diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
-    if (resolvedFeatureId) {
-      ensureSphericalFeatureDiagnosticsCache().set(resolvedFeatureId, diagnostics);
-    }
-    return diagnostics;
-  } catch (_error) {
-    return null;
+  const diagnostics = getSphericalGeometryDiagnostics(feature);
+  if (resolvedFeatureId && diagnostics) {
+    ensureSphericalFeatureDiagnosticsCache().set(resolvedFeatureId, diagnostics);
   }
+  return diagnostics;
 }
 
 function getMaxDprForProfile(renderProfile) {
@@ -5203,6 +5346,25 @@ function pathBoundsInScreen(feature) {
     Math.min(runtimeState.width, runtimeState.height) * 0.08
   );
 
+  return !(
+    maxX < -overscan ||
+    maxY < -overscan ||
+    minX > runtimeState.width + overscan ||
+    minY > runtimeState.height + overscan
+  );
+}
+
+function projectedGeoBoundsInScreen(bounds) {
+  if (!bounds) return false;
+  const minX = bounds.minX * runtimeState.zoomTransform.k + runtimeState.zoomTransform.x;
+  const minY = bounds.minY * runtimeState.zoomTransform.k + runtimeState.zoomTransform.y;
+  const maxX = bounds.maxX * runtimeState.zoomTransform.k + runtimeState.zoomTransform.x;
+  const maxY = bounds.maxY * runtimeState.zoomTransform.k + runtimeState.zoomTransform.y;
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) return false;
+  const overscan = Math.max(
+    VIEWPORT_CULL_OVERSCAN_PX,
+    Math.min(runtimeState.width, runtimeState.height) * 0.08
+  );
   return !(
     maxX < -overscan ||
     maxY < -overscan ||
@@ -9213,6 +9375,21 @@ function applyOceanClipMask(maskMode) {
     return;
   }
 
+  if (runtimeState.oceanData) {
+    context.beginPath();
+    pathCanvas(runtimeState.oceanData);
+    context.clip();
+    recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
+      applied: true,
+      maskMode,
+      maskSource: "oceanDataWithoutUsableLandMask",
+      maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.oceanData),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(runtimeState.topologyPrimary || runtimeState.topology, "ocean"),
+      rejectedMaskToken: maskInfo.maskQualityToken || "",
+    });
+    return;
+  }
+
   context.clip();
   recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
     applied: true,
@@ -9524,67 +9701,121 @@ function getContextLayerStableSourceToken(layerName, collection, {
   ].join("|");
 }
 
+function createPhysicalLandMaskInfo({
+  collection = null,
+  maskSource = "none",
+  maskFeatureCount = 0,
+  maskArcRefEstimate = null,
+  maskQualityToken = "unchecked",
+} = {}) {
+  return {
+    collection,
+    maskSource,
+    maskFeatureCount,
+    maskArcRefEstimate,
+    maskQualityToken,
+  };
+}
+
+function getPhysicalLandMaskCandidateQuality(collection, maskSource) {
+  if (!Array.isArray(collection?.features) || !collection.features.length) {
+    return { usable: false, token: "empty" };
+  }
+  const diagnostics = getSphericalGeometryDiagnostics(collection);
+  if (diagnostics?.invalid) {
+    const token = diagnostics.isWorldBounds ? "world-bounds" : "sphere-area";
+    recordRenderPerfMetric("physicalLandMaskRejected", 0, {
+      maskSource,
+      reason: token,
+      area: diagnostics.area,
+      bounds: diagnostics.bounds,
+      featureCount: getFeatureCollectionFeatureCount(collection),
+    });
+    return { usable: false, token };
+  }
+  return { usable: true, token: diagnostics ? "d3-valid" : "d3-unavailable" };
+}
+
+function getFirstUsablePhysicalLandMaskInfo(candidates = []) {
+  const rejected = [];
+  for (const candidate of candidates) {
+    const quality = getPhysicalLandMaskCandidateQuality(candidate.collection, candidate.maskSource);
+    if (quality.usable) {
+      return createPhysicalLandMaskInfo({
+        ...candidate,
+        maskQualityToken: quality.token,
+      });
+    }
+    if (candidate.maskSource !== "none") {
+      rejected.push(`${candidate.maskSource}:${quality.token}`);
+    }
+  }
+  return createPhysicalLandMaskInfo({
+    collection: null,
+    maskSource: rejected.length ? `none:${rejected.join(",")}` : "none",
+    maskFeatureCount: 0,
+    maskArcRefEstimate: null,
+    maskQualityToken: rejected.length ? `rejected:${rejected.join(",")}` : "none",
+  });
+}
+
 function getPhysicalLandMaskInfo() {
   const primaryTopology = runtimeState.topologyPrimary || runtimeState.topology;
   const detailTopology = runtimeState.topologyDetail;
   const landSource = String(runtimeState.contextLayerSourceByName?.land || "").trim().toLowerCase();
+  const candidates = [];
   if (Array.isArray(runtimeState.scenarioContextLandMaskData?.features) && runtimeState.scenarioContextLandMaskData.features.length) {
-    return {
+    candidates.push({
       collection: runtimeState.scenarioContextLandMaskData,
       maskSource: "scenarioContextLandMask",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.scenarioContextLandMaskData),
       maskArcRefEstimate: estimateTopologyObjectArcRefs(runtimeState.scenarioRuntimeTopologyData, "context_land_mask")
         ?? estimateTopologyObjectArcRefs(runtimeState.scenarioRuntimeTopologyData, "land_mask")
         ?? estimateTopologyObjectArcRefs(runtimeState.scenarioRuntimeTopologyData, "land"),
-    };
+    });
   }
   if (Array.isArray(runtimeState.scenarioLandMaskData?.features) && runtimeState.scenarioLandMaskData.features.length) {
-    return {
+    candidates.push({
       collection: runtimeState.scenarioLandMaskData,
       maskSource: "scenarioLandMask",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.scenarioLandMaskData),
       maskArcRefEstimate:
         estimateTopologyObjectArcRefs(runtimeState.scenarioRuntimeTopologyData, "land_mask")
         ?? estimateTopologyObjectArcRefs(runtimeState.scenarioRuntimeTopologyData, "land"),
-    };
+    });
   }
   if (Array.isArray(runtimeState.landBgData?.features) && runtimeState.landBgData.features.length) {
     const topology = landSource === "detail" ? detailTopology : primaryTopology;
-    return {
+    candidates.push({
       collection: runtimeState.landBgData,
       maskSource: "landBgData",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.landBgData),
       maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "land"),
-    };
+    });
   }
   if (Array.isArray(runtimeState.landDataFull?.features) && runtimeState.landDataFull.features.length) {
     const topology = runtimeState.runtimePoliticalTopology?.objects?.political
       ? runtimeState.runtimePoliticalTopology
       : (primaryTopology || null);
-    return {
+    candidates.push({
       collection: runtimeState.landDataFull,
       maskSource: "landDataFull",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.landDataFull),
       maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "political"),
-    };
+    });
   }
   if (Array.isArray(runtimeState.landData?.features) && runtimeState.landData.features.length) {
     const topology = runtimeState.runtimePoliticalTopology?.objects?.political
       ? runtimeState.runtimePoliticalTopology
       : (primaryTopology || null);
-    return {
+    candidates.push({
       collection: runtimeState.landData,
       maskSource: "landData",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.landData),
       maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "political"),
-    };
+    });
   }
-  return {
-    collection: null,
-    maskSource: "none",
-    maskFeatureCount: 0,
-    maskArcRefEstimate: null,
-  };
+  return getFirstUsablePhysicalLandMaskInfo(candidates);
 }
 
 function getPhysicalLandMask() {
@@ -16361,12 +16592,20 @@ function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
   waterFeatures.forEach((feature, index) => {
     const id = getFeatureId(feature) || `water-${index}`;
     if (!isWaterRegionEnabled(feature)) return;
-    if (!pathBoundsInScreen(feature)) return;
     const defaultStyle = getWaterRegionDefaultStyle(feature);
     const fillOpacity = defaultStyle.opacity;
     if (!(fillOpacity > 0)) return;
+    const parts = collectSafeWaterRegionGeometryParts(feature);
+    if (!parts.length) return;
     context.beginPath();
-    pathCanvas(feature);
+    let visiblePartCount = 0;
+    parts.forEach((part) => {
+      if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
+      if (!pathCanvas) return;
+      pathCanvas(part);
+      visiblePartCount += 1;
+    });
+    if (!visiblePartCount) return;
     context.save();
     context.globalAlpha = fillOpacity;
     context.fillStyle = getWaterRegionColor(id);
@@ -16415,10 +16654,18 @@ function drawScenarioWaterHighlightLayer(k) {
     const feature = runtimeState.waterRegionsById?.get(id);
     if (!feature) return;
     if (!isWaterRegionEnabled(feature)) return;
-    if (!pathBoundsInScreen(feature)) return;
+    const parts = collectSafeWaterRegionGeometryParts(feature);
+    if (!parts.length) return;
     const isMacroOcean = isMacroOceanWaterRegion(feature);
     context.beginPath();
-    pathCanvas(feature);
+    let visiblePartCount = 0;
+    parts.forEach((part) => {
+      if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
+      if (!pathCanvas) return;
+      pathCanvas(part);
+      visiblePartCount += 1;
+    });
+    if (!visiblePartCount) return;
     context.save();
     context.globalAlpha = isMacroOcean ? 0.92 : 1;
     context.strokeStyle = "#f1c40f";

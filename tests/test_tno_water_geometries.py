@@ -13,6 +13,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools import patch_tno_1962_bundle as tno_bundle
+from tools.validate_tno_water_geometries import (
+    _collect_d3_spherical_metrics,
+    _topology_objects_to_feature_collections_for_d3,
+)
 
 SCENARIO_WATER_PATH = ROOT / "data" / "scenarios" / "tno_1962" / "water_regions.geojson"
 RUNTIME_WATER_PATH = ROOT / "data" / "scenarios" / "tno_1962" / "runtime_topology.topo.json"
@@ -24,6 +28,10 @@ STARTUP_BUNDLE_ZH_PATH = ROOT / "data" / "scenarios" / "tno_1962" / "startup.bun
 TARGET_OPEN_OCEAN_IDS = {
     "tno_northwest_pacific_ocean",
     "tno_northeast_pacific_ocean",
+}
+TARGET_OPEN_OCEAN_MAX_COMPONENTS = {
+    "tno_northwest_pacific_ocean": 7,
+    "tno_northeast_pacific_ocean": 6,
 }
 MIN_COMPONENT_AREA = 0.05
 WORLD_BBOX_WIDTH_THRESHOLD = 300.0
@@ -298,6 +306,16 @@ def _load_runtime_political_features():
     return feature_collection.get("features", [])
 
 
+def _load_runtime_topology_feature_collection(object_name):
+    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    return serialize_as_geojson(payload, objectname=object_name)
+
+
+def _load_runtime_topology_feature_collections_for_d3(object_names):
+    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    return _topology_objects_to_feature_collections_for_d3(payload, object_names)
+
+
 def _load_named_water_snapshot_features():
     payload = json.loads(SCENARIO_NAMED_WATER_SNAPSHOT_PATH.read_text(encoding="utf-8"))
     return payload.get("features", [])
@@ -381,7 +399,7 @@ def test_problematic_pacific_open_oceans_are_pruned_to_large_components():
         geometry = shape(feature["geometry"])
         parts = _iter_polygon_parts(geometry)
         assert parts, feature_id
-        assert len(parts) <= 6, feature_id
+        assert len(parts) <= TARGET_OPEN_OCEAN_MAX_COMPONENTS[feature_id], feature_id
         assert min(part.area for part in parts) >= MIN_COMPONENT_AREA - 1e-9, feature_id
 
 
@@ -394,6 +412,41 @@ def test_tno_scenario_water_parts_do_not_have_world_sized_bboxes():
             if _bbox_width(part) > WORLD_BBOX_WIDTH_THRESHOLD:
                 offending.append(feature_id)
     assert offending == []
+
+
+def test_tno_runtime_land_masks_do_not_have_world_sized_bboxes():
+    offending = []
+    for object_name in ("land_mask", "context_land_mask"):
+        feature_collection = _load_runtime_topology_feature_collection(object_name)
+        for feature in feature_collection.get("features", []) or []:
+            geometry = shape(feature["geometry"])
+            for part in _iter_polygon_parts(geometry):
+                if _bbox_width(part) > WORLD_BBOX_WIDTH_THRESHOLD:
+                    offending.append(f"{object_name}:{feature.get('properties', {}).get('id')}")
+    assert offending == []
+
+
+def test_tno_water_and_runtime_masks_are_d3_spherical_safe():
+    runtime_collections = _load_runtime_topology_feature_collections_for_d3([
+        "scenario_water",
+        "land_mask",
+        "context_land_mask",
+    ])
+    metrics = _collect_d3_spherical_metrics({
+        "source": {"type": "FeatureCollection", "features": _load_scenario_water_features()},
+        "runtime": runtime_collections["scenario_water"],
+        "runtime_land_mask": runtime_collections["land_mask"],
+        "runtime_context_land_mask": runtime_collections["context_land_mask"],
+    })
+    failures = []
+    for label, section in metrics.items():
+        invalid_features = section.get("invalidFeatures") or []
+        invalid_parts = section.get("invalidParts") or []
+        if invalid_features or invalid_parts:
+            failures.append(
+                f"{label}: features={invalid_features[:3]} parts={invalid_parts[:3]}"
+            )
+    assert failures == []
 
 
 def test_large_marine_macros_do_not_overrun_land_mask():
