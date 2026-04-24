@@ -188,4 +188,6 @@ jobs:
 
       - name: Fast success for perf-unrelated changes
         if: steps.classify.outputs.should_run_perf != 'true'
-        run: Write-Host "Perf gate skipped after classifier decision: ${{ steps.classify.outputs.reason }}"
+        shell: pwsh
+        run: |
+          Write-Host "Perf gate skipped after classifier decision: ${{ steps.classify.outputs.reason }}"
