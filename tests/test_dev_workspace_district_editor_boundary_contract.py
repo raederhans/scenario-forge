@@ -50,9 +50,9 @@ class DevWorkspaceDistrictEditorBoundaryContractTest(unittest.TestCase):
     def test_district_editor_controller_keeps_runtime_contracts(self):
         owner_content = DISTRICT_EDITOR_CONTROLLER_JS.read_text(encoding="utf-8")
 
-        self.assertIn("state.devScenarioDistrictEditor = {", owner_content)
-        self.assertIn("state.scenarioDistrictGroupsData = nextPayload;", owner_content)
-        self.assertIn("state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);", owner_content)
+        self.assertIn("runtimeState.devScenarioDistrictEditor = {", owner_content)
+        self.assertIn("runtimeState.scenarioDistrictGroupsData = nextPayload;", owner_content)
+        self.assertIn("runtimeState.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(nextPayload);", owner_content)
         self.assertIn('import { rebuildStaticMeshes } from "../../core/map_renderer/public.js";', owner_content)
         self.assertIn("rebuildStaticMeshes();", owner_content)
         self.assertIn('flushDevWorkspaceRender("dev-workspace-district-save");', owner_content)
@@ -61,3 +61,4 @@ class DevWorkspaceDistrictEditorBoundaryContractTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
