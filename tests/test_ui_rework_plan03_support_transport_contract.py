@@ -51,7 +51,7 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         controller_content = (REPO_ROOT / "js" / "ui" / "toolbar" / "transport_workbench_controller.js").read_text(encoding="utf-8")
         self.assertNotIn("renderTransportWorkbenchInfoPopoverLegacy", toolbar_content)
         self.assertIn("transportWorkbenchCompareStatus.textContent", controller_content)
-        self.assertIn('transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} inspector`;', controller_content)
+        self.assertIn('transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} ${t("inspector", "ui")}`;', controller_content)
 
 
 if __name__ == "__main__":

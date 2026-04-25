@@ -90,7 +90,11 @@ class TransportFacilityInteractionsContractTest(unittest.TestCase):
             + "\n"
             + (REPO_ROOT / "js" / "core" / "state_defaults.js").read_text(encoding="utf-8")
         )
-        i18n_content = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
+        i18n_content = (
+            (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
+            + "\n"
+            + (REPO_ROOT / "js" / "ui" / "i18n_catalog.js").read_text(encoding="utf-8")
+        )
         self.assertIn('primaryColor: "#1d4ed8"', state_content)
         self.assertIn('primaryColor: "#b45309"', state_content)
         self.assertIn("function normalizeTransportOverviewPrimaryColor", state_content)

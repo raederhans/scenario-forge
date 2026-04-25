@@ -48,10 +48,10 @@ class DevWorkspaceSplitBoundaryContractTest(unittest.TestCase):
         owner_content = SCENARIO_TAG_CREATOR_CONTROLLER_JS.read_text(encoding="utf-8")
 
         self.assertIn('fetch("/__dev/scenario/tag/create"', owner_content)
-        self.assertIn('state.devWorkspaceTagPopoverDismissHandler = (event) => {', owner_content)
+        self.assertIn('runtimeState.devWorkspaceTagPopoverDismissHandler = (event) => {', owner_content)
         self.assertIn('flushDevWorkspaceRender("dev-workspace-tag-create");', owner_content)
         self.assertIn('flushDevWorkspaceRender("dev-workspace-tag-clear-target");', owner_content)
-        self.assertIn('state.devScenarioTagCreator = {', owner_content)
+        self.assertIn('runtimeState.devScenarioTagCreator = {', owner_content)
 
 
 if __name__ == "__main__":

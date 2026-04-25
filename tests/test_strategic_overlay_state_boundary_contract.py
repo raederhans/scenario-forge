@@ -30,15 +30,12 @@ class StrategicOverlayStateBoundaryContractTest(unittest.TestCase):
         self.assertIn('./state/strategic_overlay_state.js', funnel_content)
         self.assertIn('./state/strategic_overlay_state.js', renderer_content)
         self.assertIn("...createDefaultStrategicOverlayState(),", state_content)
-        self.assertIn("state.specialZoneEditor = createDefaultSpecialZoneEditorState();", funnel_content)
-        self.assertIn("state.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();", funnel_content)
-        self.assertIn("state.operationalLineEditor = createDefaultOperationalLineEditorState();", funnel_content)
-        self.assertIn("state.unitCounterEditor = createDefaultUnitCounterEditorState({", funnel_content)
-        self.assertIn("state.strategicOverlayUi = createDefaultStrategicOverlayUiState();", funnel_content)
-        self.assertIn("state.specialZoneEditor = createDefaultSpecialZoneEditorState();", renderer_content)
-        self.assertIn("state.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();", renderer_content)
-        self.assertIn("state.operationalLineEditor = createDefaultOperationalLineEditorState();", renderer_content)
-        self.assertIn("state.unitCounterEditor = createDefaultUnitCounterEditorState({", renderer_content)
+        self.assertIn("resetStrategicOverlayEditorState(state, {", funnel_content)
+        self.assertIn("...createDefaultStrategicOverlayState(),", state_content)
+        self.assertIn("runtimeState.specialZoneEditor = createDefaultSpecialZoneEditorState();", renderer_content)
+        self.assertIn("runtimeState.operationGraphicsEditor = createDefaultOperationGraphicsEditorState();", renderer_content)
+        self.assertIn("runtimeState.operationalLineEditor = createDefaultOperationalLineEditorState();", renderer_content)
+        self.assertIn("runtimeState.unitCounterEditor = createDefaultUnitCounterEditorState({", renderer_content)
 
 
 if __name__ == "__main__":

@@ -4,12 +4,14 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
+FACADE_DATA_RUNTIME_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "facade_data_runtime.js"
 CONTEXT_LAYER_RESOLVER_JS = REPO_ROOT / "js" / "core" / "renderer" / "context_layer_resolver.js"
 
 
 class MapRendererContextLayerResolverBoundaryContractTest(unittest.TestCase):
     def test_map_renderer_keeps_pass_dispatch_while_context_layer_resolution_moves_to_owner(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        facade_content = FACADE_DATA_RUNTIME_JS.read_text(encoding="utf-8")
         owner_content = CONTEXT_LAYER_RESOLVER_JS.read_text(encoding="utf-8")
         renderer_imports = renderer_content.replace('"', "'")
 
@@ -20,16 +22,16 @@ class MapRendererContextLayerResolverBoundaryContractTest(unittest.TestCase):
         self.assertIn("let contextLayerResolverOwner = null;", renderer_content)
         self.assertIn("function getContextLayerResolverOwner() {", renderer_content)
         self.assertIn("runtimeState: state,", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().getLayerFeatureCollection(topology, layerName);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().computeLayerCoverageScore(collection);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().createUrbanLayerCapability(overrides);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().getUrbanFeatureGeoBounds(feature);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().getUrbanLayerCapability(collection);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().canRenderUrbanCollection(capability);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().canPreferUrbanDetailCollection(capability);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().pickBestLayerSource(primaryCollection, detailCollection, policy);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().resolveContextLayerData(layerName);", renderer_content)
-        self.assertIn("return getContextLayerResolverOwner().ensureLayerDataFromTopology();", renderer_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().getLayerFeatureCollection(topology, layerName);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().computeLayerCoverageScore(collection);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().createUrbanLayerCapability(overrides);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().getUrbanFeatureGeoBounds(feature);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().getUrbanLayerCapability(collection);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().canRenderUrbanCollection(capability);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().canPreferUrbanDetailCollection(capability);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().pickBestLayerSource(", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().resolveContextLayerData(layerName);", facade_content)
+        self.assertIn("return readFacadeGetter('getContextLayerResolverOwner')().ensureLayerDataFromTopology();", facade_content)
         self.assertIn("function invalidateContextLayerVisualStateBatch(layerNames, reason = \"context-layer-loaded\", { renderNow = true } = {}) {", renderer_content)
         self.assertIn('const targetPasses = new Set(["contextBase"]);', renderer_content)
         self.assertIn('requestRendererRender(`context-layer-visual:${reason}`, { flush: true });', renderer_content)

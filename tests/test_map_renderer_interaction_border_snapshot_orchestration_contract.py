@@ -30,7 +30,7 @@ class MapRendererInteractionBorderSnapshotOrchestrationContractTest(unittest.Tes
         self.assertRegex(
             self.renderer_content,
             re.compile(
-                r'if \(!drawInteractionBorderSnapshot\(currentTransform\)\) \{\s*const k = Math\.max\(0\.0001, Number\(currentTransform\?\.k \|\| 1\)\);\s*context\.setTransform\(state\.dpr, 0, 0, state\.dpr, 0, 0\);\s*context\.translate\(currentTransform\.x, currentTransform\.y\);\s*context\.scale\(k, k\);\s*drawBordersPass\(k, \{ interactive: !!interactiveBorders \}\);',
+                r'if \(!drawInteractionBorderSnapshot\(currentTransform\)\) \{\s*const k = Math\.max\(0\.0001, Number\(currentTransform\?\.k \|\| 1\)\);\s*context\.setTransform\(runtimeState\.dpr, 0, 0, runtimeState\.dpr, 0, 0\);\s*context\.translate\(currentTransform\.x, currentTransform\.y\);\s*context\.scale\(k, k\);\s*drawBordersPass\(k, \{ interactive: !!interactiveBorders \}\);',
                 re.S,
             ),
         )
@@ -39,7 +39,7 @@ class MapRendererInteractionBorderSnapshotOrchestrationContractTest(unittest.Tes
         self.assertRegex(
             self.renderer_content,
             re.compile(
-                r'\.on\("start", \(\) => \{[\s\S]*?captureInteractionBorderSnapshot\(state\.zoomTransform \|\| globalThis\.d3\.zoomIdentity\);',
+                r'\.on\("start", \(\) => \{[\s\S]*?captureInteractionBorderSnapshot\(runtimeState\.zoomTransform \|\| globalThis\.d3\.zoomIdentity\);',
                 re.S,
             ),
         )

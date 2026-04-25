@@ -51,7 +51,7 @@ class DevWorkspaceSelectionOwnershipBoundaryContractTest(unittest.TestCase):
         self.assertIn('resetOwnersToScenarioBaselineForFeatureIds(resolveOwnershipTargetIds(), {', owner_content)
         self.assertIn('const payload = buildScenarioOwnershipSavePayload();', owner_content)
         self.assertIn('fetch("/__dev/scenario/ownership/save"', owner_content)
-        self.assertIn('state.devScenarioEditor = {', owner_content)
+        self.assertIn('runtimeState.devScenarioEditor = {', owner_content)
 
 
 if __name__ == "__main__":

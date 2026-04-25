@@ -36,11 +36,11 @@ class MainDeferredDetailPromotionBoundaryContractTest(unittest.TestCase):
         self.assertIn("loadDeferredDetailBundle({", owner_content)
         self.assertIn("refreshScenarioDataHealth({", owner_content)
         self.assertIn("buildInteractionInfrastructureAfterStartup({", owner_content)
-        self.assertIn("getDeferredPromotionDelay(state.renderProfile)", owner_content)
+        self.assertIn("getDeferredPromotionDelay(runtimeState.renderProfile)", owner_content)
 
         self.assertNotIn("loadDeferredDetailBundle({", donor_content)
         self.assertNotIn("refreshScenarioDataHealth({", donor_content)
-        self.assertNotIn("getDeferredPromotionDelay(state.renderProfile)", donor_content)
+        self.assertNotIn("getDeferredPromotionDelay(runtimeState.renderProfile)", donor_content)
 
     def test_main_keeps_wrappers_and_ready_state_facade(self):
         donor_content = MAIN_JS.read_text(encoding="utf-8")

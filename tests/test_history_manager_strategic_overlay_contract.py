@@ -29,7 +29,7 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
     def test_capture_snapshot_includes_operational_lines_contract(self):
         content = HISTORY_MANAGER_JS.read_text(encoding="utf-8")
 
-        self.assertIn("snapshot.operationalLines = cloneStructuredValue(state.operationalLines || []);", content)
+        self.assertIn("snapshot.operationalLines = cloneStructuredValue(runtimeState.operationalLines || []);", content)
 
     def test_undo_redo_replays_operational_lines_and_marks_dirty(self):
         result = self._run_node_json(textwrap.dedent(
