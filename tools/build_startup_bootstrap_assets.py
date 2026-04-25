@@ -12,6 +12,11 @@ if str(ROOT) not in sys.path:
 
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+)
 
 
 BOOTSTRAP_RUNTIME_OBJECTS = (
@@ -460,10 +465,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--full-locales", default=str(ROOT / "data/locales.json"))
     parser.add_argument("--full-geo-aliases", default=str(ROOT / "data/geo_aliases.json"))
     parser.add_argument("--runtime-topology", default=str(ROOT / "data/scenarios/tno_1962/runtime_topology.topo.json"))
-    parser.add_argument("--scenario-geo-patch", default=str(ROOT / "data/scenarios/tno_1962/geo_locale_patch.json"))
+    parser.add_argument("--scenario-geo-patch", default=str(ROOT / "data/scenarios/tno_1962" / SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME))
     parser.add_argument("--runtime-bootstrap-output", default=str(ROOT / "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json"))
-    parser.add_argument("--startup-locales-output", default=str(ROOT / "data/scenarios/tno_1962/locales.startup.json"))
-    parser.add_argument("--startup-geo-aliases-output", default=str(ROOT / "data/scenarios/tno_1962/geo_aliases.startup.json"))
+    parser.add_argument("--startup-locales-output", default=str(ROOT / "data/scenarios/tno_1962" / SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME))
+    parser.add_argument("--startup-geo-aliases-output", default=str(ROOT / "data/scenarios/tno_1962" / SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME))
     parser.add_argument("--startup-support-whitelist", default="")
     parser.add_argument("--report-path", default="")
     return parser.parse_args()

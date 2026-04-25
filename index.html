@@ -2763,7 +2763,7 @@
               </div>
               <div id="exportWorkbenchPreviewCanvas" class="export-workbench-preview-canvas" aria-live="polite">
                 <div id="exportWorkbenchPreviewStage" class="export-workbench-preview-stage"></div>
-                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state">
+                <div id="exportWorkbenchPreviewState" class="export-workbench-preview-state" data-i18n="Export preview ready">
                   Export preview ready
                 </div>
               </div>
@@ -2860,73 +2860,61 @@
       </div>
       <div class="scenario-guide-manual mt-3">
         <section id="scenarioGuideSectionQuick" class="scenario-guide-manual-section" data-guide-panel="quick" role="tabpanel" aria-labelledby="scenarioGuideTabQuick scenarioGuideQuickPathTitle">
-          <h4 id="scenarioGuideQuickPathTitle" class="scenario-guide-manual-title">Quick path / 快速路径</h4>
-          <p class="scenario-guide-manual-lead">Use this checklist when you want the shortest safe editing path. / 需要最短、最稳的编辑路径时，先按下面的顺序操作。</p>
+          <h4 id="scenarioGuideQuickPathTitle" class="scenario-guide-manual-title" data-i18n="Quick path">Quick path</h4>
+          <p class="scenario-guide-manual-lead" data-i18n="Use this checklist when you want the shortest safe editing path.">Use this checklist when you want the shortest safe editing path.</p>
           <ol class="scenario-guide-list mt-2">
             <li id="scenarioGuideStepApply" class="scenario-guide-step">
-              <strong>1. Apply Scenario / 应用场景</strong>
-              <span class="scenario-guide-step-line" lang="zh-CN">先应用场景，让 ownership、controller、support tools 和 project surfaces 进入同一套基线。</span>
-              <span class="scenario-guide-step-line" lang="en">Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.</span>
+              <strong data-i18n="1. Apply Scenario">1. Apply Scenario</strong>
+              <span class="scenario-guide-step-line" data-i18n="Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.">Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.</span>
             </li>
             <li id="scenarioGuideStepSelect" class="scenario-guide-step">
-              <strong>2. Select the target country in Inspector / 在 Inspector 里选中目标国家</strong>
-              <span class="scenario-guide-step-line" lang="zh-CN">打开右侧 Inspector，先确认你正在查看的国家和想修改的国家是同一个对象。</span>
-              <span class="scenario-guide-step-line" lang="en">Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.</span>
+              <strong data-i18n="2. Select the target country in Inspector">2. Select the target country in Inspector</strong>
+              <span class="scenario-guide-step-line" data-i18n="Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.">Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.</span>
             </li>
             <li id="scenarioGuideStepActive" class="scenario-guide-step">
-              <strong>3. Set the active owner / 设置 Active Owner</strong>
-              <span class="scenario-guide-step-line" lang="zh-CN">政治类操作会读取当前 Active Owner。真正落笔前，先确认上方状态条里的 Active 值正确。</span>
-              <span class="scenario-guide-step-line" lang="en">Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.</span>
+              <strong data-i18n="3. Set the active owner">3. Set the active owner</strong>
+              <span class="scenario-guide-step-line" data-i18n="Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.">Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.</span>
             </li>
             <li id="scenarioGuideStepApplyActions" class="scenario-guide-step">
-              <strong>4. Use Activate or Scenario Actions / 使用 Activate 或 Scenario Actions</strong>
-              <span class="scenario-guide-step-line" lang="zh-CN">小范围切换用 Activate，批量或规则化调整用 Scenario Actions。做完一轮后，再看 View 和 Split 是否符合预期。</span>
-              <span class="scenario-guide-step-line" lang="en">Use Activate for focused ownership changes and Scenario Actions for broader rule-driven updates. After each pass, re-check the View and Split chips.</span>
+              <strong data-i18n="4. Use Activate or Scenario Actions">4. Use Activate or Scenario Actions</strong>
+              <span class="scenario-guide-step-line" data-i18n="Use Activate for focused ownership changes and Scenario Actions for broader rule-driven updates. After each pass, re-check the View and Split chips.">Use Activate for focused ownership changes and Scenario Actions for broader rule-driven updates. After each pass, re-check the View and Split chips.</span>
             </li>
           </ol>
         </section>
 
         <section id="scenarioGuideSectionPrepare" class="scenario-guide-manual-section hidden" data-guide-panel="prepare" role="tabpanel" aria-labelledby="scenarioGuideTabPrepare scenarioGuidePreparationTitle" hidden>
-          <h4 id="scenarioGuidePreparationTitle" class="scenario-guide-manual-title">Before you edit / 开始前</h4>
+          <h4 id="scenarioGuidePreparationTitle" class="scenario-guide-manual-title" data-i18n="Before you edit">Before you edit</h4>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN">如果你准备加载另一个 project file，先保存当前工作状态。加载项目会替换当前地图工作状态；当保存时使用的 scenario baseline 和当前资源不一致时，系统会先弹出确认提示。</p>
-            <p lang="en">Save the current working state before you load a different project file. Loading a project replaces the current map state, and the app prompts for confirmation when the saved scenario baseline differs from the current assets.</p>
+            <p data-i18n="Save the current working state before you load a different project file. Loading a project replaces the current map state, and the app prompts for confirmation when the saved scenario baseline differs from the current assets.">Save the current working state before you load a different project file. Loading a project replaces the current map state, and the app prompts for confirmation when the saved scenario baseline differs from the current assets.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN">Guide 可以从顶部 scenario bar 打开，也可以从 Project › Utilities 打开。两个按钮指向同一个面板，区别只在于你当时停留在哪个工作区。</p>
-            <p lang="en">You can open Guide from the top scenario bar or from Project › Utilities. Both buttons open the same panel; the only difference is which workspace you were using when you opened it.</p>
+            <p data-i18n="You can open Guide from the top scenario bar or from Project › Utilities. Both buttons open the same panel; the only difference is which workspace you were using when you opened it.">You can open Guide from the top scenario bar or from Project › Utilities. Both buttons open the same panel; the only difference is which workspace you were using when you opened it.</p>
           </div>
         </section>
 
         <section id="scenarioGuideSectionTools" class="scenario-guide-manual-section hidden" data-guide-panel="tools" role="tabpanel" aria-labelledby="scenarioGuideTabTools scenarioGuideProjectToolsTitle" hidden>
-          <h4 id="scenarioGuideProjectToolsTitle" class="scenario-guide-manual-title">Project tools in this tab / 这个 tab 里的项目工具</h4>
+          <h4 id="scenarioGuideProjectToolsTitle" class="scenario-guide-manual-title" data-i18n="Project tools in this tab">Project tools in this tab</h4>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN"><strong>Project Management：</strong>下载当前地图状态，或从本地 JSON 恢复。适合在大改 ownership、frontline 或 overlays 之前做阶段性保存。</p>
-            <p lang="en"><strong>Project Management:</strong> Download the current map state or restore it from a local JSON file. Use it before major ownership, frontline, or overlay changes.</p>
+            <p data-i18n="Project Management: Download the current map state or restore it from a local JSON file. Use it before major ownership, frontline, or overlay changes.">Project Management: Download the current map state or restore it from a local JSON file. Use it before major ownership, frontline, or overlay changes.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN"><strong>Frontline：</strong>这里同时管理 derived frontline overlay 和 project-local strategic workspace。前者适合快速读 conflict edges，后者适合画 operational lines、graphics 和 unit counters。</p>
-            <p lang="en"><strong>Frontline:</strong> This section combines the derived frontline overlay with the project-local strategic workspace. Use the first for fast conflict-edge reading and the second for operational lines, graphics, and unit counters.</p>
+            <p data-i18n="Frontline: This section combines the derived frontline overlay with the project-local strategic workspace. Use the first for fast conflict-edge reading and the second for operational lines, graphics, and unit counters.">Frontline: This section combines the derived frontline overlay with the project-local strategic workspace. Use the first for fast conflict-edge reading and the second for operational lines, graphics, and unit counters.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN"><strong>Reference：</strong>上传本地图像后，按 opacity → scale → offset 的顺序对齐最稳。项目会保存这些对位参数，图像文件本身需要重新上传。</p>
-            <p lang="en"><strong>Reference:</strong> After you upload a local image, the most stable alignment order is opacity → scale → offsets. The project preserves the alignment values, while the image file itself must be uploaded again.</p>
+            <p data-i18n="Reference: After you upload a local image, the most stable alignment order is opacity → scale → offsets. The project preserves the alignment values, while the image file itself must be uploaded again.">Reference: After you upload a local image, the most stable alignment order is opacity → scale → offsets. The project preserves the alignment values, while the image file itself must be uploaded again.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN"><strong>Export：</strong>Open workbench 后，左侧处理图像调整，中间负责预览，右侧管理 layer order 和 text stacks。导出上限是 8K，同一时间只处理一个导出任务。</p>
-            <p lang="en"><strong>Export:</strong> After you open the workbench, the left column handles image adjustments, the center handles preview, and the right manages layer order and text stacks. Export is capped at 8K and only one export job runs at a time.</p>
+            <p data-i18n="Export: After you open the workbench, the left column handles image adjustments, the center handles preview, and the right manages layer order and text stacks. Export is capped at 8K and only one export job runs at a time.">Export: After you open the workbench, the left column handles image adjustments, the center handles preview, and the right manages layer order and text stacks. Export is capped at 8K and only one export job runs at a time.</p>
           </div>
         </section>
 
         <section id="scenarioGuideSectionChecks" class="scenario-guide-manual-section hidden" data-guide-panel="checks" role="tabpanel" aria-labelledby="scenarioGuideTabChecks scenarioGuideChecksTitle" hidden>
-          <h4 id="scenarioGuideChecksTitle" class="scenario-guide-manual-title">Success checks / 成功信号与常见漏项</h4>
+          <h4 id="scenarioGuideChecksTitle" class="scenario-guide-manual-title" data-i18n="Success checks">Success checks</h4>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN">状态条里的 <strong>Mode / View / Split</strong> 是最快的自检入口。它们和你预期一致时，通常说明当前编辑上下文正确。</p>
-            <p lang="en">The <strong>Mode / View / Split</strong> chips are the fastest self-check. When they match your expectation, the current editing context is usually correct.</p>
+            <p data-i18n="The Mode / View / Split chips are the fastest self-check. When they match your expectation, the current editing context is usually correct.">The Mode / View / Split chips are the fastest self-check. When they match your expectation, the current editing context is usually correct.</p>
           </div>
           <div class="scenario-guide-bilingual-copy">
-            <p lang="zh-CN">如果操作结果看起来不对，优先检查三件事：场景是否已应用、Inspector 里的目标国家是否正确、Active Owner 是否已经切到你要写入的对象。</p>
-            <p lang="en">If a result looks wrong, check three things first: whether a scenario is applied, whether the Inspector is focused on the right country, and whether Active Owner already points to the target you want to write to.</p>
+            <p data-i18n="If a result looks wrong, check three things first: whether a scenario is applied, whether the Inspector is focused on the right country, and whether Active Owner already points to the target you want to write to.">If a result looks wrong, check three things first: whether a scenario is applied, whether the Inspector is focused on the right country, and whether Active Owner already points to the target you want to write to.</p>
           </div>
         </section>
       </div>

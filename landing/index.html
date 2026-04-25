@@ -43,12 +43,12 @@
 
     <div class="site-shell">
       <header class="topbar">
-        <a class="brandmark" href="#hero" aria-label="Scenario Forge home">
+        <a class="brandmark" href="#hero" aria-label="Scenario Forge home" data-i18n-aria-label="brandHomeLabel">
           <span class="brandmark__dot" aria-hidden="true"></span>
           <span class="brandmark__text">Scenario Forge</span>
         </a>
 
-        <nav class="topnav" aria-label="Primary">
+        <nav class="topnav" aria-label="Primary" data-i18n-aria-label="primaryNavLabel">
           <a href="#works" data-i18n="navWorks">Works</a>
           <a href="#workflow" data-i18n="navWorkflow">Workflow</a>
           <a href="#features" data-i18n="navFeatures">Features</a>
@@ -92,7 +92,7 @@
               <div class="product-stage__viewport">
                 <img
                   src="./assets/workspace-overview.webp"
-                  alt="Scenario Forge editor showing a world political map with side panels and toolbars."
+                  alt="Scenario Forge editor showing a world political map with side panels and toolbars." data-i18n-alt="productPreviewAlt"
                   loading="eager"
                   width="1280"
                   height="874"
@@ -100,10 +100,10 @@
               </div>
             </div>
             <div class="hero__chips" aria-hidden="true">
-              <span>Blank</span>
-              <span>Modern</span>
-              <span>HOI4 1939</span>
-              <span>TNO 1962</span>
+              <span data-i18n="chipBlank">Blank</span>
+              <span data-i18n="chipModern">Modern</span>
+              <span data-i18n="chipHoi4">HOI4 1939</span>
+              <span data-i18n="chipTno">TNO 1962</span>
             </div>
           </div>
         </section>
@@ -120,7 +120,7 @@
           <div class="works-grid works-grid--bento">
             <article class="work-card work-card--tall" data-reveal>
               <div class="work-card__media work-card__media--workspace">
-                <img src="./assets/workspace-overview.webp" alt="A wide overview of Scenario Forge editing a global political scenario." loading="lazy" width="1280" height="874" />
+                <img src="./assets/workspace-overview.webp" alt="A wide overview of Scenario Forge editing a global political scenario." data-i18n-alt="workOneAlt" loading="lazy" width="1280" height="874" />
               </div>
               <div class="work-card__copy">
                 <p class="work-card__label" data-i18n="workOneLabel">Alternate history baseline</p>
@@ -131,7 +131,7 @@
 
             <article class="work-card" data-reveal>
               <div class="work-card__media">
-                <img src="./assets/night-lights-political.webp" alt="Scenario Forge combining political ownership with night lights and labels." loading="lazy" width="1280" height="874" />
+                <img src="./assets/night-lights-political.webp" alt="Scenario Forge combining political ownership with night lights and labels." data-i18n-alt="workTwoAlt" loading="lazy" width="1280" height="874" />
               </div>
               <div class="work-card__copy">
                 <p class="work-card__label" data-i18n="workTwoLabel">Conflict and context</p>
@@ -142,7 +142,7 @@
 
             <article class="work-card" data-reveal>
               <div class="work-card__media">
-                <img src="./assets/atlas-physical.webp" alt="Scenario Forge showing a lighter atlas-like map with physical context." loading="lazy" width="1280" height="874" />
+                <img src="./assets/atlas-physical.webp" alt="Scenario Forge showing a lighter atlas-like map with physical context." data-i18n-alt="workThreeAlt" loading="lazy" width="1280" height="874" />
               </div>
               <div class="work-card__copy">
                 <p class="work-card__label" data-i18n="workThreeLabel">Atlas-style output</p>
@@ -308,7 +308,7 @@
           </p>
         </div>
         <div class="footer__meta">
-          <div class="lang-switch" role="group" aria-label="Language switcher">
+          <div class="lang-switch" role="group" aria-label="Language switcher" data-i18n-aria-label="languageSwitcherLabel">
             <button type="button" class="lang-switch__btn is-active" data-lang="en">EN</button>
             <button type="button" class="lang-switch__btn" data-lang="zh">中文</button>
           </div>

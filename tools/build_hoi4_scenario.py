@@ -14,6 +14,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from scenario_builder.hoi4.audit import build_source_atlas, write_report_files
 from scenario_builder.hoi4.compiler import compile_scenario_bundle
 from map_builder.io.writers import write_json_atomic
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+    SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
+    SCENARIO_LOCALE_LANGUAGES,
+    SCENARIO_STARTUP_BUNDLE_FILENAMES_BY_LANGUAGE,
+    SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
+)
 from tools.build_startup_bootstrap_assets import build_startup_bootstrap_assets
 from tools.build_startup_bundle import (
     STARTUP_BOOTSTRAP_STRATEGY,
@@ -263,7 +274,7 @@ def build_language_geo_locale_patch_payload(base_payload: dict, language: str) -
 
 
 def ensure_geo_locale_patch_inputs(scenario_output_dir: Path, scenario_id: str) -> None:
-    base_path = scenario_output_dir / "geo_locale_patch.json"
+    base_path = scenario_output_dir / SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME
     base_payload = normalize_geo_locale_patch_payload(
         read_json(base_path) if base_path.exists() else {},
         scenario_id,
@@ -271,8 +282,8 @@ def ensure_geo_locale_patch_inputs(scenario_output_dir: Path, scenario_id: str) 
     if not base_path.exists():
         write_json(base_path, base_payload)
 
-    for language in ("en", "zh"):
-        path = scenario_output_dir / f"geo_locale_patch.{language}.json"
+    for language in SCENARIO_LOCALE_LANGUAGES:
+        path = scenario_output_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE[language]
         # Keep locale-specific files semantically derived from the base patch so
         # manifest language URLs cannot hide existing scenario geo overrides.
         write_json(path, build_language_geo_locale_patch_payload(base_payload, language))
@@ -286,28 +297,28 @@ def build_startup_assets_for_scenario(scenario_output_dir: Path, report_dir: Pat
         full_locales_path=PROJECT_ROOT / "data" / "locales.json",
         full_geo_aliases_path=PROJECT_ROOT / "data" / "geo_aliases.json",
         full_runtime_topology_path=scenario_output_dir / "runtime_topology.topo.json",
-        scenario_geo_patch_path=scenario_output_dir / "geo_locale_patch.json",
+        scenario_geo_patch_path=scenario_output_dir / SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
         runtime_bootstrap_output_path=scenario_output_dir / "startup.runtime_shell.topo.json",
-        startup_locales_output_path=scenario_output_dir / "locales.startup.json",
-        startup_geo_aliases_output_path=scenario_output_dir / "geo_aliases.startup.json",
+        startup_locales_output_path=scenario_output_dir / SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+        startup_geo_aliases_output_path=scenario_output_dir / SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
         report_path=support_report_path,
     )
     return build_startup_bundles(
         scenario_manifest_path=scenario_output_dir / "manifest.json",
         data_manifest_path=PROJECT_ROOT / "data" / "manifest.json",
         topology_primary_path=PROJECT_ROOT / "data" / "europe_topology.json",
-        startup_locales_path=scenario_output_dir / "locales.startup.json",
-        geo_aliases_path=scenario_output_dir / "geo_aliases.startup.json",
+        startup_locales_path=scenario_output_dir / SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+        geo_aliases_path=scenario_output_dir / SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
         full_runtime_topology_path=scenario_output_dir / "runtime_topology.topo.json",
         runtime_bootstrap_topology_path=scenario_output_dir / "startup.runtime_shell.topo.json",
         countries_path=scenario_output_dir / "countries.json",
         owners_path=scenario_output_dir / "owners.by_feature.json",
         controllers_path=scenario_output_dir / "controllers.by_feature.json",
         cores_path=scenario_output_dir / "cores.by_feature.json",
-        geo_locale_patch_en_path=scenario_output_dir / "geo_locale_patch.en.json",
-        geo_locale_patch_zh_path=scenario_output_dir / "geo_locale_patch.zh.json",
-        output_en_path=scenario_output_dir / "startup.bundle.en.json",
-        output_zh_path=scenario_output_dir / "startup.bundle.zh.json",
+        geo_locale_patch_en_path=scenario_output_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["en"],
+        geo_locale_patch_zh_path=scenario_output_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["zh"],
+        output_en_path=scenario_output_dir / SCENARIO_STARTUP_BUNDLE_FILENAMES_BY_LANGUAGE["en"],
+        output_zh_path=scenario_output_dir / SCENARIO_STARTUP_BUNDLE_FILENAMES_BY_LANGUAGE["zh"],
         report_path=bundle_report_path,
     )
 
@@ -562,13 +573,19 @@ def main() -> int:
     manifest_payload["startup_topology_url"] = (
         f"data/scenarios/{args.scenario_id}/runtime_topology.bootstrap.topo.json"
     )
-    manifest_payload["startup_bundle_url_en"] = f"data/scenarios/{args.scenario_id}/startup.bundle.en.json"
-    manifest_payload["startup_bundle_url_zh"] = f"data/scenarios/{args.scenario_id}/startup.bundle.zh.json"
+    for language, field_name in SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS.items():
+        manifest_payload[field_name] = (
+            f"data/scenarios/{args.scenario_id}/{SCENARIO_STARTUP_BUNDLE_FILENAMES_BY_LANGUAGE[language]}"
+        )
     manifest_payload["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
     manifest_payload["startup_bootstrap_strategy"] = STARTUP_BOOTSTRAP_STRATEGY
-    manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.json"
-    manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.en.json"
-    manifest_payload["geo_locale_patch_url_zh"] = f"data/scenarios/{args.scenario_id}/geo_locale_patch.zh.json"
+    manifest_payload[SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD] = (
+        f"data/scenarios/{args.scenario_id}/{SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME}"
+    )
+    for language, field_name in SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS.items():
+        manifest_payload[field_name] = (
+            f"data/scenarios/{args.scenario_id}/{SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE[language]}"
+        )
     manifest_payload["city_overrides_url"] = f"data/scenarios/{args.scenario_id}/city_overrides.json"
     manifest_payload["capital_hints_url"] = f"data/scenarios/{args.scenario_id}/capital_hints.json"
     write_json(scenario_output_dir / "manifest.json", manifest_payload)

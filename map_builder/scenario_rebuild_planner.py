@@ -5,6 +5,11 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 
 CHANGED_DOMAIN_POLITICAL = "political"
@@ -214,9 +219,9 @@ def compute_tno_stage_signature_payload(
         STAGE_STARTUP_SUPPORT_ASSETS: [
             checkpoint_dir / "manifest.json",
             checkpoint_dir / "runtime_topology.topo.json",
-            checkpoint_dir / "geo_locale_patch.json",
-            checkpoint_dir / "geo_locale_patch.en.json",
-            checkpoint_dir / "geo_locale_patch.zh.json",
+            checkpoint_dir / SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+            checkpoint_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["en"],
+            checkpoint_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["zh"],
             scenario_dir / "derived" / "startup_support_whitelist.json",
             ROOT / "data" / "locales.json",
             ROOT / "data" / "geo_aliases.json",
@@ -242,9 +247,9 @@ def compute_tno_stage_signature_payload(
             checkpoint_dir / "cores.by_feature.json",
             checkpoint_dir / "runtime_topology.topo.json",
             checkpoint_dir / "runtime_topology.bootstrap.topo.json",
-            checkpoint_dir / "geo_locale_patch.json",
-            checkpoint_dir / "geo_locale_patch.en.json",
-            checkpoint_dir / "geo_locale_patch.zh.json",
+            checkpoint_dir / SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
+            checkpoint_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["en"],
+            checkpoint_dir / SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE["zh"],
             ROOT / "data" / "manifest.json",
             ROOT / "data" / "locales.json",
             ROOT / "data" / "geo_aliases.json",

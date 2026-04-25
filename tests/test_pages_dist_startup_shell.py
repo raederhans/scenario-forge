@@ -31,6 +31,15 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n="productStageLabel"',
             'data-i18n-aria-label="heroMetricsLabel"',
             'data-i18n-aria-label="productPreviewLabel"',
+            'data-i18n-aria-label="brandHomeLabel"',
+            'data-i18n-aria-label="primaryNavLabel"',
+            'data-i18n-aria-label="languageSwitcherLabel"',
+            'data-i18n-alt="productPreviewAlt"',
+            'data-i18n-alt="workOneAlt"',
+            'data-i18n-alt="workTwoAlt"',
+            'data-i18n-alt="workThreeAlt"',
+            'data-i18n="chipBlank"',
+            'data-i18n="chipModern"',
             'data-reveal',
             'footer',
             'data-lang="zh"',
@@ -44,6 +53,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "heroMetricsLabel",
             "productPreviewLabel",
             "productStageLabel",
+            "brandHomeLabel",
+            "languageSwitcherLabel",
+            "productPreviewAlt",
+            "data-i18n-alt",
             "data-i18n-aria-label",
             "zh:",
         ):
@@ -53,6 +66,44 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn("prefers-reduced-motion", styles_css)
         self.assertIn('html[data-reveal="enabled"]', styles_css)
         self.assertIn(".is-revealed", styles_css)
+
+    def test_landing_i18n_table_keeps_english_and_chinese_values_separate(self) -> None:
+        app_js = LANDING_APP_JS.read_text(encoding="utf-8")
+        en_start = app_js.index("  en: {")
+        zh_start = app_js.index("  zh: {")
+        en_table = app_js[en_start:zh_start]
+        zh_table = app_js[zh_start:]
+
+        for expected_fragment in (
+            'featureGroupOneTitle: "Scenario baselines"',
+            'featureGroupTwoTitle: "Political editing"',
+            'featureGroupThreeTitle: "Presentation layers"',
+            'featureGroupFourTitle: "Project and export"',
+            'roadmapOneTitle: "Transport workbench"',
+            'roadmapTwoTitle: "Japan road preview"',
+        ):
+            with self.subTest(expected_fragment=expected_fragment):
+                self.assertIn(expected_fragment, en_table)
+
+        for expected_fragment in (
+            'featureGroupOneTitle: "场景基线"',
+            'featureGroupTwoTitle: "政治编辑"',
+            'featureGroupThreeTitle: "展示图层"',
+            'featureGroupFourTitle: "项目与导出"',
+            'workflowTitle: "从基线到可讲故事地图，一条更短的路。"',
+            'audienceTitle: "适合那些需要让地图承载场景的人。"',
+            'roadmapOneTitle: "交通工作台"',
+            'roadmapTwoTitle: "日本道路预览"',
+            'roadmapTwoBody: "目前是交通相关样例里最成熟的一块。"',
+            'ctaBody: "展示页负责讲清楚产品，编辑器负责真正把场景落到地图上。"',
+            'metaTitle: "Scenario Forge — 场景优先政治地图工作台"',
+        ):
+            with self.subTest(expected_fragment=expected_fragment):
+                self.assertIn(expected_fragment, zh_table)
+
+        for stale_fragment in ("baseline", "scenario", "Scenario-first", "transport"):
+            with self.subTest(stale_fragment=stale_fragment):
+                self.assertNotIn(stale_fragment, zh_table)
 
     def test_dist_root_index_keeps_landing_startup_contract(self) -> None:
         if not DIST_ROOT_INDEX.exists():
@@ -68,6 +119,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n="productStageLabel"',
             'data-i18n-aria-label="heroMetricsLabel"',
             'data-i18n-aria-label="productPreviewLabel"',
+            'data-i18n-aria-label="brandHomeLabel"',
+            'data-i18n-aria-label="primaryNavLabel"',
+            'data-i18n-aria-label="languageSwitcherLabel"',
+            'data-i18n-alt="productPreviewAlt"',
+            'data-i18n-alt="workOneAlt"',
             'data-i18n="workOneTitle"',
             'data-i18n="ctaPrimary"',
             "data-reveal",
@@ -87,6 +143,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "heroMetricsLabel",
             "productPreviewLabel",
             "productStageLabel",
+            "brandHomeLabel",
+            "languageSwitcherLabel",
+            "productPreviewAlt",
+            "data-i18n-alt",
             "zh:",
         ):
             with self.subTest(expected_fragment=expected_fragment):

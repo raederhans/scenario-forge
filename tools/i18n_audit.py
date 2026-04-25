@@ -16,6 +16,7 @@ try:
         load_scenario_localizable_strings,
         should_track_geo_missing_like,
     )
+    from tools.i18n_key_extractor import iter_transport_config_ui_strings
 except ImportError:
     from translate_manager import (
         has_literal_todo_marker,
@@ -27,6 +28,7 @@ except ImportError:
         load_scenario_localizable_strings,
         should_track_geo_missing_like,
     )
+    from i18n_key_extractor import iter_transport_config_ui_strings
 
 UI_T_CALL_RE = re.compile(r"""\bt\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
 GEO_T_CALL_RE = re.compile(r"""\bt\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
@@ -35,6 +37,12 @@ UI_MAP_ENTRY_RE = re.compile(
     r"""\[\s*"[^"]+"\s*,\s*"(?P<text>(?:\\.|[^"])*)"\s*\]""",
     re.DOTALL,
 )
+UI_COPY_CATALOG_BLOCK_RE = re.compile(
+    r"""export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\n\}\);""",
+    re.DOTALL,
+)
+UI_COPY_CATALOG_QUOTED_KEY_RE = re.compile(r"""^\s*"(?P<text>(?:\\.|[^"])*)"\s*:""", re.MULTILINE)
+UI_COPY_CATALOG_IDENTIFIER_KEY_RE = re.compile(r"""^\s*(?P<text>[A-Za-z][A-Za-z0-9_]*)\s*:\s*\{""", re.MULTILINE)
 TEXT_ASSIGN_LITERAL_RE = re.compile(
     r"""\b(?:textContent|innerText)\s*=\s*(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""",
     re.DOTALL,
@@ -52,11 +60,11 @@ SHOW_TOAST_TEMPLATE_RE = re.compile(
     re.DOTALL,
 )
 SET_ATTR_LITERAL_RE = re.compile(
-    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label)\1\s*,\s*(['\"])(?P<text>(?:\\.|(?!\3).)*)\3""",
+    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label|alt)\1\s*,\s*(['\"])(?P<text>(?:\\.|(?!\3).)*)\3""",
     re.DOTALL,
 )
 SET_ATTR_TEMPLATE_RE = re.compile(
-    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label)\1\s*,\s*`(?P<text>(?:\\.|[^`])*)`""",
+    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label|alt)\1\s*,\s*`(?P<text>(?:\\.|[^`])*)`""",
     re.DOTALL,
 )
 PLACEHOLDER_HTML_RE = re.compile(r"""placeholder=(['\"])(?P<text>.*?)\1""", re.DOTALL)
@@ -67,15 +75,25 @@ INNER_HTML_TEMPLATE_RE = re.compile(
     re.DOTALL,
 )
 STRING_LITERAL_RE = re.compile(r"""(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""", re.DOTALL)
+LANDING_EN_TRANSLATIONS_BLOCK_RE = re.compile(
+    r"""\ben\s*:\s*\{(?P<body>.*?)\n\s*\},\s*\n\s*zh\s*:""",
+    re.DOTALL,
+)
+LANDING_TRANSLATION_ENTRY_RE = re.compile(
+    r"""^\s*(?P<key>[A-Za-z][A-Za-z0-9_]*)\s*:\s*(?:\n\s*)?(['"])(?P<text>(?:\\.|(?!\2).)*)\2""",
+    re.MULTILINE | re.DOTALL,
+)
 
 DECLARATIVE_ATTR_NAMES = {
     "data-i18n",
     "data-i18n-placeholder",
     "data-i18n-title",
     "data-i18n-aria-label",
+    "data-i18n-alt",
 }
-VISIBLE_ATTR_NAMES = {"placeholder", "title", "aria-label"}
+VISIBLE_ATTR_NAMES = {"placeholder", "title", "aria-label", "alt"}
 A11Y_ATTR_NAMES = {"aria-label", "title"}
+MIXED_TERM_LINT_RE = re.compile(r"\b(?:override|fallback|workbench|inspector)\b", re.IGNORECASE)
 NON_VISIBLE_HTML_TAGS = {"script", "style"}
 NON_TRANSLATABLE_PATTERNS = (
     re.compile(r"^\d+(?:\.\d+)?(?:px|x|ms|s|%)$", re.IGNORECASE),
@@ -101,7 +119,7 @@ def is_user_visible_candidate(value: str) -> bool:
     if len(text) < 3:
         return False
     text_without_placeholders = re.sub(r"\{[A-Za-z_]+\}", "", text).strip()
-    if not text_without_placeholders:
+    if len(text_without_placeholders) < 3:
         return False
     if re.fullmatch(r"\{[A-Za-z_]+\}(?:px|x|ms|%)", text):
         return False
@@ -257,21 +275,38 @@ def collect_code_strings(repo_root: Path) -> dict:
     modal_keys = set()
     declarative_ui_keys = set()
     legacy_ui_map_keys = set()
+    inline_ui_keys = set()
     covered_default_literals = set()
     uncovered_user_visible_literals = set()
     a11y_literals = set()
     non_translatable_tokens = set()
     dynamic_ui = set()
     template_html_candidates = set()
+    landing_translation_keys = set()
+    landing_translation_default_values = set()
     default_markup_literals: list[dict[str, object]] = []
     runtime_literal_candidates: list[dict[str, str | None]] = []
+    scope_stats = {
+        "main_app": {"files": set(), "html_files": 0, "js_files": 0},
+        "landing": {"files": set(), "html_files": 0, "js_files": 0},
+    }
+    dynamic_config_keys = set()
 
     source_files = sorted((repo_root / "js").rglob("*.js"))
     source_files.append(repo_root / "index.html")
+    landing_root = repo_root / "landing"
+    if landing_root.exists():
+        source_files.extend(sorted(p for p in landing_root.rglob("*") if p.suffix.lower() in {".js", ".html"}))
 
     for path in source_files:
         if not path.exists():
             continue
+        source_scope = "landing" if "landing" in path.relative_to(repo_root).parts[:1] else "main_app"
+        scope_stats[source_scope]["files"].add(path.as_posix())
+        if path.suffix.lower() == ".html":
+            scope_stats[source_scope]["html_files"] += 1
+        elif path.suffix.lower() == ".js":
+            scope_stats[source_scope]["js_files"] += 1
         try:
             content = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
@@ -282,11 +317,35 @@ def collect_code_strings(repo_root: Path) -> dict:
             if value:
                 ui_t_keys.add(value)
 
+        if path.name == "i18n_catalog.js":
+            for block_match in UI_COPY_CATALOG_BLOCK_RE.finditer(content):
+                block_body = block_match.group("body")
+                for pattern in (UI_COPY_CATALOG_QUOTED_KEY_RE, UI_COPY_CATALOG_IDENTIFIER_KEY_RE):
+                    for match in pattern.finditer(block_body):
+                        value = decode_js_string(match.group("text"))
+                        if value:
+                            inline_ui_keys.add(value)
+
         if path.name == "i18n.js":
             for match in UI_MAP_ENTRY_RE.finditer(content):
                 value = decode_js_string(match.group("text"))
                 if value:
                     legacy_ui_map_keys.add(value)
+
+        for raw_transport_config_text in iter_transport_config_ui_strings(path, content):
+            value = add_ui_candidate(ui_t_keys, raw_transport_config_text)
+            if value:
+                dynamic_config_keys.add(value)
+
+        if source_scope == "landing" and path.name == "app.js":
+            for block_match in LANDING_EN_TRANSLATIONS_BLOCK_RE.finditer(content):
+                for match in LANDING_TRANSLATION_ENTRY_RE.finditer(block_match.group("body")):
+                    key = decode_js_string(match.group("key"))
+                    text = decode_js_string(match.group("text"))
+                    if key:
+                        landing_translation_keys.add(key)
+                    if text and is_user_visible_candidate(text):
+                        landing_translation_default_values.add(text)
 
         for match in GEO_T_CALL_RE.finditer(content):
             value = decode_js_string(match.group("text"))
@@ -358,7 +417,12 @@ def collect_code_strings(repo_root: Path) -> dict:
         for line in content.splitlines():
             collect_dynamic_line_candidates(line, dynamic_ui)
 
-    translation_keys = ui_t_keys | declarative_ui_keys | legacy_ui_map_keys
+    translation_keys = (
+        ui_t_keys
+        | declarative_ui_keys
+        | legacy_ui_map_keys
+        | landing_translation_default_values
+    )
 
     def classify_default_literal(value: str, attr_name: str | None, from_template: bool) -> None:
         normalized = decode_js_string(value)
@@ -406,6 +470,19 @@ def collect_code_strings(repo_root: Path) -> dict:
         "modal_keys": sorted(modal_keys),
         "declarative_ui_keys": sorted(declarative_ui_keys),
         "legacy_ui_map_keys": sorted(legacy_ui_map_keys),
+        "inline_ui_keys": sorted(inline_ui_keys),
+        "catalog_ui_keys": sorted(inline_ui_keys),
+        "landing_translation_keys": sorted(landing_translation_keys),
+        "landing_translation_default_values": sorted(landing_translation_default_values),
+        "dynamic_config_ui_keys": sorted(dynamic_config_keys),
+        "source_scope_stats": {
+            scope: {
+                "file_count": len(stats["files"]),
+                "html_file_count": stats["html_files"],
+                "js_file_count": stats["js_files"],
+            }
+            for scope, stats in scope_stats.items()
+        },
         "literal_translated_ui_keys": sorted_ui_t_keys,
         "covered_default_literals": sorted(covered_default_literals),
         "uncovered_user_visible_literals": sorted(uncovered_user_visible_literals),
@@ -429,6 +506,9 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- Literal translated UI keys via t(..., \"ui\"): {report['literal_translated_ui_count']}")
     lines.append(f"- Declarative UI keys via data-i18n*: {report['declarative_ui_key_count']}")
     lines.append(f"- Legacy uiMap keys: {report['legacy_ui_map_key_count']}")
+    lines.append(f"- Catalog UI keys: {report['catalog_ui_key_count']}")
+    lines.append(f"- Landing translation keys: {report['landing_translation_key_count']}")
+    lines.append(f"- Dynamic config UI keys: {report['dynamic_config_ui_key_count']}")
     lines.append(f"- Missing UI locale keys: {report['ui_missing_count']}")
     lines.append(f"- UI english fallback entries: {report['ui_english_fallback_count']}")
     lines.append(f"- Covered default literals: {report['covered_default_literal_count']}")
@@ -443,6 +523,7 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- Shell fallback missing-like entries: {report['shell_fallback_missing_like_count']}")
     lines.append(f"- Literal TODO markers: {report['geo_todo_marker_count']}")
     lines.append(f"- Corrupted translations: {report['corrupted_translation_count']}")
+    lines.append(f"- Mixed term lint entries: {report['mixed_term_lint_count']}")
     lines.append(f"- Corrupted source names: {report['source_name_corrupted_count']}")
     lines.append(
         "- Topology-derived geo names: "
@@ -462,6 +543,14 @@ def render_markdown(report: dict) -> str:
         "- Scenario metadata missing or untranslated in locales.geo: "
         f"{report['scenario_metadata_missing_count']}"
     )
+    lines.append("")
+
+    lines.append("## Source Scope Stats")
+    for scope_name, stats in report["source_scope_stats"].items():
+        lines.append(
+            f"- {scope_name}: files={stats['file_count']}, "
+            f"js={stats['js_file_count']}, html={stats['html_file_count']}"
+        )
     lines.append("")
 
     lines.append("## Missing UI Locale Keys")
@@ -516,6 +605,40 @@ def render_markdown(report: dict) -> str:
     if report["dynamic_ui_candidates"]:
         for key in report["dynamic_ui_candidates"]:
             lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Dynamic Config UI Keys")
+    if report["dynamic_config_ui_keys"]:
+        for key in report["dynamic_config_ui_keys"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Catalog UI Keys")
+    if report["catalog_ui_keys"]:
+        for key in report["catalog_ui_keys"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Landing Translation Keys")
+    if report["landing_translation_keys"]:
+        for key in report["landing_translation_keys"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Mixed Term Lint Entries")
+    if report["mixed_term_lint_entries"]:
+        for entry in report["mixed_term_lint_entries"][:200]:
+            lines.append(f"- [{entry['section']}] {entry['key']}: {entry['zh']}")
+        if len(report["mixed_term_lint_entries"]) > 200:
+            lines.append(f"- ... ({len(report['mixed_term_lint_entries']) - 200} more)")
     else:
         lines.append("- None")
     lines.append("")
@@ -664,12 +787,15 @@ def main() -> None:
     ui_locale = locales.get("ui") or {}
     geo_locale = locales.get("geo") or {}
 
+    inline_ui_key_set = set(code_strings["inline_ui_keys"])
     ui_used = (
         set(code_strings["ui_t_keys"])
         | set(code_strings["declarative_ui_keys"])
         | set(code_strings["legacy_ui_map_keys"])
     )
-    ui_missing = sorted(key for key in ui_used if key not in ui_locale_key_set)
+    ui_missing = sorted(key for key in ui_used if key not in ui_locale_key_set and key not in inline_ui_key_set)
+    landing_translation_key_set = set(code_strings["landing_translation_keys"])
+    ui_missing = sorted(key for key in ui_missing if key not in landing_translation_key_set)
     ui_english_fallback_keys = []
     for key, entry in ui_locale.items():
         if not isinstance(entry, dict):
@@ -714,6 +840,17 @@ def main() -> None:
                     "section": section_name,
                     "key": key,
                 })
+    mixed_term_lint_entries = []
+    for key, value in ui_locale.items():
+        if not isinstance(value, dict):
+            continue
+        zh_value = str(value.get("zh", "") or "")
+        if zh_value and MIXED_TERM_LINT_RE.search(zh_value):
+            mixed_term_lint_entries.append({
+                "section": "ui",
+                "key": key,
+                "zh": zh_value,
+            })
 
     topology_names = []
     if topology_path.exists():
@@ -773,6 +910,15 @@ def main() -> None:
         "declarative_ui_keys": code_strings["declarative_ui_keys"],
         "legacy_ui_map_key_count": len(code_strings["legacy_ui_map_keys"]),
         "legacy_ui_map_keys": code_strings["legacy_ui_map_keys"],
+        "inline_ui_key_count": len(code_strings["inline_ui_keys"]),
+        "inline_ui_keys": code_strings["inline_ui_keys"],
+        "catalog_ui_key_count": len(code_strings["catalog_ui_keys"]),
+        "catalog_ui_keys": code_strings["catalog_ui_keys"],
+        "dynamic_config_ui_key_count": len(code_strings["dynamic_config_ui_keys"]),
+        "dynamic_config_ui_keys": code_strings["dynamic_config_ui_keys"],
+        "landing_translation_key_count": len(code_strings["landing_translation_keys"]),
+        "landing_translation_keys": code_strings["landing_translation_keys"],
+        "source_scope_stats": code_strings["source_scope_stats"],
         "ui_missing_count": len(ui_missing),
         "ui_missing_keys": ui_missing,
         "ui_english_fallback_count": len(ui_english_fallback_keys),
@@ -800,6 +946,8 @@ def main() -> None:
         "geo_todo_marker_count": geo_todo_marker_count,
         "corrupted_translation_count": len(corrupted_translation_examples),
         "corrupted_translation_examples": corrupted_translation_examples,
+        "mixed_term_lint_count": len(mixed_term_lint_entries),
+        "mixed_term_lint_entries": mixed_term_lint_entries,
         "source_name_corrupted_count": len(source_name_corrupted),
         "source_name_corrupted_examples": source_name_corrupted[:500],
         "primary_topology_geo_name_count": len(topology_names),
@@ -840,6 +988,7 @@ def main() -> None:
         f"scenario_metadata_missing={report['scenario_metadata_missing_count']}, "
         f"source_name_corrupted={report['source_name_corrupted_count']}, "
         f"corrupted_translations={report['corrupted_translation_count']}, "
+        f"mixed_term_lint={report['mixed_term_lint_count']}, "
         f"todo_markers={report['geo_todo_marker_count']}"
     )
     print(f"Markdown report: {markdown_out}")

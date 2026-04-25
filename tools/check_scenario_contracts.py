@@ -13,7 +13,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
-from map_builder.contracts import SCENARIO_STRICT_REQUIRED_FILENAMES
+from map_builder.contracts import (
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
+    SCENARIO_STRICT_REQUIRED_FILENAMES,
+)
 
 DEFAULT_SCENARIOS_ROOT = PROJECT_ROOT / "data/scenarios"
 IGNORED_DIR_NAMES = {"expectations"}
@@ -319,9 +323,11 @@ def validate_locale_patch(
             return fallback
 
     patch_descriptors = [
-        ("geo_locale_patch_url", str(manifest.get("geo_locale_patch_url") or "").strip()),
-        ("geo_locale_patch_url_en", str(manifest.get("geo_locale_patch_url_en") or "").strip()),
-        ("geo_locale_patch_url_zh", str(manifest.get("geo_locale_patch_url_zh") or "").strip()),
+        (SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD, str(manifest.get(SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD) or "").strip()),
+        *(
+            (field_name, str(manifest.get(field_name) or "").strip())
+            for field_name in SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS.values()
+        ),
     ]
     active_patch_descriptors = [(field, url) for field, url in patch_descriptors if url]
     if not active_patch_descriptors:

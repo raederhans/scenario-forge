@@ -5,6 +5,10 @@ import {
   setCurrentLanguage,
 } from "../core/state/content_state.js";
 import { hasScenarioRuntimeShellContract } from "../core/scenario_resources.js";
+import {
+  getScenarioStartupBundleFilename,
+  normalizeScenarioLocaleLanguage,
+} from "../core/scenario/locale_asset_contract.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import { consumeStartupSupportKeyUsageAuditReport } from "../ui/i18n.js";
 const state = runtimeState;
@@ -212,7 +216,7 @@ export function getConfiguredDefaultScenarioId() {
 }
 
 export function getStartupBundleLanguage() {
-  return getBootLanguage() === "zh" ? "zh" : "en";
+  return normalizeScenarioLocaleLanguage(getBootLanguage());
 }
 
 export function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage()) {
@@ -220,8 +224,7 @@ export function getStartupBundleUrl(scenarioId, language = getStartupBundleLangu
   if (!normalizedScenarioId) {
     return "";
   }
-  const bundleLanguage = String(language || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
-  return `data/scenarios/${normalizedScenarioId}/startup.bundle.${bundleLanguage}.json`;
+  return `data/scenarios/${normalizedScenarioId}/${getScenarioStartupBundleFilename(language)}`;
 }
 
 export function getStartupScenarioSupportUrl(scenarioId, filename) {

@@ -15,8 +15,13 @@ if str(ROOT) not in sys.path:
 
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
+    SCENARIO_LOCALE_LANGUAGES,
+)
 
-SUPPORTED_LANGUAGES = ("en", "zh")
+SUPPORTED_LANGUAGES = SCENARIO_LOCALE_LANGUAGES
 STARTUP_BUNDLE_VERSION = 5
 STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
@@ -1151,8 +1156,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario-manifest", required=True)
     parser.add_argument("--data-manifest", default=str(ROOT / "data/manifest.json"))
     parser.add_argument("--topology-primary", default=str(ROOT / "data/europe_topology.json"))
-    parser.add_argument("--startup-locales", default=str(ROOT / "data/scenarios/tno_1962/locales.startup.json"))
-    parser.add_argument("--geo-aliases", default=str(ROOT / "data/scenarios/tno_1962/geo_aliases.startup.json"))
+    parser.add_argument(
+        "--startup-locales",
+        default=str(ROOT / "data/scenarios/tno_1962" / SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME),
+    )
+    parser.add_argument(
+        "--geo-aliases",
+        default=str(ROOT / "data/scenarios/tno_1962" / SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME),
+    )
     parser.add_argument("--full-runtime-topology", required=True)
     parser.add_argument("--runtime-bootstrap-topology", required=True)
     parser.add_argument("--countries", required=True)

@@ -12,7 +12,7 @@ from tools.translate_manager import (
     build_translation_source_audit,
     collect_ui_keys,
     contains_cjk,
-    load_inline_ui_translations,
+    load_ui_copy_catalog_translations,
 )
 
 
@@ -104,21 +104,81 @@ const label = t("Say \"hi\"", "ui");
             self.assertIn("Next Label", keys)
             self.assertNotIn("Broken      data-extra=", keys)
 
-    def test_load_inline_ui_translations_reuses_existing_runtime_copy(self) -> None:
+    def test_collect_ui_keys_includes_transport_descriptor_copy(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             self._write_repo_file(
                 repo_root,
-                "js/ui/i18n.js",
+                "js/ui/toolbar/transport_workbench_descriptor.js",
                 """
-const INLINE_UI_TRANSLATIONS = Object.freeze({
+export const TRANSPORT_WORKBENCH_FAMILIES = [
+  {
+    label: "Road",
+    lensBody: "Japan road now loads a real preview pack.",
+  },
+];
+                """.strip(),
+            )
+
+            keys = collect_ui_keys(repo_root)
+
+            self.assertIn("Road", keys)
+            self.assertIn("Japan road now loads a real preview pack.", keys)
+
+    def test_collect_ui_keys_ignores_landing_local_i18n_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "landing/index.html",
+                """
+<!doctype html>
+<html>
+  <body>
+    <a data-i18n="navWorks">Works</a>
+    <img data-i18n-alt="productPreviewAlt" alt="Scenario Forge product preview" />
+  </body>
+</html>
+                """.strip(),
+            )
+            self._write_repo_file(
+                repo_root,
+                "landing/app.js",
+                """
+const translations = {
+  en: {
+    navWorks: "Works",
+    productPreviewAlt: "Scenario Forge product preview",
+  },
+  zh: {
+    navWorks: "作品",
+    productPreviewAlt: "Scenario Forge 产品预览",
+  },
+};
+                """.strip(),
+            )
+
+            keys = collect_ui_keys(repo_root)
+
+            self.assertNotIn("navWorks", keys)
+            self.assertNotIn("productPreviewAlt", keys)
+            self.assertNotIn("Scenario Forge product preview", keys)
+
+    def test_load_ui_copy_catalog_translations_reuses_existing_runtime_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "js/ui/i18n_catalog.js",
+                """
+export const UI_COPY_CATALOG = Object.freeze({
   "Atlas Ink": { zh: "\\u56fe\\u96c6\\u58a8\\u84dd", en: "Atlas Ink" },
   Guide: { zh: "\\u6307\\u5357", en: "Guide" },
 });
                 """.strip(),
             )
 
-            translations = load_inline_ui_translations(repo_root)
+            translations = load_ui_copy_catalog_translations(repo_root)
 
             self.assertEqual(translations["Atlas Ink"], "图集墨蓝")
             self.assertEqual(translations["Guide"], "指南")

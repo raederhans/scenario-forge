@@ -81,6 +81,9 @@ from map_builder.contracts import (
     SCENARIO_PUBLISH_SCOPE_ALL as CONTRACT_PUBLISH_SCOPE_ALL,
     SCENARIO_PUBLISH_SCOPE_POLAR_RUNTIME as CONTRACT_PUBLISH_SCOPE_POLAR_RUNTIME,
     SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA as CONTRACT_PUBLISH_SCOPE_SCENARIO_DATA,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD as CONTRACT_GEO_LOCALE_PATCH_MANIFEST_FIELD,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS as CONTRACT_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
+    SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE as CONTRACT_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE,
     resolve_scenario_publish_filenames,
 )
 from scenario_builder.hoi4.audit import read_bmp24
@@ -10870,9 +10873,13 @@ def build_runtime_topology_state(
         f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME}"
     )
     manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
-    manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_FILENAME}"
-    manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_EN_FILENAME}"
-    manifest_payload["geo_locale_patch_url_zh"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_ZH_FILENAME}"
+    manifest_payload[CONTRACT_GEO_LOCALE_PATCH_MANIFEST_FIELD] = (
+        f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_FILENAME}"
+    )
+    for language, field_name in CONTRACT_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS.items():
+        manifest_payload[field_name] = (
+            f"data/scenarios/{SCENARIO_ID}/{CONTRACT_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE[language]}"
+        )
     manifest_payload["startup_bundle_url_en"] = (
         f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME}"
     )

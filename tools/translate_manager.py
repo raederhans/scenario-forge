@@ -12,10 +12,12 @@ from pathlib import Path
 try:
     # Attempt absolute import (for when running from root via init_map_data.py)
     from tools.geo_seeds import EUROPE_GEO_SEEDS as DEFAULT_EUROPE_GEO_SEEDS
+    from tools.i18n_key_extractor import iter_transport_config_ui_strings
 except ImportError:
     try:
         # Attempt local import (for when running script directly from tools/ dir)
         from geo_seeds import EUROPE_GEO_SEEDS as DEFAULT_EUROPE_GEO_SEEDS
+        from i18n_key_extractor import iter_transport_config_ui_strings
     except ImportError as exc:
         raise ImportError(
             "Could not import geo_seeds. Ensure execution from root or tools/ directory."
@@ -689,11 +691,11 @@ SCENARIO_METADATA_FIELDS = ("bookmark_name", "bookmarkName", "bookmark_descripti
 TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
 UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
 HEX_ESCAPE_RE = re.compile(r"\\x([0-9a-fA-F]{2})")
-INLINE_UI_TRANSLATIONS_RE = re.compile(
-    r"const\s+INLINE_UI_TRANSLATIONS\s*=\s*Object\.freeze\(\{(?P<body>.*?)\}\);",
+UI_COPY_CATALOG_RE = re.compile(
+    r"export\s+const\s+UI_COPY_CATALOG\s*=\s*Object\.freeze\(\{(?P<body>.*?)\}\);",
     re.DOTALL,
 )
-INLINE_UI_TRANSLATION_ENTRY_RE = re.compile(
+UI_COPY_CATALOG_ENTRY_RE = re.compile(
     r"""
     (?P<key>"(?:\\.|[^"])+"|[A-Za-z_][A-Za-z0-9_ ]*)
     \s*:\s*
@@ -944,22 +946,26 @@ def collect_ui_keys(repo_root: Path) -> list[str]:
                 value = decode_js_string(match.group("text"))
                 if value:
                     keys.add(value)
+        for raw_transport_config_text in iter_transport_config_ui_strings(path, content):
+            value = decode_js_string(raw_transport_config_text)
+            if value and is_user_visible_candidate(value):
+                keys.add(value)
     return sorted(keys)
 
 
-def load_inline_ui_translations(repo_root: Path) -> dict[str, str]:
-    i18n_path = repo_root / "js" / "ui" / "i18n.js"
-    if not i18n_path.exists():
+def load_ui_copy_catalog_translations(repo_root: Path) -> dict[str, str]:
+    catalog_path = repo_root / "js" / "ui" / "i18n_catalog.js"
+    if not catalog_path.exists():
         return {}
     try:
-        content = i18n_path.read_text(encoding="utf-8")
+        content = catalog_path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         return {}
 
-    object_match = INLINE_UI_TRANSLATIONS_RE.search(content)
+    object_match = UI_COPY_CATALOG_RE.search(content)
     scan_source = object_match.group("body") if object_match else content
     payload: dict[str, str] = {}
-    for match in INLINE_UI_TRANSLATION_ENTRY_RE.finditer(scan_source):
+    for match in UI_COPY_CATALOG_ENTRY_RE.finditer(scan_source):
         raw_key = str(match.group("key") or "").strip()
         if raw_key.startswith('"') and raw_key.endswith('"'):
             raw_key = raw_key[1:-1]
@@ -972,6 +978,10 @@ def load_inline_ui_translations(repo_root: Path) -> dict[str, str]:
         if en_value:
             payload.setdefault(en_value, zh_value)
     return payload
+
+
+# Backward-compatible public name; the source is now the standalone catalog.
+load_inline_ui_translations = load_ui_copy_catalog_translations
 
 
 def parse_country_codes(raw_value: str | None) -> set[str]:
@@ -1859,7 +1869,7 @@ def sync_translations(
     geo_names = sorted(geo_names)
     alias_to_stable, stable_to_primary, search_only_aliases = load_geo_aliases(geo_aliases_path)
     discovered_ui_keys = collect_ui_keys(base_dir)
-    inline_ui_translations = load_inline_ui_translations(base_dir)
+    inline_ui_translations = load_ui_copy_catalog_translations(base_dir)
     translator = MachineTranslator(
         enabled=machine_translate_enabled,
         delay_seconds=translator_delay_seconds,

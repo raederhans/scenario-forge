@@ -15,6 +15,10 @@ import {
   validateScenarioRuntimeShellContract,
 } from "../core/scenario_resources.js";
 import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
+import {
+  SCENARIO_STARTUP_GEO_ALIASES_FILENAME,
+  SCENARIO_STARTUP_LOCALES_FILENAME,
+} from "../core/scenario/locale_asset_contract.js";
 import { applyActivePaletteState } from "../core/palette_manager.js";
 import { loadStartupBundleViaWorker } from "../core/startup_worker_client.js";
 import {
@@ -532,8 +536,8 @@ export function createStartupDataPipelineOwner({
       includeCityData: false,
       includeContextLayers: ["urban"],
       localeLevel: "startup",
-      localesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "locales.startup.json"),
-      geoAliasesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, "geo_aliases.startup.json"),
+      localesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, SCENARIO_STARTUP_LOCALES_FILENAME),
+      geoAliasesUrl: getStartupScenarioSupportUrl(startupFallbackScenarioId, SCENARIO_STARTUP_GEO_ALIASES_FILENAME),
       useStartupWorker: true,
       useStartupCache: true,
       startupBootArtifactsOverride: startupBundleResultPromise.then((result) => (

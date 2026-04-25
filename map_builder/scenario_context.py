@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Iterator
 
 from map_builder import config as cfg
+from map_builder.contracts import (
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD,
+    SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
+)
 from map_builder.io.writers import write_json_atomic, write_text_atomic
 from map_builder.scenario_locks import scenario_build_lock
 from map_builder.scenario_mutations import DEFAULT_SCENARIO_MUTATIONS_FILENAME
@@ -226,9 +230,9 @@ def load_scenario_context(
     city_overrides_url = str(manifest.get("city_overrides_url") or "").strip()
     capital_hints_url = str(manifest.get("capital_hints_url") or "").strip()
     geo_locale_patch_url = str(
-        manifest.get("geo_locale_patch_url")
-        or manifest.get("geo_locale_patch_url_en")
-        or manifest.get("geo_locale_patch_url_zh")
+        manifest.get(SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD)
+        or manifest.get(SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS["en"])
+        or manifest.get(SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS["zh"])
         or ""
     ).strip()
     geo_locale_builder_url = str(manifest.get("geo_locale_builder_url") or "").strip()

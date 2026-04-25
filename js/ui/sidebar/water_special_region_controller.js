@@ -649,7 +649,7 @@ export function createWaterSpecialRegionController({
       if (getWaterFeatureHasOverride(featureId)) {
         const badge = document.createElement("span");
         badge.className = "country-select-meta";
-        badge.textContent = "Override";
+        badge.textContent = t("Override", "ui");
         actions.appendChild(badge);
       }
 
@@ -713,7 +713,7 @@ export function createWaterSpecialRegionController({
         if (getWaterFeatureHasOverride(featureId)) {
           const badge = document.createElement("span");
           badge.className = "country-select-meta";
-          badge.textContent = "Override";
+          badge.textContent = t("Override", "ui");
           actions.appendChild(badge);
         }
       }

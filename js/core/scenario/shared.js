@@ -1,3 +1,9 @@
+import {
+  SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD,
+  SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
+  normalizeScenarioLocaleLanguage,
+} from "./locale_asset_contract.js";
+
 const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 60_000;
 
@@ -278,15 +284,15 @@ function normalizeScenarioId(value) {
 }
 
 function normalizeScenarioLanguage(value) {
-  return String(value || "").trim().toLowerCase() === "zh" ? "zh" : "en";
+  return normalizeScenarioLocaleLanguage(value);
 }
 
 function getScenarioGeoLocalePatchDescriptor(manifest, language) {
   const normalizedLanguage = normalizeScenarioLanguage(language);
   const localeSpecificUrl = String(
     normalizedLanguage === "zh"
-      ? manifest?.geo_locale_patch_url_zh || ""
-      : manifest?.geo_locale_patch_url_en || ""
+      ? manifest?.[SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS.zh] || ""
+      : manifest?.[SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS.en] || ""
   ).trim();
   if (localeSpecificUrl) {
     return {
@@ -296,7 +302,7 @@ function getScenarioGeoLocalePatchDescriptor(manifest, language) {
     };
   }
   return {
-    url: String(manifest?.geo_locale_patch_url || "").trim(),
+    url: String(manifest?.[SCENARIO_GEO_LOCALE_PATCH_MANIFEST_FIELD] || "").trim(),
     language: normalizedLanguage,
     localeSpecific: false,
   };
