@@ -20,12 +20,6 @@ jobs:
       - name: Classify perf-relevant changes
         id: classify
         shell: pwsh
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-          GITHUB_SHA_VALUE: ${{ github.sha }}
         run: |
           New-Item -ItemType Directory -Force -Path '.runtime/reports/generated' | Out-Null
 
@@ -38,12 +32,13 @@ jobs:
             return "^$escaped$"
           }
 
-          if ($env:EVENT_NAME -eq 'pull_request') {
-            $baseSha = $env:PR_BASE_SHA
-            $headSha = $env:PR_HEAD_SHA
+          $eventPayload = Get-Content -Raw -Path $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+            $baseSha = $eventPayload.pull_request.base.sha
+            $headSha = $eventPayload.pull_request.head.sha
           } else {
-            $baseSha = $env:PUSH_BEFORE_SHA
-            $headSha = $env:GITHUB_SHA_VALUE
+            $baseSha = $eventPayload.before
+            $headSha = if ($eventPayload.after) { $eventPayload.after } else { $env:GITHUB_SHA }
           }
 
           if (-not $baseSha -or $baseSha -match '^0+$') {
