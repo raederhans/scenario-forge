@@ -53,7 +53,6 @@ ALIAS_LIMIT = 24
 ALIAS_SAMPLE_LIMIT = 200
 CITY_TIER_WEIGHT = {"minor": 1, "regional": 2, "major": 3}
 CITY_SOURCE_PRIORITY = {"merged": 0, "natural_earth": 1, "geonames": 2}
-URBAN_OWNER_NEAREST_GAP_MAX_DISTANCE_M = 40_000.0
 # Deprecated: use SCENARIO_MANUAL_CAPITALS instead.
 TNO_MANUAL_CAPITALS = {
     "GER": "Berlin",
@@ -875,9 +874,6 @@ def assign_urban_country_owners(
             if distances.empty:
                 continue
             nearest_index = distances.sort_values().index[0]
-            nearest_distance_m = float(distances.loc[nearest_index])
-            if nearest_distance_m > URBAN_OWNER_NEAREST_GAP_MAX_DISTANCE_M:
-                continue
             nearest = political_projected.loc[nearest_index]
             best_owner_id = str(nearest.get("id") or "").strip()
             best_owner_code = str(nearest.get("cntr_code") or "").strip().upper()
