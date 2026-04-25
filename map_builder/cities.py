@@ -53,6 +53,7 @@ ALIAS_LIMIT = 24
 ALIAS_SAMPLE_LIMIT = 200
 CITY_TIER_WEIGHT = {"minor": 1, "regional": 2, "major": 3}
 CITY_SOURCE_PRIORITY = {"merged": 0, "natural_earth": 1, "geonames": 2}
+URBAN_OWNER_NEAREST_GAP_MAX_DISTANCE_M = 40_000.0
 # Deprecated: use SCENARIO_MANUAL_CAPITALS instead.
 TNO_MANUAL_CAPITALS = {
     "GER": "Berlin",
@@ -849,8 +850,6 @@ def assign_urban_country_owners(
         if geom is None or geom.is_empty:
             continue
         candidate_positions = list(political_sindex.query(geom, predicate="intersects"))
-        if not candidate_positions:
-            continue
 
         best_owner_id = ""
         best_owner_code = ""
@@ -871,10 +870,25 @@ def assign_urban_country_owners(
             best_owner_code = str(candidate.get("cntr_code") or "").strip().upper()
 
         if not best_owner_id:
+            centroid = geom.centroid
+            distances = political_projected.distance(centroid)
+            if distances.empty:
+                continue
+            nearest_index = distances.sort_values().index[0]
+            nearest_distance_m = float(distances.loc[nearest_index])
+            if nearest_distance_m > URBAN_OWNER_NEAREST_GAP_MAX_DISTANCE_M:
+                continue
+            nearest = political_projected.loc[nearest_index]
+            best_owner_id = str(nearest.get("id") or "").strip()
+            best_owner_code = str(nearest.get("cntr_code") or "").strip().upper()
+            urban.loc[urban_idx, "country_owner_method"] = "nearest_gap_fallback"
+
+        if not best_owner_id:
             continue
         urban.loc[urban_idx, "country_owner_id"] = best_owner_id
         urban.loc[urban_idx, "country_owner_code"] = best_owner_code
-        urban.loc[urban_idx, "country_owner_method"] = "max_overlap"
+        if not str(urban.loc[urban_idx, "country_owner_method"]).strip():
+            urban.loc[urban_idx, "country_owner_method"] = "max_overlap"
 
     return urban
 
