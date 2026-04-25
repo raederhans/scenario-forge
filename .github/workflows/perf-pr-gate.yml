@@ -2,6 +2,8 @@ name: perf-pr-gate
 
 on:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -19,8 +21,11 @@ jobs:
         id: classify
         shell: pwsh
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
         run: |
           New-Item -ItemType Directory -Force -Path '.runtime/reports/generated' | Out-Null
 
@@ -33,10 +38,25 @@ jobs:
             return "^$escaped$"
           }
 
-          $baseSha = $env:BASE_SHA
-          $headSha = $env:HEAD_SHA
+          if ($env:EVENT_NAME -eq 'pull_request') {
+            $baseSha = $env:PR_BASE_SHA
+            $headSha = $env:PR_HEAD_SHA
+          } else {
+            $baseSha = $env:PUSH_BEFORE_SHA
+            $headSha = $env:GITHUB_SHA_VALUE
+          }
+
+          if (-not $baseSha -or $baseSha -match '^0+$') {
+            $baseSha = (git rev-parse "$headSha^" 2>$null)
+          }
+
+          if (-not $headSha) {
+            throw 'Unable to resolve head SHA for perf gate classifier'
+          }
+
+          $diffRange = if ($baseSha) { "$baseSha...$headSha" } else { $headSha }
           $changedFiles = @(
-            git diff --name-only "$baseSha...$headSha" |
+            git diff --name-only $diffRange |
               ForEach-Object { $_.Trim().Replace('\', '/') } |
               Where-Object { $_ }
           )
