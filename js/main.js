@@ -44,6 +44,12 @@ let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let postReadyTaskHandles = new Map();
 let postReadyTaskEpoch = 0;
+const POST_READY_IDLE_QUIET_MS = 850;
+const POST_READY_IDLE_TIME_REMAINING_MS = 8;
+
+function nowMs() {
+  return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+}
 
 const bootOverlayController = createStartupBootOverlayController();
 const {
@@ -319,22 +325,20 @@ function flushPendingScenarioChunkRefreshAfterReady(reason = "post-ready") {
 }
 
 function startDeferredFullInteractionInfrastructureBuild(reason = "post-ready-full-interaction") {
-  const run = () => {
-    void buildInteractionInfrastructureAfterStartup({
+  schedulePostReadyTask("post-ready-full-interaction-infra", () => {
+    return buildInteractionInfrastructureAfterStartup({
       chunked: true,
       buildHitCanvas: false,
       mode: "full",
     }).catch((error) => {
       console.warn(`[boot] Deferred full interaction infrastructure build failed. reason=${reason}`, error);
     });
-  };
-  if (typeof globalThis.requestIdleCallback === "function") {
-    globalThis.requestIdleCallback(() => {
-      run();
-    }, { timeout: 1200 });
-    return;
-  }
-  globalThis.setTimeout(run, 180);
+  }, {
+    timeout: 1200,
+    delayMs: 180,
+    retryDelayMs: 320,
+    idleQuietMs: POST_READY_IDLE_QUIET_MS,
+  });
 }
 
 function clearPostReadyTaskHandle(handle) {
@@ -364,7 +368,13 @@ function clearAllScheduledPostReadyTasks() {
   postReadyTaskHandles.clear();
 }
 
-function canRunPostReadyIdleWork() {
+function canRunPostReadyIdleWork({ quietMs = POST_READY_IDLE_QUIET_MS } = {}) {
+  const phaseEnteredAt = Number(runtimeState.phaseEnteredAt || 0);
+  const zoomEndedAt = Number(runtimeState.zoomGestureEndedAt || 0);
+  const currentMs = nowMs();
+  const idleForMs = phaseEnteredAt > 0 ? currentMs - phaseEnteredAt : Number.POSITIVE_INFINITY;
+  const zoomQuietForMs = zoomEndedAt > 0 ? currentMs - zoomEndedAt : Number.POSITIVE_INFINITY;
+  const requiredQuietMs = Math.max(0, Number(quietMs) || 0);
   return (
     !runtimeState.bootBlocking
     && !runtimeState.scenarioApplyInFlight
@@ -372,7 +382,47 @@ function canRunPostReadyIdleWork() {
     && !runtimeState.startupReadonlyUnlockInFlight
     && !runtimeState.isInteracting
     && String(runtimeState.renderPhase || "idle") === "idle"
+    && idleForMs >= requiredQuietMs
+    && zoomQuietForMs >= requiredQuietMs
   );
+}
+
+function runPostReadyTaskCallback(taskKey, callback) {
+  runtimeState.activePostReadyTaskKey = taskKey;
+  runtimeState.activePostReadyTaskStartedAt = nowMs();
+
+  const clearActivePostReadyTask = () => {
+    if (runtimeState.activePostReadyTaskKey === taskKey) {
+      runtimeState.activePostReadyTaskKey = "";
+      runtimeState.activePostReadyTaskStartedAt = 0;
+    }
+  };
+
+  try {
+    Promise.resolve(callback())
+      .catch((error) => {
+        console.warn(`[boot] Post-ready task failed. task=${taskKey}`, error);
+      })
+      .finally(clearActivePostReadyTask);
+  } catch (error) {
+    console.warn(`[boot] Post-ready task failed. task=${taskKey}`, error);
+    clearActivePostReadyTask();
+  }
+}
+
+function reschedulePostReadyTask(normalizedTaskKey, callback, {
+  timeout,
+  retryDelayMs,
+  idleQuietMs,
+  minIdleTimeRemainingMs,
+} = {}) {
+  schedulePostReadyTask(normalizedTaskKey, callback, {
+    timeout,
+    delayMs: retryDelayMs,
+    retryDelayMs,
+    idleQuietMs,
+    minIdleTimeRemainingMs,
+  });
 }
 
 function schedulePostReadyTask(
@@ -382,6 +432,8 @@ function schedulePostReadyTask(
     timeout = 1200,
     delayMs = 0,
     retryDelayMs = 320,
+    idleQuietMs = POST_READY_IDLE_QUIET_MS,
+    minIdleTimeRemainingMs = POST_READY_IDLE_TIME_REMAINING_MS,
   } = {}
 ) {
   const normalizedTaskKey = String(taskKey || "").trim();
@@ -394,26 +446,29 @@ function schedulePostReadyTask(
       clearScheduledPostReadyTask(normalizedTaskKey);
       return;
     }
-    if (!canRunPostReadyIdleWork()) {
+    if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
       const retryId = globalThis.setTimeout(runWhenIdle, Math.max(120, retryDelayMs));
       postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: retryId });
       return;
     }
     if (typeof globalThis.requestIdleCallback === "function") {
-      const idleId = globalThis.requestIdleCallback(() => {
+      const idleId = globalThis.requestIdleCallback((deadline) => {
         postReadyTaskHandles.delete(normalizedTaskKey);
         if (scheduledEpoch !== postReadyTaskEpoch) {
           return;
         }
-        if (!canRunPostReadyIdleWork()) {
-          schedulePostReadyTask(normalizedTaskKey, callback, {
-            timeout,
-            delayMs: retryDelayMs,
-            retryDelayMs,
-          });
+        const remainingMs = typeof deadline?.timeRemaining === "function"
+          ? Number(deadline.timeRemaining())
+          : Number.POSITIVE_INFINITY;
+        if (!deadline?.didTimeout && remainingMs < minIdleTimeRemainingMs) {
+          reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
           return;
         }
-        void callback();
+        if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
+          reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
+          return;
+        }
+        runPostReadyTaskCallback(normalizedTaskKey, callback);
       }, { timeout });
       postReadyTaskHandles.set(normalizedTaskKey, { type: "idle", id: idleId });
       return;
@@ -423,15 +478,11 @@ function schedulePostReadyTask(
       if (scheduledEpoch !== postReadyTaskEpoch) {
         return;
       }
-      if (!canRunPostReadyIdleWork()) {
-        schedulePostReadyTask(normalizedTaskKey, callback, {
-          timeout,
-          delayMs: retryDelayMs,
-          retryDelayMs,
-        });
+      if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
+        reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
         return;
       }
-      void callback();
+      runPostReadyTaskCallback(normalizedTaskKey, callback);
     }, 0);
     postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: timeoutId });
   };
@@ -451,9 +502,10 @@ function schedulePostReadyVisualWarmup() {
       requestMainRender("post-ready-visual-warmup");
     }
   }, {
-    timeout: 900,
-    delayMs: 120,
-    retryDelayMs: 240,
+    timeout: 1200,
+    delayMs: 900,
+    retryDelayMs: 320,
+    idleQuietMs: POST_READY_IDLE_QUIET_MS,
   });
 }
 
@@ -489,17 +541,19 @@ function schedulePostReadyDeferredContextWarmup() {
     if (requestedLayerNames.length) {
       tasks.push(ensureContextLayerDataReady(requestedLayerNames, {
         reason: "post-ready",
-        renderNow: true,
+        renderNow: false,
       }));
     }
     if (shouldWarmCities && runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
-      tasks.push(runtimeState.ensureBaseCityDataFn({ reason: "post-ready", renderNow: true }));
+      tasks.push(runtimeState.ensureBaseCityDataFn({ reason: "post-ready", renderNow: false }));
     }
     await Promise.allSettled(tasks);
+    requestMainRender("post-ready-context-warmup");
   }, {
-    timeout: 1000,
-    delayMs: 120,
-    retryDelayMs: 320,
+    timeout: 1600,
+    delayMs: 900,
+    retryDelayMs: 420,
+    idleQuietMs: POST_READY_IDLE_QUIET_MS,
   });
   if (requestedContourLayerNames.length) {
     schedulePostReadyTask("post-ready-contour-warmup", async () => {
@@ -508,12 +562,14 @@ function schedulePostReadyDeferredContextWarmup() {
       }
       await ensureContextLayerDataReady(requestedContourLayerNames, {
         reason: "post-ready-contours",
-        renderNow: true,
+        renderNow: false,
       });
+      requestMainRender("post-ready-contours");
     }, {
-      timeout: 1200,
-      delayMs: 900,
-      retryDelayMs: 320,
+      timeout: 1800,
+      delayMs: 1400,
+      retryDelayMs: 420,
+      idleQuietMs: POST_READY_IDLE_QUIET_MS,
     });
   }
 }
@@ -683,6 +739,8 @@ async function bootstrap() {
   deferredUiBootstrapPromise = null;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
+  runtimeState.activePostReadyTaskKey = "";
+  runtimeState.activePostReadyTaskStartedAt = 0;
   postReadyTaskEpoch += 1;
   clearAllScheduledPostReadyTasks();
   setStartupInteractionMode(state, resolveStartupInteractionMode());

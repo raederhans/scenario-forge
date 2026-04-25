@@ -852,6 +852,53 @@ def clear_browser_buffers() -> None:
     run_pw("network", "--clear")
 
 
+def wait_for_benchmark_runtime_ready(label: str, timeout_ms: int = 90000) -> dict:
+    js = f"""
+async (page) => {{
+  return await page.evaluate(async (payload) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const timeoutMs = Math.max(1000, Number(payload?.timeoutMs || 0));
+    const startedAt = performance.now();
+    const isReady = () => (
+      !state.bootBlocking
+      && !state.startupReadonly
+      && !state.startupReadonlyUnlockInFlight
+      && !state.scenarioApplyInFlight
+      && !state.isInteracting
+      && !state.deferExactAfterSettle
+      && !String(state.activePostReadyTaskKey || '')
+      && String(state.renderPhase || 'idle') === 'idle'
+      && (Number(state.phaseEnteredAt || 0) <= 0 || performance.now() - Number(state.phaseEnteredAt || 0) >= 600)
+      && (Number(state.zoomGestureEndedAt || 0) <= 0 || performance.now() - Number(state.zoomGestureEndedAt || 0) >= 600)
+    );
+    while (!isReady() && (performance.now() - startedAt) < timeoutMs) {{
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }}
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return {{
+      label: String(payload?.label || ''),
+      ready: isReady(),
+      waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+      bootPhase: String(state.bootPhase || ''),
+      bootBlocking: !!state.bootBlocking,
+      startupReadonly: !!state.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      isInteracting: !!state.isInteracting,
+      deferExactAfterSettle: !!state.deferExactAfterSettle,
+      activePostReadyTaskKey: String(state.activePostReadyTaskKey || ''),
+      renderPhase: String(state.renderPhase || ''),
+      activeScenarioId: String(state.activeScenarioId || ''),
+    }};
+  }}, {{ label: {json.dumps(label)}, timeoutMs: {int(timeout_ms)} }});
+}}
+""".strip()
+    result = run_code_json(js)
+    if isinstance(result, dict) and result.get("ready"):
+      return result
+    raise RuntimeError(f"Benchmark runtime did not become ready before scenario action: {result}")
+
+
 def capture_console_issues() -> list[str]:
     output = run_pw("console", "warning")
     return [line for line in str(output).splitlines() if line.strip()]
@@ -1174,6 +1221,57 @@ def with_metric_context(
     return normalized_summary
 
 
+def summarize_distribution_metric(
+    value: object,
+    *,
+    source: str,
+    details: dict | None = None,
+    count: object = None,
+) -> dict:
+    numeric_value = as_finite_number(value)
+    numeric_count = as_finite_number(count)
+    metric_details = dict(details or {})
+    metric_details["distribution"] = summarize_distribution([numeric_value] if numeric_value is not None else [])
+    return {
+      "present": numeric_value is not None,
+      "source": source if numeric_value is not None else None,
+      "durationMs": numeric_value,
+      "recordedAt": None,
+      "count": numeric_count,
+      "details": metric_details,
+    }
+
+
+def summarize_interactive_pan_metric(suite: dict) -> dict:
+    probe = suite.get("interactivePanFrame") if isinstance(suite.get("interactivePanFrame"), dict) else {}
+    frame = probe.get("interactiveFrame") if isinstance(probe.get("interactiveFrame"), dict) else {}
+    return summarize_distribution_metric(
+      frame.get("totalMs"),
+      source="interactivePanFrame.interactiveFrame.totalMs",
+      count=(probe.get("counterDelta") or {}).get("transformedFrames") if isinstance(probe.get("counterDelta"), dict) else None,
+      details={
+        "counterDelta": probe.get("counterDelta"),
+        "frame": frame,
+      },
+    )
+
+
+def summarize_fill_action_metric(suite: dict, key: str) -> dict:
+    probe = suite.get(key) if isinstance(suite.get(key), dict) else {}
+    return summarize_distribution_metric(
+      probe.get("lastActionDurationMs"),
+      source=f"{key}.lastActionDurationMs",
+      count=probe.get("longTaskCountDelta"),
+      details={
+        "target": probe.get("target"),
+        "lastAction": probe.get("lastAction"),
+        "longTaskCountDelta": probe.get("longTaskCountDelta"),
+        "counterDelta": probe.get("counterDelta"),
+        "lastActionFrame": probe.get("lastActionFrame"),
+      },
+    )
+
+
 def build_suite_scenario_consistency(suite: dict) -> dict:
     page_load = suite.get("pageLoad") if isinstance(suite.get("pageLoad"), dict) else {}
     scenario_apply = suite.get("scenarioApply") if isinstance(suite.get("scenarioApply"), dict) else {}
@@ -1471,6 +1569,29 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "scenarioApply.renderMetrics.blackFrameCount",
       ],
     )
+    wheel_anchor_trace = suite.get("wheelAnchorTrace") if isinstance(suite.get("wheelAnchorTrace"), dict) else {}
+    wheel_anchor_metric = {
+      "present": bool(wheel_anchor_trace),
+      "source": "wheelAnchorTrace",
+      "durationMs": as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")),
+      "recordedAt": None,
+      "count": as_finite_number(wheel_anchor_trace.get("maxStableAnchorDriftPx")),
+      "details": {
+        "maxAnchorDriftPx": as_finite_number(wheel_anchor_trace.get("maxAnchorDriftPx")),
+        "maxStableAnchorDriftPx": as_finite_number(wheel_anchor_trace.get("maxStableAnchorDriftPx")),
+        "postIdleAnchorDriftPx": as_finite_number(wheel_anchor_trace.get("postIdleAnchorDriftPx")),
+        "firstIdleAfterWheelMs": as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")),
+        "longTaskCountDelta": as_finite_number(wheel_anchor_trace.get("longTaskCountDelta")),
+        "maxLongTaskMs": as_finite_number(wheel_anchor_trace.get("maxLongTaskMs")),
+        "blackFrameDelta": as_finite_number(wheel_anchor_trace.get("blackFrameDelta")),
+        "distribution": summarize_distribution([
+          as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs"))
+        ] if as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")) is not None else []),
+      },
+    }
+    interactive_pan_metric = summarize_interactive_pan_metric(suite)
+    single_fill_metric = summarize_fill_action_metric(suite, "singleFill")
+    double_click_fill_metric = summarize_fill_action_metric(suite, "doubleClickFill")
     return {
       "load": load_metric,
       "pageLoad": page_load_metric,
@@ -1478,6 +1599,20 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       "timeToPoliticalCoreReady": political_core_ready_metric,
       "settleExactRefresh": settle_exact_metric,
       "zoomEndToChunkVisible": zoom_end_chunk_visible_metric,
+      "wheelAnchorTrace": wheel_anchor_metric,
+      "interactivePanFrame": interactive_pan_metric,
+      "singleFillAction": single_fill_metric,
+      "doubleClickFillAction": double_click_fill_metric,
+      "firstInteraction": {
+        "wheelAnchorTrace": wheel_anchor_metric,
+        "interactivePanFrame": interactive_pan_metric,
+        "singleFillAction": single_fill_metric,
+        "doubleClickFillAction": double_click_fill_metric,
+      },
+      "fullySettled": {
+        "settleExactRefresh": settle_exact_metric,
+        "zoomEndToChunkVisible": zoom_end_chunk_visible_metric,
+      },
       "blackFrame": black_frame_metric,
     }
 
@@ -1488,6 +1623,19 @@ async (page) => {{
   return await page.evaluate(async (scenarioId) => {{
     const {{ state }} = await import('/js/core/state.js');
     const scenarioManager = await import('/js/core/scenario_manager.js');
+    const waitForScenarioActionReady = async () => {{
+      const waitStartedAt = performance.now();
+      while (
+        (state.bootBlocking || state.startupReadonly || state.startupReadonlyUnlockInFlight || state.scenarioApplyInFlight)
+        && (performance.now() - waitStartedAt) < 90000
+      ) {{
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }}
+      if (state.bootBlocking || state.startupReadonly || state.startupReadonlyUnlockInFlight || state.scenarioApplyInFlight) {{
+        throw new Error('Benchmark scenario action timed out while waiting for startup readiness.');
+      }}
+    }};
+    await waitForScenarioActionReady();
     const normalizedScenarioId = String(scenarioId || '');
     const before = {{
       drawCanvas: Number(state.renderPassCache?.counters?.drawCanvas || 0),
@@ -1546,6 +1694,18 @@ async (page) => {{
         dynamicBorderRebuilds: Number(state.renderPassCache?.counters?.dynamicBorderRebuilds || 0) - before.dynamicBorderRebuilds,
       }},
       longTaskCount: Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0,
+      readinessDiagnostics: {{
+        requestedScenarioId: scenarioId,
+        activeScenarioId: String(state.activeScenarioId || ''),
+        baselineRecordedAt: {{
+          timeToPoliticalCoreReady: metricBaselines.timeToPoliticalCoreReadyRecordedAt,
+        }},
+        currentRecordedAt: {{
+          timeToPoliticalCoreReady: Number(state.scenarioPerfMetrics?.timeToPoliticalCoreReady?.recordedAt || 0),
+        }},
+        freshByRecordedAt: Number(state.scenarioPerfMetrics?.timeToPoliticalCoreReady?.recordedAt || 0) > metricBaselines.timeToPoliticalCoreReadyRecordedAt,
+        scenarioMatches: String(state.activeScenarioId || '') === (normalizedScenarioId === 'none' ? '' : normalizedScenarioId),
+      }},
       metricBaselines,
       lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
@@ -1602,7 +1762,7 @@ async (page) => {{
     return run_code_json(js)  # type: ignore[return-value]
 
 
-def measure_post_apply_metrics(scenario_id: str, baseline_recorded_at: object = 0) -> dict | None:
+def measure_post_apply_metrics(scenario_id: str, baseline_recorded_at: object = 0, captured_current_scenario: bool = False) -> dict | None:
     if scenario_id == "none":
       return None
     baseline_recorded_at_number = as_finite_number(baseline_recorded_at) or 0.0
@@ -1612,14 +1772,23 @@ async (page) => {{
     const {{ state }} = await import('/js/core/state.js');
     const expectedScenarioId = String(payload?.scenarioId || '');
     const baselineRecordedAt = Number(payload?.timeToPoliticalCoreReadyRecordedAt || 0);
+    const allowAlreadyReady = !!payload?.capturedCurrentScenario;
     const startedAt = performance.now();
+    const getPoliticalReadyEntry = () => state.scenarioPerfMetrics?.timeToPoliticalCoreReady || null;
+    const hasCurrentPoliticalReadyMetric = () => {{
+      const entry = getPoliticalReadyEntry();
+      return Number(entry?.recordedAt || 0) > 0
+        && String(entry?.scenarioId || '') === expectedScenarioId;
+    }};
     const hasFreshPoliticalReadyMetric = () => {{
-      const entry = state.scenarioPerfMetrics?.timeToPoliticalCoreReady;
+      const entry = getPoliticalReadyEntry();
       return Number(entry?.recordedAt || 0) > baselineRecordedAt
         && String(entry?.scenarioId || '') === expectedScenarioId;
     }};
+    const alreadyReadyCurrentScenario = allowAlreadyReady && hasCurrentPoliticalReadyMetric();
     while (
       String(state.activeScenarioId || '') === String(expectedScenarioId || '')
+      && !alreadyReadyCurrentScenario
       && !hasFreshPoliticalReadyMetric()
       && (performance.now() - startedAt) < 12000
     ) {{
@@ -1629,7 +1798,17 @@ async (page) => {{
       requestedScenarioId: expectedScenarioId,
       activeScenarioId: String(state.activeScenarioId || ''),
       waitedMs: Number((performance.now() - startedAt).toFixed(3)),
-      politicalCoreReadyObserved: hasFreshPoliticalReadyMetric(),
+      politicalCoreReadyObserved: alreadyReadyCurrentScenario || hasFreshPoliticalReadyMetric(),
+      politicalCoreReadyGate: {{
+        waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+        timeoutMs: 12000,
+        baselineRecordedAt,
+        latestRecordedAt: Number(getPoliticalReadyEntry()?.recordedAt || 0),
+        latestScenarioId: String(getPoliticalReadyEntry()?.scenarioId || ''),
+        observed: alreadyReadyCurrentScenario || hasFreshPoliticalReadyMetric(),
+        outcome: alreadyReadyCurrentScenario ? 'already-ready' : (hasFreshPoliticalReadyMetric() ? 'fresh' : 'missing'),
+        reason: alreadyReadyCurrentScenario ? 'already-ready-current-scenario' : (hasFreshPoliticalReadyMetric() ? 'fresh-recorded-at' : 'timed-out'),
+      }},
       metricBaselines: {{
         timeToPoliticalCoreReadyRecordedAt: baselineRecordedAt,
       }},
@@ -1640,6 +1819,7 @@ async (page) => {{
   }}, {{
     scenarioId: {json.dumps(scenario_id)},
     timeToPoliticalCoreReadyRecordedAt: {json.dumps(baseline_recorded_at_number)},
+    capturedCurrentScenario: {json.dumps(bool(captured_current_scenario))},
   }});
 }}
 """.strip()
@@ -2158,6 +2338,124 @@ async (page) => {{
     return run_code_json(js)  # type: ignore[return-value]
 
 
+def measure_wheel_anchor_trace(scenario_id: str) -> dict | None:
+    if scenario_id != "tno_1962":
+      return None
+    js = f"""
+async (page) => {{
+  await page.evaluate(async () => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const startedAt = performance.now();
+    while (
+      (state.isInteracting || String(state.renderPhase || '') !== 'idle')
+      && (performance.now() - startedAt) < 5000
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    }}
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }});
+  const target = await page.evaluate(async () => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const interaction = document.querySelector('#map-svg rect.interaction-layer');
+    if (!interaction) {{
+      throw new Error('Wheel benchmark interaction layer is unavailable.');
+    }}
+    const bounds = interaction.getBoundingClientRect();
+    const anchorLocal = {{
+      x: Math.max(24, Math.min(bounds.width - 24, bounds.width * 0.58)),
+      y: Math.max(24, Math.min(bounds.height - 24, bounds.height * 0.48)),
+    }};
+    const transform = state.zoomTransform || {{ x: 0, y: 0, k: 1 }};
+    return {{
+      screenX: bounds.left + anchorLocal.x,
+      screenY: bounds.top + anchorLocal.y,
+      anchorLocal,
+      worldAnchor: {{
+        x: (anchorLocal.x - Number(transform.x || 0)) / Math.max(Number(transform.k || 1), 0.0001),
+        y: (anchorLocal.y - Number(transform.y || 0)) / Math.max(Number(transform.k || 1), 0.0001),
+      }},
+      baselineLongTasks: Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0,
+      baselineBlackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+      baselineTime: performance.now(),
+    }};
+  }});
+  const sample = async (label) => page.evaluate(async (payload) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const transform = state.zoomTransform || {{ x: 0, y: 0, k: 1 }};
+    const expectedLocal = {{
+      x: payload.worldAnchor.x * Number(transform.k || 1) + Number(transform.x || 0),
+      y: payload.worldAnchor.y * Number(transform.k || 1) + Number(transform.y || 0),
+    }};
+    const dx = expectedLocal.x - payload.anchorLocal.x;
+    const dy = expectedLocal.y - payload.anchorLocal.y;
+    const longTasks = Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks : [];
+    const newLongTasks = longTasks.slice(Number(payload.baselineLongTasks || 0));
+    return {{
+      label: String(payload.label || ''),
+      dtMs: Number((performance.now() - Number(payload.baselineTime || 0)).toFixed(3)),
+      renderPhase: String(state.renderPhase || ''),
+      isInteracting: !!state.isInteracting,
+      transform: {{
+        x: Number(transform.x || 0),
+        y: Number(transform.y || 0),
+        k: Number(transform.k || 1),
+      }},
+      anchorDriftPx: Number(Math.hypot(dx, dy).toFixed(3)),
+      blackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+      longTaskCountDelta: newLongTasks.length,
+      maxLongTaskMs: newLongTasks.reduce((max, entry) => Math.max(max, Number(entry.duration || 0)), 0),
+      lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
+      renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
+    }};
+  }}, {{ ...target, label }});
+
+  const samples = [];
+  samples.push(await sample('before-wheel'));
+  await page.mouse.move(target.screenX, target.screenY);
+  for (let index = 0; index < 5; index += 1) {{
+    await page.mouse.wheel(0, -280);
+    await page.waitForTimeout(80);
+    samples.push(await sample(`after-wheel-${{index + 1}}`));
+  }}
+  const waitStartedAt = Date.now();
+  while (Date.now() - waitStartedAt < 5000) {{
+    const stateSnapshot = await page.evaluate(async () => {{
+      const {{ state }} = await import('/js/core/state.js');
+      return {{
+        renderPhase: String(state.renderPhase || ''),
+        isInteracting: !!state.isInteracting,
+      }};
+    }});
+    if (stateSnapshot.renderPhase === 'idle' && !stateSnapshot.isInteracting) break;
+    await page.waitForTimeout(80);
+  }}
+  samples.push(await sample('after-idle-wait'));
+  const after = samples[samples.length - 1] || {{}};
+  const stableSamples = samples.filter((entry) => (
+    (String(entry.label || '').startsWith('after-wheel-') && entry.label !== 'after-wheel-1')
+    || String(entry.label || '') === 'after-idle-wait'
+  ));
+  const postIdleSample = samples.find((entry) => String(entry.label || '') === 'after-idle-wait') || null;
+  const maxAnchorDriftPx = samples.reduce((max, entry) => Math.max(max, Number(entry.anchorDriftPx || 0)), 0);
+  const maxStableAnchorDriftPx = stableSamples.reduce((max, entry) => Math.max(max, Number(entry.anchorDriftPx || 0)), 0);
+  const longTaskCountDelta = Number(after.longTaskCountDelta || 0);
+  const maxLongTaskMs = samples.reduce((max, entry) => Math.max(max, Number(entry.maxLongTaskMs || 0)), 0);
+  return {{
+    requestedScenarioId: {json.dumps(scenario_id)},
+    samples,
+    maxAnchorDriftPx,
+    maxStableAnchorDriftPx,
+    postIdleAnchorDriftPx: Number(postIdleSample?.anchorDriftPx || 0),
+    firstIdleAfterWheelMs: Number(after.dtMs || 0),
+    longTaskCountDelta,
+    maxLongTaskMs,
+    blackFrameDelta: Math.max(0, Number(after.blackFrameCount || 0) - Number(target.baselineBlackFrameCount || 0)),
+  }};
+}}
+""".strip()
+    return run_code_json(js)  # type: ignore[return-value]
+
+
 def measure_single_click_fill() -> dict:
     prepare_js = f"""
 async (page) => {{
@@ -2276,7 +2574,7 @@ async (page) => {{
       const code = String(feature?.properties?.cntr_code || '').trim().toUpperCase();
       featureCounts.set(code, (featureCounts.get(code) || 0) + 1);
     }}
-    const candidate = state.landData.features
+    const doubleClickCandidates = state.landData.features
       .map((feature) => {{
         const code = String(feature?.properties?.cntr_code || '').trim().toUpperCase();
         return {{
@@ -2291,7 +2589,6 @@ async (page) => {{
       .filter((item) => (
         item.code
         && item.code !== 'AQ'
-        && item.countryFeatureCount >= 24
         && Number.isFinite(item.point[0])
         && Number.isFinite(item.point[1])
         && item.point[0] > 40
@@ -2304,7 +2601,8 @@ async (page) => {{
           return right.countryFeatureCount - left.countryFeatureCount;
         }}
         return right.area - left.area;
-      }})[0];
+      }});
+    const candidate = doubleClickCandidates.find((item) => item.countryFeatureCount >= 24) || doubleClickCandidates[0];
     if (!candidate) {{
       throw new Error('Unable to resolve a double-click benchmark target.');
     }}
@@ -2367,6 +2665,7 @@ async (page) => {{
 def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
     page_load = open_page(build_scenario_open_urls(base_urls, scenario_id))
+    startup_ready = wait_for_benchmark_runtime_ready(f"open:{scenario_id}")
     clear_browser_buffers()
     normalized_scenario_id = str(scenario_id or "").strip()
     active_scenario_id = str(page_load.get("activeScenarioId") or "").strip()
@@ -2376,9 +2675,22 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     else:
       print(f"[benchmark] apply scenario={scenario_id}", flush=True)
       scenario_apply = apply_scenario(scenario_id)
-    post_apply_metrics = measure_post_apply_metrics(
-      scenario_id,
-      (scenario_apply.get("metricBaselines") or {}).get("timeToPoliticalCoreReadyRecordedAt"),
+    post_apply_metrics = (
+      {
+        "requestedScenarioId": scenario_id,
+        "activeScenarioId": active_scenario_id,
+        "politicalCoreReadyObserved": False,
+        "politicalCoreReadyGate": {
+          "outcome": "captured-current-scenario",
+          "reason": "open-state-only",
+        },
+      }
+      if bool(scenario_apply.get("capturedCurrentScenario"))
+      else measure_post_apply_metrics(
+        scenario_id,
+        (scenario_apply.get("metricBaselines") or {}).get("timeToPoliticalCoreReadyRecordedAt"),
+        False,
+      )
     )
     print(f"[benchmark] idle redraw scenario={scenario_id}", flush=True)
     idle_full_redraw = force_idle_full_redraw(f"benchmark-{scenario_id}-idle-full-redraw")
@@ -2386,6 +2698,8 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     print(f"[benchmark] zoom settle scenario={scenario_id}", flush=True)
     zoom_settle_redraw = measure_zoom_settle_redraw()
     zoom_end_chunk_visible = measure_zoom_end_chunk_visible(scenario_id)
+    print(f"[benchmark] wheel anchor scenario={scenario_id}", flush=True)
+    wheel_anchor_trace = measure_wheel_anchor_trace(scenario_id)
     print(f"[benchmark] interactive pan scenario={scenario_id}", flush=True)
     interactive_pan_frame = measure_interactive_pan_frame()
     print(f"[benchmark] single fill scenario={scenario_id}", flush=True)
@@ -2399,12 +2713,14 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     suite = {
       "scenarioId": scenario_id,
       "pageLoad": page_load,
+      "startupReady": startup_ready,
       "scenarioApply": scenario_apply,
       "postApplyMetrics": post_apply_metrics,
       "idleFullRedraw": idle_full_redraw,
       "contextProbes": context_probes,
       "zoomSettleFullRedraw": zoom_settle_redraw,
       "zoomEndChunkVisible": zoom_end_chunk_visible,
+      "wheelAnchorTrace": wheel_anchor_trace,
       "interactivePanFrame": interactive_pan_frame,
       "singleFill": single_fill,
       "doubleClickFill": double_click_fill,
@@ -2470,7 +2786,7 @@ def main() -> None:
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
-        "benchmarkMetricsSchemaVersion": 2,
+        "benchmarkMetricsSchemaVersion": 3,
         "benchmarkMetricsByScenario": {
           scenario_id: suites[scenario_id].get("benchmarkMetrics", {})
           for scenario_id in SCENARIO_IDS

@@ -228,7 +228,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertRegex(
             infra_source,
             re.compile(
-                r'if \(isInteractionRecoveryBlocked\(\)\) \{\s*scheduleDeferredScenarioChunkPromotionInfraRefresh\(\{\s*reason,\s*suppressRender,\s*promotionVersion,\s*hasPoliticalGeometryChange,\s*refreshOpeningOwnerBorders,\s*\}\);',
+                r'if \(!isInteractionRecoverySettled\(\{ quietMs: 600 \}\)\) \{\s*scheduleDeferredScenarioChunkPromotionInfraRefresh\(\{\s*reason,\s*suppressRender,\s*promotionVersion,\s*hasPoliticalGeometryChange,\s*refreshOpeningOwnerBorders,\s*\}\);',
                 re.S,
             ),
         )

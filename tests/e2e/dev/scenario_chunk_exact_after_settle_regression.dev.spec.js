@@ -311,3 +311,139 @@ test("tno drag interaction settles cleanly without black-frame regression", asyn
   expect(afterDrag.isInteracting).toBe(false);
   expect(afterDrag.blackFrameCount).toBe(beforeDrag.blackFrameCount);
 });
+
+test("tno zoom-end keeps Great Lakes Congo political detail fill stable", async ({ page }) => {
+  const landProbes = [
+    { id: "west_kivu_drc", lon: 28.85, lat: -1.65 },
+    { id: "east_kivu_rwanda", lon: 30.05, lat: -1.95 },
+    { id: "north_tanganyika_burundi", lon: 29.35, lat: -3.5 },
+    { id: "west_tanganyika_drc", lon: 28.95, lat: -4.6 },
+  ];
+
+  await gotoApp(page, FAST_STARTUP_PATH, { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await ensureScenario(page, "tno_1962", "TNO 1962");
+  await waitForStableExactRender(page);
+
+  const beforeZoom = await page.evaluate(async (probes) => {
+    const { state } = await import("/js/core/state.js");
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
+    const d3 = globalThis.d3;
+    const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+    const results = probes.map((probe) => {
+      let matchedFeature = null;
+      for (const feature of features) {
+        try {
+          if (feature?.geometry && d3.geoContains(feature, [probe.lon, probe.lat])) {
+            matchedFeature = feature;
+            break;
+          }
+        } catch (_error) {
+          // Ignore malformed geometries while sampling this fixed regression probe.
+        }
+      }
+      const props = matchedFeature?.properties || {};
+      const featureId = String(props.id || "").trim();
+      return {
+        ...probe,
+        featureId,
+        countryCode: String(props.cntr_code || "").trim(),
+        resolvedColor: featureId ? String(state.colors?.[featureId] || "") : "",
+      };
+    });
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      blackFrameCount: Number(metrics.blackFrameCount?.count || 0),
+      results,
+    };
+  }, landProbes);
+
+  expect(beforeZoom.activeScenarioId).toBe("tno_1962");
+  for (const probe of beforeZoom.results) {
+    expect(probe.featureId, `missing feature before zoom at ${probe.id}`).toBeTruthy();
+    expect(probe.resolvedColor, `missing color before zoom at ${probe.id}`).toBeTruthy();
+  }
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    state.getViewportGeoBoundsFn = () => [12, -8, 28, 6];
+    if (state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object") {
+      state.runtimeChunkLoadState.focusCountryOverride = "CD";
+    }
+  });
+  await setZoomPercent(page, 175);
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+      state.scheduleScenarioChunkRefreshFn({ reason: "zoom-end", delayMs: 0 });
+    }
+  });
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const loadedChunkIds = Array.isArray(state.activeScenarioChunks?.loadedChunkIds)
+      ? state.activeScenarioChunks.loadedChunkIds.map((chunkId) => String(chunkId || ""))
+      : [];
+    return loadedChunkIds.includes("political.detail.country.cd")
+      && loadedChunkIds.includes("political.detail.country.gco");
+  }, { timeout: 30_000 });
+  await waitForStableExactRender(page, { timeout: 30_000 });
+
+  const afterZoom = await page.evaluate(async (probes) => {
+    const { state } = await import("/js/core/state.js");
+    const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
+      ? state.renderPerfMetrics
+      : (globalThis.__renderPerfMetrics || {});
+    const d3 = globalThis.d3;
+    const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+    const requiredChunkIds = Array.isArray(state.runtimeChunkLoadState?.lastSelection?.requiredChunkIds)
+      ? state.runtimeChunkLoadState.lastSelection.requiredChunkIds.map((chunkId) => String(chunkId || ""))
+      : [];
+    const loadedChunkIds = Array.isArray(state.activeScenarioChunks?.loadedChunkIds)
+      ? state.activeScenarioChunks.loadedChunkIds.map((chunkId) => String(chunkId || ""))
+      : [];
+    const results = probes.map((probe) => {
+      let matchedFeature = null;
+      for (const feature of features) {
+        try {
+          if (feature?.geometry && d3.geoContains(feature, [probe.lon, probe.lat])) {
+            matchedFeature = feature;
+            break;
+          }
+        } catch (_error) {
+          // Ignore malformed geometries while sampling this fixed regression probe.
+        }
+      }
+      const props = matchedFeature?.properties || {};
+      const featureId = String(props.id || "").trim();
+      return {
+        ...probe,
+        featureId,
+        countryCode: String(props.cntr_code || "").trim(),
+        resolvedColor: featureId ? String(state.colors?.[featureId] || "") : "",
+      };
+    });
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      renderPhase: String(state.renderPhase || ""),
+      isInteracting: !!state.isInteracting,
+      requiredChunkIds,
+      loadedChunkIds,
+      blackFrameCount: Number(metrics.blackFrameCount?.count || 0),
+      visualMetric: metrics.scenarioChunkPromotionVisualStage || null,
+      results,
+    };
+  }, landProbes);
+
+  expect(afterZoom.activeScenarioId).toBe("tno_1962");
+  expect(afterZoom.renderPhase).toBe("idle");
+  expect(afterZoom.isInteracting).toBe(false);
+  expect(afterZoom.blackFrameCount).toBe(beforeZoom.blackFrameCount);
+  expect(afterZoom.loadedChunkIds).toContain("political.detail.country.cd");
+  expect(afterZoom.loadedChunkIds).toContain("political.detail.country.gco");
+  for (const probe of afterZoom.results) {
+    expect(probe.featureId, `missing feature after zoom at ${probe.id}`).toBeTruthy();
+    expect(probe.resolvedColor, `missing color after zoom at ${probe.id}`).toBeTruthy();
+  }
+});

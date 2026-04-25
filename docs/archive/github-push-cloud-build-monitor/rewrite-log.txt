@@ -1,0 +1,70 @@
+Backup branch: backup/pre-push-secret-block-20260425-1
+Original commits:
+a4f7e7f 海洋修复
+34077af 性能改进1
+3155ba9 性能改进2
+a494645 性能改进3
+c7902f6 性能改进4
+daf2bd9 修改landing page
+2084347 汉化补充和模块拆分
+[main 6e3f457] Remove local Claude settings from repository
+ 2 files changed, 28 deletions(-)
+ delete mode 100644 .claude/launch.json
+ delete mode 100644 .claude/settings.local.json
+Cherry-pick a4f7e7f
+[main c489321] 海洋修复
+ Date: Thu Apr 23 23:27:51 2026 -0400
+ 20 files changed, 11290 insertions(+), 10707 deletions(-)
+ create mode 100644 docs/archive/tno-spherical-water-fix-2026-04-23/context.md
+ create mode 100644 docs/archive/tno-spherical-water-fix-2026-04-23/plan.md
+ create mode 100644 docs/archive/tno-spherical-water-fix-2026-04-23/task.md
+Cherry-pick 34077af
+[main 2a5d2af] 性能改进1
+ Date: Fri Apr 24 14:15:57 2026 -0400
+ 20 files changed, 668 insertions(+), 49 deletions(-)
+ create mode 100644 docs/active/app-performance-overhaul/context.md
+ create mode 100644 docs/active/app-performance-overhaul/plan.md
+ create mode 100644 docs/active/app-performance-overhaul/task.md
+Cherry-pick 3155ba9
+[main e230bdd] 性能改进2
+ Date: Fri Apr 24 15:23:45 2026 -0400
+ 25 files changed, 325 insertions(+), 58 deletions(-)
+ create mode 100644 data/scenarios/hoi4_1939/geo_aliases.startup.json
+ create mode 100644 data/scenarios/hoi4_1939/geo_locale_patch.en.json
+ create mode 100644 data/scenarios/hoi4_1939/geo_locale_patch.json
+ create mode 100644 data/scenarios/hoi4_1939/geo_locale_patch.zh.json
+ create mode 100644 data/scenarios/hoi4_1939/locales.startup.json
+ create mode 100644 data/scenarios/hoi4_1939/startup.bundle.en.json
+ create mode 100644 data/scenarios/hoi4_1939/startup.bundle.en.json.gz
+ create mode 100644 data/scenarios/hoi4_1939/startup.bundle.zh.json
+ create mode 100644 data/scenarios/hoi4_1939/startup.bundle.zh.json.gz
+ create mode 100644 data/scenarios/hoi4_1939/startup.runtime_shell.topo.json
+Cherry-pick a494645
+[main ed7d7c8] 性能改进3
+ Date: Fri Apr 24 16:40:29 2026 -0400
+ 11 files changed, 594 insertions(+), 47 deletions(-)
+Cherry-pick c7902f6
+[main 830cb56] 性能改进4
+ Date: Fri Apr 24 18:14:15 2026 -0400
+ 9 files changed, 278 insertions(+), 29 deletions(-)
+Cherry-pick daf2bd9
+[main 863eeb5] 修改landing page
+ Date: Fri Apr 24 19:34:16 2026 -0400
+ 10 files changed, 857 insertions(+), 288 deletions(-)
+ create mode 100644 docs/archive/landing-page-modernization/context.md
+ create mode 100644 docs/archive/landing-page-modernization/plan.md
+ create mode 100644 docs/archive/landing-page-modernization/task.md
+Cherry-pick 2084347
+[main 8309021] 汉化补充和模块拆分
+ Date: Fri Apr 24 21:14:02 2026 -0400
+ 36 files changed, 3662 insertions(+), 1120 deletions(-)
+ create mode 100644 docs/archive/app-web-i18n-zh/context.md
+ create mode 100644 docs/archive/app-web-i18n-zh/plan.md
+ create mode 100644 docs/archive/app-web-i18n-zh/task.md
+ create mode 100644 docs/archive/i18n-modularization/context.md
+ create mode 100644 docs/archive/i18n-modularization/plan.md
+ create mode 100644 docs/archive/i18n-modularization/task.md
+ create mode 100644 js/core/scenario/locale_asset_contract.js
+ create mode 100644 js/ui/i18n_catalog.js
+ create mode 100644 js/ui/toolbar/transport_workbench_descriptor.js
+ create mode 100644 tools/i18n_key_extractor.py

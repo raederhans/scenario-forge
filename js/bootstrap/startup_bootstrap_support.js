@@ -169,6 +169,14 @@ export function initLongAnimationFrameObserver() {
         startTime: Math.max(0, Number(latest.startTime || 0)),
         renderStart: Math.max(0, Number(latest.renderStart || 0)),
         firstUIEventTimestamp: Math.max(0, Number(latest.firstUIEventTimestamp || 0)),
+        bootPhase: String(runtimeState.bootPhase || ""),
+        renderPhase: String(runtimeState.renderPhase || ""),
+        startupReadonly: !!runtimeState.startupReadonly,
+        activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
+        activePostReadyTaskStartedAt: Math.max(0, Number(runtimeState.activePostReadyTaskStartedAt || 0)),
+        activePostReadyTaskAgeMs: runtimeState.activePostReadyTaskStartedAt
+          ? Math.max(0, nowMs() - Number(runtimeState.activePostReadyTaskStartedAt || 0))
+          : 0,
         recordedAt: Date.now(),
       };
       globalThis.__renderPerfMetrics = runtimeState.renderPerfMetrics;

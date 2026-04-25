@@ -1707,6 +1707,16 @@ function noteRenderAction(label, startedAt = null) {
   }
 }
 
+const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASSES = new Set(["political", "contextBase", "contextScenario", "effects"]);
+
+function invalidateLastGoodFrame(reason = "visual-invalidation") {
+  const cache = getRenderPassCacheState();
+  if (!cache.lastGoodFrame || !cache.lastGoodFrame.valid) return;
+  cache.lastGoodFrame.valid = false;
+  cache.lastGoodFrame.referenceTransform = null;
+  cache.lastGoodFrame.reason = String(reason || "visual-invalidation");
+}
+
 function invalidateRenderPasses(passNames, reason = "unspecified") {
   const cache = getRenderPassCacheState();
   const rawTargetPassNames = Array.isArray(passNames) ? passNames : [passNames];
@@ -1721,6 +1731,9 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
     cache.dirty[passName] = true;
     cache.reasons[passName] = String(reason || "unspecified");
   });
+  if (targetPassNames.some((passName) => LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASSES.has(passName))) {
+    invalidateLastGoodFrame(reason);
+  }
   if (
     targetPassNames.includes("political")
     && !["refresh-colors", "rebuild-colors"].includes(String(reason || "unspecified"))
@@ -4911,6 +4924,19 @@ function isInteractionRecoveryBlocked() {
   return runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.isInteracting;
 }
 
+function isInteractionRecoverySettled({ quietMs = 600 } = {}) {
+  if (isInteractionRecoveryBlocked() || runtimeState.deferExactAfterSettle) {
+    return false;
+  }
+  const currentMs = nowMs();
+  const phaseEnteredAt = Number(runtimeState.phaseEnteredAt || 0);
+  const zoomEndedAt = Number(runtimeState.zoomGestureEndedAt || 0);
+  const idleForMs = phaseEnteredAt > 0 ? currentMs - phaseEnteredAt : Number.POSITIVE_INFINITY;
+  const zoomQuietForMs = zoomEndedAt > 0 ? currentMs - zoomEndedAt : Number.POSITIVE_INFINITY;
+  const requiredQuietMs = Math.max(0, Number(quietMs) || 0);
+  return idleForMs >= requiredQuietMs && zoomQuietForMs >= requiredQuietMs;
+}
+
 function markOverlaysDirty({
   frontline = false,
   operationalLines = false,
@@ -6609,7 +6635,7 @@ function scheduleDeferredHeavyBorderMeshes() {
   cancelDeferredHeavyBorderMeshes();
   deferredHeavyBorderMeshHandle = scheduleDeferredWork(() => {
     deferredHeavyBorderMeshHandle = null;
-    if (runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle) {
+    if (!isInteractionRecoverySettled({ quietMs: 900 })) {
       scheduleDeferredHeavyBorderMeshes();
       return;
     }
@@ -6674,7 +6700,7 @@ function scheduleDeferredHeavyBorderMeshes() {
       render();
     }
   }, {
-    timeout: 220,
+    timeout: 360,
   });
 }
 
@@ -8519,7 +8545,7 @@ const buildSecondarySpatialIndexes = (...args) =>
   getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes(...args);
 
 function scheduleSecondarySpatialIndexBuild({
-  timeout = 48,
+  timeout = 320,
   reason = "deferred-secondary-spatial",
 } = {}) {
   const normalizedReason = String(reason || "deferred-secondary-spatial").trim() || "deferred-secondary-spatial";
@@ -8535,7 +8561,7 @@ function scheduleSecondarySpatialIndexBuild({
   cancelDeferredWork(secondarySpatialBuildHandle);
   secondarySpatialBuildHandle = scheduleDeferredWork(() => {
     secondarySpatialBuildHandle = null;
-    if (isInteractionRecoveryBlocked()) {
+    if (!isInteractionRecoverySettled({ quietMs: 800 })) {
       scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
       return;
     }
@@ -8547,6 +8573,9 @@ function scheduleSecondarySpatialIndexBuild({
       allowComputeMissingBounds: true,
     });
     runtimeState.hitCanvasDirty = true;
+    scheduleHitCanvasBuildIfNeeded({
+      reason: `${normalizedReason}-hit-canvas`,
+    });
     recordRenderPerfMetric("buildSecondarySpatialIndex", nowMs() - startedAt, {
       reason: reasons.join(",") || normalizedReason,
       reasons,
@@ -17796,6 +17825,12 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
   incrementPerfCounter("composites");
 }
 
+function canDrawTransformedPass(passName, cache = getRenderPassCacheState()) {
+  if (cache.dirty?.[passName]) return false;
+  if (!cache.canvases?.[passName]) return false;
+  return !!getPassReferenceTransform(passName);
+}
+
 function drawTransformedPass(passName, currentTransform, referenceTransform = null) {
   const cache = getRenderPassCacheState();
   const passCanvas = cache.canvases?.[passName];
@@ -17874,12 +17909,13 @@ function renderExportPassesToCanvas(passNames) {
 function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } = {}) {
   const currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   const compositeStart = nowMs();
-  resetMainCanvas();
   const cache = getRenderPassCacheState();
-  if (TRANSFORMED_FRAME_PASS_NAMES.some((passName) => cache.dirty?.[passName])) {
+  const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) => passName !== "labels");
+  // Preflight avoids clearing the visible canvas when a cached pass is missing.
+  if (TRANSFORMED_FRAME_PASS_NAMES.some((passName) => !canDrawTransformedPass(passName, cache))) {
     return false;
   }
-  const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) => passName !== "labels");
+  resetMainCanvas();
   if (
     runtimeState.deferExactAfterSettle
     && runtimeState.pendingExactPoliticalFastFrame
@@ -17975,12 +18011,14 @@ function drawCanvas() {
     || runtimeState.renderPhase === RENDER_PHASE_SETTLING
     || (runtimeState.renderPhase === RENDER_PHASE_IDLE && runtimeState.deferExactAfterSettle);
   let drewFrame = false;
+  let usedLastGoodFallback = false;
   if (useTransformedFrame) {
     drewFrame = drawTransformedFrameFromCaches(frameTimings, {
       interactiveBorders: runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle,
     });
     if (!drewFrame) {
       drewFrame = drawLastGoodFrameFallback(runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
+      usedLastGoodFallback = drewFrame;
       if (!drewFrame) {
         const cache = getRenderPassCacheState();
         if (cache.lastGoodFrame?.valid) {
@@ -18004,7 +18042,7 @@ function drawCanvas() {
     timings: frameTimings,
     transform: cloneZoomTransform(runtimeState.zoomTransform),
   };
-  if (drewFrame) {
+  if (drewFrame && !usedLastGoodFallback && (!useTransformedFrame || runtimeState.renderPhase !== RENDER_PHASE_INTERACTING)) {
     captureLastGoodFrame(useTransformedFrame ? "fast-frame" : "exact-frame", runtimeState.zoomTransform);
   }
   incrementPerfCounter("frames");
@@ -22559,7 +22597,7 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
   if (promotionVersion !== scenarioChunkPromotionVersion) {
     return false;
   }
-  if (isInteractionRecoveryBlocked()) {
+  if (!isInteractionRecoverySettled({ quietMs: 600 })) {
     scheduleDeferredScenarioChunkPromotionInfraRefresh({
       reason,
       suppressRender,

@@ -954,23 +954,6 @@ function createScenarioChunkRuntimeController({
           ...selection.optionalChunks,
         ].filter((chunk, index, array) => array.findIndex((candidate) => candidate.id === chunk.id) === index);
       }
-      const politicalRequired = selection.requiredChunks.filter((chunk) => chunk.layer === "political");
-      if (politicalRequired.length > 1) {
-        const focusMatchedPoliticalRequired = politicalRequired.filter((chunk) => chunk.countryCodes.includes(focusCountry));
-        const retainedPoliticalRequired = focusMatchedPoliticalRequired.length
-          ? focusMatchedPoliticalRequired.slice(0, 1)
-          : politicalRequired.slice(0, 1);
-        const retainedPoliticalIdSet = new Set(retainedPoliticalRequired.map((chunk) => chunk.id));
-        const demotedPoliticalOptional = politicalRequired.filter((chunk) => !retainedPoliticalIdSet.has(chunk.id));
-        selection.requiredChunks = [
-          ...selection.requiredChunks.filter((chunk) => chunk.layer !== "political"),
-          ...retainedPoliticalRequired,
-        ];
-        selection.optionalChunks = [
-          ...demotedPoliticalOptional,
-          ...selection.optionalChunks,
-        ].filter((chunk, index, array) => array.findIndex((candidate) => candidate.id === chunk.id) === index);
-      }
     }
     const selectionEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     recordScenarioChunkRuntimeMetric("chunkSelectionMs", selectionEndedAt - selectionStartedAt, {
