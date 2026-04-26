@@ -38,3 +38,69 @@ Verification target for this slice:
 - Hover overlay: mousemove path queues one RAF render; force render, mouseleave, facility card actions, and zoom start stay synchronous.
 - Click warmup: observe new click/action/rank metrics first; defer any hit-canvas warmup change until forced build cost is proven dominant.
 - Runtime hooks: keep sidebar and toolbar hooks eager for URL replay and startup boot.
+
+## 2026-04-25 Map interaction speed slice
+
+- Benchmark v3.1: add explicit schema/source fields and same-scenario context for direct interaction metrics.
+- Zoom/pan: add a conservative interaction composite cache for main color/context passes; borders, texture labels, and labels stay independent.
+- Hover: add hover-only first-containing strict hit path; click and dblclick keep strict canvas validation and snap behavior.
+- Post-ready: expose pending task keys/count and retry counters through the existing diagnostics path.
+- Verification stays parent-owned; subagents remain static-only.
+
+## 2026-04-25 Remediation addendum
+
+- Keep interactionRecoveryTaskMs/window reserved for user-triggered recovery work; startup post-ready infrastructure uses postReadyInteractionInfrastructure* metrics.
+- Treat perf report schema fields as gate contracts so stale baselines fail early.
+- Continuity frame reuse is allowed only inside the same scenario, canvas/DPR, and topology revision.
+- Explicit chunk focus overrides have priority during zoom-end probes and focused detail loading.
+
+## 2026-04-26 interaction-continuity-and-promotion-slicing
+
+### Goal
+Fix the current map interaction regression without reverting the whole interaction-composite optimization:
+- Drag must never fall through to full-screen ocean fill after a fast-frame miss.
+- Zoom-end promotion work must not run as one synchronous main-thread block.
+- Hit canvas must not scan all land features when the spatial index is temporarily unavailable.
+
+### Owner files
+- `js/core/map_renderer.js`: fast-frame decision tree, interactionComposite identity, firstVisibleFramePainted, hit canvas spatial-unavailable behavior.
+- `js/core/state/renderer_runtime_state.js`: render cache/default state shape.
+- `js/core/scenario/chunk_runtime.js`: async single-flight promotion commit and commit-stage metrics.
+- `js/core/state/scenario_runtime_state.js`: serializable promotion commit status fields.
+- `js/main.js`: post-ready/backlog handling for promotion commit in-flight status.
+- Tests under existing contract files only; no new orphan test entrypoints.
+
+### Implementation contract
+- Fast-frame path validates transformed passes and `interactionComposite` identity/signature before `resetMainCanvas()`.
+- `firstVisibleFramePainted` starts false, resets on scenario apply/reset/rollback, and becomes true only after a real visible frame succeeds.
+- Fast-frame miss order is: transformed frame -> lastGoodFrame -> keep existing pixels during `INTERACTING` -> exact compose during `SETTLING` or `IDLE + deferExactAfterSettle` -> ocean fill only for initial/no-data frames.
+- `interactionComposite` stores `scenarioId/topologyRevision/dpr/pixelWidth/pixelHeight` and refuses mismatched reuse.
+- `commitPendingScenarioChunkPromotion()` becomes the single async commit entrypoint; module-scope `promotionCommitPromise` owns single-flight, while runtime state stores only serializable status/run id/in-flight fields.
+- Promotion commit uses render-lock semantics across slices: apply merged payload -> yield -> revalidate -> apply political payload with render suppressed -> yield -> revalidate -> `flushRenderBoundary()` -> release lock.
+- Renderer stage metrics keep `scenarioChunkPromotion*StageMs`; chunk commit internal metrics use `chunkPromotionCommitInfraMs` and `chunkPromotionCommitVisualMs`.
+- `drawHitCanvas()` returns false and keeps `hitCanvasDirty` when spatial index is unavailable; it no longer falls back to `runtimeState.landData.features.forEach`.
+
+### Metrics and acceptance
+Track before/after values for:
+- `missingVisibleFrameCount`
+- `buildHitCanvas`
+- `scenarioChunkPromotionInfraStageMs`
+- `scenarioChunkPromotionVisualStageMs`
+- `zoomEndToChunkVisibleMs`
+- `wheelAnchorTrace.firstIdleAfterWheelMs`
+- `wheelAnchorTrace.maxLongTaskMs`
+
+Acceptance:
+- Long drag produces no new full-screen ocean fill frame after first visible frame.
+- `missingVisibleFrameSkippedDuringInteraction` may increase during drag; `missingVisibleFrameCount` should not increase on the interaction path.
+- `drawHitCanvas` records spatial-index-unavailable as built=false and does not run an all-feature fallback loop.
+- Promotion commit status prevents a synchronous settle-time promotion block and keeps exact-after-settle from racing the same tick.
+- Existing node, Python contract, dev E2E, and perf gates pass from a fresh run.
+
+### Verification order
+1. Syntax checks: `node --check` on changed JS files and `python -m py_compile` on changed Python tests.
+2. Node contracts: renderer runtime, scenario runtime, scenario chunk contracts.
+3. Python contracts: scenario chunk refresh, spatial orchestration, scenario runtime state, rollback, perf gate.
+4. E2E: scenario chunk runtime, TNO ready-state, interaction funnel if hit/click path is touched.
+5. Perf: `npm run perf:baseline`, then `npm run perf:gate`.
+

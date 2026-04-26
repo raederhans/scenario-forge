@@ -673,7 +673,7 @@ UI_MAP_ENTRY_RE = re.compile(
     re.DOTALL,
 )
 DECLARATIVE_UI_ATTR_RE = re.compile(
-    r"""data-i18n(?:-placeholder|-title|-aria-label)?=(['"])(?P<text>[^\r\n]*?)\1""",
+    r"""data-i18n(?:-placeholder|-title|-aria-label|-alt)?=(['"])(?P<text>[^\r\n]*?)\1""",
 )
 PLACEHOLDER_PREFIX_RE = re.compile(
     r"^\s*(?:\[(?:TODO|todo)\]|TODO:?|To do:?|待办|待翻|未翻译|未汉化|去做)\s*[:：-]?\s*"

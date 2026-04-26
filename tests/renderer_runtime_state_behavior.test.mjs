@@ -55,6 +55,11 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   const spatialIndex = createDefaultSpatialIndexState();
 
   assert.equal(renderPass.lastGoodFrame.valid, false);
+  assert.equal(renderPass.interactionComposite.scenarioId, "");
+  assert.equal(renderPass.interactionComposite.topologyRevision, 0);
+  assert.equal(renderPass.interactionComposite.pixelWidth, 0);
+  assert.equal(renderPass.counters.missingVisibleFrameSkippedDuringInteraction, 0);
+  assert.equal(createDefaultRendererTransientRuntimeState().firstVisibleFramePainted, false);
   assert.equal(sidebarPerf.counters.fullListRenders, 0);
   assert.equal(projectedBounds.projectedBoundsById.size, 0);
   assert.equal(borderCache.cachedFrontlineMeshHash, "");

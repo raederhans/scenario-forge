@@ -8,6 +8,7 @@ SCENARIO_RESOURCES_PATH = ROOT / "js/core/scenario_resources.js"
 SCENARIO_CHUNK_RUNTIME_PATH = ROOT / "js/core/scenario/chunk_runtime.js"
 SCENARIO_POST_APPLY_EFFECTS_PATH = ROOT / "js/core/scenario_post_apply_effects.js"
 MAIN_JS_PATH = ROOT / "js/main.js"
+DEFERRED_DETAIL_PROMOTION_PATH = ROOT / "js/bootstrap/deferred_detail_promotion.js"
 SCENARIO_RUNTIME_STATE_PATH = ROOT / "js/core/state/scenario_runtime_state.js"
 
 
@@ -19,6 +20,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         cls.scenario_chunk_runtime_source = SCENARIO_CHUNK_RUNTIME_PATH.read_text(encoding="utf-8")
         cls.scenario_post_apply_effects_source = SCENARIO_POST_APPLY_EFFECTS_PATH.read_text(encoding="utf-8")
         cls.main_source = MAIN_JS_PATH.read_text(encoding="utf-8")
+        cls.deferred_detail_promotion_source = DEFERRED_DETAIL_PROMOTION_PATH.read_text(encoding="utf-8")
         cls.scenario_runtime_state_source = SCENARIO_RUNTIME_STATE_PATH.read_text(encoding="utf-8")
 
     def test_basic_ready_builds_land_spatial_index_before_unlock(self):
@@ -32,19 +34,22 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             ),
         )
 
-    def test_schedule_render_phase_idle_only_short_circuits_for_committed_promotion(self):
-        self.assertIn('const committedPendingChunkRefresh = pendingChunkRefreshStatus === "promotion-committed";', self.map_renderer_source)
+    def test_schedule_render_phase_idle_short_circuits_for_active_promotion_work(self):
+        self.assertIn('const promotionWorkActive = [', self.map_renderer_source)
+        self.assertIn('"promotion-commit-started"', self.map_renderer_source)
+        self.assertIn('"promotion-commit-in-flight"', self.map_renderer_source)
         self.assertNotIn('const executedPendingChunkRefresh = pendingChunkRefreshStatus === "executed";', self.map_renderer_source)
         self.assertRegex(
             self.map_renderer_source,
             re.compile(
-                r'const committedPendingChunkRefresh = pendingChunkRefreshStatus === "promotion-committed";\s*if \(shouldStartExactAfterSettleFastPath\(\)\) \{\s*if \(committedPendingChunkRefresh\) \{\s*return;',
+                r'const promotionWorkActive = \[[\s\S]*?\]\.includes\(String\(pendingChunkRefreshStatus \|\| ""\)\);\s*if \(shouldStartExactAfterSettleFastPath\(\)\) \{\s*if \(promotionWorkActive\) \{\s*return;',
                 re.S,
             ),
         )
 
     def test_chunk_refresh_distinguishes_committed_promotion_from_async_refresh_start(self):
-        self.assertIn('return "promotion-committed";', self.scenario_chunk_runtime_source)
+        self.assertIn('return "promotion-commit-started";', self.scenario_chunk_runtime_source)
+        self.assertIn('return "promotion-commit-in-flight";', self.scenario_chunk_runtime_source)
         self.assertIn('return "refresh-started";', self.scenario_chunk_runtime_source)
         self.assertIn('allowRefreshStart = false,', self.scenario_chunk_runtime_source)
         self.assertIn('const hasPendingReason = !!allowRefreshStart || !!String(loadState.pendingReason || "").trim();', self.scenario_chunk_runtime_source)
@@ -81,6 +86,94 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('runtimeState.runtimeChunkLoadState.promotionRetryCount = Math.max(', self.scenario_chunk_runtime_source)
         self.assertIn('runtimeState.runtimeChunkLoadState.lastPromotionRetryAt = Math.max(', self.scenario_chunk_runtime_source)
 
+
+    def test_focus_country_override_has_selection_priority(self):
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'const rawFocusCountry = String\(\s*'
+                r'loadState\.focusCountryOverride\s*\|\|\s*'
+                r'runtimeState\.activeSovereignCode',
+                re.S,
+            ),
+        )
+
+    def test_post_ready_scheduler_exposes_pending_task_diagnostics(self):
+        self.assertIn("let postReadyTaskDiagnostics = new Map();", self.main_source)
+        self.assertIn("function resolvePostReadyIdleBlockReason(", self.main_source)
+        self.assertIn('if (runtimeState.deferExactAfterSettle) return "defer-exact-after-settle";', self.main_source)
+        self.assertIn('if (!allowChunkBacklog && runtimeState.runtimeChunkLoadState?.pendingInfraPromotion) return "chunk-infra-promotion";', self.main_source)
+        self.assertIn('if (runtimeState.interactionInfrastructureBuildInFlight) return "interaction-infra-in-flight";', self.main_source)
+        self.assertIn("runtimeState.renderPerfMetrics.postReadySchedulerState", self.main_source)
+        self.assertIn("pendingTaskKeys", self.main_source)
+        self.assertIn("maxRetryCount", self.main_source)
+        self.assertIn("reasonStateHint", self.main_source)
+        self.assertIn("allowChunkBacklog = false", self.main_source)
+        self.assertIn("allowChunkBacklog: true", self.deferred_detail_promotion_source)
+        self.assertRegex(
+            self.main_source,
+            re.compile(
+                r'function startDeferredFullInteractionInfrastructureBuild\(.*?'
+                r'if \(runtimeState\.detailDeferred && !runtimeState\.detailPromotionCompleted\) \{.*?'
+                r'startDeferredFullInteractionInfrastructureBuild',
+                re.S,
+            ),
+        )
+
+    def test_zoom_end_and_visual_stage_metrics_share_selection_context(self):
+        self.assertIn("requiredChunkCount", self.scenario_chunk_runtime_source)
+        self.assertIn("activePostReadyTaskKey", self.scenario_chunk_runtime_source)
+        self.assertIn("promotionRetryCount", self.scenario_chunk_runtime_source)
+        self.assertIn("selectionVersion:", self.map_renderer_source)
+        self.assertIn("requiredPoliticalChunkCount,", self.map_renderer_source)
+        self.assertIn("queueMs:", self.map_renderer_source)
+
+    def test_interaction_recovery_metrics_cover_chunk_infra_and_continuity_frame(self):
+        self.assertIn("CONTINUITY_FRAME_MAX_STALE_AGE_MS", self.map_renderer_source)
+        self.assertIn('recordRenderPerfMetric("continuityFrameStaleAgeMs"', self.map_renderer_source)
+        self.assertIn('recordRenderPerfMetric("missingVisibleFrameCount"', self.map_renderer_source)
+        self.assertIn('return reject("topology-revision-mismatch")', self.map_renderer_source)
+        self.assertIn('postReadyInteractionInfrastructureTaskMs', self.map_renderer_source)
+        self.assertIn("function recordInteractionRecoveryTaskMetric(", self.map_renderer_source)
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(r'const taskKey = "scenario-chunk-promotion-infra";.*?recordInteractionRecoveryTaskMetric\(taskKey,', re.S),
+        )
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(
+                r'const previousInteractionInfrastructureStage = String\(runtimeState\.interactionInfrastructureStage \|\| ""\);.*?'
+                r'await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*\}\);.*?'
+                r'setInteractionInfrastructureState\(previousInteractionInfrastructureStage \|\| "basic-ready", \{\s*ready: true,\s*inFlight: false,',
+                re.S,
+            ),
+        )
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(r'const taskKey = "secondary-spatial-index";.*?recordInteractionRecoveryTaskMetric\(taskKey,', re.S),
+        )
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(r'const taskKey = "deferred-heavy-border-meshes";.*?recordInteractionRecoveryTaskMetric\(taskKey,', re.S),
+        )
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(
+                r'if \(!runtimeState\.deferExactAfterSettle\) return;.*?'
+                r'if \(runtimeState\.renderPhase !== RENDER_PHASE_IDLE\) \{.*?'
+                r'scheduleExactAfterSettleRefresh\(resolvedProfile\);.*?return;',
+                re.S,
+            ),
+        )
+        interaction_blocker = re.search(
+            r"function isInteractionRecoveryBlocked\(\) \{(?P<body>.*?)\n\}",
+            self.map_renderer_source,
+            re.S,
+        )
+        self.assertIsNotNone(interaction_blocker)
+        self.assertIn("activeInteractionRecoveryTaskKey", interaction_blocker.group("body"))
+        self.assertNotIn("activePostReadyTaskKey", interaction_blocker.group("body"))
+
     def test_execute_chunk_refresh_reschedules_pending_promotion_without_active_timer_when_not_flushing(self):
         self.assertRegex(
             self.scenario_chunk_runtime_source,
@@ -109,13 +202,15 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('setScenarioChunkShellStatus("ready", loadState);', self.scenario_chunk_runtime_source)
 
     def test_ready_state_flushes_pending_scenario_chunk_refresh_before_deferred_full_interaction(self):
+        self.assertIn('function scheduleReadyPostBootWork(renderDispatcher, reason = "ready-state")', self.main_source)
         self.assertRegex(
             self.main_source,
             re.compile(
-                r'completeBootSequenceLogging\(\);\s*flushPendingScenarioChunkRefreshAfterReady\("ready-state"\);\s*startDeferredFullInteractionInfrastructureBuild\("ready-state"\);',
+                r'function scheduleReadyPostBootWork\(renderDispatcher, reason = "ready-state"\) \{[\s\S]*?completeBootSequenceLogging\(\);[\s\S]*?flushPendingScenarioChunkRefreshAfterReady\(reason\);[\s\S]*?scheduleDeferredDetailPromotion\(renderDispatcher\);[\s\S]*?startDeferredFullInteractionInfrastructureBuild\(reason\);',
                 re.S,
             ),
         )
+        self.assertGreaterEqual(self.main_source.count('scheduleReadyPostBootWork(renderDispatcher, "ready-state");'), 2)
         self.assertRegex(
             self.main_source,
             re.compile(
@@ -146,9 +241,32 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
 
     def test_promotion_pipeline_uses_single_commit_entrypoint(self):
         self.assertIn('schedulePendingScenarioChunkPromotionCommit({', self.scenario_chunk_runtime_source)
-        self.assertIn('commitPendingScenarioChunkPromotion();', self.scenario_chunk_runtime_source)
+        self.assertIn('let promotionCommitPromise = null;', self.scenario_chunk_runtime_source)
+        self.assertIn('let promotionCommitRunId = 0;', self.scenario_chunk_runtime_source)
+        self.assertIn('void commitPendingScenarioChunkPromotion().catch((error) => {', self.scenario_chunk_runtime_source)
+        self.assertIn('return "promotion-commit-started";', self.scenario_chunk_runtime_source)
+        self.assertIn('return "promotion-commit-in-flight";', self.scenario_chunk_runtime_source)
+        self.assertIn('await yieldToFrame();', self.scenario_chunk_runtime_source)
         self.assertNotIn("function commitScenarioChunkPromotion(", self.scenario_chunk_runtime_source)
         self.assertNotIn("function storePendingScenarioChunkPromotion(", self.scenario_chunk_runtime_source)
+
+    def test_promotion_commit_replays_pending_refresh_after_single_flight(self):
+        self.assertIn("pendingPostCommitRefresh", self.scenario_chunk_runtime_source)
+        self.assertIn("scheduleScenarioChunkRefresh({", self.scenario_chunk_runtime_source)
+        self.assertNotIn('clearPendingScenarioChunkRefresh(loadState);\n        return "promotion-commit-in-flight";', self.scenario_chunk_runtime_source)
+
+    def test_promotion_commit_can_be_cancelled_by_runtime_hook(self):
+        self.assertIn('import { registerRuntimeHook } from "../state/index.js";', self.scenario_chunk_runtime_source)
+        self.assertIn('function cancelScenarioChunkPromotionCommit(reason = "cancel")', self.scenario_chunk_runtime_source)
+        self.assertIn('registerRuntimeHook(runtimeState, "cancelScenarioChunkPromotionCommitFn", cancelScenarioChunkPromotionCommit);', self.scenario_chunk_runtime_source)
+
+    def test_chunk_promotion_visual_apply_has_no_post_mutation_yield(self):
+        visual_start = self.scenario_chunk_runtime_source.index('setPromotionCommitStatus(loadState, "applying-visual"')
+        visual_end = self.scenario_chunk_runtime_source.index('recordScenarioChunkRuntimeMetric("chunkPromotionCommitVisualMs"', visual_start)
+        visual_slice = self.scenario_chunk_runtime_source[visual_start:visual_end]
+
+        self.assertIn("applyScenarioPoliticalChunkPayload(", visual_slice)
+        self.assertNotIn("await yieldToFrame();", visual_slice)
 
     def test_chunk_promotion_infra_does_not_rebuild_static_meshes(self):
         start = self.map_renderer_source.index("async function runDeferredScenarioChunkPromotionInfraRefresh(")

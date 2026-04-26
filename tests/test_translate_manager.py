@@ -51,6 +51,7 @@ const uiMap = [
     <button data-i18n="Link Lakes To Ocean">Link Lakes To Ocean</button>
     <input data-i18n-placeholder="Search Water Regions" />
     <button data-i18n-aria-label="Toggle left panel"></button>
+    <img data-i18n-alt="Export preview ready" alt="Export preview ready" />
   </body>
 </html>
                 """.strip(),
@@ -63,6 +64,7 @@ const uiMap = [
             self.assertIn("Link Lakes To Ocean", keys)
             self.assertIn("Search Water Regions", keys)
             self.assertIn("Toggle left panel", keys)
+            self.assertIn("Export preview ready", keys)
 
     def test_collects_escaped_quote_ui_calls(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

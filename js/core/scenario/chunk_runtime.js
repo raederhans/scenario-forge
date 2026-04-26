@@ -6,6 +6,7 @@ import {
   createDefaultActiveScenarioChunksState,
   createDefaultRuntimeChunkLoadState,
 } from "../state/scenario_runtime_state.js";
+import { registerRuntimeHook } from "../state/index.js";
 
 function createScenarioChunkRuntimeController({
   state = null,
@@ -37,6 +38,18 @@ function createScenarioChunkRuntimeController({
   refreshDelayIdle = 60,
 } = {}) {
   const runtimeState = explicitRuntimeState || state;
+  let promotionCommitPromise = null;
+  let promotionCommitRunId = 0;
+
+  function yieldToFrame() {
+    return new Promise((resolve) => {
+      if (typeof globalThis.requestAnimationFrame === "function") {
+        globalThis.requestAnimationFrame(() => resolve());
+        return;
+      }
+      globalThis.setTimeout(resolve, 0);
+    });
+  }
 
   function isTimerHandle(value) {
     if (typeof value === "number") {
@@ -106,6 +119,45 @@ function createScenarioChunkRuntimeController({
       runtimeState.runtimeChunkLoadState.promotionTimerId = null;
     }
     runtimeState.runtimeChunkLoadState.promotionScheduled = runtimeState.runtimeChunkLoadState.promotionTimerId != null;
+    runtimeState.runtimeChunkLoadState.promotionCommitInFlight =
+      !!runtimeState.runtimeChunkLoadState.promotionCommitInFlight;
+    runtimeState.runtimeChunkLoadState.promotionCommitRunId = Math.max(
+      0,
+      Number(runtimeState.runtimeChunkLoadState.promotionCommitRunId || 0),
+    );
+    runtimeState.runtimeChunkLoadState.promotionCommitStatus =
+      typeof runtimeState.runtimeChunkLoadState.promotionCommitStatus === "string"
+        ? runtimeState.runtimeChunkLoadState.promotionCommitStatus
+        : "idle";
+    runtimeState.runtimeChunkLoadState.promotionCommitScenarioId =
+      typeof runtimeState.runtimeChunkLoadState.promotionCommitScenarioId === "string"
+        ? runtimeState.runtimeChunkLoadState.promotionCommitScenarioId
+        : "";
+    runtimeState.runtimeChunkLoadState.promotionCommitSelectionVersion = Math.max(
+      0,
+      Number(runtimeState.runtimeChunkLoadState.promotionCommitSelectionVersion || 0),
+    );
+    runtimeState.runtimeChunkLoadState.promotionCommitReason =
+      typeof runtimeState.runtimeChunkLoadState.promotionCommitReason === "string"
+        ? runtimeState.runtimeChunkLoadState.promotionCommitReason
+        : "";
+    runtimeState.runtimeChunkLoadState.promotionCommitStartedAt = Math.max(
+      0,
+      Number(runtimeState.runtimeChunkLoadState.promotionCommitStartedAt || 0),
+    );
+    runtimeState.runtimeChunkLoadState.promotionCommitFinishedAt = Math.max(
+      0,
+      Number(runtimeState.runtimeChunkLoadState.promotionCommitFinishedAt || 0),
+    );
+    runtimeState.runtimeChunkLoadState.promotionCommitError =
+      typeof runtimeState.runtimeChunkLoadState.promotionCommitError === "string"
+        ? runtimeState.runtimeChunkLoadState.promotionCommitError
+        : "";
+    runtimeState.runtimeChunkLoadState.pendingPostCommitRefresh =
+      runtimeState.runtimeChunkLoadState.pendingPostCommitRefresh
+      && typeof runtimeState.runtimeChunkLoadState.pendingPostCommitRefresh === "object"
+        ? runtimeState.runtimeChunkLoadState.pendingPostCommitRefresh
+        : null;
     runtimeState.runtimeChunkLoadState.promotionRetryCount = Math.max(
       0,
       Number(runtimeState.runtimeChunkLoadState.promotionRetryCount || 0),
@@ -190,9 +242,9 @@ function createScenarioChunkRuntimeController({
 
   function resolveScenarioChunkFocusCountry(bundle, loadState = ensureRuntimeChunkLoadState()) {
     const rawFocusCountry = String(
-      runtimeState.activeSovereignCode
+      loadState.focusCountryOverride
+      || runtimeState.activeSovereignCode
       || runtimeState.selectedInspectorCountryCode
-      || loadState.focusCountryOverride
       || getScenarioDefaultCountryCode(bundle?.manifest, bundle?.countriesPayload?.countries || {})
       || ""
     ).trim().toUpperCase();
@@ -252,7 +304,11 @@ function createScenarioChunkRuntimeController({
     loadState.promotionTimerId = globalThis.setTimeout(() => {
       loadState.promotionTimerId = null;
       loadState.promotionScheduled = false;
-      commitPendingScenarioChunkPromotion();
+      void commitPendingScenarioChunkPromotion().catch((error) => {
+        loadState.promotionCommitStatus = "error";
+        loadState.promotionCommitInFlight = false;
+        console.warn("[scenario] Failed to commit pending scenario chunk promotion.", error);
+      });
     }, resolvedDelayMs);
     return true;
   }
@@ -290,11 +346,19 @@ function createScenarioChunkRuntimeController({
         return "promotion-scheduled";
       }
     }
-    if (loadState.pendingPromotion && commitPendingScenarioChunkPromotion({
-      bundle,
-      pendingPromotion: loadState.pendingPromotion,
-    })) {
-      return "promotion-committed";
+    if (loadState.pendingPromotion) {
+      if (promotionCommitPromise || loadState.promotionCommitInFlight) {
+        return "promotion-commit-in-flight";
+      }
+      void commitPendingScenarioChunkPromotion({
+        bundle,
+        pendingPromotion: loadState.pendingPromotion,
+      }).catch((error) => {
+        loadState.promotionCommitStatus = "error";
+        loadState.promotionCommitInFlight = false;
+        console.warn("[scenario] Failed to commit pending scenario chunk promotion.", error);
+      });
+      return "promotion-commit-started";
     }
     if (!flushPending || !hasPendingReason) {
       return "noop";
@@ -538,29 +602,91 @@ function createScenarioChunkRuntimeController({
     return true;
   }
 
-  function applyPendingScenarioChunkPromotion(bundle, pendingPromotion, loadState = ensureRuntimeChunkLoadState()) {
+  function setPromotionCommitStatus(loadState, status, details = {}) {
+    loadState.promotionCommitStatus = String(status || "idle");
+    if (Object.prototype.hasOwnProperty.call(details, "inFlight")) {
+      loadState.promotionCommitInFlight = !!details.inFlight;
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "runId")) {
+      loadState.promotionCommitRunId = Math.max(0, Number(details.runId || 0));
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "scenarioId")) {
+      loadState.promotionCommitScenarioId = normalizeScenarioId(details.scenarioId);
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "selectionVersion")) {
+      loadState.promotionCommitSelectionVersion = Math.max(0, Number(details.selectionVersion || 0));
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "reason")) {
+      loadState.promotionCommitReason = String(details.reason || "");
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "startedAt")) {
+      loadState.promotionCommitStartedAt = Math.max(0, Number(details.startedAt || 0));
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "finishedAt")) {
+      loadState.promotionCommitFinishedAt = Math.max(0, Number(details.finishedAt || 0));
+    }
+    if (Object.prototype.hasOwnProperty.call(details, "error")) {
+      loadState.promotionCommitError = String(details.error || "");
+    }
+    return loadState.promotionCommitStatus;
+  }
+
+  function captureMergedLayerRuntimeSnapshot(mergedLayerPayloads = {}) {
+    return Object.keys(mergedLayerPayloads || {}).map((layerKey) => {
+      const config = getScenarioOptionalLayerConfig(layerKey);
+      if (!config?.stateField) return null;
+      return {
+        stateField: config.stateField,
+        revisionField: config.revisionField || "",
+        value: runtimeState[config.stateField],
+        revision: config.revisionField ? runtimeState[config.revisionField] : undefined,
+      };
+    }).filter(Boolean);
+  }
+
+  function restoreMergedLayerRuntimeSnapshot(snapshot = []) {
+    (Array.isArray(snapshot) ? snapshot : []).forEach((entry) => {
+      if (!entry?.stateField) return;
+      runtimeState[entry.stateField] = entry.value;
+      if (entry.revisionField) {
+        runtimeState[entry.revisionField] = entry.revision;
+      }
+    });
+  }
+
+  function isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId = "", runId = 0 } = {}) {
+    if (!pendingPromotion || typeof pendingPromotion !== "object") return false;
+    if (runtimeState.runtimeChunkLoadState !== loadState) return false;
+    if (runId > 0 && Math.max(0, Number(loadState.promotionCommitRunId || 0)) !== runId) return false;
+    const normalizedScenarioId = normalizeScenarioId(scenarioId || pendingPromotion.scenarioId || runtimeState.activeScenarioId);
+    if (!normalizedScenarioId || normalizedScenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)) return false;
+    if (loadState.pendingPromotion && loadState.pendingPromotion !== pendingPromotion) return false;
+    const pendingSelectionVersion = Math.max(0, Number(pendingPromotion.selectionVersion || 0));
+    const currentSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0));
+    if (pendingSelectionVersion > 0 && currentSelectionVersion > 0 && pendingSelectionVersion !== currentSelectionVersion) return false;
+    return true;
+  }
+
+  async function applyPendingScenarioChunkPromotion(bundle, pendingPromotion, loadState = ensureRuntimeChunkLoadState(), {
+    renderNowOverride = null,
+    runId = 0,
+  } = {}) {
     if (!pendingPromotion || typeof pendingPromotion !== "object") {
       return false;
     }
-    const pendingSelectionVersion = Math.max(0, Number(pendingPromotion.selectionVersion || 0));
-    const currentSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0));
-    if (pendingSelectionVersion > 0 && currentSelectionVersion > 0 && pendingSelectionVersion !== currentSelectionVersion) {
-      if (loadState.pendingPromotion === pendingPromotion) {
-        clearPendingScenarioChunkPromotion(loadState);
-      }
-      return false;
-    }
     const scenarioId = normalizeScenarioId(pendingPromotion.scenarioId || runtimeState.activeScenarioId);
-    if (!scenarioId || scenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)) {
+    if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
       if (loadState.pendingPromotion === pendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
+      setPromotionCommitStatus(loadState, "promotion-skipped-stale", { inFlight: false, finishedAt: Date.now() });
       return false;
     }
     const mergedLayerPayloads =
       pendingPromotion.mergedLayerPayloads && typeof pendingPromotion.mergedLayerPayloads === "object"
         ? pendingPromotion.mergedLayerPayloads
         : {};
+    const resolvedRenderNow = renderNowOverride == null ? pendingPromotion.renderNow : renderNowOverride;
     const promotionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     const queuedAt = Math.max(
       0,
@@ -578,104 +704,127 @@ function createScenarioChunkRuntimeController({
         changedLayerCount: Array.isArray(pendingPromotion.changedLayerKeys) ? pendingPromotion.changedLayerKeys.length : 0,
       });
     }
-    const infraStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    const mergedLayerResult = applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, {
-      renderNow: false,
-    });
-    const infraEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    recordScenarioChunkRuntimeMetric("chunkPromotionInfraMs", infraEndedAt - infraStartedAt, {
-      scenarioId,
-      reason: String(pendingPromotion.reason || "refresh"),
-      changedLayerCount: mergedLayerResult?.changedLayerKeys?.length || 0,
-    });
-    const visualStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    const politicalPayloadChanged = applyScenarioPoliticalChunkPayload(bundle, mergedLayerPayloads.political || null, {
-      renderNow: false,
-      reason: pendingPromotion.reason,
-      changedLayerKeys: mergedLayerResult?.changedLayerKeys || [],
-      politicalFeatureIds: pendingPromotion.politicalFeatureIds || [],
-    });
-    if (pendingPromotion.renderNow !== false) {
-      flushRenderBoundary("scenario-chunk-promotion");
-    }
-    const visualEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    recordScenarioChunkRuntimeMetric("chunkPromotionVisualMs", visualEndedAt - visualStartedAt, {
-      scenarioId,
-      reason: String(pendingPromotion.reason || "refresh"),
-      politicalFeatureCount: Array.isArray(pendingPromotion.politicalFeatureIds) ? pendingPromotion.politicalFeatureIds.length : 0,
-      politicalPayloadChanged,
-      renderNow: pendingPromotion.renderNow !== false,
-    });
-    recordScenarioRenderMetric(
-      "chunkPromotionMs",
-      visualEndedAt - promotionStartedAt,
-      {
+    const previousRenderLock = !!runtimeState.scenarioChunkPromotionRenderLocked;
+    const mergedLayerSnapshot = captureMergedLayerRuntimeSnapshot(mergedLayerPayloads);
+    runtimeState.scenarioChunkPromotionRenderLocked = true;
+    let mergedLayerResult = { changed: false, changedLayerKeys: [] };
+    let politicalPayloadChanged = false;
+    try {
+      setPromotionCommitStatus(loadState, "applying-infra", { inFlight: true, runId, scenarioId });
+      const infraStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      mergedLayerResult = applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow: false });
+      const infraEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      recordScenarioChunkRuntimeMetric("chunkPromotionCommitInfraMs", infraEndedAt - infraStartedAt, {
+        scenarioId,
+        reason: String(pendingPromotion.reason || "refresh"),
+        changedLayerCount: mergedLayerResult?.changedLayerKeys?.length || 0,
+      });
+      await yieldToFrame();
+      if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+        restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
+        setPromotionCommitStatus(loadState, "promotion-skipped-stale", { inFlight: false, finishedAt: Date.now() });
+        return false;
+      }
+
+      setPromotionCommitStatus(loadState, "applying-visual", { inFlight: true, runId, scenarioId });
+      const visualStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      politicalPayloadChanged = applyScenarioPoliticalChunkPayload(bundle, mergedLayerPayloads.political || null, {
+        renderNow: false,
+        reason: pendingPromotion.reason,
+        changedLayerKeys: mergedLayerResult?.changedLayerKeys || [],
+        politicalFeatureIds: pendingPromotion.politicalFeatureIds || [],
+      });
+      runtimeState.scenarioChunkPromotionRenderLocked = previousRenderLock;
+      if (resolvedRenderNow !== false) {
+        flushRenderBoundary("scenario-chunk-promotion");
+      }
+      const visualEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+      recordScenarioChunkRuntimeMetric("chunkPromotionCommitVisualMs", visualEndedAt - visualStartedAt, {
+        scenarioId,
+        reason: String(pendingPromotion.reason || "refresh"),
+        politicalFeatureCount: Array.isArray(pendingPromotion.politicalFeatureIds) ? pendingPromotion.politicalFeatureIds.length : 0,
+        politicalPayloadChanged,
+        renderNow: resolvedRenderNow !== false,
+      });
+      recordScenarioRenderMetric("chunkPromotionMs", visualEndedAt - promotionStartedAt, {
         scenarioId,
         reason: String(pendingPromotion.reason || "refresh"),
         loadedChunkCount: Array.isArray(runtimeState.activeScenarioChunks?.loadedChunkIds)
           ? runtimeState.activeScenarioChunks.loadedChunkIds.length
           : 0,
-      }
-    );
-    if (
-      pendingPromotion.politicalRequired
-      && Array.isArray(mergedLayerPayloads?.political?.features)
-      && !bundle?.chunkLifecycle?.politicalCoreReadyRecorded
-    ) {
-      const applyStartedAt = Number(bundle?.chunkLifecycle?.applyStartedAt || 0);
-      if (applyStartedAt > 0) {
-        recordScenarioPerfMetric(
-          "timeToPoliticalCoreReady",
-          (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
-          {
+      });
+      if (
+        pendingPromotion.politicalRequired
+        && Array.isArray(mergedLayerPayloads?.political?.features)
+        && !bundle?.chunkLifecycle?.politicalCoreReadyRecorded
+      ) {
+        const applyStartedAt = Number(bundle?.chunkLifecycle?.applyStartedAt || 0);
+        if (applyStartedAt > 0) {
+          recordScenarioPerfMetric("timeToPoliticalCoreReady", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt, {
             scenarioId,
             promotedPoliticalFeatureCount: mergedLayerPayloads.political.features.length,
             requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
-          }
-        );
+          });
+        }
+        if (bundle?.chunkLifecycle) {
+          bundle.chunkLifecycle.politicalCoreReadyRecorded = true;
+        }
       }
-      if (bundle?.chunkLifecycle) {
-        bundle.chunkLifecycle.politicalCoreReadyRecorded = true;
+      if (String(pendingPromotion.reason || "").trim().toLowerCase() === "zoom-end") {
+        const startedAt = Number(loadState.zoomEndChunkVisibleMetric?.startedAt || 0);
+        if (startedAt > 0) {
+          const endedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+          const durationMs = Math.max(0, endedAt - startedAt);
+          loadState.lastZoomEndToChunkVisibleMetric = {
+            durationMs,
+            recordedAt: Date.now(),
+            scenarioId,
+            zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
+            threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
+            focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
+            requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
+            selectionVersion: Math.max(0, Number(pendingPromotion.selectionVersion || loadState.selectionVersion || 0)),
+            requiredChunkCount: Array.isArray(pendingPromotion.requiredChunkIds) ? pendingPromotion.requiredChunkIds.length : 0,
+            loadedChunkCount: Array.isArray(runtimeState.activeScenarioChunks?.loadedChunkIds)
+              ? runtimeState.activeScenarioChunks.loadedChunkIds.length
+              : 0,
+            promotionRetryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)),
+            pendingReason: String(loadState.pendingReason || pendingPromotion.reason || ""),
+            activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
+          };
+          recordScenarioChunkRuntimeMetric("zoomEndToChunkVisibleMs", durationMs, {
+            scenarioId,
+            zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
+            threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
+            focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
+            requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
+            selectionVersion: Math.max(0, Number(pendingPromotion.selectionVersion || loadState.selectionVersion || 0)),
+            promotionRetryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)),
+            activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
+          });
+        }
+        loadState.zoomEndChunkVisibleMetric = null;
       }
+      setScenarioChunkShellStatus("ready", loadState);
+      clearPendingScenarioChunkPromotion(loadState);
+      clearPendingScenarioChunkRefresh(loadState);
+      setPromotionCommitStatus(loadState, "promotion-committed", { inFlight: false, finishedAt: Date.now() });
+      return true;
+    } finally {
+      runtimeState.scenarioChunkPromotionRenderLocked = previousRenderLock;
     }
-    if (String(pendingPromotion.reason || "").trim().toLowerCase() === "zoom-end") {
-      const startedAt = Number(loadState.zoomEndChunkVisibleMetric?.startedAt || 0);
-      if (startedAt > 0) {
-        const endedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-        const durationMs = Math.max(0, endedAt - startedAt);
-        loadState.lastZoomEndToChunkVisibleMetric = {
-          durationMs,
-          recordedAt: Date.now(),
-          scenarioId,
-          zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
-          threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
-          focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
-          requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
-        };
-        recordScenarioChunkRuntimeMetric("zoomEndToChunkVisibleMs", durationMs, {
-          scenarioId,
-          zoom: Number(loadState.zoomEndChunkVisibleMetric?.zoom || 0),
-          threshold: Number(loadState.zoomEndChunkVisibleMetric?.threshold || 0),
-          focusCountry: String(loadState.zoomEndChunkVisibleMetric?.focusCountry || ""),
-          requiredPoliticalChunkCount: Number(pendingPromotion.requiredPoliticalChunkCount || 0),
-        });
-      }
-      loadState.zoomEndChunkVisibleMetric = null;
-    }
-    setScenarioChunkShellStatus("ready", loadState);
-    clearPendingScenarioChunkPromotion(loadState);
-    clearPendingScenarioChunkRefresh(loadState);
-    return true;
   }
 
-  function commitPendingScenarioChunkPromotion({
+  async function runPendingScenarioChunkPromotionCommit({
     bundle = null,
     pendingPromotion = null,
     renderNow = null,
+    runId = 0,
   } = {}) {
     const loadState = ensureRuntimeChunkLoadState();
     const resolvedPendingPromotion = pendingPromotion || loadState.pendingPromotion;
     if (!resolvedPendingPromotion || typeof resolvedPendingPromotion !== "object") {
+      setPromotionCommitStatus(loadState, "noop", { inFlight: false, finishedAt: Date.now() });
       return false;
     }
     const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
@@ -683,6 +832,7 @@ function createScenarioChunkRuntimeController({
       if (loadState.pendingPromotion === resolvedPendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
+      setPromotionCommitStatus(loadState, "promotion-skipped-stale", { inFlight: false, finishedAt: Date.now() });
       return false;
     }
     const resolvedBundle = bundle || getCachedScenarioBundle(scenarioId);
@@ -690,6 +840,7 @@ function createScenarioChunkRuntimeController({
       if (loadState.pendingPromotion === resolvedPendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
+      setPromotionCommitStatus(loadState, "noop", { inFlight: false, finishedAt: Date.now() });
       return false;
     }
     if (shouldDeferScenarioChunkRefresh()) {
@@ -715,17 +866,106 @@ function createScenarioChunkRuntimeController({
         delayMs: retryDelayMs,
         retry: true,
       });
+      setPromotionCommitStatus(loadState, "promotion-deferred", { inFlight: false, finishedAt: Date.now() });
       return false;
     }
-    return applyPendingScenarioChunkPromotion(
-      resolvedBundle,
-      {
-        ...resolvedPendingPromotion,
-        renderNow: renderNow == null ? resolvedPendingPromotion.renderNow : renderNow,
-      },
-      loadState,
-    );
+    return applyPendingScenarioChunkPromotion(resolvedBundle, resolvedPendingPromotion, loadState, {
+      renderNowOverride: renderNow,
+      runId,
+    });
   }
+
+  function commitPendingScenarioChunkPromotion({
+    bundle = null,
+    pendingPromotion = null,
+    renderNow = null,
+  } = {}) {
+    const loadState = ensureRuntimeChunkLoadState();
+    if (promotionCommitPromise || loadState.promotionCommitInFlight) {
+      setPromotionCommitStatus(loadState, "promotion-commit-in-flight", { inFlight: true });
+      return promotionCommitPromise || Promise.resolve(false);
+    }
+    const runId = promotionCommitRunId + 1;
+    promotionCommitRunId = runId;
+    const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+    const resolvedPendingPromotion = pendingPromotion || loadState.pendingPromotion;
+    setPromotionCommitStatus(loadState, "promotion-commit-started", {
+      inFlight: true,
+      runId,
+      scenarioId: resolvedPendingPromotion?.scenarioId || runtimeState.activeScenarioId,
+      selectionVersion: resolvedPendingPromotion?.selectionVersion || loadState.selectionVersion || 0,
+      reason: resolvedPendingPromotion?.reason || loadState.pendingReason || "",
+      startedAt,
+      error: "",
+    });
+    promotionCommitPromise = runPendingScenarioChunkPromotionCommit({
+      bundle,
+      pendingPromotion: resolvedPendingPromotion,
+      renderNow,
+      runId,
+    }).catch((error) => {
+      setPromotionCommitStatus(loadState, "error", {
+        inFlight: false,
+        runId,
+        finishedAt: Date.now(),
+        error: error?.message || String(error || "unknown"),
+      });
+      throw error;
+    }).finally(() => {
+      if (Math.max(0, Number(loadState.promotionCommitRunId || 0)) === runId) {
+        loadState.promotionCommitInFlight = false;
+        if (loadState.promotionCommitStatus === "promotion-commit-started" || loadState.promotionCommitStatus === "promotion-commit-in-flight") {
+          loadState.promotionCommitStatus = "idle";
+        }
+        loadState.promotionCommitFinishedAt = Date.now();
+      }
+      if (promotionCommitRunId === runId) {
+        promotionCommitPromise = null;
+      }
+      const pendingPostCommitRefresh = loadState.pendingPostCommitRefresh;
+      loadState.pendingPostCommitRefresh = null;
+      if (
+        pendingPostCommitRefresh
+        && typeof pendingPostCommitRefresh === "object"
+        && runtimeState.runtimeChunkLoadState === loadState
+        && !loadState.promotionCommitInFlight
+      ) {
+        scheduleScenarioChunkRefresh({
+          reason: pendingPostCommitRefresh.reason || "post-commit-refresh",
+          delayMs: Number.isFinite(Number(pendingPostCommitRefresh.delayMs))
+            ? Number(pendingPostCommitRefresh.delayMs)
+            : 0,
+        });
+        return;
+      }
+      if (loadState.pendingPromotion && !loadState.promotionScheduled && !loadState.promotionCommitInFlight) {
+        schedulePendingScenarioChunkPromotionCommit({ delayMs: 0 });
+      }
+    });
+    return promotionCommitPromise;
+  }
+
+  function cancelScenarioChunkPromotionCommit(reason = "cancel") {
+    const loadState = ensureRuntimeChunkLoadState();
+    if (loadState.promotionTimerId) {
+      globalThis.clearTimeout(loadState.promotionTimerId);
+      loadState.promotionTimerId = null;
+    }
+    loadState.promotionScheduled = false;
+    loadState.pendingPostCommitRefresh = null;
+    promotionCommitRunId += 1;
+    promotionCommitPromise = null;
+    runtimeState.scenarioChunkPromotionRenderLocked = false;
+    setPromotionCommitStatus(loadState, String(reason || "cancel"), {
+      inFlight: false,
+      runId: promotionCommitRunId,
+      finishedAt: Date.now(),
+      error: "",
+    });
+    return true;
+  }
+
+  registerRuntimeHook(runtimeState, "cancelScenarioChunkPromotionCommitFn", cancelScenarioChunkPromotionCommit);
 
   function buildMergedScenarioChunkLayerPayloads(bundle, {
     previousSignatures = {},
@@ -991,6 +1231,12 @@ function createScenarioChunkRuntimeController({
           threshold: Number(loadState.zoomEndChunkVisibleMetric.threshold || 0),
           focusCountry: String(loadState.zoomEndChunkVisibleMetric.focusCountry || ""),
           requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+          selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0)),
+          requiredChunkCount: selection.requiredChunks.length,
+          loadedChunkCount: Array.isArray(chunkState.loadedChunkIds) ? chunkState.loadedChunkIds.length : 0,
+          promotionRetryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)),
+          pendingReason: String(loadState.pendingReason || reason || ""),
+          activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
         };
         recordScenarioChunkRuntimeMetric("zoomEndToChunkVisibleMs", durationMs, {
           scenarioId,
@@ -998,6 +1244,9 @@ function createScenarioChunkRuntimeController({
           threshold: Number(loadState.zoomEndChunkVisibleMetric.threshold || 0),
           focusCountry: String(loadState.zoomEndChunkVisibleMetric.focusCountry || ""),
           requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+          selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0)),
+          promotionRetryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)),
+          activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
         });
         loadState.zoomEndChunkVisibleMetric = null;
       }
@@ -1096,6 +1345,7 @@ function createScenarioChunkRuntimeController({
       changedLayerKeys: mergedResult.changedLayerKeys,
       politicalRequired,
       requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+      requiredChunkIds: nextRequiredChunkIds,
       selectionVersion: nextSelectionVersion,
       politicalFeatureIds,
       queuedAt: promotionQueuedAt,
@@ -1150,6 +1400,14 @@ function createScenarioChunkRuntimeController({
       globalThis.clearTimeout(loadState.refreshTimerId);
       loadState.refreshTimerId = null;
       loadState.refreshScheduled = false;
+    }
+    if (loadState.promotionCommitInFlight && !flushPending) {
+      loadState.pendingPostCommitRefresh = {
+        reason: nextReason,
+        delayMs: nextDelayMs,
+        requestedAt: Date.now(),
+      };
+      return "promotion-commit-in-flight";
     }
     if (shouldDeferScenarioChunkRefreshFor()) {
       markPendingScenarioChunkRefresh(nextReason, nextDelayMs);

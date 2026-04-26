@@ -128,6 +128,8 @@ export function recordRenderSample(durationMs, details = {}) {
 
 export function snapshot() {
   return {
+    schemaVersion: 1,
+    source: "mc_perf_probe",
     enabled,
     bootMetrics: cloneMetricObject(globalThis.__bootMetrics),
     renderPerfMetrics: cloneMetricObject(globalThis.__renderPerfMetrics),

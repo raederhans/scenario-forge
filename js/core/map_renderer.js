@@ -350,6 +350,7 @@ const RENDER_SETTLE_DURATION_MS = 200;
 const RENDER_SETTLE_DURATION_MS_MIN = 120;
 const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 700;
 const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS_MIN = 260;
+const CONTINUITY_FRAME_MAX_STALE_AGE_MS = 1500;
 const ZOOM_SETTLE_ADAPTIVE_DELTA_MIN = 0.06;
 const ZOOM_SETTLE_ADAPTIVE_DELTA_MAX = 0.85;
 const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
@@ -796,6 +797,17 @@ const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "contextMarkers",
   "dayNight",
 ]);
+const INTERACTION_COMPOSITE_PASS_NAMES = [
+  "background",
+  "physicalBase",
+  "political",
+  "contextBase",
+  "contextScenario",
+  "effects",
+  "lineEffects",
+  "contextMarkers",
+  "dayNight",
+];
 const TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
   "physicalBase",
@@ -1709,12 +1721,50 @@ function noteRenderAction(label, startedAt = null) {
 
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASSES = new Set(["political", "contextBase", "contextScenario", "effects"]);
 
+function getVisibleFrameIdentity(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
+  return {
+    scenarioId: String(runtimeState.activeScenarioId || ""),
+    topologyRevision: Math.max(0, Number(runtimeState.topologyRevision || 0)),
+    dpr: Math.max(1, Number(runtimeState.dpr || 1)),
+    pixelWidth: Math.max(1, Number(context?.canvas?.width || 1)),
+    pixelHeight: Math.max(1, Number(context?.canvas?.height || 1)),
+    transform: cloneZoomTransform(transform),
+  };
+}
+
+function clearLastGoodFrame(reason = "clear") {
+  const cache = getRenderPassCacheState();
+  if (!cache.lastGoodFrame || typeof cache.lastGoodFrame !== "object") return;
+  cache.lastGoodFrame.valid = false;
+  cache.lastGoodFrame.stale = false;
+  cache.lastGoodFrame.referenceTransform = null;
+  cache.lastGoodFrame.invalidatedAt = Date.now();
+  cache.lastGoodFrame.reason = String(reason || "clear");
+  cache.lastGoodFrame.staleReason = "";
+  cache.lastGoodFrame.rejectedReason = "";
+}
+
 function invalidateLastGoodFrame(reason = "visual-invalidation") {
   const cache = getRenderPassCacheState();
   if (!cache.lastGoodFrame || !cache.lastGoodFrame.valid) return;
-  cache.lastGoodFrame.valid = false;
-  cache.lastGoodFrame.referenceTransform = null;
+  cache.lastGoodFrame.stale = true;
+  cache.lastGoodFrame.invalidatedAt = Date.now();
+  cache.lastGoodFrame.staleReason = String(reason || "visual-invalidation");
   cache.lastGoodFrame.reason = String(reason || "visual-invalidation");
+  recordRenderPerfMetric("continuityFrameMarkedStale", 0, {
+    reason: cache.lastGoodFrame.staleReason,
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+  });
+}
+
+function invalidateInteractionComposite(reason = "interaction-composite-invalidation") {
+  const cache = getRenderPassCacheState();
+  if (!cache.interactionComposite || typeof cache.interactionComposite !== "object") return;
+  cache.interactionComposite.valid = false;
+  cache.interactionComposite.referenceTransform = null;
+  cache.interactionComposite.signature = "";
+  cache.interactionComposite.reason = String(reason || "interaction-composite-invalidation");
+  cache.interactionComposite.rejectedReason = String(reason || "interaction-composite-invalidation");
 }
 
 function invalidateRenderPasses(passNames, reason = "unspecified") {
@@ -1733,6 +1783,9 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
   });
   if (targetPassNames.some((passName) => LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASSES.has(passName))) {
     invalidateLastGoodFrame(reason);
+  }
+  if (targetPassNames.some((passName) => INTERACTION_COMPOSITE_PASS_NAMES.includes(passName))) {
+    invalidateInteractionComposite(reason);
   }
   if (
     targetPassNames.includes("political")
@@ -1790,6 +1843,7 @@ function clearRenderPassReferenceTransforms(passNames = null) {
     cache.referenceTransform = null;
     cache.referenceTransforms = {};
     cache.contextScenarioLayerCache = {};
+    invalidateInteractionComposite("clear-reference-transform");
     invalidateInteractionBorderSnapshot("clear-reference-transform");
     invalidatePoliticalPathCache("clear-reference-transform");
     return;
@@ -1806,6 +1860,9 @@ function clearRenderPassReferenceTransforms(passNames = null) {
     delete cache.referenceTransforms[passName];
   });
   cache.referenceTransform = null;
+  if (targetPassNames.some((passName) => INTERACTION_COMPOSITE_PASS_NAMES.includes(passName))) {
+    invalidateInteractionComposite("clear-reference-transform");
+  }
   if (targetPassNames.includes("political")) {
     invalidatePoliticalPathCache("clear-reference-transform");
   }
@@ -1919,6 +1976,62 @@ function ensureLastGoodFrameCanvas() {
   return targetCanvas;
 }
 
+function ensureInteractionCompositeCanvas() {
+  const cache = getRenderPassCacheState();
+  if (!cache.interactionComposite.canvas) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    cache.interactionComposite.canvas = canvas;
+  }
+  const targetCanvas = cache.interactionComposite.canvas;
+  const width = Math.max(1, Number(context?.canvas?.width || 1));
+  const height = Math.max(1, Number(context?.canvas?.height || 1));
+  if (targetCanvas.width !== width) targetCanvas.width = width;
+  if (targetCanvas.height !== height) targetCanvas.height = height;
+  cache.interactionComposite.layout = {
+    pixelWidth: width,
+    pixelHeight: height,
+    dpr: Math.max(1, Number(runtimeState.dpr || 1)),
+  };
+  return targetCanvas;
+}
+
+function getInteractionCompositeSignature(cache = getRenderPassCacheState()) {
+  return INTERACTION_COMPOSITE_PASS_NAMES.map((passName) => [
+    passName,
+    String(cache.signatures?.[passName] || ""),
+    getTransformSignature(getPassReferenceTransform(passName)),
+  ].join("@")).join("|");
+}
+
+function getInteractionCompositeRejectReason(composite, currentTransform, cache = getRenderPassCacheState()) {
+  if (!composite?.valid) return "invalid";
+  if (!composite.canvas || !composite.referenceTransform) return "missing-canvas-or-transform";
+  if (composite.signature !== getInteractionCompositeSignature(cache)) return "signature-mismatch";
+  const identity = getVisibleFrameIdentity(currentTransform);
+  if (String(composite.scenarioId || "") !== identity.scenarioId) return "scenario-mismatch";
+  if (Number(composite.topologyRevision || 0) !== identity.topologyRevision) return "topology-revision-mismatch";
+  if (Math.abs(Number(composite.dpr || 1) - identity.dpr) > 0.01) return "dpr-mismatch";
+  if (Number(composite.pixelWidth || 0) !== identity.pixelWidth || Number(composite.pixelHeight || 0) !== identity.pixelHeight) {
+    return "canvas-size-mismatch";
+  }
+  return "";
+}
+
+function canDrawInteractionComposite(currentTransform, cache = getRenderPassCacheState()) {
+  const composite = cache.interactionComposite || {};
+  const rejectReason = getInteractionCompositeRejectReason(composite, currentTransform, cache);
+  if (!rejectReason) return true;
+  if (composite && typeof composite === "object") {
+    composite.rejectedReason = rejectReason;
+  }
+  if (rejectReason !== "invalid") {
+    invalidateInteractionComposite(rejectReason);
+  }
+  return false;
+}
+
 function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
   if (!context?.canvas) return false;
   const targetCanvas = ensureLastGoodFrameCanvas();
@@ -1928,10 +2041,20 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
   targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
   targetContext.drawImage(context.canvas, 0, 0);
   const cache = getRenderPassCacheState();
+  const identity = getVisibleFrameIdentity(transform);
   cache.lastGoodFrame.referenceTransform = cloneZoomTransform(transform);
   cache.lastGoodFrame.capturedAt = Date.now();
+  cache.lastGoodFrame.invalidatedAt = 0;
   cache.lastGoodFrame.valid = true;
+  cache.lastGoodFrame.stale = false;
   cache.lastGoodFrame.reason = String(reason || "frame");
+  cache.lastGoodFrame.staleReason = "";
+  cache.lastGoodFrame.rejectedReason = "";
+  cache.lastGoodFrame.scenarioId = identity.scenarioId;
+  cache.lastGoodFrame.topologyRevision = identity.topologyRevision;
+  cache.lastGoodFrame.dpr = identity.dpr;
+  cache.lastGoodFrame.pixelWidth = identity.pixelWidth;
+  cache.lastGoodFrame.pixelHeight = identity.pixelHeight;
   return true;
 }
 
@@ -1946,12 +2069,105 @@ function noteBlackFrame(reason = "unknown") {
   };
 }
 
+function noteMissingVisibleFrame(reason = "unknown") {
+  incrementPerfCounter("missingVisibleFrameCount");
+  const cache = getRenderPassCacheState();
+  const count = Number(cache.counters.missingVisibleFrameCount || 0);
+  recordRenderPerfMetric("missingVisibleFrameCount", 0, {
+    count,
+    reason: String(reason || "unknown"),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+  });
+}
+
+function noteMissingVisibleFrameSkippedDuringInteraction(reason = "unknown") {
+  incrementPerfCounter("missingVisibleFrameSkippedDuringInteraction");
+  const cache = getRenderPassCacheState();
+  const count = Number(cache.counters.missingVisibleFrameSkippedDuringInteraction || 0);
+  recordRenderPerfMetric("missingVisibleFrameSkippedDuringInteraction", 0, {
+    count,
+    reason: String(reason || "unknown"),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    phase: String(runtimeState.renderPhase || ""),
+  });
+}
+
+function markFirstVisibleFramePainted(reason = "visible-frame") {
+  if (runtimeState.firstVisibleFramePainted) return;
+  runtimeState.firstVisibleFramePainted = true;
+  recordRenderPerfMetric("firstVisibleFramePainted", 0, {
+    reason: String(reason || "visible-frame"),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+  });
+}
+
+function resetFirstVisibleFramePainted(reason = "visible-frame-reset") {
+  runtimeState.firstVisibleFramePainted = false;
+  recordRenderPerfMetric("firstVisibleFramePaintedReset", 0, {
+    reason: String(reason || "visible-frame-reset"),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+  });
+}
+
+function canDrawBaseVisibleFrameFallback() {
+  return !runtimeState.firstVisibleFramePainted || !Array.isArray(runtimeState.landData?.features) || runtimeState.landData.features.length === 0;
+}
+
+function drawBaseVisibleFrameFallback(reason = "base-fill") {
+  if (!context?.canvas) return false;
+  if (runtimeState.renderPhase === RENDER_PHASE_INTERACTING && runtimeState.firstVisibleFramePainted) {
+    noteMissingVisibleFrameSkippedDuringInteraction(`${reason}-skipped-during-interaction`);
+    return false;
+  }
+  if (!canDrawBaseVisibleFrameFallback()) {
+    return false;
+  }
+  resetMainCanvas();
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.fillStyle = getOceanBaseFillColor();
+  context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+  context.restore();
+  noteMissingVisibleFrame(reason);
+  return true;
+}
+
 function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
   const cache = getRenderPassCacheState();
   const fallbackCanvas = cache.lastGoodFrame?.canvas;
   const referenceTransform = cache.lastGoodFrame?.referenceTransform;
-  if (!fallbackCanvas || !cache.lastGoodFrame?.valid || !referenceTransform) {
+  const frame = cache.lastGoodFrame || {};
+  if (!fallbackCanvas || !frame.valid || !referenceTransform) {
     return false;
+  }
+  const identity = getVisibleFrameIdentity(currentTransform);
+  const staleSince = frame.stale && Number(frame.invalidatedAt || 0) > 0
+    ? Number(frame.invalidatedAt || 0)
+    : Number(frame.capturedAt || 0);
+  const staleAgeMs = Math.max(0, Date.now() - staleSince);
+  const reject = (reason) => {
+    frame.rejectedReason = String(reason || "unknown");
+    recordRenderPerfMetric("continuityFrameRejected", 0, {
+      reason: frame.rejectedReason,
+      staleAgeMs,
+      activeScenarioId: identity.scenarioId,
+    });
+    return false;
+  };
+  if (String(frame.scenarioId || "") !== identity.scenarioId) {
+    return reject("scenario-mismatch");
+  }
+  if (Number(frame.pixelWidth || 0) !== identity.pixelWidth || Number(frame.pixelHeight || 0) !== identity.pixelHeight) {
+    return reject("canvas-size-mismatch");
+  }
+  if (Math.abs(Number(frame.dpr || 1) - identity.dpr) > 0.01) {
+    return reject("dpr-mismatch");
+  }
+  if (Number(frame.topologyRevision || 0) !== identity.topologyRevision) {
+    return reject("topology-revision-mismatch");
+  }
+  if (frame.stale && staleAgeMs > CONTINUITY_FRAME_MAX_STALE_AGE_MS) {
+    return reject("stale-age-limit");
   }
   const current = cloneZoomTransform(currentTransform);
   const reference = cloneZoomTransform(referenceTransform);
@@ -1966,11 +2182,21 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
   context.drawImage(fallbackCanvas, 0, 0);
   context.restore();
   incrementPerfCounter("lastGoodFrameReuses");
-  const ageMs = Math.max(0, Date.now() - Number(cache.lastGoodFrame?.capturedAt || 0));
-  recordRenderPerfMetric("dragVisibleStaleFrameMs", ageMs, {
+  if (frame.stale) {
+    incrementPerfCounter("continuityFrameReuses");
+  }
+  recordRenderPerfMetric("dragVisibleStaleFrameMs", staleAgeMs, {
     phase: runtimeState.renderPhase,
-    reason: String(cache.lastGoodFrame?.reason || "last-good-frame"),
+    reason: String(frame.reason || "last-good-frame"),
+    stale: !!frame.stale,
+    staleReason: String(frame.staleReason || ""),
   });
+  if (frame.stale) {
+    recordRenderPerfMetric("continuityFrameStaleAgeMs", staleAgeMs, {
+      reason: String(frame.staleReason || frame.reason || "continuity-frame"),
+      activeScenarioId: identity.scenarioId,
+    });
+  }
   return true;
 }
 
@@ -4921,7 +5147,11 @@ function setRenderPhase(phase) {
 }
 
 function isInteractionRecoveryBlocked() {
-  return runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.isInteracting;
+  return (
+    runtimeState.renderPhase !== RENDER_PHASE_IDLE
+    || runtimeState.isInteracting
+    || !!runtimeState.activeInteractionRecoveryTaskKey
+  );
 }
 
 function isInteractionRecoverySettled({ quietMs = 600 } = {}) {
@@ -4935,6 +5165,72 @@ function isInteractionRecoverySettled({ quietMs = 600 } = {}) {
   const zoomQuietForMs = zoomEndedAt > 0 ? currentMs - zoomEndedAt : Number.POSITIVE_INFINITY;
   const requiredQuietMs = Math.max(0, Number(quietMs) || 0);
   return idleForMs >= requiredQuietMs && zoomQuietForMs >= requiredQuietMs;
+}
+
+function beginInteractionRecoveryTask(taskKey) {
+  const normalizedTaskKey = String(taskKey || "interaction-recovery").trim() || "interaction-recovery";
+  if (runtimeState.activeInteractionRecoveryTaskKey) {
+    recordRenderPerfMetric("interactionRecoveryTaskBlocked", 0, {
+      taskKey: normalizedTaskKey,
+      activeTaskKey: String(runtimeState.activeInteractionRecoveryTaskKey || ""),
+    });
+    return false;
+  }
+  runtimeState.activeInteractionRecoveryTaskKey = normalizedTaskKey;
+  runtimeState.activeInteractionRecoveryTaskStartedAt = nowMs();
+  recordRenderPerfMetric("interactionRecoveryTaskStarted", 0, {
+    taskKey: normalizedTaskKey,
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+  });
+  return true;
+}
+
+function endInteractionRecoveryTask(taskKey) {
+  const normalizedTaskKey = String(taskKey || "interaction-recovery").trim() || "interaction-recovery";
+  if (runtimeState.activeInteractionRecoveryTaskKey === normalizedTaskKey) {
+    runtimeState.activeInteractionRecoveryTaskKey = "";
+    runtimeState.activeInteractionRecoveryTaskStartedAt = 0;
+  }
+}
+
+function getInteractionRecoveryChunkState() {
+  const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : {};
+  return {
+    shellStatus: String(loadState.shellStatus || ""),
+    hasPendingPromotion: !!loadState.pendingPromotion,
+    hasPendingVisualPromotion: !!loadState.pendingVisualPromotion,
+    hasPendingInfraPromotion: !!loadState.pendingInfraPromotion,
+    pendingReason: String(loadState.pendingReason || ""),
+    promotionRetryCount: Math.max(0, Number(loadState.promotionRetryCount || 0)),
+  };
+}
+
+function recordInteractionRecoveryTaskMetric(taskKey, durationMs, details = {}, { benchmarkInteraction = true } = {}) {
+  const normalizedTaskKey = String(taskKey || "interaction-recovery").trim() || "interaction-recovery";
+  const chunkState = getInteractionRecoveryChunkState();
+  const taskMetricName = benchmarkInteraction ? "interactionRecoveryTaskMs" : "postReadyInteractionInfrastructureTaskMs";
+  const windowMetricName = benchmarkInteraction ? "interactionRecoveryWindowMs" : "postReadyInteractionInfrastructureWindowMs";
+  const entry = recordRenderPerfMetric(taskMetricName, durationMs, {
+    taskKey: normalizedTaskKey,
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    renderPhase: String(runtimeState.renderPhase || ""),
+    isInteracting: !!runtimeState.isInteracting,
+    deferExactAfterSettle: !!runtimeState.deferExactAfterSettle,
+    interactionInfrastructureBuildInFlight: !!runtimeState.interactionInfrastructureBuildInFlight,
+    activeInteractionRecoveryTaskKey: String(runtimeState.activeInteractionRecoveryTaskKey || ""),
+    hitCanvasBuildScheduled: !!runtimeState.hitCanvasBuildScheduled,
+    ...chunkState,
+    ...details,
+  });
+  recordRenderPerfMetric(windowMetricName, Math.max(0, nowMs() - Number(runtimeState.zoomGestureEndedAt || nowMs())), {
+    taskKey: normalizedTaskKey,
+    chunkState,
+    activePostReadyTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
+    postReadyPendingTaskCount: Math.max(0, Number(runtimeState.postReadyTaskDiagnostics?.pendingTaskCount || 0)),
+  });
+  return entry;
 }
 
 function markOverlaysDirty({
@@ -5283,9 +5579,16 @@ function scheduleRenderPhaseIdle() {
         flushPending: true,
       })
       : "noop";
-    const committedPendingChunkRefresh = pendingChunkRefreshStatus === "promotion-committed";
+    const promotionWorkActive = [
+      "promotion-committed",
+      "promotion-commit-started",
+      "promotion-commit-in-flight",
+      "promotion-started",
+      "promotion-in-flight",
+      "promotion-scheduled",
+    ].includes(String(pendingChunkRefreshStatus || ""));
     if (shouldStartExactAfterSettleFastPath()) {
-      if (committedPendingChunkRefresh) {
+      if (promotionWorkActive) {
         return;
       }
       runtimeState.deferExactAfterSettle = true;
@@ -5957,6 +6260,7 @@ function setCanvasSize({
     hitCanvas.height = scaledH;
   }
   resizeRenderPassCanvases();
+  invalidateInteractionComposite(reason || "resize");
   texturePatternCache.clear();
   textureNoiseTileCache.clear();
   clearProjectedBoundsCache();
@@ -6639,65 +6943,83 @@ function scheduleDeferredHeavyBorderMeshes() {
       scheduleDeferredHeavyBorderMeshes();
       return;
     }
-    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
-    if (!visibleCountryCodes.size) return;
-    const currentZoom = Math.max(0.0001, Number(runtimeState.zoomTransform?.k || 1));
-    const includeProvince = currentZoom >= PROVINCE_BORDERS_TRANSITION_END_ZOOM;
-    const includeLocal = currentZoom >= LOCAL_BORDERS_MIN_ZOOM;
-    const detailAdmMeta = currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
-      ? buildDetailAdmMeshSignature(visibleCountryCodes, currentZoom)
-      : { detailCountries: [], signature: "" };
-    const includeDetailAdm =
-      currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
-      && detailAdmMeta.detailCountries.length > 0
-      && (
-        detailAdmMeshBuildState.signature !== detailAdmMeta.signature
-        || detailAdmMeshBuildState.status === "idle"
-      );
-    if (!includeProvince && !includeLocal && !includeDetailAdm) return;
-    let changed = false;
-    let snapshotChanged = false;
-    visibleCountryCodes.forEach((countryCode) => {
-      const hadProvince = runtimeState.cachedProvinceBordersByCountry?.has(countryCode);
-      const hadLocal = runtimeState.cachedLocalBordersByCountry?.has(countryCode);
-      ensureCountrySourceBorderMeshes(countryCode, {
+    const taskKey = "deferred-heavy-border-meshes";
+    if (!beginInteractionRecoveryTask(taskKey)) {
+      scheduleDeferredHeavyBorderMeshes();
+      return;
+    }
+    const startedAt = nowMs();
+    try {
+      const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
+      if (!visibleCountryCodes.size) return;
+      const currentZoom = Math.max(0.0001, Number(runtimeState.zoomTransform?.k || 1));
+      const includeProvince = currentZoom >= PROVINCE_BORDERS_TRANSITION_END_ZOOM;
+      const includeLocal = currentZoom >= LOCAL_BORDERS_MIN_ZOOM;
+      const detailAdmMeta = currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
+        ? buildDetailAdmMeshSignature(visibleCountryCodes, currentZoom)
+        : { detailCountries: [], signature: "" };
+      const includeDetailAdm =
+        currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
+        && detailAdmMeta.detailCountries.length > 0
+        && (
+          detailAdmMeshBuildState.signature !== detailAdmMeta.signature
+          || detailAdmMeshBuildState.status === "idle"
+        );
+      if (!includeProvince && !includeLocal && !includeDetailAdm) return;
+      let changed = false;
+      let snapshotChanged = false;
+      visibleCountryCodes.forEach((countryCode) => {
+        const hadProvince = runtimeState.cachedProvinceBordersByCountry?.has(countryCode);
+        const hadLocal = runtimeState.cachedLocalBordersByCountry?.has(countryCode);
+        ensureCountrySourceBorderMeshes(countryCode, {
+          includeProvince,
+          includeLocal,
+        });
+        if ((includeProvince && !hadProvince && runtimeState.cachedProvinceBordersByCountry?.has(countryCode))
+          || (includeLocal && !hadLocal && runtimeState.cachedLocalBordersByCountry?.has(countryCode))) {
+          changed = true;
+          snapshotChanged = true;
+        }
+      });
+      if (includeDetailAdm) {
+        const previousDetailAdmStatus = String(detailAdmMeshBuildState.status || "idle");
+        const detailAdmMesh = buildDetailAdmBorderMesh(runtimeState.topologyDetail, new Set(detailAdmMeta.detailCountries));
+        if (isUsableMesh(detailAdmMesh)) {
+          runtimeState.cachedDetailAdmBorders = [detailAdmMesh];
+          detailAdmMeshBuildState = {
+            signature: detailAdmMeta.signature,
+            status: "ready",
+          };
+          changed = true;
+          snapshotChanged = true;
+        } else {
+          detailAdmMeshBuildState = {
+            signature: detailAdmMeta.signature,
+            status: "empty",
+          };
+          snapshotChanged =
+            snapshotChanged
+            || previousDetailAdmStatus !== "empty"
+            || runtimeState.cachedDetailAdmBorders.length > 0;
+        }
+      }
+      if (snapshotChanged) {
+        syncStaticMeshSnapshot();
+      }
+      if (changed) {
+        invalidateRenderPasses("borders", "deferred-country-border-meshes");
+        render();
+      }
+      recordInteractionRecoveryTaskMetric(taskKey, nowMs() - startedAt, {
+        visibleCountryCount: visibleCountryCodes.size,
+        changed,
         includeProvince,
         includeLocal,
+        includeDetailAdm,
+        yieldCount: 0,
       });
-      if ((includeProvince && !hadProvince && runtimeState.cachedProvinceBordersByCountry?.has(countryCode))
-        || (includeLocal && !hadLocal && runtimeState.cachedLocalBordersByCountry?.has(countryCode))) {
-        changed = true;
-        snapshotChanged = true;
-      }
-    });
-    if (includeDetailAdm) {
-      const previousDetailAdmStatus = String(detailAdmMeshBuildState.status || "idle");
-      const detailAdmMesh = buildDetailAdmBorderMesh(runtimeState.topologyDetail, new Set(detailAdmMeta.detailCountries));
-      if (isUsableMesh(detailAdmMesh)) {
-        runtimeState.cachedDetailAdmBorders = [detailAdmMesh];
-        detailAdmMeshBuildState = {
-          signature: detailAdmMeta.signature,
-          status: "ready",
-        };
-        changed = true;
-        snapshotChanged = true;
-      } else {
-        detailAdmMeshBuildState = {
-          signature: detailAdmMeta.signature,
-          status: "empty",
-        };
-        snapshotChanged =
-          snapshotChanged
-          || previousDetailAdmStatus !== "empty"
-          || runtimeState.cachedDetailAdmBorders.length > 0;
-      }
-    }
-    if (snapshotChanged) {
-      syncStaticMeshSnapshot();
-    }
-    if (changed) {
-      invalidateRenderPasses("borders", "deferred-country-border-meshes");
-      render();
+    } finally {
+      endInteractionRecoveryTask(taskKey);
     }
   }, {
     timeout: 360,
@@ -7282,7 +7604,6 @@ function drawHitCanvas() {
     return false;
   }
 
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const t = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   const k = Math.max(0.0001, t.k || 1);
 
@@ -7298,30 +7619,24 @@ function drawHitCanvas() {
   hitContext.scale(k, k);
 
   const visibleSpatialItems = collectVisibleLandSpatialItems();
-  if (visibleSpatialItems) {
-    visibleSpatialItems.forEach((item) => {
-      const key = runtimeState.idToKey.get(item.id);
-      if (!key || !item?.feature) return;
-      if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
-      hitContext.beginPath();
-      pathHitCanvas(item.feature);
-      hitContext.fillStyle = keyToHitColor(key);
-      hitContext.fill();
+  if (visibleSpatialItems === null) {
+    hitContext.restore();
+    runtimeState.hitCanvasDirty = true;
+    recordRenderPerfMetric("hitCanvasSpatialIndexUnavailable", 0, {
+      reason: "spatial-index-unavailable",
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
     });
-  } else {
-    runtimeState.landData.features.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `feature-${index}`;
-      const key = runtimeState.idToKey.get(id);
-      if (!key) return;
-      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
-      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
-      if (!pathBoundsInScreen(feature)) return;
-      hitContext.beginPath();
-      pathHitCanvas(feature);
-      hitContext.fillStyle = keyToHitColor(key);
-      hitContext.fill();
-    });
+    return false;
   }
+  visibleSpatialItems.forEach((item) => {
+    const key = runtimeState.idToKey.get(item.id);
+    if (!key || !item?.feature) return;
+    if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
+    hitContext.beginPath();
+    pathHitCanvas(item.feature);
+    hitContext.fillStyle = keyToHitColor(key);
+    hitContext.fill();
+  });
 
   hitContext.restore();
   runtimeState.hitCanvasDirty = false;
@@ -7783,6 +8098,64 @@ function rankCandidates(candidates, lonLat, { eventType = "unknown", targetType 
   return ranked;
 }
 
+function findFirstContainingCandidate(candidates, lonLat, { eventType = "hover", targetType = "unknown" } = {}) {
+  if (!Array.isArray(candidates) || !candidates.length) return null;
+  const startedAt = nowMs();
+  let geoContainsCount = 0;
+  const ordered = candidates
+    .map((candidate) => {
+      const feature = candidate.item?.feature;
+      const source = String(candidate.item?.source || feature?.properties?.__source || "primary");
+      const bboxArea = Number.isFinite(candidate.item?.bboxArea)
+        ? candidate.item.bboxArea
+        : Math.max(0, (candidate.item.maxX - candidate.item.minX) * (candidate.item.maxY - candidate.item.minY));
+      return {
+        ...candidate,
+        sourceRank: source === "detail" ? 0 : 1,
+        bboxArea,
+      };
+    })
+    .sort((a, b) => {
+      if (a.sourceRank !== b.sourceRank) return a.sourceRank - b.sourceRank;
+      if (a.bboxArea !== b.bboxArea) return a.bboxArea - b.bboxArea;
+      if (a.distanceProj !== b.distanceProj) return a.distanceProj - b.distanceProj;
+      return String(a.item?.id || "").localeCompare(String(b.item?.id || ""));
+    });
+  for (const candidate of ordered) {
+    const feature = candidate.item?.feature;
+    const hitGeometry = candidate.item?.hitGeometry || feature;
+    if (!hitGeometry || !lonLat || !globalThis.d3?.geoContains) continue;
+    geoContainsCount += 1;
+    try {
+      if (globalThis.d3.geoContains(hitGeometry, lonLat)) {
+        recordInteractionDurationMetric("interactionHitRankDuration", nowMs() - startedAt, {
+          candidateCount: candidates.length,
+          geoContainsCount,
+          containsGeoCount: 1,
+          eventType,
+          targetType,
+          fastPath: "hover-first-containing",
+        });
+        return {
+          ...candidate,
+          containsGeo: true,
+        };
+      }
+    } catch (_error) {
+      // Ignore malformed geometry and continue with the next candidate.
+    }
+  }
+  recordInteractionDurationMetric("interactionHitRankDuration", nowMs() - startedAt, {
+    candidateCount: candidates.length,
+    geoContainsCount,
+    containsGeoCount: 0,
+    eventType,
+    targetType,
+    fastPath: "hover-first-containing",
+  });
+  return null;
+}
+
 function getPointerProjectionPosition(event) {
   if (!mapSvg || !projection || !globalThis.d3) return null;
   const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
@@ -7934,6 +8307,17 @@ function getLandHitFromPointer(
   }
 
   const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
+  if (eventType === "hover" && !enableSnap) {
+    const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
+    return strictHoverHit
+      ? toHitResult(strictHoverHit, {
+        viaSnap: false,
+        strict: true,
+        zoomK: pointer.zoomK,
+        targetType: "land",
+      })
+      : createHitResult();
+  }
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
   if (strictRanked.length > 0) {
     const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
@@ -7996,6 +8380,18 @@ function getWaterHitFromPointer(
   }
 
   const strictCandidates = collectWaterGridCandidates(pointer.px, pointer.py, 0);
+  if (eventType === "hover" && !enableSnap) {
+    const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "water" });
+    if (!strictHoverHit) return createHitResult();
+    if (isMacroOceanWaterRegion(strictHoverHit.item?.feature)) return createHitResult();
+    if (shouldSuppressOpenOceanHit(strictHoverHit, pointer)) return createHitResult();
+    return toHitResult(strictHoverHit, {
+      viaSnap: false,
+      strict: true,
+      zoomK: pointer.zoomK,
+      targetType: "water",
+    });
+  }
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "water" });
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
@@ -8054,6 +8450,17 @@ function getSpecialHitFromPointer(
   }
 
   const strictCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
+  if (eventType === "hover" && !enableSnap) {
+    const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "special" });
+    return strictHoverHit
+      ? toHitResult(strictHoverHit, {
+        viaSnap: false,
+        strict: true,
+        zoomK: pointer.zoomK,
+        targetType: "special",
+      })
+      : createHitResult();
+  }
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "special" });
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
@@ -8565,23 +8972,39 @@ function scheduleSecondarySpatialIndexBuild({
       scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
       return;
     }
+    const taskKey = "secondary-spatial-index";
+    if (!beginInteractionRecoveryTask(taskKey)) {
+      scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
+      return;
+    }
     const reasons = Array.from(pendingSecondarySpatialBuildReasons);
     pendingSecondarySpatialBuildReasons.clear();
     const startedAt = nowMs();
-    resetSecondarySpatialIndexState();
-    buildSecondarySpatialIndexes({
-      allowComputeMissingBounds: true,
-    });
-    runtimeState.hitCanvasDirty = true;
-    scheduleHitCanvasBuildIfNeeded({
-      reason: `${normalizedReason}-hit-canvas`,
-    });
-    recordRenderPerfMetric("buildSecondarySpatialIndex", nowMs() - startedAt, {
-      reason: reasons.join(",") || normalizedReason,
-      reasons,
-      waterItems: runtimeState.waterSpatialItems.length,
-      specialItems: runtimeState.specialSpatialItems.length,
-    });
+    try {
+      resetSecondarySpatialIndexState();
+      buildSecondarySpatialIndexes({
+        allowComputeMissingBounds: true,
+      });
+      runtimeState.hitCanvasDirty = true;
+      scheduleHitCanvasBuildIfNeeded({
+        reason: `${normalizedReason}-hit-canvas`,
+      });
+      recordRenderPerfMetric("buildSecondarySpatialIndex", nowMs() - startedAt, {
+        reason: reasons.join(",") || normalizedReason,
+        reasons,
+        waterItems: runtimeState.waterSpatialItems.length,
+        specialItems: runtimeState.specialSpatialItems.length,
+      });
+      recordInteractionRecoveryTaskMetric(taskKey, nowMs() - startedAt, {
+        reason: reasons.join(",") || normalizedReason,
+        reasonCount: reasons.length,
+        waterItems: runtimeState.waterSpatialItems.length,
+        specialItems: runtimeState.specialSpatialItems.length,
+        yieldCount: 0,
+      });
+    } finally {
+      endInteractionRecoveryTask(taskKey);
+    }
   }, { timeout });
 }
 
@@ -8741,12 +9164,17 @@ async function buildFullInteractionInfrastructureAfterStartup({
       inFlight: true,
     });
     try {
+      const recoveryStartedAt = nowMs();
+      let yieldCount = 0;
       while (isInteractionRecoveryBlocked()) {
+        yieldCount += 1;
         await yieldToMain();
       }
       ensureSovereigntyState({ force: true });
+      yieldCount += 1;
       await yieldToMain();
       rebuildResolvedColors();
+      yieldCount += 1;
       await yieldToMain();
       if (chunked) {
         await buildSpatialIndexChunked({
@@ -8776,6 +9204,11 @@ async function buildFullInteractionInfrastructureAfterStartup({
         ready: true,
         inFlight: false,
       });
+      recordInteractionRecoveryTaskMetric("post-ready-full-interaction-infra", nowMs() - recoveryStartedAt, {
+        chunked: !!chunked,
+        buildHitCanvas: !!buildHitCanvas,
+        yieldCount,
+      }, { benchmarkInteraction: false });
       return true;
     } catch (error) {
       setInteractionInfrastructureState("basic-ready", {
@@ -17831,6 +18264,63 @@ function canDrawTransformedPass(passName, cache = getRenderPassCacheState()) {
   return !!getPassReferenceTransform(passName);
 }
 
+function canBuildInteractionComposite(cache = getRenderPassCacheState()) {
+  return INTERACTION_COMPOSITE_PASS_NAMES.every((passName) => canDrawTransformedPass(passName, cache));
+}
+
+function buildInteractionComposite(currentTransform, timings) {
+  if (!context?.canvas || !canBuildInteractionComposite()) return false;
+  const cache = getRenderPassCacheState();
+  const compositeCanvas = ensureInteractionCompositeCanvas();
+  const compositeContext = compositeCanvas.getContext("2d");
+  if (!compositeContext) return false;
+  const startedAt = nowMs();
+  compositeContext.setTransform(1, 0, 0, 1, 0, 0);
+  compositeContext.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+  composeRenderPassesToTarget(compositeContext, INTERACTION_COMPOSITE_PASS_NAMES, currentTransform);
+  const identity = getVisibleFrameIdentity(currentTransform);
+  cache.interactionComposite.referenceTransform = cloneZoomTransform(currentTransform);
+  cache.interactionComposite.signature = getInteractionCompositeSignature(cache);
+  cache.interactionComposite.valid = true;
+  cache.interactionComposite.capturedAt = Date.now();
+  cache.interactionComposite.reason = String(runtimeState.renderPhase || "interaction");
+  cache.interactionComposite.rejectedReason = "";
+  cache.interactionComposite.scenarioId = identity.scenarioId;
+  cache.interactionComposite.topologyRevision = identity.topologyRevision;
+  cache.interactionComposite.dpr = identity.dpr;
+  cache.interactionComposite.pixelWidth = identity.pixelWidth;
+  cache.interactionComposite.pixelHeight = identity.pixelHeight;
+  incrementPerfCounter("interactionCompositeBuilds");
+  recordPassTiming(timings, "interactionCompositeBuild", startedAt);
+  recordRenderPerfMetric("interactionCompositeBuild", nowMs() - startedAt, {
+    phase: String(runtimeState.renderPhase || ""),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    passCount: INTERACTION_COMPOSITE_PASS_NAMES.length,
+  });
+  return true;
+}
+
+function drawInteractionComposite(currentTransform) {
+  const cache = getRenderPassCacheState();
+  const composite = cache.interactionComposite || {};
+  if (!canDrawInteractionComposite(currentTransform, cache)) {
+    return false;
+  }
+  const current = cloneZoomTransform(currentTransform);
+  const reference = cloneZoomTransform(composite.referenceTransform);
+  const scaleRatio = current.k / Math.max(reference.k, 0.0001);
+  const dx = current.x - (reference.x * scaleRatio);
+  const dy = current.y - (reference.y * scaleRatio);
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.translate(dx * runtimeState.dpr, dy * runtimeState.dpr);
+  context.scale(scaleRatio, scaleRatio);
+  context.drawImage(composite.canvas, 0, 0);
+  context.restore();
+  incrementPerfCounter("interactionCompositeReuses");
+  return true;
+}
+
 function drawTransformedPass(passName, currentTransform, referenceTransform = null) {
   const cache = getRenderPassCacheState();
   const passCanvas = cache.canvases?.[passName];
@@ -17910,9 +18400,23 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   const currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   const compositeStart = nowMs();
   const cache = getRenderPassCacheState();
-  const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) => passName !== "labels");
+  const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) =>
+    !INTERACTION_COMPOSITE_PASS_NAMES.includes(passName) && passName !== "labels"
+  );
   // Preflight avoids clearing the visible canvas when a cached pass is missing.
   if (TRANSFORMED_FRAME_PASS_NAMES.some((passName) => !canDrawTransformedPass(passName, cache))) {
+    return false;
+  }
+  const compositeReady = canDrawInteractionComposite(currentTransform, cache)
+    || buildInteractionComposite(currentTransform, timings);
+  if (!compositeReady) {
+    recordRenderPerfMetric("interactionCompositeUnavailable", 0, {
+      phase: String(runtimeState.renderPhase || ""),
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    });
+    return false;
+  }
+  if (!canDrawInteractionComposite(currentTransform, cache)) {
     return false;
   }
   resetMainCanvas();
@@ -17930,7 +18434,8 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
       zoomEndedAt: Number(runtimeState.zoomGestureEndedAt || 0),
     });
   }
-  const drewAll = transformedPasses.every((passName) =>
+  const drewComposite = drawInteractionComposite(currentTransform);
+  const drewAll = drewComposite && transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform)
   );
   if (!drewAll) return false;
@@ -18012,6 +18517,8 @@ function drawCanvas() {
     || (runtimeState.renderPhase === RENDER_PHASE_IDLE && runtimeState.deferExactAfterSettle);
   let drewFrame = false;
   let usedLastGoodFallback = false;
+  let usedBaseVisibleFallback = false;
+  let keptPreviousPixels = false;
   if (useTransformedFrame) {
     drewFrame = drawTransformedFrameFromCaches(frameTimings, {
       interactiveBorders: runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle,
@@ -18020,9 +18527,13 @@ function drawCanvas() {
       drewFrame = drawLastGoodFrameFallback(runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
       usedLastGoodFallback = drewFrame;
       if (!drewFrame) {
-        const cache = getRenderPassCacheState();
-        if (cache.lastGoodFrame?.valid) {
-          noteBlackFrame("missing-fast-frame-and-fallback");
+        if (runtimeState.renderPhase === RENDER_PHASE_INTERACTING && runtimeState.firstVisibleFramePainted) {
+          noteMissingVisibleFrameSkippedDuringInteraction("missing-fast-frame-no-continuity");
+          keptPreviousPixels = true;
+          drewFrame = true;
+        } else {
+          drewFrame = drawBaseVisibleFrameFallback("missing-fast-frame-no-continuity");
+          usedBaseVisibleFallback = drewFrame;
         }
       }
     }
@@ -18042,7 +18553,10 @@ function drawCanvas() {
     timings: frameTimings,
     transform: cloneZoomTransform(runtimeState.zoomTransform),
   };
-  if (drewFrame && !usedLastGoodFallback && (!useTransformedFrame || runtimeState.renderPhase !== RENDER_PHASE_INTERACTING)) {
+  if (drewFrame && !usedBaseVisibleFallback && !keptPreviousPixels) {
+    markFirstVisibleFramePainted(usedLastGoodFallback ? "last-good-frame" : (useTransformedFrame ? "fast-frame" : "exact-frame"));
+  }
+  if (drewFrame && !usedLastGoodFallback && !usedBaseVisibleFallback && (!useTransformedFrame || runtimeState.renderPhase !== RENDER_PHASE_INTERACTING)) {
     captureLastGoodFrame(useTransformedFrame ? "fast-frame" : "exact-frame", runtimeState.zoomTransform);
   }
   incrementPerfCounter("frames");
@@ -18056,7 +18570,11 @@ function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettlePr
     type: "timeout",
     id: globalThis.setTimeout(() => {
     runtimeState.exactAfterSettleHandle = null;
-    if (runtimeState.renderPhase !== RENDER_PHASE_IDLE || !runtimeState.deferExactAfterSettle) return;
+    if (!runtimeState.deferExactAfterSettle) return;
+    if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
+      scheduleExactAfterSettleRefresh(resolvedProfile);
+      return;
+    }
     const callbackStartedAt = nowMs();
     const settleWindowElapsedMs = Math.max(0, callbackStartedAt - scheduleStartedAt);
     const reuseDecision = getContextBaseReuseDecision();
@@ -20078,6 +20596,13 @@ function updatePerfOverlay() {
 
 function render() {
   const startedAt = perfIsEnabled() ? nowMs() : 0;
+  if (runtimeState.scenarioChunkPromotionRenderLocked) {
+    recordRenderPerfMetric("scenarioChunkPromotionRenderLocked", 0, {
+      phase: String(runtimeState.renderPhase || ""),
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    });
+    return;
+  }
   drawCanvas();
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
@@ -22292,9 +22817,9 @@ function initMap({
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
   renderPassCache.contextScenarioLayerCache = {};
-  renderPassCache.lastGoodFrame.valid = false;
-  renderPassCache.lastGoodFrame.referenceTransform = null;
-  renderPassCache.lastGoodFrame.reason = "init-map";
+  clearLastGoodFrame("init-map");
+  invalidateInteractionComposite("init-map");
+  resetFirstVisibleFramePainted("init-map");
   renderPassCache.perfOverlayEnabled = isPerfOverlayEnabled();
   ensureLayerDataFromTopology();
   rebuildPoliticalLandCollections();
@@ -22409,9 +22934,9 @@ function setMapData({
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
   renderPassCache.contextScenarioLayerCache = {};
-  renderPassCache.lastGoodFrame.valid = false;
-  renderPassCache.lastGoodFrame.referenceTransform = null;
-  renderPassCache.lastGoodFrame.reason = "set-map-data";
+  clearLastGoodFrame("set-map-data");
+  invalidateInteractionComposite("set-map-data");
+  resetFirstVisibleFramePainted("set-map-data");
   invalidateAllRenderPasses("set-map-data");
   markAllOverlaysDirty();
   queueTooltipUpdate({ visible: false });
@@ -22607,59 +23132,97 @@ async function runDeferredScenarioChunkPromotionInfraRefresh({
     });
     return false;
   }
-  const startedAt = nowMs();
-  buildIndex();
-  await yieldToMain();
-  if (promotionVersion !== scenarioChunkPromotionVersion) {
-    return false;
-  }
-  await buildSpatialIndexChunked({
-    includeSecondary: false,
-    keepReady: true,
-  });
-  if (promotionVersion !== scenarioChunkPromotionVersion) {
-    return false;
-  }
-  scheduleSecondarySpatialIndexBuild({
-    reason: `${reason}-secondary-spatial`,
-  });
-  if (runtimeState.hitCanvasDirty) {
-    scheduleHitCanvasBuildIfNeeded({
-      reason: `${reason}-hit-canvas`,
+  const taskKey = "scenario-chunk-promotion-infra";
+  if (!beginInteractionRecoveryTask(taskKey)) {
+    scheduleDeferredScenarioChunkPromotionInfraRefresh({
+      reason,
+      suppressRender,
+      promotionVersion,
+      hasPoliticalGeometryChange,
+      refreshOpeningOwnerBorders,
     });
+    return false;
   }
-  if (hasPoliticalGeometryChange) {
-    ensureSovereigntyState();
-    if (refreshOpeningOwnerBorders !== false) {
-      refreshScenarioOpeningOwnerBorders({
-        renderNow: false,
-        reason: `${reason}-opening`,
+  const startedAt = nowMs();
+  const previousInteractionInfrastructureStage = String(runtimeState.interactionInfrastructureStage || "");
+  let restoredInteractionInfrastructureState = false;
+  let yieldCount = 1;
+  try {
+    buildIndex();
+    await yieldToMain();
+    if (promotionVersion !== scenarioChunkPromotionVersion) {
+      return false;
+    }
+    await buildSpatialIndexChunked({
+      includeSecondary: false,
+      keepReady: true,
+    });
+    setInteractionInfrastructureState(previousInteractionInfrastructureStage || "basic-ready", {
+      ready: true,
+      inFlight: false,
+    });
+    restoredInteractionInfrastructureState = true;
+    if (promotionVersion !== scenarioChunkPromotionVersion) {
+      return false;
+    }
+    scheduleSecondarySpatialIndexBuild({
+      reason: `${reason}-secondary-spatial`,
+    });
+    if (runtimeState.hitCanvasDirty) {
+      scheduleHitCanvasBuildIfNeeded({
+        reason: `${reason}-hit-canvas`,
       });
     }
-    invalidateBorderCache();
-    updateDynamicBorderStatusUI();
-    updateSpecialZonesPaths();
-    renderSpecialZoneEditorOverlay();
+    if (hasPoliticalGeometryChange) {
+      ensureSovereigntyState();
+      if (refreshOpeningOwnerBorders !== false) {
+        refreshScenarioOpeningOwnerBorders({
+          renderNow: false,
+          reason: `${reason}-opening`,
+        });
+      }
+      invalidateBorderCache();
+      updateDynamicBorderStatusUI();
+      updateSpecialZonesPaths();
+      renderSpecialZoneEditorOverlay();
+    }
+    if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
+      runtimeState.runtimeChunkLoadState.pendingInfraPromotion = null;
+    }
+    if (!suppressRender) {
+      render();
+    }
+    const infraDurationMs = nowMs() - startedAt;
+    recordRenderPerfMetric("scenarioChunkPromotionInfraStage", infraDurationMs, {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      suppressRender: !!suppressRender,
+      promotionVersion,
+      hasPoliticalGeometryChange: !!hasPoliticalGeometryChange,
+    });
+    recordRenderPerfMetric("chunkPromotionInfraMs", infraDurationMs, {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      suppressRender: !!suppressRender,
+      promotionVersion,
+      hasPoliticalGeometryChange: !!hasPoliticalGeometryChange,
+    });
+    recordInteractionRecoveryTaskMetric(taskKey, infraDurationMs, {
+      reason: String(reason || "scenario-chunk-promotion"),
+      suppressRender: !!suppressRender,
+      promotionVersion,
+      hasPoliticalGeometryChange: !!hasPoliticalGeometryChange,
+      refreshOpeningOwnerBorders: refreshOpeningOwnerBorders !== false,
+      yieldCount,
+    });
+    return true;
+  } finally {
+    if (!restoredInteractionInfrastructureState) {
+      setInteractionInfrastructureState(previousInteractionInfrastructureStage || "basic-ready", {
+        ready: true,
+        inFlight: false,
+      });
+    }
+    endInteractionRecoveryTask(taskKey);
   }
-  if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
-    runtimeState.runtimeChunkLoadState.pendingInfraPromotion = null;
-  }
-  if (!suppressRender) {
-    render();
-  }
-  recordRenderPerfMetric("scenarioChunkPromotionInfraStage", nowMs() - startedAt, {
-    activeScenarioId: String(runtimeState.activeScenarioId || ""),
-    suppressRender: !!suppressRender,
-    promotionVersion,
-    hasPoliticalGeometryChange: !!hasPoliticalGeometryChange,
-  });
-  recordRenderPerfMetric("chunkPromotionInfraMs", nowMs() - startedAt, {
-    activeScenarioId: String(runtimeState.activeScenarioId || ""),
-    suppressRender: !!suppressRender,
-    promotionVersion,
-    hasPoliticalGeometryChange: !!hasPoliticalGeometryChange,
-  });
-  return true;
 }
 
 function refreshMapDataForScenarioChunkPromotion({
@@ -22671,6 +23234,16 @@ function refreshMapDataForScenarioChunkPromotion({
   refreshPlan = null,
 } = {}) {
   const startedAt = nowMs();
+  const runtimeChunkLoadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : null;
+  const pendingVisualPromotion = runtimeChunkLoadState?.pendingVisualPromotion || null;
+  const pendingPromotion = runtimeChunkLoadState?.pendingPromotion || null;
+  const promotionQueuedAt = Number(pendingVisualPromotion?.queuedAt || pendingPromotion?.queuedAt || 0);
+  const requiredChunkCount = Array.isArray(pendingVisualPromotion?.requiredChunkIds)
+    ? pendingVisualPromotion.requiredChunkIds.length
+    : 0;
+  const requiredPoliticalChunkCount = Math.max(0, Number(pendingPromotion?.requiredPoliticalChunkCount || 0));
   const hasPoliticalChange = !!hasPoliticalPayloadChange
     || (Array.isArray(politicalFeatureIds) && politicalFeatureIds.length > 0);
   if (hasPoliticalChange) {
@@ -22747,6 +23320,15 @@ function refreshMapDataForScenarioChunkPromotion({
   }
   recordRenderPerfMetric("scenarioChunkPromotionVisualStage", nowMs() - startedAt, {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    reason: String(reason || "scenario-chunk-promotion"),
+    selectionVersion: Math.max(0, Number(pendingVisualPromotion?.selectionVersion || pendingPromotion?.selectionVersion || runtimeChunkLoadState?.selectionVersion || 0)),
+    requiredPoliticalChunkCount,
+    requiredChunkCount,
+    queuedAt: promotionQueuedAt,
+    queueMs: promotionQueuedAt > 0 ? Math.max(0, startedAt - promotionQueuedAt) : 0,
+    promotionRetryCount: Math.max(0, Number(runtimeChunkLoadState?.promotionRetryCount || 0)),
+    renderNow: !suppressRender,
+    hasPoliticalGeometryChange: hasPoliticalChange,
     suppressRender: !!suppressRender,
     promotedFeatureCount: Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
       ? runtimeState.scenarioPoliticalChunkData.features.length
@@ -22833,6 +23415,9 @@ function refreshMapDataForScenarioApply({
   runtimeState.topologyRevision = Number(runtimeState.topologyRevision || 0) + 1;
   runtimeState.hitCanvasDirty = true;
   runtimeState.hitCanvasTopologyRevision = 0;
+  clearLastGoodFrame("scenario-apply-refresh");
+  invalidateInteractionComposite("scenario-apply-refresh");
+  resetFirstVisibleFramePainted("scenario-apply-refresh");
   const targetPasses = rendererRefreshPlan.targetPasses;
   invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
   clearRenderPassReferenceTransforms(targetPasses);

@@ -261,6 +261,14 @@ function summarizeSnapshot(snapshot) {
     rebuildStaticMeshesMs: finiteNumber(renderPerfMetrics.rebuildStaticMeshes?.durationMs),
     invalidateBorderCacheMs: finiteNumber(renderPerfMetrics.invalidateBorderCache?.durationMs),
     scenarioChunkPromotionInfraStageMs: finiteNumber(renderPerfMetrics.scenarioChunkPromotionInfraStage?.durationMs),
+    scenarioChunkPromotionVisualStageMs: finiteNumber(renderPerfMetrics.scenarioChunkPromotionVisualStage?.durationMs),
+    zoomEndToChunkVisibleMs: finiteNumber(renderPerfMetrics.zoomEndToChunkVisibleMs?.durationMs),
+    interactionRecoveryWindowMs: finiteNumber(renderPerfMetrics.interactionRecoveryWindowMs?.durationMs),
+    interactionRecoveryTaskMs: finiteNumber(renderPerfMetrics.interactionRecoveryTaskMs?.durationMs),
+    continuityFrameStaleAgeMs: finiteNumber(renderPerfMetrics.continuityFrameStaleAgeMs?.durationMs),
+    missingVisibleFrameCount: finiteNumber(renderPerfMetrics.missingVisibleFrameCount?.count),
+    postReadyMaxPendingAgeMs: finiteNumber(renderPerfMetrics.postReadySchedulerState?.maxPendingAgeMs),
+    postReadyMaxRetryCount: finiteNumber(renderPerfMetrics.postReadySchedulerState?.maxRetryCount),
     drawContextScenarioPassMs: finiteNumber(renderPerfMetrics.drawContextScenarioPass?.durationMs),
     setMapDataFirstPaintMs: finiteNumber(renderPerfMetrics.setMapDataFirstPaint?.durationMs),
     settleExactRefreshMs: finiteNumber(renderPerfMetrics.settleExactRefresh?.durationMs),
@@ -323,6 +331,14 @@ function aggregateRuns(runs) {
     "rebuildStaticMeshesMs",
     "invalidateBorderCacheMs",
     "scenarioChunkPromotionInfraStageMs",
+    "scenarioChunkPromotionVisualStageMs",
+    "zoomEndToChunkVisibleMs",
+    "interactionRecoveryWindowMs",
+    "interactionRecoveryTaskMs",
+    "continuityFrameStaleAgeMs",
+    "missingVisibleFrameCount",
+    "postReadyMaxPendingAgeMs",
+    "postReadyMaxRetryCount",
     "drawContextScenarioPassMs",
     "setMapDataFirstPaintMs",
     "settleExactRefreshMs",
@@ -497,6 +513,14 @@ function buildMarkdown(report) {
     lines.push(formatMetricRow("rebuild static meshes", summary.rebuildStaticMeshesMs));
     lines.push(formatMetricRow("invalidate border cache", summary.invalidateBorderCacheMs));
     lines.push(formatMetricRow("scenario chunk promotion infra stage", summary.scenarioChunkPromotionInfraStageMs));
+    lines.push(formatMetricRow("scenario chunk promotion visual stage", summary.scenarioChunkPromotionVisualStageMs));
+    lines.push(formatMetricRow("zoom end to chunk visible", summary.zoomEndToChunkVisibleMs));
+    lines.push(formatMetricRow("interaction recovery window", summary.interactionRecoveryWindowMs));
+    lines.push(formatMetricRow("interaction recovery task", summary.interactionRecoveryTaskMs));
+    lines.push(formatMetricRow("continuity frame stale age", summary.continuityFrameStaleAgeMs));
+    lines.push(formatMetricRow("missing visible frame count", summary.missingVisibleFrameCount));
+    lines.push(formatMetricRow("post-ready max pending age", summary.postReadyMaxPendingAgeMs));
+    lines.push(formatMetricRow("post-ready max retry count", summary.postReadyMaxRetryCount));
     lines.push(formatMetricRow("draw context scenario pass", summary.drawContextScenarioPassMs));
     lines.push(formatMetricRow("setMapData first paint", summary.setMapDataFirstPaintMs));
     lines.push(formatMetricRow("settle exact refresh", summary.settleExactRefreshMs));
@@ -542,6 +566,18 @@ async function writeBaselineArtifacts(options, report) {
   }
 }
 
+const PERF_REPORT_CONTRACT_FIELDS = [
+  { key: "schemaVersion", expected: 1 },
+  { key: "benchmarkMetricsSchemaVersion", expected: "3.1" },
+  { key: "probeSchema", expected: "mc_perf_snapshot" },
+];
+
+function getPerfReportContractMismatches(report, label = "report") {
+  return PERF_REPORT_CONTRACT_FIELDS
+    .filter(({ key, expected }) => report?.[key] !== expected)
+    .map(({ key, expected }) => `${label}.${key} expected=${JSON.stringify(expected)} actual=${JSON.stringify(report?.[key])}`);
+}
+
 function compareAgainstBaseline(currentReport, baselineReport, threshold) {
   const failures = [];
   for (const scenarioId of Object.keys(currentReport.scenarios)) {
@@ -573,6 +609,12 @@ function compareAgainstBaseline(currentReport, baselineReport, threshold) {
 function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
   if (!baselineReport || typeof baselineReport !== "object") {
     throw new Error(`[perf-baseline] Baseline report is invalid: ${baselinePath}`);
+  }
+  const baselineContractMismatches = getPerfReportContractMismatches(baselineReport, "baseline");
+  if (baselineContractMismatches.length) {
+    throw new Error(
+      `[perf-baseline] Baseline report schema mismatch: ${baselinePath}\n${baselineContractMismatches.map((item) => `- ${item}`).join("\n")}`
+    );
   }
   const baselineScenarios = baselineReport.scenarios;
   if (!baselineScenarios || typeof baselineScenarios !== "object") {
@@ -609,7 +651,10 @@ function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
 }
 
 function collectBaselineContractMismatches(currentReport, baselineReport) {
-  const mismatches = [];
+  const mismatches = [
+    ...getPerfReportContractMismatches(currentReport, "current"),
+    ...getPerfReportContractMismatches(baselineReport, "baseline"),
+  ];
   const baselinePlatform = normalizeOsPlatform(
     baselineReport?.environment?.platform || baselineReport?.environment?.os
   );
@@ -662,6 +707,9 @@ async function main() {
 
   const measurement = await runMeasurements(options);
   const report = {
+    schemaVersion: 1,
+    benchmarkMetricsSchemaVersion: "3.1",
+    probeSchema: "mc_perf_snapshot",
     generatedAt: new Date().toISOString(),
     gitHead,
     mode: options.mode,

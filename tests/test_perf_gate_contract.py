@@ -41,6 +41,11 @@ class PerfGateContractTest(unittest.TestCase):
 
     def test_perf_script_locks_hardening_contract(self):
         script = PERF_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('benchmarkMetricsSchemaVersion: "3.1"', script)
+        self.assertIn('probeSchema: "mc_perf_snapshot"', script)
+        self.assertIn('const PERF_REPORT_CONTRACT_FIELDS = [', script)
+        self.assertIn('getPerfReportContractMismatches(baselineReport, "baseline")', script)
+        self.assertIn('getPerfReportContractMismatches(currentReport, "current")', script)
         self.assertIn('const DEFAULT_GATE_SCENARIOS = ["tno_1962", "hoi4_1939"];', script)
         self.assertIn('if (activeScenarioId !== normalizeScenarioId(scenarioId)) {', script)
         self.assertIn('{ key: "scenarioAppliedMs", label: "scenarioAppliedMs" }', script)
@@ -51,6 +56,14 @@ class PerfGateContractTest(unittest.TestCase):
             "scenarioFullHydrateMs",
             "interactionInfraMs",
             "scenarioChunkPromotionInfraStageMs",
+            "scenarioChunkPromotionVisualStageMs",
+            "zoomEndToChunkVisibleMs",
+            "interactionRecoveryWindowMs",
+            "interactionRecoveryTaskMs",
+            "continuityFrameStaleAgeMs",
+            "missingVisibleFrameCount",
+            "postReadyMaxPendingAgeMs",
+            "postReadyMaxRetryCount",
             "startupBundleSource",
             "loadScenarioBundleMs",
             "drawContextScenarioPassMs",

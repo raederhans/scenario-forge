@@ -418,7 +418,7 @@ export function createDeferredDetailPromotionOwner({
       if (!runtimeState.detailDeferred || runtimeState.detailPromotionCompleted || runtimeState.detailPromotionInFlight) {
         return;
       }
-      if (!canRunPostReadyIdleWork?.()) {
+      if (!canRunPostReadyIdleWork?.({ allowChunkBacklog: true })) {
         scheduleDeferredDetailPromotion(renderDispatcher);
         return;
       }

@@ -177,6 +177,16 @@ export function initLongAnimationFrameObserver() {
         activePostReadyTaskAgeMs: runtimeState.activePostReadyTaskStartedAt
           ? Math.max(0, nowMs() - Number(runtimeState.activePostReadyTaskStartedAt || 0))
           : 0,
+        pendingPostReadyTaskCount: Math.max(0, Number(runtimeState.postReadyTaskDiagnostics?.pendingTaskCount || 0)),
+        pendingPostReadyTaskKeys: Array.isArray(runtimeState.postReadyTaskDiagnostics?.pendingTaskKeys)
+          ? [...runtimeState.postReadyTaskDiagnostics.pendingTaskKeys]
+          : [],
+        postReadyMaxPendingAgeMs: Math.max(0, Number(runtimeState.postReadyTaskDiagnostics?.maxPendingAgeMs || 0)),
+        postReadyMaxRetryCount: Math.max(0, Number(runtimeState.postReadyTaskDiagnostics?.maxRetryCount || 0)),
+        interactionRecoveryTaskKey: String(runtimeState.renderPerfMetrics?.interactionRecoveryTaskMs?.taskKey || ""),
+        activeInteractionRecoveryTaskKey: String(runtimeState.activeInteractionRecoveryTaskKey || ""),
+        interactionRecoveryTaskMs: Math.max(0, Number(runtimeState.renderPerfMetrics?.interactionRecoveryTaskMs?.durationMs || 0)),
+        interactionRecoveryWindowMs: Math.max(0, Number(runtimeState.renderPerfMetrics?.interactionRecoveryWindowMs?.durationMs || 0)),
         recordedAt: Date.now(),
       };
       globalThis.__renderPerfMetrics = runtimeState.renderPerfMetrics;

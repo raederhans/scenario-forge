@@ -29,8 +29,31 @@ export function createDefaultRenderPassCacheState() {
       canvas: null,
       referenceTransform: null,
       valid: false,
+      stale: false,
+      capturedAt: 0,
+      invalidatedAt: 0,
+      reason: "init",
+      staleReason: "",
+      rejectedReason: "",
+      scenarioId: "",
+      topologyRevision: 0,
+      dpr: 1,
+      pixelWidth: 0,
+      pixelHeight: 0,
+    },
+    interactionComposite: {
+      canvas: null,
+      layout: null,
+      referenceTransform: null,
+      signature: "",
+      valid: false,
       capturedAt: 0,
       reason: "init",
+      scenarioId: "",
+      topologyRevision: 0,
+      dpr: 1,
+      pixelWidth: 0,
+      pixelHeight: 0,
     },
     partialPoliticalDirtyIds: new Set(),
     politicalPathCache: new Map(),
@@ -61,6 +84,8 @@ export function createDefaultRenderPassCacheState() {
     counters: {
       frames: 0,
       composites: 0,
+      interactionCompositeBuilds: 0,
+      interactionCompositeReuses: 0,
       transformedFrames: 0,
       drawCanvas: 0,
       backgroundPassRenders: 0,
@@ -93,6 +118,9 @@ export function createDefaultRenderPassCacheState() {
       politicalPathWarmupCancels: 0,
       blackFrameCount: 0,
       lastGoodFrameReuses: 0,
+      continuityFrameReuses: 0,
+      missingVisibleFrameCount: 0,
+      missingVisibleFrameSkippedDuringInteraction: 0,
       waterAdaptiveStateResetCount: 0,
       contextScenarioReasonMismatchWarnings: 0,
     },
@@ -158,9 +186,12 @@ export function createDefaultRendererTransientRuntimeState() {
     zoomGestureEndedAt: 0,
     adaptiveSettleProfile: null,
     pendingExactPoliticalFastFrame: false,
+    activeInteractionRecoveryTaskKey: "",
+    activeInteractionRecoveryTaskStartedAt: 0,
     debugCountryCoverage: null,
     isInteracting: false,
     renderPhase: "idle",
+    firstVisibleFramePainted: false,
     phaseEnteredAt: 0,
     renderPhaseTimerId: null,
     pendingDayNightRefresh: false,
@@ -202,6 +233,19 @@ export function ensureRenderPassCacheState(
   cache.lastGoodFrame = cache.lastGoodFrame && typeof cache.lastGoodFrame === "object"
     ? cache.lastGoodFrame
     : { ...defaults.lastGoodFrame };
+  Object.entries(defaults.lastGoodFrame).forEach(([fieldName, initialValue]) => {
+    if (!(fieldName in cache.lastGoodFrame)) {
+      cache.lastGoodFrame[fieldName] = initialValue;
+    }
+  });
+  cache.interactionComposite = cache.interactionComposite && typeof cache.interactionComposite === "object"
+    ? cache.interactionComposite
+    : { ...defaults.interactionComposite };
+  Object.entries(defaults.interactionComposite).forEach(([fieldName, initialValue]) => {
+    if (!(fieldName in cache.interactionComposite)) {
+      cache.interactionComposite[fieldName] = initialValue;
+    }
+  });
   cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
     ? cache.partialPoliticalDirtyIds
     : defaults.partialPoliticalDirtyIds;

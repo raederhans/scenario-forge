@@ -40,6 +40,18 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("refreshScenarioDataHealth(", content)
         self.assertNotIn("syncCountryUi(", content)
 
+    def test_scenario_rollback_clears_chunk_promotion_runtime_handles(self):
+        content = SCENARIO_ROLLBACK.read_text(encoding="utf-8")
+
+        self.assertIn("refreshTimerId: null", content)
+        self.assertIn("promotionTimerId: null", content)
+        self.assertIn("promotionScheduled: false", content)
+        self.assertIn("promotionCommitInFlight: false", content)
+        self.assertIn('promotionCommitStatus: "rolled-back"', content)
+        self.assertIn("pendingPostCommitRefresh: null", content)
+        self.assertIn('callRuntimeHook(runtimeState, "cancelScenarioChunkPromotionCommitFn", "rolled-back");', content)
+        self.assertNotIn("promotionCommitPromise", content)
+
 
 if __name__ == "__main__":
     unittest.main()

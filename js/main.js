@@ -43,6 +43,7 @@ let deferredUiBootstrapPromise = null;
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let postReadyTaskHandles = new Map();
+let postReadyTaskDiagnostics = new Map();
 let postReadyTaskEpoch = 0;
 const POST_READY_IDLE_QUIET_MS = 850;
 const POST_READY_IDLE_TIME_REMAINING_MS = 8;
@@ -324,8 +325,24 @@ function flushPendingScenarioChunkRefreshAfterReady(reason = "post-ready") {
   });
 }
 
+function scheduleReadyPostBootWork(renderDispatcher, reason = "ready-state") {
+  checkpointBootMetric("time-to-interactive");
+  checkpointBootMetric("first-interactive");
+  completeBootSequenceLogging();
+  flushPendingScenarioChunkRefreshAfterReady(reason);
+  scheduleDeferredDetailPromotion(renderDispatcher);
+  startDeferredFullInteractionInfrastructureBuild(reason);
+  schedulePostReadyHydration();
+  schedulePostReadyDeferredContextWarmup();
+  schedulePostReadyVisualWarmup();
+}
+
 function startDeferredFullInteractionInfrastructureBuild(reason = "post-ready-full-interaction") {
   schedulePostReadyTask("post-ready-full-interaction-infra", () => {
+    if (runtimeState.detailDeferred && !runtimeState.detailPromotionCompleted) {
+      startDeferredFullInteractionInfrastructureBuild(`${reason}-after-detail`);
+      return false;
+    }
     return buildInteractionInfrastructureAfterStartup({
       chunked: true,
       buildHitCanvas: false,
@@ -356,9 +373,12 @@ function clearPostReadyTaskHandle(handle) {
 
 function clearScheduledPostReadyTask(taskKey) {
   const handle = postReadyTaskHandles.get(taskKey);
-  if (!handle) return;
-  clearPostReadyTaskHandle(handle);
+  if (handle) {
+    clearPostReadyTaskHandle(handle);
+  }
   postReadyTaskHandles.delete(taskKey);
+  postReadyTaskDiagnostics.delete(taskKey);
+  updatePostReadySchedulerDiagnostics({ lastBlockedReason: "cleared", taskKey });
 }
 
 function clearAllScheduledPostReadyTasks() {
@@ -366,36 +386,122 @@ function clearAllScheduledPostReadyTasks() {
     clearPostReadyTaskHandle(handle);
   });
   postReadyTaskHandles.clear();
+  postReadyTaskDiagnostics.clear();
+  updatePostReadySchedulerDiagnostics({ lastBlockedReason: "cleared-all" });
 }
 
-function canRunPostReadyIdleWork({ quietMs = POST_READY_IDLE_QUIET_MS } = {}) {
+function resolvePostReadyIdleBlockReason({
+  quietMs = POST_READY_IDLE_QUIET_MS,
+  allowChunkBacklog = false,
+} = {}) {
   const phaseEnteredAt = Number(runtimeState.phaseEnteredAt || 0);
   const zoomEndedAt = Number(runtimeState.zoomGestureEndedAt || 0);
   const currentMs = nowMs();
   const idleForMs = phaseEnteredAt > 0 ? currentMs - phaseEnteredAt : Number.POSITIVE_INFINITY;
   const zoomQuietForMs = zoomEndedAt > 0 ? currentMs - zoomEndedAt : Number.POSITIVE_INFINITY;
   const requiredQuietMs = Math.max(0, Number(quietMs) || 0);
-  return (
-    !runtimeState.bootBlocking
-    && !runtimeState.scenarioApplyInFlight
-    && !runtimeState.startupReadonly
-    && !runtimeState.startupReadonlyUnlockInFlight
-    && !runtimeState.isInteracting
-    && String(runtimeState.renderPhase || "idle") === "idle"
-    && idleForMs >= requiredQuietMs
-    && zoomQuietForMs >= requiredQuietMs
-  );
+  if (runtimeState.bootBlocking) return "boot-blocking";
+  if (runtimeState.scenarioApplyInFlight) return "scenario-apply-in-flight";
+  if (runtimeState.startupReadonly) return "startup-readonly";
+  if (runtimeState.startupReadonlyUnlockInFlight) return "startup-readonly-unlock";
+  if (runtimeState.deferExactAfterSettle) return "defer-exact-after-settle";
+  if (!allowChunkBacklog && runtimeState.runtimeChunkLoadState?.promotionCommitInFlight) return "chunk-promotion-commit-in-flight";
+  if (!allowChunkBacklog && runtimeState.runtimeChunkLoadState?.pendingVisualPromotion) return "chunk-visual-promotion";
+  if (!allowChunkBacklog && runtimeState.runtimeChunkLoadState?.pendingPromotion) return "chunk-promotion";
+  if (!allowChunkBacklog && runtimeState.runtimeChunkLoadState?.pendingInfraPromotion) return "chunk-infra-promotion";
+  if (runtimeState.hitCanvasBuildScheduled) return "hit-canvas-build-scheduled";
+  if (runtimeState.interactionInfrastructureBuildInFlight) return "interaction-infra-in-flight";
+  if (runtimeState.activeInteractionRecoveryTaskKey) return "interaction-recovery-task";
+  if (runtimeState.isInteracting) return "interacting";
+  if (String(runtimeState.renderPhase || "idle") !== "idle") return "render-non-idle";
+  if (idleForMs < requiredQuietMs) return "phase-quiet-window";
+  if (zoomQuietForMs < requiredQuietMs) return "zoom-quiet-window";
+  return "ready";
+}
+
+function updatePostReadySchedulerDiagnostics({
+  taskKey = "",
+  lastBlockedReason = "",
+  lastScheduledTaskKey = "",
+  lastStartedTaskKey = "",
+  lastFinishedTaskKey = "",
+} = {}) {
+  const currentMs = nowMs();
+  const pendingEntries = [...postReadyTaskDiagnostics.entries()];
+  const pendingTaskKeys = [...postReadyTaskHandles.keys()].sort();
+  const maxPendingAgeMs = pendingEntries.reduce((maxAge, [_key, entry]) => (
+    Math.max(maxAge, Math.max(0, currentMs - Number(entry.firstScheduledAt || currentMs)))
+  ), 0);
+  const maxRetryCount = pendingEntries.reduce((maxRetry, [_key, entry]) => (
+    Math.max(maxRetry, Number(entry.retryCount || 0))
+  ), 0);
+  runtimeState.postReadyTaskDiagnostics = {
+    activeTaskKey: String(runtimeState.activePostReadyTaskKey || ""),
+    activeTaskAgeMs: runtimeState.activePostReadyTaskStartedAt
+      ? Math.max(0, currentMs - Number(runtimeState.activePostReadyTaskStartedAt || 0))
+      : 0,
+    pendingTaskKeys,
+    pendingTaskCount: pendingTaskKeys.length,
+    lastBlockedReason: String(lastBlockedReason || runtimeState.postReadyTaskDiagnostics?.lastBlockedReason || ""),
+    lastTaskKey: String(taskKey || ""),
+    lastScheduledTaskKey: String(lastScheduledTaskKey || runtimeState.postReadyTaskDiagnostics?.lastScheduledTaskKey || ""),
+    lastStartedTaskKey: String(lastStartedTaskKey || runtimeState.postReadyTaskDiagnostics?.lastStartedTaskKey || ""),
+    lastFinishedTaskKey: String(lastFinishedTaskKey || runtimeState.postReadyTaskDiagnostics?.lastFinishedTaskKey || ""),
+    maxPendingAgeMs,
+    maxRetryCount,
+    idleQuietMs: POST_READY_IDLE_QUIET_MS,
+    minIdleTimeRemainingMs: POST_READY_IDLE_TIME_REMAINING_MS,
+    reasonStateHint: {
+      renderPhase: String(runtimeState.renderPhase || ""),
+      isInteracting: !!runtimeState.isInteracting,
+      deferExactAfterSettle: !!runtimeState.deferExactAfterSettle,
+      interactionInfrastructureBuildInFlight: !!runtimeState.interactionInfrastructureBuildInFlight,
+      activeInteractionRecoveryTaskKey: String(runtimeState.activeInteractionRecoveryTaskKey || ""),
+      hitCanvasBuildScheduled: !!runtimeState.hitCanvasBuildScheduled,
+      chunkShellStatus: String(runtimeState.runtimeChunkLoadState?.shellStatus || ""),
+      hasPendingChunkVisualPromotion: !!runtimeState.runtimeChunkLoadState?.pendingVisualPromotion,
+      hasPendingChunkPromotion: !!runtimeState.runtimeChunkLoadState?.pendingPromotion,
+      hasPendingChunkInfraPromotion: !!runtimeState.runtimeChunkLoadState?.pendingInfraPromotion,
+    },
+    recordedAt: Date.now(),
+  };
+  runtimeState.renderPerfMetrics = runtimeState.renderPerfMetrics && typeof runtimeState.renderPerfMetrics === "object"
+    ? runtimeState.renderPerfMetrics
+    : {};
+  runtimeState.renderPerfMetrics.postReadySchedulerState = { ...runtimeState.postReadyTaskDiagnostics };
+  globalThis.__renderPerfMetrics = runtimeState.renderPerfMetrics;
+  return runtimeState.postReadyTaskDiagnostics;
+}
+
+function markPostReadyTaskRetry(taskKey, reason) {
+  const entry = postReadyTaskDiagnostics.get(taskKey);
+  if (entry) {
+    entry.retryCount = Math.max(0, Number(entry.retryCount || 0) + 1);
+    entry.lastRetryAt = nowMs();
+    entry.lastBlockedReason = String(reason || "");
+  }
+  updatePostReadySchedulerDiagnostics({ taskKey, lastBlockedReason: reason });
+}
+
+function canRunPostReadyIdleWork({
+  quietMs = POST_READY_IDLE_QUIET_MS,
+  allowChunkBacklog = false,
+} = {}) {
+  return resolvePostReadyIdleBlockReason({ quietMs, allowChunkBacklog }) === "ready";
 }
 
 function runPostReadyTaskCallback(taskKey, callback) {
   runtimeState.activePostReadyTaskKey = taskKey;
   runtimeState.activePostReadyTaskStartedAt = nowMs();
+  postReadyTaskDiagnostics.delete(taskKey);
+  updatePostReadySchedulerDiagnostics({ taskKey, lastStartedTaskKey: taskKey });
 
   const clearActivePostReadyTask = () => {
     if (runtimeState.activePostReadyTaskKey === taskKey) {
       runtimeState.activePostReadyTaskKey = "";
       runtimeState.activePostReadyTaskStartedAt = 0;
     }
+    updatePostReadySchedulerDiagnostics({ taskKey, lastFinishedTaskKey: taskKey });
   };
 
   try {
@@ -438,7 +544,21 @@ function schedulePostReadyTask(
 ) {
   const normalizedTaskKey = String(taskKey || "").trim();
   if (!normalizedTaskKey) return;
+  const previousDiagnostic = postReadyTaskDiagnostics.get(normalizedTaskKey);
   clearScheduledPostReadyTask(normalizedTaskKey);
+  postReadyTaskDiagnostics.set(normalizedTaskKey, {
+    firstScheduledAt: Number(previousDiagnostic?.firstScheduledAt || 0) || nowMs(),
+    lastScheduledAt: nowMs(),
+    retryCount: Math.max(0, Number(previousDiagnostic?.retryCount || 0)),
+    timeout,
+    retryDelayMs,
+    idleQuietMs,
+    minIdleTimeRemainingMs,
+  });
+  updatePostReadySchedulerDiagnostics({
+    taskKey: normalizedTaskKey,
+    lastScheduledTaskKey: normalizedTaskKey,
+  });
   const scheduledEpoch = postReadyTaskEpoch;
 
   const runWhenIdle = () => {
@@ -446,7 +566,11 @@ function schedulePostReadyTask(
       clearScheduledPostReadyTask(normalizedTaskKey);
       return;
     }
-    if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
+    const blockReason = runtimeState.activePostReadyTaskKey
+      ? "active-task"
+      : resolvePostReadyIdleBlockReason({ quietMs: idleQuietMs });
+    if (blockReason !== "ready") {
+      markPostReadyTaskRetry(normalizedTaskKey, blockReason);
       const retryId = globalThis.setTimeout(runWhenIdle, Math.max(120, retryDelayMs));
       postReadyTaskHandles.set(normalizedTaskKey, { type: "timeout", id: retryId });
       return;
@@ -461,10 +585,15 @@ function schedulePostReadyTask(
           ? Number(deadline.timeRemaining())
           : Number.POSITIVE_INFINITY;
         if (!deadline?.didTimeout && remainingMs < minIdleTimeRemainingMs) {
+          markPostReadyTaskRetry(normalizedTaskKey, "idle-time-remaining");
           reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
           return;
         }
-        if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
+        const idleBlockReason = runtimeState.activePostReadyTaskKey
+          ? "active-task"
+          : resolvePostReadyIdleBlockReason({ quietMs: idleQuietMs });
+        if (idleBlockReason !== "ready") {
+          markPostReadyTaskRetry(normalizedTaskKey, idleBlockReason);
           reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
           return;
         }
@@ -478,7 +607,11 @@ function schedulePostReadyTask(
       if (scheduledEpoch !== postReadyTaskEpoch) {
         return;
       }
-      if (!canRunPostReadyIdleWork({ quietMs: idleQuietMs }) || runtimeState.activePostReadyTaskKey) {
+      const timeoutBlockReason = runtimeState.activePostReadyTaskKey
+        ? "active-task"
+        : resolvePostReadyIdleBlockReason({ quietMs: idleQuietMs });
+      if (timeoutBlockReason !== "ready") {
+        markPostReadyTaskRetry(normalizedTaskKey, timeoutBlockReason);
         reschedulePostReadyTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs });
         return;
       }
@@ -677,15 +810,7 @@ async function finalizeReadyState(renderDispatcher) {
       progress: 100,
       canContinueWithoutScenario: false,
     });
-    checkpointBootMetric("time-to-interactive");
-    checkpointBootMetric("first-interactive");
-    completeBootSequenceLogging();
-    flushPendingScenarioChunkRefreshAfterReady("ready-state");
-    startDeferredFullInteractionInfrastructureBuild("ready-state");
-    scheduleDeferredDetailPromotion(renderDispatcher);
-    schedulePostReadyHydration();
-    schedulePostReadyDeferredContextWarmup();
-    schedulePostReadyVisualWarmup();
+    scheduleReadyPostBootWork(renderDispatcher, "ready-state");
     return;
   }
   if (shouldEnterStartupReadonly) {
@@ -706,14 +831,7 @@ async function finalizeReadyState(renderDispatcher) {
     progress: 100,
     canContinueWithoutScenario: false,
   });
-  checkpointBootMetric("time-to-interactive");
-  checkpointBootMetric("first-interactive");
-  completeBootSequenceLogging();
-  flushPendingScenarioChunkRefreshAfterReady("ready-state");
-  scheduleDeferredDetailPromotion(renderDispatcher);
-  schedulePostReadyHydration();
-  schedulePostReadyDeferredContextWarmup();
-  schedulePostReadyVisualWarmup();
+  scheduleReadyPostBootWork(renderDispatcher, "ready-state");
 }
 
 async function bootstrap() {
@@ -741,6 +859,8 @@ async function bootstrap() {
   postReadyHydrationScheduled = false;
   runtimeState.activePostReadyTaskKey = "";
   runtimeState.activePostReadyTaskStartedAt = 0;
+  runtimeState.postReadyTaskDiagnostics = null;
+  postReadyTaskDiagnostics.clear();
   postReadyTaskEpoch += 1;
   clearAllScheduledPostReadyTasks();
   setStartupInteractionMode(state, resolveStartupInteractionMode());

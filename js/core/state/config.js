@@ -128,6 +128,7 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
   "ensureFullLocalizationDataReadyFn",
   "getViewportGeoBoundsFn",
   "scheduleScenarioChunkRefreshFn",
+  "cancelScenarioChunkPromotionCommitFn",
   "ensureBaseCityDataFn",
   "ensureContextLayerDataFn",
   "releaseDeferredContextBasePassFn",

@@ -126,3 +126,61 @@ pm run test:e2e:startup-bundle-recovery-contract;
 pm run perf:gate.
 - 
 pm run test:e2e:water-rendering failed in adjacent water/river specs: river timeout during page.waitForTimeout(350) and water cache specs could not find #toggleOpenOceanRegions. These failures are outside the changed hover/click path and need a separate UI test maintenance slice.
+
+## 2026-04-25 Fresh implementation notes
+
+- Re-read AGENTS, lessons learned, ultrawork, performanceup, agent tiers, active perf docs, and recent performance memory.
+- Static subagents mapped benchmark schema, transformed frame/cache path, hover hit path, and post-ready/chunk diagnostics.
+- Current code already has transformed fast frame and last-good fallback; missing piece is an explicit main-pass composite cache.
+- Hover and click share getHitFromEvent, so hover optimization must be gated by eventType=hover and enableSnap=false.
+
+## 2026-04-25 Implementation and verification notes
+
+- Implemented perf schema/source fields in `perf_probe`, `run_baseline`, and browser benchmark v3.1 output.
+- Implemented main-pass interaction composite cache for background/physical/political/context/effects/dayNight passes; borders, labels, and texture labels remain separately drawn in the interaction frame.
+- Implemented hover-only first-containing strict hit path for land/water/special, while click and dblclick continue to use the existing strict hit/canvas path.
+- Implemented post-ready scheduler diagnostics and chunk zoom-end/visual-stage selection context fields.
+- Passed: node syntax checks for changed JS/MJS files; Python py_compile; `npm run test:node:perf-probe-snapshot-behavior`; `npm run test:node:scenario-chunk-contracts`; `python -m unittest tests.test_perf_gate_contract tests.test_scenario_chunk_refresh_contracts tests.test_map_renderer_spatial_index_runtime_orchestration_contract tests.test_transport_facility_interactions_contract`; `npm run test:e2e:interaction-funnel`; `npm run test:e2e:dev:tno-ready-state`.
+- `npm run test:e2e:dev:scenario-chunk-runtime` was unstable: first run failed the deferred probe assertion while Congo passed; rerun passed that probe and failed the Congo loaded-chunk assertion after detail chunks were observed earlier in the test.
+
+## 2026-04-25 Map interaction speed review remediation
+
+- Static review found three real issues: perf gate accepted stale schema reports, startup post-ready infra overwrote interaction recovery benchmark fields, and continuity frame carried topologyRevision without checking it on reuse.
+- Fixed perf gate by adding hard report contract fields: schemaVersion=1, benchmarkMetricsSchemaVersion=3.1, probeSchema=mc_perf_snapshot.
+- Split post-ready full interaction infra metrics into postReadyInteractionInfrastructureTaskMs/window so zoom/chunk interaction recovery metrics keep their benchmark meaning.
+- Added topologyRevision reject for continuity frame reuse and kept visible base fill out of black-frame counting.
+- Root cause for alternating scenario chunk runtime failure was focusCountryOverride priority and post-ready task timing: explicit zoom-end probe country must win over active/selected country during chunk selection.
+
+## 2026-04-25 Final verification for map interaction speed slice
+
+- Passed: `node --check` for changed JS/MJS files and Python py_compile for changed Python tests/tools.
+- Passed: `npm run test:node:scenario-chunk-contracts`, `npm run test:node:perf-probe-snapshot-behavior`, `python -m unittest tests.test_scenario_chunk_refresh_contracts tests.test_perf_gate_contract`.
+- Passed: `npm run test:e2e:dev:scenario-chunk-runtime` after focus override and continuity-frame fixes: 4/4.
+- Passed: `npm run test:e2e:dev:tno-ready-state`: 5/5.
+- Passed: `npm run test:e2e:interaction-funnel`: 3/3.
+- Static code review initially requested changes for schema contract, metric overwrite, and topologyRevision continuity checks; all three were fixed and covered by contracts.
+
+## 2026-04-26 02:48 UTC interaction-continuity-and-promotion-slicing execution start
+- Approved plan: keep interactionComposite; fix eligibility before canvas clear; restrict ocean fill; add composite identity; make chunk promotion commit async single-flight; remove hit-canvas all-feature fallback.
+- Current working tree already contains prior map interaction speed slice changes; this round edits on top of that uncommitted state.
+- Parent thread owns all live tests and perf runs. Subagents may do static review or disjoint code work only.
+- Active docs are the canonical execution ledger for this round.
+
+
+
+## 2026-04-26 03:22 UTC interaction-continuity-and-promotion-slicing completed
+- Implemented firstVisibleFramePainted continuity guard: INTERACTING fast-frame miss now keeps existing pixels and records missingVisibleFrameSkippedDuringInteraction instead of ocean fill.
+- Added interactionComposite identity precheck before main canvas reset: scenarioId/topologyRevision/dpr/pixel size/signature must match.
+- Converted pending scenario chunk promotion commit to async single-flight with serializable runtime status, rAF yields, stale revalidation, render lock, and rollback-safe timer/status cleanup.
+- Removed hit canvas all-feature fallback when spatial index is unavailable; hit canvas stays dirty and records hitCanvasSpatialIndexUnavailable.
+- Fixed an E2E race where detail chunks could be loaded once and then evicted by a stale pending refresh: in-flight promotion flush now clears pending refresh state.
+- Verification evidence: syntax checks passed; targeted node and Python contracts passed; e2e scenario chunk runtime passed after fix; tno-ready-state passed; interaction-funnel passed; perf:baseline wrote docs/perf baseline; perf:gate passed. npm run test is unavailable because package.json has no test script.
+
+
+## 2026-04-26 03:48 UTC post-review hardening
+- Static reviewer found four blocking risks: visual mutation after yield, in-flight refresh loss, rollback-local promise cleanup, and duplicated ready branch behavior.
+- Fixed promotion transaction boundary by removing post-visual mutation yield; stale checks now happen before visual apply.
+- Added cancelScenarioChunkPromotionCommitFn runtime hook so rollback cancels promotion timer and invalidates local single-flight run state.
+- Changed in-flight refresh handling to preserve pendingPostCommitRefresh and replay after commit instead of clearing a real pending refresh.
+- Unified ready post-boot work in scheduleReadyPostBootWork(), so both ready paths start deferred full interaction infra.
+- Adjusted continuity stale age to count from invalidatedAt when the frame is marked stale.

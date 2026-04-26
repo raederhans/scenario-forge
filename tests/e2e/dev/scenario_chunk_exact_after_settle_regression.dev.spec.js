@@ -69,7 +69,8 @@ async function waitForStableExactRender(page, { timeout = 30_000 } = {}) {
     const { state } = await import("/js/core/state.js");
     return String(state.renderPhase || "") === "idle"
       && !state.deferExactAfterSettle
-      && !state.exactAfterSettleHandle;
+      && !state.exactAfterSettleHandle
+      && !state.runtimeChunkLoadState?.promotionCommitInFlight;
   }, { timeout });
 }
 

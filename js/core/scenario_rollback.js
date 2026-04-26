@@ -1,6 +1,6 @@
 import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
 import { normalizeMapSemanticMode } from "./state.js";
-import { readRegisteredRuntimeHookSource } from "./state/index.js";
+import { callRuntimeHook, readRegisteredRuntimeHookSource } from "./state/index.js";
 import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import {
@@ -181,6 +181,12 @@ function captureScenarioRuntimeSnapshot() {
     runtimeChunkLoadState: cloneScenarioStateValue({
       ...(runtimeState.runtimeChunkLoadState || {}),
       refreshTimerId: null,
+      promotionTimerId: null,
+      promotionScheduled: false,
+      promotionCommitInFlight: false,
+      promotionCommitStatus: "rolled-back",
+      promotionCommitError: "",
+      pendingPostCommitRefresh: null,
     }),
     scheduleScenarioChunkRefreshEnabled:
       readRegisteredRuntimeHookSource(runtimeState, "scheduleScenarioChunkRefreshFn") === scheduleScenarioChunkRefresh,
@@ -381,6 +387,7 @@ export function restoreScenarioApplyRollbackSnapshot(
   if (runtimeState.runtimeChunkLoadState?.refreshTimerId) {
     globalThis.clearTimeout(runtimeState.runtimeChunkLoadState.refreshTimerId);
   }
+  callRuntimeHook(runtimeState, "cancelScenarioChunkPromotionCommitFn", "rolled-back");
 
   restoreScenarioRuntimeSnapshot(snapshot);
   restoreScenarioPresentationSnapshot(snapshot);

@@ -11,6 +11,8 @@ function readRepoFile(...relativeParts) {
 
 test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+  const interactionRecoveryBlockedBody =
+    rendererSource.match(/function isInteractionRecoveryBlocked\(\) \{(?<body>[\s\S]*?)\n\}/)?.groups?.body || "";
 
   const contract = {
     drawContextScenarioPassKeepsScenarioOverlayBoundary:
@@ -42,6 +44,34 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
     hoverFacilityAndCityProbeMetricsRemainNamed:
       rendererSource.includes('recordInteractionDurationMetric("interactionHoverFacilityProbeDuration"')
       && rendererSource.includes('recordInteractionDurationMetric("interactionHoverCityProbeDuration"'),
+    interactionCompositeUsesSingleMainPassCache:
+      rendererSource.includes("const INTERACTION_COMPOSITE_PASS_NAMES = [")
+      && rendererSource.includes('recordRenderPerfMetric("interactionCompositeBuild"')
+      && /function drawTransformedFrameFromCaches\(timings, \{ interactiveBorders = false \} = \{\}\) \{[\s\S]*?drawInteractionComposite\(currentTransform\)[\s\S]*?drawInteractionBorderSnapshot\(currentTransform\)/.test(rendererSource),
+    continuityFrameSkipsBaseFillDuringInteraction:
+      rendererSource.includes("const CONTINUITY_FRAME_MAX_STALE_AGE_MS = 1500;")
+      && /function invalidateLastGoodFrame\(reason = "visual-invalidation"\) \{[\s\S]*?cache\.lastGoodFrame\.stale = true;[\s\S]*?recordRenderPerfMetric\("continuityFrameMarkedStale"/.test(rendererSource)
+      && /if \(runtimeState\.renderPhase === RENDER_PHASE_INTERACTING && runtimeState\.firstVisibleFramePainted\) \{[\s\S]*?noteMissingVisibleFrameSkippedDuringInteraction\("missing-fast-frame-no-continuity"\);[\s\S]*?keptPreviousPixels = true;[\s\S]*?\} else \{[\s\S]*?drewFrame = drawBaseVisibleFrameFallback\("missing-fast-frame-no-continuity"\);/.test(rendererSource)
+      && rendererSource.includes('recordRenderPerfMetric("continuityFrameStaleAgeMs"')
+      && rendererSource.includes('recordRenderPerfMetric("missingVisibleFrameCount"')
+      && rendererSource.includes('recordRenderPerfMetric("missingVisibleFrameSkippedDuringInteraction"')
+      && /const staleSince = frame\.stale && Number\(frame\.invalidatedAt \|\| 0\) > 0[\s\S]*?Number\(frame\.invalidatedAt \|\| 0\)[\s\S]*?Number\(frame\.capturedAt \|\| 0\);[\s\S]*?const staleAgeMs = Math\.max\(0, Date\.now\(\) - staleSince\);/.test(rendererSource)
+      && rendererSource.includes('return reject("topology-revision-mismatch")'),
+    exactAfterSettleReschedulesWhenPhaseStillBusy:
+      /function scheduleExactAfterSettleRefresh\(profile = runtimeState\.adaptiveSettleProfile \|\| getAdaptiveSettleProfile\(\)\) \{[\s\S]*?if \(!runtimeState\.deferExactAfterSettle\) return;[\s\S]*?if \(runtimeState\.renderPhase !== RENDER_PHASE_IDLE\) \{[\s\S]*?scheduleExactAfterSettleRefresh\(resolvedProfile\);[\s\S]*?return;[\s\S]*?\}/.test(rendererSource),
+    interactionRecoveryDoesNotSelfBlockPostReadyTask:
+      interactionRecoveryBlockedBody.includes("runtimeState.renderPhase !== RENDER_PHASE_IDLE")
+      && interactionRecoveryBlockedBody.includes("runtimeState.isInteracting")
+      && interactionRecoveryBlockedBody.includes("activeInteractionRecoveryTaskKey")
+      && !interactionRecoveryBlockedBody.includes("activePostReadyTaskKey"),
+    interactionRecoveryMetricsNameTaskAndWindow:
+      /function recordInteractionRecoveryTaskMetric\(taskKey, durationMs, details = \{\}, \{ benchmarkInteraction = true \} = \{\}\) \{[\s\S]*?taskMetricName = benchmarkInteraction \? "interactionRecoveryTaskMs"[\s\S]*?windowMetricName = benchmarkInteraction \? "interactionRecoveryWindowMs"/.test(rendererSource)
+      && /const taskKey = "scenario-chunk-promotion-infra";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource)
+      && /const taskKey = "secondary-spatial-index";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource)
+      && /const taskKey = "deferred-heavy-border-meshes";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource),
+    hoverStrictHitUsesFirstContainingFastPath:
+      /function findFirstContainingCandidate\(candidates, lonLat, \{ eventType = "hover", targetType = "unknown" \} = \{\}\) \{[\s\S]*?fastPath: "hover-first-containing"/.test(rendererSource)
+      && /eventType === "hover" && !enableSnap[\s\S]*?findFirstContainingCandidate\(strictCandidates, pointer\.lonLat, \{ eventType, targetType: "land" \}\)/.test(rendererSource),
     exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
       /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
       && /scheduleExactAfterSettleRefresh[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(rendererSource),

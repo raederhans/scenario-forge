@@ -69,6 +69,8 @@ test("snapshot returns safe empty metric objects when structuredClone is unavail
 
   try {
     const result = snapshot();
+    assert.equal(result.schemaVersion, 1);
+    assert.equal(result.source, "mc_perf_probe");
     assert.deepEqual(result.bootMetrics, {});
     assert.deepEqual(result.renderPerfMetrics, {});
     assert.deepEqual(result.scenarioPerfMetrics, {});

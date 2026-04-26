@@ -44,7 +44,7 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
         self.assertRegex(
             self.renderer_content,
             re.compile(
-                r'buildIndex\(\);\s*await yieldToMain\(\);\s*if \(promotionVersion !== scenarioChunkPromotionVersion\) \{\s*return false;\s*\}\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*\}\);\s*if \(promotionVersion !== scenarioChunkPromotionVersion\) \{\s*return false;\s*\}\s*scheduleSecondarySpatialIndexBuild\(\{',
+                r'buildIndex\(\);\s*await yieldToMain\(\);\s*if \(promotionVersion !== scenarioChunkPromotionVersion\) \{\s*return false;\s*\}\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*\}\);[\s\S]*?if \(promotionVersion !== scenarioChunkPromotionVersion\) \{\s*return false;\s*\}\s*scheduleSecondarySpatialIndexBuild\(\{',
                 re.S,
             ),
         )
@@ -84,6 +84,16 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
                 re.S,
             ),
         )
+
+    def test_hit_canvas_keeps_dirty_when_spatial_index_is_unavailable(self):
+        start = self.renderer_content.index("function drawHitCanvas()")
+        end = self.renderer_content.index("function drawHitCanvasWithMetric", start)
+        draw_hit_canvas = self.renderer_content[start:end]
+
+        self.assertIn("if (visibleSpatialItems === null) {", draw_hit_canvas)
+        self.assertIn("runtimeState.hitCanvasDirty = true;", draw_hit_canvas)
+        self.assertIn('recordRenderPerfMetric("hitCanvasSpatialIndexUnavailable"', draw_hit_canvas)
+        self.assertNotIn("runtimeState.landData.features.forEach", draw_hit_canvas)
 
 
 if __name__ == "__main__":

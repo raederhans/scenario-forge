@@ -12,6 +12,10 @@ test("scenario runtime factory seeds scenario-aware defaults", () => {
   assert.equal(defaults.activeScenarioChunks.scenarioId, "tno_1962");
   assert.equal(defaults.runtimeChunkLoadState.shellStatus, "ready");
   assert.equal(defaults.runtimeChunkLoadState.registryStatus, "ready");
+  assert.equal(defaults.runtimeChunkLoadState.promotionCommitStatus, "idle");
+  assert.equal(defaults.runtimeChunkLoadState.promotionCommitInFlight, false);
+  assert.equal(defaults.runtimeChunkLoadState.promotionCommitRunId, 0);
+  assert.doesNotThrow(() => JSON.stringify(defaults.runtimeChunkLoadState));
 });
 
 test("scenario runtime factory returns fresh nested objects and maps", () => {

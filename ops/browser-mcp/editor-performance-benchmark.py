@@ -1541,6 +1541,7 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       probe=zoom_end_chunk_visible,
       baselines=zoom_end_baselines,
       candidate_sources=[
+        "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
         "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
         "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
       ],
@@ -1592,6 +1593,38 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     interactive_pan_metric = summarize_interactive_pan_metric(suite)
     single_fill_metric = summarize_fill_action_metric(suite, "singleFill")
     double_click_fill_metric = summarize_fill_action_metric(suite, "doubleClickFill")
+    wheel_anchor_metric = with_metric_context(
+      wheel_anchor_metric,
+      metric_name="wheelAnchorTrace",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="direct-probe",
+      probe=wheel_anchor_trace,
+      candidate_sources=["wheelAnchorTrace.firstIdleAfterWheelMs"],
+    )
+    interactive_pan_metric = with_metric_context(
+      interactive_pan_metric,
+      metric_name="interactivePanFrame",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="direct-probe",
+      probe=suite.get("interactivePanFrame") if isinstance(suite.get("interactivePanFrame"), dict) else {},
+      candidate_sources=["interactivePanFrame.interactiveFrame.totalMs"],
+    )
+    single_fill_metric = with_metric_context(
+      single_fill_metric,
+      metric_name="singleFillAction",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="direct-probe",
+      probe=suite.get("singleFill") if isinstance(suite.get("singleFill"), dict) else {},
+      candidate_sources=["singleFill.lastActionDurationMs"],
+    )
+    double_click_fill_metric = with_metric_context(
+      double_click_fill_metric,
+      metric_name="doubleClickFillAction",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="direct-probe",
+      probe=suite.get("doubleClickFill") if isinstance(suite.get("doubleClickFill"), dict) else {},
+      candidate_sources=["doubleClickFill.lastActionDurationMs"],
+    )
     return {
       "load": load_metric,
       "pageLoad": page_load_metric,
@@ -2786,7 +2819,7 @@ def main() -> None:
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
-        "benchmarkMetricsSchemaVersion": 3,
+        "benchmarkMetricsSchemaVersion": "3.1",
         "benchmarkMetricsByScenario": {
           scenario_id: suites[scenario_id].get("benchmarkMetrics", {})
           for scenario_id in SCENARIO_IDS

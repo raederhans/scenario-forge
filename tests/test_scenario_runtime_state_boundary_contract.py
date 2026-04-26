@@ -41,6 +41,17 @@ class ScenarioRuntimeStateBoundaryContractTest(unittest.TestCase):
         self.assertIn("./state/scenario_runtime_state.js", health_content)
         self.assertIn("createDefaultScenarioDataHealth(", health_content)
 
+    def test_chunk_promotion_commit_status_stays_serializable(self):
+        owner_content = SCENARIO_RUNTIME_STATE_JS.read_text(encoding="utf-8")
+        chunk_content = CHUNK_RUNTIME_JS.read_text(encoding="utf-8")
+
+        self.assertIn('promotionCommitStatus: "idle"', owner_content)
+        self.assertIn("promotionCommitInFlight: false", owner_content)
+        self.assertIn("promotionCommitRunId: 0", owner_content)
+        self.assertIn("pendingPostCommitRefresh: null", owner_content)
+        self.assertIn("let promotionCommitPromise = null;", chunk_content)
+        self.assertNotRegex(owner_content, re.compile(r"promotionCommitPromise|new Promise|Promise\\.resolve"))
+
 
 if __name__ == "__main__":
     unittest.main()
