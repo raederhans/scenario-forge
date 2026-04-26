@@ -133,6 +133,8 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('recordRenderPerfMetric("continuityFrameStaleAgeMs"', self.map_renderer_source)
         self.assertIn('recordRenderPerfMetric("missingVisibleFrameCount"', self.map_renderer_source)
         self.assertIn('return reject("topology-revision-mismatch")', self.map_renderer_source)
+        self.assertIn('return reject("stale-age-limit")', self.map_renderer_source)
+        self.assertIn('continuityFrameRelaxedReuse', self.map_renderer_source)
         self.assertIn('postReadyInteractionInfrastructureTaskMs', self.map_renderer_source)
         self.assertIn("function recordInteractionRecoveryTaskMetric(", self.map_renderer_source)
         self.assertRegex(
@@ -253,20 +255,50 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
     def test_promotion_commit_replays_pending_refresh_after_single_flight(self):
         self.assertIn("pendingPostCommitRefresh", self.scenario_chunk_runtime_source)
         self.assertIn("scheduleScenarioChunkRefresh({", self.scenario_chunk_runtime_source)
+        self.assertIn('committedReason === "zoom-end"', self.scenario_chunk_runtime_source)
+        self.assertIn('reason: replayReason,', self.scenario_chunk_runtime_source)
         self.assertNotIn('clearPendingScenarioChunkRefresh(loadState);\n        return "promotion-commit-in-flight";', self.scenario_chunk_runtime_source)
+
+
+    def test_zoom_end_detail_chunks_are_protected_through_exact_settle_replay(self):
+        self.assertIn("function protectZoomEndChunks(loadState, chunkIds = [], {", self.scenario_chunk_runtime_source)
+        self.assertIn("function clearZoomEndChunkProtection(loadState)", self.scenario_chunk_runtime_source)
+        self.assertIn("function protectZoomEndChunksForSelection(loadState, chunkIds = [], {", self.scenario_chunk_runtime_source)
+        self.assertIn("function applyZoomEndChunkProtectionToSelection(selection, loadState, {", self.scenario_chunk_runtime_source)
+        self.assertIn("function applyZoomEndChunkProtection(selection, loadState, {", self.scenario_chunk_runtime_source)
+        self.assertIn("selectionVersion: pendingPromotion.selectionVersion || loadState.selectionVersion || 0", self.scenario_chunk_runtime_source)
+        self.assertIn("selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0))", self.scenario_chunk_runtime_source)
+        self.assertIn("clearZoomEndChunkProtectionState(loadState);", self.scenario_chunk_runtime_source)
+        self.assertIn("zoomEndProtectedChunkIds", self.scenario_runtime_state_source)
+        self.assertIn("zoomEndProtectedUntil", self.scenario_runtime_state_source)
+        self.assertIn("zoomEndProtectedSelectionVersion", self.scenario_runtime_state_source)
+        self.assertIn("zoomEndProtectedFocusCountry", self.scenario_runtime_state_source)
 
     def test_promotion_commit_can_be_cancelled_by_runtime_hook(self):
         self.assertIn('import { registerRuntimeHook } from "../state/index.js";', self.scenario_chunk_runtime_source)
         self.assertIn('function cancelScenarioChunkPromotionCommit(reason = "cancel")', self.scenario_chunk_runtime_source)
         self.assertIn('registerRuntimeHook(runtimeState, "cancelScenarioChunkPromotionCommitFn", cancelScenarioChunkPromotionCommit);', self.scenario_chunk_runtime_source)
 
-    def test_chunk_promotion_visual_apply_has_no_post_mutation_yield(self):
+    def test_chunk_promotion_visual_apply_yields_under_render_lock_and_revalidates(self):
         visual_start = self.scenario_chunk_runtime_source.index('setPromotionCommitStatus(loadState, "applying-visual"')
         visual_end = self.scenario_chunk_runtime_source.index('recordScenarioChunkRuntimeMetric("chunkPromotionCommitVisualMs"', visual_start)
         visual_slice = self.scenario_chunk_runtime_source[visual_start:visual_end]
 
         self.assertIn("applyScenarioPoliticalChunkPayload(", visual_slice)
-        self.assertNotIn("await yieldToFrame();", visual_slice)
+        self.assertIn("await yieldToFrame();", visual_slice)
+        self.assertIn("isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })", visual_slice)
+        self.assertIn("runtimeState.scenarioPoliticalChunkData = previousPoliticalChunkData;", visual_slice)
+        self.assertIn('reason: "scenario-chunk-promotion-stale-rollback"', visual_slice)
+        self.assertRegex(
+            visual_slice,
+            re.compile(
+                r'await yieldToFrame\(\);.*?'
+                r'if \(!isPendingScenarioChunkPromotionCurrent.*?'
+                r'flushRenderBoundary\("scenario-chunk-promotion"\);.*?'
+                r'runtimeState\.scenarioChunkPromotionRenderLocked = previousRenderLock;',
+                re.S,
+            ),
+        )
 
     def test_chunk_promotion_infra_does_not_rebuild_static_meshes(self):
         start = self.map_renderer_source.index("async function runDeferredScenarioChunkPromotionInfraRefresh(")

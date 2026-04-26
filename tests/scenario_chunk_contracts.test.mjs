@@ -56,7 +56,9 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && rendererSource.includes('recordRenderPerfMetric("missingVisibleFrameCount"')
       && rendererSource.includes('recordRenderPerfMetric("missingVisibleFrameSkippedDuringInteraction"')
       && /const staleSince = frame\.stale && Number\(frame\.invalidatedAt \|\| 0\) > 0[\s\S]*?Number\(frame\.invalidatedAt \|\| 0\)[\s\S]*?Number\(frame\.capturedAt \|\| 0\);[\s\S]*?const staleAgeMs = Math\.max\(0, Date\.now\(\) - staleSince\);/.test(rendererSource)
-      && rendererSource.includes('return reject("topology-revision-mismatch")'),
+      && rendererSource.includes('return reject("topology-revision-mismatch")')
+      && rendererSource.includes('return reject("stale-age-limit")')
+      && rendererSource.includes('continuityFrameRelaxedReuse'),
     exactAfterSettleReschedulesWhenPhaseStillBusy:
       /function scheduleExactAfterSettleRefresh\(profile = runtimeState\.adaptiveSettleProfile \|\| getAdaptiveSettleProfile\(\)\) \{[\s\S]*?if \(!runtimeState\.deferExactAfterSettle\) return;[\s\S]*?if \(runtimeState\.renderPhase !== RENDER_PHASE_IDLE\) \{[\s\S]*?scheduleExactAfterSettleRefresh\(resolvedProfile\);[\s\S]*?return;[\s\S]*?\}/.test(rendererSource),
     interactionRecoveryDoesNotSelfBlockPostReadyTask:
@@ -112,6 +114,21 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
       /suite_base_urls = unique_strings\(\[[\s\S]*?effective_url,[\s\S]*?ensure_app_path_url\(effective_url\),[\s\S]*?args\.url,[\s\S]*?ensure_app_path_url\(args\.url\),/.test(benchmarkSource),
     sameScenarioFreshMetricSelectionIsExplicit:
       /def is_same_scenario_fresh_metric_entry\([\s\S]*?def summarize_freshest_same_scenario_metric_entry\(/.test(benchmarkSource),
+    benchmarkWheelTraceTracksLastWheelAndBlackRatio:
+      benchmarkSource.includes("firstIdleAfterLastWheelMs")
+      && benchmarkSource.includes("sample_canvas_black_pixel_ratio_js")
+      && benchmarkSource.includes("maxBlackPixelRatio")
+      && benchmarkSource.includes("lastWheelAt = await page.evaluate(() => performance.now())")
+      && benchmarkSource.includes('"rapidWheel": rapid_wheel_screenshot_path')
+      && benchmarkSource.includes('"interactivePan": interactive_pan_screenshot_path'),
+    zoomEndVisualMetricRequiresCurrentZoomEndSelection:
+      benchmarkSource.includes("String(entry?.reason || '').toLowerCase() === 'zoom-end'")
+      && benchmarkSource.includes("expectedSelectionVersion")
+      && benchmarkSource.includes("Number(entry?.selectionVersion || 0) >= Number(expectedSelectionVersion || 0)"),
+    directProbeScenarioContextDoesNotLookLikeStaleMetric:
+      benchmarkSource.includes("direct_probe_without_scenario_fields")
+      && benchmarkSource.includes('"requestedScenarioId"')
+      && benchmarkSource.includes('"sameScenario": details_match_scenario or probe_matches_scenario or direct_probe_without_scenario_fields'),
     e2eHarnessDefaultsToAppPath:
       playwrightAppPathsSource.includes("const DEFAULT_OPEN_PATH = DEFAULT_FAST_APP_OPEN_PATH;")
       && playwrightAppPathsSource.includes("const DEFAULT_APP_ORIGIN = `http://127.0.0.1:${DEFAULT_TEST_SERVER_PORT}`;"),

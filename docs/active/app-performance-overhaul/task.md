@@ -127,3 +127,39 @@ pm run test:e2e:interaction-funnel: 3 passed.
 pm run perf:baseline: pass and rewrote baseline files.
 - Re-ran 
 pm run perf:gate: pass against refreshed baseline.
+
+## 2026-04-26 14:50 UTC interaction black-frame and zoom closeout progress
+- [x] Re-read current code and active docs before editing.
+- [x] Spawned static-only mapper and QA agents; parent owns all live verification.
+- [x] Implemented renderer continuity/composite hardening.
+- [x] Implemented chunk promotion second-yield revalidation and render-lock hold-through-flush.
+- [x] Implemented editor benchmark wheel/black-screen evidence fields.
+- [x] Updated existing contract checks for relaxed continuity and benchmark fields.
+- [ ] Run parent-owned targeted node/Python/E2E/perf verification.
+- [ ] Run review/bug-check/first-principles pass and update lessons learned if warranted.
+
+
+## 2026-04-26 15:23 UTC verification result
+- [x] Syntax and contract checks passed.
+- [x] Dev E2E scenario-chunk-runtime passed after zoom-end detail protection fix.
+- [x] TNO ready-state and interaction-funnel E2E passed.
+- [x] Editor benchmark ran and produced rapid-wheel/interactive-pan screenshot evidence.
+- [x] perf:gate warmup mismatch fixed; `npm run perf:gate` passes with three warmups.
+- [ ] Final static review pass pending.
+
+## 2026-04-26 16:25 UTC final verification refresh
+- [x] `node --check` on changed renderer/chunk/state/perf JS.
+- [x] `python -m py_compile` on changed benchmark and Python contracts.
+- [x] Node contracts: renderer runtime state, scenario runtime state, scenario chunk contracts, perf probe snapshot behavior.
+- [x] Python contracts: scenario chunk refresh + perf gate contract.
+- [x] E2E: scenario-chunk-runtime 4/4, tno-ready-state 5/5, interaction-funnel 3/3.
+- [x] Perf: `npm run perf:baseline` regenerated the checked-in three-warmup baseline; `npm run perf:gate` rerun passed against `docs/perf/baseline_2026-04-20.json`.
+- [x] Benchmark: full `editor-performance-benchmark.py` passed after isolating browser sessions per scenario; TNO wheel trace recorded `firstIdleAfterLastWheelMs=1084.5`, `maxBlackPixelRatio=0.061361`, `sameScenario=true`, and screenshots under `.runtime/browser/mcp-artifacts/perf/`.
+- [x] Review remediation: fixed warmup contract drift, wheel clock-domain mixing, zoom-end detail chunk protection scope, and continuity-frame over-reuse.
+- [x] Final review blocker follow-up: added behavior tests for wheel last-wheel/fallback semantics and zoom-end protection one-shot selection scope.
+
+## 2026-04-26 review follow-up: zoom-end metric source
+- [x] Preserve true end-to-visible timing when zoomEndChunkVisible also has scenarioChunkPromotionVisualStage.
+- [x] Keep visual-stage metric as explicit fallback only.
+- [x] Add behavior test for render/runtime/fallback source order.
+- [x] Run py_compile, perf gate contract unittest, and scenario chunk node contract.

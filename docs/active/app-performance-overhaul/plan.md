@@ -104,3 +104,11 @@ Acceptance:
 4. E2E: scenario chunk runtime, TNO ready-state, interaction funnel if hit/click path is touched.
 5. Perf: `npm run perf:baseline`, then `npm run perf:gate`.
 
+
+## 2026-04-26 14:50 UTC interaction black-frame and zoom closeout plan addendum
+- Scope stays frozen to renderer continuity, chunk-promotion visual commit slicing, and editor benchmark evidence.
+- Keep interactionComposite optimization; during INTERACTING only reuse an already valid composite and defer building missing composites to settling/idle.
+- Reuse continuity frames across DPR/topology/stale-age drift only when scenario and canvas size still match, and record drift reasons as metrics.
+- Keep scenarioChunkPromotionRenderLocked through the second yield and flushRenderBoundary; a stale post-visual run restores political chunk data before yielding ownership.
+- Benchmark acceptance uses firstIdleAfterLastWheelMs plus black-pixel-ratio samples and screenshot artifacts in .runtime/browser/mcp-artifacts/perf.
+

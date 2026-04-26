@@ -640,6 +640,30 @@ def clone_metrics_js(source: str) -> str:
     return f"""JSON.parse(JSON.stringify({source} || {{}}))"""
 
 
+def sample_canvas_black_pixel_ratio_js() -> str:
+    return """(() => {
+      const canvas = document.getElementById('map-canvas') || document.getElementById('colorCanvas');
+      if (!canvas || !canvas.width || !canvas.height) return null;
+      const sampleWidth = Math.min(96, Math.max(1, canvas.width));
+      const sampleHeight = Math.min(64, Math.max(1, canvas.height));
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = sampleWidth;
+      sampleCanvas.height = sampleHeight;
+      const sampleContext = sampleCanvas.getContext('2d', { willReadFrequently: true });
+      if (!sampleContext) return null;
+      sampleContext.drawImage(canvas, 0, 0, sampleWidth, sampleHeight);
+      const pixels = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+      let black = 0;
+      const sampled = sampleWidth * sampleHeight;
+      for (let index = 0; index < pixels.length; index += 4) {
+        const alpha = pixels[index + 3];
+        const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
+        if (alpha > 0 && luminance < 8) black += 1;
+      }
+      return sampled > 0 ? Number((black / sampled).toFixed(6)) : null;
+    })()"""
+
+
 def navigate(url: str) -> dict:
     js = f"""
 async (page) => {{
@@ -1196,16 +1220,38 @@ def with_metric_context(
     expected_metric_scenario_id = "" if normalized_requested_scenario_id == "none" else normalized_requested_scenario_id
     normalized_summary = dict(summary)
     details = dict(normalized_summary.get("details") or {})
+    probe_context = probe if isinstance(probe, dict) else {}
+    details_match_scenario = metric_entry_matches_scenario(
+      details,
+      expected_metric_scenario_id,
+      "scenarioId",
+      "activeScenarioId",
+    )
+    probe_matches_scenario = metric_entry_matches_scenario(
+      probe_context,
+      expected_metric_scenario_id,
+      "scenarioId",
+      "activeScenarioId",
+      "requestedScenarioId",
+    )
+    has_probe_scenario_context = any(
+      str(probe_context.get(field_name) or "").strip()
+      for field_name in ("scenarioId", "activeScenarioId", "requestedScenarioId")
+    )
+    # Direct probes run inside the already-open suite page. Some probes report
+    # only their measured values, so their scenario trust comes from the suite
+    # request plus scenarioConsistency instead of a stale metric entry.
+    direct_probe_without_scenario_fields = (
+      selected_via == "direct-probe"
+      and not any(str(details.get(field_name) or "").strip() for field_name in ("scenarioId", "activeScenarioId"))
+      and not has_probe_scenario_context
+    )
     details.update({
       "metricName": metric_name,
       "requestedScenarioId": normalized_requested_scenario_id,
       "expectedMetricScenarioId": expected_metric_scenario_id,
       "selectedVia": selected_via,
-      "sameScenario": (
-        metric_entry_matches_scenario(details, expected_metric_scenario_id, "scenarioId", "activeScenarioId")
-        if isinstance(details, dict)
-        else False
-      ),
+      "sameScenario": details_match_scenario or probe_matches_scenario or direct_probe_without_scenario_fields,
     })
     if candidate_sources:
       details["candidateSources"] = list(candidate_sources)
@@ -1509,30 +1555,30 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     zoom_end_render_metrics = zoom_end_chunk_visible.get("renderMetrics") if isinstance(zoom_end_chunk_visible.get("renderMetrics"), dict) else {}
     zoom_end_runtime_chunk_state = zoom_end_chunk_visible.get("runtimeChunkLoadState") if isinstance(zoom_end_chunk_visible.get("runtimeChunkLoadState"), dict) else {}
     zoom_end_baselines = zoom_end_chunk_visible.get("metricBaselines") if isinstance(zoom_end_chunk_visible.get("metricBaselines"), dict) else {}
-    zoom_end_visual_stage_metric = summarize_freshest_same_scenario_metric_entry([
+    zoom_end_chunk_visible_metric = summarize_freshest_same_scenario_metric_entry([
       (
-        zoom_end_render_metrics.get("scenarioChunkPromotionVisualStage"),
-        "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
-        zoom_end_baselines.get("scenarioChunkPromotionVisualStageRecordedAt"),
+        zoom_end_render_metrics.get("zoomEndToChunkVisibleMs"),
+        "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
+        zoom_end_baselines.get("zoomEndToChunkVisibleRecordedAt"),
       ),
-    ], expected_metric_scenario_id, field_names=("activeScenarioId",))
-    if zoom_end_visual_stage_metric.get("present"):
-      zoom_end_chunk_visible_metric = zoom_end_visual_stage_metric
-      zoom_end_selected_via = "visual-stage-priority"
-    else:
-      zoom_end_chunk_visible_metric = summarize_freshest_same_scenario_metric_entry([
+      (
+        zoom_end_runtime_chunk_state.get("lastZoomEndToChunkVisibleMetric"),
+        "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
+        zoom_end_baselines.get("lastZoomEndToChunkVisibleRecordedAt"),
+      ),
+    ], expected_metric_scenario_id, field_names=("scenarioId", "activeScenarioId"))
+    zoom_end_selected_via = "fresh-same-scenario" if zoom_end_chunk_visible_metric.get("present") else "missing"
+    if not zoom_end_chunk_visible_metric.get("present"):
+      zoom_end_visual_stage_metric = summarize_freshest_same_scenario_metric_entry([
         (
-          zoom_end_render_metrics.get("zoomEndToChunkVisibleMs"),
-          "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
-          zoom_end_baselines.get("zoomEndToChunkVisibleRecordedAt"),
+          zoom_end_render_metrics.get("scenarioChunkPromotionVisualStage"),
+          "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
+          zoom_end_baselines.get("scenarioChunkPromotionVisualStageRecordedAt"),
         ),
-        (
-          zoom_end_runtime_chunk_state.get("lastZoomEndToChunkVisibleMetric"),
-          "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
-          zoom_end_baselines.get("lastZoomEndToChunkVisibleRecordedAt"),
-        ),
-      ], expected_metric_scenario_id, field_names=("scenarioId", "activeScenarioId"))
-      zoom_end_selected_via = "fresh-same-scenario" if zoom_end_chunk_visible_metric.get("present") else "missing"
+      ], expected_metric_scenario_id, field_names=("activeScenarioId",))
+      if zoom_end_visual_stage_metric.get("present"):
+        zoom_end_chunk_visible_metric = zoom_end_visual_stage_metric
+        zoom_end_selected_via = "visual-stage-fallback"
     zoom_end_chunk_visible_metric = with_metric_context(
       zoom_end_chunk_visible_metric,
       metric_name="zoomEndToChunkVisible",
@@ -1541,9 +1587,9 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       probe=zoom_end_chunk_visible,
       baselines=zoom_end_baselines,
       candidate_sources=[
-        "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
         "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs",
         "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
+        "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
       ],
     )
 
@@ -1574,7 +1620,11 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     wheel_anchor_metric = {
       "present": bool(wheel_anchor_trace),
       "source": "wheelAnchorTrace",
-      "durationMs": as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")),
+      "durationMs": (
+        as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs"))
+        if as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs")) is not None
+        else as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs"))
+      ),
       "recordedAt": None,
       "count": as_finite_number(wheel_anchor_trace.get("maxStableAnchorDriftPx")),
       "details": {
@@ -1582,12 +1632,22 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "maxStableAnchorDriftPx": as_finite_number(wheel_anchor_trace.get("maxStableAnchorDriftPx")),
         "postIdleAnchorDriftPx": as_finite_number(wheel_anchor_trace.get("postIdleAnchorDriftPx")),
         "firstIdleAfterWheelMs": as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")),
+        "lastWheelAt": as_finite_number(wheel_anchor_trace.get("lastWheelAt")),
+        "firstIdleAfterLastWheelMs": as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs")),
+        "maxBlackPixelRatio": as_finite_number(wheel_anchor_trace.get("maxBlackPixelRatio")),
         "longTaskCountDelta": as_finite_number(wheel_anchor_trace.get("longTaskCountDelta")),
         "maxLongTaskMs": as_finite_number(wheel_anchor_trace.get("maxLongTaskMs")),
         "blackFrameDelta": as_finite_number(wheel_anchor_trace.get("blackFrameDelta")),
         "distribution": summarize_distribution([
-          as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs"))
-        ] if as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")) is not None else []),
+          (
+            as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs"))
+            if as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs")) is not None
+            else as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs"))
+          )
+        ] if (
+          as_finite_number(wheel_anchor_trace.get("firstIdleAfterLastWheelMs")) is not None
+          or as_finite_number(wheel_anchor_trace.get("firstIdleAfterWheelMs")) is not None
+        ) else []),
       },
     }
     interactive_pan_metric = summarize_interactive_pan_metric(suite)
@@ -1599,7 +1659,7 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       requested_scenario_id=requested_scenario_id,
       selected_via="direct-probe",
       probe=wheel_anchor_trace,
-      candidate_sources=["wheelAnchorTrace.firstIdleAfterWheelMs"],
+      candidate_sources=["wheelAnchorTrace.firstIdleAfterLastWheelMs", "wheelAnchorTrace.firstIdleAfterWheelMs"],
     )
     interactive_pan_metric = with_metric_context(
       interactive_pan_metric,
@@ -2257,9 +2317,11 @@ async (page) => {{
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
       && String(entry?.scenarioId || '') === expectedScenarioId
       && Math.abs(Number(entry?.zoom || 0) - expectedZoom) <= 0.02;
-    const hasFreshVisualStageMetric = (entry, baselineRecordedAt) =>
+    const hasFreshVisualStageMetric = (entry, baselineRecordedAt, expectedSelectionVersion = 0) =>
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
-      && String(entry?.activeScenarioId || '') === expectedScenarioId;
+      && String(entry?.activeScenarioId || '') === expectedScenarioId
+      && String(entry?.reason || '').toLowerCase() === 'zoom-end'
+      && Number(entry?.selectionVersion || 0) >= Number(expectedSelectionVersion || 0);
     const originalZoomPercent = Math.round(Math.max(1, Number(state.zoomTransform?.k || 1) * 100));
     const detailZoomThreshold = Number(state.activeScenarioManifest?.render_budget_hints?.detail_zoom_threshold || 0);
     const minimumTriggerPercent = Math.max(120, Math.ceil(detailZoomThreshold * 100) + 5);
@@ -2271,6 +2333,7 @@ async (page) => {{
       delayMs: 0,
       flushPending: true,
     }});
+    const expectedSelectionVersion = Number(state.runtimeChunkLoadState?.selectionVersion || 0);
     const registrationStartedAt = performance.now();
     while (
       Math.abs(Number(state.runtimeChunkLoadState?.zoomEndChunkVisibleMetric?.zoom || 0) - expectedZoom) > 0.02
@@ -2280,7 +2343,7 @@ async (page) => {{
     }}
     const startedAt = performance.now();
     while (
-      !hasFreshVisualStageMetric(state.renderPerfMetrics?.scenarioChunkPromotionVisualStage, previousVisualStageRecordedAt)
+      !hasFreshVisualStageMetric(state.renderPerfMetrics?.scenarioChunkPromotionVisualStage, previousVisualStageRecordedAt, expectedSelectionVersion)
       && !hasFreshChunkVisibleMetric(state.renderPerfMetrics?.zoomEndToChunkVisibleMs, previousRenderRecordedAt)
       && !hasFreshChunkVisibleMetric(state.runtimeChunkLoadState?.lastZoomEndToChunkVisibleMetric, previousRuntimeRecordedAt)
       && (performance.now() - startedAt) < 12000
@@ -2294,6 +2357,7 @@ async (page) => {{
       visualStageObserved: hasFreshVisualStageMetric(
         state.renderPerfMetrics?.scenarioChunkPromotionVisualStage,
         previousVisualStageRecordedAt,
+        expectedSelectionVersion,
       ),
       renderMetricObserved: hasFreshChunkVisibleMetric(
         state.renderPerfMetrics?.zoomEndToChunkVisibleMs,
@@ -2309,6 +2373,7 @@ async (page) => {{
         scenarioChunkPromotionVisualStageRecordedAt: previousVisualStageRecordedAt,
         zoomEndToChunkVisibleRecordedAt: previousRenderRecordedAt,
         lastZoomEndToChunkVisibleRecordedAt: previousRuntimeRecordedAt,
+        expectedSelectionVersion,
       }},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
@@ -2362,6 +2427,7 @@ async (page) => {{
       }},
       interactiveFrame,
       restoredFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
+      blackPixelRatio: {sample_canvas_black_pixel_ratio_js()},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       overlay: document.getElementById('perf-overlay')?.textContent || '',
     }};
@@ -2435,6 +2501,7 @@ async (page) => {{
       }},
       anchorDriftPx: Number(Math.hypot(dx, dy).toFixed(3)),
       blackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+      blackPixelRatio: {sample_canvas_black_pixel_ratio_js()},
       longTaskCountDelta: newLongTasks.length,
       maxLongTaskMs: newLongTasks.reduce((max, entry) => Math.max(max, Number(entry.duration || 0)), 0),
       lastFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
@@ -2445,8 +2512,10 @@ async (page) => {{
   const samples = [];
   samples.push(await sample('before-wheel'));
   await page.mouse.move(target.screenX, target.screenY);
+  let lastWheelAt = Number(target.baselineTime || 0);
   for (let index = 0; index < 5; index += 1) {{
     await page.mouse.wheel(0, -280);
+    lastWheelAt = await page.evaluate(() => performance.now());
     await page.waitForTimeout(80);
     samples.push(await sample(`after-wheel-${{index + 1}}`));
   }}
@@ -2473,9 +2542,15 @@ async (page) => {{
   const maxStableAnchorDriftPx = stableSamples.reduce((max, entry) => Math.max(max, Number(entry.anchorDriftPx || 0)), 0);
   const longTaskCountDelta = Number(after.longTaskCountDelta || 0);
   const maxLongTaskMs = samples.reduce((max, entry) => Math.max(max, Number(entry.maxLongTaskMs || 0)), 0);
+  const baselineTime = Number(target.baselineTime || 0);
+  const lastWheelOffsetMs = Math.max(0, Number(lastWheelAt || 0) - baselineTime);
+  const maxBlackPixelRatio = samples.reduce((max, entry) => Math.max(max, Number(entry.blackPixelRatio || 0)), 0);
   return {{
     requestedScenarioId: {json.dumps(scenario_id)},
     samples,
+    lastWheelAt: Number(lastWheelAt || 0),
+    firstIdleAfterLastWheelMs: Math.max(0, Number(after.dtMs || 0) - lastWheelOffsetMs),
+    maxBlackPixelRatio,
     maxAnchorDriftPx,
     maxStableAnchorDriftPx,
     postIdleAnchorDriftPx: Number(postIdleSample?.anchorDriftPx || 0),
@@ -2697,6 +2772,10 @@ async (page) => {{
 
 def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
+    # Each scenario is intentionally isolated. TNO can inherit enough browser
+    # state from a previous heavy scenario to make navigation itself flaky,
+    # which pollutes the benchmark before any measured action starts.
+    close_session()
     page_load = open_page(build_scenario_open_urls(base_urls, scenario_id))
     startup_ready = wait_for_benchmark_runtime_ready(f"open:{scenario_id}")
     clear_browser_buffers()
@@ -2733,8 +2812,14 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     zoom_end_chunk_visible = measure_zoom_end_chunk_visible(scenario_id)
     print(f"[benchmark] wheel anchor scenario={scenario_id}", flush=True)
     wheel_anchor_trace = measure_wheel_anchor_trace(scenario_id)
+    rapid_wheel_screenshot_path = (
+      take_screenshot(screenshot_dir / f"{scenario_id or 'none'}-rapid-wheel.png")
+      if wheel_anchor_trace
+      else None
+    )
     print(f"[benchmark] interactive pan scenario={scenario_id}", flush=True)
     interactive_pan_frame = measure_interactive_pan_frame()
+    interactive_pan_screenshot_path = take_screenshot(screenshot_dir / f"{scenario_id or 'none'}-interactive-pan.png")
     print(f"[benchmark] single fill scenario={scenario_id}", flush=True)
     single_fill = measure_single_click_fill()
     print(f"[benchmark] double fill scenario={scenario_id}", flush=True)
@@ -2761,6 +2846,8 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
       "networkIssues": network_issues,
       "screenshots": {
         "home": screenshot_path,
+        "rapidWheel": rapid_wheel_screenshot_path,
+        "interactivePan": interactive_pan_screenshot_path,
       },
     }
     suite["scenarioConsistency"] = build_suite_scenario_consistency(suite)

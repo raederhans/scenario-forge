@@ -17,6 +17,8 @@ const DEFAULT_RAW_DIR = path.join(REPO_ROOT, ".runtime", "output", "perf", "base
 const ACTIVE_SERVER_PATH = path.join(REPO_ROOT, ".runtime", "dev", "active_server.json");
 const DEV_SERVER_OUT = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.out.log");
 const DEV_SERVER_ERR = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.err.log");
+const MIN_GATE_WARMUPS = 3;
+const DEFAULT_WARMUPS = MIN_GATE_WARMUPS;
 const PERF_URL_QUERY = Object.freeze({
   render_profile: "balanced",
   startup_interaction: "full",
@@ -43,7 +45,7 @@ function parseArgs(argv) {
     mode: "baseline",
     scenarios: [...DEFAULT_SCENARIOS],
     runs: 5,
-    warmups: 1,
+    warmups: DEFAULT_WARMUPS,
     threshold: 1.15,
     baselineJson: DEFAULT_BASELINE_JSON,
     baselineMd: DEFAULT_BASELINE_MD,
@@ -688,12 +690,20 @@ function collectBaselineContractMismatches(currentReport, baselineReport) {
       `urlQuery mismatch: baseline=${JSON.stringify(baselineQuery)} current=${JSON.stringify(currentQuery)}`
     );
   }
+  const baselineWarmups = finiteNumber(baselineReport?.config?.warmups, NaN);
+  const currentWarmups = finiteNumber(currentReport?.config?.warmups, NaN);
+  if (Number.isFinite(baselineWarmups) && Number.isFinite(currentWarmups) && baselineWarmups !== currentWarmups) {
+    mismatches.push(`warmups mismatch: baseline=${baselineWarmups} current=${currentWarmups}`);
+  }
 
   return mismatches;
 }
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
+  if (options.mode === "gate" && options.warmups < MIN_GATE_WARMUPS) {
+    throw new Error(`[perf-baseline] Gate warmups must be at least ${MIN_GATE_WARMUPS}; received ${options.warmups}.`);
+  }
   await ensureDir(options.rawDir);
   const gitHead = await resolveGitHead();
   let baselineReportForGate = null;

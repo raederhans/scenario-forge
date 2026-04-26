@@ -1,4 +1,5 @@
 from pathlib import Path
+import importlib.util
 import json
 import re
 import unittest
@@ -10,13 +11,24 @@ WORKFLOW_FILE = REPO_ROOT / ".github" / "workflows" / "perf-pr-gate.yml"
 BASELINE_MD = REPO_ROOT / "docs" / "perf" / "baseline_2026-04-20.md"
 BASELINE_JSON = REPO_ROOT / "docs" / "perf" / "baseline_2026-04-20.json"
 PERF_SCRIPT = REPO_ROOT / "tools" / "perf" / "run_baseline.mjs"
+EDITOR_BENCHMARK_SCRIPT = REPO_ROOT / "ops" / "browser-mcp" / "editor-performance-benchmark.py"
+
+
+def load_editor_benchmark_module():
+    spec = importlib.util.spec_from_file_location("editor_performance_benchmark", EDITOR_BENCHMARK_SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class PerfGateContractTest(unittest.TestCase):
     def test_package_perf_gate_uses_real_gate_scenarios(self):
         package_payload = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
+        perf_baseline_script = package_payload["scripts"]["perf:baseline"]
         perf_gate_script = package_payload["scripts"]["perf:gate"]
+        self.assertIn("--warmups 3", perf_baseline_script)
         self.assertIn("--scenarios tno_1962,hoi4_1939", perf_gate_script)
+        self.assertIn("--warmups 3", perf_gate_script)
         self.assertNotIn("blank_base", perf_gate_script)
 
     def test_workflow_matches_checked_in_baseline_environment(self):
@@ -47,6 +59,10 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('getPerfReportContractMismatches(baselineReport, "baseline")', script)
         self.assertIn('getPerfReportContractMismatches(currentReport, "current")', script)
         self.assertIn('const DEFAULT_GATE_SCENARIOS = ["tno_1962", "hoi4_1939"];', script)
+        self.assertIn("const MIN_GATE_WARMUPS = 3;", script)
+        self.assertIn("const DEFAULT_WARMUPS = MIN_GATE_WARMUPS;", script)
+        self.assertIn('throw new Error(`[perf-baseline] Gate warmups must be at least ${MIN_GATE_WARMUPS}; received ${options.warmups}.`);', script)
+        self.assertIn("warmups mismatch: baseline=", script)
         self.assertIn('if (activeScenarioId !== normalizeScenarioId(scenarioId)) {', script)
         self.assertIn('{ key: "scenarioAppliedMs", label: "scenarioAppliedMs" }', script)
         self.assertIn('{ key: "applyScenarioBundleMs", label: "applyScenarioBundleMs" }', script)
@@ -73,6 +89,96 @@ class PerfGateContractTest(unittest.TestCase):
             self.assertIn(field_name, script)
         self.assertIn('bootMetrics["scenario-apply"]?.source', script)
         self.assertIn("Perf gate baseline contract mismatch.", script)
+
+    def test_wheel_anchor_metric_prefers_last_wheel_clock_and_keeps_legacy_fallback(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+            },
+            "wheelAnchorTrace": {
+                "requestedScenarioId": "tno_1962",
+                "firstIdleAfterWheelMs": 900,
+                "firstIdleAfterLastWheelMs": 123,
+                "maxBlackPixelRatio": 0.1,
+            },
+        }
+
+        metric = benchmark.build_suite_benchmark_metrics(suite)["wheelAnchorTrace"]
+        self.assertEqual(metric["durationMs"], 123)
+        self.assertEqual(metric["details"]["firstIdleAfterWheelMs"], 900)
+        self.assertEqual(metric["details"]["firstIdleAfterLastWheelMs"], 123)
+        self.assertEqual(metric["details"]["maxBlackPixelRatio"], 0.1)
+        self.assertTrue(metric["details"]["sameScenario"])
+
+        del suite["wheelAnchorTrace"]["firstIdleAfterLastWheelMs"]
+        fallback_metric = benchmark.build_suite_benchmark_metrics(suite)["wheelAnchorTrace"]
+        self.assertEqual(fallback_metric["durationMs"], 900)
+        self.assertIsNone(fallback_metric["details"]["firstIdleAfterLastWheelMs"])
+
+    def test_zoom_end_chunk_visible_metric_preserves_end_to_visible_duration(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+            },
+            "zoomEndChunkVisible": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+                "renderMetrics": {
+                    "scenarioChunkPromotionVisualStage": {
+                        "durationMs": 12,
+                        "recordedAt": 300,
+                        "activeScenarioId": "tno_1962",
+                        "reason": "zoom-end",
+                    },
+                    "zoomEndToChunkVisibleMs": {
+                        "durationMs": 850,
+                        "recordedAt": 200,
+                        "scenarioId": "tno_1962",
+                    },
+                },
+                "runtimeChunkLoadState": {
+                    "lastZoomEndToChunkVisibleMetric": {
+                        "durationMs": 910,
+                        "recordedAt": 190,
+                        "scenarioId": "tno_1962",
+                    },
+                },
+                "metricBaselines": {
+                    "scenarioChunkPromotionVisualStageRecordedAt": 0,
+                    "zoomEndToChunkVisibleRecordedAt": 0,
+                    "lastZoomEndToChunkVisibleRecordedAt": 0,
+                },
+            },
+        }
+
+        metric = benchmark.build_suite_benchmark_metrics(suite)["zoomEndToChunkVisible"]
+        self.assertEqual(metric["durationMs"], 850)
+        self.assertEqual(metric["source"], "zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs")
+        self.assertEqual(metric["details"]["selectedVia"], "fresh-same-scenario")
+        self.assertIn(
+            "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage",
+            metric["details"]["candidateSources"],
+        )
+
+        del suite["zoomEndChunkVisible"]["renderMetrics"]["zoomEndToChunkVisibleMs"]
+        runtime_metric = benchmark.build_suite_benchmark_metrics(suite)["zoomEndToChunkVisible"]
+        self.assertEqual(runtime_metric["durationMs"], 910)
+        self.assertEqual(
+            runtime_metric["source"],
+            "zoomEndChunkVisible.runtimeChunkLoadState.lastZoomEndToChunkVisibleMetric",
+        )
+
+        del suite["zoomEndChunkVisible"]["runtimeChunkLoadState"]["lastZoomEndToChunkVisibleMetric"]
+        visual_fallback_metric = benchmark.build_suite_benchmark_metrics(suite)["zoomEndToChunkVisible"]
+        self.assertEqual(visual_fallback_metric["durationMs"], 12)
+        self.assertEqual(visual_fallback_metric["source"], "zoomEndChunkVisible.renderMetrics.scenarioChunkPromotionVisualStage")
+        self.assertEqual(visual_fallback_metric["details"]["selectedVia"], "visual-stage-fallback")
 
 
 if __name__ == "__main__":

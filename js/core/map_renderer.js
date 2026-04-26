@@ -2161,7 +2161,13 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
     return reject("canvas-size-mismatch");
   }
   if (Math.abs(Number(frame.dpr || 1) - identity.dpr) > 0.01) {
-    return reject("dpr-mismatch");
+    recordRenderPerfMetric("continuityFrameRelaxedReuse", 0, {
+      reasons: "dpr-mismatch",
+      staleAgeMs,
+      activeScenarioId: identity.scenarioId,
+      frameDpr: Number(frame.dpr || 1),
+      currentDpr: identity.dpr,
+    });
   }
   if (Number(frame.topologyRevision || 0) !== identity.topologyRevision) {
     return reject("topology-revision-mismatch");
@@ -18407,12 +18413,15 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   if (TRANSFORMED_FRAME_PASS_NAMES.some((passName) => !canDrawTransformedPass(passName, cache))) {
     return false;
   }
-  const compositeReady = canDrawInteractionComposite(currentTransform, cache)
-    || buildInteractionComposite(currentTransform, timings);
+  const canReuseComposite = canDrawInteractionComposite(currentTransform, cache);
+  const canBuildCompositeNow = runtimeState.renderPhase !== RENDER_PHASE_INTERACTING;
+  const compositeReady = canReuseComposite || (canBuildCompositeNow && buildInteractionComposite(currentTransform, timings));
   if (!compositeReady) {
     recordRenderPerfMetric("interactionCompositeUnavailable", 0, {
       phase: String(runtimeState.renderPhase || ""),
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      deferredBuild: !canBuildCompositeNow,
+      reason: cache.interactionComposite?.rejectedReason || "missing-interaction-composite",
     });
     return false;
   }
@@ -18438,7 +18447,14 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   const drewAll = drewComposite && transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform)
   );
-  if (!drewAll) return false;
+  if (!drewAll) {
+    recordRenderPerfMetric("transformedFramePostClearFailure", 0, {
+      phase: String(runtimeState.renderPhase || ""),
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      drewComposite: !!drewComposite,
+    });
+    return drawLastGoodFrameFallback(currentTransform);
+  }
 
   if (!drawInteractionBorderSnapshot(currentTransform)) {
     const k = Math.max(0.0001, Number(currentTransform?.k || 1));

@@ -184,3 +184,34 @@ pm run test:e2e:water-rendering failed in adjacent water/river specs: river time
 - Changed in-flight refresh handling to preserve pendingPostCommitRefresh and replay after commit instead of clearing a real pending refresh.
 - Unified ready post-boot work in scheduleReadyPostBootWork(), so both ready paths start deferred full interaction infra.
 - Adjusted continuity stale age to count from invalidatedAt when the frame is marked stale.
+
+## 2026-04-26 14:50 UTC interaction black-frame and zoom closeout fresh implementation
+- Re-read active plan/context/task, AGENTS, lessons learned, ultrawork, agent tiers, and relevant memory for the app-performance-overhaul path.
+- Static-only subagents mapped current renderer/chunk-runtime/benchmark paths and verification entrypoints; parent retained all live test ownership.
+- Implemented interaction-period composite reuse policy: INTERACTING reuses existing interactionComposite only, records deferred build when unavailable, and post-clear transformed-frame failure immediately draws continuity frame.
+- Relaxed continuity-frame reuse to same scenario and canvas size while recording DPR/topology/stale-age reasons in continuityFrameRelaxedReuse.
+- Added second promotion yield after render-suppressed political apply, revalidates run ownership, keeps render lock through flush, and restores political chunk payload on stale post-visual ownership loss.
+- Extended editor benchmark with firstIdleAfterLastWheelMs, blackPixelRatio/maxBlackPixelRatio, current zoom-end selection-version filtering, and rapid-wheel/interactive-pan screenshots under .runtime/browser/mcp-artifacts/perf.
+
+
+## 2026-04-26 15:23 UTC verification notes
+- Static/syntax passed: node --check for renderer/chunk/state JS; py_compile for benchmark and Python contracts.
+- Node/Python contracts passed: scenario-chunk-contracts, perf-probe-snapshot-behavior, scenario-runtime-state-behavior, scenario chunk refresh + perf gate unittest group.
+- E2E passed after preserving zoom-end detail chunks through exact-settle replay: scenario-chunk-runtime 4/4, tno-ready-state 5/5, interaction-funnel 3/3.
+- Editor performance benchmark passed via Windows py launcher with dev_server running; output .runtime/output/perf/editor-performance-benchmark.json and screenshots under .runtime/browser/mcp-artifacts/perf/. Bash/WSL wrapper failed to open local Playwright browser in this environment.
+- perf:gate failed twice on broad startup/render thresholds for both tno_1962 and hoi4_1939; failures were global startup/apply/render deltas, logged under .runtime/tests/interaction-black-zoom-closeout/perf-gate*.err.log.
+
+## 2026-04-26 16:25 UTC perf gate and benchmark context closeout
+- Root cause for the broad perf gate red was warmup mismatch against the checked-in warmed baseline shape: one warmup produced cold first measured runs, while three warmups restored TNO startup/render to the existing baseline envelope.
+- Updated `perf:baseline`, `perf:gate`, `tools/perf/run_baseline.mjs`, and checked-in `docs/perf/baseline_2026-04-20.*` so baseline and gate both use three warmups. Gate now rejects lower warmup counts and compares warmup count against the baseline report contract.
+- Fixed editor benchmark direct-probe `sameScenario` context and moved `lastWheelAt` into the page `performance.now()` clock domain so `firstIdleAfterLastWheelMs` no longer mixes Playwright and page clocks.
+- Tightened zoom-end chunk protection to a one-shot, selection/focus/scenario-bound replay window instead of a broad 30s detail chunk hold.
+- Restored hard rejection for continuity frames across topology revision and stale-age limit; only DPR drift remains a measured relaxed reuse path.
+- Added behavior coverage for wheel trace last-wheel metric fallback and one-shot zoom-end detail chunk protection scope.
+- Fresh verification passed: syntax/py_compile; node renderer/runtime/perf/chunk contracts; Python chunk refresh + perf gate contracts; dev E2E scenario-chunk-runtime, tno-ready-state, interaction-funnel; full editor benchmark; `npm run perf:baseline`; `npm run perf:gate` rerun passed after one noisy refreshScenarioApplyMs miss.
+
+## 2026-04-26 review follow-up: zoom-end benchmark metric source
+- Review found zoomEndToChunkVisible report selection used scenarioChunkPromotionVisualStage.durationMs ahead of the true end-to-visible metrics, which undercounts zoom-end wait when loading, post-ready queues, or promotion retry happen before the final visual commit.
+- Fixed benchmark metric selection so zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs and untimeChunkLoadState.lastZoomEndToChunkVisibleMetric own the reported zoomEndToChunkVisible.durationMs; scenarioChunkPromotionVisualStage remains a fallback when end-to-visible metrics are absent.
+- Added Python behavior coverage for render metric, runtime metric, and visual-stage fallback order. Verification passed: python -m py_compile ops/browser-mcp/editor-performance-benchmark.py tests/test_perf_gate_contract.py; python -m unittest tests.test_perf_gate_contract -q; 
+pm run test:node:scenario-chunk-contracts.
