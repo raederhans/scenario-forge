@@ -10,14 +10,15 @@ export const HISTORICAL_1930_CITY_LIGHTS_SOURCE = Object.freeze({
 });
 
 export const HISTORICAL_1930_CITY_LIGHTS_STATS = Object.freeze({
-  entryCount: 1456,
+  entryCount: 1580,
   countryCapitalCount: 230,
-  adminCapitalCount: 1144,
+  adminCapitalCount: 1267,
   excludedCount: 6,
   populationThreshold: 1200000,
   adminCapitalPopulationThreshold: 400000,
+  calibrationVersion: "balanced-2026-04",
   maxWeight: 1.0,
-  meanWeight: 0.5632
+  meanWeight: 0.5864
 });
 
 export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
@@ -27,7 +28,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 35676000,
-    nameAscii: "Tokyo"
+    nameAscii: "Tokyo",
+    countryCode: "JP"
 },
   {
     lon: -99.1277,
@@ -35,7 +37,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 19028000,
-    nameAscii: "Mexico City"
+    nameAscii: "Mexico City",
+    countryCode: "MX"
 },
   {
     lon: 116.3972,
@@ -43,7 +46,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 18960744,
-    nameAscii: "Beijing"
+    nameAscii: "Beijing",
+    countryCode: "CN"
 },
   {
     lon: 15.3136,
@@ -51,7 +55,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 16000000,
-    nameAscii: "Kinshasa"
+    nameAscii: "Kinshasa",
+    countryCode: "CD"
 },
   {
     lon: 3.3947,
@@ -59,7 +64,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 15388000,
-    nameAscii: "Lagos"
+    nameAscii: "Lagos",
+    countryCode: "NG"
 },
   {
     lon: 90.4074,
@@ -67,7 +73,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 12797394,
-    nameAscii: "Dhaka"
+    nameAscii: "Dhaka",
+    countryCode: "BD"
 },
   {
     lon: -58.3772,
@@ -75,7 +82,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 12795000,
-    nameAscii: "Buenos Aires"
+    nameAscii: "Buenos Aires",
+    countryCode: "AR"
 },
   {
     lon: 31.2497,
@@ -83,7 +91,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 11893000,
-    nameAscii: "Cairo"
+    nameAscii: "Cairo",
+    countryCode: "EG"
 },
   {
     lon: 120.9822,
@@ -91,7 +100,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 11100000,
-    nameAscii: "Manila"
+    nameAscii: "Manila",
+    countryCode: "PH"
 },
   {
     lon: 37.6178,
@@ -99,7 +109,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 10452000,
-    nameAscii: "Moscow"
+    nameAscii: "Moscow",
+    countryCode: "RU"
 },
   {
     lon: 126.9784,
@@ -107,7 +118,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 10349312,
-    nameAscii: "Seoul"
+    nameAscii: "Seoul",
+    countryCode: "KR"
 },
   {
     lon: 2.3488,
@@ -115,7 +127,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 9904000,
-    nameAscii: "Paris"
+    nameAscii: "Paris",
+    countryCode: "FR"
 },
   {
     lon: 28.0436,
@@ -123,7 +136,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 9418183,
-    nameAscii: "Johannesburg"
+    nameAscii: "Johannesburg",
+    countryCode: "ZA"
 },
   {
     lon: 106.8451,
@@ -131,7 +145,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 9125000,
-    nameAscii: "Jakarta"
+    nameAscii: "Jakarta",
+    countryCode: "ID"
 },
   {
     lon: -0.1257,
@@ -139,7 +154,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 8961989,
-    nameAscii: "London"
+    nameAscii: "London",
+    countryCode: "GB"
 },
   {
     lon: 105.8412,
@@ -147,7 +163,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 8053663,
-    nameAscii: "Hanoi"
+    nameAscii: "Hanoi",
+    countryCode: "VN"
 },
   {
     lon: -77.0282,
@@ -155,7 +172,35 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 1.0,
     capitalKind: "country_capital",
     population: 8012000,
-    nameAscii: "Lima"
+    nameAscii: "Lima",
+    countryCode: "PE"
+},
+  {
+    lon: -3.7026,
+    lat: 40.4165,
+    weight: 1.0,
+    capitalKind: "country_capital",
+    population: 5567000,
+    nameAscii: "Madrid",
+    countryCode: "ES"
+},
+  {
+    lon: 13.4105,
+    lat: 52.5244,
+    weight: 1.0,
+    capitalKind: "country_capital",
+    population: 3426354,
+    nameAscii: "Berlin",
+    countryCode: "DE"
+},
+  {
+    lon: 12.5113,
+    lat: 41.8919,
+    weight: 1.0,
+    capitalKind: "country_capital",
+    population: 3339000,
+    nameAscii: "Rome",
+    countryCode: "IT"
 },
   {
     lon: 51.4215,
@@ -163,7 +208,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9986,
     capitalKind: "country_capital",
     population: 7873000,
-    nameAscii: "Tehran"
+    nameAscii: "Tehran",
+    countryCode: "IR"
 },
   {
     lon: 121.5264,
@@ -171,7 +217,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9986,
     capitalKind: "country_capital",
     population: 7871900,
-    nameAscii: "Taipei"
+    nameAscii: "Taipei",
+    countryCode: "TW"
+},
+  {
+    lon: 23.7278,
+    lat: 37.9838,
+    weight: 0.9975,
+    capitalKind: "country_capital",
+    population: 3242000,
+    nameAscii: "Athens",
+    countryCode: "GR"
 },
   {
     lon: -74.0817,
@@ -179,7 +235,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9966,
     capitalKind: "country_capital",
     population: 7772000,
-    nameAscii: "Bogota"
+    nameAscii: "Bogota",
+    countryCode: "CO"
 },
   {
     lon: 114.1747,
@@ -187,7 +244,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9888,
     capitalKind: "country_capital",
     population: 7396076,
-    nameAscii: "Hong Kong"
+    nameAscii: "Hong Kong",
+    countryCode: "HK"
 },
   {
     lon: 44.4009,
@@ -195,7 +253,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.985,
     capitalKind: "country_capital",
     population: 7216000,
-    nameAscii: "Baghdad"
+    nameAscii: "Baghdad",
+    countryCode: "IQ"
 },
   {
     lon: 100.5014,
@@ -203,7 +262,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9735,
     capitalKind: "country_capital",
     population: 6704000,
-    nameAscii: "Bangkok"
+    nameAscii: "Bangkok",
+    countryCode: "TH"
+},
+  {
+    lon: -9.1498,
+    lat: 38.7251,
+    weight: 0.9717,
+    capitalKind: "country_capital",
+    population: 2812000,
+    nameAscii: "Lisbon",
+    countryCode: "PT"
 },
   {
     lon: -4.0017,
@@ -211,7 +280,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9643,
     capitalKind: "country_capital",
     population: 6321017,
-    nameAscii: "Abidjan"
+    nameAscii: "Abidjan",
+    countryCode: "CI"
 },
   {
     lon: -70.6483,
@@ -219,7 +289,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9487,
     capitalKind: "country_capital",
     population: 5720000,
-    nameAscii: "Santiago"
+    nameAscii: "Santiago",
+    countryCode: "CL"
 },
   {
     lon: 103.8501,
@@ -227,15 +298,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9464,
     capitalKind: "country_capital",
     population: 5638700,
-    nameAscii: "Singapore"
+    nameAscii: "Singapore",
+    countryCode: "SG"
 },
   {
-    lon: -3.7026,
-    lat: 40.4165,
-    weight: 0.9444,
+    lon: 135.5011,
+    lat: 34.6938,
+    weight: 0.9452,
+    capitalKind: "admin_capital",
+    population: 11294000,
+    nameAscii: "Osaka",
+    countryCode: "JP"
+},
+  {
+    lon: 16.3721,
+    lat: 48.2085,
+    weight: 0.9429,
     capitalKind: "country_capital",
-    population: 5567000,
-    nameAscii: "Madrid"
+    population: 2400000,
+    nameAscii: "Vienna",
+    countryCode: "AT"
 },
   {
     lon: 39.2695,
@@ -243,7 +325,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9392,
     capitalKind: "country_capital",
     population: 5383728,
-    nameAscii: "Dar es Salaam"
+    nameAscii: "Dar es Salaam",
+    countryCode: "TZ"
+},
+  {
+    lon: 2.159,
+    lat: 41.3888,
+    weight: 0.9339,
+    capitalKind: "admin_capital",
+    population: 4920000,
+    nameAscii: "Barcelona",
+    countryCode: "ES"
 },
   {
     lon: 13.2343,
@@ -251,7 +343,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9329,
     capitalKind: "country_capital",
     population: 5172900,
-    nameAscii: "Luanda"
+    nameAscii: "Luanda",
+    countryCode: "AO"
+},
+  {
+    lon: 30.5238,
+    lat: 50.4547,
+    weight: 0.9205,
+    capitalKind: "country_capital",
+    population: 2797553,
+    nameAscii: "Kyiv",
+    countryCode: "UA"
 },
   {
     lon: 18.4232,
@@ -259,7 +361,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9204,
     capitalKind: "country_capital",
     population: 4772846,
-    nameAscii: "Cape Town"
+    nameAscii: "Cape Town",
+    countryCode: "ZA"
 },
   {
     lon: 32.5324,
@@ -267,7 +370,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9197,
     capitalKind: "country_capital",
     population: 4754000,
-    nameAscii: "Khartoum"
+    nameAscii: "Khartoum",
+    countryCode: "SD"
 },
   {
     lon: 96.1561,
@@ -275,7 +379,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9104,
     capitalKind: "country_capital",
     population: 4477638,
-    nameAscii: "Yangon"
+    nameAscii: "Yangon",
+    countryCode: "MM"
 },
   {
     lon: 46.7219,
@@ -283,7 +388,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9099,
     capitalKind: "country_capital",
     population: 4465000,
-    nameAscii: "Riyadh"
+    nameAscii: "Riyadh",
+    countryCode: "SA"
 },
   {
     lon: 69.1723,
@@ -291,7 +397,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9089,
     capitalKind: "country_capital",
     population: 4434550,
-    nameAscii: "Kabul"
+    nameAscii: "Kabul",
+    countryCode: "AF"
 },
   {
     lon: 36.8167,
@@ -299,7 +406,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9075,
     capitalKind: "country_capital",
     population: 4397073,
-    nameAscii: "Nairobi"
+    nameAscii: "Nairobi",
+    countryCode: "KE"
 },
   {
     lon: -77.0364,
@@ -307,7 +415,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9054,
     capitalKind: "country_capital",
     population: 4338000,
-    nameAscii: "Washington"
+    nameAscii: "Washington",
+    countryCode: "US"
 },
   {
     lon: -7.9752,
@@ -315,7 +424,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.9014,
     capitalKind: "country_capital",
     population: 4227569,
-    nameAscii: "Bamako"
+    nameAscii: "Bamako",
+    countryCode: "ML"
+},
+  {
+    lon: 30.3141,
+    lat: 59.9386,
+    weight: 0.9001,
+    capitalKind: "admin_capital",
+    population: 5351935,
+    nameAscii: "Saint Petersburg",
+    countryCode: "RU"
 },
   {
     lon: 38.7469,
@@ -323,7 +442,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8872,
     capitalKind: "country_capital",
     population: 3860000,
-    nameAscii: "Addis Ababa"
+    nameAscii: "Addis Ababa",
+    countryCode: "ET"
+},
+  {
+    lon: 4.3488,
+    lat: 50.8505,
+    weight: 0.8849,
+    capitalKind: "country_capital",
+    population: 1743000,
+    nameAscii: "Brussels",
+    countryCode: "BE"
 },
   {
     lon: 32.8543,
@@ -331,7 +460,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8812,
     capitalKind: "country_capital",
     population: 3716000,
-    nameAscii: "Ankara"
+    nameAscii: "Ankara",
+    countryCode: "TR"
 },
   {
     lon: 121.4581,
@@ -339,7 +469,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 24874500,
-    nameAscii: "Shanghai"
+    nameAscii: "Shanghai",
+    countryCode: "CN"
 },
   {
     lon: 72.8826,
@@ -347,7 +478,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 18978000,
-    nameAscii: "Mumbai"
+    nameAscii: "Mumbai",
+    countryCode: "IN"
 },
   {
     lon: -46.6361,
@@ -355,7 +487,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 18845000,
-    nameAscii: "Sao Paulo"
+    nameAscii: "Sao Paulo",
+    countryCode: "BR"
 },
   {
     lon: 113.25,
@@ -363,7 +496,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 16096724,
-    nameAscii: "Guangzhou"
+    nameAscii: "Guangzhou",
+    countryCode: "CN"
 },
   {
     lon: 77.2315,
@@ -371,7 +505,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 15926000,
-    nameAscii: "Delhi"
+    nameAscii: "Delhi",
+    countryCode: "IN"
 },
   {
     lon: 28.9497,
@@ -379,7 +514,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 15701602,
-    nameAscii: "Istanbul"
+    nameAscii: "Istanbul",
+    countryCode: "TR"
 },
   {
     lon: 88.363,
@@ -387,7 +523,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 14787000,
-    nameAscii: "Kolkata"
+    nameAscii: "Kolkata",
+    countryCode: "IN"
 },
   {
     lon: 106.6296,
@@ -395,7 +532,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 14002598,
-    nameAscii: "Ho Chi Minh City"
+    nameAscii: "Ho Chi Minh City",
+    countryCode: "VN"
 },
   {
     lon: 104.0667,
@@ -403,7 +541,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 13568357,
-    nameAscii: "Chengdu"
+    nameAscii: "Chengdu",
+    countryCode: "CN"
 },
   {
     lon: 74.3507,
@@ -411,7 +550,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 13004135,
-    nameAscii: "Lahore"
+    nameAscii: "Lahore",
+    countryCode: "PK"
 },
   {
     lon: -118.2437,
@@ -419,7 +559,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 12500000,
-    nameAscii: "Los Angeles"
+    nameAscii: "Los Angeles",
+    countryCode: "US"
 },
   {
     lon: 67.0104,
@@ -427,7 +568,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 12130000,
-    nameAscii: "Karachi"
+    nameAscii: "Karachi",
+    countryCode: "PK"
 },
   {
     lon: -43.1822,
@@ -435,15 +577,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 11748000,
-    nameAscii: "Rio de Janeiro"
-},
-  {
-    lon: 135.5011,
-    lat: 34.6938,
-    weight: 0.88,
-    capitalKind: "admin_capital",
-    population: 11294000,
-    nameAscii: "Osaka"
+    nameAscii: "Rio de Janeiro",
+    countryCode: "BR"
 },
   {
     lon: 117.1767,
@@ -451,7 +586,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 11090314,
-    nameAscii: "Tianjin"
+    nameAscii: "Tianjin",
+    countryCode: "CN"
 },
   {
     lon: 114.2667,
@@ -459,7 +595,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 10392693,
-    nameAscii: "Wuhan"
+    nameAscii: "Wuhan",
+    countryCode: "CN"
 },
   {
     lon: 113.7487,
@@ -467,7 +604,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 9644871,
-    nameAscii: "Dongguan"
+    nameAscii: "Dongguan",
+    countryCode: "CN"
 },
   {
     lon: 108.9286,
@@ -475,7 +613,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 9600000,
-    nameAscii: "Xi'an"
+    nameAscii: "Xi'an",
+    countryCode: "CN"
 },
   {
     lon: 118.7778,
@@ -483,7 +622,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 9314685,
-    nameAscii: "Nanjing"
+    nameAscii: "Nanjing",
+    countryCode: "CN"
 },
   {
     lon: 120.1614,
@@ -491,7 +631,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 9236032,
-    nameAscii: "Hangzhou"
+    nameAscii: "Hangzhou",
+    countryCode: "CN"
 },
   {
     lon: 113.1315,
@@ -499,7 +640,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 9042509,
-    nameAscii: "Foshan"
+    nameAscii: "Foshan",
+    countryCode: "CN"
 },
   {
     lon: -87.65,
@@ -507,7 +649,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 8990000,
-    nameAscii: "Chicago"
+    nameAscii: "Chicago",
+    countryCode: "US"
 },
   {
     lon: 77.5937,
@@ -515,7 +658,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.88,
     capitalKind: "admin_capital",
     population: 8495492,
-    nameAscii: "Bengaluru"
+    nameAscii: "Bengaluru",
+    countryCode: "IN"
 },
   {
     lon: 106.5577,
@@ -523,15 +667,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8701,
     capitalKind: "admin_capital",
     population: 7457599,
-    nameAscii: "Chongqing"
-},
-  {
-    lon: 13.4105,
-    lat: 52.5244,
-    weight: 0.8685,
-    capitalKind: "country_capital",
-    population: 3426354,
-    nameAscii: "Berlin"
+    nameAscii: "Chongqing",
+    countryCode: "CN"
 },
   {
     lon: 3.0875,
@@ -539,7 +676,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8652,
     capitalKind: "country_capital",
     population: 3354000,
-    nameAscii: "Algiers"
+    nameAscii: "Algiers",
+    countryCode: "DZ"
 },
   {
     lon: 114.1842,
@@ -547,15 +685,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8648,
     capitalKind: "admin_capital",
     population: 7206000,
-    nameAscii: "Hong Kong Island"
-},
-  {
-    lon: 12.5113,
-    lat: 41.8919,
-    weight: 0.8645,
-    capitalKind: "country_capital",
-    population: 3339000,
-    nameAscii: "Rome"
+    nameAscii: "Hong Kong Island",
+    countryCode: "HK"
 },
   {
     lon: 120.3804,
@@ -563,7 +694,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.864,
     capitalKind: "admin_capital",
     population: 7172451,
-    nameAscii: "Qingdao"
+    nameAscii: "Qingdao",
+    countryCode: "CN"
 },
   {
     lon: 80.2785,
@@ -571,7 +703,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8638,
     capitalKind: "admin_capital",
     population: 7163000,
-    nameAscii: "Chennai"
+    nameAscii: "Chennai",
+    countryCode: "IN"
 },
   {
     lon: 125.7543,
@@ -579,7 +712,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8627,
     capitalKind: "country_capital",
     population: 3300000,
-    nameAscii: "Pyongyang"
+    nameAscii: "Pyongyang",
+    countryCode: "KP"
 },
   {
     lon: 123.4328,
@@ -587,7 +721,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8613,
     capitalKind: "admin_capital",
     population: 7050000,
-    nameAscii: "Shenyang"
+    nameAscii: "Shenyang",
+    countryCode: "CN"
 },
   {
     lon: 78.4564,
@@ -595,15 +730,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8601,
     capitalKind: "admin_capital",
     population: 6993262,
-    nameAscii: "Hyderabad"
+    nameAscii: "Hyderabad",
+    countryCode: "IN"
 },
   {
-    lon: 23.7278,
-    lat: 37.9838,
-    weight: 0.8599,
+    lon: 18.0687,
+    lat: 59.3294,
+    weight: 0.8595,
     capitalKind: "country_capital",
-    population: 3242000,
-    nameAscii: "Athens"
+    population: 1515017,
+    nameAscii: "Stockholm",
+    countryCode: "SE"
+},
+  {
+    lon: 26.1063,
+    lat: 44.4323,
+    weight: 0.8577,
+    capitalKind: "country_capital",
+    population: 1942000,
+    nameAscii: "Bucharest",
+    countryCode: "RO"
 },
   {
     lon: 120.5954,
@@ -611,7 +757,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8537,
     capitalKind: "admin_capital",
     population: 6715559,
-    nameAscii: "Suzhou"
+    nameAscii: "Suzhou",
+    countryCode: "CN"
 },
   {
     lon: 34.7806,
@@ -619,7 +766,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8535,
     capitalKind: "country_capital",
     population: 3112000,
-    nameAscii: "Tel Aviv"
+    nameAscii: "Tel Aviv",
+    countryCode: "IL"
 },
   {
     lon: -66.8792,
@@ -627,23 +775,62 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8478,
     capitalKind: "country_capital",
     population: 3000000,
-    nameAscii: "Caracas"
+    nameAscii: "Caracas",
+    countryCode: "VE"
 },
   {
-    lon: -9.1498,
-    lat: 38.7251,
-    weight: 0.8376,
+    lon: 4.2986,
+    lat: 52.0767,
+    weight: 0.846,
     capitalKind: "country_capital",
-    population: 2812000,
-    nameAscii: "Lisbon"
+    population: 1406000,
+    nameAscii: "The Hague",
+    countryCode: "NL"
 },
   {
-    lon: 30.5238,
-    lat: 50.4547,
-    weight: 0.8368,
+    lon: 27.5665,
+    lat: 53.9002,
+    weight: 0.8452,
     capitalKind: "country_capital",
-    population: 2797553,
-    nameAscii: "Kyiv"
+    population: 1805000,
+    nameAscii: "Minsk",
+    countryCode: "BY"
+},
+  {
+    lon: 9.1895,
+    lat: 45.4643,
+    weight: 0.8409,
+    capitalKind: "admin_capital",
+    population: 2945000,
+    nameAscii: "Milan",
+    countryCode: "IT"
+},
+  {
+    lon: 9.177,
+    lat: 48.7823,
+    weight: 0.8408,
+    capitalKind: "admin_capital",
+    population: 2944700,
+    nameAscii: "Stuttgart",
+    countryCode: "DE"
+},
+  {
+    lon: 19.0404,
+    lat: 47.4984,
+    weight: 0.839,
+    capitalKind: "country_capital",
+    population: 1741041,
+    nameAscii: "Budapest",
+    countryCode: "HU"
+},
+  {
+    lon: 8.6842,
+    lat: 50.1155,
+    weight: 0.8377,
+    capitalKind: "admin_capital",
+    population: 2895000,
+    nameAscii: "Frankfurt am Main",
+    countryCode: "DE"
 },
   {
     lon: -78.525,
@@ -651,7 +838,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8359,
     capitalKind: "country_capital",
     population: 2781641,
-    nameAscii: "Quito"
+    nameAscii: "Quito",
+    countryCode: "EC"
+},
+  {
+    lon: 21.0118,
+    lat: 52.2298,
+    weight: 0.8356,
+    capitalKind: "country_capital",
+    population: 1707000,
+    nameAscii: "Warsaw",
+    countryCode: "PL"
 },
   {
     lon: 80.516,
@@ -659,7 +856,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8308,
     capitalKind: "admin_capital",
     population: 5800000,
-    nameAscii: "Amaravati"
+    nameAscii: "Amaravati",
+    countryCode: "IN"
 },
   {
     lon: 7.4951,
@@ -667,7 +865,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8307,
     capitalKind: "country_capital",
     population: 2690000,
-    nameAscii: "Abuja"
+    nameAscii: "Abuja",
+    countryCode: "NG"
+},
+  {
+    lon: 135.7538,
+    lat: 35.0211,
+    weight: 0.8291,
+    capitalKind: "country_capital",
+    population: 1805000,
+    nameAscii: "Kyoto",
+    countryCode: "JP"
 },
   {
     lon: -17.4441,
@@ -675,7 +883,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8282,
     capitalKind: "country_capital",
     population: 2646503,
-    nameAscii: "Dakar"
+    nameAscii: "Dakar",
+    countryCode: "SN"
+},
+  {
+    lon: 20.4651,
+    lat: 44.804,
+    weight: 0.828,
+    capitalKind: "country_capital",
+    population: 1273651,
+    nameAscii: "Belgrade",
+    countryCode: "RS"
 },
   {
     lon: -80.1937,
@@ -683,7 +901,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8249,
     capitalKind: "admin_capital",
     population: 5585000,
-    nameAscii: "Miami"
+    nameAscii: "Miami",
+    countryCode: "US"
 },
   {
     lon: -43.9378,
@@ -691,7 +910,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8246,
     capitalKind: "admin_capital",
     population: 5575000,
-    nameAscii: "Belo Horizonte"
+    nameAscii: "Belo Horizonte",
+    countryCode: "BR"
 },
   {
     lon: 45.3438,
@@ -699,7 +919,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8246,
     capitalKind: "country_capital",
     population: 2587183,
-    nameAscii: "Mogadishu"
+    nameAscii: "Mogadishu",
+    countryCode: "SO"
+},
+  {
+    lon: 139.65,
+    lat: 35.4333,
+    weight: 0.8243,
+    capitalKind: "admin_capital",
+    population: 3777491,
+    nameAscii: "Yokohama",
+    countryCode: "JP"
 },
   {
     lon: 151.2073,
@@ -707,7 +937,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8241,
     capitalKind: "admin_capital",
     population: 5557233,
-    nameAscii: "Sydney"
+    nameAscii: "Sydney",
+    countryCode: "AU"
 },
   {
     lon: -75.1636,
@@ -715,15 +946,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8223,
     capitalKind: "admin_capital",
     population: 5492000,
-    nameAscii: "Philadelphia"
-},
-  {
-    lon: 30.3141,
-    lat: 59.9386,
-    weight: 0.8183,
-    capitalKind: "admin_capital",
-    population: 5351935,
-    nameAscii: "Saint Petersburg"
+    nameAscii: "Philadelphia",
+    countryCode: "US"
 },
   {
     lon: 144.9633,
@@ -731,7 +955,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8182,
     capitalKind: "admin_capital",
     population: 5350705,
-    nameAscii: "Melbourne"
+    nameAscii: "Melbourne",
+    countryCode: "AU"
 },
   {
     lon: -66.1057,
@@ -739,7 +964,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8179,
     capitalKind: "country_capital",
     population: 2478905,
-    nameAscii: "San Juan"
+    nameAscii: "San Juan",
+    countryCode: "PR"
 },
   {
     lon: 36.2913,
@@ -747,7 +973,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8171,
     capitalKind: "country_capital",
     population: 2466000,
-    nameAscii: "Damascus"
+    nameAscii: "Damascus",
+    countryCode: "SY"
 },
   {
     lon: 29.9158,
@@ -755,7 +982,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8157,
     capitalKind: "admin_capital",
     population: 5263542,
-    nameAscii: "Alexandria"
+    nameAscii: "Alexandria",
+    countryCode: "EG"
 },
   {
     lon: 126.65,
@@ -763,7 +991,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.815,
     capitalKind: "admin_capital",
     population: 5242897,
-    nameAscii: "Harbin"
+    nameAscii: "Harbin",
+    countryCode: "CN"
 },
   {
     lon: -79.3986,
@@ -771,7 +1000,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8142,
     capitalKind: "admin_capital",
     population: 5213000,
-    nameAscii: "Toronto"
+    nameAscii: "Toronto",
+    countryCode: "CA"
 },
   {
     lon: -1.5339,
@@ -779,7 +1009,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8139,
     capitalKind: "country_capital",
     population: 2415266,
-    nameAscii: "Ouagadougou"
+    nameAscii: "Ouagadougou",
+    countryCode: "BF"
 },
   {
     lon: 10.1658,
@@ -787,15 +1018,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8137,
     capitalKind: "country_capital",
     population: 2412500,
-    nameAscii: "Tunis"
+    nameAscii: "Tunis",
+    countryCode: "TN"
 },
   {
-    lon: 16.3721,
-    lat: 48.2085,
-    weight: 0.8129,
+    lon: 12.5655,
+    lat: 55.6759,
+    weight: 0.8101,
     capitalKind: "country_capital",
-    population: 2400000,
-    nameAscii: "Vienna"
+    population: 1153615,
+    nameAscii: "Copenhagen",
+    countryCode: "DK"
 },
   {
     lon: 117.2808,
@@ -803,15 +1036,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8092,
     capitalKind: "admin_capital",
     population: 5050000,
-    nameAscii: "Hefei"
-},
-  {
-    lon: 2.159,
-    lat: 41.3888,
-    weight: 0.8051,
-    capitalKind: "admin_capital",
-    population: 4920000,
-    nameAscii: "Barcelona"
+    nameAscii: "Hefei",
+    countryCode: "CN"
 },
   {
     lon: 8.5167,
@@ -819,7 +1045,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8048,
     capitalKind: "admin_capital",
     population: 4910000,
-    nameAscii: "Kano"
+    nameAscii: "Kano",
+    countryCode: "NG"
+},
+  {
+    lon: 24.9354,
+    lat: 60.1695,
+    weight: 0.8039,
+    capitalKind: "country_capital",
+    population: 1115000,
+    nameAscii: "Helsinki",
+    countryCode: "FI"
 },
   {
     lon: -96.8067,
@@ -827,7 +1063,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8012,
     capitalKind: "admin_capital",
     population: 4798000,
-    nameAscii: "Dallas"
+    nameAscii: "Dallas",
+    countryCode: "US"
+},
+  {
+    lon: 8.4669,
+    lat: 49.4891,
+    weight: 0.8008,
+    capitalKind: "admin_capital",
+    population: 2362000,
+    nameAscii: "Mannheim",
+    countryCode: "DE"
 },
   {
     lon: 28.2871,
@@ -835,7 +1081,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.8001,
     capitalKind: "country_capital",
     population: 2212301,
-    nameAscii: "Lusaka"
+    nameAscii: "Lusaka",
+    countryCode: "ZM"
 },
   {
     lon: 71.5785,
@@ -843,7 +1090,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7999,
     capitalKind: "admin_capital",
     population: 4758762,
-    nameAscii: "Peshawar"
+    nameAscii: "Peshawar",
+    countryCode: "PK"
 },
   {
     lon: -69.8923,
@@ -851,7 +1099,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7994,
     capitalKind: "country_capital",
     population: 2201941,
-    nameAscii: "Santo Domingo"
+    nameAscii: "Santo Domingo",
+    countryCode: "DO"
+},
+  {
+    lon: 136.9064,
+    lat: 35.1815,
+    weight: 0.7989,
+    capitalKind: "admin_capital",
+    population: 3230000,
+    nameAscii: "Nagoya",
+    countryCode: "JP"
 },
   {
     lon: 125.3228,
@@ -859,7 +1117,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7985,
     capitalKind: "admin_capital",
     population: 4714996,
-    nameAscii: "Changchun"
+    nameAscii: "Changchun",
+    countryCode: "CN"
 },
   {
     lon: 13.1873,
@@ -867,7 +1126,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7985,
     capitalKind: "country_capital",
     population: 2189000,
-    nameAscii: "Tripoli"
+    nameAscii: "Tripoli",
+    countryCode: "LY"
+},
+  {
+    lon: 10.7461,
+    lat: 59.9127,
+    weight: 0.7985,
+    capitalKind: "country_capital",
+    population: 1082575,
+    nameAscii: "Oslo",
+    countryCode: "NO"
 },
   {
     lon: 1.2215,
@@ -875,7 +1144,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7984,
     capitalKind: "country_capital",
     population: 2188376,
-    nameAscii: "Lome"
+    nameAscii: "Lome",
+    countryCode: "TG"
 },
   {
     lon: 69.2163,
@@ -883,7 +1153,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7981,
     capitalKind: "country_capital",
     population: 2184000,
-    nameAscii: "Tashkent"
+    nameAscii: "Tashkent",
+    countryCode: "UZ"
 },
   {
     lon: -82.383,
@@ -891,7 +1162,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7974,
     capitalKind: "country_capital",
     population: 2174000,
-    nameAscii: "Havana"
+    nameAscii: "Havana",
+    countryCode: "CU"
 },
   {
     lon: 118.0819,
@@ -899,7 +1171,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7952,
     capitalKind: "admin_capital",
     population: 4617251,
-    nameAscii: "Xiamen"
+    nameAscii: "Xiamen",
+    countryCode: "CN"
+},
+  {
+    lon: -1.8998,
+    lat: 52.4814,
+    weight: 0.7948,
+    capitalKind: "admin_capital",
+    population: 2285000,
+    nameAscii: "Birmingham",
+    countryCode: "GB"
+},
+  {
+    lon: -6.2489,
+    lat: 53.3331,
+    weight: 0.7946,
+    capitalKind: "country_capital",
+    population: 1059000,
+    nameAscii: "Dublin",
+    countryCode: "IE"
 },
   {
     lon: 49.892,
@@ -907,7 +1198,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7937,
     capitalKind: "country_capital",
     population: 2122300,
-    nameAscii: "Baku"
+    nameAscii: "Baku",
+    countryCode: "AZ"
 },
   {
     lon: -0.1969,
@@ -915,7 +1207,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7936,
     capitalKind: "country_capital",
     population: 2121000,
-    nameAscii: "Accra"
+    nameAscii: "Accra",
+    countryCode: "GH"
 },
   {
     lon: 28.1878,
@@ -923,7 +1216,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7929,
     capitalKind: "country_capital",
     population: 2112693,
-    nameAscii: "Pretoria"
+    nameAscii: "Pretoria",
+    countryCode: "ZA"
 },
   {
     lon: 91.8317,
@@ -931,7 +1225,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7922,
     capitalKind: "admin_capital",
     population: 4529000,
-    nameAscii: "Chattogram"
+    nameAscii: "Chattogram",
+    countryCode: "BD"
+},
+  {
+    lon: 14.2681,
+    lat: 40.8522,
+    weight: 0.792,
+    capitalKind: "admin_capital",
+    population: 2250000,
+    nameAscii: "Naples",
+    countryCode: "IT"
 },
   {
     lon: -84.388,
@@ -939,7 +1243,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7914,
     capitalKind: "admin_capital",
     population: 4506000,
-    nameAscii: "Atlanta"
+    nameAscii: "Atlanta",
+    countryCode: "US"
+},
+  {
+    lon: -2.2374,
+    lat: 53.4809,
+    weight: 0.7904,
+    capitalKind: "admin_capital",
+    population: 2230000,
+    nameAscii: "Manchester",
+    countryCode: "GB"
 },
   {
     lon: 113.8829,
@@ -947,7 +1261,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7903,
     capitalKind: "admin_capital",
     population: 4476554,
-    nameAscii: "Bao'an"
+    nameAscii: "Bao'an",
+    countryCode: "CN"
 },
   {
     lon: -71.0598,
@@ -955,7 +1270,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.79,
     capitalKind: "admin_capital",
     population: 4467000,
-    nameAscii: "Boston"
+    nameAscii: "Boston",
+    countryCode: "US"
 },
   {
     lon: -95.3633,
@@ -963,7 +1279,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7897,
     capitalKind: "admin_capital",
     population: 4459000,
-    nameAscii: "Houston"
+    nameAscii: "Houston",
+    countryCode: "US"
+},
+  {
+    lon: 4.8897,
+    lat: 52.374,
+    weight: 0.7897,
+    capitalKind: "country_capital",
+    population: 1031000,
+    nameAscii: "Amsterdam",
+    countryCode: "NL"
 },
   {
     lon: 47.9743,
@@ -971,7 +1297,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7892,
     capitalKind: "country_capital",
     population: 2063000,
-    nameAscii: "Kuwait City"
+    nameAscii: "Kuwait City",
+    countryCode: "KW"
 },
   {
     lon: 120.2886,
@@ -979,7 +1306,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7875,
     capitalKind: "admin_capital",
     population: 4396835,
-    nameAscii: "Wuxi"
+    nameAscii: "Wuxi",
+    countryCode: "CN"
 },
   {
     lon: 31.2086,
@@ -987,7 +1315,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7865,
     capitalKind: "admin_capital",
     population: 4367343,
-    nameAscii: "Giza"
+    nameAscii: "Giza",
+    countryCode: "EG"
 },
   {
     lon: 116.9972,
@@ -995,7 +1324,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7854,
     capitalKind: "admin_capital",
     population: 4335989,
-    nameAscii: "Jinan"
+    nameAscii: "Jinan",
+    countryCode: "CN"
+},
+  {
+    lon: 19.0217,
+    lat: 50.2597,
+    weight: 0.7853,
+    capitalKind: "admin_capital",
+    population: 2746000,
+    nameAscii: "Katowice",
+    countryCode: "PL"
 },
   {
     lon: 44.2065,
@@ -1003,7 +1342,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.785,
     capitalKind: "country_capital",
     population: 2008000,
-    nameAscii: "Sanaa"
+    nameAscii: "Sanaa",
+    countryCode: "YE"
 },
   {
     lon: -68.15,
@@ -1011,7 +1351,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7847,
     capitalKind: "country_capital",
     population: 2004652,
-    nameAscii: "La Paz"
+    nameAscii: "La Paz",
+    countryCode: "BO"
 },
   {
     lon: 112.5603,
@@ -1019,7 +1360,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7842,
     capitalKind: "admin_capital",
     population: 4303673,
-    nameAscii: "Taiyuan"
+    nameAscii: "Taiyuan",
+    countryCode: "CN"
 },
   {
     lon: -72.3388,
@@ -1027,7 +1369,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7842,
     capitalKind: "country_capital",
     population: 1998000,
-    nameAscii: "Port-au-Prince"
+    nameAscii: "Port-au-Prince",
+    countryCode: "HT"
 },
   {
     lon: 15.2832,
@@ -1035,7 +1378,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.783,
     capitalKind: "country_capital",
     population: 1982000,
-    nameAscii: "Brazzaville"
+    nameAscii: "Brazzaville",
+    countryCode: "CG"
 },
   {
     lon: 113.6486,
@@ -1043,7 +1387,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7824,
     capitalKind: "admin_capital",
     population: 4253913,
-    nameAscii: "Zhengzhou"
+    nameAscii: "Zhengzhou",
+    countryCode: "CN"
 },
   {
     lon: -103.3475,
@@ -1051,15 +1396,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7803,
     capitalKind: "admin_capital",
     population: 4198000,
-    nameAscii: "Guadalajara"
-},
-  {
-    lon: 26.1063,
-    lat: 44.4323,
-    weight: 0.7798,
-    capitalKind: "country_capital",
-    population: 1942000,
-    nameAscii: "Bucharest"
+    nameAscii: "Guadalajara",
+    countryCode: "MX"
 },
   {
     lon: -13.6773,
@@ -1067,7 +1405,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7787,
     capitalKind: "country_capital",
     population: 1928389,
-    nameAscii: "Conakry"
+    nameAscii: "Conakry",
+    countryCode: "GN"
 },
   {
     lon: 35.5016,
@@ -1075,7 +1414,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7777,
     capitalKind: "country_capital",
     population: 1916100,
-    nameAscii: "Beirut"
+    nameAscii: "Beirut",
+    countryCode: "LB"
 },
   {
     lon: -83.0457,
@@ -1083,7 +1423,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7766,
     capitalKind: "admin_capital",
     population: 4101000,
-    nameAscii: "Detroit"
+    nameAscii: "Detroit",
+    countryCode: "US"
+},
+  {
+    lon: 130.4167,
+    lat: 33.6,
+    weight: 0.7752,
+    capitalKind: "admin_capital",
+    population: 2792000,
+    nameAscii: "Fukuoka",
+    countryCode: "JP"
 },
   {
     lon: -57.647,
@@ -1091,7 +1441,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7739,
     capitalKind: "country_capital",
     population: 1870000,
-    nameAscii: "Asuncion"
+    nameAscii: "Asuncion",
+    countryCode: "PY"
 },
   {
     lon: 121.457,
@@ -1099,7 +1450,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7729,
     capitalKind: "admin_capital",
     population: 4004367,
-    nameAscii: "New Taipei City"
+    nameAscii: "New Taipei City",
+    countryCode: "TW"
+},
+  {
+    lon: 23.3241,
+    lat: 42.6975,
+    weight: 0.7728,
+    capitalKind: "country_capital",
+    population: 1185000,
+    nameAscii: "Sofia",
+    countryCode: "BG"
 },
   {
     lon: 114.4786,
@@ -1107,7 +1468,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7703,
     capitalKind: "admin_capital",
     population: 3938513,
-    nameAscii: "Shijiazhuang"
+    nameAscii: "Shijiazhuang",
+    countryCode: "CN"
+},
+  {
+    lon: 14.4208,
+    lat: 50.088,
+    weight: 0.77,
+    capitalKind: "country_capital",
+    population: 1165581,
+    nameAscii: "Prague",
+    countryCode: "CZ"
 },
   {
     lon: -51.2302,
@@ -1115,7 +1486,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7695,
     capitalKind: "admin_capital",
     population: 3917000,
-    nameAscii: "Porto Alegre"
+    nameAscii: "Porto Alegre",
+    countryCode: "BR"
 },
   {
     lon: 121.4672,
@@ -1123,7 +1495,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7685,
     capitalKind: "admin_capital",
     population: 3893740,
-    nameAscii: "Banqiao"
+    nameAscii: "Banqiao",
+    countryCode: "TW"
 },
   {
     lon: 54.397,
@@ -1131,23 +1504,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7685,
     capitalKind: "country_capital",
     population: 1807000,
-    nameAscii: "Abu Dhabi"
-},
-  {
-    lon: 135.7538,
-    lat: 35.0211,
-    weight: 0.7683,
-    capitalKind: "country_capital",
-    population: 1805000,
-    nameAscii: "Kyoto"
-},
-  {
-    lon: 27.5665,
-    lat: 53.9002,
-    weight: 0.7683,
-    capitalKind: "country_capital",
-    population: 1805000,
-    nameAscii: "Minsk"
+    nameAscii: "Abu Dhabi",
+    countryCode: "AE"
 },
   {
     lon: 102.7183,
@@ -1155,7 +1513,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.767,
     capitalKind: "admin_capital",
     population: 3855346,
-    nameAscii: "Kunming"
+    nameAscii: "Kunming",
+    countryCode: "CN"
 },
   {
     lon: 113.3791,
@@ -1163,7 +1522,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7664,
     capitalKind: "admin_capital",
     population: 3841873,
-    nameAscii: "Zhongshan"
+    nameAscii: "Zhongshan",
+    countryCode: "CN"
 },
   {
     lon: 108.3167,
@@ -1171,7 +1531,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7664,
     capitalKind: "admin_capital",
     population: 3839800,
-    nameAscii: "Nanning"
+    nameAscii: "Nanning",
+    countryCode: "CN"
 },
   {
     lon: 116.6788,
@@ -1179,7 +1540,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7663,
     capitalKind: "admin_capital",
     population: 3838900,
-    nameAscii: "Shantou"
+    nameAscii: "Shantou",
+    countryCode: "CN"
 },
   {
     lon: 108.0838,
@@ -1187,7 +1549,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.766,
     capitalKind: "admin_capital",
     population: 3830000,
-    nameAscii: "Hechi"
+    nameAscii: "Hechi",
+    countryCode: "CN"
 },
   {
     lon: 73.0897,
@@ -1195,7 +1558,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7647,
     capitalKind: "admin_capital",
     population: 3800193,
-    nameAscii: "Faisalabad"
+    nameAscii: "Faisalabad",
+    countryCode: "PK"
 },
   {
     lon: 55.3093,
@@ -1203,31 +1567,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7643,
     capitalKind: "admin_capital",
     population: 3790000,
-    nameAscii: "Dubai"
+    nameAscii: "Dubai",
+    countryCode: "AE"
 },
   {
-    lon: 139.65,
-    lat: 35.4333,
-    weight: 0.7638,
-    capitalKind: "admin_capital",
-    population: 3777491,
-    nameAscii: "Yokohama"
-},
-  {
-    lon: 4.3488,
-    lat: 50.8505,
-    weight: 0.7629,
+    lon: 19.8187,
+    lat: 41.3274,
+    weight: 0.7641,
     capitalKind: "country_capital",
-    population: 1743000,
-    nameAscii: "Brussels"
-},
-  {
-    lon: 19.0404,
-    lat: 47.4984,
-    weight: 0.7627,
-    capitalKind: "country_capital",
-    population: 1741041,
-    nameAscii: "Budapest"
+    population: 895350,
+    nameAscii: "Tirana",
+    countryCode: "AL"
 },
   {
     lon: 119.3061,
@@ -1235,7 +1585,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7622,
     capitalKind: "admin_capital",
     population: 3740000,
-    nameAscii: "Fuzhou"
+    nameAscii: "Fuzhou",
+    countryCode: "CN"
 },
   {
     lon: 121.5494,
@@ -1243,7 +1594,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7619,
     capitalKind: "admin_capital",
     population: 3731203,
-    nameAscii: "Ningbo"
+    nameAscii: "Ningbo",
+    countryCode: "CN"
 },
   {
     lon: -100.3172,
@@ -1251,7 +1603,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7611,
     capitalKind: "admin_capital",
     population: 3712000,
-    nameAscii: "Monterrey"
+    nameAscii: "Monterrey",
+    countryCode: "MX"
+},
+  {
+    lon: 141.35,
+    lat: 43.0667,
+    weight: 0.7601,
+    capitalKind: "admin_capital",
+    population: 2544000,
+    nameAscii: "Sapporo",
+    countryCode: "JP"
+},
+  {
+    lon: -73.982,
+    lat: 40.7519,
+    weight: 0.76,
+    capitalKind: "place",
+    population: 19040000,
+    nameAscii: "New York",
+    countryCode: "US"
 },
   {
     lon: -73.5878,
@@ -1259,15 +1630,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7596,
     capitalKind: "admin_capital",
     population: 3678000,
-    nameAscii: "Montreal"
-},
-  {
-    lon: 21.0118,
-    lat: 52.2298,
-    weight: 0.7596,
-    capitalKind: "country_capital",
-    population: 1707000,
-    nameAscii: "Warsaw"
+    nameAscii: "Montreal",
+    countryCode: "CA"
 },
   {
     lon: -6.8326,
@@ -1275,7 +1639,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7594,
     capitalKind: "country_capital",
     population: 1705000,
-    nameAscii: "Rabat"
+    nameAscii: "Rabat",
+    countryCode: "MA"
 },
   {
     lon: -7.6114,
@@ -1283,7 +1648,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7591,
     capitalKind: "admin_capital",
     population: 3665954,
-    nameAscii: "Casablanca"
+    nameAscii: "Casablanca",
+    countryCode: "MA"
 },
   {
     lon: 106.7167,
@@ -1291,7 +1657,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7589,
     capitalKind: "admin_capital",
     population: 3662000,
-    nameAscii: "Guiyang"
+    nameAscii: "Guiyang",
+    countryCode: "CN"
 },
   {
     lon: 47.5361,
@@ -1299,7 +1666,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7587,
     capitalKind: "country_capital",
     population: 1697000,
-    nameAscii: "Antananarivo"
+    nameAscii: "Antananarivo",
+    countryCode: "MG"
 },
   {
     lon: -34.8811,
@@ -1307,7 +1675,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7585,
     capitalKind: "admin_capital",
     population: 3651000,
-    nameAscii: "Recife"
+    nameAscii: "Recife",
+    countryCode: "BR"
 },
   {
     lon: 3.9059,
@@ -1315,7 +1684,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7584,
     capitalKind: "admin_capital",
     population: 3649000,
-    nameAscii: "Ibadan"
+    nameAscii: "Ibadan",
+    countryCode: "NG"
 },
   {
     lon: 32.5822,
@@ -1323,7 +1693,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7572,
     capitalKind: "country_capital",
     population: 1680600,
-    nameAscii: "Kampala"
+    nameAscii: "Kampala",
+    countryCode: "UG"
 },
   {
     lon: -38.5431,
@@ -1331,7 +1702,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7564,
     capitalKind: "admin_capital",
     population: 3602319,
-    nameAscii: "Fortaleza"
+    nameAscii: "Fortaleza",
+    countryCode: "BR"
+},
+  {
+    lon: 9.993,
+    lat: 53.5507,
+    weight: 0.7561,
+    capitalKind: "admin_capital",
+    population: 1845229,
+    nameAscii: "Hamburg",
+    countryCode: "DE"
 },
   {
     lon: 119.8887,
@@ -1339,7 +1720,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7558,
     capitalKind: "admin_capital",
     population: 3590000,
-    nameAscii: "Puyang"
+    nameAscii: "Puyang",
+    countryCode: "CN"
 },
   {
     lon: 87.6005,
@@ -1347,7 +1729,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7552,
     capitalKind: "admin_capital",
     population: 3575000,
-    nameAscii: "UEruemqi"
+    nameAscii: "UEruemqi",
+    countryCode: "CN"
 },
   {
     lon: -112.074,
@@ -1355,7 +1738,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7541,
     capitalKind: "admin_capital",
     population: 3551000,
-    nameAscii: "Phoenix"
+    nameAscii: "Phoenix",
+    countryCode: "US"
 },
   {
     lon: 117.6556,
@@ -1363,7 +1747,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7532,
     capitalKind: "admin_capital",
     population: 3531147,
-    nameAscii: "Zhangzhou"
+    nameAscii: "Zhangzhou",
+    countryCode: "CN"
 },
   {
     lon: -38.491,
@@ -1371,7 +1756,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7511,
     capitalKind: "admin_capital",
     population: 3484000,
-    nameAscii: "Salvador"
+    nameAscii: "Salvador",
+    countryCode: "BR"
 },
   {
     lon: 129.03,
@@ -1379,7 +1765,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.751,
     capitalKind: "admin_capital",
     population: 3480000,
-    nameAscii: "Busan"
+    nameAscii: "Busan",
+    countryCode: "KR"
 },
   {
     lon: 11.5167,
@@ -1387,7 +1774,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7506,
     capitalKind: "country_capital",
     population: 1611000,
-    nameAscii: "Yaounde"
+    nameAscii: "Yaounde",
+    countryCode: "CM"
 },
   {
     lon: 110.7781,
@@ -1395,7 +1783,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7501,
     capitalKind: "admin_capital",
     population: 3460000,
-    nameAscii: "Shiyan"
+    nameAscii: "Shiyan",
+    countryCode: "CN"
 },
   {
     lon: -122.4194,
@@ -1403,7 +1792,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7496,
     capitalKind: "admin_capital",
     population: 3450000,
-    nameAscii: "San Francisco"
+    nameAscii: "San Francisco",
+    countryCode: "US"
 },
   {
     lon: 104.916,
@@ -1411,7 +1801,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7469,
     capitalKind: "country_capital",
     population: 1573544,
-    nameAscii: "Phnom Penh"
+    nameAscii: "Phnom Penh",
+    countryCode: "KH"
 },
   {
     lon: 31.0534,
@@ -1419,7 +1810,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7467,
     capitalKind: "country_capital",
     population: 1572000,
-    nameAscii: "Harare"
+    nameAscii: "Harare",
+    countryCode: "ZW"
 },
   {
     lon: 118.1832,
@@ -1427,7 +1819,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.746,
     capitalKind: "admin_capital",
     population: 3372102,
-    nameAscii: "Tangshan"
+    nameAscii: "Tangshan",
+    countryCode: "CN"
+},
+  {
+    lon: 7.0123,
+    lat: 51.4566,
+    weight: 0.7456,
+    capitalKind: "admin_capital",
+    population: 1742135,
+    nameAscii: "Essen",
+    countryCode: "DE"
 },
   {
     lon: 73.0479,
@@ -1435,7 +1837,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7454,
     capitalKind: "admin_capital",
     population: 3357612,
-    nameAscii: "Rawalpindi"
+    nameAscii: "Rawalpindi",
+    countryCode: "PK"
 },
   {
     lon: 111.1444,
@@ -1443,7 +1846,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7449,
     capitalKind: "admin_capital",
     population: 3346500,
-    nameAscii: "Lueliang"
+    nameAscii: "Lueliang",
+    countryCode: "CN"
 },
   {
     lon: 31.0292,
@@ -1451,7 +1855,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7445,
     capitalKind: "admin_capital",
     population: 3338026,
-    nameAscii: "Durban"
+    nameAscii: "Durban",
+    countryCode: "ZA"
 },
   {
     lon: -10.7969,
@@ -1459,7 +1864,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7438,
     capitalKind: "country_capital",
     population: 1542549,
-    nameAscii: "Monrovia"
+    nameAscii: "Monrovia",
+    countryCode: "LR"
 },
   {
     lon: -75.5715,
@@ -1467,7 +1873,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7425,
     capitalKind: "admin_capital",
     population: 3297000,
-    nameAscii: "Medellin"
+    nameAscii: "Medellin",
+    countryCode: "CO"
 },
   {
     lon: 119.954,
@@ -1475,15 +1882,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7422,
     capitalKind: "admin_capital",
     population: 3290918,
-    nameAscii: "Changzhou"
-},
-  {
-    lon: 18.0687,
-    lat: 59.3294,
-    weight: 0.741,
-    capitalKind: "country_capital",
-    population: 1515017,
-    nameAscii: "Stockholm"
+    nameAscii: "Changzhou",
+    countryCode: "CN"
 },
   {
     lon: -56.1882,
@@ -1491,15 +1891,35 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7407,
     capitalKind: "country_capital",
     population: 1513000,
-    nameAscii: "Montevideo"
+    nameAscii: "Montevideo",
+    countryCode: "UY"
 },
   {
-    lon: 136.9064,
-    lat: 35.1815,
-    weight: 0.7393,
+    lon: 140.8667,
+    lat: 38.2667,
+    weight: 0.7401,
     capitalKind: "admin_capital",
-    population: 3230000,
-    nameAscii: "Nagoya"
+    population: 2250000,
+    nameAscii: "Sendai",
+    countryCode: "JP"
+},
+  {
+    lon: 4.4792,
+    lat: 51.9225,
+    weight: 0.74,
+    capitalKind: "place",
+    population: 1005000,
+    nameAscii: "Rotterdam",
+    countryCode: "NL"
+},
+  {
+    lon: 7.6868,
+    lat: 45.0705,
+    weight: 0.736,
+    capitalKind: "admin_capital",
+    population: 1652000,
+    nameAscii: "Turin",
+    countryCode: "IT"
 },
   {
     lon: 101.6865,
@@ -1507,7 +1927,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7345,
     capitalKind: "country_capital",
     population: 1453975,
-    nameAscii: "Kuala Lumpur"
+    nameAscii: "Kuala Lumpur",
+    countryCode: "MY"
 },
   {
     lon: 51.531,
@@ -1515,7 +1936,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7341,
     capitalKind: "country_capital",
     population: 1450000,
-    nameAscii: "Doha"
+    nameAscii: "Doha",
+    countryCode: "QA"
 },
   {
     lon: 32.5832,
@@ -1523,7 +1945,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7337,
     capitalKind: "country_capital",
     population: 1446000,
-    nameAscii: "Maputo"
+    nameAscii: "Maputo",
+    countryCode: "MZ"
 },
   {
     lon: 85.3206,
@@ -1531,7 +1954,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7333,
     capitalKind: "country_capital",
     population: 1442271,
-    nameAscii: "Kathmandu"
+    nameAscii: "Kathmandu",
+    countryCode: "NP"
 },
   {
     lon: 29.0601,
@@ -1539,7 +1963,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.733,
     capitalKind: "admin_capital",
     population: 3101833,
-    nameAscii: "Bursa"
+    nameAscii: "Bursa",
+    countryCode: "TR"
 },
   {
     lon: 112.9709,
@@ -1547,7 +1972,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7326,
     capitalKind: "admin_capital",
     population: 3093980,
-    nameAscii: "Changsha"
+    nameAscii: "Changsha",
+    countryCode: "CN"
 },
   {
     lon: -89.1872,
@@ -1555,7 +1981,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7322,
     capitalKind: "country_capital",
     population: 1433000,
-    nameAscii: "San Salvador"
+    nameAscii: "San Salvador",
+    countryCode: "SV"
 },
   {
     lon: 121.0509,
@@ -1563,7 +1990,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7321,
     capitalKind: "admin_capital",
     population: 3084270,
-    nameAscii: "Quezon City"
+    nameAscii: "Quezon City",
+    countryCode: "PH"
 },
   {
     lon: -49.2731,
@@ -1571,7 +1999,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7321,
     capitalKind: "admin_capital",
     population: 3084000,
-    nameAscii: "Curitiba"
+    nameAscii: "Curitiba",
+    countryCode: "BR"
 },
   {
     lon: -122.3321,
@@ -1579,7 +2008,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7316,
     capitalKind: "admin_capital",
     population: 3074000,
-    nameAscii: "Seattle"
+    nameAscii: "Seattle",
+    countryCode: "US"
 },
   {
     lon: 75.7878,
@@ -1587,7 +2017,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7302,
     capitalKind: "admin_capital",
     population: 3046163,
-    nameAscii: "Jaipur"
+    nameAscii: "Jaipur",
+    countryCode: "IN"
+},
+  {
+    lon: 24.1059,
+    lat: 56.946,
+    weight: 0.7302,
+    capitalKind: "country_capital",
+    population: 742572,
+    nameAscii: "Riga",
+    countryCode: "LV"
 },
   {
     lon: 126.7052,
@@ -1595,15 +2035,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7298,
     capitalKind: "admin_capital",
     population: 3039450,
-    nameAscii: "Incheon"
-},
-  {
-    lon: 4.2986,
-    lat: 52.0767,
-    weight: 0.7293,
-    capitalKind: "country_capital",
-    population: 1406000,
-    nameAscii: "The Hague"
+    nameAscii: "Incheon",
+    countryCode: "KR"
 },
   {
     lon: 103.8399,
@@ -1611,23 +2044,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7278,
     capitalKind: "admin_capital",
     population: 3000000,
-    nameAscii: "Lanzhou"
+    nameAscii: "Lanzhou",
+    countryCode: "CN"
 },
   {
-    lon: 9.1895,
-    lat: 45.4643,
-    weight: 0.7249,
-    capitalKind: "admin_capital",
-    population: 2945000,
-    nameAscii: "Milan"
+    lon: 15.978,
+    lat: 45.8144,
+    weight: 0.7252,
+    capitalKind: "country_capital",
+    population: 722526,
+    nameAscii: "Zagreb",
+    countryCode: "HR"
 },
   {
-    lon: 9.177,
-    lat: 48.7823,
-    weight: 0.7249,
+    lon: 132.45,
+    lat: 34.4,
+    weight: 0.7246,
     capitalKind: "admin_capital",
-    population: 2944700,
-    nameAscii: "Stuttgart"
+    population: 2045000,
+    nameAscii: "Hiroshima",
+    countryCode: "JP"
 },
   {
     lon: 27.1384,
@@ -1635,7 +2071,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7245,
     capitalKind: "admin_capital",
     population: 2938292,
-    nameAscii: "Izmir"
+    nameAscii: "Izmir",
+    countryCode: "TR"
 },
   {
     lon: 15.0444,
@@ -1643,7 +2080,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.724,
     capitalKind: "country_capital",
     population: 1359526,
-    nameAscii: "N'Djamena"
+    nameAscii: "N'Djamena",
+    countryCode: "TD"
 },
   {
     lon: -117.1647,
@@ -1651,7 +2089,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7233,
     capitalKind: "admin_capital",
     population: 2916000,
-    nameAscii: "San Diego"
+    nameAscii: "San Diego",
+    countryCode: "US"
 },
   {
     lon: 114.4152,
@@ -1659,15 +2098,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7225,
     capitalKind: "admin_capital",
     population: 2900113,
-    nameAscii: "Huizhou"
+    nameAscii: "Huizhou",
+    countryCode: "CN"
 },
   {
-    lon: 8.6842,
-    lat: 50.1155,
-    weight: 0.7222,
+    lon: -1.5478,
+    lat: 53.7965,
+    weight: 0.722,
     capitalKind: "admin_capital",
-    population: 2895000,
-    nameAscii: "Frankfurt am Main"
+    population: 1529000,
+    nameAscii: "Leeds",
+    countryCode: "GB"
 },
   {
     lon: 112.7508,
@@ -1675,7 +2116,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7211,
     capitalKind: "admin_capital",
     population: 2874314,
-    nameAscii: "Surabaya"
+    nameAscii: "Surabaya",
+    countryCode: "ID"
 },
   {
     lon: 110.3465,
@@ -1683,15 +2125,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.721,
     capitalKind: "admin_capital",
     population: 2873358,
-    nameAscii: "Haikou"
-},
-  {
-    lon: -73.982,
-    lat: 40.7519,
-    weight: 0.72,
-    capitalKind: "place",
-    population: 19040000,
-    nameAscii: "New York"
+    nameAscii: "Haikou",
+    countryCode: "CN"
 },
   {
     lon: -74.006,
@@ -1699,7 +2134,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.72,
     capitalKind: "place",
     population: 8804190,
-    nameAscii: "New York City"
+    nameAscii: "New York City",
+    countryCode: "US"
 },
   {
     lon: 120.6839,
@@ -1707,7 +2143,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7198,
     capitalKind: "admin_capital",
     population: 2850285,
-    nameAscii: "Taichung"
+    nameAscii: "Taichung",
+    countryCode: "TW"
 },
   {
     lon: 2.1098,
@@ -1715,15 +2152,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7198,
     capitalKind: "country_capital",
     population: 1323691,
-    nameAscii: "Niamey"
+    nameAscii: "Niamey",
+    countryCode: "NE"
 },
   {
-    lon: 130.4167,
-    lat: 33.6,
-    weight: 0.7165,
+    lon: 18.3564,
+    lat: 43.8486,
+    weight: 0.7186,
+    capitalKind: "country_capital",
+    population: 696731,
+    nameAscii: "Sarajevo",
+    countryCode: "BA"
+},
+  {
+    lon: 11.2463,
+    lat: 43.7792,
+    weight: 0.7185,
     capitalKind: "admin_capital",
-    population: 2792000,
-    nameAscii: "Fukuoka"
+    population: 1500000,
+    nameAscii: "Florence",
+    countryCode: "IT"
 },
   {
     lon: 153.0281,
@@ -1731,7 +2179,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7159,
     capitalKind: "admin_capital",
     population: 2780063,
-    nameAscii: "Brisbane"
+    nameAscii: "Brisbane",
+    countryCode: "AU"
 },
   {
     lon: 120.3133,
@@ -1739,7 +2188,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7152,
     capitalKind: "admin_capital",
     population: 2769072,
-    nameAscii: "Kaohsiung"
+    nameAscii: "Kaohsiung",
+    countryCode: "TW"
 },
   {
     lon: -84.0849,
@@ -1747,7 +2197,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7151,
     capitalKind: "country_capital",
     population: 1284000,
-    nameAscii: "San Jose"
+    nameAscii: "San Jose",
+    countryCode: "CR"
 },
   {
     lon: -79.5197,
@@ -1755,7 +2206,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7147,
     capitalKind: "country_capital",
     population: 1281000,
-    nameAscii: "Panama"
+    nameAscii: "Panama",
+    countryCode: "PA"
 },
   {
     lon: 35.945,
@@ -1763,15 +2215,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7141,
     capitalKind: "country_capital",
     population: 1275857,
-    nameAscii: "Amman"
-},
-  {
-    lon: 19.0217,
-    lat: 50.2597,
-    weight: 0.7139,
-    capitalKind: "admin_capital",
-    population: 2746000,
-    nameAscii: "Katowice"
+    nameAscii: "Amman",
+    countryCode: "JO"
 },
   {
     lon: 118.3428,
@@ -1779,15 +2224,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7138,
     capitalKind: "admin_capital",
     population: 2743843,
-    nameAscii: "Linyi"
-},
-  {
-    lon: 20.4651,
-    lat: 44.804,
-    weight: 0.7138,
-    capitalKind: "country_capital",
-    population: 1273651,
-    nameAscii: "Belgrade"
+    nameAscii: "Linyi",
+    countryCode: "CN"
 },
   {
     lon: 115.4625,
@@ -1795,7 +2233,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7136,
     capitalKind: "admin_capital",
     population: 2739887,
-    nameAscii: "Baoding"
+    nameAscii: "Baoding",
+    countryCode: "CN"
 },
   {
     lon: 37.1612,
@@ -1803,7 +2242,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7135,
     capitalKind: "admin_capital",
     population: 2738000,
-    nameAscii: "Aleppo"
+    nameAscii: "Aleppo",
+    countryCode: "SY"
 },
   {
     lon: -73.9496,
@@ -1811,7 +2251,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7134,
     capitalKind: "admin_capital",
     population: 2736074,
-    nameAscii: "Brooklyn"
+    nameAscii: "Brooklyn",
+    countryCode: "US"
 },
   {
     lon: -79.8862,
@@ -1819,7 +2260,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7127,
     capitalKind: "admin_capital",
     population: 2723665,
-    nameAscii: "Guayaquil"
+    nameAscii: "Guayaquil",
+    countryCode: "EC"
 },
   {
     lon: 80.9231,
@@ -1827,7 +2269,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.711,
     capitalKind: "admin_capital",
     population: 2695000,
-    nameAscii: "Lucknow"
+    nameAscii: "Lucknow",
+    countryCode: "IN"
 },
   {
     lon: 90.4223,
@@ -1835,7 +2278,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7098,
     capitalKind: "admin_capital",
     population: 2674697,
-    nameAscii: "Gazipur"
+    nameAscii: "Gazipur",
+    countryCode: "BD"
+},
+  {
+    lon: 4.8479,
+    lat: 45.7491,
+    weight: 0.7089,
+    capitalKind: "admin_capital",
+    population: 1423000,
+    nameAscii: "Lyon",
+    countryCode: "FR"
 },
   {
     lon: 120.6668,
@@ -1843,7 +2296,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7084,
     capitalKind: "admin_capital",
     population: 2650000,
-    nameAscii: "Wenzhou"
+    nameAscii: "Wenzhou",
+    countryCode: "CN"
 },
   {
     lon: 106.6834,
@@ -1851,7 +2305,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7069,
     capitalKind: "admin_capital",
     population: 2625200,
-    nameAscii: "Haiphong"
+    nameAscii: "Haiphong",
+    countryCode: "VN"
 },
   {
     lon: -93.2638,
@@ -1859,7 +2314,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7063,
     capitalKind: "admin_capital",
     population: 2616000,
-    nameAscii: "Minneapolis"
+    nameAscii: "Minneapolis",
+    countryCode: "US"
 },
   {
     lon: 112.0381,
@@ -1867,7 +2323,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7062,
     capitalKind: "admin_capital",
     population: 2612800,
-    nameAscii: "Yunfu"
+    nameAscii: "Yunfu",
+    countryCode: "CN"
+},
+  {
+    lon: 5.3811,
+    lat: 43.297,
+    weight: 0.706,
+    capitalKind: "admin_capital",
+    population: 1400000,
+    nameAscii: "Marseille",
+    countryCode: "FR"
 },
   {
     lon: 112.9,
@@ -1875,15 +2341,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7046,
     capitalKind: "admin_capital",
     population: 2586948,
-    nameAscii: "Xiangtan"
-},
-  {
-    lon: 23.3241,
-    lat: 42.6975,
-    weight: 0.7025,
-    capitalKind: "country_capital",
-    population: 1185000,
-    nameAscii: "Sofia"
+    nameAscii: "Xiangtan",
+    countryCode: "CN"
 },
   {
     lon: -15.9785,
@@ -1891,7 +2350,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7025,
     capitalKind: "country_capital",
     population: 1184530,
-    nameAscii: "Nouakchott"
+    nameAscii: "Nouakchott",
+    countryCode: "MR"
 },
   {
     lon: -1.6244,
@@ -1899,15 +2359,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.702,
     capitalKind: "admin_capital",
     population: 2544530,
-    nameAscii: "Kumasi"
-},
-  {
-    lon: 141.35,
-    lat: 43.0667,
-    weight: 0.702,
-    capitalKind: "admin_capital",
-    population: 2544000,
-    nameAscii: "Sapporo"
+    nameAscii: "Kumasi",
+    countryCode: "GH"
 },
   {
     lon: 74.187,
@@ -1915,15 +2368,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.7,
     capitalKind: "admin_capital",
     population: 2511118,
-    nameAscii: "Gujranwala"
-},
-  {
-    lon: 14.4208,
-    lat: 50.088,
-    weight: 0.7,
-    capitalKind: "country_capital",
-    population: 1165581,
-    nameAscii: "Prague"
+    nameAscii: "Gujranwala",
+    countryCode: "PK"
 },
   {
     lon: 100.3354,
@@ -1931,15 +2377,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6993,
     capitalKind: "admin_capital",
     population: 2500000,
-    nameAscii: "George Town"
+    nameAscii: "George Town",
+    countryCode: "MY"
 },
   {
-    lon: 12.5655,
-    lat: 55.6759,
-    weight: 0.6983,
-    capitalKind: "country_capital",
-    population: 1153615,
-    nameAscii: "Copenhagen"
+    lon: -8.611,
+    lat: 41.1485,
+    weight: 0.6976,
+    capitalKind: "admin_capital",
+    population: 1337000,
+    nameAscii: "Porto",
+    countryCode: "PT"
 },
   {
     lon: 59.6057,
@@ -1947,7 +2395,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6973,
     capitalKind: "admin_capital",
     population: 2469000,
-    nameAscii: "Mashhad"
+    nameAscii: "Mashhad",
+    countryCode: "IR"
 },
   {
     lon: -75.6981,
@@ -1955,7 +2404,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6972,
     capitalKind: "country_capital",
     population: 1145000,
-    nameAscii: "Ottawa"
+    nameAscii: "Ottawa",
+    countryCode: "CA"
 },
   {
     lon: 44.5126,
@@ -1963,7 +2413,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6971,
     capitalKind: "country_capital",
     population: 1144700,
-    nameAscii: "Yerevan"
+    nameAscii: "Yerevan",
+    countryCode: "AM"
 },
   {
     lon: 128.5911,
@@ -1971,7 +2422,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6967,
     capitalKind: "admin_capital",
     population: 2460000,
-    nameAscii: "Daegu"
+    nameAscii: "Daegu",
+    countryCode: "KR"
 },
   {
     lon: 79.0849,
@@ -1979,7 +2431,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6964,
     capitalKind: "admin_capital",
     population: 2454000,
-    nameAscii: "Nagpur"
+    nameAscii: "Nagpur",
+    countryCode: "IN"
 },
   {
     lon: 107.6069,
@@ -1987,7 +2440,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6957,
     capitalKind: "admin_capital",
     population: 2444160,
-    nameAscii: "Bandung"
+    nameAscii: "Bandung",
+    countryCode: "ID"
 },
   {
     lon: 30.0588,
@@ -1995,7 +2449,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6955,
     capitalKind: "country_capital",
     population: 1132686,
-    nameAscii: "Kigali"
+    nameAscii: "Kigali",
+    countryCode: "RW"
 },
   {
     lon: 98.6667,
@@ -2003,7 +2458,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6952,
     capitalKind: "admin_capital",
     population: 2435252,
-    nameAscii: "Medan"
+    nameAscii: "Medan",
+    countryCode: "ID"
 },
   {
     lon: 120.8533,
@@ -2011,7 +2467,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6946,
     capitalKind: "admin_capital",
     population: 2426000,
-    nameAscii: "Lianshan"
+    nameAscii: "Lianshan",
+    countryCode: "CN"
+},
+  {
+    lon: 82.9317,
+    lat: 55.0226,
+    weight: 0.6938,
+    capitalKind: "admin_capital",
+    population: 1612833,
+    nameAscii: "Novosibirsk",
+    countryCode: "RU"
 },
   {
     lon: 33.7873,
@@ -2019,15 +2485,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6931,
     capitalKind: "country_capital",
     population: 1115815,
-    nameAscii: "Lilongwe"
-},
-  {
-    lon: 24.9354,
-    lat: 60.1695,
-    weight: 0.693,
-    capitalKind: "country_capital",
-    population: 1115000,
-    nameAscii: "Helsinki"
+    nameAscii: "Lilongwe",
+    countryCode: "MW"
 },
   {
     lon: 126.5608,
@@ -2035,7 +2494,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6926,
     capitalKind: "admin_capital",
     population: 2396000,
-    nameAscii: "Jilin"
+    nameAscii: "Jilin",
+    countryCode: "CN"
 },
   {
     lon: 32.4777,
@@ -2043,7 +2503,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6926,
     capitalKind: "admin_capital",
     population: 2395159,
-    nameAscii: "Omdurman"
+    nameAscii: "Omdurman",
+    countryCode: "SD"
 },
   {
     lon: -76.5199,
@@ -2051,7 +2512,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6924,
     capitalKind: "admin_capital",
     population: 2392877,
-    nameAscii: "Cali"
+    nameAscii: "Cali",
+    countryCode: "CO"
+},
+  {
+    lon: -1.4659,
+    lat: 53.383,
+    weight: 0.6915,
+    capitalKind: "admin_capital",
+    population: 1292900,
+    nameAscii: "Sheffield",
+    countryCode: "GB"
 },
   {
     lon: 44.8341,
@@ -2059,15 +2530,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6909,
     capitalKind: "country_capital",
     population: 1100000,
-    nameAscii: "Tbilisi"
-},
-  {
-    lon: 8.4669,
-    lat: 49.4891,
-    weight: 0.6904,
-    capitalKind: "admin_capital",
-    population: 2362000,
-    nameAscii: "Mannheim"
+    nameAscii: "Tbilisi",
+    countryCode: "GE"
 },
   {
     lon: 115.8531,
@@ -2075,7 +2539,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6901,
     capitalKind: "admin_capital",
     population: 2357839,
-    nameAscii: "Nanchang"
+    nameAscii: "Nanchang",
+    countryCode: "CN"
 },
   {
     lon: 111.6522,
@@ -2083,7 +2548,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6896,
     capitalKind: "admin_capital",
     population: 2350000,
-    nameAscii: "Hohhot"
+    nameAscii: "Hohhot",
+    countryCode: "CN"
+},
+  {
+    lon: 6.7652,
+    lat: 51.4325,
+    weight: 0.6893,
+    capitalKind: "admin_capital",
+    population: 1276757,
+    nameAscii: "Duisburg",
+    countryCode: "DE"
+},
+  {
+    lon: 11.5755,
+    lat: 48.1374,
+    weight: 0.689,
+    capitalKind: "admin_capital",
+    population: 1275000,
+    nameAscii: "Munich",
+    countryCode: "DE"
 },
   {
     lon: 68.779,
@@ -2091,15 +2575,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6889,
     capitalKind: "country_capital",
     population: 1086244,
-    nameAscii: "Dushanbe"
-},
-  {
-    lon: 10.7461,
-    lat: 59.9127,
-    weight: 0.6884,
-    capitalKind: "country_capital",
-    population: 1082575,
-    nameAscii: "Oslo"
+    nameAscii: "Dushanbe",
+    countryCode: "TJ"
 },
   {
     lon: -73.8365,
@@ -2107,7 +2584,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6874,
     capitalKind: "admin_capital",
     population: 2316841,
-    nameAscii: "Queens"
+    nameAscii: "Queens",
+    countryCode: "US"
 },
   {
     lon: -82.4584,
@@ -2115,7 +2593,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6872,
     capitalKind: "admin_capital",
     population: 2314000,
-    nameAscii: "Tampa"
+    nameAscii: "Tampa",
+    countryCode: "US"
 },
   {
     lon: -104.9847,
@@ -2123,7 +2602,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6871,
     capitalKind: "admin_capital",
     population: 2313000,
-    nameAscii: "Denver"
+    nameAscii: "Denver",
+    countryCode: "US"
 },
   {
     lon: 115.8614,
@@ -2131,7 +2611,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6869,
     capitalKind: "admin_capital",
     population: 2309338,
-    nameAscii: "Perth"
+    nameAscii: "Perth",
+    countryCode: "AU"
 },
   {
     lon: 120.5786,
@@ -2139,7 +2620,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6862,
     capitalKind: "admin_capital",
     population: 2300000,
-    nameAscii: "Shaoxing"
+    nameAscii: "Shaoxing",
+    countryCode: "CN"
 },
   {
     lon: 72.5873,
@@ -2147,23 +2629,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6852,
     capitalKind: "place",
     population: 6357693,
-    nameAscii: "Ahmedabad"
-},
-  {
-    lon: -1.8998,
-    lat: 52.4814,
-    weight: 0.6852,
-    capitalKind: "admin_capital",
-    population: 2285000,
-    nameAscii: "Birmingham"
-},
-  {
-    lon: -6.2489,
-    lat: 53.3331,
-    weight: 0.685,
-    capitalKind: "country_capital",
-    population: 1059000,
-    nameAscii: "Dublin"
+    nameAscii: "Ahmedabad",
+    countryCode: "IN"
 },
   {
     lon: 120.8747,
@@ -2171,7 +2638,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6844,
     capitalKind: "admin_capital",
     population: 2273326,
-    nameAscii: "Nantong"
+    nameAscii: "Nantong",
+    countryCode: "CN"
+},
+  {
+    lon: 6.1457,
+    lat: 46.2022,
+    weight: 0.684,
+    capitalKind: "admin_capital",
+    population: 1240000,
+    nameAscii: "Geneve",
+    countryCode: "CH"
 },
   {
     lon: -76.6122,
@@ -2179,31 +2656,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6831,
     capitalKind: "admin_capital",
     population: 2255000,
-    nameAscii: "Baltimore"
+    nameAscii: "Baltimore",
+    countryCode: "US"
 },
   {
-    lon: 14.2681,
-    lat: 40.8522,
-    weight: 0.6828,
+    lon: 6.7762,
+    lat: 51.2217,
+    weight: 0.681,
     capitalKind: "admin_capital",
-    population: 2250000,
-    nameAscii: "Naples"
-},
-  {
-    lon: 140.8667,
-    lat: 38.2667,
-    weight: 0.6828,
-    capitalKind: "admin_capital",
-    population: 2250000,
-    nameAscii: "Sendai"
-},
-  {
-    lon: -2.2374,
-    lat: 53.4809,
-    weight: 0.6814,
-    capitalKind: "admin_capital",
-    population: 2230000,
-    nameAscii: "Manchester"
+    population: 1220000,
+    nameAscii: "Duesseldorf",
+    countryCode: "DE"
 },
   {
     lon: 27.4794,
@@ -2211,15 +2674,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6808,
     capitalKind: "admin_capital",
     population: 2221925,
-    nameAscii: "Lubumbashi"
+    nameAscii: "Lubumbashi",
+    countryCode: "CD"
 },
   {
-    lon: 4.8897,
-    lat: 52.374,
+    lon: 60.6153,
+    lat: 56.8573,
     weight: 0.6808,
-    capitalKind: "country_capital",
-    population: 1031000,
-    nameAscii: "Amsterdam"
+    capitalKind: "admin_capital",
+    population: 1495066,
+    nameAscii: "Yekaterinburg",
+    countryCode: "RU"
 },
   {
     lon: -60.025,
@@ -2227,7 +2692,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6807,
     capitalKind: "admin_capital",
     population: 2219580,
-    nameAscii: "Manaus"
+    nameAscii: "Manaus",
+    countryCode: "BR"
 },
   {
     lon: 35.2163,
@@ -2235,7 +2701,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6805,
     capitalKind: "country_capital",
     population: 1029300,
-    nameAscii: "Jerusalem"
+    nameAscii: "Jerusalem",
+    countryCode: "IL"
 },
   {
     lon: 113.5678,
@@ -2243,7 +2710,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6798,
     capitalKind: "admin_capital",
     population: 2207090,
-    nameAscii: "Zhuhai"
+    nameAscii: "Zhuhai",
+    countryCode: "CN"
+},
+  {
+    lon: -5.9732,
+    lat: 37.3828,
+    weight: 0.6798,
+    capitalKind: "admin_capital",
+    population: 1212045,
+    nameAscii: "Sevilla",
+    countryCode: "ES"
 },
   {
     lon: -90.5133,
@@ -2251,7 +2728,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6797,
     capitalKind: "country_capital",
     population: 1024000,
-    nameAscii: "Guatemala City"
+    nameAscii: "Guatemala City",
+    countryCode: "GT"
+},
+  {
+    lon: 28.8594,
+    lat: 47.009,
+    weight: 0.6793,
+    capitalKind: "country_capital",
+    population: 688134,
+    nameAscii: "Chisinau",
+    countryCode: "MD"
 },
   {
     lon: -90.1979,
@@ -2259,7 +2746,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6792,
     capitalKind: "admin_capital",
     population: 2199000,
-    nameAscii: "St. Louis"
+    nameAscii: "St. Louis",
+    countryCode: "US"
 },
   {
     lon: -98.2072,
@@ -2267,7 +2755,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6789,
     capitalKind: "admin_capital",
     population: 2195000,
-    nameAscii: "Puebla"
+    nameAscii: "Puebla",
+    countryCode: "MX"
+},
+  {
+    lon: 139.7172,
+    lat: 35.5206,
+    weight: 0.6783,
+    capitalKind: "admin_capital",
+    population: 1538262,
+    nameAscii: "Kawasaki",
+    countryCode: "JP"
 },
   {
     lon: 106.1029,
@@ -2275,7 +2773,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6774,
     capitalKind: "admin_capital",
     population: 2174000,
-    nameAscii: "Gaoping"
+    nameAscii: "Gaoping",
+    countryCode: "CN"
 },
   {
     lon: 106.0847,
@@ -2283,7 +2782,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6774,
     capitalKind: "admin_capital",
     population: 2174000,
-    nameAscii: "Nanchong"
+    nameAscii: "Nanchong",
+    countryCode: "CN"
+},
+  {
+    lon: 135.183,
+    lat: 34.6913,
+    weight: 0.6772,
+    capitalKind: "admin_capital",
+    population: 1528478,
+    nameAscii: "Kobe",
+    countryCode: "JP"
 },
   {
     lon: 71.4782,
@@ -2291,7 +2800,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6771,
     capitalKind: "admin_capital",
     population: 2169915,
-    nameAscii: "Multan"
+    nameAscii: "Multan",
+    countryCode: "PK"
 },
   {
     lon: -48.5044,
@@ -2299,7 +2809,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6769,
     capitalKind: "admin_capital",
     population: 2167000,
-    nameAscii: "Belem"
+    nameAscii: "Belem",
+    countryCode: "BR"
+},
+  {
+    lon: 36.2548,
+    lat: 49.9818,
+    weight: 0.6768,
+    capitalKind: "admin_capital",
+    population: 1461000,
+    nameAscii: "Kharkiv",
+    countryCode: "UA"
 },
   {
     lon: 85.1356,
@@ -2307,7 +2827,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6763,
     capitalKind: "admin_capital",
     population: 2158000,
-    nameAscii: "Patna"
+    nameAscii: "Patna",
+    countryCode: "IN"
+},
+  {
+    lon: 21.1669,
+    lat: 42.6727,
+    weight: 0.6757,
+    capitalKind: "country_capital",
+    population: 550000,
+    nameAscii: "Pristina",
+    countryCode: "XK"
 },
   {
     lon: 37.3825,
@@ -2315,7 +2845,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6742,
     capitalKind: "admin_capital",
     population: 2130432,
-    nameAscii: "Gaziantep"
+    nameAscii: "Gaziantep",
+    countryCode: "TR"
 },
   {
     lon: 107.6445,
@@ -2323,7 +2854,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6739,
     capitalKind: "admin_capital",
     population: 2125400,
-    nameAscii: "Qingyang"
+    nameAscii: "Qingyang",
+    countryCode: "CN"
 },
   {
     lon: 7.0134,
@@ -2331,7 +2863,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6735,
     capitalKind: "admin_capital",
     population: 2120000,
-    nameAscii: "Port Harcourt"
+    nameAscii: "Port Harcourt",
+    countryCode: "NG"
+},
+  {
+    lon: 25.2798,
+    lat: 54.6892,
+    weight: 0.6732,
+    capitalKind: "country_capital",
+    population: 542366,
+    nameAscii: "Vilnius",
+    countryCode: "LT"
 },
   {
     lon: -64.1885,
@@ -2339,7 +2881,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6725,
     capitalKind: "admin_capital",
     population: 2106734,
-    nameAscii: "Cordoba"
+    nameAscii: "Cordoba",
+    countryCode: "AR"
 },
   {
     lon: -63.1812,
@@ -2347,7 +2890,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6722,
     capitalKind: "admin_capital",
     population: 2102998,
-    nameAscii: "Santa Cruz de la Sierra"
+    nameAscii: "Santa Cruz de la Sierra",
+    countryCode: "BO"
 },
   {
     lon: 23.5898,
@@ -2355,7 +2899,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6721,
     capitalKind: "admin_capital",
     population: 2101332,
-    nameAscii: "Mbuji-Mayi"
+    nameAscii: "Mbuji-Mayi",
+    countryCode: "CD"
+},
+  {
+    lon: -4.2576,
+    lat: 55.8651,
+    weight: 0.6719,
+    capitalKind: "admin_capital",
+    population: 1160000,
+    nameAscii: "Glasgow",
+    countryCode: "GB"
 },
   {
     lon: -86.2504,
@@ -2363,7 +2917,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6717,
     capitalKind: "country_capital",
     population: 973087,
-    nameAscii: "Managua"
+    nameAscii: "Managua",
+    countryCode: "NI"
 },
   {
     lon: 120.9543,
@@ -2371,7 +2926,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6714,
     capitalKind: "admin_capital",
     population: 2092496,
-    nameAscii: "Kunshan"
+    nameAscii: "Kunshan",
+    countryCode: "CN"
 },
   {
     lon: 117.1571,
@@ -2379,7 +2935,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6713,
     capitalKind: "admin_capital",
     population: 2091000,
-    nameAscii: "Tongshan"
+    nameAscii: "Tongshan",
+    countryCode: "CN"
 },
   {
     lon: 117.2839,
@@ -2387,7 +2944,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6713,
     capitalKind: "admin_capital",
     population: 2091000,
-    nameAscii: "Xuzhou"
+    nameAscii: "Xuzhou",
+    countryCode: "CN"
 },
   {
     lon: -71.6109,
@@ -2395,7 +2953,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6699,
     capitalKind: "admin_capital",
     population: 2072000,
-    nameAscii: "Maracaibo"
+    nameAscii: "Maracaibo",
+    countryCode: "VE"
 },
   {
     lon: 50.1033,
@@ -2403,15 +2962,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6686,
     capitalKind: "admin_capital",
     population: 2054710,
-    nameAscii: "Dammam"
-},
-  {
-    lon: 132.45,
-    lat: 34.4,
-    weight: 0.6678,
-    capitalKind: "admin_capital",
-    population: 2045000,
-    nameAscii: "Hiroshima"
+    nameAscii: "Dammam",
+    countryCode: "SA"
 },
   {
     lon: -80.1434,
@@ -2419,7 +2971,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6676,
     capitalKind: "admin_capital",
     population: 2042042,
-    nameAscii: "Fort Lauderdale"
+    nameAscii: "Fort Lauderdale",
+    countryCode: "US"
 },
   {
     lon: 106.9072,
@@ -2427,7 +2980,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6673,
     capitalKind: "admin_capital",
     population: 2037775,
-    nameAscii: "Zunyi"
+    nameAscii: "Zunyi",
+    countryCode: "CN"
 },
   {
     lon: -87.2068,
@@ -2435,7 +2989,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6673,
     capitalKind: "country_capital",
     population: 946000,
-    nameAscii: "Tegucigalpa"
+    nameAscii: "Tegucigalpa",
+    countryCode: "HN"
 },
   {
     lon: -49.2539,
@@ -2443,7 +2998,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6661,
     capitalKind: "admin_capital",
     population: 2022000,
-    nameAscii: "Goiania"
+    nameAscii: "Goiania",
+    countryCode: "BR"
 },
   {
     lon: -76.7936,
@@ -2451,7 +3007,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6659,
     capitalKind: "country_capital",
     population: 937700,
-    nameAscii: "Kingston"
+    nameAscii: "Kingston",
+    countryCode: "JM"
 },
   {
     lon: 96.1297,
@@ -2459,7 +3016,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6647,
     capitalKind: "country_capital",
     population: 930000,
-    nameAscii: "Nay Pyi Taw"
+    nameAscii: "Nay Pyi Taw",
+    countryCode: "MM"
 },
   {
     lon: 119.2156,
@@ -2467,7 +3025,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6644,
     capitalKind: "admin_capital",
     population: 2001009,
-    nameAscii: "Lianyungang"
+    nameAscii: "Lianyungang",
+    countryCode: "CN"
+},
+  {
+    lon: 8.55,
+    lat: 47.3667,
+    weight: 0.6636,
+    capitalKind: "admin_capital",
+    population: 1108000,
+    nameAscii: "Zuerich",
+    countryCode: "CH"
 },
   {
     lon: 43.145,
@@ -2475,7 +3043,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6635,
     capitalKind: "country_capital",
     population: 923000,
-    nameAscii: "Djibouti"
+    nameAscii: "Djibouti",
+    countryCode: "DJ"
 },
   {
     lon: 114.9326,
@@ -2483,7 +3052,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6626,
     capitalKind: "admin_capital",
     population: 1977253,
-    nameAscii: "Ganzhou"
+    nameAscii: "Ganzhou",
+    countryCode: "CN"
 },
   {
     lon: 76.9115,
@@ -2491,7 +3061,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6626,
     capitalKind: "admin_capital",
     population: 1977011,
-    nameAscii: "Almaty"
+    nameAscii: "Almaty",
+    countryCode: "KZ"
 },
   {
     lon: 116.9789,
@@ -2499,7 +3070,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6615,
     capitalKind: "admin_capital",
     population: 1964000,
-    nameAscii: "Suzhou"
+    nameAscii: "Suzhou",
+    countryCode: "CN"
 },
   {
     lon: 112.5466,
@@ -2507,7 +3079,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6599,
     capitalKind: "admin_capital",
     population: 1944000,
-    nameAscii: "Nanyang"
+    nameAscii: "Nanyang",
+    countryCode: "CN"
 },
   {
     lon: 74.59,
@@ -2515,15 +3088,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6595,
     capitalKind: "country_capital",
     population: 900000,
-    nameAscii: "Bishkek"
-},
-  {
-    lon: 19.8187,
-    lat: 41.3274,
-    weight: 0.6587,
-    capitalKind: "country_capital",
-    population: 895350,
-    nameAscii: "Tirana"
+    nameAscii: "Bishkek",
+    countryCode: "KG"
 },
   {
     lon: -117.0037,
@@ -2531,7 +3097,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6582,
     capitalKind: "admin_capital",
     population: 1922523,
-    nameAscii: "Tijuana"
+    nameAscii: "Tijuana",
+    countryCode: "MX"
 },
   {
     lon: 68.3772,
@@ -2539,7 +3106,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6581,
     capitalKind: "admin_capital",
     population: 1921275,
-    nameAscii: "Hyderabad"
+    nameAscii: "Hyderabad",
+    countryCode: "PK"
 },
   {
     lon: 106.8832,
@@ -2547,7 +3115,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6569,
     capitalKind: "country_capital",
     population: 885000,
-    nameAscii: "Ulan Bator"
+    nameAscii: "Ulan Bator",
+    countryCode: "MN"
 },
   {
     lon: 9.7043,
@@ -2555,7 +3124,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6568,
     capitalKind: "admin_capital",
     population: 1906000,
-    nameAscii: "Douala"
+    nameAscii: "Douala",
+    countryCode: "CM"
 },
   {
     lon: 116.3658,
@@ -2563,7 +3133,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6563,
     capitalKind: "admin_capital",
     population: 1899394,
-    nameAscii: "Jieyang"
+    nameAscii: "Jieyang",
+    countryCode: "CN"
+},
+  {
+    lon: 21.4314,
+    lat: 41.9965,
+    weight: 0.6563,
+    capitalKind: "country_capital",
+    population: 494087,
+    nameAscii: "Skopje",
+    countryCode: "MK"
 },
   {
     lon: -81.6954,
@@ -2571,7 +3151,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6555,
     capitalKind: "admin_capital",
     population: 1890000,
-    nameAscii: "Cleveland"
+    nameAscii: "Cleveland",
+    countryCode: "US"
 },
   {
     lon: 120.2133,
@@ -2579,7 +3160,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6544,
     capitalKind: "admin_capital",
     population: 1876312,
-    nameAscii: "Tainan"
+    nameAscii: "Tainan",
+    countryCode: "TW"
 },
   {
     lon: -122.6762,
@@ -2587,7 +3169,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6543,
     capitalKind: "admin_capital",
     population: 1875000,
-    nameAscii: "Portland"
+    nameAscii: "Portland",
+    countryCode: "US"
+},
+  {
+    lon: 139.6566,
+    lat: 35.9081,
+    weight: 0.654,
+    capitalKind: "admin_capital",
+    population: 1324854,
+    nameAscii: "Saitama",
+    countryCode: "JP"
+},
+  {
+    lon: 44.002,
+    lat: 56.3287,
+    weight: 0.6538,
+    capitalKind: "admin_capital",
+    population: 1278000,
+    nameAscii: "Nizhniy Novgorod",
+    countryCode: "RU"
 },
   {
     lon: 34.7523,
@@ -2595,7 +3196,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6537,
     capitalKind: "admin_capital",
     population: 1867579,
-    nameAscii: "Kakamega"
+    nameAscii: "Kakamega",
+    countryCode: "KE"
+},
+  {
+    lon: 3.0551,
+    lat: 50.6339,
+    weight: 0.6528,
+    capitalKind: "admin_capital",
+    population: 1044000,
+    nameAscii: "Lille",
+    countryCode: "FR"
 },
   {
     lon: 7.4388,
@@ -2603,7 +3214,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6522,
     capitalKind: "admin_capital",
     population: 1850000,
-    nameAscii: "Kaduna"
+    nameAscii: "Kaduna",
+    countryCode: "NG"
 },
   {
     lon: 125.6128,
@@ -2611,15 +3223,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6521,
     capitalKind: "admin_capital",
     population: 1848947,
-    nameAscii: "Davao"
-},
-  {
-    lon: 9.993,
-    lat: 53.5507,
-    weight: 0.6518,
-    capitalKind: "admin_capital",
-    population: 1845229,
-    nameAscii: "Hamburg"
+    nameAscii: "Davao",
+    countryCode: "PH"
 },
   {
     lon: -71.6296,
@@ -2627,7 +3232,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6513,
     capitalKind: "country_capital",
     population: 854000,
-    nameAscii: "Valparaiso"
+    nameAscii: "Valparaiso",
+    countryCode: "CL"
 },
   {
     lon: -79.9959,
@@ -2635,7 +3241,1079 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6512,
     capitalKind: "admin_capital",
     population: 1838000,
-    nameAscii: "Pittsburgh"
+    nameAscii: "Pittsburgh",
+    countryCode: "US"
+},
+  {
+    lon: 6.95,
+    lat: 50.9333,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 1004000,
+    nameAscii: "Koeln",
+    countryCode: "DE"
+},
+  {
+    lon: 14.7933,
+    lat: 40.6754,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 954265,
+    nameAscii: "Salerno",
+    countryCode: "IT"
+},
+  {
+    lon: 7.2661,
+    lat: 43.7031,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 927000,
+    nameAscii: "Nice",
+    countryCode: "FR"
+},
+  {
+    lon: 4.4003,
+    lat: 51.2205,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 920000,
+    nameAscii: "Antwerpen",
+    countryCode: "BE"
+},
+  {
+    lon: -1.614,
+    lat: 54.9733,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 882000,
+    nameAscii: "Newcastle upon Tyne",
+    countryCode: "GB"
+},
+  {
+    lon: -2.9253,
+    lat: 43.2627,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 875552,
+    nameAscii: "Bilbao",
+    countryCode: "ES"
+},
+  {
+    lon: 13.3636,
+    lat: 38.1166,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 863000,
+    nameAscii: "Palermo",
+    countryCode: "IT"
+},
+  {
+    lon: -3.18,
+    lat: 51.48,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 861400,
+    nameAscii: "Cardiff",
+    countryCode: "GB"
+},
+  {
+    lon: 1.4437,
+    lat: 43.6043,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 847000,
+    nameAscii: "Toulouse",
+    countryCode: "FR"
+},
+  {
+    lon: 7.5733,
+    lat: 47.5584,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 830000,
+    nameAscii: "Basel",
+    countryCode: "CH"
+},
+  {
+    lon: 22.9349,
+    lat: 40.6407,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 828000,
+    nameAscii: "Thessaloniki",
+    countryCode: "GR"
+},
+  {
+    lon: -8.4231,
+    lat: 41.5514,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 826833,
+    nameAscii: "Braga",
+    countryCode: "PT"
+},
+  {
+    lon: -1.1505,
+    lat: 52.9536,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 825600,
+    nameAscii: "Nottingham",
+    countryCode: "GB"
+},
+  {
+    lon: -0.3797,
+    lat: 39.4739,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 824340,
+    nameAscii: "Valencia",
+    countryCode: "ES"
+},
+  {
+    lon: -2.9779,
+    lat: 53.4106,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 811000,
+    nameAscii: "Liverpool",
+    countryCode: "GB"
+},
+  {
+    lon: -0.5805,
+    lat: 44.8412,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 803000,
+    nameAscii: "Bordeaux",
+    countryCode: "FR"
+},
+  {
+    lon: 7.1482,
+    lat: 51.2563,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 776525,
+    nameAscii: "Wuppertal",
+    countryCode: "DE"
+},
+  {
+    lon: 7.0098,
+    lat: 49.2326,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 770001,
+    nameAscii: "Saarbruecken",
+    countryCode: "DE"
+},
+  {
+    lon: 5.5675,
+    lat: 50.6337,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 749110,
+    nameAscii: "Liege",
+    countryCode: "BE"
+},
+  {
+    lon: 11.0775,
+    lat: 49.4542,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 737304,
+    nameAscii: "Nuernberg",
+    countryCode: "DE"
+},
+  {
+    lon: 8.8072,
+    lat: 53.0758,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 724909,
+    nameAscii: "Bremen",
+    countryCode: "DE"
+},
+  {
+    lon: 9.7332,
+    lat: 52.3705,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 722490,
+    nameAscii: "Hannover",
+    countryCode: "DE"
+},
+  {
+    lon: -0.8773,
+    lat: 41.6561,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 686986,
+    nameAscii: "Zaragoza",
+    countryCode: "ES"
+},
+  {
+    lon: 7.0955,
+    lat: 50.7344,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 680543,
+    nameAscii: "Bonn",
+    countryCode: "DE"
+},
+  {
+    lon: 15.0704,
+    lat: 37.4922,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 674542,
+    nameAscii: "Catania",
+    countryCode: "IT"
+},
+  {
+    lon: 8.9444,
+    lat: 44.4048,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 647497,
+    nameAscii: "Genoa",
+    countryCode: "IT"
+},
+  {
+    lon: 5.1222,
+    lat: 52.0908,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 640000,
+    nameAscii: "Utrecht",
+    countryCode: "NL"
+},
+  {
+    lon: 0.7143,
+    lat: 51.5378,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 618386,
+    nameAscii: "Southend-on-Sea",
+    countryCode: "GB"
+},
+  {
+    lon: 13.7383,
+    lat: 51.0509,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 617515,
+    nameAscii: "Dresden",
+    countryCode: "DE"
+},
+  {
+    lon: 8.2444,
+    lat: 50.086,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 617126,
+    nameAscii: "Wiesbaden",
+    countryCode: "DE"
+},
+  {
+    lon: 11.9668,
+    lat: 57.7072,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 608462,
+    nameAscii: "Goeteborg",
+    countryCode: "SE"
+},
+  {
+    lon: -4.4203,
+    lat: 36.7202,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 591637,
+    nameAscii: "Malaga",
+    countryCode: "ES"
+},
+  {
+    lon: 7.466,
+    lat: 51.5149,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 588462,
+    nameAscii: "Dortmund",
+    countryCode: "DE"
+},
+  {
+    lon: -2.5966,
+    lat: 51.4552,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 553528,
+    nameAscii: "Bristol",
+    countryCode: "GB"
+},
+  {
+    lon: 12.3713,
+    lat: 51.3396,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 542529,
+    nameAscii: "Leipzig",
+    countryCode: "DE"
+},
+  {
+    lon: 1.0993,
+    lat: 49.4431,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 532559,
+    nameAscii: "Rouen",
+    countryCode: "FR"
+},
+  {
+    lon: -3.1965,
+    lat: 55.9521,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 514990,
+    nameAscii: "Edinburgh",
+    countryCode: "GB"
+},
+  {
+    lon: -1.7521,
+    lat: 53.7939,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 501700,
+    nameAscii: "Bradford",
+    countryCode: "GB"
+},
+  {
+    lon: 16.8698,
+    lat: 41.1207,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 500577,
+    nameAscii: "Bari",
+    countryCode: "IT"
+},
+  {
+    lon: 11.3387,
+    lat: 44.4938,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 488172,
+    nameAscii: "Bologna",
+    countryCode: "IT"
+},
+  {
+    lon: -1.13,
+    lat: 37.987,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 471982,
+    nameAscii: "Murcia",
+    countryCode: "ES"
+},
+  {
+    lon: 23.6462,
+    lat: 37.942,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 466065,
+    nameAscii: "Piraeus",
+    countryCode: "GR"
+},
+  {
+    lon: -1.1317,
+    lat: 52.6386,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 457983,
+    nameAscii: "Leicester",
+    countryCode: "GB"
+},
+  {
+    lon: -1.3822,
+    lat: 54.9046,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 452934,
+    nameAscii: "Sunderland",
+    countryCode: "GB"
+},
+  {
+    lon: -5.9254,
+    lat: 54.5968,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 450406,
+    nameAscii: "Belfast",
+    countryCode: "GB"
+},
+  {
+    lon: 3.7167,
+    lat: 51.05,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 444336,
+    nameAscii: "Gent",
+    countryCode: "BE"
+},
+  {
+    lon: -1.0913,
+    lat: 50.799,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 442252,
+    nameAscii: "Portsmouth",
+    countryCode: "GB"
+},
+  {
+    lon: 7.7455,
+    lat: 48.5839,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 439972,
+    nameAscii: "Strasbourg",
+    countryCode: "FR"
+},
+  {
+    lon: -1.5534,
+    lat: 47.2172,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 438537,
+    nameAscii: "Nantes",
+    countryCode: "FR"
+},
+  {
+    lon: 2.6502,
+    lat: 39.5694,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 438234,
+    nameAscii: "Palma",
+    countryCode: "ES"
+},
+  {
+    lon: -1.8795,
+    lat: 50.7205,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 426945,
+    nameAscii: "Bournemouth",
+    countryCode: "GB"
+},
+  {
+    lon: 8.6908,
+    lat: 49.4077,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 426590,
+    nameAscii: "Heidelberg",
+    countryCode: "DE"
+},
+  {
+    lon: -1.2348,
+    lat: 54.5762,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 416042,
+    nameAscii: "Middlesbrough",
+    countryCode: "GB"
+},
+  {
+    lon: 6.1727,
+    lat: 49.1191,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 409186,
+    nameAscii: "Metz",
+    countryCode: "FR"
+},
+  {
+    lon: -2.1854,
+    lat: 53.0042,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 390801,
+    nameAscii: "Stoke-on-Trent",
+    countryCode: "GB"
+},
+  {
+    lon: 5.7148,
+    lat: 45.1787,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 388574,
+    nameAscii: "Grenoble",
+    countryCode: "FR"
+},
+  {
+    lon: -3.6067,
+    lat: 37.1882,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 388290,
+    nameAscii: "Granada",
+    countryCode: "ES"
+},
+  {
+    lon: -1.5122,
+    lat: 52.4066,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 388271,
+    nameAscii: "Coventry",
+    countryCode: "GB"
+},
+  {
+    lon: 7.2165,
+    lat: 51.4817,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 385729,
+    nameAscii: "Bochum",
+    countryCode: "DE"
+},
+  {
+    lon: -1.4043,
+    lat: 50.904,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 384417,
+    nameAscii: "Southampton",
+    countryCode: "GB"
+},
+  {
+    lon: -15.4157,
+    lat: 28.1018,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 383516,
+    nameAscii: "Las Palmas de Gran Canaria",
+    countryCode: "ES"
+},
+  {
+    lon: -8.7226,
+    lat: 42.2328,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 378952,
+    nameAscii: "Vigo",
+    countryCode: "ES"
+},
+  {
+    lon: 8.4044,
+    lat: 49.0094,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 377487,
+    nameAscii: "Karlsruhe",
+    countryCode: "DE"
+},
+  {
+    lon: 23.9091,
+    lat: 54.9016,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 374643,
+    nameAscii: "Kaunas",
+    countryCode: "LT"
+},
+  {
+    lon: -8.396,
+    lat: 43.3713,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 370610,
+    nameAscii: "A Coruna",
+    countryCode: "ES"
+},
+  {
+    lon: -0.9711,
+    lat: 51.4562,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 369804,
+    nameAscii: "Reading",
+    countryCode: "GB"
+},
+  {
+    lon: 13.0007,
+    lat: 55.6059,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 362133,
+    nameAscii: "Malmoe",
+    countryCode: "SE"
+},
+  {
+    lon: 10.8985,
+    lat: 48.3715,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 358989,
+    nameAscii: "Augsburg",
+    countryCode: "DE"
+},
+  {
+    lon: 5.9284,
+    lat: 43.1244,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 357693,
+    nameAscii: "Toulon",
+    countryCode: "FR"
+},
+  {
+    lon: -1.975,
+    lat: 43.3128,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 357468,
+    nameAscii: "San Sebastian",
+    countryCode: "ES"
+},
+  {
+    lon: 4.6368,
+    lat: 52.3808,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 349957,
+    nameAscii: "Haarlem",
+    countryCode: "NL"
+},
+  {
+    lon: 14.2861,
+    lat: 48.3064,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 349161,
+    nameAscii: "Linz",
+    countryCode: "AT"
+},
+  {
+    lon: -0.4815,
+    lat: 38.3452,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 348901,
+    nameAscii: "Alicante",
+    countryCode: "ES"
+},
+  {
+    lon: 10.9938,
+    lat: 45.4385,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 347459,
+    nameAscii: "Verona",
+    countryCode: "IT"
+},
+  {
+    lon: -16.2546,
+    lat: 28.4682,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 336061,
+    nameAscii: "Santa Cruz de Tenerife",
+    countryCode: "ES"
+},
+  {
+    lon: -5.6615,
+    lat: 43.5357,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 335972,
+    nameAscii: "Gijon",
+    countryCode: "ES"
+},
+  {
+    lon: 8.5333,
+    lat: 52.0333,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 331906,
+    nameAscii: "Bielefeld",
+    countryCode: "DE"
+},
+  {
+    lon: 3.8763,
+    lat: 43.6109,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 327254,
+    nameAscii: "Montpellier",
+    countryCode: "FR"
+},
+  {
+    lon: -4.7728,
+    lat: 37.8916,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 325708,
+    nameAscii: "Cordoba",
+    countryCode: "ES"
+},
+  {
+    lon: 24.6522,
+    lat: 60.2052,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 323910,
+    nameAscii: "Espoo",
+    countryCode: "FI"
+},
+  {
+    lon: -4.7235,
+    lat: 41.6554,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 322304,
+    nameAscii: "Valladolid",
+    countryCode: "ES"
+},
+  {
+    lon: -0.103,
+    lat: 51.5362,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 319143,
+    nameAscii: "Islington",
+    countryCode: "GB"
+},
+  {
+    lon: 14.2028,
+    lat: 42.4584,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 314789,
+    nameAscii: "Pescara",
+    countryCode: "IT"
+},
+  {
+    lon: -0.3352,
+    lat: 53.7446,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 314018,
+    nameAscii: "Kingston upon Hull",
+    countryCode: "GB"
+},
+  {
+    lon: -2.7045,
+    lat: 53.7628,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 313332,
+    nameAscii: "Preston",
+    countryCode: "GB"
+},
+  {
+    lon: 7.5788,
+    lat: 50.3536,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 312633,
+    nameAscii: "Koblenz",
+    countryCode: "DE"
+},
+  {
+    lon: 15.442,
+    lat: 47.0673,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 303270,
+    nameAscii: "Graz",
+    countryCode: "AT"
+},
+  {
+    lon: 12.9292,
+    lat: 50.8357,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 302643,
+    nameAscii: "Chemnitz",
+    countryCode: "DE"
+},
+  {
+    lon: -3.9432,
+    lat: 51.6208,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 300352,
+    nameAscii: "Swansea",
+    countryCode: "GB"
+},
+  {
+    lon: 5.3242,
+    lat: 60.393,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 294029,
+    nameAscii: "Bergen",
+    countryCode: "NO"
+},
+  {
+    lon: 9.1192,
+    lat: 39.2305,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 291511,
+    nameAscii: "Cagliari",
+    countryCode: "IT"
+},
+  {
+    lon: 9.5,
+    lat: 51.3167,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 289924,
+    nameAscii: "Kassel",
+    countryCode: "DE"
+},
+  {
+    lon: 10.2108,
+    lat: 56.1567,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 285273,
+    nameAscii: "Arhus",
+    countryCode: "DK"
+},
+  {
+    lon: -6.2891,
+    lat: 36.5267,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 283157,
+    nameAscii: "Cadiz",
+    countryCode: "ES"
+},
+  {
+    lon: -1.6432,
+    lat: 42.8169,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 274545,
+    nameAscii: "Pamplona",
+    countryCode: "ES"
+},
+  {
+    lon: -3.05,
+    lat: 53.8167,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 272792,
+    nameAscii: "Blackpool",
+    countryCode: "GB"
+},
+  {
+    lon: 12.3326,
+    lat: 45.4371,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 270816,
+    nameAscii: "Venice",
+    countryCode: "IT"
+},
+  {
+    lon: -1.4766,
+    lat: 52.9228,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 270468,
+    nameAscii: "Derby",
+    countryCode: "GB"
+},
+  {
+    lon: 7.6257,
+    lat: 51.9624,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 270184,
+    nameAscii: "Muenster",
+    countryCode: "DE"
+},
+  {
+    lon: 7.0965,
+    lat: 51.5051,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 270028,
+    nameAscii: "Gelsenkirchen",
+    countryCode: "DE"
+},
+  {
+    lon: 10.1349,
+    lat: 54.3213,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 269427,
+    nameAscii: "Kiel",
+    countryCode: "DE"
+},
+  {
+    lon: 6.185,
+    lat: 48.6844,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 268976,
+    nameAscii: "Nancy",
+    countryCode: "FR"
+},
+  {
+    lon: 6.6328,
+    lat: 46.516,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 265702,
+    nameAscii: "Lausanne",
+    countryCode: "CH"
+},
+  {
+    lon: 4.39,
+    lat: 45.4339,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 265684,
+    nameAscii: "Saint-Etienne",
+    countryCode: "FR"
+},
+  {
+    lon: 6.0834,
+    lat: 50.7766,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 265208,
+    nameAscii: "Aachen",
+    countryCode: "DE"
+},
+  {
+    lon: -2.123,
+    lat: 52.5855,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 263700,
+    nameAscii: "Wolverhampton",
+    countryCode: "GB"
+},
+  {
+    lon: 6.4417,
+    lat: 51.1854,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 261742,
+    nameAscii: "Moenchengladbach",
+    countryCode: "DE"
+},
+  {
+    lon: 23.7871,
+    lat: 61.4991,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 260646,
+    nameAscii: "Tampere",
+    countryCode: "FI"
+},
+  {
+    lon: -4.143,
+    lat: 50.3715,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 260203,
+    nameAscii: "Plymouth",
+    countryCode: "GB"
+},
+  {
+    lon: -2.6727,
+    lat: 42.85,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 257407,
+    nameAscii: "Gasteiz / Vitoria",
+    countryCode: "ES"
+},
+  {
+    lon: -0.7558,
+    lat: 52.0417,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 256385,
+    nameAscii: "Milton Keynes",
+    countryCode: "GB"
+},
+  {
+    lon: 7.8522,
+    lat: 47.9959,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 254889,
+    nameAscii: "Freiburg",
+    countryCode: "DE"
+},
+  {
+    lon: 25.041,
+    lat: 60.2941,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 252724,
+    nameAscii: "Vantaa",
+    countryCode: "FI"
+},
+  {
+    lon: 15.5526,
+    lat: 38.1939,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 252026,
+    nameAscii: "Messina",
+    countryCode: "IT"
+},
+  {
+    lon: 14.3323,
+    lat: 41.0726,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 250000,
+    nameAscii: "Caserta",
+    countryCode: "IT"
+},
+  {
+    lon: 9.0832,
+    lat: 45.8082,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 250000,
+    nameAscii: "Como",
+    countryCode: "IT"
+},
+  {
+    lon: 8.3064,
+    lat: 47.0505,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 250000,
+    nameAscii: "Luzern",
+    countryCode: "CH"
+},
+  {
+    lon: 21.9033,
+    lat: 43.3247,
+    weight: 0.65,
+    capitalKind: "admin_capital",
+    population: 250000,
+    nameAscii: "Nis",
+    countryCode: "RS"
+},
+  {
+    lon: -4.4833,
+    lat: 54.15,
+    weight: 0.65,
+    capitalKind: "country_capital",
+    population: 35854,
+    nameAscii: "Douglas",
+    countryCode: "IM"
 },
   {
     lon: 9.4536,
@@ -2643,7 +4321,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6499,
     capitalKind: "country_capital",
     population: 846090,
-    nameAscii: "Libreville"
+    nameAscii: "Libreville",
+    countryCode: "GA"
 },
   {
     lon: 35.3253,
@@ -2651,7 +4330,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6493,
     capitalKind: "admin_capital",
     population: 1816750,
-    nameAscii: "Adana"
+    nameAscii: "Adana",
+    countryCode: "TR"
+},
+  {
+    lon: 49.1221,
+    lat: 55.7887,
+    weight: 0.6491,
+    capitalKind: "admin_capital",
+    population: 1243500,
+    nameAscii: "Kazan",
+    countryCode: "RU"
 },
   {
     lon: 55.4122,
@@ -2659,7 +4348,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6479,
     capitalKind: "admin_capital",
     population: 1800000,
-    nameAscii: "Sharjah"
+    nameAscii: "Sharjah",
+    countryCode: "AE"
 },
   {
     lon: 77.4029,
@@ -2667,7 +4357,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6477,
     capitalKind: "admin_capital",
     population: 1798218,
-    nameAscii: "Bhopal"
+    nameAscii: "Bhopal",
+    countryCode: "IN"
 },
   {
     lon: -74.7813,
@@ -2675,7 +4366,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6477,
     capitalKind: "admin_capital",
     population: 1798000,
-    nameAscii: "Barranquilla"
+    nameAscii: "Barranquilla",
+    countryCode: "CO"
 },
   {
     lon: 113.0833,
@@ -2683,7 +4375,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6475,
     capitalKind: "admin_capital",
     population: 1795459,
-    nameAscii: "Jiangmen"
+    nameAscii: "Jiangmen",
+    countryCode: "CN"
 },
   {
     lon: 18.555,
@@ -2691,7 +4384,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6472,
     capitalKind: "country_capital",
     population: 831925,
-    nameAscii: "Bangui"
+    nameAscii: "Bangui",
+    countryCode: "CF"
 },
   {
     lon: 40.2172,
@@ -2699,7 +4393,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6471,
     capitalKind: "admin_capital",
     population: 1791373,
-    nameAscii: "Diyarbakir"
+    nameAscii: "Diyarbakir",
+    countryCode: "TR"
 },
   {
     lon: 5.6258,
@@ -2707,7 +4402,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6463,
     capitalKind: "admin_capital",
     population: 1782000,
-    nameAscii: "Benin City"
+    nameAscii: "Benin City",
+    countryCode: "NG"
 },
   {
     lon: -13.2356,
@@ -2715,7 +4411,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6463,
     capitalKind: "country_capital",
     population: 827000,
-    nameAscii: "Freetown"
+    nameAscii: "Freetown",
+    countryCode: "SL"
 },
   {
     lon: 120.263,
@@ -2723,7 +4420,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6461,
     capitalKind: "admin_capital",
     population: 1779515,
-    nameAscii: "Jiangyin"
+    nameAscii: "Jiangyin",
+    countryCode: "CN"
 },
   {
     lon: -68.0004,
@@ -2731,7 +4429,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6453,
     capitalKind: "admin_capital",
     population: 1770000,
-    nameAscii: "Valencia"
+    nameAscii: "Valencia",
+    countryCode: "VE"
 },
   {
     lon: 115.8167,
@@ -2739,7 +4438,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6452,
     capitalKind: "admin_capital",
     population: 1768947,
-    nameAscii: "Fuyang"
+    nameAscii: "Fuyang",
+    countryCode: "CN"
 },
   {
     lon: 121.6022,
@@ -2747,7 +4447,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6449,
     capitalKind: "place",
     population: 4913879,
-    nameAscii: "Dalian"
+    nameAscii: "Dalian",
+    countryCode: "CN"
 },
   {
     lon: 116.6226,
@@ -2755,7 +4456,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6436,
     capitalKind: "admin_capital",
     population: 1750945,
-    nameAscii: "Chaozhou"
+    nameAscii: "Chaozhou",
+    countryCode: "CN"
 },
   {
     lon: 104.7458,
@@ -2763,7 +4465,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6434,
     capitalKind: "admin_capital",
     population: 1749000,
-    nameAscii: "Palembang"
+    nameAscii: "Palembang",
+    countryCode: "ID"
+},
+  {
+    lon: 61.4288,
+    lat: 55.1611,
+    weight: 0.6433,
+    capitalKind: "admin_capital",
+    population: 1202371,
+    nameAscii: "Chelyabinsk",
+    countryCode: "RU"
 },
   {
     lon: -117.2898,
@@ -2771,15 +4483,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.643,
     capitalKind: "admin_capital",
     population: 1745000,
-    nameAscii: "San Bernardino"
-},
-  {
-    lon: 7.0123,
-    lat: 51.4566,
-    weight: 0.6428,
-    capitalKind: "admin_capital",
-    population: 1742135,
-    nameAscii: "Essen"
+    nameAscii: "San Bernardino",
+    countryCode: "US"
 },
   {
     lon: 88.3186,
@@ -2787,7 +4492,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6426,
     capitalKind: "place",
     population: 4841638,
-    nameAscii: "Howrah"
+    nameAscii: "Howrah",
+    countryCode: "IN"
 },
   {
     lon: 113.0333,
@@ -2795,7 +4501,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6425,
     capitalKind: "admin_capital",
     population: 1738424,
-    nameAscii: "Qingyuan"
+    nameAscii: "Qingyuan",
+    countryCode: "CN"
 },
   {
     lon: 117.12,
@@ -2803,7 +4510,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6422,
     capitalKind: "admin_capital",
     population: 1735425,
-    nameAscii: "Tai'an"
+    nameAscii: "Tai'an",
+    countryCode: "CN"
 },
   {
     lon: 58.4078,
@@ -2811,7 +4519,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6405,
     capitalKind: "country_capital",
     population: 797000,
-    nameAscii: "Muscat"
+    nameAscii: "Muscat",
+    countryCode: "OM"
 },
   {
     lon: 112.4368,
@@ -2819,7 +4528,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6403,
     capitalKind: "admin_capital",
     population: 1715000,
-    nameAscii: "Luoyang"
+    nameAscii: "Luoyang",
+    countryCode: "CN"
 },
   {
     lon: 120.9679,
@@ -2827,7 +4537,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6401,
     capitalKind: "admin_capital",
     population: 1712945,
-    nameAscii: "Caloocan"
+    nameAscii: "Caloocan",
+    countryCode: "PH"
 },
   {
     lon: -46.3336,
@@ -2835,7 +4546,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6398,
     capitalKind: "admin_capital",
     population: 1709000,
-    nameAscii: "Santos"
+    nameAscii: "Santos",
+    countryCode: "BR"
 },
   {
     lon: -40.3378,
@@ -2843,7 +4555,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6393,
     capitalKind: "admin_capital",
     population: 1704000,
-    nameAscii: "Vitoria"
+    nameAscii: "Vitoria",
+    countryCode: "BR"
+},
+  {
+    lon: 73.3686,
+    lat: 54.9924,
+    weight: 0.6389,
+    capitalKind: "admin_capital",
+    population: 1172070,
+    nameAscii: "Omsk",
+    countryCode: "RU"
 },
   {
     lon: 125.0,
@@ -2851,7 +4573,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6383,
     capitalKind: "admin_capital",
     population: 1693000,
-    nameAscii: "Daqing"
+    nameAscii: "Daqing",
+    countryCode: "CN"
 },
   {
     lon: 39.1862,
@@ -2859,7 +4582,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6379,
     capitalKind: "place",
     population: 4697000,
-    nameAscii: "Jeddah"
+    nameAscii: "Jeddah",
+    countryCode: "SA"
+},
+  {
+    lon: 50.1355,
+    lat: 53.2077,
+    weight: 0.6376,
+    capitalKind: "admin_capital",
+    population: 1163399,
+    nameAscii: "Samara",
+    countryCode: "RU"
 },
   {
     lon: 43.1189,
@@ -2867,7 +4600,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6374,
     capitalKind: "admin_capital",
     population: 1683000,
-    nameAscii: "Mosul"
+    nameAscii: "Mosul",
+    countryCode: "IQ"
 },
   {
     lon: 78.9592,
@@ -2875,7 +4609,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6374,
     capitalKind: "admin_capital",
     population: 1682687,
-    nameAscii: "Kallakurichi"
+    nameAscii: "Kallakurichi",
+    countryCode: "IN"
 },
   {
     lon: 108.3503,
@@ -2883,7 +4618,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6371,
     capitalKind: "admin_capital",
     population: 1680000,
-    nameAscii: "Shahe"
+    nameAscii: "Shahe",
+    countryCode: "CN"
 },
   {
     lon: 108.3741,
@@ -2891,7 +4627,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6371,
     capitalKind: "admin_capital",
     population: 1680000,
-    nameAscii: "Wanxian"
+    nameAscii: "Wanxian",
+    countryCode: "CN"
 },
   {
     lon: 108.3959,
@@ -2899,7 +4636,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6371,
     capitalKind: "admin_capital",
     population: 1680000,
-    nameAscii: "Wanzhou"
+    nameAscii: "Wanzhou",
+    countryCode: "CN"
 },
   {
     lon: 73.8554,
@@ -2907,7 +4645,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.637,
     capitalKind: "place",
     population: 4672000,
-    nameAscii: "Pune"
+    nameAscii: "Pune",
+    countryCode: "IN"
 },
   {
     lon: 101.7574,
@@ -2915,7 +4654,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6368,
     capitalKind: "admin_capital",
     population: 1677177,
-    nameAscii: "Xining"
+    nameAscii: "Xining",
+    countryCode: "CN"
 },
   {
     lon: 120.7422,
@@ -2923,7 +4663,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6368,
     capitalKind: "admin_capital",
     population: 1677050,
-    nameAscii: "Changshu"
+    nameAscii: "Changshu",
+    countryCode: "CN"
 },
   {
     lon: -121.895,
@@ -2931,7 +4672,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.636,
     capitalKind: "admin_capital",
     population: 1668000,
-    nameAscii: "San Jose"
+    nameAscii: "San Jose",
+    countryCode: "US"
 },
   {
     lon: 29.3614,
@@ -2939,7 +4681,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.635,
     capitalKind: "country_capital",
     population: 769317,
-    nameAscii: "Bujumbura"
+    nameAscii: "Bujumbura",
+    countryCode: "BI"
 },
   {
     lon: 110.4208,
@@ -2947,15 +4690,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6346,
     capitalKind: "admin_capital",
     population: 1653524,
-    nameAscii: "Semarang"
-},
-  {
-    lon: 7.6868,
-    lat: 45.0705,
-    weight: 0.6345,
-    capitalKind: "admin_capital",
-    population: 1652000,
-    nameAscii: "Turin"
+    nameAscii: "Semarang",
+    countryCode: "ID"
 },
   {
     lon: 72.8302,
@@ -2963,7 +4699,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6343,
     capitalKind: "place",
     population: 4591246,
-    nameAscii: "Surat"
+    nameAscii: "Surat",
+    countryCode: "IN"
 },
   {
     lon: 35.7395,
@@ -2971,7 +4708,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6342,
     capitalKind: "country_capital",
     population: 765179,
-    nameAscii: "Dodoma"
+    nameAscii: "Dodoma",
+    countryCode: "TZ"
 },
   {
     lon: -99.0606,
@@ -2979,7 +4717,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6339,
     capitalKind: "admin_capital",
     population: 1645352,
-    nameAscii: "Ecatepec de Morelos"
+    nameAscii: "Ecatepec de Morelos",
+    countryCode: "MX"
 },
   {
     lon: 116.5169,
@@ -2987,7 +4726,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6338,
     capitalKind: "admin_capital",
     population: 1644344,
-    nameAscii: "Lu'an"
+    nameAscii: "Lu'an",
+    countryCode: "CN"
 },
   {
     lon: 2.4183,
@@ -2995,7 +4735,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6335,
     capitalKind: "country_capital",
     population: 762000,
-    nameAscii: "Cotonou"
+    nameAscii: "Cotonou",
+    countryCode: "BJ"
 },
   {
     lon: 123.9615,
@@ -3003,7 +4744,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6334,
     capitalKind: "admin_capital",
     population: 1641000,
-    nameAscii: "Qiqihar"
+    nameAscii: "Qiqihar",
+    countryCode: "CN"
 },
   {
     lon: -84.5144,
@@ -3011,7 +4753,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.633,
     capitalKind: "admin_capital",
     population: 1636000,
-    nameAscii: "Cincinnati"
+    nameAscii: "Cincinnati",
+    countryCode: "US"
+},
+  {
+    lon: 39.7077,
+    lat: 47.22,
+    weight: 0.6327,
+    capitalKind: "admin_capital",
+    population: 1130305,
+    nameAscii: "Rostov-na-Donu",
+    countryCode: "RU"
 },
   {
     lon: 114.4876,
@@ -3019,7 +4771,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6325,
     capitalKind: "admin_capital",
     population: 1631000,
-    nameAscii: "Handan"
+    nameAscii: "Handan",
+    countryCode: "CN"
 },
   {
     lon: 51.6746,
@@ -3027,7 +4780,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6322,
     capitalKind: "admin_capital",
     population: 1628000,
-    nameAscii: "Isfahan"
+    nameAscii: "Isfahan",
+    countryCode: "IR"
 },
   {
     lon: 102.6,
@@ -3035,7 +4789,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6319,
     capitalKind: "country_capital",
     population: 754000,
-    nameAscii: "Vientiane"
+    nameAscii: "Vientiane",
+    countryCode: "LA"
+},
+  {
+    lon: 55.9678,
+    lat: 54.7431,
+    weight: 0.6312,
+    capitalKind: "admin_capital",
+    population: 1120547,
+    nameAscii: "Ufa",
+    countryCode: "RU"
 },
   {
     lon: 120.1573,
@@ -3043,15 +4807,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.631,
     capitalKind: "admin_capital",
     population: 1615717,
-    nameAscii: "Yancheng"
-},
-  {
-    lon: 82.9317,
-    lat: 55.0226,
-    weight: 0.6307,
-    capitalKind: "admin_capital",
-    population: 1612833,
-    nameAscii: "Novosibirsk"
+    nameAscii: "Yancheng",
+    countryCode: "CN"
 },
   {
     lon: 44.0094,
@@ -3059,7 +4816,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6307,
     capitalKind: "admin_capital",
     population: 1612700,
-    nameAscii: "Erbil"
+    nameAscii: "Erbil",
+    countryCode: "IQ"
 },
   {
     lon: 119.9081,
@@ -3067,7 +4825,1016 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6302,
     capitalKind: "admin_capital",
     population: 1607108,
-    nameAscii: "Taizhou"
+    nameAscii: "Taizhou",
+    countryCode: "CN"
+},
+  {
+    lon: 92.9314,
+    lat: 56.0374,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 1090811,
+    nameAscii: "Krasnoyarsk",
+    countryCode: "RU"
+},
+  {
+    lon: 35.0407,
+    lat: 48.4666,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 1050000,
+    nameAscii: "Dnipro",
+    countryCode: "UA"
+},
+  {
+    lon: 39.192,
+    lat: 51.6683,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 1047549,
+    nameAscii: "Voronezh",
+    countryCode: "RU"
+},
+  {
+    lon: 30.7438,
+    lat: 46.4857,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 1015826,
+    nameAscii: "Odesa",
+    countryCode: "UA"
+},
+  {
+    lon: 44.4976,
+    lat: 48.7138,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 1013533,
+    nameAscii: "Volgograd",
+    countryCode: "RU"
+},
+  {
+    lon: 56.2502,
+    lat: 58.0105,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 997000,
+    nameAscii: "Perm",
+    countryCode: "RU"
+},
+  {
+    lon: 37.8022,
+    lat: 48.023,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 988000,
+    nameAscii: "Donetsk",
+    countryCode: "UA"
+},
+  {
+    lon: 38.9818,
+    lat: 45.0453,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 899541,
+    nameAscii: "Krasnodar",
+    countryCode: "RU"
+},
+  {
+    lon: 45.9901,
+    lat: 51.5405,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 844858,
+    nameAscii: "Saratov",
+    countryCode: "RU"
+},
+  {
+    lon: 19.9366,
+    lat: 50.0614,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 804237,
+    nameAscii: "Krakow",
+    countryCode: "PL"
+},
+  {
+    lon: 24.0232,
+    lat: 49.8383,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 803880,
+    nameAscii: "Lviv",
+    countryCode: "UA"
+},
+  {
+    lon: 35.1171,
+    lat: 47.8517,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 788000,
+    nameAscii: "Zaporizhzhya",
+    countryCode: "UA"
+},
+  {
+    lon: 65.5272,
+    lat: 57.1522,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 768358,
+    nameAscii: "Tyumen",
+    countryCode: "RU"
+},
+  {
+    lon: 19.4739,
+    lat: 51.7706,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 758000,
+    nameAscii: "Lodz",
+    countryCode: "PL"
+},
+  {
+    lon: 18.6491,
+    lat: 54.3523,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 740000,
+    nameAscii: "Gdansk",
+    countryCode: "PL"
+},
+  {
+    lon: 17.0301,
+    lat: 51.1029,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 672545,
+    nameAscii: "Wroclaw",
+    countryCode: "PL"
+},
+  {
+    lon: 18.9328,
+    lat: 50.348,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 662247,
+    nameAscii: "Bytom",
+    countryCode: "PL"
+},
+  {
+    lon: 33.394,
+    lat: 47.9057,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 652380,
+    nameAscii: "Kryvyy Rih",
+    countryCode: "UA"
+},
+  {
+    lon: 53.1986,
+    lat: 56.8522,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 648213,
+    nameAscii: "Izhevsk",
+    countryCode: "RU"
+},
+  {
+    lon: 48.3866,
+    lat: 54.3282,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 640680,
+    nameAscii: "Ulyanovsk",
+    countryCode: "RU"
+},
+  {
+    lon: 83.7279,
+    lat: 53.362,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 632372,
+    nameAscii: "Barnaul",
+    countryCode: "RU"
+},
+  {
+    lon: 16.9299,
+    lat: 52.4069,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 623997,
+    nameAscii: "Poznan",
+    countryCode: "PL"
+},
+  {
+    lon: 104.2908,
+    lat: 52.2957,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 623869,
+    nameAscii: "Irkutsk",
+    countryCode: "RU"
+},
+  {
+    lon: 135.0971,
+    lat: 48.462,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 618150,
+    nameAscii: "Khabarovsk",
+    countryCode: "RU"
+},
+  {
+    lon: 39.8737,
+    lat: 57.6299,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 608722,
+    nameAscii: "Yaroslavl",
+    countryCode: "RU"
+},
+  {
+    lon: 131.8735,
+    lat: 43.1056,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 604901,
+    nameAscii: "Vladivostok",
+    countryCode: "RU"
+},
+  {
+    lon: 47.5003,
+    lat: 42.9778,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 596356,
+    nameAscii: "Makhachkala",
+    countryCode: "RU"
+},
+  {
+    lon: 84.9822,
+    lat: 56.5005,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 574002,
+    nameAscii: "Tomsk",
+    countryCode: "RU"
+},
+  {
+    lon: 55.0988,
+    lat: 51.7671,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 564773,
+    nameAscii: "Orenburg",
+    countryCode: "RU"
+},
+  {
+    lon: 86.1043,
+    lat: 55.3542,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 558973,
+    nameAscii: "Kemerovo",
+    countryCode: "RU"
+},
+  {
+    lon: 33.5213,
+    lat: 44.608,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 547820,
+    nameAscii: "Sevastopol",
+    countryCode: "UA"
+},
+  {
+    lon: 87.136,
+    lat: 53.7575,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 539616,
+    nameAscii: "Novokuznetsk",
+    countryCode: "RU"
+},
+  {
+    lon: 39.7041,
+    lat: 54.627,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 538962,
+    nameAscii: "Ryazan'",
+    countryCode: "RU"
+},
+  {
+    lon: 48.0408,
+    lat: 46.3497,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 533925,
+    nameAscii: "Astrakhan",
+    countryCode: "RU"
+},
+  {
+    lon: 45.0108,
+    lat: 53.1957,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 523553,
+    nameAscii: "Penza",
+    countryCode: "RU"
+},
+  {
+    lon: 39.5515,
+    lat: 52.5876,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 515655,
+    nameAscii: "Lipetsk",
+    countryCode: "RU"
+},
+  {
+    lon: 31.993,
+    lat: 46.9763,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 510840,
+    nameAscii: "Mykolayiv",
+    countryCode: "UA"
+},
+  {
+    lon: 52.4196,
+    lat: 55.7372,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 509870,
+    nameAscii: "Naberezhnyye Chelny",
+    countryCode: "RU"
+},
+  {
+    lon: 18.6766,
+    lat: 50.2976,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 507670,
+    nameAscii: "Gliwice",
+    countryCode: "PL"
+},
+  {
+    lon: 49.6578,
+    lat: 58.5981,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 507155,
+    nameAscii: "Kirov",
+    countryCode: "RU"
+},
+  {
+    lon: 30.9754,
+    lat: 52.4345,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 501102,
+    nameAscii: "Homyel'",
+    countryCode: "BY"
+},
+  {
+    lon: 47.246,
+    lat: 56.1322,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 492331,
+    nameAscii: "Cheboksary",
+    countryCode: "RU"
+},
+  {
+    lon: 37.6182,
+    lat: 54.1961,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 489486,
+    nameAscii: "Tula",
+    countryCode: "RU"
+},
+  {
+    lon: 18.282,
+    lat: 49.8347,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 478963,
+    nameAscii: "Ostrava",
+    countryCode: "CZ"
+},
+  {
+    lon: 20.511,
+    lat: 54.7064,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 475056,
+    nameAscii: "Kaliningrad",
+    countryCode: "RU"
+},
+  {
+    lon: 39.3055,
+    lat: 48.5681,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 452000,
+    nameAscii: "Luhansk",
+    countryCode: "UA"
+},
+  {
+    lon: 36.1846,
+    lat: 51.7269,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 448733,
+    nameAscii: "Kursk",
+    countryCode: "RU"
+},
+  {
+    lon: 41.9642,
+    lat: 45.0344,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 433931,
+    nameAscii: "Stavropol'",
+    countryCode: "RU"
+},
+  {
+    lon: 34.3214,
+    lat: 53.271,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 427236,
+    nameAscii: "Bryansk",
+    countryCode: "RU"
+},
+  {
+    lon: 40.9726,
+    lat: 56.9999,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 420839,
+    nameAscii: "Ivanovo",
+    countryCode: "RU"
+},
+  {
+    lon: 35.9006,
+    lat: 56.8584,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 420065,
+    nameAscii: "Tver",
+    countryCode: "RU"
+},
+  {
+    lon: 59.0066,
+    lat: 53.3981,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 413351,
+    nameAscii: "Magnitogorsk",
+    countryCode: "RU"
+},
+  {
+    lon: 14.553,
+    lat: 53.4289,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 407811,
+    nameAscii: "Szczecin",
+    countryCode: "PL"
+},
+  {
+    lon: 73.4177,
+    lat: 61.2576,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 400000,
+    nameAscii: "Surgut",
+    countryCode: "RU"
+},
+  {
+    lon: 27.0015,
+    lat: 49.4249,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 398346,
+    nameAscii: "Khmelnytskyy",
+    countryCode: "UA"
+},
+  {
+    lon: 38.0532,
+    lat: 48.3358,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 396885,
+    nameAscii: "Horlivka",
+    countryCode: "UA"
+},
+  {
+    lon: 16.608,
+    lat: 49.1952,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 388277,
+    nameAscii: "Brno",
+    countryCode: "CZ"
+},
+  {
+    lon: 33.465,
+    lat: 44.6,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 379200,
+    nameAscii: "Sevastapol",
+    countryCode: "RU"
+},
+  {
+    lon: 27.6,
+    lat: 47.1667,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 378954,
+    nameAscii: "Iasi",
+    countryCode: "RO"
+},
+  {
+    lon: 37.9258,
+    lat: 48.0478,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 376610,
+    nameAscii: "Makiivka",
+    countryCode: "UA"
+},
+  {
+    lon: 28.4687,
+    lat: 49.2322,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 369839,
+    nameAscii: "Vinnytsya",
+    countryCode: "UA"
+},
+  {
+    lon: 30.3404,
+    lat: 53.9088,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 369200,
+    nameAscii: "Mahilyow",
+    countryCode: "BY"
+},
+  {
+    lon: 18.0076,
+    lat: 53.1235,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 366452,
+    nameAscii: "Bydgoszcz",
+    countryCode: "PL"
+},
+  {
+    lon: 44.6699,
+    lat: 43.041,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 364630,
+    nameAscii: "Vladikavkaz",
+    countryCode: "RU"
+},
+  {
+    lon: 23.8289,
+    lat: 53.6758,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 361115,
+    nameAscii: "Hrodna",
+    countryCode: "BY"
+},
+  {
+    lon: 107.5998,
+    lat: 51.8265,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 360278,
+    nameAscii: "Ulan-Ude",
+    countryCode: "RU"
+},
+  {
+    lon: 22.5701,
+    lat: 51.2506,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 360044,
+    nameAscii: "Lublin",
+    countryCode: "PL"
+},
+  {
+    lon: 30.2049,
+    lat: 55.1904,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 358395,
+    nameAscii: "Vitebsk",
+    countryCode: "BY"
+},
+  {
+    lon: 34.0987,
+    lat: 44.9492,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 358108,
+    nameAscii: "Simferopol",
+    countryCode: "RU"
+},
+  {
+    lon: 40.3998,
+    lat: 56.1385,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 357024,
+    nameAscii: "Vladimir",
+    countryCode: "RU"
+},
+  {
+    lon: 40.5518,
+    lat: 64.5461,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 356051,
+    nameAscii: "Arkhangel'sk",
+    countryCode: "RU"
+},
+  {
+    lon: 113.4917,
+    lat: 52.0431,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 349005,
+    nameAscii: "Chita",
+    countryCode: "RU"
+},
+  {
+    lon: 36.5809,
+    lat: 50.6034,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 345289,
+    nameAscii: "Belgorod",
+    countryCode: "RU"
+},
+  {
+    lon: 23.7175,
+    lat: 52.1089,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 344470,
+    nameAscii: "Brest",
+    countryCode: "BY"
+},
+  {
+    lon: 65.3434,
+    lat: 55.449,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 343129,
+    nameAscii: "Kurgan",
+    countryCode: "RU"
+},
+  {
+    lon: 36.27,
+    lat: 54.5306,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 340851,
+    nameAscii: "Kaluga",
+    countryCode: "RU"
+},
+  {
+    lon: 24.75,
+    lat: 42.1539,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 340494,
+    nameAscii: "Plovdiv",
+    countryCode: "BG"
+},
+  {
+    lon: 34.1108,
+    lat: 44.9572,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 336460,
+    nameAscii: "Simferopol",
+    countryCode: "UA"
+},
+  {
+    lon: 36.0791,
+    lat: 52.9688,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 334552,
+    nameAscii: "Orel",
+    countryCode: "RU"
+},
+  {
+    lon: 32.0509,
+    lat: 54.7783,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 330025,
+    nameAscii: "Smolensk",
+    countryCode: "RU"
+},
+  {
+    lon: 39.7248,
+    lat: 43.597,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 327608,
+    nameAscii: "Sochi",
+    countryCode: "RU"
+},
+  {
+    lon: 47.8908,
+    lat: 56.6388,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 324406,
+    nameAscii: "Yoshkar-Ola",
+    countryCode: "RU"
+},
+  {
+    lon: 32.6146,
+    lat: 46.6369,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 320477,
+    nameAscii: "Kherson",
+    countryCode: "UA"
+},
+  {
+    lon: 33.0992,
+    lat: 68.9678,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 319263,
+    nameAscii: "Murmansk",
+    countryCode: "RU"
+},
+  {
+    lon: 45.1717,
+    lat: 54.1848,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 318841,
+    nameAscii: "Saransk",
+    countryCode: "RU"
+},
+  {
+    lon: 27.9102,
+    lat: 43.2191,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 318737,
+    nameAscii: "Varna",
+    countryCode: "BG"
+},
+  {
+    lon: 34.5537,
+    lat: 49.5892,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 317847,
+    nameAscii: "Poltava",
+    countryCode: "UA"
+},
+  {
+    lon: 28.6343,
+    lat: 44.1807,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 317832,
+    nameAscii: "Constanta",
+    countryCode: "RO"
+},
+  {
+    lon: 23.6,
+    lat: 46.7667,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 316748,
+    nameAscii: "Cluj-Napoca",
+    countryCode: "RO"
+},
+  {
+    lon: 21.2257,
+    lat: 45.7537,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 315053,
+    nameAscii: "Timisoara",
+    countryCode: "RO"
+},
+  {
+    lon: 39.884,
+    lat: 59.2239,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 312420,
+    nameAscii: "Vologda",
+    countryCode: "RU"
+},
+  {
+    lon: 28.0503,
+    lat: 45.4369,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 311156,
+    nameAscii: "Galati",
+    countryCode: "RO"
+},
+  {
+    lon: 25.6061,
+    lat: 45.6486,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 311044,
+    nameAscii: "Brasov",
+    countryCode: "RO"
+},
+  {
+    lon: 43.6189,
+    lat: 43.4981,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 307866,
+    nameAscii: "Nalchik",
+    countryCode: "RU"
+},
+  {
+    lon: 31.2866,
+    lat: 51.5054,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 307684,
+    nameAscii: "Chernihiv",
+    countryCode: "UA"
+},
+  {
+    lon: 23.8,
+    lat: 44.3167,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 304142,
+    nameAscii: "Craiova",
+    countryCode: "RO"
+},
+  {
+    lon: 41.441,
+    lat: 52.7363,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 301482,
+    nameAscii: "Tambov",
+    countryCode: "RU"
+},
+  {
+    lon: 25.9324,
+    lat: 48.2904,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 298251,
+    nameAscii: "Chernivtsi",
+    countryCode: "UA"
+},
+  {
+    lon: 32.0574,
+    lat: 49.4445,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 297568,
+    nameAscii: "Cherkasy",
+    countryCode: "UA"
+},
+  {
+    lon: 45.6889,
+    lat: 43.312,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 297137,
+    nameAscii: "Grozny",
+    countryCode: "RU"
+},
+  {
+    lon: 23.1643,
+    lat: 53.1333,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 295683,
+    nameAscii: "Bialystok",
+    countryCode: "PL"
+},
+  {
+    lon: 34.7991,
+    lat: 50.9174,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 294456,
+    nameAscii: "Sumy",
+    countryCode: "UA"
+},
+  {
+    lon: 28.6791,
+    lat: 50.2623,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 282192,
+    nameAscii: "Zhytomyr",
+    countryCode: "UA"
+},
+  {
+    lon: 34.3469,
+    lat: 61.7849,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 279190,
+    nameAscii: "Petrozavodsk",
+    countryCode: "RU"
+},
+  {
+    lon: 40.9283,
+    lat: 57.7664,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 277656,
+    nameAscii: "Kostroma",
+    countryCode: "RU"
+},
+  {
+    lon: 137.01,
+    lat: 50.5503,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 275908,
+    nameAscii: "Komsomolsk-on-Amur",
+    countryCode: "RU"
+},
+  {
+    lon: 86.7189,
+    lat: 53.9152,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 275615,
+    nameAscii: "Prokop'yevsk",
+    countryCode: "RU"
+},
+  {
+    lon: 26.9794,
+    lat: 49.4183,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 274582,
+    nameAscii: "Khmelnytskyi",
+    countryCode: "UA"
+},
+  {
+    lon: 55.9533,
+    lat: 53.6379,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 267231,
+    nameAscii: "Sterlitamak",
+    countryCode: "RU"
+},
+  {
+    lon: 101.6142,
+    lat: 56.1325,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 256600,
+    nameAscii: "Bratsk",
+    countryCode: "RU"
+},
+  {
+    lon: 43.4554,
+    lat: 56.2442,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 256537,
+    nameAscii: "Dzerzhinsk",
+    countryCode: "RU"
+},
+  {
+    lon: 26.237,
+    lat: 50.6204,
+    weight: 0.63,
+    capitalKind: "admin_capital",
+    population: 255106,
+    nameAscii: "Rivne",
+    countryCode: "UA"
 },
   {
     lon: -121.4944,
@@ -3075,15 +5842,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6299,
     capitalKind: "admin_capital",
     population: 1604000,
-    nameAscii: "Sacramento"
-},
-  {
-    lon: 24.1059,
-    lat: 56.946,
-    weight: 0.6295,
-    capitalKind: "country_capital",
-    population: 742572,
-    nameAscii: "Riga"
+    nameAscii: "Sacramento",
+    countryCode: "US"
 },
   {
     lon: 118.4295,
@@ -3091,7 +5851,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6293,
     capitalKind: "admin_capital",
     population: 1598165,
-    nameAscii: "Wuhu"
+    nameAscii: "Wuhu",
+    countryCode: "CN"
 },
   {
     lon: -100.3881,
@@ -3099,7 +5860,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6289,
     capitalKind: "admin_capital",
     population: 1594212,
-    nameAscii: "Santiago de Queretaro"
+    nameAscii: "Santiago de Queretaro",
+    countryCode: "MX"
 },
   {
     lon: 78.0167,
@@ -3107,7 +5869,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6287,
     capitalKind: "admin_capital",
     population: 1592000,
-    nameAscii: "Agra"
+    nameAscii: "Agra",
+    countryCode: "IN"
 },
   {
     lon: 110.3875,
@@ -3115,7 +5878,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6285,
     capitalKind: "admin_capital",
     population: 1590000,
-    nameAscii: "Zhanjiang"
+    nameAscii: "Zhanjiang",
+    countryCode: "CN"
 },
   {
     lon: 107.4631,
@@ -3123,7 +5887,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6284,
     capitalKind: "admin_capital",
     population: 1589435,
-    nameAscii: "Dazhou"
+    nameAscii: "Dazhou",
+    countryCode: "CN"
 },
   {
     lon: -101.6737,
@@ -3131,7 +5896,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6275,
     capitalKind: "admin_capital",
     population: 1579803,
-    nameAscii: "Leon de los Aldama"
+    nameAscii: "Leon de los Aldama",
+    countryCode: "MX"
 },
   {
     lon: 39.8256,
@@ -3139,7 +5905,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6274,
     capitalKind: "admin_capital",
     population: 1578722,
-    nameAscii: "Makkah"
+    nameAscii: "Makkah",
+    countryCode: "SA"
 },
   {
     lon: 110.2964,
@@ -3147,7 +5914,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6268,
     capitalKind: "admin_capital",
     population: 1572300,
-    nameAscii: "Guilin"
+    nameAscii: "Guilin",
+    countryCode: "CN"
 },
   {
     lon: 58.3833,
@@ -3155,7 +5923,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6263,
     capitalKind: "country_capital",
     population: 727700,
-    nameAscii: "Ashgabat"
+    nameAscii: "Ashgabat",
+    countryCode: "TM"
 },
   {
     lon: 67.0014,
@@ -3163,15 +5932,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6261,
     capitalKind: "admin_capital",
     population: 1565546,
-    nameAscii: "Quetta"
-},
-  {
-    lon: 15.978,
-    lat: 45.8144,
-    weight: 0.6252,
-    capitalKind: "country_capital",
-    population: 722526,
-    nameAscii: "Zagreb"
+    nameAscii: "Quetta",
+    countryCode: "PK"
 },
   {
     lon: 112.4609,
@@ -3179,7 +5941,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6248,
     capitalKind: "admin_capital",
     population: 1553109,
-    nameAscii: "Zhaoqing"
+    nameAscii: "Zhaoqing",
+    countryCode: "CN"
 },
   {
     lon: 89.5644,
@@ -3187,7 +5950,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6248,
     capitalKind: "admin_capital",
     population: 1553000,
-    nameAscii: "Khulna"
+    nameAscii: "Khulna",
+    countryCode: "BD"
 },
   {
     lon: 6.7857,
@@ -3195,7 +5959,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6248,
     capitalKind: "admin_capital",
     population: 1553000,
-    nameAscii: "Onitsha"
+    nameAscii: "Onitsha",
+    countryCode: "NG"
 },
   {
     lon: -70.6908,
@@ -3203,7 +5968,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6246,
     capitalKind: "admin_capital",
     population: 1550753,
-    nameAscii: "Santiago de los Caballeros"
+    nameAscii: "Santiago de los Caballeros",
+    countryCode: "DO"
 },
   {
     lon: 104.6817,
@@ -3211,7 +5977,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6245,
     capitalKind: "admin_capital",
     population: 1550000,
-    nameAscii: "Mianyang"
+    nameAscii: "Mianyang",
+    countryCode: "CN"
 },
   {
     lon: 119.0103,
@@ -3219,15 +5986,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6234,
     capitalKind: "admin_capital",
     population: 1539389,
-    nameAscii: "Putian"
-},
-  {
-    lon: 139.7172,
-    lat: 35.5206,
-    weight: 0.6233,
-    capitalKind: "admin_capital",
-    population: 1538262,
-    nameAscii: "Kawasaki"
+    nameAscii: "Putian",
+    countryCode: "CN"
 },
   {
     lon: 105.4257,
@@ -3235,7 +5995,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6232,
     capitalKind: "admin_capital",
     population: 1537000,
-    nameAscii: "Luzhou"
+    nameAscii: "Luzhou",
+    countryCode: "CN"
 },
   {
     lon: -99.6532,
@@ -3243,7 +6004,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6226,
     capitalKind: "admin_capital",
     population: 1531000,
-    nameAscii: "Toluca"
+    nameAscii: "Toluca",
+    countryCode: "MX"
 },
   {
     lon: 174.7635,
@@ -3251,15 +6013,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6225,
     capitalKind: "admin_capital",
     population: 1530500,
-    nameAscii: "Auckland"
-},
-  {
-    lon: -1.5478,
-    lat: 53.7965,
-    weight: 0.6224,
-    capitalKind: "admin_capital",
-    population: 1529000,
-    nameAscii: "Leeds"
+    nameAscii: "Auckland",
+    countryCode: "NZ"
 },
   {
     lon: 83.2016,
@@ -3267,15 +6022,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6224,
     capitalKind: "admin_capital",
     population: 1529000,
-    nameAscii: "Visakhapatnam"
-},
-  {
-    lon: 135.183,
-    lat: 34.6913,
-    weight: 0.6223,
-    capitalKind: "admin_capital",
-    population: 1528478,
-    nameAscii: "Kobe"
+    nameAscii: "Visakhapatnam",
+    countryCode: "IN"
 },
   {
     lon: -98.4936,
@@ -3283,7 +6031,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6221,
     capitalKind: "admin_capital",
     population: 1526656,
-    nameAscii: "San Antonio"
+    nameAscii: "San Antonio",
+    countryCode: "US"
 },
   {
     lon: -106.4608,
@@ -3291,7 +6040,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6207,
     capitalKind: "admin_capital",
     population: 1512450,
-    nameAscii: "Ciudad Juarez"
+    nameAscii: "Ciudad Juarez",
+    countryCode: "MX"
 },
   {
     lon: -122.2708,
@@ -3299,7 +6049,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6205,
     capitalKind: "admin_capital",
     population: 1510271,
-    nameAscii: "Oakland"
+    nameAscii: "Oakland",
+    countryCode: "US"
 },
   {
     lon: 105.7883,
@@ -3307,15 +6058,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6201,
     capitalKind: "admin_capital",
     population: 1507187,
-    nameAscii: "Can Tho"
-},
-  {
-    lon: 18.3564,
-    lat: 43.8486,
-    weight: 0.6195,
-    capitalKind: "country_capital",
-    population: 696731,
-    nameAscii: "Sarajevo"
+    nameAscii: "Can Tho",
+    countryCode: "VN"
 },
   {
     lon: -43.1036,
@@ -3323,15 +6067,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6194,
     capitalKind: "admin_capital",
     population: 1500513,
-    nameAscii: "Niteroi"
-},
-  {
-    lon: 11.2463,
-    lat: 43.7792,
-    weight: 0.6194,
-    capitalKind: "admin_capital",
-    population: 1500000,
-    nameAscii: "Florence"
+    nameAscii: "Niteroi",
+    countryCode: "BR"
 },
   {
     lon: 109.407,
@@ -3339,15 +6076,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6191,
     capitalKind: "admin_capital",
     population: 1497000,
-    nameAscii: "Liuzhou"
-},
-  {
-    lon: 60.6153,
-    lat: 56.8573,
-    weight: 0.6189,
-    capitalKind: "admin_capital",
-    population: 1495066,
-    nameAscii: "Yekaterinburg"
+    nameAscii: "Liuzhou",
+    countryCode: "CN"
 },
   {
     lon: -75.978,
@@ -3355,7 +6085,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6185,
     capitalKind: "admin_capital",
     population: 1491000,
-    nameAscii: "Virginia Beach"
+    nameAscii: "Virginia Beach",
+    countryCode: "US"
 },
   {
     lon: 106.2731,
@@ -3363,7 +6094,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6181,
     capitalKind: "admin_capital",
     population: 1487579,
-    nameAscii: "Yinchuan"
+    nameAscii: "Yinchuan",
+    countryCode: "CN"
 },
   {
     lon: -73.9663,
@@ -3371,7 +6103,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6181,
     capitalKind: "admin_capital",
     population: 1487536,
-    nameAscii: "Manhattan"
+    nameAscii: "Manhattan",
+    countryCode: "US"
 },
   {
     lon: 73.791,
@@ -3379,7 +6112,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6179,
     capitalKind: "admin_capital",
     population: 1486053,
-    nameAscii: "Nashik"
+    nameAscii: "Nashik",
+    countryCode: "IN"
 },
   {
     lon: 121.4331,
@@ -3387,15 +6121,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6179,
     capitalKind: "admin_capital",
     population: 1485502,
-    nameAscii: "Taizhou"
-},
-  {
-    lon: 28.8594,
-    lat: 47.009,
-    weight: 0.6176,
-    capitalKind: "country_capital",
-    population: 688134,
-    nameAscii: "Chisinau"
+    nameAscii: "Taizhou",
+    countryCode: "CN"
 },
   {
     lon: 120.0768,
@@ -3403,7 +6130,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6174,
     capitalKind: "admin_capital",
     population: 1481384,
-    nameAscii: "Yiwu"
+    nameAscii: "Yiwu",
+    countryCode: "CN"
 },
   {
     lon: -103.3874,
@@ -3411,7 +6139,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6169,
     capitalKind: "admin_capital",
     population: 1476491,
-    nameAscii: "Zapopan"
+    nameAscii: "Zapopan",
+    countryCode: "MX"
 },
   {
     lon: 127.3849,
@@ -3419,7 +6148,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6163,
     capitalKind: "admin_capital",
     population: 1470336,
-    nameAscii: "Daejeon"
+    nameAscii: "Daejeon",
+    countryCode: "KR"
 },
   {
     lon: 123.9436,
@@ -3427,7 +6157,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6162,
     capitalKind: "admin_capital",
     population: 1470000,
-    nameAscii: "Fushun"
+    nameAscii: "Fushun",
+    countryCode: "CN"
 },
   {
     lon: 138.5986,
@@ -3435,7 +6166,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6161,
     capitalKind: "admin_capital",
     population: 1469163,
-    nameAscii: "Adelaide"
+    nameAscii: "Adelaide",
+    countryCode: "AU"
 },
   {
     lon: 118.5858,
@@ -3443,7 +6175,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6161,
     capitalKind: "admin_capital",
     population: 1469157,
-    nameAscii: "Quanzhou"
+    nameAscii: "Quanzhou",
+    countryCode: "CN"
 },
   {
     lon: 111.6984,
@@ -3451,7 +6184,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6161,
     capitalKind: "admin_capital",
     population: 1469000,
-    nameAscii: "Changde"
+    nameAscii: "Changde",
+    countryCode: "CN"
 },
   {
     lon: 105.0622,
@@ -3459,7 +6193,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6158,
     capitalKind: "admin_capital",
     population: 1466000,
-    nameAscii: "Neijiang"
+    nameAscii: "Neijiang",
+    countryCode: "CN"
 },
   {
     lon: 78.1195,
@@ -3467,7 +6202,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6158,
     capitalKind: "admin_capital",
     population: 1465625,
-    nameAscii: "Madurai"
+    nameAscii: "Madurai",
+    countryCode: "IN"
 },
   {
     lon: 119.6442,
@@ -3475,15 +6211,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6156,
     capitalKind: "admin_capital",
     population: 1463990,
-    nameAscii: "Jinhua"
+    nameAscii: "Jinhua",
+    countryCode: "CN"
 },
   {
-    lon: 36.2548,
-    lat: 49.9818,
+    lon: 24.7535,
+    lat: 59.437,
     weight: 0.6153,
-    capitalKind: "admin_capital",
-    population: 1461000,
-    nameAscii: "Kharkiv"
+    capitalKind: "country_capital",
+    population: 394024,
+    nameAscii: "Tallinn",
+    countryCode: "EE"
 },
   {
     lon: 121.2457,
@@ -3491,7 +6229,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6149,
     capitalKind: "admin_capital",
     population: 1457510,
-    nameAscii: "Cixi"
+    nameAscii: "Cixi",
+    countryCode: "CN"
 },
   {
     lon: 50.9915,
@@ -3499,7 +6238,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6139,
     capitalKind: "admin_capital",
     population: 1448075,
-    nameAscii: "Karaj"
+    nameAscii: "Karaj",
+    countryCode: "IR"
 },
   {
     lon: -97.3208,
@@ -3507,7 +6247,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6131,
     capitalKind: "admin_capital",
     population: 1440454,
-    nameAscii: "Fort Worth"
+    nameAscii: "Fort Worth",
+    countryCode: "US"
 },
   {
     lon: 126.9156,
@@ -3515,7 +6256,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.613,
     capitalKind: "admin_capital",
     population: 1440000,
-    nameAscii: "Gwangju"
+    nameAscii: "Gwangju",
+    countryCode: "KR"
 },
   {
     lon: 107.237,
@@ -3523,7 +6265,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6128,
     capitalKind: "admin_capital",
     population: 1437802,
-    nameAscii: "Baoji"
+    nameAscii: "Baoji",
+    countryCode: "CN"
 },
   {
     lon: 118.2958,
@@ -3531,7 +6274,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6128,
     capitalKind: "admin_capital",
     population: 1437685,
-    nameAscii: "Suqian"
+    nameAscii: "Suqian",
+    countryCode: "CN"
 },
   {
     lon: -86.158,
@@ -3539,7 +6283,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6126,
     capitalKind: "admin_capital",
     population: 1436000,
-    nameAscii: "Indianapolis"
+    nameAscii: "Indianapolis",
+    countryCode: "US"
 },
   {
     lon: 77.6838,
@@ -3547,7 +6292,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6126,
     capitalKind: "admin_capital",
     population: 1435844,
-    nameAscii: "Tirunelveli"
+    nameAscii: "Tirunelveli",
+    countryCode: "IN"
 },
   {
     lon: 35.4853,
@@ -3555,7 +6301,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6124,
     capitalKind: "admin_capital",
     population: 1434357,
-    nameAscii: "Kayseri"
+    nameAscii: "Kayseri",
+    countryCode: "TR"
 },
   {
     lon: 32.4846,
@@ -3563,7 +6310,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6123,
     capitalKind: "admin_capital",
     population: 1433861,
-    nameAscii: "Konya"
+    nameAscii: "Konya",
+    countryCode: "TR"
 },
   {
     lon: 114.111,
@@ -3571,7 +6319,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6121,
     capitalKind: "place",
     population: 3984077,
-    nameAscii: "New Territories"
+    nameAscii: "New Territories",
+    countryCode: "HK"
 },
   {
     lon: 120.5389,
@@ -3579,7 +6328,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6121,
     capitalKind: "admin_capital",
     population: 1432044,
-    nameAscii: "Zhangjiagang"
+    nameAscii: "Zhangjiagang",
+    countryCode: "CN"
 },
   {
     lon: 105.5733,
@@ -3587,7 +6337,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6114,
     capitalKind: "admin_capital",
     population: 1425000,
-    nameAscii: "Suining"
+    nameAscii: "Suining",
+    countryCode: "CN"
 },
   {
     lon: 46.2919,
@@ -3595,7 +6346,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6113,
     capitalKind: "admin_capital",
     population: 1424641,
-    nameAscii: "Tabriz"
+    nameAscii: "Tabriz",
+    countryCode: "IR"
 },
   {
     lon: 119.4319,
@@ -3603,15 +6355,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6113,
     capitalKind: "admin_capital",
     population: 1423877,
-    nameAscii: "Makassar"
-},
-  {
-    lon: 4.8479,
-    lat: 45.7491,
-    weight: 0.6112,
-    capitalKind: "admin_capital",
-    population: 1423000,
-    nameAscii: "Lyon"
+    nameAscii: "Makassar",
+    countryCode: "ID"
 },
   {
     lon: 51.109,
@@ -3619,7 +6364,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6112,
     capitalKind: "admin_capital",
     population: 1423000,
-    nameAscii: "Shahr-e Qods"
+    nameAscii: "Shahr-e Qods",
+    countryCode: "IR"
 },
   {
     lon: 118.5742,
@@ -3627,7 +6373,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6104,
     capitalKind: "admin_capital",
     population: 1416151,
-    nameAscii: "Jinjiang"
+    nameAscii: "Jinjiang",
+    countryCode: "CN"
 },
   {
     lon: 77.3132,
@@ -3635,7 +6382,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6102,
     capitalKind: "admin_capital",
     population: 1414050,
-    nameAscii: "Faridabad"
+    nameAscii: "Faridabad",
+    countryCode: "IN"
 },
   {
     lon: 115.7703,
@@ -3643,15 +6391,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6097,
     capitalKind: "admin_capital",
     population: 1409436,
-    nameAscii: "Bozhou"
-},
-  {
-    lon: 5.3811,
-    lat: 43.297,
-    weight: 0.6086,
-    capitalKind: "admin_capital",
-    population: 1400000,
-    nameAscii: "Marseille"
+    nameAscii: "Bozhou",
+    countryCode: "CN"
 },
   {
     lon: 113.5461,
@@ -3659,7 +6400,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6085,
     capitalKind: "country_capital",
     population: 649335,
-    nameAscii: "Macau"
+    nameAscii: "Macau",
+    countryCode: "MO"
 },
   {
     lon: 79.8487,
@@ -3667,7 +6409,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6082,
     capitalKind: "country_capital",
     population: 648034,
-    nameAscii: "Colombo"
+    nameAscii: "Colombo",
+    countryCode: "LK"
+},
+  {
+    lon: 130.8503,
+    lat: 33.8518,
+    weight: 0.6078,
+    capitalKind: "admin_capital",
+    population: 997536,
+    nameAscii: "Kitakyushu",
+    countryCode: "JP"
 },
   {
     lon: -87.9065,
@@ -3675,7 +6427,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6073,
     capitalKind: "admin_capital",
     population: 1388000,
-    nameAscii: "Milwaukee"
+    nameAscii: "Milwaukee",
+    countryCode: "US"
 },
   {
     lon: -73.8664,
@@ -3683,7 +6436,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6069,
     capitalKind: "admin_capital",
     population: 1385108,
-    nameAscii: "The Bronx"
+    nameAscii: "The Bronx",
+    countryCode: "US"
 },
   {
     lon: 72.8983,
@@ -3691,7 +6445,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6064,
     capitalKind: "place",
     population: 3842000,
-    nameAscii: "Jalalpore"
+    nameAscii: "Jalalpore",
+    countryCode: "IN"
 },
   {
     lon: 113.6271,
@@ -3699,7 +6454,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6064,
     capitalKind: "admin_capital",
     population: 1380000,
-    nameAscii: "Guankou"
+    nameAscii: "Guankou",
+    countryCode: "CN"
 },
   {
     lon: 107.5955,
@@ -3707,7 +6463,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6064,
     capitalKind: "admin_capital",
     population: 1380000,
-    nameAscii: "Hue"
+    nameAscii: "Hue",
+    countryCode: "VN"
+},
+  {
+    lon: 140.1167,
+    lat: 35.6,
+    weight: 0.6049,
+    capitalKind: "admin_capital",
+    population: 979768,
+    nameAscii: "Chiba",
+    countryCode: "JP"
+},
+  {
+    lon: 137.7333,
+    lat: 34.7,
+    weight: 0.6045,
+    capitalKind: "admin_capital",
+    population: 977023,
+    nameAscii: "Hamamatsu",
+    countryCode: "JP"
 },
   {
     lon: 70.604,
@@ -3715,7 +6490,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6038,
     capitalKind: "admin_capital",
     population: 1357890,
-    nameAscii: "Bannu"
+    nameAscii: "Bannu",
+    countryCode: "PK"
 },
   {
     lon: 112.3473,
@@ -3723,7 +6499,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6032,
     capitalKind: "admin_capital",
     population: 1352000,
-    nameAscii: "Heshan"
+    nameAscii: "Heshan",
+    countryCode: "CN"
+},
+  {
+    lon: 14.5147,
+    lat: 35.8997,
+    weight: 0.603,
+    capitalKind: "country_capital",
+    population: 368250,
+    nameAscii: "Valletta",
+    countryCode: "MT"
 },
   {
     lon: 111.2847,
@@ -3731,7 +6517,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6029,
     capitalKind: "admin_capital",
     population: 1350150,
-    nameAscii: "Yichang"
+    nameAscii: "Yichang",
+    countryCode: "CN"
 },
   {
     lon: -81.3792,
@@ -3739,7 +6526,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6029,
     capitalKind: "admin_capital",
     population: 1350000,
-    nameAscii: "Orlando"
+    nameAscii: "Orlando",
+    countryCode: "US"
 },
   {
     lon: 115.4736,
@@ -3747,7 +6535,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6025,
     capitalKind: "admin_capital",
     population: 1346717,
-    nameAscii: "Heze"
+    nameAscii: "Heze",
+    countryCode: "CN"
 },
   {
     lon: 30.6956,
@@ -3755,7 +6544,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6022,
     capitalKind: "admin_capital",
     population: 1344000,
-    nameAscii: "Antalya"
+    nameAscii: "Antalya",
+    countryCode: "TR"
 },
   {
     lon: 77.4391,
@@ -3763,7 +6553,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6019,
     capitalKind: "admin_capital",
     population: 1341000,
-    nameAscii: "Ghaziabad"
+    nameAscii: "Ghaziabad",
+    countryCode: "IN"
 },
   {
     lon: 38.9318,
@@ -3771,15 +6562,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6015,
     capitalKind: "country_capital",
     population: 620802,
-    nameAscii: "Asmara"
-},
-  {
-    lon: -8.611,
-    lat: 41.1485,
-    weight: 0.6014,
-    capitalKind: "admin_capital",
-    population: 1337000,
-    nameAscii: "Porto"
+    nameAscii: "Asmara",
+    countryCode: "ER"
 },
   {
     lon: 86.9833,
@@ -3787,7 +6571,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6004,
     capitalKind: "admin_capital",
     population: 1328000,
-    nameAscii: "Asansol"
+    nameAscii: "Asansol",
+    countryCode: "IN"
 },
   {
     lon: 47.7804,
@@ -3795,15 +6580,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.6002,
     capitalKind: "admin_capital",
     population: 1326564,
-    nameAscii: "Basrah"
-},
-  {
-    lon: 139.6566,
-    lat: 35.9081,
-    weight: 0.6,
-    capitalKind: "admin_capital",
-    population: 1324854,
-    nameAscii: "Saitama"
+    nameAscii: "Basrah",
+    countryCode: "IQ"
 },
   {
     lon: 121.0792,
@@ -3811,7 +6589,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.598,
     capitalKind: "admin_capital",
     population: 1308085,
-    nameAscii: "Taguig"
+    nameAscii: "Taguig",
+    countryCode: "PH"
 },
   {
     lon: 110.9136,
@@ -3819,7 +6598,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.598,
     capitalKind: "admin_capital",
     population: 1307802,
-    nameAscii: "Maoming"
+    nameAscii: "Maoming",
+    countryCode: "CN"
 },
   {
     lon: -77.1345,
@@ -3827,7 +6607,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.597,
     capitalKind: "admin_capital",
     population: 1300000,
-    nameAscii: "Callao"
+    nameAscii: "Callao",
+    countryCode: "PE"
 },
   {
     lon: 39.6142,
@@ -3835,7 +6616,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.597,
     capitalKind: "admin_capital",
     population: 1300000,
-    nameAscii: "Madinah"
+    nameAscii: "Madinah",
+    countryCode: "SA"
 },
   {
     lon: 96.0836,
@@ -3843,7 +6625,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.597,
     capitalKind: "admin_capital",
     population: 1300000,
-    nameAscii: "Mandalay"
+    nameAscii: "Mandalay",
+    countryCode: "MM"
 },
   {
     lon: 108.6506,
@@ -3851,7 +6634,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5966,
     capitalKind: "admin_capital",
     population: 1296300,
-    nameAscii: "Qinzhou"
+    nameAscii: "Qinzhou",
+    countryCode: "CN"
 },
   {
     lon: 114.0427,
@@ -3859,7 +6643,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5964,
     capitalKind: "admin_capital",
     population: 1294974,
-    nameAscii: "Luohe"
+    nameAscii: "Luohe",
+    countryCode: "CN"
 },
   {
     lon: 112.1448,
@@ -3867,7 +6652,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5964,
     capitalKind: "admin_capital",
     population: 1294733,
-    nameAscii: "Xiangyang"
+    nameAscii: "Xiangyang",
+    countryCode: "CN"
 },
   {
     lon: 111.9627,
@@ -3875,15 +6661,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5962,
     capitalKind: "admin_capital",
     population: 1292987,
-    nameAscii: "Yangjiang"
+    nameAscii: "Yangjiang",
+    countryCode: "CN"
 },
   {
-    lon: -1.4659,
-    lat: 53.383,
-    weight: 0.5962,
-    capitalKind: "admin_capital",
-    population: 1292900,
-    nameAscii: "Sheffield"
+    lon: 17.1067,
+    lat: 48.1482,
+    weight: 0.5959,
+    capitalKind: "country_capital",
+    population: 423737,
+    nameAscii: "Bratislava",
+    countryCode: "SK"
 },
   {
     lon: 119.8202,
@@ -3891,7 +6679,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5953,
     capitalKind: "admin_capital",
     population: 1285785,
-    nameAscii: "Yixing"
+    nameAscii: "Yixing",
+    countryCode: "CN"
 },
   {
     lon: 57.4989,
@@ -3899,15 +6688,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.595,
     capitalKind: "country_capital",
     population: 595491,
-    nameAscii: "Port Louis"
-},
-  {
-    lon: 44.002,
-    lat: 56.3287,
-    weight: 0.5944,
-    capitalKind: "admin_capital",
-    population: 1278000,
-    nameAscii: "Nizhniy Novgorod"
+    nameAscii: "Port Louis",
+    countryCode: "MU"
 },
   {
     lon: 118.9636,
@@ -3915,7 +6697,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5942,
     capitalKind: "admin_capital",
     population: 1277000,
-    nameAscii: "Chifeng"
+    nameAscii: "Chifeng",
+    countryCode: "CN"
 },
   {
     lon: -71.4128,
@@ -3923,15 +6706,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5942,
     capitalKind: "admin_capital",
     population: 1277000,
-    nameAscii: "Providence"
-},
-  {
-    lon: 6.7652,
-    lat: 51.4325,
-    weight: 0.5942,
-    capitalKind: "admin_capital",
-    population: 1276757,
-    nameAscii: "Duisburg"
+    nameAscii: "Providence",
+    countryCode: "US"
 },
   {
     lon: 108.2208,
@@ -3939,15 +6715,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5941,
     capitalKind: "admin_capital",
     population: 1276000,
-    nameAscii: "Da Nang"
-},
-  {
-    lon: 11.5755,
-    lat: 48.1374,
-    weight: 0.594,
-    capitalKind: "admin_capital",
-    population: 1275000,
-    nameAscii: "Munich"
+    nameAscii: "Da Nang",
+    countryCode: "VN"
 },
   {
     lon: 106.8243,
@@ -3955,7 +6724,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5936,
     capitalKind: "admin_capital",
     population: 1272235,
-    nameAscii: "Bien Hoa"
+    nameAscii: "Bien Hoa",
+    countryCode: "VN"
 },
   {
     lon: -82.9988,
@@ -3963,7 +6733,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5934,
     capitalKind: "admin_capital",
     population: 1270000,
-    nameAscii: "Columbus"
+    nameAscii: "Columbus",
+    countryCode: "US"
 },
   {
     lon: 113.863,
@@ -3971,7 +6742,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5928,
     capitalKind: "admin_capital",
     population: 1265536,
-    nameAscii: "Xuchang"
+    nameAscii: "Xuchang",
+    countryCode: "CN"
+},
+  {
+    lon: 127.6785,
+    lat: 26.213,
+    weight: 0.5921,
+    capitalKind: "admin_capital",
+    population: 905238,
+    nameAscii: "Naha",
+    countryCode: "JP"
 },
   {
     lon: 110.671,
@@ -3979,7 +6760,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5919,
     capitalKind: "admin_capital",
     population: 1257912,
-    nameAscii: "Jepara"
+    nameAscii: "Jepara",
+    countryCode: "ID"
 },
   {
     lon: -80.0534,
@@ -3987,7 +6769,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5909,
     capitalKind: "admin_capital",
     population: 1250000,
-    nameAscii: "West Palm Beach"
+    nameAscii: "West Palm Beach",
+    countryCode: "US"
 },
   {
     lon: 52.5311,
@@ -3995,7 +6778,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5909,
     capitalKind: "admin_capital",
     population: 1249942,
-    nameAscii: "Shiraz"
+    nameAscii: "Shiraz",
+    countryCode: "IR"
 },
   {
     lon: 22.4166,
@@ -4003,7 +6787,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5905,
     capitalKind: "admin_capital",
     population: 1247168,
-    nameAscii: "Kananga"
+    nameAscii: "Kananga",
+    countryCode: "CD"
 },
   {
     lon: 86.4299,
@@ -4011,7 +6796,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5904,
     capitalKind: "admin_capital",
     population: 1246000,
-    nameAscii: "Dhanbad"
+    nameAscii: "Dhanbad",
+    countryCode: "IN"
 },
   {
     lon: 129.6259,
@@ -4019,15 +6805,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5901,
     capitalKind: "admin_capital",
     population: 1244000,
-    nameAscii: "Mudanjiang"
-},
-  {
-    lon: 49.1221,
-    lat: 55.7887,
-    weight: 0.5901,
-    capitalKind: "admin_capital",
-    population: 1243500,
-    nameAscii: "Kazan"
+    nameAscii: "Mudanjiang",
+    countryCode: "CN"
 },
   {
     lon: -69.357,
@@ -4035,7 +6814,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5897,
     capitalKind: "admin_capital",
     population: 1240714,
-    nameAscii: "Barquisimeto"
+    nameAscii: "Barquisimeto",
+    countryCode: "VE"
 },
   {
     lon: 31.2505,
@@ -4043,15 +6823,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5897,
     capitalKind: "admin_capital",
     population: 1240289,
-    nameAscii: "Shubra al Khaymah"
-},
-  {
-    lon: 6.1457,
-    lat: 46.2022,
-    weight: 0.5896,
-    capitalKind: "admin_capital",
-    population: 1240000,
-    nameAscii: "Geneve"
+    nameAscii: "Shubra al Khaymah",
+    countryCode: "EG"
 },
   {
     lon: 120.0933,
@@ -4059,7 +6832,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5885,
     capitalKind: "admin_capital",
     population: 1231000,
-    nameAscii: "Huzhou"
+    nameAscii: "Huzhou",
+    countryCode: "CN"
 },
   {
     lon: 116.0025,
@@ -4067,7 +6841,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5883,
     capitalKind: "admin_capital",
     population: 1229768,
-    nameAscii: "Liaocheng"
+    nameAscii: "Liaocheng",
+    countryCode: "CN"
 },
   {
     lon: 112.7547,
@@ -4075,7 +6850,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5879,
     capitalKind: "admin_capital",
     population: 1226617,
-    nameAscii: "Jinzhong"
+    nameAscii: "Jinzhong",
+    countryCode: "CN"
 },
   {
     lon: 105.8933,
@@ -4083,7 +6859,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5877,
     capitalKind: "admin_capital",
     population: 1225000,
-    nameAscii: "Beidao"
+    nameAscii: "Beidao",
+    countryCode: "CN"
 },
   {
     lon: 105.7424,
@@ -4091,7 +6868,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5877,
     capitalKind: "admin_capital",
     population: 1225000,
-    nameAscii: "Tianshui"
+    nameAscii: "Tianshui",
+    countryCode: "CN"
 },
   {
     lon: 82.5483,
@@ -4099,15 +6877,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5872,
     capitalKind: "admin_capital",
     population: 1220946,
-    nameAscii: "Nowrangapur"
-},
-  {
-    lon: 6.7762,
-    lat: 51.2217,
-    weight: 0.5871,
-    capitalKind: "admin_capital",
-    population: 1220000,
-    nameAscii: "Duesseldorf"
+    nameAscii: "Nowrangapur",
+    countryCode: "IN"
 },
   {
     lon: 44.0249,
@@ -4115,7 +6886,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5869,
     capitalKind: "admin_capital",
     population: 1218732,
-    nameAscii: "Karbala"
+    nameAscii: "Karbala",
+    countryCode: "IQ"
 },
   {
     lon: 113.1053,
@@ -4123,7 +6895,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5864,
     capitalKind: "admin_capital",
     population: 1214940,
-    nameAscii: "Changzhi"
+    nameAscii: "Changzhi",
+    countryCode: "CN"
 },
   {
     lon: 50.5857,
@@ -4131,15 +6904,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5864,
     capitalKind: "country_capital",
     population: 563920,
-    nameAscii: "Manama"
-},
-  {
-    lon: -5.9732,
-    lat: 37.3828,
-    weight: 0.5861,
-    capitalKind: "admin_capital",
-    population: 1212045,
-    nameAscii: "Sevilla"
+    nameAscii: "Manama",
+    countryCode: "BH"
 },
   {
     lon: 39.6636,
@@ -4147,7 +6913,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5856,
     capitalKind: "admin_capital",
     population: 1208333,
-    nameAscii: "Mombasa"
+    nameAscii: "Mombasa",
+    countryCode: "KE"
 },
   {
     lon: 74.8055,
@@ -4155,7 +6922,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5853,
     capitalKind: "admin_capital",
     population: 1206419,
-    nameAscii: "Srinagar"
+    nameAscii: "Srinagar",
+    countryCode: "IN"
 },
   {
     lon: 79.5833,
@@ -4163,7 +6931,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.585,
     capitalKind: "admin_capital",
     population: 1203853,
-    nameAscii: "Warangal"
+    nameAscii: "Warangal",
+    countryCode: "IN"
 },
   {
     lon: -60.6393,
@@ -4171,15 +6940,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5849,
     capitalKind: "admin_capital",
     population: 1203000,
-    nameAscii: "Rosario"
+    nameAscii: "Rosario",
+    countryCode: "AR"
 },
   {
-    lon: 61.4288,
-    lat: 55.1611,
-    weight: 0.5848,
+    lon: 133.9333,
+    lat: 34.65,
+    weight: 0.5849,
     capitalKind: "admin_capital",
-    population: 1202371,
-    nameAscii: "Chelyabinsk"
+    population: 866092,
+    nameAscii: "Okayama",
+    countryCode: "JP"
 },
   {
     lon: -89.6232,
@@ -4187,7 +6958,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5846,
     capitalKind: "admin_capital",
     population: 1201000,
-    nameAscii: "Merida"
+    nameAscii: "Merida",
+    countryCode: "MX"
 },
   {
     lon: 69.6004,
@@ -4195,7 +6967,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5845,
     capitalKind: "admin_capital",
     population: 1200000,
-    nameAscii: "Shymkent"
+    nameAscii: "Shymkent",
+    countryCode: "KZ"
 },
   {
     lon: 109.5089,
@@ -4203,7 +6976,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5844,
     capitalKind: "admin_capital",
     population: 1199290,
-    nameAscii: "Weinan"
+    nameAscii: "Weinan",
+    countryCode: "CN"
 },
   {
     lon: 32.4589,
@@ -4211,7 +6985,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5844,
     capitalKind: "admin_capital",
     population: 1198988,
-    nameAscii: "Matola"
+    nameAscii: "Matola",
+    countryCode: "MZ"
 },
   {
     lon: 26.214,
@@ -4219,7 +6994,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5844,
     capitalKind: "country_capital",
     population: 556637,
-    nameAscii: "Bloemfontein"
+    nameAscii: "Bloemfontein",
+    countryCode: "ZA"
 },
   {
     lon: -5.0003,
@@ -4227,7 +7003,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5834,
     capitalKind: "admin_capital",
     population: 1191905,
-    nameAscii: "Fes"
+    nameAscii: "Fes",
+    countryCode: "MA"
 },
   {
     lon: 127.0089,
@@ -4235,7 +7012,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5833,
     capitalKind: "admin_capital",
     population: 1191063,
-    nameAscii: "Suwon"
+    nameAscii: "Suwon",
+    countryCode: "KR"
 },
   {
     lon: -35.7353,
@@ -4243,15 +7021,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5827,
     capitalKind: "admin_capital",
     population: 1186000,
-    nameAscii: "Maceio"
-},
-  {
-    lon: 21.1669,
-    lat: 42.6727,
-    weight: 0.5825,
-    capitalKind: "country_capital",
-    population: 550000,
-    nameAscii: "Pristina"
+    nameAscii: "Maceio",
+    countryCode: "BR"
 },
   {
     lon: 73.2117,
@@ -4259,7 +7030,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5824,
     capitalKind: "admin_capital",
     population: 1183647,
-    nameAscii: "Abbottabad"
+    nameAscii: "Abbottabad",
+    countryCode: "PK"
 },
   {
     lon: 25.191,
@@ -4267,7 +7039,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5821,
     capitalKind: "admin_capital",
     population: 1181788,
-    nameAscii: "Kisangani"
+    nameAscii: "Kisangani",
+    countryCode: "CD"
 },
   {
     lon: 20.0686,
@@ -4275,7 +7048,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5819,
     capitalKind: "admin_capital",
     population: 1180000,
-    nameAscii: "Benghazi"
+    nameAscii: "Benghazi",
+    countryCode: "LY"
 },
   {
     lon: 120.75,
@@ -4283,7 +7057,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5819,
     capitalKind: "admin_capital",
     population: 1180000,
-    nameAscii: "Jiaxing"
+    nameAscii: "Jiaxing",
+    countryCode: "CN"
 },
   {
     lon: 75.3423,
@@ -4291,7 +7066,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5812,
     capitalKind: "admin_capital",
     population: 1175116,
-    nameAscii: "Aurangabad"
+    nameAscii: "Aurangabad",
+    countryCode: "IN"
 },
   {
     lon: 109.0094,
@@ -4299,23 +7075,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5812,
     capitalKind: "admin_capital",
     population: 1174964,
-    nameAscii: "Cilacap"
-},
-  {
-    lon: 73.3686,
-    lat: 54.9924,
-    weight: 0.5808,
-    capitalKind: "admin_capital",
-    population: 1172070,
-    nameAscii: "Omsk"
-},
-  {
-    lon: 25.2798,
-    lat: 54.6892,
-    weight: 0.5803,
-    capitalKind: "country_capital",
-    population: 542366,
-    nameAscii: "Vilnius"
+    nameAscii: "Cilacap",
+    countryCode: "ID"
 },
   {
     lon: 105.2611,
@@ -4323,7 +7084,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.58,
     capitalKind: "admin_capital",
     population: 1166066,
-    nameAscii: "Bandar Lampung"
+    nameAscii: "Bandar Lampung",
+    countryCode: "ID"
 },
   {
     lon: 116.0021,
@@ -4331,7 +7093,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5798,
     capitalKind: "admin_capital",
     population: 1164268,
-    nameAscii: "Jiujiang"
+    nameAscii: "Jiujiang",
+    countryCode: "CN"
 },
   {
     lon: -78.6386,
@@ -4339,15 +7102,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5797,
     capitalKind: "admin_capital",
     population: 1163515,
-    nameAscii: "Raleigh"
-},
-  {
-    lon: 50.1355,
-    lat: 53.2077,
-    weight: 0.5797,
-    capitalKind: "admin_capital",
-    population: 1163399,
-    nameAscii: "Samara"
+    nameAscii: "Raleigh",
+    countryCode: "US"
 },
   {
     lon: -97.7431,
@@ -4355,7 +7111,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5793,
     capitalKind: "admin_capital",
     population: 1161000,
-    nameAscii: "Austin"
+    nameAscii: "Austin",
+    countryCode: "US"
 },
   {
     lon: 7.3667,
@@ -4363,15 +7120,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5792,
     capitalKind: "admin_capital",
     population: 1160000,
-    nameAscii: "Aba"
-},
-  {
-    lon: -4.2576,
-    lat: 55.8651,
-    weight: 0.5792,
-    capitalKind: "admin_capital",
-    population: 1160000,
-    nameAscii: "Glasgow"
+    nameAscii: "Aba",
+    countryCode: "NG"
 },
   {
     lon: 114.3828,
@@ -4379,7 +7129,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5774,
     capitalKind: "admin_capital",
     population: 1146839,
-    nameAscii: "Anyang"
+    nameAscii: "Anyang",
+    countryCode: "CN"
+},
+  {
+    lon: 135.4665,
+    lat: 34.5822,
+    weight: 0.5772,
+    capitalKind: "admin_capital",
+    population: 826161,
+    nameAscii: "Sakai",
+    countryCode: "JP"
 },
   {
     lon: 117.9429,
@@ -4387,7 +7147,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5771,
     capitalKind: "admin_capital",
     population: 1144577,
-    nameAscii: "Shangrao"
+    nameAscii: "Shangrao",
+    countryCode: "CN"
 },
   {
     lon: -103.419,
@@ -4395,7 +7156,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.577,
     capitalKind: "admin_capital",
     population: 1144000,
-    nameAscii: "Torreon"
+    nameAscii: "Torreon",
+    countryCode: "MX"
 },
   {
     lon: 105.2863,
@@ -4403,7 +7165,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5761,
     capitalKind: "admin_capital",
     population: 1137383,
-    nameAscii: "Bijie"
+    nameAscii: "Bijie",
+    countryCode: "CN"
 },
   {
     lon: 80.3498,
@@ -4411,15 +7174,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.576,
     capitalKind: "place",
     population: 3162000,
-    nameAscii: "Kanpur"
-},
-  {
-    lon: 39.7077,
-    lat: 47.22,
-    weight: 0.5752,
-    capitalKind: "admin_capital",
-    population: 1130305,
-    nameAscii: "Rostov-na-Donu"
+    nameAscii: "Kanpur",
+    countryCode: "IN"
 },
   {
     lon: 113.15,
@@ -4427,7 +7183,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5751,
     capitalKind: "admin_capital",
     population: 1129687,
-    nameAscii: "Zhuzhou"
+    nameAscii: "Zhuzhou",
+    countryCode: "CN"
 },
   {
     lon: -86.8025,
@@ -4435,7 +7192,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5748,
     capitalKind: "admin_capital",
     population: 1128047,
-    nameAscii: "Birmingham"
+    nameAscii: "Birmingham",
+    countryCode: "US"
 },
   {
     lon: 125.4078,
@@ -4443,7 +7201,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5747,
     capitalKind: "admin_capital",
     population: 1127000,
-    nameAscii: "Namp'o"
+    nameAscii: "Namp'o",
+    countryCode: "KP"
 },
   {
     lon: 110.1469,
@@ -4451,7 +7210,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5747,
     capitalKind: "admin_capital",
     population: 1127000,
-    nameAscii: "Yulin"
+    nameAscii: "Yulin",
+    countryCode: "CN"
 },
   {
     lon: 108.7026,
@@ -4459,7 +7219,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5746,
     capitalKind: "admin_capital",
     population: 1126000,
-    nameAscii: "Xianyang"
+    nameAscii: "Xianyang",
+    countryCode: "CN"
+},
+  {
+    lon: 14.5051,
+    lat: 46.0511,
+    weight: 0.5745,
+    capitalKind: "country_capital",
+    population: 314807,
+    nameAscii: "Ljubljana",
+    countryCode: "SI"
 },
   {
     lon: 118.0633,
@@ -4467,7 +7237,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5744,
     capitalKind: "place",
     population: 3129228,
-    nameAscii: "Zibo"
+    nameAscii: "Zibo",
+    countryCode: "CN"
 },
   {
     lon: 124.6472,
@@ -4475,15 +7246,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5739,
     capitalKind: "admin_capital",
     population: 1121561,
-    nameAscii: "Cagayan de Oro"
-},
-  {
-    lon: 55.9678,
-    lat: 54.7431,
-    weight: 0.5738,
-    capitalKind: "admin_capital",
-    population: 1120547,
-    nameAscii: "Ufa"
+    nameAscii: "Cagayan de Oro",
+    countryCode: "PH"
 },
   {
     lon: 85.3094,
@@ -4491,7 +7255,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5738,
     capitalKind: "admin_capital",
     population: 1120374,
-    nameAscii: "Ranchi"
+    nameAscii: "Ranchi",
+    countryCode: "IN"
 },
   {
     lon: 116.7917,
@@ -4499,7 +7264,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5728,
     capitalKind: "admin_capital",
     population: 1113321,
-    nameAscii: "Huaibei"
+    nameAscii: "Huaibei",
+    countryCode: "CN"
 },
   {
     lon: 13.1571,
@@ -4507,15 +7273,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5723,
     capitalKind: "admin_capital",
     population: 1110000,
-    nameAscii: "Maiduguri"
-},
-  {
-    lon: 8.55,
-    lat: 47.3667,
-    weight: 0.572,
-    capitalKind: "admin_capital",
-    population: 1108000,
-    nameAscii: "Zuerich"
+    nameAscii: "Maiduguri",
+    countryCode: "NG"
 },
   {
     lon: 103.837,
@@ -4523,7 +7282,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.572,
     capitalKind: "admin_capital",
     population: 1107742,
-    nameAscii: "Meishan"
+    nameAscii: "Meishan",
+    countryCode: "CN"
 },
   {
     lon: 32.9,
@@ -4531,7 +7291,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5715,
     capitalKind: "admin_capital",
     population: 1104521,
-    nameAscii: "Mwanza"
+    nameAscii: "Mwanza",
+    countryCode: "TZ"
+},
+  {
+    lon: 139.0412,
+    lat: 37.9226,
+    weight: 0.5715,
+    capitalKind: "admin_capital",
+    population: 797591,
+    nameAscii: "Niigata",
+    countryCode: "JP"
 },
   {
     lon: 109.0172,
@@ -4539,7 +7309,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5709,
     capitalKind: "admin_capital",
     population: 1100000,
-    nameAscii: "Ankang"
+    nameAscii: "Ankang",
+    countryCode: "CN"
 },
   {
     lon: 15.7392,
@@ -4547,7 +7318,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5709,
     capitalKind: "admin_capital",
     population: 1100000,
-    nameAscii: "Huambo"
+    nameAscii: "Huambo",
+    countryCode: "AO"
 },
   {
     lon: 5.7534,
@@ -4555,7 +7327,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5709,
     capitalKind: "admin_capital",
     population: 1099931,
-    nameAscii: "Ikare"
+    nameAscii: "Ikare",
+    countryCode: "NG"
 },
   {
     lon: 129.3167,
@@ -4563,15 +7336,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5702,
     capitalKind: "admin_capital",
     population: 1095014,
-    nameAscii: "Ulsan"
-},
-  {
-    lon: 92.9314,
-    lat: 56.0374,
-    weight: 0.5696,
-    capitalKind: "admin_capital",
-    population: 1090811,
-    nameAscii: "Krasnoyarsk"
+    nameAscii: "Ulsan",
+    countryCode: "KR"
 },
   {
     lon: 116.3333,
@@ -4579,7 +7345,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5695,
     capitalKind: "admin_capital",
     population: 1089888,
-    nameAscii: "Fuzhou"
+    nameAscii: "Fuzhou",
+    countryCode: "CN"
 },
   {
     lon: -35.2094,
@@ -4587,7 +7354,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5692,
     capitalKind: "admin_capital",
     population: 1088000,
-    nameAscii: "Natal"
+    nameAscii: "Natal",
+    countryCode: "BR"
 },
   {
     lon: 109.5947,
@@ -4595,7 +7363,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5689,
     capitalKind: "admin_capital",
     population: 1086327,
-    nameAscii: "Guigang"
+    nameAscii: "Guigang",
+    countryCode: "CN"
 },
   {
     lon: 101.4417,
@@ -4603,7 +7372,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5688,
     capitalKind: "admin_capital",
     population: 1085000,
-    nameAscii: "Pekanbaru"
+    nameAscii: "Pekanbaru",
+    countryCode: "ID"
 },
   {
     lon: -117.8231,
@@ -4611,7 +7381,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5683,
     capitalKind: "place",
     population: 3010232,
-    nameAscii: "Irvine"
+    nameAscii: "Irvine",
+    countryCode: "US"
 },
   {
     lon: 128.6811,
@@ -4619,7 +7390,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5682,
     capitalKind: "admin_capital",
     population: 1081499,
-    nameAscii: "Changwon"
+    nameAscii: "Changwon",
+    countryCode: "KR"
 },
   {
     lon: -90.049,
@@ -4627,7 +7399,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5682,
     capitalKind: "admin_capital",
     population: 1081000,
-    nameAscii: "Memphis"
+    nameAscii: "Memphis",
+    countryCode: "US"
 },
   {
     lon: 4.5421,
@@ -4635,7 +7408,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.568,
     capitalKind: "admin_capital",
     population: 1080000,
-    nameAscii: "Ilorin"
+    nameAscii: "Ilorin",
+    countryCode: "NG"
 },
   {
     lon: 45.0385,
@@ -4643,7 +7417,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.568,
     capitalKind: "admin_capital",
     population: 1079670,
-    nameAscii: "Aden"
+    nameAscii: "Aden",
+    countryCode: "YE"
 },
   {
     lon: 27.9261,
@@ -4651,7 +7426,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5672,
     capitalKind: "admin_capital",
     population: 1074000,
-    nameAscii: "Vereeniging"
+    nameAscii: "Vereeniging",
+    countryCode: "ZA"
 },
   {
     lon: 28.3208,
@@ -4659,15 +7435,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.567,
     capitalKind: "place",
     population: 2986000,
-    nameAscii: "Benoni"
-},
-  {
-    lon: 21.4314,
-    lat: 41.9965,
-    weight: 0.5658,
-    capitalKind: "country_capital",
-    population: 494087,
-    nameAscii: "Skopje"
+    nameAscii: "Benoni",
+    countryCode: "ZA"
 },
   {
     lon: 126.835,
@@ -4675,7 +7444,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5654,
     capitalKind: "admin_capital",
     population: 1061752,
-    nameAscii: "Goyang-si"
+    nameAscii: "Goyang-si",
+    countryCode: "KR"
 },
   {
     lon: 119.3975,
@@ -4683,7 +7453,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5651,
     capitalKind: "admin_capital",
     population: 1060000,
-    nameAscii: "Zhucheng"
+    nameAscii: "Zhucheng",
+    countryCode: "CN"
 },
   {
     lon: -113.4687,
@@ -4691,7 +7462,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5648,
     capitalKind: "admin_capital",
     population: 1058000,
-    nameAscii: "Edmonton"
+    nameAscii: "Edmonton",
+    countryCode: "CA"
 },
   {
     lon: 112.1903,
@@ -4699,7 +7471,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.564,
     capitalKind: "admin_capital",
     population: 1052282,
-    nameAscii: "Jingzhou"
+    nameAscii: "Jingzhou",
+    countryCode: "CN"
 },
   {
     lon: 25.6149,
@@ -4707,15 +7480,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5636,
     capitalKind: "admin_capital",
     population: 1050078,
-    nameAscii: "Gqeberha"
-},
-  {
-    lon: 35.0407,
-    lat: 48.4666,
-    weight: 0.5636,
-    capitalKind: "admin_capital",
-    population: 1050000,
-    nameAscii: "Dnipro"
+    nameAscii: "Gqeberha",
+    countryCode: "ZA"
 },
   {
     lon: -76.2852,
@@ -4723,15 +7489,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5633,
     capitalKind: "admin_capital",
     population: 1047869,
-    nameAscii: "Norfolk"
-},
-  {
-    lon: 39.192,
-    lat: 51.6683,
-    weight: 0.5633,
-    capitalKind: "admin_capital",
-    population: 1047549,
-    nameAscii: "Voronezh"
+    nameAscii: "Norfolk",
+    countryCode: "US"
 },
   {
     lon: 113.8015,
@@ -4739,7 +7498,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5632,
     capitalKind: "admin_capital",
     population: 1047088,
-    nameAscii: "Xinxiang"
+    nameAscii: "Xinxiang",
+    countryCode: "CN"
 },
   {
     lon: 114.8714,
@@ -4747,7 +7507,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.563,
     capitalKind: "admin_capital",
     population: 1046000,
-    nameAscii: "Zhangjiakou"
+    nameAscii: "Zhangjiakou",
+    countryCode: "CN"
 },
   {
     lon: 114.4,
@@ -4755,15 +7516,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.563,
     capitalKind: "admin_capital",
     population: 1045952,
-    nameAscii: "Yichun"
-},
-  {
-    lon: 3.0551,
-    lat: 50.6339,
-    weight: 0.5627,
-    capitalKind: "admin_capital",
-    population: 1044000,
-    nameAscii: "Lille"
+    nameAscii: "Yichun",
+    countryCode: "CN"
 },
   {
     lon: 8.8921,
@@ -4771,7 +7525,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5621,
     capitalKind: "admin_capital",
     population: 1040000,
-    nameAscii: "Jos"
+    nameAscii: "Jos",
+    countryCode: "NG"
 },
   {
     lon: 5.2432,
@@ -4779,7 +7534,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5621,
     capitalKind: "admin_capital",
     population: 1040000,
-    nameAscii: "Sokoto"
+    nameAscii: "Sokoto",
+    countryCode: "NG"
 },
   {
     lon: -44.3028,
@@ -4787,7 +7543,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5618,
     capitalKind: "admin_capital",
     population: 1038000,
-    nameAscii: "Sao Luis"
+    nameAscii: "Sao Luis",
+    countryCode: "BR"
 },
   {
     lon: -5.7998,
@@ -4795,7 +7552,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5614,
     capitalKind: "admin_capital",
     population: 1035141,
-    nameAscii: "Tangier"
+    nameAscii: "Tangier",
+    countryCode: "MA"
 },
   {
     lon: -115.4545,
@@ -4803,7 +7561,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.561,
     capitalKind: "admin_capital",
     population: 1032686,
-    nameAscii: "Mexicali"
+    nameAscii: "Mexicali",
+    countryCode: "MX"
+},
+  {
+    lon: 139.716,
+    lat: 35.5613,
+    weight: 0.561,
+    capitalKind: "admin_capital",
+    population: 748081,
+    nameAscii: "Ota",
+    countryCode: "JP"
 },
   {
     lon: 11.8635,
@@ -4811,7 +7579,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5609,
     capitalKind: "admin_capital",
     population: 1032000,
-    nameAscii: "Pointe-Noire"
+    nameAscii: "Pointe-Noire",
+    countryCode: "CG"
 },
   {
     lon: 109.5095,
@@ -4819,7 +7588,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5608,
     capitalKind: "admin_capital",
     population: 1031396,
-    nameAscii: "Sanya"
+    nameAscii: "Sanya",
+    countryCode: "CN"
 },
   {
     lon: 89.2517,
@@ -4827,7 +7597,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5608,
     capitalKind: "admin_capital",
     population: 1031388,
-    nameAscii: "Rangpur"
+    nameAscii: "Rangpur",
+    countryCode: "BD"
 },
   {
     lon: 44.3922,
@@ -4835,7 +7606,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5608,
     capitalKind: "admin_capital",
     population: 1031000,
-    nameAscii: "Kirkuk"
+    nameAscii: "Kirkuk",
+    countryCode: "IQ"
 },
   {
     lon: 113.5833,
@@ -4843,7 +7615,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5604,
     capitalKind: "admin_capital",
     population: 1028460,
-    nameAscii: "Shaoguan"
+    nameAscii: "Shaoguan",
+    countryCode: "CN"
 },
   {
     lon: 81.6333,
@@ -4851,7 +7624,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5602,
     capitalKind: "admin_capital",
     population: 1027264,
-    nameAscii: "Raipur"
+    nameAscii: "Raipur",
+    countryCode: "IN"
 },
   {
     lon: 117.0178,
@@ -4859,7 +7633,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5599,
     capitalKind: "admin_capital",
     population: 1025087,
-    nameAscii: "Longyan"
+    nameAscii: "Longyan",
+    countryCode: "CN"
 },
   {
     lon: -48.5492,
@@ -4867,7 +7642,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5596,
     capitalKind: "admin_capital",
     population: 1023000,
-    nameAscii: "Florianopolis"
+    nameAscii: "Florianopolis",
+    countryCode: "BR"
 },
   {
     lon: 111.6131,
@@ -4875,7 +7651,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5592,
     capitalKind: "admin_capital",
     population: 1020715,
-    nameAscii: "Yongzhou"
+    nameAscii: "Yongzhou",
+    countryCode: "CN"
 },
   {
     lon: 130.3112,
@@ -4883,7 +7660,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5591,
     capitalKind: "admin_capital",
     population: 1020000,
-    nameAscii: "Jiamusi"
+    nameAscii: "Jiamusi",
+    countryCode: "CN"
+},
+  {
+    lon: 130.6918,
+    lat: 32.8059,
+    weight: 0.559,
+    capitalKind: "admin_capital",
+    population: 738907,
+    nameAscii: "Kumamoto",
+    countryCode: "JP"
 },
   {
     lon: 122.0739,
@@ -4891,7 +7678,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5589,
     capitalKind: "admin_capital",
     population: 1018849,
-    nameAscii: "Zamboanga"
+    nameAscii: "Zamboanga",
+    countryCode: "PH"
 },
   {
     lon: -78.8784,
@@ -4899,23 +7687,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5585,
     capitalKind: "admin_capital",
     population: 1016000,
-    nameAscii: "Buffalo"
-},
-  {
-    lon: 30.7438,
-    lat: 46.4857,
-    weight: 0.5585,
-    capitalKind: "admin_capital",
-    population: 1015826,
-    nameAscii: "Odesa"
-},
-  {
-    lon: 44.4976,
-    lat: 48.7138,
-    weight: 0.5581,
-    capitalKind: "admin_capital",
-    population: 1013533,
-    nameAscii: "Volgograd"
+    nameAscii: "Buffalo",
+    countryCode: "US"
 },
   {
     lon: 124.1209,
@@ -4923,7 +7696,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5579,
     capitalKind: "admin_capital",
     population: 1012000,
-    nameAscii: "Xiaoshi"
+    nameAscii: "Xiaoshi",
+    countryCode: "CN"
 },
   {
     lon: 34.9993,
@@ -4931,7 +7705,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5577,
     capitalKind: "admin_capital",
     population: 1011000,
-    nameAscii: "Haifa"
+    nameAscii: "Haifa",
+    countryCode: "IL"
 },
   {
     lon: 102.632,
@@ -4939,7 +7714,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5576,
     capitalKind: "admin_capital",
     population: 1010295,
-    nameAscii: "Wuwei"
+    nameAscii: "Wuwei",
+    countryCode: "CN"
 },
   {
     lon: -81.6556,
@@ -4947,7 +7723,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5575,
     capitalKind: "admin_capital",
     population: 1009833,
-    nameAscii: "Jacksonville"
+    nameAscii: "Jacksonville",
+    countryCode: "US"
 },
   {
     lon: -73.1189,
@@ -4955,7 +7732,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5574,
     capitalKind: "admin_capital",
     population: 1009000,
-    nameAscii: "Bucaramanga"
+    nameAscii: "Bucaramanga",
+    countryCode: "CO"
 },
   {
     lon: -71.5375,
@@ -4963,7 +7741,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5573,
     capitalKind: "admin_capital",
     population: 1008290,
-    nameAscii: "Arequipa"
+    nameAscii: "Arequipa",
+    countryCode: "PE"
 },
   {
     lon: -67.5948,
@@ -4971,7 +7750,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5571,
     capitalKind: "admin_capital",
     population: 1007000,
-    nameAscii: "Maracay"
+    nameAscii: "Maracay",
+    countryCode: "VE"
 },
   {
     lon: 107.0221,
@@ -4979,7 +7759,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.557,
     capitalKind: "admin_capital",
     population: 1006557,
-    nameAscii: "Hanzhong"
+    nameAscii: "Hanzhong",
+    countryCode: "CN"
 },
   {
     lon: 111.5667,
@@ -4987,7 +7768,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5569,
     capitalKind: "admin_capital",
     population: 1005490,
-    nameAscii: "Hezhou"
+    nameAscii: "Hezhou",
+    countryCode: "CN"
 },
   {
     lon: 36.7256,
@@ -4995,15 +7777,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5568,
     capitalKind: "admin_capital",
     population: 1005000,
-    nameAscii: "Homs"
-},
-  {
-    lon: 6.95,
-    lat: 50.9333,
-    weight: 0.5566,
-    capitalKind: "admin_capital",
-    population: 1004000,
-    nameAscii: "Koeln"
+    nameAscii: "Homs",
+    countryCode: "SY"
 },
   {
     lon: -47.0608,
@@ -5011,7 +7786,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5565,
     capitalKind: "place",
     population: 2791000,
-    nameAscii: "Campinas"
+    nameAscii: "Campinas",
+    countryCode: "BR"
 },
   {
     lon: 119.5894,
@@ -5019,7 +7795,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5565,
     capitalKind: "admin_capital",
     population: 1003000,
-    nameAscii: "Qinhuangdao"
+    nameAscii: "Qinhuangdao",
+    countryCode: "CN"
 },
   {
     lon: 99.1637,
@@ -5027,7 +7804,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.556,
     capitalKind: "admin_capital",
     population: 1000000,
-    nameAscii: "Baoshan"
+    nameAscii: "Baoshan",
+    countryCode: "CN"
 },
   {
     lon: -66.1599,
@@ -5035,7 +7813,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.556,
     capitalKind: "admin_capital",
     population: 1000000,
-    nameAscii: "Cochabamba"
+    nameAscii: "Cochabamba",
+    countryCode: "BO"
 },
   {
     lon: 119.4026,
@@ -5043,7 +7822,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.556,
     capitalKind: "admin_capital",
     population: 1000000,
-    nameAscii: "Zhu Cheng City"
+    nameAscii: "Zhu Cheng City",
+    countryCode: "CN"
 },
   {
     lon: 118.4917,
@@ -5051,23 +7831,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5558,
     capitalKind: "admin_capital",
     population: 998968,
-    nameAscii: "Dongying"
-},
-  {
-    lon: 130.8503,
-    lat: 33.8518,
-    weight: 0.5556,
-    capitalKind: "admin_capital",
-    population: 997536,
-    nameAscii: "Kitakyushu"
-},
-  {
-    lon: 56.2502,
-    lat: 58.0105,
-    weight: 0.5555,
-    capitalKind: "admin_capital",
-    population: 997000,
-    nameAscii: "Perm"
+    nameAscii: "Dongying",
+    countryCode: "CN"
 },
   {
     lon: 48.6842,
@@ -5075,7 +7840,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5554,
     capitalKind: "admin_capital",
     population: 996000,
-    nameAscii: "Ahvaz"
+    nameAscii: "Ahvaz",
+    countryCode: "IR"
 },
   {
     lon: -7.9999,
@@ -5083,7 +7849,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5554,
     capitalKind: "admin_capital",
     population: 995871,
-    nameAscii: "Marrakesh"
+    nameAscii: "Marrakesh",
+    countryCode: "MA"
 },
   {
     lon: -80.8431,
@@ -5091,7 +7858,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5552,
     capitalKind: "admin_capital",
     population: 995000,
-    nameAscii: "Charlotte"
+    nameAscii: "Charlotte",
+    countryCode: "US"
+},
+  {
+    lon: 139.2417,
+    lat: 35.5671,
+    weight: 0.555,
+    capitalKind: "admin_capital",
+    population: 720780,
+    nameAscii: "Sagamihara",
+    countryCode: "JP"
 },
   {
     lon: 116.1177,
@@ -5099,7 +7876,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5548,
     capitalKind: "admin_capital",
     population: 992351,
-    nameAscii: "Meizhou"
+    nameAscii: "Meizhou",
+    countryCode: "CN"
 },
   {
     lon: -100.9714,
@@ -5107,7 +7885,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5547,
     capitalKind: "admin_capital",
     population: 992000,
-    nameAscii: "San Luis Potosi"
+    nameAscii: "San Luis Potosi",
+    countryCode: "MX"
 },
   {
     lon: 117.6569,
@@ -5115,15 +7894,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5544,
     capitalKind: "admin_capital",
     population: 989535,
-    nameAscii: "Laiwu"
-},
-  {
-    lon: 37.8022,
-    lat: 48.023,
-    weight: 0.5541,
-    capitalKind: "admin_capital",
-    population: 988000,
-    nameAscii: "Donetsk"
+    nameAscii: "Laiwu",
+    countryCode: "CN"
 },
   {
     lon: 42.9879,
@@ -5131,7 +7903,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5538,
     capitalKind: "admin_capital",
     population: 986000,
-    nameAscii: "Dihok"
+    nameAscii: "Dihok",
+    countryCode: "IQ"
 },
   {
     lon: 113.5633,
@@ -5139,15 +7912,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5531,
     capitalKind: "admin_capital",
     population: 981448,
-    nameAscii: "Yangquan"
-},
-  {
-    lon: 140.1167,
-    lat: 35.6,
-    weight: 0.5528,
-    capitalKind: "admin_capital",
-    population: 979768,
-    nameAscii: "Chiba"
+    nameAscii: "Yangquan",
+    countryCode: "CN"
 },
   {
     lon: 113.3155,
@@ -5155,7 +7921,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5527,
     capitalKind: "admin_capital",
     population: 979130,
-    nameAscii: "Pingdingshan"
+    nameAscii: "Pingdingshan",
+    countryCode: "CN"
 },
   {
     lon: 76.7884,
@@ -5163,7 +7930,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5527,
     capitalKind: "admin_capital",
     population: 979000,
-    nameAscii: "Chandigarh"
+    nameAscii: "Chandigarh",
+    countryCode: "IN"
 },
   {
     lon: -62.641,
@@ -5171,15 +7939,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5526,
     capitalKind: "admin_capital",
     population: 978202,
-    nameAscii: "Ciudad Guayana"
-},
-  {
-    lon: 137.7333,
-    lat: 34.7,
-    weight: 0.5524,
-    capitalKind: "admin_capital",
-    population: 977023,
-    nameAscii: "Hamamatsu"
+    nameAscii: "Ciudad Guayana",
+    countryCode: "VE"
 },
   {
     lon: 72.6742,
@@ -5187,7 +7948,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5522,
     capitalKind: "admin_capital",
     population: 975886,
-    nameAscii: "Sargodha"
+    nameAscii: "Sargodha",
+    countryCode: "PK"
 },
   {
     lon: 50.8764,
@@ -5195,7 +7957,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5517,
     capitalKind: "admin_capital",
     population: 973000,
-    nameAscii: "Qom"
+    nameAscii: "Qom",
+    countryCode: "IR"
 },
   {
     lon: 31.5825,
@@ -5203,7 +7966,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5512,
     capitalKind: "country_capital",
     population: 450000,
-    nameAscii: "Juba"
+    nameAscii: "Juba",
+    countryCode: "SS"
 },
   {
     lon: -111.8911,
@@ -5211,7 +7975,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5506,
     capitalKind: "admin_capital",
     population: 966000,
-    nameAscii: "Salt Lake City"
+    nameAscii: "Salt Lake City",
+    countryCode: "US"
+},
+  {
+    lon: 138.3833,
+    lat: 34.9833,
+    weight: 0.5506,
+    capitalKind: "admin_capital",
+    population: 701561,
+    nameAscii: "Shizuoka",
+    countryCode: "JP"
 },
   {
     lon: 123.8907,
@@ -5219,7 +7993,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5505,
     capitalKind: "admin_capital",
     population: 965332,
-    nameAscii: "Cebu City"
+    nameAscii: "Cebu City",
+    countryCode: "PH"
 },
   {
     lon: 117.0689,
@@ -5227,7 +8002,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5504,
     capitalKind: "admin_capital",
     population: 965075,
-    nameAscii: "Sanhe"
+    nameAscii: "Sanhe",
+    countryCode: "CN"
 },
   {
     lon: 130.9622,
@@ -5235,7 +8011,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5504,
     capitalKind: "admin_capital",
     population: 965000,
-    nameAscii: "Jixi"
+    nameAscii: "Jixi",
+    countryCode: "CN"
 },
   {
     lon: 120.5931,
@@ -5243,7 +8020,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5504,
     capitalKind: "country_capital",
     population: 447824,
-    nameAscii: "Baguio"
+    nameAscii: "Baguio",
+    countryCode: "PH"
+},
+  {
+    lon: 7.4474,
+    lat: 46.9481,
+    weight: 0.5502,
+    capitalKind: "country_capital",
+    population: 275329,
+    nameAscii: "Bern",
+    countryCode: "CH"
 },
   {
     lon: 118.3462,
@@ -5251,7 +8038,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.55,
     capitalKind: "admin_capital",
     population: 962656,
-    nameAscii: "Xinyi"
+    nameAscii: "Xinyi",
+    countryCode: "CN"
 },
   {
     lon: 113.8535,
@@ -5259,7 +8047,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5498,
     capitalKind: "admin_capital",
     population: 961000,
-    nameAscii: "Pingxiang"
+    nameAscii: "Pingxiang",
+    countryCode: "CN"
 },
   {
     lon: -34.8631,
@@ -5267,7 +8056,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.549,
     capitalKind: "admin_capital",
     population: 956000,
-    nameAscii: "Joao Pessoa"
+    nameAscii: "Joao Pessoa",
+    countryCode: "BR"
 },
   {
     lon: 101.4433,
@@ -5275,15 +8065,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.549,
     capitalKind: "admin_capital",
     population: 956000,
-    nameAscii: "Klang"
-},
-  {
-    lon: 14.7933,
-    lat: 40.6754,
-    weight: 0.5487,
-    capitalKind: "admin_capital",
-    population: 954265,
-    nameAscii: "Salerno"
+    nameAscii: "Klang",
+    countryCode: "MY"
 },
   {
     lon: 76.9492,
@@ -5291,7 +8074,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5486,
     capitalKind: "admin_capital",
     population: 954000,
-    nameAscii: "Thiruvananthapuram"
+    nameAscii: "Thiruvananthapuram",
+    countryCode: "IN"
 },
   {
     lon: 75.7804,
@@ -5299,7 +8083,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5485,
     capitalKind: "admin_capital",
     population: 953000,
-    nameAscii: "Kozhikode"
+    nameAscii: "Kozhikode",
+    countryCode: "IN"
 },
   {
     lon: 4.2401,
@@ -5307,7 +8092,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5481,
     capitalKind: "admin_capital",
     population: 951000,
-    nameAscii: "Ogbomoso"
+    nameAscii: "Ogbomoso",
+    countryCode: "NG"
 },
   {
     lon: 119.4551,
@@ -5315,7 +8101,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5481,
     capitalKind: "admin_capital",
     population: 950516,
-    nameAscii: "Zhenjiang"
+    nameAscii: "Zhenjiang",
+    countryCode: "CN"
 },
   {
     lon: 7.4988,
@@ -5323,7 +8110,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.548,
     capitalKind: "admin_capital",
     population: 950000,
-    nameAscii: "Enugu"
+    nameAscii: "Enugu",
+    countryCode: "NG"
 },
   {
     lon: 122.95,
@@ -5331,7 +8119,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5479,
     capitalKind: "admin_capital",
     population: 949354,
-    nameAscii: "Bacolod City"
+    nameAscii: "Bacolod City",
+    countryCode: "PH"
 },
   {
     lon: -85.7594,
@@ -5339,7 +8128,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5477,
     capitalKind: "admin_capital",
     population: 948000,
-    nameAscii: "Louisville"
+    nameAscii: "Louisville",
+    countryCode: "US"
 },
   {
     lon: 121.0735,
@@ -5347,7 +8137,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5475,
     capitalKind: "admin_capital",
     population: 947000,
-    nameAscii: "Jinsha"
+    nameAscii: "Jinsha",
+    countryCode: "CN"
 },
   {
     lon: -95.9928,
@@ -5355,7 +8146,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5475,
     capitalKind: "admin_capital",
     population: 946962,
-    nameAscii: "Tulsa"
+    nameAscii: "Tulsa",
+    countryCode: "US"
 },
   {
     lon: -15.5977,
@@ -5363,7 +8155,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5475,
     capitalKind: "country_capital",
     population: 439704,
-    nameAscii: "Bissau"
+    nameAscii: "Bissau",
+    countryCode: "GW"
 },
   {
     lon: 120.8355,
@@ -5371,7 +8164,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5471,
     capitalKind: "admin_capital",
     population: 944495,
-    nameAscii: "Huludao"
+    nameAscii: "Huludao",
+    countryCode: "CN"
 },
   {
     lon: 44.0209,
@@ -5379,7 +8173,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5464,
     capitalKind: "admin_capital",
     population: 940600,
-    nameAscii: "Taiz"
+    nameAscii: "Taiz",
+    countryCode: "YE"
 },
   {
     lon: 73.0158,
@@ -5387,15 +8182,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5454,
     capitalKind: "place",
     population: 2600000,
-    nameAscii: "Navi Mumbai"
-},
-  {
-    lon: 7.2661,
-    lat: 43.7031,
-    weight: 0.5441,
-    capitalKind: "admin_capital",
-    population: 927000,
-    nameAscii: "Nice"
+    nameAscii: "Navi Mumbai",
+    countryCode: "IN"
 },
   {
     lon: -106.0889,
@@ -5403,7 +8191,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5439,
     capitalKind: "admin_capital",
     population: 925762,
-    nameAscii: "Chihuahua"
+    nameAscii: "Chihuahua",
+    countryCode: "MX"
 },
   {
     lon: 106.9896,
@@ -5411,7 +8200,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5433,
     capitalKind: "place",
     population: 2564940,
-    nameAscii: "Bekasi"
+    nameAscii: "Bekasi",
+    countryCode: "ID"
 },
   {
     lon: 76.6393,
@@ -5419,15 +8209,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5431,
     capitalKind: "admin_capital",
     population: 920550,
-    nameAscii: "Mysuru"
-},
-  {
-    lon: 4.4003,
-    lat: 51.2205,
-    weight: 0.543,
-    capitalKind: "admin_capital",
-    population: 920000,
-    nameAscii: "Antwerpen"
+    nameAscii: "Mysuru",
+    countryCode: "IN"
 },
   {
     lon: -79.03,
@@ -5435,7 +8218,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5429,
     capitalKind: "admin_capital",
     population: 919899,
-    nameAscii: "Trujillo"
+    nameAscii: "Trujillo",
+    countryCode: "PE"
+},
+  {
+    lon: 139.8833,
+    lat: 36.5667,
+    weight: 0.5426,
+    capitalKind: "admin_capital",
+    population: 667752,
+    nameAscii: "Utsunomiya",
+    countryCode: "JP"
 },
   {
     lon: -75.4933,
@@ -5443,7 +8236,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.542,
     capitalKind: "admin_capital",
     population: 914552,
-    nameAscii: "Cartagena"
+    nameAscii: "Cartagena",
+    countryCode: "CO"
 },
   {
     lon: 121.1225,
@@ -5451,7 +8245,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5419,
     capitalKind: "admin_capital",
     population: 913712,
-    nameAscii: "Antipolo"
+    nameAscii: "Antipolo",
+    countryCode: "PH"
 },
   {
     lon: -72.6851,
@@ -5459,7 +8254,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5418,
     capitalKind: "admin_capital",
     population: 913000,
-    nameAscii: "Hartford"
+    nameAscii: "Hartford",
+    countryCode: "US"
 },
   {
     lon: 114.9334,
@@ -5467,15 +8263,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5418,
     capitalKind: "admin_capital",
     population: 913000,
-    nameAscii: "Xinyu"
-},
-  {
-    lon: 17.1067,
-    lat: 48.1482,
-    weight: 0.5418,
-    capitalKind: "country_capital",
-    population: 423737,
-    nameAscii: "Bratislava"
+    nameAscii: "Xinyu",
+    countryCode: "CN"
 },
   {
     lon: -77.4603,
@@ -5483,7 +8272,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5416,
     capitalKind: "admin_capital",
     population: 912000,
-    nameAscii: "Richmond"
+    nameAscii: "Richmond",
+    countryCode: "US"
 },
   {
     lon: 74.5313,
@@ -5491,7 +8281,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5416,
     capitalKind: "admin_capital",
     population: 911817,
-    nameAscii: "Sialkot"
+    nameAscii: "Sialkot",
+    countryCode: "PK"
 },
   {
     lon: 109.2222,
@@ -5499,7 +8290,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5413,
     capitalKind: "admin_capital",
     population: 910282,
-    nameAscii: "Laibin"
+    nameAscii: "Laibin",
+    countryCode: "CN"
 },
   {
     lon: 5.7501,
@@ -5507,7 +8299,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5413,
     capitalKind: "admin_capital",
     population: 910000,
-    nameAscii: "Warri"
+    nameAscii: "Warri",
+    countryCode: "NG"
 },
   {
     lon: 100.3543,
@@ -5515,7 +8308,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5411,
     capitalKind: "admin_capital",
     population: 909040,
-    nameAscii: "Padang"
+    nameAscii: "Padang",
+    countryCode: "ID"
 },
   {
     lon: 113.9222,
@@ -5523,7 +8317,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.541,
     capitalKind: "admin_capital",
     population: 908266,
-    nameAscii: "Xiaogan"
+    nameAscii: "Xiaogan",
+    countryCode: "CN"
 },
   {
     lon: -42.8019,
@@ -5531,7 +8326,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5407,
     capitalKind: "admin_capital",
     population: 907000,
-    nameAscii: "Teresina"
+    nameAscii: "Teresina",
+    countryCode: "BR"
 },
   {
     lon: -54.6464,
@@ -5539,7 +8335,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5406,
     capitalKind: "admin_capital",
     population: 906092,
-    nameAscii: "Campo Grande"
+    nameAscii: "Campo Grande",
+    countryCode: "BR"
 },
   {
     lon: 104.6481,
@@ -5547,15 +8344,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5405,
     capitalKind: "admin_capital",
     population: 905729,
-    nameAscii: "Ziyang"
-},
-  {
-    lon: 127.6785,
-    lat: 26.213,
-    weight: 0.5404,
-    capitalKind: "admin_capital",
-    population: 905238,
-    nameAscii: "Naha"
+    nameAscii: "Ziyang",
+    countryCode: "CN"
 },
   {
     lon: -4.2949,
@@ -5563,7 +8353,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5404,
     capitalKind: "admin_capital",
     population: 904920,
-    nameAscii: "Bobo-Dioulasso"
+    nameAscii: "Bobo-Dioulasso",
+    countryCode: "BF"
 },
   {
     lon: 71.6752,
@@ -5571,7 +8362,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5402,
     capitalKind: "admin_capital",
     population: 903795,
-    nameAscii: "Bahawalpur"
+    nameAscii: "Bahawalpur",
+    countryCode: "PK"
 },
   {
     lon: 35.0085,
@@ -5579,7 +8371,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.54,
     capitalKind: "admin_capital",
     population: 902588,
-    nameAscii: "Blantyre"
+    nameAscii: "Blantyre",
+    countryCode: "MW"
 },
   {
     lon: 104.5492,
@@ -5587,7 +8380,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5399,
     capitalKind: "admin_capital",
     population: 902000,
-    nameAscii: "Baixi"
+    nameAscii: "Baixi",
+    countryCode: "CN"
 },
   {
     lon: 104.6399,
@@ -5595,7 +8389,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5399,
     capitalKind: "admin_capital",
     population: 902000,
-    nameAscii: "Yibin"
+    nameAscii: "Yibin",
+    countryCode: "CN"
 },
   {
     lon: 44.1848,
@@ -5603,15 +8398,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5395,
     capitalKind: "admin_capital",
     population: 900000,
-    nameAscii: "Abu Ghurayb"
-},
-  {
-    lon: 38.9818,
-    lat: 45.0453,
-    weight: 0.5394,
-    capitalKind: "admin_capital",
-    population: 899541,
-    nameAscii: "Krasnodar"
+    nameAscii: "Abu Ghurayb",
+    countryCode: "IQ"
 },
   {
     lon: -106.6511,
@@ -5619,7 +8407,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5393,
     capitalKind: "admin_capital",
     population: 898642,
-    nameAscii: "Albuquerque"
+    nameAscii: "Albuquerque",
+    countryCode: "US"
 },
   {
     lon: 119.0192,
@@ -5627,7 +8416,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5389,
     capitalKind: "place",
     population: 2494013,
-    nameAscii: "Huai'an"
+    nameAscii: "Huai'an",
+    countryCode: "CN"
 },
   {
     lon: 36.088,
@@ -5635,7 +8425,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5386,
     capitalKind: "admin_capital",
     population: 894691,
-    nameAscii: "Zarqa"
+    nameAscii: "Zarqa",
+    countryCode: "JO"
 },
   {
     lon: 34.8928,
@@ -5643,7 +8434,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5385,
     capitalKind: "admin_capital",
     population: 894318,
-    nameAscii: "Tarsus"
+    nameAscii: "Tarsus",
+    countryCode: "TR"
 },
   {
     lon: -68.8458,
@@ -5651,7 +8443,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5383,
     capitalKind: "admin_capital",
     population: 893000,
-    nameAscii: "Mendoza"
+    nameAscii: "Mendoza",
+    countryCode: "AR"
 },
   {
     lon: -73.0498,
@@ -5659,7 +8452,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5377,
     capitalKind: "admin_capital",
     population: 889725,
-    nameAscii: "Concepcion"
+    nameAscii: "Concepcion",
+    countryCode: "CL"
 },
   {
     lon: 77.0263,
@@ -5667,7 +8461,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5372,
     capitalKind: "admin_capital",
     population: 886519,
-    nameAscii: "Gurugram"
+    nameAscii: "Gurugram",
+    countryCode: "IN"
 },
   {
     lon: 85.8338,
@@ -5675,7 +8470,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.537,
     capitalKind: "admin_capital",
     population: 885363,
-    nameAscii: "Bhubaneswar"
+    nameAscii: "Bhubaneswar",
+    countryCode: "IN"
 },
   {
     lon: 122.2653,
@@ -5683,7 +8479,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5367,
     capitalKind: "admin_capital",
     population: 884000,
-    nameAscii: "Tongliao"
+    nameAscii: "Tongliao",
+    countryCode: "CN"
 },
   {
     lon: 122.2049,
@@ -5691,15 +8488,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5365,
     capitalKind: "admin_capital",
     population: 882932,
-    nameAscii: "Zhoushan"
-},
-  {
-    lon: -1.614,
-    lat: 54.9733,
-    weight: 0.5364,
-    capitalKind: "admin_capital",
-    population: 882000,
-    nameAscii: "Newcastle upon Tyne"
+    nameAscii: "Zhoushan",
+    countryCode: "CN"
 },
   {
     lon: 105.3,
@@ -5707,7 +8497,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5363,
     capitalKind: "admin_capital",
     population: 881801,
-    nameAscii: "Bandar Lampung"
+    nameAscii: "Bandar Lampung",
+    countryCode: "ID"
 },
   {
     lon: 45.4329,
@@ -5715,7 +8506,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5357,
     capitalKind: "admin_capital",
     population: 878146,
-    nameAscii: "Sulaymaniyah"
+    nameAscii: "Sulaymaniyah",
+    countryCode: "IQ"
 },
   {
     lon: -95.9404,
@@ -5723,7 +8515,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5355,
     capitalKind: "admin_capital",
     population: 877110,
-    nameAscii: "Omaha"
+    nameAscii: "Omaha",
+    countryCode: "US"
 },
   {
     lon: -86.7844,
@@ -5731,15 +8524,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5355,
     capitalKind: "admin_capital",
     population: 877000,
-    nameAscii: "Nashville"
-},
-  {
-    lon: -2.9253,
-    lat: 43.2627,
-    weight: 0.5352,
-    capitalKind: "admin_capital",
-    population: 875552,
-    nameAscii: "Bilbao"
+    nameAscii: "Nashville",
+    countryCode: "US"
 },
   {
     lon: 103.7578,
@@ -5747,7 +8533,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5351,
     capitalKind: "admin_capital",
     population: 875000,
-    nameAscii: "Johor Bahru"
+    nameAscii: "Johor Bahru",
+    countryCode: "MY"
 },
   {
     lon: -73.7562,
@@ -5755,7 +8542,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5344,
     capitalKind: "admin_capital",
     population: 870716,
-    nameAscii: "Albany"
+    nameAscii: "Albany",
+    countryCode: "US"
 },
   {
     lon: -102.2843,
@@ -5763,7 +8551,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.534,
     capitalKind: "admin_capital",
     population: 869000,
-    nameAscii: "Aguascalientes"
+    nameAscii: "Aguascalientes",
+    countryCode: "MX"
 },
   {
     lon: 116.7147,
@@ -5771,15 +8560,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5339,
     capitalKind: "admin_capital",
     population: 868066,
-    nameAscii: "Langfang"
-},
-  {
-    lon: 133.9333,
-    lat: 34.65,
-    weight: 0.5335,
-    capitalKind: "admin_capital",
-    population: 866092,
-    nameAscii: "Okayama"
+    nameAscii: "Langfang",
+    countryCode: "CN"
 },
   {
     lon: 118.7553,
@@ -5787,7 +8569,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5335,
     capitalKind: "admin_capital",
     population: 866000,
-    nameAscii: "Xuancheng"
+    nameAscii: "Xuancheng",
+    countryCode: "CN"
 },
   {
     lon: 113.2391,
@@ -5795,7 +8578,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5334,
     capitalKind: "admin_capital",
     population: 865413,
-    nameAscii: "Jiaozuo"
+    nameAscii: "Jiaozuo",
+    countryCode: "CN"
 },
   {
     lon: 119.5291,
@@ -5803,23 +8587,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5333,
     capitalKind: "admin_capital",
     population: 865000,
-    nameAscii: "Rizhao"
-},
-  {
-    lon: 13.3636,
-    lat: 38.1166,
-    weight: 0.533,
-    capitalKind: "admin_capital",
-    population: 863000,
-    nameAscii: "Palermo"
-},
-  {
-    lon: -3.18,
-    lat: 51.48,
-    weight: 0.5327,
-    capitalKind: "admin_capital",
-    population: 861400,
-    nameAscii: "Cardiff"
+    nameAscii: "Rizhao",
+    countryCode: "CN"
 },
   {
     lon: -97.8778,
@@ -5827,7 +8596,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5323,
     capitalKind: "admin_capital",
     population: 859419,
-    nameAscii: "Tampico"
+    nameAscii: "Tampico",
+    countryCode: "MX"
 },
   {
     lon: 106.637,
@@ -5835,7 +8605,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5321,
     capitalKind: "admin_capital",
     population: 858159,
-    nameAscii: "Guang'an"
+    nameAscii: "Guang'an",
+    countryCode: "CN"
 },
   {
     lon: 127.4897,
@@ -5843,7 +8614,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5313,
     capitalKind: "admin_capital",
     population: 853938,
-    nameAscii: "Cheongju-si"
+    nameAscii: "Cheongju-si",
+    countryCode: "KR"
 },
   {
     lon: 121.0614,
@@ -5851,7 +8623,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5312,
     capitalKind: "admin_capital",
     population: 853050,
-    nameAscii: "Pasig City"
+    nameAscii: "Pasig City",
+    countryCode: "PH"
 },
   {
     lon: 105.7667,
@@ -5859,7 +8632,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5306,
     capitalKind: "admin_capital",
     population: 850000,
-    nameAscii: "Thanh Hoa"
+    nameAscii: "Thanh Hoa",
+    countryCode: "VN"
 },
   {
     lon: 105.9333,
@@ -5867,15 +8641,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5304,
     capitalKind: "admin_capital",
     population: 849000,
-    nameAscii: "Anshun"
-},
-  {
-    lon: 24.7535,
-    lat: 59.437,
-    weight: 0.5304,
-    capitalKind: "country_capital",
-    population: 394024,
-    nameAscii: "Tallinn"
+    nameAscii: "Anshun",
+    countryCode: "CN"
 },
   {
     lon: 174.7756,
@@ -5883,23 +8650,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5301,
     capitalKind: "country_capital",
     population: 393400,
-    nameAscii: "Wellington"
-},
-  {
-    lon: 1.4437,
-    lat: 43.6043,
-    weight: 0.53,
-    capitalKind: "admin_capital",
-    population: 847000,
-    nameAscii: "Toulouse"
-},
-  {
-    lon: 45.9901,
-    lat: 51.5405,
-    weight: 0.5296,
-    capitalKind: "admin_capital",
-    population: 844858,
-    nameAscii: "Saratov"
+    nameAscii: "Wellington",
+    countryCode: "NZ"
 },
   {
     lon: -43.4511,
@@ -5907,7 +8659,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5296,
     capitalKind: "admin_capital",
     population: 844583,
-    nameAscii: "Nova Iguacu"
+    nameAscii: "Nova Iguacu",
+    countryCode: "BR"
 },
   {
     lon: 122.1136,
@@ -5915,7 +8668,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5295,
     capitalKind: "admin_capital",
     population: 844310,
-    nameAscii: "Weihai"
+    nameAscii: "Weihai",
+    countryCode: "CN"
 },
   {
     lon: 104.785,
@@ -5923,7 +8677,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5295,
     capitalKind: "admin_capital",
     population: 843931,
-    nameAscii: "Takeo"
+    nameAscii: "Takeo",
+    countryCode: "KH"
 },
   {
     lon: 30.3928,
@@ -5931,7 +8686,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5286,
     capitalKind: "admin_capital",
     population: 839327,
-    nameAscii: "Pietermaritzburg"
+    nameAscii: "Pietermaritzburg",
+    countryCode: "ZA"
 },
   {
     lon: -99.2396,
@@ -5939,7 +8695,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5277,
     capitalKind: "admin_capital",
     population: 834434,
-    nameAscii: "Naucalpan de Juarez"
+    nameAscii: "Naucalpan de Juarez",
+    countryCode: "MX"
 },
   {
     lon: -99.2308,
@@ -5947,7 +8704,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5276,
     capitalKind: "admin_capital",
     population: 834001,
-    nameAscii: "Cuernavaca"
+    nameAscii: "Cuernavaca",
+    countryCode: "MX"
 },
   {
     lon: -5.0303,
@@ -5955,7 +8713,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5273,
     capitalKind: "admin_capital",
     population: 832371,
-    nameAscii: "Bouake"
+    nameAscii: "Bouake",
+    countryCode: "CI"
 },
   {
     lon: 17.0832,
@@ -5963,7 +8722,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5273,
     capitalKind: "country_capital",
     population: 386219,
-    nameAscii: "Windhoek"
+    nameAscii: "Windhoek",
+    countryCode: "NA"
+},
+  {
+    lon: 139.7107,
+    lat: 35.8052,
+    weight: 0.5272,
+    capitalKind: "admin_capital",
+    population: 607373,
+    nameAscii: "Kawaguchi",
+    countryCode: "JP"
 },
   {
     lon: -123.1193,
@@ -5971,7 +8740,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5271,
     capitalKind: "place",
     population: 2313328,
-    nameAscii: "Vancouver"
+    nameAscii: "Vancouver",
+    countryCode: "CA"
 },
   {
     lon: 117.1458,
@@ -5979,7 +8749,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5271,
     capitalKind: "admin_capital",
     population: 831460,
-    nameAscii: "Samarinda"
+    nameAscii: "Samarinda",
+    countryCode: "ID"
 },
   {
     lon: 121.0939,
@@ -5987,15 +8758,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5271,
     capitalKind: "admin_capital",
     population: 831113,
-    nameAscii: "Taicang"
-},
-  {
-    lon: 7.5733,
-    lat: 47.5584,
-    weight: 0.5269,
-    capitalKind: "admin_capital",
-    population: 830000,
-    nameAscii: "Basel"
+    nameAscii: "Taicang",
+    countryCode: "CN"
 },
   {
     lon: -65.2105,
@@ -6003,7 +8767,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5269,
     capitalKind: "admin_capital",
     population: 830000,
-    nameAscii: "San Miguel de Tucuman"
+    nameAscii: "San Miguel de Tucuman",
+    countryCode: "AR"
 },
   {
     lon: 47.065,
@@ -6011,39 +8776,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5266,
     capitalKind: "admin_capital",
     population: 828313,
-    nameAscii: "Kermanshah"
-},
-  {
-    lon: 22.9349,
-    lat: 40.6407,
-    weight: 0.5265,
-    capitalKind: "admin_capital",
-    population: 828000,
-    nameAscii: "Thessaloniki"
-},
-  {
-    lon: -8.4231,
-    lat: 41.5514,
-    weight: 0.5263,
-    capitalKind: "admin_capital",
-    population: 826833,
-    nameAscii: "Braga"
-},
-  {
-    lon: 135.4665,
-    lat: 34.5822,
-    weight: 0.5261,
-    capitalKind: "admin_capital",
-    population: 826161,
-    nameAscii: "Sakai"
-},
-  {
-    lon: -1.1505,
-    lat: 52.9536,
-    weight: 0.526,
-    capitalKind: "admin_capital",
-    population: 825600,
-    nameAscii: "Nottingham"
+    nameAscii: "Kermanshah",
+    countryCode: "IR"
 },
   {
     lon: -9.5982,
@@ -6051,15 +8785,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.526,
     capitalKind: "admin_capital",
     population: 825467,
-    nameAscii: "Agadir"
-},
-  {
-    lon: -0.3797,
-    lat: 39.4739,
-    weight: 0.5258,
-    capitalKind: "admin_capital",
-    population: 824340,
-    nameAscii: "Valencia"
+    nameAscii: "Agadir",
+    countryCode: "MA"
 },
   {
     lon: -110.9265,
@@ -6067,7 +8794,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5255,
     capitalKind: "admin_capital",
     population: 823000,
-    nameAscii: "Tucson"
+    nameAscii: "Tucson",
+    countryCode: "US"
 },
   {
     lon: 113.0333,
@@ -6075,7 +8803,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5255,
     capitalKind: "admin_capital",
     population: 822534,
-    nameAscii: "Chenzhou"
+    nameAscii: "Chenzhou",
+    countryCode: "CN"
 },
   {
     lon: 28.8428,
@@ -6083,7 +8812,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5244,
     capitalKind: "admin_capital",
     population: 816811,
-    nameAscii: "Bukavu"
+    nameAscii: "Bukavu",
+    countryCode: "CD"
 },
   {
     lon: 104.9064,
@@ -6091,7 +8821,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5242,
     capitalKind: "admin_capital",
     population: 816000,
-    nameAscii: "Xingyi"
+    nameAscii: "Xingyi",
+    countryCode: "CN"
 },
   {
     lon: -64.6877,
@@ -6099,7 +8830,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.524,
     capitalKind: "admin_capital",
     population: 815141,
-    nameAscii: "Barcelona"
+    nameAscii: "Barcelona",
+    countryCode: "VE"
+},
+  {
+    lon: 130.55,
+    lat: 31.5667,
+    weight: 0.5238,
+    capitalKind: "admin_capital",
+    population: 595049,
+    nameAscii: "Kagoshima",
+    countryCode: "JP"
+},
+  {
+    lon: 138.1833,
+    lat: 36.65,
+    weight: 0.5236,
+    capitalKind: "admin_capital",
+    population: 594311,
+    nameAscii: "Nagano",
+    countryCode: "JP"
 },
   {
     lon: -110.9668,
@@ -6107,15 +8857,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5235,
     capitalKind: "admin_capital",
     population: 812229,
-    nameAscii: "Hermosillo"
-},
-  {
-    lon: -2.9779,
-    lat: 53.4106,
-    weight: 0.5232,
-    capitalKind: "admin_capital",
-    population: 811000,
-    nameAscii: "Liverpool"
+    nameAscii: "Hermosillo",
+    countryCode: "MX"
 },
   {
     lon: 88.6011,
@@ -6123,7 +8866,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5231,
     capitalKind: "admin_capital",
     population: 810000,
-    nameAscii: "Rajshahi"
+    nameAscii: "Rajshahi",
+    countryCode: "BD"
 },
   {
     lon: -107.3942,
@@ -6131,7 +8875,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5229,
     capitalKind: "admin_capital",
     population: 809000,
-    nameAscii: "Culiacan"
+    nameAscii: "Culiacan",
+    countryCode: "MX"
 },
   {
     lon: 103.7167,
@@ -6139,7 +8884,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5229,
     capitalKind: "admin_capital",
     population: 809000,
-    nameAscii: "Zhaotong"
+    nameAscii: "Zhaotong",
+    countryCode: "CN"
+},
+  {
+    lon: 19.2631,
+    lat: 42.4412,
+    weight: 0.5229,
+    capitalKind: "country_capital",
+    population: 236852,
+    nameAscii: "Podgorica",
+    countryCode: "ME"
 },
   {
     lon: 101.6067,
@@ -6147,7 +8902,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5226,
     capitalKind: "admin_capital",
     population: 807879,
-    nameAscii: "Petaling Jaya"
+    nameAscii: "Petaling Jaya",
+    countryCode: "MY"
 },
   {
     lon: 38.3167,
@@ -6155,7 +8911,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5223,
     capitalKind: "admin_capital",
     population: 806156,
-    nameAscii: "Malatya"
+    nameAscii: "Malatya",
+    countryCode: "TR"
 },
   {
     lon: -56.0967,
@@ -6163,7 +8920,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5223,
     capitalKind: "admin_capital",
     population: 806000,
-    nameAscii: "Cuiaba"
+    nameAscii: "Cuiaba",
+    countryCode: "BR"
 },
   {
     lon: 109.2237,
@@ -6171,7 +8929,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5221,
     capitalKind: "admin_capital",
     population: 805290,
-    nameAscii: "Qui Nhon"
+    nameAscii: "Qui Nhon",
+    countryCode: "VN"
 },
   {
     lon: 117.0472,
@@ -6179,23 +8938,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.522,
     capitalKind: "admin_capital",
     population: 804493,
-    nameAscii: "Anqing"
-},
-  {
-    lon: 19.9366,
-    lat: 50.0614,
-    weight: 0.5219,
-    capitalKind: "admin_capital",
-    population: 804237,
-    nameAscii: "Krakow"
-},
-  {
-    lon: 24.0232,
-    lat: 49.8383,
-    weight: 0.5219,
-    capitalKind: "admin_capital",
-    population: 803880,
-    nameAscii: "Lviv"
+    nameAscii: "Anqing",
+    countryCode: "CN"
 },
   {
     lon: -0.6359,
@@ -6203,15 +8947,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5218,
     capitalKind: "admin_capital",
     population: 803329,
-    nameAscii: "Oran"
-},
-  {
-    lon: -0.5805,
-    lat: 44.8412,
-    weight: 0.5217,
-    capitalKind: "admin_capital",
-    population: 803000,
-    nameAscii: "Bordeaux"
+    nameAscii: "Oran",
+    countryCode: "DZ"
 },
   {
     lon: 114.1833,
@@ -6219,7 +8956,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5216,
     capitalKind: "place",
     population: 2232339,
-    nameAscii: "Kowloon"
+    nameAscii: "Kowloon",
+    countryCode: "HK"
 },
   {
     lon: -88.0259,
@@ -6227,7 +8965,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5214,
     capitalKind: "admin_capital",
     population: 801259,
-    nameAscii: "San Pedro Sula"
+    nameAscii: "San Pedro Sula",
+    countryCode: "HN"
 },
   {
     lon: 121.4408,
@@ -6235,7 +8974,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5212,
     capitalKind: "place",
     population: 2227733,
-    nameAscii: "Yantai"
+    nameAscii: "Yantai",
+    countryCode: "CN"
 },
   {
     lon: 107.359,
@@ -6243,7 +8983,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5211,
     capitalKind: "admin_capital",
     population: 800000,
-    nameAscii: "Guozhen"
+    nameAscii: "Guozhen",
+    countryCode: "CN"
 },
   {
     lon: 114.4927,
@@ -6251,15 +8992,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5209,
     capitalKind: "admin_capital",
     population: 798770,
-    nameAscii: "Xingtai"
-},
-  {
-    lon: 139.0412,
-    lat: 37.9226,
-    weight: 0.5206,
-    capitalKind: "admin_capital",
-    population: 797591,
-    nameAscii: "Niigata"
+    nameAscii: "Xingtai",
+    countryCode: "CN"
 },
   {
     lon: 122.5025,
@@ -6267,7 +9001,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5201,
     capitalKind: "admin_capital",
     population: 795000,
-    nameAscii: "Dashiqiao"
+    nameAscii: "Dashiqiao",
+    countryCode: "CN"
 },
   {
     lon: 122.2318,
@@ -6275,15 +9010,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5201,
     capitalKind: "admin_capital",
     population: 795000,
-    nameAscii: "Yingkou"
-},
-  {
-    lon: 14.5147,
-    lat: 35.8997,
-    weight: 0.5198,
-    capitalKind: "country_capital",
-    population: 368250,
-    nameAscii: "Valletta"
+    nameAscii: "Yingkou",
+    countryCode: "CN"
 },
   {
     lon: 149.1281,
@@ -6291,7 +9019,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5196,
     capitalKind: "country_capital",
     population: 367752,
-    nameAscii: "Canberra"
+    nameAscii: "Canberra",
+    countryCode: "AU"
+},
+  {
+    lon: 139.3239,
+    lat: 35.6558,
+    weight: 0.5195,
+    capitalKind: "admin_capital",
+    population: 579399,
+    nameAscii: "Hachioji",
+    countryCode: "JP"
 },
   {
     lon: 74.8617,
@@ -6299,7 +9037,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5193,
     capitalKind: "admin_capital",
     population: 791000,
-    nameAscii: "Jammu"
+    nameAscii: "Jammu",
+    countryCode: "IN"
 },
   {
     lon: 25.4667,
@@ -6307,7 +9046,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5192,
     capitalKind: "admin_capital",
     population: 790248,
-    nameAscii: "Kolwezi"
+    nameAscii: "Kolwezi",
+    countryCode: "CD"
 },
   {
     lon: 105.6923,
@@ -6315,7 +9055,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5191,
     capitalKind: "admin_capital",
     population: 790000,
-    nameAscii: "Vinh"
+    nameAscii: "Vinh",
+    countryCode: "VN"
 },
   {
     lon: 30.5206,
@@ -6323,7 +9064,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.519,
     capitalKind: "admin_capital",
     population: 789023,
-    nameAscii: "Eskisehir"
+    nameAscii: "Eskisehir",
+    countryCode: "TR"
 },
   {
     lon: 102.2405,
@@ -6331,7 +9073,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5189,
     capitalKind: "admin_capital",
     population: 788706,
-    nameAscii: "Malacca"
+    nameAscii: "Malacca",
+    countryCode: "MY"
 },
   {
     lon: -97.5164,
@@ -6339,15 +9082,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5187,
     capitalKind: "admin_capital",
     population: 788000,
-    nameAscii: "Oklahoma City"
-},
-  {
-    lon: 35.1171,
-    lat: 47.8517,
-    weight: 0.5187,
-    capitalKind: "admin_capital",
-    population: 788000,
-    nameAscii: "Zaporizhzhya"
+    nameAscii: "Oklahoma City",
+    countryCode: "US"
 },
   {
     lon: 101.7128,
@@ -6355,7 +9091,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5186,
     capitalKind: "admin_capital",
     population: 787177,
-    nameAscii: "Panzhihua"
+    nameAscii: "Panzhihua",
+    countryCode: "CN"
 },
   {
     lon: 78.7768,
@@ -6363,7 +9100,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5186,
     capitalKind: "admin_capital",
     population: 787000,
-    nameAscii: "Moradabad"
+    nameAscii: "Moradabad",
+    countryCode: "IN"
 },
   {
     lon: -157.8583,
@@ -6371,7 +9109,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5184,
     capitalKind: "admin_capital",
     population: 786000,
-    nameAscii: "Honolulu"
+    nameAscii: "Honolulu",
+    countryCode: "US"
 },
   {
     lon: -90.0751,
@@ -6379,7 +9118,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5182,
     capitalKind: "admin_capital",
     population: 785000,
-    nameAscii: "New Orleans"
+    nameAscii: "New Orleans",
+    countryCode: "US"
 },
   {
     lon: 118.2978,
@@ -6387,7 +9127,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5177,
     capitalKind: "admin_capital",
     population: 782671,
-    nameAscii: "Chuzhou"
+    nameAscii: "Chuzhou",
+    countryCode: "CN"
 },
   {
     lon: 32.3019,
@@ -6395,7 +9136,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5173,
     capitalKind: "admin_capital",
     population: 780515,
-    nameAscii: "Port Said"
+    nameAscii: "Port Said",
+    countryCode: "EG"
 },
   {
     lon: 42.9545,
@@ -6403,7 +9145,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5172,
     capitalKind: "admin_capital",
     population: 780000,
-    nameAscii: "Al Hudaydah"
+    nameAscii: "Al Hudaydah",
+    countryCode: "YE"
 },
   {
     lon: 27.4833,
@@ -6411,7 +9154,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5168,
     capitalKind: "country_capital",
     population: 361324,
-    nameAscii: "Maseru"
+    nameAscii: "Maseru",
+    countryCode: "LS"
 },
   {
     lon: -72.5049,
@@ -6419,15 +9163,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5166,
     capitalKind: "admin_capital",
     population: 777106,
-    nameAscii: "Cucuta"
-},
-  {
-    lon: 7.1482,
-    lat: 51.2563,
-    weight: 0.5165,
-    capitalKind: "admin_capital",
-    population: 776525,
-    nameAscii: "Wuppertal"
+    nameAscii: "Cucuta",
+    countryCode: "CO"
 },
   {
     lon: 109.8439,
@@ -6435,7 +9172,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5157,
     capitalKind: "place",
     population: 2150000,
-    nameAscii: "Baotou"
+    nameAscii: "Baotou",
+    countryCode: "CN"
 },
   {
     lon: -84.1916,
@@ -6443,7 +9181,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5157,
     capitalKind: "admin_capital",
     population: 773000,
-    nameAscii: "Dayton"
+    nameAscii: "Dayton",
+    countryCode: "US"
 },
   {
     lon: 127.5364,
@@ -6451,7 +9190,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5157,
     capitalKind: "admin_capital",
     population: 773000,
-    nameAscii: "Hamhung"
+    nameAscii: "Hamhung",
+    countryCode: "KP"
 },
   {
     lon: 44.1833,
@@ -6459,7 +9199,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5154,
     capitalKind: "admin_capital",
     population: 771514,
-    nameAscii: "Ibb"
+    nameAscii: "Ibb",
+    countryCode: "YE"
 },
   {
     lon: 106.8186,
@@ -6467,7 +9208,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5153,
     capitalKind: "place",
     population: 2145400,
-    nameAscii: "Depok"
+    nameAscii: "Depok",
+    countryCode: "ID"
 },
   {
     lon: 117.5542,
@@ -6475,7 +9217,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5153,
     capitalKind: "place",
     population: 2145000,
-    nameAscii: "Zaozhuang"
+    nameAscii: "Zaozhuang",
+    countryCode: "CN"
 },
   {
     lon: 119.9519,
@@ -6483,7 +9226,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5153,
     capitalKind: "admin_capital",
     population: 771000,
-    nameAscii: "Fuyang"
+    nameAscii: "Fuyang",
+    countryCode: "CN"
 },
   {
     lon: 39.2666,
@@ -6491,23 +9235,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5152,
     capitalKind: "admin_capital",
     population: 770379,
-    nameAscii: "Nampula"
-},
-  {
-    lon: 7.0098,
-    lat: 49.2326,
-    weight: 0.5151,
-    capitalKind: "admin_capital",
-    population: 770001,
-    nameAscii: "Saarbruecken"
-},
-  {
-    lon: 65.5272,
-    lat: 57.1522,
-    weight: 0.5148,
-    capitalKind: "admin_capital",
-    population: 768358,
-    nameAscii: "Tyumen"
+    nameAscii: "Nampula",
+    countryCode: "MZ"
 },
   {
     lon: 76.9661,
@@ -6515,7 +9244,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5147,
     capitalKind: "place",
     population: 2136916,
-    nameAscii: "Coimbatore"
+    nameAscii: "Coimbatore",
+    countryCode: "IN"
 },
   {
     lon: 41.2769,
@@ -6523,7 +9253,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5147,
     capitalKind: "admin_capital",
     population: 767848,
-    nameAscii: "Erzurum"
+    nameAscii: "Erzurum",
+    countryCode: "TR"
 },
   {
     lon: 39.7269,
@@ -6531,7 +9262,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5141,
     capitalKind: "admin_capital",
     population: 764714,
-    nameAscii: "Trabzon"
+    nameAscii: "Trabzon",
+    countryCode: "TR"
 },
   {
     lon: 70.9017,
@@ -6539,7 +9271,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5137,
     capitalKind: "admin_capital",
     population: 763195,
-    nameAscii: "Dera Ismail Khan"
+    nameAscii: "Dera Ismail Khan",
+    countryCode: "PK"
 },
   {
     lon: 111.2885,
@@ -6547,7 +9280,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5135,
     capitalKind: "admin_capital",
     population: 761948,
-    nameAscii: "Wuzhou"
+    nameAscii: "Wuzhou",
+    countryCode: "CN"
 },
   {
     lon: 112.8328,
@@ -6555,7 +9289,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5131,
     capitalKind: "admin_capital",
     population: 760000,
-    nameAscii: "Jincheng"
+    nameAscii: "Jincheng",
+    countryCode: "CN"
 },
   {
     lon: 101.0829,
@@ -6563,15 +9298,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5131,
     capitalKind: "admin_capital",
     population: 759952,
-    nameAscii: "Ipoh"
-},
-  {
-    lon: 19.4739,
-    lat: 51.7706,
-    weight: 0.5127,
-    capitalKind: "admin_capital",
-    population: 758000,
-    nameAscii: "Lodz"
+    nameAscii: "Ipoh",
+    countryCode: "MY"
 },
   {
     lon: -77.6156,
@@ -6579,7 +9307,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5121,
     capitalKind: "admin_capital",
     population: 755000,
-    nameAscii: "Rochester"
+    nameAscii: "Rochester",
+    countryCode: "US"
 },
   {
     lon: -100.9796,
@@ -6587,7 +9316,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5119,
     capitalKind: "admin_capital",
     population: 754000,
-    nameAscii: "Saltillo"
+    nameAscii: "Saltillo",
+    countryCode: "MX"
 },
   {
     lon: -45.8869,
@@ -6595,7 +9325,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5118,
     capitalKind: "admin_capital",
     population: 753769,
-    nameAscii: "Sao Jose dos Campos"
+    nameAscii: "Sao Jose dos Campos",
+    countryCode: "BR"
 },
   {
     lon: 111.4621,
@@ -6603,7 +9334,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5117,
     capitalKind: "admin_capital",
     population: 753194,
-    nameAscii: "Shaoyang"
+    nameAscii: "Shaoyang",
+    countryCode: "CN"
 },
   {
     lon: -106.4869,
@@ -6611,7 +9343,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5116,
     capitalKind: "admin_capital",
     population: 753000,
-    nameAscii: "El Paso"
+    nameAscii: "El Paso",
+    countryCode: "US"
+},
+  {
+    lon: 136.6167,
+    lat: 36.6,
+    weight: 0.5114,
+    capitalKind: "admin_capital",
+    population: 551249,
+    nameAscii: "Kanazawa",
+    countryCode: "JP"
 },
   {
     lon: 120.5628,
@@ -6619,7 +9361,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.511,
     capitalKind: "admin_capital",
     population: 750000,
-    nameAscii: "Chang-hua"
+    nameAscii: "Chang-hua",
+    countryCode: "TW"
 },
   {
     lon: 120.5512,
@@ -6627,7 +9370,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.511,
     capitalKind: "admin_capital",
     population: 750000,
-    nameAscii: "Changhua"
+    nameAscii: "Changhua",
+    countryCode: "TW"
 },
   {
     lon: 71.7843,
@@ -6635,7 +9379,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.511,
     capitalKind: "admin_capital",
     population: 750000,
-    nameAscii: "Fergana"
+    nameAscii: "Fergana",
+    countryCode: "UZ"
 },
   {
     lon: 120.9686,
@@ -6643,7 +9388,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.511,
     capitalKind: "admin_capital",
     population: 750000,
-    nameAscii: "Hsinchu"
+    nameAscii: "Hsinchu",
+    countryCode: "TW"
 },
   {
     lon: 71.6726,
@@ -6651,7 +9397,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.511,
     capitalKind: "admin_capital",
     population: 750000,
-    nameAscii: "Namangan"
+    nameAscii: "Namangan",
+    countryCode: "UZ"
 },
   {
     lon: -97.147,
@@ -6659,23 +9406,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5109,
     capitalKind: "admin_capital",
     population: 749607,
-    nameAscii: "Winnipeg"
-},
-  {
-    lon: 5.5675,
-    lat: 50.6337,
-    weight: 0.5108,
-    capitalKind: "admin_capital",
-    population: 749110,
-    nameAscii: "Liege"
-},
-  {
-    lon: 139.716,
-    lat: 35.5613,
-    weight: 0.5106,
-    capitalKind: "admin_capital",
-    population: 748081,
-    nameAscii: "Ota"
+    nameAscii: "Winnipeg",
+    countryCode: "CA"
 },
   {
     lon: 72.3507,
@@ -6683,7 +9415,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5106,
     capitalKind: "admin_capital",
     population: 747800,
-    nameAscii: "Andijon"
+    nameAscii: "Andijon",
+    countryCode: "UZ"
 },
   {
     lon: 43.975,
@@ -6691,7 +9424,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5101,
     capitalKind: "admin_capital",
     population: 745353,
-    nameAscii: "Buraydah"
+    nameAscii: "Buraydah",
+    countryCode: "SA"
 },
   {
     lon: 71.446,
@@ -6699,7 +9433,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5099,
     capitalKind: "country_capital",
     population: 345604,
-    nameAscii: "Astana"
+    nameAscii: "Astana",
+    countryCode: "KZ"
 },
   {
     lon: 130.2903,
@@ -6707,7 +9442,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5096,
     capitalKind: "admin_capital",
     population: 743307,
-    nameAscii: "Hegang"
+    nameAscii: "Hegang",
+    countryCode: "CN"
 },
   {
     lon: -101.1844,
@@ -6715,7 +9451,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5096,
     capitalKind: "admin_capital",
     population: 743275,
-    nameAscii: "Morelia"
+    nameAscii: "Morelia",
+    countryCode: "MX"
 },
   {
     lon: 43.1056,
@@ -6723,7 +9460,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5094,
     capitalKind: "place",
     population: 2065597,
-    nameAscii: "Al Mawsil al Jadidah"
+    nameAscii: "Al Mawsil al Jadidah",
+    countryCode: "IQ"
 },
   {
     lon: 118.5101,
@@ -6731,7 +9469,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5092,
     capitalKind: "admin_capital",
     population: 741531,
-    nameAscii: "Ma'anshan"
+    nameAscii: "Ma'anshan",
+    countryCode: "CN"
 },
   {
     lon: 101.5328,
@@ -6739,15 +9478,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5091,
     capitalKind: "admin_capital",
     population: 740750,
-    nameAscii: "Shah Alam"
-},
-  {
-    lon: 18.6491,
-    lat: 54.3523,
-    weight: 0.5089,
-    capitalKind: "admin_capital",
-    population: 740000,
-    nameAscii: "Gdansk"
+    nameAscii: "Shah Alam",
+    countryCode: "MY"
 },
   {
     lon: 106.3892,
@@ -6755,23 +9487,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5088,
     capitalKind: "admin_capital",
     population: 739400,
-    nameAscii: "Shizuishan"
-},
-  {
-    lon: 130.6918,
-    lat: 32.8059,
-    weight: 0.5087,
-    capitalKind: "admin_capital",
-    population: 738907,
-    nameAscii: "Kumamoto"
-},
-  {
-    lon: 11.0775,
-    lat: 49.4542,
-    weight: 0.5084,
-    capitalKind: "admin_capital",
-    population: 737304,
-    nameAscii: "Nuernberg"
+    nameAscii: "Shizuishan",
+    countryCode: "CN"
 },
   {
     lon: 3.9324,
@@ -6779,7 +9496,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5081,
     capitalKind: "admin_capital",
     population: 736072,
-    nameAscii: "Oyo"
+    nameAscii: "Oyo",
+    countryCode: "NG"
 },
   {
     lon: 104.382,
@@ -6787,7 +9505,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5079,
     capitalKind: "admin_capital",
     population: 735070,
-    nameAscii: "Deyang"
+    nameAscii: "Deyang",
+    countryCode: "CN"
 },
   {
     lon: 3.3451,
@@ -6795,7 +9514,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5079,
     capitalKind: "admin_capital",
     population: 735000,
-    nameAscii: "Abeokuta"
+    nameAscii: "Abeokuta",
+    countryCode: "NG"
 },
   {
     lon: 119.1019,
@@ -6803,7 +9523,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5078,
     capitalKind: "place",
     population: 2044028,
-    nameAscii: "Weifang"
+    nameAscii: "Weifang",
+    countryCode: "CN"
 },
   {
     lon: -93.0933,
@@ -6811,7 +9532,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5078,
     capitalKind: "admin_capital",
     population: 734854,
-    nameAscii: "Saint Paul"
+    nameAscii: "Saint Paul",
+    countryCode: "US"
 },
   {
     lon: 77.75,
@@ -6819,7 +9541,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5077,
     capitalKind: "admin_capital",
     population: 734451,
-    nameAscii: "Amravati"
+    nameAscii: "Amravati",
+    countryCode: "IN"
 },
   {
     lon: 115.2167,
@@ -6827,7 +9550,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5073,
     capitalKind: "admin_capital",
     population: 732344,
-    nameAscii: "Denpasar"
+    nameAscii: "Denpasar",
+    countryCode: "ID"
 },
   {
     lon: -118.1892,
@@ -6835,7 +9559,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5072,
     capitalKind: "place",
     population: 2036134,
-    nameAscii: "Long Beach"
+    nameAscii: "Long Beach",
+    countryCode: "US"
+},
+  {
+    lon: 135.8667,
+    lat: 35.0,
+    weight: 0.5071,
+    capitalKind: "admin_capital",
+    population: 536976,
+    nameAscii: "Otsu",
+    countryCode: "JP"
 },
   {
     lon: 5.1931,
@@ -6843,7 +9577,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5068,
     capitalKind: "admin_capital",
     population: 730000,
-    nameAscii: "Akure"
+    nameAscii: "Akure",
+    countryCode: "NG"
 },
   {
     lon: 109.1155,
@@ -6851,7 +9586,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5066,
     capitalKind: "admin_capital",
     population: 728978,
-    nameAscii: "Beihai"
+    nameAscii: "Beihai",
+    countryCode: "CN"
 },
   {
     lon: 75.8333,
@@ -6859,7 +9595,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5064,
     capitalKind: "place",
     population: 2026000,
-    nameAscii: "Indore"
+    nameAscii: "Indore",
+    countryCode: "IN"
+},
+  {
+    lon: 132.7657,
+    lat: 33.8392,
+    weight: 0.5061,
+    capitalKind: "admin_capital",
+    population: 533541,
+    nameAscii: "Matsuyama",
+    countryCode: "JP"
 },
   {
     lon: 120.9667,
@@ -6867,7 +9613,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5058,
     capitalKind: "admin_capital",
     population: 725173,
-    nameAscii: "Valenzuela"
+    nameAscii: "Valenzuela",
+    countryCode: "PH"
 },
   {
     lon: 73.4708,
@@ -6875,15 +9622,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5057,
     capitalKind: "admin_capital",
     population: 725000,
-    nameAscii: "Muzaffarabad"
-},
-  {
-    lon: 8.8072,
-    lat: 53.0758,
-    weight: 0.5057,
-    capitalKind: "admin_capital",
-    population: 724909,
-    nameAscii: "Bremen"
+    nameAscii: "Muzaffarabad",
+    countryCode: "PK"
 },
   {
     lon: 47.8151,
@@ -6891,7 +9631,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5056,
     capitalKind: "place",
     population: 2015483,
-    nameAscii: "Al Basrah al Qadimah"
+    nameAscii: "Al Basrah al Qadimah",
+    countryCode: "IQ"
 },
   {
     lon: 45.4309,
@@ -6899,15 +9640,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5053,
     capitalKind: "admin_capital",
     population: 723170,
-    nameAscii: "As Sulaymaniyah"
+    nameAscii: "As Sulaymaniyah",
+    countryCode: "IQ"
 },
   {
-    lon: 9.7332,
-    lat: 52.3705,
+    lon: 134.7,
+    lat: 34.8167,
     weight: 0.5052,
     capitalKind: "admin_capital",
-    population: 722490,
-    nameAscii: "Hannover"
+    population: 530495,
+    nameAscii: "Himeji",
+    countryCode: "JP"
 },
   {
     lon: 114.0294,
@@ -6915,7 +9658,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.505,
     capitalKind: "admin_capital",
     population: 721670,
-    nameAscii: "Zhumadian"
+    nameAscii: "Zhumadian",
+    countryCode: "CN"
 },
   {
     lon: 37.3333,
@@ -6923,15 +9667,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5049,
     capitalKind: "admin_capital",
     population: 721018,
-    nameAscii: "Moshi"
-},
-  {
-    lon: 139.2417,
-    lat: 35.5671,
-    weight: 0.5048,
-    capitalKind: "admin_capital",
-    population: 720780,
-    nameAscii: "Sagamihara"
+    nameAscii: "Moshi",
+    countryCode: "TZ"
 },
   {
     lon: -122.4443,
@@ -6939,7 +9676,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5046,
     capitalKind: "admin_capital",
     population: 719868,
-    nameAscii: "Tacoma"
+    nameAscii: "Tacoma",
+    countryCode: "US"
 },
   {
     lon: 65.7101,
@@ -6947,7 +9685,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5037,
     capitalKind: "admin_capital",
     population: 715542,
-    nameAscii: "Kandahar"
+    nameAscii: "Kandahar",
+    countryCode: "AF"
 },
   {
     lon: 78.0339,
@@ -6955,7 +9694,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5034,
     capitalKind: "admin_capital",
     population: 714223,
-    nameAscii: "Dehradun"
+    nameAscii: "Dehradun",
+    countryCode: "IN"
 },
   {
     lon: -47.8103,
@@ -6963,7 +9703,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5029,
     capitalKind: "admin_capital",
     population: 711825,
-    nameAscii: "Ribeirao Preto"
+    nameAscii: "Ribeirao Preto",
+    countryCode: "BR"
 },
   {
     lon: 127.1489,
@@ -6971,7 +9712,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5028,
     capitalKind: "admin_capital",
     population: 711424,
-    nameAscii: "Jeonju"
+    nameAscii: "Jeonju",
+    countryCode: "KR"
 },
   {
     lon: 39.1979,
@@ -6979,7 +9721,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5024,
     capitalKind: "admin_capital",
     population: 709809,
-    nameAscii: "Zanzibar"
+    nameAscii: "Zanzibar",
+    countryCode: "TZ"
 },
   {
     lon: 35.7909,
@@ -6987,7 +9730,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5022,
     capitalKind: "admin_capital",
     population: 709000,
-    nameAscii: "Latakia"
+    nameAscii: "Latakia",
+    countryCode: "SY"
 },
   {
     lon: 66.9644,
@@ -6995,7 +9739,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.502,
     capitalKind: "admin_capital",
     population: 708000,
-    nameAscii: "Samarkand"
+    nameAscii: "Samarkand",
+    countryCode: "UZ"
 },
   {
     lon: 121.0175,
@@ -7003,7 +9748,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.501,
     capitalKind: "admin_capital",
     population: 703245,
-    nameAscii: "Paranaque City"
+    nameAscii: "Paranaque City",
+    countryCode: "PH"
 },
   {
     lon: -81.519,
@@ -7011,15 +9757,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5009,
     capitalKind: "admin_capital",
     population: 703200,
-    nameAscii: "Akron"
-},
-  {
-    lon: 138.3833,
-    lat: 34.9833,
-    weight: 0.5006,
-    capitalKind: "admin_capital",
-    population: 701561,
-    nameAscii: "Shizuoka"
+    nameAscii: "Akron",
+    countryCode: "US"
 },
   {
     lon: 73.0233,
@@ -7027,7 +9766,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5002,
     capitalKind: "admin_capital",
     population: 700000,
-    nameAscii: "Battagram"
+    nameAscii: "Battagram",
+    countryCode: "PK"
 },
   {
     lon: -69.8476,
@@ -7035,7 +9775,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5002,
     capitalKind: "admin_capital",
     population: 700000,
-    nameAscii: "Santo Domingo Este"
+    nameAscii: "Santo Domingo Este",
+    countryCode: "DO"
 },
   {
     lon: 32.5263,
@@ -7043,7 +9784,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5001,
     capitalKind: "admin_capital",
     population: 699541,
-    nameAscii: "Suez"
+    nameAscii: "Suez",
+    countryCode: "EG"
 },
   {
     lon: 28.5833,
@@ -7051,7 +9793,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5001,
     capitalKind: "admin_capital",
     population: 699385,
-    nameAscii: "Bulawayo"
+    nameAscii: "Bulawayo",
+    countryCode: "ZW"
 },
   {
     lon: -74.7646,
@@ -7059,7 +9802,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.5,
     capitalKind: "admin_capital",
     population: 698852,
-    nameAscii: "Soledad"
+    nameAscii: "Soledad",
+    countryCode: "CO"
 },
   {
     lon: 109.7816,
@@ -7067,7 +9811,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4997,
     capitalKind: "place",
     population: 1940653,
-    nameAscii: "Ordos"
+    nameAscii: "Ordos",
+    countryCode: "CN"
 },
   {
     lon: -5.5473,
@@ -7075,7 +9820,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4997,
     capitalKind: "admin_capital",
     population: 697628,
-    nameAscii: "Meknes"
+    nameAscii: "Meknes",
+    countryCode: "MA"
 },
   {
     lon: 116.8289,
@@ -7083,7 +9829,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4992,
     capitalKind: "admin_capital",
     population: 695287,
-    nameAscii: "Balikpapan"
+    nameAscii: "Balikpapan",
+    countryCode: "ID"
 },
   {
     lon: 80.2792,
@@ -7091,7 +9838,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4991,
     capitalKind: "admin_capital",
     population: 695000,
-    nameAscii: "Aqsu"
+    nameAscii: "Aqsu",
+    countryCode: "CN"
 },
   {
     lon: 80.2361,
@@ -7099,7 +9847,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4991,
     capitalKind: "admin_capital",
     population: 695000,
-    nameAscii: "Wensu"
+    nameAscii: "Wensu",
+    countryCode: "CN"
 },
   {
     lon: -57.9544,
@@ -7107,7 +9856,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4989,
     capitalKind: "admin_capital",
     population: 694253,
-    nameAscii: "La Plata"
+    nameAscii: "La Plata",
+    countryCode: "AR"
 },
   {
     lon: 9.8439,
@@ -7115,7 +9865,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4988,
     capitalKind: "admin_capital",
     population: 693700,
-    nameAscii: "Bauchi"
+    nameAscii: "Bauchi",
+    countryCode: "NG"
 },
   {
     lon: 106.1542,
@@ -7123,7 +9874,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4985,
     capitalKind: "admin_capital",
     population: 692101,
-    nameAscii: "Serang"
+    nameAscii: "Serang",
+    countryCode: "ID"
 },
   {
     lon: 112.6849,
@@ -7131,7 +9883,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4976,
     capitalKind: "admin_capital",
     population: 688242,
-    nameAscii: "Changsha"
+    nameAscii: "Changsha",
+    countryCode: "CN"
 },
   {
     lon: 115.0481,
@@ -7139,7 +9892,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4976,
     capitalKind: "admin_capital",
     population: 688090,
-    nameAscii: "Huangshi"
+    nameAscii: "Huangshi",
+    countryCode: "CN"
 },
   {
     lon: 34.8389,
@@ -7147,7 +9901,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4975,
     capitalKind: "admin_capital",
     population: 687764,
-    nameAscii: "Beira"
+    nameAscii: "Beira",
+    countryCode: "MZ"
 },
   {
     lon: 106.63,
@@ -7155,7 +9910,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4974,
     capitalKind: "place",
     population: 1912679,
-    nameAscii: "Tangerang"
+    nameAscii: "Tangerang",
+    countryCode: "ID"
 },
   {
     lon: -47.4581,
@@ -7163,15 +9919,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4974,
     capitalKind: "admin_capital",
     population: 687357,
-    nameAscii: "Sorocaba"
-},
-  {
-    lon: -0.8773,
-    lat: 41.6561,
-    weight: 0.4973,
-    capitalKind: "admin_capital",
-    population: 686986,
-    nameAscii: "Zaragoza"
+    nameAscii: "Sorocaba",
+    countryCode: "BR"
 },
   {
     lon: 106.6268,
@@ -7179,7 +9928,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4971,
     capitalKind: "admin_capital",
     population: 686078,
-    nameAscii: "Baise"
+    nameAscii: "Baise",
+    countryCode: "CN"
 },
   {
     lon: 114.0098,
@@ -7187,7 +9937,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4971,
     capitalKind: "admin_capital",
     population: 685967,
-    nameAscii: "Situbondo"
+    nameAscii: "Situbondo",
+    countryCode: "ID"
 },
   {
     lon: -37.0717,
@@ -7195,7 +9946,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4969,
     capitalKind: "admin_capital",
     population: 685356,
-    nameAscii: "Aracaju"
+    nameAscii: "Aracaju",
+    countryCode: "BR"
 },
   {
     lon: -121.2908,
@@ -7203,7 +9955,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4969,
     capitalKind: "admin_capital",
     population: 685306,
-    nameAscii: "Stockton"
+    nameAscii: "Stockton",
+    countryCode: "US"
 },
   {
     lon: 77.2148,
@@ -7211,7 +9964,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4968,
     capitalKind: "country_capital",
     population: 317797,
-    nameAscii: "New Delhi"
+    nameAscii: "New Delhi",
+    countryCode: "IN"
 },
   {
     lon: 118.0167,
@@ -7219,15 +9973,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4963,
     capitalKind: "admin_capital",
     population: 682717,
-    nameAscii: "Binzhou"
-},
-  {
-    lon: 7.0955,
-    lat: 50.7344,
-    weight: 0.4958,
-    capitalKind: "admin_capital",
-    population: 680543,
-    nameAscii: "Bonn"
+    nameAscii: "Binzhou",
+    countryCode: "CN"
 },
   {
     lon: 110.9928,
@@ -7235,7 +9982,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4957,
     capitalKind: "admin_capital",
     population: 680036,
-    nameAscii: "Yuncheng"
+    nameAscii: "Yuncheng",
+    countryCode: "CN"
 },
   {
     lon: 116.3671,
@@ -7243,15 +9991,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4956,
     capitalKind: "admin_capital",
     population: 679535,
-    nameAscii: "Dezhou"
+    nameAscii: "Dezhou",
+    countryCode: "CN"
 },
   {
-    lon: 14.5051,
-    lat: 46.0511,
-    weight: 0.4953,
-    capitalKind: "country_capital",
-    population: 314807,
-    nameAscii: "Ljubljana"
+    lon: 136.5167,
+    lat: 34.7333,
+    weight: 0.4955,
+    capitalKind: "admin_capital",
+    population: 500000,
+    nameAscii: "Tsu",
+    countryCode: "JP"
 },
   {
     lon: 79.987,
@@ -7259,15 +10009,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4952,
     capitalKind: "admin_capital",
     population: 678004,
-    nameAscii: "Nellore"
+    nameAscii: "Nellore",
+    countryCode: "IN"
 },
   {
-    lon: 15.0704,
-    lat: 37.4922,
-    weight: 0.4944,
+    lon: 139.9014,
+    lat: 35.7799,
+    weight: 0.4951,
     capitalKind: "admin_capital",
-    population: 674542,
-    nameAscii: "Catania"
+    population: 498575,
+    nameAscii: "Matsudo",
+    countryCode: "JP"
 },
   {
     lon: -100.2565,
@@ -7275,7 +10027,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4942,
     capitalKind: "admin_capital",
     population: 673616,
-    nameAscii: "Guadalupe"
+    nameAscii: "Guadalupe",
+    countryCode: "MX"
 },
   {
     lon: 113.2914,
@@ -7283,7 +10036,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4941,
     capitalKind: "place",
     population: 1873000,
-    nameAscii: "Datong"
+    nameAscii: "Datong",
+    countryCode: "CN"
 },
   {
     lon: -13.6878,
@@ -7291,7 +10045,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.494,
     capitalKind: "place",
     population: 1871242,
-    nameAscii: "Camayenne"
+    nameAscii: "Camayenne",
+    countryCode: "GN"
 },
   {
     lon: 129.7758,
@@ -7299,15 +10054,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.494,
     capitalKind: "admin_capital",
     population: 672614,
-    nameAscii: "Chongjin"
+    nameAscii: "Chongjin",
+    countryCode: "KP"
 },
   {
-    lon: 17.0301,
-    lat: 51.1029,
-    weight: 0.494,
+    lon: 135.5833,
+    lat: 34.6667,
+    weight: 0.4936,
     capitalKind: "admin_capital",
-    population: 672545,
-    nameAscii: "Wroclaw"
+    population: 493940,
+    nameAscii: "Higashiosaka",
+    countryCode: "JP"
 },
   {
     lon: 7.6018,
@@ -7315,7 +10072,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4934,
     capitalKind: "admin_capital",
     population: 670000,
-    nameAscii: "Katsina"
+    nameAscii: "Katsina",
+    countryCode: "NG"
 },
   {
     lon: 111.1929,
@@ -7323,7 +10081,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4932,
     capitalKind: "admin_capital",
     population: 669307,
-    nameAscii: "Sanmenxia"
+    nameAscii: "Sanmenxia",
+    countryCode: "CN"
 },
   {
     lon: 72.35,
@@ -7331,7 +10090,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4931,
     capitalKind: "place",
     population: 1860310,
-    nameAscii: "Saidu"
+    nameAscii: "Saidu",
+    countryCode: "PK"
 },
   {
     lon: 114.8865,
@@ -7339,15 +10099,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4931,
     capitalKind: "admin_capital",
     population: 668727,
-    nameAscii: "E'zhou"
-},
-  {
-    lon: 139.8833,
-    lat: 36.5667,
-    weight: 0.4929,
-    capitalKind: "admin_capital",
-    population: 667752,
-    nameAscii: "Utsunomiya"
+    nameAscii: "E'zhou",
+    countryCode: "CN"
 },
   {
     lon: 36.5715,
@@ -7355,7 +10108,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4927,
     capitalKind: "admin_capital",
     population: 667000,
-    nameAscii: "Tabuk"
+    nameAscii: "Tabuk",
+    countryCode: "SA"
 },
   {
     lon: 115.0436,
@@ -7363,7 +10117,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4925,
     capitalKind: "admin_capital",
     population: 666322,
-    nameAscii: "Puyang"
+    nameAscii: "Puyang",
+    countryCode: "CN"
 },
   {
     lon: 115.0279,
@@ -7371,7 +10126,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4925,
     capitalKind: "admin_capital",
     population: 666322,
-    nameAscii: "Puyang Chengguanzhen"
+    nameAscii: "Puyang Chengguanzhen",
+    countryCode: "CN"
 },
   {
     lon: 44.3462,
@@ -7379,7 +10135,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4923,
     capitalKind: "admin_capital",
     population: 665552,
-    nameAscii: "Najaf"
+    nameAscii: "Najaf",
+    countryCode: "IQ"
 },
   {
     lon: -76.1474,
@@ -7387,15 +10144,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4916,
     capitalKind: "admin_capital",
     population: 662577,
-    nameAscii: "Syracuse"
-},
-  {
-    lon: 18.9328,
-    lat: 50.348,
-    weight: 0.4916,
-    capitalKind: "admin_capital",
-    population: 662247,
-    nameAscii: "Bytom"
+    nameAscii: "Syracuse",
+    countryCode: "US"
 },
   {
     lon: 72.9635,
@@ -7403,7 +10153,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4915,
     capitalKind: "place",
     population: 1841488,
-    nameAscii: "Thane"
+    nameAscii: "Thane",
+    countryCode: "IN"
 },
   {
     lon: -99.0622,
@@ -7411,7 +10162,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.491,
     capitalKind: "place",
     population: 1835486,
-    nameAscii: "Iztapalapa"
+    nameAscii: "Iztapalapa",
+    countryCode: "MX"
+},
+  {
+    lon: 135.332,
+    lat: 34.7156,
+    weight: 0.4908,
+    capitalKind: "admin_capital",
+    population: 485587,
+    nameAscii: "Nishinomiya",
+    countryCode: "JP"
 },
   {
     lon: 109.325,
@@ -7419,7 +10180,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4907,
     capitalKind: "admin_capital",
     population: 658685,
-    nameAscii: "Pontianak"
+    nameAscii: "Pontianak",
+    countryCode: "ID"
 },
   {
     lon: 114.5907,
@@ -7427,7 +10189,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4905,
     capitalKind: "admin_capital",
     population: 657663,
-    nameAscii: "Banjarmasin"
+    nameAscii: "Banjarmasin",
+    countryCode: "ID"
 },
   {
     lon: 79.8298,
@@ -7435,7 +10198,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4904,
     capitalKind: "admin_capital",
     population: 657209,
-    nameAscii: "Puducherry"
+    nameAscii: "Puducherry",
+    countryCode: "IN"
 },
   {
     lon: 32.2722,
@@ -7443,7 +10207,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4901,
     capitalKind: "admin_capital",
     population: 656135,
-    nameAscii: "Ismailia"
+    nameAscii: "Ismailia",
+    countryCode: "EG"
+},
+  {
+    lon: 133.7667,
+    lat: 34.5833,
+    weight: 0.4901,
+    capitalKind: "admin_capital",
+    population: 483576,
+    nameAscii: "Kurashiki",
+    countryCode: "JP"
 },
   {
     lon: -83.9207,
@@ -7451,7 +10225,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4899,
     capitalKind: "admin_capital",
     population: 655400,
-    nameAscii: "Knoxville"
+    nameAscii: "Knoxville",
+    countryCode: "US"
 },
   {
     lon: -74.2168,
@@ -7459,7 +10234,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4899,
     capitalKind: "admin_capital",
     population: 655025,
-    nameAscii: "Soacha"
+    nameAscii: "Soacha",
+    countryCode: "CO"
 },
   {
     lon: 73.2081,
@@ -7467,15 +10243,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4898,
     capitalKind: "place",
     population: 1822221,
-    nameAscii: "Vadodara"
-},
-  {
-    lon: 33.394,
-    lat: 47.9057,
-    weight: 0.4892,
-    capitalKind: "admin_capital",
-    population: 652380,
-    nameAscii: "Kryvyy Rih"
+    nameAscii: "Vadodara",
+    countryCode: "IN"
 },
   {
     lon: 89.1789,
@@ -7483,7 +10252,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4891,
     capitalKind: "admin_capital",
     population: 651853,
-    nameAscii: "Turpan"
+    nameAscii: "Turpan",
+    countryCode: "CN"
 },
   {
     lon: -103.2934,
@@ -7491,7 +10261,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4887,
     capitalKind: "admin_capital",
     population: 650123,
-    nameAscii: "Tlaquepaque"
+    nameAscii: "Tlaquepaque",
+    countryCode: "MX"
 },
   {
     lon: 35.85,
@@ -7499,23 +10270,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4886,
     capitalKind: "admin_capital",
     population: 650000,
-    nameAscii: "Irbid"
+    nameAscii: "Irbid",
+    countryCode: "JO"
 },
   {
-    lon: 53.1986,
-    lat: 56.8522,
-    weight: 0.4882,
+    lon: 131.6,
+    lat: 33.2333,
+    weight: 0.4881,
     capitalKind: "admin_capital",
-    population: 648213,
-    nameAscii: "Izhevsk"
-},
-  {
-    lon: 8.9444,
-    lat: 44.4048,
-    weight: 0.488,
-    capitalKind: "admin_capital",
-    population: 647497,
-    nameAscii: "Genoa"
+    population: 477715,
+    nameAscii: "Oita",
+    countryCode: "JP"
 },
   {
     lon: -63.1832,
@@ -7523,7 +10288,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.488,
     capitalKind: "admin_capital",
     population: 647459,
-    nameAscii: "Maturin"
+    nameAscii: "Maturin",
+    countryCode: "VE"
 },
   {
     lon: 2.6036,
@@ -7531,7 +10297,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4878,
     capitalKind: "country_capital",
     population: 300000,
-    nameAscii: "Porto-Novo"
+    nameAscii: "Porto-Novo",
+    countryCode: "BJ"
 },
   {
     lon: 4.557,
@@ -7539,7 +10306,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4874,
     capitalKind: "admin_capital",
     population: 645000,
-    nameAscii: "Osogbo"
+    nameAscii: "Osogbo",
+    countryCode: "NG"
 },
   {
     lon: -35.0147,
@@ -7547,15 +10315,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4872,
     capitalKind: "admin_capital",
     population: 644037,
-    nameAscii: "Jaboatao dos Guararapes"
-},
-  {
-    lon: 48.3866,
-    lat: 54.3282,
-    weight: 0.4864,
-    capitalKind: "admin_capital",
-    population: 640680,
-    nameAscii: "Ulyanovsk"
+    nameAscii: "Jaboatao dos Guararapes",
+    countryCode: "BR"
 },
   {
     lon: 86.0369,
@@ -7563,15 +10324,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4862,
     capitalKind: "admin_capital",
     population: 640000,
-    nameAscii: "Shihezi"
-},
-  {
-    lon: 5.1222,
-    lat: 52.0908,
-    weight: 0.4862,
-    capitalKind: "admin_capital",
-    population: 640000,
-    nameAscii: "Utrecht"
+    nameAscii: "Shihezi",
+    countryCode: "CN"
 },
   {
     lon: 114.9401,
@@ -7579,7 +10333,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4859,
     capitalKind: "country_capital",
     population: 296500,
-    nameAscii: "Bandar Seri Begawan"
+    nameAscii: "Bandar Seri Begawan",
+    countryCode: "BN"
 },
   {
     lon: 48.0839,
@@ -7587,7 +10342,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4856,
     capitalKind: "admin_capital",
     population: 637411,
-    nameAscii: "Al Ahmadi"
+    nameAscii: "Al Ahmadi",
+    countryCode: "KW"
 },
   {
     lon: -78.9963,
@@ -7595,7 +10351,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4855,
     capitalKind: "admin_capital",
     population: 636996,
-    nameAscii: "Cuenca"
+    nameAscii: "Cuenca",
+    countryCode: "EC"
 },
   {
     lon: 110.3647,
@@ -7603,7 +10360,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4854,
     capitalKind: "admin_capital",
     population: 636660,
-    nameAscii: "Yogyakarta"
+    nameAscii: "Yogyakarta",
+    countryCode: "ID"
 },
   {
     lon: 118.7734,
@@ -7611,7 +10369,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4853,
     capitalKind: "place",
     population: 1770000,
-    nameAscii: "Shuyang"
+    nameAscii: "Shuyang",
+    countryCode: "CN"
+},
+  {
+    lon: 133.3667,
+    lat: 34.4833,
+    weight: 0.4851,
+    capitalKind: "admin_capital",
+    population: 468812,
+    nameAscii: "Fukuyama",
+    countryCode: "JP"
 },
   {
     lon: -61.5189,
@@ -7619,7 +10387,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4851,
     capitalKind: "country_capital",
     population: 294934,
-    nameAscii: "Port of Spain"
+    nameAscii: "Port of Spain",
+    countryCode: "TT"
 },
   {
     lon: 114.2862,
@@ -7627,7 +10396,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4849,
     capitalKind: "admin_capital",
     population: 634721,
-    nameAscii: "Hebi"
+    nameAscii: "Hebi",
+    countryCode: "CN"
 },
   {
     lon: 20.7999,
@@ -7635,7 +10405,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4849,
     capitalKind: "admin_capital",
     population: 634529,
-    nameAscii: "Tshikapa"
+    nameAscii: "Tshikapa",
+    countryCode: "CD"
 },
   {
     lon: 112.2047,
@@ -7643,7 +10414,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4845,
     capitalKind: "admin_capital",
     population: 632954,
-    nameAscii: "Jingmen"
+    nameAscii: "Jingmen",
+    countryCode: "CN"
 },
   {
     lon: 107.386,
@@ -7651,15 +10423,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4844,
     capitalKind: "place",
     population: 1760000,
-    nameAscii: "Bayan Nur"
-},
-  {
-    lon: 83.7279,
-    lat: 53.362,
-    weight: 0.4844,
-    capitalKind: "admin_capital",
-    population: 632372,
-    nameAscii: "Barnaul"
+    nameAscii: "Bayan Nur",
+    countryCode: "CN"
 },
   {
     lon: 115.65,
@@ -7667,7 +10432,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4838,
     capitalKind: "place",
     population: 1753000,
-    nameAscii: "Shangqiu"
+    nameAscii: "Shangqiu",
+    countryCode: "CN"
 },
   {
     lon: 28.6366,
@@ -7675,7 +10441,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4831,
     capitalKind: "admin_capital",
     population: 627503,
-    nameAscii: "Ndola"
+    nameAscii: "Ndola",
+    countryCode: "ZM"
 },
   {
     lon: -71.2145,
@@ -7683,23 +10450,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4823,
     capitalKind: "admin_capital",
     population: 624177,
-    nameAscii: "Quebec"
-},
-  {
-    lon: 16.9299,
-    lat: 52.4069,
-    weight: 0.4823,
-    capitalKind: "admin_capital",
-    population: 623997,
-    nameAscii: "Poznan"
-},
-  {
-    lon: 104.2908,
-    lat: 52.2957,
-    weight: 0.4822,
-    capitalKind: "admin_capital",
-    population: 623869,
-    nameAscii: "Irkutsk"
+    nameAscii: "Quebec",
+    countryCode: "CA"
 },
   {
     lon: 31.3807,
@@ -7707,7 +10459,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4818,
     capitalKind: "admin_capital",
     population: 621953,
-    nameAscii: "Al Mansurah"
+    nameAscii: "Al Mansurah",
+    countryCode: "EG"
+},
+  {
+    lon: 135.4167,
+    lat: 34.7167,
+    weight: 0.4818,
+    capitalKind: "admin_capital",
+    population: 459593,
+    nameAscii: "Amagasaki",
+    countryCode: "JP"
 },
   {
     lon: 83.3162,
@@ -7715,7 +10477,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4815,
     capitalKind: "place",
     population: 1728128,
-    nameAscii: "Rasapudipalem"
+    nameAscii: "Rasapudipalem",
+    countryCode: "IN"
 },
   {
     lon: 73.8037,
@@ -7723,7 +10486,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4815,
     capitalKind: "place",
     population: 1727692,
-    nameAscii: "Pimpri-Chinchwad"
+    nameAscii: "Pimpri-Chinchwad",
+    countryCode: "IN"
 },
   {
     lon: 120.0033,
@@ -7731,7 +10495,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4811,
     capitalKind: "admin_capital",
     population: 619266,
-    nameAscii: "Jiaozhou"
+    nameAscii: "Jiaozhou",
+    countryCode: "CN"
 },
   {
     lon: 113.3631,
@@ -7739,7 +10504,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4809,
     capitalKind: "admin_capital",
     population: 618582,
-    nameAscii: "Suizhou"
+    nameAscii: "Suizhou",
+    countryCode: "CN"
 },
   {
     lon: -90.5854,
@@ -7747,23 +10513,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4809,
     capitalKind: "admin_capital",
     population: 618397,
-    nameAscii: "Villa Nueva"
-},
-  {
-    lon: 0.7143,
-    lat: 51.5378,
-    weight: 0.4809,
-    capitalKind: "admin_capital",
-    population: 618386,
-    nameAscii: "Southend-on-Sea"
-},
-  {
-    lon: 135.0971,
-    lat: 48.462,
-    weight: 0.4808,
-    capitalKind: "admin_capital",
-    population: 618150,
-    nameAscii: "Khabarovsk"
+    nameAscii: "Villa Nueva",
+    countryCode: "GT"
 },
   {
     lon: 36.6833,
@@ -7771,23 +10522,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4807,
     capitalKind: "admin_capital",
     population: 617631,
-    nameAscii: "Arusha"
-},
-  {
-    lon: 13.7383,
-    lat: 51.0509,
-    weight: 0.4806,
-    capitalKind: "admin_capital",
-    population: 617515,
-    nameAscii: "Dresden"
-},
-  {
-    lon: 8.2444,
-    lat: 50.086,
-    weight: 0.4805,
-    capitalKind: "admin_capital",
-    population: 617126,
-    nameAscii: "Wiesbaden"
+    nameAscii: "Arusha",
+    countryCode: "TZ"
 },
   {
     lon: 34.6389,
@@ -7795,7 +10531,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4805,
     capitalKind: "admin_capital",
     population: 616990,
-    nameAscii: "Mersin"
+    nameAscii: "Mersin",
+    countryCode: "TR"
 },
   {
     lon: -119.7724,
@@ -7803,7 +10540,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4803,
     capitalKind: "admin_capital",
     population: 616353,
-    nameAscii: "Fresno"
+    nameAscii: "Fresno",
+    countryCode: "US"
 },
   {
     lon: 120.9828,
@@ -7811,7 +10549,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4801,
     capitalKind: "admin_capital",
     population: 615549,
-    nameAscii: "Las Pinas"
+    nameAscii: "Las Pinas",
+    countryCode: "PH"
 },
   {
     lon: 117.4778,
@@ -7819,7 +10558,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4801,
     capitalKind: "admin_capital",
     population: 615274,
-    nameAscii: "Chizhou"
+    nameAscii: "Chizhou",
+    countryCode: "CN"
 },
   {
     lon: 113.1,
@@ -7827,7 +10567,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4797,
     capitalKind: "place",
     population: 1708000,
-    nameAscii: "Jingling"
+    nameAscii: "Jingling",
+    countryCode: "CN"
 },
   {
     lon: 86.1523,
@@ -7835,7 +10576,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4795,
     capitalKind: "admin_capital",
     population: 613000,
-    nameAscii: "Korla"
+    nameAscii: "Korla",
+    countryCode: "CN"
+},
+  {
+    lon: 139.85,
+    lat: 35.7333,
+    weight: 0.4795,
+    capitalKind: "admin_capital",
+    population: 453093,
+    nameAscii: "Katsushika",
+    countryCode: "JP"
 },
   {
     lon: 119.8708,
@@ -7843,7 +10594,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4793,
     capitalKind: "admin_capital",
     population: 612445,
-    nameAscii: "Palu"
+    nameAscii: "Palu",
+    countryCode: "ID"
 },
   {
     lon: 102.999,
@@ -7851,7 +10603,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4792,
     capitalKind: "admin_capital",
     population: 612056,
-    nameAscii: "Ya'an"
+    nameAscii: "Ya'an",
+    countryCode: "CN"
 },
   {
     lon: 147.1509,
@@ -7859,7 +10612,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.479,
     capitalKind: "country_capital",
     population: 283733,
-    nameAscii: "Port Moresby"
+    nameAscii: "Port Moresby",
+    countryCode: "PG"
 },
   {
     lon: 27.8585,
@@ -7867,7 +10621,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4785,
     capitalKind: "place",
     population: 1695047,
-    nameAscii: "Soweto"
+    nameAscii: "Soweto",
+    countryCode: "ZA"
 },
   {
     lon: 36.3361,
@@ -7875,7 +10630,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4785,
     capitalKind: "admin_capital",
     population: 609339,
-    nameAscii: "Samsun"
+    nameAscii: "Samsun",
+    countryCode: "TR"
 },
   {
     lon: 32.6421,
@@ -7883,23 +10639,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4785,
     capitalKind: "admin_capital",
     population: 609248,
-    nameAscii: "Luxor"
-},
-  {
-    lon: 39.8737,
-    lat: 57.6299,
-    weight: 0.4784,
-    capitalKind: "admin_capital",
-    population: 608722,
-    nameAscii: "Yaroslavl"
-},
-  {
-    lon: 11.9668,
-    lat: 57.7072,
-    weight: 0.4783,
-    capitalKind: "admin_capital",
-    population: 608462,
-    nameAscii: "Goeteborg"
+    nameAscii: "Luxor",
+    countryCode: "EG"
 },
   {
     lon: 116.4781,
@@ -7907,15 +10648,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.478,
     capitalKind: "place",
     population: 1690000,
-    nameAscii: "Luan"
-},
-  {
-    lon: 139.7107,
-    lat: 35.8052,
-    weight: 0.478,
-    capitalKind: "admin_capital",
-    population: 607373,
-    nameAscii: "Kawaguchi"
+    nameAscii: "Luan",
+    countryCode: "CN"
 },
   {
     lon: 103.6167,
@@ -7923,7 +10657,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4777,
     capitalKind: "admin_capital",
     population: 606200,
-    nameAscii: "Jambi City"
+    nameAscii: "Jambi City",
+    countryCode: "ID"
 },
   {
     lon: 41.6907,
@@ -7931,7 +10666,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4777,
     capitalKind: "admin_capital",
     population: 605930,
-    nameAscii: "Ha'il"
+    nameAscii: "Ha'il",
+    countryCode: "SA"
 },
   {
     lon: 6.6147,
@@ -7939,15 +10675,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4775,
     capitalKind: "admin_capital",
     population: 605179,
-    nameAscii: "Constantine"
-},
-  {
-    lon: 131.8735,
-    lat: 43.1056,
-    weight: 0.4774,
-    capitalKind: "admin_capital",
-    population: 604901,
-    nameAscii: "Vladivostok"
+    nameAscii: "Constantine",
+    countryCode: "DZ"
 },
   {
     lon: -93.1158,
@@ -7955,7 +10684,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4772,
     capitalKind: "admin_capital",
     population: 604147,
-    nameAscii: "Tuxtla"
+    nameAscii: "Tuxtla",
+    countryCode: "MX"
 },
   {
     lon: 117.6186,
@@ -7963,7 +10693,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4767,
     capitalKind: "admin_capital",
     population: 602166,
-    nameAscii: "Sanming"
+    nameAscii: "Sanming",
+    countryCode: "CN"
 },
   {
     lon: 13.4925,
@@ -7971,7 +10702,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4763,
     capitalKind: "admin_capital",
     population: 600751,
-    nameAscii: "Lubango"
+    nameAscii: "Lubango",
+    countryCode: "AO"
 },
   {
     lon: 83.9685,
@@ -7979,7 +10711,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4761,
     capitalKind: "admin_capital",
     population: 600051,
-    nameAscii: "Pokhara"
+    nameAscii: "Pokhara",
+    countryCode: "NP"
 },
   {
     lon: 131.1327,
@@ -7987,7 +10720,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4761,
     capitalKind: "admin_capital",
     population: 600000,
-    nameAscii: "Shuangyashan"
+    nameAscii: "Shuangyashan",
+    countryCode: "CN"
 },
   {
     lon: 31.6948,
@@ -7995,7 +10729,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4761,
     capitalKind: "admin_capital",
     population: 600000,
-    nameAscii: "Sohag"
+    nameAscii: "Sohag",
+    countryCode: "EG"
+},
+  {
+    lon: 134.5667,
+    lat: 34.0667,
+    weight: 0.4761,
+    capitalKind: "admin_capital",
+    population: 443760,
+    nameAscii: "Tokushima",
+    countryCode: "JP"
 },
   {
     lon: 116.9969,
@@ -8003,7 +10747,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4759,
     capitalKind: "place",
     population: 1666826,
-    nameAscii: "Huainan"
+    nameAscii: "Huainan",
+    countryCode: "CN"
 },
   {
     lon: 60.8629,
@@ -8011,7 +10756,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4758,
     capitalKind: "admin_capital",
     population: 598887,
-    nameAscii: "Zahedan"
+    nameAscii: "Zahedan",
+    countryCode: "IR"
 },
   {
     lon: 70.4515,
@@ -8019,7 +10765,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4756,
     capitalKind: "admin_capital",
     population: 597971,
-    nameAscii: "Jalalabad"
+    nameAscii: "Jalalabad",
+    countryCode: "AF"
 },
   {
     lon: 114.6463,
@@ -8027,7 +10774,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4754,
     capitalKind: "admin_capital",
     population: 597130,
-    nameAscii: "Luancheng"
+    nameAscii: "Luancheng",
+    countryCode: "CN"
 },
   {
     lon: -79.855,
@@ -8035,15 +10783,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4753,
     capitalKind: "admin_capital",
     population: 596792,
-    nameAscii: "Chiclayo"
-},
-  {
-    lon: 47.5003,
-    lat: 42.9778,
-    weight: 0.4752,
-    capitalKind: "admin_capital",
-    population: 596356,
-    nameAscii: "Makhachkala"
+    nameAscii: "Chiclayo",
+    countryCode: "PE"
 },
   {
     lon: 103.3821,
@@ -8051,15 +10792,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4749,
     capitalKind: "admin_capital",
     population: 595100,
-    nameAscii: "Mengzi"
-},
-  {
-    lon: 130.55,
-    lat: 31.5667,
-    weight: 0.4748,
-    capitalKind: "admin_capital",
-    population: 595049,
-    nameAscii: "Kagoshima"
+    nameAscii: "Mengzi",
+    countryCode: "CN"
 },
   {
     lon: 49.1242,
@@ -8067,7 +10801,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4748,
     capitalKind: "admin_capital",
     population: 594951,
-    nameAscii: "Mukalla"
+    nameAscii: "Mukalla",
+    countryCode: "YE"
+},
+  {
+    lon: 135.1667,
+    lat: 34.2333,
+    weight: 0.4748,
+    capitalKind: "admin_capital",
+    population: 440006,
+    nameAscii: "Wakayama",
+    countryCode: "JP"
 },
   {
     lon: 44.4196,
@@ -8075,7 +10819,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4747,
     capitalKind: "admin_capital",
     population: 594605,
-    nameAscii: "Al Hillah"
+    nameAscii: "Al Hillah",
+    countryCode: "IQ"
 },
   {
     lon: 49.5886,
@@ -8083,15 +10828,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4747,
     capitalKind: "admin_capital",
     population: 594590,
-    nameAscii: "Rasht"
+    nameAscii: "Rasht",
+    countryCode: "IR"
 },
   {
-    lon: 138.1833,
-    lat: 36.65,
+    lon: 139.4767,
+    lat: 35.3493,
     weight: 0.4746,
     capitalKind: "admin_capital",
-    population: 594311,
-    nameAscii: "Nagano"
+    population: 439728,
+    nameAscii: "Fujisawa",
+    countryCode: "JP"
 },
   {
     lon: -5.2767,
@@ -8099,7 +10846,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4745,
     capitalKind: "country_capital",
     population: 275686,
-    nameAscii: "Yamoussoukro"
+    nameAscii: "Yamoussoukro",
+    countryCode: "CI"
 },
   {
     lon: -57.5562,
@@ -8107,15 +10855,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4744,
     capitalKind: "admin_capital",
     population: 593337,
-    nameAscii: "Mar del Plata"
-},
-  {
-    lon: 7.4474,
-    lat: 46.9481,
-    weight: 0.4743,
-    capitalKind: "country_capital",
-    population: 275329,
-    nameAscii: "Bern"
+    nameAscii: "Mar del Plata",
+    countryCode: "AR"
 },
   {
     lon: 75.8538,
@@ -8123,15 +10864,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4742,
     capitalKind: "place",
     population: 1649000,
-    nameAscii: "Ludhiana"
-},
-  {
-    lon: -4.4203,
-    lat: 36.7202,
-    weight: 0.4739,
-    capitalKind: "admin_capital",
-    population: 591637,
-    nameAscii: "Malaga"
+    nameAscii: "Ludhiana",
+    countryCode: "IN"
 },
   {
     lon: 73.9856,
@@ -8139,7 +10873,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4739,
     capitalKind: "admin_capital",
     population: 591424,
-    nameAscii: "Shekhupura"
+    nameAscii: "Shekhupura",
+    countryCode: "PK"
 },
   {
     lon: -82.5306,
@@ -8147,7 +10882,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4735,
     capitalKind: "admin_capital",
     population: 589959,
-    nameAscii: "Sarasota"
+    nameAscii: "Sarasota",
+    countryCode: "US"
 },
   {
     lon: -98.2846,
@@ -8155,7 +10891,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4734,
     capitalKind: "admin_capital",
     population: 589466,
-    nameAscii: "Reynosa"
+    nameAscii: "Reynosa",
+    countryCode: "MX"
 },
   {
     lon: 122.99,
@@ -8163,7 +10900,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4732,
     capitalKind: "place",
     population: 1639000,
-    nameAscii: "Anshan"
+    nameAscii: "Anshan",
+    countryCode: "CN"
 },
   {
     lon: 106.7143,
@@ -8171,15 +10909,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4731,
     capitalKind: "admin_capital",
     population: 588616,
-    nameAscii: "Thuan An"
+    nameAscii: "Thuan An",
+    countryCode: "VN"
 },
   {
-    lon: 7.466,
-    lat: 51.5149,
+    lon: 129.8833,
+    lat: 32.75,
     weight: 0.4731,
     capitalKind: "admin_capital",
-    population: 588462,
-    nameAscii: "Dortmund"
+    population: 435455,
+    nameAscii: "Nagasaki",
+    countryCode: "JP"
 },
   {
     lon: -51.1628,
@@ -8187,7 +10927,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.473,
     capitalKind: "admin_capital",
     population: 588125,
-    nameAscii: "Londrina"
+    nameAscii: "Londrina",
+    countryCode: "BR"
 },
   {
     lon: 121.2168,
@@ -8195,7 +10936,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4726,
     capitalKind: "place",
     population: 1632616,
-    nameAscii: "Zhongli"
+    nameAscii: "Zhongli",
+    countryCode: "TW"
 },
   {
     lon: 117.1181,
@@ -8203,15 +10945,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4723,
     capitalKind: "place",
     population: 1629000,
-    nameAscii: "Taian"
+    nameAscii: "Taian",
+    countryCode: "CN"
 },
   {
-    lon: 139.3239,
-    lat: 35.6558,
-    weight: 0.4707,
+    lon: 139.9773,
+    lat: 35.8622,
+    weight: 0.4723,
     capitalKind: "admin_capital",
-    population: 579399,
-    nameAscii: "Hachioji"
+    population: 433436,
+    nameAscii: "Kashiwa",
+    countryCode: "JP"
+},
+  {
+    lon: 139.4508,
+    lat: 35.5403,
+    weight: 0.4714,
+    capitalKind: "admin_capital",
+    population: 431079,
+    nameAscii: "Machida",
+    countryCode: "JP"
 },
   {
     lon: 109.1943,
@@ -8219,7 +10972,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4706,
     capitalKind: "admin_capital",
     population: 579000,
-    nameAscii: "Nha Trang"
+    nameAscii: "Nha Trang",
+    countryCode: "VN"
 },
   {
     lon: -96.1429,
@@ -8227,7 +10981,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4706,
     capitalKind: "admin_capital",
     population: 578963,
-    nameAscii: "Veracruz"
+    nameAscii: "Veracruz",
+    countryCode: "MX"
 },
   {
     lon: -88.0834,
@@ -8235,7 +10990,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4704,
     capitalKind: "admin_capital",
     population: 578460,
-    nameAscii: "Joliet"
+    nameAscii: "Joliet",
+    countryCode: "US"
 },
   {
     lon: 57.0788,
@@ -8243,7 +10999,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4702,
     capitalKind: "admin_capital",
     population: 577514,
-    nameAscii: "Kerman"
+    nameAscii: "Kerman",
+    countryCode: "IR"
 },
   {
     lon: 45.0761,
@@ -8251,7 +11008,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4701,
     capitalKind: "admin_capital",
     population: 577307,
-    nameAscii: "Orumiyeh"
+    nameAscii: "Orumiyeh",
+    countryCode: "IR"
 },
   {
     lon: 31.0019,
@@ -8259,7 +11017,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4699,
     capitalKind: "admin_capital",
     population: 576648,
-    nameAscii: "Tanta"
+    nameAscii: "Tanta",
+    countryCode: "EG"
 },
   {
     lon: -91.5232,
@@ -8267,7 +11026,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4696,
     capitalKind: "admin_capital",
     population: 575263,
-    nameAscii: "Quetzaltenango"
+    nameAscii: "Quetzaltenango",
+    countryCode: "GT"
+},
+  {
+    lon: 137.15,
+    lat: 35.0833,
+    weight: 0.4696,
+    capitalKind: "admin_capital",
+    population: 426162,
+    nameAscii: "Toyota",
+    countryCode: "JP"
 },
   {
     lon: 121.1653,
@@ -8275,7 +11044,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4695,
     capitalKind: "admin_capital",
     population: 575046,
-    nameAscii: "Calamba"
+    nameAscii: "Calamba",
+    countryCode: "PH"
 },
   {
     lon: 62.1997,
@@ -8283,7 +11053,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4693,
     capitalKind: "admin_capital",
     population: 574300,
-    nameAscii: "Herat"
+    nameAscii: "Herat",
+    countryCode: "AF"
 },
   {
     lon: 74.0754,
@@ -8291,15 +11062,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4693,
     capitalKind: "admin_capital",
     population: 574240,
-    nameAscii: "Gujrat"
-},
-  {
-    lon: 84.9822,
-    lat: 56.5005,
-    weight: 0.4692,
-    capitalKind: "admin_capital",
-    population: 574002,
-    nameAscii: "Tomsk"
+    nameAscii: "Gujrat",
+    countryCode: "PK"
 },
   {
     lon: -43.3503,
@@ -8307,7 +11071,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.469,
     capitalKind: "admin_capital",
     population: 573285,
-    nameAscii: "Juiz de Fora"
+    nameAscii: "Juiz de Fora",
+    countryCode: "BR"
 },
   {
     lon: 36.0722,
@@ -8315,7 +11080,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4683,
     capitalKind: "admin_capital",
     population: 570674,
-    nameAscii: "Nakuru"
+    nameAscii: "Nakuru",
+    countryCode: "KE"
 },
   {
     lon: 110.3333,
@@ -8323,7 +11089,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4682,
     capitalKind: "admin_capital",
     population: 570407,
-    nameAscii: "Kuching"
+    nameAscii: "Kuching",
+    countryCode: "MY"
 },
   {
     lon: -58.1553,
@@ -8331,7 +11098,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.468,
     capitalKind: "country_capital",
     population: 264350,
-    nameAscii: "Georgetown"
+    nameAscii: "Georgetown",
+    countryCode: "GY"
 },
   {
     lon: 119.4358,
@@ -8339,7 +11107,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4679,
     capitalKind: "place",
     population: 1584237,
-    nameAscii: "Yangzhou"
+    nameAscii: "Yangzhou",
+    countryCode: "CN"
 },
   {
     lon: 102.2433,
@@ -8347,7 +11116,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4678,
     capitalKind: "admin_capital",
     population: 568900,
-    nameAscii: "Kota Bharu"
+    nameAscii: "Kota Bharu",
+    countryCode: "MY"
 },
   {
     lon: -75.6949,
@@ -8355,7 +11125,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4678,
     capitalKind: "admin_capital",
     population: 568750,
-    nameAscii: "Pereira"
+    nameAscii: "Pereira",
+    countryCode: "CO"
 },
   {
     lon: -70.5758,
@@ -8363,7 +11134,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4676,
     capitalKind: "admin_capital",
     population: 568106,
-    nameAscii: "Puente Alto"
+    nameAscii: "Puente Alto",
+    countryCode: "CL"
 },
   {
     lon: 73.1355,
@@ -8371,7 +11143,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4672,
     capitalKind: "place",
     population: 1576614,
-    nameAscii: "Kalyan"
+    nameAscii: "Kalyan",
+    countryCode: "IN"
 },
   {
     lon: 24.8807,
@@ -8379,7 +11152,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4669,
     capitalKind: "admin_capital",
     population: 565734,
-    nameAscii: "Nyala"
+    nameAscii: "Nyala",
+    countryCode: "SD"
+},
+  {
+    lon: 134.05,
+    lat: 34.3333,
+    weight: 0.4668,
+    capitalKind: "admin_capital",
+    population: 418994,
+    nameAscii: "Takamatsu",
+    countryCode: "JP"
 },
   {
     lon: 98.4854,
@@ -8387,15 +11170,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4667,
     capitalKind: "admin_capital",
     population: 564979,
-    nameAscii: "Binjai"
-},
-  {
-    lon: 55.0988,
-    lat: 51.7671,
-    weight: 0.4667,
-    capitalKind: "admin_capital",
-    population: 564773,
-    nameAscii: "Orenburg"
+    nameAscii: "Binjai",
+    countryCode: "ID"
 },
   {
     lon: 86.1516,
@@ -8403,7 +11179,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4665,
     capitalKind: "admin_capital",
     population: 564319,
-    nameAscii: "Bokaro"
+    nameAscii: "Bokaro",
+    countryCode: "IN"
 },
   {
     lon: 68.8589,
@@ -8411,7 +11188,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4664,
     capitalKind: "admin_capital",
     population: 563851,
-    nameAscii: "Sukkur"
+    nameAscii: "Sukkur",
+    countryCode: "PK"
 },
   {
     lon: 117.7833,
@@ -8419,7 +11197,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4661,
     capitalKind: "admin_capital",
     population: 562832,
-    nameAscii: "Tongling"
+    nameAscii: "Tongling",
+    countryCode: "CN"
 },
   {
     lon: 110.8028,
@@ -8427,7 +11206,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4656,
     capitalKind: "admin_capital",
     population: 560894,
-    nameAscii: "Wenchang"
+    nameAscii: "Wenchang",
+    countryCode: "CN"
+},
+  {
+    lon: 137.2167,
+    lat: 36.7,
+    weight: 0.4656,
+    capitalKind: "admin_capital",
+    population: 415844,
+    nameAscii: "Toyama",
+    countryCode: "JP"
 },
   {
     lon: 11.1673,
@@ -8435,7 +11224,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4653,
     capitalKind: "admin_capital",
     population: 560000,
-    nameAscii: "Gombe"
+    nameAscii: "Gombe",
+    countryCode: "NG"
 },
   {
     lon: 4.5603,
@@ -8443,7 +11233,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4653,
     capitalKind: "admin_capital",
     population: 560000,
-    nameAscii: "Ile-Ife"
+    nameAscii: "Ile-Ife",
+    countryCode: "NG"
 },
   {
     lon: 113.4429,
@@ -8451,15 +11242,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4651,
     capitalKind: "place",
     population: 1556000,
-    nameAscii: "Xiantao"
-},
-  {
-    lon: 86.1043,
-    lat: 55.3542,
-    weight: 0.4651,
-    capitalKind: "admin_capital",
-    population: 558973,
-    nameAscii: "Kemerovo"
+    nameAscii: "Xiantao",
+    countryCode: "CN"
 },
   {
     lon: 46.2573,
@@ -8467,7 +11251,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4649,
     capitalKind: "admin_capital",
     population: 558400,
-    nameAscii: "Nasiriyah"
+    nameAscii: "Nasiriyah",
+    countryCode: "IQ"
+},
+  {
+    lon: 136.7604,
+    lat: 35.4229,
+    weight: 0.4644,
+    capitalKind: "admin_capital",
+    population: 412895,
+    nameAscii: "Gifu",
+    countryCode: "JP"
 },
   {
     lon: -75.8217,
@@ -8475,7 +11269,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4642,
     capitalKind: "admin_capital",
     population: 555865,
-    nameAscii: "Santiago de Cuba"
+    nameAscii: "Santiago de Cuba",
+    countryCode: "CU"
 },
   {
     lon: 13.4027,
@@ -8483,7 +11278,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.464,
     capitalKind: "admin_capital",
     population: 555124,
-    nameAscii: "Benguela"
+    nameAscii: "Benguela",
+    countryCode: "AO"
 },
   {
     lon: 101.5456,
@@ -8491,7 +11287,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.464,
     capitalKind: "admin_capital",
     population: 555081,
-    nameAscii: "Chuxiong"
+    nameAscii: "Chuxiong",
+    countryCode: "CN"
 },
   {
     lon: 7.9335,
@@ -8499,7 +11296,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4639,
     capitalKind: "admin_capital",
     population: 554906,
-    nameAscii: "Uyo"
+    nameAscii: "Uyo",
+    countryCode: "NG"
 },
   {
     lon: 114.0656,
@@ -8507,15 +11305,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4636,
     capitalKind: "place",
     population: 1541000,
-    nameAscii: "Xinyang"
-},
-  {
-    lon: -2.5966,
-    lat: 51.4552,
-    weight: 0.4635,
-    capitalKind: "admin_capital",
-    population: 553528,
-    nameAscii: "Bristol"
+    nameAscii: "Xinyang",
+    countryCode: "CN"
 },
   {
     lon: 110.004,
@@ -8523,7 +11314,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4633,
     capitalKind: "admin_capital",
     population: 552622,
-    nameAscii: "Huaihua"
+    nameAscii: "Huaihua",
+    countryCode: "CN"
+},
+  {
+    lon: 139.6672,
+    lat: 35.2836,
+    weight: 0.4631,
+    capitalKind: "admin_capital",
+    population: 409478,
+    nameAscii: "Yokosuka",
+    countryCode: "JP"
 },
   {
     lon: -6.5802,
@@ -8531,15 +11332,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.463,
     capitalKind: "admin_capital",
     population: 551786,
-    nameAscii: "Kenitra"
-},
-  {
-    lon: 136.6167,
-    lat: 36.6,
-    weight: 0.4629,
-    capitalKind: "admin_capital",
-    population: 551249,
-    nameAscii: "Kanazawa"
+    nameAscii: "Kenitra",
+    countryCode: "MA"
 },
   {
     lon: 113.133,
@@ -8547,7 +11341,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4626,
     capitalKind: "admin_capital",
     population: 550231,
-    nameAscii: "Ulanqab"
+    nameAscii: "Ulanqab",
+    countryCode: "CN"
 },
   {
     lon: 3.3312,
@@ -8555,7 +11350,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4625,
     capitalKind: "admin_capital",
     population: 550000,
-    nameAscii: "Ajegunle"
+    nameAscii: "Ajegunle",
+    countryCode: "NG"
 },
   {
     lon: 12.1948,
@@ -8563,7 +11359,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4625,
     capitalKind: "admin_capital",
     population: 550000,
-    nameAscii: "Cabinda"
+    nameAscii: "Cabinda",
+    countryCode: "AO"
 },
   {
     lon: -63.9039,
@@ -8571,7 +11368,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4622,
     capitalKind: "admin_capital",
     population: 548952,
-    nameAscii: "Porto Velho"
+    nameAscii: "Porto Velho",
+    countryCode: "BR"
 },
   {
     lon: 103.326,
@@ -8579,15 +11377,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.462,
     capitalKind: "admin_capital",
     population: 548014,
-    nameAscii: "Kuantan"
+    nameAscii: "Kuantan",
+    countryCode: "MY"
 },
   {
-    lon: 33.5213,
-    lat: 44.608,
-    weight: 0.4619,
+    lon: 135.6491,
+    lat: 34.8135,
+    weight: 0.4618,
     capitalKind: "admin_capital",
-    population: 547820,
-    nameAscii: "Sevastopol"
+    population: 406331,
+    nameAscii: "Hirakata",
+    countryCode: "JP"
 },
   {
     lon: -55.1668,
@@ -8595,7 +11395,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4618,
     capitalKind: "country_capital",
     population: 254169,
-    nameAscii: "Paramaribo"
+    nameAscii: "Paramaribo",
+    countryCode: "SR"
 },
   {
     lon: -61.0742,
@@ -8603,7 +11404,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4617,
     capitalKind: "country_capital",
     population: 253995,
-    nameAscii: "Fort-de-France"
+    nameAscii: "Fort-de-France",
+    countryCode: "MQ"
 },
   {
     lon: -64.6328,
@@ -8611,7 +11413,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4616,
     capitalKind: "admin_capital",
     population: 546616,
-    nameAscii: "Puerto La Cruz"
+    nameAscii: "Puerto La Cruz",
+    countryCode: "VE"
 },
   {
     lon: 76.2602,
@@ -8619,7 +11422,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4614,
     capitalKind: "place",
     population: 1519000,
-    nameAscii: "Kochi"
+    nameAscii: "Kochi",
+    countryCode: "IN"
 },
   {
     lon: 110.3841,
@@ -8627,7 +11431,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4614,
     capitalKind: "admin_capital",
     population: 545992,
-    nameAscii: "Wanning"
+    nameAscii: "Wanning",
+    countryCode: "CN"
 },
   {
     lon: 7.0332,
@@ -8635,7 +11440,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4611,
     capitalKind: "admin_capital",
     population: 545000,
-    nameAscii: "Owerri"
+    nameAscii: "Owerri",
+    countryCode: "NG"
 },
   {
     lon: 112.7333,
@@ -8643,15 +11449,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.461,
     capitalKind: "admin_capital",
     population: 544683,
-    nameAscii: "Xinzhou"
-},
-  {
-    lon: 12.3713,
-    lat: 51.3396,
-    weight: 0.4604,
-    capitalKind: "admin_capital",
-    population: 542529,
-    nameAscii: "Leipzig"
+    nameAscii: "Xinzhou",
+    countryCode: "CN"
 },
   {
     lon: 81.3215,
@@ -8659,7 +11458,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4604,
     capitalKind: "admin_capital",
     population: 542507,
-    nameAscii: "Ghulja"
+    nameAscii: "Ghulja",
+    countryCode: "CN"
 },
   {
     lon: 119.9464,
@@ -8667,7 +11467,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4603,
     capitalKind: "admin_capital",
     population: 542234,
-    nameAscii: "Pingdu"
+    nameAscii: "Pingdu",
+    countryCode: "CN"
 },
   {
     lon: 33.45,
@@ -8675,7 +11476,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4601,
     capitalKind: "admin_capital",
     population: 541603,
-    nameAscii: "Mbeya"
+    nameAscii: "Mbeya",
+    countryCode: "TZ"
 },
   {
     lon: 151.7801,
@@ -8683,7 +11485,26 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4599,
     capitalKind: "admin_capital",
     population: 540796,
-    nameAscii: "Newcastle"
+    nameAscii: "Newcastle",
+    countryCode: "AU"
+},
+  {
+    lon: 135.4693,
+    lat: 34.7824,
+    weight: 0.4599,
+    capitalKind: "admin_capital",
+    population: 401558,
+    nameAscii: "Toyonaka",
+    countryCode: "JP"
+},
+  {
+    lon: 131.4167,
+    lat: 31.9167,
+    weight: 0.4598,
+    capitalKind: "admin_capital",
+    population: 401339,
+    nameAscii: "Miyazaki",
+    countryCode: "JP"
 },
   {
     lon: 8.327,
@@ -8691,7 +11512,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4597,
     capitalKind: "admin_capital",
     population: 540000,
-    nameAscii: "Calabar"
+    nameAscii: "Calabar",
+    countryCode: "NG"
 },
   {
     lon: -1.9086,
@@ -8699,23 +11521,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4596,
     capitalKind: "admin_capital",
     population: 539711,
-    nameAscii: "Oujda"
-},
-  {
-    lon: 87.136,
-    lat: 53.7575,
-    weight: 0.4596,
-    capitalKind: "admin_capital",
-    population: 539616,
-    nameAscii: "Novokuznetsk"
-},
-  {
-    lon: 39.7041,
-    lat: 54.627,
-    weight: 0.4594,
-    capitalKind: "admin_capital",
-    population: 538962,
-    nameAscii: "Ryazan'"
+    nameAscii: "Oujda",
+    countryCode: "MA"
 },
   {
     lon: 114.9793,
@@ -8723,7 +11530,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4593,
     capitalKind: "admin_capital",
     population: 538699,
-    nameAscii: "Ji'an"
+    nameAscii: "Ji'an",
+    countryCode: "CN"
 },
   {
     lon: 73.1019,
@@ -8731,15 +11539,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4592,
     capitalKind: "admin_capital",
     population: 538344,
-    nameAscii: "Sahiwal"
+    nameAscii: "Sahiwal",
+    countryCode: "PK"
 },
   {
-    lon: 135.8667,
-    lat: 35.0,
-    weight: 0.4588,
-    capitalKind: "admin_capital",
-    population: 536976,
-    nameAscii: "Otsu"
+    lon: -21.8954,
+    lat: 64.1355,
+    weight: 0.4587,
+    capitalKind: "country_capital",
+    population: 166212,
+    nameAscii: "Reykjavik",
+    countryCode: "IS"
 },
   {
     lon: -85.6681,
@@ -8747,7 +11557,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4584,
     capitalKind: "admin_capital",
     population: 535829,
-    nameAscii: "Grand Rapids"
+    nameAscii: "Grand Rapids",
+    countryCode: "US"
 },
   {
     lon: 103.2064,
@@ -8755,15 +11566,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4581,
     capitalKind: "admin_capital",
     population: 534555,
-    nameAscii: "Linxia Chengguanzhen"
-},
-  {
-    lon: 48.0408,
-    lat: 46.3497,
-    weight: 0.4579,
-    capitalKind: "admin_capital",
-    population: 533925,
-    nameAscii: "Astrakhan"
+    nameAscii: "Linxia Chengguanzhen",
+    countryCode: "CN"
 },
   {
     lon: 73.4515,
@@ -8771,23 +11575,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4578,
     capitalKind: "admin_capital",
     population: 533693,
-    nameAscii: "Okara"
-},
-  {
-    lon: 132.7657,
-    lat: 33.8392,
-    weight: 0.4578,
-    capitalKind: "admin_capital",
-    population: 533541,
-    nameAscii: "Matsuyama"
-},
-  {
-    lon: 1.0993,
-    lat: 49.4431,
-    weight: 0.4575,
-    capitalKind: "admin_capital",
-    population: 532559,
-    nameAscii: "Rouen"
+    nameAscii: "Okara",
+    countryCode: "PK"
 },
   {
     lon: 39.0079,
@@ -8795,7 +11584,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4573,
     capitalKind: "admin_capital",
     population: 531952,
-    nameAscii: "Ar Raqqah"
+    nameAscii: "Ar Raqqah",
+    countryCode: "SY"
 },
   {
     lon: 109.9306,
@@ -8803,7 +11593,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4572,
     capitalKind: "admin_capital",
     population: 531696,
-    nameAscii: "Shangluo"
+    nameAscii: "Shangluo",
+    countryCode: "CN"
 },
   {
     lon: -96.7254,
@@ -8811,15 +11602,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.457,
     capitalKind: "admin_capital",
     population: 530728,
-    nameAscii: "Oaxaca"
-},
-  {
-    lon: 134.7,
-    lat: 34.8167,
-    weight: 0.4569,
-    capitalKind: "admin_capital",
-    population: 530495,
-    nameAscii: "Himeji"
+    nameAscii: "Oaxaca",
+    countryCode: "MX"
 },
   {
     lon: 25.9086,
@@ -8827,7 +11611,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4569,
     capitalKind: "country_capital",
     population: 246325,
-    nameAscii: "Gaborone"
+    nameAscii: "Gaborone",
+    countryCode: "BW"
 },
   {
     lon: 35.8441,
@@ -8835,7 +11620,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4567,
     capitalKind: "admin_capital",
     population: 530000,
-    nameAscii: "Tripoli"
+    nameAscii: "Tripoli",
+    countryCode: "LB"
 },
   {
     lon: -75.2029,
@@ -8843,7 +11629,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4566,
     capitalKind: "admin_capital",
     population: 529635,
-    nameAscii: "Ibague"
+    nameAscii: "Ibague",
+    countryCode: "CO"
 },
   {
     lon: -76.8844,
@@ -8851,7 +11638,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4564,
     capitalKind: "admin_capital",
     population: 528892,
-    nameAscii: "Harrisburg"
+    nameAscii: "Harrisburg",
+    countryCode: "US"
 },
   {
     lon: 31.1837,
@@ -8859,7 +11647,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4563,
     capitalKind: "admin_capital",
     population: 528669,
-    nameAscii: "Assiut"
+    nameAscii: "Assiut",
+    countryCode: "EG"
 },
   {
     lon: 48.5146,
@@ -8867,7 +11656,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4562,
     capitalKind: "admin_capital",
     population: 528256,
-    nameAscii: "Hamadan"
+    nameAscii: "Hamadan",
+    countryCode: "IR"
 },
   {
     lon: 110.4642,
@@ -8875,7 +11665,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4562,
     capitalKind: "admin_capital",
     population: 528238,
-    nameAscii: "Qionghai"
+    nameAscii: "Qionghai",
+    countryCode: "CN"
 },
   {
     lon: -94.5786,
@@ -8883,7 +11674,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4561,
     capitalKind: "place",
     population: 1469000,
-    nameAscii: "Kansas City"
+    nameAscii: "Kansas City",
+    countryCode: "US"
 },
   {
     lon: 116.8533,
@@ -8891,7 +11683,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4561,
     capitalKind: "admin_capital",
     population: 527681,
-    nameAscii: "Cangzhou"
+    nameAscii: "Cangzhou",
+    countryCode: "CN"
 },
   {
     lon: 116.0724,
@@ -8899,7 +11692,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4561,
     capitalKind: "admin_capital",
     population: 527671,
-    nameAscii: "Kota Kinabalu"
+    nameAscii: "Kota Kinabalu",
+    countryCode: "MY"
 },
   {
     lon: -122.6615,
@@ -8907,7 +11701,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4555,
     capitalKind: "admin_capital",
     population: 525802,
-    nameAscii: "Vancouver"
+    nameAscii: "Vancouver",
+    countryCode: "US"
 },
   {
     lon: 43.3832,
@@ -8915,7 +11710,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4553,
     capitalKind: "admin_capital",
     population: 525016,
-    nameAscii: "Van"
+    nameAscii: "Van",
+    countryCode: "TR"
 },
   {
     lon: 106.7721,
@@ -8923,15 +11719,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4552,
     capitalKind: "admin_capital",
     population: 524670,
-    nameAscii: "Thu GJuc"
-},
-  {
-    lon: 45.0108,
-    lat: 53.1957,
-    weight: 0.4548,
-    capitalKind: "admin_capital",
-    population: 523553,
-    nameAscii: "Penza"
+    nameAscii: "Thu GJuc",
+    countryCode: "VN"
 },
   {
     lon: 67.1109,
@@ -8939,7 +11728,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4548,
     capitalKind: "admin_capital",
     population: 523300,
-    nameAscii: "Mazar-e Sharif"
+    nameAscii: "Mazar-e Sharif",
+    countryCode: "AF"
 },
   {
     lon: 115.6835,
@@ -8947,7 +11737,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4544,
     capitalKind: "admin_capital",
     population: 522147,
-    nameAscii: "Hengshui"
+    nameAscii: "Hengshui",
+    countryCode: "CN"
 },
   {
     lon: 114.3074,
@@ -8955,7 +11746,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4543,
     capitalKind: "place",
     population: 1451741,
-    nameAscii: "Kaifeng"
+    nameAscii: "Kaifeng",
+    countryCode: "CN"
 },
   {
     lon: -65.42,
@@ -8963,7 +11755,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.454,
     capitalKind: "admin_capital",
     population: 520683,
-    nameAscii: "Salta"
+    nameAscii: "Salta",
+    countryCode: "AR"
 },
   {
     lon: -75.558,
@@ -8971,7 +11764,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4537,
     capitalKind: "admin_capital",
     population: 519670,
-    nameAscii: "Bello"
+    nameAscii: "Bello",
+    countryCode: "CO"
 },
   {
     lon: 30.8418,
@@ -8979,7 +11773,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4535,
     capitalKind: "admin_capital",
     population: 519047,
-    nameAscii: "Al Fayyum"
+    nameAscii: "Al Fayyum",
+    countryCode: "EG"
 },
   {
     lon: -104.6576,
@@ -8987,7 +11782,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4534,
     capitalKind: "admin_capital",
     population: 518709,
-    nameAscii: "Victoria de Durango"
+    nameAscii: "Victoria de Durango",
+    countryCode: "MX"
 },
   {
     lon: 70.3034,
@@ -8995,7 +11791,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4529,
     capitalKind: "admin_capital",
     population: 517000,
-    nameAscii: "Rahim Yar Khan"
+    nameAscii: "Rahim Yar Khan",
+    countryCode: "PK"
 },
   {
     lon: 105.823,
@@ -9003,23 +11800,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4527,
     capitalKind: "admin_capital",
     population: 516424,
-    nameAscii: "Guangyuan"
-},
-  {
-    lon: 39.5515,
-    lat: 52.5876,
-    weight: 0.4524,
-    capitalKind: "admin_capital",
-    population: 515655,
-    nameAscii: "Lipetsk"
-},
-  {
-    lon: -3.1965,
-    lat: 55.9521,
-    weight: 0.4522,
-    capitalKind: "admin_capital",
-    population: 514990,
-    nameAscii: "Edinburgh"
+    nameAscii: "Guangyuan",
+    countryCode: "CN"
 },
   {
     lon: 95.3333,
@@ -9027,7 +11809,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4519,
     capitalKind: "admin_capital",
     population: 513698,
-    nameAscii: "Banda Aceh"
+    nameAscii: "Banda Aceh",
+    countryCode: "ID"
 },
   {
     lon: -51.0664,
@@ -9035,7 +11818,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4516,
     capitalKind: "admin_capital",
     population: 512902,
-    nameAscii: "Macapa"
+    nameAscii: "Macapa",
+    countryCode: "BR"
 },
   {
     lon: 114.322,
@@ -9043,7 +11827,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4515,
     capitalKind: "admin_capital",
     population: 512517,
-    nameAscii: "Xianning"
+    nameAscii: "Xianning",
+    countryCode: "CN"
 },
   {
     lon: 2.8277,
@@ -9051,7 +11836,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4511,
     capitalKind: "admin_capital",
     population: 511348,
-    nameAscii: "Blida"
+    nameAscii: "Blida",
+    countryCode: "DZ"
 },
   {
     lon: -41.3304,
@@ -9059,7 +11845,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4511,
     capitalKind: "admin_capital",
     population: 511168,
-    nameAscii: "Campos dos Goytacazes"
+    nameAscii: "Campos dos Goytacazes",
+    countryCode: "BR"
 },
   {
     lon: 74.4502,
@@ -9067,15 +11854,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.451,
     capitalKind: "admin_capital",
     population: 510875,
-    nameAscii: "Kasur"
-},
-  {
-    lon: 31.993,
-    lat: 46.9763,
-    weight: 0.451,
-    capitalKind: "admin_capital",
-    population: 510840,
-    nameAscii: "Mykolayiv"
+    nameAscii: "Kasur",
+    countryCode: "PK"
 },
   {
     lon: 121.0327,
@@ -9083,15 +11863,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4508,
     capitalKind: "admin_capital",
     population: 510383,
-    nameAscii: "Makati City"
-},
-  {
-    lon: 19.2631,
-    lat: 42.4412,
-    weight: 0.4508,
-    capitalKind: "country_capital",
-    population: 236852,
-    nameAscii: "Podgorica"
+    nameAscii: "Makati City",
+    countryCode: "PH"
 },
   {
     lon: 125.9264,
@@ -9099,15 +11872,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4507,
     capitalKind: "admin_capital",
     population: 510000,
-    nameAscii: "Tonghua"
-},
-  {
-    lon: 52.4196,
-    lat: 55.7372,
-    weight: 0.4507,
-    capitalKind: "admin_capital",
-    population: 509870,
-    nameAscii: "Naberezhnyye Chelny"
+    nameAscii: "Tonghua",
+    countryCode: "CN"
 },
   {
     lon: 106.54,
@@ -9115,7 +11881,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4503,
     capitalKind: "admin_capital",
     population: 508703,
-    nameAscii: "Banan"
+    nameAscii: "Banan",
+    countryCode: "CN"
 },
   {
     lon: 113.9716,
@@ -9123,15 +11890,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4501,
     capitalKind: "admin_capital",
     population: 507900,
-    nameAscii: "Tuen Mun"
-},
-  {
-    lon: 18.6766,
-    lat: 50.2976,
-    weight: 0.45,
-    capitalKind: "admin_capital",
-    population: 507670,
-    nameAscii: "Gliwice"
+    nameAscii: "Tuen Mun",
+    countryCode: "HK"
 },
   {
     lon: 100.4517,
@@ -9139,15 +11899,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4499,
     capitalKind: "admin_capital",
     population: 507433,
-    nameAscii: "Zhangye"
-},
-  {
-    lon: 49.6578,
-    lat: 58.5981,
-    weight: 0.4499,
-    capitalKind: "admin_capital",
-    population: 507155,
-    nameAscii: "Kirov"
+    nameAscii: "Zhangye",
+    countryCode: "CN"
 },
   {
     lon: 100.3705,
@@ -9155,7 +11908,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4498,
     capitalKind: "admin_capital",
     population: 506964,
-    nameAscii: "Bukittinggi"
+    nameAscii: "Bukittinggi",
+    countryCode: "ID"
 },
   {
     lon: 75.9868,
@@ -9163,7 +11917,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4497,
     capitalKind: "admin_capital",
     population: 506640,
-    nameAscii: "Kashgar"
+    nameAscii: "Kashgar",
+    countryCode: "CN"
 },
   {
     lon: 125.1367,
@@ -9171,7 +11926,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4497,
     capitalKind: "admin_capital",
     population: 506548,
-    nameAscii: "Longshan"
+    nameAscii: "Longshan",
+    countryCode: "CN"
 },
   {
     lon: 103.7833,
@@ -9179,7 +11935,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4496,
     capitalKind: "place",
     population: 1408500,
-    nameAscii: "Qujing"
+    nameAscii: "Qujing",
+    countryCode: "CN"
 },
   {
     lon: 34.4667,
@@ -9187,7 +11944,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4494,
     capitalKind: "admin_capital",
     population: 505700,
-    nameAscii: "Gaza"
+    nameAscii: "Gaza",
+    countryCode: "PS"
 },
   {
     lon: 44.1277,
@@ -9195,7 +11953,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4494,
     capitalKind: "admin_capital",
     population: 505652,
-    nameAscii: "Najran"
+    nameAscii: "Najran",
+    countryCode: "SA"
 },
   {
     lon: -46.8842,
@@ -9203,7 +11962,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4494,
     capitalKind: "admin_capital",
     population: 505548,
-    nameAscii: "Jundiai"
+    nameAscii: "Jundiai",
+    countryCode: "BR"
 },
   {
     lon: 114.6333,
@@ -9211,7 +11971,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4492,
     capitalKind: "admin_capital",
     population: 505171,
-    nameAscii: "Zhoukou"
+    nameAscii: "Zhoukou",
+    countryCode: "CN"
 },
   {
     lon: 106.7179,
@@ -9219,7 +11980,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4491,
     capitalKind: "place",
     population: 1404785,
-    nameAscii: "South Tangerang"
+    nameAscii: "South Tangerang",
+    countryCode: "ID"
 },
   {
     lon: 106.6861,
@@ -9227,7 +11989,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4491,
     capitalKind: "admin_capital",
     population: 504848,
-    nameAscii: "Pingliang"
+    nameAscii: "Pingliang",
+    countryCode: "CN"
 },
   {
     lon: 125.5736,
@@ -9235,7 +11998,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4491,
     capitalKind: "country_capital",
     population: 234331,
-    nameAscii: "Dili"
+    nameAscii: "Dili",
+    countryCode: "TL"
 },
   {
     lon: -98.2385,
@@ -9243,7 +12007,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4488,
     capitalKind: "admin_capital",
     population: 503878,
-    nameAscii: "Tlaxcala"
+    nameAscii: "Tlaxcala",
+    countryCode: "MX"
 },
   {
     lon: 49.6981,
@@ -9251,7 +12016,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4488,
     capitalKind: "admin_capital",
     population: 503647,
-    nameAscii: "Arak"
+    nameAscii: "Arak",
+    countryCode: "IR"
 },
   {
     lon: 120.4817,
@@ -9259,7 +12025,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4487,
     capitalKind: "admin_capital",
     population: 503530,
-    nameAscii: "Pingtung"
+    nameAscii: "Pingtung",
+    countryCode: "TW"
 },
   {
     lon: 7.7667,
@@ -9267,7 +12034,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4487,
     capitalKind: "admin_capital",
     population: 503524,
-    nameAscii: "Annaba"
+    nameAscii: "Annaba",
+    countryCode: "DZ"
 },
   {
     lon: 77.7064,
@@ -9275,15 +12043,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4484,
     capitalKind: "place",
     population: 1398000,
-    nameAscii: "Meerut"
-},
-  {
-    lon: -1.7521,
-    lat: 53.7939,
-    weight: 0.4482,
-    capitalKind: "admin_capital",
-    population: 501700,
-    nameAscii: "Bradford"
+    nameAscii: "Meerut",
+    countryCode: "IN"
 },
   {
     lon: -94.6275,
@@ -9291,15 +12052,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4481,
     capitalKind: "admin_capital",
     population: 501577,
-    nameAscii: "Kansas City"
-},
-  {
-    lon: 30.9754,
-    lat: 52.4345,
-    weight: 0.448,
-    capitalKind: "admin_capital",
-    population: 501102,
-    nameAscii: "Homyel'"
+    nameAscii: "Kansas City",
+    countryCode: "US"
 },
   {
     lon: 57.2072,
@@ -9307,15 +12061,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4479,
     capitalKind: "admin_capital",
     population: 500757,
-    nameAscii: "Aktobe"
-},
-  {
-    lon: 16.8698,
-    lat: 41.1207,
-    weight: 0.4478,
-    capitalKind: "admin_capital",
-    population: 500577,
-    nameAscii: "Bari"
+    nameAscii: "Aktobe",
+    countryCode: "KZ"
 },
   {
     lon: 70.7932,
@@ -9323,7 +12070,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "place",
     population: 1390640,
-    nameAscii: "Rajkot"
+    nameAscii: "Rajkot",
+    countryCode: "IN"
 },
   {
     lon: 7.072,
@@ -9331,7 +12079,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Awka"
+    nameAscii: "Awka",
+    countryCode: "NG"
 },
   {
     lon: 120.4489,
@@ -9339,7 +12088,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Chiayi City"
+    nameAscii: "Chiayi City",
+    countryCode: "TW"
 },
   {
     lon: 30.4682,
@@ -9347,7 +12097,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Damanhur"
+    nameAscii: "Damanhur",
+    countryCode: "EG"
 },
   {
     lon: 121.7409,
@@ -9355,7 +12106,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Keelung"
+    nameAscii: "Keelung",
+    countryCode: "TW"
 },
   {
     lon: 30.7581,
@@ -9363,7 +12115,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Minya"
+    nameAscii: "Minya",
+    countryCode: "EG"
 },
   {
     lon: 121.3187,
@@ -9371,7 +12124,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Taoyuan"
+    nameAscii: "Taoyuan",
+    countryCode: "TW"
 },
   {
     lon: 121.297,
@@ -9379,7 +12133,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Taoyuan City"
+    nameAscii: "Taoyuan City",
+    countryCode: "TW"
 },
   {
     lon: 105.8482,
@@ -9387,15 +12142,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4476,
     capitalKind: "admin_capital",
     population: 500000,
-    nameAscii: "Thai Nguyen"
-},
-  {
-    lon: 136.5167,
-    lat: 34.7333,
-    weight: 0.4476,
-    capitalKind: "admin_capital",
-    population: 500000,
-    nameAscii: "Tsu"
+    nameAscii: "Thai Nguyen",
+    countryCode: "VN"
 },
   {
     lon: 116.1167,
@@ -9403,7 +12151,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4474,
     capitalKind: "admin_capital",
     population: 499409,
-    nameAscii: "Mataram"
+    nameAscii: "Mataram",
+    countryCode: "ID"
 },
   {
     lon: -74.1943,
@@ -9411,15 +12160,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4474,
     capitalKind: "admin_capital",
     population: 499192,
-    nameAscii: "Santa Marta"
-},
-  {
-    lon: 139.9014,
-    lat: 35.7799,
-    weight: 0.4472,
-    capitalKind: "admin_capital",
-    population: 498575,
-    nameAscii: "Matsudo"
+    nameAscii: "Santa Marta",
+    countryCode: "CO"
 },
   {
     lon: 123.9494,
@@ -9427,7 +12169,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4469,
     capitalKind: "admin_capital",
     population: 497813,
-    nameAscii: "Lapu-Lapu City"
+    nameAscii: "Lapu-Lapu City",
+    countryCode: "PH"
 },
   {
     lon: 73.1021,
@@ -9435,7 +12178,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4469,
     capitalKind: "admin_capital",
     population: 497777,
-    nameAscii: "Karagandy"
+    nameAscii: "Karagandy",
+    countryCode: "KZ"
 },
   {
     lon: 111.9944,
@@ -9443,7 +12187,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4467,
     capitalKind: "admin_capital",
     population: 497171,
-    nameAscii: "Loudi"
+    nameAscii: "Loudi",
+    countryCode: "CN"
 },
   {
     lon: -75.4902,
@@ -9451,7 +12196,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4465,
     capitalKind: "admin_capital",
     population: 496442,
-    nameAscii: "Allentown"
+    nameAscii: "Allentown",
+    countryCode: "US"
 },
   {
     lon: 36.4027,
@@ -9459,7 +12205,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4464,
     capitalKind: "admin_capital",
     population: 496145,
-    nameAscii: "Duma"
+    nameAscii: "Duma",
+    countryCode: "SY"
 },
   {
     lon: 124.8277,
@@ -9467,7 +12214,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4463,
     capitalKind: "admin_capital",
     population: 495900,
-    nameAscii: "Songyuan"
+    nameAscii: "Songyuan",
+    countryCode: "CN"
 },
   {
     lon: 114.1833,
@@ -9475,7 +12223,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4461,
     capitalKind: "admin_capital",
     population: 495200,
-    nameAscii: "Sha Tin"
+    nameAscii: "Sha Tin",
+    countryCode: "HK"
 },
   {
     lon: 70.6403,
@@ -9483,15 +12232,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4459,
     capitalKind: "admin_capital",
     population: 494464,
-    nameAscii: "Dera Ghazi Khan"
-},
-  {
-    lon: 135.5833,
-    lat: 34.6667,
-    weight: 0.4457,
-    capitalKind: "admin_capital",
-    population: 493940,
-    nameAscii: "Higashiosaka"
+    nameAscii: "Dera Ghazi Khan",
+    countryCode: "PK"
 },
   {
     lon: -104.8214,
@@ -9499,15 +12241,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4456,
     capitalKind: "admin_capital",
     population: 493654,
-    nameAscii: "Colorado Springs"
-},
-  {
-    lon: 47.246,
-    lat: 56.1322,
-    weight: 0.4452,
-    capitalKind: "admin_capital",
-    population: 492331,
-    nameAscii: "Cheboksary"
+    nameAscii: "Colorado Springs",
+    countryCode: "US"
 },
   {
     lon: 129.3648,
@@ -9515,7 +12250,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4451,
     capitalKind: "admin_capital",
     population: 492041,
-    nameAscii: "Pohang"
+    nameAscii: "Pohang",
+    countryCode: "KR"
 },
   {
     lon: 115.3475,
@@ -9523,7 +12259,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.445,
     capitalKind: "admin_capital",
     population: 491766,
-    nameAscii: "Shanwei"
+    nameAscii: "Shanwei",
+    countryCode: "CN"
 },
   {
     lon: 118.48,
@@ -9531,7 +12268,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4448,
     capitalKind: "place",
     population: 1366302,
-    nameAscii: "Maanshan"
+    nameAscii: "Maanshan",
+    countryCode: "CN"
 },
   {
     lon: -75.8782,
@@ -9539,7 +12277,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4448,
     capitalKind: "admin_capital",
     population: 490935,
-    nameAscii: "Monteria"
+    nameAscii: "Monteria",
+    countryCode: "CO"
 },
   {
     lon: -77.3431,
@@ -9547,7 +12286,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4448,
     capitalKind: "country_capital",
     population: 227940,
-    nameAscii: "Nassau"
+    nameAscii: "Nassau",
+    countryCode: "BS"
 },
   {
     lon: 76.9798,
@@ -9555,7 +12295,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4446,
     capitalKind: "place",
     population: 1365000,
-    nameAscii: "Najafgarh"
+    nameAscii: "Najafgarh",
+    countryCode: "IN"
 },
   {
     lon: -73.2531,
@@ -9563,7 +12304,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4445,
     capitalKind: "admin_capital",
     population: 490075,
-    nameAscii: "Valledupar"
+    nameAscii: "Valledupar",
+    countryCode: "CO"
 },
   {
     lon: 55.4788,
@@ -9571,7 +12313,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4445,
     capitalKind: "admin_capital",
     population: 490035,
-    nameAscii: "Ajman"
+    nameAscii: "Ajman",
+    countryCode: "AE"
 },
   {
     lon: 37.2164,
@@ -9579,7 +12322,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4444,
     capitalKind: "admin_capital",
     population: 489725,
-    nameAscii: "Port Sudan"
+    nameAscii: "Port Sudan",
+    countryCode: "SD"
 },
   {
     lon: -60.7087,
@@ -9587,15 +12331,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4443,
     capitalKind: "admin_capital",
     population: 489505,
-    nameAscii: "Santa Fe"
-},
-  {
-    lon: 37.6182,
-    lat: 54.1961,
-    weight: 0.4443,
-    capitalKind: "admin_capital",
-    population: 489486,
-    nameAscii: "Tula"
+    nameAscii: "Santa Fe",
+    countryCode: "AR"
 },
   {
     lon: 31.0979,
@@ -9603,7 +12340,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4443,
     capitalKind: "admin_capital",
     population: 489450,
-    nameAscii: "Bani Suwayf"
+    nameAscii: "Bani Suwayf",
+    countryCode: "EG"
 },
   {
     lon: -99.2567,
@@ -9611,7 +12349,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4442,
     capitalKind: "admin_capital",
     population: 489160,
-    nameAscii: "Ciudad Lopez Mateos"
+    nameAscii: "Ciudad Lopez Mateos",
+    countryCode: "MX"
 },
   {
     lon: 31.315,
@@ -9619,7 +12358,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4441,
     capitalKind: "admin_capital",
     population: 488904,
-    nameAscii: "Al Khusus"
+    nameAscii: "Al Khusus",
+    countryCode: "EG"
 },
   {
     lon: 126.5219,
@@ -9627,7 +12367,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4441,
     capitalKind: "admin_capital",
     population: 488844,
-    nameAscii: "Jeju City"
+    nameAscii: "Jeju City",
+    countryCode: "KR"
 },
   {
     lon: 129.4231,
@@ -9635,7 +12376,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4441,
     capitalKind: "admin_capital",
     population: 488740,
-    nameAscii: "Longjing"
+    nameAscii: "Longjing",
+    countryCode: "CN"
 },
   {
     lon: 129.5024,
@@ -9643,15 +12385,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4441,
     capitalKind: "admin_capital",
     population: 488740,
-    nameAscii: "Yanji"
-},
-  {
-    lon: 11.3387,
-    lat: 44.4938,
-    weight: 0.4439,
-    capitalKind: "admin_capital",
-    population: 488172,
-    nameAscii: "Bologna"
+    nameAscii: "Yanji",
+    countryCode: "CN"
 },
   {
     lon: -122.2021,
@@ -9659,7 +12394,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4435,
     capitalKind: "admin_capital",
     population: 486903,
-    nameAscii: "Everett"
+    nameAscii: "Everett",
+    countryCode: "US"
 },
   {
     lon: 83.0104,
@@ -9667,15 +12403,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4432,
     capitalKind: "place",
     population: 1352000,
-    nameAscii: "Varanasi"
-},
-  {
-    lon: 135.332,
-    lat: 34.7156,
-    weight: 0.4431,
-    capitalKind: "admin_capital",
-    population: 485587,
-    nameAscii: "Nishinomiya"
+    nameAscii: "Varanasi",
+    countryCode: "IN"
 },
   {
     lon: -80.6572,
@@ -9683,7 +12412,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4427,
     capitalKind: "admin_capital",
     population: 484475,
-    nameAscii: "Piura"
+    nameAscii: "Piura",
+    countryCode: "PE"
 },
   {
     lon: -65.2627,
@@ -9691,15 +12421,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4427,
     capitalKind: "country_capital",
     population: 224838,
-    nameAscii: "Sucre"
-},
-  {
-    lon: 133.7667,
-    lat: 34.5833,
-    weight: 0.4424,
-    capitalKind: "admin_capital",
-    population: 483576,
-    nameAscii: "Kurashiki"
+    nameAscii: "Sucre",
+    countryCode: "BO"
 },
   {
     lon: 33.354,
@@ -9707,7 +12430,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4423,
     capitalKind: "country_capital",
     population: 224300,
-    nameAscii: "Nicosia"
+    nameAscii: "Nicosia",
+    countryCode: "CY"
 },
   {
     lon: 42.8,
@@ -9715,7 +12439,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4422,
     capitalKind: "admin_capital",
     population: 483000,
-    nameAscii: "Jijiga"
+    nameAscii: "Jijiga",
+    countryCode: "ET"
 },
   {
     lon: 120.9367,
@@ -9723,7 +12448,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4419,
     capitalKind: "admin_capital",
     population: 481949,
-    nameAscii: "Imus"
+    nameAscii: "Imus",
+    countryCode: "PH"
 },
   {
     lon: -4.0159,
@@ -9731,7 +12457,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4418,
     capitalKind: "place",
     population: 1340083,
-    nameAscii: "Abobo"
+    nameAscii: "Abobo",
+    countryCode: "CI"
 },
   {
     lon: 102.2634,
@@ -9739,7 +12466,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4418,
     capitalKind: "admin_capital",
     population: 481796,
-    nameAscii: "Xichang"
+    nameAscii: "Xichang",
+    countryCode: "CN"
 },
   {
     lon: 86.1855,
@@ -9747,7 +12475,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4417,
     capitalKind: "place",
     population: 1339438,
-    nameAscii: "Jamshedpur"
+    nameAscii: "Jamshedpur",
+    countryCode: "IN"
 },
   {
     lon: -49.3794,
@@ -9755,7 +12484,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4414,
     capitalKind: "admin_capital",
     population: 480393,
-    nameAscii: "Sao Jose do Rio Preto"
+    nameAscii: "Sao Jose do Rio Preto",
+    countryCode: "BR"
 },
   {
     lon: 6.2359,
@@ -9763,7 +12493,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.441,
     capitalKind: "admin_capital",
     population: 479178,
-    nameAscii: "Okene"
+    nameAscii: "Okene",
+    countryCode: "NG"
 },
   {
     lon: 74.7774,
@@ -9771,15 +12502,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4409,
     capitalKind: "admin_capital",
     population: 479073,
-    nameAscii: "Dhule"
-},
-  {
-    lon: 18.282,
-    lat: 49.8347,
-    weight: 0.4409,
-    capitalKind: "admin_capital",
-    population: 478963,
-    nameAscii: "Ostrava"
+    nameAscii: "Dhule",
+    countryCode: "IN"
 },
   {
     lon: 27.9116,
@@ -9787,7 +12511,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4408,
     capitalKind: "admin_capital",
     population: 478676,
-    nameAscii: "East London"
+    nameAscii: "East London",
+    countryCode: "ZA"
 },
   {
     lon: 91.0444,
@@ -9795,7 +12520,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4407,
     capitalKind: "admin_capital",
     population: 478275,
-    nameAscii: "Chengguan Qu"
+    nameAscii: "Chengguan Qu",
+    countryCode: "CN"
 },
   {
     lon: 54.3675,
@@ -9803,7 +12529,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4406,
     capitalKind: "admin_capital",
     population: 477905,
-    nameAscii: "Yazd"
+    nameAscii: "Yazd",
+    countryCode: "IR"
 },
   {
     lon: 44.065,
@@ -9811,15 +12538,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4406,
     capitalKind: "admin_capital",
     population: 477876,
-    nameAscii: "Hargeysa"
-},
-  {
-    lon: 131.6,
-    lat: 33.2333,
-    weight: 0.4405,
-    capitalKind: "admin_capital",
-    population: 477715,
-    nameAscii: "Oita"
+    nameAscii: "Hargeysa",
+    countryCode: "SO"
 },
   {
     lon: -46.4614,
@@ -9827,7 +12547,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4404,
     capitalKind: "admin_capital",
     population: 477552,
-    nameAscii: "Maua"
+    nameAscii: "Maua",
+    countryCode: "BR"
 },
   {
     lon: 75.6721,
@@ -9835,7 +12556,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4399,
     capitalKind: "place",
     population: 1324570,
-    nameAscii: "Gorakhpur"
+    nameAscii: "Gorakhpur",
+    countryCode: "IN"
 },
   {
     lon: 35.2699,
@@ -9843,7 +12565,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4398,
     capitalKind: "admin_capital",
     population: 475716,
-    nameAscii: "Eldoret"
+    nameAscii: "Eldoret",
+    countryCode: "KE"
 },
   {
     lon: 109.4917,
@@ -9851,15 +12574,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4397,
     capitalKind: "admin_capital",
     population: 475234,
-    nameAscii: "Yan'an"
-},
-  {
-    lon: 20.511,
-    lat: 54.7064,
-    weight: 0.4396,
-    capitalKind: "admin_capital",
-    population: 475056,
-    nameAscii: "Kaliningrad"
+    nameAscii: "Yan'an",
+    countryCode: "CN"
 },
   {
     lon: 104.8333,
@@ -9867,7 +12583,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4395,
     capitalKind: "place",
     population: 1320825,
-    nameAscii: "Liupanshui"
+    nameAscii: "Liupanshui",
+    countryCode: "CN"
 },
   {
     lon: 122.5644,
@@ -9875,7 +12592,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4392,
     capitalKind: "admin_capital",
     population: 473728,
-    nameAscii: "Iloilo"
+    nameAscii: "Iloilo",
+    countryCode: "PH"
 },
   {
     lon: 117.2079,
@@ -9883,15 +12601,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4391,
     capitalKind: "admin_capital",
     population: 473561,
-    nameAscii: "Jingdezhen"
-},
-  {
-    lon: -1.13,
-    lat: 37.987,
-    weight: 0.4386,
-    capitalKind: "admin_capital",
-    population: 471982,
-    nameAscii: "Murcia"
+    nameAscii: "Jingdezhen",
+    countryCode: "CN"
 },
   {
     lon: -63.5769,
@@ -9899,7 +12610,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4385,
     capitalKind: "admin_capital",
     population: 471559,
-    nameAscii: "Halifax"
+    nameAscii: "Halifax",
+    countryCode: "CA"
 },
   {
     lon: 37.6612,
@@ -9907,7 +12619,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4384,
     capitalKind: "admin_capital",
     population: 471409,
-    nameAscii: "Morogoro"
+    nameAscii: "Morogoro",
+    countryCode: "TZ"
 },
   {
     lon: 82.9325,
@@ -9915,7 +12628,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4382,
     capitalKind: "admin_capital",
     population: 470600,
-    nameAscii: "Xincheng"
+    nameAscii: "Xincheng",
+    countryCode: "CN"
 },
   {
     lon: 120.4586,
@@ -9923,7 +12637,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4381,
     capitalKind: "admin_capital",
     population: 470296,
-    nameAscii: "Chaoyang"
+    nameAscii: "Chaoyang",
+    countryCode: "CN"
 },
   {
     lon: -83.5552,
@@ -9931,7 +12646,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4379,
     capitalKind: "admin_capital",
     population: 469924,
-    nameAscii: "Toledo"
+    nameAscii: "Toledo",
+    countryCode: "US"
 },
   {
     lon: -114.0853,
@@ -9939,15 +12655,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4378,
     capitalKind: "place",
     population: 1306784,
-    nameAscii: "Calgary"
-},
-  {
-    lon: 133.3667,
-    lat: 34.4833,
-    weight: 0.4376,
-    capitalKind: "admin_capital",
-    population: 468812,
-    nameAscii: "Fukuyama"
+    nameAscii: "Calgary",
+    countryCode: "CA"
 },
   {
     lon: -74.1399,
@@ -9955,7 +12664,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4375,
     capitalKind: "admin_capital",
     population: 468730,
-    nameAscii: "Staten Island"
+    nameAscii: "Staten Island",
+    countryCode: "US"
 },
   {
     lon: 118.1736,
@@ -9963,7 +12673,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4372,
     capitalKind: "admin_capital",
     population: 467875,
-    nameAscii: "Nanping"
+    nameAscii: "Nanping",
+    countryCode: "CN"
 },
   {
     lon: -100.1884,
@@ -9971,7 +12682,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.437,
     capitalKind: "admin_capital",
     population: 467157,
-    nameAscii: "Ciudad Apodaca"
+    nameAscii: "Ciudad Apodaca",
+    countryCode: "MX"
 },
   {
     lon: 29.9293,
@@ -9979,15 +12691,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4368,
     capitalKind: "admin_capital",
     population: 466504,
-    nameAscii: "Izmit"
-},
-  {
-    lon: 23.6462,
-    lat: 37.942,
-    weight: 0.4366,
-    capitalKind: "admin_capital",
-    population: 466065,
-    nameAscii: "Piraeus"
+    nameAscii: "Izmit",
+    countryCode: "TR"
 },
   {
     lon: 37.4667,
@@ -9995,7 +12700,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4366,
     capitalKind: "admin_capital",
     population: 466000,
-    nameAscii: "Gonder"
+    nameAscii: "Gonder",
+    countryCode: "ET"
 },
   {
     lon: -90.6071,
@@ -10003,7 +12709,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4365,
     capitalKind: "admin_capital",
     population: 465773,
-    nameAscii: "Mixco"
+    nameAscii: "Mixco",
+    countryCode: "GT"
 },
   {
     lon: 107.0843,
@@ -10011,7 +12718,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4362,
     capitalKind: "admin_capital",
     population: 464860,
-    nameAscii: "Vung Tau"
+    nameAscii: "Vung Tau",
+    countryCode: "VN"
 },
   {
     lon: 124.2434,
@@ -10019,7 +12727,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4361,
     capitalKind: "admin_capital",
     population: 464599,
-    nameAscii: "Iligan"
+    nameAscii: "Iligan",
+    countryCode: "PH"
 },
   {
     lon: 50.0041,
@@ -10027,7 +12736,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4361,
     capitalKind: "admin_capital",
     population: 464551,
-    nameAscii: "Qazvin"
+    nameAscii: "Qazvin",
+    countryCode: "IR"
 },
   {
     lon: -0.8393,
@@ -10035,7 +12745,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4361,
     capitalKind: "admin_capital",
     population: 464316,
-    nameAscii: "Tamale"
+    nameAscii: "Tamale",
+    countryCode: "GH"
 },
   {
     lon: 114.6833,
@@ -10043,7 +12754,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4359,
     capitalKind: "admin_capital",
     population: 463907,
-    nameAscii: "Heyuan"
+    nameAscii: "Heyuan",
+    countryCode: "CN"
 },
   {
     lon: 106.7694,
@@ -10051,7 +12763,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4356,
     capitalKind: "admin_capital",
     population: 463023,
-    nameAscii: "Di An"
+    nameAscii: "Di An",
+    countryCode: "VN"
 },
   {
     lon: 79.9501,
@@ -10059,7 +12772,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4352,
     capitalKind: "place",
     population: 1285000,
-    nameAscii: "Jabalpur"
+    nameAscii: "Jabalpur",
+    countryCode: "IN"
 },
   {
     lon: 73.807,
@@ -10067,7 +12781,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4352,
     capitalKind: "place",
     population: 1284606,
-    nameAscii: "Pimpri"
+    nameAscii: "Pimpri",
+    countryCode: "IN"
 },
   {
     lon: 56.2808,
@@ -10075,7 +12790,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4351,
     capitalKind: "admin_capital",
     population: 461499,
-    nameAscii: "Bandar Abbas"
+    nameAscii: "Bandar Abbas",
+    countryCode: "IR"
 },
   {
     lon: 118.3125,
@@ -10083,7 +12799,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4349,
     capitalKind: "admin_capital",
     population: 460786,
-    nameAscii: "Huangshan"
+    nameAscii: "Huangshan",
+    countryCode: "CN"
 },
   {
     lon: 36.7578,
@@ -10091,7 +12808,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4348,
     capitalKind: "admin_capital",
     population: 460602,
-    nameAscii: "Hamah"
+    nameAscii: "Hamah",
+    countryCode: "SY"
 },
   {
     lon: 12.4815,
@@ -10099,7 +12817,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4346,
     capitalKind: "admin_capital",
     population: 460000,
-    nameAscii: "Yola"
+    nameAscii: "Yola",
+    countryCode: "NG"
 },
   {
     lon: 105.0809,
@@ -10107,15 +12826,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4345,
     capitalKind: "admin_capital",
     population: 459860,
-    nameAscii: "Rach Gia"
-},
-  {
-    lon: 135.4167,
-    lat: 34.7167,
-    weight: 0.4345,
-    capitalKind: "admin_capital",
-    population: 459593,
-    nameAscii: "Amagasaki"
+    nameAscii: "Rach Gia",
+    countryCode: "VN"
 },
   {
     lon: -73.2529,
@@ -10123,7 +12835,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4342,
     capitalKind: "admin_capital",
     population: 458729,
-    nameAscii: "Iquitos"
+    nameAscii: "Iquitos",
+    countryCode: "PE"
 },
   {
     lon: -79.1763,
@@ -10131,7 +12844,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4341,
     capitalKind: "admin_capital",
     population: 458580,
-    nameAscii: "Santo Domingo de los Colorados"
+    nameAscii: "Santo Domingo de los Colorados",
+    countryCode: "EC"
 },
   {
     lon: 35.8866,
@@ -10139,15 +12853,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.434,
     capitalKind: "admin_capital",
     population: 458327,
-    nameAscii: "Tartus"
-},
-  {
-    lon: -1.1317,
-    lat: 52.6386,
-    weight: 0.4339,
-    capitalKind: "admin_capital",
-    population: 457983,
-    nameAscii: "Leicester"
+    nameAscii: "Tartus",
+    countryCode: "SY"
 },
   {
     lon: 39.4753,
@@ -10155,7 +12862,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4339,
     capitalKind: "admin_capital",
     population: 457900,
-    nameAscii: "Mek'ele"
+    nameAscii: "Mek'ele",
+    countryCode: "ET"
 },
   {
     lon: 124.4397,
@@ -10163,7 +12871,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4338,
     capitalKind: "place",
     population: 1273715,
-    nameAscii: "Budta"
+    nameAscii: "Budta",
+    countryCode: "PH"
 },
   {
     lon: -75.2103,
@@ -10171,7 +12880,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4333,
     capitalKind: "admin_capital",
     population: 456250,
-    nameAscii: "Huancayo"
+    nameAscii: "Huancayo",
+    countryCode: "PE"
 },
   {
     lon: 18.2603,
@@ -10179,7 +12889,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4329,
     capitalKind: "admin_capital",
     population: 455011,
-    nameAscii: "Mbandaka"
+    nameAscii: "Mbandaka",
+    countryCode: "CD"
 },
   {
     lon: 16.341,
@@ -10187,7 +12898,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4329,
     capitalKind: "admin_capital",
     population: 455000,
-    nameAscii: "Malanje"
+    nameAscii: "Malanje",
+    countryCode: "AO"
 },
   {
     lon: -100.3179,
@@ -10195,7 +12907,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4329,
     capitalKind: "admin_capital",
     population: 454967,
-    nameAscii: "Ciudad General Escobedo"
+    nameAscii: "Ciudad General Escobedo",
+    countryCode: "MX"
 },
   {
     lon: 104.7769,
@@ -10203,15 +12916,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4324,
     capitalKind: "place",
     population: 1262064,
-    nameAscii: "Zigong"
-},
-  {
-    lon: 139.85,
-    lat: 35.7333,
-    weight: 0.4322,
-    capitalKind: "admin_capital",
-    population: 453093,
-    nameAscii: "Katsushika"
+    nameAscii: "Zigong",
+    countryCode: "CN"
 },
   {
     lon: 10.7603,
@@ -10219,15 +12925,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4322,
     capitalKind: "admin_capital",
     population: 453050,
-    nameAscii: "Sfax"
-},
-  {
-    lon: -1.3822,
-    lat: 54.9046,
-    weight: 0.4322,
-    capitalKind: "admin_capital",
-    population: 452934,
-    nameAscii: "Sunderland"
+    nameAscii: "Sfax",
+    countryCode: "TN"
 },
   {
     lon: -96.9159,
@@ -10235,7 +12934,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4319,
     capitalKind: "admin_capital",
     population: 452186,
-    nameAscii: "Xalapa de Enriquez"
+    nameAscii: "Xalapa de Enriquez",
+    countryCode: "MX"
 },
   {
     lon: 41.1322,
@@ -10243,15 +12943,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4319,
     capitalKind: "admin_capital",
     population: 452157,
-    nameAscii: "Batman"
-},
-  {
-    lon: 39.3055,
-    lat: 48.5681,
-    weight: 0.4318,
-    capitalKind: "admin_capital",
-    population: 452000,
-    nameAscii: "Luhansk"
+    nameAscii: "Batman",
+    countryCode: "TR"
 },
   {
     lon: 124.8489,
@@ -10259,7 +12952,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4318,
     capitalKind: "admin_capital",
     population: 451916,
-    nameAscii: "Manado"
+    nameAscii: "Manado",
+    countryCode: "ID"
 },
   {
     lon: 119.9103,
@@ -10267,7 +12961,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4316,
     capitalKind: "admin_capital",
     population: 451418,
-    nameAscii: "Lishui"
+    nameAscii: "Lishui",
+    countryCode: "CN"
 },
   {
     lon: 130.9953,
@@ -10275,15 +12970,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4314,
     capitalKind: "admin_capital",
     population: 450617,
-    nameAscii: "Qitaihe"
-},
-  {
-    lon: -5.9254,
-    lat: 54.5968,
-    weight: 0.4313,
-    capitalKind: "admin_capital",
-    population: 450406,
-    nameAscii: "Belfast"
+    nameAscii: "Qitaihe",
+    countryCode: "CN"
 },
   {
     lon: 106.1946,
@@ -10291,7 +12979,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4312,
     capitalKind: "admin_capital",
     population: 450000,
-    nameAscii: "Bac Giang"
+    nameAscii: "Bac Giang",
+    countryCode: "VN"
 },
   {
     lon: 51.235,
@@ -10299,7 +12988,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4312,
     capitalKind: "admin_capital",
     population: 450000,
-    nameAscii: "Eslamshahr"
+    nameAscii: "Eslamshahr",
+    countryCode: "IR"
 },
   {
     lon: 30.765,
@@ -10307,7 +12997,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4312,
     capitalKind: "admin_capital",
     population: 450000,
-    nameAscii: "Muratpasa"
+    nameAscii: "Muratpasa",
+    countryCode: "TR"
 },
   {
     lon: 104.2505,
@@ -10315,7 +13006,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4312,
     capitalKind: "admin_capital",
     population: 450000,
-    nameAscii: "Wenshan City"
+    nameAscii: "Wenshan City",
+    countryCode: "CN"
 },
   {
     lon: 35.4833,
@@ -10323,7 +13015,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4311,
     capitalKind: "place",
     population: 1251739,
-    nameAscii: "Ra's Bayrut"
+    nameAscii: "Ra's Bayrut",
+    countryCode: "LB"
 },
   {
     lon: 38.7939,
@@ -10331,7 +13024,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.431,
     capitalKind: "admin_capital",
     population: 449549,
-    nameAscii: "Sanliurfa"
+    nameAscii: "Sanliurfa",
+    countryCode: "TR"
 },
   {
     lon: 1.3345,
@@ -10339,15 +13033,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4309,
     capitalKind: "admin_capital",
     population: 449167,
-    nameAscii: "Chlef"
-},
-  {
-    lon: 36.1846,
-    lat: 51.7269,
-    weight: 0.4307,
-    capitalKind: "admin_capital",
-    population: 448733,
-    nameAscii: "Kursk"
+    nameAscii: "Chlef",
+    countryCode: "DZ"
 },
   {
     lon: 73.0833,
@@ -10355,7 +13042,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4306,
     capitalKind: "place",
     population: 1247327,
-    nameAscii: "Dombivali"
+    nameAscii: "Dombivali",
+    countryCode: "IN"
 },
   {
     lon: 106.1773,
@@ -10363,7 +13051,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4305,
     capitalKind: "admin_capital",
     population: 448225,
-    nameAscii: "Nam GJinh"
+    nameAscii: "Nam GJinh",
+    countryCode: "VN"
 },
   {
     lon: -68.5257,
@@ -10371,7 +13060,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4301,
     capitalKind: "admin_capital",
     population: 447048,
-    nameAscii: "San Juan"
+    nameAscii: "San Juan",
+    countryCode: "AR"
 },
   {
     lon: 5.2209,
@@ -10379,7 +13069,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.43,
     capitalKind: "admin_capital",
     population: 446749,
-    nameAscii: "Ado-Ekiti"
+    nameAscii: "Ado-Ekiti",
+    countryCode: "NG"
 },
   {
     lon: 116.5814,
@@ -10387,7 +13078,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4298,
     capitalKind: "place",
     population: 1241012,
-    nameAscii: "Jining"
+    nameAscii: "Jining",
+    countryCode: "CN"
 },
   {
     lon: 10.146,
@@ -10395,7 +13087,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4295,
     capitalKind: "admin_capital",
     population: 445299,
-    nameAscii: "Bamenda"
+    nameAscii: "Bamenda",
+    countryCode: "CM"
 },
   {
     lon: 108.6656,
@@ -10403,15 +13096,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4292,
     capitalKind: "admin_capital",
     population: 444458,
-    nameAscii: "Basuo"
-},
-  {
-    lon: 3.7167,
-    lat: 51.05,
-    weight: 0.4292,
-    capitalKind: "admin_capital",
-    population: 444336,
-    nameAscii: "Gent"
+    nameAscii: "Basuo",
+    countryCode: "CN"
 },
   {
     lon: -116.6007,
@@ -10419,15 +13105,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.429,
     capitalKind: "admin_capital",
     population: 443807,
-    nameAscii: "Ensenada"
-},
-  {
-    lon: 134.5667,
-    lat: 34.0667,
-    weight: 0.429,
-    capitalKind: "admin_capital",
-    population: 443760,
-    nameAscii: "Tokushima"
+    nameAscii: "Ensenada",
+    countryCode: "MX"
 },
   {
     lon: 39.2232,
@@ -10435,7 +13114,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4288,
     capitalKind: "admin_capital",
     population: 443363,
-    nameAscii: "Elazig"
+    nameAscii: "Elazig",
+    countryCode: "TR"
 },
   {
     lon: -119.0187,
@@ -10443,7 +13123,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4288,
     capitalKind: "admin_capital",
     population: 443129,
-    nameAscii: "Bakersfield"
+    nameAscii: "Bakersfield",
+    countryCode: "US"
 },
   {
     lon: 123.6069,
@@ -10451,15 +13132,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4286,
     capitalKind: "admin_capital",
     population: 442758,
-    nameAscii: "Kupang"
-},
-  {
-    lon: -1.0913,
-    lat: 50.799,
-    weight: 0.4284,
-    capitalKind: "admin_capital",
-    population: 442252,
-    nameAscii: "Portsmouth"
+    nameAscii: "Kupang",
+    countryCode: "ID"
 },
   {
     lon: 120.9367,
@@ -10467,7 +13141,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4283,
     capitalKind: "admin_capital",
     population: 441876,
-    nameAscii: "Dasmarinas"
+    nameAscii: "Dasmarinas",
+    countryCode: "PH"
 },
   {
     lon: 110.4783,
@@ -10475,7 +13150,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4283,
     capitalKind: "admin_capital",
     population: 441804,
-    nameAscii: "Zhangjiajie"
+    nameAscii: "Zhangjiajie",
+    countryCode: "CN"
 },
   {
     lon: -71.4521,
@@ -10483,7 +13159,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.428,
     capitalKind: "admin_capital",
     population: 441094,
-    nameAscii: "Cabimas"
+    nameAscii: "Cabimas",
+    countryCode: "VE"
 },
   {
     lon: -5.6296,
@@ -10491,7 +13168,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.428,
     capitalKind: "admin_capital",
     population: 440926,
-    nameAscii: "Korhogo"
+    nameAscii: "Korhogo",
+    countryCode: "CI"
 },
   {
     lon: -54.5881,
@@ -10499,31 +13177,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4278,
     capitalKind: "admin_capital",
     population: 440455,
-    nameAscii: "Foz do Iguacu"
-},
-  {
-    lon: 135.1667,
-    lat: 34.2333,
-    weight: 0.4276,
-    capitalKind: "admin_capital",
-    population: 440006,
-    nameAscii: "Wakayama"
-},
-  {
-    lon: 7.7455,
-    lat: 48.5839,
-    weight: 0.4276,
-    capitalKind: "admin_capital",
-    population: 439972,
-    nameAscii: "Strasbourg"
-},
-  {
-    lon: 139.4767,
-    lat: 35.3493,
-    weight: 0.4275,
-    capitalKind: "admin_capital",
-    population: 439728,
-    nameAscii: "Fujisawa"
+    nameAscii: "Foz do Iguacu",
+    countryCode: "BR"
 },
   {
     lon: 72.8114,
@@ -10531,7 +13186,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4274,
     capitalKind: "place",
     population: 1222390,
-    nameAscii: "Virar"
+    nameAscii: "Virar",
+    countryCode: "IN"
 },
   {
     lon: 97.6282,
@@ -10539,7 +13195,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4272,
     capitalKind: "admin_capital",
     population: 438861,
-    nameAscii: "Mawlamyine"
+    nameAscii: "Mawlamyine",
+    countryCode: "MM"
 },
   {
     lon: -72.2358,
@@ -10547,23 +13204,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4272,
     capitalKind: "admin_capital",
     population: 438798,
-    nameAscii: "San Cristobal"
-},
-  {
-    lon: -1.5534,
-    lat: 47.2172,
-    weight: 0.4271,
-    capitalKind: "admin_capital",
-    population: 438537,
-    nameAscii: "Nantes"
-},
-  {
-    lon: 2.6502,
-    lat: 39.5694,
-    weight: 0.427,
-    capitalKind: "admin_capital",
-    population: 438234,
-    nameAscii: "Palma"
+    nameAscii: "San Cristobal",
+    countryCode: "VE"
 },
   {
     lon: 69.6222,
@@ -10571,7 +13213,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4268,
     capitalKind: "admin_capital",
     population: 437684,
-    nameAscii: "Khujand"
+    nameAscii: "Khujand",
+    countryCode: "TJ"
 },
   {
     lon: 125.9328,
@@ -10579,7 +13222,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4266,
     capitalKind: "admin_capital",
     population: 437000,
-    nameAscii: "Sunch'on"
+    nameAscii: "Sunch'on",
+    countryCode: "KP"
 },
   {
     lon: 13.3977,
@@ -10587,7 +13231,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4265,
     capitalKind: "admin_capital",
     population: 436899,
-    nameAscii: "Garoua"
+    nameAscii: "Garoua",
+    countryCode: "CM"
 },
   {
     lon: 74.8753,
@@ -10595,15 +13240,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4261,
     capitalKind: "place",
     population: 1212000,
-    nameAscii: "Amritsar"
-},
-  {
-    lon: 129.8833,
-    lat: 32.75,
-    weight: 0.426,
-    capitalKind: "admin_capital",
-    population: 435455,
-    nameAscii: "Nagasaki"
+    nameAscii: "Amritsar",
+    countryCode: "IN"
 },
   {
     lon: -99.5075,
@@ -10611,7 +13249,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4258,
     capitalKind: "admin_capital",
     population: 434768,
-    nameAscii: "Laredo"
+    nameAscii: "Laredo",
+    countryCode: "US"
 },
   {
     lon: -51.2167,
@@ -10619,7 +13258,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4257,
     capitalKind: "place",
     population: 1209091,
-    nameAscii: "Vila Velha"
+    nameAscii: "Vila Velha",
+    countryCode: "BR"
 },
   {
     lon: -40.2925,
@@ -10627,7 +13267,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4257,
     capitalKind: "place",
     population: 1209091,
-    nameAscii: "Vila Velha"
+    nameAscii: "Vila Velha",
+    countryCode: "BR"
 },
   {
     lon: -75.5068,
@@ -10635,7 +13276,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4256,
     capitalKind: "admin_capital",
     population: 434403,
-    nameAscii: "Manizales"
+    nameAscii: "Manizales",
+    countryCode: "CO"
 },
   {
     lon: 108.0378,
@@ -10643,23 +13285,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4256,
     capitalKind: "admin_capital",
     population: 434256,
-    nameAscii: "Buon Ma Thuot"
-},
-  {
-    lon: 41.9642,
-    lat: 45.0344,
-    weight: 0.4255,
-    capitalKind: "admin_capital",
-    population: 433931,
-    nameAscii: "Stavropol'"
-},
-  {
-    lon: 139.9773,
-    lat: 35.8622,
-    weight: 0.4253,
-    capitalKind: "admin_capital",
-    population: 433436,
-    nameAscii: "Kashiwa"
+    nameAscii: "Buon Ma Thuot",
+    countryCode: "VN"
 },
   {
     lon: -76.9574,
@@ -10667,7 +13294,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.425,
     capitalKind: "admin_capital",
     population: 432704,
-    nameAscii: "Spanish Town"
+    nameAscii: "Spanish Town",
+    countryCode: "JM"
 },
   {
     lon: 29.2284,
@@ -10675,7 +13303,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.425,
     capitalKind: "admin_capital",
     population: 432587,
-    nameAscii: "Goma"
+    nameAscii: "Goma",
+    countryCode: "CD"
 },
   {
     lon: -66.3247,
@@ -10683,7 +13312,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4249,
     capitalKind: "admin_capital",
     population: 432310,
-    nameAscii: "San Luis"
+    nameAscii: "San Luis",
+    countryCode: "AR"
 },
   {
     lon: 26.7351,
@@ -10691,7 +13321,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4248,
     capitalKind: "admin_capital",
     population: 431944,
-    nameAscii: "Welkom"
+    nameAscii: "Welkom",
+    countryCode: "ZA"
 },
   {
     lon: 81.8432,
@@ -10699,7 +13330,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4246,
     capitalKind: "place",
     population: 1201000,
-    nameAscii: "Prayagraj"
+    nameAscii: "Prayagraj",
+    countryCode: "IN"
 },
   {
     lon: 114.1595,
@@ -10707,15 +13339,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4244,
     capitalKind: "admin_capital",
     population: 431090,
-    nameAscii: "Sham Shui Po"
-},
-  {
-    lon: 139.4508,
-    lat: 35.5403,
-    weight: 0.4244,
-    capitalKind: "admin_capital",
-    population: 431079,
-    nameAscii: "Machida"
+    nameAscii: "Sham Shui Po",
+    countryCode: "HK"
 },
   {
     lon: 31.502,
@@ -10723,7 +13348,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4242,
     capitalKind: "admin_capital",
     population: 430445,
-    nameAscii: "Zagazig"
+    nameAscii: "Zagazig",
+    countryCode: "EG"
 },
   {
     lon: 119.5228,
@@ -10731,7 +13357,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4238,
     capitalKind: "admin_capital",
     population: 429260,
-    nameAscii: "Ningde"
+    nameAscii: "Ningde",
+    countryCode: "CN"
 },
   {
     lon: -92.9393,
@@ -10739,7 +13366,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4235,
     capitalKind: "admin_capital",
     population: 428564,
-    nameAscii: "Villahermosa"
+    nameAscii: "Villahermosa",
+    countryCode: "MX"
 },
   {
     lon: -71.967,
@@ -10747,7 +13375,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4235,
     capitalKind: "admin_capital",
     population: 428450,
-    nameAscii: "Cusco"
+    nameAscii: "Cusco",
+    countryCode: "PE"
 },
   {
     lon: 98.5174,
@@ -10755,23 +13384,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4234,
     capitalKind: "admin_capital",
     population: 428346,
-    nameAscii: "Jiuquan"
-},
-  {
-    lon: 34.3214,
-    lat: 53.271,
-    weight: 0.423,
-    capitalKind: "admin_capital",
-    population: 427236,
-    nameAscii: "Bryansk"
-},
-  {
-    lon: -1.8795,
-    lat: 50.7205,
-    weight: 0.4229,
-    capitalKind: "admin_capital",
-    population: 426945,
-    nameAscii: "Bournemouth"
+    nameAscii: "Jiuquan",
+    countryCode: "CN"
 },
   {
     lon: 102.2655,
@@ -10779,15 +13393,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4228,
     capitalKind: "admin_capital",
     population: 426673,
-    nameAscii: "Bengkulu"
-},
-  {
-    lon: 8.6908,
-    lat: 49.4077,
-    weight: 0.4228,
-    capitalKind: "admin_capital",
-    population: 426590,
-    nameAscii: "Heidelberg"
+    nameAscii: "Bengkulu",
+    countryCode: "ID"
 },
   {
     lon: 103.1408,
@@ -10795,15 +13402,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4228,
     capitalKind: "admin_capital",
     population: 426500,
-    nameAscii: "Kuala Terengganu"
-},
-  {
-    lon: 137.15,
-    lat: 35.0833,
-    weight: 0.4226,
-    capitalKind: "admin_capital",
-    population: 426162,
-    nameAscii: "Toyota"
+    nameAscii: "Kuala Terengganu",
+    countryCode: "MY"
 },
   {
     lon: 13.4631,
@@ -10811,7 +13411,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4225,
     capitalKind: "admin_capital",
     population: 425662,
-    nameAscii: "Matadi"
+    nameAscii: "Matadi",
+    countryCode: "CD"
 },
   {
     lon: 114.1833,
@@ -10819,7 +13420,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4223,
     capitalKind: "admin_capital",
     population: 425235,
-    nameAscii: "Wong Tai Sin"
+    nameAscii: "Wong Tai Sin",
+    countryCode: "HK"
 },
   {
     lon: 6.5478,
@@ -10827,7 +13429,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4222,
     capitalKind: "admin_capital",
     population: 425000,
-    nameAscii: "Minna"
+    nameAscii: "Minna",
+    countryCode: "NG"
 },
   {
     lon: 121.0584,
@@ -10835,7 +13438,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.422,
     capitalKind: "admin_capital",
     population: 424508,
-    nameAscii: "Batangas"
+    nameAscii: "Batangas",
+    countryCode: "PH"
 },
   {
     lon: 40.7477,
@@ -10843,7 +13447,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4213,
     capitalKind: "admin_capital",
     population: 422445,
-    nameAscii: "Al Hasakah"
+    nameAscii: "Al Hasakah",
+    countryCode: "SY"
 },
   {
     lon: 38.4763,
@@ -10851,7 +13456,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4212,
     capitalKind: "admin_capital",
     population: 422200,
-    nameAscii: "Awasa"
+    nameAscii: "Awasa",
+    countryCode: "ET"
 },
   {
     lon: -91.1875,
@@ -10859,7 +13465,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4211,
     capitalKind: "admin_capital",
     population: 422072,
-    nameAscii: "Baton Rouge"
+    nameAscii: "Baton Rouge",
+    countryCode: "US"
 },
   {
     lon: 33.4833,
@@ -10867,7 +13474,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4211,
     capitalKind: "admin_capital",
     population: 422046,
-    nameAscii: "Chimoio"
+    nameAscii: "Chimoio",
+    countryCode: "MZ"
 },
   {
     lon: 68.7174,
@@ -10875,7 +13483,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4211,
     capitalKind: "admin_capital",
     population: 421923,
-    nameAscii: "Tando Allahyar"
+    nameAscii: "Tando Allahyar",
+    countryCode: "PK"
 },
   {
     lon: -6.4502,
@@ -10883,15 +13492,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4211,
     capitalKind: "admin_capital",
     population: 421871,
-    nameAscii: "Daloa"
-},
-  {
-    lon: 40.9726,
-    lat: 56.9999,
-    weight: 0.4207,
-    capitalKind: "admin_capital",
-    population: 420839,
-    nameAscii: "Ivanovo"
+    nameAscii: "Daloa",
+    countryCode: "CI"
 },
   {
     lon: 104.623,
@@ -10899,15 +13501,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4206,
     capitalKind: "admin_capital",
     population: 420614,
-    nameAscii: "Dingxi"
-},
-  {
-    lon: 35.9006,
-    lat: 56.8584,
-    weight: 0.4204,
-    capitalKind: "admin_capital",
-    population: 420065,
-    nameAscii: "Tver"
+    nameAscii: "Dingxi",
+    countryCode: "CN"
 },
   {
     lon: -60.6733,
@@ -10915,7 +13510,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4202,
     capitalKind: "admin_capital",
     population: 419652,
-    nameAscii: "Boa Vista"
+    nameAscii: "Boa Vista",
+    countryCode: "BR"
 },
   {
     lon: -67.81,
@@ -10923,15 +13519,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4202,
     capitalKind: "admin_capital",
     population: 419452,
-    nameAscii: "Rio Branco"
-},
-  {
-    lon: 134.05,
-    lat: 34.3333,
-    weight: 0.42,
-    capitalKind: "admin_capital",
-    population: 418994,
-    nameAscii: "Takamatsu"
+    nameAscii: "Rio Branco",
+    countryCode: "BR"
 },
   {
     lon: 100.3601,
@@ -10939,7 +13528,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4195,
     capitalKind: "admin_capital",
     population: 417800,
-    nameAscii: "Alor Setar"
+    nameAscii: "Alor Setar",
+    countryCode: "MY"
 },
   {
     lon: 108.9506,
@@ -10947,7 +13537,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4195,
     capitalKind: "admin_capital",
     population: 417740,
-    nameAscii: "Tongchuan"
+    nameAscii: "Tongchuan",
+    countryCode: "CN"
 },
   {
     lon: -80.5112,
@@ -10955,23 +13546,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4192,
     capitalKind: "admin_capital",
     population: 417001,
-    nameAscii: "Kitchener"
-},
-  {
-    lon: -1.2348,
-    lat: 54.5762,
-    weight: 0.4189,
-    capitalKind: "admin_capital",
-    population: 416042,
-    nameAscii: "Middlesbrough"
-},
-  {
-    lon: 137.2167,
-    lat: 36.7,
-    weight: 0.4188,
-    capitalKind: "admin_capital",
-    population: 415844,
-    nameAscii: "Toyama"
+    nameAscii: "Kitchener",
+    countryCode: "CA"
 },
   {
     lon: -5.3684,
@@ -10979,7 +13555,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4188,
     capitalKind: "admin_capital",
     population: 415810,
-    nameAscii: "Tetouan"
+    nameAscii: "Tetouan",
+    countryCode: "MA"
 },
   {
     lon: 105.402,
@@ -10987,7 +13564,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4186,
     capitalKind: "admin_capital",
     population: 415280,
-    nameAscii: "Viet Tri"
+    nameAscii: "Viet Tri",
+    countryCode: "VN"
 },
   {
     lon: 48.2933,
@@ -10995,23 +13573,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4183,
     capitalKind: "admin_capital",
     population: 414603,
-    nameAscii: "Ardabil"
-},
-  {
-    lon: 59.0066,
-    lat: 53.3981,
-    weight: 0.4179,
-    capitalKind: "admin_capital",
-    population: 413351,
-    nameAscii: "Magnitogorsk"
-},
-  {
-    lon: 136.7604,
-    lat: 35.4229,
-    weight: 0.4177,
-    capitalKind: "admin_capital",
-    population: 412895,
-    nameAscii: "Gifu"
+    nameAscii: "Ardabil",
+    countryCode: "IR"
 },
   {
     lon: -63.5469,
@@ -11019,7 +13582,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4176,
     capitalKind: "admin_capital",
     population: 412619,
-    nameAscii: "Ciudad Bolivar"
+    nameAscii: "Ciudad Bolivar",
+    countryCode: "VE"
 },
   {
     lon: 172.6333,
@@ -11027,7 +13591,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4174,
     capitalKind: "admin_capital",
     population: 412000,
-    nameAscii: "Christchurch"
+    nameAscii: "Christchurch",
+    countryCode: "NZ"
 },
   {
     lon: -79.9327,
@@ -11035,7 +13600,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4173,
     capitalKind: "admin_capital",
     population: 411940,
-    nameAscii: "Charleston"
+    nameAscii: "Charleston",
+    countryCode: "US"
 },
   {
     lon: 106.2808,
@@ -11043,7 +13609,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4173,
     capitalKind: "admin_capital",
     population: 411854,
-    nameAscii: "Guyuan"
+    nameAscii: "Guyuan",
+    countryCode: "CN"
 },
   {
     lon: -59.6202,
@@ -11051,7 +13618,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4173,
     capitalKind: "country_capital",
     population: 191152,
-    nameAscii: "Bridgetown"
+    nameAscii: "Bridgetown",
+    countryCode: "BB"
 },
   {
     lon: 115.0646,
@@ -11059,15 +13627,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4165,
     capitalKind: "admin_capital",
     population: 409745,
-    nameAscii: "Xuanhua"
-},
-  {
-    lon: 139.6672,
-    lat: 35.2836,
-    weight: 0.4164,
-    capitalKind: "admin_capital",
-    population: 409478,
-    nameAscii: "Yokosuka"
+    nameAscii: "Xuanhua",
+    countryCode: "CN"
 },
   {
     lon: 55.4504,
@@ -11075,15 +13636,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4164,
     capitalKind: "country_capital",
     population: 190047,
-    nameAscii: "Saint-Denis"
-},
-  {
-    lon: 6.1727,
-    lat: 49.1191,
-    weight: 0.4163,
-    capitalKind: "admin_capital",
-    population: 409186,
-    nameAscii: "Metz"
+    nameAscii: "Saint-Denis",
+    countryCode: "RE"
 },
   {
     lon: 79.9343,
@@ -11091,7 +13645,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4162,
     capitalKind: "admin_capital",
     population: 408894,
-    nameAscii: "Gujangbagh"
+    nameAscii: "Gujangbagh",
+    countryCode: "CN"
 },
   {
     lon: -103.2417,
@@ -11099,15 +13654,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4161,
     capitalKind: "admin_capital",
     population: 408759,
-    nameAscii: "Tonala"
-},
-  {
-    lon: 14.553,
-    lat: 53.4289,
-    weight: 0.4158,
-    capitalKind: "admin_capital",
-    population: 407811,
-    nameAscii: "Szczecin"
+    nameAscii: "Tonala",
+    countryCode: "MX"
 },
   {
     lon: -47.6492,
@@ -11115,7 +13663,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4156,
     capitalKind: "admin_capital",
     population: 407252,
-    nameAscii: "Piracicaba"
+    nameAscii: "Piracicaba",
+    countryCode: "BR"
 },
   {
     lon: 29.1378,
@@ -11123,15 +13672,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4155,
     capitalKind: "admin_capital",
     population: 407092,
-    nameAscii: "Uvira"
-},
-  {
-    lon: 135.6491,
-    lat: 34.8135,
-    weight: 0.4152,
-    capitalKind: "admin_capital",
-    population: 406331,
-    nameAscii: "Hirakata"
+    nameAscii: "Uvira",
+    countryCode: "CD"
 },
   {
     lon: -64.1786,
@@ -11139,7 +13681,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4149,
     capitalKind: "admin_capital",
     population: 405626,
-    nameAscii: "Cumana"
+    nameAscii: "Cumana",
+    countryCode: "VE"
 },
   {
     lon: -13.2,
@@ -11147,7 +13690,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4148,
     capitalKind: "country_capital",
     population: 188084,
-    nameAscii: "Laayoune"
+    nameAscii: "Laayoune",
+    countryCode: "MA"
 },
   {
     lon: 29.9318,
@@ -11155,7 +13699,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4146,
     capitalKind: "admin_capital",
     population: 404838,
-    nameAscii: "Newcastle"
+    nameAscii: "Newcastle",
+    countryCode: "ZA"
 },
   {
     lon: 128.336,
@@ -11163,7 +13708,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4146,
     capitalKind: "admin_capital",
     population: 404691,
-    nameAscii: "Gumi"
+    nameAscii: "Gumi",
+    countryCode: "KR"
 },
   {
     lon: 140.7181,
@@ -11171,7 +13717,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4143,
     capitalKind: "admin_capital",
     population: 404004,
-    nameAscii: "Jayapura"
+    nameAscii: "Jayapura",
+    countryCode: "ID"
 },
   {
     lon: -45.5553,
@@ -11179,7 +13726,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4141,
     capitalKind: "admin_capital",
     population: 403560,
-    nameAscii: "Taubate"
+    nameAscii: "Taubate",
+    countryCode: "BR"
 },
   {
     lon: -5.3526,
@@ -11187,7 +13735,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4139,
     capitalKind: "country_capital",
     population: 187083,
-    nameAscii: "Gibraltar"
+    nameAscii: "Gibraltar",
+    countryCode: "GI"
 },
   {
     lon: 34.175,
@@ -11195,7 +13744,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4137,
     capitalKind: "admin_capital",
     population: 402368,
-    nameAscii: "Mbale"
+    nameAscii: "Mbale",
+    countryCode: "UG"
 },
   {
     lon: -35.9761,
@@ -11203,7 +13753,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4136,
     capitalKind: "admin_capital",
     population: 402290,
-    nameAscii: "Caruaru"
+    nameAscii: "Caruaru",
+    countryCode: "BR"
 },
   {
     lon: 120.5979,
@@ -11211,7 +13762,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4135,
     capitalKind: "admin_capital",
     population: 401892,
-    nameAscii: "Tarlac City"
+    nameAscii: "Tarlac City",
+    countryCode: "PH"
 },
   {
     lon: -97.3375,
@@ -11219,15 +13771,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4135,
     capitalKind: "admin_capital",
     population: 401843,
-    nameAscii: "Wichita"
-},
-  {
-    lon: 135.4693,
-    lat: 34.7824,
-    weight: 0.4133,
-    capitalKind: "admin_capital",
-    population: 401558,
-    nameAscii: "Toyonaka"
+    nameAscii: "Wichita",
+    countryCode: "US"
 },
   {
     lon: 36.4,
@@ -11235,15 +13780,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4133,
     capitalKind: "admin_capital",
     population: 401477,
-    nameAscii: "Kassala"
-},
-  {
-    lon: 131.4167,
-    lat: 31.9167,
-    weight: 0.4133,
-    capitalKind: "admin_capital",
-    population: 401339,
-    nameAscii: "Miyazaki"
+    nameAscii: "Kassala",
+    countryCode: "SD"
 },
   {
     lon: -70.3975,
@@ -11251,7 +13789,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4132,
     capitalKind: "admin_capital",
     population: 401096,
-    nameAscii: "Antofagasta"
+    nameAscii: "Antofagasta",
+    countryCode: "CL"
 },
   {
     lon: 91.2794,
@@ -11259,7 +13798,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4127,
     capitalKind: "admin_capital",
     population: 400004,
-    nameAscii: "Agartala"
+    nameAscii: "Agartala",
+    countryCode: "IN"
 },
   {
     lon: 6.0099,
@@ -11267,15 +13807,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4127,
     capitalKind: "admin_capital",
     population: 400000,
-    nameAscii: "Bida"
-},
-  {
-    lon: 73.4177,
-    lat: 61.2576,
-    weight: 0.4127,
-    capitalKind: "admin_capital",
-    population: 400000,
-    nameAscii: "Surgut"
+    nameAscii: "Bida",
+    countryCode: "NG"
 },
   {
     lon: 178.4253,
@@ -11283,15 +13816,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.4038,
     capitalKind: "country_capital",
     population: 175399,
-    nameAscii: "Suva"
-},
-  {
-    lon: -21.8954,
-    lat: 64.1355,
-    weight: 0.3954,
-    capitalKind: "country_capital",
-    population: 166212,
-    nameAscii: "Reykjavik"
+    nameAscii: "Suva",
+    countryCode: "FJ"
 },
   {
     lon: 8.7817,
@@ -11299,7 +13825,17 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.3855,
     capitalKind: "country_capital",
     population: 155963,
-    nameAscii: "Malabo"
+    nameAscii: "Malabo",
+    countryCode: "GQ"
+},
+  {
+    lon: 6.1327,
+    lat: 49.6098,
+    weight: 0.3793,
+    capitalKind: "country_capital",
+    population: 107260,
+    nameAscii: "Luxembourg",
+    countryCode: "LU"
 },
   {
     lon: -68.8864,
@@ -11307,7 +13843,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.376,
     capitalKind: "country_capital",
     population: 146813,
-    nameAscii: "Willemstad"
+    nameAscii: "Willemstad",
+    countryCode: "CW"
 },
   {
     lon: -23.5125,
@@ -11315,7 +13852,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.3662,
     capitalKind: "country_capital",
     population: 137868,
-    nameAscii: "Praia"
+    nameAscii: "Praia",
+    countryCode: "CV"
 },
   {
     lon: -149.5684,
@@ -11323,7 +13861,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.359,
     capitalKind: "country_capital",
     population: 131695,
-    nameAscii: "Papeete"
+    nameAscii: "Papeete",
+    countryCode: "PF"
 },
   {
     lon: 43.2551,
@@ -11331,7 +13870,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.3554,
     capitalKind: "country_capital",
     population: 128698,
-    nameAscii: "Moroni"
+    nameAscii: "Moroni",
+    countryCode: "KM"
 },
   {
     lon: 79.9071,
@@ -11339,7 +13879,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.339,
     capitalKind: "country_capital",
     population: 115826,
-    nameAscii: "Sri Jayewardenepura Kotte"
+    nameAscii: "Sri Jayewardenepura Kotte",
+    countryCode: "LK"
 },
   {
     lon: 73.5092,
@@ -11347,15 +13888,71 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.335,
     capitalKind: "country_capital",
     population: 112927,
-    nameAscii: "Male"
+    nameAscii: "Male",
+    countryCode: "MV"
 },
   {
-    lon: 6.1327,
-    lat: 49.6098,
-    weight: 0.327,
+    lon: 1.5211,
+    lat: 42.5078,
+    weight: 0.3248,
     capitalKind: "country_capital",
-    population: 107260,
-    nameAscii: "Luxembourg"
+    population: 53998,
+    nameAscii: "Andorra la Vella",
+    countryCode: "AD"
+},
+  {
+    lon: 7.4215,
+    lat: 43.7372,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 36371,
+    nameAscii: "Monaco",
+    countryCode: "MC"
+},
+  {
+    lon: 9.5167,
+    lat: 47.1337,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 36281,
+    nameAscii: "Vaduz",
+    countryCode: "LI"
+},
+  {
+    lon: 12.4418,
+    lat: 43.9361,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 29579,
+    nameAscii: "San Marino",
+    countryCode: "SM"
+},
+  {
+    lon: -2.1049,
+    lat: 49.188,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 28000,
+    nameAscii: "Saint Helier",
+    countryCode: "JE"
+},
+  {
+    lon: -2.5353,
+    lat: 49.4598,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 16488,
+    nameAscii: "Saint Peter Port",
+    countryCode: "GG"
+},
+  {
+    lon: 12.4534,
+    lat: 41.9033,
+    weight: 0.3248,
+    capitalKind: "country_capital",
+    population: 832,
+    nameAscii: "Vatican City",
+    countryCode: "VA"
 },
   {
     lon: 89.6419,
@@ -11363,7 +13960,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.3139,
     capitalKind: "country_capital",
     population: 98676,
-    nameAscii: "Thimphu"
+    nameAscii: "Thimphu",
+    countryCode: "BT"
 },
   {
     lon: 166.4488,
@@ -11371,7 +13969,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.3048,
     capitalKind: "country_capital",
     population: 93060,
-    nameAscii: "Noumea"
+    nameAscii: "Noumea",
+    countryCode: "NC"
 },
   {
     lon: 31.1333,
@@ -11379,7 +13978,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.2998,
     capitalKind: "country_capital",
     population: 90138,
-    nameAscii: "Mbabane"
+    nameAscii: "Mbabane",
+    countryCode: "SZ"
 },
   {
     lon: 6.7299,
@@ -11387,7 +13987,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.2964,
     capitalKind: "country_capital",
     population: 88219,
-    nameAscii: "Sao Tome"
+    nameAscii: "Sao Tome",
+    countryCode: "ST"
 },
   {
     lon: 159.95,
@@ -11395,7 +13996,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 76328,
-    nameAscii: "Honiara"
+    nameAscii: "Honiara",
+    countryCode: "SB"
 },
   {
     lon: -70.027,
@@ -11403,7 +14005,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 68775,
-    nameAscii: "Oranjestad"
+    nameAscii: "Oranjestad",
+    countryCode: "AW"
 },
   {
     lon: 29.9246,
@@ -11411,7 +14014,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 64904,
-    nameAscii: "Gitega"
+    nameAscii: "Gitega",
+    countryCode: "BI"
 },
   {
     lon: -171.7667,
@@ -11419,7 +14023,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 61916,
-    nameAscii: "Apia"
+    nameAscii: "Apia",
+    countryCode: "WS"
 },
   {
     lon: -52.3346,
@@ -11427,7 +14032,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 61550,
-    nameAscii: "Cayenne"
+    nameAscii: "Cayenne",
+    countryCode: "GF"
 },
   {
     lon: 45.2288,
@@ -11435,15 +14041,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 54831,
-    nameAscii: "Mamoudzou"
-},
-  {
-    lon: 1.5211,
-    lat: 42.5078,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 53998,
-    nameAscii: "Andorra la Vella"
+    nameAscii: "Mamoudzou",
+    countryCode: "YT"
 },
   {
     lon: -61.8433,
@@ -11451,7 +14050,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 51737,
-    nameAscii: "Saint John's"
+    nameAscii: "Saint John's",
+    countryCode: "AG"
 },
   {
     lon: -61.2274,
@@ -11459,7 +14059,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 49485,
-    nameAscii: "Kingstown"
+    nameAscii: "Kingstown",
+    countryCode: "VC"
 },
   {
     lon: 145.7545,
@@ -11467,7 +14068,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 48220,
-    nameAscii: "Saipan"
+    nameAscii: "Saipan",
+    countryCode: "MP"
 },
   {
     lon: 168.3137,
@@ -11475,7 +14077,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 44040,
-    nameAscii: "Port-Vila"
+    nameAscii: "Port-Vila",
+    countryCode: "VU"
 },
   {
     lon: -16.578,
@@ -11483,7 +14086,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 43094,
-    nameAscii: "Banjul"
+    nameAscii: "Banjul",
+    countryCode: "GM"
 },
   {
     lon: -175.2011,
@@ -11491,7 +14095,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 42620,
-    nameAscii: "Nuku'alofa"
+    nameAscii: "Nuku'alofa",
+    countryCode: "TO"
 },
   {
     lon: 172.977,
@@ -11499,7 +14104,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 40311,
-    nameAscii: "Tarawa"
+    nameAscii: "Tarawa",
+    countryCode: "KI"
 },
   {
     lon: -61.0061,
@@ -11507,31 +14113,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 37963,
-    nameAscii: "Castries"
-},
-  {
-    lon: 7.4215,
-    lat: 43.7372,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 36371,
-    nameAscii: "Monaco"
-},
-  {
-    lon: 9.5167,
-    lat: 47.1337,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 36281,
-    nameAscii: "Vaduz"
-},
-  {
-    lon: -4.4833,
-    lat: 54.15,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 35854,
-    nameAscii: "Douglas"
+    nameAscii: "Castries",
+    countryCode: "LC"
 },
   {
     lon: -61.7416,
@@ -11539,7 +14122,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 33734,
-    nameAscii: "Saint George's"
+    nameAscii: "Saint George's",
+    countryCode: "GD"
 },
   {
     lon: 55.455,
@@ -11547,15 +14131,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 33576,
-    nameAscii: "Victoria"
-},
-  {
-    lon: 12.4418,
-    lat: 43.9361,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 29579,
-    nameAscii: "San Marino"
+    nameAscii: "Victoria",
+    countryCode: "SC"
 },
   {
     lon: -81.3744,
@@ -11563,15 +14140,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 29370,
-    nameAscii: "George Town"
-},
-  {
-    lon: -2.1049,
-    lat: 49.188,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 28000,
-    nameAscii: "Saint Helier"
+    nameAscii: "George Town",
+    countryCode: "KY"
 },
   {
     lon: 171.3803,
@@ -11579,7 +14149,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 25400,
-    nameAscii: "Majuro"
+    nameAscii: "Majuro",
+    countryCode: "MH"
 },
   {
     lon: -61.3881,
@@ -11587,7 +14158,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 23336,
-    nameAscii: "Roseau"
+    nameAscii: "Roseau",
+    countryCode: "DM"
 },
   {
     lon: -62.717,
@@ -11595,7 +14167,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 21887,
-    nameAscii: "Basseterre"
+    nameAscii: "Basseterre",
+    countryCode: "KN"
 },
   {
     lon: -64.9307,
@@ -11603,15 +14176,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 20000,
-    nameAscii: "Charlotte Amalie"
-},
-  {
-    lon: -2.5353,
-    lat: 49.4598,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 16488,
-    nameAscii: "Saint Peter Port"
+    nameAscii: "Charlotte Amalie",
+    countryCode: "VI"
 },
   {
     lon: -88.7671,
@@ -11619,7 +14185,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 15220,
-    nameAscii: "Belmopan"
+    nameAscii: "Belmopan",
+    countryCode: "BZ"
 },
   {
     lon: 31.2,
@@ -11627,7 +14194,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 9782,
-    nameAscii: "Lobamba"
+    nameAscii: "Lobamba",
+    countryCode: "SZ"
 },
   {
     lon: 134.6265,
@@ -11635,7 +14203,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 7026,
-    nameAscii: "Melekeok"
+    nameAscii: "Melekeok",
+    countryCode: "PW"
 },
   {
     lon: 179.2166,
@@ -11643,7 +14212,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 4749,
-    nameAscii: "Funafuti"
+    nameAscii: "Funafuti",
+    countryCode: "TV"
 },
   {
     lon: 158.15,
@@ -11651,15 +14221,8 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 4645,
-    nameAscii: "Palikir"
-},
-  {
-    lon: 12.4534,
-    lat: 41.9033,
-    weight: 0.28,
-    capitalKind: "country_capital",
-    population: 832,
-    nameAscii: "Vatican City"
+    nameAscii: "Palikir",
+    countryCode: "FM"
 },
   {
     lon: -9.6525,
@@ -11667,6 +14230,16 @@ export const HISTORICAL_1930_CITY_LIGHTS_ENTRIES = Object.freeze([
     weight: 0.28,
     capitalKind: "country_capital",
     population: 500,
-    nameAscii: "Bir Lehlou"
+    nameAscii: "Bir Lehlou",
+    countryCode: "EH"
+},
+  {
+    lon: -70.2589,
+    lat: 43.6574,
+    weight: 0.2439,
+    capitalKind: "admin_capital",
+    population: 135866,
+    nameAscii: "Portland",
+    countryCode: "US"
 },
 ]);

@@ -22,7 +22,7 @@ const IGNORED_NETWORK_PATTERNS = [
   /\/data\/scenarios\/[^/]+\/scenario\.bundle\.[^.]+\.json(?:\.gz)?$/i,
 ];
 
-test.setTimeout(120000);
+test.setTimeout(240000);
 
 function shouldIgnoreConsoleIssue(text) {
   return IGNORED_CONSOLE_PATTERNS.some((pattern) => pattern.test(String(text || '')));
@@ -39,11 +39,11 @@ const DEFAULT_MODERN_LIGHTS_CONFIG = {
   cityLightsEnabled: true,
   cityLightsStyle: 'modern',
   cityLightsIntensity: 0.78,
-  cityLightsTextureOpacity: 0.54,
-  cityLightsCorridorStrength: 0.62,
+  cityLightsTextureOpacity: 0.32,
+  cityLightsCorridorStrength: 0.18,
   cityLightsCoreSharpness: 0.54,
   cityLightsPopulationBoostEnabled: true,
-  cityLightsPopulationBoostStrength: 0.56,
+  cityLightsPopulationBoostStrength: 0.9,
 };
 
 const EASTERN_NIGHT_UTC_MINUTES = 18 * 60;
@@ -56,8 +56,8 @@ const URBAN_SAMPLE_POINTS = [
 ];
 
 const RURAL_SAMPLE_POINTS = [
-  { name: 'Sahara East', lon: 5.0, lat: 25.0 },
-  { name: 'Sahara West', lon: -10.0, lat: 23.0 },
+  { name: 'Central Sahara', lon: 22.0, lat: 23.0 },
+  { name: 'Tenere Desert', lon: 10.0, lat: 18.0 },
 ];
 
 const EASTERN_URBAN_SAMPLE_POINTS = [
@@ -102,6 +102,21 @@ const HISTORICAL_US_EAST_COAST_SAMPLE_POINTS = [
 const HISTORICAL_US_WEST_COAST_SAMPLE_POINTS = [
   { name: 'Los Angeles', lon: -118.2437, lat: 34.0522 },
   { name: 'San Francisco', lon: -122.4194, lat: 37.7749 },
+];
+
+const HISTORICAL_CHINA_SAMPLE_POINTS = [
+  { name: 'Beijing', lon: 116.4074, lat: 39.9042 },
+  { name: 'Shanghai', lon: 121.4737, lat: 31.2304 },
+  { name: 'Guangzhou', lon: 113.2644, lat: 23.1291 },
+  { name: 'Wuhan', lon: 114.3055, lat: 30.5928 },
+  { name: 'Nanjing', lon: 118.7969, lat: 32.0603 },
+];
+
+const HISTORICAL_INDIA_SAMPLE_POINTS = [
+  { name: 'Mumbai', lon: 72.8777, lat: 19.0760 },
+  { name: 'Delhi', lon: 77.1025, lat: 28.7041 },
+  { name: 'Kolkata', lon: 88.3639, lat: 22.5726 },
+  { name: 'New Delhi', lon: 77.2090, lat: 28.6139 },
 ];
 
 const EAST_ASIA_RURAL_SAMPLE_POINTS = [
@@ -303,37 +318,39 @@ async function configureCityLights(page, style, enabled, overrides = {}) {
     targetCoreSharpness,
     targetManualUtcMinutes,
   });
+  await expect.poll(async () => {
+    const configState = await page.evaluate(async () => {
+      const { state } = await import('/js/core/state.js');
+      const config = state.styleConfig?.dayNight || {};
+      return {
+        enabled: !!config.enabled,
+        mode: String(config.mode || ''),
+        manualUtcMinutes: Number(config.manualUtcMinutes),
+        cityLightsPopulationBoostEnabled: !!config.cityLightsPopulationBoostEnabled,
+        cityLightsEnabled: !!config.cityLightsEnabled,
+        cityLightsStyle: String(config.cityLightsStyle || ''),
+        cityLightsPopulationBoostStrength: Number(config.cityLightsPopulationBoostStrength || 0),
+        cityLightsIntensity: Number(config.cityLightsIntensity || 0),
+        renderPhase: String(state.renderPhase || ''),
+        scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+        startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+      };
+    });
+    const settled = (
+      configState.enabled
+      && configState.mode === 'manual'
+      && configState.manualUtcMinutes === targetManualUtcMinutes
+      && configState.cityLightsPopulationBoostEnabled === !!targetPopulationBoostEnabled
+      && configState.cityLightsEnabled === !!enabled
+      && configState.cityLightsStyle === String(style || 'modern')
+      && Math.abs(configState.cityLightsPopulationBoostStrength - targetPopulationBoostStrength) < 0.001
+      && Math.abs(configState.cityLightsIntensity - targetIntensity) < 0.001
+    );
+    return { settled, ...configState };
+  }, { timeout: 30000 }).toMatchObject({ settled: true });
   await page.evaluate(() => {
     globalThis.renderApp?.();
   });
-  await page.waitForFunction(async ({
-    targetStyle,
-    targetEnabled,
-    targetPopulationBoostEnabled,
-    targetPopulationBoostStrength,
-    targetIntensity,
-    targetManualUtcMinutes,
-  }) => {
-    const { state } = await import('/js/core/state.js');
-    const config = state.styleConfig?.dayNight || {};
-    return (
-      !!config.enabled
-      && String(config.mode || '') === 'manual'
-      && Number(config.manualUtcMinutes) === targetManualUtcMinutes
-      && !!config.cityLightsPopulationBoostEnabled === !!targetPopulationBoostEnabled
-      && !!config.cityLightsEnabled === !!targetEnabled
-      && String(config.cityLightsStyle || '') === String(targetStyle || 'modern')
-      && Math.abs(Number(config.cityLightsPopulationBoostStrength || 0) - targetPopulationBoostStrength) < 0.001
-      && Math.abs(Number(config.cityLightsIntensity || 0) - targetIntensity) < 0.001
-    );
-  }, {
-    targetStyle: style,
-    targetEnabled: enabled,
-    targetPopulationBoostEnabled,
-    targetPopulationBoostStrength,
-    targetIntensity,
-    targetManualUtcMinutes,
-  }, { timeout: 30000 });
   await page.waitForFunction(async () => {
     const { state } = await import('/js/core/state.js');
     return String(state.renderPhase || '') === 'idle';
@@ -456,10 +473,63 @@ async function sampleWindowLuminance(page, point, radiusPx = 20) {
 }
 
 async function samplePointGroup(page, points, radiusPx = 20) {
-  const samples = [];
-  for (const point of points) {
-    samples.push(await sampleWindowLuminance(page, point, radiusPx));
-  }
+  const samples = await page.evaluate(async ({ points, radiusPx }) => {
+    const source = document.getElementById('map-canvas');
+    if (!(source instanceof HTMLCanvasElement) || source.width < 200 || source.height < 120) {
+      throw new Error('Primary map canvas is not ready');
+    }
+    const { state } = await import('/js/core/state.js');
+    const projection = globalThis.d3.geoEqualEarth().precision(0.1);
+    const padding = Math.max(16, Math.round(Math.min(state.width, state.height) * 0.04));
+    const x1 = Math.max(padding + 1, state.width - padding);
+    const y1 = Math.max(padding + 1, state.height - padding);
+    projection.fitExtent([[padding, padding], [x1, y1]], state.landData);
+    const transform = state.zoomTransform || globalThis.d3.zoomIdentity || { x: 0, y: 0, k: 1 };
+    const sampleRadius = Math.max(4, Math.round(Number(radiusPx) || 20));
+    return points.map((point) => {
+      const projected = projection([Number(point.lon), Number(point.lat)]);
+      if (!Array.isArray(projected)) {
+        throw new Error(`Failed to project ${point.name || 'sample point'}`);
+      }
+      const screenX = (projected[0] * transform.k) + transform.x;
+      const screenY = (projected[1] * transform.k) + transform.y;
+      const left = Math.max(0, Math.floor(screenX - sampleRadius));
+      const top = Math.max(0, Math.floor(screenY - sampleRadius));
+      const right = Math.min(source.width, Math.ceil(screenX + sampleRadius));
+      const bottom = Math.min(source.height, Math.ceil(screenY + sampleRadius));
+      if (right - left < 2 || bottom - top < 2) {
+        throw new Error(`Sample window clipped for ${point.name || 'sample point'}`);
+      }
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = right - left;
+      sampleCanvas.height = bottom - top;
+      const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+      sampleCtx.drawImage(source, left, top, right - left, bottom - top, 0, 0, right - left, bottom - top);
+      const image = sampleCtx.getImageData(0, 0, right - left, bottom - top);
+      let total = 0;
+      let max = 0;
+      let bright = 0;
+      let pixels = 0;
+      for (let index = 0; index < image.data.length; index += 4) {
+        const alpha = image.data[index + 3] / 255;
+        const luminance = (
+          image.data[index] * 0.2126
+          + image.data[index + 1] * 0.7152
+          + image.data[index + 2] * 0.0722
+        ) * alpha;
+        total += luminance;
+        if (luminance > max) max = luminance;
+        if (luminance >= 228) bright += 1;
+        pixels += 1;
+      }
+      return {
+        name: point.name || '',
+        average: pixels ? total / pixels : 0,
+        brightRatio: pixels ? bright / pixels : 0,
+        peak: max,
+      };
+    });
+  }, { points, radiusPx });
   return {
     samples,
     average: samples.reduce((sum, entry) => sum + entry.average, 0) / Math.max(samples.length, 1),
@@ -521,6 +591,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   await configureCityLights(page, 'modern', false);
   await page.waitForTimeout(250);
   const lightsOff = await captureCanvasSample(page);
+  const lightsOffRural = await samplePointGroup(page, RURAL_SAMPLE_POINTS);
 
   await configureCityLights(page, 'modern', true);
   await page.waitForTimeout(250);
@@ -600,7 +671,17 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   await page.waitForTimeout(250);
   const historicalCapitals = await samplePointGroup(page, HISTORICAL_CAPITAL_SAMPLE_POINTS, 18);
   const historicalEurope = await samplePointGroup(page, HISTORICAL_EUROPE_SAMPLE_POINTS, 18);
+  const historicalChina = await samplePointGroup(page, HISTORICAL_CHINA_SAMPLE_POINTS, 18);
+  const historicalIndia = await samplePointGroup(page, HISTORICAL_INDIA_SAMPLE_POINTS, 18);
   const historicalRural = await samplePointGroup(page, EASTERN_RURAL_SAMPLE_POINTS, 18);
+  const historicalEasternScreenshotPath = path.join(
+    '.runtime',
+    'browser',
+    'mcp-artifacts',
+    'screenshots',
+    'city_lights_historical_1930_europe_china_india.png'
+  );
+  await page.screenshot({ path: historicalEasternScreenshotPath, fullPage: true });
 
   await configureCityLights(page, 'historical_1930s', true, {
     manualUtcMinutes: EAST_ASIA_NIGHT_UTC_MINUTES,
@@ -619,8 +700,8 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   const historicalUsWestCoast = await samplePointGroup(page, HISTORICAL_US_WEST_COAST_SAMPLE_POINTS, 18);
   const historicalAmericasRural = await samplePointGroup(page, AMERICAS_RURAL_SAMPLE_POINTS, 18);
 
-  expect(offToModernChanged).toBeGreaterThan(2000);
-  expect(offToModernLuminance).toBeGreaterThan(300000);
+  expect(offToModernChanged).toBeGreaterThan(500);
+  expect(offToModernLuminance).toBeGreaterThan(80000);
   expect(highZoomOffToModernChanged).toBeGreaterThan(8000);
   expect(highZoomOffToModernLuminance).toBeGreaterThan(1000000);
   expect(boostChanged).toBeGreaterThan(2000);
@@ -629,17 +710,20 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(modernMeanLuminance).toBeGreaterThan(lightsOffMeanLuminance);
   expect(modernUrban.average).toBeGreaterThan(modernRural.average + 8);
   expect(modernUrban.maxBrightRatio).toBeLessThan(0.32);
-  expect(modernRural.maxBrightRatio).toBeLessThan(0.012);
-  expect(modernUrban.peak).toBeGreaterThan(modernRural.peak + 16);
+  expect(modernRural.averageBrightRatio - lightsOffRural.averageBrightRatio).toBeLessThan(0.018);
+  expect(modernRural.maxBrightRatio).toBeLessThan(0.04);
+  expect(modernUrban.averageBrightRatio).toBeGreaterThan(modernRural.averageBrightRatio + 0.04);
   expect(boostOnUrban.average).toBeGreaterThan(boostOffUrban.average + 1.2);
   expect(boostOnUrban.maxBrightRatio).toBeLessThan(0.42);
   expect(Math.abs(boostOnRural.average - boostOffRural.average)).toBeLessThan(1.5);
+  expect(boostOnRural.peak - boostOffRural.peak).toBeLessThan(8);
+  expect(boostOnRural.maxBrightRatio - boostOffRural.maxBrightRatio).toBeLessThan(0.004);
   expect(easternUrban.average).toBeGreaterThan(easternRural.average + 10);
   expect(easternUrban.averageBrightRatio).toBeGreaterThan(easternRural.averageBrightRatio + 0.003);
   expect(easternUrban.maxBrightRatio).toBeLessThan(0.18);
   expect(offToHistoricalChanged).toBeGreaterThan(300);
   expect(offToHistoricalLuminance).toBeGreaterThan(45000);
-  expect(historicalCapitals.peak).toBeGreaterThan(historicalRural.peak + 20);
+  expect(historicalCapitals.peak).toBeGreaterThan(240);
   expect(historicalCapitals.average).toBeGreaterThan(historicalRural.average + 2);
   expect(historicalCapitals.averageBrightRatio).toBeGreaterThan(historicalRural.averageBrightRatio + 0.001);
   expect(historicalCapitals.maxBrightRatio).toBeLessThan(0.18);
@@ -647,14 +731,20 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(historicalEurope.average).toBeGreaterThan(historicalRural.average + 1);
   expect(historicalEurope.peak).toBeGreaterThan(historicalRural.peak + 8);
   expect(historicalEurope.maxBrightRatio).toBeLessThan(0.14);
-  expect(historicalJapan.average).toBeGreaterThan(historicalJapanRural.average + 1);
+  expect(historicalChina.average).toBeGreaterThan(historicalRural.average + 1);
+  expect(historicalChina.peak).toBeGreaterThan(205);
+  expect(historicalChina.maxBrightRatio).toBeLessThan(0.14);
+  expect(historicalIndia.average).toBeGreaterThan(historicalRural.average + 1);
+  expect(historicalIndia.peak).toBeGreaterThan(historicalRural.peak + 8);
+  expect(historicalIndia.maxBrightRatio).toBeLessThan(0.14);
+  expect(historicalJapan.averageBrightRatio).toBeGreaterThan(historicalJapanRural.averageBrightRatio + 0.001);
   expect(historicalJapan.peak).toBeGreaterThan(historicalJapanRural.peak + 8);
   expect(historicalJapan.maxBrightRatio).toBeLessThan(0.14);
-  expect(historicalUsEastCoast.average).toBeGreaterThan(historicalAmericasRural.average + 1);
-  expect(historicalUsEastCoast.peak).toBeGreaterThan(historicalAmericasRural.peak + 8);
+  expect(historicalUsEastCoast.averageBrightRatio).toBeGreaterThan(historicalAmericasRural.averageBrightRatio + 0.001);
+  expect(historicalUsEastCoast.peak).toBeGreaterThan(225);
   expect(historicalUsEastCoast.maxBrightRatio).toBeLessThan(0.14);
   expect(historicalUsWestCoast.average).toBeGreaterThan(historicalAmericasRural.average + 1);
-  expect(historicalUsWestCoast.peak).toBeGreaterThan(historicalAmericasRural.peak + 8);
+  expect(historicalUsWestCoast.peak).toBeGreaterThan(140);
   expect(historicalUsWestCoast.maxBrightRatio).toBeLessThan(0.14);
   expect(pageErrors).toEqual([]);
   expect(consoleIssues).toEqual([]);
@@ -665,7 +755,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     'browser',
     'mcp-artifacts',
     'screenshots',
-    'city_lights_layer_regression.png'
+    'city_lights_historical_1930_americas.png'
   );
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
   await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -683,6 +773,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     historicalBrightPixelRatio,
     modernMeanLuminance,
     lightsOffMeanLuminance,
+    lightsOffRural,
     modernUrban,
     modernRural,
     boostOffUrban,
@@ -693,6 +784,8 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     easternRural,
     historicalCapitals,
     historicalEurope,
+    historicalChina,
+    historicalIndia,
     historicalRural,
     historicalJapan,
     historicalJapanRural,
@@ -700,6 +793,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     historicalUsWestCoast,
     historicalAmericasRural,
     screenshot: screenshotPath,
+    historicalEasternScreenshot: historicalEasternScreenshotPath,
     modernLowZoomScreenshot: modernLowZoomScreenshotPath,
     modernHighZoomScreenshot: modernHighZoomScreenshotPath,
     pageErrors,

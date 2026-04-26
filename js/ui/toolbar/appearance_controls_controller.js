@@ -1833,12 +1833,12 @@ export function createAppearanceControlsController({
     bindDayNightInput(dayNightCityLightsTextureOpacity, (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsTextureOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.54, 0, 1);
+      dayNight.cityLightsTextureOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.32, 0, 1);
     }, "day-night-city-lights-texture-opacity");
     bindDayNightInput(dayNightCityLightsCorridorStrength, (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsCorridorStrength = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
+      dayNight.cityLightsCorridorStrength = clamp(Number.isFinite(value) ? value / 100 : 0.18, 0, 1);
     }, "day-night-city-lights-corridor-strength");
     bindDayNightInput(dayNightCityLightsCoreSharpness, (event) => {
       const value = Number(event.target.value);
@@ -1852,7 +1852,7 @@ export function createAppearanceControlsController({
     bindDayNightInput(dayNightCityLightsPopulationBoostStrength, (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsPopulationBoostStrength = clamp(Number.isFinite(value) ? value / 100 : 0.56, 0, 1.5);
+      dayNight.cityLightsPopulationBoostStrength = clamp(Number.isFinite(value) ? value / 100 : 0.9, 0, 1.5);
     }, "day-night-city-lights-population-boost-strength");
     bindDayNightInput(dayNightHistoricalCityLightsDensity, (event) => {
       const value = Number(event.target.value);

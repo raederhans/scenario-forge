@@ -14,8 +14,27 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE_PATH = PROJECT_ROOT / "data" / "world_cities.geojson"
 DEFAULT_OUTPUT_PATH = PROJECT_ROOT / "js" / "core" / "city_lights_historical_1930_asset.js"
 DEFAULT_EXCLUSIONS_PATH = PROJECT_ROOT / "data" / "historical_city_lights_1930_exclusions.json"
+DEFAULT_HIERARCHY_PATH = PROJECT_ROOT / "data" / "hierarchy.json"
 DEFAULT_POPULATION_THRESHOLD = 1_200_000
 DEFAULT_ADMIN_CAPITAL_POPULATION_THRESHOLD = 400_000
+CALIBRATION_VERSION = "balanced-2026-04"
+EUROPE_INTENSIVE_SUBREGIONS = {
+    "subregion_northern_europe",
+    "subregion_southern_europe",
+    "subregion_western_europe",
+}
+US_COASTAL_HUB_NAMES = {
+    "new york",
+    "boston",
+    "philadelphia",
+    "baltimore",
+    "washington",
+    "los angeles",
+    "san francisco",
+    "seattle",
+    "portland",
+    "san diego",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,6 +55,11 @@ def parse_args() -> argparse.Namespace:
         "--exclusions-file",
         default=str(DEFAULT_EXCLUSIONS_PATH),
         help="Optional JSON file with manual post-1930 city exclusions.",
+    )
+    parser.add_argument(
+        "--hierarchy-file",
+        default=str(DEFAULT_HIERARCHY_PATH),
+        help="Country hierarchy metadata used for regional 1930s light calibration.",
     )
     parser.add_argument(
         "--population-threshold",
@@ -77,11 +101,59 @@ def load_exclusions(path: Path) -> set[tuple[str, str]]:
     return exclusions
 
 
+def load_country_meta(path: Path) -> dict[str, dict]:
+    if not path.exists():
+        return {}
+    payload = read_json(path)
+    if not isinstance(payload, dict):
+        return {}
+    country_groups = payload.get("country_groups", {})
+    if not isinstance(country_groups, dict):
+        return {}
+    country_meta = country_groups.get("country_meta", {})
+    return country_meta if isinstance(country_meta, dict) else {}
+
+
 def clamp(value: float, minimum: float, maximum: float) -> float:
     return max(minimum, min(maximum, value))
 
 
-def compute_weight(population: float, *, is_country_capital: bool, is_admin_capital: bool) -> float:
+def resolve_calibration(
+    *,
+    country_code: str,
+    name_ascii: str,
+    base_tier: str,
+    country_meta: dict[str, dict],
+) -> dict[str, float | bool]:
+    meta = country_meta.get(country_code, {})
+    continent_id = str(meta.get("continent_id") or "").strip().lower()
+    subregion_id = str(meta.get("subregion_id") or "").strip().lower()
+    city_name = name_ascii.strip().lower()
+    is_europe = continent_id == "continent_europe"
+    is_europe_intensive = subregion_id in EUROPE_INTENSIVE_SUBREGIONS
+    is_us_coastal_hub = country_code == "US" and city_name in US_COASTAL_HUB_NAMES
+    is_japan = country_code == "JP"
+    is_asian_population_cap = country_code in {"CN", "IN"}
+
+    return {
+        "weight_multiplier": 1.16 if is_europe_intensive else 1.10 if is_europe else 1.04 if is_japan else 1.0,
+        "admin_bonus": 0.03 if is_japan else 0.0,
+        "admin_population_threshold": 250_000.0 if is_europe else 0.0,
+        "ordinary_population_threshold": 900_000.0 if is_europe and base_tier == "major" else 0.0,
+        "admin_min_weight": 0.65 if is_europe_intensive else 0.63 if is_europe else 0.0,
+        "ordinary_min_weight": 0.74 if is_europe_intensive else 0.72 if is_europe else 0.76 if is_us_coastal_hub else 0.0,
+        "ordinary_force_keep": is_us_coastal_hub,
+        "asian_population_cap": is_asian_population_cap,
+    }
+
+
+def compute_weight(
+    population: float,
+    *,
+    is_country_capital: bool,
+    is_admin_capital: bool,
+    calibration: dict[str, float | bool],
+) -> float:
     log_pop = math.log10(max(population, 1.0))
     population_component = clamp((log_pop - 4.9) / 2.0, 0.0, 1.0)
     weight = population_component * 0.72
@@ -89,6 +161,14 @@ def compute_weight(population: float, *, is_country_capital: bool, is_admin_capi
         weight += 0.28
     elif is_admin_capital:
         weight += 0.16
+    weight *= float(calibration.get("weight_multiplier") or 1.0)
+    if is_admin_capital:
+        weight += float(calibration.get("admin_bonus") or 0.0)
+        weight = max(weight, float(calibration.get("admin_min_weight") or 0.0))
+    elif not is_country_capital:
+        weight = max(weight, float(calibration.get("ordinary_min_weight") or 0.0))
+    if bool(calibration.get("asian_population_cap")) and not is_country_capital and population >= 20_000_000:
+        weight = min(weight, 0.96)
     return round(clamp(weight, 0.18, 1.0), 4)
 
 
@@ -97,7 +177,8 @@ def build_entries(
     exclusions: set[tuple[str, str]],
     population_threshold: int,
     admin_capital_population_threshold: int,
-) -> tuple[list[dict], dict[str, float | int]]:
+    country_meta: dict[str, dict],
+) -> tuple[list[dict], dict[str, float | int | str]]:
     entries: list[dict] = []
     excluded_count = 0
     country_capital_count = 0
@@ -119,10 +200,21 @@ def build_entries(
         is_country_capital = bool(props.get("is_country_capital"))
         is_admin_capital = bool(props.get("is_admin_capital"))
         population = float(props.get("population") or 0)
+        base_tier = str(props.get("base_tier") or "").strip().lower()
+        calibration = resolve_calibration(
+            country_code=country_code,
+            name_ascii=name_ascii,
+            base_tier=base_tier,
+            country_meta=country_meta,
+        )
         keep_entry = (
             is_country_capital
-            or (is_admin_capital and population >= admin_capital_population_threshold)
-            or population >= population_threshold
+            or (
+                is_admin_capital
+                and population >= float(calibration.get("admin_population_threshold") or admin_capital_population_threshold)
+            )
+            or population >= float(calibration.get("ordinary_population_threshold") or population_threshold)
+            or bool(calibration.get("ordinary_force_keep"))
         )
         if not keep_entry:
             continue
@@ -147,10 +239,12 @@ def build_entries(
                     population,
                     is_country_capital=is_country_capital,
                     is_admin_capital=is_admin_capital,
+                    calibration=calibration,
                 ),
                 "capitalKind": capital_kind,
                 "population": int(round(population)),
                 "nameAscii": name_ascii,
+                "countryCode": country_code,
             }
         )
 
@@ -162,13 +256,14 @@ def build_entries(
         )
     )
     weights = [float(entry["weight"]) for entry in entries]
-    stats: dict[str, float | int] = {
+    stats: dict[str, float | int | str] = {
         "entryCount": len(entries),
         "countryCapitalCount": country_capital_count,
         "adminCapitalCount": admin_capital_count,
         "excludedCount": excluded_count,
         "populationThreshold": population_threshold,
         "adminCapitalPopulationThreshold": admin_capital_population_threshold,
+        "calibrationVersion": CALIBRATION_VERSION,
         "maxWeight": round(max(weights), 4) if weights else 0.0,
         "meanWeight": round(sum(weights) / len(weights), 4) if weights else 0.0,
     }
@@ -198,7 +293,7 @@ def write_module(
     source_ref: str,
     exclusions_ref: str,
     entries: list[dict],
-    stats: dict[str, float | int],
+    stats: dict[str, float | int | str],
 ) -> None:
     module_text = f"""// Generated by tools/build_city_lights_historical_1930_asset.py
 // Source: {source_ref}
@@ -226,17 +321,20 @@ def main() -> int:
     source_path = Path(args.source_file).expanduser().resolve()
     output_path = Path(args.output).expanduser().resolve()
     exclusions_path = Path(args.exclusions_file).expanduser().resolve()
+    hierarchy_path = Path(args.hierarchy_file).expanduser().resolve()
 
     if not source_path.exists():
         raise SystemExit(f"Source file not found: {source_path}")
 
     features = load_features(source_path)
     exclusions = load_exclusions(exclusions_path)
+    country_meta = load_country_meta(hierarchy_path)
     entries, stats = build_entries(
         features,
         exclusions,
         args.population_threshold,
         args.admin_capital_population_threshold,
+        country_meta,
     )
     write_module(
         output_path,

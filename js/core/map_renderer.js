@@ -864,6 +864,12 @@ const modernCityLightsPopulationBoostCache = {
   urbanEntries: [],
   cityEntries: [],
 };
+const historicalCityLightsDerivedGlowCache = {
+  key: "",
+  entries: [],
+};
+const HISTORICAL_DERIVED_GLOW_MIN_WEIGHT = 0.62;
+const HISTORICAL_DERIVED_GLOW_MAX_ENTRIES = 520;
 const layerResolverCache = {
   primaryRef: null,
   detailRef: null,
@@ -14719,27 +14725,28 @@ function drawModernCityLightsTexture(config, intensity) {
     if (shouldCullModernLightEntry(entry, overscan)) return;
     const normalized = normalizeModernCityLightsValue(entry.value);
     const lumaWeight = Math.pow(normalized, 0.78);
-    const densityDampen = entry.neighborCount >= 7 ? 0.72
-      : entry.neighborCount >= 5 ? 0.84
+    const densityDampen = entry.neighborCount >= 7 ? 0.56
+      : entry.neighborCount >= 5 ? 0.72
+        : entry.neighborCount >= 3 ? 0.88
       : 1.0;
     const isolationAlphaBoost = entry.neighborCount <= 1 ? 0.06 : 0;
     const latFade = getModernCityLightLatitudeFade(entry.gridY);
     const alpha = clamp(
       intensity
-      * (0.38 + (textureOpacity * 1.04))
-      * (0.08 + (lumaWeight * 0.36))
+      * (0.16 + (textureOpacity * 0.52))
+      * (0.035 + (lumaWeight * 0.22))
       * zoomProfile.textureAlphaScale
       * densityDampen
       * latFade,
       0,
-      0.4
+      0.16
     );
     if (alpha <= 0.002) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.textureJitterStrength);
     const isolationSpread = entry.neighborCount <= 1 ? 1.38
       : entry.neighborCount <= 3 ? 1.18
       : 1.0;
-    const radiusScale = (zoomProfile.textureRadiusScale + 0.12 + (lumaWeight * 0.48)) * isolationSpread;
+    const radiusScale = (zoomProfile.textureRadiusScale + (lumaWeight * 0.24)) * isolationSpread;
     const blobRx = entry.rx * radiusScale;
     const blobRy = entry.ry * radiusScale;
     drawSoftLightBlob(
@@ -14754,7 +14761,7 @@ function drawModernCityLightsTexture(config, intensity) {
         innerStop: 0.06,
         midStop: 0.7,
         innerAlphaScale: clamp(0.96 + isolationAlphaBoost, 0, 1.08),
-        midAlphaScale: 0.28,
+        midAlphaScale: 0.14,
       }
     );
   });
@@ -14776,18 +14783,18 @@ function drawModernCityLightsCorridors(config, intensity) {
     const latFade = getModernCityLightLatitudeFade(entry.gridY);
     const alpha = clamp(
       intensity
-      * (0.42 + (corridorStrength * 0.88))
-      * (0.06 + (corridorWeight * 0.38))
+      * (0.16 + (corridorStrength * 0.42))
+      * (0.03 + (corridorWeight * 0.2))
       * zoomProfile.corridorAlphaScale
       * latFade,
       0,
-      0.34
+      0.12
     );
     if (alpha <= 0.003) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
     const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
     const majorRadius = baseRadius
-      * (zoomProfile.corridorRadiusScale + 0.2 + (corridorStrength * 0.36) + (corridorWeight * 0.42));
+      * (zoomProfile.corridorRadiusScale + 0.08 + (corridorStrength * 0.14) + (corridorWeight * 0.22));
     drawSoftLightBlob(
       entry.x + jitter.dx,
       entry.y + jitter.dy,
@@ -14800,7 +14807,7 @@ function drawModernCityLightsCorridors(config, intensity) {
         innerStop: 0.05,
         midStop: 0.56,
         innerAlphaScale: 0.94,
-        midAlphaScale: 0.3,
+        midAlphaScale: 0.16,
       }
     );
   });
@@ -15069,19 +15076,19 @@ function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
     const densityScore = clamp(Math.log10(entry.density + 1) / 4.4, 0.08, 1.24);
     const capitalBoost = entry.capitalScore >= 3 ? 0.18 : entry.capitalScore >= 2 ? 0.1 : 0;
     const boostWeight = clamp(
-      (populationScore * 0.72) + (densityScore * 0.96) + (sampled * 0.4) + capitalBoost,
+      (populationScore * 0.82) + (densityScore * 1.08) + (sampled * 0.18) + capitalBoost,
       0.16,
       2
     );
     const areaRadiusBoost = clamp(Math.log10(entry.areaSqKm + 1) * 0.18, 0.08, 0.74);
     const baseRadiusPx = 0.82 + (boostWeight * 1.02) + areaRadiusBoost;
     const haloAlpha = clamp(
-      intensity * boostStrength * (0.08 + (boostWeight * 0.16)) * zoomProfile.coreAlphaScale,
+      intensity * boostStrength * (0.11 + (boostWeight * 0.2)) * zoomProfile.coreAlphaScale,
       0,
       0.36
     );
     const coreAlpha = clamp(
-      intensity * boostStrength * (0.16 + (boostWeight * 0.24)) * zoomProfile.coreAlphaScale,
+      intensity * boostStrength * (0.22 + (boostWeight * 0.3)) * zoomProfile.coreAlphaScale,
       0,
       0.54
     );
@@ -15136,15 +15143,15 @@ function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
       : 0;
     const populationScore = clamp(Math.log10(entry.population + 1) / 6.8, 0.12, 1.08);
     const capitalBoost = entry.capitalScore >= 3 ? 0.24 : entry.capitalScore >= 2 ? 0.14 : 0;
-    const boostWeight = clamp((populationScore * 0.96) + (sampled * 0.48) + capitalBoost, 0.18, 1.48);
+    const boostWeight = clamp((populationScore * 1.08) + (sampled * 0.2) + capitalBoost, 0.18, 1.48);
     const baseRadiusPx = 0.54 + (boostWeight * 0.72);
     const haloAlpha = clamp(
-      intensity * boostStrength * (0.06 + (boostWeight * 0.11)) * zoomProfile.coreAlphaScale,
+      intensity * boostStrength * (0.09 + (boostWeight * 0.14)) * zoomProfile.coreAlphaScale,
       0,
       0.24
     );
     const coreAlpha = clamp(
-      intensity * boostStrength * (0.12 + (boostWeight * 0.18)) * zoomProfile.coreAlphaScale,
+      intensity * boostStrength * (0.18 + (boostWeight * 0.23)) * zoomProfile.coreAlphaScale,
       0,
       0.40
     );
@@ -15394,6 +15401,72 @@ function getHistoricalNightLightEntries(config) {
   return getHistoricalProxyFallbackEntries(secondaryRetention);
 }
 
+function getHistoricalDerivedGlowEntries(historicalEntries, config) {
+  if (!Array.isArray(historicalEntries) || !historicalEntries.length) return [];
+  const projectionKey = getModernCityLightsProjectionKey();
+  const retention = getHistoricalCityLightsSecondaryRetention(config).toFixed(3);
+  const first = historicalEntries[0];
+  const last = historicalEntries[historicalEntries.length - 1];
+  const key = [
+    projectionKey,
+    retention,
+    historicalEntries.length,
+    first?.nameAscii || "",
+    first?.weight || 0,
+    last?.nameAscii || "",
+    last?.weight || 0,
+  ].join("|");
+  if (historicalCityLightsDerivedGlowCache.key === key) {
+    return historicalCityLightsDerivedGlowCache.entries;
+  }
+
+  const entries = [];
+  for (const entry of historicalEntries) {
+    if (entries.length >= HISTORICAL_DERIVED_GLOW_MAX_ENTRIES) break;
+    const weight = clamp(Number(entry?.weight || 0), 0, 1.08);
+    if (weight < HISTORICAL_DERIVED_GLOW_MIN_WEIGHT) continue;
+    const projected = projection ? projection([entry.lon, entry.lat]) : null;
+    if (!Array.isArray(projected) || !projected.every((value) => Number.isFinite(Number(value)))) continue;
+    entries.push({
+      cx: Number(projected[0]),
+      cy: Number(projected[1]),
+      weight,
+      rotation: (stringHash(entry.nameAscii || `${entry.lon}:${entry.lat}:derived`) % 180) * (Math.PI / 180),
+    });
+  }
+  historicalCityLightsDerivedGlowCache.key = key;
+  historicalCityLightsDerivedGlowCache.entries = entries;
+  return entries;
+}
+
+function drawHistoricalDerivedGlowLayer(k, historicalEntries, config, intensity, density, palette) {
+  const glowEntries = getHistoricalDerivedGlowEntries(historicalEntries, config);
+  if (!glowEntries.length) return;
+  const overscan = Math.max(28, Math.min(runtimeState.width, runtimeState.height) * 0.06);
+  context.fillStyle = palette.halo;
+  glowEntries.forEach((entry) => {
+    const screenX = (entry.cx * runtimeState.zoomTransform.k) + runtimeState.zoomTransform.x;
+    const screenY = (entry.cy * runtimeState.zoomTransform.k) + runtimeState.zoomTransform.y;
+    if (
+      screenX < -overscan ||
+      screenX > runtimeState.width + overscan ||
+      screenY < -overscan ||
+      screenY > runtimeState.height + overscan
+    ) {
+      return;
+    }
+    const glowRadiusPx = (1.1 + (entry.weight * 1.45)) * density;
+    context.globalAlpha = clamp(intensity * density * entry.weight * 0.036, 0, 0.085);
+    drawLightEllipse(
+      entry.cx,
+      entry.cy,
+      (glowRadiusPx * 1.75) / Math.max(0.0001, k),
+      (glowRadiusPx * 0.82) / Math.max(0.0001, k),
+      entry.rotation
+    );
+  });
+}
+
 function drawHistoricalNightLightsLayer(k, config, solarState) {
   const historicalEntries = getHistoricalNightLightEntries(config);
   if (!historicalEntries.length) {
@@ -15414,6 +15487,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   pathCanvas(nightHemisphere);
   context.clip();
   context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
+  drawHistoricalDerivedGlowLayer(k, historicalEntries, config, intensity, density, palette);
 
   historicalEntries.forEach((entry) => {
     const projected = projection ? projection([entry.lon, entry.lat]) : null;
