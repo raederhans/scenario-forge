@@ -7,6 +7,7 @@ import {
 import {
   applyZoomEndChunkProtectionToSelection,
   protectZoomEndChunksForSelection,
+  shouldSkipStalePostApplyRefreshAfterZoomEnd,
 } from "../js/core/scenario/chunk_runtime.js";
 
 test("scenario runtime factory seeds scenario-aware defaults", () => {
@@ -115,4 +116,53 @@ test("zoom-end detail chunk protection is one-shot and selection scoped", () => 
   }), false);
   assert.deepEqual(expiredSelection.evictableChunkIds, ["political.detail.country.cd"]);
   assert.deepEqual(loadState.zoomEndProtectedChunkIds, []);
+});
+
+test("stale post-apply skip is scoped to the zoom-end source refresh", () => {
+  const loadState = createDefaultScenarioRuntimeState({ scenarioId: "tno_1962" }).runtimeChunkLoadState;
+  const normalizeScenarioIdFn = (value) => String(value || "").trim();
+  loadState.selectionVersion = 7;
+  loadState.lastSelection = {
+    reason: "zoom-end",
+    scenarioId: "tno_1962",
+    requiredChunkIds: ["political.detail.country.cd"],
+    optionalChunkIds: [],
+  };
+  loadState.lastZoomEndToChunkVisibleMetric = {
+    recordedAt: 2000,
+    scenarioId: "tno_1962",
+    selectionVersion: 7,
+  };
+
+  assert.equal(shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, "scenario-apply", {
+    scenarioId: "tno_1962",
+    selectionVersion: 7,
+    refreshSourceStartedAtMs: 1500,
+    normalizeScenarioIdFn,
+    nowMs: 2500,
+  }), true);
+
+  assert.equal(shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, "scenario-apply", {
+    scenarioId: "tno_1962",
+    selectionVersion: 7,
+    refreshSourceStartedAtMs: 2100,
+    normalizeScenarioIdFn,
+    nowMs: 2500,
+  }), false);
+
+  assert.equal(shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, "scenario-apply-detail-prewarm", {
+    scenarioId: "tno_1962",
+    selectionVersion: 8,
+    refreshSourceStartedAtMs: 1500,
+    normalizeScenarioIdFn,
+    nowMs: 2500,
+  }), false);
+
+  assert.equal(shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, "scenario-apply-detail-prewarm", {
+    scenarioId: "other_scenario",
+    selectionVersion: 7,
+    refreshSourceStartedAtMs: 1500,
+    normalizeScenarioIdFn,
+    nowMs: 2500,
+  }), false);
 });

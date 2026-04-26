@@ -112,3 +112,12 @@ Acceptance:
 - Keep scenarioChunkPromotionRenderLocked through the second yield and flushRenderBoundary; a stale post-visual run restores political chunk data before yielding ownership.
 - Benchmark acceptance uses firstIdleAfterLastWheelMs plus black-pixel-ratio samples and screenshot artifacts in .runtime/browser/mcp-artifacts/perf.
 
+
+## 2026-04-26 21:51 UTC zoom-interaction-architecture execution addendum
+- This execution intentionally lands the low-risk prerequisite slice first: bounded exact-after-settle helper extraction, double-buffer exact compose, color invalidation narrowing, and rAF batching for brush preview.
+- Worker rasterization, fallback-cache deletion, and broader frame scheduler work remain follow-up phases after the safe slice is stable under E2E and perf gates.
+- Guardrail: protected zoom-end chunks are scoped to the previous zoom-end required political detail ids and stale post-apply refreshes, so idle refresh cannot evict the visible detail selection immediately after zoom-end.
+
+## 2026-04-26 review follow-up addendum
+- Preserve the zoom-end detail protection, but let real post-zoom scenario apply/detail prewarm refreshes run.
+- Treat refresh source start time as the ownership token: source before zoom-end metric may be stale; source after zoom-end metric is current user work.

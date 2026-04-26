@@ -1352,3 +1352,10 @@ untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数�
 
 ### 2026-04-26 - zoom-end detail promotion stability
 - zoom-end detail chunks can load once and then be evicted by exact-settle or post-commit refresh replay; when the user-facing zoom-end selection is the owner, protect its political detail chunk ids through the settle window and assert final loaded ids, not just first observation.
+
+### 2026-04-26 - Playwright waitForFunction async predicate pitfall
+- page.waitForFunction(async () => ...) can treat the returned Promise as the waited value and pass too early in this repo's E2E setup. Use a primed globalThis.__playwrightStateRef with a synchronous predicate, then keep async import() work in page.evaluate() outside the polling predicate.
+
+### 2026-04-26 - scenario chunk refresh review follow-up
+- post-apply/detail-prewarm refresh suppression must carry an origin timestamp plus scenario id and selectionVersion; a time-window check alone can swallow real user-triggered apply work after zoom-end.
+- Programmatic zoom tests can miss transient exact-after-settle flags if they wait after setZoomPercent; attach waits immediately and wait for pending chunk promotion state to settle before starting the next zoom assertion.

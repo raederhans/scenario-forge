@@ -163,3 +163,16 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] Keep visual-stage metric as explicit fallback only.
 - [x] Add behavior test for render/runtime/fallback source order.
 - [x] Run py_compile, perf gate contract unittest, and scenario chunk node contract.
+
+## 2026-04-26 21:51 UTC zoom-interaction-architecture safe slice checklist
+- [x] Exact-after-settle helper extraction keeps apply -> render -> finalize ordering.
+- [x] Political color refresh uses partial dirty ids and avoids full physical/context invalidation unless contextBase has color-dependent layers.
+- [x] Brush preview render is rAF-batched through requestInteractionRender.
+- [x] Exact compose uses compositeBuffer and copy blit to prevent stale pixels.
+- [x] Zoom-end detail chunk final-state E2E passes after replacing async waitForFunction checks with synchronous state polling.
+- [x] Review blockers addressed: contextBase contour colors, composite transparency, and bounded zoom-end protected-id retention.
+
+## 2026-04-26 review follow-up: scenario apply refresh scope
+- [x] Scope stale post-apply skip by scenario id, selectionVersion, and refresh source start time.
+- [x] Add behavior coverage for old stale apply vs new post-zoom apply/prewarm.
+- [x] E2E scenario chunk runtime review-fix run completed (`npm run test:e2e:dev:scenario-chunk-runtime`, 4/4).

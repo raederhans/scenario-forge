@@ -2003,6 +2003,25 @@ function ensureInteractionCompositeCanvas() {
   return targetCanvas;
 }
 
+function ensureCompositeBufferCanvas() {
+  const cache = getRenderPassCacheState();
+  if (!cache.compositeBuffer?.canvas) {
+    cache.compositeBuffer = cache.compositeBuffer && typeof cache.compositeBuffer === "object"
+      ? cache.compositeBuffer
+      : {};
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    cache.compositeBuffer.canvas = canvas;
+  }
+  const targetCanvas = cache.compositeBuffer.canvas;
+  const width = Math.max(1, Number(context?.canvas?.width || 1));
+  const height = Math.max(1, Number(context?.canvas?.height || 1));
+  if (targetCanvas.width !== width) targetCanvas.width = width;
+  if (targetCanvas.height !== height) targetCanvas.height = height;
+  return targetCanvas;
+}
+
 function getInteractionCompositeSignature(cache = getRenderPassCacheState()) {
   return INTERACTION_COMPOSITE_PASS_NAMES.map((passName) => [
     passName,
@@ -2679,6 +2698,7 @@ function getRenderPassSignature(passName, transform = runtimeState.zoomTransform
       runtimeState.showUrban ? "urban:on" : "urban:off",
       runtimeState.showRivers ? "rivers:on" : "rivers:off",
       `context:${Number(runtimeState.contextLayerRevision || 0)}`,
+      `context-colors:${shouldRefreshContextBaseForColorChanges() ? Number(runtimeState.colorRevision || 0) : 0}`,
       `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(runtimeState.renderProfile || "auto"),
@@ -2757,6 +2777,7 @@ function getRenderPassSignature(passName, transform = runtimeState.zoomTransform
       runtimeState.activeScenarioId || "",
       runtimeState.showCityPoints ? "cities:on" : "cities:off",
       `cities:${Number(runtimeState.cityLayerRevision || 0)}`,
+      `colors:${Number(runtimeState.colorRevision || 0)}`,
       stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
     ].join("::");
   }
@@ -5737,6 +5758,30 @@ function rebuildResolvedColors() {
   return nextColors;
 }
 
+function shouldRefreshContextBaseContoursForColorChanges() {
+  const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
+  return !!(
+    runtimeState.showPhysical
+    && cfg.mode !== "atlas_only"
+    && Array.isArray(runtimeState.physicalContourMajorData?.features)
+    && runtimeState.physicalContourMajorData.features.length > 0
+  );
+}
+
+function shouldRefreshContextBaseUrbanForColorChanges() {
+  const urbanConfig = normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {});
+  const capability = runtimeState.urbanLayerCapability || getUrbanLayerCapability(runtimeState.urbanData);
+  return !!runtimeState.showUrban
+    && Array.isArray(runtimeState.urbanData?.features)
+    && runtimeState.urbanData.features.length > 0
+    && getEffectiveUrbanMode(urbanConfig, capability) === "adaptive";
+}
+
+function shouldRefreshContextBaseForColorChanges() {
+  return shouldRefreshContextBaseContoursForColorChanges()
+    || shouldRefreshContextBaseUrbanForColorChanges();
+}
+
 function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}) {
   migrateLegacyColorState();
   ensureSovereigntyState();
@@ -5757,10 +5802,17 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   });
 
   bumpColorRevision(state);
-  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "refresh-colors");
+  invalidateRenderPasses("political", "refresh-colors");
+  invalidateRenderPasses(["contextMarkers", "labels"], "refresh-colors-collateral");
+  if (shouldRefreshContextBaseForColorChanges()) {
+    invalidateRenderPasses("contextBase", "refresh-colors-context-base");
+  }
 
   if (renderNow && context) {
-    render();
+    requestRendererRender("refresh-colors", {
+      flush: false,
+      fallback: () => render(),
+    });
   }
 }
 
@@ -18295,16 +18347,19 @@ function ensureIdleRenderPasses(timings) {
   detectContextScenarioReasonMismatch({ cache, renderPerf: runtimeState.renderPerfMetrics || {} });
 }
 
+function resetCanvasContext(targetContext, width, height) {
+  if (!targetContext) return;
+  targetContext.setTransform(1, 0, 0, 1, 0, 0);
+  targetContext.clearRect(0, 0, width, height);
+  targetContext.globalCompositeOperation = "source-over";
+  targetContext.globalAlpha = 1;
+  targetContext.shadowBlur = 0;
+  targetContext.filter = "none";
+}
+
 function resetMainCanvas() {
   if (!context?.canvas) return;
-  const width = context.canvas.width;
-  const height = context.canvas.height;
-  context.setTransform(1, 0, 0, 1, 0, 0);
-  context.clearRect(0, 0, width, height);
-  context.globalCompositeOperation = "source-over";
-  context.globalAlpha = 1;
-  context.shadowBlur = 0;
-  context.filter = "none";
+  resetCanvasContext(context, context.canvas.width, context.canvas.height);
 }
 
 function areZoomTransformsEquivalent(a, b, epsilon = 0.01) {
@@ -18318,23 +18373,20 @@ function areZoomTransformsEquivalent(a, b, epsilon = 0.01) {
 }
 
 function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
-  const cache = getRenderPassCacheState();
-  resetMainCanvas();
-  (Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES).forEach((passName) => {
-    const passCanvas = cache.canvases?.[passName];
-    if (!passCanvas) return;
-    const referenceTransform = getPassReferenceTransform(passName);
-    if (referenceTransform && !areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
-      drawTransformedPass(passName, currentTransform, referenceTransform);
-      return;
-    }
-    const layout = getRenderPassLayout(passName);
-    context.drawImage(
-      passCanvas,
-      Math.round(-Number(layout?.offsetX || 0) * runtimeState.dpr),
-      Math.round(-Number(layout?.offsetY || 0) * runtimeState.dpr),
-    );
-  });
+  if (!context?.canvas) return;
+  const bufferCanvas = ensureCompositeBufferCanvas();
+  const bufferContext = bufferCanvas.getContext("2d");
+  if (!bufferContext) return;
+  resetCanvasContext(bufferContext, bufferCanvas.width, bufferCanvas.height);
+  composeRenderPassesToTarget(bufferContext, passNames, currentTransform);
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.globalCompositeOperation = "source-over";
+  context.globalAlpha = 1;
+  context.shadowBlur = 0;
+  context.filter = "none";
+  context.globalCompositeOperation = "copy";
+  context.drawImage(bufferCanvas, 0, 0);
+  context.globalCompositeOperation = "source-over";
   incrementPerfCounter("composites");
 }
 
@@ -18652,92 +18704,52 @@ function drawCanvas() {
   incrementPerfCounter("frames");
 }
 
-function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
-  cancelExactAfterSettleRefresh({ clearDefer: false });
-  const scheduleStartedAt = nowMs();
+function buildExactAfterSettleRefreshPlan({ profile, scheduleStartedAt, callbackStartedAt }) {
   const resolvedProfile = profile || getAdaptiveSettleProfile();
-  runtimeState.exactAfterSettleHandle = {
-    type: "timeout",
-    id: globalThis.setTimeout(() => {
-    runtimeState.exactAfterSettleHandle = null;
-    if (!runtimeState.deferExactAfterSettle) return;
-    if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
-      scheduleExactAfterSettleRefresh(resolvedProfile);
-      return;
-    }
-    const callbackStartedAt = nowMs();
-    const settleWindowElapsedMs = Math.max(0, callbackStartedAt - scheduleStartedAt);
-    const reuseDecision = getContextBaseReuseDecision();
-    const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
-    const startedAt = callbackStartedAt;
-    updateDprStage("idle", { force: true });
-    setCanvasSize({
-      reason: "exact-after-settle-dpr-restore",
-      targetPassesOnDprChange: ["political", "contextBase", "borders"],
-    });
-    runtimeState.deferExactAfterSettle = false;
-    cancelDeferredContextBaseEnhancement();
-    if (forceExactContextBaseRefresh) {
-      invalidateRenderPasses(["physicalBase", "contextBase"], "physical-visible-exact");
-    } else if (reuseDecision.enabled) {
-      recordRenderPerfMetric("contextBaseReuseScaleRatio", 0, {
-        activeScenarioId: String(runtimeState.activeScenarioId || ""),
-        scaleRatio: reuseDecision.scaleRatio,
-        zoomBucket: reuseDecision.zoomBucket,
-        referenceZoomBucket: reuseDecision.referenceZoomBucket,
-      });
-      recordRenderPerfMetric("contextBaseReuseDistancePx", 0, {
-        activeScenarioId: String(runtimeState.activeScenarioId || ""),
-        distancePx: reuseDecision.distancePx,
-        maxDistancePx: reuseDecision.maxDistancePx,
-      });
-      if (reuseDecision.shouldExactRefresh) {
-        invalidateRenderPasses(getPhysicalExactRefreshPasses(), reuseDecision.reason || "context-base-exact");
-      } else {
-        recordRenderPerfMetric("contextBaseReuseSkipped", 0, {
-          activeScenarioId: String(runtimeState.activeScenarioId || ""),
-          reason: reuseDecision.reason,
-          scaleRatio: reuseDecision.scaleRatio,
-          distancePx: reuseDecision.distancePx,
-          maxDistancePx: reuseDecision.maxDistancePx,
-          zoomBucket: reuseDecision.zoomBucket,
-          referenceZoomBucket: reuseDecision.referenceZoomBucket,
-          crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
-          crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
-        });
-      }
-    }
-    const exactRefreshApplied = forceExactContextBaseRefresh || !!reuseDecision.shouldExactRefresh;
-    deferContextBaseEnhancements = shouldDeferContextBaseEnhancementsForExactRefresh(
-      reuseDecision,
-      forceExactContextBaseRefresh,
-    );
-    render();
-    flushPendingScenarioChunkRefreshAfterExact();
-    const finishedAt = nowMs();
-    const durationMs = Math.max(0, finishedAt - startedAt);
-    const finalSharpnessMs = Math.max(0, finishedAt - Number(runtimeState.zoomGestureEndedAt || startedAt));
-    recordRenderPerfMetric("settleExactRefresh", durationMs, {
+  const reuseDecision = getContextBaseReuseDecision();
+  const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
+  const exactRefreshApplied = forceExactContextBaseRefresh || !!reuseDecision.shouldExactRefresh;
+  return {
+    resolvedProfile,
+    reuseDecision,
+    forceExactContextBaseRefresh,
+    exactRefreshApplied,
+    scheduleStartedAt,
+    callbackStartedAt,
+    startedAt: callbackStartedAt,
+    settleWindowElapsedMs: Math.max(0, callbackStartedAt - scheduleStartedAt),
+  };
+}
+
+function applyExactAfterSettleRefreshPlan(plan) {
+  const reuseDecision = plan.reuseDecision || {};
+  updateDprStage("idle", { force: true });
+  setCanvasSize({
+    reason: "exact-after-settle-dpr-restore",
+    targetPassesOnDprChange: ["political", "contextBase", "borders"],
+  });
+  runtimeState.deferExactAfterSettle = false;
+  cancelDeferredContextBaseEnhancement();
+  if (plan.forceExactContextBaseRefresh) {
+    invalidateRenderPasses(["physicalBase", "contextBase"], "physical-visible-exact");
+  } else if (reuseDecision.enabled) {
+    recordRenderPerfMetric("contextBaseReuseScaleRatio", 0, {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
-      contextBaseRefreshed: exactRefreshApplied,
-      reason: forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
       scaleRatio: reuseDecision.scaleRatio,
-      distancePx: reuseDecision.distancePx,
-      maxDistancePx: reuseDecision.maxDistancePx,
       zoomBucket: reuseDecision.zoomBucket,
       referenceZoomBucket: reuseDecision.referenceZoomBucket,
-      crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
-      crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
-      scaleDelta: Number(runtimeState.zoomGestureScaleDelta || resolvedProfile.scaleDelta || 0),
-      settleDurationMs: Number(resolvedProfile.settleDurationMs || 0),
-      exactQuietWindowMs: Number(resolvedProfile.exactQuietWindowMs || 0),
-      settleWindowElapsedMs: Number(settleWindowElapsedMs || 0),
-      finalSharpnessMs: Number(finalSharpnessMs || 0),
     });
-    if (exactRefreshApplied) {
-      recordRenderPerfMetric("contextBaseExactRefresh", Number(runtimeState.renderPerfMetrics?.drawContextBasePass?.durationMs || durationMs), {
+    recordRenderPerfMetric("contextBaseReuseDistancePx", 0, {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      distancePx: reuseDecision.distancePx,
+      maxDistancePx: reuseDecision.maxDistancePx,
+    });
+    if (reuseDecision.shouldExactRefresh) {
+      invalidateRenderPasses(getPhysicalExactRefreshPasses(), reuseDecision.reason || "context-base-exact");
+    } else {
+      recordRenderPerfMetric("contextBaseReuseSkipped", 0, {
         activeScenarioId: String(runtimeState.activeScenarioId || ""),
-        reason: forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
+        reason: reuseDecision.reason,
         scaleRatio: reuseDecision.scaleRatio,
         distancePx: reuseDecision.distancePx,
         maxDistancePx: reuseDecision.maxDistancePx,
@@ -18747,9 +18759,77 @@ function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettlePr
         crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
       });
     }
-    if (deferContextBaseEnhancements) {
-      scheduleDeferredContextBaseEnhancements();
-    }
+  }
+  deferContextBaseEnhancements = shouldDeferContextBaseEnhancementsForExactRefresh(
+    reuseDecision,
+    plan.forceExactContextBaseRefresh,
+  );
+  plan.deferContextBaseEnhancements = deferContextBaseEnhancements;
+}
+
+function finalizeExactAfterSettleRefreshPlan(plan) {
+  const reuseDecision = plan.reuseDecision || {};
+  const resolvedProfile = plan.resolvedProfile || getAdaptiveSettleProfile();
+  flushPendingScenarioChunkRefreshAfterExact();
+  const finishedAt = nowMs();
+  const durationMs = Math.max(0, finishedAt - plan.startedAt);
+  const finalSharpnessMs = Math.max(0, finishedAt - Number(runtimeState.zoomGestureEndedAt || plan.startedAt));
+  recordRenderPerfMetric("settleExactRefresh", durationMs, {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    contextBaseRefreshed: plan.exactRefreshApplied,
+    reason: plan.forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
+    scaleRatio: reuseDecision.scaleRatio,
+    distancePx: reuseDecision.distancePx,
+    maxDistancePx: reuseDecision.maxDistancePx,
+    zoomBucket: reuseDecision.zoomBucket,
+    referenceZoomBucket: reuseDecision.referenceZoomBucket,
+    crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
+    crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+    scaleDelta: Number(runtimeState.zoomGestureScaleDelta || resolvedProfile.scaleDelta || 0),
+    settleDurationMs: Number(resolvedProfile.settleDurationMs || 0),
+    exactQuietWindowMs: Number(resolvedProfile.exactQuietWindowMs || 0),
+    settleWindowElapsedMs: Number(plan.settleWindowElapsedMs || 0),
+    finalSharpnessMs: Number(finalSharpnessMs || 0),
+  });
+  if (plan.exactRefreshApplied) {
+    recordRenderPerfMetric("contextBaseExactRefresh", Number(runtimeState.renderPerfMetrics?.drawContextBasePass?.durationMs || durationMs), {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      reason: plan.forceExactContextBaseRefresh ? "physical-visible-exact" : reuseDecision.reason,
+      scaleRatio: reuseDecision.scaleRatio,
+      distancePx: reuseDecision.distancePx,
+      maxDistancePx: reuseDecision.maxDistancePx,
+      zoomBucket: reuseDecision.zoomBucket,
+      referenceZoomBucket: reuseDecision.referenceZoomBucket,
+      crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
+      crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+    });
+  }
+  if (plan.deferContextBaseEnhancements) {
+    scheduleDeferredContextBaseEnhancements();
+  }
+}
+
+function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
+  cancelExactAfterSettleRefresh({ clearDefer: false });
+  const scheduleStartedAt = nowMs();
+  const resolvedProfile = profile || getAdaptiveSettleProfile();
+  runtimeState.exactAfterSettleHandle = {
+    type: "timeout",
+    id: globalThis.setTimeout(() => {
+      runtimeState.exactAfterSettleHandle = null;
+      if (!runtimeState.deferExactAfterSettle) return;
+      if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
+        scheduleExactAfterSettleRefresh(resolvedProfile);
+        return;
+      }
+      const plan = buildExactAfterSettleRefreshPlan({
+        profile: resolvedProfile,
+        scheduleStartedAt,
+        callbackStartedAt: nowMs(),
+      });
+      applyExactAfterSettleRefreshPlan(plan);
+      render();
+      finalizeExactAfterSettleRefreshPlan(plan);
     }, resolvedProfile.exactQuietWindowMs),
   };
 }
@@ -21203,6 +21283,15 @@ function refreshSidebarAfterPaint({
   });
 }
 
+function requestInteractionRender(reason = "interaction") {
+  return requestRendererRender(reason, {
+    flush: false,
+    fallback: () => {
+      if (context) render();
+    },
+  });
+}
+
 function flushInteractionRender(reason = "interaction") {
   return flushRenderBoundary(reason);
 }
@@ -22106,7 +22195,7 @@ function handleBrushPointerMove(event) {
   });
   if (!hit?.id) return;
   if (applyBrushHit(hit) && context) {
-    render();
+    requestInteractionRender("brush-preview");
   }
 }
 

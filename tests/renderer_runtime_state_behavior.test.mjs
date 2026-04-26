@@ -55,6 +55,7 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   const spatialIndex = createDefaultSpatialIndexState();
 
   assert.equal(renderPass.lastGoodFrame.valid, false);
+  assert.equal(renderPass.compositeBuffer.canvas, null);
   assert.equal(renderPass.interactionComposite.scenarioId, "");
   assert.equal(renderPass.interactionComposite.topologyRevision, 0);
   assert.equal(renderPass.interactionComposite.pixelWidth, 0);
@@ -94,6 +95,7 @@ test("renderer runtime accessors normalize cache and infra holders in place", ()
   });
 
   assert.equal(renderPassCache.counters.frames, 3);
+  assert.equal(renderPassCache.compositeBuffer.canvas, null);
   assert.equal(renderPassCache.dirty.background, true);
   assert.equal(renderPassCache.reasons.political, "init");
   assert.equal(sidebarPerf.counters.legendRenders, 0);

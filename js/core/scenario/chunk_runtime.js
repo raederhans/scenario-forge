@@ -60,9 +60,40 @@ function applyZoomEndChunkProtectionToSelection(selection, loadState, {
     return false;
   }
   const protectedSet = new Set(protectedChunkIds);
+  const previousEvictableCount = selection.evictableChunkIds.length;
   selection.evictableChunkIds = selection.evictableChunkIds.filter((chunkId) => !protectedSet.has(String(chunkId || "").trim()));
+  const protectedEvictionCount = previousEvictableCount - selection.evictableChunkIds.length;
   clearZoomEndChunkProtectionState(loadState);
-  return true;
+  return protectedEvictionCount > 0;
+}
+
+function shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, reason = "", {
+  scenarioId = "",
+  selectionVersion = 0,
+  refreshSourceStartedAtMs = 0,
+  normalizeScenarioIdFn = (value) => String(value || "").trim(),
+  nowMs = Date.now(),
+} = {}) {
+  const normalizedReason = String(reason || "").trim().toLowerCase();
+  if (!["scenario-apply", "scenario-apply-detail-prewarm"].includes(normalizedReason)) {
+    return false;
+  }
+  if (String(loadState?.lastSelection?.reason || "").trim().toLowerCase() !== "zoom-end") {
+    return false;
+  }
+  const metric = loadState?.lastZoomEndToChunkVisibleMetric;
+  const recordedAt = Number(metric?.recordedAt || 0);
+  if (!(recordedAt > 0 && Math.max(0, Number(nowMs || 0) - recordedAt) <= 5000)) {
+    return false;
+  }
+  if (normalizeScenarioIdFn(metric?.scenarioId) !== normalizeScenarioIdFn(scenarioId)) {
+    return false;
+  }
+  if (Math.max(0, Number(metric?.selectionVersion || 0)) !== Math.max(0, Number(selectionVersion || 0))) {
+    return false;
+  }
+  const sourceStartedAt = Number(refreshSourceStartedAtMs || 0);
+  return sourceStartedAt > 0 && sourceStartedAt <= recordedAt;
 }
 
 function createScenarioChunkRuntimeController({
@@ -283,6 +314,38 @@ function createScenarioChunkRuntimeController({
       .map((value) => String(value || "").trim())
       .filter(Boolean)
       .join("|");
+  }
+
+  function hasDetailScenarioChunkIds(chunkIds = []) {
+    return (Array.isArray(chunkIds) ? chunkIds : []).some((chunkId) =>
+      String(chunkId || "").includes(".detail.")
+    );
+  }
+
+  function retainPreviousZoomEndRequiredChunks(selection, previousSelection, reason = "") {
+    const normalizedReason = String(reason || "").trim().toLowerCase();
+    if (!["render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"].includes(normalizedReason)) {
+      return false;
+    }
+    if (String(previousSelection?.reason || "").trim().toLowerCase() !== "zoom-end") {
+      return false;
+    }
+    if (!selection || !Array.isArray(selection.evictableChunkIds)) {
+      return false;
+    }
+    const protectedSet = new Set(
+      (Array.isArray(previousSelection?.requiredChunkIds) ? previousSelection.requiredChunkIds : [])
+        .map((chunkId) => String(chunkId || "").trim())
+        .filter((chunkId) => chunkId.startsWith("political.detail."))
+    );
+    if (!protectedSet.size) {
+      return false;
+    }
+    const previousEvictableCount = selection.evictableChunkIds.length;
+    selection.evictableChunkIds = selection.evictableChunkIds.filter((chunkId) =>
+      !protectedSet.has(String(chunkId || "").trim())
+    );
+    return selection.evictableChunkIds.length !== previousEvictableCount;
   }
 
   function markPendingScenarioChunkRefresh(reason = "refresh", delayMs = null) {
@@ -1050,6 +1113,7 @@ function createScenarioChunkRuntimeController({
           delayMs: Number.isFinite(Number(pendingPostCommitRefresh.delayMs))
             ? Number(pendingPostCommitRefresh.delayMs)
             : 0,
+          refreshSourceStartedAtMs: Number(pendingPostCommitRefresh.refreshSourceStartedAtMs || 0),
         });
         return;
       }
@@ -1199,6 +1263,15 @@ function createScenarioChunkRuntimeController({
     const bundleScenarioId = getScenarioBundleId(bundle);
     if (bundleScenarioId && bundleScenarioId === normalizeScenarioId(runtimeState.activeScenarioId)) {
       const chunkState = ensureActiveScenarioChunkState();
+      const loadState = ensureRuntimeChunkLoadState();
+      if (
+        hasDetailScenarioChunkIds(chunkState.loadedChunkIds)
+        || Math.max(0, Number(loadState.selectionVersion || 0)) > 0
+        || loadState.promotionCommitInFlight
+        || loadState.pendingPromotion
+      ) {
+        return null;
+      }
       chunkState.scenarioId = bundleScenarioId;
       coarseSelection.requiredChunks.forEach((chunk) => {
         const payload = bundle.chunkPayloadCacheById?.[chunk.id];
@@ -1216,7 +1289,6 @@ function createScenarioChunkRuntimeController({
         previousMergedLayerPayloads: {},
       });
       const mergedLayerPayloads = mergedResult.mergedLayerPayloads;
-      const loadState = ensureRuntimeChunkLoadState();
       loadState.layerSelectionSignatures = layerSignatures;
       loadState.mergedLayerPayloadCache = mergedLayerPayloads;
       applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow: false });
@@ -1321,6 +1393,7 @@ function createScenarioChunkRuntimeController({
       reason: String(reason || "refresh"),
     });
     const previousSelection = loadState.lastSelection;
+    retainPreviousZoomEndRequiredChunks(selection, previousSelection, normalizedReason);
     const nextRequiredChunkIds = selection.requiredChunks.map((chunk) => chunk.id);
     const nextOptionalChunkIds = selection.optionalChunks.map((chunk) => chunk.id);
     const selectionUnchanged =
@@ -1487,6 +1560,7 @@ function createScenarioChunkRuntimeController({
     reason = "refresh",
     delayMs = null,
     flushPending = false,
+    refreshSourceStartedAtMs = 0,
   } = {}) {
     const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     if (!scenarioId) return "noop";
@@ -1503,6 +1577,15 @@ function createScenarioChunkRuntimeController({
       : (flushPending && Number.isFinite(Number(loadState.pendingDelayMs))
         ? Number(loadState.pendingDelayMs)
         : null);
+    if (shouldSkipStalePostApplyRefreshAfterZoomEnd(loadState, nextReason, {
+      scenarioId,
+      selectionVersion: loadState.selectionVersion,
+      refreshSourceStartedAtMs,
+      normalizeScenarioIdFn: normalizeScenarioId,
+    })) {
+      clearPendingScenarioChunkRefresh(loadState);
+      return "stale-post-apply-after-zoom-end";
+    }
     const zoomEndPriorityEnabled = shouldZoomEndPromoteImmediately(bundle, nextReason);
     if (zoomEndPriorityEnabled) {
       const hints = normalizeScenarioRenderBudgetHints(
@@ -1525,6 +1608,7 @@ function createScenarioChunkRuntimeController({
       loadState.pendingPostCommitRefresh = {
         reason: nextReason,
         delayMs: nextDelayMs,
+        refreshSourceStartedAtMs,
         requestedAt: Date.now(),
       };
       return "promotion-commit-in-flight";
@@ -1582,4 +1666,5 @@ export {
   applyZoomEndChunkProtectionToSelection,
   createScenarioChunkRuntimeController,
   protectZoomEndChunksForSelection,
+  shouldSkipStalePostApplyRefreshAfterZoomEnd,
 };

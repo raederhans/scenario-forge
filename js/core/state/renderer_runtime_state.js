@@ -18,6 +18,9 @@ export function createDefaultRenderPassCacheState() {
     layouts: {},
     signatures: {},
     contextScenarioLayerCache: {},
+    compositeBuffer: {
+      canvas: null,
+    },
     borderSnapshot: {
       canvas: null,
       layout: null,
@@ -227,6 +230,14 @@ export function ensureRenderPassCacheState(
   cache.contextScenarioLayerCache = cache.contextScenarioLayerCache && typeof cache.contextScenarioLayerCache === "object"
     ? cache.contextScenarioLayerCache
     : defaults.contextScenarioLayerCache;
+  cache.compositeBuffer = cache.compositeBuffer && typeof cache.compositeBuffer === "object"
+    ? cache.compositeBuffer
+    : { ...defaults.compositeBuffer };
+  Object.entries(defaults.compositeBuffer).forEach(([fieldName, initialValue]) => {
+    if (!(fieldName in cache.compositeBuffer)) {
+      cache.compositeBuffer[fieldName] = initialValue;
+    }
+  });
   cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
     ? cache.borderSnapshot
     : { ...defaults.borderSnapshot };

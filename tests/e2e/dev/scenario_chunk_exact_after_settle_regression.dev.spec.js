@@ -40,12 +40,14 @@ async function ensureScenario(page, scenarioId, label) {
   await page.waitForTimeout(1_000);
 }
 
-async function setZoomPercent(page, percent) {
+async function setZoomPercent(page, percent, { waitAfterMs = 700 } = {}) {
   await page.evaluate(async (targetPercent) => {
     const { setZoomPercent } = await import("/js/core/map_renderer.js");
     setZoomPercent(targetPercent);
   }, percent);
-  await page.waitForTimeout(700);
+  if (waitAfterMs > 0) {
+    await page.waitForTimeout(waitAfterMs);
+  }
 }
 
 async function dragMap(page, { dx = 180, dy = 24, steps = 8 } = {}) {
@@ -65,11 +67,14 @@ async function dragMap(page, { dx = 180, dy = 24, steps = 8 } = {}) {
 }
 
 async function waitForStableExactRender(page, { timeout = 30_000 } = {}) {
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return String(state.renderPhase || "") === "idle"
       && !state.deferExactAfterSettle
       && !state.exactAfterSettleHandle
+      && !state.runtimeChunkLoadState?.pendingPromotion
+      && !state.runtimeChunkLoadState?.promotionScheduled
+      && !state.runtimeChunkLoadState?.refreshScheduled
       && !state.runtimeChunkLoadState?.promotionCommitInFlight;
   }, { timeout });
 }
@@ -186,9 +191,9 @@ test("chunk promotion visual stage can land before exact-after-settle clears", a
   expect(seededState.activeScenarioId).toBe("tno_1962");
   await startChunkPromotionProbe(page);
 
-  await setZoomPercent(page, 120);
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await setZoomPercent(page, 120, { waitAfterMs: 0 });
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     return !!state.deferExactAfterSettle || !!state.exactAfterSettleHandle;
   }, { timeout: 20_000 });
   await waitForStableExactRender(page, { timeout: 30_000 });
@@ -235,8 +240,8 @@ test("sync prewarm threshold completes first-frame chunk prewarm before refresh 
   await gotoApp(page, HOI4_SYNC_PREWARM_PATH, { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
 
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
     const prewarmMetric = state.scenarioPerfMetrics?.chunkedFirstFramePrewarm || null;
     const visualPromotionMetric = state.renderPerfMetrics?.scenarioChunkPromotionVisualStage || null;
     return !!prewarmMetric
@@ -374,21 +379,27 @@ test("tno zoom-end keeps Great Lakes Congo political detail fill stable", async 
       state.runtimeChunkLoadState.focusCountryOverride = "CD";
     }
   });
-  await setZoomPercent(page, 175);
+  await setZoomPercent(page, 175, { waitAfterMs: 0 });
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
+    const loadState = state.runtimeChunkLoadState && typeof state.runtimeChunkLoadState === "object"
+      ? state.runtimeChunkLoadState
+      : null;
+    if (loadState) {
+      loadState.pendingReason = "zoom-end";
+      loadState.pendingDelayMs = 0;
+    }
     if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
-      state.scheduleScenarioChunkRefreshFn({ reason: "zoom-end", delayMs: 0 });
+      state.scheduleScenarioChunkRefreshFn({ reason: "zoom-end", delayMs: 0, flushPending: true });
     }
   });
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await page.waitForFunction((expectedChunkIds) => {
+    const state = globalThis.__playwrightStateRef || null;
     const loadedChunkIds = Array.isArray(state.activeScenarioChunks?.loadedChunkIds)
       ? state.activeScenarioChunks.loadedChunkIds.map((chunkId) => String(chunkId || ""))
       : [];
-    return loadedChunkIds.includes("political.detail.country.cd")
-      && loadedChunkIds.includes("political.detail.country.gco");
-  }, { timeout: 30_000 });
+    return expectedChunkIds.every((chunkId) => loadedChunkIds.includes(chunkId));
+  }, ["political.detail.country.cd", "political.detail.country.gco"], { timeout: 30_000 });
   await waitForStableExactRender(page, { timeout: 30_000 });
 
   const afterZoom = await page.evaluate(async (probes) => {

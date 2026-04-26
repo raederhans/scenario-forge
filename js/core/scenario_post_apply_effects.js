@@ -115,6 +115,7 @@ function scheduleScenarioDetailChunkPrewarm({
         scheduleScenarioChunkRefresh({
           reason: "scenario-apply-detail-prewarm",
           delayMs: 0,
+          refreshSourceStartedAtMs: prewarmStartedAt,
         });
         updateChunkedFirstFramePrewarmMetric({
           scenarioId: normalizedScenarioId,
@@ -201,6 +202,7 @@ async function ensureChunkedScenarioFirstFrameReady({
     scheduleScenarioChunkRefresh({
       reason: "scenario-apply",
       delayMs: 0,
+      refreshSourceStartedAtMs: prewarmStartedAt,
     });
     updateChunkedFirstFramePrewarmMetric({
       scenarioId: normalizedScenarioId,

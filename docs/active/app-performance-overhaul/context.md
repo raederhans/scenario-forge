@@ -212,6 +212,19 @@ pm run test:e2e:water-rendering failed in adjacent water/river specs: river time
 
 ## 2026-04-26 review follow-up: zoom-end benchmark metric source
 - Review found zoomEndToChunkVisible report selection used scenarioChunkPromotionVisualStage.durationMs ahead of the true end-to-visible metrics, which undercounts zoom-end wait when loading, post-ready queues, or promotion retry happen before the final visual commit.
-- Fixed benchmark metric selection so zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs and untimeChunkLoadState.lastZoomEndToChunkVisibleMetric own the reported zoomEndToChunkVisible.durationMs; scenarioChunkPromotionVisualStage remains a fallback when end-to-visible metrics are absent.
+- Fixed benchmark metric selection so zoomEndChunkVisible.renderMetrics.zoomEndToChunkVisibleMs and 
+untimeChunkLoadState.lastZoomEndToChunkVisibleMetric own the reported zoomEndToChunkVisible.durationMs; scenarioChunkPromotionVisualStage remains a fallback when end-to-visible metrics are absent.
 - Added Python behavior coverage for render metric, runtime metric, and visual-stage fallback order. Verification passed: python -m py_compile ops/browser-mcp/editor-performance-benchmark.py tests/test_perf_gate_contract.py; python -m unittest tests.test_perf_gate_contract -q; 
 pm run test:node:scenario-chunk-contracts.
+
+## 2026-04-26 21:51 UTC zoom-interaction-architecture safe slice
+- Implemented safe subset of the zoom/interaction architecture plan: exact-after-settle refresh is split into build/apply/finalize helpers while preserving the synchronous transaction; political color refresh now uses partial political dirty ids and rAF scheduling for renderNow paths; brush preview uses the render boundary request path.
+- Added compositeBuffer for exact pass composition. Cached passes now compose offscreen and blit with canvas copy, so transparent buffer pixels replace old main-canvas pixels and do not leave stale frame residue.
+- Expanded color-dependent contextBase invalidation to cover adaptive terrain contours and adaptive urban fills. The contextBase signature now includes color revision only when those color-dependent context layers are active.
+- Hardened zoom-end chunk detail stability: stale post-apply refreshes are skipped right after zoom-end detail visibility, and exact/idle refresh keeps previous zoom-end political detail ids from being evicted.
+- Browser-use attempt: browser-client failed in this js_repl because the plugin module contains unsupported static 
+ode: imports for this runtime; verification used project Playwright entrypoints instead.
+
+## 2026-04-26 review follow-up: scenario apply refresh scope
+- Fixed review blocker in chunk runtime: stale post-apply skipping now requires the same scenario id, the same zoom-end selectionVersion, and a refresh source timestamp older than the zoom-end visibility metric.
+- scenario-apply and scenario-apply-detail-prewarm now pass their apply/prewarm source timestamp into scheduleScenarioChunkRefresh, so a new user-triggered apply after zoom-end remains eligible to load and merge chunks.
