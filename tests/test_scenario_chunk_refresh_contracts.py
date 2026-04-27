@@ -243,7 +243,20 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertRegex(
             self.scenario_chunk_runtime_source,
             re.compile(
-                r'const nextSelectionVersion = Math\.max\(0, Number\(loadState\.selectionVersion \|\| 0\)\) \+ 1;\s*loadState\.selectionVersion = nextSelectionVersion;[\s\S]*?pendingVisualPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingInfraPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,',
+                r'loadState\.selectionVersion = nextSelectionVersion;[\s\S]*?pendingVisualPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingInfraPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?pendingPromotion = \{[\s\S]*?selectionVersion: nextSelectionVersion,',
+                re.S,
+            ),
+        )
+
+    def test_last_selection_records_post_refresh_selection_version(self):
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'const currentSelectionVersion = Math\.max\(0, Number\(loadState\.selectionVersion \|\| 0\)\);\s*'
+                r'const nextSelectionVersion = selectionUnchanged \? currentSelectionVersion : currentSelectionVersion \+ 1;[\s\S]*?'
+                r'loadState\.lastSelection = \{[\s\S]*?selectionVersion: nextSelectionVersion,[\s\S]*?\};[\s\S]*?'
+                r'if \(selectionUnchanged\) \{[\s\S]*?\}\s*'
+                r'loadState\.selectionVersion = nextSelectionVersion;',
                 re.S,
             ),
         )

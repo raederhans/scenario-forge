@@ -1447,6 +1447,8 @@ function createScenarioChunkRuntimeController({
       && getChunkIdListSignature(previousSelection?.optionalChunkIds) === getChunkIdListSignature(nextOptionalChunkIds)
       && selection.evictableChunkIds.length === 0
       && nextRequiredChunkIds.every((chunkId) => !!chunkState.payloadByChunkId?.[chunkId]);
+    const currentSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0));
+    const nextSelectionVersion = selectionUnchanged ? currentSelectionVersion : currentSelectionVersion + 1;
     const selectionRecordedAt = Date.now();
     loadState.lastSelection = {
       reason: String(reason || "refresh"),
@@ -1454,7 +1456,7 @@ function createScenarioChunkRuntimeController({
       viewportBbox,
       requiredChunkIds: nextRequiredChunkIds,
       optionalChunkIds: nextOptionalChunkIds,
-      selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0)),
+      selectionVersion: nextSelectionVersion,
       focusCountry: String(focusCountry || "").trim().toUpperCase(),
       recordedAt: selectionRecordedAt,
       zoomEndProtectionUntil: normalizedReason === "zoom-end" ? selectionRecordedAt + 5000 : 0,
@@ -1496,7 +1498,6 @@ function createScenarioChunkRuntimeController({
       clearPendingScenarioChunkRefresh();
       return selection;
     }
-    const nextSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0)) + 1;
     loadState.selectionVersion = nextSelectionVersion;
     const chunkLoadStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     await Promise.all(selection.requiredChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client })));
