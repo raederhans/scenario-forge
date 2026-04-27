@@ -10,6 +10,64 @@ export function createDefaultRendererInfrastructureState() {
   };
 }
 
+export function createDefaultExactAfterSettleControllerState() {
+  return {
+    generation: 0,
+    phase: "idle",
+    startedAt: 0,
+    scheduledAt: 0,
+    applyStartedAt: 0,
+    applyFinishedAt: 0,
+    scenarioId: "",
+    selectionVersion: 0,
+    topologyRevision: 0,
+    pendingPlan: null,
+    reason: "init",
+  };
+}
+
+export function ensureExactAfterSettleControllerState(target) {
+  if (!target || typeof target !== "object") {
+    return createDefaultExactAfterSettleControllerState();
+  }
+  if (!target.exactAfterSettleController || typeof target.exactAfterSettleController !== "object") {
+    target.exactAfterSettleController = createDefaultExactAfterSettleControllerState();
+  }
+  const controller = target.exactAfterSettleController;
+  const defaults = createDefaultExactAfterSettleControllerState();
+  Object.entries(defaults).forEach(([fieldName, initialValue]) => {
+    if (!(fieldName in controller)) {
+      controller[fieldName] = initialValue;
+    }
+  });
+  return controller;
+}
+
+export function resetExactAfterSettleControllerState(target, { reason = "reset", generation = null } = {}) {
+  const controller = ensureExactAfterSettleControllerState(target);
+  if (generation !== null && Number(controller.generation || 0) !== Number(generation || 0)) {
+    return false;
+  }
+  const nextGeneration = Number(controller.generation || 0) + 1;
+  Object.assign(controller, createDefaultExactAfterSettleControllerState(), {
+    generation: nextGeneration,
+    reason: String(reason || "reset"),
+  });
+  return true;
+}
+
+export function isExactAfterSettleGenerationCurrentState(target, generation, phase = "") {
+  const controller = target?.exactAfterSettleController;
+  return !!controller
+    && Number(controller.generation || 0) === Number(generation || 0)
+    && (!phase || String(controller.phase || "") === phase);
+}
+
+export function isExactAfterSettleControllerActiveState(target) {
+  const phase = String(target?.exactAfterSettleController?.phase || "idle");
+  return ["scheduled", "applying", "awaiting-paint", "finalizing"].includes(phase);
+}
+
 export function createDefaultRenderPassCacheState() {
   return {
     referenceTransform: null,
@@ -182,6 +240,7 @@ export function createDefaultRendererTransientRuntimeState() {
     deferContextBaseEnhancements: false,
     deferExactAfterSettle: false,
     exactAfterSettleHandle: null,
+    exactAfterSettleController: createDefaultExactAfterSettleControllerState(),
     zoomRenderScheduled: false,
     pendingZoomTransform: null,
     zoomGestureStartTransform: null,

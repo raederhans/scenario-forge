@@ -6,8 +6,12 @@ import {
   createDefaultRenderPassCacheState,
   createDefaultRendererTransientRuntimeState,
   createDefaultSidebarPerfState,
+  ensureExactAfterSettleControllerState,
   ensureRenderPassCacheState,
   ensureSidebarPerfState,
+  isExactAfterSettleControllerActiveState,
+  isExactAfterSettleGenerationCurrentState,
+  resetExactAfterSettleControllerState,
   ensureSphericalFeatureDiagnosticsCache,
   resetProjectedBoundsCacheState,
   setInteractionInfrastructureStateFields,
@@ -60,7 +64,11 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   assert.equal(renderPass.interactionComposite.topologyRevision, 0);
   assert.equal(renderPass.interactionComposite.pixelWidth, 0);
   assert.equal(renderPass.counters.missingVisibleFrameSkippedDuringInteraction, 0);
-  assert.equal(createDefaultRendererTransientRuntimeState().firstVisibleFramePainted, false);
+  const transient = createDefaultRendererTransientRuntimeState();
+  assert.equal(transient.firstVisibleFramePainted, false);
+  assert.equal(transient.exactAfterSettleController.phase, "idle");
+  assert.equal(transient.exactAfterSettleController.generation, 0);
+  assert.equal(transient.exactAfterSettleController.pendingPlan, null);
   assert.equal(sidebarPerf.counters.fullListRenders, 0);
   assert.equal(projectedBounds.projectedBoundsById.size, 0);
   assert.equal(borderCache.cachedFrontlineMeshHash, "");
@@ -68,6 +76,34 @@ test("renderer supporting factories keep cache shapes aligned", () => {
   assert.equal(spatialIndex.landIndex.size, 0);
   assert.equal(spatialIndex.waterSpatialItems.length, 0);
   assert.equal(spatialIndex.specialSpatialGrid.size, 0);
+});
+
+
+test("exact-after-settle controller ignores stale generations", () => {
+  const state = createDefaultRendererTransientRuntimeState();
+  const controller = ensureExactAfterSettleControllerState(state);
+
+  controller.generation = 1;
+  controller.phase = "awaiting-paint";
+  controller.pendingPlan = { id: "older" };
+
+  resetExactAfterSettleControllerState(state, {
+    reason: "newer-schedule",
+    generation: 1,
+  });
+  state.exactAfterSettleController.phase = "scheduled";
+  state.exactAfterSettleController.pendingPlan = { id: "newer" };
+
+  assert.equal(resetExactAfterSettleControllerState(state, {
+    reason: "stale-finalize",
+    generation: 1,
+  }), false);
+  assert.equal(isExactAfterSettleGenerationCurrentState(state, 1, "awaiting-paint"), false);
+  assert.equal(isExactAfterSettleGenerationCurrentState(state, 2, "scheduled"), true);
+  assert.equal(isExactAfterSettleControllerActiveState(state), true);
+  assert.equal(state.exactAfterSettleController.generation, 2);
+  assert.equal(state.exactAfterSettleController.phase, "scheduled");
+  assert.deepEqual(state.exactAfterSettleController.pendingPlan, { id: "newer" });
 });
 
 test("renderer runtime accessors normalize cache and infra holders in place", () => {

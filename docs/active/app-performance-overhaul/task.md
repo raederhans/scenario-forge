@@ -176,3 +176,27 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] Scope stale post-apply skip by scenario id, selectionVersion, and refresh source start time.
 - [x] Add behavior coverage for old stale apply vs new post-zoom apply/prewarm.
 - [x] E2E scenario chunk runtime review-fix run completed (`npm run test:e2e:dev:scenario-chunk-runtime`, 4/4).
+
+## 2026-04-26 23:35 UTC exact-after-settle controller task progress
+- [x] Create Ralph context snapshot and verify preflight state.
+- [x] Add local exact-after-settle controller state and after-paint finalize hook.
+- [x] Move first-batch dev-selection and land/water color writes to `requestInteractionRender`.
+- [x] Extend existing static/runtime state contracts.
+- [x] Run parent-owned syntax, node, Python, E2E, and perf verification.
+- [x] Run code-review / architect review and fix findings.
+- [x] Run deslop review and post-review regression verification.
+
+## 2026-04-27 00:18 UTC verification evidence
+- Syntax and targeted Node contracts passed: `node --check js/core/map_renderer.js`, `node --check js/core/state/renderer_runtime_state.js`, and node tests for scenario chunk, renderer runtime, scenario runtime, and physical layer contracts.
+- Python contracts passed: `python -m unittest tests.test_scenario_chunk_refresh_contracts tests.test_perf_gate_contract -q`; after recovery-block update, `tests.test_scenario_chunk_refresh_contracts` passed again.
+- E2E passed: scenario chunk runtime 4/4, TNO ready-state 5/5, interaction funnel 3/3.
+- Perf: `npm run perf:baseline` regenerated `docs/perf/baseline_2026-04-20.*`; `npm run perf:gate` had one transient TNO apply failure and one transient HOI4 render median failure, then passed on rerun against the regenerated baseline.
+- Post-change reruns passed: scenario chunk runtime 4/4 and `npm run perf:gate` passed.
+
+## 2026-04-27 00:35 UTC final closeout
+- [x] Fixed the stale helper reference in `beginExactAfterSettleControllerSchedule()` so controller defaults come from `renderer_runtime_state.js`.
+- [x] Final syntax/contracts passed: `node --check` on changed renderer/state files, targeted Node contracts, and `python -m unittest tests.test_scenario_chunk_refresh_contracts -q`.
+- [x] Final E2E passed: `npm run test:e2e:dev:scenario-chunk-runtime` 4/4, `npm run test:e2e:dev:tno-ready-state` 5/5, and `npm run test:e2e:interaction-funnel` 3/3.
+- [x] Final perf gate passed: `npm run perf:gate` against `docs/perf/baseline_2026-04-20.json`.
+- [x] Final static review result: APPROVE; optional identity-mismatch runtime coverage left as a future hardening candidate because current generation and identity contracts are already covered by behavior/static checks.
+- [x] Deslop pass checked changed files for stale helper names, dead wrappers, temporary artifacts, and broken new task lines; no extra code cleanup needed.

@@ -1359,3 +1359,6 @@ untimePoliticalTopology / defaultRuntimePoliticalTopology / landDataFull 计数�
 ### 2026-04-26 - scenario chunk refresh review follow-up
 - post-apply/detail-prewarm refresh suppression must carry an origin timestamp plus scenario id and selectionVersion; a time-window check alone can swallow real user-triggered apply work after zoom-end.
 - Programmatic zoom tests can miss transient exact-after-settle flags if they wait after setZoomPercent; attach waits immediately and wait for pending chunk promotion state to settle before starting the next zoom assertion.
+
+### 2026-04-27 - exact-after-settle finalize ownership
+- exact-after-settle 的重活可以先 apply plan，但 finalize 必须等 exact compose 完成之后再做；用 generation + scenario identity 保护 pendingPlan，避免旧 timer 或旧 selection 把新计划收尾掉。

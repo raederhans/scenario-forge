@@ -228,3 +228,10 @@ ode: imports for this runtime; verification used project Playwright entrypoints 
 ## 2026-04-26 review follow-up: scenario apply refresh scope
 - Fixed review blocker in chunk runtime: stale post-apply skipping now requires the same scenario id, the same zoom-end selectionVersion, and a refresh source timestamp older than the zoom-end visibility metric.
 - scenario-apply and scenario-apply-detail-prewarm now pass their apply/prewarm source timestamp into scheduleScenarioChunkRefresh, so a new user-triggered apply after zoom-end remains eligible to load and merge chunks.
+
+## 2026-04-26 23:35 UTC exact-after-settle controller implementation
+- Ralph snapshot: .omx/context/exact-after-settle-controller-20260426T233336Z.md.
+- Implemented local exact-after-settle controller fields in renderer runtime state and map renderer helpers.
+- scheduleExactAfterSettleRefresh() now applies the plan and requests render; drawCanvas() finalizes after exact compose.
+- settleExactRefreshApply, settleExactRefreshWaitForPaint, and settleExactRefreshFinalize record phase timing while settleExactRefresh remains the total metric.
+- First-batch rAF render writes now cover dev-selection add/toggle/remove/clear plus direct land/water color fill helpers.

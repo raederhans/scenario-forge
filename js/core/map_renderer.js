@@ -25,9 +25,14 @@ import {
 import {
   createDefaultProjectedBoundsCacheState,
   createDefaultProjectedBoundsDiagnostics,
+  createDefaultExactAfterSettleControllerState,
+  ensureExactAfterSettleControllerState,
   ensureRenderPassCacheState,
   ensureSidebarPerfState,
   ensureSphericalFeatureDiagnosticsCache as ensureSphericalFeatureDiagnosticsCacheState,
+  isExactAfterSettleControllerActiveState,
+  isExactAfterSettleGenerationCurrentState,
+  resetExactAfterSettleControllerState,
   resetProjectedBoundsCacheState as resetProjectedBoundsRuntimeCacheState,
   setInteractionInfrastructureStateFields,
 } from "./state/renderer_runtime_state.js";
@@ -3993,9 +3998,127 @@ function clearStagedMapDataTasks() {
   scenarioChunkPromotionVersion = 0;
 }
 
+function getExactAfterSettleControllerState() {
+  return ensureExactAfterSettleControllerState(runtimeState);
+}
+
+function getExactAfterSettleIdentity() {
+  const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : null;
+  return {
+    scenarioId: String(runtimeState.activeScenarioId || ""),
+    selectionVersion: Number(loadState?.selectionVersion || 0),
+    topologyRevision: Number(runtimeState.topologyRevision || 0),
+  };
+}
+
+function assignExactAfterSettleIdentity(controller, identity = getExactAfterSettleIdentity()) {
+  controller.scenarioId = identity.scenarioId;
+  controller.selectionVersion = identity.selectionVersion;
+  controller.topologyRevision = identity.topologyRevision;
+}
+
+function isExactAfterSettleIdentityCurrent(controller) {
+  if (!controller || typeof controller !== "object") return false;
+  const identity = getExactAfterSettleIdentity();
+  return String(controller.scenarioId || "") === identity.scenarioId
+    && Number(controller.selectionVersion || 0) === identity.selectionVersion
+    && Number(controller.topologyRevision || 0) === identity.topologyRevision;
+}
+
+function resetExactAfterSettleController(reason = "reset", generation = null) {
+  return resetExactAfterSettleControllerState(runtimeState, { reason, generation });
+}
+
+function beginExactAfterSettleControllerSchedule(scheduleStartedAt) {
+  const controller = getExactAfterSettleControllerState();
+  const nextGeneration = Number(controller.generation || 0) + 1;
+  Object.assign(controller, createDefaultExactAfterSettleControllerState(), {
+    generation: nextGeneration,
+    phase: "scheduled",
+    startedAt: scheduleStartedAt,
+    scheduledAt: scheduleStartedAt,
+    reason: "scheduled",
+  });
+  return controller;
+}
+
+function isExactAfterSettleGenerationCurrent(generation, phase = "") {
+  return isExactAfterSettleGenerationCurrentState(runtimeState, generation, phase);
+}
+
+function isExactAfterSettleControllerActive() {
+  return isExactAfterSettleControllerActiveState(runtimeState);
+}
+
+function applyScheduledExactAfterSettleRefreshPlan(generation, plan) {
+  if (!isExactAfterSettleGenerationCurrent(generation, "scheduled")) {
+    return false;
+  }
+  const controller = getExactAfterSettleControllerState();
+  const applyStartedAt = nowMs();
+  Object.assign(controller, {
+    phase: "applying",
+    pendingPlan: plan,
+    applyStartedAt,
+    reason: "applying",
+  });
+  assignExactAfterSettleIdentity(controller);
+  plan.controllerGeneration = generation;
+  applyExactAfterSettleRefreshPlan(plan);
+  const applyFinishedAt = nowMs();
+  Object.assign(controller, {
+    phase: "awaiting-paint",
+    applyFinishedAt,
+    reason: "awaiting-paint",
+  });
+  recordRenderPerfMetric("settleExactRefreshApply", Math.max(0, applyFinishedAt - applyStartedAt), {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    generation,
+    contextBaseRefreshed: !!plan.exactRefreshApplied,
+  });
+  return requestRendererRender("exact-after-settle", {
+    flush: false,
+    fallback: () => render(),
+  });
+}
+
+function finalizePendingExactAfterSettleRefreshAfterPaint() {
+  const controller = runtimeState.exactAfterSettleController;
+  if (!controller || typeof controller !== "object" || String(controller.phase || "") !== "awaiting-paint") {
+    return false;
+  }
+  const generation = Number(controller.generation || 0);
+  if (!isExactAfterSettleIdentityCurrent(controller)) {
+    resetExactAfterSettleController("identity-mismatch", generation);
+    return false;
+  }
+  const plan = controller.pendingPlan;
+  if (!plan || typeof plan !== "object") {
+    resetExactAfterSettleController("missing-plan", generation);
+    return false;
+  }
+  const finalizeStartedAt = nowMs();
+  controller.phase = "finalizing";
+  controller.reason = "finalizing";
+  recordRenderPerfMetric("settleExactRefreshWaitForPaint", Math.max(0, finalizeStartedAt - Number(controller.applyFinishedAt || controller.applyStartedAt || controller.startedAt || finalizeStartedAt)), {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    generation,
+  });
+  finalizeExactAfterSettleRefreshPlan(plan);
+  recordRenderPerfMetric("settleExactRefreshFinalize", Math.max(0, nowMs() - finalizeStartedAt), {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    generation,
+  });
+  resetExactAfterSettleController("finalized", generation);
+  return true;
+}
+
 function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
   cancelDeferredWork(runtimeState.exactAfterSettleHandle);
   runtimeState.exactAfterSettleHandle = null;
+  resetExactAfterSettleController(clearDefer ? "cancel" : "reschedule");
   if (clearDefer) {
     runtimeState.deferExactAfterSettle = false;
     runtimeState.pendingExactPoliticalFastFrame = false;
@@ -5183,6 +5306,7 @@ function isInteractionRecoveryBlocked() {
   return (
     runtimeState.renderPhase !== RENDER_PHASE_IDLE
     || runtimeState.isInteracting
+    || isExactAfterSettleControllerActive()
     || !!runtimeState.activeInteractionRecoveryTaskKey
   );
 }
@@ -18661,6 +18785,7 @@ function drawCanvas() {
   let usedLastGoodFallback = false;
   let usedBaseVisibleFallback = false;
   let keptPreviousPixels = false;
+  let drewExactFrame = false;
   if (useTransformedFrame) {
     drewFrame = drawTransformedFrameFromCaches(frameTimings, {
       interactiveBorders: runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle,
@@ -18685,6 +18810,7 @@ function drawCanvas() {
     resetContextBreakdownForExactFrame();
     ensureIdleRenderPasses(frameTimings);
     composeCachedPasses(RENDER_PASS_NAMES);
+    drewExactFrame = true;
     drewFrame = true;
   }
 
@@ -18700,6 +18826,9 @@ function drawCanvas() {
   }
   if (drewFrame && !usedLastGoodFallback && !usedBaseVisibleFallback && (!useTransformedFrame || runtimeState.renderPhase !== RENDER_PHASE_INTERACTING)) {
     captureLastGoodFrame(useTransformedFrame ? "fast-frame" : "exact-frame", runtimeState.zoomTransform);
+  }
+  if (drewExactFrame) {
+    finalizePendingExactAfterSettleRefreshAfterPaint();
   }
   incrementPerfCounter("frames");
 }
@@ -18812,12 +18941,18 @@ function finalizeExactAfterSettleRefreshPlan(plan) {
 function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
   cancelExactAfterSettleRefresh({ clearDefer: false });
   const scheduleStartedAt = nowMs();
+  const controller = beginExactAfterSettleControllerSchedule(scheduleStartedAt);
+  const generation = Number(controller.generation || 0);
   const resolvedProfile = profile || getAdaptiveSettleProfile();
   runtimeState.exactAfterSettleHandle = {
     type: "timeout",
     id: globalThis.setTimeout(() => {
       runtimeState.exactAfterSettleHandle = null;
-      if (!runtimeState.deferExactAfterSettle) return;
+      if (!isExactAfterSettleGenerationCurrent(generation, "scheduled")) return;
+      if (!runtimeState.deferExactAfterSettle) {
+        resetExactAfterSettleController("defer-cleared", generation);
+        return;
+      }
       if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
         scheduleExactAfterSettleRefresh(resolvedProfile);
         return;
@@ -18827,9 +18962,7 @@ function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettlePr
         scheduleStartedAt,
         callbackStartedAt: nowMs(),
       });
-      applyExactAfterSettleRefreshPlan(plan);
-      render();
-      finalizeExactAfterSettleRefreshPlan(plan);
+      applyScheduledExactAfterSettleRefreshPlan(generation, plan);
     }, resolvedProfile.exactQuietWindowMs),
   };
 }
@@ -21406,7 +21539,7 @@ function addFeatureToDevSelection(featureId) {
   runtimeState.devSelectionFeatureIds.add(id);
   runtimeState.devSelectionOrder.push(id);
   setDevSelectionDirty();
-  flushInteractionRender("dev-selection-add");
+  requestInteractionRender("dev-selection-add");
   return true;
 }
 
@@ -21422,7 +21555,7 @@ function toggleFeatureInDevSelection(featureId) {
     runtimeState.devSelectionFeatureIds.delete(id);
     runtimeState.devSelectionOrder = runtimeState.devSelectionOrder.filter((value) => value !== id);
     setDevSelectionDirty();
-    flushInteractionRender("dev-selection-toggle");
+    requestInteractionRender("dev-selection-toggle");
     return true;
   }
   return addFeatureToDevSelection(id);
@@ -21435,7 +21568,7 @@ function removeLastDevSelection() {
   runtimeState.devSelectionFeatureIds.delete(lastId);
   runtimeState.devSelectionOrder = ids.slice(0, -1);
   setDevSelectionDirty();
-  flushInteractionRender("dev-selection-remove-last");
+  requestInteractionRender("dev-selection-remove-last");
   return true;
 }
 
@@ -21445,7 +21578,7 @@ function clearDevSelection() {
   runtimeState.devSelectionOrder = [];
   if (hadEntries) {
     setDevSelectionDirty();
-    flushInteractionRender("dev-selection-clear");
+    requestInteractionRender("dev-selection-clear");
   } else {
     notifyDevWorkspace();
   }
@@ -21879,7 +22012,7 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
     }),
   });
   addRecentColor(color);
-  flushInteractionRender(kind);
+  requestInteractionRender(kind);
   refreshSidebarAfterPaint({ featureIds: resolvedIds });
   noteRenderAction(kind, actionStart);
   return true;
@@ -21910,7 +22043,7 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
     }),
   });
   addRecentColor(color);
-  flushInteractionRender(kind);
+  requestInteractionRender(kind);
   refreshSidebarAfterPaint({ waterRegionIds: [resolvedId] });
   noteRenderAction(kind, actionStart);
   return true;

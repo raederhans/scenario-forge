@@ -121,3 +121,9 @@ Acceptance:
 ## 2026-04-26 review follow-up addendum
 - Preserve the zoom-end detail protection, but let real post-zoom scenario apply/detail prewarm refreshes run.
 - Treat refresh source start time as the ownership token: source before zoom-end metric may be stale; source after zoom-end metric is current user work.
+
+## 2026-04-26 23:35 UTC exact-after-settle controller execution addendum
+- Execute only the next approved slice: local exact-after-settle controller, first-batch rAF interaction writes, and fallback audit preservation.
+- Keep controller local to map_renderer: generation + phase + pending plan, with finalize after drawCanvas() exact compose.
+- First-batch interaction writes are dev-selection plus land/water direct color helpers; brush commit, sovereignty, and special-region paths stay synchronous.
+- Fallback cleanup remains evidence-only: keep lastGoodFrame and drawBaseVisibleFrameFallback, preserve runtime metric sources.

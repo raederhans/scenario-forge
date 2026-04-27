@@ -161,12 +161,27 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertRegex(
             self.map_renderer_source,
             re.compile(
-                r'if \(!runtimeState\.deferExactAfterSettle\) return;.*?'
+                r'beginExactAfterSettleControllerSchedule\(scheduleStartedAt\);.*?'
+                r'isExactAfterSettleGenerationCurrent\(generation, "scheduled"\).*?'
+                r'if \(!runtimeState\.deferExactAfterSettle\) \{.*?'
+                r'resetExactAfterSettleController\("defer-cleared", generation\);.*?'
                 r'if \(runtimeState\.renderPhase !== RENDER_PHASE_IDLE\) \{.*?'
                 r'scheduleExactAfterSettleRefresh\(resolvedProfile\);.*?return;',
                 re.S,
             ),
         )
+        self.assertRegex(
+            self.map_renderer_source,
+            re.compile(
+                r'composeCachedPasses\(RENDER_PASS_NAMES\);.*?'
+                r'drewExactFrame = true;.*?'
+                r'finalizePendingExactAfterSettleRefreshAfterPaint\(\);',
+                re.S,
+            ),
+        )
+        self.assertIn('recordRenderPerfMetric("settleExactRefreshApply"', self.map_renderer_source)
+        self.assertIn('recordRenderPerfMetric("settleExactRefreshWaitForPaint"', self.map_renderer_source)
+        self.assertIn('recordRenderPerfMetric("settleExactRefreshFinalize"', self.map_renderer_source)
         interaction_blocker = re.search(
             r"function isInteractionRecoveryBlocked\(\) \{(?P<body>.*?)\n\}",
             self.map_renderer_source,
@@ -174,6 +189,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         )
         self.assertIsNotNone(interaction_blocker)
         self.assertIn("activeInteractionRecoveryTaskKey", interaction_blocker.group("body"))
+        self.assertIn("isExactAfterSettleControllerActive()", interaction_blocker.group("body"))
         self.assertNotIn("activePostReadyTaskKey", interaction_blocker.group("body"))
 
     def test_execute_chunk_refresh_reschedules_pending_promotion_without_active_timer_when_not_flushing(self):
