@@ -17692,12 +17692,28 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
 
 function recordPoliticalRasterWorkerSnapshot() {
   const metrics = ensurePoliticalRasterWorkerMetrics(globalThis);
-  recordRenderPerfMetric("politicalRasterWorker.roundTripMs", Number(metrics.roundTripMs || 0), {
+  const nextState = {
     enabled: !!metrics.enabled,
+    roundTripMs: Number(metrics.roundTripMs || 0),
+    timeoutCount: Number(metrics.timeoutCount || 0),
+    recycleCount: Number(metrics.recycleCount || 0),
+    staleResponseCount: Number(metrics.staleResponseCount || 0),
+  };
+  const stateChanged = !recordPoliticalRasterWorkerSnapshot.lastState
+    || recordPoliticalRasterWorkerSnapshot.lastState.enabled !== nextState.enabled
+    || recordPoliticalRasterWorkerSnapshot.lastState.roundTripMs !== nextState.roundTripMs
+    || recordPoliticalRasterWorkerSnapshot.lastState.timeoutCount !== nextState.timeoutCount
+    || recordPoliticalRasterWorkerSnapshot.lastState.recycleCount !== nextState.recycleCount
+    || recordPoliticalRasterWorkerSnapshot.lastState.staleResponseCount !== nextState.staleResponseCount;
+  recordPoliticalRasterWorkerSnapshot.frameCount = Number(recordPoliticalRasterWorkerSnapshot.frameCount || 0) + 1;
+  if (!stateChanged && (recordPoliticalRasterWorkerSnapshot.frameCount % 30) !== 0) return;
+  recordPoliticalRasterWorkerSnapshot.lastState = nextState;
+  recordRenderPerfMetric("politicalRasterWorker.roundTripMs", Number(metrics.roundTripMs || 0), {
+    enabled: nextState.enabled,
   });
-  recordRenderPerfMetric("politicalRasterWorker.timeoutCount", 0, { count: Number(metrics.timeoutCount || 0) });
-  recordRenderPerfMetric("politicalRasterWorker.recycleCount", 0, { count: Number(metrics.recycleCount || 0) });
-  recordRenderPerfMetric("politicalRasterWorker.staleResponseCount", 0, { count: Number(metrics.staleResponseCount || 0) });
+  recordRenderPerfMetric("politicalRasterWorker.timeoutCount", 0, { count: nextState.timeoutCount });
+  recordRenderPerfMetric("politicalRasterWorker.recycleCount", 0, { count: nextState.recycleCount });
+  recordRenderPerfMetric("politicalRasterWorker.staleResponseCount", 0, { count: nextState.staleResponseCount });
 }
 
 function drawPoliticalPass(k) {
