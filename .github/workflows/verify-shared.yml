@@ -18,6 +18,8 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      WHEELHOUSE_DIR: .runtime/python/wheels
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -35,12 +37,21 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Download Python wheel cache
+        run: |
+          mkdir -p "$WHEELHOUSE_DIR"
+          if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
+            python -m pip download -r requirements.lock.txt --dest "$WHEELHOUSE_DIR"
+          else
+            python -m pip download -r requirements-dev.lock.txt --dest "$WHEELHOUSE_DIR"
+          fi
+
       - name: Install Python test dependencies
         run: |
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
-            python -m pip install -r requirements.lock.txt
+            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements.lock.txt
           else
-            python -m pip install -r requirements-dev.lock.txt
+            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-dev.lock.txt
           fi
 
       - name: Install Node dependencies
@@ -82,3 +93,17 @@ jobs:
       - name: Run smoke E2E
         if: inputs.profile == 'full' && inputs.run-e2e-smoke
         run: npm run test:e2e:smoke
+
+      - name: Upload deploy wheel cache artifact
+        if: inputs.profile == 'deploy-minimal'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: deploy-wheelhouse
+          path: .runtime/python/wheels
+
+      - name: Upload deploy dist artifact
+        if: inputs.profile == 'deploy-minimal'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: deploy-dist
+          path: dist
