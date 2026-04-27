@@ -3,6 +3,10 @@ name: verify-shared
 on:
   workflow_call:
     inputs:
+      profile:
+        required: false
+        type: string
+        default: full
       run-e2e-smoke:
         required: false
         type: boolean
@@ -25,36 +29,56 @@ jobs:
           cache: 'pip'
 
       - name: Setup Node
+        if: inputs.profile == 'full'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install Python test dependencies
-        run: python -m pip install -r requirements-dev.lock.txt
+        run: |
+          if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
+            python -m pip install -r requirements.lock.txt
+          else
+            python -m pip install -r requirements-dev.lock.txt
+          fi
 
       - name: Install Node dependencies
+        if: inputs.profile == 'full'
         run: npm ci
 
       - name: Install Playwright Chromium
-        if: inputs.run-e2e-smoke
+        if: inputs.profile == 'full' && inputs.run-e2e-smoke
         run: npm run playwright:install:chromium
 
+      - name: Build Pages dist
+        if: inputs.profile == 'deploy-minimal'
+        run: python tools/build_pages_dist.py
+
+      - name: Verify Pages dist startup shell
+        if: inputs.profile == 'deploy-minimal'
+        run: python -m unittest tests.test_pages_dist_startup_shell -q
+
       - name: Run Python unit tests
+        if: inputs.profile == 'full'
         run: python -m unittest discover -s tests -p "test_*.py"
 
       - name: Run renderer split node behavior tests
+        if: inputs.profile == 'full'
         run: npm run test:node:renderer-splits
 
       - name: Run scenario chunk static contracts
+        if: inputs.profile == 'full'
         run: npm run test:node:scenario-chunk-contracts
 
       - name: Run physical layer static contracts
+        if: inputs.profile == 'full'
         run: npm run test:node:physical-layer-contracts
 
       - name: Run strict TNO scenario contract gate
+        if: inputs.profile == 'full'
         run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
-        if: inputs.run-e2e-smoke
+        if: inputs.profile == 'full' && inputs.run-e2e-smoke
         run: npm run test:e2e:smoke

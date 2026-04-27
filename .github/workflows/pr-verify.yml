@@ -7,4 +7,5 @@ jobs:
   verify:
     uses: ./.github/workflows/verify-shared.yml
     with:
+      profile: full
       run-e2e-smoke: true
