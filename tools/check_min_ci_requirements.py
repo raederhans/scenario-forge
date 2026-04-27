@@ -44,7 +44,7 @@ def iter_requirements(lock_path: Path) -> list[str]:
 
 def discover_heavy_test_paths() -> set[str]:
     heavy_paths: set[str] = set()
-    for path in TESTS_ROOT.glob("test_*.py"):
+    for path in TESTS_ROOT.rglob("test_*.py"):
         content = path.read_text(encoding="utf-8")
         if any(token in content for token in HEAVY_IMPORT_TOKENS):
             heavy_paths.add(path.relative_to(ROOT).as_posix())
