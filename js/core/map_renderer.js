@@ -4214,6 +4214,23 @@ function finalizePendingExactAfterSettleRefreshAfterPaint() {
   return true;
 }
 
+function abortPendingExactAfterSettleRefreshAfterPaint(reason = "exact-compose-failed") {
+  const controller = runtimeState.exactAfterSettleController;
+  if (!controller || typeof controller !== "object" || String(controller.phase || "") !== "awaiting-paint") {
+    return false;
+  }
+  const generation = Number(controller.generation || 0);
+  recordRenderPerfMetric("settleExactRefreshAbortAfterPaintFailure", 0, {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    generation,
+    reason: String(reason || "exact-compose-failed"),
+    controllerPhase: String(controller.phase || ""),
+    deferExactAfterSettle: !!runtimeState.deferExactAfterSettle,
+  });
+  resetExactAfterSettleController(`abort-${reason}`, generation);
+  return true;
+}
+
 function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
   cancelDeferredWork(runtimeState.exactAfterSettleHandle);
   runtimeState.exactAfterSettleHandle = null;
@@ -18635,9 +18652,16 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
     requireAllPasses: true,
   });
   if (!result.ok) {
+    const controller = getExactAfterSettleControllerState();
+    const missingPassNames = Array.isArray(result.missingPassNames) && result.missingPassNames.length
+      ? result.missingPassNames
+      : (result.passName ? [result.passName] : []);
     recordRenderPerfMetric("compositeBufferMissingPass", 0, {
       reason: result.reason,
       passName: result.passName || "",
+      missingPassNames: missingPassNames.join(","),
+      controllerPhase: String(controller.phase || ""),
+      deferExactAfterSettle: !!runtimeState.deferExactAfterSettle,
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
     });
     return false;
@@ -18746,6 +18770,37 @@ function composeRenderPassesToTarget(
   if (!targetContext) return { ok: false, reason: "missing-target-context" };
   const cache = getRenderPassCacheState();
   const names = Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES;
+  const missingCanvasPassNames = [];
+  const missingReferenceTransformPassNames = [];
+  if (requireAllPasses) {
+    for (const passName of names) {
+      const passCanvas = cache.canvases?.[passName];
+      if (!passCanvas) {
+        missingCanvasPassNames.push(passName);
+        continue;
+      }
+      const referenceTransform = getPassReferenceTransform(passName);
+      if (!referenceTransform) {
+        missingReferenceTransformPassNames.push(passName);
+      }
+    }
+    if (missingCanvasPassNames.length) {
+      return {
+        ok: false,
+        reason: "missing-pass-canvas",
+        passName: missingCanvasPassNames[0],
+        missingPassNames: missingCanvasPassNames,
+      };
+    }
+    if (missingReferenceTransformPassNames.length) {
+      return {
+        ok: false,
+        reason: "missing-reference-transform",
+        passName: missingReferenceTransformPassNames[0],
+        missingPassNames: missingReferenceTransformPassNames,
+      };
+    }
+  }
   for (const passName of names) {
     const passCanvas = cache.canvases?.[passName];
     if (!passCanvas) {
@@ -18969,6 +19024,9 @@ function drawCanvas() {
     ensureIdleRenderPasses(frameTimings);
     drewExactFrame = composeCachedPasses(RENDER_PASS_NAMES);
     drewFrame = drewExactFrame;
+    if (!drewExactFrame) {
+      abortPendingExactAfterSettleRefreshAfterPaint("compose-cached-passes-failed");
+    }
   }
 
   const cache = getRenderPassCacheState();
@@ -24033,4 +24091,3 @@ export {
   scheduleExactAfterSettleRefresh,
   scheduleRenderPhaseIdle,
 };
-
