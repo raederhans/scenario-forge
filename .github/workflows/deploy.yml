@@ -6,8 +6,9 @@ on:
   workflow_dispatch:
 
 concurrency:
+  # 策略：同一分支只保留最新部署任务，旧任务自动取消。
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   verify:
