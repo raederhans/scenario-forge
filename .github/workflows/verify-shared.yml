@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WHEELHOUSE_DIR: .runtime/python/wheels
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -58,9 +59,31 @@ jobs:
         if: inputs.profile == 'full'
         run: npm ci
 
+      - name: Cache Playwright browsers
+        if: inputs.profile == 'full' && inputs.run-e2e-smoke
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-
+
       - name: Install Playwright Chromium
         if: inputs.profile == 'full' && inputs.run-e2e-smoke
-        run: npm run playwright:install:chromium
+        run: |
+          mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+          max_retries=2
+          attempt=0
+          until npx playwright install chromium; do
+            if [ "$attempt" -ge "$max_retries" ]; then
+              echo "playwright install chromium failed after $((attempt + 1)) attempts"
+              exit 1
+            fi
+            sleep_seconds=$((2 ** attempt))
+            echo "playwright install chromium failed on attempt $((attempt + 1)); retry in ${sleep_seconds}s"
+            sleep "$sleep_seconds"
+            attempt=$((attempt + 1))
+          done
 
       - name: Build Pages dist
         if: inputs.profile == 'deploy-minimal'

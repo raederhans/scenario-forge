@@ -137,3 +137,10 @@ Browser and regression tooling:
 npm install
 npm run test:e2e
 ```
+
+CI browser install policy (`.github/workflows/verify-shared.yml`):
+
+- CI sets `PLAYWRIGHT_BROWSERS_PATH=.runtime/browser/ms-playwright` and caches that directory with `actions/cache`.
+- Browser provisioning uses `npx playwright install chromium` to match GitHub-hosted Ubuntu runner preinstalled system dependencies.
+- The install step runs with 2 retries and exponential backoff (1s, 2s) for transient download failures.
+- Fallback strategy: when runner image dependencies drift, use `npx playwright install --with-deps chromium` (or project script `npm run playwright:install:chromium`) in a dedicated remediation commit while validating the runner image changelog.
