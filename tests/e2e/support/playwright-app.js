@@ -140,20 +140,31 @@ async function readSelectorSnapshot(page, selectors = []) {
 }
 
 async function readSmokeFailureSnapshot(page, selectors = []) {
-  await primeStateRef(page);
-  const [bootState, selectorState, activeScenarioId] = await Promise.all([
-    readBootStateSnapshot(page),
-    readSelectorSnapshot(page, selectors),
-    page.evaluate(() => {
-      const state = globalThis.__playwrightStateRef || null;
-      return String(state?.activeScenarioId || "");
-    }),
-  ]);
-  return {
-    bootState,
-    activeScenarioId,
-    selectors: selectorState,
-  };
+  try {
+    await primeStateRef(page);
+    const [bootState, selectorState, activeScenarioId] = await Promise.all([
+      readBootStateSnapshot(page),
+      readSelectorSnapshot(page, selectors),
+      page.evaluate(() => {
+        const state = globalThis.__playwrightStateRef || null;
+        return String(state?.activeScenarioId || "");
+      }),
+    ]);
+    return {
+      bootState,
+      activeScenarioId,
+      selectors: selectorState,
+    };
+  } catch (error) {
+    return {
+      snapshotError: String(error?.message || error),
+      activeScenarioId: "",
+      selectors: [],
+      bootState: {
+        snapshotError: "smoke snapshot capture failed",
+      },
+    };
+  }
 }
 
 async function waitForScenarioReadyGate(page, {
