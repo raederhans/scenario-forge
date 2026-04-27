@@ -1,0 +1,3 @@
+# Minimal Python lockfile for deploy-minimal CI path.
+# Scope: tools/build_pages_dist.py + tests/test_pages_dist_startup_shell.py.
+# These paths use Python stdlib only, so this lock intentionally carries no third-party packages.

@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p "$WHEELHOUSE_DIR"
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
-            python -m pip download -r requirements.lock.txt --dest "$WHEELHOUSE_DIR"
+            python -m pip download -r requirements-ci-min.lock.txt --dest "$WHEELHOUSE_DIR"
           else
             python -m pip download -r requirements-dev.lock.txt --dest "$WHEELHOUSE_DIR"
           fi
@@ -50,10 +50,13 @@ jobs:
       - name: Install Python test dependencies
         run: |
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
-            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements.lock.txt
+            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-ci-min.lock.txt
           else
             python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-dev.lock.txt
           fi
+
+      - name: Check minimal CI dependency guardrails
+        run: python tools/check_min_ci_requirements.py
 
       - name: Install Node dependencies
         if: inputs.profile == 'full'
