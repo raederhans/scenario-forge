@@ -1,0 +1,17 @@
+{
+  "geo_stack": {
+    "description": "Tests that import geospatial/scientific packages (geopandas/shapely/rasterio/numpy family).",
+    "patterns": [
+      "tests/test_urban_topology_contract.py",
+      "tests/test_tno_bundle_builder.py",
+      "tests/test_scenario_chunk_assets.py",
+      "tests/test_tno_water_geometries.py",
+      "tests/test_tno_named_marginal_water_contract.py",
+      "tests/test_physical_context_contours.py",
+      "tests/test_patch_checked_in_urban_artifacts.py",
+      "tests/test_city_assets.py",
+      "tests/test_global_transport_builder_contracts.py",
+      "tests/test_local_canonicalization.py"
+    ]
+  }
+}
