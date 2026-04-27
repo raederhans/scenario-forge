@@ -257,6 +257,8 @@ function summarizeSnapshot(snapshot) {
     startupBundleSource: String(bootMetrics["scenario-apply"]?.source || "").trim(),
     applyScenarioBundleMs: finiteNumber(scenarioPerfMetrics.applyScenarioBundle?.durationMs),
     loadScenarioBundleMs: finiteNumber(scenarioPerfMetrics.loadScenarioBundle?.durationMs),
+    workerDecodeMs: finiteNumber(scenarioPerfMetrics.loadScenarioBundle?.workerDecodeMs),
+    workerMetaBuildMs: finiteNumber(scenarioPerfMetrics.loadScenarioBundle?.workerMetaBuildMs),
     refreshScenarioApplyMs: finiteNumber(renderPerfMetrics.scenarioApplyMapRefresh?.durationMs),
     refreshColorMs: finiteNumber(renderPerfMetrics.refreshColorState?.durationMs),
     rebuildPoliticalCollectionsMs: finiteNumber(renderPerfMetrics.rebuildPoliticalLandCollections?.durationMs),
@@ -327,6 +329,8 @@ function aggregateRuns(runs) {
     "interactionInfraMs",
     "applyScenarioBundleMs",
     "loadScenarioBundleMs",
+    "workerDecodeMs",
+    "workerMetaBuildMs",
     "refreshScenarioApplyMs",
     "refreshColorMs",
     "rebuildPoliticalCollectionsMs",
@@ -509,6 +513,8 @@ function buildMarkdown(report) {
     lines.push(`- startup bundle source: ${String(summary.startupBundleSource || "") || "unknown"}`);
     lines.push(formatMetricRow("applyScenarioBundle", summary.applyScenarioBundleMs));
     lines.push(formatMetricRow("loadScenarioBundle", summary.loadScenarioBundleMs));
+    lines.push(formatMetricRow("worker decode", summary.workerDecodeMs));
+    lines.push(formatMetricRow("worker meta build", summary.workerMetaBuildMs));
     lines.push(formatMetricRow("refresh scenario apply", summary.refreshScenarioApplyMs));
     lines.push(formatMetricRow("refresh color", summary.refreshColorMs));
     lines.push(formatMetricRow("rebuild political collections", summary.rebuildPoliticalCollectionsMs));

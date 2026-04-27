@@ -482,6 +482,21 @@ def normalize_playwright_url(url: str) -> str:
     return urlunsplit((parts.scheme, netloc, parts.path, parts.query, parts.fragment))
 
 
+def resolve_git_head() -> str:
+    try:
+      completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT_DIR,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=5,
+      )
+      return completed.stdout.strip()
+    except Exception:
+      return "unknown"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Benchmark Scenario Forge editor performance via Playwright CLI.")
     parser.add_argument("--url", default="http://127.0.0.1:8000/?perf_overlay=1", help="Benchmark target URL.")
@@ -1312,6 +1327,7 @@ def summarize_fill_action_metric(suite: dict, key: str) -> dict:
         "target": probe.get("target"),
         "lastAction": probe.get("lastAction"),
         "longTaskCountDelta": probe.get("longTaskCountDelta"),
+        "blackPixelRatio": as_finite_number(probe.get("blackPixelRatio")),
         "counterDelta": probe.get("counterDelta"),
         "lastActionFrame": probe.get("lastActionFrame"),
       },
@@ -2649,6 +2665,7 @@ async (page) => {{
       longTaskCountDelta: (
         Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0
       ) - Number(before.longTasks || 0),
+      blackPixelRatio: {sample_canvas_black_pixel_ratio_js()},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
       overlay: document.getElementById('perf-overlay')?.textContent || '',
@@ -2760,6 +2777,7 @@ async (page) => {{
       longTaskCountDelta: (
         Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0
       ) - Number(before.longTasks || 0),
+      blackPixelRatio: {sample_canvas_black_pixel_ratio_js()},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
       overlay: document.getElementById('perf-overlay')?.textContent || '',
@@ -2768,6 +2786,24 @@ async (page) => {{
 }}
 """.strip()
     return run_code_json(collect_js)  # type: ignore[return-value]
+
+
+def capture_political_raster_worker_metrics() -> dict:
+    js = """
+async (page) => {
+  return await page.evaluate(() => {
+    const source = window.__mc_politicalRasterWorkerMetrics || {};
+    return {
+      roundTripMs: Number(source.roundTripMs || 0),
+      timeoutCount: Number(source.timeoutCount || 0),
+      recycleCount: Number(source.recycleCount || 0),
+      staleResponseCount: Number(source.staleResponseCount || 0),
+      enabled: !!source.enabled,
+    };
+  });
+}
+""".strip()
+    return run_code_json(js)  # type: ignore[return-value]
 
 
 def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
@@ -2824,6 +2860,7 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     single_fill = measure_single_click_fill()
     print(f"[benchmark] double fill scenario={scenario_id}", flush=True)
     double_click_fill = measure_double_click_fill()
+    political_raster_worker = capture_political_raster_worker_metrics()
     console_issues = capture_console_issues()
     network_issues = capture_network_issues()
     screenshot_path = take_screenshot(screenshot_dir / f"{scenario_id or 'none'}-home.png")
@@ -2842,6 +2879,7 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
       "interactivePanFrame": interactive_pan_frame,
       "singleFill": single_fill,
       "doubleClickFill": double_click_fill,
+      "politicalRasterWorker": political_raster_worker,
       "consoleIssues": console_issues,
       "networkIssues": network_issues,
       "screenshots": {
@@ -2903,6 +2941,9 @@ def main() -> None:
       water_cache_summary_by_scenario = build_water_cache_summary_by_scenario(suites)
       report = {
         "createdAt": datetime.now(timezone.utc).astimezone().isoformat(),
+        "gitHead": resolve_git_head(),
+        "schemaVersion": 1,
+        "probeSchema": "mc_perf_snapshot",
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,

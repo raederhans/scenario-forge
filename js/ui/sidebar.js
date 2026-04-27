@@ -946,8 +946,8 @@ function applyOwnershipToFeatureIds(
     sovereigntyFeatureIds: normalizedTargetIds,
   });
   const changed = setFeatureOwnerCodes(normalizedTargetIds, normalizedOwnerCode);
-  refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (changed > 0) {
+    refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
@@ -1055,7 +1055,7 @@ function applyScenarioOwnerControllerAssignments(
   if (changedFeatureIds.size) {
     runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
-    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    refreshResolvedColorsForFeatures(Array.from(changedFeatureIds), { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({

@@ -127,3 +127,14 @@ Acceptance:
 - Keep controller local to map_renderer: generation + phase + pending plan, with finalize after drawCanvas() exact compose.
 - First-batch interaction writes are dev-selection plus land/water direct color helpers; brush commit, sovereignty, and special-region paths stay synchronous.
 - Fallback cleanup remains evidence-only: keep lastGoodFrame and drawBaseVisibleFrameFallback, preserve runtime metric sources.
+
+## 2026-04-27 full zoom/drag black-frame overhaul execution
+- User requested Ralph execution for all remaining planned phases.
+- Scope: pre-gate A metrics contract, pre-gate B request/flush ownership, phase 1 sliced exact-after-settle scheduling, phase 2 atomic composite identity, phase 3 political dirty + rAF batching, phase 4 fallback inventory, phase 5 flag-off political raster worker protocol.
+- Parent owns implementation and all live verification. Subagents are static-only lanes.
+- Stop condition: if a phase target cannot be verified with fresh metrics, remain on that phase and record blocker.
+
+## 2026-04-27 执行偏差
+- 本轮优先完成两道前置门与五阶段骨架。阶段 1 exact 指标在 benchmark 中已降到 11.5ms，但 wheel idle/long task/black ratio 仍超出阶段阈值。
+- 阶段 4 采用保留 guardrail 的 inventory 结果；删除 fallback 缓存会扩大风险。
+- 阶段 5 只提交 default-off 协议壳与契约，实际 raster offload 需要在下一轮以 worker lane 独立实现。

@@ -12,6 +12,10 @@ function readRepoFile(...relativeParts) {
 test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
   const rendererRuntimeStateSource = readRepoFile("js", "core", "state", "renderer_runtime_state.js");
+  const frameSchedulerSource = readRepoFile("js", "core", "frame_scheduler.js");
+  const scenarioOwnershipEditorSource = readRepoFile("js", "core", "scenario_ownership_editor.js");
+  const politicalRasterWorkerClientSource = readRepoFile("js", "core", "political_raster_worker_client.js");
+  const politicalRasterWorkerSource = readRepoFile("js", "workers", "political_raster.worker.js");
   const chunkRuntimeSource = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
   const postApplyEffectsSource = readRepoFile("js", "core", "scenario_post_apply_effects.js");
   const interactionRecoveryBlockedBody =
@@ -50,7 +54,7 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
     interactionCompositeUsesSingleMainPassCache:
       rendererSource.includes("const INTERACTION_COMPOSITE_PASS_NAMES = [")
       && rendererSource.includes('recordRenderPerfMetric("interactionCompositeBuild"')
-      && /function drawTransformedFrameFromCaches\(timings, \{ interactiveBorders = false \} = \{\}\) \{[\s\S]*?drawInteractionComposite\(currentTransform\)[\s\S]*?drawInteractionBorderSnapshot\(currentTransform\)/.test(rendererSource),
+      && /function composeTransformedFrameToBuffer\(currentTransform, transformedPasses,[\s\S]*?drawInteractionComposite\(currentTransform\)[\s\S]*?drawInteractionBorderSnapshot\(currentTransform\)/.test(rendererSource),
     continuityFrameSkipsBaseFillDuringInteraction:
       rendererSource.includes("const CONTINUITY_FRAME_MAX_STALE_AGE_MS = 1500;")
       && /function invalidateLastGoodFrame\(reason = "visual-invalidation"\) \{[\s\S]*?cache\.lastGoodFrame\.stale = true;[\s\S]*?recordRenderPerfMetric\("continuityFrameMarkedStale"/.test(rendererSource)
@@ -70,9 +74,10 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && rendererRuntimeStateSource.includes("function resetExactAfterSettleControllerState(")
       && rendererRuntimeStateSource.includes("function isExactAfterSettleGenerationCurrentState(")
       && /function getExactAfterSettleControllerState\(\) \{[\s\S]*?ensureExactAfterSettleControllerState\(runtimeState\);/.test(rendererSource)
-      && /function applyScheduledExactAfterSettleRefreshPlan\(generation, plan\) \{[\s\S]*?phase: "awaiting-paint"[\s\S]*?recordRenderPerfMetric\("settleExactRefreshApply"[\s\S]*?requestRendererRender\("exact-after-settle"/.test(rendererSource),
+      && /function applyScheduledExactAfterSettleRefreshPlan\(generation, plan\) \{[\s\S]*?phase: "applying"[\s\S]*?recordRenderPerfMetric\("settleExactRefreshApply"[\s\S]*?prepareExactAfterSettlePassesInSlices\(generation, plan\);/.test(rendererSource)
+      && /function completeScheduledExactAfterSettleRefreshPlan\(generation, plan, passStartedAt\) \{[\s\S]*?phase: "awaiting-paint"[\s\S]*?recordRenderPerfMetric\("settleExactRefreshPasses"[\s\S]*?requestRendererRender\("exact-after-settle"/.test(rendererSource),
     exactAfterSettleFinalizesAfterExactCompose:
-      /function drawCanvas\(\) \{[\s\S]*?composeCachedPasses\(RENDER_PASS_NAMES\);[\s\S]*?drewExactFrame = true;[\s\S]*?if \(drewExactFrame\) \{[\s\S]*?finalizePendingExactAfterSettleRefreshAfterPaint\(\);/.test(rendererSource)
+      /function drawCanvas\(\) \{[\s\S]*?drewExactFrame = composeCachedPasses\(RENDER_PASS_NAMES\);[\s\S]*?if \(drewExactFrame\) \{[\s\S]*?finalizePendingExactAfterSettleRefreshAfterPaint\(\);/.test(rendererSource)
       && /function finalizePendingExactAfterSettleRefreshAfterPaint\(\) \{[\s\S]*?isExactAfterSettleIdentityCurrent\(controller\)[\s\S]*?recordRenderPerfMetric\("settleExactRefreshWaitForPaint"[\s\S]*?finalizeExactAfterSettleRefreshPlan\(plan\);[\s\S]*?recordRenderPerfMetric\("settleExactRefreshFinalize"/.test(rendererSource)
       && !/applyScheduledExactAfterSettleRefreshPlan\(generation, plan\);[\s\S]{0,160}?finalizeExactAfterSettleRefreshPlan\(plan\);/.test(rendererSource),
     interactionRecoveryDoesNotSelfBlockPostReadyTask:
@@ -101,6 +106,11 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && /if \(passName === "labels"\) \{[\s\S]*?`colors:\$\{Number\(runtimeState\.colorRevision \|\| 0\)\}`/.test(rendererSource),
     firstBatchInteractionWritesUseRafRenderBoundary:
       /function requestInteractionRender\(reason = "interaction"\) \{[\s\S]*?requestRendererRender\(reason,[\s\S]*?flush: false/.test(rendererSource)
+      && !scenarioOwnershipEditorSource.includes("flushRenderBoundary")
+      && /function requestScenarioOwnershipRender\(reason = "scenario-ownership"\) \{[\s\S]*?requestInteractionRender\(reason\);/.test(scenarioOwnershipEditorSource)
+      && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner");')
+      && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-reset-baseline");')
+      && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner-controller");')
       && /function handleBrushPointerMove[\s\S]*?requestInteractionRender\("brush-preview"\);/.test(rendererSource)
       && /function addFeatureToDevSelection[\s\S]*?requestInteractionRender\("dev-selection-add"\);/.test(rendererSource)
       && /function toggleFeatureInDevSelection[\s\S]*?requestInteractionRender\("dev-selection-toggle"\);/.test(rendererSource)
@@ -112,10 +122,24 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && !rendererSource.includes('flushInteractionRender("dev-selection-toggle")')
       && !rendererSource.includes('flushInteractionRender("dev-selection-remove-last")')
       && !rendererSource.includes('flushInteractionRender("dev-selection-clear")')
+      && !rendererSource.includes('flushInteractionRender("click-fill")')
+      && !rendererSource.includes('flushInteractionRender("click-erase")')
       && !rendererSource.includes('flushInteractionRender(kind);'),
+    exactAfterSettleUsesFrameScheduler:
+      frameSchedulerSource.includes("export function enqueueFrameTask")
+      && rendererSource.includes('import { enqueueFrameTask } from "./frame_scheduler.js";')
+      && /function enqueueExactAfterSettleSegment\(generation, label, task\) \{[\s\S]*?enqueueFrameTask/.test(rendererSource)
+      && /scheduleExactAfterSettleRefresh[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Prepare"[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Apply"/.test(rendererSource),
+    politicalRasterWorkerProtocolDefaultsOff:
+      politicalRasterWorkerClientSource.includes("POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 1")
+      && politicalRasterWorkerClientSource.includes("political_raster_worker")
+      && politicalRasterWorkerClientSource.includes('reason: metrics.enabled ? "unsupported-capability" : "flag-disabled"')
+      && politicalRasterWorkerSource.includes('type: "ERROR"')
+      && politicalRasterWorkerSource.includes("taskId"),
     exactComposeUsesCompositeBuffer:
       /function ensureCompositeBufferCanvas\(\) \{[\s\S]*?cache\.compositeBuffer\.canvas = canvas;/.test(rendererSource)
-      && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?composeRenderPassesToTarget\(bufferContext, passNames, currentTransform\);[\s\S]*?context\.globalCompositeOperation = "copy";[\s\S]*?context\.drawImage\(bufferCanvas, 0, 0\);[\s\S]*?context\.globalCompositeOperation = "source-over";/.test(rendererSource),
+      && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?composeRenderPassesToTarget\(bufferContext, passNames, currentTransform,[\s\S]*?requireAllPasses: true[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
+      && /function blitCompositeBufferToMain\(bufferCanvas\) \{[\s\S]*?context\.globalCompositeOperation = "copy";[\s\S]*?context\.drawImage\(bufferCanvas, 0, 0\);[\s\S]*?context\.globalCompositeOperation = "source-over";/.test(rendererSource),
     coarsePrewarmDoesNotOverwriteActiveDetailChunks:
       /function hasDetailScenarioChunkIds\(chunkIds = \[\]\) \{[\s\S]*?String\(chunkId \|\| ""\)\.includes\("\.detail\."\)/.test(chunkRuntimeSource)
       && /function preloadScenarioCoarseChunks[\s\S]*?hasDetailScenarioChunkIds\(chunkState\.loadedChunkIds\)[\s\S]*?loadState\.promotionCommitInFlight[\s\S]*?return null;/.test(chunkRuntimeSource),
@@ -284,4 +308,52 @@ test("Atlantropa land interaction contracts use owner-aware targets with runtime
   Object.entries(checks).forEach(([label, ok]) => {
     assert.equal(ok, true, label);
   });
+});
+
+test("frame scheduler continues after a failed task", async () => {
+  const scheduler = await import("../js/core/frame_scheduler.js");
+  const originalError = console.error;
+  const calls = [];
+  console.error = () => {};
+  try {
+    scheduler.enqueueFrameTask(() => {
+      calls.push("first");
+      throw new Error("scheduler test failure");
+    }, { priority: "high", label: "throwing-test-task" });
+    scheduler.enqueueFrameTask(() => {
+      calls.push("second");
+    }, { priority: "high", label: "following-test-task" });
+    scheduler.runFrameTasks(8);
+  } finally {
+    console.error = originalError;
+  }
+  assert.deepEqual(calls, ["first", "second"]);
+});
+
+test("political raster worker result currentness includes viewport", async () => {
+  const {
+    createPoliticalRasterWorkerIdentity,
+    isPoliticalRasterWorkerResultCurrent,
+  } = await import("../js/core/political_raster_worker_client.js");
+  const base = {
+    scenarioId: "tno_1962",
+    selectionVersion: 7,
+    topologyRevision: 11,
+    colorRevision: 13,
+    transformBucket: "100:0:0",
+    dpr: 1,
+    viewport: { x: 0, y: 0, width: 800, height: 600 },
+  };
+  const requestIdentity = createPoliticalRasterWorkerIdentity(base);
+  assert.equal(
+    isPoliticalRasterWorkerResultCurrent(requestIdentity, createPoliticalRasterWorkerIdentity(base)),
+    true,
+  );
+  assert.equal(
+    isPoliticalRasterWorkerResultCurrent(
+      requestIdentity,
+      createPoliticalRasterWorkerIdentity({ ...base, viewport: { x: 80, y: 0, width: 800, height: 600 } }),
+    ),
+    false,
+  );
 });

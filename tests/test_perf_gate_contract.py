@@ -88,7 +88,52 @@ class PerfGateContractTest(unittest.TestCase):
         ):
             self.assertIn(field_name, script)
         self.assertIn('bootMetrics["scenario-apply"]?.source', script)
+        self.assertIn("workerDecodeMs", script)
+        self.assertIn("workerMetaBuildMs", script)
         self.assertIn("Perf gate baseline contract mismatch.", script)
+
+    def test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields(self):
+        baseline_payload = json.loads(BASELINE_JSON.read_text(encoding="utf-8"))
+        self.assertEqual(baseline_payload.get("schemaVersion"), 1)
+        self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.1")
+        self.assertEqual(baseline_payload.get("probeSchema"), "mc_perf_snapshot")
+        self.assertRegex(str(baseline_payload.get("gitHead", "")), r"^[0-9a-f]{40}$")
+        self.assertEqual(baseline_payload.get("config", {}).get("warmups"), 3)
+        for scenario_id in ("tno_1962", "hoi4_1939"):
+            summary = baseline_payload.get("scenarios", {}).get(scenario_id, {}).get("summary", {})
+            self.assertIn("workerDecodeMs", summary)
+            self.assertIn("workerMetaBuildMs", summary)
+            self.assertIsInstance(summary.get("workerDecodeMs"), (int, float))
+            self.assertIsInstance(summary.get("workerMetaBuildMs"), (int, float))
+
+    def test_editor_benchmark_locks_identity_and_fill_black_pixel_contract(self):
+        script = EDITOR_BENCHMARK_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('"schemaVersion": 1', script)
+        self.assertIn('"probeSchema": "mc_perf_snapshot"', script)
+        self.assertIn('"git", "rev-parse", "HEAD"', script)
+        self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
+        self.assertIn('"politicalRasterWorker": political_raster_worker', script)
+
+    def test_fill_action_metrics_carry_black_pixel_ratio(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+            },
+            "singleFill": {
+                "lastActionDurationMs": 11,
+                "blackPixelRatio": 0.12,
+            },
+            "doubleClickFill": {
+                "lastActionDurationMs": 22,
+                "blackPixelRatio": 0.34,
+            },
+        }
+        metrics = benchmark.build_suite_benchmark_metrics(suite)["firstInteraction"]
+        self.assertEqual(metrics["singleFillAction"]["details"]["blackPixelRatio"], 0.12)
+        self.assertEqual(metrics["doubleClickFillAction"]["details"]["blackPixelRatio"], 0.34)
 
     def test_wheel_anchor_metric_prefers_last_wheel_clock_and_keeps_legacy_fallback(self):
         benchmark = load_editor_benchmark_module()

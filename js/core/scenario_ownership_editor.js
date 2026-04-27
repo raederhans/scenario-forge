@@ -2,10 +2,10 @@ import { state as runtimeState } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
   refreshResolvedColorsForFeatures,
+  requestInteractionRender,
   scheduleDynamicBorderRecompute,
 } from "./map_renderer.js";
 import { markDirty } from "./dirty_state.js";
-import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 import {
   getFeatureOwnerCode,
@@ -23,8 +23,8 @@ function uniqueIds(featureIds = []) {
   ));
 }
 
-function flushScenarioOwnershipRender(reason = "scenario-ownership") {
-  return flushRenderBoundary(reason);
+function requestScenarioOwnershipRender(reason = "scenario-ownership") {
+  return requestInteractionRender(reason);
 }
 
 function filterEditableOwnershipFeatureIds(featureIds = []) {
@@ -100,8 +100,8 @@ function applyOwnerToFeatureIds(
     sovereigntyFeatureIds: matchedIds,
   });
   const changed = setFeatureOwnerCodes(matchedIds, normalizedOwnerCode);
-  refreshResolvedColorsForFeatures(matchedIds, { renderNow: false });
   if (changed > 0) {
+    refreshResolvedColorsForFeatures(matchedIds, { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
@@ -116,7 +116,7 @@ function applyOwnerToFeatureIds(
     });
   }
   if (render) {
-    flushScenarioOwnershipRender("scenario-ownership-apply-owner");
+    requestScenarioOwnershipRender("scenario-ownership-apply-owner");
   }
   return {
     applied: true,
@@ -200,8 +200,8 @@ function resetOwnersToScenarioBaselineForFeatureIds(
   groupedIdsByOwner.forEach((featureIds, ownerCode) => {
     changed += setFeatureOwnerCodes(featureIds, ownerCode);
   });
-  refreshResolvedColorsForFeatures(baselineTargetIds, { renderNow: false });
   if (changed > 0) {
+    refreshResolvedColorsForFeatures(baselineTargetIds, { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
@@ -216,7 +216,7 @@ function resetOwnersToScenarioBaselineForFeatureIds(
     });
   }
   if (render) {
-    flushScenarioOwnershipRender("scenario-ownership-reset-baseline");
+    requestScenarioOwnershipRender("scenario-ownership-reset-baseline");
   }
   return {
     applied: true,
@@ -310,7 +310,7 @@ function applyOwnerControllerAssignmentsToFeatureIds(
   if (changedFeatureIds.size) {
     runtimeState.scenarioControllerRevision = (Number(runtimeState.scenarioControllerRevision) || 0) + 1;
     recalculateScenarioOwnerControllerDiffCount();
-    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    refreshResolvedColorsForFeatures(Array.from(changedFeatureIds), { renderNow: false });
     scheduleDynamicBorderRecompute(recomputeReason, 90);
     markDirty(dirtyReason);
     pushHistoryEntry({
@@ -326,7 +326,7 @@ function applyOwnerControllerAssignmentsToFeatureIds(
     });
   }
   if (render) {
-    flushScenarioOwnershipRender("scenario-ownership-apply-owner-controller");
+    requestScenarioOwnershipRender("scenario-ownership-apply-owner-controller");
   }
   return {
     applied: true,

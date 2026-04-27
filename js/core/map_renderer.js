@@ -50,6 +50,7 @@ import {
   HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
 } from "./city_lights_historical_1930_asset.js";
 import { ColorManager } from "./color_manager.js";
+import { ensurePoliticalRasterWorkerMetrics, requestPoliticalRasterWorkerPass } from "./political_raster_worker_client.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
@@ -81,6 +82,7 @@ import {
   normalizeUnitCounterSizeToken,
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
+import { enqueueFrameTask } from "./frame_scheduler.js";
 import { flushRenderBoundary, requestRender } from "./render_boundary.js";
 import { registerRuntimeHook } from "./state/index.js";
 import {
@@ -1739,6 +1741,8 @@ function getVisibleFrameIdentity(transform = runtimeState.zoomTransform || globa
     dpr: Math.max(1, Number(runtimeState.dpr || 1)),
     pixelWidth: Math.max(1, Number(context?.canvas?.width || 1)),
     pixelHeight: Math.max(1, Number(context?.canvas?.height || 1)),
+    colorRevision: Number(runtimeState.colorRevision || 0),
+    transformBucket: getTransformBucketSignature(transform),
     transform: cloneZoomTransform(transform),
   };
 }
@@ -2046,6 +2050,7 @@ function getInteractionCompositeRejectReason(composite, currentTransform, cache 
   if (Number(composite.pixelWidth || 0) !== identity.pixelWidth || Number(composite.pixelHeight || 0) !== identity.pixelHeight) {
     return "canvas-size-mismatch";
   }
+  if (Number(composite.colorRevision || 0) !== identity.colorRevision) return "color-revision-mismatch";
   return "";
 }
 
@@ -4002,6 +4007,13 @@ function getExactAfterSettleControllerState() {
   return ensureExactAfterSettleControllerState(runtimeState);
 }
 
+function getTransformBucketSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const k = Math.round(Number(transform?.k || 1) * 100);
+  const x = Math.round(Number(transform?.x || 0) / 64);
+  const y = Math.round(Number(transform?.y || 0) / 64);
+  return `${k}:${x}:${y}`;
+}
+
 function getExactAfterSettleIdentity() {
   const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
     ? runtimeState.runtimeChunkLoadState
@@ -4010,6 +4022,12 @@ function getExactAfterSettleIdentity() {
     scenarioId: String(runtimeState.activeScenarioId || ""),
     selectionVersion: Number(loadState?.selectionVersion || 0),
     topologyRevision: Number(runtimeState.topologyRevision || 0),
+    dpr: Math.max(1, Number(runtimeState.dpr || 1)),
+    pixelWidth: Math.max(1, Number(context?.canvas?.width || 1)),
+    pixelHeight: Math.max(1, Number(context?.canvas?.height || 1)),
+    colorRevision: Number(runtimeState.colorRevision || 0),
+    zoomToken: Number(runtimeState.zoomGestureEndedAt || 0),
+    transformBucket: getTransformBucketSignature(),
   };
 }
 
@@ -4017,6 +4035,12 @@ function assignExactAfterSettleIdentity(controller, identity = getExactAfterSett
   controller.scenarioId = identity.scenarioId;
   controller.selectionVersion = identity.selectionVersion;
   controller.topologyRevision = identity.topologyRevision;
+  controller.dpr = identity.dpr;
+  controller.pixelWidth = identity.pixelWidth;
+  controller.pixelHeight = identity.pixelHeight;
+  controller.colorRevision = identity.colorRevision;
+  controller.zoomToken = identity.zoomToken;
+  controller.transformBucket = identity.transformBucket;
 }
 
 function isExactAfterSettleIdentityCurrent(controller) {
@@ -4024,7 +4048,13 @@ function isExactAfterSettleIdentityCurrent(controller) {
   const identity = getExactAfterSettleIdentity();
   return String(controller.scenarioId || "") === identity.scenarioId
     && Number(controller.selectionVersion || 0) === identity.selectionVersion
-    && Number(controller.topologyRevision || 0) === identity.topologyRevision;
+    && Number(controller.topologyRevision || 0) === identity.topologyRevision
+    && Math.abs(Number(controller.dpr || 1) - identity.dpr) <= 0.01
+    && Number(controller.pixelWidth || 0) === identity.pixelWidth
+    && Number(controller.pixelHeight || 0) === identity.pixelHeight
+    && Number(controller.colorRevision || 0) === identity.colorRevision
+    && Number(controller.zoomToken || 0) === identity.zoomToken
+    && String(controller.transformBucket || "") === identity.transformBucket;
 }
 
 function resetExactAfterSettleController(reason = "reset", generation = null) {
@@ -4041,6 +4071,7 @@ function beginExactAfterSettleControllerSchedule(scheduleStartedAt) {
     scheduledAt: scheduleStartedAt,
     reason: "scheduled",
   });
+  assignExactAfterSettleIdentity(controller);
   return controller;
 }
 
@@ -4050,6 +4081,83 @@ function isExactAfterSettleGenerationCurrent(generation, phase = "") {
 
 function isExactAfterSettleControllerActive() {
   return isExactAfterSettleControllerActiveState(runtimeState);
+}
+
+function completeScheduledExactAfterSettleRefreshPlan(generation, plan, passStartedAt) {
+  if (!isExactAfterSettleGenerationCurrent(generation, "applying")) {
+    return false;
+  }
+  const controller = getExactAfterSettleControllerState();
+  if (!isExactAfterSettleIdentityCurrent(controller)) {
+    resetExactAfterSettleController("pass-complete-identity-mismatch", generation);
+    return false;
+  }
+  const applyFinishedAt = nowMs();
+  Object.assign(controller, {
+    phase: "awaiting-paint",
+    applyFinishedAt,
+    reason: "awaiting-paint",
+  });
+  recordRenderPerfMetric("settleExactRefreshPasses", Math.max(0, applyFinishedAt - passStartedAt), {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    generation,
+    contextBaseRefreshed: !!plan.exactRefreshApplied,
+  });
+  return requestRendererRender("exact-after-settle", {
+    flush: false,
+    fallback: () => render(),
+  });
+}
+
+function prepareExactAfterSettlePassesInSlices(generation, plan) {
+  const controller = getExactAfterSettleControllerState();
+  if (!isExactAfterSettleGenerationCurrent(generation, "applying")) {
+    return false;
+  }
+  if (!isExactAfterSettleIdentityCurrent(controller)) {
+    resetExactAfterSettleController("pass-start-identity-mismatch", generation);
+    return false;
+  }
+  const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
+  const definitions = getIdleRenderPassDefinitions();
+  const timings = {};
+  const cache = getRenderPassCacheState();
+  const passStartedAt = nowMs();
+  if (runtimeState.legacyColorStateDirty) {
+    rebuildResolvedColors();
+  }
+
+  const enqueueNextPass = (index) => {
+    if (index >= definitions.length) {
+      completeScheduledExactAfterSettleRefreshPlan(generation, plan, passStartedAt);
+      return;
+    }
+    const [passName, drawFn] = definitions[index];
+    enqueueFrameTask(() => {
+      const passStart = nowMs();
+      const activeController = getExactAfterSettleControllerState();
+      if (!isExactAfterSettleGenerationCurrent(generation, "applying")) return;
+      if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
+        resetExactAfterSettleController(`${passName}-phase-interrupted`, generation);
+        return;
+      }
+      if (!isExactAfterSettleIdentityCurrent(activeController)) {
+        resetExactAfterSettleController(`${passName}-identity-mismatch`, generation);
+        return;
+      }
+      prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
+      recordRenderPerfMetric("settleExactRefreshPass", Math.max(0, nowMs() - passStart), {
+        activeScenarioId: String(runtimeState.activeScenarioId || ""),
+        generation,
+        passName,
+        index,
+      });
+      enqueueNextPass(index + 1);
+    }, { priority: "high", label: `exact-after-settle-pass-${passName}` });
+  };
+
+  enqueueNextPass(0);
+  return true;
 }
 
 function applyScheduledExactAfterSettleRefreshPlan(generation, plan) {
@@ -4067,21 +4175,12 @@ function applyScheduledExactAfterSettleRefreshPlan(generation, plan) {
   assignExactAfterSettleIdentity(controller);
   plan.controllerGeneration = generation;
   applyExactAfterSettleRefreshPlan(plan);
-  const applyFinishedAt = nowMs();
-  Object.assign(controller, {
-    phase: "awaiting-paint",
-    applyFinishedAt,
-    reason: "awaiting-paint",
-  });
-  recordRenderPerfMetric("settleExactRefreshApply", Math.max(0, applyFinishedAt - applyStartedAt), {
+  recordRenderPerfMetric("settleExactRefreshApply", Math.max(0, nowMs() - applyStartedAt), {
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
     generation,
     contextBaseRefreshed: !!plan.exactRefreshApplied,
   });
-  return requestRendererRender("exact-after-settle", {
-    flush: false,
-    fallback: () => render(),
-  });
+  return prepareExactAfterSettlePassesInSlices(generation, plan);
 }
 
 function finalizePendingExactAfterSettleRefreshAfterPaint() {
@@ -17574,7 +17673,19 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
   return true;
 }
 
+function recordPoliticalRasterWorkerSnapshot() {
+  const metrics = ensurePoliticalRasterWorkerMetrics(globalThis);
+  recordRenderPerfMetric("politicalRasterWorker.roundTripMs", Number(metrics.roundTripMs || 0), {
+    enabled: !!metrics.enabled,
+  });
+  recordRenderPerfMetric("politicalRasterWorker.timeoutCount", 0, { count: Number(metrics.timeoutCount || 0) });
+  recordRenderPerfMetric("politicalRasterWorker.recycleCount", 0, { count: Number(metrics.recycleCount || 0) });
+  recordRenderPerfMetric("politicalRasterWorker.staleResponseCount", 0, { count: Number(metrics.staleResponseCount || 0) });
+}
+
 function drawPoliticalPass(k) {
+  requestPoliticalRasterWorkerPass();
+  recordPoliticalRasterWorkerSnapshot();
   const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const visibleItems = debugMode === "PROD" ? collectVisibleLandSpatialItems() : null;
@@ -18364,13 +18475,8 @@ function renderPassToCache(passName, drawFn, transform, timings) {
   }
 }
 
-function ensureIdleRenderPasses(timings) {
-  const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
-  const cache = getRenderPassCacheState();
-  if (runtimeState.legacyColorStateDirty) {
-    rebuildResolvedColors();
-  }
-  const passDefinitions = [
+function getIdleRenderPassDefinitions() {
+  return [
     ["background", (k) => drawBackgroundPass(k)],
     ["physicalBase", (k) => drawPhysicalBasePass(k)],
     ["political", (k) => drawPoliticalPass(k)],
@@ -18384,7 +18490,9 @@ function ensureIdleRenderPasses(timings) {
     ["textureLabels", (k) => drawTextureLabelEffectsPass(k)],
     ["labels", (k) => drawLabelsPass(k)],
   ];
-  passDefinitions.forEach(([passName, drawFn]) => {
+}
+
+function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache = getRenderPassCacheState()) {
     const nextSignature = getRenderPassSignature(passName, transform);
     if (cache.signatures[passName] !== nextSignature) {
       cache.dirty[passName] = true;
@@ -18462,6 +18570,16 @@ function ensureIdleRenderPasses(timings) {
       return;
     }
     renderPassToCache(passName, drawFn, transform, timings);
+}
+
+function ensureIdleRenderPasses(timings) {
+  const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
+  const cache = getRenderPassCacheState();
+  if (runtimeState.legacyColorStateDirty) {
+    rebuildResolvedColors();
+  }
+  getIdleRenderPassDefinitions().forEach(([passName, drawFn]) => {
+    prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
   });
   if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
     timings.context =
@@ -18496,13 +18614,7 @@ function areZoomTransformsEquivalent(a, b, epsilon = 0.01) {
   );
 }
 
-function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
-  if (!context?.canvas) return;
-  const bufferCanvas = ensureCompositeBufferCanvas();
-  const bufferContext = bufferCanvas.getContext("2d");
-  if (!bufferContext) return;
-  resetCanvasContext(bufferContext, bufferCanvas.width, bufferCanvas.height);
-  composeRenderPassesToTarget(bufferContext, passNames, currentTransform);
+function blitCompositeBufferToMain(bufferCanvas) {
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.globalCompositeOperation = "source-over";
   context.globalAlpha = 1;
@@ -18511,8 +18623,30 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
   context.globalCompositeOperation = "copy";
   context.drawImage(bufferCanvas, 0, 0);
   context.globalCompositeOperation = "source-over";
-  incrementPerfCounter("composites");
 }
+
+function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
+  if (!context?.canvas) return false;
+  const bufferCanvas = ensureCompositeBufferCanvas();
+  const bufferContext = bufferCanvas.getContext("2d");
+  if (!bufferContext) return false;
+  resetCanvasContext(bufferContext, bufferCanvas.width, bufferCanvas.height);
+  const result = composeRenderPassesToTarget(bufferContext, passNames, currentTransform, {
+    requireAllPasses: true,
+  });
+  if (!result.ok) {
+    recordRenderPerfMetric("compositeBufferMissingPass", 0, {
+      reason: result.reason,
+      passName: result.passName || "",
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    });
+    return false;
+  }
+  blitCompositeBufferToMain(bufferCanvas);
+  incrementPerfCounter("composites");
+  return true;
+}
+
 
 function canDrawTransformedPass(passName, cache = getRenderPassCacheState()) {
   if (cache.dirty?.[passName]) return false;
@@ -18546,6 +18680,8 @@ function buildInteractionComposite(currentTransform, timings) {
   cache.interactionComposite.dpr = identity.dpr;
   cache.interactionComposite.pixelWidth = identity.pixelWidth;
   cache.interactionComposite.pixelHeight = identity.pixelHeight;
+  cache.interactionComposite.colorRevision = identity.colorRevision;
+  cache.interactionComposite.transformBucket = identity.transformBucket;
   incrementPerfCounter("interactionCompositeBuilds");
   recordPassTiming(timings, "interactionCompositeBuild", startedAt);
   recordRenderPerfMetric("interactionCompositeBuild", nowMs() - startedAt, {
@@ -18601,13 +18737,25 @@ function drawTransformedPass(passName, currentTransform, referenceTransform = nu
   return true;
 }
 
-function composeRenderPassesToTarget(targetContext, passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
-  if (!targetContext) return false;
+function composeRenderPassesToTarget(
+  targetContext,
+  passNames,
+  currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
+  { requireAllPasses = false } = {},
+) {
+  if (!targetContext) return { ok: false, reason: "missing-target-context" };
   const cache = getRenderPassCacheState();
-  (Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES).forEach((passName) => {
+  const names = Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES;
+  for (const passName of names) {
     const passCanvas = cache.canvases?.[passName];
-    if (!passCanvas) return;
+    if (!passCanvas) {
+      if (requireAllPasses) return { ok: false, reason: "missing-pass-canvas", passName };
+      continue;
+    }
     const referenceTransform = getPassReferenceTransform(passName);
+    if (!referenceTransform && requireAllPasses) {
+      return { ok: false, reason: "missing-reference-transform", passName };
+    }
     if (referenceTransform && !areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
       const layout = getRenderPassLayout(passName);
       const current = cloneZoomTransform(currentTransform);
@@ -18624,7 +18772,7 @@ function composeRenderPassesToTarget(targetContext, passNames, currentTransform 
       targetContext.scale(scaleRatio, scaleRatio);
       targetContext.drawImage(passCanvas, 0, 0);
       targetContext.restore();
-      return;
+      continue;
     }
     const layout = getRenderPassLayout(passName);
     targetContext.drawImage(
@@ -18632,9 +18780,10 @@ function composeRenderPassesToTarget(targetContext, passNames, currentTransform 
       Math.round(-Number(layout?.offsetX || 0) * runtimeState.dpr),
       Math.round(-Number(layout?.offsetY || 0) * runtimeState.dpr),
     );
-  });
-  return true;
+  }
+  return { ok: true };
 }
+
 
 function renderExportPassesToCanvas(passNames) {
   const width = Number(runtimeState.colorCanvas?.width || 0);
@@ -18650,6 +18799,31 @@ function renderExportPassesToCanvas(passNames) {
   exportContext.clearRect(0, 0, width, height);
   composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
   return exportCanvas;
+}
+
+function composeTransformedFrameToBuffer(currentTransform, transformedPasses, { interactiveBorders = false } = {}) {
+  const bufferCanvas = ensureCompositeBufferCanvas();
+  const bufferContext = bufferCanvas.getContext("2d");
+  if (!bufferContext) return false;
+  resetCanvasContext(bufferContext, bufferCanvas.width, bufferCanvas.height);
+  let ok = false;
+  withRenderTarget(bufferContext, () => {
+    ok = drawInteractionComposite(currentTransform)
+      && transformedPasses.every((passName) => drawTransformedPass(passName, currentTransform));
+    if (!ok) return;
+    if (!drawInteractionBorderSnapshot(currentTransform)) {
+      const k = Math.max(0.0001, Number(currentTransform?.k || 1));
+      bufferContext.setTransform(runtimeState.dpr, 0, 0, runtimeState.dpr, 0, 0);
+      bufferContext.translate(currentTransform.x, currentTransform.y);
+      bufferContext.scale(k, k);
+      drawBordersPass(k, { interactive: !!interactiveBorders });
+      bufferContext.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    ok = drawTransformedPass("labels", currentTransform);
+  });
+  if (!ok) return false;
+  blitCompositeBufferToMain(bufferCanvas);
+  return true;
 }
 
 function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } = {}) {
@@ -18678,7 +18852,6 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   if (!canDrawInteractionComposite(currentTransform, cache)) {
     return false;
   }
-  resetMainCanvas();
   if (
     runtimeState.deferExactAfterSettle
     && runtimeState.pendingExactPoliticalFastFrame
@@ -18693,28 +18866,14 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
       zoomEndedAt: Number(runtimeState.zoomGestureEndedAt || 0),
     });
   }
-  const drewComposite = drawInteractionComposite(currentTransform);
-  const drewAll = drewComposite && transformedPasses.every((passName) =>
-    drawTransformedPass(passName, currentTransform)
-  );
+  const drewAll = composeTransformedFrameToBuffer(currentTransform, transformedPasses, {
+    interactiveBorders,
+  });
   if (!drewAll) {
-    recordRenderPerfMetric("transformedFramePostClearFailure", 0, {
+    recordRenderPerfMetric("transformedFrameBufferComposeFailure", 0, {
       phase: String(runtimeState.renderPhase || ""),
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
-      drewComposite: !!drewComposite,
     });
-    return drawLastGoodFrameFallback(currentTransform);
-  }
-
-  if (!drawInteractionBorderSnapshot(currentTransform)) {
-    const k = Math.max(0.0001, Number(currentTransform?.k || 1));
-    context.setTransform(runtimeState.dpr, 0, 0, runtimeState.dpr, 0, 0);
-    context.translate(currentTransform.x, currentTransform.y);
-    context.scale(k, k);
-    drawBordersPass(k, { interactive: !!interactiveBorders });
-    context.setTransform(1, 0, 0, 1, 0, 0);
-  }
-  if (!drawTransformedPass("labels", currentTransform)) {
     return false;
   }
   const timingLabel = interactiveBorders ? "interactiveComposite" : "transformedComposite";
@@ -18809,9 +18968,8 @@ function drawCanvas() {
   if (!useTransformedFrame || !drewFrame) {
     resetContextBreakdownForExactFrame();
     ensureIdleRenderPasses(frameTimings);
-    composeCachedPasses(RENDER_PASS_NAMES);
-    drewExactFrame = true;
-    drewFrame = true;
+    drewExactFrame = composeCachedPasses(RENDER_PASS_NAMES);
+    drewFrame = drewExactFrame;
   }
 
   const cache = getRenderPassCacheState();
@@ -18938,6 +19096,23 @@ function finalizeExactAfterSettleRefreshPlan(plan) {
   }
 }
 
+function enqueueExactAfterSettleSegment(generation, label, task) {
+  return enqueueFrameTask(() => {
+    const startedAt = nowMs();
+    if (!isExactAfterSettleGenerationCurrent(generation, "scheduled")) return;
+    if (!runtimeState.deferExactAfterSettle || runtimeState.renderPhase !== RENDER_PHASE_IDLE) return;
+    if (!isExactAfterSettleIdentityCurrent(getExactAfterSettleControllerState())) {
+      resetExactAfterSettleController(`${label}-identity-mismatch`, generation);
+      return;
+    }
+    task();
+    recordRenderPerfMetric(`settleExactRefresh${label}`, Math.max(0, nowMs() - startedAt), {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      generation,
+    });
+  }, { priority: "high", label: `exact-after-settle-${label}` });
+}
+
 function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
   cancelExactAfterSettleRefresh({ clearDefer: false });
   const scheduleStartedAt = nowMs();
@@ -18957,12 +19132,17 @@ function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettlePr
         scheduleExactAfterSettleRefresh(resolvedProfile);
         return;
       }
-      const plan = buildExactAfterSettleRefreshPlan({
-        profile: resolvedProfile,
-        scheduleStartedAt,
-        callbackStartedAt: nowMs(),
+      assignExactAfterSettleIdentity(getExactAfterSettleControllerState());
+      enqueueExactAfterSettleSegment(generation, "Prepare", () => {
+        const plan = buildExactAfterSettleRefreshPlan({
+          profile: resolvedProfile,
+          scheduleStartedAt,
+          callbackStartedAt: nowMs(),
+        });
+        enqueueExactAfterSettleSegment(generation, "Apply", () => {
+          applyScheduledExactAfterSettleRefreshPlan(generation, plan);
+        });
       });
-      applyScheduledExactAfterSettleRefreshPlan(generation, plan);
     }, resolvedProfile.exactQuietWindowMs),
   };
 }
@@ -22176,10 +22356,10 @@ function applyBrushHit(hit) {
       if (!freshIds.length) return false;
       mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
       freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
-      const changed = resetFeatureOwnerCodes(targetIds);
+      const changed = resetFeatureOwnerCodes(freshIds);
       if (changed > 0) {
         brushSession.changed = true;
-        refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+        refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
         scheduleDynamicBorderRecompute("brush-sovereignty-reset", 90);
         return true;
       }
@@ -22218,10 +22398,10 @@ function applyBrushHit(hit) {
     if (!freshIds.length) return false;
     mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
     freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
-    const changed = setFeatureOwnerCodes(targetIds, runtimeState.activeSovereignCode);
+    const changed = setFeatureOwnerCodes(freshIds, runtimeState.activeSovereignCode);
     if (changed > 0) {
       brushSession.changed = true;
-      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+      refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
       scheduleDynamicBorderRecompute("brush-sovereignty-fill", 90);
       return true;
     }
@@ -22414,7 +22594,7 @@ async function handleClick(event, _interactionContext = null) {
         before: historyBefore,
         after: captureHistoryState({ specialRegionIds: [id] }),
       });
-      flushInteractionRender("click-erase-special");
+      requestInteractionRender("click-erase-special");
       refreshSidebarAfterPaint({ specialRegionIds: [id] });
       noteRenderAction("click-erase-special", actionStart);
       return;
@@ -22442,7 +22622,7 @@ async function handleClick(event, _interactionContext = null) {
         after: captureHistoryState({ specialRegionIds: [id] }),
       });
       addRecentColor(nextColor);
-      flushInteractionRender("click-fill-special");
+      requestInteractionRender("click-fill-special");
       refreshSidebarAfterPaint({ specialRegionIds: [id] });
     }
     noteRenderAction("click-fill-special", actionStart);
@@ -22472,7 +22652,7 @@ async function handleClick(event, _interactionContext = null) {
         before: historyBefore,
         after: captureHistoryState({ waterRegionIds: [id] }),
       });
-      flushInteractionRender("click-erase-water");
+      requestInteractionRender("click-erase-water");
       refreshSidebarAfterPaint({ waterRegionIds: [id] });
       noteRenderAction("click-erase-water", actionStart);
       return;
@@ -22550,8 +22730,8 @@ async function handleClick(event, _interactionContext = null) {
         sovereigntyFeatureIds: targetIds,
       });
       const changed = resetFeatureOwnerCodes(targetIds);
-      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
       if (changed > 0) {
+        refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
         markDirty("erase-sovereignty");
         if (targetIds.length > 1) {
           scheduleDynamicBorderRecompute("sovereignty-batch-reset", 90);
@@ -22602,7 +22782,7 @@ async function handleClick(event, _interactionContext = null) {
         }),
       });
     }
-    flushInteractionRender("click-erase");
+    requestInteractionRender("click-erase");
     if (shouldRefreshCountryList) {
       refreshSidebarAfterPaint({
         featureIds: targetIds,
@@ -22654,8 +22834,8 @@ async function handleClick(event, _interactionContext = null) {
       return;
     }
     const changed = setFeatureOwnerCodes(targetIds, runtimeState.activeSovereignCode);
-    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     if (changed > 0) {
+      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
       if (targetIds.length > 1) {
         scheduleDynamicBorderRecompute("sovereignty-batch-fill", 90);
       } else {
@@ -22701,7 +22881,7 @@ async function handleClick(event, _interactionContext = null) {
     return;
   }
   addRecentColor(selectedColor);
-  flushInteractionRender("click-fill");
+  requestInteractionRender("click-fill");
   if (isSovereigntyModeActive() || (runtimeState.interactionGranularity === "country" && countryCode)) {
     refreshSidebarAfterPaint({
       featureIds: targetIds,
@@ -23845,6 +24025,7 @@ export {
   renderExportPassesToCanvas,
 
   // Viewport, diagnostics, and render scheduling facade.
+  requestInteractionRender,
   setDebugMode,
   getZoomPercent,
   resetZoomToFit,

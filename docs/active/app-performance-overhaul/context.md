@@ -235,3 +235,30 @@ ode: imports for this runtime; verification used project Playwright entrypoints 
 - scheduleExactAfterSettleRefresh() now applies the plan and requests render; drawCanvas() finalizes after exact compose.
 - settleExactRefreshApply, settleExactRefreshWaitForPaint, and settleExactRefreshFinalize record phase timing while settleExactRefresh remains the total metric.
 - First-batch rAF render writes now cover dev-selection add/toggle/remove/clear plus direct land/water color fill helpers.
+
+## 2026-04-27 full zoom/drag black-frame overhaul execution
+- User requested Ralph execution for all remaining planned phases.
+- Scope: pre-gate A metrics contract, pre-gate B request/flush ownership, phase 1 sliced exact-after-settle scheduling, phase 2 atomic composite identity, phase 3 political dirty + rAF batching, phase 4 fallback inventory, phase 5 flag-off political raster worker protocol.
+- Parent owns implementation and all live verification. Subagents are static-only lanes.
+- Stop condition: if a phase target cannot be verified with fresh metrics, remain on that phase and record blocker.
+
+## 2026-04-27 本轮执行记录
+- 完成前置门 A：benchmark 输出补齐 gitHead/schemaVersion/probeSchema，singleFill/doubleClickFill 补 blackPixelRatio，perf gate contract 已覆盖固定路径与 worker 指标壳。
+- 完成前置门 B：scenario_ownership_editor 移出直接 flushRenderBoundary；sidebar/ownership 路径收窄到 changed ids；click 填色路径走 requestInteractionRender。
+- 阶段 1/2/3 已落主路径改造：frame_scheduler 切片、exact-after-settle pass 分段、compositeBuffer 原子 blit、interactionComposite 放宽 transformBucket 复用、政治色 partial dirty/rAF request 收口。
+- 阶段 4 本轮按 inventory 结论保留 lastGoodFrame/baseVisibleFrameFallback/interactionComposite；它们仍承担 guardrail 或性能职责。
+- 阶段 5 落 default-off worker protocol shell/client/metrics，worker raster 实际 offload 仍待下一轮实现。
+- Review 修复：frame_scheduler 单任务异常会记录并继续 drain；worker currentness 已比较 viewport，并补行为测试。
+- 最终 benchmark：tno exact=11.5ms，wheel firstIdleAfterLast=2221.4ms，wheel maxLong=1775ms，wheel maxBlack=0.055827，pan black=0.055827，single black=0.049479，double black=0.055827，worker flag off 指标全 0。
+- 结论：合同门、E2E、perf gate 已通过；黑屏/长任务目标仍未达成，继续阶段 2/3 深挖 political/background full pass 与 wheel idle 阻塞。
+
+## 2026-04-27 验证记录
+- node --check: map_renderer/state/frame_scheduler/political worker/scenario ownership/sidebar 通过。
+- python -m py_compile: editor benchmark 与 contract 测试文件通过。
+- npm run test:node:scenario-chunk-contracts 通过，含 frame_scheduler 异常继续 drain 与 worker viewport currentness 行为测试。
+- npm run test:node:renderer-runtime-state-behavior 通过。
+- npm run test:node:perf-probe-snapshot-behavior 通过。
+- python unittest contract 组通过：scenario chunk refresh、perf gate、frontend render boundary、dev workspace ownership、sidebar split、water special region。
+- E2E 通过：scenario-chunk-runtime 4/4、tno-ready-state 5/5、interaction-funnel 3/3。
+- Benchmark 输出：.runtime/output/perf/zoom-drag-final.json；截图目录：.runtime/browser/mcp-artifacts/zoom-drag-final。
+- npm run perf:gate 通过。

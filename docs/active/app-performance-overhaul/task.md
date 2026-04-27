@@ -200,3 +200,27 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] Final perf gate passed: `npm run perf:gate` against `docs/perf/baseline_2026-04-20.json`.
 - [x] Final static review result: APPROVE; optional identity-mismatch runtime coverage left as a future hardening candidate because current generation and identity contracts are already covered by behavior/static checks.
 - [x] Deslop pass checked changed files for stale helper names, dead wrappers, temporary artifacts, and broken new task lines; no extra code cleanup needed.
+
+## 2026-04-27 full zoom/drag black-frame overhaul task progress
+- [x] Start Ralph state and context snapshot.
+- [x] Spawn static-only lanes for metrics, request/flush, scheduler, atomic compose, political dirty batching, fallback/worker.
+- [ ] Implement pre-gate A metrics contract completion.
+- [ ] Implement pre-gate B request/flush ownership completion.
+- [ ] Implement phase 1 frame scheduler / sliced exact-after-settle minimum slice.
+- [ ] Implement phase 2 atomic composite identity completion.
+- [ ] Implement phase 3 political dirty + rAF batching completion.
+- [ ] Complete phase 4 fallback cache inventory and safe cleanup decision.
+- [ ] Implement phase 5 flag-off political raster worker protocol.
+- [ ] Run parent-owned syntax, contracts, E2E, benchmark, perf baseline/gate.
+- [ ] Run review/bug-check/first-principles pass and close Ralph state.
+
+## 2026-04-27 状态更新
+- [x] 前置门 A：指标契约字段、fill 黑屏采样、worker 指标壳、测试覆盖。
+- [x] 前置门 B：ownership editor request lane、sidebar/water contract 保持。
+- [x] 阶段 1 基础设施：frame_scheduler、exact-after-settle controller identity、pass slice 调度。
+- [x] 阶段 2 基础设施：compositeBuffer 原子提交、fast transformed frame 单次 buffer blit。
+- [x] 阶段 3 部分：changed ids 政治色刷新、click fill request lane、ownership changed-only refresh。
+- [x] 阶段 4 inventory：fallback 缓存保留理由已确认。
+- [x] 阶段 5 protocol shell：default-off client/worker/metrics/currentness contract。
+- [ ] 阶段目标达标：wheel idle、long task、black ratio 仍超阈值。
+- [ ] Worker political raster 实际 offload。
