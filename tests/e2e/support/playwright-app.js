@@ -113,6 +113,92 @@ async function waitForScenarioSelectReady(page, { scenarioId = "tno_1962", timeo
   }, String(scenarioId || "").trim(), { timeout });
 }
 
+async function readSelectorSnapshot(page, selectors = []) {
+  return page.evaluate((selectorList) => selectorList.map((selector) => {
+    const element = document.querySelector(selector);
+    if (!element) {
+      return {
+        selector,
+        exists: false,
+        visible: false,
+        text: "",
+      };
+    }
+    const style = globalThis.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const visible = style.visibility !== "hidden"
+      && style.display !== "none"
+      && Number(rect.width) > 0
+      && Number(rect.height) > 0;
+    return {
+      selector,
+      exists: true,
+      visible,
+      text: String(element.textContent || "").trim().slice(0, 200),
+    };
+  }), selectors);
+}
+
+async function readSmokeFailureSnapshot(page, selectors = []) {
+  try {
+    await primeStateRef(page);
+    const [bootState, selectorState, activeScenarioId] = await Promise.all([
+      readBootStateSnapshot(page),
+      readSelectorSnapshot(page, selectors),
+      page.evaluate(() => {
+        const state = globalThis.__playwrightStateRef || null;
+        return String(state?.activeScenarioId || "");
+      }),
+    ]);
+    return {
+      bootState,
+      activeScenarioId,
+      selectors: selectorState,
+    };
+  } catch (error) {
+    return {
+      snapshotError: String(error?.message || error),
+      activeScenarioId: "",
+      selectors: [],
+      bootState: {
+        snapshotError: "smoke snapshot capture failed",
+      },
+    };
+  }
+}
+
+async function waitForScenarioReadyGate(page, {
+  scenarioId = "tno_1962",
+  timeout = 120_000,
+  renderMode = "none",
+} = {}) {
+  await waitForAppInteractive(page, { timeout });
+  await waitForScenarioSelectReady(page, { scenarioId, timeout });
+  await applyScenarioAndWaitIdle(page, scenarioId, {
+    timeout,
+    renderMode,
+    markDirtyReason: "playwright-smoke-scenario-gate",
+    showToastOnComplete: false,
+  });
+  await expectScenarioInteractive(page, { scenarioId, timeout });
+}
+
+async function expectScenarioInteractive(page, { scenarioId, timeout = 120_000 } = {}) {
+  await expectPollScenarioId(page, { scenarioId, timeout });
+  await page.waitForFunction(() => {
+    const state = globalThis.__playwrightStateRef || null;
+    return !!state && !state.scenarioApplyInFlight;
+  }, { timeout });
+}
+
+async function expectPollScenarioId(page, { scenarioId, timeout = 120_000 } = {}) {
+  const expectedScenarioId = String(scenarioId || "").trim();
+  await page.waitForFunction((targetScenarioId) => {
+    const select = document.querySelector("#scenarioSelect");
+    return !!select && select.value === targetScenarioId;
+  }, expectedScenarioId, { timeout });
+}
+
 async function applyScenarioAndWaitIdle(page, scenarioId, {
   timeout = 120_000,
   renderMode = "none",
@@ -253,6 +339,8 @@ module.exports = {
   primeStateRef,
   primeInteractionFunnelDebugRef,
   waitForScenarioSelectReady,
+  waitForScenarioReadyGate,
+  readSmokeFailureSnapshot,
   applyScenarioAndWaitIdle,
   waitForProjectImportSettled,
   beginProjectImportWatch,
