@@ -262,3 +262,18 @@ ode: imports for this runtime; verification used project Playwright entrypoints 
 - E2E 通过：scenario-chunk-runtime 4/4、tno-ready-state 5/5、interaction-funnel 3/3。
 - Benchmark 输出：.runtime/output/perf/zoom-drag-final.json；截图目录：.runtime/browser/mcp-artifacts/zoom-drag-final。
 - npm run perf:gate 通过。
+
+## 2026-04-27 交互延迟继续推进
+- 本轮聚焦用户反馈的交互延迟：wheel 等待口径从旧 fast political exact 迁移到 sliced exact-after-settle correctness；settlePoliticalFastExactSkipped 只作为观测 probe。
+- rame_scheduler 新增 
+avigator.scheduling.isInputPending({ includeContinuous: true }) 检测，有输入时让出切片任务，避免 exact-after-settle 后台任务抢连续 wheel/drag 输入。
+- drawTransformedFrameFromCaches() 移除 settle 阶段即时 political full exact repaint，交给 sliced exact refresh 统一收尾。
+- editor benchmark 的 wheel 前置等待纳入 exact-after-settle controller/defer 状态，避免带着上一轮 settle 重活进入 wheel 采样。
+- black pixel 采样从左上角单窗改为中心与四象限多窗采样，降低局部暗区对“黑屏”指标的误导。
+- 新增命名入口：
+pm run verify:perf-gate-contract、
+pm run bench:editor-performance。
+- 新增 contract：scheduler input pending 行为、fast political exact skip owner、settleExactRefresh 唯一 correctness source、multi-region black sampling。
+- Fresh benchmark .runtime/output/perf/interaction-latency-ralph2c.json：TNO wheel firstIdleAfterLast=382.9ms，maxLong=281ms，exactRefreshFrame=38.1ms，zoomEndToChunkVisible=327.9ms；延迟目标达标。黑像素仍偏高：wheel maxBlack=0.086204，pan black=0.052037。
+- 验证通过：node/python syntax，scenario-chunk contracts，renderer-runtime-state behavior，perf-probe snapshot，verify:perf-gate-contract，Python boundary contracts，scenario-chunk-runtime E2E，第二次 perf:gate。
+- Architect 复核：第一次要求 benchmark owner 对齐；修复后第二次 APPROVE。

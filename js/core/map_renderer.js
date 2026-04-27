@@ -18857,11 +18857,10 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
     && runtimeState.pendingExactPoliticalFastFrame
     && !cache.dirty?.political
   ) {
-    const fastExactStartedAt = nowMs();
-    renderPassToCache("political", (k) => drawPoliticalPass(k), currentTransform, timings);
     runtimeState.pendingExactPoliticalFastFrame = false;
-    recordRenderPerfMetric("settlePoliticalFastExact", Math.max(0, nowMs() - fastExactStartedAt), {
+    recordRenderPerfMetric("settlePoliticalFastExactSkipped", 0, {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      reason: "defer-to-sliced-exact-refresh",
       scaleDelta: Number(runtimeState.zoomGestureScaleDelta || 0),
       zoomEndedAt: Number(runtimeState.zoomGestureEndedAt || 0),
     });

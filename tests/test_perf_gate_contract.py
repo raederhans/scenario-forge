@@ -26,6 +26,14 @@ class PerfGateContractTest(unittest.TestCase):
         package_payload = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
         perf_baseline_script = package_payload["scripts"]["perf:baseline"]
         perf_gate_script = package_payload["scripts"]["perf:gate"]
+        self.assertEqual(
+            package_payload["scripts"].get("verify:perf-gate-contract"),
+            "python -m unittest tests.test_perf_gate_contract -q",
+        )
+        self.assertEqual(
+            package_payload["scripts"].get("bench:editor-performance"),
+            "python ops/browser-mcp/editor-performance-benchmark.py --out .runtime/output/perf/editor-performance-benchmark.json --screenshot-dir .runtime/browser/mcp-artifacts/perf",
+        )
         self.assertIn("--warmups 3", perf_baseline_script)
         self.assertIn("--scenarios tno_1962,hoi4_1939", perf_gate_script)
         self.assertIn("--warmups 3", perf_gate_script)
@@ -113,6 +121,8 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('"git", "rev-parse", "HEAD"', script)
         self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
         self.assertIn('"politicalRasterWorker": political_raster_worker', script)
+        self.assertIn("const sampleRegions = [", script)
+        self.assertIn("sampleContext.drawImage(canvas, sourceX, sourceY", script)
 
     def test_fill_action_metrics_carry_black_pixel_ratio(self):
         benchmark = load_editor_benchmark_module()
@@ -228,3 +238,48 @@ class PerfGateContractTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class SettleExactMetricOwnershipTest(unittest.TestCase):
+    def test_settle_exact_metric_ignores_legacy_fast_exact_and_keeps_skip_probe(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+            },
+            "zoomSettleFullRedraw": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+                "metricBaselines": {
+                    "settleExactRefreshRecordedAt": 100,
+                    "settlePoliticalFastExactRecordedAt": 100,
+                    "settlePoliticalFastExactSkippedRecordedAt": 100,
+                },
+                "renderMetrics": {
+                    "settleExactRefresh": {
+                        "durationMs": 320,
+                        "recordedAt": 200,
+                        "activeScenarioId": "tno_1962",
+                    },
+                    "settlePoliticalFastExact": {
+                        "durationMs": 12,
+                        "recordedAt": 300,
+                        "activeScenarioId": "tno_1962",
+                    },
+                    "settlePoliticalFastExactSkipped": {
+                        "durationMs": 0,
+                        "recordedAt": 250,
+                        "activeScenarioId": "tno_1962",
+                        "reason": "defer-to-sliced-exact-refresh",
+                    },
+                },
+            },
+        }
+        metric = benchmark.build_suite_benchmark_metrics(suite)["fullySettled"]["settleExactRefresh"]
+        self.assertEqual(metric["durationMs"], 320)
+        self.assertEqual(metric["source"], "zoomSettleFullRedraw.renderMetrics.settleExactRefresh")
+        self.assertNotIn("settlePoliticalFastExact", metric["details"].get("candidateSources", []))
+        script = EDITOR_BENCHMARK_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("settlePoliticalFastExactSkipped", script)
+        self.assertNotIn('"zoomSettleFullRedraw.renderMetrics.settlePoliticalFastExact"', script)

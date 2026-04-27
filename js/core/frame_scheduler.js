@@ -15,6 +15,16 @@ function nowMs() {
   return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
 }
 
+function hasPendingInput() {
+  const scheduler = globalThis.navigator?.scheduling;
+  if (!scheduler || typeof scheduler.isInputPending !== "function") return false;
+  try {
+    return !!scheduler.isInputPending({ includeContinuous: true });
+  } catch (error) {
+    return !!scheduler.isInputPending();
+  }
+}
+
 function scheduleDrain() {
   if (scheduled) return;
   scheduled = true;
@@ -64,6 +74,7 @@ export function runFrameTasks(budgetMs = DEFAULT_FRAME_BUDGET_MS) {
   });
   while (queue.length) {
     if (nowMs() - startedAt >= budget) break;
+    if (hasPendingInput()) break;
     const entry = queue.shift();
     if (!entry || entry.canceled) continue;
     try {

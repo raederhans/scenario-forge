@@ -130,6 +130,9 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && rendererSource.includes('import { enqueueFrameTask } from "./frame_scheduler.js";')
       && /function enqueueExactAfterSettleSegment\(generation, label, task\) \{[\s\S]*?enqueueFrameTask/.test(rendererSource)
       && /scheduleExactAfterSettleRefresh[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Prepare"[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Apply"/.test(rendererSource),
+    exactAfterSettleDefersPoliticalFastExact:
+      /function drawTransformedFrameFromCaches[\s\S]*?settlePoliticalFastExactSkipped[\s\S]*?defer-to-sliced-exact-refresh/.test(rendererSource)
+      && !/function drawTransformedFrameFromCaches[\s\S]*?renderPassToCache\("political", \(k\) => drawPoliticalPass\(k\)/.test(rendererSource),
     politicalRasterWorkerProtocolDefaultsOff:
       politicalRasterWorkerClientSource.includes("POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 1")
       && politicalRasterWorkerClientSource.includes("political_raster_worker")
@@ -356,4 +359,34 @@ test("political raster worker result currentness includes viewport", async () =>
     ),
     false,
   );
+});
+
+test("frame scheduler defers tasks while input is pending", async () => {
+  const scheduler = await import("../js/core/frame_scheduler.js");
+  const originalNavigator = globalThis.navigator;
+  let inputPending = true;
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: {
+      scheduling: {
+        isInputPending: () => inputPending,
+      },
+    },
+  });
+  const calls = [];
+  try {
+    scheduler.enqueueFrameTask(() => {
+      calls.push("task");
+    }, { priority: "high", label: "input-pending-test-task" });
+    scheduler.runFrameTasks(8);
+    assert.deepEqual(calls, []);
+    inputPending = false;
+    scheduler.runFrameTasks(8);
+    assert.deepEqual(calls, ["task"]);
+  } finally {
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: originalNavigator,
+    });
+  }
 });

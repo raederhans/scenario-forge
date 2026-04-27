@@ -659,21 +659,36 @@ def sample_canvas_black_pixel_ratio_js() -> str:
     return """(() => {
       const canvas = document.getElementById('map-canvas') || document.getElementById('colorCanvas');
       if (!canvas || !canvas.width || !canvas.height) return null;
-      const sampleWidth = Math.min(96, Math.max(1, canvas.width));
-      const sampleHeight = Math.min(64, Math.max(1, canvas.height));
+      const sampleWidth = Math.min(80, Math.max(1, canvas.width));
+      const sampleHeight = Math.min(54, Math.max(1, canvas.height));
       const sampleCanvas = document.createElement('canvas');
       sampleCanvas.width = sampleWidth;
       sampleCanvas.height = sampleHeight;
       const sampleContext = sampleCanvas.getContext('2d', { willReadFrequently: true });
       if (!sampleContext) return null;
-      sampleContext.drawImage(canvas, 0, 0, sampleWidth, sampleHeight);
-      const pixels = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+      const maxX = Math.max(0, canvas.width - sampleWidth);
+      const maxY = Math.max(0, canvas.height - sampleHeight);
+      const sampleRegions = [
+        [0.5, 0.5],
+        [0.25, 0.25],
+        [0.75, 0.25],
+        [0.25, 0.75],
+        [0.75, 0.75],
+      ];
       let black = 0;
-      const sampled = sampleWidth * sampleHeight;
-      for (let index = 0; index < pixels.length; index += 4) {
-        const alpha = pixels[index + 3];
-        const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
-        if (alpha > 0 && luminance < 8) black += 1;
+      let sampled = 0;
+      for (const [xRatio, yRatio] of sampleRegions) {
+        const sourceX = Math.round(maxX * xRatio);
+        const sourceY = Math.round(maxY * yRatio);
+        sampleContext.clearRect(0, 0, sampleWidth, sampleHeight);
+        sampleContext.drawImage(canvas, sourceX, sourceY, sampleWidth, sampleHeight, 0, 0, sampleWidth, sampleHeight);
+        const pixels = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+        sampled += sampleWidth * sampleHeight;
+        for (let index = 0; index < pixels.length; index += 4) {
+          const alpha = pixels[index + 3];
+          const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
+          if (alpha > 0 && luminance < 8) black += 1;
+        }
       }
       return sampled > 0 ? Number((black / sampled).toFixed(6)) : null;
     })()"""
@@ -1547,11 +1562,6 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
         "zoomSettleFullRedraw.renderMetrics.settleExactRefresh",
         zoom_settle_baselines.get("settleExactRefreshRecordedAt"),
       ),
-      (
-        zoom_settle_render_metrics.get("settlePoliticalFastExact"),
-        "zoomSettleFullRedraw.renderMetrics.settlePoliticalFastExact",
-        zoom_settle_baselines.get("settlePoliticalFastExactRecordedAt"),
-      ),
     ], expected_metric_scenario_id, field_names=("activeScenarioId",))
     settle_exact_selected_via = "fresh-same-scenario" if settle_exact_metric.get("present") else "missing"
     settle_exact_metric = with_metric_context(
@@ -1563,7 +1573,6 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       baselines=zoom_settle_baselines,
       candidate_sources=[
         "zoomSettleFullRedraw.renderMetrics.settleExactRefresh",
-        "zoomSettleFullRedraw.renderMetrics.settlePoliticalFastExact",
       ],
     )
 
@@ -2216,7 +2225,7 @@ async (page) => {{
     const originalZoomGestureScaleDelta = Number(state.zoomGestureScaleDelta || 0);
     const originalZoomGestureEndedAt = Number(state.zoomGestureEndedAt || 0);
     const previousExactRefreshRecordedAt = Number(state.renderPerfMetrics?.settleExactRefresh?.recordedAt || 0);
-    const previousFastExactRecordedAt = Number(state.renderPerfMetrics?.settlePoliticalFastExact?.recordedAt || 0);
+    const previousFastExactSkippedRecordedAt = Number(state.renderPerfMetrics?.settlePoliticalFastExactSkipped?.recordedAt || 0);
     const benchmarkZoomEndedAt = performance.now();
     const hasFreshSettleMetric = (entry, baselineRecordedAt) =>
       Number(entry?.recordedAt || 0) > Number(baselineRecordedAt || 0)
@@ -2250,11 +2259,6 @@ async (page) => {{
     const settleMetricStartedAt = performance.now();
     while (
       !hasFreshSettleMetric(state.renderPerfMetrics?.settleExactRefresh, previousExactRefreshRecordedAt)
-      && !(
-        hasFreshSettleMetric(state.renderPerfMetrics?.settlePoliticalFastExact, previousFastExactRecordedAt)
-        && !state.deferExactAfterSettle
-        && !state.exactAfterSettleHandle
-      )
       && (performance.now() - settleMetricStartedAt) < 8000
     ) {{
       await new Promise((resolve) => setTimeout(resolve, 25));
@@ -2263,9 +2267,9 @@ async (page) => {{
       state.renderPerfMetrics?.settleExactRefresh,
       previousExactRefreshRecordedAt,
     );
-    const fastExactObserved = hasFreshSettleMetric(
-      state.renderPerfMetrics?.settlePoliticalFastExact,
-      previousFastExactRecordedAt,
+    const fastExactSkippedObserved = hasFreshSettleMetric(
+      state.renderPerfMetrics?.settlePoliticalFastExactSkipped,
+      previousFastExactSkippedRecordedAt,
     );
     const exactRefreshFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
     const settleMetrics = {clone_metrics_js("state.renderPerfMetrics")};
@@ -2293,12 +2297,12 @@ async (page) => {{
       settleFrame,
       idleFastFrame,
       exactRefreshObserved,
-      fastExactObserved,
+      fastExactSkippedObserved,
       exactRefreshFrame,
       restoredFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
       metricBaselines: {{
         settleExactRefreshRecordedAt: previousExactRefreshRecordedAt,
-        settlePoliticalFastExactRecordedAt: previousFastExactRecordedAt,
+        settlePoliticalFastExactSkippedRecordedAt: previousFastExactSkippedRecordedAt,
       }},
       renderMetrics: settleMetrics,
       overlay: document.getElementById('perf-overlay')?.textContent || '',
@@ -2461,9 +2465,13 @@ async (page) => {{
   await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
     const startedAt = performance.now();
+    const exactActive = () => {{
+      const phase = String(state.exactAfterSettleController?.phase || 'idle');
+      return !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
+    }};
     while (
-      (state.isInteracting || String(state.renderPhase || '') !== 'idle')
-      && (performance.now() - startedAt) < 5000
+      (state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive())
+      && (performance.now() - startedAt) < 7000
     ) {{
       await new Promise((resolve) => setTimeout(resolve, 80));
     }}
@@ -2471,6 +2479,7 @@ async (page) => {{
   }});
   const target = await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const interaction = document.querySelector('#map-svg rect.interaction-layer');
     if (!interaction) {{
       throw new Error('Wheel benchmark interaction layer is unavailable.');

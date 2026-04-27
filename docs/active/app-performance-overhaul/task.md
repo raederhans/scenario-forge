@@ -224,3 +224,13 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] 阶段 5 protocol shell：default-off client/worker/metrics/currentness contract。
 - [ ] 阶段目标达标：wheel idle、long task、black ratio 仍超阈值。
 - [ ] Worker political raster 实际 offload。
+
+## 2026-04-27 交互延迟任务状态
+- [x] wheel 后等待口径对齐 exact-after-settle controller。
+- [x] frame_scheduler 输入优先让出。
+- [x] 移除 settle 阶段即时 political full exact repaint。
+- [x] benchmark correctness source 收口到 settleExactRefresh。
+- [x] 新增命名验证入口与 contract。
+- [x] TNO wheel firstIdleAfterLast 降到 382.9ms，maxLong 降到 281ms。
+- [ ] political/background full pass 本体仍重，下一步继续提升 cache 命中率。
+- [ ] black pixel 指标仍高，下一步结合截图定位真实暗区与采样口径。
