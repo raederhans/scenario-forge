@@ -134,9 +134,13 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && !rendererSource.includes('flushInteractionRender(kind);'),
     exactAfterSettleUsesFrameScheduler:
       frameSchedulerSource.includes("export function enqueueFrameTask")
-      && rendererSource.includes('import { enqueueFrameTask } from "./frame_scheduler.js";')
+      && /import \{ enqueueFrameTask(?:, getFrameSchedulerQueueLength)? \} from "\.\/frame_scheduler\.js";/.test(rendererSource)
       && /function enqueueExactAfterSettleSegment\(generation, label, task\) \{[\s\S]*?enqueueFrameTask/.test(rendererSource)
       && /scheduleExactAfterSettleRefresh[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Prepare"[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Apply"/.test(rendererSource),
+    frameSchedulerQueueMetricsReportedPerPriority:
+      frameSchedulerSource.includes("HIGH_PRIORITY_MIN_PER_DRAIN = 1")
+      && /export function getFrameSchedulerQueueLength\(\{ byPriority = false \} = \{\}\) \{[\s\S]*?high:[\s\S]*?normal:[\s\S]*?low:[\s\S]*?total:/.test(frameSchedulerSource)
+      && /function render\(\) \{[\s\S]*?getFrameSchedulerQueueLength\(\{ byPriority: true \}\);[\s\S]*?recordRenderPerfMetric\("frameSchedulerQueueDepth", 0, frameSchedulerQueue\);/.test(rendererSource),
     exactAfterSettleDefersPoliticalFastExact:
       /function drawTransformedFrameFromCaches[\s\S]*?settlePoliticalFastExactSkipped[\s\S]*?defer-to-sliced-exact-refresh/.test(rendererSource)
       && !/function drawTransformedFrameFromCaches[\s\S]*?renderPassToCache\("political", \(k\) => drawPoliticalPass\(k\)/.test(rendererSource),
@@ -368,28 +372,53 @@ test("political raster worker result currentness includes viewport", async () =>
   );
 });
 
-test("frame scheduler defers tasks while input is pending", async () => {
+test("frame scheduler keeps high-priority exact slices draining under continuous input pressure", async () => {
   const scheduler = await import("../js/core/frame_scheduler.js");
   const originalNavigator = globalThis.navigator;
   let inputPending = true;
+  const pendingHighQueueLengths = [];
+  const calls = [];
+  const totalHighTasks = 6;
   Object.defineProperty(globalThis, "navigator", {
     configurable: true,
     value: {
       scheduling: {
-        isInputPending: () => inputPending,
+        isInputPending: ({ includeContinuous } = {}) => includeContinuous ? inputPending : false,
       },
     },
   });
-  const calls = [];
   try {
+    for (let index = 0; index < totalHighTasks; index += 1) {
+      scheduler.enqueueFrameTask(() => {
+        calls.push(`high-${index}`);
+      }, { priority: "high", label: `exact-slice-high-${index}` });
+    }
     scheduler.enqueueFrameTask(() => {
-      calls.push("task");
-    }, { priority: "high", label: "input-pending-test-task" });
-    scheduler.runFrameTasks(8);
-    assert.deepEqual(calls, []);
+      calls.push("normal");
+    }, { priority: "normal", label: "exact-slice-normal" });
+    for (let frame = 0; frame < totalHighTasks; frame += 1) {
+      const queueBefore = scheduler.getFrameSchedulerQueueLength({ byPriority: true });
+      pendingHighQueueLengths.push(queueBefore.high);
+      scheduler.runFrameTasks(1);
+    }
+    const queueAfterPressure = scheduler.getFrameSchedulerQueueLength({ byPriority: true });
+    assert.equal(calls.includes("normal"), false);
+    assert.equal(queueAfterPressure.high < pendingHighQueueLengths[0], true);
+    assert.equal(queueAfterPressure.high, 0);
+    for (let index = 1; index < pendingHighQueueLengths.length; index += 1) {
+      assert.equal(
+        pendingHighQueueLengths[index] <= pendingHighQueueLengths[index - 1],
+        true,
+        `high queue should keep converging by frame ${index}`,
+      );
+    }
+    assert.equal(queueAfterPressure.normal, 1);
+
     inputPending = false;
     scheduler.runFrameTasks(8);
-    assert.deepEqual(calls, ["task"]);
+    const queueAfterRelease = scheduler.getFrameSchedulerQueueLength({ byPriority: true });
+    assert.equal(queueAfterRelease.total, 0);
+    assert.equal(calls[calls.length - 1], "normal");
   } finally {
     Object.defineProperty(globalThis, "navigator", {
       configurable: true,
