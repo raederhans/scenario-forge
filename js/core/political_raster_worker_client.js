@@ -24,9 +24,10 @@ const politicalRasterWorkerFlagCache = {
 function readPoliticalRasterWorkerFlagFromSearch(search = globalThis.location?.search || "") {
   const normalizedSearch = String(search || "");
   const params = new URLSearchParams(normalizedSearch);
-  const raw = POLITICAL_RASTER_WORKER_FLAG_QUERY_KEYS
+  const values = POLITICAL_RASTER_WORKER_FLAG_QUERY_KEYS
     .map((key) => params.get(key))
-    .find((value) => value !== null) || "";
+    .filter((value) => value !== null);
+  const raw = values.find((value) => value.trim() !== "") || values[0] || "";
   return POLITICAL_RASTER_WORKER_FLAG_TRUE_VALUES.includes(raw.trim().toLowerCase());
 }
 
