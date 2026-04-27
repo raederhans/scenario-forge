@@ -158,8 +158,13 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       /function hasDetailScenarioChunkIds\(chunkIds = \[\]\) \{[\s\S]*?String\(chunkId \|\| ""\)\.includes\("\.detail\."\)/.test(chunkRuntimeSource)
       && /function preloadScenarioCoarseChunks[\s\S]*?hasDetailScenarioChunkIds\(chunkState\.loadedChunkIds\)[\s\S]*?loadState\.promotionCommitInFlight[\s\S]*?return null;/.test(chunkRuntimeSource),
     zoomEndSettleRetainsPreviousRequiredPoliticalDetailChunks:
-      /function retainPreviousZoomEndRequiredChunks\(selection, previousSelection, reason = ""\) \{[\s\S]*?"render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"[\s\S]*?previousSelection\?\.reason[\s\S]*?chunkId\.startsWith\("political\.detail\."\)/.test(chunkRuntimeSource)
-      && /const previousSelection = loadState\.lastSelection;[\s\S]*?retainPreviousZoomEndRequiredChunks\(selection, previousSelection, normalizedReason\);/.test(chunkRuntimeSource),
+      chunkRuntimeSource.includes('function applyZoomEndChunkProtectionToSelection(selection, loadState, {')
+      && chunkRuntimeSource.includes('reason = "",')
+      && chunkRuntimeSource.includes('previousSelection = null,')
+      && chunkRuntimeSource.includes('"render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"')
+      && chunkRuntimeSource.includes('previousSelection?.requiredChunkIds')
+      && chunkRuntimeSource.includes('chunkId.startsWith("political.detail.")')
+      && /const previousSelection = loadState\.lastSelection;[\s\S]*?applyZoomEndChunkProtection\(selection, loadState, \{[\s\S]*?reason: normalizedReason,[\s\S]*?previousSelection,/.test(chunkRuntimeSource),
     stalePostApplyRefreshDoesNotEvictRecentZoomEndDetail:
       /function shouldSkipStalePostApplyRefreshAfterZoomEnd\(loadState, reason = "", \{[\s\S]*?scenarioId = "",[\s\S]*?selectionVersion = 0,[\s\S]*?refreshSourceStartedAtMs = 0,[\s\S]*?lastSelection\?\.reason[\s\S]*?lastZoomEndToChunkVisibleMetric[\s\S]*?metric\?\.scenarioId[\s\S]*?metric\?\.selectionVersion[\s\S]*?sourceStartedAt > 0 && sourceStartedAt <= recordedAt/.test(chunkRuntimeSource)
       && /if \(shouldSkipStalePostApplyRefreshAfterZoomEnd\(loadState, nextReason, \{[\s\S]*?scenarioId,[\s\S]*?selectionVersion: loadState\.selectionVersion,[\s\S]*?refreshSourceStartedAtMs,[\s\S]*?normalizeScenarioIdFn: normalizeScenarioId,[\s\S]*?\}\)\) \{[\s\S]*?return "stale-post-apply-after-zoom-end";/.test(chunkRuntimeSource)
@@ -342,6 +347,94 @@ test("frame scheduler continues after a failed task", async () => {
     console.error = originalError;
   }
   assert.deepEqual(calls, ["first", "second"]);
+});
+
+test("zoom-end evictable protection reuses unified validator across TTL, focusCountry, and selectionVersion", async () => {
+  const {
+    applyZoomEndChunkProtectionToSelection,
+    protectZoomEndChunksForSelection,
+  } = await import("../js/core/scenario/chunk_runtime.js");
+  const baseLoadState = {
+    zoomEndProtectedChunkIds: [],
+    zoomEndProtectedUntil: 0,
+    zoomEndProtectedSelectionVersion: 0,
+    zoomEndProtectedScenarioId: "",
+    zoomEndProtectedFocusCountry: "",
+  };
+  const nowMs = 1_000;
+  const selection = {
+    evictableChunkIds: ["political.detail.a", "political.detail.b"],
+  };
+  protectZoomEndChunksForSelection(baseLoadState, ["political.detail.a"], {
+    scenarioId: "tno_1962",
+    selectionVersion: 7,
+    focusCountry: "de",
+    nowMs,
+  });
+  assert.equal(
+    applyZoomEndChunkProtectionToSelection(selection, baseLoadState, {
+      scenarioId: "tno_1962",
+      selectionVersion: 7,
+      focusCountry: "DE",
+      nowMs: nowMs + 4_000,
+    }),
+    true,
+  );
+  assert.deepEqual(selection.evictableChunkIds, ["political.detail.b"]);
+
+  const expiredLoadState = {
+    ...baseLoadState,
+    zoomEndProtectedChunkIds: ["political.detail.a"],
+    zoomEndProtectedUntil: nowMs + 5_000,
+    zoomEndProtectedSelectionVersion: 7,
+    zoomEndProtectedScenarioId: "tno_1962",
+    zoomEndProtectedFocusCountry: "DE",
+  };
+  const expiredSelection = { evictableChunkIds: ["political.detail.a"] };
+  assert.equal(
+    applyZoomEndChunkProtectionToSelection(expiredSelection, expiredLoadState, {
+      scenarioId: "tno_1962",
+      selectionVersion: 7,
+      focusCountry: "DE",
+      nowMs: nowMs + 5_001,
+    }),
+    false,
+  );
+  assert.deepEqual(expiredSelection.evictableChunkIds, ["political.detail.a"]);
+
+  const previousSelection = {
+    reason: "zoom-end",
+    scenarioId: "tno_1962",
+    selectionVersion: 8,
+    focusCountry: "DE",
+    recordedAt: nowMs,
+    zoomEndProtectionUntil: nowMs + 5_000,
+    requiredChunkIds: ["political.detail.a"],
+  };
+  const focusChangedSelection = { evictableChunkIds: ["political.detail.a"] };
+  assert.equal(
+    applyZoomEndChunkProtectionToSelection(focusChangedSelection, baseLoadState, {
+      reason: "scenario-apply",
+      previousSelection,
+      scenarioId: "tno_1962",
+      selectionVersion: 8,
+      focusCountry: "FR",
+      nowMs: nowMs + 3_000,
+    }),
+    false,
+  );
+  const versionChangedSelection = { evictableChunkIds: ["political.detail.a"] };
+  assert.equal(
+    applyZoomEndChunkProtectionToSelection(versionChangedSelection, baseLoadState, {
+      reason: "scenario-apply",
+      previousSelection,
+      scenarioId: "tno_1962",
+      selectionVersion: 9,
+      focusCountry: "DE",
+      nowMs: nowMs + 3_000,
+    }),
+    false,
+  );
 });
 
 test("political raster worker result currentness includes viewport", async () => {
