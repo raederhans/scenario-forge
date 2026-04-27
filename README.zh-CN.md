@@ -137,3 +137,10 @@ run_server.bat
 npm install
 npm run test:e2e
 ```
+
+CI 浏览器安装策略（`.github/workflows/verify-shared.yml`）：
+
+- CI 设置 `PLAYWRIGHT_BROWSERS_PATH=.runtime/browser/ms-playwright`，并通过 `actions/cache` 缓存该目录。
+- 浏览器安装优先使用 `npx playwright install chromium`，对齐 GitHub Hosted Ubuntu runner 的预置系统依赖。
+- 安装步骤包含 2 次重试与指数退避（1 秒、2 秒），用于吸收临时下载波动。
+- 回退策略：当 runner 镜像依赖发生变化时，在修复提交中切换到 `npx playwright install --with-deps chromium`（或项目脚本 `npm run playwright:install:chromium`），并同步核对 runner 镜像更新日志。
