@@ -30,12 +30,6 @@ jobs:
           name: deploy-dist
           path: dist
 
-      - name: Download shared wheel cache artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: deploy-wheelhouse
-          path: .runtime/python/wheels
-
       - name: Validate dist artifact payload
         run: test -f dist/index.html
 
