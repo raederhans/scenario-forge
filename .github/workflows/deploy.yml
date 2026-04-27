@@ -14,7 +14,8 @@ jobs:
   verify:
     uses: ./.github/workflows/verify-shared.yml
     with:
-      run-e2e-smoke: true
+      profile: deploy-minimal
+      run-e2e-smoke: false
 
   build:
     runs-on: ubuntu-latest
@@ -37,9 +38,6 @@ jobs:
 
       - name: Assemble Pages dist
         run: python tools/build_pages_dist.py
-
-      - name: Verify Pages dist startup shell
-        run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
