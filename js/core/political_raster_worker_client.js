@@ -9,10 +9,47 @@ export const POLITICAL_RASTER_WORKER_METRIC_NAMES = Object.freeze({
   staleResponseCount: "politicalRasterWorker.staleResponseCount",
 });
 
+const POLITICAL_RASTER_WORKER_FLAG_QUERY_KEYS = Object.freeze([
+  "political_raster_worker",
+  "ENABLE_POLITICAL_RASTER_WORKER",
+]);
+const POLITICAL_RASTER_WORKER_FLAG_TRUE_VALUES = Object.freeze(["1", "true", "yes", "on"]);
+
+const politicalRasterWorkerFlagCache = {
+  initialized: false,
+  enabled: false,
+  search: "",
+};
+
+function readPoliticalRasterWorkerFlagFromSearch(search = globalThis.location?.search || "") {
+  const normalizedSearch = String(search || "");
+  const params = new URLSearchParams(normalizedSearch);
+  const raw = POLITICAL_RASTER_WORKER_FLAG_QUERY_KEYS
+    .map((key) => params.get(key))
+    .find((value) => value !== null) || "";
+  return POLITICAL_RASTER_WORKER_FLAG_TRUE_VALUES.includes(raw.trim().toLowerCase());
+}
+
+function ensurePoliticalRasterWorkerFlagCache(search = globalThis.location?.search || "") {
+  const normalizedSearch = String(search || "");
+  if (politicalRasterWorkerFlagCache.initialized && politicalRasterWorkerFlagCache.search === normalizedSearch) {
+    return politicalRasterWorkerFlagCache.enabled;
+  }
+  politicalRasterWorkerFlagCache.enabled = readPoliticalRasterWorkerFlagFromSearch(normalizedSearch);
+  politicalRasterWorkerFlagCache.search = normalizedSearch;
+  politicalRasterWorkerFlagCache.initialized = true;
+  return politicalRasterWorkerFlagCache.enabled;
+}
+
+export function refreshPoliticalRasterWorkerFlag(search = globalThis.location?.search || "") {
+  const normalizedSearch = String(search || "");
+  politicalRasterWorkerFlagCache.search = "";
+  politicalRasterWorkerFlagCache.initialized = false;
+  return ensurePoliticalRasterWorkerFlagCache(normalizedSearch);
+}
+
 export function isPoliticalRasterWorkerEnabled(search = globalThis.location?.search || "") {
-  const params = new URLSearchParams(String(search || ""));
-  const raw = params.get("political_raster_worker") || params.get("ENABLE_POLITICAL_RASTER_WORKER") || "";
-  return ["1", "true", "yes", "on"].includes(raw.trim().toLowerCase());
+  return ensurePoliticalRasterWorkerFlagCache(search);
 }
 
 export function createPoliticalRasterWorkerIdentity({
@@ -75,7 +112,7 @@ export function ensurePoliticalRasterWorkerMetrics(root = globalThis) {
 
 export function requestPoliticalRasterWorkerPass() {
   const metrics = ensurePoliticalRasterWorkerMetrics();
-  metrics.enabled = isPoliticalRasterWorkerEnabled();
+  metrics.enabled = ensurePoliticalRasterWorkerFlagCache();
   return { ok: false, reason: metrics.enabled ? "unsupported-capability" : "flag-disabled" };
 }
 
