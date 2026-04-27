@@ -17,6 +17,35 @@ function clearZoomEndChunkProtectionState(loadState) {
   loadState.zoomEndProtectedFocusCountry = "";
 }
 
+function isZoomEndChunkProtectionContextValid(protectionState = {}, {
+  scenarioId = "",
+  selectionVersion = 0,
+  focusCountry = "",
+  normalizeScenarioIdFn = (value) => String(value || "").trim(),
+  nowMs = Date.now(),
+  ttlMs = 5000,
+} = {}) {
+  const protectedScenarioId = normalizeScenarioIdFn(protectionState?.scenarioId);
+  const requestedScenarioId = normalizeScenarioIdFn(scenarioId);
+  const protectedSelectionVersion = Math.max(0, Number(protectionState?.selectionVersion || 0));
+  const requestedSelectionVersion = Math.max(0, Number(selectionVersion || 0));
+  const protectedFocusCountry = String(protectionState?.focusCountry || "").trim().toUpperCase();
+  const requestedFocusCountry = String(focusCountry || "").trim().toUpperCase();
+  const recordedAt = Math.max(0, Number(protectionState?.recordedAt || 0));
+  const expiresAt = Math.max(
+    0,
+    Number(protectionState?.expiresAt || 0)
+    || (recordedAt > 0 ? recordedAt + Math.max(0, Number(ttlMs || 0)) : 0),
+  );
+  return (
+    expiresAt > 0
+    && Number(nowMs || 0) <= expiresAt
+    && protectedSelectionVersion === requestedSelectionVersion
+    && protectedScenarioId === requestedScenarioId
+    && protectedFocusCountry === requestedFocusCountry
+  );
+}
+
 function protectZoomEndChunksForSelection(loadState, chunkIds = [], {
   scenarioId = "",
   selectionVersion = 0,
@@ -39,6 +68,8 @@ function protectZoomEndChunksForSelection(loadState, chunkIds = [], {
 }
 
 function applyZoomEndChunkProtectionToSelection(selection, loadState, {
+  reason = "",
+  previousSelection = null,
   scenarioId = "",
   selectionVersion = 0,
   focusCountry = "",
@@ -46,24 +77,59 @@ function applyZoomEndChunkProtectionToSelection(selection, loadState, {
   nowMs = Date.now(),
 } = {}) {
   if (!selection || !Array.isArray(selection.evictableChunkIds)) return false;
-  const protectedChunkIds = Array.isArray(loadState?.zoomEndProtectedChunkIds)
+  const protectedSet = new Set();
+  const loadStateProtectedChunkIds = Array.isArray(loadState?.zoomEndProtectedChunkIds)
     ? loadState.zoomEndProtectedChunkIds.map((chunkId) => String(chunkId || "").trim()).filter(Boolean)
     : [];
-  const protectionMatches =
-    protectedChunkIds.length > 0
-    && Number(nowMs || 0) <= Number(loadState?.zoomEndProtectedUntil || 0)
-    && Math.max(0, Number(loadState?.zoomEndProtectedSelectionVersion || 0)) === Math.max(0, Number(selectionVersion || 0))
-    && normalizeScenarioIdFn(loadState?.zoomEndProtectedScenarioId) === normalizeScenarioIdFn(scenarioId)
-    && String(loadState?.zoomEndProtectedFocusCountry || "").trim().toUpperCase() === String(focusCountry || "").trim().toUpperCase();
-  if (!protectionMatches) {
-    clearZoomEndChunkProtectionState(loadState);
+  const canApplyLoadStateProtection = loadStateProtectedChunkIds.length > 0
+    && isZoomEndChunkProtectionContextValid({
+      scenarioId: loadState?.zoomEndProtectedScenarioId,
+      selectionVersion: loadState?.zoomEndProtectedSelectionVersion,
+      focusCountry: loadState?.zoomEndProtectedFocusCountry,
+      expiresAt: loadState?.zoomEndProtectedUntil,
+    }, {
+      scenarioId,
+      selectionVersion,
+      focusCountry,
+      normalizeScenarioIdFn,
+      nowMs,
+    });
+  if (canApplyLoadStateProtection) {
+    loadStateProtectedChunkIds.forEach((chunkId) => protectedSet.add(chunkId));
+  }
+  clearZoomEndChunkProtectionState(loadState);
+  const normalizedReason = String(reason || "").trim().toLowerCase();
+  const shouldApplyPreviousSelectionProtection = ["render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"]
+    .includes(normalizedReason);
+  const previousRequiredChunkIds = (Array.isArray(previousSelection?.requiredChunkIds) ? previousSelection.requiredChunkIds : [])
+    .map((chunkId) => String(chunkId || "").trim())
+    .filter((chunkId) => chunkId.startsWith("political.detail."));
+  if (
+    shouldApplyPreviousSelectionProtection
+    && String(previousSelection?.reason || "").trim().toLowerCase() === "zoom-end"
+    && previousRequiredChunkIds.length > 0
+    && isZoomEndChunkProtectionContextValid({
+      recordedAt: previousSelection?.recordedAt,
+      expiresAt: previousSelection?.zoomEndProtectionUntil,
+      scenarioId: previousSelection?.scenarioId,
+      selectionVersion: previousSelection?.selectionVersion,
+      focusCountry: previousSelection?.focusCountry,
+    }, {
+      scenarioId,
+      selectionVersion,
+      focusCountry,
+      normalizeScenarioIdFn,
+      nowMs,
+    })
+  ) {
+    previousRequiredChunkIds.forEach((chunkId) => protectedSet.add(chunkId));
+  }
+  if (!protectedSet.size) {
     return false;
   }
-  const protectedSet = new Set(protectedChunkIds);
   const previousEvictableCount = selection.evictableChunkIds.length;
   selection.evictableChunkIds = selection.evictableChunkIds.filter((chunkId) => !protectedSet.has(String(chunkId || "").trim()));
   const protectedEvictionCount = previousEvictableCount - selection.evictableChunkIds.length;
-  clearZoomEndChunkProtectionState(loadState);
   return protectedEvictionCount > 0;
 }
 
@@ -296,11 +362,15 @@ function createScenarioChunkRuntimeController({
   }
 
   function applyZoomEndChunkProtection(selection, loadState, {
+    reason = "",
+    previousSelection = null,
     scenarioId = "",
     selectionVersion = 0,
     focusCountry = "",
   } = {}) {
     applyZoomEndChunkProtectionToSelection(selection, loadState, {
+      reason,
+      previousSelection,
       scenarioId,
       selectionVersion,
       focusCountry,
@@ -320,32 +390,6 @@ function createScenarioChunkRuntimeController({
     return (Array.isArray(chunkIds) ? chunkIds : []).some((chunkId) =>
       String(chunkId || "").includes(".detail.")
     );
-  }
-
-  function retainPreviousZoomEndRequiredChunks(selection, previousSelection, reason = "") {
-    const normalizedReason = String(reason || "").trim().toLowerCase();
-    if (!["render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"].includes(normalizedReason)) {
-      return false;
-    }
-    if (String(previousSelection?.reason || "").trim().toLowerCase() !== "zoom-end") {
-      return false;
-    }
-    if (!selection || !Array.isArray(selection.evictableChunkIds)) {
-      return false;
-    }
-    const protectedSet = new Set(
-      (Array.isArray(previousSelection?.requiredChunkIds) ? previousSelection.requiredChunkIds : [])
-        .map((chunkId) => String(chunkId || "").trim())
-        .filter((chunkId) => chunkId.startsWith("political.detail."))
-    );
-    if (!protectedSet.size) {
-      return false;
-    }
-    const previousEvictableCount = selection.evictableChunkIds.length;
-    selection.evictableChunkIds = selection.evictableChunkIds.filter((chunkId) =>
-      !protectedSet.has(String(chunkId || "").trim())
-    );
-    return selection.evictableChunkIds.length !== previousEvictableCount;
   }
 
   function markPendingScenarioChunkRefresh(reason = "refresh", delayMs = null) {
@@ -1368,6 +1412,7 @@ function createScenarioChunkRuntimeController({
       visibleLayers,
       loadedChunkIds: chunkState.loadedChunkIds,
     });
+    const previousSelection = loadState.lastSelection;
     const normalizedReason = String(reason || "refresh").trim().toLowerCase();
     if (normalizedReason === "zoom-end") {
       const demotedNonPoliticalDetailOptional = selection.requiredChunks.filter(
@@ -1383,6 +1428,8 @@ function createScenarioChunkRuntimeController({
       }
     }
     applyZoomEndChunkProtection(selection, loadState, {
+      reason: normalizedReason,
+      previousSelection,
       scenarioId,
       selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0)),
       focusCountry,
@@ -1392,8 +1439,6 @@ function createScenarioChunkRuntimeController({
       scenarioId,
       reason: String(reason || "refresh"),
     });
-    const previousSelection = loadState.lastSelection;
-    retainPreviousZoomEndRequiredChunks(selection, previousSelection, normalizedReason);
     const nextRequiredChunkIds = selection.requiredChunks.map((chunk) => chunk.id);
     const nextOptionalChunkIds = selection.optionalChunks.map((chunk) => chunk.id);
     const selectionUnchanged =
@@ -1402,12 +1447,17 @@ function createScenarioChunkRuntimeController({
       && getChunkIdListSignature(previousSelection?.optionalChunkIds) === getChunkIdListSignature(nextOptionalChunkIds)
       && selection.evictableChunkIds.length === 0
       && nextRequiredChunkIds.every((chunkId) => !!chunkState.payloadByChunkId?.[chunkId]);
+    const selectionRecordedAt = Date.now();
     loadState.lastSelection = {
       reason: String(reason || "refresh"),
       scenarioId,
       viewportBbox,
       requiredChunkIds: nextRequiredChunkIds,
       optionalChunkIds: nextOptionalChunkIds,
+      selectionVersion: Math.max(0, Number(loadState.selectionVersion || 0)),
+      focusCountry: String(focusCountry || "").trim().toUpperCase(),
+      recordedAt: selectionRecordedAt,
+      zoomEndProtectionUntil: normalizedReason === "zoom-end" ? selectionRecordedAt + 5000 : 0,
     };
     if (selectionUnchanged) {
       if (nextRequiredChunkIds.length || chunkState.loadedChunkIds.length) {

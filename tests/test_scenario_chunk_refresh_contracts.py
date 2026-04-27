@@ -278,6 +278,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
     def test_zoom_end_detail_chunks_are_protected_through_exact_settle_replay(self):
         self.assertIn("function protectZoomEndChunks(loadState, chunkIds = [], {", self.scenario_chunk_runtime_source)
         self.assertIn("function clearZoomEndChunkProtection(loadState)", self.scenario_chunk_runtime_source)
+        self.assertIn("function isZoomEndChunkProtectionContextValid(protectionState = {}, {", self.scenario_chunk_runtime_source)
         self.assertIn("function protectZoomEndChunksForSelection(loadState, chunkIds = [], {", self.scenario_chunk_runtime_source)
         self.assertIn("function applyZoomEndChunkProtectionToSelection(selection, loadState, {", self.scenario_chunk_runtime_source)
         self.assertIn("function applyZoomEndChunkProtection(selection, loadState, {", self.scenario_chunk_runtime_source)
@@ -288,6 +289,30 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn("zoomEndProtectedUntil", self.scenario_runtime_state_source)
         self.assertIn("zoomEndProtectedSelectionVersion", self.scenario_runtime_state_source)
         self.assertIn("zoomEndProtectedFocusCountry", self.scenario_runtime_state_source)
+
+    def test_zoom_end_evictable_protection_contracts_cover_ttl_focus_country_and_selection_version(self):
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'function isZoomEndChunkProtectionContextValid\(protectionState = \{\}, \{[\s\S]*?'
+                r'ttlMs = 5000,[\s\S]*?'
+                r'Number\(nowMs \|\| 0\) <= expiresAt[\s\S]*?'
+                r'protectedSelectionVersion === requestedSelectionVersion[\s\S]*?'
+                r'protectedScenarioId === requestedScenarioId[\s\S]*?'
+                r'protectedFocusCountry === requestedFocusCountry',
+                re.S,
+            ),
+        )
+        self.assertRegex(
+            self.scenario_chunk_runtime_source,
+            re.compile(
+                r'applyZoomEndChunkProtectionToSelection\(selection, loadState, \{[\s\S]*?'
+                r'reason = "",[\s\S]*?previousSelection = null,[\s\S]*?'
+                r'isZoomEndChunkProtectionContextValid\(\{[\s\S]*?zoomEndProtectedSelectionVersion[\s\S]*?zoomEndProtectedFocusCountry[\s\S]*?\}, \{[\s\S]*?\}\)[\s\S]*?'
+                r'isZoomEndChunkProtectionContextValid\(\{[\s\S]*?previousSelection\?\.selectionVersion[\s\S]*?previousSelection\?\.focusCountry[\s\S]*?\}, \{[\s\S]*?\}\)',
+                re.S,
+            ),
+        )
 
     def test_promotion_commit_can_be_cancelled_by_runtime_hook(self):
         self.assertIn('import { registerRuntimeHook } from "../state/index.js";', self.scenario_chunk_runtime_source)
