@@ -82,7 +82,7 @@ import {
   normalizeUnitCounterSizeToken,
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
-import { enqueueFrameTask } from "./frame_scheduler.js";
+import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, requestRender } from "./render_boundary.js";
 import { registerRuntimeHook } from "./state/index.js";
 import {
@@ -21136,6 +21136,8 @@ function updatePerfOverlay() {
 
 function render() {
   const startedAt = perfIsEnabled() ? nowMs() : 0;
+  const frameSchedulerQueue = getFrameSchedulerQueueLength({ byPriority: true });
+  recordRenderPerfMetric("frameSchedulerQueueDepth", 0, frameSchedulerQueue);
   if (runtimeState.scenarioChunkPromotionRenderLocked) {
     recordRenderPerfMetric("scenarioChunkPromotionRenderLocked", 0, {
       phase: String(runtimeState.renderPhase || ""),
