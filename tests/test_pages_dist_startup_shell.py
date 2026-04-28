@@ -15,6 +15,7 @@ DIST_APP_JS = REPO_ROOT / "dist" / "app.js"
 DIST_STYLES_CSS = REPO_ROOT / "dist" / "styles.css"
 DIST_APP_INDEX = REPO_ROOT / "dist" / "app" / "index.html"
 DIST_MANIFEST = REPO_ROOT / "dist" / "pages-dist-manifest.json"
+VERIFY_SHARED_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "verify-shared.yml"
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
@@ -212,6 +213,14 @@ class PagesDistStartupShellTest(unittest.TestCase):
         ):
             with self.subTest(excluded_path=excluded_path):
                 self.assertNotIn(excluded_path, paths)
+
+    def test_deploy_dist_artifact_preserves_nojekyll(self) -> None:
+        workflow_lines = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8").splitlines()
+        upload_block_start = workflow_lines.index("          name: deploy-dist")
+        upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
+
+        self.assertIn("path: dist", upload_block)
+        self.assertIn("include-hidden-files: true", upload_block)
 
 
 if __name__ == "__main__":

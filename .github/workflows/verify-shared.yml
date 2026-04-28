@@ -143,3 +143,5 @@ jobs:
         with:
           name: deploy-dist
           path: dist
+          # Keep .nojekyll in the handoff artifact; upload-artifact omits hidden files by default.
+          include-hidden-files: true
