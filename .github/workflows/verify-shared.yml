@@ -32,13 +32,14 @@ jobs:
           cache: 'pip'
 
       - name: Setup Node
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Download Python wheel cache
+        if: inputs.profile != 'pr-smoke'
         run: |
           mkdir -p "$WHEELHOUSE_DIR"
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
@@ -48,6 +49,7 @@ jobs:
           fi
 
       - name: Install Python test dependencies
+        if: inputs.profile != 'pr-smoke'
         run: |
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
             python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-ci-min.lock.txt
@@ -56,14 +58,15 @@ jobs:
           fi
 
       - name: Check minimal CI dependency guardrails
+        if: inputs.profile != 'pr-smoke'
         run: python tools/check_min_ci_requirements.py
 
       - name: Install Node dependencies
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke'
         run: npm ci
 
       - name: Cache Playwright browsers
-        if: inputs.profile == 'full' && inputs.run-e2e-smoke
+        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
@@ -72,7 +75,7 @@ jobs:
             playwright-browsers-${{ runner.os }}-
 
       - name: Install Playwright Chromium
-        if: inputs.profile == 'full' && inputs.run-e2e-smoke
+        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke'
         run: |
           mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
           max_retries=2
@@ -100,32 +103,39 @@ jobs:
         if: inputs.profile == 'full'
         run: python -m unittest discover -s tests -p "test_*.py"
 
+      - name: Run Python fast contracts
+        if: inputs.profile == 'pr-fast'
+        run: >
+          python -m unittest
+          tests.test_app_entry_resolver
+          tests.test_map_renderer_interaction_border_snapshot_orchestration_contract
+          tests.test_perf_gate_contract
+          tests.test_startup_shell
+          -q
+
       - name: Run renderer split node behavior tests
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast'
         run: npm run test:node:renderer-splits
 
       - name: Run scenario chunk static contracts
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast'
         run: npm run test:node:scenario-chunk-contracts
 
       - name: Run physical layer static contracts
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast'
         run: npm run test:node:physical-layer-contracts
 
+      - name: Verify E2E layer manifest
+        if: inputs.profile == 'pr-fast'
+        run: npm run verify:test:e2e-layers
+
       - name: Run strict TNO scenario contract gate
-        if: inputs.profile == 'full'
+        if: inputs.profile == 'full' || inputs.profile == 'pr-fast'
         run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
-        if: inputs.profile == 'full' && inputs.run-e2e-smoke
+        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke'
         run: npm run test:e2e:smoke
-
-      - name: Upload deploy wheel cache artifact
-        if: inputs.profile == 'deploy-minimal'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: deploy-wheelhouse
-          path: .runtime/python/wheels
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'

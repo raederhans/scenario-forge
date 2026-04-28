@@ -4,8 +4,15 @@ on:
   pull_request:
 
 jobs:
-  verify:
+  pr-verify-fast:
     uses: ./.github/workflows/verify-shared.yml
     with:
-      profile: full
+      profile: pr-fast
+      run-e2e-smoke: false
+
+  pr-verify-smoke:
+    needs: pr-verify-fast
+    uses: ./.github/workflows/verify-shared.yml
+    with:
+      profile: pr-smoke
       run-e2e-smoke: true

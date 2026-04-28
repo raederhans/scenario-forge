@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: perf-pr-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -12,10 +16,13 @@ jobs:
   perf-gate:
     runs-on: windows-latest
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+      PERF_DEV_SERVER_READY_TIMEOUT_MS: "90000"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 0
+          fetch-depth: 50
 
       - name: Classify perf-relevant changes
         id: classify
@@ -49,12 +56,24 @@ jobs:
             throw 'Unable to resolve head SHA for perf gate classifier'
           }
 
+          git cat-file -e "$baseSha^{commit}" 2>$null
+          if ($LASTEXITCODE -ne 0 -and $baseSha) {
+            git fetch --no-tags --depth=50 origin $baseSha
+          }
+
           $diffRange = if ($baseSha) { "$baseSha...$headSha" } else { $headSha }
           $changedFiles = @(
-            git diff --name-only $diffRange |
+            git diff --name-only $diffRange 2>$null |
               ForEach-Object { $_.Trim().Replace('\', '/') } |
               Where-Object { $_ }
           )
+          if ($LASTEXITCODE -ne 0) {
+            $changedFiles = @(
+              git diff --name-only HEAD^ HEAD 2>$null |
+                ForEach-Object { $_.Trim().Replace('\', '/') } |
+                Where-Object { $_ }
+            )
+          }
 
           $rules = @(
             @{
@@ -73,9 +92,24 @@ jobs:
               patterns = @('js/**')
             },
             @{
+              name = 'app-shell'
+              reason = 'app shell markup or styles can change startup and rendering behavior'
+              patterns = @('index.html', 'css/**', 'vendor/**')
+            },
+            @{
+              name = 'scenario-registry'
+              reason = 'scenario registry can change startup selection and measured scenario inputs'
+              patterns = @('data/scenarios/index.json')
+            },
+            @{
+              name = 'perf-scenario-data'
+              reason = 'measured scenario data changed'
+              patterns = @('data/scenarios/tno_1962/**', 'data/scenarios/hoi4_1939/**')
+            },
+            @{
               name = 'playwright-app-support'
               reason = 'playwright app support affects perf harness'
-              patterns = @('tests/e2e/support/playwright-app.js')
+              patterns = @('tests/e2e/support/**', 'playwright.config.cjs')
             },
             @{
               name = 'perf-tools'
@@ -174,17 +208,18 @@ jobs:
 
       - name: Upload perf classifier audit
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: perf-pr-gate-classifier-audit
           path: .runtime/reports/generated/perf-pr-gate-classifier.*
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: steps.classify.outputs.should_run_perf == 'true'
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         if: steps.classify.outputs.should_run_perf == 'true'
         with:
           python-version: '3.11'
@@ -193,6 +228,15 @@ jobs:
         if: steps.classify.outputs.should_run_perf == 'true'
         run: npm ci
 
+      - name: Cache Playwright Chromium
+        if: steps.classify.outputs.should_run_perf == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
       - name: Install Chromium
         if: steps.classify.outputs.should_run_perf == 'true'
         run: npx playwright install chromium
@@ -200,6 +244,17 @@ jobs:
       - name: Run perf gate
         if: steps.classify.outputs.should_run_perf == 'true'
         run: npm run perf:gate
+
+      - name: Upload perf failure artifacts
+        if: failure() && steps.classify.outputs.should_run_perf == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: perf-pr-gate-failure-artifacts
+          if-no-files-found: ignore
+          path: |
+            .runtime/output/perf/**
+            .runtime/tmp/perf-baseline-dev-server.*.log
+            .runtime/tests/playwright/**
 
       - name: Fast success for perf-unrelated changes
         if: steps.classify.outputs.should_run_perf != 'true'

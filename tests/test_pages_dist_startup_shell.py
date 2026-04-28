@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import unittest
+import json
 from pathlib import Path
 
 
@@ -13,6 +14,7 @@ DIST_ROOT_INDEX = REPO_ROOT / "dist" / "index.html"
 DIST_APP_JS = REPO_ROOT / "dist" / "app.js"
 DIST_STYLES_CSS = REPO_ROOT / "dist" / "styles.css"
 DIST_APP_INDEX = REPO_ROOT / "dist" / "app" / "index.html"
+DIST_MANIFEST = REPO_ROOT / "dist" / "pages-dist-manifest.json"
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
@@ -173,6 +175,43 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertNotIn('<link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />', html)
         self.assertNotIn('href="data/locales.startup.json"', html)
         self.assertNotIn('href="data/geo_aliases.startup.json"', html)
+
+    def test_dist_manifest_keeps_pages_size_and_required_files_contract(self) -> None:
+        if not DIST_MANIFEST.exists():
+            self.skipTest("dist/pages-dist-manifest.json is only available after build_pages_dist runs")
+        payload = json.loads(DIST_MANIFEST.read_text(encoding="utf-8"))
+        paths = {record["path"] for record in payload["files"]}
+
+        self.assertLessEqual(payload["total_bytes"], payload["max_allowed_bytes"])
+        self.assertEqual(payload["max_allowed_bytes"], 950 * 1024 * 1024)
+        for expected_path in (
+            "index.html",
+            "app/index.html",
+            ".nojekyll",
+            "app/js/main.js",
+            "app/data/scenarios/index.json",
+            "app/data/scenarios/tno_1962/startup.bundle.en.json",
+            "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json",
+            "app/data/europe_topology.na_v2.json",
+            "app/data/transport_layers/global_road/catalog.json",
+            "app/data/transport_layers/japan_road/roads.preview.topo.json",
+            "app/data/transport_layers/japan_industrial_zones/industrial_zones.open.preview.geojson",
+        ):
+            with self.subTest(expected_path=expected_path):
+                self.assertIn(expected_path, paths)
+
+        for excluded_path in (
+            "app/data/PROBAV_LC100_global_v3.0.1_2019_discrete.tif",
+            "app/data/ETOPO_2022_v1_60s_N90W180_surface.tif",
+            "app/data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson",
+            "app/data/scenarios/tno_1962/audit.json",
+            "app/data/i18n/locales_baseline.json",
+            "app/data/transport_layers/global_road/shards/w120_w090/roads.topo.json",
+            "app/data/transport_layers/japan_road/roads.topo.json",
+            "app/data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson",
+        ):
+            with self.subTest(excluded_path=excluded_path):
+                self.assertNotIn(excluded_path, paths)
 
 
 if __name__ == "__main__":

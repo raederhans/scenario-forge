@@ -17,6 +17,10 @@ const DEFAULT_RAW_DIR = path.join(REPO_ROOT, ".runtime", "output", "perf", "base
 const ACTIVE_SERVER_PATH = path.join(REPO_ROOT, ".runtime", "dev", "active_server.json");
 const DEV_SERVER_OUT = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.out.log");
 const DEV_SERVER_ERR = path.join(REPO_ROOT, ".runtime", "tmp", "perf-baseline-dev-server.err.log");
+const DEV_SERVER_READY_TIMEOUT_MS = Math.max(
+  45_000,
+  Number.parseInt(process.env.PERF_DEV_SERVER_READY_TIMEOUT_MS || "45000", 10) || 45_000
+);
 const MIN_GATE_WARMUPS = 3;
 const DEFAULT_WARMUPS = MIN_GATE_WARMUPS;
 const PERF_URL_QUERY = Object.freeze({
@@ -177,7 +181,7 @@ async function ensureServerBaseUrl() {
   const serverOwner = await spawnDevServer();
   try {
     const startedAt = Date.now();
-    while (Date.now() - startedAt < 45_000) {
+    while (Date.now() - startedAt < DEV_SERVER_READY_TIMEOUT_MS) {
       const nextBaseUrl = await resolveExistingServerBaseUrl();
       if (nextBaseUrl) {
         return { baseUrl: nextBaseUrl, serverOwner };
@@ -189,7 +193,7 @@ async function ensureServerBaseUrl() {
     throw error;
   }
   await stopServer(serverOwner);
-  throw new Error("Dev server did not become ready within 45 seconds.");
+  throw new Error(`Dev server did not become ready within ${Math.round(DEV_SERVER_READY_TIMEOUT_MS / 1000)} seconds.`);
 }
 
 async function stopServer(serverOwner) {

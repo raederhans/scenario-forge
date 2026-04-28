@@ -27,13 +27,16 @@ class MapRendererInteractionBorderSnapshotOrchestrationContractTest(unittest.Tes
         )
 
     def test_transformed_frame_still_prefers_snapshot_before_border_pass_fallback(self):
-        self.assertRegex(
+        fallback_block = re.search(
+            r'if \(!drawInteractionBorderSnapshot\(currentTransform\)\) \{(?P<body>[\s\S]*?)drawBordersPass\(k, \{ interactive: !!interactiveBorders \}\);',
             self.renderer_content,
-            re.compile(
-                r'if \(!drawInteractionBorderSnapshot\(currentTransform\)\) \{\s*const k = Math\.max\(0\.0001, Number\(currentTransform\?\.k \|\| 1\)\);\s*context\.setTransform\(runtimeState\.dpr, 0, 0, runtimeState\.dpr, 0, 0\);\s*context\.translate\(currentTransform\.x, currentTransform\.y\);\s*context\.scale\(k, k\);\s*drawBordersPass\(k, \{ interactive: !!interactiveBorders \}\);',
-                re.S,
-            ),
         )
+        self.assertIsNotNone(fallback_block)
+        body = fallback_block.group("body")
+        self.assertIn("const k = Math.max(0.0001, Number(currentTransform?.k || 1));", body)
+        self.assertIn(".setTransform(runtimeState.dpr, 0, 0, runtimeState.dpr, 0, 0);", body)
+        self.assertIn(".translate(currentTransform.x, currentTransform.y);", body)
+        self.assertIn(".scale(k, k);", body)
 
     def test_zoom_start_still_captures_interaction_border_snapshot(self):
         self.assertRegex(
