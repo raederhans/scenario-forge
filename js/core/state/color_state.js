@@ -50,7 +50,7 @@ export function createDefaultColorState() {
     paletteLoadErrorById: {},
     fixedPaletteColorsByIso2: {},
     resolvedDefaultCountryPalette: { ...defaultCountryPalette },
-    paletteLibraryOpen: false,
+    paletteLibraryOpen: true,
     paletteLibrarySearch: "",
     paletteLibraryEntries: [],
     paletteQuickSwatches: [],

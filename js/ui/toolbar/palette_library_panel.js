@@ -20,13 +20,16 @@ function createPaletteLibraryPanelController({
   paletteLibraryPanel = null,
   paletteLibrarySources = null,
   paletteLibrarySearch = null,
+  paletteLibrarySearchClear = null,
   paletteLibrarySummary = null,
   paletteLibraryList = null,
   paletteLibraryToggleLabel = null,
+  applyPaletteLibraryColor = null,
   renderPalette,
   updateSwatchUI,
 } = {}) {
   const PALETTE_LIBRARY_GROUPS = [
+    { key: "recent", label: () => t("Recent", "ui"), defaultOpen: true },
     { key: "essentials", label: () => t("Essentials", "ui"), defaultOpen: true },
     { key: "dynamic", label: () => t("Dynamic / Runtime", "ui"), defaultOpen: false },
     { key: "countries", label: () => t("Countries", "ui"), defaultOpen: false },
@@ -37,6 +40,7 @@ function createPaletteLibraryPanelController({
     cap: 480,
   };
   let adaptivePaletteLibraryHeightFrame = 0;
+  let activeRowKey = "";
 
   const ensurePaletteLibrarySectionState = (sourceId) => {
     const key = String(sourceId || "legacy").trim() || "legacy";
@@ -46,8 +50,37 @@ function createPaletteLibraryPanelController({
     return runtimeState.ui.paletteLibrarySections[key];
   };
 
-  const buildPaletteLibraryGroups = (entries) => {
+  const buildRecentPaletteEntries = (searchTerm) => {
+    const recentColors = Array.isArray(runtimeState.recentColors) ? runtimeState.recentColors : [];
+    return recentColors
+      .map((color, index) => {
+        const normalized = normalizeHexColor(color);
+        if (!normalized) return null;
+        return {
+          key: `recent-${normalized}`,
+          sourceTag: normalized.toUpperCase(),
+          iso2: "",
+          mappedIso2: "",
+          color: normalized,
+          label: `${t("Recent", "ui")} ${index + 1}`,
+          localizedName: `${t("Recent", "ui")} ${index + 1}`,
+          sourceLabel: t("Recent colors", "ui"),
+          mapped: false,
+          dynamic: false,
+          recent: true,
+        };
+      })
+      .filter(Boolean)
+      .filter((entry) => !searchTerm || [
+        entry.color,
+        entry.label,
+        entry.sourceLabel,
+      ].some((value) => String(value || "").toLowerCase().includes(searchTerm)));
+  };
+
+  const buildPaletteLibraryGroups = (entries, recentEntries = []) => {
     const groups = {
+      recent: recentEntries,
       essentials: [],
       dynamic: [],
       countries: [],
@@ -93,6 +126,20 @@ function createPaletteLibraryPanelController({
     return reason || t("Unreviewed", "ui");
   }
 
+  const selectPaletteLibraryEntry = (entry) => {
+    runtimeState.selectedColor = entry.color;
+    activeRowKey = entry.key;
+    updateSwatchUI?.();
+    syncPaletteLibraryRowFocus();
+  };
+
+  const applyPaletteLibraryEntry = (entry) => {
+    selectPaletteLibraryEntry(entry);
+    if (typeof applyPaletteLibraryColor === "function") {
+      applyPaletteLibraryColor(entry.color, entry);
+    }
+  };
+
   const createPaletteLibraryRow = (entry) => {
     const row = document.createElement("button");
     row.type = "button";
@@ -100,12 +147,16 @@ function createPaletteLibraryPanelController({
     row.dataset.color = entry.color;
     row.dataset.tag = entry.sourceTag;
     row.dataset.iso2 = entry.mappedIso2 || "";
+    row.dataset.paletteRowKey = entry.key;
+    row.tabIndex = -1;
     if (entry.color === runtimeState.selectedColor) {
       row.classList.add("is-selected");
     }
     row.addEventListener("click", () => {
-      runtimeState.selectedColor = entry.color;
-      updateSwatchUI?.();
+      selectPaletteLibraryEntry(entry);
+    });
+    row.addEventListener("dblclick", () => {
+      applyPaletteLibraryEntry(entry);
     });
 
     const swatch = document.createElement("span");
@@ -140,6 +191,49 @@ function createPaletteLibraryPanelController({
     row.appendChild(meta);
     return row;
   };
+
+  function isPaletteLibraryRowVisible(row) {
+    const section = row?.closest?.(".palette-library-section");
+    return String(section?.tagName || "").toUpperCase() !== "DETAILS" || section.open;
+  }
+
+  function getPaletteLibraryRows() {
+    return Array.from(paletteLibraryList?.querySelectorAll(".palette-library-row") || [])
+      .filter(isPaletteLibraryRowVisible);
+  }
+
+  function syncPaletteLibraryRowFocus() {
+    const rows = getPaletteLibraryRows();
+    if (!rows.length) return;
+    const selectedRow = rows.find((row) => row.dataset.paletteRowKey === activeRowKey)
+      || rows.find((row) => row.dataset.color === runtimeState.selectedColor)
+      || rows[0];
+    rows.forEach((row) => {
+      row.tabIndex = row === selectedRow ? 0 : -1;
+    });
+  }
+
+  function focusPaletteLibraryRowByDelta(delta) {
+    const rows = getPaletteLibraryRows();
+    if (!rows.length) return;
+    const currentIndex = rows.findIndex((row) => row === document.activeElement);
+    const nextIndex = currentIndex < 0
+      ? 0
+      : Math.min(rows.length - 1, Math.max(0, currentIndex + delta));
+    const nextRow = rows[nextIndex];
+    activeRowKey = nextRow.dataset.paletteRowKey || "";
+    syncPaletteLibraryRowFocus();
+    nextRow.focus();
+  }
+
+  function clearPaletteLibrarySearch() {
+    runtimeState.paletteLibrarySearch = "";
+    if (paletteLibrarySearch) {
+      paletteLibrarySearch.value = "";
+      paletteLibrarySearch.focus();
+    }
+    renderPaletteLibrary();
+  }
 
   const renderPaletteLibrarySourceTabs = (sourceOptions) => {
     if (!paletteLibrarySources) return;
@@ -228,6 +322,7 @@ function createPaletteLibraryPanelController({
     if (!paletteLibraryList) return;
 
     const searchTerm = String(runtimeState.paletteLibrarySearch || "").trim().toLowerCase();
+    paletteLibrarySearchClear?.classList.toggle("hidden", !searchTerm);
     const sourceOptions = getPaletteSourceOptions();
     renderPaletteLibrarySourceTabs(sourceOptions);
     const sourceLabel = runtimeState.activePaletteMeta?.display_name || runtimeState.currentPaletteTheme || "Palette";
@@ -268,7 +363,8 @@ function createPaletteLibraryPanelController({
         entry.suggestedIso2,
       ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
     });
-    const groupedEntries = buildPaletteLibraryGroups(filtered);
+    const recentEntries = buildRecentPaletteEntries(searchTerm);
+    const groupedEntries = buildPaletteLibraryGroups(filtered, recentEntries);
     const activeSourceId = String(runtimeState.activePaletteId || runtimeState.currentPaletteTheme || "legacy").trim() || "legacy";
     const sectionState = ensurePaletteLibrarySectionState(activeSourceId);
 
@@ -277,10 +373,10 @@ function createPaletteLibraryPanelController({
       paletteLibrarySummary.textContent = summarizeResults(filtered.length);
     }
 
-    if (!filtered.length) {
+    if (!groupedEntries.length) {
       const empty = document.createElement("div");
       empty.className = "palette-library-empty";
-      empty.textContent = t("No palette colors match the current search.", "ui");
+      empty.textContent = t("No matching colors. Clear the search or try a country name, ISO-2 code, or source tag.", "ui");
       paletteLibraryList.appendChild(empty);
       scheduleAdaptivePaletteLibraryHeight();
       return;
@@ -294,8 +390,10 @@ function createPaletteLibraryPanelController({
         : (typeof sectionState[group.key] === "boolean" ? sectionState[group.key] : group.defaultOpen);
       section.open = isOpen;
       section.addEventListener("toggle", () => {
-        if (searchTerm) return;
-        sectionState[group.key] = section.open;
+        if (!searchTerm) {
+          sectionState[group.key] = section.open;
+        }
+        syncPaletteLibraryRowFocus();
         scheduleAdaptivePaletteLibraryHeight();
       });
 
@@ -327,6 +425,7 @@ function createPaletteLibraryPanelController({
     });
     scheduleAdaptivePaletteLibraryHeight();
     syncPaletteLibraryToggleUi();
+    syncPaletteLibraryRowFocus();
   }
 
   const bindEvents = () => {
@@ -346,13 +445,56 @@ function createPaletteLibraryPanelController({
         runtimeState.paletteLibrarySearch = String(event.target.value || "");
         renderPaletteLibrary();
       });
+      paletteLibrarySearch.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && String(runtimeState.paletteLibrarySearch || "")) {
+          event.preventDefault();
+          clearPaletteLibrarySearch();
+        }
+      });
       paletteLibrarySearch.dataset.bound = "true";
+    }
+
+    if (paletteLibrarySearchClear && paletteLibrarySearchClear.dataset.bound !== "true") {
+      paletteLibrarySearchClear.addEventListener("click", clearPaletteLibrarySearch);
+      paletteLibrarySearchClear.dataset.bound = "true";
+    }
+
+    if (paletteLibraryList && paletteLibraryList.dataset.bound !== "true") {
+      paletteLibraryList.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          focusPaletteLibraryRowByDelta(1);
+          return;
+        }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          focusPaletteLibraryRowByDelta(-1);
+          return;
+        }
+        if (event.key === "Enter") {
+          const row = document.activeElement?.closest?.(".palette-library-row");
+          const color = row?.dataset?.color || "";
+          if (color) {
+            event.preventDefault();
+            const entry = { key: row.dataset.paletteRowKey || color, color };
+            applyPaletteLibraryEntry(entry);
+          }
+          return;
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          runtimeState.paletteLibraryOpen = false;
+          syncPanelVisibility();
+        }
+      });
+      paletteLibraryList.dataset.bound = "true";
     }
   };
 
   const syncPanelVisibility = () => {
     paletteLibraryPanel?.classList.toggle("hidden", !runtimeState.paletteLibraryOpen);
     syncPaletteLibraryToggleUi();
+    scheduleAdaptivePaletteLibraryHeight();
   };
 
   const handleResize = () => {

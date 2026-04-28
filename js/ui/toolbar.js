@@ -17,6 +17,7 @@ import {
   invalidateOceanWaterInteractionVisualState,
   getBathymetryPresetStyleDefaults,
   refreshColorState,
+  refreshResolvedColorsForFeatures,
   resetZoomToFit,
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
@@ -387,6 +388,7 @@ function initToolbar({ render } = {}) {
   const paletteLibraryPanel = document.getElementById("paletteLibraryPanel");
   const paletteLibrarySources = document.getElementById("paletteLibrarySources");
   const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
+  const paletteLibrarySearchClear = document.getElementById("paletteLibrarySearchClear");
   const paletteLibrarySummary = document.getElementById("paletteLibrarySummary");
   const paletteLibraryList = document.getElementById("paletteLibraryList");
   const dockRecentDivider = document.getElementById("dockRecentDivider");
@@ -1515,6 +1517,118 @@ function initToolbar({ render } = {}) {
     markDirty(reason);
     if (render) render();
   };
+
+  const addRecentColor = (color) => {
+    const normalized = normalizeHexColor(color);
+    if (!normalized) return;
+    runtimeState.recentColors = (Array.isArray(runtimeState.recentColors) ? runtimeState.recentColors : [])
+      .filter((value) => normalizeHexColor(value) !== normalized);
+    runtimeState.recentColors.unshift(normalized);
+    runtimeState.recentColors = runtimeState.recentColors.slice(0, 10);
+    callRuntimeHook(state, "updateRecentUI");
+  };
+
+  const getFeatureIdsForOwnerColorRefresh = (ownerCode) => {
+    const normalizedOwner = normalizeCountryCode(ownerCode);
+    if (!normalizedOwner) return [];
+    const ids = new Set();
+    if (runtimeState.sovereigntyByFeatureId && typeof runtimeState.sovereigntyByFeatureId === "object") {
+      Object.entries(runtimeState.sovereigntyByFeatureId).forEach(([featureId, rawOwner]) => {
+        if (normalizeCountryCode(rawOwner) === normalizedOwner) ids.add(featureId);
+      });
+    }
+    const ownerIds = runtimeState.ownerToFeatureIds instanceof Map
+      ? runtimeState.ownerToFeatureIds.get(normalizedOwner)
+      : null;
+    const ownerIdList = Array.isArray(ownerIds) || ownerIds instanceof Set ? Array.from(ownerIds) : [];
+    ownerIdList.forEach((featureId) => ids.add(featureId));
+    const countryIds = runtimeState.countryToFeatureIds instanceof Map
+      ? runtimeState.countryToFeatureIds.get(normalizedOwner)
+      : null;
+    const countryIdList = Array.isArray(countryIds) || countryIds instanceof Set ? Array.from(countryIds) : [];
+    countryIdList.forEach((featureId) => ids.add(featureId));
+    return Array.from(ids)
+      .map((featureId) => String(featureId || "").trim())
+      .filter((featureId) => featureId && runtimeState.landIndex?.has(featureId));
+  };
+
+  const resolvePaletteLibraryApplyTarget = () => {
+    const selectedHitId = String(runtimeState.devSelectedHit?.id || "").trim();
+    if (selectedHitId && runtimeState.landIndex?.has(selectedHitId)) {
+      return { type: "feature", featureIds: [selectedHitId] };
+    }
+    const hoveredId = String(runtimeState.hoveredId || "").trim();
+    if (hoveredId && runtimeState.landIndex?.has(hoveredId)) {
+      return { type: "feature", featureIds: [hoveredId] };
+    }
+    const ownerCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
+    return ownerCode ? { type: "owner", ownerCode } : null;
+  };
+
+  const applyPaletteLibraryColor = (rawColor) => {
+    const color = normalizeHexColor(rawColor);
+    if (!color) return false;
+    const target = resolvePaletteLibraryApplyTarget();
+    if (!target) {
+      showToast(t("Select or hover a land feature first.", "ui"), {
+        title: t("Color Library", "ui"),
+        tone: "info",
+        duration: 2400,
+      });
+      return false;
+    }
+
+    runtimeState.selectedColor = color;
+    if (target.type === "feature") {
+      const featureIds = target.featureIds;
+      const before = captureHistoryState({ featureIds });
+      runtimeState.visualOverrides = runtimeState.visualOverrides || {};
+      runtimeState.featureOverrides = runtimeState.featureOverrides || {};
+      featureIds.forEach((featureId) => {
+        runtimeState.visualOverrides[featureId] = color;
+        runtimeState.featureOverrides[featureId] = color;
+      });
+      markLegacyColorStateDirty();
+      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
+      markDirty("palette-library-apply-color");
+      pushHistoryEntry({
+        kind: "palette-library-apply-color",
+        before,
+        after: captureHistoryState({ featureIds }),
+        meta: { affectsSovereignty: false },
+      });
+      addRecentColor(color);
+      updateSwatchUI();
+      if (render) render();
+      return true;
+    }
+
+    const ownerCode = target.ownerCode;
+    const featureIds = getFeatureIdsForOwnerColorRefresh(ownerCode);
+    const before = captureHistoryState({ ownerCodes: [ownerCode] });
+    runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
+    runtimeState.countryBaseColors = runtimeState.countryBaseColors || {};
+    runtimeState.sovereignBaseColors[ownerCode] = color;
+    runtimeState.countryBaseColors[ownerCode] = color;
+    markLegacyColorStateDirty();
+    if (featureIds.length) {
+      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
+    } else {
+      refreshColorState({ renderNow: false });
+    }
+    markDirty("palette-library-apply-owner-color");
+    pushHistoryEntry({
+      kind: "palette-library-apply-owner-color",
+      before,
+      after: captureHistoryState({ ownerCodes: [ownerCode] }),
+      meta: { affectsSovereignty: false },
+    });
+    addRecentColor(color);
+    updateSwatchUI();
+    if (render) render();
+    return true;
+  };
+
   const persistCityViewSettings = () => {
     runtimeState.persistViewSettingsFn?.();
   };
@@ -1795,9 +1909,11 @@ function initToolbar({ render } = {}) {
     paletteLibraryPanel,
     paletteLibrarySources,
     paletteLibrarySearch,
+    paletteLibrarySearchClear,
     paletteLibrarySummary,
     paletteLibraryList,
     paletteLibraryToggleLabel,
+    applyPaletteLibraryColor,
     renderPalette,
     updateSwatchUI,
   });

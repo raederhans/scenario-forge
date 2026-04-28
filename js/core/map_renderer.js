@@ -50,6 +50,7 @@ import {
   HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
 } from "./city_lights_historical_1930_asset.js";
 import { ColorManager } from "./color_manager.js";
+import { resolveFeatureColor } from "./color_resolver.js";
 import { ensurePoliticalRasterWorkerMetrics, requestPoliticalRasterWorkerPass } from "./political_raster_worker_client.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -5943,21 +5944,14 @@ function getDisplayOwnerCode(feature, id) {
 }
 
 function getResolvedFeatureColor(feature, id) {
-  if (isAtlantropaSeaFeature(feature)) {
-    return getOceanBaseFillColor();
-  }
-  const direct =
-    getSafeCanvasColor(runtimeState.visualOverrides?.[id], null) ||
-    getSafeCanvasColor(runtimeState.featureOverrides?.[id], null);
-  if (direct) return direct;
-
-  const ownerCode = getDisplayOwnerCode(feature, id);
-  if (!ownerCode) return null;
-
-  return (
-    getSafeCanvasColor(runtimeState.sovereignBaseColors?.[ownerCode], null) ||
-    getSafeCanvasColor(runtimeState.countryBaseColors?.[ownerCode], null)
-  );
+  return resolveFeatureColor(id, {
+    state: runtimeState,
+    feature,
+    getSafeColor: getSafeCanvasColor,
+    isOceanFeature: isAtlantropaSeaFeature,
+    getOceanBaseFillColor,
+    getOwnerCode: getDisplayOwnerCode,
+  }).color;
 }
 
 function rebuildResolvedColors() {

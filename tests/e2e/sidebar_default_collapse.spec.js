@@ -53,6 +53,7 @@ test("default sidebar sections stay collapsed until explicitly used", async ({ p
       specialZoneOpen: byId("#specialZonePopover")?.open ?? null,
       palettePanelHidden: byId("#paletteLibraryPanel")?.classList.contains("hidden") ?? null,
       themeSelectVisible: (byId("#themeSelect")?.getClientRects?.().length || 0) > 0,
+      paletteSourceTabsVisible: (byId("#paletteLibrarySources")?.getClientRects?.().length || 0) > 0,
     };
   });
 
@@ -60,8 +61,9 @@ test("default sidebar sections stay collapsed until explicitly used", async ({ p
   expect(initialShell.rightDrawerOpen).toBe(false);
   expect(initialShell.appearanceOpen).toBe(false);
   expect(initialShell.specialZoneOpen).toBe(false);
-  expect(initialShell.palettePanelHidden).toBe(true);
+  expect(initialShell.palettePanelHidden).toBe(false);
   expect(initialShell.themeSelectVisible).toBe(false);
+  expect(initialShell.paletteSourceTabsVisible).toBe(true);
 
   await page.evaluate(() => {
     document.querySelector("#paletteLibraryToggle")?.click();
@@ -69,7 +71,7 @@ test("default sidebar sections stay collapsed until explicitly used", async ({ p
   await page.waitForFunction(() => {
     const panel = document.querySelector("#paletteLibraryPanel");
     const select = document.querySelector("#themeSelect");
-    return panel && !panel.classList.contains("hidden") && !!select && (select.getClientRects?.().length || 0) > 0;
+    return panel && panel.classList.contains("hidden") && !!select && (select.getClientRects?.().length || 0) === 0;
   });
 
   await applyScenario(page, "tno_1962");

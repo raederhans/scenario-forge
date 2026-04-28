@@ -9,6 +9,8 @@ const stateDefaultsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComp
 const colorStateSource = await readFile(new URL("../js/core/state/color_state.js", import.meta.url), "utf8");
 const patchedColorStateSource = colorStateSource.replace("../state_defaults.js", stateDefaultsDataUrl);
 const colorStateModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedColorStateSource)}`);
+const colorResolverSource = await readFile(new URL("../js/core/color_resolver.js", import.meta.url), "utf8");
+const colorResolverModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(colorResolverSource)}`);
 
 const {
   buildRuntimeDefaultColorsByIso2,
@@ -23,6 +25,7 @@ const {
   setResolvedColorForFeature,
   bumpColorRevision,
 } = colorStateModule;
+const { resolveFeatureColor } = colorResolverModule;
 
 test("buildRuntimeDefaultTagByIso2 keeps one exposed bridge per iso2", () => {
   assert.deepEqual(
@@ -187,4 +190,40 @@ test("normalizeColorStateForRender sanitizes mirrors and resolved colors togethe
   assert.deepEqual(colorRuntimeState.countryBaseColors, { AAA: "#aabbcc" });
   assert.deepEqual(colorRuntimeState.featureOverrides, { feature_1: "#ddeeff" });
   assert.deepEqual(colorRuntimeState.colors, { feature_2: "#abcdef" });
+});
+
+test("resolveFeatureColor reports canonical color source before compatibility mirrors", () => {
+  const colorRuntimeState = createDefaultColorState();
+  colorRuntimeState.visualOverrides = { feature_1: "#112233" };
+  colorRuntimeState.featureOverrides = { feature_1: "#445566" };
+  colorRuntimeState.sovereignBaseColors = { AAA: "#778899" };
+  colorRuntimeState.countryBaseColors = { AAA: "#aabbcc" };
+
+  assert.deepEqual(
+    resolveFeatureColor("feature_1", {
+      state: colorRuntimeState,
+      getOwnerCode: () => "AAA",
+    }),
+    {
+      color: "#112233",
+      source: "visualOverrides",
+      featureId: "feature_1",
+      ownerCode: "",
+    },
+  );
+
+  delete colorRuntimeState.visualOverrides.feature_1;
+  delete colorRuntimeState.featureOverrides.feature_1;
+  assert.deepEqual(
+    resolveFeatureColor("feature_1", {
+      state: colorRuntimeState,
+      getOwnerCode: () => "AAA",
+    }),
+    {
+      color: "#778899",
+      source: "sovereignBaseColors",
+      featureId: "feature_1",
+      ownerCode: "AAA",
+    },
+  );
 });

@@ -1796,23 +1796,27 @@
                 class="palette-library-toggle-btn"
                 type="button"
                 aria-controls="paletteLibraryPanel"
-                aria-expanded="false"
-                aria-label="Browse All Colors"
-                title="Browse All Colors"
+                aria-expanded="true"
+                aria-label="Hide Color Library"
+                title="Hide Color Library"
               >
                 <span class="palette-library-toggle-glyph" aria-hidden="true">▸</span>
-                <span id="paletteLibraryToggleLabel" class="visually-hidden">Browse All Colors</span>
+                <span id="paletteLibraryToggleLabel" class="visually-hidden">Hide Color Library</span>
               </button>
             </div>
-            <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
+            <div id="paletteLibraryPanel" class="palette-library mt-3">
               <div class="palette-library-toolbar">
                 <label id="lblPaletteSource" class="visually-hidden" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
-                <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select">
+                <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select" aria-hidden="true" tabindex="-1">
                   <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
                 </select>
+                <div id="paletteLibrarySources" class="palette-library-sources" role="tablist" aria-label="Palette Source" data-i18n-aria-label="Palette Source"></div>
               </div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
-              <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
+              <div class="palette-library-search-row mt-2">
+                <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input palette-library-search-input" />
+                <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search">×</button>
+              </div>
               <div id="paletteLibrarySummary" class="body-text mt-2" data-i18n="0 colors">0 colors</div>
               <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
             </div>
@@ -2031,7 +2035,7 @@
                       <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
                       <div id="recentColors" class="dock-recent-swatches hidden" aria-label="Recent colors" data-i18n-aria-label="Recent colors"></div>
                     </div>
-                    <div id="paletteGrid" class="color-grid dock-inline-swatches dock-palette-grid-hidden"></div>
+                    <div id="paletteGrid" class="color-grid dock-inline-swatches"></div>
                   </div>
                 </div>
               </div>

@@ -68,6 +68,17 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("const ensurePaletteLibrarySectionState =", owner_content)
         self.assertIn("const buildPaletteLibraryGroups =", owner_content)
 
+    def test_palette_library_roving_focus_ignores_collapsed_section_rows(self):
+        owner_content = PALETTE_LIBRARY_PANEL_JS.read_text(encoding="utf-8")
+
+        self.assertIn("function isPaletteLibraryRowVisible(row)", owner_content)
+        self.assertIn('querySelectorAll(".palette-library-row")', owner_content)
+        self.assertIn(".filter(isPaletteLibraryRowVisible);", owner_content)
+        self.assertRegex(
+            owner_content,
+            r"section\.addEventListener\(\"toggle\"[\s\S]*?syncPaletteLibraryRowFocus\(\);",
+        )
+
     def test_toolbar_keeps_palette_callbacks_and_render_entry(self):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 

@@ -922,12 +922,18 @@ input[type="checkbox"].checkbox-input {
 .space-y-4 > * + * { margin-top: 16px; }
 
 /* ── Color Swatches ────────────────────────────────────── */
+:root {
+  --color-swatch-size: 2rem;
+  --color-swatch-gap: 8px;
+  --color-swatch-radius: 8px;
+}
+
 .color-swatch {
   display: inline-block;
-  width: 2rem;
-  height: 2rem;
+  width: var(--color-swatch-size);
+  height: var(--color-swatch-size);
   border: 2px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--color-swatch-radius);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -945,7 +951,7 @@ input[type="checkbox"].checkbox-input {
 .color-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  gap: var(--color-swatch-gap);
 }
 
 .palette-library {
@@ -971,14 +977,42 @@ input[type="checkbox"].checkbox-input {
 
 .palette-library-toolbar {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  flex-direction: column;
   gap: 10px;
 }
 
 .palette-library-source-select {
+  display: none;
+}
+
+.palette-library-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.palette-library-search-input {
   width: 100%;
-  min-height: 38px;
-  padding-right: 38px;
+}
+
+.palette-library-search-clear {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.palette-library-search-clear:hover {
+  border-color: rgba(0, 47, 167, 0.22);
+  color: var(--color-accent);
 }
 
 .palette-library-toggle-btn {
@@ -1138,7 +1172,7 @@ input[type="checkbox"].checkbox-input {
 
 .palette-library-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-columns: var(--color-swatch-size) minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   width: 100%;
@@ -1155,14 +1189,19 @@ input[type="checkbox"].checkbox-input {
   transform: translateY(-1px);
 }
 
+.palette-library-row:focus-visible {
+  outline: 2px solid rgba(0, 47, 167, 0.34);
+  outline-offset: 2px;
+}
+
 .palette-library-row.is-selected {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 1px rgba(0, 47, 167, 0.15);
 }
 
 .palette-library-row .color-swatch {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: var(--color-swatch-size);
+  height: var(--color-swatch-size);
 }
 
 .palette-library-meta {
