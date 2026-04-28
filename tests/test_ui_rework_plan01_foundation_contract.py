@@ -87,6 +87,38 @@ class UiReworkPlan01FoundationContractTest(unittest.TestCase):
         for snippet in forbidden_snippets:
             self.assertNotIn(snippet, content)
 
+    def test_adaptive_layout_tokens_and_utilities_exist(self):
+        content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
+        required_snippets = [
+            "--layout-edge: clamp(12px, 1.6vw, 22px);",
+            "--layout-gap: 8px;",
+            "--layout-popover-inline: min(320px, calc(100vw - 2 * var(--layout-edge)));",
+            "--layout-popover-block: min(60svh, 520px);",
+            "--layout-dock-block: min(42svh, 360px);",
+            "--scenario-bar-base-max-inline: 560px;",
+            "--scenario-bar-safe-max-width: 100vw;",
+            "--scenario-bar-chip-max-inline: 24ch;",
+            "--palette-library-list-min-block: 240px;",
+            "--palette-library-list-max-block: 480px;",
+            ".u-min-0 {",
+            ".u-truncate {",
+            ".u-scroll-x {",
+            ".u-scroll-y {",
+        ]
+        for snippet in required_snippets:
+            self.assertIn(snippet, content)
+
+    def test_scenario_bar_uses_css_variable_width_bridge(self):
+        toolbar = (REPO_ROOT / "js" / "ui" / "toolbar.js").read_text(encoding="utf-8")
+        css = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
+        self.assertIn('scenarioContextBar.style.setProperty("--scenario-bar-safe-max-width"', toolbar)
+        self.assertIn('scenarioContextBar.classList.toggle("is-overlay-constrained"', toolbar)
+        self.assertIn('scenarioContextBar.classList.toggle("is-narrow"', toolbar)
+        self.assertNotIn("scenarioContextBar.style.maxWidth", toolbar)
+        self.assertIn("max-inline-size: min(", css)
+        self.assertIn("var(--scenario-bar-safe-max-width)", css)
+        self.assertIn(".scenario-context-bar.is-overlay-constrained", css)
+
 
 if __name__ == "__main__":
     unittest.main()

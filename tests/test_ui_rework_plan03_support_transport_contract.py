@@ -53,6 +53,32 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn("transportWorkbenchCompareStatus.textContent", controller_content)
         self.assertIn('transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} ${t("inspector", "ui")}`;', controller_content)
 
+    def test_adaptive_popover_and_palette_contracts_are_wired(self):
+        index_content = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+        css_content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
+        palette_content = (REPO_ROOT / "js" / "ui" / "toolbar" / "palette_library_panel.js").read_text(encoding="utf-8")
+        sidebar_content = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
+
+        for token in [
+            'id="paletteLibraryList" class="palette-library-list mt-3 u-scroll-y"',
+            'id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover u-scroll-y hidden"',
+            'id="transportWorkbenchSectionHelpPopover" class="transport-workbench-section-help-popover u-scroll-y hidden"',
+        ]:
+            self.assertIn(token, index_content)
+
+        for token in [
+            "width: var(--layout-popover-inline);",
+            "max-block-size: var(--layout-popover-block);",
+            "min-height: var(--palette-library-list-min-block);",
+            "max-height: var(--palette-library-list-max-block);",
+        ]:
+            self.assertIn(token, css_content)
+
+        self.assertIn('readPaletteLibraryBlockSize("--palette-library-list-min-block"', palette_content)
+        self.assertIn('readPaletteLibraryBlockSize("--palette-library-list-max-block"', palette_content)
+        self.assertIn('title.className = "palette-library-title u-truncate";', palette_content)
+        self.assertIn('fileName.className = "project-file-name u-truncate";', sidebar_content)
+
 
 if __name__ == "__main__":
     unittest.main()

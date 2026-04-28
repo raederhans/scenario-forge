@@ -63,6 +63,32 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         self.assertIn("exportDetails.open = true;", sidebar)
         self.assertIn('callRuntimeHook(state, "restoreSupportSurfaceFromUrlFn");', sidebar)
 
+    def test_adaptive_layout_markup_contracts_are_wired(self):
+        content = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+        required_tokens = [
+            'id="scenarioContextScenarioText" class="u-truncate"',
+            'id="scenarioContextModeText" class="u-truncate"',
+            'id="scenarioContextActiveText" class="u-truncate"',
+            'id="scenarioContextSelectionText" class="u-truncate"',
+            '<section id="bottomDock" class="bottom-dock"',
+            '<div class="bottom-dock-primary">',
+        ]
+        for token in required_tokens:
+            self.assertIn(token, content)
+
+    def test_bottom_dock_adaptive_owner_uses_grid_and_container_queries(self):
+        content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
+        required_tokens = [
+            "container-type: inline-size;",
+            "grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));",
+            "@container (max-width: 720px)",
+            "grid-template-columns: repeat(2, minmax(0, 1fr));",
+            "@container (max-width: 420px)",
+            "grid-template-columns: 1fr;",
+        ]
+        for token in required_tokens:
+            self.assertIn(token, content)
+
 
 if __name__ == "__main__":
     unittest.main()

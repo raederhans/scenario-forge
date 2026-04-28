@@ -207,7 +207,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       closeScenarioGuidePopover({ restoreFocus: true });
       return;
     }
-    closeDockPopover({ restoreFocus: false, syncUrl: false });
+    closeDockPopover({ restoreFocus: false, syncUrl: true });
     closeExportWorkbench?.({ restoreFocus: false });
     closeSpecialZonePopover?.();
     rememberOverlayTrigger?.(scenarioGuidePopover, trigger);

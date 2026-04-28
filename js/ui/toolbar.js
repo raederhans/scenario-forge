@@ -689,6 +689,8 @@ function initToolbar({ render } = {}) {
   const SCENARIO_BAR_MOBILE_LEFT_OFFSET = 12;
   const SCENARIO_BAR_SAFE_GAP = 16;
   const SCENARIO_BAR_MIN_WIDTH = 172;
+  const SCENARIO_BAR_BASE_MAX_WIDTH = 560;
+  const SCENARIO_BAR_NARROW_WIDTH = 360;
   const SCENARIO_GUIDE_MAX_WIDTH = 360;
   const SCENARIO_GUIDE_VERTICAL_GAP = 10;
   if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
@@ -1362,8 +1364,9 @@ function initToolbar({ render } = {}) {
       SCENARIO_BAR_MIN_WIDTH,
       Math.min(fallbackWidth, rawAvailableWidth > 0 ? rawAvailableWidth : fallbackWidth)
     );
-    scenarioContextBar.classList.remove("is-overlap-avoid");
-    scenarioContextBar.style.maxWidth = `${availableWidth}px`;
+    scenarioContextBar.style.setProperty("--scenario-bar-safe-max-width", `${availableWidth}px`);
+    scenarioContextBar.classList.toggle("is-overlay-constrained", availableWidth < SCENARIO_BAR_BASE_MAX_WIDTH);
+    scenarioContextBar.classList.toggle("is-narrow", availableWidth < SCENARIO_BAR_NARROW_WIDTH);
   };
 
   const refreshScenarioContextBar = () => {
@@ -2480,6 +2483,7 @@ function initToolbar({ render } = {}) {
       if (isOpen) {
         runtimeState.closeExportWorkbenchFn?.({ restoreFocus: true });
       } else {
+        closeDockPopover?.({ restoreFocus: false, syncUrl: true });
         runtimeState.openExportWorkbenchFn?.(dockExportBtn);
       }
     });
@@ -3495,6 +3499,3 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar, resolveExportPassSequence };
-
-
-

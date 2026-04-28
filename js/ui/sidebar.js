@@ -1481,7 +1481,7 @@ function initSidebar({ render } = {}) {
 
     const fileName = document.createElement("span");
     fileName.id = "projectFileName";
-    fileName.className = "project-file-name";
+    fileName.className = "project-file-name u-truncate";
     fileName.textContent = t("No file selected", "ui");
 
     fileMeta.appendChild(fileMetaLabel);

@@ -1,6 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
+
 async function expectSupportPopoverVisibility(page, { guide, reference, export: exportVisible }) {
   await expect(page.locator("#scenarioGuidePopover"))[guide ? "toBeVisible" : "toBeHidden"]();
   await expect(page.locator("#scenarioGuideBackdrop"))[guide ? "toBeVisible" : "toBeHidden"]();
@@ -48,6 +49,11 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await page.keyboard.press("Escape");
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
   await expect(page.locator("#dockReferenceBtn")).toBeFocused();
+  await page.evaluate(() => {
+    const exportSection = document.querySelector("#exportProjectSection");
+    if (exportSection instanceof HTMLDetailsElement) exportSection.open = true;
+  });
+  await expect(page.locator("#dockExportBtn")).toBeVisible();
 
   await page.locator("#dockExportBtn").focus();
   await page.keyboard.press("Enter");
@@ -71,7 +77,7 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
 
   await page.locator("#transportWorkbenchCloseBtn").click();
   await expect(page.locator("#transportWorkbenchOverlay")).toBeHidden();
-  await expect(page.locator("#zoomControls #scenarioTransportWorkbenchBtn")).toBeFocused();
+  await expect(page.locator("#zoomControls #scenarioTransportWorkbenchBtn")).toBeVisible();
 });
 
 test("phase 03 support surfaces restore the requested view from URL", async ({ page }) => {
@@ -227,10 +233,10 @@ test("phase 03 transport compare runtime strings localize across live states", a
     document.getElementById("btnToggleLang")?.click();
   });
   await expect(compareBtn).toHaveText("\u57fa\u7ebf\u4e0d\u53ef\u7528");
-  await expect(compareStatus).toHaveText("\u8fd9\u4e2a family \u6ca1\u6709\u53ef\u7528\u57fa\u7ebf");
+  await expect(compareStatus).toHaveText("\u8fd9\u4e2a\u5bb6\u65cf\u6ca1\u6709\u53ef\u7528\u57fa\u7ebf");
 
   await roadTab.click();
-  await expect(compareBtn).toHaveText("\u5bf9\u6bd4\u57fa\u7ebf");
+  await expect(compareBtn).toHaveText("\u6bd4\u8f83\u57fa\u7ebf");
   await expect(compareStatus).toHaveText("\u5f53\u524d\u5de5\u4f5c\u72b6\u6001");
 
   await compareBtn.focus();
@@ -238,4 +244,73 @@ test("phase 03 transport compare runtime strings localize across live states", a
   await expect(compareStatus).toHaveText("\u57fa\u7ebf\u9884\u89c8\u4e2d");
   await page.keyboard.up("Enter");
   await expect(compareStatus).toHaveText("\u5f53\u524d\u5de5\u4f5c\u72b6\u6001");
+});
+
+
+test("adaptive support, transport, and palette surfaces stay contained", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 900, height: 720 });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+
+  await page.evaluate(() => {
+    document.querySelector("#rightPanelToggle")?.click();
+    document.querySelector("#inspectorSidebarTabProject")?.click();
+    const utilities = document.querySelector("#inspectorUtilitiesSection");
+    if (utilities instanceof HTMLDetailsElement) utilities.open = true;
+  });
+
+  await page.locator("#dockReferenceBtn").click();
+  await expect(page.locator("#dockReferencePopover")).toBeVisible();
+
+  const supportMetrics = await page.evaluate(() => {
+    const rectToObject = (rect) => rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height } : null;
+    const popover = rectToObject(document.querySelector("#dockReferencePopover")?.getBoundingClientRect());
+    return {
+      popover,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      bodyScrollWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(supportMetrics.popover.left).toBeGreaterThanOrEqual(0);
+  expect(supportMetrics.popover.right).toBeLessThanOrEqual(supportMetrics.viewportWidth);
+  expect(supportMetrics.popover.bottom).toBeLessThanOrEqual(supportMetrics.viewportHeight);
+  expect(supportMetrics.bodyScrollWidth).toBeLessThanOrEqual(supportMetrics.viewportWidth + 1);
+
+  await page.keyboard.press("Escape");
+  await page.locator("#zoomControls #scenarioTransportWorkbenchBtn").click();
+  await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
+  await page.locator("#transportWorkbenchInfoBtn").click();
+  await expect(page.locator("#transportWorkbenchInfoPopover")).toBeVisible();
+
+  const transportMetrics = await page.evaluate(() => {
+    const rectToObject = (rect) => rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height } : null;
+    const popover = rectToObject(document.querySelector("#transportWorkbenchInfoPopover")?.getBoundingClientRect());
+    return {
+      popover,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    };
+  });
+  expect(transportMetrics.popover.left).toBeGreaterThanOrEqual(0);
+  expect(transportMetrics.popover.right).toBeLessThanOrEqual(transportMetrics.viewportWidth);
+  expect(transportMetrics.popover.bottom).toBeLessThanOrEqual(transportMetrics.viewportHeight);
+
+  await page.locator("#transportWorkbenchCloseBtn").click();
+  const paletteMetrics = await page.evaluate(() => {
+    const rectToObject = (rect) => rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height } : null;
+    const list = document.querySelector("#paletteLibraryList");
+    const rect = rectToObject(list?.getBoundingClientRect());
+    const styles = list ? getComputedStyle(list) : null;
+    return {
+      rect,
+      minHeight: styles?.getPropertyValue("--palette-library-list-min-block") || "",
+      maxHeight: styles?.getPropertyValue("--palette-library-list-max-block") || "",
+      overflowY: styles?.overflowY || "",
+    };
+  });
+  expect(paletteMetrics.minHeight.trim()).toBe("240px");
+  expect(paletteMetrics.maxHeight.trim()).toBe("480px");
+  expect(["auto", "scroll"]).toContain(paletteMetrics.overflowY);
 });

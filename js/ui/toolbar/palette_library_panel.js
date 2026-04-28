@@ -39,6 +39,13 @@ function createPaletteLibraryPanelController({
     base: 240,
     cap: 480,
   };
+
+  const readPaletteLibraryBlockSize = (name, fallbackValue) => {
+    const source = paletteLibraryList || document.documentElement;
+    const rawValue = globalThis.getComputedStyle?.(source)?.getPropertyValue(name) || "";
+    const value = Number.parseFloat(rawValue);
+    return Number.isFinite(value) ? value : fallbackValue;
+  };
   let adaptivePaletteLibraryHeightFrame = 0;
   let activeRowKey = "";
 
@@ -165,10 +172,10 @@ function createPaletteLibraryPanelController({
     swatch.style.backgroundColor = entry.color;
 
     const meta = document.createElement("span");
-    meta.className = "palette-library-meta";
+    meta.className = "palette-library-meta u-min-0";
 
     const title = document.createElement("span");
-    title.className = "palette-library-title";
+    title.className = "palette-library-title u-truncate";
     title.textContent = entry.localizedName || entry.label;
 
     const subtitle = document.createElement("span");
@@ -266,10 +273,12 @@ function createPaletteLibraryPanelController({
     adaptivePaletteLibraryHeightFrame = 0;
     if (!paletteLibraryList || !runtimeState.paletteLibraryOpen) return;
     const scrollHeight = Number(paletteLibraryList.scrollHeight || 0);
+    const minimumHeight = readPaletteLibraryBlockSize("--palette-library-list-min-block", PALETTE_LIBRARY_HEIGHT.base);
+    const maximumHeight = readPaletteLibraryBlockSize("--palette-library-list-max-block", PALETTE_LIBRARY_HEIGHT.cap);
     const nextHeight = clampPaletteLibraryHeight(
       scrollHeight,
-      PALETTE_LIBRARY_HEIGHT.base,
-      PALETTE_LIBRARY_HEIGHT.cap
+      minimumHeight,
+      maximumHeight
     );
     paletteLibraryList.style.height = `${Math.round(nextHeight)}px`;
     paletteLibraryList.style.maxHeight = `${Math.round(nextHeight)}px`;

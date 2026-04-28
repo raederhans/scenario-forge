@@ -1818,7 +1818,7 @@
                 <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search">×</button>
               </div>
               <div id="paletteLibrarySummary" class="body-text mt-2" data-i18n="0 colors">0 colors</div>
-              <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
+              <div id="paletteLibraryList" class="palette-library-list mt-3 u-scroll-y"></div>
             </div>
           </div>
         </div>
@@ -1850,19 +1850,19 @@
             <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context">-</button>
             <div id="scenarioContextScenarioItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">S</span>
-              <span id="scenarioContextScenarioText">Scenario: None</span>
+              <span id="scenarioContextScenarioText" class="u-truncate">Scenario: None</span>
             </div>
             <div id="scenarioContextModeItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">M</span>
-              <span id="scenarioContextModeText">Mode: Visual Color</span>
+              <span id="scenarioContextModeText" class="u-truncate">Mode: Visual Color</span>
             </div>
             <div id="scenarioContextActiveItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">A</span>
-              <span id="scenarioContextActiveText">Active: None</span>
+              <span id="scenarioContextActiveText" class="u-truncate">Active: None</span>
             </div>
             <div id="scenarioContextSelectionItem" class="scenario-context-item hidden">
               <span class="scenario-context-icon" aria-hidden="true">#</span>
-              <span id="scenarioContextSelectionText" data-i18n="No selection">No selection</span>
+              <span id="scenarioContextSelectionText" class="u-truncate" data-i18n="No selection">No selection</span>
             </div>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-action-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide" data-i18n="Guide">Guide</button>
           </div>
@@ -2558,11 +2558,11 @@
               <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Guide">Guide</button>
               <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench" data-i18n="Close" data-i18n-aria-label="Close transport workbench">Close</button>
             </div>
-            <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
+            <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover u-scroll-y hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
               <h3 id="transportWorkbenchInfoTitle" class="transport-workbench-info-title" data-i18n="Transport guide">Transport guide</h3>
               <div id="transportWorkbenchInfoBody" class="transport-workbench-info-body"></div>
             </div>
-            <div id="transportWorkbenchSectionHelpPopover" class="transport-workbench-section-help-popover hidden" role="dialog" aria-labelledby="transportWorkbenchSectionHelpTitle" aria-hidden="true">
+            <div id="transportWorkbenchSectionHelpPopover" class="transport-workbench-section-help-popover u-scroll-y hidden" role="dialog" aria-labelledby="transportWorkbenchSectionHelpTitle" aria-hidden="true">
               <h3 id="transportWorkbenchSectionHelpTitle" class="transport-workbench-info-title"></h3>
               <div id="transportWorkbenchSectionHelpBody" class="transport-workbench-section-help-body"></div>
             </div>
