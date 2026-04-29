@@ -662,6 +662,44 @@ function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
   }
 }
 
+function validateGateCurrentReport(currentReport, scenarioIds, label = "current report") {
+  if (!currentReport || typeof currentReport !== "object") {
+    throw new Error(`[perf-baseline] Current report is invalid: ${label}`);
+  }
+  const currentScenarios = currentReport.scenarios;
+  if (!currentScenarios || typeof currentScenarios !== "object") {
+    throw new Error(`[perf-baseline] Current report misses scenarios map: ${label}`);
+  }
+  const missing = [];
+  const invalid = [];
+  for (const scenarioId of scenarioIds) {
+    const summary = currentScenarios?.[scenarioId]?.summary;
+    if (!summary || typeof summary !== "object") {
+      missing.push(scenarioId);
+      continue;
+    }
+    const invalidMetrics = GATE_METRICS
+      .map((metric) => metric.key)
+      .filter((metricKey) => {
+        const metricValue = Number(summary[metricKey]);
+        return !(Number.isFinite(metricValue) && metricValue > 0);
+      });
+    if (invalidMetrics.length) {
+      invalid.push(`${scenarioId}: ${invalidMetrics.join(", ")}`);
+    }
+  }
+  if (missing.length) {
+    throw new Error(
+      `[perf-baseline] Current report misses required scenarios (${missing.join(", ")}): ${label}`
+    );
+  }
+  if (invalid.length) {
+    throw new Error(
+      `[perf-baseline] Current report has invalid gate metrics for scenarios (${invalid.join("; ")}): ${label}`
+    );
+  }
+}
+
 function collectBaselineContractMismatches(currentReport, baselineReport) {
   const mismatches = [
     ...getPerfReportContractMismatches(currentReport, "current"),
@@ -746,6 +784,7 @@ async function main() {
   };
 
   if (options.mode === "gate") {
+    validateGateCurrentReport(report, options.scenarios, "current report");
     const contractMismatches = collectBaselineContractMismatches(report, baselineReportForGate);
     const failures = compareAgainstBaseline(report, baselineReportForGate, options.threshold);
     const gateReportPath = path.join(options.rawDir, "perf-gate-current.json");

@@ -76,6 +76,9 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('{ key: "applyScenarioBundleMs", label: "applyScenarioBundleMs" }', script)
         self.assertIn('{ key: "refreshScenarioApplyMs", label: "refreshScenarioApplyMs" }', script)
         self.assertIn('{ key: "renderSampleMedianMs", label: "renderSampleMedianMs", threshold: 1.25 }', script)
+        self.assertIn("function validateGateCurrentReport(currentReport, scenarioIds", script)
+        self.assertIn("Current report has invalid gate metrics for scenarios", script)
+        self.assertIn('validateGateCurrentReport(report, options.scenarios, "current report")', script)
         for field_name in (
             "scenarioFullHydrateMs",
             "interactionInfraMs",
@@ -143,6 +146,8 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("timedOut: !!stillActive", script)
         self.assertIn("firstIdleAfterLastWheelMs = idleState?.timedOut", script)
         self.assertIn("result.finalReset = await waitForIdle(7000)", script)
+        self.assertIn("activeScenarioId: await readActiveScenarioId()", script)
+        self.assertIn("result.activeScenarioId = await readActiveScenarioId()", script)
         self.assertIn("attribution: Array.from(entry.attribution || [])", script)
         self.assertIn('"git", "rev-parse", "HEAD"', script)
         self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
@@ -163,6 +168,7 @@ class PerfGateContractTest(unittest.TestCase):
             },
             "repeatedZoomRegions": {
                 "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
                 "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
                 "passAttributionSchema": "mc_pass_attribution_v1",
                 "cyclesPerRegion": 2,
@@ -213,6 +219,38 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertEqual(metric["details"]["passAttribution"]["politicalBg"]["max"], 18)
         self.assertEqual(metric["details"]["blackPixelClassification"]["normal"], 1)
         self.assertEqual(metric["details"]["blackPixelClassification"]["dark-content-candidate"], 1)
+
+    def test_repeated_zoom_regions_metric_requires_active_scenario_match(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "hoi4_1939",
+            },
+            "repeatedZoomRegions": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "hoi4_1939",
+                "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
+                "passAttributionSchema": "mc_pass_attribution_v1",
+                "cyclesPerRegion": 1,
+                "wheelsPerCycle": 1,
+                "regions": {
+                    "europe": {
+                        "cycles": [{"firstIdleAfterLastWheelMs": 100}],
+                        "degradation": {"ratio": 1.0},
+                    }
+                },
+            },
+        }
+
+        metric = benchmark.build_suite_benchmark_metrics(suite)["repeatedZoomRegions"]
+        self.assertTrue(metric["present"])
+        self.assertFalse(metric["details"]["sameScenario"])
+
+        del suite["repeatedZoomRegions"]["activeScenarioId"]
+        missing_active_metric = benchmark.build_suite_benchmark_metrics(suite)["repeatedZoomRegions"]
+        self.assertFalse(missing_active_metric["details"]["sameScenario"])
 
     def test_fill_action_metrics_carry_black_pixel_ratio(self):
         benchmark = load_editor_benchmark_module()

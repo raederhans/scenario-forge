@@ -1535,6 +1535,7 @@ def with_metric_context(
     probe: object = None,
     baselines: object = None,
     candidate_sources: list[str] | tuple[str, ...] | None = None,
+    allow_direct_probe_without_scenario_fields: bool = True,
 ) -> dict:
     normalized_requested_scenario_id = str(requested_scenario_id or "").strip()
     expected_metric_scenario_id = "" if normalized_requested_scenario_id == "none" else normalized_requested_scenario_id
@@ -1552,17 +1553,17 @@ def with_metric_context(
       expected_metric_scenario_id,
       "scenarioId",
       "activeScenarioId",
-      "requestedScenarioId",
     )
     has_probe_scenario_context = any(
       str(probe_context.get(field_name) or "").strip()
-      for field_name in ("scenarioId", "activeScenarioId", "requestedScenarioId")
+      for field_name in ("scenarioId", "activeScenarioId")
     )
     # Direct probes run inside the already-open suite page. Some probes report
     # only their measured values, so their scenario trust comes from the suite
     # request plus scenarioConsistency instead of a stale metric entry.
     direct_probe_without_scenario_fields = (
       selected_via == "direct-probe"
+      and allow_direct_probe_without_scenario_fields
       and not any(str(details.get(field_name) or "").strip() for field_name in ("scenarioId", "activeScenarioId"))
       and not has_probe_scenario_context
     )
@@ -2101,6 +2102,7 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       selected_via="direct-probe",
       probe=suite.get("repeatedZoomRegions") if isinstance(suite.get("repeatedZoomRegions"), dict) else {},
       candidate_sources=["repeatedZoomRegions.regions.*.cycles.*.firstIdleAfterLastWheelMs"],
+      allow_direct_probe_without_scenario_fields=False,
     )
     return {
       "load": load_metric,
@@ -3147,9 +3149,14 @@ async (page) => {{
       runtimeChunkLoadState: includeHeavyMetrics ? {clone_runtime_chunk_load_state_summary_js()} : null,
     }};
   }}, payload);
+  const readActiveScenarioId = async () => await page.evaluate(async () => {{
+    const {{ state }} = await import('/js/core/state.js');
+    return String(state.activeScenarioId || '');
+  }});
 
   const result = {{
     requestedScenarioId: String(config.scenarioId || ''),
+    activeScenarioId: await readActiveScenarioId(),
     interactionProbeSchema: 'mc_repeated_zoom_regions_v1',
     passAttributionSchema: 'mc_pass_attribution_v1',
     blackPixelAttributionSchema: 'mc_black_pixel_attribution_v1',
@@ -3282,6 +3289,7 @@ async (page) => {{
   }}
   await resetZoom();
   result.finalReset = await waitForIdle(7000);
+  result.activeScenarioId = await readActiveScenarioId();
   return result;
 }}
 """.strip()

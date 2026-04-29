@@ -12,6 +12,8 @@ from topojson import Topology
 
 from tools import scenario_chunk_assets
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
 
 def _square(x: float, y: float, size: float = 1.0) -> Polygon:
     return Polygon([
@@ -23,6 +25,16 @@ def _square(x: float, y: float, size: float = 1.0) -> Polygon:
 
 
 class ScenarioChunkAssetsTest(unittest.TestCase):
+    def test_checked_in_chunk_manifest_byte_sizes_match_files(self) -> None:
+        for scenario_id in ("hoi4_1939", "tno_1962"):
+            manifest_path = REPO_ROOT / "data" / "scenarios" / scenario_id / "detail_chunks.manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            for chunk in manifest.get("chunks", []):
+                with self.subTest(scenario_id=scenario_id, chunk_id=chunk.get("id")):
+                    chunk_path = REPO_ROOT.joinpath(*str(chunk["url"]).split("/"))
+                    self.assertTrue(chunk_path.exists(), str(chunk_path))
+                    self.assertEqual(chunk.get("byte_size"), chunk_path.stat().st_size)
+
     def test_write_json_wraps_permission_error_with_actionable_message(self) -> None:
         target = Path("C:/tmp/political.detail.country.rur.json")
         with patch.object(

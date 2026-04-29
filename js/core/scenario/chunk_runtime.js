@@ -682,7 +682,7 @@ function createScenarioChunkRuntimeController({
       });
       return "promotion-commit-started";
     }
-    if (!flushPending || !hasPendingReason) {
+    if (!hasPendingReason) {
       return "noop";
     }
     setScenarioChunkShellStatus("loading", loadState);
@@ -1911,7 +1911,7 @@ function createScenarioChunkRuntimeController({
         bundle,
         reason: nextReason,
         flushPending,
-        allowRefreshStart: flushPending && hadPendingReason,
+        allowRefreshStart: true,
       });
     }, resolvedDelayMs);
     return "scheduled";

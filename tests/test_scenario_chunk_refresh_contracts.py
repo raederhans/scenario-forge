@@ -54,7 +54,8 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('allowRefreshStart = false,', self.scenario_chunk_runtime_source)
         self.assertIn('const hasPendingReason = !!allowRefreshStart || !!String(loadState.pendingReason || "").trim();', self.scenario_chunk_runtime_source)
         self.assertIn('allowRefreshStart: hadPendingReason,', self.scenario_chunk_runtime_source)
-        self.assertIn('if (!flushPending || !hasPendingReason) {', self.scenario_chunk_runtime_source)
+        self.assertIn('allowRefreshStart: true,', self.scenario_chunk_runtime_source)
+        self.assertIn('if (!hasPendingReason) {', self.scenario_chunk_runtime_source)
 
     def test_political_chunk_promotion_refreshes_union_of_previous_and_next_feature_ids(self):
         self.assertIn('const previousFeatureIds = getScenarioFeatureCollectionIdentityList(runtimeState.scenarioPoliticalChunkData);', self.scenario_chunk_runtime_source)

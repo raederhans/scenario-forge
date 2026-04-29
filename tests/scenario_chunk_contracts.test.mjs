@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { createScenarioChunkRuntimeController } from "../js/core/scenario/chunk_runtime.js";
 import { selectScenarioChunks } from "../js/core/scenario_chunk_manager.js";
 
 const REPO_ROOT = process.cwd();
@@ -9,6 +10,100 @@ const REPO_ROOT = process.cwd();
 function readRepoFile(...relativeParts) {
   return fs.readFileSync(path.join(REPO_ROOT, ...relativeParts), "utf8");
 }
+
+test("scheduled chunk refresh starts without seeded pending reason", async () => {
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const chunk = {
+    id: "political.detail.test",
+    url: "political.detail.test.json",
+    layer: "political",
+    lod: "detail",
+    bounds: [-1, -1, 1, 1],
+    countryCodes: ["TT"],
+  };
+  const runtimeState = {
+    activeScenarioId: "tno_1962",
+    activeScenarioChunks: {
+      loadedChunkIds: [],
+      payloadByChunkId: {},
+      mergedLayerPayloads: {},
+      lruChunkIds: [],
+    },
+    renderPerfMetrics: {},
+    uiState: { developerMode: true },
+    renderDiagnostics: { perfOverlayEnabled: true },
+    zoomTransform: { k: 2 },
+    getViewportGeoBoundsFn: () => [-2, -2, 2, 2],
+  };
+  let selectCalls = 0;
+
+  globalThis.setTimeout = (callback) => {
+    callback();
+    return 1;
+  };
+  globalThis.clearTimeout = () => {};
+
+  try {
+    const controller = createScenarioChunkRuntimeController({
+      runtimeState,
+      getSearchParams: () => new URLSearchParams(),
+      normalizeScenarioId: (value) => String(value || "").trim(),
+      normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
+      normalizeScenarioFeatureCollection: (payload) => payload,
+      getScenarioFeatureCollectionIdentityList: (payload) => (
+        Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
+      ),
+      areScenarioFeatureCollectionsEquivalent: () => false,
+      getScenarioDefaultCountryCode: () => "",
+      getScenarioBundleId: () => "tno_1962",
+      getCachedScenarioBundle: () => ({
+        manifest: { scenario_id: "tno_1962" },
+        chunkRegistry: { byLayer: { political: [chunk] } },
+        runtimeShell: { renderBudgetHints: {} },
+        countriesPayload: { countries: {} },
+      }),
+      getVisibleScenarioChunkLayers: () => ["political"],
+      selectScenarioChunks: () => {
+        selectCalls += 1;
+        return {
+          scenarioId: "tno_1962",
+          requiredChunks: [chunk],
+          optionalChunks: [],
+          evictableChunkIds: [],
+          selectedFeatureCountSum: 1,
+        };
+      },
+      mergeScenarioChunkPayloads: (_layerKey, payloads) => ({
+        type: "FeatureCollection",
+        features: payloads.flatMap((payload) => payload?.features || []),
+      }),
+      normalizeScenarioRenderBudgetHints: (value) => value || {},
+      loadScenarioChunkFile: async () => ({
+        type: "FeatureCollection",
+        features: [{ type: "Feature", id: "feature-a", properties: {}, geometry: null }],
+      }),
+      scenarioSupportsChunkedRuntime: () => true,
+      scenarioBundleUsesChunkedLayer: () => true,
+      getScenarioOptionalLayerConfig: () => null,
+      syncScenarioLocalizationState: () => {},
+      refreshMapDataForScenarioChunkPromotion: () => {},
+      flushRenderBoundary: () => {},
+      recordScenarioPerfMetric: () => {},
+      ensureScenarioChunkRegistryLoaded: async () => {},
+    });
+
+    const status = controller.scheduleScenarioChunkRefresh({ reason: "visibility:political", delayMs: 0 });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    assert.equal(status, "scheduled");
+    assert.equal(selectCalls, 1);
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+  }
+});
 
 test("chunk cost tie-breaker preserves viewport center relevance", () => {
   const selection = selectScenarioChunks({
