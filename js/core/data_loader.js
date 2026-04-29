@@ -60,6 +60,7 @@ const CONTEXT_LAYER_PACKS = {
     objectName: "contours",
   },
 };
+const EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES = new Set(["roads", "railways", "rail_stations_major"]);
 const PALETTE_REGISTRY_URL = "data/palettes/index.json";
 const RELEASABLE_CATALOG_URL = "data/releasables/hoi4_vanilla.internal.phase1.catalog.json";
 const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
@@ -560,7 +561,11 @@ function normalizeRequestedContextLayerNames(includeContextLayers) {
     new Set(
       requestedNames
         .map((name) => String(name || "").trim().toLowerCase())
-        .filter((name) => name === "rivers" || Object.prototype.hasOwnProperty.call(CONTEXT_LAYER_PACKS, name))
+        .filter((name) => (
+          name === "rivers"
+          || Object.prototype.hasOwnProperty.call(CONTEXT_LAYER_PACKS, name)
+          || EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES.has(name)
+        ))
     )
   );
 }

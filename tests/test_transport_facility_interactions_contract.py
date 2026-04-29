@@ -66,6 +66,18 @@ class TransportFacilityInteractionsContractTest(unittest.TestCase):
         self.assertIn("buildFacilityInfoCardFieldSections: buildFacilityInfoCardRows", owner_content)
         self.assertIn('facilityInfoCardMoreBtn.textContent = t(expanded ? "Less fields" : "More fields", "ui");', owner_content)
 
+    def test_facility_entry_builder_uses_current_render_target_canvas(self):
+        content = (REPO_ROOT / "js" / "core" / "map_renderer.js").read_text(encoding="utf-8")
+        section = content.split("function buildContextFacilityEntries", 1)[1].split(
+            "function drawContextFacilityPointLayer",
+            1,
+        )[0]
+        self.assertIn("const targetCanvas = context?.canvas || null;", section)
+        self.assertIn("const viewportWidth = Number(targetCanvas?.width || 0);", section)
+        self.assertIn("const viewportHeight = Number(targetCanvas?.height || 0);", section)
+        self.assertNotIn("canvas?.width", section)
+        self.assertNotIn("canvas?.height", section)
+
     def test_toolbar_summary_uses_filtered_transport_counts(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
         owner_content = APPEARANCE_CONTROLLER_JS.read_text(encoding="utf-8")

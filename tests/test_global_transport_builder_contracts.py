@@ -668,6 +668,11 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertIn('data/transport_layers/global_rail/catalog.json', data_loader_content)
         self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', data_loader_content)
         self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', data_loader_content)
+        self.assertIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES = new Set(["roads", "railways", "rail_stations_major"])', data_loader_content)
+        self.assertIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES.has(name)', data_loader_content)
+        default_eager_section = data_loader_content.split('if (includeContextLayers === true) {', 1)[1].split('}', 1)[0]
+        self.assertIn('Object.keys(CONTEXT_LAYER_PACKS)', default_eager_section)
+        self.assertNotIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES', default_eager_section)
         self.assertIn('["railways", "rail_stations_major"]', appearance_controller_content)
         self.assertIn('["railways", "rail_stations_major"]', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
 
@@ -677,6 +682,7 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
         self.assertIn('data/transport_layers/global_road/catalog.json', data_loader_content)
         self.assertIn('layerName === "roads"', data_loader_content)
+        self.assertIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES.has(name)', data_loader_content)
         self.assertNotIn('road_labels.geojson', data_loader_content)
         self.assertNotIn('ensureContextLayerDataFn("road_labels"', toolbar_content)
         self.assertNotIn('ensureContextLayerDataFn("road_labels"', interaction_content)
@@ -751,6 +757,19 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         payload = json.loads(sample_station_path.read_text(encoding='utf-8'))
         self.assertEqual(payload.get('type'), 'FeatureCollection')
         self.assertEqual(payload.get('features'), [])
+
+    def test_port_renderer_default_reveal_floor_keeps_regional_ports_visible(self) -> None:
+        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
+        port_payload = json.loads((REPO_ROOT / 'data' / 'transport_layers' / 'japan_port' / 'ports.geojson').read_text(encoding='utf-8'))
+        max_importance_rank = max(
+            int(round(float(feature.get('properties', {}).get('importance_rank') or 1)))
+            for feature in port_payload.get('features', [])
+        )
+        self.assertEqual(max_importance_rank, 2)
+        self.assertIn('function getTransportPortZoomRevealFloor(scale)', renderer_content)
+        self.assertIn('return Math.max(1, 2 - getTransportOverviewZoomRevealAllowance(scale));', renderer_content)
+        self.assertIn('Math.max(getTransportPortScopeThreshold(portConfig.scope), getTransportPortZoomRevealFloor(k))', renderer_content)
+        self.assertIn('getTransportPortZoomRevealFloor(k)', renderer_content)
 
     def test_rail_runtime_loader_keeps_station_collection_shape_even_when_empty(self) -> None:
         data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')

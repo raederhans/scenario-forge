@@ -13799,6 +13799,10 @@ function getTransportOverviewZoomRevealAllowance(scale) {
   return 0;
 }
 
+function getTransportPortZoomRevealFloor(scale) {
+  return Math.max(1, 2 - getTransportOverviewZoomRevealAllowance(scale));
+}
+
 function getTransportAirportScopeThreshold(scope) {
   const normalized = String(scope || "").trim().toLowerCase();
   if (normalized === "international") return 3;
@@ -13980,8 +13984,9 @@ function buildContextFacilityEntries(
       reason: !projection ? "no-projection" : "no-data",
     };
   }
-  const viewportWidth = Number(canvas?.width || 0);
-  const viewportHeight = Number(canvas?.height || 0);
+  const targetCanvas = context?.canvas || null;
+  const viewportWidth = Number(targetCanvas?.width || 0);
+  const viewportHeight = Number(targetCanvas?.height || 0);
   const padding = 28;
   const entries = [];
   collection.features.forEach((feature) => {
@@ -14203,8 +14208,7 @@ function drawPortsLayer(k, { interactive = false } = {}) {
   const portConfig = getTransportOverviewFamilyConfig("port");
   const labelZoomConfig = getTransportOverviewLabelZoomConfig("port", portConfig.labelDensity);
   const visualStyle = getTransportOverviewPortVisualStyle(portConfig.primaryColor, portConfig.visualStrength);
-  const zoomAllowance = getTransportOverviewZoomRevealAllowance(k);
-  const revealFloor = Math.max(getTransportPortScopeThreshold(portConfig.scope), 3 - zoomAllowance);
+  const revealFloor = Math.max(getTransportPortScopeThreshold(portConfig.scope), getTransportPortZoomRevealFloor(k));
   drawContextFacilityPointLayer("drawPortsLayer", runtimeState.portsData, k, {
     familyId: "port",
     interactive,
