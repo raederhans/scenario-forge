@@ -37,6 +37,15 @@ class FrontendRenderBoundaryContractTest(unittest.TestCase):
         self.assertIn("requestInteractionRender", content)
         self.assertIn("return requestInteractionRender(reason);", content)
 
+    def test_render_boundary_reasons_survive_until_render_perf_snapshot(self):
+        boundary = (REPO_ROOT / "js" / "core" / "render_boundary.js").read_text(encoding="utf-8")
+        renderer = (REPO_ROOT / "js" / "core" / "map_renderer.js").read_text(encoding="utf-8")
+        main_js = (REPO_ROOT / "js" / "main.js").read_text(encoding="utf-8")
+        self.assertIn("lastScheduledReasons", boundary)
+        self.assertIn("markRenderBoundaryFlushed", boundary)
+        self.assertIn('recordRenderPerfMetric("renderBoundaryReasons", 0, getRenderBoundaryDebugState())', renderer)
+        self.assertIn("markRenderBoundaryFlushed();", main_js)
+
 
 if __name__ == "__main__":
     unittest.main()

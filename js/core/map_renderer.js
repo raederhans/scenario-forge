@@ -84,7 +84,7 @@ import {
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
-import { flushRenderBoundary, requestRender } from "./render_boundary.js";
+import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
 import { registerRuntimeHook } from "./state/index.js";
 import {
   bindInteractionFunnel,
@@ -216,6 +216,7 @@ let zoomBehavior = null;
 let interactionInfrastructureBasicPromise = null;
 let interactionInfrastructureFullPromise = null;
 let activeContextMetricSession = null;
+let lastHitCanvasBuildStats = null;
 
 let viewportGroup = null;
 let strategicDefs = null;
@@ -4103,6 +4104,8 @@ function completeScheduledExactAfterSettleRefreshPlan(generation, plan, passStar
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
     generation,
     contextBaseRefreshed: !!plan.exactRefreshApplied,
+    targetPasses: Array.isArray(plan.exactTargetPasses) ? plan.exactTargetPasses : [],
+    passCount: Array.isArray(plan.exactTargetPasses) ? plan.exactTargetPasses.length : 0,
   });
   return requestRendererRender("exact-after-settle", {
     flush: false,
@@ -4120,7 +4123,9 @@ function prepareExactAfterSettlePassesInSlices(generation, plan) {
     return false;
   }
   const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-  const definitions = getIdleRenderPassDefinitions();
+  const targetPasses = new Set(Array.isArray(plan.exactTargetPasses) ? plan.exactTargetPasses : []);
+  const definitions = getIdleRenderPassDefinitions()
+    .filter(([passName]) => !targetPasses.size || targetPasses.has(passName));
   const timings = {};
   const cache = getRenderPassCacheState();
   const passStartedAt = nowMs();
@@ -4152,9 +4157,17 @@ function prepareExactAfterSettlePassesInSlices(generation, plan) {
         generation,
         passName,
         index,
+        targetPasses: Array.isArray(plan.exactTargetPasses) ? plan.exactTargetPasses : [],
+        passCount: definitions.length,
       });
       enqueueNextPass(index + 1);
-    }, { priority: "high", label: `exact-after-settle-pass-${passName}` });
+    }, {
+      priority: "high",
+      label: `exact-after-settle-pass-${passName}`,
+      generation,
+      dedupe: true,
+      deferOnContinuousInput: true,
+    });
   };
 
   enqueueNextPass(0);
@@ -7891,6 +7904,7 @@ function drawHitCanvas() {
   if (!hitContext || !pathHitCanvas || !runtimeState.landData?.features?.length) {
     runtimeState.hitCanvasDirty = false;
     runtimeState.hitCanvasTopologyRevision = 0;
+    lastHitCanvasBuildStats = null;
     return false;
   }
 
@@ -7899,6 +7913,7 @@ function drawHitCanvas() {
   if (width <= 0 || height <= 0) {
     runtimeState.hitCanvasDirty = false;
     runtimeState.hitCanvasTopologyRevision = 0;
+    lastHitCanvasBuildStats = null;
     return false;
   }
 
@@ -7916,16 +7931,19 @@ function drawHitCanvas() {
   hitContext.translate(t.x, t.y);
   hitContext.scale(k, k);
 
-  const visibleSpatialItems = collectVisibleLandSpatialItems();
-  if (visibleSpatialItems === null) {
+  const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats();
+  if (visibleSpatialItemsResult === null) {
     hitContext.restore();
     runtimeState.hitCanvasDirty = true;
+    lastHitCanvasBuildStats = null;
     recordRenderPerfMetric("hitCanvasSpatialIndexUnavailable", 0, {
       reason: "spatial-index-unavailable",
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
     });
     return false;
   }
+  const visibleSpatialItems = visibleSpatialItemsResult.items;
+  let drawnItemCount = 0;
   visibleSpatialItems.forEach((item) => {
     const key = runtimeState.idToKey.get(item.id);
     if (!key || !item?.feature) return;
@@ -7934,11 +7952,19 @@ function drawHitCanvas() {
     pathHitCanvas(item.feature);
     hitContext.fillStyle = keyToHitColor(key);
     hitContext.fill();
+    drawnItemCount += 1;
   });
 
   hitContext.restore();
   runtimeState.hitCanvasDirty = false;
   runtimeState.hitCanvasTopologyRevision = Number(runtimeState.topologyRevision || 0);
+  lastHitCanvasBuildStats = {
+    ...visibleSpatialItemsResult.stats,
+    visibleItemCount: visibleSpatialItems.length,
+    drawnItemCount,
+    globalCount: Number(visibleSpatialItemsResult.stats?.globalCandidateCount || 0),
+    spatialItemCount: Array.isArray(runtimeState.spatialItems) ? runtimeState.spatialItems.length : 0,
+  };
   incrementPerfCounter("hitCanvasRenders");
   return true;
 }
@@ -7949,6 +7975,7 @@ function drawHitCanvasWithMetric(details = {}) {
   recordRenderPerfMetric("buildHitCanvas", nowMs() - startedAt, {
     built: !!built,
     dirtyBefore: true,
+    ...(lastHitCanvasBuildStats || {}),
     ...details,
   });
   return built;
@@ -8208,7 +8235,7 @@ function doesSpatialItemIntersectProjectedViewport(item, viewportBounds) {
   );
 }
 
-function collectVisibleLandSpatialItems() {
+function collectVisibleLandSpatialItemsWithStats() {
   const meta = runtimeState.spatialGridMeta;
   const grid = runtimeState.spatialGrid;
   if (!meta || !grid || !Array.isArray(runtimeState.spatialItems)) return null;
@@ -8222,6 +8249,11 @@ function collectVisibleLandSpatialItems() {
   const r1 = clamp(Math.floor(viewportBounds.maxY / cellSize), 0, rows - 1);
   const visibleItems = [];
   const seen = new Set();
+  let cellCandidateCount = 0;
+  let visitedCellCount = 0;
+  const globalCandidateCount = Number.isFinite(Number(globals?.length))
+    ? Number(globals.length)
+    : Math.max(0, Number(globals?.size || 0));
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
     seen.add(item.id);
@@ -8232,12 +8264,34 @@ function collectVisibleLandSpatialItems() {
   for (let row = r0; row <= r1; row += 1) {
     for (let col = c0; col <= c1; col += 1) {
       const bucket = grid.get(getSpatialBucketKey(col, row));
+      visitedCellCount += 1;
+      cellCandidateCount += Array.isArray(bucket) ? bucket.length : 0;
       bucket?.forEach(maybePush);
     }
   }
   globals?.forEach(maybePush);
   visibleItems.sort((left, right) => (left?.drawOrder ?? 0) - (right?.drawOrder ?? 0));
-  return visibleItems;
+  return {
+    items: visibleItems,
+    stats: {
+      cellCandidateCount,
+      globalCandidateCount,
+      visitedCellCount,
+      cellSpan: {
+        colStart: c0,
+        colEnd: c1,
+        rowStart: r0,
+        rowEnd: r1,
+        cols: Math.max(0, c1 - c0 + 1),
+        rows: Math.max(0, r1 - r0 + 1),
+      },
+    },
+  };
+}
+
+function collectVisibleLandSpatialItems() {
+  const result = collectVisibleLandSpatialItemsWithStats();
+  return result ? result.items : null;
 }
 
 function collectWaterGridCandidates(px, py, radiusProj = 0) {
@@ -9000,6 +9054,8 @@ function flushPendingSidebarRefresh() {
   );
   const hasWaterRows = pending.waterRegionIds.length > 0;
   const hasSpecialRows = pending.specialRegionIds.length > 0;
+  const hasCountryInspectorImpact = hasSelectedOrActiveCountryImpact(countryCodes);
+  const shouldRefreshPresetTree = !!pending.refreshPresetTree && hasCountryInspectorImpact;
   if (hasWaterRows) {
     if (typeof runtimeState.refreshWaterRegionListRowsFn === "function") {
       const result = unwrapRuntimeHookResult(runtimeState.refreshWaterRegionListRowsFn({
@@ -9049,31 +9105,31 @@ function flushPendingSidebarRefresh() {
   if (typeof runtimeState.refreshCountryListRowsFn === "function") {
     runtimeState.refreshCountryListRowsFn({
       countryCodes,
-      refreshInspector: true,
-      refreshPresetTree: pending.refreshPresetTree,
+      refreshInspector: hasCountryInspectorImpact,
+      refreshPresetTree: shouldRefreshPresetTree,
     });
-    if (countryCodes.length > 0 || pending.refreshPresetTree) {
+    if (countryCodes.length > 0 || shouldRefreshPresetTree) {
       recordUiRefreshMetric("uiSidebarRowRefresh", {
         scope: "country",
         changedIds: countryCodes,
         refreshMode: "row",
-        refreshInspector: true,
-        refreshPresetTree: pending.refreshPresetTree,
+        refreshInspector: hasCountryInspectorImpact,
+        refreshPresetTree: shouldRefreshPresetTree,
       });
     }
     return;
   }
-  if (typeof runtimeState.renderCountryListFn === "function" && (countryCodes.length > 0 || pending.refreshPresetTree)) {
+  if (typeof runtimeState.renderCountryListFn === "function" && (countryCodes.length > 0 || shouldRefreshPresetTree)) {
     runtimeState.renderCountryListFn();
     recordUiRefreshMetric("uiSidebarFullRefresh", {
       scope: "country",
       changedIds: countryCodes,
       refreshMode: "full",
       fullRefreshReason: "hook-unavailable",
-      refreshPresetTree: pending.refreshPresetTree,
+      refreshPresetTree: shouldRefreshPresetTree,
     });
   }
-  if (pending.refreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
+  if (shouldRefreshPresetTree && typeof runtimeState.renderPresetTreeFn === "function") {
     runtimeState.renderPresetTreeFn();
   }
 }
@@ -15876,11 +15932,26 @@ function drawNightLightsLayer(k, config, solarState) {
   drawHistoricalNightLightsLayer(k, config, solarState);
 }
 
-function ensureDayNightClockTimer() {
-  if (dayNightClockTimerId) return;
-  lastDayNightClockToken = getDayNightLiveClockToken();
+function clearDayNightClockTimer() {
+  if (!dayNightClockTimerId) return;
+  globalThis.clearInterval(dayNightClockTimerId);
+  dayNightClockTimerId = null;
+}
+
+function syncDayNightClockTimer() {
+  const initialConfig = getDayNightStyleConfig();
+  if (!initialConfig.enabled || String(initialConfig.mode || "manual") !== "utc") {
+    clearDayNightClockTimer();
+    return false;
+  }
+  if (dayNightClockTimerId) return true;
+  lastDayNightClockToken = getDayNightLiveClockToken(initialConfig);
   dayNightClockTimerId = globalThis.setInterval(() => {
     const config = getDayNightStyleConfig();
+    if (!config.enabled || String(config.mode || "manual") !== "utc") {
+      clearDayNightClockTimer();
+      return;
+    }
     const nextToken = getDayNightLiveClockToken(config);
     if (nextToken === lastDayNightClockToken) return;
     lastDayNightClockToken = nextToken;
@@ -15901,6 +15972,7 @@ function ensureDayNightClockTimer() {
       },
     });
   }, DAY_NIGHT_CLOCK_INTERVAL_MS);
+  return true;
 }
 
 function resolvePaperTextureAssetUrl(assetId) {
@@ -19068,6 +19140,7 @@ function buildExactAfterSettleRefreshPlan({ profile, scheduleStartedAt, callback
     reuseDecision,
     forceExactContextBaseRefresh,
     exactRefreshApplied,
+    exactTargetPasses: [],
     scheduleStartedAt,
     callbackStartedAt,
     startedAt: callbackStartedAt,
@@ -19119,6 +19192,19 @@ function applyExactAfterSettleRefreshPlan(plan) {
     plan.forceExactContextBaseRefresh,
   );
   plan.deferContextBaseEnhancements = deferContextBaseEnhancements;
+  const cache = getRenderPassCacheState();
+  const targetPassNames = new Set(["political", "borders", "labels", "textureLabels"]);
+  if (plan.forceExactContextBaseRefresh || plan.exactRefreshApplied) {
+    getPhysicalExactRefreshPasses().forEach((passName) => targetPassNames.add(passName));
+  }
+  RENDER_PASS_NAMES.forEach((passName) => {
+    if (cache.dirty[passName]) {
+      targetPassNames.add(passName);
+    }
+  });
+  plan.exactTargetPasses = getIdleRenderPassDefinitions()
+    .map(([passName]) => passName)
+    .filter((passName) => targetPassNames.has(passName));
 }
 
 function finalizeExactAfterSettleRefreshPlan(plan) {
@@ -19177,7 +19263,13 @@ function enqueueExactAfterSettleSegment(generation, label, task) {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
       generation,
     });
-  }, { priority: "high", label: `exact-after-settle-${label}` });
+  }, {
+    priority: "high",
+    label: `exact-after-settle-${label}`,
+    generation,
+    dedupe: true,
+    deferOnContinuousInput: true,
+  });
 }
 
 function scheduleExactAfterSettleRefresh(profile = runtimeState.adaptiveSettleProfile || getAdaptiveSettleProfile()) {
@@ -21146,8 +21238,9 @@ function updatePerfOverlay() {
 
 function render() {
   const startedAt = perfIsEnabled() ? nowMs() : 0;
-  const frameSchedulerQueue = getFrameSchedulerQueueLength({ byPriority: true });
+  const frameSchedulerQueue = getFrameSchedulerQueueLength({ byPriority: true, byLabelGeneration: true });
   recordRenderPerfMetric("frameSchedulerQueueDepth", 0, frameSchedulerQueue);
+  recordRenderPerfMetric("renderBoundaryReasons", 0, getRenderBoundaryDebugState());
   if (runtimeState.scenarioChunkPromotionRenderLocked) {
     recordRenderPerfMetric("scenarioChunkPromotionRenderLocked", 0, {
       phase: String(runtimeState.renderPhase || ""),
@@ -21647,6 +21740,18 @@ function collectCountryCodesForFeatureIds(featureIds) {
     }
   });
   return Array.from(codes);
+}
+
+function hasSelectedOrActiveCountryImpact(countryCodes = []) {
+  const impactedCodes = new Set((Array.isArray(countryCodes) ? countryCodes : [])
+    .map((code) => canonicalCountryCode(code))
+    .filter(Boolean));
+  const selectedCode = canonicalCountryCode(runtimeState.selectedInspectorCountryCode);
+  const activeCode = canonicalCountryCode(runtimeState.activeSovereignCode);
+  return !!(
+    (selectedCode && impactedCodes.has(selectedCode))
+    || (activeCode && impactedCodes.has(activeCode))
+  );
 }
 
 function refreshSidebarAfterPaint({
@@ -23414,7 +23519,8 @@ function initMap({
   runtimeState.hitCanvasBuildScheduled = null;
   resetProjectedBoundsCacheState();
   invalidateAllRenderPasses("init-map");
-  ensureDayNightClockTimer();
+  runtimeState.syncDayNightClockTimerFn = syncDayNightClockTimer;
+  syncDayNightClockTimer();
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";

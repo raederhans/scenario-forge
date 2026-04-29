@@ -1,6 +1,8 @@
 const DEFAULT_RENDER_BUDGET_HINTS = Object.freeze({
   max_required_chunks: 6,
   max_optional_chunks: 3,
+  min_required_chunks: 1,
+  max_required_estimated_path_cost: 520000,
   detail_zoom_threshold: 1.7,
 });
 
@@ -8,6 +10,12 @@ function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, parsed));
+}
+
+function clampNonNegativeNumber(value, fallback = 0) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, parsed);
 }
 
 function normalizeBounds(rawBounds) {
@@ -72,6 +80,20 @@ function normalizeChunkEntry(rawChunk = {}) {
   const chunkUrl = String(rawChunk.url || rawChunk.chunk_url || "").trim();
   const layerKey = String(rawChunk.layer || rawChunk.layer_key || "").trim().toLowerCase();
   if (!chunkId || !chunkUrl || !layerKey) return null;
+  const featureCount = Math.floor(clampNonNegativeNumber(rawChunk.feature_count ?? rawChunk.featureCount, 0));
+  const byteSize = Math.floor(clampNonNegativeNumber(
+    rawChunk.byte_size ?? rawChunk.byteSize ?? rawChunk.byte_count ?? rawChunk.byteCount ?? rawChunk.bytes,
+    0,
+  ));
+  const coordCount = Math.floor(clampNonNegativeNumber(
+    rawChunk.coord_count ?? rawChunk.coordCount ?? rawChunk.coordinate_count ?? rawChunk.coordinateCount,
+    0,
+  ));
+  const partCount = Math.floor(clampNonNegativeNumber(rawChunk.part_count ?? rawChunk.partCount, 0));
+  const estimatedPathCost = clampNonNegativeNumber(
+    rawChunk.estimated_path_cost ?? rawChunk.estimatedPathCost,
+    featureCount,
+  );
   return {
     id: chunkId,
     url: chunkUrl,
@@ -81,7 +103,11 @@ function normalizeChunkEntry(rawChunk = {}) {
     minZoom: clampNumber(rawChunk.min_zoom ?? rawChunk.minZoom, 0, 99, 0),
     maxZoom: clampNumber(rawChunk.max_zoom ?? rawChunk.maxZoom, 0, 99, 99),
     priority: clampNumber(rawChunk.priority, -999, 999, 0),
-    featureCount: Math.max(0, Number(rawChunk.feature_count || rawChunk.featureCount || 0) || 0),
+    featureCount,
+    byteSize,
+    coordCount,
+    partCount,
+    estimatedPathCost,
     dataFormat: String(rawChunk.data_format || rawChunk.dataFormat || "geojson").trim().toLowerCase(),
     countryCodes: Array.isArray(rawChunk.country_codes || rawChunk.countryCodes)
       ? rawChunk.country_codes || rawChunk.countryCodes
@@ -118,6 +144,12 @@ function sortChunksForSelection(chunks, focusCountry = "", viewportBbox = [-180,
       if (left.lod === "detail") return -1;
       if (right.lod === "detail") return 1;
     }
+    if (Math.abs(left.estimatedPathCost - right.estimatedPathCost) > 0.0001) {
+      return left.estimatedPathCost - right.estimatedPathCost;
+    }
+    if (left.byteSize !== right.byteSize) return left.byteSize - right.byteSize;
+    if (left.coordCount !== right.coordCount) return left.coordCount - right.coordCount;
+    if (left.partCount !== right.partCount) return left.partCount - right.partCount;
     if (left.featureCount !== right.featureCount) return left.featureCount - right.featureCount;
     return left.id.localeCompare(right.id);
   });
@@ -137,6 +169,18 @@ export function normalizeScenarioRenderBudgetHints(rawHints = {}) {
       12,
       DEFAULT_RENDER_BUDGET_HINTS.max_optional_chunks
     ),
+    min_required_chunks: clampNumber(
+      rawHints.min_required_chunks,
+      1,
+      24,
+      DEFAULT_RENDER_BUDGET_HINTS.min_required_chunks
+    ),
+    max_required_estimated_path_cost: clampNumber(
+      rawHints.max_required_estimated_path_cost ?? rawHints.max_required_path_cost,
+      0,
+      5000000,
+      DEFAULT_RENDER_BUDGET_HINTS.max_required_estimated_path_cost
+    ),
     detail_zoom_threshold: clampNumber(
       rawHints.detail_zoom_threshold,
       1,
@@ -144,6 +188,36 @@ export function normalizeScenarioRenderBudgetHints(rawHints = {}) {
       DEFAULT_RENDER_BUDGET_HINTS.detail_zoom_threshold
     ),
   };
+}
+
+function takeRequiredChunksWithinCostBudget(orderedChunks = [], {
+  countBudget = 0,
+  minCount = 1,
+  estimatedPathCostBudget = 0,
+} = {}) {
+  const countLimit = Math.max(0, Math.floor(Number(countBudget || 0)));
+  if (!countLimit) return [];
+  const minimum = Math.max(0, Math.min(countLimit, Math.floor(Number(minCount || 0))));
+  const costLimit = Math.max(0, Number(estimatedPathCostBudget || 0));
+  const selected = [];
+  let selectedCost = 0;
+
+  orderedChunks.forEach((chunk) => {
+    if (selected.length >= countLimit) return;
+    const nextCost = Math.max(0, Number(chunk?.estimatedPathCost || chunk?.featureCount || 0));
+    const overCostBudget = costLimit > 0 && selected.length >= minimum && selectedCost + nextCost > costLimit;
+    if (overCostBudget) return;
+    selected.push(chunk);
+    selectedCost += nextCost;
+  });
+
+  orderedChunks.forEach((chunk) => {
+    if (selected.length >= Math.min(minimum, orderedChunks.length)) return;
+    if (selected.some((entry) => entry.id === chunk.id)) return;
+    selected.push(chunk);
+  });
+
+  return selected;
 }
 
 export function normalizeScenarioChunkManifest(payload = {}) {
@@ -320,14 +394,27 @@ export function selectScenarioChunks({
       seenRequired.add(chunk.id);
       prioritizedRequired.push(chunk);
     });
-    required.push(...prioritizedRequired.slice(0, requiredBudget));
-    if (ordered.length > requiredBudget && optionalBudget > 0) {
-      optional.push(...ordered.slice(requiredBudget, requiredBudget + optionalBudget));
+    const requiredForLayer = takeRequiredChunksWithinCostBudget(prioritizedRequired, {
+      countBudget: requiredBudget,
+      minCount: layerKey === "political"
+        ? Math.min(requiredBudget, Math.max(1, hints.max_required_chunks, hints.min_required_chunks))
+        : Math.min(requiredBudget, hints.min_required_chunks),
+      estimatedPathCostBudget: hints.max_required_estimated_path_cost,
+    });
+    required.push(...requiredForLayer);
+    if (optionalBudget > 0) {
+      const requiredIdSet = new Set(requiredForLayer.map((chunk) => chunk.id));
+      optional.push(...ordered.filter((chunk) => !requiredIdSet.has(chunk.id)).slice(0, optionalBudget));
     }
   });
   const uniqueRequired = Array.from(new Map(required.map((chunk) => [chunk.id, chunk])).values());
   const uniqueOptional = Array.from(new Map(optional.map((chunk) => [chunk.id, chunk])).values())
     .filter((chunk) => !uniqueRequired.some((requiredChunk) => requiredChunk.id === chunk.id));
+  const selectedFeatureCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.featureCount || 0)), 0);
+  const selectedByteCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.byteSize || 0)), 0);
+  const selectedCoordCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.coordCount || 0)), 0);
+  const selectedPartCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.partCount || 0)), 0);
+  const selectedEstimatedPathCostSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.estimatedPathCost || 0)), 0);
   const retainedIds = new Set([...uniqueRequired, ...uniqueOptional].map((chunk) => chunk.id));
   const evictableChunkIds = Array.isArray(loadedChunkIds)
     ? loadedChunkIds
@@ -342,6 +429,11 @@ export function selectScenarioChunks({
     evictableChunkIds,
     zoom,
     viewportBbox: normalizeBounds(viewportBbox),
+    selectedFeatureCountSum,
+    selectedByteCountSum,
+    selectedCoordCountSum,
+    selectedPartCountSum,
+    selectedEstimatedPathCostSum,
   };
 }
 

@@ -2,9 +2,9 @@ let scheduleRenderImpl = null;
 let flushRenderImpl = null;
 let ensureDetailTopologyImpl = null;
 let pendingReasons = [];
+let lastScheduledReasons = [];
 let lastScheduledReason = "";
 let lastFlushReason = "";
-let pendingResetHandle = null;
 let requestPending = false;
 
 function normalizeReason(reason = "") {
@@ -14,7 +14,6 @@ function normalizeReason(reason = "") {
 function clearPendingReasons() {
   pendingReasons = [];
   requestPending = false;
-  pendingResetHandle = null;
 }
 
 export function bindRenderBoundary({
@@ -26,6 +25,7 @@ export function bindRenderBoundary({
   flushRenderImpl = typeof flushRender === "function" ? flushRender : null;
   ensureDetailTopologyImpl = typeof ensureDetailTopology === "function" ? ensureDetailTopology : null;
   clearPendingReasons();
+  lastScheduledReasons = [];
   lastScheduledReason = "";
   lastFlushReason = "";
 }
@@ -38,21 +38,12 @@ export function requestRender(reason = "") {
   if (normalizedReason && !pendingReasons.includes(normalizedReason)) {
     pendingReasons.push(normalizedReason);
   }
+  lastScheduledReasons = [...pendingReasons];
   lastScheduledReason = normalizedReason;
   if (requestPending) {
     return true;
   }
   requestPending = true;
-  if (pendingResetHandle === null && typeof globalThis.requestAnimationFrame === "function") {
-    pendingResetHandle = globalThis.requestAnimationFrame(() => {
-      clearPendingReasons();
-    });
-  }
-  if (pendingResetHandle === null) {
-    pendingResetHandle = globalThis.setTimeout(() => {
-      clearPendingReasons();
-    }, 0);
-  }
   scheduleRenderImpl({
     reason: normalizedReason,
     reasons: [...pendingReasons],
@@ -65,17 +56,16 @@ export function flushRenderBoundary(reason = "") {
     return false;
   }
   lastFlushReason = normalizeReason(reason);
-  if (pendingResetHandle !== null) {
-    if (typeof globalThis.cancelAnimationFrame === "function") {
-      globalThis.cancelAnimationFrame(pendingResetHandle);
-    }
-    if (typeof globalThis.clearTimeout === "function") {
-      globalThis.clearTimeout(pendingResetHandle);
-    }
+  try {
+    flushRenderImpl({ reason: lastFlushReason });
+  } finally {
+    clearPendingReasons();
   }
-  clearPendingReasons();
-  flushRenderImpl({ reason: lastFlushReason });
   return true;
+}
+
+export function markRenderBoundaryFlushed() {
+  clearPendingReasons();
 }
 
 export async function ensureDetailTopologyBoundary(options = {}) {
@@ -88,6 +78,7 @@ export async function ensureDetailTopologyBoundary(options = {}) {
 export function getRenderBoundaryDebugState() {
   return {
     pendingReasons: [...pendingReasons],
+    lastScheduledReasons: [...lastScheduledReasons],
     lastScheduledReason,
     lastFlushReason,
     requestPending,

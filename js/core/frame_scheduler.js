@@ -16,12 +16,12 @@ function nowMs() {
   return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
 }
 
-function hasPendingInput(priority = "normal") {
+function hasPendingInput(priority = "normal", { includeContinuous = null } = {}) {
   const scheduler = globalThis.navigator?.scheduling;
   if (!scheduler || typeof scheduler.isInputPending !== "function") return false;
-  const includeContinuous = priority === "high" ? false : true;
+  const resolvedIncludeContinuous = includeContinuous == null ? priority !== "high" : !!includeContinuous;
   try {
-    return !!scheduler.isInputPending({ includeContinuous });
+    return !!scheduler.isInputPending({ includeContinuous: resolvedIncludeContinuous });
   } catch (error) {
     return !!scheduler.isInputPending();
   }
@@ -48,23 +48,51 @@ function scheduleDrain() {
   globalThis.setTimeout(() => drain(null), 0);
 }
 
-export function enqueueFrameTask(task, { priority = "normal", label = "task" } = {}) {
-  if (typeof task !== "function") return null;
-  const entry = {
-    id: sequence += 1,
-    task,
-    priority: Object.prototype.hasOwnProperty.call(PRIORITY_WEIGHT, priority) ? priority : "normal",
-    label: String(label || "task"),
-    canceled: false,
-  };
-  queue.push(entry);
-  scheduleDrain();
+function createFrameTaskHandle(entry) {
   return {
     id: entry.id,
     cancel() {
       entry.canceled = true;
     },
   };
+}
+
+export function enqueueFrameTask(task, {
+  priority = "normal",
+  label = "task",
+  generation = null,
+  dedupe = false,
+  deferOnContinuousInput = false,
+} = {}) {
+  if (typeof task !== "function") return null;
+  const normalizedLabel = String(label || "task");
+  const normalizedGeneration = generation == null ? "" : String(generation);
+  const labelGenerationKey = normalizedGeneration ? `${normalizedLabel}:${normalizedGeneration}` : normalizedLabel;
+  if (dedupe) {
+    const existing = queue.find((entry) =>
+      entry
+      && !entry.canceled
+      && entry.labelGenerationKey === labelGenerationKey
+    );
+    if (existing) {
+      existing.handle = existing.handle || createFrameTaskHandle(existing);
+      return existing.handle;
+    }
+  }
+  const entry = {
+    id: sequence += 1,
+    task,
+    priority: Object.prototype.hasOwnProperty.call(PRIORITY_WEIGHT, priority) ? priority : "normal",
+    label: normalizedLabel,
+    generation: normalizedGeneration,
+    labelGenerationKey,
+    deferOnContinuousInput: !!deferOnContinuousInput,
+    canceled: false,
+  };
+  entry.handle = createFrameTaskHandle(entry);
+  queue.push(entry);
+  scheduleDrain();
+  return entry.handle;
 }
 
 export function runFrameTasks(budgetMs = DEFAULT_FRAME_BUDGET_MS) {
@@ -91,10 +119,15 @@ export function runFrameTasks(budgetMs = DEFAULT_FRAME_BUDGET_MS) {
 
   while (queue.length && highTasksConsumed < highPriorityMinPerDrain) {
     if (nowMs() - startedAt >= budget) break;
+    if (hasPendingInput("high")) break;
     const entryIndex = queue.findIndex((entry) => !!entry && !entry.canceled && entry.priority === "high");
     if (entryIndex < 0) break;
     const [entry] = queue.splice(entryIndex, 1);
     if (!entry || entry.canceled) continue;
+    if (entry.deferOnContinuousInput && hasPendingInput("normal")) {
+      queue.unshift(entry);
+      break;
+    }
     runTask(entry);
     highTasksConsumed += 1;
   }
@@ -103,7 +136,7 @@ export function runFrameTasks(budgetMs = DEFAULT_FRAME_BUDGET_MS) {
     if (nowMs() - startedAt >= budget) break;
     const entry = queue.shift();
     if (!entry || entry.canceled) continue;
-    if (hasPendingInput(entry.priority)) {
+    if (hasPendingInput(entry.priority, { includeContinuous: entry.deferOnContinuousInput ? true : null })) {
       queue.unshift(entry);
       break;
     }
@@ -114,18 +147,25 @@ export function runFrameTasks(budgetMs = DEFAULT_FRAME_BUDGET_MS) {
   }
 }
 
-export function getFrameSchedulerQueueLength({ byPriority = false } = {}) {
+export function getFrameSchedulerQueueLength({ byPriority = false, byLabelGeneration = false } = {}) {
   const stats = {
     high: 0,
     normal: 0,
     low: 0,
     total: 0,
   };
+  if (byLabelGeneration) {
+    stats.byLabelGeneration = {};
+  }
   queue.forEach((entry) => {
     if (!entry || entry.canceled) return;
     const priority = Object.prototype.hasOwnProperty.call(PRIORITY_WEIGHT, entry.priority) ? entry.priority : "normal";
     stats[priority] += 1;
     stats.total += 1;
+    if (byLabelGeneration) {
+      const key = String(entry.labelGenerationKey || entry.label || "task");
+      stats.byLabelGeneration[key] = (stats.byLabelGeneration[key] || 0) + 1;
+    }
   });
-  return byPriority ? stats : stats.total;
+  return byPriority || byLabelGeneration ? stats : stats.total;
 }

@@ -138,3 +138,26 @@ Acceptance:
 - 本轮优先完成两道前置门与五阶段骨架。阶段 1 exact 指标在 benchmark 中已降到 11.5ms，但 wheel idle/long task/black ratio 仍超出阶段阈值。
 - 阶段 4 采用保留 guardrail 的 inventory 结果；删除 fallback 缓存会扩大风险。
 - 阶段 5 只提交 default-off 协议壳与契约，实际 raster offload 需要在下一轮以 worker lane 独立实现。
+
+## 2026-04-29 repeated zoom performance execution plan
+
+### Goal
+Quantify and reduce repeated zoom degradation across TNO Europe, US East, and East Asia without visual downgrade.
+
+### Scope
+- Extend editor benchmark to schema 3.2 with repeatedZoomRegions and region-level degradation, memory, long-task, black-pixel, scheduler, and chunk metrics.
+- Fix cumulative runtime work: stale chunk refresh discard, focus country hint TTL, protected detail chunks excluded from current merge, and post-commit replay reason/currentness.
+- Make frame scheduler and exact-after-settle work generation-aware and input-aware.
+- Reduce UI hot-path noise in zoom toolbar, sidebar inspector/preset refresh, day/night UTC interval, and render-boundary reason tracking.
+- Add chunk manifest cost fields and make chunk selection cost-aware while preserving existing feature identity and scenario semantics.
+
+### Verification
+- Parent thread owns all live tests and perf gates.
+- Subagents remain static-only.
+- Required gates: perf contract, scenario chunk contracts, perf probe behavior, Python unit contracts, dev E2E, and perf gate.
+- Full repeatedZoomRegions live benchmark is the measurement artifact for final region degradation comparison.
+
+### Closeout note
+- Final repeatedZoomRegions benchmark passed the 1.25 degradation target for all three regions: Europe 0.9039, US East 1.0131, East Asia 1.0632.
+- Cost-aware selection now lowers high-cost detail selection in complex regions while keeping center/overlap relevance ahead of raw cost.
+- This active folder stays open for future worker raster and political/background full-pass architecture slices.

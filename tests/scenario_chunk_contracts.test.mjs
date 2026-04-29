@@ -2,12 +2,121 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { selectScenarioChunks } from "../js/core/scenario_chunk_manager.js";
 
 const REPO_ROOT = process.cwd();
 
 function readRepoFile(...relativeParts) {
   return fs.readFileSync(path.join(REPO_ROOT, ...relativeParts), "utf8");
 }
+
+test("chunk cost tie-breaker preserves viewport center relevance", () => {
+  const selection = selectScenarioChunks({
+    scenarioId: "tno_1962",
+    chunkRegistry: {
+      byLayer: {
+        political: [
+          {
+            id: "cheap-edge",
+            url: "cheap-edge.json",
+            layer: "political",
+            lod: "detail",
+            bounds: [-10, -10, -8, -8],
+            minZoom: 0,
+            maxZoom: 99,
+            priority: 0,
+            countryCodes: [],
+            estimatedPathCost: 1,
+            byteSize: 1,
+            coordCount: 1,
+            partCount: 1,
+            featureCount: 1,
+          },
+          {
+            id: "expensive-center",
+            url: "expensive-center.json",
+            layer: "political",
+            lod: "detail",
+            bounds: [-1, -1, 1, 1],
+            minZoom: 0,
+            maxZoom: 99,
+            priority: 0,
+            countryCodes: [],
+            estimatedPathCost: 1000,
+            byteSize: 1000,
+            coordCount: 1000,
+            partCount: 100,
+            featureCount: 100,
+          },
+        ],
+      },
+    },
+    zoom: 10,
+    viewportBbox: [-10, -10, 10, 10],
+    visibleLayers: ["political"],
+    renderBudgetHints: {
+      max_required_chunks: 1,
+      max_optional_chunks: 0,
+    },
+  });
+  assert.equal(selection.requiredChunks[0]?.id, "expensive-center");
+});
+
+test("chunk cost budget limits high-cost required detail tail", () => {
+  const selection = selectScenarioChunks({
+    scenarioId: "tno_1962",
+    chunkRegistry: {
+      byLayer: {
+        political: [
+          {
+            id: "center-a",
+            url: "center-a.json",
+            layer: "political",
+            lod: "detail",
+            bounds: [-1, -1, 1, 1],
+            minZoom: 0,
+            maxZoom: 99,
+            priority: 0,
+            countryCodes: [],
+            estimatedPathCost: 10,
+            byteSize: 10,
+            coordCount: 10,
+            partCount: 1,
+            featureCount: 1,
+          },
+          {
+            id: "center-b",
+            url: "center-b.json",
+            layer: "political",
+            lod: "detail",
+            bounds: [-1, -1, 1, 1],
+            minZoom: 0,
+            maxZoom: 99,
+            priority: 0,
+            countryCodes: [],
+            estimatedPathCost: 10,
+            byteSize: 10,
+            coordCount: 10,
+            partCount: 1,
+            featureCount: 1,
+          },
+        ],
+      },
+    },
+    zoom: 10,
+    viewportBbox: [-10, -10, 10, 10],
+    visibleLayers: ["political"],
+    renderBudgetHints: {
+      max_required_chunks: 1,
+      min_required_chunks: 1,
+      max_optional_chunks: 0,
+      max_required_estimated_path_cost: 15,
+    },
+  });
+
+  assert.deepEqual(selection.requiredChunks.map((chunk) => chunk.id), ["center-a"]);
+  assert.equal(selection.selectedEstimatedPathCostSum, 10);
+});
 
 test("exact-after-settle keeps scenario overlays on the contextScenario reuse path", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
@@ -17,6 +126,7 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
   const politicalRasterWorkerClientSource = readRepoFile("js", "core", "political_raster_worker_client.js");
   const politicalRasterWorkerSource = readRepoFile("js", "workers", "political_raster.worker.js");
   const chunkRuntimeSource = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
+  const chunkManagerSource = readRepoFile("js", "core", "scenario_chunk_manager.js");
   const postApplyEffectsSource = readRepoFile("js", "core", "scenario_post_apply_effects.js");
   const interactionRecoveryBlockedBody =
     rendererSource.match(/function isInteractionRecoveryBlocked\(\) \{(?<body>[\s\S]*?)\n\}/)?.groups?.body || "";
@@ -139,8 +249,20 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && /scheduleExactAfterSettleRefresh[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Prepare"[\s\S]*?enqueueExactAfterSettleSegment\(generation, "Apply"/.test(rendererSource),
     frameSchedulerQueueMetricsReportedPerPriority:
       frameSchedulerSource.includes("HIGH_PRIORITY_MIN_PER_DRAIN = 1")
-      && /export function getFrameSchedulerQueueLength\(\{ byPriority = false \} = \{\}\) \{[\s\S]*?high:[\s\S]*?normal:[\s\S]*?low:[\s\S]*?total:/.test(frameSchedulerSource)
-      && /function render\(\) \{[\s\S]*?getFrameSchedulerQueueLength\(\{ byPriority: true \}\);[\s\S]*?recordRenderPerfMetric\("frameSchedulerQueueDepth", 0, frameSchedulerQueue\);/.test(rendererSource),
+      && frameSchedulerSource.includes("byLabelGeneration = false")
+      && frameSchedulerSource.includes("labelGenerationKey")
+      && /export function getFrameSchedulerQueueLength\(\{ byPriority = false, byLabelGeneration = false \} = \{\}\) \{[\s\S]*?high:[\s\S]*?normal:[\s\S]*?low:[\s\S]*?total:/.test(frameSchedulerSource)
+      && /function render\(\) \{[\s\S]*?getFrameSchedulerQueueLength\(\{ byPriority: true, byLabelGeneration: true \}\);[\s\S]*?recordRenderPerfMetric\("frameSchedulerQueueDepth", 0, frameSchedulerQueue\);/.test(rendererSource),
+    exactAfterSettleDedupesByGeneration:
+      /function enqueueExactAfterSettleSegment\(generation, label, task\) \{[\s\S]*?generation,[\s\S]*?dedupe: true,[\s\S]*?deferOnContinuousInput: true/.test(rendererSource)
+      && /label: `exact-after-settle-pass-\$\{passName\}`,[\s\S]*?generation,[\s\S]*?dedupe: true,[\s\S]*?deferOnContinuousInput: true/.test(rendererSource),
+    buildHitCanvasReportsVisibleAndGridCandidateCounts:
+      rendererSource.includes("lastHitCanvasBuildStats")
+      && rendererSource.includes("visibleItemCount")
+      && rendererSource.includes("cellCandidateCount")
+      && rendererSource.includes("globalCandidateCount")
+      && rendererSource.includes("globalCount")
+      && rendererSource.includes("cellSpan"),
     exactAfterSettleDefersPoliticalFastExact:
       /function drawTransformedFrameFromCaches[\s\S]*?settlePoliticalFastExactSkipped[\s\S]*?defer-to-sliced-exact-refresh/.test(rendererSource)
       && !/function drawTransformedFrameFromCaches[\s\S]*?renderPassToCache\("political", \(k\) => drawPoliticalPass\(k\)/.test(rendererSource),
@@ -164,6 +286,8 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && chunkRuntimeSource.includes('"render-phase-idle", "exact-after-settle", "scenario-apply", "scenario-apply-detail-prewarm"')
       && chunkRuntimeSource.includes('previousSelection?.requiredChunkIds')
       && chunkRuntimeSource.includes('chunkId.startsWith("political.detail.")')
+      && chunkRuntimeSource.includes("selection.cacheOnlyChunkIds")
+      && chunkRuntimeSource.includes("getScenarioChunkActiveMergeIds")
       && /const previousSelection = loadState\.lastSelection;[\s\S]*?applyZoomEndChunkProtection\(selection, loadState, \{[\s\S]*?reason: normalizedReason,[\s\S]*?previousSelection,/.test(chunkRuntimeSource),
     stalePostApplyRefreshDoesNotEvictRecentZoomEndDetail:
       /function shouldSkipStalePostApplyRefreshAfterZoomEnd\(loadState, reason = "", \{[\s\S]*?scenarioId = "",[\s\S]*?selectionVersion = 0,[\s\S]*?refreshSourceStartedAtMs = 0,[\s\S]*?lastSelection\?\.reason[\s\S]*?lastZoomEndToChunkVisibleMetric[\s\S]*?metric\?\.scenarioId[\s\S]*?metric\?\.selectionVersion[\s\S]*?sourceStartedAt > 0 && sourceStartedAt <= recordedAt/.test(chunkRuntimeSource)
@@ -172,6 +296,20 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && /scheduleScenarioChunkRefresh\(\{[\s\S]*?reason: replayReason,[\s\S]*?refreshSourceStartedAtMs: Number\(pendingPostCommitRefresh\.refreshSourceStartedAtMs \|\| 0\),[\s\S]*?\}\);/.test(chunkRuntimeSource)
       && /scheduleScenarioChunkRefresh\(\{[\s\S]*?reason: "scenario-apply-detail-prewarm",[\s\S]*?refreshSourceStartedAtMs: prewarmStartedAt,[\s\S]*?\}\);/.test(postApplyEffectsSource)
       && /scheduleScenarioChunkRefresh\(\{[\s\S]*?reason: "scenario-apply",[\s\S]*?refreshSourceStartedAtMs: prewarmStartedAt,[\s\S]*?\}\);/.test(postApplyEffectsSource),
+    chunkSelectionCarriesCostFieldsAndSums:
+      chunkManagerSource.includes("byteSize")
+      && chunkManagerSource.includes("coordCount")
+      && chunkManagerSource.includes("partCount")
+      && chunkManagerSource.includes("estimatedPathCost")
+      && chunkManagerSource.includes("selectedFeatureCountSum")
+      && chunkManagerSource.includes("selectedEstimatedPathCostSum")
+      && chunkManagerSource.includes("max_required_estimated_path_cost")
+      && chunkManagerSource.includes("takeRequiredChunksWithinCostBudget"),
+    focusCountryOverrideHasTtlAndIsConsumed:
+      chunkRuntimeSource.includes("FOCUS_COUNTRY_OVERRIDE_TTL_MS")
+      && chunkRuntimeSource.includes("focusCountryOverrideExpiresAt")
+      && chunkRuntimeSource.includes("consumeScenarioChunkFocusCountryOverride(loadState)")
+      && chunkRuntimeSource.includes("clearScenarioChunkFocusCountryOverride(loadState)"),
   };
 
   Object.entries(contract).forEach(([label, ok]) => {
@@ -202,7 +340,7 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
     ensureAppPathUrlRewritesRootAndNestedPaths:
       /def ensure_app_path_url\(url: str\) -> str:[\s\S]*?if path\.startswith\("\/app\/"\) or path == "\/app":[\s\S]*?elif path == "\/":[\s\S]*?normalized_path = "\/app\/"[\s\S]*?else:[\s\S]*?normalized_path = f"\/app\{path\}" if path\.startswith\("\/"\) else f"\/app\/\{path\}"/.test(benchmarkSource),
     buildScenarioOpenUrlsAddsPerfOverlayAndScenarioCandidate:
-      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1"\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?scenario_perf_url = with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)[\s\S]*?urls\.append\(scenario_perf_url\)[\s\S]*?urls\.append\(perf_url\)/.test(benchmarkSource),
+      /def build_scenario_open_urls\([\s\S]*?perf_url = with_query_overrides\(ensure_app_path_url\(base_url\), perf_overlay="1", runtime_chunk_perf="1"\)[\s\S]*?if normalized_scenario_id and normalized_scenario_id != "none":[\s\S]*?scenario_perf_url = with_query_overrides\(perf_url, default_scenario=normalized_scenario_id\)[\s\S]*?urls\.append\(scenario_perf_url\)[\s\S]*?urls\.append\(perf_url\)/.test(benchmarkSource),
     openPageKeepsWrapperThenLocalFallbackAcrossCandidates:
       /def open_page\(urls: list\[str\] \| tuple\[str, \.\.\.\] \| str\) -> dict:[\s\S]*?if PWCLI\.exists\(\):[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_wrapper_pw\("open", candidate_url, "--browser", browser_name,[\s\S]*?for browser_name in OPEN_BROWSER_CANDIDATES:[\s\S]*?for candidate_url in candidate_urls:[\s\S]*?run_local_pw\(\s*"open",\s*candidate_url,\s*"--browser",\s*browser_name,/.test(benchmarkSource),
     suiteBaseUrlsKeepOriginalAndAppVariants:
@@ -321,7 +459,7 @@ test("Atlantropa land interaction contracts use owner-aware targets with runtime
       && /shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature/.test(spatialOwnerSource)
       && /shouldExcludePoliticalVisualFeature,/.test(spatialOwnerSource),
     hitCanvasStillFiltersNonInteractiveSpatialItems:
-      /const visibleSpatialItems = collectVisibleLandSpatialItems\(\);[\s\S]*?visibleSpatialItems\.forEach\(\(item\) => \{[\s\S]*?shouldExcludePoliticalInteractionFeature\(item\.feature, item\.id\)/.test(rendererSource),
+      /const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats\(\);[\s\S]*?const visibleSpatialItems = visibleSpatialItemsResult\.items;[\s\S]*?visibleSpatialItems\.forEach\(\(item\) => \{[\s\S]*?shouldExcludePoliticalInteractionFeature\(item\.feature, item\.id\)/.test(rendererSource),
   };
 
   Object.entries(checks).forEach(([label, ok]) => {
@@ -512,6 +650,46 @@ test("frame scheduler keeps high-priority exact slices draining under continuous
     const queueAfterRelease = scheduler.getFrameSchedulerQueueLength({ byPriority: true });
     assert.equal(queueAfterRelease.total, 0);
     assert.equal(calls[calls.length - 1], "normal");
+  } finally {
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: originalNavigator,
+    });
+  }
+});
+
+test("frame scheduler defers high tasks for discrete input and dedupes label generation", async () => {
+  const scheduler = await import("../js/core/frame_scheduler.js");
+  const originalNavigator = globalThis.navigator;
+  const calls = [];
+  let discreteInputPending = true;
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: {
+      scheduling: {
+        isInputPending: ({ includeContinuous } = {}) => includeContinuous ? true : discreteInputPending,
+      },
+    },
+  });
+  try {
+    scheduler.enqueueFrameTask(() => {
+      calls.push("deduped");
+    }, { priority: "high", label: "exact-after-settle-Apply", generation: 42, dedupe: true });
+    scheduler.enqueueFrameTask(() => {
+      calls.push("deduped-again");
+    }, { priority: "high", label: "exact-after-settle-Apply", generation: 42, dedupe: true });
+    const queued = scheduler.getFrameSchedulerQueueLength({ byPriority: true, byLabelGeneration: true });
+    assert.equal(queued.high, 1);
+    assert.equal(queued.byLabelGeneration["exact-after-settle-Apply:42"], 1);
+
+    scheduler.runFrameTasks(8);
+    assert.deepEqual(calls, []);
+    assert.equal(scheduler.getFrameSchedulerQueueLength({ byPriority: true }).high, 1);
+
+    discreteInputPending = false;
+    scheduler.runFrameTasks(8);
+    assert.deepEqual(calls, ["deduped"]);
+    assert.equal(scheduler.getFrameSchedulerQueueLength({ byPriority: true }).total, 0);
   } finally {
     Object.defineProperty(globalThis, "navigator", {
       configurable: true,

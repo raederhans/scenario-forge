@@ -24,6 +24,8 @@ export function createDefaultRuntimeChunkLoadState({ scenarioId = "" } = {}) {
     pendingReason: "",
     pendingDelayMs: null,
     focusCountryOverride: "",
+    focusCountryOverrideSource: "",
+    focusCountryOverrideExpiresAt: 0,
     zoomEndChunkVisibleMetric: null,
     lastZoomEndToChunkVisibleMetric: null,
     zoomEndProtectedChunkIds: [],

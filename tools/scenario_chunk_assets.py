@@ -251,6 +251,52 @@ def _collect_coordinates(node: Any, sink: list[tuple[float, float]]) -> None:
             _collect_coordinates(child, sink)
 
 
+def _count_geometry_coordinates(node: Any) -> int:
+    coordinates: list[tuple[float, float]] = []
+    _collect_coordinates(node, coordinates)
+    return len(coordinates)
+
+
+def _count_geometry_parts(geometry: dict[str, Any] | None) -> int:
+    if not isinstance(geometry, dict):
+        return 0
+    geometry_type = str(geometry.get("type") or "").strip()
+    coordinates = geometry.get("coordinates")
+    if geometry_type in {"Point", "LineString", "Polygon"}:
+        return 1 if coordinates else 0
+    if geometry_type == "MultiPoint":
+        return len(coordinates) if isinstance(coordinates, list) else 0
+    if geometry_type == "MultiLineString":
+        return len(coordinates) if isinstance(coordinates, list) else 0
+    if geometry_type == "MultiPolygon":
+        return len(coordinates) if isinstance(coordinates, list) else 0
+    if geometry_type == "GeometryCollection":
+        geometries = geometry.get("geometries") if isinstance(geometry.get("geometries"), list) else []
+        return sum(_count_geometry_parts(entry) for entry in geometries)
+    return 0
+
+
+def _build_chunk_cost_summary(payload: dict[str, Any], chunk_path: Path) -> dict[str, int]:
+    feature_collection = _layer_payload_to_feature_collection("", payload)
+    features = feature_collection.get("features") if isinstance(feature_collection, dict) else []
+    if not features and isinstance(payload.get("featureCollection"), dict):
+        features = payload["featureCollection"].get("features") if isinstance(payload["featureCollection"].get("features"), list) else []
+    coord_count = 0
+    part_count = 0
+    for feature in features if isinstance(features, list) else []:
+        geometry = feature.get("geometry") if isinstance(feature, dict) else None
+        coord_count += _count_geometry_coordinates((geometry or {}).get("coordinates") if isinstance(geometry, dict) else None)
+        part_count += _count_geometry_parts(geometry)
+    byte_size = int(chunk_path.stat().st_size) if chunk_path.exists() else len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+    estimated_path_cost = max(0, coord_count + (part_count * 8) + (len(features) * 3 if isinstance(features, list) else 0))
+    return {
+        "byte_size": byte_size,
+        "coord_count": coord_count,
+        "part_count": part_count,
+        "estimated_path_cost": estimated_path_cost,
+    }
+
+
 def _feature_bounds(feature: dict[str, Any]) -> list[float]:
     coordinates: list[tuple[float, float]] = []
     _collect_coordinates((feature.get("geometry") or {}).get("coordinates"), coordinates)
@@ -648,6 +694,7 @@ def _build_chunk_payloads_for_feature_collection(
                     _write_minified_json(chunk_path, chunk_payload)
                 else:
                     _write_json(chunk_path, chunk_payload)
+                chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
                 manifest_chunks.append({
                     "id": chunk_id,
                     "layer": layer_key,
@@ -658,6 +705,7 @@ def _build_chunk_payloads_for_feature_collection(
                     "bounds": bounds,
                     "priority": 100 if layer_key == "political" and spec["lod"] == "coarse" else (90 if layer_key == "political" else (1 if spec["lod"] == "coarse" else 2)),
                     "feature_count": len(selected_feature_ids),
+                    **chunk_cost_summary,
                     "data_format": "geojson",
                     "global_coverage": bool(spec["global_coverage"]),
                     "country_codes": chunk_country_codes,
@@ -736,7 +784,9 @@ def _build_political_chunk_payloads(
             chunk_payload = _slice_feature_collection(runtime_feature_collection, selected_feature_ids)
             chunk_id = f"political.detail.country.{country_code.lower()}"
             chunk_filename = f"{chunk_id}.json"
-            _write_json(chunks_dir / chunk_filename, chunk_payload)
+            chunk_path = chunks_dir / chunk_filename
+            _write_json(chunk_path, chunk_payload)
+            chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
             all_chunks.append({
                 "id": chunk_id,
                 "layer": "political",
@@ -747,6 +797,7 @@ def _build_political_chunk_payloads(
                 "bounds": bounds,
                 "priority": 95,
                 "feature_count": len(selected_feature_ids),
+                **chunk_cost_summary,
                 "data_format": "geojson",
                 "global_coverage": False,
                 "country_codes": [country_code] if country_code != "misc" else [],

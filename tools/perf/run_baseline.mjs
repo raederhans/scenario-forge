@@ -580,7 +580,7 @@ async function writeBaselineArtifacts(options, report) {
 
 const PERF_REPORT_CONTRACT_FIELDS = [
   { key: "schemaVersion", expected: 1 },
-  { key: "benchmarkMetricsSchemaVersion", expected: "3.1" },
+  { key: "benchmarkMetricsSchemaVersion", expected: "3.2" },
   { key: "probeSchema", expected: "mc_perf_snapshot" },
 ];
 
@@ -728,7 +728,7 @@ async function main() {
   const measurement = await runMeasurements(options);
   const report = {
     schemaVersion: 1,
-    benchmarkMetricsSchemaVersion: "3.1",
+    benchmarkMetricsSchemaVersion: "3.2",
     probeSchema: "mc_perf_snapshot",
     generatedAt: new Date().toISOString(),
     gitHead,

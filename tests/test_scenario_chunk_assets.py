@@ -272,6 +272,10 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
 
             coarse_chunk = next(chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["id"] == "political.coarse.r0c0")
             self.assertEqual(coarse_chunk["feature_count"], 1)
+            self.assertGreater(coarse_chunk["byte_size"], 0)
+            self.assertGreater(coarse_chunk["coord_count"], 0)
+            self.assertGreater(coarse_chunk["part_count"], 0)
+            self.assertGreater(coarse_chunk["estimated_path_cost"], 0)
             coarse_payload = json.loads((scenario_dir / "chunks" / "political.coarse.r0c0.json").read_text(encoding="utf-8"))
             self.assertEqual(len(coarse_payload["features"]), 1)
             self.assertNotIn("id", coarse_payload["features"][0])
@@ -367,6 +371,10 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
 
             coarse_chunk = next(chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["id"] == "water.coarse.r0c0")
             self.assertEqual(coarse_chunk["feature_count"], 2)
+            self.assertGreater(coarse_chunk["byte_size"], 0)
+            self.assertGreater(coarse_chunk["coord_count"], 0)
+            self.assertGreater(coarse_chunk["part_count"], 0)
+            self.assertGreater(coarse_chunk["estimated_path_cost"], 0)
 
             coarse_path = scenario_dir / "chunks" / "water.coarse.r0c0.json"
             coarse_text = coarse_path.read_text(encoding="utf-8")

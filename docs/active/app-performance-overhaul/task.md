@@ -234,3 +234,31 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] TNO wheel firstIdleAfterLast 降到 382.9ms，maxLong 降到 281ms。
 - [ ] political/background full pass 本体仍重，下一步继续提升 cache 命中率。
 - [ ] black pixel 指标仍高，下一步结合截图定位真实暗区与采样口径。
+
+## 2026-04-29 repeated zoom implementation checklist
+- [x] Re-read active docs, skills, lessons, and relevant memory before editing.
+- [x] Spawn static-only lanes for benchmark schema, chunk runtime, and scheduler/UI hot paths.
+- [x] Implement benchmark schema 3.2 and `repeatedZoomRegions` probe arguments/output.
+- [x] Add chunk manifest cost fields and cost-aware chunk selection summaries.
+- [x] Discard stale chunk refreshes by scenario/selection/signature and keep protected detail chunks cache-only outside current merge.
+- [x] Convert `focusCountryOverride` into a TTL/consumed zoom-end hint.
+- [x] Preserve post-commit replay reason and reject stale replay ownership.
+- [x] Add frame scheduler label+generation dedupe, input-aware deferral, and queue depth by label/generation.
+- [x] Narrow exact-after-settle passes to the current plan.
+- [x] Add hit-canvas visible/global/cell-span stats.
+- [x] Reduce zoom toolbar DOM writes, sidebar inspector/preset refresh fanout, and day/night interval lifetime.
+- [x] Keep render-boundary reasons until the real render flush and expose them in perf snapshots.
+- [x] Extend contract tests and run syntax/unit/node verification.
+- [x] Run dev E2E gates in parent-owned background-log mode.
+- [x] Run final perf gate and record pass/fail.
+- [x] Run full repeatedZoomRegions editor benchmark for after metrics.
+- [x] Run review/bug-check/first-principles pass and decide archive timing.
+
+## 2026-04-29 repeated zoom final verification
+- [x] Final `bench:editor-performance` passed with schema 3.2 and `interactionProbeSchema=mc_repeated_zoom_regions_v1`.
+- [x] TNO repeated zoom ratios: Europe 0.9039, US East 1.0131, East Asia 1.0632.
+- [x] Final repeated zoom chunk cost fields were populated from checked-in manifests: selected byte/coord/part/path-cost sums are present.
+- [x] Final dev E2E passed: scenario-chunk-runtime 4/4, tno-ready-state 5/5, interaction-funnel 3/3.
+- [x] Final `npm run perf:baseline` refreshed `docs/perf/baseline_2026-04-20.json/.md`.
+- [x] Final `npm run perf:gate` passed against `docs/perf/baseline_2026-04-20.json`.
+- [x] Final static review result recorded: static reviewer approved prior blockers; self-review found no simpler safe path than bounded cost-aware chunk selection plus stale-work cancellation. Folder remains active because worker raster and political/background full-pass work are still future slices.

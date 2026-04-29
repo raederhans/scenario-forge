@@ -293,6 +293,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         )
         self.assertIn("const renderTextureUI = () => {", owner_content)
         self.assertIn("const renderDayNightUI = () => {", owner_content)
+        self.assertIn("runtimeState.syncDayNightClockTimerFn?.();", owner_content)
         self.assertIn("const updateTextureStyle = (mutate, { historyKind = \"texture-style\", commitHistory = false } = {}) => {", owner_content)
         self.assertIn("const bindTextureRange = (element, handler) => {", owner_content)
         self.assertIn("const bindTextureColorInput = (element, handler) => {", owner_content)
@@ -310,6 +311,12 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("renderTextureUI();", content)
         self.assertIn("renderDayNightUI();", content)
         self.assertIn('registerRuntimeHook(state, "updateToolbarInputsFn", () => {', content)
+
+    def test_zoom_toolbar_update_avoids_rewriting_clean_dom_state(self):
+        content = TOOLBAR_JS.read_text(encoding="utf-8")
+        self.assertIn("if (zoomPercentInput.value !== text)", content)
+        self.assertIn('zoomPercentInput.hasAttribute("aria-invalid")', content)
+        self.assertIn("if (zoomPercentInput.dataset.zoomError)", content)
 
     def test_appearance_controller_owns_city_urban_physical_rivers_logic(self):
         toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")

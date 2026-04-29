@@ -566,6 +566,7 @@ export function createAppearanceControlsController({
     updateTextureValueLabel(dayNightShadowOpacityValue, `${Math.round(dayNight.shadowOpacity * 100)}%`);
     if (dayNightTwilightWidth) dayNightTwilightWidth.value = String(Math.round(dayNight.twilightWidthDeg));
     updateTextureValueLabel(dayNightTwilightWidthValue, `${Math.round(dayNight.twilightWidthDeg)}°`);
+    runtimeState.syncDayNightClockTimerFn?.();
   };
 
   const updateTextureStyle = (mutate, { historyKind = "texture-style", commitHistory = false } = {}) => {

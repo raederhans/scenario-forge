@@ -506,7 +506,33 @@ def parse_args() -> argparse.Namespace:
         help="Output JSON path.",
     )
     parser.add_argument("--screenshot-dir", default=".runtime/browser/mcp-artifacts/perf", help="Screenshot directory.")
+    parser.add_argument(
+        "--repeated-zoom-regions",
+        default="europe,us_east,east_asia",
+        help="Comma-separated repeated zoom region ids for the TNO interaction probe.",
+    )
+    parser.add_argument("--repeated-zoom-cycles", type=positive_int, default=8, help="Repeated zoom cycles per region.")
+    parser.add_argument(
+        "--repeated-zoom-wheels-per-cycle",
+        type=positive_int,
+        default=5,
+        help="Wheel events per repeated zoom cycle.",
+    )
     return parser.parse_args()
+
+
+def positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed <= 0:
+      raise argparse.ArgumentTypeError("value must be a positive integer")
+    return parsed
+
+
+def parse_repeated_zoom_regions(value: str) -> list[str]:
+    regions = [entry.strip() for entry in str(value or "").split(",") if entry.strip()]
+    if not regions:
+      raise ValueError("--repeated-zoom-regions must contain at least one region id.")
+    return list(dict.fromkeys(regions))
 
 
 def run_wrapper_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
@@ -628,9 +654,9 @@ def close_session() -> None:
     BROWSER_OPENED = False
 
 
-def run_code_json(js_code: str) -> dict | list | str:
+def run_code_json(js_code: str, timeout_sec: int = 240) -> dict | list | str:
     compact = " ".join(line.strip() for line in js_code.splitlines() if line.strip())
-    return run_pw("run-code", compact, expect_json=True)
+    return run_pw("run-code", compact, expect_json=True, timeout_sec=timeout_sec)
 
 
 def clone_frame_js(source: str) -> str:
@@ -653,6 +679,111 @@ def clone_frame_js(source: str) -> str:
 
 def clone_metrics_js(source: str) -> str:
     return f"""JSON.parse(JSON.stringify({source} || {{}}))"""
+
+
+def clone_runtime_chunk_load_state_summary_js(source: str = "state.runtimeChunkLoadState") -> str:
+    return f"""(() => {{
+      const loadState = {source} || {{}};
+      const countList = (value) => Array.isArray(value) ? value.length : 0;
+      const countKeys = (value) => value && typeof value === 'object' ? Object.keys(value).length : 0;
+      const lastSelection = loadState.lastSelection && typeof loadState.lastSelection === 'object'
+        ? loadState.lastSelection
+        : {{}};
+      const pendingPostCommitRefresh = loadState.pendingPostCommitRefresh && typeof loadState.pendingPostCommitRefresh === 'object'
+        ? loadState.pendingPostCommitRefresh
+        : null;
+      const cloneZoomMetric = (metric) => metric && typeof metric === 'object'
+        ? {{
+          durationMs: Number(metric.durationMs || 0),
+          recordedAt: Number(metric.recordedAt || 0),
+          scenarioId: String(metric.scenarioId || ''),
+          zoom: Number(metric.zoom || 0),
+          threshold: Number(metric.threshold || 0),
+          focusCountry: String(metric.focusCountry || ''),
+          requiredPoliticalChunkCount: Number(metric.requiredPoliticalChunkCount || 0),
+          requiredChunkCount: Number(metric.requiredChunkCount || 0),
+          loadedChunkCount: Number(metric.loadedChunkCount || 0),
+          selectionVersion: Number(metric.selectionVersion || 0),
+          promotionRetryCount: Number(metric.promotionRetryCount || 0),
+          pendingReason: String(metric.pendingReason || ''),
+        }}
+        : null;
+      return {{
+        shellStatus: String(loadState.shellStatus || ''),
+        registryStatus: String(loadState.registryStatus || ''),
+        refreshScheduled: !!loadState.refreshScheduled,
+        selectionVersion: Number(loadState.selectionVersion || 0),
+        pendingReason: String(loadState.pendingReason || ''),
+        pendingDelayMs: Number.isFinite(Number(loadState.pendingDelayMs)) ? Number(loadState.pendingDelayMs) : null,
+        focusCountryOverride: String(loadState.focusCountryOverride || ''),
+        focusCountryOverrideSource: String(loadState.focusCountryOverrideSource || ''),
+        focusCountryOverrideExpiresAt: Number(loadState.focusCountryOverrideExpiresAt || 0),
+        zoomEndProtectedChunkCount: countList(loadState.zoomEndProtectedChunkIds),
+        zoomEndProtectedUntil: Number(loadState.zoomEndProtectedUntil || 0),
+        zoomEndProtectedSelectionVersion: Number(loadState.zoomEndProtectedSelectionVersion || 0),
+        zoomEndProtectedScenarioId: String(loadState.zoomEndProtectedScenarioId || ''),
+        zoomEndProtectedFocusCountry: String(loadState.zoomEndProtectedFocusCountry || ''),
+        pendingVisualPromotionPresent: !!loadState.pendingVisualPromotion,
+        pendingInfraPromotionPresent: !!loadState.pendingInfraPromotion,
+        pendingPromotionPresent: !!loadState.pendingPromotion,
+        promotionScheduled: !!loadState.promotionScheduled,
+        promotionCommitInFlight: !!loadState.promotionCommitInFlight,
+        promotionCommitRunId: Number(loadState.promotionCommitRunId || 0),
+        promotionCommitStatus: String(loadState.promotionCommitStatus || ''),
+        promotionCommitScenarioId: String(loadState.promotionCommitScenarioId || ''),
+        promotionCommitSelectionVersion: Number(loadState.promotionCommitSelectionVersion || 0),
+        promotionCommitReason: String(loadState.promotionCommitReason || ''),
+        promotionCommitStartedAt: Number(loadState.promotionCommitStartedAt || 0),
+        promotionCommitFinishedAt: Number(loadState.promotionCommitFinishedAt || 0),
+        promotionCommitError: String(loadState.promotionCommitError || ''),
+        pendingPostCommitRefresh: pendingPostCommitRefresh ? {{
+          scenarioId: String(pendingPostCommitRefresh.scenarioId || ''),
+          selectionVersion: Number(pendingPostCommitRefresh.selectionVersion || 0),
+          reason: String(pendingPostCommitRefresh.reason || ''),
+          delayMs: Number(pendingPostCommitRefresh.delayMs || 0),
+          refreshSourceStartedAtMs: Number(pendingPostCommitRefresh.refreshSourceStartedAtMs || 0),
+        }} : null,
+        promotionRetryCount: Number(loadState.promotionRetryCount || 0),
+        lastPromotionRetryAt: Number(loadState.lastPromotionRetryAt || 0),
+        inFlightChunkCount: countKeys(loadState.inFlightByChunkId),
+        errorChunkCount: countKeys(loadState.errorByChunkId),
+        lastSelection: {{
+          reason: String(lastSelection.reason || ''),
+          scenarioId: String(lastSelection.scenarioId || ''),
+          selectionVersion: Number(lastSelection.selectionVersion || 0),
+          focusCountry: String(lastSelection.focusCountry || ''),
+          recordedAt: Number(lastSelection.recordedAt || 0),
+          requiredChunkCount: countList(lastSelection.requiredChunkIds),
+          optionalChunkCount: countList(lastSelection.optionalChunkIds),
+          cacheOnlyChunkCount: countList(lastSelection.cacheOnlyChunkIds),
+          zoomEndProtectionUntil: Number(lastSelection.zoomEndProtectionUntil || 0),
+        }},
+        layerSelectionSignatureCount: countKeys(loadState.layerSelectionSignatures),
+        mergedLayerPayloadCacheLayerCount: countKeys(loadState.mergedLayerPayloadCache),
+        zoomEndChunkVisibleMetric: cloneZoomMetric(loadState.zoomEndChunkVisibleMetric),
+        lastZoomEndToChunkVisibleMetric: cloneZoomMetric(loadState.lastZoomEndToChunkVisibleMetric),
+      }};
+    }})()"""
+
+
+def clone_repeated_zoom_render_metrics_summary_js(source: str = "state.renderPerfMetrics") -> str:
+    return f"""(() => {{
+      const metrics = {source} || {{}};
+      const clone = (value) => value && typeof value === 'object'
+        ? JSON.parse(JSON.stringify(value))
+        : null;
+      return {{
+        blackFrameCount: clone(metrics.blackFrameCount),
+        chunkSelectionMs: clone(metrics.chunkSelectionMs),
+        selectedFeatureCountSum: clone(metrics.selectedFeatureCountSum),
+        chunkMergeMs: clone(metrics.chunkMergeMs),
+        scenarioChunkPromotionVisualStage: clone(metrics.scenarioChunkPromotionVisualStage),
+        zoomEndToChunkVisibleMs: clone(metrics.zoomEndToChunkVisibleMs),
+        frameSchedulerQueueDepth: clone(metrics.frameSchedulerQueueDepth),
+        buildHitCanvas: clone(metrics.buildHitCanvas),
+        settleExactRefresh: clone(metrics.settleExactRefresh),
+      }};
+    }})()"""
 
 
 def sample_canvas_black_pixel_ratio_js() -> str:
@@ -694,6 +825,84 @@ def sample_canvas_black_pixel_ratio_js() -> str:
     })()"""
 
 
+def sample_canvas_black_pixel_details_js() -> str:
+    return """(() => {
+      const canvas = document.getElementById('map-canvas') || document.getElementById('colorCanvas');
+      if (!canvas || !canvas.width || !canvas.height) return null;
+      const sampleWidth = Math.min(80, Math.max(1, canvas.width));
+      const sampleHeight = Math.min(54, Math.max(1, canvas.height));
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = sampleWidth;
+      sampleCanvas.height = sampleHeight;
+      const sampleContext = sampleCanvas.getContext('2d', { willReadFrequently: true });
+      if (!sampleContext) return null;
+      const maxX = Math.max(0, canvas.width - sampleWidth);
+      const maxY = Math.max(0, canvas.height - sampleHeight);
+      const sampleRegions = [
+        ['center', 0.5, 0.5],
+        ['north_west', 0.25, 0.25],
+        ['north_east', 0.75, 0.25],
+        ['south_west', 0.25, 0.75],
+        ['south_east', 0.75, 0.75],
+      ];
+      let black = 0;
+      let sampled = 0;
+      const regions = [];
+      for (const [label, xRatio, yRatio] of sampleRegions) {
+        const sourceX = Math.round(maxX * xRatio);
+        const sourceY = Math.round(maxY * yRatio);
+        sampleContext.clearRect(0, 0, sampleWidth, sampleHeight);
+        sampleContext.drawImage(canvas, sourceX, sourceY, sampleWidth, sampleHeight, 0, 0, sampleWidth, sampleHeight);
+        const pixels = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+        let regionBlack = 0;
+        const regionSampled = sampleWidth * sampleHeight;
+        sampled += regionSampled;
+        for (let index = 0; index < pixels.length; index += 4) {
+          const alpha = pixels[index + 3];
+          const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
+          if (alpha > 0 && luminance < 8) regionBlack += 1;
+        }
+        black += regionBlack;
+        regions.push({
+          label,
+          xRatio,
+          yRatio,
+          sourceX,
+          sourceY,
+          sampled: regionSampled,
+          black: regionBlack,
+          ratio: Number((regionBlack / Math.max(1, regionSampled)).toFixed(6)),
+        });
+      }
+      return {
+        ratio: sampled > 0 ? Number((black / sampled).toFixed(6)) : null,
+        sampled,
+        black,
+        regions,
+      };
+    })()"""
+
+
+def sample_js_heap_memory_js() -> str:
+    return """(() => {
+      const memory = performance.memory;
+      if (!memory) {
+        return {
+          supported: false,
+          usedJSHeapSize: null,
+          totalJSHeapSize: null,
+          jsHeapSizeLimit: null,
+        };
+      }
+      return {
+        supported: true,
+        usedJSHeapSize: Number(memory.usedJSHeapSize || 0),
+        totalJSHeapSize: Number(memory.totalJSHeapSize || 0),
+        jsHeapSizeLimit: Number(memory.jsHeapSizeLimit || 0),
+      };
+    })()"""
+
+
 def navigate(url: str) -> dict:
     js = f"""
 async (page) => {{
@@ -729,6 +938,14 @@ async (page) => {{
           name: entry.name,
           duration: Number(entry.duration || 0),
           startTime: Number(entry.startTime || 0),
+          attribution: Array.from(entry.attribution || []).map((item) => ({{
+            name: String(item.name || ''),
+            entryType: String(item.entryType || ''),
+            containerType: String(item.containerType || ''),
+            containerName: String(item.containerName || ''),
+            containerSrc: String(item.containerSrc || ''),
+            containerId: String(item.containerId || ''),
+          }})),
         }}));
         window.__perfBench.longTasks.push(...entries);
       }});
@@ -865,7 +1082,7 @@ def build_scenario_open_urls(base_urls: list[str], scenario_id: str) -> list[str
     urls: list[str] = []
     normalized_scenario_id = str(scenario_id or "").strip()
     for base_url in unique_strings(base_urls):
-      perf_url = with_query_overrides(ensure_app_path_url(base_url), perf_overlay="1")
+      perf_url = with_query_overrides(ensure_app_path_url(base_url), perf_overlay="1", runtime_chunk_perf="1")
       if normalized_scenario_id and normalized_scenario_id != "none":
         scenario_perf_url = with_query_overrides(perf_url, default_scenario=normalized_scenario_id)
         urls.append(scenario_perf_url)
@@ -1349,6 +1566,74 @@ def summarize_fill_action_metric(suite: dict, key: str) -> dict:
     )
 
 
+def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
+    probe = suite.get("repeatedZoomRegions") if isinstance(suite.get("repeatedZoomRegions"), dict) else {}
+    regions = probe.get("regions") if isinstance(probe.get("regions"), dict) else {}
+    first_idle_values: list[float] = []
+    degradation_ratios: list[float] = []
+    max_black_values: list[float] = []
+    max_long_values: list[float] = []
+    used_heap_deltas: list[float] = []
+    region_summaries: dict[str, dict] = {}
+    for region_id, region_payload in regions.items():
+      if not isinstance(region_payload, dict):
+        continue
+      cycles = region_payload.get("cycles") if isinstance(region_payload.get("cycles"), list) else []
+      cycle_idle_values = [
+        as_finite_number(cycle.get("firstIdleAfterLastWheelMs"))
+        for cycle in cycles
+        if isinstance(cycle, dict)
+      ]
+      cycle_idle_values = [value for value in cycle_idle_values if value is not None]
+      first_idle_values.extend(cycle_idle_values)
+      degradation = region_payload.get("degradation") if isinstance(region_payload.get("degradation"), dict) else {}
+      ratio = as_finite_number(degradation.get("ratio"))
+      if ratio is not None:
+        degradation_ratios.append(ratio)
+      max_black = as_finite_number(region_payload.get("maxBlackPixelRatio"))
+      if max_black is not None:
+        max_black_values.append(max_black)
+      max_long = as_finite_number(region_payload.get("maxLongTaskMs"))
+      if max_long is not None:
+        max_long_values.append(max_long)
+      memory_delta = region_payload.get("memoryDelta") if isinstance(region_payload.get("memoryDelta"), dict) else {}
+      used_heap_delta = as_finite_number(memory_delta.get("usedJSHeapSize"))
+      if used_heap_delta is not None:
+        used_heap_deltas.append(used_heap_delta)
+      region_summaries[str(region_id)] = {
+        "cycleCount": len(cycles),
+        "firstIdleAfterLastWheelMs": summarize_distribution(cycle_idle_values),
+        "degradation": degradation,
+        "maxBlackPixelRatio": max_black,
+        "maxLongTaskMs": max_long,
+        "memoryDelta": memory_delta,
+      }
+    return {
+      "present": bool(regions),
+      "source": "repeatedZoomRegions",
+      "durationMs": max(first_idle_values) if first_idle_values else None,
+      "recordedAt": None,
+      "count": max(degradation_ratios) if degradation_ratios else None,
+      "details": {
+        "interactionProbeSchema": probe.get("interactionProbeSchema"),
+        "regionCount": len(regions),
+        "cycleCount": as_finite_number(probe.get("cyclesPerRegion")),
+        "wheelsPerCycle": as_finite_number(probe.get("wheelsPerCycle")),
+        "firstIdleAfterLastWheelMs": summarize_distribution(first_idle_values),
+        "degradationRatio": summarize_distribution(degradation_ratios),
+        "blackPixelRatio": summarize_distribution(max_black_values),
+        "longTask": {
+          "maxLongTaskMs": max(max_long_values) if max_long_values else None,
+          "distribution": summarize_distribution(max_long_values),
+        },
+        "memory": {
+          "usedJSHeapSizeDelta": summarize_distribution(used_heap_deltas),
+        },
+        "regions": region_summaries,
+      },
+    }
+
+
 def build_suite_scenario_consistency(suite: dict) -> dict:
     page_load = suite.get("pageLoad") if isinstance(suite.get("pageLoad"), dict) else {}
     scenario_apply = suite.get("scenarioApply") if isinstance(suite.get("scenarioApply"), dict) else {}
@@ -1678,6 +1963,7 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
     interactive_pan_metric = summarize_interactive_pan_metric(suite)
     single_fill_metric = summarize_fill_action_metric(suite, "singleFill")
     double_click_fill_metric = summarize_fill_action_metric(suite, "doubleClickFill")
+    repeated_zoom_metric = summarize_repeated_zoom_regions_metric(suite)
     wheel_anchor_metric = with_metric_context(
       wheel_anchor_metric,
       metric_name="wheelAnchorTrace",
@@ -1710,6 +1996,14 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       probe=suite.get("doubleClickFill") if isinstance(suite.get("doubleClickFill"), dict) else {},
       candidate_sources=["doubleClickFill.lastActionDurationMs"],
     )
+    repeated_zoom_metric = with_metric_context(
+      repeated_zoom_metric,
+      metric_name="repeatedZoomRegions",
+      requested_scenario_id=requested_scenario_id,
+      selected_via="direct-probe",
+      probe=suite.get("repeatedZoomRegions") if isinstance(suite.get("repeatedZoomRegions"), dict) else {},
+      candidate_sources=["repeatedZoomRegions.regions.*.cycles.*.firstIdleAfterLastWheelMs"],
+    )
     return {
       "load": load_metric,
       "pageLoad": page_load_metric,
@@ -1721,11 +2015,13 @@ def build_suite_benchmark_metrics(suite: dict) -> dict:
       "interactivePanFrame": interactive_pan_metric,
       "singleFillAction": single_fill_metric,
       "doubleClickFillAction": double_click_fill_metric,
+      "repeatedZoomRegions": repeated_zoom_metric,
       "firstInteraction": {
         "wheelAnchorTrace": wheel_anchor_metric,
         "interactivePanFrame": interactive_pan_metric,
         "singleFillAction": single_fill_metric,
         "doubleClickFillAction": double_click_fill_metric,
+        "repeatedZoomRegions": repeated_zoom_metric,
       },
       "fullySettled": {
         "settleExactRefresh": settle_exact_metric,
@@ -2397,7 +2693,7 @@ async (page) => {{
       }},
       renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
       scenarioMetrics: {clone_metrics_js("state.scenarioPerfMetrics")},
-      runtimeChunkLoadState: {clone_metrics_js("state.runtimeChunkLoadState")},
+      runtimeChunkLoadState: {clone_runtime_chunk_load_state_summary_js()},
       overlay: document.getElementById('perf-overlay')?.textContent || '',
     }};
     setZoomPercent(originalZoomPercent);
@@ -2587,6 +2883,288 @@ async (page) => {{
 }}
 """.strip()
     return run_code_json(js)  # type: ignore[return-value]
+
+
+def measure_repeated_zoom_regions(
+    scenario_id: str,
+    regions: list[str],
+    cycles: int,
+    wheels_per_cycle: int,
+) -> dict | None:
+    if scenario_id != "tno_1962":
+      return None
+    config = {
+      "scenarioId": scenario_id,
+      "regions": regions,
+      "cycles": cycles,
+      "wheelsPerCycle": wheels_per_cycle,
+    }
+    js = f"""
+async (page) => {{
+  const config = {json.dumps(config)};
+  const waitForIdle = async (timeoutMs = 7000) => page.evaluate(async (timeoutMs) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const startedAt = performance.now();
+    const exactActive = () => {{
+      const phase = String(state.exactAfterSettleController?.phase || 'idle');
+      return !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
+    }};
+    while (
+      (state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive())
+      && (performance.now() - startedAt) < timeoutMs
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    }}
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const stillActive = state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive();
+    return {{
+      waitedMs: Number((performance.now() - startedAt).toFixed(3)),
+      renderPhase: String(state.renderPhase || ''),
+      isInteracting: !!state.isInteracting,
+      exactActive: exactActive(),
+      timedOut: !!stillActive,
+      settled: !stillActive,
+    }};
+  }}, timeoutMs);
+
+  const resetZoom = async () => page.evaluate(async () => {{
+    const renderer = await import('/js/core/map_renderer/public.js');
+    renderer.resetZoomToFit();
+  }});
+
+  const resolveTarget = async (regionId) => page.evaluate(async (regionId) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const regionAnchors = {{
+      europe: {{ lon: 10, lat: 50, label: 'Europe' }},
+      us_east: {{ lon: -77, lat: 39, label: 'US East' }},
+      east_asia: {{ lon: 120, lat: 35, label: 'East Asia' }},
+    }};
+    const anchor = regionAnchors[String(regionId || '')];
+    if (!anchor) {{
+      throw new Error(`Unknown repeated zoom region: ${{regionId}}`);
+    }}
+    const interaction = document.querySelector('#map-svg rect.interaction-layer');
+    if (!interaction || !state.landData?.features?.length || !window.d3) {{
+      throw new Error('Repeated zoom benchmark prerequisites are unavailable.');
+    }}
+    const bounds = interaction.getBoundingClientRect();
+    const padding = Math.max(16, Math.round(Math.min(state.width, state.height) * 0.04));
+    const projection = window.d3.geoEqualEarth()
+      .precision(0.1)
+      .fitExtent(
+        [[padding, padding], [Math.max(padding + 1, state.width - padding), Math.max(padding + 1, state.height - padding)]],
+        state.landData
+      );
+    const projected = projection([anchor.lon, anchor.lat]);
+    const transform = state.zoomTransform || {{ x: 0, y: 0, k: 1 }};
+    const anchorLocal = {{
+      x: Math.max(24, Math.min(bounds.width - 24, (projected?.[0] || bounds.width * 0.5) * Number(transform.k || 1) + Number(transform.x || 0))),
+      y: Math.max(24, Math.min(bounds.height - 24, (projected?.[1] || bounds.height * 0.5) * Number(transform.k || 1) + Number(transform.y || 0))),
+    }};
+    return {{
+      regionId: String(regionId || ''),
+      regionLabel: anchor.label,
+      screenX: bounds.left + anchorLocal.x,
+      screenY: bounds.top + anchorLocal.y,
+      anchorLocal,
+      worldAnchor: {{
+        x: (anchorLocal.x - Number(transform.x || 0)) / Math.max(Number(transform.k || 1), 0.0001),
+        y: (anchorLocal.y - Number(transform.y || 0)) / Math.max(Number(transform.k || 1), 0.0001),
+      }},
+      transform: {{
+        x: Number(transform.x || 0),
+        y: Number(transform.y || 0),
+        k: Number(transform.k || 1),
+      }},
+    }};
+  }}, regionId);
+
+  const captureBaseline = async () => page.evaluate(async () => {{
+    const {{ state }} = await import('/js/core/state.js');
+    return {{
+      baselineTime: performance.now(),
+      baselineLongTasks: Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks.length : 0,
+      baselineBlackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+      memory: {sample_js_heap_memory_js()},
+    }};
+  }});
+
+  const sample = async (payload) => page.evaluate(async (payload) => {{
+    const {{ state }} = await import('/js/core/state.js');
+    const includeHeavyMetrics = payload.includeHeavyMetrics !== false;
+    const includeLongTasks = payload.includeLongTasks !== false;
+    const transform = state.zoomTransform || {{ x: 0, y: 0, k: 1 }};
+    const expectedLocal = {{
+      x: payload.worldAnchor.x * Number(transform.k || 1) + Number(transform.x || 0),
+      y: payload.worldAnchor.y * Number(transform.k || 1) + Number(transform.y || 0),
+    }};
+    const dx = expectedLocal.x - payload.anchorLocal.x;
+    const dy = expectedLocal.y - payload.anchorLocal.y;
+    const longTasks = Array.isArray(window.__perfBench?.longTasks) ? window.__perfBench.longTasks : [];
+    const baselineLongTasks = Number(payload.baselineLongTasks || 0);
+    const baselineTime = Number(payload.baselineTime || 0);
+    const newLongTasks = longTasks
+      .slice(baselineLongTasks)
+      .filter((entry) => Number(entry.startTime || 0) >= baselineTime - 1)
+      .map((entry) => ({{
+        name: String(entry.name || ''),
+        duration: Number(entry.duration || 0),
+        startTime: Number(entry.startTime || 0),
+        attribution: Array.isArray(entry.attribution) ? entry.attribution : [],
+      }}));
+    const blackPixelSamples = {sample_canvas_black_pixel_details_js()};
+    return {{
+      regionId: String(payload.regionId || ''),
+      cycleIndex: Number(payload.cycleIndex || 0),
+      wheelIndex: Number(payload.wheelIndex || 0),
+      label: String(payload.label || ''),
+      dtMs: Number((performance.now() - baselineTime).toFixed(3)),
+      renderPhase: String(state.renderPhase || ''),
+      isInteracting: !!state.isInteracting,
+      transform: {{
+        x: Number(transform.x || 0),
+        y: Number(transform.y || 0),
+        k: Number(transform.k || 1),
+      }},
+      anchorDriftPx: Number(Math.hypot(dx, dy).toFixed(3)),
+      blackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
+      blackPixelRatio: blackPixelSamples?.ratio ?? {sample_canvas_black_pixel_ratio_js()},
+      blackPixelSamples,
+      memory: {sample_js_heap_memory_js()},
+      longTasks: includeLongTasks ? newLongTasks.slice(-40) : [],
+      longTaskCountDelta: newLongTasks.length,
+      maxLongTaskMs: newLongTasks.reduce((max, entry) => Math.max(max, Number(entry.duration || 0)), 0),
+      longTaskDurationTotalMs: newLongTasks.reduce((sum, entry) => sum + Math.max(0, Number(entry.duration || 0)), 0),
+      lastFrame: includeHeavyMetrics ? {clone_frame_js("state.renderPassCache?.lastFrame || null")} : null,
+      renderMetrics: includeHeavyMetrics ? {clone_repeated_zoom_render_metrics_summary_js()} : {{}},
+      runtimeChunkLoadState: includeHeavyMetrics ? {clone_runtime_chunk_load_state_summary_js()} : null,
+    }};
+  }}, payload);
+
+  const result = {{
+    requestedScenarioId: String(config.scenarioId || ''),
+    interactionProbeSchema: 'mc_repeated_zoom_regions_v1',
+    regionsRequested: config.regions,
+    cyclesPerRegion: Number(config.cycles || 0),
+    wheelsPerCycle: Number(config.wheelsPerCycle || 0),
+    regions: {{}},
+  }};
+
+  for (const regionId of config.regions) {{
+    await resetZoom();
+    await waitForIdle(7000);
+    const memoryBefore = await page.evaluate(() => {{ return {sample_js_heap_memory_js()}; }});
+    const regionCycles = [];
+    const longTaskAttribution = [];
+    for (let cycleIndex = 0; cycleIndex < Number(config.cycles || 0); cycleIndex += 1) {{
+      await resetZoom();
+      await waitForIdle(7000);
+      const target = await resolveTarget(regionId);
+      const baseline = await captureBaseline();
+      const samples = [];
+      samples.push(await sample({{
+        ...target,
+        ...baseline,
+        cycleIndex,
+        wheelIndex: 0,
+        label: 'before-cycle',
+        includeHeavyMetrics: false,
+        includeLongTasks: false,
+      }}));
+      await page.mouse.move(target.screenX, target.screenY);
+      let lastWheelAt = Number(baseline.baselineTime || 0);
+      for (let wheelIndex = 0; wheelIndex < Number(config.wheelsPerCycle || 0); wheelIndex += 1) {{
+        await page.mouse.wheel(0, -280);
+        lastWheelAt = await page.evaluate(() => performance.now());
+        await page.waitForTimeout(80);
+        samples.push(await sample({{
+          ...target,
+          ...baseline,
+          cycleIndex,
+          wheelIndex: wheelIndex + 1,
+          label: `after-wheel-${{wheelIndex + 1}}`,
+          includeHeavyMetrics: false,
+          includeLongTasks: false,
+        }}));
+      }}
+      const idleState = await waitForIdle(7000);
+      samples.push(await sample({{
+        ...target,
+        ...baseline,
+        cycleIndex,
+        wheelIndex: Number(config.wheelsPerCycle || 0),
+        label: 'after-idle-wait',
+        includeHeavyMetrics: true,
+        includeLongTasks: true,
+      }}));
+      const after = samples[samples.length - 1] || {{}};
+      const lastWheelOffsetMs = Math.max(0, Number(lastWheelAt || 0) - Number(baseline.baselineTime || 0));
+      const firstIdleAfterLastWheelMs = idleState?.timedOut
+        ? null
+        : Math.max(0, Number(after.dtMs || 0) - lastWheelOffsetMs);
+      const cycleLongTasks = Array.isArray(after.longTasks) ? after.longTasks : [];
+      longTaskAttribution.push({{
+        regionId,
+        cycleIndex,
+        sampleLabel: 'after-idle-wait',
+        tasks: cycleLongTasks.slice(0, 20),
+      }});
+      regionCycles.push({{
+        regionId,
+        cycleIndex,
+        target,
+        idleState,
+        samples,
+        firstIdleAfterLastWheelMs,
+        longTaskCountDelta: cycleLongTasks.length,
+        maxLongTaskMs: cycleLongTasks.reduce((max, entry) => Math.max(max, Number(entry.duration || 0)), 0),
+        longTaskDurationTotalMs: cycleLongTasks.reduce((sum, entry) => sum + Math.max(0, Number(entry.duration || 0)), 0),
+        maxBlackPixelRatio: samples.reduce((max, entry) => Math.max(max, Number(entry.blackPixelRatio || 0)), 0),
+        blackFrameDelta: Math.max(0, Number(after.blackFrameCount || 0) - Number(baseline.baselineBlackFrameCount || 0)),
+        memoryBefore: baseline.memory,
+        memoryAfter: after.memory,
+        memoryDelta: {{
+          usedJSHeapSize: baseline.memory?.supported && after.memory?.supported ? (
+            Number(after.memory?.usedJSHeapSize || 0)
+            - Number(baseline.memory?.usedJSHeapSize || 0)
+          ) : null,
+        }},
+      }});
+    }}
+    const memoryAfter = await page.evaluate(() => {{ return {sample_js_heap_memory_js()}; }});
+    const idleValues = regionCycles
+      .map((cycle) => Number(cycle.firstIdleAfterLastWheelMs))
+      .filter(Number.isFinite);
+    const firstCycleIdle = idleValues.length ? idleValues[0] : null;
+    const lastCycleIdle = idleValues.length ? idleValues[idleValues.length - 1] : null;
+    result.regions[regionId] = {{
+      regionId,
+      cycles: regionCycles,
+      memoryBefore,
+      memoryAfter,
+      memoryDelta: {{
+        usedJSHeapSize: memoryBefore?.supported && memoryAfter?.supported ? (
+          Number(memoryAfter?.usedJSHeapSize || 0)
+          - Number(memoryBefore?.usedJSHeapSize || 0)
+        ) : null,
+      }},
+      degradation: {{
+        firstCycleMs: firstCycleIdle,
+        lastCycleMs: lastCycleIdle,
+        ratio: firstCycleIdle && firstCycleIdle > 0 ? Number((lastCycleIdle / firstCycleIdle).toFixed(4)) : null,
+      }},
+      maxBlackPixelRatio: regionCycles.reduce((max, cycle) => Math.max(max, Number(cycle.maxBlackPixelRatio || 0)), 0),
+      maxLongTaskMs: regionCycles.reduce((max, cycle) => Math.max(max, Number(cycle.maxLongTaskMs || 0)), 0),
+      longTaskAttribution,
+    }};
+  }}
+  await resetZoom();
+  result.finalReset = await waitForIdle(7000);
+  return result;
+}}
+""".strip()
+    timeout_sec = max(300, (len(regions) * cycles * max(20, wheels_per_cycle * 2)) + 240)
+    return run_code_json(js, timeout_sec=timeout_sec)  # type: ignore[return-value]
 
 
 def measure_single_click_fill() -> dict:
@@ -2815,7 +3393,14 @@ async (page) => {
     return run_code_json(js)  # type: ignore[return-value]
 
 
-def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: Path) -> dict:
+def run_scenario_suite(
+    base_urls: list[str],
+    scenario_id: str,
+    screenshot_dir: Path,
+    repeated_zoom_regions: list[str],
+    repeated_zoom_cycles: int,
+    repeated_zoom_wheels_per_cycle: int,
+) -> dict:
     print(f"[benchmark] start scenario={scenario_id}", flush=True)
     # Each scenario is intentionally isolated. TNO can inherit enough browser
     # state from a previous heavy scenario to make navigation itself flaky,
@@ -2857,6 +3442,12 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
     zoom_end_chunk_visible = measure_zoom_end_chunk_visible(scenario_id)
     print(f"[benchmark] wheel anchor scenario={scenario_id}", flush=True)
     wheel_anchor_trace = measure_wheel_anchor_trace(scenario_id)
+    repeated_zoom_regions_probe = measure_repeated_zoom_regions(
+      scenario_id,
+      repeated_zoom_regions,
+      repeated_zoom_cycles,
+      repeated_zoom_wheels_per_cycle,
+    )
     rapid_wheel_screenshot_path = (
       take_screenshot(screenshot_dir / f"{scenario_id or 'none'}-rapid-wheel.png")
       if wheel_anchor_trace
@@ -2885,6 +3476,7 @@ def run_scenario_suite(base_urls: list[str], scenario_id: str, screenshot_dir: P
       "zoomSettleFullRedraw": zoom_settle_redraw,
       "zoomEndChunkVisible": zoom_end_chunk_visible,
       "wheelAnchorTrace": wheel_anchor_trace,
+      "repeatedZoomRegions": repeated_zoom_regions_probe,
       "interactivePanFrame": interactive_pan_frame,
       "singleFill": single_fill,
       "doubleClickFill": double_click_fill,
@@ -2938,6 +3530,7 @@ def main() -> None:
     screenshot_dir.mkdir(parents=True, exist_ok=True)
 
     effective_url = normalize_playwright_url(args.url)
+    repeated_zoom_regions = parse_repeated_zoom_regions(args.repeated_zoom_regions)
 
     try:
       suite_base_urls = unique_strings([
@@ -2946,17 +3539,33 @@ def main() -> None:
           args.url,
           ensure_app_path_url(args.url),
       ])
-      suites = {scenario_id: run_scenario_suite(suite_base_urls, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
+      suites = {
+        scenario_id: run_scenario_suite(
+          suite_base_urls,
+          scenario_id,
+          screenshot_dir,
+          repeated_zoom_regions,
+          int(args.repeated_zoom_cycles),
+          int(args.repeated_zoom_wheels_per_cycle),
+        )
+        for scenario_id in SCENARIO_IDS
+      }
       water_cache_summary_by_scenario = build_water_cache_summary_by_scenario(suites)
       report = {
         "createdAt": datetime.now(timezone.utc).astimezone().isoformat(),
         "gitHead": resolve_git_head(),
         "schemaVersion": 1,
         "probeSchema": "mc_perf_snapshot",
+        "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
-        "benchmarkMetricsSchemaVersion": "3.1",
+        "benchmarkMetricsSchemaVersion": "3.2",
+        "config": {
+          "repeatedZoomRegions": repeated_zoom_regions,
+          "repeatedZoomCycles": int(args.repeated_zoom_cycles),
+          "repeatedZoomWheelsPerCycle": int(args.repeated_zoom_wheels_per_cycle),
+        },
         "benchmarkMetricsByScenario": {
           scenario_id: suites[scenario_id].get("benchmarkMetrics", {})
           for scenario_id in SCENARIO_IDS

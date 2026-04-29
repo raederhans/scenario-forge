@@ -60,6 +60,8 @@ export function createDeferredDetailPromotionOwner({
     }
     if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
       runtimeState.runtimeChunkLoadState.focusCountryOverride = focusCountry;
+      runtimeState.runtimeChunkLoadState.focusCountryOverrideSource = String(reason || "detail-promotion");
+      runtimeState.runtimeChunkLoadState.focusCountryOverrideExpiresAt = Date.now() + 5000;
     }
     if (typeof runtimeState.scheduleScenarioChunkRefreshFn === "function") {
       runtimeState.scheduleScenarioChunkRefreshFn({

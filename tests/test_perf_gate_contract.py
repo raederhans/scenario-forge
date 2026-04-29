@@ -61,7 +61,7 @@ class PerfGateContractTest(unittest.TestCase):
 
     def test_perf_script_locks_hardening_contract(self):
         script = PERF_SCRIPT.read_text(encoding="utf-8")
-        self.assertIn('benchmarkMetricsSchemaVersion: "3.1"', script)
+        self.assertIn('benchmarkMetricsSchemaVersion: "3.2"', script)
         self.assertIn('probeSchema: "mc_perf_snapshot"', script)
         self.assertIn('const PERF_REPORT_CONTRACT_FIELDS = [', script)
         self.assertIn('getPerfReportContractMismatches(baselineReport, "baseline")', script)
@@ -103,7 +103,7 @@ class PerfGateContractTest(unittest.TestCase):
     def test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields(self):
         baseline_payload = json.loads(BASELINE_JSON.read_text(encoding="utf-8"))
         self.assertEqual(baseline_payload.get("schemaVersion"), 1)
-        self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.1")
+        self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.2")
         self.assertEqual(baseline_payload.get("probeSchema"), "mc_perf_snapshot")
         self.assertRegex(str(baseline_payload.get("gitHead", "")), r"^[0-9a-f]{40}$")
         self.assertEqual(baseline_payload.get("config", {}).get("warmups"), 3)
@@ -118,11 +118,68 @@ class PerfGateContractTest(unittest.TestCase):
         script = EDITOR_BENCHMARK_SCRIPT.read_text(encoding="utf-8")
         self.assertIn('"schemaVersion": 1', script)
         self.assertIn('"probeSchema": "mc_perf_snapshot"', script)
+        self.assertIn('"interactionProbeSchema": "mc_repeated_zoom_regions_v1"', script)
+        self.assertIn('"benchmarkMetricsSchemaVersion": "3.2"', script)
+        self.assertIn("--repeated-zoom-regions", script)
+        self.assertIn("--repeated-zoom-cycles", script)
+        self.assertIn("--repeated-zoom-wheels-per-cycle", script)
+        self.assertIn('"repeatedZoomRegions": repeated_zoom_regions_probe', script)
+        self.assertIn('runtime_chunk_perf="1"', script)
+        self.assertIn("sample_canvas_black_pixel_details_js", script)
+        self.assertIn("usedJSHeapSize", script)
+        self.assertIn("const memoryBefore = await page.evaluate(() => {{ return", script)
+        self.assertIn("const memoryAfter = await page.evaluate(() => {{ return", script)
+        self.assertIn("timeout_sec = max(300, (len(regions) * cycles * max(20, wheels_per_cycle * 2)) + 240)", script)
+        self.assertIn("return run_code_json(js, timeout_sec=timeout_sec)", script)
+        self.assertIn("clone_runtime_chunk_load_state_summary_js", script)
+        self.assertIn("clone_repeated_zoom_render_metrics_summary_js", script)
+        self.assertIn("mergedLayerPayloadCacheLayerCount", script)
+        self.assertIn("includeHeavyMetrics: false", script)
+        self.assertIn("includeHeavyMetrics: true", script)
+        self.assertIn("timedOut: !!stillActive", script)
+        self.assertIn("firstIdleAfterLastWheelMs = idleState?.timedOut", script)
+        self.assertIn("result.finalReset = await waitForIdle(7000)", script)
+        self.assertIn("attribution: Array.from(entry.attribution || [])", script)
         self.assertIn('"git", "rev-parse", "HEAD"', script)
         self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
         self.assertIn('"politicalRasterWorker": political_raster_worker', script)
         self.assertIn("const sampleRegions = [", script)
         self.assertIn("sampleContext.drawImage(canvas, sourceX, sourceY", script)
+
+    def test_repeated_zoom_regions_metric_summarizes_degradation_black_longtask_and_memory(self):
+        benchmark = load_editor_benchmark_module()
+        suite = {
+            "scenarioId": "tno_1962",
+            "scenarioApply": {
+                "requestedScenarioId": "tno_1962",
+                "activeScenarioId": "tno_1962",
+            },
+            "repeatedZoomRegions": {
+                "requestedScenarioId": "tno_1962",
+                "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
+                "cyclesPerRegion": 2,
+                "wheelsPerCycle": 5,
+                "regions": {
+                    "europe": {
+                        "cycles": [
+                            {"firstIdleAfterLastWheelMs": 100},
+                            {"firstIdleAfterLastWheelMs": 125},
+                        ],
+                        "degradation": {"ratio": 1.25},
+                        "maxBlackPixelRatio": 0.02,
+                        "maxLongTaskMs": 30,
+                        "memoryDelta": {"usedJSHeapSize": 2048},
+                    }
+                },
+            },
+        }
+        metric = benchmark.build_suite_benchmark_metrics(suite)["repeatedZoomRegions"]
+        self.assertTrue(metric["present"])
+        self.assertEqual(metric["durationMs"], 125)
+        self.assertEqual(metric["count"], 1.25)
+        self.assertTrue(metric["details"]["sameScenario"])
+        self.assertEqual(metric["details"]["interactionProbeSchema"], "mc_repeated_zoom_regions_v1")
+        self.assertEqual(metric["details"]["regions"]["europe"]["degradation"]["ratio"], 1.25)
 
     def test_fill_action_metrics_carry_black_pixel_ratio(self):
         benchmark = load_editor_benchmark_module()

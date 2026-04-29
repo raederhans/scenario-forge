@@ -25,7 +25,7 @@ import {
   setMapData,
   render,
 } from "./core/map_renderer/public.js";
-import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
+import { bindRenderBoundary, flushRenderBoundary, markRenderBoundaryFlushed, requestRender } from "./core/render_boundary.js";
 import { registerRuntimeHook } from "./core/state/index.js";
 import { initPresetState } from "./core/preset_state.js";
 import { runPostScenarioUiReplay } from "./core/scenario_post_apply_effects.js";
@@ -922,7 +922,13 @@ async function bootstrap() {
       deferInteractionInfrastructure: startupInteractionLevel === "readonly-startup",
     });
 
-    renderDispatcher = createRenderDispatcher(render);
+    renderDispatcher = createRenderDispatcher(() => {
+      try {
+        render();
+      } finally {
+        markRenderBoundaryFlushed();
+      }
+    });
     const renderApp = () => {
       renderDispatcher.schedule();
     };

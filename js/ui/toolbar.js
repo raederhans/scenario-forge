@@ -2173,12 +2173,18 @@ function initToolbar({ render } = {}) {
   function updateZoomUi() {
     const text = getZoomPercent();
     if (zoomPercentInput && zoomPercentInput.dataset.editing !== "true") {
-      zoomPercentInput.value = text;
+      if (zoomPercentInput.value !== text) {
+        zoomPercentInput.value = text;
+      }
     }
-    zoomPercentInput?.removeAttribute("aria-invalid");
     if (zoomPercentInput) {
-      zoomPercentInput.dataset.zoomError = "";
-      zoomPercentInput.setCustomValidity("");
+      if (zoomPercentInput.hasAttribute("aria-invalid")) {
+        zoomPercentInput.removeAttribute("aria-invalid");
+      }
+      if (zoomPercentInput.dataset.zoomError) {
+        zoomPercentInput.dataset.zoomError = "";
+        zoomPercentInput.setCustomValidity("");
+      }
     }
   }
   registerRuntimeHook(state, "updateZoomUIFn", updateZoomUi);
