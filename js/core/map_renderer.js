@@ -1,4 +1,7 @@
 // Hybrid canvas + SVG rendering engine.
+// 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
+// runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
+// 只有真正跨域的 orchestration 才继续放在本文件。
 import {
   bumpColorRevision,
   normalizeCityLayerStyleConfig,
@@ -51,7 +54,11 @@ import {
 } from "./city_lights_historical_1930_asset.js";
 import { ColorManager } from "./color_manager.js";
 import { resolveFeatureColor } from "./color_resolver.js";
-import { ensurePoliticalRasterWorkerMetrics, requestPoliticalRasterWorkerPass } from "./political_raster_worker_client.js";
+import {
+  createPoliticalRasterWorkerIdentity,
+  ensurePoliticalRasterWorkerMetrics,
+  requestPoliticalRasterWorkerPass,
+} from "./political_raster_worker_client.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
@@ -199,6 +206,9 @@ const UNIT_COUNTER_STATS_PRESETS = Object.freeze({
   improvised: Object.freeze({ organizationPct: 47, equipmentPct: 42 }),
 });
 
+// 这些句柄共同描述当前唯一活跃的地图渲染现场。
+// startup / scenario apply / renderer re-init 时需要成组维护，
+// 否则很容易出现“旧 DOM 句柄 + 新 runtimeState”混搭的问题。
 let mapContainer = null;
 let mapCanvas = null;
 let hitCanvas = null;
@@ -17760,34 +17770,95 @@ function recordPoliticalRasterWorkerSnapshot() {
   const metrics = ensurePoliticalRasterWorkerMetrics(globalThis);
   const nextState = {
     enabled: !!metrics.enabled,
+    protocolVersion: Number(metrics.protocolVersion || 0),
     roundTripMs: Number(metrics.roundTripMs || 0),
+    rasterMs: Number(metrics.rasterMs || 0),
+    encodeMs: Number(metrics.encodeMs || 0),
+    decodeMs: Number(metrics.decodeMs || 0),
+    blitMs: Number(metrics.blitMs || 0),
     timeoutCount: Number(metrics.timeoutCount || 0),
     recycleCount: Number(metrics.recycleCount || 0),
     staleResponseCount: Number(metrics.staleResponseCount || 0),
+    acceptedCount: Number(metrics.acceptedCount || 0),
+    rejectedStaleCount: Number(metrics.rejectedStaleCount || 0),
+    fallbackCount: Number(metrics.fallbackCount || 0),
   };
   const stateChanged = !recordPoliticalRasterWorkerSnapshot.lastState
     || recordPoliticalRasterWorkerSnapshot.lastState.enabled !== nextState.enabled
+    || recordPoliticalRasterWorkerSnapshot.lastState.protocolVersion !== nextState.protocolVersion
     || recordPoliticalRasterWorkerSnapshot.lastState.roundTripMs !== nextState.roundTripMs
+    || recordPoliticalRasterWorkerSnapshot.lastState.rasterMs !== nextState.rasterMs
+    || recordPoliticalRasterWorkerSnapshot.lastState.encodeMs !== nextState.encodeMs
+    || recordPoliticalRasterWorkerSnapshot.lastState.decodeMs !== nextState.decodeMs
+    || recordPoliticalRasterWorkerSnapshot.lastState.blitMs !== nextState.blitMs
     || recordPoliticalRasterWorkerSnapshot.lastState.timeoutCount !== nextState.timeoutCount
     || recordPoliticalRasterWorkerSnapshot.lastState.recycleCount !== nextState.recycleCount
-    || recordPoliticalRasterWorkerSnapshot.lastState.staleResponseCount !== nextState.staleResponseCount;
+    || recordPoliticalRasterWorkerSnapshot.lastState.staleResponseCount !== nextState.staleResponseCount
+    || recordPoliticalRasterWorkerSnapshot.lastState.acceptedCount !== nextState.acceptedCount
+    || recordPoliticalRasterWorkerSnapshot.lastState.rejectedStaleCount !== nextState.rejectedStaleCount
+    || recordPoliticalRasterWorkerSnapshot.lastState.fallbackCount !== nextState.fallbackCount;
   recordPoliticalRasterWorkerSnapshot.frameCount = Number(recordPoliticalRasterWorkerSnapshot.frameCount || 0) + 1;
   if (!stateChanged && (recordPoliticalRasterWorkerSnapshot.frameCount % 30) !== 0) return;
   recordPoliticalRasterWorkerSnapshot.lastState = nextState;
   recordRenderPerfMetric("politicalRasterWorker.roundTripMs", Number(metrics.roundTripMs || 0), {
     enabled: nextState.enabled,
+    protocolVersion: nextState.protocolVersion,
   });
+  recordRenderPerfMetric("politicalRasterWorker.rasterMs", Number(metrics.rasterMs || 0), { enabled: nextState.enabled });
+  recordRenderPerfMetric("politicalRasterWorker.encodeMs", Number(metrics.encodeMs || 0), { enabled: nextState.enabled });
+  recordRenderPerfMetric("politicalRasterWorker.decodeMs", Number(metrics.decodeMs || 0), { enabled: nextState.enabled });
+  recordRenderPerfMetric("politicalRasterWorker.blitMs", Number(metrics.blitMs || 0), { enabled: nextState.enabled });
   recordRenderPerfMetric("politicalRasterWorker.timeoutCount", 0, { count: nextState.timeoutCount });
   recordRenderPerfMetric("politicalRasterWorker.recycleCount", 0, { count: nextState.recycleCount });
   recordRenderPerfMetric("politicalRasterWorker.staleResponseCount", 0, { count: nextState.staleResponseCount });
+  recordRenderPerfMetric("politicalRasterWorker.acceptedCount", 0, { count: nextState.acceptedCount });
+  recordRenderPerfMetric("politicalRasterWorker.rejectedStaleCount", 0, { count: nextState.rejectedStaleCount });
+  recordRenderPerfMetric("politicalRasterWorker.fallbackCount", 0, { count: nextState.fallbackCount });
 }
 
 function drawPoliticalPass(k) {
-  requestPoliticalRasterWorkerPass();
-  recordPoliticalRasterWorkerSnapshot();
   const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  const visibleItems = debugMode === "PROD" ? collectVisibleLandSpatialItems() : null;
+  const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : null;
+  const workerIdentity = createPoliticalRasterWorkerIdentity({
+    scenarioId: runtimeState.activeScenarioId || "",
+    selectionVersion: Number(loadState?.selectionVersion || 0),
+    topologyRevision: Number(runtimeState.topologyRevision || 0),
+    colorRevision: Number(runtimeState.colorRevision || 0),
+    transformBucket: getTransformBucketSignature(transform),
+    dpr: Number(runtimeState.dpr || 1),
+    viewport: {
+      x: 0,
+      y: 0,
+      width: canvasWidth,
+      height: canvasHeight,
+      left: 0,
+      top: 0,
+      right: canvasWidth,
+      bottom: canvasHeight,
+    },
+    passSignature: getRenderPassSignature("political", transform),
+  });
+  requestPoliticalRasterWorkerPass({
+    identity: workerIdentity,
+    renderHint: {
+      pass: "political",
+      surface: "main",
+      canvasPxWidth: Math.max(0, Math.round(canvasWidth * Number(runtimeState.dpr || 1))),
+      canvasPxHeight: Math.max(0, Math.round(canvasHeight * Number(runtimeState.dpr || 1))),
+    },
+  });
+  recordPoliticalRasterWorkerSnapshot();
+  const visibleItemsResult = debugMode === "PROD" ? collectVisibleLandSpatialItemsWithStats() : null;
+  const visibleItems = visibleItemsResult ? visibleItemsResult.items : null;
+  if (visibleItemsResult?.stats) {
+    recordRenderPerfMetric("politicalPassVisibleItems", 0, {
+      visibleItemCount: Array.isArray(visibleItems) ? visibleItems.length : 0,
+      ...visibleItemsResult.stats,
+    });
+  }
   const backgroundStartedAt = nowMs();
   const backgroundSummary = drawPoliticalBackgroundFills({
     transform,
@@ -23900,6 +23971,10 @@ function refreshMapDataForScenarioChunkPromotion({
   hasPoliticalPayloadChange = false,
   refreshPlan = null,
 } = {}) {
+  // chunk promotion 刻意分成两段：
+  // 1. 先把用户能立刻看到的 topology / color / render pass 刷出来；
+  // 2. 再把 hit canvas、border mesh、interaction infra 这些重活延后。
+  // 这样可以缩短交互停顿，同时保留后续 infra refresh 的确定性。
   const startedAt = nowMs();
   const runtimeChunkLoadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
     ? runtimeState.runtimeChunkLoadState

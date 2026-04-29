@@ -67,6 +67,18 @@ Review result: current changes are minimal and targeted. No extra abstraction in
 - npm run perf:gate passed for tno_1962 and hoi4_1939.
 - Review pass: reviewer subagent timed out and was closed; parent performed first-principles review. The smallest stable path is keeping startup shell objects empty and using runtimePoliticalMeta for feature identity, matching existing loader health contract.
 
+## 2026-04-29 five-step interaction performance execution
+- Ralph snapshot: `.omx/context/app-performance-five-step-20260429T135414Z.md`.
+- Current baseline facts: repeated zoom degradation is already within target: Europe 0.9039, US East 1.0131, East Asia 1.0632. Remaining risk is long-task attribution and political/background full-pass cost.
+- Execution boundary: parent owns all live tests and benchmarks; child agents are static-only.
+- Static worker finding: current political raster worker is a default-off v1 shell. The low-risk next step is v2 identity/request/result/metrics with safe fallback, while keeping the default political render path on the main thread.
+- Static renderer finding from current code: frame scheduler already dedupes exact-after-settle pass tasks by label/generation and defers them on continuous input. The useful next change is attribution and candidate-cost visibility around political/background pass work.
+- Implementation: editor benchmark now emits schema 3.3, pass attribution, black-pixel classification, and v2 worker metrics. Renderer records political visible candidate stats using the same spatial stats shape as hit canvas.
+- Worker v2 remains default-off. Flag-off benchmark reported enabled=false, accepted/stale/fallback counts all 0, and lastReason=flag-disabled.
+- Fresh benchmark result: Europe ratio 0.562, US East 0.9823, East Asia 1.1507. Europe still has high absolute first-cycle idle/long-task cost, now attributed to exact-settle/chunk/political-background work instead of being invisible.
+- Verification: syntax, perf gate contract, scenario chunk contracts, perf probe behavior, three dev E2E suites, editor benchmark, perf baseline, and perf gate all passed.
+- First-principles self-check: the shortest stable implementation is measurement + default-off protocol, because true bitmap transfer would change the visual path and needs a separate parity slice. No extra fallback layer was added to production rendering.
+
 ## 2026-04-24 Review blocker remediation
 - Fixed P1 by restoring `data/scenarios/hoi4_1939/runtime_topology.bootstrap.topo.json` as the legacy-compatible political bootstrap topology and writing the startup bundle shell to `startup.runtime_shell.topo.json`.
 - Fixed P2 by deriving `geo_locale_patch.en.json` / `geo_locale_patch.zh.json` from `geo_locale_patch.json` during HOI4 startup asset generation, so language URLs cannot hide base geo overrides.

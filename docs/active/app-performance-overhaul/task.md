@@ -218,6 +218,27 @@ pm run perf:gate: pass against refreshed baseline.
 - [x] 前置门 A：指标契约字段、fill 黑屏采样、worker 指标壳、测试覆盖。
 - [x] 前置门 B：ownership editor request lane、sidebar/water contract 保持。
 - [x] 阶段 1 基础设施：frame_scheduler、exact-after-settle controller identity、pass slice 调度。
+
+## 2026-04-29 five-step interaction performance task progress
+- [x] Create Ralph context snapshot and switch state to execution.
+- [x] Load ralph/ultrawork skills, lessons learned, agent tiers, and active docs.
+- [x] Spawn static-only benchmark, renderer, worker, and test-planning lanes where agent capacity allowed.
+- [x] Upgrade editor benchmark/report schema to 3.3 with pass attribution and black-pixel classification.
+- [x] Add renderer political pass visible candidate attribution.
+- [x] Upgrade default-off political raster worker shell to v2 protocol and metrics.
+- [x] Extend existing perf and scenario chunk contract tests.
+- [x] Run parent-owned syntax, node/Python contracts, E2E, editor benchmark, perf baseline, and perf gate.
+- [x] Run final review, bug check, first-principles self-check, and close Ralph/Ultrawork state.
+
+## 2026-04-29 five-step verification evidence
+- Syntax: `python -m py_compile ops/browser-mcp/editor-performance-benchmark.py tests/test_perf_gate_contract.py`; `node --check` for `map_renderer.js`, `political_raster_worker_client.js`, `political_raster.worker.js`, and `scenario_chunk_contracts.test.mjs`.
+- Contracts: `npm run verify:perf-gate-contract`, `npm run test:node:scenario-chunk-contracts`, `npm run test:node:perf-probe-snapshot-behavior`.
+- E2E: `npm run test:e2e:dev:scenario-chunk-runtime` 4/4, `npm run test:e2e:dev:tno-ready-state` 5/5, `npm run test:e2e:interaction-funnel` 3/3.
+- Benchmark: `npm run bench:editor-performance` passed and wrote `.runtime/output/perf/editor-performance-benchmark.json`.
+- Repeated zoom ratios after this slice: Europe 0.562, US East 0.9823, East Asia 1.1507. All remain below 1.25.
+- Benchmark now reports `benchmarkMetricsSchemaVersion=3.3`, `passAttributionSchema=mc_pass_attribution_v1`, and black pixel classifications; all repeated zoom black-pixel samples classified as `normal`.
+- Perf: `npm run perf:baseline` refreshed `docs/perf/baseline_2026-04-20.*`; `npm run perf:gate` passed against refreshed baseline.
+- Review/self-check: static reviewer subagent timed out and was closed. Parent review checked core diffs, schema/baseline consistency, worker-off default behavior, and verification logs; no blocker found. Remaining architecture work is the future true worker bitmap/raster offload.
 - [x] 阶段 2 基础设施：compositeBuffer 原子提交、fast transformed frame 单次 buffer blit。
 - [x] 阶段 3 部分：changed ids 政治色刷新、click fill request lane、ownership changed-only refresh。
 - [x] 阶段 4 inventory：fallback 缓存保留理由已确认。

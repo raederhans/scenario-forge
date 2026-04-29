@@ -85,6 +85,8 @@ import {
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
 const state = runtimeState;
 
+// Quick Colors 优先反映当前 palette pack，未启用 pack 时再退回静态主题色。
+// 这样 toolbar 的快速选色和 Palette Library 会共享同一份颜色来源语义。
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
   if (!paletteGrid) return;
@@ -161,6 +163,8 @@ function resolveExportBaseDimensions() {
 
 
 function initToolbar({ render } = {}) {
+  // toolbar.js 保留的是壳层接线职责：集中拿 DOM、拼 controller、注册 runtime hooks。
+  // 各个面板自身的业务逻辑应继续留在子 controller，避免再把 owner 逻辑回流到这个大文件。
   const OCEAN_ADVANCED_PRESETS = new Set([
     "bathymetry_soft",
     "bathymetry_contours",
@@ -893,6 +897,8 @@ function initToolbar({ render } = {}) {
     renderTransportWorkbenchUi,
   } = transportWorkbenchController;
 
+  // support surface owner 统一协调 guide / dock / export / transport info 这类跨面板壳层行为。
+  // 这样 URL restore、focus restore、outside click/Escape 关闭链只维护一处真相源。
   const workspaceChromeSupportSurfaceController = createWorkspaceChromeSupportSurfaceController({
     state,
     getSupportSurfaceViewFromUrl,

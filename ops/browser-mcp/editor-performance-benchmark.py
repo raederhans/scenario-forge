@@ -782,6 +782,67 @@ def clone_repeated_zoom_render_metrics_summary_js(source: str = "state.renderPer
         frameSchedulerQueueDepth: clone(metrics.frameSchedulerQueueDepth),
         buildHitCanvas: clone(metrics.buildHitCanvas),
         settleExactRefresh: clone(metrics.settleExactRefresh),
+        drawPoliticalBackgroundFillsPass: clone(metrics.drawPoliticalBackgroundFillsPass),
+        drawPoliticalFeatureFillLoop: clone(metrics.drawPoliticalFeatureFillLoop),
+        drawPoliticalFeatureStrokeLoop: clone(metrics.drawPoliticalFeatureStrokeLoop),
+        politicalPassVisibleItems: clone(metrics.politicalPassVisibleItems),
+        drawContextScenarioPass: clone(metrics.drawContextScenarioPass),
+        drawLabelsPass: clone(metrics.drawLabelsPass),
+        scenarioPoliticalBackgroundCacheBuild: clone(metrics.scenarioPoliticalBackgroundCacheBuild),
+        scenarioPoliticalBackgroundCacheReplay: clone(metrics.scenarioPoliticalBackgroundCacheReplay),
+        politicalRasterWorkerRoundTripMs: clone(metrics["politicalRasterWorker.roundTripMs"]),
+        politicalRasterWorkerAcceptedCount: clone(metrics["politicalRasterWorker.acceptedCount"]),
+        politicalRasterWorkerRejectedStaleCount: clone(metrics["politicalRasterWorker.rejectedStaleCount"]),
+        politicalRasterWorkerFallbackCount: clone(metrics["politicalRasterWorker.fallbackCount"]),
+      }};
+    }})()"""
+
+
+def clone_repeated_zoom_pass_attribution_js(source: str = "state.renderPerfMetrics") -> str:
+    return f"""(() => {{
+      const metrics = {source} || {{}};
+      const clone = (value) => value && typeof value === 'object'
+        ? JSON.parse(JSON.stringify(value))
+        : null;
+      const passMetricNames = {{
+        politicalBg: "drawPoliticalBackgroundFillsPass",
+        politicalFill: "drawPoliticalFeatureFillLoop",
+        politicalStroke: "drawPoliticalFeatureStrokeLoop",
+        contextScenario: "drawContextScenarioPass",
+        labels: "drawLabelsPass",
+        hitCanvas: "buildHitCanvas",
+        settleExact: "settleExactRefresh",
+        bgCacheBuild: "scenarioPoliticalBackgroundCacheBuild",
+        bgCacheReplay: "scenarioPoliticalBackgroundCacheReplay",
+      }};
+      const passes = {{}};
+      Object.entries(passMetricNames).forEach(([label, metricName]) => {{
+        const entry = clone(metrics[metricName]);
+        if (!entry) return;
+        passes[label] = {{
+          metricName,
+          durationMs: Number(entry.durationMs || 0),
+          recordedAt: Number(entry.recordedAt || 0),
+          details: entry,
+        }};
+      }});
+      return {{
+        schema: "mc_pass_attribution_v1",
+        passes,
+        scheduler: clone(metrics.frameSchedulerQueueDepth),
+        chunkCost: clone(metrics.selectedFeatureCountSum),
+        chunkSelection: clone(metrics.chunkSelectionMs),
+        politicalPassVisibleItems: clone(metrics.politicalPassVisibleItems),
+        politicalRasterWorker: {{
+          roundTripMs: clone(metrics["politicalRasterWorker.roundTripMs"]),
+          rasterMs: clone(metrics["politicalRasterWorker.rasterMs"]),
+          encodeMs: clone(metrics["politicalRasterWorker.encodeMs"]),
+          decodeMs: clone(metrics["politicalRasterWorker.decodeMs"]),
+          blitMs: clone(metrics["politicalRasterWorker.blitMs"]),
+          acceptedCount: clone(metrics["politicalRasterWorker.acceptedCount"]),
+          rejectedStaleCount: clone(metrics["politicalRasterWorker.rejectedStaleCount"]),
+          fallbackCount: clone(metrics["politicalRasterWorker.fallbackCount"]),
+        }},
       }};
     }})()"""
 
@@ -829,6 +890,12 @@ def sample_canvas_black_pixel_details_js() -> str:
     return """(() => {
       const canvas = document.getElementById('map-canvas') || document.getElementById('colorCanvas');
       if (!canvas || !canvas.width || !canvas.height) return null;
+      const classifyRatio = (ratio) => {
+        const value = Number(ratio || 0);
+        if (value >= 0.95) return 'blank-frame-candidate';
+        if (value >= 0.25) return 'dark-content-candidate';
+        return 'normal';
+      };
       const sampleWidth = Math.min(80, Math.max(1, canvas.width));
       const sampleHeight = Math.min(54, Math.max(1, canvas.height));
       const sampleCanvas = document.createElement('canvas');
@@ -862,6 +929,7 @@ def sample_canvas_black_pixel_details_js() -> str:
           const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
           if (alpha > 0 && luminance < 8) regionBlack += 1;
         }
+        const regionRatio = Number((regionBlack / Math.max(1, regionSampled)).toFixed(6));
         black += regionBlack;
         regions.push({
           label,
@@ -871,11 +939,16 @@ def sample_canvas_black_pixel_details_js() -> str:
           sourceY,
           sampled: regionSampled,
           black: regionBlack,
-          ratio: Number((regionBlack / Math.max(1, regionSampled)).toFixed(6)),
+          ratio: regionRatio,
+          classification: classifyRatio(regionRatio),
         });
       }
+      const maxRegionRatio = regions.reduce((max, entry) => Math.max(max, Number(entry.ratio || 0)), 0);
       return {
         ratio: sampled > 0 ? Number((black / sampled).toFixed(6)) : null,
+        maxRegionRatio,
+        classification: classifyRatio(maxRegionRatio),
+        blankCandidateCount: regions.filter((entry) => entry.classification === 'blank-frame-candidate').length,
         sampled,
         black,
         regions,
@@ -1575,6 +1648,8 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
     max_long_values: list[float] = []
     used_heap_deltas: list[float] = []
     region_summaries: dict[str, dict] = {}
+    pass_duration_values: dict[str, list[float]] = {}
+    black_classification_counts: dict[str, int] = {}
     for region_id, region_payload in regions.items():
       if not isinstance(region_payload, dict):
         continue
@@ -1600,6 +1675,21 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
       used_heap_delta = as_finite_number(memory_delta.get("usedJSHeapSize"))
       if used_heap_delta is not None:
         used_heap_deltas.append(used_heap_delta)
+      for cycle in cycles:
+        if not isinstance(cycle, dict):
+          continue
+        pass_attribution = cycle.get("passAttribution") if isinstance(cycle.get("passAttribution"), dict) else {}
+        passes = pass_attribution.get("passes") if isinstance(pass_attribution.get("passes"), dict) else {}
+        for pass_name, pass_entry in passes.items():
+          if not isinstance(pass_entry, dict):
+            continue
+          duration = as_finite_number(pass_entry.get("durationMs"))
+          if duration is not None:
+            pass_duration_values.setdefault(str(pass_name), []).append(duration)
+        black_attribution = cycle.get("blackPixelAttribution") if isinstance(cycle.get("blackPixelAttribution"), dict) else {}
+        classification = str(black_attribution.get("classification") or "").strip()
+        if classification:
+          black_classification_counts[classification] = black_classification_counts.get(classification, 0) + 1
       region_summaries[str(region_id)] = {
         "cycleCount": len(cycles),
         "firstIdleAfterLastWheelMs": summarize_distribution(cycle_idle_values),
@@ -1607,7 +1697,12 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
         "maxBlackPixelRatio": max_black,
         "maxLongTaskMs": max_long,
         "memoryDelta": memory_delta,
+        "passAttributionSchema": region_payload.get("passAttributionSchema") or probe.get("passAttributionSchema"),
       }
+    pass_attribution_summary = {
+      pass_name: summarize_distribution(values)
+      for pass_name, values in sorted(pass_duration_values.items())
+    }
     return {
       "present": bool(regions),
       "source": "repeatedZoomRegions",
@@ -1616,6 +1711,7 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
       "count": max(degradation_ratios) if degradation_ratios else None,
       "details": {
         "interactionProbeSchema": probe.get("interactionProbeSchema"),
+        "passAttributionSchema": probe.get("passAttributionSchema"),
         "regionCount": len(regions),
         "cycleCount": as_finite_number(probe.get("cyclesPerRegion")),
         "wheelsPerCycle": as_finite_number(probe.get("wheelsPerCycle")),
@@ -1629,6 +1725,8 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
         "memory": {
           "usedJSHeapSizeDelta": summarize_distribution(used_heap_deltas),
         },
+        "passAttribution": pass_attribution_summary,
+        "blackPixelClassification": black_classification_counts,
         "regions": region_summaries,
       },
     }
@@ -3030,6 +3128,14 @@ async (page) => {{
       blackFrameCount: Number(state.renderPerfMetrics?.blackFrameCount?.count || 0),
       blackPixelRatio: blackPixelSamples?.ratio ?? {sample_canvas_black_pixel_ratio_js()},
       blackPixelSamples,
+      blackPixelAttribution: blackPixelSamples ? {{
+        schema: 'mc_black_pixel_attribution_v1',
+        classification: String(blackPixelSamples.classification || ''),
+        maxRegionRatio: Number(blackPixelSamples.maxRegionRatio || 0),
+        blankCandidateCount: Number(blackPixelSamples.blankCandidateCount || 0),
+        renderPhase: String(state.renderPhase || ''),
+        regions: Array.isArray(blackPixelSamples.regions) ? blackPixelSamples.regions : [],
+      }} : null,
       memory: {sample_js_heap_memory_js()},
       longTasks: includeLongTasks ? newLongTasks.slice(-40) : [],
       longTaskCountDelta: newLongTasks.length,
@@ -3037,6 +3143,7 @@ async (page) => {{
       longTaskDurationTotalMs: newLongTasks.reduce((sum, entry) => sum + Math.max(0, Number(entry.duration || 0)), 0),
       lastFrame: includeHeavyMetrics ? {clone_frame_js("state.renderPassCache?.lastFrame || null")} : null,
       renderMetrics: includeHeavyMetrics ? {clone_repeated_zoom_render_metrics_summary_js()} : {{}},
+      passAttribution: includeHeavyMetrics ? {clone_repeated_zoom_pass_attribution_js()} : null,
       runtimeChunkLoadState: includeHeavyMetrics ? {clone_runtime_chunk_load_state_summary_js()} : null,
     }};
   }}, payload);
@@ -3044,6 +3151,8 @@ async (page) => {{
   const result = {{
     requestedScenarioId: String(config.scenarioId || ''),
     interactionProbeSchema: 'mc_repeated_zoom_regions_v1',
+    passAttributionSchema: 'mc_pass_attribution_v1',
+    blackPixelAttributionSchema: 'mc_black_pixel_attribution_v1',
     regionsRequested: config.regions,
     cyclesPerRegion: Number(config.cycles || 0),
     wheelsPerCycle: Number(config.wheelsPerCycle || 0),
@@ -3129,6 +3238,8 @@ async (page) => {{
             - Number(baseline.memory?.usedJSHeapSize || 0)
           ) : null,
         }},
+        passAttribution: after.passAttribution || null,
+        blackPixelAttribution: after.blackPixelAttribution || null,
       }});
     }}
     const memoryAfter = await page.evaluate(() => {{ return {sample_js_heap_memory_js()}; }});
@@ -3156,6 +3267,17 @@ async (page) => {{
       maxBlackPixelRatio: regionCycles.reduce((max, cycle) => Math.max(max, Number(cycle.maxBlackPixelRatio || 0)), 0),
       maxLongTaskMs: regionCycles.reduce((max, cycle) => Math.max(max, Number(cycle.maxLongTaskMs || 0)), 0),
       longTaskAttribution,
+      passAttributionSchema: 'mc_pass_attribution_v1',
+      passAttribution: regionCycles
+        .map((cycle) => ({{
+          cycleIndex: Number(cycle.cycleIndex || 0),
+          passAttribution: cycle.passAttribution || null,
+        }})),
+      blackPixelAttribution: regionCycles
+        .map((cycle) => ({{
+          cycleIndex: Number(cycle.cycleIndex || 0),
+          blackPixelAttribution: cycle.blackPixelAttribution || null,
+        }})),
     }};
   }}
   await resetZoom();
@@ -3378,14 +3500,24 @@ async (page) => {{
 def capture_political_raster_worker_metrics() -> dict:
     js = """
 async (page) => {
-  return await page.evaluate(() => {
+    return await page.evaluate(() => {
     const source = window.__mc_politicalRasterWorkerMetrics || {};
     return {
+      protocolVersion: Number(source.protocolVersion || 0),
       roundTripMs: Number(source.roundTripMs || 0),
+      rasterMs: Number(source.rasterMs || 0),
+      encodeMs: Number(source.encodeMs || 0),
+      decodeMs: Number(source.decodeMs || 0),
+      blitMs: Number(source.blitMs || 0),
       timeoutCount: Number(source.timeoutCount || 0),
       recycleCount: Number(source.recycleCount || 0),
       staleResponseCount: Number(source.staleResponseCount || 0),
+      acceptedCount: Number(source.acceptedCount || 0),
+      rejectedStaleCount: Number(source.rejectedStaleCount || 0),
+      fallbackCount: Number(source.fallbackCount || 0),
       enabled: !!source.enabled,
+      lastReason: String(source.lastReason || ''),
+      lastTaskId: String(source.lastTaskId || ''),
     };
   });
 }
@@ -3557,10 +3689,11 @@ def main() -> None:
         "schemaVersion": 1,
         "probeSchema": "mc_perf_snapshot",
         "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
+        "passAttributionSchema": "mc_pass_attribution_v1",
         "url": args.url,
         "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
-        "benchmarkMetricsSchemaVersion": "3.2",
+        "benchmarkMetricsSchemaVersion": "3.3",
         "config": {
           "repeatedZoomRegions": repeated_zoom_regions,
           "repeatedZoomCycles": int(args.repeated_zoom_cycles),

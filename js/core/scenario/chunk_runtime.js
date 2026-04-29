@@ -10,6 +10,8 @@ import { registerRuntimeHook } from "../state/index.js";
 
 const FOCUS_COUNTRY_OVERRIDE_TTL_MS = 5000;
 
+// zoom-end 之后短时间保留刚刚可见的 detail chunk，避免视图刚停稳就被立即驱逐，
+// 造成 detail geometry 闪烁或 post-apply 刷新反复打架。
 function clearZoomEndChunkProtectionState(loadState) {
   if (!loadState) return;
   loadState.zoomEndProtectedChunkIds = [];
@@ -233,6 +235,9 @@ function createScenarioChunkRuntimeController({
   }
 
   function ensureRuntimeChunkLoadState() {
+    // 这里是 runtime chunk state 的统一归一化入口。
+    // startup 恢复、局部热刷新、旧状态残留都会把字段带成半初始化形态，
+    // 所以每次进入主流程前都先把 timer、pending transaction、metrics 和 cache 字段补齐。
     if (!runtimeState.runtimeChunkLoadState || typeof runtimeState.runtimeChunkLoadState !== "object") {
       runtimeState.runtimeChunkLoadState = createDefaultRuntimeChunkLoadState();
     }
@@ -601,6 +606,8 @@ function createScenarioChunkRuntimeController({
     delayMs = 0,
     retry = false,
   } = {}) {
+    // promotion commit 必须单拥有者串行推进。
+    // 这里负责把多次 selection 变化折叠成一次延后提交，避免 visual/infra promotion 并发互踩。
     const loadState = ensureRuntimeChunkLoadState();
     if (!loadState.pendingPromotion) {
       clearPendingScenarioChunkPromotion(loadState);
@@ -1237,6 +1244,9 @@ function createScenarioChunkRuntimeController({
     pendingPromotion = null,
     renderNow = null,
   } = {}) {
+    // 真正的 promotion transaction 只允许一个 in-flight run。
+    // 结束后如果还有新的 refresh 请求，会通过 pendingPostCommitRefresh 重放，
+    // 这样可以保留最新选择结果，同时丢掉已经过时的 replay。
     const loadState = ensureRuntimeChunkLoadState();
     if (promotionCommitPromise || loadState.promotionCommitInFlight) {
       setPromotionCommitStatus(loadState, "promotion-commit-in-flight", { inFlight: true });

@@ -267,9 +267,17 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       /function drawTransformedFrameFromCaches[\s\S]*?settlePoliticalFastExactSkipped[\s\S]*?defer-to-sliced-exact-refresh/.test(rendererSource)
       && !/function drawTransformedFrameFromCaches[\s\S]*?renderPassToCache\("political", \(k\) => drawPoliticalPass\(k\)/.test(rendererSource),
     politicalRasterWorkerProtocolDefaultsOff:
-      politicalRasterWorkerClientSource.includes("POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 1")
+      politicalRasterWorkerClientSource.includes("POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 2")
       && politicalRasterWorkerClientSource.includes("political_raster_worker")
-      && politicalRasterWorkerClientSource.includes('reason: metrics.enabled ? "unsupported-capability" : "flag-disabled"')
+      && politicalRasterWorkerClientSource.includes('return { ok: false, reason: "flag-disabled" };')
+      && politicalRasterWorkerClientSource.includes('type: "RASTER_POLITICAL_PASS"')
+      && politicalRasterWorkerClientSource.includes("isPoliticalRasterWorkerResultCurrent(request, current)")
+      && politicalRasterWorkerClientSource.includes("acceptedCount")
+      && politicalRasterWorkerClientSource.includes("rejectedStaleCount")
+      && politicalRasterWorkerClientSource.includes("fallbackCount")
+      && politicalRasterWorkerClientSource.includes("passSignature")
+      && politicalRasterWorkerSource.includes('type: "RASTER_RESULT"')
+      && politicalRasterWorkerSource.includes('reason: "metadata-only"')
       && politicalRasterWorkerSource.includes('type: "ERROR"')
       && politicalRasterWorkerSource.includes("taskId"),
     exactComposeUsesCompositeBuffer:
@@ -326,7 +334,7 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
 
   const checks = {
     politicalPassStartsWithBackgroundFills:
-      /function drawPoliticalPass\(k\) \{[\s\S]*?const visibleItems = debugMode === "PROD" \? collectVisibleLandSpatialItems\(\) : null;[\s\S]*?drawPoliticalBackgroundFills\(\{[\s\S]*?returnSummary: true,[\s\S]*?\}\);[\s\S]*?if \(!(?:runtimeState|state)\.landData\?\.features\?\.length\) return;/.test(rendererSource),
+      /function drawPoliticalPass\(k\) \{[\s\S]*?const visibleItemsResult = debugMode === "PROD" \? collectVisibleLandSpatialItemsWithStats\(\) : null;[\s\S]*?const visibleItems = visibleItemsResult \? visibleItemsResult\.items : null;[\s\S]*?drawPoliticalBackgroundFills\(\{[\s\S]*?returnSummary: true,[\s\S]*?\}\);[\s\S]*?if \(!(?:runtimeState|state)\.landData\?\.features\?\.length\) return;/.test(rendererSource),
     backgroundFillHelperKeepsScenarioMergeSplit:
       /function drawPoliticalBackgroundFills\(options = \{\}\) \{[\s\S]*?if \(shouldUseScenarioPoliticalBackgroundMerge\(\)\) \{[\s\S]*?return drawScenarioPoliticalBackgroundFills\(options\);[\s\S]*?\}[\s\S]*?drawAdmin0BackgroundFills\(options\);/.test(rendererSource),
     backgroundFullPassCacheBuildsAndReplays:

@@ -1,7 +1,7 @@
 # App Performance Overhaul Plan
 
 ## Current phase
-Phase 2 v3.1 slice: metrics contract + hoi4_1939 startup bundle.
+2026-04-29 five-step interaction performance slice: pass attribution, dirty/cache narrowing metrics, cost-aware scheduling visibility, worker v2 protocol, and black-pixel attribution.
 
 ## Task list
 - [x] Preserve Phase 0/1 completed context.
@@ -161,3 +161,27 @@ Quantify and reduce repeated zoom degradation across TNO Europe, US East, and Ea
 - Final repeatedZoomRegions benchmark passed the 1.25 degradation target for all three regions: Europe 0.9039, US East 1.0131, East Asia 1.0632.
 - Cost-aware selection now lowers high-cost detail selection in complex regions while keeping center/overlap relevance ahead of raw cost.
 - This active folder stays open for future worker raster and political/background full-pass architecture slices.
+
+## 2026-04-29 five-step interaction performance execution
+
+### Goal
+Complete the next low-risk architecture slice after repeated zoom reached target ratios: make the remaining political/background full-pass cost visible, reduce repeated scheduling noise, and land a default-off worker v2 protocol without changing the default visual path.
+
+### Scope
+- Upgrade editor benchmark/report contracts to schema 3.3 with `passAttributionSchema="mc_pass_attribution_v1"`.
+- Add repeated-zoom pass attribution for political background/fill/stroke, contextScenario, labels, hit canvas, scheduler queue, chunk costs, and worker state.
+- Extend black-pixel samples with region-level classification so dark map content and blank-frame candidates are distinguishable.
+- Record political pass visible candidate stats alongside existing hit-canvas visible/global/cell-span metrics.
+- Upgrade the political raster worker shell to protocol v2 with request identity, task result, stale/accepted/fallback counters, and default-off safety.
+
+### Verification
+- Parent thread owns all syntax, contract, E2E, benchmark, baseline, and perf-gate execution.
+- Subagents remain static-only and review-only.
+- Required gates: perf gate contract, scenario chunk contracts, perf probe behavior, relevant Python compile/unit checks, dev E2E, editor benchmark, perf baseline, and perf gate.
+
+### Acceptance
+- Default worker-off path remains visually and behaviorally unchanged.
+- `repeatedZoomRegions` keeps Europe, US East, and East Asia degradation ratios at or below 1.25.
+- Benchmark output exposes pass-level attribution and black-pixel classification for every repeated zoom cycle.
+- Worker flag-on path records accepted/stale/fallback metrics without forcing political raster into the default render path.
+- Active docs, task checklist, review notes, and final verification evidence stay in this folder.

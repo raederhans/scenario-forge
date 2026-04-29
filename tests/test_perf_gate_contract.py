@@ -61,7 +61,7 @@ class PerfGateContractTest(unittest.TestCase):
 
     def test_perf_script_locks_hardening_contract(self):
         script = PERF_SCRIPT.read_text(encoding="utf-8")
-        self.assertIn('benchmarkMetricsSchemaVersion: "3.2"', script)
+        self.assertIn('benchmarkMetricsSchemaVersion: "3.3"', script)
         self.assertIn('probeSchema: "mc_perf_snapshot"', script)
         self.assertIn('const PERF_REPORT_CONTRACT_FIELDS = [', script)
         self.assertIn('getPerfReportContractMismatches(baselineReport, "baseline")', script)
@@ -103,7 +103,7 @@ class PerfGateContractTest(unittest.TestCase):
     def test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields(self):
         baseline_payload = json.loads(BASELINE_JSON.read_text(encoding="utf-8"))
         self.assertEqual(baseline_payload.get("schemaVersion"), 1)
-        self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.2")
+        self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.3")
         self.assertEqual(baseline_payload.get("probeSchema"), "mc_perf_snapshot")
         self.assertRegex(str(baseline_payload.get("gitHead", "")), r"^[0-9a-f]{40}$")
         self.assertEqual(baseline_payload.get("config", {}).get("warmups"), 3)
@@ -119,7 +119,8 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('"schemaVersion": 1', script)
         self.assertIn('"probeSchema": "mc_perf_snapshot"', script)
         self.assertIn('"interactionProbeSchema": "mc_repeated_zoom_regions_v1"', script)
-        self.assertIn('"benchmarkMetricsSchemaVersion": "3.2"', script)
+        self.assertIn('"passAttributionSchema": "mc_pass_attribution_v1"', script)
+        self.assertIn('"benchmarkMetricsSchemaVersion": "3.3"', script)
         self.assertIn("--repeated-zoom-regions", script)
         self.assertIn("--repeated-zoom-cycles", script)
         self.assertIn("--repeated-zoom-wheels-per-cycle", script)
@@ -133,6 +134,9 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("return run_code_json(js, timeout_sec=timeout_sec)", script)
         self.assertIn("clone_runtime_chunk_load_state_summary_js", script)
         self.assertIn("clone_repeated_zoom_render_metrics_summary_js", script)
+        self.assertIn("clone_repeated_zoom_pass_attribution_js", script)
+        self.assertIn("mc_black_pixel_attribution_v1", script)
+        self.assertIn("blank-frame-candidate", script)
         self.assertIn("mergedLayerPayloadCacheLayerCount", script)
         self.assertIn("includeHeavyMetrics: false", script)
         self.assertIn("includeHeavyMetrics: true", script)
@@ -143,6 +147,9 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('"git", "rev-parse", "HEAD"', script)
         self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
         self.assertIn('"politicalRasterWorker": political_raster_worker', script)
+        self.assertIn("acceptedCount: Number(source.acceptedCount || 0)", script)
+        self.assertIn("rejectedStaleCount: Number(source.rejectedStaleCount || 0)", script)
+        self.assertIn("fallbackCount: Number(source.fallbackCount || 0)", script)
         self.assertIn("const sampleRegions = [", script)
         self.assertIn("sampleContext.drawImage(canvas, sourceX, sourceY", script)
 
@@ -157,18 +164,40 @@ class PerfGateContractTest(unittest.TestCase):
             "repeatedZoomRegions": {
                 "requestedScenarioId": "tno_1962",
                 "interactionProbeSchema": "mc_repeated_zoom_regions_v1",
+                "passAttributionSchema": "mc_pass_attribution_v1",
                 "cyclesPerRegion": 2,
                 "wheelsPerCycle": 5,
                 "regions": {
                     "europe": {
                         "cycles": [
-                            {"firstIdleAfterLastWheelMs": 100},
-                            {"firstIdleAfterLastWheelMs": 125},
+                            {
+                                "firstIdleAfterLastWheelMs": 100,
+                                "passAttribution": {
+                                    "passes": {
+                                        "politicalBg": {"durationMs": 12},
+                                    },
+                                },
+                                "blackPixelAttribution": {
+                                    "classification": "normal",
+                                },
+                            },
+                            {
+                                "firstIdleAfterLastWheelMs": 125,
+                                "passAttribution": {
+                                    "passes": {
+                                        "politicalBg": {"durationMs": 18},
+                                    },
+                                },
+                                "blackPixelAttribution": {
+                                    "classification": "dark-content-candidate",
+                                },
+                            },
                         ],
                         "degradation": {"ratio": 1.25},
                         "maxBlackPixelRatio": 0.02,
                         "maxLongTaskMs": 30,
                         "memoryDelta": {"usedJSHeapSize": 2048},
+                        "passAttributionSchema": "mc_pass_attribution_v1",
                     }
                 },
             },
@@ -179,7 +208,11 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertEqual(metric["count"], 1.25)
         self.assertTrue(metric["details"]["sameScenario"])
         self.assertEqual(metric["details"]["interactionProbeSchema"], "mc_repeated_zoom_regions_v1")
+        self.assertEqual(metric["details"]["passAttributionSchema"], "mc_pass_attribution_v1")
         self.assertEqual(metric["details"]["regions"]["europe"]["degradation"]["ratio"], 1.25)
+        self.assertEqual(metric["details"]["passAttribution"]["politicalBg"]["max"], 18)
+        self.assertEqual(metric["details"]["blackPixelClassification"]["normal"], 1)
+        self.assertEqual(metric["details"]["blackPixelClassification"]["dark-content-candidate"], 1)
 
     def test_fill_action_metrics_carry_black_pixel_ratio(self):
         benchmark = load_editor_benchmark_module()
