@@ -68,6 +68,7 @@ def _write_publish_bundle_dir(
     controllers: dict[str, str] | None = None,
     cores: dict[str, object] | None = None,
     runtime_feature_ids: list[str] | None = None,
+    runtime_feature_props: dict[str, dict[str, object]] | None = None,
     manifest_feature_count: int | None = None,
 ) -> None:
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -109,7 +110,10 @@ def _write_publish_bundle_dir(
                         "geometries": [
                             {
                                 "type": "Polygon",
-                                "properties": {"id": feature_id},
+                                "properties": {
+                                    "id": feature_id,
+                                    **((runtime_feature_props or {}).get(feature_id, {})),
+                                },
                                 "arcs": [],
                             }
                             for feature_id in runtime_ids
@@ -1076,10 +1080,39 @@ class TnoBundleBuilderTest(unittest.TestCase):
         ]
         polar_diagnostics = build_polar_feature_diagnostics_from_topology(topology_payload, "political")
         shell_fragment_count = sum(feature_id.startswith("RU_ARCTIC_FB_") for feature_id in feature_ids)
+        shell_source_fragment_count = sum(
+            int((geometry.get("properties", {}) or {}).get("source_fragment_count") or 1)
+            for geometry in geometries
+            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
+        )
+        shell_source_area = sum(
+            float((geometry.get("properties", {}) or {}).get("source_fragment_area") or 0.0)
+            for geometry in geometries
+            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
+        )
+        shell_retained_area = sum(
+            float((geometry.get("properties", {}) or {}).get("retained_fragment_area") or 0.0)
+            for geometry in geometries
+            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
+        )
 
         self.assertIn("AQ", feature_ids)
         self.assertFalse(any(feature_id.startswith("AQ_") for feature_id in feature_ids))
-        self.assertGreaterEqual(shell_fragment_count, 300)
+        self.assertGreaterEqual(shell_fragment_count, 2)
+        self.assertLess(shell_fragment_count, 100)
+        self.assertFalse(any(re.fullmatch(r"RU_ARCTIC_FB_\d+", feature_id) for feature_id in feature_ids))
+        self.assertGreaterEqual(shell_source_fragment_count, 9000)
+        self.assertGreaterEqual(shell_retained_area / shell_source_area, 0.90)
+        shell_props = [
+            geometry.get("properties", {}) or {}
+            for geometry in geometries
+            if str((geometry.get("properties", {}) or {}).get("id") or "").strip().startswith("RU_ARCTIC_FB_")
+        ]
+        self.assertTrue(all(props.get("scenario_helper_kind") == "shell_fallback" for props in shell_props))
+        self.assertTrue(all(props.get("interactive") is False for props in shell_props))
+        self.assertTrue(all(props.get("render_as_base_geography") is False for props in shell_props))
+        self.assertTrue(all(props.get("scenario_shell_owner_hint") for props in shell_props))
+        self.assertTrue(all(props.get("scenario_shell_controller_hint") for props in shell_props))
         self.assertIn("AQ", polar_diagnostics)
         self.assertTrue(
             all(
@@ -1088,6 +1121,81 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 for entry in polar_diagnostics.values()
             )
         )
+
+    def test_build_runtime_shell_fragment_gdf_uses_full_runtime_shell_rows(self) -> None:
+        runtime_gdf = gpd.GeoDataFrame(
+            [
+                {"id": "RU_ARCTIC_FB_001", "name": "Russia Shell Fallback 1", "cntr_code": "RU", "geometry": _square(0, 0)},
+                {"id": "RU_ARCTIC_FB_002", "name": "Russia Shell Fallback 2", "cntr_code": "RU", "geometry": _square(2, 0)},
+                {"id": "RU-REAL", "name": "Russia", "cntr_code": "RU", "geometry": _square(4, 0)},
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        shell_gdf = tno_bundle.build_runtime_shell_fragment_gdf(runtime_gdf)
+
+        self.assertEqual(shell_gdf["id"].tolist(), ["RU_ARCTIC_FB_001", "RU_ARCTIC_FB_002"])
+        self.assertEqual(shell_gdf["interactive"].tolist(), [False, False])
+        self.assertEqual(shell_gdf["scenario_helper_kind"].tolist(), ["shell_fallback", "shell_fallback"])
+        self.assertEqual(shell_gdf["render_as_base_geography"].tolist(), [False, False])
+
+    def test_build_runtime_shell_fragment_gdf_coalesces_shell_rows_by_owner_hint(self) -> None:
+        runtime_gdf = gpd.GeoDataFrame(
+            [
+                {"id": "RU_ARCTIC_FB_001", "name": "Russia Shell Fallback 1", "cntr_code": "RU", "geometry": _square(40, 70)},
+                {"id": "RU_ARCTIC_FB_002", "name": "Russia Shell Fallback 2", "cntr_code": "RU", "geometry": _square(41, 70)},
+                {"id": "RU_ARCTIC_FB_003", "name": "Russia Shell Fallback 3", "cntr_code": "RU", "geometry": _square(80, 70)},
+                {"id": "RU-REAL-1", "name": "Russia A", "cntr_code": "RU", "geometry": _square(40, 68)},
+                {"id": "RU-REAL-2", "name": "Russia B", "cntr_code": "RU", "geometry": _square(80, 68)},
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        owner_reference_gdf = runtime_gdf.loc[runtime_gdf["id"].isin(["RU-REAL-1", "RU-REAL-2"])].copy()
+
+        shell_gdf = tno_bundle.build_runtime_shell_fragment_gdf(
+            runtime_gdf,
+            owner_reference_gdf=owner_reference_gdf,
+            owners_by_feature={"RU-REAL-1": "SOV", "RU-REAL-2": "KOM"},
+            controllers_by_feature={"RU-REAL-1": "SOV", "RU-REAL-2": "KOM"},
+        )
+
+        self.assertEqual(sorted(shell_gdf["scenario_shell_owner_hint"].tolist()), ["KOM", "SOV"])
+        self.assertEqual(int(shell_gdf["source_fragment_count"].sum()), 3)
+        self.assertGreater(float(shell_gdf["retained_fragment_area"].sum()), 0.0)
+        self.assertGreater(float(shell_gdf["source_fragment_area"].sum()), 0.0)
+        self.assertTrue(all(str(feature_id).startswith("RU_ARCTIC_FB_") for feature_id in shell_gdf["id"].tolist()))
+
+    def test_build_qyzylorda_inland_water_feature_extracts_kaz_3197_hole(self) -> None:
+        hole = Polygon([
+            (62.8, 45.5),
+            (64.0, 45.5),
+            (64.0, 46.4),
+            (62.8, 46.4),
+        ])
+        kaz_geometry = Polygon(_square(62.0, 45.0, 3.0).exterior.coords, [hole.exterior.coords])
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {
+                    "id": tno_bundle.TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID,
+                    "name": "Qyzylorda",
+                    "geometry": kaz_geometry,
+                },
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        feature = tno_bundle.build_qyzylorda_inland_water_feature(political_gdf)
+
+        props = feature["properties"]
+        water_geom = shape(feature["geometry"])
+        self.assertEqual(props["id"], tno_bundle.TNO_QYZYLORDA_INLAND_WATER_ID)
+        self.assertEqual(props["source_feature_id"], tno_bundle.TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID)
+        self.assertEqual(props["water_type"], "lake")
+        self.assertTrue(props["interactive"])
+        self.assertTrue(water_geom.contains(tno_bundle.TNO_QYZYLORDA_INLAND_WATER_PROBE))
 
     def test_resolve_publish_filenames_scopes(self) -> None:
         runtime_only = resolve_publish_filenames("polar_runtime")
@@ -1416,13 +1524,46 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 owners={"F-1": "AAA"},
                 controllers={"F-1": "AAA"},
                 cores={"F-1": ["AAA"]},
-                runtime_feature_ids=["F-1", "RU_ARCTIC_FB_1"],
+                runtime_feature_ids=["F-1", "RU_ARCTIC_FB_RFA_001"],
+                runtime_feature_props={
+                    "RU_ARCTIC_FB_RFA_001": {
+                        "scenario_helper_kind": "shell_fallback",
+                        "scenario_shell_owner_hint": "RFA",
+                        "scenario_shell_controller_hint": "RFA",
+                        "interactive": False,
+                    },
+                },
                 manifest_feature_count=1,
             )
 
             errors = validate_publish_bundle_dir(bundle_dir)
 
             self.assertEqual(errors, [])
+
+    def test_validate_publish_bundle_dir_rejects_legacy_shell_runtime_only_features(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            bundle_dir = Path(tmp_dir) / "bundle"
+            _write_publish_bundle_dir(
+                bundle_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1", "RU_ARCTIC_FB_1"],
+                runtime_feature_props={
+                    "RU_ARCTIC_FB_1": {
+                        "scenario_helper_kind": "shell_fallback",
+                        "interactive": False,
+                    },
+                },
+                manifest_feature_count=1,
+            )
+
+            errors = validate_publish_bundle_dir(bundle_dir)
+
+            self.assertTrue(
+                any("runtime-only Arctic shell features must be coalesced" in error for error in errors),
+                errors,
+            )
 
     def test_rebuild_feature_maps_skips_runtime_shell_fragments_before_explicit_or_source_map_resolution(self) -> None:
         political_gdf = gpd.GeoDataFrame(

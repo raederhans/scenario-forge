@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
@@ -636,6 +637,34 @@ def validate_strict_bundle_contract(
         errors.append(
             "runtime_topology political geometries may only exceed the feature maps with shell fallback ids in strict mode. "
             f"Sample: {illegal_runtime_only_ids[:10]}."
+        )
+    runtime_geometries = (
+        runtime_payload.get("objects", {})
+        .get("political", {})
+        .get("geometries", [])
+    )
+    shell_runtime_only_contract_errors: list[str] = []
+    if isinstance(runtime_geometries, list):
+        for geometry in runtime_geometries:
+            if not isinstance(geometry, dict):
+                continue
+            props = geometry.get("properties") if isinstance(geometry.get("properties"), dict) else {}
+            feature_id = str(props.get("id") or geometry.get("id") or "").strip()
+            if feature_id not in extra_runtime_ids:
+                continue
+            if not any(feature_id.startswith(prefix) for prefix in STRICT_RUNTIME_ONLY_FEATURE_ID_PREFIXES):
+                continue
+            if (
+                re.fullmatch(r"RU_ARCTIC_FB_\d+", feature_id)
+                or props.get("scenario_helper_kind") != "shell_fallback"
+                or not props.get("scenario_shell_owner_hint")
+                or not props.get("scenario_shell_controller_hint")
+            ):
+                shell_runtime_only_contract_errors.append(feature_id)
+    if shell_runtime_only_contract_errors:
+        errors.append(
+            "runtime-only Arctic shell features must be coalesced shell_fallback geometry with owner/controller hints in strict mode. "
+            f"Sample: {shell_runtime_only_contract_errors[:10]}."
         )
 
 

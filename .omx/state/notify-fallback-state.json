@@ -1,7 +1,7 @@
 {
-  "pid": 61900,
-  "parent_pid": 68988,
-  "started_at": "2026-04-23T19:37:56.975Z",
+  "pid": 107996,
+  "parent_pid": 104344,
+  "started_at": "2026-04-29T23:33:13.858Z",
   "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
   "authority_only": true,
@@ -17,7 +17,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-23T19:37:56.979Z",
+    "last_tick_at": "2026-04-29T23:33:13.861Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -30,7 +30,7 @@
     "leader_only": true,
     "stale_threshold_ms": 180000,
     "precomputed_leader_stale": true,
-    "last_tick_at": "2026-04-23T19:37:56.980Z",
+    "last_tick_at": "2026-04-29T23:33:13.863Z",
     "last_error": null,
     "run_count": 1
   },
@@ -57,11 +57,11 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-23T19:37:56.985Z",
-    "last_turn_at": "2026-04-20T00:27:51.799Z",
-    "last_turn_count": 80,
-    "last_message": "",
-    "last_reason": "hud_state_missing",
+    "last_tick_at": "2026-04-29T23:33:13.870Z",
+    "last_turn_at": "2026-04-29T22:43:52.319Z",
+    "last_turn_count": 6,
+    "last_message": "结论：本机 tmux/psmux 已经配置好，OMX team 诊断也通过；但你现在这个 Codex App 会话本身没有附着在 tmux 里，所以 `omx team / omx hud / omx",
+    "last_reason": "eligible_but_not_sent",
     "last_error": null,
     "last_nudged_signature": "",
     "last_nudged_at": ""
@@ -80,8 +80,8 @@
     "max_ms": 1000,
     "current_ms": 75,
     "idle_streak": 0,
-    "last_tick_at": "2026-04-23T19:37:56.986Z",
-    "last_activity_at": "2026-04-23T19:37:56.986Z",
+    "last_tick_at": "2026-04-29T23:33:13.877Z",
+    "last_activity_at": "2026-04-29T23:33:13.877Z",
     "last_activity_reason": "leader_nudge"
   },
   "last_cycle_activity": "leader_nudge"

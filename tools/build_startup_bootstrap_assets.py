@@ -20,10 +20,26 @@ from map_builder.contracts import (
 
 
 BOOTSTRAP_RUNTIME_OBJECTS = (
+    "political",
     "land_mask",
     "context_land_mask",
     "scenario_water",
     "scenario_special_land",
+)
+BOOTSTRAP_POLITICAL_PROPERTY_WHITELIST = (
+    "id",
+    "name",
+    "cntr_code",
+    "detail_tier",
+    "scenario_id",
+    "scenario_helper_kind",
+    "scenario_shell_owner_hint",
+    "scenario_shell_controller_hint",
+    "source_fragment_count",
+    "source_fragment_area",
+    "retained_fragment_area",
+    "interactive",
+    "render_as_base_geography",
 )
 STARTUP_BASE_OBJECTS = (
     "political",
@@ -85,6 +101,95 @@ def _normalize_string_set(values: object) -> set[str]:
     }
 
 
+def _iter_topology_arc_indexes(node):
+    if isinstance(node, bool):
+        return
+    if isinstance(node, int):
+        yield node if node >= 0 else ~node
+        return
+    if isinstance(node, list):
+        for child in node:
+            yield from _iter_topology_arc_indexes(child)
+
+
+def _remap_topology_arc_indexes(node, index_map: dict[int, int]):
+    if isinstance(node, bool):
+        return node
+    if isinstance(node, int):
+        source_index = node if node >= 0 else ~node
+        remapped_index = index_map[source_index]
+        return remapped_index if node >= 0 else ~remapped_index
+    if isinstance(node, list):
+        return [_remap_topology_arc_indexes(child, index_map) for child in node]
+    return copy.deepcopy(node)
+
+
+def _copy_bootstrap_geometry(geometry: object, index_map: dict[int, int], allowed_keys: tuple[str, ...]) -> object:
+    if not isinstance(geometry, dict):
+        return copy.deepcopy(geometry)
+    next_geometry = {}
+    for key, value in geometry.items():
+        if key == "properties":
+            properties = value if isinstance(value, dict) else {}
+            pruned_properties = {
+                prop_key: copy.deepcopy(properties[prop_key])
+                for prop_key in allowed_keys
+                if prop_key in properties and properties[prop_key] not in (None, "")
+            }
+            if pruned_properties:
+                next_geometry[key] = pruned_properties
+            continue
+        if key == "arcs":
+            next_geometry[key] = _remap_topology_arc_indexes(value, index_map)
+            continue
+        if key == "geometries" and isinstance(value, list):
+            next_geometry[key] = [
+                _copy_bootstrap_geometry(child, index_map, allowed_keys)
+                for child in value
+            ]
+            continue
+        next_geometry[key] = copy.deepcopy(value)
+    return next_geometry
+
+
+def _is_runtime_shell_geometry(geometry: object) -> bool:
+    if not isinstance(geometry, dict):
+        return False
+    properties = geometry.get("properties") if isinstance(geometry.get("properties"), dict) else {}
+    feature_id = _normalize_key(properties.get("id") or geometry.get("id")).upper()
+    helper_kind = _normalize_key(properties.get("scenario_helper_kind")).lower()
+    return feature_id.startswith("RU_ARCTIC_FB_") or helper_kind == "shell_fallback"
+
+
+def _copy_runtime_shell_political_object(full_topology: dict) -> tuple[dict | None, list]:
+    source_object = full_topology.get("objects", {}).get("political") if isinstance(full_topology, dict) else None
+    source_arcs = full_topology.get("arcs") if isinstance(full_topology, dict) else None
+    geometries = source_object.get("geometries") if isinstance(source_object, dict) else None
+    if not isinstance(geometries, list) or not isinstance(source_arcs, list):
+        return None, []
+    shell_geometries = [geometry for geometry in geometries if _is_runtime_shell_geometry(geometry)]
+    if not shell_geometries:
+        return None, []
+    used_arc_indexes: list[int] = []
+    seen_arc_indexes: set[int] = set()
+    for geometry in shell_geometries:
+        for arc_index in _iter_topology_arc_indexes(geometry.get("arcs")):
+            if arc_index in seen_arc_indexes:
+                continue
+            seen_arc_indexes.add(arc_index)
+            used_arc_indexes.append(arc_index)
+    index_map = {source_index: new_index for new_index, source_index in enumerate(used_arc_indexes)}
+    copied_object = {
+        "type": "GeometryCollection",
+        "geometries": [
+            _copy_bootstrap_geometry(geometry, index_map, BOOTSTRAP_POLITICAL_PROPERTY_WHITELIST)
+            for geometry in shell_geometries
+        ],
+        "computed_neighbors": [[] for _ in shell_geometries],
+    }
+    return copied_object, [copy.deepcopy(source_arcs[index]) for index in used_arc_indexes]
+
+
 def load_startup_support_whitelist(path: Path | None) -> dict[str, object] | None:
     if path is None:
         return None
@@ -113,7 +218,15 @@ def resolve_startup_support_whitelist_path(
 
 def build_bootstrap_runtime_topology(full_topology: dict) -> dict:
     selected_objects = {}
+    bootstrap_arcs: list = []
+    political_object, political_arcs = _copy_runtime_shell_political_object(full_topology)
+    if political_object is not None:
+        selected_objects["political"] = political_object
+        bootstrap_arcs.extend(political_arcs)
+
     for object_name in BOOTSTRAP_RUNTIME_OBJECTS:
+        if object_name == "political":
+            continue
         # Startup shell only needs object presence; empty collections keep scenarios
         # without water/special overlays on the same chunked-coarse contract.
         selected_objects[object_name] = {
@@ -124,8 +237,10 @@ def build_bootstrap_runtime_topology(full_topology: dict) -> dict:
     bootstrap_topology = {
         "type": "Topology",
         "objects": selected_objects,
-        "arcs": [],
+        "arcs": bootstrap_arcs,
     }
+    if bootstrap_arcs and "transform" in full_topology:
+        bootstrap_topology["transform"] = copy.deepcopy(full_topology["transform"])
     if "bbox" in full_topology:
         bootstrap_topology["bbox"] = copy.deepcopy(full_topology["bbox"])
     return bootstrap_topology

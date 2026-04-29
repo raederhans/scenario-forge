@@ -1395,6 +1395,1327 @@
           ]
         ]
       }
+    },
+    {
+      "id": 55,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_RKU_038",
+        "name": "Russia Shell Fallback RKU",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "RKU",
+        "scenario_shell_controller_hint": "RKU",
+        "source_fragment_count": 144.0,
+        "source_fragment_area": 0.436264,
+        "retained_fragment_area": 0.034814,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              34.85374853748539,
+              51.18281865718656
+            ],
+            [
+              35.04815048150482,
+              51.201912879128784
+            ],
+            [
+              35.08415084150843,
+              51.18455449554496
+            ],
+            [
+              35.15615156151563,
+              51.06304581045809
+            ],
+            [
+              35.19215192151921,
+              51.04568742687427
+            ],
+            [
+              35.30015300153002,
+              51.04568742687427
+            ],
+            [
+              35.33615336153363,
+              51.02832904329044
+            ],
+            [
+              35.30015300153002,
+              50.99361227612276
+            ],
+            [
+              35.30015300153002,
+              50.941537125371255
+            ],
+            [
+              35.33615336153363,
+              50.906820358203575
+            ],
+            [
+              35.37215372153722,
+              50.80267005670056
+            ],
+            [
+              35.44415444154441,
+              50.73323652236523
+            ],
+            [
+              35.43695436954371,
+              50.66380298802987
+            ],
+            [
+              35.4729547295473,
+              50.674218018180184
+            ],
+            [
+              35.45855458554587,
+              50.68810472504724
+            ],
+            [
+              35.48735487354875,
+              50.776632481324825
+            ],
+            [
+              35.41175411754119,
+              50.80267005670056
+            ],
+            [
+              35.4009540095401,
+              50.91549954999549
+            ],
+            [
+              35.32535325353254,
+              50.9467446404464
+            ],
+            [
+              35.354153541535425,
+              50.974518054180535
+            ],
+            [
+              35.54135541355416,
+              50.945008802088026
+            ],
+            [
+              35.33255332553327,
+              50.99187643776439
+            ],
+            [
+              35.404554045540465,
+              51.04568742687427
+            ],
+            [
+              35.41895418954189,
+              51.042215750157496
+            ],
+            [
+              35.33615336153363,
+              51.094290900909
+            ],
+            [
+              35.39735397353974,
+              51.05263078030781
+            ],
+            [
+              35.32175321753218,
+              51.08734754747546
+            ],
+            [
+              35.195751957519576,
+              51.05089494194941
+            ],
+            [
+              35.12375123751238,
+              51.16372443524436
+            ],
+            [
+              35.1489514895149,
+              51.22274293942938
+            ],
+            [
+              35.04095040950409,
+              51.205384555845555
+            ],
+            [
+              34.97974979749799,
+              51.234893807938064
+            ],
+            [
+              34.85374853748539,
+              51.18281865718656
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 56,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_RSF_039",
+        "name": "Russia Shell Fallback RSF",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "RSF",
+        "scenario_shell_controller_hint": "RSF",
+        "source_fragment_count": 126.0,
+        "source_fragment_area": 0.1485,
+        "retained_fragment_area": 0.005812,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.6480064800648,
+              58.1903981099811
+            ],
+            [
+              140.59040590405903,
+              58.05326687966878
+            ],
+            [
+              140.56160561605617,
+              58.01507843578436
+            ],
+            [
+              140.54000540005399,
+              58.01681427414273
+            ],
+            [
+              140.50040500405004,
+              57.867532175321756
+            ],
+            [
+              140.68400684006843,
+              58.21643568535684
+            ],
+            [
+              140.75240752407524,
+              58.27371835118352
+            ],
+            [
+              140.6480064800648,
+              58.1903981099811
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 57,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_RUR_040",
+        "name": "Russia Shell Fallback RUR",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "RUR",
+        "scenario_shell_controller_hint": "RUR",
+        "source_fragment_count": 97.0,
+        "source_fragment_area": 0.097036,
+        "retained_fragment_area": 0.005537,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              86.39546395463958,
+              53.59736981369814
+            ],
+            [
+              86.59346593465938,
+              53.50884205742058
+            ],
+            [
+              86.8130681306813,
+              53.451559391593904
+            ],
+            [
+              86.48546485464857,
+              53.57306807668077
+            ],
+            [
+              86.39546395463958,
+              53.59736981369814
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 58,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_SAM_041",
+        "name": "Russia Shell Fallback SAM",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "SAM",
+        "scenario_shell_controller_hint": "SAM",
+        "source_fragment_count": 381.0,
+        "source_fragment_area": 0.487666,
+        "retained_fragment_area": 0.00918,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              50.711907119071185,
+              56.00497761677617
+            ],
+            [
+              50.7479074790748,
+              55.91471402214022
+            ],
+            [
+              50.711907119071185,
+              55.92339321393213
+            ],
+            [
+              50.69030690306903,
+              55.92339321393213
+            ],
+            [
+              50.711907119071185,
+              55.92165737557376
+            ],
+            [
+              50.711907119071185,
+              55.89735563855639
+            ],
+            [
+              50.63990639906399,
+              55.85743135631357
+            ],
+            [
+              50.711907119071185,
+              55.82445042750426
+            ],
+            [
+              50.711907119071185,
+              55.841808811088114
+            ],
+            [
+              50.81990819908199,
+              55.86958222482225
+            ],
+            [
+              50.78390783907841,
+              55.91992153721536
+            ],
+            [
+              50.78390783907841,
+              55.89041228512285
+            ],
+            [
+              50.711907119071185,
+              56.00497761677617
+            ]
+          ],
+          [
+            [
+              50.81630816308163,
+              55.871318063180624
+            ],
+            [
+              50.81990819908199,
+              55.86958222482225
+            ],
+            [
+              50.79470794707947,
+              55.86784638646385
+            ],
+            [
+              50.81630816308163,
+              55.871318063180624
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 59,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_SAM_042",
+        "name": "Russia Shell Fallback SAM",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "SAM",
+        "scenario_shell_controller_hint": "SOV",
+        "source_fragment_count": 113.0,
+        "source_fragment_area": 0.121429,
+        "retained_fragment_area": 0.00699,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.34155341553415,
+              53.691105085050836
+            ],
+            [
+              55.39195391953919,
+              53.786576194761935
+            ],
+            [
+              55.363153631536335,
+              53.755331104311054
+            ],
+            [
+              55.3739537395374,
+              53.78136867968679
+            ],
+            [
+              55.319953199531994,
+              53.70499179191792
+            ],
+            [
+              55.103951039510406,
+              53.57306807668077
+            ],
+            [
+              55.067950679506794,
+              53.491483673836726
+            ],
+            [
+              55.103951039510406,
+              53.56438888488886
+            ],
+            [
+              55.2479524795248,
+              53.63035074250742
+            ],
+            [
+              55.34155341553415,
+              53.691105085050836
+            ]
+          ],
+          [
+            [
+              55.32715327153272,
+              53.69804843848438
+            ],
+            [
+              55.33435334353345,
+              53.70672763027629
+            ],
+            [
+              55.35235352353524,
+              53.73450104401043
+            ],
+            [
+              55.34155341553415,
+              53.70672763027629
+            ],
+            [
+              55.32715327153272,
+              53.69804843848438
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 60,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_SBA_043",
+        "name": "Russia Shell Fallback SBA",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "SBA",
+        "scenario_shell_controller_hint": "SBA",
+        "source_fragment_count": 107.0,
+        "source_fragment_area": 0.110268,
+        "retained_fragment_area": 0.007286,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              94.60354603546034,
+              55.59358392583927
+            ],
+            [
+              94.17154171541716,
+              55.5901122491225
+            ],
+            [
+              94.69714697146975,
+              55.56060299702996
+            ],
+            [
+              94.60354603546034,
+              55.59358392583927
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 61,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_SOV_044",
+        "name": "Russia Shell Fallback SOV",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "SOV",
+        "scenario_shell_controller_hint": "SOV",
+        "source_fragment_count": 18.0,
+        "source_fragment_area": 0.019947,
+        "retained_fragment_area": 0.003759,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              46.715867158671585,
+              43.85931662316624
+            ],
+            [
+              46.679866798668,
+              43.947844379443794
+            ],
+            [
+              46.679866798668,
+              43.85758078480784
+            ],
+            [
+              46.64746647466475,
+              43.84022240122401
+            ],
+            [
+              46.658266582665846,
+              43.82807153271533
+            ],
+            [
+              46.791467914679146,
+              43.854109108091066
+            ],
+            [
+              46.715867158671585,
+              43.85931662316624
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 62,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_SVR_045",
+        "name": "Russia Shell Fallback SVR",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "SVR",
+        "scenario_shell_controller_hint": "SVR",
+        "source_fragment_count": 322.0,
+        "source_fragment_area": 0.442126,
+        "retained_fragment_area": 0.035257,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              68.82008820088203,
+              66.82966561965618
+            ],
+            [
+              68.83448834488345,
+              66.82098642786427
+            ],
+            [
+              68.8128881288813,
+              66.82098642786427
+            ],
+            [
+              68.80928809288093,
+              66.81577891278913
+            ],
+            [
+              68.83088830888309,
+              66.81057139771399
+            ],
+            [
+              68.79848798487987,
+              66.80536388263882
+            ],
+            [
+              68.79848798487987,
+              66.79147717577176
+            ],
+            [
+              68.75528755287553,
+              66.79147717577176
+            ],
+            [
+              68.72288722887231,
+              66.77932630726308
+            ],
+            [
+              68.78768787687878,
+              66.75502457024571
+            ],
+            [
+              69.02889028890289,
+              66.765439600396
+            ],
+            [
+              69.00009000090003,
+              66.79321301413013
+            ],
+            [
+              69.01809018090182,
+              66.7984205292053
+            ],
+            [
+              68.96768967689678,
+              66.81057139771399
+            ],
+            [
+              69.05769057690577,
+              66.81404307443076
+            ],
+            [
+              68.96408964089642,
+              66.81230723607236
+            ],
+            [
+              68.96408964089642,
+              66.81057139771399
+            ],
+            [
+              68.98568985689857,
+              66.80362804428044
+            ],
+            [
+              68.90288902889029,
+              66.79147717577176
+            ],
+            [
+              68.80568805688057,
+              66.80362804428044
+            ],
+            [
+              68.85248852488525,
+              66.80362804428044
+            ],
+            [
+              68.89208892088922,
+              66.8192505895059
+            ],
+            [
+              68.9280892808928,
+              66.83834481144812
+            ],
+            [
+              68.93168931689317,
+              66.85917487174872
+            ],
+            [
+              69.09009090090902,
+              66.85570319503195
+            ],
+            [
+              69.05049050490507,
+              66.82272226622267
+            ],
+            [
+              69.06129061290613,
+              66.81404307443076
+            ],
+            [
+              69.12609126091263,
+              66.8175147511475
+            ],
+            [
+              69.0540905409054,
+              66.82272226622267
+            ],
+            [
+              69.11529115291154,
+              66.85743903339032
+            ],
+            [
+              69.32409324093243,
+              66.82966561965618
+            ],
+            [
+              69.26649266492666,
+              66.82619394293944
+            ],
+            [
+              69.43569435694357,
+              66.82272226622267
+            ],
+            [
+              69.39609396093962,
+              66.83313729637295
+            ],
+            [
+              69.33489334893349,
+              66.82966561965618
+            ],
+            [
+              69.39249392493926,
+              66.84875984159841
+            ],
+            [
+              69.63369633696337,
+              66.81404307443076
+            ],
+            [
+              69.61569615696158,
+              66.84181648816487
+            ],
+            [
+              69.57609576095763,
+              66.83313729637295
+            ],
+            [
+              69.4968949689497,
+              66.84702400324004
+            ],
+            [
+              69.33129331293313,
+              66.85049567995681
+            ],
+            [
+              69.11529115291154,
+              66.914721699217
+            ],
+            [
+              68.95688956889569,
+              66.86611822518226
+            ],
+            [
+              68.84528845288455,
+              66.90604250742508
+            ],
+            [
+              68.75168751687517,
+              66.87653325533255
+            ],
+            [
+              68.84168841688418,
+              66.86785406354063
+            ],
+            [
+              68.82008820088203,
+              66.82966561965618
+            ]
+          ],
+          [
+            [
+              68.75528755287553,
+              66.78279798397985
+            ],
+            [
+              68.75528755287553,
+              66.79147717577176
+            ],
+            [
+              68.79128791287914,
+              66.78974133741336
+            ],
+            [
+              68.75528755287553,
+              66.78279798397985
+            ]
+          ],
+          [
+            [
+              68.92448924489247,
+              66.86264654846549
+            ],
+            [
+              68.84888848888491,
+              66.80536388263882
+            ],
+            [
+              68.8128881288813,
+              66.8192505895059
+            ],
+            [
+              68.83808838088382,
+              66.82098642786427
+            ],
+            [
+              68.85248852488525,
+              66.869589901899
+            ],
+            [
+              68.92448924489247,
+              66.86264654846549
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 63,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_TAN_046",
+        "name": "Russia Shell Fallback TAN",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "TAN",
+        "scenario_shell_controller_hint": "TAN",
+        "source_fragment_count": 117.0,
+        "source_fragment_area": 0.315972,
+        "retained_fragment_area": 0.051242,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              94.28314283142834,
+              50.571803555035544
+            ],
+            [
+              93.3867338673387,
+              50.63082205922059
+            ],
+            [
+              93.30033300333002,
+              50.609991998919995
+            ],
+            [
+              93.62793627936281,
+              50.577011070110686
+            ],
+            [
+              93.98793987939882,
+              50.55965268652686
+            ],
+            [
+              94.05994059940599,
+              50.577011070110686
+            ],
+            [
+              94.23994239942402,
+              50.55965268652686
+            ],
+            [
+              94.27594275942761,
+              50.507577535775354
+            ],
+            [
+              94.34794347943483,
+              50.29927693276933
+            ],
+            [
+              94.34794347943483,
+              50.22984339843397
+            ],
+            [
+              94.38394383943842,
+              50.177768247682465
+            ],
+            [
+              94.45594455944558,
+              50.16040986409864
+            ],
+            [
+              94.56394563945639,
+              50.09097632976331
+            ],
+            [
+              94.59994599945998,
+              50.02154279542795
+            ],
+            [
+              94.6719467194672,
+              50.02154279542795
+            ],
+            [
+              94.70434704347042,
+              50.0389011790118
+            ],
+            [
+              94.61434614346143,
+              50.03542950229503
+            ],
+            [
+              94.54234542345426,
+              50.13610812708127
+            ],
+            [
+              94.66114661146611,
+              50.141315642156414
+            ],
+            [
+              94.53154531545317,
+              50.13610812708127
+            ],
+            [
+              94.52074520745208,
+              50.174296570965694
+            ],
+            [
+              94.39114391143914,
+              50.214220853208545
+            ],
+            [
+              94.3407434074341,
+              50.50063418234181
+            ],
+            [
+              94.28314283142834,
+              50.571803555035544
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 64,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_TOM_047",
+        "name": "Russia Shell Fallback TOM",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "TOM",
+        "scenario_shell_controller_hint": "TOM",
+        "source_fragment_count": 185.0,
+        "source_fragment_area": 0.702469,
+        "retained_fragment_area": 0.158461,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                74.58014580145803,
+                72.88774149041491
+              ],
+              [
+                74.61614616146161,
+                72.8998923589236
+              ],
+              [
+                74.41094410944109,
+                72.9311374493745
+              ],
+              [
+                74.2057420574206,
+                72.99189179191792
+              ],
+              [
+                74.65214652146523,
+                72.99709930699306
+              ],
+              [
+                74.65214652146523,
+                72.97453340833407
+              ],
+              [
+                74.68814688146881,
+                73.07868370983711
+              ],
+              [
+                74.97614976149762,
+                73.06132532625325
+              ],
+              [
+                74.22014220142202,
+                73.11340047700476
+              ],
+              [
+                74.13734137341373,
+                73.06306116461165
+              ],
+              [
+                74.11214112141121,
+                73.0266085590856
+              ],
+              [
+                74.13734137341373,
+                73.00751433714338
+              ],
+              [
+                74.50814508145083,
+                72.89642068220682
+              ],
+              [
+                74.58014580145803,
+                72.88774149041491
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                76.47736477364776,
+                79.63841686616867
+              ],
+              [
+                76.27216272162724,
+                79.60717177571776
+              ],
+              [
+                76.12816128161285,
+                79.64188854288544
+              ],
+              [
+                76.27216272162724,
+                79.64188854288544
+              ],
+              [
+                76.2361623616236,
+                79.65924692646927
+              ],
+              [
+                76.05616056160562,
+                79.64188854288544
+              ],
+              [
+                76.16416164161643,
+                79.57245500855008
+              ],
+              [
+                76.63216632166325,
+                79.55509662496625
+              ],
+              [
+                76.70416704167042,
+                79.52037985779857
+              ],
+              [
+                76.63216632166325,
+                79.4856630906309
+              ],
+              [
+                77.60417604176041,
+                79.50302147421475
+              ],
+              [
+                76.61416614166143,
+                79.62626599765998
+              ],
+              [
+                76.47736477364776,
+                79.63841686616867
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 65,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_TYM_048",
+        "name": "Russia Shell Fallback TYM",
+        "cntr_code": "RU",
+        "admin1_group": null,
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "TYM",
+        "scenario_shell_controller_hint": "TYM",
+        "source_fragment_count": 110.0,
+        "source_fragment_area": 0.145688,
+        "retained_fragment_area": 0.008799,
+        "interactive": false,
+        "render_as_base_geography": false,
+        "region_id": null,
+        "region_group": null,
+        "atl_surface_kind": null,
+        "atl_region_group": null,
+        "atl_geometry_role": null,
+        "atl_join_mode": null,
+        "owner_tag": null,
+        "synthetic_owner": null,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": null,
+        "atl_subbasin_id": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              63.06723067230672,
+              54.10597045270454
+            ],
+            [
+              62.85842858428586,
+              54.11812132121322
+            ],
+            [
+              62.59562595625957,
+              54.07472536225363
+            ],
+            [
+              62.58122581225814,
+              54.04521611016109
+            ],
+            [
+              62.628026280262816,
+              54.06778200882009
+            ],
+            [
+              63.06723067230672,
+              54.10597045270454
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

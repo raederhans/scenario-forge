@@ -25,7 +25,7 @@ from shapely import make_valid
 from rasterio import features as raster_features
 from rasterio.transform import Affine
 from shapely import affinity
-from shapely.geometry import GeometryCollection, LineString, MultiPolygon, Polygon, box, mapping, shape
+from shapely.geometry import GeometryCollection, LineString, MultiPolygon, Point, Polygon, box, mapping, shape
 from shapely.geometry.polygon import orient
 from shapely.ops import snap, unary_union
 from shapely.validation import explain_validity
@@ -111,6 +111,12 @@ TNO_PALETTE_AUDIT_PATH = ROOT / "data/palette-maps/tno.audit.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
 CHECKPOINT_BUILD_LOCK_FILENAME = ".build.lock"
+TNO_QYZYLORDA_INLAND_WATER_ID = "tno_qyzylorda_inland_water"
+TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID = "KAZ-3197"
+TNO_QYZYLORDA_INLAND_WATER_PROBE = Point(63.38183, 45.97802)
+TNO_QYZYLORDA_INLAND_WATER_MIN_AREA = 0.5
+TNO_ARCTIC_SHELL_MIN_PART_AREA = 0.05
+TNO_ARCTIC_SHELL_SIMPLIFY_TOLERANCE = 0.01
 STAGE_ALL = "all"
 STAGE_COUNTRIES = "countries"
 STAGE_WATER_STATE = "water_state"
@@ -8674,6 +8680,66 @@ def build_congo_lake_geometry(key_image: np.ndarray, province_type_by_id: dict[i
     return lake_geom, sorted(component_ids)
 
 
+def extract_polygon_interior_holes(geom) -> list[Polygon]:
+    holes: list[Polygon] = []
+    for part in iter_polygon_parts(normalize_polygonal(geom)):
+        for ring in part.interiors:
+            hole = normalize_polygonal(Polygon(ring))
+            if isinstance(hole, Polygon):
+                holes.append(hole)
+            elif isinstance(hole, MultiPolygon):
+                holes.extend(iter_polygon_parts(hole))
+    return holes
+
+
+def build_qyzylorda_inland_water_feature(scenario_political_gdf: gpd.GeoDataFrame) -> dict:
+    if scenario_political_gdf is None or scenario_political_gdf.empty:
+        raise ValueError("Qyzylorda inland water build requires scenario political geometry.")
+    id_series = scenario_political_gdf["id"].fillna("").astype(str).str.strip()
+    source_rows = scenario_political_gdf.loc[
+        id_series == TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID
+    ].copy()
+    if source_rows.empty:
+        raise ValueError(
+            f"Missing {TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID} for Qyzylorda inland water build."
+        )
+
+    candidate_holes = [
+        hole
+        for geom in source_rows.geometry.tolist()
+        for hole in extract_polygon_interior_holes(geom)
+        if hole.area >= TNO_QYZYLORDA_INLAND_WATER_MIN_AREA
+    ]
+    matching_holes = [
+        hole
+        for hole in candidate_holes
+        if hole.contains(TNO_QYZYLORDA_INLAND_WATER_PROBE) or hole.touches(TNO_QYZYLORDA_INLAND_WATER_PROBE)
+    ]
+    if not matching_holes:
+        raise ValueError("Qyzylorda inland water hole probe no longer matches KAZ-3197 interior geometry.")
+
+    water_geom = normalize_polygonal(max(matching_holes, key=lambda geom: geom.area))
+    if water_geom is None:
+        raise ValueError("Qyzylorda inland water geometry collapsed during normalization.")
+
+    return make_feature(water_geom, {
+        "id": TNO_QYZYLORDA_INLAND_WATER_ID,
+        "name": "Qyzylorda Inland Water",
+        "label": "Qyzylorda Inland Water",
+        "water_type": "lake",
+        "region_group": "inland_lake",
+        "parent_id": "",
+        "neighbors": "",
+        "is_chokepoint": False,
+        "interactive": True,
+        "scenario_id": SCENARIO_ID,
+        "source_standard": "tno_political_interior_hole",
+        "source_feature_id": TNO_QYZYLORDA_INLAND_WATER_SOURCE_FEATURE_ID,
+        "topology_mode": "true_water",
+        "render_as_base_geography": True,
+    })
+
+
 def fit_geometry_to_bbox(
     geom,
     target_bbox: tuple[float, float, float, float],
@@ -9433,7 +9499,113 @@ def build_single_antarctic_feature(
     return antarctic_gdf, explicit_assignments, diagnostics
 
 
-def build_runtime_shell_fragment_gdf(runtime_political_full_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+def _normalize_shell_hint(value: object, fallback: str = "") -> str:
+    normalized = normalize_tag(value)
+    if normalized:
+        return normalized
+    return normalize_tag(fallback)
+
+
+def build_coalesced_runtime_shell_fragment_gdf(
+    shell_gdf: gpd.GeoDataFrame,
+    owner_reference_gdf: gpd.GeoDataFrame,
+    owners_by_feature: dict[str, str],
+    controllers_by_feature: dict[str, str],
+) -> gpd.GeoDataFrame:
+    if shell_gdf.empty or owner_reference_gdf is None or owner_reference_gdf.empty:
+        return shell_gdf
+
+    reference_gdf = owner_reference_gdf.loc[
+        owner_reference_gdf["id"].fillna("").astype(str).str.strip().isin(owners_by_feature.keys())
+    ].copy()
+    if reference_gdf.empty:
+        return shell_gdf
+    northern_reference_gdf = reference_gdf.cx[:, 35.0:90.0]
+    if not northern_reference_gdf.empty:
+        reference_gdf = northern_reference_gdf
+
+    try:
+        shell_projected = shell_gdf.to_crs("EPSG:3413")
+        reference_projected = reference_gdf[["id", "geometry"]].to_crs("EPSG:3413").reset_index(drop=True)
+        reference_index = reference_projected.sindex
+        nearest_by_shell: dict[str, str] = {}
+        for row in shell_projected[["id", "geometry"]].to_dict("records"):
+            shell_id = str(row.get("id") or "").strip()
+            point = row.get("geometry").representative_point()
+            nearest_indexes = reference_index.nearest(point, return_all=False)
+            if len(nearest_indexes) < 2 or len(nearest_indexes[1]) == 0:
+                continue
+            nearest_position = int(nearest_indexes[1][0])
+            nearest_by_shell[shell_id] = str(reference_projected.iloc[nearest_position].get("id") or "").strip()
+    except Exception:
+        return shell_gdf
+
+    def _reduce_shell_visual_geometry(geom):
+        parts = iter_polygon_parts(normalize_polygonal(geom))
+        if not parts:
+            return None
+        retained_parts = [
+            part
+            for part in parts
+            if float(getattr(part, "area", 0.0) or 0.0) >= TNO_ARCTIC_SHELL_MIN_PART_AREA
+        ]
+        if not retained_parts:
+            retained_parts = [max(parts, key=lambda part: float(getattr(part, "area", 0.0) or 0.0))]
+        reduced = retained_parts[0] if len(retained_parts) == 1 else MultiPolygon(retained_parts)
+        if TNO_ARCTIC_SHELL_SIMPLIFY_TOLERANCE > 0:
+            reduced = reduced.simplify(TNO_ARCTIC_SHELL_SIMPLIFY_TOLERANCE, preserve_topology=True)
+        return normalize_polygonal(reduced)
+
+    grouped_geometries: dict[tuple[str, str], list] = {}
+    grouped_counts: dict[tuple[str, str], int] = {}
+    grouped_source_area: dict[tuple[str, str], float] = {}
+    for row in shell_gdf.to_dict("records"):
+        shell_id = str(row.get("id") or "").strip()
+        nearest_feature_id = nearest_by_shell.get(shell_id, "")
+        owner_hint = _normalize_shell_hint(owners_by_feature.get(nearest_feature_id), "RU")
+        controller_hint = _normalize_shell_hint(controllers_by_feature.get(nearest_feature_id), owner_hint)
+        key = (owner_hint, controller_hint)
+        geometry = row.get("geometry")
+        grouped_geometries.setdefault(key, []).append(geometry)
+        grouped_counts[key] = grouped_counts.get(key, 0) + 1
+        grouped_source_area[key] = grouped_source_area.get(key, 0.0) + float(getattr(geometry, "area", 0.0) or 0.0)
+
+    rows: list[dict[str, object]] = []
+    for index, ((owner_hint, controller_hint), geometries) in enumerate(sorted(grouped_geometries.items()), start=1):
+        source_area = grouped_source_area.get((owner_hint, controller_hint), 0.0)
+        geom = _reduce_shell_visual_geometry(safe_unary_union(geometries))
+        if geom is None:
+            continue
+        retained_area = float(getattr(geom, "area", 0.0) or 0.0)
+        owner_slug = re.sub(r"[^A-Z0-9]+", "_", owner_hint or "RU").strip("_") or "RU"
+        rows.append({
+            "id": f"RU_ARCTIC_FB_{owner_slug}_{index:03d}",
+            "name": f"Russia Shell Fallback {owner_hint or 'RU'}",
+            "cntr_code": "RU",
+            "detail_tier": "scenario_runtime_shell",
+            "__source": "detail",
+            "scenario_id": SCENARIO_ID,
+            "scenario_helper_kind": "shell_fallback",
+            "scenario_shell_owner_hint": owner_hint,
+            "scenario_shell_controller_hint": controller_hint,
+            "source_fragment_count": grouped_counts.get((owner_hint, controller_hint), 0),
+            "source_fragment_area": round(source_area, 6),
+            "retained_fragment_area": round(retained_area, 6),
+            "interactive": False,
+            "render_as_base_geography": False,
+            "geometry": geom,
+        })
+    if not rows:
+        return gpd.GeoDataFrame([], geometry="geometry", crs=shell_gdf.crs or "EPSG:4326")
+    return gpd.GeoDataFrame(rows, geometry="geometry", crs=shell_gdf.crs or "EPSG:4326")
+
+
+def build_runtime_shell_fragment_gdf(
+    runtime_political_full_gdf: gpd.GeoDataFrame,
+    owner_reference_gdf: gpd.GeoDataFrame | None = None,
+    owners_by_feature: dict[str, str] | None = None,
+    controllers_by_feature: dict[str, str] | None = None,
+) -> gpd.GeoDataFrame:
     id_series = runtime_political_full_gdf["id"].fillna("").astype(str).str.strip()
     shell_gdf = runtime_political_full_gdf.loc[
         id_series.str.upper().str.startswith("RU_ARCTIC_FB_")
@@ -9445,7 +9617,33 @@ def build_runtime_shell_fragment_gdf(runtime_political_full_gdf: gpd.GeoDataFram
         shell_gdf["scenario_helper_kind"] = "shell_fallback"
         if "render_as_base_geography" not in shell_gdf.columns:
             shell_gdf["render_as_base_geography"] = False
+    if owner_reference_gdf is not None and owners_by_feature:
+        shell_gdf = build_coalesced_runtime_shell_fragment_gdf(
+            shell_gdf,
+            owner_reference_gdf,
+            dict(owners_by_feature or {}),
+            dict(controllers_by_feature or {}),
+        )
     return shell_gdf
+
+
+def apply_runtime_shell_feature_flags(political_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if political_gdf is None or political_gdf.empty or "id" not in political_gdf.columns:
+        return political_gdf
+    result_gdf = political_gdf.copy()
+    shell_mask = result_gdf["id"].fillna("").astype(str).str.strip().str.upper().str.startswith("RU_ARCTIC_FB_")
+    if not shell_mask.any():
+        return result_gdf
+    for column, default_value in (
+        ("scenario_id", SCENARIO_ID),
+        ("scenario_helper_kind", "shell_fallback"),
+        ("interactive", False),
+        ("render_as_base_geography", False),
+    ):
+        if column not in result_gdf.columns:
+            result_gdf[column] = None
+        result_gdf.loc[shell_mask, column] = default_value
+    return result_gdf
 
 
 def load_existing_scenario_runtime_shell_fragment_gdf(scenario_dir: Path) -> gpd.GeoDataFrame:
@@ -10286,6 +10484,11 @@ def build_runtime_topology_payload(
         "__source",
         "scenario_id",
         "scenario_helper_kind",
+        "scenario_shell_owner_hint",
+        "scenario_shell_controller_hint",
+        "source_fragment_count",
+        "source_fragment_area",
+        "retained_fragment_area",
         "region_group",
         "atl_surface_kind",
         "atl_geometry_role",
@@ -10294,6 +10497,7 @@ def build_runtime_topology_payload(
         "render_as_base_geography",
         "geometry",
     ]
+    political_gdf = apply_runtime_shell_feature_flags(political_gdf)
     available_columns = [column for column in keep_columns if column in political_gdf.columns]
     runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
     runtime_political_gdf = apply_d3_spherical_safe_split_to_gdf(runtime_political_gdf, feature_ids={"AQ"})
@@ -10436,11 +10640,14 @@ def build_countries_stage_state(
     antarctic_gdf, antarctic_assignments, antarctic_diagnostics = build_single_antarctic_feature(
         runtime_political_full_gdf
     )
-    shell_fragment_gdf = load_existing_scenario_runtime_shell_fragment_gdf(scenario_dir)
     runtime_owned_political_gdf = runtime_political_full_gdf.loc[
         runtime_political_full_gdf["id"].isin(source_owner_feature_ids)
     ].copy().reset_index(drop=True)
     runtime_owned_political_gdf = pd_concat_geodataframes([runtime_owned_political_gdf, restore_gdf])
+    runtime_owned_ids = runtime_owned_political_gdf["id"].fillna("").astype(str).str.strip().str.upper()
+    runtime_owned_political_gdf = runtime_owned_political_gdf.loc[
+        ~runtime_owned_ids.str.startswith("RU_ARCTIC_FB_")
+    ].copy().reset_index(drop=True)
     if runtime_owned_political_gdf.empty:
         raise ValueError("Owned runtime political topology resolved zero features.")
 
@@ -10464,6 +10671,17 @@ def build_countries_stage_state(
         runtime_owned_political_gdf = runtime_owned_political_gdf.loc[
             ~runtime_owned_political_gdf["id"].isin(island_drop_ids)
         ].copy().reset_index(drop=True)
+    shell_owner_hints = dict(canonical_source_owners)
+    shell_controller_hints = dict(canonical_source_controllers)
+    for feature_id, assignment in restore_assignments.items():
+        shell_owner_hints[str(feature_id)] = _normalize_shell_hint(assignment.get("owner"))
+        shell_controller_hints[str(feature_id)] = _normalize_shell_hint(assignment.get("controller"), assignment.get("owner"))
+    shell_fragment_gdf = build_runtime_shell_fragment_gdf(
+        runtime_political_full_gdf,
+        owner_reference_gdf=runtime_owned_political_gdf,
+        owners_by_feature=shell_owner_hints,
+        controllers_by_feature=shell_controller_hints,
+    )
 
     atl_sea_collection, atl_sea_union, med_water_diagnostics = build_atl_sea_from_hgo(
         donor_context,
@@ -10480,6 +10698,7 @@ def build_countries_stage_state(
         crs="EPSG:4326",
     )
     scenario_political_gdf = scenario_political_gdf.drop_duplicates(subset=["id"], keep="first").reset_index(drop=True)
+    scenario_political_gdf = apply_runtime_shell_feature_flags(scenario_political_gdf)
     if scenario_political_gdf["id"].duplicated().any():
         duplicates = scenario_political_gdf.loc[scenario_political_gdf["id"].duplicated(), "id"].tolist()[:10]
         raise ValueError(f"Duplicate political feature ids after ATL append: {duplicates}")
@@ -10713,7 +10932,9 @@ def build_water_stage_state_from_countries_state(
         open_ocean_d3_reverse_orientation_ids,
     )
     scenario_water_features.extend(named_marginal_water_features)
+    qyzylorda_water_feature = build_qyzylorda_inland_water_feature(scenario_political_gdf)
     scenario_water_features.append(congo_feature)
+    scenario_water_features.append(qyzylorda_water_feature)
     validate_tno_water_geometries(
         scenario_water_features,
         stage_label="scenario_water_seed_final",
@@ -10771,6 +10992,7 @@ def build_water_stage_state_from_countries_state(
         "named_water_diagnostics": named_water_diagnostics,
         "named_water_snapshot_path": f"data/scenarios/{SCENARIO_ID}/{MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME}",
         "water_regions_provenance_path": f"data/scenarios/{SCENARIO_ID}/{TNO_WATER_REGIONS_PROVENANCE_FILENAME}",
+        "inland_water_feature_ids": [TNO_QYZYLORDA_INLAND_WATER_ID],
         "context_land_mask_tolerance": context_land_mask_tolerance,
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
@@ -10962,7 +11184,7 @@ def build_runtime_topology_state(
         "tno_water_region_ids": runtime_water_region_ids,
         "tno_named_marginal_water_ids": named_marginal_water_ids,
         "special_region_source": "runtime_topology_atl_political_features",
-        "water_region_source": "tno_extracted_lake_provinces+tno_ocean_bbox_split+marine_regions_named_waters_snapshot+global_water_region_clones",
+        "water_region_source": "tno_extracted_lake_provinces+tno_political_interior_holes+tno_ocean_bbox_split+marine_regions_named_waters_snapshot+global_water_region_clones",
         "german_baseline_annex_sets_applied": [
             "Alsace-Lorraine + Luxembourg",
             "North Schleswig + Bornholm",

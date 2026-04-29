@@ -29,6 +29,9 @@ TARGET_OPEN_OCEAN_IDS = {
     "tno_northwest_pacific_ocean",
     "tno_northeast_pacific_ocean",
 }
+TRACKED_INLAND_WATER_IDS = {
+    "tno_qyzylorda_inland_water",
+}
 TARGET_OPEN_OCEAN_MAX_COMPONENTS = {
     "tno_northwest_pacific_ocean": 7,
     "tno_northeast_pacific_ocean": 6,
@@ -204,6 +207,7 @@ TRACKED_COVERAGE_PROBES = [
     {"label": "banda_sea", "point": (128.0, -5.4), "allowed_ids": {"tno_banda_sea"}},
     {"label": "arabian_sea", "point": (64.4, 16.6), "allowed_ids": {"tno_arabian_sea"}},
     {"label": "gulf_of_aden", "point": (47.3, 12.3), "allowed_ids": {"tno_gulf_of_aden"}},
+    {"label": "qyzylorda_inland_water", "point": (63.38183, 45.97802), "allowed_ids": {"tno_qyzylorda_inland_water"}},
     {"label": "gulf_of_oman", "point": (58.3, 24.2), "allowed_ids": {"tno_gulf_of_oman"}},
     {"label": "persian_gulf", "point": (51.7, 26.8), "allowed_ids": {"tno_persian_gulf"}},
     {"label": "red_sea", "point": (38.5, 20.5), "allowed_ids": {"tno_red_sea"}},
@@ -537,8 +541,22 @@ def test_tno_water_chunk_feature_ids_cover_tracked_new_family_regions():
         str(feature.get("properties", {}).get("id") or "")
         for feature in _load_water_chunk_features()
     }
-    missing = sorted(feature_id for feature_id in TRACKED_NAMED_WATER_IDS if feature_id not in chunk_ids)
+    tracked_ids = TRACKED_NAMED_WATER_IDS | TRACKED_INLAND_WATER_IDS
+    missing = sorted(feature_id for feature_id in tracked_ids if feature_id not in chunk_ids)
     assert missing == []
+
+
+def test_tno_tracked_inland_water_regions_keep_source_contract():
+    feature_map = _feature_map(_load_scenario_water_features())
+    feature = feature_map.get("tno_qyzylorda_inland_water")
+    assert feature is not None
+    props = feature.get("properties", {})
+    assert props.get("water_type") == "lake"
+    assert props.get("region_group") == "inland_lake"
+    assert props.get("source_standard") == "tno_political_interior_hole"
+    assert props.get("source_feature_id") == "KAZ-3197"
+    assert bool(props.get("interactive")) is True
+    assert bool(props.get("render_as_base_geography")) is True
 
 
 def test_tno_tracked_detail_regions_exist_and_have_parent_ids():
@@ -567,6 +585,7 @@ def test_tno_manifest_and_startup_bundles_reflect_current_water_bootstrap():
     source_feature_count = len(_load_scenario_water_features())
     manifest = _load_scenario_manifest()
     bundle_paths = (STARTUP_BUNDLE_EN_PATH, STARTUP_BUNDLE_ZH_PATH)
+    expected_runtime_sha = _sha256_path(RUNTIME_WATER_PATH)
     expected_bootstrap_sha = _sha256_path(RUNTIME_BOOTSTRAP_WATER_PATH)
     expected_named_marginal_count = len(tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS)
 
@@ -582,9 +601,18 @@ def test_tno_manifest_and_startup_bundles_reflect_current_water_bootstrap():
         assert str(bundle.get("baseline_hash") or "") == str(manifest.get("baseline_hash") or "")
         assert int(manifest_subset.get("summary", {}).get("tno_water_region_count") or 0) == source_feature_count
         assert int(manifest_subset.get("summary", {}).get("tno_named_marginal_water_count") or 0) == expected_named_marginal_count
+        assert str(source_meta.get("runtime_topology_sha256") or "") == expected_runtime_sha
         assert str(source_meta.get("runtime_bootstrap_topology_sha256") or "") == expected_bootstrap_sha
         runtime_meta = bundle.get("scenario", {}).get("runtime_political_meta", {})
-        assert len(runtime_meta.get("featureIds", []) or []) > 1000
+        runtime_feature_ids = runtime_meta.get("featureIds", []) or []
+        assert len(runtime_feature_ids) > 1000
+        stale_shell_ids = [
+            feature_id
+            for feature_id in runtime_feature_ids
+            if str(feature_id).startswith("RU_ARCTIC_FB_")
+            and str(feature_id)[len("RU_ARCTIC_FB_"):].isdigit()
+        ]
+        assert stale_shell_ids == []
 
 
 def test_tno_tracked_probe_points_are_covered_by_expected_water_regions():

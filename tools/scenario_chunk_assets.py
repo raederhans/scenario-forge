@@ -471,6 +471,8 @@ def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any
         "admin1_group",
         "render_as_base_geography",
         "scenario_helper_kind",
+        "scenario_shell_owner_hint",
+        "scenario_shell_controller_hint",
         "atl_geometry_role",
         "atl_join_mode",
     )

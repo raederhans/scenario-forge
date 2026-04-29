@@ -5140,7 +5140,6 @@ function isPoliticalVisualRenderableFeature(feature, featureId = null) {
   if (!feature) return false;
   if (isAntarcticSectorFeature(feature, featureId)) return false;
   if (isBaseGeographyScenarioFeature(feature)) return false;
-  if (isScenarioShellFeature(feature, featureId)) return false;
   if (isAtlantropaVisualSupportHelperFeature(feature, featureId)) return false;
   return true;
 }
@@ -5151,6 +5150,7 @@ function shouldExcludePoliticalVisualFeature(feature, featureId = null) {
 
 function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
   if (!isPoliticalVisualRenderableFeature(feature, featureId)) return false;
+  if (isScenarioShellFeature(feature, featureId)) return false;
   if (feature?.properties?.interactive === false) return false;
   if (isAtlantropaSupportHelperFeature(feature, featureId)) return false;
   return true;
@@ -5940,13 +5940,19 @@ function getDisplayOwnerCode(feature, id) {
   }
   const mapSemanticMode = normalizeMapSemanticMode(runtimeState.mapSemanticMode);
   const isScenarioShell = isScenarioShellFeature(feature, resolvedId);
-  const shellOwnerCode = String(runtimeState.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+  const shellOwnerHintCode = canonicalCountryCode(feature?.properties?.scenario_shell_owner_hint || "");
+  const shellOwnerCode = String(
+    runtimeState.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || shellOwnerHintCode || ""
+  ).trim().toUpperCase();
   const directOwnerCode = canonicalCountryCode(runtimeState.sovereigntyByFeatureId?.[resolvedId] || "");
   if (mapSemanticMode === "blank") {
     if (!runtimeState.activeScenarioId || String(runtimeState.scenarioViewMode || "ownership") !== "frontline") {
       return isScenarioShell ? (directOwnerCode || shellOwnerCode || "") : directOwnerCode;
     }
-    const shellControllerCode = String(runtimeState.scenarioAutoShellControllerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+    const shellControllerHintCode = canonicalCountryCode(feature?.properties?.scenario_shell_controller_hint || "");
+    const shellControllerCode = String(
+      runtimeState.scenarioAutoShellControllerByFeatureId?.[resolvedId] || shellControllerHintCode || ""
+    ).trim().toUpperCase();
     const directControllerCode = canonicalCountryCode(runtimeState.scenarioControllersByFeatureId?.[resolvedId] || "");
     return isScenarioShell
       ? (directControllerCode || shellControllerCode || directOwnerCode || shellOwnerCode || "")
@@ -5959,7 +5965,10 @@ function getDisplayOwnerCode(feature, id) {
   if (!runtimeState.activeScenarioId || String(runtimeState.scenarioViewMode || "ownership") !== "frontline") {
     return ownershipOwnerCode;
   }
-  const shellControllerCode = String(runtimeState.scenarioAutoShellControllerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+  const shellControllerHintCode = canonicalCountryCode(feature?.properties?.scenario_shell_controller_hint || "");
+  const shellControllerCode = String(
+    runtimeState.scenarioAutoShellControllerByFeatureId?.[resolvedId] || shellControllerHintCode || ""
+  ).trim().toUpperCase();
   const directControllerCode = canonicalCountryCode(runtimeState.scenarioControllersByFeatureId?.[resolvedId] || "");
   return isScenarioShell
     ? (directControllerCode || shellControllerCode || ownershipOwnerCode || "")

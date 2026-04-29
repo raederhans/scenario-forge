@@ -55,6 +55,7 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                         "AAA-1": "AAA",
                         "BBB-1": "BBB",
                         "ATLSHL_TEST": "ATL",
+                        "RU_ARCTIC_FB_001": "RU",
                     }
                 }),
                 encoding="utf-8",
@@ -96,6 +97,20 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                         "atl_geometry_role": "shore_seal",
                         "atl_join_mode": "gap_fill",
                         "geometry": _square(3, 0),
+                    },
+                    {
+                        "id": "RU_ARCTIC_FB_001",
+                        "name": "Russia Shell Fallback 1",
+                        "cntr_code": "RU",
+                        "admin1_group": "",
+                        "detail_tier": "scenario_runtime_shell",
+                        "__source": "detail",
+                        "interactive": False,
+                        "render_as_base_geography": False,
+                        "scenario_helper_kind": "shell_fallback",
+                        "scenario_shell_owner_hint": "RU",
+                        "scenario_shell_controller_hint": "RU",
+                        "geometry": _square(4, 0),
                     },
                 ],
                 geometry="geometry",
@@ -141,6 +156,14 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
             self.assertFalse(atl_props["interactive"])
             self.assertEqual(atl_props["atl_geometry_role"], "shore_seal")
             self.assertEqual(atl_props["atl_join_mode"], "gap_fill")
+            ru_chunk_path = scenario_dir / "chunks" / "political.detail.country.ru.json"
+            ru_chunk_payload = json.loads(ru_chunk_path.read_text(encoding="utf-8"))
+            self.assertEqual(len(ru_chunk_payload["features"]), 1)
+            ru_props = ru_chunk_payload["features"][0]["properties"]
+            self.assertEqual(ru_props["id"], "RU_ARCTIC_FB_001")
+            self.assertEqual(ru_props["scenario_shell_owner_hint"], "RU")
+            self.assertEqual(ru_props["scenario_shell_controller_hint"], "RU")
+            self.assertFalse(scenario_chunk_assets._is_explicit_political_feature(ru_chunk_payload["features"][0]))
 
             owner_mesh = result["mesh_pack"]["meshes"]["opening_owner_borders"]
             self.assertEqual(owner_mesh["type"], "MultiLineString")
@@ -243,6 +266,8 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                         "interactive": True,
                         "render_as_base_geography": False,
                         "scenario_helper_kind": "shell_fallback",
+                        "scenario_shell_owner_hint": "AAA",
+                        "scenario_shell_controller_hint": "AAA",
                         "atl_geometry_role": "shore_seal",
                         "atl_join_mode": "gap_fill",
                         "geometry": _square(0, 0),
@@ -305,6 +330,8 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                     "name",
                     "render_as_base_geography",
                     "scenario_helper_kind",
+                    "scenario_shell_controller_hint",
+                    "scenario_shell_owner_hint",
                 ],
             )
 

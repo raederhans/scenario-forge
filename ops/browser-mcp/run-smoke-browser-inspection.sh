@@ -428,7 +428,7 @@ run_pwcli() {
   (
     export PLAYWRIGHT_CLI_SESSION="${PLAYWRIGHT_CLI_SESSION:-$SMOKE_SESSION_ID}"
     cd "$PWCLI_WORKDIR"
-    bash "$PWCLI" "$@"
+    timeout "${PWCLI_TIMEOUT_SEC:-60}s" bash "$PWCLI" "$@"
   )
   status=$?
   set -e
@@ -647,7 +647,36 @@ resolve_url() {
   fi
 }
 
+find_active_server_port() {
+  local metadata_path=".runtime/dev/active_server.json"
+  if [[ ! -f "$metadata_path" ]]; then
+    return 1
+  fi
+
+  python3 - "$metadata_path" <<'PY'
+import json
+import sys
+
+try:
+    with open(sys.argv[1], "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    port = int(data.get("port") or 0)
+except Exception:
+    sys.exit(1)
+
+if port <= 0:
+    sys.exit(1)
+print(port)
+PY
+}
+
 find_wsl_server_port() {
+  local active_port
+  if active_port="$(find_active_server_port)" && port_matches_expected_home "$active_port"; then
+    echo "$active_port"
+    return 0
+  fi
+
   local start="$DEFAULT_PORT_START"
   local end="$DEFAULT_PORT_END"
   for p in $(seq "$start" "$end"); do
@@ -685,7 +714,78 @@ port_matches_expected_home() {
   return 1
 }
 
+start_wsl_static_server() {
+  local start="$DEFAULT_PORT_START"
+  local end="$DEFAULT_PORT_END"
+  local p pid
+
+  for p in $(seq "$start" "$end"); do
+    python3 - "$p" "$ROOT_DIR" > "$DEV_LOG" 2>&1 <<'PY' &
+import functools
+import http.server
+import pathlib
+import socketserver
+import sys
+from urllib.parse import unquote, urlparse
+
+port = int(sys.argv[1])
+root = pathlib.Path(sys.argv[2]).resolve()
+landing_index = root / "landing" / "index.html"
+editor_index = root / "index.html"
+
+
+class StaticHandler(http.server.SimpleHTTPRequestHandler):
+    def translate_path(self, path):
+        route = unquote(urlparse(path).path or "/")
+        if route == "/":
+            return str(landing_index)
+        if route in {"/app", "/app/"}:
+            return str(editor_index)
+        if route.startswith("/app/"):
+            return str(root / route[len("/app/"):].lstrip("/"))
+
+        landing_candidate = landing_index.parent / route.lstrip("/")
+        if landing_candidate.exists():
+            return str(landing_candidate)
+        return str(root / route.lstrip("/"))
+
+
+class ReusableTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+
+handler = functools.partial(StaticHandler, directory=str(root))
+with ReusableTCPServer(("127.0.0.1", port), handler) as httpd:
+    print(f"Static server started at http://127.0.0.1:{port}", flush=True)
+    httpd.serve_forever()
+PY
+    pid=$!
+    sleep 0.5
+    if port_matches_expected_home "$p"; then
+      WSL_SERVER_PID="$pid"
+      TARGET_PORT="$p"
+      echo "[INFO] Started WSL static inspection server on 127.0.0.1:$TARGET_PORT" | tee -a "$RUN_LOG"
+      return 0
+    fi
+    kill "$pid" >/dev/null 2>&1 || true
+    wait "$pid" >/dev/null 2>&1 || true
+  done
+
+  return 1
+}
+
 start_wsl_server_if_needed() {
+  local active_port
+  if active_port="$(find_active_server_port)"; then
+    if port_matches_expected_home "$active_port"; then
+      TARGET_PORT="$active_port"
+      echo "[INFO] Using active dev server metadata port 127.0.0.1:$TARGET_PORT" | tee -a "$RUN_LOG"
+      return 0
+    fi
+    echo "[WARN] Ignoring stale active dev server metadata port 127.0.0.1:$active_port." | tee -a "$RUN_LOG"
+  fi
+
   if TARGET_PORT="$(find_wsl_server_port)"; then
     echo "[INFO] Reusing WSL dev server on 127.0.0.1:$TARGET_PORT" | tee -a "$RUN_LOG"
     return 0
@@ -710,11 +810,20 @@ start_wsl_server_if_needed() {
       echo "[INFO] Started WSL dev server on 127.0.0.1:$TARGET_PORT" | tee -a "$RUN_LOG"
       return 0
     fi
+    if ! kill -0 "$WSL_SERVER_PID" >/dev/null 2>&1; then
+      echo "[WARN] WSL dev server exited before becoming reachable; trying static fallback." | tee -a "$RUN_LOG"
+      break
+    fi
     sleep 1
   done
 
-  echo "[ERROR] Could not find reachable WSL dev server on ports ${DEFAULT_PORT_START}-${DEFAULT_PORT_END}." | tee -a "$RUN_LOG"
-  exit 1
+  if start_wsl_static_server; then
+    return 0
+  fi
+
+  TARGET_PORT="$DEFAULT_PORT_START"
+  echo "[WARN] Could not find reachable WSL dev server on ports ${DEFAULT_PORT_START}-${DEFAULT_PORT_END}; deferring to Windows-local fallback on port $TARGET_PORT." | tee -a "$RUN_LOG"
+  return 0
 }
 
 ensure_windows_server_for_edge() {
@@ -723,7 +832,7 @@ ensure_windows_server_for_edge() {
   local probe_log="$LOG_DIR/pw-open-probe-$TS.log"
 
   run_pwcli close >/dev/null 2>&1 || true
-  run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
+  PWCLI_TIMEOUT_SEC=12 run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
 
   if ! match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
     BROWSER_SESSION_READY="1"
@@ -744,16 +853,18 @@ ensure_windows_server_for_edge() {
     exit 1
   fi
 
-  local win_root win_pid_path
+  local win_root win_pid_path win_stdout_path win_stderr_path
   win_root="$(wslpath -w "$ROOT_DIR")"
   win_pid_path="$(wslpath -w "$WIN_PID_FILE")"
+  win_stdout_path="$(wslpath -w "$LOG_DIR/win-dev-server-$TS.out.log")"
+  win_stderr_path="$(wslpath -w "$LOG_DIR/win-dev-server-$TS.err.log")"
 
-  powershell.exe -NoProfile -Command "\$p=Start-Process -FilePath py -ArgumentList '-3','-m','http.server','${port}' -WorkingDirectory '${win_root}' -PassThru -WindowStyle Hidden; \$p.Id | Out-File -Encoding ascii '${win_pid_path}'" >/dev/null
+  powershell.exe -NoProfile -Command "\$p=Start-Process -FilePath py -ArgumentList '-3','tools/dev_server.py','--port','${port}','/app/' -WorkingDirectory '${win_root}' -RedirectStandardOutput '${win_stdout_path}' -RedirectStandardError '${win_stderr_path}' -PassThru -WindowStyle Hidden; \$p.Id | Out-File -Encoding ascii '${win_pid_path}'" >/dev/null
   WINDOWS_SERVER_STARTED="1"
-  for _ in $(seq 1 6); do
+  for _ in $(seq 1 20); do
     sleep 0.5
     run_pwcli close >/dev/null 2>&1 || true
-    run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
+    PWCLI_TIMEOUT_SEC=12 run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
     if ! match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
       BROWSER_SESSION_READY="1"
       LAST_OPEN_URL="$test_url"
@@ -779,6 +890,23 @@ first_route_url_for_mode() {
     return 0
   done
   return 1
+}
+
+wait_for_app_ready() {
+  local rid="$1"
+  local mode="$2"
+  local ready_log="$LOG_DIR/pw-ready-${rid}-${mode}-$TS.log"
+
+  run_pwcli run-code "async (page) => {
+    const map = page.locator('#mapContainer');
+    if (await map.count()) {
+      await map.first().waitFor({ state: 'visible', timeout: 45000 });
+    }
+    const startup = page.locator('#startupOverlay, .startup-overlay, .boot-overlay');
+    if (await startup.count()) {
+      await startup.first().waitFor({ state: 'hidden', timeout: 45000 }).catch(() => {});
+    }
+  }" > "$ready_log" 2>&1 || true
 }
 
 run_section() {
@@ -908,6 +1036,8 @@ run_route() {
     LAST_OPEN_URL="$url"
     BROWSER_SESSION_READY="1"
   fi
+
+  wait_for_app_ready "$rid" "$mode"
 
   if (( scroll > 0 )); then
     run_pwcli mousewheel 0 "$scroll" > "$LOG_DIR/pw-scroll-${rid}-${mode}-$TS.log" || true

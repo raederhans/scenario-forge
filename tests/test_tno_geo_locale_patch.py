@@ -73,6 +73,59 @@ class TnoGeoLocalePatchTest(unittest.TestCase):
             self.assertEqual(zh_payload["language"], "zh")
             self.assertEqual(zh_payload["geo"]["FEATURE-1"], {"zh": "普尔"})
 
+    def test_manual_override_replaces_data_not_available_feature_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            scenario_dir = tmp_path / "scenario"
+            feature_id = "IN_ADM2_76128533B2782141712775"
+            _write_json(
+                scenario_dir / "runtime_topology.topo.json",
+                {
+                    "objects": {
+                        "political": {
+                            "geometries": [
+                                {"id": feature_id, "properties": {"id": feature_id, "name": "DATA NOT AVAILABLE"}},
+                            ]
+                        }
+                    }
+                },
+            )
+            _write_json(
+                scenario_dir / "owners.by_feature.json",
+                {"owners": {feature_id: "RAJ"}},
+            )
+            _write_json(
+                tmp_path / "locales.json",
+                {"geo": {"DATA NOT AVAILABLE": {"en": "DATA NOT AVAILABLE", "zh": "数据不可用"}}},
+            )
+            manual_path = scenario_dir / "geo_name_overrides.manual.json"
+            _write_json(
+                manual_path,
+                {
+                    "version": 1,
+                    "scenario_id": "tno_1962",
+                    "geo": {
+                        feature_id: {"en": "Northern Areas", "zh": "北部地区"},
+                    },
+                },
+            )
+
+            payload = build_patch(
+                scenario_id="tno_1962",
+                scenario_dir=scenario_dir,
+                locales_path=tmp_path / "locales.json",
+                manual_overrides_path=manual_path,
+                reviewed_exceptions_path=scenario_dir / "missing.reviewed.json",
+                output_path=scenario_dir / "geo_locale_patch.json",
+            )
+
+            en_payload = json.loads((scenario_dir / "geo_locale_patch.en.json").read_text(encoding="utf-8"))
+            zh_payload = json.loads((scenario_dir / "geo_locale_patch.zh.json").read_text(encoding="utf-8"))
+            self.assertEqual(payload["geo"][feature_id], {"en": "Northern Areas", "zh": "北部地区"})
+            self.assertEqual(en_payload["geo"][feature_id], {"en": "Northern Areas"})
+            self.assertEqual(zh_payload["geo"][feature_id], {"zh": "北部地区"})
+            self.assertEqual(payload["audit"]["manual_feature_overrides"], 1)
+
     def test_split_clone_duplicates_are_safe_copied(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_path = Path(tmp_dir)

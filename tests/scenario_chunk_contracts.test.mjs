@@ -534,6 +534,7 @@ test("Atlantropa land interaction contracts use owner-aware targets with runtime
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
   const spatialBuilderSource = readRepoFile("js", "core", "renderer", "spatial_index_runtime_builders.js");
   const spatialOwnerSource = readRepoFile("js", "core", "renderer", "spatial_index_runtime_owner.js");
+  const visualRenderableBody = rendererSource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
 
   const checks = {
     hitResultShapeCarriesRuntimeCountry:
@@ -554,6 +555,12 @@ test("Atlantropa land interaction contracts use owner-aware targets with runtime
     booleanWeldIslandCanRenderWithoutBecomingInteractive:
       /function isAtlantropaVisualSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?joinMode === "gap_fill"[\s\S]*?\}/.test(rendererSource)
       && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?feature\?\.properties\?\.interactive === false[\s\S]*?isAtlantropaSupportHelperFeature\(feature, featureId\)/.test(rendererSource),
+    arcticShellCanRenderWithoutBecomingInteractive:
+      !/isScenarioShellFeature/.test(visualRenderableBody)
+      && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isScenarioShellFeature\(feature, featureId\)[\s\S]*?feature\?\.properties\?\.interactive === false/.test(rendererSource),
+    arcticShellOwnerHintsCanColorCoalescedShells:
+      /scenario_shell_owner_hint/.test(rendererSource)
+      && /scenario_shell_controller_hint/.test(rendererSource),
     backgroundMergeFiltersVisualHelpersButKeepsVisibleNonInteractiveLand:
       /function buildScenarioPoliticalBackgroundEntries\(\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(feature, id\)/.test(rendererSource)
       && /function buildScenarioPoliticalBackgroundEntriesFromSpatialItems\(items = \[\]\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(entry\.feature, entry\.id\)/.test(rendererSource),

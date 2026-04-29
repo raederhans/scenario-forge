@@ -27,6 +27,21 @@ STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
 STARTUP_RUNTIME_POLITICAL_META_ENCODING = "feature-index-v1"
 STARTUP_FEATURE_ORDER_ASSIGNMENT_ENCODING = "runtime-feature-index-v1"
+STARTUP_RUNTIME_SHELL_POLITICAL_PROPERTY_WHITELIST = (
+    "id",
+    "name",
+    "cntr_code",
+    "detail_tier",
+    "scenario_id",
+    "scenario_helper_kind",
+    "scenario_shell_owner_hint",
+    "scenario_shell_controller_hint",
+    "source_fragment_count",
+    "source_fragment_area",
+    "retained_fragment_area",
+    "interactive",
+    "render_as_base_geography",
+)
 STARTUP_FAMILY_SECTION_ROLES = {
     "base.topology_primary": "startup-first-paint geometry seed; high-cost and likely first slimming candidate",
     "base.locales": "external startup-scoped locale payload used before full locale hydration",
@@ -416,9 +431,35 @@ def expand_compact_core_assignment_payload(payload: dict, feature_ids: list[str]
     return expanded_payload
 
 
+def _copy_startup_runtime_shell_political_object(object_payload: dict, index_map: dict[int, int]) -> dict:
+    next_object: dict[str, Any] = {
+        "type": "GeometryCollection",
+        "geometries": [],
+    }
+    geometries = object_payload.get("geometries") if isinstance(object_payload, dict) else None
+    if isinstance(geometries, list):
+        next_object["geometries"] = [
+            _remap_topology_geometry_arcs(
+                _copy_pruned_topology_geometry(geometry, STARTUP_RUNTIME_SHELL_POLITICAL_PROPERTY_WHITELIST),
+                index_map,
+            )
+            for geometry in geometries
+        ]
+    next_object["computed_neighbors"] = [[] for _ in next_object["geometries"]]
+    return next_object
+
+
 def build_startup_runtime_shell(runtime_bootstrap_topology: dict) -> dict:
     source_objects = runtime_bootstrap_topology.get("objects", {}) if isinstance(runtime_bootstrap_topology, dict) else {}
     next_objects = {}
+    next_arcs = []
+    source_arcs = runtime_bootstrap_topology.get("arcs", []) if isinstance(runtime_bootstrap_topology, dict) else []
+    political_object = source_objects.get("political")
+    if isinstance(political_object, dict) and isinstance(source_arcs, list):
+        used_arc_indexes = _collect_topology_object_arc_indexes(political_object)
+        index_map = {source_index: new_index for new_index, source_index in enumerate(used_arc_indexes)}
+        next_objects["political"] = _copy_startup_runtime_shell_political_object(political_object, index_map)
+        next_arcs = [copy.deepcopy(source_arcs[index]) for index in used_arc_indexes]
     for object_name in ("land_mask", "context_land_mask", "scenario_water", "scenario_special_land"):
         if object_name not in source_objects:
             continue
@@ -429,8 +470,9 @@ def build_startup_runtime_shell(runtime_bootstrap_topology: dict) -> dict:
     return {
         "type": "Topology",
         "objects": next_objects,
-        "arcs": [],
+        "arcs": next_arcs,
         "bbox": copy.deepcopy(runtime_bootstrap_topology.get("bbox")),
+        **({"transform": copy.deepcopy(runtime_bootstrap_topology.get("transform"))} if next_arcs and runtime_bootstrap_topology.get("transform") else {}),
     }
 
 

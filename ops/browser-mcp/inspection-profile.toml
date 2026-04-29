@@ -52,8 +52,8 @@ report_path = ".runtime/reports/generated/browser/ai-browser-mcp-smoketest.md"
 
 [[routes]]
 id = "home"
-url = "/"
-scroll = 900
+url = "/app/?render_profile=balanced"
+scroll = 0
 screenshot = true
 capture_console = true
 capture_network = true

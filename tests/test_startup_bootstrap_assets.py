@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -22,11 +23,26 @@ def _write_json(path: Path, payload: object) -> None:
 
 
 class StartupBootstrapAssetsTest(unittest.TestCase):
-    def test_build_bootstrap_runtime_topology_returns_shell_without_arcs(self) -> None:
+    def test_build_bootstrap_runtime_topology_keeps_runtime_shell_only(self) -> None:
         full_topology = {
             "type": "Topology",
             "objects": {
-                "political": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": [[0]]}]},
+                "political": {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": [[0]]},
+                        {
+                            "type": "Polygon",
+                            "properties": {
+                                "id": "RU_ARCTIC_FB_001",
+                                "scenario_helper_kind": "shell_fallback",
+                                "scenario_shell_owner_hint": "RFA",
+                                "unused": "x",
+                            },
+                            "arcs": [[1]],
+                        },
+                    ],
+                },
                 "land_mask": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "mask-1"}, "arcs": [[1]]}]},
                 "context_land_mask": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "context-mask-1"}, "arcs": [[2]]}]},
                 "scenario_water": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "water-1"}, "arcs": [[3]]}]},
@@ -38,10 +54,13 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
 
         shell = build_startup_bootstrap_assets.build_bootstrap_runtime_topology(full_topology)
 
-        self.assertEqual(list(shell["objects"].keys()), ["land_mask", "context_land_mask", "scenario_water", "scenario_special_land"])
-        self.assertEqual(shell["arcs"], [])
+        self.assertEqual(list(shell["objects"].keys()), ["political", "land_mask", "context_land_mask", "scenario_water", "scenario_special_land"])
+        self.assertEqual(shell["arcs"], [[]])
+        shell_political = shell["objects"]["political"]["geometries"]
+        self.assertEqual([geometry["properties"]["id"] for geometry in shell_political], ["RU_ARCTIC_FB_001"])
+        self.assertEqual(shell_political[0]["properties"]["scenario_shell_owner_hint"], "RFA")
+        self.assertNotIn("unused", shell_political[0]["properties"])
         self.assertEqual(shell["objects"]["scenario_water"]["geometries"], [])
-        self.assertNotIn("political", shell["objects"])
 
 
     def test_build_bootstrap_runtime_topology_keeps_required_empty_shell_objects(self) -> None:
@@ -83,6 +102,42 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
             for object_name in ("land_mask", "context_land_mask", "scenario_water"):
                 self.assertIn(object_name, runtime_objects)
             self.assertGreater(len(bundle["scenario"]["runtime_political_meta"]["featureIds"]), 0)
+
+    def test_tno_1962_checked_in_startup_bundle_includes_arctic_shell(self) -> None:
+        scenario_dir = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "tno_1962"
+        bootstrap = json.loads((scenario_dir / "runtime_topology.bootstrap.topo.json").read_text(encoding="utf-8"))
+        bootstrap_shells = [
+            geometry
+            for geometry in bootstrap["objects"]["political"]["geometries"]
+            if str((geometry.get("properties", {}) or {}).get("id") or "").startswith("RU_ARCTIC_FB_")
+        ]
+        self.assertGreater(len(bootstrap_shells), 0)
+        bootstrap_shell_props = [geometry.get("properties", {}) or {} for geometry in bootstrap_shells]
+        self.assertFalse(
+            any(re.fullmatch(r"RU_ARCTIC_FB_\d+", str(props.get("id") or "")) for props in bootstrap_shell_props)
+        )
+        self.assertTrue(all(props.get("scenario_shell_owner_hint") for props in bootstrap_shell_props))
+        self.assertTrue(all(props.get("scenario_shell_controller_hint") for props in bootstrap_shell_props))
+
+        for language in build_startup_bundle.SUPPORTED_LANGUAGES:
+            bundle_path = scenario_dir / f"startup.bundle.{language}.json"
+            gzip_path = scenario_dir / f"startup.bundle.{language}.json.gz"
+            self.assertTrue(bundle_path.exists(), bundle_path)
+            self.assertTrue(gzip_path.exists(), gzip_path)
+            self.assertLess(gzip_path.stat().st_size, build_startup_bundle.STARTUP_BUNDLE_GZIP_BUDGET_BYTES)
+            bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+            runtime_political = bundle["scenario"]["runtime_topology_bootstrap"]["objects"]["political"]
+            shell_props = [
+                geometry.get("properties", {}) or {}
+                for geometry in runtime_political["geometries"]
+                if str((geometry.get("properties", {}) or {}).get("id") or "").startswith("RU_ARCTIC_FB_")
+            ]
+            self.assertEqual(len(shell_props), len(bootstrap_shells))
+            self.assertTrue(all(props.get("scenario_helper_kind") == "shell_fallback" for props in shell_props))
+            self.assertTrue(all(props.get("interactive") is False for props in shell_props))
+            self.assertFalse(any(re.fullmatch(r"RU_ARCTIC_FB_\d+", str(props.get("id") or "")) for props in shell_props))
+            self.assertTrue(all(props.get("scenario_shell_owner_hint") for props in shell_props))
+            self.assertTrue(all(props.get("scenario_shell_controller_hint") for props in shell_props))
 
 
     def test_hoi4_geo_locale_language_patches_derive_from_base_patch(self) -> None:
@@ -137,14 +192,25 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                             "geometries": [
                                 {"type": "Polygon", "properties": {"id": "AAA-1", "cntr_code": "AA"}, "arcs": []},
                                 {"type": "Polygon", "properties": {"id": "BBB-1", "cntr_code": "BB"}, "arcs": []},
+                                {
+                                    "type": "Polygon",
+                                    "properties": {
+                                        "id": "RU_ARCTIC_FB_RFA_001",
+                                        "cntr_code": "RU",
+                                        "scenario_helper_kind": "shell_fallback",
+                                        "scenario_shell_owner_hint": "RFA",
+                                        "interactive": False,
+                                    },
+                                    "arcs": [[0]],
+                                },
                             ],
-                            "computed_neighbors": [[], []],
+                            "computed_neighbors": [[], [], []],
                         },
                         "land_mask": {"type": "GeometryCollection", "geometries": []},
                         "context_land_mask": {"type": "GeometryCollection", "geometries": []},
                         "scenario_water": {"type": "GeometryCollection", "geometries": []},
                     },
-                    "arcs": [],
+                    "arcs": [[[0, 0], [1, 0]]],
                 },
             )
             _write_json(
@@ -152,19 +218,36 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 {
                     "type": "Topology",
                     "objects": {
+                        "political": {
+                            "type": "GeometryCollection",
+                            "geometries": [
+                                {
+                                    "type": "Polygon",
+                                    "properties": {
+                                        "id": "RU_ARCTIC_FB_RFA_001",
+                                        "cntr_code": "RU",
+                                        "scenario_helper_kind": "shell_fallback",
+                                        "scenario_shell_owner_hint": "RFA",
+                                        "interactive": False,
+                                        "unused": "x",
+                                    },
+                                    "arcs": [[0]],
+                                },
+                            ],
+                        },
                         "land_mask": {"type": "GeometryCollection", "geometries": []},
                         "context_land_mask": {"type": "GeometryCollection", "geometries": []},
                         "scenario_water": {"type": "GeometryCollection", "geometries": []},
                     },
-                    "arcs": [],
+                    "arcs": [[[0, 0], [1, 0]]],
                 },
             )
             _write_json(startup_locales_path, {"ui": {}, "geo": {}})
             _write_json(geo_aliases_path, {"alias_to_stable_key": {}})
             _write_json(countries_path, {"countries": {"AAA": {"display_name": "Alpha", "base_iso2": "AA", "feature_count": 1, "color_hex": "#111111"}}})
-            _write_json(owners_path, {"owners": {"AAA-1": "AAA"}})
-            _write_json(controllers_path, {"controllers": {"AAA-1": "AAA"}})
-            _write_json(cores_path, {"cores": {"AAA-1": ["AAA"]}})
+            _write_json(owners_path, {"owners": {"AAA-1": "AAA", "RU_ARCTIC_FB_RFA_001": "AAA"}})
+            _write_json(controllers_path, {"controllers": {"AAA-1": "AAA", "RU_ARCTIC_FB_RFA_001": "AAA"}})
+            _write_json(cores_path, {"cores": {"AAA-1": ["AAA"], "RU_ARCTIC_FB_RFA_001": ["AAA"]}})
             _write_json(geo_patch_path, {"geo": {}})
 
             payload = build_startup_bundle.build_startup_bundle_payload(
@@ -180,10 +263,14 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 cores_path=cores_path,
             )
 
-            self.assertEqual(len(payload["scenario"]["runtime_political_meta"]["featureIds"]), 2)
+            self.assertEqual(len(payload["scenario"]["runtime_political_meta"]["featureIds"]), 3)
             self.assertEqual(payload["scenario"]["runtime_political_meta"]["encoding"], build_startup_bundle.STARTUP_RUNTIME_POLITICAL_META_ENCODING)
             self.assertNotIn("featureIndexById", payload["scenario"]["runtime_political_meta"])
             self.assertNotIn("canonicalCountryByFeatureId", payload["scenario"]["runtime_political_meta"])
+            shell_geometries = payload["scenario"]["runtime_topology_bootstrap"]["objects"]["political"]["geometries"]
+            self.assertEqual([geometry["properties"]["id"] for geometry in shell_geometries], ["RU_ARCTIC_FB_RFA_001"])
+            self.assertEqual(shell_geometries[0]["properties"]["scenario_shell_owner_hint"], "RFA")
+            self.assertNotIn("unused", shell_geometries[0]["properties"])
             self.assertEqual(payload["scenario"]["runtime_topology_bootstrap"]["objects"]["scenario_water"]["geometries"], [])
             self.assertNotIn("locales", payload["base"])
             self.assertNotIn("geo_aliases", payload["base"])
