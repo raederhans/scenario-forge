@@ -337,6 +337,24 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
       && !rendererSource.includes('flushInteractionRender("click-fill")')
       && !rendererSource.includes('flushInteractionRender("click-erase")')
       && !rendererSource.includes('flushInteractionRender(kind);'),
+    exactAfterSettleDefersContextPassesAfterCriticalPaint:
+      rendererSource.includes("const EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES = new Set")
+      && rendererSource.includes('"contextBase",')
+      && rendererSource.includes('"contextScenario",')
+      && (() => {
+        const deferredPassSet = rendererSource.match(/const EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES = new Set\(\[[\s\S]*?\]\);/)?.[0] || "";
+        return !deferredPassSet.includes('"background"') && !deferredPassSet.includes('"physicalBase"');
+      })()
+      && /function shouldDeferExactAfterSettlePassForCriticalPaint\(passName, cache = getRenderPassCacheState\(\)\) \{[\s\S]*?String\(controller\.phase \|\| ""\) !== "awaiting-paint"[\s\S]*?getPassReferenceTransform\(passName\)/.test(rendererSource)
+      && /function prepareIdleRenderPassDefinition[\s\S]*?shouldDeferExactAfterSettlePassForCriticalPaint\(passName, cache\)[\s\S]*?recordRenderPerfMetric\("settleExactRefreshDeferredPass"/.test(rendererSource)
+      && /function applyExactAfterSettleRefreshPlan[\s\S]*?plan\.deferredExactTargetPasses[\s\S]*?EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES\.has\(passName\)[\s\S]*?plan\.exactTargetPasses[\s\S]*?!EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES\.has\(passName\)/.test(rendererSource)
+      && /function scheduleDeferredExactContextRefresh\(plan = \{\}\)[\s\S]*?prepareDeferredExactContextPassesInSlices[\s\S]*?recordRenderPerfMetric\("deferredExactContextRefreshScheduled"/.test(rendererSource)
+      && rendererSource.includes("let deferredExactContextRefreshVersion = 0;")
+      && rendererSource.includes("const deferredExactContextRefreshTaskHandles = new Set();")
+      && /function cancelDeferredExactContextRefresh\(\) \{[\s\S]*?deferredExactContextRefreshVersion \+= 1;[\s\S]*?deferredExactContextRefreshTaskHandles\.forEach[\s\S]*?handle\.cancel\(\);[\s\S]*?deferredExactContextRefreshTaskHandles\.clear\(\);/.test(rendererSource)
+      && /function isDeferredExactContextRefreshCurrent\(refreshVersion, plan = \{\}\) \{[\s\S]*?deferredExactContextRefreshVersion[\s\S]*?isExactAfterSettleIdentityCurrent\(identity\)/.test(rendererSource)
+      && /function prepareDeferredExactContextPassesInSlices\(passNames, plan = \{\}, refreshVersion = deferredExactContextRefreshVersion\) \{[\s\S]*?!isDeferredExactContextRefreshCurrent\(refreshVersion, plan\)[\s\S]*?deferredExactContextRefreshTaskHandles\.delete\(taskHandle\)[\s\S]*?prepareIdleRenderPassDefinition\(passName, drawFn, transform, timings, cache\)/.test(rendererSource)
+      && /function scheduleDeferredExactContextRefresh\(plan = \{\}\) \{[\s\S]*?const refreshVersion = Number\(deferredExactContextRefreshVersion \|\| 0\);[\s\S]*?plan\.deferredExactContextIdentity = getExactAfterSettleIdentity\(\);[\s\S]*?!isDeferredExactContextRefreshCurrent\(refreshVersion, plan\)[\s\S]*?prepareDeferredExactContextPassesInSlices\(targetPasses, plan, refreshVersion\)/.test(rendererSource),
     exactAfterSettleUsesFrameScheduler:
       frameSchedulerSource.includes("export function enqueueFrameTask")
       && /import \{ enqueueFrameTask(?:, getFrameSchedulerQueueLength)? \} from "\.\/frame_scheduler\.js";/.test(rendererSource)
@@ -450,6 +468,13 @@ test("perf contracts keep coarse first frame and benchmark app-path fallback bou
       /suite_base_urls = unique_strings\(\[[\s\S]*?effective_url,[\s\S]*?ensure_app_path_url\(effective_url\),[\s\S]*?args\.url,[\s\S]*?ensure_app_path_url\(args\.url\),/.test(benchmarkSource),
     sameScenarioFreshMetricSelectionIsExplicit:
       /def is_same_scenario_fresh_metric_entry\([\s\S]*?def summarize_freshest_same_scenario_metric_entry\(/.test(benchmarkSource),
+    contextProbeReportsPerPassDurations:
+      benchmarkSource.includes('("all_context_off", {')
+      && benchmarkSource.includes('"contextBaseDurationMs"')
+      && benchmarkSource.includes('"contextScenarioDurationMs"')
+      && benchmarkSource.includes('("lastFrame", "timings", "contextScenario")')
+      && benchmarkSource.includes("'showCityPoints'")
+      && benchmarkSource.includes("'showTransport'"),
     benchmarkWheelTraceTracksLastWheelAndBlackRatio:
       benchmarkSource.includes("firstIdleAfterLastWheelMs")
       && benchmarkSource.includes("sample_canvas_black_pixel_ratio_js")

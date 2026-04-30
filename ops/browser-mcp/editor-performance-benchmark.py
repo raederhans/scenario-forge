@@ -40,6 +40,16 @@ CONTEXT_PROBE_CASES = [
     ("rivers_off", {"showRivers": False}),
     ("water_off", {"showWaterRegions": False}),
     ("physical_urban_rivers_off", {"showPhysical": False, "showUrban": False, "showRivers": False}),
+    ("all_context_off", {
+      "showPhysical": False,
+      "showUrban": False,
+      "showRivers": False,
+      "showWaterRegions": False,
+      "showScenarioSpecialRegions": False,
+      "showScenarioReliefOverlays": False,
+      "showCityPoints": False,
+      "showTransport": False,
+    }),
 ]
 CONTEXT_PROBE_SAMPLE_COUNT = 5
 CONTEXT_PROBE_MIN_SAMPLES_FOR_RECOMMENDATION = 3
@@ -2388,6 +2398,12 @@ async (page) => {{
       'showWaterRegions',
       'showScenarioSpecialRegions',
       'showScenarioReliefOverlays',
+      'showCityPoints',
+      'showTransport',
+      'showRoad',
+      'showAirports',
+      'showPorts',
+      'showRail',
     ];
     const snapshot = Object.fromEntries(trackedFlags.map((key) => [key, state[key]]));
     const before = {{
@@ -2448,14 +2464,24 @@ def context_probe_case_metric_samples(samples: list[dict], key_path: tuple[str, 
 def build_context_probe_case_summary(label: str, flags: dict[str, bool], samples: list[dict]) -> dict:
     draw_canvas_values = context_probe_case_metric_samples(samples, ("counterDelta", "drawCanvas"))
     frame_values = context_probe_case_metric_samples(samples, ("counterDelta", "frames"))
-    context_scenario_values = context_probe_case_metric_samples(samples, ("lastFrame", "durations", "contextScenario"))
+    total_values = context_probe_case_metric_samples(samples, ("lastFrame", "totalMs"))
+    background_values = context_probe_case_metric_samples(samples, ("lastFrame", "timings", "background"))
+    political_values = context_probe_case_metric_samples(samples, ("lastFrame", "timings", "political"))
+    context_base_values = context_probe_case_metric_samples(samples, ("lastFrame", "timings", "contextBase"))
+    context_scenario_values = context_probe_case_metric_samples(samples, ("lastFrame", "timings", "contextScenario"))
+    context_values = context_probe_case_metric_samples(samples, ("lastFrame", "timings", "context"))
     return {
       "label": label,
       "flags": flags,
       "sampleCount": len(samples),
       "drawCanvas": summarize_distribution(draw_canvas_values),
       "frames": summarize_distribution(frame_values),
+      "totalFrameDurationMs": summarize_distribution(total_values),
+      "backgroundDurationMs": summarize_distribution(background_values),
+      "politicalDurationMs": summarize_distribution(political_values),
+      "contextBaseDurationMs": summarize_distribution(context_base_values),
       "contextScenarioDurationMs": summarize_distribution(context_scenario_values),
+      "contextDurationMs": summarize_distribution(context_values),
       "samples": samples,
     }
 
@@ -2480,10 +2506,10 @@ def build_water_cache_delta_summary(context_probes: dict | None) -> dict | None:
     water_off_samples = water_off.get("samples") if isinstance(water_off.get("samples"), list) else []
     baseline_draw_canvas = context_probe_case_metric_samples(baseline_samples, ("counterDelta", "drawCanvas"))
     baseline_frames = context_probe_case_metric_samples(baseline_samples, ("counterDelta", "frames"))
-    baseline_context_scenario = context_probe_case_metric_samples(baseline_samples, ("lastFrame", "durations", "contextScenario"))
+    baseline_context_scenario = context_probe_case_metric_samples(baseline_samples, ("lastFrame", "timings", "contextScenario"))
     water_off_draw_canvas = context_probe_case_metric_samples(water_off_samples, ("counterDelta", "drawCanvas"))
     water_off_frames = context_probe_case_metric_samples(water_off_samples, ("counterDelta", "frames"))
-    water_off_context_scenario = context_probe_case_metric_samples(water_off_samples, ("lastFrame", "durations", "contextScenario"))
+    water_off_context_scenario = context_probe_case_metric_samples(water_off_samples, ("lastFrame", "timings", "contextScenario"))
     delta_draw_canvas = pairwise_delta(water_off_draw_canvas, baseline_draw_canvas)
     delta_frames = pairwise_delta(water_off_frames, baseline_frames)
     delta_context_scenario = pairwise_delta(water_off_context_scenario, baseline_context_scenario)

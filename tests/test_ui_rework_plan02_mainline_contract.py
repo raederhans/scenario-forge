@@ -80,7 +80,10 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
         required_tokens = [
             "container-type: inline-size;",
-            "grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));",
+            "--layout-dock-inline: min(860px, calc(100% - 2 * var(--layout-edge)));",
+            "width: var(--layout-dock-inline);",
+            "flex-direction: row;",
+            "grid-template-columns: auto auto auto minmax(220px, 1fr);",
             "@container (max-width: 720px)",
             "grid-template-columns: repeat(2, minmax(0, 1fr));",
             "@container (max-width: 420px)",

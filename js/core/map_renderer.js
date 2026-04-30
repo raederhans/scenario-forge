@@ -840,6 +840,13 @@ const TRANSFORMED_FRAME_PASS_NAMES = [
   "textureLabels",
   "labels",
 ];
+const EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES = new Set([
+  "contextBase",
+  "contextScenario",
+  "contextMarkers",
+  "textureLabels",
+  "labels",
+]);
 const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
 const POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD = 48;
 const POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD = 160;
@@ -1374,6 +1381,9 @@ let pendingSecondarySpatialBuildReasons = new Set();
 let pendingScenarioChunkFlushAfterExactHandle = null;
 let deferredHeavyBorderMeshHandle = null;
 let deferredContextBaseEnhancementHandle = null;
+let deferredExactContextRefreshHandle = null;
+let deferredExactContextRefreshVersion = 0;
+const deferredExactContextRefreshTaskHandles = new Set();
 let deferredScenarioChunkPromotionInfraHandle = null;
 let scenarioChunkPromotionVersion = 0;
 let deferContextBaseEnhancements = false;
@@ -4256,6 +4266,7 @@ function abortPendingExactAfterSettleRefreshAfterPaint(reason = "exact-compose-f
 }
 
 function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
+  cancelDeferredExactContextRefresh();
   cancelDeferredWork(runtimeState.exactAfterSettleHandle);
   runtimeState.exactAfterSettleHandle = null;
   resetExactAfterSettleController(clearDefer ? "cancel" : "reschedule");
@@ -18675,6 +18686,15 @@ function getIdleRenderPassDefinitions() {
   ];
 }
 
+function shouldDeferExactAfterSettlePassForCriticalPaint(passName, cache = getRenderPassCacheState()) {
+  if (!EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES.has(passName)) return false;
+  const controller = getExactAfterSettleControllerState();
+  if (!controller || String(controller.phase || "") !== "awaiting-paint") return false;
+  if (!cache.canvases?.[passName]) return false;
+  if (!getPassReferenceTransform(passName)) return false;
+  return true;
+}
+
 function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache = getRenderPassCacheState()) {
     const nextSignature = getRenderPassSignature(passName, transform);
     if (cache.signatures[passName] !== nextSignature) {
@@ -18746,6 +18766,15 @@ function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, c
       }
     }
     if (!cache.dirty[passName]) return;
+    if (shouldDeferExactAfterSettlePassForCriticalPaint(passName, cache)) {
+      recordRenderPerfMetric("settleExactRefreshDeferredPass", 0, {
+        activeScenarioId: String(runtimeState.activeScenarioId || ""),
+        passName,
+        reason: String(cache.reasons?.[passName] || "dirty"),
+        controllerPhase: String(getExactAfterSettleControllerState()?.phase || ""),
+      });
+      return;
+    }
     if (
       passName === "political"
       && tryPartialPoliticalPassRepaint(transform, nextSignature, timings)
@@ -19286,9 +19315,12 @@ function applyExactAfterSettleRefreshPlan(plan) {
       targetPassNames.add(passName);
     }
   });
+  plan.deferredExactTargetPasses = getIdleRenderPassDefinitions()
+    .map(([passName]) => passName)
+    .filter((passName) => targetPassNames.has(passName) && EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES.has(passName));
   plan.exactTargetPasses = getIdleRenderPassDefinitions()
     .map(([passName]) => passName)
-    .filter((passName) => targetPassNames.has(passName));
+    .filter((passName) => targetPassNames.has(passName) && !EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES.has(passName));
 }
 
 function finalizeExactAfterSettleRefreshPlan(plan) {
@@ -19331,6 +19363,129 @@ function finalizeExactAfterSettleRefreshPlan(plan) {
   if (plan.deferContextBaseEnhancements) {
     scheduleDeferredContextBaseEnhancements();
   }
+  scheduleDeferredExactContextRefresh(plan);
+}
+
+function cancelDeferredExactContextRefresh() {
+  deferredExactContextRefreshVersion += 1;
+  cancelDeferredWork(deferredExactContextRefreshHandle);
+  deferredExactContextRefreshHandle = null;
+  deferredExactContextRefreshTaskHandles.forEach((handle) => {
+    if (handle && typeof handle.cancel === "function") {
+      handle.cancel();
+    }
+  });
+  deferredExactContextRefreshTaskHandles.clear();
+}
+
+function getDeferredExactContextTargetPasses(plan = {}) {
+  const cache = getRenderPassCacheState();
+  const targetPasses = new Set(Array.isArray(plan.deferredExactTargetPasses) ? plan.deferredExactTargetPasses : []);
+  EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES.forEach((passName) => {
+    if (cache.dirty?.[passName]) targetPasses.add(passName);
+  });
+  return getIdleRenderPassDefinitions()
+    .map(([passName]) => passName)
+    .filter((passName) => targetPasses.has(passName));
+}
+
+function isDeferredExactContextRefreshCurrent(refreshVersion, plan = {}) {
+  if (Number(refreshVersion || 0) !== Number(deferredExactContextRefreshVersion || 0)) return false;
+  const identity = plan && typeof plan === "object" ? plan.deferredExactContextIdentity : null;
+  if (identity && typeof identity === "object" && !isExactAfterSettleIdentityCurrent(identity)) return false;
+  return true;
+}
+
+function prepareDeferredExactContextPassesInSlices(passNames, plan = {}, refreshVersion = deferredExactContextRefreshVersion) {
+  const targetPasses = Array.isArray(passNames) ? passNames.filter(Boolean) : [];
+  if (!targetPasses.length) return false;
+  if (!isDeferredExactContextRefreshCurrent(refreshVersion, plan)) return false;
+  const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
+  const definitions = getIdleRenderPassDefinitions().filter(([passName]) => targetPasses.includes(passName));
+  const cache = getRenderPassCacheState();
+  const timings = {};
+  const startedAt = nowMs();
+
+  const enqueueNextPass = (index) => {
+    if (!isDeferredExactContextRefreshCurrent(refreshVersion, plan)) return;
+    if (index >= definitions.length) {
+      recordRenderPerfMetric("deferredExactContextRefresh", Math.max(0, nowMs() - startedAt), {
+        activeScenarioId: String(runtimeState.activeScenarioId || ""),
+        targetPasses,
+        passCount: targetPasses.length,
+        sourceGeneration: Number(plan.controllerGeneration || 0),
+      });
+      requestRendererRender("deferred-exact-context-refresh", {
+        flush: false,
+        fallback: () => render(),
+      });
+      return;
+    }
+    const [passName, drawFn] = definitions[index];
+    let taskHandle = null;
+    taskHandle = enqueueFrameTask(() => {
+      if (taskHandle) {
+        deferredExactContextRefreshTaskHandles.delete(taskHandle);
+      }
+      const passStart = nowMs();
+      if (!isDeferredExactContextRefreshCurrent(refreshVersion, plan)) return;
+      if (runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle) {
+        if (isDeferredExactContextRefreshCurrent(refreshVersion, plan)) {
+          scheduleDeferredExactContextRefresh(plan);
+        }
+        return;
+      }
+      prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
+      recordRenderPerfMetric("deferredExactContextRefreshPass", Math.max(0, nowMs() - passStart), {
+        activeScenarioId: String(runtimeState.activeScenarioId || ""),
+        passName,
+        index,
+        targetPasses,
+      });
+      enqueueNextPass(index + 1);
+    }, {
+      priority: "normal",
+      label: `deferred-exact-context-pass-${passName}`,
+      generation: Number(plan.controllerGeneration || 0),
+      dedupe: true,
+      deferOnContinuousInput: true,
+    });
+    if (taskHandle) {
+      deferredExactContextRefreshTaskHandles.add(taskHandle);
+    }
+  };
+  enqueueNextPass(0);
+  return true;
+}
+
+function scheduleDeferredExactContextRefresh(plan = {}) {
+  const targetPasses = getDeferredExactContextTargetPasses(plan);
+  if (!targetPasses.length) return false;
+  cancelDeferredExactContextRefresh();
+  const refreshVersion = Number(deferredExactContextRefreshVersion || 0);
+  if (!plan.deferredExactContextIdentity) {
+    plan.deferredExactContextIdentity = getExactAfterSettleIdentity();
+  }
+  deferredExactContextRefreshHandle = scheduleDeferredWork(() => {
+    deferredExactContextRefreshHandle = null;
+    if (!isDeferredExactContextRefreshCurrent(refreshVersion, plan)) return;
+    if (runtimeState.renderPhase !== RENDER_PHASE_IDLE || runtimeState.deferExactAfterSettle) {
+      if (isDeferredExactContextRefreshCurrent(refreshVersion, plan)) {
+        scheduleDeferredExactContextRefresh(plan);
+      }
+      return;
+    }
+    prepareDeferredExactContextPassesInSlices(targetPasses, plan, refreshVersion);
+  }, {
+    timeout: 180,
+  });
+  recordRenderPerfMetric("deferredExactContextRefreshScheduled", 0, {
+    activeScenarioId: String(runtimeState.activeScenarioId || ""),
+    targetPasses,
+    passCount: targetPasses.length,
+    sourceGeneration: Number(plan.controllerGeneration || 0),
+  });
+  return true;
 }
 
 function enqueueExactAfterSettleSegment(generation, label, task) {
