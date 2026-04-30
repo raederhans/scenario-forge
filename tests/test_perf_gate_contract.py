@@ -143,12 +143,19 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("mergedLayerPayloadCacheLayerCount", script)
         self.assertIn("includeHeavyMetrics: false", script)
         self.assertIn("includeHeavyMetrics: true", script)
-        self.assertIn("timedOut: !!stillActive", script)
+        self.assertIn("const readIdleState = async () => page.evaluate", script)
+        self.assertIn("timedOut: !snapshot.settled", script)
         self.assertIn("firstIdleAfterLastWheelMs = idleState?.timedOut", script)
         self.assertIn("result.finalReset = await waitForIdle(7000)", script)
         self.assertIn("activeScenarioId: await readActiveScenarioId()", script)
         self.assertIn("result.activeScenarioId = await readActiveScenarioId()", script)
         self.assertIn("attribution: Array.from(entry.attribution || [])", script)
+        self.assertIn("mc_long_task_attribution_v1", script)
+        self.assertIn("mc_long_task_attribution_gate_v1", script)
+        self.assertIn("LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES", script)
+        self.assertIn("category: 'render-pass'", script)
+        self.assertIn("unknownLongTaskCount", script)
+        self.assertIn("evidence: ['no-pass-or-browser-attribution']", script)
         self.assertIn('"git", "rev-parse", "HEAD"', script)
         self.assertIn('SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]', script)
         self.assertIn('"politicalRasterWorker": political_raster_worker', script)
@@ -183,6 +190,21 @@ class PerfGateContractTest(unittest.TestCase):
                                         "politicalBg": {"durationMs": 12},
                                     },
                                 },
+                                "longTaskAttribution": {
+                                    "schema": "mc_long_task_attribution_v1",
+                                    "unknownLongTaskCount": 0,
+                                    "topOwner": "render-pass",
+                                    "categoryCounts": {"render-pass": 1},
+                                    "tasks": [
+                                        {
+                                            "category": "render-pass",
+                                            "durationMs": 900,
+                                            "startTime": 123,
+                                            "evidence": ["politicalBg=900ms"],
+                                            "confidence": "high",
+                                        }
+                                    ],
+                                },
                                 "blackPixelAttribution": {
                                     "classification": "normal",
                                 },
@@ -194,6 +216,22 @@ class PerfGateContractTest(unittest.TestCase):
                                         "politicalBg": {"durationMs": 18},
                                     },
                                 },
+                                "longTaskAttribution": {
+                                    "schema": "mc_long_task_attribution_v1",
+                                    "unknownLongTaskCount": 1,
+                                    "topOwner": "unknown",
+                                    "categoryCounts": {"unknown": 1},
+                                    "tasks": [
+                                        {
+                                            "category": "unknown",
+                                            "durationMs": 800,
+                                            "startTime": 456,
+                                            "evidence": ["no-pass-or-browser-attribution"],
+                                            "confidence": "low",
+                                        }
+                                    ],
+                                },
+                                "unknownLongTaskCount": 1,
                                 "blackPixelAttribution": {
                                     "classification": "dark-content-candidate",
                                 },
@@ -217,6 +255,16 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertEqual(metric["details"]["passAttributionSchema"], "mc_pass_attribution_v1")
         self.assertEqual(metric["details"]["regions"]["europe"]["degradation"]["ratio"], 1.25)
         self.assertEqual(metric["details"]["passAttribution"]["politicalBg"]["max"], 18)
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["schema"], "mc_long_task_attribution_v1")
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["unknownLongTaskCount"], 1)
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["categoryCounts"]["render-pass"], 1)
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["categoryCounts"]["unknown"], 1)
+        self.assertFalse(metric["details"]["longTask"]["attribution"]["gate"]["passed"])
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["gate"]["unknownLongTaskCount"], 1)
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["gate"]["unknownTopOwnerCount"], 1)
+        self.assertEqual(metric["details"]["longTask"]["attribution"]["gate"]["invalidCategoryCount"], 0)
+        self.assertEqual(metric["details"]["regions"]["europe"]["longTaskAttribution"]["unknownLongTaskCount"], 1)
+        self.assertFalse(metric["details"]["regions"]["europe"]["longTaskAttribution"]["gate"]["passed"])
         self.assertEqual(metric["details"]["blackPixelClassification"]["normal"], 1)
         self.assertEqual(metric["details"]["blackPixelClassification"]["dark-content-candidate"], 1)
 

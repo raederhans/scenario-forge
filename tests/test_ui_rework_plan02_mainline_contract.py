@@ -92,6 +92,67 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         for token in required_tokens:
             self.assertIn(token, content)
 
+    def test_country_inspector_hierarchy_uses_polished_compact_stack(self):
+        css_content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
+        sidebar_content = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
+
+        for token in [
+            "#countryInspectorSection,",
+            "#specialRegionInspectorSection,",
+            "#waterInspectorSection,",
+            "border-radius: 18px;",
+            "#countryList > .country-explorer-group:not(.country-select-card)",
+            "scrollbar-gutter: stable;",
+            "#countryList.inspector-scroll",
+            "max-height: 30vh;",
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(239, 244, 249, 0.82))",
+            ".inspector-action-disclosure-body {",
+            "max-height: min(34vh, 320px);",
+            ".inspector-action-list-natural {",
+            "max-height: min(34vh, 320px);",
+            ".scenario-visual-adjustments-body {",
+            "#selectedCountryActionsSection > .inspector-panel-body {",
+            "max-height: min(54vh, 520px);",
+            "--inspector-font-card-title: 0.78rem;",
+            "--inspector-font-control: 0.74rem;",
+            "font-size: var(--inspector-font-control);",
+            "font-size: var(--inspector-font-card-title, 0.78rem);",
+            "#selectedCountryActionsSection #presetTree.inspector-scroll {",
+            "overflow: visible;",
+            "scrollbar-gutter: stable;",
+        ]:
+            self.assertIn(token, css_content)
+
+        for token in [
+            "countryListCompactCap: 30",
+            "presetTreeCompactCap: 48",
+            "selectedActionsBodyCompactCap: 54",
+            "const getCountryInspectorListCap = () => {",
+            "const getSelectedActionsBodyCap = () => (",
+            "selectedCountryActionsSection?.open",
+            "releaseAdaptiveInspectorHeight(presetTree);",
+            "toViewportPixels(getCountryInspectorListCap())",
+            "toViewportPixels(getSelectedActionsBodyCap())",
+        ]:
+            self.assertIn(token, sidebar_content)
+
+        for token in [
+            "const renderScenarioRelatedCountryGroups = (container, countryState) => {",
+            't("Related Governments", "ui")',
+            "appendScenarioChildCountryRows(section, subjectChildren);",
+            "appendScenarioChildCountryRows(section, releasableChildren);",
+        ]:
+            self.assertIn(token, sidebar_content)
+        self.assertNotIn('appendActionSection(container, t("Notes", "ui"))', sidebar_content)
+        self.assertNotIn('appendActionSection(container, t("Navigation", "ui"))', sidebar_content)
+
+        self.assertIn("#countryInspectorColorRow {", css_content)
+        self.assertIn("#countryList .country-select-row button:hover", css_content)
+        self.assertIn("#specialRegionInspectorSection .inspector-detail-section", css_content)
+        self.assertIn("#projectLegendSection,", css_content)
+        self.assertIn("#inspectorUtilitiesSection,", css_content)
+        self.assertIn("#diagnosticsSection {", css_content)
+
 
 if __name__ == "__main__":
     unittest.main()

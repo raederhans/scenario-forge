@@ -570,22 +570,14 @@ export function createCountryInspectorController({
     }
 
     if (countryInspectorColorRow) {
-      const resolvedColor = getDisplayCountryColor(countryState);
-      countryInspectorColorRow.classList.remove("hidden");
-      if (countryInspectorColorSwatch) {
-        countryInspectorColorSwatch.style.backgroundColor = resolvedColor;
-        countryInspectorColorSwatch.title = `${t("Edit country color", "ui")}: ${countryState.displayName}`;
-        countryInspectorColorSwatch.setAttribute(
-          "aria-label",
-          `${t("Edit country color", "ui")}: ${countryState.displayName}`
-        );
-      }
-      if (countryInspectorColorInput) {
-        countryInspectorColorInput.disabled = false;
-        countryInspectorColorInput.value = resolvedColor;
-        positionCountryInspectorColorAnchor();
-      }
+      countryInspectorColorRow.classList.add("hidden");
     }
+    if (countryInspectorColorInput) {
+      countryInspectorColorInput.disabled = true;
+      countryInspectorColorInput.style.removeProperty("left");
+      countryInspectorColorInput.style.removeProperty("top");
+    }
+    setCountryInspectorColorPickerOpen(false);
     scheduleAdaptiveInspectorHeights();
   };
 

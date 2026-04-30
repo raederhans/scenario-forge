@@ -1467,21 +1467,15 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "dismissOnboardingHintFn", dismissOnboardingHint);
   registerRuntimeHook(state, "showOnboardingHintFn", showOnboardingHint);
 
-  const showToolHud = (message, { duration = 1200 } = {}) => {
+  const showToolHud = (message) => {
     if (!toolHudChip || !message) return;
-    toolHudChip.textContent = message;
-    toolHudChip.classList.remove("hidden", "is-hidden");
-    toolHudChip.classList.add("is-visible");
+    toolHudChip.textContent = "";
+    toolHudChip.classList.remove("is-visible");
+    toolHudChip.classList.add("hidden", "is-hidden");
     if (toolHudTimerId) {
       globalThis.clearTimeout(toolHudTimerId);
+      toolHudTimerId = 0;
     }
-    toolHudTimerId = globalThis.setTimeout(() => {
-      toolHudChip.classList.remove("is-visible");
-      toolHudChip.classList.add("is-hidden");
-      globalThis.setTimeout(() => {
-        toolHudChip.classList.add("hidden");
-      }, 180);
-    }, duration);
   };
 
   const emitTransientFeedback = (

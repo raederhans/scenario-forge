@@ -2302,8 +2302,8 @@ function initSidebar({ render } = {}) {
 
     const statusHint = document.createElement("p");
     statusHint.id = "frontlineStatusHint";
-    statusHint.className = "sidebar-tool-hint";
-    statusHint.textContent = t("Frontline rendering is disabled until you explicitly enable it for this project.", "ui");
+    statusHint.className = "sidebar-tool-hint frontline-compact-hint";
+    statusHint.textContent = t("Overlay off.", "ui");
 
     statusRow.appendChild(statusTitleGroup);
 
@@ -2318,7 +2318,6 @@ function initSidebar({ render } = {}) {
     emptyState.className = "inspector-empty-state frontline-empty-state";
     emptyState.innerHTML = `
       <h3 class="section-header-block">${t("Frontline is off", "ui")}</h3>
-      <p class="sidebar-tool-hint">${t("Turn it on when you want to derive conflict lines from the active scenario.", "ui")}</p>
     `;
 
     const settings = document.createElement("div");
@@ -2330,8 +2329,8 @@ function initSidebar({ render } = {}) {
     controlsHeader.textContent = t("View", "ui");
 
     const controlsHint = document.createElement("p");
-    controlsHint.className = "sidebar-tool-hint";
-    controlsHint.textContent = t("Keep the line restrained by default, then opt into labels only when the theater needs annotation.", "ui");
+    controlsHint.className = "sidebar-tool-hint frontline-compact-hint";
+    controlsHint.textContent = t("Style and labels.", "ui");
 
     const controlsRow = buildRow();
     controlsRow.classList.add("frontline-compact-row");
@@ -2394,7 +2393,7 @@ function initSidebar({ render } = {}) {
 
     const hint = document.createElement("p");
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Operation graphics and unit counters stay in the same frontline workspace and remain project-local.", "ui");
+    hint.textContent = t("Project-local battle planning tools.", "ui");
 
     const workspaceIconCloseBtn = buildButton("strategicOverlayIconCloseBtn", "Close");
     workspaceIconCloseBtn.classList.add("secondary", "strategic-workspace-icon-close", "hidden");
@@ -2419,7 +2418,7 @@ function initSidebar({ render } = {}) {
     operationalLineHeader.textContent = t("Operational Lines", "ui");
     const operationalLineHint = document.createElement("p");
     operationalLineHint.className = "sidebar-tool-hint";
-    operationalLineHint.textContent = t("These are separate from political frontlines and act as your single-line battle planning layer.", "ui");
+    operationalLineHint.textContent = t("Plan lines.", "ui");
     const operationalLineRow = buildRow();
     operationalLineRow.classList.add("frontline-compact-row", "strategic-line-primary-row");
     const operationalLineKindSelect = buildSelect("operationalLineKindSelect", [
@@ -2454,7 +2453,7 @@ function initSidebar({ render } = {}) {
     const operationalLineEditorHint = document.createElement("p");
     operationalLineEditorHint.id = "operationalLineEditorHint";
     operationalLineEditorHint.className = "sidebar-tool-hint mt-2";
-    operationalLineEditorHint.textContent = t("Use the bottom command bar for fast entry, or start drawing here for the selected line type.", "ui");
+    operationalLineEditorHint.textContent = t("Choose type and draw.", "ui");
 
     const operationalLineActions = buildRow();
     operationalLineActions.className = "sidebar-equal-actions mt-3 strategic-line-management-actions";
@@ -2475,7 +2474,7 @@ function initSidebar({ render } = {}) {
     graphicsHeader.textContent = t("Operation Graphics", "ui");
     const graphicsHint = document.createElement("p");
     graphicsHint.className = "sidebar-tool-hint";
-    graphicsHint.textContent = t("Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.", "ui");
+    graphicsHint.textContent = t("Arrows and markers.", "ui");
     const graphicsRow = buildRow();
     graphicsRow.classList.add("frontline-compact-row", "strategic-graphics-primary-row");
     const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
@@ -2521,10 +2520,7 @@ function initSidebar({ render } = {}) {
     const graphicsEditorHint = document.createElement("p");
     graphicsEditorHint.id = "operationGraphicEditorHint";
     graphicsEditorHint.className = "sidebar-tool-hint mt-2";
-    graphicsEditorHint.textContent = t(
-      "Select a line to drag vertices, click midpoint pips to insert points, or remove the selected vertex.",
-      "ui"
-    );
+    graphicsEditorHint.textContent = t("Edit vertices and style.", "ui");
 
     const graphicsActions = buildRow();
     graphicsActions.className = "sidebar-equal-actions mt-3 strategic-graphics-management-actions";
@@ -2574,7 +2570,7 @@ function initSidebar({ render } = {}) {
     unitHeader.textContent = t("Unit Counters", "ui");
     const unitHint = document.createElement("p");
     unitHint.className = "sidebar-tool-hint";
-    unitHint.textContent = t("Counters should read like map pieces first. Keep only unit, nation, echelon, and label in the fast path.", "ui");
+    unitHint.textContent = t("Map pieces.", "ui");
     const unitEditorShell = document.createElement("div");
     unitEditorShell.className = "unit-counter-editor-shell mt-2";
     unitEditorShell.id = "unitCounterEditorShell";
@@ -2684,7 +2680,7 @@ function initSidebar({ render } = {}) {
     const unitCounterCatalogHeaderHint = document.createElement("p");
     unitCounterCatalogHeaderHint.id = "unitCounterCatalogHeaderHint";
     unitCounterCatalogHeaderHint.className = "sidebar-tool-hint";
-    unitCounterCatalogHeaderHint.textContent = t("Search the internal counter catalog, then apply a preset back into the editor.", "ui");
+    unitCounterCatalogHeaderHint.textContent = t("Search symbols.", "ui");
     unitCounterCatalogHeader.append(unitCounterCatalogHeaderTitle, unitCounterCatalogHeaderHint);
     const unitCounterCatalogSourceTabs = document.createElement("div");
     unitCounterCatalogSourceTabs.id = "unitCounterCatalogSourceTabs";
@@ -2773,7 +2769,7 @@ function initSidebar({ render } = {}) {
     const unitSymbolHint = document.createElement("p");
     unitSymbolHint.id = "unitCounterSymbolHint";
     unitSymbolHint.className = "sidebar-tool-hint mt-2";
-    unitSymbolHint.textContent = t("Game renderer uses short codes like HQ or ARM. MILSTD expects a SIDC string.", "ui");
+    unitSymbolHint.textContent = t("Short code or SIDC.", "ui");
     unitIdentityBlock.appendChild(unitModeRow);
     unitIdentityBlock.appendChild(unitCopyRow);
     unitIdentityBlock.appendChild(unitSymbolInput);
@@ -2914,7 +2910,6 @@ function initSidebar({ render } = {}) {
     unitListHeader.className = "unit-counter-list-header mt-3 strategic-counter-list-header";
     unitListHeader.innerHTML = `
       <div class="section-header">${t("Placed Counters", "ui")}</div>
-      <p class="sidebar-tool-hint">${t("Each entry now shows nation, unit preset, echelon, and renderer at a glance.", "ui")}</p>
     `;
 
     const unitList = document.createElement("select");
@@ -3299,6 +3294,7 @@ function initSidebar({ render } = {}) {
   const specialRegionColorInput = document.getElementById("specialRegionColorInput");
   const clearSpecialRegionColorBtn = document.getElementById("clearSpecialRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  const selectedCountryActionsBody = selectedCountryActionsSection?.querySelector(".inspector-panel-body") || null;
   const frontlineProjectSection = document.getElementById("frontlineProjectSection");
   const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
@@ -3324,16 +3320,20 @@ function initSidebar({ render } = {}) {
   };
 
   const INSPECTOR_VH_BASELINE = {
-    countryList: 26,
-    presetTree: 28,
-    countryListCap: 52,
-    presetTreeCap: 56,
+    countryList: 14,
+    countryListCap: 38,
+    countryListCompactCap: 30,
+    presetTreeCap: 52,
+    presetTreeCompactCap: 48,
+    selectedActionsBody: 26,
+    selectedActionsBodyCap: 56,
+    selectedActionsBodyCompactCap: 54,
   };
   const INSPECTOR_PX_BASELINE = {
     actionList: 120,
     actionListCap: 240,
-    presetBody: 216,
-    presetBodyCap: 432,
+    presetBody: 240,
+    presetBodyCap: 520,
   };
   let adaptiveInspectorHeightFrame = 0;
   let countryInspectorColorPickerOpen = false;
@@ -3372,17 +3372,43 @@ function initSidebar({ render } = {}) {
     element.style.maxHeight = `${Math.round(nextHeight)}px`;
   };
 
+  const releaseAdaptiveInspectorHeight = (element) => {
+    if (!element) return;
+    element.style.height = "";
+    element.style.maxHeight = "";
+  };
+
+  const getCountryInspectorListCap = () => {
+    const hasOpenActionStack = !!selectedCountryActionsSection?.open;
+    const hasSelectedDetail = !!countryInspectorDetail && !countryInspectorDetail.classList.contains("hidden");
+    return hasOpenActionStack || hasSelectedDetail
+      ? INSPECTOR_VH_BASELINE.countryListCompactCap
+      : INSPECTOR_VH_BASELINE.countryListCap;
+  };
+
+  const getPresetInspectorListCap = () => (
+    countryInspectorSection?.open
+      ? INSPECTOR_VH_BASELINE.presetTreeCompactCap
+      : INSPECTOR_VH_BASELINE.presetTreeCap
+  );
+
+  const getSelectedActionsBodyCap = () => (
+    countryInspectorSection?.open
+      ? INSPECTOR_VH_BASELINE.selectedActionsBodyCompactCap
+      : INSPECTOR_VH_BASELINE.selectedActionsBodyCap
+  );
+
   const syncAdaptiveInspectorHeights = () => {
     adaptiveInspectorHeightFrame = 0;
     applyAdaptiveInspectorHeight(
       list,
       toViewportPixels(INSPECTOR_VH_BASELINE.countryList),
-      toViewportPixels(INSPECTOR_VH_BASELINE.countryListCap)
+      toViewportPixels(getCountryInspectorListCap())
     );
     applyAdaptiveInspectorHeight(
       waterRegionList,
       toViewportPixels(18),
-      toViewportPixels(34)
+      toViewportPixels(32)
     );
     applyAdaptiveInspectorHeight(
       waterLegendList,
@@ -3391,18 +3417,19 @@ function initSidebar({ render } = {}) {
     );
     applyAdaptiveInspectorHeight(
       specialRegionList,
-      toViewportPixels(16),
-      toViewportPixels(30)
+      toViewportPixels(18),
+      toViewportPixels(32)
     );
     applyAdaptiveInspectorHeight(
       specialRegionLegendList,
       96,
       220
     );
+    releaseAdaptiveInspectorHeight(presetTree);
     applyAdaptiveInspectorHeight(
-      presetTree,
-      0,
-      toViewportPixels(INSPECTOR_VH_BASELINE.presetTreeCap)
+      selectedCountryActionsBody,
+      toViewportPixels(INSPECTOR_VH_BASELINE.selectedActionsBody),
+      toViewportPixels(getSelectedActionsBodyCap())
     );
     sidebar?.querySelectorAll(".preset-country-body").forEach((element) => {
       applyAdaptiveInspectorHeight(
@@ -4554,13 +4581,8 @@ function initSidebar({ render } = {}) {
     container.appendChild(intro);
   };
 
-  const renderScenarioChildCountryList = (container, parentState, { title, childStates = [] } = {}) => {
+  const appendScenarioChildCountryRows = (container, childStates = []) => {
     const children = Array.isArray(childStates) ? childStates : [];
-    if (!children.length) return;
-
-    const section = appendActionSection(container, title || t("Related Countries", "ui"), {
-      bodyClassName: "inspector-action-list-natural",
-    });
     children.forEach((childState) => {
       const card = document.createElement("button");
       card.type = "button";
@@ -4595,22 +4617,41 @@ function initSidebar({ render } = {}) {
 
       card.appendChild(copy);
       card.appendChild(side);
-      section.appendChild(card);
+      container.appendChild(card);
     });
+  };
+
+  const renderScenarioRelatedCountryGroups = (container, countryState) => {
+    const subjectChildren = getScenarioSubjectChildrenForParent(countryState?.code);
+    const releasableChildren = getReleasableChildrenForParent(countryState?.code);
+    if (!subjectChildren.length && !releasableChildren.length) return;
+
+    const section = appendActionSection(container, t("Related Governments", "ui"), {
+      bodyClassName: "inspector-action-list-natural",
+    });
+
+    if (subjectChildren.length) {
+      const label = document.createElement("div");
+      label.className = "inspector-mini-label";
+      label.textContent = t("Subject Governments", "ui");
+      section.appendChild(label);
+      appendScenarioChildCountryRows(section, subjectChildren);
+    }
+
+    if (releasableChildren.length) {
+      const label = document.createElement("div");
+      label.className = "inspector-mini-label";
+      label.textContent = t("Releasable Countries", "ui");
+      section.appendChild(label);
+      appendScenarioChildCountryRows(section, releasableChildren);
+    }
   };
 
   const renderScenarioParentActions = (container, countryState) => {
     if (countryState?.scenarioSubject) {
       renderScenarioParentReturnAction(container, countryState);
     }
-    renderScenarioChildCountryList(container, countryState, {
-      title: t("Subject Governments", "ui"),
-      childStates: getScenarioSubjectChildrenForParent(countryState?.code),
-    });
-    renderScenarioChildCountryList(container, countryState, {
-      title: t("Releasable Countries", "ui"),
-      childStates: getReleasableChildrenForParent(countryState?.code),
-    });
+    renderScenarioRelatedCountryGroups(container, countryState);
 
     if (countryState.hierarchyGroups.length > 0) {
       const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
@@ -4676,15 +4717,34 @@ function initSidebar({ render } = {}) {
     const parentState = latestCountryStatesByCode.get(parentCode);
     if (!parentState) return;
 
-    const section = appendActionSection(container, t("Navigation", "ui"));
-    const returnBtn = createInspectorActionButton(
-      `${t("Return to", "ui")} ${parentState.displayName} (${parentState.code})`,
-      () => {
-        selectInspectorCountry(parentState.code);
-      }
-    );
-    returnBtn.classList.add("scenario-parent-return-btn");
-    section.appendChild(returnBtn);
+    const returnBtn = document.createElement("button");
+    returnBtn.type = "button";
+    returnBtn.className = "scenario-action-card scenario-navigation-card scenario-parent-return-btn";
+    returnBtn.addEventListener("click", () => {
+      selectInspectorCountry(parentState.code);
+    });
+
+    const copy = document.createElement("div");
+    copy.className = "scenario-action-card-copy";
+    const title = document.createElement("div");
+    title.className = "country-row-title";
+    title.textContent = `${t("Return to", "ui")} ${parentState.displayName}`;
+    const meta = document.createElement("div");
+    meta.className = "country-select-meta";
+    meta.textContent = `(${parentState.code})`;
+    copy.appendChild(title);
+    copy.appendChild(meta);
+
+    const side = document.createElement("div");
+    side.className = "country-row-actions";
+    const swatch = document.createElement("span");
+    swatch.className = "country-select-swatch";
+    swatch.style.backgroundColor = getResolvedCountryColor(parentState);
+    side.appendChild(swatch);
+
+    returnBtn.appendChild(copy);
+    returnBtn.appendChild(side);
+    container.appendChild(returnBtn);
   };
 
   const renderScenarioBoundaryVariantActions = (container, countryState) => {
@@ -4693,12 +4753,6 @@ function initSidebar({ render } = {}) {
 
     const section = appendActionSection(container, t("Boundary Variants", "ui"));
     const activeVariant = getResolvedReleasableBoundaryVariant(getScenarioCountryMeta(countryState.code) || countryState);
-    if (activeVariant?.description) {
-      const note = document.createElement("div");
-      note.className = "inspector-empty-note";
-      note.textContent = activeVariant.description;
-      section.appendChild(note);
-    }
 
     variants.forEach((variant) => {
       const button = createInspectorActionButton(variant.label || variant.id, () => {
@@ -4817,12 +4871,6 @@ function initSidebar({ render } = {}) {
         applyScenarioCompanionAction(countryState, action);
       });
       section.appendChild(button);
-      if (action.description) {
-        const note = document.createElement("div");
-        note.className = "inspector-mini-label";
-        note.textContent = action.description;
-        section.appendChild(note);
-      }
     });
   };
 
@@ -4831,23 +4879,6 @@ function initSidebar({ render } = {}) {
     renderScenarioBoundaryVariantActions(container, countryState);
     renderScenarioCoreTerritoryAction(container, countryState);
     renderScenarioHistoricalTransfers(container, countryState);
-    if (countryState.notes) {
-      const notesSection = appendActionSection(container, t("Notes", "ui"));
-      const notes = document.createElement("div");
-      notes.className = "inspector-empty-note";
-      notes.textContent = countryState.notes;
-      notesSection.appendChild(notes);
-      if (
-        countryState.selectedBoundaryVariantDescription
-        && Array.isArray(countryState?.boundaryVariants)
-        && countryState.boundaryVariants.length > 1
-      ) {
-        const variantNote = document.createElement("div");
-        variantNote.className = "inspector-mini-label mt-2";
-        variantNote.textContent = countryState.selectedBoundaryVariantDescription;
-        notesSection.appendChild(variantNote);
-      }
-    }
   };
 
   const renderScenarioVisualAdjustments = (container, countryState) => {

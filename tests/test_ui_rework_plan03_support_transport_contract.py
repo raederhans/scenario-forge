@@ -31,7 +31,10 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn("scenario-guide-modal", content)
         self.assertIn("Open this manual from the scenario bar or the Utilities panel. Both Guide buttons open the same help surface, so you can keep the next editing step visible while you work.", content)
         self.assertIn("Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.", content)
-        self.assertIn("Open the export workbench to preview the map, reorder layers, tune image adjustments, choose the target format, and export up to the current 8K limit.", content)
+        self.assertIn("Preview layers, format, and resolution before export.", content)
+        self.assertIn("Scenario frontline workspace.", content)
+        self.assertNotIn("Use Guide for workflow steps and Reference for visual alignment. Both stay in the Project tab so you can check instructions without losing context.", content)
+        self.assertNotIn("Use Frontline after you apply a scenario. This section combines", content)
         self.assertNotIn("lblExportInfoTooltip", content)
 
     def test_transport_shell_uses_phase03_titles_and_status_contract(self):
@@ -78,6 +81,32 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn('readPaletteLibraryBlockSize("--palette-library-list-max-block"', palette_content)
         self.assertIn('title.className = "palette-library-title u-truncate";', palette_content)
         self.assertIn('fileName.className = "project-file-name u-truncate";', sidebar_content)
+
+        for token in [
+            "#projectLegendSection,",
+            "#frontlineProjectSection,",
+            "#exportProjectSection,",
+            "#inspectorUtilitiesSection,",
+            "#diagnosticsSection {",
+            ".frontline-tab-card {",
+            "border-radius: 18px;",
+            ".strategic-accordion-section {",
+            "border-radius: 15px;",
+            ".strategic-accordion-body {",
+            "max-height: min(52vh, 460px);",
+            "scrollbar-gutter: stable;",
+        ]:
+            self.assertIn(token, css_content)
+
+        for token in [
+            't("Project-local battle planning tools.", "ui")',
+            't("Plan lines.", "ui")',
+            't("Arrows and markers.", "ui")',
+            't("Map pieces.", "ui")',
+        ]:
+            self.assertIn(token, sidebar_content)
+        self.assertNotIn("Operation graphics and unit counters stay in the same frontline workspace", sidebar_content)
+        self.assertNotIn("Counters should read like map pieces first", sidebar_content)
 
 
 if __name__ == "__main__":

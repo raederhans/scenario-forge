@@ -22,6 +22,14 @@ SESSION_ID = "editor-perf-benchmark"
 BROWSER_OPENED = False
 SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]
 RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders"]
+LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES = {
+    "render-pass",
+    "chunk-promotion",
+    "scheduler",
+    "browser",
+    "worker",
+    "unknown",
+}
 BROWSER_OPEN_TIMEOUT_SEC = 45
 OPEN_BROWSER_CANDIDATES = ("msedge", "chromium")
 WRAPPER_BACKEND = "wrapper"
@@ -1661,6 +1669,13 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
     region_summaries: dict[str, dict] = {}
     pass_duration_values: dict[str, list[float]] = {}
     black_classification_counts: dict[str, int] = {}
+    long_task_category_counts: dict[str, int] = {}
+    unknown_long_task_count = 0
+    long_task_attribution_task_count = 0
+    invalid_long_task_category_count = 0
+    missing_long_task_evidence_count = 0
+    missing_long_task_confidence_count = 0
+    unknown_long_task_top_owner_count = 0
     for region_id, region_payload in regions.items():
       if not isinstance(region_payload, dict):
         continue
@@ -1689,6 +1704,31 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
       for cycle in cycles:
         if not isinstance(cycle, dict):
           continue
+        cycle_long_task_attribution = cycle.get("longTaskAttribution") if isinstance(cycle.get("longTaskAttribution"), dict) else {}
+        unknown_long_task_count += int(as_finite_number(cycle.get("unknownLongTaskCount")) or as_finite_number(cycle_long_task_attribution.get("unknownLongTaskCount")) or 0)
+        if str(cycle_long_task_attribution.get("topOwner") or "").strip() == "unknown":
+          unknown_long_task_top_owner_count += 1
+        cycle_long_tasks = cycle_long_task_attribution.get("tasks") if isinstance(cycle_long_task_attribution.get("tasks"), list) else []
+        for task in cycle_long_tasks:
+          if not isinstance(task, dict):
+            continue
+          duration = as_finite_number(task.get("durationMs"))
+          if duration is None or duration <= 750:
+            continue
+          long_task_attribution_task_count += 1
+          category = str(task.get("category") or "").strip()
+          if category not in LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES:
+            invalid_long_task_category_count += 1
+          evidence = task.get("evidence")
+          if not isinstance(evidence, list) or not evidence:
+            missing_long_task_evidence_count += 1
+          confidence = str(task.get("confidence") or "").strip()
+          if confidence not in {"low", "medium", "high"}:
+            missing_long_task_confidence_count += 1
+        category_counts = cycle_long_task_attribution.get("categoryCounts") if isinstance(cycle_long_task_attribution.get("categoryCounts"), dict) else {}
+        for category, count in category_counts.items():
+          category_key = str(category or "unknown")
+          long_task_category_counts[category_key] = long_task_category_counts.get(category_key, 0) + int(as_finite_number(count) or 0)
         pass_attribution = cycle.get("passAttribution") if isinstance(cycle.get("passAttribution"), dict) else {}
         passes = pass_attribution.get("passes") if isinstance(pass_attribution.get("passes"), dict) else {}
         for pass_name, pass_entry in passes.items():
@@ -1701,6 +1741,70 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
         classification = str(black_attribution.get("classification") or "").strip()
         if classification:
           black_classification_counts[classification] = black_classification_counts.get(classification, 0) + 1
+      region_long_task_attribution = region_payload.get("longTaskAttribution") if isinstance(region_payload.get("longTaskAttribution"), list) else []
+      region_unknown_long_task_count = 0
+      region_category_counts: dict[str, int] = {}
+      region_task_count = 0
+      region_invalid_category_count = 0
+      region_missing_evidence_count = 0
+      region_missing_confidence_count = 0
+      region_unknown_top_owner_count = 0
+      for entry in region_long_task_attribution:
+        if not isinstance(entry, dict):
+          continue
+        region_unknown_long_task_count += int(as_finite_number(entry.get("unknownLongTaskCount")) or 0)
+        if str(entry.get("topOwner") or "").strip() == "unknown":
+          region_unknown_top_owner_count += 1
+        entry_tasks = entry.get("tasks") if isinstance(entry.get("tasks"), list) else []
+        for task in entry_tasks:
+          if not isinstance(task, dict):
+            continue
+          duration = as_finite_number(task.get("durationMs"))
+          if duration is None or duration <= 750:
+            continue
+          region_task_count += 1
+          category = str(task.get("category") or "").strip()
+          if category not in LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES:
+            region_invalid_category_count += 1
+          evidence = task.get("evidence")
+          if not isinstance(evidence, list) or not evidence:
+            region_missing_evidence_count += 1
+          confidence = str(task.get("confidence") or "").strip()
+          if confidence not in {"low", "medium", "high"}:
+            region_missing_confidence_count += 1
+        entry_counts = entry.get("categoryCounts") if isinstance(entry.get("categoryCounts"), dict) else {}
+        for category, count in entry_counts.items():
+          category_key = str(category or "unknown")
+          region_category_counts[category_key] = region_category_counts.get(category_key, 0) + int(as_finite_number(count) or 0)
+      if not region_long_task_attribution:
+        for cycle in cycles:
+          if not isinstance(cycle, dict):
+            continue
+          cycle_long_task_attribution = cycle.get("longTaskAttribution") if isinstance(cycle.get("longTaskAttribution"), dict) else {}
+          region_unknown_long_task_count += int(as_finite_number(cycle.get("unknownLongTaskCount")) or as_finite_number(cycle_long_task_attribution.get("unknownLongTaskCount")) or 0)
+          if str(cycle_long_task_attribution.get("topOwner") or "").strip() == "unknown":
+            region_unknown_top_owner_count += 1
+          cycle_tasks = cycle_long_task_attribution.get("tasks") if isinstance(cycle_long_task_attribution.get("tasks"), list) else []
+          for task in cycle_tasks:
+            if not isinstance(task, dict):
+              continue
+            duration = as_finite_number(task.get("durationMs"))
+            if duration is None or duration <= 750:
+              continue
+            region_task_count += 1
+            category = str(task.get("category") or "").strip()
+            if category not in LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES:
+              region_invalid_category_count += 1
+            evidence = task.get("evidence")
+            if not isinstance(evidence, list) or not evidence:
+              region_missing_evidence_count += 1
+            confidence = str(task.get("confidence") or "").strip()
+            if confidence not in {"low", "medium", "high"}:
+              region_missing_confidence_count += 1
+          entry_counts = cycle_long_task_attribution.get("categoryCounts") if isinstance(cycle_long_task_attribution.get("categoryCounts"), dict) else {}
+          for category, count in entry_counts.items():
+            category_key = str(category or "unknown")
+            region_category_counts[category_key] = region_category_counts.get(category_key, 0) + int(as_finite_number(count) or 0)
       region_summaries[str(region_id)] = {
         "cycleCount": len(cycles),
         "firstIdleAfterLastWheelMs": summarize_distribution(cycle_idle_values),
@@ -1709,6 +1813,28 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
         "maxLongTaskMs": max_long,
         "memoryDelta": memory_delta,
         "passAttributionSchema": region_payload.get("passAttributionSchema") or probe.get("passAttributionSchema"),
+        "longTaskAttribution": {
+          "unknownLongTaskCount": region_unknown_long_task_count,
+          "categoryCounts": region_category_counts,
+          "topOwner": max(region_category_counts, key=region_category_counts.get) if region_category_counts else None,
+          "gate": {
+            "schema": "mc_long_task_attribution_gate_v1",
+            "passed": (
+              region_unknown_long_task_count == 0
+              and region_invalid_category_count == 0
+              and region_missing_evidence_count == 0
+              and region_missing_confidence_count == 0
+              and region_unknown_top_owner_count == 0
+            ),
+            "taskCount": region_task_count,
+            "unknownLongTaskCount": region_unknown_long_task_count,
+            "unknownTopOwnerCount": region_unknown_top_owner_count,
+            "invalidCategoryCount": region_invalid_category_count,
+            "missingEvidenceCount": region_missing_evidence_count,
+            "missingConfidenceCount": region_missing_confidence_count,
+            "allowedCategories": sorted(LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES),
+          },
+        },
       }
     pass_attribution_summary = {
       pass_name: summarize_distribution(values)
@@ -1732,6 +1858,30 @@ def summarize_repeated_zoom_regions_metric(suite: dict) -> dict:
         "longTask": {
           "maxLongTaskMs": max(max_long_values) if max_long_values else None,
           "distribution": summarize_distribution(max_long_values),
+          "attribution": {
+            "schema": "mc_long_task_attribution_v1",
+            "thresholdMs": 750,
+            "unknownLongTaskCount": unknown_long_task_count,
+            "categoryCounts": long_task_category_counts,
+            "topOwner": max(long_task_category_counts, key=long_task_category_counts.get) if long_task_category_counts else None,
+            "gate": {
+              "schema": "mc_long_task_attribution_gate_v1",
+              "passed": (
+                unknown_long_task_count == 0
+                and invalid_long_task_category_count == 0
+                and missing_long_task_evidence_count == 0
+                and missing_long_task_confidence_count == 0
+                and unknown_long_task_top_owner_count == 0
+              ),
+              "taskCount": long_task_attribution_task_count,
+              "unknownLongTaskCount": unknown_long_task_count,
+              "unknownTopOwnerCount": unknown_long_task_top_owner_count,
+              "invalidCategoryCount": invalid_long_task_category_count,
+              "missingEvidenceCount": missing_long_task_evidence_count,
+              "missingConfidenceCount": missing_long_task_confidence_count,
+              "allowedCategories": sorted(LONG_TASK_ATTRIBUTION_ALLOWED_CATEGORIES),
+            },
+          },
         },
         "memory": {
           "usedJSHeapSizeDelta": summarize_distribution(used_heap_deltas),
@@ -2886,16 +3036,23 @@ def measure_wheel_anchor_trace(scenario_id: str) -> dict | None:
 async (page) => {{
   await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
-    const startedAt = performance.now();
-    const exactActive = () => {{
+    const readIdleState = () => {{
       const phase = String(state.exactAfterSettleController?.phase || 'idle');
-      return !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
+      const exactActive = !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
+      return {{
+        renderPhase: String(state.renderPhase || ''),
+        isInteracting: !!state.isInteracting,
+        exactActive,
+      }};
     }};
+    const startedAt = performance.now();
+    let snapshot = readIdleState();
     while (
-      (state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive())
+      (snapshot.isInteracting || snapshot.renderPhase !== 'idle' || snapshot.exactActive)
       && (performance.now() - startedAt) < 7000
     ) {{
       await new Promise((resolve) => setTimeout(resolve, 80));
+      snapshot = readIdleState();
     }}
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   }});
@@ -3028,30 +3185,38 @@ def measure_repeated_zoom_regions(
     js = f"""
 async (page) => {{
   const config = {json.dumps(config)};
-  const waitForIdle = async (timeoutMs = 7000) => page.evaluate(async (timeoutMs) => {{
-    const {{ state }} = await import('/js/core/state.js');
-    const startedAt = performance.now();
-    const exactActive = () => {{
+  const waitForIdle = async (timeoutMs = 7000) => {{
+    const startedAt = Date.now();
+    const readIdleState = async () => page.evaluate(async () => {{
+      const {{ state }} = await import('/js/core/state.js');
       const phase = String(state.exactAfterSettleController?.phase || 'idle');
-      return !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
-    }};
-    while (
-      (state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive())
-      && (performance.now() - startedAt) < timeoutMs
-    ) {{
-      await new Promise((resolve) => setTimeout(resolve, 80));
+      const exactActive = !!state.deferExactAfterSettle || ['scheduled', 'applying', 'awaiting-paint', 'finalizing'].includes(phase);
+      const stillActive = state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive;
+      return {{
+        renderPhase: String(state.renderPhase || ''),
+        isInteracting: !!state.isInteracting,
+        exactActive,
+        settled: !stillActive,
+      }};
+    }});
+    let snapshot = await readIdleState();
+    while (!snapshot.settled && (Date.now() - startedAt) < timeoutMs) {{
+      await page.waitForTimeout(80);
+      snapshot = await readIdleState();
     }}
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const stillActive = state.isInteracting || String(state.renderPhase || '') !== 'idle' || exactActive();
+    await page.evaluate(async () => {{
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }});
+    snapshot = await readIdleState();
     return {{
-      waitedMs: Number((performance.now() - startedAt).toFixed(3)),
-      renderPhase: String(state.renderPhase || ''),
-      isInteracting: !!state.isInteracting,
-      exactActive: exactActive(),
-      timedOut: !!stillActive,
-      settled: !stillActive,
+      waitedMs: Number((Date.now() - startedAt).toFixed(3)),
+      renderPhase: String(snapshot.renderPhase || ''),
+      isInteracting: !!snapshot.isInteracting,
+      exactActive: !!snapshot.exactActive,
+      timedOut: !snapshot.settled,
+      settled: !!snapshot.settled,
     }};
-  }}, timeoutMs);
+  }};
 
   const resetZoom = async () => page.evaluate(async () => {{
     const renderer = await import('/js/core/map_renderer/public.js');
@@ -3144,6 +3309,8 @@ async (page) => {{
       cycleIndex: Number(payload.cycleIndex || 0),
       wheelIndex: Number(payload.wheelIndex || 0),
       label: String(payload.label || ''),
+      timeOrigin: Number(performance.timeOrigin || 0),
+      sampledAt: Number(performance.now() || 0),
       dtMs: Number((performance.now() - baselineTime).toFixed(3)),
       renderPhase: String(state.renderPhase || ''),
       isInteracting: !!state.isInteracting,
@@ -3179,6 +3346,152 @@ async (page) => {{
     const {{ state }} = await import('/js/core/state.js');
     return String(state.activeScenarioId || '');
   }});
+
+  const isMetricFreshForLongTask = (metricRecordedAt, taskStartTime, taskDurationMs, sampleContext = null) => {{
+    const timeOrigin = Math.max(0, Number(sampleContext?.timeOrigin || 0));
+    const recordedAt = Math.max(0, Number(metricRecordedAt || 0));
+    if (!timeOrigin || !recordedAt) return true;
+    const taskWallStart = timeOrigin + Math.max(0, Number(taskStartTime || 0));
+    const taskWallEnd = taskWallStart + Math.max(0, Number(taskDurationMs || 0));
+    return recordedAt >= taskWallStart - 500 && recordedAt <= taskWallEnd + 1500;
+  }};
+
+  const classifyLongTask = (entry, passAttribution = null, renderMetrics = null, sampleContext = null) => {{
+    const durationMs = Math.max(0, Number(entry?.duration || entry?.durationMs || 0));
+    const startTime = Math.max(0, Number(entry?.startTime || 0));
+    const attribution = Array.isArray(entry?.attribution) ? entry.attribution : [];
+    const evidence = [];
+    const passes = passAttribution && typeof passAttribution === 'object' && passAttribution.passes && typeof passAttribution.passes === 'object'
+      ? passAttribution.passes
+      : {{}};
+    const passEntries = Object.entries(passes)
+      .map(([name, value]) => ({{
+        name,
+        durationMs: Math.max(0, Number(value?.durationMs || 0)),
+        recordedAt: Math.max(0, Number(value?.recordedAt || value?.details?.recordedAt || 0)),
+        metricName: String(value?.metricName || ''),
+      }}))
+      .filter((value) => value.durationMs > 0)
+      .filter((value) => isMetricFreshForLongTask(value.recordedAt, startTime, durationMs, sampleContext))
+      .sort((left, right) => right.durationMs - left.durationMs);
+    const topPass = passEntries[0] || null;
+    if (topPass && (topPass.durationMs >= 500 || topPass.durationMs >= durationMs * 0.35)) {{
+      evidence.push(`${{topPass.name}}=${{Number(topPass.durationMs.toFixed(3))}}ms`);
+      if (topPass.metricName) evidence.push(`metric=${{topPass.metricName}}`);
+      return {{
+        name: String(entry?.name || ''),
+        durationMs,
+        startTime,
+        category: 'render-pass',
+        evidence,
+        confidence: topPass.durationMs >= 750 || topPass.durationMs >= durationMs * 0.6 ? 'high' : 'medium',
+        attribution,
+      }};
+    }}
+    const promotionMetrics = [
+      renderMetrics?.scenarioChunkPromotionVisualStage,
+      renderMetrics?.zoomEndToChunkVisibleMs,
+      renderMetrics?.chunkMergeMs,
+      renderMetrics?.chunkSelectionMs,
+    ].filter((value) => value && typeof value === 'object');
+    const topPromotion = promotionMetrics
+      .map((value) => ({{
+        durationMs: Math.max(0, Number(value.durationMs || 0)),
+        reason: String(value.reason || value.details?.reason || value.source || ''),
+        recordedAt: Math.max(0, Number(value.recordedAt || value.details?.recordedAt || 0)),
+      }}))
+      .filter((value) => isMetricFreshForLongTask(value.recordedAt, startTime, durationMs, sampleContext))
+      .sort((left, right) => right.durationMs - left.durationMs)[0] || null;
+    if (topPromotion && (topPromotion.durationMs >= 350 || topPromotion.durationMs >= durationMs * 0.25)) {{
+      evidence.push(`chunkMetric=${{Number(topPromotion.durationMs.toFixed(3))}}ms`);
+      if (topPromotion.reason) evidence.push(`reason=${{topPromotion.reason}}`);
+      return {{
+        name: String(entry?.name || ''),
+        durationMs,
+        startTime,
+        category: 'chunk-promotion',
+        evidence,
+        confidence: topPromotion.durationMs >= durationMs * 0.5 ? 'high' : 'medium',
+        attribution,
+      }};
+    }}
+    const schedulerDepth = Number(renderMetrics?.frameSchedulerQueueDepth?.total ?? renderMetrics?.frameSchedulerQueueDepth?.details?.total ?? renderMetrics?.frameSchedulerQueueDepth?.count ?? renderMetrics?.frameSchedulerQueueDepth?.details?.count ?? 0);
+    if (schedulerDepth > 0) {{
+      evidence.push(`frameSchedulerQueueDepth=${{schedulerDepth}}`);
+      return {{
+        name: String(entry?.name || ''),
+        durationMs,
+        startTime,
+        category: 'scheduler',
+        evidence,
+        confidence: 'medium',
+        attribution,
+      }};
+    }}
+    const workerMetrics = passAttribution?.politicalRasterWorker || {{}};
+    const workerAccepted = Number(workerMetrics.acceptedCount?.count || workerMetrics.acceptedCount?.details?.count || workerMetrics.acceptedCount?.durationMs || 0);
+    const workerFallback = Number(workerMetrics.fallbackCount?.count || workerMetrics.fallbackCount?.details?.count || workerMetrics.fallbackCount?.durationMs || 0);
+    const workerRoundTrip = Number(workerMetrics.roundTripMs?.durationMs || 0);
+    if (workerRoundTrip >= 100 || workerAccepted > 0 || workerFallback > 0) {{
+      evidence.push(`workerRoundTrip=${{Number(workerRoundTrip.toFixed(3))}}ms`);
+      evidence.push(`workerAccepted=${{workerAccepted}}`);
+      evidence.push(`workerFallback=${{workerFallback}}`);
+      return {{
+        name: String(entry?.name || ''),
+        durationMs,
+        startTime,
+        category: 'worker',
+        evidence,
+        confidence: workerRoundTrip >= durationMs * 0.25 ? 'medium' : 'low',
+        attribution,
+      }};
+    }}
+    if (attribution.length) {{
+      const browserEvidence = attribution
+        .slice(0, 3)
+        .map((item) => [item.name, item.entryType, item.containerName, item.containerSrc].filter(Boolean).join(':'))
+        .filter(Boolean);
+      evidence.push(...browserEvidence);
+      return {{
+        name: String(entry?.name || ''),
+        durationMs,
+        startTime,
+        category: 'browser',
+        evidence: evidence.length ? evidence : ['performance-observer-attribution'],
+        confidence: 'low',
+        attribution,
+      }};
+    }}
+    return {{
+      name: String(entry?.name || ''),
+      durationMs,
+      startTime,
+      category: 'unknown',
+      evidence: ['no-pass-or-browser-attribution'],
+      confidence: 'low',
+      attribution,
+    }};
+  }};
+
+  const buildLongTaskAttribution = (tasks = [], passAttribution = null, renderMetrics = null, sampleContext = null) => {{
+    const classifiedTasks = (Array.isArray(tasks) ? tasks : [])
+      .map((entry) => classifyLongTask(entry, passAttribution, renderMetrics, sampleContext))
+      .filter((entry) => entry.durationMs > 750)
+      .sort((left, right) => right.durationMs - left.durationMs);
+    const categoryCounts = classifiedTasks.reduce((counts, task) => {{
+      counts[task.category] = (counts[task.category] || 0) + 1;
+      return counts;
+    }}, {{}});
+    const topOwner = classifiedTasks[0]?.category || '';
+    return {{
+      schema: 'mc_long_task_attribution_v1',
+      thresholdMs: 750,
+      unknownLongTaskCount: Number(categoryCounts.unknown || 0),
+      topOwner,
+      categoryCounts,
+      tasks: classifiedTasks,
+    }};
+  }};
 
   const result = {{
     requestedScenarioId: String(config.scenarioId || ''),
@@ -3245,11 +3558,18 @@ async (page) => {{
         ? null
         : Math.max(0, Number(after.dtMs || 0) - lastWheelOffsetMs);
       const cycleLongTasks = Array.isArray(after.longTasks) ? after.longTasks : [];
+      const cycleLongTaskAttribution = buildLongTaskAttribution(
+        cycleLongTasks,
+        after.passAttribution || null,
+        after.renderMetrics || null,
+        after,
+      );
       longTaskAttribution.push({{
         regionId,
         cycleIndex,
         sampleLabel: 'after-idle-wait',
-        tasks: cycleLongTasks.slice(0, 20),
+        ...cycleLongTaskAttribution,
+        tasks: cycleLongTaskAttribution.tasks.slice(0, 20),
       }});
       regionCycles.push({{
         regionId,
@@ -3261,6 +3581,8 @@ async (page) => {{
         longTaskCountDelta: cycleLongTasks.length,
         maxLongTaskMs: cycleLongTasks.reduce((max, entry) => Math.max(max, Number(entry.duration || 0)), 0),
         longTaskDurationTotalMs: cycleLongTasks.reduce((sum, entry) => sum + Math.max(0, Number(entry.duration || 0)), 0),
+        longTaskAttribution: cycleLongTaskAttribution,
+        unknownLongTaskCount: Number(cycleLongTaskAttribution.unknownLongTaskCount || 0),
         maxBlackPixelRatio: samples.reduce((max, entry) => Math.max(max, Number(entry.blackPixelRatio || 0)), 0),
         blackFrameDelta: Math.max(0, Number(after.blackFrameCount || 0) - Number(baseline.baselineBlackFrameCount || 0)),
         memoryBefore: baseline.memory,

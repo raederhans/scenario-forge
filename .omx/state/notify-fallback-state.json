@@ -1,7 +1,7 @@
 {
-  "pid": 67340,
+  "pid": 62880,
   "parent_pid": 104344,
-  "started_at": "2026-04-30T01:01:42.235Z",
+  "started_at": "2026-04-30T03:48:10.891Z",
   "cwd": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "notify_script": "C:\\Users\\raede\\AppData\\Roaming\\npm\\node_modules\\oh-my-codex\\dist\\scripts\\notify-hook.js",
   "authority_only": true,
@@ -17,7 +17,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-30T01:01:42.239Z",
+    "last_tick_at": "2026-04-30T03:48:10.895Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -30,7 +30,7 @@
     "leader_only": true,
     "stale_threshold_ms": 180000,
     "precomputed_leader_stale": true,
-    "last_tick_at": "2026-04-30T01:01:42.241Z",
+    "last_tick_at": "2026-04-30T03:48:10.897Z",
     "last_error": null,
     "run_count": 1
   },
@@ -57,7 +57,7 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-30T01:01:42.249Z",
+    "last_tick_at": "2026-04-30T03:48:10.904Z",
     "last_turn_at": "2026-04-29T22:43:52.319Z",
     "last_turn_count": 6,
     "last_message": "结论：本机 tmux/psmux 已经配置好，OMX team 诊断也通过；但你现在这个 Codex App 会话本身没有附着在 tmux 里，所以 `omx team / omx hud / omx",
@@ -80,8 +80,8 @@
     "max_ms": 1000,
     "current_ms": 75,
     "idle_streak": 0,
-    "last_tick_at": "2026-04-30T01:01:42.256Z",
-    "last_activity_at": "2026-04-30T01:01:42.256Z",
+    "last_tick_at": "2026-04-30T03:48:10.911Z",
+    "last_activity_at": "2026-04-30T03:48:10.911Z",
     "last_activity_reason": "leader_nudge"
   },
   "last_cycle_activity": "leader_nudge"

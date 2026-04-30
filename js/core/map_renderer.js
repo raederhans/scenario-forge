@@ -816,6 +816,9 @@ const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "contextMarkers",
   "dayNight",
 ]);
+const VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES = new Set([
+  "contextBase",
+]);
 const INTERACTION_COMPOSITE_PASS_NAMES = [
   "background",
   "physicalBase",
@@ -1756,14 +1759,46 @@ function noteRenderAction(label, startedAt = null) {
 
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASSES = new Set(["political", "contextBase", "contextScenario", "effects"]);
 
+function getRuntimeChunkSelectionVersion() {
+  const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : null;
+  return Math.max(0, Number(loadState?.selectionVersion || 0));
+}
+
+function getVisibleContextFlagSignature() {
+  return [
+    `view:${String(runtimeState.scenarioViewMode || "ownership")}`,
+    `profile:${String(runtimeState.renderProfile || "auto")}`,
+    runtimeState.showPhysical ? "physical:on" : "physical:off",
+    runtimeState.showUrban ? "urban:on" : "urban:off",
+    runtimeState.showRivers ? "rivers:on" : "rivers:off",
+    runtimeState.showWaterRegions ? "water:on" : "water:off",
+    runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
+    runtimeState.showScenarioSpecialRegions ? "special:on" : "special:off",
+    runtimeState.showScenarioReliefOverlays ? "relief:on" : "relief:off",
+    runtimeState.showCityPoints ? "cities:on" : "cities:off",
+    runtimeState.showTransport ? "transport:on" : "transport:off",
+    runtimeState.showRoad ? "road:on" : "road:off",
+    runtimeState.showAirports ? "airports:on" : "airports:off",
+    runtimeState.showPorts ? "ports:on" : "ports:off",
+    runtimeState.showRail ? "rail:on" : "rail:off",
+    runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
+    `context-rev:${Number(runtimeState.contextLayerRevision || 0)}`,
+    `city-rev:${Number(runtimeState.cityLayerRevision || 0)}`,
+  ].join("|");
+}
+
 function getVisibleFrameIdentity(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
   return {
     scenarioId: String(runtimeState.activeScenarioId || ""),
+    selectionVersion: getRuntimeChunkSelectionVersion(),
     topologyRevision: Math.max(0, Number(runtimeState.topologyRevision || 0)),
     dpr: Math.max(1, Number(runtimeState.dpr || 1)),
     pixelWidth: Math.max(1, Number(context?.canvas?.width || 1)),
     pixelHeight: Math.max(1, Number(context?.canvas?.height || 1)),
     colorRevision: Number(runtimeState.colorRevision || 0),
+    contextFlagSignature: getVisibleContextFlagSignature(),
     transformBucket: getTransformBucketSignature(transform),
     transform: cloneZoomTransform(transform),
   };
@@ -2067,6 +2102,8 @@ function getInteractionCompositeRejectReason(composite, currentTransform, cache 
   if (composite.signature !== getInteractionCompositeSignature(cache)) return "signature-mismatch";
   const identity = getVisibleFrameIdentity(currentTransform);
   if (String(composite.scenarioId || "") !== identity.scenarioId) return "scenario-mismatch";
+  if (Number(composite.selectionVersion || 0) !== identity.selectionVersion) return "selection-version-mismatch";
+  if (String(composite.contextFlagSignature || "") !== identity.contextFlagSignature) return "context-flag-mismatch";
   if (Number(composite.topologyRevision || 0) !== identity.topologyRevision) return "topology-revision-mismatch";
   if (Math.abs(Number(composite.dpr || 1) - identity.dpr) > 0.01) return "dpr-mismatch";
   if (Number(composite.pixelWidth || 0) !== identity.pixelWidth || Number(composite.pixelHeight || 0) !== identity.pixelHeight) {
@@ -2108,6 +2145,8 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
   cache.lastGoodFrame.staleReason = "";
   cache.lastGoodFrame.rejectedReason = "";
   cache.lastGoodFrame.scenarioId = identity.scenarioId;
+  cache.lastGoodFrame.selectionVersion = identity.selectionVersion;
+  cache.lastGoodFrame.contextFlagSignature = identity.contextFlagSignature;
   cache.lastGoodFrame.topologyRevision = identity.topologyRevision;
   cache.lastGoodFrame.dpr = identity.dpr;
   cache.lastGoodFrame.pixelWidth = identity.pixelWidth;
@@ -2213,6 +2252,12 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
   };
   if (String(frame.scenarioId || "") !== identity.scenarioId) {
     return reject("scenario-mismatch");
+  }
+  if (Number(frame.selectionVersion || 0) !== identity.selectionVersion) {
+    return reject("selection-version-mismatch");
+  }
+  if (String(frame.contextFlagSignature || "") !== identity.contextFlagSignature) {
+    return reject("context-flag-mismatch");
   }
   if (Number(frame.pixelWidth || 0) !== identity.pixelWidth || Number(frame.pixelHeight || 0) !== identity.pixelHeight) {
     return reject("canvas-size-mismatch");
@@ -2675,8 +2720,22 @@ function getScenarioOverlaySignatureToken() {
   ].join("|");
 }
 
+function getRenderPassTransformSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
+  if (
+    VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES.has(passName)
+    && shouldEnableContextBaseTransformReuse()
+  ) {
+    return [
+      "transform-reuse",
+      getViewportRenderSignature(),
+      Number(Number(runtimeState.dpr || 1).toFixed(2)),
+    ].join("::");
+  }
+  return getTransformSignature(transform);
+}
+
 function getRenderPassSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  const transformSignature = getTransformSignature(transform);
+  const transformSignature = getRenderPassTransformSignature(passName, transform);
   if (passName === "background") {
     return [
       transformSignature,
@@ -4048,6 +4107,7 @@ function getExactAfterSettleIdentity() {
     pixelWidth: Math.max(1, Number(context?.canvas?.width || 1)),
     pixelHeight: Math.max(1, Number(context?.canvas?.height || 1)),
     colorRevision: Number(runtimeState.colorRevision || 0),
+    contextFlagSignature: getVisibleContextFlagSignature(),
     zoomToken: Number(runtimeState.zoomGestureEndedAt || 0),
     transformBucket: getTransformBucketSignature(),
   };
@@ -4061,6 +4121,7 @@ function assignExactAfterSettleIdentity(controller, identity = getExactAfterSett
   controller.pixelWidth = identity.pixelWidth;
   controller.pixelHeight = identity.pixelHeight;
   controller.colorRevision = identity.colorRevision;
+  controller.contextFlagSignature = identity.contextFlagSignature;
   controller.zoomToken = identity.zoomToken;
   controller.transformBucket = identity.transformBucket;
 }
@@ -4075,6 +4136,7 @@ function isExactAfterSettleIdentityCurrent(controller) {
     && Number(controller.pixelWidth || 0) === identity.pixelWidth
     && Number(controller.pixelHeight || 0) === identity.pixelHeight
     && Number(controller.colorRevision || 0) === identity.colorRevision
+    && String(controller.contextFlagSignature || "") === identity.contextFlagSignature
     && Number(controller.zoomToken || 0) === identity.zoomToken
     && String(controller.transformBucket || "") === identity.transformBucket;
 }
@@ -18895,6 +18957,8 @@ function buildInteractionComposite(currentTransform, timings) {
   cache.interactionComposite.reason = String(runtimeState.renderPhase || "interaction");
   cache.interactionComposite.rejectedReason = "";
   cache.interactionComposite.scenarioId = identity.scenarioId;
+  cache.interactionComposite.selectionVersion = identity.selectionVersion;
+  cache.interactionComposite.contextFlagSignature = identity.contextFlagSignature;
   cache.interactionComposite.topologyRevision = identity.topologyRevision;
   cache.interactionComposite.dpr = identity.dpr;
   cache.interactionComposite.pixelWidth = identity.pixelWidth;

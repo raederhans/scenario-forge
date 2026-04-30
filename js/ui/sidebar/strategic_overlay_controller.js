@@ -305,10 +305,10 @@ export function createStrategicOverlayController({
     }
     if (frontlineStatusHint) {
       frontlineStatusHint.textContent = !hasScenario
-        ? t("Apply a scenario first, then enable the overlay when you want a derived frontline view.", "ui")
+        ? t("Scenario required.", "ui")
         : frontlineEnabled
-        ? t("This project is currently deriving frontlines from scenario control boundaries.", "ui")
-        : t("Frontline rendering is disabled until you explicitly enable it for this project.", "ui");
+        ? t("Derived frontlines on.", "ui")
+        : t("Overlay off.", "ui");
     }
     if (frontlineEnabledToggle) {
       frontlineEnabledToggle.checked = frontlineEnabled;
@@ -469,10 +469,10 @@ export function createStrategicOverlayController({
     if (operationalLineDeleteBtn) operationalLineDeleteBtn.disabled = !hasSelectedOperationalLine;
     if (operationalLineEditorHint) {
       operationalLineEditorHint.textContent = isOperationalLineDrawing
-        ? t("Click the map to place vertices. Double-click or press Finish to commit the operational line.", "ui")
+        ? t("Drawing vertices.", "ui")
         : hasSelectedOperationalLine
-        ? t("Selected line can be restyled, relabeled, or deleted. Use the map to compose new lines.", "ui")
-        : t("Choose a line type below or from the bottom command bar to begin drawing.", "ui");
+        ? t("Line selected.", "ui")
+        : t("Choose type and draw.", "ui");
     }
     if (isOperationalLineDrawing || hasSelectedOperationalLine) {
       const linesAccordion = document.getElementById("accordionLines");
@@ -556,10 +556,10 @@ export function createStrategicOverlayController({
     if (operationGraphicDeleteVertexBtn) operationGraphicDeleteVertexBtn.disabled = !canDeleteVertex;
     if (operationGraphicEditorHint) {
       operationGraphicEditorHint.textContent = isGraphicDrawing
-        ? t("Click the map to place vertices. Double-click or press Finish to commit the line.", "ui")
+        ? t("Drawing path.", "ui")
         : hasSelectedGraphic
-        ? t("Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.", "ui")
-        : t("Select a line to edit its geometry and style, or start a new drawing from the controls above.", "ui");
+        ? t("Graphic selected.", "ui")
+        : t("Start drawing or select a line.", "ui");
     }
     if (isGraphicDrawing || hasSelectedGraphic) {
       const graphicsAccordion = document.getElementById("accordionGraphics");

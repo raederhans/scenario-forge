@@ -80,6 +80,130 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await expect(page.locator("#zoomControls #scenarioTransportWorkbenchBtn")).toBeVisible();
 });
 
+test("project support panels and inspector search stay polished and inset", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+
+  await page.locator("#inspectorSidebarTabProject").click();
+  await page.evaluate(() => {
+    for (const id of ["frontlineProjectSection", "exportProjectSection", "inspectorUtilitiesSection"]) {
+      const section = document.querySelector(`#${id}`);
+      if (section instanceof HTMLDetailsElement) section.open = true;
+    }
+    for (const id of ["accordionLines", "accordionGraphics", "accordionCounters"]) {
+      const accordion = document.querySelector(`#${id}`);
+      accordion?.classList.add("is-open");
+      accordion?.querySelector(".strategic-accordion-header")?.setAttribute("aria-expanded", "true");
+    }
+  });
+
+  await expect(page.locator("#exportProjectSection .sidebar-help-copy")).toHaveText("Preview layers, format, and resolution before export.");
+  await expect(page.locator("#inspectorUtilitiesSection > .inspector-panel-body > .inspector-utilities-shell > .sidebar-help-copy")).toHaveCount(0);
+
+  const projectMetrics = await page.evaluate(() => {
+    const rectToObject = (rect) => rect ? {
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+    } : null;
+    const exportSection = document.querySelector("#exportProjectSection");
+    const utilitiesSection = document.querySelector("#inspectorUtilitiesSection");
+    const frontlinePanel = document.querySelector("#frontlineOverlayPanel");
+    const strategicPanel = document.querySelector("#strategicOverlayPanel");
+    const accordionBodies = [...document.querySelectorAll("#strategicOverlayPanel .strategic-accordion-body")].map((element) => {
+      const style = getComputedStyle(element);
+      return {
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+        overflowY: style.overflowY,
+        maxHeight: style.maxHeight,
+      };
+    });
+    const frontlineHints = [...document.querySelectorAll("#frontlineProjectSection .sidebar-tool-hint")]
+      .filter((element) => getComputedStyle(element).display !== "none")
+      .map((element) => String(element.textContent || "").trim())
+      .filter(Boolean);
+    const projectSectionIds = [
+      "projectLegendSection",
+      "frontlineProjectSection",
+      "exportProjectSection",
+      "inspectorUtilitiesSection",
+      "diagnosticsSection",
+    ];
+    const visibleOverflow = [...document.querySelectorAll("#projectSidebarPanel *")].filter((element) => {
+      const style = getComputedStyle(element);
+      if (style.visibility === "hidden" || style.display === "none" || style.opacity === "0") return false;
+      const rect = element.getBoundingClientRect();
+      const panelRect = document.querySelector("#projectSidebarPanel")?.getBoundingClientRect();
+      return panelRect && rect.width > 0 && (rect.left < panelRect.left - 1 || rect.right > panelRect.right + 1);
+    }).map((element) => element.id || element.className || element.tagName);
+    return {
+      exportSection: rectToObject(exportSection?.getBoundingClientRect()),
+      exportButton: rectToObject(document.querySelector("#dockExportBtn")?.getBoundingClientRect()),
+      utilitiesSection: rectToObject(utilitiesSection?.getBoundingClientRect()),
+      guideButton: rectToObject(document.querySelector("#utilitiesGuideBtn")?.getBoundingClientRect()),
+      referenceButton: rectToObject(document.querySelector("#dockReferenceBtn")?.getBoundingClientRect()),
+      utilityActionsDisplay: getComputedStyle(document.querySelector("#inspectorUtilitiesSection .inspector-utility-actions")).display,
+      frontlinePanelRadius: frontlinePanel ? getComputedStyle(frontlinePanel).borderRadius : "",
+      strategicPanelRadius: strategicPanel ? getComputedStyle(strategicPanel).borderRadius : "",
+      strategicAccordionRadii: [...document.querySelectorAll("#strategicOverlayPanel .strategic-accordion-section")]
+        .map((element) => getComputedStyle(element).borderRadius),
+      strategicAccordionBodies: accordionBodies,
+      frontlineHintTexts: frontlineHints,
+      projectSectionRadii: projectSectionIds
+        .map((id) => document.querySelector(`#${id}`))
+        .filter(Boolean)
+        .map((element) => getComputedStyle(element).borderRadius),
+      visibleOverflow,
+    };
+  });
+
+  expect(projectMetrics.visibleOverflow).toEqual([]);
+  expect(projectMetrics.exportButton.left).toBeGreaterThan(projectMetrics.exportSection.left + 12);
+  expect(projectMetrics.exportButton.right).toBeLessThan(projectMetrics.exportSection.right - 12);
+  expect(projectMetrics.guideButton.left).toBeGreaterThan(projectMetrics.utilitiesSection.left + 12);
+  expect(projectMetrics.referenceButton.right).toBeLessThan(projectMetrics.utilitiesSection.right - 12);
+  expect(projectMetrics.utilityActionsDisplay).toBe("grid");
+  expect(projectMetrics.frontlinePanelRadius).toBe("18px");
+  expect(projectMetrics.strategicPanelRadius).toBe("18px");
+  expect(projectMetrics.strategicAccordionRadii.every((radius) => radius === "15px")).toBe(true);
+  expect(projectMetrics.strategicAccordionBodies.length).toBe(3);
+  expect(projectMetrics.strategicAccordionBodies.every((body) => body.overflowY === "auto" && body.maxHeight !== "none")).toBe(true);
+  expect(projectMetrics.frontlineHintTexts.every((text) => text.length <= 42)).toBe(true);
+  expect(projectMetrics.projectSectionRadii.every((radius) => radius === "18px")).toBe(true);
+
+  await page.locator("#inspectorSidebarTabInspector").click();
+  const searchMetrics = await page.evaluate(() => {
+    const rectToObject = (rect) => rect ? {
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+    } : null;
+    const searchBlock = document.querySelector(".inspector-search-block");
+    const countrySection = document.querySelector("#countryInspectorSection");
+    const searchInput = document.querySelector("#countrySearch");
+    const inputStyle = getComputedStyle(searchInput);
+    return {
+      searchBlock: rectToObject(searchBlock?.getBoundingClientRect()),
+      countrySection: rectToObject(countrySection?.getBoundingClientRect()),
+      inputPaddingLeft: Number.parseFloat(inputStyle.paddingLeft),
+      inputPaddingRight: Number.parseFloat(inputStyle.paddingRight),
+      inputBorderLeft: inputStyle.borderLeftWidth,
+    };
+  });
+
+  expect(searchMetrics.searchBlock.left).toBeCloseTo(searchMetrics.countrySection.left, 0);
+  expect(searchMetrics.searchBlock.width).toBeCloseTo(searchMetrics.countrySection.width, 0);
+  expect(searchMetrics.inputPaddingLeft).toBeGreaterThanOrEqual(6);
+  expect(searchMetrics.inputPaddingRight).toBeGreaterThanOrEqual(6);
+  expect(searchMetrics.inputBorderLeft).toBe("0px");
+});
+
 test("phase 03 support surfaces restore the requested view from URL", async ({ page }) => {
   test.setTimeout(240_000);
   await gotoApp(page, "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&view=reference", { waitUntil: "domcontentloaded" });

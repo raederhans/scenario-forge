@@ -379,6 +379,36 @@ test("exact-after-settle keeps scenario overlays on the contextScenario reuse pa
     exactAfterSettleDefersPoliticalFastExact:
       /function drawTransformedFrameFromCaches[\s\S]*?settlePoliticalFastExactSkipped[\s\S]*?defer-to-sliced-exact-refresh/.test(rendererSource)
       && !/function drawTransformedFrameFromCaches[\s\S]*?renderPassToCache\("political", \(k\) => drawPoliticalPass\(k\)/.test(rendererSource),
+    transformReusablePassSignaturesUseStableViewportKey:
+      rendererSource.includes("const VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES = new Set")
+      && /const VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES = new Set\(\[[\s\S]*?"contextBase",[\s\S]*?\]\);/.test(rendererSource)
+      && (() => {
+        const stableSignatureSet = rendererSource.match(/const VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES = new Set\(\[[\s\S]*?\]\);/)?.[0] || "";
+        return [
+          '"background"',
+          '"physicalBase"',
+          '"contextScenario"',
+          '"effects"',
+          '"lineEffects"',
+          '"contextMarkers"',
+          '"dayNight"',
+        ].every((passName) => !stableSignatureSet.includes(passName));
+      })()
+      && /function getRenderPassTransformSignature[\s\S]*?VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES\.has\(passName\)[\s\S]*?shouldEnableContextBaseTransformReuse\(\)[\s\S]*?"transform-reuse"[\s\S]*?getViewportRenderSignature\(\)/.test(rendererSource)
+      && /if \(passName === "contextScenario"\) \{[\s\S]*?transformSignature,[\s\S]*?`scenario-overlays:\$\{getScenarioOverlaySignatureToken\(\)\}`/.test(rendererSource)
+      && /function getRenderPassSignature[\s\S]*?const transformSignature = getRenderPassTransformSignature\(passName, transform\);/.test(rendererSource),
+    continuityFrameReuseIdentityIncludesSelectionAndContextFlags:
+      rendererSource.includes("function getRuntimeChunkSelectionVersion()")
+      && rendererSource.includes("function getVisibleContextFlagSignature()")
+      && /function getVisibleFrameIdentity[\s\S]*?selectionVersion: getRuntimeChunkSelectionVersion\(\)[\s\S]*?contextFlagSignature: getVisibleContextFlagSignature\(\)/.test(rendererSource)
+      && /function getInteractionCompositeRejectReason[\s\S]*?selection-version-mismatch[\s\S]*?context-flag-mismatch/.test(rendererSource)
+      && /function drawLastGoodFrameFallback[\s\S]*?selection-version-mismatch[\s\S]*?context-flag-mismatch/.test(rendererSource)
+      && rendererRuntimeStateSource.includes("selectionVersion: 0")
+      && rendererRuntimeStateSource.includes('contextFlagSignature: ""'),
+    exactAfterSettleFreshnessIdentityIncludesContextFlags:
+      /function getExactAfterSettleIdentity\(\)[\s\S]*?selectionVersion:[\s\S]*?contextFlagSignature: getVisibleContextFlagSignature\(\)[\s\S]*?transformBucket: getTransformBucketSignature\(\)/.test(rendererSource)
+      && /function assignExactAfterSettleIdentity[\s\S]*?controller\.contextFlagSignature = identity\.contextFlagSignature/.test(rendererSource)
+      && /function isExactAfterSettleIdentityCurrent[\s\S]*?String\(controller\.contextFlagSignature \|\| ""\) === identity\.contextFlagSignature/.test(rendererSource),
     politicalRasterWorkerProtocolDefaultsOff:
       politicalRasterWorkerClientSource.includes("POLITICAL_RASTER_WORKER_PROTOCOL_VERSION = 2")
       && politicalRasterWorkerClientSource.includes("political_raster_worker")
@@ -831,4 +861,113 @@ test("frame scheduler defers high tasks for discrete input and dedupes label gen
       value: originalNavigator,
     });
   }
+});
+
+
+
+test("political raster worker flag-on metadata path records accepted and stale counters", async () => {
+  const workerClient = await import("../js/core/political_raster_worker_client.js");
+  const originalWorker = globalThis.Worker;
+  const originalLocation = globalThis.location;
+  const originalMetrics = globalThis.__mc_politicalRasterWorkerMetrics;
+  const postedMessages = [];
+  class FakeWorker {
+    constructor() {
+      FakeWorker.instance = this;
+      this.onmessage = null;
+      this.onerror = null;
+    }
+    postMessage(message) {
+      postedMessages.push(message);
+      this.lastMessage = message;
+    }
+    terminate() {
+      this.terminated = true;
+    }
+  }
+  try {
+    workerClient.terminatePoliticalRasterWorker();
+    delete globalThis.__mc_politicalRasterWorkerMetrics;
+    Object.defineProperty(globalThis, "Worker", {
+      configurable: true,
+      value: FakeWorker,
+    });
+    Object.defineProperty(globalThis, "location", {
+      configurable: true,
+      value: { search: "?political_raster_worker=1" },
+    });
+    workerClient.refreshPoliticalRasterWorkerFlag("?political_raster_worker=1");
+    const baseIdentity = workerClient.createPoliticalRasterWorkerIdentity({
+      scenarioId: "tno_1962",
+      selectionVersion: 1,
+      topologyRevision: 2,
+      colorRevision: 3,
+      transformBucket: "100:0:0",
+      dpr: 1,
+      viewport: { x: 0, y: 0, width: 800, height: 600 },
+      passSignature: "political-a",
+    });
+    const queuedA = workerClient.requestPoliticalRasterWorkerPass({ identity: baseIdentity });
+    assert.equal(queuedA.ok, true);
+    assert.equal(postedMessages[0].type, "RASTER_POLITICAL_PASS");
+    assert.equal(postedMessages[0].protocolVersion, 2);
+    assert.equal(postedMessages[0].identity.passSignature, "political-a");
+
+    const freshIdentity = workerClient.createPoliticalRasterWorkerIdentity({
+      ...baseIdentity,
+      colorRevision: 4,
+      passSignature: "political-b",
+    });
+    const queuedB = workerClient.requestPoliticalRasterWorkerPass({ identity: freshIdentity });
+    assert.equal(queuedB.ok, true);
+    let metrics = workerClient.ensurePoliticalRasterWorkerMetrics(globalThis);
+    assert.equal(metrics.staleResponseCount, 1);
+    assert.equal(metrics.rejectedStaleCount, 1);
+    assert.equal(metrics.fallbackCount, 0);
+
+    FakeWorker.instance.onmessage({
+      data: {
+        protocolVersion: 2,
+        type: "RASTER_RESULT",
+        taskId: queuedB.taskId,
+        accepted: true,
+        identity: freshIdentity,
+        reason: "metadata-only",
+        rasterMs: 2,
+        encodeMs: 0,
+        decodeMs: 0,
+        blitMs: 0,
+      },
+    });
+    metrics = workerClient.ensurePoliticalRasterWorkerMetrics(globalThis);
+    assert.equal(metrics.acceptedCount, 1);
+    assert.equal(metrics.lastReason, "metadata-only");
+    assert.equal(metrics.fallbackCount, 0);
+  } finally {
+    workerClient.terminatePoliticalRasterWorker();
+    if (originalWorker === undefined) {
+      delete globalThis.Worker;
+    } else {
+      Object.defineProperty(globalThis, "Worker", { configurable: true, value: originalWorker });
+    }
+    if (originalLocation === undefined) {
+      delete globalThis.location;
+    } else {
+      Object.defineProperty(globalThis, "location", { configurable: true, value: originalLocation });
+    }
+    if (originalMetrics === undefined) {
+      delete globalThis.__mc_politicalRasterWorkerMetrics;
+    } else {
+      globalThis.__mc_politicalRasterWorkerMetrics = originalMetrics;
+    }
+    workerClient.refreshPoliticalRasterWorkerFlag("");
+  }
+});
+
+test("political raster worker flag parser accepts both explicit keys", async () => {
+  const workerClient = await import("../js/core/political_raster_worker_client.js");
+  assert.equal(workerClient.refreshPoliticalRasterWorkerFlag("?political_raster_worker=1"), true);
+  assert.equal(workerClient.refreshPoliticalRasterWorkerFlag("?ENABLE_POLITICAL_RASTER_WORKER=yes"), true);
+  assert.equal(workerClient.refreshPoliticalRasterWorkerFlag("?political_raster_worker=0"), false);
+  assert.equal(workerClient.refreshPoliticalRasterWorkerFlag(""), false);
 });
