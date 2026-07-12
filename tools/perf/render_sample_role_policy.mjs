@@ -5,8 +5,7 @@ export const GOVERNED_RENDER_SAMPLE_SCENARIOS = Object.freeze(["tno_1962", "hoi4
 const EXPECTED_SAMPLE_SEQUENCES = Object.freeze([1, 2]);
 
 function finiteNumberOrNull(value) {
-  const numericValue = Number(value);
-  return Number.isFinite(numericValue) ? numericValue : null;
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 export function median(values) {

@@ -78,8 +78,26 @@ async function readJsonWithHash(filePath) {
 }
 
 function finite(value) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : null;
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+export function buildRawPerformanceMetricIntegrity(records) {
+  const invalidRecords = [];
+  for (const record of Array.isArray(records) ? records : []) {
+    for (const metric of ["totalStartupMs", "canonicalRenderSampleMs"]) {
+      const value = record?.[metric];
+      if (!Number.isFinite(value) || value <= 0) {
+        invalidRecords.push({
+          block: record?.block ?? null,
+          scenarioId: record?.scenarioId ?? null,
+          runNumber: record?.runNumber ?? null,
+          metric,
+          value: value ?? null,
+        });
+      }
+    }
+  }
+  return Object.freeze({ pass: invalidRecords.length === 0, invalidRecords: Object.freeze(invalidRecords) });
 }
 
 function percentDelta(current, baseline) {
@@ -322,6 +340,7 @@ export async function buildGovernedCompanionReport({
   const blockDrift = Object.fromEntries(SCENARIOS.map((scenarioId) => [scenarioId, buildBlockDrift(byBlock, scenarioId)]));
   const outlierCheck = buildOutlierCheck(records);
   const directionCheck = buildDirectionCheck(byBlock);
+  const rawMetricIntegrity = buildRawPerformanceMetricIntegrity(records);
   const expectedCanonicalValuesPass = SCENARIOS.every((scenarioId) => (
     Math.abs(canonicalComparisons[scenarioId].a.median - EXPECTED_CANONICAL_MEDIANS[scenarioId].A) < 0.01
     && Math.abs(canonicalComparisons[scenarioId].b.median - EXPECTED_CANONICAL_MEDIANS[scenarioId].B) < 0.01
@@ -338,6 +357,7 @@ export async function buildGovernedCompanionReport({
       { count: rawFiles.length, hashCount: rawFiles.filter((entry) => /^[0-9a-f]{64}$/.test(entry.sha256)).length }
     ),
     check("render_sample_roles", roleMismatches.length === 0 && records.length === 40, { matches: records.length - roleMismatches.length, mismatches: roleMismatches }),
+    check("raw_performance_metrics_complete", rawMetricIntegrity.pass, rawMetricIntegrity),
     check("expected_canonical_medians", expectedCanonicalValuesPass, { expected: EXPECTED_CANONICAL_MEDIANS, actual: canonicalComparisons }),
     check("startup_regression", Object.values(startupComparisons).every((comparison) => !comparison.failed), startupComparisons),
     check("canonical_render_regression", Object.values(canonicalComparisons).every((comparison) => !comparison.failed), canonicalComparisons),
@@ -436,6 +456,9 @@ export async function buildGovernedCompanionReport({
 }
 
 export function buildMarkdown(report) {
+  const formatMetric = (value, digits) => (
+    typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "missing"
+  );
   const lines = [
     "# P2.1 governed render-sample reanalysis",
     "",
@@ -451,7 +474,7 @@ export function buildMarkdown(report) {
   ];
   for (const scenarioId of SCENARIOS) {
     const comparison = report.canonicalMetric.comparisons[scenarioId];
-    lines.push(`- ${scenarioId}: A=${comparison.a.median.toFixed(2)} ms, B=${comparison.b.median.toFixed(2)} ms, delta=${comparison.deltaMs.toFixed(2)} ms (${comparison.deltaPercent.toFixed(3)}%), ${comparison.status}`);
+    lines.push(`- ${scenarioId}: A=${formatMetric(comparison.a.median, 2)} ms, B=${formatMetric(comparison.b.median, 2)} ms, delta=${formatMetric(comparison.deltaMs, 2)} ms (${formatMetric(comparison.deltaPercent, 3)}%), ${comparison.status}`);
   }
   lines.push("", "## Legacy composition", `- TNO A: blank=${report.legacyMetric.tnoFirstRoleComposition.A.blank}, scenario=${report.legacyMetric.tnoFirstRoleComposition.A.scenario}`, `- TNO B: blank=${report.legacyMetric.tnoFirstRoleComposition.B.blank}, scenario=${report.legacyMetric.tnoFirstRoleComposition.B.scenario}`);
   lines.push("", "## Checks");

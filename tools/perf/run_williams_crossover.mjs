@@ -498,6 +498,7 @@ function buildCleanup(preTelemetry, postTelemetry, taskOwnedTree, jobEvidence) {
   const taskOwnedProcessesRemaining = (taskOwnedTree?.processes || []).filter((entry) => taskOwnedPidsRemaining.includes(entry.ProcessId));
   const terminationResults = [];
   const terminationSucceeded = jobEvidence?.cleanupValid === true;
+  const environmentStable = newBrowserPids.length === 0;
   const portsClear = TASK_PORTS.every((port) => (postEnvironment.ports?.[String(port)] || []).length === 0);
   const serverProbesClear = (postEnvironment.server || []).every((entry) => entry?.probe?.responded !== true)
     && (postEnvironment.probe || []).every((entry) => entry?.responded !== true);
@@ -510,7 +511,6 @@ function buildCleanup(preTelemetry, postTelemetry, taskOwnedTree, jobEvidence) {
     && taskOwnedTree?.captureStatus === "available"
     && terminationSucceeded
     && taskOwnedPidsRemaining.length === 0
-    && newBrowserPids.length === 0
     && portsClear
     && serverProbesClear
     && gitStatusStable
@@ -527,6 +527,7 @@ function buildCleanup(preTelemetry, postTelemetry, taskOwnedTree, jobEvidence) {
     taskOwnedPidsRemaining,
     taskOwnedProcessesRemaining,
     newBrowserPids,
+    environmentStable,
     portsClear,
     serverProbesClear,
     gitStatusStable,
@@ -593,7 +594,10 @@ async function runBlock(block, harnessArtifacts, preparedRunner) {
   await writeJson(path.join(directory, "telemetry-post.json"), postTelemetry);
   const cleanup = buildCleanup(preTelemetry, postTelemetry, taskOwnedTree, commandResult.jobEvidence);
   await writeJson(path.join(directory, "cleanup.json"), cleanup);
-  const complete = quietWindow.valid && commandResult.exitCode === 0 && cleanup.valid;
+  const complete = quietWindow.valid
+    && commandResult.exitCode === 0
+    && cleanup.valid
+    && cleanup.environmentStable;
   const blockResult = {
     schemaVersion: 1,
     status: complete ? "complete" : "invalid",
@@ -601,6 +605,7 @@ async function runBlock(block, harnessArtifacts, preparedRunner) {
     timedOut: commandResult.timedOut === true,
     runnerPid: commandResult.pid,
     cleanupValid: cleanup.valid,
+    environmentStable: cleanup.environmentStable,
   };
   await writeJson(path.join(directory, "block-result.json"), blockResult);
   return { complete, blockResult };

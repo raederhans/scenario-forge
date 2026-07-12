@@ -761,7 +761,6 @@ function validateCleanup(cleanup, block, evidence) {
   if (cleanup.terminationSucceeded !== true) errors.push(`${block.id}.cleanup.terminationSucceeded`);
   if ((cleanup.taskOwnedPidsRemaining || []).length !== 0) errors.push(`${block.id}.cleanup.taskOwnedPidsRemaining`);
   if ((cleanup.taskOwnedProcessesRemaining || []).length !== 0) errors.push(`${block.id}.cleanup.taskOwnedProcessesRemaining`);
-  if ((cleanup.newBrowserPids || []).length !== 0) errors.push(`${block.id}.cleanup.newBrowserPids`);
   if (cleanup.portsClear !== true) errors.push(`${block.id}.cleanup.portsClear`);
   if (cleanup.serverProbesClear !== true) errors.push(`${block.id}.cleanup.serverProbesClear`);
   if (cleanup.gitStatusStable !== true) errors.push(`${block.id}.cleanup.gitStatusStable`);
@@ -782,6 +781,15 @@ function validateCleanup(cleanup, block, evidence) {
     errors.push(`${block.id}.jobObject.cleanup-canonical`);
   }
   return errors;
+}
+
+function validatePostBlockEnvironment(cleanup, block) {
+  if (!cleanup || typeof cleanup !== "object") return [`${block.id}.environment.missing`];
+  const browserPids = Array.isArray(cleanup.newBrowserPids) ? cleanup.newBrowserPids : [];
+  const browserStable = cleanup.environmentStable === undefined
+    ? browserPids.length === 0
+    : cleanup.environmentStable === true && browserPids.length === 0;
+  return browserStable ? [] : [`${block.id}.environment.browserStable`];
 }
 
 function validateBlockResult(blockResult, block) {
@@ -1166,6 +1174,7 @@ export function analyzeWilliamsCrossoverEvidence({
     }
     invalidReasons.push(...validateIdentity(evidence.identity, expectedBlock, preregistration));
     invalidReasons.push(...validateCleanup(evidence.cleanup, expectedBlock, evidence));
+    invalidReasons.push(...validatePostBlockEnvironment(evidence.cleanup, expectedBlock));
     invalidReasons.push(...validateBlockResult(evidence.blockResult, expectedBlock));
     invalidReasons.push(...validateQuietWindow(evidence.quietWindow, expectedBlock));
     invalidReasons.push(...validateBaselineIdentity(evidence.baseline, expectedBlock, preregistration));

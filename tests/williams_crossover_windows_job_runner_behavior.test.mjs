@@ -3,6 +3,7 @@ import { EventEmitter } from "node:events";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import test from "node:test";
 
 import * as windowsRuntime from "../tools/perf/williams_crossover_windows_runtime.mjs";
@@ -11,23 +12,123 @@ const JOB_RUNNER_SOURCE_URL = new URL(
   "../tools/perf/williams_crossover_windows_job_runner.cs",
   import.meta.url,
 );
+const WINDOWS_RUNTIME_SOURCE_URL = new URL(
+  "../tools/perf/williams_crossover_windows_runtime.mjs",
+  import.meta.url,
+);
 
 function decodeBase64(value) {
   return Buffer.from(String(value), "base64").toString("utf8");
 }
 
-function createFakeChild({ stdinError = null, closeOnEnd = false } = {}) {
+function createFakeChild({
+  stdinError = null,
+  stdinThrow = null,
+  closeOnEnd = false,
+  prematureCloseOnKill = false,
+} = {}) {
   const child = new EventEmitter();
-  child.stdout = new EventEmitter();
-  child.stderr = new EventEmitter();
+  child.stdout = new PassThrough();
+  child.stderr = new PassThrough();
   child.stdin = new EventEmitter();
-  child.stdin.end = () => {
-    if (stdinError) queueMicrotask(() => child.stdin.emit("error", stdinError));
-    if (closeOnEnd) queueMicrotask(() => child.emit("close", 0, null));
+  child.killCount = 0;
+  let closed = false;
+  const close = (code) => {
+    if (closed) return;
+    closed = true;
+    child.stdout.end();
+    child.stderr.end();
+    queueMicrotask(() => child.emit("close", code, null));
   };
-  child.kill = () => true;
+  child.stdin.end = () => {
+    if (stdinThrow) throw stdinThrow;
+    if (stdinError) queueMicrotask(() => child.stdin.emit("error", stdinError));
+    if (closeOnEnd) close(0);
+  };
+  child.kill = () => {
+    child.killCount += 1;
+    if (prematureCloseOnKill) {
+      child.stdout.destroy();
+      child.stderr.destroy();
+      queueMicrotask(() => child.emit("close", 1, null));
+      return true;
+    }
+    close(1);
+    return true;
+  };
   return child;
 }
+
+test("Windows telemetry schedules fixed one-second deadlines before CIM collection", async () => {
+  const source = await fs.readFile(WINDOWS_RUNTIME_SOURCE_URL, "utf8");
+  const clockIndex = source.indexOf("[Diagnostics.Stopwatch]::StartNew()");
+  const targetIndex = source.indexOf("($index + 1) * 1000");
+  const sleepIndex = source.indexOf("Start-Sleep -Milliseconds $remainingMs");
+  const timestampIndex = source.indexOf("$sampleAt = [datetime]::UtcNow.ToString('o')");
+  const processorQueryIndex = source.indexOf("Get-CimInstance Win32_PerfFormattedData_Counters_ProcessorInformation");
+  assert.ok(clockIndex >= 0, "missing monotonic telemetry clock");
+  assert.ok(targetIndex > clockIndex, "missing absolute one-second sample deadline");
+  assert.ok(sleepIndex > targetIndex, "missing deadline-relative sleep");
+  assert.ok(timestampIndex > sleepIndex, "sample timestamp must follow the deadline wait");
+  assert.ok(processorQueryIndex > timestampIndex, "sample timestamp must precede CIM query latency");
+  assert.doesNotMatch(source, /Start-Sleep -Seconds 1/);
+});
+
+test("Windows probes bound synchronous work and persist only minimal process identity", async () => {
+  const source = await fs.readFile(WINDOWS_RUNTIME_SOURCE_URL, "utf8");
+  assert.match(source, /const WINDOWS_CAPABILITY_PROBE_TIMEOUT_MS = [\d_]+;/);
+  assert.match(source, /const WINDOWS_JOB_RUNNER_COMPILE_TIMEOUT_MS = [\d_]+;/);
+  assert.match(source, /timeout: WINDOWS_CAPABILITY_PROBE_TIMEOUT_MS/);
+  assert.match(source, /timeout: WINDOWS_JOB_RUNNER_COMPILE_TIMEOUT_MS/);
+  const processScript = source.slice(
+    source.indexOf("const WINDOWS_PROCESS_SCRIPT"),
+    source.indexOf("const WINDOWS_TCP_CONNECTION_SCRIPT"),
+  );
+  assert.match(processScript, /Select-Object ProcessId,ParentProcessId,Name/);
+  assert.doesNotMatch(processScript, /ExecutablePath|CommandLine/);
+});
+
+test("capability and compile timeouts are typed and clean temporary builds", async (t) => {
+  const timeoutError = Object.assign(new Error("timed out"), { code: "ETIMEDOUT" });
+  let capabilityOptions = null;
+  const performanceWindow = windowsRuntime.collectWindowsPerformanceWindow({
+    phase: "pre",
+    platform: "win32",
+    spawnSyncFn: (_command, _args, options) => {
+      capabilityOptions = options;
+      return { error: timeoutError, status: null, stdout: "", stderr: "" };
+    },
+  });
+  assert.equal(capabilityOptions.timeout, 60_000);
+  assert.equal(performanceWindow.capability.status, "collection-error");
+  assert.match(performanceWindow.capability.missing[0], /exceeded 60000 ms/);
+
+  const buildRoot = await fs.mkdtemp(path.join(os.tmpdir(), "williams-job-timeout-"));
+  t.after(() => fs.rm(buildRoot, { recursive: true, force: true }));
+  let compileOptions = null;
+  await assert.rejects(
+    windowsRuntime.compileWindowsJobRunner({
+      platform: "win32",
+      buildRoot,
+      spawnSyncFn: (_command, _args, options) => {
+        compileOptions = options;
+        return { error: timeoutError, status: null, stdout: "", stderr: "" };
+      },
+    }),
+    (error) => error instanceof windowsRuntime.WilliamsWindowsRuntimeError
+      && error.code === "job-runner-compile-timeout",
+  );
+  assert.equal(compileOptions.timeout, 120_000);
+  assert.deepEqual(await fs.readdir(buildRoot), []);
+});
+
+test("runtime streams workload output instead of retaining complete runs in memory", async () => {
+  const source = await fs.readFile(WINDOWS_RUNTIME_SOURCE_URL, "utf8");
+  assert.match(source, /createWriteStream/);
+  assert.match(source, /pipeline\(/);
+  assert.doesNotMatch(source, /const stdout = \[\]|const stderr = \[\]/);
+  assert.doesNotMatch(source, /Buffer\.concat\(stdout\)|Buffer\.concat\(stderr\)/);
+});
 
 function validJobEvidence(command, cwd) {
   return {
@@ -137,6 +238,57 @@ test("runtime rejects stdin EPIPE with a typed transport error", async (t) => {
   );
 });
 
+test("runtime preserves the spawn error when stream shutdown also fails", async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "williams-job-spawn-"));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const child = createFakeChild();
+  const spawnError = Object.assign(new Error("spawn denied"), { code: "EACCES" });
+  await assert.rejects(
+    windowsRuntime.runWindowsJobCommand(
+      { bin: process.execPath, args: ["--version"] },
+      {
+        preparedRunner: { status: "available", executablePath: "runner.exe", binary: {} },
+        cwd: root,
+        stdoutPath: path.join(root, "stdout.log"),
+        stderrPath: path.join(root, "stderr.log"),
+        evidencePath: path.join(root, "job.json"),
+        timeoutMs: 100,
+        spawnFn: () => {
+          queueMicrotask(() => child.emit("error", spawnError));
+          return child;
+        },
+      },
+    ),
+    (error) => error instanceof windowsRuntime.WilliamsJobRunnerTransportError
+      && error.code === "job-runner-spawn-error"
+      && error.cause === spawnError,
+  );
+});
+
+test("runtime preserves a synchronous stdin error when kill closes output streams", async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "williams-job-stdin-sync-"));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const stdinError = Object.assign(new Error("stdin closed"), { code: "EPIPE" });
+  const child = createFakeChild({ stdinThrow: stdinError, prematureCloseOnKill: true });
+  await assert.rejects(
+    windowsRuntime.runWindowsJobCommand(
+      { bin: process.execPath, args: ["--version"] },
+      {
+        preparedRunner: { status: "available", executablePath: "runner.exe", binary: {} },
+        cwd: root,
+        stdoutPath: path.join(root, "stdout.log"),
+        stderrPath: path.join(root, "stderr.log"),
+        evidencePath: path.join(root, "job.json"),
+        timeoutMs: 100,
+        spawnFn: () => child,
+      },
+    ),
+    (error) => error instanceof windowsRuntime.WilliamsJobRunnerTransportError
+      && error.code === "job-runner-stdin-error"
+      && error.cause === stdinError,
+  );
+});
+
 test("runtime rejects asynchronous output persistence failures", async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "williams-job-output-"));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -157,6 +309,7 @@ test("runtime rejects asynchronous output persistence failures", async (t) => {
     (error) => error instanceof windowsRuntime.WilliamsJobRunnerTransportError
       && error.code === "job-runner-output-write-error",
   );
+  assert.ok(child.killCount > 0, "output sink failure must stop the Job runner immediately");
 });
 
 test("preparation probes and returns the immutable evidence binary copy", async (t) => {

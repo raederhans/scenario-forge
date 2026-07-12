@@ -1,10 +1,11 @@
 import crypto from "node:crypto";
-import { constants as fsConstants } from "node:fs";
+import { constants as fsConstants, createWriteStream } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { pipeline } from "node:stream/promises";
 
 export const WINDOWS_JOB_RUNNER_PROTOCOL_ID = "SF_WILLIAMS_JOB_V1";
 export const WINDOWS_JOB_RUNNER_SOURCE_PATH = fileURLToPath(
@@ -14,6 +15,8 @@ export const WINDOWS_JOB_RUNNER_SOURCE_PATH = fileURLToPath(
 const WINDOWS_JOB_RUNNER_BINARY_NAME = "williams_crossover_windows_job_runner.exe";
 const WINDOWS_JOB_RUNNER_DESCRIPTOR_PATH = `runtime-compiled/${WINDOWS_JOB_RUNNER_BINARY_NAME}`;
 export const WINDOWS_JOB_RUNNER_EVIDENCE_PATH = "tooling/windows-job-runner.exe";
+const WINDOWS_CAPABILITY_PROBE_TIMEOUT_MS = 60_000;
+const WINDOWS_JOB_RUNNER_COMPILE_TIMEOUT_MS = 120_000;
 const DEFAULT_JOB_RUNNER_BUILD_ROOT = path.resolve(
   path.dirname(WINDOWS_JOB_RUNNER_SOURCE_PATH),
   "..",
@@ -26,8 +29,12 @@ const DEFAULT_JOB_RUNNER_BUILD_ROOT = path.resolve(
 const WINDOWS_COUNTER_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
 $samples = @()
+$sampleClock = [Diagnostics.Stopwatch]::StartNew()
 for ($index = 0; $index -lt 5; $index += 1) {
-  Start-Sleep -Seconds 1
+  $targetElapsedMs = ($index + 1) * 1000
+  $remainingMs = [math]::Ceiling($targetElapsedMs - $sampleClock.Elapsed.TotalMilliseconds)
+  if ($remainingMs -gt 0) { Start-Sleep -Milliseconds $remainingMs }
+  $sampleAt = [datetime]::UtcNow.ToString('o')
   $processorSample = Get-CimInstance Win32_PerfFormattedData_Counters_ProcessorInformation -Filter "Name='_Total'" -ErrorAction Stop
   $memorySample = Get-CimInstance Win32_PerfFormattedData_PerfOS_Memory -ErrorAction Stop
   foreach ($propertyName in @('PercentProcessorTime','PercentProcessorPerformance','PercentofMaximumFrequency','ProcessorFrequency')) {
@@ -37,7 +44,7 @@ for ($index = 0; $index -lt 5; $index += 1) {
     if ($null -eq $memorySample.$propertyName) { throw "required memory counter missing: $propertyName" }
   }
   $samples += [pscustomobject]@{
-    at = [datetime]::UtcNow.ToString('o')
+    at = $sampleAt
     cpuUtilizationPercent = [double]$processorSample.PercentProcessorTime
     processorPerformancePercent = [double]$processorSample.PercentProcessorPerformance
     percentOfMaximumFrequency = [double]$processorSample.PercentofMaximumFrequency
@@ -107,7 +114,7 @@ const WINDOWS_PROCESS_SCRIPT = String.raw`
 $ErrorActionPreference = 'Stop'
 @(
   Get-CimInstance Win32_Process -ErrorAction Stop |
-    Select-Object ProcessId,ParentProcessId,Name,ExecutablePath,CommandLine
+    Select-Object ProcessId,ParentProcessId,Name
 ) | ConvertTo-Json -Depth 5 -Compress
 `;
 
@@ -119,12 +126,28 @@ $ErrorActionPreference = 'Stop'
 ) | ConvertTo-Json -Depth 5 -Compress
 `;
 
-function runPowerShell(script) {
-  const result = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], {
+export class WilliamsWindowsRuntimeError extends Error {
+  constructor(message, code, cause = null) {
+    super(message, cause ? { cause } : undefined);
+    this.name = "WilliamsWindowsRuntimeError";
+    this.code = code;
+  }
+}
+
+function runPowerShell(script, spawnSyncFn = spawnSync) {
+  const result = spawnSyncFn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], {
     encoding: "utf8",
     windowsHide: true,
     maxBuffer: 16 * 1024 * 1024,
+    timeout: WINDOWS_CAPABILITY_PROBE_TIMEOUT_MS,
   });
+  if (result.error?.code === "ETIMEDOUT") {
+    throw new WilliamsWindowsRuntimeError(
+      `PowerShell capability probe exceeded ${WINDOWS_CAPABILITY_PROBE_TIMEOUT_MS} ms`,
+      "windows-capability-probe-timeout",
+      result.error,
+    );
+  }
   if (result.error) throw result.error;
   if (result.status !== 0) {
     throw new Error(`PowerShell capability probe exited ${result.status}: ${String(result.stderr || result.stdout || "").trim()}`);
@@ -144,12 +167,12 @@ function missingWindow(phase, status, detail) {
   };
 }
 
-export function collectWindowsPerformanceWindow({ phase, platform = process.platform } = {}) {
+export function collectWindowsPerformanceWindow({ phase, platform = process.platform, spawnSyncFn = spawnSync } = {}) {
   if (platform !== "win32") {
     return missingWindow(phase, "required-capability-missing", `platform=${platform}`);
   }
   try {
-    const payload = runPowerShell(WINDOWS_COUNTER_SCRIPT);
+    const payload = runPowerShell(WINDOWS_COUNTER_SCRIPT, spawnSyncFn);
     return {
       schemaVersion: 1,
       phase,
@@ -164,19 +187,19 @@ export function collectWindowsPerformanceWindow({ phase, platform = process.plat
   }
 }
 
-export function collectWindowsProcessSnapshot({ platform = process.platform } = {}) {
+export function collectWindowsProcessSnapshot({ platform = process.platform, spawnSyncFn = spawnSync } = {}) {
   if (platform !== "win32") {
     throw new Error(`Windows process capability required; platform=${platform}`);
   }
-  const payload = runPowerShell(WINDOWS_PROCESS_SCRIPT);
+  const payload = runPowerShell(WINDOWS_PROCESS_SCRIPT, spawnSyncFn);
   return Array.isArray(payload) ? payload : [payload].filter(Boolean);
 }
 
-export function collectWindowsTcpConnections({ platform = process.platform } = {}) {
+export function collectWindowsTcpConnections({ platform = process.platform, spawnSyncFn = spawnSync } = {}) {
   if (platform !== "win32") {
     throw new Error(`Windows TCP capability required; platform=${platform}`);
   }
-  const payload = runPowerShell(WINDOWS_TCP_CONNECTION_SCRIPT);
+  const payload = runPowerShell(WINDOWS_TCP_CONNECTION_SCRIPT, spawnSyncFn);
   return (Array.isArray(payload) ? payload : [payload].filter(Boolean)).map((entry) => ({
     localAddress: String(entry?.LocalAddress || ""),
     port: Number(entry?.LocalPort),
@@ -292,10 +315,22 @@ export async function compileWindowsJobRunner({
   const result = spawnSyncFn(
     "powershell.exe",
     ["-NoProfile", "-NonInteractive", "-EncodedCommand", encodePowerShellCommand(script)],
-    { encoding: "utf8", windowsHide: true, maxBuffer: 16 * 1024 * 1024 },
+    {
+      encoding: "utf8",
+      windowsHide: true,
+      maxBuffer: 16 * 1024 * 1024,
+      timeout: WINDOWS_JOB_RUNNER_COMPILE_TIMEOUT_MS,
+    },
   );
   if (result.error || result.status !== 0) {
     await fs.rm(buildDirectory, { recursive: true, force: true });
+    if (result.error?.code === "ETIMEDOUT") {
+      throw new WilliamsWindowsRuntimeError(
+        `Windows Job runner compilation exceeded ${WINDOWS_JOB_RUNNER_COMPILE_TIMEOUT_MS} ms`,
+        "job-runner-compile-timeout",
+        result.error,
+      );
+    }
     throw result.error || new Error(
       `Windows Job runner compilation exited ${result.status}: ${String(result.stderr || result.stdout || "").trim()}`,
     );
@@ -342,35 +377,34 @@ export async function runWindowsJobCommand(command, {
       windowsHide: true,
       stdio: ["pipe", "pipe", "pipe"],
     });
-    const stdout = [];
-    const stderr = [];
     let settled = false;
     let outerTimedOut = false;
     let guardTimer = null;
-    child.stdout?.on("data", (chunk) => stdout.push(Buffer.from(chunk)));
-    child.stderr?.on("data", (chunk) => stderr.push(Buffer.from(chunk)));
+    let transportError = null;
+    const stopForTransportError = (error, { stopChild = true } = {}) => {
+      if (transportError) return;
+      transportError = error;
+      if (stopChild) child.kill();
+    };
+    const pipeOutput = (source, filePath) => pipeline(source, createWriteStream(filePath, { flags: "w" }))
+      .then(() => null, (writeError) => {
+        stopForTransportError(new WilliamsJobRunnerTransportError(
+          `Windows Job runner output write failed: ${String(writeError?.message || writeError)}`,
+          "job-runner-output-write-error",
+          writeError,
+        ));
+        return writeError;
+      });
+    const stdoutPipeline = pipeOutput(child.stdout, stdoutPath);
+    const stderrPipeline = pipeOutput(child.stderr, stderrPath);
 
-    const finish = async ({ code, signal, error = null }) => {
+    const finish = async ({ code, signal }) => {
       if (settled) return;
       settled = true;
       try {
         if (guardTimer) clearTimeout(guardTimer);
-        const stdoutBuffer = Buffer.concat(stdout);
-        const stderrBuffer = Buffer.concat(stderr);
-        try {
-          await fs.writeFile(stdoutPath, stdoutBuffer);
-          await fs.writeFile(
-            stderrPath,
-            error ? String(error?.stack || error?.message || error) : stderrBuffer,
-          );
-        } catch (writeError) {
-          throw new WilliamsJobRunnerTransportError(
-            `Windows Job runner output write failed: ${String(writeError?.message || writeError)}`,
-            "job-runner-output-write-error",
-            writeError,
-          );
-        }
-        if (error instanceof WilliamsJobRunnerTransportError) throw error;
+        await Promise.all([stdoutPipeline, stderrPipeline]);
+        if (transportError) throw transportError;
         let evidence = null;
         let evidenceError = null;
         try {
@@ -418,29 +452,38 @@ export async function runWindowsJobCommand(command, {
             captureErrors: evidenceErrors,
             jobEvidence: evidence,
           },
-          error: error ? String(error?.message || error) : evidenceErrors[0],
+          error: evidenceErrors[0],
         });
       } catch (finishError) {
         reject(finishError);
       }
     };
     child.on("close", (code, signal) => { void finish({ code, signal }); });
-    child.on("error", (error) => { void finish({ code: 1, signal: null, error }); });
+    child.on("error", (error) => {
+      stopForTransportError(new WilliamsJobRunnerTransportError(
+        `Windows Job runner spawn failed: ${String(error?.message || error)}`,
+        "job-runner-spawn-error",
+        error,
+      ), { stopChild: false });
+      child.stdout?.destroy();
+      child.stderr?.destroy();
+      void finish({ code: 1, signal: null });
+    });
     child.stdin?.once("error", (stdinError) => {
-      child.kill();
+      stopForTransportError(new WilliamsJobRunnerTransportError(
+        `Windows Job runner stdin failed: ${String(stdinError?.message || stdinError)}`,
+        "job-runner-stdin-error",
+        stdinError,
+      ));
       void finish({
         code: 1,
         signal: null,
-        error: new WilliamsJobRunnerTransportError(
-          `Windows Job runner stdin failed: ${String(stdinError?.message || stdinError)}`,
-          "job-runner-stdin-error",
-          stdinError,
-        ),
       });
     });
     guardTimer = setTimeout(() => {
       outerTimedOut = true;
       child.kill();
+      void finish({ code: 1, signal: null });
     }, timeoutMs + 10_000);
     try {
       child.stdin?.end(encodeWindowsJobRunnerSpec({
@@ -451,15 +494,14 @@ export async function runWindowsJobCommand(command, {
         args: command.args,
       }));
     } catch (stdinError) {
-      child.kill();
+      stopForTransportError(new WilliamsJobRunnerTransportError(
+        `Windows Job runner stdin failed: ${String(stdinError?.message || stdinError)}`,
+        "job-runner-stdin-error",
+        stdinError,
+      ));
       void finish({
         code: 1,
         signal: null,
-        error: new WilliamsJobRunnerTransportError(
-          `Windows Job runner stdin failed: ${String(stdinError?.message || stdinError)}`,
-          "job-runner-stdin-error",
-          stdinError,
-        ),
       });
     }
   });

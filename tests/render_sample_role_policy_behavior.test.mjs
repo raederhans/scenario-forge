@@ -62,6 +62,10 @@ const invalidCases = [
   ["wrong phase", (snapshot) => { snapshot.renderSamples.samples[1].phase = "settling"; }, "last-phase-idle"],
   ["missing progressive role", (snapshot) => { snapshot.renderSamples.samples[1].politicalBgProgressive = false; }, "last-political-bg-progressive"],
   ["missing scenario context", (snapshot) => { snapshot.renderSamples.samples[1].contextScenarioMs = 0; }, "last-context-scenario-positive"],
+  ["null canonical duration", (snapshot) => { snapshot.renderSamples.samples[1].durationMs = null; }, "last-duration-positive"],
+  ["blank canonical duration", (snapshot) => { snapshot.renderSamples.samples[1].durationMs = ""; }, "last-duration-positive"],
+  ["boolean canonical duration", (snapshot) => { snapshot.renderSamples.samples[1].durationMs = true; }, "last-duration-positive"],
+  ["array canonical duration", (snapshot) => { snapshot.renderSamples.samples[1].durationMs = [1200]; }, "last-duration-positive"],
   ["pre-promotion sample", (snapshot) => { snapshot.renderSamples.samples[1].recordedAt = 199; }, "last-recorded-after-promotion"],
   ["non-unique canonical role", (snapshot) => {
     Object.assign(snapshot.renderSamples.samples[0], {

@@ -808,6 +808,19 @@ test("Windows Job cleanup evidence fails admission closed for any unverified pro
   assert.ok(report.decision.invalidReasons.includes("block-01.cleanup.jobObject.unverifiedPids"));
 });
 
+test("external browser churn is an environment invalidator instead of a task cleanup failure", () => {
+  const evidence = createEvidence();
+  evidence.blocks[0].cleanup.valid = true;
+  evidence.blocks[0].cleanup.environmentStable = false;
+  evidence.blocks[0].cleanup.newBrowserPids = [99504, 106292];
+  evidence.blocks[0].blockResult.environmentStable = false;
+  const report = analyzeWilliamsCrossoverEvidence(evidence);
+  assert.equal(report.decision.exitCode, WILLIAMS_EXIT_CODES.invalidExperiment);
+  assert.ok(report.decision.invalidReasons.includes("block-01.environment.browserStable"));
+  assert.ok(!report.decision.invalidReasons.includes("block-01.cleanup.newBrowserPids"));
+  assert.ok(!report.decision.invalidReasons.includes("block-01.cleanup.valid"));
+});
+
 test("Job runner preparation fails closed on schema, timestamp, identity, and capability drift", () => {
   const cases = [
     ["job-runner-preparation.schemaVersion", (evidence) => { evidence.jobRunnerPreparation.schemaVersion = 0; }],
