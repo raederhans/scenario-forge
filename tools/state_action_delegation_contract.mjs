@@ -2665,18 +2665,151 @@ const SCENARIO_CHUNK_OPTIONAL_LAYER_ASSIGN_MEMBERSHIPS = Object.freeze([
   "ui|P4.4|assign|specialZoneLayers",
 ]);
 
+function sortStateActionMemberships(memberships = []) {
+  return Object.freeze([...new Set(memberships.map(
+    normalizeStateActionMembership,
+  ).filter(Boolean))].sort((left, right) => left.localeCompare(right)));
+}
+
+function createLegacyMembershipReplacementEntry({
+  modulePath,
+  exportName,
+  retiredMembership,
+  requiredConcreteMemberships,
+}) {
+  return freezeLegacyMembershipReplacementEntry({
+    modulePath,
+    exportName,
+    retiredMembership,
+    requiredConcreteMemberships:
+      sortStateActionMemberships(requiredConcreteMemberships),
+  });
+}
+
+const STRATEGIC_COLLECTION_ASSIGN_MEMBERSHIPS = sortStateActionMemberships([
+  "ui|P4.4|assign|operationalLines",
+  "ui|P4.4|assign|operationalLinesDirty",
+  "ui|P4.4|assign|operationGraphics",
+  "ui|P4.4|assign|operationGraphicsDirty",
+  "ui|P4.4|assign|unitCounters",
+  "ui|P4.4|assign|unitCountersDirty",
+]);
+const STRATEGIC_EDITOR_ASSIGN_MEMBERSHIPS = sortStateActionMemberships([
+  "strategic-overlay|P4.4|assign|operationalLineEditor",
+  "strategic-overlay|P4.4|assign|operationGraphicsEditor",
+  "strategic-overlay|P4.4|assign|strategicOverlayUi",
+  "strategic-overlay|P4.4|assign|unitCounterEditor",
+]);
+const TRANSPORT_OWNER_WRITE_MEMBERSHIPS = sortStateActionMemberships([
+  "ui|P4.4|assign|transportWorkbenchUi",
+  "ui|P4.4|define-property|showAirports",
+  "ui|P4.4|define-property|showPorts",
+  "ui|P4.4|define-property|showRail",
+  "ui|P4.4|define-property|showRoad",
+  "ui|P4.4|define-property|showTransport",
+  "ui|P4.4|define-property|styleConfig",
+  "ui|P4.4|define-property|transportWorkbenchPointDeltas",
+  "ui|P4.4|define-property|transportWorkbenchUi",
+]);
+const TRANSPORT_OVERVIEW_WRITE_MEMBERSHIPS = sortStateActionMemberships([
+  ...TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+  "ui|P4.4|assign|styleConfig",
+]);
+
 export const STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT =
   Object.freeze([
-    "applyScenarioChunkOptionalLayerState",
-    "restoreScenarioChunkPromotionState",
-  ].map((exportName) =>
-    freezeLegacyMembershipReplacementEntry({
+    ...[
+      "applyScenarioChunkOptionalLayerState",
+      "restoreScenarioChunkPromotionState",
+    ].map((exportName) =>
+      createLegacyMembershipReplacementEntry({
       modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
       exportName,
       retiredMembership: "scenario|P4.2|assign|*",
       requiredConcreteMemberships:
         SCENARIO_CHUNK_OPTIONAL_LAYER_ASSIGN_MEMBERSHIPS,
-    })
+      })
+    ),
+    ...[
+      "operationalLines",
+      "operationGraphics",
+      "unitCounters",
+    ].flatMap((key) => [
+      createLegacyMembershipReplacementEntry({
+        modulePath: STRATEGIC_OVERLAY_ACTION_MODULE_PATH,
+        exportName: "commitStrategicOverlayCollectionsState",
+        retiredMembership: `ui|P4.4|collection-mutate|${key}`,
+        requiredConcreteMemberships: STRATEGIC_COLLECTION_ASSIGN_MEMBERSHIPS,
+      }),
+      createLegacyMembershipReplacementEntry({
+        modulePath: STRATEGIC_OVERLAY_ACTION_MODULE_PATH,
+        exportName: "patchStrategicOverlayEntityGroupState",
+        retiredMembership: `ui|P4.4|collection-mutate|${key}`,
+        requiredConcreteMemberships: STRATEGIC_COLLECTION_ASSIGN_MEMBERSHIPS,
+      }),
+    ]),
+    ...[
+      "operationalLineEditor",
+      "operationGraphicsEditor",
+      "strategicOverlayUi",
+      "unitCounterEditor",
+    ].map((key) => createLegacyMembershipReplacementEntry({
+      modulePath: STRATEGIC_OVERLAY_ACTION_MODULE_PATH,
+      exportName: "patchStrategicOverlayEditorState",
+      retiredMembership: `strategic-overlay|P4.4|compound-assign|${key}`,
+      requiredConcreteMemberships: STRATEGIC_EDITOR_ASSIGN_MEMBERSHIPS,
+    })),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "applyTransportWorkbenchOverviewState",
+      retiredMembership: "ui|P4.4|assign|*",
+      requiredConcreteMemberships: TRANSPORT_OVERVIEW_WRITE_MEMBERSHIPS,
+    }),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "applyTransportWorkbenchOverviewState",
+      retiredMembership: "ui|P4.4|assign|showTransport",
+      requiredConcreteMemberships: TRANSPORT_OVERVIEW_WRITE_MEMBERSHIPS,
+    }),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "setTransportMasterVisibilityState",
+      retiredMembership: "ui|P4.4|assign|showTransport",
+      requiredConcreteMemberships: TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+    }),
+    ...[
+      "showAirports",
+      "showPorts",
+      "showRail",
+      "showRoad",
+    ].map((key) => createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "setTransportFamilyVisibilityState",
+      retiredMembership: `ui|P4.4|assign|${key}`,
+      requiredConcreteMemberships: TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+    })),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "commitTransportWorkbenchPointDeltasState",
+      retiredMembership: "ui|P4.4|assign|transportWorkbenchPointDeltas",
+      requiredConcreteMemberships: TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+    }),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "ensureTransportWorkbenchUiState",
+      retiredMembership: "ui|P4.4|assign|transportWorkbenchUi",
+      requiredConcreteMemberships: TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+    }),
+    createLegacyMembershipReplacementEntry({
+      modulePath: TRANSPORT_ACTION_MODULE_PATH,
+      exportName: "commitTransportWorkbenchUiState",
+      retiredMembership: "ui|P4.4|object-assign|transportWorkbenchUi",
+      requiredConcreteMemberships: TRANSPORT_OWNER_WRITE_MEMBERSHIPS,
+    }),
+  ].sort((left, right) =>
+    legacyMembershipReplacementEntryId(left).localeCompare(
+      legacyMembershipReplacementEntryId(right),
+    )
   ));
 
 const SCENARIO_MANAGER_RUNTIME_STATE_BINDING_IDENTITY =
@@ -3323,8 +3456,234 @@ function createRendererCrossBoundaryMigrationEntry({
   });
 }
 
+function createP44FunctionParameterBindingIdentity(
+  functionName,
+  { parameterPath = "$" } = {},
+) {
+  return JSON.stringify({
+    kind: "function-parameter",
+    name: "",
+    functionName,
+    parameterName: "",
+    parameterIndex: 0,
+    parameterPath,
+    importSource: "",
+    importedName: "",
+    aliasSources: [],
+    aliasOperators: [],
+  });
+}
+
+function createP44FunctionIdentity(...ancestryNames) {
+  return JSON.stringify({
+    kind: "function",
+    ancestry: ancestryNames.map((entry) => (
+      typeof entry === "string"
+        ? { name: entry, ordinal: 0 }
+        : entry
+    )),
+  });
+}
+
+function createP44CrossFileMigrationEntry({
+  retiredCallerPath,
+  retiredCallerBindingIdentity,
+  key,
+  retiredMutationSites,
+  replacementCallerPath,
+  replacementCallerBindingIdentity,
+  replacementEnclosingFunctionIdentity,
+  actionModulePath,
+  actionExportName,
+  replacementActionSourceFingerprint,
+}) {
+  return freezeCrossFileMigrationEntry({
+    retiredCallerPath,
+    retiredCallerBindingIdentity,
+    domain: "ui",
+    migrationPhase: "P4.4",
+    operation: "assign",
+    key,
+    retiredMutationSites,
+    replacementCallerPath,
+    replacementCallerBindingIdentity,
+    replacementEnclosingFunctionIdentity,
+    actionModulePath,
+    actionExportName,
+    targetArgumentIndex: 0,
+    replacementActionSourceFingerprint,
+  });
+}
+
 export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
   Object.freeze([
+    createP44CrossFileMigrationEntry({
+      retiredCallerPath: "js/core/special_zone_layers.js",
+      retiredCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "mutateRuntimeSpecialZoneLayersState",
+        ),
+      key: "specialZoneLayers",
+      retiredMutationSites: [
+        {
+          enclosingFunctionIdentity: createP44FunctionIdentity(
+            "mutateRuntimeSpecialZoneLayersState",
+          ),
+          sourceFingerprint:
+            "fd5d59cac0c899e80a5991627c4cc1859c15fda0958a28b5951d709e90fff62d",
+          occurrenceIndex: 0,
+        },
+        {
+          enclosingFunctionIdentity: createP44FunctionIdentity(
+            "normalizeRuntimeSpecialZoneLayersState",
+          ),
+          sourceFingerprint:
+            "fd5d59cac0c899e80a5991627c4cc1859c15fda0958a28b5951d709e90fff62d",
+          occurrenceIndex: 0,
+        },
+      ],
+      replacementCallerPath: "js/core/special_zone_layers.js",
+      replacementCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "mutateRuntimeSpecialZoneLayersState",
+        ),
+      replacementEnclosingFunctionIdentity: createP44FunctionIdentity(
+        "mutateRuntimeSpecialZoneLayersState",
+      ),
+      actionModulePath: SPECIAL_ZONE_ACTION_MODULE_PATH,
+      actionExportName: "commitSpecialZoneLayersState",
+      replacementActionSourceFingerprint:
+        "84879d13d4320985ed649bfc4929c419bf6d26e5ded3278f006dfcb658086fea",
+    }),
+    createP44CrossFileMigrationEntry({
+      retiredCallerPath: "js/core/special_zone_layers.js",
+      retiredCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "setSpecialZoneMembershipBrushModeState",
+        ),
+      key: "specialZoneMembershipBrushMode",
+      retiredMutationSites: [{
+        enclosingFunctionIdentity: createP44FunctionIdentity(
+          "setSpecialZoneMembershipBrushModeState",
+        ),
+        sourceFingerprint:
+          "5e5dd8b8a8bd0551d98e2873643108e5d78b1f270ef6226d12525e4e48014b2a",
+        occurrenceIndex: 0,
+      }],
+      replacementCallerPath:
+        "js/ui/toolbar/special_zones_workbench_controller.js",
+      replacementCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "createSpecialZonesWorkbenchController",
+          { parameterPath: "$/property:runtimeState" },
+        ),
+      replacementEnclosingFunctionIdentity: createP44FunctionIdentity(
+        "createSpecialZonesWorkbenchController",
+        "renderActions",
+        { name: "<anonymous>", ordinal: 1 },
+        "<anonymous>",
+      ),
+      actionModulePath: SPECIAL_ZONE_ACTION_MODULE_PATH,
+      actionExportName: "setSpecialZoneMembershipBrushModeState",
+      replacementActionSourceFingerprint:
+        "7189e7f4fb3f9e8ec59351b7d685080a793fc4427c8791b12bf31d0c90c39bdb",
+    }),
+    createP44CrossFileMigrationEntry({
+      retiredCallerPath: "js/core/special_zone_layers.js",
+      retiredCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "setSpecialZonePresetCategoryState",
+        ),
+      key: "specialZonePresetCategory",
+      retiredMutationSites: [{
+        enclosingFunctionIdentity: createP44FunctionIdentity(
+          "setSpecialZonePresetCategoryState",
+        ),
+        sourceFingerprint:
+          "8974b9efefc036debb37c12e45838cb20cf39ee932090ec5ce8e99893dfe3470",
+        occurrenceIndex: 0,
+      }],
+      replacementCallerPath:
+        "js/ui/toolbar/special_zones_workbench_controller.js",
+      replacementCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "createSpecialZonesWorkbenchController",
+          { parameterPath: "$/property:runtimeState" },
+        ),
+      replacementEnclosingFunctionIdentity: createP44FunctionIdentity(
+        "createSpecialZonesWorkbenchController",
+        "renderPresetList",
+      ),
+      actionModulePath: SPECIAL_ZONE_ACTION_MODULE_PATH,
+      actionExportName: "setSpecialZonePresetCategoryState",
+      replacementActionSourceFingerprint:
+        "8a0095351d0567c92a99e6983e8f089d0641480ddedea853e9a07bfb42b07f16",
+    }),
+    createP44CrossFileMigrationEntry({
+      retiredCallerPath: "js/core/state/appearance_preset_state.js",
+      retiredCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "applyAppearancePresetToRuntimeState",
+        ),
+      key: "intensityFields",
+      retiredMutationSites: [{
+        enclosingFunctionIdentity: createP44FunctionIdentity(
+          "applyAppearancePresetToRuntimeState",
+        ),
+        sourceFingerprint:
+          "946f6a319281398d673ee3c036de665c727bd75b529be02f2a30a8fb8ab3e279",
+        occurrenceIndex: 0,
+      }],
+      replacementCallerPath:
+        "js/core/state/actions/appearance_preset_actions.js",
+      replacementCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "applyAppearancePresetState",
+        ),
+      replacementEnclosingFunctionIdentity: createP44FunctionIdentity(
+        "applyAppearancePresetState",
+      ),
+      actionModulePath: INTENSITY_FIELD_ACTION_MODULE_PATH,
+      actionExportName: "setIntensityFieldsState",
+      replacementActionSourceFingerprint:
+        "535fe9d6b0c542302e1ac6634777f399de33c1643b8afddc9196d5010b0d6116",
+    }),
+    createP44CrossFileMigrationEntry({
+      retiredCallerPath:
+        "js/ui/toolbar/special_zones_workbench_controller.js",
+      retiredCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "createSpecialZonesWorkbenchController",
+          { parameterPath: "$/property:runtimeState" },
+        ),
+      key: "specialZonePresetOpenCategories",
+      retiredMutationSites: [{
+        enclosingFunctionIdentity: createP44FunctionIdentity(
+          "createSpecialZonesWorkbenchController",
+          "setPresetCategoryOpen",
+        ),
+        sourceFingerprint:
+          "2cc6e6d94aebd8e6d313ca92316f7f5a2761b6d736787934e1a55f0e7f679696",
+        occurrenceIndex: 0,
+      }],
+      replacementCallerPath:
+        "js/ui/toolbar/special_zones_workbench_controller.js",
+      replacementCallerBindingIdentity:
+        createP44FunctionParameterBindingIdentity(
+          "createSpecialZonesWorkbenchController",
+          { parameterPath: "$/property:runtimeState" },
+        ),
+      replacementEnclosingFunctionIdentity: createP44FunctionIdentity(
+        "createSpecialZonesWorkbenchController",
+        "renderPresetList",
+        { name: "<anonymous>", ordinal: 2 },
+        "<anonymous>",
+      ),
+      actionModulePath: SPECIAL_ZONE_ACTION_MODULE_PATH,
+      actionExportName: "setSpecialZonePresetCategoryOpenState",
+      replacementActionSourceFingerprint:
+        "6e12e5ca425b30af2198b5ba4340dc7bc23281ea37669cd0badea79c4011b208",
+    }),
     ...[
       "detailDeferred",
       "detailPromotionCompleted",
@@ -4097,8 +4456,7 @@ export function validateStateActionLegacyMembershipReplacementContract(
     const valid = Boolean(
       normalized.modulePath === String(entry.modulePath || "")
       && actionContract
-      && retiredMembership?.key === "*"
-      && ["assign", "delete"].includes(retiredMembership?.operation)
+      && retiredMembership
       && requiredMemberships.length > 0
       && JSON.stringify(requiredMemberships)
         === JSON.stringify(requiredMembershipsSorted)
@@ -4107,7 +4465,9 @@ export function validateStateActionLegacyMembershipReplacementContract(
         (membership) =>
           membership
           && membership.key !== "*"
-          && membership.operation === retiredMembership.operation,
+      )
+      && requiredMemberships.some(
+        (membership) => membership !== retiredMembership.normalized,
       )
       && String(entry.contractIdentity || "")
         === buildStateActionLegacyMembershipReplacementContractIdentity(
@@ -4159,24 +4519,15 @@ export function expandStateActionMembershipsWithLegacyReplacements({
   }
   const normalizedModulePath = normalizeModulePath(modulePath);
   const normalizedExportName = String(exportName || "");
+  const concreteMemberships = [...effectiveMemberships]
+    .filter((membership) => parseStateActionMembership(membership)?.key !== "*")
+    .sort((left, right) => left.localeCompare(right));
   for (const entry of contractEntries) {
-    const retiredOperation = parseStateActionMembership(
-      entry.retiredMembership,
-    )?.operation;
-    const concreteMembershipsForOperation = [...effectiveMemberships].filter(
-      (membership) => {
-        const parsed = parseStateActionMembership(membership);
-        return parsed?.operation === retiredOperation && parsed.key !== "*";
-      },
-    );
     if (
       entry.modulePath !== normalizedModulePath
       || entry.exportName !== normalizedExportName
-      || concreteMembershipsForOperation.length
-        !== entry.requiredConcreteMemberships.length
-      || !entry.requiredConcreteMemberships.every(
-        (membership) => effectiveMemberships.has(membership),
-      )
+      || JSON.stringify(concreteMemberships)
+        !== JSON.stringify(entry.requiredConcreteMemberships)
     ) {
       continue;
     }

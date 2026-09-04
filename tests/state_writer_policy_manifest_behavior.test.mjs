@@ -2316,10 +2316,14 @@ test("P4.2b optional-layer actions explicitly replace the retired wildcard membe
     [],
   );
   assert.deepEqual(
-    STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT.map(({
+    STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT
+      .filter(({ retiredMembership: membership }) =>
+        membership === retiredMembership
+      )
+      .map(({
       contractIdentity: _contractIdentity,
       ...entry
-    }) => entry),
+      }) => entry),
     [
       {
         modulePath,
@@ -2391,7 +2395,7 @@ test("legacy wildcard replacement contract rejects malformed coverage", () => {
     {
       ...valid,
       requiredConcreteMemberships:
-        valid.requiredConcreteMemberships.slice(1),
+        [valid.retiredMembership],
     },
     {
       ...valid,
@@ -2407,13 +2411,83 @@ test("legacy wildcard replacement contract rejects malformed coverage", () => {
     },
     {
       ...valid,
-      retiredMembership: "scenario|P4.2|assign|concrete",
+      requiredConcreteMemberships: [
+        "scenario|P4.2|assign|*",
+      ],
     },
   ];
   assert.ok(malformed.every((entry) =>
     validateStateActionLegacyMembershipReplacementContract([entry])
       .length > 0
   ));
+});
+
+test("P4.4 replacement mappings require the exact current action membership set", () => {
+  const p44Entries = STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT
+    .filter(({ retiredMembership }) => retiredMembership.includes("|P4.4|"));
+  assert.equal(p44Entries.length, 20);
+  assert.deepEqual(
+    validateStateActionLegacyMembershipReplacementContract(),
+    [],
+  );
+  for (const entry of p44Entries) {
+    const expanded = expandStateActionMembershipsWithLegacyReplacements({
+      modulePath: entry.modulePath,
+      exportName: entry.exportName,
+      memberships: entry.requiredConcreteMemberships,
+    });
+    assert.equal(expanded.has(entry.retiredMembership), true);
+    const membershipToRemove = entry.requiredConcreteMemberships.find(
+      (membership) => membership !== entry.retiredMembership,
+    );
+    const incompleteMemberships = entry.requiredConcreteMemberships.filter(
+      (membership) => membership !== membershipToRemove,
+    );
+    assert.equal(
+      expandStateActionMembershipsWithLegacyReplacements({
+        modulePath: entry.modulePath,
+        exportName: entry.exportName,
+        memberships: incompleteMemberships,
+      }).size,
+      incompleteMemberships.length,
+    );
+    const extraMemberships = [
+      ...entry.requiredConcreteMemberships,
+      "ui|P4.4|assign|unexpectedFutureKey",
+    ];
+    assert.equal(
+      expandStateActionMembershipsWithLegacyReplacements({
+        modulePath: entry.modulePath,
+        exportName: entry.exportName,
+        memberships: extraMemberships,
+      }).size,
+      extraMemberships.length,
+    );
+    const [firstMembership, ...remainingMemberships] =
+      entry.requiredConcreteMemberships;
+    const [, , operation, key] = firstMembership.split("|");
+    const wrongOperation = firstMembership.replace(
+      `|${operation}|${key}`,
+      `|wrong-operation|${key}`,
+    );
+    const wrongOperationMemberships = [wrongOperation, ...remainingMemberships];
+    assert.equal(
+      expandStateActionMembershipsWithLegacyReplacements({
+        modulePath: entry.modulePath,
+        exportName: entry.exportName,
+        memberships: wrongOperationMemberships,
+      }).size,
+      wrongOperationMemberships.length,
+    );
+    assert.equal(
+      expandStateActionMembershipsWithLegacyReplacements({
+        modulePath: entry.modulePath,
+        exportName: `${entry.exportName}Wrong`,
+        memberships: entry.requiredConcreteMemberships,
+      }).size,
+      entry.requiredConcreteMemberships.length,
+    );
+  }
 });
 
 test("state action delegation contract rejects invalid and duplicate entries", () => {
@@ -7060,6 +7134,34 @@ test("cross-file migration contract is deterministic and rejects forged or dupli
       ({ code }) =>
         code
         === "state-action-cross-file-migration-entry-duplicate",
+    ),
+  );
+});
+
+test("P4.4 cross-file migrations retain exact retired and replacement identities", () => {
+  const p44Entries = STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT.filter(
+    ({ migrationPhase, key }) => migrationPhase === "P4.4"
+      && [
+        "specialZoneLayers",
+        "specialZoneMembershipBrushMode",
+        "specialZonePresetCategory",
+        "intensityFields",
+        "specialZonePresetOpenCategories",
+      ].includes(key),
+  );
+  assert.equal(p44Entries.length, 5);
+  assert.ok(p44Entries.every((entry) =>
+    /^[a-f0-9]{64}$/.test(entry.contractIdentity)
+    && entry.contractIdentity
+      === buildStateActionCrossFileMigrationContractIdentity(entry)
+    && entry.retiredMutationSites.length > 0
+    && /^[a-f0-9]{64}$/.test(entry.replacementActionSourceFingerprint)
+  ));
+  const forged = structuredClone(p44Entries[0]);
+  forged.replacementCallerBindingIdentity = "{}";
+  assert.ok(
+    validateStateActionCrossFileMigrationContract([forged]).some(
+      ({ code }) => code === "state-action-cross-file-migration-entry-invalid",
     ),
   );
 });
