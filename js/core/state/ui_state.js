@@ -33,6 +33,9 @@ import {
 } from "../transport_capability_registry.js";
 import { getDefaultTransportWorkbenchPackIdForFamily } from "../transport_pack_resolver.js";
 import { createEmptySpecialZoneLayersState } from "../special_zone_layers.js";
+import {
+  applyTransportWorkbenchOverviewState as applyTransportWorkbenchOverviewStateAction,
+} from "./actions/transport_actions.js";
 
 const TRANSPORT_WORKBENCH_RUNTIME_FAMILY_IDS = listTransportRuntimeCapabilityFamilyIds();
 const TRANSPORT_OVERVIEW_VISIBILITY_FIELDS = listTransportOverviewCapabilityFamilyIds()
@@ -84,6 +87,10 @@ export function createDefaultTransportWorkbenchUiState() {
   };
 }
 
+// Compatibility entrypoint for legacy callers. Transport writes remain owned by the canonical action.
+export function applyTransportWorkbenchOverviewState(target, patch = {}) {
+  return applyTransportWorkbenchOverviewStateAction(target, patch);
+}
 
 export function ensureTransportOverviewStyleConfigState(target) {
   if (!target || typeof target !== "object") {

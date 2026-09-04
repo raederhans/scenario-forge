@@ -32,6 +32,7 @@ test("export and transport owners delegate canonical state writes", () => {
   assert.doesNotMatch(exportOwner, /(?:exportUi|state\.exportWorkbenchUi)\.(?:layerOrder|visibility|textVisibility|includeTextLayer|previewMode|previewLayerId|target|format|scale|adjustments|bakeCache|bakeArtifacts)\s*=(?!=)/);
   assert.match(transportStateOwner, /state\/actions\/transport_actions\.js/);
   assert.doesNotMatch(transportStateOwner, /runtimeState\.(?:transportWorkbenchUi|transportWorkbenchPointDeltas)\s*=/);
+  assert.doesNotMatch(transportStateOwner, /Object\.assign\(/);
   assert.match(transportAppearance, /setTransportMasterVisibilityState\(runtimeState,/);
   assert.match(transportAppearance, /setTransportFamilyVisibilityState\(runtimeState,/);
   assert.doesNotMatch(transportAppearance, /runtimeState\.(?:showTransport|showAirports|showPorts|showRail|showRoad)\s*=/);
@@ -43,7 +44,10 @@ test("export and transport owners delegate canonical state writes", () => {
     transportApplyBridge,
     /import\s*\{[^}]*applyTransportWorkbenchOverviewState[^}]*\}\s*from\s*["']\.\.\/\.\.\/core\/state\.js["']/s,
   );
-  assert.doesNotMatch(legacyUiState, /function\s+applyTransportWorkbenchOverviewState\s*\(/);
+  assert.match(
+    legacyUiState,
+    /export function applyTransportWorkbenchOverviewState\(target, patch = \{\}\) \{\s*return applyTransportWorkbenchOverviewStateAction\(target, patch\);\s*\}/s,
+  );
 });
 
 test("file manager routes project visibility snapshots through the finite action surface", () => {

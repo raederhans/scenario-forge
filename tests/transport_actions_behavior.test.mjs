@@ -10,6 +10,9 @@ import {
   setTransportFamilyVisibilityState,
   setTransportMasterVisibilityState,
 } from "../js/core/state/actions/transport_actions.js";
+import {
+  applyTransportWorkbenchOverviewState as applyLegacyTransportWorkbenchOverviewState,
+} from "../js/core/state/ui_state.js";
 
 test("transport workbench commits preserve the existing ui root and detach drafts", () => {
   const root = { open: false, familyConfigs: { road: { width: 1 } } };
@@ -68,6 +71,19 @@ test("transport overview and visibility actions publish only renderer-owned stat
   assert.equal(overview.road.opacity, 0.33);
   assert.equal(overview.activePackIdByFamily.road, "japan_road");
   assert.equal(Object.hasOwn(overview, "previewCamera"), false);
+});
+
+test("legacy transport overview entrypoint delegates to the canonical action", () => {
+  const target = {};
+
+  const overview = applyLegacyTransportWorkbenchOverviewState(target, {
+    familyId: "port",
+    familyConfig: { opacity: 0.42 },
+  });
+
+  assert.equal(overview, target.styleConfig.transportOverview);
+  assert.equal(target.showTransport, true);
+  assert.equal(overview.port.opacity, 0.42);
 });
 
 test("transport actions detach inherited workbench and overview containers", () => {
