@@ -85,47 +85,6 @@ export function createDefaultTransportWorkbenchUiState() {
 }
 
 
-export function applyTransportWorkbenchOverviewState(target, patch = {}) {
-  if (!target || typeof target !== "object" || !patch || typeof patch !== "object") {
-    return null;
-  }
-  if (!target.styleConfig || typeof target.styleConfig !== "object") {
-    target.styleConfig = {};
-  }
-  const currentOverviewConfig = normalizeTransportOverviewStyleConfig(
-    target.styleConfig.transportOverview || {},
-  );
-  const familyId = String(patch.familyId || "").trim();
-  // 这里负责 workbench -> main map 的窄桥接：只把 renderer 真正消费的 overview
-  // 配置写回 styleConfig，preview camera 这类本地 UI 状态继续留在 workbench。
-  const nextOverviewConfig = {
-    ...currentOverviewConfig,
-    visualMode: patch.visualMode,
-  };
-  // workbench -> main map 的桥只发布 overview 认可的字段；
-  // preview camera、局部交互模式等 workbench 私有状态继续留在 transportWorkbenchUi。
-  if (familyId) {
-    nextOverviewConfig[familyId] = {
-      ...(currentOverviewConfig[familyId] || {}),
-      ...(patch.familyConfig || {}),
-    };
-    if (patch.activePackId) {
-      nextOverviewConfig.activePackIdByFamily = {
-        ...(currentOverviewConfig.activePackIdByFamily || {}),
-        [familyId]: String(patch.activePackId || "").trim().toLowerCase(),
-      };
-    }
-  }
-  // Workbench apply may only publish the normalized overview fields that the
-  // main map renderer already understands; workbench-only preview controls stay local.
-  target.styleConfig.transportOverview = normalizeTransportOverviewStyleConfig(nextOverviewConfig);
-  target.showTransport = true;
-  if (patch.visibilityField) {
-    target[patch.visibilityField] = true;
-  }
-  return target.styleConfig.transportOverview;
-}
-
 export function ensureTransportOverviewStyleConfigState(target) {
   if (!target || typeof target !== "object") {
     return createDefaultTransportOverviewStyleConfig();

@@ -2,9 +2,11 @@
 // Owns workbench-to-main-map apply decisions and the side-effect sequence.
 
 import {
-  applyTransportWorkbenchOverviewState,
   normalizeTransportOverviewStyleConfig,
 } from "../../core/state.js";
+import {
+  applyTransportWorkbenchOverviewState,
+} from "../../core/state/actions/transport_actions.js";
 import { getTransportAsset } from "../../core/data_service.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { resolveTransportManifestUrl } from "../../core/runtime_asset_registry.js";

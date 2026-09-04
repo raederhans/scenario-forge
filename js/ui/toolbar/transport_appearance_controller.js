@@ -15,6 +15,10 @@ import {
   formatTransportScopeLabel,
   formatTransportThresholdLabel,
 } from "./appearance_transport_summary.js";
+import {
+  setTransportFamilyVisibilityState,
+  setTransportMasterVisibilityState,
+} from "../../core/state/actions/transport_actions.js";
 
 /**
  * Owns the Appearance panel transport controls: DOM sync, family toggles,
@@ -400,7 +404,7 @@ export function createTransportAppearanceController({
       renderTransportAppearanceUi();
       return;
     }
-    runtimeState.showTransport = normalized;
+    setTransportMasterVisibilityState(runtimeState, normalized);
     if (normalized && hasVisibleTransportFamily()) {
       runtimeState.releaseDeferredContextBasePassFn?.("transport-master-toggle");
     }
@@ -452,8 +456,7 @@ export function createTransportAppearanceController({
     if (toggleAirports && !toggleAirports.dataset.bound) {
       toggleAirports.checked = !!runtimeState.showAirports;
       toggleAirports.addEventListener("change", (event) => {
-        runtimeState.showAirports = !!event.target.checked;
-        if (runtimeState.showAirports && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        setTransportFamilyVisibilityState(runtimeState, "airport", event.target.checked);
         if (runtimeState.showAirports) {
           releaseDeferredContextForTransportToggle("toggle-airports");
         }
@@ -468,8 +471,7 @@ export function createTransportAppearanceController({
     if (togglePorts && !togglePorts.dataset.bound) {
       togglePorts.checked = !!runtimeState.showPorts;
       togglePorts.addEventListener("change", (event) => {
-        runtimeState.showPorts = !!event.target.checked;
-        if (runtimeState.showPorts && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        setTransportFamilyVisibilityState(runtimeState, "port", event.target.checked);
         if (runtimeState.showPorts) {
           releaseDeferredContextForTransportToggle("toggle-ports");
         }
@@ -484,8 +486,7 @@ export function createTransportAppearanceController({
     if (toggleRail && !toggleRail.dataset.bound) {
       toggleRail.checked = !!runtimeState.showRail;
       toggleRail.addEventListener("change", (event) => {
-        runtimeState.showRail = !!event.target.checked;
-        if (runtimeState.showRail && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        setTransportFamilyVisibilityState(runtimeState, "rail", event.target.checked);
         if (runtimeState.showRail) {
           releaseDeferredContextForTransportToggle("toggle-rail");
         }
@@ -500,8 +501,7 @@ export function createTransportAppearanceController({
     if (toggleRoad && !toggleRoad.dataset.bound) {
       toggleRoad.checked = !!runtimeState.showRoad;
       toggleRoad.addEventListener("change", (event) => {
-        runtimeState.showRoad = !!event.target.checked;
-        if (runtimeState.showRoad && runtimeState.showTransport === false) runtimeState.showTransport = true;
+        setTransportFamilyVisibilityState(runtimeState, "road", event.target.checked);
         if (runtimeState.showRoad) {
           releaseDeferredContextForTransportToggle("toggle-road");
         }

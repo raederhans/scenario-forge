@@ -1,3 +1,5 @@
+import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
+
 const SCENARIO_BAR_LEFT_OFFSET = 18;
 const SCENARIO_BAR_MOBILE_LEFT_OFFSET = 12;
 const SCENARIO_BAR_SAFE_GAP = 16;
@@ -150,7 +152,9 @@ function createScenarioContextBarController({
   const bindScenarioContextBarEvents = () => {
     if (scenarioContextCollapseBtn && !scenarioContextCollapseBtn.dataset.bound) {
       scenarioContextCollapseBtn.addEventListener("click", () => {
-        runtimeState.ui.scenarioBarCollapsed = !runtimeState.ui.scenarioBarCollapsed;
+        patchUiChromeState(runtimeState, {
+          scenarioBarCollapsed: !runtimeState.ui.scenarioBarCollapsed,
+        });
         refreshScenarioContextBar();
       });
       scenarioContextCollapseBtn.dataset.bound = "true";
@@ -167,7 +171,7 @@ function createScenarioContextBarController({
       };
       globalRef.addEventListener("resize", refreshResponsiveChromeLayout);
       globalRef.addEventListener("mapcreator:sidebar-layout-refresh", refreshResponsiveChromeLayout);
-      runtimeState.ui.overlayResizeBound = true;
+      patchUiChromeState(runtimeState, { overlayResizeBound: true });
     }
   };
 

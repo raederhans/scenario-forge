@@ -44,6 +44,10 @@ import {
   serializeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
 import { normalizeOpenOceanLayerVisibility } from "./state/ui_state.js";
+import {
+  captureUiVisibilityState,
+  commitUiVisibilityState,
+} from "./state/actions/ui_visibility_actions.js";
 
 const LEGACY_BOUNDARY_VARIANT_ALIASES = {
   legacy_approx: "historical_reference",
@@ -150,9 +154,13 @@ function buildTransportOverviewLayerVisibility(appState) {
 }
 
 function normalizeTransportOverviewLayerVisibility(layerVisibility) {
-  getTransportOverviewVisibilityFields().forEach((field) => {
-    layerVisibility[field] = layerVisibility[field] === undefined ? false : !!layerVisibility[field];
-  });
+  commitUiVisibilityState(
+    layerVisibility,
+    Object.fromEntries(getTransportOverviewVisibilityFields().map((field) => [
+      field,
+      layerVisibility[field] === undefined ? false : !!layerVisibility[field],
+    ])),
+  );
 }
 
 function normalizeTransportCountryOverlayProjectState(value) {
@@ -566,6 +574,27 @@ class FileManager {
     if (!appState) return null;
     const timestamp = Date.now();
     const openOceanLayerVisibility = normalizeOpenOceanLayerVisibility(appState);
+    const layerVisibility = captureUiVisibilityState({
+      showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
+      showOpenOceanRegions: openOceanLayerVisibility.showOpenOceanRegions,
+      allowOpenOceanSelect: openOceanLayerVisibility.allowOpenOceanSelect,
+      allowOpenOceanPaint: openOceanLayerVisibility.allowOpenOceanPaint,
+      showScenarioSpecialRegions:
+        appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
+      showScenarioAtlantropa:
+        appState.showScenarioAtlantropa === undefined ? true : !!appState.showScenarioAtlantropa,
+      showScenarioReliefOverlays:
+        appState.showScenarioReliefOverlays === undefined ? true : !!appState.showScenarioReliefOverlays,
+      showCityPoints: appState.showCityPoints === undefined ? true : !!appState.showCityPoints,
+      showStrategicResourceMarkers: !!appState.showStrategicResourceMarkers,
+      strategicChoroplethMetric: String(appState.strategicChoroplethMetric || ""),
+      showUrban: !!appState.showUrban,
+      showPhysical: !!appState.showPhysical,
+      showRivers: !!appState.showRivers,
+      showTransport: appState.showTransport === undefined ? true : !!appState.showTransport,
+      ...buildTransportOverviewLayerVisibility(appState),
+      showSpecialZones: !!appState.showSpecialZones,
+    });
     // export 的职责是把当前 runtimeState 收敛成稳定 schema。
     // 这里宁可集中做一次 normalize，也不要让读取方承担多套历史字段和 UI 派生状态。
     const payload = {
@@ -606,27 +635,7 @@ class FileManager {
       legendLabels: LegendManager.normalizeLabels(appState.legendLabels),
       legendConfig: LegendManager.normalizeConfig(appState.legendConfig),
       legendControl: LegendManager.normalizeControl(appState.legendControl),
-      layerVisibility: {
-        showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
-        showOpenOceanRegions: openOceanLayerVisibility.showOpenOceanRegions,
-        allowOpenOceanSelect: openOceanLayerVisibility.allowOpenOceanSelect,
-        allowOpenOceanPaint: openOceanLayerVisibility.allowOpenOceanPaint,
-        showScenarioSpecialRegions:
-          appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
-        showScenarioAtlantropa:
-          appState.showScenarioAtlantropa === undefined ? true : !!appState.showScenarioAtlantropa,
-        showScenarioReliefOverlays:
-          appState.showScenarioReliefOverlays === undefined ? true : !!appState.showScenarioReliefOverlays,
-        showCityPoints: appState.showCityPoints === undefined ? true : !!appState.showCityPoints,
-        showStrategicResourceMarkers: !!appState.showStrategicResourceMarkers,
-        strategicChoroplethMetric: String(appState.strategicChoroplethMetric || ""),
-        showUrban: !!appState.showUrban,
-        showPhysical: !!appState.showPhysical,
-        showRivers: !!appState.showRivers,
-        showTransport: appState.showTransport === undefined ? true : !!appState.showTransport,
-        ...buildTransportOverviewLayerVisibility(appState),
-        showSpecialZones: !!appState.showSpecialZones,
-      },
+      layerVisibility,
       styleConfig: {
         internalBorders: appState.styleConfig?.internalBorders || null,
         empireBorders: appState.styleConfig?.empireBorders || null,
@@ -920,41 +929,40 @@ class FileManager {
     if (!data.exportWorkbenchUi || typeof data.exportWorkbenchUi !== "object") {
       data.exportWorkbenchUi = null;
     }
-    data.layerVisibility.showWaterRegions =
-      data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
-    Object.assign(data.layerVisibility, normalizeOpenOceanLayerVisibility(data.layerVisibility));
-    data.layerVisibility.showScenarioSpecialRegions =
-      data.layerVisibility.showScenarioSpecialRegions === undefined
-        ? true
-        : !!data.layerVisibility.showScenarioSpecialRegions;
-    data.layerVisibility.showScenarioAtlantropa =
-      data.layerVisibility.showScenarioAtlantropa === undefined
-        ? true
-        : !!data.layerVisibility.showScenarioAtlantropa;
-    data.layerVisibility.showScenarioReliefOverlays =
-      data.layerVisibility.showScenarioReliefOverlays === undefined
-        ? true
-        : !!data.layerVisibility.showScenarioReliefOverlays;
-    data.layerVisibility.showCityPoints =
-      data.layerVisibility.showCityPoints === undefined ? true : !!data.layerVisibility.showCityPoints;
-    data.layerVisibility.showStrategicResourceMarkers =
-      data.layerVisibility.showStrategicResourceMarkers === undefined
-        ? false
-        : !!data.layerVisibility.showStrategicResourceMarkers;
-    data.layerVisibility.strategicChoroplethMetric = String(data.layerVisibility.strategicChoroplethMetric || "");
-    data.layerVisibility.showUrban =
-      data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
-    data.layerVisibility.showPhysical =
-      data.layerVisibility.showPhysical === undefined ? true : !!data.layerVisibility.showPhysical;
-    data.layerVisibility.showRivers =
-      data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers;
-    data.layerVisibility.showTransport =
-      data.layerVisibility.showTransport === undefined ? true : !!data.layerVisibility.showTransport;
+    const openOceanVisibility = normalizeOpenOceanLayerVisibility(data.layerVisibility);
+    commitUiVisibilityState(data.layerVisibility, {
+      showWaterRegions:
+        data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions,
+      ...openOceanVisibility,
+      showScenarioSpecialRegions:
+        data.layerVisibility.showScenarioSpecialRegions === undefined
+          ? true
+          : !!data.layerVisibility.showScenarioSpecialRegions,
+      showScenarioAtlantropa:
+        data.layerVisibility.showScenarioAtlantropa === undefined
+          ? true
+          : !!data.layerVisibility.showScenarioAtlantropa,
+      showScenarioReliefOverlays:
+        data.layerVisibility.showScenarioReliefOverlays === undefined
+          ? true
+          : !!data.layerVisibility.showScenarioReliefOverlays,
+      showCityPoints:
+        data.layerVisibility.showCityPoints === undefined ? true : !!data.layerVisibility.showCityPoints,
+      showStrategicResourceMarkers:
+        data.layerVisibility.showStrategicResourceMarkers === undefined
+          ? false
+          : !!data.layerVisibility.showStrategicResourceMarkers,
+      strategicChoroplethMetric: String(data.layerVisibility.strategicChoroplethMetric || ""),
+      showUrban: data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban,
+      showPhysical:
+        data.layerVisibility.showPhysical === undefined ? true : !!data.layerVisibility.showPhysical,
+      showRivers: data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers,
+      showTransport:
+        data.layerVisibility.showTransport === undefined ? true : !!data.layerVisibility.showTransport,
+      showSpecialZones:
+        data.layerVisibility.showSpecialZones === undefined ? false : !!data.layerVisibility.showSpecialZones,
+    });
     normalizeTransportOverviewLayerVisibility(data.layerVisibility);
-    data.layerVisibility.showSpecialZones =
-      data.layerVisibility.showSpecialZones === undefined
-        ? false
-        : !!data.layerVisibility.showSpecialZones;
     return data;
   }
 

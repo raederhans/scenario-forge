@@ -9,6 +9,10 @@ import {
   normalizeTransportWorkbenchUiState,
 } from "../../core/state.js";
 import {
+  commitTransportWorkbenchPointDeltasState,
+  commitTransportWorkbenchUiState,
+} from "../../core/state/actions/transport_actions.js";
+import {
   getDefaultTransportWorkbenchPackIdForFamily,
   getTransportWorkbenchPackMeta,
 } from "../../core/transport_pack_resolver.js";
@@ -80,14 +84,7 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       ? [...previousUiState.layerOrder]
       : null;
     const normalizedUiState = normalizeTransportWorkbenchUiState(previousUiState);
-    // Keep the existing object reference stable for bound controls and preview listeners.
-    if (!previousUiState || typeof previousUiState !== "object") {
-      runtimeState.transportWorkbenchUi = normalizedUiState;
-    } else {
-      Object.assign(previousUiState, normalizedUiState);
-      runtimeState.transportWorkbenchUi = previousUiState;
-    }
-    const uiState = runtimeState.transportWorkbenchUi;
+    const uiState = normalizedUiState;
     uiState.open = !!uiState.open;
     uiState.activeFamily = normalizeTransportWorkbenchFamily(uiState.activeFamily);
     if (!uiState.activePackIdByFamily || typeof uiState.activePackIdByFamily !== "object") {
@@ -113,7 +110,10 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
     if (!uiState.displayConfigs || typeof uiState.displayConfigs !== "object") {
       uiState.displayConfigs = {};
     }
-    runtimeState.transportWorkbenchPointDeltas = normalizeTransportWorkbenchPointDeltas(runtimeState.transportWorkbenchPointDeltas);
+    commitTransportWorkbenchPointDeltasState(
+      runtimeState,
+      runtimeState.transportWorkbenchPointDeltas,
+    );
     TRANSPORT_WORKBENCH_RUNTIME_FAMILY_IDS.forEach((familyId) => {
       uiState.familyConfigs[familyId] = normalizeTransportWorkbenchFamilyConfig(familyId, uiState.familyConfigs[familyId]);
       uiState.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(
@@ -139,7 +139,7 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
     uiState.shellPhase = "road-live-preview";
     uiState.restoreLeftDrawer = !!uiState.restoreLeftDrawer;
     uiState.restoreRightDrawer = !!uiState.restoreRightDrawer;
-    return uiState;
+    return commitTransportWorkbenchUiState(runtimeState, uiState);
   };
 
   const getFamilyMeta = () => {
@@ -204,21 +204,21 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
   };
 
   const resetSectionState = () => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     uiState.sectionOpen = Object.fromEntries(
       TRANSPORT_WORKBENCH_RUNTIME_FAMILY_IDS.map((familyId) => [
         familyId,
         { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS[familyId] },
       ])
     );
-    return uiState.sectionOpen;
+    return commitTransportWorkbenchUiState(runtimeState, uiState).sectionOpen;
   };
 
   const updateFamilyConfig = (familyId, key, nextValue, { appendValue = null } = {}) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     const family = TRANSPORT_WORKBENCH_FAMILIES.find((entry) => entry.id === familyId);
     if (!family?.supportsDetailedControls) return false;
-    const current = clonePlainObject(getWorkingConfig(familyId) || {});
+    const current = clonePlainObject(uiState.familyConfigs?.[familyId] || {});
     if (appendValue !== null) {
       const currentValues = Array.isArray(current[key]) ? [...current[key]] : [];
       const index = currentValues.indexOf(appendValue);
@@ -232,29 +232,32 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       current[key] = nextValue;
     }
     writeTransportWorkbenchFamilyConfig(uiState, familyId, current);
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return true;
   };
 
   const updateDisplayConfig = (familyId, updateFn) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(familyId) || typeof updateFn !== "function") return false;
-    const draft = clonePlainObject(getDisplayConfig(familyId));
+    const draft = clonePlainObject(uiState.displayConfigs?.[familyId]);
     updateFn(draft);
     uiState.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(draft, familyId);
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return true;
   };
 
   const toggleSection = (familyId, sectionKey, nextOpen) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     if (!uiState.sectionOpen[familyId]) {
       uiState.sectionOpen[familyId] = {};
     }
     uiState.sectionOpen[familyId][sectionKey] = !!nextOpen;
-    return uiState.sectionOpen[familyId][sectionKey];
+    const committed = commitTransportWorkbenchUiState(runtimeState, uiState);
+    return committed.sectionOpen[familyId][sectionKey];
   };
 
   const setActivePackId = (packId) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     const normalizedPackId = String(packId || "").trim().toLowerCase();
     const meta = getTransportWorkbenchPackMeta(normalizedPackId);
     if (!meta) return null;
@@ -265,11 +268,12 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
     uiState.activePackIdByFamily[meta.family] = meta.packId;
     uiState.activePackId = meta.packId;
     uiState.sampleCountry = meta.country;
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return meta;
   };
 
   const setActiveFamily = (familyId) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     const activeFamily = normalizeTransportWorkbenchFamily(familyId || "road");
     uiState.activeFamily = activeFamily;
     const activePackId = resolveTransportWorkbenchPackIdForFamily(uiState, activeFamily);
@@ -280,41 +284,43 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
     uiState.activePackIdByFamily[activeFamily] = activePackId;
     const activePackMeta = getTransportWorkbenchPackMeta(activePackId);
     if (activePackMeta?.country) uiState.sampleCountry = activePackMeta.country;
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return activeFamily;
   };
 
   const setInspectorTab = (tabId) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     uiState.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(tabId || "inspect");
-    return uiState.activeInspectorTab;
+    return commitTransportWorkbenchUiState(runtimeState, uiState).activeInspectorTab;
   };
 
   const prepareOpenState = ({ restoreLeftDrawer = false, restoreRightDrawer = false } = {}) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     uiState.restoreLeftDrawer = !!restoreLeftDrawer;
     uiState.restoreRightDrawer = !!restoreRightDrawer;
-    return uiState;
+    return commitTransportWorkbenchUiState(runtimeState, uiState);
   };
 
   const setOpenState = (nextOpen) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     uiState.open = !!nextOpen;
-    return uiState;
+    return commitTransportWorkbenchUiState(runtimeState, uiState);
   };
 
   const prepareCloseState = () => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     const restoreState = {
       restoreLeftDrawer: !!uiState.restoreLeftDrawer,
       restoreRightDrawer: !!uiState.restoreRightDrawer,
     };
     uiState.restoreLeftDrawer = false;
     uiState.restoreRightDrawer = false;
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return restoreState;
   };
 
   const moveLayerOrder = (draggedFamilyId, targetFamilyId) => {
-    const uiState = ensureUiState();
+    const uiState = clonePlainObject(ensureUiState());
     const draggedId = normalizeTransportWorkbenchFamily(draggedFamilyId);
     const targetId = normalizeTransportWorkbenchFamily(targetFamilyId);
     if (!draggedId || draggedId === targetId) return false;
@@ -325,6 +331,7 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
     nextOrder.splice(draggedIndex, 1);
     nextOrder.splice(targetIndex, 0, draggedId);
     uiState.layerOrder = normalizeTransportWorkbenchLayerOrder(nextOrder);
+    commitTransportWorkbenchUiState(runtimeState, uiState);
     return true;
   };
 
@@ -373,8 +380,8 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       sourcePackId: packId,
       updatedAt: new Date().toISOString(),
     };
-    runtimeState.transportWorkbenchPointDeltas = normalizeTransportWorkbenchPointDeltas(pointDeltas);
-    return runtimeState.transportWorkbenchPointDeltas.byFamily[normalizedFamilyId].created
+    const committed = commitTransportWorkbenchPointDeltasState(runtimeState, pointDeltas);
+    return committed.byFamily[normalizedFamilyId].created
       .find((feature) => feature.id === nextFeature.id) || null;
   };
 
@@ -428,8 +435,8 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       sourcePackId: packId,
       updatedAt: new Date().toISOString(),
     };
-    runtimeState.transportWorkbenchPointDeltas = normalizeTransportWorkbenchPointDeltas(pointDeltas);
-    const nextFamilyDeltas = runtimeState.transportWorkbenchPointDeltas.byFamily[normalizedFamilyId];
+    const committed = commitTransportWorkbenchPointDeltasState(runtimeState, pointDeltas);
+    const nextFamilyDeltas = committed.byFamily[normalizedFamilyId];
     return [...(nextFamilyDeltas.created || []), ...(nextFamilyDeltas.updated || [])]
       .find((feature) => feature.id === normalizedFeatureId) || null;
   };
@@ -452,7 +459,7 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       revision: Number(familyDeltas.revision || 0) + 1,
       updatedAt: new Date().toISOString(),
     };
-    runtimeState.transportWorkbenchPointDeltas = normalizeTransportWorkbenchPointDeltas(pointDeltas);
+    commitTransportWorkbenchPointDeltasState(runtimeState, pointDeltas);
     return true;
   };
 
@@ -484,7 +491,7 @@ export function createTransportWorkbenchStateOwner(runtimeState) {
       sourcePackId: resolveTransportWorkbenchPackIdForFamily(uiState, normalizedFamilyId),
       updatedAt: new Date().toISOString(),
     };
-    runtimeState.transportWorkbenchPointDeltas = normalizeTransportWorkbenchPointDeltas(pointDeltas);
+    commitTransportWorkbenchPointDeltasState(runtimeState, pointDeltas);
     return true;
   };
 

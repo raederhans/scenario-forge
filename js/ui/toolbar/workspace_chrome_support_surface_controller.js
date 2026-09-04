@@ -2,7 +2,10 @@
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
 // toolbar.js 继续保留 export workbench facade、special zone facade、drawer 切换和更高层的页面编排。
 
-import { setActiveDockPopoverState } from "../../core/state/index.js";
+import {
+  setActiveDockPopoverState,
+  setRestoredSupportSurfaceViewState,
+} from "../../core/state/actions/ui_chrome_actions.js";
 
 export function createWorkspaceChromeSupportSurfaceController({
   state,
@@ -176,28 +179,28 @@ export function createWorkspaceChromeSupportSurfaceController({
     }
     if (view === "guide") {
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-        state.ui.restoredSupportSurfaceViewFromUrl = view;
+        setRestoredSupportSurfaceViewState(state, view);
         return;
       }
       toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      setRestoredSupportSurfaceViewState(state, view);
       return;
     }
     if (view === "export") {
       ensureProjectSupportSurface("export");
       const exportTrigger = isFocusableGuideTriggerVisible(dockExportBtn) ? dockExportBtn : null;
       openExportWorkbench?.(exportTrigger);
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      setRestoredSupportSurfaceViewState(state, view);
       return;
     }
     ensureProjectSupportSurface("utilities");
     const targetPopover = getDockPopoverByKind(view);
     if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
-      state.ui.restoredSupportSurfaceViewFromUrl = view;
+      setRestoredSupportSurfaceViewState(state, view);
       return;
     }
     openDockPopover(view);
-    state.ui.restoredSupportSurfaceViewFromUrl = view;
+    setRestoredSupportSurfaceViewState(state, view);
   };
 
   const toggleScenarioGuidePopover = (trigger = scenarioGuideBtn) => {
