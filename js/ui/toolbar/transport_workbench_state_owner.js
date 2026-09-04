@@ -11,6 +11,7 @@ import {
 import {
   commitTransportWorkbenchPointDeltasState,
   commitTransportWorkbenchUiState,
+  ensureTransportWorkbenchUiState,
 } from "../../core/state/actions/transport_actions.js";
 import {
   getDefaultTransportWorkbenchPackIdForFamily,
@@ -79,7 +80,7 @@ function writeTransportWorkbenchFamilyConfig(uiState, familyId, config) {
 
 export function createTransportWorkbenchStateOwner(runtimeState) {
   const ensureUiState = () => {
-    const previousUiState = runtimeState.transportWorkbenchUi;
+    const previousUiState = ensureTransportWorkbenchUiState(runtimeState);
     const previousLayerOrder = Array.isArray(previousUiState?.layerOrder)
       ? [...previousUiState.layerOrder]
       : null;

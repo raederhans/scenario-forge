@@ -34,6 +34,36 @@ test("transport workbench state owner preserves the UI object while normalizing 
   assert.equal(typeof normalized.sectionOpen.road, "object");
 });
 
+test("transport workbench state owner initializes through an accessor-free canonical record", () => {
+  const getterCalls = { inherited: 0, own: 0 };
+  const inheritedPrototype = {};
+  Object.defineProperty(inheritedPrototype, "transportWorkbenchUi", {
+    configurable: true,
+    get: () => {
+      getterCalls.inherited += 1;
+      return { open: true };
+    },
+  });
+  const inheritedRuntimeState = Object.create(inheritedPrototype);
+  const ownRuntimeState = {};
+  Object.defineProperty(ownRuntimeState, "transportWorkbenchUi", {
+    configurable: true,
+    get: () => {
+      getterCalls.own += 1;
+      return { open: true };
+    },
+  });
+
+  const inheritedUi = createTransportWorkbenchStateOwner(inheritedRuntimeState).ensureUiState();
+  const ownUi = createTransportWorkbenchStateOwner(ownRuntimeState).ensureUiState();
+
+  assert.deepEqual(getterCalls, { inherited: 0, own: 0 });
+  assert.equal(Object.hasOwn(inheritedRuntimeState, "transportWorkbenchUi"), true);
+  assert.equal(Object.hasOwn(ownRuntimeState, "transportWorkbenchUi"), true);
+  assert.equal(inheritedUi.open, false);
+  assert.equal(ownUi.open, false);
+});
+
 test("transport workbench state owner updates active pack and family-local pack map", () => {
   const { owner, runtimeState } = createOwner({});
 
