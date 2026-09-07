@@ -328,7 +328,10 @@ test("scenario manager owns apply requests with same-target reuse and latest-tar
 
 test("stale scenario apply callbacks are fenced at post-apply, optional layer, and chunk writes", () => {
   const postApply = readRepoFile("js", "core", "scenario_post_apply_effects.js");
+  const optionalLayers = readRepoFile("js", "core", "scenario", "optional_layer_runtime.js");
   const resources = readRepoFile("js", "core", "scenario_resources.js");
+  assert.ok(resources.includes("applyScenarioOptionalLayerState("));
+  assert.ok(resources.includes("optional-layer-state-apply"));
   const chunkRuntime = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
   const pipeline = readRepoFile("js", "core", "scenario_apply_pipeline.js");
 
@@ -340,11 +343,9 @@ test("stale scenario apply callbacks are fenced at post-apply, optional layer, a
   ].forEach((token) => assert.ok(postApply.includes(token), `post_apply should include ${token}`));
 
   [
-    "applyScenarioOptionalLayerState(",
     "scenarioApplyRequestId = 0",
-    "optional-layer-state-apply",
     "optional-layer-visibility-sync-after-load",
-  ].forEach((token) => assert.ok(resources.includes(token), `scenario_resources should include ${token}`));
+  ].forEach((token) => assert.ok(optionalLayers.includes(token), `optional_layer_runtime should include ${token}`));
 
   [
     "scenarioApplyRequestIdBySelectionVersion",

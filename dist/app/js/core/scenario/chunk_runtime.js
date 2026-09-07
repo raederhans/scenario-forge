@@ -2,19 +2,21 @@
 // 这个模块只负责 chunk runtime 的 runtimeState、selection、promotion、refresh/schedule。
 // facade、startup cache、hydrate 主交易仍留在 scenario_resources.js。
 
+import {
+  getChunkIdListSignature,
+  buildScenarioChunkLayerSelectionSignatures,
+  buildMergedScenarioChunkLayerPayloads,
+} from "./chunk_layer_payloads.js";
+import { createScenarioChunkPayloadLoader } from "./chunk_payload_loader.js";
 import { registerRuntimeHook } from "../state/index.js";
 import { setRenderPerfMetricEntryState } from "../state/actions/renderer_diagnostics_actions.js";
 import {
-  beginScenarioChunkLoadState,
   captureScenarioChunkLoadStateContinuation,
   clearScenarioChunkPromotionState,
   commitScenarioChunkPayloadEntriesState,
   commitScenarioChunkSelectionState,
-  completeScenarioChunkLoadState,
   ensureScenarioChunkRuntimeState,
   evictScenarioChunkPayloadsState,
-  failScenarioChunkLoadState,
-  finishScenarioChunkLoadState,
   patchScenarioChunkLoadState,
   queueScenarioChunkPromotionState,
   replaceScenarioChunkPendingPromotionIdentityState,
@@ -271,8 +273,9 @@ function createScenarioChunkRuntimeController({
   const runtimeState = explicitRuntimeState || state;
   let promotionCommitPromise = null;
   let promotionCommitRunId = 0;
-  const chunkRequestsByRequest = new Map();
-  let activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || runtimeState.activeScenarioId || ""));
+  const { loadScenarioChunkPayload, resetScenarioChunkRequests } = createScenarioChunkPayloadLoader({
+    runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile,
+  });
 
   function getScenarioApplyEpochFromDiagnostics(scenarioId = "") {
     const diagnostics = runtimeState?.renderTransactionDiagnostics || {};
@@ -513,13 +516,6 @@ function createScenarioChunkRuntimeController({
       normalizeScenarioIdFn: normalizeScenarioId,
       nowMs: Date.now(),
     }, loadState);
-  }
-
-  function getChunkIdListSignature(chunkIds = []) {
-    return (Array.isArray(chunkIds) ? chunkIds : [])
-      .map((value) => String(value || "").trim())
-      .filter(Boolean)
-      .join("|");
   }
 
   function getScenarioChunkActiveMergeIds(chunkState, selection) {
@@ -983,26 +979,6 @@ function createScenarioChunkRuntimeController({
     return runtimeState.activeScenarioChunks;
   }
 
-  function ensureScenarioChunkPayloadCache(bundle) {
-    if (!bundle || typeof bundle !== "object") {
-      return {};
-    }
-    bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
-      ? bundle.chunkPayloadCacheById
-      : {};
-    return bundle.chunkPayloadCacheById;
-  }
-
-  function ensureScenarioChunkPromiseCache(bundle) {
-    if (!bundle || typeof bundle !== "object") {
-      return {};
-    }
-    bundle.chunkPayloadPromisesById = bundle.chunkPayloadPromisesById && typeof bundle.chunkPayloadPromisesById === "object"
-      ? bundle.chunkPayloadPromisesById
-      : {};
-    return bundle.chunkPayloadPromisesById;
-  }
-
   function hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey) {
     return !!(
       mergedLayerPayloads
@@ -1023,75 +999,11 @@ function createScenarioChunkRuntimeController({
 
   function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
     const normalizedScenarioId = normalizeScenarioId(scenarioId);
-    const outgoingScenarioId = activeRequestScenarioId
-      || normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || ""));
     cancelScenarioChunkPromotionCommit("scenario-chunk-runtime-reset");
-    if (outgoingScenarioId && outgoingScenarioId !== normalizedScenarioId) {
-      // activeScenarioId may already refer to the incoming scene after commit.
-      // A same-scene reload can replace its bundle while requests remain alive.
-      // Only this controller's in-flight bundles for the outgoing scene belong here.
-      for (const [request, { bundle: outgoingBundle, chunkId }] of chunkRequestsByRequest) {
-        if (getScenarioBundleId(outgoingBundle) !== outgoingScenarioId) continue;
-        chunkRequestsByRequest.delete(request);
-        const promiseCache = ensureScenarioChunkPromiseCache(outgoingBundle);
-        if (promiseCache[chunkId] === request.promise) delete promiseCache[chunkId];
-        request.controller.abort();
-      }
-    }
+    resetScenarioChunkRequests(normalizedScenarioId);
     resetScenarioChunkRuntimeStateAction(runtimeState, {
       scenarioId: normalizedScenarioId,
     });
-    activeRequestScenarioId = normalizedScenarioId;
-  }
-
-  function getScenarioChunkIdsByLayer(chunkState, layerKey, activeChunkIdSet = null) {
-    return chunkState.loadedChunkIds
-      .filter((chunkId) => !activeChunkIdSet || activeChunkIdSet.has(String(chunkId || "").trim()))
-      .map((chunkId) => ({ chunkId, entry: chunkState.payloadByChunkId?.[chunkId] || null }))
-      .filter(({ entry }) => entry && entry.layerKey === layerKey)
-      .map(({ chunkId }) => chunkId);
-  }
-
-  function getScenarioChunkMetaById(bundle, chunkId = "") {
-    const normalizedChunkId = String(chunkId || "").trim();
-    if (!normalizedChunkId) return null;
-    const byLayer = bundle?.chunkRegistry?.byLayer && typeof bundle.chunkRegistry.byLayer === "object"
-      ? bundle.chunkRegistry.byLayer
-      : {};
-    for (const chunks of Object.values(byLayer)) {
-      const match = (Array.isArray(chunks) ? chunks : [])
-        .find((chunk) => String(chunk?.id || "").trim() === normalizedChunkId);
-      if (match) return match;
-    }
-    return null;
-  }
-
-  function getScenarioChunkPayloadEntriesForLayer(bundle, chunkState, layerKey, activeChunkIdSet = null) {
-    return chunkState.loadedChunkIds
-      .filter((chunkId) => !activeChunkIdSet || activeChunkIdSet.has(String(chunkId || "").trim()))
-      .map((chunkId) => ({
-        chunkId,
-        chunk: getScenarioChunkMetaById(bundle, chunkId),
-        entry: chunkState.payloadByChunkId?.[chunkId] || null,
-      }))
-      .filter(({ entry }) => entry && entry.layerKey === layerKey);
-  }
-
-  function buildScenarioChunkLayerSelectionSignatures(bundle, activeChunkIds = null) {
-    const chunkState = ensureActiveScenarioChunkState();
-    const activeChunkIdSet = Array.isArray(activeChunkIds)
-      ? new Set(activeChunkIds.map((chunkId) => String(chunkId || "").trim()).filter(Boolean))
-      : null;
-    const layerKeys = new Set([
-      ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
-      ...Object.keys(chunkState.mergedLayerPayloads || {}),
-    ]);
-    const signatures = {};
-    layerKeys.forEach((layerKey) => {
-      const chunkIds = getScenarioChunkIdsByLayer(chunkState, layerKey, activeChunkIdSet);
-      signatures[layerKey] = getChunkIdListSignature(chunkIds);
-    });
-    return signatures;
   }
 
   function getScenarioChunkFeatureIdsFromChunkPayload(payload) {
@@ -2277,174 +2189,6 @@ function createScenarioChunkRuntimeController({
     (reason) => cancelScenarioChunkPromotionCommit(reason),
   );
 
-  function buildMergedScenarioChunkLayerPayloads(bundle, {
-    previousSignatures = {},
-    nextSignatures = {},
-    previousMergedLayerPayloads = {},
-    activeChunkIds = null,
-    viewportBbox = null,
-  } = {}) {
-    const chunkState = ensureActiveScenarioChunkState();
-    const activeChunkIdSet = Array.isArray(activeChunkIds)
-      ? new Set(activeChunkIds.map((chunkId) => String(chunkId || "").trim()).filter(Boolean))
-      : null;
-    const mergedLayerPayloads = {};
-    const primaryMergedLayerPayloads = {};
-    const primaryLayerStats = {};
-    const changedLayerKeys = [];
-    const layerKeys = new Set([
-      ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
-      ...Object.keys(previousMergedLayerPayloads || {}),
-    ]);
-    layerKeys.forEach((layerKey) => {
-      const layerChunkPayloadEntries = getScenarioChunkPayloadEntriesForLayer(bundle, chunkState, layerKey, activeChunkIdSet);
-      const previousSignature = String(previousSignatures?.[layerKey] || "");
-      const nextSignature = String(nextSignatures?.[layerKey] || "");
-      if (
-        previousSignature === nextSignature
-        && Object.prototype.hasOwnProperty.call(previousMergedLayerPayloads || {}, layerKey)
-      ) {
-        mergedLayerPayloads[layerKey] = previousMergedLayerPayloads[layerKey] || null;
-        if (layerKey === "political" && typeof mergeScenarioChunkPayloadsForViewport === "function") {
-          const primaryResult = mergeScenarioChunkPayloadsForViewport(layerKey, layerChunkPayloadEntries.map(({ chunk, entry }) => ({
-            chunk,
-            payload: entry?.payload || null,
-          })), viewportBbox || [-180, -90, 180, 90]);
-          primaryMergedLayerPayloads[layerKey] = primaryResult?.payload || null;
-          primaryLayerStats[layerKey] = primaryResult?.stats || null;
-        }
-        return;
-      }
-      const layerChunkPayloads = layerChunkPayloadEntries
-        .map(({ entry }) => entry?.payload || null)
-        .filter(Boolean);
-      if (!layerChunkPayloads.length) {
-        mergedLayerPayloads[layerKey] = null;
-        primaryMergedLayerPayloads[layerKey] = null;
-        primaryLayerStats[layerKey] = null;
-        changedLayerKeys.push(layerKey);
-        return;
-      }
-      mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
-      if (layerKey === "political" && typeof mergeScenarioChunkPayloadsForViewport === "function") {
-        const primaryResult = mergeScenarioChunkPayloadsForViewport(layerKey, layerChunkPayloadEntries.map(({ chunk, entry }) => ({
-          chunk,
-          payload: entry?.payload || null,
-        })), viewportBbox || [-180, -90, 180, 90]);
-        primaryMergedLayerPayloads[layerKey] = primaryResult?.payload || null;
-        primaryLayerStats[layerKey] = primaryResult?.stats || null;
-      }
-      changedLayerKeys.push(layerKey);
-    });
-    setScenarioChunkMergedLayerPayloadsState(runtimeState, mergedLayerPayloads);
-    return {
-      mergedLayerPayloads,
-      primaryMergedLayerPayloads,
-      primaryLayerStats,
-      changedLayerKeys,
-    };
-  }
-
-  function observeScenarioChunkLoadPromise(
-    loadPromise,
-    normalizedChunkId,
-    expectedLoadStateGeneration,
-  ) {
-    beginScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-      expectedLoadStateGeneration,
-    });
-    return loadPromise
-      .then((payload) => {
-        completeScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-          expectedLoadStateGeneration,
-        });
-        return payload;
-      }, (error) => {
-        failScenarioChunkLoadState(
-          runtimeState,
-          normalizedChunkId,
-          String(error?.message || error || "Unknown chunk load error."),
-          { expectedLoadStateGeneration },
-        );
-        throw error;
-      })
-      .finally(() => {
-        finishScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-          expectedLoadStateGeneration,
-        });
-      });
-  }
-
-  async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3 } = {}) {
-    const normalizedChunkId = String(chunkMeta?.id || "").trim();
-    if (!bundle || !normalizedChunkId) return null;
-    const payloadCache = ensureScenarioChunkPayloadCache(bundle);
-    if (payloadCache[normalizedChunkId]) {
-      return payloadCache[normalizedChunkId];
-    }
-    const promiseCache = ensureScenarioChunkPromiseCache(bundle);
-    ensureRuntimeChunkLoadState();
-    if (!activeRequestScenarioId) activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioId || ""));
-    const expectedLoadStateGeneration = Math.max(
-      0,
-      Number(runtimeState.runtimeChunkLoadState?.generation || 0),
-    );
-    if (promiseCache[normalizedChunkId]) {
-      return observeScenarioChunkLoadPromise(
-        promiseCache[normalizedChunkId],
-        normalizedChunkId,
-        expectedLoadStateGeneration,
-      );
-    }
-    beginScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-      expectedLoadStateGeneration,
-    });
-    const request = { controller: new AbortController(), promise: null };
-    chunkRequestsByRequest.set(request, { bundle, chunkId: normalizedChunkId });
-    const loadPromise = (async () => {
-      try {
-        const result = await loadScenarioChunkFile(chunkMeta.url, {
-          d3Client,
-          scenarioId: getScenarioBundleId(bundle),
-          resourceLabel: `chunk:${chunkMeta.layer}:${normalizedChunkId}`,
-          signal: request.controller.signal,
-        });
-        request.controller.signal.throwIfAborted();
-        const payload = {
-          layerKey: chunkMeta.layer,
-          payload: result?.payload || null,
-        };
-        payloadCache[normalizedChunkId] = payload;
-        completeScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-          expectedLoadStateGeneration,
-        });
-        return payload;
-      } catch (error) {
-        failScenarioChunkLoadState(
-          runtimeState,
-          normalizedChunkId,
-          String(error?.message || error || "Unknown chunk load error."),
-          { expectedLoadStateGeneration },
-        );
-        throw error;
-      } finally {
-        finishScenarioChunkLoadState(runtimeState, normalizedChunkId, {
-          expectedLoadStateGeneration,
-        });
-      }
-    })();
-    request.promise = loadPromise;
-    promiseCache[normalizedChunkId] = loadPromise;
-    const clearCachedLoadPromise = () => {
-      if (promiseCache[normalizedChunkId] === loadPromise) {
-        delete promiseCache[normalizedChunkId];
-      }
-      chunkRequestsByRequest.delete(request);
-    };
-    void loadPromise.then(clearCachedLoadPromise, clearCachedLoadPromise);
-    return loadPromise;
-  }
-
   function getCurrentScenarioChunkViewportBbox() {
     return typeof runtimeState.getViewportGeoBoundsFn === "function"
       ? runtimeState.getViewportGeoBoundsFn()
@@ -2566,13 +2310,16 @@ function createScenarioChunkRuntimeController({
           }))
           .filter((entry) => entry.payload),
       );
-      const layerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle);
-      const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, {
+      const layerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState());
+      const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, ensureActiveScenarioChunkState(), {
+        mergeScenarioChunkPayloads,
+        mergeScenarioChunkPayloadsForViewport,
         previousSignatures: {},
         nextSignatures: layerSignatures,
         previousMergedLayerPayloads: {},
         viewportBbox: coarseSelection.viewportBbox || [...SCENARIO_CHUNK_FULL_WORLD_BBOX],
       });
+      setScenarioChunkMergedLayerPayloadsState(runtimeState, mergedResult.mergedLayerPayloads);
       const mergedLayerPayloads = mergedResult.mergedLayerPayloads;
       patchScenarioChunkLoadState(runtimeState, {
         layerSelectionSignatures: layerSignatures,
@@ -3001,15 +2748,18 @@ function createScenarioChunkRuntimeController({
     }
     const previousLayerSignatures = loadState.layerSelectionSignatures || {};
     const activeMergeChunkIds = getScenarioChunkActiveMergeIds(chunkState, selection);
-    const nextLayerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, activeMergeChunkIds);
+    const nextLayerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState(), activeMergeChunkIds);
     const chunkMergeStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, {
+    const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, ensureActiveScenarioChunkState(), {
+        mergeScenarioChunkPayloads,
+        mergeScenarioChunkPayloadsForViewport,
       previousSignatures: previousLayerSignatures,
       nextSignatures: nextLayerSignatures,
       previousMergedLayerPayloads: loadState.mergedLayerPayloadCache || chunkState.mergedLayerPayloads || {},
       activeChunkIds: activeMergeChunkIds,
       viewportBbox: selection.viewportBbox || viewportBbox,
     });
+    setScenarioChunkMergedLayerPayloadsState(runtimeState, mergedResult.mergedLayerPayloads);
     const chunkMergeEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     recordScenarioChunkRuntimeMetric("chunkMergeMs", chunkMergeEndedAt - chunkMergeStartedAt, {
       scenarioId,

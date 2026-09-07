@@ -106,6 +106,23 @@ test("core runner edits use declared aggregate coverage without unrelated domain
   }
 });
 
+test("renderer and scenario convergence selects owner behavior and live assembly coverage", () => {
+  const cases = [
+    ["js/core/renderer/city_paint_style_model.js", ["node --test tests/city_paint_style_model_behavior.test.mjs", "test:node:renderer-surface-host"]],
+    ["js/core/renderer/city_label_owner.js", ["test:node:renderer-surface-host"]],
+    ["js/core/scenario/chunk_payload_loader.js", ["node --test tests/scenario_chunk_payload_loader_behavior.test.mjs", "node --test tests/scenario_chunk_cancellation_behavior.test.mjs", "test:node:scenario-chunk-contracts:quick"]],
+    ["js/core/scenario/chunk_layer_payloads.js", ["node --test tests/scenario_chunk_layer_payloads_behavior.test.mjs", "test:node:scenario-chunk-contracts:quick"]],
+    ["js/core/scenario/optional_layer_runtime.js", ["node --test tests/scenario_optional_layers_behavior.test.mjs"]],
+  ];
+  for (const [source, expectedCommands] of cases) {
+    const selection = buildRepositoryRecommendation([source]);
+    assert.deepEqual(selection.unmatchedChangedFiles, [], source);
+    for (const commandRef of expectedCommands) {
+      assert.ok(selection.recommendedCommands.some((entry) => entry.commandRef === commandRef), `${source}: ${commandRef}`);
+    }
+  }
+});
+
 test("local owner feedback selects existing behavior without admitting broader roots", () => {
   const cases = [
     ["js/core/renderer/ocean_render_owner.js", "tests/ocean_render_owner_behavior.test.mjs"],

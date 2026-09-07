@@ -116,6 +116,7 @@ test("renderer owner wiring remains lazy and preserves live host and global read
     OperationGraphicsEditorRenderOwner: {},
     StaticBorderMeshLifecycle: {},
     ScenarioRegionOverlayRenderOwner: {},
+    CityPaintStyleModel: {},
     RenderPassCacheHostOwner: {},
     RenderPassCommitAccountingOwner: {},
   };

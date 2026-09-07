@@ -31,3 +31,25 @@ Pages build and required-files/mirror contract1/1 completed successfully. Third 
 No round4. Real localhost mouse smoke passed operation vertex selection/drag, unit drag and physical point pointerup; each gesture adds exactly one history entry. Native releasePointerCapture causes trusted lostpointercapture and one commit, subsequent pointerup adds none. Native pointercancel and quantitative raster/performance comparisons remain untested. Browser fixture preparation issue corrected without production changes. Final console0 errors/0 warnings; browser/server closed, owned metadata removed.
 
 Cumulative review found one missing sourceRef for the actual-import regression; corrected map_renderer.js -> renderer-surface-host route and verified selector/schema443. Reviewer final PASS WITH NOTES. Closeout commit contains routing and this delivery record only; production/dist remain e996be14. Ten new policy locations and preexisting unit model debt remain explicit, with getter writes/effects and trusted-policy command sequence in context. Ready for parent integration decision, not full P4/release admission. No push/merge/deploy performed.
+
+## Continued batch after PR121 — implementation frozen, integration running
+
+Three independent implementation lanes completed: city paint style model + placement in existing city-label owner; chunk payload request/cache owner + shared layer payload derivation; optional acquisition/visibility runtime with original active-state writer retained in facade. Renderer15,868 ->15,598; chunk controller3,641 ->3,391. These are responsibility reductions, not performance measurements.
+
+Passed: renderer Node25/Python4; chunk quick+cancellation66 and new owner6; optional/apply ownership/diagnostics43 (optional14 rerun after fixture cleanup); resources Python18; architecture; direct-write allowlist118 projected/73 observed after retaining optional writer; exact P4.3 renderer replacement1; route schema448; route regression1; script portfolio342; local infra Node224/Python63. Full file-set selector has no unmatched before dist; repeat once for final generated file set.
+
+Known inherited tests: chunk state-actions boundary+refresh40/41, with activation_actions importing special_zone_actions while its unchanged test requires no imports. Both existed at731afead. Five toolbar source-position assertions fail identically using731afead source; toolbar test remains unchanged. No thresholds/allowlists altered.
+
+Policy increment: city paint factory runtimeState1 binding/4 findings; chunk loader factory runtimeState1 binding/0 direct findings plus canonical delegated actions; optional runtime state1 binding/38 findings. All3 new locations unregistered. Existing city-label/new chunk-layer scans0 retained bindings do not prove absence of alias writes or delegated effects. Prior10 new locations and existing unit-display gap remain separate. No full P4 or policy write.
+
+Canonical Pages build and independent bounded review in progress. No browser/performance/full P4/remote CI/merge/release claim for this batch.
+
+Final Pages builder and required-files/source-mirror1/1 passed. Full changed-file selector unmatched=[] including dist. Resources facade1,266 ->904, new optional runtime381. All live build/test processes ended; awaiting independent review before local commit.
+
+## Continued batch closeout — complete
+
+Independent reviewer PASS WITH NOTES, no material findings; independent48 targeted Node pass. Complete36-file route selector unmatched=[]; final source/dist parity confirmed. Formal3-binding policy increment and inherited6 source-contract failures remain explicitly documented. One local reviewable batch commit follows; report parent01a075b3-61a1-76d2-999b-415e21460c36 and stop. No further batch, push, merge or release.
+
+## Inherited source-contract follow-up — complete
+
+All6 previously documented failing methods repaired and passed (5 unchanged toolbar successes from six-method run, then1 action success after fixing its masked presentation-import expectation). Exact canonical named imports/target calls are constrained; singleton/noncanonical/global-effect exclusions retained. Toolbar assertions track real facade/action/brush ownership while preserving behavior and wiring checks. No production or dist edits; prior dist/tests reused. This supersedes the inherited6-failure status above; formal3-binding P4 increment remains unresolved and separate. Follow-up local contract-only commit for parent integration; no push/merge.

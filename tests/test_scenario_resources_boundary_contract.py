@@ -5,6 +5,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_RESOURCES = REPO_ROOT / "js" / "core" / "scenario_resources.js"
+SCENARIO_OPTIONAL_LAYER_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "optional_layer_runtime.js"
 SCENARIO_BUNDLE_LOADER = REPO_ROOT / "js" / "core" / "scenario" / "bundle_loader.js"
 SCENARIO_BUNDLE_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "bundle_runtime.js"
 SCENARIO_CHUNK_RUNTIME = REPO_ROOT / "js" / "core" / "scenario" / "chunk_runtime.js"
@@ -104,6 +105,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("bundle.deferredMetadataCommitLease !== commitLease", content)
         self.assertIn("const leaseContext = commitLease.currentnessContext;", content)
         self.assertIn("function applyScenarioOptionalLayerState(", content)
+        self.assertIn("createScenarioOptionalLayerRuntime({", content)
         self.assertIn("scenarioApplyRequestId = 0", content)
         self.assertIn("isScenarioApplyRequestCurrent = null", content)
         self.assertIn("shouldContinueScenarioApplyContext({", content)
@@ -111,7 +113,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("state.scenarioApplyInFlight", content)
 
     def test_optional_layer_load_failures_remain_retryable(self):
-        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+        content = SCENARIO_OPTIONAL_LAYER_RUNTIME.read_text(encoding="utf-8")
 
         failure_block = re.search(
             r'console\.warn\(`\[scenario\] Failed to load scenario \$\{layerKey\} layer.*?return null;',
@@ -196,7 +198,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         manager_content = SCENARIO_MANAGER.read_text(encoding="utf-8")
 
         self.assertIn("./scenario/chunk_runtime.js", resources_content)
-        self.assertIn("chunkPayloadPromisesById", chunk_runtime_content)
+        self.assertIn("chunkPayloadPromisesById", (REPO_ROOT / "js/core/scenario/chunk_payload_loader.js").read_text(encoding="utf-8"))
         self.assertIn("hasScenarioMergedLayerPayload(mergedLayerPayloads, layerKey)", chunk_runtime_content)
         self.assertNotIn("bundle.chunkMergedLayerPayloads", resources_content)
         self.assertNotIn("chunkMergedLayerPayloads:", resources_content)
