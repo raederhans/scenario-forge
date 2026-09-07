@@ -1,0 +1,148 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  createStaticBorderMeshLifecycle,
+  getCoastlineDecisionSignature,
+  getSourceCountriesSignature,
+} from "../js/core/renderer/static_border_mesh_lifecycle.js";
+
+function harness() {
+  const events = [];
+  const pending = new Map();
+  let nextId = 0;
+  let settled = true;
+  let admitted = true;
+  let detailState = { signature: "", status: "idle" };
+  let sourceCountries = { primary: new Set(), detail: new Set(["AA"]) };
+  let viewport = { minX: 0, minY: 0, maxX: 10, maxY: 10 };
+  let mesh = { coordinates: [[1, 2]] };
+  let shouldThrow = false;
+  const state = {
+    topologyRevision: 1, topologyDetail: { id: "detail-1" }, zoomTransform: { k: 5 },
+    spatialItems: [{ countryCode: "aa", minX: 1, minY: 1, maxX: 2, maxY: 2 }],
+    cachedProvinceBorders: [], cachedProvinceBordersByCountry: new Map(),
+    cachedLocalBorders: [], cachedLocalBordersByCountry: new Map(), cachedDetailAdmBorders: [],
+  };
+  const owner = createStaticBorderMeshLifecycle({
+    runtimeState: state,
+    getStaticMeshSourceCountries: () => sourceCountries,
+    getDetailAdmMeshBuildState: () => detailState,
+    setDetailAdmMeshBuildState: (next) => { detailState = next; },
+    getContextBaseZoomBucketId: (k) => Math.floor(k),
+    getProjectedViewportBounds: () => viewport,
+    VIEWPORT_CULL_OVERSCAN_PX: 20,
+    canonicalCountryCode: (code) => code.toUpperCase(),
+    cancelDeferredWork: (handle) => { events.push(["cancel", handle]); pending.delete(handle); },
+    scheduleDeferredWork: (callback, options) => { const id = ++nextId; pending.set(id, callback); events.push(["schedule", options.timeout]); return id; },
+    isInteractionRecoverySettled: (options) => { events.push(["settled", options.quietMs]); return settled; },
+    beginInteractionRecoveryTask: (key) => { events.push(["begin", key]); return admitted; },
+    endInteractionRecoveryTask: (key) => events.push(["end", key]),
+    nowMs: () => 10,
+    PROVINCE_BORDERS_TRANSITION_END_ZOOM: 2,
+    LOCAL_BORDERS_MIN_ZOOM: 3,
+    DETAIL_ADM_BORDERS_MIN_ZOOM: 4,
+    ensureCountrySourceBorderMeshes: (code, options) => {
+      if (shouldThrow) throw new Error("build failure");
+      events.push(["country", code, options]);
+      if (options.includeProvince) state.cachedProvinceBordersByCountry.set(code, []);
+      if (options.includeLocal) state.cachedLocalBordersByCountry.set(code, []);
+    },
+    buildDetailAdmBorderMesh: (topology, countries) => { events.push(["detail", topology, [...countries]]); return mesh; },
+    isUsableMesh: (value) => !!value,
+    replaceDetailAdmBorders: (meshes) => { state.cachedDetailAdmBorders = meshes; events.push(["replace", meshes]); },
+    syncStaticMeshSnapshot: () => events.push(["snapshot"]),
+    invalidateRenderPasses: (...args) => events.push(["invalidate", ...args]),
+    render: () => events.push(["render"]),
+    recordInteractionRecoveryTaskMetric: (...args) => events.push(["metric", ...args]),
+  });
+  return {
+    owner, state, events, pending,
+    run() { const [id, callback] = pending.entries().next().value; pending.delete(id); callback(); },
+    getDetailState: () => detailState,
+    setSettled: (value) => { settled = value; }, setAdmitted: (value) => { admitted = value; },
+    setSourceCountries: (value) => { sourceCountries = value; },
+    setViewport: (value) => { viewport = value; }, setMesh: (value) => { mesh = value; },
+    throwOnBuild: () => { shouldThrow = true; },
+  };
+}
+
+test("deferred mesh work replaces pending jobs and retries only recovery gates", () => {
+  const h = harness(); h.owner.scheduleDeferredHeavyBorderMeshes(); h.owner.scheduleDeferredHeavyBorderMeshes();
+  assert.equal(h.pending.size, 1);
+  h.setSettled(false); h.run();
+  assert.equal(h.pending.size, 1); assert.equal(h.events.some(([name]) => name === "begin"), false);
+  h.setSettled(true); h.setAdmitted(false); h.run();
+  assert.equal(h.pending.size, 1); assert.equal(h.events.some(([name]) => name === "country"), false);
+  h.owner.cancelDeferredHeavyBorderMeshes(); assert.equal(h.pending.size, 0);
+  assert.ok(h.events.filter(([name]) => name === "schedule").every(([, timeout]) => timeout === 360));
+});
+
+test("deferred work reads execution-time topology, zoom and sources then snapshots before rendering", () => {
+  const h = harness(); h.owner.scheduleDeferredHeavyBorderMeshes();
+  h.state.topologyRevision = 2; h.state.topologyDetail = { id: "detail-2" };
+  h.state.zoomTransform = { k: 6 };
+  h.state.spatialItems = [{ countryCode: "bb", minX: 1, minY: 1, maxX: 2, maxY: 2 }];
+  h.setSourceCountries({ detail: new Set(["BB"]) }); h.run();
+  assert.deepEqual(h.events.find(([name]) => name === "detail"), ["detail", h.state.topologyDetail, ["BB"]]);
+  assert.deepEqual(h.getDetailState(), { signature: "2|6|BB", status: "ready" });
+  const names = h.events.map(([name]) => name);
+  assert.ok(names.indexOf("snapshot") < names.indexOf("invalidate"));
+  assert.ok(names.indexOf("invalidate") < names.indexOf("render"));
+  assert.equal(names.at(-1), "end");
+  h.events.length = 0; h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+  assert.equal(h.events.some(([name]) => name === "detail" || name === "render" || name === "snapshot"), false);
+});
+
+test("empty detail results settle once without rendering and re-evaluate on signature change", () => {
+  const h = harness(); h.setMesh(null);
+  h.state.cachedProvinceBordersByCountry.set("AA", []); h.state.cachedLocalBordersByCountry.set("AA", []);
+  h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+  assert.equal(h.getDetailState().status, "empty");
+  assert.equal(h.events.filter(([name]) => name === "snapshot").length, 1);
+  assert.equal(h.events.some(([name]) => name === "render"), false);
+  h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+  assert.equal(h.events.filter(([name]) => name === "detail").length, 1);
+  h.state.topologyRevision += 1; h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+  assert.equal(h.events.filter(([name]) => name === "detail").length, 2);
+});
+
+test("recovery task is released on early exits and mesh errors", () => {
+  const h = harness(); h.state.zoomTransform.k = 1;
+  h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+  assert.equal(h.events.at(-1)[0], "end");
+  assert.equal(h.events.some(([name]) => name === "country"), false);
+  h.state.zoomTransform.k = 5; h.throwOnBuild(); h.owner.scheduleDeferredHeavyBorderMeshes();
+  assert.throws(() => h.run(), /build failure/);
+  assert.equal(h.events.at(-1)[0], "end"); assert.equal(h.pending.size, 0);
+});
+
+test("visible-country cache returns detached sets and invalidates with viewport and explicit reset", () => {
+  const h = harness();
+  const first = h.owner.getVisibleCountryCodesForBorderMeshes(); first.clear();
+  assert.deepEqual([...h.owner.getVisibleCountryCodesForBorderMeshes()], ["AA"]);
+  h.setViewport({ minX: 20, minY: 20, maxX: 30, maxY: 30 });
+  assert.equal(h.owner.getVisibleCountryCodesForBorderMeshes().size, 0);
+  h.state.spatialItems[0] = { borderMeshCountryCode: "cc", minX: 21, minY: 21, maxX: 22, maxY: 22 };
+  h.owner.resetVisibleCountryCodesCache();
+  assert.deepEqual([...h.owner.getVisibleCountryCodesForBorderMeshes()], ["CC"]);
+  h.setViewport(null); assert.equal(h.owner.getVisibleCountryCodesForBorderMeshes().size, 0);
+});
+
+test("snapshot copies collections while preserving mesh identities and current detail state", () => {
+  const h = harness(); const mesh = { id: "mesh" };
+  h.state.cachedCountryBorders = [mesh]; h.state.cachedProvinceBordersByCountry.set("AA", [mesh]);
+  const snapshot = h.owner.captureStaticMeshSnapshot();
+  assert.notEqual(snapshot.cachedCountryBorders, h.state.cachedCountryBorders);
+  assert.equal(snapshot.cachedCountryBorders[0], mesh);
+  assert.notEqual(snapshot.cachedProvinceBordersByCountry, h.state.cachedProvinceBordersByCountry);
+  assert.equal(snapshot.cachedProvinceBordersByCountry.get("AA"), h.state.cachedProvinceBordersByCountry.get("AA"));
+  snapshot.detailAdmMeshBuildState.status = "empty"; assert.equal(h.getDetailState().status, "idle");
+});
+
+test("source signature is order-independent and coastline signature tracks decision fields", () => {
+  assert.equal(getSourceCountriesSignature({ primary: new Set(["BB", "AA"]), detail: new Set(["CC"]) }), "primary:AA,BB|detail:CC");
+  assert.equal(getCoastlineDecisionSignature(null), "");
+  const decision = { scenarioSurfaceVersionSignal: "a", source: "runtime", scenarioId: "tno" };
+  assert.notEqual(getCoastlineDecisionSignature(decision), getCoastlineDecisionSignature({ ...decision, scenarioSurfaceVersionSignal: "b" }));
+  assert.notEqual(getCoastlineDecisionSignature(decision), getCoastlineDecisionSignature({ ...decision, runtimeInteriorRingRatio: 0.5 }));
+});

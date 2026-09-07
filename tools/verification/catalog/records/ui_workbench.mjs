@@ -1069,6 +1069,7 @@ export const UI_WORKBENCH_RECORDS = [
     "id": "node:test:node:physical-layer-contracts",
     "commandRef": "test:node:physical-layer-contracts",
     "sourceRefs": [
+      "js/core/renderer/physical_intensity_interaction_owner.js",
       "tests/physical_layer_contracts.test.mjs"
     ],
     "ownerHints": [

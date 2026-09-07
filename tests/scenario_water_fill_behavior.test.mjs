@@ -6,16 +6,17 @@ import vm from "node:vm";
 import { parse } from "acorn";
 
 const rendererSource = readFileSync(
-  new URL("../js/core/map_renderer.js", import.meta.url),
+  new URL("../js/core/renderer/scenario_region_overlay_render_owner.js", import.meta.url),
   "utf8",
 );
 
 function extractFunctionSource(source, functionName) {
   const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
-  const declaration = ast.body.find((node) => (
+  const factory = ast.body.find((node) => node.type === "ExportNamedDeclaration").declaration;
+  const declaration = factory.body.body.find((node) => (
     node.type === "FunctionDeclaration" && node.id?.name === functionName
   ));
-  assert.ok(declaration, `map_renderer must define ${functionName}`);
+  assert.ok(declaration, `scenario region overlay owner must define ${functionName}`);
   return source.slice(declaration.start, declaration.end);
 }
 

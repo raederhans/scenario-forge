@@ -5208,8 +5208,7 @@ function collectFailures() {
         "return getProjectedGeometryBoundsOwner().getProjectedFeatureBounds(feature, { featureId, allowCompute });",
         "return getProjectedGeometryBoundsOwner().sanitizeWaterRegionFeatures(features);",
         "collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,",
-        "let scenarioWaterPartPathCache = new WeakMap();",
-        "let scenarioWaterFeaturePathCache = new WeakMap();",
+        "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();",
       ],
       rendererForbiddenTokens: [
         "const sphericalGeometryDiagnosticsByObject = new WeakMap();",
@@ -5667,6 +5666,27 @@ function collectFailures() {
       ],
     },
   ];
+
+  const scenarioRegionOwnerPath = "js/core/renderer/scenario_region_overlay_render_owner.js";
+  sources[scenarioRegionOwnerPath] = readProjectFile(scenarioRegionOwnerPath);
+  ownershipRules.push({
+    ownerPath: scenarioRegionOwnerPath,
+    ownerTokens: [
+      "let scenarioWaterPartPathCache = new WeakMap();",
+      "let scenarioWaterFeaturePathCache = new WeakMap();",
+      "function resetWaterPathCaches()",
+      "function drawScenarioRegionOverlaysPass(k)",
+    ],
+    rendererRequiredTokens: [
+      "createScenarioRegionOverlayRenderOwner({",
+      "return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);",
+      "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();",
+    ],
+    rendererForbiddenTokens: [
+      "let scenarioWaterPartPathCache = new WeakMap();",
+      "let scenarioWaterFeaturePathCache = new WeakMap();",
+    ],
+  });
 
   for (const rule of ownershipRules) {
     const ownerSource = sources[rule.ownerPath];
