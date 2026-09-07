@@ -19,11 +19,112 @@ import {
 import {
   createScenarioDisplayRestoreRuntime,
 } from "../js/core/scenario/presentation_display_restore.js";
+import { normalizeScenarioPerformanceHints } from "../js/core/scenario/presentation_hint_helpers.js";
 import {
   STATE_BUS_EVENTS,
   off,
   subscribeStateBusEvent,
 } from "../js/core/state/index.js";
+
+test("health normalization preserves distinct numeric fallback contracts", () => {
+  const cases = [
+    { value: undefined, count: 0, ratio: 1, minimum: 0.6, overlapCount: 0 },
+    { value: null, count: 0, ratio: 0, minimum: 0.6, overlapCount: 0 },
+    { value: "", count: 0, ratio: 0, minimum: 0.6, overlapCount: 0 },
+    { value: "invalid", count: 0, ratio: 1, minimum: 0.6, overlapCount: 0 },
+    { value: NaN, count: 0, ratio: 1, minimum: 0.6, overlapCount: 0 },
+    { value: Infinity, count: Infinity, ratio: 1, minimum: Infinity, overlapCount: 0 },
+    { value: -Infinity, count: -Infinity, ratio: 1, minimum: -Infinity, overlapCount: 0 },
+    { value: "-2.5", count: -2.5, ratio: -2.5, minimum: -2.5, overlapCount: -2.5 },
+    { value: false, count: 0, ratio: 0, minimum: 0.6, overlapCount: 0 },
+  ];
+  for (const { value, count, ratio, minimum, overlapCount } of cases) {
+    const healthInput = Object.freeze({
+      expectedFeatureCount: value,
+      runtimeFeatureCount: value,
+      ratio: value,
+      minRatio: value,
+    });
+    const gateInput = Object.freeze({
+      checkedAt: 42,
+      ownerFeatureOverlapRatio: value,
+      ownerFeatureOverlapCount: value,
+      ownerFeatureRenderedCount: value,
+    });
+    const health = normalizeScenarioDataHealthState(healthInput, 0.6);
+    const gate = normalizeScenarioHydrationHealthGateState(gateInput);
+    assert.deepEqual(
+      [health.expectedFeatureCount, health.runtimeFeatureCount, health.ratio, health.minRatio],
+      [count, count, ratio, minimum],
+      `data health input: ${String(value)}`,
+    );
+    assert.deepEqual(
+      [gate.ownerFeatureOverlapRatio, gate.ownerFeatureOverlapCount, gate.ownerFeatureRenderedCount],
+      [ratio, overlapCount, overlapCount],
+      `hydration health input: ${String(value)}`,
+    );
+  }
+});
+
+test("health normalization retains defaults and extension fields without changing input", () => {
+  for (const input of [undefined, null, false, "invalid", 42]) {
+    assert.deepEqual(normalizeScenarioDataHealthState(input), {
+      expectedFeatureCount: 0,
+      runtimeFeatureCount: 0,
+      ratio: 1,
+      minRatio: 0.7,
+      generatedColorTags: [],
+      warning: "",
+      severity: "",
+    });
+  }
+  for (const fallback of [undefined, null, 0, NaN, "invalid"]) {
+    assert.equal(normalizeScenarioDataHealthState({ minRatio: 0 }, fallback).minRatio, 0.7);
+  }
+  const extension = Object.freeze({ source: "import" });
+  const generatedColorTags = Object.freeze(["AA"]);
+  const input = Object.freeze({ generatedColorTags, extension, checkedAt: 42 });
+  const health = normalizeScenarioDataHealthState(input);
+  const gate = normalizeScenarioHydrationHealthGateState(input);
+  assert.equal(health.extension, extension);
+  assert.equal(gate.extension, extension);
+  health.generatedColorTags.push("BB");
+  assert.deepEqual(input.generatedColorTags, ["AA"]);
+  assert.deepEqual(normalizeScenarioDataHealthState({ generatedColorTags: "AA" }).generatedColorTags, []);
+});
+
+test("hydration health uses the current time only for empty or invalid timestamps", (t) => {
+  const now = t.mock.method(Date, "now", () => 123456);
+  for (const checkedAt of [undefined, null, 0, "", NaN, "invalid"]) {
+    assert.equal(normalizeScenarioHydrationHealthGateState({ checkedAt }).checkedAt, 123456);
+  }
+  assert.equal(normalizeScenarioHydrationHealthGateState().checkedAt, 123456);
+  assert.equal(now.mock.callCount(), 7);
+  for (const [checkedAt, expected] of [["42", 42], [-1, -1], [Infinity, Infinity]]) {
+    assert.equal(normalizeScenarioHydrationHealthGateState({ checkedAt }).checkedAt, expected);
+  }
+  assert.equal(now.mock.callCount(), 7);
+});
+
+test("scenario performance hints share one default shape and preserve explicit false", () => {
+  const defaults = {
+    renderProfileDefault: "",
+    dynamicBordersDefault: null,
+    parentBordersDefault: null,
+    scenarioReliefOverlaysDefault: null,
+    scenarioAtlantropaDefault: null,
+    waterRegionsDefault: null,
+    specialRegionsDefault: null,
+  };
+  for (const performance_hints of [undefined, null, false, "full", {}, []]) {
+    assert.deepEqual(normalizeScenarioPerformanceHints({ performance_hints }), defaults);
+  }
+  assert.deepEqual(normalizeScenarioPerformanceHints({ performance_hints: {
+    render_profile_default: " FULL ", dynamic_borders_default: false,
+    parent_borders_default: true, water_regions_default: "false",
+    special_regions_default: 0,
+  } }), { ...defaults, renderProfileDefault: "full", dynamicBordersDefault: false, parentBordersDefault: true });
+});
 
 test("scenario health actions normalize writes through the runtime-state read contract", () => {
   const target = {};

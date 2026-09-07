@@ -139,16 +139,11 @@ function loadScenarioJsonWithTimeout(
   loadMeasuredJsonResourceFn,
   d3Client,
   url,
-  { scenarioId = "", resourceLabel = "resource" } = {}
+  options = {}
 ) {
-  return withScenarioLoadTimeout(
-    loadMeasuredJsonResourceFn(cacheBust(url), {
-      d3Client,
-      label: `scenario:${resourceLabel}`,
-    }).then((result) => result.payload),
-    SCENARIO_LOAD_TIMEOUT_MS,
-    { scenarioId, resourceLabel }
-  );
+  return loadScenarioJsonResourceWithTimeout(
+    loadMeasuredJsonResourceFn, d3Client, url, options,
+  ).then((result) => result.payload);
 }
 
 function loadScenarioJsonResourceWithTimeout(
@@ -184,30 +179,6 @@ function validateScenarioRequiredResourcePayload(
     );
   }
   return payload;
-}
-
-async function loadRequiredScenarioResource(
-  loadMeasuredJsonResourceFn,
-  d3Client,
-  url,
-  {
-    scenarioId = "",
-    resourceLabel = "resource",
-    requiredField = "",
-  } = {}
-) {
-  if (!url) {
-    throw new Error(`[scenario] Required resource "${resourceLabel}" is missing for "${scenarioId}".`);
-  }
-  const payload = await loadScenarioJsonWithTimeout(loadMeasuredJsonResourceFn, d3Client, url, {
-    scenarioId,
-    resourceLabel,
-  });
-  return validateScenarioRequiredResourcePayload(payload, {
-    scenarioId,
-    resourceLabel,
-    requiredField,
-  });
 }
 
 async function loadOptionalScenarioResource(
@@ -323,7 +294,6 @@ export {
   loadScenarioJsonWithTimeout,
   loadScenarioJsonResourceWithTimeout,
   validateScenarioRequiredResourcePayload,
-  loadRequiredScenarioResource,
   loadOptionalScenarioResource,
   loadMeasuredRequiredScenarioResource,
   normalizeScenarioId,

@@ -3,18 +3,8 @@ import {
 } from "./pure_helpers.js";
 
 function normalizeScenarioPerformanceHints(manifest) {
-  const raw = manifest?.performance_hints;
-  if (!raw || typeof raw !== "object") {
-    return {
-      renderProfileDefault: "",
-      dynamicBordersDefault: null,
-      parentBordersDefault: null,
-      scenarioReliefOverlaysDefault: null,
-      scenarioAtlantropaDefault: null,
-      waterRegionsDefault: null,
-      specialRegionsDefault: null,
-    };
-  }
+  const hints = manifest?.performance_hints;
+  const raw = hints && typeof hints === "object" ? hints : {};
   const renderProfileDefault = String(raw.render_profile_default || "").trim().toLowerCase();
   return {
     renderProfileDefault: SCENARIO_RENDER_PROFILES.has(renderProfileDefault) ? renderProfileDefault : "",

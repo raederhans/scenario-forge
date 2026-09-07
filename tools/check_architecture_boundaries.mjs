@@ -5108,11 +5108,11 @@ function collectFailures() {
       rendererRequiredTokens: [
         "let hgoRuntimePreviewRenderOwner = null;",
         "createHgoRuntimePreviewRenderOwner({",
-        "return getHgoRuntimePreviewRenderOwner().renderIfReady(reason, options);",
         "return getHgoRuntimePreviewRenderOwner().inspectFromEvent(event, { eventType });",
         "getHgoRuntimePreviewRenderOwner().drawPreviewPass();",
       ],
       rendererForbiddenTokens: [
+        "function renderHgoRuntimePreviewIfReady(",
         "const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES =",
         "function getHgoRuntimePreviewCanvasPointFromEvent(",
         "const HGO_RUNTIME_PREVIEW_PROJECTION_NAME =",

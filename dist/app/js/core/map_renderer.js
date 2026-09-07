@@ -3,6 +3,73 @@
 // runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
 // 只有真正跨域的 orchestration 才继续放在本文件。
 import {
+  getLineMidpointFromCoordinates,
+  getMultiLineLabelAnchor,
+  getOperationGraphicPreset,
+  getOperationalLinePreset,
+  getOperationGraphicMinPoints,
+  getOperationalLineMinPoints,
+  normalizeOperationGraphicStylePreset,
+  normalizeOperationalLineStylePreset,
+  normalizeOperationGraphicStroke,
+  normalizeOperationGraphicWidth,
+  normalizeOperationGraphicOpacity,
+  getOperationGraphicEditorMidpoints,
+  getOperationGraphicLabelAnchor,
+  DEFAULT_OPERATION_GRAPHIC_KIND,
+  DEFAULT_OPERATIONAL_LINE_KIND,
+  OPERATION_GRAPHIC_STYLE_PRESETS,
+  OPERATIONAL_LINE_STYLE_PRESETS,
+} from "./renderer/operation_graphic_geometry.js";
+import {
+  createUnitCounterDisplayModel,
+  normalizeUnitCounterStatPercent,
+  normalizeUnitCounterStatsPresetId,
+  normalizeUnitCounterBaseFillColor,
+  getNormalizedUnitCounterCombatState,
+  normalizeUnitCounterNationSource,
+  getUnitCounterSlotOffset,
+  compareUnitCounterRenderOrder,
+  getUnitCounterNodeTransform,
+  DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+  DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+  DEFAULT_UNIT_COUNTER_BASE_FILL,
+  DEFAULT_UNIT_COUNTER_RENDERER,
+} from "./renderer/unit_counter_display_model.js";
+import {
+  getCityCanonicalId,
+  getCityTier,
+  getCityTierWeight,
+  getDefaultCityMinZoomForTier,
+  getCityEffectiveMinZoom,
+  getUrbanFeatureStableId,
+  getCityCapitalScore,
+  getCitySortWeight,
+  getCityCountryTierFromScenarioRecord,
+  getCityCountryVisibilityClass,
+  isCityScenarioTagExcludedFromReveal,
+  getCityCountryRevealOverride,
+  getFallbackCityCountryTier,
+  getCityRevealPhase,
+  getCityRevealPhaseInterpolation,
+  getCityRevealBucket,
+  getCityMarkerDensityMultiplier,
+  getCityInterpolatedMarkerQuota,
+  getCityInterpolatedMarkerBudget,
+  getCityPriorityCountryReserveBudget,
+  getCityPriorityCountryReserveRank,
+  compareCityRevealEntries,
+  getCityLabelBudget,
+  isCityLabelEligibleForPhase,
+  getCityLabelMinZoom,
+  getCityMarkerSizePx,
+  CITY_COUNTRY_TIER_RANK,
+  CITY_COUNTRY_CLASS_RANK,
+  CITY_PRIMARY_POWER_TAGS,
+  CITY_SECONDARY_POWER_TAGS,
+  CITY_MARKER_SIZE_LIMITS_PX,
+} from "./renderer/city_reveal_policy.js";
+import {
   bumpColorRevision, normalizeCityLayerStyleConfig,
   normalizeColorStateForRender, normalizeDayNightStyleConfig,
   INTENSITY_FIELD_CHANNEL_IDS, INTENSITY_FIELD_GRID,
@@ -85,6 +152,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager } from "./legend_manager.js";
+import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
 import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -116,10 +184,8 @@ import { fragmentCamouflageRules } from "./country_feature_policies.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
   getUnitCounterIconPathById,
-  getUnitCounterEchelonLabel,
   getUnitCounterPresetById,
   normalizeUnitCounterSizeToken,
-  UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
@@ -182,7 +248,6 @@ import { createHitCanvasSchedulingOwner } from "./map_renderer/hit_canvas_schedu
 import { createMapHoverInteractionOwner } from "./map_renderer/map_hover_interaction_owner.js";
 import {
   createClickSelectionTransactionOwner,
-  resolveClickSelectionDecision,
 } from "./map_renderer/click_selection_transaction_owner.js";
 import { createRendererTransactionResetOwner } from "./map_renderer/renderer_transaction_reset_owner.js";
 import { createScenarioRefreshRuntime } from "./map_renderer/scenario_refresh_runtime.js";
@@ -245,21 +310,27 @@ import { createVisibleFrameDiagnosticsOwner } from "./renderer/visible_frame_dia
 import { recordColorRebuildDiagnostics, recordPartialColorRefreshDiagnostics, recordPendingPoliticalColorEditClearDiagnostics, recordPoliticalPatchOverlayPaintDiagnostics, recordProgressivePoliticalFullCacheReadyDiagnostics, recordRenderPassInvalidationDiagnostics, recordVisibleFrameTransactionDiagnostics } from "./renderer/render_transaction_diagnostics.js";
 import { createIntensityFieldMaskOwner } from "./renderer/intensity_field_mask_owner.js";
 const state = runtimeState;
+const {
+  getUnitCounterCardModel,
+  getUnitCounterRenderEntries,
+  getUnitCounterRenderScale,
+} = createUnitCounterDisplayModel({
+  runtimeState,
+  canonicalCountryCode,
+  getScenarioCountryDisplayName,
+  ColorManager,
+  t,
+  getUnitCounterEffectiveSidc,
+  getMilSymbolDataUri,
+  getOperationalLineById,
+  getLineMidpointFromCoordinates,
+  clamp,
+});
 
 function showToast(message, options = {}) {
   callRuntimeHook(runtimeState, "showToastFn", message, options);
 }
 
-const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
-const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
-const DEFAULT_UNIT_COUNTER_BASE_FILL = "#f4f0e6";
-const UNIT_COUNTER_STATS_PRESETS = Object.freeze({
-  elite: Object.freeze({ organizationPct: 94, equipmentPct: 92 }),
-  regular: Object.freeze({ organizationPct: 82, equipmentPct: 78 }),
-  worn: Object.freeze({ organizationPct: 68, equipmentPct: 62 }),
-  understrength: Object.freeze({ organizationPct: 58, equipmentPct: 48 }),
-  improvised: Object.freeze({ organizationPct: 47, equipmentPct: 42 }),
-});
 
 const rendererSurfaceHost = createRendererSurfaceHost();
 let interactionInfrastructureBasicPromise = null;
@@ -507,9 +578,7 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
 ]);
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
-const DEFAULT_OPERATION_GRAPHIC_KIND = "attack";
-const DEFAULT_OPERATIONAL_LINE_KIND = "frontline";
-const DEFAULT_UNIT_COUNTER_RENDERER = "game";
+
 const DEFAULT_MILSTD_SIDC = "130310001412110000000000000000";
 const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
@@ -522,18 +591,12 @@ const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
   coal: "#3f3f46",
 });
 const STRATEGIC_RESOURCE_MARKER_STROKE = "#f8fafc";
-const OPERATION_GRAPHIC_STYLE_PRESETS = ["attack", "retreat", "supply", "naval", "encirclement", "theater"];
-const OPERATIONAL_LINE_STYLE_PRESETS = ["frontline", "offensive_line", "spearhead_line", "defensive_line"];
 const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 const milsymbolSvgUriCache = new Map();
 const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
 const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
 const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
-const UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN = Object.freeze({
-  small: 12,
-  medium: 14,
-  large: 18,
-});
+
 const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
   INF: DEFAULT_UNIT_COUNTER_SIDC,
   ARMORED: "130310001712110000000000000000",
@@ -546,39 +609,6 @@ const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\",
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
 const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
 const CITY_LABEL_DARK_BACKGROUND_LUMINANCE = 0.34;
-const CITY_COUNTRY_TIER_RANK = {
-  A: 5,
-  B: 4,
-  C: 3,
-  D: 2,
-  E: 1,
-};
-const CITY_COUNTRY_CLASS_RANK = Object.freeze({
-  global_core: 6,
-  regional_core: 5,
-  local_actor: 4,
-  fragmented_actor: 3,
-  micro: 2,
-  micro_subject: 1,
-});
-const CITY_COUNTRY_CLASS_WEIGHT = Object.freeze({
-  global_core: 1.36,
-  regional_core: 1.2,
-  local_actor: 1.02,
-  fragmented_actor: 1.12,
-  micro: 0.86,
-  micro_subject: 0.74,
-});
-const CITY_SCENARIO_EXCLUDED_TAGS = new Set(["AFA", "RFA"]);
-const CITY_WARLORD_SCENARIO_TAGS = new Set([
-  // Russia warlord/fragmentation bloc
-  "ALT", "BKR", "BRY", "CHT", "GOR", "IRK", "KOM", "KRS", "NOV", "OMS", "OUR", "PRM", "RSF",
-  "RUR", "SAM", "SBA", "SVR", "TAT", "TOM", "TYM", "URA", "VOL", "VYT", "WRS", "YAK", "ZLT",
-  // China warlord/clique bloc
-  "GXC", "GUI", "PRC", "QMA", "RGC", "SIC", "SIK", "XIK", "XSM",
-]);
-const CITY_PRIMARY_POWER_TAGS = new Set(["USA", "GER", "JAP"]);
-const CITY_SECONDARY_POWER_TAGS = new Set(["ITA", "ENG", "FRA", "CAN", "BRA", "BRG", "RKM", "RKO", "RKU"]);
 const CITY_MARKER_THEME_TOKENS = {
   classic_graphite: {
     fillTop: "rgba(82, 91, 103, 0.99)",
@@ -666,22 +696,6 @@ const bathymetryTopologyCacheByUrl = new Map();
 const bathymetryLoadPromiseByUrl = new Map();
 const bathymetryLoadFailureByUrl = new Map();
 const BATHYMETRY_LOAD_RETRY_COOLDOWN_MS = 10_000;
-const CITY_MARKER_SIZE_LIMITS_PX = {
-  minor: 10,
-  regional: 14,
-  major: 18,
-  capital: 22,
-};
-const CITY_MARKER_BASE_SIZES_PX = {
-  minor: 5.8,
-  regional: 7.7,
-  major: 10.4,
-};
-const CITY_LABEL_DENSITY_BUDGETS = {
-  sparse: { P4: 16, P5: 32 },
-  balanced: { P4: 24, P5: 48 },
-  dense: { P4: 32, P5: 64 },
-};
 const CITY_LABEL_MAX_WIDTH_PX = {
   sparse: { capital: 212, major: 186, regional: 164, minor: 150 },
   balanced: { capital: 188, major: 166, regional: 148, minor: 134 },
@@ -717,30 +731,6 @@ const CITY_ADMIN_LABEL_REJECT_PATTERNS = [
   /район/iu,
   /область/iu,
 ];
-const CITY_REVEAL_PHASES = [
-  { id: "P0", minScale: 0, maxScale: 1.15, markerBudget: 18, labelBudget: 0 },
-  { id: "P1", minScale: 1.15, maxScale: 1.45, markerBudget: 28, labelBudget: 0 },
-  { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 0 },
-  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 8 },
-  { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
-  { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
-];
-const CITY_MARKER_QUOTAS_BY_PHASE = Object.freeze({
-  P0: Object.freeze({ A: 1, B: 0, C: 0, D: 0, E: 0 }),
-  P1: Object.freeze({ A: 1, B: 1, C: 1, D: 1, E: 1 }),
-  P2: Object.freeze({ A: 3, B: 1, C: 1, D: 1, E: 1 }),
-  P3: Object.freeze({ A: 4, B: 2, C: 1, D: 1, E: 1 }),
-  P4: Object.freeze({ A: 6, B: 4, C: 2, D: 1, E: 1 }),
-  P5: Object.freeze({ A: 8, B: 6, C: 4, D: 2, E: 1 }),
-});
-const CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE = Object.freeze({
-  P0: 0.5,
-  P1: 0.5,
-  P2: 0.3,
-  P3: 0.3,
-  P4: 0,
-  P5: 0,
-});
 const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
 };
@@ -923,6 +913,7 @@ let intensityFieldMaskOwner = null;
 let hgoRuntimePreviewRenderOwner = null;
 let legendControlOwner = null;
 let selectionOverlayOwner = null;
+let transientOverlayRenderOwner = null;
 
 // --- owner 初始化区：getXxxOwner() 统一承载组装入口与依赖注入。 ---
 function markDevSelectionOverlayClean() {
@@ -931,6 +922,24 @@ function markDevSelectionOverlayClean() {
 
 function markInspectorOverlayClean() {
   runtimeState.inspectorOverlayDirty = false;
+}
+
+function getTransientOverlayRenderOwner() {
+  if (transientOverlayRenderOwner) return transientOverlayRenderOwner;
+  transientOverlayRenderOwner = createTransientOverlayRenderOwner({
+    runtimeState,
+    rendererSurfaceHost,
+    ensureSpecialZoneEditorState,
+    getSpecialZoneStyle,
+    DEFAULT_SPECIAL_ZONE_TYPE,
+    RENDER_PHASE_IDLE,
+    isSpecialRegionEnabled,
+    isWaterRegionEnabled,
+    getFeatureId,
+    getActiveFacilityHighlightEntry,
+    buildFacilityEntryKey,
+  });
+  return transientOverlayRenderOwner;
 }
 
 function getSelectionOverlayOwner() {
@@ -4150,12 +4159,6 @@ function invalidateOceanBackgroundVisualState(reason = "ocean-background") {
   clearRenderPassReferenceTransforms(["background", "physicalBase", "political", "contextBase", "contextScenario"]);
 }
 
-function invalidateOceanTextureVisualState(reason = "ocean-texture") {
-  cancelExactAfterSettleRefresh({ clearDefer: true });
-  invalidateRenderPasses(["background", "physicalBase", "effects"], reason);
-  clearRenderPassReferenceTransforms(["background", "physicalBase", "effects"]);
-}
-
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
   resetScenarioWaterCacheAdaptiveState(reason);
   cancelExactAfterSettleRefresh({ clearDefer: true });
@@ -4256,25 +4259,6 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
     committedFrameIdentity,
   });
   return true;
-}
-
-function noteBlackFrame(reason = "unknown") {
-  incrementPerfCounter("blackFrameCount");
-  const cache = getRenderPassCacheState();
-  const count = Number(cache.counters.blackFrameCount || 0);
-  setRenderPerfMetricEntryState(runtimeState, {
-    name: "blackFrameCount",
-    entry: {
-      count,
-      reason: String(reason || "unknown"),
-      recordedAt: Date.now(),
-    },
-  });
-  mirrorRenderPerfMetricSnapshot("blackFrameCount");
-  recordVisibleFrameTransactionMetric("missing", {
-    reason: String(reason || "unknown"),
-    paintSource: "black-frame",
-  });
 }
 
 function noteMissingVisibleFrame(reason = "unknown", { recordTransaction = true } = {}) {
@@ -5376,16 +5360,6 @@ function getFeatureId(feature) {
   return getSharedFeatureId(feature) || null;
 }
 
-function getWaterRegionName(feature) {
-  const rawName =
-    feature?.properties?.label ||
-    feature?.properties?.name ||
-    feature?.properties?.name_en ||
-    feature?.properties?.NAME ||
-    "Water Region";
-  return String(rawName || "").trim() || "Water Region";
-}
-
 function getWaterRegionType(feature) {
   return String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
 }
@@ -5576,16 +5550,6 @@ function getEffectiveWaterRegionFeatures() {
     ...(Array.isArray(runtimeState.waterRegionsData?.features) ? runtimeState.waterRegionsData.features : []),
     ...scenarioFeatures,
   ].filter((feature) => !isWaterRegionExcludedByScenario(feature)));
-}
-
-function getSpecialRegionName(feature) {
-  const rawName =
-    feature?.properties?.label ||
-    feature?.properties?.name ||
-    feature?.properties?.name_en ||
-    feature?.properties?.NAME ||
-    "Special Region";
-  return String(rawName || "").trim() || "Special Region";
 }
 
 function getSpecialRegionType(feature) {
@@ -5787,10 +5751,6 @@ function drawScenarioReliefOverlaysPass(k) {
 
 function getFeatureCountryCodeNormalized(feature) {
   return canonicalCountryCode(getSharedFeatureCountryCode(feature));
-}
-
-function getFeatureCountryCode(feature) {
-  return getFeatureCountryCodeNormalized(feature);
 }
 
 function getFeatureBorderMeshCountryCodeNormalized(feature) {
@@ -8085,10 +8045,6 @@ function getContourVisibleFeatures(
 const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
 const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
 
-function invalidateContextLayerVisualState(layerName, reason = "context-layer-loaded", { renderNow = true } = {}) {
-  return invalidateContextLayerVisualStateBatch([layerName], reason, { renderNow });
-}
-
 function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-layer-loaded", { renderNow = true } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
@@ -8295,12 +8251,6 @@ function getEntityCountryCode(entity) {
 function getEntityBorderMeshCountryCode(entity) {
   const featureLike = asFeatureLike(entity);
   return featureLike ? getFeatureBorderMeshCountryCodeNormalized(featureLike) : "";
-}
-
-function getEntityOwnerCode(entity) {
-  const featureId = getEntityFeatureId(entity);
-  if (!featureId) return "";
-  return getDisplayOwnerCode(asFeatureLike(entity), featureId);
 }
 
 function shouldExcludeOwnerBorderEntity(entity, { excludeSea = false } = {}) {
@@ -9305,10 +9255,6 @@ function getHgoRuntimePreviewProjectionOptions(overrides = {}) {
 }
 
 registerRuntimeHook(runtimeState, "getHgoRuntimePreviewProjectionOptionsFn", getHgoRuntimePreviewProjectionOptions);
-
-function renderHgoRuntimePreviewIfReady(reason = "render", options = {}) {
-  return getHgoRuntimePreviewRenderOwner().renderIfReady(reason, options);
-}
 
 function inspectHgoRuntimePreviewFromEvent(event, { eventType = "unknown" } = {}) {
   return getHgoRuntimePreviewRenderOwner().inspectFromEvent(event, { eventType });
@@ -10896,15 +10842,6 @@ function getHitFromEvent(
   return resolvedHit;
 }
 
-function getFeatureIdFromEvent(event) {
-  const hit = getHitFromEvent(event, {
-    enableSnap: true,
-    snapPx: HIT_SNAP_RADIUS_PX,
-    eventType: "compat",
-  });
-  return hit.id;
-}
-
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
@@ -12094,10 +12031,6 @@ function getPhysicalLandMaskInfo() {
   return getFirstUsablePhysicalLandMaskInfo(candidates);
 }
 
-function getPhysicalLandMask() {
-  return getPhysicalLandMaskInfo().collection;
-}
-
 function getPhysicalLandClipCacheKey(maskInfo) {
   return [
     getProjectionRenderSignature(),
@@ -12718,89 +12651,6 @@ function formatCityMapLabel(fullLabel, { entry = null, context: labelContext = n
   return truncateCityLabelToWidth(abbreviatedLabel || cleanedLabel || rawLabel, maxWidthPx, measureWidth);
 }
 
-function getCityCanonicalId(feature) {
-  const props = feature?.properties || {};
-  return String(props.__city_id || props.id || feature?.id || "").trim();
-}
-
-function getCityTier(feature) {
-  const props = feature?.properties || {};
-  const tier = String(props.__city_base_tier || props.base_tier || props.baseTier || "").trim().toLowerCase();
-  if (tier === "major" || tier === "regional" || tier === "minor") {
-    return tier;
-  }
-  return "minor";
-}
-
-function getCityTierWeight(feature) {
-  switch (getCityTier(feature)) {
-    case "major":
-      return 3;
-    case "regional":
-      return 2;
-    default:
-      return 1;
-  }
-}
-
-function getDefaultCityMinZoomForTier(tier) {
-  switch (String(tier || "").trim().toLowerCase()) {
-    case "major":
-      return 0.8;
-    case "regional":
-      return 1.6;
-    default:
-      return 2.9;
-  }
-}
-
-function getCityEffectiveMinZoom(feature) {
-  const props = feature?.properties || {};
-  const explicit = Number(props.__city_min_zoom ?? props.min_zoom ?? props.minZoom);
-  if (Number.isFinite(explicit)) return explicit;
-  return getDefaultCityMinZoomForTier(getCityTier(feature));
-}
-
-function getUrbanFeatureStableId(feature) {
-  const directId = String(feature?.id ?? "").trim();
-  if (directId) return directId;
-  const props = feature?.properties || {};
-  const lowercasePropId = String(props.id ?? "").trim();
-  if (lowercasePropId) return lowercasePropId;
-  return String(props.ID ?? "").trim();
-}
-
-function getCityRadiusMultiplier(feature) {
-  switch (getCityTier(feature)) {
-    case "major":
-      return 1.45;
-    case "regional":
-      return 1.1;
-    default:
-      return 0.85;
-  }
-}
-
-function getCityCapitalScore(feature) {
-  const props = feature?.properties || {};
-  if (props.__city_is_country_capital) return 3;
-  if (props.__city_is_admin_capital) return 2;
-  if (props.__city_is_capital) return 1;
-  return 0;
-}
-
-function getCitySortWeight(feature) {
-  const props = feature?.properties || {};
-  const population = Math.max(0, Number(props.__city_population || 0));
-  const victoryPointValue = Math.max(0, Number(props.__city_scenario_victory_points || 0));
-  return (
-    (props.__city_is_capital ? 2_000_000_000 : 0)
-    + (getCityTierWeight(feature) * 250_000_000)
-    + (victoryPointValue * 25_000_000)
-    + population
-  );
-}
-
 function getCityMarkerThemeTokens(config = {}) {
   const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
   const baseTokens = CITY_MARKER_THEME_TOKENS[themeKey] || CITY_MARKER_THEME_TOKENS.classic_graphite;
@@ -12837,139 +12687,6 @@ function getScenarioFeaturedTagSet() {
         .filter(Boolean)
       : []
   );
-}
-
-function getCityCountryTierFromScenarioRecord(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
-  if (!record || typeof record !== "object") return "";
-  const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
-  const entryKind = String(record.entry_kind || record.entryKind || "").trim().toLowerCase();
-  const controllerFeatureCount = Math.max(
-    0,
-    Number(record.controller_feature_count ?? record.controllerFeatureCount ?? 0) || 0
-  );
-  const isFeatured = !!record.featured || featuredTags.has(tag);
-  if (entryKind === "controller_only" || controllerFeatureCount <= 0) {
-    return "E";
-  }
-  if (
-    tag === defaultCountry
-    || (isFeatured && controllerFeatureCount >= 40)
-    || (!isFeatured && controllerFeatureCount >= 150)
-  ) {
-    return "A";
-  }
-  if ((isFeatured && controllerFeatureCount < 40) || (!isFeatured && controllerFeatureCount >= 40)) {
-    return "B";
-  }
-  if (controllerFeatureCount >= 12) return "C";
-  if (controllerFeatureCount >= 1) return "D";
-  return "E";
-}
-
-function getCityCountryVisibilityClass(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
-  const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
-  const controllerFeatureCount = Math.max(
-    0,
-    Number(record?.controller_feature_count ?? record?.controllerFeatureCount ?? 0) || 0
-  );
-  const profileFeatureCount = Math.max(0, Number(profile?.featureCount || 0));
-  const isFeatured = !!record?.featured || featuredTags.has(tag) || tag === defaultCountry;
-  const isScenarioOnly = !!record?.scenario_only;
-  const parentOwnerTag = String(record?.parent_owner_tag || record?.parentOwnerTag || "").trim().toUpperCase();
-  const entryKind = String(record?.entry_kind || record?.entryKind || "").trim().toLowerCase();
-  const isSubject = !!parentOwnerTag || entryKind === "scenario_subject";
-  if (isSubject) return "micro_subject";
-  if (CITY_WARLORD_SCENARIO_TAGS.has(tag)) {
-    return "fragmented_actor";
-  }
-  if (isFeatured || controllerFeatureCount >= 120 || profileFeatureCount >= 200) return "global_core";
-  if (controllerFeatureCount >= 40 || profileFeatureCount >= 80) return "regional_core";
-  if (controllerFeatureCount >= 8 || profileFeatureCount >= 16) return "local_actor";
-  if (isScenarioOnly && controllerFeatureCount >= 1 && !parentOwnerTag && profileFeatureCount <= 18) {
-    return "fragmented_actor";
-  }
-  return "micro";
-}
-
-function isCityScenarioTagExcludedFromReveal(tag = "") {
-  const normalized = String(tag || "").trim().toUpperCase();
-  return normalized ? CITY_SCENARIO_EXCLUDED_TAGS.has(normalized) : false;
-}
-
-function getCityFixedPowerCalibration(tag = "") {
-  const normalized = String(tag || "").trim().toUpperCase();
-  if (CITY_PRIMARY_POWER_TAGS.has(normalized)) {
-    return {
-      className: "global_core",
-      classWeightBias: 0.42,
-      minQuotaFloorBoost: 2,
-    };
-  }
-  if (CITY_SECONDARY_POWER_TAGS.has(normalized)) {
-    return {
-      className: "regional_core",
-      classWeightBias: 0.22,
-      minQuotaFloorBoost: 1,
-    };
-  }
-  return null;
-}
-
-function normalizeCityCountryVisibilityClass(value = "") {
-  const normalized = String(value || "").trim().toLowerCase();
-  return Object.prototype.hasOwnProperty.call(CITY_COUNTRY_CLASS_WEIGHT, normalized)
-    ? normalized
-    : "";
-}
-
-function getCityCountryRevealOverride(record = null) {
-  const tag = String(record?.tag || "").trim().toUpperCase();
-  const fixedPower = getCityFixedPowerCalibration(tag);
-  if (!record || typeof record !== "object") {
-    return fixedPower || {
-      className: "",
-      classWeightBias: 0,
-      minQuotaFloorBoost: 0,
-    };
-  }
-  const className = normalizeCityCountryVisibilityClass(
-    record.city_reveal_class
-    || record.cityRevealClass
-    || record.city_visibility_class
-    || record.cityVisibilityClass
-  ) || String(fixedPower?.className || "");
-  const classWeightBias = clamp(
-    Number(record.city_reveal_weight_bias ?? record.cityRevealWeightBias ?? fixedPower?.classWeightBias ?? 0) || 0,
-    -0.35,
-    0.75
-  );
-  const minQuotaFloorBoost = clamp(
-    Math.round(Number(record.city_reveal_min_floor_boost ?? record.cityRevealMinFloorBoost ?? fixedPower?.minQuotaFloorBoost ?? 0) || 0),
-    0,
-    3
-  );
-  return {
-    className,
-    classWeightBias,
-    minQuotaFloorBoost,
-  };
-}
-
-function getFallbackCityCountryTier(profile) {
-  const maxPopulation = Math.max(0, Number(profile?.maxPopulation || 0));
-  if ((profile?.hasCountryCapital && maxPopulation >= 2_500_000) || maxPopulation >= 5_000_000) {
-    return "A";
-  }
-  if (profile?.hasCountryCapital || maxPopulation >= 1_500_000) {
-    return "B";
-  }
-  if (maxPopulation >= 350_000) {
-    return "C";
-  }
-  if ((profile?.featureCount || 0) > 0) {
-    return "D";
-  }
-  return "E";
 }
 
 function getCityCountryProfileIndex(cityCollection) {
@@ -13052,79 +12769,6 @@ function getCityCountryProfileIndex(cityCollection) {
   return profiles;
 }
 
-function getCityRevealPhase(scale) {
-  const normalizedScale = Math.max(0.0001, Number(scale || 1));
-  return CITY_REVEAL_PHASES.find((phase) => normalizedScale >= phase.minScale && normalizedScale < phase.maxScale)
-    || CITY_REVEAL_PHASES[CITY_REVEAL_PHASES.length - 1];
-}
-
-function getCityRevealPhaseIndex(scale) {
-  const phase = getCityRevealPhase(scale);
-  const index = CITY_REVEAL_PHASES.findIndex((entry) => entry.id === phase.id);
-  return Math.max(0, index);
-}
-
-function getCityRevealPhaseInterpolation(scale) {
-  const phaseIndex = getCityRevealPhaseIndex(scale);
-  const currentPhase = CITY_REVEAL_PHASES[phaseIndex] || CITY_REVEAL_PHASES[0];
-  const nextPhase = CITY_REVEAL_PHASES[Math.min(CITY_REVEAL_PHASES.length - 1, phaseIndex + 1)] || currentPhase;
-  if (!nextPhase || nextPhase.id === currentPhase.id || !Number.isFinite(nextPhase.minScale)) {
-    return { phaseIndex, currentPhase, nextPhase: currentPhase, t: 0 };
-  }
-  const minScale = Number(currentPhase.minScale || 0);
-  const maxScale = Number(nextPhase.minScale || currentPhase.maxScale || minScale);
-  const span = Math.max(0.0001, maxScale - minScale);
-  const t = clamp((Number(scale || 1) - minScale) / span, 0, 1);
-  return { phaseIndex, currentPhase, nextPhase, t };
-}
-
-function getCityRevealBucket(entry, phaseId) {
-  const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
-  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
-  const isCapital = !!entry?.isCapital;
-  switch (String(phaseId || "P0")) {
-    case "P0":
-      return countryTier === "A" && isCapital ? 0 : Number.POSITIVE_INFINITY;
-    case "P1":
-      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
-      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
-      if (countryTier === "E" && isCapital) return 2;
-      return Number.POSITIVE_INFINITY;
-    case "P2":
-      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
-      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
-      if (countryTier === "E" && isCapital) return 2;
-      if (countryTier === "A" && cityTier === "major") return 3;
-      return Number.POSITIVE_INFINITY;
-    case "P3":
-      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
-      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
-      if (countryTier === "E" && isCapital) return 2;
-      if (countryTier === "A" && cityTier === "major") return 3;
-      if (countryTier === "B" && cityTier === "major") return 4;
-      return Number.POSITIVE_INFINITY;
-    case "P4":
-      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
-      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
-      if (countryTier === "E" && isCapital) return 2;
-      if (countryTier === "A" && cityTier === "major") return 3;
-      if (countryTier === "B" && cityTier === "major") return 4;
-      if ((countryTier === "A" || countryTier === "B" || countryTier === "C") && (cityTier === "regional" || cityTier === "major")) {
-        return 5;
-      }
-      return Number.POSITIVE_INFINITY;
-    case "P5":
-    default:
-      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
-      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
-      if (countryTier === "E" && isCapital) return 2;
-      if (cityTier === "major") return 3;
-      if (cityTier === "regional") return 4;
-      if (countryTier !== "E" && cityTier === "minor") return 5;
-      return Number.POSITIVE_INFINITY;
-  }
-}
-
 function getCityInterpolatedRevealBucket(entry, scale) {
   const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
   const currentBucket = getCityRevealBucket(entry, currentPhase.id);
@@ -13143,141 +12787,6 @@ function getCityInterpolatedRevealBucket(entry, scale) {
   return currentBucket;
 }
 
-function getCityMarkerQuotaForTier(phaseId, countryTier) {
-  const quotaTable = CITY_MARKER_QUOTAS_BY_PHASE[String(phaseId || "P0")] || CITY_MARKER_QUOTAS_BY_PHASE.P0;
-  return quotaTable[String(countryTier || "D").trim().toUpperCase()] ?? 0;
-}
-
-function getCityMarkerDensityMultiplier(config = {}) {
-  return clamp(Number(config.markerDensity) || 1, 0.5, 2);
-}
-
-function scaleCityMarkerQuota(baseQuota, markerDensity) {
-  const normalizedQuota = Math.max(0, Number(baseQuota) || 0);
-  const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
-  if (normalizedQuota <= 0) return 0;
-  const scaledQuota = normalizedQuota * normalizedDensity;
-  if (normalizedDensity < 1) {
-    const flooredQuota = Math.floor(scaledQuota);
-    if (normalizedQuota >= 1 && scaledQuota > 0) {
-      return Math.max(1, flooredQuota);
-    }
-    return flooredQuota;
-  }
-  return Math.ceil(scaledQuota);
-}
-
-function getCitySizeQuotaFloor(entry, scale, markerDensity = 1) {
-  const featureCount = Math.max(0, Number(entry?.countryFeatureCount || 0));
-  const controllerFeatureCount = Math.max(0, Number(entry?.countryControllerFeatureCount || featureCount));
-  const maxPopulation = Math.max(0, Number(entry?.countryMaxPopulation || 0));
-  const countryClass = String(entry?.countryClass || "micro").trim().toLowerCase();
-  const classWeight = clamp(
-    Number(CITY_COUNTRY_CLASS_WEIGHT[countryClass] || CITY_COUNTRY_CLASS_WEIGHT.micro)
-      + Number(entry?.countryClassWeightBias || 0),
-    0.55,
-    2.1
-  );
-  const minQuotaFloorBoost = clamp(Number(entry?.countryMinQuotaFloorBoost || 0) || 0, 0, 3);
-  const normalizedDensity = clamp(Number(markerDensity) || 1, 0.5, 2);
-  const scaleFactor = clamp((Math.max(0.0001, Number(scale || 1)) - 1.05) / 2.3, 0, 1);
-  const featureBoost = featureCount >= 220 ? 3
-    : featureCount >= 120 ? 2
-      : featureCount >= 60 ? 1
-        : 0;
-  const controllerBoost = controllerFeatureCount >= 160 ? 2
-    : controllerFeatureCount >= 50 ? 1
-      : 0;
-  const populationBoost = maxPopulation >= 8_000_000 ? 1
-    : maxPopulation >= 3_000_000 ? 0.5
-      : 0;
-  const coarseFloor = Math.floor((featureBoost + controllerBoost + populationBoost) * classWeight * scaleFactor * normalizedDensity);
-  return clamp(coarseFloor + minQuotaFloorBoost, 0, 6);
-}
-
-function buildCityViewportCountryStats(candidateEntries = []) {
-  const statsByCountry = new Map();
-  let totalCandidates = 0;
-  candidateEntries.forEach((entry) => {
-    totalCandidates += 1;
-    const countryKey = String(entry?.countryKey || "").trim();
-    if (!countryKey) return;
-    let stat = statsByCountry.get(countryKey);
-    if (!stat) {
-      stat = { visibleCount: 0, capitalCount: 0 };
-      statsByCountry.set(countryKey, stat);
-    }
-    stat.visibleCount += 1;
-    if (entry?.isCapital) stat.capitalCount += 1;
-  });
-  return { statsByCountry, totalCandidates };
-}
-
-function getCityViewportQuotaMultiplier(entry, viewportStats = null) {
-  if (!viewportStats || !(viewportStats.statsByCountry instanceof Map)) return 1;
-  const countryKey = String(entry?.countryKey || "").trim();
-  if (!countryKey) return 1;
-  const stat = viewportStats.statsByCountry.get(countryKey);
-  if (!stat) return 1;
-  const total = Math.max(1, Number(viewportStats.totalCandidates || 0));
-  const share = clamp((Number(stat.visibleCount || 0) / total) * 12, 0, 1);
-  const spreadBoost = 0.9 + (Math.sqrt(share) * 0.28);
-  const capitalBoost = Number(stat.capitalCount || 0) > 0 ? 0.06 : 0;
-  return clamp(spreadBoost + capitalBoost, 0.85, 1.32);
-}
-
-function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1, viewportStats = null) {
-  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
-  const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
-  const fromQuota = Number(getCityMarkerQuotaForTier(currentPhase.id, countryTier) || 0);
-  const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) || fromQuota);
-  const interpolated = fromQuota + ((toQuota - fromQuota) * t);
-  return scaleCityMarkerQuota(interpolated, markerDensity);
-}
-
-function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
-  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
-  const fromBudget = Math.max(0, Number(currentPhase?.markerBudget || 0));
-  const toBudget = Math.max(0, Number(nextPhase?.markerBudget || fromBudget));
-  const interpolated = fromBudget + ((toBudget - fromBudget) * t);
-  return Math.max(0, Math.round(interpolated * clamp(Number(markerDensity) || 1, 0.5, 2)));
-}
-
-function getCityRevealCompetitionBand(phaseId = "") {
-  if (phaseId === "P0" || phaseId === "P1") return "low";
-  if (phaseId === "P2" || phaseId === "P3") return "mid";
-  return "high";
-}
-
-function getCityCountryClassScore(entry) {
-  const className = String(entry?.countryClass || "micro").trim().toLowerCase();
-  const rank = Number(entry?.countryClassRank || CITY_COUNTRY_CLASS_RANK[className] || 0);
-  const bias = clamp(Number(entry?.countryClassWeightBias || 0) || 0, -0.35, 0.75);
-  return rank + bias;
-}
-
-function getCityPriorityCountryReserveBudget(scale, markerBudget) {
-  const normalizedBudget = Math.max(0, Number(markerBudget) || 0);
-  if (normalizedBudget <= 0) return 0;
-  const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
-  const fromShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[currentPhase.id] || 0);
-  const toShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[nextPhase.id] || fromShare);
-  const share = clamp(fromShare + ((toShare - fromShare) * t), 0, 0.5);
-  return Math.min(normalizedBudget, Math.max(0, Math.round(normalizedBudget * share)));
-}
-
-function getCityPriorityCountryReserveRank(entry) {
-  let score = 0;
-  if (entry?.isDefaultCountry) score += 600;
-  if (entry?.isPrimaryPower) score += 520;
-  if (entry?.isFeaturedCountry) score += 360;
-  if (entry?.isSecondaryPower) score += 260;
-  score += Number(entry?.countryTierRank || 0) * 24;
-  score += getCityCountryClassScore(entry) * 8;
-  if (entry?.feature?.properties?.__city_is_country_capital) score += 18;
-  return score;
-}
-
 function getCityViewportCenterDistanceNorm(entry) {
   const point = Array.isArray(entry?.screenPoint) ? entry.screenPoint : null;
   if (!point || point.length < 2) return 1;
@@ -13285,90 +12794,6 @@ function getCityViewportCenterDistanceNorm(entry) {
   const centerY = Number(runtimeState.height || 0) * 0.5;
   const maxDistance = Math.max(1, Math.hypot(centerX + 48, centerY + 48));
   return clamp(Math.hypot(Number(point[0] || 0) - centerX, Number(point[1] || 0) - centerY) / maxDistance, 0, 1);
-}
-
-function compareCityRevealEntries(left, right, phaseId = "P0") {
-  const leftBucket = Number(left?.revealBucket ?? Number.POSITIVE_INFINITY);
-  const rightBucket = Number(right?.revealBucket ?? Number.POSITIVE_INFINITY);
-  if (leftBucket !== rightBucket) return leftBucket - rightBucket;
-  const competitionBand = getCityRevealCompetitionBand(phaseId);
-  const leftCountryRank = Number(left?.countryTierRank || 0);
-  const rightCountryRank = Number(right?.countryTierRank || 0);
-  const leftTierWeight = Number(left?.cityTierWeight || 0);
-  const rightTierWeight = Number(right?.cityTierWeight || 0);
-  const leftPopulation = Math.max(0, Number(left?.population || 0));
-  const rightPopulation = Math.max(0, Number(right?.population || 0));
-  const leftCenterDistance = Number(left?.centerDistanceNorm ?? 1);
-  const rightCenterDistance = Number(right?.centerDistanceNorm ?? 1);
-  const leftCountryClassScore = getCityCountryClassScore(left);
-  const rightCountryClassScore = getCityCountryClassScore(right);
-
-  if (competitionBand === "low") {
-    if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
-    if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
-    if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
-  } else {
-    if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
-    if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
-    if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
-    if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
-    if (competitionBand === "mid") {
-      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
-      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
-      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
-    } else {
-      if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
-      if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
-      if (!!left?.isPriorityCountry !== !!right?.isPriorityCountry) return left?.isPriorityCountry ? -1 : 1;
-    }
-  }
-  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
-  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
-  if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
-  if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
-  return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
-}
-
-function getCityLabelBudget(phase, config = {}) {
-  const densityKey = String(config.labelDensity || "balanced").trim().toLowerCase();
-  const budgetTable = CITY_LABEL_DENSITY_BUDGETS[densityKey] || CITY_LABEL_DENSITY_BUDGETS.balanced;
-  const phaseId = String(phase?.id || "");
-  if (Object.prototype.hasOwnProperty.call(budgetTable, phaseId)) {
-    return Math.max(0, Number(budgetTable[phaseId] || 0));
-  }
-  return Math.max(0, Number(phase?.labelBudget || 0));
-}
-
-function isCityLabelEligibleForPhase(entry, phaseId) {
-  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
-  if (String(phaseId || "P0") === "P3") {
-    return !!entry?.isCapital;
-  }
-  if (String(phaseId || "P0") === "P4") {
-    return !!entry?.isCapital || cityTier === "major";
-  }
-  if (String(phaseId || "P0") === "P5") {
-    return true;
-  }
-  return false;
-}
-
-function getCityLabelMinZoom(entry, config = {}) {
-  const configuredMinZoom = Number(config?.labelMinZoom || 1.9);
-  if (entry?.isCapital) {
-    return configuredMinZoom;
-  }
-  return Math.max(configuredMinZoom, Number(entry?.minZoom || 0));
-}
-
-function getCityMarkerSizePx(entry, config = {}) {
-  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
-  const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 2.5);
-  const baseSize = CITY_MARKER_BASE_SIZES_PX[cityTier] || CITY_MARKER_BASE_SIZES_PX.minor;
-  const hardLimit = CITY_MARKER_SIZE_LIMITS_PX[cityTier] || CITY_MARKER_SIZE_LIMITS_PX.minor;
-  const capitalLimit = entry?.isCapital ? CITY_MARKER_SIZE_LIMITS_PX.capital : hardLimit;
-  const boostedSize = entry?.isCapital ? baseSize * 1.08 : baseSize;
-  return Math.min(capitalLimit, boostedSize * markerScale);
 }
 
 function getCityMarkerSprite(entry, config = {}) {
@@ -15521,85 +14946,7 @@ function syncSpecialZonePatternTransformDuringZoom() {
 }
 
 function renderSpecialZoneEditorOverlay() {
-  if (!rendererSurfaceHost.getSpecialZoneEditorGroup() || !rendererSurfaceHost.getPathSvg()) return;
-  ensureSpecialZoneEditorState();
-
-  const vertices = runtimeState.specialZoneEditor.vertices || [];
-  const isActive = !!runtimeState.specialZoneEditor.active;
-
-  if (!isActive || vertices.length === 0) {
-    rendererSurfaceHost.getSpecialZoneEditorGroup().selectAll("*").remove();
-    return;
-  }
-
-  const lineFeature = {
-    type: "Feature",
-    geometry: {
-      type: "LineString",
-      coordinates: vertices,
-    },
-    properties: {},
-  };
-  const polygonFeature = vertices.length >= 3
-    ? {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [[...vertices, vertices[0]]],
-      },
-      properties: {},
-    }
-    : null;
-
-  const style = getSpecialZoneStyle({
-    properties: { type: runtimeState.specialZoneEditor.zoneType || DEFAULT_SPECIAL_ZONE_TYPE },
-  });
-
-  const paths = [];
-  if (polygonFeature) paths.push({ id: "draw-poly", feature: polygonFeature, fill: true });
-  paths.push({ id: "draw-line", feature: lineFeature, fill: false });
-
-  const pathSelection = rendererSurfaceHost.getSpecialZoneEditorGroup()
-    .selectAll("path.special-zone-editor-path")
-    .data(paths, (d) => d.id);
-
-  pathSelection
-    .enter()
-    .append("path")
-    .attr("class", "special-zone-editor-path")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .attr("vector-effect", "non-scaling-stroke")
-    .merge(pathSelection)
-    .attr("d", (d) => rendererSurfaceHost.getPathSvg()(d.feature))
-    .attr("fill", (d) => (d.fill ? style.fill : "none"))
-    .attr("fill-opacity", (d) => (d.fill ? Math.min(style.fillOpacity * 0.85, 0.6) : 0))
-    .attr("stroke", style.stroke)
-    .attr("stroke-width", Math.max(1.2, style.strokeWidth + 0.5))
-    .attr("stroke-dasharray", style.dash.join(" "));
-
-  pathSelection.exit().remove();
-
-  const points = vertices.map((coord, index) => ({ coord, key: `v-${index}` }));
-  const pointSelection = rendererSurfaceHost.getSpecialZoneEditorGroup()
-    .selectAll("circle.special-zone-editor-point")
-    .data(points, (d) => d.key);
-
-  pointSelection
-    .enter()
-    .append("circle")
-    .attr("class", "special-zone-editor-point")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .merge(pointSelection)
-    .attr("r", 3.4)
-    .attr("cx", (d) => rendererSurfaceHost.getProjection()(d.coord)?.[0] ?? -9999)
-    .attr("cy", (d) => rendererSurfaceHost.getProjection()(d.coord)?.[1] ?? -9999)
-    .attr("fill", "#ffffff")
-    .attr("stroke", style.stroke)
-    .attr("stroke-width", 1.3);
-
-  pointSelection.exit().remove();
+  getTransientOverlayRenderOwner().renderSpecialZoneEditorOverlay();
 }
 
 function updateStrategicOverlayUi() {
@@ -15645,47 +14992,6 @@ function ensureOperationalLineEditorState() {
   runtimeState.operationalLineEditor.width = Math.max(0, Math.min(16, Number(runtimeState.operationalLineEditor.width) || 0));
   runtimeState.operationalLineEditor.opacity = Math.max(0, Math.min(1, Number(runtimeState.operationalLineEditor.opacity) || 1));
   runtimeState.operationalLineEditor.selectedVertexIndex = Math.max(-1, Number(runtimeState.operationalLineEditor.selectedVertexIndex) || -1);
-}
-
-function normalizeUnitCounterStatPercent(value, fallback = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT) {
-  const nextValue = Number(value);
-  if (!Number.isFinite(nextValue)) {
-    return Math.max(0, Math.min(100, Number(fallback) || 0));
-  }
-  return Math.max(0, Math.min(100, Math.round(nextValue)));
-}
-
-function normalizeUnitCounterStatsPresetId(value, fallback = "regular") {
-  const normalizedValue = String(value || "").trim().toLowerCase();
-  if (normalizedValue === "random") return "random";
-  return Object.prototype.hasOwnProperty.call(UNIT_COUNTER_STATS_PRESETS, normalizedValue)
-    ? normalizedValue
-    : fallback;
-}
-
-function getUnitCounterStatsPreset(value, fallback = "regular") {
-  const presetId = normalizeUnitCounterStatsPresetId(value, fallback);
-  return UNIT_COUNTER_STATS_PRESETS[presetId] || UNIT_COUNTER_STATS_PRESETS.regular;
-}
-
-function normalizeUnitCounterBaseFillColor(value) {
-  const candidate = String(value || "").trim();
-  return /^#(?:[0-9a-f]{6})$/i.test(candidate) ? candidate.toLowerCase() : "";
-}
-
-function getNormalizedUnitCounterCombatState(candidate = {}) {
-  const statsPresetId = normalizeUnitCounterStatsPresetId(candidate.statsPresetId || "regular");
-  const presetDefaults = getUnitCounterStatsPreset(statsPresetId);
-  const statsSource = ["preset", "random", "manual"].includes(String(candidate.statsSource || "").trim().toLowerCase())
-    ? String(candidate.statsSource || "").trim().toLowerCase()
-    : "preset";
-  return {
-    baseFillColor: normalizeUnitCounterBaseFillColor(candidate.baseFillColor),
-    organizationPct: normalizeUnitCounterStatPercent(candidate.organizationPct, presetDefaults.organizationPct || DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT),
-    equipmentPct: normalizeUnitCounterStatPercent(candidate.equipmentPct, presetDefaults.equipmentPct || DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT),
-    statsPresetId,
-    statsSource,
-  };
 }
 
 function assignUnitCounterEditorFromCounter(counter = null) {
@@ -15824,70 +15130,6 @@ function getProjectedPoint(coord) {
   return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
 }
 
-function getLineMidpointFromCoordinates(coordinates = []) {
-  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
-  const totalSegments = [];
-  let totalLength = 0;
-  for (let index = 1; index < coordinates.length; index += 1) {
-    const previous = coordinates[index - 1];
-    const current = coordinates[index];
-    if (!Array.isArray(previous) || !Array.isArray(current)) continue;
-    const dx = Number(current[0]) - Number(previous[0]);
-    const dy = Number(current[1]) - Number(previous[1]);
-    const segmentLength = Math.hypot(dx, dy);
-    if (!Number.isFinite(segmentLength) || segmentLength <= 0) continue;
-    totalSegments.push({ previous, current, segmentLength });
-    totalLength += segmentLength;
-  }
-  if (!totalLength || !totalSegments.length) return null;
-  let distance = totalLength / 2;
-  for (const segment of totalSegments) {
-    if (distance <= segment.segmentLength) {
-      const ratio = distance / segment.segmentLength;
-      return [
-        Number(segment.previous[0]) + (Number(segment.current[0]) - Number(segment.previous[0])) * ratio,
-        Number(segment.previous[1]) + (Number(segment.current[1]) - Number(segment.previous[1])) * ratio,
-      ];
-    }
-    distance -= segment.segmentLength;
-  }
-  const last = totalSegments[totalSegments.length - 1];
-  return [Number(last.current[0]), Number(last.current[1])];
-}
-
-function getMultiLineLabelAnchor(geometry, placementMode = "midpoint") {
-  const lines = Array.isArray(geometry?.coordinates) ? geometry.coordinates : [];
-  let bestLine = null;
-  let bestLength = -1;
-  lines.forEach((line) => {
-    if (!Array.isArray(line) || line.length < 2) return;
-    let length = 0;
-    for (let index = 1; index < line.length; index += 1) {
-      const previous = line[index - 1];
-      const current = line[index];
-      length += Math.hypot(
-        Number(current?.[0] || 0) - Number(previous?.[0] || 0),
-        Number(current?.[1] || 0) - Number(previous?.[1] || 0)
-      );
-    }
-    if (length > bestLength) {
-      bestLength = length;
-      bestLine = line;
-    }
-  });
-  if (!bestLine) return null;
-  if (placementMode === "centroid") {
-    const sums = bestLine.reduce((acc, coord) => {
-      acc[0] += Number(coord?.[0] || 0);
-      acc[1] += Number(coord?.[1] || 0);
-      acc[2] += 1;
-      return acc;
-    }, [0, 0, 0]);
-    return sums[2] > 0 ? [sums[0] / sums[2], sums[1] / sums[2]] : null;
-  }
-  return getLineMidpointFromCoordinates(bestLine);
-}
-
 function renderStrategicDefs() {
   if (!rendererSurfaceHost.getStrategicDefs()) return;
   const defs = [
@@ -15946,108 +15188,6 @@ function renderStrategicDefs() {
   selection.exit().remove();
 }
 
-function getOperationGraphicPreset(kind) {
-  const presets = {
-    attack: {
-      stroke: "#7f1d1d",
-      width: 2.2,
-      opacity: 0.9,
-      dasharray: null,
-      markerEnd: "url(#strategic-arrow-attack)",
-      curved: true,
-      closed: false,
-    },
-    retreat: {
-      stroke: "#9a3412",
-      width: 1.8,
-      opacity: 0.82,
-      dasharray: "7 5",
-      markerEnd: "url(#strategic-arrow-retreat)",
-      curved: true,
-      closed: false,
-    },
-    supply: {
-      stroke: "#475569",
-      width: 1.4,
-      opacity: 0.8,
-      dasharray: "4 4",
-      markerEnd: "url(#strategic-arrow-supply)",
-      curved: true,
-      closed: false,
-    },
-    naval: {
-      stroke: "#1e3a8a",
-      width: 1.8,
-      opacity: 0.82,
-      dasharray: "8 5",
-      markerEnd: "url(#strategic-arrow-naval)",
-      curved: true,
-      closed: false,
-    },
-    encirclement: {
-      stroke: "#4c1d95",
-      width: 1.7,
-      opacity: 0.76,
-      dasharray: "6 4",
-      markerEnd: null,
-      curved: true,
-      closed: true,
-    },
-    theater: {
-      stroke: "#7c2d12",
-      width: 1.9,
-      opacity: 0.74,
-      dasharray: "10 5",
-      markerEnd: null,
-      curved: true,
-      closed: true,
-    },
-  };
-  return presets[kind] || presets.attack;
-}
-
-function getOperationalLinePreset(kind) {
-  const presets = {
-    frontline: {
-      stroke: "#6b7280",
-      width: 2.1,
-      opacity: 0.82,
-      dasharray: "10 5",
-      markerEnd: null,
-      curved: true,
-      closed: false,
-    },
-    offensive_line: {
-      stroke: "#7f1d1d",
-      width: 2.5,
-      opacity: 0.94,
-      dasharray: null,
-      markerEnd: "url(#strategic-arrow-attack)",
-      curved: true,
-      closed: false,
-    },
-    spearhead_line: {
-      stroke: "#991b1b",
-      width: 2.9,
-      opacity: 0.98,
-      dasharray: "14 5 2 5",
-      markerEnd: "url(#strategic-arrow-attack)",
-      curved: true,
-      closed: false,
-    },
-    defensive_line: {
-      stroke: "#92400e",
-      width: 1.9,
-      opacity: 0.82,
-      dasharray: "5 4",
-      markerEnd: null,
-      curved: true,
-      closed: false,
-    },
-  };
-  return presets[kind] || presets.frontline;
-}
-
 function projectStrategicPoints(points = []) {
   return points.map((point) => getProjectedPoint(point)).filter(Boolean);
 }
@@ -16061,14 +15201,6 @@ function createOperationGraphicPath(points = [], { closed = false, curved = true
   return globalThis.d3.line().curve(curve)(projected) || "";
 }
 
-function getOperationGraphicMinPoints(kind = DEFAULT_OPERATION_GRAPHIC_KIND) {
-  return kind === "encirclement" || kind === "theater" ? 3 : 2;
-}
-
-function getOperationalLineMinPoints() {
-  return 2;
-}
-
 function getOperationGraphicById(id) {
   const selectedId = String(id || "").trim();
   if (!selectedId) return null;
@@ -16079,39 +15211,6 @@ function getOperationalLineById(id) {
   const selectedId = String(id || "").trim();
   if (!selectedId) return null;
   return (runtimeState.operationalLines || []).find((entry) => String(entry?.id || "") === selectedId) || null;
-}
-
-function normalizeOperationGraphicStylePreset(value, fallback = DEFAULT_OPERATION_GRAPHIC_KIND) {
-  const normalized = String(value || "").trim().toLowerCase();
-  if (OPERATION_GRAPHIC_STYLE_PRESETS.includes(normalized)) {
-    return normalized;
-  }
-  return OPERATION_GRAPHIC_STYLE_PRESETS.includes(String(fallback || "").trim().toLowerCase())
-    ? String(fallback || "").trim().toLowerCase()
-    : DEFAULT_OPERATION_GRAPHIC_KIND;
-}
-
-function normalizeOperationalLineStylePreset(value, fallback = DEFAULT_OPERATIONAL_LINE_KIND) {
-  const normalized = String(value || "").trim().toLowerCase();
-  if (OPERATIONAL_LINE_STYLE_PRESETS.includes(normalized)) {
-    return normalized;
-  }
-  return OPERATIONAL_LINE_STYLE_PRESETS.includes(String(fallback || "").trim().toLowerCase())
-    ? String(fallback || "").trim().toLowerCase()
-    : DEFAULT_OPERATIONAL_LINE_KIND;
-}
-
-function normalizeOperationGraphicStroke(value) {
-  const candidate = String(value || "").trim();
-  return /^#(?:[0-9a-f]{6})$/i.test(candidate) ? candidate.toLowerCase() : "";
-}
-
-function normalizeOperationGraphicWidth(value) {
-  return Math.max(0, Math.min(16, Number(value) || 0));
-}
-
-function normalizeOperationGraphicOpacity(value) {
-  return Math.max(0, Math.min(1, Number(value) || 1));
 }
 
 function getOperationGraphicEditorModel() {
@@ -16147,26 +15246,6 @@ function getOperationGraphicEditorModel() {
     opacity: normalizeOperationGraphicOpacity(graphic.opacity),
     selectedVertexIndex: Math.max(-1, Number(runtimeState.operationGraphicsEditor.selectedVertexIndex) || -1),
   };
-}
-
-function getOperationGraphicEditorMidpoints(points = [], { closed = false } = {}) {
-  const segments = [];
-  const maxIndex = closed ? points.length : points.length - 1;
-  for (let index = 0; index < maxIndex; index += 1) {
-    const start = points[index];
-    const end = points[(index + 1) % points.length];
-    if (!Array.isArray(start) || !Array.isArray(end)) continue;
-    const midpoint = [
-      (Number(start[0]) + Number(end[0])) / 2,
-      (Number(start[1]) + Number(end[1])) / 2,
-    ];
-    segments.push({
-      id: `opg-midpoint-${index}`,
-      insertIndex: index + 1,
-      coord: midpoint,
-    });
-  }
-  return segments;
 }
 
 function getUnitCounterSymbolToken(counter = {}) {
@@ -16407,219 +15486,11 @@ function renderOperationGraphicsEditorOverlay() {
   syncInteractionLayerPointerEvents();
 }
 
-function getOperationGraphicLabelAnchor(projectedPoints = [], { closed = false } = {}) {
-  if (!Array.isArray(projectedPoints) || projectedPoints.length === 0) {
-    return null;
-  }
-  if (closed) {
-    const [sumX, sumY] = projectedPoints.reduce(
-      (acc, point) => [acc[0] + Number(point?.[0] || 0), acc[1] + Number(point?.[1] || 0)],
-      [0, 0]
-    );
-    return [sumX / projectedPoints.length, sumY / projectedPoints.length];
-  }
-  if (projectedPoints.length === 1) {
-    return projectedPoints[0];
-  }
-  const midIndex = Math.floor((projectedPoints.length - 1) / 2);
-  const start = projectedPoints[midIndex];
-  const end = projectedPoints[Math.min(projectedPoints.length - 1, midIndex + 1)];
-  const anchorX = (Number(start?.[0] || 0) + Number(end?.[0] || 0)) / 2;
-  const anchorY = (Number(start?.[1] || 0) + Number(end?.[1] || 0)) / 2;
-  const dx = Number(end?.[0] || 0) - Number(start?.[0] || 0);
-  const dy = Number(end?.[1] || 0) - Number(start?.[1] || 0);
-  const length = Math.max(1, Math.hypot(dx, dy));
-  return [anchorX - (dy / length) * 9, anchorY + (dx / length) * 9];
-}
-
-function getUnitCounterNationMeta(tag) {
-  const normalizedTag = canonicalCountryCode(tag);
-  if (!normalizedTag) {
-    return {
-      tag: "",
-      name: "",
-      color: "#7c8ba1",
-    };
-  }
-  const scenarioEntry = runtimeState.scenarioCountriesByTag?.[normalizedTag];
-  const name = getScenarioCountryDisplayName(
-    scenarioEntry,
-    runtimeState.countryNames?.[normalizedTag] || normalizedTag
-  ) || runtimeState.countryNames?.[normalizedTag] || normalizedTag;
-  const color = String(
-    scenarioEntry?.color_hex
-    || scenarioEntry?.colorHex
-    || runtimeState.countryPalette?.[normalizedTag]
-    || ColorManager.getPoliticalFallbackColor(normalizedTag, 0)
-    || "#7c8ba1"
-  ).trim() || "#7c8ba1";
-  return {
-    tag: normalizedTag,
-    name,
-    color,
-  };
-}
-
-function normalizeUnitCounterNationSource(value, fallback = "display") {
-  const source = String(value || "").trim().toLowerCase();
-  return ["display", "controller", "owner", "active", "manual"].includes(source) ? source : fallback;
-}
-
-function getUnitCounterScreenMetrics(size = "medium") {
-  const token = normalizeUnitCounterSizeToken(size);
-  return UNIT_COUNTER_SCREEN_SIZE[token] || UNIT_COUNTER_SCREEN_SIZE.medium;
-}
-
-function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
-  const preset = getUnitCounterPresetById(counter.presetId || counter.unitType || DEFAULT_UNIT_COUNTER_PRESET_ID);
-  const sizeToken = normalizeUnitCounterSizeToken(counter.size);
-  const metrics = getUnitCounterScreenMetrics(sizeToken);
-  const nation = getUnitCounterNationMeta(counter.nationTag);
-  const renderer = String(counter.renderer || preset.defaultRenderer || DEFAULT_UNIT_COUNTER_RENDERER).trim().toLowerCase() === "milstd" ? "milstd" : "game";
-  const sidc = getUnitCounterEffectiveSidc({
-    ...counter,
-    presetId: preset.id,
-  });
-  const combatState = getNormalizedUnitCounterCombatState(counter);
-  return {
-    counter,
-    preset,
-    renderer,
-    metrics,
-    nation,
-    nationTag: nation.tag || "N/A",
-    nationName: nation.name || t("Unassigned", "ui"),
-    label: String(counter.label || "").trim(),
-    subLabel: String(counter.subLabel || "").trim(),
-    strengthText: String(counter.strengthText || "").trim(),
-    baseFillColor: combatState.baseFillColor || DEFAULT_UNIT_COUNTER_BASE_FILL,
-    baseFillColorOverride: combatState.baseFillColor,
-    organizationPct: combatState.organizationPct,
-    equipmentPct: combatState.equipmentPct,
-    statsPresetId: combatState.statsPresetId,
-    statsSource: combatState.statsSource,
-    echelon: String(counter.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
-    echelonLabel: getUnitCounterEchelonLabel(counter.echelon || preset.defaultEchelon || ""),
-    shortCode: String(counter.unitType || preset.shortCode || "").trim().toUpperCase() || preset.shortCode,
-    iconId: String(counter.iconId || preset.iconId || "infantry").trim().toLowerCase() || "infantry",
-    shellVariant: preset.shellVariant || "line",
-    sidc,
-    stackCount: Math.max(1, Number(stackCount) || 1),
-    symbolUri: renderer === "milstd"
-      ? getMilSymbolDataUri(sidc, UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN[sizeToken] || UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN.medium)
-      : "",
-    sizeToken,
-  };
-}
-
 function getUnitCounterIconPath(iconId = "") {
   return getUnitCounterIconPathById(iconId);
 }
 
-function getOperationalLineAnchorCoord(lineId = "") {
-  const line = getOperationalLineById(lineId);
-  if (!line || !Array.isArray(line.points) || line.points.length < 2) return null;
-  return getLineMidpointFromCoordinates(line.points);
-}
-
-function getUnitCounterRenderAnchor(counter = {}) {
-  const attachedLineId = String(counter?.attachment?.lineId || "").trim();
-  if (attachedLineId) {
-    const lineCoord = getOperationalLineAnchorCoord(attachedLineId);
-    if (lineCoord) {
-      return {
-        coord: lineCoord,
-        key: `line:${attachedLineId}`,
-      };
-    }
-  }
-  const lon = Number(counter?.anchor?.lon || 0);
-  const lat = Number(counter?.anchor?.lat || 0);
-  return {
-    coord: [lon, lat],
-    key: String(counter?.anchor?.featureId || "").trim() || `${Math.round(lon * 3)}:${Math.round(lat * 3)}`,
-  };
-}
-
-function getUnitCounterSlotOffset(slotIndex = 0, stackCount = 1, metrics = UNIT_COUNTER_SCREEN_SIZE.medium) {
-  const count = Math.max(1, Number(stackCount) || 1);
-  const index = Math.max(0, Number(slotIndex) || 0);
-  const columns = count <= 2 ? count : count <= 4 ? 2 : 3;
-  const rows = Math.max(1, Math.ceil(count / Math.max(1, columns)));
-  const row = Math.floor(index / Math.max(1, columns));
-  const col = index % Math.max(1, columns);
-  const itemsInRow = row === rows - 1 ? Math.min(columns, count - row * columns) : columns;
-  const x = (col - (itemsInRow - 1) / 2) * Math.max(metrics.width * 0.76, 18);
-  const y = (row - (rows - 1) / 2) * Math.max(metrics.height * 0.84, 14);
-  return [x, y];
-}
-
-function compareUnitCounterRenderOrder(left, right) {
-  const zDelta = Number(left?.zIndex || 0) - Number(right?.zIndex || 0);
-  if (zDelta !== 0) return zDelta;
-  const leftId = String(left?.id || "");
-  const rightId = String(right?.id || "");
-  if (leftId < rightId) return -1;
-  if (leftId > rightId) return 1;
-  return 0;
-}
-
-function getUnitCounterRenderEntries() {
-  const counters = Array.isArray(runtimeState.unitCounters) ? runtimeState.unitCounters : [];
-  const grouped = new Map();
-  counters.forEach((counter) => {
-    const anchor = getUnitCounterRenderAnchor(counter);
-    const key = String(anchor?.key || "");
-    if (!grouped.has(key)) {
-      grouped.set(key, { anchor, counters: [] });
-    }
-    grouped.get(key).counters.push(counter);
-  });
-  return Array.from(grouped.values()).flatMap((bucket) => {
-    const sortedBucket = bucket.counters
-      .slice()
-      .sort(compareUnitCounterRenderOrder);
-    return sortedBucket.map((counter, slotIndex) => ({
-      counter,
-      stackCount: sortedBucket.length,
-      slotIndex,
-      anchor: bucket.anchor,
-    }));
-  });
-}
-
-function getUnitCounterRenderScale(metrics, zoomK) {
-  const normalizedZoom = Math.max(0.1, Number(zoomK) || 1);
-  const zoomPercent = normalizedZoom * 100;
-  const fixedScaleMultiplier = clamp(
-    Number(runtimeState.annotationView?.unitCounterFixedScaleMultiplier) || 1.5,
-    0.5,
-    2.0,
-  );
-  const desiredScreenScale = 0.5 * fixedScaleMultiplier;
-
-  const effectiveWidth = Number(metrics?.width || 0) * desiredScreenScale;
-  const localScale = desiredScreenScale / normalizedZoom;
-  const hidden = zoomPercent <= 600;
-  const opacity = hidden ? 0 : 1;
-
-  return {
-    desiredScreenScale,
-    localScale,
-    effectiveWidth,
-    hidden,
-    opacity,
-  };
-}
-
 // 在缩放过程中轻量更新兵牌 transform，避免 localScale 陈旧导致跳变
-function getUnitCounterNodeTransform(entry) {
-  const projected = Array.isArray(entry?.projected) ? entry.projected : [0, 0];
-  const slotOffset = Array.isArray(entry?.slotOffset) ? entry.slotOffset : [0, 0];
-  const localScale = Number(entry?.scaleModel?.localScale || 1);
-  return `translate(${projected[0]},${projected[1]}) scale(${localScale}) translate(${slotOffset[0]},${slotOffset[1]})`;
-}
-
 function renderUnitCountersOverlay() {
   getStrategicOverlayHelpersOwner().renderUnitCountersOverlay();
   bindUnitCounterOverlayInteractions();
@@ -16661,78 +15532,7 @@ function bindUnitCounterOverlayInteractions() {
 }
 
 function renderHoverOverlay() {
-  if (!rendererSurfaceHost.getHoverGroup() || !rendererSurfaceHost.getPathSvg()) return;
-
-  if (runtimeState.renderPhase !== RENDER_PHASE_IDLE) {
-    rendererSurfaceHost.getHoverGroup().selectAll("path.hovered-feature").remove();
-    rendererSurfaceHost.getHoverGroup().selectAll("path.hovered-facility-marker").remove();
-    rendererSurfaceHost.getHoverGroup().attr("aria-hidden", "true");
-    return;
-  }
-
-  const feature = runtimeState.hoveredSpecialRegionId
-    ? runtimeState.specialRegionsById.get(runtimeState.hoveredSpecialRegionId)
-    : runtimeState.hoveredWaterRegionId
-      ? runtimeState.waterRegionsById.get(runtimeState.hoveredWaterRegionId)
-      : (runtimeState.hoveredId ? runtimeState.landIndex.get(runtimeState.hoveredId) : null);
-  const data = feature && (
-    (!runtimeState.hoveredSpecialRegionId || isSpecialRegionEnabled(feature))
-    && (!runtimeState.hoveredWaterRegionId || isWaterRegionEnabled(feature))
-  ) ? [feature] : [];
-
-  const selection = rendererSurfaceHost.getHoverGroup()
-    .selectAll("path.hovered-feature")
-    .data(data, (d) => getFeatureId(d) || "hover");
-
-  selection
-    .enter()
-    .append("path")
-    .attr("class", "hovered-feature")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .attr("vector-effect", "non-scaling-stroke")
-    .merge(selection)
-    .attr("d", rendererSurfaceHost.getPathSvg())
-    .attr("fill", "none")
-    .attr("stroke", "#f1c40f")
-    .attr("stroke-linejoin", "round")
-    .attr("stroke-linecap", "round")
-    .attr("stroke-width", () => (runtimeState.hoveredWaterRegionId ? 1.25 : 1.45));
-
-  selection.exit().remove();
-
-  const activeFacilityEntry = getActiveFacilityHighlightEntry();
-  const facilityMarkerData = activeFacilityEntry?.projectedPoint?.length >= 2 ? [activeFacilityEntry] : [];
-  const facilitySelection = rendererSurfaceHost.getHoverGroup()
-    .selectAll("path.hovered-facility-marker")
-    .data(facilityMarkerData, (datum) => buildFacilityEntryKey(datum) || "hovered-facility");
-
-  facilitySelection
-    .enter()
-    .append("path")
-    .attr("class", "hovered-facility-marker")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .attr("vector-effect", "non-scaling-stroke")
-    .merge(facilitySelection)
-    .attr("d", (datum) => {
-      const [x, y] = datum.projectedPoint || [];
-      const zoomScale = Math.max(0.0001, Number(runtimeState.zoomTransform?.k || datum.screenScale || 1));
-      const radius = Math.max(6.8, Number(datum.markerRadiusPx || 0) + 2.8) / zoomScale;
-      if (datum.shape === "icon") {
-        return `M ${x - radius} ${y} A ${radius} ${radius} 0 1 0 ${x + radius} ${y} A ${radius} ${radius} 0 1 0 ${x - radius} ${y} Z`;
-      }
-      if (datum.shape === "square") {
-        return `M ${x - radius} ${y - radius} L ${x + radius} ${y - radius} L ${x + radius} ${y + radius} L ${x - radius} ${y + radius} Z`;
-      }
-      return `M ${x} ${y - radius} L ${x + radius} ${y} L ${x} ${y + radius} L ${x - radius} ${y} Z`;
-    })
-    .attr("fill", "rgba(255,255,255,0.12)")
-    .attr("stroke", (datum) => String(datum.highlightStroke || "#ffffff"))
-    .attr("stroke-width", 2.1);
-
-  facilitySelection.exit().remove();
-  rendererSurfaceHost.getHoverGroup().attr("aria-hidden", data.length || facilityMarkerData.length ? "false" : "true");
+  getTransientOverlayRenderOwner().renderHoverOverlay();
 }
 
 function renderInspectorHighlightOverlay() {
@@ -18358,19 +17158,6 @@ function executeSingleSubdivisionFill(action) {
   });
 }
 
-function executeBatchFill(action, resolverFn, kind) {
-  if (!action) return false;
-  const feature = action.eventPayload?.feature || runtimeState.landIndex.get(action.featureId);
-  const targetIds = resolverFn(feature, action.featureId);
-  if (!targetIds.length) {
-    return executeSingleSubdivisionFill(action);
-  }
-  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
-    kind,
-    dirtyReason: kind,
-  });
-}
-
 function executeDoubleClickBatchFill(feature, featureId) {
   if (!feature || !featureId) return false;
   const plan = buildDoubleClickBatchPlan(feature, featureId);
@@ -19181,11 +17968,9 @@ export {
   // Render cache and visual invalidation facade.
   rebuildStaticMeshes,
   invalidateBorderCache,
-  invalidateContextLayerVisualState,
   invalidateContextLayerVisualStateBatch,
   invalidateAllRenderPasses,
   invalidateOceanBackgroundVisualState,
-  invalidateOceanTextureVisualState,
   invalidateOceanWaterInteractionVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,

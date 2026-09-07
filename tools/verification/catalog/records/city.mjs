@@ -344,7 +344,8 @@ export const CITY_RECORDS = [
       "tests/city_points_render_owner_behavior.test.mjs",
       "tests/urban_city_policy_strategic_values_behavior.test.mjs",
       "js/core/renderer/city_points_render_owner.js",
-      "js/core/renderer/urban_city_policy.js"
+      "js/core/renderer/urban_city_policy.js",
+      "js/core/renderer/city_reveal_policy.js"
     ],
     "ownerHints": [
       "city-runtime"

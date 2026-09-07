@@ -1,3 +1,8 @@
+import {
+  normalizeScenarioFeatureCollection,
+  getScenarioFeatureCollectionIdentityList,
+  areScenarioFeatureCollectionsEquivalent,
+} from "../../js/core/scenario/pure_helpers.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -795,19 +800,9 @@ async function runOptionalChunkPromotionScenario({
       getSearchParams: () => new URLSearchParams(),
       normalizeScenarioId: (value) => String(value || "").trim(),
       normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
-      normalizeScenarioFeatureCollection: (payload) => (
-        Array.isArray(payload?.features)
-          ? { type: "FeatureCollection", features: payload.features }
-          : null
-      ),
-      getScenarioFeatureCollectionIdentityList: (payload) => (
-        Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-      ),
-      areScenarioFeatureCollectionsEquivalent: (left, right) => {
-        const leftIds = Array.isArray(left?.features) ? left.features.map((feature) => feature.id) : [];
-        const rightIds = Array.isArray(right?.features) ? right.features.map((feature) => feature.id) : [];
-        return leftIds.length === rightIds.length && leftIds.every((id, index) => id === rightIds[index]);
-      },
+      normalizeScenarioFeatureCollection,
+      getScenarioFeatureCollectionIdentityList,
+      areScenarioFeatureCollectionsEquivalent,
       getScenarioDefaultCountryCode: () => "",
       getScenarioBundleId: () => "tno_1962",
       getCachedScenarioBundle: () => bundle,
@@ -971,11 +966,7 @@ function createCoarsePrewarmContinuationHarness({
       scenarioAtlantropaDefault: false,
     }),
     normalizeScenarioFeatureCollection: (payload) => payload,
-    getScenarioFeatureCollectionIdentityList: (payload) => (
-      Array.isArray(payload?.features)
-        ? payload.features.map((feature) => String(feature?.id || ""))
-        : []
-    ),
+    getScenarioFeatureCollectionIdentityList,
     areScenarioFeatureCollectionsEquivalent: () => false,
     getScenarioDefaultCountryCode: () => "",
     getScenarioBundleId: (candidate) => String(candidate?.manifest?.scenario_id || ""),

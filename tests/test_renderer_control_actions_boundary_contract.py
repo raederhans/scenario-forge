@@ -23,6 +23,10 @@ PHASE_KEYS = {
 }
 
 INTERACTION_KEYS = {
+    "zoomTransform",
+    "lastMouseMoveTime",
+    "tooltipPendingState",
+    "tooltipRafHandle",
     "zoomGestureStartTransform",
     "zoomGestureScaleDelta",
     "pendingZoomTransform",
@@ -41,6 +45,10 @@ CLICK_INTERACTION_KEYS = {
     "waterRegionOverrides",
 }
 
+# These action setters coexist with policy-tracked renderer writes; they are
+# not yet an exclusive action boundary like the keys above.
+SHARED_HIT_CANVAS_KEYS = {"hitCanvasDirty", "hitCanvasBuildScheduled"}
+
 
 def assigned_keys(source):
     return set(re.findall(r"target\.([A-Za-z_$][\w$]*)\s*=", source))
@@ -57,7 +65,7 @@ class RendererControlActionsBoundaryContractTest(unittest.TestCase):
         self.assertEqual(assigned_keys(self.phase_actions), PHASE_KEYS)
         self.assertEqual(
             assigned_keys(self.interaction_actions),
-            INTERACTION_KEYS | CLICK_INTERACTION_KEYS,
+            INTERACTION_KEYS | CLICK_INTERACTION_KEYS | SHARED_HIT_CANVAS_KEYS,
         )
 
     def test_action_modules_remain_import_free_state_only_surfaces(self):

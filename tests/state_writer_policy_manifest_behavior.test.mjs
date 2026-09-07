@@ -8487,16 +8487,20 @@ test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mu
   assert.deepEqual(
     rendererContracts.map(({ contractIdentity }) => contractIdentity),
     [
+      "0ad5e419c276faf62c7375f4b112c5f0331830938718acc400226629b234aefe",
       "5e6cd046957fc4a7f2d806adaa12afff8f86b5ea7e6fd62c4d023f6fa1885251",
       "f8293fd8d98cb3ab0362a52ae7ebf30372c2cb9cc183641436a3f1895338c139",
       "b039cb07c359bf2a0270c650c3b54a13e66c4d150b84ef369fcd07359f4dff58",
       "661569a4008d4a8a207bab8115268533f7fd94035f2508e5572e1d5289a2d793",
+      "447d2f10d0b8a7089a85f38fbdcef8564ffdadc5581fd9628f16bd07948f53cc",
       "6a7f9cf11b3288cbbbee8549e865f12488e0cee699c86f1daa4d08fe59449727",
       "f0392f7324a158420ab19c737cc6fd8be57758a20ea4049e70e9ddd01333f740",
       "4b0f41e40474b9eac61cb1e8afa533e7717f9bc62345afb53b4d9ef0ca4d141d",
       "c01abd31e713c14331a6e2ac8f1c5529813d5fc5048e3d3fb970ad5dbf161a6b",
       "4a1e7970e1ec86ff50ea3785eff073c2d015d2afa766fa2743361ac1ea0dda7d",
       "70e4c965698025b40e1a74945b6880f421dc1260982afffab26c449b531a0277",
+      "9289a139b92d4caeaea609c4bbd1b58acc34affcf8f67f3fc10b7e82ca3cc7cf",
+      "5bda77ffb52ef7687f2cb7b1a7cdfb2ac6a594dfcc94c696ee94393011d43274",
       "a1574269705ceb9f5a06b7e8f10748e4f77e12778218d68a8e3104d757f1ef59",
       "3ebe1743567ed05509aa5e55b801279d5a765b7dc5a3be42b54c6b5bd28d091f",
       "907a7a73d938121b892601ad956e6cea04f5d1caeeedd038a94b1b76ebb4c440",
@@ -8506,6 +8510,9 @@ test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mu
   const callerToActionEntries =
     frozenPolicy.progress.callerToActionLedger.entries;
   for (const contract of rendererContracts) {
+    // These four P4.3 memberships acquired their explicit cross-file proof in P4.4.
+    const recordedPhase = ["cachedDetailAdmBorders", "lastMouseMoveTime"].includes(contract.key)
+      ? "P4.4" : "P4.3";
     const entry = callerToActionEntries.find(
       ({ retiredMembershipIdentity }) =>
         retiredMembershipIdentity
@@ -8568,8 +8575,8 @@ test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mu
         targetArgumentIndex: contract.targetArgumentIndex,
         sourceFingerprint:
           contract.replacementActionSourceFingerprint,
-        retiredInPhase: "P4.3",
-        recordedInPhase: "P4.3",
+        retiredInPhase: recordedPhase,
+        recordedInPhase: recordedPhase,
         backfilled: false,
       },
       contract.retiredMembershipIdentity,

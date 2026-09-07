@@ -1,5 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import {
+  compareCityRevealEntries,
+  getCityCountryRevealOverride,
+  getCityCountryTierFromScenarioRecord,
+  getCityCountryVisibilityClass,
+  getCityInterpolatedMarkerBudget,
+  getCityInterpolatedMarkerQuota,
+  getCityRevealPhase,
+  isCityLabelEligibleForPhase,
+} from "../js/core/renderer/city_reveal_policy.js";
 
 import {
   createUrbanCityPolicyOwner,
@@ -227,4 +237,60 @@ test("urban city policy ignores strategic victory points from diagnostic-error p
   assert.equal(collection.features[0].properties.__city_scenario_victory_points, undefined);
   assert.equal(collection.features[0].properties.__city_scenario_vp_name, undefined);
   assert.equal(collection.features[0].properties.__city_scenario_vp_province_id, undefined);
+});
+
+test("city reveal phases preserve threshold ownership and interpolated budgets", () => {
+  for (const [scale, phase] of [[1, "P0"], [1.149999, "P0"], [1.15, "P1"],
+    [1.45, "P2"], [1.9, "P3"], [2.45, "P4"], [3.05, "P5"], [20, "P5"]]) {
+    assert.equal(getCityRevealPhase(scale).id, phase);
+  }
+  assert.equal(getCityInterpolatedMarkerBudget(1.3), 35);
+  assert.equal(getCityInterpolatedMarkerBudget(3.05, 2), 340);
+  assert.equal(getCityInterpolatedMarkerQuota({ countryTier: "A" }, 1.25), 2);
+  assert.equal(getCityInterpolatedMarkerQuota({ countryTier: "E" }, 3.05), 1);
+  assert.equal(getCityInterpolatedMarkerQuota({ countryTier: "E" }, 3.05, 0.5), 1);
+  assert.equal(getCityInterpolatedMarkerQuota({ countryTier: "E" }, 0.5, 2), 1);
+  assert.equal(getCityInterpolatedMarkerQuota({ countryTier: "A" }, 1.45, 0.5), 1);
+});
+
+test("city reveal ranking shifts from country priority to capital and population", () => {
+  const priority = Object.freeze({ cityId: "priority", revealBucket: 0, isPriorityCountry: true,
+    countryTierRank: 5, cityTierWeight: 1, population: 100 });
+  const capital = Object.freeze({ cityId: "capital", revealBucket: 0, isCapital: true,
+    countryTierRank: 1, cityTierWeight: 3, population: 1000000 });
+  assert.ok(compareCityRevealEntries(priority, capital, "P0") < 0);
+  assert.ok(compareCityRevealEntries(priority, capital, "P3") > 0);
+  assert.ok(compareCityRevealEntries(priority, capital, "P5") > 0);
+  assert.ok(compareCityRevealEntries({ ...capital, revealBucket: 2 }, priority, "P0") > 0);
+  assert.ok(compareCityRevealEntries({ cityId: "a" }, { cityId: "b" }) < 0);
+});
+
+test("city country rules preserve subject precedence and explicit override bounds", () => {
+  const profile = Object.freeze({ scenarioTag: "USA", featureCount: 300 });
+  assert.equal(getCityCountryTierFromScenarioRecord(profile, { controller_feature_count: 150 }), "A");
+  assert.equal(getCityCountryTierFromScenarioRecord(profile, {
+    controller_feature_count: 150, entry_kind: "controller_only",
+  }), "E");
+  assert.equal(getCityCountryVisibilityClass(profile, {
+    parent_owner_tag: "GER", controller_feature_count: 150, featured: true,
+  }), "micro_subject");
+  assert.deepEqual(getCityCountryRevealOverride(Object.freeze({
+    tag: "USA", city_reveal_class: "local_actor", city_reveal_weight_bias: -8,
+    city_reveal_min_floor_boost: 20,
+  })), { className: "local_actor", classWeightBias: -0.35, minQuotaFloorBoost: 3 });
+  assert.deepEqual(getCityCountryRevealOverride({ tag: "USA" }), {
+    className: "global_core", classWeightBias: 0.42, minQuotaFloorBoost: 2,
+  });
+});
+
+test("city labels retain staged capital, major and minor eligibility", () => {
+  const capital = { isCapital: true, cityTier: "minor" };
+  const major = { cityTier: "major" };
+  const minor = { cityTier: "minor" };
+  assert.equal(isCityLabelEligibleForPhase(capital, "P2"), false);
+  assert.equal(isCityLabelEligibleForPhase(capital, "P3"), true);
+  assert.equal(isCityLabelEligibleForPhase(major, "P3"), false);
+  assert.equal(isCityLabelEligibleForPhase(major, "P4"), true);
+  assert.equal(isCityLabelEligibleForPhase(minor, "P4"), false);
+  assert.equal(isCityLabelEligibleForPhase(minor, "P5"), true);
 });

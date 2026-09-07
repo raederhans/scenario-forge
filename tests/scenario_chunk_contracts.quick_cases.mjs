@@ -1,4 +1,9 @@
 import {
+  normalizeScenarioFeatureCollection,
+  getScenarioFeatureCollectionIdentityList,
+  areScenarioFeatureCollectionsEquivalent,
+} from "../js/core/scenario/pure_helpers.js";
+import {
   test,
   assert,
   createScenarioChunkRuntimeController,
@@ -185,9 +190,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
       normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
       normalizeScenarioPerformanceHints: (value) => value || {},
       normalizeScenarioFeatureCollection: (payload) => payload,
-      getScenarioFeatureCollectionIdentityList: (payload) => (
-        Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-      ),
+      getScenarioFeatureCollectionIdentityList,
       areScenarioFeatureCollectionsEquivalent: () => false,
       getScenarioDefaultCountryCode: () => "",
       getScenarioBundleId: (bundle) => String(bundle?.manifest?.scenario_id || ""),
@@ -575,9 +578,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         normalizeScenarioId: (value) => String(value || "").trim(),
         normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
         normalizeScenarioFeatureCollection: (payload) => payload,
-        getScenarioFeatureCollectionIdentityList: (payload) => (
-          Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-        ),
+        getScenarioFeatureCollectionIdentityList,
         areScenarioFeatureCollectionsEquivalent: () => false,
         getScenarioDefaultCountryCode: () => "",
         getScenarioBundleId: () => "tno_1962",
@@ -685,9 +686,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         normalizeScenarioId: (value) => String(value || "").trim(),
         normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
         normalizeScenarioFeatureCollection: (payload) => payload,
-        getScenarioFeatureCollectionIdentityList: (payload) => (
-          Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-        ),
+        getScenarioFeatureCollectionIdentityList,
         areScenarioFeatureCollectionsEquivalent: () => false,
         getScenarioDefaultCountryCode: () => "GCO",
         getScenarioBundleId: () => "tno_1962",
@@ -1480,9 +1479,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         normalizeScenarioId: (value) => String(value || "").trim(),
         normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
         normalizeScenarioFeatureCollection: (payload) => payload,
-        getScenarioFeatureCollectionIdentityList: (payload) => (
-          Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-        ),
+        getScenarioFeatureCollectionIdentityList,
         areScenarioFeatureCollectionsEquivalent: () => false,
         getScenarioDefaultCountryCode: () => "DE",
         getScenarioBundleId: () => "tno_1962",
@@ -1599,19 +1596,9 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         getSearchParams: () => new URLSearchParams(),
         normalizeScenarioId: (value) => String(value || "").trim(),
         normalizeCountryCodeAlias: (value) => String(value || "").trim().toUpperCase(),
-        normalizeScenarioFeatureCollection: (payload) => (
-          Array.isArray(payload?.features)
-            ? { type: "FeatureCollection", features: payload.features }
-            : null
-        ),
-        getScenarioFeatureCollectionIdentityList: (payload) => (
-          Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-        ),
-        areScenarioFeatureCollectionsEquivalent: (left, right) => {
-          const leftIds = Array.isArray(left?.features) ? left.features.map((feature) => feature.id) : [];
-          const rightIds = Array.isArray(right?.features) ? right.features.map((feature) => feature.id) : [];
-          return leftIds.length === rightIds.length && leftIds.every((id, index) => id === rightIds[index]);
-        },
+        normalizeScenarioFeatureCollection,
+        getScenarioFeatureCollectionIdentityList,
+        areScenarioFeatureCollectionsEquivalent,
         getScenarioDefaultCountryCode: () => "",
         getScenarioBundleId: () => "tno_1962",
         getCachedScenarioBundle: () => bundle,
@@ -2024,14 +2011,8 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         scenarioReliefOverlaysDefault: false,
         scenarioAtlantropaDefault: false,
       }),
-      normalizeScenarioFeatureCollection: (payload) => (
-        Array.isArray(payload?.features)
-          ? { type: "FeatureCollection", features: payload.features }
-          : null
-      ),
-      getScenarioFeatureCollectionIdentityList: (payload) => (
-        Array.isArray(payload?.features) ? payload.features.map((feature) => String(feature?.id || "")) : []
-      ),
+      normalizeScenarioFeatureCollection,
+      getScenarioFeatureCollectionIdentityList,
       areScenarioFeatureCollectionsEquivalent: () => false,
       getScenarioDefaultCountryCode: () => "",
       getScenarioBundleId: () => "hoi4_1939",

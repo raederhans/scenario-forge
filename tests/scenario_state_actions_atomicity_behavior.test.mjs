@@ -127,6 +127,74 @@ function createAuthorityPatch(keys) {
   );
 }
 
+for (const [kind, title, keys] of [
+  ["readiness", "Readiness", READINESS_KEYS],
+  ["activation", "Activation", ACTIVATION_KEYS],
+  ["presentation", "Presentation", PRESENTATION_KEYS],
+  ["palette", "Palette", PALETTE_KEYS],
+]) {
+  test(`${kind} rejects malformed patches and snapshots before any write`, async () => {
+    const actions = await import(`../js/core/state/actions/scenario_${kind}_actions.js`);
+    const commit = actions[`commitScenario${title}State`];
+    const restore = actions[`restoreScenario${title}State`];
+    const prefix = `[scenario_${kind}_actions]`;
+    const target = Object.freeze(createAuthorityTarget(keys));
+    const before = { ...target };
+    const complete = createAuthorityPatch(keys);
+    const missing = keys.at(-1);
+    const inherited = Object.assign(Object.create({ [missing]: complete[missing] }), complete);
+    delete inherited[missing];
+    for (const patch of [null, [], 42]) {
+      assert.throws(() => commit(target, patch), {
+        name: "TypeError", message: `${prefix} patch must be an object`,
+      });
+    }
+    assert.throws(() => commit(target, inherited), {
+      message: `${prefix} commitScenario${title}State missing required key: ${missing}`,
+    });
+    const cases = [
+      [null, "TypeError", "snapshot must be an object"],
+      [[], "TypeError", "snapshot must be an object"],
+      [{ values: [] }, "TypeError", "snapshot.values must be an object"],
+      [{ values: null }, "TypeError", "snapshot.values must be an object"],
+      // Missing own keys must take precedence over an invalid presentKeys shape.
+      [{ values: inherited }, "Error", `restoreScenario${title}State missing snapshot key: ${missing}`],
+      [{ values: complete, presentKeys: {} }, "TypeError", "snapshot.presentKeys must be an array or Set"],
+      ...[[], new Set()].map((collection) => [
+        { values: complete, presentKeys: collection instanceof Set
+          ? new Set([...keys, "unknownKey"]) : [...keys, "unknownKey"] },
+        "Error", `restoreScenario${title}State contains unknown present key: unknownKey`,
+      ]),
+    ];
+    for (const [snapshot, name, detail] of cases) {
+      assert.throws(() => restore(target, snapshot), { name, message: `${prefix} ${detail}` });
+      assert.deepEqual(target, before);
+    }
+  });
+
+  test(`${kind} restores Set presence and own undefined without changing inherited fields`, async () => {
+    const actions = await import(`../js/core/state/actions/scenario_${kind}_actions.js`);
+    const capture = actions[`captureScenario${title}State`];
+    const restore = actions[`restoreScenario${title}State`];
+    const [inheritedKey, undefinedKey] = keys;
+    const inheritedValue = { inherited: true };
+    const prototype = { [inheritedKey]: inheritedValue };
+    const source = Object.assign(Object.create(prototype), createAuthorityTarget(keys, inheritedKey));
+    source[undefinedKey] = undefined;
+    const snapshot = capture(source);
+    assert.equal(Object.hasOwn(snapshot.values, inheritedKey), true);
+    assert.equal(snapshot.presentKeys.includes(inheritedKey), false);
+    const presentKeys = new Set(snapshot.presentKeys);
+    const target = Object.assign(Object.create(prototype), createAuthorityPatch(keys));
+    restore(target, { values: snapshot.values, presentKeys });
+    assert.equal(Object.hasOwn(target, inheritedKey), false);
+    assert.equal(target[inheritedKey], inheritedValue);
+    assert.equal(Object.hasOwn(target, undefinedKey), true);
+    assert.equal(target[undefinedKey], undefined);
+    assert.deepEqual([...presentKeys], snapshot.presentKeys);
+  });
+}
+
 function assertCompleteAtomicAuthority({
   keys,
   exportedKeys,
