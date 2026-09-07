@@ -1,6 +1,5 @@
 // Transient SVG overlays: special-zone editing and feature/facility hover.
-export function createTransientOverlayRenderOwner({
-  runtimeState,
+export function createTransientOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
   ensureSpecialZoneEditorState,
   getSpecialZoneStyle,
@@ -169,5 +168,5 @@ export function createTransientOverlayRenderOwner({
     rendererSurfaceHost.getHoverGroup().attr("aria-hidden", data.length || facilityMarkerData.length ? "false" : "true");
   }
 
-  return { renderSpecialZoneEditorOverlay, renderHoverOverlay };
+  return Object.freeze({ renderSpecialZoneEditorOverlay, renderHoverOverlay });
 }

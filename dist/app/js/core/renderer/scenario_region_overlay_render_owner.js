@@ -1,8 +1,7 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 
-export function createScenarioRegionOverlayRenderOwner({
-  runtimeState,
+export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
   getRenderPassCacheState,
   getRenderPassLayout,
@@ -644,7 +643,7 @@ export function createScenarioRegionOverlayRenderOwner({
     lastScenarioWaterRenderedCount = 0;
   }
 
-  return {
+  return Object.freeze({
     drawScenarioRegionOverlaysPass,
     getContextScenarioLayerCacheEntry,
     ensureContextScenarioLayerCanvas,
@@ -652,5 +651,5 @@ export function createScenarioRegionOverlayRenderOwner({
     resetWaterPathCaches,
     getPreviousWaterRenderedCount,
     resetPreviousWaterRenderedCount,
-  };
+  });
 }

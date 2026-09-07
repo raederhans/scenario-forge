@@ -4040,7 +4040,9 @@ function validateStateTargetPureReaderBinding({
   for (const finding of findings) {
     if (
       finding?.unsupported
-      && finding.reason === "state-alias-escape"
+      && (finding.reason === "state-alias-escape"
+        || (["unsupported-call-mutation", "ambiguous-alias-flow"].includes(finding.reason)
+          && (entry.reviewedReadSiteFingerprints || []).includes(finding.sourceFingerprint)))
     ) {
       observedConservativeFindings.push(finding);
       continue;

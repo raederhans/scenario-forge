@@ -5,8 +5,7 @@ const POLITICAL_PATH_WARMUP_MAX_FEATURES_PER_SLICE = 24;
 const POLITICAL_PATH_WARMUP_CPU_BUDGET_MS = 4;
 const POLITICAL_PATH_WARMUP_TIMEOUT_MS = 24;
 
-export function createPoliticalPathCacheOwner({
-  runtimeState,
+export function createPoliticalPathCacheOwner(runtimeState, {
   rendererSurfaceHost,
   getPoliticalPassStaticSignature,
   getProjectionRenderSignature,
@@ -345,12 +344,12 @@ export function createPoliticalPathCacheOwner({
     return true;
   }
 
-  return {
+  return Object.freeze({
     getPoliticalPathCacheSignature,
     cancelPoliticalPathWarmup,
     invalidatePoliticalPathCache,
     getPoliticalPathCacheHandle,
     getPoliticalFeaturePathEntry,
     schedulePoliticalPathWarmup,
-  };
+  });
 }

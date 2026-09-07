@@ -1202,7 +1202,7 @@ function createCallerActionLedgerPolicy(entries = []) {
   return policy;
 }
 
-function createCrossFileMigrationFixture() {
+function createCrossFileMigrationFixture({ retiredSiteCount = 1 } = {}) {
   const retiredCallerPath =
     "js/core/legacy_cross_file_fixture.js";
   const retiredBinding = {
@@ -1244,6 +1244,10 @@ function createCrossFileMigrationFixture() {
       unsupportedSites: [],
     }],
   };
+  const retiredSites = retiredBinding.grants[0].memberships[0].mutationSites;
+  while (retiredSites.length < retiredSiteCount) {
+    retiredSites.push({ ...retiredSites[0], occurrenceIndex: retiredSites.length });
+  }
   const retiredCallerBindingIdentity =
     buildStableStateBindingIdentity(retiredBinding);
   const retiredMembershipIdentity = [
@@ -8382,8 +8386,9 @@ test("caller-to-action ledger accepts only an exact explicit cross-file migratio
   );
 });
 
-test("an existing caller-to-action proof adopts a newly explicit cross-file handoff", () => {
-  const fixture = createCrossFileMigrationFixture();
+for (const retiredSiteCount of [1, 2]) {
+test(`an existing caller-to-action proof adopts a newly explicit cross-file handoff (${retiredSiteCount} sites in one function)`, () => {
+  const fixture = createCrossFileMigrationFixture({ retiredSiteCount });
   const legacyDelegation = {
     ...fixture.actionDelegation,
     callerPath: fixture.contract.retiredCallerPath,
@@ -8472,7 +8477,17 @@ test("an existing caller-to-action proof adopts a newly explicit cross-file hand
     currentPolicy: driftedTransitionPolicy,
     crossFileMigrationContract: [fixture.contract],
   }).some(({ code }) => code === "caller-action-ledger-history-drift"));
+  for (const field of ["retiredMutationSiteCount", "retiredEnclosingFunctionIdentity"]) {
+    const forged = structuredClone(currentTransitionPolicy);
+    forged.progress.callerToActionLedger.entries[0][field] = "forged";
+    assert.ok(validateCallerToActionLedgerHistoryTransition({
+      previousPolicy: previousTransitionPolicy,
+      currentPolicy: forged,
+      crossFileMigrationContract: [fixture.contract],
+    }).some(({ code }) => code === "caller-action-ledger-history-drift"));
+  }
 });
+}
 
 test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mutation sites", () => {
   const frozenPolicy = JSON.parse(

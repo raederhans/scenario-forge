@@ -86,8 +86,7 @@ function fixture(t) {
     finishOperationGraphicVertexDrag: (index) => h.calls.push(["finish", index]),
     insertOperationGraphicVertex: (index, coord) => h.calls.push(["insert", index, coord]),
   };
-  h.owner = createOperationGraphicsEditorRenderOwner({
-    runtimeState: h.state,
+  h.owner = createOperationGraphicsEditorRenderOwner(h.state, {
     rendererSurfaceHost: { getOperationGraphicsEditorGroup: () => h.group, getInteractionRect: () => h.interaction },
     ensureOperationGraphicsEditorState: () => { h.ensured++; },
     getOperationGraphicById: (id) => id === h.graphic?.id ? h.graphic : null,

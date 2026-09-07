@@ -1,3 +1,4 @@
+const visibleFrameIdentitySource = readRepoFile("js", "core", "renderer", "visible_frame_identity_policy.js").replace(/^  /gm, "");
 import {
   test,
   assert,
@@ -32,6 +33,8 @@ const politicalFeaturePolicySource = readRepoFile("js", "core", "renderer", "pol
 const staticBorderMeshLifecycleSource = readRepoFile("js", "core", "renderer", "static_border_mesh_lifecycle.js");
 
 const brushInteractionSessionOwnerSource = readRepoFile("js", "core", "renderer", "brush_interaction_session_owner.js");
+
+const renderPassSignatureSource = readRepoFile("js", "core", "renderer", "render_pass_signature_policy.js").replace(/^  /gm, "");
 
 const defaultRegister = (_order, ...args) => test(...args);
 
@@ -222,7 +225,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     );
     const mainSource = readRepoFile("js", "main.js");
     const deferredUiBootstrapSource = readRepoFile("js", "bootstrap", "deferred_ui_bootstrap.js");
-    const contextScenarioSignatureBranch = extractRendererPassSignatureBranch(rendererSource, "contextScenario");
+    const contextScenarioSignatureBranch = extractRendererPassSignatureBranch(renderPassSignatureSource, "contextScenario");
     const rendererRuntimeStateSource = readRepoFile("js", "core", "state", "renderer_runtime_state.js");
     const frameSchedulerSource = readRepoFile("js", "core", "frame_scheduler.js");
     const exactAfterSettlePlansSource = readRepoFile("js", "core", "map_renderer", "exact_after_settle_refresh_plans.js");
@@ -333,7 +336,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && rendererSource.includes('return reject("stale-age-limit")')
         && rendererSource.includes('continuityFrameRelaxedReuse'),
       firstVisibleScenarioRequiresCurrentPoliticalExactFrame:
-        /function getFirstVisiblePoliticalFrameBlockReason\(reason = "visible-frame"\) \{[\s\S]*?base-visible-fallback[\s\S]*?normalizedReason !== "exact-frame"[\s\S]*?dirty-political-pass[\s\S]*?stale-ocean-fill[\s\S]*?stale-political-signature[\s\S]*?stale-political-reference-transform[\s\S]*?politicalPassDataStage[\s\S]*?politicalPassFineCacheReady[\s\S]*?stale-political-full-reference-transform/.test(rendererSource)
+        /function getFirstVisiblePoliticalFrameBlockReason\(reason = "visible-frame"\) \{[\s\S]*?base-visible-fallback[\s\S]*?normalizedReason !== "exact-frame"[\s\S]*?dirty-political-pass[\s\S]*?stale-ocean-fill[\s\S]*?stale-political-signature[\s\S]*?stale-political-reference-transform[\s\S]*?politicalPassDataStage[\s\S]*?politicalPassFineCacheReady[\s\S]*?stale-political-full-reference-transform/.test(visibleFrameIdentitySource)
         && /function noteFirstVisibleFrameBlocked\(reason = "visible-frame", blockReason = "unknown"\) \{[\s\S]*?getVisibleFrameDiagnosticsOwner\(\)\.recordFirstVisibleFrameBlocked\(reason, blockReason\);/.test(rendererSource)
         && /function recordVisibleFrameTransactionMetric\(status, details = \{\}\) \{[\s\S]*?getVisibleFrameDiagnosticsOwner\(\)\.recordVisibleFrameTransaction\(status, details\)\.metricEntry;/.test(rendererSource)
         && /function markFirstVisibleFramePainted\(reason = "visible-frame"\) \{[\s\S]*?getVisibleFrameDiagnosticsOwner\(\)\.markFirstVisibleFramePainted\(reason\);/.test(rendererSource)
@@ -345,8 +348,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && visibleFrameDiagnosticsOwnerSource.includes("oceanFill"),
       oceanBackgroundInvalidationCoversPoliticalSignatureDependents:
         /function invalidateOceanBackgroundVisualState\(reason = "ocean-background"\) \{[\s\S]*?cancelExactAfterSettleRefresh\(\{ clearDefer: true \}\);[\s\S]*?invalidateRenderPasses\(\["background", "physicalBase", "political", "contextBase", "contextScenario"\], reason\);[\s\S]*?clearRenderPassReferenceTransforms\(\["background", "physicalBase", "political", "contextBase", "contextScenario"\]\);/.test(rendererSource)
-        && /function getPoliticalPassStaticSignature[\s\S]*?`ocean-fill:\$\{getOceanBaseFillColor\(\)\}`/.test(rendererSource)
-        && /if \(passName === "contextScenario"\) \{[\s\S]*?`ocean-fill:\$\{getOceanBaseFillColor\(\)\}`/.test(rendererSource),
+        && /function getPoliticalPassStaticSignature[\s\S]*?`ocean-fill:\$\{getOceanBaseFillColor\(\)\}`/.test(renderPassSignatureSource)
+        && /if \(passName === "contextScenario"\) \{[\s\S]*?`ocean-fill:\$\{getOceanBaseFillColor\(\)\}`/.test(renderPassSignatureSource),
       exactAfterSettleReschedulesWhenPhaseStillBusy:
         /function scheduleExactAfterSettleRefresh\(profile = runtimeState\.adaptiveSettleProfile \|\| getAdaptiveSettleProfile\(\)\) \{[\s\S]*?getExactAfterSettleScheduler\(\)\.scheduleExactAfterSettleRefresh\(profile\);/.test(rendererSource)
         && /function scheduleExactAfterSettleRefresh\(profile = runtimeState\.adaptiveSettleProfile \|\| getAdaptiveSettleProfile\(\)\) \{[\s\S]*?const generation = Number\(beginExactAfterSettleControllerSchedule\(scheduleStartedAt\) \|\| 0\);[\s\S]*?isExactAfterSettleGenerationCurrent\(generation, "scheduled"\)[\s\S]*?if \(!runtimeState\.deferExactAfterSettle\) \{[\s\S]*?resetExactAfterSettleController\("defer-cleared", generation\);[\s\S]*?if \(runtimeState\.renderPhase !== renderPhaseIdle\) \{[\s\S]*?scheduleExactAfterSettleRefresh\(resolvedProfile\);[\s\S]*?return;[\s\S]*?\}/.test(exactSchedulerSource),
@@ -425,9 +428,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function clearPendingPoliticalColorEdit\(\{[\s\S]*?renderedCount = 0,[\s\S]*?renderedIds = null,[\s\S]*?force = false,[\s\S]*?paintSource = "political-pass"[\s\S]*?\} = \{\}\) \{[\s\S]*?const hasRenderedIdScope = renderedIds !== null && renderedIds !== undefined;[\s\S]*?renderedIdList\.forEach\(\(id\) => pendingIds\.delete\(id\)\);[\s\S]*?if \(pendingIds\.size > 0\) return false;/.test(rendererSource)
         && /function recordFillPatchFirstPixelMetric\(\{[\s\S]*?recordRenderPerfMetric\("fillPatchInputToFirstPixelMs"/.test(rendererSource)
         && /function shouldRefreshContextBaseContoursForColorChanges\(\) \{[\s\S]*?runtimeState\.showPhysical[\s\S]*?physicalContourMajorData/.test(rendererSource)
-        && /if \(passName === "contextBase"\) \{[\s\S]*?`context-colors:\$\{shouldRefreshContextBaseForColorChanges\(\) \? Number\(runtimeState\.colorRevision \|\| 0\) : 0\}`/.test(rendererSource)
+        && /if \(passName === "contextBase"\) \{[\s\S]*?`context-colors:\$\{shouldRefreshContextBaseForColorChanges\(\) \? Number\(runtimeState\.colorRevision \|\| 0\) : 0\}`/.test(renderPassSignatureSource)
         && !contextScenarioSignatureBranch.includes("`colors:${Number(runtimeState.colorRevision || 0)}`")
-        && /if \(passName === "labels"\) \{[\s\S]*?getUrbanCityRenderPassSignatureParts\(runtimeState, "labels"\)/.test(rendererSource)
+        && /if \(passName === "labels"\) \{[\s\S]*?getUrbanCityRenderPassSignatureParts\(runtimeState, "labels"\)/.test(renderPassSignatureSource)
         && /const sharedTail = \[[\s\S]*?`colors:\$\{Number\(state\?\.colorRevision \|\| 0\)\}`[\s\S]*?\];/.test(urbanCityPolicySource)
         && /if \(passName === "labels"\) \{[\s\S]*?return \[[\s\S]*?strategic, \.\.\.sharedTail\];/.test(urbanCityPolicySource),
       partialPoliticalRepaintOnlyAcceptsTargetedRefreshColors:
@@ -624,16 +627,16 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
             '"dayNight"',
           ].every((passName) => !stableSignatureSet.includes(passName));
         })()
-        && /function getRenderPassTransformSignature[\s\S]*?VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES\.has\(passName\)[\s\S]*?shouldEnableContextBaseTransformReuse\(\)[\s\S]*?"transform-reuse"[\s\S]*?getViewportRenderSignature\(\)/.test(rendererSource)
-        && /if \(passName === "contextScenario"\) \{[\s\S]*?transformSignature,[\s\S]*?`scenario-overlays:\$\{getScenarioOverlaySignatureToken\(\)\}`/.test(rendererSource)
-        && /function getRenderPassSignature[\s\S]*?const transformSignature = getRenderPassTransformSignature\(passName, transform\);/.test(rendererSource),
+        && /function getRenderPassTransformSignature[\s\S]*?VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES\.has\(passName\)[\s\S]*?shouldEnableContextBaseTransformReuse\(\)[\s\S]*?"transform-reuse"[\s\S]*?getViewportRenderSignature\(\)/.test(renderPassSignatureSource)
+        && /if \(passName === "contextScenario"\) \{[\s\S]*?transformSignature,[\s\S]*?`scenario-overlays:\$\{getScenarioOverlaySignatureToken\(\)\}`/.test(renderPassSignatureSource)
+        && /function getRenderPassSignature[\s\S]*?const transformSignature = getRenderPassTransformSignature\(passName, transform\);/.test(renderPassSignatureSource),
       continuityFrameReuseIdentityIncludesSelectionAndContextFlags:
-        rendererSource.includes("function getRuntimeChunkSelectionVersion()")
-        && rendererSource.includes("function getVisibleContextFlagSignature()")
-        && rendererSource.includes("function getCommittedFrameIdentity")
-        && rendererSource.includes("function getCommittedFrameKeySignature")
-        && /function getVisibleFrameIdentity[\s\S]*?selectionVersion: getRuntimeChunkSelectionVersion\(\)[\s\S]*?contextFlagSignature: getVisibleContextFlagSignature\(\)/.test(rendererSource)
-        && /function getCommittedFrameIdentity[\s\S]*?const commitKey = \{[\s\S]*?scenarioId: identity\.scenarioId[\s\S]*?sceneGeneration: identity\.sceneGeneration[\s\S]*?scenarioDataGeneration: identity\.scenarioDataGeneration[\s\S]*?selectionVersion: identity\.selectionVersion[\s\S]*?topologyRevision: identity\.topologyRevision[\s\S]*?colorRevision: identity\.colorRevision[\s\S]*?contextFlagSignature: identity\.contextFlagSignature[\s\S]*?pixelWidth: identity\.pixelWidth[\s\S]*?pixelHeight: identity\.pixelHeight/.test(rendererSource)
+        visibleFrameIdentitySource.includes("function getRuntimeChunkSelectionVersion()")
+        && visibleFrameIdentitySource.includes("function getVisibleContextFlagSignature()")
+        && visibleFrameIdentitySource.includes("function getCommittedFrameIdentity")
+        && visibleFrameIdentitySource.includes("function getCommittedFrameKeySignature")
+        && /function getVisibleFrameIdentity[\s\S]*?selectionVersion: getRuntimeChunkSelectionVersion\(\)[\s\S]*?contextFlagSignature: getVisibleContextFlagSignature\(\)/.test(visibleFrameIdentitySource)
+        && /function getCommittedFrameIdentity[\s\S]*?const commitKey = \{[\s\S]*?scenarioId: identity\.scenarioId[\s\S]*?sceneGeneration: identity\.sceneGeneration[\s\S]*?scenarioDataGeneration: identity\.scenarioDataGeneration[\s\S]*?selectionVersion: identity\.selectionVersion[\s\S]*?topologyRevision: identity\.topologyRevision[\s\S]*?colorRevision: identity\.colorRevision[\s\S]*?contextFlagSignature: identity\.contextFlagSignature[\s\S]*?pixelWidth: identity\.pixelWidth[\s\S]*?pixelHeight: identity\.pixelHeight/.test(visibleFrameIdentitySource)
         && /function recordVisibleFrameTransactionMetric\(status, details = \{\}\) \{[\s\S]*?getVisibleFrameDiagnosticsOwner\(\)\.recordVisibleFrameTransaction\(status, details\)\.metricEntry;/.test(rendererSource)
         && /function recordVisibleFrameTransactionCore[\s\S]*?committedFrameIdentity: providedCommittedFrameIdentity[\s\S]*?getCommittedFrameIdentity[\s\S]*?getCommittedFrameKeySignature[\s\S]*?commitKey: visibleFrameCommitKey[\s\S]*?committedFrameIdentity/.test(visibleFrameDiagnosticsOwnerSource)
         && /function getInteractionCompositeMismatchReasons[\s\S]*?selection-version-mismatch[\s\S]*?context-flag-mismatch[\s\S]*?color-revision-mismatch/.test(renderCacheOwnerSource)
@@ -798,8 +801,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
   });
 
   register(34, "first visible political frame accepts coarse startup pass without full reference", () => {
-    const rendererSource = readRepoFile("js", "core", "map_renderer.js");
-    const harness = createFirstVisibleFrameGateHarness(rendererSource);
+    const harness = createFirstVisibleFrameGateHarness();
 
     harness.setPoliticalStage("coarse", false);
     harness.setFullReferenceTransform(null);
@@ -1181,13 +1183,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       spatialHitPreservesRuntimeCountryAndReturnsInteractionCountry:
         /function toHitResult\([\s\S]*?const runtimeCountryCode = canonicalCountryCode\([\s\S]*?candidate\.item\.countryCode[\s\S]*?const interactionCountryCode = feature[\s\S]*?getFeatureInteractionCountryCodeNormalized\(feature, resolvedId\)[\s\S]*?countryCode: interactionCountryCode \|\| runtimeCountryCode,[\s\S]*?runtimeCountryCode,/.test(interactionHitCandidateSource)
         && /function toHitResult\(candidate,[\s\S]*?toCandidateHitResult\(candidate,[\s\S]*?getFeatureInteractionCountryCodeNormalized,/.test(rendererSource),
-      targetResolutionUsesOwnerAwareFeatureIds:
-        /function getInteractionCountryFeatureIds\(feature, featureId\) \{[\s\S]*?getScenarioOwnerFeatureIds\(interactionCountryCode\)[\s\S]*?getCountryFeatureIds\(runtimeCountryCode\)/.test(rendererSource)
-        && /function resolveInteractionTargetIds\(feature, id\) \{[\s\S]*?getFeatureInteractionCountryCodeNormalized\(feature, id\)[\s\S]*?getInteractionCountryFeatureIds\(feature, id\)/.test(rendererSource)
-        && /function resolveCountryFillTargetIds\(feature, featureId[\s\S]*?getFeatureInteractionCountryCodeNormalized\(feature, featureId\)[\s\S]*?getInteractionCountryFeatureIds\(feature, featureId\)/.test(rendererSource),
-      parentGroupsUseOwnerAwareScope:
-        /function resolveParentGroupKey\(feature, featureId\) \{[\s\S]*?getFeatureInteractionCountryCodeNormalized\(feature, featureId\)/.test(rendererSource)
-        && /function resolveParentGroupTargetIds\(feature, featureId\) \{[\s\S]*?getInteractionCountryFeatureIds\(feature, featureId\)/.test(rendererSource),
       booleanWeldDonorIslandHasDedicatedInteractiveEscape:
         /function isInteractiveAtlantropaBooleanWeldIslandFeature\(feature, featureId = null\) \{[\s\S]*?candidate\.startsWith\("ATLISL_"\)[\s\S]*?getAtlantropaGeometryRole\(feature\) === "donor_island"[\s\S]*?getAtlantropaJoinMode\(feature\) === "boolean_weld"[\s\S]*?\}/.test(rendererSource),
       booleanWeldIslandCanRenderAndRemainInteractive:

@@ -6,8 +6,7 @@ const feature = (id, properties = {}) => ({ properties: { id, ...properties } })
 
 function fixture() {
   const h = { state: {}, pending: false, cache: { pendingPoliticalColorEditIds: new Set() } };
-  h.policy = createPoliticalFeaturePolicy({
-    runtimeState: h.state,
+  h.policy = createPoliticalFeaturePolicy(h.state, {
     getFeatureId: (value) => value?.properties?.id || value?.id,
     getFeatureCountryCodeNormalized: (value) => value?.properties?.country || "",
     getSafeCanvasColor: (value, fallback) => /^#[0-9a-f]{6}$/i.test(value || "") ? value : fallback,

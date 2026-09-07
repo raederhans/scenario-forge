@@ -19,18 +19,18 @@ class MapRendererStrategicValuesRenderContractTest(unittest.TestCase):
             "\n  function drawContextScenarioPass",
             1,
         )[0]
-        context_signature_body = renderer_content.split(
+        context_signature_body = (REPO_ROOT / "js/core/renderer/render_pass_signature_policy.js").read_text(encoding="utf-8").split(
             'if (passName === "contextMarkers") {',
             1,
         )[1].split(
             "\n  }",
             1,
         )[0]
-        context_flag_signature_body = renderer_content.split(
+        context_flag_signature_body = (REPO_ROOT / "js/core/renderer/visible_frame_identity_policy.js").read_text(encoding="utf-8").split(
             "function getVisibleContextFlagSignature() {",
             1,
         )[1].split(
-            "\n}\n\nfunction countFeatureCollectionFeatures",
+            "\n  }\n\n  function countFeatureCollectionFeatures",
             1,
         )[0]
 

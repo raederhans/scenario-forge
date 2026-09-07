@@ -1,8 +1,16 @@
+import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
+import { createVisibleFrameIdentityPolicy } from './renderer/visible_frame_identity_policy.js';
+import { createParentBorderGroupingPolicy } from './renderer/parent_border_grouping_policy.js';
+import { COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW, COASTLINE_ACCENT_DENSITY_THRESHOLD_MID, COASTLINE_LOD_LOW_ZOOM_MAX, COASTLINE_LOD_MID_ZOOM_MAX } from './renderer/bathymetry_style_policy.js';
+import { createBathymetryStylePolicy } from './renderer/bathymetry_style_policy.js';
+import { createRenderPassSignaturePolicy } from './renderer/render_pass_signature_policy.js';
+import { createProjectedBoundsDiagnosticsOwner } from "./renderer/projected_bounds_diagnostics_owner.js";
+import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
-import { createBrushInteractionSessionOwner, mergeHistorySnapshot } from "./renderer/brush_interaction_session_owner.js";
+import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
@@ -110,7 +118,6 @@ import {
   ensureSidebarPerfState,
   bumpSceneGenerationState,
   resetProjectedBoundsCacheState as resetProjectedBoundsRuntimeCacheState,
-  commitRendererDprStageState, commitProjectedBoundsDiagnosticsState,
 } from "./state/renderer_runtime_state.js";
 import {
   setAdaptiveSettleProfileState, setPendingDayNightRefreshState,
@@ -140,10 +147,11 @@ import {
   setSphericalFeatureDiagnosticsCacheEntryState,
 } from "./state/actions/renderer_cache_actions.js";
 import {
-  captureProjectedBoundsDiagnosticsState, captureRenderPerfContextBreakdownState,
+  captureRenderPerfContextBreakdownState,
   captureRenderPerfMetricEntryState, captureRenderPerfMetricsState, captureRenderSnapshotState,
   commitRenderPerfMetricState, ensureRenderPerfMetricsState,
-  setDebugCountryCoverageState, setFirstVisibleFramePaintedState,
+  setDebugCountryCoverageState,
+  setProjectedBoundsDiagnosticsState as commitProjectedBoundsDiagnosticsState,
   setRenderPerfContextBreakdownState, setRenderPerfMetricEntryState,
 } from "./state/actions/renderer_diagnostics_actions.js";
 import { ColorManager } from "./color_manager.js";
@@ -209,7 +217,7 @@ import {
   dispatchMapClick,
   dispatchMapDoubleClick,
 } from "./interaction_funnel.js";
-import { createUrbanCityPolicyOwner, getUrbanCityRenderPassSignatureParts } from "./renderer/urban_city_policy.js";
+import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createCityPaintStyleModel } from "./renderer/city_paint_style_model.js";
 import { createCityLabelOwner } from "./renderer/city_label_owner.js";
 import { createCityPointsRenderOwner } from "./renderer/city_points_render_owner.js";
@@ -284,7 +292,6 @@ import {
   RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
   TRANSFORM_REUSED_RENDER_PASS_NAMES,
   TRANSFORMED_FRAME_PASS_NAMES,
-  VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES,
 } from "./map_renderer/render_pass_catalog.js";
 import {
   collectSpatialGridCandidates,
@@ -325,20 +332,24 @@ import { createVisibleFrameDiagnosticsOwner } from "./renderer/visible_frame_dia
 import { recordColorRebuildDiagnostics, recordPartialColorRefreshDiagnostics, recordPendingPoliticalColorEditClearDiagnostics, recordPoliticalPatchOverlayPaintDiagnostics, recordProgressivePoliticalFullCacheReadyDiagnostics, recordRenderPassInvalidationDiagnostics, recordVisibleFrameTransactionDiagnostics } from "./renderer/render_transaction_diagnostics.js";
 import { createIntensityFieldMaskOwner } from "./renderer/intensity_field_mask_owner.js";
 const state = runtimeState;
+function composeUnitCounterDisplayModel() {
+  const owner = createUnitCounterDisplayModel(runtimeState, {
+    canonicalCountryCode,
+    getScenarioCountryDisplayName,
+    ColorManager,
+    t,
+    getOperationalLineById,
+    getLineMidpointFromCoordinates,
+    clamp,
+  });
+  return owner;
+}
+
 const {
   getUnitCounterCardModel,
   getUnitCounterRenderEntries,
   getUnitCounterRenderScale,
-} = createUnitCounterDisplayModel({
-  runtimeState,
-  canonicalCountryCode,
-  getScenarioCountryDisplayName,
-  ColorManager,
-  t,
-  getOperationalLineById,
-  getLineMidpointFromCoordinates,
-  clamp,
-});
+} = composeUnitCounterDisplayModel();
 
 function showToast(message, options = {}) {
   callRuntimeHook(runtimeState, "showToastFn", message, options);
@@ -401,8 +412,7 @@ const HIT_SNAP_RADIUS_CLICK_PX = 3;
 const HIT_MAX_CELLS_PER_ITEM = 400;
 const HIT_MODE_PARAM = "hit_mode";
 const HIT_MODES = new Set(["auto", "canvas", "spatial"]);
-const COASTLINE_LOD_LOW_ZOOM_MAX = 1.8;
-const COASTLINE_LOD_MID_ZOOM_MAX = 3.2;
+
 const COASTLINE_SIMPLIFY_MID_EPSILON = 0.09;
 const COASTLINE_SIMPLIFY_LOW_EPSILON = 0.22;
 const COASTLINE_SIMPLIFY_MID_MIN_LENGTH = 0.2;
@@ -411,29 +421,11 @@ const COASTLINE_EFFECTIVE_AREA_MULTIPLIER = 0.5;
 const COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX = 1.8;
 const COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX = 1.1;
 const COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG = 10;
-const COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW = 0.0016;
-const COASTLINE_ACCENT_DENSITY_THRESHOLD_MID = 0.0022;
+
 const COASTLINE_ACCENT_DENSITY_ALPHA_LOW = 0.68;
 const COASTLINE_ACCENT_DENSITY_ALPHA_MID = 0.82;
 const COASTLINE_ACCENT_DENSITY_WIDTH_SCALE = 0.9;
-const COASTLINE_OVERLAY_ATLANTROPA_ALPHA = 0.42;
-const COASTLINE_OVERLAY_ATLANTROPA_ALPHA_INTERACTIVE = 0.30;
-const COASTLINE_OVERLAY_DENSITY_ALPHA_LOW = 0.78;
-const COASTLINE_OVERLAY_DENSITY_ALPHA_MID = 0.86;
-const COASTLINE_ACCENT_MIN_WIDTH_PX = 0.85;
-const COASTLINE_ACCENT_OVERLAY_MIN_WIDTH_PX = 0.95;
-const BATHYMETRY_SHALLOW_DEPTH_MAX_M = 200;
-const BATHYMETRY_MID_DEPTH_MAX_M = 500;
-const BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM = 2.0;
-const BATHYMETRY_BAND_SHALLOW_FADE_END_ZOOM = 2.8;
-const BATHYMETRY_BAND_MID_FADE_START_ZOOM = 2.6;
-const BATHYMETRY_BAND_MID_FADE_END_ZOOM = 3.4;
-const BATHYMETRY_BAND_DEEP_FADE_START_ZOOM = COASTLINE_LOD_MID_ZOOM_MAX;
-const BATHYMETRY_BAND_DEEP_FADE_END_ZOOM = 4.2;
-const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM = 2.0;
-const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM = 3.0;
-const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM = 2.4;
-const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM = 3.4;
+
 const BATHYMETRY_PRESET_PROFILES = Object.freeze({
   bathymetry_soft: Object.freeze({
     defaultOpacity: 0.84,
@@ -542,16 +534,7 @@ const PROVINCE_BORDERS_FAR_WIDTH_SCALE = 0.75;
 const PROVINCE_BORDERS_NEAR_ZOOM_START = 2.2;
 const PROVINCE_BORDERS_NEAR_ALPHA_SCALE = 0.86;
 const PROVINCE_BORDERS_NEAR_WIDTH_SCALE = 0.90;
-const PARENT_BORDER_MIN_COVERAGE = 0.70;
-const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
-const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
-const GB_PARENT_MIN_GROUPS = 20;
-const GB_NUTS1_GROUP_MIN = 10;
-const GB_NUTS1_PREFIX_LENGTH = 3;
-const GB_ID_PATTERN_RE = /^[A-Z]{2}[A-Z0-9]{3}$/;
-const DE_STATE_GROUP_MIN = 12;
-const DE_STATE_GROUP_MAX = 20;
-const DE_CITY_STATES = new Set(["Berlin", "Hamburg", "Bremen"]);
+
 const BOUNDARY_DEFAULT_LINE_JOIN = "round";
 const BOUNDARY_DEFAULT_LINE_CAP = "round";
 const BOUNDARY_DEFAULT_MITER_LIMIT = 2.4;
@@ -562,7 +545,7 @@ const OCEAN_MASK_MIN_QUALITY = 0.35;
 const GLOBAL_BATHYMETRY_TOPOLOGY_URL = resolveDataAssetUrl("bathymetry:global_topology");
 const BATHYMETRY_BANDS_OBJECT_NAME = "bathymetry_bands";
 const BATHYMETRY_CONTOURS_OBJECT_NAME = "bathymetry_contours";
-const BATHYMETRY_MAX_REFERENCE_DEPTH_M = 6000;
+
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawPhysicalReliefOverlayLayer",
@@ -590,7 +573,6 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 
-
 const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
   steel: "#64748b",
@@ -606,8 +588,6 @@ const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 
 const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
 const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
-
-
 
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
@@ -768,6 +748,120 @@ let renderPassCommitAccountingOwner = null;
 let drawCanvasOrchestrationOwner = null;
 let renderTransformReusePolicyOwner = null;
 let projectedGeometryBoundsOwner = null;
+let projectedBoundsDiagnosticsOwner = null;
+
+function recordProjectedBoundsDiagnosticsState(...args) {
+  if (!projectedBoundsDiagnosticsOwner) {
+    projectedBoundsDiagnosticsOwner = createProjectedBoundsDiagnosticsOwner({ runtimeState, recordRenderPerfMetric });
+  }
+  return projectedBoundsDiagnosticsOwner.recordProjectedBoundsDiagnosticsState(...args);
+}
+let bathymetryStylePolicy = null;
+
+function getBathymetryStylePolicy() {
+  if (!bathymetryStylePolicy) {
+    bathymetryStylePolicy = createBathymetryStylePolicy(runtimeState, {
+      buildBathymetryFeatureCollection,
+      clamp,
+      getBathymetryPresetProfile,
+      getFeatureProjectedDensity,
+      getOceanBaseFillColor,
+      getReliefOverlayKind,
+      parseCanvasColorChannels,
+      toRgbaString,
+    });
+  }
+  return bathymetryStylePolicy;
+}
+
+let parentBorderGroupingPolicy = null;
+
+function getParentBorderGroupingPolicy() {
+  if (!parentBorderGroupingPolicy) {
+    parentBorderGroupingPolicy = createParentBorderGroupingPolicy(runtimeState, {
+      canonicalCountryCode,
+      getAdmin1Group,
+      getFeatureCountryCodeNormalized,
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
+    });
+  }
+  return parentBorderGroupingPolicy;
+}
+
+let visibleFrameIdentityPolicy = null;
+
+function getVisibleFrameIdentityPolicy() {
+  if (!visibleFrameIdentityPolicy) {
+    visibleFrameIdentityPolicy = createVisibleFrameIdentityPolicy(runtimeState, {
+      areZoomTransformsEquivalent,
+      cloneZoomTransform,
+      ensureCurrentSceneSnapshot,
+      getCachedPoliticalPassStaticSignature,
+      getOceanBaseFillColor,
+      getPassFullReferenceTransform,
+      getPassReferenceTransform,
+      getRenderPassCacheState,
+      getRenderPassSignature,
+      getResolvedColorCountForSceneSnapshot,
+      getTransformBucketSignature,
+      rendererSurfaceHost,
+    });
+  }
+  return visibleFrameIdentityPolicy;
+}
+
+let fillTargetPolicy = null;
+
+function getFillTargetPolicy() {
+  if (!fillTargetPolicy) {
+    fillTargetPolicy = createFillTargetPolicy(runtimeState, {
+      getAdmin1Group,
+      getFeatureCountryCodeNormalized,
+      getFeatureInteractionCountryCodeNormalized,
+      isSovereigntyModeActive,
+      shouldExcludePoliticalInteractionFeature,
+    });
+  }
+  return fillTargetPolicy;
+}
+
+let renderPassSignaturePolicy = null;
+
+function getRenderPassSignaturePolicy() {
+  if (!renderPassSignaturePolicy) {
+    renderPassSignaturePolicy = createRenderPassSignaturePolicy(runtimeState, {
+      getTransformSignature,
+      getOceanBaseFillColor,
+      getDebugMode: () => String(debugMode),
+      shouldEnableContextBaseTransformReuse,
+      getViewportRenderSignature,
+      getPhysicalLandMaskInfo,
+      getScenarioRuntimeTopologySignatureToken,
+      getHgoRuntimePreviewVisibilitySignature,
+      getHgoRuntimePreviewProjectionOptions,
+      isHgoRuntimePreviewReady,
+      rendererSurfaceHost,
+      getContextBaseZoomBucketId,
+      shouldRefreshContextBaseForColorChanges,
+      getScenarioOverlaySignatureToken,
+      getLakeBaseFillColor,
+      getLakeStyleConfig,
+      stableJson,
+      getDayNightRuntimeOwner,
+    });
+  }
+  return renderPassSignaturePolicy;
+}
+
+let pixelRatioPolicy = null;
+
+function getPixelRatioPolicy() {
+  if (!pixelRatioPolicy) {
+    pixelRatioPolicy = createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRatio: () => globalThis.devicePixelRatio });
+  }
+  return pixelRatioPolicy;
+}
 let viewportReadModelOwner = null;
 const renderSnapshotOwner = createRenderSnapshotOwner();
 let viewportCommandOwner = null;
@@ -806,8 +900,7 @@ function markInspectorOverlayClean() {
 
 function getTransientOverlayRenderOwner() {
   if (transientOverlayRenderOwner) return transientOverlayRenderOwner;
-  transientOverlayRenderOwner = createTransientOverlayRenderOwner({
-    runtimeState,
+  transientOverlayRenderOwner = createTransientOverlayRenderOwner(runtimeState, {
     rendererSurfaceHost,
     ensureSpecialZoneEditorState,
     getSpecialZoneStyle,
@@ -1378,13 +1471,11 @@ function getVisibleFrameDiagnosticsOwner() {
     return visibleFrameDiagnosticsOwner;
   }
   visibleFrameDiagnosticsOwner = createVisibleFrameDiagnosticsOwner({
+    runtimeState,
     effects: {
       incrementPerfCounter,
       recordVisibleFrameTransactionDiagnostics: (payload) => recordVisibleFrameTransactionDiagnostics(runtimeState, payload),
       recordRenderPerfMetric,
-      setFirstVisibleFramePainted: (painted) => {
-        setFirstVisibleFramePaintedState(runtimeState, painted);
-      },
       callFirstVisibleFramePaintedHook: (payload) => {
         callRuntimeHook(runtimeState, "noteFirstVisibleFramePaintedFn", payload);
       },
@@ -3703,40 +3794,11 @@ function noteRenderAction(label, startedAt = null) {
 }
 
 function getRuntimeChunkSelectionVersion() {
-  const loadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
-    ? runtimeState.runtimeChunkLoadState
-    : null;
-  return Math.max(0, Number(loadState?.selectionVersion || 0));
+  return getVisibleFrameIdentityPolicy().getRuntimeChunkSelectionVersion();
 }
 
 function getVisibleContextFlagSignature() {
-  return [
-    `view:${"ownership"}`,
-    `profile:${String(runtimeState.renderProfile || "auto")}`,
-    runtimeState.showPhysical ? "physical:on" : "physical:off",
-    runtimeState.showUrban ? "urban:on" : "urban:off",
-    runtimeState.showRivers ? "rivers:on" : "rivers:off",
-    runtimeState.showWaterRegions ? "water:on" : "water:off",
-    runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
-    runtimeState.showScenarioSpecialRegions ? "special:on" : "special:off",
-    runtimeState.showScenarioReliefOverlays ? "relief:on" : "relief:off",
-    runtimeState.showCityPoints ? "cities:on" : "cities:off",
-    runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
-    `strategic-rev:${Number(runtimeState.scenarioStrategicValuesRevision || 0)}`,
-    `strategic-metric:${String(runtimeState.strategicChoroplethMetric || "")}`,
-    runtimeState.showTransport ? "transport:on" : "transport:off",
-    runtimeState.showRoad ? "road:on" : "road:off",
-    runtimeState.showAirports ? "airports:on" : "airports:off",
-    runtimeState.showPorts ? "ports:on" : "ports:off",
-    runtimeState.showRail ? "rail:on" : "rail:off",
-    runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
-    `context-rev:${Number(runtimeState.contextLayerRevision || 0)}`,
-    `city-rev:${Number(runtimeState.cityLayerRevision || 0)}`,
-  ].join("|");
-}
-
-function countFeatureCollectionFeatures(collection) {
-  return Array.isArray(collection?.features) ? collection.features.length : 0;
+  return getVisibleFrameIdentityPolicy().getVisibleContextFlagSignature();
 }
 
 const resolvedColorCountSnapshot = {
@@ -3772,112 +3834,16 @@ function ensureCurrentSceneSnapshot(reason = "visible-frame") {
   return snapshotState;
 }
 
-function getPoliticalSceneReadiness() {
-  const cache = getRenderPassCacheState();
-  const scenarioPoliticalFeatureCount = countFeatureCollectionFeatures(runtimeState.scenarioPoliticalChunkData);
-  const landFeatureCount = Math.max(
-    countFeatureCollectionFeatures(runtimeState.landDataFull),
-    countFeatureCollectionFeatures(runtimeState.landData),
-  );
-  const colorCount = getResolvedColorCountForSceneSnapshot();
-  const fullPoliticalReady = !!(
-    String(runtimeState.activeScenarioId || "")
-    && scenarioPoliticalFeatureCount > 0
-    && landFeatureCount > 0
-    && colorCount > 0
-  );
-  const politicalPassCurrent = !!(
-    Number(cache.politicalPassSceneGeneration || 0) === Number(runtimeState.sceneGeneration || 0)
-    && Number(cache.politicalPassScenarioDataGeneration || 0) === Number(runtimeState.scenarioDataGeneration || 0)
-  );
-  const finePoliticalCacheReady = !!(
-    cache.politicalPassFineCacheReady
-    && cache.politicalPassDataStage === "fine"
-    && politicalPassCurrent
-  );
-  const politicalDataStage = finePoliticalCacheReady
-    ? "fine"
-    : (fullPoliticalReady ? (politicalPassCurrent ? String(cache.politicalPassDataStage || "data-ready") : "data-ready") : "not-ready");
-  return {
-    politicalDataStage,
-    fullPoliticalReady,
-    finePoliticalCacheReady,
-    scenarioPoliticalFeatureCount,
-    landFeatureCount,
-    colorCount,
-  };
+function getVisibleFrameIdentity(transform) {
+  return getVisibleFrameIdentityPolicy().getVisibleFrameIdentity(transform);
 }
 
-function getVisibleFrameIdentity(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  ensureCurrentSceneSnapshot("visible-frame-identity");
-  const politicalReadiness = getPoliticalSceneReadiness();
-  return {
-    sceneGeneration: Math.max(0, Number(runtimeState.sceneGeneration || 0)),
-    scenarioDataGeneration: Math.max(0, Number(runtimeState.scenarioDataGeneration || 0)),
-    scenarioId: String(runtimeState.activeScenarioId || ""),
-    selectionVersion: getRuntimeChunkSelectionVersion(),
-    topologyRevision: Math.max(0, Number(runtimeState.topologyRevision || 0)),
-    dpr: Math.max(1, Number(runtimeState.dpr || 1)),
-    pixelWidth: Math.max(1, Number(rendererSurfaceHost.getContext()?.canvas?.width || 1)),
-    pixelHeight: Math.max(1, Number(rendererSurfaceHost.getContext()?.canvas?.height || 1)),
-    colorRevision: Number(runtimeState.colorRevision || 0),
-    contextFlagSignature: getVisibleContextFlagSignature(),
-    transformBucket: getTransformBucketSignature(transform),
-    politicalDataStage: politicalReadiness.politicalDataStage,
-    fullPoliticalReady: politicalReadiness.fullPoliticalReady,
-    finePoliticalCacheReady: politicalReadiness.finePoliticalCacheReady,
-    transform: cloneZoomTransform(transform),
-  };
+function getCommittedFrameKeySignature(commitKey) {
+  return getVisibleFrameIdentityPolicy().getCommittedFrameKeySignature(commitKey);
 }
 
-function getCommittedFrameKeySignature(commitKey = {}) {
-  return [
-    String(commitKey.scenarioId || ""),
-    Number(commitKey.sceneGeneration || 0),
-    Number(commitKey.scenarioDataGeneration || 0),
-    Number(commitKey.selectionVersion || 0),
-    Number(commitKey.topologyRevision || 0),
-    Number(commitKey.colorRevision || 0),
-    String(commitKey.contextFlagSignature || ""),
-    Number(commitKey.dpr || 1).toFixed(2),
-    Number(commitKey.pixelWidth || 0),
-    Number(commitKey.pixelHeight || 0),
-  ].join("::");
-}
-
-function getCommittedFrameIdentity(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity, metadata = {}) {
-  const identity = getVisibleFrameIdentity(transform);
-  const cache = getRenderPassCacheState();
-  const commitKey = {
-    scenarioId: identity.scenarioId,
-    sceneGeneration: identity.sceneGeneration,
-    scenarioDataGeneration: identity.scenarioDataGeneration,
-    selectionVersion: identity.selectionVersion,
-    topologyRevision: identity.topologyRevision,
-    colorRevision: identity.colorRevision,
-    contextFlagSignature: identity.contextFlagSignature,
-    dpr: identity.dpr,
-    pixelWidth: identity.pixelWidth,
-    pixelHeight: identity.pixelHeight,
-  };
-  return {
-    commitKey,
-    metadata: {
-      politicalDataStage: identity.politicalDataStage,
-      fullPoliticalReady: identity.fullPoliticalReady,
-      finePoliticalCacheReady: identity.finePoliticalCacheReady,
-      referenceTransform: cloneZoomTransform(transform),
-      transformBucket: identity.transformBucket,
-      passSignature: getRenderPassSignature("political", transform),
-      dirtyReasons: { ...(cache.reasons || {}) },
-      resourcesReady: {
-        politicalPassCurrent: !cache.dirty?.political,
-        fullPoliticalReady: identity.fullPoliticalReady,
-        finePoliticalCacheReady: identity.finePoliticalCacheReady,
-      },
-      ...metadata,
-    },
-  };
+function getCommittedFrameIdentity(transform, metadata) {
+  return getVisibleFrameIdentityPolicy().getCommittedFrameIdentity(transform, metadata);
 }
 
 function clearLastGoodFrame(reason = "clear") {
@@ -4170,42 +4136,8 @@ function noteMissingVisibleFrameSkippedDuringInteraction(reason = "unknown") {
   });
 }
 
-function getFirstVisiblePoliticalFrameBlockReason(reason = "visible-frame") {
-  const activeScenarioId = String(runtimeState.activeScenarioId || "").trim();
-  if (!activeScenarioId) return "";
-  const normalizedReason = String(reason || "visible-frame");
-  if (normalizedReason === "base-visible-fallback") {
-    return "base-visible-fallback";
-  }
-  if (normalizedReason !== "exact-frame") {
-    return `${normalizedReason}-before-current-political-frame`;
-  }
-  const cache = getRenderPassCacheState();
-  if (cache.dirty?.political) {
-    return "dirty-political-pass";
-  }
-  const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
-  const expectedSignature = getRenderPassSignature("political", transform);
-  if (String(cache.signatures?.political || "") !== String(expectedSignature || "")) {
-    const cachedOceanFill = getCachedPoliticalPassStaticSignature(cache.signatures?.political)
-      .split("::")
-      .find((part) => String(part || "").startsWith("ocean-fill:"));
-    if (cachedOceanFill && cachedOceanFill !== `ocean-fill:${getOceanBaseFillColor()}`) {
-      return "stale-ocean-fill";
-    }
-    return "stale-political-signature";
-  }
-  const referenceTransform = getPassReferenceTransform("political");
-  if (!referenceTransform || !areZoomTransformsEquivalent(referenceTransform, transform)) {
-    return "stale-political-reference-transform";
-  }
-  if (String(cache.politicalPassDataStage || "") === "fine" && cache.politicalPassFineCacheReady) {
-    const fullReferenceTransform = getPassFullReferenceTransform("political");
-    if (!fullReferenceTransform || !areZoomTransformsEquivalent(fullReferenceTransform, transform)) {
-      return "stale-political-full-reference-transform";
-    }
-  }
-  return "";
+function getFirstVisiblePoliticalFrameBlockReason(reason) {
+  return getVisibleFrameIdentityPolicy().getFirstVisiblePoliticalFrameBlockReason(reason);
 }
 
 function noteFirstVisibleFrameBlocked(reason = "visible-frame", blockReason = "unknown") {
@@ -4221,7 +4153,7 @@ function resetFirstVisibleFramePainted(reason = "visible-frame-reset") {
 }
 
 function canDrawBaseVisibleFrameFallback() {
-  return !runtimeState.firstVisibleFramePainted || !Array.isArray(runtimeState.landData?.features) || runtimeState.landData.features.length === 0;
+  return getVisibleFrameIdentityPolicy().canDrawBaseVisibleFrameFallback();
 }
 
 function drawBaseVisibleFrameFallback(reason = "base-fill") {
@@ -4390,14 +4322,30 @@ function ensureInteractionBorderSnapshotCanvas() {
   return getInteractionBorderSnapshotOwner().ensureInteractionBorderSnapshotCanvas();
 }
 
-function getPoliticalPassStaticSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  return [
-    getTransformSignature(transform),
-    runtimeState.topologyRevision || 0,
-    `ocean-fill:${getOceanBaseFillColor()}`,
-    debugMode,
-    runtimeState.topologyBundleMode || "single",
-  ].join("::");
+function getPoliticalPassStaticSignature(transform) {
+  return getRenderPassSignaturePolicy().getPoliticalPassStaticSignature(transform);
+}
+
+function composePoliticalPathCacheOwner() {
+  const owner = createPoliticalPathCacheOwner(runtimeState, {
+    rendererSurfaceHost,
+    getPoliticalPassStaticSignature,
+    getProjectionRenderSignature,
+    getViewportRenderSignature,
+    getRenderPassCacheState,
+    cancelDeferredWork,
+    scheduleDeferredWork,
+    incrementPerfCounter,
+    recordRenderPerfMetric,
+    areZoomTransformsEquivalent,
+    cloneZoomTransform,
+    getFeatureId,
+    screenRectToProjectedRect,
+    collectLandSpatialItemsForProjectedRects,
+    nowMs,
+    RENDER_PHASE_IDLE,
+  });
+  return owner;
 }
 
 const {
@@ -4407,25 +4355,7 @@ const {
   getPoliticalPathCacheHandle,
   getPoliticalFeaturePathEntry,
   schedulePoliticalPathWarmup,
-} = createPoliticalPathCacheOwner({
-  runtimeState,
-  rendererSurfaceHost,
-  getPoliticalPassStaticSignature,
-  getProjectionRenderSignature,
-  getViewportRenderSignature,
-  getRenderPassCacheState,
-  cancelDeferredWork,
-  scheduleDeferredWork,
-  incrementPerfCounter,
-  recordRenderPerfMetric,
-  areZoomTransformsEquivalent,
-  cloneZoomTransform,
-  getFeatureId,
-  screenRectToProjectedRect,
-  collectLandSpatialItemsForProjectedRects,
-  nowMs,
-  RENDER_PHASE_IDLE,
-});
+} = composePoliticalPathCacheOwner();
 
 function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified") {
   return getPoliticalBackgroundRenderOwner().cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
@@ -4585,201 +4515,12 @@ function getScenarioOverlaySignatureToken() {
   ].join("|");
 }
 
-function getRenderPassTransformSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  if (
-    VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES.has(passName)
-    && shouldEnableContextBaseTransformReuse()
-  ) {
-    return [
-      "transform-reuse",
-      getViewportRenderSignature(),
-      Number(Number(runtimeState.dpr || 1).toFixed(2)),
-    ].join("::");
-  }
-  return getTransformSignature(transform);
+function getRenderPassTransformSignature(passName, transform) {
+  return getRenderPassSignaturePolicy().getRenderPassTransformSignature(passName, transform);
 }
 
-function getRenderPassSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  const transformSignature = getRenderPassTransformSignature(passName, transform);
-  const intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
-  if (passName === "background") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      runtimeState.oceanMaskMode || "topology_ocean",
-      Number(runtimeState.oceanMaskQuality || 1).toFixed(3),
-      `field:oceanDepth:${Number(intensityFields.channels.oceanDepth?.revision || 0)}`,
-      stableJson(runtimeState.styleConfig?.ocean || {}),
-    ].join("::");
-  }
-  if (passName === "physicalBase") {
-    const maskInfo = getPhysicalLandMaskInfo();
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      runtimeState.activeScenarioId || "",
-      runtimeState.showPhysical ? "physical:on" : "physical:off",
-      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
-      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
-      `field:${Number(intensityFields.channels.physicalAtlas?.revision || 0)}`,
-      stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
-    ].join("::");
-  }
-  if (passName === "political") {
-    return [
-      runtimeState.colorRevision || 0,
-      getHgoRuntimePreviewVisibilitySignature(),
-      getPoliticalPassStaticSignature(transform),
-    ].join("::");
-  }
-  if (passName === "hgoPreview") {
-    const preview = runtimeState.hgoRuntimePreview || {};
-    const summary = preview.summary || {};
-    const hgoProjectionOptions = getHgoRuntimePreviewProjectionOptions();
-    return [
-      isHgoRuntimePreviewReady() ? "hgo:on" : "hgo:off",
-      String(preview.status || ""),
-      Number(runtimeState.dpr || 1).toFixed(2),
-      Number(runtimeState.width || 0),
-      Number(runtimeState.height || 0),
-      rendererSurfaceHost.getProjection() ? transformSignature : "projection:none",
-      hgoProjectionOptions.projectionName,
-      hgoProjectionOptions.sourceProjection,
-      `seed:${Number(summary.provinceCount || summary.province_count || 0)}:${Number(summary.stateCount || summary.state_count || 0)}:${Number(summary.countryCount || summary.country_count || 0)}`,
-    ].join("::");
-  }
-  if (passName === "effects") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
-    ].join("::");
-  }
-  if (passName === "lineEffects") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
-    ].join("::");
-  }
-  if (passName === "contextBase") {
-    const maskInfo = getPhysicalLandMaskInfo();
-    const zoomBucket = getContextBaseZoomBucketId(transform?.k || runtimeState.zoomTransform?.k || 1);
-    const baseSignatureParts = [
-      runtimeState.topologyRevision || 0,
-      runtimeState.activeScenarioId || "",
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
-      `bucket:${zoomBucket}`,
-      runtimeState.showPhysical ? "physical:on" : "physical:off",
-      runtimeState.showUrban ? "urban:on" : "urban:off",
-      runtimeState.showRivers ? "rivers:on" : "rivers:off",
-      `context:${Number(runtimeState.contextLayerRevision || 0)}`,
-      `context-colors:${shouldRefreshContextBaseForColorChanges() ? Number(runtimeState.colorRevision || 0) : 0}`,
-      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
-      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
-      `field:physicalContour:${Number(intensityFields.channels.physicalContour?.revision || 0)}`,
-      `field:urbanGlow:${Number(intensityFields.channels.urbanGlow?.revision || 0)}`,
-      String(runtimeState.renderProfile || "auto"),
-      stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
-      stableJson(normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {})),
-      stableJson(runtimeState.styleConfig?.rivers || {}),
-    ];
-    if (shouldEnableContextBaseTransformReuse()) {
-      return [
-        getViewportRenderSignature(),
-        "context-base-transform-reuse",
-        ...baseSignatureParts,
-      ].join("::");
-    }
-    return [
-      transformSignature,
-      ...baseSignatureParts,
-    ].join("::");
-  }
-  if (passName === "contextMarkers") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      runtimeState.activeScenarioId || "",
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
-      runtimeState.showCityPoints ? "cities:on" : "cities:off",
-      runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
-      runtimeState.showTransport ? "transport:on" : "transport:off",
-      runtimeState.showRoad ? "road:on" : "road:off",
-      runtimeState.showAirports ? "airports:on" : "airports:off",
-      runtimeState.showPorts ? "ports:on" : "ports:off",
-      runtimeState.showRail ? "rail:on" : "rail:off",
-      ...getUrbanCityRenderPassSignatureParts(runtimeState, "contextMarkers"),
-      `context:${Number(runtimeState.contextLayerRevision || 0)}`,
-      stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
-      stableJson(normalizeTransportOverviewStyleConfig(runtimeState.styleConfig?.transportOverview || {})),
-    ].join("::");
-  }
-  if (passName === "labels") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      runtimeState.activeScenarioId || "",
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.showBlankFeatureLabels ? "blank-feature-labels:on" : "blank-feature-labels:off",
-      runtimeState.showCityPoints ? "cities:on" : "cities:off",
-      ...getUrbanCityRenderPassSignatureParts(runtimeState, "labels"),
-      stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
-    ].join("::");
-  }
-  if (passName === "contextScenario") {
-    return [
-      transformSignature,
-      runtimeState.topologyRevision || 0,
-      runtimeState.activeScenarioId || "",
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.scenarioReliefOverlayRevision || 0,
-      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
-      `scenario-overlays:${getScenarioOverlaySignatureToken()}`,
-      runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
-      runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
-      runtimeState.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
-      runtimeState.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
-      `ocean-fill:${getOceanBaseFillColor()}`,
-      `lake-fill:${getLakeBaseFillColor()}`,
-      `lake-style:${stableJson(getLakeStyleConfig())}`,
-    ].join("::");
-  }
-  if (passName === "textureLabels") {
-    return [
-      transformSignature,
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.topologyRevision || 0,
-      stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
-    ].join("::");
-  }
-  if (passName === "dayNight") {
-    return getDayNightRuntimeOwner().buildDayNightPassSignature(
-      transformSignature, intensityFields.channels.urbanGlow?.revision, Number(runtimeState.topologyRevision || 0),
-    );
-  }
-  if (passName === "borders") {
-    return [
-      transformSignature,
-      getHgoRuntimePreviewVisibilitySignature(),
-      runtimeState.topologyRevision || 0,
-      runtimeState.colorRevision || 0,
-      runtimeState.cachedDynamicBordersHash || "",
-      runtimeState.sovereigntyRevision || 0,
-      0,
-      runtimeState.activeScenarioId || "",
-      runtimeState.scenarioBorderMode || "canonical",
-      "ownership",
-      stableJson(runtimeState.parentBorderEnabledByCountry || {}),
-      stableJson(runtimeState.styleConfig?.internalBorders || {}),
-      stableJson(runtimeState.styleConfig?.empireBorders || {}),
-      stableJson(runtimeState.styleConfig?.coastlines || {}),
-      stableJson(runtimeState.styleConfig?.parentBorders || {}),
-    ].join("::");
-  }
-  return transformSignature;
+function getRenderPassSignature(passName, transform) {
+  return getRenderPassSignaturePolicy().getRenderPassSignature(passName, transform);
 }
 
 function resolveHitMode() {
@@ -6083,38 +5824,6 @@ function isLineGeometryType(geometryType) {
   return geometryType === "LineString" || geometryType === "MultiLineString";
 }
 
-function recordProjectedBoundsDiagnosticsState(feature, reason = "unknown") {
-  const geometryType = String(feature?.geometry?.type || "").trim() || "Unknown";
-  const currentDiagnostics = captureProjectedBoundsDiagnosticsState(runtimeState);
-  const currentByGeometryType = currentDiagnostics.byGeometryType
-    && typeof currentDiagnostics.byGeometryType === "object"
-    ? currentDiagnostics.byGeometryType
-    : {};
-  const currentByReason = currentDiagnostics.byReason
-    && typeof currentDiagnostics.byReason === "object"
-    ? currentDiagnostics.byReason
-    : {};
-  const diagnostics = {
-    total: Math.max(0, Number(currentDiagnostics.total || 0) + 1),
-    byGeometryType: {
-      ...currentByGeometryType,
-      [geometryType]: Math.max(0, Number(currentByGeometryType[geometryType] || 0) + 1),
-    },
-    byReason: {
-      ...currentByReason,
-      [reason]: Math.max(0, Number(currentByReason[reason] || 0) + 1),
-    },
-  };
-  commitProjectedBoundsDiagnosticsState(runtimeState, diagnostics);
-  recordRenderPerfMetric("projectedBoundsDiagnostics", 0, {
-    total: diagnostics.total,
-    byGeometryType: { ...diagnostics.byGeometryType },
-    byReason: { ...diagnostics.byReason },
-    lastGeometryType: geometryType,
-    lastReason: reason,
-  });
-}
-
 function recordProjectedBoundsDiagnostic(feature, reason = "unknown") {
   return getProjectedGeometryBoundsOwner().recordProjectedBoundsDiagnostic(feature, reason);
 }
@@ -6203,6 +5912,21 @@ function isAdmin0ShellFeature(feature, featureId) {
   return detailTier === "antarctic_sector" && candidate.startsWith("AQ_");
 }
 
+function composePoliticalFeaturePolicy() {
+  const owner = createPoliticalFeaturePolicy(runtimeState, {
+    getSafeCanvasColor,
+    hasPendingPoliticalColorEdit,
+    getRenderPassCacheState,
+    getFeatureId,
+    getFeatureCountryCodeNormalized,
+    isAtlantropaFieldDrivenFeature,
+    isInteractiveAtlantropaBooleanWeldIslandFeature,
+    isScenarioAtlantropaVisible,
+    isBaseGeographyScenarioFeature,
+  });
+  return owner;
+}
+
 const {
   isScenarioShellFeature,
   hasVisiblePoliticalForegroundColorOverride,
@@ -6214,18 +5938,7 @@ const {
   shouldExcludePoliticalVisualFeature,
   isPoliticalInteractionRenderableFeature,
   shouldExcludePoliticalInteractionFeature,
-} = createPoliticalFeaturePolicy({
-  runtimeState,
-  getSafeCanvasColor,
-  hasPendingPoliticalColorEdit,
-  getRenderPassCacheState,
-  getFeatureId,
-  getFeatureCountryCodeNormalized,
-  isAtlantropaFieldDrivenFeature,
-  isInteractiveAtlantropaBooleanWeldIslandFeature,
-  isScenarioAtlantropaVisible,
-  isBaseGeographyScenarioFeature,
-});
+} = composePoliticalFeaturePolicy();
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
   const bounds = boundsOverride || getProjectedFeatureBounds(feature);
@@ -6386,34 +6099,10 @@ function getSphericalFeatureDiagnostics(feature, { featureId = null, allowComput
 }
 
 function getMaxDprForProfile(renderProfile) {
-  const profile = String(renderProfile || "auto").trim().toLowerCase();
-  const deviceDpr = Math.max(1, Number(globalThis.devicePixelRatio) || 1);
-  const baseMaxDpr = profile === "full"
-    ? deviceDpr
-    : profile === "balanced"
-      ? 1.5
-      : 1.25;
-  const stage = String(runtimeState.dprStage || "idle").toLowerCase();
-  if (stage === "interactive") {
-    const scale = Math.min(1, Math.max(0.5, Number(runtimeState.dprInteractiveScale) || 0.72));
-    return Math.max(1, baseMaxDpr * scale);
-  }
-  return baseMaxDpr;
+  return getPixelRatioPolicy().getMaxDprForProfile(String(renderProfile || "auto"));
 }
 
-function updateDprStage(nextStage = "idle", { force = false } = {}) {
-  const normalizedStage = String(nextStage || "idle").toLowerCase() === "interactive"
-    ? "interactive"
-    : "idle";
-  if (!force && runtimeState.dprStage === normalizedStage) {
-    return false;
-  }
-  commitRendererDprStageState(runtimeState, {
-    stage: normalizedStage,
-    switchedAt: nowMs(),
-  });
-  return true;
-}
+function updateDprStage(...args) { return getPixelRatioPolicy().updateDprStage(...args); }
 
 function getRuntimePoliticalBaseCollection(collection) {
   const features = Array.isArray(collection?.features) ? collection.features : [];
@@ -7707,260 +7396,15 @@ function resolveOwnerBorderCode(entity, ownershipContext = {}) {
 }
 
 function getFullLandDataFeatures() {
-  if (Array.isArray(runtimeState.landDataFull?.features) && runtimeState.landDataFull.features.length) {
-    return runtimeState.landDataFull.features;
-  }
-  return Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features : [];
+  return getParentBorderGroupingPolicy().getFullLandDataFeatures();
 }
 
 function getCountryFeatureEntriesMap() {
-  const byCountry = new Map();
-  const features = getFullLandDataFeatures();
-  features.forEach((feature) => {
-    const id = getFeatureId(feature);
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (!id || !countryCode || shouldExcludePoliticalInteractionFeature(feature, id)) return;
-    const list = byCountry.get(countryCode) || [];
-    list.push({ id, feature });
-    byCountry.set(countryCode, list);
-  });
-  return byCountry;
-}
-
-function evaluateCountryGroupingCandidate(countryCode, source, featureEntries, featureToGroup) {
-  if (!featureEntries?.length || !(featureToGroup instanceof Map) || !featureToGroup.size) return null;
-
-  const groupCounts = new Map();
-  let groupedCount = 0;
-  featureEntries.forEach(({ id }) => {
-    const group = featureToGroup.get(id);
-    if (!group) return;
-    groupedCount += 1;
-    groupCounts.set(group, (groupCounts.get(group) || 0) + 1);
-  });
-
-  if (!groupedCount || !groupCounts.size) return null;
-
-  const totalCount = featureEntries.length;
-  const groupSizes = Array.from(groupCounts.values());
-  const renderableGroupCount = groupSizes.filter((count) => count >= 2).length;
-  const coverage = totalCount > 0 ? groupedCount / totalCount : 0;
-  const dominantShare = groupedCount > 0 ? Math.max(...groupSizes) / groupedCount : 1;
-
-  return {
-    countryCode,
-    source,
-    featureToGroup,
-    groupCounts,
-    totalCount,
-    groupedCount,
-    groupCount: renderableGroupCount,
-    groupCountTotal: groupCounts.size,
-    coverage,
-    dominantShare,
-    accepted:
-      renderableGroupCount >= PARENT_BORDER_MIN_RENDERABLE_GROUPS &&
-      coverage >= PARENT_BORDER_MIN_COVERAGE &&
-      dominantShare <= PARENT_BORDER_MAX_DOMINANT_SHARE,
-  };
-}
-
-function buildHierarchyGroupingCandidate(countryCode, featureEntries) {
-  const groups = runtimeState.hierarchyData?.groups;
-  if (!groups || typeof groups !== "object") return null;
-
-  const idSet = new Set(featureEntries.map((entry) => entry.id));
-  const featureToGroup = new Map();
-  Object.entries(groups).forEach(([groupId, children]) => {
-    const groupCountry = canonicalCountryCode(String(groupId || "").split("_")[0]);
-    if (!groupCountry || groupCountry !== countryCode) return;
-    if (!Array.isArray(children)) return;
-    children.forEach((child) => {
-      const childId = String(child || "").trim();
-      if (!childId || !idSet.has(childId)) return;
-      if (!featureToGroup.has(childId)) {
-        featureToGroup.set(childId, groupId);
-      }
-    });
-  });
-
-  return evaluateCountryGroupingCandidate(countryCode, "hierarchy", featureEntries, featureToGroup);
-}
-
-function buildAdmin1GroupingCandidate(countryCode, featureEntries) {
-  const featureToGroup = new Map();
-  featureEntries.forEach(({ id, feature }) => {
-    const group = getAdmin1Group(feature);
-    if (!group) return;
-    featureToGroup.set(id, group);
-  });
-  return evaluateCountryGroupingCandidate(countryCode, "admin1_group", featureEntries, featureToGroup);
-}
-
-function buildScenarioDistrictGroupingCandidate(countryCode, featureEntries) {
-  const districtCountry = runtimeState.scenarioDistrictGroupsData?.countries?.[countryCode];
-  if (!districtCountry || typeof districtCountry !== "object") return null;
-  const idSet = new Set(featureEntries.map((entry) => entry.id));
-  const featureToGroup = new Map();
-  Object.entries(districtCountry.districts && typeof districtCountry.districts === "object" ? districtCountry.districts : {})
-    .forEach(([districtId, rawDistrict]) => {
-      const normalizedDistrictId = String(rawDistrict?.id || rawDistrict?.district_id || districtId || "").trim();
-      if (!normalizedDistrictId) return;
-      const featureIds = Array.isArray(rawDistrict?.feature_ids) ? rawDistrict.feature_ids : [];
-      featureIds.forEach((featureId) => {
-        const normalizedFeatureId = String(featureId || "").trim();
-        if (!normalizedFeatureId || !idSet.has(normalizedFeatureId)) return;
-        if (!featureToGroup.has(normalizedFeatureId)) {
-          featureToGroup.set(normalizedFeatureId, normalizedDistrictId);
-        }
-      });
-    });
-  if (!featureToGroup.size) {
-    return {
-      countryCode,
-      source: "scenario_district",
-      featureToGroup,
-      groupCounts: new Map(),
-      totalCount: featureEntries.length,
-      groupedCount: 0,
-      groupCount: 0,
-      groupCountTotal: 0,
-      coverage: 0,
-      dominantShare: 1,
-      accepted: false,
-      forcedRule: "scenario_district",
-    };
-  }
-  return {
-    ...evaluateCountryGroupingCandidate(countryCode, "scenario_district", featureEntries, featureToGroup),
-    forcedRule: "scenario_district",
-  };
-}
-
-function buildIdPrefixGroupingCandidate(countryCode, featureEntries, prefixLength) {
-  const length = Number(prefixLength);
-  if (!Number.isFinite(length) || length < 3) return null;
-
-  const featureToGroup = new Map();
-  let validIds = 0;
-  featureEntries.forEach(({ id }) => {
-    const text = String(id || "").trim().toUpperCase();
-    if (!GB_ID_PATTERN_RE.test(text)) return;
-    validIds += 1;
-    featureToGroup.set(id, text.slice(0, length));
-  });
-
-  if (!featureToGroup.size || !featureEntries.length) return null;
-  const idPatternCoverage = validIds / featureEntries.length;
-  if (idPatternCoverage < 0.95) return null;
-
-  const candidate = evaluateCountryGroupingCandidate(countryCode, "id_prefix", featureEntries, featureToGroup);
-  if (!candidate) return null;
-  return {
-    ...candidate,
-    prefixLength: length,
-    idPatternCoverage,
-  };
-}
-
-function isGermanStateLevelCandidate(candidate) {
-  if (!candidate || candidate.source !== "admin1_group") return false;
-  if (candidate.groupCountTotal < DE_STATE_GROUP_MIN || candidate.groupCountTotal > DE_STATE_GROUP_MAX) {
-    return false;
-  }
-  const groups = new Set(candidate.groupCounts ? Array.from(candidate.groupCounts.keys()) : []);
-  return Array.from(DE_CITY_STATES).every((name) => groups.has(name));
-}
-
-function isBritishConstituentGroupingCandidate(candidate) {
-  if (!candidate || candidate.source !== "hierarchy") return false;
-  if (candidate.coverage < PARENT_BORDER_MIN_COVERAGE) return false;
-  if (candidate.groupCount < 4) return false;
-  const groups = new Set(candidate.groupCounts ? Array.from(candidate.groupCounts.keys()) : []);
-  return (
-    groups.has("GB_England")
-    && groups.has("GB_Scotland")
-    && groups.has("GB_Wales")
-    && groups.has("GB_Northern_Ireland")
-  );
-}
-
-function isBritishNuts1GroupingCandidate(candidate) {
-  if (!candidate || candidate.source !== "id_prefix") return false;
-  if (candidate.prefixLength !== GB_NUTS1_PREFIX_LENGTH) return false;
-  if (candidate.coverage < PARENT_BORDER_MIN_COVERAGE) return false;
-  return candidate.groupCountTotal >= GB_NUTS1_GROUP_MIN;
+  return getParentBorderGroupingPolicy().getCountryFeatureEntriesMap();
 }
 
 function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
-  if (!countryCode || !featureEntries?.length) return null;
-
-  const scenarioDistrictCandidate = buildScenarioDistrictGroupingCandidate(countryCode, featureEntries);
-  if (scenarioDistrictCandidate) {
-    return scenarioDistrictCandidate;
-  }
-  if (String(runtimeState.activeScenarioId || "").trim().toLowerCase() === "tno_1962") {
-    return null;
-  }
-
-  const hierarchyCandidate = buildHierarchyGroupingCandidate(countryCode, featureEntries);
-  const adminCandidate = buildAdmin1GroupingCandidate(countryCode, featureEntries);
-
-  if (countryCode === "DE") {
-    if (adminCandidate && isGermanStateLevelCandidate(adminCandidate)) {
-      return {
-        ...adminCandidate,
-        accepted: true,
-        forcedRule: "de_state_level",
-      };
-    }
-    if (hierarchyCandidate?.accepted) return hierarchyCandidate;
-    if (adminCandidate?.accepted) return adminCandidate;
-    return null;
-  }
-
-  if (countryCode === "GB") {
-    const britishLeafEntries = featureEntries.filter(({ id }) =>
-      GB_ID_PATTERN_RE.test(String(id || "").trim().toUpperCase())
-    );
-    const nuts1Candidate = buildIdPrefixGroupingCandidate(
-      countryCode,
-      britishLeafEntries,
-      GB_NUTS1_PREFIX_LENGTH
-    );
-    if (isBritishNuts1GroupingCandidate(nuts1Candidate)) {
-      return {
-        ...nuts1Candidate,
-        accepted: true,
-        forcedRule: "gb_nuts1",
-      };
-    }
-    if (isBritishConstituentGroupingCandidate(hierarchyCandidate)) {
-      return {
-        ...hierarchyCandidate,
-        accepted: true,
-        forcedRule: "gb_constituent_countries",
-      };
-    }
-    const hierarchyFineEnough =
-      hierarchyCandidate?.accepted &&
-      Math.max(hierarchyCandidate.groupCount, hierarchyCandidate.groupCountTotal) >= GB_PARENT_MIN_GROUPS;
-    if (hierarchyFineEnough) return hierarchyCandidate;
-
-    const idPrefixCandidate = [
-      buildIdPrefixGroupingCandidate(countryCode, britishLeafEntries, 4),
-    ].find(
-      (candidate) =>
-        candidate?.accepted &&
-        Math.max(candidate.groupCount, candidate.groupCountTotal) >= GB_PARENT_MIN_GROUPS
-    );
-    if (idPrefixCandidate) return idPrefixCandidate;
-    return null;
-  }
-
-  if (hierarchyCandidate?.accepted) return hierarchyCandidate;
-  if (adminCandidate?.accepted) return adminCandidate;
-  return null;
+  return getParentBorderGroupingPolicy().resolveCountryParentGroupingCandidate(countryCode, featureEntries);
 }
 
 function syncParentBorderEnabledByCountry(supportedCountries) {
@@ -8092,8 +7536,7 @@ function scheduleDeferredContextBaseEnhancements() {
 
 function getStaticBorderMeshLifecycle() {
   if (!staticBorderMeshLifecycle) {
-    staticBorderMeshLifecycle = createStaticBorderMeshLifecycle({
-      runtimeState,
+    staticBorderMeshLifecycle = createStaticBorderMeshLifecycle(runtimeState, {
       getStaticMeshSourceCountries: () => staticMeshSourceCountries,
       getDetailAdmMeshBuildState: () => detailAdmMeshBuildState,
       setDetailAdmMeshBuildState: (next) => { detailAdmMeshBuildState = next; },
@@ -8227,12 +7670,6 @@ function cancelDeferredHeavyBorderMeshes() {
 function scheduleDeferredHeavyBorderMeshes() {
   return getStaticBorderMeshLifecycle().scheduleDeferredHeavyBorderMeshes();
 }
-
-
-
-
-
-
 
 function captureStaticMeshSnapshot() {
   return getStaticBorderMeshLifecycle().captureStaticMeshSnapshot();
@@ -10502,195 +9939,27 @@ function getBathymetryFeatureCollections() {
 }
 
 function getBathymetryFeatureDepthMax(feature) {
-  const rawValue = Number(
-    feature?.properties?.depth_max_m ??
-    feature?.properties?.depth_m ??
-    feature?.properties?.max_depth_m ??
-    0
-  );
-  return Number.isFinite(rawValue) ? Math.max(0, Math.abs(rawValue)) : 0;
-}
-
-function interpolateRgbChannels(startRgb, endRgb, ratio) {
-  const tRatio = clamp(Number(ratio) || 0, 0, 1);
-  return {
-    r: Math.round(startRgb.r + (endRgb.r - startRgb.r) * tRatio),
-    g: Math.round(startRgb.g + (endRgb.g - startRgb.g) * tRatio),
-    b: Math.round(startRgb.b + (endRgb.b - startRgb.b) * tRatio),
-  };
-}
-
-function getBathymetryBaseRgb() {
-  const oceanChannels = parseCanvasColorChannels(getOceanBaseFillColor());
-  if (oceanChannels) {
-    return {
-      r: oceanChannels.r,
-      g: oceanChannels.g,
-      b: oceanChannels.b,
-    };
-  }
-  return { r: 170, g: 218, b: 255 };
+  return getBathymetryStylePolicy().getBathymetryFeatureDepthMax(feature);
 }
 
 function isAtlantropaBathymetryFeature(feature) {
-  return String(feature?.properties?.region_group || "").trim().toLowerCase().startsWith("atlantropa_");
-}
-
-function getBathymetryVisualModifiers(feature) {
-  const source = String(feature?.properties?._bathymetrySource || "").trim().toLowerCase();
-  const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
-  const depthMax = getBathymetryFeatureDepthMax(feature);
-  if (source !== "scenario" || !isAtlantropaBathymetryFeature(feature)) {
-    return {
-      bandBrightness: 1,
-      bandAlpha: 1,
-      contourBrightness: 1,
-      contourAlpha: 1,
-    };
-  }
-
-  if (mode === "synthetic") {
-    const shallowScale = depthMax <= 150 ? 0.92 : 1;
-    return {
-      bandBrightness: 0.7 * shallowScale,
-      bandAlpha: 0.62 * shallowScale,
-      contourBrightness: 0.64 * shallowScale,
-      contourAlpha: 0.56 * shallowScale,
-    };
-  }
-
-  const shallowScale = depthMax <= 150 ? 0.95 : 1;
-  return {
-    bandBrightness: 0.88 * shallowScale,
-    bandAlpha: 0.8 * shallowScale,
-    contourBrightness: 0.86 * shallowScale,
-    contourAlpha: 0.8 * shallowScale,
-  };
+  return getBathymetryStylePolicy().isAtlantropaBathymetryFeature(feature);
 }
 
 function getBathymetryBandFillStyle(feature, oceanStyle) {
-  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
-  const baseRgb = getBathymetryBaseRgb();
-  const shallowRgb = interpolateRgbChannels(baseRgb, { r: 226, g: 242, b: 255 }, 0.88);
-  const deepRgb = interpolateRgbChannels(baseRgb, { r: 12, g: 47, b: 86 }, 0.78);
-  const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
-  const scaledDepthRatio = clamp(
-    Math.pow(clamp(depthRatioRaw, 0, 1), 1 / Math.max(0.45, oceanStyle.scale)),
-    0,
-    1
-  );
-  const visualModifiers = getBathymetryVisualModifiers(feature);
-  const fillRgb = interpolateRgbChannels(
-    baseRgb,
-    interpolateRgbChannels(shallowRgb, deepRgb, scaledDepthRatio),
-    visualModifiers.bandBrightness
-  );
-  const alphaBase = profile?.bandAlphaBase ?? 0.42;
-  const alpha = clamp(
-    oceanStyle.opacity
-      * (alphaBase + scaledDepthRatio * 0.2 + (1 - scaledDepthRatio) * 0.1 + oceanStyle.contourStrength * 0.1)
-      * visualModifiers.bandAlpha,
-    0,
-    0.96
-  );
-  return toRgbaString(fillRgb, alpha);
+  return getBathymetryStylePolicy().getBathymetryBandFillStyle(feature, oceanStyle);
 }
 
 function getBathymetryContourStrokeStyle(feature, oceanStyle) {
-  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
-  const baseRgb = getBathymetryBaseRgb();
-  const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
-  const scaledDepthRatio = clamp(depthRatioRaw, 0, 1);
-  const visualModifiers = getBathymetryVisualModifiers(feature);
-  const strokeRgb = interpolateRgbChannels(
-    baseRgb,
-    interpolateRgbChannels(
-      { r: 204, g: 228, b: 246 },
-      { r: 58, g: 101, b: 144 },
-      scaledDepthRatio
-    ),
-    visualModifiers.contourBrightness
-  );
-  const alphaBase = profile?.contourAlphaBase ?? 0.28;
-  const alpha = clamp(
-    oceanStyle.opacity
-      * (alphaBase + oceanStyle.contourStrength * 0.46 + scaledDepthRatio * 0.08)
-      * visualModifiers.contourAlpha,
-    0,
-    0.92
-  );
-  return toRgbaString(strokeRgb, alpha);
+  return getBathymetryStylePolicy().getBathymetryContourStrokeStyle(feature, oceanStyle);
 }
 
 function sortBathymetryFeaturesForFill(collection) {
-  if (!Array.isArray(collection?.features)) return [];
-  return [...collection.features].sort((a, b) => getBathymetryFeatureDepthMax(b) - getBathymetryFeatureDepthMax(a));
-}
-
-function getBathymetryTuningConfig() {
-  const ocean = runtimeState.styleConfig?.ocean || {};
-  const shallowBandFadeEndZoom = clamp(
-    Number.isFinite(Number(ocean.shallowBandFadeEndZoom)) ? Number(ocean.shallowBandFadeEndZoom) : BATHYMETRY_BAND_SHALLOW_FADE_END_ZOOM,
-    BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM + 0.1,
-    4.8
-  );
-  const midBandFadeEndZoom = clamp(
-    Number.isFinite(Number(ocean.midBandFadeEndZoom)) ? Number(ocean.midBandFadeEndZoom) : BATHYMETRY_BAND_MID_FADE_END_ZOOM,
-    BATHYMETRY_BAND_MID_FADE_START_ZOOM + 0.1,
-    5.2
-  );
-  const deepBandFadeEndZoom = clamp(
-    Number.isFinite(Number(ocean.deepBandFadeEndZoom)) ? Number(ocean.deepBandFadeEndZoom) : BATHYMETRY_BAND_DEEP_FADE_END_ZOOM,
-    BATHYMETRY_BAND_DEEP_FADE_START_ZOOM + 0.1,
-    6
-  );
-  const scenarioSyntheticContourFadeEndZoom = clamp(
-    Number.isFinite(Number(ocean.scenarioSyntheticContourFadeEndZoom))
-      ? Number(ocean.scenarioSyntheticContourFadeEndZoom)
-      : BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM,
-    BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM + 0.1,
-    4.6
-  );
-  const scenarioShallowContourFadeEndZoom = clamp(
-    Number.isFinite(Number(ocean.scenarioShallowContourFadeEndZoom))
-      ? Number(ocean.scenarioShallowContourFadeEndZoom)
-      : BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM,
-    BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM + 0.1,
-    5
-  );
-  return {
-    shallowBandFadeEndZoom,
-    midBandFadeEndZoom,
-    deepBandFadeEndZoom,
-    scenarioSyntheticContourFadeEndZoom,
-    scenarioShallowContourFadeEndZoom,
-  };
-}
-
-function getZoomFadeFactor(k, fadeStartZoom, fadeEndZoom) {
-  if (!(k >= fadeStartZoom)) {
-    return 1;
-  }
-  if (k >= fadeEndZoom) {
-    return 0;
-  }
-  return clamp(
-    1 - (k - fadeStartZoom) / Math.max(0.0001, fadeEndZoom - fadeStartZoom),
-    0,
-    1
-  );
+  return getBathymetryStylePolicy().sortBathymetryFeaturesForFill(collection);
 }
 
 function getBathymetryBandVisibilityConfig(feature, k) {
-  const tuning = getBathymetryTuningConfig();
-  const depthMax = getBathymetryFeatureDepthMax(feature);
-  if (depthMax <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
-    return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM, tuning.shallowBandFadeEndZoom) };
-  }
-  if (depthMax <= BATHYMETRY_MID_DEPTH_MAX_M) {
-    return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_MID_FADE_START_ZOOM, tuning.midBandFadeEndZoom) };
-  }
-  return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_DEEP_FADE_START_ZOOM, tuning.deepBandFadeEndZoom) };
+  return getBathymetryStylePolicy().getBathymetryBandVisibilityConfig(feature, k);
 }
 
 function drawBathymetryBands(collection, oceanStyle) {
@@ -10702,31 +9971,7 @@ function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
 }
 
 function getBathymetryContourVisibilityConfig(feature, k) {
-  const tuning = getBathymetryTuningConfig();
-  const source = String(feature?.properties?._bathymetrySource || "").trim().toLowerCase();
-  if (source !== "scenario") {
-    return { alpha: 1 };
-  }
-  const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
-  if (mode === "synthetic") {
-    return {
-      alpha: getZoomFadeFactor(
-        k,
-        BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM,
-        tuning.scenarioSyntheticContourFadeEndZoom
-      ),
-    };
-  }
-  if (getBathymetryFeatureDepthMax(feature) <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
-    return {
-      alpha: getZoomFadeFactor(
-        k,
-        BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM,
-        tuning.scenarioShallowContourFadeEndZoom
-      ),
-    };
-  }
-  return { alpha: 1 };
+  return getBathymetryStylePolicy().getBathymetryContourVisibilityConfig(feature, k);
 }
 
 function drawBathymetryContours(collection, oceanStyle) {
@@ -10734,10 +9979,7 @@ function drawBathymetryContours(collection, oceanStyle) {
 }
 
 function getBathymetryCollectionBySource(collection, source) {
-  if (!Array.isArray(collection?.features)) return null;
-  return buildBathymetryFeatureCollection(
-    collection.features.filter((feature) => String(feature?.properties?._bathymetrySource || "") === source)
-  );
+  return getBathymetryStylePolicy().getBathymetryCollectionBySource(collection, source);
 }
 
 function getCoastlineCollectionForZoom(k) {
@@ -10750,19 +9992,8 @@ function getCoastlineCollectionForZoom(k) {
   return runtimeState.cachedCoastlinesHigh?.length ? runtimeState.cachedCoastlinesHigh : runtimeState.cachedCoastlines;
 }
 
-function getScenarioCoastalAccentLineWidth(k, { interactive = false, overlay = false } = {}) {
-  const baseWidth = overlay
-    ? 1.22 / Math.max(0.0001, k)
-    : (interactive ? 1.05 : 1.28) / Math.max(0.0001, k);
-  if (k < COASTLINE_LOD_MID_ZOOM_MAX) {
-    return baseWidth;
-  }
-  return Math.max(baseWidth, overlay ? COASTLINE_ACCENT_OVERLAY_MIN_WIDTH_PX : COASTLINE_ACCENT_MIN_WIDTH_PX);
-}
-
-function isAtlantropaScenarioShorelineOverlay(feature) {
-  if (getReliefOverlayKind(feature) !== "new_shoreline") return false;
-  return String(feature?.properties?.parent_id || "").trim().toLowerCase().startsWith("atlantropa_");
+function getScenarioCoastalAccentLineWidth(k, options1) {
+  return getBathymetryStylePolicy().getScenarioCoastalAccentLineWidth(k, options1);
 }
 
 function getFeatureProjectedDensity(feature) {
@@ -10791,29 +10022,8 @@ function drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa = false } = {}
   return getOceanRenderOwner().drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa });
 }
 
-function getScenarioCoastalAccentOverlayVisualConfig(feature, k, { interactive = false } = {}) {
-  const isAtlantropa = isAtlantropaScenarioShorelineOverlay(feature);
-  let alpha = interactive ? 0.38 : 0.62;
-  if (isAtlantropa) {
-    alpha = interactive
-      ? COASTLINE_OVERLAY_ATLANTROPA_ALPHA_INTERACTIVE
-      : COASTLINE_OVERLAY_ATLANTROPA_ALPHA;
-    if (k < COASTLINE_LOD_MID_ZOOM_MAX) {
-      const densityThreshold = k < COASTLINE_LOD_LOW_ZOOM_MAX
-        ? COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW
-        : COASTLINE_ACCENT_DENSITY_THRESHOLD_MID;
-      const densityAlpha = k < COASTLINE_LOD_LOW_ZOOM_MAX
-        ? COASTLINE_OVERLAY_DENSITY_ALPHA_LOW
-        : COASTLINE_OVERLAY_DENSITY_ALPHA_MID;
-      if (getFeatureProjectedDensity(feature) > densityThreshold) {
-        alpha *= densityAlpha;
-      }
-    }
-  }
-  return {
-    alpha,
-    lineWidth: getScenarioCoastalAccentLineWidth(k, { interactive, overlay: true }),
-  };
+function getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2) {
+  return getBathymetryStylePolicy().getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2);
 }
 
 function clipOutAtlantropaAccentRegions() {
@@ -11517,11 +10727,16 @@ function getPhysicalExactRefreshPasses() {
   return passes;
 }
 
+function composeUrbanAdaptivePaintModel() {
+  const owner = createUrbanAdaptivePaintModel(runtimeState, { getResolvedFeatureColor, clamp });
+  return owner;
+}
+
 const {
   computeUrbanAdaptivePaintFromHostColor,
   getUrbanAdaptivePaint,
   getEffectiveUrbanMode,
-} = createUrbanAdaptivePaintModel({ runtimeState, getResolvedFeatureColor, clamp });
+} = composeUrbanAdaptivePaintModel();
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
   const startedAt = nowMs();
@@ -11588,9 +10803,14 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   return getRiverLayerRenderOwner().drawRiversLayer(k, { interactive });
 }
 
-const { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel } = createCityLabelTextModel({
-  runtimeState, getStrictGeoLabel, getPreferredGeoLabel,
-});
+function composeCityLabelTextModel() {
+  const owner = createCityLabelTextModel(runtimeState, {
+    getStrictGeoLabel, getPreferredGeoLabel,
+  });
+  return owner;
+}
+
+const { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel } = composeCityLabelTextModel();
 
 function getCityCountryGroupKey(feature) {
   const props = feature?.properties || {};
@@ -11862,8 +11082,8 @@ function getCityTooltipText(entry) {
 let cityPaintStyleModel = null;
 function getCityPaintStyleModel() {
   if (!cityPaintStyleModel) {
-    cityPaintStyleModel = createCityPaintStyleModel({
-      runtimeState, getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
+    cityPaintStyleModel = createCityPaintStyleModel(runtimeState, {
+      getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
     });
   }
   return cityPaintStyleModel;
@@ -12570,8 +11790,7 @@ function drawCachedContextScenarioLayer(...args) {
 
 function getScenarioRegionOverlayRenderOwner() {
   if (!scenarioRegionOverlayRenderOwner) {
-    scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner({
-      runtimeState,
+    scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost,
       getRenderPassCacheState,
       getRenderPassLayout,
@@ -13290,7 +12509,7 @@ function ensureUnitCounterEditorState() {
     || ""
   ).trim();
   runtimeState.unitCounterEditor.nationTag = canonicalCountryCode(runtimeState.unitCounterEditor.nationTag || "");
-  runtimeState.unitCounterEditor.nationSource = normalizeUnitCounterNationSource(runtimeState.unitCounterEditor.nationSource, "display");
+  runtimeState.unitCounterEditor.nationSource = normalizeUnitCounterNationSource(String(runtimeState.unitCounterEditor.nationSource || ""), "display");
   runtimeState.unitCounterEditor.presetId = String(runtimeState.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
   runtimeState.unitCounterEditor.iconId = String(
     runtimeState.unitCounterEditor.iconId
@@ -13319,13 +12538,13 @@ function ensureUnitCounterEditorState() {
       lineId: String(runtimeState.unitCounterEditor.attachment.lineId || "").trim(),
     }
     : null;
-  runtimeState.unitCounterEditor.baseFillColor = normalizeUnitCounterBaseFillColor(runtimeState.unitCounterEditor.baseFillColor);
+  runtimeState.unitCounterEditor.baseFillColor = normalizeUnitCounterBaseFillColor(String(runtimeState.unitCounterEditor.baseFillColor || ""));
   runtimeState.unitCounterEditor.organizationPct = normalizeUnitCounterStatPercent(
-    runtimeState.unitCounterEditor.organizationPct,
+    Number(runtimeState.unitCounterEditor.organizationPct),
     DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT
   );
   runtimeState.unitCounterEditor.equipmentPct = normalizeUnitCounterStatPercent(
-    runtimeState.unitCounterEditor.equipmentPct,
+    Number(runtimeState.unitCounterEditor.equipmentPct),
     DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT
   );
   runtimeState.unitCounterEditor.statsPresetId = normalizeUnitCounterStatsPresetId(runtimeState.unitCounterEditor.statsPresetId || "regular");
@@ -13374,8 +12593,6 @@ function getProjectedPoint(coord) {
   return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
 }
 
-
-
 function projectStrategicPoints(points = []) {
   return points.map((point) => getProjectedPoint(point)).filter(Boolean);
 }
@@ -13404,8 +12621,7 @@ function getOperationalLineById(id) {
 let operationGraphicsEditorRenderOwner = null;
 function getOperationGraphicsEditorRenderOwner() {
   if (!operationGraphicsEditorRenderOwner) {
-    operationGraphicsEditorRenderOwner = createOperationGraphicsEditorRenderOwner({
-      runtimeState,
+    operationGraphicsEditorRenderOwner = createOperationGraphicsEditorRenderOwner(runtimeState, {
       rendererSurfaceHost,
       ensureOperationGraphicsEditorState,
       getOperationGraphicById,
@@ -13424,12 +12640,6 @@ function getOperationGraphicsEditorRenderOwner() {
   }
   return operationGraphicsEditorRenderOwner;
 }
-
-
-
-
-
-
 
 function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {
   const hit = getHitFromEvent(event, {
@@ -13458,8 +12668,6 @@ function renderFrontlineOverlay() {
   rendererSurfaceHost.getFrontlineLabelsGroup().attr("aria-hidden", "true");
 }
 
-
-
 function renderOperationGraphicsEditorOverlay() {
   return getOperationGraphicsEditorRenderOwner().renderOperationGraphicsEditorOverlay((event, datum, points) => {
     event.stopPropagation();
@@ -13480,8 +12688,6 @@ function renderUnitCountersOverlay() {
   getStrategicOverlayHelpersOwner().renderUnitCountersOverlay();
   getStrategicOverlayHelpersOwner().bindUnitCounterOverlayInteractions();
 }
-
-
 
 function renderHoverOverlay() {
   getTransientOverlayRenderOwner().renderHoverOverlay();
@@ -13794,6 +13000,13 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
   }
 }
 
+function composePhysicalIntensityPreviewOwner() {
+  const owner = createPhysicalIntensityPreviewOwner(runtimeState, {
+    rendererSurfaceHost, getIntensityFieldTool, getProjectedDegreeRadiusPx, clamp,
+  });
+  return owner;
+}
+
 const {
   getMapLonLatFromEvent,
   projectGeoToScreen,
@@ -13801,9 +13014,7 @@ const {
   renderPhysicalIntensityBrushPreview,
   updatePhysicalIntensityBrushPreviewFromEvent,
   getPhysicalIntensityPointHit,
-} = createPhysicalIntensityPreviewOwner({
-  runtimeState, rendererSurfaceHost, getIntensityFieldTool, getProjectedDegreeRadiusPx, clamp,
-});
+} = composePhysicalIntensityPreviewOwner();
 
 function getPhysicalIntensityChannel(channelId = "") {
   runtimeState.intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
@@ -13817,11 +13028,8 @@ function refreshPhysicalIntensityUi() {
   callRuntimeHook(runtimeState, "updateToolbarInputsFn");
 }
 
-const {
-  handlePhysicalIntensityPointerDown,
-  handlePhysicalIntensityPointerMove,
-  handlePhysicalIntensityPointerEnd,
-} = createPhysicalIntensityInteractionOwner({
+function composePhysicalIntensityInteractionOwner() {
+  const owner = createPhysicalIntensityInteractionOwner({
   runtimeState,
   rendererSurfaceHost,
   getPhysicalIntensityChannel,
@@ -13844,6 +13052,14 @@ const {
   setIntensityFieldTool,
   updatePhysicalIntensityBrushPreviewFromEvent,
 });
+  return owner;
+}
+
+const {
+  handlePhysicalIntensityPointerDown,
+  handlePhysicalIntensityPointerMove,
+  handlePhysicalIntensityPointerEnd,
+} = composePhysicalIntensityInteractionOwner();
 
 function updateSpecialZoneEditorUI() {
   if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {
@@ -13965,36 +13181,7 @@ function handleSpecialZoneMembershipClick(hit, event) {
 }
 
 function getCountryFeatureIds(countryCode) {
-  if (!countryCode || !(runtimeState.countryToFeatureIds instanceof Map)) return [];
-  const ids = runtimeState.countryToFeatureIds.get(countryCode);
-  if (!Array.isArray(ids)) return [];
-  return ids.filter((candidateId) => {
-    const candidateFeature = runtimeState.landIndex?.get(candidateId);
-    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
-  });
-}
-
-function getScenarioOwnerFeatureIds(ownerTag) {
-  const normalizedOwnerTag = String(ownerTag || "").trim().toUpperCase();
-  if (!normalizedOwnerTag || !(runtimeState.ownerToFeatureIds instanceof Map)) return [];
-  const ids = runtimeState.ownerToFeatureIds.get(normalizedOwnerTag);
-  if (!Array.isArray(ids)) return [];
-  return ids.filter((candidateId) => {
-    const candidateFeature = runtimeState.landIndex?.get(candidateId);
-    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
-  });
-}
-
-function getInteractionCountryFeatureIds(feature, featureId) {
-  const interactionCountryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
-  const ownerIds = interactionCountryCode ? getScenarioOwnerFeatureIds(interactionCountryCode) : [];
-  if (ownerIds.length) return ownerIds;
-
-  const runtimeCountryCode = getFeatureCountryCodeNormalized(feature);
-  const runtimeIds = runtimeCountryCode ? getCountryFeatureIds(runtimeCountryCode) : [];
-  if (runtimeIds.length) return runtimeIds;
-
-  return interactionCountryCode ? getCountryFeatureIds(interactionCountryCode) : [];
+  return getFillTargetPolicy().getCountryFeatureIds(countryCode);
 }
 
 function getCountryInteractionPolicy(countryCode) {
@@ -14647,21 +13834,7 @@ function applyDevSelectionFill() {
 }
 
 function resolveInteractionTargetIds(feature, id) {
-  if (shouldExcludePoliticalInteractionFeature(feature, id)) {
-    return [];
-  }
-  if (isSovereigntyModeActive()) {
-    return [id];
-  }
-  if (runtimeState.interactionGranularity !== "country") {
-    return [id];
-  }
-  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, id);
-  if (!countryCode) {
-    return [id];
-  }
-  const ids = getInteractionCountryFeatureIds(feature, id);
-  return ids.length ? ids : [id];
+  return getFillTargetPolicy().resolveInteractionTargetIds(feature, id);
 }
 
 function isBrushNavigationModifier(event) {
@@ -14687,112 +13860,20 @@ function dismissOnboardingHint() {
   }
 }
 
-function resolveParentGroupKey(feature, featureId) {
-  const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
-  const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-  const scopeCode = scenarioDistrictGroup && scenarioOwnerTag
-    ? scenarioOwnerTag
-    : getFeatureInteractionCountryCodeNormalized(feature, featureId);
-  if (!scopeCode) return "";
-  const directGroup = getAdmin1Group(feature);
-  const groupName = String(scenarioDistrictGroup || runtimeState.parentGroupByFeatureId?.get(featureId) || directGroup || "").trim();
-  if (!groupName) return "";
-  return `${scopeCode}::${groupName}`;
-}
-
 function resolveParentGroupTargetIds(feature, featureId) {
-  if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
-  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-  const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
-  const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-  const parentGroupKey = resolveParentGroupKey(feature, featureId);
-  const ids = scenarioDistrictGroup && scenarioOwnerTag
-    ? getScenarioOwnerFeatureIds(scenarioOwnerTag)
-    : getInteractionCountryFeatureIds(feature, featureId);
-  if (!parentGroupKey || !ids.length) return [];
-  const targetIds = ids.filter((candidateId) => {
-    const candidateFeature = runtimeState.landIndex.get(candidateId);
-    if (!candidateFeature) return false;
-    if (shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId)) return false;
-    return resolveParentGroupKey(candidateFeature, candidateId) === parentGroupKey;
-  });
-  if (targetIds.length < 2) return [];
-  return Array.from(new Set(targetIds));
+  return getFillTargetPolicy().resolveParentGroupTargetIds(feature, featureId);
 }
 
 function resolveSpecialZoneParentGroupTargetIds(featureId) {
-  const id = String(featureId || "").trim();
-  const feature = id ? runtimeState.landIndex?.get(id) : null;
-  if (!feature) return [];
-  return resolveParentGroupTargetIds(feature, id);
-}
-
-function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
-  if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
-  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-  const countryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
-  if (!countryCode) return [];
-  const ids = getInteractionCountryFeatureIds(feature, featureId).filter((candidateId) => {
-    const candidateFeature = runtimeState.landIndex.get(candidateId);
-    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
-  });
-  if (ids.length < 2) return [];
-
-  if (!allowWhenParentGrouping) {
-    const hasParentGrouping = ids.some((candidateId) => {
-      const candidateFeature = runtimeState.landIndex.get(candidateId);
-      if (!candidateFeature) return false;
-      return !!resolveParentGroupKey(candidateFeature, candidateId);
-    });
-    if (hasParentGrouping) return [];
-  }
-
-  return ids;
-}
-
-function isBatchFillDoubleClickBaseEligible(hit, feature) {
-  if (!hit?.id || !feature) return false;
-  if (runtimeState.currentTool !== "fill") return false;
-  if (isSovereigntyModeActive()) return false;
-  if (runtimeState.interactionGranularity !== "subdivision") return false;
-  if (runtimeState.brushModeEnabled) return false;
-  if (runtimeState.specialZoneEditor?.active) return false;
-  return true;
+  return getFillTargetPolicy().resolveSpecialZoneParentGroupTargetIds(featureId);
 }
 
 function buildDoubleClickBatchPlan(feature, featureId) {
-  if (!feature || !featureId) return null;
-  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return null;
-  const requestedScope = String(runtimeState.batchFillScope || "parent") === "country" ? "country" : "parent";
-  if (requestedScope === "parent") {
-    const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
-    if (parentTargetIds.length >= 2) {
-      return {
-        targetIds: parentTargetIds,
-        kind: "fill-parent-group",
-        dirtyReason: "fill-parent-group",
-        fallbackToCountry: false,
-      };
-    }
-  }
-
-  const countryTargetIds = resolveCountryFillTargetIds(feature, featureId, {
-    allowWhenParentGrouping: true,
-  });
-  if (countryTargetIds.length >= 2) {
-    return {
-      targetIds: countryTargetIds,
-      kind: "fill-country-batch",
-      dirtyReason: "fill-country-batch",
-      fallbackToCountry: requestedScope === "parent",
-    };
-  }
-  return null;
+  return getFillTargetPolicy().buildDoubleClickBatchPlan(feature, featureId);
 }
 
 function isDoubleClickBatchEligible(hit, feature) {
-  if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
-  return !!buildDoubleClickBatchPlan(feature, hit.id);
+  return getFillTargetPolicy().isDoubleClickBatchEligible(hit, feature);
 }
 
 function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind } = {}) {
@@ -14880,37 +13961,50 @@ function executeDoubleClickBatchFill(feature, featureId) {
   });
 }
 
+function composeBrushInteractionSessionOwner() {
+  const owner = createBrushInteractionSessionOwner(runtimeState, {
+    getBrushSession: () => brushSession,
+    setBrushSession: (session) => { brushSession = session; },
+    suppressNextClick: () => { suppressNextClickAfterBrush = true; },
+    getContext: () => rendererSurfaceHost.getContext(),
+    nowMs,
+    captureHistoryState,
+    pushHistoryEntry,
+    isSovereigntyModeActive,
+    addRecentColor,
+    markDirty,
+    refreshSidebarAfterPaint,
+    requestRendererRender,
+    noteRenderAction,
+    getHitFromEvent,
+    getStrategicOverlayRuntimeOwner,
+    getSpecialZoneMembershipTool,
+    getSpecialZoneMembershipBrushMode,
+    blockStartupReadonlyInteraction,
+    handlePhysicalIntensityPointerDown,
+    handlePhysicalIntensityPointerMove,
+    isBrushNavigationModifier,
+    applyBrushHit,
+    requestInteractionRender,
+  });
+  return owner;
+}
+
 const {
   flushBrushSession,
   flushSpecialZoneMembershipDragSession,
   handleBrushPointerDown,
   handleBrushPointerMove,
-} = createBrushInteractionSessionOwner({
-  runtimeState,
-  getBrushSession: () => brushSession,
-  setBrushSession: (session) => { brushSession = session; },
-  suppressNextClick: () => { suppressNextClickAfterBrush = true; },
-  getContext: () => rendererSurfaceHost.getContext(),
-  nowMs,
-  captureHistoryState,
-  pushHistoryEntry,
-  isSovereigntyModeActive,
-  addRecentColor,
-  markDirty,
-  refreshSidebarAfterPaint,
-  requestRendererRender,
-  noteRenderAction,
-  getHitFromEvent,
-  getStrategicOverlayRuntimeOwner,
-  getSpecialZoneMembershipTool,
-  getSpecialZoneMembershipBrushMode,
-  blockStartupReadonlyInteraction,
-  handlePhysicalIntensityPointerDown,
-  handlePhysicalIntensityPointerMove,
-  isBrushNavigationModifier,
-  applyBrushHit,
-  requestInteractionRender,
-});
+} = composeBrushInteractionSessionOwner();
+
+function mergeHistorySnapshot(target, snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return;
+  Object.entries(snapshot).forEach(([section, patch]) => {
+    if (!patch || typeof patch !== "object") return;
+    target[section] = target[section] || {};
+    Object.assign(target[section], patch);
+  });
+}
 
 function applyBrushHit(hit) {
   if (!hit?.id) return false;

@@ -1332,6 +1332,32 @@ test("explicit imported pure readers accept only an exact direct state root", ()
   }
 });
 
+test("borrowed chunk readers accept subtrees while unrelated calls and writes remain tracked", () => {
+  const source = `
+    import { buildScenarioChunkLayerSelectionSignatures } from "./chunk_layer_payloads.js";
+    export function read(runtimeState, bundle, other) {
+      const selected = other || runtimeState.activeScenarioChunks;
+      buildScenarioChunkLayerSelectionSignatures(bundle, selected, null);
+      runtimeState.activeScenarioChunks.loadedChunkIds = [];
+    }
+  `;
+  const inspect = (text) => scanStateMutations(text, {
+    filePath: "js/core/scenario/chunk_runtime.js",
+    bindings: [parameterBindingFor(text, "read", "runtimeState")],
+  });
+  const findings = inspect(source);
+  assert.equal(findings.some(({ reason }) => reason === "state-alias-escape"), false);
+  assert.ok(findings.some(({ operation }) => operation === "assign"));
+  assert.ok(inspect(source.replace(
+    "buildScenarioChunkLayerSelectionSignatures(bundle, selected, null)",
+    "unknownReader(bundle, selected, null)",
+  )).some(({ reason }) => reason === "state-alias-escape"));
+  assert.ok(inspect(source.replace(
+    "buildScenarioChunkLayerSelectionSignatures(bundle, selected, null)",
+    "buildScenarioChunkLayerSelectionSignatures(bundle, selected)",
+  )).some(({ reason }) => reason === "state-alias-escape"));
+});
+
 test("source-bound special-zone projection keeps its land-index output borrowed", () => {
   const source = `
     import { buildSpecialZoneRenderFeatures } from "../special_zone_layers.js";

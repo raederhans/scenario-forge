@@ -11,8 +11,7 @@ import {
 } from "../js/core/renderer/unit_counter_display_model.js";
 
 function createModel(runtimeState = {}) {
-  return createUnitCounterDisplayModel({
-    runtimeState,
+  return createUnitCounterDisplayModel(runtimeState, {
     canonicalCountryCode: (value) => String(value || "").trim().toUpperCase(),
     getScenarioCountryDisplayName: (entry, fallback) => entry?.name || fallback,
     ColorManager: { getPoliticalFallbackColor: () => "#123456" },

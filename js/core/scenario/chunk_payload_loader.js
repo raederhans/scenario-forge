@@ -103,5 +103,5 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     return loadPromise;
   }
 
-  return { loadScenarioChunkPayload, resetScenarioChunkRequests };
+  return Object.freeze({ loadScenarioChunkPayload, resetScenarioChunkRequests });
 }

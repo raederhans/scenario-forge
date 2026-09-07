@@ -50,7 +50,7 @@ test("background render pass composes ocean depth mask after ocean style", () =>
   assert.match(oceanOwnerSource, /function drawOceanStyle\(\)/);
   assert.match(oceanOwnerSource, /runtimeState\.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY/);
   assert.match(source, /getIntensityFieldMaskOwner,/);
-  assert.match(source, /`field:oceanDepth:\$\{Number\(intensityFields\.channels\.oceanDepth\?\.revision \|\| 0\)\}`/);
+  assert.match(readText("js/core/renderer/render_pass_signature_policy.js"), /`field:oceanDepth:\$\{Number\(intensityFields\.channels\.oceanDepth\?\.revision \|\| 0\)\}`/);
   assert.ok(drawBackgroundBody.indexOf("drawOceanStyle();") < drawBackgroundBody.indexOf("drawOceanDepthMaskLayer();"));
   assert.match(depthLayerBody, /getIntensityFieldMaskOwner\(\)\.getMaskCanvas\("oceanDepth"/);
   assert.match(depthLayerBody, /commitIntensityFieldsState\(intensityFields\)/);

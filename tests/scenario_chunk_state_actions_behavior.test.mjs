@@ -1130,3 +1130,23 @@ test("political payload generation, render lock, and default topology stay atomi
   assert.equal(target.defaultRuntimePoliticalTopology, synchronizedTopology);
   assert.equal(target.sentinel, "preserved");
 });
+test("optional payload action preserves bundle identity and rejects non-payload fields", async () => {
+  const { commitScenarioOptionalLayerPayloadState } = await import(ACTIVATION_ACTIONS_PATH);
+  const { SCENARIO_OPTIONAL_LAYER_CONFIGS } = await import("../js/core/scenario/optional_layer_runtime.js");
+  const bundle = { optionalLayerSettledByKey: {}, manifest: { id: "stable" } };
+  const target = { scenarioBundleCacheById: { example: bundle } };
+  for (const [key, config] of Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)) {
+    const payload = { features: [] };
+    assert.equal(commitScenarioOptionalLayerPayloadState(target, "example", key, config.bundleField, payload), true);
+    assert.equal(target.scenarioBundleCacheById.example, bundle);
+    assert.equal(bundle[config.bundleField], payload);
+    assert.equal(bundle.optionalLayerSettledByKey[key], true);
+    assert.equal(commitScenarioOptionalLayerPayloadState(target, "example", key, config.bundleField, null, false), true);
+    assert.equal(Object.hasOwn(bundle.optionalLayerSettledByKey, key), false);
+  }
+  const before = structuredClone(bundle);
+  assert.equal(commitScenarioOptionalLayerPayloadState(target, "example", "water", "manifest", null), false);
+  assert.equal(commitScenarioOptionalLayerPayloadState(target, "__proto__", "water", "waterRegionsPayload", null), false);
+  assert.equal(commitScenarioOptionalLayerPayloadState(target, "missing", "water", "waterRegionsPayload", null), false);
+  assert.deepEqual(bundle, before);
+});

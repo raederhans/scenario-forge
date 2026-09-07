@@ -33,8 +33,7 @@ export function getCoastlineDecisionSignature(decision = null) {
   ].join("|");
 }
 
-export function createStaticBorderMeshLifecycle({
-  runtimeState,
+export function createStaticBorderMeshLifecycle(runtimeState, {
   getStaticMeshSourceCountries,
   getDetailAdmMeshBuildState,
   setDetailAdmMeshBuildState,
@@ -99,14 +98,14 @@ export function createStaticBorderMeshLifecycle({
     const minY = Number(viewportBounds.minY);
     const maxX = Number(viewportBounds.maxX);
     const maxY = Number(viewportBounds.maxY);
-    (runtimeState.spatialItems || []).forEach((item) => {
+    for (const item of runtimeState.spatialItems || []) {
       const countryCode = canonicalCountryCode(item?.borderMeshCountryCode || item?.countryCode || "");
-      if (!countryCode || visible.has(countryCode)) return;
+      if (!countryCode || visible.has(countryCode)) continue;
       if (item.maxX < minX || item.maxY < minY || item.minX > maxX || item.minY > maxY) {
-        return;
+        continue;
       }
       visible.add(countryCode);
-    });
+    }
     visibleBorderCountryCodesCache = {
       signature,
       codes: new Set(visible),
@@ -235,12 +234,12 @@ export function createStaticBorderMeshLifecycle({
     visibleBorderCountryCodesCache = { signature: "", codes: new Set() };
   }
 
-  return {
+  return Object.freeze({
     buildDetailAdmMeshSignature,
     getVisibleCountryCodesForBorderMeshes,
     cancelDeferredHeavyBorderMeshes,
     scheduleDeferredHeavyBorderMeshes,
     captureStaticMeshSnapshot,
     resetVisibleCountryCodesCache,
-  };
+  });
 }

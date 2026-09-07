@@ -99,6 +99,7 @@ class RendererControlActionsBoundaryContractTest(unittest.TestCase):
         for key in INTERACTION_KEYS - renderer_owned_interaction_keys:
             self.assertNotRegex(runtime_state, rf"\btarget\.{re.escape(key)}\s*=(?!=)")
         self.assertIn("setInteractionInfrastructureActionStateFields(target, stage, options)", runtime_state)
+        self.assertIn("setInteractionInfrastructureStateFields(state, stage,", self.renderer)
 
     def test_public_boundary_remains_private(self):
         public_facade = PUBLIC_FACADE_JS.read_text(encoding="utf-8")

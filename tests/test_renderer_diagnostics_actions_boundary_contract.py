@@ -41,13 +41,12 @@ READ_ONLY_ACTION_NAMES = {
     "captureRenderSnapshotState",
 }
 MAP_RENDERER_DIRECT_ACTION_NAMES = {
-    *READ_ONLY_ACTION_NAMES,
+    *(READ_ONLY_ACTION_NAMES - {"captureProjectedBoundsDiagnosticsState"}),
     "ensureRenderPerfMetricsState",
     "setRenderPerfMetricEntryState",
     "setRenderPerfContextBreakdownState",
     "commitRenderPerfMetricState",
     "setDebugCountryCoverageState",
-    "setFirstVisibleFramePaintedState",
 }
 MAP_RENDERER_COMPATIBILITY_ACTION_NAMES = {
     "commitProjectedBoundsDiagnosticsState",
@@ -162,7 +161,8 @@ class RendererDiagnosticsActionsBoundaryContractTest(unittest.TestCase):
         )
         self.assertEqual(
             direct_action_imports,
-            {(name, name) for name in MAP_RENDERER_DIRECT_ACTION_NAMES},
+            {(name, name) for name in MAP_RENDERER_DIRECT_ACTION_NAMES}
+            | {("setProjectedBoundsDiagnosticsState", "commitProjectedBoundsDiagnosticsState")},
         )
         self.assertEqual(
             {
@@ -170,24 +170,12 @@ class RendererDiagnosticsActionsBoundaryContractTest(unittest.TestCase):
                 for binding in compatibility_imports
                 if binding[0] in MAP_RENDERER_COMPATIBILITY_ACTION_NAMES
             },
-            {(name, name) for name in MAP_RENDERER_COMPATIBILITY_ACTION_NAMES},
+            set(),
         )
-        self.assertEqual(
-            imported_bindings_from(
-                self.runtime_state,
-                "./actions/renderer_diagnostics_actions.js",
-            ),
-            {
-                (
-                    "setFirstVisibleFramePaintedState",
-                    "setFirstVisibleFramePaintedActionState",
-                ),
-                (
-                    "setProjectedBoundsDiagnosticsState",
-                    "setProjectedBoundsDiagnosticsActionState",
-                ),
-            },
-        )
+        self.assertNotIn("./actions/renderer_diagnostics_actions.js", self.runtime_state)
+        visible_owner = (REPO_ROOT / "js/core/renderer/visible_frame_diagnostics_owner.js").read_text(encoding="utf-8")
+        self.assertIn("setFirstVisibleFramePaintedState(runtimeState, painted)", visible_owner)
+        self.assertIn("createVisibleFrameDiagnosticsOwner({\n    runtimeState,", self.map_renderer)
         self.assertEqual(direct_runtime_writes(self.map_renderer), [])
 
     def test_map_renderer_wires_perf_metrics_owner_factory_and_thin_wrappers(self):
@@ -244,7 +232,7 @@ class RendererDiagnosticsActionsBoundaryContractTest(unittest.TestCase):
         )
 
         projected_bounds_body = function_body(
-            self.map_renderer,
+            (REPO_ROOT / "js/core/renderer/projected_bounds_diagnostics_owner.js").read_text(encoding="utf-8"),
             "recordProjectedBoundsDiagnosticsState",
         )
         self.assertIn(

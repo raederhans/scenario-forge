@@ -4,9 +4,9 @@ import { createPhysicalIntensityInteractionOwner } from "../js/core/renderer/phy
 
 function harness() {
   const calls = [], frames = [];
-  const state = {};
+  const state = { intensityFields: { channels: { physicalAtlas: { enabled: false, points: [], revision: 0 } } } };
   const tool = { active: true, channelId: "physicalAtlas", subMode: "paint", brushRadiusDeg: 3, brushStrength: 2 };
-  let channel = { enabled: false, points: [], revision: 0 };
+  const channel = () => state.intensityFields.channels.physicalAtlas;
   const mode = { hit: null, stamp: true, captureThrows: false };
   const record = (name) => (...args) => calls.push([name, ...args]);
   const node = {
@@ -15,11 +15,11 @@ function harness() {
   };
   const owner = createPhysicalIntensityInteractionOwner({
     runtimeState: state, rendererSurfaceHost: { getInteractionRect: () => ({ node: () => node }) },
-    getPhysicalIntensityChannel: () => channel, getIntensityFieldTargetPasses: () => [],
+    getPhysicalIntensityChannel: channel, getIntensityFieldTargetPasses: () => [],
     invalidateRenderPasses: record("invalidate"), requestInteractionRender: record("render"),
     refreshPhysicalIntensityUi: record("ui"), clamp: (v,a,b) => Math.max(a, Math.min(b,v)),
     INTENSITY_FIELD_GRID: { min: 0, max: 5 }, bakeIntensityComposite: record("bake"),
-    captureHistoryState: () => { calls.push(["history-capture"]); return structuredClone(channel); },
+    captureHistoryState: () => { calls.push(["history-capture"]); return structuredClone(channel()); },
     pushHistoryEntry: record("history"), suppressNextClick: record("suppress"),
     getMapLonLatFromEvent: (event) => event.lonLat,
     stampIntensityBrush: (target, options) => { calls.push(["stamp", options]); if (mode.stamp) target.stamped = true; return mode.stamp ? {} : null; },
@@ -30,7 +30,7 @@ function harness() {
     requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
   });
   const event = (lonLat = [1, 2], buttons = 1) => ({ lonLat, buttons, pointerId: 7, preventDefault: record("prevent") });
-  return { owner, state, tool, mode, calls, frames, event, channel: () => channel, replaceChannel: (value) => { channel = value; } };
+  return { owner, state, tool, mode, calls, frames, event, channel, replaceChannel: (value) => { state.intensityFields.channels.physicalAtlas = value; } };
 }
 
 test("brush captures before mutation, coalesces frames and commits live replacement channel on lost buttons", () => {

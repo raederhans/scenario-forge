@@ -29,7 +29,7 @@ const CITY_ADMIN_LABEL_REJECT_PATTERNS = [
 ];
 
 // Label lookup stays live across language and locale changes.
-export function createCityLabelTextModel({ runtimeState, getStrictGeoLabel, getPreferredGeoLabel }) {
+export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getPreferredGeoLabel }) {
   function getCityFeatureKey(feature, fallbackKey = "") {
     const props = feature?.properties || {};
     return String(
@@ -276,5 +276,5 @@ export function createCityLabelTextModel({ runtimeState, getStrictGeoLabel, getP
     return truncateCityLabelToWidth(abbreviatedLabel || cleanedLabel || rawLabel, maxWidthPx, measureWidth);
   }
 
-  return { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel };
+  return Object.freeze({ getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel });
 }

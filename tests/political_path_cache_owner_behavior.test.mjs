@@ -18,8 +18,7 @@ function fixture(t) {
     timers: new Map(), cancelled: [], metrics: [], counters: {}, builds: [], serial: 0,
   };
   h.path = (feature) => { h.builds.push(feature.id); h.time += h.pathCost; return `path:${feature.id}`; };
-  h.owner = createPoliticalPathCacheOwner({
-    runtimeState: h.state,
+  h.owner = createPoliticalPathCacheOwner(h.state, {
     rendererSurfaceHost: { getPathSvg: () => h.path },
     getPoliticalPassStaticSignature: (transform) => `static:${transform.k}:${transform.x}:${transform.y}`,
     getProjectionRenderSignature: () => h.projection,

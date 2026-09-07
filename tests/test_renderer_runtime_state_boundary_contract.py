@@ -30,14 +30,12 @@ class RendererRuntimeStateBoundaryContractTest(unittest.TestCase):
         self.assertIn("ensureSidebarPerfState", owner_content)
         self.assertIn("resetProjectedBoundsCacheState", owner_content)
         self.assertNotIn("ensureSphericalFeatureDiagnosticsCache", owner_content)
-        self.assertIn("./actions/renderer_interaction_actions.js", owner_content)
         self.assertIn("./actions/renderer_cache_actions.js", owner_content)
-        self.assertIn("./actions/renderer_phase_actions.js", owner_content)
-        self.assertIn("./actions/renderer_diagnostics_actions.js", owner_content)
-        self.assertIn("setInteractionInfrastructureActionStateFields(target, stage, options)", owner_content)
-        self.assertIn("commitRendererDprStageActionState(target, update)", owner_content)
-        self.assertIn("setFirstVisibleFramePaintedActionState(target, painted)", owner_content)
-        self.assertIn("setProjectedBoundsDiagnosticsActionState(target, diagnostics)", owner_content)
+        for retired in (
+            "commitRendererDprStageState",
+            "setFirstVisibleFramePaintedState", "commitProjectedBoundsDiagnosticsState",
+        ):
+            self.assertNotIn(retired, owner_content)
         self.assertIn("applyRendererSurfaceBridgeState", owner_content)
 
         action_content = RENDERER_INTERACTION_ACTIONS_JS.read_text(encoding="utf-8")

@@ -1,6 +1,6 @@
 // Physical intensity preview and point picking share the live projection surface.
-export function createPhysicalIntensityPreviewOwner({
-  runtimeState, rendererSurfaceHost, getIntensityFieldTool, getProjectedDegreeRadiusPx, clamp,
+export function createPhysicalIntensityPreviewOwner(runtimeState, {
+  rendererSurfaceHost, getIntensityFieldTool, getProjectedDegreeRadiusPx, clamp,
 }) {
   let physicalIntensityPreviewLonLat = null;
 
@@ -107,12 +107,12 @@ export function createPhysicalIntensityPreviewOwner({
     return best;
   }
 
-  return {
+  return Object.freeze({
     getMapLonLatFromEvent,
     projectGeoToScreen,
     hidePhysicalIntensityBrushPreview,
     renderPhysicalIntensityBrushPreview,
     updatePhysicalIntensityBrushPreviewFromEvent,
     getPhysicalIntensityPointHit,
-  };
+  });
 }

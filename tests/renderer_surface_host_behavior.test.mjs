@@ -55,7 +55,11 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
   });
   Object.assign(scope, dependencies);
   let constructions = 0;
-  scope[`create${name}`] = (options) => { constructions++; return options; };
+  scope[`create${name}`] = (...args) => {
+    constructions++;
+    if (["RenderPassSignaturePolicy", "BathymetryStylePolicy", "ParentBorderGroupingPolicy", "VisibleFrameIdentityPolicy", "FillTargetPolicy"].includes(name)) assert.equal(args[0], runtimeState);
+    return args.at(-1);
+  };
   const factory = rendererAst.body.find(node => node.type === "FunctionDeclaration" && node.id.name === `get${name}`);
   assert.ok(factory, `get${name} exists`);
   const extraSource = includeFunctions.map(functionName => {
@@ -330,4 +334,11 @@ test("surface host supports initial handles and null normalization", () => {
 
 test("renderer composition imports without eager dependency initialization errors", async () => {
   await import("../js/core/map_renderer.js");
+});
+
+test("renderer read policies are assembled lazily without reading live renderer handles", () => {
+  for (const [name, dependency] of [["RenderPassSignaturePolicy", "getDebugMode"], ["BathymetryStylePolicy", "getOceanBaseFillColor"], ["ParentBorderGroupingPolicy", "getFeatureId"], ["VisibleFrameIdentityPolicy", "ensureCurrentSceneSnapshot"], ["FillTargetPolicy", "getAdmin1Group"]]) {
+    const { owner } = createOwnerWiringHarness(name);
+    assert.equal(typeof owner[dependency], "function");
+  }
 });

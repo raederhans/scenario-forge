@@ -28,8 +28,7 @@ function harness() {
     state: { renderPhase: "idle", specialZoneEditor: { active: true, vertices: [[1, 2], [3, 4]], zoneType: "custom" }, landIndex: new Map(), specialRegionsById: new Map(), waterRegionsById: new Map() },
     style: { fill: "blue", fillOpacity: 0.9, stroke: "red", strokeWidth: 0.5, dash: [2, 4] },
   };
-  h.owner = createTransientOverlayRenderOwner({
-    runtimeState: h.state,
+  h.owner = createTransientOverlayRenderOwner(h.state, {
     rendererSurfaceHost: {
       getHoverGroup: () => h.hover, getSpecialZoneEditorGroup: () => h.editor,
       getPathSvg: () => h.path, getProjection: () => h.project,

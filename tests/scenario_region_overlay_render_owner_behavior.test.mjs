@@ -31,8 +31,7 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
     if (oldDocument) Object.defineProperty(globalThis, "document", oldDocument); else delete globalThis.document;
     if (oldPath) Object.defineProperty(globalThis, "Path2D", oldPath); else delete globalThis.Path2D;
   });
-  const owner = createScenarioRegionOverlayRenderOwner({
-    runtimeState: state,
+  const owner = createScenarioRegionOverlayRenderOwner(state, {
     rendererSurfaceHost: {
       getContext: () => target,
       getPathCanvas: () => (feature) => events.push(["pathCanvas", feature.id]),
@@ -166,7 +165,7 @@ test("Atlantropa land-like overlays stay between water highlight and special wit
 
 test("renderer wires projection and adaptive resets to the same overlay owner", () => {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  assert.match(source, /createScenarioRegionOverlayRenderOwner\(\{\s*runtimeState,\s*rendererSurfaceHost,/);
+  assert.match(source, /createScenarioRegionOverlayRenderOwner\(runtimeState,\s*\{\s*rendererSurfaceHost,/);
   assert.match(source, /resetHostWaterPathCaches: \(\) => \{\s*scenarioRegionOverlayRenderOwner\?\.resetWaterPathCaches\(\);/);
   assert.match(source, /getPreviousRenderedCount: \(\) => getScenarioRegionOverlayRenderOwner\(\)\.getPreviousWaterRenderedCount\(\),/);
   assert.match(source, /function resetScenarioWaterCacheAdaptiveState\([^)]*\) \{\s*scenarioRegionOverlayRenderOwner\?\.resetPreviousWaterRenderedCount\(\);/);

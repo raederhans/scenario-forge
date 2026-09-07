@@ -5678,7 +5678,7 @@ function collectFailures() {
       "function drawScenarioRegionOverlaysPass(k)",
     ],
     rendererRequiredTokens: [
-      "createScenarioRegionOverlayRenderOwner({",
+      "createScenarioRegionOverlayRenderOwner(runtimeState, {",
       "return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);",
       "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();",
     ],

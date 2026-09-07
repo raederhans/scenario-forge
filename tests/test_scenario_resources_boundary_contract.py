@@ -105,7 +105,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn("bundle.deferredMetadataCommitLease !== commitLease", content)
         self.assertIn("const leaseContext = commitLease.currentnessContext;", content)
         self.assertIn("function applyScenarioOptionalLayerState(", content)
-        self.assertIn("createScenarioOptionalLayerRuntime({", content)
+        self.assertIn("createScenarioOptionalLayerRuntime(state, {", content)
         self.assertIn("scenarioApplyRequestId = 0", content)
         self.assertIn("isScenarioApplyRequestCurrent = null", content)
         self.assertIn("shouldContinueScenarioApplyContext({", content)
@@ -113,7 +113,7 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("state.scenarioApplyInFlight", content)
 
     def test_optional_layer_load_failures_remain_retryable(self):
-        content = SCENARIO_OPTIONAL_LAYER_RUNTIME.read_text(encoding="utf-8")
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
 
         failure_block = re.search(
             r'console\.warn\(`\[scenario\] Failed to load scenario \$\{layerKey\} layer.*?return null;',
@@ -122,8 +122,11 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         )
 
         self.assertIsNotNone(failure_block)
-        self.assertIn("delete bundle.optionalLayerSettledByKey[layerKey];", failure_block.group(0))
-        self.assertNotIn("bundle.optionalLayerSettledByKey[layerKey] = true;", failure_block.group(0))
+        self.assertIn("commitPayload(null, false);", failure_block.group(0))
+        self.assertNotIn("commitPayload(null, true);", failure_block.group(0))
+        self.assertIn("if (!ownsSettlement()) return;", content)
+        self.assertIn("commitScenarioOptionalLayerPayloadState(state, scenarioId, layerKey, config.bundleField, payload, settled);", content)
+        self.assertIn("else delete bundle.optionalLayerSettledByKey[layerKey];", content)
 
     def test_renderable_runtime_topology_helper_has_single_owner(self):
         content = SCENARIO_RESOURCES.read_text(encoding="utf-8")

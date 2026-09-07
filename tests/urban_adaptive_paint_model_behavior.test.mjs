@@ -7,7 +7,7 @@ import {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const createModel = (runtimeState = {}, getResolvedFeatureColor = () => "#eeeeee") =>
-  createUrbanAdaptivePaintModel({ runtimeState, getResolvedFeatureColor, clamp });
+  createUrbanAdaptivePaintModel(runtimeState, { getResolvedFeatureColor, clamp });
 
 test("urban paint preserves dark, middle and light host colors with channel-specific tint", () => {
   const model = createModel();

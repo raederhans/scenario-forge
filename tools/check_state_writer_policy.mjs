@@ -243,6 +243,9 @@ export function validateCallerToActionLedgerHistoryTransition({
         crossFileMigrationContract,
       );
     const retiredMutationSites = migrationContract?.retiredMutationSites || [];
+    const retiredFunctionIdentities = [...new Set(
+      retiredMutationSites.map(({ enclosingFunctionIdentity }) => enclosingFunctionIdentity),
+    )].sort();
     const canonicalCrossFileAdoption = Boolean(
       migrationContract
       && previousEntry.crossFileMigrationContractIdentity
@@ -274,14 +277,12 @@ export function validateCallerToActionLedgerHistoryTransition({
           .update(JSON.stringify(retiredMutationSites))
           .digest("hex")
       && (
-        retiredMutationSites.length === 1
+        retiredFunctionIdentities.length === 1
           ? currentEntry.retiredEnclosingFunctionIdentity
-            === retiredMutationSites[0].enclosingFunctionIdentity
+            === retiredFunctionIdentities[0]
           : isDeepStrictEqual(
             currentEntry.retiredEnclosingFunctionIdentities,
-            retiredMutationSites
-              .map(({ enclosingFunctionIdentity }) => enclosingFunctionIdentity)
-              .sort(),
+            retiredFunctionIdentities,
           )
       )
     );

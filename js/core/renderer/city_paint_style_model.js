@@ -90,8 +90,8 @@ const CITY_MARKER_THEME_TOKENS = {
 };
 
 // Marker and label contrast derive from the same live host/palette state.
-export function createCityPaintStyleModel({
-  runtimeState, getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
+export function createCityPaintStyleModel(runtimeState, {
+  getResolvedFeatureColor, computeUrbanAdaptivePaintFromHostColor,
 }) {
   function getCityMarkerThemeTokens(config = {}) {
     const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
@@ -214,5 +214,5 @@ export function createCityPaintStyleModel({
     };
   }
 
-  return { getCityLabelRenderStyle, getCityMarkerRenderStyle };
+  return Object.freeze({ getCityLabelRenderStyle, getCityMarkerRenderStyle });
 }

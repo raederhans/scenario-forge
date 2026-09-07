@@ -44,9 +44,9 @@ test("export and transport owners delegate canonical state writes", () => {
     transportApplyBridge,
     /import\s*\{[^}]*applyTransportWorkbenchOverviewState[^}]*\}\s*from\s*["']\.\.\/\.\.\/core\/state\.js["']/s,
   );
-  assert.match(
+  assert.doesNotMatch(
     legacyUiState,
-    /export function applyTransportWorkbenchOverviewState\(target, patch = \{\}\) \{\s*return applyTransportWorkbenchOverviewStateAction\(target, patch\);\s*\}/s,
+    /applyTransportWorkbenchOverviewState/,
   );
 });
 

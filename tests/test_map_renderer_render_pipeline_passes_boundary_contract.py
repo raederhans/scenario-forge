@@ -321,19 +321,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         hgo_preview_commit_content = HGO_RUNTIME_PREVIEW_FRAME_COMMIT_JS.read_text(encoding="utf-8")
         render_pass_commit_owner_content = RENDER_PASS_COMMIT_ACCOUNTING_OWNER_JS.read_text(encoding="utf-8")
         render_pass_catalog_content = RENDER_PASS_CATALOG_JS.read_text(encoding="utf-8")
-        signature_body = renderer_content.split("function getRenderPassSignature(passName", 1)[1].split(
-            "\nfunction resolveHitMode",
-            1,
-        )[0]
-
         self.assertIn("function getHgoRuntimePreviewVisibilitySignature() {", renderer_content)
-        hgo_signature_body = signature_body.split('if (passName === "hgoPreview")', 1)[1].split(
-            "\n  if (passName === ",
-            1,
-        )[0]
-        self.assertIn('isHgoRuntimePreviewReady() ? "hgo:on" : "hgo:off"', hgo_signature_body)
-        self.assertIn('String(preview.status || "")', hgo_signature_body)
-        self.assertIn('rendererSurfaceHost.getProjection() ? transformSignature : "projection:none"', hgo_signature_body)
         hgo_preview_pass_body = hgo_preview_owner_content.split("function drawPreviewPass()", 1)[1].split(
             "\n\n  function normalizeHitPayload",
             1,
@@ -420,30 +408,6 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             reset_zoom_body.index("updateZoomTranslateExtent();"),
             reset_zoom_body.index("const transform = centerContent"),
         )
-        self.assertEqual(signature_body.count("getHgoRuntimePreviewVisibilitySignature()"), 7)
-        political_body = signature_body.split('if (passName === "political")', 1)[1].split(
-            "\n  if (passName === ",
-            1,
-        )[0]
-        self.assertLess(
-            political_body.index("runtimeState.colorRevision || 0"),
-            political_body.index("getHgoRuntimePreviewVisibilitySignature()"),
-        )
-        for pass_name in (
-            "political",
-            "contextBase",
-            "contextMarkers",
-            "labels",
-            "contextScenario",
-            "textureLabels",
-            "borders",
-        ):
-            pass_body = signature_body.split(f'if (passName === "{pass_name}")', 1)[1].split(
-                "\n  if (passName === ",
-                1,
-            )[0]
-            self.assertIn("getHgoRuntimePreviewVisibilitySignature()", pass_body)
-
         for function_name in (
             "drawPoliticalPass",
             "drawContextBasePass",

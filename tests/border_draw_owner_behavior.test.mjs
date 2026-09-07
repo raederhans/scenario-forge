@@ -120,55 +120,29 @@ test("drawing requests detail cache reconciliation without writing renderer stat
   assert.deepEqual(requests, [detailMeta]);
 });
 
-test("drawHierarchicalBorders applies border opacity and width styles to normal pass", () => {
-  const { owner, context } = createOwner();
-
-  owner.drawHierarchicalBorders(2, { interactive: false });
-
-  const internalStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#111111");
-  const countryStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#222222");
-  const coastStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#333333");
-
-  assert.equal(internalStroke.alpha, 0);
-  nearlyEqual(countryStroke.alpha, 0.25);
-  nearlyEqual(coastStroke.alpha, 0.3785714286);
-  nearlyEqual(countryStroke.lineWidth, 1.0071428571);
-  nearlyEqual(coastStroke.lineWidth, 0.8485714286);
+test("border styles retain normal and interactive opacity and width", () => {
+  for (const [interactive, countryAlpha, coastAlpha, countryWidth, coastWidth] of [
+    [false, 0.25, 0.3785714286, 1.0071428571, 0.8485714286],
+    [true, 0.22, 0.39, 0.95, 0.792],
+  ]) {
+    const { owner, context } = createOwner({ interactive });
+    owner.drawHierarchicalBorders(2, { interactive });
+    const country = context.strokes.find(stroke => stroke.strokeStyle === "#222222");
+    const coast = context.strokes.find(stroke => stroke.strokeStyle === "#333333");
+    nearlyEqual(country.alpha, countryAlpha);
+    nearlyEqual(coast.alpha, coastAlpha);
+    nearlyEqual(country.lineWidth, countryWidth);
+    nearlyEqual(coast.lineWidth, coastWidth);
+    if (!interactive) assert.equal(context.strokes.find(stroke => stroke.strokeStyle === "#111111").alpha, 0);
+  }
 });
 
-test("drawHierarchicalBorders applies border opacity and width styles to interactive snapshot pass", () => {
-  const { owner, context } = createOwner({ interactive: true });
-
-  owner.drawHierarchicalBorders(2, { interactive: true });
-
-  const countryStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#222222");
-  const coastStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#333333");
-
-  nearlyEqual(countryStroke.alpha, 0.22);
-  nearlyEqual(coastStroke.alpha, 0.39);
-  nearlyEqual(countryStroke.lineWidth, 0.95);
-  nearlyEqual(coastStroke.lineWidth, 0.792);
-});
-
-test("drawHierarchicalBorders suppresses canonical coastlines for HGO vector normal pass", () => {
-  const { owner, context, coastalAccentCalls } = createOwner({ hgoVectorScene: true });
-
-  owner.drawHierarchicalBorders(2, { interactive: false });
-
-  const countryStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#222222");
-  const coastStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#333333");
-  assert.ok(countryStroke);
-  assert.equal(coastStroke, undefined);
-  assert.equal(coastalAccentCalls.length, 0);
-});
-
-test("drawHierarchicalBorders suppresses canonical coastlines for HGO vector interactive pass", () => {
-  const { owner, context } = createOwner({ hgoVectorScene: true, interactive: true });
-
-  owner.drawHierarchicalBorders(2, { interactive: true });
-
-  const countryStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#222222");
-  const coastStroke = context.strokes.find((stroke) => stroke.strokeStyle === "#333333");
-  assert.ok(countryStroke);
-  assert.equal(coastStroke, undefined);
+test("HGO vector scenes suppress canonical coastlines in both passes", () => {
+  for (const interactive of [false, true]) {
+    const { owner, context, coastalAccentCalls } = createOwner({ hgoVectorScene: true, interactive });
+    owner.drawHierarchicalBorders(2, { interactive });
+    assert.ok(context.strokes.find(stroke => stroke.strokeStyle === "#222222"));
+    assert.equal(context.strokes.find(stroke => stroke.strokeStyle === "#333333"), undefined);
+    if (!interactive) assert.equal(coastalAccentCalls.length, 0);
+  }
 });

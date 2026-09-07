@@ -18,6 +18,7 @@ import {
   inspectStateImportedPureNormalizerSource,
   inspectStateDetachedCaptureSource,
   inspectStateMutationDelegatingOwnerSources,
+  inspectStateTargetPureReaderFunctionSource,
   validateStateActionModuleSource,
   validateStateActionModulePhaseAdmissions,
   validateStateActionDelegationContract,
@@ -738,26 +739,35 @@ test("P4.3 renderer cross-boundary proofs lock retired evidence and exact replac
     ],
   );
 
+  const retiredRelayTargets = {
+    dprLastStageSwitchAt: "pixel_ratio_policy",
+    dprStage: "pixel_ratio_policy",
+    firstVisibleFramePainted: "visible_frame_diagnostics_owner",
+    projectedBoundsDiagnostics: "projected_bounds_diagnostics_owner",
+  };
+  for (const [key, owner] of Object.entries(retiredRelayTargets)) {
+    const proof = rendererProofs.find((entry) => entry.key === key);
+    assert.equal(proof.replacementCallerPath, `js/core/renderer/${owner}.js`);
+  }
   const runtimeStateProofs = rendererProofs.filter(
     ({ replacementCallerPath }) =>
       replacementCallerPath
-        === "js/core/state/renderer_runtime_state.js",
+        === "js/core/state/renderer_runtime_state.js"
+        || ["pixel_ratio_policy", "projected_bounds_diagnostics_owner", "visible_frame_diagnostics_owner"]
+          .some((name) => replacementCallerPath === `js/core/renderer/${name}.js`),
   );
-  const runtimeStatePath =
-    "js/core/state/renderer_runtime_state.js";
-  const runtimeStateSource = fs.readFileSync(
-    runtimeStatePath,
-    "utf8",
-  );
-  const runtimeStateInventory =
-    await discoverStateWriterBindingsForSource(
-      runtimeStatePath,
-      runtimeStateSource,
+  const replacementInventories = [];
+  for (const callerPath of new Set(runtimeStateProofs.map((proof) => proof.replacementCallerPath))) {
+    const inventory = await discoverStateWriterBindingsForSource(
+      callerPath,
+      fs.readFileSync(callerPath, "utf8"),
       "production",
       { scanAllParameters: true, includeInventories: true },
     );
+    replacementInventories.push(...inventory.bindingInventories);
+  }
   const runtimeStateEdges = normalizeStateActionDelegations(
-    runtimeStateInventory.bindingInventories.flatMap(
+    replacementInventories.flatMap(
       ({ actionDelegations = [] }) => actionDelegations,
     ),
   );
@@ -973,6 +983,114 @@ test("scenario style defaults use one P4.3 action handoff without legacy alias a
     || sourceFingerprint
       === "cc52c4a40d11016bfc97a3f61ed1e34e48aa964578291cdb48d280138cd835de0"
   )), false);
+});
+
+test("source-bound owner method destructuring preserves rejection of unknown fields and source drift", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ compositionExportName }) => compositionExportName === "composeCityLabelTextModel",
+  );
+  const source = fs.readFileSync(entry.compositionModulePath, "utf8").replaceAll("\r\n", "\n");
+  const node = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .find((statement) => statement.id?.name === entry.compositionExportName);
+  const composition = source.slice(node.start, node.end);
+  const inspect = (declaration, ownerSource = composition) => scanStateMutationInventory([
+    'import { state as runtimeState } from "./state.js";',
+    'import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";',
+    ownerSource,
+    'export function run() { consume(label); runtimeState.dpr = 2; }',
+    declaration,
+  ].join("\n"), {
+    filePath: entry.compositionModulePath,
+    bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+    derivedAliasTaintMode: "strict",
+  }).findings;
+  const safe = 'const { getCityDisplayLabel: label } = composeCityLabelTextModel();';
+  const findings = inspect(safe);
+  assert.equal(findings.some(({ reason }) => reason === "state-alias-escape"), false);
+  assert.ok(findings.some(({ operation, key }) => operation === "assign" && key === "dpr"));
+  for (const declaration of [
+    'const { unknown: label } = composeCityLabelTextModel();',
+    'const { ...label } = composeCityLabelTextModel();',
+    'let { getCityDisplayLabel: label } = composeCityLabelTextModel();',
+  ]) {
+    assert.ok(inspect(declaration).some(({ reason }) => reason === "state-alias-escape"));
+  }
+  assert.ok(inspect(safe, composition.replace("return owner;", "return runtimeState;")).some(
+    ({ reason }) => reason === "state-alias-escape",
+  ));
+});
+
+test("source-bound local session callbacks do not taint detached sessions but reject changed composition", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ compositionExportName }) => compositionExportName === "composeBrushInteractionSessionOwner",
+  );
+  const source = fs.readFileSync(entry.compositionModulePath, "utf8").replaceAll("\r\n", "\n");
+  const node = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .find((statement) => statement.id?.name === entry.compositionExportName);
+  const composition = source.slice(node.start, node.end);
+  const inspect = (ownerSource) => scanStateMutationInventory([
+    'import { state as runtimeState } from "./state.js";',
+    'import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction_session_owner.js";',
+    'let brushSession = null;',
+    ownerSource,
+    'const { flushBrushSession } = composeBrushInteractionSessionOwner();',
+    'export function run() { brushSession.changed = true; }',
+  ].join("\n"), {
+    filePath: entry.compositionModulePath,
+    bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+    derivedAliasTaintMode: "strict",
+  }).findings;
+  assert.deepEqual(inspect(composition), []);
+  assert.ok(inspect(composition.replace("brushSession = session;", "brushSession = runtimeState;")).length > 0);
+});
+
+test("source-bound chunk composition accepts an immutable root union and rejects source drift", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ compositionExportName }) => compositionExportName === "composeScenarioChunkPayloadLoader",
+  );
+  const source = fs.readFileSync(entry.compositionModulePath, "utf8").replaceAll("\r\n", "\n");
+  const node = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .find((statement) => statement.id?.name === entry.compositionExportName);
+  const composition = source.slice(node.start, node.end);
+  const inspect = (ownerSource) => scanStateMutationInventory([
+    'import { state } from "../state.js";',
+    'import { createScenarioChunkPayloadLoader } from "./chunk_payload_loader.js";',
+    ownerSource,
+    'export function read(other) {',
+    '  const runtimeState = other || state;',
+    '  const { loadScenarioChunkPayload } = composeScenarioChunkPayloadLoader(runtimeState, normalize, getId, loadFile);',
+    '  return loadScenarioChunkPayload;',
+    '}',
+  ].join("\n"), {
+    filePath: entry.compositionModulePath,
+    bindings: [{ id: "module:state", kind: "module", name: "state", importSource: "../state.js", importedName: "state" }],
+    derivedAliasTaintMode: "strict",
+  }).findings;
+  assert.deepEqual(inspect(composition), []);
+  assert.ok(inspect(composition.replace("return owner;", "return runtimeState;")).length > 0);
+});
+
+test("borrowed chunk reader proofs cover transitive local helper source", async () => {
+  const modulePath = "js/core/scenario/chunk_layer_payloads.js";
+  const source = fs.readFileSync(modulePath, "utf8").replaceAll("\r\n", "\n");
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+  for (const name of ["getScenarioChunkIdsByLayer", "getScenarioChunkPayloadEntriesForLayer"]) {
+    const helper = ast.body.find((node) => node.id?.name === name);
+    const mutated = source.slice(0, helper.body.start + 1)
+      + "\n  chunkState.loadedChunkIds.push(0);"
+      + source.slice(helper.body.start + 1);
+    await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutated, "production", {
+      scanAllParameters: true,
+    }), (error) => error.violations?.some(({ code }) => (
+      code === "state-target-pure-reader-dependency-source-drift"
+    )));
+  }
+  for (const entry of STATE_TARGET_PURE_READER_CONTRACT.filter((entry) => entry.modulePath === modulePath)) {
+    assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry).violations, []);
+    assert.ok(inspectStateTargetPureReaderFunctionSource(source, {
+      ...entry, localFunctionFingerprints: {},
+    }).violations.some(({ code }) => code === "state-target-pure-reader-dependency-source-drift"));
+  }
 });
 
 test("source-bound owner proof prepares once and applies independently per binding", () => {
@@ -2039,6 +2157,22 @@ test("defaulted full-root target is accepted while a defaulted child target is r
   assert.equal(edges[0].actionExportName, "setBootStateFields");
 });
 
+test("render pass signature reader accepts reviewed joins and rejects state writes or mutating replacements", async () => {
+  const modulePath = "js/core/renderer/render_pass_signature_policy.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  assert.deepEqual(await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true }), []);
+  for (const changed of [
+    source.replace('const transformSignature =', 'runtimeState.colorRevision = 99;\n    const transformSignature ='),
+    source.replace('].join("::")', '].push("mutation")'),
+  ]) {
+    assert.notEqual(changed, source);
+    await assert.rejects(
+      discoverStateWriterBindingsForSource(modulePath, changed, "production", { scanAllParameters: true }),
+      (error) => error?.code === "state-target-pure-reader-contract-violation",
+    );
+  }
+});
+
 test("registered pure-reader target stays out of writer policy and fails closed on drift", async () => {
   const modulePath = "js/core/scenario_manager.js";
   const source = fs.readFileSync(modulePath, "utf8");
@@ -2470,6 +2604,18 @@ test("rollback snapshot composition has no state-alias escape from returned capt
   );
 });
 
+test("renderer policy readers bind exact source and reject injected state writes", async () => {
+  for (const module of ["bathymetry_style_policy", "parent_border_grouping_policy", "visible_frame_identity_policy", "fill_target_policy"]) {
+    const modulePath = `js/core/renderer/${module}.js`;
+    const source = fs.readFileSync(modulePath, "utf8");
+    assert.deepEqual(await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true }), []);
+    const mutated = source.replace("}) {", "}) {\n  runtimeState.sceneGeneration = 0;");
+    assert.notEqual(mutated, source);
+    await assert.rejects(() => discoverStateWriterBindingsForSource(modulePath, mutated, "production", { scanAllParameters: true }),
+      (error) => error?.code === "state-target-pure-reader-contract-violation");
+  }
+});
+
 test("pure-reader contracts reject wildcard accepted escapes", () => {
   const [entry] = STATE_TARGET_PURE_READER_CONTRACT;
   const forged = [{
@@ -2517,4 +2663,32 @@ test("borrowed projection source proof rejects source drift and new input writes
   assert.ok(inspectStateImportedBorrowedProjectionSource(mutated, entry).violations.some(({ code }) => code.endsWith("source-drift")));
   const refreshed = { ...entry, sourceFingerprint: createHash("sha256").update(mutated).digest("hex") };
   assert.ok(inspectStateImportedBorrowedProjectionSource(mutated, refreshed).violations.some(({ code }) => code.endsWith("input-hazard")));
+});
+test("reviewed read sites reject mutators and mutating callbacks even with a fresh source identity", () => {
+  const inspect = (expression) => {
+    const source = "export function read(target) { return " + expression + "; }";
+    return inspectStateTargetPureReaderFunctionSource(source, {
+      modulePath: "js/core/renderer/read_model.js",
+      functionName: "read",
+      targetParameterName: "target",
+      targetParameterIndex: 0,
+      targetParameterPath: "$",
+      importedArgumentCount: 1,
+      sourceFingerprint: fingerprintDirectExportedFunction(source, "read"),
+      reviewedReadSiteFingerprints: [createHash("sha256").update(expression).digest("hex")],
+      conservativeFindings: [],
+      acceptedEscapes: [],
+    }).violations;
+  };
+  assert.deepEqual(inspect('target.landIndex.get("id")'), []);
+  assert.deepEqual(inspect("target.items.map((item) => ({ value: item.value }))"), []);
+  assert.ok(inspect('target.landIndex.set("id", {})').some(v => v.code === "state-target-pure-reader-read-method-invalid"));
+  for (const expression of [
+    "target.items.forEach((item) => { item.value = 2; })",
+    "target.items.forEach((item) => { const alias = item; alias.value++; })",
+    "target.items.map((item) => mutateUnknown(item))",
+    "target.items.forEach((item, index, items) => { items.push(item); })",
+  ]) {
+    assert.ok(inspect(expression).some(v => v.code === "state-target-pure-reader-read-callback-mutation"), expression);
+  }
 });

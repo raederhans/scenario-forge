@@ -92,6 +92,7 @@ const SCENARIO_READINESS_ACTION_EXPORT_NAMES = Object.freeze([
 ]);
 
 const SCENARIO_ACTIVATION_ACTION_EXPORT_NAMES = Object.freeze([
+  "commitScenarioOptionalLayerPayloadState",
   "commitScenarioActivationState",
   "restoreScenarioActivationBeforeAuditState",
   "restoreScenarioActivationBeforeColorDirtyState",
@@ -297,6 +298,7 @@ const APPEARANCE_VISIBILITY_ACTION_EXPORT_NAMES = Object.freeze([
 ]);
 
 const INTENSITY_FIELD_ACTION_EXPORT_NAMES = Object.freeze([
+  "appendIntensityFieldPointState",
   "setIntensityFieldsState",
   "normalizeIntensityFieldsIntoState",
   "updateIntensityFieldChannelState",
@@ -708,8 +710,11 @@ function freezeStateTargetPureReaderEntry({
   targetParameterPath = "$",
   sourceFingerprint,
   importedArgumentCount = 0,
+  allowBorrowedTarget = false,
+  localFunctionFingerprints = {},
   acceptedEscapes = [],
   conservativeFindings = [],
+  reviewedReadSiteFingerprints = [],
 } = {}) {
   return Object.freeze({
     modulePath: normalizeModulePath(modulePath),
@@ -719,6 +724,9 @@ function freezeStateTargetPureReaderEntry({
     targetParameterPath: String(targetParameterPath || ""),
     sourceFingerprint: String(sourceFingerprint || ""),
     importedArgumentCount: Number(importedArgumentCount),
+    allowBorrowedTarget,
+    localFunctionFingerprints: Object.freeze({ ...localFunctionFingerprints }),
+    reviewedReadSiteFingerprints: Object.freeze([...reviewedReadSiteFingerprints].map(String)),
     acceptedEscapes: Object.freeze(
       acceptedEscapes.map(freezePureReaderEscape),
     ),
@@ -754,6 +762,1746 @@ function scenarioDetailConservativeFinding(
 }
 
 export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/fill_target_policy.js",
+  "functionName": "createFillTargetPolicy",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "sourceFingerprint": "bfbb22703f23ad405387f8d0a849bf4df23e155bcd166d7d995e7b44d34de9c6",
+  "reviewedReadSiteFingerprints": [
+    "7b885591dab7ab6d93797f0a408ad1d4fa33e4982e7674e8da5392f59be17215",
+    "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
+    "90ba4e4c01486eea5e532bed52d65d1d41517445f540787567990b3290ad4b61",
+    "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
+    "8e68207ab45cddfcd9f15925f3e1b9f8c77b10c3ce354c7adbc857e8bb09d327",
+    "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
+    "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
+    "44afb93474315315a086f168cd8ba61f10b7601ee62389e0ada7c85c47f2d02e"
+  ],
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "countryToFeatureIds",
+      "sourceFingerprint": "7b885591dab7ab6d93797f0a408ad1d4fa33e4982e7674e8da5392f59be17215",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getScenarioOwnerFeatureIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "ownerToFeatureIds",
+      "sourceFingerprint": "90ba4e4c01486eea5e532bed52d65d1d41517445f540787567990b3290ad4b61",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getScenarioOwnerFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupKey\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "scenarioDistrictGroupByFeatureId",
+      "sourceFingerprint": "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupKey\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "parentGroupByFeatureId",
+      "sourceFingerprint": "8e68207ab45cddfcd9f15925f3e1b9f8c77b10c3ce354c7adbc857e8bb09d327",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "scenarioDistrictGroupByFeatureId",
+      "sourceFingerprint": "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveSpecialZoneParentGroupTargetIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "44afb93474315315a086f168cd8ba61f10b7601ee62389e0ada7c85c47f2d02e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
+      "count": 1
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/visible_frame_identity_policy.js",
+  "functionName": "createVisibleFrameIdentityPolicy",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "sourceFingerprint": "f7a5dee8726e035460d07ad4ecf9e2d5345fa575be771b14979dba95d0ce63ce",
+  "reviewedReadSiteFingerprints": [],
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"countFeatureCollectionFeatures\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2a6713bd3774cc4560c7c908fcb21a262a9ccc75c5e521889b78338be3d87771",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getPoliticalSceneReadiness\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "09ab370303a30c957edda080d7bc453da2f7114e5a6fd4bde27b19115a553c6f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getPoliticalSceneReadiness\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "62ef700615dc02ae51c682a78ed69d920c2668cd376228b2a1adf9b10ee248fb",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getPoliticalSceneReadiness\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "45e84462f70b67ed95d57ee05e143731aeda00563ac6ce09f3be59b8c156534b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getPoliticalSceneReadiness\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "ef5783ca31441756782e4ee380dec5da629b387c018672af235eeb385c50d09c",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getVisibleFrameIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getCommittedFrameIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getFirstVisiblePoliticalFrameBlockReason\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 3
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/parent_border_grouping_policy.js",
+  "functionName": "createParentBorderGroupingPolicy",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "sourceFingerprint": "5670f3a4632551c5bc5f87ead6ec7f6d09b05e1fe747c3069d62613ddb63116b",
+  "reviewedReadSiteFingerprints": [],
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"getFullLandDataFeatures\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "landDataFull",
+      "sourceFingerprint": "cfc372e856be4393336edb59dfdd9a85818ae640f2ff3cbb9d159ffd618b585b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"getFullLandDataFeatures\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a4b2da05ea08f0b3e96876c13b91160b5f314216f91475d452974700e25d095d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureEntriesMap\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2ad562319767157087dda0dec6391f4479f8a04869ab0cc8d3a9c3637dae73b5",
+      "count": 4
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureEntriesMap\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "7a753bfb25faa0d4209caee0c6618e0477b90d9c79ce81a283bfd81bf8b296dc",
+      "count": 1
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/bathymetry_style_policy.js",
+  "functionName": "createBathymetryStylePolicy",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "sourceFingerprint": "69daef834597d419b5e93be094053086a119ba50a35767dcfa275a1512708f53",
+  "reviewedReadSiteFingerprints": [],
+  "conservativeFindings": []
+}),
+  // Reviewed cache-key construction: no writes to the supplied runtime state.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/render_pass_signature_policy.js",
+  "functionName": "createRenderPassSignaturePolicy",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "sourceFingerprint": "6d8d9cea8923de1e6a69a966aebe32f9361d761ec53b8591e92a0ee59eb1abae",
+  "reviewedReadSiteFingerprints": [
+    "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
+    "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
+    "c9d026f60b7716cd3896264465741cca7bcbd32575de5255b357408f1c7733fb",
+    "649a631808e219f64f8c15f28dd2e05b159de8621abeaedf4ae517eb36dd7840",
+    "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
+    "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
+    "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
+    "9f7e6546ebb1b6477dab9826fe690ae225ccbbd24041005cdfce8a149a0e4ed2",
+    "b46cb62af9dd7bcafca409a19656ec87522a467486be274674f823ca5ed6f0fc",
+    "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
+    "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
+    "a3213918da1546dbd2aebf8ababc8cb0a7a8cfaf9f985f81d119dcd832417a4e"
+  ],
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b0993135d395f1d11c7b028f8e69efb916c608b6955251b21aa613a8e6f13faf",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "8f894f0728091252c297f7371b02ff62a720321a08f0c8d83155e5cd1ee20fe3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassTransformSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "intensityFields",
+      "sourceFingerprint": "00c77b0847e15fd470bdad5f4172e4f93f9a32a71533d98d23cd0f975f130516",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b0993135d395f1d11c7b028f8e69efb916c608b6955251b21aa613a8e6f13faf",
+      "count": 10
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "59d7a6a13ccf6a3cb22c93a67fb238930870286a34e58d15b23951a598f2dcda",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b8ffadb3e829551dd90b4eecb6773c5efa5cb0c9460b006d703602a2a266d614",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c9d026f60b7716cd3896264465741cca7bcbd32575de5255b357408f1c7733fb",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "46b307d8e854682ac1d79f4f83fe73751551d9e56bcea1bd04dfff5c111ff585",
+      "count": 6
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1be60129cbadd56582e2ce5ebd597edc8b62bf2418ff3b7e334c8c9c5fd62219",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "649a631808e219f64f8c15f28dd2e05b159de8621abeaedf4ae517eb36dd7840",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "28375c9754788fcb5fe581ab5b29acfe5db4c54114b457174a82b548718a1380",
+      "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "8ce80812e36b0cf81bccd066585ee426d85089d62619f8ef45468d0b673194ab",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "fb966f56bb34229459f83628f83d5f91f8e71a63b56b21b78872cdf363f10763",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "0d1e0dd18ba428d8870b1eee499ea6ec71ad706a55de5e94334658565b551251",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2ee0c86b2ebf1f6dd9b5644b774f50ebfe29b2d713c0bee13c87b02ed19e9ae0",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9f7e6546ebb1b6477dab9826fe690ae225ccbbd24041005cdfce8a149a0e4ed2",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c84724b94202621a115ca289c7fe4e4669dc929026ed18ee9bd7bc56d8fda013",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "80251709a36cf44e189abc1e5226764f9b0ce854f927627da901911f68c6774d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b46cb62af9dd7bcafca409a19656ec87522a467486be274674f823ca5ed6f0fc",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "181d34d5760d34994027705303bfcd807190a30bbe17c9b8ffb4d61a8fd53d9a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a3213918da1546dbd2aebf8ababc8cb0a7a8cfaf9f985f81d119dcd832417a4e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9ce1772f57bd2cbf9a3f5043a4b3473980a70b1f05175096d82307733f428829",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "60fb297c4a75911be7e8f2cef19f26423b4a2c6a42492beab8d0a70a06a1b7b4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "080d98b9113dceb3b76d147ec18328889e9b81f123077a1dc7ffc82acc8e11df",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "34ca10667d7c502ea9ecb3ca98c818062fc23b399b5e48860ba7752207370d7d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "be70b4cf5e47ec0e28197cae3b392cf36cefab52d4c7de6f5631dac8c8e24856",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f7f9493575a38b36742e1d86033a3c670a08024a776317cc3dbdf14dedb2aa33",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c77c0c7203dea786aa285fdc577bfce274ef2b3bb548df4f44ba4bdcfdc5aed1",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "814a638b718c74404bf36981e5d2704cf8405dddee63fb90dec6992979ba42bc",
+      "count": 1
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  localFunctionFingerprints: {
+  "getScenarioChunkIdsByLayer": "2d7eef210310a415ae3b185a942ca141a49db425bb2836626a9f644d8e1cfefb",
+  "getChunkIdListSignature": "2dd0c550d186f5d474dcd96b299fdaa069510efd1dc003f80cb37caa5f013aa4"
+},
+  "modulePath": "js/core/scenario/chunk_layer_payloads.js",
+  "functionName": "buildScenarioChunkLayerSelectionSignatures",
+  "allowBorrowedTarget": true,
+  "targetParameterName": "chunkState",
+  "targetParameterIndex": 1,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "f144bfd5d612264fd8fa32751802431f2f9a9bf08c2541ccd070b3795b76ffd5",
+  "importedArgumentCount": 3,
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"buildScenarioChunkLayerSelectionSignatures\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2391ae740baea4f907b8bcd3778b16ae0a3fc97d4dbfdc3c019aad3dc8bbef22",
+      "count": 1
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  localFunctionFingerprints: {
+  "getScenarioChunkPayloadEntriesForLayer": "3b8ba0d6e209d0a771990d7504f3cc03a90f0d425ad56ddba783daa5c8808610",
+  "getScenarioChunkMetaById": "c55fff21eb454724f793c8301537488f096c4694afd1b226f79765a48502c84a"
+},
+  "modulePath": "js/core/scenario/chunk_layer_payloads.js",
+  "functionName": "buildMergedScenarioChunkLayerPayloads",
+  "allowBorrowedTarget": true,
+  "targetParameterName": "chunkState",
+  "targetParameterIndex": 1,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "c95c256e12e0084ad363ce93735b4742222aa43d75e639f80c00ae0030253001",
+  "importedArgumentCount": 3,
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"buildMergedScenarioChunkLayerPayloads\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2391ae740baea4f907b8bcd3778b16ae0a3fc97d4dbfdc3c019aad3dc8bbef22",
+      "count": 1
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/city_label_text_model.js",
+  "functionName": "createCityLabelTextModel",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "0fe76ded2890283e1c6dcac426c372b22e5a6716b734e1b9741a2534b7f4a65a",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"getCityRawFallbackLabel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "currentLanguage",
+      "sourceFingerprint": "ca4a227c42b62e44f8daa1e53f62cda734b0577033429c0a4b3b1589aec935bd",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"getCityDisplayLabel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "currentLanguage",
+      "sourceFingerprint": "ca4a227c42b62e44f8daa1e53f62cda734b0577033429c0a4b3b1589aec935bd",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/political_feature_policy.js",
+  "functionName": "createPoliticalFeaturePolicy",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "a7bc4b4a4d4410f19e0168a2091c32aa706d610aaeb4d478332efd19ab137f1d",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalFeaturePolicy\",\"ordinal\":0},{\"name\":\"hasPoliticalForegroundColorOverride\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "visualOverrides",
+      "sourceFingerprint": "3a75131341f80cbba7fff3e9eb4d5d8a4a0a6a2e62befb33b09056ab8eae2d1e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalFeaturePolicy\",\"ordinal\":0},{\"name\":\"hasPoliticalForegroundColorOverride\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "featureOverrides",
+      "sourceFingerprint": "af800fea6948a4f22285356a219f80362a89b98ef5d5c75a5adb52e730e413eb",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/physical_intensity_preview_owner.js",
+  "functionName": "createPhysicalIntensityPreviewOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "f1785aa7513397801118f9b489d1656cd6e02e3756330b52b082394d8e06f6b2",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPhysicalIntensityPreviewOwner\",\"ordinal\":0},{\"name\":\"getMapLonLatFromEvent\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "59ded132c1a2410e3d59235da3a5d0bbaa01688efe5fbf18796419317f0707e2",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/political_path_cache_owner.js",
+  "functionName": "createPoliticalPathCacheOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "2373a82ad02daa02f3a9cf8a78192c13e8e6008e2a81d69089440e7b9c05be3e",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheHandle\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalFeaturePathEntry\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"collectWarmupCandidateItems\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"runPoliticalPathWarmupSlice\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"runPoliticalPathWarmupSlice\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a692fae1891f016b7aac2655559f73c3e5fdf4118eab6dfa1211cceea73fb921",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"schedulePoliticalPathWarmup\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 3
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/brush_interaction_session_owner.js",
+  "functionName": "createBrushInteractionSessionOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "fc2e1d1ed5a96512a40bea2b7b1aa80c2d76ebbcf82b643dacfeffabb3952da0",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBrushInteractionSessionOwner\",\"ordinal\":0},{\"name\":\"flushBrushSession\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "selectedColor",
+      "sourceFingerprint": "44f205f7b042beac7faa6d0be234297e11f83fddafd1ad9e1fb29daedca94437",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBrushInteractionSessionOwner\",\"ordinal\":0},{\"name\":\"applySpecialZoneMembershipDragHit\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/city_paint_style_model.js",
+  "functionName": "createCityPaintStyleModel",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "f71945637e83848b11df931adfc59d5f3e3902aec0a839007e2dcd6a27642084",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityPaintStyleModel\",\"ordinal\":0},{\"name\":\"getCityLabelBackgroundColor\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "3d16be86c3951d290a05d9b59533e6d2d15912c57d3deb03c03811bfe6e8d66e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityPaintStyleModel\",\"ordinal\":0},{\"name\":\"getCityLabelBackgroundColor\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colors",
+      "sourceFingerprint": "2c8e4f2f749d810bc634816c230ad1a7d8f906f23a9771372dca36a55f0b5fd6",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityPaintStyleModel\",\"ordinal\":0},{\"name\":\"getCityLabelBackgroundColor\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereignBaseColors",
+      "sourceFingerprint": "c88066fe383ba2647eaac3aef10079b359814c85eedfcb1fc4ef4c874beb2cac",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityPaintStyleModel\",\"ordinal\":0},{\"name\":\"getCityLabelBackgroundColor\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "countryBaseColors",
+      "sourceFingerprint": "c70df4a92814a02f80381bfc2d8a2b66509bd101c74a5ec6c9d2d00f96ba91a5",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "3d16be86c3951d290a05d9b59533e6d2d15912c57d3deb03c03811bfe6e8d66e"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/urban_adaptive_paint_model.js",
+  "functionName": "createUrbanAdaptivePaintModel",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "8cfcb05b28d27745fa135a08fd0ea2936a158fd35eab514edf42059cddde3a8b",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanAdaptivePaintModel\",\"ordinal\":0},{\"name\":\"getUrbanHostFillColor\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "1bc050c6358029b1974e561af79bcba76eeb45b6811ccd05360265b9c768be80",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanAdaptivePaintModel\",\"ordinal\":0},{\"name\":\"getUrbanHostFillColor\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colors",
+      "sourceFingerprint": "20fe3f066d3e2d5876d47a1d229c88545c132f2e504de5089028ef62fc0756e2",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "1bc050c6358029b1974e561af79bcba76eeb45b6811ccd05360265b9c768be80"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/operation_graphics_editor_render_owner.js",
+  "functionName": "createOperationGraphicsEditorRenderOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "015a8f1dcfeda3376b1a0e6be49f2dc8e4a48dbdb33dd7ed11622d37ea8314c3",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "19b3d8f375a6e5ae595efc5cddffdcc1c94a84225ec07dede2c3cd5d40b38b3a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "155baacdcb6b78a1c24f733f3dd45699a4a82219a2e937ed4a355d3426a60740",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "operationGraphicsEditor",
+      "sourceFingerprint": "519aa1198f2441799d53442efae395b1533d82e4ae64fcce1d88935792abc3c7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "operationGraphicsEditor",
+      "sourceFingerprint": "24274d8edb690ba0f26f1557bf01ab9eaaa2d3cafecfe1eea04742dfd1baf904",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "operationGraphicsEditor",
+      "sourceFingerprint": "2cca5adc673c1813e77b922f7f3c4cf5958154e861946b39e71d07e4930786d6",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "operationGraphicsEditor",
+      "sourceFingerprint": "f7c19143f20496140a503658b715316e4ac8af8cf6c46b6032821fbb3f6c6ecc",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"getOperationGraphicEditorModel\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "operationGraphicsEditor",
+      "sourceFingerprint": "cb04ec6dff788fd9f09d3f43fb58b34def6678b6898f77cb1f4ebf1093cead86",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e0d46c367252678dc0eda80c1ade7b5be5861b42c0ebb1a67ada007d7a38bfe4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "47effeab37eb17c30289312c8a8e38c1d0c361193e6c638147ed85b77c306afa",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c54a061dfcc125cb160421b2680feaf6d65d938d756d887fe4d8d1d046eb626e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f35c051744c7dacb6394badfcd87ca74e491a0635dbd4021307eadbcff84c224",
+      "count": 4
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c24a12d63a6be7c543e772fa84730f55a9a7dd72c0e6c19fd9baca437ed63109",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c117e6bea9223b0bdb5596451c8516952ba86ffa96a1ed143f0d3c93cbe710fa",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "ambiguous-alias-flow",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "48c2f317e6ec8c795de225bf8c6d41f3936c3e898c7308b9bd948ce2caf119e0",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "23cc4069ee1cbf8cd8dcccf007d5c323acdb79356731d1d2f6b009c1919502a6",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createOperationGraphicsEditorRenderOwner\",\"ordinal\":0},{\"name\":\"renderOperationGraphicsEditorOverlay\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":9}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c54a061dfcc125cb160421b2680feaf6d65d938d756d887fe4d8d1d046eb626e",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "48c2f317e6ec8c795de225bf8c6d41f3936c3e898c7308b9bd948ce2caf119e0",
+    "23cc4069ee1cbf8cd8dcccf007d5c323acdb79356731d1d2f6b009c1919502a6"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/scenario_region_overlay_render_owner.js",
+  "functionName": "createScenarioRegionOverlayRenderOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "1dec308013061fb3c024487c0d463288b382eb0927287196117da4d8dd37d11d",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterFillLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e0962e33df9a3d2e7f82c8baae3639a9ce39285a6847aa7b0134797e572e5a0a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterFillLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d80ecbcca1f8812f667c273a85ad27337b7dd89950e3b29f14bfa4c27a45951a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioAtlantropaLandLikeOverlayLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colors",
+      "sourceFingerprint": "2e8220e7a8bb2055af50b2c67c01da148a594d8938caf0713d14ccd7fd061c77",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioAtlantropaLandLikeOverlayLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "3c6433af2ff4d9f1a5cd72bbf568ad73f998345c30494d40606a1582c9b943ce",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioAtlantropaLandLikeOverlayLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"getScenarioWaterFeaturePath\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d80ecbcca1f8812f667c273a85ad27337b7dd89950e3b29f14bfa4c27a45951a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterHighlightLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "waterRegionsById",
+      "sourceFingerprint": "e7977b6652a98c924e5d56cd04a860c20c291684311194d7aa70305da8298a62",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioRegionOverlaysPass\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1e54a3b975197cb6ff380af66df12d4bbd987aca2256543e91e4fd341fc1585e",
+      "count": 2
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "e7977b6652a98c924e5d56cd04a860c20c291684311194d7aa70305da8298a62"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
+  "functionName": "createStaticBorderMeshLifecycle",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "173c45652e3d9686bd647eb194658d19e6886accba3d4b452480e3577ecc8b7c",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"buildDetailAdmMeshSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "6ee3ea5be0fff658a0d31bd14d8fea0c11d9d6eb03b5aaf391978880971cc963",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "bcaf5eab79242d6df3d77d118c98aed908da502e5a60b25bb6af8e9eed7661d2",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "cachedProvinceBordersByCountry",
+      "sourceFingerprint": "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "cachedLocalBordersByCountry",
+      "sourceFingerprint": "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyDetail",
+      "sourceFingerprint": "8edd070d7210a8201b16b65ba20c261acc7c4fe661a79b5e1245731ef6c9bc39",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e2d15361c9fc9967183d139951c46a7376f5ab0eb4c7fb900c3c6aad23915c16",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "fae5b0a220e1ba8551c1e62eb6840b5ae0fa94ee63e20fbb95ad4a2bdc421176",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a6fb3c0d19791619021b29305034932a534f8d31e53b165838a0c4453bfab844",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "63f218ce93822be3aaab058ab7c076f099b73b4b9f95e128aee4c6b365a8af8a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "825ba80f85d4297065e09046bc0384a76354a8cfeaa61a26cabbadaa5451a741",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2c40a63d04e06d704264f58fe99aa72ce9e0de5e06354ba48d8f67c894c6ace6",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "0d7697173cbabc5239d99627f46b960710b15ae826a843fae7c14ea264963a5f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1e31289410bd9b1203c6097d9fcbdc39ae1df7bd54a39c53c4741c3a6c01a168",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "baf43bcd52a6d4a2c95551551241cea3c144cd6761681076247fed92ad5b0427",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e2545b6887e7a64ddcceee36b8287c5addb100225c3b38bbb14f9195b8aff28b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "5b86385e6a9bd09851b294c0848c9df6b6d09ae86a04231a45a7af4d752d12a1",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "4562e6a3c7edb21eb3a6f0ca43d50c3ea7db9245e02f96021a5e4a1f8ce7226c",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f7f6b3760014f41fca0f05c69c6afab091f64627401e7e862336d6bc7aca0705",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "be50eed3ca51bfb92932742e45d2b50002d0d255b75ad690163318ebbea67ea5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "eac58d75a6a0129a3d7115573b618b9f8ce6e57b4d2808af83ea744a770c5708",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "15c766f8f3292c6614d208ceb318a9665520e65078c55aa9f2a37e4c32a319c9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "81c6ad98f8c0a688fab87b97e8b84090d38c7bea3697cffe1608de89ac407750",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "91add48bde0eea8752a95375e776f975d2ebb3f5efedbea7e32e557d7e3882ea",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "72454a3cc82de994e177033a54550509466ca6bd1d434acf90257f18437735ca",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "89c06705d47e1d0b3974e4570e71ac9dc0dee46e07abc7c8fddf24ae80d8570a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d5bdad7afb5df8a724d6aa1887dffb6ffbe5e6fde4c044a448f908e5a56ad7f2",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b0b72d636adba43bb381e746caa1bc0ed2419ebe88c347c3178a34c661df1e15",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "bea38f6b4dc48e1a4aa8e427534a9c7c6a9f21c108f219b77d81dec03465b226",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b5feceb5a7ac93a98242080a915c121048555e3f6e6f1ecd73166679c84eb0f4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9d717940f9d071e66573cf3e6c6bbdbf2d9e96682bf0e0e2ae3a391c7f6a0f21",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "ee3344eb18c023daf909ce520e9faa321ce12f1acc572addf5c3bbfd82e8ff32",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
+    "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
+    "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/transient_overlay_render_owner.js",
+  "functionName": "createTransientOverlayRenderOwner",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "ae07580ea25d02255a0bc0d939977f3c7896f0620d5c6fac971093cc36b92e86",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1ec216c8af482ac8b5d362130e5e62a5228d33dee5bda2ad24a509b7e79339c0",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "da9d870e98d2a1c36b0136c32a26aa413e9989d6b80758f15ed0f7fb4ab748cd",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "860be45182390b0a5ad50394e0c2b9f1ddf7772170cc2624534a7f3be15f11ae",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "eb0680818fdc18f742006d48f1827ec7b70cffd8d0bbfdf9f0b899dd947ae4bf",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "63eaf64aa2d6883785345f846082280295a6d943a07fee2716fb6cb7a4d2a863",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9f6d171bfd4bfea97b43c83b87ecf0a6c300ba4b5f8a83d02af64386b01d5e07",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d851eb5374add303119f20881c7498839ed006453728f7052fe48a539ad51eee",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9b43a30569690522861259390e64e06a40ed2be5b8860fbfe386cd98eacbc8f3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1dfff8979f55425fa63d059c4ea33fb891b018351f4a02f2702e6926217f3826",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "25e4665c61841f11a60521eb39f7135d2f5fea798e9c34d25c6fb7c4aa61db45",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "170c8d57bbd3c904eec1c4f597382e8e81d45b82e651d7ed3751da10c585aa2a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "180b603f81687b2f76d9871deda7d7a98858dc3548e14ed0941b31b7cd5fa810",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a5fae0d1d82d08291c160c0bc61029d5ec9b1eaf8d0eff6ee39c52a4b8455ab9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "ambiguous-alias-flow",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "777e3d6fcb79cba1cfb3e137449facb61417d0c67ee5a5b2ff310b4d9c40e814",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderSpecialZoneEditorOverlay\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d3f03be5c53786e04f4f4ab1b75bf1156a3f57442fbeed4c3bf87039d274f833",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "specialRegionsById",
+      "sourceFingerprint": "6e5cc07af3f65a2c310c5752a6be8176a7843914743d78cd080023b39d84d1f4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "hoveredSpecialRegionId",
+      "sourceFingerprint": "18e1ca5e9f601ffd560d54762bef40bc83540eb2c07dd451fd594d24c7790834",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "waterRegionsById",
+      "sourceFingerprint": "aa89f9e45d0e6e6d90277ac6eea2a7cfb9cd4904607749417c0962a93f02823f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "hoveredWaterRegionId",
+      "sourceFingerprint": "92f477d4bd553d571a84078255db7d005f497f3806336f745eadbf0d31008e57",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "171cb83ffec7716452353e2d6e48aeb33bec078e9aad010ef734a92c04ab3602",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransientOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"renderHoverOverlay\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "hoveredId",
+      "sourceFingerprint": "480716aca0ac4b1b6c73b8f237759ac1c82b9fc9896b9941a2eb15954bc31319",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "777e3d6fcb79cba1cfb3e137449facb61417d0c67ee5a5b2ff310b4d9c40e814",
+    "d3f03be5c53786e04f4f4ab1b75bf1156a3f57442fbeed4c3bf87039d274f833",
+    "6e5cc07af3f65a2c310c5752a6be8176a7843914743d78cd080023b39d84d1f4",
+    "aa89f9e45d0e6e6d90277ac6eea2a7cfb9cd4904607749417c0962a93f02823f",
+    "171cb83ffec7716452353e2d6e48aeb33bec078e9aad010ef734a92c04ab3602"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/unit_counter_display_model.js",
+  "functionName": "createUnitCounterDisplayModel",
+  "importedArgumentCount": 2,
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "83de6c3a776a4554559e347e4b78908e86996925ce04dfd863b7cd6a193c7998",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUnitCounterDisplayModel\",\"ordinal\":0},{\"name\":\"getUnitCounterNationMeta\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioCountriesByTag",
+      "sourceFingerprint": "012a725893b2fe37f85477f3a23a3cc7fa77b5e8bfdfb9daeb1636ac9ff50c26",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUnitCounterDisplayModel\",\"ordinal\":0},{\"name\":\"getUnitCounterNationMeta\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a518f4ab8d22a41c9ade2923b0431d3550fe0cf7b928358718fb5bfca432fc21",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUnitCounterDisplayModel\",\"ordinal\":0},{\"name\":\"getUnitCounterNationMeta\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9e71e85661cff9a09700506da46e649e2ad3e384993ef0088e6c5215409f8184",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUnitCounterDisplayModel\",\"ordinal\":0},{\"name\":\"getUnitCounterNationMeta\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "82a3537ff0dbce7eec35d69edc3a189ee6f17d82f353a553f9aa96cb0be3ce89",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUnitCounterDisplayModel\",\"ordinal\":0},{\"name\":\"getUnitCounterRenderEntries\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "efe899c74558f20b08bbc19bf0228c0c25bddb7871d80bd34ac8b33c030b3698",
+      "count": 2
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+
+  // Bundle identity is only a key into the owner-local request lease map.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/scenario_resources.js",
+  "functionName": "getOptionalLayerRequestTokens",
+  "targetParameterName": "bundle",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "21115602fb6c6d09001e36cfcddc394d17f3b1d0f1e22516b7a1f23f003a04a7",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getOptionalLayerRequestTokens\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1e6ed65d77d6364eeaed5a745ba5c4985ae2b700dd85d7cf7f027bdf294a33fc",
+      "count": 3
+    }
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/scenario/optional_layer_runtime.js",
+  "functionName": "createScenarioOptionalLayerRuntime",
+  "importedArgumentCount": 2,
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "sourceFingerprint": "59e459c489d1b1272c7a8bb1fc2f80c9fe82b725093ed0b20238a2315561c9fb",
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayerLoaded\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayerLoaded\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioBundleCacheById",
+      "sourceFingerprint": "1e6ed65d77d6364eeaed5a745ba5c4985ae2b700dd85d7cf7f027bdf294a33fc",
+      "count": 4
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayerLoaded\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "4ba69735ca53765ed6a709edb56c6ea236b7193a3b29a6b390c346f0f4340e4e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"isScenarioOptionalLayerRequestedForVisibility\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "4ba69735ca53765ed6a709edb56c6ea236b7193a3b29a6b390c346f0f4340e4e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayersForVisibility\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayersForVisibility\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":2}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "6f355f4c726407ce6e8fb9f1a2d56666f715d94a716136007fb929dce0b42691",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioOptionalLayerRuntime\",\"ordinal\":0},{\"name\":\"ensureActiveScenarioOptionalLayersForVisibility\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":4}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "6f355f4c726407ce6e8fb9f1a2d56666f715d94a716136007fb929dce0b42691",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+
+  // Renderer read models retain live state reads; mutations remain in canonical actions.
+
+  // Renderer read models retain live state reads; mutations remain in canonical actions.
+
   // Preset UI reads its target; existing injected transactions receive detached IDs/strings.
   freezeStateTargetPureReaderEntry({
     modulePath: "js/ui/sidebar/regional_preset_controller.js",
@@ -1238,6 +2986,277 @@ function freezeMutationDelegatingOwnerEntry(entry = {}) {
 }
 
 export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
+freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getVisibleFrameDiagnosticsOwner",
+  "compositionSourceFingerprint": "053e296fd24239f313455cdf6e6972e07146356a72d13b1e565d186f343cbb0a",
+  "factoryModulePath": "js/core/renderer/visible_frame_diagnostics_owner.js",
+  "factoryExportName": "createVisibleFrameDiagnosticsOwner",
+  "factorySourceFingerprint": "9f0befd8fd36469c6f45f51ff21a93a007c03165ce92fcaca269221be2e32385",
+  "ownerBindingName": "visibleFrameDiagnosticsOwner",
+  "methods": [
+    "recordVisibleFrameTransaction",
+    "recordFirstVisibleFrameBlocked",
+    "markFirstVisibleFramePainted",
+    "resetFirstVisibleFramePainted"
+  ],
+  "actionExports": []
+}),
+freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composePhysicalIntensityInteractionOwner",
+  "compositionSourceFingerprint": "34e3c2904fa042f7bacbbb51e79ff25e9a8067788ca4b4d5f553c5e72497fc8b",
+  "factoryModulePath": "js/core/renderer/physical_intensity_interaction_owner.js",
+  "factoryExportName": "createPhysicalIntensityInteractionOwner",
+  "factorySourceFingerprint": "a9b2b2a5b8da55bbbd27bdb4d212483b71b507169f45a1c4d9970264868c7153",
+  "ownerBindingName": "owner",
+  "methods": [
+    "handlePhysicalIntensityPointerDown",
+    "handlePhysicalIntensityPointerMove",
+    "handlePhysicalIntensityPointerEnd"
+  ],
+  "actionExports": []
+}),
+freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getPixelRatioPolicy",
+  "compositionSourceFingerprint": "466362d23f7fa54eaf838f3a038fb8e60ef1716d832d3989c54fdfbf8300ab24",
+  "factoryModulePath": "js/core/renderer/pixel_ratio_policy.js",
+  "factoryExportName": "createPixelRatioPolicy",
+  "factorySourceFingerprint": "a280d42abf7f492c871786616f466c7e03c8ff8d4c0c5b1f0be9c13970a06efc",
+  "ownerBindingName": "pixelRatioPolicy",
+  "methods": [
+    "getMaxDprForProfile",
+    "updateDprStage"
+  ],
+  "actionExports": []
+}),
+freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "recordProjectedBoundsDiagnosticsState",
+  "compositionSourceFingerprint": "4c304da4acd6feef8e3d4abdd08945cbd1969f2816aac54570c7134f19fb04d7",
+  "factoryModulePath": "js/core/renderer/projected_bounds_diagnostics_owner.js",
+  "factoryExportName": "createProjectedBoundsDiagnosticsOwner",
+  "factorySourceFingerprint": "f4b56295e387f224826937d1a97d91fc3694d43673a20d6dadc403c90bd48bf5",
+  "ownerBindingName": "projectedBoundsDiagnosticsOwner",
+  "methods": [
+    "recordProjectedBoundsDiagnosticsState"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/scenario/chunk_runtime.js",
+  "compositionExportName": "composeScenarioChunkPayloadLoader",
+  "compositionSourceFingerprint": "506a3145b37deb016c6193c09371f6fc0dadc6c146234ee57fa19ac3eb39c7f4",
+  "factoryModulePath": "js/core/scenario/chunk_payload_loader.js",
+  "factoryExportName": "createScenarioChunkPayloadLoader",
+  "factorySourceFingerprint": "ef9f4c154f1382ba294521fe8f06b67e5d4f617694ec7d2c5dc1edc367be3158",
+  "ownerBindingName": "owner",
+  "methods": [
+    "loadScenarioChunkPayload",
+    "resetScenarioChunkRequests"
+  ],
+  "actionExports": []
+}),
+  // Composition receipts keep callable owner interfaces distinct from state data.
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composeCityLabelTextModel",
+  "compositionSourceFingerprint": "bc6d83e78976b4dae096897ab3c09bddd93c44c8830eed2c1153d415ab13a2bd",
+  "factoryModulePath": "js/core/renderer/city_label_text_model.js",
+  "factoryExportName": "createCityLabelTextModel",
+  "factorySourceFingerprint": "0fe76ded2890283e1c6dcac426c372b22e5a6716b734e1b9741a2534b7f4a65a",
+  "ownerBindingName": "owner",
+  "methods": [
+    "getCityFeatureKey",
+    "getCityFeatureAliases",
+    "getCityDisplayLabel",
+    "formatCityMapLabel"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composePoliticalFeaturePolicy",
+  "compositionSourceFingerprint": "d0b7a2baa68d42144def1e2946ba81c74880c6eb51972371af444b579e79313f",
+  "factoryModulePath": "js/core/renderer/political_feature_policy.js",
+  "factoryExportName": "createPoliticalFeaturePolicy",
+  "factorySourceFingerprint": "a7bc4b4a4d4410f19e0168a2091c32aa706d610aaeb4d478332efd19ab137f1d",
+  "ownerBindingName": "owner",
+  "methods": [
+    "isScenarioShellFeature",
+    "hasVisiblePoliticalForegroundColorOverride",
+    "orderPoliticalShellUnderlayFirst",
+    "shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature",
+    "getAtlantropaGeometryRole",
+    "getAtlantropaJoinMode",
+    "isAntarcticSectorFeature",
+    "shouldExcludePoliticalVisualFeature",
+    "isPoliticalInteractionRenderableFeature",
+    "shouldExcludePoliticalInteractionFeature"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composePhysicalIntensityPreviewOwner",
+  "compositionSourceFingerprint": "a1fd2c1f62ecc0fad5cf2ae0dcf39059607588d34b89a2144b280a0aab72f2d1",
+  "factoryModulePath": "js/core/renderer/physical_intensity_preview_owner.js",
+  "factoryExportName": "createPhysicalIntensityPreviewOwner",
+  "factorySourceFingerprint": "f1785aa7513397801118f9b489d1656cd6e02e3756330b52b082394d8e06f6b2",
+  "ownerBindingName": "owner",
+  "methods": [
+    "getMapLonLatFromEvent",
+    "projectGeoToScreen",
+    "hidePhysicalIntensityBrushPreview",
+    "renderPhysicalIntensityBrushPreview",
+    "updatePhysicalIntensityBrushPreviewFromEvent",
+    "getPhysicalIntensityPointHit"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composePoliticalPathCacheOwner",
+  "compositionSourceFingerprint": "cf4648c87226489ac0cbd8d94197dba295482737cd2ba535ef1d75aad98948b1",
+  "factoryModulePath": "js/core/renderer/political_path_cache_owner.js",
+  "factoryExportName": "createPoliticalPathCacheOwner",
+  "factorySourceFingerprint": "2373a82ad02daa02f3a9cf8a78192c13e8e6008e2a81d69089440e7b9c05be3e",
+  "ownerBindingName": "owner",
+  "methods": [
+    "getPoliticalPathCacheSignature",
+    "cancelPoliticalPathWarmup",
+    "invalidatePoliticalPathCache",
+    "getPoliticalPathCacheHandle",
+    "getPoliticalFeaturePathEntry",
+    "schedulePoliticalPathWarmup"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composeBrushInteractionSessionOwner",
+  "compositionSourceFingerprint": "29330f19625cc92158ee8d91c7c9cfec930d86b21da42575427cc52ec25dc354",
+  "factoryModulePath": "js/core/renderer/brush_interaction_session_owner.js",
+  "factoryExportName": "createBrushInteractionSessionOwner",
+  "factorySourceFingerprint": "fc2e1d1ed5a96512a40bea2b7b1aa80c2d76ebbcf82b643dacfeffabb3952da0",
+  "ownerBindingName": "owner",
+  "methods": [
+    "flushBrushSession",
+    "flushSpecialZoneMembershipDragSession",
+    "handleBrushPointerDown",
+    "handleBrushPointerMove"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getCityPaintStyleModel",
+  "compositionSourceFingerprint": "688e2307ffefb2e587b175ac8fe1f4425af25d790104d1b028a34eb3a9504f07",
+  "factoryModulePath": "js/core/renderer/city_paint_style_model.js",
+  "factoryExportName": "createCityPaintStyleModel",
+  "factorySourceFingerprint": "f71945637e83848b11df931adfc59d5f3e3902aec0a839007e2dcd6a27642084",
+  "ownerBindingName": "cityPaintStyleModel",
+  "methods": [
+    "getCityLabelRenderStyle",
+    "getCityMarkerRenderStyle"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composeUrbanAdaptivePaintModel",
+  "compositionSourceFingerprint": "d61dcb9e056c84418d3ae71e864add8ca2bb05d9d6fc66f3c6ae551b0507a088",
+  "factoryModulePath": "js/core/renderer/urban_adaptive_paint_model.js",
+  "factoryExportName": "createUrbanAdaptivePaintModel",
+  "factorySourceFingerprint": "8cfcb05b28d27745fa135a08fd0ea2936a158fd35eab514edf42059cddde3a8b",
+  "ownerBindingName": "owner",
+  "methods": [
+    "computeUrbanAdaptivePaintFromHostColor",
+    "getUrbanAdaptivePaint",
+    "getEffectiveUrbanMode"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getOperationGraphicsEditorRenderOwner",
+  "compositionSourceFingerprint": "62f126b231771d327eb0b9b12b0e65f0ea267b7b811d7c813ff68a5ab721eed2",
+  "factoryModulePath": "js/core/renderer/operation_graphics_editor_render_owner.js",
+  "factoryExportName": "createOperationGraphicsEditorRenderOwner",
+  "factorySourceFingerprint": "015a8f1dcfeda3376b1a0e6be49f2dc8e4a48dbdb33dd7ed11622d37ea8314c3",
+  "ownerBindingName": "operationGraphicsEditorRenderOwner",
+  "methods": [
+    "renderOperationGraphicsEditorOverlay"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getScenarioRegionOverlayRenderOwner",
+  "compositionSourceFingerprint": "cb25db9f2d1650f2e021b09f83b4957a46ef6ba217bfe99d55d68294e7a698d9",
+  "factoryModulePath": "js/core/renderer/scenario_region_overlay_render_owner.js",
+  "factoryExportName": "createScenarioRegionOverlayRenderOwner",
+  "factorySourceFingerprint": "1dec308013061fb3c024487c0d463288b382eb0927287196117da4d8dd37d11d",
+  "ownerBindingName": "scenarioRegionOverlayRenderOwner",
+  "methods": [
+    "drawScenarioRegionOverlaysPass",
+    "getContextScenarioLayerCacheEntry",
+    "ensureContextScenarioLayerCanvas",
+    "drawCachedContextScenarioLayer",
+    "resetWaterPathCaches",
+    "getPreviousWaterRenderedCount",
+    "resetPreviousWaterRenderedCount"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getStaticBorderMeshLifecycle",
+  "compositionSourceFingerprint": "d37b5e33b55cea3232dc0eb65f4962d69b534aacff0fb52300b17429ac7142a3",
+  "factoryModulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
+  "factoryExportName": "createStaticBorderMeshLifecycle",
+  "factorySourceFingerprint": "173c45652e3d9686bd647eb194658d19e6886accba3d4b452480e3577ecc8b7c",
+  "ownerBindingName": "staticBorderMeshLifecycle",
+  "methods": [
+    "buildDetailAdmMeshSignature",
+    "getVisibleCountryCodesForBorderMeshes",
+    "cancelDeferredHeavyBorderMeshes",
+    "scheduleDeferredHeavyBorderMeshes",
+    "captureStaticMeshSnapshot",
+    "resetVisibleCountryCodesCache"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getTransientOverlayRenderOwner",
+  "compositionSourceFingerprint": "8f6bd8a66fe2079283208b0ecd2efa87b6cf2c188cfae05063d25b72d3d9ecae",
+  "factoryModulePath": "js/core/renderer/transient_overlay_render_owner.js",
+  "factoryExportName": "createTransientOverlayRenderOwner",
+  "factorySourceFingerprint": "ae07580ea25d02255a0bc0d939977f3c7896f0620d5c6fac971093cc36b92e86",
+  "ownerBindingName": "transientOverlayRenderOwner",
+  "methods": [
+    "renderSpecialZoneEditorOverlay",
+    "renderHoverOverlay"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composeUnitCounterDisplayModel",
+  "compositionSourceFingerprint": "528868b43ffb081174714f2d3adf1979bb6dc52fcfc21b0f1c9d98a98298c4ba",
+  "factoryModulePath": "js/core/renderer/unit_counter_display_model.js",
+  "factoryExportName": "createUnitCounterDisplayModel",
+  "factorySourceFingerprint": "83de6c3a776a4554559e347e4b78908e86996925ce04dfd863b7cd6a193c7998",
+  "ownerBindingName": "owner",
+  "methods": [
+    "getUnitCounterCardModel",
+    "getUnitCounterRenderEntries",
+    "getUnitCounterRenderScale"
+  ],
+  "actionExports": []
+}),
   freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getSelectionOverlayOwner",
@@ -2965,6 +4984,22 @@ const RENDER_PERF_METRIC_DYNAMIC_SITES = Object.freeze([
 
 const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
   [
+    `${INTENSITY_FIELD_ACTION_MODULE_PATH}#appendIntensityFieldPointState`,
+    Object.freeze([
+      freezeAllowedDynamicSite({ operation: "assign", key: "intensityFields", pathPattern: "intensityFields.channels.*.enabled" }),
+      freezeAllowedDynamicSite({ operation: "collection-mutate", key: "intensityFields", pathPattern: "intensityFields.channels.*.points" }),
+    ]),
+  ],
+  [
+    `${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#commitScenarioOptionalLayerPayloadState`,
+    Object.freeze([
+      // The action validates the layer-to-payload-field pair before publishing.
+      freezeAllowedDynamicSite({ operation: "assign", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.*" }),
+      freezeAllowedDynamicSite({ operation: "assign", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.optionalLayerSettledByKey.*" }),
+      freezeAllowedDynamicSite({ operation: "delete", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.optionalLayerSettledByKey.*" }),
+    ]),
+  ],
+  [
     `${SCENARIO_PRESENTATION_ACTION_MODULE_PATH}#setHgoIdentityVariantSelectionState`,
     Object.freeze([
       freezeAllowedDynamicSite({
@@ -4569,6 +6604,102 @@ function createScenarioRuntimeActivationRetirementEntry([domain, migrationPhase,
 export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
   Object.freeze([
     ...P44_STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
+    // Successors recovered from accepted policy sites; frozen evidence is retained.
+
+    freezeCrossFileMigrationEntry({
+      "retiredCallerPath": "js/core/state/ui_state.js",
+      "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"applyTransportWorkbenchOverviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "domain": "cross-domain",
+      "migrationPhase": "multi-phase",
+      "operation": "assign",
+      "key": "*",
+      "retiredMutationSites": [
+        {
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyTransportWorkbenchOverviewState\",\"ordinal\":0}]}",
+          "sourceFingerprint": "6bf49676bc0f94f98f396ed64aeb4def6e1b7614637c3b662cfb64e832acb925",
+          "occurrenceIndex": 0
+        }
+      ],
+      "replacementCallerPath": "js/ui/toolbar/transport_workbench_apply_bridge_owner.js",
+      "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createTransportWorkbenchApplyBridgeOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransportWorkbenchApplyBridgeOwner\",\"ordinal\":0},{\"name\":\"applyFamilyToMainMap\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/transport_actions.js",
+      "actionExportName": "applyTransportWorkbenchOverviewState",
+      "targetArgumentIndex": 0,
+      "replacementActionSourceFingerprint": "cc9e8748bdb1a44950f03ff8866845003a6cb62bd2546c312828e3a1f2d0576a"
+    }),
+    freezeCrossFileMigrationEntry({
+      "retiredCallerPath": "js/core/state/ui_state.js",
+      "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"applyTransportWorkbenchOverviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "domain": "ui",
+      "migrationPhase": "P4.4",
+      "operation": "assign",
+      "key": "showTransport",
+      "retiredMutationSites": [
+        {
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyTransportWorkbenchOverviewState\",\"ordinal\":0}]}",
+          "sourceFingerprint": "e952b1edc69cc1172be0f3a582dbdc78e6677d650f644a00fc3b995a1eab5ee7",
+          "occurrenceIndex": 0
+        }
+      ],
+      "replacementCallerPath": "js/ui/toolbar/transport_workbench_apply_bridge_owner.js",
+      "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createTransportWorkbenchApplyBridgeOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransportWorkbenchApplyBridgeOwner\",\"ordinal\":0},{\"name\":\"applyFamilyToMainMap\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/transport_actions.js",
+      "actionExportName": "applyTransportWorkbenchOverviewState",
+      "targetArgumentIndex": 0,
+      "replacementActionSourceFingerprint": "cc9e8748bdb1a44950f03ff8866845003a6cb62bd2546c312828e3a1f2d0576a"
+    }),
+    freezeCrossFileMigrationEntry({
+      "retiredCallerPath": "js/core/state/ui_state.js",
+      "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"applyTransportWorkbenchOverviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "domain": "ui",
+      "migrationPhase": "P4.4",
+      "operation": "assign",
+      "key": "styleConfig",
+      "retiredMutationSites": [
+        {
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyTransportWorkbenchOverviewState\",\"ordinal\":0}]}",
+          "sourceFingerprint": "6ff4e78b8ae6b947c2ec59ea76cd2c4f4090059152abad58aa647829d5c5dec6",
+          "occurrenceIndex": 0
+        },
+        {
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyTransportWorkbenchOverviewState\",\"ordinal\":0}]}",
+          "sourceFingerprint": "fb9e193bb4c5a12b22f9a2b3a01a3e1e7a0f85b5fe815b5254f170bc53c3f324",
+          "occurrenceIndex": 0
+        }
+      ],
+      "replacementCallerPath": "js/ui/toolbar/transport_workbench_apply_bridge_owner.js",
+      "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createTransportWorkbenchApplyBridgeOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createTransportWorkbenchApplyBridgeOwner\",\"ordinal\":0},{\"name\":\"applyFamilyToMainMap\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/transport_actions.js",
+      "actionExportName": "applyTransportWorkbenchOverviewState",
+      "targetArgumentIndex": 0,
+      "replacementActionSourceFingerprint": "cc9e8748bdb1a44950f03ff8866845003a6cb62bd2546c312828e3a1f2d0576a"
+    }),
+    freezeCrossFileMigrationEntry({
+      "retiredCallerPath": "js/core/map_renderer.js",
+      "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "domain": "appearance",
+      "migrationPhase": "P4.4",
+      "operation": "collection-mutate",
+      "key": "intensityFields",
+      "retiredMutationSites": [
+        {
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"handlePhysicalIntensityPointerDown\",\"ordinal\":0}]}",
+          "sourceFingerprint": "d47b2b8c00c0143ed139897d71242036adf3cc54300904029380f76c6318be67",
+          "occurrenceIndex": 0
+        }
+      ],
+      "replacementCallerPath": "js/core/renderer/physical_intensity_interaction_owner.js",
+      "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createPhysicalIntensityInteractionOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+      "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPhysicalIntensityInteractionOwner\",\"ordinal\":0},{\"name\":\"handlePhysicalIntensityPointerDown\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/intensity_field_actions.js",
+      "actionExportName": "appendIntensityFieldPointState",
+      "targetArgumentIndex": 0,
+      "replacementActionSourceFingerprint": "0b64390ff46f8d0b47bab961e655fdf2bfe493de0afe6450d847e7e48fdb6ab3"
+    }),
+
     freezeCrossFileMigrationEntry({
       "retiredCallerPath": "js/ui/sidebar/country_inspector_controller.js",
       "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createCountryInspectorController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
@@ -5291,19 +7422,15 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
         key,
         retiredMutationSites,
         replacementCallerPath:
-          "js/core/state/renderer_runtime_state.js",
+          "js/core/renderer/pixel_ratio_policy.js",
         replacementCallerBindingIdentity:
-          createRendererFunctionParameterBindingIdentity(
-            "commitRendererDprStageState",
-          ),
+          "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createPixelRatioPolicy\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
         replacementEnclosingFunctionIdentity:
-          createRendererFunctionIdentity(
-            "commitRendererDprStageState",
-          ),
+          "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPixelRatioPolicy\",\"ordinal\":0},{\"name\":\"updateDprStage\",\"ordinal\":0}]}",
         actionModulePath: RENDERER_PHASE_ACTION_MODULE_PATH,
         actionExportName: "commitRendererDprStageState",
         replacementActionSourceFingerprint:
-          "21b13184a45c45e2cde7bb66273ecffdb190ca3250cc5c0ce7fdd6ff43816f15",
+          "d6f8982b4d145ebf2faa71a6c4112c7073fc1c538b754af2f6e085b3a3c5d901",
       })
     ),
     createRendererCrossBoundaryMigrationEntry({
@@ -5314,20 +7441,16 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
       retiredMutationSites:
         MAP_RENDERER_FIRST_VISIBLE_RETIRED_MUTATION_SITES,
       replacementCallerPath:
-        "js/core/state/renderer_runtime_state.js",
+        "js/core/renderer/visible_frame_diagnostics_owner.js",
       replacementCallerBindingIdentity:
-        createRendererFunctionParameterBindingIdentity(
-          "setFirstVisibleFramePaintedState",
-        ),
+        "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createVisibleFrameDiagnosticsOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
       replacementEnclosingFunctionIdentity:
-        createRendererFunctionIdentity(
-          "setFirstVisibleFramePaintedState",
-        ),
+        "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameDiagnosticsOwner\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
       actionModulePath:
         RENDERER_DIAGNOSTICS_ACTION_MODULE_PATH,
       actionExportName: "setFirstVisibleFramePaintedState",
       replacementActionSourceFingerprint:
-        "4b37f18717c2ef312c44b44062011dc84feb3a63b103f7beffd88cd4a5ed1556",
+        "aa23300756fbd1509d1038ce98cdd0431d49848b8de76edf9a3b1e3ee988e685",
     }),
     createRendererCrossBoundaryMigrationEntry({
       retiredCallerPath: "js/core/map_renderer.js",
@@ -5457,21 +7580,17 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
       retiredMutationSites:
         MAP_RENDERER_PROJECTED_DIAGNOSTICS_RETIRED_MUTATION_SITES,
       replacementCallerPath:
-        "js/core/state/renderer_runtime_state.js",
+        "js/core/renderer/projected_bounds_diagnostics_owner.js",
       replacementCallerBindingIdentity:
-        createRendererFunctionParameterBindingIdentity(
-          "commitProjectedBoundsDiagnosticsState",
-        ),
+        "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createProjectedBoundsDiagnosticsOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
       replacementEnclosingFunctionIdentity:
-        createRendererFunctionIdentity(
-          "commitProjectedBoundsDiagnosticsState",
-        ),
+        "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createProjectedBoundsDiagnosticsOwner\",\"ordinal\":0},{\"name\":\"recordProjectedBoundsDiagnosticsState\",\"ordinal\":0}]}",
       actionModulePath:
         RENDERER_DIAGNOSTICS_ACTION_MODULE_PATH,
       actionExportName:
         "setProjectedBoundsDiagnosticsState",
       replacementActionSourceFingerprint:
-        "232b0cecc793ce7c8dc1ba2fd403de9ab9d7b5879f130bd9d871ccd657a4fd01",
+        "fee97a9d0c1e461648d339dc0c796e20a74683ea767399e1c71e44e4b2d80061",
     }),
     createRendererCrossBoundaryMigrationEntry({
       retiredCallerPath: "js/core/map_renderer.js",
@@ -6203,6 +8322,18 @@ export function validateStateTargetPureReaderContract(
       );
     }
     seenEntryIds.add(entryId);
+    const readSites = entry.reviewedReadSiteFingerprints || [];
+    const localFunctions = entry.localFunctionFingerprints || {};
+    if (!localFunctions || typeof localFunctions !== "object" || Array.isArray(localFunctions)
+      || Object.entries(localFunctions).some(([name, fingerprint]) => (
+        !isValidExportName(name) || !/^[a-f0-9]{64}$/.test(String(fingerprint))
+      ))) {
+      violations.push(createViolation("state-target-pure-reader-dependencies-invalid", { index, entryId }));
+    }
+    if (!Array.isArray(readSites) || new Set(readSites).size !== readSites.length
+      || readSites.some((value) => !/^[a-f0-9]{64}$/.test(String(value)))) {
+      violations.push(createViolation("state-target-pure-reader-read-sites-invalid", { index, entryId }));
+    }
     if (
       !/^js\/[^/].*\.js$/.test(normalizeModulePath(entry.modulePath))
       || !isValidExportName(entry.functionName)
@@ -6210,6 +8341,7 @@ export function validateStateTargetPureReaderContract(
       || !Number.isInteger(entry.targetParameterIndex)
       || entry.targetParameterIndex < 0
       || !Number.isInteger(entry.importedArgumentCount ?? 0)
+      || typeof (entry.allowBorrowedTarget ?? false) !== "boolean"
       || (entry.importedArgumentCount ?? 0) < 0
       || ((entry.importedArgumentCount ?? 0) > 0 && (
         entry.targetParameterPath !== "$" || entry.importedArgumentCount <= entry.targetParameterIndex
@@ -6297,7 +8429,9 @@ export function validateStateTargetPureReaderContract(
       ].join("|");
       if (
         !String(finding?.enclosingFunctionIdentity || "")
-        || String(finding?.reason || "") !== "state-alias-escape"
+        || !(String(finding?.reason || "") === "state-alias-escape"
+          || (["unsupported-call-mutation", "ambiguous-alias-flow"].includes(finding?.reason)
+            && readSites.includes(finding?.sourceFingerprint)))
         || String(finding?.operation || "") !== "unsupported"
         || !String(finding?.key || "")
         || !/^[a-f0-9]{64}$/.test(
@@ -6430,6 +8564,53 @@ function findTopLevelFunctionDeclarations(ast, functionName) {
   return matches;
 }
 
+function validateReviewedStateReadSites(source, ast, functionNode, fingerprints = []) {
+  const pending = new Set(fingerprints);
+  const violations = [];
+  const readMethods = new Set(["get", "has", "keys", "join", "map", "forEach"]);
+  const fingerprint = (node) => createHash("sha256")
+    .update(source.slice(node.start, node.end).trim().replaceAll("\r\n", "\n"))
+    .digest("hex");
+  const localFunctions = new Map([
+    ...topLevelFunctionDeclarations(ast),
+    ...directFunctionDeclarations(functionNode),
+  ]);
+  walkSyntaxTree(functionNode.body, (node) => {
+    if (node.type !== "CallExpression" || node.callee?.type !== "MemberExpression") return;
+    const identities = [fingerprint(node), fingerprint(node.callee)];
+    const matches = identities.filter((identity) => pending.has(identity));
+    if (!matches.length) return;
+    const method = !node.callee.computed ? node.callee.property?.name : "";
+    if (!readMethods.has(method)) {
+      violations.push(createViolation("state-target-pure-reader-read-method-invalid", { method }));
+      return;
+    }
+    if (["map", "forEach"].includes(method)) {
+      const callback = node.arguments[0];
+      if (!["ArrowFunctionExpression", "FunctionExpression"].includes(callback?.type)) {
+        violations.push(createViolation("state-target-pure-reader-read-callback-invalid", { method }));
+        return;
+      }
+      const hazards = collectReachableTaintedHazardSites({
+        ast, rootFunction: callback, taintedParameterIndexes: [0, 2], localFunctions,
+      }).filter((site) => site.type !== "ReturnStatement");
+      if (hazards.length) {
+        violations.push(createViolation("state-target-pure-reader-read-callback-mutation", {
+          method, lines: hazards.map((site) => Number(site.loc?.start?.line || 1)),
+        }));
+        return;
+      }
+    }
+    for (const identity of matches) pending.delete(identity);
+  });
+  if (pending.size) {
+    violations.push(createViolation("state-target-pure-reader-read-site-unverified", {
+      fingerprints: [...pending],
+    }));
+  }
+  return violations;
+}
+
 export function inspectStateTargetPureReaderFunctionSource(
   source,
   entry,
@@ -6490,6 +8671,35 @@ export function inspectStateTargetPureReaderFunctionSource(
     }));
   }
   const [functionNode] = functions;
+  if (entry.allowBorrowedTarget || Object.keys(entry.localFunctionFingerprints || {}).length) {
+    const localFunctions = topLevelFunctionDeclarations(ast);
+    const dependencies = new Map();
+    const pending = [functionNode];
+    while (pending.length) {
+      walkSyntaxTree(pending.pop().body, (node) => {
+        if (node.type !== "CallExpression" || node.callee?.type !== "Identifier") return;
+        const helper = localFunctions.get(node.callee.name);
+        if (!helper || helper === functionNode || dependencies.has(node.callee.name)) return;
+        dependencies.set(node.callee.name, helper);
+        pending.push(helper);
+      });
+    }
+    const expected = entry.localFunctionFingerprints || {};
+    for (const name of new Set([...dependencies.keys(), ...Object.keys(expected)])) {
+      const helper = dependencies.get(name);
+      const actual = helper ? createHash("sha256")
+        .update(String(source || "").slice(helper.start, helper.end).replaceAll("\r\n", "\n").trim())
+        .digest("hex") : "";
+      if (!actual || actual !== expected[name]) {
+        violations.push(createViolation("state-target-pure-reader-dependency-source-drift", {
+          modulePath: entry.modulePath, functionName: entry.functionName, dependencyName: name,
+        }));
+      }
+    }
+  }
+  violations.push(...validateReviewedStateReadSites(
+    String(source || ""), ast, functionNode, entry.reviewedReadSiteFingerprints || [],
+  ));
   const parameter = functionNode.params?.[entry.targetParameterIndex];
   const targetBindings = collectParameterBindingPaths(parameter).filter(
     ({ name, path }) =>
