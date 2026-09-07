@@ -1,4 +1,6 @@
-import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
+import {
+  state as runtimeState,
+} from "./state.js";
 import {
   patchScenarioChunkLoadState,
 } from "./state/actions/scenario_chunk_runtime_actions.js";
@@ -10,15 +12,11 @@ import {
   createStartupHydrationRefreshPlan,
   invalidateContextLayerVisualStateBatch,
   invalidateOceanWaterInteractionVisualState,
-  recomputeDynamicBordersNow,
   refreshColorState,
   refreshMapDataForScenarioChunkPromotion,
-  refreshResolvedColorsForFeatures,
   refreshScenarioOpeningOwnerBorders,
-  setMapData,
 } from "./scenario/scenario_renderer_bridge.js";
 import {
-  loadDeferredDetailBundle,
   loadMeasuredJsonResource,
   resolveScenarioRegistryUrl,
   normalizeCityText,
@@ -53,11 +51,12 @@ import {
   resolveSpecialZoneTopologyFingerprint,
 } from "./special_zone_layers.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
-import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
+import {
+  flushRenderBoundary,
+} from "./render_boundary.js";
 import { buildScenarioReleasableIndex } from "./releasable_manager.js";
 import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
 import {
-  ensureScenarioAuditUiState,
   setScenarioAuditUiState,
   syncCountryUi,
   syncScenarioUi,
@@ -66,7 +65,9 @@ import {
   enterScenarioFatalRecovery,
 } from "./scenario_recovery.js";
 import {
-  buildHoi4FarEastSovietOwnerBackfill,
+  normalizeScenarioFeatureCollection,
+  getScenarioFeatureCollectionIdentityList,
+  areScenarioFeatureCollectionsEquivalent,
   recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
 } from "./scenario/pure_helpers.js";
 import {
@@ -74,13 +75,9 @@ import {
   getSearchParams,
   normalizeScenarioBundleLevel,
   scenarioBundleSatisfiesLevel,
-  normalizeScenarioCoreTag,
-  normalizeScenarioCoreValue,
   normalizeScenarioCoreMap as sharedNormalizeScenarioCoreMap,
   loadScenarioJsonWithTimeout as sharedLoadScenarioJsonWithTimeout,
   loadScenarioJsonResourceWithTimeout as sharedLoadScenarioJsonResourceWithTimeout,
-  validateScenarioRequiredResourcePayload,
-  loadRequiredScenarioResource as sharedLoadRequiredScenarioResource,
   loadOptionalScenarioResource as sharedLoadOptionalScenarioResource,
   loadMeasuredRequiredScenarioResource as sharedLoadMeasuredRequiredScenarioResource,
   normalizeScenarioId,
@@ -110,7 +107,6 @@ import {
   getScenarioManifestVersion,
   getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
   getScenarioBaselineHashFromBundle,
-  getScenarioBlockerCount,
   getScenarioDefaultCountryCode,
   normalizeScenarioRuntimeTopologyPayload as normalizeBundleLoaderScenarioRuntimeTopologyPayload,
   normalizeScenarioRuntimePoliticalMeta as normalizeBundleLoaderScenarioRuntimePoliticalMeta,
@@ -329,10 +325,6 @@ function loadScenarioJsonResourceWithTimeout(d3Client, url, options = {}) {
   return sharedLoadScenarioJsonResourceWithTimeout(loadMeasuredJsonResource, d3Client, url, options);
 }
 
-async function loadRequiredScenarioResource(d3Client, url, options = {}) {
-  return sharedLoadRequiredScenarioResource(loadMeasuredJsonResource, d3Client, url, options);
-}
-
 async function loadOptionalScenarioResource(d3Client, url, options = {}) {
   return sharedLoadOptionalScenarioResource(loadMeasuredJsonResource, d3Client, url, options);
 }
@@ -370,23 +362,8 @@ const assembleScenarioBundle = createScenarioBundleAssembler({
   loadOptionalScenarioResource,
 });
 
-function normalizeScenarioViewMode(value) {
-  void value;
-  return "ownership";
-}
-
 function recordScenarioPerfMetric(name, durationMs, details = {}) {
   return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
-}
-
-function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
-  // 这里读的是“当前展示层看到的 owner”，优先吃 runtime sovereignty 覆盖，
-  // fallback 才回退到 bundle / 调用方提供的静态 owner。
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
-  const fallback = String(fallbackOwner || "").trim().toUpperCase();
-  const directOwner = String(runtimeState.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  return directOwner || fallback;
 }
 
 function getScenarioRegistryEntries() {
@@ -418,69 +395,6 @@ function getScenarioManifestSummary(manifest = runtimeState.activeScenarioManife
 }
 
 
-function refreshMapDataColorsForScenarioShell(featureIds) {
-  const targetIds = Array.from(new Set(
-    (Array.isArray(featureIds) ? featureIds : [])
-      .map((value) => String(value || "").trim())
-      .filter(Boolean)
-  ));
-  if (!targetIds.length) {
-    return;
-  }
-  refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-}
-
-
-function getScenarioMapSemanticMode(manifest, fallback = "political") {
-  return normalizeMapSemanticMode(manifest?.map_mode, fallback);
-}
-
-function normalizeScenarioFeatureCollection(payload) {
-  if (!Array.isArray(payload?.features)) {
-    return null;
-  }
-  return {
-    type: "FeatureCollection",
-    features: payload.features,
-  };
-}
-
-function getScenarioFeatureCollectionIdentityList(payload) {
-  const normalizedPayload = normalizeScenarioFeatureCollection(payload);
-  const features = Array.isArray(normalizedPayload?.features) ? normalizedPayload.features : [];
-  // 这里故意只比较 feature identity，不比较几何和属性细节。
-  // optional layer 刷新时，维护者更关心“成员集合有没有换”，而不是 payload 顺序或附属字段抖动。
-  return features
-    .map((feature) => String(feature?.id || feature?.properties?.id || "").trim())
-    .filter(Boolean);
-}
-
-function areScenarioFeatureCollectionIdentitiesEqual(leftPayload, rightPayload) {
-  const leftIds = getScenarioFeatureCollectionIdentityList(leftPayload);
-  const rightIds = getScenarioFeatureCollectionIdentityList(rightPayload);
-  return (
-    leftIds.length === rightIds.length
-    && leftIds.every((featureId, index) => featureId === rightIds[index])
-  );
-}
-
-function areScenarioFeatureCollectionFeatureReferencesEqual(leftPayload, rightPayload) {
-  const leftNormalized = normalizeScenarioFeatureCollection(leftPayload);
-  const rightNormalized = normalizeScenarioFeatureCollection(rightPayload);
-  const leftFeatures = Array.isArray(leftNormalized?.features) ? leftNormalized.features : [];
-  const rightFeatures = Array.isArray(rightNormalized?.features) ? rightNormalized.features : [];
-  return (
-    leftFeatures.length === rightFeatures.length
-    && leftFeatures.every((feature, index) => feature === rightFeatures[index])
-  );
-}
-
-function areScenarioFeatureCollectionsEquivalent(leftPayload, rightPayload) {
-  return (
-    areScenarioFeatureCollectionIdentitiesEqual(leftPayload, rightPayload)
-    && areScenarioFeatureCollectionFeatureReferencesEqual(leftPayload, rightPayload)
-  );
-}
 
 function normalizeScenarioOptionalLayerKey(value) {
   const rawKey = String(value || "").trim().toLowerCase();
@@ -500,10 +414,6 @@ function getScenarioOptionalLayerConfig(layerKey) {
 
 function normalizeScenarioRuntimeTopologyPayload(payload) {
   return normalizeBundleLoaderScenarioRuntimeTopologyPayload(payload);
-}
-
-function hasScenarioRuntimePoliticalPayload(payload) {
-  return !!normalizeScenarioRuntimeTopologyPayload(payload)?.objects?.political;
 }
 
 function normalizeScenarioRuntimePoliticalMeta(meta) {
@@ -839,32 +749,6 @@ const {
   ownerFeatureCoverageMinFeatures: SCENARIO_OWNER_FEATURE_COVERAGE_MIN_FEATURES,
 });
 const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;
-
-function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints = normalizeScenarioPerformanceHints(manifest)) {
-  const config = getScenarioOptionalLayerConfig(layerKey);
-  if (!config) return false;
-  // “默认可见”不等于“必须在 startup/apply 主路径同步拉取”。
-  // 这里只回答“理论上值得尽快准备吗”，真正是否在 cache-hit 或 visibility 阶段触发，
-  // 还要继续受 runtime topology 已有内容和性能 hints 约束。
-  const visibleByDefault = config.visibilityField === "showWaterRegions"
-    ? hints.waterRegionsDefault !== false
-    : config.visibilityField === "showScenarioSpecialRegions"
-      ? hints.specialRegionsDefault !== false
-      : config.visibilityField === "showScenarioAtlantropa"
-        ? hints.scenarioAtlantropaDefault !== false
-        : config.visibilityField === "showScenarioReliefOverlays"
-          ? hints.scenarioReliefOverlaysDefault === true
-          : config.visibilityField === "showCityPoints"
-            ? runtimeState.showCityPoints !== false
-            : false;
-  if (!visibleByDefault) {
-    return false;
-  }
-  if (config.objectName && getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName)) {
-    return false;
-  }
-  return !!manifest?.[config.urlField];
-}
 
 function applyScenarioOptionalLayerState(
   bundle,

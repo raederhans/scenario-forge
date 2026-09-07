@@ -7,11 +7,6 @@ import {
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import {
   invalidateOceanBackgroundVisualState,
-  recomputeDynamicBordersNow,
-  refreshColorState,
-  refreshMapDataForScenarioChunkPromotion,
-  refreshResolvedColorsForFeatures,
-  setMapData,
 } from "./scenario/scenario_renderer_bridge.js";
 import {
   loadDeferredDetailBundle,
@@ -33,11 +28,9 @@ import {
   getScenarioReleasableCountries,
 } from "./releasable_manager.js";
 import {
-  DETAIL_POLITICAL_MIN_FEATURES,
   SCENARIO_DETAIL_MIN_RATIO_STRICT,
   evaluateScenarioDataHealth,
   hasUsablePoliticalTopology,
-  refreshScenarioDataHealth,
   scenarioNeedsDetailTopology,
 } from "./scenario_data_health.js";
 import {
@@ -57,15 +50,11 @@ import {
   applyBlankScenarioPresentationDefaults,
   awaitInitialScenarioChunkVisualPromotion,
   ensureRuntimeChunkLoadState,
-  ensureActiveScenarioOptionalLayerLoaded,
-  ensureScenarioGeoLocalePatchForLanguage,
   evaluateScenarioHydrationHealthGateState,
   buildScenarioRuntimeVersionTag,
   hasRenderableScenarioPoliticalTopology,
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,
-  hydrateActiveScenarioBundle,
-  loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
   resetScenarioChunkRuntimeState,
@@ -75,7 +64,6 @@ import {
   scenarioBundleHasChunkedData,
   scenarioSupportsChunkedRuntime,
   scenarioBundleUsesChunkedLayer,
-  validateImportedScenarioBaseline,
 } from "./scenario_resources.js";
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
@@ -100,10 +88,7 @@ import {
 } from "./renderer/render_transaction_diagnostics.js";
 import {
   getSearchParams,
-  shouldBypassScenarioCache,
   scenarioBundleSatisfiesLevel,
-  normalizeScenarioCoreTag,
-  normalizeScenarioCoreValue,
   normalizeScenarioCoreMap as sharedNormalizeScenarioCoreMap,
   normalizeScenarioId,
   cloneScenarioStateValue,
@@ -116,10 +101,8 @@ import {
   mergeReleasableCatalogs,
   getScenarioMetaById as getBundleLoaderScenarioMetaById,
   getDefaultScenarioId as getBundleLoaderDefaultScenarioId,
-  getScenarioManifestVersion,
   getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
   getScenarioBaselineHashFromBundle,
-  getScenarioBlockerCount,
   getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode,
 } from "./scenario/bundle_loader.js";
 import { t } from "./i18n.js";
@@ -234,11 +217,6 @@ function hasActiveScenarioPaletteLoaded(paletteId) {
     && !!runtimeState.activePaletteMap;
 }
 
-function normalizeScenarioViewMode(value) {
-  void value;
-  return "ownership";
-}
-
 function canReuseActiveScenarioBundle(cachedScenarioBundle, normalizedScenarioId) {
   // 复用只接受“同一场景、完整 bundle、当前 runtime 已完整激活”的情况；startup readonly 和半水合状态继续走正常 apply 链路。
   if (!normalizedScenarioId || normalizeScenarioId(runtimeState.activeScenarioId) !== normalizedScenarioId) {
@@ -323,14 +301,6 @@ const {
   syncResolvedDefaultCountryPalette,
   applyBlankScenarioPresentationDefaults,
 });
-
-function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
-  const fallback = String(fallbackOwner || "").trim().toUpperCase();
-  const directOwner = String(runtimeState.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
-  return directOwner || fallback;
-}
 
 function getScenarioRegistryEntries() {
   return getBundleLoaderScenarioRegistryEntries(state);
@@ -1527,10 +1497,8 @@ export {
   formatScenarioStatusText,
   getDefaultScenarioId,
   getScenarioDisplayName,
-  getScenarioDisplayOwnerByFeatureId,
   getScenarioRegistryEntries,
   normalizeScenarioId,
-  normalizeScenarioViewMode,
   prepareScenarioDetailTopologyState,
   resetToScenarioBaseline,
   setScenarioViewMode,

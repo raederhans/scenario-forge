@@ -45782,7 +45782,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 740659,
+      "size_bytes": 693616,
       "source_kind": "dist"
     },
     {
@@ -46016,6 +46016,11 @@
       "source_kind": "dist"
     },
     {
+      "path": "app/js/core/renderer/city_reveal_policy.js",
+      "size_bytes": 21427,
+      "source_kind": "dist"
+    },
+    {
       "path": "app/js/core/renderer/color_resolution_strategy.js",
       "size_bytes": 3756,
       "source_kind": "dist"
@@ -46068,6 +46073,11 @@
     {
       "path": "app/js/core/renderer/ocean_render_owner.js",
       "size_bytes": 12744,
+      "source_kind": "dist"
+    },
+    {
+      "path": "app/js/core/renderer/operation_graphic_geometry.js",
+      "size_bytes": 8254,
       "source_kind": "dist"
     },
     {
@@ -46281,6 +46291,11 @@
       "source_kind": "dist"
     },
     {
+      "path": "app/js/core/renderer/transient_overlay_render_owner.js",
+      "size_bytes": 6761,
+      "source_kind": "dist"
+    },
+    {
       "path": "app/js/core/renderer/transport_facility_display_policy.js",
       "size_bytes": 7981,
       "source_kind": "dist"
@@ -46308,6 +46323,11 @@
     {
       "path": "app/js/core/renderer/transport_overview_style_policy.js",
       "size_bytes": 4924,
+      "source_kind": "dist"
+    },
+    {
+      "path": "app/js/core/renderer/unit_counter_display_model.js",
+      "size_bytes": 10576,
       "source_kind": "dist"
     },
     {
@@ -46397,7 +46417,7 @@
     },
     {
       "path": "app/js/core/scenario/presentation_hint_helpers.js",
-      "size_bytes": 2096,
+      "size_bytes": 1845,
       "source_kind": "dist"
     },
     {
@@ -46412,7 +46432,7 @@
     },
     {
       "path": "app/js/core/scenario/pure_helpers.js",
-      "size_bytes": 3852,
+      "size_bytes": 5046,
       "source_kind": "dist"
     },
     {
@@ -46422,7 +46442,7 @@
     },
     {
       "path": "app/js/core/scenario/shared.js",
-      "size_bytes": 9337,
+      "size_bytes": 8583,
       "source_kind": "dist"
     },
     {
@@ -46472,7 +46492,7 @@
     },
     {
       "path": "app/js/core/scenario_manager.js",
-      "size_bytes": 56674,
+      "size_bytes": 55558,
       "source_kind": "dist"
     },
     {
@@ -46492,7 +46512,7 @@
     },
     {
       "path": "app/js/core/scenario_resources.js",
-      "size_bytes": 52556,
+      "size_bytes": 47470,
       "source_kind": "dist"
     },
     {
@@ -46747,7 +46767,7 @@
     },
     {
       "path": "app/js/core/state/scenario_runtime_state.js",
-      "size_bytes": 14140,
+      "size_bytes": 13846,
       "source_kind": "dist"
     },
     {
@@ -47662,7 +47682,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2114003,
+      "size_bytes": 2119043,
       "source_kind": "dist"
     },
     {
@@ -47785,9 +47805,9 @@
     },
     "categories": [
       {
-        "file_count": 212,
+        "file_count": 216,
         "id": "startup-critical",
-        "size_bytes": 5347865
+        "size_bytes": 5347840
       },
       {
         "file_count": 94,
@@ -47797,12 +47817,12 @@
       {
         "file_count": 821,
         "id": "on-demand-product",
-        "size_bytes": 252959659
+        "size_bytes": 252964699
       },
       {
         "file_count": 8390,
         "id": "scenario-specific",
-        "size_bytes": 696185619
+        "size_bytes": 696179312
       },
       {
         "file_count": 5,
@@ -50297,7 +50317,7 @@
               {
                 "column": 21,
                 "kind": "new-url-reference",
-                "line": 745,
+                "line": 735,
                 "local": true,
                 "reference": "../../vendor/textures/paper_vintage_01.svg",
                 "resolved_path": "app/vendor/textures/paper_vintage_01.svg"
@@ -50309,13 +50329,37 @@
                 "kind": "import-declaration",
                 "line": 5,
                 "local": true,
+                "reference": "./renderer/operation_graphic_geometry.js",
+                "resolved_path": "app/js/core/renderer/operation_graphic_geometry.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 24,
+                "local": true,
+                "reference": "./renderer/unit_counter_display_model.js",
+                "resolved_path": "app/js/core/renderer/unit_counter_display_model.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 39,
+                "local": true,
+                "reference": "./renderer/city_reveal_policy.js",
+                "resolved_path": "app/js/core/renderer/city_reveal_policy.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 72,
+                "local": true,
                 "reference": "./state.js",
                 "resolved_path": "app/js/core/state.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 18,
+                "line": 85,
                 "local": true,
                 "reference": "./state/strategic_overlay_state.js",
                 "resolved_path": "app/js/core/state/strategic_overlay_state.js"
@@ -50323,7 +50367,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 22,
+                "line": 89,
                 "local": true,
                 "reference": "./state/renderer_runtime_state.js",
                 "resolved_path": "app/js/core/state/renderer_runtime_state.js"
@@ -50331,7 +50375,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 34,
+                "line": 101,
                 "local": true,
                 "reference": "./state/actions/renderer_phase_actions.js",
                 "resolved_path": "app/js/core/state/actions/renderer_phase_actions.js"
@@ -50339,7 +50383,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 39,
+                "line": 106,
                 "local": true,
                 "reference": "./state/actions/scenario_presentation_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_presentation_actions.js"
@@ -50347,7 +50391,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 43,
+                "line": 110,
                 "local": true,
                 "reference": "./state/actions/scenario_activation_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_activation_actions.js"
@@ -50355,7 +50399,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 44,
+                "line": 111,
                 "local": true,
                 "reference": "./state/actions/renderer_interaction_actions.js",
                 "resolved_path": "app/js/core/state/actions/renderer_interaction_actions.js"
@@ -50363,7 +50407,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 54,
+                "line": 121,
                 "local": true,
                 "reference": "./state/actions/renderer_exact_refresh_actions.js",
                 "resolved_path": "app/js/core/state/actions/renderer_exact_refresh_actions.js"
@@ -50371,7 +50415,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 57,
+                "line": 124,
                 "local": true,
                 "reference": "./state/actions/renderer_cache_actions.js",
                 "resolved_path": "app/js/core/state/actions/renderer_cache_actions.js"
@@ -50379,7 +50423,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 61,
+                "line": 128,
                 "local": true,
                 "reference": "./state/actions/renderer_diagnostics_actions.js",
                 "resolved_path": "app/js/core/state/actions/renderer_diagnostics_actions.js"
@@ -50387,7 +50431,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 68,
+                "line": 135,
                 "local": true,
                 "reference": "./color_manager.js",
                 "resolved_path": "app/js/core/color_manager.js"
@@ -50395,7 +50439,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 69,
+                "line": 136,
                 "local": true,
                 "reference": "./renderer/canvas_color_helpers.js",
                 "resolved_path": "app/js/core/renderer/canvas_color_helpers.js"
@@ -50403,7 +50447,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 75,
+                "line": 142,
                 "local": true,
                 "reference": "./feature_identity.js",
                 "resolved_path": "app/js/core/feature_identity.js"
@@ -50411,7 +50455,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 79,
+                "line": 146,
                 "local": true,
                 "reference": "./runtime_asset_registry.js",
                 "resolved_path": "app/js/core/runtime_asset_registry.js"
@@ -50419,7 +50463,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 80,
+                "line": 147,
                 "local": true,
                 "reference": "./political_raster_worker_client.js",
                 "resolved_path": "app/js/core/political_raster_worker_client.js"
@@ -50427,7 +50471,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 87,
+                "line": 154,
                 "local": true,
                 "reference": "./legend_manager.js",
                 "resolved_path": "app/js/core/legend_manager.js"
@@ -50435,7 +50479,15 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 88,
+                "line": 155,
+                "local": true,
+                "reference": "./renderer/transient_overlay_render_owner.js",
+                "resolved_path": "app/js/core/renderer/transient_overlay_render_owner.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 156,
                 "local": true,
                 "reference": "./renderer/selection_overlay_owner.js",
                 "resolved_path": "app/js/core/renderer/selection_overlay_owner.js"
@@ -50443,7 +50495,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 89,
+                "line": 157,
                 "local": true,
                 "reference": "./renderer/legend_control_owner.js",
                 "resolved_path": "app/js/core/renderer/legend_control_owner.js"
@@ -50451,7 +50503,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 90,
+                "line": 158,
                 "local": true,
                 "reference": "./history_manager.js",
                 "resolved_path": "app/js/core/history_manager.js"
@@ -50459,7 +50511,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 91,
+                "line": 159,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/core/i18n.js"
@@ -50467,7 +50519,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 98,
+                "line": 166,
                 "local": true,
                 "reference": "./dirty_state.js",
                 "resolved_path": "app/js/core/dirty_state.js"
@@ -50475,7 +50527,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 99,
+                "line": 167,
                 "local": true,
                 "reference": "./perf_probe.js",
                 "resolved_path": "app/js/core/perf_probe.js"
@@ -50483,7 +50535,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 100,
+                "line": 168,
                 "local": true,
                 "reference": "./scenario_country_display.js",
                 "resolved_path": "app/js/core/scenario_country_display.js"
@@ -50491,7 +50543,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 101,
+                "line": 169,
                 "local": true,
                 "reference": "./scenario/presentation_hint_helpers.js",
                 "resolved_path": "app/js/core/scenario/presentation_hint_helpers.js"
@@ -50499,7 +50551,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 105,
+                "line": 173,
                 "local": true,
                 "reference": "./sovereignty_manager.js",
                 "resolved_path": "app/js/core/sovereignty_manager.js"
@@ -50507,7 +50559,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 114,
+                "line": 182,
                 "local": true,
                 "reference": "./country_code_aliases.js",
                 "resolved_path": "app/js/core/country_code_aliases.js"
@@ -50515,7 +50567,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 115,
+                "line": 183,
                 "local": true,
                 "reference": "./country_feature_policies.js",
                 "resolved_path": "app/js/core/country_feature_policies.js"
@@ -50523,7 +50575,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 116,
+                "line": 184,
                 "local": true,
                 "reference": "./unit_counter_presets.js",
                 "resolved_path": "app/js/core/unit_counter_presets.js"
@@ -50531,7 +50583,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 124,
+                "line": 190,
                 "local": true,
                 "reference": "./frame_scheduler.js",
                 "resolved_path": "app/js/core/frame_scheduler.js"
@@ -50539,7 +50591,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 125,
+                "line": 191,
                 "local": true,
                 "reference": "./render_boundary.js",
                 "resolved_path": "app/js/core/render_boundary.js"
@@ -50547,7 +50599,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 126,
+                "line": 192,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -50555,7 +50607,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 127,
+                "line": 193,
                 "local": true,
                 "reference": "./interaction_funnel.js",
                 "resolved_path": "app/js/core/interaction_funnel.js"
@@ -50563,7 +50615,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 132,
+                "line": 198,
                 "local": true,
                 "reference": "./renderer/urban_city_policy.js",
                 "resolved_path": "app/js/core/renderer/urban_city_policy.js"
@@ -50571,7 +50623,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 133,
+                "line": 199,
                 "local": true,
                 "reference": "./renderer/city_label_owner.js",
                 "resolved_path": "app/js/core/renderer/city_label_owner.js"
@@ -50579,7 +50631,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 134,
+                "line": 200,
                 "local": true,
                 "reference": "./renderer/city_points_render_owner.js",
                 "resolved_path": "app/js/core/renderer/city_points_render_owner.js"
@@ -50587,7 +50639,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 135,
+                "line": 201,
                 "local": true,
                 "reference": "./renderer/strategic_resource_markers.js",
                 "resolved_path": "app/js/core/renderer/strategic_resource_markers.js"
@@ -50595,7 +50647,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 136,
+                "line": 202,
                 "local": true,
                 "reference": "./scenario/strategic_values.js",
                 "resolved_path": "app/js/core/scenario/strategic_values.js"
@@ -50603,7 +50655,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 137,
+                "line": 203,
                 "local": true,
                 "reference": "./renderer/color_resolution_strategy.js",
                 "resolved_path": "app/js/core/renderer/color_resolution_strategy.js"
@@ -50611,7 +50663,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 138,
+                "line": 204,
                 "local": true,
                 "reference": "./renderer/strategic_overlay_helpers.js",
                 "resolved_path": "app/js/core/renderer/strategic_overlay_helpers.js"
@@ -50619,7 +50671,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 139,
+                "line": 205,
                 "local": true,
                 "reference": "./renderer/strategic_overlay_render_owner.js",
                 "resolved_path": "app/js/core/renderer/strategic_overlay_render_owner.js"
@@ -50627,7 +50679,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 140,
+                "line": 206,
                 "local": true,
                 "reference": "./renderer/strategic_overlay_runtime_owner.js",
                 "resolved_path": "app/js/core/renderer/strategic_overlay_runtime_owner.js"
@@ -50635,7 +50687,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 141,
+                "line": 207,
                 "local": true,
                 "reference": "./renderer/political_collection_owner.js",
                 "resolved_path": "app/js/core/renderer/political_collection_owner.js"
@@ -50643,7 +50695,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 142,
+                "line": 208,
                 "local": true,
                 "reference": "./renderer/context_layer_resolver.js",
                 "resolved_path": "app/js/core/renderer/context_layer_resolver.js"
@@ -50651,7 +50703,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 143,
+                "line": 209,
                 "local": true,
                 "reference": "./renderer/asset_url_policy.js",
                 "resolved_path": "app/js/core/renderer/asset_url_policy.js"
@@ -50659,7 +50711,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 144,
+                "line": 210,
                 "local": true,
                 "reference": "./renderer/facility_surface.js",
                 "resolved_path": "app/js/core/renderer/facility_surface.js"
@@ -50667,7 +50719,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 148,
+                "line": 214,
                 "local": true,
                 "reference": "./renderer/river_layer_render_owner.js",
                 "resolved_path": "app/js/core/renderer/river_layer_render_owner.js"
@@ -50675,7 +50727,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 149,
+                "line": 215,
                 "local": true,
                 "reference": "./renderer/ocean_render_owner.js",
                 "resolved_path": "app/js/core/renderer/ocean_render_owner.js"
@@ -50683,7 +50735,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 150,
+                "line": 216,
                 "local": true,
                 "reference": "./renderer/physical_layer_render_owner.js",
                 "resolved_path": "app/js/core/renderer/physical_layer_render_owner.js"
@@ -50691,7 +50743,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 151,
+                "line": 217,
                 "local": true,
                 "reference": "./renderer/scenario_relief_overlay_render_owner.js",
                 "resolved_path": "app/js/core/renderer/scenario_relief_overlay_render_owner.js"
@@ -50699,7 +50751,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 152,
+                "line": 218,
                 "local": true,
                 "reference": "./renderer/city_lights_render_owner.js",
                 "resolved_path": "app/js/core/renderer/city_lights_render_owner.js"
@@ -50707,7 +50759,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 153,
+                "line": 219,
                 "local": true,
                 "reference": "./renderer/city_lights_asset_provider.js",
                 "resolved_path": "app/js/core/renderer/city_lights_asset_provider.js"
@@ -50715,7 +50767,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 154,
+                "line": 220,
                 "local": true,
                 "reference": "./renderer/transport_overview_render_owner.js",
                 "resolved_path": "app/js/core/renderer/transport_overview_render_owner.js"
@@ -50723,7 +50775,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 155,
+                "line": 221,
                 "local": true,
                 "reference": "./renderer/border_mesh_owner.js",
                 "resolved_path": "app/js/core/renderer/border_mesh_owner.js"
@@ -50731,7 +50783,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 156,
+                "line": 222,
                 "local": true,
                 "reference": "./renderer/polyline_simplification_helpers.js",
                 "resolved_path": "app/js/core/renderer/polyline_simplification_helpers.js"
@@ -50739,7 +50791,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 161,
+                "line": 227,
                 "local": true,
                 "reference": "./renderer/special_zone_layers_render_owner.js",
                 "resolved_path": "app/js/core/renderer/special_zone_layers_render_owner.js"
@@ -50747,7 +50799,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 162,
+                "line": 228,
                 "local": true,
                 "reference": "./special_zone_layers.js",
                 "resolved_path": "app/js/core/special_zone_layers.js"
@@ -50755,7 +50807,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 166,
+                "line": 232,
                 "local": true,
                 "reference": "./renderer/border_draw_owner.js",
                 "resolved_path": "app/js/core/renderer/border_draw_owner.js"
@@ -50763,7 +50815,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 167,
+                "line": 233,
                 "local": true,
                 "reference": "./renderer/interaction_border_snapshot_owner.js",
                 "resolved_path": "app/js/core/renderer/interaction_border_snapshot_owner.js"
@@ -50771,7 +50823,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 168,
+                "line": 234,
                 "local": true,
                 "reference": "./renderer/spatial_index_runtime_owner.js",
                 "resolved_path": "app/js/core/renderer/spatial_index_runtime_owner.js"
@@ -50779,7 +50831,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 169,
+                "line": 235,
                 "local": true,
                 "reference": "./renderer/spatial_index_runtime_builders.js",
                 "resolved_path": "app/js/core/renderer/spatial_index_runtime_builders.js"
@@ -50787,7 +50839,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 170,
+                "line": 236,
                 "local": true,
                 "reference": "./renderer/spatial_query_index.js",
                 "resolved_path": "app/js/core/renderer/spatial_query_index.js"
@@ -50795,7 +50847,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 174,
+                "line": 240,
                 "local": true,
                 "reference": "./map_renderer/hgo_runtime_preview_render_owner.js",
                 "resolved_path": "app/js/core/map_renderer/hgo_runtime_preview_render_owner.js"
@@ -50803,7 +50855,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 175,
+                "line": 241,
                 "local": true,
                 "reference": "./map_renderer/set_map_data_transaction_owner.js",
                 "resolved_path": "app/js/core/map_renderer/set_map_data_transaction_owner.js"
@@ -50811,7 +50863,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 176,
+                "line": 242,
                 "local": true,
                 "reference": "./map_renderer/render_request_boundary_owner.js",
                 "resolved_path": "app/js/core/map_renderer/render_request_boundary_owner.js"
@@ -50819,7 +50871,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 177,
+                "line": 243,
                 "local": true,
                 "reference": "./map_renderer/render_phase_lifecycle_owner.js",
                 "resolved_path": "app/js/core/map_renderer/render_phase_lifecycle_owner.js"
@@ -50827,7 +50879,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 178,
+                "line": 244,
                 "local": true,
                 "reference": "./map_renderer/render_pass_cache_host_owner.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_cache_host_owner.js"
@@ -50835,7 +50887,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 179,
+                "line": 245,
                 "local": true,
                 "reference": "./map_renderer/render_pass_commit_accounting_owner.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_commit_accounting_owner.js"
@@ -50843,7 +50895,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 180,
+                "line": 246,
                 "local": true,
                 "reference": "./map_renderer/draw_canvas_orchestration_owner.js",
                 "resolved_path": "app/js/core/map_renderer/draw_canvas_orchestration_owner.js"
@@ -50851,7 +50903,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 181,
+                "line": 247,
                 "local": true,
                 "reference": "./map_renderer/hit_canvas_scheduling_owner.js",
                 "resolved_path": "app/js/core/map_renderer/hit_canvas_scheduling_owner.js"
@@ -50859,7 +50911,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 182,
+                "line": 248,
                 "local": true,
                 "reference": "./map_renderer/map_hover_interaction_owner.js",
                 "resolved_path": "app/js/core/map_renderer/map_hover_interaction_owner.js"
@@ -50867,7 +50919,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 183,
+                "line": 249,
                 "local": true,
                 "reference": "./map_renderer/click_selection_transaction_owner.js",
                 "resolved_path": "app/js/core/map_renderer/click_selection_transaction_owner.js"
@@ -50875,7 +50927,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 187,
+                "line": 252,
                 "local": true,
                 "reference": "./map_renderer/renderer_transaction_reset_owner.js",
                 "resolved_path": "app/js/core/map_renderer/renderer_transaction_reset_owner.js"
@@ -50883,7 +50935,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 188,
+                "line": 253,
                 "local": true,
                 "reference": "./map_renderer/scenario_refresh_runtime.js",
                 "resolved_path": "app/js/core/map_renderer/scenario_refresh_runtime.js"
@@ -50891,7 +50943,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 189,
+                "line": 254,
                 "local": true,
                 "reference": "./map_renderer/exact_after_settle_scheduler.js",
                 "resolved_path": "app/js/core/map_renderer/exact_after_settle_scheduler.js"
@@ -50899,7 +50951,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 190,
+                "line": 255,
                 "local": true,
                 "reference": "./map_renderer/canvas_layer_manager.js",
                 "resolved_path": "app/js/core/map_renderer/canvas_layer_manager.js"
@@ -50907,7 +50959,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 198,
+                "line": 263,
                 "local": true,
                 "reference": "./map_renderer/political_raster_worker_packet.js",
                 "resolved_path": "app/js/core/map_renderer/political_raster_worker_packet.js"
@@ -50915,7 +50967,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 201,
+                "line": 266,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -50923,7 +50975,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 209,
+                "line": 274,
                 "local": true,
                 "reference": "./map_renderer/interaction_hit_candidates.js",
                 "resolved_path": "app/js/core/map_renderer/interaction_hit_candidates.js"
@@ -50931,7 +50983,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 217,
+                "line": 282,
                 "local": true,
                 "reference": "./renderer/render_pipeline_passes.js",
                 "resolved_path": "app/js/core/renderer/render_pipeline_passes.js"
@@ -50939,7 +50991,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 218,
+                "line": 283,
                 "local": true,
                 "reference": "./renderer/visual_effects_pass_owner.js",
                 "resolved_path": "app/js/core/renderer/visual_effects_pass_owner.js"
@@ -50947,7 +50999,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 219,
+                "line": 284,
                 "local": true,
                 "reference": "./renderer/day_night_runtime_owner.js",
                 "resolved_path": "app/js/core/renderer/day_night_runtime_owner.js"
@@ -50955,7 +51007,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 220,
+                "line": 285,
                 "local": true,
                 "reference": "./renderer/context_pass_orchestrator_owner.js",
                 "resolved_path": "app/js/core/renderer/context_pass_orchestrator_owner.js"
@@ -50963,7 +51015,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 221,
+                "line": 286,
                 "local": true,
                 "reference": "./renderer/political_pass_orchestrator_owner.js",
                 "resolved_path": "app/js/core/renderer/political_pass_orchestrator_owner.js"
@@ -50971,7 +51023,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 222,
+                "line": 287,
                 "local": true,
                 "reference": "./renderer/political_background_render_owner.js",
                 "resolved_path": "app/js/core/renderer/political_background_render_owner.js"
@@ -50979,7 +51031,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 223,
+                "line": 288,
                 "local": true,
                 "reference": "./renderer/political_partial_repaint_owner.js",
                 "resolved_path": "app/js/core/renderer/political_partial_repaint_owner.js"
@@ -50987,7 +51039,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 224,
+                "line": 289,
                 "local": true,
                 "reference": "./renderer/render_perf_metrics_runtime_owner.js",
                 "resolved_path": "app/js/core/renderer/render_perf_metrics_runtime_owner.js"
@@ -50995,7 +51047,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 225,
+                "line": 290,
                 "local": true,
                 "reference": "./renderer/render_cache_owner.js",
                 "resolved_path": "app/js/core/renderer/render_cache_owner.js"
@@ -51003,7 +51055,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 226,
+                "line": 291,
                 "local": true,
                 "reference": "./renderer/cached_pass_compositor_owner.js",
                 "resolved_path": "app/js/core/renderer/cached_pass_compositor_owner.js"
@@ -51011,7 +51063,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 227,
+                "line": 292,
                 "local": true,
                 "reference": "./map_renderer/transformed_frame_compositor_owner.js",
                 "resolved_path": "app/js/core/map_renderer/transformed_frame_compositor_owner.js"
@@ -51019,7 +51071,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 228,
+                "line": 293,
                 "local": true,
                 "reference": "./renderer/render_transform_reuse_policy_owner.js",
                 "resolved_path": "app/js/core/renderer/render_transform_reuse_policy_owner.js"
@@ -51027,7 +51079,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 229,
+                "line": 294,
                 "local": true,
                 "reference": "./renderer/projected_geometry_bounds_owner.js",
                 "resolved_path": "app/js/core/renderer/projected_geometry_bounds_owner.js"
@@ -51035,7 +51087,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 230,
+                "line": 295,
                 "local": true,
                 "reference": "./renderer/viewport_read_model_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_read_model_owner.js"
@@ -51043,7 +51095,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 231,
+                "line": 296,
                 "local": true,
                 "reference": "./renderer/render_snapshot.js",
                 "resolved_path": "app/js/core/renderer/render_snapshot.js"
@@ -51051,7 +51103,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 232,
+                "line": 297,
                 "local": true,
                 "reference": "./renderer/viewport_command_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_command_owner.js"
@@ -51059,7 +51111,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 233,
+                "line": 298,
                 "local": true,
                 "reference": "./renderer/renderer_viewport_update_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_viewport_update_owner.js"
@@ -51067,7 +51119,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 234,
+                "line": 299,
                 "local": true,
                 "reference": "./renderer/renderer_startup_transaction_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_startup_transaction_owner.js"
@@ -51075,7 +51127,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 235,
+                "line": 300,
                 "local": true,
                 "reference": "./renderer/viewport_resize_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_resize_lifecycle_owner.js"
@@ -51083,7 +51135,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 236,
+                "line": 301,
                 "local": true,
                 "reference": "./renderer/scenario_water_cache_policy_owner.js",
                 "resolved_path": "app/js/core/renderer/scenario_water_cache_policy_owner.js"
@@ -51091,7 +51143,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 237,
+                "line": 302,
                 "local": true,
                 "reference": "./renderer/zoom_interaction_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/zoom_interaction_lifecycle_owner.js"
@@ -51099,7 +51151,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 238,
+                "line": 303,
                 "local": true,
                 "reference": "./renderer/map_interaction_event_binding_owner.js",
                 "resolved_path": "app/js/core/renderer/map_interaction_event_binding_owner.js"
@@ -51107,7 +51159,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 239,
+                "line": 304,
                 "local": true,
                 "reference": "./renderer/renderer_surface_host.js",
                 "resolved_path": "app/js/core/renderer/renderer_surface_host.js"
@@ -51115,7 +51167,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 240,
+                "line": 305,
                 "local": true,
                 "reference": "./renderer/renderer_surface_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_surface_lifecycle_owner.js"
@@ -51123,7 +51175,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 241,
+                "line": 306,
                 "local": true,
                 "reference": "./renderer/renderer_projection_path_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_projection_path_owner.js"
@@ -51131,7 +51183,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 242,
+                "line": 307,
                 "local": true,
                 "reference": "./renderer/renderer_svg_surface_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_svg_surface_lifecycle_owner.js"
@@ -51139,7 +51191,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 243,
+                "line": 308,
                 "local": true,
                 "reference": "./renderer/renderer_fit_projection_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_fit_projection_owner.js"
@@ -51147,7 +51199,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 244,
+                "line": 309,
                 "local": true,
                 "reference": "./renderer/visible_frame_diagnostics_owner.js",
                 "resolved_path": "app/js/core/renderer/visible_frame_diagnostics_owner.js"
@@ -51155,7 +51207,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 245,
+                "line": 310,
                 "local": true,
                 "reference": "./renderer/render_transaction_diagnostics.js",
                 "resolved_path": "app/js/core/renderer/render_transaction_diagnostics.js"
@@ -51163,7 +51215,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 246,
+                "line": 311,
                 "local": true,
                 "reference": "./renderer/intensity_field_mask_owner.js",
                 "resolved_path": "app/js/core/renderer/intensity_field_mask_owner.js"
@@ -51171,7 +51223,7 @@
               {
                 "column": 1,
                 "kind": "export-named-source",
-                "line": 19129,
+                "line": 17916,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -51223,6 +51275,7 @@
             "app/js/core/renderer/city_lights_asset_provider.js",
             "app/js/core/renderer/city_lights_render_owner.js",
             "app/js/core/renderer/city_points_render_owner.js",
+            "app/js/core/renderer/city_reveal_policy.js",
             "app/js/core/renderer/color_resolution_strategy.js",
             "app/js/core/renderer/context_layer_resolver.js",
             "app/js/core/renderer/context_pass_orchestrator_owner.js",
@@ -51233,6 +51286,7 @@
             "app/js/core/renderer/legend_control_owner.js",
             "app/js/core/renderer/map_interaction_event_binding_owner.js",
             "app/js/core/renderer/ocean_render_owner.js",
+            "app/js/core/renderer/operation_graphic_geometry.js",
             "app/js/core/renderer/physical_layer_render_owner.js",
             "app/js/core/renderer/political_background_render_owner.js",
             "app/js/core/renderer/political_collection_owner.js",
@@ -51265,7 +51319,9 @@
             "app/js/core/renderer/strategic_overlay_render_owner.js",
             "app/js/core/renderer/strategic_overlay_runtime_owner.js",
             "app/js/core/renderer/strategic_resource_markers.js",
+            "app/js/core/renderer/transient_overlay_render_owner.js",
             "app/js/core/renderer/transport_overview_render_owner.js",
+            "app/js/core/renderer/unit_counter_display_model.js",
             "app/js/core/renderer/urban_city_policy.js",
             "app/js/core/renderer/viewport_command_owner.js",
             "app/js/core/renderer/viewport_read_model_owner.js",
@@ -52368,6 +52424,21 @@
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
           "load_phase": "initial",
+          "path": "app/js/core/renderer/city_reveal_policy.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
           "path": "app/js/core/renderer/color_resolution_strategy.js",
           "product_category": "startup-critical",
           "reference_locations": {
@@ -52550,6 +52621,21 @@
           "dynamic_imports": [],
           "load_phase": "initial",
           "path": "app/js/core/renderer/ocean_render_owner.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
+          "path": "app/js/core/renderer/operation_graphic_geometry.js",
           "product_category": "startup-critical",
           "reference_locations": {
             "dynamic_imports": [],
@@ -53385,6 +53471,21 @@
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
           "load_phase": "initial",
+          "path": "app/js/core/renderer/transient_overlay_render_owner.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
           "path": "app/js/core/renderer/transport_facility_display_policy.js",
           "product_category": "startup-critical",
           "reference_locations": {
@@ -53541,6 +53642,32 @@
           "source_bindings": [],
           "static_imports": [
             "app/js/core/color_manager.js"
+          ]
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
+          "path": "app/js/core/renderer/unit_counter_display_model.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": [
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 1,
+                "local": true,
+                "reference": "../unit_counter_presets.js",
+                "resolved_path": "app/js/core/unit_counter_presets.js"
+              }
+            ]
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": [
+            "app/js/core/unit_counter_presets.js"
           ]
         },
         {
@@ -54741,7 +54868,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 16,
+                "line": 11,
                 "local": true,
                 "reference": "./data_loader.js",
                 "resolved_path": "app/js/core/data_loader.js"
@@ -54749,7 +54876,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 20,
+                "line": 15,
                 "local": true,
                 "reference": "./scenario_chunk_manager.js",
                 "resolved_path": "app/js/core/scenario_chunk_manager.js"
@@ -54757,7 +54884,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 25,
+                "line": 20,
                 "local": true,
                 "reference": "./scenario_districts.js",
                 "resolved_path": "app/js/core/scenario_districts.js"
@@ -54765,7 +54892,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 29,
+                "line": 24,
                 "local": true,
                 "reference": "./palette_manager.js",
                 "resolved_path": "app/js/core/palette_manager.js"
@@ -54773,7 +54900,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 30,
+                "line": 25,
                 "local": true,
                 "reference": "./dirty_state.js",
                 "resolved_path": "app/js/core/dirty_state.js"
@@ -54781,7 +54908,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 31,
+                "line": 26,
                 "local": true,
                 "reference": "./releasable_manager.js",
                 "resolved_path": "app/js/core/releasable_manager.js"
@@ -54789,7 +54916,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 35,
+                "line": 30,
                 "local": true,
                 "reference": "./scenario_data_health.js",
                 "resolved_path": "app/js/core/scenario_data_health.js"
@@ -54797,7 +54924,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 43,
+                "line": 36,
                 "local": true,
                 "reference": "./scenario_post_apply_effects.js",
                 "resolved_path": "app/js/core/scenario_post_apply_effects.js"
@@ -54805,7 +54932,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 51,
+                "line": 44,
                 "local": true,
                 "reference": "./scenario_ui_sync.js",
                 "resolved_path": "app/js/core/scenario_ui_sync.js"
@@ -54813,7 +54940,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 55,
+                "line": 48,
                 "local": true,
                 "reference": "./scenario_localization_state.js",
                 "resolved_path": "app/js/core/scenario_localization_state.js"
@@ -54821,7 +54948,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 56,
+                "line": 49,
                 "local": true,
                 "reference": "./scenario_resources.js",
                 "resolved_path": "app/js/core/scenario_resources.js"
@@ -54829,7 +54956,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 80,
+                "line": 68,
                 "local": true,
                 "reference": "./scenario_recovery.js",
                 "resolved_path": "app/js/core/scenario_recovery.js"
@@ -54837,7 +54964,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 81,
+                "line": 69,
                 "local": true,
                 "reference": "./scenario_rollback.js",
                 "resolved_path": "app/js/core/scenario_rollback.js"
@@ -54845,7 +54972,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 82,
+                "line": 70,
                 "local": true,
                 "reference": "./scenario/pure_helpers.js",
                 "resolved_path": "app/js/core/scenario/pure_helpers.js"
@@ -54853,7 +54980,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 86,
+                "line": 74,
                 "local": true,
                 "reference": "./scenario/presentation_runtime.js",
                 "resolved_path": "app/js/core/scenario/presentation_runtime.js"
@@ -54861,7 +54988,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 89,
+                "line": 77,
                 "local": true,
                 "reference": "./scenario/lifecycle_runtime.js",
                 "resolved_path": "app/js/core/scenario/lifecycle_runtime.js"
@@ -54869,7 +54996,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 92,
+                "line": 80,
                 "local": true,
                 "reference": "./scenario_apply_pipeline.js",
                 "resolved_path": "app/js/core/scenario_apply_pipeline.js"
@@ -54877,7 +55004,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 95,
+                "line": 83,
                 "local": true,
                 "reference": "./renderer/render_transaction_diagnostics.js",
                 "resolved_path": "app/js/core/renderer/render_transaction_diagnostics.js"
@@ -54885,7 +55012,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 101,
+                "line": 89,
                 "local": true,
                 "reference": "./scenario/shared.js",
                 "resolved_path": "app/js/core/scenario/shared.js"
@@ -54893,7 +55020,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 111,
+                "line": 96,
                 "local": true,
                 "reference": "./scenario/bundle_loader.js",
                 "resolved_path": "app/js/core/scenario/bundle_loader.js"
@@ -54901,7 +55028,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 125,
+                "line": 108,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/core/i18n.js"
@@ -54909,7 +55036,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 126,
+                "line": 109,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -55208,7 +55335,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 2,
+                "line": 4,
                 "local": true,
                 "reference": "./state/actions/scenario_chunk_runtime_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js"
@@ -55216,7 +55343,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 5,
+                "line": 7,
                 "local": true,
                 "reference": "./state/actions/scenario_activation_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_activation_actions.js"
@@ -55224,7 +55351,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 6,
+                "line": 8,
                 "local": true,
                 "reference": "./state/actions/special_zone_actions.js",
                 "resolved_path": "app/js/core/state/actions/special_zone_actions.js"
@@ -55232,7 +55359,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 7,
+                "line": 9,
                 "local": true,
                 "reference": "./sovereignty_manager.js",
                 "resolved_path": "app/js/core/sovereignty_manager.js"
@@ -55240,7 +55367,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 8,
+                "line": 10,
                 "local": true,
                 "reference": "./state.js",
                 "resolved_path": "app/js/core/state.js"
@@ -55248,7 +55375,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 9,
+                "line": 11,
                 "local": true,
                 "reference": "./scenario/scenario_renderer_bridge.js",
                 "resolved_path": "app/js/core/scenario/scenario_renderer_bridge.js"
@@ -55256,7 +55383,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 20,
+                "line": 19,
                 "local": true,
                 "reference": "./data_loader.js",
                 "resolved_path": "app/js/core/data_loader.js"
@@ -55264,7 +55391,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 28,
+                "line": 26,
                 "local": true,
                 "reference": "./startup_cache.js",
                 "resolved_path": "app/js/core/startup_cache.js"
@@ -55272,7 +55399,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 38,
+                "line": 36,
                 "local": true,
                 "reference": "./scenario_chunk_manager.js",
                 "resolved_path": "app/js/core/scenario_chunk_manager.js"
@@ -55280,7 +55407,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 46,
+                "line": 44,
                 "local": true,
                 "reference": "./scenario_districts.js",
                 "resolved_path": "app/js/core/scenario_districts.js"
@@ -55288,7 +55415,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 50,
+                "line": 48,
                 "local": true,
                 "reference": "./special_zone_layers.js",
                 "resolved_path": "app/js/core/special_zone_layers.js"
@@ -55296,7 +55423,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 55,
+                "line": 53,
                 "local": true,
                 "reference": "./country_code_aliases.js",
                 "resolved_path": "app/js/core/country_code_aliases.js"
@@ -55304,7 +55431,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 56,
+                "line": 54,
                 "local": true,
                 "reference": "./render_boundary.js",
                 "resolved_path": "app/js/core/render_boundary.js"
@@ -55336,7 +55463,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 65,
+                "line": 64,
                 "local": true,
                 "reference": "./scenario_recovery.js",
                 "resolved_path": "app/js/core/scenario_recovery.js"
@@ -55344,7 +55471,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 68,
+                "line": 67,
                 "local": true,
                 "reference": "./scenario/pure_helpers.js",
                 "resolved_path": "app/js/core/scenario/pure_helpers.js"
@@ -55352,7 +55479,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 72,
+                "line": 73,
                 "local": true,
                 "reference": "./scenario/shared.js",
                 "resolved_path": "app/js/core/scenario/shared.js"
@@ -55360,7 +55487,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 90,
+                "line": 87,
                 "local": true,
                 "reference": "./scenario/chunk_runtime.js",
                 "resolved_path": "app/js/core/scenario/chunk_runtime.js"
@@ -55368,7 +55495,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 93,
+                "line": 90,
                 "local": true,
                 "reference": "./scenario/bundle_runtime.js",
                 "resolved_path": "app/js/core/scenario/bundle_runtime.js"
@@ -55376,7 +55503,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 96,
+                "line": 93,
                 "local": true,
                 "reference": "./scenario/presentation_hint_helpers.js",
                 "resolved_path": "app/js/core/scenario/presentation_hint_helpers.js"
@@ -55384,7 +55511,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 99,
+                "line": 96,
                 "local": true,
                 "reference": "./scenario/startup_hydration.js",
                 "resolved_path": "app/js/core/scenario/startup_hydration.js"
@@ -55392,7 +55519,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 102,
+                "line": 99,
                 "local": true,
                 "reference": "./scenario/bundle_loader.js",
                 "resolved_path": "app/js/core/scenario/bundle_loader.js"
@@ -55400,7 +55527,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 134,
+                "line": 130,
                 "local": true,
                 "reference": "./scenario/strategic_values.js",
                 "resolved_path": "app/js/core/scenario/strategic_values.js"
@@ -55408,7 +55535,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 137,
+                "line": 133,
                 "local": true,
                 "reference": "./renderer/render_transaction_diagnostics.js",
                 "resolved_path": "app/js/core/renderer/render_transaction_diagnostics.js"
@@ -55416,7 +55543,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 141,
+                "line": 137,
                 "local": true,
                 "reference": "./scenario_recovery.js",
                 "resolved_path": "app/js/core/scenario_recovery.js"
@@ -55424,7 +55551,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 142,
+                "line": 138,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/core/i18n.js"
@@ -55432,7 +55559,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 143,
+                "line": 139,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -62989,21 +63116,21 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3076892,
+        "deferred_graph_bytes": 3075776,
         "deferred_graph_file_count": 124,
         "deferred_module_count": 123,
         "deferred_resource_count": 1,
-        "initial_graph_bytes": 5333938,
-        "initial_graph_file_count": 246,
-        "initial_module_count": 232,
+        "initial_graph_bytes": 5328722,
+        "initial_graph_file_count": 250,
+        "initial_module_count": 236,
         "initial_resource_count": 14,
-        "initial_script_bytes": 3975612,
-        "initial_script_count": 234,
-        "module_count": 362,
+        "initial_script_bytes": 3970396,
+        "initial_script_count": 238,
+        "module_count": 366,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 949029804,
+        "untraversed_dist_bytes": 949034844,
         "untraversed_dist_file_count": 9151,
         "untraversed_module_count": 7
       },
@@ -63053,7 +63180,7 @@
       {
         "basis": "startup-module-graph",
         "category": "startup-critical",
-        "file_count": 186,
+        "file_count": 190,
         "owner": "editor-startup",
         "path_exceptions": [
           {
@@ -63178,7 +63305,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 740659
+            "size_bytes": 693616
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -63341,6 +63468,10 @@
             "size_bytes": 17844
           },
           {
+            "path": "app/js/core/renderer/city_reveal_policy.js",
+            "size_bytes": 21427
+          },
+          {
             "path": "app/js/core/renderer/color_resolution_strategy.js",
             "size_bytes": 3756
           },
@@ -63383,6 +63514,10 @@
           {
             "path": "app/js/core/renderer/ocean_render_owner.js",
             "size_bytes": 12744
+          },
+          {
+            "path": "app/js/core/renderer/operation_graphic_geometry.js",
+            "size_bytes": 8254
           },
           {
             "path": "app/js/core/renderer/physical_layer_render_owner.js",
@@ -63521,6 +63656,10 @@
             "size_bytes": 4453
           },
           {
+            "path": "app/js/core/renderer/transient_overlay_render_owner.js",
+            "size_bytes": 6761
+          },
+          {
             "path": "app/js/core/renderer/transport_facility_display_policy.js",
             "size_bytes": 7981
           },
@@ -63539,6 +63678,10 @@
           {
             "path": "app/js/core/renderer/transport_overview_style_policy.js",
             "size_bytes": 4924
+          },
+          {
+            "path": "app/js/core/renderer/unit_counter_display_model.js",
+            "size_bytes": 10576
           },
           {
             "path": "app/js/core/renderer/urban_city_policy.js",
@@ -63782,7 +63925,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 2922326
+        "size_bytes": 2922301
       },
       {
         "basis": "startup-resource-graph",
@@ -64639,11 +64782,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2114003
+            "size_bytes": 2119043
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2114003
+        "size_bytes": 2119043
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -64838,7 +64981,7 @@
           },
           {
             "path": "app/js/core/scenario_manager.js",
-            "size_bytes": 56674
+            "size_bytes": 55558
           },
           {
             "path": "app/js/core/scenario_ownership_editor.js",
@@ -64854,7 +64997,7 @@
           },
           {
             "path": "app/js/core/scenario_resources.js",
-            "size_bytes": 52556
+            "size_bytes": 47470
           },
           {
             "path": "app/js/core/scenario_rollback.js",
@@ -64910,7 +65053,7 @@
           },
           {
             "path": "app/js/core/state/scenario_runtime_state.js",
-            "size_bytes": 14140
+            "size_bytes": 13846
           },
           {
             "path": "app/js/ui/scenario_controls.js",
@@ -64933,10 +65076,10 @@
           {
             "file_count": 14,
             "prefix": "app/js/core/scenario/",
-            "size_bytes": 321546
+            "size_bytes": 321735
           }
         ],
-        "size_bytes": 974476
+        "size_bytes": 968169
       },
       {
         "basis": "product-registry:scenario-runtime-data",
@@ -65026,7 +65169,7 @@
       }
     ],
     "product_inventory": {
-      "classified_file_count": 9534,
+      "classified_file_count": 9538,
       "exact_exclusions": [],
       "publication_ownership_status": "complete",
       "registry_rules": [
@@ -65143,7 +65286,7 @@
             "prefixes": []
           },
           "owner": "scenario-runtime",
-          "size_bytes": 974476
+          "size_bytes": 968169
         },
         {
           "category": "scenario-specific",
@@ -65396,11 +65539,11 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2114003
+          "size_bytes": 2119043
         }
       ],
       "status": "complete",
-      "total_file_count": 9534,
+      "total_file_count": 9538,
       "unknown_file_count": 0,
       "unknown_paths": []
     },
@@ -65409,8 +65552,8 @@
       "graph_scan_status": "complete",
       "registry_resolved_dynamic_expression_count": 2,
       "status": "complete",
-      "total_file_count": 9534,
-      "traversed_file_count": 383,
+      "total_file_count": 9538,
+      "traversed_file_count": 387,
       "unresolved_dynamic_expression_count": 0,
       "unresolved_reference_count": 0,
       "untraversed_file_count": 9151,
@@ -65437,9 +65580,9 @@
   },
   "top_level_directories": [
     {
-      "file_count": 9472,
+      "file_count": 9476,
       "path": "app",
-      "size_bytes": 951317423
+      "size_bytes": 951311091
     },
     {
       "file_count": 57,
@@ -65449,7 +65592,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2114003
+      "size_bytes": 2119043
     },
     {
       "file_count": 1,
@@ -65472,5 +65615,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 958222039
+  "total_bytes": 958220747
 }

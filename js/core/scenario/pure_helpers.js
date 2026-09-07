@@ -14,6 +14,31 @@ const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const EMPTY_FROZEN_LIST = Object.freeze([]);
 const hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology = new WeakMap();
 
+function normalizeScenarioFeatureCollection(payload) {
+  return Array.isArray(payload?.features)
+    ? { type: "FeatureCollection", features: payload.features }
+    : null;
+}
+
+function getScenarioFeatureCollectionIdentityList(payload) {
+  const features = Array.isArray(payload?.features) ? payload.features : EMPTY_FROZEN_LIST;
+  return features
+    .map((feature) => String(feature?.id || feature?.properties?.id || "").trim())
+    .filter(Boolean);
+}
+
+function areScenarioFeatureCollectionsEquivalent(leftPayload, rightPayload) {
+  const left = Array.isArray(leftPayload?.features) ? leftPayload.features : EMPTY_FROZEN_LIST;
+  const right = Array.isArray(rightPayload?.features) ? rightPayload.features : EMPTY_FROZEN_LIST;
+  if (left.length !== right.length) return false;
+  // A same-ID replacement can contain new geometry or properties. Only identical,
+  // ordered feature references permit hydration to skip the payload update.
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) return false;
+  }
+  return true;
+}
+
 function isHoi4FarEastSovietBackfillLandCandidate(geometry, featureId = "") {
   if (geometry?.properties?.render_as_base_geography === true) {
     return false;
@@ -102,6 +127,9 @@ function recordScenarioPerfMetric(state, name, durationMs, details = {}) {
 
 export {
   SCENARIO_RENDER_PROFILES,
+  normalizeScenarioFeatureCollection,
+  getScenarioFeatureCollectionIdentityList,
+  areScenarioFeatureCollectionsEquivalent,
   buildHoi4FarEastSovietOwnerBackfill,
   getHoi4FarEastSovietRuntimeCandidateFeatureIds,
   isHoi4FarEastSovietBackfillLandCandidate,

@@ -1,60 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import * as pureHelpers from "../js/core/scenario/pure_helpers.js";
 
-const pureHelpersPath = new URL("../js/core/scenario/pure_helpers.js", import.meta.url);
-const pureHelpersSource = await readFile(pureHelpersPath, "utf8");
-const inlinedSource = pureHelpersSource
-  .replace(
-    /import\s*\{[\s\S]*?\}\s*from\s*"\.\.\/scenario_runtime_queries\.js";/,
-    `const getRuntimeGeometryFeatureId = (geometry) => String(geometry?.properties?.id || geometry?.id || "").trim();
-const getScenarioRuntimeGeometryCountryCode = (geometry) => String(geometry?.properties?.cntr_code || "").trim().toUpperCase();
-const hasExplicitScenarioAssignment = (featureMap, featureId) => !!(featureMap && Object.prototype.hasOwnProperty.call(featureMap, featureId));
-const WATER_LIKE_TOKEN_PATTERN = /(^|[_-])(water|marine|ocean|sea|gulf|bay|lake|river|strait|chokepoint)([_-]|$)/i;
-const isScenarioWaterLikeFeature = (feature, featureId = "") => {
-  const props = feature?.properties || {};
-  if (String(props.water_type || "").trim()) return true;
-  if (WATER_LIKE_TOKEN_PATTERN.test(String(props.region_group || "").trim())) return true;
-  if (WATER_LIKE_TOKEN_PATTERN.test(String(props.geometry_role || "").trim())) return true;
-  if (props.render_as_base_geography === true) {
-    const identity = [
-      featureId,
-      String(props.id || feature?.id || ""),
-      props.__source,
-      props.source_layer,
-      props.layer,
-      props.feature_class,
-      props.kind,
-    ].map((value) => String(value || "").trim()).filter(Boolean).join(" ");
-    return WATER_LIKE_TOKEN_PATTERN.test(identity);
+test("scenario collections preserve feature identity and normalize missing payloads", () => {
+  const features = [{ id: " first " }, { properties: { id: "second" } }, null, {}];
+  const normalized = pureHelpers.normalizeScenarioFeatureCollection({ features, extra: true });
+  assert.deepEqual(normalized, { type: "FeatureCollection", features });
+  assert.equal(normalized.features, features);
+  assert.deepEqual(pureHelpers.getScenarioFeatureCollectionIdentityList(normalized), ["first", "second"]);
+  for (const invalid of [null, undefined, {}, { features: {} }]) {
+    assert.equal(pureHelpers.normalizeScenarioFeatureCollection(invalid), null);
+    assert.deepEqual(pureHelpers.getScenarioFeatureCollectionIdentityList(invalid), []);
+    assert.equal(pureHelpers.areScenarioFeatureCollectionsEquivalent(invalid, { features: [] }), true);
   }
-  return false;
-};
-const shouldApplyHoi4FarEastSovietBackfill = (scenarioId) => {
-  const normalizedId = String(scenarioId || "").trim();
-  return normalizedId === "hoi4_1936" || normalizedId === "hoi4_1939";
-};`,
-  )
-  .replace(
-    /import\s*\{\s*recordScenarioPerfMetricState,\s*\}\s*from\s*"\.\.\/state\/scenario_runtime_state\.js";/,
-    `const recordScenarioPerfMetricState = (state, name, durationMs, details = {}) => {
-  if (!state.scenarioPerfMetrics || typeof state.scenarioPerfMetrics !== "object") {
-    Reflect.set(state, "scenarioPerfMetrics", {});
+});
+
+test("scenario collection equivalence detects replacements and ordering without reading feature IDs", () => {
+  const first = { id: "same", properties: { version: 1 } };
+  const second = { id: "second" };
+  const original = { features: [first, second] };
+  const replacement = { id: "same", properties: { version: 2 } };
+  assert.equal(pureHelpers.areScenarioFeatureCollectionsEquivalent(original, { features: [first, second] }), true);
+  for (const features of [[replacement, second], [second, first], [first], [first, second, second]]) {
+    assert.equal(pureHelpers.areScenarioFeatureCollectionsEquivalent(original, { features }), false);
   }
-  const metrics = state.scenarioPerfMetrics;
-  const normalizedName = String(name || "").trim();
-  if (!normalizedName) return null;
-  const nextEntry = {
-    durationMs: Math.max(0, Number(durationMs) || 0),
-    recordedAt: Date.now(),
-    ...(details && typeof details === "object" ? details : {}),
-  };
-  metrics[normalizedName] = nextEntry;
-  globalThis.__scenarioPerfMetrics = metrics;
-  return nextEntry;
-};`,
-  );
-const pureHelpers = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(inlinedSource)}`);
+  const unreadId = { get id() { throw new Error("equivalence must not build ID lists"); } };
+  assert.equal(pureHelpers.areScenarioFeatureCollectionsEquivalent({ features: [unreadId] }, { features: [unreadId] }), true);
+  assert.equal(pureHelpers.areScenarioFeatureCollectionsEquivalent({ features: new Array(1) }, { features: [first] }), false);
+});
 
 test("getHoi4FarEastSovietRuntimeCandidateFeatureIds uses topology identity cache on repeated calls", () => {
   const topology = {

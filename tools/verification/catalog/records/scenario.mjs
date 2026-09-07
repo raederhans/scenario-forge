@@ -701,6 +701,12 @@ export const SCENARIO_RECORDS = [
     "id": "node:test:node:renderer-splits",
     "commandRef": "test:node:renderer-splits",
     "sourceRefs": [
+      "js/core/renderer/transient_overlay_render_owner.js",
+      "tests/transient_overlay_render_owner_behavior.test.mjs",
+      "js/core/renderer/unit_counter_display_model.js",
+      "js/core/renderer/operation_graphic_geometry.js",
+      "tests/unit_counter_display_model_behavior.test.mjs",
+      "tests/operation_graphic_geometry_behavior.test.mjs",
       "js/core/state/actions/special_zone_actions.js",
       "tests/strategic_overlay_runtime_owner_behavior.test.mjs",
       "tests/strategic_overlay_render_owner_behavior.test.mjs",

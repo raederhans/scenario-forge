@@ -84,6 +84,11 @@ export function createDefaultScenarioDataHealth(minRatio = 0.7) {
   };
 }
 
+function finiteNumberOr(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
 export function normalizeScenarioDataHealthState(nextState = {}, fallbackMinRatio = 0.7) {
   const health = {
     ...createDefaultScenarioDataHealth(fallbackMinRatio),
@@ -95,7 +100,7 @@ export function normalizeScenarioDataHealthState(nextState = {}, fallbackMinRati
   };
   health.expectedFeatureCount = Number(health.expectedFeatureCount) || 0;
   health.runtimeFeatureCount = Number(health.runtimeFeatureCount) || 0;
-  health.ratio = Number.isFinite(Number(health.ratio)) ? Number(health.ratio) : 1;
+  health.ratio = finiteNumberOr(health.ratio, 1);
   health.minRatio = Number(health.minRatio) || Number(fallbackMinRatio) || 0.7;
   health.generatedColorTags = Array.isArray(health.generatedColorTags)
     ? [...health.generatedColorTags]
@@ -270,18 +275,9 @@ export function normalizeScenarioHydrationHealthGateState(nextState = {}) {
   gateState.reason = String(gateState.reason || "");
   gateState.checkedAt = Number(gateState.checkedAt) || Date.now();
   gateState.attemptedRetry = !!gateState.attemptedRetry;
-  gateState.ownerFeatureOverlapRatio = Number(gateState.ownerFeatureOverlapRatio);
-  gateState.ownerFeatureOverlapRatio = Number.isFinite(gateState.ownerFeatureOverlapRatio)
-    ? gateState.ownerFeatureOverlapRatio
-    : 1;
-  gateState.ownerFeatureOverlapCount = Number(gateState.ownerFeatureOverlapCount);
-  gateState.ownerFeatureOverlapCount = Number.isFinite(gateState.ownerFeatureOverlapCount)
-    ? gateState.ownerFeatureOverlapCount
-    : 0;
-  gateState.ownerFeatureRenderedCount = Number(gateState.ownerFeatureRenderedCount);
-  gateState.ownerFeatureRenderedCount = Number.isFinite(gateState.ownerFeatureRenderedCount)
-    ? gateState.ownerFeatureRenderedCount
-    : 0;
+  gateState.ownerFeatureOverlapRatio = finiteNumberOr(gateState.ownerFeatureOverlapRatio, 1);
+  gateState.ownerFeatureOverlapCount = finiteNumberOr(gateState.ownerFeatureOverlapCount, 0);
+  gateState.ownerFeatureRenderedCount = finiteNumberOr(gateState.ownerFeatureRenderedCount, 0);
   gateState.degradedWaterOverlay = !!gateState.degradedWaterOverlay;
   return gateState;
 }

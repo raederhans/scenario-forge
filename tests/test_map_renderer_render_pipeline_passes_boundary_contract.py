@@ -299,10 +299,8 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             "\nfunction drawScenarioSpecialRegionOverlaysLayer",
             1,
         )[0]
-        hover_overlay_body = renderer_content.split("function renderHoverOverlay() {", 1)[1].split(
-            "\nfunction renderInspectorHighlightOverlay",
-            1,
-        )[0]
+        hover_overlay_body = (MAP_RENDERER_JS.parent / "renderer" / "transient_overlay_render_owner.js").read_text(encoding="utf-8")
+        self.assertIn("getTransientOverlayRenderOwner().renderHoverOverlay()", renderer_content)
 
         self.assertIn('`water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`', water_token_body)
         self.assertIn('String(runtimeState.selectedWaterRegionId || "").trim()', water_highlight_body)

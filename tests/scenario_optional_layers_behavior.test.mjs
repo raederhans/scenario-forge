@@ -8,6 +8,72 @@ import {
 } from "../js/core/scenario_resources.js";
 import { createScenarioBundleAssembler } from "../js/core/scenario/bundle_loader.js";
 import { createLayerFromPreset } from "../js/core/special_zone_layers.js";
+import {
+  loadScenarioJsonWithTimeout,
+  loadScenarioJsonResourceWithTimeout,
+  loadMeasuredRequiredScenarioResource,
+  loadOptionalScenarioResource,
+} from "../js/core/scenario/shared.js";
+
+for (const [name, load, select] of [
+  ["payload", loadScenarioJsonWithTimeout, (result) => result.payload],
+  ["measured", loadScenarioJsonResourceWithTimeout, (result) => result],
+]) {
+  test(`scenario ${name} loading preserves results and releases its timeout`, async (t) => {
+    const timer = {};
+    t.mock.method(globalThis, "setTimeout", (_callback, delay) => {
+      assert.equal(delay, 60_000);
+      return timer;
+    });
+    const clear = t.mock.method(globalThis, "clearTimeout", (id) => assert.equal(id, timer));
+    const result = { payload: { owners: {} }, metrics: { durationMs: 12 } };
+    const client = {};
+    const loader = async (url, options) => {
+      assert.equal(url, "owners.json");
+      assert.deepEqual(options, { d3Client: client, label: "scenario:owners" });
+      return result;
+    };
+    assert.equal(await load(loader, client, "owners.json", { resourceLabel: "owners" }), select(result));
+    assert.equal(clear.mock.callCount(), 1);
+  });
+
+  test(`scenario ${name} loading propagates rejection and timeout with cleanup`, async (t) => {
+    let expire;
+    t.mock.method(globalThis, "setTimeout", (callback) => { expire = callback; return 1; });
+    const clear = t.mock.method(globalThis, "clearTimeout", () => {});
+    const failure = new Error("network failed");
+    await assert.rejects(load(async () => { throw failure; }, {}, "owners.json"), (error) => error === failure);
+    const pending = load(() => new Promise(() => {}), {}, "owners.json", {
+      scenarioId: "test", resourceLabel: "owners",
+    });
+    const rejected = assert.rejects(pending, /Timed out loading "owners" for "test" after 60000ms/);
+    expire();
+    await rejected;
+    assert.equal(clear.mock.callCount(), 2);
+  });
+}
+
+test("required scenario resources validate payloads while optional resources retain failure results", async (t) => {
+  const options = { scenarioId: "test", resourceLabel: "owners", requiredField: "owners" };
+  const payload = { owners: {} };
+  const metrics = { durationMs: 12 };
+  const loader = t.mock.fn(async () => ({ payload, metrics }));
+  assert.deepEqual(await loadMeasuredRequiredScenarioResource(loader, {}, "owners.json", options), { payload, metrics });
+  await assert.rejects(loadMeasuredRequiredScenarioResource(loader, {}, "", options), /Required resource "owners" is missing/);
+  assert.equal(loader.mock.callCount(), 1);
+  for (const invalid of [null, "invalid", {}]) {
+    await assert.rejects(
+      loadMeasuredRequiredScenarioResource(async () => ({ payload: invalid }), {}, "owners.json", options),
+      /invalid payload|missing "owners"/,
+    );
+  }
+  const missing = await loadOptionalScenarioResource(loader, {}, "", options);
+  assert.equal(missing.reason, "missing_url");
+  assert.equal(loader.mock.callCount(), 1);
+  t.mock.method(console, "warn", () => {});
+  const failed = await loadOptionalScenarioResource(async () => { throw new Error("offline"); }, {}, "owners.json", options);
+  assert.deepEqual(failed, { ok: false, value: null, metrics: null, reason: "load_error", errorMessage: "offline" });
+});
 
 test("visibility sync skips stale optional layer writes after scenario apply request changes", async () => {
   const previousActiveScenarioId = state.activeScenarioId;
