@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_PATH = ROOT / "js/core/map_renderer.js"
+STATIC_BORDER_MESH_LIFECYCLE_PATH = ROOT / "js/core/renderer/static_border_mesh_lifecycle.js"
 DRAW_CANVAS_ORCHESTRATION_OWNER_PATH = ROOT / "js/core/map_renderer/draw_canvas_orchestration_owner.js"
 SCENARIO_REFRESH_RUNTIME_PATH = ROOT / "js/core/map_renderer/scenario_refresh_runtime.js"
 SCENARIO_REFRESH_PLANS_PATH = ROOT / "js/core/map_renderer/scenario_refresh_plans.js"
@@ -30,6 +31,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.map_renderer_source = MAP_RENDERER_PATH.read_text(encoding="utf-8")
+        cls.static_border_mesh_lifecycle_source = STATIC_BORDER_MESH_LIFECYCLE_PATH.read_text(encoding="utf-8")
         cls.draw_canvas_orchestration_owner_source = DRAW_CANVAS_ORCHESTRATION_OWNER_PATH.read_text(encoding="utf-8")
         cls.scenario_refresh_runtime_source = SCENARIO_REFRESH_RUNTIME_PATH.read_text(encoding="utf-8")
         cls.scenario_refresh_plans_source = SCENARIO_REFRESH_PLANS_PATH.read_text(encoding="utf-8")
@@ -257,7 +259,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             re.compile(r'const taskKey = "secondary-spatial-index";.*?recordInteractionRecoveryTaskMetric\(taskKey,', re.S),
         )
         self.assertRegex(
-            self.map_renderer_source,
+            self.static_border_mesh_lifecycle_source,
             re.compile(r'const taskKey = "deferred-heavy-border-meshes";.*?recordInteractionRecoveryTaskMetric\(taskKey,', re.S),
         )
         self.assertRegex(

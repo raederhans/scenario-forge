@@ -29,6 +29,10 @@ const scenarioRegionOverlayOwnerSource = readRepoFile("js", "core", "renderer", 
 
 const politicalFeaturePolicySource = readRepoFile("js", "core", "renderer", "political_feature_policy.js").replace(/^  /gm, "");
 
+const staticBorderMeshLifecycleSource = readRepoFile("js", "core", "renderer", "static_border_mesh_lifecycle.js");
+
+const brushInteractionSessionOwnerSource = readRepoFile("js", "core", "renderer", "brush_interaction_session_owner.js");
+
 const defaultRegister = (_order, ...args) => test(...args);
 
 export function registerScenarioChunkContractHeavyTests(register = defaultRegister) {
@@ -394,7 +398,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function recordInteractionRecoveryTaskMetric\(taskKey, durationMs, details = \{\}, \{ benchmarkInteraction = true \} = \{\}\) \{[\s\S]*?taskMetricName = benchmarkInteraction \? "interactionRecoveryTaskMs"[\s\S]*?windowMetricName = benchmarkInteraction \? "interactionRecoveryWindowMs"/.test(rendererSource)
         && /const taskKey = "scenario-chunk-promotion-infra";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(scenarioRefreshRuntimeSource)
         && /const taskKey = "secondary-spatial-index";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource)
-        && /const taskKey = "deferred-heavy-border-meshes";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource),
+        && /const taskKey = "deferred-heavy-border-meshes";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(staticBorderMeshLifecycleSource),
       hoverStrictHitUsesFirstContainingFastPath:
         /function findFirstContainingCandidate\([\s\S]*?eventType = "hover",[\s\S]*?targetType = "unknown",[\s\S]*?fastPath: "hover-first-containing"/.test(interactionHitCandidateSource)
         && /function findFirstContainingCandidate\(candidates, lonLat,[\s\S]*?findFirstContainingHitCandidate\(candidates, lonLat,[\s\S]*?recordInteractionDurationMetric,/.test(rendererSource)
@@ -485,7 +489,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner");')
         && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-reset-baseline");')
         && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner-controller");')
-        && /function handleBrushPointerMove[\s\S]*?requestInteractionRender\("brush-preview"\);/.test(rendererSource)
+        && /function handleBrushPointerMove[\s\S]*?requestInteractionRender\("brush-preview"\);/.test(brushInteractionSessionOwnerSource)
         && /function addFeatureToDevSelection[\s\S]*?requestInteractionRender\("dev-selection-add"\);/.test(rendererSource)
         && /function toggleFeatureInDevSelection[\s\S]*?requestInteractionRender\("dev-selection-toggle"\);/.test(rendererSource)
         && /function setDevSelectionDirty\(\)[\s\S]*?runtimeState\.refreshCountryListRowsFn\(\{[\s\S]*?refreshInspector: true,[\s\S]*?refreshPresetTree: true,[\s\S]*?\}\);/.test(rendererSource)
@@ -1081,7 +1085,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function getScenarioSurfaceVersionParts\(waterFeatureCount = null, atlantropaCounts = null\) \{[\s\S]*?const atlantropaRevisionToken = String\(getScenarioAtlantropaRevisionToken\(atlantropaCounts\)\);[\s\S]*?return \{ signal: signal\.join\("\|"\), atlantropaRevisionToken \};/.test(rendererSource)
         && /function getScenarioWaterVisualRevisionToken\(\) \{[\s\S]*?const \{ signal, atlantropaRevisionToken \} = getScenarioSurfaceVersionParts\(\s*effectiveWaterFeatureCount, atlantropaCounts\s*\);\s*return \[\s*signal,/.test(rendererSource)
         && /function getPhysicalLandClipCacheKey\(maskInfo\) \{[\s\S]*?scenario-surface:\$\{getScenarioSurfaceVersionSignal\(\)\}/.test(rendererSource)
-        && /function getCoastlineDecisionSignature\(decision = null\) \{[\s\S]*?String\(decision\.scenarioSurfaceVersionSignal \|\| ""\)/.test(rendererSource),
+        && /function getCoastlineDecisionSignature\(decision = null\) \{[\s\S]*?String\(decision\.scenarioSurfaceVersionSignal \|\| ""\)/.test(staticBorderMeshLifecycleSource),
       chunkPromotionSkipsDeferredInfraWhenSecondaryIndexesAlreadySynced:
         /const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes\(\{[\s\S]*?const shouldSkipDeferredInfraRefresh = synchronizedSecondaryRegionIndexes && !hasPoliticalChange;[\s\S]*?if \(shouldSkipDeferredInfraRefresh\) \{[\s\S]*?scheduleHitCanvasBuildIfNeeded\(\{[\s\S]*?\}\);[\s\S]*?\} else \{[\s\S]*?scheduleDeferredScenarioChunkPromotionInfraRefresh\(\{/.test(scenarioRefreshRuntimeSource),
       startupHydrationWaterOnlyChangeSyncsSecondaryIndexes:
@@ -1780,18 +1784,20 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
 
   register(71, "political path cache reset exposes invalidation reason and previous size", () => {
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+    const politicalPathCacheSource = readRepoFile("js", "core", "renderer", "political_path_cache_owner.js")
+      .replace(/^  /gm, "");
     const politicalBackgroundOwnerSource = readRepoFile("js", "core", "renderer", "political_background_render_owner.js");
-    const invalidateBody = rendererSource.match(/function invalidatePoliticalPathCache\(reason = "unspecified"\) \{[\s\S]*?\n\}/)?.[0] || "";
+    const invalidateBody = politicalPathCacheSource.match(/function invalidatePoliticalPathCache\(reason = "unspecified"\) \{[\s\S]*?\n\}/)?.[0] || "";
     assert.ok(invalidateBody.includes('recordRenderPerfMetric("politicalPathCacheReset"'));
     assert.ok(invalidateBody.includes("previousSize"));
     assert.ok(invalidateBody.includes("previousSignature"));
     assert.ok(invalidateBody.includes("previousReason"));
 
-    const handleBody = rendererSource.match(/function getPoliticalPathCacheHandle\([\s\S]*?\n\}/)?.[0] || "";
+    const handleBody = politicalPathCacheSource.match(/function getPoliticalPathCacheHandle\([\s\S]*?\n\}/)?.[0] || "";
     assert.ok(handleBody.includes('recordRenderPerfMetric("politicalPathCacheReset"'));
     assert.ok(handleBody.includes('reason: "prepare-mismatch"'));
     assert.ok(handleBody.includes("nextSignature: signature"));
-    const signatureBody = rendererSource.match(/function getPoliticalPathCacheSignature\([\s\S]*?\n\}/)?.[0] || "";
+    const signatureBody = politicalPathCacheSource.match(/function getPoliticalPathCacheSignature\([\s\S]*?\n\}/)?.[0] || "";
     [
       "getPoliticalPassStaticSignature(transform)",
       "getProjectionRenderSignature()",
@@ -1804,11 +1810,11 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       assert.ok(signatureBody.includes(signatureInput), `political path cache signature should include ${signatureInput}`);
     });
     assert.ok(rendererSource.includes("runtimeState.topologyRevision || 0"));
-    const entryBody = rendererSource.match(/function buildPoliticalFeaturePathEntry\(feature\) \{[\s\S]*?\n\}/)?.[0] || "";
+    const entryBody = politicalPathCacheSource.match(/function buildPoliticalFeaturePathEntry\(feature\) \{[\s\S]*?\n\}/)?.[0] || "";
     assert.ok(entryBody.includes("path: new globalThis.Path2D(pathString)"));
     assert.equal(entryBody.includes("featureRef"), false);
     assert.equal(entryBody.includes("projectionSignature"), false);
-    const getEntryBody = rendererSource.match(/function getPoliticalFeaturePathEntry\([\s\S]*?\n\}/)?.[0] || "";
+    const getEntryBody = politicalPathCacheSource.match(/function getPoliticalFeaturePathEntry\([\s\S]*?\n\}/)?.[0] || "";
     assert.ok(getEntryBody.includes("if (cachedEntry?.path)"));
     assert.ok(politicalBackgroundOwnerSource.includes("pathCacheSizeBefore"));
     assert.ok(politicalBackgroundOwnerSource.includes("pathCacheSizeAfter"));

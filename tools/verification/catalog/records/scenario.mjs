@@ -1,6 +1,45 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const SCENARIO_RECORDS = [
   {
+    "id": "node:test:node:renderer-lifecycles",
+    "commandRef": "test:node:renderer-lifecycles",
+    "sourceRefs": [
+      "js/core/renderer/political_path_cache_owner.js",
+      "tests/political_path_cache_owner_behavior.test.mjs",
+      "js/core/renderer/brush_interaction_session_owner.js",
+      "tests/brush_interaction_session_owner_behavior.test.mjs",
+      "js/core/renderer/static_border_mesh_lifecycle.js",
+      "tests/static_border_mesh_lifecycle_behavior.test.mjs",
+      "js/core/renderer/physical_intensity_preview_owner.js",
+      "tests/physical_intensity_preview_owner_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "scenario-runtime"
+    ],
+    "domains": [
+      "scenario-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": 394,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "direct-e2e:test:e2e:dev:political-progressive-recovery",
     "commandRef": "test:e2e:dev:political-progressive-recovery",
     "sourceRefs": [
