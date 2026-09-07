@@ -510,6 +510,8 @@ export const RENDERER_SURFACE_STATE_RECORDS = [
       "docs/active/renderer-cohesive-splits-20260907/plan.md",
       "docs/active/renderer-cohesive-splits-20260907/task.md",
       "js/core/map_renderer.js",
+      "js/core/renderer/city_paint_style_model.js",
+      "js/core/renderer/city_label_owner.js",
       "tests/renderer_surface_host_behavior.test.mjs",
       "tests/renderer_surface_host_inventory_boundary.test.mjs",
       "js/core/renderer/renderer_surface_host.js"

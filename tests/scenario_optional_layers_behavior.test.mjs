@@ -638,3 +638,83 @@ test("visibility sync loads strategic values when choropleth metric is enabled",
   }
 });
 
+
+function installOptionalWaterScenario(t) {
+  const fields = [
+    "activeScenarioId", "scenarioBundleCacheById", "scenarioWaterRegionsData",
+    "currentScenarioApplyRequestId", "renderTransactionDiagnostics", "scenarioPerfMetrics",
+  ];
+  const previous = Object.fromEntries(fields.map((key) => [key, state[key]]));
+  const previousGlobalMetrics = globalThis.__scenarioPerfMetrics;
+  t.after(() => {
+    Object.assign(state, previous);
+    globalThis.__scenarioPerfMetrics = previousGlobalMetrics;
+  });
+  state.scenarioPerfMetrics = {};
+  const bundle = { manifest: { scenario_id: "optional_owner_test", water_regions_url: "water.json" } };
+  state.activeScenarioId = "optional_owner_test";
+  state.scenarioBundleCacheById = { optional_owner_test: bundle };
+  state.scenarioWaterRegionsData = null;
+  state.currentScenarioApplyRequestId = 1;
+  state.renderTransactionDiagnostics = null;
+  // Exercise the d3 acquisition path deterministically, without network access.
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = undefined;
+  t.after(() => { globalThis.fetch = previousFetch; });
+  return bundle;
+}
+
+test("optional payload dedupe keeps each caller's fence and reuses settled payload", async (t) => {
+  const bundle = installOptionalWaterScenario(t);
+  let resolvePayload;
+  const pendingPayload = new Promise((resolve) => { resolvePayload = resolve; });
+  const json = t.mock.fn(() => pendingPayload);
+  const options = { d3Client: { json }, renderNow: false, scenarioApplyRequestId: 1 };
+  const oldCaller = ensureActiveScenarioOptionalLayerLoaded("water", options);
+  state.currentScenarioApplyRequestId = 2;
+  const newCaller = ensureActiveScenarioOptionalLayerLoaded("water", {
+    ...options, scenarioApplyRequestId: 2,
+  });
+  const payload = { type: "FeatureCollection", features: [{ type: "Feature", id: "water-new", properties: {}, geometry: null }] };
+  resolvePayload(payload);
+  const [oldResult, newResult] = await Promise.all([oldCaller, newCaller]);
+  assert.equal(json.mock.callCount(), 1);
+  assert.equal(oldResult, newResult);
+  assert.equal(state.scenarioWaterRegionsData, newResult);
+  assert.equal(bundle.optionalLayerSettledByKey.water, true);
+  assert.equal(bundle.optionalLayerPromises.water, undefined);
+  assert.ok(state.renderTransactionDiagnostics.snapshots.some((snapshot) => (
+    snapshot.phase === "scenario-apply-stale-callback-skipped"
+    && snapshot.extra?.callbackPhase === "optional-layer-loaded-before-render"
+    && snapshot.extra?.scenarioApplyRequestId === 1
+  )));
+  assert.equal(await ensureActiveScenarioOptionalLayerLoaded("water", {
+    ...options, scenarioApplyRequestId: 2,
+  }), newResult);
+  assert.equal(json.mock.callCount(), 1);
+});
+
+test("optional payload failures retry while absent assets settle until forced reload", async (t) => {
+  const bundle = installOptionalWaterScenario(t);
+  t.mock.method(console, "warn", () => {});
+  const payload = { type: "FeatureCollection", features: [] };
+  let fail = true;
+  const json = t.mock.fn(async () => {
+    if (fail) throw new Error("offline");
+    return payload;
+  });
+  const options = { d3Client: { json }, renderNow: false };
+  assert.equal(await ensureActiveScenarioOptionalLayerLoaded("water", options), null);
+  assert.equal(bundle.optionalLayerSettledByKey.water, undefined);
+  fail = false;
+  assert.deepEqual(await ensureActiveScenarioOptionalLayerLoaded("water", options), payload);
+  assert.equal(json.mock.callCount(), 2);
+  delete bundle.manifest.water_regions_url;
+  assert.equal(await ensureActiveScenarioOptionalLayerLoaded("water", { ...options, forceReload: true }), null);
+  assert.equal(bundle.optionalLayerSettledByKey.water, true);
+  bundle.manifest.water_regions_url = "water-restored.json";
+  assert.equal(await ensureActiveScenarioOptionalLayerLoaded("water", options), null);
+  assert.equal(json.mock.callCount(), 2);
+  assert.deepEqual(await ensureActiveScenarioOptionalLayerLoaded("water", { ...options, forceReload: true }), payload);
+  assert.equal(json.mock.callCount(), 3);
+});

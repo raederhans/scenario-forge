@@ -1494,6 +1494,8 @@ export const RENDERER_LAYERS_RECORDS = [
     "sourceRefs": [
       "js/core/map_renderer.js",
       "js/core/renderer/city_points_render_owner.js",
+      "js/core/renderer/city_label_owner.js",
+      "js/core/renderer/city_paint_style_model.js",
       "js/core/renderer/urban_city_policy.js",
       "tests/test_map_renderer_urban_city_policy_boundary_contract.py",
       "tests/test_map_renderer_city_label_owner_boundary_contract.py",

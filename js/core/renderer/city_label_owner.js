@@ -1,3 +1,87 @@
+const CITY_LABEL_PLACEMENT_ORDER = [
+  "right",
+  "left",
+  "upper-right",
+  "lower-right",
+  "upper-left",
+  "lower-left",
+];
+
+function buildCityLabelPlacementCandidates(entry, {
+  textWidthPx,
+  fontPx,
+  scale,
+  offsetPx,
+  verticalOffsetPx,
+}) {
+  if (!entry?.screenPoint || !entry?.anchor) return [];
+  const widthPx = Math.max(1, Number(textWidthPx || 0));
+  const heightPx = fontPx + 4;
+  const halfHeightPx = heightPx * 0.5;
+  const placements = {
+    right: {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: 0,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] - halfHeightPx,
+    },
+    left: {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: 0,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] - halfHeightPx,
+    },
+    "upper-right": {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: -verticalOffsetPx,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] - verticalOffsetPx - halfHeightPx,
+    },
+    "lower-right": {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: verticalOffsetPx,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] + verticalOffsetPx - halfHeightPx,
+    },
+    "upper-left": {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: -verticalOffsetPx,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] - verticalOffsetPx - halfHeightPx,
+    },
+    "lower-left": {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: verticalOffsetPx,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] + verticalOffsetPx - halfHeightPx,
+    },
+  };
+  return CITY_LABEL_PLACEMENT_ORDER
+    .map((placementId) => {
+      const candidate = placements[placementId];
+      if (!candidate) return null;
+      return {
+        id: placementId,
+        textAlign: candidate.textAlign,
+        drawX: entry.anchor[0] + (candidate.dxPx / scale),
+        drawY: entry.anchor[1] + (candidate.dyPx / scale),
+        box: {
+          x: candidate.boxX,
+          y: candidate.boxY,
+          w: widthPx + 6,
+          h: heightPx,
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
 const DEFAULT_SERIF_STACK = '"Libre Baskerville", "Palatino Linotype", Georgia, serif';
 
 function doScreenBoxesOverlap(a, b) {
@@ -44,7 +128,7 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       const offsetPx = Math.max(7, markerSizePx + 4);
       const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
       const metrics = context.measureText(text);
-      const candidates = helpers.buildCityLabelPlacementCandidates(visualEntry, {
+      const candidates = buildCityLabelPlacementCandidates(visualEntry, {
         textWidthPx: metrics.width * scale,
         fontPx,
         scale,

@@ -883,6 +883,8 @@ export const SCENARIO_RECORDS = [
       "js/core/renderer/spatial_index_runtime_builders.js",
       "js/core/scenario/bundle_loader.js",
       "js/core/scenario/chunk_runtime.js",
+      "js/core/scenario/chunk_payload_loader.js",
+      "js/core/scenario/chunk_layer_payloads.js",
       "js/core/scenario_chunk_manager.js",
       "js/core/scenario_runtime_queries.js",
       "js/core/state/actions/scenario_activation_actions.js",

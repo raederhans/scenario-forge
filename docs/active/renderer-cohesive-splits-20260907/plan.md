@@ -13,3 +13,7 @@ Audit round1 and round2 policy increments with per-file official discovery. Do n
 ## Round 3 (authorized after second parent review)
 
 Extract operation graphics editor drawing and physical intensity interaction sessions; extend existing strategic helpers with defs and unit-counter interaction and existing display model with SIDC/symbol rendering cache. Preserve main selected-vertex callback and intensity normalizer writes, retired frontline writer, dynamic surfaces, draw/bind order, pointer-end commit and history/frame semantics. Parent integrates, runs focused behavior/assembly/contracts and Pages mirror, obtains bounded review and commits. Report parent and stop before round4. Per-file policy increment audit only.
+
+## Continued batch after PR121 (2026-09-07)
+
+Start from fetched origin/main 731afeaddb13052232dad2b003086beeea800c31 in isolated 2231 worktree. Converge cohesive renderer owners, scenario chunk/bundle/startup orchestration, and optional-layer resource lifecycle. Separate agent ownership, serial parent integration. Preserve identity/generation fences, cancellation, atomic rollback, live dependencies and frozen historical writer anchors. Acceptance: focused behavior and actual assembly, affected contracts, complete changed-file selector coverage, source/dist parity and independent bounded review. Record policy increments separately from inherited gaps; no full P4 qualification, performance claim, merge or release.

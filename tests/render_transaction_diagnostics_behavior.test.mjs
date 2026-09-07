@@ -784,6 +784,9 @@ test("render transaction instrumentation remains wired into apply, chunk, and re
   const mapRenderer = readRepoFile("js", "core", "map_renderer.js");
   const renderDiagnostics = readRepoFile("js", "core", "renderer", "render_transaction_diagnostics.js");
   const scenarioResources = readRepoFile("js", "core", "scenario_resources.js");
+  const optionalLayers = readRepoFile("js", "core", "scenario", "optional_layer_runtime.js");
+  assert.ok(scenarioResources.includes("registerRenderTransactionOptionalLayerConfigs"));
+  assert.ok(scenarioResources.includes("optional-layer-state-apply"));
 
   [
     "scenario-apply-requested",
@@ -839,9 +842,7 @@ test("render transaction instrumentation remains wired into apply, chunk, and re
   ));
 
   [
-    "registerRenderTransactionOptionalLayerConfigs",
     "optional-layer-visibility-sync-start",
     "optional-layer-visibility-sync-complete",
-    "optional-layer-state-apply",
-  ].forEach((token) => assert.ok(scenarioResources.includes(token), `scenario_resources should include ${token}`));
+  ].forEach((token) => assert.ok(optionalLayers.includes(token), `optional_layer_runtime should include ${token}`));
 });

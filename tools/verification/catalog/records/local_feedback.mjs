@@ -72,6 +72,11 @@ export function createLocalFeedbackRecords(baseRecords) {
   // Each local leaf covers this owner only; broader roots and data retain their
   // existing PR/nightly/release requirements.
   const localOwnerCoverage = [
+    ["city-label", "renderer-runtime", "js/core/renderer/city_label_owner.js", "tests/city_label_owner_behavior.test.mjs"],
+    ["city-paint-style", "renderer-runtime", "js/core/renderer/city_paint_style_model.js", "tests/city_paint_style_model_behavior.test.mjs"],
+    ["scenario-chunk-payload-loader", "scenario-runtime", "js/core/scenario/chunk_payload_loader.js", "tests/scenario_chunk_payload_loader_behavior.test.mjs"],
+    ["scenario-chunk-layer-payloads", "scenario-runtime", "js/core/scenario/chunk_layer_payloads.js", "tests/scenario_chunk_layer_payloads_behavior.test.mjs"],
+    ["scenario-optional-layer-runtime", "scenario-runtime", "js/core/scenario/optional_layer_runtime.js", "tests/scenario_optional_layers_behavior.test.mjs", ["js/core/scenario_resources.js"]],
     ["state-write-allowlist", "state-ownership", "tools/check_state_write_allowlist.mjs", "tests/state_write_allowlist_behavior.test.mjs"],
     ["viewport-read-model", "renderer-runtime", "js/core/renderer/viewport_read_model_owner.js", "tests/viewport_read_model_owner_behavior.test.mjs"],
     ["selection-overlay", "renderer-runtime", "js/core/renderer/selection_overlay_owner.js", "tests/selection_overlay_owner_behavior.test.mjs"],
@@ -113,12 +118,12 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-water-fill", "renderer-runtime", "tests/scenario_water_fill_behavior.test.mjs"],
     ["scenario-water-signature", "renderer-runtime", "tests/scenario_water_signature_behavior.test.mjs"],
     ["retired-frontline", "renderer-runtime", "tests/retired_frontline_behavior.test.mjs"],
-    ["scenario-chunk-cancellation", "scenario-runtime", "tests/scenario_chunk_cancellation_behavior.test.mjs"],
+    ["scenario-chunk-cancellation", "scenario-runtime", "tests/scenario_chunk_cancellation_behavior.test.mjs", ["js/core/scenario/chunk_runtime.js", "js/core/scenario/chunk_payload_loader.js"]],
     ["startup-boot-worker-cancellation", "scenario-runtime", "tests/startup_boot_worker_cancellation.test.mjs"],
   ];
-  const testRecords = localTestFiles.map(([id, domain, testFile], index) => ({
+  const testRecords = localTestFiles.map(([id, domain, testFile, extraSources = []], index) => ({
     id: "local:test:" + id, commandRef: "node --test " + testFile,
-    sourceRefs: [testFile],
+    sourceRefs: [testFile, ...extraSources],
     ownerHints: [domain], domains: [domain], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
     platforms: ["all"], entrypointPolicyIndex: 5,
