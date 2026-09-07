@@ -11,6 +11,7 @@ function readRepoFile(...relativeParts) {
 
 test("physical layer source contracts stay wired to the expected renderer and startup boundaries", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+  const physicalInteractionSource = readRepoFile("js", "core", "renderer", "physical_intensity_interaction_owner.js");
   const physicalLayerOwnerSource = readRepoFile("js", "core", "renderer", "physical_layer_render_owner.js");
   const scenarioReliefOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_relief_overlay_render_owner.js");
   const mainSource = readRepoFile("js", "main.js");
@@ -139,7 +140,8 @@ test("physical layer source contracts stay wired to the expected renderer and st
     physicalIntensityToolHookRegistered:
       /registerRuntimeHook\(runtimeState, "setIntensityFieldToolFn", setIntensityFieldTool\);/.test(rendererSource),
     physicalIntensityPointCommitRebakesComposite:
-      /if \(current\.subMode === "points"\) \{\s*bakeIntensityComposite\(channel\);\s*\}/.test(rendererSource),
+      /if \(current\.subMode === "points"\) \{\s*bakeIntensityComposite\(channel\);\s*\}/.test(physicalInteractionSource)
+      && /createPhysicalIntensityInteractionOwner\(\{/.test(rendererSource),
     contourFirstIdleKeepsFastPath:
       /function shouldPreferImmediateExactContextBaseRefresh\(reuseDecision = null\)/.test(rendererSource) === false
       && /const deferredReuseDecision = state\.deferExactAfterSettle \? getContextBaseReuseDecision\(\) : null;/.test(rendererSource) === false,
