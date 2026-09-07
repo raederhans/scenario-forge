@@ -25,6 +25,10 @@ import {
   getRingSignedArea,
 } from "./helpers/scenario_chunk_contract_support.mjs";
 
+const scenarioRegionOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_region_overlay_render_owner.js");
+
+const politicalFeaturePolicySource = readRepoFile("js", "core", "renderer", "political_feature_policy.js").replace(/^  /gm, "");
+
 const defaultRegister = (_order, ...args) => test(...args);
 
 export function registerScenarioChunkContractHeavyTests(register = defaultRegister) {
@@ -273,10 +277,10 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /passName === "contextScenario"[\s\S]*?shouldEnableContextScenarioTransformReuse\(\)[\s\S]*?cache\.dirty\[passName\] = false;[\s\S]*?recordRenderPerfMetric\("contextScenarioReuseSkipped", 0, \{/.test(renderPipelinePassesSource)
         && /shouldEnableContextScenarioTransformReuse,/.test(rendererSource),
       contextScenarioKeepsLayerMetrics:
-        rendererSource.includes('"contextScenarioLayerWater"')
-        && rendererSource.includes('"contextScenarioLayerSpecial"')
-        && rendererSource.includes('renderScenarioSpecialRegionOverlaysLayerToCache')
-        && rendererSource.includes('getContextScenarioLayerCacheEntry("special")')
+        scenarioRegionOverlayOwnerSource.includes('"contextScenarioLayerWater"')
+        && scenarioRegionOverlayOwnerSource.includes('"contextScenarioLayerSpecial"')
+        && scenarioRegionOverlayOwnerSource.includes('renderScenarioSpecialRegionOverlaysLayerToCache')
+        && scenarioRegionOverlayOwnerSource.includes('getContextScenarioLayerCacheEntry("special")')
         && rendererSource.includes('"contextScenarioLayerRelief"')
         && rendererSource.includes('renderScenarioReliefOverlaysLayerToCache')
         && rendererSource.includes('getContextScenarioLayerCacheEntry("relief")')
@@ -427,7 +431,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && !politicalPartialOwnerSource.includes('["refresh-colors", "rebuild-colors"].includes(String(cache.reasons?.political || ""))')
         && !politicalPartialOwnerSource.includes('!["refresh-colors", "rebuild-colors"].includes(String(reason || "unspecified"))'),
       progressiveRecoveryKeepsFineLoopForVisibleColorOverrides:
-        /function hasVisiblePoliticalForegroundColorOverride\(entries = \[\]\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(featureId\);[\s\S]*?\}/.test(rendererSource)
+        /function hasVisiblePoliticalForegroundColorOverride\(entries = \[\]\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(featureId\);[\s\S]*?\}/.test(politicalFeaturePolicySource)
         && /const progressiveRecoveryCoarseSkipCandidate = \([\s\S]*?!pendingPoliticalColorEdit[\s\S]*?\);[\s\S]*?const visiblePoliticalForegroundColorOverride = progressiveRecoveryCoarseSkipCandidate[\s\S]*?hasVisiblePoliticalForegroundColorOverride\(viewport\.visibleItems\)[\s\S]*?if \(progressiveRecoveryCoarseSkipCandidate && !visiblePoliticalForegroundColorOverride\)/.test(politicalPassOwnerSource),
       politicalPathCachePreservesTargetedColorAndDeferredFullCacheReady:
         /const POLITICAL_PATH_CACHE_PRESERVING_INVALIDATION_REASONS = new Set\(\[[\s\S]*?"refresh-colors"[\s\S]*?"progressive-political-full-cache-ready"[\s\S]*?\]\);/.test(rendererSource)
@@ -1041,22 +1045,22 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
         && /function isWaterRegionEnabled\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanOverlayActive\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
         && /function getWaterHitFromPointer\([\s\S]*?\) \{[\s\S]*?if \(!runtimeState\.showWaterRegions && !isOpenOceanOverlayActive\(\)\) return createHitResult\(\);/.test(rendererSource)
-        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) return;/.test(rendererSource)
+        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource)
         && /function collectWaterGridCandidates\(px, py, radiusProj = 0\) \{[\s\S]*?shouldIncludeItem: \(item\) => isWaterRegionEnabled\(item\.feature\),/.test(rendererSource)
         && /function rebuildAuxiliaryRegionIndexes\(\) \{[\s\S]*?if \(!isWaterRegionEnabled\(selectedFeature\)\) \{[\s\S]*?runtimeState\.selectedWaterRegionId = "";/.test(rendererSource)
-        && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?if \(!isWaterRegionEnabled\(feature\)\) return;/.test(rendererSource),
+        && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?if \(!isWaterRegionEnabled\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource),
       waterSphericalDiagnosticsBacksSanitization:
         /function getSphericalGeometryDiagnostics\(geoObject\) \{[\s\S]*?const d3 = getD3\(\);[\s\S]*?d3\.geoArea[\s\S]*?d3\.geoBounds[\s\S]*?isWorldBounds\(bounds\)[\s\S]*?sphericalGeometryMaxArea/.test(projectedGeometryBoundsOwnerSource)
         && /function collectSafeWaterRegionGeometryPartsInfo\(feature\) \{[\s\S]*?isSphericalGeometryUnsafe\(part\)[\s\S]*?removedCount \+= 1;/.test(projectedGeometryBoundsOwnerSource)
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?recordRenderPerfMetric\("waterSphericalSanitization"/.test(projectedGeometryBoundsOwnerSource)
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?return getProjectedGeometryBoundsOwner\(\)\.sanitizeWaterRegionFeatures\(features\);/.test(rendererSource),
       waterDrawAndHighlightUseSafeParts:
-        /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(rendererSource)
-        && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(rendererSource),
+        /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource),
       waterFillUsesProjectionPathCacheBeforeCanvasFallback:
-        /let scenarioWaterPartPathCache = new WeakMap\(\);[\s\S]*?let scenarioWaterFeaturePathCache = new WeakMap\(\);/.test(rendererSource)
-        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?scenarioWaterFeaturePathCache\.has\(feature\)[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterFeaturePathCache\.set\(feature, path\);/.test(rendererSource)
-        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?const waterPath = visibleParts\.length === parts\.length[\s\S]*?getScenarioWaterFeaturePath\(feature, parts\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(rendererSource),
+        /let scenarioWaterPartPathCache = new WeakMap\(\);[\s\S]*?let scenarioWaterFeaturePathCache = new WeakMap\(\);/.test(scenarioRegionOverlayOwnerSource)
+        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?scenarioWaterFeaturePathCache\.has\(feature\)[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterFeaturePathCache\.set\(feature, path\);/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?const waterPath = visibleParts\.length === parts\.length[\s\S]*?getScenarioWaterFeaturePath\(feature, parts\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
       waterCoverageUsesSafeParts:
         /function getScreenBounds\(part\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)
         && /function getScenarioWaterVisibleCoverageRatioLegacy\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part\)/.test(scenarioWaterCachePolicyOwnerSource)
@@ -1113,8 +1117,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /if \(samePayload && samePrimaryPayload && !forceRefresh\) \{[\s\S]*?recordScenarioRenderMetric\("politicalChunkPromotionBreakdown"[\s\S]*?samePayload: true,[\s\S]*?samePrimaryPayload: true,[\s\S]*?refreshMs: 0,/.test(chunkRuntimeSource)
         && /recordScenarioRenderMetric\("politicalChunkPromotionBreakdown", finishedAt - startedAt,[\s\S]*?samePayload: false,[\s\S]*?samePrimaryPayload,[\s\S]*?forcedRefresh: !!forceRefresh,[\s\S]*?resolvedPoliticalFeatureCount: resolvedPoliticalFeatureIds\.length,/.test(chunkRuntimeSource),
       compositeScenarioRebuildKeepsScenarioRuntimeTopology:
-        [
-          "render_as_base_geography === false",
+        politicalFeaturePolicySource.includes("render_as_base_geography === false")
+        && [
           "scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology",
           "const runtimeBaseCollection = getRuntimePoliticalBaseCollection(runtimeCollection);",
           "const hasScenarioRuntimePoliticalSource = !!String(runtimeState.activeScenarioId || \"\").trim()",
@@ -1161,7 +1165,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       colorCoverageE2eSource.indexOf("expect(afterZoom.activeScenarioId)"),
     );
     const pixelProbeSource = readRepoFile("tests", "e2e", "support", "political-pixel-probe.js");
-    const visualRenderableBody = rendererSource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
+    const visualRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
 
     const checks = {
       hitResultShapeCarriesRuntimeCountry:
@@ -1183,21 +1187,21 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       booleanWeldDonorIslandHasDedicatedInteractiveEscape:
         /function isInteractiveAtlantropaBooleanWeldIslandFeature\(feature, featureId = null\) \{[\s\S]*?candidate\.startsWith\("ATLISL_"\)[\s\S]*?getAtlantropaGeometryRole\(feature\) === "donor_island"[\s\S]*?getAtlantropaJoinMode\(feature\) === "boolean_weld"[\s\S]*?\}/.test(rendererSource),
       booleanWeldIslandCanRenderAndRemainInteractive:
-        /function isAtlantropaVisualSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?joinMode === "gap_fill"[\s\S]*?\}/.test(rendererSource)
-        && /function isAtlantropaSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?isInteractiveAtlantropaBooleanWeldIslandFeature\(feature, featureId\)[\s\S]*?return false;[\s\S]*?joinMode === "boolean_weld"[\s\S]*?\}/.test(rendererSource)
-        && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?feature\?\.properties\?\.interactive === false[\s\S]*?isAtlantropaSupportHelperFeature\(feature, featureId\)/.test(rendererSource),
+        /function isAtlantropaVisualSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?joinMode === "gap_fill"[\s\S]*?\}/.test(politicalFeaturePolicySource)
+        && /function isAtlantropaSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?isInteractiveAtlantropaBooleanWeldIslandFeature\(feature, featureId\)[\s\S]*?return false;[\s\S]*?joinMode === "boolean_weld"[\s\S]*?\}/.test(politicalFeaturePolicySource)
+        && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?feature\?\.properties\?\.interactive === false[\s\S]*?isAtlantropaSupportHelperFeature\(feature, featureId\)/.test(politicalFeaturePolicySource),
       arcticShellCanRenderWithoutBecomingInteractive:
         !/shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature/.test(visualRenderableBody)
         && !/isScenarioShellFeature/.test(visualRenderableBody)
-        && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isScenarioShellFeature\(feature, featureId\)[\s\S]*?feature\?\.properties\?\.interactive === false/.test(rendererSource),
+        && /function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isScenarioShellFeature\(feature, featureId\)[\s\S]*?feature\?\.properties\?\.interactive === false/.test(politicalFeaturePolicySource),
       arcticShellUnderlayDrawsBeforeDetailFeatures:
-        /function isPoliticalShellUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isRuntimeOnlyShellFallbackPoliticalFeature\(feature, featureId\)/.test(rendererSource)
-        && /function isPoliticalPrimaryUnderlayFeature\(feature, _featureId = null\) \{[\s\S]*?__source[\s\S]*?=== "primary";[\s\S]*?\}/.test(rendererSource)
-        && /function isPoliticalUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isPoliticalShellUnderlayFeature\(feature, featureId\)[\s\S]*?isPoliticalPrimaryUnderlayFeature\(feature, featureId\)/.test(rendererSource)
-        && /function hasPoliticalForegroundColorOverride\(featureId\) \{[\s\S]*?runtimeState\.visualOverrides\?\.\[id\][\s\S]*?runtimeState\.featureOverrides\?\.\[id\]/.test(rendererSource)
-        && /function isPendingPoliticalColorEditFeature\(feature, featureId = null\) \{[\s\S]*?hasPendingPoliticalColorEdit\(\)[\s\S]*?pendingPoliticalColorEditIds[\s\S]*?pendingIds\.has\(id\);/.test(rendererSource)
-        && /function isPoliticalForegroundFeature\(feature, featureId = null\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(rendererSource)
-        && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(rendererSource)
+        /function isPoliticalShellUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isRuntimeOnlyShellFallbackPoliticalFeature\(feature, featureId\)/.test(politicalFeaturePolicySource)
+        && /function isPoliticalPrimaryUnderlayFeature\(feature, _featureId = null\) \{[\s\S]*?__source[\s\S]*?=== "primary";[\s\S]*?\}/.test(politicalFeaturePolicySource)
+        && /function isPoliticalUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isPoliticalShellUnderlayFeature\(feature, featureId\)[\s\S]*?isPoliticalPrimaryUnderlayFeature\(feature, featureId\)/.test(politicalFeaturePolicySource)
+        && /function hasPoliticalForegroundColorOverride\(featureId\) \{[\s\S]*?runtimeState\.visualOverrides\?\.\[id\][\s\S]*?runtimeState\.featureOverrides\?\.\[id\]/.test(politicalFeaturePolicySource)
+        && /function isPendingPoliticalColorEditFeature\(feature, featureId = null\) \{[\s\S]*?hasPendingPoliticalColorEdit\(\)[\s\S]*?pendingPoliticalColorEditIds[\s\S]*?pendingIds\.has\(id\);/.test(politicalFeaturePolicySource)
+        && /function isPoliticalForegroundFeature\(feature, featureId = null\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(politicalFeaturePolicySource)
+        && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(politicalFeaturePolicySource)
         && /orderPoliticalShellUnderlayFirst\(redrawEntries\)\.forEach/.test(politicalPartialOwnerSource)
         && /orderPoliticalShellUnderlayFirst\(viewport\.visibleItems\)\.forEach/.test(politicalFineLoopSource)
         && /const featureEntries = state\.landData\.features\.map/.test(politicalFineLoopSource)
@@ -1208,9 +1212,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       scenarioAtlantropaVisibilityGatesFieldDrivenRenderPaths:
         /function isScenarioAtlantropaVisible\(\) \{[\s\S]*?runtimeState\.showScenarioAtlantropa !== false;[\s\S]*?\}/.test(rendererSource)
         && /function getEffectiveAtlantropaFeatures\(\) \{[\s\S]*?if \(!isScenarioAtlantropaVisible\(\)\) \{[\s\S]*?return buckets;[\s\S]*?\}/.test(rendererSource)
-        && /function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isAtlantropaFieldDrivenFeature\(feature\) && !isScenarioAtlantropaVisible\(\)/.test(rendererSource),
+        && /function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isAtlantropaFieldDrivenFeature\(feature\) && !isScenarioAtlantropaVisible\(\)/.test(politicalFeaturePolicySource),
       fieldDrivenAtlantropaUsesExplicitInteractionFlag:
-        /function isAtlantropaSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?if \(isAtlantropaFieldDrivenFeature\(feature\)\) \{[\s\S]*?return feature\?\.properties\?\.atl_interactive !== true;[\s\S]*?\}/.test(rendererSource),
+        /function isAtlantropaSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?if \(isAtlantropaFieldDrivenFeature\(feature\)\) \{[\s\S]*?return feature\?\.properties\?\.atl_interactive !== true;[\s\S]*?\}/.test(politicalFeaturePolicySource),
       backgroundMergeFiltersVisualHelpersButKeepsVisibleNonInteractiveLand:
         /function buildScenarioPoliticalBackgroundEntries\(\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(feature, id\)/.test(politicalBackgroundOwnerSource)
         && /function buildScenarioPoliticalBackgroundEntriesFromSpatialItems\(items = \[\]\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(entry\.feature, entry\.id\)/.test(politicalBackgroundOwnerSource),
@@ -1269,14 +1273,14 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?runtimeState\.scenarioAtlantropaData[\s\S]*?water:\$\{counts \? counts\.water : buckets\.water\.length\}/.test(rendererSource)
         && /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?isScenarioAtlantropaVisible\(\) \? "visible:on" : "visible:off"/.test(rendererSource)
         && /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?\.\.\.atlantropaFeatures\.water,/.test(rendererSource)
-        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?const buckets = getEffectiveAtlantropaFeatures\(\);[\s\S]*?\.\.\.buckets\.shoal,/.test(rendererSource)
-        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?getSafeCanvasColor\(runtimeState\.colors\?\.\[id\], null\)[\s\S]*?getSafeCanvasColor\(getResolvedFeatureColor\(feature, id\), null\)/.test(rendererSource)
-        && /function drawScenarioRegionOverlaysPass\(k\) \{[\s\S]*?const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible\(\);[\s\S]*?if \(showAtlantropaLandLikeOverlay\) \{[\s\S]*?drawScenarioAtlantropaLandLikeOverlayLayer\(k\);[\s\S]*?\}/.test(rendererSource)
+        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?const buckets = getEffectiveAtlantropaFeatures\(\);[\s\S]*?\.\.\.buckets\.shoal,/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?getSafeCanvasColor\(runtimeState\.colors\?\.\[id\], null\)[\s\S]*?getSafeCanvasColor\(getResolvedFeatureColor\(feature, id\), null\)/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioRegionOverlaysPass\(k\) \{[\s\S]*?const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible\(\);[\s\S]*?if \(showAtlantropaLandLikeOverlay\) \{[\s\S]*?drawScenarioAtlantropaLandLikeOverlayLayer\(k\);[\s\S]*?\}/.test(scenarioRegionOverlayOwnerSource)
         && /function shouldExcludeWaterHitGeometry\(hitGeometry, feature = null\) \{[\s\S]*?return getProjectedGeometryBoundsOwner\(\)\.shouldExcludeWaterHitGeometry\(hitGeometry, feature\);[\s\S]*?\}/.test(rendererSource)
         && /function shouldExcludeWaterHitGeometry\(hitGeometry, _feature = null\) \{[\s\S]*?return isSphericalGeometryUnsafe\(hitGeometry\);[\s\S]*?\}/.test(projectedGeometryBoundsOwnerSource)
         && /function getUnifiedWaterBaseStyle\(feature\) \{[\s\S]*?isAtlantropaSeaFeature\(feature\)[\s\S]*?getAtlantropaSeaPoliticalFillColor\(\)/.test(rendererSource)
         && /function getWaterRegionColor\(id, feature = null\) \{[\s\S]*?const defaultStyleFeature = feature \|\| runtimeState\.waterRegionsById\?\.get\(resolvedId\);/.test(rendererSource)
-        && /rendererSurfaceHost\.getContext\(\)\.fillStyle = getWaterRegionColor\(id, feature\);/.test(rendererSource)
+        && /rendererSurfaceHost\.getContext\(\)\.fillStyle = getWaterRegionColor\(id, feature\);/.test(scenarioRegionOverlayOwnerSource)
         && /function getScenarioWaterVisualRevisionToken\(\) \{[\s\S]*?water-atlantropa:\$\{atlantropaRevisionToken\}/.test(rendererSource)
         && /let bounds = computeProjectedGeoBounds\(hitGeometry\);[\s\S]*?if \(!bounds\) \{[\s\S]*?if \(!featureBoundsComputed\) \{[\s\S]*?featureBounds = computeProjectedGeoBounds\(feature\);[\s\S]*?featureBoundsComputed = true;[\s\S]*?bounds = featureBounds;/.test(spatialBuilderSource)
         && !rendererSource.includes("atl_water_projection")
@@ -1508,8 +1512,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
 
   register(43, "TNO Russian Arctic shell fallbacks remain visual-only political coverage", () => {
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
-    const visualRenderableBody = rendererSource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
-    const interactionRenderableBody = rendererSource.match(/function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
+    const visualRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
+    const interactionRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
     const coarsePoliticalChunk = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "chunks", "political.coarse.r0c0.json"));
     const countries = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "countries.json")).countries || {};
     const ownersByFeature = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "owners.by_feature.json"));

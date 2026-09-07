@@ -113,6 +113,7 @@ test("renderer owner wiring remains lazy and preserves live host and global read
     MapInteractionEventBindingOwner: { getInteractionRect: "InteractionRect" },
     HitCanvasSchedulingOwner: {},
     MapHoverInteractionOwner: {},
+    ScenarioRegionOverlayRenderOwner: {},
     RenderPassCacheHostOwner: {},
     RenderPassCommitAccountingOwner: {},
   };

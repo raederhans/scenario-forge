@@ -467,6 +467,8 @@ function extractRendererPassSignatureBranch(source, passName) {
 }
 
 function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerSource) {
+  const politicalPolicySource = readRepoFile("js", "core", "renderer", "political_feature_policy.js")
+    .replace(/^  /gm, "");
   const functionNames = [
     "isScenarioShellFeature",
     "isRuntimeOnlyShellFallbackPoliticalFeature",
@@ -535,7 +537,10 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
     const isAntarcticSectorFeature = () => false;
     const isAtlantropaVisualSupportHelperFeature = () => false;
     const isAtlantropaSupportHelperFeature = () => false;
-    ${functionNames.map((name) => extractRendererFunction(rendererSource, name)).join("\n")}
+    ${functionNames.map((name) => extractRendererFunction(
+      politicalPolicySource.includes(`function ${name}(`) ? politicalPolicySource : rendererSource,
+      name,
+    )).join("\n")}
     ${partialFillSource}
     globalThis.__shellPolicyHarness = {
       isScenarioShellFeature,

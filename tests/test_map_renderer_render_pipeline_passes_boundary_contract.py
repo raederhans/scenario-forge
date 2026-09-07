@@ -295,8 +295,10 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
     def test_water_hover_uses_svg_overlay_while_selected_water_invalidates_canvas_layer(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         water_token_body = renderer_content.split("function getScenarioWaterVisualRevisionToken() {", 1)[1].split("\n}", 1)[0]
-        water_highlight_body = renderer_content.split("function drawScenarioWaterHighlightLayer(k) {", 1)[1].split(
-            "\nfunction drawScenarioSpecialRegionOverlaysLayer",
+        scenario_overlay_content = (MAP_RENDERER_JS.parent / "renderer" / "scenario_region_overlay_render_owner.js").read_text(encoding="utf-8")
+        self.assertIn("getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k)", renderer_content)
+        water_highlight_body = scenario_overlay_content.split("function drawScenarioWaterHighlightLayer(k) {", 1)[1].split(
+            "\n  function drawScenarioSpecialRegionOverlaysLayer",
             1,
         )[0]
         hover_overlay_body = (MAP_RENDERER_JS.parent / "renderer" / "transient_overlay_render_owner.js").read_text(encoding="utf-8")

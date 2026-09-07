@@ -1,3 +1,10 @@
+import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
+import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
+import {
+  createUrbanAdaptivePaintModel,
+  getUrbanFeatureOwnerId,
+} from "./renderer/urban_adaptive_paint_model.js";
+import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
 // runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
@@ -342,7 +349,6 @@ let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
 let lastInspectorOverlaySignature = "";
 let lastDevSelectionOverlaySignature = "";
-let lastScenarioWaterRenderedCount = 0;
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -696,11 +702,6 @@ const bathymetryTopologyCacheByUrl = new Map();
 const bathymetryLoadPromiseByUrl = new Map();
 const bathymetryLoadFailureByUrl = new Map();
 const BATHYMETRY_LOAD_RETRY_COOLDOWN_MS = 10_000;
-const CITY_LABEL_MAX_WIDTH_PX = {
-  sparse: { capital: 212, major: 186, regional: 164, minor: 150 },
-  balanced: { capital: 188, major: 166, regional: 148, minor: 134 },
-  dense: { capital: 166, major: 148, regional: 132, minor: 120 },
-};
 const CITY_LABEL_PLACEMENT_ORDER = [
   "right",
   "left",
@@ -708,28 +709,6 @@ const CITY_LABEL_PLACEMENT_ORDER = [
   "lower-right",
   "upper-left",
   "lower-left",
-];
-const CITY_ADMIN_LABEL_PATTERNS = [
-  /\bcounty\b/giu,
-  /\bdistrict\b/giu,
-  /\boblast\b/giu,
-  /\bokrug\b/giu,
-  /\braion\b/giu,
-  /\bmunicipality\b/giu,
-  /\bgovernorate\b/giu,
-  /городской округ/giu,
-  /район/giu,
-  /область/giu,
-];
-const CITY_ADMIN_LABEL_REJECT_PATTERNS = [
-  /\bcounty\b/iu,
-  /\bdistrict\b/iu,
-  /\boblast\b/iu,
-  /\bokrug\b/iu,
-  /\braion\b/iu,
-  /городской округ/iu,
-  /район/iu,
-  /область/iu,
 ];
 const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
@@ -817,8 +796,7 @@ const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
 const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
-let scenarioWaterPartPathCache = new WeakMap();
-let scenarioWaterFeaturePathCache = new WeakMap();
+let scenarioRegionOverlayRenderOwner = null;
 const renderDiag = {
   enabled: false,
   seenKeys: new Set(),
@@ -2514,8 +2492,7 @@ function getProjectedGeometryBoundsOwner() {
       recordRenderPerfMetric,
       recordProjectedBoundsDiagnosticsState,
       resetHostWaterPathCaches: () => {
-        scenarioWaterPartPathCache = new WeakMap();
-        scenarioWaterFeaturePathCache = new WeakMap();
+        scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();
       },
       warn: (...args) => console.warn(...args),
     },
@@ -2694,7 +2671,7 @@ function getScenarioWaterCachePolicyOwner() {
     getters: {
       readSearchParam,
       getDevicePixelRatio: () => globalThis.devicePixelRatio,
-      getPreviousRenderedCount: () => lastScenarioWaterRenderedCount,
+      getPreviousRenderedCount: () => getScenarioRegionOverlayRenderOwner().getPreviousWaterRenderedCount(),
     },
     helpers: {
       cloneZoomTransform: (transform) => cloneZoomTransform(transform || globalThis.d3?.zoomIdentity),
@@ -3751,7 +3728,7 @@ function detectContextScenarioReasonMismatch({
 }
 
 function resetScenarioWaterCacheAdaptiveState(reason = "water-adaptive-state-reset") {
-  lastScenarioWaterRenderedCount = 0;
+  scenarioRegionOverlayRenderOwner?.resetPreviousWaterRenderedCount();
   incrementPerfCounter("waterAdaptiveStateResetCount");
   const previousCount = Math.max(
     0,
@@ -6619,190 +6596,29 @@ function isAdmin0ShellFeature(feature, featureId) {
   return detailTier === "antarctic_sector" && candidate.startsWith("AQ_");
 }
 
-function isScenarioShellFeature(feature, featureId = null) {
-  if (String(feature?.properties?.scenario_helper_kind || "").trim().toLowerCase() === "shell_fallback") {
-    return true;
-  }
-  const candidate = String(
-    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
-  ).trim().toUpperCase();
-  if (candidate.startsWith("RU_ARCTIC_FB_")) return true;
-  return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
-}
-
-function isRuntimeOnlyShellFallbackPoliticalFeature(feature, featureId = null) {
-  return isScenarioShellFeature(feature, featureId)
-    && feature?.properties?.render_as_base_geography === false;
-}
-
-function isPoliticalShellUnderlayFeature(feature, featureId = null) {
-  return isRuntimeOnlyShellFallbackPoliticalFeature(feature, featureId);
-}
-
-function isPoliticalPrimaryUnderlayFeature(feature, _featureId = null) {
-  return String(feature?.properties?.__source || "").trim().toLowerCase() === "primary";
-}
-
-function isPoliticalUnderlayFeature(feature, featureId = null) {
-  return isPoliticalShellUnderlayFeature(feature, featureId)
-    || isPoliticalPrimaryUnderlayFeature(feature, featureId);
-}
-
-function hasPoliticalForegroundColorOverride(featureId) {
-  const id = String(featureId || "").trim();
-  if (!id) return false;
-  return !!(
-    getSafeCanvasColor(runtimeState.visualOverrides?.[id], null)
-    || getSafeCanvasColor(runtimeState.featureOverrides?.[id], null)
-  );
-}
-
-function isPendingPoliticalColorEditFeature(feature, featureId = null) {
-  const id = String(
-    featureId
-    || feature?.properties?.id
-    || feature?.id
-    || ""
-  ).trim();
-  if (!id || !hasPendingPoliticalColorEdit()) return false;
-  const pendingIds = getRenderPassCacheState().pendingPoliticalColorEditIds;
-  return pendingIds instanceof Set && pendingIds.has(id);
-}
-
-function isPoliticalForegroundFeature(feature, featureId = null) {
-  const id = String(featureId || getFeatureId(feature) || "").trim();
-  return hasPoliticalForegroundColorOverride(id)
-    || isPendingPoliticalColorEditFeature(feature, id);
-}
-
-function hasVisiblePoliticalForegroundColorOverride(entries = []) {
-  if (!Array.isArray(entries) || !entries.length) return false;
-  return entries.some((entry) => {
-    const feature = entry?.feature || entry;
-    const featureId = entry?.id || getFeatureId(feature);
-    return hasPoliticalForegroundColorOverride(featureId);
-  });
-}
-
-function orderPoliticalShellUnderlayFirst(entries = []) {
-  const underlayEntries = [];
-  const detailEntries = [];
-  const foregroundEntries = [];
-  entries.forEach((entry) => {
-    const feature = entry?.feature || entry;
-    const featureId = entry?.id || getFeatureId(feature);
-    let target = detailEntries;
-    if (isPoliticalForegroundFeature(feature, featureId)) {
-      target = foregroundEntries;
-    } else if (isPoliticalUnderlayFeature(feature, featureId)) {
-      target = underlayEntries;
-    }
-    target.push(entry);
-  });
-  return [...underlayEntries, ...detailEntries, ...foregroundEntries];
-}
-
-function shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature(feature, featureId = null) {
-  if (String(runtimeState.mapSemanticMode || "").trim().toLowerCase() === "blank") {
-    return false;
-  }
-  return isRuntimeOnlyShellFallbackPoliticalFeature(feature, featureId);
-}
-
-function getAtlantropaGeometryRole(feature) {
-  return String(feature?.properties?.atl_geometry_role || "").trim().toLowerCase();
-}
-
-function getAtlantropaJoinMode(feature) {
-  return String(feature?.properties?.atl_join_mode || "").trim().toLowerCase();
-}
-
-function isAntarcticSectorFeature(feature, featureId = null) {
-  const candidate = String(
-    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
-  ).trim().toUpperCase();
-  if (!candidate) return false;
-  const countryCode = getFeatureCountryCodeNormalized(feature);
-  const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
-  return detailTier === "antarctic_sector" && (countryCode === "AQ" || candidate.startsWith("AQ_"));
-}
-
-function isAtlantropaSupportHelperFeature(feature, featureId = null) {
-  if (isAtlantropaFieldDrivenFeature(feature)) {
-    return feature?.properties?.atl_interactive !== true;
-  }
-  const candidate = String(
-    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
-  ).trim().toUpperCase();
-  if (
-    candidate.startsWith("ATLSHL_")
-    || candidate.startsWith("ATLWLD_")
-    || candidate.startsWith("ATLSEA_FILL_")
-  ) {
-    return true;
-  }
-  if (isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId)) {
-    return false;
-  }
-  const geometryRole = getAtlantropaGeometryRole(feature);
-  const joinMode = getAtlantropaJoinMode(feature);
-  return (
-    geometryRole === "shore_seal"
-    || geometryRole === "sea_completion"
-    || geometryRole === "donor_sea"
-    || joinMode === "gap_fill"
-    || joinMode === "boolean_weld"
-  );
-}
-
-function isAtlantropaVisualSupportHelperFeature(feature, featureId = null) {
-  if (isAtlantropaFieldDrivenFeature(feature)) {
-    return false;
-  }
-  const candidate = String(
-    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
-  ).trim().toUpperCase();
-  if (
-    candidate.startsWith("ATLSHL_")
-    || candidate.startsWith("ATLWLD_")
-    || candidate.startsWith("ATLSEA_FILL_")
-  ) {
-    return true;
-  }
-  const geometryRole = getAtlantropaGeometryRole(feature);
-  const joinMode = getAtlantropaJoinMode(feature);
-  return (
-    geometryRole === "shore_seal"
-    || geometryRole === "sea_completion"
-    || geometryRole === "donor_sea"
-    || joinMode === "gap_fill"
-  );
-}
-
-function isPoliticalVisualRenderableFeature(feature, featureId = null) {
-  if (!feature) return false;
-  if (isAtlantropaFieldDrivenFeature(feature) && !isScenarioAtlantropaVisible()) return false;
-  if (isAntarcticSectorFeature(feature, featureId)) return false;
-  if (isBaseGeographyScenarioFeature(feature)) return false;
-  if (isAtlantropaVisualSupportHelperFeature(feature, featureId)) return false;
-  return true;
-}
-
-function shouldExcludePoliticalVisualFeature(feature, featureId = null) {
-  return !isPoliticalVisualRenderableFeature(feature, featureId);
-}
-
-function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
-  if (!isPoliticalVisualRenderableFeature(feature, featureId)) return false;
-  if (isScenarioShellFeature(feature, featureId)) return false;
-  if (feature?.properties?.interactive === false) return false;
-  if (isAtlantropaSupportHelperFeature(feature, featureId)) return false;
-  return true;
-}
-
-function shouldExcludePoliticalInteractionFeature(feature, featureId = null) {
-  return !isPoliticalInteractionRenderableFeature(feature, featureId);
-}
+const {
+  isScenarioShellFeature,
+  hasVisiblePoliticalForegroundColorOverride,
+  orderPoliticalShellUnderlayFirst,
+  shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature,
+  getAtlantropaGeometryRole,
+  getAtlantropaJoinMode,
+  isAntarcticSectorFeature,
+  shouldExcludePoliticalVisualFeature,
+  isPoliticalInteractionRenderableFeature,
+  shouldExcludePoliticalInteractionFeature,
+} = createPoliticalFeaturePolicy({
+  runtimeState,
+  getSafeCanvasColor,
+  hasPendingPoliticalColorEdit,
+  getRenderPassCacheState,
+  getFeatureId,
+  getFeatureCountryCodeNormalized,
+  isAtlantropaFieldDrivenFeature,
+  isInteractiveAtlantropaBooleanWeldIslandFeature,
+  isScenarioAtlantropaVisible,
+  isBaseGeographyScenarioFeature,
+});
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
   const bounds = boundsOverride || getProjectedFeatureBounds(feature);
@@ -12241,104 +12057,11 @@ function getPhysicalExactRefreshPasses() {
   return passes;
 }
 
-function getUrbanFeatureOwnerId(feature) {
-  const props = feature?.properties || {};
-  return String(
-    props.country_owner_id ||
-    props.countryOwnerId ||
-    ""
-  ).trim();
-}
-
-function getUrbanHostFillColor(feature) {
-  const ownerFeatureId = getUrbanFeatureOwnerId(feature);
-  if (!ownerFeatureId) return null;
-  const hostFeature = runtimeState.landIndex?.get(ownerFeatureId);
-  if (!hostFeature) return null;
-  return (
-    getSafeCanvasColor(runtimeState.colors?.[ownerFeatureId], null) ||
-    getSafeCanvasColor(getResolvedFeatureColor(hostFeature, ownerFeatureId), null)
-  );
-}
-
-function computeUrbanAdaptivePaintFromHostColor(backgroundColor, config = {}) {
-  if (!backgroundColor) return null;
-  const luminance = getCanvasColorRelativeLuminance(backgroundColor);
-  if (!Number.isFinite(luminance)) return null;
-
-  const strength = clamp(Number(config.adaptiveStrength) || 0, 0, 1);
-  const toneBias = clamp(Number(config.toneBias) || 0, -0.3, 0.3);
-  const lightenBias = Math.max(toneBias, 0);
-  const deepenBias = Math.max(-toneBias, 0);
-  const isDark = luminance <= 0.30;
-  const isLight = luminance >= 0.62;
-
-  const tintEnabled = !!config.adaptiveTintEnabled;
-  const tintColor = getSafeCanvasColor(config.adaptiveTintColor, null);
-  const tintStrength = clamp(Number(config.adaptiveTintStrength) || 0, 0, 0.5);
-  const applyTintOverlay = (baseColor, channelStrength = 1) => {
-    if (!tintEnabled || !tintColor || tintStrength <= 0) return baseColor;
-    return mixCanvasColors(baseColor, tintColor, clamp(tintStrength * channelStrength, 0, 0.5));
-  };
-
-  if (isDark) {
-    const fillColor = mixCanvasColors(
-      backgroundColor,
-      "#f4efe3",
-      clamp(0.48 + (strength * 0.18) + (lightenBias * 0.56) - (deepenBias * 0.24), 0.18, 0.96)
-    );
-    const strokeColor = mixCanvasColors(
-      backgroundColor,
-      "#fff9ef",
-      clamp(0.66 + (strength * 0.14) + (lightenBias * 0.44) - (deepenBias * 0.18), 0.24, 0.98)
-    );
-    return {
-      fillColor: applyTintOverlay(fillColor, 1),
-      strokeColor: applyTintOverlay(strokeColor, 0.72),
-    };
-  }
-  if (isLight) {
-    const fillColor = mixCanvasColors(
-      backgroundColor,
-      "#20252b",
-      clamp(0.42 + (strength * 0.16) + (deepenBias * 0.34) - (lightenBias * 0.28), 0.16, 0.94)
-    );
-    const strokeColor = mixCanvasColors(
-      backgroundColor,
-      "#0f1419",
-      clamp(0.62 + (strength * 0.12) + (deepenBias * 0.26) - (lightenBias * 0.18), 0.22, 0.96)
-    );
-    return {
-      fillColor: applyTintOverlay(fillColor, 1),
-      strokeColor: applyTintOverlay(strokeColor, 0.72),
-    };
-  }
-  const targetFill = luminance < 0.48 ? "#ede7da" : "#272d34";
-  const targetStroke = luminance < 0.48 ? "#fff7ec" : "#10151a";
-  const fillColor = mixCanvasColors(
-    backgroundColor,
-    targetFill,
-    clamp(0.46 + (strength * 0.16) + (luminance < 0.48 ? (lightenBias * 0.42) - (deepenBias * 0.18) : (deepenBias * 0.26) - (lightenBias * 0.22)), 0.18, 0.95)
-  );
-  const strokeColor = mixCanvasColors(
-    backgroundColor,
-    targetStroke,
-    clamp(0.66 + (strength * 0.12) + (luminance < 0.48 ? (lightenBias * 0.3) - (deepenBias * 0.14) : (deepenBias * 0.22) - (lightenBias * 0.16)), 0.24, 0.97)
-  );
-  return {
-    fillColor: applyTintOverlay(fillColor, 1),
-    strokeColor: applyTintOverlay(strokeColor, 0.72),
-  };
-}
-
-function getUrbanAdaptivePaint(feature, config = {}) {
-  const backgroundColor = getUrbanHostFillColor(feature);
-  return computeUrbanAdaptivePaintFromHostColor(backgroundColor, config);
-}
-
-function getEffectiveUrbanMode(config = {}, capability = runtimeState.urbanLayerCapability) {
-  return config?.mode === "adaptive" && capability?.adaptiveAvailable ? "adaptive" : "manual";
-}
+const {
+  computeUrbanAdaptivePaintFromHostColor,
+  getUrbanAdaptivePaint,
+  getEffectiveUrbanMode,
+} = createUrbanAdaptivePaintModel({ runtimeState, getResolvedFeatureColor, clamp });
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
   const startedAt = nowMs();
@@ -12405,251 +12128,9 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   return getRiverLayerRenderOwner().drawRiversLayer(k, { interactive });
 }
 
-function getCityFeatureKey(feature, fallbackKey = "") {
-  const props = feature?.properties || {};
-  return String(
-    props.__city_stable_key
-    || props.stable_key
-    || props.__city_id
-    || props.id
-    || feature?.id
-    || fallbackKey
-    || ""
-  ).trim();
-}
-
-function getCityFeatureAliases(feature, key = "") {
-  const props = feature?.properties || {};
-  const aliases = new Set([
-    key,
-    props.__city_stable_key,
-    props.stable_key,
-    props.__city_id,
-    props.id,
-    props.name,
-    props.label,
-    props.name_en,
-    props.label_en,
-    props.name_zh,
-    props.label_zh,
-  ].filter(Boolean).map((value) => String(value).trim()));
-  const extraAliases = Array.isArray(props.__city_aliases) ? props.__city_aliases : [];
-  extraAliases.forEach((value) => {
-    const alias = String(value || "").trim();
-    if (alias) aliases.add(alias);
-  });
-  return Array.from(aliases);
-}
-
-function normalizeCityLabelComparisonValue(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
-
-function getCityRawLanguageLabel(feature, language = runtimeState.currentLanguage) {
-  const props = feature?.properties || {};
-  if (String(language || "en").trim().toLowerCase() === "zh") {
-    return String(props.label_zh || props.name_zh || props.label_cn || props.name_cn || "").trim();
-  }
-  return String(props.label_en || props.name_en || props.label || props.name || "").trim();
-}
-
-function getCityOverrideDisplayLabel(feature) {
-  const props = feature?.properties || {};
-  if (!props.__city_has_display_name_override) {
-    return "";
-  }
-  const displayName = props.__city_display_name_override && typeof props.__city_display_name_override === "object"
-    ? props.__city_display_name_override
-    : {};
-  return String(
-    runtimeState.currentLanguage === "zh"
-      ? (displayName.zh || "")
-      : (displayName.en || "")
-  ).trim();
-}
-
-function getCityBaseLocalizedLabel(feature, { strict = false } = {}) {
-  const props = feature?.properties || {};
-  const baseCandidates = [
-    props.__city_stable_key,
-    props.stable_key,
-    props.__city_id,
-    props.id,
-    props.name,
-    props.label,
-    props.name_en,
-    props.label_en,
-    props.name_zh,
-    props.label_zh,
-  ];
-  const aliases = Array.isArray(props.__city_aliases) ? props.__city_aliases : [];
-  return strict
-    ? getStrictGeoLabel([...baseCandidates, ...aliases], "")
-    : getPreferredGeoLabel([...baseCandidates, ...aliases], "");
-}
-
-function isAdministrativeCityLabelCandidate(label = "") {
-  const normalizedLabel = String(label || "").trim();
-  if (!normalizedLabel) return false;
-  return CITY_ADMIN_LABEL_REJECT_PATTERNS.some((pattern) => pattern.test(normalizedLabel));
-}
-
-function getCityHostFeatureDisplayLabel(feature) {
-  const props = feature?.properties || {};
-  const hostFeatureId = String(props.__city_host_feature_id || "").trim();
-  if (!hostFeatureId) return "";
-  const hostLabel = getStrictGeoLabel(hostFeatureId, "");
-  if (!hostLabel || isAdministrativeCityLabelCandidate(hostLabel)) {
-    return "";
-  }
-  return hostLabel;
-}
-
-function getCityRawFallbackLabel(feature) {
-  const props = feature?.properties || {};
-  const currentLanguageLabel = getCityRawLanguageLabel(feature, runtimeState.currentLanguage);
-  if (currentLanguageLabel) {
-    return currentLanguageLabel;
-  }
-  const alternateLanguageLabel = getCityRawLanguageLabel(feature, runtimeState.currentLanguage === "zh" ? "en" : "zh");
-  if (alternateLanguageLabel) {
-    return alternateLanguageLabel;
-  }
-  const localeEntry = props.__city_locale && typeof props.__city_locale === "object" ? props.__city_locale : {};
-  return String(
-    runtimeState.currentLanguage === "zh"
-      ? (localeEntry.zh || localeEntry.en || props.label_zh || props.name_zh || props.label || props.name || props.__city_id || feature?.id || "")
-      : (localeEntry.en || localeEntry.zh || props.label_en || props.name_en || props.label || props.name || props.__city_id || feature?.id || "")
-  ).trim();
-}
-
-function getCityDisplayLabel(feature) {
-  const props = feature?.properties || {};
-  const overrideLabel = getCityOverrideDisplayLabel(feature);
-  if (overrideLabel) {
-    return overrideLabel;
-  }
-  const baseStrict = getCityBaseLocalizedLabel(feature, { strict: true });
-  const baseFallback = getCityBaseLocalizedLabel(feature);
-  const rawCurrentLanguageLabel = getCityRawLanguageLabel(feature, runtimeState.currentLanguage);
-  const rawFallback = getCityRawFallbackLabel(feature);
-  const hostFeatureLabel = getCityHostFeatureDisplayLabel(feature);
-  const prefersLocalizedFallback = !!props.__city_has_display_name_override;
-  const hostComparison = normalizeCityLabelComparisonValue(hostFeatureLabel);
-  const baseComparison = normalizeCityLabelComparisonValue(
-    baseStrict || (prefersLocalizedFallback ? baseFallback : rawCurrentLanguageLabel) || (prefersLocalizedFallback ? rawCurrentLanguageLabel : baseFallback) || rawFallback
-  );
-  if (hostComparison && hostComparison !== baseComparison) {
-    return hostFeatureLabel;
-  }
-  if (baseStrict) {
-    return baseStrict;
-  }
-  if (prefersLocalizedFallback) {
-    if (baseFallback) {
-      return baseFallback;
-    }
-    if (rawCurrentLanguageLabel) {
-      return rawCurrentLanguageLabel;
-    }
-  } else {
-    if (rawCurrentLanguageLabel) {
-      return rawCurrentLanguageLabel;
-    }
-    if (baseFallback) {
-      return baseFallback;
-    }
-  }
-  return rawFallback;
-}
-
-function cleanCityMapLabelText(label = "") {
-  const rawLabel = String(label || "").trim();
-  if (!rawLabel) return "";
-  let cleaned = rawLabel
-    .replace(/\s*\(([^)]*)\)\s*/g, " ")
-    .replace(/\s*,\s*/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  CITY_ADMIN_LABEL_PATTERNS.forEach((pattern) => {
-    cleaned = cleaned.replace(pattern, " ").replace(/\s+/g, " ").trim();
-  });
-  cleaned = cleaned.replace(/^[\s,;:-]+|[\s,;:-]+$/g, "").trim();
-  return cleaned.length >= 3 ? cleaned : rawLabel;
-}
-
-function isCjkText(value = "") {
-  return /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(String(value || ""));
-}
-
-function abbreviateCityMapLabel(label = "") {
-  const rawLabel = String(label || "").trim();
-  if (!rawLabel || isCjkText(rawLabel) || !/[\s-]/u.test(rawLabel)) {
-    return rawLabel;
-  }
-  const segments = rawLabel.split(/([\s-]+)/u);
-  let wordIndex = 0;
-  return segments.map((segment) => {
-    if (!segment || /^[\s-]+$/u.test(segment)) {
-      return segment;
-    }
-    wordIndex += 1;
-    if (wordIndex === 1) {
-      return segment;
-    }
-    const firstGlyph = Array.from(segment)[0] || "";
-    return firstGlyph ? `${firstGlyph}.` : segment;
-  }).join("").replace(/\s+/g, " ").trim();
-}
-
-function truncateCityLabelToWidth(text = "", maxWidthPx = 0, measureWidth = () => 0) {
-  const rawText = String(text || "").trim();
-  if (!rawText) return "";
-  if (measureWidth(rawText) <= maxWidthPx) {
-    return rawText;
-  }
-  const glyphs = Array.from(rawText);
-  if (glyphs.length <= 4) {
-    return rawText;
-  }
-  let truncated = rawText;
-  while (glyphs.length > 4) {
-    glyphs.pop();
-    truncated = `${glyphs.join("")}\u2026`;
-    if (measureWidth(truncated) <= maxWidthPx) {
-      return truncated;
-    }
-  }
-  return truncated;
-}
-
-function getCityMapLabelMaxWidth(entry, config = {}) {
-  const densityKey = String(config.labelDensity || "balanced").trim().toLowerCase();
-  const widthTable = CITY_LABEL_MAX_WIDTH_PX[densityKey] || CITY_LABEL_MAX_WIDTH_PX.balanced;
-  const widthKey = entry?.isCapital ? "capital" : (String(entry?.cityTier || "minor").trim().toLowerCase());
-  return Number(widthTable[widthKey] || widthTable.minor || 132);
-}
-
-function formatCityMapLabel(fullLabel, { entry = null, context: labelContext = null, config = {}, scale = 1 } = {}) {
-  const rawLabel = String(fullLabel || "").trim();
-  if (!rawLabel || !labelContext?.measureText) {
-    return rawLabel;
-  }
-  const maxWidthPx = getCityMapLabelMaxWidth(entry, config);
-  const measureWidth = (candidate) => Number(labelContext.measureText(String(candidate || "")).width || 0) * scale;
-  const cleanedLabel = cleanCityMapLabelText(rawLabel);
-  if (cleanedLabel && measureWidth(cleanedLabel) <= maxWidthPx) {
-    return cleanedLabel;
-  }
-  const abbreviatedLabel = abbreviateCityMapLabel(cleanedLabel || rawLabel);
-  if (abbreviatedLabel && measureWidth(abbreviatedLabel) <= maxWidthPx) {
-    return abbreviatedLabel;
-  }
-  return truncateCityLabelToWidth(abbreviatedLabel || cleanedLabel || rawLabel, maxWidthPx, measureWidth);
-}
+const { getCityFeatureKey, getCityFeatureAliases, getCityDisplayLabel, formatCityMapLabel } = createCityLabelTextModel({
+  runtimeState, getStrictGeoLabel, getPreferredGeoLabel,
+});
 
 function getCityMarkerThemeTokens(config = {}) {
   const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
@@ -13794,587 +13275,69 @@ function drawPoliticalPass(k) {
   return getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);
 }
 
-function getContextScenarioLayerCacheEntry(layerName) {
-  const cache = getRenderPassCacheState();
-  const resolvedLayerName = String(layerName || "default").trim() || "default";
-  const existing = cache.contextScenarioLayerCache?.[resolvedLayerName];
-  if (existing && typeof existing === "object") {
-    return existing;
-  }
-  const next = {
-    canvas: null,
-    signature: "",
-    referenceTransform: null,
-    renderedCount: 0,
-  };
-  cache.contextScenarioLayerCache[resolvedLayerName] = next;
-  return next;
+function getContextScenarioLayerCacheEntry(...args) {
+  return getScenarioRegionOverlayRenderOwner().getContextScenarioLayerCacheEntry(...args);
 }
 
-function ensureContextScenarioLayerCanvas(layerName) {
-  const layerEntry = getContextScenarioLayerCacheEntry(layerName);
-  if (!layerEntry.canvas) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    layerEntry.canvas = canvas;
-  }
-  const layout = getRenderPassLayout("contextScenario");
-  if (layerEntry.canvas.width !== layout.pixelWidth || layerEntry.canvas.height !== layout.pixelHeight) {
-    layerEntry.canvas.width = layout.pixelWidth;
-    layerEntry.canvas.height = layout.pixelHeight;
-    layerEntry.signature = "";
-    layerEntry.referenceTransform = null;
-    layerEntry.renderedCount = 0;
-  }
-  return layerEntry.canvas;
+function ensureContextScenarioLayerCanvas(...args) {
+  return getScenarioRegionOverlayRenderOwner().ensureContextScenarioLayerCanvas(...args);
 }
 
-function drawCachedContextScenarioLayer(layerName, currentTransform) {
-  const layerEntry = getContextScenarioLayerCacheEntry(layerName);
-  const layerCanvas = layerEntry.canvas;
-  const referenceTransform = layerEntry.referenceTransform
-    ? cloneZoomTransform(layerEntry.referenceTransform)
-    : null;
-  if (!layerCanvas || !referenceTransform) return false;
-  const layout = getRenderPassLayout("contextScenario");
-  if (layerCanvas.width !== layout.pixelWidth || layerCanvas.height !== layout.pixelHeight) {
-    return false;
-  }
-  rendererSurfaceHost.getContext().save();
-  rendererSurfaceHost.getContext().setTransform(1, 0, 0, 1, 0, 0);
-  if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
-    rendererSurfaceHost.getContext().drawImage(layerCanvas, 0, 0);
-    rendererSurfaceHost.getContext().restore();
-    return true;
-  }
-  const current = cloneZoomTransform(currentTransform);
-  const scaleRatio = current.k / Math.max(referenceTransform.k, 0.0001);
-  const dx = current.x - (referenceTransform.x * scaleRatio);
-  const dy = current.y - (referenceTransform.y * scaleRatio);
-  const offsetX = Number(layout?.offsetX || 0);
-  const offsetY = Number(layout?.offsetY || 0);
-  rendererSurfaceHost.getContext().translate(
-    (dx + offsetX * (1 - scaleRatio)) * runtimeState.dpr,
-    (dy + offsetY * (1 - scaleRatio)) * runtimeState.dpr,
-  );
-  rendererSurfaceHost.getContext().scale(scaleRatio, scaleRatio);
-  rendererSurfaceHost.getContext().drawImage(layerCanvas, 0, 0);
-  rendererSurfaceHost.getContext().restore();
-  return true;
+function drawCachedContextScenarioLayer(...args) {
+  return getScenarioRegionOverlayRenderOwner().drawCachedContextScenarioLayer(...args);
 }
 
-function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
-  const startedAt = nowMs();
-  let renderedWaterCount = 0;
-  if (!waterFeatures.length) {
-    collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "no-features",
+function getScenarioRegionOverlayRenderOwner() {
+  if (!scenarioRegionOverlayRenderOwner) {
+    scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner({
+      runtimeState,
+      rendererSurfaceHost,
+      getRenderPassCacheState,
+      getRenderPassLayout,
+      cloneZoomTransform,
+      areZoomTransformsEquivalent,
+      nowMs,
+      collectContextMetric,
+      getFeatureId,
+      isWaterRegionRenderable,
+      getWaterRegionDefaultStyle,
+      collectSafeWaterRegionGeometryParts,
+      projectedGeoBoundsInScreen,
+      computeProjectedGeoBounds,
+      getWaterRegionColor,
+      getEffectiveAtlantropaFeatures,
+      getLogicalCanvasDimensions,
+      shouldExcludePoliticalVisualFeature,
+      shouldSkipFeature,
+      pathBoundsInScreen,
+      getResolvedFeatureColor,
+      LAND_FILL_COLOR,
+      getPoliticalFeaturePathEntry,
+      withRenderTarget,
+      prepareTargetContext,
+      getScenarioWaterVisualRevisionToken,
+      isWaterRegionEnabled,
+      isMacroOceanWaterRegion,
+      isBaseGeographyScenarioFeature,
+      isSpecialRegionEnabled,
+      getSpecialRegionOpacity,
+      getSpecialRegionColor,
+      getSpecialRegionStrokeColor,
+      getScenarioSpecialVisualRevisionToken,
+      isScenarioAtlantropaVisible,
+      getEffectiveWaterRegionFeatures,
+      getEffectiveSpecialRegionFeatures,
+      getForcedScenarioWaterCacheMode,
+      getScenarioWaterCacheComplexitySignals,
+      shouldEnableContextScenarioTransformReuse,
+      shouldUseDirectScenarioWaterDraw,
     });
-    return 0;
   }
-  waterFeatures.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `water-${index}`;
-    if (!isWaterRegionRenderable(feature)) return;
-    const defaultStyle = getWaterRegionDefaultStyle(feature);
-    const fillOpacity = defaultStyle.opacity;
-    if (!(fillOpacity > 0)) return;
-    const parts = collectSafeWaterRegionGeometryParts(feature);
-    if (!parts.length) return;
-    const visibleParts = [];
-    parts.forEach((part) => {
-      if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
-      visibleParts.push(part);
-    });
-    if (!visibleParts.length) return;
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
-    rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
-    const waterPath = visibleParts.length === parts.length
-      ? getScenarioWaterFeaturePath(feature, parts)
-      : null;
-    let didFill = false;
-    if (waterPath) {
-      rendererSurfaceHost.getContext().fill(waterPath);
-      didFill = true;
-    } else if (globalThis.Path2D) {
-      visibleParts.forEach((part) => {
-        const partPath = getScenarioWaterPartPath(part);
-        if (partPath) {
-          rendererSurfaceHost.getContext().fill(partPath);
-          didFill = true;
-        } else if (rendererSurfaceHost.getPathCanvas()) {
-          rendererSurfaceHost.getContext().beginPath();
-          rendererSurfaceHost.getPathCanvas()(part);
-          rendererSurfaceHost.getContext().fill();
-          didFill = true;
-        }
-      });
-    } else if (rendererSurfaceHost.getPathCanvas()) {
-      rendererSurfaceHost.getContext().beginPath();
-      visibleParts.forEach((part) => {
-        if (rendererSurfaceHost.getPathCanvas()) rendererSurfaceHost.getPathCanvas()(part);
-      });
-      rendererSurfaceHost.getContext().fill();
-      didFill = true;
-    }
-    rendererSurfaceHost.getContext().restore();
-    if (didFill) renderedWaterCount += 1;
-  });
-  collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
-    featureCount: waterFeatures.length,
-    renderedCount: renderedWaterCount,
-    skipped: renderedWaterCount === 0,
-    reason: renderedWaterCount === 0 ? "culled" : "",
-  });
-  return renderedWaterCount;
-}
-
-function drawScenarioAtlantropaLandLikeOverlayLayer(k) {
-  const startedAt = nowMs();
-  const buckets = getEffectiveAtlantropaFeatures();
-  const overlayFeatures = [
-    ...buckets.land,
-    ...buckets.shoal,
-    ...buckets.relief,
-  ];
-  let renderedCount = 0;
-  if (!overlayFeatures.length) {
-    collectContextMetric("drawScenarioAtlantropaLandLikeOverlayLayer", nowMs() - startedAt, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "no-features",
-    });
-    return 0;
-  }
-  const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  overlayFeatures.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `atlantropa-overlay-${index}`;
-    if (!id) return;
-    if (shouldExcludePoliticalVisualFeature(feature, id)) return;
-    if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
-    if (!pathBoundsInScreen(feature)) return;
-    const fillColor =
-      getSafeCanvasColor(runtimeState.colors?.[id], null)
-      || getSafeCanvasColor(getResolvedFeatureColor(feature, id), null)
-      || LAND_FILL_COLOR;
-    const cachedPath = getPoliticalFeaturePathEntry(feature, {
-      featureId: id,
-      transform,
-      allowBuild: true,
-      countBuild: false,
-    })?.path || null;
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().globalAlpha = 1;
-    rendererSurfaceHost.getContext().fillStyle = fillColor;
-    if (cachedPath) {
-      rendererSurfaceHost.getContext().fill(cachedPath);
-    } else {
-      rendererSurfaceHost.getContext().beginPath();
-      rendererSurfaceHost.getPathCanvas()(feature);
-      rendererSurfaceHost.getContext().fill();
-    }
-    rendererSurfaceHost.getContext().restore();
-    renderedCount += 1;
-  });
-  collectContextMetric("drawScenarioAtlantropaLandLikeOverlayLayer", nowMs() - startedAt, {
-    featureCount: overlayFeatures.length,
-    renderedCount,
-    skipped: renderedCount === 0,
-    reason: renderedCount === 0 ? "culled" : "",
-  });
-  return renderedCount;
-}
-
-function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures) {
-  const layerEntry = getContextScenarioLayerCacheEntry("water");
-  const layerCanvas = ensureContextScenarioLayerCanvas("water");
-  const layerContext = layerCanvas.getContext("2d");
-  if (!layerContext) {
-    layerEntry.signature = "";
-    layerEntry.referenceTransform = null;
-    layerEntry.renderedCount = 0;
-    return 0;
-  }
-  const layout = getRenderPassLayout("contextScenario");
-  let renderedWaterCount = 0;
-  withRenderTarget(layerContext, () => {
-    const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-    renderedWaterCount = drawScenarioWaterFillLayer(layerK, { waterFeatures });
-  });
-  layerEntry.signature = getScenarioWaterVisualRevisionToken();
-  layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-  layerEntry.renderedCount = renderedWaterCount;
-  return renderedWaterCount;
-}
-
-function getScenarioWaterPartPath(part) {
-  if (!part || typeof part !== "object" || !globalThis.Path2D || typeof rendererSurfaceHost.getPathSvg() !== "function") {
-    return null;
-  }
-  if (scenarioWaterPartPathCache.has(part)) {
-    return scenarioWaterPartPathCache.get(part) || null;
-  }
-  let path = null;
-  try {
-    const pathString = rendererSurfaceHost.getPathSvg()(part);
-    path = pathString ? new globalThis.Path2D(pathString) : null;
-  } catch (_error) {
-    path = null;
-  }
-  scenarioWaterPartPathCache.set(part, path);
-  return path;
-}
-
-function getScenarioWaterFeaturePath(feature, parts) {
-  if (!feature || typeof feature !== "object" || !globalThis.Path2D) {
-    return null;
-  }
-  if (scenarioWaterFeaturePathCache.has(feature)) {
-    return scenarioWaterFeaturePathCache.get(feature) || null;
-  }
-  const combinedPath = new globalThis.Path2D();
-  let added = false;
-  (Array.isArray(parts) ? parts : []).forEach((part) => {
-    const partPath = getScenarioWaterPartPath(part);
-    if (!partPath || typeof combinedPath.addPath !== "function") return;
-    combinedPath.addPath(partPath);
-    added = true;
-  });
-  const path = added ? combinedPath : null;
-  scenarioWaterFeaturePathCache.set(feature, path);
-  return path;
-}
-
-function drawScenarioWaterHighlightLayer(k) {
-  const highlightIds = new Set([
-    String(runtimeState.selectedWaterRegionId || "").trim(),
-  ].filter(Boolean));
-  let highlightedCount = 0;
-  highlightIds.forEach((id) => {
-    const feature = runtimeState.waterRegionsById?.get(id);
-    if (!feature) return;
-    if (!isWaterRegionEnabled(feature)) return;
-    const parts = collectSafeWaterRegionGeometryParts(feature);
-    if (!parts.length) return;
-    const isMacroOcean = isMacroOceanWaterRegion(feature);
-    rendererSurfaceHost.getContext().beginPath();
-    let visiblePartCount = 0;
-    parts.forEach((part) => {
-      if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
-      if (!rendererSurfaceHost.getPathCanvas()) return;
-      rendererSurfaceHost.getPathCanvas()(part);
-      visiblePartCount += 1;
-    });
-    if (!visiblePartCount) return;
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().globalAlpha = isMacroOcean ? 0.92 : 1;
-    rendererSurfaceHost.getContext().strokeStyle = "#f1c40f";
-    rendererSurfaceHost.getContext().lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
-    rendererSurfaceHost.getContext().lineJoin = "round";
-    rendererSurfaceHost.getContext().stroke();
-    rendererSurfaceHost.getContext().restore();
-    highlightedCount += 1;
-  });
-  return highlightedCount;
-}
-
-function drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures = [] } = {}) {
-  const startedAt = nowMs();
-  let renderedSpecialCount = 0;
-  if (!specialFeatures.length) {
-    collectContextMetric("drawScenarioSpecialRegionOverlaysLayer", nowMs() - startedAt, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "no-features",
-    });
-    return 0;
-  }
-  specialFeatures.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `special-${index}`;
-    const renderAsBase = isBaseGeographyScenarioFeature(feature);
-    if (!isSpecialRegionEnabled(feature)) return;
-    if (!pathBoundsInScreen(feature)) return;
-    rendererSurfaceHost.getContext().beginPath();
-    rendererSurfaceHost.getPathCanvas()(feature);
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().globalAlpha = renderAsBase
-      ? Math.max(getSpecialRegionOpacity(feature, id), 0.94)
-      : getSpecialRegionOpacity(feature, id);
-    rendererSurfaceHost.getContext().fillStyle = getSpecialRegionColor(id, feature);
-    rendererSurfaceHost.getContext().fill();
-    rendererSurfaceHost.getContext().restore();
-    rendererSurfaceHost.getContext().strokeStyle = getSpecialRegionStrokeColor(feature);
-    rendererSurfaceHost.getContext().lineWidth = 1 / Math.max(0.0001, k);
-    rendererSurfaceHost.getContext().lineJoin = "round";
-    rendererSurfaceHost.getContext().stroke();
-    renderedSpecialCount += 1;
-  });
-  collectContextMetric("drawScenarioSpecialRegionOverlaysLayer", nowMs() - startedAt, {
-    featureCount: specialFeatures.length,
-    renderedCount: renderedSpecialCount,
-    skipped: renderedSpecialCount === 0,
-    reason: renderedSpecialCount === 0 ? "culled" : "",
-  });
-  return renderedSpecialCount;
-}
-
-function renderScenarioSpecialRegionOverlaysLayerToCache(currentTransform, specialFeatures) {
-  const layerEntry = getContextScenarioLayerCacheEntry("special");
-  const layerCanvas = ensureContextScenarioLayerCanvas("special");
-  const layerContext = layerCanvas.getContext("2d");
-  if (!layerContext) {
-    layerEntry.signature = "";
-    layerEntry.referenceTransform = null;
-    layerEntry.renderedCount = 0;
-    return 0;
-  }
-  const layout = getRenderPassLayout("contextScenario");
-  let renderedSpecialCount = 0;
-  withRenderTarget(layerContext, () => {
-    const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-    renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(layerK, { specialFeatures });
-  });
-  layerEntry.signature = getScenarioSpecialVisualRevisionToken();
-  layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-  layerEntry.renderedCount = renderedSpecialCount;
-  return renderedSpecialCount;
+  return scenarioRegionOverlayRenderOwner;
 }
 
 function drawScenarioRegionOverlaysPass(k) {
-  const startedAt = nowMs();
-  const showWater = !!runtimeState.showWaterRegions;
-  const showSpecial = !!runtimeState.showScenarioSpecialRegions;
-  const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible();
-  const waterFeatures = showWater ? getEffectiveWaterRegionFeatures() : [];
-  const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
-  let renderedWaterCount = 0;
-  let renderedAtlantropaLandLikeCount = 0;
-  let renderedSpecialCount = 0;
-  let highlightedWaterCount = 0;
-  let waterCacheMode = "disabled";
-  let waterCacheStrategyMode = "disabled";
-  let waterCacheStrategySource = "disabled";
-  let waterCoverageAlgo = "disabled";
-  let waterVisibleCoverageRatio = 0;
-  let waterPrevRenderedCount = Math.max(0, Number(lastScenarioWaterRenderedCount || 0));
-  let specialCacheMode = "disabled";
-  // water/special overlay 这里走的是显式策略选择，不是错误恢复链：
-  // adaptive 会按覆盖率和复杂度在 reuse/redraw/direct 间切换；
-  // direct 表示“直接画到当前 pass，不维护复用缓存”，不要把它当失败兜底继续叠 fallback。
-  if (!showWater && !showSpecial && !showAtlantropaLandLikeOverlay) {
-    collectContextMetric("contextScenarioLayerWater", 0, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "disabled",
-      cacheMode: "disabled",
-      signature: getScenarioWaterVisualRevisionToken(),
-    });
-    collectContextMetric("contextScenarioLayerSpecial", 0, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "disabled",
-      cacheMode: "disabled",
-      signature: getScenarioSpecialVisualRevisionToken(),
-    });
-    collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
-      featureCount: 0,
-      waterFeatureCount: 0,
-      specialFeatureCount: 0,
-      renderedWaterCount: 0,
-      renderedSpecialCount: 0,
-      highlightedWaterCount: 0,
-      waterVisibleCoverageRatio,
-      waterPrevRenderedCount,
-      waterCoverageAlgo,
-      waterCacheMode,
-      waterCacheStrategyMode,
-      waterCacheStrategySource,
-      skipped: true,
-      reason: "disabled",
-    });
-    return;
-  }
-
-  if (showWater) {
-    const forcedWaterCache = getForcedScenarioWaterCacheMode();
-    waterCacheStrategyMode = forcedWaterCache.mode;
-    waterCacheStrategySource = forcedWaterCache.source;
-    const signals = getScenarioWaterCacheComplexitySignals(waterFeatures);
-    waterVisibleCoverageRatio = signals.visibleCoverageRatio;
-    waterPrevRenderedCount = signals.previousRenderedCount;
-    waterCoverageAlgo = signals.waterCoverageAlgo || "grid";
-
-    const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-    const waterLayerEntry = getContextScenarioLayerCacheEntry("water");
-    const waterVisualRevision = getScenarioWaterVisualRevisionToken();
-    const canReuseWaterLayer = (
-      shouldEnableContextScenarioTransformReuse()
-      && waterLayerEntry.signature === waterVisualRevision
-      && !!waterLayerEntry.canvas
-      && !!waterLayerEntry.referenceTransform
-    );
-
-    const useAdaptiveDirect = forcedWaterCache.mode === "adaptive" && shouldUseDirectScenarioWaterDraw(signals);
-    const strategy = useAdaptiveDirect ? "adaptive-direct" : forcedWaterCache.mode;
-
-    if (strategy === "direct" || strategy === "adaptive-direct") {
-      waterCacheMode = strategy;
-      collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-        layer: "water",
-        reason: strategy,
-        signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-      });
-      renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-    } else if (strategy === "reuse") {
-      if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
-        waterCacheMode = "reuse";
-        collectContextMetric("contextScenarioLayerCacheHit", 0, {
-          layer: "water",
-          renderedCount: Number(waterLayerEntry.renderedCount || 0),
-        });
-        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
-      } else {
-        waterCacheMode = "redraw";
-        collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-          layer: "water",
-          reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
-          signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-        });
-        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-        if (!drawCachedContextScenarioLayer("water", currentTransform)) {
-          waterCacheMode = "direct";
-          renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-        }
-      }
-    } else if (strategy === "redraw") {
-      waterCacheMode = "redraw";
-      collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-        layer: "water",
-        reason: "forced-redraw",
-        signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-      });
-      renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-      if (!drawCachedContextScenarioLayer("water", currentTransform)) {
-        waterCacheMode = "direct";
-        renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-      }
-    } else {
-      if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
-        waterCacheMode = "reuse";
-        collectContextMetric("contextScenarioLayerCacheHit", 0, {
-          layer: "water",
-          renderedCount: Number(waterLayerEntry.renderedCount || 0),
-        });
-        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
-      } else {
-        waterCacheMode = "redraw";
-        collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-          layer: "water",
-          reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
-          signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-        });
-        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-        if (!drawCachedContextScenarioLayer("water", currentTransform)) {
-          waterCacheMode = "direct";
-          renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-        }
-      }
-    }
-    highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
-    if (showAtlantropaLandLikeOverlay) {
-      renderedAtlantropaLandLikeCount = drawScenarioAtlantropaLandLikeOverlayLayer(k);
-    }
-    lastScenarioWaterRenderedCount = Math.max(0, Number(renderedWaterCount || 0));
-    collectContextMetric("contextScenarioLayerWater", 0, {
-      featureCount: waterFeatures.length,
-      renderedCount: renderedWaterCount,
-      highlightedCount: highlightedWaterCount,
-      cacheMode: waterCacheMode,
-      signature: waterVisualRevision,
-    });
-  } else {
-    collectContextMetric("contextScenarioLayerWater", 0, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "disabled",
-      cacheMode: "disabled",
-      signature: getScenarioWaterVisualRevisionToken(),
-    });
-  }
-
-  if (showSpecial) {
-    const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-    const specialLayerEntry = getContextScenarioLayerCacheEntry("special");
-    const specialVisualRevision = getScenarioSpecialVisualRevisionToken();
-    const canReuseSpecialLayer = (
-      shouldEnableContextScenarioTransformReuse()
-      && specialLayerEntry.signature === specialVisualRevision
-      && !!specialLayerEntry.canvas
-      && !!specialLayerEntry.referenceTransform
-    );
-    if (canReuseSpecialLayer && drawCachedContextScenarioLayer("special", currentTransform)) {
-      specialCacheMode = "reuse";
-      renderedSpecialCount = Number(specialLayerEntry.renderedCount || 0);
-      collectContextMetric("contextScenarioLayerCacheHit", 0, {
-        layer: "special",
-        renderedCount: renderedSpecialCount,
-      });
-    } else {
-      specialCacheMode = "redraw";
-      collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-        layer: "special",
-        reason: specialLayerEntry.signature === specialVisualRevision ? "transform" : "signature",
-        signatureChanged: specialLayerEntry.signature !== specialVisualRevision,
-      });
-      renderedSpecialCount = renderScenarioSpecialRegionOverlaysLayerToCache(currentTransform, specialFeatures);
-      if (!drawCachedContextScenarioLayer("special", currentTransform)) {
-        specialCacheMode = "direct";
-        renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures });
-      }
-    }
-    collectContextMetric("contextScenarioLayerSpecial", 0, {
-      featureCount: specialFeatures.length,
-      renderedCount: renderedSpecialCount,
-      cacheMode: specialCacheMode,
-      signature: getScenarioSpecialVisualRevisionToken(),
-    });
-  } else {
-    collectContextMetric("contextScenarioLayerSpecial", 0, {
-      featureCount: 0,
-      renderedCount: 0,
-      skipped: true,
-      reason: "disabled",
-      cacheMode: "disabled",
-      signature: getScenarioSpecialVisualRevisionToken(),
-    });
-  }
-  collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
-    featureCount: waterFeatures.length + specialFeatures.length,
-    waterFeatureCount: waterFeatures.length,
-    atlantropaLandLikeRenderedCount: renderedAtlantropaLandLikeCount,
-    specialFeatureCount: specialFeatures.length,
-    renderedWaterCount,
-    renderedSpecialCount,
-    highlightedWaterCount,
-    waterVisibleCoverageRatio,
-    waterPrevRenderedCount,
-    waterCoverageAlgo,
-    waterCacheMode,
-    waterCacheStrategyMode,
-    waterCacheStrategySource,
-    specialCacheMode,
-    skipped: false,
-  });
+  return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);
 }
 
 function drawHgoPreviewPass() {

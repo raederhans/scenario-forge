@@ -20,7 +20,7 @@ test("river layer contracts keep zoom gating, render metrics, and targeted regre
   const riverSpecSource = readRepoFile("tests", "e2e", "river_layer_regression.spec.js");
 
   const drawRiversLayerStart = rendererSource.indexOf("function drawRiversLayer");
-  const drawRiversLayerEnd = rendererSource.indexOf("function getCityFeatureKey", drawRiversLayerStart);
+  const drawRiversLayerEnd = rendererSource.indexOf("const { getCityFeatureKey", drawRiversLayerStart);
   const drawRiversLayerSource =
     drawRiversLayerStart >= 0 && drawRiversLayerEnd > drawRiversLayerStart
       ? rendererSource.slice(drawRiversLayerStart, drawRiversLayerEnd)
