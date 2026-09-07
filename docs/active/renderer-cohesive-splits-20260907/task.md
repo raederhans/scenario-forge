@@ -25,3 +25,9 @@ Policy: round3 adds1 unregistered retained operation-editor binding/19 conservat
 No real browser drag/pointer capture test, performance benchmark, remote CI, merge or deployment. Complete Pages build/mirror, create local third commit, then report parent task 01a075b3-61a1-76d2-999b-415e21460c36 for independent verification and further instructions. Do not enter round4 independently.
 
 Pages build and required-files/mirror contract1/1 completed successfully. Third local commit is ready; parent report follows with the exact revision.
+
+## Cumulative closeout — complete
+
+No round4. Real localhost mouse smoke passed operation vertex selection/drag, unit drag and physical point pointerup; each gesture adds exactly one history entry. Native releasePointerCapture causes trusted lostpointercapture and one commit, subsequent pointerup adds none. Native pointercancel and quantitative raster/performance comparisons remain untested. Browser fixture preparation issue corrected without production changes. Final console0 errors/0 warnings; browser/server closed, owned metadata removed.
+
+Cumulative review found one missing sourceRef for the actual-import regression; corrected map_renderer.js -> renderer-surface-host route and verified selector/schema443. Reviewer final PASS WITH NOTES. Closeout commit contains routing and this delivery record only; production/dist remain e996be14. Ten new policy locations and preexisting unit model debt remain explicit, with getter writes/effects and trusted-policy command sequence in context. Ready for parent integration decision, not full P4/release admission. No push/merge/deploy performed.

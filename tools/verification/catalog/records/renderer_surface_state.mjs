@@ -506,6 +506,7 @@ export const RENDERER_SURFACE_STATE_RECORDS = [
     "id": "node:test:node:renderer-surface-host",
     "commandRef": "test:node:renderer-surface-host",
     "sourceRefs": [
+      "js/core/map_renderer.js",
       "tests/renderer_surface_host_behavior.test.mjs",
       "tests/renderer_surface_host_inventory_boundary.test.mjs",
       "js/core/renderer/renderer_surface_host.js"
