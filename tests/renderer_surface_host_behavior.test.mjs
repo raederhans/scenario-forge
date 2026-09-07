@@ -21,6 +21,13 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     if (declaration?.type === "FunctionDeclaration") scope[declaration.id.name] = noop;
     for (const entry of declaration?.declarations || []) {
       if (entry.id.type === "Identifier") scope[entry.id.name] = null;
+      if (entry.id.type === "ObjectPattern") {
+        // Display-model methods are destructured at the composition root.
+        for (const property of entry.id.properties) {
+          assert.equal(property.value?.type, "Identifier", "owner method bindings use explicit names");
+          scope[property.value.name] = noop;
+        }
+      }
     }
     for (const entry of node.type === "ImportDeclaration" ? node.specifiers : []) scope[entry.local.name] = noop;
   }
@@ -111,6 +118,11 @@ test("renderer owner wiring remains lazy and preserves live host and global read
   };
   for (const [name, getters] of Object.entries(dependencies)) {
     const { owner, handles, globals, setWindow } = createOwnerWiringHarness(name);
+    if (name === "StrategicOverlayHelpersOwner") {
+      for (const helper of ["getUnitCounterCardModel", "getUnitCounterRenderEntries", "getUnitCounterRenderScale"]) {
+        assert.equal(typeof owner.helpers[helper], "function", helper);
+      }
+    }
     for (let version = 1; version <= 2; version++) {
       const d3 = { zoomIdentity: { version } };
       Object.defineProperty(globals, "d3", { value: d3, configurable: true });
