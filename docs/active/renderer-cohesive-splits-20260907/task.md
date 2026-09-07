@@ -49,3 +49,7 @@ Final Pages builder and required-files/source-mirror1/1 passed. Full changed-fil
 ## Continued batch closeout — complete
 
 Independent reviewer PASS WITH NOTES, no material findings; independent48 targeted Node pass. Complete36-file route selector unmatched=[]; final source/dist parity confirmed. Formal3-binding policy increment and inherited6 source-contract failures remain explicitly documented. One local reviewable batch commit follows; report parent01a075b3-61a1-76d2-999b-415e21460c36 and stop. No further batch, push, merge or release.
+
+## Inherited source-contract follow-up — complete
+
+All6 previously documented failing methods repaired and passed (5 unchanged toolbar successes from six-method run, then1 action success after fixing its masked presentation-import expectation). Exact canonical named imports/target calls are constrained; singleton/noncanonical/global-effect exclusions retained. Toolbar assertions track real facade/action/brush ownership while preserving behavior and wiring checks. No production or dist edits; prior dist/tests reused. This supersedes the inherited6-failure status above; formal3-binding P4 increment remains unresolved and separate. Follow-up local contract-only commit for parent integration; no push/merge.

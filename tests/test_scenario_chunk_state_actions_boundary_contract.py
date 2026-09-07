@@ -126,8 +126,42 @@ class ScenarioChunkStateActionsBoundaryContractTest(unittest.TestCase):
                 self.assertEqual(imports, ["../scenario_runtime_state.js"])
                 self.assertIn("createDefaultActiveScenarioChunksState", content)
                 self.assertIn("createDefaultRuntimeChunkLoadState", content)
+            elif path == ACTIVATION_ACTIONS_JS:
+                self.assertEqual(imports, ["./special_zone_actions.js"])
+                self.assertRegex(
+                    content,
+                    r'import\s*\{\s*commitSpecialZoneLayersState\s*\}\s*from\s*"\./special_zone_actions.js";',
+                )
+                self.assertRegex(content, r"commitSpecialZoneLayersState\(\s*target,\s*payload,")
+            elif path == PRESENTATION_ACTIONS_JS:
+                canonical_imports = {
+                    "./appearance_actions.js": [
+                        "patchAppearanceStyleGroupState",
+                        "setAppearanceParentBorderEnabledMapState",
+                        "setAppearanceStyleConfigState",
+                        "setAppearanceStyleGroupState",
+                    ],
+                    "./appearance_visibility_actions.js": ["setAppearanceVisibilitySnapshotState"],
+                    "./ui_chrome_actions.js": ["patchUiChromeState", "setUiChromeState"],
+                    "./ui_visibility_actions.js": ["commitUiVisibilityState"],
+                }
+                self.assertEqual(imports, list(canonical_imports))
+                for dependency, expected_names in canonical_imports.items():
+                    declaration = re.search(
+                        rf'import\s*\{{([^}}]+)\}}\s*from\s*"{re.escape(dependency)}";',
+                        content,
+                    )
+                    self.assertIsNotNone(declaration, dependency)
+                    self.assertEqual(
+                        [name.strip() for name in declaration.group(1).split(",") if name.strip()],
+                        expected_names,
+                    )
+                    for name in expected_names:
+                        self.assertRegex(content, rf"\b{name}\(\s*target,")
             else:
                 self.assertEqual(imports, [])
+            self.assertNotRegex(content, r'''(?m)^\s*import\s*["']''')
+            self.assertNotRegex(content, r"\bimport\s*\(")
             if frozen_catalog:
                 self.assertIn(f"export const {frozen_catalog} = Object.freeze(", content)
             for export_name in exports:
