@@ -35,7 +35,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
   const handles = {};
   let reads = 0;
   const rendererSurfaceHost = {};
-  for (const key of ["Context", "HitContext", "Projection", "PathSvg", "PathCanvas", "PathHitCanvas", "ZoomBehavior", "InteractionRect", "MapContainer", "MapSvg", "ViewportGroup", "Tooltip", "OperationalLinesGroup", "OperationGraphicsGroup", "UnitCountersGroup", "SpecialZonesGroup", "SpecialZoneEditorGroup"]) {
+  for (const key of ["Context", "HitContext", "Projection", "PathSvg", "PathCanvas", "PathHitCanvas", "ZoomBehavior", "InteractionRect", "MapContainer", "MapSvg", "ViewportGroup", "Tooltip", "StrategicDefs", "OperationalLinesGroup", "OperationGraphicsGroup", "UnitCountersGroup", "SpecialZonesGroup", "SpecialZoneEditorGroup"]) {
     rendererSurfaceHost[`get${key}`] = function () {
       assert.equal(this, rendererSurfaceHost, `get${key} must keep its host receiver`);
       reads++;
@@ -103,7 +103,7 @@ test("renderer owner wiring remains lazy and preserves live host and global read
     SpatialIndexRuntimeOwner: { getPathSvg: "PathSvg" },
     IntensityFieldMaskOwner: { getProjection: "Projection" },
     HgoRuntimePreviewRenderOwner: { getProjection: "Projection", getMapSvg: "MapSvg", getTargetCanvas: "TargetCanvas" },
-    StrategicOverlayHelpersOwner: { getOperationalLinesGroup: "OperationalLinesGroup", getOperationGraphicsGroup: "OperationGraphicsGroup", getUnitCountersGroup: "UnitCountersGroup", getSpecialZonesGroup: "SpecialZonesGroup", getSpecialZoneEditorGroup: "SpecialZoneEditorGroup" },
+    StrategicOverlayHelpersOwner: { getStrategicDefs: "StrategicDefs", getOperationalLinesGroup: "OperationalLinesGroup", getOperationGraphicsGroup: "OperationGraphicsGroup", getUnitCountersGroup: "UnitCountersGroup", getSpecialZonesGroup: "SpecialZonesGroup", getSpecialZoneEditorGroup: "SpecialZoneEditorGroup" },
     RenderCacheOwner: { getContext: "Context" },
     ViewportReadModelOwner: {},
     ViewportCommandOwner: { getZoomBehavior: "ZoomBehavior", getInteractionRect: "InteractionRect", getD3: "d3" },
@@ -113,6 +113,7 @@ test("renderer owner wiring remains lazy and preserves live host and global read
     MapInteractionEventBindingOwner: { getInteractionRect: "InteractionRect" },
     HitCanvasSchedulingOwner: {},
     MapHoverInteractionOwner: {},
+    OperationGraphicsEditorRenderOwner: {},
     StaticBorderMeshLifecycle: {},
     ScenarioRegionOverlayRenderOwner: {},
     RenderPassCacheHostOwner: {},
@@ -324,4 +325,8 @@ test("surface host supports initial handles and null normalization", () => {
 
   assert.equal(host.getMapContainer(), initialContainer);
   assert.equal(host.getTooltip(), null);
+});
+
+test("renderer composition imports without eager dependency initialization errors", async () => {
+  await import("../js/core/map_renderer.js");
 });

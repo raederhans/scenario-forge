@@ -6,6 +6,30 @@ import {
   UNIT_COUNTER_SCREEN_SIZE,
 } from "../unit_counter_presets.js";
 
+export const DEFAULT_MILSTD_SIDC = "130310001412110000000000000000";
+
+const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
+
+const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
+  INF: DEFAULT_UNIT_COUNTER_SIDC,
+  ARMORED: "130310001712110000000000000000",
+  ARM: "130310001712110000000000000000",
+  HQ: "100310001712110000000000000000",
+  ART: "130320000000000000000000000000",
+});
+
+function getUnitCounterSymbolToken(counter = {}) {
+  return String(counter.sidc || counter.symbolCode || getUnitCounterPresetById(counter.presetId).baseSidc || "").trim();
+}
+
+export function getUnitCounterEffectiveSidc(counter = {}) {
+  const raw = getUnitCounterSymbolToken(counter);
+  if (/^\d{30}$/.test(raw)) {
+    return raw;
+  }
+  return UNIT_COUNTER_SIDC_ALIASES[String(raw || "").trim().toUpperCase()] || DEFAULT_MILSTD_SIDC;
+}
+
 export const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
 
 export const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
@@ -116,12 +140,37 @@ export function createUnitCounterDisplayModel({
   getScenarioCountryDisplayName,
   ColorManager,
   t,
-  getUnitCounterEffectiveSidc,
-  getMilSymbolDataUri,
   getOperationalLineById,
   getLineMidpointFromCoordinates,
   clamp,
 }) {
+  const milsymbolSvgUriCache = new Map();
+
+  function getMilSymbolDataUri(sidc, size = 42) {
+    const normalizedSidc = String(sidc || "").trim();
+    const normalizedSize = Math.max(24, Math.min(96, Number(size) || 42));
+    const cacheKey = `${normalizedSidc}|${normalizedSize}`;
+    if (milsymbolSvgUriCache.has(cacheKey)) {
+      return milsymbolSvgUriCache.get(cacheKey);
+    }
+    if (!normalizedSidc || !globalThis.ms?.Symbol) {
+      return "";
+    }
+    try {
+      const symbol = new globalThis.ms.Symbol(normalizedSidc, {
+        size: normalizedSize,
+        frame: true,
+        colorMode: "Light",
+      });
+      const uri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(symbol.asSVG())}`;
+      milsymbolSvgUriCache.set(cacheKey, uri);
+      return uri;
+    } catch (_error) {
+      milsymbolSvgUriCache.set(cacheKey, "");
+      return "";
+    }
+  }
+
   function getUnitCounterNationMeta(tag) {
     const normalizedTag = canonicalCountryCode(tag);
     if (!normalizedTag) {

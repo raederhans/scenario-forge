@@ -7,7 +7,9 @@ MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 STRATEGIC_OVERLAY_HELPERS_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_helpers.js"
 UNIT_COUNTER_RUNTIME_DOMAIN_JS = REPO_ROOT / "js" / "core" / "renderer" / "strategic_overlay_runtime" / "unit_counter_runtime_domain.js"
 EXPECTED_STRATEGIC_OVERLAY_HELPER_WHITELIST = [
-    "renderStrategicDefs",
+    "getStrategicOverlayRuntimeOwner",
+    "getMapLonLatFromEvent",
+    "getLandFeatureIdFromEvent",
     "ensureOperationalLineEditorState",
     "getOperationalLinePreset",
     "projectStrategicPoints",
@@ -96,6 +98,20 @@ class MapRendererStrategicOverlayHelpersBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("pushHistoryEntry({", owner_content)
         self.assertNotIn('markDirty("move-unit-counter");', owner_content)
         self.assertNotIn('renderUnitCountersIfNeeded({ force: true });', owner_content)
+
+    def test_defs_and_unit_drag_bindings_are_owned_with_live_surface_access(self):
+        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        owner_content = STRATEGIC_OVERLAY_HELPERS_JS.read_text(encoding="utf-8")
+        self.assertNotIn("function renderStrategicDefs()", renderer_content)
+        self.assertNotIn("function bindUnitCounterOverlayInteractions()", renderer_content)
+        self.assertIn("function renderStrategicDefs()", owner_content)
+        self.assertIn("function bindUnitCounterOverlayInteractions()", owner_content)
+        self.assertIn("getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs()", renderer_content)
+        self.assertIn("groupGetters.getStrategicDefs?.()", owner_content)
+        self.assertIn("groupGetters.getUnitCountersGroup?.()", owner_content)
+        self.assertIn("getStrategicOverlayHelpersOwner().bindUnitCounterOverlayInteractions()", renderer_content)
+        self.assertIn("getStrategicOverlayRuntimeOwner().beginUnitCounterDrag(datum.counter)", owner_content)
+        self.assertIn("getStrategicOverlayRuntimeOwner().finishUnitCounterDrag(datum.counter, { featureId })", owner_content)
 
     def test_owner_helper_injection_matches_owner_helper_contract_whitelist(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")

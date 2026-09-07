@@ -1,3 +1,5 @@
+import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
+import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
 import { createBrushInteractionSessionOwner, mergeHistorySnapshot } from "./renderer/brush_interaction_session_owner.js";
@@ -34,6 +36,7 @@ import {
 } from "./renderer/operation_graphic_geometry.js";
 import {
   createUnitCounterDisplayModel,
+  DEFAULT_MILSTD_SIDC,
   normalizeUnitCounterStatPercent,
   normalizeUnitCounterStatsPresetId,
   normalizeUnitCounterBaseFillColor,
@@ -331,8 +334,6 @@ const {
   getScenarioCountryDisplayName,
   ColorManager,
   t,
-  getUnitCounterEffectiveSidc,
-  getMilSymbolDataUri,
   getOperationalLineById,
   getLineMidpointFromCoordinates,
   clamp,
@@ -588,7 +589,7 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 
-const DEFAULT_MILSTD_SIDC = "130310001412110000000000000000";
+
 const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
   steel: "#64748b",
@@ -601,18 +602,12 @@ const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
 });
 const STRATEGIC_RESOURCE_MARKER_STROKE = "#f8fafc";
 const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
-const milsymbolSvgUriCache = new Map();
+
 const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
 const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
-const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
 
-const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
-  INF: DEFAULT_UNIT_COUNTER_SIDC,
-  ARMORED: "130310001712110000000000000000",
-  ARM: "130310001712110000000000000000",
-  HQ: "100310001712110000000000000000",
-  ART: "130320000000000000000000000000",
-});
+
+
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
@@ -1519,6 +1514,7 @@ function getStrategicOverlayHelpersOwner() {
       strategicLineLabelFont: STRATEGIC_LINE_LABEL_FONT,
     },
     groupGetters: {
+      getStrategicDefs: () => rendererSurfaceHost.getStrategicDefs(),
       getOperationalLinesGroup: () => rendererSurfaceHost.getOperationalLinesGroup(),
       getOperationGraphicsGroup: () => rendererSurfaceHost.getOperationGraphicsGroup(),
       getUnitCountersGroup: () => rendererSurfaceHost.getUnitCountersGroup(),
@@ -1526,7 +1522,9 @@ function getStrategicOverlayHelpersOwner() {
       getSpecialZoneEditorGroup: () => rendererSurfaceHost.getSpecialZoneEditorGroup(),
     },
     helpers: {
-      renderStrategicDefs,
+      getStrategicOverlayRuntimeOwner,
+      getMapLonLatFromEvent,
+      getLandFeatureIdFromEvent,
       ensureOperationalLineEditorState,
       getOperationalLinePreset,
       projectStrategicPoints,
@@ -13646,63 +13644,7 @@ function getProjectedPoint(coord) {
   return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
 }
 
-function renderStrategicDefs() {
-  if (!rendererSurfaceHost.getStrategicDefs()) return;
-  const defs = [
-    {
-      id: "strategic-arrow-attack",
-      path: "M 0 5 L 8 1.8 L 7 5 L 8 8.2 z",
-      fill: "#7f1d1d",
-      stroke: "#f5d7d3",
-      strokeWidth: 0.45,
-    },
-    {
-      id: "strategic-arrow-retreat",
-      path: "M 1 5 L 8 2 L 6.6 5 L 8 8 z",
-      fill: "#9a3412",
-      stroke: "#f3dec6",
-      strokeWidth: 0.45,
-    },
-    {
-      id: "strategic-arrow-supply",
-      path: "M 0 5 L 6 2.5 L 6 4.2 L 8 4.2 L 8 5.8 L 6 5.8 L 6 7.5 z",
-      fill: "#475569",
-      stroke: "#dbe2eb",
-      strokeWidth: 0.5,
-    },
-    {
-      id: "strategic-arrow-naval",
-      path: "M 0 5 L 7 1.6 L 6 5 L 7 8.4 z",
-      fill: "#1e3a8a",
-      stroke: "#d8e6ff",
-      strokeWidth: 0.45,
-    },
-  ];
 
-  const selection = rendererSurfaceHost.getStrategicDefs().selectAll("marker.strategic-marker").data(defs, (d) => d.id);
-  const enter = selection
-    .enter()
-    .append("marker")
-    .attr("class", "strategic-marker")
-    .attr("markerUnits", "strokeWidth")
-    .attr("orient", "auto-start-reverse")
-    .attr("refX", 10)
-    .attr("refY", 5)
-    .attr("markerWidth", 11)
-    .attr("markerHeight", 10)
-    .attr("viewBox", "0 0 11 10");
-
-  enter.append("path");
-  enter.merge(selection)
-    .attr("id", (d) => d.id)
-    .select("path")
-    .attr("d", (d) => d.path)
-    .attr("fill", (d) => d.fill)
-    .attr("stroke", (d) => d.stroke)
-    .attr("stroke-width", (d) => d.strokeWidth);
-
-  selection.exit().remove();
-}
 
 function projectStrategicPoints(points = []) {
   return points.map((point) => getProjectedPoint(point)).filter(Boolean);
@@ -13729,77 +13671,35 @@ function getOperationalLineById(id) {
   return (runtimeState.operationalLines || []).find((entry) => String(entry?.id || "") === selectedId) || null;
 }
 
-function getOperationGraphicEditorModel() {
-  ensureOperationGraphicsEditorState();
-  const isDrawing = !!runtimeState.operationGraphicsEditor.active;
-  if (isDrawing) {
-    const kind = String(runtimeState.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-    return {
-      mode: "draw",
-      graphic: null,
-      points: Array.isArray(runtimeState.operationGraphicsEditor.points) ? runtimeState.operationGraphicsEditor.points : [],
-      kind,
-      stylePreset: normalizeOperationGraphicStylePreset(runtimeState.operationGraphicsEditor.stylePreset, kind),
-      stroke: normalizeOperationGraphicStroke(runtimeState.operationGraphicsEditor.stroke),
-      width: normalizeOperationGraphicWidth(runtimeState.operationGraphicsEditor.width),
-      opacity: normalizeOperationGraphicOpacity(runtimeState.operationGraphicsEditor.opacity),
-      selectedVertexIndex: -1,
-    };
-  }
-  const graphic = getOperationGraphicById(runtimeState.operationGraphicsEditor.selectedId);
-  if (!graphic) {
-    return null;
-  }
-  const kind = String(graphic.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  return {
-    mode: "edit",
-    graphic,
-    points: Array.isArray(graphic.points) ? graphic.points : [],
-    kind,
-    stylePreset: normalizeOperationGraphicStylePreset(graphic.stylePreset, kind),
-    stroke: normalizeOperationGraphicStroke(graphic.stroke),
-    width: normalizeOperationGraphicWidth(graphic.width),
-    opacity: normalizeOperationGraphicOpacity(graphic.opacity),
-    selectedVertexIndex: Math.max(-1, Number(runtimeState.operationGraphicsEditor.selectedVertexIndex) || -1),
-  };
-}
-
-function getUnitCounterSymbolToken(counter = {}) {
-  return String(counter.sidc || counter.symbolCode || getUnitCounterPresetById(counter.presetId).baseSidc || "").trim();
-}
-
-function getUnitCounterEffectiveSidc(counter = {}) {
-  const raw = getUnitCounterSymbolToken(counter);
-  if (/^\d{30}$/.test(raw)) {
-    return raw;
-  }
-  return UNIT_COUNTER_SIDC_ALIASES[String(raw || "").trim().toUpperCase()] || DEFAULT_MILSTD_SIDC;
-}
-
-function getMilSymbolDataUri(sidc, size = 42) {
-  const normalizedSidc = String(sidc || "").trim();
-  const normalizedSize = Math.max(24, Math.min(96, Number(size) || 42));
-  const cacheKey = `${normalizedSidc}|${normalizedSize}`;
-  if (milsymbolSvgUriCache.has(cacheKey)) {
-    return milsymbolSvgUriCache.get(cacheKey);
-  }
-  if (!normalizedSidc || !globalThis.ms?.Symbol) {
-    return "";
-  }
-  try {
-    const symbol = new globalThis.ms.Symbol(normalizedSidc, {
-      size: normalizedSize,
-      frame: true,
-      colorMode: "Light",
+let operationGraphicsEditorRenderOwner = null;
+function getOperationGraphicsEditorRenderOwner() {
+  if (!operationGraphicsEditorRenderOwner) {
+    operationGraphicsEditorRenderOwner = createOperationGraphicsEditorRenderOwner({
+      runtimeState,
+      rendererSurfaceHost,
+      ensureOperationGraphicsEditorState,
+      getOperationGraphicById,
+      DEFAULT_OPERATION_GRAPHIC_KIND,
+      normalizeOperationGraphicStylePreset,
+      normalizeOperationGraphicStroke,
+      normalizeOperationGraphicWidth,
+      normalizeOperationGraphicOpacity,
+      getOperationGraphicPreset,
+      createOperationGraphicPath,
+      getProjectedPoint,
+      getStrategicOverlayRuntimeOwner,
+      getMapLonLatFromEvent,
+      getOperationGraphicEditorMidpoints,
     });
-    const uri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(symbol.asSVG())}`;
-    milsymbolSvgUriCache.set(cacheKey, uri);
-    return uri;
-  } catch (_error) {
-    milsymbolSvgUriCache.set(cacheKey, "");
-    return "";
   }
+  return operationGraphicsEditorRenderOwner;
 }
+
+
+
+
+
+
 
 function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {
   const hit = getHitFromEvent(event, {
@@ -13828,178 +13728,17 @@ function renderFrontlineOverlay() {
   rendererSurfaceHost.getFrontlineLabelsGroup().attr("aria-hidden", "true");
 }
 
-function syncInteractionLayerPointerEvents() {
-  if (!rendererSurfaceHost.getInteractionRect()) return;
-  const operationGraphicEditor = runtimeState.operationGraphicsEditor || {};
-  const hasEditableOperationGraphic = !operationGraphicEditor.active
-    && String(operationGraphicEditor.mode || "") === "edit"
-    && !!String(operationGraphicEditor.selectedId || "").trim()
-    && Array.isArray(operationGraphicEditor.points)
-    && operationGraphicEditor.points.length > 0;
-  rendererSurfaceHost.getInteractionRect()
-    .style("pointer-events", hasEditableOperationGraphic ? "none" : "all")
-    .lower();
-}
+
 
 function renderOperationGraphicsEditorOverlay() {
-  if (!rendererSurfaceHost.getOperationGraphicsEditorGroup()) return;
-  ensureOperationGraphicsEditorState();
-  const editorModel = getOperationGraphicEditorModel();
-  const points = Array.isArray(editorModel?.points) ? editorModel.points : [];
-  const isDrawing = editorModel?.mode === "draw";
-  if (!editorModel || points.length === 0) {
-    rendererSurfaceHost.getOperationGraphicsEditorGroup().selectAll("*").remove();
-    rendererSurfaceHost.getOperationGraphicsEditorGroup().attr("aria-hidden", "true");
-    syncInteractionLayerPointerEvents();
-    return;
-  }
-  const geometryPreset = getOperationGraphicPreset(editorModel.kind);
-  const stylePreset = getOperationGraphicPreset(editorModel.stylePreset);
-  const previewPath = createOperationGraphicPath(points, {
-    closed: !!geometryPreset.closed && points.length >= 3,
-    curved: true,
+  return getOperationGraphicsEditorRenderOwner().renderOperationGraphicsEditorOverlay((event, datum, points) => {
+    event.stopPropagation();
+    runtimeState.operationGraphicsEditor.selectedVertexIndex = datum.index;
+    runtimeState.operationGraphicsEditor.points = points;
+    runtimeState.operationGraphicsDirty = true;
+    updateStrategicOverlayUi();
+    renderOperationGraphicsIfNeeded({ force: true });
   });
-  const previewData = previewPath ? [{ id: "preview", d: previewPath, closed: !!geometryPreset.closed && points.length >= 3 }] : [];
-  const pathSelection = rendererSurfaceHost.getOperationGraphicsEditorGroup()
-    .selectAll("path.operation-graphics-editor-path")
-    .data(previewData, (d) => d.id);
-
-  pathSelection
-    .enter()
-    .append("path")
-    .attr("class", "operation-graphics-editor-path")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .attr("pointer-events", "none")
-    .attr("vector-effect", "non-scaling-stroke")
-    .merge(pathSelection)
-    .attr("d", (d) => d.d)
-    .attr("fill", (d) => (d.closed ? "rgba(59, 130, 246, 0.08)" : "none"))
-    .attr("stroke", editorModel.stroke || stylePreset.stroke)
-    .attr("stroke-width", Math.max(1.5, editorModel.width || stylePreset.width))
-    .attr("stroke-linecap", "round")
-    .attr("stroke-linejoin", "round")
-    .attr("stroke-dasharray", stylePreset.dasharray || "8 4")
-    .attr("opacity", Number.isFinite(Number(editorModel.opacity)) ? editorModel.opacity : stylePreset.opacity);
-
-  pathSelection.exit().remove();
-
-  const pointSelection = rendererSurfaceHost.getOperationGraphicsEditorGroup()
-    .selectAll("circle.operation-graphics-editor-point")
-    .data(points.map((coord, index) => ({ coord, index, id: `opg-point-${index}` })), (d) => d.id);
-
-  const pointEnter = pointSelection
-    .enter()
-    .append("circle")
-    .attr("class", "operation-graphics-editor-point")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true");
-
-  pointEnter.merge(pointSelection)
-    .attr("r", 4.2)
-    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
-    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
-    .attr("fill", (_d, index) => (index === editorModel.selectedVertexIndex ? "#0f172a" : "#ffffff"))
-    .attr("stroke", editorModel.stroke || stylePreset.stroke)
-    .attr("stroke-width", (_d, index) => (index === editorModel.selectedVertexIndex ? 2 : 1.3))
-    .attr("pointer-events", "all")
-    .style("cursor", isDrawing ? "default" : "grab");
-
-  pointSelection.exit().remove();
-
-  if (!isDrawing && globalThis.d3?.drag) {
-    if (!renderOperationGraphicsEditorOverlay.pointDragBehavior) {
-      renderOperationGraphicsEditorOverlay.pointDragBehavior = globalThis.d3.drag()
-        .on("start", function onStart(event, datum) {
-          event?.sourceEvent?.stopPropagation?.();
-          getStrategicOverlayRuntimeOwner().beginOperationGraphicVertexDrag(datum.index);
-          globalThis.d3.select(this).style("cursor", "grabbing");
-        })
-        .on("drag", function onDrag(event, datum) {
-          const coord = getMapLonLatFromEvent(event?.sourceEvent || event);
-          getStrategicOverlayRuntimeOwner().moveOperationGraphicVertexDrag(datum.index, coord);
-        })
-        .on("end", function onEnd(_event, datum) {
-          globalThis.d3.select(this).style("cursor", "grab");
-          getStrategicOverlayRuntimeOwner().finishOperationGraphicVertexDrag(datum.index);
-        });
-    }
-    pointEnter.merge(pointSelection)
-      .on("click", (event, datum) => {
-        event.stopPropagation();
-        runtimeState.operationGraphicsEditor.selectedVertexIndex = datum.index;
-        runtimeState.operationGraphicsEditor.points = points;
-        runtimeState.operationGraphicsDirty = true;
-        updateStrategicOverlayUi();
-        renderOperationGraphicsIfNeeded({ force: true });
-      })
-      .call(renderOperationGraphicsEditorOverlay.pointDragBehavior);
-  }
-
-  const midpointData = !isDrawing
-    ? getOperationGraphicEditorMidpoints(points, { closed: !!geometryPreset.closed && points.length >= 3 })
-    : [];
-  const midpointSelection = rendererSurfaceHost.getOperationGraphicsEditorGroup()
-    .selectAll("circle.operation-graphics-editor-midpoint")
-    .data(midpointData, (d) => d.id);
-
-  midpointSelection
-    .enter()
-    .append("circle")
-    .attr("class", "operation-graphics-editor-midpoint")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .merge(midpointSelection)
-    .attr("r", 10)
-    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
-    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
-    .attr("fill", editorModel.stroke || stylePreset.stroke)
-    .attr("opacity", 0.001)
-    .attr("stroke", "none")
-    .attr("stroke-width", 0)
-    .attr("pointer-events", "all")
-    .style("cursor", "copy")
-    .on("pointerdown", function onPointerDown(event, datum) {
-      this.dataset.skipMidpointClick = "true";
-      event.stopPropagation();
-      event.preventDefault?.();
-      getStrategicOverlayRuntimeOwner().insertOperationGraphicVertex(datum.insertIndex, datum.coord);
-    })
-    .on("click", function onClick(event, datum) {
-      if (this.dataset.skipMidpointClick === "true") {
-        this.dataset.skipMidpointClick = "false";
-        return;
-      }
-      event.stopPropagation();
-      getStrategicOverlayRuntimeOwner().insertOperationGraphicVertex(datum.insertIndex, datum.coord);
-    });
-
-  const midpointVisualSelection = rendererSurfaceHost.getOperationGraphicsEditorGroup()
-    .selectAll("circle.operation-graphics-editor-midpoint-visual")
-    .data(midpointData, (d) => d.id);
-
-  midpointVisualSelection
-    .enter()
-    .append("circle")
-    .attr("class", "operation-graphics-editor-midpoint-visual")
-    .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .merge(midpointVisualSelection)
-    .attr("r", 4.6)
-    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
-    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
-    .attr("fill", editorModel.stroke || stylePreset.stroke)
-    .attr("opacity", 0.72)
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 1)
-    .attr("pointer-events", "none");
-
-  rendererSurfaceHost.getOperationGraphicsEditorGroup().selectAll("circle.operation-graphics-editor-point").raise();
-
-  midpointSelection.exit().remove();
-  midpointVisualSelection.exit().remove();
-  rendererSurfaceHost.getOperationGraphicsEditorGroup().attr("aria-hidden", "false");
-  syncInteractionLayerPointerEvents();
 }
 
 function getUnitCounterIconPath(iconId = "") {
@@ -14009,43 +13748,10 @@ function getUnitCounterIconPath(iconId = "") {
 // 在缩放过程中轻量更新兵牌 transform，避免 localScale 陈旧导致跳变
 function renderUnitCountersOverlay() {
   getStrategicOverlayHelpersOwner().renderUnitCountersOverlay();
-  bindUnitCounterOverlayInteractions();
+  getStrategicOverlayHelpersOwner().bindUnitCounterOverlayInteractions();
 }
 
-function bindUnitCounterOverlayInteractions() {
-  if (!rendererSurfaceHost.getUnitCountersGroup()) return;
-  const merged = rendererSurfaceHost.getUnitCountersGroup().selectAll("g.unit-counter");
-  if (globalThis.d3?.drag) {
-    if (!bindUnitCounterOverlayInteractions.dragBehavior) {
-      bindUnitCounterOverlayInteractions.dragBehavior = globalThis.d3.drag()
-        .on("start", function onStart(event, datum) {
-          getStrategicOverlayRuntimeOwner().beginUnitCounterDrag(datum.counter);
-          globalThis.d3.select(this).style("cursor", "grabbing");
-        })
-        .on("drag", function onDrag(event, datum) {
-          const sourceEvent = event?.sourceEvent || event;
-          const coord = getMapLonLatFromEvent(sourceEvent);
-          if (!coord) return;
-          if (!getStrategicOverlayRuntimeOwner().moveUnitCounterDrag(datum.counter, coord)) return;
-          const projected = getProjectedPoint(coord);
-          if (projected) {
-            datum.projected = projected;
-            this.setAttribute("transform", getUnitCounterNodeTransform(datum));
-          }
-        })
-        .on("end", function onEnd(event, datum) {
-          globalThis.d3.select(this).style("cursor", "grab");
-          const featureId = getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end");
-          getStrategicOverlayRuntimeOwner().finishUnitCounterDrag(datum.counter, { featureId });
-        });
-    }
-    merged.call(bindUnitCounterOverlayInteractions.dragBehavior);
-  }
 
-  merged.on("click", (_event, datum) => {
-    getStrategicOverlayRuntimeOwner().selectUnitCounterFromRender(datum.counter);
-  });
-}
 
 function renderHoverOverlay() {
   getTransientOverlayRenderOwner().renderHoverOverlay();
@@ -14369,9 +14075,6 @@ const {
   runtimeState, rendererSurfaceHost, getIntensityFieldTool, getProjectedDegreeRadiusPx, clamp,
 });
 
-let physicalIntensityDragSession = null;
-let physicalIntensityRenderFrame = null;
-
 function getPhysicalIntensityChannel(channelId = "") {
   runtimeState.intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
   const normalizedChannelId = INTENSITY_FIELD_TOOL_CHANNELS.has(String(channelId || ""))
@@ -14380,188 +14083,37 @@ function getPhysicalIntensityChannel(channelId = "") {
   return runtimeState.intensityFields.channels[normalizedChannelId];
 }
 
-function getIntensityFieldPassNames(channelId) {
-  const targetPasses = getIntensityFieldTargetPasses(channelId);
-  return targetPasses.length ? targetPasses : ["physicalBase"];
-}
-
-function schedulePhysicalIntensityRender(channelId, reason) {
-  invalidateRenderPasses(getIntensityFieldPassNames(channelId), reason);
-  if (physicalIntensityRenderFrame !== null) return;
-  physicalIntensityRenderFrame = requestAnimationFrame(() => {
-    physicalIntensityRenderFrame = null;
-    requestInteractionRender(reason);
-  });
-}
-
 function refreshPhysicalIntensityUi() {
   callRuntimeHook(runtimeState, "updateToolbarInputsFn");
 }
 
-function createIntensityPoint(channel, lonLat, tool) {
-  const nextIndex = channel.points.length + 1;
-  return {
-    id: `point-${Date.now().toString(36)}-${nextIndex}`,
-    lon: clamp(Number(lonLat[0]) || 0, -180, 180),
-    lat: clamp(Number(lonLat[1]) || 0, -90, 90),
-    strength: clamp(Number(tool.brushStrength || 1), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
-    radiusDeg: clamp(Number(tool.brushRadiusDeg || 3), 0.25, 30),
-    falloff: "smooth",
-  };
-}
-
-function commitPhysicalIntensitySession(reason = "physical-intensity-field") {
-  const current = physicalIntensityDragSession;
-  physicalIntensityDragSession = null;
-  if (!current) return false;
-  if (rendererSurfaceHost.getInteractionRect()?.node && current.pointerId !== undefined) {
-    try {
-      rendererSurfaceHost.getInteractionRect().node().releasePointerCapture(current.pointerId);
-    } catch (_error) {
-      // Pointer capture may already be released by the browser.
-    }
-  }
-  if (!current.changed) return false;
-  const channel = getPhysicalIntensityChannel(current.channelId);
-  if (current.subMode === "points") {
-    bakeIntensityComposite(channel);
-  }
-  channel.revision = Math.max(0, Math.round(Number(channel.revision) || 0)) + 1;
-  const after = captureHistoryState({ intensityFieldChannels: [current.channelId] });
-  pushHistoryEntry({
-    kind: current.subMode === "points" ? "physical-intensity-point" : "physical-intensity-brush",
-    before: current.before,
-    after,
-    meta: {
-      reason,
-      affectsIntensityField: true,
-    },
-  });
-  suppressNextClickAfterBrush = true;
-  schedulePhysicalIntensityRender(current.channelId, reason);
-  refreshPhysicalIntensityUi();
-  return true;
-}
-
-function applyPhysicalIntensityBrushAt(event) {
-  const current = physicalIntensityDragSession;
-  if (!current || current.subMode === "points") return false;
-  const lonLat = getMapLonLatFromEvent(event);
-  if (!lonLat) return false;
-  const channel = getPhysicalIntensityChannel(current.channelId);
-  channel.enabled = true;
-  const dirtyRect = stampIntensityBrush(channel, {
-    lon: lonLat[0],
-    lat: lonLat[1],
-    radiusDeg: current.brushRadiusDeg,
-    strength: current.brushStrength,
-    mode: current.subMode,
-  });
-  if (!dirtyRect) return false;
-  current.changed = true;
-  schedulePhysicalIntensityRender(current.channelId, "physical-intensity-field-drag");
-  return true;
-}
-
-function applyPhysicalIntensityPointDrag(event) {
-  const current = physicalIntensityDragSession;
-  if (!current || current.subMode !== "points" || !current.pointId) return false;
-  const lonLat = getMapLonLatFromEvent(event);
-  if (!lonLat) return false;
-  const channel = getPhysicalIntensityChannel(current.channelId);
-  const point = channel.points.find((entry) => entry.id === current.pointId);
-  if (!point) return false;
-  if (current.pointDragMode === "radius") {
-    const deltaLon = Math.abs(point.lon - lonLat[0]);
-    const deltaLat = Math.abs(point.lat - lonLat[1]);
-    point.radiusDeg = clamp(Math.hypot(Math.min(deltaLon, 360 - deltaLon), deltaLat), 0.25, 30);
-  } else {
-    point.lon = clamp(lonLat[0], -180, 180);
-    point.lat = clamp(lonLat[1], -90, 90);
-  }
-  channel.enabled = true;
-  current.changed = true;
-  schedulePhysicalIntensityRender(current.channelId, "physical-intensity-point-drag");
-  refreshPhysicalIntensityUi();
-  return true;
-}
-
-function handlePhysicalIntensityPointerDown(event) {
-  const tool = getIntensityFieldTool();
-  if (!tool.active) return false;
-  if (physicalIntensityDragSession) return true;
-  if (runtimeState.startupReadonly) {
-    if (event?.preventDefault) event.preventDefault();
-    blockStartupReadonlyInteraction();
-    return true;
-  }
-  if ((event.buttons & 1) !== 1) return true;
-  const lonLat = getMapLonLatFromEvent(event);
-  if (!lonLat) return true;
-  renderPhysicalIntensityBrushPreview(lonLat);
-  if (event?.preventDefault) event.preventDefault();
-  if (rendererSurfaceHost.getInteractionRect()?.node && event.pointerId !== undefined) {
-    try {
-      rendererSurfaceHost.getInteractionRect().node().setPointerCapture(event.pointerId);
-    } catch (_error) {
-      // Pointer capture is best-effort across browser targets.
-    }
-  }
-  const channel = getPhysicalIntensityChannel(tool.channelId);
-  physicalIntensityDragSession = {
-    pointerId: event.pointerId,
-    channelId: tool.channelId,
-    subMode: tool.subMode,
-    brushRadiusDeg: tool.brushRadiusDeg,
-    brushStrength: tool.brushStrength,
-    before: captureHistoryState({ intensityFieldChannels: [tool.channelId] }),
-    changed: false,
-    pointId: "",
-    pointDragMode: "move",
-  };
-  if (tool.subMode === "points") {
-    const hit = getPhysicalIntensityPointHit(channel, lonLat);
-    if (hit?.point) {
-      setIntensityFieldTool({ selectedPointId: hit.point.id });
-      physicalIntensityDragSession.pointId = hit.point.id;
-      physicalIntensityDragSession.pointDragMode = hit.mode;
-    } else {
-      const point = createIntensityPoint(channel, lonLat, tool);
-      channel.enabled = true;
-      channel.points.push(point);
-      setIntensityFieldTool({ selectedPointId: point.id });
-      physicalIntensityDragSession.pointId = point.id;
-      physicalIntensityDragSession.changed = true;
-      schedulePhysicalIntensityRender(tool.channelId, "physical-intensity-point-add");
-      refreshPhysicalIntensityUi();
-    }
-    return true;
-  }
-  applyPhysicalIntensityBrushAt(event);
-  return true;
-}
-
-function handlePhysicalIntensityPointerMove(event) {
-  updatePhysicalIntensityBrushPreviewFromEvent(event);
-  if (!physicalIntensityDragSession) return false;
-  if ((event.buttons & 1) !== 1) {
-    commitPhysicalIntensitySession("physical-intensity-pointer-lost-buttons");
-    return true;
-  }
-  if (event?.preventDefault) event.preventDefault();
-  if (physicalIntensityDragSession.subMode === "points") {
-    return applyPhysicalIntensityPointDrag(event);
-  }
-  return applyPhysicalIntensityBrushAt(event);
-}
-
-function handlePhysicalIntensityPointerEnd(event) {
-  if (!physicalIntensityDragSession) return false;
-  if (event?.preventDefault) event.preventDefault();
-  updatePhysicalIntensityBrushPreviewFromEvent(event);
-  commitPhysicalIntensitySession("physical-intensity-field-commit");
-  return true;
-}
+const {
+  handlePhysicalIntensityPointerDown,
+  handlePhysicalIntensityPointerMove,
+  handlePhysicalIntensityPointerEnd,
+} = createPhysicalIntensityInteractionOwner({
+  runtimeState,
+  rendererSurfaceHost,
+  getPhysicalIntensityChannel,
+  getIntensityFieldTargetPasses,
+  invalidateRenderPasses,
+  requestInteractionRender,
+  refreshPhysicalIntensityUi,
+  clamp,
+  INTENSITY_FIELD_GRID,
+  bakeIntensityComposite,
+  captureHistoryState,
+  pushHistoryEntry,
+  suppressNextClick: () => { suppressNextClickAfterBrush = true; },
+  getMapLonLatFromEvent,
+  stampIntensityBrush,
+  getIntensityFieldTool,
+  blockStartupReadonlyInteraction,
+  renderPhysicalIntensityBrushPreview,
+  getPhysicalIntensityPointHit,
+  setIntensityFieldTool,
+  updatePhysicalIntensityBrushPreviewFromEvent,
+});
 
 function updateSpecialZoneEditorUI() {
   if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {

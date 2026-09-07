@@ -1,6 +1,43 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const SCENARIO_RECORDS = [
   {
+    "id": "node:test:node:renderer-editing",
+    "commandRef": "test:node:renderer-editing",
+    "sourceRefs": [
+      "js/core/renderer/operation_graphics_editor_render_owner.js",
+      "tests/operation_graphics_editor_render_owner_behavior.test.mjs",
+      "js/core/renderer/physical_intensity_interaction_owner.js",
+      "tests/physical_intensity_interaction_owner_behavior.test.mjs",
+      "js/core/renderer/strategic_overlay_helpers.js",
+      "tests/strategic_overlay_helpers_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "scenario-runtime"
+    ],
+    "domains": [
+      "scenario-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": 395,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "node:test:node:renderer-lifecycles",
     "commandRef": "test:node:renderer-lifecycles",
     "sourceRefs": [

@@ -10,7 +10,9 @@ export function createStrategicOverlayHelpersOwner({
     strategicLineLabelFont = '"IBM Plex Sans", "Segoe UI", sans-serif',
   } = constants;
   const {
-    renderStrategicDefs,
+    getStrategicOverlayRuntimeOwner,
+    getMapLonLatFromEvent,
+    getLandFeatureIdFromEvent,
     ensureOperationalLineEditorState,
     getOperationalLinePreset,
     projectStrategicPoints,
@@ -33,6 +35,99 @@ export function createStrategicOverlayHelpersOwner({
     renderSpecialZoneEditorOverlay,
     getEffectiveSpecialZonesFeatureCollection,
   } = helpers;
+
+function renderStrategicDefs() {
+  if (!groupGetters.getStrategicDefs?.()) return;
+  const defs = [
+    {
+      id: "strategic-arrow-attack",
+      path: "M 0 5 L 8 1.8 L 7 5 L 8 8.2 z",
+      fill: "#7f1d1d",
+      stroke: "#f5d7d3",
+      strokeWidth: 0.45,
+    },
+    {
+      id: "strategic-arrow-retreat",
+      path: "M 1 5 L 8 2 L 6.6 5 L 8 8 z",
+      fill: "#9a3412",
+      stroke: "#f3dec6",
+      strokeWidth: 0.45,
+    },
+    {
+      id: "strategic-arrow-supply",
+      path: "M 0 5 L 6 2.5 L 6 4.2 L 8 4.2 L 8 5.8 L 6 5.8 L 6 7.5 z",
+      fill: "#475569",
+      stroke: "#dbe2eb",
+      strokeWidth: 0.5,
+    },
+    {
+      id: "strategic-arrow-naval",
+      path: "M 0 5 L 7 1.6 L 6 5 L 7 8.4 z",
+      fill: "#1e3a8a",
+      stroke: "#d8e6ff",
+      strokeWidth: 0.45,
+    },
+  ];
+
+  const selection = groupGetters.getStrategicDefs?.().selectAll("marker.strategic-marker").data(defs, (d) => d.id);
+  const enter = selection
+    .enter()
+    .append("marker")
+    .attr("class", "strategic-marker")
+    .attr("markerUnits", "strokeWidth")
+    .attr("orient", "auto-start-reverse")
+    .attr("refX", 10)
+    .attr("refY", 5)
+    .attr("markerWidth", 11)
+    .attr("markerHeight", 10)
+    .attr("viewBox", "0 0 11 10");
+
+  enter.append("path");
+  enter.merge(selection)
+    .attr("id", (d) => d.id)
+    .select("path")
+    .attr("d", (d) => d.path)
+    .attr("fill", (d) => d.fill)
+    .attr("stroke", (d) => d.stroke)
+    .attr("stroke-width", (d) => d.strokeWidth);
+
+  selection.exit().remove();
+}
+
+function bindUnitCounterOverlayInteractions() {
+  if (!groupGetters.getUnitCountersGroup?.()) return;
+  const merged = groupGetters.getUnitCountersGroup?.().selectAll("g.unit-counter");
+  if (globalThis.d3?.drag) {
+    if (!bindUnitCounterOverlayInteractions.dragBehavior) {
+      bindUnitCounterOverlayInteractions.dragBehavior = globalThis.d3.drag()
+        .on("start", function onStart(event, datum) {
+          getStrategicOverlayRuntimeOwner().beginUnitCounterDrag(datum.counter);
+          globalThis.d3.select(this).style("cursor", "grabbing");
+        })
+        .on("drag", function onDrag(event, datum) {
+          const sourceEvent = event?.sourceEvent || event;
+          const coord = getMapLonLatFromEvent(sourceEvent);
+          if (!coord) return;
+          if (!getStrategicOverlayRuntimeOwner().moveUnitCounterDrag(datum.counter, coord)) return;
+          const projected = getProjectedPoint(coord);
+          if (projected) {
+            datum.projected = projected;
+            this.setAttribute("transform", getUnitCounterNodeTransform(datum));
+          }
+        })
+        .on("end", function onEnd(event, datum) {
+          globalThis.d3.select(this).style("cursor", "grab");
+          const featureId = getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end");
+          getStrategicOverlayRuntimeOwner().finishUnitCounterDrag(datum.counter, { featureId });
+        });
+    }
+    merged.call(bindUnitCounterOverlayInteractions.dragBehavior);
+  }
+
+  merged.on("click", (_event, datum) => {
+    getStrategicOverlayRuntimeOwner().selectUnitCounterFromRender(datum.counter);
+  });
+}
 
 function renderOperationalLinesOverlay() {
   const operationalLinesGroup = groupGetters.getOperationalLinesGroup?.() || null;
@@ -683,6 +778,8 @@ function renderSpecialZones() {
 }
 
   return {
+    renderStrategicDefs,
+    bindUnitCounterOverlayInteractions,
     renderOperationalLinesOverlay,
     renderOperationGraphicsOverlay,
     syncUnitCounterScalesDuringZoom,
