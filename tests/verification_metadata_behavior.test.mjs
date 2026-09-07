@@ -198,7 +198,18 @@ test("authored catalog source covers command authority, policies, and every proj
   assert.equal(summary.packageAliasCount, 17);
   assert.equal(summary.prProfileCount, 4);
   assert.equal(summary.nightlyRoleCount, 12);
-  assert.equal(summary.documentationProjectionCount, 50);
+  assert.equal(summary.documentationProjectionCount, 53);
+});
+
+test("renderer split delivery records route to assembly verification", () => {
+  for (const name of ["context", "plan", "task"]) {
+    const sourceRef = `docs/active/renderer-cohesive-splits-20260907/${name}.md`;
+    const report = buildRecommendation([sourceRef]);
+    assert.deepEqual(report.unmatchedChangedFiles, [], sourceRef);
+    assert.ok(report.recommendedCommands.some(
+      (command) => command.commandRef === "test:node:renderer-surface-host",
+    ), sourceRef);
+  }
 });
 
 test("development closeout records have metadata verification ownership", () => {
