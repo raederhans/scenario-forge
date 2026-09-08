@@ -2278,12 +2278,9 @@ function analyzeBindingMutations(
   }
 
   function cloneAliasRecords(aliasRecords) {
-    return new Map(
-      [...aliasRecords.entries()].map(([record, state]) => [
-        record,
-        cloneTrackedState(state),
-      ]),
-    );
+    // Tracked states are replaced, never mutated; branches own their Map while
+    // sharing these scan-local values. Reference resolution copies path arrays.
+    return new Map(aliasRecords);
   }
 
   function trackedStateStatus(state) {

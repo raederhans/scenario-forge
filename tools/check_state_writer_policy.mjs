@@ -70,6 +70,7 @@ function parseArgs(argv) {
     jsonOut: "",
     json: false,
     requireClean: false,
+    previousPolicyRevision: "",
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -83,6 +84,12 @@ function parseArgs(argv) {
       args.json = true;
     } else if (arg === "--require-clean") {
       args.requireClean = true;
+    } else if (arg === "--previous-policy-revision") {
+      args.previousPolicyRevision = String(argv[index + 1] || "").trim();
+      if (!args.previousPolicyRevision || args.previousPolicyRevision.startsWith("--")) {
+        throw new Error("--previous-policy-revision requires a Git revision");
+      }
+      index += 1;
     } else {
       throw new Error(`Unknown argument: ${arg}`);
     }
@@ -1009,16 +1016,23 @@ export async function recomputeDerivedAliasTaintBaseline({
   });
 }
 
-function loadPreviousStateWriterPolicy({
+export function loadPreviousStateWriterPolicy({
   phase,
   trackedClean,
+  previousPolicyRevision = "",
   executeGit = runGit,
 } = {}) {
-  const revision = trackedClean ? "HEAD^1" : "HEAD";
+  let revision = String(previousPolicyRevision || "").trim()
+    || (trackedClean ? "HEAD^1" : "HEAD");
   const policyPath = path
     .relative(PROJECT_ROOT, STATE_WRITER_POLICY_PATH)
     .replaceAll("\\", "/");
   try {
+    if (previousPolicyRevision) {
+      revision = String(executeGit([
+        "rev-parse", "--verify", `${revision}^{commit}`,
+      ])).trim();
+    }
     const source = executeGit(["show", `${revision}:${policyPath}`]);
     return {
       revision,
@@ -1030,6 +1044,7 @@ function loadPreviousStateWriterPolicy({
       revision,
       policy: null,
       violations: normalizeP4StateActionPhase(phase) === "P4.0"
+        && !previousPolicyRevision
         ? []
         : [{
           code: "previous-policy-unavailable",
@@ -1315,10 +1330,14 @@ export async function buildStateWriterPolicyReport({
   phase = "",
   policy = null,
   previousPolicy = undefined,
+  previousPolicyRevision = "",
   requireClean = false,
   repositoryScanCache = null,
   historicalDerivedAliasProofCache = null,
 } = {}) {
+  if (previousPolicy !== undefined && previousPolicyRevision) {
+    throw new Error("Supply either previousPolicy or previousPolicyRevision, not both.");
+  }
   const ownsCanonicalPolicy = policy === null;
   const loadedPolicy = policy || await readStateWriterPolicy();
   const requestedPhase = String(phase || "").trim()
@@ -1339,6 +1358,7 @@ export async function buildStateWriterPolicyReport({
     ? loadPreviousStateWriterPolicy({
       phase: normalizedPhase,
       trackedClean: identity.trackedClean,
+      previousPolicyRevision,
     })
     : {
       revision: "injected",
@@ -1651,6 +1671,7 @@ async function main() {
   const report = await buildStateWriterPolicyReport({
     phase: args.phase,
     requireClean: args.requireClean,
+    previousPolicyRevision: args.previousPolicyRevision,
   });
   const outputPath = await writeStateWriterPolicyReport(report, {
     jsonOut: args.jsonOut,

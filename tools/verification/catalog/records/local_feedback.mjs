@@ -106,6 +106,19 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-transfers", "sidebar-shell", "js/ui/sidebar/scenario_transfer_controller.js", "tests/scenario_transfer_controller_behavior.test.mjs"],
     ["scenario-territory", "sidebar-shell", "js/ui/sidebar/scenario_territory_controller.js", "tests/scenario_territory_controller_behavior.test.mjs"],
     ["scenario-inspector", "sidebar-shell", "js/ui/sidebar/scenario_inspector_controller.js", "tests/scenario_inspector_controller_behavior.test.mjs"],
+    ["brush-interaction-session", "renderer-runtime", "js/core/renderer/brush_interaction_session_owner.js", "tests/brush_interaction_session_owner_behavior.test.mjs"],
+    ["city-label-text", "renderer-runtime", "js/core/renderer/city_label_text_model.js", "tests/city_label_text_model_behavior.test.mjs"],
+    ["operation-graphics-editor-render", "renderer-runtime", "js/core/renderer/operation_graphics_editor_render_owner.js", "tests/operation_graphics_editor_render_owner_behavior.test.mjs"],
+    ["physical-intensity-interaction", "renderer-runtime", "js/core/renderer/physical_intensity_interaction_owner.js", "tests/physical_intensity_interaction_owner_behavior.test.mjs"],
+    ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
+    ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
+    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
+    ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs"],
+    ["static-border-mesh-lifecycle", "renderer-runtime", "js/core/renderer/static_border_mesh_lifecycle.js", "tests/static_border_mesh_lifecycle_behavior.test.mjs"],
+    ["transient-overlay-render", "renderer-runtime", "js/core/renderer/transient_overlay_render_owner.js", "tests/transient_overlay_render_owner_behavior.test.mjs"],
+    ["unit-counter-display", "renderer-runtime", "js/core/renderer/unit_counter_display_model.js", "tests/unit_counter_display_model_behavior.test.mjs"],
+    ["urban-adaptive-paint", "renderer-runtime", "js/core/renderer/urban_adaptive_paint_model.js", "tests/urban_adaptive_paint_model_behavior.test.mjs"],
+    ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
   ];
 
   const localOwnerOrder = pythonCoverageOrder + pythonRecords.length;
