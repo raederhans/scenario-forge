@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { state } from '../js/core/state.js';
-import { clearHistory, pushHistoryEntry, undoHistory, redoHistory } from '../js/core/history_manager.js';
+import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from '../js/core/history_manager.js';
+import { readRegisteredRuntimeHookSource, registerRuntimeHook } from '../js/core/state/index.js';
 
 function privateFunction(file, name, globals = {}) {
   const source = readFileSync(new URL(file, import.meta.url), 'utf8');
@@ -29,16 +30,34 @@ test('feature-only history scope unions both snapshots and rejects mixed/global 
 
 test('multi-feature undo/redo restores removals and supplies the union to the existing hook', t => {
   const oldDocument = globalThis.document;
-  const oldHook = state.refreshColorStateFn;
+  const hadDocument = Object.hasOwn(globalThis, 'document');
+  const oldHook = readRegisteredRuntimeHookSource(state, 'refreshColorStateFn');
+  const originalColors = captureHistoryState({ featureIds: ['A', 'B'] });
   globalThis.document = { getElementById: () => null };
-  t.after(() => { globalThis.document = oldDocument; state.refreshColorStateFn = oldHook; clearHistory(); });
+  t.after(() => {
+    try {
+      // Restore only the feature keys owned by this test through the real history API.
+      clearHistory();
+      pushHistoryEntry({ before: originalColors,
+        after: captureHistoryState({ featureIds: ['A', 'B'] }) });
+      undoHistory();
+      clearHistory();
+    } finally {
+      registerRuntimeHook(state, 'refreshColorStateFn', oldHook);
+      if (hadDocument) globalThis.document = oldDocument;
+      else delete globalThis.document;
+    }
+  });
   const calls = [];
-  state.refreshColorStateFn = options => calls.push(options);
+  registerRuntimeHook(state, 'refreshColorStateFn', options => calls.push(options));
   clearHistory();
-  state.visualOverrides = { A: '#e31ac4' };
-  state.featureOverrides = {};
   const before = { visualOverrides: { A: null, B: '#123456' }, featureOverrides: { A: null, B: null } };
   const after = { visualOverrides: { A: '#e31ac4', B: null }, featureOverrides: { A: null, B: null } };
+  // Seed the applied snapshot with the existing history entrypoint, without a singleton write.
+  pushHistoryEntry({ before: after, after: originalColors });
+  undoHistory();
+  clearHistory();
+  calls.length = 0;
   pushHistoryEntry({ before, after, meta: { kind: 'fill-feature-color' } });
   undoHistory();
   assert.deepEqual(state.visualOverrides, { B: '#123456' });
