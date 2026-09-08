@@ -2416,3 +2416,10 @@ test("M4 overlay lifecycle edits select one shared behavior command within the e
     assert.deepEqual(report.unmatchedChangedFiles, []);
   }
 });
+
+
+test("editor checkout instructions retain a canonical verification route", () => {
+  const report = buildRecommendation(["README.md"]);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.ok(report.recommendedCommands.some(({ commandRef }) => commandRef === "python -m unittest tests.test_editor_checkout_profile -q"));
+});
