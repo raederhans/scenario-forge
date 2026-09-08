@@ -29,4 +29,4 @@ Complete: all five stages and the local acceptance criteria in plan.md are satis
 
 - Global `verify:state-write-allowlist` fails on the already-existing `tests/history_feature_color_refresh_behavior.test.mjs` direct singleton writes. Reading HEAD confirmed the same writer before this work; none of the four changed production modules became a new direct-writer file. The allowlist was not widened. This is not proof of full historical/indirect state-policy admission.
 - Browser validation is one focused reuse-mode TNO case; unit/owner coverage exercises the other modes. No full browser matrix, remote CI, deployment or absolute performance improvement is claimed.
-- Changes remain uncommitted. Pre-existing config and M0–M1 documents are preserved.
+- Implementation committed as `1decb144` and pushed to the integration branch. PR #123 is the authoritative remote review/merge record. Pre-existing config and M0–M1 documents are preserved.

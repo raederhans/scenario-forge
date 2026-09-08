@@ -20,4 +20,4 @@ The browser run completed successfully (exit 0); no test server remains owned by
 
 ## Handoff
 
-M4 implementation and local acceptance are complete; task.md records checks and the unrelated pre-existing global allowlist failure. No implementation steps remain within plan.md. Working-tree changes have not been committed or published.
+M4 implementation and local acceptance are complete; task.md records checks and the unrelated pre-existing global allowlist failure. No implementation steps remain within plan.md. Implementation commit: `1decb14428582957a929b17f1dce9e75bf7e31e3`, pushed to `origin/codex/recovery-m0-m4-integration-20260908`. Integration and current remote check/merge status: https://github.com/raederhans/scenario-forge/pull/123. Direct main push was rejected by branch protection; merge uses the normal required-check PR path. Existing evidence worktrees are retained; no unowned worktree cleanup was attempted.
