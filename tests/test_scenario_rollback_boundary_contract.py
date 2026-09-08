@@ -39,9 +39,9 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
             / "scenario_health_actions.js"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("function captureScenarioRuntimeSnapshot()", content)
-        self.assertIn("function captureScenarioPresentationSnapshot()", content)
-        self.assertIn("function captureScenarioPaletteSnapshot()", content)
+        self.assertIn("function captureScenarioRuntimeSnapshot(cloneValue)", content)
+        self.assertIn("function captureScenarioPresentationSnapshot(cloneValue)", content)
+        self.assertIn("function captureScenarioPaletteSnapshot(cloneValue)", content)
         self.assertIn(
             "function buildScenarioTransactionRollbackStatePatch(snapshot)",
             content,

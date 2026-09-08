@@ -280,7 +280,7 @@ function createScenarioChunkRuntimeController({
   const runtimeState = explicitRuntimeState || state;
   let promotionCommitPromise = null;
   let promotionCommitRunId = 0;
-  const { loadScenarioChunkPayload, resetScenarioChunkRequests } = composeScenarioChunkPayloadLoader(
+  const { loadScenarioChunkPayload, loadScenarioChunkPayloadEntries, resetScenarioChunkRequests } = composeScenarioChunkPayloadLoader(
     runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile,
   );
 
@@ -2264,11 +2264,8 @@ function createScenarioChunkRuntimeController({
       visibleLayers,
       loadedChunkIds: [],
     });
-    const requiredChunksToLoad = coarseSelection.requiredChunks.filter((chunk) => (
-      !bundle.chunkPayloadCacheById?.[chunk.id]
-    ));
-    await Promise.all(
-      requiredChunksToLoad.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client }))
+    const coarsePayloadEntries = await loadScenarioChunkPayloadEntries(
+      bundle, coarseSelection.requiredChunks, { d3Client },
     );
     if (!isPrewarmContinuationCurrent("coarse-prewarm-after-load")) {
       return null;
@@ -2310,12 +2307,7 @@ function createScenarioChunkRuntimeController({
       if (committedSelectionVersion === false) return null;
       commitScenarioChunkPayloadEntriesState(
         runtimeState,
-        coarseSelection.requiredChunks
-          .map((chunk) => ({
-            chunkId: chunk.id,
-            payload: bundle.chunkPayloadCacheById?.[chunk.id],
-          }))
-          .filter((entry) => entry.payload),
+        coarsePayloadEntries.filter((entry) => entry.payload),
       );
       const layerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState(), null);
       const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, ensureActiveScenarioChunkState(), {
@@ -2696,7 +2688,9 @@ function createScenarioChunkRuntimeController({
       return selection;
     }
     const chunkLoadStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    await Promise.all(selection.requiredChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client })));
+    const requiredPayloadEntries = await loadScenarioChunkPayloadEntries(
+      bundle, selection.requiredChunks, { d3Client },
+    );
     if (!isScenarioChunkRefreshCurrent(loadState, {
       scenarioId,
       continuationState: refreshContinuationState,
@@ -2736,12 +2730,7 @@ function createScenarioChunkRuntimeController({
     });
     commitScenarioChunkPayloadEntriesState(
       runtimeState,
-      selection.requiredChunks
-        .map((chunk) => ({
-          chunkId: chunk.id,
-          payload: bundle.chunkPayloadCacheById?.[chunk.id],
-        }))
-        .filter((entry) => entry.payload),
+      requiredPayloadEntries.filter((entry) => entry.payload),
     );
     if (selection.evictableChunkIds.length) {
       evictScenarioChunkPayloadsState(

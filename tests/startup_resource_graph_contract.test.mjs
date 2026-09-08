@@ -73,6 +73,10 @@ test("startup resource graph is deterministic and reconciles the source entrypoi
   ]);
   assert.ok(first.modules.every((record) => record.product_owner));
   assert.ok(first.resources.every((record) => record.product_owner));
+  for (const sourcePath of ["js/core/file_manager.js", "js/core/export_artifact_package.js"]) {
+    const module = first.modules.find((record) => record.source_path === sourcePath);
+    assert.equal(module?.base_startup, false, `${sourcePath} must load through explicit project/export intent`);
+  }
 });
 
 test("startup resource graph rejects optional base-startup re-entry and missing ownership", () => {

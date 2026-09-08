@@ -335,21 +335,22 @@ async function handleLoadBaseStartup(message) {
       : Promise.resolve({ payload: null, metrics: null }),
   ]);
 
+  const topologyForDecode = topologyResult.payload || message?.cachedTopologyPrimary || null;
   postWorkerMessage(MESSAGE_TYPES.BASE_STARTUP_READY, {
     taskId,
     topologyPrimary: topologyResult.payload,
     locales: needLocales ? (localesResult.payload || { ui: {}, geo: {} }) : null,
     geoAliases: needGeoAliases ? (geoAliasesResult.payload || { alias_to_stable_key: {} }) : null,
-    decodedCollections: topologyResult.payload
+    decodedCollections: topologyForDecode
       ? {
-        landData: decodeTopologyObject(topologyResult.payload, "political"),
-        specialZonesData: decodeTopologyObject(topologyResult.payload, "special_zones"),
-        riversData: decodeTopologyObject(topologyResult.payload, "rivers"),
-        waterRegionsData: decodeTopologyObject(topologyResult.payload, "water_regions"),
-        oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
-        landBgData: decodeTopologyObject(topologyResult.payload, "land"),
-        urbanData: decodeTopologyObject(topologyResult.payload, "urban"),
-        physicalData: decodeTopologyObject(topologyResult.payload, "physical"),
+        landData: decodeTopologyObject(topologyForDecode, "political"),
+        specialZonesData: decodeTopologyObject(topologyForDecode, "special_zones"),
+        riversData: decodeTopologyObject(topologyForDecode, "rivers"),
+        waterRegionsData: decodeTopologyObject(topologyForDecode, "water_regions"),
+        oceanData: decodeTopologyObject(topologyForDecode, "ocean"),
+        landBgData: decodeTopologyObject(topologyForDecode, "land"),
+        urbanData: decodeTopologyObject(topologyForDecode, "urban"),
+        physicalData: decodeTopologyObject(topologyForDecode, "physical"),
       }
       : null,
     metrics: {

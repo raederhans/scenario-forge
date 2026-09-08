@@ -88,6 +88,77 @@ async function drainMicrotasks() {
   await Promise.resolve();
 }
 
+for (const rejects of [false, true]) {
+  test(`old ${rejects ? "rejected" : "completed"} execution cannot finish a new same-key task after reset`, async () => {
+    const targetState = createTargetState();
+    const globalScope = createTimerScope();
+    const warnings = [];
+    const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => 1000,
+      warn: (...args) => warnings.push(args) });
+    let finishOld;
+    let finishNew;
+    const oldError = new Error("old execution failed");
+    scheduler.scheduleTask("same-key", () => new Promise((resolve, reject) => {
+      finishOld = () => rejects ? reject(oldError) : resolve();
+    }));
+    globalScope.__test.runNextTimeout();
+    globalScope.__test.runNextTimeout();
+    scheduler.reset();
+    scheduler.scheduleTask("same-key", () => new Promise((resolve) => { finishNew = resolve; }));
+    globalScope.__test.runNextTimeout();
+    globalScope.__test.runNextTimeout();
+    const diagnostics = targetState.postReadyTaskDiagnostics;
+    finishOld();
+    await drainMicrotasks();
+    assert.equal(targetState.activePostReadyTaskKey, "same-key");
+    assert.equal(targetState.postReadyTaskDiagnostics, diagnostics, "stale finish must not publish diagnostics");
+    assert.equal(warnings.length, rejects ? 1 : 0);
+    if (rejects) assert.equal(warnings[0][1], oldError);
+    finishNew();
+    await drainMicrotasks();
+    assert.equal(targetState.activePostReadyTaskKey, "");
+    assert.equal(targetState.postReadyTaskDiagnostics.lastFinishedTaskKey, "same-key");
+  });
+}
+
+for (const stage of ["start", "timeout", "idle", "retry"]) {
+  for (const invalidate of ["reset", "replace", "clear", "clear-all"]) {
+    test(`stale ${stage} callback after ${invalidate} preserves the replacement handle`, async () => {
+      const targetState = createTargetState();
+      const globalScope = createTimerScope({ idle: stage === "idle" });
+      const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => 1000 });
+      let oldRuns = 0;
+      let newRuns = 0;
+      if (stage === "retry") targetState.bootBlocking = true;
+      scheduler.scheduleTask("same-key", () => { oldRuns += 1; });
+      if (stage !== "start") globalScope.__test.runNextTimeout();
+      const staleCallback = stage === "idle"
+        ? globalScope.__test.idleCalls.at(-1).callback
+        : globalScope.__test.timeoutCalls.at(-1).callback;
+      if (invalidate === "reset") scheduler.reset();
+      if (invalidate === "clear") scheduler.clearTask("same-key");
+      if (invalidate === "clear-all") scheduler.clearAllTasks();
+      targetState.bootBlocking = false;
+      scheduler.scheduleTask("same-key", () => { newRuns += 1; });
+      const replacement = globalScope.__test.timeoutCalls.at(-1);
+      const diagnostics = targetState.postReadyTaskDiagnostics;
+      staleCallback({ didTimeout: false, timeRemaining: () => 20 });
+      assert.equal(oldRuns, 0);
+      assert.equal(replacement.cleared, false);
+      assert.equal(targetState.postReadyTaskDiagnostics, diagnostics);
+      assert.deepEqual(scheduler.getDiagnostics().pendingTaskKeys, ["same-key"]);
+      globalScope.__test.runNextTimeout();
+      if (stage === "idle") globalScope.__test.runNextIdle();
+      else globalScope.__test.runNextTimeout();
+      await drainMicrotasks();
+      assert.equal(oldRuns, 0);
+      assert.equal(newRuns, 1);
+      assert.equal(targetState.activePostReadyTaskKey, "");
+      assert.deepEqual(scheduler.getDiagnostics().pendingTaskKeys, []);
+    });
+  }
+}
+
 test("post-ready idle block reason preserves blocker order", () => {
   let currentTime = 1000;
   const targetState = createTargetState({

@@ -111,7 +111,7 @@ export function createStrategicOverlayRuntimeOwner({
   const operationGraphicsDomain = createOperationGraphicsRuntimeDomain({
     state,
     defaultOperationGraphicKind,
-    captureHistoryState,
+    captureHistoryState: (options) => captureHistoryState({ ...options, strategicOverlay: ["operationGraphics"] }),
     commitHistoryEntry,
     ensureOperationGraphicCounter,
     ensureOperationGraphicsEditorState,
@@ -163,7 +163,7 @@ export function createStrategicOverlayRuntimeOwner({
     helpers: {
       assignUnitCounterEditorFromCounter,
       canonicalCountryCode,
-      captureHistoryState,
+      captureHistoryState: (options) => captureHistoryState({ ...options, strategicOverlay: ["unitCounters", "operationalLines"] }),
       commitHistoryEntry,
       ensureUnitCounterCounter,
       ensureUnitCounterEditorState,
@@ -261,7 +261,7 @@ export function createStrategicOverlayRuntimeOwner({
       return false;
     }
     ensureOperationalLineCounter();
-    const before = captureHistoryState({ strategicOverlay: true });
+    const before = captureHistoryState({ strategicOverlay: ["operationalLines"] });
     const id = `opl_${state.operationalLineEditor.counter}`;
     commitStrategicOverlayCollectionsState(state, {
       operationalLines: [...Array.from(state.operationalLines), {
@@ -293,7 +293,7 @@ export function createStrategicOverlayRuntimeOwner({
     commitHistoryEntry({
       kind: "create-operational-line",
       before,
-      after: captureHistoryState({ strategicOverlay: true }),
+      after: captureHistoryState({ strategicOverlay: ["operationalLines"] }),
     });
     markDirty("create-operational-line");
     updateStrategicOverlayUi();
@@ -339,7 +339,7 @@ export function createStrategicOverlayRuntimeOwner({
     if (!selectedId) return false;
     const line = getOperationalLineById(selectedId);
     if (!line) return false;
-    const before = captureHistoryState({ strategicOverlay: true });
+    const before = captureHistoryState({ strategicOverlay: ["operationalLines"] });
     const nextKind = partial.kind
       ? String(partial.kind || defaultOperationalLineKind).trim().toLowerCase()
       : String(line.kind || defaultOperationalLineKind);
@@ -359,7 +359,7 @@ export function createStrategicOverlayRuntimeOwner({
     commitHistoryEntry({
       kind: "update-operational-line",
       before,
-      after: captureHistoryState({ strategicOverlay: true }),
+      after: captureHistoryState({ strategicOverlay: ["operationalLines"] }),
     });
     markDirty("update-operational-line");
     updateStrategicOverlayUi();
@@ -371,7 +371,7 @@ export function createStrategicOverlayRuntimeOwner({
     ensureOperationalLineEditorState();
     const selectedId = String(state.operationalLineEditor.selectedId || "").trim();
     if (!selectedId) return false;
-    const before = captureHistoryState({ strategicOverlay: true });
+    const before = captureHistoryState({ strategicOverlay: ["operationalLines", "unitCounters"] });
     const nextLines = (state.operationalLines || []).filter((entry) => String(entry?.id || "") !== selectedId);
     if (nextLines.length === (state.operationalLines || []).length) return false;
     const nextCounters = (state.unitCounters || []).map((counter) => {
@@ -397,7 +397,7 @@ export function createStrategicOverlayRuntimeOwner({
     commitHistoryEntry({
       kind: "delete-operational-line",
       before,
-      after: captureHistoryState({ strategicOverlay: true }),
+      after: captureHistoryState({ strategicOverlay: ["operationalLines", "unitCounters"] }),
     });
     markDirty("delete-operational-line");
     updateStrategicOverlayUi();
@@ -455,12 +455,12 @@ export function createStrategicOverlayRuntimeOwner({
     const layerId = getActiveSpecialZoneMembershipLayerId();
     if (!layerId) return false;
     const mode = resolveSpecialZoneMembershipClickMode({ membershipTool, brushMode });
-    const before = captureHistoryState({ strategicOverlay: true });
+    const before = captureHistoryState({ strategicOverlay: ["specialZoneLayers"] });
     if (!applySpecialZoneMembershipFeature(featureId, mode, layerId)) return false;
     commitHistoryEntry({
       kind: `special-zone-membership-${mode}`,
       before,
-      after: captureHistoryState({ strategicOverlay: true }),
+      after: captureHistoryState({ strategicOverlay: ["specialZoneLayers"] }),
     });
     renderSpecialZonesIfNeeded({ force: true });
     refreshSpecialZonesWorkbenchUi();
@@ -478,7 +478,7 @@ export function createStrategicOverlayRuntimeOwner({
       return false;
     }
     specialZoneMembershipDragSession = {
-      before: captureHistoryState({ strategicOverlay: true }),
+      before: captureHistoryState({ strategicOverlay: ["specialZoneLayers"] }),
       changed: false,
       layerId,
       mode: resolveSpecialZoneMembershipDragMode({ membershipTool, brushMode, altKey }),
@@ -513,7 +513,7 @@ export function createStrategicOverlayRuntimeOwner({
     commitHistoryEntry({
       kind: `special-zone-membership-drag-${current.mode}`,
       before: current.before,
-      after: captureHistoryState({ strategicOverlay: true }),
+      after: captureHistoryState({ strategicOverlay: ["specialZoneLayers"] }),
     });
     renderSpecialZonesIfNeeded({ force: true });
     refreshSpecialZonesWorkbenchUi();

@@ -159,19 +159,39 @@ function createScenarioRefreshRuntime(deps = {}) {
 
   let deferredScenarioChunkPromotionInfraHandle = null;
   let scenarioChunkPromotionVersion = 0;
+  let deferredInfraEpoch = 0;
+  let activeInfraExecution = null;
   const scenarioVisualInvalidationExecutor = createScenarioVisualInvalidationExecutor({
     clearLastGoodFrame, clearRenderPassReferenceTransforms, invalidateInteractionComposite,
     invalidateBorderCache, resetScenarioWaterCacheAdaptiveState, invalidateRenderPasses,
     markAllOverlaysDirty, updateZoomTranslateExtent, render,
   });
 
-  function cancelDeferredScenarioChunkPromotionInfraRefresh() {
+  function clearDeferredInfraHandle() {
     cancelDeferredWork(deferredScenarioChunkPromotionInfraHandle);
     deferredScenarioChunkPromotionInfraHandle = null;
+    deferredInfraEpoch += 1;
+  }
+
+  function cancelDeferredScenarioChunkPromotionInfraRefresh() {
+    clearDeferredInfraHandle();
+    if (activeInfraExecution) {
+      if (runtimeState.runtimeChunkLoadState === activeInfraExecution.loadState) {
+        if (activeInfraExecution.mutationStarted) {
+          setInteractionInfrastructureState(activeInfraExecution.stage || "basic-ready", { ready: false, inFlight: false });
+        }
+      }
+      endInteractionRecoveryTask("scenario-chunk-promotion-infra");
+      activeInfraExecution = null;
+    }
+    if (runtimeState.runtimeChunkLoadState?.pendingInfraPromotion) {
+      patchScenarioChunkLoadState(runtimeState, { pendingInfraPromotion: null });
+    }
   }
 
   function resetDeferredScenarioChunkPromotionState() {
     cancelDeferredScenarioChunkPromotionInfraRefresh();
+    activeInfraExecution = null;
     scenarioChunkPromotionVersion = 0;
   }
 
@@ -185,10 +205,12 @@ function createScenarioRefreshRuntime(deps = {}) {
     primaryDerivedStateReady = false,
     refreshOpeningOwnerBorders = true,
   } = {}) {
-    cancelDeferredScenarioChunkPromotionInfraRefresh();
+    clearDeferredInfraHandle();
+    const scheduledEpoch = deferredInfraEpoch;
     deferredScenarioChunkPromotionInfraHandle = scheduleDeferredWork(() => {
+      if (scheduledEpoch !== deferredInfraEpoch) return false;
       deferredScenarioChunkPromotionInfraHandle = null;
-      void runDeferredScenarioChunkPromotionInfraRefresh({
+      return runDeferredScenarioChunkPromotionInfraRefresh({
         reason,
         suppressRender,
         promotionVersion,
@@ -197,6 +219,9 @@ function createScenarioRefreshRuntime(deps = {}) {
         completePoliticalDerivedStateReady,
         primaryDerivedStateReady,
         refreshOpeningOwnerBorders,
+      }).catch((error) => {
+        console.warn("[renderer] Deferred scenario chunk infrastructure failed.", error);
+        return false;
       });
     }, {
       timeout: 120,
@@ -213,6 +238,13 @@ function createScenarioRefreshRuntime(deps = {}) {
     primaryDerivedStateReady = false,
     refreshOpeningOwnerBorders = true,
   } = {}) {
+    const executionEpoch = deferredInfraEpoch;
+    const loadState = runtimeState.runtimeChunkLoadState;
+    const scenarioId = runtimeState.activeScenarioId;
+    const isCurrent = () => executionEpoch === deferredInfraEpoch
+      && promotionVersion === scenarioChunkPromotionVersion
+      && runtimeState.runtimeChunkLoadState === loadState
+      && runtimeState.activeScenarioId === scenarioId;
     if (promotionVersion !== scenarioChunkPromotionVersion) {
       return false;
     }
@@ -244,6 +276,8 @@ function createScenarioRefreshRuntime(deps = {}) {
       return false;
     }
     const startedAt = nowMs();
+    const execution = { loadState, stage: runtimeState.interactionInfrastructureStage, mutationStarted: false };
+    activeInfraExecution = execution;
     const previousInteractionInfrastructureStage = String(runtimeState.interactionInfrastructureStage || "");
     const previousInteractionInfrastructureReady = !!runtimeState.interactionInfrastructureReady;
     let restoredInteractionInfrastructureState = false;
@@ -253,6 +287,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     let restoredFullPoliticalChunkData = false;
     let preliminaryIndexBuildMs = null;
     let preliminarySpatialBuildMs = null;
+    let infrastructureMutationStarted = false;
     try {
       let politicalCoverageBeforeRestore = hasPoliticalGeometryChange
         ? analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)
@@ -275,21 +310,25 @@ function createScenarioRefreshRuntime(deps = {}) {
         // below replaces its index and spatial data, so do not build them twice.
         await yieldToMain();
         yieldCount += 1;
-        if (promotionVersion !== scenarioChunkPromotionVersion) return false;
+        if (!isCurrent()) return false;
       } else if (!resolvedCompletePoliticalDerivedStateReady) {
         const indexStartedAt = nowMs();
+        infrastructureMutationStarted = true;
+        execution.mutationStarted = true;
         buildIndex();
         preliminaryIndexBuildMs = nowMs() - indexStartedAt;
         await yieldToMain();
         yieldCount += 1;
-        if (promotionVersion !== scenarioChunkPromotionVersion) {
+        if (!isCurrent()) {
           return false;
         }
         const spatialStartedAt = nowMs();
         await buildSpatialIndexChunked({
           includeSecondary: false,
           keepReady: true,
+          isCurrent,
         });
+        if (!isCurrent()) return false;
         preliminarySpatialBuildMs = nowMs() - spatialStartedAt;
       }
       if (hasPoliticalGeometryChange) {
@@ -304,6 +343,7 @@ function createScenarioRefreshRuntime(deps = {}) {
         });
         if (hasPrimaryVisiblePoliticalSubset || shouldRestoreFullPoliticalDerivedState) {
           fullRestoreMutationStarted = true;
+          execution.mutationStarted = true;
           setScenarioPoliticalChunkPayloadState(runtimeState, { visiblePayload: null });
         }
         if (shouldRestoreFullPoliticalDerivedState) {
@@ -322,6 +362,7 @@ function createScenarioRefreshRuntime(deps = {}) {
           );
           await yieldToMain();
           yieldCount += 1;
+          if (!isCurrent()) return false;
         }
         fullPoliticalRestoreMs = nowMs() - fullRestoreStartedAt;
         restoredFullPoliticalChunkData = shouldRestoreFullPoliticalDerivedState;
@@ -341,7 +382,7 @@ function createScenarioRefreshRuntime(deps = {}) {
           coverage: politicalCoverageBeforeRestore,
           restoredFullPoliticalChunkData,
         });
-        if (promotionVersion !== scenarioChunkPromotionVersion) {
+        if (!isCurrent()) {
           return false;
         }
       }
@@ -350,7 +391,7 @@ function createScenarioRefreshRuntime(deps = {}) {
         inFlight: false,
       });
       restoredInteractionInfrastructureState = true;
-      if (promotionVersion !== scenarioChunkPromotionVersion) {
+      if (!isCurrent()) {
         return false;
       }
       scheduleSecondarySpatialIndexBuild({
@@ -432,14 +473,31 @@ function createScenarioRefreshRuntime(deps = {}) {
         yieldCount,
       });
       return true;
+    } catch (error) {
+      if (isCurrent()) {
+        if (loadState?.pendingInfraPromotion) {
+          patchScenarioChunkLoadState(runtimeState, { pendingInfraPromotion: null });
+        }
+        restoredInteractionInfrastructureState = false;
+        recordRenderPerfMetric("scenarioChunkPromotionInfraFailure", nowMs() - startedAt, {
+          activeScenarioId: String(scenarioId || ""),
+          reason: String(reason || "scenario-chunk-promotion"),
+          promotionVersion,
+          error: error?.message || String(error),
+        });
+      }
+      throw error;
     } finally {
-      if (!restoredInteractionInfrastructureState && promotionVersion === scenarioChunkPromotionVersion) {
+      if (!restoredInteractionInfrastructureState && isCurrent()) {
         setInteractionInfrastructureState(previousInteractionInfrastructureStage || "basic-ready", {
-          ready: previousInteractionInfrastructureReady && !fullRestoreMutationStarted,
+          ready: previousInteractionInfrastructureReady && !fullRestoreMutationStarted && !infrastructureMutationStarted,
           inFlight: false,
         });
       }
-      endInteractionRecoveryTask(taskKey);
+      if (activeInfraExecution === execution) {
+        activeInfraExecution = null;
+        endInteractionRecoveryTask(taskKey);
+      }
     }
   }
 

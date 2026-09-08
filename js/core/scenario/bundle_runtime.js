@@ -2,6 +2,7 @@
 // 这个模块负责 loadScenarioBundle 主交易、startup bootstrap cache probe/write、bundle assemble 与 cache-hit 恢复。
 // scenario_resources.js 继续保留 facade、startup hydration、optional layer 与对外 export 面。
 
+import { trimScenarioBundleCache } from "./bundle_cache.js";
 import { setStartupScenarioBootstrapCacheStatus } from "../state/actions/boot_actions.js";
 
 function createScenarioBundleRuntimeController({
@@ -37,6 +38,7 @@ function createScenarioBundleRuntimeController({
   scheduleScenarioDeferredBundleMetadataLoad,
 } = {}) {
   const bundleLoadPromisesByKey = new Map();
+  const bundleCacheRecency = new Map();
   const normalizeBundleLoadKeyPart = (value, fallback = "") => String(value ?? fallback).trim() || fallback;
   const normalizeSourceShaMetadata = (source = null) => {
     const payload = source && typeof source === "object" ? source : {};
@@ -51,6 +53,11 @@ function createScenarioBundleRuntimeController({
     const normalizedRight = normalizeSourceShaMetadata(right);
     return Object.keys(normalizedLeft).every((key) => normalizedLeft[key] === normalizedRight[key]);
   };
+
+  function retainBundleInCache(targetId, bundle) {
+    if (!bundle || !targetId) return;
+    trimScenarioBundleCache(state, bundleCacheRecency, targetId);
+  }
 
   function buildBundleLoadKey({
     targetId,
@@ -281,6 +288,7 @@ function createScenarioBundleRuntimeController({
     });
     const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
     if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
+      retainBundleInCache(targetId, cachedBundle);
       if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioBundleUsesChunkedLayer(cachedBundle)) {
         prewarmScenarioOptionalLayersOnCacheHit(cachedBundle, { d3Client });
       }
@@ -412,6 +420,7 @@ function createScenarioBundleRuntimeController({
         `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
       );
       state.scenarioBundleCacheById[targetId] = bundle;
+      retainBundleInCache(targetId, bundle);
       queueBootstrapBundleCacheWrite({
         targetId,
         requestedBundleLevel,
@@ -458,6 +467,9 @@ function createScenarioBundleRuntimeController({
 
   return {
     loadScenarioBundle,
+    trimScenarioBundleCaches: () => trimScenarioBundleCache(
+      state, bundleCacheRecency, normalizeScenarioId(state.activeScenarioId),
+    ),
   };
 }
 

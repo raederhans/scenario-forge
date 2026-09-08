@@ -31,7 +31,10 @@ class PoliticalPartialRepaintOwnerBoundaryContractTest(unittest.TestCase):
         )
         self.assertIn("politicalPartialRepaintOwner = createPoliticalPartialRepaintOwner({", renderer)
         facades = {
-            "tryPartialPoliticalPassRepaint": "return getPoliticalPartialRepaintOwner().tryPartialPoliticalPassRepaint(transform, nextSignature, timings);",
+            "tryPartialPoliticalPassRepaint": (
+                "exactCompositeReuseOwner?.invalidate();\n"
+                "  return getPoliticalPartialRepaintOwner().tryPartialPoliticalPassRepaint(transform, nextSignature, timings);"
+            ),
             "resolvePoliticalPassIdentity": "return getPoliticalPartialRepaintOwner().resolvePoliticalPassIdentity(k);",
             "resolvePoliticalPassViewport": "return getPoliticalPartialRepaintOwner().resolvePoliticalPassViewport(identity);",
             "requestPoliticalPassWorker": "return getPoliticalPartialRepaintOwner().requestPoliticalPassWorker({ identity, packetState });",

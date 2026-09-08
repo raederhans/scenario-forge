@@ -195,51 +195,80 @@ export function createRiverLayerRenderOwner({
       visibleEntries.push({ feature, profile });
     });
 
-    context.save();
+    // Reuse projected geometry only inside this synchronous draw. The shared
+    // d3 path must be restored before stroking or drawing another layer.
+    function createStrokePath(feature) {
+      if (typeof globalThis.Path2D !== "function" || typeof pathCanvas.context !== "function") return null;
+      const previousContext = pathCanvas.context();
+      if (!previousContext) return null;
+      const path = new globalThis.Path2D();
+      try {
+        pathCanvas.context(path);
+        if (pathCanvas.context() !== path) return null;
+        pathCanvas(feature);
+        return path;
+      } finally {
+        pathCanvas.context(previousContext);
+      }
+    }
 
-    if (outlineWidth > 0) {
-      context.strokeStyle = outlineColor;
+    function strokeEntry(entry) {
+      if (entry.path) {
+        context.stroke(entry.path);
+      } else {
+        context.beginPath();
+        pathCanvas(entry.feature);
+        context.stroke();
+      }
+    }
+
+    context.save();
+    try {
+
+      if (outlineWidth > 0) {
+        context.strokeStyle = outlineColor;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.setLineDash(resolvedDashPattern);
+        visibleEntries.forEach((entry) => {
+          const { feature, profile } = entry;
+          const resolvedOutlineWidth = outlineWidth
+            * zoomStyle.outlineWidthFactor
+            * profile.outlineFactor;
+          if (!(resolvedOutlineWidth > 0)) return;
+          const resolvedCoreWidth = widthBase
+            * zoomStyle.coreWidthFactor
+            * profile.widthFactor;
+          const outlineAlpha = opacity
+            * zoomStyle.outlineAlphaFactor
+            * profile.opacityFactor;
+          context.globalAlpha = interactive ? Math.min(outlineAlpha * 0.7, 0.65) : Math.min(outlineAlpha, 0.95);
+          context.lineWidth = (resolvedCoreWidth + resolvedOutlineWidth * 2) / scale;
+          entry.path = createStrokePath(feature);
+          strokeEntry(entry);
+        });
+      }
+
+      context.strokeStyle = color;
       context.lineCap = "round";
       context.lineJoin = "round";
       context.setLineDash(resolvedDashPattern);
-      visibleEntries.forEach(({ feature, profile }) => {
-        const resolvedOutlineWidth = outlineWidth
-          * zoomStyle.outlineWidthFactor
-          * profile.outlineFactor;
-        if (!(resolvedOutlineWidth > 0)) return;
+      visibleEntries.forEach((entry) => {
+        const { profile } = entry;
         const resolvedCoreWidth = widthBase
           * zoomStyle.coreWidthFactor
           * profile.widthFactor;
-        const outlineAlpha = opacity
-          * zoomStyle.outlineAlphaFactor
-          * profile.opacityFactor;
-        context.globalAlpha = interactive ? Math.min(outlineAlpha * 0.7, 0.65) : Math.min(outlineAlpha, 0.95);
-        context.lineWidth = (resolvedCoreWidth + resolvedOutlineWidth * 2) / scale;
-        context.beginPath();
-        pathCanvas(feature);
-        context.stroke();
+        context.globalAlpha = interactive
+          ? Math.min(opacity * profile.opacityFactor, 0.78)
+          : opacity * profile.opacityFactor;
+        context.lineWidth = resolvedCoreWidth / scale;
+        strokeEntry(entry);
       });
+      context.setLineDash([]);
+
+    } finally {
+      context.restore();
     }
-
-    context.strokeStyle = color;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.setLineDash(resolvedDashPattern);
-    visibleEntries.forEach(({ feature, profile }) => {
-      const resolvedCoreWidth = widthBase
-        * zoomStyle.coreWidthFactor
-        * profile.widthFactor;
-      context.globalAlpha = interactive
-        ? Math.min(opacity * profile.opacityFactor, 0.78)
-        : opacity * profile.opacityFactor;
-      context.lineWidth = resolvedCoreWidth / scale;
-      context.beginPath();
-      pathCanvas(feature);
-      context.stroke();
-    });
-    context.setLineDash([]);
-
-    context.restore();
     collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
       featureCount,
       visibleFeatureCount: visibleEntries.length,

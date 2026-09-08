@@ -1,4 +1,3 @@
-import { FileManager } from "./file_manager.js";
 import { clearHistory } from "./history_manager.js";
 import {
   buildScenarioReleasableIndex,
@@ -47,6 +46,7 @@ let mapClickImpl = null;
 let mapDoubleClickImpl = null;
 let scenarioResourcesModulePromise = null;
 let scenarioDispatcherModulePromise = null;
+let fileManagerModulePromise = null;
 const debugState = {
   clickCount: 0,
   doubleClickCount: 0,
@@ -76,6 +76,21 @@ function getScenarioDispatcherModule() {
     scenarioDispatcherModulePromise = import("./scenario_dispatcher.js");
   }
   return scenarioDispatcherModulePromise;
+}
+
+function getFileManagerModule() {
+  if (!fileManagerModulePromise) {
+    fileManagerModulePromise = import("./file_manager.js");
+  }
+  return fileManagerModulePromise;
+}
+
+function reportImportModuleFailure(error, ui, hooks) {
+  debugState.importPhase = "error";
+  debugState.lastImportError = String(error?.message || error || "");
+  ui.showToast(ui.t("Failed to import project.", "ui"), { tone: "error" });
+  hooks.onProjectImportError?.(error);
+  return false;
 }
 
 function getContextLayerRequestFromKeys(layerKeys = []) {
@@ -393,7 +408,7 @@ export function importProjectThroughFunnel(file, options = {}) {
   debugState.lastImportError = "";
   debugState.lastImportFileName = String(file?.name || "");
   let importSummary = null;
-  FileManager.importProject(
+  void getFileManagerModule().then(({ FileManager }) => FileManager.importProject(
     file,
     async (data) => {
       try {
@@ -408,7 +423,7 @@ export function importProjectThroughFunnel(file, options = {}) {
       onSuccess: () => hooks.onProjectImportComplete?.(importSummary),
       onError: (error) => hooks.onProjectImportError?.(error),
     }
-  );
+  )).catch((error) => reportImportModuleFailure(error, ui, hooks));
   return true;
 }
 
@@ -422,6 +437,12 @@ export async function importProjectTextThroughFunnel(text, options = {}) {
   debugState.lastImportError = "";
   debugState.lastImportFileName = String(options.fileName || "");
   let importSummary = null;
+  let FileManager;
+  try {
+    ({ FileManager } = await getFileManagerModule());
+  } catch (error) {
+    return reportImportModuleFailure(error, ui, hooks);
+  }
   return FileManager.importProjectText(
     text,
     async (data) => {

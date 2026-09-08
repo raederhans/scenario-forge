@@ -3,3 +3,4 @@
 # Current Codex desktop build treats `resources/list` / `resources/templates/list`
 # failures from `@playwright/mcp` as fatal on this machine.
 # Repo-local playwright stays reserved for this project's own tests and scripts.
+model_verbosity = "medium"

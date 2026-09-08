@@ -53,6 +53,7 @@ function createRenderPassToCacheHarness({
   };
   let nowIndex = 0;
   const dependencyMap = {
+    exactCompositeReuseOwner: null,
     getRenderPassCacheState: () => cacheState,
     getRenderPassCacheHostOwner: () => ({
       prepareRenderPassHost(options) {

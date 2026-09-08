@@ -56,6 +56,7 @@ import {
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,
   loadScenarioBundle,
+  trimScenarioBundleCaches,
   loadScenarioRegistry,
   resetScenarioChunkRuntimeState,
   releaseScenarioAuditPayload,
@@ -1151,6 +1152,7 @@ async function runScenarioApplyRequest(request) {
       activeScenarioApplyTargetId = "";
       activeScenarioApplyRequestId = 0;
       clearActiveScenarioApplyRequestState(runtimeState);
+      trimScenarioBundleCaches();
       // Post-apply chunk work is deferred while this request owns the apply lock.
       // Resume it only after releasing that lock, while its request is still current.
       if (resumePendingChunks) {

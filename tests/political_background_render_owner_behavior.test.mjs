@@ -17,8 +17,10 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
   const calls = [];
   const pending = [];
   const cancelled = [];
+  const metrics = [];
   let maskResult = null;
   const pathCache = new Map();
+  let preparedPathIdentity = null;
   const renderCache = { dirty: {}, reasons: {} };
   const state = {
     activeScenarioId: "scenario-a",
@@ -67,8 +69,21 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     getDisplayOwnerCode: (feature) => feature?.properties?.owner || "AA",
     getFeatureCountryCodeNormalized: (feature) => feature?.properties?.country || "AA",
     isWorldBounds: () => false,
-    getPoliticalPathCacheHandle: () => ({ valid: true, map: pathCache }),
-    getPoliticalFeaturePathEntry: (feature, { featureId }) => {
+    getPoliticalPathCacheHandle: (transform, { resetIfMismatch }) => {
+      calls.push("path:prepare");
+      assert.equal(resetIfMismatch, true);
+      const identity = `${transform.k}:${transform.x}:${transform.y}:${state.scenarioDataGeneration}`;
+      if (preparedPathIdentity !== null && preparedPathIdentity !== identity) {
+        pathCache.clear();
+        calls.push("path:reset");
+      }
+      preparedPathIdentity = identity;
+      return { valid: true, map: pathCache };
+    },
+    getPoliticalFeaturePathEntry: (feature, { featureId, allowBuild, countBuild }) => {
+      calls.push(`lookup:${featureId}`);
+      assert.equal(allowBuild, true);
+      assert.equal(countBuild, true);
       if (!pathCache.has(featureId)) {
         pathCache.set(featureId, { path: { featureId } });
         calls.push(`build:${featureId}`);
@@ -106,7 +121,10 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     getOceanBaseFillColor: () => "#001122",
   };
   const effects = {
-    recordRenderPerfMetric: (name) => calls.push(`metric:${name}`),
+    recordRenderPerfMetric: (name, _duration, detail) => {
+      calls.push(`metric:${name}`);
+      metrics.push({ name, ...detail });
+    },
     cancelDeferredWork: (handle) => { cancelled.push(handle); calls.push("cancel"); },
     scheduleDeferredWork: (callback) => {
       const handle = { callback };
@@ -153,7 +171,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     },
   });
   return {
-    owner, state, calls, pending, cancelled, pathCache, renderCache, context,
+    owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics,
     setMaskResult: (value) => { maskResult = value; },
   };
 }
@@ -207,6 +225,80 @@ test("full-pass cache replays only for current transform and color identity", ()
   assert.equal(transformed.cacheHit, false);
 });
 
+test("recolor regroups warm paths with one cache preparation and no feature lookup", () => {
+  const fixture = createFixture();
+  const entries = ["a", "b"].map((id) => ({ feature: feature(id), id }));
+  fixture.state.landData = { features: entries.map((entry) => entry.feature) };
+  const draw = () => fixture.owner.drawPoliticalBackgroundFillsForEntries(entries, {
+    useFullPassCache: true, returnSummary: true,
+  });
+  assert.equal(draw().builtPathCount, 2);
+  fixture.calls.length = 0;
+  fixture.state.colors.a = "#ff0000";
+  const summary = draw();
+  assert.equal(summary.cacheHit, false);
+  assert.equal(summary.reusedPathCount, 2);
+  assert.equal(summary.builtPathCount, 0);
+  assert.equal(summary.pathlessEntryCount, 0);
+  assert.equal(summary.groupCount, 2);
+  assert.equal(fixture.calls.filter((call) => call === "path:prepare").length, 1);
+  assert.equal(fixture.calls.some((call) => /^(lookup|build):/.test(call)), false);
+});
+
+test("changed transform or geometry generation still prepares and rebuilds stale paths", () => {
+  for (const change of [
+    (fixture) => { fixture.state.zoomTransform = { k: 2, x: 0, y: 0 }; },
+    (fixture, entries) => {
+      entries[0].feature = feature("a");
+      fixture.state.landData = { features: [entries[0].feature] };
+      fixture.state.scenarioDataGeneration += 1;
+    },
+  ]) {
+    const fixture = createFixture();
+    const entries = [{ feature: feature("a"), id: "a" }];
+    fixture.state.landData = { features: [entries[0].feature] };
+    const draw = () => fixture.owner.drawPoliticalBackgroundFillsForEntries(entries, {
+      useFullPassCache: true, returnSummary: true,
+    });
+    draw();
+    const oldPath = fixture.pathCache.get("a").path;
+    change(fixture, entries);
+    const summary = draw();
+    assert.equal(summary.cacheHit, false);
+    assert.equal(summary.reusedPathCount, 0);
+    assert.equal(summary.builtPathCount, 1);
+    assert.equal(fixture.calls.filter((call) => call === "path:reset").length, 1);
+    assert.notEqual(fixture.pathCache.get("a").path, oldPath);
+  }
+});
+
+test("deferred slices prepare once each and reuse warm paths without feature lookup", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: [feature("a"), feature("b"), feature("c")] };
+  for (const item of fixture.state.landData.features) {
+    const featureId = item.properties.id;
+    fixture.pathCache.set(featureId, { path: { featureId } });
+  }
+  const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  fixture.calls.length = 0;
+  fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  assert.equal(fixture.calls.filter((call) => call === "path:prepare").length, 1);
+  assert.equal(fixture.calls.some((call) => /^(lookup|build):/.test(call)), false);
+  assert.equal(fixture.pending.length, 1);
+  fixture.calls.length = 0;
+  fixture.pending.shift().callback();
+  // One preparation for the second slice, one for the completed full-pass grouping.
+  assert.equal(fixture.calls.filter((call) => call === "path:prepare").length, 2);
+  assert.equal(fixture.calls.some((call) => /^(lookup|build):/.test(call)), false);
+  const slices = fixture.metrics.filter((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.deepEqual(slices.map(({ processedCount, reusedPathCount, builtPathCount, pathlessEntryCount }) =>
+    [processedCount, reusedPathCount, builtPathCount, pathlessEntryCount]), [[1, 1, 0, 0], [2, 2, 0, 0]]);
+  assert.equal(fixture.calls.filter((call) => call === "repaint").length, 1);
+});
+
 test("progressive Admin0 underlay schedules one current deferred completion", () => {
   const fixture = createFixture({ progressiveLimit: 1 });
   fixture.state.landData = { features: [feature("a"), feature("b")] };
@@ -234,6 +326,10 @@ test("progressive Admin0 underlay schedules one current deferred completion", ()
   assert.equal(fixture.calls.filter((entry) => entry === "diagnostics").length, 1);
   assert.equal(fixture.calls.filter((entry) => entry === "repaint").length, 1);
   assert.equal(fixture.calls.filter((entry) => entry === "fallback").length, 1);
+  const slice = fixture.metrics.find((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.equal(slice.builtPathCount, 2);
+  assert.equal(slice.reusedPathCount, 0);
+  assert.equal(slice.pathlessEntryCount, 0);
 });
 
 test("stale deferred work cancels without invalidation, diagnostics, or repaint", () => {

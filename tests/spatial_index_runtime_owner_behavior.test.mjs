@@ -20,6 +20,8 @@ function createOwnerHarness({
   computeProjectedFeatureBounds = () => null,
   shouldSkipFeature = () => false,
   getLogicalCanvasDimensions = () => [800, 600],
+  yieldToMain = async () => {},
+  chunkedSpatialBuildSliceSize = 400,
 } = {}) {
   const state = {
     ...createDefaultSpatialIndexState(),
@@ -29,10 +31,12 @@ function createOwnerHarness({
   };
   const owner = createSpatialIndexRuntimeOwner({
     state,
+    constants: { chunkedSpatialBuildSliceSize },
     getters: {
       getPathSvg: () => ({}),
     },
     helpers: {
+      yieldToMain,
       getFeatureId: (feature) => String(feature?.id || ""),
       getFeatureCountryCodeNormalized: (feature) => String(feature?.countryCode || ""),
       getFeatureBorderMeshCountryCodeNormalized: (feature) => String(feature?.countryCode || ""),
@@ -45,6 +49,23 @@ function createOwnerHarness({
     },
   });
   return { owner, state };
+}
+
+for (const cancelAtYield of [1, 2]) {
+  test(`chunked spatial build does not publish after invalidation at yield ${cancelAtYield}`, async () => {
+    let current = true;
+    let yields = 0;
+    const { owner, state } = createOwnerHarness({
+      landFeatures: [{ id: "a", bounds: bounds(1) }, { id: "b", bounds: bounds(2) }],
+      chunkedSpatialBuildSliceSize: 1,
+      yieldToMain: async () => { if (++yields === cancelAtYield) current = false; },
+    });
+    const originalItems = state.spatialItems;
+    await owner.buildSpatialIndexChunked({ includeSecondary: false, isCurrent: () => current });
+    assert.equal(state.spatialItems, originalItems);
+    assert.equal(state.hitCanvasDirty, false);
+    assert.equal(yields, cancelAtYield);
+  });
 }
 
 test("runtime primary rebuild refreshes current land and river bounds without changing index semantics", () => {

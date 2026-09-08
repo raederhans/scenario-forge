@@ -1,5 +1,11 @@
 // Derives layer payloads from a captured chunk state. The controller owns state commits.
 
+// Viewport merge is more expensive than selecting the already merged layer. Keep
+// a one-entry cache per bundle, keyed by the viewport and the exact payload
+// objects participating in the merge. Object identity makes invalidation safe
+// when a chunk is replaced while avoiding another state surface.
+const primaryViewportMergeCacheByBundle = new WeakMap();
+
 function getChunkIdListSignature(chunkIds = []) {
   return (Array.isArray(chunkIds) ? chunkIds : [])
     .map((value) => String(value || "").trim())
@@ -15,26 +21,25 @@ function getScenarioChunkIdsByLayer(chunkState, layerKey, activeChunkIdSet = nul
     .map(({ chunkId }) => chunkId);
 }
 
-function getScenarioChunkMetaById(bundle, chunkId = "") {
-  const normalizedChunkId = String(chunkId || "").trim();
-  if (!normalizedChunkId) return null;
+function buildScenarioChunkMetaIndex(bundle) {
+  const byId = new Map();
   const byLayer = bundle?.chunkRegistry?.byLayer && typeof bundle.chunkRegistry.byLayer === "object"
     ? bundle.chunkRegistry.byLayer
     : {};
   for (const chunks of Object.values(byLayer)) {
-    const match = (Array.isArray(chunks) ? chunks : [])
-      .find((chunk) => String(chunk?.id || "").trim() === normalizedChunkId);
-    if (match) return match;
+    for (const chunk of Array.isArray(chunks) ? chunks : []) {
+      const id = String(chunk?.id || "").trim();
+      if (id && !byId.has(id)) byId.set(id, chunk);
+    }
   }
-  return null;
+  return byId;
 }
 
-function getScenarioChunkPayloadEntriesForLayer(bundle, chunkState, layerKey, activeChunkIdSet = null) {
+function getScenarioChunkPayloadEntriesForLayer(chunkState, layerKey, activeChunkIdSet = null) {
   return chunkState.loadedChunkIds
     .filter((chunkId) => !activeChunkIdSet || activeChunkIdSet.has(String(chunkId || "").trim()))
     .map((chunkId) => ({
       chunkId,
-      chunk: getScenarioChunkMetaById(bundle, chunkId),
       entry: chunkState.payloadByChunkId?.[chunkId] || null,
     }))
     .filter(({ entry }) => entry && entry.layerKey === layerKey);
@@ -72,12 +77,15 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
   const primaryMergedLayerPayloads = {};
   const primaryLayerStats = {};
   const changedLayerKeys = [];
+  // Local to this merge: registry entries can be edited in place. Build only
+  // when viewport projection needs metadata, rather than search per chunk/layer.
+  let chunkMetaById = null;
   const layerKeys = new Set([
     ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
     ...Object.keys(previousMergedLayerPayloads || {}),
   ]);
   layerKeys.forEach((layerKey) => {
-    const layerChunkPayloadEntries = getScenarioChunkPayloadEntriesForLayer(bundle, chunkState, layerKey, activeChunkIdSet);
+    const layerChunkPayloadEntries = getScenarioChunkPayloadEntriesForLayer(chunkState, layerKey, activeChunkIdSet);
     const previousSignature = String(previousSignatures?.[layerKey] || "");
     const nextSignature = String(nextSignatures?.[layerKey] || "");
     const canReuse = previousSignature === nextSignature
@@ -90,6 +98,7 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
         .filter(Boolean);
       changedLayerKeys.push(layerKey);
       if (!layerChunkPayloads.length) {
+        if (layerKey === "political") primaryViewportMergeCacheByBundle.delete(bundle);
         mergedLayerPayloads[layerKey] = null;
         primaryMergedLayerPayloads[layerKey] = null;
         primaryLayerStats[layerKey] = null;
@@ -98,12 +107,42 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
       mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
     }
     if (layerKey === "political" && typeof mergeScenarioChunkPayloadsForViewport === "function") {
-      const primaryResult = mergeScenarioChunkPayloadsForViewport(layerKey, layerChunkPayloadEntries.map(({ chunk, entry }) => ({
-        chunk,
+      chunkMetaById ||= buildScenarioChunkMetaIndex(bundle);
+      const viewportKey = Array.isArray(viewportBbox)
+        ? viewportBbox.join(",")
+        : "";
+      const politicalEntries = layerChunkPayloadEntries.map(({ chunkId, entry }) => ({
+        chunk: chunkMetaById.get(String(chunkId || "").trim()) || null,
         payload: entry?.payload || null,
-      })), viewportBbox || [-180, -90, 180, 90]);
-      primaryMergedLayerPayloads[layerKey] = primaryResult?.payload || null;
-      primaryLayerStats[layerKey] = primaryResult?.stats || null;
+      }));
+      const previousViewportCache = primaryViewportMergeCacheByBundle.get(bundle);
+      const canReusePrimaryViewport = previousViewportCache
+        && previousViewportCache.merge === mergeScenarioChunkPayloadsForViewport
+        && previousViewportCache.key === `${nextSignature}|${viewportKey}`
+        && previousViewportCache.entries.length === politicalEntries.length
+        && previousViewportCache.entries.every((entry, index) => (
+          entry.chunk === politicalEntries[index].chunk
+          && entry.payload === politicalEntries[index].payload
+        ));
+      if (canReusePrimaryViewport) {
+        primaryMergedLayerPayloads[layerKey] = previousViewportCache.payload;
+        primaryLayerStats[layerKey] = previousViewportCache.stats;
+      } else {
+        const primaryResult = mergeScenarioChunkPayloadsForViewport(
+          layerKey,
+          politicalEntries,
+          viewportBbox || [-180, -90, 180, 90],
+        );
+        primaryMergedLayerPayloads[layerKey] = primaryResult?.payload || null;
+        primaryLayerStats[layerKey] = primaryResult?.stats || null;
+        primaryViewportMergeCacheByBundle.set(bundle, {
+          merge: mergeScenarioChunkPayloadsForViewport,
+          key: `${nextSignature}|${viewportKey}`,
+          entries: politicalEntries,
+          payload: primaryMergedLayerPayloads[layerKey],
+          stats: primaryLayerStats[layerKey],
+        });
+      }
     }
   });
   return {

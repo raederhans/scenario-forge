@@ -1270,9 +1270,9 @@ export async function loadStartupBootArtifacts({
     }
   }
 
-  if ((!topologyPrimary || !locales || !geoAliases) && workerEnabled) {
+  if ((!topologyPrimary || !locales || !geoAliases || !decodedCollections) && workerEnabled) {
     try {
-      // worker 只补 cache 没命中的那部分，避免主线程首屏同时做 JSON parse。
+      // 缓存命中的拓扑同样交给 worker 解码；仅对缺失资源发起网络请求。
       startupWorkerUsed = true;
       const workerResult = await loadBaseStartupViaWorker({
         topologyUrl,
@@ -1281,6 +1281,7 @@ export async function loadStartupBootArtifacts({
         needTopologyPrimary: !topologyPrimary,
         needLocales: !locales,
         needGeoAliases: !geoAliases,
+        cachedTopologyPrimary: topologyPrimary,
       });
       topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;
       locales = locales || workerResult.locales || null;

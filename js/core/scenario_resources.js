@@ -418,6 +418,10 @@ function scheduleScenarioDeferredBundleMetadataLoad(
           }
         }
         resolve();
+        // The payloads are now settled; do not let the resolved promise pin an
+        // otherwise evictable bundle in the bounded scenario cache.
+        bundle.deferredMetadataLoadSettled = true;
+        trimScenarioBundleCaches();
       }, 1200);
     });
   }
@@ -970,6 +974,7 @@ function releaseScenarioAuditPayload(scenarioId = runtimeState.activeScenarioId,
 
 const {
   loadScenarioBundle,
+  trimScenarioBundleCaches,
 } = createScenarioBundleRuntimeController({
   // bundle_runtime 拥有 bundle 事务、startup cache 读写和 registry 解析；
   // scenario_resources 保留的职责只是把 facade 暴露给上层，并补齐 optional layer / deferred metadata 这些共享接线。
@@ -1050,6 +1055,7 @@ export {
   loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
+  trimScenarioBundleCaches,
   enforceScenarioHydrationHealthGate,
   releaseScenarioAuditPayload,
   scheduleScenarioDeferredBundleMetadataLoad,

@@ -308,6 +308,7 @@ test("completed apply resumes only its current pending chunk work after releasin
       },
       normalizeScenarioId: value => String(value || ""),
       clearActiveScenarioApplyRequestState: () => { state.scenarioApplyInFlight = false; },
+      trimScenarioBundleCaches: () => { assert.equal(state.scenarioApplyInFlight, false); },
       scheduleScenarioChunkRefresh: options => {
         assert.equal(state.scenarioApplyInFlight, false);
         calls.push(options);

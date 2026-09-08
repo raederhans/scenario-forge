@@ -1534,3 +1534,58 @@ test("project import success is not reclassified when status observer fails", as
     console.error = previousConsoleError;
   }
 });
+
+
+test("ZIP download serializes the editable project once", async () => {
+  let serializations = 0;
+  const payload = { schemaVersion: 22, toJSON() { serializations++; return { schemaVersion: 22 }; } };
+  const { blob } = await FileManager.buildProjectDownloadPayload(payload, { format: "zip" });
+  assert.equal(serializations, 1);
+  const entries = unzipSync(new Uint8Array(await blob.arrayBuffer()));
+  assert.deepEqual(entries["map_project.json"], entries["project/map_project.json"]);
+});
+
+test("ZIP parsed import skips FileReader while retaining preview, normalization and observers", async t => {
+  const { blob } = await FileManager.buildProjectDownloadPayload({ schemaVersion: 22, visualOverrides: { A: "#123456" } }, { format: "zip" });
+  Object.defineProperty(blob, "name", { value: "map_project.zip" });
+  const projectText = strFromU8(unzipSync(new Uint8Array(await blob.arrayBuffer()))["map_project.json"]);
+  const oldReader = globalThis.FileReader, oldFile = globalThis.File, oldDocument = globalThis.document;
+  const parse = JSON.parse;
+  let projectParses = 0;
+  globalThis.FileReader = class { constructor() { throw new Error("Unexpected FileReader"); } };
+  globalThis.File = class { constructor() { throw new Error("Unexpected File materialization"); } };
+  globalThis.document = { getElementById: () => null };
+  JSON.parse = function(text, ...args) { if (text === projectText) projectParses++; return parse.call(this, text, ...args); };
+  t.after(() => { globalThis.FileReader = oldReader; globalThis.File = oldFile; globalThis.document = oldDocument; JSON.parse = parse; });
+  const prepared = await prepareProjectImportFile(blob, { materializeFile: false });
+  assert.equal(prepared.file, null);
+  assert.equal(prepared.preview.packageKind, "editable-project-package");
+  assert.equal(prepared.projectPayload.schemaVersion, 22);
+  assert.equal(projectParses, 1);
+  projectParses = 0;
+  const events = [];
+  assert.equal(await FileManager.importProject(blob, async data => {
+    assert.equal(data.visualOverrides.A, "#123456");
+    events.push("callback");
+  }, { onSuccess: () => events.push("success"), onError: () => events.push("error") }), true);
+  assert.equal(projectParses, 1);
+  assert.deepEqual(events, ["callback", "success"]);
+  events.length = 0;
+  const oldError = console.error;
+  console.error = () => {};
+  try {
+    assert.equal(await FileManager.importProject(blob, () => { throw new Error("apply failed"); }, {
+      onSuccess: () => events.push("success"), onError: error => events.push(error.message),
+    }), false);
+    assert.deepEqual(events, ["apply failed"]);
+    const entries = unzipSync(new Uint8Array(await blob.arrayBuffer()));
+    entries["project/map_project.json"] = strToU8('{"schemaVersion":22,"visualOverrides":{}}');
+    const tampered = new Blob([zipSync(entries)], { type: "application/zip" });
+    let callbackCount = 0;
+    assert.equal(await FileManager.importProject(tampered, () => callbackCount++, {
+      onError: error => events.push(error.message),
+    }), false);
+    assert.equal(callbackCount, 0);
+    assert.equal(events.length, 2);
+  } finally { console.error = oldError; }
+});

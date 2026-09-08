@@ -48,6 +48,7 @@ export function createPostReadyScheduler({
   const taskHandles = new Map();
   const taskDiagnostics = new Map();
   let taskEpoch = 0;
+  let activeExecution = null;
 
   function nowMs() {
     const value = typeof clock === "function" ? Number(clock()) : Number.NaN;
@@ -151,6 +152,7 @@ export function createPostReadyScheduler({
 
   function reset(reason = "reset") {
     taskEpoch += 1;
+    activeExecution = null;
     taskHandles.forEach((handle) => {
       clearTaskHandle(handle);
     });
@@ -207,6 +209,8 @@ export function createPostReadyScheduler({
   }
 
   function runTaskCallback(taskKey, callback) {
+    const execution = { epoch: taskEpoch };
+    activeExecution = execution;
     setActivePostReadyTask(targetState, {
       taskKey,
       startedAt: nowMs(),
@@ -215,6 +219,8 @@ export function createPostReadyScheduler({
     updateDiagnostics({ taskKey, lastStartedTaskKey: taskKey });
 
     const clearActiveTask = () => {
+      if (activeExecution !== execution || execution.epoch !== taskEpoch) return;
+      activeExecution = null;
       clearActivePostReadyTask(targetState, { expectedTaskKey: taskKey });
       updateDiagnostics({ taskKey, lastFinishedTaskKey: taskKey });
     };
@@ -278,27 +284,30 @@ export function createPostReadyScheduler({
       allowChunkBacklog: shouldAllowChunkBacklog,
     });
     const scheduledEpoch = taskEpoch;
+    const scheduledHandle = { type: "timeout", id: null };
+    const ownsScheduledHandle = () => scheduledEpoch === taskEpoch
+      && taskHandles.get(normalizedTaskKey) === scheduledHandle;
+    const registerHandle = (type, id) => {
+      scheduledHandle.type = type;
+      scheduledHandle.id = id;
+      taskHandles.set(normalizedTaskKey, scheduledHandle);
+    };
 
     const runWhenIdle = () => {
-      if (scheduledEpoch !== taskEpoch) {
-        clearTask(normalizedTaskKey);
-        return;
-      }
+      if (!ownsScheduledHandle()) return;
       const blockReason = targetState.activePostReadyTaskKey
         ? "active-task"
         : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
       if (blockReason !== "ready") {
         markTaskRetry(normalizedTaskKey, blockReason);
         const retryId = timers.setTimeout(runWhenIdle, Math.max(120, retryDelayMs));
-        taskHandles.set(normalizedTaskKey, { type: "timeout", id: retryId });
+        registerHandle("timeout", retryId);
         return;
       }
       if (timers.requestIdleCallback) {
         const idleId = timers.requestIdleCallback((deadline) => {
+          if (!ownsScheduledHandle()) return;
           taskHandles.delete(normalizedTaskKey);
-          if (scheduledEpoch !== taskEpoch) {
-            return;
-          }
           const remainingMs = typeof deadline?.timeRemaining === "function"
             ? Number(deadline.timeRemaining())
             : Number.POSITIVE_INFINITY;
@@ -317,14 +326,12 @@ export function createPostReadyScheduler({
           }
           runTaskCallback(normalizedTaskKey, callback);
         }, { timeout });
-        taskHandles.set(normalizedTaskKey, { type: "idle", id: idleId });
+        registerHandle("idle", idleId);
         return;
       }
       const timeoutId = timers.setTimeout(() => {
+        if (!ownsScheduledHandle()) return;
         taskHandles.delete(normalizedTaskKey);
-        if (scheduledEpoch !== taskEpoch) {
-          return;
-        }
         const timeoutBlockReason = targetState.activePostReadyTaskKey
           ? "active-task"
           : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
@@ -335,11 +342,11 @@ export function createPostReadyScheduler({
         }
         runTaskCallback(normalizedTaskKey, callback);
       }, 0);
-      taskHandles.set(normalizedTaskKey, { type: "timeout", id: timeoutId });
+      registerHandle("timeout", timeoutId);
     };
 
     const startId = timers.setTimeout(runWhenIdle, Math.max(0, delayMs));
-    taskHandles.set(normalizedTaskKey, { type: "timeout", id: startId });
+    registerHandle("timeout", startId);
     updateDiagnostics({
       taskKey: normalizedTaskKey,
       lastBlockedReason: String(previousDiagnostic?.lastBlockedReason || ""),

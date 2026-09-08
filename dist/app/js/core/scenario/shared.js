@@ -3,6 +3,7 @@ import {
   SCENARIO_GEO_LOCALE_PATCH_MANIFEST_LANGUAGE_FIELDS,
   normalizeScenarioLocaleLanguage,
 } from "./locale_asset_contract.js";
+import { createScenarioCoreArrayNormalizer } from "./core_value_normalizer.js";
 
 const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 60_000;
@@ -48,17 +49,11 @@ function normalizeScenarioCoreTag(rawValue) {
   return String(rawValue || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
+const normalizeScenarioCoreArray = createScenarioCoreArrayNormalizer(normalizeScenarioCoreTag);
+
 function normalizeScenarioCoreValue(rawValue) {
   if (Array.isArray(rawValue)) {
-    const seen = new Set();
-    const tags = [];
-    rawValue.forEach((entry) => {
-      const tag = normalizeScenarioCoreTag(entry);
-      if (!tag || seen.has(tag)) return;
-      seen.add(tag);
-      tags.push(tag);
-    });
-    return tags;
+    return normalizeScenarioCoreArray(rawValue);
   }
   const text = String(rawValue || "").trim();
   if (!text) return [];

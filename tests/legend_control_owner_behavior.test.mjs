@@ -60,14 +60,14 @@ function harness(t) {
   globalThis.document = document;
   t.after(() => { globalThis.document = previous; });
   const h = {
-    document, container: new Element(), language: "en", updates: [],
+    document, container: new Element(), language: "en", updates: [], modelReads: 0,
     control: { visible: true, collapsed: false, width: 240, height: 340, opacity: 0.9, xRatio: 0, yRatio: 0 },
     model: { colors: ["#ff0000"], labelMap: { "#ff0000": "Red" }, specialZoneLegendLayers: [], activeScenarioId: "", hasScenarioVisualEdits: false },
   };
   h.owner = createLegendControlOwner({
     getMapContainer: () => h.container,
     getLanguage: () => h.language,
-    getLegendModel: (colors, labels) => ({ ...h.model, colors: colors || h.model.colors, labelMap: labels || h.model.labelMap }),
+    getLegendModel: (colors, labels) => { h.modelReads++; return { ...h.model, colors: colors || h.model.colors, labelMap: labels || h.model.labelMap }; },
     getControlState: () => h.control,
     updateControlState: (patch) => { h.updates.push(patch); Object.assign(h.control, patch); return h.control; },
     toggleControlCollapsed: () => { h.control.collapsed = !h.control.collapsed; return h.control; },
@@ -214,3 +214,44 @@ for (const [edge, width, height] of [["s", 240, 390], ["se", 280, 390]]) {
     assert.equal(element.querySelector(".map-legend-opacity-panel").hidden, true);
   });
 }
+
+
+test("hidden legend skips model reads and unchanged layout performs no style writes", (t) => {
+  const h = harness(t);
+  h.control.visible = false;
+  h.render();
+  h.render();
+  assert.equal(h.modelReads, 0);
+  h.control.visible = true;
+  h.render();
+  let writes = 0;
+  h.element().style = new Proxy(h.element().style, {
+    set(target, key, value) { writes++; target[key] = value; return true; },
+  });
+  h.render();
+  assert.equal(writes, 0);
+  h.control.width = 280;
+  h.render();
+  assert.equal(h.element().style.width, "280px");
+  assert.ok(writes > 0);
+});
+
+
+test("unchanged visible legend header avoids repeated text writes but language and collapse refresh", t => {
+  const h = harness(t);
+  h.render();
+  const title = h.element().querySelector(".map-legend-control-title");
+  let text = title.textContent, writes = 0;
+  Object.defineProperty(title, "textContent", { get: () => text, set(value) { writes++; text = value; } });
+  h.render();
+  h.render();
+  assert.equal(writes, 0);
+  h.language = "zh";
+  h.render();
+  assert.equal(writes, 1);
+  assert.equal(text, "图例");
+  h.control.collapsed = true;
+  h.render();
+  assert.equal(writes, 2);
+  assert.ok(h.element().className.includes("is-collapsed"));
+});

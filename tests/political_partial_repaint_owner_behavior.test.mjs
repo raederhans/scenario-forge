@@ -155,6 +155,37 @@ function createHarness(overrides = {}) {
   return { owner, state, cache, context, events, feature, transform, path, workerMetrics };
 }
 
+test("fine loop validates paths once per draw and rechecks changed transforms without building", () => {
+  const cachedPath = { cached: true };
+  let valid = true;
+  const transforms = [];
+  const h = createHarness({ helpers: {
+    getPoliticalPathCacheHandle: (transform, options) => {
+      transforms.push(transform);
+      assert.equal(options.resetIfMismatch, false);
+      return { valid, map: new Map([["land-1", { path: cachedPath }]]) };
+    },
+    getPoliticalFeaturePathEntry: () => { throw new Error("unexpected per-feature validation"); },
+  } });
+  const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
+  const viewport = { visibleItems: Array.from({ length: 100 }, (_, drawOrder) => ({ feature: h.feature, drawOrder })) };
+  assert.equal(h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport }).renderedCount, 100);
+  assert.equal(transforms.length, 1);
+  assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "fill" && event[1] === cachedPath).length, 100);
+  valid = false;
+  h.events.length = 0;
+  const nextTransform = { x: 10, y: 0, k: 2 };
+  h.owner.drawPoliticalFineFeatureLoop({ k: 2, identity: { ...identity, transform: nextTransform }, viewport });
+  assert.equal(transforms.length, 2);
+  assert.equal(transforms[1], nextTransform);
+  assert.equal(h.events.filter(event => event === "path").length, 100);
+  valid = true;
+  h.events.length = 0;
+  h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport: { visibleItems: null } });
+  assert.equal(transforms.length, 3);
+  assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === cachedPath));
+});
+
 test("factory validates ports and freezes the exact owner API", () => {
   assert.throws(() => createPoliticalPartialRepaintOwner(), /surface must expose/);
   const { owner } = createHarness();

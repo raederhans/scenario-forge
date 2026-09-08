@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
+const { summarizeInputEvidence } = require('../support/input-evidence');
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../support/playwright-app');
 
 // Dev-only cold-start/input measurements and the TNO/HOI4/TNO cycle wait for full idle convergence.
@@ -47,6 +48,24 @@ async function waitForStableInputWindow(page) {
 // Keep the existing diagnostics as the source of phase timings. Sampling observes
 // distinct published sequences; missing stages remain absent, never zero-filled.
 async function installStageObserver(page) {
+  if (process.env.N3_SCENARIO_REFRESH_SOURCE) {
+    const source = fs.readFileSync(process.env.N3_SCENARIO_REFRESH_SOURCE, 'utf8');
+    await page.route('**/js/core/map_renderer/scenario_refresh_runtime.js', route => route.fulfill({
+      status: 200, contentType: 'application/javascript', body: source,
+    }));
+  }
+  if (process.env.N3_RENDERER_SOURCE) {
+    const source = fs.readFileSync(process.env.N3_RENDERER_SOURCE, 'utf8');
+    await page.route('**/js/core/map_renderer.js', route => route.fulfill({
+      status: 200, contentType: 'application/javascript', body: source,
+    }));
+  }
+  if (process.env.N3_HISTORY_SOURCE) {
+    const source = fs.readFileSync(process.env.N3_HISTORY_SOURCE, 'utf8');
+    await page.route('**/js/core/history_manager.js', route => route.fulfill({
+      status: 200, contentType: 'application/javascript', body: source,
+    }));
+  }
   await page.addInitScript(() => {
     globalThis.__runtimeStageSamples = [];
     globalThis.__inputEventTimings = [];
@@ -69,13 +88,15 @@ async function installStageObserver(page) {
     const seen = new Set();
     setInterval(() => {
       const metrics = globalThis.__renderPerfMetrics || {};
-      for (const name of ['scenarioChunkPromotionInfraStage', 'scenarioChunkPromotionVisualStage',
+      for (const name of ['postReadySchedulerState', 'scenarioChunkPromotionInfraStage', 'scenarioChunkPromotionVisualStage',
         'rebuildPoliticalLandCollectionsBreakdown', 'rebuildResolvedColors', 'buildSpatialIndex', 'buildHitCanvas',
         'drawContextScenarioPass', 'drawScenarioRegionOverlaysPass', 'drawScenarioAtlantropaLandLikeOverlayLayer',
         'drawScenarioWaterFillLayer', 'drawScenarioReliefOverlaysLayer', 'drawCanvas']) {
         const metric = metrics[name];
-        if (!metric || !Number.isFinite(metric.sequence)) continue;
-        const key = `${name}:${metric.sequence}`;
+        if (!metric) continue;
+        const identity = name === 'postReadySchedulerState' ? JSON.stringify(metric) : metric.sequence;
+        if (name !== 'postReadySchedulerState' && !Number.isFinite(identity)) continue;
+        const key = `${name}:${identity}`;
         if (seen.has(key)) continue;
         seen.add(key);
         if (globalThis.__runtimeStageSamples.length < 4096) {
@@ -315,6 +336,7 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
     } finally {
       const evidence = await page.evaluate(() => ({
         stages: globalThis.__runtimeStageSamples || [],
+        historySpans: globalThis.__historySpans || [],
         snapshot: globalThis.__mc_perf__?.snapshot?.() || null,
         inputs: globalThis.__runtimeInputProbe?.results || [],
         pendingInput: globalThis.__runtimeInputProbe?.pending || null,
@@ -324,35 +346,25 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         busyTasks: globalThis.__runtimeInputProbe?.busyTasks || [],
         timeOrigin: performance.timeOrigin, userAgent: navigator.userAgent, devicePixelRatio,
       }));
-      for (const input of evidence.inputs) {
-        input.eventTimings = input.kind === 'zoom' ? null : evidence.eventTimings.filter(e =>
-          e.startTime >= input.armedAt && e.startTime <= input.firstVisibleAt
-          && ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click'].includes(e.name));
-        // Missing EventTiming (below threshold or unsupported) is not a zero queue delay.
-        input.queueMs = input.eventTimings?.length ? Math.max(...input.eventTimings.map(e => e.queueMs)) : null;
-        input.inputToVisibleMs = Number.isFinite(input.eventTimeStamp) ? input.firstVisibleAt - input.eventTimeStamp : null;
-        input.inputToStableMs = Number.isFinite(input.eventTimeStamp) ? input.stableAt - input.eventTimeStamp : null;
-        input.busyTasks = evidence.busyTasks.filter(task => task.startTime >= input.armedAt && task.startTime <= input.stableAt);
-        input.queuedDuringBusyTask = input.eventTimings?.length ? input.eventTimings.some(e =>
-          input.busyTasks.some(task => task.startTime <= e.processingStart && task.endTime >= e.startTime)) : null;
-        input.eventTimingStatus = input.kind === 'zoom' ? 'not-applicable-continuous-wheel'
-          : input.eventTimings.length ? 'observed' : 'unobserved-below-threshold-or-unsupported';
-      }
+      const interpreted = summarizeInputEvidence(evidence, {
+        mode: stableInputWindow ? 'stable' : 'controlled-busy',
+      });
       const evidencePath = testInfo.outputPath('runtime-stage-input-evidence.json');
       fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, variant, viewport, stableInputWindow,
-        measurementVersion: 2,
+        measurementVersion: 3,
         baselineRevision: process.env.P1_BASE_REVISION || null,
         browserVersion: page.context().browser()?.version(), nodeVersion: process.version,
         host: require('node:os').hostname(), platform: process.platform,
         timingContract: { eventThresholdMs: 16, stableHoldMs: 250, visible: 'canvas/SVG at rAF; not physical display presentation',
           trace: 'off: before-action DOM snapshots would perturb dispatch timing',
           handlerBoundary: 'capture listener; exact processingStart/End retained per EventTiming entry',
+          eventAssociation: 'unique pointerdown timestamp and target; queue from that entry only; raw events retained separately',
           busyCondition: 'concurrent synchronous full-color-refresh and mouse down/up after 10ms client delay; overlap must be observed',
-          wheel: 'capture timestamps and frame evidence; excluded from discrete EventTiming' }, pageErrors, ...evidence }, null, 2));
+          wheel: 'capture timestamps and frame evidence; excluded from discrete EventTiming' }, pageErrors, ...interpreted }, null, 2));
       await testInfo.attach('runtime-stage-input-evidence', { path: evidencePath, contentType: 'application/json' });
       if (!stableInputWindow && evidence.inputs.length === 5) {
-        for (const input of evidence.inputs.filter(input => input.kind !== 'zoom')) {
-          expect(input.queuedDuringBusyTask, `${input.kind}: busy input must overlap a recorded renderer task`).toBe(true);
+        for (const input of interpreted.inputs.filter(input => input.kind !== 'zoom')) {
+          expect(input.busyConditionPassed, `${input.kind}: busy input must overlap a recorded renderer task`).toBe(true);
         }
       }
     }
@@ -474,6 +486,22 @@ test('natural background edit feedback tno_1962', async ({ page }, testInfo) => 
       || dispatch.refreshScheduled || dispatch.promotionScheduled || dispatch.pendingPromotion
       || dispatch.pendingInfraPromotion || dispatch.promotionCommitInFlight),
     'natural background work must still be pending at real input capture').toBe(true);
+    if (process.env.N3_NATURAL_HISTORY === '1') {
+      // Diagnostic only: keep first-visible samples separate from full-stable results.
+      for (const kind of ['undo', 'redo']) {
+        await page.waitForFunction(() => globalThis.__runtimeInputProbe.pending?.firstVisibleAt !== null
+          && !!globalThis.__runtimeInputProbe.pending, undefined, { timeout: 30_000 });
+        await page.evaluate(() => {
+          const probe = globalThis.__runtimeInputProbe;
+          (globalThis.__naturalHistoryVisibleSamples ||= []).push({ ...probe.pending, stableAt: null });
+          probe.pending = null;
+        });
+        await arm(page, kind, kind === 'redo' ? [227, 26, 196] : null,
+          await controlPoint(page, kind === 'redo' ? '#redoBtn' : '#undoBtn'), { naturalBackground: true });
+        await page.mouse.down();
+        await page.mouse.up();
+      }
+    }
     await waitForInputEvidence(page);
     // Only after dispatch/first-visible recording, wait for natural work to drain.
     await page.waitForFunction(() => {
@@ -511,19 +539,18 @@ test('natural background edit feedback tno_1962', async ({ page }, testInfo) => 
       inputs: globalThis.__runtimeInputProbe?.results || [],
       pendingInput: globalThis.__runtimeInputProbe?.pending || null,
       stages: globalThis.__runtimeStageSamples || [],
+      historySpans: globalThis.__historySpans || [],
+      naturalHistoryVisibleSamples: globalThis.__naturalHistoryVisibleSamples || [],
       eventTimings: globalThis.__inputEventTimings || [], longTasks: globalThis.__inputLongTasks || [],
       timeOrigin: performance.timeOrigin, devicePixelRatio,
     }));
-    for (const input of evidence.inputs) {
-      input.inputToVisibleMs = input.firstVisibleAt - input.eventTimeStamp;
-      input.inputToStableMs = input.stableAt - input.eventTimeStamp;
-    }
+    const interpreted = summarizeInputEvidence(evidence, { mode: 'natural-background' });
     const evidencePath = testInfo.outputPath('natural-background-input-evidence.json');
-    fs.writeFileSync(evidencePath, JSON.stringify({ measurementMode: 'natural-background-v1', variant,
+    fs.writeFileSync(evidencePath, JSON.stringify({ measurementVersion: 3, variant,
       baselineRevision: process.env.P1_BASE_REVISION || null, viewport,
       browserVersion: page.context().browser()?.version(), host: require('node:os').hostname(),
       timingContract: 'native mouse, no pre-edit idle or injected refresh; canvas rAF visibility; stable hold 250ms',
-      checks, pageErrors, ...evidence }, null, 2));
+      checks, pageErrors, ...interpreted }, null, 2));
     await testInfo.attach('natural-background-input-evidence', { path: evidencePath, contentType: 'application/json' });
   }
 });
