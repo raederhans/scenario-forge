@@ -14,9 +14,6 @@ import {
   ensureSidebarPerfState,
   resetProjectedBoundsCacheState,
   setInteractionInfrastructureStateFields,
-  commitRendererDprStageState,
-  setFirstVisibleFramePaintedState,
-  commitProjectedBoundsDiagnosticsState,
 } from "../js/core/state/renderer_runtime_state.js";
 import {
   ensureExactAfterSettleControllerState,
@@ -266,29 +263,6 @@ test("renderer runtime accessors normalize cache holders in place", () => {
   assert.equal(state.sphericalFeatureDiagnosticsById.size, 0);
 });
 
-test("renderer callback mutation bridges preserve canonical action semantics", () => {
-  const target = {};
-  const diagnostics = {
-    total: 1,
-    byGeometryType: { Polygon: 1 },
-    byReason: { projected: 1 },
-  };
-
-  assert.equal(commitRendererDprStageState(target, {
-    stage: "interactive",
-    switchedAt: 42,
-  }), "interactive");
-  assert.equal(setFirstVisibleFramePaintedState(target, 1), true);
-  assert.equal(
-    commitProjectedBoundsDiagnosticsState(target, diagnostics),
-    true,
-  );
-  assert.equal(target.dprStage, "interactive");
-  assert.equal(target.dprLastStageSwitchAt, 42);
-  assert.equal(target.firstVisibleFramePainted, true);
-  assert.equal(target.projectedBoundsDiagnostics, diagnostics);
-});
-
 test("renderer runtime cache wrapper preserves a fully normalized holder identity", () => {
   const renderPassCache = createDefaultRenderPassCacheState();
   renderPassCache.politicalPathCacheTransform = { x: 4, y: 5, k: 1.5 };
@@ -354,11 +328,11 @@ test("renderer runtime cache repair rejects malformed nullable object fields onc
 });
 
 test("renderer runtime cache wrappers preserve legacy invalid-target fallbacks", () => {
+  assert.equal(setInteractionInfrastructureStateFields(null, "ready"), "idle");
+  assert.equal(setInteractionInfrastructureStateFields(undefined, "ready"), "idle");
   assert.ok(ensureRenderPassCacheState(null).politicalPathCache instanceof Map);
   assert.ok(ensureProjectedBoundsCacheState(null).projectedBoundsById instanceof Map);
   assert.ok(resetProjectedBoundsCacheState(null).projectedBoundsById instanceof Map);
-  assert.equal(setInteractionInfrastructureStateFields(null, "ready"), "idle");
-  assert.equal(setInteractionInfrastructureStateFields(undefined, "ready"), "idle");
 });
 
 test("renderer runtime cache wrappers detach prototype-owned mutable caches", () => {

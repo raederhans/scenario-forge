@@ -2232,7 +2232,8 @@ test("local projection retains metadata inventory and defers the standalone sele
   ), false);
 });
 
-test("local projection treats selector coverage as fallback for exact indivisible test routes", () => {
+for (const includeRenderer of [false, true]) {
+test(`local projection preserves exact test routes with renderer scope ${includeRenderer}`, () => {
   const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8")).scripts;
   const selectorRoutes = buildRouteIndex();
   const binding = prepareRepositoryVerificationCatalogBinding({
@@ -2243,7 +2244,7 @@ test("local projection treats selector coverage as fallback for exact indivisibl
     platform: process.platform,
   });
   const changedFiles = [
-    "js/core/map_renderer.js",
+    ...(includeRenderer ? ["js/core/map_renderer.js"] : []),
     "js/core/render_change_set.js",
     "js/core/renderer/render_snapshot.js",
     "tests/render_change_set_behavior.test.mjs",
@@ -2262,6 +2263,10 @@ test("local projection treats selector coverage as fallback for exact indivisibl
     preparedCatalog: binding.preparedCatalog,
   }), "edit", { preparedCatalog: binding.preparedCatalog });
   const expectedCommands = [
+    ...(includeRenderer ? [
+      "node --test tests/history_feature_color_refresh_behavior.test.mjs",
+      "node --test tests/render_pass_signature_policy_behavior.test.mjs",
+    ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
     "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
   ];
@@ -2269,19 +2274,29 @@ test("local projection treats selector coverage as fallback for exact indivisibl
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), expectedCommands);
   assert.deepEqual(projected.localEntrypointRouteGaps, []);
   assert.equal(projected.localLeafEquivalence.status, "equivalent");
-  assert.deepEqual(plan.routeGaps, []);
+  // The broader renderer scope must retain its added obligations and report
+  // the edit budget honestly; exact test routing must not drop those leaves.
+  assert.deepEqual(plan.routeGaps.map((gap) => gap.code), includeRenderer ? [
+    "adaptive-edit-command-budget-exceeded",
+    "adaptive-edit-process-group-budget-exceeded",
+    "adaptive-edit-runtime-budget-exceeded",
+    "adaptive-edit-cost-budget-exceeded",
+  ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
+    ...(includeRenderer ? ["node-test:tests/history_feature_color_refresh_behavior.test.mjs"] : []),
     "node-test:tests/render_change_set_behavior.test.mjs",
+    ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
     "python-unittest:tests.test_map_renderer_render_snapshot_boundary_contract",
   ]);
-  assert.equal(plan.executionCommands.length, 2);
-  assert.equal(adaptivePlanningExitCode(projected, plan), 0);
+  assert.equal(plan.executionCommands.length, includeRenderer ? 0 : 2);
+  assert.equal(adaptivePlanningExitCode(projected, plan), includeRenderer ? 2 : 0);
   for (const testFile of changedFiles.filter((file) => file.startsWith("tests/"))) {
     const match = projected.matchedByFile.find((entry) => entry.changedFile === testFile);
     assert.equal(match.matchedRouteIds.includes("infra:verification-selector"), false);
   }
 });
+}
 
 test("local projection selects the Stage C startup support sentinels without promoting heavy geo", () => {
   const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8")).scripts;

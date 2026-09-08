@@ -14,7 +14,7 @@ export function getUrbanFeatureOwnerId(feature) {
 }
 
 // Read state collections and colors at call time to reflect scenario and palette changes.
-export function createUrbanAdaptivePaintModel({ runtimeState, getResolvedFeatureColor, clamp }) {
+export function createUrbanAdaptivePaintModel(runtimeState, { getResolvedFeatureColor, clamp }) {
   function getUrbanHostFillColor(feature) {
     const ownerFeatureId = getUrbanFeatureOwnerId(feature);
     if (!ownerFeatureId) return null;
@@ -105,9 +105,9 @@ export function createUrbanAdaptivePaintModel({ runtimeState, getResolvedFeature
     return config?.mode === "adaptive" && capability?.adaptiveAvailable ? "adaptive" : "manual";
   }
 
-  return {
+  return Object.freeze({
     computeUrbanAdaptivePaintFromHostColor,
     getUrbanAdaptivePaint,
     getEffectiveUrbanMode,
-  };
+  });
 }

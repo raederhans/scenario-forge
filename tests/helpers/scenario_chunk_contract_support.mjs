@@ -1,3 +1,4 @@
+import { createVisibleFrameIdentityPolicy } from "../../js/core/renderer/visible_frame_identity_policy.js";
 import {
   normalizeScenarioFeatureCollection,
   getScenarioFeatureCollectionIdentityList,
@@ -575,61 +576,58 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
   return context.__shellPolicyHarness;
 }
 
-function createFirstVisibleFrameGateHarness(rendererSource) {
-  const source = `
-    const runtimeState = {
-      activeScenarioId: "startup-scenario",
-      zoomTransform: { x: 0, y: 0, k: 1 },
-    };
-    const referenceTransform = { x: 0, y: 0, k: 1 };
-    let fullReferenceTransform = null;
-    const cache = {
-      dirty: { political: false },
-      signatures: { political: "political::ocean-fill:#101820" },
-      politicalPassDataStage: "coarse",
-      politicalPassFineCacheReady: false,
-    };
-    function getRenderPassCacheState() {
-      return cache;
-    }
-    function getRenderPassSignature() {
-      return "political::ocean-fill:#101820";
-    }
-    function getCachedPoliticalPassStaticSignature(signature) {
-      return String(signature || "");
-    }
-    function getOceanBaseFillColor() {
-      return "#101820";
-    }
-    function getPassReferenceTransform() {
-      return referenceTransform;
-    }
-    function getPassFullReferenceTransform() {
-      return fullReferenceTransform;
-    }
-    function areZoomTransformsEquivalent(first, second) {
-      return !!first && !!second
-        && Number(first.x || 0) === Number(second.x || 0)
-        && Number(first.y || 0) === Number(second.y || 0)
-        && Number(first.k || 1) === Number(second.k || 1);
-    }
-    ${extractRendererFunction(rendererSource, "getFirstVisiblePoliticalFrameBlockReason")}
-    globalThis.__firstVisibleFrameGateHarness = {
-      blockReason: getFirstVisiblePoliticalFrameBlockReason,
-      setPoliticalStage: (stage, fineReady) => {
-        cache.politicalPassDataStage = stage;
-        cache.politicalPassFineCacheReady = !!fineReady;
-      },
-      setFullReferenceTransform: (transform) => {
-        fullReferenceTransform = transform;
-      },
-    };
-  `;
-  const context = { globalThis: {}, d3: { zoomIdentity: { x: 0, y: 0, k: 1 } } };
-  context.globalThis = context;
-  vm.createContext(context);
-  vm.runInContext(source, context);
-  return context.__firstVisibleFrameGateHarness;
+function createFirstVisibleFrameGateHarness() {
+  const runtimeState = {
+    activeScenarioId: "startup-scenario",
+    zoomTransform: { x: 0, y: 0, k: 1 },
+  };
+  const referenceTransform = { x: 0, y: 0, k: 1 };
+  let fullReferenceTransform = null;
+  const cache = {
+    dirty: { political: false },
+    signatures: { political: "political::ocean-fill:#101820" },
+    politicalPassDataStage: "coarse",
+    politicalPassFineCacheReady: false,
+  };
+  function getRenderPassCacheState() {
+    return cache;
+  }
+  function getRenderPassSignature() {
+    return "political::ocean-fill:#101820";
+  }
+  function getCachedPoliticalPassStaticSignature(signature) {
+    return String(signature || "");
+  }
+  function getOceanBaseFillColor() {
+    return "#101820";
+  }
+  function getPassReferenceTransform() {
+    return referenceTransform;
+  }
+  function getPassFullReferenceTransform() {
+    return fullReferenceTransform;
+  }
+  function areZoomTransformsEquivalent(first, second) {
+    return !!first && !!second
+      && Number(first.x || 0) === Number(second.x || 0)
+      && Number(first.y || 0) === Number(second.y || 0)
+      && Number(first.k || 1) === Number(second.k || 1);
+  }
+  const policy = createVisibleFrameIdentityPolicy(runtimeState, {
+    getRenderPassCacheState, getRenderPassSignature, getCachedPoliticalPassStaticSignature,
+    getOceanBaseFillColor, getPassReferenceTransform, getPassFullReferenceTransform,
+    areZoomTransformsEquivalent,
+  });
+  return {
+    blockReason: policy.getFirstVisiblePoliticalFrameBlockReason,
+    setPoliticalStage: (stage, fineReady) => {
+      cache.politicalPassDataStage = stage;
+      cache.politicalPassFineCacheReady = !!fineReady;
+    },
+    setFullReferenceTransform: (transform) => {
+      fullReferenceTransform = transform;
+    },
+  };
 }
 
 function getPolygonCoordinateSets(geometry) {

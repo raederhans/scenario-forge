@@ -1000,3 +1000,130 @@ test("baseline mismatch acceptance persists scenario import audit", async ({ pag
   });
   expect(importAudit.currentBaselineHash).not.toBe("bogus-baseline-hash");
 });
+
+for (const baseline of [
+  { mode: "fresh", scenario: "tno_1962", sample: "tno-1962-atlantropa-briefing" },
+  { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing" },
+]) {
+  test(`editing baseline ${baseline.mode} ${baseline.scenario} click undo save reload`, async ({ page }, testInfo) => {
+    test.setTimeout(110000);
+    page.setDefaultTimeout(10000);
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    const { DEFAULT_FAST_APP_OPEN_PATH, DEFAULT_FRESH_APP_OPEN_PATH } = require("./support/startup-paths");
+    const { waitForScenarioApplyIdle: waitReady } = require("./support/playwright-app");
+    const target = baseline.mode === "fast" ? DEFAULT_FAST_APP_OPEN_PATH : DEFAULT_FRESH_APP_OPEN_PATH;
+    await gotoProjectPage(page, `${target}&sample=${baseline.sample}`);
+    await waitReady(page, { scenarioId: baseline.scenario, timeout: 60000 });
+    await waitForStartupReadonlyUnlocked(page, { timeout: 30000 });
+    if (await page.locator("#scenarioGuidePopover").isVisible()) {
+      await page.locator("#scenarioGuideCloseBtn").click();
+    }
+    logProjectSaveLoadStep("baseline:paint-controls");
+    await page.locator("#paintModeVisualBtn").click();
+    await page.locator("#toolFillBtn").click();
+    await page.locator("#customColor").fill("#e31ac4");
+    const point = await page.evaluate(async () => {
+      const { projectGeoToScreen } = await import("/js/core/map_renderer.js");
+      const xy = projectGeoToScreen(13.4, 52.5);
+      const rect = document.querySelector("#mapContainer").getBoundingClientRect();
+      return { x: rect.left + xy[0], y: rect.top + xy[1] };
+    });
+    await page.keyboard.down("Control");
+    await page.mouse.click(point.x, point.y);
+    await page.keyboard.up("Control");
+    const selected = await page.evaluate(() => {
+      const s = globalThis.__pwProjectSaveLoad.state;
+      return { id: s.devSelectedHit?.id, count: s.devSelectionFeatureIds.size, before: { ...s.visualOverrides }, history: s.historyPast.length };
+    });
+    expect(selected.id).toBeTruthy();
+    expect(selected.count).toBe(1);
+    await page.mouse.click(point.x, point.y);
+    await expect.poll(() => page.evaluate(() => globalThis.__pwProjectSaveLoad.state.historyPast.length)).toBe(selected.history + 1);
+    const painted = await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }));
+    expect(painted).not.toEqual(selected.before);
+    expect(Object.values(painted)).toContain("#e31ac4");
+    await page.locator("#undoBtn").click();
+    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
+    expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.historyPast.length)).toBe(selected.history);
+    await page.locator("#redoBtn").click();
+    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
+    const savePath = testInfo.outputPath("edited.project.json");
+    const saved = await exportProjectJson(page, savePath);
+    expect(saved.visualOverrides).toEqual(painted);
+    await page.locator("h1").click();
+    await page.keyboard.press("Control+z");
+    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
+    const watch = await beginProjectImportWait(page, { expectedFileName: path.basename(savePath) });
+    await page.locator("#projectFileInput").setInputFiles(savePath);
+    await waitForProjectImportCompletionFrom(page, watch, { timeout: 30000 });
+    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
+    const reexported = await exportProjectJson(page, testInfo.outputPath("reloaded.project.json"));
+    expect(reexported.visualOverrides).toEqual(saved.visualOverrides);
+    await applyScenario(page, "modern_world");
+    const afterSwitch = await page.evaluate(() => {
+      const s = globalThis.__pwProjectSaveLoad.state;
+      return { scenario: s.activeScenarioId, overrides: { ...s.visualOverrides }, past: s.historyPast.length, future: s.historyFuture.length, selection: s.devSelectionFeatureIds.size };
+    });
+    expect(afterSwitch).toEqual({ scenario: "modern_world", overrides: {}, past: 0, future: 0, selection: 0 });
+    // Import from another active scenario: current target baseline must authorize
+    // unloaded real IDs, while an ID invented by the project stays invalid.
+    const foreignPath = testInfo.outputPath("foreign-id.project.json");
+    fs.writeFileSync(foreignPath, JSON.stringify({
+      ...saved,
+      visualOverrides: { ...painted, M0_FORGED_FEATURE: "#00ff00" },
+    }));
+    const foreignWatch = await beginProjectImportWait(page, { expectedFileName: path.basename(foreignPath) });
+    await page.locator("#projectFileInput").setInputFiles(foreignPath);
+    await waitForProjectImportCompletionFrom(page, foreignWatch, { timeout: 30000 });
+    const restored = await page.evaluate((id) => {
+      const s = globalThis.__pwProjectSaveLoad.state;
+      return { scenario: s.activeScenarioId, overrides: { ...s.visualOverrides }, baselineOwnsId: Object.hasOwn(s.scenarioBaselineOwnersByFeatureId, id) };
+    }, selected.id);
+    expect(restored).toEqual({ scenario: baseline.scenario, overrides: painted, baselineOwnsId: true });
+    await exportProjectJson(page, testInfo.outputPath("cross-scenario-reloaded.project.json"));
+    // Reload resets the view to the globe. Enlarge the edited district before
+    // asserting exact raster color so resampling a two-pixel feature is not the oracle.
+    const exportPoint = await page.evaluate(async () => {
+      const { projectGeoToScreen } = await import("/js/core/map_renderer.js");
+      const xy = projectGeoToScreen(13.4, 52.5);
+      const rect = document.querySelector("#mapContainer").getBoundingClientRect();
+      return { x: rect.left + xy[0], y: rect.top + xy[1] };
+    });
+    await page.mouse.move(exportPoint.x, exportPoint.y);
+    await page.mouse.wheel(0, -1600);
+    await require("./support/playwright-app").waitForRenderIdle(page, { scenarioId: baseline.scenario, timeout: 30000 });
+    await page.locator("#dockExportBtn").click();
+    await expect(page.locator("#exportWorkbenchOverlay")).toBeVisible();
+    const pngDownload = page.waitForEvent("download");
+    await page.locator("#exportWorkbenchSnapshotBtn").click();
+    const png = await pngDownload;
+    expect(await png.failure()).toBeNull();
+    const pngPath = testInfo.outputPath("edited-map.png");
+    await png.saveAs(pngPath);
+    const bytes = fs.readFileSync(pngPath);
+    expect(bytes.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(bytes.length).toBeGreaterThan(1024);
+    const paintedPixels = await page.evaluate(async (encoded) => {
+      const blob = await (await fetch(`data:image/png;base64,${encoded}`)).blob();
+      const bitmap = await createImageBitmap(blob);
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const context = canvas.getContext("2d");
+      context.drawImage(bitmap, 0, 0);
+      const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+      let count = 0;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (pixels[i] === 227 && pixels[i + 1] === 26 && pixels[i + 2] === 196 && pixels[i + 3] > 0) count++;
+      }
+      bitmap.close();
+      return count;
+    }, bytes.toString("base64"));
+    logProjectSaveLoadStep("baseline:export-pixels", { paintedPixels, state: await page.evaluate((id) => {
+      const s = globalThis.__pwProjectSaveLoad.state;
+      return { color: s.colors?.[id], override: s.visualOverrides?.[id], runtimeCount: s.runtimeFeatureIds?.length,
+        landCount: s.landData?.features?.length, politicalCount: s.scenarioPoliticalChunkData?.features?.length,
+        scenario: s.activeScenarioId, exportUi: s.exportWorkbenchUi };
+    }, selected.id) });
+    expect(paintedPixels).toBeGreaterThan(0);
+    await testInfo.attach("editing-baseline-state", { body: JSON.stringify({ baseline, selected, painted, afterSwitch }, null, 2), contentType: "application/json" });
+  });
+}

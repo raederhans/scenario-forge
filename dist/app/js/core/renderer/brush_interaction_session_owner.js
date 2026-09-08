@@ -1,14 +1,4 @@
-export function mergeHistorySnapshot(target, snapshot) {
-  if (!snapshot || typeof snapshot !== "object") return;
-  Object.entries(snapshot).forEach(([section, patch]) => {
-    if (!patch || typeof patch !== "object") return;
-    target[section] = target[section] || {};
-    Object.assign(target[section], patch);
-  });
-}
-
-export function createBrushInteractionSessionOwner({
-  runtimeState,
+export function createBrushInteractionSessionOwner(runtimeState, {
   getBrushSession,
   setBrushSession,
   suppressNextClick,
@@ -179,10 +169,10 @@ export function createBrushInteractionSessionOwner({
     }
   }
 
-  return {
+  return Object.freeze({
     flushBrushSession,
     flushSpecialZoneMembershipDragSession,
     handleBrushPointerDown,
     handleBrushPointerMove,
-  };
+  });
 }

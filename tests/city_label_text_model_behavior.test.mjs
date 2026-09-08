@@ -6,7 +6,7 @@ function setup() {
   const runtimeState = { currentLanguage: 'en' };
   let labels = {};
   const lookup = (keys, fallback) => (Array.isArray(keys) ? keys : [keys]).map(key => labels[key]).find(Boolean) || fallback;
-  return { runtimeState, setLabels(next) { labels = next; }, model: createCityLabelTextModel({ runtimeState, getStrictGeoLabel: lookup, getPreferredGeoLabel: lookup }) };
+  return { runtimeState, setLabels(next) { labels = next; }, model: createCityLabelTextModel(runtimeState, { getStrictGeoLabel: lookup, getPreferredGeoLabel: lookup }) };
 }
 
 test('city display labels follow live language, explicit overrides and replaced locale lookup', () => {

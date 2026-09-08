@@ -1,3 +1,5 @@
+import { appendIntensityFieldPointState } from "../state/actions/intensity_field_actions.js";
+
 // Channels returned by getPhysicalIntensityChannel are live: brush/point edits mutate them.
 // Pointer cancel and lost capture use the same commit route as pointerup.
 export function createPhysicalIntensityInteractionOwner({
@@ -170,8 +172,7 @@ export function createPhysicalIntensityInteractionOwner({
         physicalIntensityDragSession.pointDragMode = hit.mode;
       } else {
         const point = createIntensityPoint(channel, lonLat, tool);
-        channel.enabled = true;
-        channel.points.push(point);
+        appendIntensityFieldPointState(runtimeState, tool.channelId, point);
         setIntensityFieldTool({ selectedPointId: point.id });
         physicalIntensityDragSession.pointId = point.id;
         physicalIntensityDragSession.changed = true;
@@ -206,9 +207,9 @@ export function createPhysicalIntensityInteractionOwner({
     return true;
   }
 
-  return {
+  return Object.freeze({
     handlePhysicalIntensityPointerDown,
     handlePhysicalIntensityPointerMove,
     handlePhysicalIntensityPointerEnd,
-  };
+  });
 }

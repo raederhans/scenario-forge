@@ -215,7 +215,7 @@ test("authored catalog source covers command authority, policies, and every proj
   assert.equal(summary.packageAliasCount, 17);
   assert.equal(summary.prProfileCount, 4);
   assert.equal(summary.nightlyRoleCount, 12);
-  assert.equal(summary.documentationProjectionCount, 53);
+  assert.equal(summary.documentationProjectionCount, 56);
 });
 
 test("renderer split delivery records route to assembly verification", () => {
@@ -2391,4 +2391,35 @@ test("city policy and live power preflight have named verification ownership", (
   assert.ok(report.mainThreadSerialVerification.some((command) => (
     command.commandRef === "perf:williams-power-scheme:live-preflight"
   )));
+});
+
+
+test("M4 overlay lifecycle edits select one shared behavior command within the edit budget", () => {
+  const changedFiles = [
+    "js/core/renderer/render_cache_owner.js",
+    "js/core/renderer/scenario_region_overlay_render_owner.js",
+    "js/core/renderer/scenario_relief_overlay_render_owner.js",
+  ];
+  const selection = constrainAdaptiveEntrypointSelection(
+    buildAdaptiveEntrypointRecommendation(changedFiles, undefined, { entrypoint: "edit" }),
+    "edit", { preparedCatalog: prepareRepositoryVerificationCatalog() },
+  );
+  assert.deepEqual(selection.unmatchedChangedFiles, []);
+  assert.deepEqual(selection.localEntrypointRouteGaps, []);
+  const sharedCommands = selection.recommendedCommands.filter(({ commandRef }) => commandRef.includes("scenario_region_overlay_render_owner_behavior"));
+  assert.equal(sharedCommands.length, 1);
+  for (const file of ["scenario_relief_overlay_render_owner_behavior", "render_cache_owner_invalidation_behavior"]) {
+    assert.ok(sharedCommands[0].commandRef.includes(file));
+  }
+  for (const name of ["plan", "context", "task"]) {
+    const report = buildRecommendation([`docs/active/development-recovery-m4-20260908/${name}.md`]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+  }
+});
+
+
+test("editor checkout instructions retain a canonical verification route", () => {
+  const report = buildRecommendation(["README.md"]);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.ok(report.recommendedCommands.some(({ commandRef }) => commandRef === "python -m unittest tests.test_editor_checkout_profile -q"));
 });

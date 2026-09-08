@@ -1,7 +1,9 @@
+import { commitScenarioOptionalLayerPayloadState } from "./state/actions/scenario_activation_actions.js";
 import { commitSpecialZoneLayersState } from "./state/actions/special_zone_actions.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   resolveSpecialZoneTopologyFingerprint,
+  normalizeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
 import { normalizeScenarioStrategicValuesPayload } from "./scenario/strategic_values.js";
 import {
@@ -30,6 +32,7 @@ import {
   loadMeasuredJsonResource,
   resolveScenarioRegistryUrl,
   normalizeCityText,
+  normalizeScenarioCityOverridesPayload,
   normalizeScenarioGeoLocalePatchPayload,
 } from "./data_loader.js";
 import {
@@ -676,7 +679,7 @@ const {
 });
 const hasRenderableScenarioPoliticalTopology = hasRenderableScenarioPoliticalTopologyFromStartupHydration;
 
-function applyScenarioOptionalLayerState(
+export function applyScenarioOptionalLayerState(
   bundle,
   layerKey,
   payload,
@@ -690,6 +693,7 @@ function applyScenarioOptionalLayerState(
   const config = getScenarioOptionalLayerConfig(layerKey);
   if (!config) return false;
   const bundleScenarioId = getScenarioBundleId(bundle);
+  if (state.scenarioBundleCacheById?.[bundleScenarioId] !== bundle) return false;
   const transactionScenarioApplyEpoch = Math.max(0, Number(scenarioApplyEpoch || bundle?.chunkLifecycle?.scenarioApplyEpoch || 0));
   const transactionScenarioApplyRequestId = Math.max(0, Number(scenarioApplyRequestId || bundle?.chunkLifecycle?.scenarioApplyRequestId || 0));
   if (!bundleScenarioId || !shouldContinueScenarioApplyContext({
@@ -753,19 +757,168 @@ function applyScenarioOptionalLayerState(
   return true;
 }
 
+// Settlement ownership survives promise cleanup and is isolated by bundle identity.
+const requestTokensByBundle = new WeakMap();
+
+function getOptionalLayerRequestTokens(bundle) {
+  if (!requestTokensByBundle.has(bundle)) requestTokensByBundle.set(bundle, new Map());
+  return requestTokensByBundle.get(bundle);
+}
+
+export async function loadScenarioOptionalLayerPayload(
+  bundle,
+  layerKey,
+  {
+    d3Client = globalThis.d3,
+    forceReload = false,
+    applyToActiveScenario = false,
+    scenarioApplyEpoch = 0,
+    scenarioApplyRequestId = 0,
+    isScenarioApplyRequestCurrent = null,
+  } = {}
+) {
+  const config = getScenarioOptionalLayerConfig(layerKey);
+  if (!bundle || !config) return null;
+  const requestTokens = getOptionalLayerRequestTokens(bundle);
+  let requestToken = requestTokens.get(layerKey);
+  const ownsSettlement = () => requestTokens.get(layerKey) === requestToken;
+  const commitPayload = (payload, settled) => {
+    if (!ownsSettlement()) return;
+    const scenarioId = getScenarioBundleId(bundle);
+    if (state.scenarioBundleCacheById?.[scenarioId] === bundle) {
+      commitScenarioOptionalLayerPayloadState(state, scenarioId, layerKey, config.bundleField, payload, settled);
+    } else {
+      // An outgoing bundle can finish caching without touching the active cache.
+      bundle[config.bundleField] = payload;
+      if (settled) bundle.optionalLayerSettledByKey[layerKey] = true;
+      else delete bundle.optionalLayerSettledByKey[layerKey];
+    }
+  };
+  const applyLoadedPayload = (payload, reason) => {
+    if (applyToActiveScenario && ownsSettlement()) {
+      applyScenarioOptionalLayerState(bundle, layerKey, payload, {
+        scenarioApplyEpoch,
+        scenarioApplyRequestId,
+        isScenarioApplyRequestCurrent,
+        reason,
+      });
+    }
+  };
+  // optional layer 允许从 3 个来源收敛到同一份 bundle/runtime state：
+  // 1) 现成 promise，避免并发重复请求
+  // 2) runtime topology 内嵌对象，避免再走一次磁盘/网络
+  // 3) manifest URL 指向的独立 payload
+  // 外部只看最终 layerKey，不需要感知实际命中的来源。
+  bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
+    ? bundle.optionalLayerPromises
+    : {};
+  bundle.optionalLayerSettledByKey = bundle.optionalLayerSettledByKey
+    && typeof bundle.optionalLayerSettledByKey === "object"
+    ? bundle.optionalLayerSettledByKey
+    : {};
+  if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
+    const payload = await bundle.optionalLayerPromises[layerKey];
+    applyLoadedPayload(payload, "scenario-optional-layer-promise-cache");
+    return payload;
+  }
+  if (forceReload) {
+    delete bundle.optionalLayerSettledByKey[layerKey];
+  }
+  if (!forceReload && bundle.optionalLayerSettledByKey[layerKey] === true) {
+    const payload = bundle[config.bundleField] ?? null;
+    applyLoadedPayload(payload, "scenario-optional-layer-settled-cache");
+    return payload;
+  }
+  requestToken = {};
+  requestTokens.set(layerKey, requestToken);
+  const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
+  // Cache validation belongs to this request's bundle, not a later active scenario.
+  const expectedBaselineHash = config.stateField === "scenarioStrategicValuesData"
+    ? String(bundle?.manifest?.baseline_hash || state.scenarioBaselineHash || "")
+    : "";
+  const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  const promise = (async () => {
+    if (config.objectName) {
+      const payload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName);
+      if (payload) {
+        commitPayload(payload, true);
+        return payload;
+      }
+    }
+    const requestUrl = bundle.manifest?.[config.urlField];
+    if (!requestUrl) {
+      commitPayload(null, true);
+      return null;
+    }
+    if (!d3Client || typeof d3Client.json !== "function") {
+      commitPayload(null, false);
+      return null;
+    }
+    try {
+      const { payload: rawPayload } = await loadMeasuredJsonResource(cacheBust(requestUrl), {
+        d3Client,
+        label: `scenario_optional:${layerKey}`,
+      });
+      const payload = layerKey === "cities"
+        ? normalizeScenarioCityOverridesPayload(rawPayload, {
+          sourceLabel: `scenario_city_overrides:${getScenarioBundleId(bundle) || "scenario"}`,
+        })
+        : layerKey === "specialzonelayers"
+          ? normalizeSpecialZoneLayersState(rawPayload, {
+            defaultSource: "scenario",
+            topologyFingerprint: resolveSpecialZoneTopologyFingerprint(state),
+          })
+          : config.stateField === "scenarioStrategicValuesData"
+            ? normalizeScenarioStrategicValuesPayload(rawPayload, {
+              expected: {
+                scenario_id: getScenarioBundleId(bundle),
+                baseline_hash: expectedBaselineHash,
+              },
+            })
+          : config.objectName
+            ? getScenarioTopologyFeatureCollection(rawPayload, config.objectName)
+              || normalizeScenarioFeatureCollection(rawPayload)
+            : normalizeScenarioFeatureCollection(rawPayload);
+      commitPayload(payload, true);
+      return payload;
+    } catch (error) {
+      console.warn(`[scenario] Failed to load scenario ${layerKey} layer for "${getScenarioBundleId(bundle)}".`, error);
+      commitPayload(null, false);
+      return null;
+    }
+  })();
+  bundle.optionalLayerPromises[layerKey] = promise;
+  try {
+    const payload = await promise;
+    recordScenarioPerfMetric("loadScenarioOptionalLayer", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
+      scenarioId: getScenarioBundleId(bundle),
+      layerKey,
+      loaded: !!payload,
+      cacheHit: false,
+    });
+    applyLoadedPayload(payload, "scenario-optional-layer-loaded");
+    return payload;
+  } finally {
+    if (bundle.optionalLayerPromises[layerKey] === promise) {
+      delete bundle.optionalLayerPromises[layerKey];
+    }
+  }
+}
+
 const {
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
   isScenarioOptionalLayerRequestedForVisibility,
-} = createScenarioOptionalLayerRuntime({
-  state,
+} = createScenarioOptionalLayerRuntime(state, {
   getScenarioBundleId,
-  getScenarioTopologyFeatureCollection,
   scenarioBundleUsesChunkedLayer,
   scheduleScenarioChunkRefresh,
   shouldContinueScenarioApplyContext,
-  recordScenarioPerfMetric,
-  applyScenarioOptionalLayerState,
+  loadScenarioOptionalLayerPayloadById: (scenarioId, layerKey, options) => {
+    const bundle = runtimeState.scenarioBundleCacheById?.[scenarioId];
+    return loadScenarioOptionalLayerPayload(bundle, layerKey, options);
+  },
+  recordOptionalLayerVisibilitySnapshot: (snapshot) => recordRenderTransactionSnapshot(state, snapshot),
 });
 
 function prewarmScenarioOptionalLayersOnCacheHit(

@@ -81,6 +81,13 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["viewport-read-model", "renderer-runtime", "js/core/renderer/viewport_read_model_owner.js", "tests/viewport_read_model_owner_behavior.test.mjs"],
     ["selection-overlay", "renderer-runtime", "js/core/renderer/selection_overlay_owner.js", "tests/selection_overlay_owner_behavior.test.mjs"],
     ["projected-geometry-bounds", "renderer-runtime", "js/core/renderer/projected_geometry_bounds_owner.js", "tests/projected_geometry_bounds_owner_behavior.test.mjs"],
+    ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
+    ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
+    ["fill-target-policy", "renderer-runtime", "js/core/renderer/fill_target_policy.js", "tests/fill_target_policy_behavior.test.mjs"],
+    ["visible-frame-identity-policy", "renderer-runtime", "js/core/renderer/visible_frame_identity_policy.js", "tests/visible_frame_identity_policy_behavior.test.mjs"],
+    ["parent-border-grouping-policy", "renderer-runtime", "js/core/renderer/parent_border_grouping_policy.js", "tests/parent_border_grouping_policy_behavior.test.mjs"],
+    ["render-pass-signature-policy", "renderer-runtime", "js/core/renderer/render_pass_signature_policy.js", "tests/render_pass_signature_policy_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["projected-bounds-diagnostics", "renderer-runtime", "js/core/renderer/projected_bounds_diagnostics_owner.js", "tests/projected_bounds_diagnostics_owner_behavior.test.mjs"],
     ["spatial-index-runtime", "renderer-runtime", "js/core/renderer/spatial_index_runtime_owner.js", "tests/spatial_index_runtime_owner_behavior.test.mjs", ["js/core/renderer/spatial_index_runtime_derivation.js"]],
     ["spatial-index-builders", "renderer-runtime", "js/core/renderer/spatial_index_runtime_builders.js", "tests/spatial_index_runtime_builders_behavior.test.mjs"],
     ["legend-control", "renderer-runtime", "js/core/renderer/legend_control_owner.js", "tests/legend_control_owner_behavior.test.mjs"],
@@ -99,13 +106,34 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-transfers", "sidebar-shell", "js/ui/sidebar/scenario_transfer_controller.js", "tests/scenario_transfer_controller_behavior.test.mjs"],
     ["scenario-territory", "sidebar-shell", "js/ui/sidebar/scenario_territory_controller.js", "tests/scenario_territory_controller_behavior.test.mjs"],
     ["scenario-inspector", "sidebar-shell", "js/ui/sidebar/scenario_inspector_controller.js", "tests/scenario_inspector_controller_behavior.test.mjs"],
+    ["brush-interaction-session", "renderer-runtime", "js/core/renderer/brush_interaction_session_owner.js", "tests/brush_interaction_session_owner_behavior.test.mjs"],
+    ["city-label-text", "renderer-runtime", "js/core/renderer/city_label_text_model.js", "tests/city_label_text_model_behavior.test.mjs"],
+    ["operation-graphics-editor-render", "renderer-runtime", "js/core/renderer/operation_graphics_editor_render_owner.js", "tests/operation_graphics_editor_render_owner_behavior.test.mjs"],
+    ["physical-intensity-interaction", "renderer-runtime", "js/core/renderer/physical_intensity_interaction_owner.js", "tests/physical_intensity_interaction_owner_behavior.test.mjs"],
+    ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
+    ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
+    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
+    // Shared-cache changes run the actual region/relief/cache assembly suite.
+    ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs", [
+      "js/core/renderer/render_cache_owner.js", "js/core/renderer/scenario_relief_overlay_render_owner.js",
+      "tests/scenario_relief_overlay_render_owner_behavior.test.mjs", "tests/render_cache_owner_invalidation_behavior.test.mjs",
+      "docs/active/development-recovery-m4-20260908/plan.md",
+      "docs/active/development-recovery-m4-20260908/context.md",
+      "docs/active/development-recovery-m4-20260908/task.md",
+    ]],
+    ["static-border-mesh-lifecycle", "renderer-runtime", "js/core/renderer/static_border_mesh_lifecycle.js", "tests/static_border_mesh_lifecycle_behavior.test.mjs"],
+    ["transient-overlay-render", "renderer-runtime", "js/core/renderer/transient_overlay_render_owner.js", "tests/transient_overlay_render_owner_behavior.test.mjs"],
+    ["unit-counter-display", "renderer-runtime", "js/core/renderer/unit_counter_display_model.js", "tests/unit_counter_display_model_behavior.test.mjs"],
+    ["urban-adaptive-paint", "renderer-runtime", "js/core/renderer/urban_adaptive_paint_model.js", "tests/urban_adaptive_paint_model_behavior.test.mjs"],
+    ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
   ];
 
   const localOwnerOrder = pythonCoverageOrder + pythonRecords.length;
 
   const ownerRecords = localOwnerCoverage.map(([id, domain, source, testFile, extraSources = []], index) => ({
     id: "local:owner:" + id, commandRef: "node --test " + testFile
-      + (id === "regional-presets" ? " tests/scenario_core_plan_behavior.test.mjs" : ""),
+      + (id === "regional-presets" ? " tests/scenario_core_plan_behavior.test.mjs" : "")
+      + (id === "scenario-region-overlay-render" ? " tests/scenario_relief_overlay_render_owner_behavior.test.mjs tests/render_cache_owner_invalidation_behavior.test.mjs" : ""),
     sourceRefs: [source, testFile, ...extraSources, ...(id === "regional-presets" ? ["tests/scenario_core_plan_behavior.test.mjs"] : [])], ownerHints: [domain], domains: [domain], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
     platforms: ["all"], entrypointPolicyIndex: 5,
@@ -131,6 +159,38 @@ export function createLocalFeedbackRecords(baseRecords) {
     verification: null, selector: {},
   }));
 
+  const editorCheckoutRecord = {
+    id: "local:editor-checkout-profile",
+    commandRef: "python -m unittest tests.test_editor_checkout_profile -q",
+    sourceRefs: ["README.md", "tools/editor_checkout_profile.py", "tests/test_editor_checkout_profile.py"],
+    ownerHints: ["test-infra"], domains: ["data-governance"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 5,
+    verificationOrder: null,
+    selectorOrder: localOwnerOrder + localOwnerCoverage.length + localTestFiles.length,
+    verification: null, selector: {},
+  };
+
+  const historyColorRecord = {
+    ...editorCheckoutRecord,
+    id: "local:history-feature-color-refresh",
+    commandRef: "node --test tests/history_feature_color_refresh_behavior.test.mjs",
+    sourceRefs: ["tests/history_feature_color_refresh_behavior.test.mjs", "js/core/history_manager.js", "js/core/map_renderer.js"],
+    ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 1,
+  };
+  const runtimeInputRecord = {
+    ...editorCheckoutRecord,
+    id: "e2e:runtime-input-latency",
+    commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js --workers=1 --retries=0",
+    sourceRefs: ["tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"],
+    ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
+    executionOwners: ["main-thread"], profiles: ["full"], entrypointPolicyIndex: 0,
+    selectorOrder: editorCheckoutRecord.selectorOrder + 2,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
-    ...pythonRecords, ...ownerRecords, ...testRecords];
+    ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
+    historyColorRecord, runtimeInputRecord];
 }

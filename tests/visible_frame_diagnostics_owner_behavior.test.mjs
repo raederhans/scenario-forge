@@ -38,7 +38,7 @@ function createHarness({
     counters: {},
   };
   const transform = { k: 2, x: 3, y: 4 };
-  let painted = firstVisibleFramePainted;
+  const runtimeState = { firstVisibleFramePainted };
   const frameState = {
     activeScenarioId: "tno_1962",
     sceneGeneration: 21,
@@ -51,6 +51,7 @@ function createHarness({
   };
   const committedFrameIdentity = createCommittedFrameIdentity();
   const owner = createVisibleFrameDiagnosticsOwner({
+    runtimeState,
     effects: {
       incrementPerfCounter: (counterName) => {
         calls.push(["incrementPerfCounter", counterName]);
@@ -63,10 +64,6 @@ function createHarness({
       recordRenderPerfMetric: (name, durationMs, payload) => {
         calls.push(["recordRenderPerfMetric", name, durationMs, payload]);
         return { name, durationMs, payload };
-      },
-      setFirstVisibleFramePainted: (nextPainted) => {
-        calls.push(["setFirstVisibleFramePainted", nextPainted]);
-        painted = Boolean(nextPainted);
       },
       callFirstVisibleFramePaintedHook: (payload) => {
         calls.push(["callFirstVisibleFramePaintedHook", payload]);
@@ -103,7 +100,7 @@ function createHarness({
       },
       hasFirstVisibleFramePainted: () => {
         calls.push(["hasFirstVisibleFramePainted"]);
-        return painted;
+        return runtimeState.firstVisibleFramePainted;
       },
     },
   });
@@ -114,7 +111,7 @@ function createHarness({
     transform,
     committedFrameIdentity,
     get painted() {
-      return painted;
+      return runtimeState.firstVisibleFramePainted;
     },
   };
 }
@@ -263,8 +260,8 @@ test("markFirstVisibleFramePainted records accepted payload once and keeps hook 
     visibleFrameTransactionCount: 1,
     visibleFrameCommittedCount: 1,
   });
-  assert.equal(findCalls(calls, "setFirstVisibleFramePainted").length, 1);
-  assert.deepEqual(findCalls(calls, "setFirstVisibleFramePainted")[0], ["setFirstVisibleFramePainted", true]);
+  assert.equal(first.effectOrder.filter((name) => name === "setFirstVisibleFramePainted").length, 1);
+  assert.equal(second.effectOrder.includes("setFirstVisibleFramePainted"), false);
   assert.deepEqual(
     findCalls(calls, "callFirstVisibleFramePaintedHook")[0],
     ["callFirstVisibleFramePaintedHook", { reason: "exact-frame", activeScenarioId: "tno_1962" }],
@@ -295,7 +292,7 @@ test("markFirstVisibleFramePainted records blocked payload without accepting the
   assert.equal(summary.status, "blocked");
   assert.equal(summary.blockReason, "dirty-political-pass");
   assert.equal(harness.painted, false);
-  assert.equal(findCalls(calls, "setFirstVisibleFramePainted").length, 0);
+  assert.equal(summary.effectOrder.includes("setFirstVisibleFramePainted"), false);
   assert.deepEqual(cache.counters, {
     visibleFrameTransactionCount: 1,
     visibleFrameBlockedCount: 1,
@@ -349,7 +346,7 @@ test("resetFirstVisibleFramePainted records reset metric through injected effect
 
   assert.equal(harness.painted, false);
   assert.equal(summary.firstVisibleAction, "reset");
-  assert.deepEqual(findCalls(harness.calls, "setFirstVisibleFramePainted")[0], ["setFirstVisibleFramePainted", false]);
+  assert.equal(summary.effectOrder.filter((name) => name === "setFirstVisibleFramePainted").length, 1);
   assert.deepEqual(findCalls(harness.calls, "recordRenderPerfMetric")[0].slice(1), [
     "firstVisibleFramePaintedReset",
     0,
@@ -367,7 +364,6 @@ test("createVisibleFrameDiagnosticsOwner fails fast for missing dependencies", (
         incrementPerfCounter() {},
         recordVisibleFrameTransactionDiagnostics() {},
         recordRenderPerfMetric() {},
-        setFirstVisibleFramePainted() {},
       },
       getters: {
         getRenderPassCacheState() {},
@@ -388,7 +384,6 @@ test("createVisibleFrameDiagnosticsOwner fails fast for missing dependencies", (
         incrementPerfCounter() {},
         recordVisibleFrameTransactionDiagnostics() {},
         recordRenderPerfMetric() {},
-        setFirstVisibleFramePainted() {},
         callFirstVisibleFramePaintedHook() {},
       },
       getters: {

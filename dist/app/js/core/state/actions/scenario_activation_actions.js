@@ -3,6 +3,28 @@
 
 import { commitSpecialZoneLayersState } from "./special_zone_actions.js";
 
+// Request timing stays in the loader; published bundle payloads use this authority.
+export function commitScenarioOptionalLayerPayloadState(target, scenarioId, layerKey, payloadField, payload, settled = true) {
+  assertStateTarget(target);
+  const id = String(scenarioId || "");
+  const key = String(layerKey || "");
+  const field = String(payloadField || "");
+  const cache = target.scenarioBundleCacheById;
+  if (!cache || !Object.hasOwn(cache, id)) return false;
+  const bundle = cache[id];
+  if (!bundle || typeof bundle !== "object") return false;
+  const fields = {
+    water: "waterRegionsPayload", special: "specialRegionsPayload",
+    scenario_atlantropa: "scenarioAtlantropaPayload", specialzonelayers: "specialZoneLayersPayload",
+    relief: "reliefOverlaysPayload", cities: "cityOverridesPayload", strategicvalues: "strategicValuesPayload",
+  };
+  if (!Object.hasOwn(fields, key) || fields[key] !== field) return false;
+  target.scenarioBundleCacheById[id][field] = payload;
+  if (settled) target.scenarioBundleCacheById[id].optionalLayerSettledByKey[key] = true;
+  else delete target.scenarioBundleCacheById[id].optionalLayerSettledByKey[key];
+  return true;
+}
+
 export const SCENARIO_ACTIVATION_STATE_KEYS = Object.freeze([
   "activeScenarioId",
   "scenarioBorderMode",

@@ -3,9 +3,6 @@ import {
   setInteractionInfrastructureStateFields as setInteractionInfrastructureActionStateFields,
 } from "./actions/renderer_interaction_actions.js";
 import {
-  commitRendererDprStageState as commitRendererDprStageActionState,
-} from "./actions/renderer_phase_actions.js";
-import {
   commitProjectedBoundsCacheState,
   commitRenderPassCacheState,
 } from "./actions/renderer_cache_actions.js";
@@ -19,10 +16,6 @@ import {
   isExactAfterSettleGenerationCurrentState as isExactAfterSettleGenerationCurrentActionState,
   resetExactAfterSettleControllerState as resetExactAfterSettleControllerActionState,
 } from "./actions/renderer_exact_refresh_actions.js";
-import {
-  setFirstVisibleFramePaintedState as setFirstVisibleFramePaintedActionState,
-  setProjectedBoundsDiagnosticsState as setProjectedBoundsDiagnosticsActionState,
-} from "./actions/renderer_diagnostics_actions.js";
 // 这里收口 map_renderer / sidebar 共享的运行时默认 shape，
 // 避免 defer 标记、pass cache、诊断缓存和交互基础设施状态再次漂移。
 
@@ -492,27 +485,10 @@ export function resetProjectedBoundsCacheState(target) {
   return defaults;
 }
 
-// Transitional compatibility surface. Canonical mutation authority lives in
-// renderer_interaction_actions.js; new callers import that module directly.
+// Compatibility behavior includes the historical invalid-target fallback.
 export function setInteractionInfrastructureStateFields(target, stage, options) {
   if (!target || typeof target !== "object" || Array.isArray(target)) {
     return "idle";
   }
   return setInteractionInfrastructureActionStateFields(target, stage, options);
-}
-
-// Transitional compatibility surface for renderer callbacks that are handed
-// across owner factories. These named functions keep mutation authority
-// explicit and statically reachable while the composition root remains the
-// runtime-effects owner.
-export function commitRendererDprStageState(target, update) {
-  return commitRendererDprStageActionState(target, update);
-}
-
-export function setFirstVisibleFramePaintedState(target, painted) {
-  return setFirstVisibleFramePaintedActionState(target, painted);
-}
-
-export function commitProjectedBoundsDiagnosticsState(target, diagnostics) {
-  return setProjectedBoundsDiagnosticsActionState(target, diagnostics);
 }

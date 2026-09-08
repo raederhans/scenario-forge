@@ -6,6 +6,7 @@
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
+| [M4 完成记录](development-recovery-m4-20260908/task.md) / [整合 PR #123](https://github.com/raederhans/scenario-forge/pull/123) | 本地实现与验收完成，功能提交 `1decb144` 已推送集成分支；远端检查和合并状态以 PR 为准。保留其他证据工作树和未归属 WIP。 |
 | [快速治理任务](development-loop-simplification-20260905/task.md) / [交接与所有权](development-loop-simplification-20260905/context.md) | 维护已集成的 deeper stages 1–4 和新一轮 1–4 项的进度；新一轮并行任务尚未完成，不在这里提前验收。 |
 | [P4 当前状态](state-action-ownership-p4-20260719/task.md#current-status) | 区分 P4.4 本地实现、正式 admission 与发布；这里不复制第二份阶段结论。 |
 | [历史 registry 正文](../archive/worktree-registry-history-through-20260831.md) | 完整保留原登记、提交、验收、恢复与清理证据；下方保留原标题锚点并指向对应历史段落。 |

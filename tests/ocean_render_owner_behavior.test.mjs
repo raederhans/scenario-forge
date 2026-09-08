@@ -209,18 +209,7 @@ test("ocean owner skips alternate contour depths through the preset profile", ()
   assert.deepEqual([...visibleDepths], [100, 300]);
 });
 
-test("ocean owner batches coastal accents and applies Atlantropa clipping only for global coastlines", () => {
-  const harness = createOwner();
-
-  harness.owner.drawScenarioCoastalAccentLayer(1, { interactive: false });
-
-  assert.ok(harness.helperCalls.some((call) => call.type === "clip-atlantropa"));
-  const strokeCalls = harness.context.calls.filter((call) => call.type === "stroke");
-  assert.equal(strokeCalls.length, 2);
-  assert.ok(strokeCalls[0].alpha < strokeCalls[1].alpha);
-});
-
-test("ocean owner skips Atlantropa clipping and overlay redraw for scenario coastlines", () => {
+test("coastal accent batching clips global coastlines and skips duplicate scenario overlays", () => {
   const overlayFeature = {
     type: "Feature",
     properties: {},
@@ -229,16 +218,15 @@ test("ocean owner skips Atlantropa clipping and overlay redraw for scenario coas
       coordinates: [[4, 4], [5, 5]],
     },
   };
-  const harness = createOwner({
-    coastlineSource: "scenario",
-    overlayFeatures: [overlayFeature],
-  });
-
-  harness.owner.drawScenarioCoastalAccentLayer(1, { interactive: false });
-
-  assert.equal(harness.helperCalls.some((call) => call.type === "clip-atlantropa"), false);
-  assert.equal(harness.pathCalls.includes(overlayFeature), false);
-  assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 2);
+  for (const coastlineSource of ["global", "scenario"]) {
+    const harness = createOwner({ coastlineSource, overlayFeatures: coastlineSource === "scenario" ? [overlayFeature] : [] });
+    harness.owner.drawScenarioCoastalAccentLayer(1, { interactive: false });
+    assert.equal(harness.helperCalls.some(call => call.type === "clip-atlantropa"), coastlineSource === "global");
+    const strokes = harness.context.calls.filter(call => call.type === "stroke");
+    assert.equal(strokes.length, 2, coastlineSource);
+    if (coastlineSource === "global") assert.ok(strokes[0].alpha < strokes[1].alpha);
+    else assert.equal(harness.pathCalls.includes(overlayFeature), false);
+  }
 });
 
 test("ocean owner suppresses coastal accents for HGO vector scenes", () => {

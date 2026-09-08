@@ -4,12 +4,12 @@ import { createCityPaintStyleModel } from "../js/core/renderer/city_paint_style_
 import { createUrbanAdaptivePaintModel } from "../js/core/renderer/urban_adaptive_paint_model.js";
 
 function createModel(runtimeState = {}, getResolvedFeatureColor = () => "#ffffff") {
-  const urban = createUrbanAdaptivePaintModel({
-    runtimeState, getResolvedFeatureColor,
+  const urban = createUrbanAdaptivePaintModel(runtimeState, {
+    getResolvedFeatureColor,
     clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
   });
-  return createCityPaintStyleModel({
-    runtimeState, getResolvedFeatureColor,
+  return createCityPaintStyleModel(runtimeState, {
+    getResolvedFeatureColor,
     computeUrbanAdaptivePaintFromHostColor: urban.computeUrbanAdaptivePaintFromHostColor,
   });
 }

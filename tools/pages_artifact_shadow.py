@@ -166,7 +166,8 @@ def run_git(args: list[str], *, repo_root: Path = ROOT) -> str:
     result = subprocess.run(["git", *args], cwd=repo_root, text=True, capture_output=True)
     if result.returncode:
         raise ShadowVerificationError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
-    return result.stdout.strip()
+    # Porcelain status uses leading spaces as fixed-width index/worktree columns.
+    return result.stdout.rstrip("\r\n")
 
 
 def read_git_identity(*, repo_root: Path = ROOT) -> dict[str, str]:

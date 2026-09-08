@@ -13,6 +13,17 @@ function commitIntensityFieldsState(target, next) {
   return next;
 }
 export function setIntensityFieldsState(target, value) { assertTarget(target); target.intensityFields = value; return value; }
+export function appendIntensityFieldPointState(target, channelId, point) {
+  assertTarget(target);
+  const id = String(channelId || "");
+  if (!Object.hasOwn(target.intensityFields.channels, id)) {
+    throw new RangeError("Unknown intensity field channel");
+  }
+  const nextPoint = structuredClone(point);
+  target.intensityFields.channels[id].enabled = true;
+  target.intensityFields.channels[id].points.push(nextPoint);
+  return nextPoint;
+}
 export function normalizeIntensityFieldsIntoState(target) {
   assertTarget(target);
   const current = structuredClone(target.intensityFields);

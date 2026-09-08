@@ -40,7 +40,7 @@ function getScenarioChunkPayloadEntriesForLayer(bundle, chunkState, layerKey, ac
     .filter(({ entry }) => entry && entry.layerKey === layerKey);
 }
 
-function buildScenarioChunkLayerSelectionSignatures(bundle, chunkState, activeChunkIds = null) {
+export function buildScenarioChunkLayerSelectionSignatures(bundle, chunkState, activeChunkIds = null) {
   const activeChunkIdSet = Array.isArray(activeChunkIds)
     ? new Set(activeChunkIds.map((chunkId) => String(chunkId || "").trim()).filter(Boolean))
     : null;
@@ -56,7 +56,7 @@ function buildScenarioChunkLayerSelectionSignatures(bundle, chunkState, activeCh
   return signatures;
 }
 
-function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
+export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
   previousSignatures = {},
   nextSignatures = {},
   previousMergedLayerPayloads = {},
@@ -114,4 +114,4 @@ function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
   };
 }
 
-export { getChunkIdListSignature, buildScenarioChunkLayerSelectionSignatures, buildMergedScenarioChunkLayerPayloads };
+export { getChunkIdListSignature };

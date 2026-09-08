@@ -2278,12 +2278,9 @@ function analyzeBindingMutations(
   }
 
   function cloneAliasRecords(aliasRecords) {
-    return new Map(
-      [...aliasRecords.entries()].map(([record, state]) => [
-        record,
-        cloneTrackedState(state),
-      ]),
-    );
+    // Tracked states are replaced, never mutated; branches own their Map while
+    // sharing these scan-local values. Reference resolution copies path arrays.
+    return new Map(aliasRecords);
   }
 
   function trackedStateStatus(state) {
@@ -2381,8 +2378,11 @@ function analyzeBindingMutations(
     if (isSanctionedMutationDelegatingOwnerBindingRead(node)) {
       return { status: "none", reference: null };
     }
+    if (isSanctionedMutationDelegatingOwnerMethodRead(node)) {
+      return { status: "none", reference: null };
+    }
     if (
-      isSanctionedMutationDelegatingOwnerCompositionClosureRead()
+      isSanctionedMutationDelegatingOwnerCompositionClosureRead(node)
       && !isImportedActionTargetNode(node)
     ) {
       return { status: "none", reference: null };
@@ -2681,7 +2681,7 @@ function analyzeBindingMutations(
         rawRootIdentifier(unwrapChain(source)),
       );
       if (sourceRecord?.kind === "parameter") {
-        return true;
+        return !isSanctionedMutationDelegatingOwnerCompositionClosureRead(source);
       }
       return Boolean(
         sourceRecord
@@ -3566,10 +3566,12 @@ function analyzeBindingMutations(
               importedDelegation.pureNormalizerContract,
             )
             : importedDelegation.importedPureReaderContract
-              ? isDirectStateRootArgument(
-                unwrapChain(node.arguments[importedTargetIndex]),
-                targetClassification,
-              )
+              ? importedDelegation.importedPureReaderContract.allowBorrowedTarget
+                ? ["exact", "maybe"].includes(targetClassification?.status)
+                : isDirectStateRootArgument(
+                  unwrapChain(node.arguments[importedTargetIndex]),
+                  targetClassification,
+                )
             : importedDelegation.detachedCaptureContract
               ? isSanctionedImportedDetachedCaptureTargetArgument(
                 node.arguments[importedTargetIndex],
@@ -3713,6 +3715,15 @@ function analyzeBindingMutations(
       index += 1
     ) {
       const classification = argumentClassifications[index];
+      if (
+        isSourceBoundMutationDelegatingOwnerGetter
+        && classification.status === "maybe"
+        && helperNode.params?.[index]?.type === "Identifier"
+        && isImmutableStateRootUnionArgument(node.arguments[index], aliasRecords)
+      ) {
+        delegatedArgumentIndexes.add(index);
+        continue;
+      }
       if (
         !isExplicitTargetArgument(node.arguments[index])
         ||
@@ -3966,10 +3977,15 @@ function analyzeBindingMutations(
     ));
   }
 
-  function isSanctionedMutationDelegatingOwnerCompositionClosureRead() {
-    const activeFunctions = executionFunctionStack.filter(Boolean);
-    if (!activeFunctions.length) return false;
-    let compositionFunction = activeFunctions.at(-1);
+  function isSanctionedMutationDelegatingOwnerCompositionClosureRead(expression) {
+    // Identity-transition analysis can inspect a callback outside its execution
+    // frame. Use the lexical owner so those reads obey the same source receipt.
+    let enclosingFunction = expression;
+    while (enclosingFunction && !isFunctionNode(enclosingFunction)) {
+      enclosingFunction = analysis.parentNodeForNode(enclosingFunction);
+    }
+    if (!enclosingFunction) return false;
+    let compositionFunction = enclosingFunction;
     let functionRecord = functionRecordForNode(compositionFunction);
     let parentScope = functionRecord?.parentScope || null;
     while (parentScope) {
@@ -3978,7 +3994,7 @@ function analyzeBindingMutations(
       }
       parentScope = parentScope.parent;
     }
-    if (compositionFunction === activeFunctions.at(-1)) return false;
+    if (compositionFunction === enclosingFunction) return false;
     return mutationDelegatingOwnerContractsForCurrentModule().some((contract) => {
       if (!hasExactMutationDelegatingOwnerCompositionFunction(
         contract,
@@ -4016,6 +4032,22 @@ function analyzeBindingMutations(
 
   function isSanctionedMutationDelegatingOwnerGetterCall(node) {
     let member = analysis.parentNodeForNode(node);
+    if (member?.type === "VariableDeclarator" && member.init === node) {
+      const declaration = analysis.parentNodeForNode(member);
+      const pattern = member.id;
+      if (declaration?.kind !== "const" || pattern?.type !== "ObjectPattern") {
+        return false;
+      }
+      return mutationDelegatingOwnerGetterContracts(node).some((contract) => (
+        pattern.properties.length > 0
+        && pattern.properties.every((property) => (
+          property.type === "Property"
+          && !property.computed
+          && property.value?.type === "Identifier"
+          && contract.methods.includes(staticPropertyName(property.key, false))
+        ))
+      ));
+    }
     if (member?.type === "ChainExpression") {
       member = analysis.parentNodeForNode(member);
     }
@@ -4052,6 +4084,18 @@ function analyzeBindingMutations(
           !segment.dynamic && segment.key === expectedKeys[index],
       )
     );
+  }
+
+  function isSanctionedMutationDelegatingOwnerMethodRead(node) {
+    const identifier = node?.type === "CallExpression" ? node.callee : node;
+    if (identifier?.type !== "Identifier") return false;
+    const record = analysis.resolveIdentifier(identifier);
+    return record?.kind === "variable"
+      && record.declarationKind === "const"
+      && !isIdentityTransitionRecord(record)
+      && record.ownerNode?.id?.type === "ObjectPattern"
+      && record.init?.type === "CallExpression"
+      && isSanctionedMutationDelegatingOwnerGetterCall(record.init);
   }
 
   function isSanctionedImportedBorrowedProjectionArgument(
@@ -4904,7 +4948,7 @@ function analyzeBindingMutations(
           && !property.computed
           && property.kind === "init"
           && !property.method
-          && staticPropertyName(property.key, property.computed) === "state"
+          && ["state", "runtimeState"].includes(staticPropertyName(property.key, property.computed))
           && unwrapChain(property.value)?.type === "Identifier"
           && (() => {
             const classification = referenceClassification(

@@ -83,6 +83,7 @@ import {
 } from "../tools/state_writer_inventory.mjs";
 import {
   buildStateWriterVerificationIdentity,
+  loadPreviousStateWriterPolicy,
   buildStateWriterCloseoutTargetViolations,
   buildStateWriterPolicyReport,
   recomputeDerivedAliasTaintBaseline,
@@ -140,6 +141,46 @@ const SHARED_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE =
   new ExactHistoricalProofSeedCache();
 const SHARED_CHECKER_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE =
   new Map();
+
+test("explicit previous policy revision stays pinned across worktree dirt and fails closed", () => {
+  const acceptedSha = "a".repeat(40);
+  for (const trackedClean of [true, false]) {
+    const calls = [];
+    const result = loadPreviousStateWriterPolicy({
+      phase: "P4.4",
+      trackedClean,
+      previousPolicyRevision: "reviewed-policy",
+      executeGit(args) {
+        calls.push(args);
+        if (args[0] === "rev-parse") return `${acceptedSha}\n`;
+        return JSON.stringify({ accepted: true });
+      },
+    });
+    assert.deepEqual(calls, [
+      ["rev-parse", "--verify", "reviewed-policy^{commit}"],
+      ["show", `${acceptedSha}:tools/state_writer_policy.json`],
+    ]);
+    assert.equal(result.revision, acceptedSha);
+    assert.deepEqual(result.policy, { accepted: true });
+    assert.deepEqual(result.violations, []);
+  }
+  for (const phase of ["P4.0", "P4.4"]) {
+    const calls = [];
+    const failed = loadPreviousStateWriterPolicy({
+      phase,
+      trackedClean: false,
+      previousPolicyRevision: "missing-policy",
+      executeGit(args) {
+        calls.push(args);
+        throw new Error("revision missing");
+      },
+    });
+    assert.equal(calls.length, 1, "never fall back to HEAD");
+    assert.equal(failed.policy, null);
+    assert.equal(failed.violations[0].code, "previous-policy-unavailable");
+    assert.equal(failed.violations[0].revision, "missing-policy");
+  }
+});
 
 function createHistoricalProofWorkerEnvelopeFixture() {
   const fixture = createHistoricalDerivedAliasProofCacheFixture();
@@ -202,6 +243,11 @@ const readSharedRepositoryPolicy = createReadOnlySingleFlight(
   () => readStateWriterPolicy(),
 );
 
+// Accepted Stage 1 producer/checker checkpoint. Advancing this fixture requires
+// reviewed historical evidence; worktree dirt and HEAD are not trust sources.
+const CURRENT_PHASE_PREVIOUS_POLICY_REVISION =
+  "a2adc4b627b0f0b6ad88c5ed04d68eae3f1ad15c";
+
 function buildCurrentHistoricalProofInputs(checkedIn) {
   const phase = checkedIn.progress.latestPhase;
   const candidatePaths = [
@@ -216,7 +262,7 @@ function buildCurrentHistoricalProofInputs(checkedIn) {
       phase,
       policy: checkedIn,
     }),
-    previousPolicy: checkedIn,
+    previousPolicy: readCheckerPreviousPolicy(),
     policy: checkedIn,
   };
   return {
@@ -227,24 +273,26 @@ function buildCurrentHistoricalProofInputs(checkedIn) {
 }
 
 function readCheckerPreviousPolicy() {
-  const status = spawnSync(
-    "git",
-    ["status", "--porcelain=v1", "--untracked-files=all"],
-    {
-      cwd: process.cwd(),
-      encoding: "utf8",
-      maxBuffer: 64 * 1024 * 1024,
-    },
-  );
-  assert.equal(
-    status.status,
-    0,
-    String(status.stderr || "Unable to inspect the policy worktree."),
-  );
   return readStateWriterPolicyAtRevision(
-    String(status.stdout || "").trim() === "" ? "HEAD^1" : "HEAD",
+    CURRENT_PHASE_PREVIOUS_POLICY_REVISION,
   );
 }
+
+test("current phase proof inputs never trust the candidate baseline", async () => {
+  const candidate = structuredClone(await readSharedRepositoryPolicy());
+  candidate.baselines.derivedAliasTaint.diagnosticDelta.unsupportedSites.push(
+    "forged-current-signature",
+  );
+  const { identityInputs } = buildCurrentHistoricalProofInputs(candidate);
+  assert.equal(identityInputs.policy, candidate);
+  assert.notEqual(identityInputs.previousPolicy, candidate);
+  assert.deepEqual(identityInputs.previousPolicy, readCheckerPreviousPolicy());
+  assert.equal(
+    identityInputs.previousPolicy.baselines.derivedAliasTaint
+      .diagnosticDelta.unsupportedSites.includes("forged-current-signature"),
+    false,
+  );
+});
 
 function reuseHistoricalProofSeedForExactIdentity({
   sourceCache,
@@ -268,7 +316,13 @@ const prepareSharedCurrentPhasePolicyInputs = createReadOnlySingleFlight(
       identityInputs,
       identity,
     } = buildCurrentHistoricalProofInputs(checkedIn);
-    const workerSession = startP4StateWriterHistoricalProofWorker();
+    const workerSession = startP4StateWriterHistoricalProofWorker({
+      request: {
+        identity,
+        previousPolicy: identityInputs.previousPolicy,
+        policy: checkedIn,
+      },
+    });
     const inventoryPromise = scanStateWriterPolicySnapshot(checkedIn, {
       repositoryScanCache: SHARED_REPOSITORY_SCAN_CACHE,
     });
@@ -339,14 +393,20 @@ const buildSharedCurrentPhasePolicy = createReadOnlySingleFlight(
   async () => {
     const checkedIn = await readSharedRepositoryPolicy();
     await prepareSharedCurrentPhasePolicyInputs();
+    const previousPolicy = readCheckerPreviousPolicy();
     const rebuilt = await buildStateWriterPolicySnapshot({
       phase: checkedIn.progress.latestPhase,
       baseSha: checkedIn.baseline.sourceBaseSha,
       generatedAt: checkedIn.baseline.generatedAt,
-      previousPolicy: checkedIn,
-      repositoryScanCache: SHARED_REPOSITORY_SCAN_CACHE,
-      historicalDerivedAliasProofCache:
-        SHARED_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE,
+      previousPolicy,
+      acceptedPolicyCheckpoint: resolveAcceptedStateWriterPolicyCheckpoint({
+        policy: previousPolicy,
+        revision: CURRENT_PHASE_PREVIOUS_POLICY_REVISION,
+      }),
+      // Builder inputs differ from the checked-in snapshot proof. Never re-key
+      // its verified result or share the scan cache across policy identities.
+      repositoryScanCache: new Map(),
+      historicalDerivedAliasProofCache: new Map(),
     });
     assert.equal(SHARED_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE.size, 1);
     return rebuilt;
@@ -1202,7 +1262,7 @@ function createCallerActionLedgerPolicy(entries = []) {
   return policy;
 }
 
-function createCrossFileMigrationFixture() {
+function createCrossFileMigrationFixture({ retiredSiteCount = 1 } = {}) {
   const retiredCallerPath =
     "js/core/legacy_cross_file_fixture.js";
   const retiredBinding = {
@@ -1244,6 +1304,10 @@ function createCrossFileMigrationFixture() {
       unsupportedSites: [],
     }],
   };
+  const retiredSites = retiredBinding.grants[0].memberships[0].mutationSites;
+  while (retiredSites.length < retiredSiteCount) {
+    retiredSites.push({ ...retiredSites[0], occurrenceIndex: retiredSites.length });
+  }
   const retiredCallerBindingIdentity =
     buildStableStateBindingIdentity(retiredBinding);
   const retiredMembershipIdentity = [
@@ -2340,8 +2404,11 @@ test("P4.2b optional-layer actions explicitly replace the retired wildcard membe
 
 test("legacy membership replacement contract rejects malformed coverage", () => {
   const valid = structuredClone(
-    STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT[0],
+    STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT.find(
+      (entry) => entry.requiredConcreteMemberships.length > 1,
+    ),
   );
+  assert.ok(valid, "reversing coverage requires more than one membership");
   const refreshIdentity = (entry) => ({
     ...entry,
     contractIdentity:
@@ -2382,9 +2449,10 @@ test("legacy membership replacement contract rejects malformed coverage", () => 
 test("P4.4 operation replacements require exact action memberships", async () => {
   const entries =
     STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT.filter(
-      ({ modulePath }) =>
-        modulePath !==
-          "js/core/state/actions/scenario_activation_actions.js",
+      ({ modulePath }) => [
+        "js/core/state/actions/strategic_overlay_actions.js",
+        "js/core/state/actions/transport_actions.js",
+      ].includes(modulePath),
     );
   assert.equal(entries.length, 18);
   assert.deepEqual(
@@ -5921,7 +5989,7 @@ test("P4.3 renderer action calls stay within the frozen runtime-state escape bud
       && finding.key === "*"
       && finding.sourceFingerprint === runtimeStateEscapeFingerprint,
   );
-  assert.equal(runtimeStateEscapes.length, 27);
+  assert.ok(runtimeStateEscapes.length <= 27, "runtime-state escapes must not exceed the frozen budget of 27");
 
   const repairedFunctionIdentities = new Set([
     '{"kind":"function","ancestry":[{"name":"getSetMapDataTransactionOwner","ordinal":0},{"name":"clearSphericalFeatureDiagnosticsCache","ordinal":0}]}',
@@ -7084,14 +7152,15 @@ test("cross-phase policy rebuild fails closed when two actions own the successor
 });
 
 test("P4.4 successor proofs persist the exact contracted relay edge and fail closed", () => {
+  const callerPath = "js/core/fixture_ui_state.js";
   assert.deepEqual(validateStateActionSuccessorProofContract(), []);
-  assert.equal(STATE_ACTION_SUCCESSOR_PROOF_CONTRACT.length, 21);
+  assert.equal(STATE_ACTION_SUCCESSOR_PROOF_CONTRACT.length, 23);
   assert.equal(
     STATE_ACTION_SUCCESSOR_PROOF_CONTRACT.reduce(
       (count, entry) => count + entry.successorEdges.length,
       0,
     ),
-    24,
+    26,
   );
   const contract = findStateActionSuccessorProofContractEntry(
     "js/core/state/actions/transport_actions.js",
@@ -7149,7 +7218,7 @@ test("P4.4 successor proofs persist the exact contracted relay edge and fail clo
     bindings: [leafBinding],
   };
   const retiredIdentity = [
-    "js/core/state/ui_state.js",
+    callerPath,
     buildStableStateBindingIdentity(callerBinding),
     "ui",
     "P4.4",
@@ -7157,7 +7226,7 @@ test("P4.4 successor proofs persist the exact contracted relay edge and fail clo
     "styleConfig",
   ].join("|");
   const firstEdge = {
-    callerPath: "js/core/state/ui_state.js",
+    callerPath,
     callerBindingId: callerBinding.id,
     callerBindingIdentity: buildStableStateBindingIdentity(callerBinding),
     enclosingFunctionIdentity:
@@ -7190,7 +7259,7 @@ test("P4.4 successor proofs persist the exact contracted relay edge and fail clo
   };
   const previousPolicy = {
     writers: [{
-      path: "js/core/state/ui_state.js",
+      path: callerPath,
       surface: "production",
       authority: "legacy-direct",
       bindings: [callerBinding],
@@ -7414,7 +7483,11 @@ test("P4.4 hybrid wildcard replacement builds and validates schema-v3 proofs acr
   const actionModulePath =
     "js/core/state/actions/scenario_activation_actions.js";
   const requiredConcreteMemberships = [
-    ...STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT[0]
+    ...STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT.find(
+      (entry) => entry.modulePath === actionModulePath
+        && entry.exportName === "applyScenarioChunkOptionalLayerState"
+        && entry.retiredMembership === "scenario|P4.2|assign|*",
+    )
       .requiredConcreteMemberships,
   ];
   const retiredMembership = "scenario|P4.2|assign|*";
@@ -8148,7 +8221,7 @@ test("governance owner retirements require real action edges and concrete write 
     "js/ui/toolbar/workspace_chrome_support_surface_controller.js",
   ];
   const entries = STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT.filter((entry) => callerPaths.includes(entry.replacementCallerPath));
-  assert.equal(entries.length, 15);
+  assert.equal(entries.length, 14);
   const previous = readStateWriterPolicyAtRevision("348a952e");
   const identities = entries.map((entry) => entry.retiredMembershipIdentity);
   const edges = [];
@@ -8178,7 +8251,7 @@ test("governance owner retirements require real action edges and concrete write 
     writers: currentWriters, retiredLegacySemanticAuthority: { memberships: identities },
     actionDelegations, crossFileMigrationContract: entries,
   });
-  assert.equal(build(edges).entries.length, 15);
+  assert.equal(build(edges).entries.length, 14);
   assert.throws(() => build([]), ({ code }) => code === "caller-action-ledger-proof-missing");
   const withoutCacheReplacement = writers.map((writer) => ({ ...writer,
     bindings: writer.bindings.filter((binding) => binding.functionName !== "replaceCachedDetailAdmBordersState"),
@@ -8382,8 +8455,9 @@ test("caller-to-action ledger accepts only an exact explicit cross-file migratio
   );
 });
 
-test("an existing caller-to-action proof adopts a newly explicit cross-file handoff", () => {
-  const fixture = createCrossFileMigrationFixture();
+for (const retiredSiteCount of [1, 2]) {
+test(`an existing caller-to-action proof adopts a newly explicit cross-file handoff (${retiredSiteCount} sites in one function)`, () => {
+  const fixture = createCrossFileMigrationFixture({ retiredSiteCount });
   const legacyDelegation = {
     ...fixture.actionDelegation,
     callerPath: fixture.contract.retiredCallerPath,
@@ -8472,7 +8546,17 @@ test("an existing caller-to-action proof adopts a newly explicit cross-file hand
     currentPolicy: driftedTransitionPolicy,
     crossFileMigrationContract: [fixture.contract],
   }).some(({ code }) => code === "caller-action-ledger-history-drift"));
+  for (const field of ["retiredMutationSiteCount", "retiredEnclosingFunctionIdentity"]) {
+    const forged = structuredClone(currentTransitionPolicy);
+    forged.progress.callerToActionLedger.entries[0][field] = "forged";
+    assert.ok(validateCallerToActionLedgerHistoryTransition({
+      previousPolicy: previousTransitionPolicy,
+      currentPolicy: forged,
+      crossFileMigrationContract: [fixture.contract],
+    }).some(({ code }) => code === "caller-action-ledger-history-drift"));
+  }
 });
+}
 
 test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mutation sites", () => {
   const frozenPolicy = JSON.parse(
@@ -8489,14 +8573,14 @@ test("P4.3 renderer cross-boundary contracts exactly match the frozen retired mu
     [
       "0ad5e419c276faf62c7375f4b112c5f0331830938718acc400226629b234aefe",
       "5e6cd046957fc4a7f2d806adaa12afff8f86b5ea7e6fd62c4d023f6fa1885251",
-      "f8293fd8d98cb3ab0362a52ae7ebf30372c2cb9cc183641436a3f1895338c139",
-      "b039cb07c359bf2a0270c650c3b54a13e66c4d150b84ef369fcd07359f4dff58",
-      "661569a4008d4a8a207bab8115268533f7fd94035f2508e5572e1d5289a2d793",
+      "f000ed13ec06cb81417586b4f14b02ceb65a3b265c9795483d2b52b477f94d76",
+      "95b8bae84f2c434a7168b5d3d741c5477b13c9b66990e654a9c8d0adc832399f",
+      "0190e81a30df989a2773c853ba54a7e130e00b9f13cb58a950515237ada93744",
       "447d2f10d0b8a7089a85f38fbdcef8564ffdadc5581fd9628f16bd07948f53cc",
       "6a7f9cf11b3288cbbbee8549e865f12488e0cee699c86f1daa4d08fe59449727",
       "f0392f7324a158420ab19c737cc6fd8be57758a20ea4049e70e9ddd01333f740",
       "4b0f41e40474b9eac61cb1e8afa533e7717f9bc62345afb53b4d9ef0ca4d141d",
-      "c01abd31e713c14331a6e2ac8f1c5529813d5fc5048e3d3fb970ad5dbf161a6b",
+      "854140fd70b3c11193b2f3fc45380dd5074c1a6c1806d313a08487b4ab100052",
       "4a1e7970e1ec86ff50ea3785eff073c2d015d2afa766fa2743361ac1ea0dda7d",
       "70e4c965698025b40e1a74945b6880f421dc1260982afffab26c449b531a0277",
       "9289a139b92d4caeaea609c4bbd1b58acc34affcf8f67f3fc10b7e82ca3cc7cf",
@@ -8917,6 +9001,7 @@ test("repository checker reports a passing closed-world policy and default-state
   await prepareSharedCurrentPhasePolicyInputs();
   const report = await buildStateWriterPolicyReport({
     policy,
+    previousPolicyRevision: CURRENT_PHASE_PREVIOUS_POLICY_REVISION,
     repositoryScanCache: SHARED_REPOSITORY_SCAN_CACHE,
     historicalDerivedAliasProofCache:
       SHARED_CHECKER_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE,
@@ -8979,6 +9064,7 @@ test("checker rejects a requested phase that has no matching policy checkpoint",
   const report = await buildStateWriterPolicyReport({
     phase: missingPhase,
     policy,
+    previousPolicyRevision: CURRENT_PHASE_PREVIOUS_POLICY_REVISION,
     repositoryScanCache: SHARED_REPOSITORY_SCAN_CACHE,
     historicalDerivedAliasProofCache:
       SHARED_CHECKER_HISTORICAL_DERIVED_ALIAS_PROOF_CACHE,

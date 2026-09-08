@@ -1,14 +1,6 @@
 import { getScenarioChunkOptionalLayerState } from "../state/actions/scenario_activation_actions.js";
-import { loadMeasuredJsonResource, normalizeScenarioCityOverridesPayload } from "../data_loader.js";
-import {
-  normalizeSpecialZoneLayersState,
-  resolveSpecialZoneTopologyFingerprint,
-} from "../special_zone_layers.js";
-import { normalizeScenarioStrategicValuesPayload } from "./strategic_values.js";
-import { normalizeScenarioFeatureCollection } from "./pure_helpers.js";
-import { cacheBust, normalizeScenarioId } from "./shared.js";
+import { normalizeScenarioId } from "./shared.js";
 import { flushRenderBoundary } from "../render_boundary.js";
-import { recordRenderTransactionSnapshot } from "../renderer/render_transaction_diagnostics.js";
 
 // optional layer 的单一映射表。
 // 这里同时定义 bundle 字段、runtime state 字段、manifest URL、可见性开关和 revision 语义，
@@ -85,138 +77,16 @@ export function getScenarioOptionalLayerConfig(layerKey) {
   return normalizedKey ? SCENARIO_OPTIONAL_LAYER_CONFIGS[normalizedKey] : null;
 }
 
-// Owns optional payload acquisition and visibility demand. Active-state application
-// remains a fenced facade write; chunk-owned layers delegate to the chunk controller.
-export function createScenarioOptionalLayerRuntime({
-  state,
+// Owns visibility demand and completion fences. The facade owns request/cache
+// settlement; chunk-owned layers delegate to the chunk controller.
+export function createScenarioOptionalLayerRuntime(state, {
   getScenarioBundleId,
-  getScenarioTopologyFeatureCollection,
   scenarioBundleUsesChunkedLayer,
   scheduleScenarioChunkRefresh,
   shouldContinueScenarioApplyContext,
-  recordScenarioPerfMetric,
-  applyScenarioOptionalLayerState,
+  loadScenarioOptionalLayerPayloadById,
+  recordOptionalLayerVisibilitySnapshot,
 }) {
-  async function loadScenarioOptionalLayerPayload(
-    bundle,
-    layerKey,
-    {
-      d3Client = globalThis.d3,
-      forceReload = false,
-      applyToActiveScenario = false,
-      scenarioApplyEpoch = 0,
-      scenarioApplyRequestId = 0,
-      isScenarioApplyRequestCurrent = null,
-    } = {}
-  ) {
-    const config = getScenarioOptionalLayerConfig(layerKey);
-    if (!bundle || !config) return null;
-    const applyLoadedPayload = (payload, reason) => {
-      if (applyToActiveScenario) {
-        applyScenarioOptionalLayerState(bundle, layerKey, payload, {
-          scenarioApplyEpoch,
-          scenarioApplyRequestId,
-          isScenarioApplyRequestCurrent,
-          reason,
-        });
-      }
-      return payload;
-    };
-    // optional layer 允许从 3 个来源收敛到同一份 bundle/runtime state：
-    // 1) 现成 promise，避免并发重复请求
-    // 2) runtime topology 内嵌对象，避免再走一次磁盘/网络
-    // 3) manifest URL 指向的独立 payload
-    // 外部只看最终 layerKey，不需要感知实际命中的来源。
-    bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
-      ? bundle.optionalLayerPromises
-      : {};
-    bundle.optionalLayerSettledByKey = bundle.optionalLayerSettledByKey
-      && typeof bundle.optionalLayerSettledByKey === "object"
-      ? bundle.optionalLayerSettledByKey
-      : {};
-    if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
-      const payload = await bundle.optionalLayerPromises[layerKey];
-      return applyLoadedPayload(payload, "scenario-optional-layer-promise-cache");
-    }
-    if (forceReload) {
-      delete bundle.optionalLayerSettledByKey[layerKey];
-    }
-    if (!forceReload && bundle.optionalLayerSettledByKey[layerKey] === true) {
-      const payload = bundle[config.bundleField] ?? null;
-      return applyLoadedPayload(payload, "scenario-optional-layer-settled-cache");
-    }
-    const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
-    const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    const promise = (async () => {
-      if (config.objectName) {
-        const payload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName);
-        if (payload) {
-          bundle[config.bundleField] = payload;
-          bundle.optionalLayerSettledByKey[layerKey] = true;
-          return payload;
-        }
-      }
-      const requestUrl = bundle.manifest?.[config.urlField];
-      if (!requestUrl) {
-        bundle[config.bundleField] = null;
-        bundle.optionalLayerSettledByKey[layerKey] = true;
-        return null;
-      }
-      if (!d3Client || typeof d3Client.json !== "function") {
-        bundle[config.bundleField] = null;
-        delete bundle.optionalLayerSettledByKey[layerKey];
-        return null;
-      }
-      try {
-        const { payload: rawPayload } = await loadMeasuredJsonResource(cacheBust(requestUrl), {
-          d3Client,
-          label: `scenario_optional:${layerKey}`,
-        });
-        const payload = layerKey === "cities"
-          ? normalizeScenarioCityOverridesPayload(rawPayload, {
-            sourceLabel: `scenario_city_overrides:${getScenarioBundleId(bundle) || "scenario"}`,
-          })
-          : layerKey === "specialzonelayers"
-            ? normalizeSpecialZoneLayersState(rawPayload, {
-              defaultSource: "scenario",
-              topologyFingerprint: resolveSpecialZoneTopologyFingerprint(state),
-            })
-            : config.stateField === "scenarioStrategicValuesData"
-              ? normalizeScenarioStrategicValuesPayload(rawPayload, {
-                expected: {
-                  scenario_id: getScenarioBundleId(bundle),
-                  baseline_hash: state.scenarioBaselineHash || bundle?.manifest?.baseline_hash || "",
-                },
-              })
-            : config.objectName
-              ? getScenarioTopologyFeatureCollection(rawPayload, config.objectName)
-                || normalizeScenarioFeatureCollection(rawPayload)
-              : normalizeScenarioFeatureCollection(rawPayload);
-        bundle[config.bundleField] = payload;
-        bundle.optionalLayerSettledByKey[layerKey] = true;
-        return payload;
-      } catch (error) {
-        console.warn(`[scenario] Failed to load scenario ${layerKey} layer for "${getScenarioBundleId(bundle)}".`, error);
-        bundle[config.bundleField] = null;
-        delete bundle.optionalLayerSettledByKey[layerKey];
-        return null;
-      }
-    })();
-    bundle.optionalLayerPromises[layerKey] = promise;
-    try {
-      const payload = await promise;
-      recordScenarioPerfMetric("loadScenarioOptionalLayer", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
-        scenarioId: getScenarioBundleId(bundle),
-        layerKey,
-        loaded: !!payload,
-        cacheHit: false,
-      });
-      return applyLoadedPayload(payload, "scenario-optional-layer-loaded");
-    } finally {
-      delete bundle.optionalLayerPromises[layerKey];
-    }
-  }
-
   async function ensureActiveScenarioOptionalLayerLoaded(
     layerKey,
     {
@@ -241,7 +111,7 @@ export function createScenarioOptionalLayerRuntime({
       });
       return getScenarioChunkOptionalLayerState(state, normalizedKey) || null;
     }
-    const payload = await loadScenarioOptionalLayerPayload(bundle, normalizedKey, {
+    const payload = await loadScenarioOptionalLayerPayloadById(String(getScenarioBundleId(bundle)), normalizedKey, {
       d3Client,
       forceReload,
       applyToActiveScenario: true,
@@ -249,6 +119,7 @@ export function createScenarioOptionalLayerRuntime({
       scenarioApplyRequestId,
       isScenarioApplyRequestCurrent,
     });
+    if (state.scenarioBundleCacheById?.[getScenarioBundleId(bundle)] !== bundle) return payload;
     if (!shouldContinueScenarioApplyContext({
       scenarioId: getScenarioBundleId(bundle),
       scenarioApplyEpoch,
@@ -290,6 +161,7 @@ export function createScenarioOptionalLayerRuntime({
     const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
     const activeBundle = bundle || state.scenarioBundleCacheById?.[activeScenarioId] || null;
     if (!activeScenarioId || !activeBundle) return [];
+    if (state.scenarioBundleCacheById?.[activeScenarioId] !== activeBundle) return [];
     const transactionScenarioApplyEpoch = Math.max(0, Number(scenarioApplyEpoch || activeBundle?.chunkLifecycle?.scenarioApplyEpoch || 0));
     const transactionScenarioApplyRequestId = Math.max(0, Number(scenarioApplyRequestId || activeBundle?.chunkLifecycle?.scenarioApplyRequestId || 0));
     const currentnessContext = {
@@ -317,7 +189,7 @@ export function createScenarioOptionalLayerRuntime({
       });
     }
     const recordVisibilitySnapshot = (phase, extra = {}) => {
-      recordRenderTransactionSnapshot(state, {
+      recordOptionalLayerVisibilitySnapshot({
         phase,
         reason: "visibility-sync",
         expectedScenarioId: activeScenarioId,
@@ -351,7 +223,7 @@ export function createScenarioOptionalLayerRuntime({
     }
     const payloads = await Promise.all(
       requestedLayers.map((layerKey) =>
-        loadScenarioOptionalLayerPayload(activeBundle, layerKey, {
+        loadScenarioOptionalLayerPayloadById(activeScenarioId, layerKey, {
           d3Client,
           applyToActiveScenario: true,
           scenarioApplyEpoch: transactionScenarioApplyEpoch,
@@ -360,7 +232,8 @@ export function createScenarioOptionalLayerRuntime({
         })
       )
     );
-    if (!shouldContinueScenarioApplyContext(currentnessContext, "optional-layer-visibility-sync-after-load")) {
+    if (!shouldContinueScenarioApplyContext(currentnessContext, "optional-layer-visibility-sync-after-load")
+      || state.scenarioBundleCacheById?.[activeScenarioId] !== activeBundle) {
       return [];
     }
     if (renderNow) {

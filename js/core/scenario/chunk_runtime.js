@@ -8,6 +8,13 @@ import {
   buildMergedScenarioChunkLayerPayloads,
 } from "./chunk_layer_payloads.js";
 import { createScenarioChunkPayloadLoader } from "./chunk_payload_loader.js";
+
+function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile) {
+  const owner = createScenarioChunkPayloadLoader({
+    runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile,
+  });
+  return owner;
+}
 import { registerRuntimeHook } from "../state/index.js";
 import { setRenderPerfMetricEntryState } from "../state/actions/renderer_diagnostics_actions.js";
 import {
@@ -273,9 +280,9 @@ function createScenarioChunkRuntimeController({
   const runtimeState = explicitRuntimeState || state;
   let promotionCommitPromise = null;
   let promotionCommitRunId = 0;
-  const { loadScenarioChunkPayload, resetScenarioChunkRequests } = createScenarioChunkPayloadLoader({
+  const { loadScenarioChunkPayload, resetScenarioChunkRequests } = composeScenarioChunkPayloadLoader(
     runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile,
-  });
+  );
 
   function getScenarioApplyEpochFromDiagnostics(scenarioId = "") {
     const diagnostics = runtimeState?.renderTransactionDiagnostics || {};
@@ -2310,7 +2317,7 @@ function createScenarioChunkRuntimeController({
           }))
           .filter((entry) => entry.payload),
       );
-      const layerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState());
+      const layerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState(), null);
       const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, ensureActiveScenarioChunkState(), {
         mergeScenarioChunkPayloads,
         mergeScenarioChunkPayloadsForViewport,

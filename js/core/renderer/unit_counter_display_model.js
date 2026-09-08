@@ -134,8 +134,7 @@ export function getUnitCounterNodeTransform(entry) {
 }
 
 // State is read when a model is requested so scenario switches and zoom updates stay live.
-export function createUnitCounterDisplayModel({
-  runtimeState,
+export function createUnitCounterDisplayModel(runtimeState, {
   canonicalCountryCode,
   getScenarioCountryDisplayName,
   ColorManager,
@@ -269,14 +268,14 @@ export function createUnitCounterDisplayModel({
   function getUnitCounterRenderEntries() {
     const counters = Array.isArray(runtimeState.unitCounters) ? runtimeState.unitCounters : [];
     const grouped = new Map();
-    counters.forEach((counter) => {
+    for (const counter of counters) {
       const anchor = getUnitCounterRenderAnchor(counter);
       const key = String(anchor?.key || "");
       if (!grouped.has(key)) {
         grouped.set(key, { anchor, counters: [] });
       }
       grouped.get(key).counters.push(counter);
-    });
+    }
     return Array.from(grouped.values()).flatMap((bucket) => {
       const sortedBucket = bucket.counters
         .slice()
@@ -314,9 +313,9 @@ export function createUnitCounterDisplayModel({
     };
   }
 
-  return {
+  return Object.freeze({
     getUnitCounterCardModel,
     getUnitCounterRenderEntries,
     getUnitCounterRenderScale,
-  };
+  });
 }

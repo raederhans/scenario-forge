@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createBrushInteractionSessionOwner, mergeHistorySnapshot } from "../js/core/renderer/brush_interaction_session_owner.js";
+import { createBrushInteractionSessionOwner } from "../js/core/renderer/brush_interaction_session_owner.js";
 
 function harness() {
   let session = null;
@@ -8,8 +8,7 @@ function harness() {
   const state = { brushModeEnabled: true, currentTool: "fill", selectedColor: "#abcdef", landIndex: new Map([["a", {}]]) };
   const modes = { physical: false, special: false, changed: true, hit: { id: "a", targetType: "land" } };
   const record = (name) => (...args) => calls.push([name, ...args]);
-  const owner = createBrushInteractionSessionOwner({
-    runtimeState: state,
+  const owner = createBrushInteractionSessionOwner(state, {
     getBrushSession: () => session,
     setBrushSession: (value) => { session = value; calls.push(["session", value]); },
     suppressNextClick: record("suppress"), getContext: () => ({}), nowMs: () => 10,
@@ -110,11 +109,4 @@ test("brush guards navigation, disabled state, eyedropper and special editor", (
   const h = harness(); h.owner.handleBrushPointerDown({ ...h.event(), ctrlKey: true });
   assert.equal(h.getSession(), null);
   h.owner.handleBrushPointerDown(h.event(0, 0)); assert.equal(h.getSession(), null);
-});
-
-test("history merge preserves unrelated sections and ignores invalid patches", () => {
-  const target = { colors: { a: "old" }, owners: { a: "AA" } };
-  mergeHistorySnapshot(target, null);
-  mergeHistorySnapshot(target, { colors: { b: "old-b" }, owners: null, ignored: 0 });
-  assert.deepEqual(target, { colors: { a: "old", b: "old-b" }, owners: { a: "AA" } });
 });

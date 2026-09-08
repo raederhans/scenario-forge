@@ -23,8 +23,7 @@ function harness() {
     cachedProvinceBorders: [], cachedProvinceBordersByCountry: new Map(),
     cachedLocalBorders: [], cachedLocalBordersByCountry: new Map(), cachedDetailAdmBorders: [],
   };
-  const owner = createStaticBorderMeshLifecycle({
-    runtimeState: state,
+  const owner = createStaticBorderMeshLifecycle(state, {
     getStaticMeshSourceCountries: () => sourceCountries,
     getDetailAdmMeshBuildState: () => detailState,
     setDetailAdmMeshBuildState: (next) => { detailState = next; },

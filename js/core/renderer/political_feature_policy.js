@@ -1,7 +1,6 @@
 // Political visibility, interaction eligibility, and stable paint-layer ordering.
 // Runtime fields and cache references are read when each rule runs.
-export function createPoliticalFeaturePolicy({
-  runtimeState,
+export function createPoliticalFeaturePolicy(runtimeState, {
   getSafeCanvasColor,
   hasPendingPoliticalColorEdit,
   getRenderPassCacheState,
@@ -197,7 +196,7 @@ export function createPoliticalFeaturePolicy({
     return !isPoliticalInteractionRenderableFeature(feature, featureId);
   }
 
-  return {
+  return Object.freeze({
     isScenarioShellFeature,
     hasVisiblePoliticalForegroundColorOverride,
     orderPoliticalShellUnderlayFirst,
@@ -208,5 +207,5 @@ export function createPoliticalFeaturePolicy({
     shouldExcludePoliticalVisualFeature,
     isPoliticalInteractionRenderableFeature,
     shouldExcludePoliticalInteractionFeature,
-  };
+  });
 }

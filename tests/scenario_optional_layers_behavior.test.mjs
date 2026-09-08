@@ -75,17 +75,8 @@ test("required scenario resources validate payloads while optional resources ret
   assert.deepEqual(failed, { ok: false, value: null, metrics: null, reason: "load_error", errorMessage: "offline" });
 });
 
-test("visibility sync skips stale optional layer writes after scenario apply request changes", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousShowWaterRegions = state.showWaterRegions;
-  const previousShowScenarioSpecialRegions = state.showScenarioSpecialRegions;
-  const previousShowScenarioAtlantropa = state.showScenarioAtlantropa;
-  const previousShowScenarioReliefOverlays = state.showScenarioReliefOverlays;
-  const previousShowCityPoints = state.showCityPoints;
-  const previousScenarioWaterRegionsData = state.scenarioWaterRegionsData;
-  const previousCurrentScenarioApplyRequestId = state.currentScenarioApplyRequestId;
-  const previousDiagnostics = state.renderTransactionDiagnostics;
+test("visibility sync skips stale optional layer writes after scenario apply request changes", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","scenarioBundleCacheById","showWaterRegions","showScenarioSpecialRegions","showScenarioAtlantropa","showScenarioReliefOverlays","showCityPoints","scenarioWaterRegionsData","currentScenarioApplyRequestId","renderTransactionDiagnostics"]);
   const previousFetch = globalThis.fetch;
 
   const bundle = {
@@ -149,26 +140,12 @@ test("visibility sync skips stale optional layer writes after scenario apply req
       && snapshot.extra?.currentScenarioApplyRequestId === 2
     )));
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.showWaterRegions = previousShowWaterRegions;
-    state.showScenarioSpecialRegions = previousShowScenarioSpecialRegions;
-    state.showScenarioAtlantropa = previousShowScenarioAtlantropa;
-    state.showScenarioReliefOverlays = previousShowScenarioReliefOverlays;
-    state.showCityPoints = previousShowCityPoints;
-    state.scenarioWaterRegionsData = previousScenarioWaterRegionsData;
-    state.currentScenarioApplyRequestId = previousCurrentScenarioApplyRequestId;
-    state.renderTransactionDiagnostics = previousDiagnostics;
     globalThis.fetch = previousFetch;
   }
 });
 
-test("failed special zone optional layer load clears stale runtime state", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousActiveScenarioManifest = state.activeScenarioManifest;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousSpecialZoneLayers = state.specialZoneLayers;
-  const previousLandIndex = state.landIndex;
+test("failed special zone optional layer load clears stale runtime state", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","activeScenarioManifest","scenarioBundleCacheById","specialZoneLayers","landIndex"]);
   const previousFetch = globalThis.fetch;
 
   const pendingLayer = createLayerFromPreset("custom", { id: "pending-layer", memberFeatureIds: ["a"] });
@@ -205,28 +182,12 @@ test("failed special zone optional layer load clears stale runtime state", async
     assert.ok(state.specialZoneLayers.diagnostics.some((entry) => entry.code === "special_zone_layers_load_failed"));
     assert.equal(state.specialZonesOverlayDirty, true);
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.activeScenarioManifest = previousActiveScenarioManifest;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.specialZoneLayers = previousSpecialZoneLayers;
-    state.landIndex = previousLandIndex;
     globalThis.fetch = previousFetch;
   }
 });
 
-test("visibility sync clears stale special zone layers when declared asset load fails", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousActiveScenarioManifest = state.activeScenarioManifest;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousSpecialZoneLayers = state.specialZoneLayers;
-  const previousLandIndex = state.landIndex;
-  const previousShowSpecialZones = state.showSpecialZones;
-  const previousShowWaterRegions = state.showWaterRegions;
-  const previousShowScenarioSpecialRegions = state.showScenarioSpecialRegions;
-  const previousShowScenarioAtlantropa = state.showScenarioAtlantropa;
-  const previousShowScenarioReliefOverlays = state.showScenarioReliefOverlays;
-  const previousShowCityPoints = state.showCityPoints;
-  const previousSpecialZonesOverlayDirty = state.specialZonesOverlayDirty;
+test("visibility sync clears stale special zone layers when declared asset load fails", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","activeScenarioManifest","scenarioBundleCacheById","specialZoneLayers","landIndex","showSpecialZones","showWaterRegions","showScenarioSpecialRegions","showScenarioAtlantropa","showScenarioReliefOverlays","showCityPoints","specialZonesOverlayDirty"]);
   const previousFetch = globalThis.fetch;
 
   const staleLayer = createLayerFromPreset("custom", { id: "stale-layer", memberFeatureIds: ["a"] });
@@ -272,18 +233,6 @@ test("visibility sync clears stale special zone layers when declared asset load 
     assert.ok(state.specialZoneLayers.diagnostics.some((entry) => entry.code === "special_zone_layers_load_failed"));
     assert.equal(state.specialZonesOverlayDirty, true);
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.activeScenarioManifest = previousActiveScenarioManifest;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.specialZoneLayers = previousSpecialZoneLayers;
-    state.landIndex = previousLandIndex;
-    state.showSpecialZones = previousShowSpecialZones;
-    state.showWaterRegions = previousShowWaterRegions;
-    state.showScenarioSpecialRegions = previousShowScenarioSpecialRegions;
-    state.showScenarioAtlantropa = previousShowScenarioAtlantropa;
-    state.showScenarioReliefOverlays = previousShowScenarioReliefOverlays;
-    state.showCityPoints = previousShowCityPoints;
-    state.specialZonesOverlayDirty = previousSpecialZonesOverlayDirty;
     globalThis.fetch = previousFetch;
   }
 });
@@ -430,13 +379,8 @@ test("bundle assembly clears stale strategic values optional layer after baselin
   assert.equal(switchedScenarioBundle.optionalLayerSettledByKey.strategicvalues, undefined);
 });
 
-test("strategic values optional layer load normalizes runtime payload and bumps revision", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousActiveScenarioManifest = state.activeScenarioManifest;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousStrategicValues = state.scenarioStrategicValuesData;
-  const previousStrategicRevision = state.scenarioStrategicValuesRevision;
-  const previousBaselineHash = state.scenarioBaselineHash;
+test("strategic values optional layer load normalizes runtime payload and bumps revision", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","activeScenarioManifest","scenarioBundleCacheById","scenarioStrategicValuesData","scenarioStrategicValuesRevision","scenarioBaselineHash"]);
   const previousFetch = globalThis.fetch;
 
   state.activeScenarioId = "hoi4_optional_test";
@@ -477,30 +421,12 @@ test("strategic values optional layer load normalizes runtime payload and bumps 
     assert.equal(state.scenarioStrategicValuesData.resourcePoints.features[0].properties.resource, "steel");
     assert.equal(state.scenarioStrategicValuesRevision, 1);
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.activeScenarioManifest = previousActiveScenarioManifest;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.scenarioStrategicValuesData = previousStrategicValues;
-    state.scenarioStrategicValuesRevision = previousStrategicRevision;
-    state.scenarioBaselineHash = previousBaselineHash;
     globalThis.fetch = previousFetch;
   }
 });
 
-test("visibility sync loads strategic values when resource markers are enabled", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousActiveScenarioManifest = state.activeScenarioManifest;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousStrategicValues = state.scenarioStrategicValuesData;
-  const previousStrategicRevision = state.scenarioStrategicValuesRevision;
-  const previousShowStrategicResourceMarkers = state.showStrategicResourceMarkers;
-  const previousShowWaterRegions = state.showWaterRegions;
-  const previousShowScenarioSpecialRegions = state.showScenarioSpecialRegions;
-  const previousShowScenarioAtlantropa = state.showScenarioAtlantropa;
-  const previousShowScenarioReliefOverlays = state.showScenarioReliefOverlays;
-  const previousShowCityPoints = state.showCityPoints;
-  const previousShowSpecialZones = state.showSpecialZones;
-  const previousBaselineHash = state.scenarioBaselineHash;
+test("visibility sync loads strategic values when resource markers are enabled", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","activeScenarioManifest","scenarioBundleCacheById","scenarioStrategicValuesData","scenarioStrategicValuesRevision","showStrategicResourceMarkers","showWaterRegions","showScenarioSpecialRegions","showScenarioAtlantropa","showScenarioReliefOverlays","showCityPoints","showSpecialZones","scenarioBaselineHash"]);
   const previousFetch = globalThis.fetch;
 
   state.activeScenarioId = "hoi4_optional_test";
@@ -544,38 +470,12 @@ test("visibility sync loads strategic values when resource markers are enabled",
     assert.equal(state.scenarioStrategicValuesData.buckets.s1.steel, 20);
     assert.equal(state.scenarioStrategicValuesRevision, 1);
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.activeScenarioManifest = previousActiveScenarioManifest;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.scenarioStrategicValuesData = previousStrategicValues;
-    state.scenarioStrategicValuesRevision = previousStrategicRevision;
-    state.showStrategicResourceMarkers = previousShowStrategicResourceMarkers;
-    state.showWaterRegions = previousShowWaterRegions;
-    state.showScenarioSpecialRegions = previousShowScenarioSpecialRegions;
-    state.showScenarioAtlantropa = previousShowScenarioAtlantropa;
-    state.showScenarioReliefOverlays = previousShowScenarioReliefOverlays;
-    state.showCityPoints = previousShowCityPoints;
-    state.showSpecialZones = previousShowSpecialZones;
-    state.scenarioBaselineHash = previousBaselineHash;
     globalThis.fetch = previousFetch;
   }
 });
 
-test("visibility sync loads strategic values when choropleth metric is enabled", async () => {
-  const previousActiveScenarioId = state.activeScenarioId;
-  const previousActiveScenarioManifest = state.activeScenarioManifest;
-  const previousBundleCache = state.scenarioBundleCacheById;
-  const previousStrategicValues = state.scenarioStrategicValuesData;
-  const previousStrategicRevision = state.scenarioStrategicValuesRevision;
-  const previousShowStrategicResourceMarkers = state.showStrategicResourceMarkers;
-  const previousStrategicChoroplethMetric = state.strategicChoroplethMetric;
-  const previousShowWaterRegions = state.showWaterRegions;
-  const previousShowScenarioSpecialRegions = state.showScenarioSpecialRegions;
-  const previousShowScenarioAtlantropa = state.showScenarioAtlantropa;
-  const previousShowScenarioReliefOverlays = state.showScenarioReliefOverlays;
-  const previousShowCityPoints = state.showCityPoints;
-  const previousShowSpecialZones = state.showSpecialZones;
-  const previousBaselineHash = state.scenarioBaselineHash;
+test("visibility sync loads strategic values when choropleth metric is enabled", async (t) => {
+  preserveScenarioState(t, ["activeScenarioId","activeScenarioManifest","scenarioBundleCacheById","scenarioStrategicValuesData","scenarioStrategicValuesRevision","showStrategicResourceMarkers","strategicChoroplethMetric","showWaterRegions","showScenarioSpecialRegions","showScenarioAtlantropa","showScenarioReliefOverlays","showCityPoints","showSpecialZones","scenarioBaselineHash"]);
   const previousFetch = globalThis.fetch;
 
   state.activeScenarioId = "hoi4_optional_test";
@@ -620,24 +520,15 @@ test("visibility sync loads strategic values when choropleth metric is enabled",
     assert.equal(state.scenarioStrategicValuesData.buckets.s1.steel, 20);
     assert.equal(state.scenarioStrategicValuesRevision, 1);
   } finally {
-    state.activeScenarioId = previousActiveScenarioId;
-    state.activeScenarioManifest = previousActiveScenarioManifest;
-    state.scenarioBundleCacheById = previousBundleCache;
-    state.scenarioStrategicValuesData = previousStrategicValues;
-    state.scenarioStrategicValuesRevision = previousStrategicRevision;
-    state.showStrategicResourceMarkers = previousShowStrategicResourceMarkers;
-    state.strategicChoroplethMetric = previousStrategicChoroplethMetric;
-    state.showWaterRegions = previousShowWaterRegions;
-    state.showScenarioSpecialRegions = previousShowScenarioSpecialRegions;
-    state.showScenarioAtlantropa = previousShowScenarioAtlantropa;
-    state.showScenarioReliefOverlays = previousShowScenarioReliefOverlays;
-    state.showCityPoints = previousShowCityPoints;
-    state.showSpecialZones = previousShowSpecialZones;
-    state.scenarioBaselineHash = previousBaselineHash;
     globalThis.fetch = previousFetch;
   }
 });
 
+
+function preserveScenarioState(t, fields) {
+  const previous = Object.fromEntries(fields.map((key) => [key, state[key]]));
+  t.after(() => Object.assign(state, previous));
+}
 
 function installOptionalWaterScenario(t) {
   const fields = [
@@ -717,4 +608,82 @@ test("optional payload failures retry while absent assets settle until forced re
   assert.equal(json.mock.callCount(), 2);
   assert.deepEqual(await ensureActiveScenarioOptionalLayerLoaded("water", { ...options, forceReload: true }), payload);
   assert.equal(json.mock.callCount(), 3);
+});
+
+for (const oldFinishesFirst of [true, false]) {
+  for (const oldFails of [false, true]) {
+    test(`optional forced reload owns settlement (old first=${oldFinishesFirst}, fails=${oldFails})`, async (t) => {
+      const bundle = installOptionalWaterScenario(t);
+      t.mock.method(console, "warn", () => {});
+      const requests = [];
+      const json = t.mock.fn(() => new Promise((resolve, reject) => requests.push({ resolve, reject })));
+      const options = { d3Client: { json }, renderNow: false };
+      const oldCaller = ensureActiveScenarioOptionalLayerLoaded("water", options);
+      const newCaller = ensureActiveScenarioOptionalLayerLoaded("water", { ...options, forceReload: true });
+      const newPromise = bundle.optionalLayerPromises.water;
+      const payload = (id) => ({ type: "FeatureCollection", features: [{ type: "Feature", id, properties: {}, geometry: null }] });
+      const oldPayload = payload("old");
+      const newPayload = payload("new");
+      const finishOld = () => oldFails ? requests[0].reject(new Error("old failed")) : requests[0].resolve(oldPayload);
+      if (oldFinishesFirst) {
+        finishOld();
+        await oldCaller;
+        assert.equal(bundle.optionalLayerPromises.water, newPromise);
+        assert.equal(state.scenarioWaterRegionsData, null);
+        const follower = ensureActiveScenarioOptionalLayerLoaded("water", options);
+        assert.equal(json.mock.callCount(), 2);
+        requests[1].resolve(newPayload);
+        await Promise.all([newCaller, follower]);
+      } else {
+        requests[1].resolve(newPayload);
+        await newCaller;
+        finishOld();
+        await oldCaller;
+      }
+      assert.deepEqual(bundle.waterRegionsPayload, newPayload);
+      assert.equal(state.scenarioWaterRegionsData, bundle.waterRegionsPayload);
+      assert.equal(bundle.optionalLayerSettledByKey.water, true);
+      assert.equal(bundle.optionalLayerPromises.water, undefined);
+    });
+  }
+}
+
+test("optional completion caches its bundle without mutating a same-ID replacement", async (t) => {
+  const oldBundle = installOptionalWaterScenario(t);
+  let resolvePayload;
+  const pending = ensureActiveScenarioOptionalLayerLoaded("water", {
+    d3Client: { json: () => new Promise((resolve) => { resolvePayload = resolve; }) },
+    renderNow: false,
+  });
+  const replacement = { manifest: { ...oldBundle.manifest } };
+  state.scenarioBundleCacheById.optional_owner_test = replacement;
+  const payload = { type: "FeatureCollection", features: [] };
+  resolvePayload(payload);
+  assert.deepEqual(await pending, payload);
+  assert.deepEqual(oldBundle.waterRegionsPayload, payload);
+  assert.equal(state.scenarioWaterRegionsData, null);
+  assert.equal(replacement.waterRegionsPayload, undefined);
+});
+
+test("outgoing strategic payload validation stays bound to its bundle baseline", async (t) => {
+  const bundle = installOptionalWaterScenario(t);
+  preserveScenarioState(t, ["scenarioBaselineHash", "scenarioStrategicValuesData", "scenarioStrategicValuesRevision"]);
+  bundle.manifest.baseline_hash = "baseline-1";
+  bundle.manifest.strategic_values_url = "strategic-values.json";
+  state.scenarioBaselineHash = "baseline-1";
+  state.scenarioStrategicValuesData = null;
+  let resolvePayload;
+  const pending = ensureActiveScenarioOptionalLayerLoaded("strategic_values", {
+    d3Client: { json: () => new Promise((resolve) => { resolvePayload = resolve; }) },
+    renderNow: false,
+  });
+  state.activeScenarioId = "incoming-scenario";
+  state.scenarioBaselineHash = "baseline-2";
+  const raw = createStrategicValuesFixture();
+  raw.scenario_id = "optional_owner_test";
+  resolvePayload(raw);
+  const payload = await pending;
+  assert.deepEqual(payload.diagnostics.errors, []);
+  assert.equal(bundle.strategicValuesPayload, payload);
+  assert.equal(state.scenarioStrategicValuesData, null);
 });

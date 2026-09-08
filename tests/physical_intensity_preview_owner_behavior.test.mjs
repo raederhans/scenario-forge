@@ -17,8 +17,7 @@ function harness(t) {
     return group;
   };
   let group = makeGroup();
-  const owner = createPhysicalIntensityPreviewOwner({
-    runtimeState: state,
+  const owner = createPhysicalIntensityPreviewOwner(state, {
     rendererSurfaceHost: { getProjection: () => projection, getInteractionRect: () => ({ node: () => ({}) }), getIntensityFieldPreviewGroup: () => group },
     getIntensityFieldTool: () => tool,
     getProjectedDegreeRadiusPx: () => radius,

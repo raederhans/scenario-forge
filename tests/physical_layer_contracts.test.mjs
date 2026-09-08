@@ -10,6 +10,7 @@ function readRepoFile(...relativeParts) {
 }
 
 test("physical layer source contracts stay wired to the expected renderer and startup boundaries", () => {
+  const signaturePolicySource = readRepoFile("js", "core", "renderer", "render_pass_signature_policy.js");
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
   const physicalInteractionSource = readRepoFile("js", "core", "renderer", "physical_intensity_interaction_owner.js");
   const physicalLayerOwnerSource = readRepoFile("js", "core", "renderer", "physical_layer_render_owner.js");
@@ -75,11 +76,10 @@ test("physical layer source contracts stay wired to the expected renderer and st
       /function drawPolygonLinePattern/.test(scenarioReliefOverlayOwnerSource)
       && /function drawScenarioReliefOverlaysLayer\(k, \{[\s\S]*?return getScenarioReliefOverlayRenderOwner\(\)\.drawScenarioReliefOverlaysLayer\(k, \{/.test(rendererSource)
       && !/function drawPolygonLinePattern/.test(rendererSource),
-    scenarioReliefCacheLifecycleStaysInRenderer:
-      /function renderScenarioReliefOverlaysLayerToCache\(currentTransform, reliefFeatures\) \{[\s\S]*?getContextScenarioLayerCacheEntry\("relief"\)/.test(rendererSource)
-      && /function drawScenarioReliefOverlaysPass\(k\) \{[\s\S]*?drawCachedContextScenarioLayer\("relief", currentTransform\)/.test(rendererSource)
-      && !/getContextScenarioLayerCacheEntry/.test(scenarioReliefOverlayOwnerSource)
-      && !/drawCachedContextScenarioLayer/.test(scenarioReliefOverlayOwnerSource),
+    scenarioReliefPassDelegatesToOwner:
+      rendererSource.includes("return getScenarioReliefOverlayRenderOwner().drawScenarioReliefOverlaysPass(k)")
+      && !rendererSource.includes("function renderScenarioReliefOverlaysLayerToCache")
+      && rendererSource.includes("scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache"),
     scenarioReliefOwnerKeepsPhaseAndCoastalAccentSkips:
       /runtimeState\.renderPhase === RENDER_PHASE_INTERACTING \|\| runtimeState\.renderPhase === RENDER_PHASE_SETTLING/.test(scenarioReliefOverlayOwnerSource)
       && /kind === "new_shoreline" \|\| kind === "lake_shoreline"[\s\S]*?isScenarioCoastalAccentEnabled\(\)/.test(scenarioReliefOverlayOwnerSource),
@@ -90,7 +90,7 @@ test("physical layer source contracts stay wired to the expected renderer and st
       /function drawPhysicalIntensityFieldLayer\(\{ clipAlreadyApplied = false \} = \{\}\)/.test(physicalLayerOwnerSource)
       && /return getPhysicalLayerRenderOwner\(\)\.drawPhysicalIntensityFieldLayer\(\{ clipAlreadyApplied \}\);/.test(rendererSource),
     physicalBaseSignatureTracksIntensityRevision:
-      /if \(passName === "physicalBase"\) \{[\s\S]*?`field:\$\{Number\(intensityFields\.channels\.physicalAtlas\?\.revision \|\| 0\)\}`/.test(rendererSource),
+      /if \(passName === "physicalBase"\) \{[\s\S]*?`field:\$\{Number\(intensityFields\.channels\.physicalAtlas\?\.revision \|\| 0\)\}`/.test(signaturePolicySource),
     reliefOverlayBlendClamp:
       /function getPhysicalReliefOverlayBlendMode\(cfg, presetProfile\)/.test(rendererSource)
       && /if \(requestedMode === "overlay" \|\| requestedMode === "multiply"\) \{[\s\S]*?return "soft-light";/.test(rendererSource),

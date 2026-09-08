@@ -1,8 +1,9 @@
+import { setFirstVisibleFramePaintedState } from "../state/actions/renderer_diagnostics_actions.js";
+
 const REQUIRED_EFFECT_NAMES = Object.freeze([
   "incrementPerfCounter",
   "recordVisibleFrameTransactionDiagnostics",
   "recordRenderPerfMetric",
-  "setFirstVisibleFramePainted",
   "callFirstVisibleFramePaintedHook",
 ]);
 
@@ -78,10 +79,11 @@ function createSummary({
   });
 }
 
-export function createVisibleFrameDiagnosticsOwner({ effects = {}, getters = {} } = {}) {
+export function createVisibleFrameDiagnosticsOwner({ runtimeState, effects = {}, getters = {} } = {}) {
   const effectApi = Object.fromEntries(
     REQUIRED_EFFECT_NAMES.map((name) => [name, requireFunction(effects, name, "effects")]),
   );
+  effectApi.setFirstVisibleFramePainted = (painted) => setFirstVisibleFramePaintedState(runtimeState, painted);
   const getterApi = Object.fromEntries(
     REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
   );

@@ -32,6 +32,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     for (const entry of node.type === "ImportDeclaration" ? node.specifiers : []) scope[entry.local.name] = noop;
   }
   const runtimeState = {};
+  const scenarioLayerCache = Object.freeze({ getSnapshot: noop, render: noop, draw: noop });
   const handles = {};
   let reads = 0;
   const rendererSurfaceHost = {};
@@ -48,6 +49,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
   }
   Object.assign(scope, passCatalog, {
     runtimeState, rendererSurfaceHost, globalThis: globals, window: undefined,
+    getRenderCacheOwner: () => ({ scenarioLayerCache }),
     MIN_ZOOM_SCALE: 1, MAX_ZOOM_SCALE: 16, PROJECTION_PRECISION: 0.25,
     PATH_POINT_RADIUS: 4.5, PROJECTION_FIT_PADDING_RATIO: 0.05, MAP_PAN_PADDING_PX: 24,
     RENDER_PHASE_IDLE: "idle", RENDER_PHASE_INTERACTING: "interacting", RENDER_PHASE_SETTLING: "settling",
@@ -55,7 +57,11 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
   });
   Object.assign(scope, dependencies);
   let constructions = 0;
-  scope[`create${name}`] = (options) => { constructions++; return options; };
+  scope[`create${name}`] = (...args) => {
+    constructions++;
+    if (["RenderPassSignaturePolicy", "BathymetryStylePolicy", "ParentBorderGroupingPolicy", "VisibleFrameIdentityPolicy", "FillTargetPolicy"].includes(name)) assert.equal(args[0], runtimeState);
+    return args.at(-1);
+  };
   const factory = rendererAst.body.find(node => node.type === "FunctionDeclaration" && node.id.name === `get${name}`);
   assert.ok(factory, `get${name} exists`);
   const extraSource = includeFunctions.map(functionName => {
@@ -74,8 +80,15 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     assert.equal(Object.isFrozen(runtimeState), false);
   }
   if ("surfaceHost" in owner) assert.equal(owner.surfaceHost, rendererSurfaceHost);
-  return { owner, handles, runtimeState, globals, setWindow };
+  return { owner, handles, runtimeState, globals, setWindow, scenarioLayerCache };
 }
+
+test("scenario overlay composition shares the cache owner's bounded lifecycle API", () => {
+  for (const name of ["ScenarioRegionOverlayRenderOwner", "ScenarioReliefOverlayRenderOwner"]) {
+    const { owner, scenarioLayerCache } = createOwnerWiringHarness(name);
+    assert.equal(owner.scenarioLayerCache, scenarioLayerCache);
+  }
+});
 
 test("startup and transaction reset wire cancellation to the hover lifecycle owner", () => {
   for (const name of ["RendererStartupTransactionOwner", "RendererTransactionResetOwner"]) {
@@ -330,4 +343,11 @@ test("surface host supports initial handles and null normalization", () => {
 
 test("renderer composition imports without eager dependency initialization errors", async () => {
   await import("../js/core/map_renderer.js");
+});
+
+test("renderer read policies are assembled lazily without reading live renderer handles", () => {
+  for (const [name, dependency] of [["RenderPassSignaturePolicy", "getDebugMode"], ["BathymetryStylePolicy", "getOceanBaseFillColor"], ["ParentBorderGroupingPolicy", "getFeatureId"], ["VisibleFrameIdentityPolicy", "ensureCurrentSceneSnapshot"], ["FillTargetPolicy", "getAdmin1Group"]]) {
+    const { owner } = createOwnerWiringHarness(name);
+    assert.equal(typeof owner[dependency], "function");
+  }
 });

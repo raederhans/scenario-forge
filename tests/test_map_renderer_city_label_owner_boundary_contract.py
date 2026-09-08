@@ -42,18 +42,19 @@ class MapRendererCityLabelOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"function\s+doScreenBoxesOverlap\s*\(", renderer_content))
 
     def test_city_pass_signatures_track_every_city_collection_revision(self):
-        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        signature_content = (URBAN_CITY_POLICY_JS.parent / "render_pass_signature_policy.js").read_text(encoding="utf-8")
         policy_content = URBAN_CITY_POLICY_JS.read_text(encoding="utf-8")
         labels_signature_token = 'if (passName === "labels") {'
         context_markers_signature_token = 'if (passName === "contextMarkers") {'
 
-        self.assertEqual(renderer_content.count(labels_signature_token), 1)
-        self.assertEqual(renderer_content.count(context_markers_signature_token), 1)
-        context_markers_signature = renderer_content.split(context_markers_signature_token, 1)[1].split(
+        self.assertEqual(signature_content.count(labels_signature_token), 1)
+        self.assertEqual(signature_content.count(context_markers_signature_token), 1)
+        self.assertIn("import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';", signature_content)
+        context_markers_signature = signature_content.split(context_markers_signature_token, 1)[1].split(
             labels_signature_token,
             1,
         )[0]
-        labels_signature = renderer_content.split(labels_signature_token, 1)[1].split(
+        labels_signature = signature_content.split(labels_signature_token, 1)[1].split(
             'if (passName === "contextScenario") {',
             1,
         )[0]

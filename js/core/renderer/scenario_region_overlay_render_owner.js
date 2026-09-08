@@ -1,13 +1,10 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 
-export function createScenarioRegionOverlayRenderOwner({
-  runtimeState,
+export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
-  getRenderPassCacheState,
-  getRenderPassLayout,
+  scenarioLayerCache,
   cloneZoomTransform,
-  areZoomTransformsEquivalent,
   nowMs,
   collectContextMetric,
   getFeatureId,
@@ -25,8 +22,6 @@ export function createScenarioRegionOverlayRenderOwner({
   getResolvedFeatureColor,
   LAND_FILL_COLOR,
   getPoliticalFeaturePathEntry,
-  withRenderTarget,
-  prepareTargetContext,
   getScenarioWaterVisualRevisionToken,
   isWaterRegionEnabled,
   isMacroOceanWaterRegion,
@@ -47,76 +42,6 @@ export function createScenarioRegionOverlayRenderOwner({
   let scenarioWaterPartPathCache = new WeakMap();
   let scenarioWaterFeaturePathCache = new WeakMap();
   let lastScenarioWaterRenderedCount = 0;
-
-  function getContextScenarioLayerCacheEntry(layerName) {
-    const cache = getRenderPassCacheState();
-    const resolvedLayerName = String(layerName || "default").trim() || "default";
-    const existing = cache.contextScenarioLayerCache?.[resolvedLayerName];
-    if (existing && typeof existing === "object") {
-      return existing;
-    }
-    const next = {
-      canvas: null,
-      signature: "",
-      referenceTransform: null,
-      renderedCount: 0,
-    };
-    cache.contextScenarioLayerCache[resolvedLayerName] = next;
-    return next;
-  }
-
-  function ensureContextScenarioLayerCanvas(layerName) {
-    const layerEntry = getContextScenarioLayerCacheEntry(layerName);
-    if (!layerEntry.canvas) {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1;
-      canvas.height = 1;
-      layerEntry.canvas = canvas;
-    }
-    const layout = getRenderPassLayout("contextScenario");
-    if (layerEntry.canvas.width !== layout.pixelWidth || layerEntry.canvas.height !== layout.pixelHeight) {
-      layerEntry.canvas.width = layout.pixelWidth;
-      layerEntry.canvas.height = layout.pixelHeight;
-      layerEntry.signature = "";
-      layerEntry.referenceTransform = null;
-      layerEntry.renderedCount = 0;
-    }
-    return layerEntry.canvas;
-  }
-
-  function drawCachedContextScenarioLayer(layerName, currentTransform) {
-    const layerEntry = getContextScenarioLayerCacheEntry(layerName);
-    const layerCanvas = layerEntry.canvas;
-    const referenceTransform = layerEntry.referenceTransform
-      ? cloneZoomTransform(layerEntry.referenceTransform)
-      : null;
-    if (!layerCanvas || !referenceTransform) return false;
-    const layout = getRenderPassLayout("contextScenario");
-    if (layerCanvas.width !== layout.pixelWidth || layerCanvas.height !== layout.pixelHeight) {
-      return false;
-    }
-    rendererSurfaceHost.getContext().save();
-    rendererSurfaceHost.getContext().setTransform(1, 0, 0, 1, 0, 0);
-    if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
-      rendererSurfaceHost.getContext().drawImage(layerCanvas, 0, 0);
-      rendererSurfaceHost.getContext().restore();
-      return true;
-    }
-    const current = cloneZoomTransform(currentTransform);
-    const scaleRatio = current.k / Math.max(referenceTransform.k, 0.0001);
-    const dx = current.x - (referenceTransform.x * scaleRatio);
-    const dy = current.y - (referenceTransform.y * scaleRatio);
-    const offsetX = Number(layout?.offsetX || 0);
-    const offsetY = Number(layout?.offsetY || 0);
-    rendererSurfaceHost.getContext().translate(
-      (dx + offsetX * (1 - scaleRatio)) * runtimeState.dpr,
-      (dy + offsetY * (1 - scaleRatio)) * runtimeState.dpr,
-    );
-    rendererSurfaceHost.getContext().scale(scaleRatio, scaleRatio);
-    rendererSurfaceHost.getContext().drawImage(layerCanvas, 0, 0);
-    rendererSurfaceHost.getContext().restore();
-    return true;
-  }
 
   function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
     const startedAt = nowMs();
@@ -246,25 +171,10 @@ export function createScenarioRegionOverlayRenderOwner({
   }
 
   function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures) {
-    const layerEntry = getContextScenarioLayerCacheEntry("water");
-    const layerCanvas = ensureContextScenarioLayerCanvas("water");
-    const layerContext = layerCanvas.getContext("2d");
-    if (!layerContext) {
-      layerEntry.signature = "";
-      layerEntry.referenceTransform = null;
-      layerEntry.renderedCount = 0;
-      return 0;
-    }
-    const layout = getRenderPassLayout("contextScenario");
-    let renderedWaterCount = 0;
-    withRenderTarget(layerContext, () => {
-      const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-      renderedWaterCount = drawScenarioWaterFillLayer(layerK, { waterFeatures });
+    return scenarioLayerCache.render("water", currentTransform, {
+      draw: (layerK) => drawScenarioWaterFillLayer(layerK, { waterFeatures }),
+      getSignature: getScenarioWaterVisualRevisionToken,
     });
-    layerEntry.signature = getScenarioWaterVisualRevisionToken();
-    layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-    layerEntry.renderedCount = renderedWaterCount;
-    return renderedWaterCount;
   }
 
   function getScenarioWaterPartPath(part) {
@@ -380,25 +290,10 @@ export function createScenarioRegionOverlayRenderOwner({
   }
 
   function renderScenarioSpecialRegionOverlaysLayerToCache(currentTransform, specialFeatures) {
-    const layerEntry = getContextScenarioLayerCacheEntry("special");
-    const layerCanvas = ensureContextScenarioLayerCanvas("special");
-    const layerContext = layerCanvas.getContext("2d");
-    if (!layerContext) {
-      layerEntry.signature = "";
-      layerEntry.referenceTransform = null;
-      layerEntry.renderedCount = 0;
-      return 0;
-    }
-    const layout = getRenderPassLayout("contextScenario");
-    let renderedSpecialCount = 0;
-    withRenderTarget(layerContext, () => {
-      const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-      renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(layerK, { specialFeatures });
+    return scenarioLayerCache.render("special", currentTransform, {
+      draw: (layerK) => drawScenarioSpecialRegionOverlaysLayer(layerK, { specialFeatures }),
+      getSignature: getScenarioSpecialVisualRevisionToken,
     });
-    layerEntry.signature = getScenarioSpecialVisualRevisionToken();
-    layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-    layerEntry.renderedCount = renderedSpecialCount;
-    return renderedSpecialCount;
   }
 
   function drawScenarioRegionOverlaysPass(k) {
@@ -468,13 +363,13 @@ export function createScenarioRegionOverlayRenderOwner({
       waterCoverageAlgo = signals.waterCoverageAlgo || "grid";
 
       const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-      const waterLayerEntry = getContextScenarioLayerCacheEntry("water");
+      const waterLayerEntry = scenarioLayerCache.getSnapshot("water");
       const waterVisualRevision = getScenarioWaterVisualRevisionToken();
       const canReuseWaterLayer = (
         shouldEnableContextScenarioTransformReuse()
         && waterLayerEntry.signature === waterVisualRevision
-        && !!waterLayerEntry.canvas
-        && !!waterLayerEntry.referenceTransform
+        && waterLayerEntry.hasCanvas
+        && waterLayerEntry.hasReferenceTransform
       );
 
       const useAdaptiveDirect = forcedWaterCache.mode === "adaptive" && shouldUseDirectScenarioWaterDraw(signals);
@@ -488,59 +383,27 @@ export function createScenarioRegionOverlayRenderOwner({
           signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
         });
         renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-      } else if (strategy === "reuse") {
-        if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
-          waterCacheMode = "reuse";
-          collectContextMetric("contextScenarioLayerCacheHit", 0, {
-            layer: "water",
-            renderedCount: Number(waterLayerEntry.renderedCount || 0),
-          });
-          renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
-        } else {
-          waterCacheMode = "redraw";
-          collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-            layer: "water",
-            reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
-            signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-          });
-          renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-          if (!drawCachedContextScenarioLayer("water", currentTransform)) {
-            waterCacheMode = "direct";
-            renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-          }
-        }
-      } else if (strategy === "redraw") {
+      } else if (strategy !== "redraw" && canReuseWaterLayer && scenarioLayerCache.draw("water", currentTransform)) {
+        waterCacheMode = "reuse";
+        collectContextMetric("contextScenarioLayerCacheHit", 0, {
+          layer: "water",
+          renderedCount: Number(waterLayerEntry.renderedCount || 0),
+        });
+        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
+      } else {
+        // Reuse and adaptive share the same cache lifecycle; forced redraw only skips the hit.
         waterCacheMode = "redraw";
         collectContextMetric("contextScenarioLayerCacheMiss", 0, {
           layer: "water",
-          reason: "forced-redraw",
+          reason: strategy === "redraw"
+            ? "forced-redraw"
+            : waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
           signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
         });
         renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-        if (!drawCachedContextScenarioLayer("water", currentTransform)) {
+        if (!scenarioLayerCache.draw("water", currentTransform)) {
           waterCacheMode = "direct";
           renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-        }
-      } else {
-        if (canReuseWaterLayer && drawCachedContextScenarioLayer("water", currentTransform)) {
-          waterCacheMode = "reuse";
-          collectContextMetric("contextScenarioLayerCacheHit", 0, {
-            layer: "water",
-            renderedCount: Number(waterLayerEntry.renderedCount || 0),
-          });
-          renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
-        } else {
-          waterCacheMode = "redraw";
-          collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-            layer: "water",
-            reason: waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
-            signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
-          });
-          renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
-          if (!drawCachedContextScenarioLayer("water", currentTransform)) {
-            waterCacheMode = "direct";
-            renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-          }
         }
       }
       highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
@@ -568,15 +431,15 @@ export function createScenarioRegionOverlayRenderOwner({
 
     if (showSpecial) {
       const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-      const specialLayerEntry = getContextScenarioLayerCacheEntry("special");
+      const specialLayerEntry = scenarioLayerCache.getSnapshot("special");
       const specialVisualRevision = getScenarioSpecialVisualRevisionToken();
       const canReuseSpecialLayer = (
         shouldEnableContextScenarioTransformReuse()
         && specialLayerEntry.signature === specialVisualRevision
-        && !!specialLayerEntry.canvas
-        && !!specialLayerEntry.referenceTransform
+        && specialLayerEntry.hasCanvas
+        && specialLayerEntry.hasReferenceTransform
       );
-      if (canReuseSpecialLayer && drawCachedContextScenarioLayer("special", currentTransform)) {
+      if (canReuseSpecialLayer && scenarioLayerCache.draw("special", currentTransform)) {
         specialCacheMode = "reuse";
         renderedSpecialCount = Number(specialLayerEntry.renderedCount || 0);
         collectContextMetric("contextScenarioLayerCacheHit", 0, {
@@ -591,7 +454,7 @@ export function createScenarioRegionOverlayRenderOwner({
           signatureChanged: specialLayerEntry.signature !== specialVisualRevision,
         });
         renderedSpecialCount = renderScenarioSpecialRegionOverlaysLayerToCache(currentTransform, specialFeatures);
-        if (!drawCachedContextScenarioLayer("special", currentTransform)) {
+        if (!scenarioLayerCache.draw("special", currentTransform)) {
           specialCacheMode = "direct";
           renderedSpecialCount = drawScenarioSpecialRegionOverlaysLayer(k, { specialFeatures });
         }
@@ -644,13 +507,10 @@ export function createScenarioRegionOverlayRenderOwner({
     lastScenarioWaterRenderedCount = 0;
   }
 
-  return {
+  return Object.freeze({
     drawScenarioRegionOverlaysPass,
-    getContextScenarioLayerCacheEntry,
-    ensureContextScenarioLayerCanvas,
-    drawCachedContextScenarioLayer,
     resetWaterPathCaches,
     getPreviousWaterRenderedCount,
     resetPreviousWaterRenderedCount,
-  };
+  });
 }

@@ -1,7 +1,6 @@
 // Owns the operation-graphic editor preview and keyed SVG handles.
 // Persistent state changes stay with the host and strategic runtime effects.
-export function createOperationGraphicsEditorRenderOwner({
-  runtimeState,
+export function createOperationGraphicsEditorRenderOwner(runtimeState, {
   rendererSurfaceHost,
   ensureOperationGraphicsEditorState,
   getOperationGraphicById,
@@ -219,5 +218,5 @@ export function createOperationGraphicsEditorRenderOwner({
     syncInteractionLayerPointerEvents();
   }
 
-  return { renderOperationGraphicsEditorOverlay };
+  return Object.freeze({ renderOperationGraphicsEditorOverlay });
 }
