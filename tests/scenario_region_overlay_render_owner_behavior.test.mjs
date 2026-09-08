@@ -143,7 +143,12 @@ test("selection highlight remains live after cached water and before special ove
   assert.equal(images.length, 2); assert.ok(images[0] < highlight && highlight < images[1]);
   assert.equal(h.main.strokeStyle, "#f1c40f");
   assert.equal(h.metrics.at(-1).highlightedWaterCount, 1);
+  assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+  assert.equal(h.events.some((event) => event[0] === "layer" && event[1] === "fill"), false);
   assert.equal(h.metrics.at(-1).specialCacheMode, "reuse");
+  h.state.selectedWaterRegionId = ""; h.events.length = 0; h.draw();
+  assert.equal(h.metrics.at(-1).highlightedWaterCount, 0);
+  assert.equal(h.events.some((event) => event[1] === "stroke"), false);
   h.state.showWaterRegions = false; h.state.showScenarioSpecialRegions = false;
   h.events.length = 0; h.draw();
   assert.deepEqual(h.events, []); assert.equal(h.metrics.at(-1).reason, "disabled");

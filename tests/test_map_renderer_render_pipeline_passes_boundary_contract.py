@@ -292,7 +292,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIn("function filterExactAfterSettleIdleRenderPassDefinitions(", exact_plan_content)
         self.assertIn("filterExactAfterSettleIdleRenderPassDefinitions(", exact_scheduler_content)
 
-    def test_water_hover_uses_svg_overlay_while_selected_water_invalidates_canvas_layer(self):
+    def test_water_hover_uses_svg_overlay_while_selection_invalidates_composite_only(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         water_token_body = renderer_content.split("function getScenarioWaterVisualRevisionToken() {", 1)[1].split("\n}", 1)[0]
         scenario_overlay_content = (MAP_RENDERER_JS.parent / "renderer" / "scenario_region_overlay_render_owner.js").read_text(encoding="utf-8")
@@ -304,7 +304,10 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         hover_overlay_body = (MAP_RENDERER_JS.parent / "renderer" / "transient_overlay_render_owner.js").read_text(encoding="utf-8")
         self.assertIn("getTransientOverlayRenderOwner().renderHoverOverlay()", renderer_content)
 
-        self.assertIn('`water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`', water_token_body)
+        selection_token = '`water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`'
+        composite_token_body = renderer_content.split("function getScenarioOverlaySignatureToken() {", 1)[1].split("\n}", 1)[0]
+        self.assertNotIn(selection_token, water_token_body)
+        self.assertIn(selection_token, composite_token_body)
         self.assertIn('String(runtimeState.selectedWaterRegionId || "").trim()', water_highlight_body)
         self.assertNotIn("runtimeState.hoveredWaterRegionId", water_highlight_body)
         self.assertIn('.attr("stroke-linejoin", "round")', hover_overlay_body)
