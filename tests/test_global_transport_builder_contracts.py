@@ -948,7 +948,9 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
         self.assertIn('showRail', state_content)
         self.assertIn('showRail', appearance_controller_content)
-        self.assertIn('showRail', renderer_content)
+        self.assertIn('getTransportOverviewRenderOwner().drawRailwaysLayer(k, options)', renderer_content)
+        transport_owner_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
+        self.assertIn('!!runtimeState.showTransport && !!runtimeState.showRail', transport_owner_content)
         self.assertIn('getTransportOverviewVisibilityField', file_manager_content)
         self.assertIn('const visibilityField = getTransportOverviewVisibilityField(familyId);', interaction_content)
         self.assertIn('const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));', interaction_content)
@@ -970,13 +972,21 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
 
         self.assertIn('showRoad', state_content)
         self.assertIn('showRoad', appearance_controller_content)
-        self.assertIn('showRoad', renderer_content)
+        self.assertIn('getTransportOverviewRenderOwner().drawRoadsLayer(k, options)', renderer_content)
+        transport_owner_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
+        self.assertIn('!!runtimeState.showTransport && !!runtimeState.showRoad', transport_owner_content)
         self.assertIn('layerName === "roads"', data_loader_content)
         self.assertIn('getTransportOverviewVisibilityFields()', file_manager_content)
         self.assertIn('const visibilityField = getTransportOverviewVisibilityField(familyId);', interaction_content)
         self.assertIn('const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));', interaction_content)
         self.assertIn('function normalizeTransportOverviewLayerVisibility(layerVisibility) {', file_manager_content)
-        self.assertIn('layerVisibility[field] = layerVisibility[field] === undefined ? false : !!layerVisibility[field];', file_manager_content)
+        self.assertRegex(
+            file_manager_content,
+            r'function normalizeTransportOverviewLayerVisibility\(layerVisibility\)\s*\{\s*'
+            r'commitUiVisibilityState\(\s*layerVisibility,\s*'
+            r'Object\.fromEntries\(getTransportOverviewVisibilityFields\(\)\.map\(\(field\) => \[\s*'
+            r'field,\s*layerVisibility\[field\] === undefined \? false : !!layerVisibility\[field\],',
+        )
         self.assertIn('transportOverviewLayerVisibility[field] = !!layerVisibility[field];', state_content)
         self.assertIn('getTransportOverviewVisibilityField,', interaction_content)
         self.assertIn('getTransportOverviewDataLayerKeys,', interaction_content)

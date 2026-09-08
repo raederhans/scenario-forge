@@ -141,25 +141,23 @@ function getScenarioImportValidFeatureIds() {
   if (!String(state.activeScenarioId || "").trim()) {
     return null;
   }
-  if (Array.isArray(state.runtimeFeatureIds) && state.runtimeFeatureIds.length) {
-    return new Set(
-      state.runtimeFeatureIds
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
+  // Chunked rendering exposes only a partial ID set. The active scenario baseline
+  // also identifies valid, currently unloaded features whose saved edits must survive.
+  const validIds = new Set(Object.keys(state.scenarioBaselineOwnersByFeatureId || {}));
+  for (const id of Array.isArray(state.runtimeFeatureIds) ? state.runtimeFeatureIds : []) {
+    if (String(id || "").trim()) validIds.add(String(id).trim());
   }
-  if (state.runtimeFeatureIndexById instanceof Map && state.runtimeFeatureIndexById.size) {
-    return new Set(
-      Array.from(state.runtimeFeatureIndexById.keys())
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
+  if (state.runtimeFeatureIndexById instanceof Map) {
+    for (const id of state.runtimeFeatureIndexById.keys()) {
+      if (String(id || "").trim()) validIds.add(String(id).trim());
+    }
   }
   const runtimeGeometries = state.runtimePoliticalTopology?.objects?.political?.geometries;
-  if (Array.isArray(runtimeGeometries) && runtimeGeometries.length) {
-    return new Set(runtimeGeometries.map((geometry) => getFeatureId(geometry)).filter(Boolean));
+  for (const geometry of Array.isArray(runtimeGeometries) ? runtimeGeometries : []) {
+    const id = getFeatureId(geometry);
+    if (id) validIds.add(id);
   }
-  return null;
+  return validIds.size ? validIds : null;
 }
 
 function resolveImportedOwnershipState(data) {
