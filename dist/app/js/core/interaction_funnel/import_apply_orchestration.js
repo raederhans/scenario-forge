@@ -141,25 +141,22 @@ function getScenarioImportValidFeatureIds() {
   if (!String(state.activeScenarioId || "").trim()) {
     return null;
   }
+  // Preserve the runtime source priority, adding trusted scenario IDs that may
+  // not yet be present in the partially loaded geometry.
+  const baselineIds = Object.keys(state.scenarioBaselineOwnersByFeatureId || {});
   if (Array.isArray(state.runtimeFeatureIds) && state.runtimeFeatureIds.length) {
-    return new Set(
-      state.runtimeFeatureIds
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
+    return new Set(baselineIds.concat(state.runtimeFeatureIds
+        .map((featureId) => String(featureId || "").trim()).filter(Boolean)));
   }
   if (state.runtimeFeatureIndexById instanceof Map && state.runtimeFeatureIndexById.size) {
-    return new Set(
-      Array.from(state.runtimeFeatureIndexById.keys())
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean)
-    );
+    return new Set(baselineIds.concat(Array.from(state.runtimeFeatureIndexById.keys())
+      .map((featureId) => String(featureId || "").trim()).filter(Boolean)));
   }
   const runtimeGeometries = state.runtimePoliticalTopology?.objects?.political?.geometries;
   if (Array.isArray(runtimeGeometries) && runtimeGeometries.length) {
-    return new Set(runtimeGeometries.map((geometry) => getFeatureId(geometry)).filter(Boolean));
+    return new Set(baselineIds.concat(runtimeGeometries.map((geometry) => getFeatureId(geometry)).filter(Boolean)));
   }
-  return null;
+  return baselineIds.length ? new Set(baselineIds) : null;
 }
 
 function resolveImportedOwnershipState(data) {

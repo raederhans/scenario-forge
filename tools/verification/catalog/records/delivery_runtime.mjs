@@ -172,6 +172,9 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "id": "infra:pages-dist",
     "commandRef": "verify:pages-dist-and-drift",
     "sourceRefs": [
+      "docs/active/recovery-followup-20260908/plan.md",
+      "docs/active/recovery-followup-20260908/context.md",
+      "docs/active/recovery-followup-20260908/task.md",
       "tools/build_pages_dist.py",
       "tools/pages_artifact_admission.py",
       "tools/pages_artifact_root.py",

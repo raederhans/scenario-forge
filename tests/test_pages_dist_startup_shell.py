@@ -69,6 +69,15 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_published_modern_world_keeps_renderable_runtime_topology(self):
+        app_root = PAGES_DIST_ROOT / "app"
+        manifest = json.loads((app_root / "data/scenarios/modern_world/manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["runtime_topology_url"], "data/scenarios/modern_world/runtime_topology.topo.json")
+        topology = json.loads((app_root / manifest["runtime_topology_url"]).read_text(encoding="utf-8"))
+        geometries = topology["objects"]["political"]["geometries"]
+        self.assertTrue(any(item.get("type") in {"Polygon", "MultiPolygon"} and item.get("arcs")
+                            for item in geometries))
+
 
     def test_checked_in_pages_dist_manifest_exists(self) -> None:
         self.assertTrue(
@@ -1357,24 +1366,25 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(inventory["graph_scan_status"], "complete")
         self.assertEqual(inventory["publication_ownership_status"], "incomplete")
         self.assertEqual(inventory["reachability_evidence"]["untraversed_file_count"], 9)
-        self.assertEqual(inventory["untraversed_owned_file_count"], 1)
-        self.assertEqual(inventory["product_inventory"]["unknown_file_count"], 8)
+        self.assertEqual(inventory["untraversed_owned_file_count"], 2)
+        self.assertEqual(inventory["product_inventory"]["unknown_file_count"], 7)
         unknown_paths = {
             record["path"]
             for record in records
-            if record["path"] != "app/data/scenarios/new_scenario/runtime.json"
+            if record["path"] not in {"app/data/scenarios/new_scenario/runtime.json",
+                                      "app/data/scenarios/modern_world/runtime_topology.topo.json"}
         }
         self.assertEqual(
             inventory["product_inventory"]["unknown_paths"],
             sorted(unknown_paths),
         )
-        self.assertIn(
+        self.assertNotIn(
             "app/data/scenarios/modern_world/runtime_topology.topo.json",
             inventory["product_inventory"]["exact_exclusions"],
         )
         self.assertEqual(
             next(item for item in inventory["categories"] if item["id"] == "unknown")["file_count"],
-            8,
+            7,
         )
         self.assertFalse(
             [
@@ -1384,7 +1394,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 if prefix.startswith("app/js/")
             ]
         )
-        with self.assertRaisesRegex(ValueError, "unknown_files=8"):
+        with self.assertRaisesRegex(ValueError, "unknown_files=7"):
             build_pages_dist.build_dist_manifest_payload(
                 records,
                 9,
@@ -2663,7 +2673,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/ETOPO_2022_v1_60s_N90W180_surface.tif",
             "app/data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson",
             "app/data/scenarios/tno_1962/audit.json",
-            "app/data/scenarios/modern_world/runtime_topology.topo.json",
             "app/data/i18n/locales_baseline.json",
             "app/data/transport_layers/global_road/shards/w120_w090/roads.topo.json",
             "app/data/transport_layers/global_rail/regions/south_america/shards/sa_w082_w058/railways.topo.json",

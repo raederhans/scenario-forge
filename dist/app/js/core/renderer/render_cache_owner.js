@@ -33,6 +33,9 @@ export function createRenderCacheOwner({
     ensureRenderPassCacheState = () => ({}),
     getTransformSignature = () => "",
     getVisibleFrameIdentity = () => ({}),
+    areZoomTransformsEquivalent,
+    withRenderTarget,
+    prepareTargetContext,
   } = helpers;
 
   function normalizeReason(reason, fallback) {
@@ -291,6 +294,111 @@ export function createRenderCacheOwner({
     const layout = buildRenderPassLayout(passName);
     cache.layouts[passName] = layout;
     return layout;
+  }
+
+  function getContextScenarioLayerCacheEntry(layerName) {
+    const cache = getRenderPassCacheState();
+    const resolvedLayerName = String(layerName || "default").trim() || "default";
+    const existing = cache.contextScenarioLayerCache?.[resolvedLayerName];
+    if (existing && typeof existing === "object") {
+      return existing;
+    }
+    const next = {
+      canvas: null,
+      signature: "",
+      referenceTransform: null,
+      renderedCount: 0,
+    };
+    cache.contextScenarioLayerCache[resolvedLayerName] = next;
+    return next;
+  }
+
+  function ensureContextScenarioLayerCanvas(layerName) {
+    const layerEntry = getContextScenarioLayerCacheEntry(layerName);
+    if (!layerEntry.canvas) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      layerEntry.canvas = canvas;
+    }
+    const layout = getRenderPassLayout("contextScenario");
+    if (layerEntry.canvas.width !== layout.pixelWidth || layerEntry.canvas.height !== layout.pixelHeight) {
+      layerEntry.canvas.width = layout.pixelWidth;
+      layerEntry.canvas.height = layout.pixelHeight;
+      clearContextScenarioLayerIdentity(layerEntry);
+    }
+    return layerEntry.canvas;
+  }
+
+  function drawCachedContextScenarioLayer(layerName, currentTransform) {
+    const layerEntry = getContextScenarioLayerCacheEntry(layerName);
+    const layerCanvas = layerEntry.canvas;
+    const referenceTransform = layerEntry.referenceTransform
+      ? cloneZoomTransform(layerEntry.referenceTransform)
+      : null;
+    if (!layerCanvas || !referenceTransform) return false;
+    const layout = getRenderPassLayout("contextScenario");
+    if (layerCanvas.width !== layout.pixelWidth || layerCanvas.height !== layout.pixelHeight) {
+      return false;
+    }
+    getContext().save();
+    getContext().setTransform(1, 0, 0, 1, 0, 0);
+    if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
+      getContext().drawImage(layerCanvas, 0, 0);
+      getContext().restore();
+      return true;
+    }
+    const current = cloneZoomTransform(currentTransform);
+    const scaleRatio = current.k / Math.max(referenceTransform.k, 0.0001);
+    const dx = current.x - (referenceTransform.x * scaleRatio);
+    const dy = current.y - (referenceTransform.y * scaleRatio);
+    const offsetX = Number(layout?.offsetX || 0);
+    const offsetY = Number(layout?.offsetY || 0);
+    getContext().translate(
+      (dx + offsetX * (1 - scaleRatio)) * state.dpr,
+      (dy + offsetY * (1 - scaleRatio)) * state.dpr,
+    );
+    getContext().scale(scaleRatio, scaleRatio);
+    getContext().drawImage(layerCanvas, 0, 0);
+    getContext().restore();
+    return true;
+  }
+
+  function getContextScenarioLayerSnapshot(layerName) {
+    const entry = getContextScenarioLayerCacheEntry(layerName);
+    return Object.freeze({
+      signature: entry.signature,
+      renderedCount: entry.renderedCount,
+      hasCanvas: !!entry.canvas,
+      hasReferenceTransform: !!entry.referenceTransform,
+    });
+  }
+
+  function clearContextScenarioLayerIdentity(entry) {
+    entry.signature = "";
+    entry.referenceTransform = null;
+    entry.renderedCount = 0;
+  }
+
+  function renderContextScenarioLayer(layerName, currentTransform, { draw, getSignature }) {
+    const entry = getContextScenarioLayerCacheEntry(layerName);
+    const canvas = ensureContextScenarioLayerCanvas(layerName);
+    // Rendering can clear or partially paint the canvas before throwing. Publish only on success.
+    clearContextScenarioLayerIdentity(entry);
+    const context = canvas.getContext("2d");
+    if (!context) return 0;
+    const layout = getRenderPassLayout("contextScenario");
+    let renderedCount = 0;
+    withRenderTarget(context, () => {
+      const k = prepareTargetContext(context, currentTransform, layout);
+      renderedCount = draw(k);
+    });
+    const signature = getSignature();
+    const referenceTransform = cloneZoomTransform(currentTransform);
+    entry.signature = signature;
+    entry.referenceTransform = referenceTransform;
+    entry.renderedCount = renderedCount;
+    return renderedCount;
   }
 
   function resizeRenderPassCanvases(passNames = renderPassNames) {
@@ -585,6 +693,11 @@ export function createRenderCacheOwner({
   }
 
   return Object.freeze({
+    scenarioLayerCache: Object.freeze({
+      getSnapshot: getContextScenarioLayerSnapshot,
+      render: renderContextScenarioLayer,
+      draw: drawCachedContextScenarioLayer,
+    }),
     canDrawInteractionComposite,
     clearLastGoodFrame,
     clearPassFullReferenceTransforms,

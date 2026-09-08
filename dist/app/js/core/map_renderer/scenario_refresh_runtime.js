@@ -245,27 +245,52 @@ function createScenarioRefreshRuntime(deps = {}) {
     }
     const startedAt = nowMs();
     const previousInteractionInfrastructureStage = String(runtimeState.interactionInfrastructureStage || "");
+    const previousInteractionInfrastructureReady = !!runtimeState.interactionInfrastructureReady;
     let restoredInteractionInfrastructureState = false;
+    let fullRestoreMutationStarted = false;
     let yieldCount = 0;
     let fullPoliticalRestoreMs = 0;
     let restoredFullPoliticalChunkData = false;
+    let preliminaryIndexBuildMs = null;
+    let preliminarySpatialBuildMs = null;
     try {
       let politicalCoverageBeforeRestore = hasPoliticalGeometryChange
         ? analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)
         : null;
       let resolvedCompletePoliticalDerivedStateReady = !!completePoliticalDerivedStateReady
         || (!!primaryDerivedStateReady && !politicalCoverageBeforeRestore?.primaryVisibleFeatureSubsetActive);
-      if (!resolvedCompletePoliticalDerivedStateReady) {
+      const shouldRestoreFullPoliticalDerivedState = (
+        hasPoliticalGeometryChange
+        && politicalCoverageBeforeRestore.completePoliticalFeatureCount > 0
+        && (
+          !resolvedCompletePoliticalDerivedStateReady
+          || !!primaryVisibleDerivedStateReady
+          || politicalCoverageBeforeRestore.primaryVisibleFeatureSubsetActive
+          || politicalCoverageBeforeRestore.landDataCoverageMissing
+          || politicalCoverageBeforeRestore.colorCoverageMissing
+        )
+      );
+      if (shouldRestoreFullPoliticalDerivedState) {
+        // The visual stage already prepared the primary subset. Full restoration
+        // below replaces its index and spatial data, so do not build them twice.
+        await yieldToMain();
+        yieldCount += 1;
+        if (promotionVersion !== scenarioChunkPromotionVersion) return false;
+      } else if (!resolvedCompletePoliticalDerivedStateReady) {
+        const indexStartedAt = nowMs();
         buildIndex();
+        preliminaryIndexBuildMs = nowMs() - indexStartedAt;
         await yieldToMain();
         yieldCount += 1;
         if (promotionVersion !== scenarioChunkPromotionVersion) {
           return false;
         }
+        const spatialStartedAt = nowMs();
         await buildSpatialIndexChunked({
           includeSecondary: false,
           keepReady: true,
         });
+        preliminarySpatialBuildMs = nowMs() - spatialStartedAt;
       }
       if (hasPoliticalGeometryChange) {
         const fullRestoreStartedAt = nowMs();
@@ -277,17 +302,8 @@ function createScenarioRefreshRuntime(deps = {}) {
           stage: "before-deferred-restore",
           coverage: politicalCoverageBeforeRestore,
         });
-        const shouldRestoreFullPoliticalDerivedState = (
-          politicalCoverageBeforeRestore.completePoliticalFeatureCount > 0
-          && (
-            !resolvedCompletePoliticalDerivedStateReady
-            || !!primaryVisibleDerivedStateReady
-            || politicalCoverageBeforeRestore.primaryVisibleFeatureSubsetActive
-            || politicalCoverageBeforeRestore.landDataCoverageMissing
-            || politicalCoverageBeforeRestore.colorCoverageMissing
-          )
-        );
         if (hasPrimaryVisiblePoliticalSubset || shouldRestoreFullPoliticalDerivedState) {
+          fullRestoreMutationStarted = true;
           setScenarioPoliticalChunkPayloadState(runtimeState, { visiblePayload: null });
         }
         if (shouldRestoreFullPoliticalDerivedState) {
@@ -366,6 +382,10 @@ function createScenarioRefreshRuntime(deps = {}) {
       }
       const infraDurationMs = nowMs() - startedAt;
       recordRenderPerfMetric("scenarioChunkPromotionInfraStage", infraDurationMs, {
+        preliminaryIndexBuildMs,
+        preliminarySpatialBuildMs,
+        preliminaryIndexBuildCount: preliminaryIndexBuildMs === null ? 0 : 1,
+        preliminarySpatialBuildCount: preliminarySpatialBuildMs === null ? 0 : 1,
         activeScenarioId: String(runtimeState.activeScenarioId || ""),
         suppressRender: !!suppressRender,
         promotionVersion,
@@ -413,9 +433,9 @@ function createScenarioRefreshRuntime(deps = {}) {
       });
       return true;
     } finally {
-      if (!restoredInteractionInfrastructureState) {
+      if (!restoredInteractionInfrastructureState && promotionVersion === scenarioChunkPromotionVersion) {
         setInteractionInfrastructureState(previousInteractionInfrastructureStage || "basic-ready", {
-          ready: true,
+          ready: previousInteractionInfrastructureReady && !fullRestoreMutationStarted,
           inFlight: false,
         });
       }

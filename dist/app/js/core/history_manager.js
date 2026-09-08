@@ -207,6 +207,20 @@ function pushHistoryEntry(entry) {
   return true;
 }
 
+function getFeatureColorHistoryIds(entry) {
+  if (entry?.meta?.affectsSovereignty) return null;
+  const ids = new Set();
+  for (const snapshot of [entry?.before, entry?.after]) {
+    if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
+    for (const [key, values] of Object.entries(snapshot)) {
+      if (key !== "visualOverrides" && key !== "featureOverrides") return null;
+      if (!values || typeof values !== "object" || Array.isArray(values)) return null;
+      Object.keys(values).forEach((id) => ids.add(id));
+    }
+  }
+  return ids.size ? Array.from(ids) : null;
+}
+
 function refreshUiAfterHistory(direction, entry) {
   // undo/redo 之后统一从这里补 UI 和 render side effects，
   // 调用方只负责准备 before/after，不要在外面各自手写半套刷新逻辑。
@@ -214,7 +228,11 @@ function refreshUiAfterHistory(direction, entry) {
     runtimeState.sovereigntyInitialized = true;
     rebuildOwnerIndex();
   }
-  callRuntimeHook(state, "refreshColorStateFn", { renderNow: false });
+  const featureIds = getFeatureColorHistoryIds(entry);
+  callRuntimeHook(state, "refreshColorStateFn", {
+    renderNow: false,
+    ...(featureIds ? { featureIds, inputLabel: `history-${direction}` } : {}),
+  });
   if (entry?.meta?.affectsSovereignty) {
     callRuntimeHook(state, "recomputeDynamicBordersNowFn", { renderNow: false, reason: `history-${direction}` });
   }

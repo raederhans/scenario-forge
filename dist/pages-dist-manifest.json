@@ -39832,12 +39832,17 @@
     },
     {
       "path": "app/data/scenarios/modern_world/manifest.json",
-      "size_bytes": 2462,
+      "size_bytes": 2546,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/modern_world/owners.by_feature.json",
       "size_bytes": 389458,
+      "source_kind": "generated_ignored"
+    },
+    {
+      "path": "app/data/scenarios/modern_world/runtime_topology.topo.json",
+      "size_bytes": 8506077,
       "source_kind": "generated_ignored"
     },
     {
@@ -45727,7 +45732,7 @@
     },
     {
       "path": "app/js/core/history_manager.js",
-      "size_bytes": 13567,
+      "size_bytes": 14318,
       "source_kind": "dist"
     },
     {
@@ -45752,7 +45757,7 @@
     },
     {
       "path": "app/js/core/interaction_funnel/import_apply_orchestration.js",
-      "size_bytes": 6081,
+      "size_bytes": 6361,
       "source_kind": "dist"
     },
     {
@@ -45782,7 +45787,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 562769,
+      "size_bytes": 560824,
       "source_kind": "dist"
     },
     {
@@ -45887,7 +45892,7 @@
     },
     {
       "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-      "size_bytes": 32164,
+      "size_bytes": 33359,
       "source_kind": "dist"
     },
     {
@@ -46182,7 +46187,7 @@
     },
     {
       "path": "app/js/core/renderer/render_cache_owner.js",
-      "size_bytes": 22814,
+      "size_bytes": 27170,
       "source_kind": "dist"
     },
     {
@@ -46272,12 +46277,12 @@
     },
     {
       "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-      "size_bytes": 26902,
+      "size_bytes": 20842,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/renderer/scenario_relief_overlay_render_owner.js",
-      "size_bytes": 9139,
+      "size_bytes": 11565,
       "source_kind": "dist"
     },
     {
@@ -46597,7 +46602,7 @@
     },
     {
       "path": "app/js/core/scenario_manager.js",
-      "size_bytes": 55558,
+      "size_bytes": 56332,
       "source_kind": "dist"
     },
     {
@@ -47787,7 +47792,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2149854,
+      "size_bytes": 2150016,
       "source_kind": "dist"
     },
     {
@@ -47906,13 +47911,13 @@
       "graph_scan_status": "complete",
       "publication_ownership_status": "complete",
       "status": "complete",
-      "untraversed_owned_file_count": 9151
+      "untraversed_owned_file_count": 9152
     },
     "categories": [
       {
         "file_count": 236,
         "id": "startup-critical",
-        "size_bytes": 5398395
+        "size_bytes": 5395777
       },
       {
         "file_count": 95,
@@ -47922,12 +47927,12 @@
       {
         "file_count": 821,
         "id": "on-demand-product",
-        "size_bytes": 252995510
+        "size_bytes": 252995672
       },
       {
-        "file_count": 8390,
+        "file_count": 8391,
         "id": "scenario-specific",
-        "size_bytes": 696163159
+        "size_bytes": 704673715
       },
       {
         "file_count": 5,
@@ -51480,7 +51485,7 @@
               {
                 "column": 1,
                 "kind": "export-named-source",
-                "line": 14595,
+                "line": 14536,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -63852,22 +63857,22 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3084822,
+        "deferred_graph_bytes": 3085596,
         "deferred_graph_file_count": 125,
         "deferred_module_count": 124,
         "deferred_resource_count": 1,
-        "initial_graph_bytes": 5363124,
+        "initial_graph_bytes": 5364127,
         "initial_graph_file_count": 270,
         "initial_module_count": 256,
         "initial_resource_count": 14,
-        "initial_script_bytes": 4004798,
+        "initial_script_bytes": 4005801,
         "initial_script_count": 258,
         "module_count": 387,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 949065655,
-        "untraversed_dist_file_count": 9151,
+        "untraversed_dist_bytes": 957571978,
+        "untraversed_dist_file_count": 9152,
         "untraversed_module_count": 7
       },
       "unresolved_references": []
@@ -64013,7 +64018,7 @@
           },
           {
             "path": "app/js/core/history_manager.js",
-            "size_bytes": 13567
+            "size_bytes": 14318
           },
           {
             "path": "app/js/core/i18n.js",
@@ -64041,7 +64046,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 562769
+            "size_bytes": 560824
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -64337,7 +64342,7 @@
           },
           {
             "path": "app/js/core/renderer/render_cache_owner.js",
-            "size_bytes": 22814
+            "size_bytes": 27170
           },
           {
             "path": "app/js/core/renderer/render_pass_cache_state_normalizer.js",
@@ -64401,7 +64406,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-            "size_bytes": 26902
+            "size_bytes": 20842
           },
           {
             "path": "app/js/core/renderer/selection_overlay_owner.js",
@@ -64733,7 +64738,7 @@
           {
             "file_count": 3,
             "prefix": "app/js/core/interaction_funnel/",
-            "size_bytes": 9769
+            "size_bytes": 10049
           },
           {
             "file_count": 4,
@@ -64741,7 +64746,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 2972856
+        "size_bytes": 2970238
       },
       {
         "basis": "startup-resource-graph",
@@ -65602,11 +65607,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2149854
+            "size_bytes": 2150016
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2149854
+        "size_bytes": 2150016
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -65753,7 +65758,7 @@
           },
           {
             "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-            "size_bytes": 32164
+            "size_bytes": 33359
           },
           {
             "path": "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
@@ -65765,7 +65770,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_relief_overlay_render_owner.js",
-            "size_bytes": 9139
+            "size_bytes": 11565
           },
           {
             "path": "app/js/core/renderer/scenario_water_cache_policy_owner.js",
@@ -65857,7 +65862,7 @@
           },
           {
             "path": "app/js/core/scenario_manager.js",
-            "size_bytes": 55558
+            "size_bytes": 56332
           },
           {
             "path": "app/js/core/scenario_ownership_editor.js",
@@ -65949,19 +65954,19 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 952016
+        "size_bytes": 956411
       },
       {
         "basis": "product-registry:scenario-runtime-data",
         "category": "scenario-specific",
-        "file_count": 936,
+        "file_count": 937,
         "owner": "scenario-runtime",
         "path_exceptions": [],
         "path_prefixes": [
           {
-            "file_count": 927,
+            "file_count": 928,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 682728084
+            "size_bytes": 691234245
           },
           {
             "file_count": 9,
@@ -65969,7 +65974,7 @@
             "size_bytes": 118248
           }
         ],
-        "size_bytes": 682846332
+        "size_bytes": 691352493
       },
       {
         "basis": "product-registry:export-modules",
@@ -66039,7 +66044,7 @@
       }
     ],
     "product_inventory": {
-      "classified_file_count": 9559,
+      "classified_file_count": 9560,
       "exact_exclusions": [],
       "publication_ownership_status": "complete",
       "registry_rules": [
@@ -66156,11 +66161,11 @@
             "prefixes": []
           },
           "owner": "scenario-runtime",
-          "size_bytes": 952016
+          "size_bytes": 956411
         },
         {
           "category": "scenario-specific",
-          "file_count": 936,
+          "file_count": 937,
           "id": "scenario-runtime-data",
           "match": {
             "exact_paths": [],
@@ -66170,7 +66175,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 682846332
+          "size_bytes": 691352493
         },
         {
           "category": "scenario-specific",
@@ -66409,11 +66414,11 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2149854
+          "size_bytes": 2150016
         }
       ],
       "status": "complete",
-      "total_file_count": 9559,
+      "total_file_count": 9560,
       "unknown_file_count": 0,
       "unknown_paths": []
     },
@@ -66422,15 +66427,15 @@
       "graph_scan_status": "complete",
       "registry_resolved_dynamic_expression_count": 2,
       "status": "complete",
-      "total_file_count": 9559,
+      "total_file_count": 9560,
       "traversed_file_count": 408,
       "unresolved_dynamic_expression_count": 0,
       "unresolved_reference_count": 0,
-      "untraversed_file_count": 9151,
-      "untraversed_owned_file_count": 9151
+      "untraversed_file_count": 9152,
+      "untraversed_owned_file_count": 9152
     },
     "schema_version": 2,
-    "untraversed_owned_file_count": 9151
+    "untraversed_owned_file_count": 9152
   },
   "required_files": [
     "index.html",
@@ -66450,9 +66455,9 @@
   },
   "top_level_directories": [
     {
-      "file_count": 9497,
+      "file_count": 9498,
       "path": "app",
-      "size_bytes": 951354539
+      "size_bytes": 959862477
     },
     {
       "file_count": 57,
@@ -66462,7 +66467,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2149854
+      "size_bytes": 2150016
     },
     {
       "file_count": 1,
@@ -66485,5 +66490,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 958295006
+  "total_bytes": 966803106
 }
