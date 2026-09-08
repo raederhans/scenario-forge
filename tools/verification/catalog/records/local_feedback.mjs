@@ -163,6 +163,26 @@ export function createLocalFeedbackRecords(baseRecords) {
     verification: null, selector: {},
   };
 
+  const historyColorRecord = {
+    ...editorCheckoutRecord,
+    id: "local:history-feature-color-refresh",
+    commandRef: "node --test tests/history_feature_color_refresh_behavior.test.mjs",
+    sourceRefs: ["tests/history_feature_color_refresh_behavior.test.mjs", "js/core/history_manager.js", "js/core/map_renderer.js"],
+    ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 1,
+  };
+  const runtimeInputRecord = {
+    ...editorCheckoutRecord,
+    id: "e2e:runtime-input-latency",
+    commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js --workers=1 --retries=0",
+    sourceRefs: ["tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"],
+    ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
+    executionOwners: ["main-thread"], profiles: ["full"], entrypointPolicyIndex: 0,
+    selectorOrder: editorCheckoutRecord.selectorOrder + 2,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
-    ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord];
+    ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
+    historyColorRecord, runtimeInputRecord];
 }
