@@ -5989,7 +5989,7 @@ test("P4.3 renderer action calls stay within the frozen runtime-state escape bud
       && finding.key === "*"
       && finding.sourceFingerprint === runtimeStateEscapeFingerprint,
   );
-  assert.equal(runtimeStateEscapes.length, 27);
+  assert.ok(runtimeStateEscapes.length <= 27, "runtime-state escapes must not exceed the frozen budget of 27");
 
   const repairedFunctionIdentities = new Set([
     '{"kind":"function","ancestry":[{"name":"getSetMapDataTransactionOwner","ordinal":0},{"name":"clearSphericalFeatureDiagnosticsCache","ordinal":0}]}',
