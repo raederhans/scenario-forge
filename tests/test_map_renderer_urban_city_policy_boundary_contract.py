@@ -28,7 +28,7 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         renderer_export_block = self.get_map_renderer_export_block(renderer_content)
 
         self.assertIn(
-            "import { createUrbanCityPolicyOwner, getUrbanCityRenderPassSignatureParts } from './renderer/urban_city_policy.js';",
+            "import { createUrbanCityPolicyOwner } from './renderer/urban_city_policy.js';",
             renderer_imports,
         )
         self.assertIn("import { createCityPointsRenderOwner } from './renderer/city_points_render_owner.js';", renderer_imports)
@@ -105,11 +105,12 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         city_lights_content = CITY_LIGHTS_RENDER_OWNER_JS.read_text(encoding="utf-8")
         day_night_owner_content = DAY_NIGHT_RUNTIME_OWNER_JS.read_text(encoding="utf-8")
         intensity_content = (REPO_ROOT / "js" / "core" / "intensity_field.js").read_text(encoding="utf-8")
-        context_base_body = renderer_content.split('if (passName === "contextBase") {', 1)[1].split(
+        signature_content = (URBAN_CITY_POLICY_JS.parent / "render_pass_signature_policy.js").read_text(encoding="utf-8")
+        context_base_body = signature_content.split('if (passName === "contextBase") {', 1)[1].split(
             '\n  }',
             1,
         )[0]
-        day_night_body = renderer_content.split('if (passName === "dayNight") {', 1)[1].split(
+        day_night_body = signature_content.split('if (passName === "dayNight") {', 1)[1].split(
             '\n  }',
             1,
         )[0]
