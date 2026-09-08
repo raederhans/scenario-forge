@@ -3,7 +3,7 @@
 - [x] R0: source/artifact closure merged in PR #124 as fbf89bee; automatic deployment 34207190613 succeeded.
 - [x] T1: real history fixture actions and hook/state restoration merged in PR #124 (7508660a integrated as 52c08e51); 4 behavior tests and direct-writer scan passed.
 - [x] U1: import outcome feedback merged in PR #125 as 84efc954 after all six required checks passed.
-- [x] P1: bounded water optimization and corrected measurement accepted locally. Remote admission and deployment are determined by the pull request containing this record, not these local checkboxes.
+- [x] P1: bounded water optimization, controlled-busy comparison and separate natural-background coverage passed locally. PR #126 carries remote admission; deployment is verified separately from these local checkboxes.
 
 ## R0 and U1 evidence
 
@@ -17,7 +17,7 @@ Only one hotspot changed: the water part projected bounds cache is shared by cov
 
 Final measurement v2 uses real mouse input concurrent with real renderer work, native EventTiming, separate capture/visible/stable boundaries, and separate wheel timing. Trace is off only in this dev diagnostic because before-action snapshots were delaying input. Stable timing includes a 250 ms hold and visible means canvas/SVG sampled at rAF, not display presentation.
 
-Twelve fixed-machine interleaved runs passed: stable A2/B2 and busy A4/B4, 60 operations, 32/32 busy discrete inputs with actual task/queue overlap. Primary independently recomputed the raw metadata, overlaps and redo medians. All four neighboring busy redo pairs improved. Water draw run medians: stable 522.6 -> 355.4 ms; busy 544.05 -> 403.6 ms.
+Twelve fixed-machine interleaved runs passed: stable A2/B2 and controlled-busy A4/B4, 60 operations, 32/32 controlled-busy discrete inputs with actual task/queue overlap. Primary independently recomputed the raw metadata, overlaps and redo medians. All four neighboring controlled-busy redo pairs improved. Water draw run medians: stable 522.6 -> 355.4 ms; controlled-busy 544.05 -> 403.6 ms. This controlled work is separate from natural post-ready background promotion.
 
 Native input-to-visible medians (ms):
 
@@ -33,3 +33,11 @@ Stable selection includes one B sample at 818.5 ms; stable results are not unifo
 Unchanged B runtime qualification: overlay/cache-policy 30/30; projected bounds/fit/history/cancellation 40/40; HOI4 input and TNO/HOI4/TNO 2/2. All twelve v2 runs retain immediate undo and exact zoom assertions. Final integrated generated-dist cache check is recorded in .runtime/tmp/p1-dist-water.log.
 
 Authoritative report in collaborator worktree 5d0c: .runtime/reports/generated/p1-water-bounds-evidence-v2.md; full distributions and raw index: .runtime/tmp/p1/v2-summary.json and v2-raw-files.json. Old v1 data is retained as exploration only because it lacked actual busy overlap and mixed trace/actionability waiting. It is not acceptance evidence.
+
+## Natural-background supplement
+
+Four additional fixed-machine ABBA runs passed without a pre-edit global idle barrier or injected renderer work. Real pointer input saw 6/5/5/4 post-ready tasks pending, with interaction ready and boot unlocked. Promotion sequences advanced afterward; painted pixels and overrides survived task drain. A separate immediate edit/undo pair passed after drain. Primary independently read all four raw records and recomputed timings.
+
+Native input-to-visible ABBA: 69.9/69.4/102.9/92.6 ms. Native input-to-stable: 10146.3/9741.6/11978.0/12036.3 ms, including natural task drain and a 250 ms stable hold. This small group proves natural-window coverage and records absolute costs; it is not pooled with controlled-busy v2 and supports no performance improvement or percentile claim.
+
+Supplement commit 5e822284 changes only the existing dev measurement file. Runtime, scheduler, build and dist are unchanged. Report in collaborator worktree 5d0c: .runtime/reports/generated/p1-natural-background-evidence.md; summary/raw index: .runtime/tmp/p1/natural-summary.json and natural-raw-files.json. The four formal runs exclude calibration samples. Collaborator browser and port8008 server were stopped.
