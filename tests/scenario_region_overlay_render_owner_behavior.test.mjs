@@ -4,6 +4,7 @@ import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.j
 import { createScenarioReliefOverlayRenderOwner } from "../js/core/renderer/scenario_relief_overlay_render_owner.js";
 import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
+import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
 
 function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
   const events = [];
@@ -21,6 +22,8 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
   let revision = "water-1";
   let projection = "projection-1";
   let adaptiveDirect = false;
+  let boundsAvailable = true;
+  let visible = true;
   const oldDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const oldPath = Object.getOwnPropertyDescriptor(globalThis, "Path2D");
   Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: () => ({ width: 1, height: 1, getContext: () => noLayerContext ? null : layer }) } });
@@ -76,8 +79,8 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
     isWaterRegionRenderable: () => true,
     getWaterRegionDefaultStyle: () => ({ opacity: 0.6 }),
     collectSafeWaterRegionGeometryParts: (feature) => feature.parts,
-    projectedGeoBoundsInScreen: () => true,
-    computeProjectedGeoBounds: (part) => part,
+    projectedGeoBoundsInScreen: (bounds) => { events.push(["cull", state.zoomTransform.k, bounds]); return !!bounds && visible; },
+    computeProjectedGeoBounds: (part) => { events.push(["bounds", projection, part.id]); return boundsAvailable ? { minX: 0, minY: 0, maxX: 10, maxY: 10, part, projection } : null; },
     getWaterRegionColor: () => "#123456",
     getScenarioWaterVisualRevisionToken: () => revision,
     isWaterRegionEnabled: () => true,
@@ -104,8 +107,10 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
     shouldEnableContextScenarioTransformReuse: () => true,
     shouldUseDirectScenarioWaterDraw: () => adaptiveDirect,
   });
-  return { owner, reliefOwner, cacheOwner, state, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
+  return { owner, reliefOwner, cacheOwner, state, water, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
     setNoLayerContext: (value) => { noLayerContext = value; },
+    setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
+    replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
     setMode: (value) => { mode = value; }, setRevision: (value) => { revision = value; },
     setProjection: (value) => { projection = value; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
@@ -125,6 +130,52 @@ test("water cache draws into the live target then reuses with DPR and overscan t
   assert.deepEqual(h.events.find((event) => event[1] === "scale"), ["main", "scale", 2, 2]);
   assert.equal(h.events.some((event) => event[1] === "fill"), false);
   assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+});
+
+test("water bounds reuse projection coordinates while zoom culling and selection stay live", t => {
+  const h = harness(t, { mode: "direct" });
+  h.draw();
+  h.state.zoomTransform = { k: 2, x: 10, y: 20 };
+  h.state.selectedWaterRegionId = "water";
+  h.draw();
+  assert.equal(h.events.filter(e => e[0] === "bounds").length, 1);
+  assert.ok(h.events.some(e => e[0] === "cull" && e[1] === 2));
+  h.setVisible(false); h.events.length = 0; h.draw();
+  assert.equal(h.events.some(e => e[1] === "fill"), false);
+  h.setVisible(true); h.replaceWaterPart(); h.draw();
+  assert.ok(h.events.some(e => e[0] === "bounds" && e[2] === "replacement"));
+  h.setProjection("projection-2"); h.owner.resetWaterPathCaches(); h.draw();
+  assert.ok(h.events.some(e => e[0] === "bounds" && e[1] === "projection-2"));
+});
+
+test("failed water bounds do not poison the cache", t => {
+  const h = harness(t, { mode: "direct" });
+  h.setBoundsAvailable(false); h.draw();
+  assert.equal(h.owner.getPreviousWaterRenderedCount(), 0);
+  h.setBoundsAvailable(true); h.draw();
+  assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
+  assert.equal(h.events.filter(e => e[0] === "bounds").length, 2);
+});
+
+test("coverage policy and water drawing share bounds but recompute screen coverage after zoom", t => {
+  const h = harness(t, { mode: "direct" });
+  const policy = createScenarioWaterCachePolicyOwner({
+    state: h.state,
+    helpers: {
+      collectSafeWaterRegionGeometryParts: feature => feature.parts,
+      computeProjectedGeoBounds: part => h.owner.getScenarioWaterPartBounds(part),
+    },
+  });
+  const firstCoverage = policy.getScenarioWaterCacheComplexitySignals([h.water]).visibleCoverageRatio;
+  h.draw();
+  h.state.zoomTransform = { k: 2, x: 0, y: 0 };
+  const zoomCoverage = policy.getScenarioWaterCacheComplexitySignals([h.water]).visibleCoverageRatio;
+  assert.ok(zoomCoverage > firstCoverage);
+  h.draw();
+  assert.equal(h.events.filter(e => e[0] === "bounds").length, 1);
+  h.owner.resetWaterPathCaches();
+  policy.getScenarioWaterCacheComplexitySignals([h.water]); h.draw();
+  assert.equal(h.events.filter(e => e[0] === "bounds").length, 2);
 });
 
 test("revision, dimensions and replacement cache each redraw while path cache resets with projection", (t) => {
@@ -242,6 +293,7 @@ test("renderer wires projection and adaptive resets to the same overlay owner", 
   assert.match(source, /createScenarioRegionOverlayRenderOwner\(runtimeState,\s*\{\s*rendererSurfaceHost,/);
   assert.match(source, /resetHostWaterPathCaches: \(\) => \{\s*scenarioRegionOverlayRenderOwner\?\.resetWaterPathCaches\(\);/);
   assert.match(source, /getPreviousRenderedCount: \(\) => getScenarioRegionOverlayRenderOwner\(\)\.getPreviousWaterRenderedCount\(\),/);
+  assert.match(source, /computeProjectedGeoBounds: \(part\) => getScenarioRegionOverlayRenderOwner\(\)\.getScenarioWaterPartBounds\(part\),/);
   assert.match(source, /function resetScenarioWaterCacheAdaptiveState\([^)]*\) \{\s*scenarioRegionOverlayRenderOwner\?\.resetPreviousWaterRenderedCount\(\);/);
   assert.match(source, /function drawScenarioRegionOverlaysPass\(k\) \{\s*return getScenarioRegionOverlayRenderOwner\(\)\.drawScenarioRegionOverlaysPass\(k\);/);
   assert.doesNotMatch(source, /let scenarioWater(?:Part|Feature)PathCache/);

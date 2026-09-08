@@ -2677,7 +2677,7 @@ function getScenarioWaterCachePolicyOwner() {
     helpers: {
       cloneZoomTransform: (transform) => cloneZoomTransform(transform || globalThis.d3?.zoomIdentity),
       collectSafeWaterRegionGeometryParts,
-      computeProjectedGeoBounds,
+      computeProjectedGeoBounds: (part) => getScenarioRegionOverlayRenderOwner().getScenarioWaterPartBounds(part),
       isWaterRegionRenderable,
     },
   });
