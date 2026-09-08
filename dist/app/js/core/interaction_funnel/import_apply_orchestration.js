@@ -29,15 +29,25 @@ export async function prepareImportedProjectState({
 
   debugState.importPhase = "migration";
   const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds();
+  let migrationSummary = null;
   data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
     landData: scenarioImportValidFeatureIds ? null : state.landData,
     validFeatureIds: scenarioImportValidFeatureIds,
+    onMigration: (summary) => { migrationSummary = summary; },
   });
   debugState.importPhase = "migration-done";
   return {
     data,
     importedOwnershipState: resolveImportedOwnershipState(data),
     scenarioImportAudit,
+    importSummary: {
+      scenarioId: String(state.activeScenarioId || ""),
+      scenarioName: String(state.activeScenarioManifest?.display_name || state.activeScenarioId || ""),
+      restoredColorEntries: Object.keys(data.visualOverrides || {}).length,
+      restoredOwnershipEntries: Object.keys(data.sovereigntyByFeatureId || {}).length,
+      ignoredEntries: migrationSummary?.ignoredEntries ?? null,
+      migratedEntries: migrationSummary?.migratedEntries ?? 0,
+    },
   };
 }
 

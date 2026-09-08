@@ -677,13 +677,12 @@ export function createProjectSupportDiagnosticsController({
       hooks: {
         refreshColorState: mapRenderer.refreshColorState,
         invalidateFrontlineOverlayState,
-        onProjectImportComplete: () => {
-          refreshProjectSaveStatus();
+        onProjectImportComplete: (summary) => {
+          completeProjectImportStatus(summary);
           setBackendCloudStatus(t("Community save loaded into the editor.", "ui"));
         },
-        onProjectImportError: () => {
-          const message = t("Project import failed before completion. Review the current map state.", "ui");
-          refreshProjectSaveStatus(message);
+        onProjectImportError: (error) => {
+          const message = failProjectImportStatus(error);
           setBackendCloudStatus(message);
         },
       },
@@ -867,6 +866,36 @@ export function createProjectSupportDiagnosticsController({
     legendManager.getSpecialZoneLayers(state)
   );
 
+  let lastProjectImportSummary = null;
+  const formatProjectImportSummary = (summary) => {
+    const scenario = summary.scenarioName || summary.scenarioId || t("None", "ui");
+    const restored = t("Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.", "ui")
+      .replace("{scenario}", scenario)
+      .replace("{colors}", String(summary.restoredColorEntries))
+      .replace("{owners}", String(summary.restoredOwnershipEntries));
+    const details = [restored];
+    if (summary.ignoredEntries > 0) {
+      details.push(t("Ignored {count} entries that are not valid for this map.", "ui")
+        .replace("{count}", String(summary.ignoredEntries)));
+    }
+    if (summary.migratedEntries > 0) {
+      details.push(t("Updated {count} entries to the current map regions.", "ui")
+        .replace("{count}", String(summary.migratedEntries)));
+    }
+    return details.join(" ");
+  };
+  const completeProjectImportStatus = (summary) => {
+    lastProjectImportSummary = summary || null;
+    refreshProjectSaveStatus();
+  };
+  const failProjectImportStatus = (error) => {
+    lastProjectImportSummary = null;
+    const message = error?.code === "IMPORT_ABORTED"
+      ? t("Project import cancelled.", "ui")
+      : t("Project import failed before completion. Review the current map state.", "ui");
+    refreshProjectSaveStatus(message);
+    return message;
+  };
   const refreshProjectSaveStatus = (message = "") => {
     // 保存状态只读 dirty contract 与最近一次项目事务，避免各按钮各自拼接状态文案。
     if (!projectSaveStatus) return;
@@ -888,7 +917,9 @@ export function createProjectSupportDiagnosticsController({
       return;
     }
     if (lastChange === "project-import") {
-      setStatusMessage(t("Project imported. Appearance and transport settings were restored from the JSON file.", "ui"));
+      setStatusMessage(lastProjectImportSummary
+        ? formatProjectImportSummary(lastProjectImportSummary)
+        : t("Project imported. Appearance and transport settings were restored from the JSON file.", "ui"));
       return;
     }
     setStatusMessage("");
@@ -1651,6 +1682,7 @@ export function createProjectSupportDiagnosticsController({
           projectFileName.textContent = file.name;
         }
         refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
+        lastProjectImportSummary = null;
         try {
           const { file: importFile, preview } = await prepareProjectImportFile(file);
           if (!(await confirmProjectPackagePreview(preview))) {
@@ -1666,8 +1698,8 @@ export function createProjectSupportDiagnosticsController({
             hooks: {
               refreshColorState: mapRenderer.refreshColorState,
               invalidateFrontlineOverlayState,
-              onProjectImportComplete: () => refreshProjectSaveStatus(),
-              onProjectImportError: () => refreshProjectSaveStatus(t("Project import failed before completion. Review the current map state.", "ui")),
+              onProjectImportComplete: completeProjectImportStatus,
+              onProjectImportError: failProjectImportStatus,
             },
           });
         } catch (error) {

@@ -178,7 +178,7 @@ function createController(projectSaveStatus, overrides = {}) {
   };
   const nodesById = new Map(Object.entries(elements).map(([name, node]) => [elementIds[name] || name, node]));
   return createProjectSupportDiagnosticsController({
-    state,
+    state: overrides.state || state,
     hosts: overrides.hosts,
     documentRef: overrides.documentRef || {
       getElementById: (id) => nodesById.get(id) || null,
@@ -823,6 +823,43 @@ test("local project zip load unwraps editable project before import funnel", asy
   assert.equal(importedFile.name, "map_project.json");
   assert.match(await importedFile.text(), /"schemaVersion":21/);
   assert.equal(projectFileInput.value, "");
+});
+
+test("local project import reports restored entries and keeps cancellation distinct", async () => {
+  const projectSaveStatus = createStatusNode();
+  const projectFileInput = { ...createButtonNode(), files: [{ name: "saved.json" }], value: "saved.json" };
+  const runtime = { isDirty: true, lastDirtyReason: "paint" };
+  let hooks;
+  const controller = createController(projectSaveStatus, {
+    state: runtime,
+    elements: { projectFileInput },
+    helpers: { importProjectThroughFunnel: (_file, options) => { hooks = options.hooks; } },
+  });
+  controller.bindEvents();
+  await projectFileInput.listeners.change();
+  hooks.onProjectImportError({ code: "IMPORT_ABORTED" });
+  assert.equal(projectSaveStatus.textContent, "Project import cancelled.");
+  assert.equal(runtime.isDirty, true);
+  hooks.onProjectImportError(new Error("apply failed"));
+  assert.match(projectSaveStatus.textContent, /failed before completion/);
+  assert.doesNotMatch(projectSaveStatus.textContent, /Project imported:/);
+  assert.equal(runtime.isDirty, true);
+  runtime.isDirty = false;
+  runtime.lastDirtyReason = "project-import";
+  hooks.onProjectImportComplete({
+    scenarioId: "hoi4_1936", scenarioName: "HOI4 1936",
+    restoredColorEntries: 2, restoredOwnershipEntries: 1, ignoredEntries: 3, migratedEntries: 0,
+  });
+  assert.equal(projectSaveStatus.textContent,
+    "Project imported: HOI4 1936. Restored 2 color entries and 1 ownership entries. Ignored 3 entries that are not valid for this map.");
+  controller.refreshProjectSaveStatus();
+  assert.match(projectSaveStatus.textContent, /Ignored 3 entries/);
+  hooks.onProjectImportComplete({
+    scenarioId: "tno_1962", scenarioName: "TNO 1962",
+    restoredColorEntries: 1, restoredOwnershipEntries: 0, ignoredEntries: 0, migratedEntries: 0,
+  });
+  assert.match(projectSaveStatus.textContent, /TNO 1962/);
+  assert.doesNotMatch(projectSaveStatus.textContent, /Ignored/);
 });
 
 test("local project zip preview cancel clears selected file input", async () => {

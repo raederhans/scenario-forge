@@ -37077,7 +37077,7 @@
     },
     {
       "path": "app/data/locales.json",
-      "size_bytes": 8466309,
+      "size_bytes": 8467060,
       "source_kind": "generated_ignored"
     },
     {
@@ -45752,12 +45752,12 @@
     },
     {
       "path": "app/js/core/interaction_funnel.js",
-      "size_bytes": 18245,
+      "size_bytes": 18418,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/interaction_funnel/import_apply_orchestration.js",
-      "size_bytes": 6361,
+      "size_bytes": 6933,
       "source_kind": "dist"
     },
     {
@@ -46647,7 +46647,7 @@
     },
     {
       "path": "app/js/core/sovereignty_manager.js",
-      "size_bytes": 17644,
+      "size_bytes": 18308,
       "source_kind": "dist"
     },
     {
@@ -47037,7 +47037,7 @@
     },
     {
       "path": "app/js/ui/sidebar/project_support_diagnostics_controller.js",
-      "size_bytes": 75585,
+      "size_bytes": 76955,
       "source_kind": "dist"
     },
     {
@@ -47917,17 +47917,17 @@
       {
         "file_count": 236,
         "id": "startup-critical",
-        "size_bytes": 5395777
+        "size_bytes": 5397186
       },
       {
         "file_count": 95,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3420462
+        "size_bytes": 3421832
       },
       {
         "file_count": 821,
         "id": "on-demand-product",
-        "size_bytes": 252995672
+        "size_bytes": 252996423
       },
       {
         "file_count": 8391,
@@ -63857,21 +63857,21 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3085596,
+        "deferred_graph_bytes": 3086966,
         "deferred_graph_file_count": 125,
         "deferred_module_count": 124,
         "deferred_resource_count": 1,
-        "initial_graph_bytes": 5364127,
+        "initial_graph_bytes": 5365536,
         "initial_graph_file_count": 270,
         "initial_module_count": 256,
         "initial_resource_count": 14,
-        "initial_script_bytes": 4005801,
+        "initial_script_bytes": 4007210,
         "initial_script_count": 258,
         "module_count": 387,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 957571978,
+        "untraversed_dist_bytes": 957572729,
         "untraversed_dist_file_count": 9152,
         "untraversed_module_count": 7
       },
@@ -64034,7 +64034,7 @@
           },
           {
             "path": "app/js/core/interaction_funnel.js",
-            "size_bytes": 18245
+            "size_bytes": 18418
           },
           {
             "path": "app/js/core/legend_manager.js",
@@ -64542,7 +64542,7 @@
           },
           {
             "path": "app/js/core/sovereignty_manager.js",
-            "size_bytes": 17644
+            "size_bytes": 18308
           },
           {
             "path": "app/js/core/special_zone_layers.js",
@@ -64738,7 +64738,7 @@
           {
             "file_count": 3,
             "prefix": "app/js/core/interaction_funnel/",
-            "size_bytes": 10049
+            "size_bytes": 10621
           },
           {
             "file_count": 4,
@@ -64746,7 +64746,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 2970238
+        "size_bytes": 2971647
       },
       {
         "basis": "startup-resource-graph",
@@ -65213,10 +65213,10 @@
           {
             "file_count": 13,
             "prefix": "app/js/ui/sidebar/",
-            "size_bytes": 363377
+            "size_bytes": 364747
           }
         ],
-        "size_bytes": 2555267
+        "size_bytes": 2556637
       },
       {
         "basis": "product-registry:milsymbol-deferred-vendor",
@@ -65336,7 +65336,7 @@
           },
           {
             "path": "app/data/locales.json",
-            "size_bytes": 8466309
+            "size_bytes": 8467060
           },
           {
             "path": "app/data/manifest.json",
@@ -65372,7 +65372,7 @@
             "size_bytes": 1095022
           }
         ],
-        "size_bytes": 124705596
+        "size_bytes": 124706347
       },
       {
         "basis": "product-registry:on-demand-module-entries",
@@ -66311,7 +66311,7 @@
             ]
           },
           "owner": "editor-data-runtime",
-          "size_bytes": 124705596
+          "size_bytes": 124706347
         },
         {
           "category": "on-demand-product",
@@ -66457,7 +66457,7 @@
     {
       "file_count": 9498,
       "path": "app",
-      "size_bytes": 959862477
+      "size_bytes": 959866007
     },
     {
       "file_count": 57,
@@ -66490,5 +66490,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 966803106
+  "total_bytes": 966806636
 }

@@ -356,6 +356,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   debugState.lastImportedScenarioId = String(state.activeScenarioId || "");
   syncProjectImportUiState({ scenarioImportAudit, hooks });
   debugState.importPhase = "complete";
+  return preparedImport.importSummary;
 }
 
 export function bindInteractionFunnel({
@@ -391,11 +392,12 @@ export function importProjectThroughFunnel(file, options = {}) {
   debugState.importPhase = "file-read";
   debugState.lastImportError = "";
   debugState.lastImportFileName = String(file?.name || "");
+  let importSummary = null;
   FileManager.importProject(
     file,
     async (data) => {
       try {
-        await applyImportedProjectState(data, { ui, hooks });
+        importSummary = await applyImportedProjectState(data, { ui, hooks });
       } catch (error) {
         debugState.importPhase = "error";
         debugState.lastImportError = String(error?.message || error || "");
@@ -403,8 +405,8 @@ export function importProjectThroughFunnel(file, options = {}) {
       }
     },
     {
-      onSuccess: () => hooks.onProjectImportComplete?.(),
-      onError: () => hooks.onProjectImportError?.(),
+      onSuccess: () => hooks.onProjectImportComplete?.(importSummary),
+      onError: (error) => hooks.onProjectImportError?.(error),
     }
   );
   return true;
@@ -419,11 +421,12 @@ export async function importProjectTextThroughFunnel(text, options = {}) {
   debugState.importPhase = "text-read";
   debugState.lastImportError = "";
   debugState.lastImportFileName = String(options.fileName || "");
+  let importSummary = null;
   return FileManager.importProjectText(
     text,
     async (data) => {
       try {
-        await applyImportedProjectState(data, { ui, hooks });
+        importSummary = await applyImportedProjectState(data, { ui, hooks });
       } catch (error) {
         debugState.importPhase = "error";
         debugState.lastImportError = String(error?.message || error || "");
@@ -431,8 +434,8 @@ export async function importProjectTextThroughFunnel(text, options = {}) {
       }
     },
     {
-      onSuccess: () => hooks.onProjectImportComplete?.(),
-      onError: () => hooks.onProjectImportError?.(),
+      onSuccess: () => hooks.onProjectImportComplete?.(importSummary),
+      onError: (error) => hooks.onProjectImportError?.(error),
     },
     importOptions,
   );

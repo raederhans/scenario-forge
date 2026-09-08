@@ -21,7 +21,7 @@ CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP = REPO_ROOT / "landing" / "app.js"
-EXPECTED_SCHEMA_REF_COUNT = 28
+EXPECTED_SCHEMA_REF_COUNT = 29
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -64,6 +64,7 @@ class DataCatalogContractTest(unittest.TestCase):
 
         self.assertEqual(payload.get("counts", {}).get("entries"), len(entries))
         self.assertEqual(len(schema_counts), EXPECTED_SCHEMA_REF_COUNT)
+        self.assertEqual(schema_counts["schema://city_lights/source_descriptor/v1"], 1)
         self.assertEqual(schema_counts["schema://transport/manifest/v1"], 138)
         self.assertEqual(schema_counts["schema://transport/build_audit/v1"], 130)
         self.assertEqual(schema_counts["schema://topojson/line_collection/roads_v1"], 94)
@@ -121,13 +122,15 @@ class DataCatalogContractTest(unittest.TestCase):
         payload = self._load_catalog()
         expected_count = payload.get("counts", {}).get("entries")
         self.assertIsInstance(expected_count, int)
-        english_copy = f"The checked-in catalog tracks {expected_count} assets"
-        chinese_copy = f"入库目录跟踪 {expected_count} 个资产"
+        english_copy = "cataloged assets · checked-in data surface"
+        chinese_copy = "已编目资产 · 签入数据范围"
 
         landing_index = LANDING_INDEX.read_text(encoding="utf-8")
         landing_app = LANDING_APP.read_text(encoding="utf-8")
 
         self.assertIn(f'data-stat-value="{expected_count}"', landing_index)
+        self.assertIn('data-stat-source="data/CATALOG.json:counts.entries"', landing_index)
+        self.assertIn(f'data-story-evidence-value="{expected_count}">{expected_count}</dd>', landing_index)
         self.assertIn(english_copy, landing_index)
         self.assertIn(english_copy, landing_app)
         self.assertIn(chinese_copy, landing_app)

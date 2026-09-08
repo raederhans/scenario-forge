@@ -299406,6 +299406,18 @@
       "en": "Project imported",
       "zh": "项目导入"
     },
+    "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.": {
+      "en": "Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.",
+      "zh": "已导入项目：{scenario}。已恢复 {colors} 条上色记录和 {owners} 条归属记录。"
+    },
+    "Ignored {count} entries that are not valid for this map.": {
+      "en": "Ignored {count} entries that are not valid for this map.",
+      "zh": "已忽略 {count} 条不适用于当前地图的记录。"
+    },
+    "Updated {count} entries to the current map regions.": {
+      "en": "Updated {count} entries to the current map regions.",
+      "zh": "已将 {count} 条记录更新到当前地图区域。"
+    },
     "Project saved": {
       "en": "Project saved",
       "zh": "项目已保存"

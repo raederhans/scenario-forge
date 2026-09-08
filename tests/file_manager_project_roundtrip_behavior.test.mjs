@@ -32,6 +32,31 @@ import {
 } from "../js/core/state/index.js";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "../vendor/fflate.browser.js";
 
+test("import summary counts rejected entries while preserving valid unloaded regions and migration", async () => {
+  // Isolate the module's migration-asset promise from other project-import cases.
+  const { migrateFeatureScopedProjectDataToCurrentTopology: migrate } = await import("../js/core/sovereignty_manager.js?import-summary");
+  const summaries = [];
+  const original = {
+    visualOverrides: { loaded: "#111111", unloaded: "#222222", forged: "#333333", legacy: "#444444" },
+    sovereigntyByFeatureId: { unloaded: "GER", forged: "FRA" },
+  };
+  const result = await migrate(original, {
+    validFeatureIds: new Set(["loaded", "unloaded", "successor"]),
+    landData: { features: [{ id: "loaded" }] },
+    fetchImpl: async () => ({ ok: true, json: async () => ({ legacy: ["successor"] }) }),
+    onMigration: (summary) => summaries.push(summary),
+  });
+  assert.deepEqual(result.visualOverrides, { loaded: "#111111", unloaded: "#222222", successor: "#444444" });
+  assert.deepEqual(result.sovereigntyByFeatureId, { unloaded: "GER" });
+  assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 2 }]);
+  assert.equal(original.visualOverrides.forged, "#333333");
+  assert.equal(Object.hasOwn(result, "importSummary"), false, "summary must not alter the project file format");
+  await migrate({ visualOverrides: { unloaded: "#222222", AQ_INVALID: "#333333" } }, {
+    validFeatureIds: new Set(["unloaded"]), onMigration: (summary) => summaries.push(summary),
+  });
+  assert.deepEqual(summaries[1], { migratedEntries: 0, ignoredEntries: 1 });
+});
+
 async function exportProjectPayload(appState) {
   let capturedBlob = null;
   const previousDocument = globalThis.document;
