@@ -45787,7 +45787,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 560824,
+      "size_bytes": 560906,
       "source_kind": "dist"
     },
     {
@@ -46277,7 +46277,7 @@
     },
     {
       "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-      "size_bytes": 20842,
+      "size_bytes": 21410,
       "source_kind": "dist"
     },
     {
@@ -47917,7 +47917,7 @@
       {
         "file_count": 236,
         "id": "startup-critical",
-        "size_bytes": 5397186
+        "size_bytes": 5397836
       },
       {
         "file_count": 95,
@@ -63861,11 +63861,11 @@
         "deferred_graph_file_count": 125,
         "deferred_module_count": 124,
         "deferred_resource_count": 1,
-        "initial_graph_bytes": 5365536,
+        "initial_graph_bytes": 5366186,
         "initial_graph_file_count": 270,
         "initial_module_count": 256,
         "initial_resource_count": 14,
-        "initial_script_bytes": 4007210,
+        "initial_script_bytes": 4007860,
         "initial_script_count": 258,
         "module_count": 387,
         "registry_resolved_dynamic_expression_count": 2,
@@ -64046,7 +64046,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 560824
+            "size_bytes": 560906
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -64406,7 +64406,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-            "size_bytes": 20842
+            "size_bytes": 21410
           },
           {
             "path": "app/js/core/renderer/selection_overlay_owner.js",
@@ -64746,7 +64746,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 2971647
+        "size_bytes": 2972297
       },
       {
         "basis": "startup-resource-graph",
@@ -66457,7 +66457,7 @@
     {
       "file_count": 9498,
       "path": "app",
-      "size_bytes": 959866007
+      "size_bytes": 959866657
     },
     {
       "file_count": 57,
@@ -66490,5 +66490,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 966806636
+  "total_bytes": 966807286
 }

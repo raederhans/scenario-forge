@@ -5,8 +5,13 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../suppor
 // Dev-only cold-start/input measurements and the TNO/HOI4/TNO cycle wait for full idle convergence.
 // JUSTIFY: Bounds the complete multi-stage diagnostic, not input latency; no retries are enabled.
 test.setTimeout(180_000);
+// Trace snapshots await renderer-side DOM work before input dispatch, which can
+// move the input past the busy task. Preserve raw probes instead for this lane.
+test.use({ trace: 'off' });
 const startupPath = '/app/?render_profile=balanced&startup_interaction=full&startup_worker=1&startup_cache=0&perf=1';
 const stableInputWindow = process.env.M2_STABLE_INPUT === '1';
+const variant = process.env.P1_VARIANT || 'baseline';
+const viewport = { width: 1600, height: 1000 };
 
 async function waitForStableInputWindow(page) {
   if (!stableInputWindow) return;
@@ -44,18 +49,37 @@ async function waitForStableInputWindow(page) {
 async function installStageObserver(page) {
   await page.addInitScript(() => {
     globalThis.__runtimeStageSamples = [];
+    globalThis.__inputEventTimings = [];
+    globalThis.__inputLongTasks = [];
+    if (PerformanceObserver.supportedEntryTypes.includes('event')) {
+      new PerformanceObserver(list => {
+        for (const e of list.getEntries()) globalThis.__inputEventTimings.push({
+          name: e.name, startTime: e.startTime, processingStart: e.processingStart,
+          processingEnd: e.processingEnd, duration: e.duration, interactionId: e.interactionId,
+          targetId: e.target?.id || '', queueMs: e.processingStart - e.startTime,
+          processingMs: e.processingEnd - e.processingStart,
+        });
+      }).observe({ type: 'event', durationThreshold: 16 });
+    }
+    if (PerformanceObserver.supportedEntryTypes.includes('longtask')) {
+      new PerformanceObserver(list => {
+        globalThis.__inputLongTasks.push(...list.getEntries().map(e => ({ startTime: e.startTime, duration: e.duration })));
+      }).observe({ type: 'longtask' });
+    }
     const seen = new Set();
     setInterval(() => {
       const metrics = globalThis.__renderPerfMetrics || {};
       for (const name of ['scenarioChunkPromotionInfraStage', 'scenarioChunkPromotionVisualStage',
-        'rebuildPoliticalLandCollectionsBreakdown', 'rebuildResolvedColors', 'buildSpatialIndex', 'buildHitCanvas']) {
+        'rebuildPoliticalLandCollectionsBreakdown', 'rebuildResolvedColors', 'buildSpatialIndex', 'buildHitCanvas',
+        'drawContextScenarioPass', 'drawScenarioRegionOverlaysPass', 'drawScenarioAtlantropaLandLikeOverlayLayer',
+        'drawScenarioWaterFillLayer', 'drawScenarioReliefOverlaysLayer', 'drawCanvas']) {
         const metric = metrics[name];
         if (!metric || !Number.isFinite(metric.sequence)) continue;
         const key = `${name}:${metric.sequence}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        if (globalThis.__runtimeStageSamples.length < 256) {
-          globalThis.__runtimeStageSamples.push({ name, ...metric });
+        if (globalThis.__runtimeStageSamples.length < 4096) {
+          globalThis.__runtimeStageSamples.push({ name, observedAt: performance.now(), ...metric });
         }
       }
     }, 50);
@@ -63,7 +87,8 @@ async function installStageObserver(page) {
 }
 
 async function installInputObserver(page, point) {
-  await page.evaluate(({ x, y }) => {
+  await page.evaluate(async ({ x, y }) => {
+    const { refreshColorState } = await import(new URL('./js/core/map_renderer.js', location.href));
     const sampleCanvas = document.createElement('canvas');
     sampleCanvas.width = 9; sampleCanvas.height = 9;
     const context = sampleCanvas.getContext('2d', { willReadFrequently: true });
@@ -79,14 +104,42 @@ async function installInputObserver(page, point) {
       }
       return Array.from(context.getImageData(0, 0, 9, 9).data);
     };
-    globalThis.__runtimeInputProbe = { results: [], pending: null, readPixels };
-    document.addEventListener('pointerdown', () => {
+    globalThis.__runtimeInputProbe = { results: [], pending: null, readPixels, busyTasks: [],
+      runBusyRender: () => {
+        const task = { kind: 'full-color-refresh', startTime: performance.now() };
+        try { refreshColorState({ renderNow: true }); }
+        finally {
+          task.endTime = performance.now();
+          globalThis.__runtimeInputProbe.busyTasks.push(task);
+        }
+      } };
+    const busySnapshot = () => {
+      const s = globalThis.__playwrightStateRef;
+      const c = s.runtimeChunkLoadState || {};
+      return { phase: s.renderPhase, interacting: s.isInteracting, applying: s.scenarioApplyInFlight,
+        ready: s.interactionInfrastructureReady, exact: s.deferExactAfterSettle, exactHandle: !!s.exactAfterSettleHandle,
+        activeTask: s.activePostReadyTaskKey, pendingReason: c.pendingReason,
+        refresh: c.refreshScheduled, promotion: !!(c.pendingPromotion || c.pendingInfraPromotion || c.promotionScheduled || c.promotionCommitInFlight),
+        naturalPendingTasks: globalThis.__naturalBackground
+          ? (s.renderPerfMetrics?.postReadySchedulerState?.pendingTaskKeys || []).length : 0 };
+    };
+    const isStable = snapshot => snapshot.ready && !snapshot.interacting && !snapshot.applying
+      && snapshot.phase === 'idle' && !snapshot.exact && !snapshot.exactHandle
+      && !snapshot.activeTask && !snapshot.pendingReason && !snapshot.refresh && !snapshot.promotion
+      && !snapshot.naturalPendingTasks;
+    document.addEventListener('pointerdown', event => {
       const p = globalThis.__runtimeInputProbe.pending;
-      if (p && p.kind !== 'zoom' && p.startedAt === null) p.startedAt = performance.now();
+      if (p && p.kind !== 'zoom' && p.startedAt === null) {
+        p.startedAt = performance.now(); p.eventTimeStamp = event.timeStamp;
+        p.targetId = event.target.id || ''; p.atDispatch = busySnapshot();
+      }
     }, true);
-    document.addEventListener('wheel', () => {
+    document.addEventListener('wheel', event => {
       const p = globalThis.__runtimeInputProbe.pending;
-      if (p?.kind === 'zoom') p.startedAt = performance.now();
+      if (p?.kind === 'zoom') {
+        if (p.startedAt === null) { p.startedAt = performance.now(); p.atDispatch = busySnapshot(); }
+        p.wheelEvents.push({ timeStamp: event.timeStamp, captureAt: performance.now() });
+      }
     }, { capture: true, passive: true });
     function observe() {
       const probe = globalThis.__runtimeInputProbe;
@@ -98,9 +151,7 @@ async function installInputObserver(page, point) {
         if (pending.kind === 'selection') {
           visible = !!document.querySelector('path.dev-selected-feature[d]')?.getAttribute('d');
         } else if (pending.kind === 'zoom') {
-          visible = state.renderPhase === 'idle' && !state.deferExactAfterSettle
-            && !state.exactAfterSettleHandle && !state.pendingZoomTransform
-            && state.zoomTransform.k !== pending.zoomK
+          visible = state.zoomTransform.k !== pending.zoomK
             && pixels.some((value, index) => value !== pending.before[index]);
         } else {
           const start = pending.kind === 'undo' ? probe.paintedPixelIndex : 0;
@@ -116,10 +167,28 @@ async function installInputObserver(page, point) {
           }
         }
         if (visible) {
+          if (pending.firstVisibleAt === null) {
+            pending.firstVisibleAt = performance.now();
+            pending.stableSince = performance.now();
+          }
+        }
+        const signature = JSON.stringify([state.colorRevision, state.zoomTransform.k,
+          state.runtimeChunkLoadState?.selectionVersion, state.renderPerfMetrics?.scenarioChunkPromotionVisualStage?.sequence]);
+        if (!visible || !isStable(busySnapshot()) || state.pendingZoomTransform || pending.stableSignature !== signature) {
+          pending.stableSince = performance.now(); pending.stableSignature = signature;
+        }
+        if (pending.firstVisibleAt !== null && visible && isStable(busySnapshot())
+          && performance.now() - pending.stableSince >= 250) {
           const metrics = state.renderPerfMetrics || {};
           const stages = Object.fromEntries(['refreshColorState', 'rebuildResolvedColors', 'drawContextScenarioPass', 'drawCanvas', 'fillPatchInputToFirstPixelMs'].map(name => [name,
             metrics[name]?.sequence > pending.beforeSequence ? metrics[name] : null]));
-          probe.results.push({ kind: pending.kind, durationMs: performance.now() - pending.startedAt, stages,
+          probe.results.push({ kind: pending.kind, durationMs: pending.firstVisibleAt - pending.startedAt, stages,
+            firstVisibleAt: pending.firstVisibleAt, stableAt: performance.now(),
+            handlerToVisibleMs: pending.firstVisibleAt - pending.startedAt,
+            handlerToStableMs: performance.now() - pending.startedAt,
+            eventTimeStamp: pending.eventTimeStamp, targetId: pending.targetId,
+            playwrightActionMs: pending.playwrightActionMs,
+            armedAt: pending.armedAt, atDispatch: pending.atDispatch, wheelEvents: pending.wheelEvents,
             stableWindow: pending.stableWindow, startedAt: pending.startedAt,
             evidence: pending.kind === 'selection' ? 'svg-path-at-animation-frame' : 'composited-canvas-pixel-at-animation-frame' });
           probe.pending = null;
@@ -131,15 +200,43 @@ async function installInputObserver(page, point) {
   }, point);
 }
 
-async function arm(page, kind, rgb = null) {
-  if (kind !== 'zoom') await waitForStableInputWindow(page);
+async function arm(page, kind, rgb = null, inputPoint = null, { naturalBackground = false } = {}) {
+  if (kind !== 'zoom' && !naturalBackground) await waitForStableInputWindow(page);
+  // Resolve actionability/coordinates and move before the measured busy task.
+  if (inputPoint) await page.mouse.move(inputPoint.x, inputPoint.y);
   await page.evaluate(({ kind, rgb }) => {
     const probe = globalThis.__runtimeInputProbe;
     probe.pending = { kind, rgb: kind === 'undo' ? probe.undoRgb : rgb, startedAt: null, before: probe.readPixels(),
+      armedAt: performance.now(), firstVisibleAt: null, stableSince: null, wheelEvents: [],
       stableWindow: globalThis.__inputStableWindow || null,
       beforeSequence: globalThis.__playwrightStateRef.renderPerfMetricSequence || 0,
       zoomK: globalThis.__playwrightStateRef.zoomTransform.k };
   }, { kind, rgb });
+}
+
+async function controlPoint(page, selector) {
+  const rect = await page.locator(selector).boundingBox();
+  expect(rect, `${selector} must have a screen rectangle before arming`).not.toBeNull();
+  return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+}
+
+async function dispatchInput(page) {
+  // Do not await renderer work before injecting real mouse events. A client-side
+  // delay lets the renderer task start, while EventTiming must prove overlap.
+  const work = stableInputWindow ? Promise.resolve() : page.evaluate(() => globalThis.__runtimeInputProbe.runBusyRender());
+  const workOutcome = work.then(() => null, error => error);
+  if (!stableInputWindow) await new Promise(resolve => setTimeout(resolve, 10));
+  const started = process.hrtime.bigint();
+  await page.mouse.down();
+  await page.mouse.up();
+  const playwrightActionMs = Number(process.hrtime.bigint() - started) / 1e6;
+  const workError = await workOutcome;
+  if (workError) throw workError;
+  await page.evaluate(value => {
+    const probe = globalThis.__runtimeInputProbe;
+    const sample = probe.pending || probe.results.at(-1);
+    sample.playwrightActionMs = value;
+  }, playwrightActionMs);
 }
 
 async function waitForInputEvidence(page) {
@@ -148,7 +245,7 @@ async function waitForInputEvidence(page) {
 
 for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
   test(`runtime stage and input feedback ${scenarioId}`, async ({ page }, testInfo) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize(viewport);
     const pageErrors = [];
     page.on('pageerror', error => pageErrors.push(error.message));
     await installStageObserver(page);
@@ -167,9 +264,9 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         return { x: rect.left + xy[0], y: rect.top + xy[1] };
       });
       await installInputObserver(page, point);
-      await arm(page, 'selection');
+      await arm(page, 'selection', null, point);
       await page.keyboard.down('Control');
-      await page.mouse.click(point.x, point.y);
+      await dispatchInput(page);
       await page.keyboard.up('Control');
       await waitForInputEvidence(page);
       const initial = await page.evaluate(async () => {
@@ -183,16 +280,16 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       expect(initial.id).toBeTruthy();
       await waitForRenderIdle(page, { scenarioId });
-      await arm(page, 'fill', [227, 26, 196]);
-      await page.mouse.click(point.x, point.y);
+      await arm(page, 'fill', [227, 26, 196], point);
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => Object.values(globalThis.__playwrightStateRef.visualOverrides))).toContain('#e31ac4');
-      await arm(page, 'undo', initial.rgb);
-      await page.locator('#undoBtn').click();
+      await arm(page, 'undo', initial.rgb, await controlPoint(page, '#undoBtn'));
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => ({ ...globalThis.__playwrightStateRef.visualOverrides }))).toEqual(initial.overrides);
-      await arm(page, 'redo', [227, 26, 196]);
-      await page.locator('#redoBtn').click();
+      await arm(page, 'redo', [227, 26, 196], await controlPoint(page, '#redoBtn'));
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => Object.values(globalThis.__playwrightStateRef.visualOverrides))).toContain('#e31ac4');
       await page.locator('#undoBtn').click();
@@ -210,7 +307,10 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       await waitForStableInputWindow(page);
       const results = await page.evaluate(() => globalThis.__runtimeInputProbe.results);
       expect(results.map(item => item.kind)).toEqual(['selection', 'fill', 'undo', 'redo', 'zoom']);
-      for (const item of results) expect(item.durationMs).toBeGreaterThan(0);
+      for (const item of results) {
+        expect(item.durationMs).toBeGreaterThan(0);
+        expect(item.stableAt).toBeGreaterThanOrEqual(item.firstVisibleAt + 250);
+      }
       expect(pageErrors).toEqual([]);
     } finally {
       const evidence = await page.evaluate(() => ({
@@ -219,10 +319,42 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         inputs: globalThis.__runtimeInputProbe?.results || [],
         pendingInput: globalThis.__runtimeInputProbe?.pending || null,
         stableDiagnostics: globalThis.__inputStableDiagnostics || null,
+        eventTimings: globalThis.__inputEventTimings || [],
+        longTasks: globalThis.__inputLongTasks || [],
+        busyTasks: globalThis.__runtimeInputProbe?.busyTasks || [],
+        timeOrigin: performance.timeOrigin, userAgent: navigator.userAgent, devicePixelRatio,
       }));
+      for (const input of evidence.inputs) {
+        input.eventTimings = input.kind === 'zoom' ? null : evidence.eventTimings.filter(e =>
+          e.startTime >= input.armedAt && e.startTime <= input.firstVisibleAt
+          && ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click'].includes(e.name));
+        // Missing EventTiming (below threshold or unsupported) is not a zero queue delay.
+        input.queueMs = input.eventTimings?.length ? Math.max(...input.eventTimings.map(e => e.queueMs)) : null;
+        input.inputToVisibleMs = Number.isFinite(input.eventTimeStamp) ? input.firstVisibleAt - input.eventTimeStamp : null;
+        input.inputToStableMs = Number.isFinite(input.eventTimeStamp) ? input.stableAt - input.eventTimeStamp : null;
+        input.busyTasks = evidence.busyTasks.filter(task => task.startTime >= input.armedAt && task.startTime <= input.stableAt);
+        input.queuedDuringBusyTask = input.eventTimings?.length ? input.eventTimings.some(e =>
+          input.busyTasks.some(task => task.startTime <= e.processingStart && task.endTime >= e.startTime)) : null;
+        input.eventTimingStatus = input.kind === 'zoom' ? 'not-applicable-continuous-wheel'
+          : input.eventTimings.length ? 'observed' : 'unobserved-below-threshold-or-unsupported';
+      }
       const evidencePath = testInfo.outputPath('runtime-stage-input-evidence.json');
-      fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, stableInputWindow, pageErrors, ...evidence }, null, 2));
+      fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, variant, viewport, stableInputWindow,
+        measurementVersion: 2,
+        baselineRevision: process.env.P1_BASE_REVISION || null,
+        browserVersion: page.context().browser()?.version(), nodeVersion: process.version,
+        host: require('node:os').hostname(), platform: process.platform,
+        timingContract: { eventThresholdMs: 16, stableHoldMs: 250, visible: 'canvas/SVG at rAF; not physical display presentation',
+          trace: 'off: before-action DOM snapshots would perturb dispatch timing',
+          handlerBoundary: 'capture listener; exact processingStart/End retained per EventTiming entry',
+          busyCondition: 'concurrent synchronous full-color-refresh and mouse down/up after 10ms client delay; overlap must be observed',
+          wheel: 'capture timestamps and frame evidence; excluded from discrete EventTiming' }, pageErrors, ...evidence }, null, 2));
       await testInfo.attach('runtime-stage-input-evidence', { path: evidencePath, contentType: 'application/json' });
+      if (!stableInputWindow && evidence.inputs.length === 5) {
+        for (const input of evidence.inputs.filter(input => input.kind !== 'zoom')) {
+          expect(input.queuedDuringBusyTask, `${input.kind}: busy input must overlap a recorded renderer task`).toBe(true);
+        }
+      }
     }
   });
 }
@@ -280,5 +412,118 @@ test('runtime scenario A-B-A preserves usable indexes and clears selection', asy
       const { clearDevSelection } = await import(new URL('./js/core/map_renderer.js', location.href));
       clearDevSelection();
     });
+  }
+});
+
+test('natural background edit feedback tno_1962', async ({ page }, testInfo) => {
+  await page.setViewportSize(viewport);
+  await installStageObserver(page);
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  let checks = {};
+  try {
+    await gotoApp(page, `${startupPath}&default_scenario=tno_1962`, { waitUntil: 'domcontentloaded' });
+    await waitForAppInteractive(page);
+    // Deliberately no global idle barrier before this first edit.
+    if (await page.locator('#scenarioGuidePopover').isVisible()) await page.locator('#scenarioGuideCloseBtn').click();
+    await page.locator('#paintModeVisualBtn').click();
+    await page.locator('#toolFillBtn').click();
+    await page.locator('#customColor').fill('#e31ac4');
+    const point = await page.evaluate(async () => {
+      const { projectGeoToScreen } = await import(new URL('./js/core/map_renderer.js', location.href));
+      const xy = projectGeoToScreen(13.4, 52.5);
+      const rect = document.querySelector('#mapContainer').getBoundingClientRect();
+      return { x: rect.left + xy[0], y: rect.top + xy[1] };
+    });
+    await installInputObserver(page, point);
+    const initial = await page.evaluate(() => {
+      globalThis.__naturalBackground = { dispatches: [] };
+      globalThis.__readNaturalBackground = () => {
+        const s = globalThis.__playwrightStateRef;
+        const c = s.runtimeChunkLoadState || {};
+        const scheduler = s.renderPerfMetrics?.postReadySchedulerState || {};
+        return { observedAt: performance.now(), ready: s.interactionInfrastructureReady,
+          bootBlocking: s.bootBlocking, applying: s.scenarioApplyInFlight,
+          activeTask: s.activePostReadyTaskKey || scheduler.activeTaskKey || '',
+          pendingTaskKeys: [...(scheduler.pendingTaskKeys || [])],
+          pendingReason: c.pendingReason, refreshScheduled: !!c.refreshScheduled,
+          promotionScheduled: !!c.promotionScheduled, pendingPromotion: !!c.pendingPromotion,
+          pendingInfraPromotion: !!c.pendingInfraPromotion, promotionCommitInFlight: !!c.promotionCommitInFlight,
+          selectionVersion: c.selectionVersion,
+          visualSequence: s.renderPerfMetrics?.scenarioChunkPromotionVisualStage?.sequence,
+          infraSequence: s.renderPerfMetrics?.scenarioChunkPromotionInfraStage?.sequence };
+      };
+      document.addEventListener('pointerdown', event => {
+        if (globalThis.__runtimeInputProbe.pending) {
+          globalThis.__naturalBackground.dispatches.push({ eventTimeStamp: event.timeStamp,
+            ...globalThis.__readNaturalBackground() });
+        }
+      }, true);
+      globalThis.__naturalBackground.beforeEdit = globalThis.__readNaturalBackground();
+      return { ...globalThis.__playwrightStateRef.visualOverrides };
+    });
+    await arm(page, 'fill', [227, 26, 196], point, { naturalBackground: true });
+    await page.mouse.down();
+    await page.mouse.up();
+    const dispatch = await page.evaluate(() => globalThis.__naturalBackground.dispatches[0]);
+    expect(dispatch, 'must capture a real edit input').toBeTruthy();
+    expect(dispatch.bootBlocking).toBe(false);
+    expect(dispatch.ready).toBe(true);
+    expect(dispatch.applying).toBeFalsy();
+    expect(Boolean(dispatch.activeTask || dispatch.pendingTaskKeys.length || dispatch.pendingReason
+      || dispatch.refreshScheduled || dispatch.promotionScheduled || dispatch.pendingPromotion
+      || dispatch.pendingInfraPromotion || dispatch.promotionCommitInFlight),
+    'natural background work must still be pending at real input capture').toBe(true);
+    await waitForInputEvidence(page);
+    // Only after dispatch/first-visible recording, wait for natural work to drain.
+    await page.waitForFunction(() => {
+      const b = globalThis.__readNaturalBackground();
+      return !b.activeTask && !b.pendingTaskKeys.length && !b.pendingReason && !b.refreshScheduled
+        && !b.promotionScheduled && !b.pendingPromotion && !b.pendingInfraPromotion && !b.promotionCommitInFlight;
+    }, undefined, { timeout: 30_000 });
+    await waitForRenderIdle(page, { scenarioId: 'tno_1962' });
+    const after = await page.evaluate(() => {
+      globalThis.__naturalBackground.afterDrain = globalThis.__readNaturalBackground();
+      const pixels = globalThis.__runtimeInputProbe.readPixels();
+      return { background: globalThis.__naturalBackground.afterDrain,
+        overrides: { ...globalThis.__playwrightStateRef.visualOverrides },
+        painted: pixels.some((v, i) => i % 4 === 0 && [227, 26, 196].every((c, j) => Math.abs(pixels[i+j]-c)<18)) };
+    });
+    expect(Object.values(after.overrides)).toContain('#e31ac4');
+    expect(after.painted).toBe(true);
+    expect(after.background.visualSequence > dispatch.visualSequence
+      || after.background.infraSequence > dispatch.infraSequence,
+    'real promotion diagnostics must advance after the edit').toBe(true);
+    checks.editSurvivesNaturalDrain = true;
+    await page.locator('#undoBtn').click();
+    await waitForRenderIdle(page, { scenarioId: 'tno_1962' });
+    expect(await page.evaluate(() => ({ ...globalThis.__playwrightStateRef.visualOverrides }))).toEqual(initial);
+    // A separate edit/undo pair has no idle or pixel wait between its inputs.
+    await page.mouse.click(point.x, point.y);
+    await page.locator('#undoBtn').click();
+    await waitForRenderIdle(page, { scenarioId: 'tno_1962' });
+    expect(await page.evaluate(() => ({ ...globalThis.__playwrightStateRef.visualOverrides }))).toEqual(initial);
+    checks.immediateUndo = true;
+    expect(pageErrors).toEqual([]);
+  } finally {
+    const evidence = await page.evaluate(() => ({
+      background: globalThis.__naturalBackground || null,
+      inputs: globalThis.__runtimeInputProbe?.results || [],
+      pendingInput: globalThis.__runtimeInputProbe?.pending || null,
+      stages: globalThis.__runtimeStageSamples || [],
+      eventTimings: globalThis.__inputEventTimings || [], longTasks: globalThis.__inputLongTasks || [],
+      timeOrigin: performance.timeOrigin, devicePixelRatio,
+    }));
+    for (const input of evidence.inputs) {
+      input.inputToVisibleMs = input.firstVisibleAt - input.eventTimeStamp;
+      input.inputToStableMs = input.stableAt - input.eventTimeStamp;
+    }
+    const evidencePath = testInfo.outputPath('natural-background-input-evidence.json');
+    fs.writeFileSync(evidencePath, JSON.stringify({ measurementMode: 'natural-background-v1', variant,
+      baselineRevision: process.env.P1_BASE_REVISION || null, viewport,
+      browserVersion: page.context().browser()?.version(), host: require('node:os').hostname(),
+      timingContract: 'native mouse, no pre-edit idle or injected refresh; canvas rAF visibility; stable hold 250ms',
+      checks, pageErrors, ...evidence }, null, 2));
+    await testInfo.attach('natural-background-input-evidence', { path: evidencePath, contentType: 'application/json' });
   }
 });
