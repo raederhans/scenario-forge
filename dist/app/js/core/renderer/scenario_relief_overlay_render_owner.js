@@ -3,6 +3,7 @@ export function createScenarioReliefOverlayRenderOwner({
   constants = {},
   getters = {},
   helpers = {},
+  scenarioLayerCache,
 } = {}) {
   const runtimeState = state;
   const {
@@ -26,6 +27,8 @@ export function createScenarioReliefOverlayRenderOwner({
     getPathCanvas = () => null,
   } = getters;
   const {
+    cloneZoomTransform,
+    shouldEnableContextScenarioTransformReuse,
     collectContextMetric = () => {},
     getEffectiveScenarioReliefOverlayFeatures = () => [],
     getPathBounds = () => null,
@@ -265,7 +268,63 @@ export function createScenarioReliefOverlayRenderOwner({
     return renderedCount;
   }
 
+  function renderScenarioReliefOverlaysLayerToCache(currentTransform, reliefFeatures) {
+    return scenarioLayerCache.render("relief", currentTransform, {
+      draw: (layerK) => drawScenarioReliefOverlaysLayer(layerK, { reliefFeatures, cacheMode: "redraw" }),
+      getSignature: getScenarioReliefVisualRevisionToken,
+    });
+  }
+
+  function drawScenarioReliefOverlaysPass(k) {
+    const overlays = getEffectiveScenarioReliefOverlayFeatures();
+    if (
+      !overlays.length
+      || !runtimeState.showScenarioReliefOverlays
+      || runtimeState.renderPhase === RENDER_PHASE_INTERACTING
+      || runtimeState.renderPhase === RENDER_PHASE_SETTLING
+    ) {
+      drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
+      return;
+    }
+
+    const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
+    const reliefLayerEntry = scenarioLayerCache.getSnapshot("relief");
+    const reliefVisualRevision = getScenarioReliefVisualRevisionToken();
+    const canReuseReliefLayer = (
+      shouldEnableContextScenarioTransformReuse()
+      && reliefLayerEntry.signature === reliefVisualRevision
+      && reliefLayerEntry.hasCanvas
+      && reliefLayerEntry.hasReferenceTransform
+    );
+    if (canReuseReliefLayer && scenarioLayerCache.draw("relief", currentTransform)) {
+      const renderedCount = Number(reliefLayerEntry.renderedCount || 0);
+      collectContextMetric("contextScenarioLayerCacheHit", 0, {
+        layer: "relief",
+        renderedCount,
+      });
+      collectContextMetric("contextScenarioLayerRelief", 0, {
+        featureCount: overlays.length,
+        renderedCount,
+        skipped: false,
+        cacheMode: "reuse",
+        signature: reliefVisualRevision,
+      });
+      return;
+    }
+
+    collectContextMetric("contextScenarioLayerCacheMiss", 0, {
+      layer: "relief",
+      reason: reliefLayerEntry.signature === reliefVisualRevision ? "transform" : "signature",
+      signatureChanged: reliefLayerEntry.signature !== reliefVisualRevision,
+    });
+    renderScenarioReliefOverlaysLayerToCache(currentTransform, overlays);
+    if (!scenarioLayerCache.draw("relief", currentTransform)) {
+      drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
+    }
+  }
+
   return {
+    drawScenarioReliefOverlaysPass,
     drawPolygonLinePattern,
     drawScenarioReliefOverlaysLayer,
   };

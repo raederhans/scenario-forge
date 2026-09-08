@@ -1939,6 +1939,7 @@ function getScenarioReliefOverlayRenderOwner() {
   }
   scenarioReliefOverlayRenderOwner = createScenarioReliefOverlayRenderOwner({
     state,
+    scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
     constants: {
       RELIEF_ATLANTROPA_CONTOUR_COLOR,
       RELIEF_ATLANTROPA_SALT_FILL_COLOR,
@@ -1960,6 +1961,8 @@ function getScenarioReliefOverlayRenderOwner() {
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
     },
     helpers: {
+      cloneZoomTransform,
+      shouldEnableContextScenarioTransformReuse,
       collectContextMetric,
       getEffectiveScenarioReliefOverlayFeatures,
       getPathBounds,
@@ -2312,6 +2315,9 @@ function getRenderCacheOwner() {
     },
     helpers: {
       cloneZoomTransform,
+      areZoomTransformsEquivalent,
+      withRenderTarget,
+      prepareTargetContext,
       ensureRenderPassCacheState,
       getTransformSignature,
       getVisibleFrameIdentity,
@@ -4474,7 +4480,6 @@ function getScenarioWaterVisualRevisionToken() {
     runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
     runtimeState.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
     runtimeState.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
-    `water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`,
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
@@ -4510,6 +4515,8 @@ function getScenarioOverlaySignatureToken() {
     runtimeState.detailPromotionCompleted ? "detail-ready" : "detail-pending",
     runtimeState.detailPromotionInFlight ? "detail-in-flight" : "detail-idle",
     `water:${getScenarioWaterVisualRevisionToken()}`,
+    // Selection redraws the live highlight, without rebuilding the water fill bitmap.
+    `water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`,
     `special:${getScenarioSpecialVisualRevisionToken()}`,
     `relief:${getScenarioReliefVisualRevisionToken()}`,
   ].join("|");
@@ -5001,77 +5008,8 @@ function drawScenarioReliefOverlaysLayer(k, {
   });
 }
 
-function renderScenarioReliefOverlaysLayerToCache(currentTransform, reliefFeatures) {
-  const layerEntry = getContextScenarioLayerCacheEntry("relief");
-  const layerCanvas = ensureContextScenarioLayerCanvas("relief");
-  const layerContext = layerCanvas.getContext("2d");
-  if (!layerContext) {
-    layerEntry.signature = "";
-    layerEntry.referenceTransform = null;
-    layerEntry.renderedCount = 0;
-    return 0;
-  }
-  const layout = getRenderPassLayout("contextScenario");
-  let renderedCount = 0;
-  withRenderTarget(layerContext, () => {
-    const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-    renderedCount = drawScenarioReliefOverlaysLayer(layerK, {
-      reliefFeatures,
-      cacheMode: "redraw",
-    });
-  });
-  layerEntry.signature = getScenarioReliefVisualRevisionToken();
-  layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-  layerEntry.renderedCount = renderedCount;
-  return renderedCount;
-}
-
 function drawScenarioReliefOverlaysPass(k) {
-  const overlays = getEffectiveScenarioReliefOverlayFeatures();
-  if (
-    !overlays.length
-    || !runtimeState.showScenarioReliefOverlays
-    || runtimeState.renderPhase === RENDER_PHASE_INTERACTING
-    || runtimeState.renderPhase === RENDER_PHASE_SETTLING
-  ) {
-    drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
-    return;
-  }
-
-  const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-  const reliefLayerEntry = getContextScenarioLayerCacheEntry("relief");
-  const reliefVisualRevision = getScenarioReliefVisualRevisionToken();
-  const canReuseReliefLayer = (
-    shouldEnableContextScenarioTransformReuse()
-    && reliefLayerEntry.signature === reliefVisualRevision
-    && !!reliefLayerEntry.canvas
-    && !!reliefLayerEntry.referenceTransform
-  );
-  if (canReuseReliefLayer && drawCachedContextScenarioLayer("relief", currentTransform)) {
-    const renderedCount = Number(reliefLayerEntry.renderedCount || 0);
-    collectContextMetric("contextScenarioLayerCacheHit", 0, {
-      layer: "relief",
-      renderedCount,
-    });
-    collectContextMetric("contextScenarioLayerRelief", 0, {
-      featureCount: overlays.length,
-      renderedCount,
-      skipped: false,
-      cacheMode: "reuse",
-      signature: reliefVisualRevision,
-    });
-    return;
-  }
-
-  collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-    layer: "relief",
-    reason: reliefLayerEntry.signature === reliefVisualRevision ? "transform" : "signature",
-    signatureChanged: reliefLayerEntry.signature !== reliefVisualRevision,
-  });
-  renderScenarioReliefOverlaysLayerToCache(currentTransform, overlays);
-  if (!drawCachedContextScenarioLayer("relief", currentTransform)) {
-    drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
-  }
+  return getScenarioReliefOverlayRenderOwner().drawScenarioReliefOverlaysPass(k);
 }
 
 function getFeatureCountryCodeNormalized(feature) {
@@ -6966,8 +6904,23 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
   refreshResolvedColorsForFeatures(ids, { renderNow });
 }
 
-function refreshColorState({ renderNow = true } = {}) {
+function refreshColorState({ renderNow = true, featureIds = null, inputLabel = "" } = {}) {
   const startedAt = nowMs();
+  const ids = Array.isArray(featureIds) ? normalizeFeatureOverrideTargetIds(featureIds) : [];
+  // Only local political colors can bypass the full surface refresh. Atlantropa
+  // colors also participate in contextScenario and keep the existing full path.
+  if (ids.length && ids.every((id) => {
+    const feature = findResolvedColorFeatureById(id);
+    return feature && !isAtlantropaFieldDrivenFeature(feature);
+  })) {
+    refreshResolvedColorsForFeatures(ids, { renderNow, inputStartedAt: startedAt, inputLabel });
+    recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
+      renderNow: !!renderNow,
+      featureCount: ids.length,
+      mode: "partial",
+    });
+    return;
+  }
   normalizeColorStateForRender(state, {
     sanitizeColorMap,
     sanitizeCountryColorMap,
@@ -6977,6 +6930,7 @@ function refreshColorState({ renderNow = true } = {}) {
   recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
     renderNow: !!renderNow,
     featureCount: Object.keys(runtimeState.colors || {}).length,
+    mode: "full",
   });
   if (renderNow && rendererSurfaceHost.getContext()) {
     render();
@@ -11776,26 +11730,12 @@ function drawPoliticalPass(k) {
   return getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);
 }
 
-function getContextScenarioLayerCacheEntry(...args) {
-  return getScenarioRegionOverlayRenderOwner().getContextScenarioLayerCacheEntry(...args);
-}
-
-function ensureContextScenarioLayerCanvas(...args) {
-  return getScenarioRegionOverlayRenderOwner().ensureContextScenarioLayerCanvas(...args);
-}
-
-function drawCachedContextScenarioLayer(...args) {
-  return getScenarioRegionOverlayRenderOwner().drawCachedContextScenarioLayer(...args);
-}
-
 function getScenarioRegionOverlayRenderOwner() {
   if (!scenarioRegionOverlayRenderOwner) {
     scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost,
-      getRenderPassCacheState,
-      getRenderPassLayout,
+      scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
       cloneZoomTransform,
-      areZoomTransformsEquivalent,
       nowMs,
       collectContextMetric,
       getFeatureId,
@@ -11813,8 +11753,6 @@ function getScenarioRegionOverlayRenderOwner() {
       getResolvedFeatureColor,
       LAND_FILL_COLOR,
       getPoliticalFeaturePathEntry,
-      withRenderTarget,
-      prepareTargetContext,
       getScenarioWaterVisualRevisionToken,
       isWaterRegionEnabled,
       isMacroOceanWaterRegion,
@@ -12205,6 +12143,9 @@ function promoteDeferredColorRenderToIdle() {
   clearRenderPhaseTimer();
   cancelExactAfterSettleRefresh({ clearDefer: true });
   setRenderPhase(RENDER_PHASE_IDLE);
+  // This fast color path replaces both normal settle completion callbacks.
+  // Preserve their pending chunk wakeup after the current draw returns.
+  flushPendingScenarioChunkRefreshAfterExact("color-render-idle");
   recordRenderPerfMetric("promoteDeferredColorRenderToIdle", 0, {
     previousPhase,
     previousDefer,

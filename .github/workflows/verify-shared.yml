@@ -93,6 +93,19 @@ jobs:
           test -s "$changed_files" || { echo "::error::verification selector received an empty changed-file set"; exit 1; }
           node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
 
+      - name: Check tracked Pages mirrors for relevant PR changes
+        if: inputs.profile == 'pr-fast'
+        shell: bash
+        run: |
+          changed_files=.runtime/tmp/verification-selector-changed-files.txt
+          if grep -Eq '^(js/|css/|vendor/|landing/|data/|dist/|index\.html$|app\.js$|styles\.css$|tools/(build_pages_dist|pages_|app_entry_resolver)|\.github/workflows/verify-shared\.yml$)' "$changed_files"; then
+            python tools/build_pages_dist.py
+            git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/pages-dist-manifest.json \
+              || { echo "::error::tracked dist must match this PR's final source; run the canonical Pages builder and commit its output."; exit 1; }
+          else
+            echo "No Pages source, builder or mirror changes; mirror rebuild is not required."
+          fi
+
       - name: Cache Playwright browsers
         if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4

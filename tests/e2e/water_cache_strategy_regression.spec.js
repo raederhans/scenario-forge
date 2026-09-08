@@ -44,7 +44,7 @@ async function ensureScenario(page, scenarioId, label) {
   }, scenarioId, { timeout: 120_000 });
 
   const currentScenarioId = await page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     return String(state.activeScenarioId || "");
   });
 
@@ -75,7 +75,7 @@ async function ensureWaterInspectorItemsReady(page) {
   const hasItems = await page.evaluate(() => !!document.querySelector("#waterRegionList .inspector-item-btn"));
   if (!hasItems) {
     await page.evaluate(async () => {
-      const { scheduleScenarioChunkRefresh } = await import("/js/core/scenario_resources.js");
+      const { scheduleScenarioChunkRefresh } = await import(new URL("./js/core/scenario_resources.js", location.href));
       scheduleScenarioChunkRefresh({ reason: "scenario-apply", delayMs: 0 });
     });
     await waitForRenderIdle(page, { scenarioId: TARGET_SCENARIO_ID, timeout: 120_000 });
@@ -104,7 +104,7 @@ async function dragMap(page, { dx = 180, dy = 28, steps = 8 } = {}) {
 
 async function zoomMap(page, percent) {
   await page.evaluate(async (targetPercent) => {
-    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    const { setZoomPercent } = await import(new URL("./js/core/map_renderer.js", location.href));
     setZoomPercent(targetPercent);
   }, percent);
   await waitForRenderIdle(page, { timeout: 30_000 });
@@ -112,7 +112,7 @@ async function zoomMap(page, percent) {
 
 async function zoomMapWithoutWaitingForIdle(page, percent) {
   await page.evaluate(async (targetPercent) => {
-    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    const { setZoomPercent } = await import(new URL("./js/core/map_renderer.js", location.href));
     setZoomPercent(targetPercent);
   }, percent);
 }
@@ -142,7 +142,7 @@ async function selectWaterRegionByName(page, searchValue, expectedName) {
 
 async function hoverWaterFeatureOnMap(page, featureId) {
   const targetPoint = await page.evaluate(async (targetFeatureId) => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     const mapContainer = document.querySelector("#mapContainer");
     if (!mapContainer) return null;
     const rect = mapContainer.getBoundingClientRect();
@@ -172,7 +172,7 @@ async function hoverWaterFeatureOnMap(page, featureId) {
   await expect.poll(async () => {
     await page.mouse.move(targetPoint.x, targetPoint.y, { steps: 2 });
     return page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     const current = state.hoveredWaterRegionId;
     return current ? String(current) : null;
     });
@@ -194,7 +194,7 @@ async function enableOpenOceanInteraction(page) {
 
 async function readWaterRuntimeSnapshot(page) {
   return page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     const metrics = state.renderPerfMetrics && typeof state.renderPerfMetrics === "object"
       ? state.renderPerfMetrics
       : (globalThis.__renderPerfMetrics || {});

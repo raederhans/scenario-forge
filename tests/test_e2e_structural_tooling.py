@@ -1960,6 +1960,23 @@ jobs:
                 )
                 self.assertNotEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
+    def test_pr_pages_mirrors_cover_runtime_without_rebuilding_unrelated_edits(self) -> None:
+        workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
+        step = next(step for step in parse_job_steps(parse_workflow_job_blocks(workflow)["verify"])
+                    if step.get("name") == "Check tracked Pages mirrors for relevant PR changes")
+        body = "\n".join(str(line) for line in step["lines"])
+        self.assertIn("if: inputs.profile == 'pr-fast'", body)
+        pattern = re.search(r"grep -Eq '([^']+)'", body).group(1)
+        for changed in ["js/core/renderer/render_cache_owner.js", "tools/build_pages_dist.py",
+                        "dist/app/js/core/history_manager.js", "data/scenarios/index.json"]:
+            self.assertRegex(changed, pattern)
+        for changed in ["docs/notes.md", "tests/history_feature_color_refresh_behavior.test.mjs"]:
+            self.assertNotRegex(changed, pattern)
+        self.assertIn("python tools/build_pages_dist.py", body)
+        self.assertIn("git diff --exit-code --", body)
+        self.assertIn("dist/pages-dist-manifest.json", body)
+        self.assertIn("exit 1", body)
+
     def test_verify_shared_rejects_unknown_profiles_before_profile_steps(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
         validation_index = workflow.index("- name: Validate verification profile")

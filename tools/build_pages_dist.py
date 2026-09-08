@@ -161,9 +161,7 @@ SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES = {
     Path("tno_1962") / "derived" / "geometry_drop_audit.json",
 }
 SCENARIO_EXCLUDED_FILE_NAMES = {"audit.json"}
-SCENARIO_EXCLUDED_RELATIVE_FILES = {
-    Path("modern_world") / "runtime_topology.topo.json",
-}
+SCENARIO_EXCLUDED_RELATIVE_FILES: set[Path] = set()
 TRANSPORT_METADATA_FILE_NAMES = {
     "catalog.json",
     "manifest.json",

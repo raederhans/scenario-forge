@@ -44,7 +44,7 @@ function logProjectSaveLoadStep(step, extra = null) {
 async function installStateHandle(page) {
   await page.evaluate(async () => {
     globalThis.__pwProjectSaveLoad = {
-      state: (await import("/js/core/state.js")).state,
+      state: (await import(new URL("./js/core/state.js", location.href))).state,
     };
   });
 }
@@ -54,7 +54,7 @@ async function installInteractionFunnelDebugHandle(page) {
   await page.evaluate(async () => {
     globalThis.__pwProjectSaveLoad = {
       ...(globalThis.__pwProjectSaveLoad || {}),
-      getInteractionFunnelDebugState: (await import("/js/core/interaction_funnel.js")).getInteractionFunnelDebugState,
+      getInteractionFunnelDebugState: (await import(new URL("./js/core/interaction_funnel.js", location.href))).getInteractionFunnelDebugState,
     };
   });
 }
@@ -253,7 +253,7 @@ async function applyScenario(page, scenarioId) {
       select.value = expectedScenarioId;
       select.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
+    const { applyScenarioById } = await import(new URL("./js/core/scenario_manager.js", location.href));
     await applyScenarioById(expectedScenarioId, {
       renderNow: true,
       markDirtyReason: "playwright-apply-scenario",
@@ -332,7 +332,7 @@ async function waitForProjectImportCompletionFrom(page, importWaitState, { timeo
 
 async function getScenarioOwnershipFeature(page) {
   return page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     const featureId = Object.keys(state.scenarioBaselineOwnersByFeatureId || {})[0] || "";
     return {
       featureId,
@@ -419,7 +419,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await page.waitForFunction((value) => document.querySelector("#themeSelect")?.value === value, selectedPaletteId);
 
   const legacySpecialZoneStartResult = await page.evaluate(async () => {
-    const { startSpecialZoneDraw } = await import("/js/core/map_renderer.js");
+    const { startSpecialZoneDraw } = await import(new URL("./js/core/map_renderer.js", location.href));
     return startSpecialZoneDraw({ zoneType: "custom", label: "" });
   });
   expect(legacySpecialZoneStartResult).toBe(false);
@@ -930,7 +930,7 @@ test("legacy scenario project import ignores retired controller map", async ({ p
   await waitForProjectImportCompletionFrom(page, legacyScenarioImportWait);
 
   const runtimeState = await page.evaluate(async ({ featureId }) => {
-    const { state } = await import("/js/core/state.js");
+    const { state } = await import(new URL("./js/core/state.js", location.href));
     return {
       activeScenarioId: state.activeScenarioId || "",
       owner: String(state.sovereigntyByFeatureId?.[featureId] || ""),
@@ -1004,11 +1004,14 @@ test("baseline mismatch acceptance persists scenario import audit", async ({ pag
 for (const baseline of [
   { mode: "fresh", scenario: "tno_1962", sample: "tno-1962-atlantropa-briefing" },
   { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing" },
+  { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing", roundtripOnly: true },
 ]) {
-  test(`editing baseline ${baseline.mode} ${baseline.scenario} click undo save reload`, async ({ page }, testInfo) => {
+  test(`editing baseline ${baseline.mode} ${baseline.scenario} click undo save reload${baseline.roundtripOnly ? " (roundtrip only)" : ""}`, async ({ page }, testInfo) => {
     test.setTimeout(110000);
     page.setDefaultTimeout(10000);
-    await page.setViewportSize({ width: 1600, height: 1000 });
+    await page.setViewportSize(baseline.roundtripOnly
+      ? { width: 1280, height: 720 }
+      : { width: 1600, height: 1000 });
     const { DEFAULT_FAST_APP_OPEN_PATH, DEFAULT_FRESH_APP_OPEN_PATH } = require("./support/startup-paths");
     const { waitForScenarioApplyIdle: waitReady } = require("./support/playwright-app");
     const target = baseline.mode === "fast" ? DEFAULT_FAST_APP_OPEN_PATH : DEFAULT_FRESH_APP_OPEN_PATH;
@@ -1023,7 +1026,7 @@ for (const baseline of [
     await page.locator("#toolFillBtn").click();
     await page.locator("#customColor").fill("#e31ac4");
     const point = await page.evaluate(async () => {
-      const { projectGeoToScreen } = await import("/js/core/map_renderer.js");
+      const { projectGeoToScreen } = await import(new URL("./js/core/map_renderer.js", location.href));
       const xy = projectGeoToScreen(13.4, 52.5);
       const rect = document.querySelector("#mapContainer").getBoundingClientRect();
       return { x: rect.left + xy[0], y: rect.top + xy[1] };
@@ -1042,10 +1045,16 @@ for (const baseline of [
     const painted = await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }));
     expect(painted).not.toEqual(selected.before);
     expect(Object.values(painted)).toContain("#e31ac4");
-    await page.locator("#undoBtn").click();
+    if (baseline.roundtripOnly) {
+      await page.locator("h1").click();
+      await page.keyboard.press("Control+z");
+    } else {
+      await page.locator("#undoBtn").click();
+    }
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
     expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.historyPast.length)).toBe(selected.history);
-    await page.locator("#redoBtn").click();
+    if (baseline.roundtripOnly) await page.keyboard.press("Control+y");
+    else await page.locator("#redoBtn").click();
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
     const savePath = testInfo.outputPath("edited.project.json");
     const saved = await exportProjectJson(page, savePath);
@@ -1065,6 +1074,9 @@ for (const baseline of [
       return { scenario: s.activeScenarioId, overrides: { ...s.visualOverrides }, past: s.historyPast.length, future: s.historyFuture.length, selection: s.devSelectionFeatureIds.size };
     });
     expect(afterSwitch).toEqual({ scenario: "modern_world", overrides: {}, past: 0, future: 0, selection: 0 });
+    // The generated-product gate also catches missing published Modern World
+    // topology. The broader cross-scenario reimport/raster regression remains.
+    if (baseline.roundtripOnly) return;
     // Import from another active scenario: current target baseline must authorize
     // unloaded real IDs, while an ID invented by the project stays invalid.
     const foreignPath = testInfo.outputPath("foreign-id.project.json");
@@ -1084,7 +1096,7 @@ for (const baseline of [
     // Reload resets the view to the globe. Enlarge the edited district before
     // asserting exact raster color so resampling a two-pixel feature is not the oracle.
     const exportPoint = await page.evaluate(async () => {
-      const { projectGeoToScreen } = await import("/js/core/map_renderer.js");
+      const { projectGeoToScreen } = await import(new URL("./js/core/map_renderer.js", location.href));
       const xy = projectGeoToScreen(13.4, 52.5);
       const rect = document.querySelector("#mapContainer").getBoundingClientRect();
       return { x: rect.left + xy[0], y: rect.top + xy[1] };
