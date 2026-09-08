@@ -184,8 +184,8 @@ class ProjectSupportDiagnosticsSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('projectSaveStatus.textContent = "";', owner_content)
         self.assertIn('Project export includes appearance and transport settings.', owner_content)
         self.assertIn('Project exported. Appearance and transport settings are saved in the selected project file.', owner_content)
-        self.assertIn('onProjectImportComplete: () => refreshProjectSaveStatus()', owner_content)
-        self.assertIn('onProjectImportError: () => refreshProjectSaveStatus(t("Project import failed before completion. Review the current map state.", "ui"))', owner_content)
+        self.assertIn('onProjectImportComplete: completeProjectImportStatus', owner_content)
+        self.assertIn('onProjectImportError: failProjectImportStatus', owner_content)
         self.assertIn('importProjectThroughFunnel(file, {', owner_content)
         self.assertIn('invalidateFrontlineOverlayState,', owner_content)
 
@@ -208,7 +208,7 @@ class ProjectSupportDiagnosticsSidebarBoundaryContractTest(unittest.TestCase):
 
         self.assertIn('syncProjectImportUiStateHelper', interaction_funnel_content)
         self.assertIn("onProjectImportComplete", interaction_funnel_content)
-        self.assertIn("onSuccess: () => hooks.onProjectImportComplete?.()", interaction_funnel_content)
+        self.assertIn("onSuccess: () => hooks.onProjectImportComplete?.(importSummary)", interaction_funnel_content)
         self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_LEGEND_UI);', interaction_funnel_ui_sync_content)
         self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);', interaction_funnel_ui_sync_content)
         self.assertIn('emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TRANSPORT_APPEARANCE_UI);', interaction_funnel_ui_sync_content)

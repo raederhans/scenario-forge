@@ -399,7 +399,7 @@ function partitionFeatureScopedEntries(entries, validFeatureIds) {
 
 async function migrateFeatureScopedProjectDataToCurrentTopology(
   data,
-  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null } = {}
+  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null } = {}
 ) {
   const payload = data && typeof data === "object" ? { ...data } : {};
   delete payload.scenarioControllersByFeatureId;
@@ -426,10 +426,22 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   );
   const nextVisualOverrides = payload.visualOverrides || payload.featureOverrides || {};
   const visualPartition = partitionFeatureScopedEntries(nextVisualOverrides, normalizedValidFeatureIds);
+  const reportMigration = (migratedEntries = 0) => {
+    if (typeof onMigration !== "function") return;
+    const sourceCount = Object.keys(payload.sovereigntyByFeatureId || {}).length
+      + Object.keys(nextVisualOverrides).length;
+    const retainedCount = Object.keys(sovereigntyPartition.retained).length
+      + Object.keys(visualPartition.retained).length;
+    onMigration({
+      migratedEntries,
+      ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries),
+    });
+  };
   if (
     !sovereigntyPartition.needsMigration
     && !visualPartition.needsMigration
   ) {
+    reportMigration();
     payload.sovereigntyByFeatureId = { ...sovereigntyPartition.retained };
     delete payload.scenarioControllersByFeatureId;
     payload.visualOverrides = { ...visualPartition.retained };
@@ -439,6 +451,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
 
   const migrationMap = await loadFeatureMigrationMap({ fetchImpl });
   if (!migrationMap || typeof migrationMap !== "object") {
+    reportMigration();
     payload.sovereigntyByFeatureId = { ...sovereigntyPartition.retained };
     delete payload.scenarioControllersByFeatureId;
     payload.visualOverrides = { ...visualPartition.retained };
@@ -457,6 +470,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     migrationMap
   );
 
+  reportMigration(sovereigntyMigration.migratedSourceCount + visualMigration.migratedSourceCount);
   payload.sovereigntyByFeatureId = sovereigntyMigration.remapped;
   delete payload.scenarioControllersByFeatureId;
   payload.visualOverrides = visualMigration.remapped;
@@ -504,4 +518,3 @@ export {
   migrateImportedProjectData,
   migrateFeatureScopedProjectDataToCurrentTopology,
 };
-

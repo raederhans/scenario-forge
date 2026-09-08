@@ -1062,10 +1062,33 @@ for (const baseline of [
     await page.locator("h1").click();
     await page.keyboard.press("Control+z");
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
+    if (baseline.roundtripOnly) {
+      // Cancellation and parse failure must preserve the actual unsaved edit state.
+      // Undo restores its historical dirty snapshot, so make a fresh real edit.
+      await page.mouse.click(point.x, point.y);
+      expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
+      const cancelledPath = testInfo.outputPath("cancelled.project.json");
+      fs.writeFileSync(cancelledPath, JSON.stringify({ ...saved, scenario: { ...saved.scenario, baselineHash: "u1-mismatch" } }));
+      await page.locator("#projectFileInput").setInputFiles(cancelledPath);
+      await page.locator("[data-app-dialog-overlay='true'] [data-dialog-cancel='true']").click();
+      await expect(page.locator("#projectSaveStatus")).toHaveText("Project import cancelled.");
+      expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
+      const invalidPath = testInfo.outputPath("invalid.project.json");
+      fs.writeFileSync(invalidPath, "{invalid-json");
+      await page.locator("#projectFileInput").setInputFiles(invalidPath);
+      await expect(page.locator("#projectSaveStatus")).toContainText("Project import failed before completion.");
+      expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
+      fs.writeFileSync(savePath, JSON.stringify({ ...saved, visualOverrides: { ...saved.visualOverrides, U1_FORGED_FEATURE: "#00ff00" } }));
+    }
     const watch = await beginProjectImportWait(page, { expectedFileName: path.basename(savePath) });
     await page.locator("#projectFileInput").setInputFiles(savePath);
     await waitForProjectImportCompletionFrom(page, watch, { timeout: 30000 });
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
+    if (baseline.roundtripOnly) {
+      await expect(page.locator("#projectSaveStatus")).toContainText("Project imported: HOI4 1936.");
+      await expect(page.locator("#projectSaveStatus")).toContainText("Ignored 1 entries");
+      expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(false);
+    }
     const reexported = await exportProjectJson(page, testInfo.outputPath("reloaded.project.json"));
     expect(reexported.visualOverrides).toEqual(saved.visualOverrides);
     await applyScenario(page, "modern_world");
