@@ -1135,15 +1135,30 @@ async function runScenarioApplyRequest(request) {
     return bundle;
   })();
   const requestPromise = activeScenarioApplyPromise;
-
+  let applyCompleted = false;
   try {
-    return await requestPromise;
+    const bundle = await requestPromise;
+    applyCompleted = true;
+    return bundle;
   } finally {
     if (activeScenarioApplyPromise === requestPromise && activeScenarioApplyRequestId === request.requestId) {
+      const resumePendingChunks = applyCompleted
+        && isScenarioApplyRequestCurrent(request)
+        && normalizeScenarioId(runtimeState.activeScenarioId) === request.scenarioId
+        && !!runtimeState.runtimeChunkLoadState?.pendingReason
+        && runtimeState.runtimeChunkLoadState.pendingScenarioApplyRequestId === request.requestId;
       activeScenarioApplyPromise = null;
       activeScenarioApplyTargetId = "";
       activeScenarioApplyRequestId = 0;
       clearActiveScenarioApplyRequestState(runtimeState);
+      // Post-apply chunk work is deferred while this request owns the apply lock.
+      // Resume it only after releasing that lock, while its request is still current.
+      if (resumePendingChunks) {
+        scheduleScenarioChunkRefresh({
+          flushPending: true,
+          scenarioApplyRequestId: request.requestId,
+        });
+      }
       syncScenarioUi();
     }
   }

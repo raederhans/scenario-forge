@@ -285,6 +285,47 @@ test("new and queued scenario transactions allocate a new apply epoch", async ()
   );
 });
 
+test("completed apply resumes only its current pending chunk work after releasing the lock", async () => {
+  const body = extractFunctionBody(readRepoFile("js", "core", "scenario_manager.js"), "runScenarioApplyRequest");
+  for (const mode of ["success", "no-pending", "failure", "cancelled", "replaced", "other-scene", "other-pending"]) {
+    const state = { activeScenarioId: "alpha", runtimeChunkLoadState: {
+      pendingReason: mode === "no-pending" ? "" : "scenario-apply",
+      pendingScenarioApplyRequestId: mode === "other-pending" ? 2 : 1,
+    } };
+    const calls = [];
+    const dependencies = {
+      runtimeState: state,
+      getScenarioFatalRecoveryState: () => null,
+      beginScenarioApplyRequestState: () => { state.scenarioApplyInFlight = true; },
+      syncScenarioUi: () => {}, recordRenderTransactionSnapshot: () => {},
+      getSearchParams: () => new URLSearchParams(),
+      loadScenarioBundle: async () => ({ manifest: { scenario_id: "alpha" } }),
+      scheduleScenarioDeferredBundleMetadataLoad: () => {},
+      isScenarioApplyRequestCurrent: () => mode !== "cancelled" && mode !== "replaced",
+      applyScenarioBundle: async () => {
+        if (mode === "failure") throw new Error("apply failed");
+        if (mode === "other-scene") state.activeScenarioId = "beta";
+      },
+      normalizeScenarioId: value => String(value || ""),
+      clearActiveScenarioApplyRequestState: () => { state.scenarioApplyInFlight = false; },
+      scheduleScenarioChunkRefresh: options => {
+        assert.equal(state.scenarioApplyInFlight, false);
+        calls.push(options);
+      },
+    };
+    const run = new Function("dependencies", `
+      const { ${Object.keys(dependencies).join(",")} } = dependencies;
+      let activeScenarioApplyPromise = null, activeScenarioApplyTargetId = "", activeScenarioApplyRequestId = 0;
+      return async function(request) { ${body} };
+    `)(dependencies);
+    const result = run({ requestId: 1, scenarioId: "alpha" });
+    if (mode === "failure") await assert.rejects(result, /apply failed/);
+    else await result;
+    assert.equal(calls.length, mode === "success" ? 1 : 0, mode);
+    if (calls.length) assert.deepEqual(calls[0], { flushPending: true, scenarioApplyRequestId: 1 });
+  }
+});
+
 test("scenario manager owns apply requests with same-target reuse and latest-target queue", () => {
   const source = readRepoFile("js", "core", "scenario_manager.js");
 

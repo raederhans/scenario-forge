@@ -6967,8 +6967,23 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
   refreshResolvedColorsForFeatures(ids, { renderNow });
 }
 
-function refreshColorState({ renderNow = true } = {}) {
+function refreshColorState({ renderNow = true, featureIds = null, inputLabel = "" } = {}) {
   const startedAt = nowMs();
+  const ids = Array.isArray(featureIds) ? normalizeFeatureOverrideTargetIds(featureIds) : [];
+  // Only local political colors can bypass the full surface refresh. Atlantropa
+  // colors also participate in contextScenario and keep the existing full path.
+  if (ids.length && ids.every((id) => {
+    const feature = findResolvedColorFeatureById(id);
+    return feature && !isAtlantropaFieldDrivenFeature(feature);
+  })) {
+    refreshResolvedColorsForFeatures(ids, { renderNow, inputStartedAt: startedAt, inputLabel });
+    recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
+      renderNow: !!renderNow,
+      featureCount: ids.length,
+      mode: "partial",
+    });
+    return;
+  }
   normalizeColorStateForRender(state, {
     sanitizeColorMap,
     sanitizeCountryColorMap,
@@ -6978,6 +6993,7 @@ function refreshColorState({ renderNow = true } = {}) {
   recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
     renderNow: !!renderNow,
     featureCount: Object.keys(runtimeState.colors || {}).length,
+    mode: "full",
   });
   if (renderNow && rendererSurfaceHost.getContext()) {
     render();
@@ -12206,6 +12222,9 @@ function promoteDeferredColorRenderToIdle() {
   clearRenderPhaseTimer();
   cancelExactAfterSettleRefresh({ clearDefer: true });
   setRenderPhase(RENDER_PHASE_IDLE);
+  // This fast color path replaces both normal settle completion callbacks.
+  // Preserve their pending chunk wakeup after the current draw returns.
+  flushPendingScenarioChunkRefreshAfterExact("color-render-idle");
   recordRenderPerfMetric("promoteDeferredColorRenderToIdle", 0, {
     previousPhase,
     previousDefer,

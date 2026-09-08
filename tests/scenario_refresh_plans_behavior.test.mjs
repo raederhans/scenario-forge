@@ -657,6 +657,8 @@ test("chunk promotion runtime executes default frame graph invalidation effects"
 });
 
 test("chunk promotion deferred infra restores full political derived state after primary visible subset refresh", async () => {
+  let yieldEffect = null;
+  let failRestore = false;
   const feature = (id) => ({ type: "Feature", id, properties: { id }, geometry: null });
   const fullPoliticalPayload = {
     type: "FeatureCollection",
@@ -709,6 +711,7 @@ test("chunk promotion deferred infra restores full political derived state after
     },
     rebuildRuntimeDerivedState: () => {
       calls.push(["rebuildRuntimeDerivedState"]);
+      if (failRestore) throw new Error("full restore failed");
       runtimeState.colors = colorsFor(fullPoliticalPayload);
       return runtimeState.colors;
     },
@@ -742,7 +745,7 @@ test("chunk promotion deferred infra restores full political derived state after
       return { kind: "deferred-work" };
     },
     cancelDeferredWork: (...args) => calls.push(["cancelDeferredWork", ...args]),
-    yieldToMain: async () => calls.push(["yieldToMain"]),
+    yieldToMain: async () => { calls.push(["yieldToMain"]); await yieldEffect?.(); },
     nowMs: (() => {
       let now = 200;
       return () => {
@@ -799,6 +802,9 @@ test("chunk promotion deferred infra restores full political derived state after
   assert.deepEqual(Object.keys(runtimeState.colors), ["GER", "ITA", "POL", "FRA"]);
   assert.ok(calls.some(([name]) => name === "rebuildPoliticalLandCollections"));
   assert.ok(calls.some(([name]) => name === "rebuildRuntimeDerivedState"));
+  assert.equal(calls.filter(([name]) => name === "buildIndex").length, 0);
+  assert.equal(calls.filter(([name]) => name === "buildSpatialIndexChunked").length, 0);
+  assert.ok(calls.some(([name]) => name === "yieldToMain"));
   assert.ok(calls.some(([name, metricName, _duration, details]) => (
     name === "recordRenderPerfMetric"
     && metricName === "scenarioPoliticalDerivedStateCoverage"
@@ -811,6 +817,27 @@ test("chunk promotion deferred infra restores full political derived state after
     && Array.isArray(details?.missingColorFeatureIdsSample)
     && details.missingColorFeatureIdsSample.includes("FRA")
   )));
+
+  runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true, hasPoliticalPayloadChange: true });
+  calls.length = 0;
+  yieldEffect = () => runtime.resetDeferredScenarioChunkPromotionState();
+  assert.equal(await runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    promotionVersion: 2, hasPoliticalGeometryChange: true, primaryVisibleDerivedStateReady: true,
+  }), false);
+  assert.equal(calls.some(([name]) => name === "rebuildRuntimeDerivedState"), false);
+  assert.equal(calls.some(([name]) => name === "setInteractionInfrastructureState"), false);
+
+  yieldEffect = null;
+  runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true, hasPoliticalPayloadChange: true });
+  calls.length = 0;
+  runtimeState.interactionInfrastructureReady = true;
+  failRestore = true;
+  await assert.rejects(runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    promotionVersion: 1, hasPoliticalGeometryChange: true, primaryVisibleDerivedStateReady: true,
+  }), /full restore failed/);
+  assert.equal(calls.find(([name]) => name === "setInteractionInfrastructureState")?.[2].ready, false);
+  assert.equal(calls.some(([name]) => name === "scheduleHitCanvasBuildIfNeeded"), false);
+  assert.ok(calls.some(([name]) => name === "endInteractionRecoveryTask"));
 });
 
 test("chunk promotion deferred infra refreshes stale colors when land coverage is already complete", async () => {
