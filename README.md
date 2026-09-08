@@ -120,25 +120,33 @@ Prerequisites:
 
 - Windows is the supported path for the included `.bat` launchers.
 - Python 3 should be available through `py -3` or `python`.
-- The first launch can take longer while local data and runtime files are prepared.
+- The runtime assets needed by the selected scenario must already be present in the checkout. The default, `fast`, and `fresh` launch modes skip data rebuilding; they do not create missing assets.
 
-Run the full local editor:
+Start the local editor using existing runtime assets:
 
 ```bat
 start_dev.bat
 ```
 
-Start faster after local data has already been built:
+Use the startup worker and cache with readonly startup interaction:
 
 ```bat
 start_dev.bat fast
 ```
 
-Start with a clean runtime session:
+Use full startup interaction with the startup worker and cache disabled (this still skips data rebuilding):
 
 ```bat
 start_dev.bat fresh
 ```
+
+When data rebuilding is required, use the explicit full mode with the data build dependencies and source inputs installed:
+
+```bat
+start_dev.bat full
+```
+
+Full mode runs `build_data.bat` before starting the server; it is not required for ordinary UI edits when the runtime assets are already available.
 
 ### Local Backend Preview
 
