@@ -5,6 +5,9 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../suppor
 // Dev-only cold-start/input measurements and the TNO/HOI4/TNO cycle wait for full idle convergence.
 // JUSTIFY: Bounds the complete multi-stage diagnostic, not input latency; no retries are enabled.
 test.setTimeout(180_000);
+// Trace snapshots await renderer-side DOM work before input dispatch, which can
+// move the input past the busy task. Preserve raw probes instead for this lane.
+test.use({ trace: 'off' });
 const startupPath = '/app/?render_profile=balanced&startup_interaction=full&startup_worker=1&startup_cache=0&perf=1';
 const stableInputWindow = process.env.M2_STABLE_INPUT === '1';
 const variant = process.env.P1_VARIANT || 'baseline';
@@ -102,12 +105,14 @@ async function installInputObserver(page, point) {
       return Array.from(context.getImageData(0, 0, 9, 9).data);
     };
     globalThis.__runtimeInputProbe = { results: [], pending: null, readPixels, busyTasks: [],
-      scheduleBusyRender: () => requestAnimationFrame(() => {
+      runBusyRender: () => {
         const task = { kind: 'full-color-refresh', startTime: performance.now() };
-        refreshColorState({ renderNow: true });
-        task.endTime = performance.now();
-        globalThis.__runtimeInputProbe.busyTasks.push(task);
-      }) };
+        try { refreshColorState({ renderNow: true }); }
+        finally {
+          task.endTime = performance.now();
+          globalThis.__runtimeInputProbe.busyTasks.push(task);
+        }
+      } };
     const busySnapshot = () => {
       const s = globalThis.__playwrightStateRef;
       const c = s.runtimeChunkLoadState || {};
@@ -192,25 +197,38 @@ async function installInputObserver(page, point) {
   }, point);
 }
 
-async function arm(page, kind, rgb = null) {
+async function arm(page, kind, rgb = null, inputPoint = null) {
   if (kind !== 'zoom') await waitForStableInputWindow(page);
-  await page.evaluate(({ kind, rgb, stableInputWindow }) => {
+  // Resolve actionability/coordinates and move before the measured busy task.
+  if (inputPoint) await page.mouse.move(inputPoint.x, inputPoint.y);
+  await page.evaluate(({ kind, rgb }) => {
     const probe = globalThis.__runtimeInputProbe;
     probe.pending = { kind, rgb: kind === 'undo' ? probe.undoRgb : rgb, startedAt: null, before: probe.readPixels(),
       armedAt: performance.now(), firstVisibleAt: null, stableSince: null, wheelEvents: [],
       stableWindow: globalThis.__inputStableWindow || null,
       beforeSequence: globalThis.__playwrightStateRef.renderPerfMetricSequence || 0,
       zoomK: globalThis.__playwrightStateRef.zoomTransform.k };
-    // Use real renderer work without moving the feature under the pixel probe.
-    // Keep actual busy intervals so a missed overlap is not claimed as queueing.
-    if (!stableInputWindow && kind !== 'zoom') probe.scheduleBusyRender();
-  }, { kind, rgb, stableInputWindow });
+  }, { kind, rgb });
 }
 
-async function dispatchInput(page, action) {
+async function controlPoint(page, selector) {
+  const rect = await page.locator(selector).boundingBox();
+  expect(rect, `${selector} must have a screen rectangle before arming`).not.toBeNull();
+  return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+}
+
+async function dispatchInput(page) {
+  // Do not await renderer work before injecting real mouse events. A client-side
+  // delay lets the renderer task start, while EventTiming must prove overlap.
+  const work = stableInputWindow ? Promise.resolve() : page.evaluate(() => globalThis.__runtimeInputProbe.runBusyRender());
+  const workOutcome = work.then(() => null, error => error);
+  if (!stableInputWindow) await new Promise(resolve => setTimeout(resolve, 10));
   const started = process.hrtime.bigint();
-  await action();
+  await page.mouse.down();
+  await page.mouse.up();
   const playwrightActionMs = Number(process.hrtime.bigint() - started) / 1e6;
+  const workError = await workOutcome;
+  if (workError) throw workError;
   await page.evaluate(value => {
     const probe = globalThis.__runtimeInputProbe;
     const sample = probe.pending || probe.results.at(-1);
@@ -243,9 +261,9 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         return { x: rect.left + xy[0], y: rect.top + xy[1] };
       });
       await installInputObserver(page, point);
-      await arm(page, 'selection');
+      await arm(page, 'selection', null, point);
       await page.keyboard.down('Control');
-      await dispatchInput(page, () => page.mouse.click(point.x, point.y));
+      await dispatchInput(page);
       await page.keyboard.up('Control');
       await waitForInputEvidence(page);
       const initial = await page.evaluate(async () => {
@@ -259,16 +277,16 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       expect(initial.id).toBeTruthy();
       await waitForRenderIdle(page, { scenarioId });
-      await arm(page, 'fill', [227, 26, 196]);
-      await dispatchInput(page, () => page.mouse.click(point.x, point.y));
+      await arm(page, 'fill', [227, 26, 196], point);
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => Object.values(globalThis.__playwrightStateRef.visualOverrides))).toContain('#e31ac4');
-      await arm(page, 'undo', initial.rgb);
-      await dispatchInput(page, () => page.locator('#undoBtn').click());
+      await arm(page, 'undo', initial.rgb, await controlPoint(page, '#undoBtn'));
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => ({ ...globalThis.__playwrightStateRef.visualOverrides }))).toEqual(initial.overrides);
-      await arm(page, 'redo', [227, 26, 196]);
-      await dispatchInput(page, () => page.locator('#redoBtn').click());
+      await arm(page, 'redo', [227, 26, 196], await controlPoint(page, '#redoBtn'));
+      await dispatchInput(page);
       await waitForInputEvidence(page);
       expect(await page.evaluate(() => Object.values(globalThis.__playwrightStateRef.visualOverrides))).toContain('#e31ac4');
       await page.locator('#undoBtn').click();
@@ -309,6 +327,8 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
           && ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click'].includes(e.name));
         // Missing EventTiming (below threshold or unsupported) is not a zero queue delay.
         input.queueMs = input.eventTimings?.length ? Math.max(...input.eventTimings.map(e => e.queueMs)) : null;
+        input.inputToVisibleMs = Number.isFinite(input.eventTimeStamp) ? input.firstVisibleAt - input.eventTimeStamp : null;
+        input.inputToStableMs = Number.isFinite(input.eventTimeStamp) ? input.stableAt - input.eventTimeStamp : null;
         input.busyTasks = evidence.busyTasks.filter(task => task.startTime >= input.armedAt && task.startTime <= input.stableAt);
         input.queuedDuringBusyTask = input.eventTimings?.length ? input.eventTimings.some(e =>
           input.busyTasks.some(task => task.startTime <= e.processingStart && task.endTime >= e.startTime)) : null;
@@ -317,14 +337,21 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       }
       const evidencePath = testInfo.outputPath('runtime-stage-input-evidence.json');
       fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, variant, viewport, stableInputWindow,
+        measurementVersion: 2,
         baselineRevision: process.env.P1_BASE_REVISION || null,
         browserVersion: page.context().browser()?.version(), nodeVersion: process.version,
         host: require('node:os').hostname(), platform: process.platform,
         timingContract: { eventThresholdMs: 16, stableHoldMs: 250, visible: 'canvas/SVG at rAF; not physical display presentation',
+          trace: 'off: before-action DOM snapshots would perturb dispatch timing',
           handlerBoundary: 'capture listener; exact processingStart/End retained per EventTiming entry',
-          busyCondition: 'real full-color-refresh scheduled at next animation frame; overlap recorded, never assumed',
+          busyCondition: 'concurrent synchronous full-color-refresh and mouse down/up after 10ms client delay; overlap must be observed',
           wheel: 'capture timestamps and frame evidence; excluded from discrete EventTiming' }, pageErrors, ...evidence }, null, 2));
       await testInfo.attach('runtime-stage-input-evidence', { path: evidencePath, contentType: 'application/json' });
+      if (!stableInputWindow && evidence.inputs.length === 5) {
+        for (const input of evidence.inputs.filter(input => input.kind !== 'zoom')) {
+          expect(input.queuedDuringBusyTask, `${input.kind}: busy input must overlap a recorded renderer task`).toBe(true);
+        }
+      }
     }
   });
 }
