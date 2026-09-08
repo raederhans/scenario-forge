@@ -4474,7 +4474,6 @@ function getScenarioWaterVisualRevisionToken() {
     runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
     runtimeState.allowOpenOceanSelect ? "open-ocean-select:on" : "open-ocean-select:off",
     runtimeState.allowOpenOceanPaint ? "open-ocean-paint:on" : "open-ocean-paint:off",
-    `water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`,
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
@@ -4510,6 +4509,8 @@ function getScenarioOverlaySignatureToken() {
     runtimeState.detailPromotionCompleted ? "detail-ready" : "detail-pending",
     runtimeState.detailPromotionInFlight ? "detail-in-flight" : "detail-idle",
     `water:${getScenarioWaterVisualRevisionToken()}`,
+    // Selection redraws the live highlight, without rebuilding the water fill bitmap.
+    `water-selected:${String(runtimeState.selectedWaterRegionId || "").trim()}`,
     `special:${getScenarioSpecialVisualRevisionToken()}`,
     `relief:${getScenarioReliefVisualRevisionToken()}`,
   ].join("|");

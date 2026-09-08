@@ -13,7 +13,7 @@ const names = [
   "isWaterRegionExcludedByScenario", "getObjectIdentityToken", "getScenarioDetailPhaseSignatureToken",
   "getScenarioRuntimeTopologySignatureToken", "estimateTopologyObjectArcRefs", "countTopologyArcRefs",
   "getPhysicalLandMaskInfo", "getFirstUsablePhysicalLandMaskInfo", "getPhysicalLandMaskCandidateQuality",
-  "createPhysicalLandMaskInfo",
+  "createPhysicalLandMaskInfo", "getScenarioOverlaySignatureToken",
 ];
 const feature = (id, props = {}) => ({ type: "Feature", properties: { id, ...props } });
 
@@ -40,6 +40,8 @@ export function createHarness(source = rendererSource) {
     getFeatureCollectionFeatureCount: (collection) => collection?.features?.length || 0,
     stableJson: JSON.stringify, getOceanBaseFillColor: () => "#ocean", getLakeBaseFillColor: () => "#lake",
     getLakeStyleConfig: () => ({ opacity: 1 }),
+    getScenarioSpecialVisualRevisionToken: () => "special",
+    getScenarioReliefVisualRevisionToken: () => "relief",
   });
   vm.runInContext(functions.map((node) => source.slice(node.start, node.end)).join("\n"), context);
   for (const [name, key] of [["getEffectiveWaterRegionFeatures", "water"], ["getEffectiveAtlantropaFeatures", "buckets"],
@@ -56,7 +58,7 @@ const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|deta
   + "|mask-tag:scenarioLandMask:scenario-mask:2:1:na:d3-valid|water-ref:scenario-water:3|water-tag:features:3"
   + `|water-mode:combined|atlantropa:${atlantropa}`;
 const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|water-overrides:{}`
-  + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off|water-selected:"
+  + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
   + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}';
 
 test("water signature preserves bytes and identity allocation while avoiding duplicate water composition and revision work", () => {
@@ -72,6 +74,27 @@ test("standalone surface and Atlantropa calls keep their no-argument semantics",
   assert.equal(h.surface(), surface);
   assert.equal(h.context.getScenarioAtlantropaRevisionToken(), atlantropa);
   assert.equal(h.water(), surface + suffix);
+});
+
+test("water selection invalidates the composite while fill reuse survives selection and clearing", () => {
+  const h = createHarness();
+  const fill = h.water();
+  const composite = h.context.getScenarioOverlaySignatureToken();
+  h.state.selectedWaterRegionId = "scenario";
+  assert.equal(h.water(), fill);
+  assert.notEqual(h.context.getScenarioOverlaySignatureToken(), composite);
+  h.state.selectedWaterRegionId = "";
+  assert.equal(h.water(), fill);
+  assert.equal(h.context.getScenarioOverlaySignatureToken(), composite);
+  h.state.waterRegionOverrides = { scenario: "#123456" };
+  assert.notEqual(h.water(), fill);
+  h.state.waterRegionOverrides = {};
+  assert.equal(h.water(), fill);
+  h.state.showWaterRegions = false;
+  assert.notEqual(h.water(), fill);
+  h.state.showWaterRegions = true;
+  h.state.activeScenarioId = "hoi4";
+  assert.notEqual(h.water(), fill);
 });
 
 test("explicit revision tags retain their bytes and skip unused identity allocations", () => {
