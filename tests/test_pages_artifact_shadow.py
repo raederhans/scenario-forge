@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 import unittest
 import uuid
 from pathlib import Path
+from unittest.mock import patch
 
 from tools import build_pages_dist
 from tools import pages_artifact_shadow as shadow
@@ -61,6 +63,51 @@ def fixture_identity(suffix: str = "a") -> dict[str, str]:
         "tree": ("b" if suffix == "a" else "c") * 40,
         "rollbackDistTree": ("d" if suffix == "a" else "e") * 40,
     }
+
+
+class PagesArtifactGitIdentityTests(unittest.TestCase):
+    def read_identity_from_status(self, status: str) -> dict[str, str]:
+        identity = fixture_identity()
+        outputs = [status, identity["sha"] + "\r\n", identity["tree"] + "\n", identity["rollbackDistTree"] + "\n"]
+        with patch.object(shadow.subprocess, "run", side_effect=[
+            subprocess.CompletedProcess([], 0, stdout=output, stderr="") for output in outputs
+        ]) as runner:
+            result = shadow.read_git_identity()
+        self.assertEqual(
+            [call.args[0] for call in runner.call_args_list],
+            [
+                ["git", "status", "--porcelain", "--untracked-files=all"],
+                ["git", "rev-parse", "HEAD"],
+                ["git", "rev-parse", "HEAD^{tree}"],
+                ["git", "rev-parse", "HEAD:dist"],
+            ],
+        )
+        return result
+
+    def test_first_unstaged_dist_change_preserves_porcelain_columns(self) -> None:
+        self.assertEqual(
+            self.read_identity_from_status(" M dist/app/js/main.js\n M dist/pages-dist-manifest.json\n"),
+            fixture_identity(),
+        )
+
+    def test_clean_and_staged_dist_keep_exact_git_identity(self) -> None:
+        for status in ("", "M  dist/app/js/main.js\r\n"):
+            with self.subTest(status=status):
+                self.assertEqual(self.read_identity_from_status(status), fixture_identity())
+
+    def test_non_dist_changes_remain_rejected_in_first_or_later_rows(self) -> None:
+        for status in (
+            " M js/main.js\n",
+            " M dist/app/js/main.js\n M js/main.js\n",
+            "?? dist-other/main.js\n",
+        ):
+            with self.subTest(status=status), patch.object(
+                shadow.subprocess, "run",
+                return_value=subprocess.CompletedProcess([], 0, stdout=status, stderr=""),
+            ) as runner:
+                with self.assertRaisesRegex(shadow.ShadowVerificationError, "only under tracked dist"):
+                    shadow.read_git_identity()
+                self.assertEqual(runner.call_count, 1)
 
 
 class PagesArtifactShadowTests(unittest.TestCase):
