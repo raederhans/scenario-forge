@@ -41,7 +41,18 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
 }) {
   let scenarioWaterPartPathCache = new WeakMap();
   let scenarioWaterFeaturePathCache = new WeakMap();
+  let scenarioWaterPartBoundsCache = new WeakMap();
   let lastScenarioWaterRenderedCount = 0;
+
+  function getScenarioWaterPartBounds(part) {
+    const cached = scenarioWaterPartBoundsCache.get(part);
+    if (cached) return cached;
+    const bounds = computeProjectedGeoBounds(part);
+    // Bounds live in projection coordinates, as do the cached paths. Screen
+    // culling still uses the current zoom on every draw. Retry failed bounds.
+    if (bounds) scenarioWaterPartBoundsCache.set(part, bounds);
+    return bounds;
+  }
 
   function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
     const startedAt = nowMs();
@@ -65,7 +76,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (!parts.length) return;
       const visibleParts = [];
       parts.forEach((part) => {
-        if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
+        if (!projectedGeoBoundsInScreen(getScenarioWaterPartBounds(part))) return;
         visibleParts.push(part);
       });
       if (!visibleParts.length) return;
@@ -230,7 +241,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost.getContext().beginPath();
       let visiblePartCount = 0;
       parts.forEach((part) => {
-        if (!projectedGeoBoundsInScreen(computeProjectedGeoBounds(part))) return;
+        if (!projectedGeoBoundsInScreen(getScenarioWaterPartBounds(part))) return;
         if (!rendererSurfaceHost.getPathCanvas()) return;
         rendererSurfaceHost.getPathCanvas()(part);
         visiblePartCount += 1;
@@ -497,6 +508,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   function resetWaterPathCaches() {
     scenarioWaterPartPathCache = new WeakMap();
     scenarioWaterFeaturePathCache = new WeakMap();
+    scenarioWaterPartBoundsCache = new WeakMap();
   }
 
   function getPreviousWaterRenderedCount() {
@@ -508,6 +520,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   return Object.freeze({
+    getScenarioWaterPartBounds,
     drawScenarioRegionOverlaysPass,
     resetWaterPathCaches,
     getPreviousWaterRenderedCount,
