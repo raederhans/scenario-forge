@@ -151,6 +151,18 @@ export function createLocalFeedbackRecords(baseRecords) {
     verification: null, selector: {},
   }));
 
+  const editorCheckoutRecord = {
+    id: "local:editor-checkout-profile",
+    commandRef: "python -m unittest tests.test_editor_checkout_profile -q",
+    sourceRefs: ["tools/editor_checkout_profile.py", "tests/test_editor_checkout_profile.py"],
+    ownerHints: ["test-infra"], domains: ["test-infra"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 5,
+    verificationOrder: null,
+    selectorOrder: localOwnerOrder + localOwnerCoverage.length + localTestFiles.length,
+    verification: null, selector: {},
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
-    ...pythonRecords, ...ownerRecords, ...testRecords];
+    ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord];
 }
