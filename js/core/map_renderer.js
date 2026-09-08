@@ -1939,6 +1939,7 @@ function getScenarioReliefOverlayRenderOwner() {
   }
   scenarioReliefOverlayRenderOwner = createScenarioReliefOverlayRenderOwner({
     state,
+    scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
     constants: {
       RELIEF_ATLANTROPA_CONTOUR_COLOR,
       RELIEF_ATLANTROPA_SALT_FILL_COLOR,
@@ -1960,6 +1961,8 @@ function getScenarioReliefOverlayRenderOwner() {
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
     },
     helpers: {
+      cloneZoomTransform,
+      shouldEnableContextScenarioTransformReuse,
       collectContextMetric,
       getEffectiveScenarioReliefOverlayFeatures,
       getPathBounds,
@@ -2312,6 +2315,9 @@ function getRenderCacheOwner() {
     },
     helpers: {
       cloneZoomTransform,
+      areZoomTransformsEquivalent,
+      withRenderTarget,
+      prepareTargetContext,
       ensureRenderPassCacheState,
       getTransformSignature,
       getVisibleFrameIdentity,
@@ -5002,77 +5008,8 @@ function drawScenarioReliefOverlaysLayer(k, {
   });
 }
 
-function renderScenarioReliefOverlaysLayerToCache(currentTransform, reliefFeatures) {
-  const layerEntry = getContextScenarioLayerCacheEntry("relief");
-  const layerCanvas = ensureContextScenarioLayerCanvas("relief");
-  const layerContext = layerCanvas.getContext("2d");
-  if (!layerContext) {
-    layerEntry.signature = "";
-    layerEntry.referenceTransform = null;
-    layerEntry.renderedCount = 0;
-    return 0;
-  }
-  const layout = getRenderPassLayout("contextScenario");
-  let renderedCount = 0;
-  withRenderTarget(layerContext, () => {
-    const layerK = prepareTargetContext(layerContext, currentTransform, layout);
-    renderedCount = drawScenarioReliefOverlaysLayer(layerK, {
-      reliefFeatures,
-      cacheMode: "redraw",
-    });
-  });
-  layerEntry.signature = getScenarioReliefVisualRevisionToken();
-  layerEntry.referenceTransform = cloneZoomTransform(currentTransform);
-  layerEntry.renderedCount = renderedCount;
-  return renderedCount;
-}
-
 function drawScenarioReliefOverlaysPass(k) {
-  const overlays = getEffectiveScenarioReliefOverlayFeatures();
-  if (
-    !overlays.length
-    || !runtimeState.showScenarioReliefOverlays
-    || runtimeState.renderPhase === RENDER_PHASE_INTERACTING
-    || runtimeState.renderPhase === RENDER_PHASE_SETTLING
-  ) {
-    drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
-    return;
-  }
-
-  const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
-  const reliefLayerEntry = getContextScenarioLayerCacheEntry("relief");
-  const reliefVisualRevision = getScenarioReliefVisualRevisionToken();
-  const canReuseReliefLayer = (
-    shouldEnableContextScenarioTransformReuse()
-    && reliefLayerEntry.signature === reliefVisualRevision
-    && !!reliefLayerEntry.canvas
-    && !!reliefLayerEntry.referenceTransform
-  );
-  if (canReuseReliefLayer && drawCachedContextScenarioLayer("relief", currentTransform)) {
-    const renderedCount = Number(reliefLayerEntry.renderedCount || 0);
-    collectContextMetric("contextScenarioLayerCacheHit", 0, {
-      layer: "relief",
-      renderedCount,
-    });
-    collectContextMetric("contextScenarioLayerRelief", 0, {
-      featureCount: overlays.length,
-      renderedCount,
-      skipped: false,
-      cacheMode: "reuse",
-      signature: reliefVisualRevision,
-    });
-    return;
-  }
-
-  collectContextMetric("contextScenarioLayerCacheMiss", 0, {
-    layer: "relief",
-    reason: reliefLayerEntry.signature === reliefVisualRevision ? "transform" : "signature",
-    signatureChanged: reliefLayerEntry.signature !== reliefVisualRevision,
-  });
-  renderScenarioReliefOverlaysLayerToCache(currentTransform, overlays);
-  if (!drawCachedContextScenarioLayer("relief", currentTransform)) {
-    drawScenarioReliefOverlaysLayer(k, { reliefFeatures: overlays, cacheMode: "direct" });
-  }
+  return getScenarioReliefOverlayRenderOwner().drawScenarioReliefOverlaysPass(k);
 }
 
 function getFeatureCountryCodeNormalized(feature) {
@@ -11793,26 +11730,12 @@ function drawPoliticalPass(k) {
   return getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);
 }
 
-function getContextScenarioLayerCacheEntry(...args) {
-  return getScenarioRegionOverlayRenderOwner().getContextScenarioLayerCacheEntry(...args);
-}
-
-function ensureContextScenarioLayerCanvas(...args) {
-  return getScenarioRegionOverlayRenderOwner().ensureContextScenarioLayerCanvas(...args);
-}
-
-function drawCachedContextScenarioLayer(...args) {
-  return getScenarioRegionOverlayRenderOwner().drawCachedContextScenarioLayer(...args);
-}
-
 function getScenarioRegionOverlayRenderOwner() {
   if (!scenarioRegionOverlayRenderOwner) {
     scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost,
-      getRenderPassCacheState,
-      getRenderPassLayout,
+      scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
       cloneZoomTransform,
-      areZoomTransformsEquivalent,
       nowMs,
       collectContextMetric,
       getFeatureId,
@@ -11830,8 +11753,6 @@ function getScenarioRegionOverlayRenderOwner() {
       getResolvedFeatureColor,
       LAND_FILL_COLOR,
       getPoliticalFeaturePathEntry,
-      withRenderTarget,
-      prepareTargetContext,
       getScenarioWaterVisualRevisionToken,
       isWaterRegionEnabled,
       isMacroOceanWaterRegion,

@@ -113,7 +113,14 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
     ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
     ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
-    ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs"],
+    // Shared-cache changes run the actual region/relief/cache assembly suite.
+    ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs", [
+      "js/core/renderer/render_cache_owner.js", "js/core/renderer/scenario_relief_overlay_render_owner.js",
+      "tests/scenario_relief_overlay_render_owner_behavior.test.mjs", "tests/render_cache_owner_invalidation_behavior.test.mjs",
+      "docs/active/development-recovery-m4-20260908/plan.md",
+      "docs/active/development-recovery-m4-20260908/context.md",
+      "docs/active/development-recovery-m4-20260908/task.md",
+    ]],
     ["static-border-mesh-lifecycle", "renderer-runtime", "js/core/renderer/static_border_mesh_lifecycle.js", "tests/static_border_mesh_lifecycle_behavior.test.mjs"],
     ["transient-overlay-render", "renderer-runtime", "js/core/renderer/transient_overlay_render_owner.js", "tests/transient_overlay_render_owner_behavior.test.mjs"],
     ["unit-counter-display", "renderer-runtime", "js/core/renderer/unit_counter_display_model.js", "tests/unit_counter_display_model_behavior.test.mjs"],
@@ -125,7 +132,8 @@ export function createLocalFeedbackRecords(baseRecords) {
 
   const ownerRecords = localOwnerCoverage.map(([id, domain, source, testFile, extraSources = []], index) => ({
     id: "local:owner:" + id, commandRef: "node --test " + testFile
-      + (id === "regional-presets" ? " tests/scenario_core_plan_behavior.test.mjs" : ""),
+      + (id === "regional-presets" ? " tests/scenario_core_plan_behavior.test.mjs" : "")
+      + (id === "scenario-region-overlay-render" ? " tests/scenario_relief_overlay_render_owner_behavior.test.mjs tests/render_cache_owner_invalidation_behavior.test.mjs" : ""),
     sourceRefs: [source, testFile, ...extraSources, ...(id === "regional-presets" ? ["tests/scenario_core_plan_behavior.test.mjs"] : [])], ownerHints: [domain], domains: [domain], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
     platforms: ["all"], entrypointPolicyIndex: 5,

@@ -246,7 +246,10 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIn('cache.reasons[passName] = "hgo-runtime-preview";', owner_content)
         self.assertIn('tryPartialPoliticalPassRepaint(transform, nextSignature, timings)', owner_content)
         self.assertIn("function getPoliticalPassFineBaselineMismatch(", renderer_content)
-        self.assertIn("const politicalPassCurrent = !!(", renderer_content)
+        visible_frame_policy_content = (
+            REPO_ROOT / "js" / "core" / "renderer" / "visible_frame_identity_policy.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("const politicalPassCurrent = !!(", visible_frame_policy_content)
         self.assertIn('return "coarse-baseline";', renderer_content)
         self.assertIn('return "scene-snapshot-mismatch";', renderer_content)
         self.assertIn('return "scenario-data-generation-mismatch";', renderer_content)

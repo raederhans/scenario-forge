@@ -27,6 +27,7 @@ import {
 } from "./helpers/scenario_chunk_contract_support.mjs";
 
 const scenarioRegionOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_region_overlay_render_owner.js");
+const scenarioReliefOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_relief_overlay_render_owner.js");
 
 const politicalFeaturePolicySource = readRepoFile("js", "core", "renderer", "political_feature_policy.js").replace(/^  /gm, "");
 
@@ -286,11 +287,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       contextScenarioKeepsLayerMetrics:
         scenarioRegionOverlayOwnerSource.includes('"contextScenarioLayerWater"')
         && scenarioRegionOverlayOwnerSource.includes('"contextScenarioLayerSpecial"')
-        && scenarioRegionOverlayOwnerSource.includes('renderScenarioSpecialRegionOverlaysLayerToCache')
-        && scenarioRegionOverlayOwnerSource.includes('getContextScenarioLayerCacheEntry("special")')
-        && rendererSource.includes('"contextScenarioLayerRelief"')
-        && rendererSource.includes('renderScenarioReliefOverlaysLayerToCache')
-        && rendererSource.includes('getContextScenarioLayerCacheEntry("relief")')
+        && scenarioReliefOverlayOwnerSource.includes('"contextScenarioLayerRelief"')
         && renderPipelinePassesSource.includes('recordRenderPerfMetric("contextScenarioSignatureChanged"'),
       contextScenarioSpecialSignatureTracksPayloadIdentity:
         /function getScenarioSpecialVisualRevisionToken\(\) \{[\s\S]*?special-ref:\$\{getObjectIdentityToken\(runtimeState\.scenarioSpecialRegionsData, "scenario-special"\)\}[\s\S]*?special-count:\$\{getFeatureCollectionFeatureCount\(runtimeState\.scenarioSpecialRegionsData\)\}[\s\S]*?runtimeState\.showScenarioSpecialRegions \? "scenario-special:on" : "scenario-special:off"/.test(rendererSource),
