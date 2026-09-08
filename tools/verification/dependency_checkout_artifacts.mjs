@@ -516,8 +516,40 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
-export function writePythonCoreArtifacts(profile, { profileOut, lockOut } = {}) {
+function validatePythonCoreOutput(outRoot, output, name) {
+  if (typeof outRoot !== "string" || !outRoot.trim()
+    || typeof output !== "string" || !output.trim()
+    || path.resolve(output) !== path.resolve(outRoot, name)) {
+    throw new Error("python-core-output-path-invalid");
+  }
+  const target = path.resolve(output);
+  for (let current = target; ; current = path.dirname(current)) {
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+    if (stat && (stat.isSymbolicLink()
+      || (current === target ? !stat.isFile() : !stat.isDirectory()))) {
+      throw new Error("python-core-output-path-invalid");
+    }
+    if (current === path.dirname(current)) break;
+  }
+  return target;
+}
+
+export function writePythonCoreArtifacts(profile, { outRoot, profileOut, lockOut } = {}) {
   assertPythonCoreProfile(profile);
+  profileOut = validatePythonCoreOutput(outRoot, profileOut, "python-core-profile.json");
+  lockOut = validatePythonCoreOutput(outRoot, lockOut, "requirements-python-core.lock.txt");
+  if (profile.status === "blocked") {
+    try {
+      fs.unlinkSync(lockOut);
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+  }
   writeJson(profileOut, profile);
   if (profile.status === "ready") {
     fs.mkdirSync(path.dirname(lockOut), { recursive: true });
@@ -578,6 +610,7 @@ if (isMainModule) {
     });
     const outRoot = path.resolve(args.outRoot);
     const pythonOutputs = writePythonCoreArtifacts(pythonCoreProfile, {
+      outRoot,
       profileOut: path.join(outRoot, "python-core-profile.json"),
       lockOut: path.join(outRoot, "requirements-python-core.lock.txt"),
     });
