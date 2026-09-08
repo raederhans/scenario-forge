@@ -2,6 +2,8 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../support/playwright-app');
 
+// Dev-only cold-start/input measurements and the TNO/HOI4/TNO cycle wait for full idle convergence.
+// JUSTIFY: Bounds the complete multi-stage diagnostic, not input latency; no retries are enabled.
 test.setTimeout(180_000);
 const startupPath = '/app/?render_profile=balanced&startup_interaction=full&startup_worker=1&startup_cache=0&perf=1';
 const stableInputWindow = process.env.M2_STABLE_INPUT === '1';

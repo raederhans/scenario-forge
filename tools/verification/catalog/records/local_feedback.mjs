@@ -163,7 +163,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     id: "local:editor-checkout-profile",
     commandRef: "python -m unittest tests.test_editor_checkout_profile -q",
     sourceRefs: ["README.md", "tools/editor_checkout_profile.py", "tests/test_editor_checkout_profile.py"],
-    ownerHints: ["test-infra"], domains: ["test-infra"], tiers: ["contract"],
+    ownerHints: ["test-infra"], domains: ["data-governance"], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
     platforms: ["all"], entrypointPolicyIndex: 5,
     verificationOrder: null,

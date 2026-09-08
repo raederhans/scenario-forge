@@ -153,13 +153,16 @@ const FORBIDDEN_TRANSACTION_RESET_HELPER_PATHS = Object.freeze([
 ]);
 
 const LINE_BUDGETS = Object.freeze({
-  [FILES.renderer]: 20513,
-  [FILES.scenarioRefreshRuntime]: 729,
+  // Recovery moves complete cache lifecycles out of the renderer and retains
+  // scenario index synchronization with refresh. Transfer 121 lines from the
+  // composition root; the combined budget remains 21,862 lines.
+  [FILES.renderer]: 20392,
+  [FILES.scenarioRefreshRuntime]: 746,
   [FILES.scenarioVisualInvalidationExecutor]: 260,
   [FILES.exactAfterSettleScheduler]: 760,
   [FILES.exactAfterSettlePassCatalog]: 120,
   [FILES.hgoPreviewRenderOwner]: 280,
-  [FILES.renderCacheOwner]: 620,
+  [FILES.renderCacheOwner]: 724,
   [FILES.renderTransformReusePolicyOwner]: 260,
   [FILES.projectedGeometryBoundsOwner]: 420,
   [FILES.viewportReadModelOwner]: 260,
