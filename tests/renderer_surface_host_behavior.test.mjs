@@ -32,6 +32,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     for (const entry of node.type === "ImportDeclaration" ? node.specifiers : []) scope[entry.local.name] = noop;
   }
   const runtimeState = {};
+  const scenarioLayerCache = Object.freeze({ getSnapshot: noop, render: noop, draw: noop });
   const handles = {};
   let reads = 0;
   const rendererSurfaceHost = {};
@@ -48,6 +49,7 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
   }
   Object.assign(scope, passCatalog, {
     runtimeState, rendererSurfaceHost, globalThis: globals, window: undefined,
+    getRenderCacheOwner: () => ({ scenarioLayerCache }),
     MIN_ZOOM_SCALE: 1, MAX_ZOOM_SCALE: 16, PROJECTION_PRECISION: 0.25,
     PATH_POINT_RADIUS: 4.5, PROJECTION_FIT_PADDING_RATIO: 0.05, MAP_PAN_PADDING_PX: 24,
     RENDER_PHASE_IDLE: "idle", RENDER_PHASE_INTERACTING: "interacting", RENDER_PHASE_SETTLING: "settling",
@@ -78,8 +80,15 @@ function createOwnerWiringHarness(name, { dependencies = {}, includeFunctions = 
     assert.equal(Object.isFrozen(runtimeState), false);
   }
   if ("surfaceHost" in owner) assert.equal(owner.surfaceHost, rendererSurfaceHost);
-  return { owner, handles, runtimeState, globals, setWindow };
+  return { owner, handles, runtimeState, globals, setWindow, scenarioLayerCache };
 }
+
+test("scenario overlay composition shares the cache owner's bounded lifecycle API", () => {
+  for (const name of ["ScenarioRegionOverlayRenderOwner", "ScenarioReliefOverlayRenderOwner"]) {
+    const { owner, scenarioLayerCache } = createOwnerWiringHarness(name);
+    assert.equal(owner.scenarioLayerCache, scenarioLayerCache);
+  }
+});
 
 test("startup and transaction reset wire cancellation to the hover lifecycle owner", () => {
   for (const name of ["RendererStartupTransactionOwner", "RendererTransactionResetOwner"]) {
