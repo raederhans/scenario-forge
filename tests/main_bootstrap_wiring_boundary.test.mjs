@@ -172,6 +172,62 @@ test("main commits initial chunk promotion through the canonical boot action bef
   assert.equal(mainSource.includes(legacyDirectWrite), false);
 });
 
+test("bootstrap draws one complete frame after promotion, and none after failed readiness", async () => {
+  const mainSource = readRepoFile("js", "main.js");
+  const helper = mainSource.slice(
+    mainSource.indexOf("async function ensureStartupInitialScenarioChunkVisualReady("),
+    mainSource.indexOf("function hasDetailTopologyLoaded("),
+  );
+  const frameStart = mainSource.indexOf("    await ensureStartupInitialScenarioChunkVisualReady({");
+  const frameEnd = mainSource.indexOf('    assertStartupFirstVisibleFrameAccepted("bootstrap-first-political-frame");', frameStart)
+    + '    assertStartupFirstVisibleFrameAccepted("bootstrap-first-political-frame");'.length;
+  const frame = mainSource.slice(frameStart, frameEnd);
+  for (const status of ["promoted", "already-current", "not-chunked", "missing-hook", "failed"]) {
+    const events = [];
+    let ready = false;
+    let dirty = false;
+    let draws = 0;
+    const runtimeState = {};
+    const render = () => {
+      assert.equal(ready, true, "visible work requires completed promotion");
+      draws += 1;
+      dirty = false;
+      events.push("draw");
+    };
+    if (status !== "missing-hook") {
+      runtimeState.awaitInitialScenarioChunkVisualPromotionFn = async ({ renderNow }) => {
+        await Promise.resolve();
+        ready = status !== "failed";
+        events.push("promote");
+        if (renderNow && ready) render();
+        return { ok: ready, status };
+      };
+    } else {
+      ready = true;
+    }
+    const dependencies = {
+      runtimeState, d3Client: {},
+      setStartupInitialScenarioChunkVisualPromotion: (_state, result) => events.push(result.status),
+      setBootState: () => events.push("warmup"),
+      invalidateAllRenderPasses: () => { dirty = true; },
+      renderDispatcher: { flush: render },
+      assertStartupFirstVisibleFrameAccepted: () => {
+        assert.equal(dirty, false);
+        assert.equal(draws, 1, "bootstrap and promotion must not both draw the first frame");
+      },
+    };
+    const execute = new Function(...Object.keys(dependencies), `${helper}\nreturn (async () => {${frame}})();`);
+    if (status === "failed") {
+      await assert.rejects(execute(...Object.values(dependencies)), /did not reach visible readiness/);
+      assert.equal(draws, 0);
+      assert.equal(events.includes("warmup"), false);
+    } else {
+      await execute(...Object.values(dependencies));
+      assert.equal(draws, 1);
+    }
+  }
+});
+
 test("startup content hydration adopts the loader cache object by identity", () => {
   const startupBootCacheState = {
     enabled: true,

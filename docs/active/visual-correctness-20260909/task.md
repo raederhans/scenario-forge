@@ -53,3 +53,9 @@ Modern 记录两个可选启动本地化资源 404，走已有空默认 fallback
 PR #129 首轮 CI 集成修复：TNO 资产快照未包含新增名称，已通过现有 snapshot/audit 构建函数同步三处身份字段，第二次生成字节不变，strict scenario 检查通过。旧 Python 结构断言要求 flush 后恢复锁，已对齐为 currentness 检查后先恢复锁、再按 renderNow 条件 flush；38 项契约检查通过。未改变运行时源码或视觉阈值。
 
 PR 综合验证续修：更新重型 chunk 契约的旧 SVG/path-only 缓存断言，以及 marker pass 纯委托断言，保留数值流构建、geometry identity、candidate reset→labels invalidation→owner delegate 的明确约束。完整 chunk 契约79/79、pipeline边界5/5通过；按PR变更选择的81组本地可执行命令已全部通过（先77组，再修正失败项并续跑剩余4组），route gap为0。59组主线程命令按原选择器规则deferred，不作为本地通过声明。
+
+## PR 性能阻塞修复
+
+1a34c464 的五项必需检查通过，perf run 34360189226 因两个场景均出现两个 post-promotion candidate 而失败。进一步核对原始时间线，更正最初“post-ready 颜色补绘”的归因：TNO 最后一次完整颜色重建 recordedAt=1788962850810，早于 promotion=1788962851750、首场景帧=1788962854304、额外帧=1788962855196。启动 helper 以 renderNow:true 等待 promotion，解锁修复使其 flush 真正生效；bootstrap 随即 invalidateAll 并再次 flush，造成重复首帧。
+
+修复仅将 main 的启动专用 promotion 调用改为 renderNow:false。数据、完整颜色准备和就绪校验照常执行，由 bootstrap 独占首次场景绘制。交互 promotion 的解锁与 flush、真正晚到的 post-ready 颜色补绘继续保留。未修改性能角色策略、指标、阈值或冻结基线。新增行为回归覆盖 promoted、already-current、not-chunked、missing-hook 和 failed 的首帧所有权；启动目标测试15/15通过。完整实际性能与远端门禁结果以对应运行记录为准。

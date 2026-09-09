@@ -47022,7 +47022,7 @@
     },
     {
       "path": "app/js/main.js",
-      "size_bytes": 24577,
+      "size_bytes": 24739,
       "source_kind": "dist"
     },
     {
@@ -47987,7 +47987,7 @@
       {
         "file_count": 249,
         "id": "startup-critical",
-        "size_bytes": 5337379
+        "size_bytes": 5337541
       },
       {
         "file_count": 96,
@@ -64541,11 +64541,11 @@
         "deferred_graph_file_count": 126,
         "deferred_module_count": 124,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5316782,
+        "initial_graph_bytes": 5316944,
         "initial_graph_file_count": 283,
         "initial_module_count": 270,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4049378,
+        "initial_script_bytes": 4049540,
         "initial_script_count": 272,
         "module_count": 401,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65442,7 +65442,7 @@
           },
           {
             "path": "app/js/main.js",
-            "size_bytes": 24577
+            "size_bytes": 24739
           },
           {
             "path": "app/js/ui/i18n.js",
@@ -65470,7 +65470,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3002762
+        "size_bytes": 3002924
       },
       {
         "basis": "startup-resource-graph",
@@ -67191,7 +67191,7 @@
     {
       "file_count": 9512,
       "path": "app",
-      "size_bytes": 958457457
+      "size_bytes": 958457619
     },
     {
       "file_count": 57,
@@ -67224,5 +67224,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 965425411
+  "total_bytes": 965425573
 }
