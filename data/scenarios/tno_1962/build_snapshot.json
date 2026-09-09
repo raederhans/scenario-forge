@@ -11,7 +11,7 @@
     "city_overrides.json": "0b0029e2504d1f188efa14c56b90894aa40801bb7f0dda06c9cea3e190bca94d",
     "cores.by_feature.json": "de5efb3b9bdacffb38e14742b9053407eff58d86cb755ae345784044729f721c",
     "countries.json": "3d1dbc96a35caa7c32d5cb2ec998898866d73f31b0b5145ea9343012743ec6b0",
-    "geo_locale_patch.json": "78937b569ab0829c6a581d1749d05c60ed37022cfc9cf7d73e1d1d4cc39bd52c",
+    "geo_locale_patch.json": "ad6bf0528441a7e7bd1da87c21c559b8834149dd867bba74c86b63ce2a58ff30",
     "owners.by_feature.json": "95b9ac25ab95647ddfb0d06e78e18b18cfee061e489ca69a31559e64ace7f09a",
     "relief_overlays.geojson": "e14ef01b40d603c88a4f174cfc4a27f38f51edb1456db391a35e4e2218f22364",
     "runtime_topology.topo.json": "06830553628cdb532bb444b5225e319b20683215c47573af59e173f3e836232d",
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "9174e52c00bd1112b4bce5c0cbadfba5379460c2e4d9cf6f5f955c39624cad8f",
+  "snapshot_fingerprint": "bdbc7490664d81f5be41ab81e282c9e7088d4dd7e1dbd1ed8dbe5928df0c3bc0",
   "water_count": 141
 }
