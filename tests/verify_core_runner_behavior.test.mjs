@@ -2271,6 +2271,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
     "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
+    ...(includeRenderer ? ["test:node:startup-lifecycle"] : []),
   ];
 
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), expectedCommands);
@@ -2280,6 +2281,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
   // the edit budget honestly; exact test routing must not drop those leaves.
   assert.deepEqual(plan.routeGaps.map((gap) => gap.code), includeRenderer ? [
     "adaptive-edit-command-budget-exceeded",
+    "adaptive-edit-leaf-budget-exceeded",
     "adaptive-edit-process-group-budget-exceeded",
     "adaptive-edit-runtime-budget-exceeded",
     "adaptive-edit-cost-budget-exceeded",
@@ -2291,6 +2293,11 @@ test(`local projection preserves exact test routes with renderer scope ${include
     "node-test:tests/render_change_set_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
+    ...(includeRenderer ? [
+      "node-test:tests/startup_data_pipeline_lifecycle_behavior.test.mjs",
+      "node-test:tests/startup_interaction_lifecycle_behavior.test.mjs",
+      "node-test:tests/startup_ready_handoff_behavior.test.mjs",
+    ] : []),
     "python-unittest:tests.test_map_renderer_render_snapshot_boundary_contract",
   ]);
   assert.equal(plan.executionCommands.length, includeRenderer ? 0 : 2);

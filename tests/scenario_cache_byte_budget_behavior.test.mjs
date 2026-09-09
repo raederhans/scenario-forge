@@ -2,6 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createScenarioChunkPayloadLoader } from "../js/core/scenario/chunk_payload_loader.js";
 import { trimScenarioChunkPayloadCache, SCENARIO_CHUNK_PAYLOAD_CACHE_BYTE_LIMIT } from "../js/core/scenario/bundle_cache.js";
+import { getScenarioChunkPayloadEvictionIds } from "../js/core/scenario/bundle_cache_policy.js";
+
+test("retention policy returns detached eviction IDs without mutating a published bundle", () => {
+  const cache = Object.freeze(Object.fromEntries(Array.from({ length: 34 }, (_, id) => [String(id), Object.freeze({})])));
+  const bundle = Object.freeze({ chunkPayloadCacheById: cache, chunkPayloadProtectedIds: Object.freeze(["0"]), chunkPayloadPromisesById: Object.freeze({}) });
+  const ids = getScenarioChunkPayloadEvictionIds(bundle);
+  assert.deepEqual(ids, ["1", "2"]);
+  ids.push("unrelated");
+  assert.equal(Object.keys(cache).length, 34);
+  assert.deepEqual(getScenarioChunkPayloadEvictionIds(bundle), ["1", "2"]);
+});
 
 function fixture() {
   const bundle = { id: "a" };

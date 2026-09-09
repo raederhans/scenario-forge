@@ -6,6 +6,11 @@ import {
   finishScenarioChunkLoadState,
 } from "../state/actions/scenario_chunk_runtime_actions.js";
 import { recordScenarioChunkPayloadSourceBytes, touchScenarioChunkPayloadCache, trimScenarioChunkPayloadCache } from "./bundle_cache.js";
+import { getScenarioChunkPayloadEvictionIds } from "./bundle_cache_policy.js";
+import {
+  clearScenarioBundleChunkProtectionState,
+  removeScenarioBundleChunkPayloadState,
+} from "../state/actions/scenario_activation_actions.js";
 
 function ensureScenarioChunkPayloadCache(bundle) {
   if (!bundle || typeof bundle !== "object") return {};
@@ -28,7 +33,7 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
 
   function activePayloadIds(bundle) {
     return getScenarioBundleId(bundle) === activeRequestScenarioId
-      && getScenarioBundleId(bundle) === normalizeScenarioId(runtimeState.activeScenarioChunks?.scenarioId || "")
+      && getScenarioBundleId(bundle) === normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || ""))
       ? Object.keys(runtimeState.activeScenarioChunks?.payloadByChunkId || {}) : [];
   }
 
@@ -39,18 +44,21 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     bundle.chunkPayloadProtectedIds = chunks.map((chunk) => String(chunk.id));
     trimScenarioChunkPayloadCache(bundle, activePayloadIds(bundle));
     return Promise.all(chunks.map(async (chunk) => ({
-      chunkId: chunk.id, payload: await loadScenarioChunkPayload(bundle, chunk, options),
+      chunkId: chunk.id,
+      payload: await loadScenarioChunkPayload(bundle, chunk, options),
     })));
   }
 
   function resetScenarioChunkRequests(scenarioId) {
-    const outgoingScenarioId = activeRequestScenarioId
-      || normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || ""));
+    const outgoingScenarioId = String(activeRequestScenarioId
+      || normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || "")));
     if (outgoingScenarioId && outgoingScenarioId !== scenarioId) {
       const outgoingBundle = runtimeState.scenarioBundleCacheById?.[outgoingScenarioId];
       if (outgoingBundle) {
-        outgoingBundle.chunkPayloadProtectedIds = [];
-        trimScenarioChunkPayloadCache(outgoingBundle);
+        clearScenarioBundleChunkProtectionState(runtimeState, outgoingScenarioId);
+        for (const chunkId of getScenarioChunkPayloadEvictionIds(outgoingBundle)) {
+          removeScenarioBundleChunkPayloadState(runtimeState, outgoingScenarioId, chunkId);
+        }
       }
       // The active ID may already be incoming; track every replaced outgoing bundle.
       for (const [request, { bundle, chunkId }] of chunkRequestsByRequest) {
@@ -62,25 +70,6 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       }
     }
     activeRequestScenarioId = scenarioId;
-  }
-
-  function beginObservedLoad(chunkId, expectedLoadStateGeneration) {
-    beginScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration });
-    return {
-      complete(payload) {
-        completeScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration });
-        return payload;
-      },
-      fail(error) {
-        failScenarioChunkLoadState(runtimeState, chunkId,
-          String(error?.message || error || "Unknown chunk load error."),
-          { expectedLoadStateGeneration });
-        throw error;
-      },
-      finish() {
-        finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration });
-      },
-    };
   }
 
   async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3 } = {}) {
@@ -97,9 +86,20 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     ensureScenarioChunkRuntimeState(runtimeState);
     if (!activeRequestScenarioId) activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioId || ""));
     const generation = Math.max(0, Number(runtimeState.runtimeChunkLoadState?.generation || 0));
-    const observer = beginObservedLoad(chunkId, generation);
+    beginScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
     if (promiseCache[chunkId]) {
-      return promiseCache[chunkId].then(observer.complete, observer.fail).finally(observer.finish);
+      try {
+        const payload = await promiseCache[chunkId];
+        completeScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
+        return payload;
+      } catch (error) {
+        failScenarioChunkLoadState(runtimeState, chunkId,
+          String(error?.message || error || "Unknown chunk load error."),
+          { expectedLoadStateGeneration: generation });
+        throw error;
+      } finally {
+        finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
+      }
     }
     const request = { controller: new AbortController(), promise: null };
     chunkRequestsByRequest.set(request, { bundle, chunkId });
@@ -115,11 +115,15 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
         const payload = { layerKey: chunkMeta.layer, payload: result?.payload || null };
         recordScenarioChunkPayloadSourceBytes(payload, chunkMeta);
         payloadCache[chunkId] = payload;
-        return observer.complete(payload);
+        completeScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
+        return payload;
       } catch (error) {
-        return observer.fail(error);
+        failScenarioChunkLoadState(runtimeState, chunkId,
+          String(error?.message || error || "Unknown chunk load error."),
+          { expectedLoadStateGeneration: generation });
+        throw error;
       } finally {
-        observer.finish();
+        finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
       }
     })();
     request.promise = loadPromise;

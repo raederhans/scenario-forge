@@ -140,16 +140,16 @@ export function createScenarioReliefOverlayRenderOwner({
 
   function recordReliefSkip(startedAt, overlays, reason, cacheMode, durationMs = 0) {
     collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
-      featureCount: overlays.length,
+      featureCount: Number(overlays.length),
       renderedCount: 0,
       skipped: true,
-      reason,
+      reason: String(reason || ""),
     });
     collectContextMetric("contextScenarioLayerRelief", durationMs, {
-      featureCount: overlays.length,
+      featureCount: Number(overlays.length),
       renderedCount: 0,
       skipped: true,
-      reason,
+      reason: String(reason || ""),
       cacheMode,
       signature: getScenarioReliefVisualRevisionToken(),
     });
@@ -253,13 +253,13 @@ export function createScenarioReliefOverlayRenderOwner({
       renderedCount += 1;
     });
     collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
-      featureCount: overlays.length,
+      featureCount: Number(overlays.length),
       renderedCount,
       skipped: false,
-      phase: runtimeState.renderPhase,
+      phase: String(runtimeState.renderPhase || ""),
     });
     collectContextMetric("contextScenarioLayerRelief", 0, {
-      featureCount: overlays.length,
+      featureCount: Number(overlays.length),
       renderedCount,
       skipped: false,
       cacheMode,
@@ -287,7 +287,13 @@ export function createScenarioReliefOverlayRenderOwner({
       return;
     }
 
-    const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
+    const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
+    // The renderer callback receives scalar coordinates, never the live transform.
+    const currentTransform = cloneZoomTransform({
+      x: Number(transform?.x || 0),
+      y: Number(transform?.y || 0),
+      k: Math.max(0.0001, Number(transform?.k || 1)),
+    });
     const reliefLayerEntry = scenarioLayerCache.getSnapshot("relief");
     const reliefVisualRevision = getScenarioReliefVisualRevisionToken();
     const canReuseReliefLayer = (
@@ -303,7 +309,7 @@ export function createScenarioReliefOverlayRenderOwner({
         renderedCount,
       });
       collectContextMetric("contextScenarioLayerRelief", 0, {
-        featureCount: overlays.length,
+        featureCount: Number(overlays.length),
         renderedCount,
         skipped: false,
         cacheMode: "reuse",

@@ -12,6 +12,7 @@
       "tests/test_physical_context_contours.py",
       "tests/test_polar_water_spherical_safety.py",
       "tests/test_political_topology_gap_contract.py",
+      "tests/test_reviewed_place_names.py",
       "tests/test_scenario_chunk_assets.py",
       "tests/test_tno_bundle_builder.py",
       "tests/test_tno_named_marginal_water_contract.py",

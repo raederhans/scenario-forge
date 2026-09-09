@@ -54,7 +54,10 @@ async function waitForProjectImportCompletion(page, importWatchState, {
         throw new Error(`Project import failed: ${importError}`);
       }
       const importApplied = Number(debug?.importApplyCount || 0) > Number(watchState.initialImportApplyCount || 0);
-      const phaseComplete = String(debug?.importPhase || "") === "complete";
+      if (debug?.importRecovery?.phase === "blocked") {
+        throw new Error(`Project committed but required recovery is blocked: ${JSON.stringify(debug.importRecovery.warnings)}`);
+      }
+      const phaseComplete = ["complete", "completion-partial"].includes(String(debug?.importPhase || ""));
       const fileMatches = !expectedFileName || String(debug?.lastImportFileName || "") === expectedFileName;
       if (importApplied && phaseComplete && fileMatches) {
         return;

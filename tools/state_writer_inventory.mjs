@@ -2605,6 +2605,7 @@ function analyzeBindingMutations(
     }
 
     resolvingLocalCallResultNodes.add(helperNode);
+    let enteredCalleeScope = false;
     try {
       const helperState = cloneAliasRecords(aliasRecords);
       for (
@@ -2625,6 +2626,10 @@ function analyzeBindingMutations(
         );
       }
 
+      // Arguments are resolved in the caller; returned values belong to the
+      // callee, even when its hoisted declaration follows the caller.
+      executionFunctionStack.push(helperNode);
+      enteredCalleeScope = true;
       const returnedExpressions = helperNode.type === "ArrowFunctionExpression"
         && helperNode.body?.type !== "BlockStatement"
         ? [helperNode.body]
@@ -2652,6 +2657,7 @@ function analyzeBindingMutations(
         }),
       );
     } finally {
+      if (enteredCalleeScope) executionFunctionStack.pop();
       resolvingLocalCallResultNodes.delete(helperNode);
     }
   }
@@ -3589,7 +3595,8 @@ function analyzeBindingMutations(
       );
       const sanctionedTarget = Boolean(
         initiallySanctionedTarget
-        && (!callerActionContract || exactCurrentActionTarget),
+        && (!callerActionContract || exactCurrentActionTarget
+          || importedDelegation.importedPureReaderContract?.allowBorrowedTarget),
       );
       const sanctionedReferenceIdentityTarget = Boolean(
         importedDelegation.actionContract

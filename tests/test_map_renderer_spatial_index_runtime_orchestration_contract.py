@@ -40,7 +40,9 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
         self.assertRegex(
             self.renderer_content,
             re.compile(
-                r'if \(chunked\) \{\s*await buildIndexChunked\(\{ scheduleUiMode: "deferred" \}\);\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*\}\);\s*\} else \{\s*buildIndex\(\{ scheduleUiMode: "deferred" \}\);\s*buildSpatialIndex\(\{\s*includeSecondary: false,\s*\}\);\s*\}',
+                r'if \(chunked\) \{\s*await buildIndexChunked\(\{ scheduleUiMode: "deferred", isCurrent: taskContext\?\.isCurrent, yieldControl: \(\) => yieldInteractionInfrastructureBuild\(taskContext\) \}\);'
+                r'\s*taskContext\?\.throwIfStale\(\);\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*isCurrent: taskContext\?\.isCurrent,\s*yieldControl: \(\) => yieldInteractionInfrastructureBuild\(taskContext\),\s*\}\);'
+                r'\s*\} else \{\s*buildIndex\(\{ scheduleUiMode: "deferred" \}\);\s*buildSpatialIndex\(\{\s*includeSecondary: false,\s*\}\);\s*\}',
                 re.S,
             ),
         )
@@ -96,11 +98,23 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
                 r'async function runDeferredScenarioChunkPromotionInfraRefresh\(\{[\s\S]*?'
                 r'primaryVisibleDerivedStateReady = false,[\s\S]*?completePoliticalDerivedStateReady = false,[\s\S]*?'
                 r'let resolvedCompletePoliticalDerivedStateReady = !!completePoliticalDerivedStateReady[\s\S]*?'
-                r'if \(!resolvedCompletePoliticalDerivedStateReady\) \{\s*buildIndex\(\);\s*await yieldToMain\(\);[\s\S]*?await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*\}\);\s*\}[\s\S]*?'
+                r'else if \(!resolvedCompletePoliticalDerivedStateReady\) \{\s*'
+                r'const indexStartedAt = nowMs\(\);\s*infrastructureMutationStarted = true;\s*execution.mutationStarted = true;\s*'
+                r'buildIndex\(\);\s*preliminaryIndexBuildMs = nowMs\(\) - indexStartedAt;\s*await yieldToMain\(\);\s*'
+                r'yieldCount \+= 1;\s*if \(!isCurrent\(\)\) \{\s*return false;\s*\}\s*'
+                r'const spatialStartedAt = nowMs\(\);\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*isCurrent,\s*\}\);\s*'
+                r'if \(!isCurrent\(\)\) return false;\s*preliminarySpatialBuildMs = nowMs\(\) - spatialStartedAt;\s*\}[\s\S]*?'
                 r'scheduleSecondarySpatialIndexBuild\(\{',
                 re.S,
             ),
         )
+        start = self.refresh_runtime_content.index("if (shouldRestoreFullPoliticalDerivedState) {")
+        end = self.refresh_runtime_content.index("} else if (!resolvedCompletePoliticalDerivedStateReady)", start)
+        restore_wait = self.refresh_runtime_content[start:end]
+        self.assertIn("await yieldToMain();", restore_wait)
+        self.assertIn("if (!isCurrent()) return false;", restore_wait)
+        self.assertNotIn("buildIndex(", restore_wait)
+        self.assertNotIn("buildSpatialIndexChunked(", restore_wait)
 
     def test_chunk_promotion_water_and_special_sync_secondary_indexes_before_deferred_infra(self):
         start = self.renderer_content.index("function syncScenarioSecondaryRegionIndexes({")

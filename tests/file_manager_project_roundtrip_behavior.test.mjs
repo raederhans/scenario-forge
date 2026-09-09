@@ -311,9 +311,11 @@ async function importProjectThroughFunnelPayload(
     }
   };
   registerRuntimeHook(state, "ensureContextLayerDataFn", async (layerRequest, options) => {
+    assert.equal(typeof options.isCurrent, "function");
+    assert.equal(options.signal.aborted, false);
     requests.push({
       layerRequest: Array.isArray(layerRequest) ? [...layerRequest] : layerRequest,
-      options: { ...options },
+      options: { reason: options.reason, renderNow: options.renderNow },
     });
   });
   registerRuntimeHook(fixtureState, "clearExportBakeCacheFn", () => {
@@ -321,8 +323,7 @@ async function importProjectThroughFunnelPayload(
   });
 
   try {
-    await new Promise((resolve, reject) => {
-      importProjectThroughFunnel(
+    const result = await importProjectThroughFunnel(
         {
           name: "map_project.json",
           text: JSON.stringify(payload),
@@ -335,12 +336,12 @@ async function importProjectThroughFunnelPayload(
           },
           hooks: {
             refreshColorState: () => {},
-            onProjectImportComplete: resolve,
-            onProjectImportError: () => reject(new Error("project import failed")),
+            onProjectImportError: () => assert.fail("project import failed"),
           },
         }
       );
-    });
+    assert.ok(result.status.startsWith("committed"));
+    await result.completion;
     if (captureIntensityFields) {
       importedIntensityFields = state.intensityFields;
     }
@@ -697,7 +698,7 @@ test("project import through funnel restores legacy physical intensity into unif
   assert.equal(channel.points[0].strength, 1.35);
 });
 
-test("optional completion failure returns warnings without losing the committed import", async () => {
+test("required refresh failure preserves the committed import and blocks editing until retry", async () => {
   const previousDocument = globalThis.document;
   const previousFileReader = globalThis.FileReader;
   globalThis.document = {
@@ -710,6 +711,7 @@ test("optional completion failure returns warnings without losing the committed 
     }
   };
 
+  let failRefresh = true;
   try {
     const result = await importProjectThroughFunnel(
         {
@@ -724,7 +726,7 @@ test("optional completion failure returns warnings without losing the committed 
           },
           hooks: {
             invalidateFrontlineOverlayState: () => {
-              throw new Error("debug reset sentinel");
+              if (failRefresh) throw new Error("debug reset sentinel");
             },
             onProjectImportError: () => assert.fail("committed import must not become a failure"),
           },
@@ -733,7 +735,11 @@ test("optional completion failure returns warnings without losing the committed 
 
     assert.equal(result.status, "committed-with-warnings");
     assert.ok(result.warnings.some(warning => warning.resource === "document-refresh" && /debug reset sentinel/.test(warning.message)));
-    assert.equal(getInteractionFunnelDebugState().importPhase, "complete");
+    assert.equal(getInteractionFunnelDebugState().importPhase, "completion-blocked");
+    assert.equal(state.startupReadonly, true);
+    failRefresh = false;
+    assert.equal(await result.retry("document-refresh"), true);
+    assert.equal(state.startupReadonly, false);
 
     resetInteractionFunnelDebugState();
 

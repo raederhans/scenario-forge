@@ -1,3 +1,8 @@
+import {
+  ensureRenderTransactionDiagnosticsState as ensureTransactionDiagnosticsState,
+  advanceScenarioApplyEpochState,
+} from "../state/actions/renderer_transaction_diagnostics_actions.js";
+
 const GLOBAL_RENDER_TRANSACTION_DIAGNOSTICS_NAME = "__scenarioForgeRenderTransactions";
 const DEFAULT_SNAPSHOT_LIMIT = 1;
 const ENABLED_SNAPSHOT_LIMIT = 200;
@@ -181,36 +186,8 @@ function getSearchParamsFromGlobal() {
 
 export function ensureRenderTransactionDiagnosticsState(runtimeState) {
   const state = runtimeState && typeof runtimeState === "object" ? runtimeState : {};
-  if (!state.renderTransactionDiagnostics || typeof state.renderTransactionDiagnostics !== "object") {
-    state.renderTransactionDiagnostics = {
-      sequence: 0,
-      scenarioApplyEpoch: 0,
-      renderTransactionEpoch: 0,
-      enabled: false,
-      maxSnapshots: DEFAULT_SNAPSHOT_LIMIT,
-      snapshots: [],
-      warnings: [],
-      latestSnapshot: null,
-      latestWarning: null,
-      lastAcceptedFrameIdentity: null,
-      lastRenderPassInvalidation: null,
-      scenarioApplyEpochByScenarioId: {},
-      optionalLayerConfigs: null,
-      globalName: GLOBAL_RENDER_TRANSACTION_DIAGNOSTICS_NAME,
-    };
-  }
+  ensureTransactionDiagnosticsState(state);
   const diagnostics = state.renderTransactionDiagnostics;
-  diagnostics.sequence = Math.max(0, Number(diagnostics.sequence || 0));
-  diagnostics.scenarioApplyEpoch = Math.max(0, Number(diagnostics.scenarioApplyEpoch || 0));
-  diagnostics.renderTransactionEpoch = Math.max(0, Number(diagnostics.renderTransactionEpoch || 0));
-  diagnostics.maxSnapshots = Math.max(1, Number(diagnostics.maxSnapshots || DEFAULT_SNAPSHOT_LIMIT));
-  diagnostics.snapshots = Array.isArray(diagnostics.snapshots) ? diagnostics.snapshots : [];
-  diagnostics.warnings = Array.isArray(diagnostics.warnings) ? diagnostics.warnings : [];
-  diagnostics.scenarioApplyEpochByScenarioId =
-    diagnostics.scenarioApplyEpochByScenarioId && typeof diagnostics.scenarioApplyEpochByScenarioId === "object"
-      ? diagnostics.scenarioApplyEpochByScenarioId
-      : {};
-  diagnostics.globalName = GLOBAL_RENDER_TRANSACTION_DIAGNOSTICS_NAME;
   return diagnostics;
 }
 
@@ -256,18 +233,8 @@ export function exposeRenderTransactionDiagnostics(runtimeState, searchParams = 
 }
 
 export function nextScenarioApplyEpoch(runtimeState, { scenarioId = "", reason = "" } = {}) {
-  const diagnostics = ensureRenderTransactionDiagnosticsState(runtimeState);
-  diagnostics.scenarioApplyEpoch += 1;
-  diagnostics.lastScenarioApply = {
-    scenarioId: normalizeId(scenarioId),
-    reason: String(reason || ""),
-    recordedAt: nowMs(),
-  };
-  const normalizedScenarioId = normalizeId(scenarioId);
-  if (normalizedScenarioId) {
-    diagnostics.scenarioApplyEpochByScenarioId[normalizedScenarioId] = diagnostics.scenarioApplyEpoch;
-  }
-  return diagnostics.scenarioApplyEpoch;
+  const target = runtimeState && typeof runtimeState === "object" ? runtimeState : {};
+  return advanceScenarioApplyEpochState(target, { scenarioId, reason, recordedAt: nowMs() });
 }
 
 export function nextRenderTransactionEpoch(runtimeState, { reason = "" } = {}) {

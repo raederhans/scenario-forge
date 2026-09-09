@@ -60,6 +60,18 @@ function fingerprintDirectExportedFunction(source, exportName) {
     .digest("hex");
 }
 
+test("bundle retention reader rejects source mutation against its registered proof", async () => {
+  const modulePath = "js/core/scenario/bundle_cache_policy.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath);
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry).violations, []);
+  const mutated = source.replace("  const cache = bundle.chunkPayloadCacheById", '  bundle.chunkPayloadProtectedIds.push("unexpected");\n  const cache = bundle.chunkPayloadCacheById');
+  assert.notEqual(mutated, source);
+  await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutated, "production", {
+    includeInventories: true, scanAllParameters: true,
+  }), { code: "state-target-pure-reader-contract-violation" });
+});
+
 test("import preflight readers exclude only proven reads and retain the live restore boundary", async () => {
   const expectedReaders = new Map([
     ["js/core/interaction_funnel.js", [
@@ -67,7 +79,7 @@ test("import preflight readers exclude only proven reads and retain the live res
       "validateImportedContextLayerResult",
       "resolveImportedTransportCountryOverlayPackIds",
     ]],
-    ["js/core/interaction_funnel/import_apply_orchestration.js", [
+    ["js/core/interaction_funnel/import_trust_projection.js", [
       "getScenarioImportValidFeatureIds",
       "resolveImportedOwnershipState",
     ]],
@@ -88,8 +100,8 @@ test("import preflight readers exclude only proven reads and retain the live res
       assert.ok(result.bindingInventories.some(({ binding, findings }) =>
         binding.functionName === "restoreImportedTransportCountryOverlayState" && findings.length > 0));
       const mutatedSource = source.replace(
-        "return [target.dirtyRevision,",
-        "target.dirtyRevision += 1; return [target.dirtyRevision,",
+        "const dirtyRevision = target.dirtyRevision;",
+        "target.dirtyRevision += 1; const dirtyRevision = target.dirtyRevision;",
       );
       assert.notEqual(mutatedSource, source);
       await assert.rejects(
@@ -2733,5 +2745,23 @@ test("reviewed read sites reject mutators and mutating callbacks even with a fre
     "target.items.forEach((item, index, items) => { items.push(item); })",
   ]) {
     assert.ok(inspect(expression).some(v => v.code === "state-target-pure-reader-read-callback-mutation"), expression);
+  }
+});
+
+test("canonical actions borrow only through an exact registered borrowed reader", async () => {
+  const path = "js/core/state/actions/scenario_activation_actions.js";
+  const fixtures = [
+    ['import { getScenarioChunkPayloadEvictionIds as read } from "../../scenario/bundle_cache_policy.js";', "read(target.scenarioBundleCacheById.scene)", false],
+    ['import { analyzeScenarioPoliticalDerivedStateCoverage as read } from "../../renderer/scenario_chunk_promotion_helpers.js";', "read(target.scenarioBundleCacheById.scene)", true],
+    ['import { patchLegendState as read } from "./legend_actions.js";', "read(target.scenarioBundleCacheById.scene, {})", true],
+    ['import { unknownReader as read } from "../../scenario/unknown.js";', "read(target.scenarioBundleCacheById.scene)", true],
+  ];
+  for (const [importLine, expression, rejected] of fixtures) {
+    const source = `${importLine}\nexport function trimScenarioBundleCacheState(target) { ${expression}; }`;
+    const { bindingInventories } = await discoverStateWriterBindingsForSource(path, source, "production", {
+      includeInventories: true, scanAllParameters: true, derivedAliasTaintMode: "strict",
+    });
+    const findings = bindingInventories.flatMap(row => row.findings);
+    assert.equal(findings.some(row => row.unsupported), rejected, expression + " " + importLine);
   }
 });

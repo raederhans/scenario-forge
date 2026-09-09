@@ -1014,7 +1014,7 @@ class FileManager {
   static importProject(file, callback, observers = {}, options = {}) {
     if (!file) return false;
     const { notifyError } = resolveProjectImportObservers(observers);
-    return prepareProjectImportFile(file, { materializeFile: false })
+    return prepareProjectImportFile(file, { materializeFile: false, signal: options.signal })
       .then(({ file: importFile, projectPayload }) => {
         if (projectPayload !== undefined) {
           return FileManager.importProjectData(projectPayload, callback, observers, options);

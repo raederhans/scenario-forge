@@ -1,4 +1,4 @@
-import { strFromU8, strToU8, unzipSync, zipSync } from "../../vendor/fflate.browser.js";
+import { strFromU8, strToU8, Unzip, UnzipInflate, zipSync } from "../../vendor/fflate.browser.js";
 import {
   normalizeArtifactPath,
   normalizeArtifactToken,
@@ -260,18 +260,81 @@ function assertProjectZipFileBudget(file) {
   }
 }
 
-function assertProjectZipEntryBudget(entries = {}) {
-  const entryNames = Object.keys(entries);
-  if (entryNames.length > MAX_PROJECT_PACKAGE_ENTRY_COUNT) {
-    throw new Error("Project ZIP contains too many files for editable project import.");
+function checkImportCancellation(signal) {
+  if (signal?.aborted) throw new DOMException("Project import cancelled.", "AbortError");
+}
+
+async function readProjectZipEntries(file, signal) {
+  checkImportCancellation(signal);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  checkImportCancellation(signal);
+  assertProjectZipFileBudget({ size: bytes.byteLength });
+  // The streaming decoder accepts a missing directory. Require a complete end
+  // record as well, so a truncated package cannot become a successful import.
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let endRecord = -1;
+  for (let offset = bytes.length - 22; offset >= Math.max(0, bytes.length - 65557); offset -= 1) {
+    if (view.getUint32(offset, true) === 0x06054b50
+      && offset + 22 + view.getUint16(offset + 20, true) === bytes.length) {
+      endRecord = offset;
+      break;
+    }
   }
-  const totalBytes = entryNames.reduce((sum, name) => {
-    const entry = entries[name];
-    return sum + (entry instanceof Uint8Array ? entry.byteLength : 0);
-  }, 0);
-  if (totalBytes > MAX_PROJECT_PACKAGE_UNZIPPED_BYTES) {
-    throw new Error("Project ZIP expands beyond the editable project import limit.");
+  if (endRecord < 0) throw new Error("Project ZIP is incomplete or damaged.");
+  const entries = Object.create(null);
+  let entryCount = 0;
+  let completedCount = 0;
+  let totalBytes = 0;
+  let failure = null;
+  const unzip = new Unzip((entry) => {
+    if (failure) throw failure;
+    entryCount += 1;
+    if (entryCount > MAX_PROJECT_PACKAGE_ENTRY_COUNT) {
+      throw new Error("Project ZIP contains too many files for editable project import.");
+    }
+    if (Object.hasOwn(entries, entry.name)) throw new Error(`Duplicate project package file path: ${entry.name}`);
+    entries[entry.name] = null;
+    const chunks = [];
+    let entryBytes = 0;
+    entry.ondata = (error, chunk, final) => {
+      if (failure) return;
+      if (error) { failure = error; return; }
+      totalBytes += chunk.byteLength;
+      if (totalBytes > MAX_PROJECT_PACKAGE_UNZIPPED_BYTES) {
+        failure = new Error("Project ZIP expands beyond the editable project import limit.");
+        return;
+      }
+      chunks.push(chunk);
+      entryBytes += chunk.byteLength;
+      if (final) {
+        const output = new Uint8Array(entryBytes);
+        let offset = 0;
+        for (const part of chunks) { output.set(part, offset); offset += part.byteLength; }
+        chunks.length = 0;
+        entries[entry.name] = output;
+        completedCount += 1;
+      }
+    };
+    entry.start();
+  });
+  unzip.register(UnzipInflate);
+  let sliceStarted = performance.now();
+  // Bound each inflation allocation independently of untrusted ZIP sizes.
+  // Yield between small input slices to let cancellation and painting run.
+  for (let offset = 0; offset < bytes.length; offset += 1024) {
+    checkImportCancellation(signal);
+    unzip.push(bytes.subarray(offset, offset + 1024), offset + 1024 >= bytes.length);
+    if (failure) throw failure;
+    if (performance.now() - sliceStarted >= 8) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      sliceStarted = performance.now();
+    }
   }
+  checkImportCancellation(signal);
+  if (completedCount !== entryCount || view.getUint16(endRecord + 10, true) !== entryCount) {
+    throw new Error("Project ZIP is incomplete or damaged.");
+  }
+  return entries;
 }
 
 function parseJsonBytes(bytes, fallback = null) {
@@ -394,7 +457,8 @@ async function validateManifestProjectEntry({ manifest, projectBytes, selectedPr
   }
 }
 
-async function prepareProjectImportFile(file, { materializeFile = true } = {}) {
+async function prepareProjectImportFile(file, { materializeFile = true, signal } = {}) {
+  checkImportCancellation(signal);
   if (!fileLooksLikeProjectZip(file)) {
     return { file, preview: null, manifest: null };
   }
@@ -402,8 +466,7 @@ async function prepareProjectImportFile(file, { materializeFile = true } = {}) {
     throw new Error("Project ZIP cannot be read by this browser.");
   }
   assertProjectZipFileBudget(file);
-  const entries = unzipSync(new Uint8Array(await file.arrayBuffer()));
-  assertProjectZipEntryBudget(entries);
+  const entries = await readProjectZipEntries(file, signal);
   const selectedProjectPath = entries[PROJECT_PACKAGE_PROJECT_PATH]
     ? PROJECT_PACKAGE_PROJECT_PATH
     : LEGACY_PROJECT_PATH;
@@ -415,6 +478,7 @@ async function prepareProjectImportFile(file, { materializeFile = true } = {}) {
   const projectText = strFromU8(projectBytes);
   const projectPayload = JSON.parse(projectText);
   await validateManifestProjectEntry({ manifest, projectBytes, selectedProjectPath });
+  checkImportCancellation(signal);
   if (!projectManifestMatchesPayload(manifest, projectPayload)) {
     throw new Error("Project package manifest does not match editable project.");
   }

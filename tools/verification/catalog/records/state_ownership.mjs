@@ -159,6 +159,7 @@ export const STATE_OWNERSHIP_RECORDS = [
       "tests/startup_hydration_behavior.test.mjs",
       "tests/sample_project_contracts.test.mjs",
       "tests/state_writer_scanner_soundness_behavior.test.mjs",
+      "tests/state_writer_callable_result_behavior.test.mjs",
       "tools/run_p4_phase_verification.mjs",
       "js/core/state/actions/boot_actions.js",
       "js/core/state/boot_state.js",

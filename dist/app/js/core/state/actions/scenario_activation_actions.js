@@ -2,6 +2,66 @@
 // Rendering, observers, rollback orchestration, and recovery stay outside this module.
 
 import { commitSpecialZoneLayersState } from "./special_zone_actions.js";
+import { SCENARIO_BUNDLE_CACHE_LIMIT, getScenarioChunkPayloadEvictionIds } from "../../scenario/bundle_cache_policy.js";
+
+export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
+  // The caller retains its Map identity; only a short string-ID order crosses
+  // this write boundary. Published bundles are never copied.
+  const recency = new Map(JSON.parse(JSON.stringify(recencyOrder)).map(id => [String(id), true]));
+  const cache = target.scenarioBundleCacheById || {};
+  let cacheSize = Object.keys(cache).length;
+  for (const id of recency.keys()) if (!cache[id]) recency.delete(id);
+  for (const id of Object.keys(cache)) if (!recency.has(id)) recency.set(id, true);
+  recency.delete(String(targetId));
+  recency.set(String(targetId), true);
+  // An apply can still need the outgoing bundle for rollback. Defer trimming
+  // until a subsequent load/cache hit outside that transaction.
+  if (target.scenarioApplyInFlight) return Array.from(recency.keys());
+  for (const id of recency.keys()) {
+    const bundle = cache[id];
+    if (id === targetId || id === String(target.activeScenarioId || "").trim()) continue;
+    if ((bundle?.deferredMetadataLoadPromise && !bundle.deferredMetadataLoadSettled)
+      || Object.values(bundle?.optionalLayerPromises || {}).some(Boolean)
+      || Object.values(bundle?.chunkPayloadPromisesById || {}).some(Boolean)) continue;
+    if (!bundle) continue;
+    clearScenarioBundleChunkProtectionState(target, id);
+    for (const chunkId of getScenarioChunkPayloadEvictionIds(target.scenarioBundleCacheById[id])) {
+      removeScenarioBundleChunkPayloadState(target, id, chunkId);
+    }
+    if (cacheSize <= SCENARIO_BUNDLE_CACHE_LIMIT) continue;
+    removeScenarioBundleCacheEntryState(target, id);
+    cacheSize -= 1;
+    recency.delete(id);
+  }
+  return Array.from(recency.keys());
+}
+
+// Published cache writes share the authority used for bundle payload publication.
+export function clearScenarioBundleChunkProtectionState(target, scenarioId) {
+  assertStateTarget(target);
+  const id = String(scenarioId || "");
+  if (!Object.hasOwn(target.scenarioBundleCacheById || {}, id)) return false;
+  target.scenarioBundleCacheById[id].chunkPayloadProtectedIds = [];
+  return true;
+}
+
+export function removeScenarioBundleChunkPayloadState(target, scenarioId, chunkId) {
+  assertStateTarget(target);
+  const id = String(scenarioId || "");
+  const key = String(chunkId || "");
+  if (!Object.hasOwn(target.scenarioBundleCacheById || {}, id)
+    || !Object.hasOwn(target.scenarioBundleCacheById[id].chunkPayloadCacheById || {}, key)) return false;
+  delete target.scenarioBundleCacheById[id].chunkPayloadCacheById[key];
+  return true;
+}
+
+export function removeScenarioBundleCacheEntryState(target, scenarioId) {
+  assertStateTarget(target);
+  const id = String(scenarioId || "");
+  if (!Object.hasOwn(target.scenarioBundleCacheById || {}, id)) return false;
+  delete target.scenarioBundleCacheById[id];
+  return true;
+}
 
 // Request timing stays in the loader; published bundle payloads use this authority.
 export function commitScenarioOptionalLayerPayloadState(target, scenarioId, layerKey, payloadField, payload, settled = true) {

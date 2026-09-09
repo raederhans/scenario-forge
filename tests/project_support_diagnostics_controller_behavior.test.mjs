@@ -794,6 +794,7 @@ test("local project zip load unwraps editable project before import funnel", asy
     value: "map_project.zip",
   };
   let importedFile = null;
+  let importedOptions;
   const dialogs = [];
   const controller = createController(projectSaveStatus, {
     elements: {
@@ -801,8 +802,9 @@ test("local project zip load unwraps editable project before import funnel", asy
       projectFileName,
     },
     helpers: {
-      importProjectThroughFunnel: (file) => {
+      importProjectThroughFunnel: (file, options) => {
         importedFile = file;
+        importedOptions = options;
         return true;
       },
       showAppDialog: async (options) => {
@@ -820,8 +822,10 @@ test("local project zip load unwraps editable project before import funnel", asy
   assert.equal(projectFileName.dataset.projectFileState, "selected");
   assert.equal(dialogs[0].title, "Load Project Package");
   assert.match(dialogs[0].details, /Package: map_project\.zip/);
-  assert.equal(importedFile.name, "map_project.json");
-  assert.match(await importedFile.text(), /"schemaVersion":21/);
+  assert.equal(importedFile, null, "preview does not serialize a second JSON File");
+  assert.deepEqual(importedOptions.projectPayload, { schemaVersion: 21, activePaletteId: "hoi4_vanilla" });
+  assert.equal(importedOptions.fileName, "map_project.zip");
+  assert.equal(importedOptions.signal.aborted, false);
   assert.equal(projectFileInput.value, "");
 });
 

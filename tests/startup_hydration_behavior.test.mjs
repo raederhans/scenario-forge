@@ -54,6 +54,36 @@ function createMinimalHydrationController(state, overrides = {}) {
   });
 }
 
+for (const invalidation of ["request", "epoch"]) {
+test(`health gate retry arriving after a new scenario ${invalidation} cannot change its recovery state`, async () => {
+  let finishLoad;
+  const state = {
+    activeScenarioId: "sample",
+    currentScenarioApplyRequestId: 1,
+    renderTransactionDiagnostics: { scenarioApplyEpoch: 1 },
+    landData: { type: "FeatureCollection", features: [] },
+    sovereigntyByFeatureId: {},
+    scenarioRuntimeTopologyVersionTag: "sample:missing-runtime-source-sha:runtime_topology_sha256",
+  };
+  const effects = [];
+  const controller = createMinimalHydrationController(state, {
+    getLoadScenarioBundle: () => () => new Promise((resolve) => { finishLoad = resolve; }),
+    enterScenarioFatalRecovery: () => effects.push("fatal"),
+    syncScenarioUi: () => effects.push("ui"),
+    flushRenderBoundary: () => effects.push("render"),
+  });
+  const pending = controller.enforceScenarioHydrationHealthGate();
+  assert.equal(typeof finishLoad, "function");
+  if (invalidation === "request") state.currentScenarioApplyRequestId = 2;
+  else state.renderTransactionDiagnostics.scenarioApplyEpoch = 2;
+  state.scenarioHydrationHealthGate = { status: "new-request" };
+  finishLoad({ manifest: { scenario_id: "sample" } });
+  await assert.rejects(pending, { name: "AbortError" });
+  assert.deepEqual(state.scenarioHydrationHealthGate, { status: "new-request" });
+  assert.deepEqual(effects, []);
+});
+}
+
 test("startup shell-empty scenario political baseline cannot fall back to modern primary", () => {
   const rendererSource = readRepoFile("js", "core", "map_renderer.js");
 

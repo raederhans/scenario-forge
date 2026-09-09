@@ -210,6 +210,7 @@ const LAZY_STATE_KEY_DOMAINS = Object.freeze({
   postReadyTaskDiagnostics: Object.freeze(["boot", "P4.1"]),
   projectedBoundsDiagnostics: Object.freeze(["renderer", "P4.3"]),
   renderPerfMetrics: Object.freeze(["renderer", "P4.3"]),
+  renderTransactionDiagnostics: Object.freeze(["renderer", "P4.3"]),
   renderPerfMetricSequence: Object.freeze(["renderer", "P4.3"]),
   scenarioWaterCacheCoverageAlgo: Object.freeze(["renderer", "P4.3"]),
   scenarioWaterCacheMode: Object.freeze(["renderer", "P4.3"]),

@@ -15,11 +15,10 @@ import { restoreProjectImportFields as restoreRendererInteractionImportFields } 
 import { applyProjectImportPatch } from "../state/actions/project_import_actions.js";
 
 import {
-  getFeatureId,
   migrateFeatureScopedProjectDataToCurrentTopology,
-  normalizeFeatureOwnershipMap,
 } from "../sovereignty_manager.js";
 import { state } from "../state.js";
+import { getScenarioImportValidFeatureIds, resolveImportedOwnershipState } from "./import_trust_projection.js";
 import {
   waitForScenarioApplyIdle,
   waitForStartupReadonlyUnlock,
@@ -62,17 +61,12 @@ export async function prepareImportedProjectState({
     activeScenarioId: preparedScenario.staged.scenarioId,
     activeScenarioManifest: preparedScenario.bundle.manifest,
     scenarioBaselineOwnersByFeatureId: preparedScenario.staged.resolvedOwners,
-    runtimePoliticalTopology: preparedScenario.staged.runtimeTopologyPayload,
-    runtimeFeatureIds: preparedScenario.staged.scenarioId === state.activeScenarioId ? state.runtimeFeatureIds : [],
-    runtimeFeatureIndexById: preparedScenario.staged.scenarioId === state.activeScenarioId ? state.runtimeFeatureIndexById : null,
     mapSemanticMode: preparedScenario.staged.mapSemanticMode,
     scenarioCountriesByTag: preparedScenario.staged.countryMap,
   } : { activeScenarioId: "", activeScenarioManifest: null, scenarioBaselineOwnersByFeatureId: {},
-    scenarioCountriesByTag: {}, scenarioReleasableIndex: null,
-    runtimePoliticalTopology: state.defaultRuntimePoliticalTopology, runtimeFeatureIds: [], runtimeFeatureIndexById: null };
-  const target = { ...state, ...scenarioState };
+    scenarioCountriesByTag: {}, scenarioReleasableIndex: null };
   debugState.importPhase = "migration";
-  const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds(target);
+  const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds(state, preparedScenario);
   let migrationSummary = null;
   data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
     landData: scenarioImportValidFeatureIds ? null : state.landData,
@@ -84,11 +78,11 @@ export async function prepareImportedProjectState({
     data,
     preparedScenario, scenarioState, manager,
     validFeatureIds: scenarioImportValidFeatureIds,
-    importedOwnershipState: resolveImportedOwnershipState(data, target),
+    importedOwnershipState: resolveImportedOwnershipState(data, scenarioState),
     scenarioImportAudit,
     importSummary: {
-      scenarioId: String(target.activeScenarioId || ""),
-      scenarioName: String(target.activeScenarioManifest?.display_name || target.activeScenarioId || ""),
+      scenarioId: String(scenarioState.activeScenarioId || ""),
+      scenarioName: String(scenarioState.activeScenarioManifest?.display_name || scenarioState.activeScenarioId || ""),
       restoredColorEntries: Object.keys(data.visualOverrides || {}).length,
       restoredOwnershipEntries: Object.keys(data.sovereigntyByFeatureId || {}).length,
       ignoredEntries: migrationSummary?.ignoredEntries ?? null,
@@ -146,43 +140,4 @@ async function resolveScenarioImportAudit(data, ui, getScenarioResourcesModule) 
     };
   }
   return scenarioImportAudit;
-}
-
-function getScenarioImportValidFeatureIds(target = state) {
-  // Staged scenario topology omits global coarse/auxiliary features that the
-  // runtime composites into the scene. Keep those trusted identities as well as
-  // baseline owners for regions whose detail chunks are not loaded yet.
-  const ids = new Set(Object.keys(target.scenarioBaselineOwnersByFeatureId || {}));
-  const add = value => { const id = String(value || "").trim(); if (id) ids.add(id); };
-  for (const id of Array.isArray(target.runtimeFeatureIds) ? target.runtimeFeatureIds : []) add(id);
-  if (target.runtimeFeatureIndexById instanceof Map) target.runtimeFeatureIndexById.forEach((_value, id) => add(id));
-  for (const topology of [
-    target.runtimePoliticalTopology,
-    target.defaultRuntimePoliticalTopology,
-    target.topologyPrimary || target.topology,
-    // Plain projects use base detail regions. A scenario instead supplies its
-    // own trusted runtime topology and must not inherit a prior detail variant.
-    !target.activeScenarioId ? target.topologyDetail : null,
-  ]) {
-    const geometries = topology?.objects?.political?.geometries;
-    for (const geometry of Array.isArray(geometries) ? geometries : []) add(getFeatureId(geometry));
-  }
-  return ids.size ? ids : null;
-}
-
-function resolveImportedOwnershipState(data, target = state) {
-  const importedOwnersByFeatureId = normalizeFeatureOwnershipMap(data.sovereigntyByFeatureId);
-  if (target.activeScenarioId) {
-    return {
-      sovereigntyByFeatureId: {
-        ...(target.scenarioBaselineOwnersByFeatureId || {}),
-        ...importedOwnersByFeatureId,
-      },
-      shouldRestoreScenarioBaselineControllers: false,
-    };
-  }
-  return {
-    sovereigntyByFeatureId: importedOwnersByFeatureId,
-    shouldRestoreScenarioBaselineControllers: false,
-  };
 }

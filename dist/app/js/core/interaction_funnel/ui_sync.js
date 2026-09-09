@@ -8,14 +8,14 @@ import {
 } from "../state/index.js";
 import { setScenarioImportAudit } from "../state/scenario_runtime_state.js";
 
-export function syncProjectImportUiState({ scenarioImportAudit, hooks }) {
+export function syncProjectImportUiState({ scenarioImportAudit, hooks, recovery = false }) {
   setScenarioImportAudit(
     state,
     state.activeScenarioId
       ? cloneImportedProjectValue(scenarioImportAudit)
       : null
   );
-  emitStateBusEvent(STATE_BUS_EVENTS.CLEAR_REFERENCE_IMAGE, { markDirty: false });
+  if (!recovery) emitStateBusEvent(STATE_BUS_EVENTS.CLEAR_REFERENCE_IMAGE, { markDirty: false });
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_PARENT_BORDER_COUNTRY_LIST);
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SPECIAL_ZONE_EDITOR_UI);
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_TRANSPORT_APPEARANCE_UI);

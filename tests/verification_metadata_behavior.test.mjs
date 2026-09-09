@@ -52,6 +52,73 @@ import {
 
 const REPO_ROOT = process.cwd();
 
+test("reviewed city names select executable Python and Node regression routes", () => {
+  const routes = buildRouteIndex();
+  const python = routes.find((route) => route.id === "city:reviewed-place-names-python");
+  const chinaPython = routes.find((route) => route.id === "city:tno-china-place-names-python");
+  const node = routes.find((route) => route.id === "city:tno-reviewed-labels-node");
+  assert.equal(python.executionOwner, "main-thread");
+  assert.ok(python.resourceLocks.includes("heavy-geo"));
+  assert.equal(node.executionOwner, "child-safe");
+  const pythonFiles = ["tests/test_reviewed_place_names.py"];
+  assert.equal(chinaPython.commandRef, "python -m unittest tests.test_tno_china_place_names -q");
+  assert.equal(chinaPython.executionOwner, "child-safe");
+  const nodeFiles = [
+    "tests/tno_china_city_labels_behavior.test.mjs", "tests/tno_russia_city_labels_behavior.test.mjs",
+    "tests/tno_eastern_city_labels_behavior.test.mjs", "tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+  ];
+  for (const file of pythonFiles) {
+    assert.ok(python.commandRef.includes(file.replaceAll("/", ".").replace(/\.py$/, "")));
+  }
+  for (const file of nodeFiles) assert.ok(node.commandRef.includes(file));
+  for (const [file, route] of [
+    ...pythonFiles.map((file) => [file, python]), ...nodeFiles.map((file) => [file, node]),
+    ["tests/test_tno_china_place_names.py", chinaPython],
+    ["map_builder/cities.py", python], ["data/i18n/manual_geo_overrides.json", python],
+    ["data/scenarios/tno_1962/geo_locale_patch.zh.json", python],
+    ["data/world_cities.geojson", node], ["data/scenarios/tno_1962/city_overrides.json", node],
+  ]) {
+    const recommendation = buildRepositoryRecommendation([file]);
+    assert.deepEqual(recommendation.unmatchedChangedFiles, [], file);
+    assert.ok(recommendation.recommendedCommands.some((command) =>
+      command.commandRef === route.commandRef), file);
+  }
+});
+
+test("round two lifecycle regressions have executable local and reserved browser routes", () => {
+  const routes = buildRouteIndex();
+  const preparedCatalog = prepareRepositoryVerificationCatalog();
+  const localCases = [
+    ["tests/startup_data_pipeline_lifecycle_behavior.test.mjs", "test:node:startup-lifecycle"],
+    ["tests/startup_interaction_lifecycle_behavior.test.mjs", "test:node:startup-lifecycle"],
+    ["tests/project_import_completion_behavior.test.mjs", "test:node:project-import-lifecycle"],
+    ["tests/project_package_stream_import_behavior.test.mjs", "test:node:project-import-lifecycle"],
+    ["tests/scenario_import_trust_projection_behavior.test.mjs", "test:node:project-import-lifecycle"],
+    ["tests/scenario_project_import_recovery_behavior.test.mjs", "test:node:project-import-lifecycle"],
+    ["js/core/interaction_funnel/import_trust_projection.js", "test:node:project-import-lifecycle"],
+    ["tests/legend_actions_behavior.test.mjs", "node --test tests/legend_actions_behavior.test.mjs"],
+    ["js/core/legend_state_normalizers.js", "node --test tests/legend_actions_behavior.test.mjs"],
+  ];
+  for (const [file, commandRef] of localCases) {
+    const selection = constrainAdaptiveEntrypointSelection(
+      buildAdaptiveEntrypointRecommendation([file], routes, { entrypoint: "edit" }), "edit", { preparedCatalog },
+    );
+    assert.deepEqual(selection.unmatchedChangedFiles, [], file);
+    assert.deepEqual(selection.localEntrypointRouteGaps, [], file);
+    assert.ok(selection.recommendedCommands.some((command) => command.commandRef === commandRef), file);
+  }
+  const browser = routes.find((route) => route.id === "e2e:project-import-recovery-round2");
+  assert.ok(browser.sourceRef.split(",").includes("tests/e2e/dev/project_import_recovery_round2.dev.spec.js"));
+  assert.equal(browser.executionOwner, "main-thread");
+  assert.ok(browser.resourceLocks.includes("playwright-browser"));
+  assert.ok(browser.commandRef.includes("--workers=1 --retries=0"));
+  const diagnostics = routes.find((route) => route.id === "node:test:node:render-transaction-diagnostics");
+  assert.equal(diagnostics.commandRef, "test:node:render-transaction-diagnostics");
+  assert.ok(diagnostics.sourceRef.split(",").includes("tests/renderer_transaction_diagnostics_actions_behavior.test.mjs"));
+  assert.ok(diagnostics.sourceRef.split(",").includes("js/core/state/actions/renderer_transaction_diagnostics_actions.js"));
+  assert.equal(diagnostics.entrypointPolicy.minimumDepth, "pr");
+});
+
 test("selector explicitly classifies task prose and agent config without inventing behavior coverage", () => {
   const files = [
     ".codex/config.toml",
@@ -351,14 +418,15 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
 
   const heavy = buildCanonicalHeavyDependencyGroups();
   assert.equal(heavy.heavyDependencyGroups[0].id, "geo_stack");
-  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 16);
+  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 17);
   assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_city_data_contract.py"));
+  assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_reviewed_place_names.py"));
   const cityRoute = buildRouteIndex().find((route) => route.id === "city:data-contract-python");
   assert.equal(cityRoute.executionOwner, "main-thread");
   assert.equal(cityRoute.cost, "heavy");
   assert.ok(cityRoute.resourceLocks.includes("heavy-geo"));
   heavy.heavyDependencyGroups[0].patterns.push("detached-only.py");
-  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 16);
+  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 17);
 
   const aliases = buildCanonicalPackageAliases().packageAliases;
   assert.deepEqual(

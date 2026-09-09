@@ -1,4 +1,7 @@
 import { clearDirty } from "./dirty_state.js";
+import { createProjectImportCompletion } from "./interaction_funnel/import_completion.js";
+import { createImportRecoveryUi } from "./interaction_funnel/import_recovery_ui.js";
+import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from "./state/actions/boot_actions.js";
 import { captureProjectImportState } from "./state/actions/project_import_actions.js";
 import { clearHistory } from "./history_manager.js";
 import {
@@ -95,7 +98,7 @@ function getContextLayerRequestFromKeys(layerKeys = []) {
   return normalizedKeys.length === 1 ? normalizedKeys[0] : normalizedKeys;
 }
 
-async function restoreImportedTransportOverviewDataLayers(importState, isCurrent = () => true) {
+async function restoreImportedTransportOverviewDataLayers(importState, isCurrent = () => true, signal) {
   if (!importState.showTransport) return;
   for (const familyId of listTransportOverviewCapabilityFamilyIds()) {
     if (!isCurrent()) return;
@@ -106,8 +109,9 @@ async function restoreImportedTransportOverviewDataLayers(importState, isCurrent
     const result = await callRuntimeHook(importState, "ensureContextLayerDataFn", layerRequest, {
       reason: "project-import",
       renderNow: false,
+      isCurrent, signal,
     });
-    if (isCurrent()) validateImportedContextLayerResult(result, importState);
+    if (isCurrent()) validateImportedContextLayerResult(result);
   }
 }
 
@@ -175,6 +179,8 @@ function resolveHooks(hooks = {}) {
       typeof hooks.onProjectImportComplete === "function" ? hooks.onProjectImportComplete : null,
     onProjectImportError:
       typeof hooks.onProjectImportError === "function" ? hooks.onProjectImportError : null,
+    onProjectImportRecoveryState:
+      typeof hooks.onProjectImportRecoveryState === "function" ? hooks.onProjectImportRecoveryState : null,
   };
 }
 
@@ -188,8 +194,8 @@ function cloneImportedProjectValue(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function syncProjectImportUiState({ scenarioImportAudit, hooks }) {
-  return syncProjectImportUiStateHelper({ scenarioImportAudit, hooks });
+function syncProjectImportUiState({ scenarioImportAudit, hooks, recovery = false }) {
+  return syncProjectImportUiStateHelper({ scenarioImportAudit, hooks, recovery });
 }
 
 // project import 既要恢复文件里显式保存的 overlay pack，也要兼容旧工程只留下
@@ -340,13 +346,26 @@ let activeImportRequest = null;
 let importRequestSequence = 0;
 
 function captureImportDocumentIdentity(target) {
-  return [target.dirtyRevision, target.activeScenarioId, target.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0,
-    target.currentScenarioApplyRequestId, target.historyPast, target.historyFuture,
-    target.historyPast?.length, target.historyFuture?.length];
+  const dirtyRevision = target.dirtyRevision;
+  const scenarioId = target.activeScenarioId;
+  const epoch = target.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+  const requestId = target.currentScenarioApplyRequestId;
+  const past = target.historyPast;
+  const future = target.historyFuture;
+  const pastLength = past?.length;
+  const futureLength = future?.length;
+  // Borrow history only inside this equality check; the request never receives
+  // a writable alias to either stack.
+  return () => target.dirtyRevision === dirtyRevision
+    && target.activeScenarioId === scenarioId
+    && (target.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === epoch
+    && target.currentScenarioApplyRequestId === requestId
+    && target.historyPast === past && target.historyFuture === future
+    && past?.length === pastLength && future?.length === futureLength;
 }
 
 function isImportDocumentCurrent(identity) {
-  return captureImportDocumentIdentity(state).every((value, index) => value === identity[index]);
+  return identity();
 }
 
 async function applyImportedProjectState(data, { ui, hooks, request }) {
@@ -355,7 +374,7 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
     data, ui, debugState, getScenarioResourcesModule,
     getScenarioManagerModule: () => import("./scenario_manager.js"),
   });
-  if (request && (activeImportRequest !== request || request.committed || !isImportDocumentCurrent(request.identity))) {
+  if (request && (request.signal?.aborted || activeImportRequest !== request || request.committed || !isImportDocumentCurrent(request.identity))) {
     throw Object.assign(new Error("Project import superseded by a document change."), { code: "IMPORT_ABORTED" });
   }
   data = preparedImport.data;
@@ -384,74 +403,84 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
   const committedIdentity = captureImportDocumentIdentity(state);
   const isCurrent = () => (!request || activeImportRequest === request) && isImportDocumentCurrent(committedIdentity);
   if (request) request.isCurrent = isCurrent;
-  const retryTasks = new Map();
-  const complete = async (name, task) => {
-    if (!isCurrent()) return;
-    try {
-      const result = await task();
-      if (result === false) throw new Error(`${name} could not be restored.`);
-    } catch (error) {
-      if (!isCurrent()) return;
-      warnings.push({ resource: name, message: String(error?.message || error) });
-      retryTasks.set(name, task);
-      ui.showToast(`${ui.t("Project imported", "ui")}: ${name} — ${String(error?.message || error)}`, {
-        tone: "warning", duration: 12000, actionLabel: ui.t("Retry", "ui"),
-        onAction: async () => {
-          if (!isCurrent()) return;
-          if (await task() === false) throw new Error(`${name} could not be restored.`);
-          retryTasks.delete(name);
-        },
-      });
-    }
-  };
-  await complete("document-refresh", () => {
+  const required = [{ name: "document-refresh", run: () => {
     markLegacyColorStateDirty();
     hooks.invalidateFrontlineOverlayState?.();
     callRuntimeHook(state, "clearExportBakeCacheFn");
-  });
-  await complete("scenario-runtime", () => preparedImport.manager.completeScenarioProjectImport(preparedImport.preparedScenario, isCurrent));
+  } }, { name: "scenario-runtime", run: ({ isCurrent: valid }) =>
+    preparedImport.manager.completeScenarioProjectImport(preparedImport.preparedScenario, valid) },
   // Scenario activation commits topology before the renderer publishes its new
   // landData. Seeding ownership earlier would copy outgoing TNO/Atlantropa/global
   // feature IDs into this document, and its next import would correctly reject them.
-  if (!warnings.some(warning => warning.resource === "scenario-runtime")) {
-    await complete("ownership-index", () => ensureSovereigntyState({ force: true }));
-  }
+  { name: "ownership-index", run: () => ensureSovereigntyState({ force: true }) }];
+  const optional = [];
+  const complete = (name, run) => optional.push({ name, run });
   const paletteId = String(data.activePaletteId || "").trim();
-  if (paletteId) await complete(`palette:${paletteId}`, () => setActivePaletteSource(paletteId, {
-    syncUI: true, overwriteCountryPalette: false, isCurrent,
+  if (paletteId) complete(`palette:${paletteId}`, ({ isCurrent: valid }) => setActivePaletteSource(paletteId, {
+    syncUI: true, overwriteCountryPalette: false, isCurrent: valid,
   }));
-  if (state.activeScenarioId && state.showCityPoints) await complete("cities", async () => {
-    const baseCities = await callRuntimeHook(state, "ensureBaseCityDataFn", { reason: "project-import", renderNow: false });
-    if (!isCurrent()) return;
+  if (state.activeScenarioId && state.showCityPoints) complete("cities", async ({ isCurrent: valid, signal }) => {
+    const baseCities = await callRuntimeHook(state, "ensureBaseCityDataFn", { reason: "project-import", renderNow: false, isCurrent: valid, signal });
+    if (!valid()) return;
     if (baseCities === null || state.baseCityDataState === "error") throw new Error("Base cities could not be restored.");
-    return restoreImportedScenarioOptionalLayer("cities", preparedImport, isCurrent);
+    return restoreImportedScenarioOptionalLayer("cities", preparedImport, valid);
   });
   if (state.activeScenarioId && (state.showStrategicResourceMarkers || state.strategicChoroplethMetric)) {
-    await complete("strategicvalues", () => restoreImportedScenarioOptionalLayer("strategicvalues", preparedImport, isCurrent));
+    complete("strategicvalues", ({ isCurrent: valid }) => restoreImportedScenarioOptionalLayer("strategicvalues", preparedImport, valid));
   }
   for (const [visible, name, layer] of [
     [state.showRivers, "rivers", "rivers"], [state.showUrban, "urban", "urban"],
     [state.showPhysical, "physical", ["physical-set", "physical-contours-set"]],
-  ]) if (visible) await complete(name, async () => {
-    const result = await callRuntimeHook(state, "ensureContextLayerDataFn", layer, { reason: "project-import", renderNow: false });
-    if (isCurrent()) validateImportedContextLayerResult(result);
+  ]) if (visible) complete(name, async ({ isCurrent: valid, signal }) => {
+    const result = await callRuntimeHook(state, "ensureContextLayerDataFn", layer, { reason: "project-import", renderNow: false, isCurrent: valid, signal });
+    if (valid()) validateImportedContextLayerResult(result);
   });
-  await complete("transport-overview", () => restoreImportedTransportOverviewDataLayers(state, isCurrent));
-  await complete("transport-country-overlays", () => restoreImportedTransportCountryOverlayState(state, data, isCurrent));
-  await complete("project-ui", () => syncProjectImportUiState({ scenarioImportAudit: preparedImport.scenarioImportAudit, hooks }));
-  if (!request || activeImportRequest === request) {
-    debugState.importPhase = "complete";
-  }
+  complete("transport-overview", ({ isCurrent: valid, signal }) => restoreImportedTransportOverviewDataLayers(state, valid, signal));
+  complete("transport-country-overlays", ({ isCurrent: valid }) => restoreImportedTransportCountryOverlayState(state, data, valid));
+  let job;
+  let uiInitialized = false;
+  const retry = async resource => {
+    const restored = await job.retry(resource);
+    if (restored) ui.showToast(`${ui.t("Restored", "ui")}: ${resource}`, { tone: "success" });
+    return restored;
+  };
+  const updateRecoveryUi = createImportRecoveryUi({ t: ui.t, retry });
+  commitStartupReadonlyStateFields(state, { active: true, reason: "project-import-recovery" });
+  job = createProjectImportCompletion({ required, optional, isCurrent,
+    finalize: () => {
+      const recovery = uiInitialized;
+      uiInitialized = true;
+      syncProjectImportUiState({ scenarioImportAudit: preparedImport.scenarioImportAudit, hooks, recovery });
+    },
+    onState: recovery => {
+      if (request && activeImportRequest !== request) { updateRecoveryUi({ ...recovery, phase: "cancelled" }); return; }
+      if (recovery.editable || recovery.phase === "cancelled") clearStartupReadonlyStateForReason(state, "project-import-recovery");
+      updateRecoveryUi(recovery);
+      if (!request || activeImportRequest === request) {
+        debugState.importPhase = recovery.phase === "complete" ? "complete" : `completion-${recovery.phase}`;
+        debugState.importRecovery = recovery;
+        hooks.onProjectImportRecoveryState?.(recovery);
+      }
+    },
+    onFailure: (resource, error) => ui.showToast(`${ui.t("Project imported", "ui")}: ${resource} — ${String(error?.message || error)}`, {
+      tone: "warning", duration: 12000, actionLabel: ui.t("Retry", "ui"), onAction: () => retry(resource),
+    }),
+  });
+  if (request) request.completionJob = job;
+  await job.start();
+  // Only required recovery occupies the document import entry. Optional resources
+  // run as a separate cancellable job with their own deadline and identity guards.
+  if (request) request.pending = false;
+  const initialRecovery = job.getState();
+  warnings.push(...initialRecovery.warnings);
+  const completion = initialRecovery.editable ? job.startOptional() : Promise.resolve(initialRecovery);
+  if (initialRecovery.editable && optional.length) ui.showToast(ui.t("Project ready. Loading optional layers…", "ui"), {
+    duration: 12000, actionLabel: ui.t("Stop loading", "ui"), onAction: () => job.cancel(),
+  });
   return {
     status: warnings.length ? "committed-with-warnings" : "committed",
     summary: preparedImport.importSummary, warnings,
-    // Retry only the named incomplete resource while this committed document is still current.
-    retry: async (resource) => {
-      if (!isCurrent() || !retryTasks.has(resource)) return false;
-      if (await retryTasks.get(resource)() === false) return false;
-      retryTasks.delete(resource);
-      return true;
-    },
+    completion, getRecoveryState: job.getState, retry, cancelCompletion: job.cancel,
   };
 }
 
@@ -482,8 +511,15 @@ export function dispatchMapDoubleClick(event) {
 }
 
 async function runProjectImport(input, options, source) {
+  if (options.signal?.aborted) return { status: "cancelled", reason: "import-aborted" };
   if (activeImportRequest?.pending) return { status: "failed", reason: "import-in-progress" };
+  const recoveryState = activeImportRequest?.completionJob?.getState();
+  if (recoveryState && !recoveryState.editable && recoveryState.phase !== "cancelled") {
+    return { status: "failed", reason: "import-recovery-required" };
+  }
+  activeImportRequest?.completionJob?.cancel();
   const request = { id: ++importRequestSequence, pending: true, committed: false,
+    signal: options.signal,
     identity: captureImportDocumentIdentity(state) };
   activeImportRequest = request;
   const ui = resolveUi(options.ui);
@@ -491,7 +527,7 @@ async function runProjectImport(input, options, source) {
   debugState.importStartCount += 1;
   debugState.importPhase = `${source}-read`;
   debugState.lastImportError = "";
-  debugState.lastImportFileName = String(source === "file" ? input?.name || "" : options.fileName || "");
+  debugState.lastImportFileName = String(source === "file" ? input?.name || options.fileName || "" : options.fileName || "");
   let result = null;
   try {
     const { FileManager } = await getFileManagerModule();
@@ -512,8 +548,10 @@ async function runProjectImport(input, options, source) {
         hooks.onProjectImportError?.(error);
       },
     };
-    const outcome = source === "file"
-      ? await FileManager.importProject(input, callback, observers, options.importOptions || {})
+    const outcome = options.projectPayload !== undefined
+      ? await FileManager.importProjectData(options.projectPayload, callback, observers, options.importOptions || {})
+      : source === "file"
+      ? await FileManager.importProject(input, callback, observers, { ...options.importOptions, signal: options.signal })
       : await FileManager.importProjectText(input, callback, observers, options.importOptions || {});
     return result || (outcome && typeof outcome === "object" ? outcome : { status: "failed" });
   } catch (error) {

@@ -191,6 +191,7 @@ function getStartupReadyHandoffOwner() {
       checkpointBootMetric,
       completeBootSequenceLogging,
       ensureActiveScenarioBundleHydrated,
+      ensureBaseCityDataReady,
       ensureContextLayerDataReady,
       ensureFullLocalizationDataReady,
       reconcileDetailPromotionPoliticalPass,
@@ -255,20 +256,22 @@ async function rollbackStartupScenarioToBaseMap() {
   });
 }
 
-async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
-  return getStartupDataPipelineOwner().ensureBaseCityDataReady({ reason, renderNow });
+async function ensureBaseCityDataReady(options = {}) {
+  return getStartupDataPipelineOwner().ensureBaseCityDataReady(options);
 }
 
-async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNow = true } = {}) {
-  const result = await getStartupDataPipelineOwner().ensureFullLocalizationDataReady({ reason, renderNow });
+async function ensureFullLocalizationDataReady(options = {}) {
+  const result = await getStartupDataPipelineOwner().ensureFullLocalizationDataReady(options);
+  if (options.signal?.aborted || (options.isCurrent && !options.isCurrent())
+    || (options.taskContext && !options.taskContext.isCurrent())) return result;
   updateUIText();
   return result;
 }
 
 registerRuntimeHook(state, "ensureFullLocalizationDataReadyFn", ensureFullLocalizationDataReady);
 
-async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", renderNow = true } = {}) {
-  return getStartupDataPipelineOwner().ensureActiveScenarioBundleHydrated({ reason, renderNow });
+async function ensureActiveScenarioBundleHydrated(options = {}) {
+  return getStartupDataPipelineOwner().ensureActiveScenarioBundleHydrated(options);
 }
 
 function shouldFastTrackScenarioHydration() {
@@ -277,12 +280,9 @@ function shouldFastTrackScenarioHydration() {
 
 async function ensureContextLayerDataReady(
   requestedLayerNames,
-  { reason = "manual", renderNow = true } = {}
+  options = {}
 ) {
-  return getStartupDataPipelineOwner().ensureContextLayerDataReady(requestedLayerNames, {
-    reason,
-    renderNow,
-  });
+  return getStartupDataPipelineOwner().ensureContextLayerDataReady(requestedLayerNames, options);
 }
 
 async function ensureStartupInitialScenarioChunkVisualReady({

@@ -68,6 +68,7 @@ import {
 } from "./scenario_resources.js";
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
+import { advanceScenarioApplyEpochState } from "./state/actions/renderer_transaction_diagnostics_actions.js";
 import {
   buildHoi4FarEastSovietOwnerBackfill,
   recordScenarioPerfMetric as sharedRecordScenarioPerfMetric,
@@ -1425,8 +1426,8 @@ export function commitScenarioForProjectImport(prepared, commitProject, isCurren
   const rollback = captureScenarioApplyRollbackSnapshot();
   try {
     if (prepared) {
-      prepared.staged.scenarioApplyEpoch = nextScenarioApplyEpoch(runtimeState, {
-        scenarioId: prepared.staged.scenarioId, reason: "project-import",
+      prepared.staged.scenarioApplyEpoch = advanceScenarioApplyEpochState(runtimeState, {
+        scenarioId: prepared.staged.scenarioId, reason: "project-import", recordedAt: Date.now(),
       });
       applyPreparedScenarioState(prepared.bundle, prepared.staged);
     } else if (runtimeState.activeScenarioId) {
@@ -1442,16 +1443,31 @@ export function commitScenarioForProjectImport(prepared, commitProject, isCurren
 
 export async function completeScenarioProjectImport(prepared, isCurrent) {
   if (!prepared || !isCurrent()) return;
-  await runPostScenarioApplyEffects({
+  const result = await runPostScenarioApplyEffects({
     bundle: prepared.bundle,
     scenarioId: prepared.staged.scenarioId,
     scenarioApplyEpoch: prepared.staged.scenarioApplyEpoch,
     scenarioApplyRequestId: 0,
     isScenarioApplyRequestCurrent: isCurrent,
-    deferChunkPrewarm: true,
+    deferChunkPrewarm: false,
+    deferOptionalLayers: true,
     renderNow: false,
     suppressRender: true,
   });
+  if (!isCurrent() || !result?.hasChunkedRuntime) return;
+  if (result.prewarmFailed) {
+    throw new Error("Scenario project import coarse prewarm failed.");
+  }
+  // Loading coarse payloads does not always commit them immediately. Keep the
+  // import required until the political collection has actually been promoted.
+  const promotion = await awaitInitialScenarioChunkVisualPromotion({
+    reason: "project-import-required",
+    renderNow: false,
+  });
+  if (!isCurrent()) return;
+  if (!promotion?.ok) {
+    throw new Error(`Scenario project import political promotion failed: ${promotion?.status || "not-ready"}.`);
+  }
 }
 
 async function applyDefaultScenarioOnStartup(
@@ -1523,13 +1539,13 @@ function formatScenarioStatusText() {
     if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
       return formatScenarioFatalRecoveryMessage(fatalState);
     }
-    const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, runtimeState.activeScenarioId);
+    const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, String(runtimeState.activeScenarioId || ""));
     return `${displayName} - ${formatScenarioFatalRecoveryMessage(fatalState)}`;
   }
   if (!runtimeState.activeScenarioId || !runtimeState.activeScenarioManifest) {
     return t("No scenario active", "ui");
   }
-  const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, runtimeState.activeScenarioId);
+  const displayName = getScenarioDisplayName(runtimeState.activeScenarioManifest, String(runtimeState.activeScenarioId || ""));
   const liveHealth = evaluateScenarioDataHealth(runtimeState.activeScenarioManifest, {
     minRatio: Number(runtimeState.scenarioDataHealth?.minRatio || SCENARIO_DETAIL_MIN_RATIO_STRICT),
   });

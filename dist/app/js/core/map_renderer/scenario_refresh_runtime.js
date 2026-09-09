@@ -87,6 +87,7 @@ function createScenarioRefreshRuntime(deps = {}) {
   let scenarioChunkPromotionVersion = 0;
   let deferredInfraEpoch = 0;
   let activeInfraExecution = null;
+  let activeInfraLoadStateIsCurrent = () => false;
   const scenarioVisualInvalidationExecutor = createScenarioVisualInvalidationExecutor({
     clearLastGoodFrame, clearRenderPassReferenceTransforms, invalidateInteractionComposite,
     invalidateBorderCache, resetScenarioWaterCacheAdaptiveState, invalidateRenderPasses,
@@ -102,13 +103,14 @@ function createScenarioRefreshRuntime(deps = {}) {
   function cancelDeferredScenarioChunkPromotionInfraRefresh() {
     clearDeferredInfraHandle();
     if (activeInfraExecution) {
-      if (runtimeState.runtimeChunkLoadState === activeInfraExecution.loadState) {
+      if (activeInfraLoadStateIsCurrent()) {
         if (activeInfraExecution.mutationStarted) {
-          setInteractionInfrastructureState(activeInfraExecution.stage || "basic-ready", { ready: false, inFlight: false });
+          setInteractionInfrastructureState(String(activeInfraExecution.stage || "basic-ready"), { ready: false, inFlight: false });
         }
       }
       endInteractionRecoveryTask("scenario-chunk-promotion-infra");
       activeInfraExecution = null;
+      activeInfraLoadStateIsCurrent = () => false;
     }
     if (runtimeState.runtimeChunkLoadState?.pendingInfraPromotion) {
       patchScenarioChunkLoadState(runtimeState, { pendingInfraPromotion: null });
@@ -202,7 +204,11 @@ function createScenarioRefreshRuntime(deps = {}) {
       return false;
     }
     const startedAt = nowMs();
-    const execution = { loadState, stage: runtimeState.interactionInfrastructureStage, mutationStarted: false };
+    const execution = {
+      stage: String(runtimeState.interactionInfrastructureStage || ""),
+      mutationStarted: false,
+    };
+    activeInfraLoadStateIsCurrent = () => runtimeState.runtimeChunkLoadState === loadState;
     activeInfraExecution = execution;
     const previousInteractionInfrastructureStage = String(runtimeState.interactionInfrastructureStage || "");
     const previousInteractionInfrastructureReady = !!runtimeState.interactionInfrastructureReady;
@@ -422,6 +428,7 @@ function createScenarioRefreshRuntime(deps = {}) {
       }
       if (activeInfraExecution === execution) {
         activeInfraExecution = null;
+        activeInfraLoadStateIsCurrent = () => false;
         endInteractionRecoveryTask(taskKey);
       }
     }
