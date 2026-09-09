@@ -51,3 +51,5 @@ Modern 记录两个可选启动本地化资源 404，走已有空默认 fallback
 用户于本轮验证结果说明后明确授权提交、推送和合并。当前集成分支为 codex/visual-correctness-v0-v3-20260909，基于与 origin/main 一致的 8ed56525。PR 将保留单像素检查失败和部分验收状态，并按仓库要求同步 canonical Pages dist。main 合并须通过六项远端必需检查；合并会触发既有 Pages 工作流。
 
 PR #129 首轮 CI 集成修复：TNO 资产快照未包含新增名称，已通过现有 snapshot/audit 构建函数同步三处身份字段，第二次生成字节不变，strict scenario 检查通过。旧 Python 结构断言要求 flush 后恢复锁，已对齐为 currentness 检查后先恢复锁、再按 renderNow 条件 flush；38 项契约检查通过。未改变运行时源码或视觉阈值。
+
+PR 综合验证续修：更新重型 chunk 契约的旧 SVG/path-only 缓存断言，以及 marker pass 纯委托断言，保留数值流构建、geometry identity、candidate reset→labels invalidation→owner delegate 的明确约束。完整 chunk 契约79/79、pipeline边界5/5通过；按PR变更选择的81组本地可执行命令已全部通过（先77组，再修正失败项并续跑剩余4组），route gap为0。59组主线程命令按原选择器规则deferred，不作为本地通过声明。

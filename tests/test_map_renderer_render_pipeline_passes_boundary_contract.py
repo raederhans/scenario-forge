@@ -95,7 +95,6 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         )
         for function_name in (
             "drawContextBasePass",
-            "drawContextMarkersPass",
             "drawContextScenarioPass",
         ):
             self.assertIn(
@@ -104,6 +103,16 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
                 "}",
                 renderer_content,
             )
+        self.assertRegex(
+            renderer_content,
+            re.compile(
+                r'function drawContextMarkersPass\(k, options = undefined\) \{.*?'
+                r'getTransportOverviewRenderOwner\(\)\.resetLabelCandidates\(\);\s*'
+                r'invalidateRenderPasses\("labels", "transport-label-candidates"\);\s*'
+                r'return getContextPassOrchestratorOwner\(\)\.drawContextMarkersPass\(k, options\);\s*\}',
+                re.S,
+            ),
+        )
         self.assertIn("export function createVisualEffectsPassOwner({", visual_effects_owner_content)
         self.assertIn("export function createContextPassOrchestratorOwner({", context_pass_owner_content)
         self.assertIn("export function createPoliticalPassOrchestratorOwner({", political_pass_owner_content)
