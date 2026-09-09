@@ -55,11 +55,14 @@ const REPO_ROOT = process.cwd();
 test("reviewed city names select executable Python and Node regression routes", () => {
   const routes = buildRouteIndex();
   const python = routes.find((route) => route.id === "city:reviewed-place-names-python");
+  const chinaPython = routes.find((route) => route.id === "city:tno-china-place-names-python");
   const node = routes.find((route) => route.id === "city:tno-reviewed-labels-node");
   assert.equal(python.executionOwner, "main-thread");
   assert.ok(python.resourceLocks.includes("heavy-geo"));
   assert.equal(node.executionOwner, "child-safe");
-  const pythonFiles = ["tests/test_reviewed_place_names.py", "tests/test_tno_china_place_names.py"];
+  const pythonFiles = ["tests/test_reviewed_place_names.py"];
+  assert.equal(chinaPython.commandRef, "python -m unittest tests.test_tno_china_place_names -q");
+  assert.equal(chinaPython.executionOwner, "child-safe");
   const nodeFiles = [
     "tests/tno_china_city_labels_behavior.test.mjs", "tests/tno_russia_city_labels_behavior.test.mjs",
     "tests/tno_eastern_city_labels_behavior.test.mjs", "tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
@@ -70,6 +73,7 @@ test("reviewed city names select executable Python and Node regression routes", 
   for (const file of nodeFiles) assert.ok(node.commandRef.includes(file));
   for (const [file, route] of [
     ...pythonFiles.map((file) => [file, python]), ...nodeFiles.map((file) => [file, node]),
+    ["tests/test_tno_china_place_names.py", chinaPython],
     ["map_builder/cities.py", python], ["data/i18n/manual_geo_overrides.json", python],
     ["data/scenarios/tno_1962/geo_locale_patch.zh.json", python],
     ["data/world_cities.geojson", node], ["data/scenarios/tno_1962/city_overrides.json", node],
@@ -414,14 +418,15 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
 
   const heavy = buildCanonicalHeavyDependencyGroups();
   assert.equal(heavy.heavyDependencyGroups[0].id, "geo_stack");
-  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 16);
+  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 17);
   assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_city_data_contract.py"));
+  assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_reviewed_place_names.py"));
   const cityRoute = buildRouteIndex().find((route) => route.id === "city:data-contract-python");
   assert.equal(cityRoute.executionOwner, "main-thread");
   assert.equal(cityRoute.cost, "heavy");
   assert.ok(cityRoute.resourceLocks.includes("heavy-geo"));
   heavy.heavyDependencyGroups[0].patterns.push("detached-only.py");
-  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 16);
+  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 17);
 
   const aliases = buildCanonicalPackageAliases().packageAliases;
   assert.deepEqual(

@@ -128,13 +128,16 @@ class MainDeferredDetailPromotionBoundaryContractTest(unittest.TestCase):
             startup_ready_handoff_content,
             re.compile(
                 r"function schedulePostReadyPoliticalReconcileTask\(reason = \"detail-promotion-political-reconcile\"\) \{[\s\S]*?"
-                r"if \(!targetRuntime\.detailPromotionCompleted\) \{[\s\S]*?"
-                r"schedulePostReadyPoliticalReconcileTask\(normalizedReason\);[\s\S]*?"
-                r"return false;",
+                r"postReadyScheduler\.scheduleTask\(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, async \(task\) => \{\s*"
+                r"task\.throwIfStale\(\);\s*"
+                r"while \(!targetRuntime\.detailPromotionCompleted\s*"
+                r"\|\| !task\.commit\(\(\) => reconcileDetailPromotionPoliticalPass\(normalizedReason\)\)\) \{\s*"
+                r"await task\.yield\(\);\s*\}\s*return true;\s*"
+                r"\}, scopedTaskOptions\(\{\s*canStart: \(\) => !!targetRuntime\.detailPromotionCompleted,",
                 re.S,
             ),
         )
-        self.assertIn("schedulePostReadyPoliticalReconcileTask(normalizedReason);", startup_ready_handoff_content)
+        self.assertNotIn("schedulePostReadyPoliticalReconcileTask(normalizedReason);", startup_ready_handoff_content)
 
     def test_main_keeps_wrappers_and_ready_state_facade(self):
         donor_content = MAIN_JS.read_text(encoding="utf-8")

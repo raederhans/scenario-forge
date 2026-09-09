@@ -21,6 +21,7 @@ test("physical layer source contracts stay wired to the expected renderer and st
   const appearanceControllerSource = readRepoFile("js", "ui", "toolbar", "appearance_controls_controller.js");
   const physicalOwnerSource = readRepoFile("js", "ui", "toolbar", "appearance_physical_owner.js");
   const interactionFunnelSource = readRepoFile("js", "core", "interaction_funnel.js");
+  const importCompletionSource = readRepoFile("js", "core", "interaction_funnel", "import_completion.js");
   const renderPipelinePassesSource = readRepoFile("js", "core", "renderer", "render_pipeline_passes.js");
   const renderPipelineCatalogSource = readRepoFile("js", "core", "renderer", "render_pipeline_catalog.js");
   const contextPassOwnerSource = readRepoFile("js", "core", "renderer", "context_pass_orchestrator_owner.js");
@@ -181,7 +182,9 @@ test("physical layer source contracts stay wired to the expected renderer and st
       /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(physicalOwnerSource)
       && /physicalOwner\.bindEvents\(\);/.test(appearanceControllerSource),
     projectImportLoadsFullPhysicalSet:
-      /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", \["physical-set", "physical-contours-set"\]\],[\s\S]*?\]\) if \(visible\) await complete\(name, async \(\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false \}\);\s*if \(isCurrent\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource),
+      /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", \["physical-set", "physical-contours-set"\]\],[\s\S]*?\]\) if \(visible\) complete\(name, async \(\{ isCurrent: valid, signal \}\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false, isCurrent: valid, signal \}\);\s*if \(valid\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource)
+      && /job = createProjectImportCompletion\(\{ required, optional, isCurrent,/.test(interactionFunnelSource)
+      && /return task\.run\(\{ isCurrent: valid, signal: attempt\.signal \}\);/.test(importCompletionSource),
     contextMarkersStagedMetricsCoverTransportLines:
       /if \(getDeferContextBasePass\(\) && !interactive\) \{/.test(contextMarkersSource)
       && /collectContextMetric\([\s\S]*?"drawRoadsLayer",[\s\S]*?createDeferredMetricPayload\(snapshot\.roadFeatureCount\)/.test(contextMarkersSource)

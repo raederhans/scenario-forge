@@ -63,9 +63,21 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertIn('await buildSpatialIndexChunked({', self.map_renderer_source)
         self.assertIn('includeSecondary: false,', self.map_renderer_source)
         self.assertRegex(
-            self.map_renderer_source,
+            self._slice_between(self.map_renderer_source,
+                                "async function buildBasicInteractionInfrastructureAfterStartup(",
+                                "async function buildFullInteractionInfrastructureAfterStartup("),
             re.compile(
-                r'if \(chunked\) \{\s*await buildIndexChunked\(\{ scheduleUiMode: "deferred" \}\);\s*await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*\}\);\s*\} else \{\s*buildIndex\(\{ scheduleUiMode: "deferred" \}\);\s*buildSpatialIndex\(\{\s*includeSecondary: false,\s*\}\);\s*\}\s*setInteractionInfrastructureState\("basic-ready"',
+                r'if \(chunked\) \{\s*'
+                r'await buildIndexChunked\(\{ scheduleUiMode: "deferred", isCurrent: taskContext\?\.isCurrent, '
+                r'yieldControl: \(\) => yieldInteractionInfrastructureBuild\(taskContext\) \}\);\s*'
+                r'taskContext\?\.throwIfStale\(\);\s*'
+                r'await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*'
+                r'isCurrent: taskContext\?\.isCurrent,\s*'
+                r'yieldControl: \(\) => yieldInteractionInfrastructureBuild\(taskContext\),\s*\}\);\s*'
+                r'\} else \{\s*buildIndex\(\{ scheduleUiMode: "deferred" \}\);\s*'
+                r'buildSpatialIndex\(\{\s*includeSecondary: false,\s*\}\);\s*\}\s*'
+                r'taskContext\?\.throwIfStale\(\);\s*'
+                r'setInteractionInfrastructureState\("basic-ready", \{\s*ready: true,\s*inFlight: false,',
                 re.S,
             ),
         )
@@ -217,8 +229,11 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.startup_ready_handoff_source,
             re.compile(
                 r'function startDeferredFullInteractionInfrastructureBuild\(.*?'
-                r'if \(targetRuntime\.detailDeferred && !targetRuntime\.detailPromotionCompleted\) \{.*?'
-                r'startDeferredFullInteractionInfrastructureBuild',
+                r'postReadyScheduler\.scheduleTask\("post-ready-full-interaction-infra", \(task\) => \{\s*'
+                r'task\.throwIfStale\(\);\s*return buildInteractionInfrastructureAfterStartup\(\{\s*'
+                r'taskContext: task,\s*chunked: true,\s*buildHitCanvas: false,\s*mode: "full",.*?'
+                r'\}, scopedTaskOptions\(\{\s*'
+                r'canStart: \(\) => !targetRuntime\.detailDeferred \|\| !!targetRuntime\.detailPromotionCompleted,',
                 re.S,
             ),
         )
@@ -535,9 +550,11 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertRegex(
             self.startup_ready_handoff_source,
             re.compile(
-                r"const requested = reconcileDetailPromotionPoliticalPass\(normalizedReason\);\s*"
-                r"if \(!requested\) \{\s*"
-                r"schedulePostReadyPoliticalReconcileTask\(normalizedReason\);",
+                r"postReadyScheduler\.scheduleTask\(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, async \(task\) => \{\s*"
+                r"task\.throwIfStale\(\);\s*"
+                r"while \(!targetRuntime\.detailPromotionCompleted\s*"
+                r"\|\| !task\.commit\(\(\) => reconcileDetailPromotionPoliticalPass\(normalizedReason\)\)\) \{\s*"
+                r"await task\.yield\(\);\s*\}\s*return true;",
                 re.S,
             ),
         )
@@ -564,10 +581,10 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertNotIn("falling back to setMapData", detail_refresh_source)
         self.assertNotIn("catch (error)", detail_refresh_source)
         self.assertIn(
-            'postReadyScheduler.scheduleTask(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, () => {',
+            'postReadyScheduler.scheduleTask(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, async (task) => {',
             self.startup_ready_handoff_source,
         )
-        self.assertIn("schedulePostReadyPoliticalReconcileTask(normalizedReason);", self.startup_ready_handoff_source)
+        self.assertNotIn("schedulePostReadyPoliticalReconcileTask(normalizedReason);", self.startup_ready_handoff_source)
 
     def test_detail_topology_prepare_without_map_refresh_defers_political_reconcile(self):
         self.assertRegex(

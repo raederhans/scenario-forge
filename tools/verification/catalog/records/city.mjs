@@ -2,9 +2,9 @@
 export const CITY_RECORDS = [
   {
     id: "city:reviewed-place-names-python",
-    commandRef: "python -m unittest tests.test_reviewed_place_names tests.test_tno_china_place_names -q",
+    commandRef: "python -m unittest tests.test_reviewed_place_names -q",
     sourceRefs: [
-      "tests/test_reviewed_place_names.py", "tests/test_tno_china_place_names.py",
+      "tests/test_reviewed_place_names.py",
       "map_builder/cities.py", "map_builder/city_contract.py",
       "data/world_cities.geojson", "data/city_aliases.json", "data/geo_aliases.json",
       "data/locales.json", "data/i18n/manual_geo_overrides.json",
@@ -15,6 +15,20 @@ export const CITY_RECORDS = [
     ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["heavy"],
     cost: "heavy", resourceLocks: ["heavy-geo", ".runtime-output"], executionOwners: ["main-thread"], profiles: ["full"],
     platforms: ["all"], entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: 402,
+    verification: null, selector: {},
+  },
+  {
+    id: "city:tno-china-place-names-python",
+    commandRef: "python -m unittest tests.test_tno_china_place_names -q",
+    sourceRefs: [
+      "tests/test_tno_china_place_names.py", "data/locales.json", "data/geo_aliases.json",
+      "data/i18n/manual_geo_overrides.json", "data/scenarios/tno_1962/geo_name_overrides.manual.json",
+      "data/scenarios/tno_1962/geo_locale_patch.json", "data/scenarios/tno_1962/geo_locale_patch.en.json",
+      "data/scenarios/tno_1962/geo_locale_patch.zh.json", "data/scenarios/tno_1962/locales.startup.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 404,
     verification: null, selector: {},
   },
   {
