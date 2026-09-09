@@ -598,7 +598,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const pendingVisualPromotion = \{[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:/.test(chunkRuntimeSource)
         && /const pendingPromotion = \{[\s\S]*?requiredPoliticalChunkCount:[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:[\s\S]*?queueScenarioChunkPromotionState\(runtimeState, \{[\s\S]*?visualPromotion: pendingVisualPromotion,[\s\S]*?promotion: pendingPromotion,/.test(chunkRuntimeSource),
       deferredInfraRestoresFullPoliticalDerivedStateWhenVisibleSubsetIsActive:
-        scenarioRefreshRuntimeSource.includes("function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
+        chunkPromotionHelperSource.includes("export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
+        && /import \{[^}]*\banalyzeScenarioPoliticalDerivedStateCoverage\b[^}]*\} from "\.\.\/renderer\/scenario_chunk_promotion_helpers\.js";/.test(scenarioRefreshRuntimeSource)
+        && scenarioRefreshRuntimeSource.includes("analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
         && scenarioRefreshRuntimeSource.includes('recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage"')
         && scenarioRefreshRuntimeSource.includes("primaryVisibleDerivedStateReady = false")
         && scenarioRefreshRuntimeSource.includes("completePoliticalDerivedStateReady = false")
