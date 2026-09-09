@@ -13,6 +13,16 @@ Runtime implementation, independent reviews and the original bounded P4 repair s
 - [x] E stable data contract and artifact-only release preparation: city migration and independent review passed; handoff7/7; current independent build trees byte-identical,9565files/966850264bytes. Actual production promotion/rollback remains external follow-up.
 - [x] Final artifact focused import journey after P4 source corrections: current rebuild pair matches9565files/966850264bytes; identical assertions pass in about85s with trace off under the original110s budget. Two traced deadline failures remain recorded; permanent configuration unchanged. Earlier source lifecycle+save/reload, artifact public gate and all3editing journeys passed. Single natural-background observation only, no p95 or paired speedup claim.
 
+## Authorized remote integration and cleanup
+
+- [x] Preserve the complete implementation in `ece5d2c0`, on top of the existing optimization commit `9d4b715a`.
+- [x] Fix the actual PR #127 adaptive-selector failure: explicitly classify bounded task prose and the exact local Codex configuration without accepting unknown runtime files. Metadata/routes tests76/76; cumulative selection189files,0unmatched,15nonbehavioral.
+- [x] Audit all15 additional worktrees; preserve359 evidence files /179,225,200bytes, binary patches and originals for both generated-dist dirty trees,8 source-identity archive tags, and a verified incremental Git bundle.
+- [x] Remove15 covered worktrees,17 old local branches and6 remote branches already contained in remote main. Retain main and the active PR branch pending acceptance.
+- [ ] Push final integration commits and source-identity tags, pass protected-main required checks, merge [PR #127](https://github.com/raederhans/scenario-forge/pull/127), synchronize local main, and remove the merged PR branch. The PR is the authoritative live remote receipt; local final receipts belong under `.runtime/tmp/editor-kernel-renewal/worktree-recovery/`.
+
+Cleanup preserves original commit identities and existing local performance evidence; it does not establish a new paired performance improvement. Full P4 and traced artifact limitations below remain recorded independently of the PR required checks.
+
 ## Evidence
 
 Initial git status --short: empty. HEAD: 9d4b715a.
