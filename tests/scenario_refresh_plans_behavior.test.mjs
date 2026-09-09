@@ -671,6 +671,8 @@ test("chunk promotion deferred infra restores full political derived state after
   const idsOf = (payload) => (payload?.features || []).map((entry) => entry.id);
   const colorsFor = (payload) => Object.fromEntries(idsOf(payload).map((id) => [id, `#${id}`]));
   const calls = [];
+  const dirtyPasses = new Set();
+  const renderedPasses = [];
   let deferredCallback = null;
   const runtimeState = {
     activeScenarioId: "tno_1962",
@@ -726,11 +728,18 @@ test("chunk promotion deferred infra restores full political derived state after
     scheduleHitCanvasBuildIfNeeded: (...args) => calls.push(["scheduleHitCanvasBuildIfNeeded", ...args]),
     ensureSovereigntyState: () => calls.push(["ensureSovereigntyState"]),
     refreshScenarioOpeningOwnerBorders: (...args) => calls.push(["refreshScenarioOpeningOwnerBorders", ...args]),
-    invalidateBorderCache: () => calls.push(["invalidateBorderCache"]),
+    invalidateBorderCache: () => {
+      calls.push(["invalidateBorderCache"]);
+      dirtyPasses.add("borders");
+    },
     updateDynamicBorderStatusUI: () => calls.push(["updateDynamicBorderStatusUI"]),
     updateSpecialZonesPaths: () => calls.push(["updateSpecialZonesPaths"]),
     renderSpecialZoneEditorOverlay: () => calls.push(["renderSpecialZoneEditorOverlay"]),
-    render: () => calls.push(["render"]),
+    render: () => {
+      calls.push(["render"]);
+      renderedPasses.push([...dirtyPasses].sort());
+      dirtyPasses.clear();
+    },
     recordRenderPerfMetric: (...args) => calls.push(["recordRenderPerfMetric", ...args]),
     recordInteractionRecoveryTaskMetric: (...args) => calls.push(["recordInteractionRecoveryTaskMetric", ...args]),
     beginInteractionRecoveryTask: (...args) => {
@@ -761,7 +770,10 @@ test("chunk promotion deferred infra restores full political derived state after
       calls.push(["syncScenarioSecondaryRegionIndexes", ...args]);
       return false;
     },
-    invalidateRenderPasses: (...args) => calls.push(["invalidateRenderPasses", ...args]),
+    invalidateRenderPasses: (passes, reason) => {
+      calls.push(["invalidateRenderPasses", passes, reason]);
+      for (const pass of Array.isArray(passes) ? passes : [passes]) dirtyPasses.add(pass);
+    },
     markAllOverlaysDirty: () => calls.push(["markAllOverlaysDirty"]),
     updateZoomTranslateExtent: () => calls.push(["updateZoomTranslateExtent"]),
     isUsableMesh: () => false,
@@ -791,11 +803,17 @@ test("chunk promotion deferred infra restores full political derived state after
   assert.deepEqual(idsOf(runtimeState.landData), ["GER", "ITA"]);
   assert.equal(runtimeState.runtimeChunkLoadState.pendingInfraPromotion.completePoliticalDerivedStateReady, false);
   assert.equal(typeof deferredCallback, "function");
+  assert.equal(calls.some(([name]) => name === "render"), false, "synchronous suppressRender must remain respected");
 
-  deferredCallback();
-  for (let index = 0; index < 8; index += 1) {
-    await Promise.resolve();
-  }
+  // The enclosing visual transaction flushes once before async full restoration.
+  deps.render();
+  assert.equal(dirtyPasses.size, 0);
+  await deferredCallback();
+
+  assert.equal(renderedPasses.length, 2, "deferred visible invalidation must get its own normal render");
+  assert.deepEqual(renderedPasses[1], ["borders", "contextBase", "contextScenario", "physicalBase", "political"]);
+  assert.equal(dirtyPasses.size, 0, "normal render consumes the late dirty passes");
+  assert.equal(runtimeState.runtimeChunkLoadState.pendingInfraPromotion, null);
 
   assert.equal(runtimeState.scenarioPoliticalVisibleChunkData, null);
   assert.deepEqual(idsOf(runtimeState.landData), ["GER", "ITA", "POL", "FRA"]);
@@ -826,6 +844,7 @@ test("chunk promotion deferred infra restores full political derived state after
   }), false);
   assert.equal(calls.some(([name]) => name === "rebuildRuntimeDerivedState"), false);
   assert.equal(calls.some(([name]) => name === "setInteractionInfrastructureState"), false);
+  assert.equal(calls.some(([name]) => name === "render"), false, "obsolete restore cannot render a replacement scenario");
 
   yieldEffect = null;
   runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true, hasPoliticalPayloadChange: true });

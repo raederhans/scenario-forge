@@ -32,6 +32,7 @@ export function createPoliticalBackgroundRenderOwner({
     isWorldBounds,
     getPoliticalPathCacheHandle,
     getPoliticalFeaturePathEntry,
+    isPoliticalFeaturePathEntryCurrent,
     getTransformSignature,
     getPoliticalPathCacheSignature,
     getVisibleFrameIdentity,
@@ -76,7 +77,7 @@ export function createPoliticalBackgroundRenderOwner({
     getAtlantropaSeaPoliticalFillColor, getFeatureId, getSafeCanvasColor,
     isAtlantropaSeaFeature, getResolvedFeatureColor, getDisplayOwnerCode,
     getFeatureCountryCodeNormalized, isWorldBounds, getPoliticalPathCacheHandle,
-    getPoliticalFeaturePathEntry, getTransformSignature, getPoliticalPathCacheSignature,
+    getPoliticalFeaturePathEntry, isPoliticalFeaturePathEntryCurrent, getTransformSignature, getPoliticalPathCacheSignature,
     getVisibleFrameIdentity, nowMs, getRenderPassCacheState, isInteractionRecoverySettled,
     isExactAfterSettleControllerActive, cloneZoomTransform, getLogicalCanvasDimensions,
     isAntarcticSectorFeature, isBaseGeographyScenarioFeature,
@@ -345,7 +346,7 @@ export function createPoliticalBackgroundRenderOwner({
         reusedPathCount += 1;
       } else if (allowBuildPaths && pathCacheHandle?.valid && pathCacheHandle.map instanceof Map) {
         const cachedEntry = pathCacheHandle.map.get(meta.id);
-        const hadCachedPath = !!cachedEntry?.path;
+        const hadCachedPath = isPoliticalFeaturePathEntryCurrent(cachedEntry, meta.feature);
         const pathEntry = hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(meta.feature, {
           featureId: meta.id,
           transform,
@@ -679,7 +680,7 @@ export function createPoliticalBackgroundRenderOwner({
         continue;
       }
       const cachedEntry = pathCacheHandle?.valid ? pathCacheHandle.map?.get(featureId) : null;
-      const hadCachedPath = !!cachedEntry?.path;
+      const hadCachedPath = isPoliticalFeaturePathEntryCurrent(cachedEntry, entry.feature);
       const pathEntry = hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(entry.feature, {
         featureId,
         transform,

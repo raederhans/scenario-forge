@@ -1808,11 +1808,16 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     });
     assert.ok(rendererSource.includes("runtimeState.topologyRevision || 0"));
     const entryBody = politicalPathCacheSource.match(/function buildPoliticalFeaturePathEntry\(feature\) \{[\s\S]*?\n\}/)?.[0] || "";
-    assert.ok(entryBody.includes("path: new globalThis.Path2D(pathString)"));
+    assert.ok(entryBody.includes("const path = new globalThis.Path2D()"));
+    assert.ok(entryBody.includes("pathCanvas.context(path)"));
+    assert.ok(entryBody.includes("pathCanvas(feature)"));
+    assert.ok(entryBody.includes("pathCanvas.context(previousContext)"));
+    assert.ok(entryBody.includes("geometryRef: feature.geometry"));
+    assert.equal(entryBody.includes("pathString"), false);
     assert.equal(entryBody.includes("featureRef"), false);
     assert.equal(entryBody.includes("projectionSignature"), false);
     const getEntryBody = politicalPathCacheSource.match(/function getPoliticalFeaturePathEntry\([\s\S]*?\n\}/)?.[0] || "";
-    assert.ok(getEntryBody.includes("if (cachedEntry?.path)"));
+    assert.ok(getEntryBody.includes("isPoliticalFeaturePathEntryCurrent(cachedEntry, feature)"));
     assert.ok(politicalBackgroundOwnerSource.includes("pathCacheSizeBefore"));
     assert.ok(politicalBackgroundOwnerSource.includes("pathCacheSizeAfter"));
     assert.ok(politicalBackgroundOwnerSource.includes("pathCacheResetReason"));

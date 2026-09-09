@@ -805,8 +805,9 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             re.compile(
                 r'await yieldToFrame\(\);.*?'
                 r'if \(!isPendingScenarioChunkPromotionCurrent.*?'
-                r'flushRenderBoundary\("scenario-chunk-promotion"\);.*?'
-                r'setScenarioChunkPromotionRenderLockState\(runtimeState, previousRenderLock\);',
+                r'setScenarioChunkPromotionRenderLockState\(runtimeState, previousRenderLock\);.*?'
+                r'if \(resolvedRenderNow !== false\) \{\s*'
+                r'flushRenderBoundary\("scenario-chunk-promotion"\);',
                 re.S,
             ),
         )

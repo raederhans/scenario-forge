@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createCityPointsRenderOwner } from "../js/core/renderer/city_points_render_owner.js";
+import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
 
 const markerTokens = {
   baseShadow: "rgba(0, 0, 0, 0.2)",
@@ -19,6 +20,8 @@ const markerTokens = {
 function createSpriteContext() {
   const gradient = { addColorStop: () => {} };
   return {
+    scaleCalls: [],
+    scale(x, y) { this.scaleCalls.push([x, y]); },
     beginPath: () => {},
     createLinearGradient: () => gradient,
     ellipse: () => {},
@@ -42,11 +45,14 @@ function installCanvasFactory() {
   const previousOffscreenCanvas = globalThis.OffscreenCanvas;
   globalThis.OffscreenCanvas = undefined;
   globalThis.document = {
-    createElement: () => ({
-      height: 0,
-      width: 0,
-      getContext: () => createSpriteContext(),
-    }),
+    createElement: () => {
+      const spriteContext = createSpriteContext();
+      return {
+        height: 0,
+        width: 0,
+        getContext: () => spriteContext,
+      };
+    },
   };
   return () => {
     if (previousDocument === undefined) {
@@ -150,12 +156,7 @@ function createCityPointsHarness({
         && hit?.targetType === "land"
         && String(entry?.feature?.properties?.__city_host_feature_id || "") === String(hit?.id || "")
       ),
-      normalizeCityLayerStyleConfig: (config) => ({
-        opacity: 0.9,
-        showLabels: true,
-        revealProfile: "hybrid_country_budget",
-        ...config,
-      }),
+      normalizeCityLayerStyleConfig,
       nowMs: () => 0,
       recordInteractionDurationMetric: (name, _duration, detail) => interactionMetrics.push({ name, detail }),
       recordRenderPerfMetric: (name, _duration, detail) => renderMetrics.push({ name, detail }),
@@ -364,6 +365,61 @@ test("city marker sprite cache distinguishes background, paint tokens and exact 
   }
 });
 
+test("city draw entries consume normalized opacity including zero across zoom and interaction", (t) => {
+  t.after(installCanvasFactory());
+  const entry = {
+    id: "opacity-city",
+    anchor: [40, 50],
+    screenPoint: [80, 100],
+    cityTier: "major",
+    markerSizePx: 16,
+  };
+  const cases = [
+    [0, 0],
+    ["0", 0],
+    [0.45, 0.45],
+    [undefined, 0.96],
+    ["invalid", 0.96],
+    [Number.NaN, 0.96],
+    [Infinity, 0.96],
+    [-1, 0],
+    [2, 1],
+  ];
+  for (const [opacity, expected] of cases) {
+    for (const entryPoint of ["drawCityPointsLayer", "drawLabelsPass"]) {
+      for (const interactive of [false, true]) {
+        const harness = createCityPointsHarness({
+          markerEntries: [entry],
+          labelEntries: [entry],
+          styleConfig: { opacity },
+        });
+        let screenSize;
+        for (const scale of [1, 3]) {
+          harness.state.zoomTransform = { x: 0, y: 0, k: scale };
+          harness.context.calls.length = 0;
+          harness.owner[entryPoint](scale, { interactive });
+          const message = `${entryPoint}, opacity ${String(opacity)}, zoom ${scale}, interactive ${interactive}`;
+          if (entryPoint === "drawLabelsPass" && interactive) {
+            assert.deepEqual(harness.context.calls, [], message);
+            assert.equal(harness.renderMetrics.at(-1).detail.reason, "interactive", message);
+            continue;
+          }
+          const alphaCalls = harness.context.calls.filter((call) => call.type === "globalAlpha");
+          assert.deepEqual(alphaCalls.map((call) => call.value), [interactive ? Math.min(expected, 0.8) : expected], message);
+          const drawCalls = harness.context.calls.filter((call) => call.type === "drawImage");
+          assert.equal(drawCalls.length, 1, message);
+          const [, , , width, height] = drawCalls[0].args;
+          if (!screenSize) screenSize = [width * scale, height * scale];
+          assert.deepEqual([width * scale, height * scale], screenSize, message);
+          if (entryPoint === "drawLabelsPass" && !interactive) {
+            assert.deepEqual(harness.labelCalls.at(-1).entries, [entry], message);
+          }
+        }
+      }
+    }
+  }
+});
+
 test("city marker sprite cache retains the 256 most recently used sprites", () => {
   const restoreCanvas = installCanvasFactory();
   try {
@@ -380,4 +436,48 @@ test("city marker sprite cache retains the 256 most recently used sprites", () =
   } finally {
     restoreCanvas();
   }
+});
+
+test("city marker draws use target density while preserving logical geometry and cache reuse", (t) => {
+  t.after(installCanvasFactory());
+  const entry = {
+    id: "density-city",
+    anchor: [40, 50],
+    screenPoint: [80, 100],
+    cityTier: "major",
+    markerSizePx: 16,
+    isCapital: true,
+  };
+  const harness = createCityPointsHarness({ markerEntries: [entry] });
+  const byDensity = new Map();
+  let baselineGeometry;
+  let density = 1;
+  let zoom = 2;
+  // Translation and axis rotation do not affect the target's pixel density.
+  harness.context.getTransform = () => ({ a: 0, b: density * zoom, c: -density * zoom, d: 0, e: 300, f: 400 });
+  for (density of [1, 1.25, 2, 3, 1.25, 1]) {
+    for (zoom of [2, 4]) {
+      harness.state.zoomTransform = { x: 0, y: 0, k: zoom };
+      harness.owner.drawCityPointsLayer(zoom);
+      const { args: [canvas, x, y, width, height] } = harness.context.calls.filter((call) => call.type === "drawImage").at(-1);
+      const geometry = [width * zoom, height * zoom, (entry.anchor[0] - x) * zoom, (entry.anchor[1] - y) * zoom];
+      if (!baselineGeometry) baselineGeometry = geometry;
+      geometry.forEach((value, index) => {
+        assert.ok(Math.abs(value - baselineGeometry[index]) < 1e-10, `logical geometry at density ${density}, zoom ${zoom}`);
+      });
+      assert.equal(canvas.width, Math.ceil(baselineGeometry[0] * density));
+      assert.equal(canvas.height, Math.ceil(baselineGeometry[1] * density));
+      assert.deepEqual(canvas.getContext("2d").scaleCalls, [[canvas.width / baselineGeometry[0], canvas.height / baselineGeometry[1]]]);
+      if (byDensity.has(density)) {
+        assert.equal(canvas, byDensity.get(density), "reuse density-specific sprite across zoom changes and return visits");
+      } else {
+        assert.ok([...byDensity.values()].every((existing) => existing !== canvas), "a different density needs a different bitmap");
+        byDensity.set(density, canvas);
+      }
+    }
+  }
+  delete harness.context.getTransform;
+  harness.owner.drawCityPointsLayer(zoom);
+  const fallbackCanvas = harness.context.calls.filter((call) => call.type === "drawImage").at(-1).args[0];
+  assert.equal(fallbackCanvas, byDensity.get(1), "missing target transform uses density one");
 });

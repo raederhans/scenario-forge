@@ -295,7 +295,9 @@ async function ensureStartupInitialScenarioChunkVisualReady({
   const result = await runtimeState.awaitInitialScenarioChunkVisualPromotionFn({
     reason,
     d3Client,
-    renderNow: true,
+    // Bootstrap owns the first visible frame after promotion readiness. Rendering
+    // here would draw it twice when bootstrap invalidates and flushes below.
+    renderNow: false,
   });
   setStartupInitialScenarioChunkVisualPromotion(runtimeState, result);
   if (result && result.ok === false) {

@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
 import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
 
 const item = (id, x = 50, drawOrder = 0) => ({
@@ -17,9 +19,21 @@ function fixture(t) {
     candidates: { items: [item("a"), item("b", 60)] },
     timers: new Map(), cancelled: [], metrics: [], counters: {}, builds: [], serial: 0,
   };
-  h.path = (feature) => { h.builds.push(feature.id); h.time += h.pathCost; return `path:${feature.id}`; };
+  h.makePath = (draw) => {
+    let context = null;
+    const path = (feature) => draw(feature, context);
+    path.context = (...args) => {
+      if (!args.length) return context;
+      [context] = args;
+      return path;
+    };
+    return path;
+  };
+  h.path = h.makePath((feature, context) => {
+    h.builds.push(feature.id); h.time += h.pathCost; context.value = `path:${feature.id}`;
+  });
   h.owner = createPoliticalPathCacheOwner(h.state, {
-    rendererSurfaceHost: { getPathSvg: () => h.path },
+    rendererSurfaceHost: { getPathCanvas: () => h.path },
     getPoliticalPassStaticSignature: (transform) => `static:${transform.k}:${transform.x}:${transform.y}`,
     getProjectionRenderSignature: () => h.projection,
     getViewportRenderSignature: () => h.viewport,
@@ -83,15 +97,58 @@ test("entries build lazily, reuse cached paths, read live surfaces, and tolerate
   assert.equal(h.counters.politicalPartialPathCacheMisses, 1);
   const entry = h.owner.getPoliticalFeaturePathEntry(value, { allowBuild: true, countBuild: true });
   assert.equal(entry.path.value, "path:a");
-  h.path = () => "replacement";
+  h.path = h.makePath((_feature, context) => { context.value = "replacement"; });
   assert.equal(h.owner.getPoliticalFeaturePathEntry(value, { allowBuild: true }), entry);
   h.owner.invalidatePoliticalPathCache("surface-change");
   assert.equal(h.owner.getPoliticalFeaturePathEntry(value, { allowBuild: true }).path.value, "replacement");
-  h.path = () => { throw Error("invalid geometry"); };
+  h.path = h.makePath(() => { throw Error("invalid geometry"); });
+  const previousContext = { target: "visible-canvas" };
+  h.path.context(previousContext);
   assert.equal(h.owner.getPoliticalFeaturePathEntry(item("b").feature, { allowBuild: true }), null);
+  assert.equal(h.path.context(), previousContext);
   h.path = null;
   assert.equal(h.owner.getPoliticalFeaturePathEntry(item("c").feature, { allowBuild: true }), null);
   assert.equal(h.counters.politicalPathCacheBuild, 1);
+});
+
+test("cached paths stream the exact canvas coordinates for decimals, holes, parts and antimeridian clipping", (t) => {
+  const h = fixture(t);
+  const sandbox = {};
+  vm.runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  class RecordingPath {
+    constructor(...args) { assert.equal(args.length, 0, "No rounded SVG string may enter Path2D"); this.commands = []; }
+    moveTo(...args) { this.commands.push(["moveTo", ...args]); }
+    lineTo(...args) { this.commands.push(["lineTo", ...args]); }
+    arc(...args) { this.commands.push(["arc", ...args]); }
+    closePath(...args) { this.commands.push(["closePath", ...args]); }
+  }
+  globalThis.Path2D = RecordingPath;
+  const projection = d3.geoEqualEarth().scale(123.456789).translate([50.123456789, 60.987654321]).precision(0.3);
+  const direct = new RecordingPath();
+  h.path = d3.geoPath(projection, direct).pointRadius(1.23456789);
+  const geometries = [
+    { type: "Polygon", coordinates: [
+      [[0.123456789, 0.876543219], [0.1, 3.2], [4.3, 3.2], [4.3, 0.8], [0.123456789, 0.876543219]],
+      [[1, 1], [2, 1], [2, 2], [1, 2], [1, 1]],
+    ] },
+    { type: "MultiPolygon", coordinates: [
+      [[[179.1, 10.1], [-179.2, 10.1], [-179.2, 12.3], [179.1, 12.3], [179.1, 10.1]]],
+      [[[20.1, 20.2], [20.1, 22.3], [22.4, 22.3], [22.4, 20.2], [20.1, 20.2]]],
+    ] },
+    { type: "Point", coordinates: [0.123456789, 0.876543219] },
+  ];
+  for (const [index, geometry] of geometries.entries()) {
+    direct.commands = [];
+    const feature = { type: "Feature", id: String(index), geometry };
+    h.path(feature);
+    const entry = h.owner.getPoliticalFeaturePathEntry(feature, { allowBuild: true });
+    assert.ok(entry.path.commands.length > 0);
+    assert.deepEqual(entry.path.commands, direct.commands);
+    assert.equal(h.path.context(), direct);
+    assert.equal(h.owner.getPoliticalFeaturePathEntry(feature), entry);
+  }
+  assert.ok(direct.commands.flat().some((value) => typeof value === "number" && value !== Math.round(value * 1000) / 1000));
 });
 
 test("warmup prioritizes viewport center and tie draw order, replaces timers, and cancels atomically", (t) => {
@@ -166,4 +223,33 @@ test("queued work rechecks phase, deferred exact work, dirty flags, and signatur
   h.candidates.overflow = true;
   assert.equal(h.owner.schedulePoliticalPathWarmup(), false);
   assert.equal(h.cache.politicalPathWarmupReason, "warmup-spatial-unavailable");
+});
+
+test("same ID requires the current geometry while wrapper copies preserve cache hits", (t) => {
+  const h = fixture(t);
+  const original = item("a").feature;
+  const cached = h.owner.getPoliticalFeaturePathEntry(original, { allowBuild: true });
+  assert.equal(cached.geometryRef, original.geometry);
+  assert.equal(h.owner.getPoliticalFeaturePathEntry({ ...original }), cached);
+  const replacement = item("a").feature;
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(replacement), null);
+  assert.equal(h.owner.isPoliticalFeaturePathEntryCurrent({ path: cached.path }, original), false);
+  const rebuilt = h.owner.getPoliticalFeaturePathEntry(replacement, { allowBuild: true });
+  assert.notEqual(rebuilt.path, cached.path);
+  assert.equal(rebuilt.geometryRef, replacement.geometry);
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(original), null);
+});
+
+test("warmup queues and rebuilds same-ID stale geometry instead of skipping it", (t) => {
+  const h = fixture(t);
+  const old = item("a").feature;
+  h.owner.getPoliticalFeaturePathEntry(old, { allowBuild: true });
+  const current = item("a");
+  h.candidates.items = [current];
+  assert.equal(h.owner.schedulePoliticalPathWarmup(), true);
+  assert.equal(h.cache.politicalPathWarmupQueue.length, 1);
+  assert.equal(h.tick(), true);
+  assert.equal(h.cache.politicalPathCache.get("a").geometryRef, current.feature.geometry);
+  assert.equal(h.counters.politicalPathWarmupBuild, 1);
+  assert.equal(h.owner.schedulePoliticalPathWarmup(), false);
 });

@@ -35,6 +35,7 @@ export function createPoliticalPartialRepaintOwner({
     "shouldSkipFeature",
     "pathBoundsInScreen",
     "getPoliticalFeaturePathEntry",
+    "isPoliticalFeaturePathEntryCurrent",
     "rectsIntersect",
     "screenRectToProjectedRect",
     "collectLandSpatialItemsForProjectedRects",
@@ -294,7 +295,7 @@ export function createPoliticalPartialRepaintOwner({
       const degree = islandNeighbors?.[index]?.length || 0;
       fillColor = degree === 0 ? "orange" : "lightgreen";
     }
-    const cachedPath = path || (useCachedPath
+    const renderPath = path || (useCachedPath
       ? helper.getPoliticalFeaturePathEntry(feature, {
         featureId: id,
         transform,
@@ -305,8 +306,8 @@ export function createPoliticalPartialRepaintOwner({
     const context = surface.getContext();
     context.fillStyle = fillColor;
     const fillStartedAt = metricsCollector ? helper.nowMs() : 0;
-    if (cachedPath) {
-      context.fill(cachedPath);
+    if (renderPath) {
+      context.fill(renderPath);
     } else {
       context.beginPath();
       surface.getPathCanvas()(feature);
@@ -322,7 +323,7 @@ export function createPoliticalPartialRepaintOwner({
       context.lineJoin = "round";
       context.lineCap = "round";
       const strokeStartedAt = metricsCollector ? helper.nowMs() : 0;
-      if (cachedPath) context.stroke(cachedPath);
+      if (renderPath) context.stroke(renderPath);
       else context.stroke();
       if (metricsCollector) {
         metricsCollector.strokeMs = Number(metricsCollector.strokeMs || 0)
@@ -456,7 +457,7 @@ export function createPoliticalPartialRepaintOwner({
       return fallback("path-cache-unavailable", { dirtyRectCount: mergedDirtyRects.length, viewportCoverage, candidateCount });
     }
     candidateItems.forEach((item) => {
-      if (!pathCacheHandle.map.get(item.id)?.path) pathCacheMisses += 1;
+      if (!helper.isPoliticalFeaturePathEntryCurrent(pathCacheHandle.map.get(item.id), item.feature)) pathCacheMisses += 1;
     });
     if (pathCacheMisses > 0) effect.incrementPerfCounter("politicalPartialPathCacheMisses", pathCacheMisses);
     const pathCacheMissRatio = candidateCount > 0 ? pathCacheMisses / candidateCount : 0;
@@ -473,6 +474,7 @@ export function createPoliticalPartialRepaintOwner({
     }
     const redrawEntries = candidateItems.map((item) => {
       let pathEntry = pathCacheHandle.map.get(item.id) || null;
+      if (!helper.isPoliticalFeaturePathEntryCurrent(pathEntry, item.feature)) pathEntry = null;
       if (!pathEntry?.path && allowSyncPartialBuild) {
         pathEntry = helper.getPoliticalFeaturePathEntry(item.feature, {
           featureId: item.id,
@@ -694,11 +696,14 @@ export function createPoliticalPartialRepaintOwner({
     const state = getRuntimeState();
     const islandNeighbors = getDebugMode() === "ISLANDS" ? helper.getIslandNeighborGraph() : null;
     const featureMetrics = { fillMs: 0, strokeMs: 0, renderedCount: 0, renderedIds: new Set() };
-    // This synchronous loop only reads paths. Validate once per pass, including
+    // This synchronous loop only reads the persistent cache. Validate once per pass, including
     // after scene/projection changes, instead of once for every visible feature.
     const pathHandle = helper.getPoliticalPathCacheHandle(identity.transform, { resetIfMismatch: false });
     const paths = pathHandle.valid && pathHandle.map instanceof Map ? pathHandle.map : null;
-    const readPath = (feature, index) => paths?.get(helper.getFeatureId(feature) || `feature-${index}`)?.path || null;
+    const readPath = (feature, index) => {
+      const entry = paths?.get(helper.getFeatureId(feature) || `feature-${index}`);
+      return helper.isPoliticalFeaturePathEntryCurrent(entry, feature) ? entry.path : null;
+    };
     if (Array.isArray(viewport.visibleItems)) {
       helper.orderPoliticalShellUnderlayFirst(viewport.visibleItems).forEach((item) => {
         drawPoliticalFeature(item.feature, item.drawOrder, {

@@ -177,7 +177,7 @@ export function createCityPointsRenderOwner({
     };
   }
 
-  function getCityMarkerSprite(entry, config = {}) {
+  function getCityMarkerSprite(entry, config = {}, pixelDensity = 1) {
     const spec = getCityMarkerVisualSpec(entry, config);
     const sizePx = spec.sizePx;
     const themeKey = String(config.theme || cityMarkerThemeGraphite).trim().toLowerCase();
@@ -192,6 +192,7 @@ export function createCityPointsRenderOwner({
       String(entry?.cityTier || "minor"),
       entry?.isCapital ? "capital" : "regular",
       sizePx,
+      pixelDensity,
       baseColorKey,
       capitalColorKey,
       backgroundKey,
@@ -214,7 +215,10 @@ export function createCityPointsRenderOwner({
       return cached;
     }
 
-    const canvas = createCityMarkerSpriteCanvas(spec.widthPx, spec.heightPx + spec.capitalTopExtra);
+    const canvas = createCityMarkerSpriteCanvas(
+      Math.ceil(spec.widthPx * pixelDensity),
+      Math.ceil((spec.heightPx + spec.capitalTopExtra) * pixelDensity),
+    );
     const sprite = {
       canvas,
       width: spec.widthPx,
@@ -233,6 +237,9 @@ export function createCityPointsRenderOwner({
       return sprite;
     }
 
+    // Keep sprite geometry and anchors in logical pixels, including fractional
+    // densities whose bitmap dimensions must round up to whole pixels.
+    spriteContext.scale(canvas.width / sprite.width, canvas.height / sprite.height);
     const anchor = renderCityMarkerSprite(spriteContext, spec, tokens, entry);
     sprite.anchorX = anchor.anchorX;
     sprite.anchorY = anchor.anchorY;
@@ -283,7 +290,7 @@ export function createCityPointsRenderOwner({
     const config = normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {});
     const transform = runtimeState.zoomTransform || getZoomIdentity();
     const scale = Math.max(0.0001, Number(transform?.k || k || 1));
-    const opacity = clamp(Number(config.opacity) || 0.92, 0, 1);
+    const opacity = config.opacity;
     const plan = config.revealProfile === cityRevealProfileHybrid
       ? buildCityRevealPlan(cityCollection, scale, transform, config)
       : buildCityRevealPlan(cityCollection, scale, transform, {
@@ -325,6 +332,11 @@ export function createCityPointsRenderOwner({
   function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false } = {}) {
     syncRenderTargets();
     if (!context || !Array.isArray(markerEntries) || !markerEntries.length) return;
+    const transform = context.getTransform?.();
+    const targetDensity = transform
+      ? Math.max(Math.hypot(transform.a, transform.b), Math.hypot(transform.c, transform.d)) / scale
+      : 1;
+    const pixelDensity = Number.isFinite(targetDensity) && targetDensity > 0 ? targetDensity : 1;
     context.save();
     context.globalCompositeOperation = "source-over";
     context.lineJoin = "round";
@@ -339,7 +351,7 @@ export function createCityPointsRenderOwner({
           isCapital: false,
           markerSizePx: null,
         };
-      const sprite = getCityMarkerSprite(spriteEntry, config);
+      const sprite = getCityMarkerSprite(spriteEntry, config, pixelDensity);
       if (!sprite?.canvas) return;
       const drawWidth = sprite.width / scale;
       const drawHeight = sprite.height / scale;
@@ -382,7 +394,7 @@ export function createCityPointsRenderOwner({
     });
   }
 
-  function drawLabelsPass(k, { interactive = false } = {}) {
+  function drawLabelsPass(k, { interactive = false, occupiedBoxes = [] } = {}) {
     const startedAt = nowMs();
     if (interactive) {
       recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
@@ -426,6 +438,7 @@ export function createCityPointsRenderOwner({
     const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {
       config: renderState.config,
       scale: renderState.scale,
+      occupiedBoxes,
     });
     recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
       interactive: false,

@@ -157,6 +157,16 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     if (overrideLabel) {
       return overrideLabel;
     }
+    // An explicit scenario city entry is authoritative even when a containing
+    // host polygon has its own translated name. Do not infer this relationship
+    // from raw names or aliases: both can also identify administrative regions.
+    const scenarioGeo = runtimeState.scenarioGeoLocalePatchData?.geo;
+    const explicitCityKeys = [
+      props.__city_stable_key, props.stable_key, props.__city_id, props.id, feature?.id,
+    ].filter((key) => key && scenarioGeo && Object.prototype.hasOwnProperty.call(scenarioGeo, key));
+    const explicitCityLabel = getStrictGeoLabel(explicitCityKeys, "");
+    if (explicitCityLabel) return explicitCityLabel;
+
     const baseStrict = getCityBaseLocalizedLabel(feature, { strict: true });
     const baseFallback = getCityBaseLocalizedLabel(feature);
     const rawCurrentLanguageLabel = getCityRawLanguageLabel(feature, runtimeState.currentLanguage);

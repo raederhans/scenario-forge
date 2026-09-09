@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createPoliticalBackgroundRenderOwner } from "../js/core/renderer/political_background_render_owner.js";
+import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
 
 class FakePath2D {
   constructor() {
@@ -84,12 +85,13 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
       calls.push(`lookup:${featureId}`);
       assert.equal(allowBuild, true);
       assert.equal(countBuild, true);
-      if (!pathCache.has(featureId)) {
-        pathCache.set(featureId, { path: { featureId } });
+      if (!isPoliticalFeaturePathEntryCurrent(pathCache.get(featureId), feature)) {
+        pathCache.set(featureId, { path: { featureId }, geometryRef: feature.geometry });
         calls.push(`build:${featureId}`);
       }
       return pathCache.get(featureId);
     },
+    isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
     getPoliticalPathCacheSignature: (transform) => `path:${transform.k}:${transform.x}:${transform.y}`,
     getVisibleFrameIdentity: () => ({
@@ -245,6 +247,24 @@ test("recolor regroups warm paths with one cache preparation and no feature look
   assert.equal(fixture.calls.some((call) => /^(lookup|build):/.test(call)), false);
 });
 
+for (const progressiveLimit of [2400, 1]) {
+  test(`background ${progressiveLimit === 1 ? "deferred" : "exact"} builds reject same-ID foreign geometry`, () => {
+    const fixture = createFixture({ progressiveLimit });
+    fixture.state.landData = { features: [feature("a"), feature("b")] };
+    const stale = { path: { old: true }, geometryRef: feature("a").geometry };
+    fixture.pathCache.set("a", stale);
+    const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
+      id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+    }));
+    fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+    if (progressiveLimit === 1) fixture.pending.shift().callback();
+    assert.ok(fixture.calls.includes("lookup:a"));
+    assert.ok(fixture.calls.includes("build:a"));
+    assert.notEqual(fixture.pathCache.get("a").path, stale.path);
+    assert.equal(fixture.pathCache.get("a").geometryRef, fixture.state.landData.features[0].geometry);
+  });
+}
+
 test("changed transform or geometry generation still prepares and rebuilds stale paths", () => {
   for (const change of [
     (fixture) => { fixture.state.zoomTransform = { k: 2, x: 0, y: 0 }; },
@@ -277,7 +297,7 @@ test("deferred slices prepare once each and reuse warm paths without feature loo
   fixture.state.landData = { features: [feature("a"), feature("b"), feature("c")] };
   for (const item of fixture.state.landData.features) {
     const featureId = item.properties.id;
-    fixture.pathCache.set(featureId, { path: { featureId } });
+    fixture.pathCache.set(featureId, { path: { featureId }, geometryRef: item.geometry });
   }
   const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
     id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,

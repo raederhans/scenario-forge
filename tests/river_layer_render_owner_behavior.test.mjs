@@ -154,6 +154,39 @@ test("river layer owner keeps min zoom bridge for rank eight rivers at mid zoom"
   assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 1);
 });
 
+test("river draw preserves zero ranks and finite rank defaults across zoom buckets", () => {
+  const cases = [
+    { properties: { scalerank: 0 }, visible: [true, true, true] },
+    { properties: { scalerank: "0" }, visible: [true, true, true] },
+    { properties: { SCALERANK: 0 }, visible: [true, true, true] },
+    { properties: { scalerank: 0, SCALERANK: 9 }, visible: [true, true, true] },
+    { properties: { scalerank: 4 }, visible: [true, true, true] },
+    { properties: { scalerank: 7 }, visible: [false, true, true] },
+    { properties: {}, visible: [false, false, true] },
+    { properties: { scalerank: "invalid" }, visible: [false, false, true] },
+    { properties: { scalerank: Number.NaN }, visible: [false, false, true] },
+    { properties: { scalerank: Infinity, min_zoom: 4 }, visible: [false, true, true] },
+    { properties: { scalerank: -Infinity, min_zoom: 4 }, visible: [false, true, true] },
+  ];
+  for (const [index, sample] of cases.entries()) {
+    for (const [zoomIndex, scale] of [1, 2, 3].entries()) {
+      const feature = { properties: { featurecla: "River", ...sample.properties } };
+      const harness = createOwner({ features: [feature] });
+      harness.owner.drawRiversLayer(scale);
+      const visible = sample.visible[zoomIndex];
+      const message = `case ${index}, zoom ${scale}`;
+      assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, Number(visible), message);
+      assert.deepEqual(harness.pathCalls, visible ? [feature, feature] : [], message);
+      const strokes = harness.context.calls.filter((call) => call.type === "stroke");
+      assert.equal(strokes.length, visible ? 2 : 0, message);
+      if (visible) {
+        const widthFactor = [1.2, 1, 0.75][zoomIndex];
+        assert.equal(strokes[1].lineWidth, 1.2 * widthFactor / scale, message);
+      }
+    }
+  }
+});
+
 test("river layer owner culls offscreen features before drawing", () => {
   const visibleFeature = createFeature("River", 4);
   const hiddenFeature = createFeature("River", 4);
