@@ -1,6 +1,38 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const CITY_RECORDS = [
   {
+    id: "city:reviewed-place-names-python",
+    commandRef: "python -m unittest tests.test_reviewed_place_names tests.test_tno_china_place_names -q",
+    sourceRefs: [
+      "tests/test_reviewed_place_names.py", "tests/test_tno_china_place_names.py",
+      "map_builder/cities.py", "map_builder/city_contract.py",
+      "data/world_cities.geojson", "data/city_aliases.json", "data/geo_aliases.json",
+      "data/locales.json", "data/i18n/manual_geo_overrides.json",
+      "data/scenarios/tno_1962/geo_name_overrides.manual.json",
+      "data/scenarios/tno_1962/geo_locale_patch.json", "data/scenarios/tno_1962/geo_locale_patch.en.json",
+      "data/scenarios/tno_1962/geo_locale_patch.zh.json", "data/scenarios/tno_1962/locales.startup.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo", ".runtime-output"], executionOwners: ["main-thread"], profiles: ["full"],
+    platforms: ["all"], entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: 402,
+    verification: null, selector: {},
+  },
+  {
+    id: "city:tno-reviewed-labels-node",
+    commandRef: "node --test tests/tno_china_city_labels_behavior.test.mjs tests/tno_russia_city_labels_behavior.test.mjs tests/tno_eastern_city_labels_behavior.test.mjs tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+    sourceRefs: [
+      "tests/tno_china_city_labels_behavior.test.mjs", "tests/tno_russia_city_labels_behavior.test.mjs",
+      "tests/tno_eastern_city_labels_behavior.test.mjs", "tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+      "js/core/renderer/city_label_text_model.js", "map_builder/cities.py",
+      "data/world_cities.geojson", "data/locales.json", "data/city_aliases.json",
+      "data/scenarios/tno_1962/geo_locale_patch.json", "data/scenarios/tno_1962/city_overrides.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 403,
+    verification: null, selector: {},
+  },
+  {
     id: "city:data-contract-python",
     commandRef: "python -m unittest tests.test_city_data_contract -q",
     sourceRefs: [

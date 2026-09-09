@@ -29,7 +29,7 @@
     },
     "BE100": {
       "en": "Hauptstadtbezirk Brüssel",
-      "zh": "布吕塞尔"
+      "zh": "布鲁塞尔首都区"
     },
     "BE211": {
       "en": "Bezirk Antwerpen",
@@ -89,7 +89,7 @@
     },
     "BE251": {
       "en": "Bezirk Brügge",
-      "zh": "布吕赫"
+      "zh": "布吕格"
     },
     "BE252": {
       "en": "Bezirk Diksmuide",
@@ -108,8 +108,8 @@
       "zh": "奥斯滕德"
     },
     "BE256": {
-      "en": "Bezirk Roeselare",
-      "zh": "鲁瑟拉勒"
+      "en": "Bezirk Russelaere",
+      "zh": "吕瑟拉勒"
     },
     "BE257": {
       "en": "Bezirk Thielt",
@@ -164,8 +164,8 @@
       "zh": "博格沃姆"
     },
     "BE335": {
-      "en": "Bezirk Verviers — Französische Gemeinden",
-      "zh": "费尔维耶"
+      "en": "Bezirk Velwisch — Französische Gemeinden",
+      "zh": "费尔维施法语市镇"
     },
     "BE341": {
       "en": "Bezirk Arel",
@@ -201,7 +201,7 @@
     },
     "BY_RAY_67162791B30498032594927": {
       "en": "Brest-Litowsk",
-      "zh": "布列瑟-立陶施"
+      "zh": "布列斯特-立托夫斯克"
     },
     "IN_ADM2_76128533B2782141712775": {
       "en": "Northern Areas",
@@ -236,8 +236,8 @@
       "zh": "马斯河畔韦尔登"
     },
     "FR_ARR_59002": {
-      "en": "Kamerijk",
-      "zh": "卡默赖克"
+      "en": "Kamerich",
+      "zh": "卡默里希"
     },
     "FR_ARR_59003": {
       "en": "Dowaai",
@@ -248,7 +248,7 @@
       "zh": "敦基兴"
     },
     "FR_ARR_59005": {
-      "en": "Rijsel",
+      "en": "Ryssel",
       "zh": "赖瑟尔"
     },
     "FR_ARR_59006": {
@@ -268,8 +268,8 @@
       "zh": "圣奥马尔斯"
     },
     "FR_ARR_62006": {
-      "en": "Kales",
-      "zh": "卡勒斯"
+      "en": "Kalen",
+      "zh": "卡伦"
     },
     "FR_ARR_88001": {
       "en": "Spinneln",
@@ -292,11 +292,11 @@
       "zh": "巴德吉斯"
     },
     "RU_CITY_SAINT_PETERSBURG": {
-      "en": "Saint Petersburg",
+      "en": "Sankt Petersburg",
       "zh": "圣彼得堡"
     },
     "RU_RAY_50074027B61494461730219": {
-      "en": "Gobelstadt",
+      "en": "Goebbels",
       "zh": "戈培尔"
     },
     "RU_RAY_50074027B61241799946425": {
@@ -320,8 +320,8 @@
       "zh": "日耳曼尼亚都会区"
     },
     "RU_RAY_50074027B39404018386654": {
-      "en": "Saratau",
-      "zh": "萨拉陶"
+      "en": "Platenfurt",
+      "zh": "普拉滕富特"
     },
     "RU_RAY_50074027B44365109797977": {
       "en": "Nizhny Novgorod",
@@ -342,6 +342,938 @@
     "FI196": {
       "en": "Satakunta",
       "zh": "萨塔昆塔"
+    },
+    "CN_CITY_17275852B77518624384720": {
+      "en": "Jimo",
+      "zh": "即墨"
+    },
+    "TWN-1163": {
+      "en": "Yilan",
+      "zh": "宜蘭"
+    },
+    "CN_CITY_17275852B13666567623021": {
+      "en": "Siping",
+      "zh": "四平"
+    },
+    "CN_CITY_17275852B13766311075127": {
+      "en": "Yakeshei",
+      "zh": "牙克石"
+    },
+    "CN_CITY_17275852B24114902469869": {
+      "en": "Mukden",
+      "zh": "奉天"
+    },
+    "CN_CITY_17275852B86600169878018": {
+      "en": "Elunchunzizhiqi",
+      "zh": "鄂伦春自治旗"
+    },
+    "CN_CITY_17275852B85317988773277": {
+      "en": "Heihe",
+      "zh": "黑河"
+    },
+    "CN_CITY_17275852B65249545845720": {
+      "en": "Zalantun",
+      "zh": "扎蘭屯"
+    },
+    "CN_CITY_17275852B39795357410298": {
+      "en": "Yianxian",
+      "zh": "依安县"
+    },
+    "CN_CITY_17275852B40864949822732": {
+      "en": "Luobeixian",
+      "zh": "萝北县"
+    },
+    "CN_CITY_17275852B18460482115025": {
+      "en": "Mishan",
+      "zh": "密山"
+    },
+    "CN_CITY_17275852B70872957460472": {
+      "en": "Taonan",
+      "zh": "洮南"
+    },
+    "CN_CITY_17275852B79901110252407": {
+      "en": "Wuchang",
+      "zh": "五常"
+    },
+    "CN_CITY_17275852B56398394923562": {
+      "en": "Huolinguole",
+      "zh": "霍林郭勒"
+    },
+    "CN_CITY_17275852B95395692507678": {
+      "en": "Zaluteqi",
+      "zh": "扎鲁特旗"
+    },
+    "CN_CITY_17275852B73984278517457": {
+      "en": "Hunchun",
+      "zh": "琿春"
+    },
+    "CN_CITY_17275852B52479935584445": {
+      "en": "Huadian",
+      "zh": "樺甸"
+    },
+    "CN_CITY_17275852B76401344363897": {
+      "en": "Panshi",
+      "zh": "磐石"
+    },
+    "CN_CITY_17275852B8726104203357": {
+      "en": "Yanji",
+      "zh": "延吉"
+    },
+    "CN_CITY_17275852B85208147359460": {
+      "en": "Changtuxian",
+      "zh": "昌图县"
+    },
+    "CN_CITY_17275852B84565810607959": {
+      "en": "Fusong County",
+      "zh": "撫松縣"
+    },
+    "CN_CITY_17275852B64701323045966": {
+      "en": "Qingyuanmanzuzizhixian",
+      "zh": "清原满族自治县"
+    },
+    "CN_CITY_17275852B96105205848287": {
+      "en": "Fuxinmengguzuzizhixian",
+      "zh": "阜新蒙古族自治县"
+    },
+    "CN_CITY_17275852B75499036549183": {
+      "en": "Chifeng",
+      "zh": "赤峰"
+    },
+    "CN_CITY_17275852B14323409203108": {
+      "en": "Beizhenmanzuzizhixian",
+      "zh": "北镇满族自治县"
+    },
+    "CN_CITY_17275852B24282650686841": {
+      "en": "Benximanzuzizhixian",
+      "zh": "本溪满族自治县"
+    },
+    "CN_CITY_17275852B84212901325884": {
+      "en": "Fenchengmanzuzizhixian",
+      "zh": "凤城满族自治县"
+    },
+    "CN_CITY_17275852B79805983057899": {
+      "en": "Fengruanxian",
+      "zh": "丰润县"
+    },
+    "CN_CITY_17275852B38375506939997": {
+      "en": "Dachanghuizuzizhixian",
+      "zh": "大厂回族自治县"
+    },
+    "CN_CITY_17275852B23021356422447": {
+      "en": "Baodixian",
+      "zh": "宝坻县"
+    },
+    "CN_CITY_17275852B86260962826974": {
+      "en": "Rongchengxian",
+      "zh": "容城县"
+    },
+    "CN_CITY_17275852B96657206671737": {
+      "en": "Dachengxian",
+      "zh": "大城县"
+    },
+    "CN_CITY_17275852B42311251295370": {
+      "en": "Xinhai",
+      "zh": "新海"
+    },
+    "CN_CITY_17275852B51175072856676": {
+      "en": "Shuningxian",
+      "zh": "肃宁县"
+    },
+    "CN_CITY_17275852B37600232739643": {
+      "en": "Mencunhuizuzizhixian",
+      "zh": "孟村回族自治县"
+    },
+    "CN_CITY_17275852B19731807948045": {
+      "en": "Wuqiangxian",
+      "zh": "武强县"
+    },
+    "CN_CITY_17275852B11407259911678": {
+      "en": "Jintan",
+      "zh": "金坛"
+    },
+    "CN_CITY_17275852B10920492354283": {
+      "en": "Jiangchenghanizhuyizuzizhixian",
+      "zh": "江城哈尼族彝族自治县"
+    },
+    "CN_CITY_17275852B10936165440282": {
+      "en": "Yuzhongxian",
+      "zh": "榆中县"
+    },
+    "CN_CITY_17275852B12916935567443": {
+      "en": "Qianxian",
+      "zh": "乾县"
+    },
+    "CN_CITY_17275852B36912897985697": {
+      "en": "Gannanxian",
+      "zh": "甘南县"
+    },
+    "CN_CITY_17275852B24544375432219": {
+      "en": "Siziwangqi",
+      "zh": "四子王旗"
+    },
+    "CN_CITY_17275852B3088754118842": {
+      "en": "Yijinhuoluoqi",
+      "zh": "伊金霍洛旗"
+    },
+    "CN_CITY_17275852B50201707862643": {
+      "en": "Zungeerqi",
+      "zh": "准格尔旗"
+    },
+    "CN_CITY_17275852B68283317499250": {
+      "en": "Dalateqi",
+      "zh": "达拉特旗"
+    },
+    "CN_CITY_17275852B17909208638027": {
+      "en": "Daerhanmaominganlianheqi",
+      "zh": "达尔罕茂明安联合旗"
+    },
+    "CN_CITY_17275852B79222988236433": {
+      "en": "Shuniteyouqi",
+      "zh": "苏尼特右旗"
+    },
+    "CN_CITY_17275852B56784937332062": {
+      "en": "Ertuokeqi",
+      "zh": "鄂托克旗"
+    },
+    "CN_CITY_17275852B41932351427715": {
+      "en": "Ertuokeqianqi",
+      "zh": "鄂托克前旗"
+    },
+    "CN_CITY_17275852B56850756381420": {
+      "en": "Zuozixian",
+      "zh": "卓资县"
+    },
+    "CN_CITY_17275852B22612364472373": {
+      "en": "Zhengxiangbaiqi",
+      "zh": "正镶白旗"
+    },
+    "CN_CITY_17275852B4230864536687": {
+      "en": "Wuyuanxian",
+      "zh": "五原县"
+    },
+    "CN_CITY_17275852B38336781870813": {
+      "en": "Anxixian",
+      "zh": "安西县"
+    },
+    "CN_CITY_17275852B82452317993245": {
+      "en": "Jidongxian",
+      "zh": "鸡东县"
+    },
+    "CN_CITY_17275852B48136438053745": {
+      "en": "Haiyangxian",
+      "zh": "海阳县"
+    },
+    "CN_CITY_17275852B64529865795141": {
+      "en": "Hsinking",
+      "zh": "新京"
+    },
+    "CN_CITY_17275852B83272093468807": {
+      "en": "Dairen",
+      "zh": "大連"
+    },
+    "CN_CITY_17275852B15106805877311": {
+      "en": "Antung",
+      "zh": "安東"
+    },
+    "CN_CITY_17275852B55723809295301": {
+      "en": "Zhuhe",
+      "zh": "珠河"
+    },
+    "CN_CITY_17275852B13668088847896": {
+      "en": "Mengjiang County",
+      "zh": "濛江縣"
+    },
+    "CN_CITY_17275852B34101037808925": {
+      "en": "Xi'an",
+      "zh": "西安"
+    },
+    "CN_CITY_17275852B71134370106008": {
+      "en": "Sartu",
+      "zh": "薩爾圖"
+    },
+    "CN_CITY_17275852B58561192252896": {
+      "en": "Houhehot",
+      "zh": "厚和浩特"
+    },
+    "CN_CITY_17275852B35052748065606": {
+      "en": "Wangyehmiao",
+      "zh": "王爺廟"
+    },
+    "CN_CITY_17275852B66003162693266": {
+      "en": "Kalgan",
+      "zh": "張家口"
+    },
+    "RU_RAY_50074027B11673707761487": {
+      "en": "Luga District",
+      "zh": "卢加区"
+    },
+    "RU_RAY_50074027B42720608112791": {
+      "en": "Sharya",
+      "zh": "沙里亚"
+    },
+    "RU_RAY_50074027B93366024646378": {
+      "en": "Goryachy Klyuch",
+      "zh": "戈里亚奇克柳奇"
+    },
+    "RU_RAY_50074027B90093816910352": {
+      "en": "Kovrov",
+      "zh": "科夫罗夫"
+    },
+    "RU_RAY_50074027B80046840644847": {
+      "en": "Obninsk",
+      "zh": "奥布宁斯克"
+    },
+    "RU_RAY_50074027B40993243777694": {
+      "en": "Rschew",
+      "zh": "勒热夫"
+    },
+    "RU_RAY_50074027B91132812213332": {
+      "en": "Yeysky District",
+      "zh": "叶伊斯克区"
+    },
+    "RU_RAY_50074027B96584787026473": {
+      "en": "Noworossijsk",
+      "zh": "新罗西斯克"
+    },
+    "RU_RAY_50074027B38701103870150": {
+      "en": "Derbent",
+      "zh": "杰尔宾特"
+    },
+    "RU_RAY_50074027B33448065960180": {
+      "en": "Schachty",
+      "zh": "沙赫特"
+    },
+    "RU_RAY_50074027B23731895824617": {
+      "en": "Stary Oskol",
+      "zh": "旧奥斯科尔"
+    },
+    "RU_RAY_50074027B21604114440864": {
+      "en": "Gubkin",
+      "zh": "古布金"
+    },
+    "RU_RAY_50074027B89083918550968": {
+      "en": "Seversky District",
+      "zh": "谢韦尔斯基区"
+    },
+    "RU_RAY_50074027B99227036451137": {
+      "en": "Jamburg",
+      "zh": "扬堡"
+    },
+    "RU_RAY_50074027B38735593525636": {
+      "en": "Liwny",
+      "zh": "利夫内"
+    },
+    "RU_RAY_50074027B18879924091572": {
+      "en": "Kimry",
+      "zh": "基姆雷"
+    },
+    "RU_RAY_50074027B39817723955170": {
+      "en": "Alatyr",
+      "zh": "阿拉特里"
+    },
+    "RU_RAY_50074027B51935162594441": {
+      "en": "Shchyolkovsky District",
+      "zh": "谢尔科夫斯基区"
+    },
+    "RU_RAY_50074027B85824641289458": {
+      "en": "Tikhoretsky District",
+      "zh": "季霍列茨克区"
+    },
+    "RU_RAY_50074027B88311001056531": {
+      "en": "Novoshakhtinsk",
+      "zh": "新沙赫京斯克"
+    },
+    "RU_RAY_50074027B90926067565803": {
+      "en": "Zheleznogorsk",
+      "zh": "热列兹诺哥尔斯克"
+    },
+    "RU_RAY_50074027B92950284592103": {
+      "en": "Gus-Khrustalny",
+      "zh": "古斯赫鲁斯特尔内"
+    },
+    "RU_RAY_50074027B43628650883925": {
+      "en": "Apsheronsky District",
+      "zh": "阿普歇伦斯克区"
+    },
+    "RU_RAY_50074027B99437248655047": {
+      "en": "Kamensk-Shakhtinsky",
+      "zh": "卡缅斯克-沙赫京斯基"
+    },
+    "RU_RAY_50074027B40609596354067": {
+      "en": "Nevinnomyssk",
+      "zh": "涅温诺梅斯克"
+    },
+    "RU_CITY_MOSCOW": {
+      "en": "Moskau",
+      "zh": "莫斯科"
+    },
+    "RU_RAY_50074027B21233041988666": {
+      "en": "Woronesch",
+      "zh": "沃罗涅日"
+    },
+    "RU_RAY_50074027B57358126207690": {
+      "en": "Jaroslawl",
+      "zh": "雅罗斯拉夫尔"
+    },
+    "RU_RAY_50074027B77320350284147": {
+      "en": "Twer",
+      "zh": "特维尔"
+    },
+    "RU_RAY_50074027B64455240716412": {
+      "en": "Holmgard",
+      "zh": "霍尔姆加德"
+    },
+    "RU_RAY_50074027B25563950651561": {
+      "en": "Brjansk",
+      "zh": "布良斯克"
+    },
+    "RU_RAY_50074027B49841574383841": {
+      "en": "Orel",
+      "zh": "奥廖尔"
+    },
+    "RU_RAY_50074027B73956111205177": {
+      "en": "Lipezk",
+      "zh": "利佩茨克"
+    },
+    "RU_RAY_50074027B89252490479976": {
+      "en": "Jekaterinodar",
+      "zh": "叶卡捷琳诺达尔"
+    },
+    "RU_RAY_50074027B37471881817771": {
+      "en": "Stawropol",
+      "zh": "斯塔夫罗波尔"
+    },
+    "RU_RAY_50074027B22946859849779": {
+      "en": "Grosny",
+      "zh": "格罗兹尼"
+    },
+    "RU_RAY_50074027B53939252162264": {
+      "en": "Rostow am Don",
+      "zh": "顿河畔罗斯托夫"
+    },
+    "RU_RAY_50074027B32606930376124": {
+      "en": "Nowotscherkassk",
+      "zh": "新切尔卡斯克"
+    },
+    "RU_RAY_50074027B2873749547467": {
+      "en": "Sotschi",
+      "zh": "索契"
+    },
+    "RU_RAY_50074027B19325401389824": {
+      "en": "Kineschma",
+      "zh": "基涅什马"
+    },
+    "RU_RAY_50074027B37574948551047": {
+      "en": "Kamyschin",
+      "zh": "卡梅申"
+    },
+    "RU_RAY_50074027B61355742422522": {
+      "en": "Koslow",
+      "zh": "科兹洛夫"
+    },
+    "RU_RAY_50074027B86215702387170": {
+      "en": "Neu-Kiel",
+      "zh": "新基尔"
+    },
+    "RU_RAY_50074027B22082895013138": {
+      "en": "Woskressensk",
+      "zh": "沃斯克列先斯克"
+    },
+    "RU_RAY_50074027B81132289602019": {
+      "en": "Morschansk",
+      "zh": "莫尔尚斯克"
+    },
+    "RU_RAY_50074027B5014175331817": {
+      "en": "Königsberg",
+      "zh": "柯尼斯堡"
+    },
+    "RU_RAY_50074027B10994626105324": {
+      "en": "Ludwigsort",
+      "zh": "路德维希索特"
+    },
+    "RU_RAY_50074027B14538200684789": {
+      "en": "Heinrichswalde",
+      "zh": "海因里希斯瓦尔德"
+    },
+    "RU_RAY_50074027B15138360662510": {
+      "en": "Tapiau",
+      "zh": "塔皮奥"
+    },
+    "RU_RAY_50074027B15782484108203": {
+      "en": "Preußisch Eylau",
+      "zh": "普鲁士艾劳"
+    },
+    "RU_RAY_50074027B18775873271761": {
+      "en": "Friedland in Ostpreußen",
+      "zh": "东普鲁士弗里德兰"
+    },
+    "RU_RAY_50074027B20728982890731": {
+      "en": "Labiau",
+      "zh": "拉比奥"
+    },
+    "RU_RAY_50074027B25644225360356": {
+      "en": "Heiligenbeil",
+      "zh": "海利根拜尔"
+    },
+    "RU_RAY_50074027B27880509956465": {
+      "en": "Gumbinnen",
+      "zh": "贡宾嫩"
+    },
+    "RU_RAY_50074027B28549884825225": {
+      "en": "Pillau",
+      "zh": "皮劳"
+    },
+    "RU_RAY_50074027B4169206169632": {
+      "en": "Rauschen",
+      "zh": "劳申"
+    },
+    "RU_RAY_50074027B43921475786516": {
+      "en": "Ebenrode",
+      "zh": "埃本罗德"
+    },
+    "RU_RAY_50074027B66676359272188": {
+      "en": "Angerapp",
+      "zh": "安格拉普"
+    },
+    "RU_RAY_50074027B72223889697429": {
+      "en": "Zimmerbude",
+      "zh": "齐默尔布德"
+    },
+    "RU_RAY_50074027B78200612798540": {
+      "en": "Neukuhren",
+      "zh": "诺伊库伦"
+    },
+    "RU_RAY_50074027B85308151104910": {
+      "en": "Palmnicken",
+      "zh": "帕尔姆尼肯"
+    },
+    "RU_RAY_50074027B89212805690722": {
+      "en": "Cranz",
+      "zh": "克兰茨"
+    },
+    "RU_RAY_50074027B90959697167325": {
+      "en": "Insterburg",
+      "zh": "因斯特堡"
+    },
+    "RU_RAY_50074027B93509676978918": {
+      "en": "Tilsit",
+      "zh": "蒂尔西特"
+    },
+    "RU_RAY_50074027B93803510078780": {
+      "en": "Ragnit",
+      "zh": "拉格尼特"
+    },
+    "RU_RAY_50074027B12162041502673": {
+      "en": "Kiefernwald",
+      "zh": "基费恩瓦尔德"
+    },
+    "RU_RAY_50074027B3207695915667": {
+      "en": "Glockenburg",
+      "zh": "格洛肯堡"
+    },
+    "RU_RAY_50074027B44469290153568": {
+      "en": "Johannesstadt",
+      "zh": "约翰尼斯施塔特"
+    },
+    "RU_RAY_50074027B75402656675224": {
+      "en": "Wolgodonstadt",
+      "zh": "伏尔加顿施塔特"
+    },
+    "RU_RAY_50074027B77582248025356": {
+      "en": "Klugeburg",
+      "zh": "克卢格堡"
+    },
+    "RU_RAY_50074027B78363579504678": {
+      "en": "Heidestadt",
+      "zh": "海德施塔特"
+    },
+    "RU_RAY_50074027B81882539182238": {
+      "en": "Bannerstadt",
+      "zh": "班纳施塔特"
+    },
+    "RU_RAY_50074027B87683621003887": {
+      "en": "Guderianstadt",
+      "zh": "古德里安施塔特"
+    },
+    "RU_RAY_50074027B90178869914073": {
+      "en": "Sternenstadt",
+      "zh": "施特嫩施塔特"
+    },
+    "RU_RAY_50074027B95764525225523": {
+      "en": "Stahlstadt",
+      "zh": "施塔尔施塔特"
+    },
+    "PL_POW_1009": {
+      "en": "pajęczański",
+      "zh": "帕延奇诺县"
+    },
+    "PL_POW_1215": {
+      "en": "suski",
+      "zh": "苏哈县"
+    },
+    "PL_POW_1408": {
+      "en": "legionowski",
+      "zh": "莱吉奥诺沃县"
+    },
+    "PL_POW_1409": {
+      "en": "lipski",
+      "zh": "利普斯科县"
+    },
+    "PL_POW_1412": {
+      "en": "miński",
+      "zh": "马佐夫舍地区明斯克县"
+    },
+    "PL_POW_1608": {
+      "en": "oleski",
+      "zh": "奥莱斯诺县"
+    },
+    "PL_POW_2605": {
+      "en": "konecki",
+      "zh": "孔斯凯县"
+    },
+    "PL_POW_2471": {
+      "en": "Piekary Śląskie",
+      "zh": "希隆斯克地区佩卡雷"
+    },
+    "PL_POW_2474": {
+      "en": "Siemianowice Śląskie",
+      "zh": "希隆斯克地区谢米亚诺维采"
+    },
+    "ARM-1555": {
+      "en": "Shirak",
+      "zh": "希拉克"
+    },
+    "ARM-1671": {
+      "en": "Ararat",
+      "zh": "阿拉拉特"
+    },
+    "ARM-1674": {
+      "en": "Lori",
+      "zh": "洛里"
+    },
+    "ARM-1732": {
+      "en": "Syunik",
+      "zh": "休尼克"
+    },
+    "AZE-1684": {
+      "en": "Qazax",
+      "zh": "加扎赫"
+    },
+    "AZE-1701": {
+      "en": "Dəvəçi",
+      "zh": "德韦奇"
+    },
+    "AZE-1713": {
+      "en": "Saatlı",
+      "zh": "萨特勒"
+    },
+    "AZE-1719": {
+      "en": "Xızı",
+      "zh": "赫泽"
+    },
+    "AZE-1720": {
+      "en": "Yardımlı",
+      "zh": "亚尔德姆勒"
+    },
+    "AZE-1726": {
+      "en": "Qax",
+      "zh": "卡赫"
+    },
+    "AZE-1730": {
+      "en": "Xaçmaz",
+      "zh": "哈奇马兹"
+    },
+    "AZE-1740": {
+      "en": "Zəngilan",
+      "zh": "赞格兰"
+    },
+    "AZE-1680": {
+      "en": "Xanlar",
+      "zh": "汉拉尔"
+    },
+    "AZE-1696": {
+      "en": "Bərdə",
+      "zh": "巴尔达"
+    },
+    "AZE-1697": {
+      "en": "Beyləqan",
+      "zh": "贝伊拉甘"
+    },
+    "AZE-1712": {
+      "en": "Siyəzən",
+      "zh": "锡阿赞"
+    },
+    "AZE-1728": {
+      "en": "Quba",
+      "zh": "库巴"
+    },
+    "AZE-1734": {
+      "en": "Xocavənd",
+      "zh": "霍贾文德"
+    },
+    "UA_RAY_74538382B72647920433352": {
+      "en": "Kodyma",
+      "zh": "科季马"
+    },
+    "UA_RAY_74538382B46561623007945": {
+      "en": "Okny",
+      "zh": "奥克内"
+    },
+    "UA_RAY_74538382B34887074672752": {
+      "en": "Sarata",
+      "zh": "萨拉塔"
+    },
+    "UA_RAY_74538382B21342332427534": {
+      "en": "Artsyz",
+      "zh": "阿尔齐兹"
+    },
+    "UA_RAY_74538382B97836372307066": {
+      "en": "Kiliia",
+      "zh": "基利亚"
+    },
+    "UA_RAY_74538382B44725547103458": {
+      "en": "Reni",
+      "zh": "雷尼"
+    },
+    "UA_RAY_74538382B95291552499633": {
+      "en": "Izmail",
+      "zh": "伊兹梅尔"
+    },
+    "UA_RAY_74538382B37171380171685": {
+      "en": "Sumy",
+      "zh": "苏梅"
+    },
+    "BY_RAY_67162791B14569635979911": {
+      "en": "Kastsyukovichy",
+      "zh": "卡斯秋科维奇"
+    },
+    "BY_RAY_67162791B18102707107362": {
+      "en": "Braslaw",
+      "zh": "布拉斯拉夫"
+    },
+    "ARM-1675": {
+      "en": "Yerevan",
+      "zh": "埃里温"
+    },
+    "GEO-3036": {
+      "en": "Tiflis",
+      "zh": "第比利斯"
+    },
+    "AZE-1679": {
+      "en": "Gandscha",
+      "zh": "甘贾"
+    },
+    "AZE-1689": {
+      "en": "Baku",
+      "zh": "巴库"
+    },
+    "PL_POW_1465": {
+      "en": "Warschau",
+      "zh": "华沙"
+    },
+    "PL_POW_2261": {
+      "en": "Danzig",
+      "zh": "但泽"
+    },
+    "PL_POW_0264": {
+      "en": "Breslau",
+      "zh": "布雷斯劳"
+    },
+    "PL_POW_3064": {
+      "en": "Posen",
+      "zh": "波森"
+    },
+    "PL_POW_1061": {
+      "en": "Litzmannstadt",
+      "zh": "利茨曼施塔特"
+    },
+    "PL_POW_1261": {
+      "en": "Krakau",
+      "zh": "克拉考"
+    },
+    "UA_RAY_74538382B60890943260132": {
+      "en": "Kiew",
+      "zh": "基辅"
+    },
+    "UA_RAY_74538382B36501884751905": {
+      "en": "Charkow",
+      "zh": "哈尔科夫"
+    },
+    "UA_RAY_74538382B23045356862491": {
+      "en": "Reichenaustadt",
+      "zh": "赖歇瑙施塔特"
+    },
+    "UA_RAY_74538382B89307192182420": {
+      "en": "Winnizia",
+      "zh": "文尼察"
+    },
+    "UA_RAY_74538382B57692221763967": {
+      "en": "Shitomir",
+      "zh": "日托米尔"
+    },
+    "UA_RAY_74538382B55212312657182": {
+      "en": "Kriwoi Rog",
+      "zh": "克里沃罗格"
+    },
+    "UA_RAY_74538382B95492559683598": {
+      "en": "Ost-Germania",
+      "zh": "东日耳曼尼亚"
+    },
+    "UA_RAY_74538382B84040377374615": {
+      "en": "Gotenburg",
+      "zh": "哥滕堡"
+    },
+    "UA_RAY_74538382B88282912225835": {
+      "en": "Tarnopol",
+      "zh": "塔尔诺波尔"
+    },
+    "UA_RAY_74538382B37791268598116": {
+      "en": "Proskurow",
+      "zh": "普罗斯库罗夫"
+    },
+    "UA_RAY_74538382B36980255523800": {
+      "en": "Rowno",
+      "zh": "罗夫诺"
+    },
+    "UA_RAY_74538382B39784518508744": {
+      "en": "Poltawa",
+      "zh": "波尔塔瓦"
+    },
+    "UA_RAY_74538382B44220139144156": {
+      "en": "Tschernigow",
+      "zh": "切尔尼戈夫"
+    },
+    "BY_RAY_67162791B13547290723272": {
+      "en": "Garten",
+      "zh": "加滕"
+    },
+    "BY_RAY_67162791B45929653886900": {
+      "en": "Polazk",
+      "zh": "波洛茨克"
+    },
+    "PL_POW_3262": {
+      "en": "Stettin",
+      "zh": "斯德丁"
+    },
+    "PL_POW_0463": {
+      "en": "Thorn",
+      "zh": "托恩"
+    },
+    "PL_POW_2475": {
+      "en": "Sosnowitz",
+      "zh": "索斯诺维茨"
+    },
+    "PL_POW_2461": {
+      "en": "Bielitz",
+      "zh": "比利茨"
+    },
+    "PL_POW_2464": {
+      "en": "Tschenstochau",
+      "zh": "琴斯托霍瓦"
+    },
+    "PL_POW_1863": {
+      "en": "Reichshof",
+      "zh": "赖希斯霍夫"
+    },
+    "PL_POW_2661": {
+      "en": "Kieltz",
+      "zh": "凯尔采"
+    },
+    "UA_RAY_74538382B5065610238765": {
+      "en": "Eichhornburg",
+      "zh": "艾希霍恩堡"
+    },
+    "NA_ADM1_NAM-3340": {
+      "en": "Khomas",
+      "zh": "霍马斯"
+    },
+    "NA_ADM1_NAM-3352": {
+      "en": "Ohangwena",
+      "zh": "奥汉圭纳"
+    },
+    "NA_ADM1_NAM-3353": {
+      "en": "Omaheke",
+      "zh": "奥马海凯"
+    },
+    "NA_ADM1_NAM-3355": {
+      "en": "Oshikoto",
+      "zh": "奥希科托"
+    },
+    "NA_ADM1_NAM-3356": {
+      "en": "Caprivi",
+      "zh": "卡普里维"
+    },
+    "AO_ADM1_AGO-1876": {
+      "en": "Malanje",
+      "zh": "马兰热"
+    },
+    "AO_ADM1_AGO-1890": {
+      "en": "Neu Lissabon",
+      "zh": "新里斯本"
+    },
+    "MZ_ADM1_MOZ-1207": {
+      "en": "Gaza",
+      "zh": "加扎"
+    },
+    "TZ_ADM1_TZA-3393": {
+      "en": "Kilimanjaro",
+      "zh": "乞力马扎罗"
+    },
+    "ZW_ADM1_ZWE-524": {
+      "en": "Mashonaland Central",
+      "zh": "中马绍纳兰"
+    },
+    "BI_ADM1_BDI-3364": {
+      "en": "Bujumbura Mairie",
+      "zh": "布琼布拉市"
+    },
+    "CF_ADM1_CAF-804": {
+      "en": "Nana-Mambéré Prefecture",
+      "zh": "纳纳-曼贝雷省"
+    },
+    "CG_ADM1_COG-3343": {
+      "en": "Kouilou",
+      "zh": "奎卢"
+    },
+    "MZ_ADM1_MOZ-5854": {
+      "en": "Lourenço Marques",
+      "zh": "洛伦索·马贵斯"
+    },
+    "ZW_ADM1_ZWE-525": {
+      "en": "Salisbury",
+      "zh": "索尔兹伯里"
+    },
+    "TZ_ADM1_TZA-3378": {
+      "en": "Daressalam",
+      "zh": "达累斯萨拉姆"
+    },
+    "TZ_ADM1_TZA-3391": {
+      "en": "Löweburg",
+      "zh": "勒韦堡"
+    },
+    "RW_ADM1_RWA-3495": {
+      "en": "Barthstadt",
+      "zh": "巴特城"
+    },
+    "ZW_ADM1_ZWE-532": {
+      "en": "Fort Victoria",
+      "zh": "维多利亚堡"
+    },
+    "CD_ADM1_COD-1884": {
+      "en": "Leopoldstadt",
+      "zh": "利奥波德城"
+    },
+    "CG_ADM1_COG-4855": {
+      "en": "Brazzastadt",
+      "zh": "布拉柴城"
+    },
+    "CG_ADM1_COG-5855": {
+      "en": "Schwarze-Spitze",
+      "zh": "黑角"
+    },
+    "FR_ARR_62002": {
+      "en": "Betun",
+      "zh": "贝蒂讷"
     }
   }
 }
