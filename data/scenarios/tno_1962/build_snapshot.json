@@ -8,10 +8,10 @@
   "generated_at": "2026-05-31T23:17:04Z",
   "input_sha": {
     "bathymetry.topo.json": "93c40c14ac2d18a9b4a74bb5b6bb8c2a5355d31c921d3477b1a8d5ca3626c928",
-    "city_overrides.json": "323664daaa7e20e76b27178d30d8fdfbdaf152b1021b4eefb7e81489e35398d1",
+    "city_overrides.json": "0b0029e2504d1f188efa14c56b90894aa40801bb7f0dda06c9cea3e190bca94d",
     "cores.by_feature.json": "de5efb3b9bdacffb38e14742b9053407eff58d86cb755ae345784044729f721c",
     "countries.json": "3d1dbc96a35caa7c32d5cb2ec998898866d73f31b0b5145ea9343012743ec6b0",
-    "geo_locale_patch.json": "d8e8559555d295d0b71c1d047a7a6722dc01e44117dc011852400c7cb2af38c1",
+    "geo_locale_patch.json": "78937b569ab0829c6a581d1749d05c60ed37022cfc9cf7d73e1d1d4cc39bd52c",
     "owners.by_feature.json": "95b9ac25ab95647ddfb0d06e78e18b18cfee061e489ca69a31559e64ace7f09a",
     "relief_overlays.geojson": "e14ef01b40d603c88a4f174cfc4a27f38f51edb1456db391a35e4e2218f22364",
     "runtime_topology.topo.json": "06830553628cdb532bb444b5225e319b20683215c47573af59e173f3e836232d",
@@ -27,7 +27,7 @@
     "derived/geometry_drop_audit.json": "cecf44815835ac15610c6c83742cbabf32858b722231e067326f55135a1194ba",
     "detail_chunks.manifest.json": "a24c4458361bc0b03cb152e971ba59e237b8a72eddfd344ed4ab8b6914da9a8b",
     "geo_aliases.startup.json": "4087b200237be216c8a79ee39d5dc367a452e588ea4ea3647c40ea975a1b440c",
-    "locales.startup.json": "66cf013d6fcea84ff848d5c2b15e2d59d358514bc61f58f52de571b5589f7f0f",
+    "locales.startup.json": "0c0d2b0ce2332dbf9b88ea8a7a71134b8a0552e752ae75e4b18f609f1aa59eb6",
     "mesh_pack.json": "ebbf91ce452dc4638a6fc08e6cd3aeeb5c5dda8b39c5ef78cfe1ceeb489cf80a",
     "runtime_meta.json": "3cc155354645b343b8f88758a16ae445f0fee30bae89d793a172856c68005faa",
     "runtime_topology.bootstrap.topo.json": "0537fc1bcb1eadc28d9bc450d8d1b7630b84fbb7388c9dd3240340887badb405",
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "562fb7aa31c6adf20ffe8010d55bdc333e65eb1d361a12d2a52f1df854128e13",
+  "snapshot_fingerprint": "9174e52c00bd1112b4bce5c0cbadfba5379460c2e4d9cf6f5f955c39624cad8f",
   "water_count": 141
 }

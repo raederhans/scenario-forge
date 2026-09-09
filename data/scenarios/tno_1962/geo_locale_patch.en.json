@@ -4063,7 +4063,7 @@
     },
     "CN_CITY_17275852B13666567623021": {
       "en": "Siping",
-      "zh": "引用"
+      "zh": "四平"
     },
     "CN_CITY_17275852B13668088847896": {
       "en": "Mengjiang County",
@@ -4071,7 +4071,7 @@
     },
     "CN_CITY_17275852B13766311075127": {
       "en": "Yakeshei",
-      "zh": "醒来"
+      "zh": "牙克石"
     },
     "CN_CITY_17275852B1379721554141": {
       "en": "Puxi",
@@ -6369,6 +6369,10 @@
       "en": "Longmenxian",
       "zh": "龙门县"
     },
+    "CN_CITY_17275852B38336781870813": {
+      "en": "Anxixian",
+      "zh": "安西县"
+    },
     "CN_CITY_17275852B38338809131920": {
       "en": "Haifengxian",
       "zh": "海丰县"
@@ -6688,6 +6692,10 @@
     "CN_CITY_17275852B42279115337630": {
       "en": "Jinshanxian",
       "zh": "金山县"
+    },
+    "CN_CITY_17275852B4230864536687": {
+      "en": "Wuyuanxian",
+      "zh": "五原县"
     },
     "CN_CITY_17275852B42311251295370": {
       "en": "Xinhai",
@@ -9835,7 +9843,7 @@
     },
     "CN_CITY_17275852B77518624384720": {
       "en": "Jimo",
-      "zh": "双胞胎"
+      "zh": "即墨"
     },
     "CN_CITY_17275852B77535138951060": {
       "en": "Yingde",
@@ -13003,7 +13011,7 @@
     },
     "DE245": {
       "en": "Bamberg, Landkreis",
-      "zh": "班贝格 (Landkreis)"
+      "zh": "班贝格县"
     },
     "DE246": {
       "en": "Bayreuth, Landkreis",
@@ -13099,7 +13107,7 @@
     },
     "DE264": {
       "en": "Aschaffenburg, Landkreis",
-      "zh": "阿沙芬堡, Landkreis"
+      "zh": "阿沙芬堡县"
     },
     "DE265": {
       "en": "Bad Kissingen",
@@ -19527,7 +19535,7 @@
     },
     "IN_ADM2_76128533B74859418903113": {
       "en": "Thane",
-      "zh": "领主"
+      "zh": "塔那"
     },
     "IN_ADM2_76128533B74887942950962": {
       "en": "Vikarabad",
@@ -20243,7 +20251,7 @@
     },
     "IRN-3209": {
       "en": "Kohgiluyeh and Buyer Ahmad",
-      "zh": "Kohgiluyeh 和买家艾哈迈德"
+      "zh": "科吉卢耶-博韦艾哈迈德省"
     },
     "IRN-3210": {
       "en": "Bushehr",
@@ -23816,6 +23824,10 @@
     "MZ_ADM1_MOZ-1925": {
       "en": "Inhambane",
       "zh": "伊尼扬巴内"
+    },
+    "MZ_ADM1_MOZ-5854": {
+      "en": "Lourenço Marques",
+      "zh": "洛伦索·马贵斯"
     },
     "NA_ADM1_NAM-3338": {
       "en": "Karas",
@@ -37635,7 +37647,7 @@
     },
     "TWN-1163": {
       "en": "Yilan",
-      "zh": "蛇"
+      "zh": "宜蘭"
     },
     "TWN-1164": {
       "en": "Keelung City",
@@ -40599,7 +40611,7 @@
     },
     "US_CNTY_06059": {
       "en": "Irvine",
-      "zh": "欧文"
+      "zh": "尔湾"
     },
     "US_CNTY_06061": {
       "en": "Placer County",
@@ -40627,7 +40639,7 @@
     },
     "US_CNTY_06073": {
       "en": "San Diego",
-      "zh": "圣迪亚哥"
+      "zh": "圣迭戈"
     },
     "US_CNTY_06075": {
       "en": "San Francisco",
@@ -44088,18 +44100,6 @@
     "ZW_ADM1_ZWE-533": {
       "en": "Mashonaland West",
       "zh": "西马绍纳兰"
-    },
-    "CN_CITY_17275852B38336781870813": {
-      "en": "Anxixian",
-      "zh": "安西县"
-    },
-    "CN_CITY_17275852B4230864536687": {
-      "en": "Wuyuanxian",
-      "zh": "五原县"
-    },
-    "MZ_ADM1_MOZ-5854": {
-      "en": "Lourenço Marques",
-      "zh": "洛伦索·马贵斯"
     }
   },
   "language": "en",

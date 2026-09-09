@@ -212,7 +212,7 @@ export function createLocalFeedbackRecords(baseRecords) {
 
   const startupLifecycleRecord = {
     ...editorCheckoutRecord,
-    id: "local:startup-lifecycle",
+    id: "node:test:node:startup-lifecycle",
     commandRef: "test:node:startup-lifecycle",
     sourceRefs: ["tests/startup_ready_handoff_behavior.test.mjs", "tests/startup_data_pipeline_lifecycle_behavior.test.mjs",
       "tests/startup_interaction_lifecycle_behavior.test.mjs", "js/bootstrap/startup_ready_handoff.js",
@@ -224,7 +224,7 @@ export function createLocalFeedbackRecords(baseRecords) {
   };
   const projectImportLifecycleRecord = {
     ...editorCheckoutRecord,
-    id: "local:project-import-lifecycle",
+    id: "node:test:node:project-import-lifecycle",
     commandRef: "test:node:project-import-lifecycle",
     sourceRefs: ["tests/project_import_completion_behavior.test.mjs", "tests/project_package_stream_import_behavior.test.mjs",
       "tests/scenario_import_trust_projection_behavior.test.mjs", "tests/scenario_project_import_recovery_behavior.test.mjs",

@@ -41787,7 +41787,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/geo_locale_patch.en.json",
-      "size_bytes": 1062987,
+      "size_bytes": 1062972,
       "source_kind": "generated_ignored"
     },
     {
@@ -41812,7 +41812,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/locales.startup.json",
-      "size_bytes": 3825397,
+      "size_bytes": 3826067,
       "source_kind": "generated_ignored"
     },
     {
@@ -47997,7 +47997,7 @@
       {
         "file_count": 8391,
         "id": "scenario-specific",
-        "size_bytes": 705272905
+        "size_bytes": 705273560
       },
       {
         "file_count": 5,
@@ -64511,7 +64511,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 956083362,
+        "untraversed_dist_bytes": 956084017,
         "untraversed_dist_file_count": 9152,
         "untraversed_module_count": 7
       },
@@ -66656,7 +66656,7 @@
           {
             "file_count": 928,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 691820128
+            "size_bytes": 691820783
           },
           {
             "file_count": 9,
@@ -66664,7 +66664,7 @@
             "size_bytes": 118248
           }
         ],
-        "size_bytes": 691938376
+        "size_bytes": 691939031
       },
       {
         "basis": "product-registry:export-modules",
@@ -66865,7 +66865,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 691938376
+          "size_bytes": 691939031
         },
         {
           "category": "scenario-specific",
@@ -67147,7 +67147,7 @@
     {
       "file_count": 9511,
       "path": "app",
-      "size_bytes": 958443267
+      "size_bytes": 958443922
     },
     {
       "file_count": 57,
@@ -67180,5 +67180,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 965409694
+  "total_bytes": 965410349
 }

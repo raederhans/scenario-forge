@@ -6369,6 +6369,10 @@
       "en": "Longmenxian",
       "zh": "龙门县"
     },
+    "CN_CITY_17275852B38336781870813": {
+      "en": "Anxixian",
+      "zh": "安西县"
+    },
     "CN_CITY_17275852B38338809131920": {
       "en": "Haifengxian",
       "zh": "海丰县"
@@ -6688,6 +6692,10 @@
     "CN_CITY_17275852B42279115337630": {
       "en": "Jinshanxian",
       "zh": "金山县"
+    },
+    "CN_CITY_17275852B4230864536687": {
+      "en": "Wuyuanxian",
+      "zh": "五原县"
     },
     "CN_CITY_17275852B42311251295370": {
       "en": "Xinhai",
@@ -23816,6 +23824,10 @@
     "MZ_ADM1_MOZ-1925": {
       "en": "Inhambane",
       "zh": "伊尼扬巴内"
+    },
+    "MZ_ADM1_MOZ-5854": {
+      "en": "Lourenço Marques",
+      "zh": "洛伦索·马贵斯"
     },
     "NA_ADM1_NAM-3338": {
       "en": "Karas",
@@ -44088,18 +44100,6 @@
     "ZW_ADM1_ZWE-533": {
       "en": "Mashonaland West",
       "zh": "西马绍纳兰"
-    },
-    "CN_CITY_17275852B38336781870813": {
-      "en": "Anxixian",
-      "zh": "安西县"
-    },
-    "CN_CITY_17275852B4230864536687": {
-      "en": "Wuyuanxian",
-      "zh": "五原县"
-    },
-    "MZ_ADM1_MOZ-5854": {
-      "en": "Lourenço Marques",
-      "zh": "洛伦索·马贵斯"
     }
   },
   "language": "zh",

@@ -4,7 +4,7 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../suppor
 
 // One real HOI4 document: required recovery, save/reopen, then an optional-layer
 // race. No replacement renderer or scenario manager is installed.
-test.setTimeout(180_000);
+test.setTimeout(60_000);
 
 async function mapPoint(page) {
   return page.evaluate(() => {
@@ -89,7 +89,15 @@ async function assertRecoveredDocument(page, featureId, color) {
   return observed;
 }
 
-test('required import recovery restores real land ownership hit and pixels; optional work cannot overwrite a newer import', async ({ page }, testInfo) => {
+test.describe.serial('project import recovery on a real HOI4 document', () => {
+let context;
+let page;
+let featureId;
+let recovered;
+
+test.beforeAll(async ({ browser, baseURL }) => {
+  context = await browser.newContext({ baseURL });
+  page = await context.newPage();
   await page.setViewportSize({ width: 1600, height: 1000 });
   await page.route('**/js/core/scenario_manager.js', async route => {
     const response = await route.fetch();
@@ -106,7 +114,7 @@ test('required import recovery restores real land ownership hit and pixels; opti
     await route.fulfill({ response, body });
   });
   await gotoApp(page, '/app/?render_profile=balanced&startup_interaction=full&startup_worker=0&startup_cache=0&default_scenario=hoi4_1936', { waitUntil: 'domcontentloaded' });
-  await waitForAppInteractive(page, { timeout: 90_000 });
+  await waitForAppInteractive(page, { timeout: 60_000 });
   await waitForRenderIdle(page, { scenarioId: 'hoi4_1936', timeout: 60_000 });
   if (await page.locator('#scenarioGuidePopover').isVisible()) await page.locator('#scenarioGuideCloseBtn').click();
   await page.evaluate(async () => {
@@ -124,8 +132,15 @@ test('required import recovery restores real land ownership hit and pixels; opti
     };
   });
   const point = await mapPoint(page);
-  const featureId = await selectAt(page, point);
+  featureId = await selectAt(page, point);
   expect(featureId).toBeTruthy();
+});
+
+test.afterAll(async () => {
+  await context?.close();
+});
+
+test('required recovery restores real land ownership hit and pixels', async ({}, testInfo) => {
   await page.screenshot({ path: testInfo.outputPath('before-import.png') });
   const blocked = await page.evaluate(async id => {
     const h = globalThis.__round2;
@@ -162,8 +177,10 @@ test('required import recovery restores real land ownership hit and pixels; opti
   const recovery = await page.evaluate(() => globalThis.__round2.first.getRecoveryState());
   expect(recovery.tasks['scenario-runtime']).toBe('complete');
   expect(recovery.tasks['ownership-index']).toBe('complete');
-  const recovered = await assertRecoveredDocument(page, featureId, '#e31ac4');
+  recovered = await assertRecoveredDocument(page, featureId, '#e31ac4');
+});
 
+test('saving and reopening preserves recovered document semantics', async ({}, testInfo) => {
   const savedText = await page.evaluate(async () => {
     const h = globalThis.__round2;
     const saved = h.FileManager.buildProjectPayload(h.state);
@@ -189,7 +206,9 @@ test('required import recovery restores real land ownership hit and pixels; opti
     return { before: semantics(before), after: semantics(after) };
   });
   expect(semanticRoundtrip.after).toEqual(semanticRoundtrip.before);
+});
 
+test('optional work cannot overwrite a newer import', async () => {
   await page.evaluate(async () => {
     const h = globalThis.__round2;
     h.originalContextLoader = h.hooks.readRegisteredRuntimeHookSource(h.state, 'ensureContextLayerDataFn');
@@ -253,4 +272,5 @@ test('required import recovery restores real land ownership hit and pixels; opti
   delete late.after.exportHandoff.project.timestamp;
   expect(late.after).toEqual(late.before);
   await assertRecoveredDocument(page, featureId, '#16b8da');
+});
 });
