@@ -1446,6 +1446,50 @@ test("City rendering aggregate reuses one canonical layering invocation per spec
   }
 });
 
+test("Physical layer runtime contract reuses its canonical wrapper across alias and selector", () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "package.json"), "utf8"));
+  const spec = "tests/e2e/physical_layer_runtime_contract.spec.js";
+  const wrapper = `node tools/e2e_layering.mjs run-spec ${spec}`;
+  for (const roots of [["test:e2e:physical-layer-runtime-contract", wrapper], [wrapper, "test:e2e:physical-layer-runtime-contract"]]) {
+    const plan = buildRepositoryVerificationSelectionPlan({
+      packageScripts: packageJson.scripts,
+      roots,
+      repoRoot: REPO_ROOT,
+      platform: process.platform,
+    });
+    assert.equal(plan.executions.length, 1);
+    assert.deepEqual(plan.executions[0].logicalArgv, ["tools/e2e_layering.mjs", "run-spec", spec]);
+    assert.equal(plan.executions[0].executionOwner, "main-thread");
+    assert.ok(plan.executions[0].resourceLocks.includes("playwright-browser"));
+    assert.deepEqual(new Set(plan.executions[0].provenance.map(({ rootCommandRef }) => rootCommandRef)), new Set(roots));
+  }
+});
+
+test("TNO contract aggregate preserves both specs and shares their canonical wrappers", () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "package.json"), "utf8"));
+  const specs = [
+    "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
+    "tests/e2e/tno_1962_ui_smoke.spec.js",
+  ];
+  const wrappers = specs.map((spec) => `node tools/e2e_layering.mjs run-spec ${spec}`);
+  const plan = buildRepositoryVerificationSelectionPlan({
+    packageScripts: packageJson.scripts,
+    roots: ["test:e2e:tno-contracts", ...wrappers],
+    repoRoot: REPO_ROOT,
+    platform: process.platform,
+  });
+  assert.equal(plan.executions.length, 2);
+  for (const [index, spec] of specs.entries()) {
+    const execution = plan.executions.find((entry) => entry.specs.includes(spec));
+    assert.ok(execution, spec);
+    assert.deepEqual(execution.logicalArgv, ["tools/e2e_layering.mjs", "run-spec", spec]);
+    assert.equal(execution.executionOwner, "main-thread");
+    assert.ok(execution.resourceLocks.includes("playwright-browser"));
+    assert.deepEqual(new Set(execution.provenance.map(({ rootCommandRef }) => rootCommandRef)), new Set(["test:e2e:tno-contracts", wrappers[index]]));
+  }
+  assert.equal(packageJson.scripts["test:e2e:tno-contracts"], wrappers.join(" && "));
+});
+
 test("Scenario resilience keeps the canonical layering wrapper invocation", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "package.json"), "utf8"));
   const wrapper = "node tools/e2e_layering.mjs run-spec tests/e2e/scenario_apply_resilience.spec.js";

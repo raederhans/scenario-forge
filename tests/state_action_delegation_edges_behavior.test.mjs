@@ -60,6 +60,48 @@ function fingerprintDirectExportedFunction(source, exportName) {
     .digest("hex");
 }
 
+test("import preflight readers exclude only proven reads and retain the live restore boundary", async () => {
+  const expectedReaders = new Map([
+    ["js/core/interaction_funnel.js", [
+      "captureImportDocumentIdentity",
+      "validateImportedContextLayerResult",
+      "resolveImportedTransportCountryOverlayPackIds",
+    ]],
+    ["js/core/interaction_funnel/import_apply_orchestration.js", [
+      "getScenarioImportValidFeatureIds",
+      "resolveImportedOwnershipState",
+    ]],
+  ]);
+  for (const [modulePath, names] of expectedReaders) {
+    const source = fs.readFileSync(modulePath, "utf8");
+    for (const name of names) {
+      const entry = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) =>
+        candidate.modulePath === modulePath && candidate.functionName === name);
+      assert.ok(entry, name);
+      assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry).violations, []);
+    }
+    const result = await discoverStateWriterBindingsForSource(modulePath, source, "production", {
+      includeInventories: true, scanAllParameters: true,
+    });
+    assert.equal(result.bindingInventories.some(({ binding }) => names.includes(binding.functionName)), false);
+    if (modulePath.endsWith("interaction_funnel.js")) {
+      assert.ok(result.bindingInventories.some(({ binding, findings }) =>
+        binding.functionName === "restoreImportedTransportCountryOverlayState" && findings.length > 0));
+      const mutatedSource = source.replace(
+        "return [target.dirtyRevision,",
+        "target.dirtyRevision += 1; return [target.dirtyRevision,",
+      );
+      assert.notEqual(mutatedSource, source);
+      await assert.rejects(
+        discoverStateWriterBindingsForSource(modulePath, mutatedSource, "production", {
+          includeInventories: true, scanAllParameters: true,
+        }),
+        { code: "state-target-pure-reader-contract-violation" },
+      );
+    }
+  }
+});
+
 test("source-bound detached captures return fresh values and fail closed on alias escape", () => {
   assert.deepEqual(validateStateDetachedCaptureContract(), []);
   assert.deepEqual(
@@ -573,13 +615,13 @@ test("P4.2b optional and city action exports have one canonical owner", () => {
   assert.deepEqual(
     validateStateActionModulePhaseAdmissions({
       modulePaths: ["js/core/state/actions/scenario_activation_actions.js"],
-      phase: "P4.3",
+      phase: "P4.4",
     }),
     [],
   );
   assert.ok(validateStateActionModulePhaseAdmissions({
     modulePaths: ["js/core/state/actions/scenario_activation_actions.js"],
-    phase: "P4.2b",
+    phase: "P4.3",
   }).some(({ code }) => code === "state-action-module-phase-not-admitted"));
 });
 
@@ -718,6 +760,7 @@ test("P4.3 renderer cross-boundary proofs lock retired evidence and exact replac
       proof.retiredMutationSites.length,
     ]),
     [
+      ["js/core/interaction_funnel.js", "parentBorderEnabledByCountry", "restoreProjectImportFields", 1],
       ["js/core/map_renderer.js", "cachedDetailAdmBorders", "replaceCachedDetailAdmBordersState", 5],
       ["js/core/map_renderer.js", "deferExactAfterSettle", "setDeferExactAfterSettleState", 3],
       ["js/core/map_renderer.js", "dprLastStageSwitchAt", "commitRendererDprStageState", 1],

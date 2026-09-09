@@ -1,11 +1,12 @@
 # Worktree Registry
 
-## 当前导航（2026-09-05）
+## 当前导航（2026-09-09）
 
 这里只维护当前工作入口。分支、远端、进程和验收状态的历史快照统一见下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
+| [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) / [PR #127](https://github.com/raederhans/scenario-forge/pull/127) | 本轮导入事务、调度生命周期、城市身份及发布产物改进已完成本地验证。用户已授权远端合并推送和工作树清理；必需检查、合并与清理结果以该任务及下方回执为准。完整 P4 未准入。 |
 | [恢复后续 R0 / T1 / U1 / P1](recovery-followup-20260908/task.md) | PR #123 已合并，但自动部署因 tracked dist 漂移失败。当前先闭合产物与夹具，再开展导入反馈和单热点性能改进；状态以任务记录为准。 |
 | [M4 完成记录](development-recovery-m4-20260908/task.md) / [整合 PR #123](https://github.com/raederhans/scenario-forge/pull/123) | 本地实现与验收完成，功能提交 `1decb144` 已推送集成分支；远端检查和合并状态以 PR 为准。保留其他证据工作树和未归属 WIP。 |
 | [快速治理任务](development-loop-simplification-20260905/task.md) / [交接与所有权](development-loop-simplification-20260905/context.md) | 维护已集成的 deeper stages 1–4 和新一轮 1–4 项的进度；新一轮并行任务尚未完成，不在这里提前验收。 |
@@ -26,6 +27,14 @@
 | `gate4-startup-graph-audit-20260901` | `a1f0885c6617622d260bc633c257b3f67b941686` | 一个独立提交已 patch-equivalent |
 
 继续保留 `b52a`（`611c21400661085161e46c1daf0a9318f467b94b`，A-admitted-source）和 `d081`（`c41a17d2d9668243988929399108fb28e4707eac`）：仍有 `git cherry +` 的提交，未证明被整合结果完整覆盖。清理分支范围仅为本次 integration、已合并 baseline，以及已等价覆盖的 gate4；不扩大到这些保留工作树。
+
+## 2026-09-09 工作树清理回执
+
+本轮已整合功能提交 `ece5d2c0`，保留此前 `9d4b715a` 的优化。已逐一清理15个额外工作树、17个旧本地分支及6个已在远端主线历史内的远端分支；当前仅保留主工作区、`main` 和 PR #127 集成分支。远端必需检查及最终合并状态以 [PR #127](https://github.com/raederhans/scenario-forge/pull/127) 为准；此回执不提前声明合并成功。
+
+清理前已归档359个运行证据文件（179,225,200字节），两个脏工作树的改动仅为已被新产物覆盖的3个旧 dist 文件，各自保留原文件和二进制补丁。原 tip、逐项覆盖分析、删除回执及验证过的增量 Git bundle 位于主工作区 `.runtime/tmp/editor-kernel-renewal/worktree-recovery/`。8个 `archive/worktree-cleanup-20260909/*` 标签保留补丁等价或语义已覆盖提交的原始身份，并随集成分支推送。
+
+上方2026-09-06的保留决定是历史快照。本轮重新核对后，`b52a` 的有效变更已覆盖，剩余差异为后来明确移除的旧 transport wrapper；`d081` 的旧证明已被当前更严格的操作感知契约覆盖。两者原始提交均由归档标签及 bundle 保留，工作树现已清理。完整 P4 admission 仍为 FAIL，未更新冻结基线或放宽检查。
 
 ## 历史记录索引
 

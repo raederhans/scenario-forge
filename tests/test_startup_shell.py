@@ -122,7 +122,10 @@ class StartupShellTest(unittest.TestCase):
         self.assertNotIn('./data_loader.js', startup_cache_js)
         self.assertIn('./runtime_asset_registry.js', startup_cache_js)
         self.assertIn('./runtime_asset_registry.js', data_loader_js)
-        self.assertIn('if ((!topologyPrimary || !locales || !geoAliases) && workerEnabled)', data_loader_js)
+        # Cached topology still needs worker decoding even when all resources hit.
+        self.assertIn('if ((!topologyPrimary || !locales || !geoAliases || !decodedCollections) && workerEnabled)', data_loader_js)
+        self.assertIn('cachedTopologyPrimary: topologyPrimary,', data_loader_js)
+        self.assertIn('decodedCollections = workerResult.decodedCollections || null;', data_loader_js)
         self.assertIn('startupBootArtifacts && startupBootArtifacts.locales && startupBootArtifacts.geoAliases', data_loader_js)
         self.assertIn('needTopologyPrimary: !topologyPrimary,', data_loader_js)
         self.assertIn('needLocales: !locales,', data_loader_js)

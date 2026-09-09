@@ -33,3 +33,8 @@ export function patchReferenceImageState(target, patch, { clamp } = {}) {
   return next;
 }
 export function setReferenceImageUrlState(target, value = null) { assertTarget(target); target.referenceImageUrl = value; return value; }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "referenceImageState")) target.referenceImageState = patch.referenceImageState;
+}

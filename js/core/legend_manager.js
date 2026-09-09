@@ -565,8 +565,8 @@ class LegendManager {
       colors.push(color);
       if (colors.length >= maxItems) return colors;
     }
-    for (const value of Object.values(appState.colors)) {
-      const color = normalizeColor(value);
+    // Reuse the normalized insertion-ordered set instead of scanning every feature twice.
+    for (const color of availableColors) {
       if (!color || seen.has(color)) continue;
       seen.add(color);
       colors.push(color);
@@ -680,4 +680,30 @@ class LegendManager {
   }
 }
 
-export { LegendManager };
+// Renderer-only opt-in: its resolved-color transaction advances colorRevision before rendering.
+// General LegendManager callers retain uncached reads for arbitrary mutable input objects.
+function createRevisionedLegendColorReader() {
+  let lastState = null;
+  let lastSource = null;
+  let lastKey = "";
+  let lastColors = [];
+  return (appState) => {
+    if (!appState || !Number.isFinite(appState.colorRevision)) {
+      return LegendManager.getUniqueColors(appState);
+    }
+    LegendManager.ensureLegendState(appState);
+    const key = JSON.stringify([
+      appState.colorRevision, appState.sceneGeneration, appState.scenarioDataGeneration,
+      appState.activeScenarioId, appState.legendConfig.maxItems, appState.legendColorOrder,
+    ]);
+    if (lastState !== appState || lastSource !== appState.colors || lastKey !== key) {
+      lastColors = LegendManager.getUniqueColors(appState);
+      lastState = appState;
+      lastSource = appState.colors;
+      lastKey = key;
+    }
+    return lastColors.slice();
+  };
+}
+
+export { LegendManager, createRevisionedLegendColorReader };

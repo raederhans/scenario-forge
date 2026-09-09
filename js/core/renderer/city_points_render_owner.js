@@ -1,4 +1,5 @@
 const DEFAULT_ZOOM_IDENTITY = Object.freeze({ x: 0, y: 0, k: 1 });
+const CITY_MARKER_SPRITE_CACHE_LIMIT = 256;
 
 export function createCityPointsRenderOwner({
   state = {},
@@ -41,7 +42,6 @@ export function createCityPointsRenderOwner({
   } = getters;
 
   const cityMarkerSpriteCache = new Map();
-  let cityMarkerSpriteCacheColorRevision = -1;
   let visibleCityHoverEntries = [];
   let context = null;
   let projection = null;
@@ -178,11 +178,6 @@ export function createCityPointsRenderOwner({
   }
 
   function getCityMarkerSprite(entry, config = {}) {
-    const colorRevision = Number(runtimeState.colorRevision || 0);
-    if (cityMarkerSpriteCacheColorRevision !== colorRevision) {
-      cityMarkerSpriteCache.clear();
-      cityMarkerSpriteCacheColorRevision = colorRevision;
-    }
     const spec = getCityMarkerVisualSpec(entry, config);
     const sizePx = spec.sizePx;
     const themeKey = String(config.theme || cityMarkerThemeGraphite).trim().toLowerCase();
@@ -190,20 +185,35 @@ export function createCityPointsRenderOwner({
     const capitalColorKey = String(config.capitalColor || "");
     const markerStyle = getCityMarkerRenderStyle(entry, config) || {};
     const backgroundKey = markerStyle.backgroundColor || "none";
-    const spriteKey = [
+    const tokens = markerStyle.tokens;
+    // Match the actual sprite inputs, so unrelated map color edits can reuse it.
+    const spriteKey = JSON.stringify([
       themeKey,
       String(entry?.cityTier || "minor"),
       entry?.isCapital ? "capital" : "regular",
-      sizePx.toFixed(2),
+      sizePx,
       baseColorKey,
       capitalColorKey,
       backgroundKey,
-    ].join("|");
+      Number(cityMarkerSizeLimitsPx.capital || 24),
+      tokens?.fillTop,
+      tokens?.fillMid || tokens?.fillTop,
+      tokens?.fillBottom,
+      tokens?.baseShadow,
+      tokens?.stroke,
+      tokens?.rimDark || tokens?.fillBottom,
+      tokens?.highlight,
+      tokens?.specular || tokens?.highlight,
+      tokens?.capitalAccent,
+      tokens?.capitalHighlight,
+    ]);
     if (cityMarkerSpriteCache.has(spriteKey)) {
-      return cityMarkerSpriteCache.get(spriteKey);
+      const cached = cityMarkerSpriteCache.get(spriteKey);
+      cityMarkerSpriteCache.delete(spriteKey);
+      cityMarkerSpriteCache.set(spriteKey, cached);
+      return cached;
     }
 
-    const tokens = markerStyle.tokens;
     const canvas = createCityMarkerSpriteCanvas(spec.widthPx, spec.heightPx + spec.capitalTopExtra);
     const sprite = {
       canvas,
@@ -213,21 +223,28 @@ export function createCityPointsRenderOwner({
       anchorY: spec.heightPx + spec.capitalTopExtra - Math.max(2, sizePx * 0.12),
     };
     if (!canvas) {
-      cityMarkerSpriteCache.set(spriteKey, sprite);
+      cacheCityMarkerSprite(spriteKey, sprite);
       return sprite;
     }
 
     const spriteContext = canvas.getContext("2d");
     if (!spriteContext) {
-      cityMarkerSpriteCache.set(spriteKey, sprite);
+      cacheCityMarkerSprite(spriteKey, sprite);
       return sprite;
     }
 
     const anchor = renderCityMarkerSprite(spriteContext, spec, tokens, entry);
     sprite.anchorX = anchor.anchorX;
     sprite.anchorY = anchor.anchorY;
-    cityMarkerSpriteCache.set(spriteKey, sprite);
+    cacheCityMarkerSprite(spriteKey, sprite);
     return sprite;
+  }
+
+  function cacheCityMarkerSprite(key, sprite) {
+    cityMarkerSpriteCache.set(key, sprite);
+    if (cityMarkerSpriteCache.size > CITY_MARKER_SPRITE_CACHE_LIMIT) {
+      cityMarkerSpriteCache.delete(cityMarkerSpriteCache.keys().next().value);
+    }
   }
 
   function getCityHoverRadiusPx(entry) {

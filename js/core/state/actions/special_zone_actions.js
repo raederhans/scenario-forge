@@ -406,3 +406,11 @@ export function registerSpecialZonesWorkbenchRuntimeHooks(target, hooks = {}) {
     target.updateSpecialZonesWorkbenchCurrentTargetUIFn = hooks.renderCurrentTarget;
   }
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "manualSpecialZones")) target.manualSpecialZones = patch.manualSpecialZones;
+  if (Object.hasOwn(patch, "specialZoneEditor")) target.specialZoneEditor = patch.specialZoneEditor;
+  if (Object.hasOwn(patch, "specialZoneLayers")) target.specialZoneLayers = patch.specialZoneLayers;
+  if (Object.hasOwn(patch, "specialZoneMembershipBrushMode")) target.specialZoneMembershipBrushMode = patch.specialZoneMembershipBrushMode;
+}

@@ -52,6 +52,46 @@ import {
 
 const REPO_ROOT = process.cwd();
 
+test("selector explicitly classifies task prose and agent config without inventing behavior coverage", () => {
+  const files = [
+    ".codex/config.toml",
+    ...["business-efficiency-20260908", "development-recovery-m0-m1-20260907",
+      "editing-response-v1-20260908", "editor-kernel-renewal-20260909"]
+      .flatMap((task) => ["plan", "context", "task"].map((name) => `docs/active/${task}/${name}.md`)),
+    "docs/active/business-efficiency-20260908/editing-analysis.md",
+    "docs/active/business-efficiency-20260908/render-reuse-analysis.md",
+  ];
+  const report = buildRepositoryRecommendation(files);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(report.unroutedChangedFiles, [...files].sort());
+  assert.equal(report.nonBehavioralChangedFiles.length, files.length);
+  assert.deepEqual(report.recommendedCommands, []);
+  assert.ok(report.matchedByFile.every((entry) => entry.matchedRouteIds.length === 0));
+  assert.ok(report.nonBehavioralChangedFiles.every((entry) =>
+    entry.disposition === "no-app-behavior-validation" && entry.behaviorTestsRun === false));
+  assert.equal(report.nonBehavioralChangedFiles.find((entry) => entry.changedFile === ".codex/config.toml").classification,
+    "agent-tool-config");
+  assert.deepEqual(buildAdaptiveEntrypointRecommendation(files).unmatchedChangedFiles, []);
+});
+
+test("nonbehavioral classification preserves unknown-file rejection and actual runtime routes", () => {
+  const unknown = [
+    "docs/active/editor-kernel-renewal-20260909/new-runtime.js",
+    "docs/active/editor-kernel-renewal-20260909/unknown-analysis.md",
+    "docs/archive/unregistered/plan.md",
+    ".codex/unknown.toml",
+  ];
+  const report = buildRepositoryRecommendation([
+    "docs/active/editor-kernel-renewal-20260909/plan.md", ...unknown,
+    "js/core/state/actions/project_import_actions.js", "docs/active/_worktree_registry.md",
+  ]);
+  assert.deepEqual(report.unmatchedChangedFiles, [...unknown].sort());
+  assert.ok(report.recommendedCommands.some((entry) =>
+    entry.commandRef === "node --test tests/project_import_transaction_behavior.test.mjs"));
+  assert.ok(report.matchedByFile.find((entry) => entry.changedFile === "docs/active/_worktree_registry.md")
+    .matchedRouteIds.length > 0);
+});
+
 test("repository route inventory validates schema and independently discovered coverage", () => {
   validateRouteIndex();
   validateDiscoveredRouteCoverage();
@@ -311,9 +351,14 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
 
   const heavy = buildCanonicalHeavyDependencyGroups();
   assert.equal(heavy.heavyDependencyGroups[0].id, "geo_stack");
-  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 15);
+  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 16);
+  assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_city_data_contract.py"));
+  const cityRoute = buildRouteIndex().find((route) => route.id === "city:data-contract-python");
+  assert.equal(cityRoute.executionOwner, "main-thread");
+  assert.equal(cityRoute.cost, "heavy");
+  assert.ok(cityRoute.resourceLocks.includes("heavy-geo"));
   heavy.heavyDependencyGroups[0].patterns.push("detached-only.py");
-  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 15);
+  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 16);
 
   const aliases = buildCanonicalPackageAliases().packageAliases;
   assert.deepEqual(

@@ -147,7 +147,17 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-water-signature", "renderer-runtime", "tests/scenario_water_signature_behavior.test.mjs"],
     ["retired-frontline", "renderer-runtime", "tests/retired_frontline_behavior.test.mjs"],
     ["scenario-chunk-cancellation", "scenario-runtime", "tests/scenario_chunk_cancellation_behavior.test.mjs", ["js/core/scenario/chunk_runtime.js", "js/core/scenario/chunk_payload_loader.js"]],
+    ["scenario-deferred-infra-lifecycle", "scenario-runtime", "tests/scenario_deferred_infra_lifecycle_behavior.test.mjs", ["js/core/map_renderer/scenario_refresh_runtime.js"]],
     ["startup-boot-worker-cancellation", "scenario-runtime", "tests/startup_boot_worker_cancellation.test.mjs"],
+    ["startup-cached-topology", "startup", "tests/startup_cached_topology_behavior.test.mjs", ["js/core/data_loader.js", "js/core/startup_worker_client.js", "js/workers/startup_boot.worker.js"]],
+    ["startup-cache-metadata-gc", "startup", "tests/startup_cache_metadata_gc_behavior.test.mjs", ["js/core/startup_cache.js"]],
+    ["scenario-cache-efficiency", "scenario-runtime", "tests/scenario_cache_efficiency_behavior.test.mjs", ["js/core/scenario/bundle_cache.js", "js/core/scenario/bundle_runtime.js", "js/core/scenario/rollback_clone.js", "js/core/scenario_rollback.js", "js/core/scenario/chunk_runtime.js", "js/core/scenario/chunk_payload_loader.js", "js/core/scenario_resources.js", "js/core/state/actions/scenario_chunk_runtime_actions.js"]],
+    ["strategic-history-scope", "renderer-runtime", "tests/strategic_history_scope_behavior.test.mjs", ["js/core/history_manager.js", "js/core/renderer/strategic_overlay_runtime_owner.js"]],
+    ["scenario-cache-byte-budget", "scenario-runtime", "tests/scenario_cache_byte_budget_behavior.test.mjs", ["js/core/scenario/bundle_cache.js", "js/core/scenario/chunk_payload_loader.js"]],
+    ["scenario-core-value-normalizer", "scenario-runtime", "tests/scenario_core_value_normalizer_behavior.test.mjs", ["js/core/scenario/shared.js", "js/core/scenario/core_value_normalizer.js"]],
+    ["legend-color-revision", "renderer-runtime", "tests/legend_color_revision_behavior.test.mjs", ["js/core/legend_manager.js", "js/core/map_renderer.js"]],
+    ["render-dispatcher", "startup", "tests/render_dispatcher_behavior.test.mjs", ["js/bootstrap/startup_bootstrap_support.js", "js/core/render_boundary.js", "js/bootstrap/render_runtime_binding.js"]],
+    ["exact-composite-reuse", "renderer-runtime", "tests/exact_composite_reuse_behavior.test.mjs", ["js/core/renderer/exact_composite_reuse_owner.js", "js/core/map_renderer.js", "js/core/renderer/cached_pass_compositor_owner.js"]],
   ];
   const testRecords = localTestFiles.map(([id, domain, testFile, extraSources = []], index) => ({
     id: "local:test:" + id, commandRef: "node --test " + testFile,
@@ -183,14 +193,23 @@ export function createLocalFeedbackRecords(baseRecords) {
     ...editorCheckoutRecord,
     id: "e2e:runtime-input-latency",
     commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js --workers=1 --retries=0",
-    sourceRefs: ["tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"],
+    sourceRefs: ["tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js", "tests/e2e/support/input-evidence.js"],
     ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], tiers: ["heavy"],
     cost: "heavy", resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
     executionOwners: ["main-thread"], profiles: ["full"], entrypointPolicyIndex: 0,
     selectorOrder: editorCheckoutRecord.selectorOrder + 2,
   };
+  const inputEvidenceRecord = {
+    ...editorCheckoutRecord,
+    id: "local:input-evidence",
+    commandRef: "node --test tests/input_evidence_behavior.test.mjs",
+    sourceRefs: ["tests/input_evidence_behavior.test.mjs", "tests/e2e/support/input-evidence.js",
+      "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"],
+    ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 3,
+  };
 
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
-    historyColorRecord, runtimeInputRecord];
+    historyColorRecord, runtimeInputRecord, inputEvidenceRecord];
 }

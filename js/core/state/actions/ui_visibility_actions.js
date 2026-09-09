@@ -84,3 +84,27 @@ export function restoreImportedLayerVisibilityState(target, layerVisibility = nu
   const detachedVisibility = { ...layerVisibility };
   return commitUiVisibilityState(target, detachedVisibility);
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "allowOpenOceanPaint")) target.allowOpenOceanPaint = patch.allowOpenOceanPaint;
+  if (Object.hasOwn(patch, "allowOpenOceanSelect")) target.allowOpenOceanSelect = patch.allowOpenOceanSelect;
+  if (Object.hasOwn(patch, "showAirports")) target.showAirports = patch.showAirports;
+  if (Object.hasOwn(patch, "showBlankFeatureLabels")) target.showBlankFeatureLabels = patch.showBlankFeatureLabels;
+  if (Object.hasOwn(patch, "showCityPoints")) target.showCityPoints = patch.showCityPoints;
+  if (Object.hasOwn(patch, "showOpenOceanRegions")) target.showOpenOceanRegions = patch.showOpenOceanRegions;
+  if (Object.hasOwn(patch, "showPhysical")) target.showPhysical = patch.showPhysical;
+  if (Object.hasOwn(patch, "showPorts")) target.showPorts = patch.showPorts;
+  if (Object.hasOwn(patch, "showRail")) target.showRail = patch.showRail;
+  if (Object.hasOwn(patch, "showRivers")) target.showRivers = patch.showRivers;
+  if (Object.hasOwn(patch, "showRoad")) target.showRoad = patch.showRoad;
+  if (Object.hasOwn(patch, "showScenarioAtlantropa")) target.showScenarioAtlantropa = patch.showScenarioAtlantropa;
+  if (Object.hasOwn(patch, "showScenarioReliefOverlays")) target.showScenarioReliefOverlays = patch.showScenarioReliefOverlays;
+  if (Object.hasOwn(patch, "showScenarioSpecialRegions")) target.showScenarioSpecialRegions = patch.showScenarioSpecialRegions;
+  if (Object.hasOwn(patch, "showSpecialZones")) target.showSpecialZones = patch.showSpecialZones;
+  if (Object.hasOwn(patch, "showStrategicResourceMarkers")) target.showStrategicResourceMarkers = patch.showStrategicResourceMarkers;
+  if (Object.hasOwn(patch, "showTransport")) target.showTransport = patch.showTransport;
+  if (Object.hasOwn(patch, "showUrban")) target.showUrban = patch.showUrban;
+  if (Object.hasOwn(patch, "showWaterRegions")) target.showWaterRegions = patch.showWaterRegions;
+  if (Object.hasOwn(patch, "strategicChoroplethMetric")) target.strategicChoroplethMetric = patch.strategicChoroplethMetric;
+}

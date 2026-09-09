@@ -321,12 +321,15 @@ export function createSpatialIndexRuntimeOwner({
     includeSecondary = true,
     allowComputeMissingBounds = true,
     keepReady = false,
+    isCurrent = () => true,
   } = {}) {
+    if (!isCurrent()) return false;
     setInteractionInfrastructureState("building-spatial", {
       ready: keepReady ? true : false,
       inFlight: true,
     });
     await yieldToMain();
+    if (!isCurrent()) return false;
     const startedAt = nowMs();
     const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
     if (!features.length || !getPathSvg()) {
@@ -365,6 +368,7 @@ export function createSpatialIndexRuntimeOwner({
       });
       if (end < features.length) {
         await yieldToMain();
+        if (!isCurrent()) return false;
       }
     }
     const nextGridSnapshot = captureSpatialGridBuild({

@@ -727,7 +727,6 @@ class FileManager {
 
   static async buildProjectDownloadPayload(payload, { format = "json", packageContents = "recommended" } = {}) {
     const normalizedFormat = String(format || "json").trim().toLowerCase();
-    const data = JSON.stringify(payload, null, 2);
     if (normalizedFormat === "zip") {
       const projectPackage = await buildProjectPackagePayload(payload, {
         contentPreset: packageContents,
@@ -737,6 +736,7 @@ class FileManager {
         label: "Project ZIP package downloaded.",
       };
     }
+    const data = JSON.stringify(payload, null, 2);
     return {
       blob: new Blob([data], { type: "application/json" }),
       filename: "map_project.json",
@@ -967,21 +967,42 @@ class FileManager {
   }
 
   static async importProjectText(text, callback, observers = {}, options = {}) {
+    let payload;
+    try {
+      payload = JSON.parse(String(text || ""));
+    } catch (error) {
+      console.error("Failed to import project:", error);
+      showProjectImportFailure(error);
+      notifyProjectImportObserver(resolveProjectImportObservers(observers).notifyError, error, "error");
+      return false;
+    }
+    return FileManager.importProjectData(payload, callback, observers, options);
+  }
+
+  static async importProjectData(payload, callback, observers = {}, options = {}) {
     const { notifySuccess, notifyError } = resolveProjectImportObservers(observers);
     try {
-      const data = FileManager.normalizeImportedProjectData(JSON.parse(String(text || "")));
+      const data = FileManager.normalizeImportedProjectData(payload);
+      let importResult = null;
       if (typeof callback === "function") {
         // callback 负责把归一化后的项目状态真正接到运行时；
         // 只有 callback 完整成功，才把这次导入视为成功并清掉 dirty / 弹成功提示。
-        await callback(data);
+        importResult = await callback(data);
       }
-      clearDirty("project-import");
+      // Transactional funnel callbacks own the baseline at their synchronous commit.
+      // Optional completion may await while the user makes a newer edit.
+      const committed = importResult?.status === "committed" || importResult?.status === "committed-with-warnings";
+      if (importResult?.status === "cancelled" || importResult?.status === "failed") {
+        notifyProjectImportObserver(notifyError, importResult.error || importResult, "error");
+        return importResult;
+      }
+      if (!committed) clearDirty("project-import");
       showToast(t(options.successMessage || "Project file loaded successfully.", "ui"), {
         title: t(options.successTitle || "Project imported", "ui"),
-        tone: "success",
+        tone: importResult?.status === "committed-with-warnings" ? "warning" : "success",
       });
       notifyProjectImportObserver(notifySuccess, data, "success");
-      return true;
+      return importResult || true;
     } catch (error) {
       console.error("Failed to import project:", error);
       showProjectImportFailure(error);
@@ -993,22 +1014,26 @@ class FileManager {
   static importProject(file, callback, observers = {}, options = {}) {
     if (!file) return false;
     const { notifyError } = resolveProjectImportObservers(observers);
-    const reader = new FileReader();
-
-    return prepareProjectImportFile(file)
-      .then(({ file: importFile }) => new Promise((resolve) => {
-        reader.onload = async () => {
-          const text = typeof reader.result === "string" ? reader.result : "";
-          resolve(await FileManager.importProjectText(text, callback, observers, options));
-        };
-        reader.onerror = () => {
-          console.error("Failed to read project file:", reader.error);
-          showProjectReadFailure(reader.error);
-          notifyProjectImportObserver(notifyError, reader.error, "read-error");
-          resolve(false);
-        };
-        reader.readAsText(importFile);
-      }))
+    return prepareProjectImportFile(file, { materializeFile: false })
+      .then(({ file: importFile, projectPayload }) => {
+        if (projectPayload !== undefined) {
+          return FileManager.importProjectData(projectPayload, callback, observers, options);
+        }
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = async () => {
+            const text = typeof reader.result === "string" ? reader.result : "";
+            resolve(await FileManager.importProjectText(text, callback, observers, options));
+          };
+          reader.onerror = () => {
+            console.error("Failed to read project file:", reader.error);
+            showProjectReadFailure(reader.error);
+            notifyProjectImportObserver(notifyError, reader.error, "read-error");
+            resolve(false);
+          };
+          reader.readAsText(importFile);
+        });
+      })
       .catch((error) => {
         console.error("Failed to read project package:", error);
         showProjectReadFailure(error);

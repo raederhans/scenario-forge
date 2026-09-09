@@ -204,6 +204,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
 
   register(33, "exact-after-settle keeps scenario overlays on the contextScenario reuse path", () => {
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+    const exactCompositeReuseOwnerSource = readRepoFile("js", "core", "renderer", "exact_composite_reuse_owner.js");
     const hoverOwnerSource = readRepoFile("js", "core", "map_renderer", "map_hover_interaction_owner.js");
     const politicalPassOwnerSource = readRepoFile(
       "js",
@@ -597,7 +598,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const pendingVisualPromotion = \{[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:/.test(chunkRuntimeSource)
         && /const pendingPromotion = \{[\s\S]*?requiredPoliticalChunkCount:[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:[\s\S]*?queueScenarioChunkPromotionState\(runtimeState, \{[\s\S]*?visualPromotion: pendingVisualPromotion,[\s\S]*?promotion: pendingPromotion,/.test(chunkRuntimeSource),
       deferredInfraRestoresFullPoliticalDerivedStateWhenVisibleSubsetIsActive:
-        scenarioRefreshRuntimeSource.includes("function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
+        chunkPromotionHelperSource.includes("export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
+        && /import \{[^}]*\banalyzeScenarioPoliticalDerivedStateCoverage\b[^}]*\} from "\.\.\/renderer\/scenario_chunk_promotion_helpers\.js";/.test(scenarioRefreshRuntimeSource)
+        && scenarioRefreshRuntimeSource.includes("analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
         && scenarioRefreshRuntimeSource.includes('recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage"')
         && scenarioRefreshRuntimeSource.includes("primaryVisibleDerivedStateReady = false")
         && scenarioRefreshRuntimeSource.includes("completePoliticalDerivedStateReady = false")
@@ -684,7 +687,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && politicalRasterWorkerSource.includes("taskId"),
       exactComposeUsesCompositeBuffer:
         /function ensureCompositeBufferCanvas\(\) \{[\s\S]*?cache\.compositeBuffer\.canvas = canvas;/.test(renderCacheOwnerSource)
-        && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?composeRenderPassesToTarget\(bufferContext, passNames, currentTransform,[\s\S]*?requireAllPasses: true[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
+        && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?const result = getExactCompositeReuseOwner\(\)\.composeExact\(bufferCanvas, passNames, currentTransform\);[\s\S]*?if \(!result\.ok\) \{[\s\S]*?return false;[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
+        && /function getExactCompositeReuseOwner\(\)[\s\S]*?createExactCompositeReuseOwner\(\{[\s\S]*?compose: composeRenderPassesToTarget,/.test(rendererSource)
+        && /function composeExact\(bufferCanvas, passNames, currentTransform\)[\s\S]*?invalidate\(\);\s*resetContext\(context, bufferCanvas\.width, bufferCanvas\.height\);\s*const result = compose\(context, passNames, currentTransform, \{ requireAllPasses: true \}\);\s*if \(result\.ok\) previous = inputs;/.test(exactCompositeReuseOwnerSource)
         && /function blitCompositeBufferToMain\(bufferCanvas\) \{[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "copy";[\s\S]*?rendererSurfaceHost\.getContext\(\)\.drawImage\(bufferCanvas, 0, 0\);[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "source-over";/.test(rendererSource),
       coarsePrewarmDoesNotOverwriteActiveDetailChunks:
         /function hasDetailScenarioChunkIds\(chunkIds = \[\]\) \{[\s\S]*?String\(chunkId \|\| ""\)\.includes\("\.detail\."\)/.test(chunkRuntimeSource)
@@ -1196,8 +1201,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function isPoliticalUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isPoliticalShellUnderlayFeature\(feature, featureId\)[\s\S]*?isPoliticalPrimaryUnderlayFeature\(feature, featureId\)/.test(politicalFeaturePolicySource)
         && /function hasPoliticalForegroundColorOverride\(featureId\) \{[\s\S]*?runtimeState\.visualOverrides\?\.\[id\][\s\S]*?runtimeState\.featureOverrides\?\.\[id\]/.test(politicalFeaturePolicySource)
         && /function isPendingPoliticalColorEditFeature\(feature, featureId = null\) \{[\s\S]*?hasPendingPoliticalColorEdit\(\)[\s\S]*?pendingPoliticalColorEditIds[\s\S]*?pendingIds\.has\(id\);/.test(politicalFeaturePolicySource)
-        && /function isPoliticalForegroundFeature\(feature, featureId = null\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(politicalFeaturePolicySource)
-        && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(politicalFeaturePolicySource)
+        && /function isPoliticalForegroundFeature\(feature, featureId = null, pendingIds = undefined\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(politicalFeaturePolicySource)
+        && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId, pendingIds\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(politicalFeaturePolicySource)
         && /orderPoliticalShellUnderlayFirst\(redrawEntries\)\.forEach/.test(politicalPartialOwnerSource)
         && /orderPoliticalShellUnderlayFirst\(viewport\.visibleItems\)\.forEach/.test(politicalFineLoopSource)
         && /const featureEntries = state\.landData\.features\.map/.test(politicalFineLoopSource)

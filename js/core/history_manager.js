@@ -111,12 +111,17 @@ function captureHistoryState({
   }
 
   if (strategicOverlay) {
-    snapshot.annotationView = cloneStructuredValue(runtimeState.annotationView || {});
-    snapshot.operationalLines = cloneStructuredValue(runtimeState.operationalLines || []);
-    snapshot.operationGraphics = cloneStructuredValue(runtimeState.operationGraphics || []);
-    snapshot.unitCounters = cloneStructuredValue(runtimeState.unitCounters || []);
-    snapshot.specialZoneLayers = cloneStructuredValue(runtimeState.specialZoneLayers || {});
-    snapshot.specialZoneMembershipBrushMode = cloneStructuredValue(runtimeState.specialZoneMembershipBrushMode || "add");
+    const defaults = {
+      annotationView: {}, operationalLines: [], operationGraphics: [], unitCounters: [],
+      specialZoneLayers: {}, specialZoneMembershipBrushMode: "add",
+    };
+    // true preserves legacy callers; scoped callers clone only the collections they edit.
+    const keys = strategicOverlay === true ? Object.keys(defaults) : uniqueKeys(strategicOverlay);
+    keys.forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+        snapshot[key] = cloneStructuredValue(runtimeState[key] || defaults[key]);
+      }
+    });
   }
 
   const intensityChannels = uniqueKeys(intensityFieldChannels);
@@ -236,19 +241,34 @@ function refreshUiAfterHistory(direction, entry) {
   if (entry?.meta?.affectsSovereignty) {
     callRuntimeHook(state, "recomputeDynamicBordersNowFn", { renderNow: false, reason: `history-${direction}` });
   }
-  callRuntimeHooks(state, [
-    "updateToolUIFn",
-    "updateSwatchUIFn",
-    "updatePaintModeUIFn",
-    "updateToolbarInputsFn",
-    "updateActiveSovereignUIFn",
-    "renderCountryListFn",
-    "renderWaterRegionListFn",
-    "renderSpecialRegionListFn",
-    "renderPresetTreeFn",
-    "updateLegendUI",
-    "updateStrategicOverlayUIFn",
-  ]);
+  // Feature-only visual history does not change ownership, region lists,
+  // appearance controls, legend configuration, or strategic overlays. Keep
+  // its UI work local to the color/tool/selection surfaces; broader history
+  // domains still use the complete refresh set below.
+  // The idle renderer refreshes both the map legend and its editor from the
+  // restored colors, so no separate legend refresh is needed here.
+  const uiHooks = featureIds
+    ? [
+      "updateToolUIFn",
+      "updateSwatchUIFn",
+      "updatePaintModeUIFn",
+      "updateActiveSovereignUIFn",
+      "refreshCountryInspectorDetailFn",
+    ]
+    : [
+      "updateToolUIFn",
+      "updateSwatchUIFn",
+      "updatePaintModeUIFn",
+      "updateToolbarInputsFn",
+      "updateActiveSovereignUIFn",
+      "renderCountryListFn",
+      "renderWaterRegionListFn",
+      "renderSpecialRegionListFn",
+      "renderPresetTreeFn",
+      "updateLegendUI",
+      "updateStrategicOverlayUIFn",
+    ];
+  callRuntimeHooks(state, uiHooks);
   flushHistoryRender(`history-${direction}`);
 }
 

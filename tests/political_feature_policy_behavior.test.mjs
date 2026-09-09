@@ -1,17 +1,32 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feature_policy.js";
+import { createRendererShellPolicyHarness } from "./helpers/scenario_chunk_contract_support.mjs";
 
 const feature = (id, properties = {}) => ({ properties: { id, ...properties } });
 
 function fixture() {
-  const h = { state: {}, pending: false, cache: { pendingPoliticalColorEditIds: new Set() } };
+  const h = {
+    state: { activeScenarioId: "scenario-a", colorRevision: 1 },
+    pending: false,
+    pendingReads: 0,
+    cacheReads: 0,
+    cache: { pendingPoliticalColorEditIds: new Set() },
+  };
   h.policy = createPoliticalFeaturePolicy(h.state, {
     getFeatureId: (value) => value?.properties?.id || value?.id,
     getFeatureCountryCodeNormalized: (value) => value?.properties?.country || "",
     getSafeCanvasColor: (value, fallback) => /^#[0-9a-f]{6}$/i.test(value || "") ? value : fallback,
-    hasPendingPoliticalColorEdit: () => h.pending,
-    getRenderPassCacheState: () => h.cache,
+    hasPendingPoliticalColorEdit: () => {
+      h.pendingReads += 1;
+      return h.pending
+        && (!h.cache.pendingPoliticalColorEditScenarioId
+          || h.cache.pendingPoliticalColorEditScenarioId === h.state.activeScenarioId)
+        && (h.cache.pendingPoliticalColorEditRevision === undefined
+          || h.cache.pendingPoliticalColorEditRevision === h.state.colorRevision);
+    },
+    getRenderPassCacheState: () => { h.cacheReads += 1; return h.cache; },
     isAtlantropaFieldDrivenFeature: (value) => !!value?.properties?.atl_render_layer,
     isScenarioAtlantropaVisible: () => h.state.showScenarioAtlantropa !== false,
     isBaseGeographyScenarioFeature: (value) => value?.properties?.render_as_base_geography === true,
@@ -63,6 +78,50 @@ test("paint order is stable and sees replaced override maps and pending cache on
   assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), [primary, shell, detailA, detailB]);
   assert.deepEqual(entries, [detailA, primary, detailB, shell]);
   assert.equal(h.policy.hasVisiblePoliticalForegroundColorOverride(null), false);
+});
+
+test("large paint ordering reads pending validity and cache once and rechecks next invocation", () => {
+  const h = fixture();
+  const entries = Array.from({ length: 12000 }, (_, index) => feature(`detail-${index}`));
+  h.pending = true;
+  h.cache = {
+    pendingPoliticalColorEditIds: new Set(["detail-0"]),
+    pendingPoliticalColorEditScenarioId: "scenario-a",
+    pendingPoliticalColorEditRevision: 1,
+  };
+  const ordered = h.policy.orderPoliticalShellUnderlayFirst(entries);
+  assert.deepEqual(ordered, [...entries.slice(1), entries[0]]);
+  assert.equal(h.pendingReads, 1);
+  assert.equal(h.cacheReads, 1);
+
+  h.state.colorRevision = 2;
+  assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), entries);
+  assert.equal(h.pendingReads, 2);
+  assert.equal(h.cacheReads, 1);
+
+  h.cache.pendingPoliticalColorEditRevision = 2;
+  h.cache.pendingPoliticalColorEditIds = new Set(["detail-1"]);
+  assert.equal(h.policy.orderPoliticalShellUnderlayFirst(entries).at(-1), entries[1]);
+  h.state.activeScenarioId = "scenario-b";
+  assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), entries);
+  assert.equal(h.pendingReads, 4);
+  assert.equal(h.cacheReads, 2);
+});
+
+test("foreground reader without a sorting snapshot observes each pending replacement", () => {
+  const source = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+  const h = createRendererShellPolicyHarness(
+    source("../js/core/map_renderer.js"),
+    source("../js/core/renderer/political_partial_repaint_owner.js"),
+  );
+  const item = feature("detail-a");
+  assert.equal(h.isPoliticalForegroundFeature(item), false);
+  h.setPendingColorEditIds(["detail-a"]);
+  assert.equal(h.isPoliticalForegroundFeature(item), true);
+  h.setPendingColorEditIds(["detail-b"]);
+  assert.equal(h.isPoliticalForegroundFeature(item), false);
+  h.setVisualOverrides({ "detail-a": "#112233" });
+  assert.equal(h.isPoliticalForegroundFeature(item), true);
 });
 
 test("visual and interaction eligibility retain Antarctic, base geography, and helper distinctions", () => {

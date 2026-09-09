@@ -38,9 +38,10 @@ function createCanvasContext() {
     setLineDash(pattern) {
       calls.push({ type: "setLineDash", pattern: [...pattern] });
     },
-    stroke() {
+    stroke(path) {
       calls.push({
         type: "stroke",
+        path,
         alpha: this.globalAlpha,
         lineWidth: this.lineWidth,
         strokeStyle: this.strokeStyle,
@@ -55,6 +56,7 @@ function createOwner({
   hgoVectorScene = false,
   pathBoundsInScreen = () => true,
   showRivers = true,
+  pathCanvas = null,
 } = {}) {
   const metrics = [];
   const pathCalls = [];
@@ -90,7 +92,7 @@ function createOwner({
       getContextBaseZoomBucketId: (k) => (k < 1.4 ? "low" : k < 2.5 ? "mid" : "high"),
       getDashPattern: () => [4, 2],
       getFeatureCollectionFeatureCount: (collection) => collection?.features?.length || 0,
-      getPathCanvas: () => (feature) => pathCalls.push(feature),
+      getPathCanvas: () => pathCanvas || ((feature) => pathCalls.push(feature)),
       getSafeCanvasColor: (color, fallback) => color || fallback,
       nowMs: () => 10,
       pathBoundsInScreen,
@@ -229,4 +231,91 @@ test("river layer owner applies interactive alpha caps", () => {
   assert.equal(interactiveStrokes.length, 2);
   assert.ok(interactiveStrokes[0].alpha < normalStrokes[0].alpha);
   assert.ok(interactiveStrokes[1].alpha < normalStrokes[1].alpha);
+});
+
+function installPath2D(t) {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "Path2D");
+  class TestPath2D { features = []; }
+  Object.defineProperty(globalThis, "Path2D", { configurable: true, value: TestPath2D });
+  t.after(() => {
+    if (previous) Object.defineProperty(globalThis, "Path2D", previous);
+    else delete globalThis.Path2D;
+  });
+}
+
+function createSwitchablePath(context, { throws = false, ignoresSetter = false } = {}) {
+  let target = context;
+  const calls = [];
+  const path = (feature) => {
+    calls.push({ feature, target });
+    if (throws) throw new Error("projection failed");
+    target.features?.push(feature);
+  };
+  path.context = function(next) {
+    if (!arguments.length) return target;
+    if (!ignoresSetter) target = next;
+    return path;
+  };
+  return { path, calls };
+}
+
+test("river geometry is projected once per outlined feature with outline-before-core order", (t) => {
+  installPath2D(t);
+  const context = createCanvasContext();
+  const a = createFeature("River", 2);
+  const b = createFeature("River", 3);
+  const canal = createFeature("Canal", 3);
+  const projection = createSwitchablePath(context);
+  const harness = createOwner({ context, features: [a, b, canal], pathCanvas: projection.path });
+  harness.owner.drawRiversLayer(3);
+  const strokes = context.calls.filter((call) => call.type === "stroke");
+  assert.deepEqual(projection.calls.map((call) => call.feature), [a, b, canal]);
+  assert.deepEqual(strokes.map((call) => call.strokeStyle), ["#ddeeff", "#ddeeff", "#336699", "#336699", "#336699"]);
+  assert.equal(strokes[0].path, strokes[2].path);
+  assert.equal(strokes[1].path, strokes[3].path);
+  assert.deepEqual(strokes[0].path.features, [a]);
+  assert.deepEqual(strokes[1].path.features, [b]);
+  assert.equal(strokes[4].path, undefined);
+  assert.equal(projection.path.context(), context);
+  harness.owner.drawRiversLayer(3);
+  const laterStrokes = context.calls.filter((call) => call.type === "stroke").slice(5);
+  assert.notEqual(laterStrokes[0].path, strokes[0].path);
+  assert.equal(projection.calls.length, 6);
+});
+
+test("river geometry restores shared d3 and canvas contexts after projection failure", (t) => {
+  installPath2D(t);
+  const context = createCanvasContext();
+  const projection = createSwitchablePath(context, { throws: true });
+  const harness = createOwner({ context, features: [createFeature("River", 2)], pathCanvas: projection.path });
+  assert.throws(() => harness.owner.drawRiversLayer(1), /projection failed/);
+  assert.equal(projection.path.context(), context);
+  assert.equal(context.calls.at(-1).type, "restore");
+  assert.equal(harness.metrics.length, 0);
+});
+
+test("river geometry keeps legacy drawing when d3 context cannot be switched", (t) => {
+  installPath2D(t);
+  const context = createCanvasContext();
+  const projection = createSwitchablePath(context, { ignoresSetter: true });
+  const harness = createOwner({ context, features: [createFeature("River", 2)], pathCanvas: projection.path });
+  harness.owner.drawRiversLayer(1);
+  assert.equal(projection.calls.length, 2);
+  assert.ok(projection.calls.every((call) => call.target === context));
+  assert.ok(context.calls.filter((call) => call.type === "stroke").every((call) => !call.path));
+});
+
+test("river geometry fallback without context API preserves widths alpha and dash", (t) => {
+  installPath2D(t);
+  const fallback = createOwner({ features: [createFeature("River", 2)] });
+  const context = createCanvasContext();
+  const projection = createSwitchablePath(context);
+  const reused = createOwner({ context, features: [createFeature("River", 2)], pathCanvas: projection.path });
+  fallback.owner.drawRiversLayer(1.5, { interactive: true });
+  reused.owner.drawRiversLayer(1.5, { interactive: true });
+  const styles = (harness) => harness.context.calls.filter((call) => call.type === "stroke").map(({ path, ...style }) => style);
+  assert.deepEqual(styles(reused), styles(fallback));
+  assert.equal(fallback.pathCalls.length, 2);
+  assert.equal(projection.calls.length, 1);
+  assert.deepEqual(reused.metrics, fallback.metrics);
 });

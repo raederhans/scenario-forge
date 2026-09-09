@@ -17,6 +17,7 @@ import pandas as pd
 from shapely.geometry import Point
 
 from map_builder import config as cfg
+from map_builder.city_contract import validate_city_features
 from map_builder.io.fetch import fetch_or_cache_binary
 from map_builder.io.readers import load_populated_places, read_json_optional
 from map_builder.io.writers import write_json_atomic
@@ -659,6 +660,8 @@ def merge_world_cities(geonames_gdf: gpd.GeoDataFrame, natural_earth_gdf: gpd.Ge
     ne_index = _build_ne_candidate_index(natural_earth_gdf)
     used_ne_indices: set[int] = set()
     rows: list[dict[str, object]] = []
+    matches: list[tuple[dict[str, object], int | None]] = []
+    ne_identity_owners: dict[int, tuple[float, str]] = {}
 
     for geo_row in geonames_gdf.to_dict(orient="records"):
         country_code = _clean_text(geo_row.get("country_code")).upper()
@@ -666,7 +669,7 @@ def merge_world_cities(geonames_gdf: gpd.GeoDataFrame, natural_earth_gdf: gpd.Ge
         for key in _record_name_keys(geo_row):
             candidate_indices.update(ne_index.get((country_code, key), set()))
         best_idx: int | None = None
-        best_score: tuple[float, int, int] | None = None
+        best_score: tuple[float, int, int, str] | None = None
         for idx in candidate_indices:
             ne_row = natural_earth_gdf.iloc[idx]
             distance_km = _haversine_km(
@@ -681,13 +684,23 @@ def merge_world_cities(geonames_gdf: gpd.GeoDataFrame, natural_earth_gdf: gpd.Ge
                 distance_km,
                 -_capital_score(ne_row.get("capital_kind")),
                 -_safe_int(ne_row.get("population")),
+                _clean_text(ne_row.get("id")),
             )
             if best_score is None or score < best_score:
                 best_score = score
                 best_idx = idx
 
-        match_row = None
+        matches.append((geo_row, best_idx))
         if best_idx is not None:
+            owner_score = (best_score[0], _clean_text(geo_row.get("id")))
+            if best_idx not in ne_identity_owners or owner_score < ne_identity_owners[best_idx]:
+                ne_identity_owners[best_idx] = owner_score
+
+    # A Natural Earth identity belongs to exactly one GeoNames point. Choosing
+    # the nearest match first avoids assigning the identity by source row order.
+    for geo_row, best_idx in matches:
+        match_row = None
+        if best_idx is not None and _clean_text(geo_row.get("id")) == ne_identity_owners[best_idx][1]:
             used_ne_indices.add(best_idx)
             match_row = natural_earth_gdf.iloc[best_idx].to_dict()
         rows.append(_merge_city_rows(geo_row, match_row))
@@ -1111,10 +1124,13 @@ def build_world_cities(
     merged["host_feature_id"] = merged["political_feature_id"].fillna("").astype(str)
     merged["urban_match_id"] = merged["urban_area_id"].fillna("").astype(str)
     merged["is_capital"] = merged["capital_kind"].fillna("").astype(str) != "place"
-    return gpd.GeoDataFrame(merged, crs="EPSG:4326")
+    result = gpd.GeoDataFrame(merged, crs="EPSG:4326")
+    validate_city_features(result.iterfeatures(drop_id=True))
+    return result
 
 
 def build_city_aliases_payload(world_cities: gpd.GeoDataFrame) -> dict[str, object]:
+    validate_city_features(world_cities.iterfeatures(drop_id=True))
     alias_to_city_ids: dict[str, set[str]] = {}
     alias_to_stable_keys: dict[str, set[str]] = {}
     entries: list[dict[str, object]] = []

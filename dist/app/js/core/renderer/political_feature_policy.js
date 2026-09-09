@@ -61,10 +61,12 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     return pendingIds instanceof Set && pendingIds.has(id);
   }
 
-  function isPoliticalForegroundFeature(feature, featureId = null) {
+  function isPoliticalForegroundFeature(feature, featureId = null, pendingIds = undefined) {
     const id = String(featureId || getFeatureId(feature) || "").trim();
     return hasPoliticalForegroundColorOverride(id)
-      || isPendingPoliticalColorEditFeature(feature, id);
+      || (pendingIds === undefined
+        ? isPendingPoliticalColorEditFeature(feature, id)
+        : !!id && pendingIds instanceof Set && pendingIds.has(id));
   }
 
   function hasVisiblePoliticalForegroundColorOverride(entries = []) {
@@ -80,11 +82,14 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     const underlayEntries = [];
     const detailEntries = [];
     const foregroundEntries = [];
+    const pendingIds = hasPendingPoliticalColorEdit()
+      ? getRenderPassCacheState().pendingPoliticalColorEditIds ?? null
+      : null;
     entries.forEach((entry) => {
       const feature = entry?.feature || entry;
       const featureId = entry?.id || getFeatureId(feature);
       let target = detailEntries;
-      if (isPoliticalForegroundFeature(feature, featureId)) {
+      if (isPoliticalForegroundFeature(feature, featureId, pendingIds)) {
         target = foregroundEntries;
       } else if (isPoliticalUnderlayFeature(feature, featureId)) {
         target = underlayEntries;

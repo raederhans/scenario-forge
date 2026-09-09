@@ -42,3 +42,8 @@ export function updateIntensityFieldChannelState(target, channelId, mutate) {
   );
 }
 export function setIntensityFieldToolState(target, value) { assertTarget(target); target.intensityFieldTool = value; return value; }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "intensityFields")) target.intensityFields = patch.intensityFields;
+}

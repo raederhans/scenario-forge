@@ -771,3 +771,16 @@ export function restoreScenarioActivationState(target, snapshot) {
   );
   return true;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "countryBaseColors")) target.countryBaseColors = patch.countryBaseColors;
+  if (Object.hasOwn(patch, "featureOverrides")) target.featureOverrides = patch.featureOverrides;
+  if (Object.hasOwn(patch, "mapSemanticMode")) target.mapSemanticMode = patch.mapSemanticMode;
+  if (Object.hasOwn(patch, "scenarioCountriesByTag")) target.scenarioCountriesByTag = patch.scenarioCountriesByTag;
+  if (Object.hasOwn(patch, "scenarioReleasableIndex")) target.scenarioReleasableIndex = patch.scenarioReleasableIndex;
+  if (Object.hasOwn(patch, "sovereignBaseColors")) target.sovereignBaseColors = patch.sovereignBaseColors;
+  if (Object.hasOwn(patch, "sovereigntyByFeatureId")) target.sovereigntyByFeatureId = patch.sovereigntyByFeatureId;
+  if (Object.hasOwn(patch, "sovereigntyInitialized")) target.sovereigntyInitialized = patch.sovereigntyInitialized;
+  if (Object.hasOwn(patch, "visualOverrides")) target.visualOverrides = patch.visualOverrides;
+}

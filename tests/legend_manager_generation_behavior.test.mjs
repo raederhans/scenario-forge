@@ -218,3 +218,15 @@ test("continent mode filters candidates before area sorting", () => {
   assert.equal(generation.entries.length, 1);
   assert.equal(generation.entries[0].code, "CHI");
 });
+
+
+test("unique colors reads each feature value once and preserves preferred order", () => {
+  let reads = 0;
+  const colors = {};
+  ["#ff0000", "#00ff00", "#ff0000", "#0000ff"].forEach((value, index) => {
+    Object.defineProperty(colors, String(index), { enumerable: true, get() { reads++; return value; } });
+  });
+  const appState = { colors, legendColorOrder: ["#0000ff"], legendConfig: { maxItems: 15 } };
+  assert.deepEqual(LegendManager.getUniqueColors(appState), ["#0000ff", "#ff0000", "#00ff00"]);
+  assert.equal(reads, 4);
+});

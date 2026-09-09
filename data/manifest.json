@@ -218,8 +218,8 @@
       "artifact_class": "publish",
       "owner": "init_map_data.world_cities",
       "description": "Published world city dataset with stable feature links.",
-      "size_bytes": 24981098,
-      "sha256": "6fc6393dea4177b231ef6d8e5d2a7687c8f3c90e5094102a2df452889279d53a",
+      "size_bytes": 24980735,
+      "sha256": "7ae6c36d667a787e7b52421ba5515ff850719850622ea12a0c55ccd7359fd30e",
       "type": "world_cities",
       "feature_count": 21338,
       "country_capital_count": 233,
@@ -231,12 +231,12 @@
       "artifact_class": "publish",
       "owner": "init_map_data.world_cities",
       "description": "City alias lookup generated from world city build outputs.",
-      "size_bytes": 31115167,
-      "sha256": "1e76a5adee7a52901c3a1aa8b10d95f8fc29a86f03c8fa32035bb2ba99b806e6",
+      "size_bytes": 31116634,
+      "sha256": "3238cc9f943a3f56c8e1040aa1ee3d629e0d05bbfe9b0788e5eb0acb833f0618",
       "type": "city_aliases",
       "entry_count": 21338,
-      "alias_count": 189269,
-      "ambiguous_alias_count": 3839
+      "alias_count": 189255,
+      "ambiguous_alias_count": 3935
     },
     "locales.json": {
       "role": "locales",

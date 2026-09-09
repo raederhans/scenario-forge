@@ -2264,7 +2264,9 @@ test(`local projection preserves exact test routes with renderer scope ${include
   }), "edit", { preparedCatalog: binding.preparedCatalog });
   const expectedCommands = [
     ...(includeRenderer ? [
+      "node --test tests/exact_composite_reuse_behavior.test.mjs",
       "node --test tests/history_feature_color_refresh_behavior.test.mjs",
+      "node --test tests/legend_color_revision_behavior.test.mjs",
       "node --test tests/render_pass_signature_policy_behavior.test.mjs",
     ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
@@ -2283,7 +2285,9 @@ test(`local projection preserves exact test routes with renderer scope ${include
     "adaptive-edit-cost-budget-exceeded",
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
+    ...(includeRenderer ? ["node-test:tests/exact_composite_reuse_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/history_feature_color_refresh_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/legend_color_revision_behavior.test.mjs"] : []),
     "node-test:tests/render_change_set_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
@@ -3383,12 +3387,40 @@ test("adaptive execution consumes only an exact and complete changed-file select
   );
 });
 
+test("adaptive selection roundtrips prose-only changes without trusting forged classifications", (t) => {
+  const runtimeTmp = path.join(process.cwd(), ".runtime", "tmp");
+  fs.mkdirSync(runtimeTmp, { recursive: true });
+  const tempRoot = fs.mkdtempSync(path.join(runtimeTmp, "selector-prose-artifact-"));
+  t.after(() => fs.rmSync(tempRoot, { recursive: true, force: true }));
+  const artifactPath = path.join(tempRoot, "selector.json");
+  const changedFiles = [".codex/config.toml", "docs/active/editor-kernel-renewal-20260909/task.md"];
+  const report = buildRecommendation(changedFiles);
+  fs.writeFileSync(artifactPath, JSON.stringify(report));
+  assert.deepEqual(readSelectionArtifact(artifactPath, changedFiles).recommendedCommands, []);
+
+  const forged = structuredClone(report);
+  forged.changedFiles.push("js/unregistered_runtime.js");
+  forged.matchedByFile.push({
+    changedFile: "js/unregistered_runtime.js", matchedRouteIds: [], recommendedCommands: [],
+  });
+  forged.nonBehavioralChangedFiles.push({
+    changedFile: "js/unregistered_runtime.js", classification: "task-documentation",
+    disposition: "no-app-behavior-validation", behaviorTestsRun: false,
+  });
+  fs.writeFileSync(artifactPath, JSON.stringify(forged));
+  assert.throws(() => readSelectionArtifact(artifactPath, forged.changedFiles),
+    /adaptive-selection-artifact-empty-closure/);
+});
+
 test("real selector CLI artifact binds to the repository catalog and drives structured execution", (t) => {
   const runtimeTmp = path.join(process.cwd(), ".runtime", "tmp");
   fs.mkdirSync(runtimeTmp, { recursive: true });
   const tempRoot = fs.mkdtempSync(path.join(runtimeTmp, "selector-adaptive-seam-"));
   t.after(() => fs.rmSync(tempRoot, { recursive: true, force: true }));
-  const changedFiles = [".github/workflows/verify-shared.yml"];
+  const changedFiles = [
+    ".codex/config.toml", ".github/workflows/verify-shared.yml",
+    "docs/active/editor-kernel-renewal-20260909/task.md",
+  ];
   const changedFilesPath = path.join(tempRoot, "changed-files.txt");
   const artifactPath = path.join(tempRoot, "selector.json");
   const markdownPath = path.join(tempRoot, "selector.md");

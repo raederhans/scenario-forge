@@ -121,3 +121,8 @@ export function setExportBakeState(
   const ui = normalizeAndCommit(target, mergeUiDraft(target, patch));
   return { bakeArtifacts: ui.bakeArtifacts };
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "exportWorkbenchUi")) target.exportWorkbenchUi = patch.exportWorkbenchUi;
+}

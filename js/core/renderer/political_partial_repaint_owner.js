@@ -694,6 +694,11 @@ export function createPoliticalPartialRepaintOwner({
     const state = getRuntimeState();
     const islandNeighbors = getDebugMode() === "ISLANDS" ? helper.getIslandNeighborGraph() : null;
     const featureMetrics = { fillMs: 0, strokeMs: 0, renderedCount: 0, renderedIds: new Set() };
+    // This synchronous loop only reads paths. Validate once per pass, including
+    // after scene/projection changes, instead of once for every visible feature.
+    const pathHandle = helper.getPoliticalPathCacheHandle(identity.transform, { resetIfMismatch: false });
+    const paths = pathHandle.valid && pathHandle.map instanceof Map ? pathHandle.map : null;
+    const readPath = (feature, index) => paths?.get(helper.getFeatureId(feature) || `feature-${index}`)?.path || null;
     if (Array.isArray(viewport.visibleItems)) {
       helper.orderPoliticalShellUnderlayFirst(viewport.visibleItems).forEach((item) => {
         drawPoliticalFeature(item.feature, item.drawOrder, {
@@ -703,7 +708,8 @@ export function createPoliticalPartialRepaintOwner({
           islandNeighbors,
           transform: identity.transform,
           skipScreenCheck: true,
-          useCachedPath: true,
+          path: readPath(item.feature, item.drawOrder),
+          useCachedPath: false,
           allowBuildPath: false,
           countPathBuild: false,
           metricsCollector: featureMetrics,
@@ -722,7 +728,8 @@ export function createPoliticalPartialRepaintOwner({
           canvasHeight: identity.canvasHeight,
           islandNeighbors,
           transform: identity.transform,
-          useCachedPath: true,
+          path: readPath(feature, index),
+          useCachedPath: false,
           allowBuildPath: false,
           countPathBuild: false,
           metricsCollector: featureMetrics,

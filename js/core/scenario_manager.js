@@ -56,6 +56,7 @@ import {
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,
   loadScenarioBundle,
+  trimScenarioBundleCaches,
   loadScenarioRegistry,
   resetScenarioChunkRuntimeState,
   releaseScenarioAuditPayload,
@@ -1151,6 +1152,7 @@ async function runScenarioApplyRequest(request) {
       activeScenarioApplyTargetId = "";
       activeScenarioApplyRequestId = 0;
       clearActiveScenarioApplyRequestState(runtimeState);
+      trimScenarioBundleCaches();
       // Post-apply chunk work is deferred while this request owns the apply lock.
       // Resume it only after releasing that lock, while its request is still current.
       if (resumePendingChunks) {
@@ -1403,6 +1405,53 @@ async function applyScenarioById(
   }
 
   return runScenarioApplyRequest(request);
+}
+
+// Project imports stage required scenario assets without selecting/resetting the live scene.
+// Palette selection is an optional project completion step, so staging never borrows
+// the live palette singleton across an await.
+export async function prepareScenarioForProjectImport(scenarioId) {
+  const normalizedId = normalizeScenarioId(scenarioId);
+  if (!normalizedId) return null;
+  assertScenarioInteractionsAllowed("import a project");
+  const bundle = await loadScenarioBundle(normalizedId, { bundleLevel: "full" });
+  const staged = await prepareScenarioApplyState(bundle, { syncPalette: false });
+  return { bundle, staged };
+}
+
+export function commitScenarioForProjectImport(prepared, commitProject, isCurrent) {
+  if (prepared || runtimeState.activeScenarioId) assertScenarioInteractionsAllowed("import a project");
+  if (!isCurrent()) throw Object.assign(new Error("Project import superseded."), { code: "IMPORT_ABORTED" });
+  const rollback = captureScenarioApplyRollbackSnapshot();
+  try {
+    if (prepared) {
+      prepared.staged.scenarioApplyEpoch = nextScenarioApplyEpoch(runtimeState, {
+        scenarioId: prepared.staged.scenarioId, reason: "project-import",
+      });
+      applyPreparedScenarioState(prepared.bundle, prepared.staged);
+    } else if (runtimeState.activeScenarioId) {
+      clearActiveScenario({ renderNow: false, markDirtyReason: "", showToastOnComplete: false });
+    }
+    commitProject();
+  } catch (error) {
+    restoreScenarioApplyRollbackSnapshot(rollback);
+    runPostRollbackRestoreEffects({ renderNow: false });
+    throw error;
+  }
+}
+
+export async function completeScenarioProjectImport(prepared, isCurrent) {
+  if (!prepared || !isCurrent()) return;
+  await runPostScenarioApplyEffects({
+    bundle: prepared.bundle,
+    scenarioId: prepared.staged.scenarioId,
+    scenarioApplyEpoch: prepared.staged.scenarioApplyEpoch,
+    scenarioApplyRequestId: 0,
+    isScenarioApplyRequestCurrent: isCurrent,
+    deferChunkPrewarm: true,
+    renderNow: false,
+    suppressRender: true,
+  });
 }
 
 async function applyDefaultScenarioOnStartup(

@@ -1,3 +1,19 @@
+import { restoreProjectImportFields as restoreScenarioPresentationImportFields } from "../state/actions/scenario_presentation_actions.js";
+import { restoreProjectImportFields as restoreUiVisibilityImportFields } from "../state/actions/ui_visibility_actions.js";
+import { restoreProjectImportFields as restoreAppearancePresetImportFields } from "../state/actions/appearance_preset_actions.js";
+import { restoreProjectImportFields as restoreScenarioActivationImportFields } from "../state/actions/scenario_activation_actions.js";
+import { restoreProjectImportFields as restoreRendererCacheImportFields } from "../state/actions/renderer_cache_actions.js";
+import { restoreProjectImportFields as restoreExportWorkbenchImportFields } from "../state/actions/export_workbench_actions.js";
+import { restoreProjectImportFields as restoreIntensityFieldImportFields } from "../state/actions/intensity_field_actions.js";
+import { restoreProjectImportFields as restoreSpecialZoneImportFields } from "../state/actions/special_zone_actions.js";
+import { restoreProjectImportFields as restoreStrategicOverlayImportFields } from "../state/actions/strategic_overlay_actions.js";
+import { restoreProjectImportFields as restoreAppearanceImportFields } from "../state/actions/appearance_actions.js";
+import { restoreProjectImportFields as restoreAppearanceVisibilityImportFields } from "../state/actions/appearance_visibility_actions.js";
+import { restoreProjectImportFields as restoreAppearanceReferenceImportFields } from "../state/actions/appearance_reference_actions.js";
+import { restoreProjectImportFields as restoreTransportImportFields } from "../state/actions/transport_actions.js";
+import { restoreProjectImportFields as restoreRendererInteractionImportFields } from "../state/actions/renderer_interaction_actions.js";
+import { applyProjectImportPatch } from "../state/actions/project_import_actions.js";
+
 import {
   getFeatureId,
   migrateFeatureScopedProjectDataToCurrentTopology,
@@ -9,26 +25,54 @@ import {
   waitForStartupReadonlyUnlock,
 } from "./wait_readiness.js";
 
+// Commit and rollback use the same synchronous workflow; each action retains its domain.
+export function commitImportedProjectPatch(target, patch) {
+  restoreScenarioPresentationImportFields(target, patch);
+  restoreUiVisibilityImportFields(target, patch);
+  restoreAppearancePresetImportFields(target, patch);
+  restoreScenarioActivationImportFields(target, patch);
+  restoreRendererCacheImportFields(target, patch);
+  restoreExportWorkbenchImportFields(target, patch);
+  restoreIntensityFieldImportFields(target, patch);
+  restoreSpecialZoneImportFields(target, patch);
+  restoreStrategicOverlayImportFields(target, patch);
+  restoreAppearanceImportFields(target, patch);
+  restoreAppearanceVisibilityImportFields(target, patch);
+  restoreAppearanceReferenceImportFields(target, patch);
+  restoreTransportImportFields(target, patch);
+  restoreRendererInteractionImportFields(target, patch);
+  applyProjectImportPatch(target, patch);
+}
+
 export async function prepareImportedProjectState({
   data,
   ui,
   debugState,
   getScenarioResourcesModule,
-  getScenarioDispatcherModule,
+  getScenarioManagerModule,
 }) {
   const scenarioImportAudit = await resolveScenarioImportAudit(data, ui, getScenarioResourcesModule);
   debugState.importPhase = "validated";
   await waitForScenarioApplyIdle();
   await waitForStartupReadonlyUnlock();
   debugState.importPhase = "scenario-idle";
-  await applyImportedScenarioSelection({
-    data,
-    debugState,
-    getScenarioDispatcherModule,
-  });
-
+  const manager = await getScenarioManagerModule();
+  const preparedScenario = await manager.prepareScenarioForProjectImport(data.scenario?.id || "");
+  const scenarioState = preparedScenario ? {
+    activeScenarioId: preparedScenario.staged.scenarioId,
+    activeScenarioManifest: preparedScenario.bundle.manifest,
+    scenarioBaselineOwnersByFeatureId: preparedScenario.staged.resolvedOwners,
+    runtimePoliticalTopology: preparedScenario.staged.runtimeTopologyPayload,
+    runtimeFeatureIds: preparedScenario.staged.scenarioId === state.activeScenarioId ? state.runtimeFeatureIds : [],
+    runtimeFeatureIndexById: preparedScenario.staged.scenarioId === state.activeScenarioId ? state.runtimeFeatureIndexById : null,
+    mapSemanticMode: preparedScenario.staged.mapSemanticMode,
+    scenarioCountriesByTag: preparedScenario.staged.countryMap,
+  } : { activeScenarioId: "", activeScenarioManifest: null, scenarioBaselineOwnersByFeatureId: {},
+    scenarioCountriesByTag: {}, scenarioReleasableIndex: null,
+    runtimePoliticalTopology: state.defaultRuntimePoliticalTopology, runtimeFeatureIds: [], runtimeFeatureIndexById: null };
+  const target = { ...state, ...scenarioState };
   debugState.importPhase = "migration";
-  const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds();
+  const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds(target);
   let migrationSummary = null;
   data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
     landData: scenarioImportValidFeatureIds ? null : state.landData,
@@ -38,11 +82,13 @@ export async function prepareImportedProjectState({
   debugState.importPhase = "migration-done";
   return {
     data,
-    importedOwnershipState: resolveImportedOwnershipState(data),
+    preparedScenario, scenarioState, manager,
+    validFeatureIds: scenarioImportValidFeatureIds,
+    importedOwnershipState: resolveImportedOwnershipState(data, target),
     scenarioImportAudit,
     importSummary: {
-      scenarioId: String(state.activeScenarioId || ""),
-      scenarioName: String(state.activeScenarioManifest?.display_name || state.activeScenarioId || ""),
+      scenarioId: String(target.activeScenarioId || ""),
+      scenarioName: String(target.activeScenarioManifest?.display_name || target.activeScenarioId || ""),
       restoredColorEntries: Object.keys(data.visualOverrides || {}).length,
       restoredOwnershipEntries: Object.keys(data.sovereigntyByFeatureId || {}).length,
       ignoredEntries: migrationSummary?.ignoredEntries ?? null,
@@ -102,79 +148,34 @@ async function resolveScenarioImportAudit(data, ui, getScenarioResourcesModule) 
   return scenarioImportAudit;
 }
 
-async function applyImportedScenarioSelection({
-  data,
-  debugState,
-  getScenarioDispatcherModule,
-}) {
-  const importedScenarioId = String(data.scenario?.id || "").trim();
-  const currentScenarioId = String(state.activeScenarioId || "").trim();
-  if (importedScenarioId) {
-    const {
-      applyScenarioByIdCommand,
-      resetScenarioToBaselineCommand,
-      setScenarioViewModeCommand,
-    } = await getScenarioDispatcherModule();
-    if (importedScenarioId === currentScenarioId) {
-      debugState.importPhase = "scenario-reset";
-      resetScenarioToBaselineCommand({
-        renderMode: "none",
-        markDirtyReason: "",
-        showToastOnComplete: false,
-      });
-    } else {
-      debugState.importPhase = "scenario-apply";
-      await applyScenarioByIdCommand(importedScenarioId, {
-        renderMode: "none",
-        markDirtyReason: "",
-        showToastOnComplete: false,
-      });
-    }
-    setScenarioViewModeCommand(data.scenario.viewMode || "ownership", {
-      renderMode: "none",
-      markDirtyReason: "",
-    });
-    return;
+function getScenarioImportValidFeatureIds(target = state) {
+  // Staged scenario topology omits global coarse/auxiliary features that the
+  // runtime composites into the scene. Keep those trusted identities as well as
+  // baseline owners for regions whose detail chunks are not loaded yet.
+  const ids = new Set(Object.keys(target.scenarioBaselineOwnersByFeatureId || {}));
+  const add = value => { const id = String(value || "").trim(); if (id) ids.add(id); };
+  for (const id of Array.isArray(target.runtimeFeatureIds) ? target.runtimeFeatureIds : []) add(id);
+  if (target.runtimeFeatureIndexById instanceof Map) target.runtimeFeatureIndexById.forEach((_value, id) => add(id));
+  for (const topology of [
+    target.runtimePoliticalTopology,
+    target.defaultRuntimePoliticalTopology,
+    target.topologyPrimary || target.topology,
+    // Plain projects use base detail regions. A scenario instead supplies its
+    // own trusted runtime topology and must not inherit a prior detail variant.
+    !target.activeScenarioId ? target.topologyDetail : null,
+  ]) {
+    const geometries = topology?.objects?.political?.geometries;
+    for (const geometry of Array.isArray(geometries) ? geometries : []) add(getFeatureId(geometry));
   }
-  if (state.activeScenarioId) {
-    const { clearActiveScenarioCommand } = await getScenarioDispatcherModule();
-    debugState.importPhase = "scenario-clear";
-    clearActiveScenarioCommand({
-      renderMode: "none",
-      markDirtyReason: "",
-      showToastOnComplete: false,
-    });
-  }
+  return ids.size ? ids : null;
 }
 
-function getScenarioImportValidFeatureIds() {
-  if (!String(state.activeScenarioId || "").trim()) {
-    return null;
-  }
-  // Preserve the runtime source priority, adding trusted scenario IDs that may
-  // not yet be present in the partially loaded geometry.
-  const baselineIds = Object.keys(state.scenarioBaselineOwnersByFeatureId || {});
-  if (Array.isArray(state.runtimeFeatureIds) && state.runtimeFeatureIds.length) {
-    return new Set(baselineIds.concat(state.runtimeFeatureIds
-        .map((featureId) => String(featureId || "").trim()).filter(Boolean)));
-  }
-  if (state.runtimeFeatureIndexById instanceof Map && state.runtimeFeatureIndexById.size) {
-    return new Set(baselineIds.concat(Array.from(state.runtimeFeatureIndexById.keys())
-      .map((featureId) => String(featureId || "").trim()).filter(Boolean)));
-  }
-  const runtimeGeometries = state.runtimePoliticalTopology?.objects?.political?.geometries;
-  if (Array.isArray(runtimeGeometries) && runtimeGeometries.length) {
-    return new Set(baselineIds.concat(runtimeGeometries.map((geometry) => getFeatureId(geometry)).filter(Boolean)));
-  }
-  return baselineIds.length ? new Set(baselineIds) : null;
-}
-
-function resolveImportedOwnershipState(data) {
+function resolveImportedOwnershipState(data, target = state) {
   const importedOwnersByFeatureId = normalizeFeatureOwnershipMap(data.sovereigntyByFeatureId);
-  if (state.activeScenarioId) {
+  if (target.activeScenarioId) {
     return {
       sovereigntyByFeatureId: {
-        ...(state.scenarioBaselineOwnersByFeatureId || {}),
+        ...(target.scenarioBaselineOwnersByFeatureId || {}),
         ...importedOwnersByFeatureId,
       },
       shouldRestoreScenarioBaselineControllers: false,

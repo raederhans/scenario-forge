@@ -33,6 +33,36 @@ function createRoute({
   };
 }
 
+test("integrated runtime owners receive cumulative P4 admission without losing behavior routes", () => {
+  const cases = [
+    ["js/core/data_loader.js", "node --test tests/startup_cached_topology_behavior.test.mjs"],
+    ["js/core/interaction_funnel.js", "node tools/e2e_layering.mjs run-spec tests/e2e/interaction_funnel_contract.spec.js"],
+    ["js/core/legend_manager.js", "node --test tests/legend_color_revision_behavior.test.mjs"],
+    ["js/core/project_package_io.js", "test:node:annotation-productization"],
+    ["js/core/renderer/city_points_render_owner.js", "test:node:city-points-render-owner"],
+    ["js/core/renderer/exact_composite_reuse_owner.js", "node --test tests/exact_composite_reuse_behavior.test.mjs"],
+    ["js/core/renderer/legend_control_owner.js", "node --test tests/legend_control_owner_behavior.test.mjs"],
+    ["js/core/renderer/river_layer_render_owner.js", "test:node:river-layer-owner"],
+    ["js/core/renderer/spatial_index_runtime_owner.js", "node --test tests/spatial_index_runtime_owner_behavior.test.mjs"],
+    ["js/core/scenario/bundle_cache.js", "node --test tests/scenario_cache_byte_budget_behavior.test.mjs"],
+    ["js/core/scenario/core_value_normalizer.js", "node --test tests/scenario_core_value_normalizer_behavior.test.mjs"],
+    ["js/core/scenario/rollback_clone.js", "node --test tests/scenario_cache_efficiency_behavior.test.mjs"],
+    ["js/core/scenario/shared.js", "test:node:p4:p4-2a"],
+    ["js/core/startup_cache.js", "test:node:p4:p4-1"],
+    ["js/core/startup_worker_client.js", "node --test tests/startup_cached_topology_behavior.test.mjs"],
+    ["js/workers/startup_boot.worker.js", "node --test tests/startup_cached_topology_behavior.test.mjs"],
+  ];
+  const changedFiles = cases.map(([file]) => file);
+  const routes = buildRouteIndex();
+  const recommendation = buildRecommendation(changedFiles, routes);
+  const report = buildP4StateActionRouteReport({ phase: "P4.4", changedFiles, recommendation, routes });
+  assert.equal(report.verdict, "pass", JSON.stringify(report.routeGaps));
+  for (const [file, behaviorCommand] of cases) {
+    const entry = recommendation.matchedByFile.find((item) => item.changedFile === file);
+    if (behaviorCommand) assert.ok(entry.recommendedCommands.some((item) => item.commandRef === behaviorCommand), file);
+  }
+});
+
 function createRecommendation({
   changedFile = "tools/state_writer_policy.mjs",
   route = createRoute(),
@@ -417,6 +447,46 @@ test("selector unmatched files fail even outside the P4-owned path set", () => {
   assert.deepEqual(report.routeGaps.map((gap) => gap.code), [
     "selector-unmatched-file",
   ]);
+});
+
+test("task records and agent config are reported as nonbehavioral, not as executed coverage", () => {
+  const changedFiles = [
+    "docs/active/editor-kernel-renewal-20260909/plan.md",
+    "docs/active/editor-kernel-renewal-20260909/context.md",
+    "docs/active/editor-kernel-renewal-20260909/task.md",
+    "docs/active/business-efficiency-20260908/editing-analysis.md",
+    "docs/active/business-efficiency-20260908/render-reuse-analysis.md",
+    ".codex/config.toml",
+  ];
+  const report = buildP4StateActionRouteReport({
+    phase: "P4.4", changedFiles, routes: [],
+    recommendation: { unmatchedChangedFiles: changedFiles },
+  });
+  assert.equal(report.verdict, "pass");
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(report.selectorUnmatchedChangedFiles, changedFiles);
+  assert.equal(report.nonBehavioralChangedFiles.length, changedFiles.length);
+  assert.ok(report.nonBehavioralChangedFiles.every((entry) => entry.behaviorTestsRun === false));
+  assert.equal(report.nonBehavioralChangedFiles.find((entry) => entry.changedFile === ".codex/config.toml").classification, "agent-tool-config");
+  assert.ok(report.files.every((entry) => !entry.selectorMatched));
+});
+
+test("nonbehavioral classification never covers adjacent code or unknown documents", () => {
+  const changedFiles = [
+    "docs/active/editor-kernel-renewal-20260909/task.js",
+    "docs/active/editor-kernel-renewal-20260909/unknown.md",
+    "docs/archive/task.md",
+    "js/core/task.js",
+    ".codex/unknown.toml",
+  ];
+  const report = buildP4StateActionRouteReport({
+    phase: "P4.4", changedFiles, routes: [],
+    recommendation: { unmatchedChangedFiles: changedFiles },
+  });
+  assert.equal(report.verdict, "fail");
+  assert.deepEqual(report.nonBehavioralChangedFiles, []);
+  assert.equal(report.unmatchedChangedFiles.length, changedFiles.length);
+  assert.ok(report.routeGaps.some((gap) => gap.changedFile === "js/core/task.js" && gap.code === "missing-direct-state-ownership-route"));
 });
 
 test("matched non-P4 support files do not require state-ownership routes", () => {

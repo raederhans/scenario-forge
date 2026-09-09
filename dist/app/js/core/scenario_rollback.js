@@ -63,6 +63,7 @@ import {
   scheduleScenarioChunkRefresh,
 } from "./scenario_resources.js";
 import { cloneScenarioStateValue } from "./scenario/shared.js";
+import { createScenarioRollbackClone } from "./scenario/rollback_clone.js";
 const state = runtimeState;
 
 // 回滚快照是 scenario apply 的最后一道事务边界；这里的字段清单必须和
@@ -223,24 +224,24 @@ function validateScenarioApplyRollbackSnapshot(snapshot) {
   throw new Error(`Invalid rollback snapshot: missing required keys: ${preview}${suffix}`);
 }
 
-function cloneScenarioRollbackCaptureValues(snapshot) {
+function cloneScenarioRollbackCaptureValues(snapshot, cloneValue) {
   return Object.fromEntries(
     Object.entries(snapshot.values).map(([key, value]) => [
       key,
-      cloneScenarioStateValue(value),
+      cloneValue(value),
     ]),
   );
 }
 
-function captureScenarioRuntimeSnapshot() {
+function captureScenarioRuntimeSnapshot(cloneValue) {
   const activationValues = cloneScenarioRollbackCaptureValues(
-    captureScenarioActivationState(runtimeState),
+    captureScenarioActivationState(runtimeState), cloneValue,
   );
   const supplementalValues =
     captureScenarioTransactionRollbackSupplementalState(
       runtimeState,
       {
-        cloneValue: cloneScenarioStateValue,
+        cloneValue,
         readHookSource: readRegisteredRuntimeHookSource,
         scheduleScenarioChunkRefreshSource:
           scheduleScenarioChunkRefresh,
@@ -249,10 +250,10 @@ function captureScenarioRuntimeSnapshot() {
       },
     ).values;
   const scenarioHealthValues = cloneScenarioRollbackCaptureValues(
-    captureScenarioHealthState(runtimeState),
+    captureScenarioHealthState(runtimeState), cloneValue,
   );
   const scenarioPerformanceHintValues = cloneScenarioRollbackCaptureValues(
-    captureActiveScenarioPerformanceHintsState(runtimeState),
+    captureActiveScenarioPerformanceHintsState(runtimeState), cloneValue,
   );
   return {
     ...activationValues,
@@ -262,14 +263,14 @@ function captureScenarioRuntimeSnapshot() {
   };
 }
 
-function captureScenarioPresentationSnapshot() {
+function captureScenarioPresentationSnapshot(cloneValue) {
   ensureScenarioAuditUiState();
   const {
     ui,
     styleConfig,
     ...presentationValues
   } = cloneScenarioRollbackCaptureValues(
-    captureScenarioPresentationState(runtimeState),
+    captureScenarioPresentationState(runtimeState), cloneValue,
   );
   return {
     ...presentationValues,
@@ -279,33 +280,34 @@ function captureScenarioPresentationSnapshot() {
         !!ui?.scenarioVisualAdjustmentsOpen,
     },
     styleConfigOcean:
-      cloneScenarioStateValue(styleConfig?.ocean || {}),
+      styleConfig?.ocean || {},
   };
 }
 
-function captureScenarioPaletteSnapshot() {
+function captureScenarioPaletteSnapshot(cloneValue) {
   return cloneScenarioRollbackCaptureValues(
     captureScenarioPaletteState(
       runtimeState,
       {
-        clonePaletteLoadErrorById: cloneScenarioStateValue,
+        clonePaletteLoadErrorById: (value) => value,
       },
-    ),
+    ), cloneValue,
   );
 }
 
 export function captureScenarioApplyRollbackSnapshot() {
+  const cloneValue = createScenarioRollbackClone();
   const optionalState =
     captureScenarioTransactionRollbackOptionalState(
       runtimeState,
-      { cloneValue: cloneScenarioStateValue },
+      { cloneValue },
     );
   return {
     rollbackPresentStateKeys: optionalState.presentKeys,
-    ...captureScenarioRuntimeSnapshot(),
-    ...captureScenarioPresentationSnapshot(),
+    ...captureScenarioRuntimeSnapshot(cloneValue),
+    ...captureScenarioPresentationSnapshot(cloneValue),
     ...optionalState.values,
-    ...captureScenarioPaletteSnapshot(),
+    ...captureScenarioPaletteSnapshot(cloneValue),
   };
 }
 

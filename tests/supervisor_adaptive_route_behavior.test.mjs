@@ -182,7 +182,9 @@ test("SF-ATS docs route stays scoped to registry and work package docs", () => {
   assert.deepEqual(registryReport.unmatchedChangedFiles, []);
   assert.ok(commandRefs(registryReport).includes("verify:supervisor-contracts"));
   assert.deepEqual(unrelatedActiveDocReport.recommendedCommands, []);
-  assert.deepEqual(unrelatedActiveDocReport.unmatchedChangedFiles, ["docs/active/unrelated-task/context.md"]);
+  assert.deepEqual(unrelatedActiveDocReport.unmatchedChangedFiles, []);
+  assert.deepEqual(unrelatedActiveDocReport.unroutedChangedFiles, ["docs/active/unrelated-task/context.md"]);
+  assert.equal(unrelatedActiveDocReport.nonBehavioralChangedFiles[0].classification, "task-documentation");
   assert.deepEqual(unrelatedTestingDocReport.recommendedCommands, []);
   assert.deepEqual(unrelatedTestingDocReport.unmatchedChangedFiles, ["docs/testing/unrelated.md"]);
 });

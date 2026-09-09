@@ -344,8 +344,9 @@ export function createPoliticalBackgroundRenderOwner({
       if (resolvedPath) {
         reusedPathCount += 1;
       } else if (allowBuildPaths && pathCacheHandle?.valid && pathCacheHandle.map instanceof Map) {
-        const hadCachedPath = !!pathCacheHandle.map.get(meta.id)?.path;
-        const pathEntry = getPoliticalFeaturePathEntry(meta.feature, {
+        const cachedEntry = pathCacheHandle.map.get(meta.id);
+        const hadCachedPath = !!cachedEntry?.path;
+        const pathEntry = hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(meta.feature, {
           featureId: meta.id,
           transform,
           allowBuild: true,
@@ -658,6 +659,7 @@ export function createPoliticalBackgroundRenderOwner({
     let builtCount = 0;
     let reusedCount = 0;
     let pathlessCount = 0;
+    const pathCacheHandle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
     while (deferredState.index < normalizedEntries.length) {
       if (processedCount > 0 && (nowMs() - startedAt) >= POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS) break;
       if (
@@ -676,9 +678,9 @@ export function createPoliticalBackgroundRenderOwner({
         pathlessCount += 1;
         continue;
       }
-      const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
-      const hadCachedPath = !!handle?.map?.get(featureId)?.path;
-      const pathEntry = getPoliticalFeaturePathEntry(entry.feature, {
+      const cachedEntry = pathCacheHandle?.valid ? pathCacheHandle.map?.get(featureId) : null;
+      const hadCachedPath = !!cachedEntry?.path;
+      const pathEntry = hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(entry.feature, {
         featureId,
         transform,
         allowBuild: true,

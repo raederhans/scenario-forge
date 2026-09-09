@@ -783,3 +783,16 @@ export function restoreScenarioTransactionPresentationState(
   );
   return true;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "activeSovereignCode")) target.activeSovereignCode = patch.activeSovereignCode;
+  if (Object.hasOwn(patch, "batchFillScope")) target.batchFillScope = patch.batchFillScope;
+  if (Object.hasOwn(patch, "expandedInspectorContinents")) target.expandedInspectorContinents = patch.expandedInspectorContinents;
+  if (Object.hasOwn(patch, "expandedInspectorReleaseParents")) target.expandedInspectorReleaseParents = patch.expandedInspectorReleaseParents;
+  if (Object.hasOwn(patch, "inspectorExpansionInitialized")) target.inspectorExpansionInitialized = patch.inspectorExpansionInitialized;
+  if (Object.hasOwn(patch, "inspectorHighlightCountryCode")) target.inspectorHighlightCountryCode = patch.inspectorHighlightCountryCode;
+  if (Object.hasOwn(patch, "interactionGranularity")) target.interactionGranularity = patch.interactionGranularity;
+  if (Object.hasOwn(patch, "paintMode")) target.paintMode = patch.paintMode;
+  if (Object.hasOwn(patch, "selectedInspectorCountryCode")) target.selectedInspectorCountryCode = patch.selectedInspectorCountryCode;
+}

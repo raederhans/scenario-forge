@@ -211,3 +211,9 @@ export function setSphericalFeatureDiagnosticsCacheEntryState(
   );
   return true;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "dynamicBordersDirty")) target.dynamicBordersDirty = patch.dynamicBordersDirty;
+  if (Object.hasOwn(patch, "dynamicBordersDirtyReason")) target.dynamicBordersDirtyReason = patch.dynamicBordersDirtyReason;
+}

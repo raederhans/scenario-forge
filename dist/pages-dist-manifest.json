@@ -22,7 +22,7 @@
     },
     {
       "path": "app/data/city_aliases.json",
-      "size_bytes": 3619854,
+      "size_bytes": 3590485,
       "source_kind": "generated_ignored"
     },
     {
@@ -38092,7 +38092,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/strategic_values.by_feature.json",
-      "size_bytes": 2049351,
+      "size_bytes": 2049327,
       "source_kind": "generated_ignored"
     },
     {
@@ -39797,7 +39797,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/strategic_values.by_feature.json",
-      "size_bytes": 2047810,
+      "size_bytes": 2047786,
       "source_kind": "generated_ignored"
     },
     {
@@ -45517,7 +45517,7 @@
     },
     {
       "path": "app/data/world_cities.geojson",
-      "size_bytes": 24981098,
+      "size_bytes": 24980735,
       "source_kind": "generated_ignored"
     },
     {
@@ -45552,7 +45552,7 @@
     },
     {
       "path": "app/js/bootstrap/post_ready_scheduler.js",
-      "size_bytes": 14461,
+      "size_bytes": 21829,
       "source_kind": "dist"
     },
     {
@@ -45567,7 +45567,7 @@
     },
     {
       "path": "app/js/bootstrap/startup_bootstrap_support.js",
-      "size_bytes": 14721,
+      "size_bytes": 15292,
       "source_kind": "dist"
     },
     {
@@ -45587,7 +45587,7 @@
     },
     {
       "path": "app/js/bootstrap/startup_ready_handoff.js",
-      "size_bytes": 12843,
+      "size_bytes": 13771,
       "source_kind": "dist"
     },
     {
@@ -45662,7 +45662,7 @@
     },
     {
       "path": "app/js/core/data_loader.js",
-      "size_bytes": 64268,
+      "size_bytes": 65742,
       "source_kind": "dist"
     },
     {
@@ -45692,7 +45692,7 @@
     },
     {
       "path": "app/js/core/file_manager.js",
-      "size_bytes": 46365,
+      "size_bytes": 47721,
       "source_kind": "dist"
     },
     {
@@ -45732,7 +45732,7 @@
     },
     {
       "path": "app/js/core/history_manager.js",
-      "size_bytes": 14318,
+      "size_bytes": 14981,
       "source_kind": "dist"
     },
     {
@@ -45752,12 +45752,12 @@
     },
     {
       "path": "app/js/core/interaction_funnel.js",
-      "size_bytes": 18418,
+      "size_bytes": 24422,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/interaction_funnel/import_apply_orchestration.js",
-      "size_bytes": 6933,
+      "size_bytes": 9718,
       "source_kind": "dist"
     },
     {
@@ -45772,7 +45772,7 @@
     },
     {
       "path": "app/js/core/legend_manager.js",
-      "size_bytes": 21666,
+      "size_bytes": 22758,
       "source_kind": "dist"
     },
     {
@@ -45787,7 +45787,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 560906,
+      "size_bytes": 561795,
       "source_kind": "dist"
     },
     {
@@ -45892,7 +45892,7 @@
     },
     {
       "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-      "size_bytes": 33359,
+      "size_bytes": 32748,
       "source_kind": "dist"
     },
     {
@@ -45917,7 +45917,7 @@
     },
     {
       "path": "app/js/core/palette_manager.js",
-      "size_bytes": 20546,
+      "size_bytes": 20646,
       "source_kind": "dist"
     },
     {
@@ -45942,7 +45942,7 @@
     },
     {
       "path": "app/js/core/project_package_io.js",
-      "size_bytes": 15583,
+      "size_bytes": 15661,
       "source_kind": "dist"
     },
     {
@@ -46037,7 +46037,7 @@
     },
     {
       "path": "app/js/core/renderer/city_points_render_owner.js",
-      "size_bytes": 17844,
+      "size_bytes": 18422,
       "source_kind": "dist"
     },
     {
@@ -46071,6 +46071,11 @@
       "source_kind": "dist"
     },
     {
+      "path": "app/js/core/renderer/exact_composite_reuse_owner.js",
+      "size_bytes": 1946,
+      "source_kind": "dist"
+    },
+    {
       "path": "app/js/core/renderer/facility_surface.js",
       "size_bytes": 12609,
       "source_kind": "dist"
@@ -46092,7 +46097,7 @@
     },
     {
       "path": "app/js/core/renderer/legend_control_owner.js",
-      "size_bytes": 20242,
+      "size_bytes": 20639,
       "source_kind": "dist"
     },
     {
@@ -46142,7 +46147,7 @@
     },
     {
       "path": "app/js/core/renderer/political_background_render_owner.js",
-      "size_bytes": 50513,
+      "size_bytes": 50700,
       "source_kind": "dist"
     },
     {
@@ -46152,12 +46157,12 @@
     },
     {
       "path": "app/js/core/renderer/political_feature_policy.js",
-      "size_bytes": 7914,
+      "size_bytes": 8192,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/renderer/political_partial_repaint_owner.js",
-      "size_bytes": 32587,
+      "size_bytes": 33169,
       "source_kind": "dist"
     },
     {
@@ -46267,12 +46272,12 @@
     },
     {
       "path": "app/js/core/renderer/river_layer_render_owner.js",
-      "size_bytes": 8239,
+      "size_bytes": 9220,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
-      "size_bytes": 14050,
+      "size_bytes": 17066,
       "source_kind": "dist"
     },
     {
@@ -46307,7 +46312,7 @@
     },
     {
       "path": "app/js/core/renderer/spatial_index_runtime_owner.js",
-      "size_bytes": 13680,
+      "size_bytes": 13820,
       "source_kind": "dist"
     },
     {
@@ -46367,7 +46372,7 @@
     },
     {
       "path": "app/js/core/renderer/strategic_overlay_runtime_owner.js",
-      "size_bytes": 22283,
+      "size_bytes": 22676,
       "source_kind": "dist"
     },
     {
@@ -46472,12 +46477,17 @@
     },
     {
       "path": "app/js/core/sample_project_import_workflow.js",
-      "size_bytes": 6471,
+      "size_bytes": 6565,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/sample_project_registry.js",
       "size_bytes": 10010,
+      "source_kind": "dist"
+    },
+    {
+      "path": "app/js/core/scenario/bundle_cache.js",
+      "size_bytes": 3026,
       "source_kind": "dist"
     },
     {
@@ -46487,22 +46497,27 @@
     },
     {
       "path": "app/js/core/scenario/bundle_runtime.js",
-      "size_bytes": 19159,
+      "size_bytes": 19662,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/scenario/chunk_layer_payloads.js",
-      "size_bytes": 4811,
+      "size_bytes": 6711,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/scenario/chunk_payload_loader.js",
-      "size_bytes": 4860,
+      "size_bytes": 6538,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/scenario/chunk_runtime.js",
-      "size_bytes": 150708,
+      "size_bytes": 150331,
+      "source_kind": "dist"
+    },
+    {
+      "path": "app/js/core/scenario/core_value_normalizer.js",
+      "size_bytes": 1141,
       "source_kind": "dist"
     },
     {
@@ -46546,13 +46561,18 @@
       "source_kind": "dist"
     },
     {
+      "path": "app/js/core/scenario/rollback_clone.js",
+      "size_bytes": 1111,
+      "source_kind": "dist"
+    },
+    {
       "path": "app/js/core/scenario/scenario_renderer_bridge.js",
       "size_bytes": 2155,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/scenario/shared.js",
-      "size_bytes": 8583,
+      "size_bytes": 8566,
       "source_kind": "dist"
     },
     {
@@ -46602,7 +46622,7 @@
     },
     {
       "path": "app/js/core/scenario_manager.js",
-      "size_bytes": 56332,
+      "size_bytes": 58428,
       "source_kind": "dist"
     },
     {
@@ -46622,12 +46642,12 @@
     },
     {
       "path": "app/js/core/scenario_resources.js",
-      "size_bytes": 39924,
+      "size_bytes": 40216,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/scenario_rollback.js",
-      "size_bytes": 25481,
+      "size_bytes": 25646,
       "source_kind": "dist"
     },
     {
@@ -46662,12 +46682,12 @@
     },
     {
       "path": "app/js/core/startup_cache.js",
-      "size_bytes": 19872,
+      "size_bytes": 21386,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/startup_worker_client.js",
-      "size_bytes": 6142,
+      "size_bytes": 6201,
       "source_kind": "dist"
     },
     {
@@ -46677,17 +46697,17 @@
     },
     {
       "path": "app/js/core/state/actions/appearance_actions.js",
-      "size_bytes": 8892,
+      "size_bytes": 9263,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/appearance_preset_actions.js",
-      "size_bytes": 3811,
+      "size_bytes": 4066,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/appearance_reference_actions.js",
-      "size_bytes": 1788,
+      "size_bytes": 2049,
       "source_kind": "dist"
     },
     {
@@ -46697,7 +46717,7 @@
     },
     {
       "path": "app/js/core/state/actions/appearance_visibility_actions.js",
-      "size_bytes": 3924,
+      "size_bytes": 4188,
       "source_kind": "dist"
     },
     {
@@ -46707,17 +46727,22 @@
     },
     {
       "path": "app/js/core/state/actions/export_workbench_actions.js",
-      "size_bytes": 4291,
+      "size_bytes": 4546,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/intensity_field_actions.js",
-      "size_bytes": 2048,
+      "size_bytes": 2297,
+      "source_kind": "dist"
+    },
+    {
+      "path": "app/js/core/state/actions/project_import_actions.js",
+      "size_bytes": 5663,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/renderer_cache_actions.js",
-      "size_bytes": 7020,
+      "size_bytes": 7406,
       "source_kind": "dist"
     },
     {
@@ -46732,7 +46757,7 @@
     },
     {
       "path": "app/js/core/state/actions/renderer_interaction_actions.js",
-      "size_bytes": 5086,
+      "size_bytes": 5350,
       "source_kind": "dist"
     },
     {
@@ -46742,7 +46767,7 @@
     },
     {
       "path": "app/js/core/state/actions/scenario_activation_actions.js",
-      "size_bytes": 29607,
+      "size_bytes": 30724,
       "source_kind": "dist"
     },
     {
@@ -46757,7 +46782,7 @@
     },
     {
       "path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js",
-      "size_bytes": 42257,
+      "size_bytes": 42391,
       "source_kind": "dist"
     },
     {
@@ -46772,7 +46797,7 @@
     },
     {
       "path": "app/js/core/state/actions/scenario_presentation_actions.js",
-      "size_bytes": 24079,
+      "size_bytes": 25307,
       "source_kind": "dist"
     },
     {
@@ -46787,17 +46812,17 @@
     },
     {
       "path": "app/js/core/state/actions/special_zone_actions.js",
-      "size_bytes": 14030,
+      "size_bytes": 14630,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/strategic_overlay_actions.js",
-      "size_bytes": 15929,
+      "size_bytes": 17135,
       "source_kind": "dist"
     },
     {
       "path": "app/js/core/state/actions/transport_actions.js",
-      "size_bytes": 9046,
+      "size_bytes": 9310,
       "source_kind": "dist"
     },
     {
@@ -46812,7 +46837,7 @@
     },
     {
       "path": "app/js/core/state/actions/ui_visibility_actions.js",
-      "size_bytes": 4698,
+      "size_bytes": 6857,
       "source_kind": "dist"
     },
     {
@@ -47037,7 +47062,7 @@
     },
     {
       "path": "app/js/ui/sidebar/project_support_diagnostics_controller.js",
-      "size_bytes": 76955,
+      "size_bytes": 77766,
       "source_kind": "dist"
     },
     {
@@ -47462,7 +47487,7 @@
     },
     {
       "path": "app/js/workers/startup_boot.worker.js",
-      "size_bytes": 23888,
+      "size_bytes": 23937,
       "source_kind": "dist"
     },
     {
@@ -47792,7 +47817,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2150016,
+      "size_bytes": 2162934,
       "source_kind": "dist"
     },
     {
@@ -47824,7 +47849,7 @@
     },
     {
       "path": "app/data/world_cities.geojson",
-      "size_bytes": 24981098,
+      "size_bytes": 24980735,
       "source_kind": "generated_ignored"
     },
     {
@@ -47915,24 +47940,24 @@
     },
     "categories": [
       {
-        "file_count": 236,
+        "file_count": 240,
         "id": "startup-critical",
-        "size_bytes": 5397836
+        "size_bytes": 5309011
       },
       {
-        "file_count": 95,
+        "file_count": 96,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3421832
+        "size_bytes": 3563027
       },
       {
         "file_count": 821,
         "id": "on-demand-product",
-        "size_bytes": 252996423
+        "size_bytes": 252979609
       },
       {
         "file_count": 8391,
         "id": "scenario-specific",
-        "size_bytes": 704673715
+        "size_bytes": 704681213
       },
       {
         "file_count": 5,
@@ -47968,7 +47993,8 @@
     "module_graph": {
       "byte_measurement": "published-uncompressed-file-bytes",
       "deferred_resource_paths": [
-        "app/data/thematic_layers/index.json"
+        "app/data/thematic_layers/index.json",
+        "app/vendor/fflate.browser.js"
       ],
       "dynamic_import_registry": {
         "declarations": [
@@ -48107,7 +48133,6 @@
         "app/js/core/renderer/transport_facility_icon_atlas.png",
         "app/js/main.js",
         "app/vendor/d3.v7.min.js",
-        "app/vendor/fflate.browser.js",
         "app/vendor/textures/paper_vintage_01.svg",
         "app/vendor/topojson-client.min.js",
         "assets/favicon.png",
@@ -49373,7 +49398,7 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "initial",
+          "load_phase": "deferred-runtime",
           "path": "app/js/core/export_artifact_package.js",
           "product_category": "export-only",
           "reference_locations": {
@@ -49449,9 +49474,9 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "initial",
+          "load_phase": "deferred-runtime",
           "path": "app/js/core/file_manager.js",
-          "product_category": "startup-critical",
+          "product_category": "startup-deferred-runtime",
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
@@ -49951,22 +49976,32 @@
               "expression": "\"./scenario_resources.js\"",
               "expression_index": 0,
               "kind": "literal_dynamic_import",
-              "line": 69,
+              "line": 70,
               "reference": "./scenario_resources.js",
               "resolution": "literal"
             },
             {
-              "column": 39,
-              "expression": "\"./scenario_dispatcher.js\"",
+              "column": 32,
+              "expression": "\"./file_manager.js\"",
               "expression_index": 1,
               "kind": "literal_dynamic_import",
-              "line": 76,
-              "reference": "./scenario_dispatcher.js",
+              "line": 77,
+              "reference": "./file_manager.js",
+              "resolution": "literal"
+            },
+            {
+              "column": 37,
+              "expression": "\"./scenario_manager.js\"",
+              "expression_index": 2,
+              "kind": "literal_dynamic_import",
+              "line": 356,
+              "reference": "./scenario_manager.js",
               "resolution": "literal"
             }
           ],
           "dynamic_imports": [
-            "app/js/core/scenario_dispatcher.js",
+            "app/js/core/file_manager.js",
+            "app/js/core/scenario_manager.js",
             "app/js/core/scenario_resources.js"
           ],
           "load_phase": "initial",
@@ -49977,18 +50012,26 @@
               {
                 "column": 38,
                 "kind": "literal-dynamic-import",
-                "line": 69,
+                "line": 70,
                 "local": true,
                 "reference": "./scenario_resources.js",
                 "resolved_path": "app/js/core/scenario_resources.js"
               },
               {
-                "column": 39,
+                "column": 32,
                 "kind": "literal-dynamic-import",
-                "line": 76,
+                "line": 77,
                 "local": true,
-                "reference": "./scenario_dispatcher.js",
-                "resolved_path": "app/js/core/scenario_dispatcher.js"
+                "reference": "./file_manager.js",
+                "resolved_path": "app/js/core/file_manager.js"
+              },
+              {
+                "column": 37,
+                "kind": "literal-dynamic-import",
+                "line": 356,
+                "local": true,
+                "reference": "./scenario_manager.js",
+                "resolved_path": "app/js/core/scenario_manager.js"
               }
             ],
             "resource_references": [],
@@ -49998,13 +50041,21 @@
                 "kind": "import-declaration",
                 "line": 1,
                 "local": true,
-                "reference": "./file_manager.js",
-                "resolved_path": "app/js/core/file_manager.js"
+                "reference": "./dirty_state.js",
+                "resolved_path": "app/js/core/dirty_state.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
                 "line": 2,
+                "local": true,
+                "reference": "./state/actions/project_import_actions.js",
+                "resolved_path": "app/js/core/state/actions/project_import_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 3,
                 "local": true,
                 "reference": "./history_manager.js",
                 "resolved_path": "app/js/core/history_manager.js"
@@ -50012,7 +50063,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 3,
+                "line": 4,
                 "local": true,
                 "reference": "./releasable_manager.js",
                 "resolved_path": "app/js/core/releasable_manager.js"
@@ -50020,7 +50071,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 7,
+                "line": 8,
                 "local": true,
                 "reference": "./palette_manager.js",
                 "resolved_path": "app/js/core/palette_manager.js"
@@ -50028,7 +50079,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 8,
+                "line": 9,
                 "local": true,
                 "reference": "./sovereignty_manager.js",
                 "resolved_path": "app/js/core/sovereignty_manager.js"
@@ -50036,7 +50087,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 12,
+                "line": 13,
                 "local": true,
                 "reference": "./state.js",
                 "resolved_path": "app/js/core/state.js"
@@ -50044,7 +50095,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 22,
+                "line": 23,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -50052,7 +50103,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 23,
+                "line": 24,
                 "local": true,
                 "reference": "./state/strategic_overlay_state.js",
                 "resolved_path": "app/js/core/state/strategic_overlay_state.js"
@@ -50060,7 +50111,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 26,
+                "line": 27,
                 "local": true,
                 "reference": "./state/dev_state.js",
                 "resolved_path": "app/js/core/state/dev_state.js"
@@ -50068,7 +50119,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 27,
+                "line": 28,
                 "local": true,
                 "reference": "./interaction_funnel/import_apply_orchestration.js",
                 "resolved_path": "app/js/core/interaction_funnel/import_apply_orchestration.js"
@@ -50076,7 +50127,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 28,
+                "line": 29,
                 "local": true,
                 "reference": "./transport_country_overlay.js",
                 "resolved_path": "app/js/core/transport_country_overlay.js"
@@ -50084,7 +50135,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 33,
+                "line": 34,
                 "local": true,
                 "reference": "./transport_capability_registry.js",
                 "resolved_path": "app/js/core/transport_capability_registry.js"
@@ -50092,7 +50143,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 38,
+                "line": 39,
                 "local": true,
                 "reference": "./transport_pack_resolver.js",
                 "resolved_path": "app/js/core/transport_pack_resolver.js"
@@ -50100,7 +50151,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 39,
+                "line": 40,
                 "local": true,
                 "reference": "./interaction_funnel/ui_sync.js",
                 "resolved_path": "app/js/core/interaction_funnel/ui_sync.js"
@@ -50108,7 +50159,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 40,
+                "line": 41,
                 "local": true,
                 "reference": "./special_zone_layers.js",
                 "resolved_path": "app/js/core/special_zone_layers.js"
@@ -50118,7 +50169,7 @@
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
-            "app/js/core/file_manager.js",
+            "app/js/core/dirty_state.js",
             "app/js/core/history_manager.js",
             "app/js/core/interaction_funnel/import_apply_orchestration.js",
             "app/js/core/interaction_funnel/ui_sync.js",
@@ -50127,6 +50178,7 @@
             "app/js/core/sovereignty_manager.js",
             "app/js/core/special_zone_layers.js",
             "app/js/core/state.js",
+            "app/js/core/state/actions/project_import_actions.js",
             "app/js/core/state/dev_state.js",
             "app/js/core/state/index.js",
             "app/js/core/state/strategic_overlay_state.js",
@@ -50150,13 +50202,133 @@
                 "kind": "import-declaration",
                 "line": 1,
                 "local": true,
+                "reference": "../state/actions/scenario_presentation_actions.js",
+                "resolved_path": "app/js/core/state/actions/scenario_presentation_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 2,
+                "local": true,
+                "reference": "../state/actions/ui_visibility_actions.js",
+                "resolved_path": "app/js/core/state/actions/ui_visibility_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 3,
+                "local": true,
+                "reference": "../state/actions/appearance_preset_actions.js",
+                "resolved_path": "app/js/core/state/actions/appearance_preset_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 4,
+                "local": true,
+                "reference": "../state/actions/scenario_activation_actions.js",
+                "resolved_path": "app/js/core/state/actions/scenario_activation_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 5,
+                "local": true,
+                "reference": "../state/actions/renderer_cache_actions.js",
+                "resolved_path": "app/js/core/state/actions/renderer_cache_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 6,
+                "local": true,
+                "reference": "../state/actions/export_workbench_actions.js",
+                "resolved_path": "app/js/core/state/actions/export_workbench_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 7,
+                "local": true,
+                "reference": "../state/actions/intensity_field_actions.js",
+                "resolved_path": "app/js/core/state/actions/intensity_field_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 8,
+                "local": true,
+                "reference": "../state/actions/special_zone_actions.js",
+                "resolved_path": "app/js/core/state/actions/special_zone_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 9,
+                "local": true,
+                "reference": "../state/actions/strategic_overlay_actions.js",
+                "resolved_path": "app/js/core/state/actions/strategic_overlay_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 10,
+                "local": true,
+                "reference": "../state/actions/appearance_actions.js",
+                "resolved_path": "app/js/core/state/actions/appearance_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 11,
+                "local": true,
+                "reference": "../state/actions/appearance_visibility_actions.js",
+                "resolved_path": "app/js/core/state/actions/appearance_visibility_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 12,
+                "local": true,
+                "reference": "../state/actions/appearance_reference_actions.js",
+                "resolved_path": "app/js/core/state/actions/appearance_reference_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 13,
+                "local": true,
+                "reference": "../state/actions/transport_actions.js",
+                "resolved_path": "app/js/core/state/actions/transport_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 14,
+                "local": true,
+                "reference": "../state/actions/renderer_interaction_actions.js",
+                "resolved_path": "app/js/core/state/actions/renderer_interaction_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 15,
+                "local": true,
+                "reference": "../state/actions/project_import_actions.js",
+                "resolved_path": "app/js/core/state/actions/project_import_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 17,
+                "local": true,
                 "reference": "../sovereignty_manager.js",
                 "resolved_path": "app/js/core/sovereignty_manager.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 6,
+                "line": 22,
                 "local": true,
                 "reference": "../state.js",
                 "resolved_path": "app/js/core/state.js"
@@ -50164,7 +50336,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 7,
+                "line": 23,
                 "local": true,
                 "reference": "./wait_readiness.js",
                 "resolved_path": "app/js/core/interaction_funnel/wait_readiness.js"
@@ -50176,7 +50348,22 @@
           "static_imports": [
             "app/js/core/interaction_funnel/wait_readiness.js",
             "app/js/core/sovereignty_manager.js",
-            "app/js/core/state.js"
+            "app/js/core/state.js",
+            "app/js/core/state/actions/appearance_actions.js",
+            "app/js/core/state/actions/appearance_preset_actions.js",
+            "app/js/core/state/actions/appearance_reference_actions.js",
+            "app/js/core/state/actions/appearance_visibility_actions.js",
+            "app/js/core/state/actions/export_workbench_actions.js",
+            "app/js/core/state/actions/intensity_field_actions.js",
+            "app/js/core/state/actions/project_import_actions.js",
+            "app/js/core/state/actions/renderer_cache_actions.js",
+            "app/js/core/state/actions/renderer_interaction_actions.js",
+            "app/js/core/state/actions/scenario_activation_actions.js",
+            "app/js/core/state/actions/scenario_presentation_actions.js",
+            "app/js/core/state/actions/special_zone_actions.js",
+            "app/js/core/state/actions/strategic_overlay_actions.js",
+            "app/js/core/state/actions/transport_actions.js",
+            "app/js/core/state/actions/ui_visibility_actions.js"
           ]
         },
         {
@@ -50427,7 +50614,7 @@
               {
                 "column": 21,
                 "kind": "new-url-reference",
-                "line": 601,
+                "line": 602,
                 "local": true,
                 "reference": "../../vendor/textures/paper_vintage_01.svg",
                 "resolved_path": "app/vendor/textures/paper_vintage_01.svg"
@@ -51319,13 +51506,21 @@
                 "kind": "import-declaration",
                 "line": 313,
                 "local": true,
+                "reference": "./renderer/exact_composite_reuse_owner.js",
+                "resolved_path": "app/js/core/renderer/exact_composite_reuse_owner.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 314,
+                "local": true,
                 "reference": "./renderer/cached_pass_compositor_owner.js",
                 "resolved_path": "app/js/core/renderer/cached_pass_compositor_owner.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 314,
+                "line": 315,
                 "local": true,
                 "reference": "./map_renderer/transformed_frame_compositor_owner.js",
                 "resolved_path": "app/js/core/map_renderer/transformed_frame_compositor_owner.js"
@@ -51333,7 +51528,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 315,
+                "line": 316,
                 "local": true,
                 "reference": "./renderer/render_transform_reuse_policy_owner.js",
                 "resolved_path": "app/js/core/renderer/render_transform_reuse_policy_owner.js"
@@ -51341,7 +51536,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 316,
+                "line": 317,
                 "local": true,
                 "reference": "./renderer/projected_geometry_bounds_owner.js",
                 "resolved_path": "app/js/core/renderer/projected_geometry_bounds_owner.js"
@@ -51349,7 +51544,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 317,
+                "line": 318,
                 "local": true,
                 "reference": "./renderer/viewport_read_model_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_read_model_owner.js"
@@ -51357,7 +51552,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 318,
+                "line": 319,
                 "local": true,
                 "reference": "./renderer/render_snapshot.js",
                 "resolved_path": "app/js/core/renderer/render_snapshot.js"
@@ -51365,7 +51560,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 319,
+                "line": 320,
                 "local": true,
                 "reference": "./renderer/viewport_command_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_command_owner.js"
@@ -51373,7 +51568,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 320,
+                "line": 321,
                 "local": true,
                 "reference": "./renderer/renderer_viewport_update_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_viewport_update_owner.js"
@@ -51381,7 +51576,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 321,
+                "line": 322,
                 "local": true,
                 "reference": "./renderer/renderer_startup_transaction_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_startup_transaction_owner.js"
@@ -51389,7 +51584,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 322,
+                "line": 323,
                 "local": true,
                 "reference": "./renderer/viewport_resize_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/viewport_resize_lifecycle_owner.js"
@@ -51397,7 +51592,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 323,
+                "line": 324,
                 "local": true,
                 "reference": "./renderer/scenario_water_cache_policy_owner.js",
                 "resolved_path": "app/js/core/renderer/scenario_water_cache_policy_owner.js"
@@ -51405,7 +51600,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 324,
+                "line": 325,
                 "local": true,
                 "reference": "./renderer/zoom_interaction_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/zoom_interaction_lifecycle_owner.js"
@@ -51413,7 +51608,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 325,
+                "line": 326,
                 "local": true,
                 "reference": "./renderer/map_interaction_event_binding_owner.js",
                 "resolved_path": "app/js/core/renderer/map_interaction_event_binding_owner.js"
@@ -51421,7 +51616,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 326,
+                "line": 327,
                 "local": true,
                 "reference": "./renderer/renderer_surface_host.js",
                 "resolved_path": "app/js/core/renderer/renderer_surface_host.js"
@@ -51429,7 +51624,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 327,
+                "line": 328,
                 "local": true,
                 "reference": "./renderer/renderer_surface_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_surface_lifecycle_owner.js"
@@ -51437,7 +51632,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 328,
+                "line": 329,
                 "local": true,
                 "reference": "./renderer/renderer_projection_path_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_projection_path_owner.js"
@@ -51445,7 +51640,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 329,
+                "line": 330,
                 "local": true,
                 "reference": "./renderer/renderer_svg_surface_lifecycle_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_svg_surface_lifecycle_owner.js"
@@ -51453,7 +51648,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 330,
+                "line": 331,
                 "local": true,
                 "reference": "./renderer/renderer_fit_projection_owner.js",
                 "resolved_path": "app/js/core/renderer/renderer_fit_projection_owner.js"
@@ -51461,7 +51656,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 331,
+                "line": 332,
                 "local": true,
                 "reference": "./renderer/visible_frame_diagnostics_owner.js",
                 "resolved_path": "app/js/core/renderer/visible_frame_diagnostics_owner.js"
@@ -51469,7 +51664,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 332,
+                "line": 333,
                 "local": true,
                 "reference": "./renderer/render_transaction_diagnostics.js",
                 "resolved_path": "app/js/core/renderer/render_transaction_diagnostics.js"
@@ -51477,7 +51672,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 333,
+                "line": 334,
                 "local": true,
                 "reference": "./renderer/intensity_field_mask_owner.js",
                 "resolved_path": "app/js/core/renderer/intensity_field_mask_owner.js"
@@ -51485,7 +51680,7 @@
               {
                 "column": 1,
                 "kind": "export-named-source",
-                "line": 14536,
+                "line": 14557,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -51546,6 +51741,7 @@
             "app/js/core/renderer/context_layer_resolver.js",
             "app/js/core/renderer/context_pass_orchestrator_owner.js",
             "app/js/core/renderer/day_night_runtime_owner.js",
+            "app/js/core/renderer/exact_composite_reuse_owner.js",
             "app/js/core/renderer/facility_surface.js",
             "app/js/core/renderer/fill_target_policy.js",
             "app/js/core/renderer/intensity_field_mask_owner.js",
@@ -52061,21 +52257,13 @@
                 "kind": "import-declaration",
                 "line": 4,
                 "local": true,
-                "reference": "../feature_identity.js",
-                "resolved_path": "app/js/core/feature_identity.js"
-              },
-              {
-                "column": 1,
-                "kind": "import-declaration",
-                "line": 5,
-                "local": true,
                 "reference": "../state/actions/scenario_chunk_runtime_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 6,
+                "line": 5,
                 "local": true,
                 "reference": "../state/actions/scenario_chunk_promotion_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_promotion_actions.js"
@@ -52085,7 +52273,6 @@
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
-            "app/js/core/feature_identity.js",
             "app/js/core/map_renderer/scenario_refresh_plans.js",
             "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
             "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
@@ -52331,9 +52518,9 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "initial",
+          "load_phase": "deferred-runtime",
           "path": "app/js/core/project_package_io.js",
-          "product_category": "startup-critical",
+          "product_category": "startup-deferred-runtime",
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
@@ -52871,6 +53058,21 @@
           "dynamic_imports": [],
           "load_phase": "initial",
           "path": "app/js/core/renderer/exact_after_settle_pass_catalog.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
+          "path": "app/js/core/renderer/exact_composite_reuse_owner.js",
           "product_category": "startup-critical",
           "reference_locations": {
             "dynamic_imports": [],
@@ -53583,11 +53785,22 @@
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
-            "static_imports": []
+            "static_imports": [
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 1,
+                "local": true,
+                "reference": "../feature_identity.js",
+                "resolved_path": "app/js/core/feature_identity.js"
+              }
+            ]
           },
           "resource_references": [],
           "source_bindings": [],
-          "static_imports": []
+          "static_imports": [
+            "app/js/core/feature_identity.js"
+          ]
         },
         {
           "dynamic_import_expressions": [],
@@ -54566,6 +54779,21 @@
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
           "load_phase": "initial",
+          "path": "app/js/core/scenario/bundle_cache.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
           "path": "app/js/core/scenario/bundle_loader.js",
           "product_category": "scenario-specific",
           "reference_locations": {
@@ -54648,6 +54876,14 @@
                 "kind": "import-declaration",
                 "line": 5,
                 "local": true,
+                "reference": "./bundle_cache.js",
+                "resolved_path": "app/js/core/scenario/bundle_cache.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 6,
+                "local": true,
                 "reference": "../state/actions/boot_actions.js",
                 "resolved_path": "app/js/core/state/actions/boot_actions.js"
               }
@@ -54656,6 +54892,7 @@
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
+            "app/js/core/scenario/bundle_cache.js",
             "app/js/core/state/actions/boot_actions.js"
           ]
         },
@@ -54691,12 +54928,21 @@
                 "local": true,
                 "reference": "../state/actions/scenario_chunk_runtime_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 8,
+                "local": true,
+                "reference": "./bundle_cache.js",
+                "resolved_path": "app/js/core/scenario/bundle_cache.js"
               }
             ]
           },
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
+            "app/js/core/scenario/bundle_cache.js",
             "app/js/core/state/actions/scenario_chunk_runtime_actions.js"
           ]
         },
@@ -54797,6 +55043,21 @@
             "app/js/core/state/actions/scenario_presentation_actions.js",
             "app/js/core/state/index.js"
           ]
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
+          "path": "app/js/core/scenario/core_value_normalizer.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
         },
         {
           "dynamic_import_expressions": [],
@@ -55115,6 +55376,21 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
+          "load_phase": "deferred-runtime",
+          "path": "app/js/core/scenario/rollback_clone.js",
+          "product_category": "startup-deferred-runtime",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
           "load_phase": "initial",
           "path": "app/js/core/scenario/scenario_renderer_bridge.js",
           "product_category": "scenario-specific",
@@ -55172,12 +55448,21 @@
                 "local": true,
                 "reference": "./locale_asset_contract.js",
                 "resolved_path": "app/js/core/scenario/locale_asset_contract.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 6,
+                "local": true,
+                "reference": "./core_value_normalizer.js",
+                "resolved_path": "app/js/core/scenario/core_value_normalizer.js"
               }
             ]
           },
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
+            "app/js/core/scenario/core_value_normalizer.js",
             "app/js/core/scenario/locale_asset_contract.js"
           ]
         },
@@ -55715,7 +56000,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 68,
+                "line": 69,
                 "local": true,
                 "reference": "./scenario_recovery.js",
                 "resolved_path": "app/js/core/scenario_recovery.js"
@@ -55723,7 +56008,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 69,
+                "line": 70,
                 "local": true,
                 "reference": "./scenario_rollback.js",
                 "resolved_path": "app/js/core/scenario_rollback.js"
@@ -55731,7 +56016,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 70,
+                "line": 71,
                 "local": true,
                 "reference": "./scenario/pure_helpers.js",
                 "resolved_path": "app/js/core/scenario/pure_helpers.js"
@@ -55739,7 +56024,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 74,
+                "line": 75,
                 "local": true,
                 "reference": "./scenario/presentation_runtime.js",
                 "resolved_path": "app/js/core/scenario/presentation_runtime.js"
@@ -55747,7 +56032,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 77,
+                "line": 78,
                 "local": true,
                 "reference": "./scenario/lifecycle_runtime.js",
                 "resolved_path": "app/js/core/scenario/lifecycle_runtime.js"
@@ -55755,7 +56040,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 80,
+                "line": 81,
                 "local": true,
                 "reference": "./scenario_apply_pipeline.js",
                 "resolved_path": "app/js/core/scenario_apply_pipeline.js"
@@ -55763,7 +56048,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 83,
+                "line": 84,
                 "local": true,
                 "reference": "./renderer/render_transaction_diagnostics.js",
                 "resolved_path": "app/js/core/renderer/render_transaction_diagnostics.js"
@@ -55771,7 +56056,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 89,
+                "line": 90,
                 "local": true,
                 "reference": "./scenario/shared.js",
                 "resolved_path": "app/js/core/scenario/shared.js"
@@ -55779,7 +56064,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 96,
+                "line": 97,
                 "local": true,
                 "reference": "./scenario/bundle_loader.js",
                 "resolved_path": "app/js/core/scenario/bundle_loader.js"
@@ -55787,7 +56072,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 108,
+                "line": 109,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/core/i18n.js"
@@ -55795,7 +56080,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 109,
+                "line": 110,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -56520,6 +56805,14 @@
                 "local": true,
                 "reference": "./scenario/shared.js",
                 "resolved_path": "app/js/core/scenario/shared.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 66,
+                "local": true,
+                "reference": "./scenario/rollback_clone.js",
+                "resolved_path": "app/js/core/scenario/rollback_clone.js"
               }
             ]
           },
@@ -56527,6 +56820,7 @@
           "source_bindings": [],
           "static_imports": [
             "app/js/core/palette_manager.js",
+            "app/js/core/scenario/rollback_clone.js",
             "app/js/core/scenario/shared.js",
             "app/js/core/scenario_resources.js",
             "app/js/core/scenario_ui_sync.js",
@@ -57122,9 +57416,9 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "deferred-runtime",
+          "load_phase": "initial",
           "path": "app/js/core/state/actions/appearance_reference_actions.js",
-          "product_category": "startup-deferred-runtime",
+          "product_category": "startup-critical",
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
@@ -57213,9 +57507,9 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "deferred-runtime",
+          "load_phase": "initial",
           "path": "app/js/core/state/actions/export_workbench_actions.js",
-          "product_category": "startup-deferred-runtime",
+          "product_category": "startup-critical",
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
@@ -57261,6 +57555,21 @@
           "static_imports": [
             "app/js/core/state/intensity_field_state.js"
           ]
+        },
+        {
+          "dynamic_import_expressions": [],
+          "dynamic_imports": [],
+          "load_phase": "initial",
+          "path": "app/js/core/state/actions/project_import_actions.js",
+          "product_category": "startup-critical",
+          "reference_locations": {
+            "dynamic_imports": [],
+            "resource_references": [],
+            "static_imports": []
+          },
+          "resource_references": [],
+          "source_bindings": [],
+          "static_imports": []
         },
         {
           "dynamic_import_expressions": [],
@@ -57614,9 +57923,9 @@
         {
           "dynamic_import_expressions": [],
           "dynamic_imports": [],
-          "load_phase": "deferred-runtime",
+          "load_phase": "initial",
           "path": "app/js/core/state/actions/transport_actions.js",
-          "product_category": "startup-deferred-runtime",
+          "product_category": "startup-critical",
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
@@ -63857,21 +64166,21 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3086966,
-        "deferred_graph_file_count": 125,
-        "deferred_module_count": 124,
-        "deferred_resource_count": 1,
-        "initial_graph_bytes": 5366186,
-        "initial_graph_file_count": 270,
-        "initial_module_count": 256,
-        "initial_resource_count": 14,
-        "initial_script_bytes": 4007860,
-        "initial_script_count": 258,
-        "module_count": 387,
+        "deferred_graph_bytes": 3237021,
+        "deferred_graph_file_count": 127,
+        "deferred_module_count": 125,
+        "deferred_resource_count": 2,
+        "initial_graph_bytes": 5276047,
+        "initial_graph_file_count": 273,
+        "initial_module_count": 260,
+        "initial_resource_count": 13,
+        "initial_script_bytes": 4008643,
+        "initial_script_count": 262,
+        "module_count": 392,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 957572729,
+        "untraversed_dist_bytes": 957555867,
         "untraversed_dist_file_count": 9152,
         "untraversed_module_count": 7
       },
@@ -63921,7 +64230,7 @@
       {
         "basis": "startup-module-graph",
         "category": "startup-critical",
-        "file_count": 210,
+        "file_count": 215,
         "owner": "editor-startup",
         "path_exceptions": [
           {
@@ -63934,7 +64243,7 @@
           },
           {
             "path": "app/js/bootstrap/post_ready_scheduler.js",
-            "size_bytes": 14461
+            "size_bytes": 21829
           },
           {
             "path": "app/js/bootstrap/render_runtime_binding.js",
@@ -63946,7 +64255,7 @@
           },
           {
             "path": "app/js/bootstrap/startup_bootstrap_support.js",
-            "size_bytes": 14721
+            "size_bytes": 15292
           },
           {
             "path": "app/js/bootstrap/startup_data_pipeline.js",
@@ -63962,7 +64271,7 @@
           },
           {
             "path": "app/js/bootstrap/startup_ready_handoff.js",
-            "size_bytes": 12843
+            "size_bytes": 13771
           },
           {
             "path": "app/js/core/city_lights_historical_1930_asset.js",
@@ -63990,7 +64299,7 @@
           },
           {
             "path": "app/js/core/data_loader.js",
-            "size_bytes": 64268
+            "size_bytes": 65742
           },
           {
             "path": "app/js/core/data_service.js",
@@ -64009,16 +64318,12 @@
             "size_bytes": 4855
           },
           {
-            "path": "app/js/core/file_manager.js",
-            "size_bytes": 46365
-          },
-          {
             "path": "app/js/core/frame_scheduler.js",
             "size_bytes": 6109
           },
           {
             "path": "app/js/core/history_manager.js",
-            "size_bytes": 14318
+            "size_bytes": 14981
           },
           {
             "path": "app/js/core/i18n.js",
@@ -64034,11 +64339,11 @@
           },
           {
             "path": "app/js/core/interaction_funnel.js",
-            "size_bytes": 18418
+            "size_bytes": 24422
           },
           {
             "path": "app/js/core/legend_manager.js",
-            "size_bytes": 21666
+            "size_bytes": 22758
           },
           {
             "path": "app/js/core/load_status_display.js",
@@ -64046,7 +64351,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 560906
+            "size_bytes": 561795
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -64130,7 +64435,7 @@
           },
           {
             "path": "app/js/core/palette_manager.js",
-            "size_bytes": 20546
+            "size_bytes": 20646
           },
           {
             "path": "app/js/core/palette_runtime_bridge.js",
@@ -64147,10 +64452,6 @@
           {
             "path": "app/js/core/preset_state.js",
             "size_bytes": 686
-          },
-          {
-            "path": "app/js/core/project_package_io.js",
-            "size_bytes": 15583
           },
           {
             "path": "app/js/core/releasable_manager.js",
@@ -64222,7 +64523,7 @@
           },
           {
             "path": "app/js/core/renderer/city_points_render_owner.js",
-            "size_bytes": 17844
+            "size_bytes": 18422
           },
           {
             "path": "app/js/core/renderer/city_reveal_policy.js",
@@ -64249,6 +64550,10 @@
             "size_bytes": 685
           },
           {
+            "path": "app/js/core/renderer/exact_composite_reuse_owner.js",
+            "size_bytes": 1946
+          },
+          {
             "path": "app/js/core/renderer/facility_surface.js",
             "size_bytes": 12609
           },
@@ -64266,7 +64571,7 @@
           },
           {
             "path": "app/js/core/renderer/legend_control_owner.js",
-            "size_bytes": 20242
+            "size_bytes": 20639
           },
           {
             "path": "app/js/core/renderer/map_interaction_event_binding_owner.js",
@@ -64306,7 +64611,7 @@
           },
           {
             "path": "app/js/core/renderer/political_background_render_owner.js",
-            "size_bytes": 50513
+            "size_bytes": 50700
           },
           {
             "path": "app/js/core/renderer/political_collection_owner.js",
@@ -64314,11 +64619,11 @@
           },
           {
             "path": "app/js/core/renderer/political_feature_policy.js",
-            "size_bytes": 7914
+            "size_bytes": 8192
           },
           {
             "path": "app/js/core/renderer/political_partial_repaint_owner.js",
-            "size_bytes": 32587
+            "size_bytes": 33169
           },
           {
             "path": "app/js/core/renderer/political_pass_orchestrator_owner.js",
@@ -64402,7 +64707,7 @@
           },
           {
             "path": "app/js/core/renderer/river_layer_render_owner.js",
-            "size_bytes": 8239
+            "size_bytes": 9220
           },
           {
             "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
@@ -64422,7 +64727,7 @@
           },
           {
             "path": "app/js/core/renderer/spatial_index_runtime_owner.js",
-            "size_bytes": 13680
+            "size_bytes": 13820
           },
           {
             "path": "app/js/core/renderer/spatial_index_runtime_state_ops.js",
@@ -64454,7 +64759,7 @@
           },
           {
             "path": "app/js/core/renderer/strategic_overlay_runtime_owner.js",
-            "size_bytes": 22283
+            "size_bytes": 22676
           },
           {
             "path": "app/js/core/renderer/strategic_resource_markers.js",
@@ -64529,12 +64834,20 @@
             "size_bytes": 3296
           },
           {
+            "path": "app/js/core/scenario/bundle_cache.js",
+            "size_bytes": 3026
+          },
+          {
             "path": "app/js/core/scenario/chunk_layer_payloads.js",
-            "size_bytes": 4811
+            "size_bytes": 6711
           },
           {
             "path": "app/js/core/scenario/chunk_payload_loader.js",
-            "size_bytes": 4860
+            "size_bytes": 6538
+          },
+          {
+            "path": "app/js/core/scenario/core_value_normalizer.js",
+            "size_bytes": 1141
           },
           {
             "path": "app/js/core/scenario/optional_layer_runtime.js",
@@ -64554,11 +64867,11 @@
           },
           {
             "path": "app/js/core/startup_cache.js",
-            "size_bytes": 19872
+            "size_bytes": 21386
           },
           {
             "path": "app/js/core/startup_worker_client.js",
-            "size_bytes": 6142
+            "size_bytes": 6201
           },
           {
             "path": "app/js/core/state.js",
@@ -64566,11 +64879,15 @@
           },
           {
             "path": "app/js/core/state/actions/appearance_actions.js",
-            "size_bytes": 8892
+            "size_bytes": 9263
           },
           {
             "path": "app/js/core/state/actions/appearance_preset_actions.js",
-            "size_bytes": 3811
+            "size_bytes": 4066
+          },
+          {
+            "path": "app/js/core/state/actions/appearance_reference_actions.js",
+            "size_bytes": 2049
           },
           {
             "path": "app/js/core/state/actions/appearance_selection_actions.js",
@@ -64578,19 +64895,27 @@
           },
           {
             "path": "app/js/core/state/actions/appearance_visibility_actions.js",
-            "size_bytes": 3924
+            "size_bytes": 4188
           },
           {
             "path": "app/js/core/state/actions/boot_actions.js",
             "size_bytes": 6368
           },
           {
+            "path": "app/js/core/state/actions/export_workbench_actions.js",
+            "size_bytes": 4546
+          },
+          {
             "path": "app/js/core/state/actions/intensity_field_actions.js",
-            "size_bytes": 2048
+            "size_bytes": 2297
+          },
+          {
+            "path": "app/js/core/state/actions/project_import_actions.js",
+            "size_bytes": 5663
           },
           {
             "path": "app/js/core/state/actions/renderer_cache_actions.js",
-            "size_bytes": 7020
+            "size_bytes": 7406
           },
           {
             "path": "app/js/core/state/actions/renderer_diagnostics_actions.js",
@@ -64602,7 +64927,7 @@
           },
           {
             "path": "app/js/core/state/actions/renderer_interaction_actions.js",
-            "size_bytes": 5086
+            "size_bytes": 5350
           },
           {
             "path": "app/js/core/state/actions/renderer_phase_actions.js",
@@ -64610,11 +64935,15 @@
           },
           {
             "path": "app/js/core/state/actions/special_zone_actions.js",
-            "size_bytes": 14030
+            "size_bytes": 14630
           },
           {
             "path": "app/js/core/state/actions/strategic_overlay_actions.js",
-            "size_bytes": 15929
+            "size_bytes": 17135
+          },
+          {
+            "path": "app/js/core/state/actions/transport_actions.js",
+            "size_bytes": 9310
           },
           {
             "path": "app/js/core/state/actions/ui_chrome_actions.js",
@@ -64626,7 +64955,7 @@
           },
           {
             "path": "app/js/core/state/actions/ui_visibility_actions.js",
-            "size_bytes": 4698
+            "size_bytes": 6857
           },
           {
             "path": "app/js/core/state/appearance_preset_state.js",
@@ -64733,12 +65062,12 @@
           {
             "file_count": 2,
             "prefix": "app/js/workers/",
-            "size_bytes": 31365
+            "size_bytes": 31414
           },
           {
             "file_count": 3,
             "prefix": "app/js/core/interaction_funnel/",
-            "size_bytes": 10621
+            "size_bytes": 13406
           },
           {
             "file_count": 4,
@@ -64746,7 +65075,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 2972297
+        "size_bytes": 2974394
       },
       {
         "basis": "startup-resource-graph",
@@ -64769,16 +65098,12 @@
       {
         "basis": "startup-resource-graph",
         "category": "startup-critical",
-        "file_count": 4,
+        "file_count": 3,
         "owner": "editor-vendor",
         "path_exceptions": [
           {
             "path": "app/vendor/d3.v7.min.js",
             "size_bytes": 279706
-          },
-          {
-            "path": "app/vendor/fflate.browser.js",
-            "size_bytes": 90922
           },
           {
             "path": "app/vendor/textures/paper_vintage_01.svg",
@@ -64790,7 +65115,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 380735
+        "size_bytes": 289813
       },
       {
         "basis": "entrypoint-reference",
@@ -64901,28 +65226,28 @@
             "size_bytes": 834442
           },
           {
+            "path": "app/js/core/file_manager.js",
+            "size_bytes": 47721
+          },
+          {
             "path": "app/js/core/logic.js",
             "size_bytes": 3864
           },
           {
+            "path": "app/js/core/project_package_io.js",
+            "size_bytes": 15661
+          },
+          {
             "path": "app/js/core/sample_project_import_workflow.js",
-            "size_bytes": 6471
+            "size_bytes": 6565
           },
           {
             "path": "app/js/core/sample_project_registry.js",
             "size_bytes": 10010
           },
           {
-            "path": "app/js/core/state/actions/appearance_reference_actions.js",
-            "size_bytes": 1788
-          },
-          {
-            "path": "app/js/core/state/actions/export_workbench_actions.js",
-            "size_bytes": 4291
-          },
-          {
-            "path": "app/js/core/state/actions/transport_actions.js",
-            "size_bytes": 9046
+            "path": "app/js/core/scenario/rollback_clone.js",
+            "size_bytes": 1111
           },
           {
             "path": "app/js/core/thematic_layer_catalog.js",
@@ -65213,10 +65538,24 @@
           {
             "file_count": 13,
             "prefix": "app/js/ui/sidebar/",
-            "size_bytes": 364747
+            "size_bytes": 365558
           }
         ],
-        "size_bytes": 2556637
+        "size_bytes": 2606910
+      },
+      {
+        "basis": "deferred-resource-graph",
+        "category": "startup-deferred-runtime",
+        "file_count": 1,
+        "owner": "editor-vendor",
+        "path_exceptions": [
+          {
+            "path": "app/vendor/fflate.browser.js",
+            "size_bytes": 90922
+          }
+        ],
+        "path_prefixes": [],
+        "size_bytes": 90922
       },
       {
         "basis": "product-registry:milsymbol-deferred-vendor",
@@ -65276,7 +65615,7 @@
         "path_exceptions": [
           {
             "path": "app/data/city_aliases.json",
-            "size_bytes": 3619854
+            "size_bytes": 3590485
           },
           {
             "path": "app/data/europe_physical.geojson",
@@ -65352,7 +65691,7 @@
           },
           {
             "path": "app/data/world_cities.geojson",
-            "size_bytes": 24981098
+            "size_bytes": 24980735
           }
         ],
         "path_prefixes": [
@@ -65372,7 +65711,7 @@
             "size_bytes": 1095022
           }
         ],
-        "size_bytes": 124706347
+        "size_bytes": 124676615
       },
       {
         "basis": "product-registry:on-demand-module-entries",
@@ -65607,11 +65946,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2150016
+            "size_bytes": 2162934
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2150016
+        "size_bytes": 2162934
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -65758,7 +66097,7 @@
           },
           {
             "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-            "size_bytes": 33359
+            "size_bytes": 32748
           },
           {
             "path": "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
@@ -65766,7 +66105,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
-            "size_bytes": 14050
+            "size_bytes": 17066
           },
           {
             "path": "app/js/core/renderer/scenario_relief_overlay_render_owner.js",
@@ -65782,11 +66121,11 @@
           },
           {
             "path": "app/js/core/scenario/bundle_runtime.js",
-            "size_bytes": 19159
+            "size_bytes": 19662
           },
           {
             "path": "app/js/core/scenario/chunk_runtime.js",
-            "size_bytes": 150708
+            "size_bytes": 150331
           },
           {
             "path": "app/js/core/scenario/lifecycle_runtime.js",
@@ -65822,7 +66161,7 @@
           },
           {
             "path": "app/js/core/scenario/shared.js",
-            "size_bytes": 8583
+            "size_bytes": 8566
           },
           {
             "path": "app/js/core/scenario/startup_hydration.js",
@@ -65862,7 +66201,7 @@
           },
           {
             "path": "app/js/core/scenario_manager.js",
-            "size_bytes": 56332
+            "size_bytes": 58428
           },
           {
             "path": "app/js/core/scenario_ownership_editor.js",
@@ -65878,11 +66217,11 @@
           },
           {
             "path": "app/js/core/scenario_resources.js",
-            "size_bytes": 39924
+            "size_bytes": 40216
           },
           {
             "path": "app/js/core/scenario_rollback.js",
-            "size_bytes": 25481
+            "size_bytes": 25646
           },
           {
             "path": "app/js/core/scenario_runtime_queries.js",
@@ -65898,7 +66237,7 @@
           },
           {
             "path": "app/js/core/state/actions/scenario_activation_actions.js",
-            "size_bytes": 29607
+            "size_bytes": 30724
           },
           {
             "path": "app/js/core/state/actions/scenario_apply_request_actions.js",
@@ -65910,7 +66249,7 @@
           },
           {
             "path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js",
-            "size_bytes": 42257
+            "size_bytes": 42391
           },
           {
             "path": "app/js/core/state/actions/scenario_health_actions.js",
@@ -65922,7 +66261,7 @@
           },
           {
             "path": "app/js/core/state/actions/scenario_presentation_actions.js",
-            "size_bytes": 24079
+            "size_bytes": 25307
           },
           {
             "path": "app/js/core/state/actions/scenario_readiness_actions.js",
@@ -65954,7 +66293,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 956411
+        "size_bytes": 963957
       },
       {
         "basis": "product-registry:scenario-runtime-data",
@@ -65966,7 +66305,7 @@
           {
             "file_count": 928,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 691234245
+            "size_bytes": 691234197
           },
           {
             "file_count": 9,
@@ -65974,7 +66313,7 @@
             "size_bytes": 118248
           }
         ],
-        "size_bytes": 691352493
+        "size_bytes": 691352445
       },
       {
         "basis": "product-registry:export-modules",
@@ -66044,7 +66383,7 @@
       }
     ],
     "product_inventory": {
-      "classified_file_count": 9560,
+      "classified_file_count": 9565,
       "exact_exclusions": [],
       "publication_ownership_status": "complete",
       "registry_rules": [
@@ -66161,7 +66500,7 @@
             "prefixes": []
           },
           "owner": "scenario-runtime",
-          "size_bytes": 956411
+          "size_bytes": 963957
         },
         {
           "category": "scenario-specific",
@@ -66175,7 +66514,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 691352493
+          "size_bytes": 691352445
         },
         {
           "category": "scenario-specific",
@@ -66311,7 +66650,7 @@
             ]
           },
           "owner": "editor-data-runtime",
-          "size_bytes": 124706347
+          "size_bytes": 124676615
         },
         {
           "category": "on-demand-product",
@@ -66414,11 +66753,11 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2150016
+          "size_bytes": 2162934
         }
       ],
       "status": "complete",
-      "total_file_count": 9560,
+      "total_file_count": 9565,
       "unknown_file_count": 0,
       "unknown_paths": []
     },
@@ -66427,8 +66766,8 @@
       "graph_scan_status": "complete",
       "registry_resolved_dynamic_expression_count": 2,
       "status": "complete",
-      "total_file_count": 9560,
-      "traversed_file_count": 408,
+      "total_file_count": 9565,
+      "traversed_file_count": 413,
       "unresolved_dynamic_expression_count": 0,
       "unresolved_reference_count": 0,
       "untraversed_file_count": 9152,
@@ -66455,9 +66794,9 @@
   },
   "top_level_directories": [
     {
-      "file_count": 9498,
+      "file_count": 9503,
       "path": "app",
-      "size_bytes": 959866657
+      "size_bytes": 959896793
     },
     {
       "file_count": 57,
@@ -66467,7 +66806,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2150016
+      "size_bytes": 2162934
     },
     {
       "file_count": 1,
@@ -66490,5 +66829,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 966807286
+  "total_bytes": 966850340
 }

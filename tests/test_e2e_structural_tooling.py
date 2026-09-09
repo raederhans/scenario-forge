@@ -820,7 +820,7 @@ if (!mainThreadPlan.commandsToRun.includes(tnoWaterCommand) || mainThreadPlan.bl
             "--changed-file",
             "tools/ai_test_supervisor/supervise_adaptive_verification.mjs",
             "--changed-file",
-            "docs/active/unrelated-task/context.md",
+            "docs/active/unrelated-task/unregistered-runtime.js",
             "--json-out",
             str(self.tmp_root / "test-adaptive-unmatched-execute.json"),
             "--md-out",
@@ -829,7 +829,7 @@ if (!mainThreadPlan.commandsToRun.includes(tnoWaterCommand) || mainThreadPlan.bl
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("unmatched changed files", result.stderr)
         payload = json.loads((self.tmp_root / "test-adaptive-unmatched-execute.json").read_text(encoding="utf-8"))
-        self.assertIn("docs/active/unrelated-task/context.md", payload["unmatchedChangedFiles"])
+        self.assertIn("docs/active/unrelated-task/unregistered-runtime.js", payload["unmatchedChangedFiles"])
         self.assertEqual(payload["executionStatus"], "blocked")
         self.assertEqual(payload["executionResults"], [])
         self.assertEqual(payload["executionPlan"]["executionCommands"], [])

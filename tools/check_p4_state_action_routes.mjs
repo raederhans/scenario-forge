@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildRecommendation,
+  nonBehavioralClassification,
   normalizeChangedFiles,
 } from "./select_verification_targets.mjs";
 import { discoverChangedFiles } from "./run_adaptive_tests.mjs";
@@ -219,10 +220,20 @@ export function buildP4StateActionRouteReport({
   const normalizedChangedFiles = normalizeChangedFiles(
     changedFiles?.length ? changedFiles : recommendation?.changedFiles || [],
   );
-  const unmatchedChangedFiles = (recommendation?.unmatchedChangedFiles || [])
+  const selectorUnmatchedChangedFiles = (recommendation?.unroutedChangedFiles || recommendation?.unmatchedChangedFiles || [])
     .map(normalizeRepoPath)
     .filter((file) => normalizedChangedFiles.includes(file));
-  const unmatchedSet = new Set(unmatchedChangedFiles);
+  const nonBehavioralChangedFiles = normalizedChangedFiles
+    .filter((file) => nonBehavioralClassification(file))
+    .map((file) => ({
+      changedFile: file,
+      classification: nonBehavioralClassification(file),
+      disposition: "no-app-behavior-validation",
+      behaviorTestsRun: false,
+    }));
+  const unmatchedChangedFiles = selectorUnmatchedChangedFiles
+    .filter((file) => !nonBehavioralClassification(file));
+  const unmatchedSet = new Set(selectorUnmatchedChangedFiles);
   const routeGaps = normalizedChangedFiles.length === 0 && !allowEmpty
     ? [createGap(
       "",
@@ -284,6 +295,7 @@ export function buildP4StateActionRouteReport({
     return {
       changedFile,
       p4Owned,
+      nonBehavioralClassification: nonBehavioralClassification(changedFile),
       selectorMatched: !unmatchedSet.has(changedFile),
       selectorMatchedRouteIds: [...(selectorEntry.matchedRouteIds || [])].sort(),
       selectorRecommendedCommands: (selectorEntry.recommendedCommands || [])
@@ -314,6 +326,8 @@ export function buildP4StateActionRouteReport({
     p4OwnedChangedFiles,
     recommendedCommands: recommendation?.recommendedCommands || [],
     unmatchedChangedFiles,
+    selectorUnmatchedChangedFiles,
+    nonBehavioralChangedFiles,
     files,
     routeGaps,
     summary: {

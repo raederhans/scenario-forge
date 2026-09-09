@@ -394,7 +394,7 @@ async function validateManifestProjectEntry({ manifest, projectBytes, selectedPr
   }
 }
 
-async function prepareProjectImportFile(file) {
+async function prepareProjectImportFile(file, { materializeFile = true } = {}) {
   if (!fileLooksLikeProjectZip(file)) {
     return { file, preview: null, manifest: null };
   }
@@ -425,7 +425,8 @@ async function prepareProjectImportFile(file) {
     projectPayload,
   });
   return {
-    file: buildJsonProjectFile(projectText, "map_project.json"),
+    file: materializeFile ? buildJsonProjectFile(projectText, "map_project.json") : null,
+    projectPayload,
     preview,
     manifest,
   };

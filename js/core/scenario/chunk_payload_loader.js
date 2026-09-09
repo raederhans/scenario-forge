@@ -5,6 +5,7 @@ import {
   failScenarioChunkLoadState,
   finishScenarioChunkLoadState,
 } from "../state/actions/scenario_chunk_runtime_actions.js";
+import { recordScenarioChunkPayloadSourceBytes, touchScenarioChunkPayloadCache, trimScenarioChunkPayloadCache } from "./bundle_cache.js";
 
 function ensureScenarioChunkPayloadCache(bundle) {
   if (!bundle || typeof bundle !== "object") return {};
@@ -25,10 +26,32 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
   const chunkRequestsByRequest = new Map();
   let activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || runtimeState.activeScenarioId || ""));
 
+  function activePayloadIds(bundle) {
+    return getScenarioBundleId(bundle) === activeRequestScenarioId
+      && getScenarioBundleId(bundle) === normalizeScenarioId(runtimeState.activeScenarioChunks?.scenarioId || "")
+      ? Object.keys(runtimeState.activeScenarioChunks?.payloadByChunkId || {}) : [];
+  }
+
+  async function loadScenarioChunkPayloadEntries(bundle, chunks, options) {
+    // Persist the latest selection through prewarm -> apply and load -> promotion.
+    // Older concurrent callers own their returned entries and cannot lose them
+    // when a newer selection replaces these pins.
+    bundle.chunkPayloadProtectedIds = chunks.map((chunk) => String(chunk.id));
+    trimScenarioChunkPayloadCache(bundle, activePayloadIds(bundle));
+    return Promise.all(chunks.map(async (chunk) => ({
+      chunkId: chunk.id, payload: await loadScenarioChunkPayload(bundle, chunk, options),
+    })));
+  }
+
   function resetScenarioChunkRequests(scenarioId) {
     const outgoingScenarioId = activeRequestScenarioId
       || normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || ""));
     if (outgoingScenarioId && outgoingScenarioId !== scenarioId) {
+      const outgoingBundle = runtimeState.scenarioBundleCacheById?.[outgoingScenarioId];
+      if (outgoingBundle) {
+        outgoingBundle.chunkPayloadProtectedIds = [];
+        trimScenarioChunkPayloadCache(outgoingBundle);
+      }
       // The active ID may already be incoming; track every replaced outgoing bundle.
       for (const [request, { bundle, chunkId }] of chunkRequestsByRequest) {
         if (getScenarioBundleId(bundle) !== outgoingScenarioId) continue;
@@ -64,7 +87,12 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     const chunkId = String(chunkMeta?.id || "").trim();
     if (!bundle || !chunkId) return null;
     const payloadCache = ensureScenarioChunkPayloadCache(bundle);
-    if (payloadCache[chunkId]) return payloadCache[chunkId];
+    if (payloadCache[chunkId]) {
+      const payload = payloadCache[chunkId];
+      recordScenarioChunkPayloadSourceBytes(payload, chunkMeta);
+      touchScenarioChunkPayloadCache(bundle, chunkId, activePayloadIds(bundle));
+      return payload;
+    }
     const promiseCache = ensureScenarioChunkPromiseCache(bundle);
     ensureScenarioChunkRuntimeState(runtimeState);
     if (!activeRequestScenarioId) activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioId || ""));
@@ -85,6 +113,7 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
         });
         request.controller.signal.throwIfAborted();
         const payload = { layerKey: chunkMeta.layer, payload: result?.payload || null };
+        recordScenarioChunkPayloadSourceBytes(payload, chunkMeta);
         payloadCache[chunkId] = payload;
         return observer.complete(payload);
       } catch (error) {
@@ -98,10 +127,11 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     const clearCachedLoadPromise = () => {
       if (promiseCache[chunkId] === loadPromise) delete promiseCache[chunkId];
       chunkRequestsByRequest.delete(request);
+      if (payloadCache[chunkId]) touchScenarioChunkPayloadCache(bundle, chunkId, activePayloadIds(bundle));
     };
     void loadPromise.then(clearCachedLoadPromise, clearCachedLoadPromise);
     return loadPromise;
   }
 
-  return Object.freeze({ loadScenarioChunkPayload, resetScenarioChunkRequests });
+  return Object.freeze({ loadScenarioChunkPayload, loadScenarioChunkPayloadEntries, resetScenarioChunkRequests });
 }

@@ -173,7 +173,7 @@ import {
   isPoliticalRasterWorkerBitmapEnabled,
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
-import { LegendManager } from "./legend_manager.js";
+import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
 import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
@@ -310,6 +310,7 @@ import { createPoliticalBackgroundRenderOwner } from "./renderer/political_backg
 import { createPoliticalPartialRepaintOwner } from "./renderer/political_partial_repaint_owner.js";
 import { createRenderPerfMetricsRuntimeOwner } from "./renderer/render_perf_metrics_runtime_owner.js";
 import { createRenderCacheOwner } from "./renderer/render_cache_owner.js";
+import { createExactCompositeReuseOwner } from "./renderer/exact_composite_reuse_owner.js";
 import { createCachedPassCompositorOwner } from "./renderer/cached_pass_compositor_owner.js";
 import { createTransformedFrameCompositorOwner } from "./map_renderer/transformed_frame_compositor_owner.js";
 import { createRenderTransformReusePolicyOwner } from "./renderer/render_transform_reuse_policy_owner.js";
@@ -740,6 +741,7 @@ let politicalBackgroundRenderOwner = null;
 let politicalPartialRepaintOwner = null;
 let renderCacheOwner = null;
 let cachedPassCompositorOwner = null;
+let exactCompositeReuseOwner = null;
 let transformedFrameCompositorOwner = null;
 let renderPerfMetricsRuntimeOwner = null;
 const renderPerfMetricsMirrorRuntime = { snapshot: null };
@@ -949,12 +951,13 @@ function getSelectionOverlayOwner() {
 
 function getLegendControlOwner() {
   if (legendControlOwner) return legendControlOwner;
+  const readLegendColors = createRevisionedLegendColorReader();
   legendControlOwner = createLegendControlOwner({
     getMapContainer: () => rendererSurfaceHost.getMapContainer(),
     getViewportSize: () => ({ width: Number(runtimeState.width), height: Number(runtimeState.height) }),
     getLanguage: () => String(runtimeState.currentLanguage || state.currentLanguage || ""),
     getLegendModel: (uniqueColors, labels) => ({
-      colors: Array.isArray(uniqueColors) ? uniqueColors : LegendManager.getUniqueColors(state),
+      colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
       activeScenarioId: runtimeState.activeScenarioId,
@@ -2326,6 +2329,21 @@ function getRenderCacheOwner() {
   return renderCacheOwner;
 }
 
+function getExactCompositeReuseOwner() {
+  if (!exactCompositeReuseOwner) {
+    exactCompositeReuseOwner = createExactCompositeReuseOwner({
+      getCache: getRenderPassCacheState,
+      getReferenceTransform: getPassReferenceTransform,
+      getLayout: getRenderPassLayout,
+      getDpr: () => runtimeState.dpr,
+      diagnosticsEnabled: () => !!renderDiag.enabled,
+      resetContext: resetCanvasContext,
+      compose: composeRenderPassesToTarget,
+    });
+  }
+  return exactCompositeReuseOwner;
+}
+
 function getCachedPassCompositorOwner() {
   if (cachedPassCompositorOwner) return cachedPassCompositorOwner;
   cachedPassCompositorOwner = createCachedPassCompositorOwner({
@@ -2386,7 +2404,10 @@ function getTransformedFrameCompositorOwner() {
       getInteractionCompositeReuseDecision,
     },
     effects: {
-      ensureCompositeBufferCanvas,
+      ensureCompositeBufferCanvas: () => {
+        exactCompositeReuseOwner?.invalidate();
+        return ensureCompositeBufferCanvas();
+      },
       resetCanvasContext,
       withRenderTarget,
       drawInteractionComposite,
@@ -4026,10 +4047,12 @@ function getRenderPassLayout(passName) {
 }
 
 function resizeRenderPassCanvases(passNames = RENDER_PASS_NAMES) {
+  exactCompositeReuseOwner?.invalidate();
   return getRenderCacheOwner().resizeRenderPassCanvases(passNames);
 }
 
 function ensureRenderPassCanvas(passName) {
+  exactCompositeReuseOwner?.invalidate();
   return getRenderCacheOwner().ensureRenderPassCanvas(passName);
 }
 
@@ -11683,12 +11706,14 @@ function buildPoliticalRasterWorkerPacket(options = {}) {
   return getPoliticalPartialRepaintOwner().buildPoliticalRasterWorkerPacket(options);
 }
 function drawPoliticalWorkerBitmapResult(result, workerIdentity) {
+  exactCompositeReuseOwner?.invalidate();
   return getPoliticalPartialRepaintOwner().drawPoliticalWorkerBitmapResult(result, workerIdentity);
 }
 function drawPoliticalFeature(feature, index, options = {}) {
   return getPoliticalPartialRepaintOwner().drawPoliticalFeature(feature, index, options);
 }
 function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
+  exactCompositeReuseOwner?.invalidate();
   return getPoliticalPartialRepaintOwner().tryPartialPoliticalPassRepaint(transform, nextSignature, timings);
 }
 function recordPoliticalRasterWorkerSnapshot() {
@@ -11879,6 +11904,7 @@ function drawLabelsPass(k, { interactive = false } = {}) {
 }
 
 function renderPassToCache(passName, drawFn, transform, timings) {
+  exactCompositeReuseOwner?.invalidate();
   let passStart = 0;
   const hostResult = getRenderPassCacheHostOwner().prepareRenderPassHost({
     passName,
@@ -11938,12 +11964,7 @@ function blitCompositeBufferToMain(bufferCanvas) {
 function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
   if (!rendererSurfaceHost.getContext()?.canvas) return false;
   const bufferCanvas = ensureCompositeBufferCanvas();
-  const bufferContext = bufferCanvas.getContext("2d");
-  if (!bufferContext) return false;
-  resetCanvasContext(bufferContext, bufferCanvas.width, bufferCanvas.height);
-  const result = composeRenderPassesToTarget(bufferContext, passNames, currentTransform, {
-    requireAllPasses: true,
-  });
+  const result = getExactCompositeReuseOwner().composeExact(bufferCanvas, passNames, currentTransform);
   if (!result.ok) {
     const controller = getExactAfterSettleControllerState();
     const missingPassNames = Array.isArray(result.missingPassNames) && result.missingPassNames.length
@@ -11960,7 +11981,7 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
     return false;
   }
   blitCompositeBufferToMain(bufferCanvas);
-  incrementPerfCounter("composites");
+  incrementPerfCounter(result.reused ? "compositeBufferReuses" : "composites");
   return true;
 }
 

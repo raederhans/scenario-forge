@@ -7,6 +7,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 
 from map_builder import config as cfg
+from map_builder.city_contract import validate_city_features
 from map_builder.geo.utils import round_geometries
 from map_builder.io.writers import write_geojson_atomic, write_json_atomic
 
@@ -50,6 +51,9 @@ def save_outputs(
     urban_out = round_geometries(urban)
     physical_out = round_geometries(physical)
     world_cities_out = round_geometries(world_cities) if world_cities is not None else None
+
+    if world_cities_out is not None:
+        validate_city_features(world_cities_out.iterfeatures(drop_id=True))
 
     _write_geojson(output_dir / cfg.WORLD_CITIES_FILENAME, world_cities_out)
     _write_json(output_dir / cfg.CITY_ALIASES_FILENAME, city_aliases)

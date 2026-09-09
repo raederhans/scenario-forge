@@ -18,6 +18,7 @@ export function createLegendControlOwner({
   let legendDragSession = null;
   let legendResizeSession = null;
   let lastLegendKey = null;
+  let lastHeaderKey = null;
 
   function getLegendControlText(key, count = 0) {
     const zh = String(getLanguage() || "").toLowerCase().startsWith("zh");
@@ -89,6 +90,12 @@ export function createLegendControlOwner({
     };
   }
 
+  function setStyleIfChanged(property, value) {
+    if (legendControlElement.style[property] !== value) {
+      legendControlElement.style[property] = value;
+    }
+  }
+
   function applyLegendControlSize(controlState) {
     if (!legendControlElement) return;
     const limits = getLegendControlLimits();
@@ -96,9 +103,9 @@ export function createLegendControlOwner({
     const height = clamp(Number(controlState.height || 340), limits.minHeight, limits.maxHeight);
     const opacity = clamp(Number(controlState.opacity || 0.9), limits.minOpacity, limits.maxOpacity);
     const collapsedWidth = Math.min(176, limits.minWidth);
-    legendControlElement.style.width = controlState.collapsed ? `${collapsedWidth}px` : `${Math.round(width)}px`;
-    legendControlElement.style.height = controlState.collapsed ? "" : `${Math.round(height)}px`;
-    legendControlElement.style.opacity = String(opacity);
+    setStyleIfChanged("width", controlState.collapsed ? `${collapsedWidth}px` : `${Math.round(width)}px`);
+    setStyleIfChanged("height", controlState.collapsed ? "" : `${Math.round(height)}px`);
+    setStyleIfChanged("opacity", String(opacity));
     if (legendOpacityInputElement) {
       legendOpacityInputElement.min = String(Math.round(limits.minOpacity * 100));
       legendOpacityInputElement.max = String(Math.round(limits.maxOpacity * 100));
@@ -125,8 +132,8 @@ export function createLegendControlOwner({
     const bounds = getLegendControlBounds(legendControlElement);
     const left = clamp(Math.round(bounds.maxLeft * Number(controlState.xRatio || 0)), bounds.padding, bounds.maxLeft);
     const top = clamp(Math.round(bounds.maxTop * Number(controlState.yRatio || 0)), bounds.padding, bounds.maxTop);
-    legendControlElement.style.left = `${left}px`;
-    legendControlElement.style.top = `${top}px`;
+    setStyleIfChanged("left", `${left}px`);
+    setStyleIfChanged("top", `${top}px`);
   }
 
   function storeLegendControlPosition(left, top) {
@@ -269,6 +276,7 @@ export function createLegendControlOwner({
     stopLegendDrag();
     stopLegendResize();
     lastLegendKey = null;
+    lastHeaderKey = null;
     legendControlElement?.remove();
 
     const element = document.createElement("section");
@@ -423,6 +431,14 @@ export function createLegendControlOwner({
     const controlElement = ensureLegendControlElement();
     if (!controlElement || !legendControlBodyElement) return;
 
+    const controlState = getControlState();
+    if (!controlState.visible) {
+      controlElement.hidden = true;
+      stopLegendDrag();
+      stopLegendResize();
+      return;
+    }
+
     const { colors, specialZoneLegendLayers, labelMap, activeScenarioId, hasScenarioVisualEdits } =
       getLegendModel(uniqueColors, labels);
     const hasMeaningfulLabels = colors.some((color) => {
@@ -456,17 +472,13 @@ export function createLegendControlOwner({
       return;
     }
 
-    const controlState = getControlState();
-    if (!controlState.visible) {
-      controlElement.hidden = true;
-      stopLegendDrag();
-      stopLegendResize();
-      return;
-    }
-
     controlElement.hidden = false;
-    controlElement.classList.toggle("is-collapsed", controlState.collapsed);
-    setLegendControlHeader(colors.length + specialZoneLegendLayers.length, controlState.collapsed);
+    const headerKey = JSON.stringify([getLanguage(), colors.length + specialZoneLegendLayers.length, controlState.collapsed]);
+    if (headerKey !== lastHeaderKey) {
+      controlElement.classList.toggle("is-collapsed", controlState.collapsed);
+      setLegendControlHeader(colors.length + specialZoneLegendLayers.length, controlState.collapsed);
+      lastHeaderKey = headerKey;
+    }
 
     if (shouldRebuild) {
       legendControlBodyElement.replaceChildren();

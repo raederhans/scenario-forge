@@ -146,17 +146,33 @@ export function persistViewSettings() {
 }
 
 export function createRenderDispatcher(renderFn) {
-  let framePending = false;
+  let pendingFrame = null;
 
   const flush = () => {
-    framePending = false;
+    const frame = pendingFrame;
+    pendingFrame = null;
+    if (frame && typeof globalThis.cancelAnimationFrame === "function") {
+      globalThis.cancelAnimationFrame(frame.handle);
+    }
     renderFn();
   };
 
   const schedule = () => {
-    if (framePending) return;
-    framePending = true;
-    globalThis.requestAnimationFrame(flush);
+    if (pendingFrame) return;
+    const frame = { handle: null };
+    pendingFrame = frame;
+    try {
+      frame.handle = globalThis.requestAnimationFrame(() => {
+        // A synchronous flush already consumed this work. A stale callback
+        // must not render or consume a newer scheduled frame.
+        if (pendingFrame !== frame) return;
+        pendingFrame = null;
+        renderFn();
+      });
+    } catch (error) {
+      if (pendingFrame === frame) pendingFrame = null;
+      throw error;
+    }
   };
 
   return { schedule, flush };

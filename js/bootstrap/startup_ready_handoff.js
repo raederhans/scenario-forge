@@ -76,8 +76,27 @@ export function createStartupReadyHandoffOwner({
 
   let postReadyContextWarmupScheduled = false;
   let postReadyHydrationScheduled = false;
+  let lifecycleEpoch = 0;
+
+  function scopedTaskOptions(options = {}) {
+    const epoch = lifecycleEpoch;
+    const scenarioId = targetRuntime.activeScenarioId;
+    const requestId = targetRuntime.currentScenarioApplyRequestId;
+    return {
+      // Operational cancellation limits, not input-latency performance budgets.
+      maxWaitMs: 120_000,
+      maxRunMs: 120_000,
+      isCurrent: () => epoch === lifecycleEpoch
+        && targetRuntime.activeScenarioId === scenarioId
+        && targetRuntime.currentScenarioApplyRequestId === requestId,
+      ...options,
+    };
+  }
 
   function reset(reason = "reset") {
+    lifecycleEpoch += 1;
+    postReadyScheduler.clearTask?.("post-ready-context-warmup");
+    postReadyScheduler.clearTask?.("post-ready-contour-warmup");
     postReadyContextWarmupScheduled = false;
     postReadyHydrationScheduled = false;
     return {
@@ -299,7 +318,8 @@ export function createStartupReadyHandoffOwner({
       return;
     }
     postReadyContextWarmupScheduled = true;
-    postReadyScheduler.scheduleTask("post-ready-context-warmup", async () => {
+    postReadyScheduler.scheduleTask("post-ready-context-warmup", async (task) => {
+      task.throwIfStale();
       if (targetRuntime.bootBlocking) {
         return;
       }
@@ -313,30 +333,32 @@ export function createStartupReadyHandoffOwner({
       if (shouldWarmCities && targetRuntime.baseCityDataState === "idle" && typeof targetRuntime.ensureBaseCityDataFn === "function") {
         tasks.push(targetRuntime.ensureBaseCityDataFn({ reason: "post-ready", renderNow: false }));
       }
-      await Promise.allSettled(tasks);
-      requestMainRender("post-ready-context-warmup");
-    }, {
+      await task.waitFor(Promise.allSettled(tasks));
+      task.commit(() => requestMainRender("post-ready-context-warmup"));
+    }, scopedTaskOptions({
       timeout: 1600,
       delayMs: 900,
       retryDelayMs: 420,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
-    });
+    }));
     if (requestedContourLayerNames.length) {
-      postReadyScheduler.scheduleTask("post-ready-contour-warmup", async () => {
+      postReadyScheduler.scheduleTask("post-ready-contour-warmup", async (task) => {
+        task.throwIfStale();
         if (targetRuntime.bootBlocking) {
           return;
         }
-        await ensureContextLayerDataReady(requestedContourLayerNames, {
+        await task.yield();
+        await task.waitFor(ensureContextLayerDataReady(requestedContourLayerNames, {
           reason: "post-ready-contours",
           renderNow: false,
-        });
-        requestMainRender("post-ready-contours");
-      }, {
+        }));
+        task.commit(() => requestMainRender("post-ready-contours"));
+      }, scopedTaskOptions({
         timeout: 1800,
         delayMs: 1400,
         retryDelayMs: 420,
         idleQuietMs: POST_READY_IDLE_QUIET_MS,
-      });
+      }));
     }
   }
 

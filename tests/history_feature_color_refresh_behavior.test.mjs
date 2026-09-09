@@ -67,6 +67,107 @@ test('multi-feature undo/redo restores removals and supplies the union to the ex
   assert.deepEqual(calls.at(-1), { renderNow: false, featureIds: ['A', 'B'], inputLabel: 'history-redo' });
 });
 
+test('feature-only history refreshes color and selection UI without rebuilding unrelated surfaces', t => {
+  const oldDocument = globalThis.document;
+  const hadDocument = Object.hasOwn(globalThis, 'document');
+  const oldHooks = new Map([
+    'refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn',
+    'updatePaintModeUIFn', 'updateActiveSovereignUIFn',
+    'refreshCountryInspectorDetailFn', 'updateToolbarInputsFn',
+    'renderCountryListFn', 'renderWaterRegionListFn',
+    'renderSpecialRegionListFn', 'renderPresetTreeFn', 'updateLegendUI',
+    'updateStrategicOverlayUIFn',
+  ].map(name => [name, readRegisteredRuntimeHookSource(state, name)]));
+  globalThis.document = { getElementById: () => null };
+  t.after(() => {
+    try {
+      clearHistory();
+    } finally {
+      oldHooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
+      if (hadDocument) globalThis.document = oldDocument;
+      else delete globalThis.document;
+    }
+  });
+
+  const calls = [];
+  const trackedHooks = [
+    'refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn',
+    'updatePaintModeUIFn', 'updateActiveSovereignUIFn',
+    'refreshCountryInspectorDetailFn', 'updateToolbarInputsFn',
+    'renderCountryListFn', 'renderWaterRegionListFn',
+    'renderSpecialRegionListFn', 'renderPresetTreeFn', 'updateLegendUI',
+    'updateStrategicOverlayUIFn',
+  ];
+  trackedHooks.forEach(name => registerRuntimeHook(state, name, () => calls.push(name)));
+  clearHistory();
+  pushHistoryEntry({
+    before: { visualOverrides: { A: null }, featureOverrides: { A: null } },
+    after: { visualOverrides: { A: '#123456' }, featureOverrides: { A: '#123456' } },
+    meta: { affectsSovereignty: false },
+  });
+  undoHistory();
+  assert.deepEqual(calls, [
+    'refreshColorStateFn',
+    'updateToolUIFn',
+    'updateSwatchUIFn',
+    'updatePaintModeUIFn',
+    'updateActiveSovereignUIFn',
+    'refreshCountryInspectorDetailFn',
+  ]);
+});
+
+test('mixed and ownership history retain the complete UI refresh set', t => {
+  const oldDocument = globalThis.document;
+  const hadDocument = Object.hasOwn(globalThis, 'document');
+  const hookNames = [
+    'refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn',
+    'updatePaintModeUIFn', 'updateToolbarInputsFn',
+    'updateActiveSovereignUIFn', 'renderCountryListFn',
+    'renderWaterRegionListFn', 'renderSpecialRegionListFn',
+    'renderPresetTreeFn', 'updateLegendUI', 'updateStrategicOverlayUIFn',
+  ];
+  const oldHooks = new Map(hookNames.map(name => [name, readRegisteredRuntimeHookSource(state, name)]));
+  globalThis.document = { getElementById: () => null };
+  t.after(() => {
+    try {
+      clearHistory();
+    } finally {
+      oldHooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
+      if (hadDocument) globalThis.document = oldDocument;
+      else delete globalThis.document;
+    }
+  });
+
+  const calls = [];
+  hookNames.forEach(name => registerRuntimeHook(state, name, () => calls.push(name)));
+  const expected = [
+    'refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn',
+    'updatePaintModeUIFn', 'updateToolbarInputsFn',
+    'updateActiveSovereignUIFn', 'renderCountryListFn',
+    'renderWaterRegionListFn', 'renderSpecialRegionListFn',
+    'renderPresetTreeFn', 'updateLegendUI', 'updateStrategicOverlayUIFn',
+  ];
+
+  clearHistory();
+  pushHistoryEntry({
+    before: { visualOverrides: { A: null }, featureOverrides: { A: null }, waterRegionOverrides: { W: null } },
+    after: { visualOverrides: { A: '#123456' }, featureOverrides: { A: '#123456' }, waterRegionOverrides: { W: '#abcdef' } },
+    meta: { affectsSovereignty: false },
+  });
+  undoHistory();
+  assert.deepEqual(calls, expected, 'mixed visual and water history must use broad UI refresh');
+
+  calls.length = 0;
+  clearHistory();
+  pushHistoryEntry({
+    before: { sovereigntyByFeatureId: { A: null } },
+    after: { sovereigntyByFeatureId: { A: 'USA' } },
+    meta: { affectsSovereignty: true },
+  });
+  undoHistory();
+  assert.deepEqual(calls, expected, 'ownership history must use broad UI refresh');
+});
+
 test('renderer uses local refresh only for resolved non-Atlantropa targets; existing callers remain full', () => {
   const calls = [];
   const refresh = privateFunction('../js/core/map_renderer.js', 'refreshColorState', {

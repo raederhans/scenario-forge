@@ -555,21 +555,22 @@ export function finishScenarioChunkLoadState(
 
 export function commitScenarioChunkPayloadEntriesState(target, entries = []) {
   ensureScenarioChunkRuntimeState(target);
+  const payloadByChunkId = Object.fromEntries(Object.entries(target.activeScenarioChunks.payloadByChunkId));
+  const loadedChunkIds = new Set(Object.values(target.activeScenarioChunks.loadedChunkIds));
+  const lruChunkIds = new Set(Object.values(target.activeScenarioChunks.lruChunkIds));
   for (const entry of Array.isArray(entries) ? entries : []) {
     const chunkId = String(entry?.chunkId || "").trim();
     if (!chunkId) continue;
-    target.activeScenarioChunks.payloadByChunkId = Object.fromEntries([
-      ...Object.entries(target.activeScenarioChunks.payloadByChunkId),
-      [chunkId, entry?.payload],
-    ]);
-    if (!Object.values(target.activeScenarioChunks.loadedChunkIds).includes(chunkId)) {
-      target.activeScenarioChunks.loadedChunkIds = [...Object.values(target.activeScenarioChunks.loadedChunkIds), chunkId];
-    }
-    target.activeScenarioChunks.lruChunkIds = [
-      ...Object.values(target.activeScenarioChunks.lruChunkIds).filter((existingChunkId) => existingChunkId !== chunkId),
-      chunkId,
-    ];
+    Object.defineProperty(payloadByChunkId, chunkId, {
+      value: entry?.payload, enumerable: true, configurable: true, writable: true,
+    });
+    loadedChunkIds.add(chunkId);
+    lruChunkIds.delete(chunkId);
+    lruChunkIds.add(chunkId);
   }
+  target.activeScenarioChunks.payloadByChunkId = payloadByChunkId;
+  target.activeScenarioChunks.loadedChunkIds = [...loadedChunkIds];
+  target.activeScenarioChunks.lruChunkIds = [...lruChunkIds];
   return true;
 }
 

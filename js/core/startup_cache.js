@@ -6,10 +6,11 @@ import {
 import { resolveDataAssetUrl } from "./runtime_asset_registry.js";
 
 const STARTUP_CACHE_DB_NAME = "mapcreator-startup-cache";
-const STARTUP_CACHE_DB_VERSION = 1;
+const STARTUP_CACHE_DB_VERSION = 2;
 const STARTUP_CACHE_STORE_NAME = "entries";
 const STARTUP_CACHE_KIND_INDEX = "by_kind";
 const STARTUP_CACHE_UPDATED_AT_INDEX = "by_updated_at";
+const STARTUP_CACHE_KIND_UPDATED_AT_INDEX = "by_kind_updated_at";
 const BUILD_MANIFEST_PROXY_OUTPUT_BY_URL = {};
 
 export const BOOT_CACHE_SCHEMA_VERSION = 3;
@@ -134,6 +135,9 @@ function openStartupCacheDb() {
       }
       if (!store.indexNames.contains(STARTUP_CACHE_UPDATED_AT_INDEX)) {
         store.createIndex(STARTUP_CACHE_UPDATED_AT_INDEX, "updatedAt", { unique: false });
+      }
+      if (!store.indexNames.contains(STARTUP_CACHE_KIND_UPDATED_AT_INDEX)) {
+        store.createIndex(STARTUP_CACHE_KIND_UPDATED_AT_INDEX, ["kind", "updatedAt"], { unique: false });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -498,14 +502,25 @@ export async function garbageCollectStartupCache({
   const deletedKeys = [];
   for (const kind of kinds) {
     const readTx = db.transaction(STARTUP_CACHE_STORE_NAME, "readonly");
-    const index = readTx.objectStore(STARTUP_CACHE_STORE_NAME).index(STARTUP_CACHE_KIND_INDEX);
-    const entries = await createRequestPromise(() => index.getAll(kind));
-    const sorted = Array.isArray(entries)
-      ? entries
-        .slice()
-        .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")))
-      : [];
-    const overflow = sorted.slice(Math.max(0, Number(maxEntriesPerKind) || 0));
+    const index = readTx.objectStore(STARTUP_CACHE_STORE_NAME).index(STARTUP_CACHE_KIND_UPDATED_AT_INDEX);
+    const entries = await new Promise((resolve, reject) => {
+      const values = [];
+      const request = index.openKeyCursor(IDBKeyRange.bound([kind, ""], [kind, "\uffff"]));
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) {
+          resolve(values);
+          return;
+        }
+        // Compound index keys provide kind/updatedAt and primaryKey provides cacheKey;
+        // never touch cursor.value, which would clone the potentially large payload.
+        values.push({ cacheKey: cursor.primaryKey, updatedAt: cursor.key[1] });
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error("IndexedDB cursor failed."));
+    });
+    const retainedCount = Math.max(0, Math.trunc(Number(maxEntriesPerKind) || 0));
+    const overflow = entries.slice(0, Math.max(0, entries.length - retainedCount));
     if (!overflow.length) {
       continue;
     }
@@ -532,16 +547,32 @@ export async function getStartupCacheDiagnostics({ search = null } = {}) {
   }
   const db = await openStartupCacheDb();
   const transaction = db.transaction(STARTUP_CACHE_STORE_NAME, "readonly");
-  const entries = await createRequestPromise(() => transaction.objectStore(STARTUP_CACHE_STORE_NAME).getAll());
+  const store = transaction.objectStore(STARTUP_CACHE_STORE_NAME);
+  const countPromise = createRequestPromise(() => store.count());
   const kinds = {};
-  (Array.isArray(entries) ? entries : []).forEach((entry) => {
-    const kind = normalizeText(entry?.kind) || "unknown";
-    kinds[kind] = (Number(kinds[kind]) || 0) + 1;
+  let indexedCount = 0;
+  const kindsPromise = new Promise((resolve, reject) => {
+    const request = store.index(STARTUP_CACHE_KIND_INDEX).openKeyCursor();
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) return resolve();
+      const kind = normalizeText(cursor.key) || "unknown";
+      Object.defineProperty(kinds, kind, {
+        value: (Object.hasOwn(kinds, kind) ? kinds[kind] : 0) + 1,
+        enumerable: true, configurable: true, writable: true,
+      });
+      indexedCount++;
+      cursor.continue();
+    };
+    request.onerror = () => reject(request.error || new Error("IndexedDB cursor failed."));
   });
+  const [entryCount] = await Promise.all([countPromise, kindsPromise]);
+  // Legacy records without an indexable kind are still included in the total.
+  if (entryCount > indexedCount) kinds.unknown = (kinds.unknown || 0) + entryCount - indexedCount;
   return {
     enabled: true,
     bypassed: false,
-    entryCount: Array.isArray(entries) ? entries.length : 0,
+    entryCount,
     kinds,
   };
 }

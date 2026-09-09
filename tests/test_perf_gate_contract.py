@@ -491,6 +491,7 @@ class PerfGateContractTest(unittest.TestCase):
 
     def test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields(self):
         baseline_payload = json.loads(BASELINE_JSON.read_text(encoding="utf-8"))
+        ratification = json.loads(BASELINE_RATIFICATION.read_text(encoding="utf-8"))
         self.assertEqual(baseline_payload.get("schemaVersion"), 3)
         self.assertEqual(baseline_payload.get("benchmarkMetricsSchemaVersion"), "3.3")
         self.assertEqual(baseline_payload.get("probeSchema"), "mc_perf_snapshot")
@@ -576,7 +577,9 @@ class PerfGateContractTest(unittest.TestCase):
             self.assertEqual(identity.get("manifestPath"), manifest_path.relative_to(REPO_ROOT).as_posix())
             self.assertEqual(
                 identity.get("manifestSha256"),
-                canonical_text_sha256(manifest_path),
+                # This immutable report describes its ratified source revision;
+                # candidate manifests are compared by the live workload gate.
+                ratification["workloadIdentityChanges"][scenario_id]["ratifiedManifestSha256"],
             )
             self.assertRegex(str(identity.get("manifestSha256", "")), r"^[0-9a-f]{64}$")
             self.assertGreater(int(identity.get("featureCount", 0)), 0)

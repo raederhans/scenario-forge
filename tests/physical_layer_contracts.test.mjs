@@ -176,12 +176,12 @@ test("physical layer source contracts stay wired to the expected renderer and st
       && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return PHYSICAL_CONTOUR_LAYER_SET;/.test(startupDataPipelineSource),
     schedulesDeferredContourWarmup:
       /if \(targetRuntime\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(startupReadyHandoffSource)
-      && /postReadyScheduler\.scheduleTask\("post-ready-contour-warmup", async \(\) => \{[\s\S]*?await ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",[\s\S]*?renderNow: false,[\s\S]*?requestMainRender\("post-ready-contours"\);/.test(startupReadyHandoffSource),
+      && /postReadyScheduler\.scheduleTask\("post-ready-contour-warmup", async \(task\) => \{[\s\S]*?task\.throwIfStale\(\);[\s\S]*?await task\.yield\(\);[\s\S]*?await task\.waitFor\(ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",[\s\S]*?renderNow: false,[\s\S]*?task\.commit\(\(\) => requestMainRender\("post-ready-contours"\)\);[\s\S]*?\}, scopedTaskOptions\(\{/.test(startupReadyHandoffSource),
     toolbarToggleLoadsFullPhysicalSet:
       /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(physicalOwnerSource)
       && /physicalOwner\.bindEvents\(\);/.test(appearanceControllerSource),
     projectImportLoadsFullPhysicalSet:
-      /callRuntimeHook\(state, "ensureContextLayerDataFn", \["physical-set", "physical-contours-set"\], \{[\s\S]*?reason: "project-import",[\s\S]*?renderNow: false,/.test(interactionFunnelSource),
+      /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", \["physical-set", "physical-contours-set"\]\],[\s\S]*?\]\) if \(visible\) await complete\(name, async \(\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false \}\);\s*if \(isCurrent\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource),
     contextMarkersStagedMetricsCoverTransportLines:
       /if \(getDeferContextBasePass\(\) && !interactive\) \{/.test(contextMarkersSource)
       && /collectContextMetric\([\s\S]*?"drawRoadsLayer",[\s\S]*?createDeferredMetricPayload\(snapshot\.roadFeatureCount\)/.test(contextMarkersSource)

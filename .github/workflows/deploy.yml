@@ -4,6 +4,11 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+    inputs:
+      artifact_only:
+        description: Use the verified source-built artifact; leave disabled for the tracked-dist rollback path.
+        type: boolean
+        default: false
 
 concurrency:
   # 策略：同一分支只保留最新部署任务，旧任务自动取消。
@@ -16,6 +21,7 @@ jobs:
     with:
       profile: deploy-minimal
       run-e2e-smoke: false
+      pages-artifact-only: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_only }}
 
   build:
     runs-on: ubuntu-latest
@@ -24,13 +30,31 @@ jobs:
       contents: read
       pages: write
     steps:
+      - name: Checkout artifact verifier
+        if: github.event_name == 'workflow_dispatch' && inputs.artifact_only
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
       - name: Download verified dist artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: deploy-dist
-          path: dist
+          path: ${{ (github.event_name == 'workflow_dispatch' && inputs.artifact_only) && '.runtime/pages-release/dist' || 'dist' }}
+
+      - name: Download Pages artifact admission
+        if: github.event_name == 'workflow_dispatch' && inputs.artifact_only
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: deploy-admission
+          path: .runtime/pages-release
+
+      - name: Verify artifact source and downloaded bytes
+        if: github.event_name == 'workflow_dispatch' && inputs.artifact_only
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+        run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --verify-receipt .runtime/pages-release/receipt.json --expected-source-sha "$EXPECTED_SOURCE_SHA"
 
       - name: Validate dist artifact payload
+        if: github.event_name != 'workflow_dispatch' || !inputs.artifact_only
         run: |
           test -f dist/index.html
           test -f dist/app/index.html
@@ -56,7 +80,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
-          path: 'dist'
+          path: ${{ (github.event_name == 'workflow_dispatch' && inputs.artifact_only) && '.runtime/pages-release/dist' || 'dist' }}
 
   deploy:
     environment:

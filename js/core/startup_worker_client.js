@@ -98,6 +98,7 @@ export async function loadBaseStartupViaWorker({
   needTopologyPrimary = true,
   needLocales = true,
   needGeoAliases = true,
+  cachedTopologyPrimary = null,
   timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_BASE_STARTUP, {
@@ -107,6 +108,7 @@ export async function loadBaseStartupViaWorker({
     needTopologyPrimary,
     needLocales,
     needGeoAliases,
+    cachedTopologyPrimary,
   }, { timeoutMs });
   return {
     topologyPrimary: message.topologyPrimary || null,

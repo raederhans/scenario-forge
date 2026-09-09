@@ -81,6 +81,7 @@ function createRecordingContext(events = []) {
 
 function createCityPointsHarness({
   buildCityRevealPlan = null,
+  getCityMarkerRenderStyle = () => ({ backgroundColor: "", tokens: markerTokens }),
   markerEntries = [],
   labelEntries = [],
   projection = () => [0, 0],
@@ -135,10 +136,7 @@ function createCityPointsHarness({
         labelCalls.push({ entries, options });
         return entries.length;
       },
-      getCityMarkerRenderStyle: () => ({
-        backgroundColor: "",
-        tokens: markerTokens,
-      }),
+      getCityMarkerRenderStyle,
       getCityMarkerSizePx: (entry) => Number(entry?.markerSizePx || 12),
       getCityTooltipText: (entry) => `tooltip:${entry.id || entry.stableId || ""}`,
       getCityVisualCapitalState: (entry, config) => !!entry?.isCapital && config?.showCapitalOverlay !== false,
@@ -314,7 +312,7 @@ test("city layer render state uses injected zoom identity when runtime transform
   assert.equal(renderState.scale, 3);
 });
 
-test("city marker sprite cache follows color revision", () => {
+test("city marker sprite cache reuses unchanged visuals across color revisions", () => {
   const restoreCanvas = installCanvasFactory();
   try {
     const entry = {
@@ -331,7 +329,54 @@ test("city marker sprite cache follows color revision", () => {
     const refreshed = harness.owner.getCityMarkerSprite(entry, {});
 
     assert.equal(first, cached);
-    assert.notEqual(first, refreshed);
+    assert.equal(first, refreshed);
+  } finally {
+    restoreCanvas();
+  }
+});
+
+test("city marker sprite cache distinguishes background, paint tokens and exact geometry", () => {
+  const restoreCanvas = installCanvasFactory();
+  try {
+    let backgroundColor = "#ffffff";
+    let tokens = { ...markerTokens };
+    const { owner } = createCityPointsHarness({
+      getCityMarkerRenderStyle: () => ({ backgroundColor, tokens }),
+    });
+    const entry = { cityTier: "regional", isCapital: true, markerSizePx: 12.001 };
+    const first = owner.getCityMarkerSprite(entry);
+    backgroundColor = "#000000";
+    assert.notEqual(owner.getCityMarkerSprite(entry), first);
+    backgroundColor = "#ffffff";
+    assert.equal(owner.getCityMarkerSprite(entry), first);
+    for (const token of Object.keys(markerTokens)) {
+      tokens = { ...markerTokens, [token]: "#123456" };
+      assert.notEqual(owner.getCityMarkerSprite(entry), first, token);
+    }
+    tokens = { ...markerTokens };
+    assert.notEqual(owner.getCityMarkerSprite({ ...entry, markerSizePx: 12.002 }), first);
+    assert.notEqual(owner.getCityMarkerSprite({ ...entry, isCapital: false }), first);
+    assert.notEqual(owner.getCityMarkerSprite({ ...entry, cityTier: "major" }), first);
+    assert.notEqual(owner.getCityMarkerSprite(entry, { theme: "alternate" }), first);
+    assert.equal(owner.getCityMarkerSprite(entry), first);
+  } finally {
+    restoreCanvas();
+  }
+});
+
+test("city marker sprite cache retains the 256 most recently used sprites", () => {
+  const restoreCanvas = installCanvasFactory();
+  try {
+    const { owner } = createCityPointsHarness();
+    const entry = { cityTier: "regional", markerSizePx: 12 };
+    const get = (index) => owner.getCityMarkerSprite(entry, { color: `color-${index}` });
+    const first = get(0);
+    const second = get(1);
+    for (let index = 2; index < 256; index += 1) get(index);
+    assert.equal(get(0), first, "a hit must refresh recency");
+    get(256);
+    assert.equal(get(0), first, "recent sprite survives capacity eviction");
+    assert.notEqual(get(1), second, "least recently used sprite is evicted");
   } finally {
     restoreCanvas();
   }

@@ -39493,6 +39493,171 @@
       ]
     },
     {
+      "path": "js/core/state/actions/project_import_actions.js",
+      "surface": "production",
+      "domain": "cross-domain",
+      "authority": "domain-action",
+      "migrationPhase": "multi-phase",
+      "bindings": [
+        {
+          "id": "parameter:applyProjectImportPatch:0:09fc96082d34:84:56",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "applyProjectImportPatch",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 84,
+            "column": 56
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "specialZones"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "specialZones"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "scenario",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "releasableBoundaryVariantByTag"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "releasableBoundaryVariantByTag"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "customPresets",
+                "specialRegionOverrides"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "customPresets"
+                },
+                {
+                  "operation": "assign",
+                  "key": "specialRegionOverrides"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "dev",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "devClipboardFallbackText",
+                "devClipboardPreviewFormat",
+                "devHoverHit",
+                "devSelectedHit",
+                "devSelectionFeatureIds",
+                "devSelectionOrder"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "devClipboardFallbackText"
+                },
+                {
+                  "operation": "assign",
+                  "key": "devClipboardPreviewFormat"
+                },
+                {
+                  "operation": "assign",
+                  "key": "devHoverHit"
+                },
+                {
+                  "operation": "assign",
+                  "key": "devSelectedHit"
+                },
+                {
+                  "operation": "assign",
+                  "key": "devSelectionFeatureIds"
+                },
+                {
+                  "operation": "assign",
+                  "key": "devSelectionOrder"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "annotationView",
+                "recentColors",
+                "transportWorkbenchPointDeltas"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "annotationView"
+                },
+                {
+                  "operation": "assign",
+                  "key": "recentColors"
+                },
+                {
+                  "operation": "assign",
+                  "key": "transportWorkbenchPointDeltas"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "js/core/state_catalog.js",
       "surface": "production",
       "domain": "scenario",
@@ -40308,6 +40473,62 @@
               "unsupportedSites": []
             }
           ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:261:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 261,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "renderer",
+              "migrationPhase": "P4.3",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "parentBorderEnabledByCountry"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "parentBorderEnabledByCountry"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "styleConfig"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "styleConfig"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
         }
       ]
     },
@@ -40609,6 +40830,42 @@
               "unsupportedSites": []
             }
           ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:65:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 65,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "appearance",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "appearancePresets"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "appearancePresets"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
         }
       ]
     },
@@ -40718,6 +40975,42 @@
                 {
                   "operation": "assign",
                   "key": "referenceImageUrl"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:38:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 38,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "referenceImageState"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "referenceImageState"
                 }
               ],
               "aliasSites": [],
@@ -40876,6 +41169,42 @@
           "locator": {
             "line": 15,
             "column": 66
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "parentBordersVisible"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "parentBordersVisible"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:68:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 68,
+            "column": 59
           },
           "authority": "domain-action",
           "grants": [
@@ -42102,6 +42431,42 @@
               "unsupportedSites": []
             }
           ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:126:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 126,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "exportWorkbenchUi"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "exportWorkbenchUi"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
         }
       ]
     },
@@ -42376,6 +42741,42 @@
                   "sourceFingerprint": "946f6a319281398d673ee3c036de665c727bd75b529be02f2a30a8fb8ab3e279"
                 }
               ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:47:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 47,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "appearance",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "intensityFields"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "intensityFields"
+                }
+              ],
+              "aliasSites": [],
               "dynamicSites": [],
               "ambiguousSites": [],
               "unsupportedSites": []
@@ -42726,6 +43127,47 @@
                 {
                   "operation": "collection-mutate",
                   "key": "sphericalFeatureDiagnosticsById"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:216:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 216,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "dynamicBordersDirty",
+                "dynamicBordersDirtyReason"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "dynamicBordersDirty"
+                },
+                {
+                  "operation": "assign",
+                  "key": "dynamicBordersDirtyReason"
                 }
               ],
               "aliasSites": [],
@@ -45190,6 +45632,42 @@
                 {
                   "operation": "assign",
                   "key": "zoomTransform"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:180:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 180,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "waterRegionOverrides"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "waterRegionOverrides"
                 }
               ],
               "aliasSites": [],
@@ -48951,6 +49429,97 @@
                 {
                   "operation": "assign",
                   "key": "sovereignBaseColors"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:776:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 776,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "scenario",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "scenarioCountriesByTag",
+                "scenarioReleasableIndex"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "scenarioCountriesByTag"
+                },
+                {
+                  "operation": "assign",
+                  "key": "scenarioReleasableIndex"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "countryBaseColors",
+                "featureOverrides",
+                "mapSemanticMode",
+                "sovereignBaseColors",
+                "sovereigntyByFeatureId",
+                "sovereigntyInitialized",
+                "visualOverrides"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "countryBaseColors"
+                },
+                {
+                  "operation": "assign",
+                  "key": "featureOverrides"
+                },
+                {
+                  "operation": "assign",
+                  "key": "mapSemanticMode"
+                },
+                {
+                  "operation": "assign",
+                  "key": "sovereignBaseColors"
+                },
+                {
+                  "operation": "assign",
+                  "key": "sovereigntyByFeatureId"
+                },
+                {
+                  "operation": "assign",
+                  "key": "sovereigntyInitialized"
+                },
+                {
+                  "operation": "assign",
+                  "key": "visualOverrides"
                 }
               ],
               "aliasSites": [],
@@ -65985,6 +66554,82 @@
               "unsupportedSites": []
             }
           ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:788:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 788,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "activeSovereignCode",
+                "batchFillScope",
+                "expandedInspectorContinents",
+                "expandedInspectorReleaseParents",
+                "inspectorExpansionInitialized",
+                "inspectorHighlightCountryCode",
+                "interactionGranularity",
+                "paintMode",
+                "selectedInspectorCountryCode"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "activeSovereignCode"
+                },
+                {
+                  "operation": "assign",
+                  "key": "batchFillScope"
+                },
+                {
+                  "operation": "assign",
+                  "key": "expandedInspectorContinents"
+                },
+                {
+                  "operation": "assign",
+                  "key": "expandedInspectorReleaseParents"
+                },
+                {
+                  "operation": "assign",
+                  "key": "inspectorExpansionInitialized"
+                },
+                {
+                  "operation": "assign",
+                  "key": "inspectorHighlightCountryCode"
+                },
+                {
+                  "operation": "assign",
+                  "key": "interactionGranularity"
+                },
+                {
+                  "operation": "assign",
+                  "key": "paintMode"
+                },
+                {
+                  "operation": "assign",
+                  "key": "selectedInspectorCountryCode"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
         }
       ]
     },
@@ -66853,6 +67498,72 @@
           "authority": "domain-action",
           "delegationOnly": true,
           "grants": []
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:411:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 411,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "strategic-overlay",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "specialZoneEditor"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "specialZoneEditor"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "manualSpecialZones",
+                "specialZoneLayers",
+                "specialZoneMembershipBrushMode"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "manualSpecialZones"
+                },
+                {
+                  "operation": "assign",
+                  "key": "specialZoneLayers"
+                },
+                {
+                  "operation": "assign",
+                  "key": "specialZoneMembershipBrushMode"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
         }
       ]
     },
@@ -67330,6 +68041,102 @@
                 {
                   "operation": "assign",
                   "key": "operationGraphicsDirty"
+                },
+                {
+                  "operation": "assign",
+                  "key": "unitCountersDirty"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:413:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 413,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "strategic-overlay",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "operationalLineEditor",
+                "operationGraphicsEditor",
+                "strategicOverlayUi",
+                "unitCounterEditor"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "operationalLineEditor"
+                },
+                {
+                  "operation": "assign",
+                  "key": "operationGraphicsEditor"
+                },
+                {
+                  "operation": "assign",
+                  "key": "strategicOverlayUi"
+                },
+                {
+                  "operation": "assign",
+                  "key": "unitCounterEditor"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "operationalLines",
+                "operationalLinesDirty",
+                "operationGraphics",
+                "operationGraphicsDirty",
+                "unitCounters",
+                "unitCountersDirty"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "operationalLines"
+                },
+                {
+                  "operation": "assign",
+                  "key": "operationalLinesDirty"
+                },
+                {
+                  "operation": "assign",
+                  "key": "operationGraphics"
+                },
+                {
+                  "operation": "assign",
+                  "key": "operationGraphicsDirty"
+                },
+                {
+                  "operation": "assign",
+                  "key": "unitCounters"
                 },
                 {
                   "operation": "assign",
@@ -68476,6 +69283,42 @@
                   "sourceFingerprint": "05aba6d9a80e7f52fb2097072a7ca8a8c2bedcebc45895df68cb880454925aeb"
                 }
               ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:211:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 211,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "transportWorkbenchUi"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "transportWorkbenchUi"
+                }
+              ],
+              "aliasSites": [],
               "dynamicSites": [],
               "ambiguousSites": [],
               "unsupportedSites": []
@@ -70302,6 +71145,137 @@
                   "sourceFingerprint": "36d5ae7f6a88c3708955a1aa27a904434cbc2f3a91b862385e3a3006308cbd19"
                 }
               ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreProjectImportFields:0:09fc96082d34:89:59",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreProjectImportFields",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 89,
+            "column": 59
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "allowOpenOceanPaint",
+                "allowOpenOceanSelect",
+                "showAirports",
+                "showBlankFeatureLabels",
+                "showCityPoints",
+                "showOpenOceanRegions",
+                "showPhysical",
+                "showPorts",
+                "showRail",
+                "showRivers",
+                "showRoad",
+                "showScenarioAtlantropa",
+                "showScenarioReliefOverlays",
+                "showScenarioSpecialRegions",
+                "showSpecialZones",
+                "showStrategicResourceMarkers",
+                "showTransport",
+                "showUrban",
+                "showWaterRegions",
+                "strategicChoroplethMetric"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "allowOpenOceanPaint"
+                },
+                {
+                  "operation": "assign",
+                  "key": "allowOpenOceanSelect"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showAirports"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showBlankFeatureLabels"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showCityPoints"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showOpenOceanRegions"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showPhysical"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showPorts"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showRail"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showRivers"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showRoad"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showScenarioAtlantropa"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showScenarioReliefOverlays"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showScenarioSpecialRegions"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showSpecialZones"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showStrategicResourceMarkers"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showTransport"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showUrban"
+                },
+                {
+                  "operation": "assign",
+                  "key": "showWaterRegions"
+                },
+                {
+                  "operation": "assign",
+                  "key": "strategicChoroplethMetric"
+                }
+              ],
+              "aliasSites": [],
               "dynamicSites": [],
               "ambiguousSites": [],
               "unsupportedSites": []

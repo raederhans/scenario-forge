@@ -18,6 +18,21 @@ import {
 } from "./verification/script_portfolio.mjs";
 import { buildPrCostObservation } from "./verification/verification_profile.mjs";
 
+export function nonBehavioralClassification(changedFile) {
+  // Task records are prose, not application or verification inputs. Unknown
+  // Markdown and adjacent executable files still require an explicit route.
+  if (/^docs\/active\/(?:[^/]+\/)+(?:plan|context|task)\.md$/u.test(changedFile)
+    || changedFile === "docs/active/business-efficiency-20260908/editing-analysis.md"
+    || changedFile === "docs/active/business-efficiency-20260908/render-reuse-analysis.md") {
+    return "task-documentation";
+  }
+  // This is an agent setting, not an application state writer. Classification
+  // here does not validate TOML syntax or authorize its configuration values.
+  if (changedFile === ".codex/config.toml") return "agent-tool-config";
+  return null;
+}
+
+
 const REPO_ROOT = process.cwd();
 const IMPORT_GRAPH_PATH = path.join(REPO_ROOT, "tests", "e2e", "test-import-graph.json");
 const P4_STATE_WRITER_POLICY_PATH = path.join(REPO_ROOT, "tools", "state_writer_policy.json");
@@ -614,9 +629,19 @@ function buildRecommendation(changedFiles, allRoutes = buildRouteIndex(), {
   const mainThreadRoutes = commandEntries.filter((entry) => classifyExecutionOwners(entry.executionOwners) === "main-thread");
   const ciOnlyRoutes = commandEntries.filter((entry) => classifyExecutionOwners(entry.executionOwners) === "ci-only");
   const blockedRoutes = commandEntries.filter((entry) => classifyExecutionOwners(entry.executionOwners) === "blocked");
-  const unmatchedChangedFiles = matchedRoutesByFile
+  const unroutedChangedFiles = matchedRoutesByFile
     .filter((entry) => entry.routes.length === 0)
     .map((entry) => entry.changedFile);
+  const nonBehavioralChangedFiles = unroutedChangedFiles
+    .filter((file) => nonBehavioralClassification(file))
+    .map((changedFile) => ({
+      changedFile,
+      classification: nonBehavioralClassification(changedFile),
+      disposition: "no-app-behavior-validation",
+      behaviorTestsRun: false,
+    }));
+  const unmatchedChangedFiles = unroutedChangedFiles
+    .filter((file) => !nonBehavioralClassification(file));
 
   return {
     schemaVersion: 1,
@@ -675,6 +700,8 @@ function buildRecommendation(changedFiles, allRoutes = buildRouteIndex(), {
     impactedDomains: summarizeImpactedDomains(commandEntries),
     diagnosticNextSteps: buildDiagnosticNextSteps(commandEntries),
     advisoryNotes: buildAdvisoryNotes(commandEntries),
+    unroutedChangedFiles,
+    nonBehavioralChangedFiles,
     unmatchedChangedFiles,
     skippedHeavyTests: skippedHeavyRoutes(allRoutes, matchedRoutes),
   };
@@ -687,7 +714,11 @@ function renderMarkdown(report) {
   for (const entry of report.matchedByFile || []) {
     lines.push(`- ${entry.changedFile}`);
     if (!entry.recommendedCommands.length) {
-      lines.push("  - no matched commands");
+      const nonBehavioral = (report.nonBehavioralChangedFiles || [])
+        .find((file) => file.changedFile === entry.changedFile);
+      lines.push(nonBehavioral
+        ? `  - ${nonBehavioral.classification}: no application behavior tests required or run`
+        : "  - no matched commands");
       continue;
     }
     for (const command of entry.recommendedCommands) {
@@ -819,7 +850,8 @@ function explainRoute(target) {
   const normalizedTarget = target ? normalizeChangedFiles([target])[0] : "";
   const recommendation = buildRecommendation([target], routes);
   const targetExists = normalizedTarget ? fs.existsSync(path.join(REPO_ROOT, normalizedTarget)) : false;
-  if (targetExists && recommendation.recommendedCommands.length > 0) {
+  if (targetExists && (recommendation.recommendedCommands.length > 0
+    || recommendation.nonBehavioralChangedFiles.length > 0)) {
     console.log(JSON.stringify({
       mode: "recommendation-fallback",
       target,

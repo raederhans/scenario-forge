@@ -309,7 +309,7 @@ test("partial political repaint stays upstream and partial-owner owned", () => {
   ], "partial political repaint");
   assert.match(
     extractFunctionSource(readRepoFile(MAP_RENDERER_PATH), "tryPartialPoliticalPassRepaint"),
-    /^function tryPartialPoliticalPassRepaint\(transform, nextSignature, timings\) \{\s*return getPoliticalPartialRepaintOwner\(\)\.tryPartialPoliticalPassRepaint\(transform, nextSignature, timings\);\s*\}$/,
+    /^function tryPartialPoliticalPassRepaint\(transform, nextSignature, timings\) \{\s*exactCompositeReuseOwner\?\.invalidate\(\);\s*return getPoliticalPartialRepaintOwner\(\)\.tryPartialPoliticalPassRepaint\(transform, nextSignature, timings\);\s*\}$/,
   );
 });
 
