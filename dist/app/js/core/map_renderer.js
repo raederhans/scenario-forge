@@ -3149,6 +3149,7 @@ function getPoliticalBackgroundRenderOwner() {
       isWorldBounds,
       getPoliticalPathCacheHandle,
       getPoliticalFeaturePathEntry,
+      isPoliticalFeaturePathEntryCurrent,
       getTransformSignature,
       getPoliticalPathCacheSignature,
       getVisibleFrameIdentity,
@@ -3240,6 +3241,7 @@ function getPoliticalPartialRepaintOwner() {
       shouldSkipFeature,
       pathBoundsInScreen,
       getPoliticalFeaturePathEntry,
+      isPoliticalFeaturePathEntryCurrent,
       rectsIntersect,
       screenRectToProjectedRect,
       collectLandSpatialItemsForProjectedRects,
@@ -4383,6 +4385,7 @@ const {
   invalidatePoliticalPathCache,
   getPoliticalPathCacheHandle,
   getPoliticalFeaturePathEntry,
+  isPoliticalFeaturePathEntryCurrent,
   schedulePoliticalPathWarmup,
 } = composePoliticalPathCacheOwner();
 
@@ -9483,10 +9486,17 @@ async function buildFullInteractionInfrastructureAfterStartup({
         });
       }
       taskContext?.throwIfStale();
+      if (runtimeState.activeScenarioId !== scenarioId || runtimeState.currentScenarioApplyRequestId !== requestId
+        || (runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) !== scenarioApplyEpoch) {
+        return false;
+      }
       setInteractionInfrastructureState("ready", {
         ready: true,
         inFlight: false,
       });
+      // Color rebuilding can finish after the startup visual frame. Consume its
+      // dirty passes through the normal request boundary once this task is current.
+      requestRendererRender("startup-full-interaction-infra", { flush: false });
       recordInteractionRecoveryTaskMetric("post-ready-full-interaction-infra", nowMs() - recoveryStartedAt, {
         chunked: !!chunked,
         buildHitCanvas: !!buildHitCanvas,
@@ -11869,6 +11879,9 @@ function drawContextBasePass(k, options = undefined) {
 }
 
 function drawContextMarkersPass(k, options = undefined) {
+  // Candidate lifetime matches the cached marker pass, not an individual frame.
+  getTransportOverviewRenderOwner().resetLabelCandidates();
+  invalidateRenderPasses("labels", "transport-label-candidates");
   return getContextPassOrchestratorOwner().drawContextMarkersPass(k, options);
 }
 
@@ -11945,7 +11958,11 @@ function drawLabelsPass(k, { interactive = false } = {}) {
     return;
   }
   drawBlankFeatureLabelsPass(k, { interactive });
-  return getCityPointsRenderOwner().drawLabelsPass(k, { interactive });
+  const occupiedBoxes = [];
+  getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
+  if (!interactive && !runtimeState.deferContextBasePass) {
+    getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
+  }
 }
 
 function renderPassToCache(passName, drawFn, transform, timings) {

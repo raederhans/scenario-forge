@@ -14,7 +14,6 @@ import {
 } from "./transport_facility_icons.js";
 import {
   applyTransportFacilityDensity,
-  doTransportFacilityLabelBoxesOverlap,
   findTransportFacilityLabelPlacement,
   getTransportFacilityDensityStrategy,
   getTransportFacilityEntryStableSortKey,
@@ -22,6 +21,7 @@ import {
   getTransportOverviewAirportLabelText,
   getTransportOverviewPortLabelText,
 } from "./transport_facility_display_policy.js";
+import { claimScreenLabelPlacement } from "./screen_label_placement.js";
 import {
   getIncludedTransportOverviewLineClass,
   getTransportOverviewLabelZoomConfig,
@@ -76,6 +76,39 @@ export function createTransportOverviewRenderOwner({
   let pathCanvas = null;
   let projection = null;
   let transportFacilityIconAtlasRenderQueued = false;
+  let pendingLabelBatches = [];
+
+  function resetLabelCandidates() {
+    pendingLabelBatches = [];
+  }
+
+  // Retain world-space candidates while contextMarkers is cached. Each labels
+  // draw projects them again and uses only its caller's fresh occupancy array.
+  function drawPendingLabels(k, { occupiedBoxes = [] } = {}) {
+    syncRenderTargets();
+    if (!context || !runtimeState.showTransport) return 0;
+    const transform = getCurrentZoomTransform();
+    let labelCount = 0;
+    for (const batch of pendingLabelBatches) {
+      if (batch.scenarioId !== runtimeState.activeScenarioId
+        || batch.sceneGeneration !== runtimeState.sceneGeneration
+        || batch.scenarioDataGeneration !== runtimeState.scenarioDataGeneration) continue;
+      if (batch.options.familyId === "airport" ? !runtimeState.showAirports : !runtimeState.showPorts) continue;
+      const entries = batch.entries.map((entry) => ({
+        ...entry,
+        screenX: entry.x * transform.k + transform.x,
+        screenY: entry.y * transform.k + transform.y,
+        screenScale: transform.k,
+      }));
+      const startedAt = nowMs();
+      const count = drawTransportFacilityLabels(entries, { ...batch.options, k, occupiedBoxes });
+      labelCount += count;
+      collectContextMetric(`${batch.metricName}Labels`, nowMs() - startedAt, {
+        labelCount: count, candidateCount: entries.length, skipped: false,
+      });
+    }
+    return labelCount;
+  }
 
   // render owner 不缓存外部 helper 返回值的快照；每次 pass 前同步当前 canvas /
   // projection，保证 zoom resize 与 render-pass reset 后仍然读到最新目标。
@@ -284,6 +317,7 @@ function drawTransportFacilityLabels(entries, {
   nationalLabelScale,
   regionalLabelScale,
   radiusScale,
+  occupiedBoxes,
 }) {
   const normalizedFamilyId = String(familyId || "").trim().toLowerCase();
   const configuredLabelSize = clamp(Math.round(Number(labelSize || 9)), 7, 16);
@@ -294,7 +328,6 @@ function drawTransportFacilityLabels(entries, {
     nationalLabelScale,
     regionalLabelScale,
   });
-  const occupiedBoxes = [];
   let labelCount = 0;
   context.save();
   context.textAlign = "left";
@@ -322,9 +355,8 @@ function drawTransportFacilityLabels(entries, {
       measureText,
       zoomTransform: getCurrentZoomTransform(),
     });
-    const placement = placements?.find((candidate) => !occupiedBoxes.some((box) => doTransportFacilityLabelBoxesOverlap(candidate.box, box)));
+    const placement = claimScreenLabelPlacement(placements, occupiedBoxes);
     if (!placement) return;
-    occupiedBoxes.push(placement.box);
     context.lineWidth = usesFacilityIcon ? ((0.45 + (configuredLabelHalo * 2.4)) / zoomScale) : 3;
     context.strokeStyle = `rgba(255,255,255,${(0.16 + (configuredLabelHalo * 0.62)).toFixed(3)})`;
     context.fillStyle = labelColor;
@@ -527,21 +559,29 @@ function drawContextFacilityPointLayer(
     return;
   }
 
-  const labelCount = drawTransportFacilityLabels(renderState.entries, {
-    familyId: normalizedFamilyId,
-    k,
-    labelColor,
-    labelSize,
-    labelHalo,
-    nationalLabelScale,
-    regionalLabelScale,
-    radiusScale,
+  pendingLabelBatches.push({
+    entries: renderState.entries,
+    metricName,
+    scenarioId: runtimeState.activeScenarioId,
+    sceneGeneration: runtimeState.sceneGeneration,
+    scenarioDataGeneration: runtimeState.scenarioDataGeneration,
+    options: {
+      familyId: normalizedFamilyId,
+      labelColor,
+      labelSize,
+      labelHalo,
+      nationalLabelScale,
+      regionalLabelScale,
+      radiusScale,
+    },
   });
 
   collectContextMetric(metricName, nowMs() - startedAt, {
     featureCount: renderState.featureCount,
     visibleFeatureCount: renderState.entries.length,
-    labelCount,
+    labelCount: 0,
+    labelCandidateCount: renderState.entries.length,
+    labelsDeferred: true,
     interactive: !!interactive,
     skipped: false,
     unfilteredVisibleFeatureCount: renderState.unfilteredVisibleFeatureCount,
@@ -1383,6 +1423,8 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
 
 
   return {
+    resetLabelCandidates,
+    drawPendingLabels,
     drawAirportsLayer,
     drawPortsLayer,
     drawRailwaysLayer,

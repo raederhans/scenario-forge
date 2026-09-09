@@ -1696,6 +1696,12 @@ function createScenarioChunkRuntimeController({
       if (deferredOptionalVisibleRefresh) {
         refreshScenarioRenderVisibleOptionalChunkPayloadChange(deferredOptionalVisibleRefresh);
       }
+      if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+        return false;
+      }
+      // The payload is complete after both frame breaks. The synchronous render
+      // boundary must see the caller's lock state, or render() will discard it.
+      setScenarioChunkPromotionRenderLockState(runtimeState, previousRenderLock);
       if (resolvedRenderNow !== false) {
         flushRenderBoundary("scenario-chunk-promotion");
       }
@@ -1707,7 +1713,6 @@ function createScenarioChunkRuntimeController({
       ) {
         return false;
       }
-      setScenarioChunkPromotionRenderLockState(runtimeState, previousRenderLock);
       const visualEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
       recordScenarioChunkRuntimeMetric("chunkPromotionCommitVisualMs", visualEndedAt - visualStartedAt, {
         scenarioId,

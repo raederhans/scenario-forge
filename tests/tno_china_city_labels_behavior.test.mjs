@@ -22,7 +22,7 @@ const names = [
 ];
 
 function setup() {
-  const state = { currentLanguage: 'zh' };
+  const state = { currentLanguage: 'zh', scenarioGeoLocalePatchData: { geo: scenario } };
   let geo = { ...base, ...scenario };
   const lookup = (keys, fallback) => {
     for (const key of Array.isArray(keys) ? keys : [keys]) {
@@ -34,7 +34,7 @@ function setup() {
   return {
     state,
     model: createCityLabelTextModel(state, { getStrictGeoLabel: lookup, getPreferredGeoLabel: lookup }),
-    resetToBase() { geo = base; },
+    resetToBase() { geo = base; state.scenarioGeoLocalePatchData = null; },
   };
 }
 
@@ -51,6 +51,7 @@ test('TNO Chinese and Manchurian city labels use matching historical names in bo
   const { state, model } = setup();
   for (const [suffix, en, zh] of names) {
     const feature = cityFeature(suffix);
+    assert.deepEqual(scenario[feature.properties.stable_key], { en, zh }, `${suffix}: explicit city locale`);
     state.currentLanguage = 'zh';
     assert.equal(model.getCityDisplayLabel(feature), zh, suffix);
     state.currentLanguage = 'en';

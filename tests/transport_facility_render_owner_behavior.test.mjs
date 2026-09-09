@@ -443,10 +443,13 @@ test("facility labels use bbox placement and report drawn labelCount", () => {
     labelsEnabled: true,
     labelDensity: "dense",
   });
+  owner.resetLabelCandidates();
   owner.drawAirportsLayer(6);
+  assert.equal(context.calls.filter((call) => call.type === "fillText").length, 0);
+  owner.drawPendingLabels(6, { occupiedBoxes: [] });
 
   const labels = context.calls.filter((call) => call.type === "fillText");
-  const metric = metrics.findLast((entry) => entry.name === "drawAirportsLayer");
+  const metric = metrics.findLast((entry) => entry.name === "drawAirportsLayerLabels");
   assert.equal(metric?.detail?.labelCount, labels.length);
   assert.ok(labels.length > 0, "at least one label should be drawn");
   assert.ok(labels.length < features.length, "bbox placement should skip labels when all directions collide");
@@ -476,7 +479,9 @@ test("facility label size, halo, and adaptive text follow overview config", () =
     labelHalo: 0.1,
     projection: () => [80, 60],
   });
+  owner.resetLabelCandidates();
   owner.drawAirportsLayer(6);
+  owner.drawPendingLabels(6, { occupiedBoxes: [] });
 
   const label = context.calls.find((call) => call.type === "fillText");
   assert.equal(label?.text, "HND");

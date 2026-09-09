@@ -101,8 +101,9 @@ export function createRiverLayerRenderOwner({
     const props = feature?.properties || {};
     const zoomBucket = getContextBaseZoomBucketId(k);
     const classKind = getRiverClassKind(feature);
+    const rawScalerank = Number(props.scalerank ?? props.SCALERANK ?? 8);
     const scalerank = clamp(
-      Math.round(Number(props.scalerank ?? props.SCALERANK ?? 8)) || 8,
+      Number.isFinite(rawScalerank) ? Math.round(rawScalerank) : 8,
       0,
       12,
     );

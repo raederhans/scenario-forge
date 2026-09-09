@@ -39,6 +39,39 @@ test('aliases preserve ordered identity and deduplicate normalized extra aliases
   assert.deepEqual(model.getCityFeatureAliases(feature, 'stable'), ['stable', 'id', 'extra']);
 });
 
+test('explicit scenario city identity wins over unrelated host translations and stays live', () => {
+  const h = setup();
+  h.runtimeState.currentLanguage = 'zh';
+  const feature = { properties: {
+    __city_stable_key: 'stable-city', id: 'city', name_zh: '石家庄',
+    __city_host_feature_id: 'host', __city_aliases: ['alias'],
+  } };
+  h.setLabels({ 'stable-city': '石家庄', alias: '别名译名', host: '河北' });
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { 'stable-city': { zh: '石家庄' } } };
+  assert.equal(h.model.getCityDisplayLabel(feature), '石家庄');
+  feature.properties.__city_has_display_name_override = true;
+  feature.properties.__city_display_name_override = { zh: '显式剧本名' };
+  assert.equal(h.model.getCityDisplayLabel(feature), '显式剧本名');
+  delete feature.properties.__city_display_name_override;
+  h.runtimeState.scenarioGeoLocalePatchData = null;
+  assert.equal(h.model.getCityDisplayLabel(feature), '河北');
+});
+
+test('raw-name and alias patches do not imply an explicit city identity', () => {
+  const h = setup();
+  h.setLabels({ Raw: 'Alias City', host: 'Host City' });
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { Raw: { en: 'Alias City' } } };
+  const feature = { properties: { id: 'city', name: 'Raw', __city_aliases: ['Raw'], __city_host_feature_id: 'host' } };
+  assert.equal(h.model.getCityDisplayLabel(feature), 'Host City');
+});
+
+test('an explicit top-level city ID resolves without normalized properties', () => {
+  const h = setup();
+  h.setLabels({ city: 'Identity City', host: 'Host City' });
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { city: { en: 'Identity City' } } };
+  assert.equal(h.model.getCityDisplayLabel({ id: 'city', properties: { __city_host_feature_id: 'host' } }), 'Identity City');
+});
+
 test('map labels clean, abbreviate and measure CJK at the requested scale', () => {
   const { model } = setup();
   assert.equal(model.formatCityMapLabel(' Example County (Old) '), 'Example County (Old)');

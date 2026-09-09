@@ -1,6 +1,106 @@
 {
   "generated_at": "2026-05-31T23:17:04Z",
   "geo": {
+    "id::CITY::ne::1159146521": {
+      "en": "Goebbels",
+      "zh": "戈培尔"
+    },
+    "id::CITY::ne::1159149575": {
+      "en": "Platenfurt",
+      "zh": "普拉滕富特"
+    },
+    "id::CITY::ne::1159150697": {
+      "en": "Paulusburg",
+      "zh": "保卢斯堡"
+    },
+    "id::CITY::ne::1159149549": {
+      "en": "Jekaterinodar",
+      "zh": "叶卡捷琳诺达尔"
+    },
+    "id::CITY::ne::1159149557": {
+      "en": "Woronesch",
+      "zh": "沃罗涅日"
+    },
+    "id::CITY::ne::1159146503": {
+      "en": "Holmgard",
+      "zh": "霍尔姆加德"
+    },
+    "id::CITY::ne::1159149527": {
+      "en": "Königsberg",
+      "zh": "柯尼斯堡"
+    },
+    "id::CITY::ne::1159148119": {
+      "en": "Noworossijsk",
+      "zh": "新罗西斯克"
+    },
+    "id::CITY::ne::1159137187": {
+      "en": "Sharya",
+      "zh": "沙里亚"
+    },
+    "id::CITY::ne::1159137443": {
+      "en": "Kovrov",
+      "zh": "科夫罗夫"
+    },
+    "id::CITY::gn::559317": {
+      "en": "Goryachy Klyuch",
+      "zh": "戈里亚奇克柳奇"
+    },
+    "id::CITY::gn::550280": {
+      "en": "Neu-Kiel",
+      "zh": "新基尔"
+    },
+    "id::CITY::gn::548602": {
+      "en": "Jamburg",
+      "zh": "扬堡"
+    },
+    "id::CITY::ne::1159149533": {
+      "en": "Klugeburg",
+      "zh": "克卢格堡"
+    },
+    "id::CITY::ne::1159149545": {
+      "en": "Rostow am Don",
+      "zh": "顿河畔罗斯托夫"
+    },
+    "id::CITY::ne::1159151393": {
+      "en": "Hsinking",
+      "zh": "新京"
+    },
+    "id::CITY::ne::1159151377": {
+      "en": "Mukden",
+      "zh": "奉天"
+    },
+    "id::CITY::ne::1159149913": {
+      "en": "Dairen",
+      "zh": "大連"
+    },
+    "id::CITY::ne::1159147067": {
+      "en": "Antung",
+      "zh": "安東"
+    },
+    "id::CITY::ne::1159141171": {
+      "en": "Zhuhe",
+      "zh": "珠河"
+    },
+    "id::CITY::ne::1159147115": {
+      "en": "Xi'an",
+      "zh": "西安"
+    },
+    "id::CITY::ne::1159149955": {
+      "en": "Sartu",
+      "zh": "薩爾圖"
+    },
+    "id::CITY::ne::1159149941": {
+      "en": "Houhehot",
+      "zh": "厚和浩特"
+    },
+    "id::CITY::ne::1159149945": {
+      "en": "Wangyehmiao",
+      "zh": "王爺廟"
+    },
+    "id::CITY::ne::1159140859": {
+      "en": "Xinhai",
+      "zh": "新海"
+    },
     "AD_ADM1_AND-4876": {
       "en": "Andorra la Vella",
       "zh": "安道尔城"

@@ -49,6 +49,25 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("transport presentation changes invalidate shared labels without invalidating political pixels", () => {
+  for (const change of [
+    (state) => { state.showAirports = true; },
+    (state) => { state.showPorts = true; },
+    (state) => { state.currentLanguage = "zh"; },
+    (state) => { state.contextLayerRevision = 9; },
+    (state) => { state.sceneGeneration = 2; },
+    (state) => { state.scenarioDataGeneration = 2; },
+    (state) => { state.styleConfig.transportOverview = { airport: { labelSize: 14 } }; },
+  ]) {
+    const { state, policy } = createHarness();
+    const before = Object.fromEntries(["political", "contextMarkers", "labels"].map((name) => [name, policy.getRenderPassSignature(name)]));
+    change(state);
+    assert.equal(policy.getRenderPassSignature("political"), before.political);
+    assert.notEqual(policy.getRenderPassSignature("contextMarkers"), before.contextMarkers);
+    assert.notEqual(policy.getRenderPassSignature("labels"), before.labels);
+  }
+});
+
 test("every catalog pass reads its live invalidation input and ignores unrelated UI state", () => {
   assert.deepEqual(invalidationCases.map(([pass]) => pass).sort(), [...RENDER_PASS_NAMES].sort());
   for (const [pass, field] of invalidationCases) {

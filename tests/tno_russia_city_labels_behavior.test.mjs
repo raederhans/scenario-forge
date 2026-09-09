@@ -9,7 +9,7 @@ const scenario = read('../data/scenarios/tno_1962/geo_locale_patch.json').geo;
 const cities = new Map(read('../data/world_cities.geojson').features.map(feature => [feature.properties.id, feature]));
 
 function setup() {
-  const state = { currentLanguage: 'zh' };
+  const state = { currentLanguage: 'zh', scenarioGeoLocalePatchData: { geo: scenario } };
   let geo = { ...base, ...scenario };
   const lookup = (keys, fallback) => {
     for (const key of Array.isArray(keys) ? keys : [keys]) {
@@ -20,7 +20,7 @@ function setup() {
   return {
     state,
     model: createCityLabelTextModel(state, { getStrictGeoLabel: lookup, getPreferredGeoLabel: lookup }),
-    resetToBase() { geo = base; },
+    resetToBase() { geo = base; state.scenarioGeoLocalePatchData = null; },
   };
 }
 
@@ -52,6 +52,7 @@ test('German Russian city labels resolve coherent names in both languages', () =
     ['ne::1159149533', 'Klugeburg', '克卢格堡'],
   ]) {
     const feature = city(id);
+    assert.deepEqual(scenario[feature.properties.stable_key], { en, zh }, `${id}: explicit city locale`);
     state.currentLanguage = 'en';
     assert.equal(model.getCityDisplayLabel(feature), en, id);
     state.currentLanguage = 'zh';
@@ -62,6 +63,7 @@ test('German Russian city labels resolve coherent names in both languages', () =
 test('Rostov am Don is not applied to Rostov Veliky, and leaving TNO restores city names', () => {
   const { state, model, resetToBase } = setup();
   state.currentLanguage = 'en';
+  assert.equal(scenario[city('ne::1159149545').properties.stable_key].en, 'Rostow am Don');
   assert.equal(model.getCityDisplayLabel(city('ne::1159149545')), 'Rostow am Don');
   assert.notEqual(model.getCityDisplayLabel(city('ne::1159137245')), 'Rostow am Don');
   assert.equal(model.getCityDisplayLabel(city('ne::1159149575')), 'Platenfurt');

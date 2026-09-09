@@ -27,6 +27,21 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   stableJson,
   getDayNightRuntimeOwner,
 }) {
+  function getTransportPresentationSignatureParts() {
+    return [
+      runtimeState.showTransport ? "transport:on" : "transport:off",
+      runtimeState.showRoad ? "road:on" : "road:off",
+      runtimeState.showAirports ? "airports:on" : "airports:off",
+      runtimeState.showPorts ? "ports:on" : "ports:off",
+      runtimeState.showRail ? "rail:on" : "rail:off",
+      `context:${Number(runtimeState.contextLayerRevision || 0)}`,
+      `scene:${Number(runtimeState.sceneGeneration || 0)}`,
+      `scenario-data:${Number(runtimeState.scenarioDataGeneration || 0)}`,
+      `language:${String(runtimeState.currentLanguage || "en")}`,
+      stableJson(normalizeTransportOverviewStyleConfig(runtimeState.styleConfig?.transportOverview || {})),
+    ];
+  }
+
   function getPoliticalPassStaticSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
     return [
       getTransformSignature(transform),
@@ -158,15 +173,9 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
-        runtimeState.showTransport ? "transport:on" : "transport:off",
-        runtimeState.showRoad ? "road:on" : "road:off",
-        runtimeState.showAirports ? "airports:on" : "airports:off",
-        runtimeState.showPorts ? "ports:on" : "ports:off",
-        runtimeState.showRail ? "rail:on" : "rail:off",
+        ...getTransportPresentationSignatureParts(),
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "contextMarkers"),
-        `context:${Number(runtimeState.contextLayerRevision || 0)}`,
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
-        stableJson(normalizeTransportOverviewStyleConfig(runtimeState.styleConfig?.transportOverview || {})),
       ].join("::");
     }
     if (passName === "labels") {
@@ -178,6 +187,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.showBlankFeatureLabels ? "blank-feature-labels:on" : "blank-feature-labels:off",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "labels"),
+        ...getTransportPresentationSignatureParts(),
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),
       ].join("::");
     }

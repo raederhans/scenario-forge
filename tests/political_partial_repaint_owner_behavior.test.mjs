@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { createPoliticalPartialRepaintOwner } from "../js/core/renderer/political_partial_repaint_owner.js";
+import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -70,7 +71,8 @@ function createHarness(overrides = {}) {
     shouldExcludePoliticalVisualFeature: () => false,
     shouldSkipFeature: () => false,
     pathBoundsInScreen: () => true,
-    getPoliticalFeaturePathEntry: () => ({ path }),
+    getPoliticalFeaturePathEntry: (candidate) => ({ path, geometryRef: candidate.geometry }),
+    isPoliticalFeaturePathEntryCurrent,
     rectsIntersect: (a, b) => !(a.maxX < b.minX || a.maxY < b.minY || a.minX > b.maxX || a.minY > b.maxY),
     screenRectToProjectedRect: (rect) => ({ ...rect }),
     collectLandSpatialItemsForProjectedRects: () => ({
@@ -85,7 +87,7 @@ function createHarness(overrides = {}) {
     getPassFullReferenceTransform: () => transform,
     getPoliticalPassFineBaselineMismatch: () => "",
     getCachedPoliticalPassStaticSignature: () => "static",
-    getPoliticalPathCacheHandle: () => ({ valid: true, map: new Map([["land-1", { path }]]) }),
+    getPoliticalPathCacheHandle: () => ({ valid: true, map: new Map([["land-1", { path, geometryRef: feature.geometry }]]) }),
     getVisibleFrameIdentity: () => ({
       sceneGeneration: 2,
       scenarioDataGeneration: 3,
@@ -155,35 +157,56 @@ function createHarness(overrides = {}) {
   return { owner, state, cache, context, events, feature, transform, path, workerMetrics };
 }
 
-test("fine loop validates paths once per draw and rechecks changed transforms without building", () => {
+test("fine loop validates once per draw and rejects same-ID different geometry without cache writes", () => {
   const cachedPath = { cached: true };
+  const pathMap = new Map();
   let valid = true;
   const transforms = [];
   const h = createHarness({ helpers: {
     getPoliticalPathCacheHandle: (transform, options) => {
       transforms.push(transform);
       assert.equal(options.resetIfMismatch, false);
-      return { valid, map: new Map([["land-1", { path: cachedPath }]]) };
+      return { valid, map: pathMap };
     },
     getPoliticalFeaturePathEntry: () => { throw new Error("unexpected per-feature validation"); },
   } });
+  pathMap.set("land-1", { path: cachedPath, geometryRef: h.feature.geometry });
   const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
   const viewport = { visibleItems: Array.from({ length: 100 }, (_, drawOrder) => ({ feature: h.feature, drawOrder })) };
   assert.equal(h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport }).renderedCount, 100);
   assert.equal(transforms.length, 1);
   assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "fill" && event[1] === cachedPath).length, 100);
-  valid = false;
+  const originalGeometry = h.feature.geometry;
+  h.feature.geometry = { type: "Polygon", coordinates: [] };
   h.events.length = 0;
   const nextTransform = { x: 10, y: 0, k: 2 };
   h.owner.drawPoliticalFineFeatureLoop({ k: 2, identity: { ...identity, transform: nextTransform }, viewport });
   assert.equal(transforms.length, 2);
   assert.equal(transforms[1], nextTransform);
   assert.equal(h.events.filter(event => event === "path").length, 100);
-  valid = true;
+  assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "fill" && event[1] === undefined).length, 100);
+  assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "stroke" && event[1] === undefined).length, 100);
+  assert.equal(pathMap.size, 1);
+  assert.equal(pathMap.get("land-1").path, cachedPath);
+  h.state.landData.features = [{ ...h.feature, geometry: originalGeometry }];
   h.events.length = 0;
   h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport: { visibleItems: null } });
   assert.equal(transforms.length, 3);
   assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === cachedPath));
+});
+
+test("unavailable cache uses direct canvas fill and stroke", () => {
+  const h = createHarness({ helpers: {
+    getPoliticalPathCacheHandle: () => ({ valid: false, map: new Map() }),
+  } });
+  h.owner.drawPoliticalFineFeatureLoop({
+    k: 1,
+    identity: { transform: h.transform, canvasWidth: 100, canvasHeight: 100 },
+    viewport: { visibleItems: [{ feature: h.feature, drawOrder: 0 }] },
+  });
+  assert.equal(h.events.filter(event => event === "path").length, 1);
+  assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === undefined));
+  assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "stroke" && event[1] === undefined));
 });
 
 test("factory validates ports and freezes the exact owner API", () => {

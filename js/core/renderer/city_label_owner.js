@@ -1,3 +1,5 @@
+import { claimScreenLabelPlacement } from "./screen_label_placement.js";
+
 const CITY_LABEL_PLACEMENT_ORDER = [
   "right",
   "left",
@@ -84,15 +86,6 @@ function buildCityLabelPlacementCandidates(entry, {
 
 const DEFAULT_SERIF_STACK = '"Libre Baskerville", "Palatino Linotype", Georgia, serif';
 
-function doScreenBoxesOverlap(a, b) {
-  return (
-    a.x < (b.x + b.w)
-    && (a.x + a.w) > b.x
-    && a.y < (b.y + b.h)
-    && (a.y + a.h) > b.y
-  );
-}
-
 export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {} } = {}) {
   const serifStack = constants.textureLabelSerifStack || DEFAULT_SERIF_STACK;
   const getContext = typeof getters.getContext === "function" ? getters.getContext : () => null;
@@ -100,7 +93,7 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
     ? getters.getViewportSize
     : () => ({ width: 0, height: 0 });
 
-  function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
+  function drawCityLabelsFromEntries(labelEntries, { config, scale, occupiedBoxes = [] } = {}) {
     const context = getContext();
     if (!Array.isArray(labelEntries) || !labelEntries.length || !context) return 0;
     let labelCount = 0;
@@ -109,7 +102,6 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
     context.globalAlpha = 1;
     context.textBaseline = "middle";
     context.lineJoin = "round";
-    const occupiedBoxes = [];
     labelEntries.forEach((entry) => {
       const visualEntry = helpers.getCityVisualCapitalState(entry, config)
         ? entry
@@ -136,17 +128,15 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
         verticalOffsetPx,
       });
       const viewportSize = getViewportSize();
-      const acceptedPlacement = candidates.find(({ box }) => (
+      const acceptedPlacement = claimScreenLabelPlacement(candidates, occupiedBoxes, (box) => (
         !(box.x > viewportSize.width + 24
         || box.y > viewportSize.height + 24
         || (box.x + box.w) < -24
         || (box.y + box.h) < -24)
-        && !occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))
       ));
       if (!acceptedPlacement) {
         return;
       }
-      occupiedBoxes.push(acceptedPlacement.box);
       entry.acceptedLabelPlacement = acceptedPlacement.id;
       labelCount += 1;
       const labelStyle = helpers.getCityLabelRenderStyle(visualEntry, config);

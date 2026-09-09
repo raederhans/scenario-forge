@@ -347,10 +347,15 @@ function createScenarioRefreshRuntime(deps = {}) {
         updateSpecialZonesPaths();
         renderSpecialZoneEditorOverlay();
       }
+      if (!isCurrent()) {
+        return false;
+      }
       if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
         patchScenarioChunkLoadState(runtimeState, { pendingInfraPromotion: null });
       }
-      if (!suppressRender) {
+      // The caller's synchronous render boundary may have already completed before
+      // this deferred geometry work dirties passes. Consume those invalidations here.
+      if (!suppressRender || hasPoliticalGeometryChange) {
         render();
       }
       const infraDurationMs = nowMs() - startedAt;

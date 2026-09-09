@@ -15,6 +15,7 @@ import {
   applyTransportCountryOverlayState,
 } from "../js/core/transport_country_overlay.js";
 import { createTransportOverviewRenderOwner } from "../js/core/renderer/transport_overview_render_owner.js";
+import { doScreenLabelBoxesOverlap } from "../js/core/renderer/screen_label_placement.js";
 import {
   formatCityPointsDensityValue,
   getCityPointsLabelDensityHint,
@@ -556,6 +557,62 @@ function createLineRenderOwnerHarness({ k = 4, roadLabelsEnabled = false, railLa
   });
   return { context, metrics, owner, appRuntime: state, hoverEntries };
 }
+
+test("facility labels defer until the shared labels draw and retain candidates across cached marker passes", () => {
+  const { owner, context, appRuntime, hoverEntries } = createLineRenderOwnerHarness({ k: 8 });
+  appRuntime.portsData = { type: "FeatureCollection", features: [
+    { type: "Feature", geometry: { type: "Point", coordinates: [0.25, 0.25] }, properties: { id: "p", name: "Port", importance_rank: 3 } },
+  ] };
+  owner.resetLabelCandidates();
+  owner.drawPortsLayer(8);
+  assert.equal(context.calls.filter((call) => call.type === "fillText").length, 0);
+  assert.equal(hoverEntries.at(-1).entries.length, 1);
+  const occupiedBoxes = [];
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes }), 1);
+  assert.equal(occupiedBoxes.length, 1);
+  const oldBox = occupiedBoxes[0];
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: [{ x: -1000, y: -1000, w: 3000, h: 3000 }] }), 0);
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: [] }), 1);
+  appRuntime.zoomTransform = { x: 100, y: 60, k: 8 };
+  const movedBoxes = [];
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: movedBoxes }), 1);
+  assert.equal(movedBoxes[0].x, oldBox.x + 100);
+  assert.equal(movedBoxes[0].y, oldBox.y + 60);
+  appRuntime.showPorts = false;
+  assert.equal(owner.drawPendingLabels(8), 0);
+  appRuntime.showPorts = true;
+  appRuntime.activeScenarioId = "changed";
+  assert.equal(owner.drawPendingLabels(8), 0);
+  owner.resetLabelCandidates();
+  owner.drawPortsLayer(8);
+  assert.equal(owner.drawPendingLabels(8), 1);
+  owner.resetLabelCandidates();
+  assert.equal(owner.drawPendingLabels(8), 0);
+});
+
+test("airport and port candidates share occupancy after city labels have reserved space", () => {
+  const { owner, context, appRuntime } = createLineRenderOwnerHarness({ k: 8 });
+  Object.assign(context, { moveTo() {}, lineTo() {}, closePath() {} });
+  appRuntime.showAirports = true;
+  appRuntime.styleConfig.transportOverview.airport = { ...appRuntime.styleConfig.transportOverview.port };
+  appRuntime.portsData = { type: "FeatureCollection", features: [
+    { type: "Feature", geometry: { type: "Point", coordinates: [0.25, 0.25] }, properties: { id: "p", name: "Port", importance_rank: 3 } },
+  ] };
+  appRuntime.airportsData = { type: "FeatureCollection", features: [
+    { type: "Feature", geometry: { type: "Point", coordinates: [0.25, 0.25] }, properties: { id: "a", name: "Aero Hub", importance_rank: 3 } },
+  ] };
+  owner.resetLabelCandidates();
+  owner.drawAirportsLayer(8);
+  owner.drawPortsLayer(8);
+  const occupiedBoxes = [{ x: 210, y: 199, w: 80, h: 2 }];
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes }), 2);
+  assert.equal(occupiedBoxes.length, 3);
+  for (let i = 0; i < occupiedBoxes.length; i += 1) {
+    for (let j = i + 1; j < occupiedBoxes.length; j += 1) {
+      assert.equal(doScreenLabelBoxesOverlap(occupiedBoxes[i], occupiedBoxes[j]), false);
+    }
+  }
+});
 
 test("transport overview road line draw resets dash and keeps screen-width floors", () => {
   const zoom = 4;

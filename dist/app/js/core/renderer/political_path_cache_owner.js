@@ -5,6 +5,10 @@ const POLITICAL_PATH_WARMUP_MAX_FEATURES_PER_SLICE = 24;
 const POLITICAL_PATH_WARMUP_CPU_BUDGET_MS = 4;
 const POLITICAL_PATH_WARMUP_TIMEOUT_MS = 24;
 
+export function isPoliticalFeaturePathEntryCurrent(entry, feature) {
+  return !!entry?.path && !!feature?.geometry && entry.geometryRef === feature.geometry;
+}
+
 export function createPoliticalPathCacheOwner(runtimeState, {
   rendererSurfaceHost,
   getPoliticalPassStaticSignature,
@@ -138,17 +142,24 @@ export function createPoliticalPathCacheOwner(runtimeState, {
   }
 
   function buildPoliticalFeaturePathEntry(feature) {
-    if (!feature?.geometry || !globalThis.Path2D || typeof rendererSurfaceHost.getPathSvg() !== "function") {
+    const pathCanvas = rendererSurfaceHost.getPathCanvas();
+    if (!feature?.geometry || !globalThis.Path2D || typeof pathCanvas?.context !== "function") {
       return null;
     }
+    const previousContext = pathCanvas.context();
     try {
-      const pathString = rendererSurfaceHost.getPathSvg()(feature);
-      if (!pathString) return null;
-      return {
-        path: new globalThis.Path2D(pathString),
-      };
+      // Feed the same numeric geoPath stream as an uncached canvas draw. SVG
+      // serialization rounds coordinates, making warmup change visible pixels.
+      const path = new globalThis.Path2D();
+      pathCanvas.context(path);
+      pathCanvas(feature);
+      return { path, geometryRef: feature.geometry };
     } catch (_error) {
       return null;
+    } finally {
+      // geoPath streaming is synchronous; never leave the shared draw target
+      // bound to the cached path, including when malformed geometry throws.
+      pathCanvas.context(previousContext);
     }
   }
 
@@ -170,7 +181,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       return null;
     }
     const cachedEntry = handle.map.get(resolvedId);
-    if (cachedEntry?.path) {
+    if (isPoliticalFeaturePathEntryCurrent(cachedEntry, feature)) {
       return cachedEntry;
     }
     if (countMiss) incrementPerfCounter("politicalPartialPathCacheMisses");
@@ -271,7 +282,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       const nextItem = cache.politicalPathWarmupQueue.shift();
       if (!nextItem?.id || !nextItem?.feature) continue;
       processedCount += 1;
-      if (handle.map.get(nextItem.id)?.path) continue;
+      if (isPoliticalFeaturePathEntryCurrent(handle.map.get(nextItem.id), nextItem.feature)) continue;
       const pathEntry = getPoliticalFeaturePathEntry(nextItem.feature, {
         featureId: nextItem.id,
         transform,
@@ -326,7 +337,8 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     }
     const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: false });
     const cacheMap = handle.valid && handle.map instanceof Map ? handle.map : null;
-    const queue = candidateItems.filter((item) => item?.id && item?.feature && !cacheMap?.get(item.id)?.path);
+    const queue = candidateItems.filter((item) => item?.id && item?.feature
+      && !isPoliticalFeaturePathEntryCurrent(cacheMap?.get(item.id), item.feature));
     if (!queue.length) {
       cancelPoliticalPathWarmup("warmup-complete");
       return false;
@@ -349,6 +361,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     cancelPoliticalPathWarmup,
     invalidatePoliticalPathCache,
     getPoliticalPathCacheHandle,
+    isPoliticalFeaturePathEntryCurrent,
     getPoliticalFeaturePathEntry,
     schedulePoliticalPathWarmup,
   });

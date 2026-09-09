@@ -14,6 +14,7 @@ test("a cancelled full infrastructure build cannot publish ready and a current c
   let yields = 0;
   let rank = 1;
   const states = [];
+  const renderRequests = [];
   const runtimeState = { interactionInfrastructureBuildInFlight: false, hitCanvasDirty: false };
   const dependencies = {
     runtimeState,
@@ -29,6 +30,7 @@ test("a cancelled full infrastructure build cannot publish ready and a current c
     yieldToMain: async () => { if (++yields === 1) { beginYield(); await deferredYield; } },
     ensureSovereigntyState() {}, rebuildResolvedColors() {}, scheduleSecondarySpatialIndexBuild() {},
     recordInteractionRecoveryTaskMetric() {}, nowMs: () => 0,
+    requestRendererRender: (...args) => { renderRequests.push(args); return true; },
   };
   const build = new Function(...Object.keys(dependencies), `let interactionInfrastructureBasicPromise = null; let interactionInfrastructureFullPromise = null; ${source}\nreturn buildInteractionInfrastructureAfterStartup;`)(...Object.values(dependencies));
   function context(controller) {
@@ -51,11 +53,15 @@ test("a cancelled full infrastructure build cannot publish ready and a current c
   assert.equal(await duplicate, true);
   assert.equal(states.filter((stage) => stage === "ready").length, 1);
   assert.equal(runtimeState.interactionInfrastructureBuildInFlight, false);
+  assert.deepEqual(renderRequests, [["startup-full-interaction-infra", { flush: false }]]);
 });
 
 test("real scheduler completes full infrastructure while its own in-flight flag is set", async () => {
   let rank = 1;
   let yields = 0;
+  const dirtyPasses = new Set();
+  const renderRequests = [];
+  let consumeRequestedRender = null;
   const runtimeState = { bootBlocking: false, renderPhase: "idle", interactionInfrastructureBuildInFlight: false, hitCanvasDirty: false };
   const dependencies = {
     runtimeState,
@@ -70,8 +76,18 @@ test("real scheduler completes full infrastructure while its own in-flight flag 
     },
     isInteractionRecoveryBlocked: () => false,
     yieldToMain: async () => { yields += 1; await new Promise((resolve) => setTimeout(resolve, 0)); },
-    ensureSovereigntyState() {}, rebuildResolvedColors() {}, scheduleSecondarySpatialIndexBuild() {},
+    ensureSovereigntyState() {},
+    rebuildResolvedColors() {
+      for (const pass of ["physicalBase", "political", "contextBase"]) dirtyPasses.add(pass);
+    },
+    scheduleSecondarySpatialIndexBuild() {},
     recordInteractionRecoveryTaskMetric() {}, nowMs: () => 0,
+    requestRendererRender: (reason, options) => {
+      assert.equal(rank, 2, "publish ready before requesting the visible update");
+      renderRequests.push([reason, options]);
+      consumeRequestedRender = () => dirtyPasses.clear();
+      return true;
+    },
   };
   const build = new Function(...Object.keys(dependencies), `let interactionInfrastructureBasicPromise = null; let interactionInfrastructureFullPromise = null; ${source}\nreturn buildInteractionInfrastructureAfterStartup;`)(...Object.values(dependencies));
   const scheduler = createPostReadyScheduler({ targetState: runtimeState });
@@ -86,6 +102,10 @@ test("real scheduler completes full infrastructure while its own in-flight flag 
     assert.equal(rank, 2);
     assert.equal(runtimeState.interactionInfrastructureBuildInFlight, false);
     assert.equal(yields, 3);
+    assert.deepEqual(renderRequests, [["startup-full-interaction-infra", { flush: false }]]);
+    assert.deepEqual([...dirtyPasses].sort(), ["contextBase", "physicalBase", "political"]);
+    consumeRequestedRender();
+    assert.equal(dirtyPasses.size, 0, "the requested normal render consumes late color invalidations");
   } finally {
     scheduler.reset("test-cleanup");
   }
@@ -102,6 +122,7 @@ test("old infrastructure catch cannot clear in-flight state owned by a newer sam
     interactionInfrastructureBuildInFlight: false, hitCanvasDirty: false,
   };
   const stages = [];
+  const renderRequests = [];
   const dependencies = {
     runtimeState,
     getInteractionInfrastructureStageRank: () => 1,
@@ -112,6 +133,7 @@ test("old infrastructure catch cannot clear in-flight state owned by a newer sam
     isInteractionRecoveryBlocked: () => false,
     yieldToMain: async () => { beginYield(); await deferredYield; },
     ensureSovereigntyState() {}, nowMs: () => 0,
+    requestRendererRender: (...args) => { renderRequests.push(args); return true; },
   };
   const build = new Function(...Object.keys(dependencies), `let interactionInfrastructureBasicPromise = null; let interactionInfrastructureFullPromise = null; ${source}\nreturn buildInteractionInfrastructureAfterStartup;`)(...Object.values(dependencies));
   const taskContext = {
@@ -126,4 +148,40 @@ test("old infrastructure catch cannot clear in-flight state owned by a newer sam
   await assert.rejects(old, { name: "AbortError" });
   assert.equal(runtimeState.interactionInfrastructureBuildInFlight, true);
   assert.deepEqual(stages, []);
+  assert.deepEqual(renderRequests, []);
+});
+
+test("full infrastructure without a task context cannot publish or request render after identity replacement", async () => {
+  for (const replacedIdentity of ["scenario", "request", "epoch"]) {
+    const runtimeState = {
+      activeScenarioId: "A", currentScenarioApplyRequestId: 1,
+      renderTransactionDiagnostics: { scenarioApplyEpoch: 1 },
+      interactionInfrastructureBuildInFlight: false, hitCanvasDirty: false,
+    };
+    const stages = [];
+    const renderRequests = [];
+    const dependencies = {
+      runtimeState,
+      getInteractionInfrastructureStageRank: () => 1,
+      setInteractionInfrastructureState: (stage) => stages.push(stage),
+      isInteractionRecoveryBlocked: () => false,
+      yieldToMain: async () => {},
+      ensureSovereigntyState() {}, rebuildResolvedColors() {},
+      buildSpatialIndexChunked: async () => {
+        if (replacedIdentity === "scenario") runtimeState.activeScenarioId = "B";
+        if (replacedIdentity === "request") runtimeState.currentScenarioApplyRequestId = 2;
+        if (replacedIdentity === "epoch") runtimeState.renderTransactionDiagnostics.scenarioApplyEpoch = 2;
+        runtimeState.interactionInfrastructureBuildInFlight = true;
+        stages.length = 0;
+      },
+      scheduleSecondarySpatialIndexBuild() {},
+      recordInteractionRecoveryTaskMetric() {}, nowMs: () => 0,
+      requestRendererRender: (...args) => { renderRequests.push(args); return true; },
+    };
+    const build = new Function(...Object.keys(dependencies), `let interactionInfrastructureBasicPromise = null; let interactionInfrastructureFullPromise = null; ${source}\nreturn buildInteractionInfrastructureAfterStartup;`)(...Object.values(dependencies));
+    assert.equal(await build({ buildHitCanvas: false }), false, replacedIdentity);
+    assert.deepEqual(stages, [], replacedIdentity);
+    assert.deepEqual(renderRequests, [], replacedIdentity);
+    assert.equal(runtimeState.interactionInfrastructureBuildInFlight, true, "replacement retains ownership");
+  }
 });
