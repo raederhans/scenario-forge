@@ -7,9 +7,9 @@ export const CITY_RECORDS = [
       "map_builder/cities.py", "map_builder/city_contract.py", "map_builder/outputs/save.py",
       "tests/test_city_data_contract.py", "data/world_cities.geojson", "data/city_aliases.json",
     ],
-    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
-    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
-    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 400,
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo", ".runtime-output"], executionOwners: ["main-thread"], profiles: ["full"],
+    platforms: ["all"], entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: 400,
     verification: null, selector: {},
   },
   {

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildRecommendation,
   classifyExecutionOwners,
+  nonBehavioralClassification,
   normalizeChangedFiles,
   projectLocalEntrypointTestRoutes,
 } from "./select_verification_targets.mjs";
@@ -1494,8 +1495,11 @@ function validateSelectionArtifactProvenance(report, authority, { platform = pro
       continue;
     }
     observedFiles.add(normalizedFile);
+    // Recompute from the shared source rules; artifact-provided classifications
+    // must never exempt an unknown executable file from route provenance.
+    const nonBehavioral = Boolean(nonBehavioralClassification(normalizedFile));
     const matchedRouteIds = requiredStringArray(entry, "matchedRouteIds", {
-      allowEmpty: unmatchedFiles.has(normalizedFile),
+      allowEmpty: unmatchedFiles.has(normalizedFile) || nonBehavioral,
     });
     if (matchedRouteIds === null || !Array.isArray(entry.recommendedCommands)) {
       routeGaps.push(planGap("adaptive-selection-provenance-field", normalizedFile, `matchedByFile[${index}]`));
@@ -1506,6 +1510,7 @@ function validateSelectionArtifactProvenance(report, authority, { platform = pro
         || String(gap?.detail || "").includes(`changed-file=${normalizedFile}`)
     ));
     if (!unmatchedFiles.has(normalizedFile)
+      && !nonBehavioral
       && (matchedRouteIds.length === 0 || (entry.recommendedCommands.length === 0 && !explicitRouteGap))) {
       routeGaps.push(planGap("adaptive-selection-provenance-empty", normalizedFile, `matchedByFile[${index}]`));
       continue;
@@ -2609,6 +2614,7 @@ export function readSelectionArtifact(selectionPath, changedFiles, {
     );
   }
   if (artifactChangedFiles.length > 0
+    && !artifactChangedFiles.every((file) => nonBehavioralClassification(file))
     && report.recommendedCommands.length === 0
     && report.unmatchedChangedFiles.length === 0
     && report.blockedVerification.length === 0

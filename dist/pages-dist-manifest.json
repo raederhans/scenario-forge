@@ -45892,7 +45892,7 @@
     },
     {
       "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-      "size_bytes": 35710,
+      "size_bytes": 32748,
       "source_kind": "dist"
     },
     {
@@ -46277,7 +46277,7 @@
     },
     {
       "path": "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
-      "size_bytes": 14050,
+      "size_bytes": 17066,
       "source_kind": "dist"
     },
     {
@@ -47817,7 +47817,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2162912,
+      "size_bytes": 2162934,
       "source_kind": "dist"
     },
     {
@@ -47952,12 +47952,12 @@
       {
         "file_count": 821,
         "id": "on-demand-product",
-        "size_bytes": 252979587
+        "size_bytes": 252979609
       },
       {
         "file_count": 8391,
         "id": "scenario-specific",
-        "size_bytes": 704681159
+        "size_bytes": 704681213
       },
       {
         "file_count": 5,
@@ -52257,21 +52257,13 @@
                 "kind": "import-declaration",
                 "line": 4,
                 "local": true,
-                "reference": "../feature_identity.js",
-                "resolved_path": "app/js/core/feature_identity.js"
-              },
-              {
-                "column": 1,
-                "kind": "import-declaration",
-                "line": 5,
-                "local": true,
                 "reference": "../state/actions/scenario_chunk_runtime_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_runtime_actions.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 6,
+                "line": 5,
                 "local": true,
                 "reference": "../state/actions/scenario_chunk_promotion_actions.js",
                 "resolved_path": "app/js/core/state/actions/scenario_chunk_promotion_actions.js"
@@ -52281,7 +52273,6 @@
           "resource_references": [],
           "source_bindings": [],
           "static_imports": [
-            "app/js/core/feature_identity.js",
             "app/js/core/map_renderer/scenario_refresh_plans.js",
             "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
             "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
@@ -53794,11 +53785,22 @@
           "reference_locations": {
             "dynamic_imports": [],
             "resource_references": [],
-            "static_imports": []
+            "static_imports": [
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 1,
+                "local": true,
+                "reference": "../feature_identity.js",
+                "resolved_path": "app/js/core/feature_identity.js"
+              }
+            ]
           },
           "resource_references": [],
           "source_bindings": [],
-          "static_imports": []
+          "static_imports": [
+            "app/js/core/feature_identity.js"
+          ]
         },
         {
           "dynamic_import_expressions": [],
@@ -64168,17 +64170,17 @@
         "deferred_graph_file_count": 127,
         "deferred_module_count": 125,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5275993,
+        "initial_graph_bytes": 5276047,
         "initial_graph_file_count": 273,
         "initial_module_count": 260,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4008589,
+        "initial_script_bytes": 4008643,
         "initial_script_count": 262,
         "module_count": 392,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 957555845,
+        "untraversed_dist_bytes": 957555867,
         "untraversed_dist_file_count": 9152,
         "untraversed_module_count": 7
       },
@@ -65944,11 +65946,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2162912
+            "size_bytes": 2162934
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2162912
+        "size_bytes": 2162934
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -66095,7 +66097,7 @@
           },
           {
             "path": "app/js/core/map_renderer/scenario_refresh_runtime.js",
-            "size_bytes": 35710
+            "size_bytes": 32748
           },
           {
             "path": "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
@@ -66103,7 +66105,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_chunk_promotion_helpers.js",
-            "size_bytes": 14050
+            "size_bytes": 17066
           },
           {
             "path": "app/js/core/renderer/scenario_relief_overlay_render_owner.js",
@@ -66291,7 +66293,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 963903
+        "size_bytes": 963957
       },
       {
         "basis": "product-registry:scenario-runtime-data",
@@ -66498,7 +66500,7 @@
             "prefixes": []
           },
           "owner": "scenario-runtime",
-          "size_bytes": 963903
+          "size_bytes": 963957
         },
         {
           "category": "scenario-specific",
@@ -66751,7 +66753,7 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2162912
+          "size_bytes": 2162934
         }
       ],
       "status": "complete",
@@ -66794,7 +66796,7 @@
     {
       "file_count": 9503,
       "path": "app",
-      "size_bytes": 959896739
+      "size_bytes": 959896793
     },
     {
       "file_count": 57,
@@ -66804,7 +66806,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2162912
+      "size_bytes": 2162934
     },
     {
       "file_count": 1,
@@ -66827,5 +66829,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 966850264
+  "total_bytes": 966850340
 }

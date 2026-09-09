@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('../support/playwright-app');
 
-// Three bounded lifecycle windows; this is not a latency budget or perf comparison.
+// JUSTIFY: three sequential cold/warm/switch lifecycle windows took 1.6m locally; each drain remains bounded to 30s.
 test.setTimeout(180_000);
 test.use({ trace: 'off', viewport: { width: 1600, height: 1000 } });
 

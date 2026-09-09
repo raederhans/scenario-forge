@@ -77,6 +77,7 @@ export const CATALOG_POLICIES = {
           "tests/test_physical_context_contours.py",
           "tests/test_patch_checked_in_urban_artifacts.py",
           "tests/test_city_assets.py",
+          "tests/test_city_data_contract.py",
           "tests/test_global_transport_builder_contracts.py",
           "tests/test_landing_map_asset_contracts.py",
           "tests/test_local_canonicalization.py",

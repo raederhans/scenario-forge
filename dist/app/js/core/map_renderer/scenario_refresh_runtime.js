@@ -1,34 +1,8 @@
 import { normalizeRendererRefreshPlan, resolveScenarioChunkPromotionRendererRefreshDescriptor } from "./scenario_refresh_plans.js";
 import { createScenarioVisualInvalidationExecutor } from "./scenario_visual_invalidation_executor.js";
-import { buildScenarioChunkPromotionVisualMetricDetails, createScenarioChunkPromotionDelta, readFirstNonNegativeCount, resolveScenarioChunkPromotionChangeSet } from "../renderer/scenario_chunk_promotion_helpers.js";
-import { getFeatureId } from "../feature_identity.js";
+import { analyzeScenarioPoliticalDerivedStateCoverage, buildScenarioChunkPromotionVisualMetricDetails, createScenarioChunkPromotionDelta, readFirstNonNegativeCount, resolveScenarioChunkPromotionChangeSet } from "../renderer/scenario_chunk_promotion_helpers.js";
 import { patchScenarioChunkLoadState, queueScenarioChunkPromotionState } from "../state/actions/scenario_chunk_runtime_actions.js";
 import { setScenarioPoliticalChunkPayloadState } from "../state/actions/scenario_chunk_promotion_actions.js";
-
-const POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT = 8;
-
-function getFeatureCollectionFeatures(payload) {
-  return Array.isArray(payload?.features) ? payload.features : [];
-}
-
-function collectFeatureIdSet(features = []) {
-  return new Set(
-    (Array.isArray(features) ? features : [])
-      .map((feature) => String(getFeatureId(feature) || feature?.id || feature?.properties?.id || "").trim())
-      .filter(Boolean)
-  );
-}
-
-function getMissingFeatureIdSample(completeFeatureIds, candidateFeatureIds) {
-  const missing = [];
-  completeFeatureIds.forEach((featureId) => {
-    if (missing.length >= POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT) return;
-    if (!candidateFeatureIds.has(featureId)) {
-      missing.push(featureId);
-    }
-  });
-  return missing;
-}
 
 function isPoliticalCoverageDiagnosticsEnabled(runtimeState) {
   if (runtimeState?.renderDiagnostics?.perfOverlayEnabled || runtimeState?.renderDiagnostics?.enabled) return true;
@@ -39,54 +13,6 @@ function isPoliticalCoverageDiagnosticsEnabled(runtimeState) {
   } catch (_error) {
     return false;
   }
-}
-
-function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState) {
-  const completeFeatures = getFeatureCollectionFeatures(runtimeState?.scenarioPoliticalChunkData);
-  const primaryVisibleFeatures = getFeatureCollectionFeatures(runtimeState?.scenarioPoliticalVisibleChunkData);
-  const landDataFeatures = getFeatureCollectionFeatures(runtimeState?.landData);
-  const colorIds = new Set(Object.keys(runtimeState?.colors || {}).map((featureId) => String(featureId || "").trim()).filter(Boolean));
-  const completeFeatureIds = collectFeatureIdSet(completeFeatures);
-  const primaryVisibleFeatureIds = collectFeatureIdSet(primaryVisibleFeatures);
-  const landDataFeatureIds = collectFeatureIdSet(landDataFeatures);
-  const completePoliticalFeatureCount = completeFeatures.length;
-  const primaryVisibleFeatureCount = primaryVisibleFeatures.length;
-  const landDataFeatureCount = landDataFeatures.length;
-  const colorsCount = colorIds.size;
-  const primaryVisibleFeatureSubsetActive = primaryVisibleFeatureCount > 0
-    && completePoliticalFeatureCount > primaryVisibleFeatureCount
-    && (
-      primaryVisibleFeatureIds.size <= 0
-      || Array.from(primaryVisibleFeatureIds).every((featureId) => completeFeatureIds.has(featureId))
-    );
-  const missingLandFeatureIdsSample = completeFeatureIds.size > 0
-    ? getMissingFeatureIdSample(completeFeatureIds, landDataFeatureIds)
-    : [];
-  const missingColorFeatureIdsSample = completeFeatureIds.size > 0
-    ? getMissingFeatureIdSample(completeFeatureIds, colorIds)
-    : [];
-  const landDataCoverageMissing = completePoliticalFeatureCount > 0
-    && (
-      landDataFeatureCount < completePoliticalFeatureCount
-      || missingLandFeatureIdsSample.length > 0
-    );
-  const colorCoverageMissing = completePoliticalFeatureCount > 0
-    && (
-      colorsCount < completePoliticalFeatureCount
-      || missingColorFeatureIdsSample.length > 0
-    );
-
-  return {
-    completePoliticalFeatureCount,
-    primaryVisibleFeatureCount,
-    landDataFeatureCount,
-    colorsCount,
-    primaryVisibleFeatureSubsetActive,
-    landDataCoverageMissing,
-    colorCoverageMissing,
-    missingLandFeatureIdsSample,
-    missingColorFeatureIdsSample,
-  };
 }
 
 function getScenarioChunkSelectionDiagnostics(runtimeState) {

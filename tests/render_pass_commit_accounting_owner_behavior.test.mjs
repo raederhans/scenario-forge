@@ -111,6 +111,11 @@ function createOwnerHarness({
 function createRenderPassToCacheHarness({ hostResult, nowValue = 900 } = {}) {
   const calls = [];
   const dependencyMap = {
+    exactCompositeReuseOwner: {
+      invalidate() {
+        calls.push(["invalidateExactComposite"]);
+      },
+    },
     getRenderPassCacheHostOwner: () => ({
       prepareRenderPassHost(options) {
         calls.push(["prepareRenderPassHost", options.passName, typeof options.drawFn]);
@@ -374,6 +379,7 @@ test("renderPassToCache wrapper returns before commit owner when host skips", ()
   renderPassToCache("political", () => ({ committed: true }), { k: 2 }, {});
 
   assert.deepEqual(calls, [
+    ["invalidateExactComposite"],
     ["prepareRenderPassHost", "political", "function"],
   ]);
 });
@@ -392,11 +398,12 @@ test("renderPassToCache wrapper delegates host draw result to commit accounting 
 
   renderPassToCache("political", () => ({ committed: true }), transform, timings);
 
-  assert.equal(calls.length, 3);
-  assert.deepEqual(calls[0], ["prepareRenderPassHost", "political", "function"]);
-  assert.deepEqual(calls[1], ["nowMs"]);
-  assert.equal(calls[2][0], "commitRenderPass");
-  assert.deepEqual(calls[2][1], {
+  assert.equal(calls.length, 4);
+  assert.deepEqual(calls[0], ["invalidateExactComposite"]);
+  assert.deepEqual(calls[1], ["prepareRenderPassHost", "political", "function"]);
+  assert.deepEqual(calls[2], ["nowMs"]);
+  assert.equal(calls[3][0], "commitRenderPass");
+  assert.deepEqual(calls[3][1], {
     passName: "political",
     transform,
     drawResult: hostResult.drawResult,

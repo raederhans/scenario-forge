@@ -249,7 +249,8 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.scenario_refresh_runtime_source,
             re.compile(
                 r'const previousInteractionInfrastructureStage = String\(runtimeState\.interactionInfrastructureStage \|\| ""\);.*?'
-                r'await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*\}\);.*?'
+                r'await buildSpatialIndexChunked\(\{\s*includeSecondary: false,\s*keepReady: true,\s*isCurrent,\s*\}\);\s*'
+                r'if \(!isCurrent\(\)\) return false;.*?'
                 r'setInteractionInfrastructureState\(previousInteractionInfrastructureStage \|\| "basic-ready", \{\s*ready: true,\s*inFlight: false,',
                 re.S,
             ),

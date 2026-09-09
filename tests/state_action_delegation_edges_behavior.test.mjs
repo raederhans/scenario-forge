@@ -615,13 +615,13 @@ test("P4.2b optional and city action exports have one canonical owner", () => {
   assert.deepEqual(
     validateStateActionModulePhaseAdmissions({
       modulePaths: ["js/core/state/actions/scenario_activation_actions.js"],
-      phase: "P4.3",
+      phase: "P4.4",
     }),
     [],
   );
   assert.ok(validateStateActionModulePhaseAdmissions({
     modulePaths: ["js/core/state/actions/scenario_activation_actions.js"],
-    phase: "P4.2b",
+    phase: "P4.3",
   }).some(({ code }) => code === "state-action-module-phase-not-admitted"));
 });
 
@@ -760,6 +760,7 @@ test("P4.3 renderer cross-boundary proofs lock retired evidence and exact replac
       proof.retiredMutationSites.length,
     ]),
     [
+      ["js/core/interaction_funnel.js", "parentBorderEnabledByCountry", "restoreProjectImportFields", 1],
       ["js/core/map_renderer.js", "cachedDetailAdmBorders", "replaceCachedDetailAdmBordersState", 5],
       ["js/core/map_renderer.js", "deferExactAfterSettle", "setDeferExactAfterSettleState", 3],
       ["js/core/map_renderer.js", "dprLastStageSwitchAt", "commitRendererDprStageState", 1],

@@ -23,6 +23,10 @@ Runtime implementation, independent reviews and the original bounded P4 repair s
 
 Cleanup preserves original commit identities and existing local performance evidence; it does not establish a new paired performance improvement. Full P4 and traced artifact limitations below remain recorded independently of the PR required checks.
 
+The first pushed integration (`7299a6ad`) passed remote performance, transport, TNO, tracked-mirror, smoke and demo checks. Required-check follow-up synchronized HOI4 snapshot/manifest/audit identities, selector artifact consumption, duplicate Playwright aliases, actual city-test heavy dependencies and current behavior assertions. The immutable performance baseline is now checked against its existing ratification receipt rather than the changing candidate manifest; the live workload gate remains unchanged. Unknown executable files remain rejected. The three-window lifecycle test retains its original180s budget with the required justification (previously measured1.6m), and the landing city-alias count now matches189255.
+
+Complete local selected-child execution exposed13 failing command groups, each addressed with the relevant narrower check; already-passed groups were retained. The final runtime-only adjustment moves pure political-coverage analysis to the existing promotion helper: scenario refresh804→729lines within the unchanged746line budget, architecture PASS and related runtime33/33. Source imports/Pages mirrors are regenerated after this extraction. These local corrections still require the final PR head's remote required checks; do not read the earlier performance result as acceptance of a later commit.
+
 ## Evidence
 
 Initial git status --short: empty. HEAD: 9d4b715a.

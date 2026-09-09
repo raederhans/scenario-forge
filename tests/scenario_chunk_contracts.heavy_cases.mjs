@@ -204,6 +204,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
 
   register(33, "exact-after-settle keeps scenario overlays on the contextScenario reuse path", () => {
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+    const exactCompositeReuseOwnerSource = readRepoFile("js", "core", "renderer", "exact_composite_reuse_owner.js");
     const hoverOwnerSource = readRepoFile("js", "core", "map_renderer", "map_hover_interaction_owner.js");
     const politicalPassOwnerSource = readRepoFile(
       "js",
@@ -684,7 +685,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && politicalRasterWorkerSource.includes("taskId"),
       exactComposeUsesCompositeBuffer:
         /function ensureCompositeBufferCanvas\(\) \{[\s\S]*?cache\.compositeBuffer\.canvas = canvas;/.test(renderCacheOwnerSource)
-        && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?composeRenderPassesToTarget\(bufferContext, passNames, currentTransform,[\s\S]*?requireAllPasses: true[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
+        && /function composeCachedPasses[\s\S]*?const bufferCanvas = ensureCompositeBufferCanvas\(\);[\s\S]*?const result = getExactCompositeReuseOwner\(\)\.composeExact\(bufferCanvas, passNames, currentTransform\);[\s\S]*?if \(!result\.ok\) \{[\s\S]*?return false;[\s\S]*?blitCompositeBufferToMain\(bufferCanvas\);/.test(rendererSource)
+        && /function getExactCompositeReuseOwner\(\)[\s\S]*?createExactCompositeReuseOwner\(\{[\s\S]*?compose: composeRenderPassesToTarget,/.test(rendererSource)
+        && /function composeExact\(bufferCanvas, passNames, currentTransform\)[\s\S]*?invalidate\(\);\s*resetContext\(context, bufferCanvas\.width, bufferCanvas\.height\);\s*const result = compose\(context, passNames, currentTransform, \{ requireAllPasses: true \}\);\s*if \(result\.ok\) previous = inputs;/.test(exactCompositeReuseOwnerSource)
         && /function blitCompositeBufferToMain\(bufferCanvas\) \{[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "copy";[\s\S]*?rendererSurfaceHost\.getContext\(\)\.drawImage\(bufferCanvas, 0, 0\);[\s\S]*?rendererSurfaceHost\.getContext\(\)\.globalCompositeOperation = "source-over";/.test(rendererSource),
       coarsePrewarmDoesNotOverwriteActiveDetailChunks:
         /function hasDetailScenarioChunkIds\(chunkIds = \[\]\) \{[\s\S]*?String\(chunkId \|\| ""\)\.includes\("\.detail\."\)/.test(chunkRuntimeSource)

@@ -351,9 +351,14 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
 
   const heavy = buildCanonicalHeavyDependencyGroups();
   assert.equal(heavy.heavyDependencyGroups[0].id, "geo_stack");
-  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 15);
+  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 16);
+  assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_city_data_contract.py"));
+  const cityRoute = buildRouteIndex().find((route) => route.id === "city:data-contract-python");
+  assert.equal(cityRoute.executionOwner, "main-thread");
+  assert.equal(cityRoute.cost, "heavy");
+  assert.ok(cityRoute.resourceLocks.includes("heavy-geo"));
   heavy.heavyDependencyGroups[0].patterns.push("detached-only.py");
-  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 15);
+  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 16);
 
   const aliases = buildCanonicalPackageAliases().packageAliases;
   assert.deepEqual(

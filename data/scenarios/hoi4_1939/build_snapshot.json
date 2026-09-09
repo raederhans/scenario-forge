@@ -15,7 +15,7 @@
     "owners.by_feature.json": "229bcea69bb75a3363b709762fe7c5c15316869cbed92c21473b0af337302548",
     "runtime_topology.topo.json": "50cad6f666725fa6518b8aa5f8519a1b520946f3b4c2e46614029234ad8be0c3",
     "special_zone_layers.json": "4565092b196e374cdf1054eaf5bf0f2982f7f028f14ff7d183984f7dfa75b56f",
-    "strategic_values.by_feature.json": "4ddf2f1deea1e0aaecbf0de9df1170fa03392cf158fd475b78c4802d194560af"
+    "strategic_values.by_feature.json": "f233acef9dd828f65acf662b3fcf21110e7b360bea92f2b8b29d85e7f4dad37f"
   },
   "output_sha": {
     "context_lod.manifest.json": "f50891fede3dfba6dec0866b4ed43aea71e3003ce0ccc40571b7e1048ea63ce9",
@@ -33,6 +33,6 @@
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "b3a823c614bd8a94164e2125dc26d5ff29b3390854954c3adb4395dfa8537c2f",
+  "snapshot_fingerprint": "281f309e3f80523ad4b48505a12063d1234f0ab8510893613a57a677ff131df5",
   "water_count": 0
 }
