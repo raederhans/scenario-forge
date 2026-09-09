@@ -1,6 +1,30 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const CITY_RECORDS = [
   {
+    id: "city:data-contract-python",
+    commandRef: "python -m unittest tests.test_city_data_contract -q",
+    sourceRefs: [
+      "map_builder/cities.py", "map_builder/city_contract.py", "map_builder/outputs/save.py",
+      "tests/test_city_data_contract.py", "data/world_cities.geojson", "data/city_aliases.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 400,
+    verification: null, selector: {},
+  },
+  {
+    id: "city:data-contract-node",
+    commandRef: "node --test tests/city_data_contract_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/data_loader.js",
+      "tests/city_data_contract_behavior.test.mjs", "data/world_cities.geojson", "data/city_aliases.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 401,
+    verification: null, selector: {},
+  },
+  {
     "id": "e2e:tests/e2e/city_label_i18n_redraw.spec.js",
     "commandRef": "node tools/e2e_layering.mjs run-spec tests/e2e/city_label_i18n_redraw.spec.js",
     "sourceRefs": [

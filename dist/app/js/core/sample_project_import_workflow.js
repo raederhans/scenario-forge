@@ -135,7 +135,7 @@ export async function loadPublicSampleProjectIntoRuntime(sampleId, {
         ...(helpers.importOptions && typeof helpers.importOptions === "object" ? helpers.importOptions : {}),
       },
     });
-    if (!imported) {
+    if (!imported || (imported !== true && !["committed", "committed-with-warnings"].includes(imported.status))) {
       writeSampleProjectState(targetState, {
         status: "error",
         sampleId: sampleProject.id,

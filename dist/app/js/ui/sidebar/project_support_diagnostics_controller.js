@@ -668,7 +668,7 @@ export function createProjectSupportDiagnosticsController({
     const filename = String(payload?.filename || "community-mapcreator-save.json");
     const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
     const file = typeof File === "function" ? new File([blob], filename, { type: "application/json" }) : blob;
-    importProjectThroughFunnel(file, {
+    const outcome = await importProjectThroughFunnel(file, {
       ui: {
         t,
         showAppDialog,
@@ -687,6 +687,11 @@ export function createProjectSupportDiagnosticsController({
         },
       },
     });
+    if (outcome?.status === "committed-with-warnings") {
+      setBackendCloudStatus(`${t("Community save loaded into the editor.", "ui")} ${outcome.warnings.map(item => item.resource).join(", ")}`);
+    } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
+      setBackendCloudStatus(t("Project import is already in progress.", "ui"));
+    }
   };
 
   const renderCommunitySaves = (saves = []) => {
@@ -1689,7 +1694,7 @@ export function createProjectSupportDiagnosticsController({
             refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
             return;
           }
-          importProjectThroughFunnel(importFile, {
+          const outcome = await importProjectThroughFunnel(importFile, {
             ui: {
               t,
               showAppDialog,
@@ -1702,6 +1707,11 @@ export function createProjectSupportDiagnosticsController({
               onProjectImportError: failProjectImportStatus,
             },
           });
+          if (outcome?.status === "committed-with-warnings") {
+            refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
+          } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
+            refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
+          }
         } catch (error) {
           const message = String(error?.message || error || "");
           refreshProjectSaveStatus(message);

@@ -175,3 +175,8 @@ export function removeClickWaterRegionOverrideState(target, regionId) {
   target.waterRegionOverrides = nextOverrides;
   return removed;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "waterRegionOverrides")) target.waterRegionOverrides = patch.waterRegionOverrides;
+}

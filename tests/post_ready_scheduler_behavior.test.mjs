@@ -88,6 +88,161 @@ async function drainMicrotasks() {
   await Promise.resolve();
 }
 
+test("explicit resource wait releases the slot and cancellation prevents its commit", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  let resolveDownload;
+  let oldContext;
+  let commits = 0;
+  scheduler.scheduleTask("download", async (context) => {
+    oldContext = context;
+    await context.waitFor(new Promise((resolve) => { resolveDownload = resolve; }));
+    context.commit(() => { commits += 1; });
+  });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  assert.equal(targetState.activePostReadyTaskKey, "");
+  assert.deepEqual(scheduler.getDiagnostics().waitingTaskKeys, ["download"]);
+  assert.deepEqual(scheduler.getDiagnostics().pendingTaskKeys, ["download"], "resource waits must not be reported as drained");
+  scheduler.scheduleTask("independent", () => { commits += 10; });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  assert.equal(commits, 10);
+  scheduler.clearTask("download");
+  assert.equal(oldContext.signal.aborted, true);
+  resolveDownload();
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  assert.equal(commits, 10);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.download.status, "cancelled");
+  assert.deepEqual(scheduler.getDiagnostics().waitingTaskKeys, []);
+});
+
+test("queued cancellation leaves a terminal outcome and old callbacks cannot execute", () => {
+  for (const operation of ["clearTask", "clearAllTasks", "reset"]) {
+    const targetState = createTargetState();
+    const globalScope = createTimerScope();
+    const scheduler = createPostReadyScheduler({ targetState, globalScope });
+    let calls = 0;
+    scheduler.scheduleTask("queued", () => { calls += 1; });
+    const oldId = globalScope.__test.timeoutCalls.at(-1).id;
+    scheduler[operation]("queued");
+    globalScope.__test.runTimerById(oldId);
+    assert.equal(calls, 0);
+    assert.deepEqual(scheduler.getDiagnostics().pendingTaskKeys, []);
+    assert.equal(scheduler.getDiagnostics().taskOutcomes.queued.status, "cancelled");
+  }
+});
+
+test("dependency wait has a terminal deadline and cannot run from a stale idle callback", () => {
+  let now = 0;
+  const targetState = createTargetState();
+  const globalScope = createTimerScope({ idle: true });
+  const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => now });
+  let ready = false;
+  let calls = 0;
+  scheduler.scheduleTask("dependent", () => { calls += 1; }, { canStart: () => ready, maxWaitMs: 500 });
+  globalScope.__test.runNextTimeout();
+  assert.equal(scheduler.getDiagnostics().lastBlockedReason, "dependency-pending");
+  now = 600;
+  globalScope.__test.runNextTimeout();
+  ready = true;
+  assert.equal(calls, 0);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.dependent.reason, "waiting-deadline");
+  scheduler.scheduleTask("idle", () => { calls += 1; }, { isCurrent: () => ready });
+  globalScope.__test.runNextTimeout();
+  ready = false;
+  globalScope.__test.runNextIdle();
+  assert.equal(calls, 0);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.idle.reason, "stale");
+});
+
+test("cooperative yield returns to timers and rechecks document revision", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  let revision = 1;
+  const work = [];
+  scheduler.scheduleTask("slice", async (context) => {
+    work.push("first");
+    await context.yield();
+    context.commit(() => work.push("second"));
+  }, { isCurrent: () => revision === 1 });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  assert.deepEqual(work, ["first"]);
+  revision += 1;
+  globalScope.__test.runNextTimeout();
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  assert.deepEqual(work, ["first"]);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.slice.reason, "stale");
+});
+
+test("execution deadline aborts a hung resource wait and frees all scheduler timers", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  let context;
+  scheduler.scheduleTask("hung", async (task) => {
+    context = task;
+    await task.waitFor(new Promise(() => {}));
+  }, { maxRunMs: 1000 });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  assert.equal(context.signal.aborted, true);
+  assert.equal(targetState.activePostReadyTaskKey, "");
+  assert.deepEqual(scheduler.getDiagnostics().waitingTaskKeys, []);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.hung.reason, "execution-deadline");
+  assert.equal(globalScope.__test.timeoutCalls.filter((item) => !item.ran && !item.cleared).length, 0);
+});
+
+test("same-key replacement revokes a waiting execution and its final outcome", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  let finishOld;
+  const committed = [];
+  scheduler.scheduleTask("same", async (task) => {
+    await task.waitFor(new Promise((resolve) => { finishOld = resolve; }));
+    task.commit(() => committed.push("old"));
+  });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  scheduler.scheduleTask("same", () => committed.push("new"));
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  finishOld();
+  for (let n = 0; n < 16; n++) await Promise.resolve();
+  assert.deepEqual(committed, ["new"]);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.same.status, "completed");
+});
+
+test("resource continuation waits for interaction to end before reacquiring the slot", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  let finishDownload;
+  let commits = 0;
+  scheduler.scheduleTask("resume", async (task) => {
+    await task.waitFor(new Promise((resolve) => { finishDownload = resolve; }));
+    task.commit(() => { commits += 1; });
+  });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  targetState.isInteracting = true;
+  finishDownload();
+  for (let n = 0; n < 8; n++) await Promise.resolve();
+  assert.equal(commits, 0);
+  assert.equal(targetState.activePostReadyTaskKey, "");
+  targetState.isInteracting = false;
+  globalScope.__test.runNextTimeout();
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  assert.equal(commits, 1);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.resume.status, "completed");
+});
+
 for (const rejects of [false, true]) {
   test(`old ${rejects ? "rejected" : "completed"} execution cannot finish a new same-key task after reset`, async () => {
     const targetState = createTargetState();

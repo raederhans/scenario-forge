@@ -1,3 +1,5 @@
+import { clearDirty } from "./dirty_state.js";
+import { captureProjectImportState } from "./state/actions/project_import_actions.js";
 import { clearHistory } from "./history_manager.js";
 import {
   buildScenarioReleasableIndex,
@@ -23,7 +25,7 @@ import {
   resetStrategicOverlayEditorState,
 } from "./state/strategic_overlay_state.js";
 import { resetDevTransientImportState } from "./state/dev_state.js";
-import { prepareImportedProjectState } from "./interaction_funnel/import_apply_orchestration.js";
+import { prepareImportedProjectState, commitImportedProjectPatch } from "./interaction_funnel/import_apply_orchestration.js";
 import {
   applyTransportCountryOverlayState,
   clearTransportCountryOverlayState,
@@ -45,7 +47,6 @@ import {
 let mapClickImpl = null;
 let mapDoubleClickImpl = null;
 let scenarioResourcesModulePromise = null;
-let scenarioDispatcherModulePromise = null;
 let fileManagerModulePromise = null;
 const debugState = {
   clickCount: 0,
@@ -71,13 +72,6 @@ function getScenarioResourcesModule() {
   return scenarioResourcesModulePromise;
 }
 
-function getScenarioDispatcherModule() {
-  if (!scenarioDispatcherModulePromise) {
-    scenarioDispatcherModulePromise = import("./scenario_dispatcher.js");
-  }
-  return scenarioDispatcherModulePromise;
-}
-
 function getFileManagerModule() {
   if (!fileManagerModulePromise) {
     fileManagerModulePromise = import("./file_manager.js");
@@ -101,18 +95,48 @@ function getContextLayerRequestFromKeys(layerKeys = []) {
   return normalizedKeys.length === 1 ? normalizedKeys[0] : normalizedKeys;
 }
 
-async function restoreImportedTransportOverviewDataLayers(importState) {
+async function restoreImportedTransportOverviewDataLayers(importState, isCurrent = () => true) {
   if (!importState.showTransport) return;
   for (const familyId of listTransportOverviewCapabilityFamilyIds()) {
+    if (!isCurrent()) return;
     const visibilityField = getTransportOverviewVisibilityField(familyId);
     if (!visibilityField || !importState[visibilityField]) continue;
     const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));
     if (!layerRequest) continue;
-    await callRuntimeHook(importState, "ensureContextLayerDataFn", layerRequest, {
+    const result = await callRuntimeHook(importState, "ensureContextLayerDataFn", layerRequest, {
       reason: "project-import",
       renderNow: false,
     });
+    if (isCurrent()) validateImportedContextLayerResult(result, importState);
   }
+}
+
+function validateImportedContextLayerResult(result, target = state) {
+  // A null result is legitimate when topology already supplies the layer; that
+  // branch explicitly marks it loaded. Failed deferred fetches instead mark error.
+  for (const [name, collection] of Object.entries(result || {})) {
+    if (target.contextLayerLoadStateByName?.[name] === "error"
+      || (collection === null && target.contextLayerLoadStateByName?.[name] !== "loaded")) {
+      throw new Error(target.contextLayerLoadErrorByName?.[name] || `${name} could not be restored.`);
+    }
+  }
+}
+
+async function restoreImportedScenarioOptionalLayer(layer, preparedImport, isCurrent) {
+  const resources = await getScenarioResourcesModule();
+  if (!isCurrent()) return;
+  const bundle = preparedImport.preparedScenario?.bundle;
+  const result = await resources.ensureActiveScenarioOptionalLayerLoaded(layer, {
+    renderNow: false, isScenarioApplyRequestCurrent: isCurrent,
+  });
+  if (!isCurrent()) return;
+  const urlField = layer === "cities" ? "city_overrides_url" : "strategic_values_url";
+  // Missing configuration and chunk-owned layers legitimately return null.
+  if (result === null && bundle?.manifest?.[urlField]
+    && !resources.scenarioBundleUsesChunkedLayer(bundle, layer)) {
+    throw new Error(`${layer} could not be restored.`);
+  }
+  return result;
 }
 
 function buildMapInteractionContext(kind, event) {
@@ -193,7 +217,7 @@ export function resolveImportedTransportCountryOverlayPackIds(target, importedSt
 
 // country overlay 仍然以 pack 为加载单位，所以导入工程时要把要用到的 pack
 // 逐个读回 runtime，再让 applyTransportCountryOverlayState 负责合并到统一状态。
-async function restoreImportedTransportCountryOverlayState(target, importedState = {}) {
+async function restoreImportedTransportCountryOverlayState(target, importedState = {}, isCurrent = () => true) {
   const activePackIds = resolveImportedTransportCountryOverlayPackIds(target, importedState);
   if (!activePackIds.length) {
     clearTransportCountryOverlayState(target, "project-import-no-country-pack");
@@ -203,97 +227,94 @@ async function restoreImportedTransportCountryOverlayState(target, importedState
     let appliedState = null;
     for (const activePackId of activePackIds) {
       const overlayState = await loadTransportCountryOverlayState(activePackId);
+      if (!isCurrent()) return null;
       appliedState = applyTransportCountryOverlayState(target, overlayState);
     }
     return appliedState;
   } catch (error) {
-    clearTransportCountryOverlayState(target, "project-import-country-pack-load-failed");
+    if (!isCurrent()) return null;
     console.warn(`[project-import] Unable to restore transport country overlays ${activePackIds.join(", ")}.`, error);
-    return null;
+    throw error;
   }
 }
 
-// 这里是 project import 的集中收口点：先让 prepareImportedProjectState 解决
-// scenario/runtime 依赖，再一次性回填 state，避免各个 editor 各自恢复半套状态。
-async function applyImportedProjectState(data, { ui, hooks }) {
-  debugState.importPhase = "begin";
-  clearHistory();
-  const preparedImport = await prepareImportedProjectState({
-    data,
-    ui,
-    debugState,
-    getScenarioResourcesModule,
-    getScenarioDispatcherModule,
-  });
-  data = preparedImport.data;
-  const { importedOwnershipState, scenarioImportAudit } = preparedImport;
-  state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
-  state.featureOverrides = { ...state.visualOverrides };
-  markLegacyColorStateDirty();
-  state.waterRegionOverrides = data.waterRegionOverrides || {};
-  state.specialRegionOverrides = {};
-  state.sovereigntyByFeatureId = importedOwnershipState.sovereigntyByFeatureId;
-  state.mapSemanticMode = normalizeMapSemanticMode(
+function stageImportedProjectPatch(data, preparedImport) {
+  const original = { ...state, ...preparedImport.scenarioState };
+  // Capture the complete explicit import-owned field set, including equal values:
+  // scenario activation may change those values before this patch lands.
+  const draft = { ...original,
+    styleConfig: cloneImportedProjectValue(original.styleConfig),
+    expandedInspectorContinents: new Set(original.expandedInspectorContinents || []),
+    expandedInspectorReleaseParents: new Set(original.expandedInspectorReleaseParents || []),
+  };
+  const { importedOwnershipState } = preparedImport;
+  draft.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
+  draft.countryBaseColors = { ...draft.sovereignBaseColors };
+  draft.visualOverrides = data.visualOverrides || data.featureOverrides || {};
+  draft.featureOverrides = { ...draft.visualOverrides };
+
+  draft.waterRegionOverrides = data.waterRegionOverrides || {};
+  draft.specialRegionOverrides = {};
+  draft.sovereigntyByFeatureId = importedOwnershipState.sovereigntyByFeatureId;
+  draft.mapSemanticMode = normalizeMapSemanticMode(
     data.mapSemanticMode,
-    state.activeScenarioId ? state.mapSemanticMode : "political"
+    draft.activeScenarioId ? draft.mapSemanticMode : "political"
   );
-  state.sovereigntyInitialized = false;
-  state.paintMode = data.paintMode || "visual";
-  state.activeSovereignCode = data.activeSovereignCode || "";
-  state.selectedInspectorCountryCode = "";
-  state.inspectorHighlightCountryCode = state.selectedInspectorCountryCode;
-  state.releasableBoundaryVariantByTag =
+  draft.sovereigntyInitialized = false;
+  draft.paintMode = data.paintMode || "visual";
+  draft.activeSovereignCode = data.activeSovereignCode || "";
+  draft.selectedInspectorCountryCode = "";
+  draft.inspectorHighlightCountryCode = draft.selectedInspectorCountryCode;
+  draft.releasableBoundaryVariantByTag =
     data.releasableBoundaryVariantByTag &&
     typeof data.releasableBoundaryVariantByTag === "object"
       ? { ...data.releasableBoundaryVariantByTag }
       : {};
-  if (state.activeScenarioId) {
-    const existingTags = Object.keys(state.scenarioCountriesByTag || {});
-    state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId);
-    state.scenarioCountriesByTag = {
-      ...(state.scenarioCountriesByTag || {}),
-      ...getScenarioReleasableCountries(state.activeScenarioId, {
+  if (draft.activeScenarioId) {
+    const existingTags = Object.keys(draft.scenarioCountriesByTag || {});
+    draft.scenarioReleasableIndex = buildScenarioReleasableIndex(draft.activeScenarioId);
+    draft.scenarioCountriesByTag = {
+      ...(draft.scenarioCountriesByTag || {}),
+      ...getScenarioReleasableCountries(draft.activeScenarioId, {
         excludeTags: existingTags,
       }),
     };
   }
-  state.inspectorExpansionInitialized = false;
-  if (state.expandedInspectorContinents instanceof Set) {
-    state.expandedInspectorContinents.clear();
+  draft.inspectorExpansionInitialized = false;
+  if (draft.expandedInspectorContinents instanceof Set) {
+    draft.expandedInspectorContinents.clear();
   }
-  if (state.expandedInspectorReleaseParents instanceof Set) {
-    state.expandedInspectorReleaseParents.clear();
+  if (draft.expandedInspectorReleaseParents instanceof Set) {
+    draft.expandedInspectorReleaseParents.clear();
   }
-  state.dynamicBordersDirty = !!data.dynamicBordersDirty;
-  state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
-  resetDevTransientImportState(state, { previewFormat: "names_with_ids" });
-  ensureSovereigntyState({ force: true });
-  const importedOverlayState = restoreImportedAnnotationOverlayState(state, data, {
+  draft.dynamicBordersDirty = !!data.dynamicBordersDirty;
+  draft.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
+  resetDevTransientImportState(draft, { previewFormat: "names_with_ids" });
+
+  const importedOverlayState = restoreImportedAnnotationOverlayState(draft, data, {
     cloneValue: cloneImportedProjectValue,
   });
-  resetStrategicOverlayEditorState(state, {
+  resetStrategicOverlayEditorState(draft, {
     unitCounterRenderer: importedOverlayState?.annotationView?.unitRendererDefault || "game",
   });
-  hooks.invalidateFrontlineOverlayState?.();
+
   // workbench UI 要先于 style/layer visibility 恢复，这样后面的 normalize 可以拿到
   // 正确的 tab、preview family 和 panel 状态，不会把导入文件里的 UI 语义抹掉。
-  restoreImportedWorkbenchUiState(state, data, {
+  restoreImportedWorkbenchUiState(draft, data, {
     cloneValue: cloneImportedProjectValue,
   });
-  callRuntimeHook(state, "clearExportBakeCacheFn");
-  state.specialZones = data.specialZones || {};
-  state.specialZoneLayers = normalizeSpecialZoneLayersState(data.specialZoneLayers, {
+
+  draft.specialZones = data.specialZones || {};
+  draft.specialZoneLayers = normalizeSpecialZoneLayersState(data.specialZoneLayers, {
     defaultSource: "project",
-    topologyFingerprint: resolveSpecialZoneTopologyFingerprint(state),
-    validFeatureIds: state.landIndex instanceof Map ? new Set(state.landIndex.keys()) : null,
+    topologyFingerprint: resolveSpecialZoneTopologyFingerprint(draft),
+    validFeatureIds: preparedImport.validFeatureIds,
   });
-  state.specialZoneMembershipBrushMode = normalizeSpecialZoneMembershipBrushModeState(data.specialZoneMembershipBrushMode);
-  state.parentBordersVisible = data.parentBordersVisible !== false;
-  state.manualSpecialZones = { type: "FeatureCollection", features: [] };
-  const supportedCountries = Array.isArray(state.parentBorderSupportedCountries)
-    ? state.parentBorderSupportedCountries
+  draft.specialZoneMembershipBrushMode = normalizeSpecialZoneMembershipBrushModeState(data.specialZoneMembershipBrushMode);
+  draft.parentBordersVisible = data.parentBordersVisible !== false;
+  draft.manualSpecialZones = { type: "FeatureCollection", features: [] };
+  const supportedCountries = Array.isArray(draft.parentBorderSupportedCountries)
+    ? draft.parentBorderSupportedCountries
     : [];
   const importedParentEnabled =
     data.parentBorderEnabledByCountry && typeof data.parentBorderEnabledByCountry === "object"
@@ -303,75 +324,135 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   supportedCountries.forEach((countryCode) => {
     normalizedParentEnabled[countryCode] = !!importedParentEnabled[countryCode];
   });
-  state.parentBorderEnabledByCountry = normalizedParentEnabled;
-  restoreImportedStyleConfigState(state, data.styleConfig);
-  state.intensityFields = normalizeIntensityFieldsState(data.intensityFields);
-  state.appearancePresets = normalizeAppearancePresetsState(data.appearancePresets);
-  restoreImportedLayerVisibilityState(state, data.layerVisibility);
-  state.customPresets =
+  draft.parentBorderEnabledByCountry = normalizedParentEnabled;
+  restoreImportedStyleConfigState(draft, data.styleConfig);
+  draft.intensityFields = normalizeIntensityFieldsState(data.intensityFields);
+  draft.appearancePresets = normalizeAppearancePresetsState(data.appearancePresets);
+  restoreImportedLayerVisibilityState(draft, data.layerVisibility);
+  draft.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
-  debugState.importPhase = "state-restored";
-  const paletteRestoreTarget = String(data.activePaletteId || "").trim();
-  const shouldRestorePalette =
-    !!paletteRestoreTarget &&
-    (paletteRestoreTarget !== String(state.activePaletteId || "").trim() ||
-      !state.activePaletteMeta ||
-      !state.activePalettePack ||
-      !state.activePaletteMap);
-  if (shouldRestorePalette) {
-    const paletteRestored = await setActivePaletteSource(paletteRestoreTarget, {
-      syncUI: true,
-      overwriteCountryPalette: false,
-    });
-    if (!paletteRestored) {
-      console.warn(
-        `[project-import] Unable to restore saved palette source: ${paletteRestoreTarget}`
-      );
-      ui.showToast(ui.t("Saved palette could not be restored. Keeping the current palette.", "ui"), {
-        title: ui.t("Palette restore skipped", "ui"),
-        tone: "warning",
-        duration: 3600,
-      });
+  return captureProjectImportState(draft);
+}
+
+// Required assets and the project patch are staged before changing the document.
+// Once committed, optional completion cannot turn a successful import into failure.
+let activeImportRequest = null;
+let importRequestSequence = 0;
+
+function captureImportDocumentIdentity(target) {
+  return [target.dirtyRevision, target.activeScenarioId, target.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0,
+    target.currentScenarioApplyRequestId, target.historyPast, target.historyFuture,
+    target.historyPast?.length, target.historyFuture?.length];
+}
+
+function isImportDocumentCurrent(identity) {
+  return captureImportDocumentIdentity(state).every((value, index) => value === identity[index]);
+}
+
+async function applyImportedProjectState(data, { ui, hooks, request }) {
+  debugState.importPhase = "begin";
+  const preparedImport = await prepareImportedProjectState({
+    data, ui, debugState, getScenarioResourcesModule,
+    getScenarioManagerModule: () => import("./scenario_manager.js"),
+  });
+  if (request && (activeImportRequest !== request || request.committed || !isImportDocumentCurrent(request.identity))) {
+    throw Object.assign(new Error("Project import superseded by a document change."), { code: "IMPORT_ABORTED" });
+  }
+  data = preparedImport.data;
+  const patch = stageImportedProjectPatch(data, preparedImport);
+  const previous = captureProjectImportState(state);
+  try {
+    preparedImport.manager.commitScenarioForProjectImport(preparedImport.preparedScenario, () => {
+      commitImportedProjectPatch(state, patch);
+    }, () => !request || (activeImportRequest === request && !request.committed && isImportDocumentCurrent(request.identity)));
+  } catch (error) {
+    commitImportedProjectPatch(state, previous);
+    throw error;
+  }
+  const warnings = [];
+  // Both APIs update their state before notifying UI observers. An observer failure
+  // must not turn a document that has already committed into a failed import.
+  for (const [resource, finalize] of [["history-ui", clearHistory], ["save-status-ui", () => clearDirty("project-import")]]) {
+    try { finalize(); } catch (error) {
+      warnings.push({ resource, message: String(error?.message || error) });
     }
   }
-  if (state.activeScenarioId && state.showCityPoints) {
-    const { ensureActiveScenarioOptionalLayerLoaded } = await getScenarioResourcesModule();
-    await callRuntimeHook(state, "ensureBaseCityDataFn", { reason: "project-import", renderNow: false });
-    await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
-  }
-  if (
-    state.activeScenarioId
-    && (state.showStrategicResourceMarkers || String(state.strategicChoroplethMetric || "").trim())
-  ) {
-    const { ensureActiveScenarioOptionalLayerLoaded } = await getScenarioResourcesModule();
-    await ensureActiveScenarioOptionalLayerLoaded("strategicvalues", { renderNow: false });
-  }
-  if (state.showRivers) {
-    await callRuntimeHook(state, "ensureContextLayerDataFn", "rivers", {
-      reason: "project-import",
-      renderNow: false,
-    });
-  }
-  await restoreImportedTransportOverviewDataLayers(state);
-  if (state.showUrban) {
-    await callRuntimeHook(state, "ensureContextLayerDataFn", "urban", {
-      reason: "project-import",
-      renderNow: false,
-    });
-  }
-  if (state.showPhysical) {
-    await callRuntimeHook(state, "ensureContextLayerDataFn", ["physical-set", "physical-contours-set"], {
-      reason: "project-import",
-      renderNow: false,
-    });
-  }
-  await restoreImportedTransportCountryOverlayState(state, data);
-  debugState.importPhase = "ui-sync";
+  if (request) request.committed = true;
   debugState.importApplyCount += 1;
   debugState.lastImportedScenarioId = String(state.activeScenarioId || "");
-  syncProjectImportUiState({ scenarioImportAudit, hooks });
-  debugState.importPhase = "complete";
-  return preparedImport.importSummary;
+  debugState.importPhase = "committed";
+  const committedIdentity = captureImportDocumentIdentity(state);
+  const isCurrent = () => (!request || activeImportRequest === request) && isImportDocumentCurrent(committedIdentity);
+  if (request) request.isCurrent = isCurrent;
+  const retryTasks = new Map();
+  const complete = async (name, task) => {
+    if (!isCurrent()) return;
+    try {
+      const result = await task();
+      if (result === false) throw new Error(`${name} could not be restored.`);
+    } catch (error) {
+      if (!isCurrent()) return;
+      warnings.push({ resource: name, message: String(error?.message || error) });
+      retryTasks.set(name, task);
+      ui.showToast(`${ui.t("Project imported", "ui")}: ${name} — ${String(error?.message || error)}`, {
+        tone: "warning", duration: 12000, actionLabel: ui.t("Retry", "ui"),
+        onAction: async () => {
+          if (!isCurrent()) return;
+          if (await task() === false) throw new Error(`${name} could not be restored.`);
+          retryTasks.delete(name);
+        },
+      });
+    }
+  };
+  await complete("document-refresh", () => {
+    markLegacyColorStateDirty();
+    hooks.invalidateFrontlineOverlayState?.();
+    callRuntimeHook(state, "clearExportBakeCacheFn");
+  });
+  await complete("scenario-runtime", () => preparedImport.manager.completeScenarioProjectImport(preparedImport.preparedScenario, isCurrent));
+  // Scenario activation commits topology before the renderer publishes its new
+  // landData. Seeding ownership earlier would copy outgoing TNO/Atlantropa/global
+  // feature IDs into this document, and its next import would correctly reject them.
+  if (!warnings.some(warning => warning.resource === "scenario-runtime")) {
+    await complete("ownership-index", () => ensureSovereigntyState({ force: true }));
+  }
+  const paletteId = String(data.activePaletteId || "").trim();
+  if (paletteId) await complete(`palette:${paletteId}`, () => setActivePaletteSource(paletteId, {
+    syncUI: true, overwriteCountryPalette: false, isCurrent,
+  }));
+  if (state.activeScenarioId && state.showCityPoints) await complete("cities", async () => {
+    const baseCities = await callRuntimeHook(state, "ensureBaseCityDataFn", { reason: "project-import", renderNow: false });
+    if (!isCurrent()) return;
+    if (baseCities === null || state.baseCityDataState === "error") throw new Error("Base cities could not be restored.");
+    return restoreImportedScenarioOptionalLayer("cities", preparedImport, isCurrent);
+  });
+  if (state.activeScenarioId && (state.showStrategicResourceMarkers || state.strategicChoroplethMetric)) {
+    await complete("strategicvalues", () => restoreImportedScenarioOptionalLayer("strategicvalues", preparedImport, isCurrent));
+  }
+  for (const [visible, name, layer] of [
+    [state.showRivers, "rivers", "rivers"], [state.showUrban, "urban", "urban"],
+    [state.showPhysical, "physical", ["physical-set", "physical-contours-set"]],
+  ]) if (visible) await complete(name, async () => {
+    const result = await callRuntimeHook(state, "ensureContextLayerDataFn", layer, { reason: "project-import", renderNow: false });
+    if (isCurrent()) validateImportedContextLayerResult(result);
+  });
+  await complete("transport-overview", () => restoreImportedTransportOverviewDataLayers(state, isCurrent));
+  await complete("transport-country-overlays", () => restoreImportedTransportCountryOverlayState(state, data, isCurrent));
+  await complete("project-ui", () => syncProjectImportUiState({ scenarioImportAudit: preparedImport.scenarioImportAudit, hooks }));
+  if (!request || activeImportRequest === request) {
+    debugState.importPhase = "complete";
+  }
+  return {
+    status: warnings.length ? "committed-with-warnings" : "committed",
+    summary: preparedImport.importSummary, warnings,
+    // Retry only the named incomplete resource while this committed document is still current.
+    retry: async (resource) => {
+      if (!isCurrent() || !retryTasks.has(resource)) return false;
+      if (await retryTasks.get(resource)() === false) return false;
+      retryTasks.delete(resource);
+      return true;
+    },
+  };
 }
 
 export function bindInteractionFunnel({
@@ -400,66 +481,55 @@ export function dispatchMapDoubleClick(event) {
   return mapDoubleClickImpl(event, debugState.lastDoubleClickContext);
 }
 
-export function importProjectThroughFunnel(file, options = {}) {
+async function runProjectImport(input, options, source) {
+  if (activeImportRequest?.pending) return { status: "failed", reason: "import-in-progress" };
+  const request = { id: ++importRequestSequence, pending: true, committed: false,
+    identity: captureImportDocumentIdentity(state) };
+  activeImportRequest = request;
   const ui = resolveUi(options.ui);
   const hooks = resolveHooks(options.hooks);
   debugState.importStartCount += 1;
-  debugState.importPhase = "file-read";
+  debugState.importPhase = `${source}-read`;
   debugState.lastImportError = "";
-  debugState.lastImportFileName = String(file?.name || "");
-  let importSummary = null;
-  void getFileManagerModule().then(({ FileManager }) => FileManager.importProject(
-    file,
-    async (data) => {
-      try {
-        importSummary = await applyImportedProjectState(data, { ui, hooks });
-      } catch (error) {
-        debugState.importPhase = "error";
+  debugState.lastImportFileName = String(source === "file" ? input?.name || "" : options.fileName || "");
+  let result = null;
+  try {
+    const { FileManager } = await getFileManagerModule();
+    const callback = async data => {
+      result = await applyImportedProjectState(data, { ui, hooks, request });
+      return result;
+    };
+    const observers = {
+      onSuccess: () => {
+        request.pending = false;
+        if (activeImportRequest === request && result && request.isCurrent?.()) hooks.onProjectImportComplete?.(result.summary);
+      },
+      onError: error => {
+        request.pending = false;
+        result = { status: error?.code === "IMPORT_ABORTED" ? "cancelled" : "failed", error };
+        debugState.importPhase = result.status;
         debugState.lastImportError = String(error?.message || error || "");
-        throw error;
-      }
-    },
-    {
-      onSuccess: () => hooks.onProjectImportComplete?.(importSummary),
-      onError: (error) => hooks.onProjectImportError?.(error),
-    }
-  )).catch((error) => reportImportModuleFailure(error, ui, hooks));
-  return true;
+        hooks.onProjectImportError?.(error);
+      },
+    };
+    const outcome = source === "file"
+      ? await FileManager.importProject(input, callback, observers, options.importOptions || {})
+      : await FileManager.importProjectText(input, callback, observers, options.importOptions || {});
+    return result || (outcome && typeof outcome === "object" ? outcome : { status: "failed" });
+  } catch (error) {
+    reportImportModuleFailure(error, ui, hooks);
+    return { status: "failed", error };
+  } finally {
+    request.pending = false;
+  }
 }
 
-export async function importProjectTextThroughFunnel(text, options = {}) {
-  const ui = resolveUi(options.ui);
-  const hooks = resolveHooks(options.hooks);
-  const importOptions =
-    options.importOptions && typeof options.importOptions === "object" ? options.importOptions : {};
-  debugState.importStartCount += 1;
-  debugState.importPhase = "text-read";
-  debugState.lastImportError = "";
-  debugState.lastImportFileName = String(options.fileName || "");
-  let importSummary = null;
-  let FileManager;
-  try {
-    ({ FileManager } = await getFileManagerModule());
-  } catch (error) {
-    return reportImportModuleFailure(error, ui, hooks);
-  }
-  return FileManager.importProjectText(
-    text,
-    async (data) => {
-      try {
-        importSummary = await applyImportedProjectState(data, { ui, hooks });
-      } catch (error) {
-        debugState.importPhase = "error";
-        debugState.lastImportError = String(error?.message || error || "");
-        throw error;
-      }
-    },
-    {
-      onSuccess: () => hooks.onProjectImportComplete?.(importSummary),
-      onError: (error) => hooks.onProjectImportError?.(error),
-    },
-    importOptions,
-  );
+export function importProjectThroughFunnel(file, options = {}) {
+  return runProjectImport(file, options, "file");
+}
+
+export function importProjectTextThroughFunnel(text, options = {}) {
+  return runProjectImport(text, options, "text");
 }
 
 export function getInteractionFunnelDebugState() {

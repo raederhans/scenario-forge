@@ -555,7 +555,7 @@ export function finishScenarioChunkLoadState(
 
 export function commitScenarioChunkPayloadEntriesState(target, entries = []) {
   ensureScenarioChunkRuntimeState(target);
-  const payloadByChunkId = { ...target.activeScenarioChunks.payloadByChunkId };
+  const payloadByChunkId = Object.fromEntries(Object.entries(target.activeScenarioChunks.payloadByChunkId));
   const loadedChunkIds = new Set(Object.values(target.activeScenarioChunks.loadedChunkIds));
   const lruChunkIds = new Set(Object.values(target.activeScenarioChunks.lruChunkIds));
   for (const entry of Array.isArray(entries) ? entries : []) {

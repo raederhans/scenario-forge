@@ -983,18 +983,26 @@ class FileManager {
     const { notifySuccess, notifyError } = resolveProjectImportObservers(observers);
     try {
       const data = FileManager.normalizeImportedProjectData(payload);
+      let importResult = null;
       if (typeof callback === "function") {
         // callback 负责把归一化后的项目状态真正接到运行时；
         // 只有 callback 完整成功，才把这次导入视为成功并清掉 dirty / 弹成功提示。
-        await callback(data);
+        importResult = await callback(data);
       }
-      clearDirty("project-import");
+      // Transactional funnel callbacks own the baseline at their synchronous commit.
+      // Optional completion may await while the user makes a newer edit.
+      const committed = importResult?.status === "committed" || importResult?.status === "committed-with-warnings";
+      if (importResult?.status === "cancelled" || importResult?.status === "failed") {
+        notifyProjectImportObserver(notifyError, importResult.error || importResult, "error");
+        return importResult;
+      }
+      if (!committed) clearDirty("project-import");
       showToast(t(options.successMessage || "Project file loaded successfully.", "ui"), {
         title: t(options.successTitle || "Project imported", "ui"),
-        tone: "success",
+        tone: importResult?.status === "committed-with-warnings" ? "warning" : "success",
       });
       notifyProjectImportObserver(notifySuccess, data, "success");
-      return true;
+      return importResult || true;
     } catch (error) {
       console.error("Failed to import project:", error);
       showProjectImportFailure(error);

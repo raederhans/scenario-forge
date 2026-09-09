@@ -29,7 +29,8 @@ async function installLifecycleObserver(page) {
     }
   });
   const source = fs.readFileSync(path.resolve('js/bootstrap/post_ready_scheduler.js'), 'utf8');
-  const instrumented = source.replace('Promise.resolve(callback())', 'Promise.resolve(globalThis.__n4Run(taskKey, callback))')
+  expect(source).toContain('Promise.resolve(callback(context))');
+  const instrumented = source.replace('Promise.resolve(callback(context))', 'Promise.resolve(globalThis.__n4Run(taskKey, () => callback(context)))')
     .replace('return diagnostics;', 'globalThis.__n4Record("scheduler", diagnostics); return diagnostics;');
   expect(instrumented).not.toBe(source);
   await page.route('**/js/bootstrap/post_ready_scheduler.js', route => route.fulfill({
@@ -101,6 +102,7 @@ test('deferred infra terminates across cold warm and scenario-switch editing win
         const s = globalThis.__playwrightStateRef;
         return !s.activePostReadyTaskKey && !s.activeInteractionRecoveryTaskKey
           && !(s.postReadyTaskDiagnostics?.pendingTaskKeys || []).length
+          && !(s.postReadyTaskDiagnostics?.waitingTaskKeys || []).length
           && !s.runtimeChunkLoadState?.pendingInfraPromotion;
       }, undefined, { timeout: 30_000 });
       entry.afterDrain = await snapshot(page);

@@ -697,7 +697,7 @@ test("project import through funnel restores legacy physical intensity into unif
   assert.equal(channel.points[0].strength, 1.35);
 });
 
-test("interaction funnel debug reset clears stale import error state", async () => {
+test("optional completion failure returns warnings without losing the committed import", async () => {
   const previousDocument = globalThis.document;
   const previousFileReader = globalThis.FileReader;
   globalThis.document = {
@@ -711,8 +711,7 @@ test("interaction funnel debug reset clears stale import error state", async () 
   };
 
   try {
-    await new Promise((resolve) => {
-      importProjectThroughFunnel(
+    const result = await importProjectThroughFunnel(
         {
           name: "map_project.json",
           text: JSON.stringify(createTransportOverviewImportPayload()),
@@ -727,14 +726,14 @@ test("interaction funnel debug reset clears stale import error state", async () 
             invalidateFrontlineOverlayState: () => {
               throw new Error("debug reset sentinel");
             },
-            onProjectImportError: resolve,
+            onProjectImportError: () => assert.fail("committed import must not become a failure"),
           },
         }
       );
-    });
 
-    assert.equal(getInteractionFunnelDebugState().importPhase, "error");
-    assert.match(getInteractionFunnelDebugState().lastImportError, /debug reset sentinel/);
+    assert.equal(result.status, "committed-with-warnings");
+    assert.ok(result.warnings.some(warning => warning.resource === "document-refresh" && /debug reset sentinel/.test(warning.message)));
+    assert.equal(getInteractionFunnelDebugState().importPhase, "complete");
 
     resetInteractionFunnelDebugState();
 

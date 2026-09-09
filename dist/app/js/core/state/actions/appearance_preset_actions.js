@@ -60,3 +60,8 @@ export function applyAppearancePresetState(target, presetOrSnapshot) {
   );
   return snapshot;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "appearancePresets")) target.appearancePresets = patch.appearancePresets;
+}

@@ -13,6 +13,7 @@ const P4_4_SOURCE_REFS = Object.freeze([
   "js/core/scenario_resources.js",
   "js/core/special_zone_layers.js",
   "js/core/state/actions/appearance_actions.js",
+  "js/core/state/actions/project_import_actions.js",
   "js/core/state/actions/appearance_preset_actions.js",
   "js/core/state/actions/appearance_reference_actions.js",
   "js/core/state/actions/appearance_selection_actions.js",
@@ -133,6 +134,18 @@ const P4_4_NODE_ROUTE_SOURCE_REFS = Object.freeze([
 ]);
 
 export const STATE_OWNERSHIP_RECORDS = [
+  {
+    id: "state:project-import-transaction",
+    commandRef: "node --test tests/project_import_transaction_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/state/actions/project_import_actions.js", "js/core/interaction_funnel.js",
+      "js/core/interaction_funnel/import_apply_orchestration.js", "tests/project_import_transaction_behavior.test.mjs",
+    ],
+    ownerHints: ["state-ownership"], domains: ["state-ownership"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 402,
+    verification: null, selector: {},
+  },
   {
     "id": "node:test:node:p4:p4-1",
     "commandRef": "test:node:p4:p4-1",
@@ -1861,6 +1874,26 @@ export const STATE_OWNERSHIP_RECORDS = [
     "commandRef": "verify:p4:p4-4",
     "sourceRefs": [
       ...P4_4_SOURCE_REFS,
+      // Cumulative policy admission for the integrated startup, scenario and
+      // renderer changes. Their existing owner behavior routes remain separate.
+      "js/core/data_loader.js",
+      "js/core/interaction_funnel.js",
+      "js/core/interaction_funnel/import_apply_orchestration.js",
+      "js/ui/sidebar/project_support_diagnostics_controller.js",
+      "js/core/legend_manager.js",
+      "js/core/project_package_io.js",
+      "js/core/renderer/city_points_render_owner.js",
+      "js/core/renderer/exact_composite_reuse_owner.js",
+      "js/core/renderer/legend_control_owner.js",
+      "js/core/renderer/river_layer_render_owner.js",
+      "js/core/renderer/spatial_index_runtime_owner.js",
+      "js/core/scenario/bundle_cache.js",
+      "js/core/scenario/core_value_normalizer.js",
+      "js/core/scenario/rollback_clone.js",
+      "js/core/scenario/shared.js",
+      "js/core/startup_cache.js",
+      "js/core/startup_worker_client.js",
+      "js/workers/startup_boot.worker.js",
       "js/core/renderer/bathymetry_style_policy.js",
       "js/core/renderer/brush_interaction_session_owner.js",
       "js/core/renderer/city_label_text_model.js",

@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   createStartupReadyHandoffOwner,
 } from "../js/bootstrap/startup_ready_handoff.js";
-import { POST_READY_IDLE_QUIET_MS } from "../js/bootstrap/post_ready_scheduler.js";
+import { createPostReadyScheduler, POST_READY_IDLE_QUIET_MS } from "../js/bootstrap/post_ready_scheduler.js";
 import { attachDeferredUiBootstrapRejectionObserver } from "../js/bootstrap/deferred_ui_bootstrap.js";
 import { setUiHydrationState } from "../js/core/state/actions/boot_actions.js";
 
@@ -20,7 +20,21 @@ function createSchedulerRecorder({ order = null } = {}) {
   return {
     tasks,
     scheduleTask(key, callback, options = {}) {
-      tasks.push({ key, callback, options });
+      tasks.push({ key, callback: () => callback({
+        throwIfStale() {
+          if (options.isCurrent && !options.isCurrent()) throw new Error("stale");
+        },
+        waitFor: async (value) => {
+          const result = await value;
+          if (options.isCurrent && !options.isCurrent()) throw new Error("stale");
+          return result;
+        },
+        yield: async () => {},
+        commit: (apply) => {
+          if (options.isCurrent && !options.isCurrent()) throw new Error("stale");
+          return apply();
+        },
+      }), options });
       const orderLabel = orderLabelByTaskKey[key];
       if (order && orderLabel && !recordedOrderLabels.has(orderLabel)) {
         recordedOrderLabels.add(orderLabel);
@@ -500,12 +514,18 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
   ]);
   assert.deepEqual(scheduler.tasks[0].options, {
     timeout: 1600,
+    isCurrent: scheduler.tasks[0].options.isCurrent,
+    maxWaitMs: 120_000,
+    maxRunMs: 120_000,
     delayMs: 900,
     retryDelayMs: 420,
     idleQuietMs: POST_READY_IDLE_QUIET_MS,
   });
   assert.deepEqual(scheduler.tasks[1].options, {
     timeout: 1800,
+    isCurrent: scheduler.tasks[1].options.isCurrent,
+    maxWaitMs: 120_000,
+    maxRunMs: 120_000,
     delayMs: 1400,
     retryDelayMs: 420,
     idleQuietMs: POST_READY_IDLE_QUIET_MS,
@@ -550,4 +570,34 @@ test("reset clears internal scheduling flags", () => {
   owner.schedulePostReadyHydration();
   owner.schedulePostReadyDeferredContextWarmup();
   assert.equal(scheduler.tasks.length, 6);
+});
+
+test("real scheduler and warmup owner discard a completion after a scene switch", async () => {
+  const targetRuntime = createTargetRuntime({ showRivers: true, activeScenarioId: "A", currentScenarioApplyRequestId: 1 });
+  const scheduler = createPostReadyScheduler({ targetState: targetRuntime });
+  let finishLoad;
+  let beginLoad;
+  const started = new Promise((resolve) => { beginLoad = resolve; });
+  const renders = [];
+  const { owner } = createOwnerHarness({
+    targetRuntime,
+    scheduler: { scheduleTask: (key, callback, options) => scheduler.scheduleTask(key, callback, { ...options, delayMs: 0 }) },
+    helpers: createHelpers({ overrides: {
+      ensureContextLayerDataReady: () => new Promise((resolve) => { finishLoad = resolve; beginLoad(); }),
+      requestMainRender: (reason) => renders.push(reason),
+    } }),
+  });
+  try {
+    owner.schedulePostReadyDeferredContextWarmup();
+    await started;
+    targetRuntime.activeScenarioId = "B";
+    targetRuntime.currentScenarioApplyRequestId = 2;
+    finishLoad({ rivers: { features: [] } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.deepEqual(renders, []);
+    assert.equal(scheduler.getDiagnostics().taskOutcomes["post-ready-context-warmup"].reason, "stale");
+    assert.deepEqual(scheduler.getDiagnostics().waitingTaskKeys, []);
+  } finally {
+    scheduler.reset("test-cleanup");
+  }
 });

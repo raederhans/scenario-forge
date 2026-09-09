@@ -49,6 +49,14 @@ export function createPostReadyScheduler({
   const taskDiagnostics = new Map();
   let taskEpoch = 0;
   let activeExecution = null;
+  const executions = new Set();
+  const outcomes = new Map();
+
+  function recordOutcome(taskKey, status, reason = "") {
+    outcomes.delete(taskKey);
+    outcomes.set(taskKey, { status, reason, finishedAt: nowMs() });
+    if (outcomes.size > 32) outcomes.delete(outcomes.keys().next().value);
+  }
 
   function nowMs() {
     const value = typeof clock === "function" ? Number(clock()) : Number.NaN;
@@ -78,9 +86,12 @@ export function createPostReadyScheduler({
   } = {}) {
     const currentMs = nowMs();
     const pendingEntries = [...taskDiagnostics.entries()];
-    const pendingTaskKeys = [...taskHandles.keys()].sort();
+    const pendingTaskKeys = [...new Set([
+      ...taskHandles.keys(),
+      ...[...executions].filter((entry) => entry.waiting).map((entry) => entry.taskKey),
+    ])].sort();
     const maxPendingAgeMs = pendingEntries.reduce((maxAge, [_key, entry]) => (
-      Math.max(maxAge, Math.max(0, currentMs - Number(entry.firstScheduledAt || currentMs)))
+      Math.max(maxAge, Math.max(0, currentMs - Number(entry.firstScheduledAt ?? currentMs)))
     ), 0);
     const maxRetryCount = pendingEntries.reduce((maxRetry, [_key, entry]) => (
       Math.max(maxRetry, Number(entry.retryCount || 0))
@@ -101,6 +112,8 @@ export function createPostReadyScheduler({
       maxRetryCount,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
       minIdleTimeRemainingMs: POST_READY_IDLE_TIME_REMAINING_MS,
+      taskOutcomes: Object.fromEntries(outcomes),
+      waitingTaskKeys: [...executions].filter((entry) => entry.waiting).map((entry) => entry.taskKey),
       reasonStateHint: {
         renderPhase: String(targetState.renderPhase || ""),
         isInteracting: !!targetState.isInteracting,
@@ -138,24 +151,32 @@ export function createPostReadyScheduler({
   }
 
   function clearTask(taskKey) {
+    if (taskHandles.has(normalizeTaskKey(taskKey))) recordOutcome(normalizeTaskKey(taskKey), "cancelled", "cancelled");
     clearTaskInternal(taskKey);
+    for (const execution of executions) {
+      if (execution.taskKey === normalizeTaskKey(taskKey)) execution.cancel("cancelled");
+    }
   }
 
   function clearAllTasks() {
+    for (const execution of executions) execution.cancel("cancelled");
     taskHandles.forEach((handle) => {
       clearTaskHandle(handle);
     });
+    taskHandles.forEach((_handle, taskKey) => recordOutcome(taskKey, "cancelled", "cancelled"));
     taskHandles.clear();
     taskDiagnostics.clear();
     updateDiagnostics({ lastBlockedReason: "cleared-all" });
   }
 
   function reset(reason = "reset") {
+    for (const execution of executions) execution.cancel(String(reason || "reset"));
     taskEpoch += 1;
     activeExecution = null;
     taskHandles.forEach((handle) => {
       clearTaskHandle(handle);
     });
+    taskHandles.forEach((_handle, taskKey) => recordOutcome(taskKey, "cancelled", String(reason || "reset")));
     taskHandles.clear();
     taskDiagnostics.clear();
     clearActivePostReadyTask(targetState);
@@ -208,8 +229,14 @@ export function createPostReadyScheduler({
     return resolveIdleBlockReason({ quietMs, allowChunkBacklog }) === "ready";
   }
 
-  function runTaskCallback(taskKey, callback) {
-    const execution = { epoch: taskEpoch };
+  function runTaskCallback(taskKey, callback, {
+    isCurrent = () => true, maxRunMs = 0,
+    idleQuietMs = POST_READY_IDLE_QUIET_MS, allowChunkBacklog = false,
+  } = {}) {
+    const timers = getTimerApi(globalScope);
+    const controller = new AbortController();
+    const execution = { epoch: taskEpoch, taskKey, waiting: false, cancel: null };
+    executions.add(execution);
     activeExecution = execution;
     setActivePostReadyTask(targetState, {
       taskKey,
@@ -218,20 +245,109 @@ export function createPostReadyScheduler({
     taskDiagnostics.delete(taskKey);
     updateDiagnostics({ taskKey, lastStartedTaskKey: taskKey });
 
-    const clearActiveTask = () => {
+    const releaseSlot = () => {
       if (activeExecution !== execution || execution.epoch !== taskEpoch) return;
       activeExecution = null;
       clearActivePostReadyTask(targetState, { expectedTaskKey: taskKey });
+    };
+    let deadlineId = null;
+    const clearActiveTask = () => {
+      executions.delete(execution);
+      if (deadlineId !== null) timers.clearTimeout(deadlineId);
+      if (execution.epoch !== taskEpoch || controller.signal.aborted) return;
+      releaseSlot();
       updateDiagnostics({ taskKey, lastFinishedTaskKey: taskKey });
     };
+    execution.cancel = (reason) => {
+      if (controller.signal.aborted) return;
+      controller.abort(reason);
+      releaseSlot();
+      executions.delete(execution);
+      if (deadlineId !== null) timers.clearTimeout(deadlineId);
+      recordOutcome(taskKey, "cancelled", reason);
+      updateDiagnostics({ taskKey, lastFinishedTaskKey: taskKey });
+    };
+    const checkCurrent = () => {
+      if (controller.signal.aborted || execution.epoch !== taskEpoch || !isCurrent()) {
+        const error = new Error("Post-ready task is no longer current.");
+        error.name = "AbortError";
+        throw error;
+      }
+    };
+    const waitWithSignal = (promise) => new Promise((resolve, reject) => {
+      const onAbort = () => {
+        const error = new Error(String(controller.signal.reason || "Task cancelled."));
+        error.name = "AbortError";
+        reject(error);
+      };
+      controller.signal.addEventListener("abort", onAbort, { once: true });
+      Promise.resolve(promise).then(resolve, reject).finally(() => {
+        controller.signal.removeEventListener("abort", onAbort);
+      });
+      if (controller.signal.aborted) onAbort();
+    });
+    const pause = (delay = 0) => new Promise((resolve) => {
+      const finish = () => {
+        timers.clearTimeout(id);
+        controller.signal.removeEventListener("abort", finish);
+        resolve();
+      };
+      const id = timers.setTimeout(finish, delay);
+      controller.signal.addEventListener("abort", finish, { once: true });
+    });
+    const waitFor = async (promise) => {
+      // Only explicit resource waits release the execution slot. Legacy callbacks
+      // remain serialized, and a continuation reacquires it before doing CPU work.
+      checkCurrent();
+      execution.waiting = true;
+      releaseSlot();
+      updateDiagnostics({ taskKey });
+      let value;
+      let failure;
+      try { value = await waitWithSignal(promise); } catch (error) { failure = error; }
+      checkCurrent();
+      while ((activeExecution && activeExecution !== execution)
+        || resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog }) !== "ready") {
+        await waitWithSignal(pause(120));
+        checkCurrent();
+      }
+      activeExecution = execution;
+      execution.waiting = false;
+      setActivePostReadyTask(targetState, { taskKey, startedAt: nowMs() });
+      updateDiagnostics({ taskKey });
+      if (failure) throw failure;
+      return value;
+    };
+    const context = Object.freeze({
+      signal: controller.signal,
+      isCurrent: () => !controller.signal.aborted && execution.epoch === taskEpoch && isCurrent(),
+      throwIfStale: checkCurrent,
+      waitFor,
+      yield: () => waitFor(pause()),
+      commit: (apply) => { checkCurrent(); return apply(); },
+    });
+    if (Number(maxRunMs) > 0) {
+      deadlineId = timers.setTimeout(() => execution.cancel("execution-deadline"), Number(maxRunMs));
+    }
 
     try {
-      Promise.resolve(callback())
+      checkCurrent();
+      Promise.resolve(callback(context))
+        .then(() => {
+          if (context.isCurrent()) recordOutcome(taskKey, "completed");
+          else if (!controller.signal.aborted && execution.epoch === taskEpoch) recordOutcome(taskKey, "cancelled", "stale");
+        })
         .catch((error) => {
+          if (error?.name === "AbortError") {
+            if (!controller.signal.aborted && execution.epoch === taskEpoch) recordOutcome(taskKey, "cancelled", "stale");
+            return;
+          }
+          if (execution.epoch === taskEpoch && !controller.signal.aborted) recordOutcome(taskKey, "failed", error?.message || String(error));
           warn(`[boot] Post-ready task failed. task=${taskKey}`, error);
         })
         .finally(clearActiveTask);
     } catch (error) {
+      recordOutcome(taskKey, error?.name === "AbortError" ? "cancelled" : "failed", error?.message || String(error));
       warn(`[boot] Post-ready task failed. task=${taskKey}`, error);
       clearActiveTask();
     }
@@ -243,6 +359,10 @@ export function createPostReadyScheduler({
     idleQuietMs,
     minIdleTimeRemainingMs,
     allowChunkBacklog,
+    isCurrent,
+    canStart,
+    maxWaitMs,
+    maxRunMs,
   } = {}) {
     scheduleTask(normalizedTaskKey, callback, {
       timeout,
@@ -251,6 +371,10 @@ export function createPostReadyScheduler({
       idleQuietMs,
       minIdleTimeRemainingMs,
       allowChunkBacklog,
+      isCurrent,
+      canStart,
+      maxWaitMs,
+      maxRunMs,
     });
   }
 
@@ -264,16 +388,23 @@ export function createPostReadyScheduler({
       idleQuietMs = POST_READY_IDLE_QUIET_MS,
       minIdleTimeRemainingMs = POST_READY_IDLE_TIME_REMAINING_MS,
       allowChunkBacklog = false,
+      isCurrent = () => true,
+      canStart = () => true,
+      maxWaitMs = 0,
+      maxRunMs = 0,
     } = {}
   ) {
     const normalizedTaskKey = normalizeTaskKey(taskKey);
     if (!normalizedTaskKey) return;
+    for (const execution of executions) {
+      if (execution.taskKey === normalizedTaskKey) execution.cancel("superseded");
+    }
     const shouldAllowChunkBacklog = !!allowChunkBacklog;
     const timers = getTimerApi(globalScope);
     const previousDiagnostic = taskDiagnostics.get(normalizedTaskKey);
     clearTaskInternal(normalizedTaskKey, { recordDiagnostics: false });
     taskDiagnostics.set(normalizedTaskKey, {
-      firstScheduledAt: Number(previousDiagnostic?.firstScheduledAt || 0) || nowMs(),
+      firstScheduledAt: previousDiagnostic?.firstScheduledAt ?? nowMs(),
       lastScheduledAt: nowMs(),
       retryCount: Math.max(0, Number(previousDiagnostic?.retryCount || 0)),
       lastBlockedReason: String(previousDiagnostic?.lastBlockedReason || ""),
@@ -295,9 +426,18 @@ export function createPostReadyScheduler({
 
     const runWhenIdle = () => {
       if (!ownsScheduledHandle()) return;
+      const age = nowMs() - taskDiagnostics.get(normalizedTaskKey).firstScheduledAt;
+      if (!isCurrent() || (Number(maxWaitMs) > 0 && age >= Number(maxWaitMs))) {
+        const reason = !isCurrent() ? "stale" : "waiting-deadline";
+        clearTaskInternal(normalizedTaskKey, { recordDiagnostics: false });
+        recordOutcome(normalizedTaskKey, "cancelled", reason);
+        updateDiagnostics({ taskKey: normalizedTaskKey, lastFinishedTaskKey: normalizedTaskKey, lastBlockedReason: reason });
+        return;
+      }
       const blockReason = targetState.activePostReadyTaskKey
         ? "active-task"
-        : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
+        : !canStart() ? "dependency-pending"
+          : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
       if (blockReason !== "ready") {
         markTaskRetry(normalizedTaskKey, blockReason);
         const retryId = timers.setTimeout(runWhenIdle, Math.max(120, retryDelayMs));
@@ -307,13 +447,17 @@ export function createPostReadyScheduler({
       if (timers.requestIdleCallback) {
         const idleId = timers.requestIdleCallback((deadline) => {
           if (!ownsScheduledHandle()) return;
+          if (!isCurrent() || !canStart() || (Number(maxWaitMs) > 0 && nowMs() - taskDiagnostics.get(normalizedTaskKey).firstScheduledAt >= Number(maxWaitMs))) {
+            runWhenIdle();
+            return;
+          }
           taskHandles.delete(normalizedTaskKey);
           const remainingMs = typeof deadline?.timeRemaining === "function"
             ? Number(deadline.timeRemaining())
             : Number.POSITIVE_INFINITY;
           if (!deadline?.didTimeout && remainingMs < minIdleTimeRemainingMs) {
             markTaskRetry(normalizedTaskKey, "idle-time-remaining");
-            rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog });
+            rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog, isCurrent, canStart, maxWaitMs, maxRunMs });
             return;
           }
           const idleBlockReason = targetState.activePostReadyTaskKey
@@ -321,26 +465,30 @@ export function createPostReadyScheduler({
             : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
           if (idleBlockReason !== "ready") {
             markTaskRetry(normalizedTaskKey, idleBlockReason);
-            rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog });
+            rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog, isCurrent, canStart, maxWaitMs, maxRunMs });
             return;
           }
-          runTaskCallback(normalizedTaskKey, callback);
+          runTaskCallback(normalizedTaskKey, callback, { isCurrent, maxRunMs, idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
         }, { timeout });
         registerHandle("idle", idleId);
         return;
       }
       const timeoutId = timers.setTimeout(() => {
         if (!ownsScheduledHandle()) return;
+        if (!isCurrent() || !canStart() || (Number(maxWaitMs) > 0 && nowMs() - taskDiagnostics.get(normalizedTaskKey).firstScheduledAt >= Number(maxWaitMs))) {
+          runWhenIdle();
+          return;
+        }
         taskHandles.delete(normalizedTaskKey);
         const timeoutBlockReason = targetState.activePostReadyTaskKey
           ? "active-task"
           : resolveIdleBlockReason({ quietMs: idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
         if (timeoutBlockReason !== "ready") {
           markTaskRetry(normalizedTaskKey, timeoutBlockReason);
-          rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog });
+          rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog, isCurrent, canStart, maxWaitMs, maxRunMs });
           return;
         }
-        runTaskCallback(normalizedTaskKey, callback);
+        runTaskCallback(normalizedTaskKey, callback, { isCurrent, maxRunMs, idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
       }, 0);
       registerHandle("timeout", timeoutId);
     };

@@ -106,19 +106,29 @@ function runCommand(commandRef, {
   platform,
 } = {}) {
   const resolved = commandProcess(commandRef, platform);
-  const result = runner(resolved.command, resolved.args, {
-    cwd,
-    env,
-    encoding: "utf8",
-    shell: false,
-    stdio: "inherit",
-  });
+  let result;
+  try {
+    result = runner(resolved.command, resolved.args, {
+      cwd,
+      env,
+      encoding: "utf8",
+      shell: false,
+      stdio: "inherit",
+    });
+  } catch (cause) {
+    const error = new Error(`P4 Nightly authority command could not start: ${commandRef}`, { cause });
+    error.commandRef = commandRef;
+    error.failureCategory = "command-start";
+    throw error;
+  }
   if (result?.error || result?.signal || result?.status !== 0) {
     const error = new Error(`P4 Nightly authority command failed: ${commandRef}`);
     error.commandRef = commandRef;
     error.status = result?.status;
     error.signal = result?.signal;
     error.cause = result?.error;
+    error.failureCategory = result?.error ? "command-start"
+      : result?.signal ? "command-signal" : "command-exit";
     throw error;
   }
   return { commandRef, status: "pass", exitCode: 0 };
@@ -170,109 +180,155 @@ export function runP4NightlyAuthority(role, {
   evidenceValidator = validateStateWriterPolicyEvidence,
 } = {}) {
   const plan = buildP4NightlyAuthorityPlan(role);
-  const sourceIdentity = requireCleanIdentity(identityReader(), "P4 Nightly authority source");
   const commands = [];
   const receipt = {
     schemaVersion: P4_NIGHTLY_AUTHORITY_SCHEMA_VERSION,
     kind: P4_NIGHTLY_AUTHORITY_KIND,
     role,
     status: "pass",
-    sourceIdentity,
+    sourceIdentity: null,
     commands,
   };
+  let stage = "source-identity";
+  let activeCommand = null;
+  try {
+    receipt.sourceIdentity = normalizeIdentity(identityReader());
+    const sourceIdentity = requireCleanIdentity(receipt.sourceIdentity, "P4 Nightly authority source");
 
-  if (role === "checker-boundaries") {
-    const evidencePath = defaultStateWriterPolicyEvidencePath("P4.4");
-    const reportPath = defaultStateWriterPolicyReportPath("P4.4");
-    const checkerPlan = buildStateWriterCheckerPlan({ phase: "P4.4", reportPath });
-    const produced = evidenceProducer({
-      cwd,
-      phase: "P4.4",
-      evidencePath,
-      reportPath,
-      checkerPlan,
-    });
-    commands.push({
-      commandRef: plan.commands[0],
-      status: "pass",
-      exitCode: 0,
-      evidenceId: produced.evidenceId,
-    });
-    const boundaryEvidence = [];
-    for (const commandRef of P4_NIGHTLY_PYTHON_BOUNDARY_COMMANDS) {
-      const validated = evidenceValidator({
+    if (role === "checker-boundaries") {
+      const evidencePath = defaultStateWriterPolicyEvidencePath("P4.4");
+      const reportPath = defaultStateWriterPolicyReportPath("P4.4");
+      const checkerPlan = buildStateWriterCheckerPlan({ phase: "P4.4", reportPath });
+      stage = "evidence-production";
+      activeCommand = plan.commands[0];
+      const produced = evidenceProducer({
         cwd,
         phase: "P4.4",
         evidencePath,
+        reportPath,
         checkerPlan,
-        expectedEvidenceId: produced.evidenceId,
-        expectedProducerRole: STATE_WRITER_POLICY_CHECKER_PRODUCER_ROLE,
-        routeApplicability: { unmatchedChangedFiles: [] },
       });
-      const env = buildStrictStateWriterEvidenceEnvironment(validated, {
+      commands.push({
+        commandRef: plan.commands[0],
+        status: "pass",
+        exitCode: 0,
+        evidenceId: produced.evidenceId,
+      });
+      const boundaryEvidence = [];
+      for (const commandRef of P4_NIGHTLY_PYTHON_BOUNDARY_COMMANDS) {
+        activeCommand = commandRef;
+        stage = "evidence-validation";
+        const validated = evidenceValidator({
+          cwd,
+          phase: "P4.4",
+          evidencePath,
+          checkerPlan,
+          expectedEvidenceId: produced.evidenceId,
+          expectedProducerRole: STATE_WRITER_POLICY_CHECKER_PRODUCER_ROLE,
+          routeApplicability: { unmatchedChangedFiles: [] },
+        });
+        const env = buildStrictStateWriterEvidenceEnvironment(validated, {
+          cwd,
+          baseEnv: {
+            ...baseEnv,
+            [STATE_WRITER_POLICY_LIVE_FALLBACK_ENV]: STATE_WRITER_POLICY_LIVE_FALLBACK_FORBID,
+          },
+        });
+        stage = "command";
+        commands.push(runCommand(commandRef, { cwd, env, runner, platform }));
+        boundaryEvidence.push({ commandRef, evidenceId: validated.evidenceId });
+      }
+      receipt.checker = {
+        producerRole: produced.producer?.role,
+        checkerCount: 1,
+        liveFallbackAttempts: 0,
+        evidenceId: produced.evidenceId,
+        evidencePath,
+        reportPath,
+        boundaryEvidence,
+      };
+    } else if (role === "full-policy-tap") {
+      activeCommand = P4_NIGHTLY_FULL_POLICY_COMMAND;
+      stage = "command";
+      commands.push(runCommand(P4_NIGHTLY_FULL_POLICY_COMMAND, {
         cwd,
-        baseEnv: {
-          ...baseEnv,
-          [STATE_WRITER_POLICY_LIVE_FALLBACK_ENV]: STATE_WRITER_POLICY_LIVE_FALLBACK_FORBID,
-        },
+        env: baseEnv,
+        runner,
+        platform,
+      }));
+      stage = "canonical-admission";
+      const artifactPaths = resolveP4StateWriterPolicyArtifactPaths({ mode: "full" });
+      const completedArtifact = readJson(artifactPaths.completedPath);
+      const canonicalTap = fs.readFileSync(artifactPaths.reportPath, "utf8");
+      const admissionEligible = isOfficialP4StateWriterPolicyCanonicalAdmissionEligible({
+        completedArtifact,
+        canonicalTap,
+        publishingArtifact: fs.existsSync(artifactPaths.publishingPath)
+          ? readJson(artifactPaths.publishingPath)
+          : null,
       });
-      commands.push(runCommand(commandRef, { cwd, env, runner, platform }));
-      boundaryEvidence.push({ commandRef, evidenceId: validated.evidenceId });
+      if (!admissionEligible) {
+        throw new Error("Windows canonical full policy TAP is not admissionEligible.");
+      }
+      receipt.fullPolicy = {
+        admissionEligible,
+        canonicalFullPlanCount: 1,
+        planIdentity: completedArtifact.planIdentity,
+        expectedPlanIdentity: P4_STATE_WRITER_POLICY_FULL_PLAN_IDENTITY,
+        testArguments: P4_STATE_WRITER_POLICY_TEST_FILES,
+        canonicalSha256: completedArtifact.canonicalSha256,
+        tapPath: path.relative(cwd, artifactPaths.reportPath).replaceAll("\\", "/"),
+        completedPath: path.relative(cwd, artifactPaths.completedPath).replaceAll("\\", "/"),
+      };
+    } else {
+      for (const commandRef of P4_NIGHTLY_FAST_COMMANDS) {
+        activeCommand = commandRef;
+        stage = "command";
+        commands.push(runCommand(commandRef, { cwd, env: baseEnv, runner, platform }));
+      }
+      receipt.fast = {
+        contracts: "pass",
+        routes: "pass",
+      };
     }
-    receipt.checker = {
-      producerRole: produced.producer?.role,
-      checkerCount: 1,
-      liveFallbackAttempts: 0,
-      evidenceId: produced.evidenceId,
-      evidencePath,
-      reportPath,
-      boundaryEvidence,
-    };
-  } else if (role === "full-policy-tap") {
-    commands.push(runCommand(P4_NIGHTLY_FULL_POLICY_COMMAND, {
-      cwd,
-      env: baseEnv,
-      runner,
-      platform,
-    }));
-    const artifactPaths = resolveP4StateWriterPolicyArtifactPaths({ mode: "full" });
-    const completedArtifact = readJson(artifactPaths.completedPath);
-    const canonicalTap = fs.readFileSync(artifactPaths.reportPath, "utf8");
-    const admissionEligible = isOfficialP4StateWriterPolicyCanonicalAdmissionEligible({
-      completedArtifact,
-      canonicalTap,
-      publishingArtifact: fs.existsSync(artifactPaths.publishingPath)
-        ? readJson(artifactPaths.publishingPath)
-        : null,
-    });
-    if (!admissionEligible) {
-      throw new Error("Windows canonical full policy TAP is not admissionEligible.");
-    }
-    receipt.fullPolicy = {
-      admissionEligible,
-      canonicalFullPlanCount: 1,
-      planIdentity: completedArtifact.planIdentity,
-      expectedPlanIdentity: P4_STATE_WRITER_POLICY_FULL_PLAN_IDENTITY,
-      testArguments: P4_STATE_WRITER_POLICY_TEST_FILES,
-      canonicalSha256: completedArtifact.canonicalSha256,
-      tapPath: path.relative(cwd, artifactPaths.reportPath).replaceAll("\\", "/"),
-      completedPath: path.relative(cwd, artifactPaths.completedPath).replaceAll("\\", "/"),
-    };
-  } else {
-    for (const commandRef of P4_NIGHTLY_FAST_COMMANDS) {
-      commands.push(runCommand(commandRef, { cwd, env: baseEnv, runner, platform }));
-    }
-    receipt.fast = {
-      contracts: "pass",
-      routes: "pass",
-    };
-  }
 
-  const finalIdentity = requireCleanIdentity(identityReader(), "P4 Nightly authority final source");
-  if (!sameIdentity(sourceIdentity, finalIdentity)) {
-    throw new Error("P4 Nightly authority source SHA/tree drifted during execution.");
+    activeCommand = null;
+    stage = "final-identity";
+    receipt.finalSourceIdentity = normalizeIdentity(identityReader());
+    const finalIdentity = requireCleanIdentity(receipt.finalSourceIdentity, "P4 Nightly authority final source");
+    if (!sameIdentity(sourceIdentity, finalIdentity)) {
+      throw new Error("P4 Nightly authority source SHA/tree drifted during execution.");
+    }
+    receipt.finalSourceIdentity = finalIdentity;
+  } catch (error) {
+    receipt.status = "fail";
+    const exitCode = Number.isInteger(error?.status) && error.status !== 0 ? error.status : null;
+    receipt.failure = {
+      category: error?.failureCategory || stage,
+      commandRef: error?.commandRef || activeCommand,
+      exitCode,
+      signal: error?.signal || null,
+      code: error?.code || error?.cause?.code || null,
+      message: error?.message || String(error),
+      stdout: error?.stdout || "",
+      stderr: error?.stderr || "",
+    };
+    if (activeCommand && !commands.some((entry) => entry.commandRef === activeCommand)) {
+      commands.push({ commandRef: activeCommand, status: "fail", exitCode });
+    }
+    receipt.completedSteps = commands.filter((entry) => entry.status === "pass").map((entry) => entry.commandRef);
+    try {
+      receipt.finalSourceIdentity = normalizeIdentity(identityReader());
+    } catch (identityError) {
+      receipt.identityCaptureError = identityError?.message || String(identityError);
+    }
+    try {
+      error.receipt = finalizeReceipt(receipt, outPath, cwd);
+    } catch (writeError) {
+      error.receiptWriteError = writeError;
+    }
+    throw error;
   }
-  receipt.finalSourceIdentity = finalIdentity;
   return finalizeReceipt(receipt, outPath, cwd);
 }
 
@@ -297,6 +353,7 @@ if (isMainModule) {
     console.log(`P4 Nightly authority passed role=${result.role} sha=${result.sourceIdentity.verificationSha}`);
   } catch (error) {
     console.error(error?.stack || error?.message || error);
-    process.exitCode = 1;
+    if (error?.receiptWriteError) console.error("P4 failure receipt could not be written:", error.receiptWriteError);
+    process.exitCode = Number.isInteger(error?.status) && error.status > 0 ? error.status : 1;
   }
 }

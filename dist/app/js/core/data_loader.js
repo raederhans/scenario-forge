@@ -142,14 +142,33 @@ function getCityLocaleEntry(source = {}, fallbackName = "") {
 }
 
 function normalizeCityFeature(feature, index, { sourceLabel = "world_cities" } = {}) {
-  if (!feature || typeof feature !== "object" || !feature.geometry) return null;
+  const reject = (reason) => {
+    throw new Error(`[city-contract] ${sourceLabel} feature ${index + 1}: ${reason}`);
+  };
+  if (!feature || typeof feature !== "object" || feature.type !== "Feature") {
+    reject("expected Feature");
+  }
+  const coordinates = feature.geometry?.coordinates;
+  if (feature.geometry?.type !== "Point" || !Array.isArray(coordinates)
+    || ![2, 3].includes(coordinates.length)) {
+    reject("expected Point coordinates");
+  }
+  if (!coordinates.every((value) => typeof value === "number" && Number.isFinite(value))) {
+    reject("coordinates must be finite numbers");
+  }
+  if (Math.abs(coordinates[0]) > 180 || Math.abs(coordinates[1]) > 90) {
+    reject("coordinates outside WGS84 bounds");
+  }
   const props = feature.properties && typeof feature.properties === "object" ? feature.properties : {};
-  const id = normalizeCityText(
-    props.id || props.city_id || props.cityId || props.stable_id || feature.id || `${sourceLabel}_${index + 1}`
-  );
-  if (!id) return null;
+  const rawId = props.id || props.city_id || props.cityId || props.stable_id || feature.id;
+  if (rawId != null && typeof rawId !== "string"
+    && !(typeof rawId === "number" && Number.isFinite(rawId))) reject("invalid city id");
+  const id = normalizeCityText(rawId);
+  if (!id) reject("missing explicit city id");
 
-  const stableKey = normalizeCityText(getSharedFeatureStableKey(feature, { fallback: `city::${id}`, useIdFallback: false }));
+  const rawStableKey = props.stable_key || props.stableKey || props.locale_key || props.localeKey || `id::${id}`;
+  if (typeof rawStableKey !== "string" || !rawStableKey.trim()) reject("invalid stable_key");
+  const stableKey = normalizeCityText(rawStableKey);
   const localeEntry = getCityLocaleEntry(props, id);
   const population = parseFiniteNumber(
     props.population || props.pop || props.population_est || props.populationEstimate,
@@ -216,6 +235,8 @@ function normalizeCityFeature(feature, index, { sourceLabel = "world_cities" } =
       ...props,
       id,
       stable_key: stableKey,
+      host_feature_id: hostFeatureId,
+      urban_match_id: urbanMatchId,
       __city_source: sourceLabel,
       __city_id: id,
       __city_stable_key: stableKey,
@@ -248,10 +269,21 @@ function normalizeCityFeatureCollection(payload, { sourceLabel = "world_cities" 
   if (!Array.isArray(payload?.features)) {
     return null;
   }
-  const features = payload.features
-    .map((feature, index) => normalizeCityFeature(feature, index, { sourceLabel }))
-    .filter(Boolean);
+  const ids = new Set();
+  const stableKeys = new Set();
+  const features = payload.features.map((feature, index) => {
+    const normalized = normalizeCityFeature(feature, index, { sourceLabel });
+    for (const [field, seen] of [["id", ids], ["stable_key", stableKeys]]) {
+      const value = normalized.properties[field];
+      if (seen.has(value)) {
+        throw new Error(`[city-contract] ${sourceLabel} feature ${index + 1}: duplicate ${field}: ${value}`);
+      }
+      seen.add(value);
+    }
+    return normalized;
+  });
   return {
+    ...payload,
     type: "FeatureCollection",
     features,
   };

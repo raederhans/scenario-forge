@@ -1,11 +1,12 @@
 # Worktree Registry
 
-## 当前导航（2026-09-05）
+## 当前导航（2026-09-09）
 
 这里只维护当前工作入口。分支、远端、进程和验收状态的历史快照统一见下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
+| [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) / [PR #127](https://github.com/raederhans/scenario-forge/pull/127) | 本轮导入事务、调度生命周期、城市身份及发布产物改进已完成本地验证。用户已授权远端合并推送和工作树清理；必需检查、合并与清理结果以该任务及下方回执为准。完整 P4 未准入。 |
 | [恢复后续 R0 / T1 / U1 / P1](recovery-followup-20260908/task.md) | PR #123 已合并，但自动部署因 tracked dist 漂移失败。当前先闭合产物与夹具，再开展导入反馈和单热点性能改进；状态以任务记录为准。 |
 | [M4 完成记录](development-recovery-m4-20260908/task.md) / [整合 PR #123](https://github.com/raederhans/scenario-forge/pull/123) | 本地实现与验收完成，功能提交 `1decb144` 已推送集成分支；远端检查和合并状态以 PR 为准。保留其他证据工作树和未归属 WIP。 |
 | [快速治理任务](development-loop-simplification-20260905/task.md) / [交接与所有权](development-loop-simplification-20260905/context.md) | 维护已集成的 deeper stages 1–4 和新一轮 1–4 项的进度；新一轮并行任务尚未完成，不在这里提前验收。 |

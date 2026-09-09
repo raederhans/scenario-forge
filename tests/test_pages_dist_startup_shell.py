@@ -3375,7 +3375,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         upload_block_start = workflow_lines.index("          name: deploy-dist")
         upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
 
-        self.assertIn("path: dist", upload_block)
+        self.assertIn(
+            "path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}",
+            upload_block,
+        )
         self.assertIn("include-hidden-files: true", upload_block)
 
 

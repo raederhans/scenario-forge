@@ -177,6 +177,38 @@ def build_admission_summary(receipt: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def verify_artifact_handoff(
+    artifact_root: Path,
+    receipt: dict[str, Any],
+    *,
+    expected_source_sha: str,
+    repo_root: Path = ROOT,
+) -> dict[str, Any]:
+    """Verify the downloaded artifact itself before promoting an existing build."""
+    validate_admission_receipt(receipt)
+    if GIT_IDENTITY_PATTERN.fullmatch(expected_source_sha) is None:
+        raise PagesArtifactAdmissionError("expected source SHA is required")
+    if receipt.get("source", {}).get("gitSha") != expected_source_sha:
+        raise PagesArtifactAdmissionError("artifact source SHA does not match the selected release")
+    if receipt.get("publicSmoke") != "passed":
+        raise PagesArtifactAdmissionError("artifact has no passing smoke receipt")
+    selected_root = resolve_pages_artifact_root(
+        artifact_root, repo_root=repo_root, allow_tracked_fallback=False, must_exist=True,
+    )
+    snapshot = build_tree_snapshot(selected_root)
+    manifest = validate_pages_manifest(selected_root, snapshot)
+    actual = {
+        "treeSha256": snapshot["treeSha256"],
+        "fileCount": snapshot["fileCount"],
+        "totalBytes": snapshot["totalBytes"],
+        "manifestSha256": manifest["manifestSha256"],
+    }
+    for field, value in actual.items():
+        if receipt["artifact"].get(field) != value:
+            raise PagesArtifactAdmissionError(f"downloaded artifact {field} mismatch")
+    return build_admission_summary(receipt)
+
+
 def write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
@@ -187,10 +219,12 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Record compact Pages artifact build admission")
     parser.add_argument("--artifact-root", type=Path, required=True)
-    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--run-id")
+    parser.add_argument("--verify-receipt", type=Path)
+    parser.add_argument("--expected-source-sha")
     parser.add_argument("--public-smoke", choices=("not-run", "passed"), default="not-run")
-    parser.add_argument("--receipt-out", type=Path, required=True)
-    parser.add_argument("--summary-out", type=Path, required=True)
+    parser.add_argument("--receipt-out", type=Path)
+    parser.add_argument("--summary-out", type=Path)
     return parser.parse_args(argv)
 
 
@@ -202,6 +236,16 @@ def main(argv: list[str] | None = None) -> int:
             allow_tracked_fallback=False,
             must_exist=True,
         )
+        if args.verify_receipt:
+            receipt_path = resolve_runtime_path(args.verify_receipt, label="Pages handoff receipt")
+            result = verify_artifact_handoff(
+                artifact_root, json.loads(receipt_path.read_text(encoding="utf-8")),
+                expected_source_sha=str(args.expected_source_sha or ""),
+            )
+            print(json.dumps(result, sort_keys=True))
+            return 0
+        if not args.run_id or not args.receipt_out or not args.summary_out:
+            raise PagesArtifactAdmissionError("recording requires run-id, receipt-out and summary-out")
         receipt_out = resolve_runtime_path(args.receipt_out, label="Pages admission receipt output")
         summary_out = resolve_runtime_path(args.summary_out, label="Pages admission summary output")
         receipt = build_admission_receipt(

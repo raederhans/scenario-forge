@@ -551,6 +551,7 @@ async function setActivePaletteSource(
     syncDefaultPalette = true,
     overwriteCountryPalette = false,
     d3Client = globalThis.d3,
+    isCurrent = () => true,
   } = {}
 ) {
   const previousState = {
@@ -564,6 +565,7 @@ async function setActivePaletteSource(
 
   try {
     const { meta, pack, map } = await ensurePaletteAssetsLoaded(paletteId, { d3Client });
+    if (!isCurrent()) return false;
     commitActivePaletteSourceState(runtimeState, {
       activePaletteId: meta?.palette_id || paletteId,
       activePaletteMeta: meta,
@@ -592,6 +594,7 @@ async function setActivePaletteSource(
     }
     return true;
   } catch (error) {
+    if (!isCurrent()) return false;
     const targetId = String(paletteId || "").trim();
     if (targetId) {
       setPaletteLoadErrorState(

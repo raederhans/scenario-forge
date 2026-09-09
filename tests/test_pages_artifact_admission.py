@@ -39,6 +39,32 @@ class QuietStaticHandler(SimpleHTTPRequestHandler):
         return
 
 
+class ArtifactReleaseWorkflowTests(unittest.TestCase):
+    def test_existing_release_path_keeps_opt_in_and_verifies_before_upload(self) -> None:
+        from tests.test_e2e_structural_tooling import (
+            parse_workflow_dispatch_inputs, parse_workflow_job_blocks, parse_job_steps, parse_step_run,
+        )
+        deploy = (REPO_ROOT / ".github/workflows/deploy.yml").read_text(encoding="utf-8")
+        inputs = parse_workflow_dispatch_inputs(deploy)
+        self.assertEqual(inputs["artifact_only"]["default"], "false")
+        self.assertEqual(inputs["artifact_only"]["type"], "boolean")
+        steps = parse_job_steps(parse_workflow_job_blocks(deploy)["build"])
+        names = [step["name"] for step in steps]
+        verify = steps[names.index("Verify artifact source and downloaded bytes")]
+        self.assertIn("--verify-receipt", parse_step_run(verify))
+        self.assertIn('--expected-source-sha "$EXPECTED_SOURCE_SHA"', parse_step_run(verify))
+        self.assertLess(names.index(verify["name"]), names.index("Upload artifact"))
+        self.assertIn("github.event_name == 'workflow_dispatch' && inputs.artifact_only", "\n".join(verify["lines"]))
+        shared = (REPO_ROOT / ".github/workflows/verify-shared.yml").read_text(encoding="utf-8")
+        steps = parse_job_steps(parse_workflow_job_blocks(shared)["verify"])
+        by_name = {step["name"]: step for step in steps}
+        exercise = parse_step_run(by_name["Verify and exercise the Pages artifact"])
+        self.assertLess(exercise.index("project_save_load_roundtrip"), exercise.index("pages_artifact_admission.py"))
+        self.assertIn("--public-smoke passed", exercise)
+        self.assertIn("--output-root .runtime/pages-release/dist", parse_step_run(by_name["Build Pages artifact from source"]))
+        self.assertIn("!inputs.pages-artifact-only", "\n".join(by_name["Fail if tracked dist drifted from source"]["lines"]))
+
+
 def runtime_temp_directory() -> tempfile.TemporaryDirectory[str]:
     RUNTIME_TMP_ROOT.mkdir(parents=True, exist_ok=True)
     return tempfile.TemporaryDirectory(dir=RUNTIME_TMP_ROOT)
@@ -175,6 +201,40 @@ class PagesArtifactAdmissionTests(unittest.TestCase):
             receipt["artifact"]["totalBytes"] += 1
             with self.assertRaisesRegex(admission.PagesArtifactAdmissionError, "receiptSha256 mismatch"):
                 admission.validate_admission_receipt(receipt)
+
+    def test_release_handoff_binds_source_smoke_and_actual_bytes(self) -> None:
+        with runtime_temp_directory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            artifact = repo_root / ".runtime" / "fixture" / "dist"
+            write_fixture_artifact(artifact)
+            receipt = admission.build_admission_receipt(
+                artifact, run_id="handoff", public_smoke="passed",
+                source_identity={"gitSha": "a" * 40, "gitTree": "b" * 40},
+                builder_identity={"path": admission.BUILDER_PATH, "sha256": "c" * 64},
+                repo_root=repo_root,
+            )
+            result = admission.verify_artifact_handoff(
+                artifact, receipt, expected_source_sha="a" * 40, repo_root=repo_root,
+            )
+            self.assertEqual(result["gitSha"], "a" * 40)
+            with self.assertRaisesRegex(admission.PagesArtifactAdmissionError, "source SHA"):
+                admission.verify_artifact_handoff(
+                    artifact, receipt, expected_source_sha="d" * 40, repo_root=repo_root,
+                )
+            untested = {**receipt, "publicSmoke": "not-run"}
+            untested["receiptSha256"] = admission.receipt_hash(untested)
+            with self.assertRaisesRegex(admission.PagesArtifactAdmissionError, "smoke"):
+                admission.verify_artifact_handoff(
+                    artifact, untested, expected_source_sha="a" * 40, repo_root=repo_root,
+                )
+            # Preserve length so even a valid path/size manifest cannot hide changed bytes.
+            main = artifact / "app" / "js" / "main.js"
+            original = main.read_bytes()
+            main.write_bytes(b"X" + original[1:])
+            with self.assertRaisesRegex(admission.PagesArtifactAdmissionError, "treeSha256 mismatch"):
+                admission.verify_artifact_handoff(
+                    artifact, receipt, expected_source_sha="a" * 40, repo_root=repo_root,
+                )
 
     def test_startup_consumer_resolves_explicit_runtime_root_at_import(self) -> None:
         expected = REPO_ROOT / ".runtime" / "m10-consumer-contract-fixture" / "dist"

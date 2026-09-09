@@ -1068,11 +1068,23 @@ for (const baseline of [
       await page.mouse.click(point.x, point.y);
       expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
       const cancelledPath = testInfo.outputPath("cancelled.project.json");
+      const beforeCancelledImport = await page.evaluate(() => {
+        const s = globalThis.__pwProjectSaveLoad.state;
+        return JSON.stringify({ past: s.historyPast, future: s.historyFuture,
+          dirty: s.isDirty, dirtyRevision: s.dirtyRevision, overrides: s.visualOverrides,
+          scenario: s.activeScenarioId });
+      });
       fs.writeFileSync(cancelledPath, JSON.stringify({ ...saved, scenario: { ...saved.scenario, baselineHash: "u1-mismatch" } }));
       await page.locator("#projectFileInput").setInputFiles(cancelledPath);
       await page.locator("[data-app-dialog-overlay='true'] [data-dialog-cancel='true']").click();
       await expect(page.locator("#projectSaveStatus")).toHaveText("Project import cancelled.");
       expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
+      expect(await page.evaluate(() => {
+        const s = globalThis.__pwProjectSaveLoad.state;
+        return JSON.stringify({ past: s.historyPast, future: s.historyFuture,
+          dirty: s.isDirty, dirtyRevision: s.dirtyRevision, overrides: s.visualOverrides,
+          scenario: s.activeScenarioId });
+      })).toBe(beforeCancelledImport);
       const invalidPath = testInfo.outputPath("invalid.project.json");
       fs.writeFileSync(invalidPath, "{invalid-json");
       await page.locator("#projectFileInput").setInputFiles(invalidPath);

@@ -13,6 +13,7 @@ import {
   P4_NIGHTLY_FULL_POLICY_COMMAND,
   P4_NIGHTLY_PYTHON_BOUNDARY_COMMANDS,
   buildP4NightlyAuthorityPlan,
+  runP4NightlyAuthority,
 } from "../tools/verification/p4_nightly_authority.mjs";
 import { validateP4NightlyCloseout } from "../tools/verification/p4_nightly_closeout.mjs";
 import { resolveP4NightlyAuthorityReceipt } from "../tools/verification/p4_nightly_receipt_resolver.mjs";
@@ -27,6 +28,123 @@ const TREE = "b".repeat(40);
 const PLAN_ID = "sha256:canonical-full-plan";
 const TAP = "TAP version 13\n1..1\nok 1 - canonical\n";
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function authorityOutput(t) {
+  const runtimeTmp = path.join(REPO_ROOT, ".runtime", "tmp");
+  fs.mkdirSync(runtimeTmp, { recursive: true });
+  const root = fs.mkdtempSync(path.join(runtimeTmp, "p4-authority-failure-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  return path.join(root, "receipt.json");
+}
+
+test("authority writes failed command and completed steps while preserving the original exit", (t) => {
+  const outPath = authorityOutput(t);
+  let calls = 0;
+  assert.throws(() => runP4NightlyAuthority("fast-contracts-routes", {
+    outPath,
+    identityReader: identity,
+    runner: () => ({ status: ++calls === 1 ? 0 : 23 }),
+  }), (error) => error.status === 23 && error.receipt.status === "fail");
+  const receipt = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  assert.equal(receipt.failure.category, "command-exit");
+  assert.equal(receipt.failure.exitCode, 23);
+  assert.equal(receipt.failure.commandRef, P4_NIGHTLY_FAST_COMMANDS[1]);
+  assert.deepEqual(receipt.completedSteps, [P4_NIGHTLY_FAST_COMMANDS[0]]);
+  assert.equal(receipt.commands[1].status, "fail");
+  assert.deepEqual(receipt.finalSourceIdentity, identity());
+  const { receiptDigest, ...body } = receipt;
+  assert.equal(receiptDigest, seal(body).receiptDigest);
+  const closeout = fixtures();
+  closeout.authorities[2] = receipt;
+  assert.throws(() => validateP4NightlyCloseout(closeout),
+    (error) => error.code === "p4-nightly-authority-role-set");
+});
+
+test("authority writes receipts for returned startup errors, thrown startup errors, and signals", (t) => {
+  for (const [runner, category, signal] of [
+    [() => ({ error: Object.assign(new Error("missing binary"), { code: "ENOENT" }), status: null }), "command-start", null],
+    [() => { throw Object.assign(new Error("cannot spawn"), { code: "ENOENT" }); }, "command-start", null],
+    [() => ({ status: null, signal: "SIGTERM" }), "command-signal", "SIGTERM"],
+  ]) {
+    const outPath = authorityOutput(t);
+    assert.throws(() => runP4NightlyAuthority("fast-contracts-routes", { outPath, identityReader: identity, runner }));
+    const receipt = JSON.parse(fs.readFileSync(outPath, "utf8"));
+    assert.equal(receipt.failure.category, category);
+    assert.equal(receipt.failure.exitCode, null);
+    assert.equal(receipt.failure.signal, signal);
+    assert.deepEqual(receipt.completedSteps, []);
+    assert.equal(receipt.commands.length, 1);
+  }
+});
+
+test("authority records dirty source rejection before executing commands", (t) => {
+  const outPath = authorityOutput(t);
+  const dirty = { ...identity(), workspaceClean: false, trackedClean: false, workspaceStatus: " M js/example.js" };
+  assert.throws(() => runP4NightlyAuthority("fast-contracts-routes", {
+    outPath,
+    identityReader: () => dirty,
+    runner: () => assert.fail("dirty source must not execute"),
+  }), /exact clean Git/);
+  const receipt = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  assert.equal(receipt.failure.category, "source-identity");
+  assert.deepEqual(receipt.sourceIdentity, dirty);
+  assert.deepEqual(receipt.commands, []);
+});
+
+test("authority records producer rejection and post-command identity drift", (t) => {
+  const outPath = authorityOutput(t);
+  assert.throws(() => runP4NightlyAuthority("checker-boundaries", {
+    outPath,
+    identityReader: identity,
+    evidenceProducer: () => { throw Object.assign(new Error("checker failed"), { status: 2, code: "owner-proof", stderr: "proof mismatch" }); },
+  }));
+  let receipt = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  assert.equal(receipt.failure.category, "evidence-production");
+  assert.equal(receipt.failure.exitCode, 2);
+  assert.equal(receipt.failure.stderr, "proof mismatch");
+  let reads = 0;
+  assert.throws(() => runP4NightlyAuthority("fast-contracts-routes", {
+    outPath,
+    identityReader: () => ({ ...identity(), verificationSha: ++reads === 1 ? SHA : "c".repeat(40) }),
+    runner: () => ({ status: 0 }),
+  }), /drifted/);
+  receipt = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  assert.equal(receipt.failure.category, "final-identity");
+  assert.deepEqual(receipt.completedSteps, P4_NIGHTLY_FAST_COMMANDS);
+});
+
+test("authority does not replace a child failure when receipt persistence fails", (t) => {
+  const outPath = authorityOutput(t);
+  fs.mkdirSync(outPath);
+  assert.throws(() => runP4NightlyAuthority("full-policy-tap", {
+    outPath,
+    identityReader: identity,
+    runner: () => ({ status: 17 }),
+  }), (error) => error.status === 17 && error.receiptWriteError instanceof Error);
+});
+
+test("authority preserves successful receipts and records evidence validation failures", (t) => {
+  const outPath = authorityOutput(t);
+  const success = runP4NightlyAuthority("fast-contracts-routes", {
+    outPath,
+    identityReader: identity,
+    runner: () => ({ status: 0 }),
+  });
+  assert.equal(success.status, "pass");
+  assert.deepEqual(success.commands.map((entry) => entry.commandRef), P4_NIGHTLY_FAST_COMMANDS);
+  assert.equal(success.failure, undefined);
+  assert.throws(() => runP4NightlyAuthority("checker-boundaries", {
+    outPath,
+    identityReader: identity,
+    evidenceProducer: () => ({ evidenceId: "proof" }),
+    evidenceValidator: () => { throw new Error("evidence mismatch"); },
+    runner: () => assert.fail("invalid evidence must not execute"),
+  }));
+  const failure = JSON.parse(fs.readFileSync(outPath, "utf8"));
+  assert.equal(failure.failure.category, "evidence-validation");
+  assert.equal(failure.failure.commandRef, P4_NIGHTLY_PYTHON_BOUNDARY_COMMANDS[0]);
+  assert.equal(failure.completedSteps.length, 1);
+});
 
 function identity() {
   return {

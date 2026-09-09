@@ -256,3 +256,9 @@ export function patchAppearanceParentBorderEnabledMapState(target, patch) {
   const nextPatch = normalizeBooleanRecord(patch, "enabled-map patch");
   return setAppearanceParentBorderEnabledMapState(target, { ...current, ...nextPatch });
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "parentBorderEnabledByCountry")) target.parentBorderEnabledByCountry = patch.parentBorderEnabledByCountry;
+  if (Object.hasOwn(patch, "styleConfig")) target.styleConfig = patch.styleConfig;
+}

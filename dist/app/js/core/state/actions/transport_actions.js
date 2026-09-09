@@ -206,3 +206,8 @@ export function setTransportFamilyVisibilityState(target, familyId, visible) {
   if (nextVisible) setOwnDataValue(target, "showTransport", true);
   return nextVisible;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "transportWorkbenchUi")) target.transportWorkbenchUi = patch.transportWorkbenchUi;
+}

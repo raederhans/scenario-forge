@@ -1,6 +1,18 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DELIVERY_RUNTIME_RECORDS = [
   {
+    id: "pages:artifact-admission-contract",
+    commandRef: "python -m unittest tests.test_pages_artifact_admission -q",
+    sourceRefs: [
+      "tools/pages_artifact_admission.py", "tests/test_pages_artifact_admission.py",
+      ".github/workflows/deploy.yml", ".github/workflows/verify-shared.yml",
+    ],
+    ownerHints: ["deploy-runtime"], domains: ["pages-dist"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 403,
+    verification: null, selector: {},
+  },
+  {
     "id": "direct-e2e:test:e2e:pages-public-release-gate",
     "commandRef": "test:e2e:pages-public-release-gate",
     "sourceRefs": [

@@ -408,3 +408,17 @@ export function setStrategicOverlayDirtyState(target, dirtyKey, value = true) {
   }
   return nextValue;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "operationGraphics")) target.operationGraphics = patch.operationGraphics;
+  if (Object.hasOwn(patch, "operationGraphicsDirty")) target.operationGraphicsDirty = patch.operationGraphicsDirty;
+  if (Object.hasOwn(patch, "operationGraphicsEditor")) target.operationGraphicsEditor = patch.operationGraphicsEditor;
+  if (Object.hasOwn(patch, "operationalLineEditor")) target.operationalLineEditor = patch.operationalLineEditor;
+  if (Object.hasOwn(patch, "operationalLines")) target.operationalLines = patch.operationalLines;
+  if (Object.hasOwn(patch, "operationalLinesDirty")) target.operationalLinesDirty = patch.operationalLinesDirty;
+  if (Object.hasOwn(patch, "strategicOverlayUi")) target.strategicOverlayUi = patch.strategicOverlayUi;
+  if (Object.hasOwn(patch, "unitCounterEditor")) target.unitCounterEditor = patch.unitCounterEditor;
+  if (Object.hasOwn(patch, "unitCounters")) target.unitCounters = patch.unitCounters;
+  if (Object.hasOwn(patch, "unitCountersDirty")) target.unitCountersDirty = patch.unitCountersDirty;
+}

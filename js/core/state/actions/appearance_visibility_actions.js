@@ -63,3 +63,8 @@ export function patchAppearanceVisibilityState(target, patch) {
   for (const [key, value] of entries) setAppearanceVisibilityState(target, key, value);
   return true;
 }
+
+// Restore only this domain's prevalidated project fields; retain references for rollback.
+export function restoreProjectImportFields(target, patch) {
+  if (Object.hasOwn(patch, "parentBordersVisible")) target.parentBordersVisible = patch.parentBordersVisible;
+}
