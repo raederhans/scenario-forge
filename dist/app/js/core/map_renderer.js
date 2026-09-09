@@ -2335,7 +2335,7 @@ function getExactCompositeReuseOwner() {
       getCache: getRenderPassCacheState,
       getReferenceTransform: getPassReferenceTransform,
       getLayout: getRenderPassLayout,
-      getDpr: () => runtimeState.dpr,
+      getDpr: () => Number(runtimeState.dpr),
       diagnosticsEnabled: () => !!renderDiag.enabled,
       resetContext: resetCanvasContext,
       compose: composeRenderPassesToTarget,
@@ -9340,15 +9340,33 @@ async function buildHitCanvasAfterStartup({ keepReady = false, reason = "startup
   await yieldToMain();
 }
 
+async function yieldInteractionInfrastructureBuild(taskContext) {
+  // The scheduler's idle predicate includes our own infrastructure-in-flight flag.
+  // Yield locally while retaining its slot; only external interaction blocks us.
+  do {
+    await yieldToMain();
+    taskContext?.throwIfStale();
+  } while (taskContext && isInteractionRecoveryBlocked());
+}
+
 async function buildBasicInteractionInfrastructureAfterStartup({
   chunked = true,
+  taskContext,
 } = {}) {
+  taskContext?.throwIfStale();
   if (getInteractionInfrastructureStageRank() >= 1 && !runtimeState.interactionInfrastructureBuildInFlight) {
     return true;
   }
   if (interactionInfrastructureBasicPromise) {
-    return interactionInfrastructureBasicPromise;
+    try { await (taskContext ? taskContext.waitFor(interactionInfrastructureBasicPromise) : interactionInfrastructureBasicPromise); } catch (error) {
+      if (error?.name !== "AbortError") throw error;
+    }
+    taskContext?.throwIfStale();
+    return Boolean(await buildBasicInteractionInfrastructureAfterStartup({ chunked, taskContext }));
   }
+  const scenarioId = runtimeState.activeScenarioId;
+  const requestId = runtimeState.currentScenarioApplyRequestId;
+  const scenarioApplyEpoch = runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
   interactionInfrastructureBasicPromise = (async () => {
     setInteractionInfrastructureState("deferred-startup", {
       ready: false,
@@ -9357,9 +9375,12 @@ async function buildBasicInteractionInfrastructureAfterStartup({
     try {
       runtimeState.deferHitCanvasBuild = false;
       if (chunked) {
-        await buildIndexChunked({ scheduleUiMode: "deferred" });
+        await buildIndexChunked({ scheduleUiMode: "deferred", isCurrent: taskContext?.isCurrent, yieldControl: () => yieldInteractionInfrastructureBuild(taskContext) });
+        taskContext?.throwIfStale();
         await buildSpatialIndexChunked({
           includeSecondary: false,
+          isCurrent: taskContext?.isCurrent,
+          yieldControl: () => yieldInteractionInfrastructureBuild(taskContext),
         });
       } else {
         buildIndex({ scheduleUiMode: "deferred" });
@@ -9367,16 +9388,20 @@ async function buildBasicInteractionInfrastructureAfterStartup({
           includeSecondary: false,
         });
       }
+      taskContext?.throwIfStale();
       setInteractionInfrastructureState("basic-ready", {
         ready: true,
         inFlight: false,
       });
       return true;
     } catch (error) {
-      setInteractionInfrastructureState("error", {
+      if (runtimeState.activeScenarioId === scenarioId && runtimeState.currentScenarioApplyRequestId === requestId
+        && (runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === scenarioApplyEpoch) {
+        setInteractionInfrastructureState(error?.name === "AbortError" ? "deferred-startup" : "error", {
         ready: false,
         inFlight: false,
-      });
+        });
+      }
       throw error;
     } finally {
       interactionInfrastructureBasicPromise = null;
@@ -9388,42 +9413,55 @@ async function buildBasicInteractionInfrastructureAfterStartup({
 async function buildFullInteractionInfrastructureAfterStartup({
   chunked = true,
   buildHitCanvas = true,
+  taskContext,
 } = {}) {
+  taskContext?.throwIfStale();
   if (getInteractionInfrastructureStageRank() >= 2 && !runtimeState.interactionInfrastructureBuildInFlight) {
     return true;
   }
   if (interactionInfrastructureFullPromise) {
-    return interactionInfrastructureFullPromise;
+    try { await (taskContext ? taskContext.waitFor(interactionInfrastructureFullPromise) : interactionInfrastructureFullPromise); } catch (error) {
+      if (error?.name !== "AbortError") throw error;
+    }
+    taskContext?.throwIfStale();
+    return Boolean(await buildFullInteractionInfrastructureAfterStartup({ chunked, buildHitCanvas, taskContext }));
   }
+  const scenarioId = runtimeState.activeScenarioId;
+  const requestId = runtimeState.currentScenarioApplyRequestId;
+  const scenarioApplyEpoch = runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
   interactionInfrastructureFullPromise = (async () => {
-    await buildBasicInteractionInfrastructureAfterStartup({ chunked });
-    setInteractionInfrastructureState("building-spatial", {
-      ready: true,
-      inFlight: true,
-    });
     try {
+      await buildBasicInteractionInfrastructureAfterStartup({ chunked, taskContext });
+      taskContext?.throwIfStale();
+      setInteractionInfrastructureState("building-spatial", { ready: true, inFlight: true });
       const recoveryStartedAt = nowMs();
       let yieldCount = 0;
       while (isInteractionRecoveryBlocked()) {
         yieldCount += 1;
-        await yieldToMain();
+        await yieldInteractionInfrastructureBuild(taskContext);
+        taskContext?.throwIfStale();
       }
       ensureSovereigntyState({ force: true });
       yieldCount += 1;
-      await yieldToMain();
+      await yieldInteractionInfrastructureBuild(taskContext);
+      taskContext?.throwIfStale();
       rebuildResolvedColors();
       yieldCount += 1;
-      await yieldToMain();
+      await yieldInteractionInfrastructureBuild(taskContext);
+      taskContext?.throwIfStale();
       if (chunked) {
         await buildSpatialIndexChunked({
           includeSecondary: false,
           keepReady: true,
+          isCurrent: taskContext?.isCurrent,
+          yieldControl: () => yieldInteractionInfrastructureBuild(taskContext),
         });
       } else {
         buildSpatialIndex({
           includeSecondary: false,
         });
       }
+      taskContext?.throwIfStale();
       scheduleSecondarySpatialIndexBuild({
         reason: chunked ? "startup-deferred-secondary-spatial" : "startup-secondary-spatial",
       });
@@ -9444,6 +9482,7 @@ async function buildFullInteractionInfrastructureAfterStartup({
           reason: chunked ? "startup-deferred-hit-canvas" : "startup-hit-canvas",
         });
       }
+      taskContext?.throwIfStale();
       setInteractionInfrastructureState("ready", {
         ready: true,
         inFlight: false,
@@ -9455,10 +9494,14 @@ async function buildFullInteractionInfrastructureAfterStartup({
       }, { benchmarkInteraction: false });
       return true;
     } catch (error) {
-      setInteractionInfrastructureState("basic-ready", {
-        ready: true,
-        inFlight: false,
-      });
+      if (runtimeState.activeScenarioId === scenarioId && runtimeState.currentScenarioApplyRequestId === requestId
+        && (runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === scenarioApplyEpoch) {
+        const basicReady = getInteractionInfrastructureStageRank() >= 1;
+        setInteractionInfrastructureState(basicReady ? "basic-ready" : "deferred-startup", {
+          ready: basicReady,
+          inFlight: false,
+        });
+      }
       throw error;
     } finally {
       interactionInfrastructureFullPromise = null;
@@ -9471,14 +9514,16 @@ async function buildInteractionInfrastructureAfterStartup({
   chunked = true,
   buildHitCanvas = true,
   mode = "full",
+  taskContext,
 } = {}) {
   if (String(mode || "full").trim().toLowerCase() === "basic") {
-    return buildBasicInteractionInfrastructureAfterStartup({ chunked });
+    return Boolean(await buildBasicInteractionInfrastructureAfterStartup({ chunked, taskContext }));
   }
-  return buildFullInteractionInfrastructureAfterStartup({
+  return Boolean(await buildFullInteractionInfrastructureAfterStartup({
     chunked,
     buildHitCanvas,
-  });
+    taskContext,
+  }));
 }
 
 function getHitFromEvent(

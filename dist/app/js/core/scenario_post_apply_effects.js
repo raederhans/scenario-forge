@@ -672,6 +672,7 @@ async function runPostScenarioApplyEffects({
   bundle,
   scenarioId = "",
   deferChunkPrewarm = false,
+  deferOptionalLayers = false,
   renderNow = false,
   suppressRender = false,
   scenarioApplyEpoch = 0,
@@ -773,7 +774,7 @@ async function runPostScenarioApplyEffects({
       prewarmFailed: chunkPrewarmResult?.prewarmFailed === true,
     };
   }
-  await syncVisibleScenarioOptionalLayersForPostApply({
+  if (!deferOptionalLayers) await syncVisibleScenarioOptionalLayersForPostApply({
     bundle,
     scenarioId,
     renderNow,

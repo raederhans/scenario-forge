@@ -2,6 +2,16 @@
 // Palette loading, UI synchronization, and scenario transaction ordering stay
 // in scenario composition roots.
 
+// Legend labels/config retain their existing palette authority when edited
+// outside scenario activation. Absence preserves the current field.
+export function patchLegendPaletteState(target, patch = {}) {
+  if (!target || typeof target !== "object" || Array.isArray(target)) {
+    throw new TypeError("[scenario_palette_actions] target must be an object");
+  }
+  if (Object.hasOwn(patch, "legendLabels")) target.legendLabels = { ...patch.legendLabels };
+  if (Object.hasOwn(patch, "legendConfig")) target.legendConfig = { ...patch.legendConfig };
+}
+
 export const SCENARIO_PALETTE_STATE_KEYS = Object.freeze([
   "activePaletteId",
   "activePaletteMeta",

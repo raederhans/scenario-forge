@@ -119,7 +119,7 @@ function captureHistoryState({
     const keys = strategicOverlay === true ? Object.keys(defaults) : uniqueKeys(strategicOverlay);
     keys.forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(defaults, key)) {
-        snapshot[key] = cloneStructuredValue(runtimeState[key] || defaults[key]);
+        snapshot[key] = JSON.parse(JSON.stringify(runtimeState[key] || defaults[key]));
       }
     });
   }

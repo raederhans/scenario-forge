@@ -268,12 +268,16 @@ export function createSpatialIndexRuntimeOwner({
   async function buildIndexChunked({
     scheduleUiMode = "immediate",
     keepReady = false,
+    isCurrent = () => true,
+    yieldControl = yieldToMain,
   } = {}) {
+    if (!isCurrent()) return false;
     setInteractionInfrastructureState("building-index", {
       ready: keepReady ? true : false,
       inFlight: true,
     });
-    await yieldToMain();
+    await yieldControl();
+    if (!isCurrent()) return false;
     clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
@@ -285,7 +289,7 @@ export function createSpatialIndexRuntimeOwner({
         renderSpecialRegionList: true,
       }, scheduleUiMode);
       finalizeIndexBuildEffects();
-      await yieldToMain();
+      await yieldControl();
       return;
     }
 
@@ -301,7 +305,8 @@ export function createSpatialIndexRuntimeOwner({
         getFeatureCountryCodeNormalized,
       });
       if (end < features.length) {
-        await yieldToMain();
+        await yieldControl();
+        if (!isCurrent()) return false;
       }
     }
 
@@ -311,7 +316,7 @@ export function createSpatialIndexRuntimeOwner({
       renderSpecialRegionList: true,
     }, scheduleUiMode);
     finalizeIndexBuildEffects();
-    await yieldToMain();
+    await yieldControl();
   }
 
   // buildSpatialIndexChunked 与 buildSpatialIndex 产物一致，差异在于分片构建与让出主线程；
@@ -322,13 +327,14 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
     keepReady = false,
     isCurrent = () => true,
+    yieldControl = yieldToMain,
   } = {}) {
     if (!isCurrent()) return false;
     setInteractionInfrastructureState("building-spatial", {
       ready: keepReady ? true : false,
       inFlight: true,
     });
-    await yieldToMain();
+    await yieldControl();
     if (!isCurrent()) return false;
     const startedAt = nowMs();
     const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
@@ -342,7 +348,7 @@ export function createSpatialIndexRuntimeOwner({
           chunked: true,
         }),
       );
-      await yieldToMain();
+      await yieldControl();
       return;
     }
 
@@ -367,7 +373,7 @@ export function createSpatialIndexRuntimeOwner({
         getFeatureBorderMeshCountryCodeNormalized,
       });
       if (end < features.length) {
-        await yieldToMain();
+        await yieldControl();
         if (!isCurrent()) return false;
       }
     }
@@ -413,7 +419,7 @@ export function createSpatialIndexRuntimeOwner({
         chunked: true,
       }),
     );
-    await yieldToMain();
+    await yieldControl();
   }
 
   return {

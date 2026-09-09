@@ -35,6 +35,18 @@ function getTimerApi(globalScope) {
   };
 }
 
+function pauseWithSignal(timers, signal, delay = 0) {
+  return new Promise((resolve) => {
+    const finish = () => {
+      timers.clearTimeout(handle);
+      signal.removeEventListener("abort", finish);
+      resolve();
+    };
+    const handle = timers.setTimeout(finish, Number(delay) || 0);
+    signal.addEventListener("abort", finish, { once: true });
+  });
+}
+
 export function createPostReadyScheduler({
   targetState,
   globalScope = globalThis,
@@ -53,8 +65,9 @@ export function createPostReadyScheduler({
   const outcomes = new Map();
 
   function recordOutcome(taskKey, status, reason = "") {
-    outcomes.delete(taskKey);
-    outcomes.set(taskKey, { status, reason, finishedAt: nowMs() });
+    const key = String(taskKey);
+    outcomes.delete(key);
+    outcomes.set(key, { status: String(status), reason: String(reason), finishedAt: Number(nowMs()) });
     if (outcomes.size > 32) outcomes.delete(outcomes.keys().next().value);
   }
 
@@ -112,7 +125,9 @@ export function createPostReadyScheduler({
       maxRetryCount,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
       minIdleTimeRemainingMs: POST_READY_IDLE_TIME_REMAINING_MS,
-      taskOutcomes: Object.fromEntries(outcomes),
+      taskOutcomes: Object.fromEntries([...outcomes].map(([key, outcome]) => [String(key), {
+        status: String(outcome.status), reason: String(outcome.reason), finishedAt: Number(outcome.finishedAt),
+      }])),
       waitingTaskKeys: [...executions].filter((entry) => entry.waiting).map((entry) => entry.taskKey),
       reasonStateHint: {
         renderPhase: String(targetState.renderPhase || ""),
@@ -286,15 +301,7 @@ export function createPostReadyScheduler({
       });
       if (controller.signal.aborted) onAbort();
     });
-    const pause = (delay = 0) => new Promise((resolve) => {
-      const finish = () => {
-        timers.clearTimeout(id);
-        controller.signal.removeEventListener("abort", finish);
-        resolve();
-      };
-      const id = timers.setTimeout(finish, delay);
-      controller.signal.addEventListener("abort", finish, { once: true });
-    });
+    const pause = (delay = 0) => pauseWithSignal(timers, controller.signal, delay);
     const waitFor = async (promise) => {
       // Only explicit resource waits release the execution slot. Legacy callbacks
       // remain serialized, and a continuation reacquires it before doing CPU work.

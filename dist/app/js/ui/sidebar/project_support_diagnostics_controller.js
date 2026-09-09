@@ -872,6 +872,7 @@ export function createProjectSupportDiagnosticsController({
   );
 
   let lastProjectImportSummary = null;
+  let projectImportController = null;
   const formatProjectImportSummary = (summary) => {
     const scenario = summary.scenarioName || summary.scenarioId || t("None", "ui");
     const restored = t("Project imported: {scenario}. Restored {colors} color entries and {owners} ownership entries.", "ui")
@@ -1673,8 +1674,12 @@ export function createProjectSupportDiagnosticsController({
 
     if (projectFileInput && !projectFileInput.dataset.bound) {
       projectFileInput.addEventListener("change", async () => {
+        projectImportController?.abort();
+        const importController = new AbortController();
+        projectImportController = importController;
         const file = projectFileInput.files?.[0];
         if (!file) {
+          projectImportController = null;
           if (projectFileName) {
             if (projectFileName.dataset) projectFileName.dataset.projectFileState = "empty";
             projectFileName.textContent = t("No file selected", "ui");
@@ -1689,12 +1694,21 @@ export function createProjectSupportDiagnosticsController({
         refreshProjectSaveStatus(t("Project import started. Appearance and transport settings will be restored from the file.", "ui"));
         lastProjectImportSummary = null;
         try {
-          const { file: importFile, preview } = await prepareProjectImportFile(file);
-          if (!(await confirmProjectPackagePreview(preview))) {
+          const { file: importFile, preview, projectPayload } = await prepareProjectImportFile(file, {
+            materializeFile: false,
+            signal: importController.signal,
+          });
+          if (importController.signal.aborted) return;
+          const confirmed = await confirmProjectPackagePreview(preview);
+          if (importController.signal.aborted) return;
+          if (!confirmed) {
             refreshProjectSaveStatus(t("Project import cancelled.", "ui"));
             return;
           }
           const outcome = await importProjectThroughFunnel(importFile, {
+            projectPayload,
+            fileName: file.name,
+            signal: importController.signal,
             ui: {
               t,
               showAppDialog,
@@ -1704,15 +1718,24 @@ export function createProjectSupportDiagnosticsController({
               refreshColorState: mapRenderer.refreshColorState,
               invalidateFrontlineOverlayState,
               onProjectImportComplete: completeProjectImportStatus,
-              onProjectImportError: failProjectImportStatus,
+                onProjectImportError: failProjectImportStatus,
+                onProjectImportRecoveryState: recovery => {
+                  if (projectImportController && projectImportController !== importController) return;
+                  if (recovery.phase === "complete") refreshProjectSaveStatus();
+                  else if (recovery.warnings.length) refreshProjectSaveStatus(
+                    `${t("Project imported", "ui")}: ${recovery.warnings.map(item => item.resource).join(", ")}`
+                  );
+                },
             },
           });
+          if (importController.signal.aborted) return;
           if (outcome?.status === "committed-with-warnings") {
             refreshProjectSaveStatus(`${t("Project imported", "ui")}: ${outcome.warnings.map(item => item.resource).join(", ")}`);
           } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
             refreshProjectSaveStatus(t("Project import is already in progress.", "ui"));
           }
         } catch (error) {
+          if (importController.signal.aborted) return;
           const message = String(error?.message || error || "");
           refreshProjectSaveStatus(message);
           if (typeof showToast === "function") {
@@ -1722,7 +1745,10 @@ export function createProjectSupportDiagnosticsController({
             });
           }
         } finally {
-          projectFileInput.value = "";
+          if (projectImportController === importController) {
+            projectFileInput.value = "";
+            projectImportController = null;
+          }
         }
       });
       projectFileInput.dataset.bound = "true";

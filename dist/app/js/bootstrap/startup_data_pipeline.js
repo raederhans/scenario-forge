@@ -52,6 +52,11 @@ import {
   setContextLayerLoadState,
 } from "../core/state/content_state.js";
 import { hydrateStartupPaletteState } from "../core/state/color_state.js";
+import {
+  finishBaseCitySupportLoad,
+  finishFullLocalizationLoad,
+  finishContextLayerLoad,
+} from "../core/state/actions/content_load_actions.js";
 import { hydrateStartupReleasableCatalogState } from "../core/state_catalog.js";
 import {
   STATE_BUS_EVENTS,
@@ -97,13 +102,38 @@ export function createStartupDataPipelineOwner({
     startBootMetric,
   } = helpers;
 
-  async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
+  // Page resources can serve several callers. Cancellation removes a receiver,
+  // rather than aborting a fetch that another current receiver still needs.
+  const resourceReceivers = new Map();
+  function receiverIsCurrent({ taskContext, signal, isCurrent } = {}) {
+    return !signal?.aborted && (!isCurrent || isCurrent())
+      && (!taskContext || taskContext.isCurrent());
+  }
+  function assertReceiverCurrent(options) {
+    if (!receiverIsCurrent(options)) {
+      throw Object.assign(new Error("Hydration receiver is no longer current."), { name: "AbortError" });
+    }
+  }
+  function registerResourceReceiver(key, options, pending) {
+    if (!pending || !resourceReceivers.has(key)) resourceReceivers.set(key, new Set());
+    const receivers = resourceReceivers.get(key);
+    receivers.add(options);
+    return {
+      canCommit: () => [...receivers].some(receiverIsCurrent),
+      shouldRender: () => [...receivers].some((receiver) => receiverIsCurrent(receiver) && receiver.renderNow !== false),
+    };
+  }
+
+  async function ensureBaseCityDataReady(options = {}) {
+    const { reason = "manual", renderNow = true } = options;
+    assertReceiverCurrent(options);
     if (state.worldCitiesData && state.baseCityDataState === "loaded") {
       if (renderNow) {
         requestMainRender?.(`base-city-ready:${reason}`, { flush: true });
       }
       return state.worldCitiesData;
     }
+    const { canCommit, shouldRender } = registerResourceReceiver("cities", options, state.baseCityDataPromise);
     if (state.baseCityDataPromise) {
       return state.baseCityDataPromise;
     }
@@ -123,6 +153,7 @@ export function createStartupDataPipelineOwner({
       },
     })
       .then((result) => {
+        if (!canCommit()) return null;
         commitBaseCitySupportData(state, result, {
           scenarioActive: !!state.activeScenarioId,
         });
@@ -133,28 +164,34 @@ export function createStartupDataPipelineOwner({
           });
         }
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
-        if (renderNow) {
+        if (shouldRender()) {
           requestMainRender?.(`base-city-loaded:${reason}`, { flush: true });
         }
         console.info(`[boot] Base city support data loaded on demand. reason=${reason}`);
         return state.worldCitiesData;
       })
       .catch((error) => {
+        if (!canCommit()) return null;
         failBaseCitySupportLoad(state, error);
         console.warn(`[boot] Failed to load base city support data. reason=${reason}`, error);
         throw error;
+      }).finally(() => {
+        finishBaseCitySupportLoad(state, { expectedPromise: promise, cancelled: !canCommit() });
       });
     setBaseCityDataPromise(state, promise);
     return promise;
   }
 
-  async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNow = true } = {}) {
+  async function ensureFullLocalizationDataReady(options = {}) {
+    const { reason = "post-ready", renderNow = true } = options;
+    assertReceiverCurrent(options);
     if (state.baseLocalizationLevel === "full" && state.baseLocalizationDataState === "loaded") {
       return {
         locales: state.locales,
         geoAliases: { alias_to_stable_key: state.geoAliasToStableKey || {} },
       };
     }
+    const { canCommit, shouldRender } = registerResourceReceiver("localization", options, state.baseLocalizationDataPromise);
     if (state.baseLocalizationDataPromise) {
       return state.baseLocalizationDataPromise;
     }
@@ -165,6 +202,7 @@ export function createStartupDataPipelineOwner({
       localeLevel: "full",
     })
       .then((result) => {
+        if (!canCommit()) return null;
         const fullBaseGeoLocales =
           result.locales?.geo && typeof result.locales.geo === "object"
             ? { ...result.locales.geo }
@@ -202,12 +240,13 @@ export function createStartupDataPipelineOwner({
           resourceMetrics: result.resourceMetrics || {},
         });
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
-        if (renderNow) {
+        if (shouldRender()) {
           requestMainRender?.(`localization-full-ready:${reason}`, { flush: true });
         }
         return result;
       })
       .catch((error) => {
+        if (!canCommit()) return null;
         const errorMessage = failFullLocalizationLoad(state, error);
         finishBootMetric?.("localization:full:load", {
           reason,
@@ -216,26 +255,39 @@ export function createStartupDataPipelineOwner({
         });
         console.warn(`[boot] Failed to hydrate full localization data. reason=${reason}`, error);
         throw error;
+      }).finally(() => {
+        finishFullLocalizationLoad(state, { expectedPromise: promise, cancelled: !canCommit() });
       });
     setBaseLocalizationDataPromise(state, promise);
     return promise;
   }
 
-  async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", renderNow = true } = {}) {
+  async function ensureActiveScenarioBundleHydrated(options = {}) {
+    const { reason = "post-ready", renderNow = true } = options;
     const scenarioId = String(state.activeScenarioId || "").trim();
     if (!scenarioId) return null;
+    const requestId = state.currentScenarioApplyRequestId;
+    const scenarioApplyEpoch = state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+    const isCurrent = () => receiverIsCurrent(options)
+      && String(state.activeScenarioId || "").trim() === scenarioId
+      && state.currentScenarioApplyRequestId === requestId
+      && (state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === scenarioApplyEpoch;
+    assertReceiverCurrent({ isCurrent });
     startBootMetric?.("scenario:full:hydrate");
     try {
       const bundle = await loadScenarioBundle(scenarioId, {
         d3Client: globalThis.d3,
         bundleLevel: "full",
       });
+      assertReceiverCurrent({ isCurrent });
       hydrateActiveScenarioBundle(bundle, { renderNow });
       const healthGateResult = await enforceScenarioHydrationHealthGate({
         renderNow,
         reason,
         autoRetry: true,
+        isCurrent,
       });
+      assertReceiverCurrent({ isCurrent });
       finishBootMetric?.("scenario:full:hydrate", {
         reason,
         bundleLevel: bundle?.bundleLevel || "full",
@@ -248,6 +300,7 @@ export function createStartupDataPipelineOwner({
       });
       return bundle;
     } catch (error) {
+      assertReceiverCurrent({ isCurrent });
       finishBootMetric?.("scenario:full:hydrate", {
         reason,
         failed: true,
@@ -314,8 +367,10 @@ export function createStartupDataPipelineOwner({
 
   async function ensureContextLayerDataReady(
     requestedLayerNames,
-    { reason = "manual", renderNow = true } = {}
+    options = {}
   ) {
+    const { reason = "manual", renderNow = true } = options;
+    assertReceiverCurrent(options);
     // 这里把“已在 topology 内的层”和“需要额外请求的 deferred pack”统一成同一个调用面，
     // 上层不必关心某个图层究竟来自首屏拓扑还是后续外部资源。
     const layerNames = expandDeferredContextLayerNames(requestedLayerNames);
@@ -331,6 +386,7 @@ export function createStartupDataPipelineOwner({
         results[layerName] = null;
         continue;
       }
+      const { canCommit } = registerResourceReceiver(`context:${layerName}`, options, state.contextLayerLoadPromiseByName?.[layerName]);
       if (state.contextLayerLoadPromiseByName?.[layerName]) {
         pendingEntries.push({
           layerName,
@@ -342,6 +398,7 @@ export function createStartupDataPipelineOwner({
       startBootMetric?.(`layer:${layerName}:load`);
       const promise = loadContextLayerPack(layerName, globalThis.d3)
         .then((collection) => {
+          if (!canCommit()) return null;
           if (!Array.isArray(collection?.features)) {
             setContextLayerLoadState(state, layerName, "error", {
               errorMessage: `Deferred context layer "${layerName}" is unavailable.`,
@@ -370,6 +427,7 @@ export function createStartupDataPipelineOwner({
           return collection;
         })
         .catch((error) => {
+          if (!canCommit()) return null;
           setContextLayerLoadState(state, layerName, "error", {
             errorMessage: error?.message || String(error || "Unknown context layer error."),
           });
@@ -381,7 +439,7 @@ export function createStartupDataPipelineOwner({
           return null;
         })
         .finally(() => {
-          setContextLayerLoadPromise(state, layerName, null);
+          finishContextLayerLoad(state, layerName, { expectedPromise: promise, cancelled: !canCommit() });
         });
       setContextLayerLoadPromise(state, layerName, promise);
       pendingEntries.push({ layerName, promise });
@@ -389,6 +447,7 @@ export function createStartupDataPipelineOwner({
 
     if (pendingEntries.length) {
       const settled = await Promise.allSettled(pendingEntries.map(({ promise }) => promise));
+      assertReceiverCurrent(options);
       const loadedLayerNames = [];
       settled.forEach((entry, index) => {
         const { layerName } = pendingEntries[index];
