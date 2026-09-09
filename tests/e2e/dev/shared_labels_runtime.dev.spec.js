@@ -4,6 +4,7 @@ const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("../support/playwright-app");
 const { DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("../support/startup-paths");
 
+// JUSTIFY: real Modern startup and seven label/cache/export frames took 60-80s at actual DPR 1/1.25/2; retain a fixed 120s total cap and bounded fixture waits.
 test.setTimeout(120_000);
 
 const LABELS = ["FixtureCity", "FixtureAir", "FixturePort"];

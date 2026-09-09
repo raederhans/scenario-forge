@@ -8,6 +8,7 @@ const { DEFAULT_FAST_APP_OPEN_PATH, toRootPath } = require("../support/startup-p
 
 // Paired current-run references, never golden snapshots or semantic correctness proof.
 test.use({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
+// JUSTIFY: real scenario loading plus settled reference pairs took up to 168s; each case keeps a fixed 180s cap, with the switch isolated and preparation capped at 45s.
 test.setTimeout(180_000);
 
 function sha256(bytes) {
