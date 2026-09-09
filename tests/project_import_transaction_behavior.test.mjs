@@ -12,6 +12,8 @@ import { markDirty } from '../js/core/dirty_state.js';
 import { getFeatureId, seedSovereigntyFromLandData } from '../js/core/sovereignty_manager.js';
 import { captureProjectImportState } from '../js/core/state/actions/project_import_actions.js';
 import { nextScenarioApplyEpoch } from '../js/core/renderer/render_transaction_diagnostics.js';
+import { createProjectImportCompletion } from '../js/core/interaction_funnel/import_completion.js';
+import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from '../js/core/state/actions/boot_actions.js';
 
 const ui = { t: text => text, showToast: () => {}, showAppDialog: async () => false };
 const payload = () => ({ schemaVersion: 21, visualOverrides: { IMPORT_TEST: '#abcdef' },
@@ -66,6 +68,8 @@ test('scenario import never seeds outgoing Atlantropa, TNO split or coarse land 
     const events = [];
     const globals = {
       state: target, runtimeState: target, debugState: { importApplyCount: 0 },
+      createProjectImportCompletion, createImportRecoveryUi: () => () => {},
+      commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason,
       captureProjectImportState, commitImportedProjectPatch: applyProjectImportPatch, seedSovereigntyFromLandData,
       normalizeMapSemanticMode: mode => mode, migrateLegacyColorState: () => {},
       ensureOwnerIndexMaps: () => {}, rebuildOwnerIndex: () => events.push('owners'),
@@ -90,10 +94,13 @@ test('scenario import never seeds outgoing Atlantropa, TNO split or coarse land 
     vm.runInContext(ownerSource.slice(ensureNode.start, ensureNode.end), context);
     vm.runInContext(funnelSource.slice(applyNode.start, applyNode.end), context);
     const result = await context.applyImportedProjectState({}, { ui, hooks: {} });
+    await result.completion;
     assert.deepEqual(Object.keys(target.sovereigntyByFeatureId), ['HOI4_TARGET']);
     assert.ok(events.indexOf('invalidate') < events.indexOf('runtime'));
     if (runtimeFails) {
       assert.equal(result.status, 'committed-with-warnings');
+      assert.equal(result.getRecoveryState().phase, 'blocked');
+      assert.equal(target.startupReadonly, true);
       assert.equal(events.includes('owners'), false);
     } else {
       assert.equal(result.status, 'committed');
@@ -278,8 +285,9 @@ test('context loader swallowed failure produces named warning but topology-provi
     const data = payload();
     data.layerVisibility.showRivers = true;
     const result = await importProjectTextThroughFunnel(JSON.stringify(data), { ui });
-    assert.equal(result.status, 'committed-with-warnings');
-    assert.ok(result.warnings.some(warning => warning.resource === 'rivers'));
+    await result.completion;
+    assert.equal(result.status, 'committed');
+    assert.ok(result.getRecoveryState().warnings.some(warning => warning.resource === 'rivers'));
     const source = readFileSync(new URL('../js/core/interaction_funnel.js', import.meta.url), 'utf8');
     const fn = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
       .find(node => node.id?.name === 'validateImportedContextLayerResult');
@@ -294,29 +302,24 @@ test('context loader swallowed failure produces named warning but topology-provi
   }
 });
 
-test('trusted import universe retains composite coarse features alongside unloaded scenario regions', () => {
-  const source = readFileSync(new URL('../js/core/interaction_funnel/import_apply_orchestration.js', import.meta.url), 'utf8');
-  const fn = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
-    .find(node => node.type === 'FunctionDeclaration' && node.id.name === 'getScenarioImportValidFeatureIds');
-  const context = vm.createContext({ getFeatureId, Map });
-  vm.runInContext(source.slice(fn.start, fn.end), context);
-  const ids = context.getScenarioImportValidFeatureIds({
+test('trusted import universe retains composite coarse features alongside unloaded scenario regions', async () => {
+  const { getScenarioImportValidFeatureIds } = await import('../js/core/interaction_funnel/import_trust_projection.js');
+  const ids = getScenarioImportValidFeatureIds({
     activeScenarioId: 'hoi4_1936',
-    scenarioBaselineOwnersByFeatureId: { UNLOADED: 'GER' },
     runtimeFeatureIds: ['RUNTIME_ONLY'],
     runtimeFeatureIndexById: new Map([['INDEX_ONLY', {}]]),
-    runtimePoliticalTopology: { objects: { political: { geometries: [{ id: 'STAGED' }] } } },
     defaultRuntimePoliticalTopology: { objects: { political: { geometries: [{ id: 'AE' }] } } },
     topologyPrimary: { objects: { political: { geometries: [{ id: 'AD' }, { id: 'AU__1' }] } } },
     // Outgoing rendered data and detail variants are not shared-base authorities.
     landData: { features: [{ id: 'ATLPRV_18225' }] },
     topologyDetail: { objects: { political: { geometries: [{ id: 'AZE-1707__tno1962_1' }] } } },
-  });
+  }, { staged: { scenarioId: 'hoi4_1936', resolvedOwners: { UNLOADED: 'GER' },
+    runtimeTopologyPayload: { objects: { political: { geometries: [{ id: 'STAGED' }] } } } } });
   assert.deepEqual([...ids].sort(), ['AD', 'AE', 'AU__1', 'INDEX_ONLY', 'RUNTIME_ONLY', 'STAGED', 'UNLOADED']);
   assert.equal(ids.has('U1_FORGED_FEATURE'), false);
   assert.equal(ids.has('ATLPRV_18225'), false);
   assert.equal(ids.has('AZE-1707__tno1962_1'), false);
-  const fallbackIds = context.getScenarioImportValidFeatureIds({
+  const fallbackIds = getScenarioImportValidFeatureIds({
     topology: { objects: { political: { geometries: [{ id: 'AD' }] } } },
   });
   assert.deepEqual([...fallbackIds], ['AD']);
@@ -392,8 +395,9 @@ test('optional failure has a named retry; later edits invalidate retry and stay 
     const data = payload();
     data.layerVisibility.showRivers = true;
     const result = await importProjectTextThroughFunnel(JSON.stringify(data), { ui });
-    assert.equal(result.status, 'committed-with-warnings');
-    assert.ok(result.warnings.some(warning => warning.resource === 'rivers'));
+    await result.completion;
+    assert.equal(result.status, 'committed');
+    assert.ok(result.getRecoveryState().warnings.some(warning => warning.resource === 'rivers'));
     assert.equal(state.isDirty, false);
     assert.equal(state.historyPast.length, 0);
     assert.equal(await result.retry('rivers'), true);
@@ -422,12 +426,47 @@ test('editing during optional completion does not clear the newer dirty baseline
     markDirty('new-edit-during-optional');
     finish.resolve();
     const result = await pending;
+    await result.completion;
     assert.ok(['committed', 'committed-with-warnings'].includes(result.status));
     assert.equal(state.isDirty, true);
     assert.equal(state.lastDirtyReason, 'new-edit-during-optional');
     assert.equal(getInteractionFunnelDebugState().importApplyCount, beforeCount + 1);
-    assert.equal(getInteractionFunnelDebugState().importPhase, 'complete');
+    assert.equal(getInteractionFunnelDebugState().importPhase, 'completion-cancelled');
   } finally {
+    registerRuntimeHook(state, 'ensureContextLayerDataFn', null);
+    globalThis.document = oldDocument;
+  }
+});
+
+test('a hung optional loader does not occupy import; replacement revokes old loader writes', async () => {
+  const oldDocument = globalThis.document;
+  globalThis.document = { getElementById: () => null };
+  const started = deferred();
+  const finish = deferred();
+  let staleWrites = 0;
+  registerRuntimeHook(state, 'ensureContextLayerDataFn', async (_layer, { isCurrent, signal }) => {
+    started.resolve();
+    await finish.promise;
+    if (isCurrent() && !signal.aborted) staleWrites++;
+  });
+  try {
+    const firstData = payload();
+    firstData.layerVisibility.showRivers = true;
+    const first = await importProjectThroughFunnel(null, { ui, projectPayload: firstData });
+    await started.promise;
+    assert.equal(first.getRecoveryState().editable, true);
+    const secondData = payload();
+    secondData.visualOverrides.IMPORT_TEST = '#112233';
+    const second = await importProjectThroughFunnel(null, { ui, projectPayload: secondData });
+    assert.equal(second.status, 'committed');
+    await second.completion;
+    assert.equal((await first.completion).phase, 'cancelled');
+    finish.resolve();
+    await Promise.resolve();
+    assert.equal(staleWrites, 0);
+    assert.equal(state.visualOverrides.IMPORT_TEST, '#112233');
+  } finally {
+    finish.resolve();
     registerRuntimeHook(state, 'ensureContextLayerDataFn', null);
     globalThis.document = oldDocument;
   }

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  analyzeScenarioPoliticalDerivedStateCoverage,
   assertPromotionDeltaPureValue,
   buildScenarioChunkPromotionVisualMetricDetails,
   createScenarioChunkPromotionDelta,
@@ -9,6 +10,29 @@ import {
   isDrawSubsetIndexCurrent,
   resolveScenarioChunkPromotionChangeSet,
 } from "../js/core/renderer/scenario_chunk_promotion_helpers.js";
+
+test("political coverage borrows frozen scene collections and returns detached diagnostic samples", () => {
+  const first = Object.freeze({ id: "A" });
+  const second = Object.freeze({ id: "B" });
+  const state = Object.freeze({
+    scenarioPoliticalChunkData: Object.freeze({ features: Object.freeze([first, second]) }),
+    scenarioPoliticalVisibleChunkData: Object.freeze({ features: Object.freeze([first]) }),
+    landData: Object.freeze({ features: Object.freeze([first]) }),
+    colors: Object.freeze({ A: "#112233" }),
+  });
+  const coverage = analyzeScenarioPoliticalDerivedStateCoverage(state);
+  assert.equal(coverage.primaryVisibleFeatureSubsetActive, true);
+  assert.equal(coverage.landDataCoverageMissing, true);
+  assert.equal(coverage.colorCoverageMissing, true);
+  assert.deepEqual(coverage.missingLandFeatureIdsSample, ["B"]);
+  assert.deepEqual(coverage.missingColorFeatureIdsSample, ["B"]);
+  coverage.missingLandFeatureIdsSample.push("external");
+  coverage.missingColorFeatureIdsSample[0] = "external";
+  const again = analyzeScenarioPoliticalDerivedStateCoverage(state);
+  assert.deepEqual(again.missingLandFeatureIdsSample, ["B"]);
+  assert.deepEqual(again.missingColorFeatureIdsSample, ["B"]);
+  assert.equal(state.scenarioPoliticalChunkData.features[1], second);
+});
 
 test("scenario chunk promotion change set treats atlantropa as water and political change", () => {
   const result = resolveScenarioChunkPromotionChangeSet({

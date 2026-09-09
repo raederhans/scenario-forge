@@ -8,6 +8,8 @@ import { createPostReadyScheduler, POST_READY_IDLE_QUIET_MS } from "../js/bootst
 import { attachDeferredUiBootstrapRejectionObserver } from "../js/bootstrap/deferred_ui_bootstrap.js";
 import { setUiHydrationState } from "../js/core/state/actions/boot_actions.js";
 
+function timingOptions({ isCurrent, maxWaitMs, maxRunMs, canStart, ...options }) { return options; }
+
 function createSchedulerRecorder({ order = null } = {}) {
   const tasks = [];
   const recordedOrderLabels = new Set();
@@ -21,6 +23,7 @@ function createSchedulerRecorder({ order = null } = {}) {
     tasks,
     scheduleTask(key, callback, options = {}) {
       tasks.push({ key, callback: () => callback({
+        isCurrent: () => !options.isCurrent || options.isCurrent(),
         throwIfStale() {
           if (options.isCurrent && !options.isCurrent()) throw new Error("stale");
         },
@@ -75,6 +78,7 @@ function createHelpers({ order = null, overrides = {} } = {}) {
       order?.push("completeBootSequenceLogging");
     },
     ensureActiveScenarioBundleHydrated: async () => true,
+    ensureBaseCityDataReady: async () => true,
     ensureContextLayerDataReady: async () => true,
     ensureFullLocalizationDataReady: async () => true,
     reconcileDetailPromotionPoliticalPass: () => true,
@@ -292,12 +296,12 @@ test("schedulePostReadyHydration schedules two task keys and preserves timing", 
     "post-ready-localization-hydration",
     "post-ready-scenario-hydration",
   ]);
-  assert.deepEqual(slowHarness.scheduler.tasks[0].options, {
+  assert.deepEqual(timingOptions(slowHarness.scheduler.tasks[0].options), {
     timeout: 2200,
     delayMs: 1200,
     retryDelayMs: 600,
   });
-  assert.deepEqual(slowHarness.scheduler.tasks[1].options, {
+  assert.deepEqual(timingOptions(slowHarness.scheduler.tasks[1].options), {
     timeout: 4800,
     delayMs: 4200,
     retryDelayMs: 900,
@@ -313,7 +317,7 @@ test("schedulePostReadyHydration schedules two task keys and preserves timing", 
 
   fastHarness.owner.schedulePostReadyHydration();
 
-  assert.deepEqual(fastHarness.scheduler.tasks[1].options, {
+  assert.deepEqual(timingOptions(fastHarness.scheduler.tasks[1].options), {
     timeout: 4800,
     delayMs: 300,
     retryDelayMs: 450,
@@ -348,7 +352,7 @@ test("hydration task callbacks catch and warn", async () => {
   assert.equal(warnings[1][1], scenarioFailure);
 });
 
-test("schedulePostReadyPoliticalReconcile gates detail readiness and reschedules false requests", () => {
+test("schedulePostReadyPoliticalReconcile gates detail readiness and retries false requests within one bounded task", async () => {
   const targetRuntime = createTargetRuntime({ detailPromotionCompleted: false });
   const reconcileCalls = [];
   const { owner, scheduler } = createOwnerHarness({
@@ -357,7 +361,7 @@ test("schedulePostReadyPoliticalReconcile gates detail readiness and reschedules
       overrides: {
         reconcileDetailPromotionPoliticalPass(reason) {
           reconcileCalls.push(reason);
-          return false;
+          return reconcileCalls.length >= 2;
         },
       },
     }),
@@ -369,16 +373,16 @@ test("schedulePostReadyPoliticalReconcile gates detail readiness and reschedules
   targetRuntime.detailPromotionCompleted = true;
   assert.equal(owner.schedulePostReadyPoliticalReconcile("detail-ready"), true);
   assert.equal(scheduler.tasks[0].key, "post-ready-detail-promotion-political-reconcile");
-  assert.deepEqual(scheduler.tasks[0].options, {
+  assert.deepEqual(timingOptions(scheduler.tasks[0].options), {
     timeout: 1200,
     delayMs: 0,
     retryDelayMs: 320,
     idleQuietMs: POST_READY_IDLE_QUIET_MS,
   });
 
-  assert.equal(scheduler.tasks[0].callback(), false);
-  assert.deepEqual(reconcileCalls, ["detail-ready"]);
-  assert.equal(scheduler.tasks.length, 2);
+  assert.equal(await scheduler.tasks[0].callback(), true);
+  assert.deepEqual(reconcileCalls, ["detail-ready", "detail-ready"]);
+  assert.equal(scheduler.tasks.length, 1);
 });
 
 test("startDeferredFullInteractionInfrastructureBuild defers until detail is complete", async () => {
@@ -401,13 +405,14 @@ test("startDeferredFullInteractionInfrastructureBuild defers until detail is com
 
   owner.startDeferredFullInteractionInfrastructureBuild("ready-state");
   assert.equal(scheduler.tasks[0].key, "post-ready-full-interaction-infra");
-  assert.equal(scheduler.tasks[0].callback(), false);
+  assert.equal(scheduler.tasks[0].options.canStart(), false);
   assert.deepEqual(buildCalls, []);
-  assert.equal(scheduler.tasks.length, 2);
+  assert.equal(scheduler.tasks.length, 1);
 
   targetRuntime.detailPromotionCompleted = true;
-  await scheduler.tasks[1].callback();
+  await scheduler.tasks[0].callback();
   assert.deepEqual(buildCalls, [{
+    taskContext: buildCalls[0].taskContext,
     chunked: true,
     buildHitCanvas: false,
     mode: "full",
@@ -455,7 +460,7 @@ test("schedulePostReadyVisualWarmup respects visual state and boot blocking", as
 
   owner.schedulePostReadyVisualWarmup();
   assert.equal(scheduler.tasks[0].key, "post-ready-visual-warmup");
-  assert.deepEqual(scheduler.tasks[0].options, {
+  assert.deepEqual(timingOptions(scheduler.tasks[0].options), {
     timeout: 1200,
     delayMs: 900,
     retryDelayMs: 320,
@@ -488,10 +493,6 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
     showPhysical: true,
     showCityPoints: true,
     baseCityDataState: "idle",
-    ensureBaseCityDataFn: async (options) => {
-      cityCalls.push(options);
-      return true;
-    },
   });
   const { owner, scheduler } = createOwnerHarness({
     targetRuntime,
@@ -499,6 +500,10 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
       overrides: {
         ensureContextLayerDataReady: async (layerNames, options) => {
           contextCalls.push({ layerNames: [...layerNames], options });
+          return true;
+        },
+        ensureBaseCityDataReady: async (options) => {
+          cityCalls.push(options);
           return true;
         },
         requestMainRender: (reason) => renderCalls.push(reason),
@@ -512,20 +517,14 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
     "post-ready-context-warmup",
     "post-ready-contour-warmup",
   ]);
-  assert.deepEqual(scheduler.tasks[0].options, {
+  assert.deepEqual(timingOptions(scheduler.tasks[0].options), {
     timeout: 1600,
-    isCurrent: scheduler.tasks[0].options.isCurrent,
-    maxWaitMs: 120_000,
-    maxRunMs: 120_000,
     delayMs: 900,
     retryDelayMs: 420,
     idleQuietMs: POST_READY_IDLE_QUIET_MS,
   });
-  assert.deepEqual(scheduler.tasks[1].options, {
+  assert.deepEqual(timingOptions(scheduler.tasks[1].options), {
     timeout: 1800,
-    isCurrent: scheduler.tasks[1].options.isCurrent,
-    maxWaitMs: 120_000,
-    maxRunMs: 120_000,
     delayMs: 1400,
     retryDelayMs: 420,
     idleQuietMs: POST_READY_IDLE_QUIET_MS,
@@ -534,15 +533,15 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
   await scheduler.tasks[0].callback();
   assert.deepEqual(contextCalls[0], {
     layerNames: ["rivers", "urban", "physical-set"],
-    options: { reason: "post-ready", renderNow: false },
+    options: { reason: "post-ready", renderNow: false, taskContext: contextCalls[0].options.taskContext },
   });
-  assert.deepEqual(cityCalls, [{ reason: "post-ready", renderNow: false }]);
+  assert.deepEqual(cityCalls, [{ reason: "post-ready", renderNow: false, taskContext: cityCalls[0].taskContext }]);
   assert.equal(renderCalls[0], "post-ready-context-warmup");
 
   await scheduler.tasks[1].callback();
   assert.deepEqual(contextCalls[1], {
     layerNames: ["physical-contours-set"],
-    options: { reason: "post-ready-contours", renderNow: false },
+    options: { reason: "post-ready-contours", renderNow: false, taskContext: contextCalls[1].options.taskContext },
   });
   assert.equal(renderCalls[1], "post-ready-contours");
 
@@ -601,3 +600,90 @@ test("real scheduler and warmup owner discard a completion after a scene switch"
     scheduler.reset("test-cleanup");
   }
 });
+
+test("scenario hydration re-arms for a new apply request while localization remains page scoped", () => {
+  const { owner, targetRuntime, scheduler } = createOwnerHarness();
+  owner.schedulePostReadyHydration();
+  targetRuntime.activeScenarioId = "next";
+  targetRuntime.currentScenarioApplyRequestId = 2;
+  owner.schedulePostReadyHydration();
+  owner.schedulePostReadyHydration();
+  assert.deepEqual(scheduler.tasks.map(({ key }) => key), [
+    "post-ready-localization-hydration", "post-ready-scenario-hydration", "post-ready-scenario-hydration",
+  ]);
+  assert.equal(scheduler.tasks[0].options.isCurrent(), true);
+  assert.equal(scheduler.tasks[1].options.isCurrent(), false);
+  assert.equal(scheduler.tasks[2].options.isCurrent(), true);
+  for (const { options } of scheduler.tasks) {
+    assert.equal(options.maxWaitMs, 120_000);
+    assert.equal(options.maxRunMs, 120_000);
+  }
+});
+
+test("same-scenario import epoch re-arms scenario hydration and invalidates queued scene work", () => {
+  const { owner, targetRuntime, scheduler } = createOwnerHarness();
+  targetRuntime.renderTransactionDiagnostics = { scenarioApplyEpoch: 4 };
+  owner.schedulePostReadyHydration();
+  owner.startDeferredFullInteractionInfrastructureBuild();
+  targetRuntime.renderTransactionDiagnostics.scenarioApplyEpoch = 5;
+  owner.schedulePostReadyHydration();
+  assert.equal(scheduler.tasks.length, 4);
+  assert.equal(scheduler.tasks[0].options.isCurrent(), true);
+  assert.equal(scheduler.tasks[1].options.isCurrent(), false);
+  assert.equal(scheduler.tasks[2].options.isCurrent(), false);
+  assert.equal(scheduler.tasks[3].options.isCurrent(), true);
+});
+
+test("reset invalidates pending UI hydration observation without replaying or reporting failure", async () => {
+  let resolveUi;
+  const { owner } = createOwnerHarness({ startupUiBootstrapPromise: new Promise((resolve) => { resolveUi = resolve; }) });
+  const observation = owner.observePostReadyUiBootstrap({
+    runPostScenarioUiReplay: () => assert.fail("stale replay"),
+    handleUiBootstrapReady: () => assert.fail("stale ready"),
+    handleUiBootstrapFailure: () => assert.fail("stale failure"),
+  });
+  owner.reset();
+  resolveUi();
+  assert.deepEqual(await observation, { ready: false, skipped: true, error: null });
+});
+
+for (const cancellation of ["deadline", "reset"]) {
+  test(`real scheduler ${cancellation} aborts the scenario hydration receiver before a late commit`, async () => {
+    const targetRuntime = createTargetRuntime({ activeScenarioId: "A", currentScenarioApplyRequestId: 1 });
+    const scheduler = createPostReadyScheduler({ targetState: targetRuntime });
+    let finishLoad;
+    let beginLoad;
+    let observeAbort;
+    const started = new Promise((resolve) => { beginLoad = resolve; });
+    const aborted = new Promise((resolve) => { observeAbort = resolve; });
+    const commits = [];
+    const { owner } = createOwnerHarness({
+      targetRuntime,
+      scheduler: {
+        clearTask: (key) => scheduler.clearTask(key),
+        scheduleTask: (key, callback, options) => scheduler.scheduleTask(key, callback, {
+          ...options, delayMs: 0, maxRunMs: cancellation === "deadline" ? 25 : 120_000,
+        }),
+      },
+      helpers: createHelpers({ overrides: {
+        ensureActiveScenarioBundleHydrated: async ({ taskContext }) => {
+          taskContext.signal.addEventListener("abort", observeAbort, { once: true });
+          await new Promise((resolve) => { finishLoad = resolve; beginLoad(); });
+          taskContext.commit(() => commits.push("late"));
+        },
+      } }),
+    });
+    try {
+      owner.schedulePostReadyHydration();
+      await started;
+      if (cancellation === "reset") owner.reset();
+      await aborted;
+      finishLoad();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      assert.deepEqual(commits, []);
+      assert.equal(scheduler.getDiagnostics().taskOutcomes["post-ready-scenario-hydration"].status, "cancelled");
+    } finally {
+      scheduler.reset("test-cleanup");
+    }
+  });
+}

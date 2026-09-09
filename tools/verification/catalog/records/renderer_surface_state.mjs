@@ -72,7 +72,10 @@ export const RENDERER_SURFACE_STATE_RECORDS = [
     "commandRef": "test:node:render-transaction-diagnostics",
     "sourceRefs": [
       "tests/render_transaction_diagnostics_behavior.test.mjs",
-      "js/core/renderer/render_transaction_diagnostics.js"
+      "tests/renderer_transaction_diagnostics_actions_behavior.test.mjs",
+      "js/core/renderer/render_transaction_diagnostics.js",
+      "js/core/state/actions/renderer_transaction_diagnostics_actions.js",
+      "js/core/scenario_manager.js"
     ],
     "ownerHints": [
       "renderer-runtime"

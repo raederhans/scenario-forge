@@ -14,6 +14,19 @@ function bounds(seed) {
   };
 }
 
+test("chunked primary index cancellation at its first yield preserves the existing index", async () => {
+  let current = true;
+  const { owner, state } = createOwnerHarness({
+    landFeatures: [{ id: "late", countryCode: "AA" }],
+    yieldToMain: async () => { current = false; },
+  });
+  const previous = new Map([["previous", { id: "previous" }]]);
+  state.featureById = previous;
+  assert.equal(await owner.buildIndexChunked({ isCurrent: () => current }), false);
+  assert.equal(state.featureById, previous);
+  assert.equal(state.featureById.has("late"), false);
+});
+
 function createOwnerHarness({
   landFeatures = [],
   riverFeatures = [],

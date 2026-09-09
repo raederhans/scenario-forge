@@ -1,7 +1,18 @@
 // Legend manager (Phase 13)
 
 import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
-import { normalizeHexColor } from "./color_hex_utils.js";
+import {
+  DEFAULT_LEGEND_CONFIG,
+  DEFAULT_LEGEND_CONTROL,
+  LEGEND_CONTROL_LIMITS,
+  normalizeColor,
+  normalizeLabels,
+  normalizeLegendConfig,
+  normalizeLegendControl,
+  getUniqueLegendColors,
+  getLegendColorRevisionKey,
+} from "./legend_state_normalizers.js";
+import { patchLegendState, setLegendLabelState, ensureLegendState } from "./state/actions/legend_actions.js";
 import {
   getFeatureId,
   getFeatureOwnerCode,
@@ -10,32 +21,6 @@ import {
   getSpecialZoneLegendLayers,
   getSpecialZoneLegendSignature,
 } from "./special_zone_layers.js";
-
-const DEFAULT_LEGEND_CONFIG = Object.freeze({
-  mode: "weighted-random",
-  continent: "all",
-  useModernMajorOrder: false,
-  maxItems: 15,
-});
-
-const DEFAULT_LEGEND_CONTROL = Object.freeze({
-  visible: true,
-  collapsed: false,
-  xRatio: 0.02,
-  yRatio: 0.72,
-  width: 240,
-  height: 340,
-  opacity: 0.9,
-});
-
-const LEGEND_CONTROL_LIMITS = Object.freeze({
-  minWidth: 180,
-  maxWidth: 420,
-  minHeight: 130,
-  maxHeight: 560,
-  minOpacity: 0.35,
-  maxOpacity: 1,
-});
 
 const MODERN_MAJOR_POWER_ORDER = Object.freeze([
   "USA",
@@ -93,83 +78,6 @@ const MAJOR_POWER_BOOST = 2.2;
 
 function normalizeCode(value) {
   return String(value || "").trim().toUpperCase();
-}
-
-function normalizeColor(value) {
-  return normalizeHexColor(value) || "";
-}
-
-function normalizeLabels(value) {
-  const labels = {};
-  if (!value || typeof value !== "object") return labels;
-  Object.entries(value).forEach(([color, label]) => {
-    const key = normalizeColor(color);
-    const text = String(label || "").trim();
-    if (key && text) labels[key] = text;
-  });
-  return labels;
-}
-
-function normalizeColorOrder(value) {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set();
-  const colors = [];
-  value.forEach((entry) => {
-    const color = normalizeColor(entry);
-    if (!color || seen.has(color)) return;
-    seen.add(color);
-    colors.push(color);
-  });
-  return colors;
-}
-
-function normalizeLegendConfig(value) {
-  const source = value && typeof value === "object" ? value : {};
-  const mode = String(source.mode || DEFAULT_LEGEND_CONFIG.mode).trim();
-  const maxItems = Math.max(1, Math.min(30, Number(source.maxItems || DEFAULT_LEGEND_CONFIG.maxItems) || DEFAULT_LEGEND_CONFIG.maxItems));
-  const continent = String(source.continent || DEFAULT_LEGEND_CONFIG.continent).trim().toLowerCase() || DEFAULT_LEGEND_CONFIG.continent;
-  return {
-    mode: ["weighted-random", "direct-area", "realm-area", "continent-area"].includes(mode)
-      ? mode
-      : DEFAULT_LEGEND_CONFIG.mode,
-    continent,
-    useModernMajorOrder: !!source.useModernMajorOrder,
-    maxItems,
-  };
-}
-
-function clampNumber(value, fallback, min, max) {
-  const number = Number(value);
-  if (!Number.isFinite(number)) return fallback;
-  return Math.max(min, Math.min(max, number));
-}
-
-function normalizeLegendControl(value) {
-  const source = value && typeof value === "object" ? value : {};
-  return {
-    visible: source.visible !== false,
-    collapsed: !!source.collapsed,
-    xRatio: clampNumber(source.xRatio, DEFAULT_LEGEND_CONTROL.xRatio, 0, 1),
-    yRatio: clampNumber(source.yRatio, DEFAULT_LEGEND_CONTROL.yRatio, 0, 1),
-    width: Math.round(clampNumber(
-      source.width,
-      DEFAULT_LEGEND_CONTROL.width,
-      LEGEND_CONTROL_LIMITS.minWidth,
-      LEGEND_CONTROL_LIMITS.maxWidth
-    )),
-    height: Math.round(clampNumber(
-      source.height,
-      DEFAULT_LEGEND_CONTROL.height,
-      LEGEND_CONTROL_LIMITS.minHeight,
-      LEGEND_CONTROL_LIMITS.maxHeight
-    )),
-    opacity: clampNumber(
-      source.opacity,
-      DEFAULT_LEGEND_CONTROL.opacity,
-      LEGEND_CONTROL_LIMITS.minOpacity,
-      LEGEND_CONTROL_LIMITS.maxOpacity
-    ),
-  };
 }
 
 function hashString(value) {
@@ -255,7 +163,7 @@ function getFeatureContinentId(feature, appState, ownerCode = "") {
     appState?.scenarioCountriesByTag?.[ownerCode]?.subregion_label,
   ];
   for (const value of candidates) {
-    const normalized = normalizeContinentId(value);
+    const normalized = normalizeContinentId(String(value || ""));
     if (normalized) return normalized;
   }
   return "";
@@ -482,29 +390,14 @@ function buildGeneratedEntries(appState, entries, config) {
   return entries.slice(0, config.maxItems).map((entry, index) => ({
     ...entry,
     label: getCountryDisplayName(appState, entry.code),
-    color: getDominantEntryColor(entry) || palette[index % palette.length],
+    color: String(getDominantEntryColor(entry) || palette[index % palette.length] || ""),
   }));
 }
 
 class LegendManager {
   static ensureLegendState(appState) {
     if (!appState) return null;
-    appState.legendLabels = normalizeLabels(
-      Object.prototype.hasOwnProperty.call(appState, "legendLabels")
-        ? appState.legendLabels
-        : {}
-    );
-    appState.legendConfig = normalizeLegendConfig(
-      Object.prototype.hasOwnProperty.call(appState, "legendConfig")
-        ? appState.legendConfig
-        : DEFAULT_LEGEND_CONFIG
-    );
-    appState.legendControl = normalizeLegendControl(
-      Object.prototype.hasOwnProperty.call(appState, "legendControl")
-        ? appState.legendControl
-        : DEFAULT_LEGEND_CONTROL
-    );
-    appState.legendColorOrder = normalizeColorOrder(appState.legendColorOrder);
+    ensureLegendState(appState);
     return appState;
   }
 
@@ -537,7 +430,7 @@ class LegendManager {
   }
 
   static getConfig(appState) {
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     return { ...(appState?.legendConfig || DEFAULT_LEGEND_CONFIG) };
   }
 
@@ -546,60 +439,33 @@ class LegendManager {
       ...LegendManager.getConfig(appState),
       ...(patch || {}),
     });
-    if (appState) appState.legendConfig = nextConfig;
+    if (appState) patchLegendState(appState, { legendConfig: nextConfig });
     return { ...nextConfig };
   }
 
   static getUniqueColors(appState) {
-    LegendManager.ensureLegendState(appState);
-    const maxItems = LegendManager.getConfig(appState).maxItems;
-    const colors = [];
-    if (!appState || !appState.colors) return colors;
-
-    const seen = new Set();
-    const availableColors = new Set(Object.values(appState.colors).map(normalizeColor).filter(Boolean));
-    for (const value of normalizeColorOrder(appState.legendColorOrder)) {
-      const color = normalizeColor(value);
-      if (!color || seen.has(color) || !availableColors.has(color)) continue;
-      seen.add(color);
-      colors.push(color);
-      if (colors.length >= maxItems) return colors;
-    }
-    // Reuse the normalized insertion-ordered set instead of scanning every feature twice.
-    for (const color of availableColors) {
-      if (!color || seen.has(color)) continue;
-      seen.add(color);
-      colors.push(color);
-      if (colors.length >= maxItems) break;
-    }
-
-    return colors;
+    ensureLegendState(appState);
+    return getUniqueLegendColors(appState);
   }
 
   static setLabel(color, text, appState = null) {
     if (!appState) return;
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     const key = normalizeColor(color);
     if (!key) return;
     const value = String(text || "").trim();
-    const labels = appState.legendLabels;
-    if (!value) {
-      delete labels[key];
-    } else {
-      labels[key] = value;
-    }
-    appState.legendLabels = labels;
+    setLegendLabelState(appState, key, value);
   }
 
   static getLabel(color, appState = null) {
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     const key = normalizeColor(color);
     const labels = appState?.legendLabels || {};
     return key ? labels[key] || "" : "";
   }
 
   static getLabels(appState = null) {
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     return appState?.legendLabels || {};
   }
 
@@ -617,7 +483,7 @@ class LegendManager {
 
   static applyGeneratedLegend(appState, generation) {
     if (!appState || !generation?.entries?.length) return [];
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     const touchedOwners = new Set();
     const colorOrder = [];
     generation.entries.forEach((entry) => {
@@ -632,12 +498,12 @@ class LegendManager {
       });
       if (label) LegendManager.setLabel(color, label, appState);
     });
-    appState.legendColorOrder = colorOrder;
+    patchLegendState(appState, { legendColorOrder: colorOrder });
     return Array.from(touchedOwners);
   }
 
   static getControlState(appState) {
-    LegendManager.ensureLegendState(appState);
+    ensureLegendState(appState);
     return { ...(appState?.legendControl || DEFAULT_LEGEND_CONTROL) };
   }
 
@@ -646,7 +512,7 @@ class LegendManager {
       ...LegendManager.getControlState(appState),
       ...(patch || {}),
     });
-    if (appState) appState.legendControl = nextControl;
+    if (appState) patchLegendState(appState, { legendControl: nextControl });
     return { ...nextControl };
   }
 
@@ -688,16 +554,13 @@ function createRevisionedLegendColorReader() {
   let lastKey = "";
   let lastColors = [];
   return (appState) => {
-    if (!appState || !Number.isFinite(appState.colorRevision)) {
-      return LegendManager.getUniqueColors(appState);
+    ensureLegendState(appState);
+    if (!appState || typeof appState.colorRevision !== "number" || !Number.isFinite(Number(appState.colorRevision))) {
+      return getUniqueLegendColors(appState);
     }
-    LegendManager.ensureLegendState(appState);
-    const key = JSON.stringify([
-      appState.colorRevision, appState.sceneGeneration, appState.scenarioDataGeneration,
-      appState.activeScenarioId, appState.legendConfig.maxItems, appState.legendColorOrder,
-    ]);
+    const key = getLegendColorRevisionKey(appState);
     if (lastState !== appState || lastSource !== appState.colors || lastKey !== key) {
-      lastColors = LegendManager.getUniqueColors(appState);
+      lastColors = getUniqueLegendColors(appState);
       lastState = appState;
       lastSource = appState.colors;
       lastKey = key;

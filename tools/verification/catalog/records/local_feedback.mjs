@@ -153,9 +153,10 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["startup-cache-metadata-gc", "startup", "tests/startup_cache_metadata_gc_behavior.test.mjs", ["js/core/startup_cache.js"]],
     ["scenario-cache-efficiency", "scenario-runtime", "tests/scenario_cache_efficiency_behavior.test.mjs", ["js/core/scenario/bundle_cache.js", "js/core/scenario/bundle_runtime.js", "js/core/scenario/rollback_clone.js", "js/core/scenario_rollback.js", "js/core/scenario/chunk_runtime.js", "js/core/scenario/chunk_payload_loader.js", "js/core/scenario_resources.js", "js/core/state/actions/scenario_chunk_runtime_actions.js"]],
     ["strategic-history-scope", "renderer-runtime", "tests/strategic_history_scope_behavior.test.mjs", ["js/core/history_manager.js", "js/core/renderer/strategic_overlay_runtime_owner.js"]],
-    ["scenario-cache-byte-budget", "scenario-runtime", "tests/scenario_cache_byte_budget_behavior.test.mjs", ["js/core/scenario/bundle_cache.js", "js/core/scenario/chunk_payload_loader.js"]],
+    ["scenario-cache-byte-budget", "scenario-runtime", "tests/scenario_cache_byte_budget_behavior.test.mjs", ["js/core/scenario/bundle_cache.js", "js/core/scenario/bundle_cache_policy.js", "js/core/scenario/chunk_payload_loader.js"]],
     ["scenario-core-value-normalizer", "scenario-runtime", "tests/scenario_core_value_normalizer_behavior.test.mjs", ["js/core/scenario/shared.js", "js/core/scenario/core_value_normalizer.js"]],
-    ["legend-color-revision", "renderer-runtime", "tests/legend_color_revision_behavior.test.mjs", ["js/core/legend_manager.js", "js/core/map_renderer.js"]],
+    ["legend-actions", "renderer-runtime", "tests/legend_actions_behavior.test.mjs", ["js/core/state/actions/legend_actions.js", "js/core/legend_state_normalizers.js"]],
+    ["legend-color-revision", "renderer-runtime", "tests/legend_color_revision_behavior.test.mjs", ["js/core/legend_manager.js", "js/core/legend_state_normalizers.js", "js/core/map_renderer.js"]],
     ["render-dispatcher", "startup", "tests/render_dispatcher_behavior.test.mjs", ["js/bootstrap/startup_bootstrap_support.js", "js/core/render_boundary.js", "js/bootstrap/render_runtime_binding.js"]],
     ["exact-composite-reuse", "renderer-runtime", "tests/exact_composite_reuse_behavior.test.mjs", ["js/core/renderer/exact_composite_reuse_owner.js", "js/core/map_renderer.js", "js/core/renderer/cached_pass_compositor_owner.js"]],
   ];
@@ -209,7 +210,44 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 3,
   };
 
+  const startupLifecycleRecord = {
+    ...editorCheckoutRecord,
+    id: "local:startup-lifecycle",
+    commandRef: "test:node:startup-lifecycle",
+    sourceRefs: ["tests/startup_ready_handoff_behavior.test.mjs", "tests/startup_data_pipeline_lifecycle_behavior.test.mjs",
+      "tests/startup_interaction_lifecycle_behavior.test.mjs", "js/bootstrap/startup_ready_handoff.js",
+      "js/bootstrap/startup_data_pipeline.js", "js/bootstrap/post_ready_scheduler.js", "js/main.js",
+      "js/core/state/actions/content_load_actions.js",
+      "js/core/map_renderer.js", "js/core/renderer/spatial_index_runtime_owner.js"],
+    ownerHints: ["startup"], domains: ["startup"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 4,
+  };
+  const projectImportLifecycleRecord = {
+    ...editorCheckoutRecord,
+    id: "local:project-import-lifecycle",
+    commandRef: "test:node:project-import-lifecycle",
+    sourceRefs: ["tests/project_import_completion_behavior.test.mjs", "tests/project_package_stream_import_behavior.test.mjs",
+      "tests/scenario_import_trust_projection_behavior.test.mjs", "tests/scenario_project_import_recovery_behavior.test.mjs",
+      "js/core/interaction_funnel/import_apply_orchestration.js", "js/core/scenario_manager.js",
+      "js/core/interaction_funnel/import_trust_projection.js",
+      "js/core/interaction_funnel/import_completion.js", "js/core/interaction_funnel.js", "js/core/project_package_io.js",
+      "js/core/file_manager.js"],
+    ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 5,
+  };
+  const projectImportRecoveryRecord = {
+    ...runtimeInputRecord,
+    id: "e2e:project-import-recovery-round2",
+    commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/dev/project_import_recovery_round2.dev.spec.js --workers=1 --retries=0",
+    sourceRefs: ["tests/e2e/dev/project_import_recovery_round2.dev.spec.js", "js/core/interaction_funnel/import_completion.js",
+      "js/core/interaction_funnel/import_apply_orchestration.js", "js/core/scenario_manager.js",
+      "js/core/interaction_funnel/import_trust_projection.js",
+      "js/core/interaction_funnel.js", "js/core/project_package_io.js", "js/core/file_manager.js"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 6,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
-    historyColorRecord, runtimeInputRecord, inputEvidenceRecord];
+    historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
+    startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord];
 }

@@ -692,7 +692,19 @@ function createScenarioStartupHydrationController({
     renderNow = true,
     reason = "post-ready",
     autoRetry = true,
+    isCurrent = () => true,
   } = {}) {
+    const requestId = state.currentScenarioApplyRequestId;
+    const scenarioApplyEpoch = state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+    const initialScenarioId = state.activeScenarioId;
+    const assertCurrent = () => {
+      if (!isCurrent() || state.activeScenarioId !== initialScenarioId
+        || state.currentScenarioApplyRequestId !== requestId
+        || (state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) !== scenarioApplyEpoch) {
+        throw Object.assign(new Error("Scenario hydration superseded."), { name: "AbortError" });
+      }
+    };
+    assertCurrent();
     // health gate 的目标不是“尽量兜住”，而是尽快判断当前 runtime 壳层是否还能支撑后续编辑。
     // 能通过就放行；一次强制重载能修复就立即收口；仍然失败就显式进入 fatal recovery。
     const scenarioId = normalizeScenarioId(state.activeScenarioId);
@@ -730,11 +742,13 @@ function createScenarioStartupHydrationController({
           bundleLevel: "full",
           forceReload: true,
         });
+        assertCurrent();
         hydrateActiveScenarioBundle(refreshedBundle, { renderNow: false });
         ({ report, overlayConsistency: waterConsistency } = evaluateScenarioHydrationHealthGateState({
           phase: "deferred",
         }));
       } catch (retryError) {
+        assertCurrent();
         console.warn(`[scenario] Hydration health gate retry failed for "${scenarioId}".`, retryError);
       }
     }

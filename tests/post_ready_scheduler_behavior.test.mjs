@@ -88,6 +88,47 @@ async function drainMicrotasks() {
   await Promise.resolve();
 }
 
+test("published task outcomes are detached from scheduler-owned records", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  scheduler.scheduleTask("complete", () => true);
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  const first = scheduler.getDiagnostics();
+  first.taskOutcomes.complete.status = "corrupted";
+  first.taskOutcomes.complete.finishedAt = -1;
+  const second = scheduler.getDiagnostics();
+  assert.equal(second.taskOutcomes.complete.status, "completed");
+  assert.ok(second.taskOutcomes.complete.finishedAt >= 0);
+});
+
+test("cooperative delay cancellation preserves opaque timer handles", async () => {
+  const targetState = createTargetState();
+  const globalScope = createTimerScope();
+  const setTimeout = globalScope.setTimeout;
+  const clearTimeout = globalScope.clearTimeout;
+  const handles = new Set();
+  globalScope.setTimeout = (callback, delay) => {
+    const handle = { timerId: setTimeout(callback, delay) };
+    handles.add(handle);
+    return handle;
+  };
+  globalScope.clearTimeout = (handle) => {
+    assert.ok(handles.has(handle), "cleanup must retain opaque timer identity");
+    clearTimeout(handle.timerId);
+  };
+  const scheduler = createPostReadyScheduler({ targetState, globalScope });
+  scheduler.scheduleTask("opaque", async (task) => { await task.yield(); });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextTimeout();
+  scheduler.clearTask("opaque");
+  for (let n = 0; n < 12; n++) await Promise.resolve();
+  assert.equal(globalScope.__test.timeoutCalls.filter((item) => !item.ran && !item.cleared).length, 0);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.opaque.status, "cancelled");
+});
+
 test("explicit resource wait releases the slot and cancellation prevents its commit", async () => {
   const targetState = createTargetState();
   const globalScope = createTimerScope();

@@ -8,6 +8,7 @@ const REQUIRED_HELPERS = Object.freeze([
   "checkpointBootMetric",
   "completeBootSequenceLogging",
   "ensureActiveScenarioBundleHydrated",
+  "ensureBaseCityDataReady",
   "ensureContextLayerDataReady",
   "ensureFullLocalizationDataReady",
   "reconcileDetailPromotionPoliticalPass",
@@ -66,6 +67,7 @@ export function createStartupReadyHandoffOwner({
   const getStartupUiBootstrapPromise = effects.getStartupUiBootstrapPromise;
   const completeBootSequenceLogging = helpers.completeBootSequenceLogging;
   const ensureActiveScenarioBundleHydrated = helpers.ensureActiveScenarioBundleHydrated;
+  const ensureBaseCityDataReady = helpers.ensureBaseCityDataReady;
   const ensureContextLayerDataReady = helpers.ensureContextLayerDataReady;
   const ensureFullLocalizationDataReady = helpers.ensureFullLocalizationDataReady;
   const reconcileDetailPromotionPoliticalPass = helpers.reconcileDetailPromotionPoliticalPass;
@@ -77,24 +79,33 @@ export function createStartupReadyHandoffOwner({
   let postReadyContextWarmupScheduled = false;
   let postReadyHydrationScheduled = false;
   let lifecycleEpoch = 0;
+  let hydrationScenarioId;
+  let hydrationRequestId;
+  let hydrationScenarioApplyEpoch;
 
-  function scopedTaskOptions(options = {}) {
+  function scopedTaskOptions(options = {}, { scenarioScoped = true } = {}) {
     const epoch = lifecycleEpoch;
     const scenarioId = targetRuntime.activeScenarioId;
     const requestId = targetRuntime.currentScenarioApplyRequestId;
+    const scenarioApplyEpoch = targetRuntime.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
     return {
       // Operational cancellation limits, not input-latency performance budgets.
       maxWaitMs: 120_000,
       maxRunMs: 120_000,
       isCurrent: () => epoch === lifecycleEpoch
-        && targetRuntime.activeScenarioId === scenarioId
-        && targetRuntime.currentScenarioApplyRequestId === requestId,
+        && (!scenarioScoped || (targetRuntime.activeScenarioId === scenarioId
+        && targetRuntime.currentScenarioApplyRequestId === requestId
+        && (targetRuntime.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === scenarioApplyEpoch)),
       ...options,
     };
   }
 
   function reset(reason = "reset") {
     lifecycleEpoch += 1;
+    for (const key of ["post-ready-localization-hydration", "post-ready-scenario-hydration",
+      "post-ready-full-interaction-infra", "post-ready-visual-warmup", DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY]) {
+      postReadyScheduler.clearTask?.(key);
+    }
     postReadyScheduler.clearTask?.("post-ready-context-warmup");
     postReadyScheduler.clearTask?.("post-ready-contour-warmup");
     postReadyContextWarmupScheduled = false;
@@ -107,50 +118,56 @@ export function createStartupReadyHandoffOwner({
   }
 
   function schedulePostReadyHydration() {
-    if (postReadyHydrationScheduled) {
+    if (postReadyHydrationScheduled && hydrationScenarioId === targetRuntime.activeScenarioId
+      && hydrationRequestId === targetRuntime.currentScenarioApplyRequestId
+      && hydrationScenarioApplyEpoch === (targetRuntime.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0)) {
       return;
     }
+    const scheduleLocalization = !postReadyHydrationScheduled;
     postReadyHydrationScheduled = true;
-    postReadyScheduler.scheduleTask("post-ready-localization-hydration", () => (
-      ensureFullLocalizationDataReady({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
+    hydrationScenarioId = targetRuntime.activeScenarioId;
+    hydrationRequestId = targetRuntime.currentScenarioApplyRequestId;
+    hydrationScenarioApplyEpoch = targetRuntime.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+    if (scheduleLocalization) postReadyScheduler.scheduleTask("post-ready-localization-hydration", (task) => task.waitFor(
+      ensureFullLocalizationDataReady({ reason: "post-ready-idle", renderNow: true, taskContext: task }).catch((error) => {
+        task.throwIfStale();
         consoleWarn("[boot] Deferred full localization hydration failed during idle scheduling.", error);
         return null;
       })
-    ), {
+    ), scopedTaskOptions({
       timeout: 2200,
       delayMs: 1200,
       retryDelayMs: 600,
-    });
-    postReadyScheduler.scheduleTask("post-ready-scenario-hydration", () => (
-      ensureActiveScenarioBundleHydrated({ reason: "post-ready-idle", renderNow: true }).catch((error) => {
+    }, { scenarioScoped: false }));
+    postReadyScheduler.scheduleTask("post-ready-scenario-hydration", (task) => task.waitFor(
+      ensureActiveScenarioBundleHydrated({ reason: "post-ready-idle", renderNow: true, taskContext: task }).catch((error) => {
+        task.throwIfStale();
         consoleWarn("[boot] Deferred full scenario hydration failed during idle scheduling.", error);
         return null;
       })
-    ), {
+    ), scopedTaskOptions({
       timeout: 4800,
       delayMs: shouldFastTrackScenarioHydration() ? 300 : 4200,
       retryDelayMs: shouldFastTrackScenarioHydration() ? 450 : 900,
-    });
+    }));
   }
 
   function schedulePostReadyPoliticalReconcileTask(reason = "detail-promotion-political-reconcile") {
     const normalizedReason = normalizeReadyReason(reason, "detail-promotion-political-reconcile");
-    postReadyScheduler.scheduleTask(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, () => {
-      if (!targetRuntime.detailPromotionCompleted) {
-        schedulePostReadyPoliticalReconcileTask(normalizedReason);
-        return false;
+    postReadyScheduler.scheduleTask(DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY, async (task) => {
+      task.throwIfStale();
+      while (!targetRuntime.detailPromotionCompleted
+        || !task.commit(() => reconcileDetailPromotionPoliticalPass(normalizedReason))) {
+        await task.yield();
       }
-      const requested = reconcileDetailPromotionPoliticalPass(normalizedReason);
-      if (!requested) {
-        schedulePostReadyPoliticalReconcileTask(normalizedReason);
-      }
-      return requested;
-    }, {
+      return true;
+    }, scopedTaskOptions({
+      canStart: () => !!targetRuntime.detailPromotionCompleted,
       timeout: 1200,
       delayMs: 0,
       retryDelayMs: 320,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
-    });
+    }));
     return true;
   }
 
@@ -219,6 +236,7 @@ export function createStartupReadyHandoffOwner({
     handleUiBootstrapReady,
     handleUiBootstrapFailure,
   } = {}) {
+    const epoch = lifecycleEpoch;
     const startupUiBootstrapPromise = getStartupUiBootstrapPromise();
     if (!startupUiBootstrapPromise || typeof startupUiBootstrapPromise.then !== "function") {
       return Promise.resolve({ ready: false, skipped: true, error: null });
@@ -234,6 +252,7 @@ export function createStartupReadyHandoffOwner({
     }
     return Promise.resolve(startupUiBootstrapPromise)
       .then(async () => {
+        if (epoch !== lifecycleEpoch) return { ready: false, skipped: true, error: null };
         markUiHydrationReady();
         runPostScenarioUiReplay({
           full: true,
@@ -245,6 +264,7 @@ export function createStartupReadyHandoffOwner({
         return { ready: true, skipped: false, error: null };
       })
       .catch(async (error) => {
+        if (epoch !== lifecycleEpoch) return { ready: false, skipped: true, error: null };
         commitUiHydrationState({
           status: "failed",
           error: error?.message || String(error || "UI hydration failed."),
@@ -256,24 +276,24 @@ export function createStartupReadyHandoffOwner({
   }
 
   function startDeferredFullInteractionInfrastructureBuild(reason = "post-ready-full-interaction") {
-    postReadyScheduler.scheduleTask("post-ready-full-interaction-infra", () => {
-      if (targetRuntime.detailDeferred && !targetRuntime.detailPromotionCompleted) {
-        startDeferredFullInteractionInfrastructureBuild(`${reason}-after-detail`);
-        return false;
-      }
+    postReadyScheduler.scheduleTask("post-ready-full-interaction-infra", (task) => {
+      task.throwIfStale();
       return buildInteractionInfrastructureAfterStartup({
+        taskContext: task,
         chunked: true,
         buildHitCanvas: false,
         mode: "full",
       }).catch((error) => {
+        task.throwIfStale();
         consoleWarn(`[boot] Deferred full interaction infrastructure build failed. reason=${reason}`, error);
       });
-    }, {
+    }, scopedTaskOptions({
+      canStart: () => !targetRuntime.detailDeferred || !!targetRuntime.detailPromotionCompleted,
       timeout: 1200,
       delayMs: 180,
       retryDelayMs: 320,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
-    });
+    }));
   }
 
   function schedulePostReadyVisualWarmup() {
@@ -282,16 +302,17 @@ export function createStartupReadyHandoffOwner({
     if (textureMode === "none" && !dayNightEnabled) {
       return;
     }
-    postReadyScheduler.scheduleTask("post-ready-visual-warmup", async () => {
+    postReadyScheduler.scheduleTask("post-ready-visual-warmup", async (task) => {
+      task.throwIfStale();
       if (!targetRuntime.bootBlocking) {
-        requestMainRender("post-ready-visual-warmup");
+        task.commit(() => requestMainRender("post-ready-visual-warmup"));
       }
-    }, {
+    }, scopedTaskOptions({
       timeout: 1200,
       delayMs: 900,
       retryDelayMs: 320,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
-    });
+    }, { scenarioScoped: false }));
   }
 
   function schedulePostReadyDeferredContextWarmup() {
@@ -312,8 +333,7 @@ export function createStartupReadyHandoffOwner({
     }
     const shouldWarmCities =
       targetRuntime.showCityPoints !== false
-      && targetRuntime.baseCityDataState === "idle"
-      && typeof targetRuntime.ensureBaseCityDataFn === "function";
+      && targetRuntime.baseCityDataState === "idle";
     if (!requestedLayerNames.length && !shouldWarmCities) {
       return;
     }
@@ -326,12 +346,13 @@ export function createStartupReadyHandoffOwner({
       const tasks = [];
       if (requestedLayerNames.length) {
         tasks.push(ensureContextLayerDataReady(requestedLayerNames, {
+          taskContext: task,
           reason: "post-ready",
           renderNow: false,
         }));
       }
-      if (shouldWarmCities && targetRuntime.baseCityDataState === "idle" && typeof targetRuntime.ensureBaseCityDataFn === "function") {
-        tasks.push(targetRuntime.ensureBaseCityDataFn({ reason: "post-ready", renderNow: false }));
+      if (shouldWarmCities && targetRuntime.baseCityDataState === "idle") {
+        tasks.push(ensureBaseCityDataReady({ reason: "post-ready", renderNow: false, taskContext: task }));
       }
       await task.waitFor(Promise.allSettled(tasks));
       task.commit(() => requestMainRender("post-ready-context-warmup"));
@@ -349,6 +370,7 @@ export function createStartupReadyHandoffOwner({
         }
         await task.yield();
         await task.waitFor(ensureContextLayerDataReady(requestedContourLayerNames, {
+          taskContext: task,
           reason: "post-ready-contours",
           renderNow: false,
         }));

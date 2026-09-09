@@ -54,3 +54,22 @@ test("new request completes its generation in the fetch continuation without an 
   assert.ok(f.bundle.chunkPayloadCacheById[f.meta.id]);
   await result;
 });
+
+test("entry requests retain shared cached payload identity in caller-owned wrappers", async () => {
+  const f = fixture();
+  const first = f.loader.loadScenarioChunkPayloadEntries(f.bundle, [f.meta]);
+  const second = f.loader.loadScenarioChunkPayloadEntries(f.bundle, [f.meta]);
+  const geometry = { type: "FeatureCollection", features: [] };
+  f.resolve({ payload: geometry });
+  const [firstEntries, secondEntries] = await Promise.all([first, second]);
+  const cachedEntries = await f.loader.loadScenarioChunkPayloadEntries(f.bundle, [f.meta]);
+  assert.equal(f.loadCount(), 1);
+  assert.notEqual(firstEntries, secondEntries);
+  assert.notEqual(firstEntries[0], secondEntries[0]);
+  assert.equal(firstEntries[0].payload, f.bundle.chunkPayloadCacheById[f.meta.id]);
+  assert.equal(secondEntries[0].payload, firstEntries[0].payload);
+  assert.equal(cachedEntries[0].payload, firstEntries[0].payload);
+  assert.equal(firstEntries[0].payload.payload, geometry);
+  firstEntries[0].chunkId = "caller-local";
+  assert.equal(secondEntries[0].chunkId, f.meta.id);
+});

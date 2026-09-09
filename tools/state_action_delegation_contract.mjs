@@ -375,6 +375,36 @@ const SPECIAL_ZONE_ACTION_EXPORT_NAMES = Object.freeze([
 ]);
 
 const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
+  Object.freeze({
+    modulePath: "js/core/state/actions/content_load_actions.js",
+    exportNames: Object.freeze(["finishBaseCitySupportLoad", "finishFullLocalizationLoad", "finishContextLayerLoad"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: "js/core/state/actions/renderer_transaction_diagnostics_actions.js",
+    exportNames: Object.freeze(["ensureRenderTransactionDiagnosticsState", "advanceScenarioApplyEpochState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: SCENARIO_PALETTE_ACTION_MODULE_PATH,
+    exportNames: Object.freeze(["patchLegendPaletteState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: "js/core/state/actions/legend_actions.js",
+    exportNames: Object.freeze(["ensureLegendState", "patchLegendState", "setLegendLabelState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
+    exportNames: Object.freeze([
+      "trimScenarioBundleCacheState",
+      "clearScenarioBundleChunkProtectionState",
+      "removeScenarioBundleChunkPayloadState",
+      "removeScenarioBundleCacheEntryState",
+    ]),
+    introducedInPhase: "P4.4",
+  }),
   ...[
     SCENARIO_PRESENTATION_ACTION_MODULE_PATH,
     UI_VISIBILITY_ACTION_MODULE_PATH,
@@ -790,6 +820,204 @@ function scenarioDetailConservativeFinding(
 }
 
 export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "normalizeLabels",
+  "targetParameterName": "value",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "4838808f5753e0ab92bd43e3dbe5e799766e05b7929315e646c4b89a784a7ab3",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {
+    "normalizeColor": "0056e3c114fca25c0bd010a717d1376e45aa3733448faab76776a22c8a3cb734"
+  },
+  "conservativeFindings": []
+}),
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "normalizeColorOrder",
+  "targetParameterName": "value",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "ce99b5efe1510ebac8662962ddb148a61aab251ff366ff6ec544847e996ba62f",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {
+    "normalizeColor": "0056e3c114fca25c0bd010a717d1376e45aa3733448faab76776a22c8a3cb734"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeColorOrder\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "923fe53966c6cd9343e11af776cd4b05be315ea4b200b02e4d5dfb0f929b73bf",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "normalizeLegendConfig",
+  "targetParameterName": "value",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "2942db1de8d263cad9f210f45c6a162714139e51dbb3df361d270a9d9be70284",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {},
+  "conservativeFindings": []
+}),
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "normalizeLegendControl",
+  "targetParameterName": "value",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "65ce45fd619647d6c2af095ef8784832b8fd9dfd327e42ca8d04f60b8a556d9c",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {
+    "clampNumber": "d3c8031cc777389f1db77853c8eb8f035a6352b2c5ac088aa7604a76988a9236"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeLegendControl\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f5b3c61db26736b6ded41aa82f8e896db993055956b871aad3af70377b5f3d0d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeLegendControl\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "fac0303db1408f5ba08f8a3c14b735bb3a2c96e88955f064ca9b076eb8aa6335",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeLegendControl\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a84b24495a15ced1c0e420cf31933ae647265edbab1bcd4f2df0801a5e4be686",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeLegendControl\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1abd5470f4c5d68af89800b0946cef1192d677a0611ea559a562ab74b0abfa09",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeLegendControl\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "0b5863751e7d47e7348f188fb67b638707b31c96ebf3549e59d96e2bc4c9d45b",
+      "count": 1
+    }
+  ]
+}),
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "getUniqueLegendColors",
+  "targetParameterName": "appState",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "078f05ade9b8ab403e8d365b38bf3d5868f0382d790e38ce0993fd254be0d13c",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {
+    "normalizeColorOrder": "ce99b5efe1510ebac8662962ddb148a61aab251ff366ff6ec544847e996ba62f",
+    "normalizeColor": "0056e3c114fca25c0bd010a717d1376e45aa3733448faab76776a22c8a3cb734"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getUniqueLegendColors\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "legendColorOrder",
+      "sourceFingerprint": "c8b4867508471920f1c1853bdb45071da159dc1f386710bb858dddf39f9bdc27",
+      "count": 1
+    }
+  ]
+}),
+freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/legend_state_normalizers.js",
+  "functionName": "getLegendColorRevisionKey",
+  "targetParameterName": "appState",
+  "importedArgumentCount": 1,
+  "sourceFingerprint": "cdf6c83fe1ccba36ff13fa188da588c0ab23309a92a40ac5148f6b83260b13aa",
+  "allowBorrowedTarget": true,
+  "localFunctionFingerprints": {
+    "normalizeColorOrder": "ce99b5efe1510ebac8662962ddb148a61aab251ff366ff6ec544847e996ba62f",
+    "normalizeColor": "0056e3c114fca25c0bd010a717d1376e45aa3733448faab76776a22c8a3cb734"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getLegendColorRevisionKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "legendColorOrder",
+      "sourceFingerprint": "c8b4867508471920f1c1853bdb45071da159dc1f386710bb858dddf39f9bdc27",
+      "count": 1
+    }
+  ]
+}),
+  // Coverage uses borrowed scene inputs and returns detached scalar/sample data.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/scenario_chunk_promotion_helpers.js",
+  "functionName": "analyzeScenarioPoliticalDerivedStateCoverage",
+  "targetParameterName": "runtimeState",
+  "sourceFingerprint": "9630df7917a5e7b3509fc089734917818d5ddd8317903b421b98c367570ff4c8",
+  "importedArgumentCount": 1,
+  "localFunctionFingerprints": {
+    "getFeatureCollectionFeatures": "e1a8a6c9a1bb7968a52e0ae8aed7f1c1862a45f8a5cc5f6b00cc3675e20b21b6",
+    "collectFeatureIdSet": "139e43dd1f00389c8e6e4a59e556f630cc3df23f5ae6e47afdd26f202b953967",
+    "getMissingFeatureIdSample": "0de8806d203d060439d08e570190d693e750f6f2944641ae8e8dbb277a089274"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"analyzeScenarioPoliticalDerivedStateCoverage\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioPoliticalChunkData",
+      "sourceFingerprint": "c024782e27a373543558bb66fb1cf9475829b276e80bfaca5ca61d93b8585073",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"analyzeScenarioPoliticalDerivedStateCoverage\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioPoliticalVisibleChunkData",
+      "sourceFingerprint": "0b6ab5f5502a69e63c362ba5066ce94639dffd4721206ab983818dcd0dbf6184",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"analyzeScenarioPoliticalDerivedStateCoverage\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "landData",
+      "sourceFingerprint": "0fd4d335198763a982ae64517b274530ce4975db4efbf1fef68c70e3a3385e3b",
+      "count": 1
+    }
+  ]
+}),
+  // Returns newly allocated string IDs; live bundles and entries remain borrowed
+  // read inputs. Actual eviction is performed by the canonical activation action.
+  freezeStateTargetPureReaderEntry({
+    modulePath: "js/core/scenario/bundle_cache_policy.js",
+    functionName: "getScenarioChunkPayloadEvictionIds",
+    targetParameterName: "bundle",
+    sourceFingerprint: "a5a8980315d54289b51d3f6b901118c94490f2981103a99cd8b453a6d2815f94",
+    allowBorrowedTarget: true,
+    importedArgumentCount: 1,
+    conservativeFindings: [
+      ["06a3f95d90319f606623f626102f5b792f8a9366a72257623f701e105e749f90", 1],
+      ["5d0ff787e23deec7d6d7888d48ac87812247b6962ea3c77c340508d8dbaf397a", 1],
+      ["c75c997274dc0bde9157ba2ffdcf72b6027cfee0760fc5fb5ec8b61692a35cbe", 2],
+    ].map(([sourceFingerprint, count]) => ({
+      enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getScenarioChunkPayloadEvictionIds","ordinal":0}]}',
+      reason: "state-alias-escape", operation: "unsupported", key: "*", sourceFingerprint, count,
+    })),
+  }),
   // Document identity deliberately borrows the two history array references as
   // comparison tokens; no consumer mutates through them. This is not a deep snapshot.
   freezeStateTargetPureReaderEntry({
@@ -798,86 +1026,13 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   "targetParameterName": "target",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "0015f28bd7b34113ecfc187b61172db82b368b64d64e7fc534415cdda350866c",
+  "sourceFingerprint": "50b3fa1014131652b85c6be5a22723a804a6924b30cc88dc2fa1e3fed8f70b5d",
   "importedArgumentCount": 0,
   "allowBorrowedTarget": false,
   "localFunctionFingerprints": {},
-  "acceptedEscapes": [],
   "reviewedReadSiteFingerprints": [],
-  "conservativeFindings": [
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "fe4920ab87273ce1df032fe9cc5580b7b050c6bb14e6dcd24c0c006c65dae221",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "dirtyRevision",
-      "sourceFingerprint": "c5dff085f1ecf80fdb8bfe840e5694edc96da345bb0d423effe9a5f86b28327a",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "activeScenarioId",
-      "sourceFingerprint": "bd369a1292cb1ede5f46d5d758d262e7fce395703e9ef4f3d1ff1267f1dce205",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b44898a0bfc2ed4cd697e2c166ac30cf096b296dfe203fda82a5082c6fcfeeb8",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "currentScenarioApplyRequestId",
-      "sourceFingerprint": "23ccea584464d1e9475514288388fe3d90f656d73d337f7c2fd954e13106ab76",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "historyPast",
-      "sourceFingerprint": "cf1f52ea48580741c1d61861105936c67d8394c73f62922c8efd6dc6ea9e3608",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "historyFuture",
-      "sourceFingerprint": "4b9a5411c558cdb336f74656ed3a78dda0540c83ba9e70bce6e4e8a3ee520059",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "historyPast",
-      "sourceFingerprint": "c9c16322a88962f7cf9932bdd5cc162668141dc5828d0edb91149ee4a391fded",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"captureImportDocumentIdentity\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "historyFuture",
-      "sourceFingerprint": "867a4fb4a0844603312e863b91a0f3be7548a7dee676f94ace61873b96d0db3b",
-      "count": 1
-    }
-  ]
+  "acceptedEscapes": [],
+  "conservativeFindings": []
 }),
   freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/interaction_funnel.js",
@@ -928,18 +1083,18 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   // Import preflight only reads trusted topology/ownership projections; each
   // result is a fresh Set or ownership object. Map iteration is source reviewed.
   freezeStateTargetPureReaderEntry({
-  "modulePath": "js/core/interaction_funnel/import_apply_orchestration.js",
+  "modulePath": "js/core/interaction_funnel/import_trust_projection.js",
   "functionName": "getScenarioImportValidFeatureIds",
   "targetParameterName": "target",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "5a83bfddbd4b1336346c3b6b7f268c44e11e63e55a637202ef2a2f16f6a98326",
-  "importedArgumentCount": 0,
+  "sourceFingerprint": "e1f569b8d5dbb5b053c7e9c434034b7cc7bc1ca89988cf9ffc00d55591d31a23",
+  "importedArgumentCount": 2,
   "allowBorrowedTarget": false,
   "localFunctionFingerprints": {},
   "acceptedEscapes": [],
   "reviewedReadSiteFingerprints": [
-    "55d56837281bfd124a129ad077f4ed6f7e1c625b2d5c9a3894f49215d0bda3c9"
+    "2a3f88c19bcbf4ceb733620430e27a19ee9088d6de6f928f5722addd844e1617"
   ],
   "conservativeFindings": [
     {
@@ -955,7 +1110,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "runtimeFeatureIndexById",
-      "sourceFingerprint": "55d56837281bfd124a129ad077f4ed6f7e1c625b2d5c9a3894f49215d0bda3c9",
+      "sourceFingerprint": "2a3f88c19bcbf4ceb733620430e27a19ee9088d6de6f928f5722addd844e1617",
       "count": 1
     },
     {
@@ -969,27 +1124,27 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   ]
 }),
   freezeStateTargetPureReaderEntry({
-  "modulePath": "js/core/interaction_funnel/import_apply_orchestration.js",
+  "modulePath": "js/core/interaction_funnel/import_trust_projection.js",
   "functionName": "resolveImportedOwnershipState",
-  "targetParameterName": "target",
-  "targetParameterIndex": 1,
+  "targetParameterName": "data",
+  "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "c4b8c1f9b6b37086a2a3fd1a005cfc630e3bdd62f3d49e09a2c1cba812853f13",
-  "importedArgumentCount": 0,
+  "sourceFingerprint": "6baa3db16ae9bf40d4f663aa5694901d9b64a590e676075de7933553a9b6633e",
+  "importedArgumentCount": 2,
   "allowBorrowedTarget": false,
   "localFunctionFingerprints": {},
   "acceptedEscapes": [],
   "reviewedReadSiteFingerprints": [],
   "conservativeFindings": [
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveImportedOwnershipState\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "2afd8e59cb52025ac96612b8754f9cf40e095a23c61d098be6d18fcc5f3a2ad3",
-      "count": 1
-    }
-  ]
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveImportedOwnershipState\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "sovereigntyByFeatureId",
+    "sourceFingerprint": "ed8a7f8b9ada9fc6e308b97db6117a2e9afabd4285af5f1f615be3d769b4da09",
+    "count": 1
+  }
+]
 }),
   freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/renderer/fill_target_policy.js",
@@ -2051,14 +2206,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   "targetParameterPath": "$",
   "sourceFingerprint": "f9e236ec7300fb094535764db2eea2efa6fe2514d0fffed94fce8ba530d01387",
   "conservativeFindings": [
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterFillLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "e0962e33df9a3d2e7f82c8baae3639a9ce39285a6847aa7b0134797e572e5a0a",
-      "count": 1
-    },
+
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterFillLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
       "reason": "state-alias-escape",
@@ -2742,14 +2890,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
     sourceFingerprint: "4abc2b6fd9d5c5a818fc6bd88e4e5125f63092d359140e725124022f62304677",
     // The indexed adapter returns the detached application result; it returns no target reference.
     conservativeFindings: [
-      {
-        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRegionalPresetController\",\"ordinal\":0},{\"name\":\"applyPresetWithMode\",\"ordinal\":0}]}",
-        "reason": "state-alias-escape",
-        "operation": "unsupported",
-        "key": "*",
-        "sourceFingerprint": "0b63087c37f3465c3a7e584136408fc72ae39a39b6ced22cd98120f30389ec74",
-        "count": 1
-      },
+
     ],
   }),
   // Query-only model: these two returns deliberately preserve borrowed metadata identity.
@@ -3279,7 +3420,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "506a3145b37deb016c6193c09371f6fc0dadc6c146234ee57fa19ac3eb39c7f4",
   "factoryModulePath": "js/core/scenario/chunk_payload_loader.js",
   "factoryExportName": "createScenarioChunkPayloadLoader",
-  "factorySourceFingerprint": "fabe1b1f44f119c11f6252aaa27ec6e6725375ae9c0104f52b8e39ca75caf7ff",
+  "factorySourceFingerprint": "872d1eca77a7db583222abf4a316c630141372121c7a19ecfb49fd58792fbeef",
   "ownerBindingName": "owner",
   "methods": [
     "loadScenarioChunkPayload",
@@ -3869,11 +4010,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/main.js",
     compositionExportName: "getStartupReadyHandoffOwner",
     compositionSourceFingerprint:
-      "d95f89b89a45a0334a8f227572f5ee3dabb39415aadb9929961de3e3eff1c709",
+      "671db953deac93bd1e92ad8d8c11dfda2bf87f617ba5ed99c634aab0f6ce24e8",
     factoryModulePath: "js/bootstrap/startup_ready_handoff.js",
     factoryExportName: "createStartupReadyHandoffOwner",
     factorySourceFingerprint:
-      "b094480747a9422eece8b10726786dd2baf535935ef12e09f8a8ecd8caee974f",
+      "e794556d4692ccfd0192aa4b1275bbadfdbfa9fccf9d88140ae9caf1aa23d643",
     ownerBindingName: "startupReadyHandoffOwner",
     methods: [
       "beginUiHydration",
@@ -5211,6 +5352,28 @@ const RENDER_PERF_METRIC_DYNAMIC_SITES = Object.freeze([
 ]);
 
 const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
+  ["js/core/state/actions/content_load_actions.js#finishContextLayerLoad", Object.freeze([
+    freezeAllowedDynamicSite({ operation: "delete", key: "contextLayerLoadPromiseByName", pathPattern: "contextLayerLoadPromiseByName.*" }),
+    freezeAllowedDynamicSite({ operation: "assign", key: "contextLayerLoadStateByName", pathPattern: "contextLayerLoadStateByName.*" }),
+    freezeAllowedDynamicSite({ operation: "assign", key: "contextLayerLoadErrorByName", pathPattern: "contextLayerLoadErrorByName.*" }),
+  ])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#trimScenarioBundleCacheState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.chunkPayloadProtectedIds" }),
+    freezeAllowedDynamicSite({ operation: "delete", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.chunkPayloadCacheById.*" }),
+    freezeAllowedDynamicSite({ operation: "delete", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*" }),
+  ])],
+  ["js/core/state/actions/renderer_transaction_diagnostics_actions.js#advanceScenarioApplyEpochState", Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "renderTransactionDiagnostics", pathPattern: "renderTransactionDiagnostics.scenarioApplyEpochByScenarioId.*" }),
+  ])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#clearScenarioBundleChunkProtectionState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.chunkPayloadProtectedIds" }),
+  ])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#removeScenarioBundleChunkPayloadState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "delete", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*.chunkPayloadCacheById.*" }),
+  ])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#removeScenarioBundleCacheEntryState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "delete", key: "scenarioBundleCacheById", pathPattern: "scenarioBundleCacheById.*" }),
+  ])],
   [
     `${INTENSITY_FIELD_ACTION_MODULE_PATH}#appendIntensityFieldPointState`,
     Object.freeze([
@@ -5506,6 +5669,126 @@ successorEntries.push(
     carrierFunctions: [{ functionName: "setHoveredFeatureIdsState", sourceFingerprint: "f8a2836a2bd862986f8178c0158e7d11d39f82e119623d68525d59f1d984c0a4" }],
     successorEdges: [successorEdge(SCENARIO_PRESENTATION_ACTION_MODULE_PATH, "setScenarioHoverRegionIdsState", "e3463a5e9d61e6396d301ed94bee7a39a9d6b9637ab2d9bc9acb0a805a76dbc5", 0, '{"kind":"function","ancestry":[{"name":"setHoveredFeatureIdsState","ordinal":0}]}')],
   }),
+);
+
+for (const key of ["legendLabels", "legendConfig"]) {
+  successorEntries.push(freezeActionSuccessorProofEntry({
+    modulePath: "js/core/state/actions/legend_actions.js",
+    exportName: "patchLegendState",
+    replacementMembership: `color|P4.4|assign|${key}`,
+    carrierFunctions: [{ functionName: "patchLegendState", sourceFingerprint: "15960db1542112d203f5543680dddc235ee4a47b178835117298f557db18cabf" }],
+    successorEdges: [successorEdge(SCENARIO_PALETTE_ACTION_MODULE_PATH, "patchLegendPaletteState", "56fd1abca5818d063f12394d8ad707a716e4357602341617cfb353fcd86133c5", 0,
+      '{"kind":"function","ancestry":[{"name":"patchLegendState","ordinal":0}]}')],
+  }));
+}
+
+// Legend entry points normalize or update a detached label map before the
+// existing palette owner publishes it; deletion is committed as map replacement.
+successorEntries.push(
+freezeActionSuccessorProofEntry({
+  "modulePath": "js/core/state/actions/legend_actions.js",
+  "exportName": "ensureLegendState",
+  "replacementMembership": "color|P4.4|assign|legendConfig",
+  "carrierFunctions": [
+    {
+      "functionName": "ensureLegendState",
+      "sourceFingerprint": "c22f5f0499706c69fae6336721d6ec441cf8d1d677fe8a47b9925115908089ae"
+    },
+    {
+      "functionName": "patchLegendState",
+      "sourceFingerprint": "15960db1542112d203f5543680dddc235ee4a47b178835117298f557db18cabf"
+    }
+  ],
+  "successorEdges": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"patchLegendState\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/scenario_palette_actions.js",
+      "actionExportName": "patchLegendPaletteState",
+      "targetArgumentIndex": 0,
+      "sourceFingerprint": "56fd1abca5818d063f12394d8ad707a716e4357602341617cfb353fcd86133c5",
+      "occurrenceIndex": 0,
+      "terminalMembership": "color|P4.4|assign|legendConfig"
+    }
+  ]
+}),
+freezeActionSuccessorProofEntry({
+  "modulePath": "js/core/state/actions/legend_actions.js",
+  "exportName": "ensureLegendState",
+  "replacementMembership": "color|P4.4|assign|legendLabels",
+  "carrierFunctions": [
+    {
+      "functionName": "ensureLegendState",
+      "sourceFingerprint": "c22f5f0499706c69fae6336721d6ec441cf8d1d677fe8a47b9925115908089ae"
+    },
+    {
+      "functionName": "patchLegendState",
+      "sourceFingerprint": "15960db1542112d203f5543680dddc235ee4a47b178835117298f557db18cabf"
+    }
+  ],
+  "successorEdges": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"patchLegendState\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/scenario_palette_actions.js",
+      "actionExportName": "patchLegendPaletteState",
+      "targetArgumentIndex": 0,
+      "sourceFingerprint": "56fd1abca5818d063f12394d8ad707a716e4357602341617cfb353fcd86133c5",
+      "occurrenceIndex": 0,
+      "terminalMembership": "color|P4.4|assign|legendLabels"
+    }
+  ]
+}),
+freezeActionSuccessorProofEntry({
+  "modulePath": "js/core/state/actions/legend_actions.js",
+  "exportName": "setLegendLabelState",
+  "replacementMembership": "color|P4.4|assign|legendLabels",
+  "carrierFunctions": [
+    {
+      "functionName": "setLegendLabelState",
+      "sourceFingerprint": "3d918915922cf34b42c2e9f412c2942a905cf1e4138bd86f37eaf3fb64c867c6"
+    },
+    {
+      "functionName": "patchLegendState",
+      "sourceFingerprint": "15960db1542112d203f5543680dddc235ee4a47b178835117298f557db18cabf"
+    }
+  ],
+  "successorEdges": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"patchLegendState\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/scenario_palette_actions.js",
+      "actionExportName": "patchLegendPaletteState",
+      "targetArgumentIndex": 0,
+      "sourceFingerprint": "56fd1abca5818d063f12394d8ad707a716e4357602341617cfb353fcd86133c5",
+      "occurrenceIndex": 0,
+      "terminalMembership": "color|P4.4|assign|legendLabels"
+    }
+  ]
+}),
+freezeActionSuccessorProofEntry({
+  "modulePath": "js/core/state/actions/legend_actions.js",
+  "exportName": "setLegendLabelState",
+  "replacementMembership": "color|P4.4|delete|legendLabels",
+  "carrierFunctions": [
+    {
+      "functionName": "setLegendLabelState",
+      "sourceFingerprint": "3d918915922cf34b42c2e9f412c2942a905cf1e4138bd86f37eaf3fb64c867c6"
+    },
+    {
+      "functionName": "patchLegendState",
+      "sourceFingerprint": "15960db1542112d203f5543680dddc235ee4a47b178835117298f557db18cabf"
+    }
+  ],
+  "successorEdges": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"patchLegendState\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/scenario_palette_actions.js",
+      "actionExportName": "patchLegendPaletteState",
+      "targetArgumentIndex": 0,
+      "sourceFingerprint": "56fd1abca5818d063f12394d8ad707a716e4357602341617cfb353fcd86133c5",
+      "occurrenceIndex": 0,
+      "terminalMembership": "color|P4.4|assign|legendLabels"
+    }
+  ]
+})
 );
 
 export const STATE_ACTION_SUCCESSOR_PROOF_CONTRACT = Object.freeze(
