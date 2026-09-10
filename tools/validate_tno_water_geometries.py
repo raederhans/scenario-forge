@@ -1,16 +1,19 @@
 import argparse
 import json
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 from shapely import coverage_invalid_edges, coverage_is_valid
-from shapely.geometry import Point, shape
+from shapely.geometry import Point, box, mapping, shape
 from shapely.ops import nearest_points, unary_union
 from topojson.utils import serialize_as_geojson
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 DEFAULT_SCENARIO_DIR = ROOT / "data" / "scenarios" / "tno_1962"
 DEFAULT_REPORT_PATH = ROOT / ".runtime" / "reports" / "generated" / "tno_water_geometry_report.json"
 WORLD_BBOX_WIDTH_THRESHOLD = 300.0
@@ -426,10 +429,10 @@ def _load_runtime_topology_feature_collection(path: Path, object_name: str) -> d
     return serialize_as_geojson(topology_payload, objectname=object_name)
 
 
-def _load_chunk_feature_collections(scenario_dir: Path) -> list[tuple[str, dict]]:
+def _load_chunk_feature_collections(scenario_dir: Path, pattern: str = "water.*.json") -> list[tuple[str, dict]]:
     chunks_dir = scenario_dir / "chunks"
     feature_collections = []
-    for path in sorted(chunks_dir.glob("water.*.json")):
+    for path in sorted(chunks_dir.glob(pattern)):
         payload = _load_json(path)
         if str(payload.get("type") or "").strip() != "FeatureCollection":
             continue
@@ -898,6 +901,80 @@ def _collect_named_water_snapshot_inflation(feature_collection: dict, snapshot_f
     }
 
 
+# Degrees in the source coordinate system, not kilometres. Existing sea builders
+# reserve 0.03 around coasts, 0.002 around ATL land and 0.0004 between sea patches.
+MEDITERRANEAN_COVERAGE_GUARD = 0.03 + 0.002 + 0.0004
+MEDITERRANEAN_COVERAGE_PROBES = ((18.0, 36.0), (20.0, 36.0), (20.0, 38.0))
+
+
+def _atlantropa_sea_collection(collection: dict) -> dict:
+    return {"type": "FeatureCollection", "features": [
+        feature for feature in collection.get("features", [])
+        if (feature.get("properties") or {}).get("atl_surface_kind") == "sea"
+        or (feature.get("properties") or {}).get("atl_render_layer") == "water"
+    ]}
+
+
+def collect_mediterranean_coverage(
+    *, template: dict, atlantropa: dict, ordinary_water: dict, land: dict,
+    atlantropa_chunks: list[tuple[str, dict]] | None = None,
+    require_chunks: bool = True,
+) -> dict:
+    """Detect uncovered interiors across regional AOIs, allowing only coastal seams."""
+    template_geom = unary_union([shape(f["geometry"]) for f in template.get("features", [])])
+
+    def local_union(features):
+        parts = []
+        for feature in features:
+            geom = shape(feature["geometry"])
+            if not geom.is_valid:
+                geom = geom.buffer(0)
+            if geom.intersects(template_geom):
+                parts.append(geom.intersection(template_geom))
+        return unary_union(parts)
+
+    sea = _atlantropa_sea_collection(atlantropa)
+    sea_ids = {str((f.get("properties") or {}).get("id") or f.get("id")) for f in sea["features"]}
+    atl_land = [f for f in atlantropa.get("features", []) if
+                (f.get("properties") or {}).get("atl_render_layer") == "land"
+                or (f.get("properties") or {}).get("atl_surface_kind") == "land"]
+    fixed_coverage = local_union(land.get("features", []) + atl_land + ordinary_water.get("features", []))
+    collections = {"source": sea}
+    if require_chunks:
+        # Each LOD must stand alone; a complete coarse layer must not conceal
+        # a missing detail tile when the renderer promotes to detail geometry.
+        for lod in ("coarse", "detail"):
+            collections[f"chunks:{lod}"] = _atlantropa_sea_collection({
+                "features": [f for label, collection in atlantropa_chunks or []
+                             if f".{lod}." in label for f in collection.get("features", [])]
+            })
+    surfaces = {}
+    failures = []
+    for label, collection in collections.items():
+        sea_geom = local_union(collection["features"])
+        uncovered = template_geom.difference(fixed_coverage.union(sea_geom))
+        interior = uncovered.buffer(-MEDITERRANEAN_COVERAGE_GUARD)
+        probes = [{"point": list(point), "covered": bool(sea_geom.covers(Point(point)))}
+                  for point in MEDITERRANEAN_COVERAGE_PROBES if template_geom.covers(Point(point))]
+        ids = {str((f.get("properties") or {}).get("id") or f.get("id")) for f in collection["features"]}
+        missing_ids = sorted(sea_ids - ids)
+        surfaces[label] = {
+            "uncovered_area_degrees2": float(uncovered.area),
+            "interior_gap_area_degrees2": float(interior.area),
+            "interior_gap_bounds": list(interior.bounds) if not interior.is_empty else None,
+            "probes": probes, "missing_sea_ids": missing_ids,
+        }
+        if interior.area > 1e-10:
+            failures.append(f"{label}: uncovered Mediterranean interior")
+        if any(not probe["covered"] for probe in probes):
+            failures.append(f"{label}: missing Ionian probe coverage")
+        if missing_ids:
+            failures.append(f"{label}: missing Atlantropa sea features")
+    return {"coastal_guard_degrees": MEDITERRANEAN_COVERAGE_GUARD,
+            "coverage_domain_bounds": template.get("coverage_domain_bounds"),
+            "surfaces": surfaces, "failures": failures}
+
+
 def build_report_from_collections(
     *,
     scenario_id: str,
@@ -910,6 +987,9 @@ def build_report_from_collections(
     runtime_context_land_mask: dict | None = None,
     chunk_feature_collections: list[tuple[str, dict]] | None = None,
     require_chunks: bool = True,
+    mediterranean_template: dict | None = None,
+    scenario_atlantropa: dict | None = None,
+    atlantropa_chunk_feature_collections: list[tuple[str, dict]] | None = None,
 ) -> dict:
     d3_runtime_collections = {}
     if runtime_topology_payload is not None:
@@ -949,6 +1029,18 @@ def build_report_from_collections(
         d3_collections["aq_polar_runtime"] = aq_polar_runtime
     for label, collection in chunk_feature_collections or []:
         d3_collections[f"chunk:{label}"] = collection
+    mediterranean_checks = {}
+    if mediterranean_template is not None and scenario_atlantropa is not None:
+        mediterranean_checks["mediterranean_coverage"] = collect_mediterranean_coverage(
+            template=mediterranean_template, atlantropa=scenario_atlantropa,
+            ordinary_water=source_water, land=runtime_land_mask or runtime_political,
+            atlantropa_chunks=atlantropa_chunk_feature_collections, require_chunks=require_chunks,
+        )
+        mediterranean_checks["atlantropa_sea"] = _collect_feature_metrics(
+            _atlantropa_sea_collection(scenario_atlantropa), label="scenario_atlantropa::sea")
+        d3_collections["atlantropa_sea"] = _atlantropa_sea_collection(scenario_atlantropa)
+        for label, collection in atlantropa_chunk_feature_collections or []:
+            d3_collections[f"chunk:{label}"] = _atlantropa_sea_collection(collection)
     d3_spherical_metrics = collect_d3_spherical_metrics(d3_collections)
     source_ids = set(source_metrics["feature_ids"])
     runtime_ids = set(runtime_metrics["feature_ids"])
@@ -964,6 +1056,7 @@ def build_report_from_collections(
             },
         },
         "checks": {
+            **mediterranean_checks,
             "source": source_metrics,
             "runtime": runtime_metrics,
             "runtime_land_mask": runtime_land_mask_metrics,
@@ -1001,6 +1094,25 @@ def build_report_from_collections(
     }
 
 
+def load_declared_mediterranean_template() -> dict:
+    # Lazy import: the builder also uses this validator for intermediate stages.
+    from tools.patch_tno_1962_bundle import mediterranean_construction_domain_bounds
+
+    domain_bounds = mediterranean_construction_domain_bounds()
+    if domain_bounds is None:
+        raise ValueError("Mediterranean construction domain is empty.")
+    domain = box(*domain_bounds)
+    features = []
+    for feature in _load_json(ROOT / "data" / "water_regions.geojson")["features"]:
+        if (feature.get("properties") or {}).get("region_group") != "mediterranean":
+            continue
+        geom = shape(feature["geometry"]).intersection(domain)
+        if not geom.is_empty:
+            features.append({**feature, "geometry": mapping(geom)})
+    return {"type": "FeatureCollection", "features": features,
+            "coverage_domain_bounds": list(domain.bounds)}
+
+
 def build_report(scenario_dir: Path) -> dict:
     return build_report_from_collections(
         scenario_id=scenario_dir.name,
@@ -1009,6 +1121,11 @@ def build_report(scenario_dir: Path) -> dict:
         named_water_snapshot=_load_json(scenario_dir / "derived" / "marine_regions_named_waters.snapshot.geojson"),
         chunk_feature_collections=_load_chunk_feature_collections(scenario_dir),
         require_chunks=True,
+        mediterranean_template=load_declared_mediterranean_template(),
+        scenario_atlantropa=_topology_objects_to_feature_collections_for_d3(
+            _load_json(scenario_dir / "scenario_atlantropa.topo.json"), ["scenario_atlantropa"]
+        )["scenario_atlantropa"],
+        atlantropa_chunk_feature_collections=_load_chunk_feature_collections(scenario_dir, "scenario_atlantropa.*.json"),
     )
 
 
@@ -1018,6 +1135,10 @@ def summarize_failures(report: dict, *, require_chunks: bool = True) -> list[str
     section_names = ["source", "runtime", "runtime_land_mask", "runtime_context_land_mask"]
     if require_chunks:
         section_names.append("chunks")
+    if "atlantropa_sea" in checks:
+        section_names.append("atlantropa_sea")
+    for failure in (checks.get("mediterranean_coverage") or {}).get("failures", []):
+        failures.append(f"mediterranean_coverage: {failure}")
     for section_name in section_names:
         section = checks[section_name]
         if section["invalid_feature_ids"]:

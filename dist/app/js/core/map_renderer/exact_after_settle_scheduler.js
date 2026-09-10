@@ -280,12 +280,22 @@ function createExactAfterSettleScheduler({
     const resolvedProfile = profile || getAdaptiveSettleProfile();
     const reuseDecision = getContextBaseReuseDecision();
     const forceExactContextBaseRefresh = shouldForceExactContextBaseRefresh(reuseDecision);
+    const referenceScale = Number(reuseDecision.referenceTransform?.k);
+    const currentScale = Number(runtimeState.zoomTransform?.k);
+    const urbanZoomExactRefresh = !!reuseDecision.enabled
+      && !!runtimeState.showUrban
+      && Array.isArray(runtimeState.urbanData?.features)
+      && runtimeState.urbanData.features.length > 0
+      && Number.isFinite(referenceScale) && referenceScale > 0
+      && Number.isFinite(currentScale) && currentScale > 0
+      && referenceScale !== currentScale;
     return createExactAfterSettleRefreshPlan({
       profile: resolvedProfile,
       scheduleStartedAt,
       callbackStartedAt,
       reuseDecision,
       forceExactContextBaseRefresh,
+      urbanZoomExactRefresh,
       metricSequenceStartedAt: Math.max(0, Number(runtimeState.renderPerfMetricSequence || 0)),
     });
   }
@@ -330,6 +340,11 @@ function createExactAfterSettleScheduler({
           crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
         });
       }
+    }
+    // Urban strokes use screen pixels. A reused bitmap needs a fresh context pass
+    // after scale changes, independently of the physical-layer refresh policy.
+    if (plan.urbanZoomExactRefresh) {
+      invalidateRenderPasses("contextBase", "urban-zoom-exact");
     }
     const deferContextBaseEnhancements = shouldDeferContextBaseEnhancementsForExactRefresh(
       reuseDecision,

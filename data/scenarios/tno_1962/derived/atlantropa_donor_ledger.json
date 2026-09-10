@@ -7,7 +7,7 @@
         22.5,
         40.0
       ],
-      "bbox_candidate_count": 19,
+      "bbox_candidate_count": 20,
       "chunk_missing_feature_ids": [],
       "expected_prefixes": [
         "ATLSEA_",
@@ -16,7 +16,7 @@
       "failure_reasons": [],
       "id": "ionian_mediterranean",
       "label": "Ionian Mediterranean",
-      "match_count": 19,
+      "match_count": 20,
       "matching_feature_ids": [
         "ATLSEA_FILL_adriatica_10",
         "ATLSEA_FILL_adriatica_37",
@@ -32,6 +32,7 @@
         "ATLSEA_FILL_aegean_60",
         "ATLSEA_FILL_aegean_61",
         "ATLSEA_FILL_libya_suez_9",
+        "ATLSEA_FILL_mediterranean_1",
         "ATLSEA_FILL_tyrrhenian_33",
         "ATLSEA_adriatica_8601_5913_0",
         "ATLSEA_adriatica_8602_5864_0",
@@ -47,7 +48,7 @@
         34.2,
         35.3
       ],
-      "bbox_candidate_count": 87,
+      "bbox_candidate_count": 88,
       "chunk_missing_feature_ids": [],
       "expected_prefixes": [
         "ATLPRV_",
@@ -57,7 +58,7 @@
       "failure_reasons": [],
       "id": "libya_suez_chain",
       "label": "Libya and Suez Atlantropa Chain",
-      "match_count": 87,
+      "match_count": 88,
       "matching_feature_ids": [
         "ATLPRV_18129",
         "ATLPRV_18132",
@@ -202,7 +203,7 @@
         31.0,
         36.9
       ],
-      "bbox_candidate_count": 52,
+      "bbox_candidate_count": 53,
       "chunk_missing_feature_ids": [],
       "expected_prefixes": [
         "ATLISL_",
@@ -212,7 +213,7 @@
       "failure_reasons": [],
       "id": "cretan_mediterranean",
       "label": "Cretan Mediterranean",
-      "match_count": 52,
+      "match_count": 53,
       "matching_feature_ids": [
         "ATLISL_aegean_GRE_1",
         "ATLISL_aegean_GRE_15",
@@ -261,9 +262,9 @@
         "ATLSEA_FILL_libya_suez_22",
         "ATLSEA_FILL_libya_suez_23",
         "ATLSEA_FILL_libya_suez_9",
+        "ATLSEA_FILL_mediterranean_1",
         "ATLSEA_aegean_8608_6608_1",
-        "ATLSEA_aegean_8610_225_0",
-        "ATLSEA_aegean_8619_428_0"
+        "ATLSEA_aegean_8610_225_0"
       ],
       "ok": true
     }
@@ -9497,6 +9498,33 @@
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 43.451677,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        16.5,
+        35.2,
+        22.0,
+        38.8
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "mediterranean_sea",
+      "donor_province": "1",
+      "donor_state": "ATL",
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_mediterranean_1",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 12.750923,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -24506,20 +24534,20 @@
   ],
   "scenario_id": "tno_1962",
   "source": {
-    "detail_chunk_manifest_sha256": "a24c4458361bc0b03cb152e971ba59e237b8a72eddfd344ed4ab8b6914da9a8b",
-    "runtime_topology_sha256": "06830553628cdb532bb444b5225e319b20683215c47573af59e173f3e836232d",
-    "scenario_atlantropa_metadata_sha256": "0fa60f68069c5498b6bf4718e0ff56ea66cf45142778fad3760fb9c92de552ad"
+    "detail_chunk_manifest_sha256": "84a28520add46b579d2fcc9015d5d270e1b7d1cc18ecc3eab7b29c35e5d8f948",
+    "runtime_topology_sha256": "f66e57b22529c510f790f7b2310b87ae701918db20331917c598df363c2f6d24",
+    "scenario_atlantropa_metadata_sha256": "2378eaf15559bfa31b48db81d32ecdd68b8107b5ce8779eeadb3daa50aa80984"
   },
   "summary": {
     "basin_probe_count": 5,
     "basin_probe_failure_count": 0,
-    "chunk_feature_count": 897,
-    "interactive_feature_count": 897,
+    "chunk_feature_count": 898,
+    "interactive_feature_count": 898,
     "metadata_prefix_counts": {
       "ATLISL_": 62,
       "ATLPRV_": 86,
       "ATLSEA_": 86,
-      "ATLSEA_FILL_": 355,
+      "ATLSEA_FILL_": 356,
       "ATLSHL_": 91,
       "ATLWLD_": 217
     },
@@ -24528,9 +24556,9 @@
       "ATLISL_": 62,
       "ATLPRV_": 86,
       "ATLSEA_": 86,
-      "ATLSEA_FILL_": 355
+      "ATLSEA_FILL_": 356
     },
-    "runtime_feature_count": 897
+    "runtime_feature_count": 898
   },
   "version": 1
 }

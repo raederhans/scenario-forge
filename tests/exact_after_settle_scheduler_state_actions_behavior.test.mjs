@@ -3,8 +3,9 @@ import test from "node:test";
 
 import { createExactAfterSettleScheduler } from "../js/core/map_renderer/exact_after_settle_scheduler.js";
 
-function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null } = {}) {
+function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false } = {}) {
   const events = [];
+  const metrics = [];
   const frameTasks = [];
   const deferredTasks = [];
   const timers = new Map();
@@ -66,6 +67,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
   };
   const definitions = [
     ...(cameraSignatureMismatch ? [["background", () => {}]] : []),
+    ...(includeContextPasses ? [["physicalBase", () => {}], ["contextBase", () => {}]] : []),
     ["political", () => {}],
     ["borders", () => {}],
     ["labels", () => {}],
@@ -101,9 +103,10 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     getRenderPassCacheState: () => cache,
     getRenderPassSignature: cameraSignatureMismatch ? () => "new-camera" : undefined,
     getRenderPipelinePassesOwner: () => pipelineOwner,
-    getPhysicalExactRefreshPasses: () => [],
+    getPhysicalExactRefreshPasses: () => includeContextPasses ? ["physicalBase", "contextBase"] : [],
     invalidateRenderPasses: (passes, reason) => {
       events.push(`invalidate:${Array.isArray(passes) ? passes.join(",") : passes}:${reason}`);
+      for (const pass of Array.isArray(passes) ? passes : [passes]) cache.dirty[pass] = true;
     },
     rebuildResolvedColors: () => events.push("rebuild-colors"),
     requestRendererRender: (reason, options) => {
@@ -111,7 +114,10 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
       return true;
     },
     render: () => events.push("render"),
-    recordRenderPerfMetric: (name) => events.push(`metric:${name}`),
+    recordRenderPerfMetric: (name, duration, details) => {
+      events.push(`metric:${name}`);
+      metrics.push({ name, duration, details });
+    },
     readRenderPerfMetricDuration: () => 0,
     nowMs: () => ++now,
     enqueueFrameTask: (callback, metadata = {}) => {
@@ -196,6 +202,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     driveToAwaitingPaint,
     events,
     frameTasks,
+    metrics,
     profile,
     restore() {
       globalThis.setTimeout = originalSetTimeout;
@@ -220,6 +227,57 @@ function assertOrdered(events, expected) {
     cursor = next;
   }
 }
+
+test("visible urban scale changes refresh context after settle without refreshing physical passes", () => {
+  const h = createHarness({ includeContextPasses: true });
+  try {
+    h.reuseDecision.enabled = true;
+    h.runtimeState.showUrban = true;
+    h.runtimeState.urbanData = { features: [{}] };
+    h.driveToAwaitingPaint();
+    const plan = h.runtimeState.exactAfterSettleController.pendingPlan;
+    assert.equal(plan.urbanZoomExactRefresh, true);
+    assert.equal(plan.forceExactContextBaseRefresh, false);
+    assert.equal(plan.exactRefreshApplied, false);
+    assert.deepEqual(plan.exactTargetPasses, ["political", "borders"]);
+    assert.deepEqual(plan.deferredExactTargetPasses, ["contextBase", "labels", "textureLabels"]);
+    assert.ok(h.events.includes("invalidate:contextBase:urban-zoom-exact"));
+    assert.equal(h.events.includes("prepare:physicalBase"), false);
+    assert.equal(h.events.includes("prepare:contextBase"), false);
+    h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+    assert.equal(h.metrics.some(({ details }) => details?.contextBaseRefreshed), false);
+    h.deferredTasks[0].callback();
+    h.runNextFrame("deferred-exact-context-pass-contextBase");
+    h.runNextFrame("deferred-exact-context-pass-labels");
+    h.runNextFrame("deferred-exact-context-pass-textureLabels");
+    assert.ok(h.events.includes("prepare:contextBase"));
+    assert.equal(h.events.includes("prepare:physicalBase"), false);
+    assert.ok(h.events.includes("request-render:deferred-exact-context-refresh:false"));
+  } finally { h.restore(); }
+});
+
+test("pan, hidden or absent urban data, and disabled reuse retain the existing settle targets", () => {
+  for (const condition of ["pan", "hidden", "empty", "missing", "reuse-disabled", "missing-reference"]) {
+    const h = createHarness({ includeContextPasses: true });
+    try {
+      h.reuseDecision.enabled = true;
+      h.runtimeState.showUrban = true;
+      h.runtimeState.urbanData = { features: [{}] };
+      if (condition === "pan") h.runtimeState.zoomTransform = { k: 3, x: 700, y: 200 };
+      if (condition === "hidden") h.runtimeState.showUrban = false;
+      if (condition === "empty") h.runtimeState.urbanData.features = [];
+      if (condition === "missing") h.runtimeState.urbanData = null;
+      if (condition === "reuse-disabled") h.reuseDecision.enabled = false;
+      if (condition === "missing-reference") h.reuseDecision.referenceTransform = null;
+      h.driveToAwaitingPaint();
+      const plan = h.runtimeState.exactAfterSettleController.pendingPlan;
+      assert.equal(plan.urbanZoomExactRefresh, false, condition);
+      assert.deepEqual(plan.exactTargetPasses, ["political", "borders"], condition);
+      assert.deepEqual(plan.deferredExactTargetPasses, ["labels", "textureLabels"], condition);
+      assert.equal(h.events.includes("invalidate:contextBase:urban-zoom-exact"), false, condition);
+    } finally { h.restore(); }
+  }
+});
 
 test("async pass preparation preserves the visible frame and waits before pass draw or completion", async () => {
   let resolvePreparation;

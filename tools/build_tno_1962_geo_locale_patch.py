@@ -376,6 +376,21 @@ def build_patch(
         key: entry for key, entry in manual_geo.items()
         if key.startswith("id::CITY::")
     })
+    # Rebuilt islands and exposed seabed live outside the political object.
+    # Retain only explicit reviews of registered features, not arbitrary aliases
+    # or automatic translations of geometry-processing placeholder names.
+    special_geometries = (
+        topology_payload.get("objects", {})
+        .get("scenario_atlantropa", {})
+        .get("geometries", [])
+    )
+    for geometry in special_geometries:
+        if not isinstance(geometry, dict):
+            continue
+        properties = geometry.get("properties", {})
+        feature_id = normalize_text(properties.get("id") or geometry.get("id"))
+        if feature_id in manual_geo:
+            payload["geo"][feature_id] = manual_geo[feature_id]
     write_json(output_path, payload)
     for language, locale_output_path in build_locale_specific_patch_paths(output_path).items():
         write_json(

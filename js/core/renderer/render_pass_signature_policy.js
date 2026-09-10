@@ -141,6 +141,9 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `bucket:${zoomBucket}`,
         runtimeState.showPhysical ? "physical:on" : "physical:off",
         runtimeState.showUrban ? "urban:on" : "urban:off",
+        runtimeState.showUrban && runtimeState.urbanData?.features?.length
+          ? `urban-scale:${Number(transform?.k || runtimeState.zoomTransform?.k || 1).toFixed(4)}`
+          : "urban-scale:inactive",
         runtimeState.showRivers ? "rivers:on" : "rivers:off",
         `context:${Number(runtimeState.contextLayerRevision || 0)}`,
         `context-colors:${shouldRefreshContextBaseForColorChanges() ? Number(runtimeState.colorRevision || 0) : 0}`,
