@@ -44,6 +44,7 @@ function createHarness(overrides = {}) {
     },
   };
   const getters = {
+    getHitCanvasBuildIdentity: () => harnessState.identity ?? harnessState.activeScenarioId,
     hasHitCanvasRuntime: () => {
       calls.push(["hasHitCanvasRuntime"]);
       return harnessState.hasRuntime;
@@ -216,11 +217,11 @@ test("scheduled callback clears handle before drawing deferred hit canvas metric
   const { owner, calls, scheduledCallbacks, harnessState } = createHarness();
   owner.scheduleHitCanvasBuildIfNeeded({ reason: "custom-reason" });
   calls.length = 0;
-  harnessState.activeScenarioId = "scenario-b";
 
   scheduledCallbacks[0]();
 
   assert.deepEqual(callNames(calls), [
+    "getScheduledHitCanvasBuildHandle",
     "setScheduledHitCanvasBuildHandle",
     "hasHitCanvasRuntime",
     "isHitCanvasDirty",
@@ -235,7 +236,7 @@ test("scheduled callback clears handle before drawing deferred hit canvas metric
     {
       mode: "deferred",
       reason: "custom-reason",
-      activeScenarioId: "scenario-b",
+      activeScenarioId: "scenario-a",
     },
   ]);
 });
@@ -249,6 +250,7 @@ test("scheduled callback only clears handle when runtime gates are closed", () =
   scheduledCallbacks[0]();
 
   assert.deepEqual(callNames(calls), [
+    "getScheduledHitCanvasBuildHandle",
     "setScheduledHitCanvasBuildHandle",
     "hasHitCanvasRuntime",
     "isHitCanvasDirty",
@@ -279,6 +281,48 @@ test("cancel cancels an existing scheduled handle and clears it", () => {
     effectOrder: ["cancelDeferredWork", "setScheduledHitCanvasBuildHandle"],
     getterOrder: ["getScheduledHitCanvasBuildHandle"],
   });
+});
+
+test("cancelled or replaced callbacks cannot clear the new handle or build twice", () => {
+  const { owner, calls, scheduledCallbacks, harnessState } = createHarness();
+  owner.scheduleHitCanvasBuildIfNeeded();
+  const obsolete = scheduledCallbacks[0];
+  owner.cancelScheduledHitCanvasBuild();
+  owner.scheduleHitCanvasBuildIfNeeded();
+  const replacement = harnessState.scheduledHandle;
+  obsolete();
+  assert.equal(harnessState.scheduledHandle, replacement);
+  const current = scheduledCallbacks[1];
+  current();
+  current();
+  assert.equal(calls.filter(([name]) => name === "runScheduledHitCanvasBuild").length, 1);
+});
+
+test("a callback from a previous scenario cannot build the current scenario", () => {
+  const { owner, calls, scheduledCallbacks, harnessState } = createHarness();
+  owner.scheduleHitCanvasBuildIfNeeded();
+  Object.assign(harnessState, { activeScenarioId: "scenario-b" });
+  scheduledCallbacks[0]();
+  assert.equal(harnessState.scheduledHandle, null);
+  assert.equal(calls.some(([name]) => name === "runScheduledHitCanvasBuild"), false);
+  owner.scheduleHitCanvasBuildIfNeeded();
+  scheduledCallbacks[1]();
+  const builds = calls.filter(([name]) => name === "runScheduledHitCanvasBuild");
+  assert.equal(builds.length, 1);
+  assert.equal(builds[0][1].activeScenarioId, "scenario-b");
+});
+
+test("same-scenario generation changes and another builder completing retire pending work", () => {
+  const { owner, calls, scheduledCallbacks, harnessState } = createHarness({ identity: "scene-a:topology1:viewport1" });
+  owner.scheduleHitCanvasBuildIfNeeded();
+  harnessState.identity = "scene-a:topology2:viewport2";
+  scheduledCallbacks[0]();
+  assert.equal(harnessState.scheduledHandle, null);
+  assert.equal(calls.some(([name]) => name === "runScheduledHitCanvasBuild"), false);
+  owner.scheduleHitCanvasBuildIfNeeded();
+  harnessState.dirty = false;
+  scheduledCallbacks[1]();
+  assert.equal(calls.some(([name]) => name === "runScheduledHitCanvasBuild"), false);
 });
 
 test("cancel reports a frozen skipped summary when no handle exists", () => {

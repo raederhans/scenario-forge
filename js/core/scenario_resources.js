@@ -60,6 +60,7 @@ import {
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
   flushRenderBoundary,
+  requestRender,
 } from "./render_boundary.js";
 import { buildScenarioReleasableIndex } from "./releasable_manager.js";
 import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
@@ -610,6 +611,7 @@ const {
   syncScenarioLocalizationState,
   refreshMapDataForScenarioChunkPromotion,
   flushRenderBoundary,
+  requestRender,
   recordScenarioPerfMetric,
   ensureScenarioChunkRegistryLoaded: (...args) => ensureScenarioChunkRegistryLoaded(...args),
   refreshDelayInteracting: SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING,

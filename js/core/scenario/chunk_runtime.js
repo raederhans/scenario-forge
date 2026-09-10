@@ -272,6 +272,7 @@ function createScenarioChunkRuntimeController({
   syncScenarioLocalizationState,
   refreshMapDataForScenarioChunkPromotion,
   flushRenderBoundary,
+  requestRender = flushRenderBoundary,
   recordScenarioPerfMetric,
   ensureScenarioChunkRegistryLoaded,
   refreshDelayInteracting = 180,
@@ -1529,6 +1530,7 @@ function createScenarioChunkRuntimeController({
       restoreScenarioChunkPromotionRootState(runtimeState, promotionRootSnapshot);
     };
     setScenarioChunkPromotionRenderLockState(runtimeState, true);
+    const promotionGestureStartTransform = runtimeState.zoomGestureStartTransform;
     let mergedLayerResult = { changed: false, changedLayerKeys: [] };
     let politicalPayloadChanged = false;
     let politicalMutationStarted = false;
@@ -1593,6 +1595,22 @@ function createScenarioChunkRuntimeController({
             },
           });
         }
+        return false;
+      }
+
+      // A real gesture can start while the infra continuation is yielding, before
+      // zoom-end creates a new selection. Restore the cheap infra snapshot and
+      // leave this promotion pending instead of rebuilding geometry during input.
+      if (
+        runtimeState.zoomGestureStartTransform !== promotionGestureStartTransform
+        || runtimeState.isInteracting
+        || runtimeState.renderPhase === "interacting"
+      ) {
+        if (canRollbackPromotionContinuation()) {
+          restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
+          restoreScenarioDataGenerationSnapshot();
+        }
+        setPromotionCommitStatus("promotion-deferred", { inFlight: false, finishedAt: Date.now() });
         return false;
       }
 
@@ -1699,11 +1717,17 @@ function createScenarioChunkRuntimeController({
       if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
         return false;
       }
-      // The payload is complete after both frame breaks. The synchronous render
-      // boundary must see the caller's lock state, or render() will discard it.
+      // Publish the completed payload before scheduling its frame. A synchronous
+      // flush here bypasses render coalescing and extends the promotion long task.
       setScenarioChunkPromotionRenderLockState(runtimeState, previousRenderLock);
       if (resolvedRenderNow !== false) {
-        flushRenderBoundary("scenario-chunk-promotion");
+        requestRender("scenario-chunk-promotion");
+        // The dispatcher registers its RAF before this continuation. Keep the
+        // visible/commit metrics after that draw, with the same ownership guard.
+        await yieldToFrame();
+        if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+          return false;
+        }
       }
       if (
         runtimeState.runtimeChunkLoadState !== loadState
@@ -2459,13 +2483,14 @@ function createScenarioChunkRuntimeController({
     }
     clearPendingScenarioChunkRefresh(loadState);
     const viewportBbox = getCurrentScenarioChunkViewportBbox();
+    const requiredSemanticLayers = resolveRequiredScenarioSemanticLayers({
+      scenarioId,
+      manifest: bundle.manifest,
+    });
     const visibleLayers = startupInitialPoliticalOnly
       ? getVisibleScenarioChunkLayers({
         includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
-        requiredSemanticLayers: resolveRequiredScenarioSemanticLayers({
-          scenarioId,
-          manifest: bundle.manifest,
-        }),
+        requiredSemanticLayers,
       })
       : getVisibleScenarioChunkLayers({
         includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
@@ -2474,10 +2499,7 @@ function createScenarioChunkRuntimeController({
         showScenarioAtlantropa: runtimeState.showScenarioAtlantropa !== false,
         showScenarioReliefOverlays: runtimeState.showScenarioReliefOverlays !== false,
         showCityPoints: runtimeState.showCityPoints !== false,
-        requiredSemanticLayers: resolveRequiredScenarioSemanticLayers({
-          scenarioId,
-          manifest: bundle.manifest,
-        }),
+        requiredSemanticLayers,
       });
     ensureScenarioChunkRuntimeState(runtimeState, {
       scenarioId,
@@ -2500,8 +2522,10 @@ function createScenarioChunkRuntimeController({
     const previousSelection = loadState.lastSelection;
     const normalizedReason = String(reason || "refresh").trim().toLowerCase();
     if (normalizedReason === "zoom-end") {
+      // Semantic layers define the scenario geography and must survive detail promotion.
+      const protectedLayers = new Set(["political", "scenario_atlantropa", ...requiredSemanticLayers]);
       const demotedNonPoliticalDetailOptional = selection.requiredChunks.filter(
-        (chunk) => !["political", "scenario_atlantropa"].includes(chunk.layer) && chunk.lod === "detail"
+        (chunk) => !protectedLayers.has(chunk.layer) && chunk.lod === "detail"
       );
       if (demotedNonPoliticalDetailOptional.length) {
         const demotedIdSet = new Set(demotedNonPoliticalDetailOptional.map((chunk) => chunk.id));
@@ -2551,13 +2575,26 @@ function createScenarioChunkRuntimeController({
     const previousZoomEndProtectionUntil = Math.max(0, Number(previousSelection?.zoomEndProtectionUntil || 0));
     const shouldCarryZoomEndProtection = nextRetainedActiveChunkIds.length > 0 && previousZoomEndProtectionUntil > Date.now();
     const carriedZoomEndRecordedAt = Math.max(0, Number(previousSelection?.recordedAt || 0));
+    // A complete political envelope has no camera-dependent primary subset.
+    // Chunk/source changes still invalidate selection through the ID lists below.
+    const hasCommittedGlobalPoliticalCoverage = runtimeState.scenarioPoliticalChunkData?.globalCoverage === true
+      && (!runtimeState.scenarioPoliticalVisibleChunkData
+        || runtimeState.scenarioPoliticalVisibleChunkData === runtimeState.scenarioPoliticalChunkData);
+    const currentPayloadSignatures = buildScenarioChunkLayerSelectionSignatures(
+      bundle, chunkState, getScenarioChunkActiveMergeIds(chunkState, selection),
+    );
+    const payloadSelectionUnchanged = Object.keys(currentPayloadSignatures).every(
+      (layer) => currentPayloadSignatures[layer] === loadState.layerSelectionSignatures?.[layer],
+    );
     const selectionUnchanged =
       normalizeScenarioId(previousSelection?.scenarioId) === scenarioId
+      && payloadSelectionUnchanged
       && getChunkIdListSignature(previousSelection?.requiredChunkIds) === getChunkIdListSignature(nextRequiredChunkIds)
       && getChunkIdListSignature(previousSelection?.optionalChunkIds) === getChunkIdListSignature(nextOptionalChunkIds)
       && getChunkIdListSignature(previousSelection?.cacheOnlyChunkIds) === getChunkIdListSignature(nextCacheOnlyChunkIds)
       && getChunkIdListSignature(previousSelection?.retainedActiveChunkIds) === getChunkIdListSignature(nextRetainedActiveChunkIds)
-      && String(previousSelection?.politicalVisibleFeatureSubsetSignature || "") === nextPoliticalVisibleFeatureSubsetSignature
+      && (hasCommittedGlobalPoliticalCoverage
+        || String(previousSelection?.politicalVisibleFeatureSubsetSignature || "") === nextPoliticalVisibleFeatureSubsetSignature)
       && selection.evictableChunkIds.length === 0
       && nextRequiredChunkIds.every((chunkId) => !!chunkState.payloadByChunkId?.[chunkId]);
     const currentSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0));
@@ -2798,7 +2835,10 @@ function createScenarioChunkRuntimeController({
       return !cacheOnlyChunkIdSet.has(normalizedChunkId) || retainedActiveChunkIdSet.has(normalizedChunkId);
     });
     const politicalFeatureIds = collectScenarioPoliticalFeatureIdsForChunkIds(bundle, changedPoliticalChunkIds);
-    const primaryVisibleFeatureSubsetChanged = String(previousSelection?.politicalVisibleFeatureSubsetSignature || "") !== nextPoliticalVisibleFeatureSubsetSignature;
+    const hasGlobalPoliticalCoverage = mergedLayerPayloads.political?.globalCoverage === true
+      && primaryMergedLayerPayloads.political === mergedLayerPayloads.political;
+    const primaryVisibleFeatureSubsetChanged = !hasGlobalPoliticalCoverage
+      && String(previousSelection?.politicalVisibleFeatureSubsetSignature || "") !== nextPoliticalVisibleFeatureSubsetSignature;
     const effectiveChangedLayerKeys = primaryVisibleFeatureSubsetChanged
       ? Array.from(new Set([...mergedResult.changedLayerKeys, "political"]))
       : mergedResult.changedLayerKeys;

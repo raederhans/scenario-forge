@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { createExactAfterSettleScheduler } from "../js/core/map_renderer/exact_after_settle_scheduler.js";
 
-function createHarness() {
+function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null } = {}) {
   const events = [];
   const frameTasks = [];
   const deferredTasks = [];
@@ -65,6 +65,7 @@ function createHarness() {
     },
   };
   const definitions = [
+    ...(cameraSignatureMismatch ? [["background", () => {}]] : []),
     ["political", () => {}],
     ["borders", () => {}],
     ["labels", () => {}],
@@ -80,6 +81,7 @@ function createHarness() {
   };
 
   const scheduler = createExactAfterSettleScheduler({
+    prepareRenderPassAsync,
     runtimeState: schedulerRuntime,
     renderPassNames: definitions.map(([passName]) => passName),
     renderPhaseIdle: "idle",
@@ -97,6 +99,7 @@ function createHarness() {
     shouldDeferContextBaseEnhancementsForExactRefresh: () => false,
     scheduleDeferredContextBaseEnhancements: () => events.push("schedule-context-base"),
     getRenderPassCacheState: () => cache,
+    getRenderPassSignature: cameraSignatureMismatch ? () => "new-camera" : undefined,
     getRenderPipelinePassesOwner: () => pipelineOwner,
     getPhysicalExactRefreshPasses: () => [],
     invalidateRenderPasses: (passes, reason) => {
@@ -176,9 +179,12 @@ function createHarness() {
     runNextFrame("exact-after-settle-Prepare");
     runNextFrame("exact-after-settle-Apply");
     assert.equal(schedulerRuntime.exactAfterSettleController.phase, "applying");
+    assert.equal(schedulerRuntime.deferExactAfterSettle, true, "ordinary renders between slices must replay the committed frame");
     runNextFrame("exact-after-settle-pass-political");
+    assert.equal(schedulerRuntime.deferExactAfterSettle, true);
     runNextFrame("exact-after-settle-pass-borders");
     assert.equal(schedulerRuntime.exactAfterSettleController.phase, "awaiting-paint");
+    assert.equal(schedulerRuntime.deferExactAfterSettle, false);
     assert.equal(schedulerRuntime.exactAfterSettleController.generation, generation);
     return generation;
   }
@@ -214,6 +220,66 @@ function assertOrdered(events, expected) {
     cursor = next;
   }
 }
+
+test("async pass preparation preserves the visible frame and waits before pass draw or completion", async () => {
+  let resolvePreparation;
+  let ready = false;
+  const preparation = new Promise((resolve) => { resolvePreparation = () => { ready = true; resolve(); }; });
+  const h = createHarness({ prepareRenderPassAsync: (pass) => pass === "political" && !ready ? preparation : null });
+  try {
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame(); h.runNextFrame("exact-after-settle-pass-political");
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "applying");
+    assert.equal(h.runtimeState.deferExactAfterSettle, true);
+    assert.equal(h.events.includes("prepare:political"), false);
+    assert.equal(h.events.includes("request-render:exact-after-settle:true"), false);
+    assert.equal(h.frameTasks.length, 0);
+    resolvePreparation(); await Promise.resolve();
+    h.runNextFrame("exact-after-settle-pass-political");
+    assert.equal(h.events.includes("prepare:political"), true);
+    h.runNextFrame("exact-after-settle-pass-borders");
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+  } finally { h.restore(); }
+});
+
+test("late preparation cannot draw an old generation or an interrupted gesture", async () => {
+  for (const interruption of ["new-generation", "gesture", "identity"]) {
+    let resolvePreparation;
+    const preparation = new Promise((resolve) => { resolvePreparation = resolve; });
+    const h = createHarness({ prepareRenderPassAsync: () => preparation });
+    try {
+      h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+      h.runTimer(); h.runNextFrame(); h.runNextFrame(); h.runNextFrame();
+      if (interruption === "new-generation") {
+        h.scheduler.cancelExactAfterSettleRefresh();
+        h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+      } else if (interruption === "gesture") h.runtimeState.renderPhase = "interacting";
+      else h.setTopologyRevision(999);
+      resolvePreparation(); await Promise.resolve();
+      if (h.frameTasks.some((task) => !task.cancelled)) h.runNextFrame();
+      assert.equal(h.events.includes("prepare:political"), false);
+      assert.equal(h.events.includes("request-render:exact-after-settle:true"), false);
+      if (interruption === "new-generation") assert.equal(h.runtimeState.exactAfterSettleController.phase, "scheduled");
+    } finally { h.restore(); }
+  }
+});
+
+test("camera signature changes enter cancellable passes before final paint even without a dirty bit", () => {
+  const harness = createHarness({ cameraSignatureMismatch: true });
+  try {
+    harness.cache.signatures = { background: "old-camera" };
+    harness.scheduler.scheduleExactAfterSettleRefresh(harness.profile);
+    harness.runTimer();
+    harness.runNextFrame("exact-after-settle-Prepare");
+    harness.runNextFrame("exact-after-settle-Apply");
+    harness.runNextFrame("exact-after-settle-pass-background");
+    assert.ok(harness.events.includes("prepare:background"));
+    assert.ok(!harness.events.includes("request-render:exact-after-settle:true"));
+    harness.scheduler.cancelExactAfterSettleRefresh();
+  } finally {
+    harness.restore();
+  }
+});
 
 test("schedule, apply, awaiting-paint, and finalize follow action-owned state transitions", () => {
   const harness = createHarness();

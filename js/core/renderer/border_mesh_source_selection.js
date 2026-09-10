@@ -1,3 +1,75 @@
+// Topology geometry is immutable within one political object identity. Country
+// assignment is not: its caller-owned revision invalidates only country groups.
+const politicalGeometryIndexes = new WeakMap();
+
+function getPoliticalCountryIndex(object, resolveCountry, assignmentRevision) {
+  let geometryIndex = politicalGeometryIndexes.get(object);
+  if (!geometryIndex) {
+    const geometries = [];
+    const arcGeometries = new Map();
+    const arcsByGeometry = new Map();
+    const visitGeometry = (geometry) => {
+      if (geometry?.type === "GeometryCollection") {
+        (geometry.geometries || []).forEach(visitGeometry);
+        return;
+      }
+      if (!geometry) return;
+      geometries.push(geometry);
+      const arcIds = new Set();
+      const visitArcs = (arcs) => {
+        for (const arc of arcs || []) {
+          if (Array.isArray(arc)) visitArcs(arc);
+          else if (Number.isInteger(arc)) arcIds.add(arc < 0 ? ~arc : arc);
+        }
+      };
+      visitArcs(geometry.arcs);
+      arcsByGeometry.set(geometry, arcIds);
+      for (const arcId of arcIds) {
+        if (!arcGeometries.has(arcId)) arcGeometries.set(arcId, []);
+        arcGeometries.get(arcId).push(geometry);
+      }
+    };
+    visitGeometry(object);
+    geometryIndex = { geometries, arcGeometries, arcsByGeometry,
+      order: new Map(geometries.map((geometry, index) => [geometry, index])), assignments: new WeakMap() };
+    politicalGeometryIndexes.set(object, geometryIndex);
+  }
+  const revision = String(assignmentRevision);
+  let assignment = geometryIndex.assignments.get(resolveCountry);
+  if (!assignment || assignment.revision !== revision) {
+    const countries = new Map();
+    const codes = new Map();
+    for (const geometry of geometryIndex.geometries) {
+      const code = resolveCountry(geometry);
+      codes.set(geometry, code);
+      if (!code) continue;
+      if (!countries.has(code)) countries.set(code, []);
+      countries.get(code).push(geometry);
+    }
+    assignment = { revision, countries, codes, objects: new Map() };
+    geometryIndex.assignments.set(resolveCountry, assignment);
+  }
+  return {
+    codes: assignment.codes,
+    getCountryObject(countryCode) {
+      if (assignment.objects.has(countryCode)) return assignment.objects.get(countryCode);
+      const members = assignment.countries.get(countryCode) || [];
+      const included = new Set(members);
+      // Keep every original neighbor on a target arc. Removing these would turn
+      // international boundaries into a===b coastline in topojson.mesh.
+      for (const geometry of members) {
+        for (const arcId of geometryIndex.arcsByGeometry.get(geometry)) {
+          for (const neighbor of geometryIndex.arcGeometries.get(arcId)) included.add(neighbor);
+        }
+      }
+      const subset = { type: "GeometryCollection", geometries: [...included]
+        .sort((a, b) => geometryIndex.order.get(a) - geometryIndex.order.get(b)) };
+      assignment.objects.set(countryCode, subset);
+      return subset;
+    },
+  };
+}
+
 export function resolveScenarioOpeningOwnerBorderSelection({
   state,
   isUsableMesh = () => false,
@@ -115,6 +187,9 @@ export function buildSourceBorderMeshes({
   getFeatureCountryCodeNormalized = () => "",
   getAdmin1Group = () => "",
   isUsableMesh = () => false,
+  countryAssignmentRevision = "",
+  includeProvince = true,
+  includeLocal = true,
 } = {}) {
   const object = topology?.objects?.political;
   if (!object || !globalThis.topojson || !includedCountries?.size) {
@@ -124,47 +199,61 @@ export function buildSourceBorderMeshes({
   const localMeshesByCountry = new Map();
   const provinceMeshes = [];
   const localMeshes = [];
+  const countryIndex = getPoliticalCountryIndex(object, getFeatureCountryCodeNormalized, countryAssignmentRevision);
+  const excludedByGeometry = new WeakMap();
+  const groupByGeometry = new WeakMap();
+  const isExcluded = (geometry) => {
+    if (!excludedByGeometry.has(geometry)) {
+      excludedByGeometry.set(geometry, shouldExcludePoliticalInteractionFeature(asFeatureLike(geometry)));
+    }
+    return excludedByGeometry.get(geometry);
+  };
+  const getGroup = (geometry) => {
+    if (!groupByGeometry.has(geometry)) groupByGeometry.set(geometry, getAdmin1Group(geometry));
+    return groupByGeometry.get(geometry);
+  };
 
   includedCountries.forEach((countryCode) => {
     const normalizedCode = canonicalCountryCode(countryCode);
     if (!normalizedCode) return;
-    const provinceMesh = globalThis.topojson.mesh(
+    const countryObject = countryIndex.getCountryObject(normalizedCode);
+    const provinceMesh = includeProvince ? globalThis.topojson.mesh(
       topology,
-      object,
+      countryObject,
       (a, b) => {
         if (!a || !b) return false;
-        if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+        if (isExcluded(a) || isExcluded(b)) {
           return false;
         }
-        const codeA = getFeatureCountryCodeNormalized(a);
-        const codeB = getFeatureCountryCodeNormalized(b);
+        const codeA = countryIndex.codes.get(a);
+        const codeB = countryIndex.codes.get(b);
         if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
-        const groupA = getAdmin1Group(a);
-        const groupB = getAdmin1Group(b);
+        const groupA = getGroup(a);
+        const groupB = getGroup(b);
         return !!(groupA && groupB && groupA !== groupB);
       }
-    );
+    ) : null;
     if (isUsableMesh(provinceMesh)) {
       provinceMeshesByCountry.set(normalizedCode, [provinceMesh]);
       provinceMeshes.push(provinceMesh);
     }
 
-    const localMesh = globalThis.topojson.mesh(
+    const localMesh = includeLocal ? globalThis.topojson.mesh(
       topology,
-      object,
+      countryObject,
       (a, b) => {
         if (!a || !b) return false;
-        if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+        if (isExcluded(a) || isExcluded(b)) {
           return false;
         }
-        const codeA = getFeatureCountryCodeNormalized(a);
-        const codeB = getFeatureCountryCodeNormalized(b);
+        const codeA = countryIndex.codes.get(a);
+        const codeB = countryIndex.codes.get(b);
         if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
-        const groupA = getAdmin1Group(a);
-        const groupB = getAdmin1Group(b);
+        const groupA = getGroup(a);
+        const groupB = getGroup(b);
         return !(groupA && groupB && groupA !== groupB);
       }
-    );
+    ) : null;
     if (isUsableMesh(localMesh)) {
       localMeshesByCountry.set(normalizedCode, [localMesh]);
       localMeshes.push(localMesh);

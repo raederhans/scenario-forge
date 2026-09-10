@@ -807,7 +807,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
                 r'if \(!isPendingScenarioChunkPromotionCurrent.*?'
                 r'setScenarioChunkPromotionRenderLockState\(runtimeState, previousRenderLock\);.*?'
                 r'if \(resolvedRenderNow !== false\) \{\s*'
-                r'flushRenderBoundary\("scenario-chunk-promotion"\);',
+                r'requestRender\("scenario-chunk-promotion"\);',
                 re.S,
             ),
         )
@@ -840,7 +840,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.scenario_chunk_runtime_source.count(
                 "canRollbackPromotionContinuation()"
             ),
-            3,
+            4,
         )
         ownership_start = self.scenario_chunk_runtime_source.index(
             "function resolvePendingScenarioChunkPromotionOwnedScenarioId("

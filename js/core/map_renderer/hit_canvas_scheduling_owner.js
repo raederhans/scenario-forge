@@ -65,6 +65,9 @@ export function createHitCanvasSchedulingOwner({ state = {}, effects = {}, gette
   const getterApi = Object.fromEntries(
     REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
   );
+  let activeTask = null;
+  const getBuildIdentity = typeof getters.getHitCanvasBuildIdentity === "function"
+    ? getters.getHitCanvasBuildIdentity : () => String(getterApi.getActiveScenarioId() || "");
 
   function runEffect(trace, name, ...args) {
     trace.effectOrder.push(name);
@@ -105,8 +108,13 @@ export function createHitCanvasSchedulingOwner({ state = {}, effects = {}, gette
       });
     }
 
+    const task = { identity: getBuildIdentity(), handle: null };
+    activeTask = task;
     const scheduledHandle = runEffect(trace, "scheduleDeferredWork", () => {
+      if (activeTask !== task || !task.handle || getterApi.getScheduledHitCanvasBuildHandle() !== task.handle) return;
+      activeTask = null;
       runEffect(createTrace(), "setScheduledHitCanvasBuildHandle", null);
+      if (getBuildIdentity() !== task.identity) return;
       if (!shouldRunScheduledBuild()) return;
       runEffect(createTrace(), "runScheduledHitCanvasBuild", {
         mode: "deferred",
@@ -116,6 +124,8 @@ export function createHitCanvasSchedulingOwner({ state = {}, effects = {}, gette
     }, {
       timeout: idleTimeoutMs,
     });
+    task.handle = scheduledHandle;
+    if (!scheduledHandle) activeTask = null;
     runEffect(trace, "setScheduledHitCanvasBuildHandle", scheduledHandle);
 
     return createSummary({
@@ -131,6 +141,7 @@ export function createHitCanvasSchedulingOwner({ state = {}, effects = {}, gette
     const trace = createTrace();
     const normalizedReason = normalizeReason(reason, "hit-canvas-schedule-cancel");
     const scheduledHandle = runGetter(trace, "getScheduledHitCanvasBuildHandle");
+    activeTask = null;
     if (!scheduledHandle) {
       return createSummary({
         reason: normalizedReason,

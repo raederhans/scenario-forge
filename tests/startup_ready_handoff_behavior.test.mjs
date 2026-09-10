@@ -491,6 +491,7 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
     showRivers: true,
     showUrban: true,
     showPhysical: true,
+    styleConfig: { physical: { mode: "atlas_and_contours" } },
     showCityPoints: true,
     baseCityDataState: "idle",
   });
@@ -547,6 +548,38 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
 
   owner.schedulePostReadyDeferredContextWarmup();
   assert.equal(scheduler.tasks.length, 2);
+});
+
+test("default physical warmup keeps atlas without loading contours", async () => {
+  const loads = [];
+  const { owner, scheduler } = createOwnerHarness({
+    targetRuntime: createTargetRuntime({ showPhysical: true }),
+    helpers: createHelpers({ overrides: {
+      ensureContextLayerDataReady: async (layers) => loads.push(layers),
+    } }),
+  });
+  owner.schedulePostReadyDeferredContextWarmup();
+  assert.deepEqual(scheduler.tasks.map(({ key }) => key), ["post-ready-context-warmup"]);
+  await scheduler.tasks[0].callback();
+  assert.deepEqual(loads, [["physical-set"]]);
+});
+
+test("queued contour warmup checks whether contours are still enabled", async () => {
+  const loads = [];
+  const targetRuntime = createTargetRuntime({
+    showPhysical: true,
+    styleConfig: { physical: { mode: "atlas_and_contours" } },
+  });
+  const { owner, scheduler } = createOwnerHarness({
+    targetRuntime,
+    helpers: createHelpers({ overrides: {
+      ensureContextLayerDataReady: async (layers) => loads.push(layers),
+    } }),
+  });
+  owner.schedulePostReadyDeferredContextWarmup();
+  targetRuntime.styleConfig.physical.mode = "atlas_only";
+  await scheduler.tasks.find(({ key }) => key === "post-ready-contour-warmup").callback();
+  assert.deepEqual(loads, []);
 });
 
 test("reset clears internal scheduling flags", () => {

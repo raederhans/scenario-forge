@@ -140,6 +140,7 @@ function createHarness(overrides = {}) {
       getDebugMode: () => overrides.debugMode || "PROD",
       getDefaultTransform: () => transform,
       getRenderPassCacheState: () => cache,
+      ...overrides.getters,
     },
     helpers,
     effects,
@@ -157,18 +158,47 @@ function createHarness(overrides = {}) {
   return { owner, state, cache, context, events, feature, transform, path, workerMetrics };
 }
 
-test("fine loop validates once per draw and rejects same-ID different geometry without cache writes", () => {
+test("accepted worker fine frame bypasses synchronous geometry and preserves its result", () => {
+  const result = { fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["land-1"]) };
+  const h = createHarness({ getters: { drawWorkerPoliticalFine: () => result }, helpers: {
+    getPoliticalPathCacheHandle: () => { throw Error("synchronous geometry must be bypassed"); },
+  } });
+  h.events.push("background-already-painted");
+  assert.equal(h.owner.drawPoliticalFineFeatureLoop({}), result);
+  assert.deepEqual(h.events, ["background-already-painted"], "fine replacement does not clear or redraw the background");
+});
+
+test("unavailable worker fine frame falls through to synchronous rendering", () => {
+  let attempts = 0;
+  const h = createHarness({ getters: { drawWorkerPoliticalFine: () => { attempts++; return null; } } });
+  const metrics = h.owner.drawPoliticalFineFeatureLoop({ k: 1,
+    identity: { transform: h.transform, canvasWidth: 100, canvasHeight: 100 },
+    viewport: { visibleItems: [{ feature: h.feature, id: "land-1", drawOrder: 0 }] } });
+  assert.equal(attempts, 1);
+  assert.equal(metrics.renderedCount, 1);
+  assert.equal(h.events.some((event) => Array.isArray(event) && event[0] === "fill"), true);
+});
+
+test("fine loop caches cold and replacement geometry and reuses paths across pans", () => {
   const cachedPath = { cached: true };
   const pathMap = new Map();
   let valid = true;
   const transforms = [];
+  const builds = [];
   const h = createHarness({ helpers: {
     getPoliticalPathCacheHandle: (transform, options) => {
       transforms.push(transform);
-      assert.equal(options.resetIfMismatch, false);
+      assert.equal(options.resetIfMismatch, true);
       return { valid, map: pathMap };
     },
-    getPoliticalFeaturePathEntry: () => { throw new Error("unexpected per-feature validation"); },
+    getPoliticalFeaturePathEntry: (feature, options) => {
+      assert.equal(options.allowBuild, true);
+      assert.equal(options.countBuild, true);
+      builds.push(feature);
+      const entry = { path: { built: builds.length }, geometryRef: feature.geometry };
+      pathMap.set(options.featureId, entry);
+      return entry;
+    },
   } });
   pathMap.set("land-1", { path: cachedPath, geometryRef: h.feature.geometry });
   const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
@@ -183,21 +213,49 @@ test("fine loop validates once per draw and rejects same-ID different geometry w
   h.owner.drawPoliticalFineFeatureLoop({ k: 2, identity: { ...identity, transform: nextTransform }, viewport });
   assert.equal(transforms.length, 2);
   assert.equal(transforms[1], nextTransform);
-  assert.equal(h.events.filter(event => event === "path").length, 100);
-  assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "fill" && event[1] === undefined).length, 100);
-  assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === "stroke" && event[1] === undefined).length, 100);
+  assert.equal(builds.length, 1, "replacement geometry streams once even if repeated in the draw list");
+  assert.equal(h.events.filter(event => event === "path").length, 0);
   assert.equal(pathMap.size, 1);
-  assert.equal(pathMap.get("land-1").path, cachedPath);
+  assert.notEqual(pathMap.get("land-1").path, cachedPath);
+  const replacementPath = pathMap.get("land-1").path;
+  h.owner.drawPoliticalFineFeatureLoop({ k: 3, identity: { ...identity, transform: { x: 200, y: 0, k: 3 } }, viewport });
+  assert.equal(builds.length, 1, "pan does not stream already prepared geometry");
+  assert.equal(pathMap.get("land-1").path, replacementPath);
   h.state.landData.features = [{ ...h.feature, geometry: originalGeometry }];
   h.events.length = 0;
   h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport: { visibleItems: null } });
-  assert.equal(transforms.length, 3);
-  assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === cachedPath));
+  assert.equal(transforms.length, 4);
+  assert.equal(builds.length, 2);
+  assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === pathMap.get("land-1").path));
+});
+
+test("exact fine drawing persists cold geometry beyond the idle warmup queue budget", () => {
+  const paths = new Map();
+  let builds = 0;
+  const h = createHarness({ helpers: {
+    getPoliticalPathCacheHandle: () => ({ valid: true, map: paths }),
+    getPoliticalFeaturePathEntry: (feature, { featureId }) => {
+      builds += 1;
+      const entry = { path: { featureId }, geometryRef: feature.geometry };
+      paths.set(featureId, entry);
+      return entry;
+    },
+  } });
+  const viewport = { visibleItems: Array.from({ length: 600 }, (_, drawOrder) => ({
+    feature: { ...h.feature, id: `feature-${drawOrder}`, geometry: { ...h.feature.geometry } }, drawOrder,
+  })) };
+  const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
+  h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport });
+  assert.equal(builds, 600);
+  assert.equal(paths.size, 600);
+  h.owner.drawPoliticalFineFeatureLoop({ k: 2, identity: { ...identity, transform: { x: 200, y: 0, k: 2 } }, viewport });
+  assert.equal(builds, 600);
 });
 
 test("unavailable cache uses direct canvas fill and stroke", () => {
   const h = createHarness({ helpers: {
     getPoliticalPathCacheHandle: () => ({ valid: false, map: new Map() }),
+    getPoliticalFeaturePathEntry: () => null,
   } });
   h.owner.drawPoliticalFineFeatureLoop({
     k: 1,
@@ -214,6 +272,7 @@ test("factory validates ports and freezes the exact owner API", () => {
   const { owner } = createHarness();
   assert.equal(Object.isFrozen(owner), true);
   assert.deepEqual(Object.keys(owner), [
+    "getPoliticalFeatureFillColor",
     "buildPoliticalRasterWorkerPacket",
     "drawPoliticalFeature",
     "drawPoliticalFineFeatureLoop",

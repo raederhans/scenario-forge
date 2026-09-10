@@ -201,6 +201,23 @@ test("physical owner toggles visibility and requests physical context layers", (
   assert.deepEqual(harness.dirtyReasons, ["toggle-physical"]);
 });
 
+test("physical owner loads contours on demand after atlas-only mode", () => {
+  const harness = createHarness(["togglePhysical", "physicalMode"], {
+    showPhysical: false,
+    styleConfig: { physical: createPhysicalConfig({ mode: "atlas_only" }) },
+  });
+  harness.owner.bindEvents();
+  harness.nodes.togglePhysical.checked = true;
+  harness.nodes.togglePhysical.dispatch("change");
+  assert.deepEqual(harness.contextLayerLoads[0].layers, ["physical-set"]);
+  harness.nodes.physicalMode.value = "atlas_and_contours";
+  harness.nodes.physicalMode.dispatch("change");
+  assert.deepEqual(harness.contextLayerLoads[1], {
+    layers: ["physical-set", "physical-contours-set"],
+    options: { reason: "physical-mode", renderNow: true },
+  });
+});
+
 test("physical owner applies presets once and preserves selected mode", () => {
   const harness = createHarness(PHYSICAL_NODE_IDS, {
     styleConfig: {

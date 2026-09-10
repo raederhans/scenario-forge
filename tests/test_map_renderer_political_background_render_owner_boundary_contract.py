@@ -109,13 +109,13 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         for token in ('{ type: "Sphere" }', "state.oceanData", "drawOceanStyle();", "drawOceanDepthMaskLayer();"):
             cursor = background.find(token, cursor + 1)
             self.assertGreaterEqual(cursor, 0, token)
-        progressive = owner[owner.index("if (useProgressiveRecovery)") :]
+        progressive = owner[owner.index("if (useProgressiveRecovery)") : owner.index("    return drawPoliticalBackgroundFillsForEntries(visibleEntries", owner.index("if (useProgressiveRecovery)"))]
+        self.assertNotIn("drawAdmin0BackgroundFills(", progressive)
         cursor = -1
         for token in (
-            "drawAdmin0BackgroundFills({",
             "scheduleScenarioPoliticalBackgroundDeferredFullCache(visibleEntries",
             'recordRenderPerfMetric("scenarioPoliticalBackgroundProgressiveRecovery"',
-            "coarseUnderlay: \"admin0\"",
+            "coarseUnderlay: \"scenario-features\"",
         ):
             cursor = progressive.find(token, cursor + 1)
             self.assertGreaterEqual(cursor, 0, token)

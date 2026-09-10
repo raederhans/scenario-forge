@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createProjectedGeometryBoundsOwner } from "../js/core/renderer/projected_geometry_bounds_owner.js";
+import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
 function firstLon(geoObject) {
   const geometry = geoObject?.type === "Feature" ? geoObject.geometry : geoObject;
@@ -146,6 +147,35 @@ test("getProjectedFeatureBounds caches computed bounds by feature id", () => {
   assert.equal(owner.getProjectedFeatureBounds(feature), harnessStore.projectedBoundsById.get("A"));
   assert.equal(calls.pathBounds, 1);
   assert.equal(owner.getProjectedFeatureBounds(createFeature("B", createPolygon([0, 0])), { allowCompute: false }), null);
+});
+
+test("projected geometry cache reuses spatial precomputation but rejects replaced geometry and projection", () => {
+  let offset = 0;
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({ projection,
+    pathBounds: (feature) => [[firstLon(feature) + offset, 0], [firstLon(feature) + offset + 1, 1]] });
+  const first = createFeature("A", createPolygon([1, 0]));
+  const prepared = owner.computeProjectedFeatureBounds(first);
+  assert.equal(owner.getProjectedFeatureBounds(first, { allowCompute: false }), prepared);
+  assert.equal(calls.pathBounds, 1);
+  harnessStore.zoomTransform = { x: 200, y: -20, k: 4 };
+  harnessStore.dpr = 2;
+  harnessStore.colorRevision = 3;
+  assert.equal(owner.getProjectedFeatureBounds({ ...first }), prepared);
+  assert.equal(calls.pathBounds, 1);
+  const replacement = createFeature("A", createPolygon([30, 0]));
+  assert.equal(owner.getProjectedFeatureBounds(replacement, { allowCompute: false }), null);
+  assert.equal(owner.getProjectedFeatureBounds(replacement).minX, 30);
+  assert.equal(calls.pathBounds, 2);
+  offset = 10;
+  markProjectionGeometryChanged(projection);
+  assert.equal(owner.getProjectedFeatureBounds(replacement, { allowCompute: false }), null);
+  assert.equal(owner.getProjectedFeatureBounds(replacement).minX, 40);
+  assert.equal(calls.pathBounds, 3);
+  harnessStore.activeScenarioId = "other";
+  assert.equal(owner.getProjectedFeatureBounds(replacement, { allowCompute: false }), null);
+  owner.getProjectedFeatureBounds(replacement);
+  assert.equal(calls.pathBounds, 4);
 });
 
 test("computeProjectedGeoBounds falls back to coordinate projection when path bounds fail", () => {

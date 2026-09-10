@@ -86,7 +86,7 @@ function createScenarioLifecycleRuntime({
         politicalEditingExpanded: !!runtimeState.ui?.politicalEditingExpanded,
       };
     }
-    runtimeState.paintMode = "sovereignty";
+    runtimeState.paintMode = "visual";
     runtimeState.interactionGranularity = "subdivision";
     if (runtimeState.ui && typeof runtimeState.ui === "object") {
       runtimeState.ui.politicalEditingExpanded = false;

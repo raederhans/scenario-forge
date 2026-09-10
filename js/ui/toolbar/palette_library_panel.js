@@ -15,6 +15,19 @@ import {
 import { t } from "../i18n.js";
 const state = runtimeState;
 
+// Choosing a paint color is an explicit visual-edit intent, including in scenarios.
+function selectPalettePaintColor(appState, rawColor) {
+  const color = normalizeHexColor(rawColor);
+  if (!color) return false;
+  setSelectedColorState(appState, color);
+  appState.paintMode = "visual";
+  if (appState.ui && typeof appState.ui === "object") {
+    appState.ui.politicalEditingExpanded = false;
+  }
+  appState.updatePaintModeUIFn?.();
+  return true;
+}
+
 const PALETTE_LIBRARY_GROUPING_MODES = new Set(["default", "region"]);
 
 const PALETTE_LIBRARY_GROUPS = [
@@ -292,7 +305,7 @@ function createPaletteLibraryPanelController({
   }
 
   const selectPaletteLibraryEntry = (entry) => {
-    setSelectedColorState(runtimeState, entry.color);
+    selectPalettePaintColor(runtimeState, entry.color);
     activeRowKey = entry.key;
     updateSwatchUI?.();
     syncPaletteLibraryRowFocus();
@@ -804,6 +817,7 @@ function createPaletteLibraryPanelController({
 }
 
 export {
+  selectPalettePaintColor,
   buildPaletteLibraryGroups,
   createPaletteLibraryPanelController,
   normalizePaletteLibraryGroupingMode,

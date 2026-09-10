@@ -2,6 +2,38 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
+
+test("synchronous validated cache scopes share one validation, revalidate replacements and end on throw", () => {
+  const state = { renderPassCache: {} };
+  let validations = 0;
+  const owner = createRenderCacheOwner({ state, helpers: { ensureRenderPassCacheState: (target) => {
+    validations += 1;
+    target.renderPassCache ||= {};
+    return target.renderPassCache;
+  } } });
+  assert.equal(owner.withValidatedCache((cache) => {
+    assert.equal(owner.getRenderPassCacheState(), cache);
+    owner.withValidatedCache((nested) => assert.equal(nested, cache));
+    assert.equal(validations, 1);
+    state.renderPassCache = {};
+    assert.equal(owner.getRenderPassCacheState(), state.renderPassCache);
+    assert.equal(validations, 2);
+    assert.equal(owner.getRenderPassCacheState(), state.renderPassCache);
+    return "frame";
+  }), "frame");
+  owner.getRenderPassCacheState();
+  owner.getRenderPassCacheState();
+  assert.equal(validations, 4, "no memoization survives the synchronous frame");
+  assert.throws(() => owner.withValidatedCache(() => { throw Error("draw failed"); }), /draw failed/);
+  const afterThrow = validations;
+  owner.getRenderPassCacheState();
+  assert.equal(validations, afterThrow + 1);
+  assert.throws(() => owner.withValidatedCache(async () => {}), /synchronous/);
+  assert.throws(() => owner.withValidatedCache(() => Promise.resolve()), /asynchronous/);
+  const afterPromise = validations;
+  owner.getRenderPassCacheState();
+  assert.equal(validations, afterPromise + 1);
+});
 import {
   INTERACTION_COMPOSITE_PASS_NAMES,
   RENDER_PASS_NAMES,

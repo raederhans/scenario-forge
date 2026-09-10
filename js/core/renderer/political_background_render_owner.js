@@ -57,6 +57,7 @@ export function createPoliticalBackgroundRenderOwner({
     normalizeIntensityFieldsState,
     getRenderPassLayout,
     getProjectionRenderSignature,
+    getProjectionGeometryGeneration = () => getProjectionRenderSignature(),
     getOceanBaseFillColor,
   } = helpers;
   const {
@@ -113,6 +114,7 @@ export function createPoliticalBackgroundRenderOwner({
   const OCEAN_DEPTH_MASK_GRAY_MAP = Object.freeze({ ...(constants.oceanDepthMaskGrayMap || {}) });
   const OCEAN_MASK_MODE_TOPOLOGY = String(constants.oceanMaskModeTopology || "topology");
   let admin0MergedCache = { topologyRef: null, featureCount: 0, entries: [] };
+  let oceanBasePath = null;
   let scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
   let scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
   let scenarioPoliticalBackgroundDeferredFullCacheState = null;
@@ -1017,7 +1019,10 @@ export function createPoliticalBackgroundRenderOwner({
       && visibleEntries.length > POLITICAL_PROGRESSIVE_BACKGROUND_EXACT_ENTRY_LIMIT
     );
     if (useProgressiveRecovery) {
-      // progressive 恢复先用 admin0 粗底图守住颜色可见性；refresh-colors 保持精确路径，避免编辑反馈被粗底图吞掉。
+      // Warm the grouped paths in the background. Until they are ready, the
+      // foreground loop draws interactive features. Paint noninteractive shell
+      // coverage here while waiting for the grouped cache. Modern admin0 is not a valid
+      // political fallback for a scenario with different borders or owners.
       const cachedFullPass = getScenarioPoliticalBackgroundFullPassGroups(visibleEntries, {
         transform,
         allowBuild: false,
@@ -1042,10 +1047,14 @@ export function createPoliticalBackgroundRenderOwner({
           : groupCount;
       }
       const underlayStartedAt = nowMs();
-      drawAdmin0BackgroundFills({
-        screenRects: normalizedScreenRects,
-        transform,
-      });
+      const foregroundIds = new Set((state.landData?.features || []).map(getFeatureId).filter(Boolean));
+      const underlayEntries = visibleEntries.filter((entry) => !foregroundIds.has(getFeatureId(entry.feature) || entry.id));
+      const underlaySummary = underlayEntries.length
+        ? drawPoliticalBackgroundFillsForEntries(underlayEntries, {
+          transform, useFullPassCache: false, returnSummary: true,
+          recoveryQuality: politicalRecoveryQuality,
+        })
+        : { groupCount: 0, reusedPathCount: 0, builtPathCount: 0, pathlessEntryCount: 0 };
       const deferredFullCacheScheduled = scheduleScenarioPoliticalBackgroundDeferredFullCache(visibleEntries, {
         transform,
         reason: "progressive-recovery-background",
@@ -1055,6 +1064,7 @@ export function createPoliticalBackgroundRenderOwner({
         phase: "render",
         recoveryQuality: politicalRecoveryQuality,
         entryCount: visibleEntries.length,
+        underlayEntryCount: underlayEntries.length,
         exactEntryLimit: POLITICAL_PROGRESSIVE_BACKGROUND_EXACT_ENTRY_LIMIT,
         deferredFullCacheScheduled: !!deferredFullCacheScheduled,
         deferredFullCacheReady: false,
@@ -1062,19 +1072,20 @@ export function createPoliticalBackgroundRenderOwner({
       });
       return returnSummary
         ? {
-          groupCount: 0,
+          groupCount: underlaySummary.groupCount,
           entryCount: visibleEntries.length,
-          reusedPathCount: 0,
-          builtPathCount: 0,
-          pathlessEntryCount: 0,
+          underlayEntryCount: underlayEntries.length,
+          reusedPathCount: underlaySummary.reusedPathCount,
+          builtPathCount: underlaySummary.builtPathCount,
+          pathlessEntryCount: underlaySummary.pathlessEntryCount,
           cacheHit: false,
           recoveryQuality: politicalRecoveryQuality,
           progressive: true,
           deferredFullCacheReady: false,
           deferredFullCacheScheduled: !!deferredFullCacheScheduled,
-          coarseUnderlay: "admin0",
+          coarseUnderlay: "scenario-features",
         }
-        : 0;
+        : underlaySummary.groupCount;
     }
     return drawPoliticalBackgroundFillsForEntries(visibleEntries, {
       transform,
@@ -1229,9 +1240,28 @@ export function createPoliticalBackgroundRenderOwner({
 
     if (state.oceanData) {
       surface.getContext().fillStyle = oceanFillColor;
-      surface.getContext().beginPath();
-      surface.getPathCanvas()(state.oceanData);
-      surface.getContext().fill();
+      const oceanData = state.oceanData;
+      const pathCanvas = surface.getPathCanvas();
+      const generation = getProjectionGeometryGeneration(surface.getProjection());
+      if (platform.Path2D && typeof pathCanvas.context === "function") {
+        if (oceanBasePath?.source !== oceanData || oceanBasePath.generation !== generation) {
+          const previousContext = pathCanvas.context();
+          oceanBasePath = null;
+          try {
+            const path = new platform.Path2D();
+            pathCanvas.context(path);
+            pathCanvas(oceanData);
+            oceanBasePath = { source: oceanData, generation, path };
+          } finally {
+            pathCanvas.context(previousContext);
+          }
+        }
+        surface.getContext().fill(oceanBasePath.path);
+      } else {
+        surface.getContext().beginPath();
+        pathCanvas(oceanData);
+        surface.getContext().fill();
+      }
     }
     drawOceanStyle();
     drawOceanDepthMaskLayer();

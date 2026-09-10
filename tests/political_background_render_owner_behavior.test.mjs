@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { createPoliticalBackgroundRenderOwner } from "../js/core/renderer/political_background_render_owner.js";
 import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
+import { getProjectionGeometryGeneration, markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
 class FakePath2D {
   constructor() {
@@ -120,6 +121,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     normalizeIntensityFieldsState: (value) => ({ ...value, normalized: true }),
     getRenderPassLayout: () => ({ pixelWidth: 800, pixelHeight: 400, dpr: 1 }),
     getProjectionRenderSignature: () => "projection-a",
+    getProjectionGeometryGeneration,
     getOceanBaseFillColor: () => "#001122",
   };
   const effects = {
@@ -173,7 +175,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     },
   });
   return {
-    owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics,
+    owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics, surface,
     setMaskResult: (value) => { maskResult = value; },
   };
 }
@@ -192,6 +194,31 @@ test("background pass preserves sphere, ocean data, style, and delegated intensi
   ]);
   assert.deepEqual(fixture.calls.slice(9), ["commit:intensity"]);
   assert.equal(fixture.state.intensityFields.normalized, true);
+});
+
+test("ocean geometry survives camera, color and DPR changes but reprojects changed sources and projections", () => {
+  const fixture = createFixture();
+  const projection = (point) => point;
+  let context = fixture.context;
+  let oceanBuilds = 0;
+  const path = (feature) => { if (feature === fixture.state.oceanData) oceanBuilds += 1; };
+  path.context = (...args) => { if (!args.length) return context; context = args[0]; return path; };
+  fixture.surface.getProjection = () => projection;
+  fixture.surface.getPathCanvas = () => path;
+  fixture.state.oceanData = feature("ocean");
+  fixture.owner.drawBackgroundPass();
+  fixture.state.zoomTransform = { x: 45, y: 20, k: 2 };
+  fixture.state.dpr = 2;
+  fixture.state.colorRevision += 1;
+  fixture.owner.drawBackgroundPass();
+  assert.equal(oceanBuilds, 1);
+  assert.equal(context, fixture.context);
+  markProjectionGeometryChanged(projection);
+  fixture.owner.drawBackgroundPass();
+  assert.equal(oceanBuilds, 2);
+  fixture.state.oceanData = feature("replacement");
+  fixture.owner.drawBackgroundPass();
+  assert.equal(oceanBuilds, 3);
 });
 
 test("full-pass cache replays only for current transform and color identity", () => {
@@ -319,7 +346,7 @@ test("deferred slices prepare once each and reuse warm paths without feature loo
   assert.equal(fixture.calls.filter((call) => call === "repaint").length, 1);
 });
 
-test("progressive Admin0 underlay schedules one current deferred completion", () => {
+test("scenario recovery leaves modern admin0 out and schedules one current deferred completion", () => {
   const fixture = createFixture({ progressiveLimit: 1 });
   fixture.state.landData = { features: [feature("a"), feature("b")] };
   fixture.state.topology = {
@@ -333,7 +360,8 @@ test("progressive Admin0 underlay schedules one current deferred completion", ()
     returnSummary: true,
   });
   assert.equal(summary.progressive, true);
-  assert.equal(summary.coarseUnderlay, "admin0");
+  assert.equal(summary.coarseUnderlay, "scenario-features");
+  assert.equal(fixture.calls.some((entry) => entry === "fillStyle:color:AA"), false);
   assert.equal(summary.deferredFullCacheScheduled, true);
   assert.equal(fixture.pending.length, 1);
 
@@ -350,6 +378,32 @@ test("progressive Admin0 underlay schedules one current deferred completion", ()
   assert.equal(slice.builtPathCount, 2);
   assert.equal(slice.reusedPathCount, 0);
   assert.equal(slice.pathlessEntryCount, 0);
+});
+
+test("progressive recovery paints noninteractive scenario shell immediately without repainting foreground", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  const interactive = feature("interactive");
+  const shell = feature("RU_ARCTIC_FB_RKM_030");
+  shell.properties.interactive = false;
+  shell.properties.scenario_helper_kind = "shell_fallback";
+  fixture.state.landData = { features: [interactive] };
+  fixture.state.landDataFull = { features: [interactive, shell] };
+  const visibleItems = fixture.state.landDataFull.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  const summary = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  assert.equal(summary.underlayEntryCount, 1);
+  assert.equal(summary.groupCount, 1);
+  assert.equal(summary.deferredFullCacheReady, false);
+  assert.equal(fixture.pending.length, 1);
+  assert.ok(fixture.calls.includes("path:RU_ARCTIC_FB_RKM_030"));
+  assert.ok(fixture.calls.includes("fill"));
+  assert.ok(!fixture.calls.includes("path:interactive"));
+  assert.equal(fixture.metrics.find((metric) => metric.name === "scenarioPoliticalBackgroundProgressiveRecovery").underlayEntryCount, 1);
+  fixture.pending.shift().callback();
+  assert.equal(fixture.calls.filter((entry) => entry === "repaint").length, 1);
+  const warm = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  assert.equal(warm.deferredFullCacheReady, true);
 });
 
 test("stale deferred work cancels without invalidation, diagnostics, or repaint", () => {

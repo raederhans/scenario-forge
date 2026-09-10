@@ -16,18 +16,20 @@ const hoi4FarEastSovietRuntimeCandidateFeatureIdsByTopology = new WeakMap();
 
 function normalizeScenarioFeatureCollection(payload) {
   return Array.isArray(payload?.features)
-    ? { type: "FeatureCollection", features: payload.features }
+    ? { type: "FeatureCollection", features: payload.features,
+      ...(payload.globalCoverage === true ? { globalCoverage: true } : {}) }
     : null;
 }
 
 function getScenarioFeatureCollectionIdentityList(payload) {
   const features = Array.isArray(payload?.features) ? payload.features : EMPTY_FROZEN_LIST;
   return features
-    .map((feature) => String(feature?.id || feature?.properties?.id || "").trim())
+    .map((feature) => String(getRuntimeGeometryFeatureId(feature) || "").trim())
     .filter(Boolean);
 }
 
 function areScenarioFeatureCollectionsEquivalent(leftPayload, rightPayload) {
+  if ((leftPayload?.globalCoverage === true) !== (rightPayload?.globalCoverage === true)) return false;
   const left = Array.isArray(leftPayload?.features) ? leftPayload.features : EMPTY_FROZEN_LIST;
   const right = Array.isArray(rightPayload?.features) ? rightPayload.features : EMPTY_FROZEN_LIST;
   if (left.length !== right.length) return false;

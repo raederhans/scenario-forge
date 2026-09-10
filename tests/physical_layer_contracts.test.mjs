@@ -178,11 +178,11 @@ test("physical layer source contracts stay wired to the expected renderer and st
     schedulesDeferredContourWarmup:
       /if \(targetRuntime\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(startupReadyHandoffSource)
       && /postReadyScheduler\.scheduleTask\("post-ready-contour-warmup", async \(task\) => \{[\s\S]*?task\.throwIfStale\(\);[\s\S]*?await task\.yield\(\);[\s\S]*?await task\.waitFor\(ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",[\s\S]*?renderNow: false,[\s\S]*?task\.commit\(\(\) => requestMainRender\("post-ready-contours"\)\);[\s\S]*?\}, scopedTaskOptions\(\{/.test(startupReadyHandoffSource),
-    toolbarToggleLoadsFullPhysicalSet:
-      /ensureContextLayerDataFn\(\["physical-set", "physical-contours-set"\], \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(physicalOwnerSource)
+    toolbarToggleLoadsRequestedPhysicalSet:
+      /ensureContextLayerDataFn\(getPhysicalContextLayerRequests\(runtimeState\.styleConfig\?\.physical\), \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(physicalOwnerSource)
       && /physicalOwner\.bindEvents\(\);/.test(appearanceControllerSource),
-    projectImportLoadsFullPhysicalSet:
-      /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", \["physical-set", "physical-contours-set"\]\],[\s\S]*?\]\) if \(visible\) complete\(name, async \(\{ isCurrent: valid, signal \}\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false, isCurrent: valid, signal \}\);\s*if \(valid\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource)
+    projectImportLoadsRequestedPhysicalSet:
+      /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", getPhysicalContextLayerRequests\(state\.styleConfig\?\.physical\)\],[\s\S]*?\]\) if \(visible\) complete\(name, async \(\{ isCurrent: valid, signal \}\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false, isCurrent: valid, signal \}\);\s*if \(valid\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource)
       && /job = createProjectImportCompletion\(\{ required, optional, isCurrent,/.test(interactionFunnelSource)
       && /return task\.run\(\{ isCurrent: valid, signal: attempt\.signal \}\);/.test(importCompletionSource),
     contextMarkersStagedMetricsCoverTransportLines:

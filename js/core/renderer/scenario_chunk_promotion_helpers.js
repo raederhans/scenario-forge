@@ -25,14 +25,27 @@ function getMissingFeatureIdSample(completeFeatureIds, candidateFeatureIds) {
   return missing;
 }
 
-export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState) {
+export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
+  buildInteractiveLandData = null,
+  shouldExcludePoliticalVisualFeature = () => false,
+} = {}) {
   const completeFeatures = getFeatureCollectionFeatures(runtimeState?.scenarioPoliticalChunkData);
   const primaryVisibleFeatures = getFeatureCollectionFeatures(runtimeState?.scenarioPoliticalVisibleChunkData);
   const landDataFeatures = getFeatureCollectionFeatures(runtimeState?.landData);
+  const fullLandCollection = Array.isArray(runtimeState?.landDataFull?.features)
+    ? runtimeState.landDataFull : runtimeState?.landData;
+  const fullLandDataFeatures = getFeatureCollectionFeatures(fullLandCollection);
+  const expectedInteractiveFeatures = typeof buildInteractiveLandData === "function"
+    ? getFeatureCollectionFeatures(buildInteractiveLandData(fullLandCollection)) : [];
   const colorIds = new Set(Object.keys(runtimeState?.colors || {}).map((featureId) => String(featureId || "").trim()).filter(Boolean));
   const completeFeatureIds = collectFeatureIdSet(completeFeatures);
+  const requiredColorFeatureIds = collectFeatureIdSet(completeFeatures.filter((feature) => (
+    !shouldExcludePoliticalVisualFeature(feature, getFeatureId(feature))
+  )));
   const primaryVisibleFeatureIds = collectFeatureIdSet(primaryVisibleFeatures);
   const landDataFeatureIds = collectFeatureIdSet(landDataFeatures);
+  const fullLandDataFeatureIds = collectFeatureIdSet(fullLandDataFeatures);
+  const expectedInteractiveFeatureIds = collectFeatureIdSet(expectedInteractiveFeatures);
   const completePoliticalFeatureCount = completeFeatures.length;
   const primaryVisibleFeatureCount = primaryVisibleFeatures.length;
   const landDataFeatureCount = landDataFeatures.length;
@@ -43,20 +56,22 @@ export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState) {
       primaryVisibleFeatureIds.size <= 0
       || Array.from(primaryVisibleFeatureIds).every((featureId) => completeFeatureIds.has(featureId))
     );
-  const missingLandFeatureIdsSample = completeFeatureIds.size > 0
-    ? getMissingFeatureIdSample(completeFeatureIds, landDataFeatureIds)
+  const missingFullLandFeatureIdsSample = completeFeatureIds.size > 0
+    ? getMissingFeatureIdSample(completeFeatureIds, fullLandDataFeatureIds)
     : [];
-  const missingColorFeatureIdsSample = completeFeatureIds.size > 0
-    ? getMissingFeatureIdSample(completeFeatureIds, colorIds)
+  const missingInteractiveFeatureIdsSample = getMissingFeatureIdSample(expectedInteractiveFeatureIds, landDataFeatureIds);
+  const missingLandFeatureIdsSample = [...new Set([
+    ...missingFullLandFeatureIdsSample, ...missingInteractiveFeatureIdsSample,
+  ])].slice(0, POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT);
+  const missingColorFeatureIdsSample = requiredColorFeatureIds.size > 0
+    ? getMissingFeatureIdSample(requiredColorFeatureIds, colorIds)
     : [];
-  const landDataCoverageMissing = completePoliticalFeatureCount > 0
+  const fullLandDataCoverageMissing = missingFullLandFeatureIdsSample.length > 0;
+  const interactiveLandDataCoverageMissing = missingInteractiveFeatureIdsSample.length > 0;
+  const landDataCoverageMissing = fullLandDataCoverageMissing || interactiveLandDataCoverageMissing;
+  const colorCoverageMissing = completeFeatureIds.size > 0
     && (
-      landDataFeatureCount < completePoliticalFeatureCount
-      || missingLandFeatureIdsSample.length > 0
-    );
-  const colorCoverageMissing = completePoliticalFeatureCount > 0
-    && (
-      colorsCount < completePoliticalFeatureCount
+      colorsCount < requiredColorFeatureIds.size
       || missingColorFeatureIdsSample.length > 0
     );
 
@@ -64,13 +79,87 @@ export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState) {
     completePoliticalFeatureCount,
     primaryVisibleFeatureCount,
     landDataFeatureCount,
+    fullLandDataFeatureCount: fullLandDataFeatures.length,
+    expectedInteractiveFeatureCount: expectedInteractiveFeatures.length,
+    interactiveCoverageChecked: typeof buildInteractiveLandData === "function",
     colorsCount,
+    requiredColorFeatureCount: requiredColorFeatureIds.size,
     primaryVisibleFeatureSubsetActive,
     landDataCoverageMissing,
+    fullLandDataCoverageMissing,
+    interactiveLandDataCoverageMissing,
     colorCoverageMissing,
     missingLandFeatureIdsSample,
+    missingFullLandFeatureIdsSample,
+    missingInteractiveFeatureIdsSample,
     missingColorFeatureIdsSample,
   };
+}
+
+function isPoliticalCoverageDiagnosticsEnabled(runtimeState) {
+  if (runtimeState?.renderDiagnostics?.perfOverlayEnabled || runtimeState?.renderDiagnostics?.enabled) return true;
+  if (runtimeState?.uiState?.developerMode) return true;
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    return params.has("render_diag") || params.has("perf_overlay");
+  } catch (_error) {
+    return false;
+  }
+}
+
+function getScenarioChunkSelectionDiagnostics(runtimeState) {
+  const loadState = runtimeState?.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
+    ? runtimeState.runtimeChunkLoadState
+    : {};
+  const lastSelection = loadState.lastSelection && typeof loadState.lastSelection === "object"
+    ? loadState.lastSelection
+    : {};
+  return {
+    selectionVersion: Math.max(0, Number(loadState.selectionVersion || lastSelection.selectionVersion || 0)),
+    requiredChunkIds: Array.isArray(lastSelection.requiredChunkIds) ? [...lastSelection.requiredChunkIds] : [],
+    cacheOnlyChunkIds: Array.isArray(lastSelection.cacheOnlyChunkIds) ? [...lastSelection.cacheOnlyChunkIds] : [],
+    retainedActiveChunkIds: Array.isArray(lastSelection.retainedActiveChunkIds) ? [...lastSelection.retainedActiveChunkIds] : [],
+  };
+}
+
+export function recordScenarioPoliticalDerivedStateCoverage({
+  runtimeState,
+  recordRenderPerfMetric,
+  reason = "scenario-chunk-promotion",
+  stage = "check",
+  coverage,
+  restoredFullPoliticalChunkData = false,
+} = {}) {
+  if (typeof recordRenderPerfMetric !== "function" || !coverage) return null;
+  const shouldRecord = isPoliticalCoverageDiagnosticsEnabled(runtimeState)
+    || coverage.primaryVisibleFeatureSubsetActive
+    || coverage.landDataCoverageMissing
+    || coverage.colorCoverageMissing
+    || restoredFullPoliticalChunkData;
+  if (!shouldRecord) return null;
+  return recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage", 0, {
+    reason: String(reason || "scenario-chunk-promotion"),
+    stage: String(stage || "check"),
+    completePoliticalFeatureCount: coverage.completePoliticalFeatureCount,
+    primaryVisibleFeatureCount: coverage.primaryVisibleFeatureCount,
+    landDataFeatureCount: coverage.landDataFeatureCount,
+    fullLandDataFeatureCount: coverage.fullLandDataFeatureCount,
+    expectedInteractiveFeatureCount: coverage.expectedInteractiveFeatureCount,
+    interactiveCoverageChecked: coverage.interactiveCoverageChecked,
+    colorsCount: coverage.colorsCount,
+    requiredColorFeatureCount: coverage.requiredColorFeatureCount,
+    primaryVisibleFeatureSubsetActive: !!coverage.primaryVisibleFeatureSubsetActive,
+    landDataCoverageMissing: !!coverage.landDataCoverageMissing,
+    fullLandDataCoverageMissing: !!coverage.fullLandDataCoverageMissing,
+    interactiveLandDataCoverageMissing: !!coverage.interactiveLandDataCoverageMissing,
+    colorCoverageMissing: !!coverage.colorCoverageMissing,
+    missingLandFeatureIdsSample: coverage.missingLandFeatureIdsSample,
+    missingFullLandFeatureIdsSample: coverage.missingFullLandFeatureIdsSample,
+    missingInteractiveFeatureIdsSample: coverage.missingInteractiveFeatureIdsSample,
+    missingColorFeatureIdsSample: coverage.missingColorFeatureIdsSample,
+    restoredFullPoliticalChunkData: !!restoredFullPoliticalChunkData,
+    ...getScenarioChunkSelectionDiagnostics(runtimeState),
+  });
 }
 
 export function resolveScenarioChunkPromotionChangeSet({

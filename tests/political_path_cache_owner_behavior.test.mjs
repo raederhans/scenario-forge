@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
+import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
 const item = (id, x = 50, drawOrder = 0) => ({
   id, minX: x, maxX: x, minY: 50, maxY: 50, drawOrder,
@@ -15,7 +16,7 @@ function fixture(t) {
   t.after(() => { globalThis.Path2D = originalPath; });
   const h = {
     state: { zoomTransform: { k: 1, x: 0, y: 0 }, width: 100, height: 100, renderPhase: "idle" },
-    cache: { dirty: {} }, projection: "p1", viewport: "v1", time: 0, pathCost: 0,
+    cache: { dirty: {} }, projection: {}, viewport: "v1", time: 0, pathCost: 0,
     candidates: { items: [item("a"), item("b", 60)] },
     timers: new Map(), cancelled: [], metrics: [], counters: {}, builds: [], serial: 0,
   };
@@ -33,7 +34,7 @@ function fixture(t) {
     h.builds.push(feature.id); h.time += h.pathCost; context.value = `path:${feature.id}`;
   });
   h.owner = createPoliticalPathCacheOwner(h.state, {
-    rendererSurfaceHost: { getPathCanvas: () => h.path },
+    rendererSurfaceHost: { getPathCanvas: () => h.path, getProjection: () => h.projection },
     getPoliticalPassStaticSignature: (transform) => `static:${transform.k}:${transform.x}:${transform.y}`,
     getProjectionRenderSignature: () => h.projection,
     getViewportRenderSignature: () => h.viewport,
@@ -71,6 +72,14 @@ test("cache mismatch reads are non-destructive; preparation preserves map identi
   first.map.set("old", { path: true });
   h.state.zoomTransform.x = 5;
   assert.equal(h.cache.politicalPathCacheTransform.x, 0);
+  assert.equal(h.owner.getPoliticalPathCacheHandle().valid, true);
+  h.state.zoomTransform.k = 3;
+  h.viewport = "DPR2";
+  h.state.colorRevision = 3;
+  h.state.sovereigntyRevision = 2;
+  h.state.scenarioShellOverlayRevision = 2;
+  assert.equal(h.owner.getPoliticalPathCacheHandle().valid, true);
+  markProjectionGeometryChanged(h.projection);
   assert.equal(h.owner.getPoliticalPathCacheHandle().valid, false);
   assert.equal(first.map.size, 1);
   const next = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
@@ -79,9 +88,9 @@ test("cache mismatch reads are non-destructive; preparation preserves map identi
   assert.equal(next.resetSummary.previousSize, 1);
   assert.equal(next.cache.politicalPathCacheTransform.x, 5);
   for (const change of [
-    () => { h.projection = "p2"; }, () => { h.viewport = "v2"; },
-    () => { h.state.activeScenarioId = "new"; }, () => { h.state.sovereigntyRevision = 1; },
-    () => { h.state.scenarioShellOverlayRevision = 1; },
+    () => { h.projection = {}; }, () => { h.state.topologyPrimary = {}; },
+    () => { h.state.activeScenarioId = "new"; }, () => { h.state.sceneGeneration = 1; },
+    () => { h.state.runtimePoliticalTopology = {}; },
   ]) {
     change();
     assert.equal(h.owner.getPoliticalPathCacheHandle().valid, false);
@@ -223,6 +232,21 @@ test("queued work rechecks phase, deferred exact work, dirty flags, and signatur
   h.candidates.overflow = true;
   assert.equal(h.owner.schedulePoliticalPathWarmup(), false);
   assert.equal(h.cache.politicalPathWarmupReason, "warmup-spatial-unavailable");
+});
+
+test("warmup viewport changes retire only the queue and preserve reusable projected paths", (t) => {
+  const h = fixture(t);
+  const feature = h.candidates.items[0].feature;
+  const entry = h.owner.getPoliticalFeaturePathEntry(feature, { allowBuild: true });
+  h.owner.schedulePoliticalPathWarmup();
+  h.state.zoomTransform = { k: 4, x: 300, y: -60 };
+  assert.equal(h.tick(), false);
+  assert.equal(h.cache.politicalPathWarmupReason, "warmup-viewport-changed");
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(feature), entry);
+  h.owner.schedulePoliticalPathWarmup();
+  h.viewport = "resized-DPR2";
+  assert.equal(h.tick(), false);
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(feature), entry);
 });
 
 test("same ID requires the current geometry while wrapper copies preserve cache hits", (t) => {

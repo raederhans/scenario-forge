@@ -5,10 +5,22 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { createRendererFitProjectionOwner } from "../js/core/renderer/renderer_fit_projection_owner.js";
+import { getProjectionGeometryGeneration } from "../js/core/renderer/projection_geometry_identity.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
+
+test("successful projection fit invalidates geometry while a skipped fit preserves it", () => {
+  const harness = createHarness();
+  const before = getProjectionGeometryGeneration(harness.projection);
+  assert.equal(harness.owner.fitProjection(), true);
+  assert.notEqual(getProjectionGeometryGeneration(harness.projection), before);
+  const skipped = createHarness({ features: [] });
+  const unchanged = getProjectionGeometryGeneration(skipped.projection);
+  assert.equal(skipped.owner.fitProjection(), false);
+  assert.equal(getProjectionGeometryGeneration(skipped.projection), unchanged);
+});
 
 const BASE_FEATURES = Object.freeze([
   { type: "Feature", id: "A", geometry: { type: "Point", coordinates: [0, 0] } },

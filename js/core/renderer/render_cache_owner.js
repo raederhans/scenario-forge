@@ -5,6 +5,7 @@
  * primitives. map_renderer.js keeps diagnostics, adjacent render side effects,
  * render pass orchestration, and visible-frame transactions.
  */
+import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASS_NAMES = new Set([
   "political",
   "contextBase",
@@ -114,12 +115,10 @@ export function createRenderCacheOwner({
     };
   }
 
-  function getRenderPassCacheState() {
-    return ensureRenderPassCacheState(state, {
-      cloneZoomTransform,
-      renderPassNames,
-    });
-  }
+  const { getRenderPassCacheState, withValidatedCache } = createRenderCacheValidationScope({
+    getRoot: () => state.renderPassCache,
+    ensure: () => ensureRenderPassCacheState(state, { cloneZoomTransform, renderPassNames }),
+  });
 
   function invalidateLastGoodFrame(reason = "visual-invalidation") {
     const cache = getRenderPassCacheState();
@@ -693,6 +692,7 @@ export function createRenderCacheOwner({
   }
 
   return Object.freeze({
+    withValidatedCache,
     scenarioLayerCache: Object.freeze({
       getSnapshot: getContextScenarioLayerSnapshot,
       render: renderContextScenarioLayer,

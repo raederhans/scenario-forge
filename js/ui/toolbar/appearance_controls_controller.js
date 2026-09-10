@@ -8,6 +8,7 @@ import {
   setAppearanceStyleGroupState,
 } from "../../core/state/actions/appearance_actions.js";
 import { setSelectedColorState } from "../../core/state/actions/appearance_selection_actions.js";
+import { getPhysicalContextLayerRequests } from "../../core/state_defaults.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
 import { createTransportAppearanceController } from "./transport_appearance_controller.js";
@@ -274,7 +275,7 @@ export function createAppearanceControlsController({
     if (typeof runtimeState.ensureContextLayerDataFn !== "function") return;
     const requests = [];
     if (runtimeState.showUrban) requests.push("urban");
-    if (runtimeState.showPhysical) requests.push(["physical-set", "physical-contours-set"]);
+    if (runtimeState.showPhysical) requests.push(getPhysicalContextLayerRequests(runtimeState.styleConfig?.physical));
     if (runtimeState.showRivers) requests.push("rivers");
     if (runtimeState.showTransport !== false) {
       listTransportOverviewCapabilityFamilyIds().forEach((familyId) => {

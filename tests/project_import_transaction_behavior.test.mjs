@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { parse } from 'acorn';
 import { state } from '../js/core/state.js';
+import { getPhysicalContextLayerRequests } from '../js/core/state_defaults.js';
 import { clearHistory, pushHistoryEntry, undoHistory, redoHistory } from '../js/core/history_manager.js';
 import { prepareImportedProjectState, commitImportedProjectPatch as applyProjectImportPatch } from '../js/core/interaction_funnel/import_apply_orchestration.js';
 import { importProjectTextThroughFunnel, importProjectThroughFunnel, getInteractionFunnelDebugState } from '../js/core/interaction_funnel.js';
@@ -68,6 +69,7 @@ test('scenario import never seeds outgoing Atlantropa, TNO split or coarse land 
     const events = [];
     const globals = {
       state: target, runtimeState: target, debugState: { importApplyCount: 0 },
+      getPhysicalContextLayerRequests,
       createProjectImportCompletion, createImportRecoveryUi: () => () => {},
       commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason,
       captureProjectImportState, commitImportedProjectPatch: applyProjectImportPatch, seedSovereigntyFromLandData,
