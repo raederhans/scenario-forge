@@ -330,9 +330,10 @@ test("fine drawing and diagnostics live in the partial owner while state writes 
   assertOrderedTokens(fineSource, [
     "const islandNeighbors = getDebugMode() === \"ISLANDS\" ? helper.getIslandNeighborGraph() : null;",
     "const featureMetrics = {",
-    "if (Array.isArray(viewport.visibleItems))",
-    "orderPoliticalShellUnderlayFirst(viewport.visibleItems).forEach",
-    "const featureEntries = state.landData.features.map",
+    "const hasVisibleItems = Array.isArray(viewport.visibleItems);",
+    "const featureEntries = hasVisibleItems",
+    "? viewport.visibleItems",
+    ": state.landData.features.map",
     "orderPoliticalShellUnderlayFirst(featureEntries).forEach",
     "return featureMetrics;",
   ], "fine political root loop");

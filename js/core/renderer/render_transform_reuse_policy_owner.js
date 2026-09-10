@@ -1,6 +1,3 @@
-import { RENDER_PASS_NAMES } from "../map_renderer/render_pass_catalog.js";
-
-const VECTOR_RENDER_PASS_NAMES = Object.freeze(RENDER_PASS_NAMES.filter((passName) => passName !== "hgoPreview"));
 const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 640;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
@@ -43,7 +40,7 @@ export function createRenderTransformReusePolicyOwner({
   const {
     getRenderPassCacheState = () => state.renderPassCache || {},
     getPassReferenceTransform = () => null,
-    getActiveRenderPassNames = () => VECTOR_RENDER_PASS_NAMES,
+    getActiveRenderPassNames = () => null,
   } = getters;
   const {
     cloneZoomTransform = defaultCloneZoomTransform,
