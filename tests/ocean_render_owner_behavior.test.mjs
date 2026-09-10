@@ -16,8 +16,8 @@ function createCanvasContext() {
     beginPath() {
       calls.push({ type: "beginPath" });
     },
-    fill() {
-      calls.push({ type: "fill", fillStyle: this.fillStyle, alpha: this.globalAlpha });
+    fill(path) {
+      calls.push({ type: "fill", path, fillStyle: this.fillStyle, alpha: this.globalAlpha });
     },
     restore() {
       calls.push({ type: "restore" });
@@ -25,9 +25,10 @@ function createCanvasContext() {
     save() {
       calls.push({ type: "save" });
     },
-    stroke() {
+    stroke(path) {
       calls.push({
         type: "stroke",
+        path,
         alpha: this.globalAlpha,
         lineWidth: this.lineWidth,
         strokeStyle: this.strokeStyle,
@@ -63,6 +64,7 @@ function createOwner({
   },
   state = {},
   overlayFeatures = [],
+  helperOverrides = {},
 } = {}) {
   const helperCalls = [];
   const pathCalls = [];
@@ -137,6 +139,7 @@ function createOwner({
       pathBoundsInScreen: () => true,
       resolveCoastlineTopologySource: () => ({ source: coastlineSource }),
       resolveOceanMask: () => ({ mode: "topology_ocean", quality: 1 }),
+      ...helperOverrides,
       sortBathymetryFeaturesForFill: (collection) => [...(collection?.features || [])].sort(
         (a, b) => b.properties.depth_max_m - a.properties.depth_max_m,
       ),
@@ -247,3 +250,54 @@ test("ocean owner suppresses coastal accents for HGO vector scenes", () => {
   assert.equal(harness.pathCalls.length, 0);
   assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 0);
 });
+
+for (const [method, paintType, visibilityHelper, metricName] of [
+  ["drawBathymetryBands", "fill", "getBathymetryBandVisibilityConfig", "drawBathymetryBands"],
+  ["drawBathymetryContours", "stroke", "getBathymetryContourVisibilityConfig", "drawBathymetryContours"],
+]) {
+  for (const cached of [true, false]) {
+    test(`${method} ${cached ? "passes cached path only to paint" : "uses the existing current-path fallback"}`, () => {
+      const feature = createFeature(100);
+      const cachedPath = { name: "cached-path" };
+      const requests = [];
+      const metrics = [];
+      const harness = createOwner({ helperOverrides: {
+        getProjectedGeographicPath: (object) => { requests.push(object); return cached ? cachedPath : null; },
+        collectContextMetric: (name, duration, details) => metrics.push({ name, details }),
+      } });
+      harness.owner[method]({ features: [feature] }, { contourStrength: 0.5 });
+      const paintCalls = harness.context.calls.filter((call) => call.type === "fill" || call.type === "stroke");
+      assert.equal(paintCalls.length, 1);
+      assert.equal(paintCalls[0].type, paintType);
+      assert.equal(paintCalls[0].path, cached ? cachedPath : undefined);
+      assert.deepEqual(harness.pathCalls, cached ? [] : [feature]);
+      assert.equal(harness.context.calls.filter((call) => call.type === "beginPath").length, cached ? 0 : 1);
+      assert.deepEqual(requests, [feature]);
+      assert.deepEqual(metrics, [{ name: metricName, details: { featureCount: 1, renderedCount: 1 } }]);
+    });
+  }
+
+  test(`${method} skips offscreen and zero-alpha features before requesting paths`, () => {
+    const zeroAlpha = createFeature(100);
+    const offscreen = createFeature(200);
+    const visible = createFeature(300);
+    const requests = [];
+    const boundsRequests = [];
+    const metrics = [];
+    const harness = createOwner({ helperOverrides: {
+      getBathymetryPresetProfile: () => ({ skipAlternateContourDepths: false }),
+      [visibilityHelper]: (feature) => ({ alpha: feature === zeroAlpha ? 0 : 1 }),
+      pathBoundsInScreen: (feature) => { boundsRequests.push(feature); return feature !== offscreen; },
+      getProjectedGeographicPath: (feature) => { requests.push(feature); return { feature }; },
+      collectContextMetric: (name, duration, details) => metrics.push({ name, details }),
+    } });
+    harness.owner[method]({ features: [zeroAlpha, offscreen, visible] }, { contourStrength: 0.5 });
+    assert.deepEqual(requests, [visible]);
+    assert.ok(!boundsRequests.includes(zeroAlpha));
+    assert.deepEqual(harness.pathCalls, []);
+    const paints = harness.context.calls.filter((call) => call.type === "fill" || call.type === "stroke");
+    assert.equal(paints.length, 1);
+    assert.equal(paints[0].type, paintType);
+    assert.deepEqual(metrics, [{ name: metricName, details: { featureCount: 3, renderedCount: 1 } }]);
+  });
+}

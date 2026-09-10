@@ -241,6 +241,9 @@ import {
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
+import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
+import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
+import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
 import { createPhysicalLayerRenderOwner } from "./renderer/physical_layer_render_owner.js";
 import { createScenarioReliefOverlayRenderOwner } from "./renderer/scenario_relief_overlay_render_owner.js";
 import { createCityLightsRenderOwner } from "./renderer/city_lights_render_owner.js";
@@ -470,7 +473,7 @@ const ZOOM_SETTLE_ADAPTIVE_DELTA_MIN = 0.06;
 const ZOOM_SETTLE_ADAPTIVE_DELTA_MAX = 0.85;
 const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
   low: Object.freeze({
-    majorIntervalMultiplier: 3,
+    majorIntervalMultiplier: 4,
     majorOpacityMultiplier: 0.42,
     majorWidthMultiplier: 0.78,
     majorMinScreenSpanPx: 22,
@@ -493,9 +496,9 @@ const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
     minorWidthMultiplier: 0.82,
     minorIntervalMultiplier: 2,
     minorMinScreenSpanPx: 18,
-    minorMaxFeaturesBase: 900,
-    minorMaxFeaturesPerMajor: 1.8,
-    minorMaxFeaturesHardCap: 3000,
+    minorMaxFeaturesBase: 450,
+    minorMaxFeaturesPerMajor: 1.2,
+    minorMaxFeaturesHardCap: 1600,
   }),
   high: Object.freeze({
     majorIntervalMultiplier: 1,
@@ -506,10 +509,10 @@ const CONTOUR_ZOOM_STYLE_PROFILES = Object.freeze({
     minorOpacityMultiplier: 1,
     minorWidthMultiplier: 1,
     minorIntervalMultiplier: 1,
-    minorMinScreenSpanPx: 8,
-    minorMaxFeaturesBase: 1800,
-    minorMaxFeaturesPerMajor: 2.8,
-    minorMaxFeaturesHardCap: 6400,
+    minorMinScreenSpanPx: 12,
+    minorMaxFeaturesBase: 900,
+    minorMaxFeaturesPerMajor: 1.8,
+    minorMaxFeaturesHardCap: 3200,
   }),
 });
 const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
@@ -1844,6 +1847,32 @@ function getRiverLayerRenderOwner() {
   return riverLayerRenderOwner;
 }
 
+let geographicPathCache = null;
+const oceanSphereGeometry = Object.freeze({ type: "Sphere" });
+const oceanExclusionPaths = new WeakMap();
+
+function getProjectedGeographicPath(object) {
+  geographicPathCache ||= createProjectedGeographicPathCache({
+    getProjection: () => rendererSurfaceHost.getProjection(),
+  });
+  return geographicPathCache.getPath(object);
+}
+
+function getOceanExclusionPath(collection) {
+  if (!collection || typeof globalThis.Path2D?.prototype?.addPath !== "function") return null;
+  const generation = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
+  const cached = oceanExclusionPaths.get(collection);
+  if (cached?.generation === generation) return cached.path;
+  const sphere = getProjectedGeographicPath(oceanSphereGeometry);
+  const excluded = getProjectedGeographicPath(collection);
+  if (!sphere || !excluded) return null;
+  const path = new globalThis.Path2D();
+  path.addPath(sphere);
+  path.addPath(excluded);
+  oceanExclusionPaths.set(collection, { generation, path });
+  return path;
+}
+
 function getOceanRenderOwner() {
   if (oceanRenderOwner) {
     return oceanRenderOwner;
@@ -1883,6 +1912,9 @@ function getOceanRenderOwner() {
       getBathymetryPresetProfile,
       getCoastlineCollectionForZoom,
       getOceanStyleConfig,
+      getProjectedGeographicPath,
+      collectContextMetric,
+      nowMs,
       getProjectedLineDensityStats,
       getSafeCanvasColor,
       getScenarioCoastalAccentLineWidth,
@@ -1915,6 +1947,7 @@ function getPhysicalLayerRenderOwner() {
       getContext: () => rendererSurfaceHost.getContext(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getProjection: () => rendererSurfaceHost.getProjection(),
+      getContourPath2D: getProjectedGeographicPath,
     },
     helpers: {
       applyPhysicalLandClipMask,
@@ -3431,7 +3464,14 @@ function getDrawCanvasOrchestrationOwner() {
       nowMs,
     },
     effects: {
-      ensureLayerDataFromTopology,
+      ensureLayerDataFromTopology: () => {
+        ensureLayerDataFromTopology();
+        // Cached viewport frames also need to select the current contour pack.
+        if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
+          && !runtimeState.bootBlocking && !runtimeState.scenarioApplyInFlight) {
+          ensureContourLodForView();
+        }
+      },
       prepareAsyncFrame: () => getGeometryRasterRuntimeOwner().prepareFrame(),
       withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
       incrementPerfCounter,
@@ -5373,7 +5413,7 @@ function getAdaptiveContourStrokeColor(feature, baseColor) {
     return safeBaseColor;
   }
   const targetColor = luminance >= 0.42 ? "#111827" : "#ffffff";
-  const mixAmount = luminance >= 0.42 ? 0.58 : 0.74;
+  const mixAmount = luminance >= 0.42 ? 0.28 : 0.38;
   return mixCanvasColors(safeBaseColor, targetColor, mixAmount) || targetColor || safeBaseColor;
 }
 
@@ -9942,11 +9982,18 @@ function normalizeBathymetryTopologyEntry(url, topology) {
   if (!Array.isArray(bands?.features) && !Array.isArray(contours?.features)) {
     return null;
   }
+  const normalizationStartedAt = nowMs();
+  const normalizedBands = normalizeBathymetryFeatureCollection(bands);
+  recordRenderPerfMetric("bathymetryGeometryNormalization", nowMs() - normalizationStartedAt, {
+    url,
+    ...normalizedBands.diagnostics,
+  });
   return {
     url,
     topology,
-    bands: Array.isArray(bands?.features) ? bands : null,
+    bands: Array.isArray(bands?.features) ? normalizedBands.collection : null,
     contours: Array.isArray(contours?.features) ? contours : null,
+    geometryDiagnostics: normalizedBands.diagnostics,
   };
 }
 
@@ -10200,28 +10247,39 @@ function applyOceanClipMask(maskMode) {
   const startedAt = nowMs();
   rendererSurfaceHost.getContext().beginPath();
   if (maskMode === OCEAN_MASK_MODE_TOPOLOGY && runtimeState.oceanData) {
-    rendererSurfaceHost.getPathCanvas()(runtimeState.oceanData);
-    rendererSurfaceHost.getContext().clip();
+    const cachedPath = getProjectedGeographicPath(runtimeState.oceanData);
+    if (cachedPath) {
+      rendererSurfaceHost.getContext().clip(cachedPath);
+    } else {
+      rendererSurfaceHost.getPathCanvas()(runtimeState.oceanData);
+      rendererSurfaceHost.getContext().clip();
+    }
     recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
       applied: true,
       maskMode,
       maskSource: "oceanData",
       maskFeatureCount: getFeatureCollectionFeatureCount(runtimeState.oceanData),
       maskArcRefEstimate: estimateTopologyObjectArcRefs(runtimeState.topologyPrimary || runtimeState.topology, "ocean"),
+      pathCache: geographicPathCache?.getStats(),
     });
     return;
   }
 
-  rendererSurfaceHost.getPathCanvas()({ type: "Sphere" });
   const maskInfo = getPhysicalLandMaskInfo();
   const landMask = maskInfo.collection;
 
   if (landMask) {
-    rendererSurfaceHost.getPathCanvas()(landMask);
-    try {
-      rendererSurfaceHost.getContext().clip("evenodd");
-    } catch (error) {
-      rendererSurfaceHost.getContext().clip();
+    const exclusionPath = getOceanExclusionPath(landMask);
+    if (exclusionPath) {
+      rendererSurfaceHost.getContext().clip(exclusionPath, "evenodd");
+    } else {
+      rendererSurfaceHost.getPathCanvas()(oceanSphereGeometry);
+      rendererSurfaceHost.getPathCanvas()(landMask);
+      try {
+        rendererSurfaceHost.getContext().clip("evenodd");
+      } catch (error) {
+        rendererSurfaceHost.getContext().clip();
+      }
     }
     recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
       applied: true,
@@ -10229,14 +10287,19 @@ function applyOceanClipMask(maskMode) {
       maskSource: maskInfo.maskSource,
       maskFeatureCount: maskInfo.maskFeatureCount,
       maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+      pathCache: geographicPathCache?.getStats(),
     });
     return;
   }
 
   if (runtimeState.oceanData) {
     rendererSurfaceHost.getContext().beginPath();
-    rendererSurfaceHost.getPathCanvas()(runtimeState.oceanData);
-    rendererSurfaceHost.getContext().clip();
+    const cachedPath = getProjectedGeographicPath(runtimeState.oceanData);
+    if (cachedPath) rendererSurfaceHost.getContext().clip(cachedPath);
+    else {
+      rendererSurfaceHost.getPathCanvas()(runtimeState.oceanData);
+      rendererSurfaceHost.getContext().clip();
+    }
     recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
       applied: true,
       maskMode,
@@ -10248,7 +10311,12 @@ function applyOceanClipMask(maskMode) {
     return;
   }
 
-  rendererSurfaceHost.getContext().clip();
+  const spherePath = getProjectedGeographicPath(oceanSphereGeometry);
+  if (spherePath) rendererSurfaceHost.getContext().clip(spherePath);
+  else {
+    rendererSurfaceHost.getPathCanvas()(oceanSphereGeometry);
+    rendererSurfaceHost.getContext().clip();
+  }
   recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
     applied: true,
     maskMode,
@@ -10260,6 +10328,11 @@ function applyOceanClipMask(maskMode) {
 
 function applyBathymetryCoverageExclusionMask(coverageCollection) {
   if (!Array.isArray(coverageCollection?.features) || !coverageCollection.features.length) return;
+  const exclusionPath = getOceanExclusionPath(coverageCollection);
+  if (exclusionPath) {
+    rendererSurfaceHost.getContext().clip(exclusionPath, "evenodd");
+    return;
+  }
   rendererSurfaceHost.getContext().beginPath();
   rendererSurfaceHost.getPathCanvas()({ type: "Sphere" });
   rendererSurfaceHost.getPathCanvas()(coverageCollection);
@@ -10403,7 +10476,7 @@ function getPhysicalPresetRenderProfile(cfg) {
       semanticBlendMode: "source-over",
       majorContourOpacityMultiplier: 1.55,
       minorContourOpacityRatio: 0.8,
-      minorContourMinZoom: 1.2,
+      minorContourMinZoom: 4,
     };
   }
   return {
@@ -10416,7 +10489,7 @@ function getPhysicalPresetRenderProfile(cfg) {
     semanticBlendMode: "source-over",
     majorContourOpacityMultiplier: 1.22,
     minorContourOpacityRatio: 0.68,
-    minorContourMinZoom: 1.6,
+    minorContourMinZoom: 3.2,
   };
 }
 
@@ -10809,6 +10882,41 @@ function drawContourCollection(
     minScreenSpanPx,
     maxFeatures,
     opacityMultiplierResolver,
+  });
+}
+
+let lastContourLodRequest = null;
+
+function ensureContourLodForView() {
+  if (!runtimeState.showPhysical || runtimeState.styleConfig?.physical?.mode === "atlas_only"
+    || typeof runtimeState.ensureContextLayerDataFn !== "function") return;
+  const requested = resolveContourLodRequest(runtimeState);
+  const key = `${runtimeState.activeScenarioId || ""}:${requested.join("|")}`;
+  const ensure = runtimeState.ensureContextLayerDataFn;
+  const cache = runtimeState.contextLayerExternalDataByName;
+  const major = runtimeState.physicalContourMajorData;
+  const minor = runtimeState.physicalContourMinorData;
+  const previous = lastContourLodRequest;
+  if (previous?.key === key && previous.ensure === ensure && previous.cache === cache
+    && (previous.pending || (previous.major === major && previous.minor === minor))) return;
+  const request = { key, ensure, cache, major, minor, pending: true };
+  lastContourLodRequest = request;
+  Promise.resolve().then(() => ensure(["physical-contours-set"], {
+    reason: "contour-lod",
+    renderNow: false,
+  })).then(() => {
+    if (lastContourLodRequest !== request) return;
+    request.pending = false;
+    if (requested.some((name) => runtimeState.contextLayerLoadStateByName?.[name] === "error")) {
+      lastContourLodRequest = null;
+      return; // Retry on the next user frame, without a failed-load render loop.
+    }
+    request.major = runtimeState.physicalContourMajorData;
+    request.minor = runtimeState.physicalContourMinorData;
+    requestRendererRender("contour-lod-ready");
+  }).catch((error) => {
+    if (lastContourLodRequest === request) lastContourLodRequest = null;
+    console.warn("[physical] Contour LOD request failed", error);
   });
 }
 

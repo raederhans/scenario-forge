@@ -12,6 +12,10 @@ export function createPhysicalLayerRenderOwner({
     getContext = () => null,
     getPathCanvas = () => null,
     getProjection = () => null,
+    // Optional contour-specific path cache. The renderer owns projection
+    // generation and invalidation; this owner only consumes the replayable
+    // Path2D when available and keeps the existing d3 path fallback.
+    getContourPath2D = null,
   } = getters;
   const {
     applyPhysicalLandClipMask = () => false,
@@ -326,6 +330,7 @@ export function createPhysicalLayerRenderOwner({
     if (!context || !pathCanvas || !Array.isArray(collection?.features) || collection.features.length === 0) {
       return { drewAny: false, renderedCount: 0, selectedCount: 0 };
     }
+    const selectionStartedAt = nowMs();
     const visibleFeatures = getContourVisibleFeatures(collection, {
       cacheSlot,
       k,
@@ -335,7 +340,17 @@ export function createPhysicalLayerRenderOwner({
       minScreenSpanPx,
       maxFeatures,
     });
-    if (!visibleFeatures.length) return { drewAny: false, renderedCount: 0, selectedCount: 0 };
+    const selectionMs = nowMs() - selectionStartedAt;
+    let pathBuildMs = 0;
+    let strokeMs = 0;
+    if (!visibleFeatures.length) {
+      collectContextMetric(`drawContourCollection:${cacheSlot}`, selectionMs, {
+        cacheSlot, selectionMs, styleMs: 0, pathBuildMs, strokeMs,
+        selectedCount: 0, renderedCount: 0,
+      });
+      return { drewAny: false, renderedCount: 0, selectedCount: 0 };
+    }
+    const styleStartedAt = nowMs();
     const scale = Math.max(0.0001, k);
     context.globalAlpha = interactive ? Math.min(opacity, 0.22) : opacity;
     context.strokeStyle = color;
@@ -352,7 +367,9 @@ export function createPhysicalLayerRenderOwner({
       const rawMultiplier = typeof opacityMultiplierResolver === "function"
         ? opacityMultiplierResolver(feature)
         : 1;
-      const multiplier = clamp(Math.round((Number(rawMultiplier) || 1) / 0.05) * 0.05, 0, 2);
+      const numericMultiplier = Number(rawMultiplier);
+      const multiplier = clamp(Math.round((Number.isFinite(numericMultiplier) ? numericMultiplier : 1) / 0.05) * 0.05, 0, 2);
+      if (multiplier <= 0) return;
       const batchKey = `${strokeColor}|${multiplier.toFixed(2)}`;
       if (!strokeBatches.has(batchKey)) {
         strokeBatches.set(batchKey, {
@@ -364,19 +381,47 @@ export function createPhysicalLayerRenderOwner({
       strokeBatches.get(batchKey).features.push(feature);
     });
 
+    const styleMs = nowMs() - styleStartedAt;
     let drewAny = false;
     let renderedCount = 0;
     strokeBatches.forEach(({ features, strokeColor, multiplier }) => {
       if (!Array.isArray(features) || !features.length) return;
       context.strokeStyle = strokeColor;
       context.globalAlpha = clamp((interactive ? Math.min(opacity, 0.22) : opacity) * multiplier, 0, 1);
+      const pathBuildStartedAt = nowMs();
+      const canAggregate = typeof getContourPath2D === "function"
+        && typeof globalThis.Path2D === "function"
+        && typeof globalThis.Path2D.prototype?.addPath === "function";
+      if (canAggregate) {
+        const aggregate = new globalThis.Path2D();
+        const cachedPaths = features.map((feature) => getContourPath2D(feature, { cacheSlot, k }));
+        if (cachedPaths.every((path) => path)) {
+          cachedPaths.forEach((path) => aggregate.addPath(path));
+          pathBuildMs += nowMs() - pathBuildStartedAt;
+          const strokeStartedAt = nowMs();
+          context.stroke(aggregate);
+          strokeMs += nowMs() - strokeStartedAt;
+          drewAny = true;
+          renderedCount += features.length;
+          return;
+        }
+      }
+      // Keep the original one-batch Canvas behavior whenever Path2D
+      // aggregation is unavailable or partially populated.
       context.beginPath();
       features.forEach((feature) => {
         pathCanvas(feature);
       });
+      pathBuildMs += nowMs() - pathBuildStartedAt;
+      const strokeStartedAt = nowMs();
       context.stroke();
+      strokeMs += nowMs() - strokeStartedAt;
       drewAny = true;
       renderedCount += features.length;
+    });
+    collectContextMetric(`drawContourCollection:${cacheSlot}`, selectionMs + styleMs + pathBuildMs + strokeMs, {
+      cacheSlot, selectionMs, styleMs, pathBuildMs, strokeMs,
+      selectedCount: visibleFeatures.length, renderedCount,
     });
     return {
       drewAny,
@@ -473,6 +518,7 @@ export function createPhysicalLayerRenderOwner({
       opacityMultiplierResolver: resolveContourIntensity,
     });
 
+    let minorDrawResult = { renderedCount: 0, selectedCount: 0 };
     if (cfg.contourMinorVisible && zoomProfile.minorVisible && k >= presetProfile.minorContourMinZoom) {
       if (Array.isArray(runtimeState.physicalContourMinorData?.features) && runtimeState.physicalContourMinorData.features.length > 0) {
         const dynamicMinorMaxFeatures = clamp(
@@ -483,7 +529,7 @@ export function createPhysicalLayerRenderOwner({
           0,
           Number(zoomProfile.minorMaxFeaturesHardCap || 0) || 100000
         );
-        drawContourCollection(runtimeState.physicalContourMinorData, {
+        minorDrawResult = drawContourCollection(runtimeState.physicalContourMinorData, {
           cacheSlot: "minor",
           color: contourColor,
           colorResolver: resolveContourColor,
@@ -515,6 +561,10 @@ export function createPhysicalLayerRenderOwner({
         + getFeatureCollectionFeatureCount(runtimeState.physicalContourMinorData),
       majorFeatureCount: getFeatureCollectionFeatureCount(runtimeState.physicalContourMajorData),
       minorFeatureCount: getFeatureCollectionFeatureCount(runtimeState.physicalContourMinorData),
+      majorSelectedCount: Number(majorDrawResult?.selectedCount || 0),
+      majorRenderedCount: Number(majorDrawResult?.renderedCount || 0),
+      minorSelectedCount: Number(minorDrawResult?.selectedCount || 0),
+      minorRenderedCount: Number(minorDrawResult?.renderedCount || 0),
       interactive: !!interactive,
       skipped: false,
       maskSource: maskInfo.maskSource,

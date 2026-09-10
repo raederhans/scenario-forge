@@ -1,3 +1,4 @@
+import { resolveContourLodRequest } from "../js/core/renderer/physical_contour_lod_policy.js";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
@@ -13,10 +14,11 @@ function deferred() {
   const promise = new Promise((done) => { resolve = done; });
   return { promise, resolve };
 }
-function harness(overrides = {}) {
+function harness(overrides = {}, helperOverrides = {}) {
   const state = { activeScenarioId: "A", currentScenarioApplyRequestId: 1, locales: { ui: {}, geo: {} } };
   const events = [];
   const dependencies = {
+    resolveContourLodRequest,
     ...contentActions,
     ...contentLoadActions,
     normalizeRequestedContextLayerNames: (names) => names,
@@ -31,6 +33,7 @@ function harness(overrides = {}) {
   const owner = createOwner({ state, helpers: {
     requestMainRender: () => events.push("render"),
     invalidateContextLayerVisualStateBatch: () => events.push("invalidate"),
+    ...helperOverrides,
   } });
   return { owner, state, events };
 }
@@ -157,3 +160,110 @@ for (const resource of ["city", "localization"]) {
     assert.deepEqual(events, []);
   });
 }
+
+function contourHarness() {
+  const loads = new Map();
+  const calls = [];
+  const result = harness({ loadContextLayerPack: (name) => {
+    calls.push(name);
+    const load = deferred();
+    loads.set(name, load);
+    return load.promise;
+  } });
+  result.state.zoomTransform = { k: 4 };
+  result.state.styleConfig = { physical: { contourMinorVisible: false } };
+  return { ...result, loads, calls };
+}
+const pack = (id) => ({ type: "FeatureCollection", features: [{ id }] });
+
+test("contour high-low-high uses independent pack caches and reactivates with revision/invalidation", async () => {
+  const { owner, state, loads, calls, events } = contourHarness();
+  const high = pack("high"), low = pack("low");
+  let pending = owner.ensureContextLayerDataReady("physical-contours-set");
+  loads.get("physical_contours_major").resolve(high);
+  await pending;
+  state.zoomTransform.k = 1;
+  pending = owner.ensureContextLayerDataReady("physical-contours-set");
+  assert.equal(state.physicalContourMajorData, high, "retain last good data during new LOD fetch");
+  loads.get("physical_contours_low_major").resolve(low);
+  await pending;
+  assert.equal(state.physicalContourMajorData, low);
+  assert.equal(state.contextLayerExternalDataByName.physical_contours_major, high);
+  const revision = state.contextLayerRevision;
+  const invalidations = events.length;
+  state.zoomTransform.k = 4;
+  await owner.ensureContextLayerDataReady("physical-contours-set", { renderNow: false });
+  assert.equal(state.physicalContourMajorData, high);
+  assert.equal(state.contextLayerRevision, revision + 1);
+  assert.equal(events.length, invalidations + 1);
+  assert.equal(calls.length, 2);
+});
+
+test("out-of-order explicit detail result caches without replacing current low display", async () => {
+  const { owner, state, loads, events } = contourHarness();
+  const high = pack("high"), low = pack("low");
+  const detailRequest = owner.ensureContextLayerDataReady("physical_contours_major");
+  state.zoomTransform.k = 1;
+  const lowRequest = owner.ensureContextLayerDataReady("physical-contours-set");
+  loads.get("physical_contours_low_major").resolve(low);
+  await lowRequest;
+  const revision = state.contextLayerRevision, count = events.length;
+  loads.get("physical_contours_major").resolve(high);
+  const result = await detailRequest;
+  assert.equal(result.physical_contours_major, high);
+  assert.equal(state.contextLayerExternalDataByName.physical_contours_major, high);
+  assert.equal(state.physicalContourMajorData, low);
+  assert.equal(state.contextLayerRevision, revision);
+  assert.equal(events.length, count);
+});
+
+test("unrelated river requests never clear contour aliases, minor gate clears immediately", async () => {
+  const { owner, state, loads } = contourHarness();
+  const major = pack("old-major"), minor = pack("old-minor");
+  state.physicalContourMajorData = major;
+  state.physicalContourMinorData = minor;
+  const river = owner.ensureContextLayerDataReady("rivers");
+  assert.equal(state.physicalContourMajorData, major);
+  assert.equal(state.physicalContourMinorData, minor);
+  loads.get("rivers").resolve(pack("rivers"));
+  await river;
+  assert.equal(state.physicalContourMinorData, minor);
+  state.zoomTransform.k = 1;
+  const contour = owner.ensureContextLayerDataReady("physical-contours-set");
+  assert.equal(state.physicalContourMajorData, major);
+  assert.equal(state.physicalContourMinorData, null);
+  loads.get("physical_contours_low_major").resolve(pack("low"));
+  await contour;
+});
+
+test("cancelled contour receivers cannot cache or publish a late pack", async () => {
+  const { owner, state, loads } = contourHarness();
+  let current = true;
+  const pending = owner.ensureContextLayerDataReady("physical-contours-set", { isCurrent: () => current });
+  current = false;
+  loads.get("physical_contours_major").resolve(pack("cancelled"));
+  await assert.rejects(pending, { name: "AbortError" });
+  assert.equal(state.contextLayerExternalDataByName?.physical_contours_major, undefined);
+  assert.equal(state.physicalContourMajorData, undefined);
+  assert.equal(state.contextLayerLoadStateByName.physical_contours_major, "idle");
+});
+
+
+test("cached contour reactivation forwards renderNow false without scheduling an eager render", async () => {
+  const invalidations = [];
+  const { owner, state, events } = harness({}, {
+    invalidateContextLayerVisualStateBatch: (...args) => invalidations.push(args),
+  });
+  const detail = pack("detail");
+  state.zoomTransform = { k: 4 };
+  state.styleConfig = { physical: { contourMinorVisible: false } };
+  state.contextLayerExternalDataByName = { physical_contours_major: detail };
+  state.physicalContourMajorData = pack("low");
+  await owner.ensureContextLayerDataReady("physical-contours-set", { renderNow: false });
+  assert.equal(state.physicalContourMajorData, detail);
+  assert.equal(state.contextLayerRevision, 1);
+  assert.deepEqual(invalidations, [[["physical_contours_major"], "context-layer:manual", { renderNow: false }]]);
+  assert.deepEqual(events, []);
+  await owner.ensureContextLayerDataReady("physical-contours-set", { renderNow: false });
+  assert.equal(invalidations.length, 1, "same alias has no second invalidation");
+});

@@ -7,6 +7,7 @@ import {
   loadMapData,
   resolveScenarioRegistryUrl,
 } from "../core/data_loader.js";
+import { resolveContourLodRequest } from "../core/renderer/physical_contour_lod_policy.js";
 import {
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
@@ -41,6 +42,7 @@ import {
   beginFullLocalizationLoad,
   commitBaseCitySupportData,
   commitContextLayerCollection,
+  commitPhysicalContourDisplay,
   commitFullLocalizationData,
   decodeStartupPrimaryCollectionsIntoState,
   failBaseCitySupportLoad,
@@ -344,7 +346,7 @@ export function createStartupDataPipelineOwner({
         return PHYSICAL_CONTEXT_LAYER_SET;
       }
       if (normalized === "physical-contours-set") {
-        return PHYSICAL_CONTOUR_LAYER_SET;
+        return resolveContourLodRequest(state);
       }
       return [normalized];
     });
@@ -365,6 +367,21 @@ export function createStartupDataPipelineOwner({
     );
   }
 
+  function isPhysicalContourLayer(name) {
+    return name.startsWith("physical_contours_");
+  }
+
+  function publishPhysicalContourLod() {
+    const names = resolveContourLodRequest(state);
+    const major = state.contextLayerExternalDataByName?.[names.find((name) => name.endsWith("_major"))];
+    const minorName = names.find((name) => name.endsWith("_minor"));
+    const minor = minorName ? state.contextLayerExternalDataByName?.[minorName] : null;
+    return commitPhysicalContourDisplay(state, {
+      major: Array.isArray(major?.features) ? major : undefined,
+      minor: !minorName ? null : Array.isArray(minor?.features) ? minor : undefined,
+    });
+  }
+
   async function ensureContextLayerDataReady(
     requestedLayerNames,
     options = {}
@@ -374,6 +391,10 @@ export function createStartupDataPipelineOwner({
     // 这里把“已在 topology 内的层”和“需要额外请求的 deferred pack”统一成同一个调用面，
     // 上层不必关心某个图层究竟来自首屏拓扑还是后续外部资源。
     const layerNames = expandDeferredContextLayerNames(requestedLayerNames);
+    if (layerNames.some(isPhysicalContourLayer)) {
+      const changed = publishPhysicalContourLod();
+      if (changed.length) invalidateContextLayerVisualStateBatch?.(changed, `context-layer:${reason}`, { renderNow });
+    }
     const results = {};
     const pendingEntries = [];
     for (const layerName of layerNames) {
@@ -409,7 +430,9 @@ export function createStartupDataPipelineOwner({
             });
             return null;
           }
-          commitContextLayerCollection(state, layerName, collection, { bumpRevision: true });
+          const contourLayer = isPhysicalContourLayer(layerName);
+          commitContextLayerCollection(state, layerName, collection, { bumpRevision: !contourLayer, publish: !contourLayer });
+          if (contourLayer) publishPhysicalContourLod();
           setContextLayerLoadState(state, layerName, "loaded", { clearError: true });
           if (
             layerName === "airports"
@@ -453,7 +476,8 @@ export function createStartupDataPipelineOwner({
         const { layerName } = pendingEntries[index];
         const value = entry.status === "fulfilled" ? entry.value : null;
         results[layerName] = value;
-        if (Array.isArray(value?.features)) {
+        if (Array.isArray(value?.features)
+          && (!isPhysicalContourLayer(layerName) || resolveContourLodRequest(state).includes(layerName))) {
           loadedLayerNames.push(layerName);
         }
       });

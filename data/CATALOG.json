@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-08-14T20:52:35.840939+00:00",
   "counts": {
-    "entries": 659,
+    "entries": 662,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -10,7 +10,7 @@
       "city_lights_entries": 1,
       "city_lights_source": 1,
       "city_overrides": 1,
-      "context_layer": 3,
+      "context_layer": 6,
       "country_feature_policies": 1,
       "detail_topology_na_v1": 1,
       "detail_topology_na_v2": 1,
@@ -64,11 +64,11 @@
       "geojson": 147,
       "javascript": 2,
       "json": 341,
-      "topojson": 168
+      "topojson": 171
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 656,
+      "json": 659,
       "module": 2
     }
   },
@@ -279,6 +279,19 @@
       "aliases": []
     },
     {
+      "key": "context_layer:physical_contours_low_major",
+      "url": "data/global_contours.low.major.topo.json",
+      "role": "context_layer",
+      "format": "topojson",
+      "schemaRef": "schema://topojson/topology/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.context_layer:physical_contours_low_major",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
       "key": "manifest_output:global_contours.major.topo.json",
       "url": "data/global_contours.major.topo.json",
       "role": "terrain_contours_major_topology",
@@ -292,6 +305,32 @@
       "aliases": [
         "context_layer:physical_contours_major"
       ]
+    },
+    {
+      "key": "context_layer:physical_contours_mid_major",
+      "url": "data/global_contours.mid.major.topo.json",
+      "role": "context_layer",
+      "format": "topojson",
+      "schemaRef": "schema://topojson/topology/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.context_layer:physical_contours_mid_major",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "context_layer:physical_contours_mid_minor",
+      "url": "data/global_contours.mid.minor.topo.json",
+      "role": "context_layer",
+      "format": "topojson",
+      "schemaRef": "schema://topojson/topology/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.context_layer:physical_contours_mid_minor",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
     },
     {
       "key": "manifest_output:global_contours.minor.topo.json",
