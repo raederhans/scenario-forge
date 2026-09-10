@@ -370,6 +370,12 @@ def build_patch(
             ),
         },
     }
+    # City identities are not political geometries. Keep reviewed scenario city
+    # names in the same patch so rebuilding does not discard their localization.
+    payload["geo"].update({
+        key: entry for key, entry in manual_geo.items()
+        if key.startswith("id::CITY::")
+    })
     write_json(output_path, payload)
     for language, locale_output_path in build_locale_specific_patch_paths(output_path).items():
         write_json(

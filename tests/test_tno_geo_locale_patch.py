@@ -28,6 +28,33 @@ def _write_locale_fixture(locales_path: Path, raw_name: str, zh_name: str) -> No
 
 
 class TnoGeoLocalePatchTest(unittest.TestCase):
+    def test_reviewed_city_identity_survives_rebuild_without_political_geometry(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir)
+            _write_json(scenario_dir / "runtime_topology.topo.json", {
+                "objects": {"political": {"geometries": []}},
+            })
+            _write_json(scenario_dir / "owners.by_feature.json", {"owners": {}})
+            _write_json(scenario_dir / "locales.json", {"geo": {}})
+            city_key = "id::CITY::ne::1159150701"
+            reviewed_name = {"en": "Sverdlovsk", "zh": "斯维尔德洛夫斯克"}
+            _write_json(scenario_dir / "manual.json", {"geo": {
+                city_key: reviewed_name,
+                "Yekaterinburg": reviewed_name,
+                "absent-region": reviewed_name,
+            }})
+            payload = build_patch(
+                scenario_id="tno_1962", scenario_dir=scenario_dir,
+                locales_path=scenario_dir / "locales.json",
+                manual_overrides_path=scenario_dir / "manual.json",
+                reviewed_exceptions_path=scenario_dir / "missing.json",
+                output_path=scenario_dir / "geo_locale_patch.json",
+            )
+            self.assertEqual(payload["geo"], {city_key: reviewed_name})
+            for language in ("en", "zh"):
+                variant = json.loads((scenario_dir / f"geo_locale_patch.{language}.json").read_text(encoding="utf-8"))
+                self.assertEqual(variant["geo"], {city_key: {language: reviewed_name[language]}})
+
     def test_checked_in_tno_china_toponym_fixes_stay_synced(self) -> None:
         root = Path(__file__).resolve().parents[1]
         locales = json.loads((root / "data" / "locales.json").read_text(encoding="utf-8"))["geo"]
