@@ -20,6 +20,7 @@ function createExactAfterSettleRefreshPlan({
   callbackStartedAt = 0,
   reuseDecision = {},
   forceExactContextBaseRefresh = false,
+  urbanZoomExactRefresh = false,
   metricSequenceStartedAt = 0,
 } = {}) {
   const startedAt = Math.max(0, Number(callbackStartedAt || 0));
@@ -27,6 +28,7 @@ function createExactAfterSettleRefreshPlan({
     resolvedProfile: profile || {},
     reuseDecision: reuseDecision && typeof reuseDecision === "object" ? reuseDecision : {},
     forceExactContextBaseRefresh: !!forceExactContextBaseRefresh,
+    urbanZoomExactRefresh: !!urbanZoomExactRefresh,
     exactRefreshApplied: !!forceExactContextBaseRefresh || !!reuseDecision?.shouldExactRefresh,
     exactTargetPasses: [],
     deferredExactTargetPasses: [],

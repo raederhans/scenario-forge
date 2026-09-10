@@ -128,6 +128,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["transient-overlay-render", "renderer-runtime", "js/core/renderer/transient_overlay_render_owner.js", "tests/transient_overlay_render_owner_behavior.test.mjs"],
     ["unit-counter-display", "renderer-runtime", "js/core/renderer/unit_counter_display_model.js", "tests/unit_counter_display_model_behavior.test.mjs"],
     ["urban-adaptive-paint", "renderer-runtime", "js/core/renderer/urban_adaptive_paint_model.js", "tests/urban_adaptive_paint_model_behavior.test.mjs"],
+    ["urban-layer-render", "renderer-runtime", "js/core/renderer/urban_layer_render_owner.js", "tests/urban_layer_render_owner_behavior.test.mjs"],
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
   ];
 

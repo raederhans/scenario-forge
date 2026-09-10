@@ -10011,6 +10011,129 @@ def build_atl_sea_completion_rows(
     return completion_rows, completion_union, diagnostics
 
 
+def mediterranean_construction_domain_bounds() -> tuple[float, float, float, float] | None:
+    bounds = [
+        tuple(config.get("sea_completion_bbox") or config["aoi_bbox"])
+        for config in ATLANTROPA_REGION_CONFIGS.values()
+    ]
+    if not bounds:
+        return None
+    return (
+        min(item[0] for item in bounds), min(item[1] for item in bounds),
+        max(item[2] for item in bounds), max(item[3] for item in bounds),
+    )
+
+
+def build_mediterranean_unmanaged_template_geom(template_geom):
+    """Find unassigned template water inside the Atlantropa construction extent.
+
+    The coarse Mediterranean template also has a tail in the Red Sea, south of
+    every Atlantropa region. That tail is outside the construction domain and
+    must not become Atlantropa water merely because no region manages it.
+    """
+    template = normalize_polygonal(template_geom)
+    if template is None:
+        return None
+    managed = safe_unary_union([
+        box(*tuple(config.get("sea_completion_bbox") or config["aoi_bbox"]))
+        for config in ATLANTROPA_REGION_CONFIGS.values()
+    ])
+    domain_bounds = mediterranean_construction_domain_bounds()
+    if managed is None or domain_bounds is None:
+        return None
+    return normalize_polygonal(template.intersection(box(*domain_bounds)).difference(managed))
+
+
+def build_mediterranean_other_water_geom(named_water_snapshot_payload: dict):
+    """Keep ordinary seas ordinary, using upstream water sources, not outputs.
+
+    In particular the legacy med_open_basin template extends into the Red Sea.
+    Its coarse global polygon is narrower than the TNO named-water source, so
+    both canonical sources participate in the exclusion.
+    """
+    template = safe_unary_union(load_mediterranean_template_water_gdf().geometry.tolist())
+    if template is None:
+        return None
+    excluded = []
+    for feature in [
+        *load_global_water_regions_feature_index().values(),
+        *named_water_snapshot_payload.get("features", []),
+    ]:
+        props = feature.get("properties") or {}
+        if str(props.get("region_group") or "").strip().lower() == MEDITERRANEAN_WATER_REGION_GROUP:
+            continue
+        geom = shape(feature["geometry"]) if feature.get("geometry") else None
+        if geom is not None and geom.intersects(template):
+            geom = normalize_polygonal(geom)
+            if geom is not None:
+                excluded.append(geom.intersection(template))
+    return safe_unary_union(excluded)
+
+
+def build_mediterranean_sea_closure_rows(
+    *,
+    expected_template_geom,
+    baseline_land_geom,
+    atlantropa_land_geom,
+    existing_sea_geom,
+    other_water_geom=None,
+) -> tuple[list[dict], object | None, dict]:
+    """Close unassigned Mediterranean water without changing existing surfaces.
+
+    Masks are supplied by the caller, including any coastline protection margins.
+    Unlike regional donor cleanup, closure must not smooth or buffer its result:
+    doing so can reopen seams or flood small islands. Keep the complete difference
+    in one feature rather than creating a selectable feature for every fragment.
+    """
+    expected = normalize_polygonal(expected_template_geom)
+    for mask in (baseline_land_geom, atlantropa_land_geom, other_water_geom):
+        mask = normalize_polygonal(mask)
+        if expected is not None and mask is not None:
+            expected = normalize_polygonal(expected.difference(mask))
+    existing = normalize_polygonal(existing_sea_geom)
+    completion = expected
+    if expected is not None and existing is not None:
+        completion = normalize_polygonal(expected.difference(existing))
+    rows = []
+    if completion is not None:
+        # Canonical ordering makes serialization deterministic even when union
+        # inputs arrive in a different order. The identity does not depend on
+        # how many connected components the gap has.
+        completion = completion.normalize()
+        rows.append(make_feature(completion, {
+            "id": "ATLSEA_FILL_mediterranean_1",
+            "name": "Mediterranean Sea",
+            "cntr_code": ATL_TAG,
+            "admin1_group": "mediterranean_sea",
+            "detail_tier": "scenario_atlantropa",
+            "__source": ATL_SOURCE_TAG,
+            "scenario_id": SCENARIO_ID,
+            "region_id": "mediterranean",
+            "region_group": "mediterranean_sea",
+            "atl_surface_kind": ATL_SURFACE_SEA,
+            "atl_region_group": "mediterranean_remaining_mediterranean",
+            "atl_geometry_role": ATL_GEOMETRY_ROLE_SEA_COMPLETION,
+            "atl_join_mode": ATL_JOIN_MODE_GAP_FILL,
+            "atl_subbasin_id": "mediterranean_fill_1",
+            "interactive": False,
+            "render_as_base_geography": False,
+            "owner_tag": ATL_TAG,
+            "synthetic_owner": True,
+            "source_standard": "mediterranean_template_sea_completion",
+        }))
+    final_sea = safe_unary_union([geom for geom in (existing, completion) if geom is not None])
+    remaining = (
+        normalize_polygonal(expected.difference(final_sea))
+        if expected is not None and final_sea is not None else expected
+    )
+    return rows, completion, {
+        "completion_feature_count": len(rows),
+        "completion_area": float(completion.area) if completion is not None else 0.0,
+        "remaining_hole_count": len(iter_polygon_parts(remaining)),
+        "remaining_hole_area": float(remaining.area) if remaining is not None else 0.0,
+    }
+
+
 def collect_baseline_island_drop_ids(
     political_gdf: gpd.GeoDataFrame,
     replacement_specs: dict[str, dict],
@@ -11447,6 +11570,8 @@ def build_atl_sea_from_hgo(
     donor_context: dict,
     baseline_land_full_gdf: gpd.GeoDataFrame,
     atlantropa_region_unions: dict[str, object],
+    *,
+    other_water_geom,
 ) -> tuple[list[dict], object | None, dict]:
     sea_features: list[dict] = []
     sea_geoms: list[object] = []
@@ -11597,6 +11722,24 @@ def build_atl_sea_from_hgo(
             "expected_completion_area": round(float(expected_sea.area), 6) if expected_sea is not None else 0.0,
             **completion_diagnostics,
         }
+
+    template_union = safe_unary_union(mediterranean_template_gdf.geometry.tolist())
+    unmanaged_template = build_mediterranean_unmanaged_template_geom(template_union)
+    closure_land = (
+        local_land_union(baseline_land_full_gdf, unmanaged_template.bounds, padding=2.5)
+        if unmanaged_template is not None else None
+    )
+    closure_rows, closure_union, closure_diagnostics = build_mediterranean_sea_closure_rows(
+        expected_template_geom=unmanaged_template,
+        baseline_land_geom=closure_land.buffer(0.03) if closure_land is not None else None,
+        atlantropa_land_geom=atlantropa_union.buffer(0.002) if atlantropa_union is not None else None,
+        existing_sea_geom=accumulated_sea_union,
+        other_water_geom=other_water_geom,
+    )
+    sea_features.extend(closure_rows)
+    if closure_union is not None:
+        sea_geoms.append(closure_union)
+    diagnostics["mediterranean_closure"] = closure_diagnostics
 
     if not sea_features:
         raise ValueError("Mediterranean donor extraction produced zero ATL sea features.")
@@ -12312,6 +12455,7 @@ def build_countries_stage_state(
         donor_context,
         runtime_political_full_gdf,
         atlantropa_region_unions,
+        other_water_geom=build_mediterranean_other_water_geom(named_water_snapshot_payload),
     )
     atl_sea_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_sea_collection]
     atl_sea_gdf = geopandas_from_features(atl_sea_collection)
@@ -12493,6 +12637,7 @@ def build_water_stage_state_from_countries_state(
         donor_context,
         runtime_political_full_gdf,
         atlantropa_region_unions,
+        other_water_geom=build_mediterranean_other_water_geom(named_water_snapshot_payload),
     )
     atl_sea_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_sea_collection]
     base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())

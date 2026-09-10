@@ -101,6 +101,17 @@ export function createUrbanAdaptivePaintModel(runtimeState, { getResolvedFeature
     return computeUrbanAdaptivePaintFromHostColor(backgroundColor, config);
   }
 
+  // A draw is synchronous. Share owner colors only within it so subsequent
+  // palette edits, scenario changes and replacement land maps remain live.
+  function createDrawPaintResolver(config = {}) {
+    const byOwner = new Map();
+    return (feature) => {
+      const ownerId = getUrbanFeatureOwnerId(feature);
+      if (!byOwner.has(ownerId)) byOwner.set(ownerId, getUrbanAdaptivePaint(feature, config));
+      return byOwner.get(ownerId);
+    };
+  }
+
   function getEffectiveUrbanMode(config = {}, capability = runtimeState.urbanLayerCapability) {
     return config?.mode === "adaptive" && capability?.adaptiveAvailable ? "adaptive" : "manual";
   }
@@ -108,6 +119,7 @@ export function createUrbanAdaptivePaintModel(runtimeState, { getResolvedFeature
   return Object.freeze({
     computeUrbanAdaptivePaintFromHostColor,
     getUrbanAdaptivePaint,
+    createDrawPaintResolver,
     getEffectiveUrbanMode,
   });
 }

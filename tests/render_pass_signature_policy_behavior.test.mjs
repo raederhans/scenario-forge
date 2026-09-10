@@ -63,6 +63,25 @@ test("border pixels depend on country appearance rather than unrelated individua
   assert.notEqual(policy.getRenderPassSignature("borders"), recolored);
 });
 
+test("urban screen paint invalidates on zoom within a reuse bucket but not on pan or inactive urban data", () => {
+  const { state, live, policy } = createHarness({ getContextBaseZoomBucketId: () => "high" });
+  live.reuse = true;
+  state.showUrban = true;
+  state.urbanData = { features: [{}] };
+  state.zoomTransform = { k: 10, x: 0, y: 0 };
+  const atTen = policy.getRenderPassSignature("contextBase");
+  state.zoomTransform.x = 20;
+  assert.equal(policy.getRenderPassSignature("contextBase"), atTen);
+  state.zoomTransform.k = 20;
+  assert.notEqual(policy.getRenderPassSignature("contextBase"), atTen);
+  for (const deactivate of [() => { state.showUrban = false; }, () => { state.showUrban = true; state.urbanData = null; }]) {
+    deactivate();
+    const inactive = policy.getRenderPassSignature("contextBase");
+    state.zoomTransform.k += 1;
+    assert.equal(policy.getRenderPassSignature("contextBase"), inactive);
+  }
+});
+
 test("transport presentation changes invalidate shared labels without invalidating political pixels", () => {
   for (const change of [
     (state) => { state.showAirports = true; },

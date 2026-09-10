@@ -53,6 +53,23 @@ test("DPR restore pass list keeps political invalidation explicit", () => {
   );
 });
 
+test("urban zoom refresh requests only the dirty deferred context pass without physical refresh", () => {
+  const plan = createExactAfterSettleRefreshPlan({ urbanZoomExactRefresh: true });
+  assert.equal(plan.urbanZoomExactRefresh, true);
+  assert.equal(plan.forceExactContextBaseRefresh, false);
+  assert.equal(plan.exactRefreshApplied, false, "a deferred urban request is not completed refresh work");
+  const targets = resolveExactAfterSettleTargetPasses({
+    renderPassNames: RENDER_PASSES,
+    idleRenderPassNames: RENDER_PASSES,
+    dirtyPassNames: ["contextBase"],
+    physicalExactRefreshPasses: ["physicalBase", "contextBase"],
+    forceExactContextBaseRefresh: plan.forceExactContextBaseRefresh,
+    exactRefreshApplied: plan.exactRefreshApplied,
+  });
+  assert.deepEqual(targets.exactTargetPasses, ["political", "borders"]);
+  assert.deepEqual(targets.deferredExactTargetPasses, ["contextBase", "textureLabels", "labels"]);
+});
+
 test("refresh plans keep exact-after-settle pass catalog compatibility exports", () => {
   assert.equal(EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES, CATALOG_DEFERRED_PASS_NAMES);
   assert.equal(getExactAfterSettleDprRestorePasses, getCatalogDprRestorePasses);

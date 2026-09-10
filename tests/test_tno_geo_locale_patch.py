@@ -28,6 +28,42 @@ def _write_locale_fixture(locales_path: Path, raw_name: str, zh_name: str) -> No
 
 
 class TnoGeoLocalePatchTest(unittest.TestCase):
+    def test_reviewed_special_land_survives_rebuild_without_copying_placeholders(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scenario_dir = Path(tmp_dir)
+            island_id = "ATLISL_sicily_tunis_sicily"
+            reviewed_name = {"en": "Sicilia", "zh": "西西里岛"}
+            _write_json(scenario_dir / "runtime_topology.topo.json", {
+                "objects": {
+                    "political": {"geometries": []},
+                    "scenario_atlantropa": {"geometries": [
+                        {"properties": {"id": island_id, "name": "Sicily Rebuilt Island"}},
+                        {"id": "ATLPRV_reviewed", "properties": {}},
+                        {"properties": {"id": "ATLPRV_unreviewed", "name": "Boolean Weld 1"}},
+                    ]},
+                },
+            })
+            _write_json(scenario_dir / "owners.by_feature.json", {"owners": {}})
+            _write_json(scenario_dir / "locales.json", {"geo": {}})
+            _write_json(scenario_dir / "manual.json", {"geo": {
+                island_id: reviewed_name,
+                "ATLPRV_reviewed": reviewed_name,
+                "ATLPRV_absent": reviewed_name,
+                "Sicily Rebuilt Island": reviewed_name,
+            }})
+            payload = build_patch(
+                scenario_id="tno_1962", scenario_dir=scenario_dir,
+                locales_path=scenario_dir / "locales.json",
+                manual_overrides_path=scenario_dir / "manual.json",
+                reviewed_exceptions_path=scenario_dir / "missing.json",
+                output_path=scenario_dir / "geo_locale_patch.json",
+            )
+            expected = {island_id: reviewed_name, "ATLPRV_reviewed": reviewed_name}
+            self.assertEqual(payload["geo"], expected)
+            for language in ("en", "zh"):
+                variant = json.loads((scenario_dir / f"geo_locale_patch.{language}.json").read_text(encoding="utf-8"))
+                self.assertEqual(variant["geo"], {key: {language: value[language]} for key, value in expected.items()})
+
     def test_reviewed_city_identity_survives_rebuild_without_political_geometry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             scenario_dir = Path(tmp_dir)

@@ -24,6 +24,7 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
+import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
 // runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
@@ -10960,63 +10961,24 @@ const {
   computeUrbanAdaptivePaintFromHostColor,
   getUrbanAdaptivePaint,
   getEffectiveUrbanMode,
+  createDrawPaintResolver,
 } = composeUrbanAdaptivePaintModel();
 
+const urbanLayerRenderOwner = createUrbanLayerRenderOwner({
+  state: runtimeState,
+  helpers: {
+    clamp, collectContextMetric, createDrawPaintResolver, getEffectiveUrbanMode,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    getSafeBlendMode, getSafeCanvasColor, getUrbanGlowFeatureMultiplier,
+    getUrbanLayerCapability, normalizeUrbanStyleConfig, nowMs,
+    estimateProjectedAreaPx, pathBoundsInScreen,
+  },
+});
+
 function drawUrbanLayer(k, { interactive = false } = {}) {
-  const startedAt = nowMs();
-  if (!runtimeState.showUrban || !runtimeState.urbanData?.features?.length) {
-    collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
-      featureCount: getFeatureCollectionFeatureCount(runtimeState.urbanData),
-      interactive: !!interactive,
-      skipped: true,
-      reason: !runtimeState.showUrban ? "hidden" : "no-data",
-    });
-    return;
-  }
-  const cfg = normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {});
-  const capability = runtimeState.urbanLayerCapability || getUrbanLayerCapability(runtimeState.urbanData);
-  const effectiveMode = getEffectiveUrbanMode(cfg, capability);
-  const manualColor = getSafeCanvasColor(cfg.color, "#4b5563");
-  const fillOpacity = clamp(Number.isFinite(Number(cfg.fillOpacity)) ? Number(cfg.fillOpacity) : 0.34, 0, 1);
-  const strokeOpacity = clamp(Number.isFinite(Number(cfg.strokeOpacity)) ? Number(cfg.strokeOpacity) : 0.25, 0, 1);
-  const minAreaPx = clamp(Number.isFinite(Number(cfg.minAreaPx)) ? Number(cfg.minAreaPx) : 1, 1, 80);
-  const blendMode = effectiveMode === "manual"
-    ? getSafeBlendMode(cfg.blendMode, "multiply")
-    : "source-over";
-  const strokeWidth = clamp(0.85 / Math.max(Math.sqrt(Math.max(Number(k) || 1, 1)), 1), 0.3, 0.85);
-
-  rendererSurfaceHost.getContext().save();
-  rendererSurfaceHost.getContext().globalCompositeOperation = blendMode;
-  runtimeState.urbanData.features.forEach((feature) => {
-    if (estimateProjectedAreaPx(feature, k) < minAreaPx) return;
-    if (!pathBoundsInScreen(feature)) return;
-    const adaptivePaint = effectiveMode === "adaptive" ? getUrbanAdaptivePaint(feature, cfg) : null;
-    const fillColor = getSafeCanvasColor(adaptivePaint?.fillColor, manualColor);
-    const outlineColor = getSafeCanvasColor(adaptivePaint?.strokeColor, null);
-    const glowMultiplier = getUrbanGlowFeatureMultiplier(feature);
-    if (!fillColor) return;
-    rendererSurfaceHost.getContext().beginPath();
-    rendererSurfaceHost.getPathCanvas()(feature);
-    rendererSurfaceHost.getContext().fillStyle = fillColor;
-    rendererSurfaceHost.getContext().globalAlpha = clamp((interactive ? Math.min(fillOpacity, 0.15) : fillOpacity) * glowMultiplier, 0, 1);
-    rendererSurfaceHost.getContext().fill();
-    if (effectiveMode === "adaptive" && outlineColor) {
-      rendererSurfaceHost.getContext().strokeStyle = outlineColor;
-      rendererSurfaceHost.getContext().lineWidth = strokeWidth;
-      rendererSurfaceHost.getContext().globalAlpha = clamp((interactive ? Math.min(strokeOpacity, 0.18) : strokeOpacity) * glowMultiplier, 0, 1);
-      rendererSurfaceHost.getContext().stroke();
-    }
-  });
-
-  rendererSurfaceHost.getContext().restore();
-  collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
-    featureCount: getFeatureCollectionFeatureCount(runtimeState.urbanData),
-    interactive: !!interactive,
-    skipped: false,
-    mode: effectiveMode,
-    requestedMode: cfg.mode,
-    adaptiveAvailable: !!capability?.adaptiveAvailable,
-  });
+  return urbanLayerRenderOwner.drawUrbanLayer(k, { interactive });
 }
 
 function recordDeferredRiversLayerMetric({ interactive = false, reason = "staged-apply" } = {}) {

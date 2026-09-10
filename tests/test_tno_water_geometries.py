@@ -19,6 +19,8 @@ from tools.audit_tno_water_family_refinement import build_report as build_family
 from tools.validate_tno_water_geometries import (
     OCEAN_REFINEMENT_PHASE_TARGET_IDS,
     collect_d3_spherical_metrics,
+    collect_mediterranean_coverage,
+    load_declared_mediterranean_template,
     _topology_objects_to_feature_collections_for_d3,
     build_report_from_collections,
     summarize_failures,
@@ -2172,3 +2174,107 @@ class TnoWaterRecentRefinementContractTest(unittest.TestCase):
 
     def test_water_validator_checks_geometry_collection_coordinates(self):
         test_tno_water_validator_checks_geometry_collection_coordinates()
+
+
+def _mediterranean_fixture_collection(*entries):
+    from shapely.geometry import mapping
+    return {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "properties": {"id": feature_id, "atl_surface_kind": kind},
+         "geometry": mapping(geom)} for feature_id, kind, geom in entries
+    ]}
+
+
+def test_mediterranean_validator_detects_cross_region_macro_gap():
+    from shapely.geometry import box
+    template = _mediterranean_fixture_collection(("template", "sea", box(16, 34, 23, 40)))
+    sea = _mediterranean_fixture_collection(("ATLSEA_left", "sea", box(16, 34, 17, 40)))
+    empty = _mediterranean_fixture_collection()
+    result = collect_mediterranean_coverage(
+        template=template, atlantropa=sea, ordinary_water=empty, land=empty,
+        atlantropa_chunks=[("scenario_atlantropa.coarse.fixture", sea), ("scenario_atlantropa.detail.fixture", sea)],
+    )
+    assert result["surfaces"]["source"]["interior_gap_area_degrees2"] > 30
+    assert any("source: uncovered" in failure for failure in result["failures"])
+    assert any("missing Ionian" in failure for failure in result["failures"])
+
+
+def test_mediterranean_validator_preserves_land_and_other_water_coverage():
+    from shapely.geometry import box
+    template = _mediterranean_fixture_collection(("template", "sea", box(0, 0, 10, 10)))
+    atl = _mediterranean_fixture_collection(
+        ("ATLSEA", "sea", box(0, 0, 4, 10)),
+        ("ATLPRV", "land", box(4, 0, 6, 10)),
+    )
+    land = _mediterranean_fixture_collection(("island", "land", box(6, 0, 8, 10)))
+    other_water = _mediterranean_fixture_collection(("ordinary_sea", "sea", box(8, 0, 10, 10)))
+    result = collect_mediterranean_coverage(
+        template=template, atlantropa=atl, ordinary_water=other_water, land=land,
+        atlantropa_chunks=[("scenario_atlantropa.coarse.fixture", atl), ("scenario_atlantropa.detail.fixture", atl)],
+    )
+    assert result["failures"] == []
+    assert result["surfaces"]["source"]["uncovered_area_degrees2"] == 0
+
+
+def test_mediterranean_validator_detects_chunk_omission():
+    from shapely.geometry import box
+    sea = _mediterranean_fixture_collection(("ATLSEA", "sea", box(16, 34, 23, 40)))
+    empty = _mediterranean_fixture_collection()
+    result = collect_mediterranean_coverage(
+        template=sea, atlantropa=sea, ordinary_water=empty, land=empty,
+        atlantropa_chunks=[],
+    )
+    assert result["surfaces"]["source"]["interior_gap_area_degrees2"] == 0
+    assert result["surfaces"]["chunks:detail"]["missing_sea_ids"] == ["ATLSEA"]
+    assert any("chunks:detail: uncovered" in failure for failure in result["failures"])
+    assert collect_mediterranean_coverage(
+        template=sea, atlantropa=sea, ordinary_water=empty, land=empty,
+        atlantropa_chunks=[], require_chunks=False,
+    )["failures"] == []
+
+
+def test_mediterranean_validator_allows_only_narrow_construction_seams():
+    from shapely.geometry import box
+    template = _mediterranean_fixture_collection(("template", "sea", box(0, 0, 10, 10)))
+    sea = _mediterranean_fixture_collection(("ATLSEA", "sea", box(0.03, 0.03, 9.97, 9.97)))
+    empty = _mediterranean_fixture_collection()
+    result = collect_mediterranean_coverage(
+        template=template, atlantropa=sea, ordinary_water=empty, land=empty,
+        require_chunks=False,
+    )
+    assert result["surfaces"]["source"]["uncovered_area_degrees2"] > 0
+    assert result["failures"] == []
+
+
+def test_mediterranean_validator_requires_detail_even_when_coarse_is_complete():
+    from shapely.geometry import box
+    sea = _mediterranean_fixture_collection(("ATLSEA", "sea", box(16, 34, 23, 40)))
+    empty = _mediterranean_fixture_collection()
+    result = collect_mediterranean_coverage(
+        template=sea, atlantropa=sea, ordinary_water=empty, land=empty,
+        atlantropa_chunks=[("scenario_atlantropa.coarse.r0c0.json", sea)],
+    )
+    assert result["surfaces"]["chunks:coarse"]["interior_gap_area_degrees2"] == 0
+    assert result["surfaces"]["chunks:detail"]["missing_sea_ids"] == ["ATLSEA"]
+    assert all(not probe["covered"] for probe in result["surfaces"]["chunks:detail"]["probes"])
+    assert any("chunks:detail: uncovered" in failure for failure in result["failures"])
+
+
+def test_mediterranean_validator_declared_extent_excludes_red_sea_not_ionian_gap(monkeypatch):
+    from shapely.geometry import box
+    from tools import validate_tno_water_geometries as validator
+    payload = _mediterranean_fixture_collection(
+        ("med_ionian", "sea", box(16.5, 35.2, 22, 38.8)),
+        ("red_sea_tail", "sea", box(33.5, 27.2, 34.2, 27.79)),
+    )
+    for feature in payload["features"]:
+        feature["properties"]["region_group"] = "mediterranean"
+    monkeypatch.setattr(validator, "_load_json", lambda path: payload)
+    template = load_declared_mediterranean_template()
+    assert template["coverage_domain_bounds"][1] == 27.8
+    assert [f["properties"]["id"] for f in template["features"]] == ["med_ionian"]
+    empty = _mediterranean_fixture_collection()
+    result = collect_mediterranean_coverage(
+        template=template, atlantropa=empty, ordinary_water=empty, land=empty, require_chunks=False,
+    )
+    assert result["surfaces"]["source"]["interior_gap_area_degrees2"] > 10
+    assert any("source: uncovered" in failure for failure in result["failures"])

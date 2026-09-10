@@ -2622,6 +2622,144 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(cyprus_group["baseline_feature_ids"], ["CY000"])
         self.assertEqual(cyprus_group["max_baseline_area_ratio"], 1.08)
 
+    def test_mediterranean_closure_fills_gap_without_flooding_land_or_other_water(self) -> None:
+        template = box(0, 0, 10, 10)
+        baseline_land = box(3, 3, 4, 4)
+        atlantropa_land = box(6, 6, 7, 7)
+        existing_sea = box(0, 0, 2, 10)
+        other_water = box(8, 0, 10, 10)
+        rows, completion, diagnostics = tno_bundle.build_mediterranean_sea_closure_rows(
+            expected_template_geom=template,
+            baseline_land_geom=baseline_land,
+            atlantropa_land_geom=atlantropa_land,
+            existing_sea_geom=existing_sea,
+            other_water_geom=other_water,
+        )
+        self.assertEqual([row["properties"]["id"] for row in rows], ["ATLSEA_FILL_mediterranean_1"])
+        self.assertTrue(completion.covers(Point(5, 5)))
+        for excluded in [baseline_land, atlantropa_land, existing_sea, other_water]:
+            self.assertEqual(completion.intersection(excluded).area, 0)
+        self.assertEqual(completion.area, 58)
+        self.assertEqual(diagnostics["remaining_hole_area"], 0)
+        self.assertEqual(diagnostics["remaining_hole_count"], 0)
+        self.assertTrue(shape(rows[0]["geometry"]).equals(completion))
+
+    def test_mediterranean_closure_is_deterministic_and_idempotent(self) -> None:
+        parts = [box(0, 0, 2, 2), box(4, 0, 6, 2)]
+        arguments = dict(
+            baseline_land_geom=None, atlantropa_land_geom=None, existing_sea_geom=None,
+        )
+        first_rows, first_union, _ = tno_bundle.build_mediterranean_sea_closure_rows(
+            expected_template_geom=MultiPolygon(parts), **arguments,
+        )
+        reversed_rows, _, _ = tno_bundle.build_mediterranean_sea_closure_rows(
+            expected_template_geom=MultiPolygon(parts[::-1]), **arguments,
+        )
+        self.assertEqual(first_rows, reversed_rows)
+        self.assertEqual(len(first_rows), 1)
+        rows, completion, diagnostics = tno_bundle.build_mediterranean_sea_closure_rows(
+            expected_template_geom=MultiPolygon(parts),
+            baseline_land_geom=None,
+            atlantropa_land_geom=None,
+            existing_sea_geom=first_union,
+        )
+        self.assertEqual(rows, [])
+        self.assertIsNone(completion)
+        self.assertEqual(diagnostics["remaining_hole_area"], 0)
+
+    def test_mediterranean_closure_preserves_small_islands_and_exact_seams(self) -> None:
+        island = box(0.9999, 0.9999, 1.0001, 1.0001)
+        existing_sea = box(0, 0, 0.5, 2)
+        _, completion, diagnostics = tno_bundle.build_mediterranean_sea_closure_rows(
+            expected_template_geom=box(0, 0, 2, 2),
+            baseline_land_geom=island,
+            atlantropa_land_geom=None,
+            existing_sea_geom=existing_sea,
+        )
+        self.assertEqual(completion.intersection(island).area, 0)
+        self.assertTrue(completion.covers(Point(0.50000001, 1)))
+        self.assertEqual(diagnostics["remaining_hole_area"], 0)
+
+    def test_mediterranean_unmanaged_template_excludes_regional_responsibility(self) -> None:
+        configs = {
+            "west": {"sea_completion_bbox": (0, 0, 2, 2)},
+            "east": {"aoi_bbox": (3, 0, 5, 2)},
+        }
+        with patch.object(tno_bundle, "ATLANTROPA_REGION_CONFIGS", configs):
+            unmanaged = tno_bundle.build_mediterranean_unmanaged_template_geom(box(0, 0, 5, 2))
+        self.assertTrue(unmanaged.equals(box(2, 0, 3, 2)))
+
+    def test_mediterranean_other_water_excludes_named_source_beyond_coarse_base(self) -> None:
+        def feature(geom, region_group):
+            return {"type": "Feature", "geometry": mapping(geom), "properties": {"region_group": region_group}}
+
+        template = box(0, 0, 5, 5)
+        with (
+            patch.object(tno_bundle, "load_mediterranean_template_water_gdf", return_value=gpd.GeoDataFrame(geometry=[template])),
+            patch.object(tno_bundle, "load_global_water_regions_feature_index", return_value={
+                "med": feature(template, "mediterranean"),
+                "red": feature(box(4, 0, 5, 1), "marine_macro"),
+            }),
+        ):
+            other = tno_bundle.build_mediterranean_other_water_geom({
+                "features": [feature(box(3, 0, 6, 2), "marine_macro")],
+            })
+        self.assertTrue(other.equals(box(3, 0, 5, 2)))
+
+    def test_mediterranean_unmanaged_template_excludes_outside_construction_extent(self) -> None:
+        configs = {
+            "west": {"sea_completion_bbox": (0, 1, 2, 3)},
+            "east": {"aoi_bbox": (3, 1, 5, 3)},
+        }
+        # The lower strip models med_open_basin extending into the Red Sea.
+        with patch.object(tno_bundle, "ATLANTROPA_REGION_CONFIGS", configs):
+            unmanaged = tno_bundle.build_mediterranean_unmanaged_template_geom(box(0, 0, 5, 3))
+        self.assertTrue(unmanaged.equals(box(2, 1, 3, 3)))
+        self.assertEqual(unmanaged.intersection(box(0, 0, 5, 1)).area, 0)
+
+    def test_mediterranean_generator_appends_closure_without_changing_regional_rows(self) -> None:
+        configs = {
+            region: {"aoi_bbox": bounds, "group_label": region, "feature_group_id": region}
+            for region, bounds in [("west", (0, 0, 2, 2)), ("east", (3, 0, 5, 2))]
+        }
+        regional_rows = {
+            region: tno_bundle.make_feature(box(*config["aoi_bbox"]), {"id": f"ATLSEA_FILL_{region}_1"})
+            for region, config in configs.items()
+        }
+
+        def regional_completion(region_id, _config, **_kwargs):
+            row = regional_rows[region_id]
+            return [row], shape(row["geometry"]), {}
+
+        with (
+            patch.object(tno_bundle, "ATLANTROPA_REGION_CONFIGS", configs),
+            patch.object(tno_bundle, "load_mediterranean_template_water_gdf", return_value=gpd.GeoDataFrame(geometry=[box(0, 0, 5, 2)])),
+            patch.object(tno_bundle, "local_land_union", return_value=box(10, 10, 11, 11)),
+            patch.object(tno_bundle, "build_region_affine_coeffs", return_value=(None, None)),
+            patch.object(tno_bundle, "build_atl_sea_completion_rows", side_effect=regional_completion),
+        ):
+            rows, sea, diagnostics = tno_bundle.build_atl_sea_from_hgo(
+                {}, gpd.GeoDataFrame(geometry=[]), {}, other_water_geom=None,
+            )
+        self.assertEqual(rows[:2], list(regional_rows.values()))
+        self.assertEqual(rows[2]["properties"]["id"], "ATLSEA_FILL_mediterranean_1")
+        self.assertTrue(shape(rows[2]["geometry"]).equals(box(2, 0, 3, 2)))
+        self.assertTrue(sea.equals(box(0, 0, 5, 2)))
+        self.assertEqual(diagnostics["mediterranean_closure"]["remaining_hole_area"], 0)
+
+    def test_checked_in_tno_1962_ionian_cross_region_gaps_are_atlantropa_water(self) -> None:
+        topology = json.loads(
+            (Path(tno_bundle.SCENARIO_DIR) / "scenario_atlantropa.topo.json").read_text(encoding="utf-8")
+        )
+        sea = tno_bundle.safe_unary_union([
+            _geometry_from_topology_geometry(topology, geometry)
+            for geometry in topology["objects"]["scenario_atlantropa"]["geometries"]
+            if (geometry.get("properties") or {}).get("atl_color_rule") == "atlantropa_sea"
+        ])
+        for coordinates in [(18, 36), (20, 36), (20, 38)]:
+            with self.subTest(coordinates=coordinates):
+                self.assertTrue(sea.covers(Point(*coordinates)), "Cross-region Ionian sea gap")
+
     def test_checked_in_tno_1962_southwest_greece_gap_is_atlantropa_water(self) -> None:
         scenario_dir = Path(tno_bundle.SCENARIO_DIR)
         atlantropa_topology = json.loads((scenario_dir / "scenario_atlantropa.topo.json").read_text(encoding="utf-8"))

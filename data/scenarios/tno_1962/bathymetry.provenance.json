@@ -46,8 +46,8 @@
     ]
   },
   "diagnostics": {
-    "band_feature_count": 90,
-    "contour_feature_count": 74,
+    "band_feature_count": 94,
+    "contour_feature_count": 77,
     "observed_region_ids": [
       "adriatica",
       "aegean",
@@ -64,6 +64,7 @@
       "gabes",
       "levant",
       "libya_suez",
+      "mediterranean",
       "sicily_tunis",
       "tyrrhenian",
       "west_med"

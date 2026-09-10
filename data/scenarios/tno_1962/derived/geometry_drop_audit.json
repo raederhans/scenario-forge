@@ -7899,6 +7899,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_mediterranean_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_sicily_tunis_1",
       "final_area": null,
       "missing_stages": [],
@@ -14762,7 +14785,7 @@
       "ATLISL_": 62,
       "ATLPRV_": 86,
       "ATLSEA_": 86,
-      "ATLSEA_FILL_": 355,
+      "ATLSEA_FILL_": 356,
       "RU_ARCTIC_FB_": 51
     },
     "owner_core": {
@@ -14770,13 +14793,13 @@
       "ATLISL_": 62,
       "ATLPRV_": 86,
       "ATLSEA_": 86,
-      "ATLSEA_FILL_": 355
+      "ATLSEA_FILL_": 356
     },
     "runtime_atlantropa": {
       "ATLISL_": 62,
       "ATLPRV_": 86,
       "ATLSEA_": 86,
-      "ATLSEA_FILL_": 355
+      "ATLSEA_FILL_": 356
     },
     "runtime_political": {
       "AQ": 1,
@@ -14788,7 +14811,7 @@
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 641,
+    "protected_feature_count": 642,
     "protected_prefix_drop_count": 0,
     "runtime_only_shell_count": 51
   },

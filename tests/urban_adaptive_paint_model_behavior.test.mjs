@@ -58,3 +58,17 @@ test("urban adaptive capability defaults remain live and explicit capability ove
   assert.equal(model.getEffectiveUrbanMode({ mode: "adaptive" }, null), "manual");
   assert.equal(model.getEffectiveUrbanMode({ mode: "manual" }), "manual");
 });
+
+test("a draw resolver shares owner paint while the next draw reflects recoloring", () => {
+  let color = "#101010";
+  let calls = 0;
+  const state = { landIndex: new Map([["host", {}]]) };
+  const model = createModel(state, () => { calls++; return color; });
+  const resolve = model.createDrawPaintResolver();
+  const first = resolve({ properties: { country_owner_id: "host" } });
+  assert.equal(resolve({ properties: { country_owner_id: "host" } }), first);
+  assert.equal(calls, 1);
+  color = "#eeeeee";
+  assert.notDeepEqual(model.createDrawPaintResolver()({ properties: { country_owner_id: "host" } }), first);
+  assert.equal(calls, 2);
+});
