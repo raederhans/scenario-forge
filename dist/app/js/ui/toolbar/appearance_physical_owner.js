@@ -8,6 +8,7 @@ import {
   setAppearanceStyleGroupState,
 } from "../../core/state/actions/appearance_actions.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
+import { getPhysicalContextLayerRequests } from "../../core/state_defaults.js";
 import {
   captureHistoryState as captureRuntimeHistoryState,
   pushHistoryEntry as pushRuntimeHistoryEntry,
@@ -218,6 +219,10 @@ export function createAppearancePhysicalOwner({
       if (patch && typeof patch === "object") {
         patchAppearanceStyleGroupState(runtimeState, "physical", patch);
       }
+      if (reason === "physical-mode" && runtimeState.showPhysical
+        && typeof runtimeState.ensureContextLayerDataFn === "function") {
+        void runtimeState.ensureContextLayerDataFn(getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason, renderNow: true });
+      }
       renderDirty(reason);
     });
     element.dataset.bound = "true";
@@ -229,7 +234,7 @@ export function createAppearancePhysicalOwner({
       nodes.togglePhysical.addEventListener("change", (event) => {
         setAppearanceVisibilityState(runtimeState, "showPhysical", event.target.checked);
         if (runtimeState.showPhysical && typeof runtimeState.ensureContextLayerDataFn === "function") {
-          void runtimeState.ensureContextLayerDataFn(["physical-set", "physical-contours-set"], { reason: "toolbar-toggle", renderNow: true });
+          void runtimeState.ensureContextLayerDataFn(getPhysicalContextLayerRequests(runtimeState.styleConfig?.physical), { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-physical");
       });
@@ -245,7 +250,7 @@ export function createAppearancePhysicalOwner({
       nodes.physicalPreset.dataset.bound = "true";
     }
 
-    bindPhysicalChange(nodes.physicalMode, (_cfg, event) => ({ mode: String(event.target.value || "atlas_and_contours") }), "physical-mode");
+    bindPhysicalChange(nodes.physicalMode, (_cfg, event) => ({ mode: String(event.target.value || "atlas_only") }), "physical-mode");
     bindPhysicalInput(nodes.physicalOpacity, (_cfg, event) => {
       const value = Number(event.target.value);
       const opacity = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);

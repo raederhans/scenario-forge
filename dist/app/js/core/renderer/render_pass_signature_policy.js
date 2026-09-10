@@ -26,6 +26,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getLakeStyleConfig,
   stableJson,
   getDayNightRuntimeOwner,
+  getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
 }) {
   function getTransportPresentationSignatureParts() {
     return [
@@ -227,7 +228,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         transformSignature,
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.topologyRevision || 0,
-        runtimeState.colorRevision || 0,
+        getBorderAppearanceRevision(),
         runtimeState.cachedDynamicBordersHash || "",
         runtimeState.sovereigntyRevision || 0,
         0,

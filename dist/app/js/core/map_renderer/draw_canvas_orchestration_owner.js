@@ -126,7 +126,7 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     finalizePendingExactAfterSettleRefreshAfterPaint: effects.finalizePendingExactAfterSettleRefreshAfterPaint,
   });
 
-  function drawCanvasFrame(options) {
+  function drawCanvasFrameCore(options) {
     const includeSummary = options?.includeSummary === true;
     if (!isFrameSurfaceReady()) {
       return includeSummary
@@ -135,6 +135,11 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     }
 
     ensureLayerDataFromTopology();
+    // Exact asynchronous work keeps the last complete visible frame intact.
+    // Input frames still take the ordinary transformed-frame branch.
+    if (effects.prepareAsyncFrame?.()) {
+      return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
+    }
     incrementPerfCounter("drawCanvas");
     clearPoliticalPatchOverlayIfStale("drawCanvas-stale-overlay");
     const initialPhase = getRenderPhase();
@@ -252,6 +257,12 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
         },
       })
       : undefined;
+  }
+
+  function drawCanvasFrame(options) {
+    return typeof effects.withValidatedCache === "function"
+      ? effects.withValidatedCache(() => drawCanvasFrameCore(options))
+      : drawCanvasFrameCore(options);
   }
 
   return Object.freeze({

@@ -8,10 +8,10 @@
   "generated_at": "2026-05-31T23:17:04Z",
   "input_sha": {
     "bathymetry.topo.json": "93c40c14ac2d18a9b4a74bb5b6bb8c2a5355d31c921d3477b1a8d5ca3626c928",
-    "city_overrides.json": "0b0029e2504d1f188efa14c56b90894aa40801bb7f0dda06c9cea3e190bca94d",
+    "city_overrides.json": "223ab2e45625ffa7b33b72945a6f2f21262e5b9e18890e68a1d757b8a364b078",
     "cores.by_feature.json": "de5efb3b9bdacffb38e14742b9053407eff58d86cb755ae345784044729f721c",
     "countries.json": "3d1dbc96a35caa7c32d5cb2ec998898866d73f31b0b5145ea9343012743ec6b0",
-    "geo_locale_patch.json": "ad6bf0528441a7e7bd1da87c21c559b8834149dd867bba74c86b63ce2a58ff30",
+    "geo_locale_patch.json": "9decdeb1a9da30fcf29b873317b89d8f8f74b737ee7783ccea7bca5e6c50027e",
     "owners.by_feature.json": "95b9ac25ab95647ddfb0d06e78e18b18cfee061e489ca69a31559e64ace7f09a",
     "relief_overlays.geojson": "e14ef01b40d603c88a4f174cfc4a27f38f51edb1456db391a35e4e2218f22364",
     "runtime_topology.topo.json": "06830553628cdb532bb444b5225e319b20683215c47573af59e173f3e836232d",
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "bdbc7490664d81f5be41ab81e282c9e7088d4dd7e1dbd1ed8dbe5928df0c3bc0",
+  "snapshot_fingerprint": "1f2295bf33d3b35ffe5326ff20a0496cb3e4bf65c633519bbd47384147cd9544",
   "water_count": 141
 }

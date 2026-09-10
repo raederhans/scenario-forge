@@ -383,7 +383,9 @@ export function createPoliticalCollectionOwner({
   }
 
   function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
-    const normalizedPrimaryCollection = Array.isArray(primaryCollection?.features)
+    // A complete scenario collection owns every region, including its shell
+    // underlays. Modern primary geometry must not be promoted over that source.
+    const normalizedPrimaryCollection = detailCollection?.globalCoverage !== true && Array.isArray(primaryCollection?.features)
       ? primaryCollection
       : { type: "FeatureCollection", features: [] };
     const normalizedDetailCollection = Array.isArray(detailCollection?.features)
