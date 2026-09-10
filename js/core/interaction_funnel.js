@@ -1,4 +1,5 @@
 import { clearDirty } from "./dirty_state.js";
+import { getPhysicalContextLayerRequests } from "./state_defaults.js";
 import { createProjectImportCompletion } from "./interaction_funnel/import_completion.js";
 import { createImportRecoveryUi } from "./interaction_funnel/import_recovery_ui.js";
 import { commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason } from "./state/actions/boot_actions.js";
@@ -430,7 +431,7 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
   }
   for (const [visible, name, layer] of [
     [state.showRivers, "rivers", "rivers"], [state.showUrban, "urban", "urban"],
-    [state.showPhysical, "physical", ["physical-set", "physical-contours-set"]],
+    [state.showPhysical, "physical", getPhysicalContextLayerRequests(state.styleConfig?.physical)],
   ]) if (visible) complete(name, async ({ isCurrent: valid, signal }) => {
     const result = await callRuntimeHook(state, "ensureContextLayerDataFn", layer, { reason: "project-import", renderNow: false, isCurrent: valid, signal });
     if (valid()) validateImportedContextLayerResult(result);

@@ -6,7 +6,35 @@ import {
   normalizePaletteLibraryGroupingMode,
   resolveAdaptivePaletteLibraryHeight,
   resolvePaletteLibraryEntryRegion,
+  selectPalettePaintColor,
 } from "../js/ui/toolbar/palette_library_panel.js";
+
+test("choosing a palette color switches ownership editing to visual without changing owners", () => {
+  const owners = { milan: "ITA" };
+  const modeUpdates = [];
+  const paintState = {
+    selectedColor: "#3c3c3c",
+    paintMode: "sovereignty",
+    activeSovereignCode: "GER",
+    sovereigntyByFeatureId: owners,
+    ui: { politicalEditingExpanded: true },
+    updatePaintModeUIFn: () => modeUpdates.push(paintState.paintMode),
+  };
+  assert.equal(selectPalettePaintColor(paintState, "#00FF00"), true);
+  assert.equal(paintState.selectedColor, "#00ff00");
+  assert.equal(paintState.paintMode, "visual");
+  assert.equal(paintState.ui.politicalEditingExpanded, false);
+  assert.equal(paintState.activeSovereignCode, "GER");
+  assert.equal(paintState.sovereigntyByFeatureId, owners);
+  assert.deepEqual(owners, { milan: "ITA" });
+  assert.deepEqual(modeUpdates, ["visual"]);
+});
+
+test("an invalid color leaves explicit ownership editing untouched", () => {
+  const paintState = { paintMode: "sovereignty", selectedColor: "#123456" };
+  assert.equal(selectPalettePaintColor(paintState, "invalid"), false);
+  assert.deepEqual(paintState, { paintMode: "sovereignty", selectedColor: "#123456" });
+});
 
 const appState = {
   countryGroupMetaByCode: new Map([

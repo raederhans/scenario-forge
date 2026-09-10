@@ -27,6 +27,10 @@ export function createZoomInteractionLifecycleOwner({
   } = constants;
 
   let currentZoomBehavior = null;
+  let gestureStartTransform = null;
+  let gestureActive = false;
+  let frameGeneration = 0;
+  let disposed = false;
   const updateMap = requireFunction(effects, "updateMap", "effects");
 
   function getD3() {
@@ -99,15 +103,39 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function scheduleLatestZoomTransformFlush() {
-    requestFrame(flushLatestZoomTransform);
+    const generation = frameGeneration;
+    requestFrame(() => {
+      if (disposed || generation !== frameGeneration) return;
+      flushLatestZoomTransform();
+    });
+  }
+
+  function transformsEqual(left, right) {
+    return !!left && !!right
+      && Number(left.x) === Number(right.x)
+      && Number(left.y) === Number(right.y)
+      && Number(left.k) === Number(right.k);
   }
 
   function handleZoomStart() {
+    if (disposed) return;
+    frameGeneration += 1;
+    gestureStartTransform = cloneTransform(getCurrentTransform());
+    gestureActive = false;
+    effects.setPendingZoomTransform?.(null);
+    effects.setZoomRenderScheduled?.(false);
+  }
+
+  function activateGesture() {
+    if (gestureActive) return;
+    gestureActive = true;
+    gestureStartTransform ||= cloneTransform(getCurrentTransform());
     effects.clearRenderPhaseTimer?.();
     effects.cancelExactAfterSettleRefresh?.();
-    effects.setZoomGestureStartTransform?.(cloneTransform(getCurrentTransform()));
+    effects.setZoomGestureStartTransform?.(gestureStartTransform);
     effects.setZoomGestureScaleDelta?.(0);
     effects.setPendingExactPoliticalFastFrame?.(false);
+    effects.notifyGestureStarted?.();
     effects.setRenderPhase?.(renderPhaseInteracting);
     effects.captureInteractionBorderSnapshot?.(getCurrentTransform());
     effects.renderHoverOverlayIfNeeded?.({ force: true, eventType: "zoom-start" });
@@ -115,6 +143,9 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function handleZoom(event = {}) {
+    if (disposed || !event.transform) return;
+    if (!gestureActive && transformsEqual(event.transform, getCurrentTransform())) return;
+    activateGesture();
     effects.setPendingZoomTransform?.(event.transform);
     if (isZoomRenderScheduled()) return;
     effects.setZoomRenderScheduled?.(true);
@@ -122,11 +153,14 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function flushLatestZoomTransform() {
+    if (disposed) return;
+    const generation = frameGeneration;
     const nextTransform = getPendingZoomTransform();
     effects.setPendingZoomTransform?.(null);
-    if (nextTransform) {
+    if (nextTransform && !transformsEqual(nextTransform, getCurrentTransform())) {
       updateMap(nextTransform);
     }
+    if (disposed || generation !== frameGeneration) return;
     if (getPendingZoomTransform()) {
       scheduleLatestZoomTransformFlush();
       return;
@@ -135,10 +169,18 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function handleZoomEnd(event = {}) {
-    const endTransform = event.transform;
-    effects.setRenderPhase?.(renderPhaseSettling);
+    if (disposed) return;
+    const endTransform = event.transform || getPendingZoomTransform() || getCurrentTransform();
+    if (!gestureActive && !transformsEqual(endTransform, getCurrentTransform())) activateGesture();
+    frameGeneration += 1;
     effects.setPendingZoomTransform?.(null);
-    updateMap(endTransform);
+    effects.setZoomRenderScheduled?.(false);
+    if (!gestureActive) {
+      gestureStartTransform = null;
+      return;
+    }
+    effects.setRenderPhase?.(renderPhaseSettling);
+    if (!transformsEqual(endTransform, getCurrentTransform())) updateMap(endTransform);
     const startK = Math.max(0.0001, Number(getZoomGestureStartTransform()?.k || endTransform?.k || 1));
     const endK = Math.max(0.0001, Number(endTransform?.k || startK));
     effects.setZoomGestureScaleDelta?.(Math.abs(Math.log2(endK / startK)));
@@ -149,9 +191,12 @@ export function createZoomInteractionLifecycleOwner({
       delayMs: 0,
     });
     effects.scheduleRenderPhaseIdle?.();
+    gestureActive = false;
+    gestureStartTransform = null;
   }
 
   function initZoom() {
+    disposed = false;
     const d3 = getD3();
     const rect = getInteractionRect();
     const node = typeof rect?.node === "function" ? rect.node() : null;
@@ -181,6 +226,10 @@ export function createZoomInteractionLifecycleOwner({
   }
 
   function dispose() {
+    disposed = true;
+    frameGeneration += 1;
+    gestureActive = false;
+    gestureStartTransform = null;
     effects.setPendingZoomTransform?.(null);
     effects.setZoomRenderScheduled?.(false);
     currentZoomBehavior = null;

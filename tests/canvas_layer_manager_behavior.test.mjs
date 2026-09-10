@@ -69,6 +69,7 @@ class FakeCanvas extends FakeElement {
       filter: "blur(1px)",
       setTransform: (...args) => this.context.calls.push(["setTransform", ...args]),
       clearRect: (...args) => this.context.calls.push(["clearRect", ...args]),
+      drawImage: (...args) => this.context.calls.push(["drawImage", ...args]),
     };
   }
 
@@ -149,6 +150,33 @@ test("clearCanvasLayer resets transform and drawing state", () => {
   assert.equal(canvas.context.globalAlpha, 1);
   assert.equal(canvas.context.shadowBlur, 0);
   assert.equal(canvas.context.filter, "none");
+});
+
+test("DPR resize retains the composite including pending political paint until the replacement frame", () => {
+  const documentRef = createFakeDocument();
+  const layers = ensureCanvasLayers(new FakeElement("div", documentRef));
+  resizeCanvasLayers(layers, { width: 320, height: 180 });
+  const composite = layers.composite.canvas;
+  const patch = layers.politicalPatch.canvas;
+  resizeCanvasLayers(layers, { width: 320, height: 180, dpr: 2, preserveComposite: true });
+  const [restore] = composite.context.calls;
+  assert.equal(restore[0], "drawImage");
+  const retained = restore[1];
+  assert.equal(retained.width, 320);
+  assert.equal(retained.height, 180);
+  assert.deepEqual(retained.context.calls, [["drawImage", composite, 0, 0], ["drawImage", patch, 0, 0]]);
+  assert.deepEqual(restore.slice(2), [0, 0, 640, 360]);
+  assert.deepEqual(patch.context.calls, []);
+  resizeCanvasLayers(layers, { width: 320, height: 180, dpr: 2, preserveComposite: true });
+  assert.equal(composite.context.calls.length, 1, "same-size calls must not clear or copy the frame");
+});
+
+test("initial or replacement scenes do not retain the old composite", () => {
+  const documentRef = createFakeDocument();
+  const layers = ensureCanvasLayers(new FakeElement("div", documentRef));
+  resizeCanvasLayers(layers, { width: 320, height: 180, preserveComposite: true });
+  resizeCanvasLayers(layers, { width: 320, height: 180, dpr: 2 });
+  assert.deepEqual(layers.composite.canvas.context.calls, []);
 });
 
 test("shouldClearStaleCanvasOverlay clears on transform, phase, or deferred exact drift", () => {

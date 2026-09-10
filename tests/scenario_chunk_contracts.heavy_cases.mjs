@@ -362,7 +362,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /replaceExactAfterSettlePendingPlanState\(runtimeState, \{[\s\S]*?generation,[\s\S]*?plan: appliedPlan,[\s\S]*?\}\);/.test(exactSchedulerSource)
         && /function completeScheduledExactAfterSettleRefreshPlan\(generation, plan, passStartedAt\) \{[\s\S]*?completeExactAfterSettleControllerApplyState\(runtimeState, \{[\s\S]*?generation,[\s\S]*?applyFinishedAt,[\s\S]*?recordRenderPerfMetric\("settleExactRefreshPasses"[\s\S]*?requestRendererRender\("exact-after-settle", \{[\s\S]*?flush: true/.test(exactSchedulerSource),
       exactAfterSettleFinalizesAfterExactCompose:
-        /function drawCanvasFrame\(options\) \{[\s\S]*?const activeRenderPassNames = getActiveRenderPassNames\(\);[\s\S]*?drewExactFrame = !!composeCachedPasses\(activeRenderPassNames\);[\s\S]*?if \(drewExactFrame\) \{[\s\S]*?finalizePendingExactAfterSettleRefreshAfterPaint\(\);/.test(drawCanvasOrchestrationOwnerSource)
+        /function drawCanvasFrameCore\(options\) \{[\s\S]*?const activeRenderPassNames = getActiveRenderPassNames\(\);[\s\S]*?drewExactFrame = !!composeCachedPasses\(activeRenderPassNames\);[\s\S]*?if \(drewExactFrame\) \{[\s\S]*?finalizePendingExactAfterSettleRefreshAfterPaint\(\);/.test(drawCanvasOrchestrationOwnerSource)
         && /function finalizePendingExactAfterSettleRefreshAfterPaint\(\) \{[\s\S]*?isExactAfterSettleIdentityCurrent\(controller\)[\s\S]*?recordRenderPerfMetric\("settleExactRefreshWaitForPaint"[\s\S]*?finalizeExactAfterSettleRefreshPlan\(plan\);[\s\S]*?recordRenderPerfMetric\("settleExactRefreshFinalize"/.test(exactSchedulerSource)
         && /metricSequenceStartedAt: Math\.max\(0, Number\(runtimeState\.renderPerfMetricSequence \|\| 0\)\)/.test(exactSchedulerSource)
         && /function readRenderPerfMetricDuration\(metricName, minSequence = 0\) \{[\s\S]*?requiredMinSequence > 0[\s\S]*?entry\?\.sequence/.test(rendererSource)
@@ -598,14 +598,15 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const pendingVisualPromotion = \{[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:/.test(chunkRuntimeSource)
         && /const pendingPromotion = \{[\s\S]*?requiredPoliticalChunkCount:[\s\S]*?selectedFeatureCountSum:[\s\S]*?selectedByteCountSum:[\s\S]*?selectedEstimatedPathCostSum:[\s\S]*?queueScenarioChunkPromotionState\(runtimeState, \{[\s\S]*?visualPromotion: pendingVisualPromotion,[\s\S]*?promotion: pendingPromotion,/.test(chunkRuntimeSource),
       deferredInfraRestoresFullPoliticalDerivedStateWhenVisibleSubsetIsActive:
-        chunkPromotionHelperSource.includes("export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
+        chunkPromotionHelperSource.includes("export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {")
         && /import \{[^}]*\banalyzeScenarioPoliticalDerivedStateCoverage\b[^}]*\} from "\.\.\/renderer\/scenario_chunk_promotion_helpers\.js";/.test(scenarioRefreshRuntimeSource)
-        && scenarioRefreshRuntimeSource.includes("analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)")
-        && scenarioRefreshRuntimeSource.includes('recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage"')
+        && scenarioRefreshRuntimeSource.includes("analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature })")
+        && chunkPromotionHelperSource.includes('recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage"')
+        && scenarioRefreshRuntimeSource.includes("recordScenarioPoliticalDerivedStateCoverage({")
         && scenarioRefreshRuntimeSource.includes("primaryVisibleDerivedStateReady = false")
         && scenarioRefreshRuntimeSource.includes("completePoliticalDerivedStateReady = false")
         && /const shouldRestoreFullPoliticalDerivedState = \([\s\S]*?politicalCoverageBeforeRestore\.completePoliticalFeatureCount > 0[\s\S]*?!resolvedCompletePoliticalDerivedStateReady[\s\S]*?primaryVisibleDerivedStateReady[\s\S]*?primaryVisibleFeatureSubsetActive[\s\S]*?landDataCoverageMissing[\s\S]*?colorCoverageMissing[\s\S]*?\);/.test(scenarioRefreshRuntimeSource)
-        && /colorCoverageMissing: !!coverage\.colorCoverageMissing,/.test(scenarioRefreshRuntimeSource)
+        && /colorCoverageMissing: !!coverage\.colorCoverageMissing,/.test(chunkPromotionHelperSource)
         && /if \(hasPrimaryVisiblePoliticalSubset \|\| shouldRestoreFullPoliticalDerivedState\) \{[\s\S]*?setScenarioPoliticalChunkPayloadState\(runtimeState, \{ visiblePayload: null \}\);[\s\S]*?\}[\s\S]*?if \(shouldRestoreFullPoliticalDerivedState\) \{/.test(scenarioRefreshRuntimeSource)
         && /if \(shouldRestoreFullPoliticalDerivedState\) \{[\s\S]*?rebuildPoliticalLandCollections\(\);[\s\S]*?rebuildRuntimeDerivedState\(\{[\s\S]*?includeRuntimePoliticalMeta: true,[\s\S]*?includeSecondarySpatial: false,[\s\S]*?\}\);/.test(scenarioRefreshRuntimeSource)
         && /restoredFullPoliticalChunkData = shouldRestoreFullPoliticalDerivedState;/.test(scenarioRefreshRuntimeSource),
@@ -919,7 +920,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
             && /!recoverySettled[\s\S]*?deferredState\.index >= normalizedEntries\.length[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?const startedAt = nowMs\(\)[\s\S]*?getPoliticalFeaturePathEntry\([\s\S]*?allowBuild: true/.test(body)
             && /if \(!isInteractionRecoverySettled\(\{ quietMs: 600 \}\)\) \{[\s\S]*?scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork\([\s\S]*?runScenarioPoliticalBackgroundDeferredFullCacheSlice,[\s\S]*?\{ timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS \},[\s\S]*?\);[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?return false;[\s\S]*?\}/.test(body);
         })()
-        && /function drawScenarioPoliticalBackgroundFills\([\s\S]*?const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?politicalDirtyReason !== "refresh-colors"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?allowBuild: false[\s\S]*?drawAdmin0BackgroundFills\(\{[\s\S]*?scheduleScenarioPoliticalBackgroundDeferredFullCache/.test(politicalBackgroundOwnerSource)
+        && /function drawScenarioPoliticalBackgroundFills\([\s\S]*?const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?politicalDirtyReason !== "refresh-colors"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?allowBuild: false[\s\S]*?const foregroundIds = new Set[\s\S]*?const underlayEntries = visibleEntries\.filter[\s\S]*?!foregroundIds\.has[\s\S]*?drawPoliticalBackgroundFillsForEntries\(underlayEntries,[\s\S]*?scheduleScenarioPoliticalBackgroundDeferredFullCache/.test(politicalBackgroundOwnerSource)
         && /const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?const progressiveRecoveryCoarseSkipCandidate = \([\s\S]*?coarseUnderlay \|\| ""\) === "admin0"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?\);[\s\S]*?if \(progressiveRecoveryCoarseSkipCandidate && !visiblePoliticalForegroundColorOverride\)/.test(politicalOwnerDrawSource)
         && /function clearPendingPoliticalColorEdit\(\{[\s\S]*?renderedCount = 0,[\s\S]*?renderedIds = null,[\s\S]*?force = false,[\s\S]*?paintSource = "political-pass"[\s\S]*?\} = \{\}\) \{[\s\S]*?cache\.pendingPoliticalColorEditIds\.clear\(\);[\s\S]*?cache\.pendingPoliticalColorEditRevision = -1;/.test(rendererSource)
         && /function drawPoliticalFeature\([\s\S]*?metricsCollector\.renderedIds instanceof Set[\s\S]*?metricsCollector\.renderedIds\.add\(id\);/.test(politicalPartialOwnerSource)
@@ -1204,8 +1205,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function isPoliticalForegroundFeature\(feature, featureId = null, pendingIds = undefined\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(politicalFeaturePolicySource)
         && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId, pendingIds\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(politicalFeaturePolicySource)
         && /orderPoliticalShellUnderlayFirst\(redrawEntries\)\.forEach/.test(politicalPartialOwnerSource)
-        && /orderPoliticalShellUnderlayFirst\(viewport\.visibleItems\)\.forEach/.test(politicalFineLoopSource)
-        && /const featureEntries = state\.landData\.features\.map/.test(politicalFineLoopSource)
+        && /const hasVisibleItems = Array\.isArray\(viewport\.visibleItems\);/.test(politicalFineLoopSource)
+        && /const featureEntries = hasVisibleItems[\s\S]*?\? viewport\.visibleItems[\s\S]*?: state\.landData\.features\.map/.test(politicalFineLoopSource)
         && /orderPoliticalShellUnderlayFirst\(featureEntries\)\.forEach/.test(politicalFineLoopSource),
       arcticShellOwnerHintsCanColorCoalescedShells:
         /scenario_shell_owner_hint/.test(rendererSource)
@@ -1796,16 +1797,18 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     assert.ok(handleBody.includes("nextSignature: signature"));
     const signatureBody = politicalPathCacheSource.match(/function getPoliticalPathCacheSignature\([\s\S]*?\n\}/)?.[0] || "";
     [
-      "getPoliticalPassStaticSignature(transform)",
-      "getProjectionRenderSignature()",
-      "getViewportRenderSignature()",
+      "getProjectionGeometryGeneration(rendererSurfaceHost.getProjection?.())",
+      "getProjectionGeometryGeneration(runtimeState.topologyPrimary || runtimeState.topology)",
+      "getProjectionGeometryGeneration(runtimeState.topologyDetail)",
+      "getProjectionGeometryGeneration(runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology)",
       "String(runtimeState.activeScenarioId || \"\")",
-      "\"ownership\"",
-      "Number(runtimeState.sovereigntyRevision || 0)",
-      "Number(runtimeState.scenarioShellOverlayRevision || 0)",
+      "Number(runtimeState.sceneGeneration || 0)",
     ].forEach((signatureInput) => {
       assert.ok(signatureBody.includes(signatureInput), `political path cache signature should include ${signatureInput}`);
     });
+    for (const unrelatedInput of ["getPoliticalPassStaticSignature", "getViewportRenderSignature", "colorRevision", "sovereigntyRevision"]) {
+      assert.equal(signatureBody.includes(unrelatedInput), false, `geometry paths must survive changes to ${unrelatedInput}`);
+    }
     assert.ok(rendererSource.includes("runtimeState.topologyRevision || 0"));
     const entryBody = politicalPathCacheSource.match(/function buildPoliticalFeaturePathEntry\(feature\) \{[\s\S]*?\n\}/)?.[0] || "";
     assert.ok(entryBody.includes("const path = new globalThis.Path2D()"));

@@ -389,6 +389,7 @@ test("progressive coarse admission stays exact and keeps the foreground check la
     { backgroundSummary: { ...progressive, progressive: false } },
     { backgroundSummary: { ...progressive, deferredFullCacheReady: true } },
     { backgroundSummary: { ...progressive, coarseUnderlay: "other" } },
+    { backgroundSummary: { ...progressive, coarseUnderlay: "scenario-features" } },
     { backgroundSummary: progressive, pendingEdit: true },
   ]) {
     const harness = createHarness(options);

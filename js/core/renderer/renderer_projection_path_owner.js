@@ -1,3 +1,5 @@
+import { markProjectionGeometryChanged } from "./projection_geometry_identity.js";
+
 function requireObject(value, name) {
   if (!value || typeof value !== "object") {
     throw new TypeError(`renderer projection/path owner requires ${name}`);
@@ -69,6 +71,7 @@ export function createRendererProjectionPathOwner({
     const projection = requireFunction(rawProjection, "precision", "d3.geoEqualEarth()")(projectionPrecision);
     const nextProjection = hostApi.setProjection(projection);
     requireFunction(nextProjection, "clipExtent", "surfaceHost.setProjection(projection)")(null);
+    markProjectionGeometryChanged(nextProjection);
     const pathSvg = hostApi.setPathSvg(createPath({
       geoPath: d3.geoPath.bind(d3),
       projection: nextProjection,

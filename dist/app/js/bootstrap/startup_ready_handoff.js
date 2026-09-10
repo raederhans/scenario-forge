@@ -1,5 +1,6 @@
 import { POST_READY_IDLE_QUIET_MS } from "./post_ready_scheduler.js";
 import { patchScenarioChunkLoadState } from "../core/state/actions/scenario_chunk_runtime_actions.js";
+import { normalizePhysicalStyleConfig } from "../core/state_defaults.js";
 
 const DETAIL_PROMOTION_POLITICAL_RECONCILE_TASK_KEY = "post-ready-detail-promotion-political-reconcile";
 
@@ -329,7 +330,9 @@ export function createStartupReadyHandoffOwner({
     }
     if (targetRuntime.showPhysical) {
       requestedLayerNames.push("physical-set");
-      requestedContourLayerNames.push("physical-contours-set");
+      if (normalizePhysicalStyleConfig(targetRuntime.styleConfig?.physical).mode !== "atlas_only") {
+        requestedContourLayerNames.push("physical-contours-set");
+      }
     }
     const shouldWarmCities =
       targetRuntime.showCityPoints !== false
@@ -365,10 +368,11 @@ export function createStartupReadyHandoffOwner({
     if (requestedContourLayerNames.length) {
       postReadyScheduler.scheduleTask("post-ready-contour-warmup", async (task) => {
         task.throwIfStale();
-        if (targetRuntime.bootBlocking) {
+        await task.yield();
+        if (targetRuntime.bootBlocking || !targetRuntime.showPhysical
+          || normalizePhysicalStyleConfig(targetRuntime.styleConfig?.physical).mode === "atlas_only") {
           return;
         }
-        await task.yield();
         await task.waitFor(ensureContextLayerDataReady(requestedContourLayerNames, {
           taskContext: task,
           reason: "post-ready-contours",

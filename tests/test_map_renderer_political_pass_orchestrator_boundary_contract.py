@@ -118,9 +118,12 @@ class MapRendererPoliticalPassOrchestratorBoundaryContractTest(unittest.TestCase
             self.assertGreaterEqual(cursor, 0, token)
 
         for token in (
-            "orderPoliticalShellUnderlayFirst(viewport.visibleItems).forEach",
-            "drawPoliticalFeature(item.feature, item.drawOrder, {",
-            "const featureEntries = state.landData.features.map",
+            "const hasVisibleItems = Array.isArray(viewport.visibleItems);",
+            "const featureEntries = hasVisibleItems",
+            "? viewport.visibleItems",
+            ": state.landData.features.map",
+            "drawPoliticalFeature(feature, drawOrder, {",
+            "skipScreenCheck: hasVisibleItems",
             "orderPoliticalShellUnderlayFirst(featureEntries).forEach",
             "return featureMetrics;",
         ):

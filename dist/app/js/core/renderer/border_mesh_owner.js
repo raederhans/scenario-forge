@@ -339,10 +339,14 @@ export function createBorderMeshOwner({
     });
   }
 
-  function buildSourceBorderMeshes(topology, includedCountries) {
+  function buildSourceBorderMeshes(topology, includedCountries, { includeProvince = true, includeLocal = true } = {}) {
     return buildSourceBorderMeshesFromSources({
       topology,
       includedCountries,
+      includeProvince,
+      includeLocal,
+      countryAssignmentRevision: [state.activeScenarioId, state.topologyRevision, state.sovereigntyRevision,
+        state.scenarioShellOverlayRevision, state.scenarioViewMode, state.mapSemanticMode].join("|"),
       canonicalCountryCode,
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,

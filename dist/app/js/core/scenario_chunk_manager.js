@@ -1,3 +1,5 @@
+import { getFeatureId } from "./feature_identity.js";
+
 const DEFAULT_RENDER_BUDGET_HINTS = Object.freeze({
   max_required_chunks: 6,
   max_optional_chunks: 3,
@@ -536,6 +538,10 @@ function resolveLayerChunksForZoom({
   return registryChunks.filter((chunk) => activeChunkIds.has(chunk.id));
 }
 
+export function isScenarioPoliticalBaseChunk(chunk) {
+  return chunk?.layer === "political" && chunk.globalCoverage === true && chunk.lod === "coarse";
+}
+
 export function selectScenarioChunks({
   scenarioId = "",
   chunkRegistry = null,
@@ -553,6 +559,9 @@ export function selectScenarioChunks({
   const optional = [];
   const visibleLayerSet = new Set((Array.isArray(visibleLayers) ? visibleLayers : []).map((value) => String(value || "").trim().toLowerCase()));
   visibleLayerSet.forEach((layerKey) => {
+    // Detail budgets govern extra precision, never the existence of countries.
+    const baseChunks = (chunkRegistry?.byLayer?.[layerKey] || []).filter(isScenarioPoliticalBaseChunk);
+    required.push(...baseChunks);
     const requiredBudget = layerKey === "political"
       ? hints.max_required_political_chunks
       : hints.max_required_chunks;
@@ -562,7 +571,8 @@ export function selectScenarioChunks({
       contextLodManifest,
       layerKey,
       zoom,
-    }).filter((chunk) => chunk.globalCoverage || chunkIntersectsViewport(chunk, viewportBbox));
+    }).filter((chunk) => !isScenarioPoliticalBaseChunk(chunk)
+      && (chunk.globalCoverage || chunkIntersectsViewport(chunk, viewportBbox)));
     const ordered = sortChunksForSelection(candidates, focusCountry, viewportBbox, loadedChunkIds);
     const focusDetailChunks = normalizedFocusCountry
       ? ordered.filter((chunk) => chunk.lod === "detail" && chunk.countryCodes.includes(normalizedFocusCountry))
@@ -639,7 +649,7 @@ export function selectScenarioChunks({
 }
 
 function getChunkFeatureId(feature, fallbackIndex = 0) {
-  const rawValue = feature?.id ?? feature?.properties?.id ?? feature?.properties?.feature_id ?? fallbackIndex;
+  const rawValue = getFeatureId(feature) || feature?.properties?.feature_id || fallbackIndex;
   const normalized = String(rawValue ?? "").trim();
   return normalized || `chunk-feature-${fallbackIndex}`;
 }
@@ -712,11 +722,16 @@ export function mergeScenarioChunkPayloadsForViewport(layerKey, chunkPayloadEntr
       payload: entry?.payload || null,
     }))
     .filter((entry) => entry.payload);
-  const fullPayload = mergeScenarioChunkPayloads(
-    normalizedLayerKey,
-    entries.map((entry) => entry.payload),
-  );
+  if (normalizedLayerKey === "political") {
+    // The feature merger keeps the first ID. Precision must win independently
+    // of network completion order, with the base filling every remaining ID.
+    entries.sort((left, right) => Number(right.chunk?.lod === "detail") - Number(left.chunk?.lod === "detail"));
+  }
   if (!entries.length || normalizedLayerKey !== "political") {
+    const fullPayload = mergeScenarioChunkPayloads(
+      normalizedLayerKey,
+      entries.map((entry) => entry.payload),
+    );
     const featureCount = Array.isArray(fullPayload?.features) ? fullPayload.features.length : 0;
     return {
       payload: fullPayload,
@@ -738,7 +753,7 @@ export function mergeScenarioChunkPayloadsForViewport(layerKey, chunkPayloadEntr
   const filteredPayloads = entries.map(({ chunk, payload }) => {
     const features = Array.isArray(payload?.features) ? payload.features : [];
     totalFeatureCount += features.length;
-    const visibleIndexes = getChunkVisibleFeatureIndexes(chunk, viewportBbox, {
+    const visibleIndexes = isScenarioPoliticalBaseChunk(chunk) ? null : getChunkVisibleFeatureIndexes(chunk, viewportBbox, {
       expectedFeatureCount: features.length,
     });
     if (!Array.isArray(visibleIndexes)) {

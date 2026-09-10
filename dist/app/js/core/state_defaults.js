@@ -107,7 +107,7 @@ function normalizeTextureMode(value) {
 
 function normalizePhysicalMode(value) {
   const raw = String(value || "").trim().toLowerCase();
-  return PHYSICAL_MODE_ALIASES[raw] || "atlas_and_contours";
+  return PHYSICAL_MODE_ALIASES[raw] || "atlas_only";
 }
 
 function normalizePhysicalPreset(value) {
@@ -153,7 +153,7 @@ function createPhysicalPresetConfig(preset = "balanced") {
   if (normalizedPreset === "political_clean") {
     return {
       preset: normalizedPreset,
-      mode: "atlas_and_contours",
+      mode: "atlas_only",
       opacity: 0.36,
       atlasOpacity: 0.24,
       atlasIntensity: 0.78,
@@ -173,7 +173,7 @@ function createPhysicalPresetConfig(preset = "balanced") {
   }
   return {
     preset: normalizedPreset,
-    mode: "atlas_and_contours",
+    mode: "atlas_only",
     opacity: 0.56,
     atlasOpacity: 0.44,
     atlasIntensity: 0.96,
@@ -194,6 +194,12 @@ function createPhysicalPresetConfig(preset = "balanced") {
 
 function createDefaultPhysicalStyleConfig() {
   return createPhysicalPresetConfig("balanced");
+}
+
+export function getPhysicalContextLayerRequests(rawConfig) {
+  return normalizePhysicalStyleConfig(rawConfig).mode === "atlas_only"
+    ? ["physical-set"]
+    : ["physical-set", "physical-contours-set"];
 }
 
 function createPhysicalStyleConfigForPreset(preset = "balanced") {

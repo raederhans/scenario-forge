@@ -7,16 +7,9 @@ const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
 const CONTEXT_SCENARIO_REUSE_MAX_DISTANCE_PX = 960;
 const CONTEXT_SCENARIO_REUSE_FRAME_LIMIT = 24;
 const EXACT_AFTER_SETTLE_FAST_PATH_REQUIRED_PASS_NAMES = Object.freeze([
-  "background",
-  "physicalBase",
-  "political",
-  "contextBase",
-  "contextScenario",
-  "effects",
-  "lineEffects",
-  "contextMarkers",
-  "dayNight",
-  "textureLabels",
+  "background", "physicalBase", "political",
+  "contextBase", "contextScenario", "effects", "lineEffects",
+  "contextMarkers", "dayNight", "textureLabels",
 ]);
 
 function defaultCloneZoomTransform(transform = null) {
@@ -47,6 +40,7 @@ export function createRenderTransformReusePolicyOwner({
   const {
     getRenderPassCacheState = () => state.renderPassCache || {},
     getPassReferenceTransform = () => null,
+    getActiveRenderPassNames = () => null,
   } = getters;
   const {
     cloneZoomTransform = defaultCloneZoomTransform,
@@ -238,8 +232,11 @@ export function createRenderTransformReusePolicyOwner({
   }
 
   function shouldStartExactAfterSettleFastPath() {
-    if (!shouldEnableContextBaseTransformReuse()) return false;
     if (state.deferContextBasePass) return false;
+    // Sliced recovery does not require long-lived contextBase transform reuse.
+    // HGO owns a separate surface pipeline, even when old vector caches remain.
+    const activePassNames = getActiveRenderPassNames();
+    if (!Array.isArray(activePassNames) || !activePassNames.length || activePassNames.includes("hgoPreview")) return false;
     const cache = getRenderPassCacheState();
     return exactAfterSettleFastPathRequiredPassNames.every((passName) => (
       !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName)

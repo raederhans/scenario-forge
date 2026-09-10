@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 54,
-    "nodeCount": 68,
-    "reverseIndexKeyCount": 90,
+    "specCount": 57,
+    "nodeCount": 71,
+    "reverseIndexKeyCount": 100,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 54
+        "specCount": 56
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -59,11 +59,11 @@
         "specCount": 9
       },
       {
-        "dependency": "js/bootstrap/startup_bootstrap_support.js",
-        "specCount": 5
+        "dependency": "js/core/state/ui_state.js",
+        "specCount": 6
       },
       {
-        "dependency": "js/core/state/ui_state.js",
+        "dependency": "js/bootstrap/startup_bootstrap_support.js",
         "specCount": 5
       },
       {
@@ -337,6 +337,47 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/dev/normal_visual_paths.dev.spec.js": {
+      "directDependencies": [
+        "js/core/feature_identity.js",
+        "js/core/map_renderer.js",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
+        "js/core/renderer/render_transaction_diagnostics.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/sovereignty_manager.js",
+        "js/core/state.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/feature_identity.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
+        "js/core/renderer/render_transaction_diagnostics.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/sovereignty_manager.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/feature_identity.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
+        "js/core/renderer/render_transaction_diagnostics.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/sovereignty_manager.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
     "tests/e2e/dev/project_import_recovery_round2.dev.spec.js": {
       "directDependencies": [
         "tests/e2e/support/playwright-app.js"
@@ -451,6 +492,49 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/dev/shared_labels_runtime.dev.spec.js": {
+      "directDependencies": [
+        "js/core/data_loader.js",
+        "js/core/map_renderer.js",
+        "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/transport_facility_icons.js",
+        "js/core/scenario/presentation_display_restore.js",
+        "js/core/state.js",
+        "js/core/state/ui_state.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/data_loader.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/transport_facility_icons.js",
+        "js/core/scenario/presentation_display_restore.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/ui_state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/data_loader.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/transport_facility_icons.js",
+        "js/core/scenario/presentation_display_restore.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/ui_state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
     "tests/e2e/dev/tno_ready_state_contract.dev.spec.js": {
       "directDependencies": [
         "js/core/map_renderer.js",
@@ -479,6 +563,23 @@
         "js/core/scenario_resources.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/dev/visual_owner_semantics.dev.spec.js": {
+      "directDependencies": [
+        "js/core/renderer/city_points_render_owner.js",
+        "js/core/renderer/river_layer_render_owner.js",
+        "js/core/state_defaults.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/renderer/city_points_render_owner.js",
+        "js/core/renderer/river_layer_render_owner.js",
+        "js/core/state_defaults.js"
+      ],
+      "repoImpact": [
+        "js/core/renderer/city_points_render_owner.js",
+        "js/core/renderer/river_layer_render_owner.js",
+        "js/core/state_defaults.js"
       ]
     },
     "tests/e2e/dev_workspace_i18n.spec.js": {
@@ -1710,6 +1811,7 @@
       "tests/e2e/city_urban_rendering_regression.spec.js"
     ],
     "js/core/data_loader.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/review_regressions.spec.js"
     ],
     "js/core/dirty_state.js": [
@@ -1719,6 +1821,7 @@
     ],
     "js/core/feature_identity.js": [
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js"
     ],
     "js/core/history_manager.js": [
@@ -1732,10 +1835,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1788,10 +1893,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1836,13 +1943,29 @@
       "tests/e2e/ui_rework_support_transport_hardening.spec.js",
       "tests/e2e/water_cache_strategy_regression.spec.js"
     ],
+    "js/core/map_renderer/hgo_runtime_preview_render_owner.js": [
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js"
+    ],
     "js/core/render_boundary.js": [
       "tests/e2e/dev_workspace_render_boundary.spec.js",
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/shortcut_history_render_boundary.spec.js"
     ],
+    "js/core/renderer/city_points_render_owner.js": [
+      "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
+    ],
+    "js/core/renderer/pixel_ratio_policy.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
     "js/core/renderer/render_transaction_diagnostics.js": [
-      "tests/e2e/dev/full_visual_acceptance.dev.spec.js"
+      "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js"
+    ],
+    "js/core/renderer/river_layer_render_owner.js": [
+      "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
+    ],
+    "js/core/renderer/transport_facility_icons.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
     "js/core/scenario_dispatcher.js": [
       "tests/e2e/city_label_i18n_redraw.spec.js",
@@ -1852,10 +1975,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1915,12 +2040,19 @@
       "tests/e2e/startup_bundle_recovery_contract.spec.js",
       "tests/e2e/water_cache_strategy_regression.spec.js"
     ],
+    "js/core/scenario/presentation_display_restore.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
     "js/core/sovereignty_manager.js": [
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
       "tests/e2e/scenario_blank_exit.spec.js"
     ],
     "js/core/startup_cache.js": [
       "tests/e2e/review_regressions.spec.js"
+    ],
+    "js/core/state_defaults.js": [
+      "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
     ],
     "js/core/state.js": [
       "tests/e2e/city_label_i18n_redraw.spec.js",
@@ -1930,10 +2062,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1986,7 +2120,8 @@
       "tests/e2e/city_lights_layer_regression.spec.js",
       "tests/e2e/city_points_urban_runtime.spec.js",
       "tests/e2e/city_reveal_plan_regression.spec.js",
-      "tests/e2e/city_urban_rendering_regression.spec.js"
+      "tests/e2e/city_urban_rendering_regression.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
     "js/ui/dev_workspace.js": [
       "tests/e2e/dev_workspace_i18n.spec.js"
@@ -2003,10 +2138,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2093,6 +2230,9 @@
     "tests/e2e/dev/full_visual_acceptance.dev.spec.js": [
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js"
     ],
+    "tests/e2e/dev/normal_visual_paths.dev.spec.js": [
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js"
+    ],
     "tests/e2e/dev/project_import_recovery_round2.dev.spec.js": [
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js"
     ],
@@ -2105,8 +2245,14 @@
     "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js": [
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"
     ],
+    "tests/e2e/dev/shared_labels_runtime.dev.spec.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
     "tests/e2e/dev/tno_ready_state_contract.dev.spec.js": [
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js"
+    ],
+    "tests/e2e/dev/visual_owner_semantics.dev.spec.js": [
+      "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
     ],
     "tests/e2e/hoi4_1939_ui_smoke.spec.js": [
       "tests/e2e/hoi4_1939_ui_smoke.spec.js"
@@ -2215,10 +2361,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2271,10 +2419,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2327,10 +2477,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2383,10 +2535,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2450,10 +2604,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2513,10 +2669,12 @@
       "tests/e2e/city_reveal_plan_regression.spec.js",
       "tests/e2e/city_urban_rendering_regression.spec.js",
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
+      "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js",
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",

@@ -19,6 +19,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
   const pending = [];
   const cancelled = [];
   const metrics = [];
+  const filledPaths = [];
   let maskResult = null;
   const pathCache = new Map();
   let preparedPathIdentity = null;
@@ -47,7 +48,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
   const context = {
     canvas: { width: 800, height: 400 },
     beginPath: () => calls.push("beginPath"),
-    fill: (path) => calls.push(path ? "fill:path" : "fill"),
+    fill: (path) => { filledPaths.push(path); calls.push(path ? "fill:path" : "fill"); },
     save: () => calls.push("save"),
     restore: () => calls.push("restore"),
     setTransform: () => calls.push("setTransform"),
@@ -67,7 +68,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     getSafeCanvasColor: (value, fallback) => value || fallback,
     isAtlantropaSeaFeature: () => false,
     getResolvedFeatureColor: () => "#778899",
-    getDisplayOwnerCode: (feature) => feature?.properties?.owner || "AA",
+    getDisplayOwnerCode: (feature) => { calls.push(`owner:${feature?.properties?.id}`); return feature?.properties?.owner || "AA"; },
     getFeatureCountryCodeNormalized: (feature) => feature?.properties?.country || "AA",
     isWorldBounds: () => false,
     getPoliticalPathCacheHandle: (transform, { resetIfMismatch }) => {
@@ -173,7 +174,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     },
   });
   return {
-    owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics,
+    owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics, surface, filledPaths,
     setMaskResult: (value) => { maskResult = value; },
   };
 }
@@ -182,16 +183,37 @@ function feature(id, owner = "AA") {
   return { type: "Feature", properties: { id, owner, country: owner }, geometry: { type: "Polygon" } };
 }
 
-test("background pass preserves sphere, ocean data, style, and delegated intensity write order", () => {
+test("background pass fills sphere once before ocean style and delegated depth state", () => {
   const fixture = createFixture();
   fixture.state.oceanData = feature("ocean");
   fixture.owner.drawBackgroundPass();
-  assert.deepEqual(fixture.calls.slice(0, 9), [
+  assert.deepEqual(fixture.calls, [
     "fillStyle:#001122", "beginPath", "path:Sphere", "fill",
-    "fillStyle:#001122", "beginPath", "path:ocean", "fill", "ocean:style",
+    "ocean:style", "commit:intensity",
   ]);
-  assert.deepEqual(fixture.calls.slice(9), ["commit:intensity"]);
   assert.equal(fixture.state.intensityFields.normalized, true);
+});
+
+test("ocean base never reprojects redundant ocean polygons after camera, color, DPR or source changes", () => {
+  const fixture = createFixture();
+  let sphereBuilds = 0;
+  fixture.surface.getPathCanvas = () => (item) => {
+    assert.equal(item.type, "Sphere", "only the projection sphere defines the ocean base coverage");
+    sphereBuilds += 1;
+  };
+  fixture.state.oceanData = feature("ocean");
+  fixture.owner.drawBackgroundPass();
+  fixture.state.zoomTransform = { x: 45, y: 20, k: 2 };
+  fixture.state.dpr = 2;
+  fixture.state.colorRevision += 1;
+  fixture.owner.drawBackgroundPass();
+  fixture.surface.getProjection = () => (point) => [point[0] * 2, point[1] * 2];
+  fixture.state.oceanData = feature("replacement");
+  fixture.owner.drawBackgroundPass();
+  assert.equal(sphereBuilds, 3);
+  assert.equal(fixture.calls.filter(call => call === "fill").length, 3);
+  assert.equal(fixture.calls.filter(call => call === "ocean:style").length, 3);
+  assert.equal(fixture.calls.filter(call => call === "commit:intensity").length, 3);
 });
 
 test("full-pass cache replays only for current transform and color identity", () => {
@@ -319,7 +341,7 @@ test("deferred slices prepare once each and reuse warm paths without feature loo
   assert.equal(fixture.calls.filter((call) => call === "repaint").length, 1);
 });
 
-test("progressive Admin0 underlay schedules one current deferred completion", () => {
+test("scenario recovery leaves modern admin0 out and schedules one current deferred completion", () => {
   const fixture = createFixture({ progressiveLimit: 1 });
   fixture.state.landData = { features: [feature("a"), feature("b")] };
   fixture.state.topology = {
@@ -333,7 +355,8 @@ test("progressive Admin0 underlay schedules one current deferred completion", ()
     returnSummary: true,
   });
   assert.equal(summary.progressive, true);
-  assert.equal(summary.coarseUnderlay, "admin0");
+  assert.equal(summary.coarseUnderlay, "scenario-features");
+  assert.equal(fixture.calls.some((entry) => entry === "fillStyle:color:AA"), false);
   assert.equal(summary.deferredFullCacheScheduled, true);
   assert.equal(fixture.pending.length, 1);
 
@@ -350,6 +373,71 @@ test("progressive Admin0 underlay schedules one current deferred completion", ()
   assert.equal(slice.builtPathCount, 2);
   assert.equal(slice.reusedPathCount, 0);
   assert.equal(slice.pathlessEntryCount, 0);
+});
+
+test("progressive recovery paints noninteractive scenario shell immediately without repainting foreground", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  const interactive = feature("interactive");
+  const shell = feature("RU_ARCTIC_FB_RKM_030");
+  shell.properties.interactive = false;
+  shell.properties.scenario_helper_kind = "shell_fallback";
+  fixture.state.landData = { features: [interactive] };
+  fixture.state.landDataFull = { features: [interactive, shell] };
+  const visibleItems = fixture.state.landDataFull.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  const summary = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  assert.equal(summary.underlayEntryCount, 1);
+  assert.equal(summary.groupCount, 1);
+  assert.equal(summary.deferredFullCacheReady, false);
+  assert.equal(fixture.pending.length, 1);
+  assert.ok(fixture.calls.includes("build:RU_ARCTIC_FB_RKM_030"));
+  assert.ok(fixture.calls.includes("fill:path"));
+  assert.ok(!fixture.calls.includes("path:interactive"));
+  assert.equal(fixture.metrics.find((metric) => metric.name === "scenarioPoliticalBackgroundProgressiveRecovery").underlayEntryCount, 1);
+  fixture.pending.shift().callback();
+  assert.equal(fixture.calls.filter((entry) => entry === "repaint").length, 1);
+  const warm = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  assert.equal(warm.deferredFullCacheReady, true);
+});
+
+test("scenario underlay fills warm and cold paths as one compound path and reuses both next frame", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  const warm = feature("warm");
+  const cold = feature("cold");
+  fixture.state.landDataFull = { features: [warm, cold] };
+  const warmPath = { featureId: "warm" };
+  fixture.pathCache.set("warm", { path: warmPath, geometryRef: warm.geometry });
+  const draw = () => fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+  const first = draw();
+  assert.equal(first.underlayEntryCount, 2);
+  assert.equal(first.groupCount, 1);
+  assert.deepEqual(fixture.calls.filter(call => call.startsWith("build:")), ["build:cold"]);
+  assert.equal(fixture.calls.some(call => call === "path:warm" || call === "path:cold"), false);
+  assert.equal(fixture.filledPaths.length, 1, "same-color geometry, including holes, shares one nonzero fill");
+  assert.deepEqual(fixture.filledPaths[0].paths, [warmPath, fixture.pathCache.get("cold").path]);
+  assert.equal(fixture.calls.filter(call => call.startsWith("owner:")).length, 4,
+    "one full identity scan plus the underlay grouping; schedule shares the synchronous identity");
+
+  fixture.calls.length = 0;
+  fixture.filledPaths.length = 0;
+  draw();
+  assert.equal(fixture.calls.some(call => /^(build|lookup):/.test(call)), false);
+  assert.equal(fixture.filledPaths.length, 1);
+  assert.equal(fixture.calls.filter(call => call.startsWith("owner:")).length, 4,
+    "a subsequent frame independently recomputes the full identity");
+  assert.equal(fixture.pending.length, 1);
+
+  fixture.state.colors.cold = "#ff0000";
+  fixture.calls.length = 0;
+  fixture.pending.shift().callback();
+  assert.equal(fixture.calls.some(call => call.startsWith("build:")), false);
+  fixture.filledPaths.length = 0;
+  fixture.calls.length = 0;
+  const recolored = draw();
+  assert.equal(recolored.deferredFullCacheReady, true);
+  assert.equal(recolored.groupCount, 2, "deferred completion recomputes changed colors instead of publishing the scheduling snapshot");
+  assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
 });
 
 test("stale deferred work cancels without invalidation, diagnostics, or repaint", () => {
@@ -396,10 +484,10 @@ test("land source replacement invalidates cached entry identity", () => {
   const fixture = createFixture();
   fixture.state.landData = { features: [feature("source-a")] };
   fixture.owner.drawPoliticalBackgroundFills();
-  assert.equal(fixture.calls.includes("path:source-a"), true);
+  assert.equal(fixture.filledPaths.at(-1).featureId, "source-a");
   fixture.state.landData = { features: [feature("source-b")] };
   fixture.owner.drawPoliticalBackgroundFills();
-  assert.equal(fixture.calls.includes("path:source-b"), true);
+  assert.equal(fixture.filledPaths.at(-1).featureId, "source-b");
 });
 
 test("ocean depth mask restores canvas state when drawing throws", () => {
@@ -412,6 +500,14 @@ test("ocean depth mask restores canvas state when drawing throws", () => {
   };
   assert.throws(() => fixture.owner.drawBackgroundPass(), /draw failed/);
   assert.equal(fixture.calls.at(-1), "restore");
+});
+
+test("background sphere drawing failures propagate without running later ocean effects", () => {
+  const fixture = createFixture();
+  fixture.surface.getPathCanvas = () => () => { throw new Error("sphere projection failed"); };
+  assert.throws(() => fixture.owner.drawBackgroundPass(), /sphere projection failed/);
+  assert.equal(fixture.calls.includes("ocean:style"), false);
+  assert.equal(fixture.calls.includes("commit:intensity"), false);
 });
 
 test("suspicious merge diagnostics use the injected warning port once", () => {

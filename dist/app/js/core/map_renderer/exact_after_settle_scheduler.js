@@ -40,7 +40,10 @@ function createExactAfterSettleScheduler({
   shouldDeferContextBaseEnhancementsForExactRefresh,
   scheduleDeferredContextBaseEnhancements,
   getRenderPassCacheState,
+  getRenderPassSignature,
+  getActiveRenderPassNames = () => renderPassNames,
   getRenderPipelinePassesOwner,
+  prepareRenderPassAsync = () => null,
   getPhysicalExactRefreshPasses,
   invalidateRenderPasses,
   rebuildResolvedColors,
@@ -184,6 +187,9 @@ function createExactAfterSettleScheduler({
       generation,
       applyFinishedAt,
     });
+    // Intermediate render requests must keep using the committed frame until
+    // every critical pass is ready. Only this current generation can publish.
+    setDeferExactAfterSettleState(runtimeState, false);
     recordRenderPerfMetric("settleExactRefreshPasses", Math.max(0, applyFinishedAt - passStartedAt), {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
       generation,
@@ -237,6 +243,13 @@ function createExactAfterSettleScheduler({
           abortInterruptedExactAfterSettleRefresh(`${passName}-identity-mismatch`, generation);
           return;
         }
+        const preparation = prepareRenderPassAsync(passName);
+        if (preparation) {
+          Promise.resolve(preparation).then(() => {
+            if (isExactAfterSettleGenerationCurrent(generation, "applying")) enqueueNextPass(index, activePlan);
+          }).catch(() => abortInterruptedExactAfterSettleRefresh(`${passName}-prepare-failed`, generation));
+          return;
+        }
         const nextPlan = passName === "political"
           ? invalidateExactAfterSettlePoliticalPass(generation, activePlan)
           : activePlan;
@@ -287,7 +300,6 @@ function createExactAfterSettleScheduler({
       targetPassesOnResize: exactAfterSettleDprPasses,
       targetPassesOnCanvasResize: exactAfterSettleDprPasses,
     });
-    setDeferExactAfterSettleState(runtimeState, false);
     cancelDeferredContextBaseEnhancement();
     if (plan.forceExactContextBaseRefresh) {
       invalidateRenderPasses(["physicalBase", "contextBase"], "physical-visible-exact");
@@ -330,7 +342,12 @@ function createExactAfterSettleScheduler({
     const targetPassPlan = resolveExactAfterSettleTargetPasses({
       renderPassNames,
       idleRenderPassNames,
-      dirtyPassNames: renderPassNames.filter((passName) => cache.dirty[passName]),
+      // Camera changes can invalidate a signature without setting its dirty bit.
+      // Include those passes now so the final paint cannot discover unplanned
+      // synchronous geometry work after the cancellable slices have completed.
+      dirtyPassNames: getActiveRenderPassNames().filter((passName) => cache.dirty[passName]
+        || (typeof getRenderPassSignature === "function"
+          && cache.signatures?.[passName] !== getRenderPassSignature(passName, runtimeState.zoomTransform))),
       physicalExactRefreshPasses: getPhysicalExactRefreshPasses(),
       forceExactContextBaseRefresh: plan.forceExactContextBaseRefresh,
       exactRefreshApplied: plan.exactRefreshApplied,

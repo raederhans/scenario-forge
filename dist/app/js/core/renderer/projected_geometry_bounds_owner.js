@@ -1,3 +1,5 @@
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+
 const DEFAULT_SPHERICAL_GEOMETRY_MAX_AREA = Math.PI * 2;
 
 function defaultWarn(...args) {
@@ -56,6 +58,23 @@ export function createProjectedGeometryBoundsOwner({
   const safeWaterRegionGeometryPartsByFeature = new WeakMap();
   const sanitizedWaterRegionFeatureByFeature = new WeakMap();
   const waterSphericalSanitizationWarnings = new Set();
+  let projectedBoundsByGeometry = new WeakMap();
+  let boundsProjectionGeneration = -1;
+  let boundsScenarioId = "";
+
+  function ensureGeometryBoundsIdentity() {
+    const generation = getProjectionGeometryGeneration(getProjection());
+    const scenarioId = String(getActiveScenarioId() || "");
+    if (generation !== boundsProjectionGeneration || scenarioId !== boundsScenarioId) {
+      projectedBoundsByGeometry = new WeakMap();
+      if (boundsProjectionGeneration !== -1) {
+        getCache()?.clear();
+        resetHostWaterPathCaches();
+      }
+      boundsProjectionGeneration = generation;
+      boundsScenarioId = scenarioId;
+    }
+  }
 
   function getCache() {
     const cache = getProjectedBoundsCache();
@@ -114,21 +133,30 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function computeProjectedFeatureBounds(feature) {
-    return computeProjectedGeoBounds(feature);
+    ensureGeometryBoundsIdentity();
+    const geometry = feature?.geometry;
+    if (!geometry || typeof geometry !== "object") return computeProjectedGeoBounds(feature);
+    if (projectedBoundsByGeometry.has(geometry)) return projectedBoundsByGeometry.get(geometry);
+    const bounds = computeProjectedGeoBounds(feature);
+    projectedBoundsByGeometry.set(geometry, bounds);
+    return bounds;
   }
 
   function getProjectedFeatureBounds(feature, { featureId = null, allowCompute = true } = {}) {
+    ensureGeometryBoundsIdentity();
     const resolvedFeatureId = featureId || getFeatureId(feature);
+    const geometry = feature?.geometry;
+    const cached = geometry && projectedBoundsByGeometry.has(geometry);
+    // The public ID map can be populated by spatial-index builders. Only the
+    // geometry cache proves which shape those bounds describe after a LOD swap.
+    if (!cached && !allowCompute) return null;
+    const bounds = cached ? projectedBoundsByGeometry.get(geometry) : computeProjectedFeatureBounds(feature);
     if (resolvedFeatureId) {
       const cache = getCache();
-      if (cache?.has(resolvedFeatureId)) return cache.get(resolvedFeatureId) || null;
-      if (!allowCompute) return null;
-      const computed = computeProjectedFeatureBounds(feature);
-      if (computed && cache) cache.set(resolvedFeatureId, computed);
-      return computed;
+      if (bounds && cache?.get(resolvedFeatureId) !== bounds) cache?.set(resolvedFeatureId, bounds);
+      else if (!bounds) cache?.delete(resolvedFeatureId);
     }
-    if (!allowCompute) return null;
-    return computeProjectedFeatureBounds(feature);
+    return bounds;
   }
 
   function rebuildProjectedBoundsCache() {
@@ -144,6 +172,7 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function clearProjectedBoundsCache() {
+    projectedBoundsByGeometry = new WeakMap();
     getCache()?.clear();
     resetHostWaterPathCaches();
   }

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createRenderTransformReusePolicyOwner } from "../js/core/renderer/render_transform_reuse_policy_owner.js";
+import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
 
 const EXACT_FAST_PATH_REQUIRED_PASS_NAMES = [
   "background",
@@ -29,6 +30,7 @@ function createOwner({
   cache: cacheOverrides = {},
   references = {},
   heavyScenario = true,
+  activePassNames = RENDER_PASS_NAMES.filter((passName) => passName !== "hgoPreview"),
 } = {}) {
   const state = {
     width: 1000,
@@ -54,6 +56,7 @@ function createOwner({
       getters: {
         getRenderPassCacheState: () => cache,
         getPassReferenceTransform: (passName) => referenceTransforms[passName] || null,
+        getActiveRenderPassNames: () => activePassNames,
       },
       helpers: {
         cloneZoomTransform,
@@ -161,14 +164,54 @@ test("getContextScenarioReuseDecision covers disabled missing reference distance
   assert.equal(reuse.shouldExactRefresh, false);
 });
 
-test("shouldStartExactAfterSettleFastPath requires enabled contextBase reuse and required cached pass surfaces", () => {
+test("ready ordinary maps can schedule sliced recovery while contextBase transform reuse remains disabled", () => {
+  for (const options of [
+    { state: { renderProfile: "auto" } },
+    { heavyScenario: false },
+    { state: { activeScenarioId: "" } },
+  ]) {
+    const { owner } = createOwner({
+      ...options,
+      cache: { canvases: createRequiredPassCanvases() },
+      references: createRequiredPassReferences(),
+    });
+    assert.equal(owner.shouldStartExactAfterSettleFastPath(), true);
+    assert.equal(owner.shouldEnableContextBaseTransformReuse(), false);
+    assert.equal(owner.getContextBaseReuseDecision().shouldExactRefresh, true);
+  }
+});
+
+test("HGO and unavailable active pipelines cannot reuse stale vector surfaces for sliced recovery", () => {
+  const withoutActivePipeline = createRenderTransformReusePolicyOwner({
+    getters: {
+      getRenderPassCacheState: () => ({ canvases: createRequiredPassCanvases() }),
+      getPassReferenceTransform: () => ({ k: 1, x: 0, y: 0 }),
+    },
+  });
+  assert.equal(withoutActivePipeline.shouldStartExactAfterSettleFastPath(), false);
+  for (const activePassNames of [["hgoPreview"], [...EXACT_FAST_PATH_REQUIRED_PASS_NAMES, "hgoPreview"], [], null]) {
+    const { owner } = createOwner({
+      activePassNames,
+      cache: { canvases: createRequiredPassCanvases() },
+      references: createRequiredPassReferences(),
+    });
+    assert.equal(owner.shouldStartExactAfterSettleFastPath(), false);
+  }
+  assert.equal(createOwner({
+    activePassNames: [...EXACT_FAST_PATH_REQUIRED_PASS_NAMES, "borders", "labels"],
+    cache: { canvases: createRequiredPassCanvases() },
+    references: createRequiredPassReferences(),
+  }).owner.shouldStartExactAfterSettleFastPath(), true);
+});
+
+test("shouldStartExactAfterSettleFastPath requires ready cached pass surfaces without requiring contextBase reuse", () => {
   assert.equal(
     createOwner({
       state: { renderProfile: "auto" },
       cache: { canvases: createRequiredPassCanvases() },
       references: createRequiredPassReferences(),
     }).owner.shouldStartExactAfterSettleFastPath(),
-    false,
+    true,
   );
   assert.equal(
     createOwner({

@@ -23,15 +23,17 @@ test("viewport metadata reads the registry once and observes in-place registry e
   assert.equal(projectedEntries[0].chunk, replacement);
 });
 
-test("non-viewport merge does not inspect metadata and duplicate IDs keep first registry entry", () => {
+test("political merge reads precision metadata and duplicate IDs keep first registry entry", () => {
   const first = { id: "a" }, duplicate = { id: "a" };
   const bundle = { chunkRegistry: { byLayer: { political: [first], city: [duplicate] } } };
   const state = { loadedChunkIds: ["a"], payloadByChunkId: { a: { layerKey: "political", payload: {} } } };
   const options = { mergeScenarioChunkPayloads: () => ({}),
     mergeScenarioChunkPayloadsForViewport: (_layer, entries) => { assert.equal(entries[0].chunk, first); return {}; } };
   buildMergedScenarioChunkLayerPayloads(bundle, state, options);
-  Object.defineProperty(first, "id", { get() { throw Error("unused metadata"); } });
+  let reads = 0;
+  Object.defineProperty(first, "id", { get() { reads += 1; return "a"; } });
   buildMergedScenarioChunkLayerPayloads(bundle, state, { mergeScenarioChunkPayloads: () => ({}) });
+  assert.equal(reads, 1);
 });
 
 test("unchanged viewport reuses primary merge and bbox, payload, selection and merger changes invalidate it", () => {
@@ -84,14 +86,16 @@ for (const reuse of [false, true]) {
     const { bundle, state, oldPolitical } = fixture();
     const before = structuredClone(state);
     const signatures = buildScenarioChunkLayerSelectionSignatures(bundle, state, ["a"]);
-    assert.deepEqual(signatures, { political: "a", city: "", removed: "" });
+    assert.match(signatures.political, /^a@\d+$/);
+    assert.equal(signatures.city, "");
+    assert.equal(signatures.removed, "");
     const viewport = [0, 1, 2, 3];
     let merges = 0, projections = 0;
     const primary = { features: ["visible"] };
     const merged = { features: ["merged"] };
     const result = buildMergedScenarioChunkLayerPayloads(bundle, state, {
       activeChunkIds: ["a"],
-      previousSignatures: { political: reuse ? "a" : "a|b", removed: "removed" },
+      previousSignatures: { political: reuse ? signatures.political : "a|b", removed: "removed" },
       nextSignatures: signatures,
       previousMergedLayerPayloads: state.mergedLayerPayloads,
       viewportBbox: viewport,
@@ -137,4 +141,46 @@ test("empty changed political layer clears primary while reusable null still pro
   });
   assert.deepEqual(reused.changedLayerKeys, []);
   assert.equal(projections, 1);
+});
+
+test("persistent political coverage shares the complete payload across viewport changes without projecting", () => {
+  const bundle = { chunkRegistry: { byLayer: { political: [
+    { id: "base", lod: "coarse", globalCoverage: true },
+    { id: "detail", lod: "detail" },
+  ] } } };
+  const a = { id: "a" }, b = { id: "b" }, detailA = { id: "a", detail: true };
+  const state = { loadedChunkIds: ["base", "detail"], payloadByChunkId: {
+    base: { layerKey: "political", payload: { features: [a, b] } },
+    detail: { layerKey: "political", payload: { features: [detailA] } },
+  } };
+  const merged = { features: [detailA, b] };
+  let merges = 0;
+  const options = {
+    nextSignatures: { political: "base|detail" }, viewportBbox: [0, 0, 1, 1],
+    mergeScenarioChunkPayloads: () => { merges += 1; return merged; },
+    mergeScenarioChunkPayloadsForViewport: () => assert.fail("complete base must not project a subset"),
+  };
+  const first = buildMergedScenarioChunkLayerPayloads(bundle, state, options);
+  assert.equal(first.primaryMergedLayerPayloads.political, first.mergedLayerPayloads.political);
+  assert.equal(first.mergedLayerPayloads.political.globalCoverage, true);
+  assert.equal(first.mergedLayerPayloads.political.features, merged.features);
+  assert.equal(merged.globalCoverage, undefined, "coverage metadata must not mutate a borrowed payload");
+  assert.deepEqual(first.primaryLayerStats.political, {
+    coverageMode: "full", visibleFeatureCount: 2, totalFeatureCount: 2,
+    clippedChunkCount: 0, fullChunkCount: 2, unboundedChunkCount: 0,
+  });
+  const panned = buildMergedScenarioChunkLayerPayloads(bundle, state, {
+    ...options, viewportBbox: [50, 0, 60, 10], previousSignatures: options.nextSignatures,
+    previousMergedLayerPayloads: first.mergedLayerPayloads,
+  });
+  assert.equal(merges, 1);
+  assert.equal(panned.primaryMergedLayerPayloads.political, first.mergedLayerPayloads.political);
+  assert.equal(panned.primaryMergedLayerPayloads.political, panned.mergedLayerPayloads.political);
+  assert.deepEqual(panned.primaryLayerStats.political, first.primaryLayerStats.political);
+  const withoutProjector = buildMergedScenarioChunkLayerPayloads(bundle, state, {
+    ...options, mergeScenarioChunkPayloadsForViewport: null,
+  });
+  assert.equal(withoutProjector.primaryMergedLayerPayloads.political.globalCoverage, true);
+  assert.equal(withoutProjector.primaryMergedLayerPayloads.political.features, merged.features);
+  assert.equal(withoutProjector.primaryMergedLayerPayloads.political, withoutProjector.mergedLayerPayloads.political);
 });

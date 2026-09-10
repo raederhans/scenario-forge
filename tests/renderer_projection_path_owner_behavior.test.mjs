@@ -5,10 +5,21 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { createRendererProjectionPathOwner } from "../js/core/renderer/renderer_projection_path_owner.js";
+import { getProjectionGeometryGeneration } from "../js/core/renderer/projection_geometry_identity.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
+
+test("initializing projection paths advances explicit geometry generation", () => {
+  const harness = createHarness();
+  const before = getProjectionGeometryGeneration(harness.projection);
+  harness.owner.initializeProjectionPaths();
+  assert.notEqual(getProjectionGeometryGeneration(harness.projection), before);
+  const initialized = getProjectionGeometryGeneration(harness.projection);
+  harness.owner.initializeProjectionPaths();
+  assert.notEqual(getProjectionGeometryGeneration(harness.projection), initialized);
+});
 
 function createHarness({
   context = { id: "map-context" },

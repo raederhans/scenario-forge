@@ -84,7 +84,7 @@ import {
   normalizeExportWorkbenchVisibility as normalizeExportWorkbenchVisibilityFromController,
   resolveExportPassSequence,
 } from "./toolbar/export_workbench_controller.js";
-import { createPaletteLibraryPanelController } from "./toolbar/palette_library_panel.js";
+import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
 import { createScenarioGuidePopoverController } from "./toolbar/scenario_guide_popover.js";
@@ -129,7 +129,7 @@ function renderPalette(themeName) {
     btn.setAttribute("aria-label", `${t("Quick Colors", "ui")}: ${normalized}`);
     btn.title = normalized;
     btn.addEventListener("click", () => {
-      runtimeState.selectedColor = normalized;
+      selectPalettePaintColor(runtimeState, normalized);
       callRuntimeHook(state, "updateSwatchUIFn");
     });
     paletteGrid.appendChild(btn);
@@ -1347,7 +1347,7 @@ function initToolbar({ render } = {}) {
       return false;
     }
 
-    runtimeState.selectedColor = color;
+    selectPalettePaintColor(runtimeState, color);
     if (target.type === "feature") {
       const featureIds = target.featureIds;
       const before = captureHistoryState({ featureIds });
@@ -2023,7 +2023,7 @@ function initToolbar({ render } = {}) {
 
   if (customColor) {
     customColor.addEventListener("input", (event) => {
-      runtimeState.selectedColor = event.target.value;
+      selectPalettePaintColor(runtimeState, event.target.value);
       updateSwatchUI();
     });
   }

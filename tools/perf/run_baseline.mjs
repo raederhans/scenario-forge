@@ -14,8 +14,11 @@ import {
   GOVERNED_RENDER_SAMPLE_SCENARIOS,
   RENDER_SAMPLE_ROLE_POLICY_ID,
   STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID,
+  SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID,
   analyzeRenderSampleRole,
+  findInitialScenarioRenderSample,
   resolveRenderSampleRunProfile,
+  resolveRenderSampleRolePolicyIdentity,
   summarizeRenderSampleRoleAnalyses,
 } from "./render_sample_role_policy.mjs";
 import {
@@ -120,7 +123,7 @@ function parseArgs(argv) {
     rawDir: null,
     urlQuery: { ...PERF_URL_QUERY },
     writeMarkdown: true,
-    renderSampleRunProfileId: STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID,
+    renderSampleRunProfileId: SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID,
     measuredRepoRoot: REPO_ROOT,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -194,11 +197,10 @@ export function validateRenderSampleRunProfileSelection(options = {}) {
   return profile;
 }
 
-function buildRenderSampleRolePolicyIdentity(profileId) {
+export function buildRenderSampleRolePolicyIdentity(profileId) {
   const profile = resolveRenderSampleRunProfile(profileId);
   return {
-    policyId: RENDER_SAMPLE_ROLE_POLICY_ID,
-    canonicalRoleId: CANONICAL_RENDER_SAMPLE_ROLE_ID,
+    ...resolveRenderSampleRolePolicyIdentity(profileId),
     governedScenarios: GOVERNED_RENDER_SAMPLE_SCENARIOS,
     runProfile: {
       id: profile.id,
@@ -592,12 +594,12 @@ function metricAtMs(metric, bootTotal) {
   return 0;
 }
 
-export function summarizeSnapshot(snapshot, scenarioId) {
+export function summarizeSnapshot(snapshot, scenarioId, runProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID) {
   const bootMetrics = snapshot?.bootMetrics && typeof snapshot.bootMetrics === "object" ? snapshot.bootMetrics : {};
   const renderPerfMetrics = snapshot?.renderPerfMetrics && typeof snapshot.renderPerfMetrics === "object" ? snapshot.renderPerfMetrics : {};
   const scenarioPerfMetrics = snapshot?.scenarioPerfMetrics && typeof snapshot.scenarioPerfMetrics === "object" ? snapshot.scenarioPerfMetrics : {};
   const renderSamples = snapshot?.renderSamples && typeof snapshot.renderSamples === "object" ? snapshot.renderSamples : {};
-  const renderSampleRole = analyzeRenderSampleRole({ scenarioId, snapshot });
+  const renderSampleRole = analyzeRenderSampleRole({ scenarioId, snapshot, runProfileId });
   const bootTotal = bootMetrics.total && typeof bootMetrics.total === "object" ? bootMetrics.total : {};
   return {
     totalStartupMs: finiteNumber(bootTotal.durationMs),
@@ -645,7 +647,7 @@ export function summarizeSnapshot(snapshot, scenarioId) {
     renderSampleCount: finiteNumber(renderSamples.count),
     renderSampleTotalMs: finiteNumber(renderSamples.totalMs),
     renderSampleMedianMs: finiteNumber(renderSamples.medianMs),
-    canonicalRenderSampleMs: finiteNumber(renderSampleRole.canonicalRenderSampleMs),
+    canonicalRenderSampleMs: renderSampleRole.canonicalRenderSampleMs,
     preScenarioRenderSampleCount: finiteNumber(renderSampleRole.preScenarioSampleCount),
   };
 }
@@ -776,7 +778,9 @@ function aggregateRuns(runs) {
   ];
   const medianSummary = {};
   for (const fieldName of fieldNames) {
-    medianSummary[fieldName] = median(summaries.map((summary) => summary[fieldName]));
+    const values = summaries.map((summary) => summary[fieldName]);
+    medianSummary[fieldName] = fieldName === "canonicalRenderSampleMs" && !values.some(Number.isFinite)
+      ? null : median(values);
   }
   medianSummary.startupBundleSource = summaries
     .map((summary) => String(summary.startupBundleSource || "").trim())
@@ -875,6 +879,174 @@ async function readPerfRuntimeState(page) {
       snapshotAvailable: !!snapshot,
     };
   });
+}
+
+const STANDARD_PERF_REQUIRED_POST_READY_TASKS = new Set([
+  "post-ready-localization-hydration", "post-ready-scenario-hydration",
+  "post-ready-full-interaction-infra", "post-ready-detail-promotion-political-reconcile",
+  "post-ready-visual-warmup",
+]);
+
+export function resolvePerfGateMetrics(runProfileId) {
+  return GATE_METRICS.map((metric) => runProfileId === SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID && metric.key === "renderSampleMedianMs"
+    ? { ...metric, key: "canonicalRenderSampleMs", label: "scenario render CPU through settlement" } : metric);
+}
+
+export function inspectStandardPerfSettlement(status, scenarioId) {
+  if (!status || typeof status !== "object") return { complete: false, pending: ["missing-status"] };
+  const pending = [];
+  if (status.activeScenarioId !== scenarioId || status.bootPhase !== "ready" || status.bootBlocking
+    || status.startupReadonly || status.startupReadonlyUnlockInFlight || status.scenarioApplyInFlight) pending.push("boot");
+  if (status.renderPhase !== "idle" || status.isInteracting || status.deferExactAfterSettle
+    || status.zoomRenderScheduled || status.pendingZoomTransform || status.activeInteractionRecoveryTaskKey) pending.push("render-recovery");
+  // The legacy renderer can retain a completed full-infrastructure stage while
+  // cancellation clears its ready flag. Task completion can establish work
+  // quiescence, not interaction capability; every live queue must still be empty.
+  const fullInfrastructureCompleted = status.postReadyScheduler?.taskOutcomes?.["post-ready-full-interaction-infra"]?.status === "completed";
+  if ((!status.interactionInfrastructureReady && !fullInfrastructureCompleted) || status.interactionInfrastructureBuildInFlight
+    || status.hitCanvasBuildScheduled) pending.push("interaction-infrastructure");
+  const chunk = status.chunkRuntime;
+  if (!chunk || chunk.pendingPromotion || chunk.pendingVisualPromotion || chunk.pendingInfraPromotion
+    || chunk.promotionScheduled || chunk.refreshScheduled || chunk.promotionCommitInFlight
+    || Object.keys(chunk.inFlightByChunkId || {}).length) pending.push("chunk-promotion");
+  if (status.detailDeferred && !status.detailPromotionCompleted) pending.push("detail-promotion");
+  const scheduler = status.postReadyScheduler;
+  if (!scheduler || scheduler.activeTaskKey || [...(scheduler.pendingTaskKeys || []), ...(scheduler.waitingTaskKeys || [])]
+    .some((key) => STANDARD_PERF_REQUIRED_POST_READY_TASKS.has(key))) pending.push("post-ready");
+  const boundary = status.renderBoundary;
+  if (!boundary || boundary.requestPending || !Array.isArray(boundary.pendingReasons) || boundary.pendingReasons.length) pending.push("render-boundary");
+  if (status.asyncWork?.supported === true && (!Number.isInteger(status.asyncWork.geometryPendingCount)
+    || status.asyncWork.geometryPendingCount !== 0 || status.asyncWork.borderScheduled !== false
+    || status.asyncWork.exactPending !== false)) pending.push("async-renderer");
+  if (!status.asyncWork || typeof status.asyncWork.supported !== "boolean") pending.push("async-capability-missing");
+  return { complete: pending.length === 0, pending };
+}
+
+const STANDARD_PERF_SETTLEMENT_QUIET_MS = 850;
+
+function standardPerfQuiescenceEvidence(observation) {
+  const samples = observation.snapshot?.renderSamples;
+  return {
+    observedAt: observation.observedAt,
+    sampleCount: samples?.count,
+    lastSampleSequence: samples?.samples?.at(-1)?.sequence ?? null,
+    promotion: observation.snapshot?.renderPerfMetrics?.scenarioChunkPromotionVisualStage || null,
+    status: observation.status,
+  };
+}
+
+function standardPerfQuiescenceIdentity(evidence) {
+  const { observedAt: _observedAt, ...identity } = evidence;
+  return JSON.stringify(identity);
+}
+
+function hasValidStandardPerfQuiescence(settlement, snapshot, scenarioId) {
+  const observations = settlement?.quiescenceObservations;
+  if (!Array.isArray(observations) || observations.length < 2
+    || !observations.every((entry) => entry && typeof entry === "object" && !Array.isArray(entry))) return false;
+  const first = observations[0];
+  const last = observations.at(-1);
+  const identity = standardPerfQuiescenceIdentity(first);
+  const expectedLast = standardPerfQuiescenceEvidence({ status: settlement.status, snapshot, observedAt: settlement.observedAt });
+  return Number.isFinite(first.observedAt) && first.observedAt >= 0
+    && settlement.quiescenceStartedAt === first.observedAt
+    && settlement.quiescenceDurationMs === last.observedAt - first.observedAt
+    && settlement.quiescenceDurationMs >= STANDARD_PERF_SETTLEMENT_QUIET_MS
+    && JSON.stringify(last) === JSON.stringify(expectedLast)
+    && observations.every((observation, index) => Number.isFinite(observation.observedAt)
+      && (!index || observation.observedAt > observations[index - 1].observedAt)
+      && standardPerfQuiescenceIdentity(observation) === identity
+      && inspectStandardPerfSettlement(observation.status, scenarioId).complete);
+}
+
+export async function readStandardPerfObservation(page, targetUrl) {
+  return page.evaluate(async (url) => {
+    const root = new URL("./", url);
+    const [{ state }, boundary, renderer] = await Promise.all([
+      import(new URL("js/core/state.js", root).href),
+      import(new URL("js/core/render_boundary.js", root).href),
+      import(new URL("js/core/map_renderer.js", root).href),
+    ]);
+    // Read the real queues and the sample snapshot in the same task, after all
+    // imports resolve. Cached postReady reasonStateHint is not a live queue.
+    const main = globalThis.__mapcreator__?.snapshot?.()?.loadStatus?.providers?.main_runtime;
+    const asyncSupported = typeof renderer.getRendererAsyncWorkStatus === "function";
+    const asyncWork = asyncSupported ? renderer.getRendererAsyncWorkStatus() : null;
+    const status = {
+      activeScenarioId: state.activeScenarioId, bootPhase: state.bootPhase, bootBlocking: !!state.bootBlocking,
+      startupReadonly: !!state.startupReadonly, startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight, bootError: String(state.bootError || ""), renderPhase: state.renderPhase,
+      isInteracting: !!state.isInteracting, deferExactAfterSettle: !!state.deferExactAfterSettle,
+      zoomRenderScheduled: !!state.zoomRenderScheduled, pendingZoomTransform: !!state.pendingZoomTransform,
+      activeInteractionRecoveryTaskKey: state.activeInteractionRecoveryTaskKey || "",
+      interactionInfrastructureReady: !!state.interactionInfrastructureReady,
+      interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
+      hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
+      detailDeferred: !!state.detailDeferred, detailPromotionCompleted: !!state.detailPromotionCompleted,
+      chunkRuntime: main?.chunkRuntime, postReadyScheduler: main?.postReadyScheduler,
+      renderBoundary: boundary.getRenderBoundaryDebugState(),
+      asyncWork: { supported: asyncSupported, ...(asyncWork || {}) },
+      capabilityMode: asyncSupported ? "renderer-async-status" : "legacy-renderer-without-async-status",
+    };
+    return { status, snapshot: globalThis.__mc_perf__?.snapshot?.() ?? null, observedAt: Date.now() };
+  }, targetUrl);
+}
+
+export async function waitForStandardPerfSettlement(readObservation, scenarioId, {
+  timeoutMs = 120_000, now = Date.now, pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+} = {}) {
+  const startedAt = now();
+  let last;
+  let initialPromotion = null;
+  let initialFrameSequence = null;
+  let initialSamplePrefix = null;
+  const promotionObservations = [];
+  let quiescenceObservations = [];
+  while (now() - startedAt < timeoutMs) {
+    last = await readObservation();
+    if (last.status?.bootError) throw new Error(`[perf-baseline] bootError=${last.status.bootError}`);
+    const promotion = last.snapshot?.renderPerfMetrics?.scenarioChunkPromotionVisualStage;
+    if (promotion && JSON.stringify(promotion) !== JSON.stringify(promotionObservations.at(-1)?.metric)) {
+      promotionObservations.push({ observedAt: last.observedAt, metric: structuredClone(promotion) });
+      if (promotionObservations.length === 1 && promotion.reason === "startup-initial-visual" && promotion.activeScenarioId === scenarioId) {
+        initialPromotion = structuredClone(promotion);
+      }
+    }
+    if (initialPromotion && initialFrameSequence === null) {
+      const sample = findInitialScenarioRenderSample(last.snapshot, scenarioId, initialPromotion);
+      if (sample) {
+        initialFrameSequence = sample.sequence;
+        initialSamplePrefix = structuredClone(last.snapshot.renderSamples.samples.slice(0, sample.index + 1));
+      }
+    }
+    const decision = inspectStandardPerfSettlement(last.status, scenarioId);
+    if (decision.complete && last.snapshot) {
+      const evidence = standardPerfQuiescenceEvidence(last);
+      if (!quiescenceObservations.length
+        || standardPerfQuiescenceIdentity(evidence) !== standardPerfQuiescenceIdentity(quiescenceObservations[0])) {
+        quiescenceObservations = [];
+      }
+      quiescenceObservations.push(structuredClone(evidence));
+      const quiescenceStartedAt = quiescenceObservations[0].observedAt;
+      const quiescenceDurationMs = last.observedAt - quiescenceStartedAt;
+      if (quiescenceDurationMs < STANDARD_PERF_SETTLEMENT_QUIET_MS) {
+        await pause(50);
+        continue;
+      }
+      const samples = last.snapshot.renderSamples;
+      return { ...last.snapshot, standardPerfSettlement: {
+        complete: true, activeScenarioId: scenarioId, observedAt: last.observedAt,
+        sampleCount: samples?.count, lastSampleSequence: samples?.samples?.at(-1)?.sequence ?? null,
+        capabilityMode: last.status.capabilityMode, status: last.status,
+        initialPromotion, initialFrameSequence, initialSamplePrefix, promotionObservations,
+        quiescenceStartedAt, quiescenceDurationMs, quiescenceObservations,
+      } };
+    } else {
+      quiescenceObservations = [];
+    }
+    await pause(50);
+  }
+  throw new Error(`[perf-baseline] startup settlement did not complete in ${timeoutMs}ms: ${JSON.stringify(last?.status || null)}`);
 }
 
 async function collectPerfBrowserRuntimeSnapshot(page) {
@@ -1021,12 +1193,20 @@ async function measureOneRun(browser, baseUrl, scenarioId, options = {}) {
   });
   try {
     await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
-    await waitForPerfSnapshotReady(page, {
-      timeoutMs: 120_000,
-      getTransientNetworkFailure: diagnostics.getTransientNetworkFailure,
-    });
-    await page.waitForTimeout(300);
-    const snapshot = await page.evaluate(() => globalThis.__mc_perf__?.snapshot?.() ?? null);
+    let snapshot;
+    if (options.renderSampleRunProfileId === SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID) {
+      // Observe promotion before readiness: later hydration legitimately replaces
+      // the latest metric, but must never replace the measurement's first anchor.
+      snapshot = await waitForStandardPerfSettlement(async () => {
+        const failure = diagnostics.getTransientNetworkFailure();
+        if (failure) throw new Error(`[perf-baseline] transient network failure ${failure.failure}: ${failure.url}`);
+        return readStandardPerfObservation(page, targetUrl);
+      }, scenarioId);
+    } else {
+      await waitForPerfSnapshotReady(page, { timeoutMs: 120_000, getTransientNetworkFailure: diagnostics.getTransientNetworkFailure });
+      await page.waitForTimeout(300);
+      snapshot = await page.evaluate(() => globalThis.__mc_perf__?.snapshot?.() ?? null);
+    }
     if (!snapshot) {
       throw new Error("window.__mc_perf__.snapshot() returned null.");
     }
@@ -1040,8 +1220,8 @@ async function measureOneRun(browser, baseUrl, scenarioId, options = {}) {
       url: targetUrl,
       activeScenarioId,
       snapshot,
-      summary: summarizeSnapshot(snapshot, scenarioId),
-      renderSampleRole: analyzeRenderSampleRole({ scenarioId, snapshot }),
+      summary: summarizeSnapshot(snapshot, scenarioId, options.renderSampleRunProfileId),
+      renderSampleRole: analyzeRenderSampleRole({ scenarioId, snapshot, runProfileId: options.renderSampleRunProfileId }),
     };
   } catch (error) {
     try {
@@ -1162,7 +1342,7 @@ async function runScenarioSeries(browser, serverLeaseRef, scenarioId, options) {
     runs,
     summary: aggregateRuns(runs),
     sampleSpread: buildAggregateSampleSpread(runs),
-    renderSampleRoleSummary: summarizeRenderSampleRoleAnalyses(runs.map((run) => run.renderSampleRole)),
+    renderSampleRoleSummary: summarizeRenderSampleRoleAnalyses(runs.map((run) => run.renderSampleRole), options.renderSampleRunProfileId),
   };
 }
 
@@ -1572,12 +1752,12 @@ function getPerfReportContractMismatches(report, label = "report", expectedMode 
   return mismatches;
 }
 
-function compareAgainstBaseline(currentReport, baselineReport, threshold) {
+export function compareAgainstBaseline(currentReport, baselineReport, threshold) {
   const failures = [];
   for (const scenarioId of Object.keys(currentReport.scenarios)) {
     const currentSummary = currentReport.scenarios[scenarioId]?.summary || {};
     const baselineSummary = baselineReport?.scenarios?.[scenarioId]?.summary || {};
-    for (const metric of GATE_METRICS) {
+    for (const metric of resolvePerfGateMetrics(currentReport.workloadIdentity?.renderSampleRunProfileId)) {
       const baselineValue = finiteNumber(baselineSummary?.[metric.key]);
       const currentValue = finiteNumber(currentSummary?.[metric.key]);
       if (baselineValue <= 0) {
@@ -1608,7 +1788,7 @@ function formatPerfRegressionFailures(failures) {
     .join("\n");
 }
 
-export function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath) {
+export function validateGateBaselineReport(baselineReport, scenarioIds, baselinePath, runProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID) {
   if (!baselineReport || typeof baselineReport !== "object") {
     throw new Error(`[perf-baseline] Baseline report is invalid: ${baselinePath}`);
   }
@@ -1653,7 +1833,7 @@ export function validateGateBaselineReport(baselineReport, scenarioIds, baseline
       missing.push(scenarioId);
       continue;
     }
-    const invalidMetrics = GATE_METRICS
+    const invalidMetrics = resolvePerfGateMetrics(runProfileId)
       .map((metric) => metric.key)
       .filter((metricKey) => {
         const metricValue = summary[metricKey];
@@ -1676,6 +1856,7 @@ export function validateGateBaselineReport(baselineReport, scenarioIds, baseline
   const roleMismatches = collectGovernedRenderSampleRoleMismatches(
     baselineReport,
     scenarioIds,
+    runProfileId,
   );
   if (roleMismatches.length) {
     throw new Error(
@@ -1706,7 +1887,7 @@ export function validateGateCurrentReport(currentReport, scenarioIds, label = "c
       missing.push(scenarioId);
       continue;
     }
-    const invalidMetrics = GATE_METRICS
+    const invalidMetrics = resolvePerfGateMetrics(currentReport.workloadIdentity?.renderSampleRunProfileId)
       .map((metric) => metric.key)
       .filter((metricKey) => {
         const metricValue = summary[metricKey];
@@ -1735,6 +1916,7 @@ export function collectGovernedRenderSampleRoleMismatches(
 ) {
   const mismatches = [];
   const expectedRunProfile = resolveRenderSampleRunProfile(expectedRunProfileId);
+  const expectedRolePolicy = resolveRenderSampleRolePolicyIdentity(expectedRunProfileId);
   const declaredRolePolicy = report?.renderSampleRolePolicy || {};
   const declaredRunProfile = declaredRolePolicy.runProfile;
   const reportRunProfileId = report?.workloadIdentity?.renderSampleRunProfileId;
@@ -1746,14 +1928,14 @@ export function collectGovernedRenderSampleRoleMismatches(
     && declaredRunProfile === undefined
     && reportRunProfileId === undefined
     && scenarioRunProfileIdsAbsent;
-  if (declaredRolePolicy.policyId !== RENDER_SAMPLE_ROLE_POLICY_ID) {
+  if (declaredRolePolicy.policyId !== expectedRolePolicy.policyId) {
     mismatches.push(
-      `renderSampleRolePolicy.policyId expected=${RENDER_SAMPLE_ROLE_POLICY_ID} actual=${JSON.stringify(declaredRolePolicy.policyId)}`
+      `renderSampleRolePolicy.policyId expected=${expectedRolePolicy.policyId} actual=${JSON.stringify(declaredRolePolicy.policyId)}`
     );
   }
-  if (declaredRolePolicy.canonicalRoleId !== CANONICAL_RENDER_SAMPLE_ROLE_ID) {
+  if (declaredRolePolicy.canonicalRoleId !== expectedRolePolicy.canonicalRoleId) {
     mismatches.push(
-      `renderSampleRolePolicy.canonicalRoleId expected=${CANONICAL_RENDER_SAMPLE_ROLE_ID} actual=${JSON.stringify(declaredRolePolicy.canonicalRoleId)}`
+      `renderSampleRolePolicy.canonicalRoleId expected=${expectedRolePolicy.canonicalRoleId} actual=${JSON.stringify(declaredRolePolicy.canonicalRoleId)}`
     );
   }
   if (
@@ -1842,10 +2024,22 @@ export function collectGovernedRenderSampleRoleMismatches(
       );
     }
     const recomputedAnalyses = runs.map((run, runIndex) => {
+      if (expectedRunProfileId === SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID) {
+        const settlement = run?.snapshot?.standardPerfSettlement;
+        const decision = inspectStandardPerfSettlement(settlement?.status, scenarioId);
+        if (!decision.complete) mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement=${decision.pending.join(",")}`);
+        if (!hasValidStandardPerfQuiescence(settlement, run?.snapshot, scenarioId)) {
+          mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement quiescence must bind 850ms of unchanged completed observations`);
+        }
+        if (settlement?.capabilityMode !== settlement?.status?.capabilityMode) {
+          mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement capability does not match raw status`);
+        }
+      }
       const recomputed = analyzeRenderSampleRole({
         scenarioId,
         snapshot: run?.snapshot,
         summary: run?.summary,
+        runProfileId: expectedRunProfileId,
       });
       if (!isDeepStrictEqual(run?.renderSampleRole, recomputed)) {
         mismatches.push(`${scenarioId}.run-${runIndex + 1}.renderSampleRole does not match raw snapshot evidence`);
@@ -1857,7 +2051,7 @@ export function collectGovernedRenderSampleRoleMismatches(
       }
       return recomputed;
     });
-    const recomputedSummary = summarizeRenderSampleRoleAnalyses(recomputedAnalyses);
+    const recomputedSummary = summarizeRenderSampleRoleAnalyses(recomputedAnalyses, expectedRunProfileId);
     if (!isDeepStrictEqual(roleSummary, recomputedSummary)) {
       mismatches.push(`${scenarioId}.renderSampleRoleSummary does not match raw run evidence`);
     }
@@ -1879,6 +2073,9 @@ export function collectBaselineContractMismatches(currentReport, baselineReport)
     ...getPerfReportContractMismatches(currentReport, "current", "gate"),
     ...getPerfReportContractMismatches(baselineReport, "baseline", "baseline"),
   ];
+  if (!isDeepStrictEqual(currentReport?.renderSampleRolePolicy, baselineReport?.renderSampleRolePolicy)) {
+    mismatches.push("render sample role policy mismatch: baseline and current must use the same measurement contract");
+  }
   const baselinePlatform = readCanonicalNodePlatform(
     baselineReport?.environment?.platform
   );
@@ -2109,7 +2306,7 @@ async function main() {
     }
     const baselineOracle = await readJsonAndSha256Strict(options.baselineJson, "baseline report");
     baselineReportForGate = baselineOracle.payload;
-    validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson);
+    validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);
     baselineOracleBeforeSha256 = baselineOracle.sha256;
   }
   const environmentAdmission = await runStandardPerfAdmission(options);
@@ -2162,7 +2359,7 @@ async function main() {
   if (options.mode === "gate") {
     validateGateCurrentReport(report, options.scenarios, "current report");
     const contractMismatches = collectBaselineContractMismatches(report, baselineReportForGate);
-    const renderSampleRoleMismatches = collectGovernedRenderSampleRoleMismatches(report, options.scenarios);
+    const renderSampleRoleMismatches = collectGovernedRenderSampleRoleMismatches(report, options.scenarios, options.renderSampleRunProfileId);
     const failures = compareAgainstBaseline(report, baselineReportForGate, options.threshold);
     const regressionsEnforced = normalizePerfRegressionMode(options.regressionMode) === "enforce";
     const gateReportPath = path.join(options.rawDir, "perf-gate-current.json");

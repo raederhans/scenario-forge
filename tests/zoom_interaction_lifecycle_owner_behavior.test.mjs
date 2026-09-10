@@ -131,6 +131,7 @@ function createHarness({
     setZoomGestureEndedAt: (endedAtMs) => {
       writeState("zoomGestureEndedAt", endedAtMs);
     },
+    notifyGestureStarted: () => calls.order.push("notifyGestureStarted"),
     clearRenderPhaseTimer: () => calls.order.push("clearRenderPhaseTimer"),
     cancelExactAfterSettleRefresh: () => calls.order.push("cancelExactAfterSettleRefresh"),
     setRenderPhase: (phase) => {
@@ -157,6 +158,7 @@ function createHarness({
   };
   if (includeUpdateMap) {
     effects.updateMap = (transform) => {
+      writeState("zoomTransform", transform);
       calls.updateMap.push(transform);
       calls.order.push(`updateMap:${transform?.label || ""}`);
       updateMapHook?.({ calls, readState, writeState, transform });
@@ -244,15 +246,18 @@ test("initZoom configures behavior and installs zoom handlers", () => {
   ]);
 });
 
-test("zoom start enters interacting phase and captures start state", () => {
+test("first changed transform enters interacting phase and captures start state", () => {
   const { calls, handlers, owner, readState } = createHarness();
   owner.initZoom();
 
   handlers.start();
+  assert.deepEqual(calls.order.slice(4), []);
+  handlers.zoom({ transform: createTransform("moved", { x: 4, y: 4, k: 2 }) });
 
   assert.deepEqual(calls.order.slice(4), [
     "clearRenderPhaseTimer",
     "cancelExactAfterSettleRefresh",
+    "notifyGestureStarted",
     "setRenderPhase:interacting-test",
     "captureInteractionBorderSnapshot",
     "renderHoverOverlayIfNeeded",
@@ -318,16 +323,18 @@ test("zoom handler schedules another frame when pending transform appears during
 test("zoom end flushes final transform and schedules settled refresh", () => {
   const { calls, handlers, owner, readState } = createHarness({
     state: {
-      zoomGestureStartTransform: createTransform("start", { k: 1 }),
+      zoomTransform: createTransform("start", { k: 1 }),
       pendingZoomTransform: createTransform("pending", { k: 2 }),
     },
   });
   owner.initZoom();
   const endTransform = createTransform("end", { k: 4 });
 
+  handlers.start();
+  handlers.zoom({ transform: endTransform });
   handlers.end({ transform: endTransform });
 
-  assert.deepEqual(calls.phases, ["settling-test"]);
+  assert.deepEqual(calls.phases, ["interacting-test", "settling-test"]);
   assert.equal(readState("pendingZoomTransform"), null);
   assert.deepEqual(calls.updateMap, [endTransform]);
   assert.equal(readState("zoomGestureScaleDelta"), 2);
@@ -371,3 +378,71 @@ test("factory freezes its exact public API", () => {
 
   assert.equal(Object.isFrozen(owner), true);
 });
+
+for (const inputType of ["mousedown", "touchstart", "wheel", "programmatic"]) {
+  test(`${inputType} with unchanged transform does not prepare or recover a camera gesture`, () => {
+    const h = createHarness(); h.owner.initZoom();
+    const current = h.readState("zoomTransform");
+    h.handlers.start({ sourceEvent: { type: inputType }, transform: current });
+    h.handlers.zoom({ sourceEvent: { type: inputType }, transform: { ...current } });
+    h.handlers.end({ transform: current });
+    assert.deepEqual(h.calls.order.slice(4), []);
+    assert.deepEqual(h.calls.updateMap, []);
+    assert.deepEqual(h.calls.chunkRefresh, []);
+    assert.equal(h.readState("pendingExactPoliticalFastFrame"), true);
+    assert.equal(h.readState("zoomGestureEndedAt"), 0);
+    assert.equal(h.rafCallbacks.length, 0);
+  });
+}
+
+test("an already flushed final transform is not drawn twice and its RAF cannot touch the next gesture", () => {
+  const h = createHarness(); h.owner.initZoom();
+  const first = createTransform("first", { x: 7, k: 2 });
+  h.handlers.start(); h.handlers.zoom({ transform: first }); h.flushRaf();
+  h.handlers.end({ transform: { ...first } });
+  assert.deepEqual(h.calls.updateMap, [first]);
+  assert.equal(h.calls.chunkRefresh.length, 1);
+  const second = createTransform("second", { x: 8, k: 2 });
+  h.handlers.start(); h.handlers.zoom({ transform: second });
+  h.flushRaf(0);
+  assert.equal(h.readState("pendingZoomTransform"), second);
+  assert.equal(h.readState("zoomRenderScheduled"), true);
+  h.flushRaf(1);
+  assert.deepEqual(h.calls.updateMap, [first, second]);
+});
+
+test("moving away and returning to the start still completes recovery without redundant painting", () => {
+  const h = createHarness(); h.owner.initZoom();
+  const start = h.readState("zoomTransform");
+  h.handlers.start(); h.handlers.zoom({ transform: { ...start, x: start.x + 1 } });
+  h.handlers.zoom({ transform: { ...start } });
+  h.handlers.end({ transform: start }); h.flushRaf();
+  assert.deepEqual(h.calls.phases, ["interacting-test", "settling-test"]);
+  assert.deepEqual(h.calls.updateMap, []);
+  assert.equal(h.calls.chunkRefresh.length, 1);
+});
+
+test("dispose invalidates pending frames and stale event handlers", () => {
+  const h = createHarness(); h.owner.initZoom();
+  const moved = createTransform("moved", { k: 3 });
+  h.handlers.start(); h.handlers.zoom({ transform: moved });
+  h.owner.dispose(); const order = [...h.calls.order];
+  h.flushRaf(); h.handlers.zoom({ transform: moved }); h.handlers.end({ transform: moved });
+  assert.deepEqual(h.calls.order, order);
+  assert.deepEqual(h.calls.updateMap, []);
+  assert.equal(h.readState("zoomRenderScheduled"), false);
+});
+
+for (const inputType of ["wheel", "touchmove", null]) {
+  test(`real transform changes activate ${inputType || "programmatic"} gestures exactly once`, () => {
+    const h = createHarness(); h.owner.initZoom();
+    const moved = createTransform("moved", { k: 2.000000001, x: 3, y: 4 });
+    h.handlers.start();
+    h.handlers.zoom({ sourceEvent: inputType ? { type: inputType } : null, transform: moved });
+    h.handlers.zoom({ transform: moved }); h.handlers.end({ transform: moved });
+    h.flushRaf();
+    assert.deepEqual(h.calls.updateMap, [moved]);
+    assert.equal(h.calls.order.filter((name) => name === "notifyGestureStarted").length, 1);
+    assert.equal(h.calls.chunkRefresh.length, 1);
+  });
+}

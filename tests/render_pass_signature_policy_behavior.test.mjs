@@ -5,7 +5,7 @@ import { parse } from "acorn";
 import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass_signature_policy.js";
 import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
 
-function createHarness() {
+function createHarness(overrides = {}) {
   const state = {
     zoomTransform: { k: 2, x: 10, y: 20 }, dpr: 2, width: 800, height: 600,
     topologyRevision: 1, styleConfig: {},
@@ -35,6 +35,7 @@ function createHarness() {
       calls.push(args);
       return args.join("::");
     } }),
+    ...overrides,
   };
   return { state, live, calls, policy: createRenderPassSignaturePolicy(state, dependencies) };
 }
@@ -48,6 +49,19 @@ const invalidationCases = [
   ["textureLabels", "topologyRevision"], ["dayNight", "topologyRevision"],
   ["borders", "sovereigntyRevision"],
 ];
+
+test("border pixels depend on country appearance rather than unrelated individual color edits", () => {
+  let appearanceRevision = 1;
+  const { state, policy } = createHarness({ getBorderAppearanceRevision: () => appearanceRevision });
+  const before = policy.getRenderPassSignature("borders");
+  state.colorRevision = 7;
+  assert.equal(policy.getRenderPassSignature("borders"), before);
+  appearanceRevision += 1;
+  assert.notEqual(policy.getRenderPassSignature("borders"), before);
+  const recolored = policy.getRenderPassSignature("borders");
+  state.styleConfig.internalBorders = { colorMode: "manual", color: "#ff0000" };
+  assert.notEqual(policy.getRenderPassSignature("borders"), recolored);
+});
 
 test("transport presentation changes invalidate shared labels without invalidating political pixels", () => {
   for (const change of [

@@ -1,3 +1,5 @@
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+
 export function createBorderDrawOwner({
   state,
   constants = {},
@@ -64,6 +66,28 @@ export function createBorderDrawOwner({
     reconcileDetailAdmBorders = () => {},
     setVisibleInternalBorderMeshSignature = () => {},
   } = helpers;
+
+  let meshGeometryCache = new WeakMap();
+  let meshProjectionGeneration = -1;
+  function cachedMeshGeometry(mesh, key, build) {
+    const generation = getProjectionGeometryGeneration(getProjection());
+    if (generation !== meshProjectionGeneration) {
+      meshGeometryCache = new WeakMap();
+      meshProjectionGeneration = generation;
+    }
+    let entries = meshGeometryCache.get(mesh);
+    if (!entries) {
+      entries = new Map();
+      meshGeometryCache.set(mesh, entries);
+    }
+    if (entries.has(key)) return entries.get(key);
+    const result = build();
+    // Current callers use a few fixed LOD parameter tuples. Bound future custom
+    // styles too; replaced source meshes are naturally released by the WeakMap.
+    if (entries.size >= 12) entries.delete(entries.keys().next().value);
+    entries.set(key, result);
+    return result;
+  }
 
   function isHgoVectorSceneActive() {
     const manifest = state?.activeScenarioManifest || {};
@@ -210,24 +234,27 @@ export function createBorderDrawOwner({
     angleThresholdDeg = coastlineViewSimplifyCollinearAngleDeg,
   } = {}) {
     if (!isUsableMesh(mesh)) return null;
-    const nextCoordinates = mesh.coordinates
-      .map((line) => {
-        const simplified = simplifyDistancePx > 0
-          ? declutterProjectedPolyline(line, simplifyDistancePx, angleThresholdDeg)
-          : sanitizePolyline(line);
-        if (!Array.isArray(simplified) || simplified.length < 2) return null;
-        const metrics = getProjectedPolylineMetrics(simplified);
-        if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
-        if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
-        if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
-        return simplified;
-      })
-      .filter((line) => Array.isArray(line) && line.length >= 2);
-    if (!nextCoordinates.length) return null;
-    return {
-      type: "MultiLineString",
-      coordinates: nextCoordinates,
-    };
+    const cacheKey = ["boundary", simplifyDistancePx, minLengthPx, minSpanPx, minAreaPx, angleThresholdDeg].join("|");
+    return cachedMeshGeometry(mesh, cacheKey, () => {
+      const nextCoordinates = mesh.coordinates
+        .map((line) => {
+          const simplified = simplifyDistancePx > 0
+            ? declutterProjectedPolyline(line, simplifyDistancePx, angleThresholdDeg)
+            : sanitizePolyline(line);
+          if (!Array.isArray(simplified) || simplified.length < 2) return null;
+          const metrics = getProjectedPolylineMetrics(simplified);
+          if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
+          if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
+          if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
+          return simplified;
+        })
+        .filter((line) => Array.isArray(line) && line.length >= 2);
+      if (!nextCoordinates.length) return null;
+      return {
+        type: "MultiLineString",
+        coordinates: nextCoordinates,
+      };
+    });
   }
 
   function getViewportAwareCoastlineCollection(collection, k) {
@@ -242,14 +269,16 @@ export function createBorderDrawOwner({
     }
     return collection.map((mesh) => {
       if (!isUsableMesh(mesh)) return mesh;
-      const nextCoordinates = mesh.coordinates
-        .map((line) => declutterProjectedPolyline(line, minDistancePx, coastlineViewSimplifyCollinearAngleDeg))
-        .filter((line) => Array.isArray(line) && line.length >= 2);
-      if (!nextCoordinates.length) return mesh;
-      return {
-        type: "MultiLineString",
-        coordinates: nextCoordinates,
-      };
+      return cachedMeshGeometry(mesh, ["coast", minDistancePx, coastlineViewSimplifyCollinearAngleDeg].join("|"), () => {
+        const nextCoordinates = mesh.coordinates
+          .map((line) => declutterProjectedPolyline(line, minDistancePx, coastlineViewSimplifyCollinearAngleDeg))
+          .filter((line) => Array.isArray(line) && line.length >= 2);
+        if (!nextCoordinates.length) return mesh;
+        return {
+          type: "MultiLineString",
+          coordinates: nextCoordinates,
+        };
+      });
     });
   }
 

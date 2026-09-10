@@ -10,11 +10,9 @@ export function createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRati
       : profile === "balanced"
         ? 1.5
         : 1.25;
-    const stage = String(runtimeState.dprStage || "idle").toLowerCase();
-    if (stage === "interactive") {
-      const scale = Math.min(1, Math.max(0.5, Number(runtimeState.dprInteractiveScale) || 0.72));
-      return Math.max(1, baseMaxDpr * scale);
-    }
+    // Gestures replay the committed frame. Changing backing-store density here
+    // destroys the exact pass caches twice per drag and defeats that reuse.
+    // Keep density tied to device/profile; the camera changes only presentation.
     return baseMaxDpr;
   }
 

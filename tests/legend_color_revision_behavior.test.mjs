@@ -5,6 +5,7 @@ import vm from "node:vm";
 import { parse } from "acorn";
 import { createRevisionedLegendColorReader, LegendManager } from "../js/core/legend_manager.js";
 import { setResolvedColorForFeature, bumpColorRevision, replaceResolvedColorsState } from "../js/core/state/color_state.js";
+import { createCountryFillPaletteOwner } from "../js/core/renderer/country_fill_palette_owner.js";
 
 function rendererFunction(name, globals) {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
@@ -21,6 +22,18 @@ test("visible legend avoids feature scans until actual renderer color transactio
     ownKeys(target) { scans++; return Reflect.ownKeys(target); },
   });
   const state = { colors, colorRevision: 0 };
+  const features = [{ id: "A", country: "AA" }, { id: "B", country: "BB" }];
+  const palette = createCountryFillPaletteOwner({
+    state,
+    getFeatures: () => features,
+    getFeatureId: feature => feature.id,
+    resolveCountryCode: feature => feature.country,
+    isExcluded: () => false,
+    resolveColor: (_feature, id) => state.colors[id],
+  });
+  const dominantColors = palette.getDominantFillColorMap();
+  assert.equal(dominantColors.get("AA"), "#112233");
+  assert.equal(dominantColors.get("BB"), "#445566");
   const read = createRevisionedLegendColorReader();
   assert.deepEqual(read(state), ["#112233", "#445566"]);
   for (let index = 0; index < 20; index++) read(state);
@@ -28,21 +41,30 @@ test("visible legend avoids feature scans until actual renderer color transactio
   let visibleColors;
   const refresh = rendererFunction("refreshResolvedColorsForFeatures", {
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
+    getCountryFillPaletteOwner: () => palette,
     migrateLegacyColorState() {}, ensureSovereigntyState() {},
     getRenderPassCacheState: () => ({ partialPoliticalDirtyIds: new Set() }),
     hasPendingPoliticalColorEdit: () => false, normalizePoliticalColorEditIds: ids => ids,
-    findResolvedColorFeatureById: id => id === "missing" ? null : { id },
+    findResolvedColorFeatureById: id => features.find(feature => feature.id === id) || null,
     getResolvedFeatureColor: () => "#abcdef",
     markPendingPoliticalColorEdit: () => false, clearPendingPoliticalColorEdit() {},
     invalidateRenderPasses() {}, shouldRefreshContextBaseForColorChanges: () => false,
     recordPartialColorRefreshDiagnostics() {}, rendererSurfaceHost: { getContext: () => ({}) },
-    requestRendererRender: (_reason, { fallback }) => fallback(), render: () => { visibleColors = read(state); },
+    requestRendererRender: (_reason, { fallback }) => fallback(),
+    render: () => {
+      assert.equal(state.colorRevision, 1);
+      assert.equal(dominantColors.get("AA"), "#abcdef", "palette notification commits before synchronous render");
+      assert.equal(dominantColors.get("BB"), "#445566", "unpainted country's palette is preserved");
+      visibleColors = read(state);
+    },
   });
   refresh(["A"], { renderNow: true });
   assert.equal(state.colors, colors, "transaction mutates the existing table");
   assert.deepEqual(visibleColors, ["#abcdef", "#445566"]);
   assert.equal(scans, 2, "revision already changed before synchronous render fallback");
   refresh(["B"], { renderNow: false });
+  assert.equal(state.colorRevision, 2);
+  assert.equal(dominantColors.get("BB"), "#abcdef", "non-rendering color transactions also update palette");
   assert.deepEqual(read(state), ["#abcdef"]);
   assert.equal(scans, 3);
   replaceResolvedColorsState(state, {});

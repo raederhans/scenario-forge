@@ -71,20 +71,39 @@ export function getCanvasLayer(layers, name) {
   return layer?.canvas ? layer : null;
 }
 
-export function resizeCanvasLayers(layers, { width = 0, height = 0, dpr = 1 } = {}) {
+export function resizeCanvasLayers(layers, { width = 0, height = 0, dpr = 1, preserveComposite = false } = {}) {
   const logicalWidth = Math.max(1, Math.round(Number(width || 0)));
   const logicalHeight = Math.max(1, Math.round(Number(height || 0)));
   const pixelRatio = Math.max(0.1, Number(dpr || 1));
   const pixelWidth = Math.max(1, Math.floor(logicalWidth * pixelRatio));
   const pixelHeight = Math.max(1, Math.floor(logicalHeight * pixelRatio));
+  const composite = getCanvasLayer(layers, CANVAS_LAYER_NAMES.composite)?.canvas;
+  let retainedFrame = null;
+  if (preserveComposite && composite?.width > 1 && composite?.height > 1
+    && (composite.width !== pixelWidth || composite.height !== pixelHeight)) {
+    // Changing a canvas backing size clears its pixels immediately. Keep the
+    // current scene visible while its passes are rebuilt at the new DPR.
+    retainedFrame = composite.ownerDocument.createElement("canvas");
+    retainedFrame.width = composite.width;
+    retainedFrame.height = composite.height;
+    const retainedContext = retainedFrame.getContext("2d");
+    retainedContext.drawImage(composite, 0, 0);
+    const patch = getCanvasLayer(layers, CANVAS_LAYER_NAMES.politicalPatch)?.canvas;
+    if (patch) retainedContext.drawImage(patch, 0, 0);
+  }
   Object.values(CANVAS_LAYER_NAMES).forEach((name) => {
     const canvas = getCanvasLayer(layers, name)?.canvas;
     if (!canvas) return;
-    canvas.width = pixelWidth;
-    canvas.height = pixelHeight;
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
     canvas.style.width = `${logicalWidth}px`;
     canvas.style.height = `${logicalHeight}px`;
   });
+  if (retainedFrame) {
+    composite.getContext("2d").drawImage(retainedFrame, 0, 0, pixelWidth, pixelHeight);
+  }
   return { pixelWidth, pixelHeight, logicalWidth, logicalHeight };
 }
 

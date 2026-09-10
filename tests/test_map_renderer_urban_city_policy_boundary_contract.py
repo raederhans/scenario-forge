@@ -15,7 +15,11 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
     def get_map_renderer_export_block(self, renderer_content):
         marker = "// Batch 5 facade note:"
         start = renderer_content.index(marker)
-        block_start = renderer_content.index("export {", start)
+        # Select the grouped facade, not the preceding single-line re-export
+        # whose semicolon can otherwise make a following function body the end.
+        block_match = re.search(r"(?m)^export \{\s*$", renderer_content[start:])
+        self.assertIsNotNone(block_match)
+        block_start = start + block_match.start()
         block_end = renderer_content.index("};", block_start)
         return renderer_content[block_start:block_end]
 

@@ -693,58 +693,52 @@ export function createPoliticalPartialRepaintOwner({
   }
 
   function drawPoliticalFineFeatureLoop({ k, identity, viewport }) {
+    const workerFrame = getters.drawWorkerPoliticalFine?.();
+    if (workerFrame) return workerFrame;
     const state = getRuntimeState();
     const islandNeighbors = getDebugMode() === "ISLANDS" ? helper.getIslandNeighborGraph() : null;
     const featureMetrics = { fillMs: 0, strokeMs: 0, renderedCount: 0, renderedIds: new Set() };
-    // This synchronous loop only reads the persistent cache. Validate once per pass, including
-    // after scene/projection changes, instead of once for every visible feature.
-    const pathHandle = helper.getPoliticalPathCacheHandle(identity.transform, { resetIfMismatch: false });
+    // Prepare once per pass; persist each cold path as it is first drawn so
+    // geometry outside the bounded idle warmup queue is reusable on later pans.
+    const pathHandle = helper.getPoliticalPathCacheHandle(identity.transform, { resetIfMismatch: true });
     const paths = pathHandle.valid && pathHandle.map instanceof Map ? pathHandle.map : null;
     const readPath = (feature, index) => {
-      const entry = paths?.get(helper.getFeatureId(feature) || `feature-${index}`);
-      return helper.isPoliticalFeaturePathEntryCurrent(entry, feature) ? entry.path : null;
-    };
-    if (Array.isArray(viewport.visibleItems)) {
-      helper.orderPoliticalShellUnderlayFirst(viewport.visibleItems).forEach((item) => {
-        drawPoliticalFeature(item.feature, item.drawOrder, {
-          k,
-          canvasWidth: identity.canvasWidth,
-          canvasHeight: identity.canvasHeight,
-          islandNeighbors,
-          transform: identity.transform,
-          skipScreenCheck: true,
-          path: readPath(item.feature, item.drawOrder),
-          useCachedPath: false,
-          allowBuildPath: false,
-          countPathBuild: false,
-          metricsCollector: featureMetrics,
-        });
+      const featureId = helper.getFeatureId(feature) || `feature-${index}`;
+      const entry = paths?.get(featureId);
+      if (helper.isPoliticalFeaturePathEntryCurrent(entry, feature)) return entry.path;
+      const built = helper.getPoliticalFeaturePathEntry(feature, {
+        featureId, transform: identity.transform, allowBuild: true, countBuild: true,
       });
-    } else {
-      const featureEntries = state.landData.features.map((feature, index) => ({
+      return helper.isPoliticalFeaturePathEntryCurrent(built, feature) ? built.path : null;
+    };
+    const hasVisibleItems = Array.isArray(viewport.visibleItems);
+    const featureEntries = hasVisibleItems
+      ? viewport.visibleItems
+      : state.landData.features.map((feature, index) => ({
         feature,
-        index,
+        drawOrder: index,
         id: helper.getFeatureId(feature) || `feature-${index}`,
       }));
-      helper.orderPoliticalShellUnderlayFirst(featureEntries).forEach(({ feature, index }) => {
-        drawPoliticalFeature(feature, index, {
-          k,
-          canvasWidth: identity.canvasWidth,
-          canvasHeight: identity.canvasHeight,
-          islandNeighbors,
-          transform: identity.transform,
-          path: readPath(feature, index),
-          useCachedPath: false,
-          allowBuildPath: false,
-          countPathBuild: false,
-          metricsCollector: featureMetrics,
-        });
+    helper.orderPoliticalShellUnderlayFirst(featureEntries).forEach(({ feature, drawOrder }) => {
+      drawPoliticalFeature(feature, drawOrder, {
+        k,
+        canvasWidth: identity.canvasWidth,
+        canvasHeight: identity.canvasHeight,
+        islandNeighbors,
+        transform: identity.transform,
+        skipScreenCheck: hasVisibleItems,
+        path: readPath(feature, drawOrder),
+        useCachedPath: false,
+        allowBuildPath: false,
+        countPathBuild: false,
+        metricsCollector: featureMetrics,
       });
-    }
+    });
     return featureMetrics;
   }
 
   return Object.freeze({
+    getPoliticalFeatureFillColor,
     buildPoliticalRasterWorkerPacket,
     drawPoliticalFeature,
     drawPoliticalFineFeatureLoop,

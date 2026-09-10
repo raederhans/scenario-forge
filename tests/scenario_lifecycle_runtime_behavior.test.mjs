@@ -284,6 +284,28 @@ function createFeatures(count) {
   }));
 }
 
+test("scenario activation starts in visual paint mode and preserves the previous mode for exit", () => {
+  const updates = [];
+  const runtimeState = createBaseState({
+    scenarioPaintModeBeforeActivate: null,
+    updatePaintModeUIFn: () => updates.push(runtimeState.paintMode),
+  });
+  const lifecycle = createLifecycleRuntime(runtimeState);
+  lifecycle.applyScenarioPaintMode();
+  assert.equal(runtimeState.paintMode, "visual");
+  assert.equal(runtimeState.interactionGranularity, "subdivision");
+  assert.equal(runtimeState.ui.politicalEditingExpanded, false);
+  assert.deepEqual(runtimeState.scenarioPaintModeBeforeActivate, {
+    paintMode: "sovereignty",
+    interactionGranularity: "country",
+    batchFillScope: "country",
+    politicalEditingExpanded: true,
+  });
+  lifecycle.applyScenarioPaintMode();
+  assert.equal(runtimeState.scenarioPaintModeBeforeActivate.paintMode, "sovereignty");
+  assert.deepEqual(updates, ["visual", "visual"]);
+});
+
 test("chunked coarse data health signals remain internal until full derived state settles", () => {
   assert.equal(shouldSuppressChunkedPostApplyDataHealthSignals({
     hasChunkedRuntime: true,

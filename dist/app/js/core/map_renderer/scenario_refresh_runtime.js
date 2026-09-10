@@ -1,72 +1,16 @@
 import { normalizeRendererRefreshPlan, resolveScenarioChunkPromotionRendererRefreshDescriptor } from "./scenario_refresh_plans.js";
 import { createScenarioVisualInvalidationExecutor } from "./scenario_visual_invalidation_executor.js";
-import { analyzeScenarioPoliticalDerivedStateCoverage, buildScenarioChunkPromotionVisualMetricDetails, createScenarioChunkPromotionDelta, readFirstNonNegativeCount, resolveScenarioChunkPromotionChangeSet } from "../renderer/scenario_chunk_promotion_helpers.js";
+import { recordScenarioPoliticalDerivedStateCoverage, analyzeScenarioPoliticalDerivedStateCoverage, buildScenarioChunkPromotionVisualMetricDetails, createScenarioChunkPromotionDelta, readFirstNonNegativeCount, resolveScenarioChunkPromotionChangeSet } from "../renderer/scenario_chunk_promotion_helpers.js";
 import { patchScenarioChunkLoadState, queueScenarioChunkPromotionState } from "../state/actions/scenario_chunk_runtime_actions.js";
 import { setScenarioPoliticalChunkPayloadState } from "../state/actions/scenario_chunk_promotion_actions.js";
-
-function isPoliticalCoverageDiagnosticsEnabled(runtimeState) {
-  if (runtimeState?.renderDiagnostics?.perfOverlayEnabled || runtimeState?.renderDiagnostics?.enabled) return true;
-  if (runtimeState?.uiState?.developerMode) return true;
-  try {
-    const params = new URLSearchParams(globalThis.location?.search || "");
-    return params.has("render_diag") || params.has("perf_overlay");
-  } catch (_error) {
-    return false;
-  }
-}
-
-function getScenarioChunkSelectionDiagnostics(runtimeState) {
-  const loadState = runtimeState?.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
-    ? runtimeState.runtimeChunkLoadState
-    : {};
-  const lastSelection = loadState.lastSelection && typeof loadState.lastSelection === "object"
-    ? loadState.lastSelection
-    : {};
-  return {
-    selectionVersion: Math.max(0, Number(loadState.selectionVersion || lastSelection.selectionVersion || 0)),
-    requiredChunkIds: Array.isArray(lastSelection.requiredChunkIds) ? [...lastSelection.requiredChunkIds] : [],
-    cacheOnlyChunkIds: Array.isArray(lastSelection.cacheOnlyChunkIds) ? [...lastSelection.cacheOnlyChunkIds] : [],
-    retainedActiveChunkIds: Array.isArray(lastSelection.retainedActiveChunkIds) ? [...lastSelection.retainedActiveChunkIds] : [],
-  };
-}
-
-function recordScenarioPoliticalDerivedStateCoverage({
-  runtimeState,
-  recordRenderPerfMetric,
-  reason = "scenario-chunk-promotion",
-  stage = "check",
-  coverage,
-  restoredFullPoliticalChunkData = false,
-} = {}) {
-  if (typeof recordRenderPerfMetric !== "function" || !coverage) return null;
-  const shouldRecord = isPoliticalCoverageDiagnosticsEnabled(runtimeState)
-    || coverage.primaryVisibleFeatureSubsetActive
-    || coverage.landDataCoverageMissing
-    || coverage.colorCoverageMissing
-    || restoredFullPoliticalChunkData;
-  if (!shouldRecord) return null;
-  return recordRenderPerfMetric("scenarioPoliticalDerivedStateCoverage", 0, {
-    reason: String(reason || "scenario-chunk-promotion"),
-    stage: String(stage || "check"),
-    completePoliticalFeatureCount: coverage.completePoliticalFeatureCount,
-    primaryVisibleFeatureCount: coverage.primaryVisibleFeatureCount,
-    landDataFeatureCount: coverage.landDataFeatureCount,
-    colorsCount: coverage.colorsCount,
-    primaryVisibleFeatureSubsetActive: !!coverage.primaryVisibleFeatureSubsetActive,
-    landDataCoverageMissing: !!coverage.landDataCoverageMissing,
-    colorCoverageMissing: !!coverage.colorCoverageMissing,
-    missingLandFeatureIdsSample: coverage.missingLandFeatureIdsSample,
-    missingColorFeatureIdsSample: coverage.missingColorFeatureIdsSample,
-    restoredFullPoliticalChunkData: !!restoredFullPoliticalChunkData,
-    ...getScenarioChunkSelectionDiagnostics(runtimeState),
-  });
-}
 
 function createScenarioRefreshRuntime(deps = {}) {
   const {
     runtimeState,
     buildIndex, buildSpatialIndexChunked,
     rebuildPoliticalLandCollections, rebuildRuntimeDerivedState, rebuildPrimaryPoliticalDerivedState,
+    buildInteractiveLandData,
+    shouldExcludePoliticalVisualFeature,
     setInteractionInfrastructureState, scheduleSecondarySpatialIndexBuild, scheduleHitCanvasBuildIfNeeded,
     ensureSovereigntyState, refreshScenarioOpeningOwnerBorders, invalidateBorderCache,
     updateDynamicBorderStatusUI, updateSpecialZonesPaths, renderSpecialZoneEditorOverlay, render,
@@ -222,7 +166,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     let infrastructureMutationStarted = false;
     try {
       let politicalCoverageBeforeRestore = hasPoliticalGeometryChange
-        ? analyzeScenarioPoliticalDerivedStateCoverage(runtimeState)
+        ? analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature })
         : null;
       let resolvedCompletePoliticalDerivedStateReady = !!completePoliticalDerivedStateReady
         || (!!primaryDerivedStateReady && !politicalCoverageBeforeRestore?.primaryVisibleFeatureSubsetActive);
@@ -298,7 +242,7 @@ function createScenarioRefreshRuntime(deps = {}) {
         }
         fullPoliticalRestoreMs = nowMs() - fullRestoreStartedAt;
         restoredFullPoliticalChunkData = shouldRestoreFullPoliticalDerivedState;
-        politicalCoverageBeforeRestore = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState);
+        politicalCoverageBeforeRestore = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature });
         if (
           restoredFullPoliticalChunkData
           && !politicalCoverageBeforeRestore.landDataCoverageMissing
@@ -511,7 +455,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     const promotedPrimaryFeatureCount = Array.isArray(runtimeState.scenarioPoliticalVisibleChunkData?.features)
       ? runtimeState.scenarioPoliticalVisibleChunkData.features.length
       : promotedTotalFeatureCount;
-    const currentPoliticalCoverage = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState);
+    const currentPoliticalCoverage = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature });
     const primaryVisibleDerivedStateReady = hasPoliticalChange
       && !!currentPoliticalCoverage.primaryVisibleFeatureSubsetActive;
     const completePoliticalDerivedStateReady = hasPoliticalChange

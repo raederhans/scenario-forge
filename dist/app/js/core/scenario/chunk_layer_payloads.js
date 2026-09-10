@@ -5,6 +5,14 @@
 // objects participating in the merge. Object identity makes invalidation safe
 // when a chunk is replaced while avoiding another state surface.
 const primaryViewportMergeCacheByBundle = new WeakMap();
+const payloadIdentityByObject = new WeakMap();
+let nextPayloadIdentity = 1;
+
+function getPayloadIdentity(payload) {
+  if (!payload || typeof payload !== "object") return 0;
+  if (!payloadIdentityByObject.has(payload)) payloadIdentityByObject.set(payload, nextPayloadIdentity++);
+  return payloadIdentityByObject.get(payload);
+}
 
 function getChunkIdListSignature(chunkIds = []) {
   return (Array.isArray(chunkIds) ? chunkIds : [])
@@ -56,7 +64,9 @@ export function buildScenarioChunkLayerSelectionSignatures(bundle, chunkState, a
   const signatures = {};
   layerKeys.forEach((layerKey) => {
     const chunkIds = getScenarioChunkIdsByLayer(chunkState, layerKey, activeChunkIdSet);
-    signatures[layerKey] = getChunkIdListSignature(chunkIds);
+    // Chunk IDs describe selection, not the content of a replaced chunk. The
+    // runtime owns immutable payload objects; replacements need a new merge.
+    signatures[layerKey] = chunkIds.map((id) => `${id}@${getPayloadIdentity(chunkState.payloadByChunkId[id]?.payload)}`).join("|");
   });
   return signatures;
 }
@@ -78,7 +88,7 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
   const primaryLayerStats = {};
   const changedLayerKeys = [];
   // Local to this merge: registry entries can be edited in place. Build only
-  // when viewport projection needs metadata, rather than search per chunk/layer.
+  // when political merging needs metadata, rather than search per chunk/layer.
   let chunkMetaById = null;
   const layerKeys = new Set([
     ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
@@ -86,6 +96,14 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
   ]);
   layerKeys.forEach((layerKey) => {
     const layerChunkPayloadEntries = getScenarioChunkPayloadEntriesForLayer(chunkState, layerKey, activeChunkIdSet);
+    if (layerKey === "political") {
+      chunkMetaById ||= buildScenarioChunkMetaIndex(bundle);
+      // mergeScenarioChunkPayloads keeps the first feature with each ID.
+      layerChunkPayloadEntries.sort((left, right) => (
+        Number(chunkMetaById.get(right.chunkId)?.lod === "detail")
+        - Number(chunkMetaById.get(left.chunkId)?.lod === "detail")
+      ));
+    }
     const previousSignature = String(previousSignatures?.[layerKey] || "");
     const nextSignature = String(nextSignatures?.[layerKey] || "");
     const canReuse = previousSignature === nextSignature
@@ -106,7 +124,31 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
       }
       mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
     }
-    if (layerKey === "political" && typeof mergeScenarioChunkPayloadsForViewport === "function") {
+    const hasPersistentPoliticalBase = layerKey === "political" && layerChunkPayloadEntries.some(({ chunkId, entry }) => {
+      const chunk = chunkMetaById.get(chunkId);
+      return entry?.payload && chunk?.globalCoverage === true && chunk.lod === "coarse";
+    });
+    if (hasPersistentPoliticalBase) {
+      // Complete coverage already exists. Keep one geometry collection for
+      // rendering and hit testing; their spatial indexes own viewport culling.
+      const mergedPayload = mergedLayerPayloads[layerKey];
+      // The renderer must not supplement a complete scenario with modern
+      // country polygons merely because their topology IDs differ.
+      const payload = mergedPayload?.globalCoverage === true
+        ? mergedPayload : { ...mergedPayload, globalCoverage: true };
+      mergedLayerPayloads[layerKey] = payload;
+      const featureCount = Array.isArray(payload?.features) ? payload.features.length : 0;
+      primaryMergedLayerPayloads[layerKey] = payload;
+      primaryLayerStats[layerKey] = {
+        coverageMode: "full",
+        visibleFeatureCount: featureCount,
+        totalFeatureCount: featureCount,
+        clippedChunkCount: 0,
+        fullChunkCount: layerChunkPayloadEntries.filter(({ entry }) => entry?.payload).length,
+        unboundedChunkCount: 0,
+      };
+      primaryViewportMergeCacheByBundle.delete(bundle);
+    } else if (layerKey === "political" && typeof mergeScenarioChunkPayloadsForViewport === "function") {
       chunkMetaById ||= buildScenarioChunkMetaIndex(bundle);
       const viewportKey = Array.isArray(viewportBbox)
         ? viewportBbox.join(",")

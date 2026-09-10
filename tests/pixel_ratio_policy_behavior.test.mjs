@@ -14,11 +14,11 @@ test("pixel ratio policy reads live display inputs and commits only stage transi
   assert.equal(clock, 40);
   assert.equal(policy.updateDprStage("interactive"), true);
   assert.equal(runtimeState.dprLastStageSwitchAt, 41);
-  assert.equal(policy.getMaxDprForProfile("full"), 1.44);
+  assert.equal(policy.getMaxDprForProfile("full"), 2);
   deviceDpr = 3;
   runtimeState.dprInteractiveScale = 0.5;
-  assert.equal(policy.getMaxDprForProfile("full"), 1.5);
-  assert.equal(policy.getMaxDprForProfile("balanced"), 1);
+  assert.equal(policy.getMaxDprForProfile("full"), 3);
+  assert.equal(policy.getMaxDprForProfile("balanced"), 1.5);
   assert.equal(policy.updateDprStage("interactive", { force: true }), true);
   assert.equal(runtimeState.dprLastStageSwitchAt, 42);
   assert.equal(policy.updateDprStage("unknown"), true);

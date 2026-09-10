@@ -104,7 +104,7 @@ export const PACKAGE_SCRIPTS = {
     "perf:baseline": "node tools/perf/run_baseline.mjs --mode baseline --scenarios tno_1962,hoi4_1939 --runs 5 --warmups 3",
     "perf:gate": "node tools/perf/run_baseline.mjs --mode gate --scenarios tno_1962,hoi4_1939 --runs 5 --warmups 3 --threshold 1.15 --write-markdown false",
     "perf:analyze-render-sample-roles": "node tools/perf/analyze_render_sample_roles.mjs",
-    "test:node:render-sample-role-policy": "node --test tests/render_sample_role_policy_behavior.test.mjs tests/perf_role_governed_report_behavior.test.mjs",
+    "test:node:render-sample-role-policy": "node --test tests/render_sample_role_policy_behavior.test.mjs tests/perf_role_governed_report_behavior.test.mjs tests/standard_perf_settlement_role_behavior.test.mjs",
     "perf:williams-crossover:plan": "node tools/perf/run_williams_crossover.mjs --plan",
     "perf:williams-crossover:analyze": "node tools/perf/run_williams_crossover.mjs --analyze",
     "perf:williams-crossover:run": "node tools/perf/run_williams_crossover.mjs --execute",

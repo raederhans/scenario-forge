@@ -1410,7 +1410,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "6d8d9cea8923de1e6a69a966aebe32f9361d761ec53b8591e92a0ee59eb1abae",
+  "sourceFingerprint": "b1f9d5450a30f26b32ff8cd5741027c0c86b329edc0d5bf5f62219fd909c4a89",
   "reviewedReadSiteFingerprints": [
     "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
     "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
@@ -1419,11 +1419,11 @@ freezeStateTargetPureReaderEntry({
     "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
     "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
     "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
-    "9f7e6546ebb1b6477dab9826fe690ae225ccbbd24041005cdfce8a149a0e4ed2",
-    "b46cb62af9dd7bcafca409a19656ec87522a467486be274674f823ca5ed6f0fc",
     "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
     "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
-    "a3213918da1546dbd2aebf8ababc8cb0a7a8cfaf9f985f81d119dcd832417a4e"
+    "e03c9d6798f08d8092629c97836f33a9b660fefbf049728c3b9fe4d759dc709d",
+    "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
+    "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf"
   ],
   "conservativeFindings": [
     {
@@ -1552,7 +1552,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
-      "count": 2
+      "count": 1
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -1620,14 +1620,6 @@ freezeStateTargetPureReaderEntry({
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "9f7e6546ebb1b6477dab9826fe690ae225ccbbd24041005cdfce8a149a0e4ed2",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
@@ -1643,19 +1635,11 @@ freezeStateTargetPureReaderEntry({
       "count": 2
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "80251709a36cf44e189abc1e5226764f9b0ce854f927627da901911f68c6774d",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b46cb62af9dd7bcafca409a19656ec87522a467486be274674f823ca5ed6f0fc",
       "count": 1
     },
     {
@@ -1687,7 +1671,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "a3213918da1546dbd2aebf8ababc8cb0a7a8cfaf9f985f81d119dcd832417a4e",
+      "sourceFingerprint": "e03c9d6798f08d8092629c97836f33a9b660fefbf049728c3b9fe4d759dc709d",
       "count": 1
     },
     {
@@ -1753,13 +1737,37 @@ freezeStateTargetPureReaderEntry({
       "key": "*",
       "sourceFingerprint": "814a638b718c74404bf36981e5d2704cf8405dddee63fb90dec6992979ba42bc",
       "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getBorderAppearanceRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
+      "count": 1
     }
   ]
 }),
   freezeStateTargetPureReaderEntry({
   localFunctionFingerprints: {
   "getScenarioChunkIdsByLayer": "2d7eef210310a415ae3b185a942ca141a49db425bb2836626a9f644d8e1cfefb",
-  "getChunkIdListSignature": "2dd0c550d186f5d474dcd96b299fdaa069510efd1dc003f80cb37caa5f013aa4"
+  "getPayloadIdentity": "f9317f6fb2449ac07e27a7b1ba8cdbf72269ad6f686e94b42e825971ae4e2063"
 },
   "modulePath": "js/core/scenario/chunk_layer_payloads.js",
   "functionName": "buildScenarioChunkLayerSelectionSignatures",
@@ -1767,7 +1775,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "chunkState",
   "targetParameterIndex": 1,
   "targetParameterPath": "$",
-  "sourceFingerprint": "f144bfd5d612264fd8fa32751802431f2f9a9bf08c2541ccd070b3795b76ffd5",
+  "sourceFingerprint": "41838c0e0a1f663e76858ea9096a4b21a88de35ffd3bd18857433a83fd925dc3",
   "importedArgumentCount": 3,
   "conservativeFindings": [
     {
@@ -1791,7 +1799,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "chunkState",
   "targetParameterIndex": 1,
   "targetParameterPath": "$",
-  "sourceFingerprint": "3ab0f701c69b7756c3efab8b31ee1c9a8749f06896ff1ed3be385310cbd79de8",
+  "sourceFingerprint": "47dc1cc4395b44564e669f0a7cb8142e190d1000fad0c87a97687dcc31685ca4",
   "importedArgumentCount": 3,
   "conservativeFindings": [
     {
@@ -3393,7 +3401,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "466362d23f7fa54eaf838f3a038fb8e60ef1716d832d3989c54fdfbf8300ab24",
   "factoryModulePath": "js/core/renderer/pixel_ratio_policy.js",
   "factoryExportName": "createPixelRatioPolicy",
-  "factorySourceFingerprint": "a280d42abf7f492c871786616f466c7e03c8ff8d4c0c5b1f0be9c13970a06efc",
+  "factorySourceFingerprint": "562da86ec29a16d6dabb1be5d875ded0f0b8638e143517dfe5c2d0892d3bf400",
   "ownerBindingName": "pixelRatioPolicy",
   "methods": [
     "getMaxDprForProfile",
@@ -3436,7 +3444,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "bc6d83e78976b4dae096897ab3c09bddd93c44c8830eed2c1153d415ab13a2bd",
   "factoryModulePath": "js/core/renderer/city_label_text_model.js",
   "factoryExportName": "createCityLabelTextModel",
-  "factorySourceFingerprint": "0fe76ded2890283e1c6dcac426c372b22e5a6716b734e1b9741a2534b7f4a65a",
+  "factorySourceFingerprint": "648b253aec69b442f7098185f7a7db9fb4586210a2e6f0d49d454ec29983994d",
   "ownerBindingName": "owner",
   "methods": [
     "getCityFeatureKey",
@@ -3492,7 +3500,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "cf4648c87226489ac0cbd8d94197dba295482737cd2ba535ef1d75aad98948b1",
   "factoryModulePath": "js/core/renderer/political_path_cache_owner.js",
   "factoryExportName": "createPoliticalPathCacheOwner",
-  "factorySourceFingerprint": "2373a82ad02daa02f3a9cf8a78192c13e8e6008e2a81d69089440e7b9c05be3e",
+  "factorySourceFingerprint": "c451d541f0d567309f5f0f71f97c5274f5052cd92c4cf28996446f2e17972891",
   "ownerBindingName": "owner",
   "methods": [
     "getPoliticalPathCacheSignature",
@@ -3582,10 +3590,10 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getStaticBorderMeshLifecycle",
-  "compositionSourceFingerprint": "d37b5e33b55cea3232dc0eb65f4962d69b534aacff0fb52300b17429ac7142a3",
+  "compositionSourceFingerprint": "ea3ea276be7d700ec93c23d12555eb1bc7173739271917c2d598cec594f4f549",
   "factoryModulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
   "factoryExportName": "createStaticBorderMeshLifecycle",
-  "factorySourceFingerprint": "173c45652e3d9686bd647eb194658d19e6886accba3d4b452480e3577ecc8b7c",
+  "factorySourceFingerprint": "0f2123e3978bb1c08fc9a16dce754e4a8f41d566720a5071a0c087e05a9a9aa7",
   "ownerBindingName": "staticBorderMeshLifecycle",
   "methods": [
     "buildDetailAdmMeshSignature",
@@ -3656,7 +3664,7 @@ freezeMutationDelegatingOwnerEntry({
     "compositionSourceFingerprint": "f9e6134fee02281e43d48d388d37bcdb3b6767d7fd5f228f76d8e2b91cbacfe0",
     "factoryModulePath": "js/core/renderer/render_cache_owner.js",
     "factoryExportName": "createRenderCacheOwner",
-    "factorySourceFingerprint": "5d86c2e05a80d011dc0eeaedf8718462b3d2b543151848799b9cb2da3d4c8910",
+    "factorySourceFingerprint": "a3c05d63a34af542451f31681e92d836973a8f473ebdfb5696da14a621eabfa6",
     "ownerBindingName": "renderCacheOwner",
     "methods": [
       "canDrawInteractionComposite",
@@ -3739,7 +3747,7 @@ freezeMutationDelegatingOwnerEntry({
     "compositionSourceFingerprint": "77be4039f6d5b8af80f9dca408b5e108fab0fe0545cc86471a497c06cc5e2565",
     "factoryModulePath": "js/core/renderer/zoom_interaction_lifecycle_owner.js",
     "factoryExportName": "createZoomInteractionLifecycleOwner",
-    "factorySourceFingerprint": "337b824fcb4b596f898745ed9f98fdad3b2ae339badcdfebec852cd5963c2c47",
+    "factorySourceFingerprint": "bfeab0d137018835a1a925045885be7898283074acae8aeec912be69bc155e5f",
     "ownerBindingName": "zoomInteractionLifecycleOwner",
     "methods": [
       "initZoom",
@@ -3776,10 +3784,10 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getHitCanvasSchedulingOwner",
-    compositionSourceFingerprint: "3ca23379a1769264010b923a73022c87445917c6ee6dc50fc29b6cf26cf95414",
+    compositionSourceFingerprint: "ff892613e155506c55bf68c0b6c4af1d7ad6fd40c39aff06a3d41656a117e934",
     factoryModulePath: "js/core/map_renderer/hit_canvas_scheduling_owner.js",
     factoryExportName: "createHitCanvasSchedulingOwner",
-    factorySourceFingerprint: "3663a2a133d1764c86f0c190bd92165f72f19ad17d774a56afd08817c42aaf02",
+    factorySourceFingerprint: "a2652c44c74755efcadfba35b637ccc35b4caa7be9482f4ffcfa10b557c9b0f6",
     ownerBindingName: "hitCanvasSchedulingOwner",
     methods: ["scheduleHitCanvasBuildIfNeeded", "cancelScheduledHitCanvasBuild"],
     actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH,
@@ -3791,7 +3799,7 @@ freezeMutationDelegatingOwnerEntry({
     compositionSourceFingerprint: "49d45b45f2da5052fdba6a4407f58228e5ea9c09ca7153b8798c387cbebfe6c5",
     factoryModulePath: "js/core/renderer/renderer_projection_path_owner.js",
     factoryExportName: "createRendererProjectionPathOwner",
-    factorySourceFingerprint: "39f59ce161e106be30d24421b20a854c23a7018bc063b6e536fce80588bb933c",
+    factorySourceFingerprint: "6a7ab1cce3bdaf74ea6c7ad0a1a8a1295a3dcf7e9f5119846db2beee72360ca2",
     ownerBindingName: "rendererProjectionPathOwner",
     methods: ["initializeProjectionPaths"], actionExports: [],
   }),
@@ -3801,7 +3809,7 @@ freezeMutationDelegatingOwnerEntry({
     compositionSourceFingerprint: "90d49709571b02a5cde1cd7c4d690059dccdb82ab840d6cdfea442030c466329",
     factoryModulePath: "js/core/renderer/renderer_fit_projection_owner.js",
     factoryExportName: "createRendererFitProjectionOwner",
-    factorySourceFingerprint: "42ac70173a1359fe057348f81559d8381bff62e8c5c31b3d39d626c8fadd0415",
+    factorySourceFingerprint: "c567b0a86d148b86722371dd264f3023f81adba5a63a8758d49415c959c9fdc3",
     ownerBindingName: "rendererFitProjectionOwner", methods: ["fitProjection"],
     actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH,
     actionExports: ["setHitCanvasDirtyState"],
@@ -3893,11 +3901,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalBackgroundRenderOwner",
     compositionSourceFingerprint:
-      "6c7ca3a50636e5189175b8077f5c0c712a19f3eab817bafdff8a899784305b54",
+      "eaf23737b1e05c66c977c99b7b194792421be811642a6948ac8f825ed5fe486e",
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "bbf8def03cfcd86222d1230e05f0ea5b0bdcf931883fbb65fb6d0e40488b3bed",
+      "7fc2e64b8f974b6d30774a7c40ce8ce567bbb1aee38b3f8920f13bb340f3dada",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",
@@ -3911,11 +3919,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalPartialRepaintOwner",
     compositionSourceFingerprint:
-      "39bc292ae63462625b80ef63f5263cd16bef1436c855695a9f03d29e589c64ae",
+      "02ff9a5c2d54921b54269fcf14b6bb53850bd6c3f4b08d239e1210af59eb8e35",
     factoryModulePath: "js/core/renderer/political_partial_repaint_owner.js",
     factoryExportName: "createPoliticalPartialRepaintOwner",
     factorySourceFingerprint:
-      "6bdca9a3690f24861bb91b0cb60314a3f05cca8ec445a61cd600f11cb113bf53",
+      "4694a7d859e28f5e905e97d77c04bb522d89686239f1caf9b3ab624f4ff0d4ec",
     ownerBindingName: "politicalPartialRepaintOwner",
     methods: [
       "buildPoliticalRasterWorkerPacket",
@@ -4014,7 +4022,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/bootstrap/startup_ready_handoff.js",
     factoryExportName: "createStartupReadyHandoffOwner",
     factorySourceFingerprint:
-      "e794556d4692ccfd0192aa4b1275bbadfdbfa9fccf9d88140ae9caf1aa23d643",
+      "0f427eabfea3546220cfaacf06ab55ff5a1d255d78496996100c0aec69601422",
     ownerBindingName: "startupReadyHandoffOwner",
     methods: [
       "beginUiHydration",

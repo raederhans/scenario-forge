@@ -34,6 +34,7 @@ function createHarness({
   onTransformed = null,
   onLastGood = null,
   onEnsureIdleTimings = null,
+  prepareAsyncFrame = null,
 } = {}) {
   const calls = [];
   let currentPhase = phase;
@@ -52,6 +53,10 @@ function createHarness({
     },
   });
   const effects = {
+    ...(prepareAsyncFrame ? { prepareAsyncFrame: () => {
+      calls.push(["prepareAsyncFrame"]);
+      return prepareAsyncFrame();
+    } } : {}),
     ensureLayerDataFromTopology: () => calls.push(["ensureLayerDataFromTopology"]),
     incrementPerfCounter: (name) => calls.push(["incrementPerfCounter", name]),
     clearPoliticalPatchOverlayIfStale: (reason) => calls.push(["clearPoliticalPatchOverlayIfStale", reason]),
@@ -152,6 +157,21 @@ test("readiness failure returns before side effects and counters", () => {
   assert.equal(summary.status, "skipped-not-ready");
   assert.equal(summary.frameMode, "none");
   assert.equal(summary.drewFrame, false);
+});
+
+test("pending async preparation retains existing pixels without composing or committing an exact frame", () => {
+  let pending = true;
+  const { calls, owner } = createHarness({ firstVisible: true, prepareAsyncFrame: () => pending });
+  const waiting = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(waiting.status, "waiting-worker");
+  assert.equal(waiting.frameMode, "previous-pixels");
+  assert.equal(waiting.drewFrame, false);
+  assert.deepEqual(names(calls), ["isFrameSurfaceReady", "ensureLayerDataFromTopology", "prepareAsyncFrame"]);
+  pending = false; calls.length = 0;
+  const ready = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(ready.frameMode, "exact");
+  assert.equal(names(calls).includes("composeCachedPasses"), true);
+  assert.equal(names(calls).includes("commitLastFrame"), true);
 });
 
 test("exact idle success preserves order and final frames counter", () => {

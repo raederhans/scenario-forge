@@ -50,6 +50,27 @@ function createFixture(overrides = {}) {
   return { state, calls, scheduled, runtime, promote };
 }
 
+test("complete shared political payload with legal interactive filtering skips full restoration", async () => {
+  const leaf = { id: "leaf" }, shell = { id: "shell", properties: { interactive: false } };
+  const full = { features: [leaf, shell] };
+  const { state, runtime, calls, scheduled } = createFixture({
+    buildInteractiveLandData: (collection) => ({ features: collection.features.filter((feature) => feature.properties?.interactive !== false) }),
+  });
+  state.scenarioPoliticalChunkData = full;
+  state.scenarioPoliticalVisibleChunkData = full;
+  state.landDataFull = full;
+  state.landData = { features: [leaf] };
+  state.colors = { leaf: "#112233", shell: "#112233" };
+  runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true,
+    changedLayerKeys: ["political"], hasPoliticalPayloadChange: true });
+  assert.equal(state.runtimeChunkLoadState.pendingInfraPromotion.completePoliticalDerivedStateReady, true);
+  assert.equal(await scheduled.at(-1).callback(), true);
+  assert.ok(!calls.some(([name]) => name === "rebuildPoliticalLandCollections" || name === "rebuildRuntimeDerivedState"));
+  const metric = calls.find(([method, name]) => method === "recordRenderPerfMetric" && name === "chunkPromotionDeferredInfraMs");
+  assert.ok(metric);
+  assert.equal(metric[3].restoredFullPoliticalChunkData, false);
+});
+
 test("obsolete deferred callback cannot release or execute a replacement handle", async () => {
   const { runtime, scheduled, state } = createFixture();
   runtime.scheduleDeferredScenarioChunkPromotionInfraRefresh();

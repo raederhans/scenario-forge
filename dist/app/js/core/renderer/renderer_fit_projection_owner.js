@@ -1,3 +1,5 @@
+import { markProjectionGeometryChanged } from "./projection_geometry_identity.js";
+
 function getLandFeatures(state) {
   const features = state?.landData?.features;
   return Array.isArray(features) ? features : [];
@@ -107,6 +109,7 @@ export function createRendererFitProjectionOwner({
       : state.landData;
 
     fitExtent([[padding, padding], [x1, y1]], fitTarget);
+    markProjectionGeometryChanged(projection);
     resetCityAnchorCache();
     rebuildProjectedBoundsCache();
     if (!skipSpatialIndex) {

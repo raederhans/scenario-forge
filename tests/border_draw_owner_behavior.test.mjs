@@ -2,6 +2,33 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createBorderDrawOwner } from "../js/core/renderer/border_draw_owner.js";
+import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
+
+test("boundary and coastline geometry reuse follows projection and simplification, not paint or camera", () => {
+  let projections = 0;
+  const projection = (point) => { projections += 1; return point; };
+  const state = {};
+  const owner = createBorderDrawOwner({ state, getters: { getProjection: () => projection },
+    helpers: { isUsableMesh: (value) => !!value?.coordinates?.length } });
+  const source = { type: "MultiLineString", coordinates: [[[0, 0], [1, 0], [100, 0]]] };
+  const options = { simplifyDistancePx: 3, minLengthPx: 10 };
+  const first = owner.buildRenderableBoundaryMesh(source, options);
+  const coast = owner.getViewportAwareCoastlineCollection([source], 1)[0];
+  const count = projections;
+  state.colorRevision = 9;
+  state.zoomTransform = { x: 200, y: -50, k: 1.2 };
+  state.dpr = 2;
+  assert.equal(owner.buildRenderableBoundaryMesh(source, options), first);
+  assert.equal(owner.getViewportAwareCoastlineCollection([source], 1.2)[0], coast);
+  assert.equal(projections, count);
+  assert.notEqual(owner.buildRenderableBoundaryMesh(source, { ...options, minLengthPx: 20 }), first);
+  assert.notEqual(owner.getViewportAwareCoastlineCollection([source], 2)[0], coast);
+  markProjectionGeometryChanged(projection);
+  assert.notEqual(owner.buildRenderableBoundaryMesh(source, options), first);
+  assert.notEqual(owner.getViewportAwareCoastlineCollection([source], 1)[0], coast);
+  const replaced = { ...source, coordinates: [[[0, 0], [200, 0]]] };
+  assert.notEqual(owner.buildRenderableBoundaryMesh(replaced, options), first);
+});
 
 const mesh = { type: "MultiLineString", coordinates: [[[0, 0], [100, 100]]] };
 

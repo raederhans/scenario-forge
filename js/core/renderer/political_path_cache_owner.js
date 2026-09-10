@@ -1,3 +1,5 @@
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+
 // Owns projected political paths and cancellable idle warmup; cache state remains shared.
 const POLITICAL_PATH_WARMUP_OVERSCAN_PX = 96;
 const POLITICAL_PATH_WARMUP_QUEUE_MAX = 512;
@@ -11,8 +13,6 @@ export function isPoliticalFeaturePathEntryCurrent(entry, feature) {
 
 export function createPoliticalPathCacheOwner(runtimeState, {
   rendererSurfaceHost,
-  getPoliticalPassStaticSignature,
-  getProjectionRenderSignature,
   getViewportRenderSignature,
   getRenderPassCacheState,
   cancelDeferredWork,
@@ -27,16 +27,16 @@ export function createPoliticalPathCacheOwner(runtimeState, {
   nowMs,
   RENDER_PHASE_IDLE,
 }) {
-  function getPoliticalPathCacheSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
+  let warmupTransform = null;
+  let warmupViewportSignature = "";
+  function getPoliticalPathCacheSignature() {
     return [
-      getPoliticalPassStaticSignature(transform),
-      getProjectionRenderSignature(),
-      getViewportRenderSignature(),
+      getProjectionGeometryGeneration(rendererSurfaceHost.getProjection?.()),
       String(runtimeState.activeScenarioId || ""),
-      "ownership",
-      Number(runtimeState.sovereigntyRevision || 0),
-      0,
-      Number(runtimeState.scenarioShellOverlayRevision || 0),
+      Number(runtimeState.sceneGeneration || 0),
+      getProjectionGeometryGeneration(runtimeState.topologyPrimary || runtimeState.topology),
+      getProjectionGeometryGeneration(runtimeState.topologyDetail),
+      getProjectionGeometryGeneration(runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology),
     ].join("::");
   }
 
@@ -52,6 +52,8 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     cache.politicalPathWarmupHandle = null;
     cache.politicalPathWarmupQueue = [];
     cache.politicalPathWarmupSignature = "";
+    warmupTransform = null;
+    warmupViewportSignature = "";
     cache.politicalPathWarmupReason = String(reason || "unspecified");
     if (hadWork) {
       incrementPerfCounter("politicalPathWarmupCancels");
@@ -90,8 +92,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     const signature = getPoliticalPathCacheSignature(transform);
     const valid =
       cache.politicalPathCache instanceof Map
-      && cache.politicalPathCacheSignature === signature
-      && areZoomTransformsEquivalent(cache.politicalPathCacheTransform, transform);
+      && cache.politicalPathCacheSignature === signature;
     if (valid) {
       return {
         cache,
@@ -244,6 +245,11 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       return false;
     }
     const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
+    if (!areZoomTransformsEquivalent(warmupTransform, transform)
+      || warmupViewportSignature !== getViewportRenderSignature()) {
+      cancelPoliticalPathWarmup("warmup-viewport-changed");
+      return false;
+    }
     const expectedSignature = getPoliticalPathCacheSignature(transform);
     if (
       cache.politicalPathWarmupSignature !== expectedSignature
@@ -349,6 +355,8 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     cache.politicalPathWarmupHandle = null;
     cache.politicalPathWarmupQueue = queue;
     cache.politicalPathWarmupSignature = signature;
+    warmupTransform = cloneZoomTransform(transform);
+    warmupViewportSignature = getViewportRenderSignature();
     cache.politicalPathWarmupReason = "scheduled";
     cache.politicalPathWarmupHandle = scheduleDeferredWork(runPoliticalPathWarmupSlice, {
       timeout: POLITICAL_PATH_WARMUP_TIMEOUT_MS,
