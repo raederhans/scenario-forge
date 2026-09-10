@@ -32,11 +32,26 @@ export const CITY_RECORDS = [
     verification: null, selector: {},
   },
   {
+    id: "city:tno-geo-locale-patch-python",
+    commandRef: "python -m unittest tests.test_tno_geo_locale_patch -q",
+    sourceRefs: [
+      "tools/build_tno_1962_geo_locale_patch.py", "tests/test_tno_geo_locale_patch.py",
+      "data/scenarios/tno_1962/geo_name_overrides.manual.json",
+      "data/scenarios/tno_1962/geo_locale_patch.json", "data/scenarios/tno_1962/geo_locale_patch.en.json",
+      "data/scenarios/tno_1962/geo_locale_patch.zh.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 405,
+    verification: null, selector: {},
+  },
+  {
     id: "city:tno-reviewed-labels-node",
-    commandRef: "node --test tests/tno_china_city_labels_behavior.test.mjs tests/tno_russia_city_labels_behavior.test.mjs tests/tno_eastern_city_labels_behavior.test.mjs tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+    commandRef: "node --test tests/tno_china_city_labels_behavior.test.mjs tests/tno_russia_city_labels_behavior.test.mjs tests/tno_eastern_city_labels_behavior.test.mjs tests/tno_burgundy_africa_city_labels_behavior.test.mjs tests/tno_russian_warlord_city_labels_behavior.test.mjs tests/tno_usa_city_labels_behavior.test.mjs",
     sourceRefs: [
       "tests/tno_china_city_labels_behavior.test.mjs", "tests/tno_russia_city_labels_behavior.test.mjs",
       "tests/tno_eastern_city_labels_behavior.test.mjs", "tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+      "tests/tno_russian_warlord_city_labels_behavior.test.mjs", "tests/tno_usa_city_labels_behavior.test.mjs",
       "js/core/renderer/city_label_text_model.js", "map_builder/cities.py",
       "data/world_cities.geojson", "data/locales.json", "data/city_aliases.json",
       "data/scenarios/tno_1962/geo_locale_patch.json", "data/scenarios/tno_1962/city_overrides.json",

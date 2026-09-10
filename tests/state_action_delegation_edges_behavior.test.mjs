@@ -1146,6 +1146,16 @@ test("borrowed chunk reader proofs cover transitive local helper source", async 
       ...entry, localFunctionFingerprints: {},
     }).violations.some(({ code }) => code === "state-target-pure-reader-dependency-source-drift"));
   }
+  const identityHelper = ast.body.find((node) => node.id?.name === "getPayloadIdentity");
+  assert.ok(identityHelper);
+  const mutatedPayload = source.slice(0, identityHelper.body.start + 1)
+    + "\n  payload.features.length = 0;"
+    + source.slice(identityHelper.body.start + 1);
+  await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutatedPayload, "production", {
+    scanAllParameters: true,
+  }), (error) => error.violations?.some(({ code, dependencyName }) => (
+    code === "state-target-pure-reader-dependency-source-drift" && dependencyName === "getPayloadIdentity"
+  )));
 });
 
 test("source-bound owner proof prepares once and applies independently per binding", () => {
@@ -2219,6 +2229,8 @@ test("render pass signature reader accepts reviewed joins and rejects state writ
   for (const changed of [
     source.replace('const transformSignature =', 'runtimeState.colorRevision = 99;\n    const transformSignature ='),
     source.replace('].join("::")', '].push("mutation")'),
+    source.replace('getBorderAppearanceRevision = () => runtimeState.colorRevision || 0',
+      'getBorderAppearanceRevision = () => (runtimeState.colorRevision = 99)'),
   ]) {
     assert.notEqual(changed, source);
     await assert.rejects(

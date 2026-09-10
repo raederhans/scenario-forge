@@ -56,6 +56,7 @@ test("reviewed city names select executable Python and Node regression routes", 
   const routes = buildRouteIndex();
   const python = routes.find((route) => route.id === "city:reviewed-place-names-python");
   const chinaPython = routes.find((route) => route.id === "city:tno-china-place-names-python");
+  const patchPython = routes.find((route) => route.id === "city:tno-geo-locale-patch-python");
   const node = routes.find((route) => route.id === "city:tno-reviewed-labels-node");
   assert.equal(python.executionOwner, "main-thread");
   assert.ok(python.resourceLocks.includes("heavy-geo"));
@@ -63,17 +64,25 @@ test("reviewed city names select executable Python and Node regression routes", 
   const pythonFiles = ["tests/test_reviewed_place_names.py"];
   assert.equal(chinaPython.commandRef, "python -m unittest tests.test_tno_china_place_names -q");
   assert.equal(chinaPython.executionOwner, "child-safe");
+  assert.equal(patchPython.commandRef, "python -m unittest tests.test_tno_geo_locale_patch -q");
+  assert.equal(patchPython.executionOwner, "child-safe");
   const nodeFiles = [
     "tests/tno_china_city_labels_behavior.test.mjs", "tests/tno_russia_city_labels_behavior.test.mjs",
     "tests/tno_eastern_city_labels_behavior.test.mjs", "tests/tno_burgundy_africa_city_labels_behavior.test.mjs",
+    "tests/tno_russian_warlord_city_labels_behavior.test.mjs", "tests/tno_usa_city_labels_behavior.test.mjs",
   ];
   for (const file of pythonFiles) {
     assert.ok(python.commandRef.includes(file.replaceAll("/", ".").replace(/\.py$/, "")));
   }
-  for (const file of nodeFiles) assert.ok(node.commandRef.includes(file));
+  for (const file of nodeFiles) {
+    assert.ok(node.commandRef.includes(file));
+    assert.equal(routes.filter((route) => route.commandRef.split(/\s+/).includes(file)).length, 1, file);
+  }
   for (const [file, route] of [
     ...pythonFiles.map((file) => [file, python]), ...nodeFiles.map((file) => [file, node]),
     ["tests/test_tno_china_place_names.py", chinaPython],
+    ["tools/build_tno_1962_geo_locale_patch.py", patchPython],
+    ["tests/test_tno_geo_locale_patch.py", patchPython],
     ["map_builder/cities.py", python], ["data/i18n/manual_geo_overrides.json", python],
     ["data/scenarios/tno_1962/geo_locale_patch.zh.json", python],
     ["data/world_cities.geojson", node], ["data/scenarios/tno_1962/city_overrides.json", node],
