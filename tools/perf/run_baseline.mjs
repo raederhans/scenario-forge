@@ -899,7 +899,11 @@ export function inspectStandardPerfSettlement(status, scenarioId) {
     || status.startupReadonly || status.startupReadonlyUnlockInFlight || status.scenarioApplyInFlight) pending.push("boot");
   if (status.renderPhase !== "idle" || status.isInteracting || status.deferExactAfterSettle
     || status.zoomRenderScheduled || status.pendingZoomTransform || status.activeInteractionRecoveryTaskKey) pending.push("render-recovery");
-  if (!status.interactionInfrastructureReady || status.interactionInfrastructureBuildInFlight
+  // The legacy renderer can retain a completed full-infrastructure stage while
+  // cancellation clears its ready flag. Task completion can establish work
+  // quiescence, not interaction capability; every live queue must still be empty.
+  const fullInfrastructureCompleted = status.postReadyScheduler?.taskOutcomes?.["post-ready-full-interaction-infra"]?.status === "completed";
+  if ((!status.interactionInfrastructureReady && !fullInfrastructureCompleted) || status.interactionInfrastructureBuildInFlight
     || status.hitCanvasBuildScheduled) pending.push("interaction-infrastructure");
   const chunk = status.chunkRuntime;
   if (!chunk || chunk.pendingPromotion || chunk.pendingVisualPromotion || chunk.pendingInfraPromotion
@@ -916,6 +920,43 @@ export function inspectStandardPerfSettlement(status, scenarioId) {
     || status.asyncWork.exactPending !== false)) pending.push("async-renderer");
   if (!status.asyncWork || typeof status.asyncWork.supported !== "boolean") pending.push("async-capability-missing");
   return { complete: pending.length === 0, pending };
+}
+
+const STANDARD_PERF_SETTLEMENT_QUIET_MS = 850;
+
+function standardPerfQuiescenceEvidence(observation) {
+  const samples = observation.snapshot?.renderSamples;
+  return {
+    observedAt: observation.observedAt,
+    sampleCount: samples?.count,
+    lastSampleSequence: samples?.samples?.at(-1)?.sequence ?? null,
+    promotion: observation.snapshot?.renderPerfMetrics?.scenarioChunkPromotionVisualStage || null,
+    status: observation.status,
+  };
+}
+
+function standardPerfQuiescenceIdentity(evidence) {
+  const { observedAt: _observedAt, ...identity } = evidence;
+  return JSON.stringify(identity);
+}
+
+function hasValidStandardPerfQuiescence(settlement, snapshot, scenarioId) {
+  const observations = settlement?.quiescenceObservations;
+  if (!Array.isArray(observations) || observations.length < 2
+    || !observations.every((entry) => entry && typeof entry === "object" && !Array.isArray(entry))) return false;
+  const first = observations[0];
+  const last = observations.at(-1);
+  const identity = standardPerfQuiescenceIdentity(first);
+  const expectedLast = standardPerfQuiescenceEvidence({ status: settlement.status, snapshot, observedAt: settlement.observedAt });
+  return Number.isFinite(first.observedAt) && first.observedAt >= 0
+    && settlement.quiescenceStartedAt === first.observedAt
+    && settlement.quiescenceDurationMs === last.observedAt - first.observedAt
+    && settlement.quiescenceDurationMs >= STANDARD_PERF_SETTLEMENT_QUIET_MS
+    && JSON.stringify(last) === JSON.stringify(expectedLast)
+    && observations.every((observation, index) => Number.isFinite(observation.observedAt)
+      && (!index || observation.observedAt > observations[index - 1].observedAt)
+      && standardPerfQuiescenceIdentity(observation) === identity
+      && inspectStandardPerfSettlement(observation.status, scenarioId).complete);
 }
 
 export async function readStandardPerfObservation(page, targetUrl) {
@@ -960,6 +1001,7 @@ export async function waitForStandardPerfSettlement(readObservation, scenarioId,
   let initialFrameSequence = null;
   let initialSamplePrefix = null;
   const promotionObservations = [];
+  let quiescenceObservations = [];
   while (now() - startedAt < timeoutMs) {
     last = await readObservation();
     if (last.status?.bootError) throw new Error(`[perf-baseline] bootError=${last.status.bootError}`);
@@ -979,13 +1021,28 @@ export async function waitForStandardPerfSettlement(readObservation, scenarioId,
     }
     const decision = inspectStandardPerfSettlement(last.status, scenarioId);
     if (decision.complete && last.snapshot) {
+      const evidence = standardPerfQuiescenceEvidence(last);
+      if (!quiescenceObservations.length
+        || standardPerfQuiescenceIdentity(evidence) !== standardPerfQuiescenceIdentity(quiescenceObservations[0])) {
+        quiescenceObservations = [];
+      }
+      quiescenceObservations.push(structuredClone(evidence));
+      const quiescenceStartedAt = quiescenceObservations[0].observedAt;
+      const quiescenceDurationMs = last.observedAt - quiescenceStartedAt;
+      if (quiescenceDurationMs < STANDARD_PERF_SETTLEMENT_QUIET_MS) {
+        await pause(50);
+        continue;
+      }
       const samples = last.snapshot.renderSamples;
       return { ...last.snapshot, standardPerfSettlement: {
         complete: true, activeScenarioId: scenarioId, observedAt: last.observedAt,
         sampleCount: samples?.count, lastSampleSequence: samples?.samples?.at(-1)?.sequence ?? null,
         capabilityMode: last.status.capabilityMode, status: last.status,
         initialPromotion, initialFrameSequence, initialSamplePrefix, promotionObservations,
+        quiescenceStartedAt, quiescenceDurationMs, quiescenceObservations,
       } };
+    } else {
+      quiescenceObservations = [];
     }
     await pause(50);
   }
@@ -1971,6 +2028,9 @@ export function collectGovernedRenderSampleRoleMismatches(
         const settlement = run?.snapshot?.standardPerfSettlement;
         const decision = inspectStandardPerfSettlement(settlement?.status, scenarioId);
         if (!decision.complete) mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement=${decision.pending.join(",")}`);
+        if (!hasValidStandardPerfQuiescence(settlement, run?.snapshot, scenarioId)) {
+          mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement quiescence must bind 850ms of unchanged completed observations`);
+        }
         if (settlement?.capabilityMode !== settlement?.status?.capabilityMode) {
           mismatches.push(`${scenarioId}.run-${runIndex + 1}.settlement capability does not match raw status`);
         }

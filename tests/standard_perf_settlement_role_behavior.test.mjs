@@ -16,11 +16,24 @@ function fixture() {
       { sequence: 2, recordedAt: 220, durationMs: 20, activeScenarioId: scenarioId, phase: "idle", politicalBgProgressive: false, contextScenarioMs: 0 },
       { sequence: 3, recordedAt: 260, durationMs: 30, activeScenarioId: scenarioId, phase: "idle", politicalBgProgressive: false, contextScenarioMs: 0 },
     ] },
-    standardPerfSettlement: { complete: true, activeScenarioId: scenarioId, observedAt: 280, sampleCount: 3, lastSampleSequence: 3,
+    standardPerfSettlement: { complete: true, activeScenarioId: scenarioId, observedAt: 1200, sampleCount: 3, lastSampleSequence: 3,
       status: readyStatus(), capabilityMode: "renderer-async-status" },
   };
   bindInitialEvidence(snapshot);
+  bindQuietEvidence(snapshot);
   return snapshot;
+}
+function bindQuietEvidence(snapshot) {
+  const completion = snapshot.standardPerfSettlement;
+  completion.quiescenceStartedAt = completion.observedAt - 850;
+  completion.quiescenceDurationMs = 850;
+  completion.quiescenceObservations = Array.from({ length: 18 }, (_, index) => ({
+    observedAt: completion.quiescenceStartedAt + index * 50,
+    sampleCount: snapshot.renderSamples.count,
+    lastSampleSequence: snapshot.renderSamples.samples.at(-1).sequence,
+    promotion: structuredClone(snapshot.renderPerfMetrics.scenarioChunkPromotionVisualStage),
+    status: structuredClone(completion.status),
+  }));
 }
 function bindInitialEvidence(snapshot) {
   const completion = snapshot.standardPerfSettlement;
@@ -44,7 +57,7 @@ test("settled standard profile charges the unique full frame and every subsequen
   assert.equal(result.subsequentRenderCount, 2);
   assert.equal(result.canonicalRenderSampleMs, 1050);
   assert.equal(result.lastRenderCompletedAt, 260);
-  assert.equal(result.settlementObservedAt, 280);
+  assert.equal(result.settlementObservedAt, 1200);
   assert.deepEqual(snapshot, original);
   assert.equal(summarizeSnapshot(snapshot, scenarioId, profile).canonicalRenderSampleMs, 1050);
   const summary = summarizeRenderSampleRoleAnalyses([result], profile);
@@ -112,7 +125,7 @@ test("later promotion and repeated full frames remain billed behind the frozen i
   const result = await waitForStandardPerfSettlement(async () => {
     reads += 1;
     return { snapshot: reads === 1 ? first : final,
-      status: { ...readyStatus(), bootPhase: reads === 1 ? "loading" : "ready" }, observedAt: reads === 1 ? 205 : 300 };
+      status: { ...readyStatus(), bootPhase: reads === 1 ? "loading" : "ready" }, observedAt: 300 + time };
   }, scenarioId, { now: () => time, pause: async (ms) => { time += ms; } });
   assert.equal(result.standardPerfSettlement.promotionObservations.length, 2);
   assert.equal(analyze(result).roleMatched, true);
@@ -120,7 +133,8 @@ test("later promotion and repeated full frames remain billed behind the frozen i
   assert.equal(analyze(result).canonicalSample.sequence, 1);
   assert.equal(analyze(result).promotionRecordedAt, 100);
   assert.equal(result.renderPerfMetrics.scenarioChunkPromotionVisualStage.recordedAt, 215);
-  const missed = await waitForStandardPerfSettlement(async () => ({ snapshot: final, status: readyStatus(), observedAt: 300 }), scenarioId);
+  const missed = await waitForStandardPerfSettlement(async () => ({ snapshot: final, status: readyStatus(), observedAt: 300 + time }), scenarioId,
+    { now: () => time, pause: async (ms) => { time += ms; } });
   assert.equal(analyze(missed).roleMatched, false);
   assert.ok(analyze(missed).roleMismatches.includes("initial-promotion-bound"));
 });
@@ -151,6 +165,17 @@ test("standard report recomputes all five charged samples and rejects cheap-fram
   const pending = structuredClone(report);
   pending.scenarios[scenarioId].runs[0].snapshot.standardPerfSettlement.status.asyncWork.geometryPendingCount = 1;
   assert.ok(collectGovernedRenderSampleRoleMismatches(pending, [scenarioId], profile).some((message) => message.includes("settlement=async-renderer")));
+  for (const mutate of [
+    (settlement) => { settlement.quiescenceDurationMs = 849; },
+    (settlement) => { settlement.quiescenceObservations[5].status.hitCanvasBuildScheduled = true; },
+    (settlement) => { settlement.quiescenceObservations[5].sampleCount = 2; },
+    (settlement) => { settlement.quiescenceObservations[5].promotion.sequence = 999; },
+    (settlement) => { settlement.quiescenceObservations = []; },
+  ]) {
+    const changed = structuredClone(report);
+    mutate(changed.scenarios[scenarioId].runs[0].snapshot.standardPerfSettlement);
+    assert.ok(collectGovernedRenderSampleRoleMismatches(changed, [scenarioId], profile).some((message) => message.includes("settlement quiescence")));
+  }
   assert.ok(collectGovernedRenderSampleRoleMismatches(report, [scenarioId]).some((message) => message.includes("policyId expected=")));
   const old = structuredClone(report);
   old.renderSampleRolePolicy = buildRenderSampleRolePolicyIdentity();
@@ -205,8 +230,10 @@ test("observer waits for real completion and stamps the final atomic snapshot wi
     const status = readyStatus();
     status.asyncWork.geometryPendingCount = reads === 1 ? 1 : 0;
     return { status, snapshot, observedAt: 300 + time };
-  }, scenarioId, { now: () => time, pause: async (ms) => { time += ms; }, timeoutMs: 200 });
-  assert.equal(reads, 2);
+  }, scenarioId, { now: () => time, pause: async (ms) => { time += ms; }, timeoutMs: 1500 });
+  assert.equal(reads, 19);
+  assert.equal(result.standardPerfSettlement.quiescenceStartedAt, 350);
+  assert.equal(result.standardPerfSettlement.quiescenceDurationMs, 850);
   assert.equal(result.standardPerfSettlement.sampleCount, 3);
   assert.equal(analyze(result).canonicalRenderSampleMs, 1050);
   assert.equal(snapshot.standardPerfSettlement, undefined);
@@ -221,4 +248,52 @@ test("v2 gate compares all charged render CPU at the unchanged render threshold"
   } });
   const failures = compareAgainstBaseline(report(1260, 116), report(1000, 100), 1.15);
   assert.deepEqual(failures.map((failure) => [failure.metricKey, failure.allowedRatio]), [["totalStartupMs", 1.15], ["canonicalRenderSampleMs", 1.25]]);
+});
+
+test("completed full infrastructure proves stale false readiness only while all live queues remain empty", () => {
+  const stale = { ...readyStatus(), interactionInfrastructureReady: false };
+  assert.equal(inspectStandardPerfSettlement(stale, scenarioId).complete, false);
+  stale.postReadyScheduler.taskOutcomes = { "post-ready-full-interaction-infra": { status: "failed" } };
+  assert.equal(inspectStandardPerfSettlement(stale, scenarioId).complete, false);
+  stale.postReadyScheduler.taskOutcomes["post-ready-full-interaction-infra"].status = "completed";
+  assert.equal(inspectStandardPerfSettlement(stale, scenarioId).complete, true);
+  assert.equal(stale.interactionInfrastructureReady, false);
+  for (const mutate of [
+    (s) => { s.interactionInfrastructureBuildInFlight = true; },
+    (s) => { s.hitCanvasBuildScheduled = true; },
+    (s) => { s.chunkRuntime.pendingPromotion = true; },
+    (s) => { s.renderBoundary.requestPending = true; },
+    (s) => { s.asyncWork.geometryPendingCount = 1; },
+    (s) => { s.postReadyScheduler.pendingTaskKeys = ["post-ready-full-interaction-infra"]; },
+  ]) {
+    const busy = structuredClone(stale); mutate(busy);
+    assert.equal(inspectStandardPerfSettlement(busy, scenarioId).complete, false);
+  }
+});
+
+test("850ms quiescence restarts on a late frame, promotion and new pending work without losing CPU evidence", async () => {
+  let time = 0;
+  const snapshot = fixture();
+  delete snapshot.standardPerfSettlement;
+  const result = await waitForStandardPerfSettlement(async () => {
+    const status = readyStatus();
+    status.interactionInfrastructureReady = false;
+    status.postReadyScheduler.taskOutcomes = { "post-ready-full-interaction-infra": { status: "completed" } };
+    if (time === 400) {
+      snapshot.renderSamples.samples.push({ ...snapshot.renderSamples.samples.at(-1), sequence: 4, recordedAt: 700, durationMs: 40 });
+      snapshot.renderSamples.count = 4;
+    }
+    if (time === 450) {
+      snapshot.renderPerfMetrics.scenarioChunkPromotionVisualStage = { recordedAt: 750, activeScenarioId: scenarioId, reason: "scenario-hydrate-atlantropa", sequence: 6 };
+    }
+    status.asyncWork.geometryPendingCount = time === 600 ? 1 : 0;
+    return { status, snapshot: structuredClone(snapshot), observedAt: 300 + time };
+  }, scenarioId, { now: () => time, pause: async (ms) => { time += ms; }, timeoutMs: 2000 });
+  assert.equal(time, 1500);
+  assert.equal(result.standardPerfSettlement.quiescenceStartedAt, 950);
+  assert.equal(result.standardPerfSettlement.quiescenceDurationMs, 850);
+  assert.equal(result.standardPerfSettlement.status.interactionInfrastructureReady, false);
+  assert.equal(result.standardPerfSettlement.promotionObservations.length, 2);
+  assert.equal(result.renderSamples.count, 4);
+  assert.equal(analyze(result).canonicalRenderSampleMs, 1090);
 });
