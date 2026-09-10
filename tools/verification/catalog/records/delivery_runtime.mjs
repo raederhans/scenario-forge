@@ -375,6 +375,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "tools/perf/run_baseline.mjs",
       "tools/perf/standard_perf_admission.mjs",
       "tests/render_sample_role_policy_behavior.test.mjs",
+      "tests/standard_perf_settlement_role_behavior.test.mjs",
       "tests/perf_role_governed_report_behavior.test.mjs",
       "tests/test_perf_gate_contract.py",
       "docs/perf/baseline_2026-07-14.json",
@@ -880,6 +881,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "commandRef": "test:node:render-sample-role-policy",
     "sourceRefs": [
       "tests/render_sample_role_policy_behavior.test.mjs",
+      "tests/standard_perf_settlement_role_behavior.test.mjs",
       "tests/perf_role_governed_report_behavior.test.mjs",
       "tools/perf/render_sample_role_policy.mjs",
       "tools/perf/analyze_render_sample_roles.mjs",

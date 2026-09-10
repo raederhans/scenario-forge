@@ -172,5 +172,6 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   }
 
   return { prepareFrame, preparePolitical, drawPolitical, requestHit,
+    getPendingWorkCount: () => inFlight.size,
     dispose() { disposed = true; worker.dispose(); close(politicalFrame?.result); politicalFrame = null; pending.clear(); inFlight.clear(); } };
 }

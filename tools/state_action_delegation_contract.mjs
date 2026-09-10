@@ -3593,7 +3593,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "ea3ea276be7d700ec93c23d12555eb1bc7173739271917c2d598cec594f4f549",
   "factoryModulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
   "factoryExportName": "createStaticBorderMeshLifecycle",
-  "factorySourceFingerprint": "2dcbb700d03f877ad00dfa134d198eb06bdfda540da26d96343b85615a601e87",
+  "factorySourceFingerprint": "0f2123e3978bb1c08fc9a16dce754e4a8f41d566720a5071a0c087e05a9a9aa7",
   "ownerBindingName": "staticBorderMeshLifecycle",
   "methods": [
     "buildDetailAdmMeshSignature",
@@ -3905,7 +3905,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "66e4ecbdd6df0dd55c486322e31f6e2f51ff62b82f26a4ad75f3acc53b46fe59",
+      "7fc2e64b8f974b6d30774a7c40ce8ce567bbb1aee38b3f8920f13bb340f3dada",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",

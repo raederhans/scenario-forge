@@ -106,9 +106,10 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         owner = OWNER.read_text(encoding="utf-8")
         background = owner[owner.index("function drawBackgroundPass()") :]
         cursor = -1
-        for token in ('{ type: "Sphere" }', "state.oceanData", "drawOceanStyle();", "drawOceanDepthMaskLayer();"):
+        for token in ('{ type: "Sphere" }', "surface.getContext().fill();", "drawOceanStyle();", "drawOceanDepthMaskLayer();"):
             cursor = background.find(token, cursor + 1)
             self.assertGreaterEqual(cursor, 0, token)
+        self.assertNotIn("state.oceanData", background)
         progressive = owner[owner.index("if (useProgressiveRecovery)") : owner.index("    return drawPoliticalBackgroundFillsForEntries(visibleEntries", owner.index("if (useProgressiveRecovery)"))]
         self.assertNotIn("drawAdmin0BackgroundFills(", progressive)
         cursor = -1

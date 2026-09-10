@@ -75,12 +75,15 @@ test("worker wait releases recovery ownership and commits only after quiet admis
   let resolve; let commits = 0;
   const h = harness({ buildDeferredBorderMeshesAsync: () => new Promise((done) => { resolve = done; }),
     commitDeferredBorderMeshes: () => { commits += 1; return true; } });
+  assert.equal(h.owner.hasPendingWork(), false);
   h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+  assert.equal(h.owner.hasPendingWork(), true, "awaiting the worker remains observable after the timer runs");
   assert.equal(h.events.filter(([name]) => name === "end").length, 1);
   assert.equal(h.pending.size, 0);
   resolve({}); for (let i = 0; i < 6; i++) await Promise.resolve();
   h.setSettled(false); h.run(); assert.equal(commits, 0);
   h.setSettled(true); h.drain(); assert.equal(commits, 1);
+  assert.equal(h.owner.hasPendingWork(), false);
   assert.equal(h.events.some(([name]) => name === "country"), false);
 });
 

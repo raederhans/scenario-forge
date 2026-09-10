@@ -45817,7 +45817,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 571365,
+      "size_bytes": 571762,
       "source_kind": "dist"
     },
     {
@@ -46132,7 +46132,7 @@
     },
     {
       "path": "app/js/core/renderer/geometry_raster_runtime_owner.js",
-      "size_bytes": 8806,
+      "size_bytes": 8852,
       "source_kind": "dist"
     },
     {
@@ -46202,7 +46202,7 @@
     },
     {
       "path": "app/js/core/renderer/political_background_render_owner.js",
-      "size_bytes": 52656,
+      "size_bytes": 51505,
       "source_kind": "dist"
     },
     {
@@ -46402,7 +46402,7 @@
     },
     {
       "path": "app/js/core/renderer/static_border_mesh_lifecycle.js",
-      "size_bytes": 14445,
+      "size_bytes": 14521,
       "source_kind": "dist"
     },
     {
@@ -48042,7 +48042,7 @@
       {
         "file_count": 260,
         "id": "startup-critical",
-        "size_bytes": 5405430
+        "size_bytes": 5404798
       },
       {
         "file_count": 96,
@@ -65054,11 +65054,11 @@
         "deferred_graph_file_count": 126,
         "deferred_module_count": 124,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5390836,
+        "initial_graph_bytes": 5390204,
         "initial_graph_file_count": 294,
         "initial_module_count": 281,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4123432,
+        "initial_script_bytes": 4122800,
         "initial_script_count": 283,
         "module_count": 412,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65247,7 +65247,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 571365
+            "size_bytes": 571762
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -65471,7 +65471,7 @@
           },
           {
             "path": "app/js/core/renderer/geometry_raster_runtime_owner.js",
-            "size_bytes": 8806
+            "size_bytes": 8852
           },
           {
             "path": "app/js/core/renderer/geometry_raster_worker_kernel.js",
@@ -65527,7 +65527,7 @@
           },
           {
             "path": "app/js/core/renderer/political_background_render_owner.js",
-            "size_bytes": 52656
+            "size_bytes": 51505
           },
           {
             "path": "app/js/core/renderer/political_collection_owner.js",
@@ -65671,7 +65671,7 @@
           },
           {
             "path": "app/js/core/renderer/static_border_mesh_lifecycle.js",
-            "size_bytes": 14445
+            "size_bytes": 14521
           },
           {
             "path": "app/js/core/renderer/strategic_choropleth.js",
@@ -66019,7 +66019,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3070813
+        "size_bytes": 3070181
       },
       {
         "basis": "startup-resource-graph",
@@ -67740,7 +67740,7 @@
     {
       "file_count": 9523,
       "path": "app",
-      "size_bytes": 959152214
+      "size_bytes": 959151582
     },
     {
       "file_count": 57,
@@ -67773,5 +67773,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 966139456
+  "total_bytes": 966138824
 }

@@ -35,6 +35,7 @@ function fixture({ injectedClient = null } = {}) {
 }
 test("prepare gates, forced exact preparation, dimensions and fine-only drawing preserve style ports", async () => {
   const f = fixture();
+  assert.equal(f.owner.getPendingWorkCount(), 0);
   f.state.renderPhase = "interacting";
   assert.equal(f.owner.prepareFrame(), false);
   f.state.renderPhase = "idle"; f.state.deferExactAfterSettle = true;
@@ -43,12 +44,14 @@ test("prepare gates, forced exact preparation, dimensions and fine-only drawing 
   assert.equal(f.owner.prepareFrame(), false);
   const pending = f.owner.preparePolitical({ force: true });
   assert.ok(pending instanceof Promise);
+  assert.equal(f.owner.getPendingWorkCount(), 1);
   assert.equal(f.requests[0].input.width, 126);
   assert.equal(f.requests[0].input.height, 128);
   assert.equal(f.requests[0].input.entries[0].strokeColor, "#987654");
   assert.equal(f.requests[0].input.entries[0].lineWidth, 0.375);
   assert.equal(f.paints.length, 0, "preparation never clears or draws the visible frame");
   const bitmap = f.finish(0); await pending;
+  assert.equal(f.owner.getPendingWorkCount(), 0);
   f.paints.push("background");
   assert.equal(f.owner.drawPolitical().renderedCount, 1);
   assert.deepEqual(f.paints, ["background", bitmap]);

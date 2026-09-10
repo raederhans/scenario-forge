@@ -413,10 +413,10 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('path.join(options.rawDir, "perf-admission.json")', runner)
         self.assertLess(
             runner.index('const baselineOracle = await readJsonAndSha256Strict(options.baselineJson, "baseline report");'),
-            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson);"),
+            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);"),
         )
         self.assertLess(
-            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson);"),
+            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);"),
             runner.index("const environmentAdmission = await runStandardPerfAdmission(options);"),
         )
         self.assertIn("baselineReportForGate = baselineOracle.payload;", runner)
@@ -482,12 +482,46 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("pathToFileURL", analyzer)
         self.assertEqual(
             package_payload["scripts"].get("test:node:render-sample-role-policy"),
-            "node --test tests/render_sample_role_policy_behavior.test.mjs tests/perf_role_governed_report_behavior.test.mjs",
+            "node --test tests/render_sample_role_policy_behavior.test.mjs tests/perf_role_governed_report_behavior.test.mjs tests/standard_perf_settlement_role_behavior.test.mjs",
         )
         self.assertEqual(
             package_payload["scripts"].get("perf:analyze-render-sample-roles"),
             "node tools/perf/analyze_render_sample_roles.mjs",
         )
+
+    def test_new_standard_profile_observes_initial_promotion_through_real_settlement(self):
+        runner = PERF_SCRIPT.read_text(encoding="utf-8")
+        policy = RENDER_SAMPLE_ROLE_POLICY.read_text(encoding="utf-8")
+        self.assertIn('SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID = "standard-perf-5-run-v2"', policy)
+        self.assertIn('SETTLED_RENDER_SAMPLE_ROLE_POLICY_ID = "render-sample-role-v3"', policy)
+        self.assertIn('SETTLED_CANONICAL_RENDER_SAMPLE_ROLE_ID = "initial-scenario-frame-through-startup-settlement-v1"', policy)
+        self.assertIn("renderSampleRunProfileId: SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID", runner)
+        # The old profile remains the default for historical analysis, while
+        # new CLI measurements explicitly opt into the versioned settled role.
+        self.assertIn("runProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID", policy)
+        for token in (
+            '"initial-promotion-bound"',
+            '"initial-frame-anchor"',
+            '"initial-sample-prefix-unchanged"',
+            '"promotion-observation-history"',
+            '"post-canonical-same-scenario-idle"',
+            '"settlement-binds-samples"',
+            '"settlement-after-last-frame"',
+            "candidate.durationMs + subsequentRenderCpuMs",
+        ):
+            self.assertIn(token, policy)
+        measurement = runner.split("async function measureOneRun(", 1)[1].split("async function waitForPerfSnapshotReady(", 1)[0]
+        settled_branch, legacy_branch = measurement.split("} else {", 1)
+        self.assertIn("waitForStandardPerfSettlement(", settled_branch)
+        self.assertNotIn("waitForPerfSnapshotReady(", settled_branch)
+        self.assertIn("waitForPerfSnapshotReady(", legacy_branch)
+        self.assertIn("initialPromotion, initialFrameSequence, initialSamplePrefix, promotionObservations", runner)
+        self.assertIn("inspectStandardPerfSettlement(settlement?.status, scenarioId)", runner)
+        self.assertIn("same measurement contract", runner)
+        self.assertIn("canonicalRenderSampleMs: renderSampleRole.canonicalRenderSampleMs", runner)
+        self.assertIn('key: "canonicalRenderSampleMs", label: "scenario render CPU through settlement"', runner)
+        self.assertIn('key: "renderSampleMedianMs", label: "renderSampleMedianMs", threshold: 1.25', runner)
+        self.assertIn("threshold: 1.15", runner)
 
     def test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields(self):
         baseline_payload = json.loads(BASELINE_JSON.read_text(encoding="utf-8"))

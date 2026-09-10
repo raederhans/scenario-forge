@@ -14704,6 +14704,15 @@ function refreshMapDataForScenarioApply(options = {}) {
 // 2) 这里按 consumer lane 分组公开 stable facade，owner-backed 细节继续留在模块内部。
 export { RENDER_PASS_NAMES } from "./map_renderer/render_pass_catalog.js";
 
+// Read existing owners only: observing completion must never schedule work.
+export function getRendererAsyncWorkStatus() {
+  return {
+    geometryPendingCount: geometryRasterRuntimeOwner?.getPendingWorkCount() || 0,
+    borderScheduled: staticBorderMeshLifecycle?.hasPendingWork() || false,
+    exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
+  };
+}
+
 export {
   // Core render lifecycle facade.
   initMap,

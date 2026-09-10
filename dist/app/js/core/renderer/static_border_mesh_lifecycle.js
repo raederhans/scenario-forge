@@ -314,6 +314,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
   }
 
   return Object.freeze({
+    hasPendingWork: () => !!deferredHeavyBorderMeshHandle || !!workerAbort,
     buildDetailAdmMeshSignature,
     getVisibleCountryCodesForBorderMeshes,
     cancelDeferredHeavyBorderMeshes,
